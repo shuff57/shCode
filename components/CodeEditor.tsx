@@ -22,7 +22,7 @@ export default function CodeEditor() {
         value={value}
         onChange={(v) => updateFile(currentFile, v || '')}
         theme="vs-dark"
-        options={{ minimap: { enabled: false } }}
+        options={{ minimap: { enabled: false }, automaticLayout: true }}
       />
     </div>
   );
