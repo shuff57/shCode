@@ -1,7 +1,6 @@
 {
   "name": "shcode",
   "version": "1.0.0",
-  "description": "",
   "main": "server.js",
   "scripts": {
     "dev": "node server.js",
@@ -9,14 +8,22 @@
     "start": "NODE_ENV=production node server.js",
     "test": "echo \"No tests\""
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
     "express": "^4.21.2",
     "next": "^15.4.6",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^5.5.4"
   }
 }
