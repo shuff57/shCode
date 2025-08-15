@@ -133,6 +133,13 @@ require(['vs/editor/editor.main'], function () {
   const fileList = document.getElementById('fileList');
   const files = {};
 
+  const toggleBtn = document.getElementById('sidebarToggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
+  }
+
   // Auto-open sidebar when mouse is near the left edge
   document.addEventListener('mousemove', (e) => {
     if (e.clientX <= 10) {
