@@ -191,3 +191,102 @@ details.editor-card > summary:hover::before {
   z-index: 5;
   background: transparent;
 }
+
+/* Sidebar */
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 240px;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  padding: 10px;
+  box-sizing: border-box;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+#sidebar.open {
+  transform: translateX(0);
+}
+
+#sidebarToggle {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 101;
+  background: var(--brand);
+  color: #000;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#fileList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#fileList li {
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  border: 1px solid var(--border);
+  background: var(--muted);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#fileList li.dragging {
+  opacity: 0.5;
+}
+
+.drop-hint {
+  font-size: 0.9rem;
+  color: var(--text);
+  opacity: 0.7;
+  margin-top: 10px;
+}
+
+/* Autograder badge layout + icon sizing */
+.req-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+}
+.req-status svg {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  stroke-width: 2.25; /* a bit bolder for visibility */
+}
+
+/* These color rules already exist for text; SVGs inherit currentColor */
+/* .requirement.pass .req-status { color: #a5d6a7; }
+   .requirement.fail .req-status { color: #ff8a80; } */
+
+/* --- Autograder UI --- */
+.requirement { position: relative; }
+.requirement.pass { border-color: #2e7d32; box-shadow: 0 2px 8px rgba(46,125,50,.25); }
+.requirement.fail { border-color: #b00020; box-shadow: 0 2px 8px rgba(176,0,32,.2); }
+
+.req-status {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #2a2a2a;
+  border: 1px solid var(--border);
+  opacity: .95;
+  font-family: 'Courier New', monospace;
+}
+.requirement.pass .req-status { color: #a5d6a7; border-color: #2e7d32; }
+.requirement.fail .req-status { color: #ff8a80; border-color: #b00020; }

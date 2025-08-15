@@ -8,6 +8,12 @@
 </head>
 
 <body>
+  <button id="sidebarToggle" aria-label="Toggle file explorer">☰</button>
+  <aside id="sidebar" aria-label="File explorer">
+    <h2>Files</h2>
+    <ul id="fileList"></ul>
+    <p class="drop-hint">Drag files here</p>
+  </aside>
   <!-- Collapsible “card” with editor + live preview + resizer -->
   <details class="editor-card" open>
     <summary>Starter Code & Live Preview</summary>
@@ -73,8 +79,7 @@
   <!-- Monaco Editor loader -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
   <script src="app.js"></script>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  <script src="autograder.js"></script>
+<script src="https://unpkg.com/lucide@0.44.0/dist/umd/lucide.js"></script>  <script src="autograder.js"></script>
 
   
   
