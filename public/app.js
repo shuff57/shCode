@@ -130,12 +130,16 @@ require(['vs/editor/editor.main'], function () {
 
   // ----- Sidebar toggle and file explorer -----
   const sidebar = document.getElementById('sidebar');
-  const toggleBtn = document.getElementById('sidebarToggle');
   const fileList = document.getElementById('fileList');
   const files = {};
 
-  toggleBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
+  // Auto-open sidebar when mouse is near the left edge
+  document.addEventListener('mousemove', (e) => {
+    if (e.clientX <= 10) {
+      sidebar.classList.add('open');
+    } else if (!sidebar.matches(':hover')) {
+      sidebar.classList.remove('open');
+    }
   });
 
   function addFile(file) {
