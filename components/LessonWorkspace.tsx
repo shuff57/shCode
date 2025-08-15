@@ -61,13 +61,9 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
       <div id="titleRow">
         <h1 className="text-2xl font-bold">{lesson.title}</h1>
       </div>
-      <div
-        id="workspace"
-        className="grid gap-4"
-        style={{ gridTemplateColumns: ui.sidebarOpen ? '250px 1fr 1fr' : '1fr 1fr' }}
-      >
+      <div id="workspace" className="gap-4">
         {ui.sidebarOpen && (
-          <div id="sidebar" className="border p-2 flex flex-col">
+          <div id="sidebar" className="border p-2 flex flex-col w-64">
             <div className="flex mb-2 space-x-2 text-sm sidebar-tabs">
               <button
                 className={ui.activeSidebarTab === 'Files' ? 'font-bold' : ''}
