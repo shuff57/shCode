@@ -27,6 +27,35 @@ app.prepare().then(() => {
         status: hasLog ? 'passed' : 'failed',
         messages: hasLog ? [] : ['Missing console.log("hi")'],
       });
+    } else if (lessonId === 'basic-html') {
+      const html = files?.['index.html'] || '';
+      const hasH1 = /<h1[^>]*>.*<\/h1>/i.test(html);
+      const hasP = /<p[^>]*>.*<\/p>/i.test(html);
+      results.push({
+        id: 'req1',
+        status: hasH1 ? 'passed' : 'failed',
+        messages: hasH1 ? [] : ['Missing <h1> element'],
+      });
+      results.push({
+        id: 'req2',
+        status: hasP ? 'passed' : 'failed',
+        messages: hasP ? [] : ['Missing <p> element'],
+      });
+    } else if (lessonId === 'debug-camper-bot') {
+      const html = files?.['index.html'] || '';
+      const js = files?.['script.js'] || '';
+      const hasAlt = /<img[^>]*alt=['"]Camper Bot['"][^>]*>/i.test(html);
+      const hasLog = /console\.log\(['"]Camper Bot ready['"]\)/.test(js);
+      results.push({
+        id: 'req1',
+        status: hasAlt ? 'passed' : 'failed',
+        messages: hasAlt ? [] : ['Image missing alt="Camper Bot"'],
+      });
+      results.push({
+        id: 'req2',
+        status: hasLog ? 'passed' : 'failed',
+        messages: hasLog ? [] : ['Missing console.log("Camper Bot ready")'],
+      });
     }
     res.json(results);
   });
