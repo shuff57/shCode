@@ -213,19 +213,6 @@ details.editor-card > summary:hover::before {
   transform: translateX(0);
 }
 
-#sidebarToggle {
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  z-index: 101;
-  background: var(--brand);
-  color: #000;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
 #fileList {
   list-style: none;
   padding: 0;
