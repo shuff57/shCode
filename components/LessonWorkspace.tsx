@@ -57,48 +57,56 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
   };
 
   return (
-    <div className="space-y-4">
+    <>
       <div id="titleRow">
-        <h1 className="text-2xl font-bold">{lesson.title}</h1>
+        <h1>{lesson.title}</h1>
       </div>
-      <div
-        id="workspace"
-        className="grid gap-4"
-        style={{ gridTemplateColumns: ui.sidebarOpen ? '250px 1fr 1fr' : '1fr 1fr' }}
-      >
-        {ui.sidebarOpen && (
-          <div id="sidebar" className="border p-2 flex flex-col">
-            <div className="flex mb-2 space-x-2 text-sm sidebar-tabs">
-              <button
-                className={ui.activeSidebarTab === 'Files' ? 'font-bold' : ''}
-                onClick={() => setActiveTab('Files')}
-              >
-                Files
-              </button>
-              <button
-                className={ui.activeSidebarTab === 'Steps' ? 'font-bold' : ''}
-                onClick={() => setActiveTab('Steps')}
-              >
-                Steps
-              </button>
+      <aside id="sidebar" className={ui.sidebarOpen ? 'open' : ''} aria-label="File explorer">
+        <div className="sidebar-tabs">
+          <button
+            style={ui.activeSidebarTab === 'Files' ? { fontWeight: 'bold' } : {}}
+            onClick={() => setActiveTab('Files')}
+          >
+            Files
+          </button>
+          <button
+            style={ui.activeSidebarTab === 'Steps' ? { fontWeight: 'bold' } : {}}
+            onClick={() => setActiveTab('Steps')}
+          >
+            Steps
+          </button>
+        </div>
+        <div className="sidebar-content">
+          {ui.activeSidebarTab === 'Files' ? (
+            <FileExplorer tree={lesson.files} />
+          ) : (
+            <LessonSteps lesson={lesson} />
+          )}
+        </div>
+      </aside>
+      <details className="editor-card" open>
+        <summary>Starter Code & Live Preview</summary>
+        <div className="editor-body">
+          <div className="editor-preview-container" id="split">
+            <div className="pane" id="editorPane">
+              <CodeEditor />
             </div>
-            <div className="flex-1 overflow-auto sidebar-content">
-              {ui.activeSidebarTab === 'Files' ? (
-                <FileExplorer tree={lesson.files} />
-              ) : (
-                <LessonSteps lesson={lesson} />
-              )}
+            <div
+              className="divider"
+              id="divider"
+              tabIndex={0}
+              aria-label="Resize editor and preview"
+            >
+              <span className="drag-handle" aria-hidden="true"></span>
             </div>
+            <div className="pane" id="previewPane">
+              <LivePreview srcDoc={srcDoc} />
+            </div>
+            <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
           </div>
-        )}
-        <div id="editorPane" className="h-96 md:h-auto pane">
-          <CodeEditor />
         </div>
-        <div id="previewPane" className="h-96 md:h-auto pane">
-          <LivePreview srcDoc={srcDoc} />
-        </div>
-      </div>
-      <button onClick={toggleSidebar} className="px-2 py-1 border rounded">
+      </details>
+      <button onClick={toggleSidebar}>
         {ui.sidebarOpen ? 'Hide Sidebar' : 'Show Sidebar'}
       </button>
       <RequirementsSection
@@ -106,6 +114,6 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
         summary={summary}
         onRerun={runTests}
       />
-    </div>
+    </>
   );
 }
