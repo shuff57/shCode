@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Debug Exercise with Resizable Live Editor</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <!-- Collapsible “card” with editor + live preview + resizer -->
+  <details class="editor-card" open>
+    <summary>Starter Code & Live Preview</summary>
+    <div class="editor-body">
+      <div class="editor-preview-container" id="split">
+        <div class="pane" id="editorPane">
+          <div id="editor"></div>
+        </div>
+        <div class="divider" id="divider" tabindex="0" aria-label="Resize editor and preview">
+          <span class="drag-handle" aria-hidden="true"></span>
+        </div>
+        <div class="pane" id="previewPane">
+          <iframe id="preview" title="Live Preview"></iframe>
+        </div>
+        <div class="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
+      </div>
+    </div>
+  </details>
+
+  <h2>Requirements to Pass</h2>
+
+  <div class="requirement">
+    <h3>Requirement 1</h3>
+    <p>You should have exactly one <code>h1</code> element on the page.</p>
+  </div>
+  <div class="requirement">
+    <h3>Requirement 2</h3>
+    <p>You should not remove the <code>&lt;h1&gt;Hello from Camperbot!&lt;/h1&gt;</code> element from the page.</p>
+  </div>
+  <div class="requirement">
+    <h3>Requirement 3</h3>
+    <p>You should have exactly one <code>h2</code> element on the page.</p>
+  </div>
+  <div class="requirement">
+    <h3>Requirement 4</h3>
+    <p>You should have an <code>h2</code> element with the text "About".</p>
+  </div>
+  <div class="requirement">
+    <h3>Requirement 5</h3>
+    <p>You should have a paragraph element with the text "My name is Camperbot and I love learning new things."</p>
+  </div>
+  <div class="requirement">
+    <h3>Requirement 6</h3>
+    <p>You should have a paragraph element with the text "I enjoy solving puzzles."</p>
+  </div>
+  <div class="requirement">
+    <h3>Requirement 7</h3>
+    <p>You should have exactly two paragraph elements on the page.</p>
+  </div>
+  <div class="requirement">
+    <h3>Requirement 8</h3>
+    <p>You should have exactly one <code>h3</code> element on the page.</p>
+  </div>
+  <div class="requirement">
+    <h3>Requirement 9</h3>
+    <p>You should have an <code>h3</code> element with the text "Background and Interests".</p>
+  </div>
+  <div class="requirement">
+    <h3>Requirement 10</h3>
+    <p>You should have exactly five total elements on the page.</p>
+  </div>
+
+  <!-- Monaco Editor loader -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+  <script src="app.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="autograder.js"></script>
+
+  
+  
+</body>
+</html>

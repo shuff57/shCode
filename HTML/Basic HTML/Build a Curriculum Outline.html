@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>freeCodeCamp Tutorial</title>
+    <style>
+        /* Basic Body Styles */
+        body {
+            background-color: #1b1b32;
+            color: #f5f6f7;
+            font-family: 'Helvetica', sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* Step Container */
+        .step {
+            background-color: #3b3b4f;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #99a9d3;
+        }
+
+        /* Step Title */
+        .step h3 {
+            margin-top: 0;
+            color: #f5f6f7;
+        }
+
+        /* Inline Code Styling */
+        code {
+            background-color: #2a2a40;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* Code Block Styling */
+        pre > code {
+            display: block;
+            padding: 15px;
+            background-color: #0a0a23;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+
+        /* Collapsible Details Styling */
+        summary {
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="step">
+        <h3>Step 1 ✓</h3>
+        <p>
+            Every HTML page starts with some standard boilerplate code. The <code>&lt;!DOCTYPE html&gt;</code> declaration tells the browser that the document is an HTML5 file. The <code>&lt;html&gt;</code> element is the root element that encloses all the content on the page.
+        </p>
+        <details open>
+            <summary>Example Code</summary>
+            <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+
+&lt;/html&gt;</code></pre>
+        </details>
+        <p>
+            To begin, add the <code>&lt;!DOCTYPE html&gt;</code> declaration to the top of your file, followed by an opening and closing <code>&lt;html&gt;</code> tag.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>Step 2 ✓</h3>
+        <p>
+            The <code>&lt;head&gt;</code> element is a container for metadata (data about the HTML document) and is placed between the <code>&lt;html&gt;</code> and <code>&lt;body&gt;</code> tags. Adding a <code>lang="en"</code> attribute to the opening <code>&lt;html&gt;</code> tag is important for accessibility, as it tells screen readers and browsers that the page is in English.
+        </p>
+        <details open>
+            <summary>Example Code</summary>
+            <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+
+  &lt;/head&gt;
+&lt;/html&gt;</code></pre>
+        </details>
+        <p>
+            Add a <code>&lt;head&gt;</code> element inside the <code>&lt;html&gt;</code> element. Also, add the <code>lang</code> attribute with a value of <code>en</code> to your opening <code>&lt;html&gt;</code> tag.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>Step 3 ✓</h3>
+        <p>
+            Inside the <code>&lt;head&gt;</code>, we add important metadata. The <code>&lt;meta charset="UTF-8"&gt;</code> tag specifies the character encoding for the document, ensuring that text displays correctly across different devices. The <code>&lt;title&gt;</code> element sets the title of the page, which is shown in the browser's title bar or tab.
+        </p>
+        <details open>
+            <summary>Example Code</summary>
+            <pre><code>&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Full Stack Curriculum&lt;/title&gt;
+&lt;/head&gt;</code></pre>
+        </details>
+        <p>
+            Inside your <code>&lt;head&gt;</code> element, add a <code>&lt;meta&gt;</code> tag with the <code>charset</code> attribute set to <code>UTF-8</code>, and a <code>&lt;title&gt;</code> element with your desired text.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>Step 4 ✓</h3>
+        <p>
+            The <code>&lt;body&gt;</code> element contains all the visible content of a webpage, like headings, paragraphs, images, and links. It comes after the closing <code>&lt;/head&gt;</code> tag.
+        </p>
+        <details open>
+            <summary>Example Code</summary>
+            <pre><code>...
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;/body&gt;
+...</code></pre>
+        </details>
+        <p>
+            After your closing <code>&lt;/head&gt;</code> tag, add an opening and closing <code>&lt;body&gt;</code> tag.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>Step 5 ✓</h3>
+        <p>
+            The <code>&lt;h1&gt;</code> element is used for the main heading of a page. There should typically only be one <code>&lt;h1&gt;</code> per page, as it tells search engines and assistive technologies what the most important title on the page is.
+        </p>
+        <details open>
+            <summary>Example Code</summary>
+            <pre><code>&lt;body&gt;
+  &lt;h1&gt;Welcome to freeCodeCamp&lt;/h1&gt;
+&lt;/body&gt;</code></pre>
+        </details>
+        <p>
+            Inside your <code>&lt;body&gt;</code>, add an <code>&lt;h1&gt;</code> element with the text <code>Welcome to freeCodeCamp</code>.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>Step 6 ✓</h3>
+        <p>
+            HTML provides six levels of headings, from <code>&lt;h1&gt;</code> to <code>&lt;h6&gt;</code>. These are used to create a hierarchical structure. An <code>&lt;h2&gt;</code> is a subheading under an <code>&lt;h1&gt;</code>.
+        </p>
+        <details open>
+            <summary>Example Code</summary>
+            <pre><code>&lt;h1&gt;Welcome to freeCodeCamp&lt;/h1&gt;
+&lt;h2&gt;Full Stack Curriculum&lt;/h2&gt;</code></pre>
+        </details>
+        <p>
+            Below your <code>&lt;h1&gt;</code> element, add an <code>&lt;h2&gt;</code> element with the text <code>Full Stack Curriculum</code>.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>Step 7 ✓</h3>
+        <p>
+            The <code>&lt;p&gt;</code> element is used for paragraphs of text. It's a fundamental block-level element for displaying most text content on a webpage.
+        </p>
+        <details open>
+            <summary>Example Code</summary>
+            <pre><code>&lt;h2&gt;Full Stack Curriculum&lt;/h2&gt;
+&lt;p&gt;Learn the skills to become a full stack developer&lt;/p&gt;</code></pre>
+        </details>
+        <p>
+            Add a <code>&lt;p&gt;</code> element after your <code>&lt;h2&gt;</code> and give it the text <code>Learn the skills to become a full stack developer</code>.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>Step 8 ✓</h3>
+        <p>
+            Now we will create the different sections of the curriculum. Each section will consist of a heading (we'll continue using <code>&lt;h2&gt;</code> for consistency) and a descriptive paragraph (<code>&lt;p&gt;</code>).
+        </p>
+        <details open>
+            <summary>Example Code</summary>
+            <pre><code>&lt;h2&gt;Introduction to HTML&lt;/h2&gt;
+&lt;p&gt;HTML represents the content and structure of a webpage&lt;/p&gt;</code></pre>
+        </details>
+        <p>
+            Create the HTML section by adding an <code>&lt;h2&gt;</code> with the text <code>Introduction to HTML</code> followed by a <code>&lt;p&gt;</code> with the text <code>HTML represents the content and structure of a webpage</code>.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>Step 9 ✓</h3>
+        <p>
+            Let's continue the pattern from the previous step to add the section for CSS. This reinforces the structure of the page, making it easy to read both for users and for developers looking at the code.
+        </p>
+        <details open>
+            <summary>Example Code</summary>
+            <pre><code>&lt;h2&gt;Introduction to CSS&lt;/h2&gt;
+&lt;p&gt;CSS is used to style a webpage&lt;/p&gt;</code></pre>
+        </details>
+        <p>
+            Next, create the CSS section by adding an <code>&lt;h2&gt;</code> with the text <code>Introduction to CSS</code> followed by a <code>&lt;p&gt;</code> with the text <code>CSS is used to style a webpage</code>.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>Step 10 ✓</h3>
+        <p>
+            To complete the content, we will add the final section for JavaScript. This follows the same structure as the HTML and CSS sections, ensuring the document is well-organized.
+        </p>
+        <details open>
+            <summary>Example Code</summary>
+            <pre><code>&lt;h2&gt;Introduction to JavaScript&lt;/h2&gt;
+&lt;p&gt;JavaScript adds interactivity to a webpage&lt;/p&gt;</code></pre>
+        </details>
+        <p>
+            Finally, create the JavaScript section. Add an <code>&lt;h2&gt;</code> with the text <code>Introduction to JavaScript</code> followed by a <code>&lt;p&gt;</code> with the text <code>JavaScript adds interactivity to a webpage</code>.
+        </p>
+    </div>
+
+    <div class="step">
+        <h3>Step 11 ✓</h3>
+        <p>
+            The <code>&lt;main&gt;</code> element specifies the main content of a document. It should be unique to the document and not contain content that is repeated across pages (like sidebars or navigation bars). Wrapping our content in a <code>&lt;main&gt;</code> tag improves the semantics and accessibility of the page.
+        </p>
+        <details open>
+            <summary>Example Code</summary>
+            <pre><code>&lt;body&gt;
+  &lt;main&gt;
+    &lt;h1&gt;Welcome to freeCodeCamp&lt;/h1&gt;
+    &lt;h2&gt;Full Stack Curriculum&lt;/h2&gt;
+    ...
+  &lt;/main&gt;
+&lt;/body&gt;</code></pre>
+        </details>
+        <p>
+            For better semantics and accessibility, wrap all the elements currently inside your <code>&lt;body&gt;</code> (from the <code>&lt;h1&gt;</code> to the last <code>&lt;p&gt;</code>) within a <code>&lt;main&gt;</code> element.
+        </p>
+    </div>
+
+</body>
+</html>
