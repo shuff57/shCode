@@ -1,0 +1,56 @@
+{
+  "id": "debug-pet-adoption",
+  "title": "Fix Image and Link Attributes",
+  "description": "Practice correcting common HTML attribute mistakes for <img> and <a> elements.",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "steps": [
+    { "id": "s1", "title": "Give the <img> a src attribute" },
+    { "id": "s2", "title": "Add a proper alt attribute to the <img>" },
+    { "id": "s3", "title": "Remove the closing </img> tag" },
+    { "id": "s4", "title": "Fix the cats link to use href" },
+    { "id": "s5", "title": "Fix the dogs link to use href" }
+  ],
+  "requirements": [
+    {
+      "id": "req1",
+      "title": "img has src attribute",
+      "description": "Your img element should have a src attribute instead of the href attribute.",
+      "file": "index.html",
+      "pattern": "<img[^>]*\\bsrc\\s*=\\s*['\"][^'\"]+['\"][^>]*>",
+      "flags": "i"
+    },
+    {
+      "id": "req2",
+      "title": "img has alt attribute",
+      "description": "Your img element should have an alt attribute instead of the non-existent att attribute.",
+      "file": "index.html",
+      "pattern": "<img[^>]*\\balt\\s*=\\s*['\"][^'\"]+['\"][^>]*>",
+      "flags": "i"
+    },
+    {
+      "id": "req3",
+      "title": "No closing </img> tag",
+      "description": "Your img element should not have a </img> closing tag.",
+      "file": "index.html",
+      "pattern": "^(?![\\s\\S]*</\\s*img\\s*>)[\\s\\S]*$",
+      "flags": "is"
+    },
+    {
+      "id": "req4",
+      "title": "Cats link uses href",
+      "description": "Your a element with the text Visit cats page needs to have an href attribute instead of a src attribute.",
+      "file": "index.html",
+      "pattern": "<a[^>]*\\bhref\\s*=\\s*['\"][^'\"]+['\"][^>]*>\\s*Visit cats page\\s*</a>",
+      "flags": "i"
+    },
+    {
+      "id": "req5",
+      "title": "Dogs link uses href",
+      "description": "Your a element with the text Visit dogs page needs to have an href attribute instead of a src attribute.",
+      "file": "index.html",
+      "pattern": "<a[^>]*\\bhref\\s*=\\s*['\"][^'\"]+['\"][^>]*>\\s*Visit dogs page\\s*</a>",
+      "flags": "i"
+    }
+  ]
+}
