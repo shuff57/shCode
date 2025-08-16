@@ -166,60 +166,7 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
       <div id="titleRow">
         <h1>{lesson.title}</h1>
       </div>
-      <div
-        id="sidebarHover"
-        aria-hidden="true"
-        onMouseEnter={() => setSidebarOpen(true)}
-        onMouseLeave={(e) => {
-          const sidebar = document.getElementById('sidebar');
-          if (!sidebar?.contains(e.relatedTarget as Node)) {
-            setSidebarOpen(false);
-          }
-        }}
-      ></div>
-      <aside
-        id="sidebar"
-        className={ui.sidebarOpen ? 'open' : ''}
-        aria-label="File explorer"
-        onMouseEnter={() => setSidebarOpen(true)}
-        onMouseLeave={() => setSidebarOpen(false)}
-      >
-        <div className="sidebar-tabs">
-          <button
-            style={ui.activeSidebarTab === 'Files' ? { fontWeight: 'bold' } : {}}
-            onClick={() => setActiveTab('Files')}
-          >
-            Files
-          </button>
-          <button
-            style={ui.activeSidebarTab === 'Steps' ? { fontWeight: 'bold' } : {}}
-            onClick={() => setActiveTab('Steps')}
-          >
-            Steps
-          </button>
-        </div>
-        <div className="sidebar-content">
-          {ui.activeSidebarTab === 'Files' ? (
-            <FileExplorer tree={lesson.files} />
-          ) : (
-            <LessonSteps lesson={lesson} />
-          )}
-        </div>
-      </aside>
-      <details className="editor-card" open>
-        <summary>Starter Code & Live Preview</summary>
-        <div className="editor-body">
-          <div className="editor-preview-container" id="split">
-            <div className="pane" id="editorPane">
-              <CodeEditor />
-            </div>
-            <div
-              className="divider"
-              id="divider"
-              tabIndex={0}
-              aria-label="Resize editor and preview"
-            >
-              <span className="drag-handle" aria-hidden="true"></span>
+
             </div>
             <div className="pane" id="previewPane">
               <LivePreview srcDoc={srcDoc} />
