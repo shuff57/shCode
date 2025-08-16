@@ -17,8 +17,9 @@ export default function CodeEditor() {
       <Editor
         key={currentFile}
         height="100%"
-        defaultLanguage={lang}
-        defaultValue={value}
+        width="100%"
+        language={lang}
+        value={value}
         path={currentFile}
         onChange={(v) => updateFile(currentFile, v || '')}
         theme="vs-dark"
