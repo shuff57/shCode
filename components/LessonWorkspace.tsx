@@ -172,7 +172,8 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
         onMouseEnter={() => setSidebarOpen(true)}
         onMouseLeave={(e) => {
           const sidebar = document.getElementById('sidebar');
-          if (!sidebar?.contains(e.relatedTarget as Node)) {
+          const to = e.relatedTarget;
+          if (!sidebar || !(to instanceof Node) || !sidebar.contains(to)) {
             setSidebarOpen(false);
           }
         }}
