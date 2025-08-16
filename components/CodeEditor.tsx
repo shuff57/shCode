@@ -7,20 +7,19 @@ export default function CodeEditor() {
   const value = useLessonStore((s) => (currentFile ? s.fileContents[currentFile] : ''));
   const updateFile = useLessonStore((s) => s.updateFile);
   if (!currentFile) return <div>No file selected</div>;
+  const lang = currentFile.endsWith('.css')
+    ? 'css'
+    : currentFile.endsWith('.js')
+    ? 'javascript'
+    : 'html';
   return (
     <div id="editor">
       <Editor
         key={currentFile}
         height="100%"
-        language={
-          currentFile.endsWith('.css')
-            ? 'css'
-            : currentFile.endsWith('.js')
-            ? 'javascript'
-            : 'html'
-        }
+        defaultLanguage={lang}
+        defaultValue={value}
         path={currentFile}
-        value={value}
         onChange={(v) => updateFile(currentFile, v || '')}
         theme="vs-dark"
         options={{ minimap: { enabled: false }, automaticLayout: true }}
