@@ -12,7 +12,7 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
   const setLesson = useLessonStore((s) => s.setLesson);
   const files = useLessonStore((s) => s.fileContents);
   const ui = useLessonStore((s) => s.ui);
-  const toggleSidebar = useLessonStore((s) => s.toggleSidebar);
+  const setSidebarOpen = useLessonStore((s) => s.setSidebarOpen);
   const setActiveTab = useLessonStore((s) => s.setActiveTab);
   const requirements = useLessonStore((s) => s.requirements);
   const setRequirements = useLessonStore((s) => s.setRequirements);
@@ -166,7 +166,24 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
       <div id="titleRow">
         <h1>{lesson.title}</h1>
       </div>
-      <aside id="sidebar" className={ui.sidebarOpen ? 'open' : ''} aria-label="File explorer">
+      <div
+        id="sidebarHover"
+        aria-hidden="true"
+        onMouseEnter={() => setSidebarOpen(true)}
+        onMouseLeave={(e) => {
+          const sidebar = document.getElementById('sidebar');
+          if (!sidebar?.contains(e.relatedTarget as Node)) {
+            setSidebarOpen(false);
+          }
+        }}
+      ></div>
+      <aside
+        id="sidebar"
+        className={ui.sidebarOpen ? 'open' : ''}
+        aria-label="File explorer"
+        onMouseEnter={() => setSidebarOpen(true)}
+        onMouseLeave={() => setSidebarOpen(false)}
+      >
         <div className="sidebar-tabs">
           <button
             style={ui.activeSidebarTab === 'Files' ? { fontWeight: 'bold' } : {}}
@@ -211,9 +228,6 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
           </div>
         </div>
       </details>
-      <button onClick={toggleSidebar}>
-        {ui.sidebarOpen ? 'Hide Sidebar' : 'Show Sidebar'}
-      </button>
       <RequirementsSection
         requirements={requirements}
         summary={summary}
