@@ -3,19 +3,20 @@
 @tailwind utilities;
 
 :root{
-  --bg: #121212;
+  --bg: #252525;
   --card: #1e1e1e;
   --border: #333;
   --muted: #2a2a2a;
-  --text: #e0e0e0;
+  --text: #cccccc;
   --brand: #5baafd;
 }
+
 
 /* Base */
 body {
   background-color: var(--bg);
   color: var(--text);
-  font-family: Arial, sans-serif;
+  font-family: 'Courier', monospace;
   line-height: 1.6;
   padding: 20px;
   display: flex;
@@ -36,7 +37,7 @@ code {
 .requirement {
   background-color: var(--card);
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 4px;
   border: 1px solid var(--border);
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
@@ -47,9 +48,9 @@ code {
 
 /* Collapsible editor card */
 details.editor-card {
-  background-color: #333333;               /* header background */
+  background-color: var(--card);               /* header background */
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
@@ -96,7 +97,7 @@ details.editor-card > summary:hover::before {
 /* Card body */
 .editor-body {
   background: var(--card);
-  border-top: 1px solid #444;
+  border-top: 1px solid var(--border);
   padding: 16px;
 }
 
@@ -107,7 +108,7 @@ details.editor-card > summary:hover::before {
   align-items: stretch;
   background-color: var(--card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   height: 420px;
   overflow: hidden;
@@ -119,5 +120,64 @@ details.editor-card > summary:hover::before {
   height: 100%;
   position: relative;
   display: flex;
+}
+
+#editor {
+  width: 100%;
+  height: 100%;
+}
+
+#preview {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+.divider {
+  flex: 0 0 6px;
+  background: var(--border);
+  cursor: col-resize;
+  position: relative;
+  z-index: 20;
+}
+
+.drag-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 24px;
+  background: var(--text);
+  border-radius: 1px;
+}
+
+.drag-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  cursor: col-resize;
+  z-index: 30;
+}
+
+/* Requirement status overlays */
+.requirement.pass {
+  border-left: 4px solid #16a34a;
+}
+
+.requirement.fail {
+  border-left: 4px solid #dc2626;
+}
+
+.requirement .req-status {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-weight: bold;
+}
+
+.lesson-grid {
+  grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
 }
 

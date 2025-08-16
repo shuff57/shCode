@@ -1,0 +1,93 @@
+{
+  "id": "build-a-cat-photo-app",
+  "title": "Build a Cat Photo App",
+  "description": "Create a simple, accessible Cat Photo App that showcases images, lists, and a submission form using semantic HTML and a touch of CSS.",
+  "difficulty": "beginner",
+  "estimateMins": 30,
+  "steps": [
+    { "id": "s1", "title": "Create the project folder and index.html" },
+    { "id": "s2", "title": "Add the HTML5 doctype" },
+    { "id": "s3", "title": "Open the <html> tag with a lang attribute" },
+    { "id": "s4", "title": "Add a <head> with meta charset and viewport" },
+    { "id": "s5", "title": "Set the page <title>" },
+    { "id": "s6", "title": "Link a stylesheet (style.css)" },
+    { "id": "s7", "title": "Add the <body> element" },
+    { "id": "s8", "title": "Insert a semantic <header> with the site name" },
+    { "id": "s9", "title": "Build a <nav> with in-page links" },
+    { "id": "s10", "title": "Add the <main> landmark" },
+    { "id": "s11", "title": "Create a hero section with an <h1>" },
+    { "id": "s12", "title": "Insert a hero cat image with descriptive alt text" },
+    { "id": "s13", "title": "Wrap the hero image in <figure> and add a <figcaption>" },
+    { "id": "s14", "title": "Add a “Cat Photos” section with an <h2>" },
+    { "id": "s15", "title": "Create a gallery list of cat thumbnails" },
+    { "id": "s16", "title": "Link each thumbnail to a full-size image" },
+    { "id": "s17", "title": "Add a “Cat Lists” section with an <h2>" },
+    { "id": "s18", "title": "List things cats love using an unordered list" },
+    { "id": "s19", "title": "Add an ordered list of top cat facts" },
+    { "id": "s20", "title": "Emphasize key words with <em> and <strong>" },
+    { "id": "s21", "title": "Add a cat quote using <blockquote> and cite" },
+    { "id": "s22", "title": "Create a “Cat Form” section with an <h2>" },
+    { "id": "s23", "title": "Add a <form> element with an action attribute" },
+    { "id": "s24", "title": "Group options in a <fieldset> for Indoor/Outdoor" },
+    { "id": "s25", "title": "Add two radio inputs sharing a name with labels" },
+    { "id": "s26", "title": "Add a <fieldset> for Personality checkboxes" },
+    { "id": "s27", "title": "Add three checkbox inputs with labels" },
+    { "id": "s28", "title": "Add a text input for photo URL with placeholder and required" },
+    { "id": "s29", "title": "Add a submit button" },
+    { "id": "s30", "title": "Associate labels and inputs using for/id" },
+    { "id": "s31", "title": "Give sections ids to anchor the nav links" },
+    { "id": "s32", "title": "Add a skip-to-main accessible link" },
+    { "id": "s33", "title": "Insert a semantic <footer> with copyright text" },
+    { "id": "s34", "title": "Mark external links with target=\"_blank\" and rel=\"noopener\"" },
+    { "id": "s35", "title": "Create style.css" },
+    { "id": "s36", "title": "Set base fonts, colors, and spacing" },
+    { "id": "s37", "title": "Style the header and navigation layout" },
+    { "id": "s38", "title": "Make gallery images responsive" },
+    { "id": "s39", "title": "Tidy list spacing and bullets" },
+    { "id": "s40", "title": "Style form controls and the submit button" },
+    { "id": "s41", "title": "Add a responsive layout with max-width and a media query" },
+    { "id": "s42", "title": "Validate HTML and polish copy" }
+  ],
+  "requirements": [
+    {
+      "id": "req1",
+      "title": "Headings",
+      "description": "Add at least one <h1> and one <h2> element.",
+      "file": "index.html",
+      "pattern": "<h1[\\s\\S]*>.*</h1>[\\s\\S]*<h2[\\s\\S]*>.*</h2>",
+      "flags": "is"
+    },
+    {
+      "id": "req2",
+      "title": "Paragraph",
+      "description": "Include at least one <p> element with text content.",
+      "file": "index.html",
+      "pattern": "<p[\\s\\S]*>.+</p>",
+      "flags": "is"
+    },
+    {
+      "id": "req3",
+      "title": "Image",
+      "description": "Add an <img> element with a src attribute and alt text.",
+      "file": "index.html",
+      "pattern": "<img[^>]*\\bsrc\\s*=\\s*['\"][^'\"]+['\"][^>]*\\balt\\s*=\\s*['\"][^'\"]+['\"][^>]*>",
+      "flags": "i"
+    },
+    {
+      "id": "req4",
+      "title": "Link",
+      "description": "Add an <a> element with an href attribute.",
+      "file": "index.html",
+      "pattern": "<a[^>]*\\bhref\\s*=\\s*['\"][^'\"]+['\"][^>]*>.*</a>",
+      "flags": "is"
+    },
+    {
+      "id": "req5",
+      "title": "List",
+      "description": "Include at least one <ul> or <ol> with <li> items inside.",
+      "file": "index.html",
+      "pattern": "<(ul|ol)[^>]*>\\s*<li[\\s\\S]*>.*</li>\\s*</\\1>",
+      "flags": "is"
+    }
+  ]
+}
