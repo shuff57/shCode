@@ -7,32 +7,31 @@ function FileItem({ node }: { node: FileNode }) {
   const currentFile = useLessonStore((s) => s.currentFile);
   if (node.type === 'folder') {
     return (
-      <div className="ml-2">
-        <div className="font-semibold">{node.name}</div>
-        <div className="ml-2">
+      <li>
+        <div>{node.name}</div>
+        <ul>
           {node.children?.map((child) => (
             <FileItem key={child.path} node={child} />
           ))}
-        </div>
-      </div>
+        </ul>
+      </li>
     );
   }
   return (
-    <div
-      className={`cursor-pointer ml-2 ${currentFile === node.path ? 'text-blue-500 font-bold' : ''}`}
+    <li
       onClick={() => selectFile(node.path)}
+      style={currentFile === node.path ? { color: 'var(--brand)', fontWeight: 'bold' } : {}}
     >
       {node.name}
-    </div>
+    </li>
   );
 }
 
 export default function FileExplorer({ tree }: { tree: FileNode[] }) {
   return (
-    <div>
-      {tree.map((node) => (
-        <FileItem key={node.path} node={node} />
-      ))}
-    </div>
+    <>
+      <ul id="fileList">{tree.map((node) => <FileItem key={node.path} node={node} />)}</ul>
+      <p className="drop-hint">Drag files here</p>
+    </>
   );
 }

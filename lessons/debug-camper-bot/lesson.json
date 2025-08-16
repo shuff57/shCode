@@ -1,0 +1,29 @@
+{
+  "id": "debug-camper-bot",
+  "title": "Debug Camper Bot",
+  "description": "Fix the Camper Bot markup and script",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "steps": [
+    { "id": "s1", "title": "Add alt text to image" },
+    { "id": "s2", "title": "Log readiness" }
+  ],
+  "requirements": [
+    {
+      "id": "req1",
+      "title": "Image has alt",
+      "description": "Image element has alt=\"Camper Bot\"",
+      "file": "index.html",
+      "pattern": "<img[^>]*alt=['\"]Camper Bot['\"][^>]*>",
+      "flags": "i"
+    },
+    {
+      "id": "req2",
+      "title": "Log ready",
+      "description": "script logs \"Camper Bot ready\"",
+      "file": "script.js",
+      "pattern": "console\\.log\\(['\"]Camper Bot ready['\"]\\)",
+      "flags": ""
+    }
+  ]
+}

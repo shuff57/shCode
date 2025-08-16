@@ -2,18 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #__next {
-  height: 100%;
+:root{
+  --bg: #121212;
+  --card: #1e1e1e;
+  --border: #333;
+  --muted: #2a2a2a;
+  --text: #e0e0e0;
+  --brand: #5baafd;
 }
 
-#workspace {
-  position: relative;
+/* Base */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+code {
+  background-color: #2d2d2d;
+  color: #d65093;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+}
+
+/* Requirements styling */
+.requirement {
+  background-color: var(--card);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.requirement h3 {
+  margin-top: 0;
+  color: var(--brand);
+}
+
+/* Collapsible editor card */
+details.editor-card {
+  background-color: #333333;               /* header background */
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Summary (header) with custom arrow */
+details.editor-card > summary {
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  list-style: none;           /* hide default marker */
+  transition: background-color .2s ease, color .2s ease;
+}
+details.editor-card > summary::-webkit-details-marker { display: none; }
+
+/* Custom arrow */
+details.editor-card > summary::before {
+  content: '';
+  display: inline-block;
+  width: 0; height: 0;
+  border-left: 6px solid var(--text);
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  transition: transform .15s ease-in-out, border-left-color .2s ease;
+}
+/* Rotate + colorize on open */
+details.editor-card[open] > summary::before {
+  transform: rotate(90deg);
+  border-left-color: var(--brand);
+}
+/* Hover state */
+details.editor-card > summary:hover {
+  color: var(--brand);
+  background-color: var(--muted);
+}
+details.editor-card > summary:hover::before {
+  border-left-color: var(--brand);
+}
+
+/* Card body */
+.editor-body {
+  background: var(--card);
+  border-top: 1px solid #444;
+  padding: 16px;
+}
+
+/* Resizable split container */
+.editor-preview-container {
+  position: relative; /* for overlay */
   display: flex;
   align-items: stretch;
-  background-color: #fff;
-  border: 1px solid #e5e7eb;
+  background-color: var(--card);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   height: 420px;
   overflow: hidden;
 }
@@ -26,10 +121,3 @@ html, body, #__next {
   display: flex;
 }
 
-.sidebar-tabs button {
-  padding: 0.25rem 0.5rem;
-}
-
-.sidebar-content {
-  padding-top: 0.5rem;
-}
