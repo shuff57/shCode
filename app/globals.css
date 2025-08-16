@@ -172,6 +172,13 @@ details.editor-card > summary:hover::before {
   display: flex;
 }
 
+#preview {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
 .divider {
   flex: 0 0 6px;
   background: var(--border);

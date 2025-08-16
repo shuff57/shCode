@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Lesson } from '../lib/lessons';
+import type { Lesson } from '../lib/lessons';
 import { useLessonStore } from '../lib/store';
 import FileExplorer from './FileExplorer';
 import LessonSteps from './LessonSteps';
@@ -134,7 +134,20 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
       const html = files['index.html'] || '';
       const css = files['style.css'] || '';
       const js = files['script.js'] || '';
-      const doc = `${html}\n<style>${css}</style>\n<script>${js}</script>`;
+      let doc = html;
+      if (doc.includes('</head>')) {
+        const headIdx = doc.indexOf('</head>');
+        const styles = `<style>body{background:white;}${css}</style>`;
+        doc = doc.slice(0, headIdx) + styles + doc.slice(headIdx);
+      } else {
+        doc = `<!DOCTYPE html><html><head><style>body{background:white;}${css}</style></head><body>${doc}`;
+      }
+      if (doc.includes('</body>')) {
+        const bodyIdx = doc.indexOf('</body>');
+        doc = doc.slice(0, bodyIdx) + `<script>${js}</script>` + doc.slice(bodyIdx);
+      } else {
+        doc += `<script>${js}</script></body></html>`;
+      }
       setSrcDoc(doc);
       const to2 = setTimeout(() => {
         runTests();

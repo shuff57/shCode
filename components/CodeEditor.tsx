@@ -10,8 +10,9 @@ export default function CodeEditor() {
   return (
     <div id="editor">
       <Editor
+        key={currentFile}
         height="100%"
-        defaultLanguage={
+        language={
           currentFile.endsWith('.css')
             ? 'css'
             : currentFile.endsWith('.js')
