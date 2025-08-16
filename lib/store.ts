@@ -15,7 +15,7 @@ interface LessonState {
   setLesson: (lesson: Lesson) => void;
   selectFile: (path: string) => void;
   updateFile: (path: string, value: string) => void;
-  toggleSidebar: () => void;
+  setSidebarOpen: (open: boolean) => void;
   setActiveTab: (tab: 'Files' | 'Steps') => void;
   setRequirements: (reqs: Requirement[]) => void;
 }
@@ -25,7 +25,7 @@ export const useLessonStore = create<LessonState>((set) => ({
   currentFile: undefined,
   fileContents: {},
   requirements: [],
-  ui: { sidebarOpen: true, activeSidebarTab: 'Files' },
+  ui: { sidebarOpen: false, activeSidebarTab: 'Files' },
   setLesson: (lesson) =>
     set({
       lesson,
@@ -42,10 +42,8 @@ export const useLessonStore = create<LessonState>((set) => ({
     set((state) => ({
       fileContents: { ...state.fileContents, [path]: value },
     })),
-  toggleSidebar: () =>
-    set((state) => ({
-      ui: { ...state.ui, sidebarOpen: !state.ui.sidebarOpen },
-    })),
+  setSidebarOpen: (open) =>
+    set((state) => ({ ui: { ...state.ui, sidebarOpen: open } })),
   setActiveTab: (tab) =>
     set((state) => ({ ui: { ...state.ui, activeSidebarTab: tab } })),
   setRequirements: (reqs) => set({ requirements: reqs }),

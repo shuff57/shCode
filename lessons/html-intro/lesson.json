@@ -1,0 +1,29 @@
+{
+  "id": "html-intro",
+  "title": "HTML Intro",
+  "description": "Build a simple HTML page",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "steps": [
+    { "id": "s1", "title": "Add heading" },
+    { "id": "s2", "title": "Style heading" }
+  ],
+  "requirements": [
+    {
+      "id": "req1",
+      "title": "Has h1",
+      "description": "Contains an h1 tag",
+      "file": "index.html",
+      "pattern": "<h1>.*</h1>",
+      "flags": "i"
+    },
+    {
+      "id": "req2",
+      "title": "Logs hi",
+      "description": "console logs 'hi'",
+      "file": "script.js",
+      "pattern": "console\\.log\\(['\"']hi['\"]\\)",
+      "flags": ""
+    }
+  ]
+}

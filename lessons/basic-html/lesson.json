@@ -1,0 +1,29 @@
+{
+  "id": "basic-html",
+  "title": "Basic HTML",
+  "description": "Learn the fundamentals of HTML structure",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "steps": [
+    { "id": "s1", "title": "Add a paragraph" },
+    { "id": "s2", "title": "Style the text" }
+  ],
+  "requirements": [
+    {
+      "id": "req1",
+      "title": "Add h1",
+      "description": "Includes an h1 element",
+      "file": "index.html",
+      "pattern": "<h1[^>]*>.*</h1>",
+      "flags": "i"
+    },
+    {
+      "id": "req2",
+      "title": "Add paragraph",
+      "description": "Includes a p element",
+      "file": "index.html",
+      "pattern": "<p[^>]*>.*</p>",
+      "flags": "i"
+    }
+  ]
+}
