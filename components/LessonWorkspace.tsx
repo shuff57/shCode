@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Lesson } from '../lib/lessons';
+import type { Lesson } from '../lib/lessons';
 import { useLessonStore } from '../lib/store';
 import FileExplorer from './FileExplorer';
 import LessonSteps from './LessonSteps';
@@ -125,7 +125,7 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
 
   useEffect(() => {
     setLesson(lesson);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lesson]);
 
   // build preview and trigger tests with debounce
@@ -134,7 +134,20 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
       const html = files['index.html'] || '';
       const css = files['style.css'] || '';
       const js = files['script.js'] || '';
-      const doc = `${html}\n<style>${css}</style>\n<script>${js}</script>`;
+      let doc = html;
+      if (doc.includes('</head>')) {
+        const headIdx = doc.indexOf('</head>');
+        const styles = `<style>body{background:white;}${css}</style>`;
+        doc = doc.slice(0, headIdx) + styles + doc.slice(headIdx);
+      } else {
+        doc = `<!DOCTYPE html><html><head><style>body{background:white;}${css}</style></head><body>${doc}`;
+      }
+      if (doc.includes('</body>')) {
+        const bodyIdx = doc.indexOf('</body>');
+        doc = doc.slice(0, bodyIdx) + `<script>${js}</script>` + doc.slice(bodyIdx);
+      } else {
+        doc += `<script>${js}</script></body></html>`;
+      }
       setSrcDoc(doc);
       const to2 = setTimeout(() => {
         runTests();
@@ -166,7 +179,61 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
       <div id="titleRow">
         <h1>{lesson.title}</h1>
       </div>
-
+      <div
+        id="sidebarHover"
+        aria-hidden="true"
+        onMouseEnter={() => setSidebarOpen(true)}
+        onMouseLeave={(e) => {
+          const sidebar = document.getElementById('sidebar');
+          const to = e.relatedTarget;
+          if (!sidebar || !(to instanceof Node) || !sidebar.contains(to)) {
+            setSidebarOpen(false);
+          }
+        }}
+      ></div>
+      <aside
+        id="sidebar"
+        className={ui.sidebarOpen ? 'open' : ''}
+        aria-label="File explorer"
+        onMouseEnter={() => setSidebarOpen(true)}
+        onMouseLeave={() => setSidebarOpen(false)}
+      >
+        <div className="sidebar-tabs">
+          <button
+            style={ui.activeSidebarTab === 'Files' ? { fontWeight: 'bold' } : {}}
+            onClick={() => setActiveTab('Files')}
+          >
+            Files
+          </button>
+          <button
+            style={ui.activeSidebarTab === 'Steps' ? { fontWeight: 'bold' } : {}}
+            onClick={() => setActiveTab('Steps')}
+          >
+            Steps
+          </button>
+        </div>
+        <div className="sidebar-content">
+          {ui.activeSidebarTab === 'Files' ? (
+            <FileExplorer tree={lesson.files} />
+          ) : (
+            <LessonSteps lesson={lesson} />
+          )}
+        </div>
+      </aside>
+      <details className="editor-card" open>
+        <summary>Starter Code &amp; Live Preview</summary>
+        <div className="editor-body">
+          <div className="editor-preview-container" id="split">
+            <div className="pane" id="editorPane">
+              <CodeEditor />
+            </div>
+            <div
+              className="divider"
+              id="divider"
+              tabIndex={0}
+              aria-label="Resize editor and preview"
+            >
+              <span className="drag-handle" aria-hidden="true"></span>
             </div>
             <div className="pane" id="previewPane">
               <LivePreview srcDoc={srcDoc} />
