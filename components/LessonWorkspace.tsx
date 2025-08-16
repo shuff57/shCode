@@ -165,16 +165,55 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
     <>
       <div id="titleRow">
         <h1>{lesson.title}</h1>
+        <button id="sidebarToggle" onClick={() => setSidebarOpen(!ui.sidebarOpen)}>
+          {ui.sidebarOpen ? 'Hide' : 'Show'} Sidebar
+        </button>
       </div>
-
+      <div className="workspace">
+        {ui.sidebarOpen && (
+          <aside id="sidebar">
+            <div className="tabs">
+              <button
+                onClick={() => setActiveTab('Files')}
+                className={ui.activeSidebarTab === 'Files' ? 'active' : ''}
+              >
+                Files
+              </button>
+              <button
+                onClick={() => setActiveTab('Steps')}
+                className={ui.activeSidebarTab === 'Steps' ? 'active' : ''}
+              >
+                Steps
+              </button>
             </div>
-            <div className="pane" id="previewPane">
-              <LivePreview srcDoc={srcDoc} />
+            {ui.activeSidebarTab === 'Files' ? (
+              <FileExplorer tree={lesson.files} />
+            ) : (
+              <LessonSteps lesson={lesson} />
+            )}
+          </aside>
+        )}
+        <details className="editor-card" open>
+          <summary>Starter Code &amp; Live Preview</summary>
+          <div className="editor-body">
+            <div className="editor-preview-container" id="split">
+              <div className="pane" id="editorPane">
+                <CodeEditor />
+              </div>
+              <div
+                className="divider"
+                id="divider"
+                tabIndex={0}
+                aria-label="Resize editor and preview"
+              ></div>
+              <div className="pane" id="previewPane">
+                <LivePreview srcDoc={srcDoc} />
+              </div>
+              <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
             </div>
-            <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
           </div>
-        </div>
-      </details>
+        </details>
+      </div>
       <RequirementsSection
         requirements={requirements}
         summary={summary}
