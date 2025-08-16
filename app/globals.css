@@ -213,15 +213,6 @@ details.editor-card > summary:hover::before {
   z-index: 100;
 }
 
-#sidebarHover {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 10px;
-  z-index: 99;
-}
-
 #sidebar.open {
   transform: translateX(0);
 }
@@ -290,4 +281,3 @@ details.editor-card > summary:hover::before {
 }
 .requirement.pass .req-status { color: #a5d6a7; border-color: #2e7d32; }
 .requirement.fail .req-status { color: #ff8a80; border-color: #b00020; }
-
