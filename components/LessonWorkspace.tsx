@@ -242,6 +242,12 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
             <LessonSteps lesson={lesson} />
           )}
         </div>
+        {ui.activeSidebarTab === 'Files' && (
+          <div className="sidebar-actions">
+            <button type="button">Add file</button>
+            <button type="button">Upload file(s)</button>
+          </div>
+        )}
       </aside>
       <details className="editor-card" open>
         <summary>Starter Code &amp; Live Preview</summary>
