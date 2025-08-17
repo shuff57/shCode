@@ -218,6 +218,54 @@ details.editor-card > summary:hover::before {
   border-left: 4px solid #16a34a;
 }
 
+/* Console styles */
+details.console {
+  margin-top: 1rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+details.console > summary {
+  cursor: pointer;
+  padding: 6px 8px;
+  font-weight: bold;
+  list-style: none;
+}
+details.console > summary::-webkit-details-marker { display: none; }
+
+.console-body {
+  border-top: 1px solid var(--border);
+  padding: 8px;
+  background: var(--card);
+}
+
+.console-root {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 160px;
+  overflow-y: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.console-controls {
+  margin-bottom: 4px;
+}
+
+.console-output {
+  white-space: pre-wrap;
+}
+
+.log-error {
+  color: #dc2626;
+}
+
+.log-warn {
+  color: #f59e0b;
+}
+
 .requirement.fail {
   border-left: 4px solid #dc2626;
 }
