@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Lesson, Requirement } from './lessons';
+import { Lesson, Requirement, FileNode } from './lessons';
 
 interface UIState {
   sidebarOpen: boolean;
@@ -26,17 +26,21 @@ export const useLessonStore = create<LessonState>((set) => ({
   fileContents: {},
   requirements: [],
   ui: { sidebarOpen: false, activeSidebarTab: 'Files' },
-  setLesson: (lesson) =>
+  setLesson: (lesson) => {
+    const flatten = (nodes: FileNode[]): FileNode[] =>
+      nodes.flatMap((n) =>
+        n.type === 'file' ? [n] : flatten(n.children || [])
+      );
+    const files = flatten(lesson.files);
     set({
       lesson,
-      currentFile: lesson.files[0]?.path,
+      currentFile: files[0]?.path,
       fileContents: Object.fromEntries(
-        lesson.files
-          .filter((f) => f.type === 'file')
-          .map((f) => [f.path, f.content || ''])
+        files.map((f) => [f.path, f.content || ''])
       ),
       requirements: lesson.requirements,
-    }),
+    });
+  },
   selectFile: (path) => set({ currentFile: path }),
   updateFile: (path, value) =>
     set((state) => ({
