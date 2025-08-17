@@ -216,12 +216,10 @@ details.editor-card > summary:hover::before {
 /* Requirement status overlays */
 .requirement.pass {
   border-left: 4px solid #16a34a;
-  box-shadow: inset 0 0 0 1000px rgba(22,163,74,0.15);
 }
 
 .requirement.fail {
   border-left: 4px solid #dc2626;
-  box-shadow: inset 0 0 0 1000px rgba(220,38,38,0.15);
 }
 
 .requirement .req-status {
