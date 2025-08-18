@@ -1,67 +1,7 @@
-'use client';
-import { useState, DragEvent } from 'react';
+"use client";
+import { useState, useRef, DragEvent } from 'react';
 import { FileNode } from '../lib/lessons';
 import { useLessonStore } from '../lib/store';
-
-function FileItem({
-  node,
-  move,
-  external,
-}: {
-  node: FileNode;
-  move: (src: string, dest: string | null) => void;
-  external: (e: DragEvent, dest: string) => void;
-}) {
-  const selectFile = useLessonStore((s) => s.selectFile);
-  const currentFile = useLessonStore((s) => s.currentFile);
-  const [over, setOver] = useState(false);
-  if (node.type === 'folder') {
-    return (
-      <li
-        className={`folder ${over ? 'drag-over' : ''}`}
-        onDrop={(e) => {
-          e.stopPropagation();
-          setOver(false);
-          const src = e.dataTransfer.getData('text/plain');
-          if (src) {
-            move(src, node.path);
-          } else {
-            external(e, node.path);
-          }
-        }}
-        onDragOver={(e) => {
-          e.preventDefault();
-        }}
-        onDragEnter={() => setOver(true)}
-        onDragLeave={() => setOver(false)}
-      >
-        <div className="file-item">{`📁 ${node.name}`}</div>
-        <ul>
-          {node.children?.map((child) => (
-            <FileItem
-              key={child.path}
-              node={child}
-              move={move}
-              external={external}
-            />
-          ))}
-        </ul>
-      </li>
-    );
-  }
-  return (
-    <li
-      draggable
-      onDragStart={(e) => e.dataTransfer.setData('text/plain', node.path)}
-      onClick={() => selectFile(node.path)}
-      className={`file-item ${
-        currentFile === node.path ? 'active' : ''
-      }`}
-    >
-      {`📄 ${node.name}`}
-    </li>
-  );
-}
 
 export default function FileExplorer({ tree }: { tree: FileNode[] }) {
   const updateFile = useLessonStore((s) => s.updateFile);
@@ -109,53 +49,93 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
     return null;
   }
 
-  function removeNode(list: FileNode[], path: string): [FileNode | null, FileNode[]] {
+  function removeNode(
+    list: FileNode[],
+    path: string
+  ): [FileNode | null, FileNode[], string | null, number | null] {
     let removed: FileNode | null = null;
-    const filtered = list
-      .map((n) => {
-        if (n.path === path) {
-          removed = n;
-          return null;
-        }
-        if (n.type === 'folder' && n.children) {
-          const [childRemoved, children] = removeNode(n.children, path);
-          if (childRemoved) {
-            removed = childRemoved;
-            return { ...n, children };
+    let parent: string | null = null;
+    let index: number | null = null;
+    function recurse(nodes: FileNode[], p: string | null): FileNode[] {
+      return nodes
+        .map((n, i) => {
+          if (n.path === path) {
+            removed = n;
+            parent = p;
+            index = i;
+            return null;
           }
-        }
-        return n;
-      })
-      .filter(Boolean) as FileNode[];
-    return [removed, filtered];
+          if (n.type === 'folder' && n.children) {
+            const children = recurse(n.children, n.path);
+            if (removed) {
+              return { ...n, children };
+            }
+          }
+          return n;
+        })
+        .filter(Boolean) as FileNode[];
+    }
+    const filtered = recurse(list, null);
+    return [removed, filtered, parent, index];
   }
 
   function insertNode(
     list: FileNode[],
     folder: string | null,
-    node: FileNode
+    node: FileNode,
+    index?: number
   ): FileNode[] {
-    if (!folder) return [...list, node];
+    if (!folder) {
+      const copy = [...list];
+      const i = index !== undefined ? index : copy.length;
+      copy.splice(i, 0, node);
+      return copy;
+    }
     return list.map((n) => {
       if (n.path === folder && n.type === 'folder') {
-        return { ...n, children: [...(n.children || []), node] };
+        const children = [...(n.children || [])];
+        const i = index !== undefined ? index : children.length;
+        children.splice(i, 0, node);
+        return { ...n, children };
       }
       if (n.type === 'folder' && n.children) {
-        return { ...n, children: insertNode(n.children, folder, node) };
+        return { ...n, children: insertNode(n.children, folder, node, index) };
       }
       return n;
     });
   }
 
-  const moveNode = (src: string, dest: string | null) => {
+  function getDropIndex(container: HTMLUListElement, y: number) {
+    const items = Array.from(container.children) as HTMLElement[];
+    let idx = items.length;
+    for (let i = 0; i < items.length; i++) {
+      const box = items[i].getBoundingClientRect();
+      if (y < box.top + box.height / 2) {
+        idx = i;
+        break;
+      }
+    }
+    return idx;
+  }
+
+  const moveNode = (src: string, dest: string | null, index?: number) => {
     let target: string | null = null;
     setNodes((prev) => {
-      const [removed, without] = removeNode(prev, src);
+      const [removed, without, parent, origIndex] = removeNode(prev, src);
       if (!removed) return prev;
       const name = removed.name;
       target = dest ? `${dest}/${name}` : name;
       const updated = { ...removed, path: target };
-      return insertNode(without, dest, updated);
+      let insertAt = index;
+      if (
+        dest === parent &&
+        insertAt !== undefined &&
+        origIndex !== null &&
+        origIndex < insertAt
+      ) {
+        insertAt -= 1;
+      }
+      return insertNode(without, dest, updated, insertAt);
     });
     if (target) {
       moveFile(src, target);
@@ -164,7 +144,8 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
 
   const handleExternalDrop = async (
     e: DragEvent,
-    dest: string | null
+    dest: string | null,
+    index?: number
   ) => {
     const items = Array.from(e.dataTransfer.items || []);
     const newNodes: FileNode[] = [];
@@ -178,45 +159,104 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
     if (newNodes.length) {
       setNodes((prev) => {
         let next = prev;
+        let insertAt = index;
         for (const n of newNodes) {
-          next = insertNode(next, dest, n);
+          next = insertNode(next, dest, n, insertAt);
+          if (insertAt !== undefined) insertAt++;
         }
         return next;
       });
     }
   };
 
-  const handleDrop = async (e: DragEvent) => {
-    e.preventDefault();
-    setRootOver(false);
-    const internal = e.dataTransfer.getData('text/plain');
-    if (internal) {
-      moveNode(internal, null);
-      return;
-    }
-    await handleExternalDrop(e, null);
-  };
-
-  return (
-    <div
-      className={`file-explorer ${rootOver ? 'drag-target' : ''}`}
-      onDragOver={(e) => {
-        e.preventDefault();
-        setRootOver(true);
-      }}
-      onDragLeave={() => setRootOver(false)}
-      onDrop={handleDrop}
-    >
-      <ul id="fileList">
-        {nodes.map((node) => (
-          <FileItem
-            key={node.path}
-            node={node}
-            move={moveNode}
-            external={handleExternalDrop}
-          />
+  function FileList({
+    list,
+    parent,
+  }: {
+    list: FileNode[];
+    parent: string | null;
+  }) {
+    const ref = useRef<HTMLUListElement>(null);
+    const onDrop = async (e: DragEvent<HTMLUListElement>) => {
+      e.preventDefault();
+      if (!parent) setRootOver(false);
+      const ul = ref.current;
+      if (!ul) return;
+      const index = getDropIndex(ul, e.clientY);
+      const internal = e.dataTransfer.getData('text/plain');
+      if (internal) {
+        moveNode(internal, parent, index);
+      } else {
+        await handleExternalDrop(e, parent, index);
+      }
+    };
+    return (
+      <ul
+        ref={ref}
+        onDragOver={(e) => {
+          e.preventDefault();
+          if (!parent) setRootOver(true);
+        }}
+        onDragLeave={() => {
+          if (!parent) setRootOver(false);
+        }}
+        onDrop={onDrop}
+      >
+        {list.map((node) => (
+          <FileItem key={node.path} node={node} />
         ))}
       </ul>
+    );
+  }
+
+  function FileItem({ node }: { node: FileNode }) {
+    const selectFile = useLessonStore((s) => s.selectFile);
+    const currentFile = useLessonStore((s) => s.currentFile);
+    const [over, setOver] = useState(false);
+    if (node.type === 'folder') {
+      return (
+        <li
+          className={`folder ${over ? 'drag-over' : ''}`}
+          onDragEnter={() => setOver(true)}
+          onDragLeave={() => setOver(false)}
+        >
+          <div
+            className="file-item"
+            onDrop={(e) => {
+              e.stopPropagation();
+              setOver(false);
+              const src = e.dataTransfer.getData('text/plain');
+              if (src) {
+                moveNode(src, node.path);
+              } else {
+                handleExternalDrop(e, node.path);
+              }
+            }}
+            onDragOver={(e) => e.preventDefault()}
+          >
+            {`📁 ${node.name}`}
+          </div>
+          <FileList list={node.children || []} parent={node.path} />
+        </li>
+      );
+    }
+    return (
+      <li
+        draggable
+        onDragStart={(e) => e.dataTransfer.setData('text/plain', node.path)}
+        onClick={() => selectFile(node.path)}
+        className={`file-item ${
+          currentFile === node.path ? 'active' : ''
+        }`}
+      >
+        {`📄 ${node.name}`}
+      </li>
+    );
+  }
+
+  return (
+    <div className={`file-explorer ${rootOver ? 'drag-target' : ''}`}>
+      <FileList list={nodes} parent={null} />
       <p className="drop-hint">Drag files or folders here</p>
     </div>
   );
