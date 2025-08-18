@@ -142,15 +142,18 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
   }
 
   const moveNode = (src: string, dest: string | null) => {
+    let target: string | null = null;
     setNodes((prev) => {
       const [removed, without] = removeNode(prev, src);
       if (!removed) return prev;
       const name = removed.name;
-      const newPath = dest ? `${dest}/${name}` : name;
-      const updated = { ...removed, path: newPath };
-      moveFile(src, newPath);
+      target = dest ? `${dest}/${name}` : name;
+      const updated = { ...removed, path: target };
       return insertNode(without, dest, updated);
     });
+    if (target) {
+      moveFile(src, target);
+    }
   };
 
   const handleExternalDrop = async (
