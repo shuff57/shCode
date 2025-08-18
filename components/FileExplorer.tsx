@@ -14,11 +14,14 @@ function FileItem({
 }) {
   const selectFile = useLessonStore((s) => s.selectFile);
   const currentFile = useLessonStore((s) => s.currentFile);
+  const [over, setOver] = useState(false);
   if (node.type === 'folder') {
     return (
       <li
+        className={`folder ${over ? 'drag-over' : ''}`}
         onDrop={(e) => {
           e.stopPropagation();
+          setOver(false);
           const src = e.dataTransfer.getData('text/plain');
           if (src) {
             move(src, node.path);
@@ -26,9 +29,13 @@ function FileItem({
             external(e, node.path);
           }
         }}
-        onDragOver={(e) => e.preventDefault()}
+        onDragOver={(e) => {
+          e.preventDefault();
+        }}
+        onDragEnter={() => setOver(true)}
+        onDragLeave={() => setOver(false)}
       >
-        <div>{node.name}</div>
+        <div className="file-item">{`📁 ${node.name}`}</div>
         <ul>
           {node.children?.map((child) => (
             <FileItem
@@ -47,13 +54,11 @@ function FileItem({
       draggable
       onDragStart={(e) => e.dataTransfer.setData('text/plain', node.path)}
       onClick={() => selectFile(node.path)}
-      style={
-        currentFile === node.path
-          ? { color: 'var(--brand)', fontWeight: 'bold' }
-          : {}
-      }
+      className={`file-item ${
+        currentFile === node.path ? 'active' : ''
+      }`}
     >
-      {node.name}
+      {`📄 ${node.name}`}
     </li>
   );
 }
@@ -62,6 +67,7 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
   const updateFile = useLessonStore((s) => s.updateFile);
   const moveFile = useLessonStore((s) => s.moveFile);
   const [nodes, setNodes] = useState<FileNode[]>(tree);
+  const [rootOver, setRootOver] = useState(false);
 
   async function traverse(entry: any, base = ''): Promise<FileNode | null> {
     if (entry.isFile) {
@@ -182,6 +188,7 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
 
   const handleDrop = async (e: DragEvent) => {
     e.preventDefault();
+    setRootOver(false);
     const internal = e.dataTransfer.getData('text/plain');
     if (internal) {
       moveNode(internal, null);
@@ -191,7 +198,15 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
   };
 
   return (
-    <div onDragOver={(e) => e.preventDefault()} onDrop={handleDrop}>
+    <div
+      className={`file-explorer ${rootOver ? 'drag-target' : ''}`}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setRootOver(true);
+      }}
+      onDragLeave={() => setRootOver(false)}
+      onDrop={handleDrop}
+    >
       <ul id="fileList">
         {nodes.map((node) => (
           <FileItem
