@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, DragEvent } from 'react';
+import { useState, useRef, DragEvent, Fragment } from 'react';
 import { FileNode } from '../lib/lessons';
 import { useLessonStore } from '../lib/store';
 
@@ -106,7 +106,9 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
   }
 
   function getDropIndex(container: HTMLUListElement, y: number) {
-    const items = Array.from(container.children) as HTMLElement[];
+    const items = Array.from(container.children).filter(
+      (el) => !el.classList.contains('drop-indicator')
+    ) as HTMLElement[];
     let idx = items.length;
     for (let i = 0; i < items.length; i++) {
       const box = items[i].getBoundingClientRect();
@@ -177,12 +179,14 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
     parent: string | null;
   }) {
     const ref = useRef<HTMLUListElement>(null);
+    const [dropIndex, setDropIndex] = useState<number | null>(null);
     const onDrop = async (e: DragEvent<HTMLUListElement>) => {
       e.preventDefault();
       if (!parent) setRootOver(false);
       const ul = ref.current;
       if (!ul) return;
       const index = getDropIndex(ul, e.clientY);
+      setDropIndex(null);
       const internal = e.dataTransfer.getData('text/plain');
       if (internal) {
         moveNode(internal, parent, index);
@@ -195,16 +199,25 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
         ref={ref}
         onDragOver={(e) => {
           e.preventDefault();
+          const ul = ref.current;
+          if (ul) {
+            setDropIndex(getDropIndex(ul, e.clientY));
+          }
           if (!parent) setRootOver(true);
         }}
         onDragLeave={() => {
           if (!parent) setRootOver(false);
+          setDropIndex(null);
         }}
         onDrop={onDrop}
       >
-        {list.map((node) => (
-          <FileItem key={node.path} node={node} />
+        {list.map((node, i) => (
+          <Fragment key={node.path}>
+            {dropIndex === i && <li className="drop-indicator" />}
+            <FileItem node={node} />
+          </Fragment>
         ))}
+        {dropIndex === list.length && <li className="drop-indicator" />}
       </ul>
     );
   }

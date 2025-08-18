@@ -139,6 +139,12 @@ code {
   background: var(--muted);
 }
 
+.drop-indicator {
+  height: 0;
+  border-top: 2px solid var(--brand);
+  margin-bottom: .25rem;
+}
+
 /* Requirements styling */
 .requirement {
   background-color: var(--card);
