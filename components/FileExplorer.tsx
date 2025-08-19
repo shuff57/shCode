@@ -1,11 +1,15 @@
 "use client";
-import { useState, useRef, DragEvent, Fragment, useEffect } from 'react';
+import { useState, useEffect, DragEvent } from 'react';
+import { Tree, NodeRendererProps } from 'react-arborist';
 import { FileNode } from '../lib/lessons';
 import { useLessonStore } from '../lib/store';
 
 export default function FileExplorer({ tree }: { tree: FileNode[] }) {
   const updateFile = useLessonStore((s) => s.updateFile);
   const moveFile = useLessonStore((s) => s.moveFile);
+  const selectFile = useLessonStore((s) => s.selectFile);
+  const currentFile = useLessonStore((s) => s.currentFile);
+
   const [nodes, setNodes] = useState<FileNode[]>(tree);
   useEffect(() => setNodes(tree), [tree]);
   const [rootOver, setRootOver] = useState(false);
@@ -106,21 +110,6 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
     });
   }
 
-  function getDropIndex(container: HTMLUListElement, y: number) {
-    const items = Array.from(container.children).filter(
-      (el) => !el.classList.contains('drop-indicator')
-    ) as HTMLElement[];
-    let idx = items.length;
-    for (let i = 0; i < items.length; i++) {
-      const box = items[i].getBoundingClientRect();
-      if (y < box.top + box.height / 2) {
-        idx = i;
-        break;
-      }
-    }
-    return idx;
-  }
-
   const moveNode = (src: string, dest: string | null, index?: number) => {
     let target: string | null = null;
     setNodes((prev) => {
@@ -147,8 +136,7 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
 
   const handleExternalDrop = async (
     e: DragEvent,
-    dest: string | null,
-    index?: number
+    dest: string | null
   ) => {
     const items = Array.from(e.dataTransfer.items || []);
     const newNodes: FileNode[] = [];
@@ -162,116 +150,75 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
     if (newNodes.length) {
       setNodes((prev) => {
         let next = prev;
-        let insertAt = index;
         for (const n of newNodes) {
-          next = insertNode(next, dest, n, insertAt);
-          if (insertAt !== undefined) insertAt++;
+          next = insertNode(next, dest, n);
         }
         return next;
       });
     }
   };
 
-  function FileList({
-    list,
-    parent,
-  }: {
-    list: FileNode[];
-    parent: string | null;
-  }) {
-    const ref = useRef<HTMLUListElement>(null);
-    const [dropIndex, setDropIndex] = useState<number | null>(null);
-    const onDrop = async (e: DragEvent<HTMLUListElement>) => {
-      e.preventDefault();
-      if (!parent) setRootOver(false);
-      const ul = ref.current;
-      if (!ul) return;
-      const index = getDropIndex(ul, e.clientY);
-      setDropIndex(null);
-      const internal = e.dataTransfer.getData('text/plain');
-      if (internal) {
-        moveNode(internal, parent, index);
-      } else {
-        await handleExternalDrop(e, parent, index);
-      }
-    };
+  const Node = ({ node, style, dragHandle }: NodeRendererProps<FileNode>) => {
+    const isFile = node.data.type === 'file';
     return (
-      <ul
-        ref={ref}
-        onDragOver={(e) => {
-          e.preventDefault();
-          const ul = ref.current;
-          if (ul) {
-            setDropIndex(getDropIndex(ul, e.clientY));
-          }
-          if (!parent) setRootOver(true);
-        }}
-        onDragLeave={() => {
-          if (!parent) setRootOver(false);
-          setDropIndex(null);
-        }}
-        onDrop={onDrop}
-      >
-        {list.map((node, i) => (
-          <Fragment key={node.path}>
-            {dropIndex === i && <li className="drop-indicator" />}
-            <FileItem node={node} />
-          </Fragment>
-        ))}
-        {dropIndex === list.length && <li className="drop-indicator" />}
-      </ul>
-    );
-  }
-
-  function FileItem({ node }: { node: FileNode }) {
-    const selectFile = useLessonStore((s) => s.selectFile);
-    const currentFile = useLessonStore((s) => s.currentFile);
-    const [over, setOver] = useState(false);
-    if (node.type === 'folder') {
-      return (
-        <li
-          className={`folder ${over ? 'drag-over' : ''}`}
-          onDragEnter={() => setOver(true)}
-          onDragLeave={() => setOver(false)}
-        >
-          <div
-            className="file-item"
-            onDrop={(e) => {
-              e.stopPropagation();
-              setOver(false);
-              const src = e.dataTransfer.getData('text/plain');
-              if (src) {
-                moveNode(src, node.path);
-              } else {
-                handleExternalDrop(e, node.path);
-              }
-            }}
-            onDragOver={(e) => e.preventDefault()}
-          >
-            {`📁 ${node.name}`}
-          </div>
-          <FileList list={node.children || []} parent={node.path} />
-        </li>
-      );
-    }
-    return (
-      <li
-        draggable
-        onDragStart={(e) => e.dataTransfer.setData('text/plain', node.path)}
-        onClick={() => selectFile(node.path)}
+      <div
+        style={style}
+        ref={dragHandle}
         className={`file-item ${
-          currentFile === node.path ? 'active' : ''
+          isFile && currentFile === node.data.path ? 'active' : ''
         }`}
+        onClick={() => {
+          if (isFile) selectFile(node.data.path);
+          else node.toggle();
+        }}
+        onDrop={async (e) => {
+          if (!Array.from(e.dataTransfer.types).includes('Files')) return;
+          e.preventDefault();
+          e.stopPropagation();
+          await handleExternalDrop(e, node.data.type === 'folder' ? node.data.path : null);
+        }}
+        onDragOver={(e) => {
+          if (Array.from(e.dataTransfer.types).includes('Files')) e.preventDefault();
+        }}
       >
-        {`📄 ${node.name}`}
-      </li>
+        {isFile ? `📄 ${node.data.name}` : `📁 ${node.data.name}`}
+      </div>
     );
-  }
+  };
 
   return (
-    <div className={`file-explorer ${rootOver ? 'drag-target' : ''}`}>
-      <FileList list={nodes} parent={null} />
+    <div
+      className={`file-explorer ${rootOver ? 'drag-target' : ''}`}
+      onDragOver={(e) => {
+        if (Array.from(e.dataTransfer.types).includes('Files')) {
+          e.preventDefault();
+          setRootOver(true);
+        }
+      }}
+      onDragLeave={(e) => {
+        if (e.currentTarget === e.target) setRootOver(false);
+      }}
+      onDrop={async (e) => {
+        if (Array.from(e.dataTransfer.types).includes('Files')) {
+          e.preventDefault();
+          setRootOver(false);
+          await handleExternalDrop(e, null);
+        }
+      }}
+    >
+      <Tree
+        data={nodes}
+        onMove={({ dragIds, parentId, index }) => moveNode(dragIds[0], parentId, index)}
+        idAccessor={(n) => n.path}
+        openByDefault
+        width="100%"
+        height={400}
+        rowHeight={24}
+      >
+        {Node}
+      </Tree>
       <p className="drop-hint">Drag files or folders here</p>
     </div>
   );
 }
+
