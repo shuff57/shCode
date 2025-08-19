@@ -15,6 +15,7 @@ interface LessonState {
   setLesson: (lesson: Lesson) => void;
   selectFile: (path: string) => void;
   updateFile: (path: string, value: string) => void;
+  moveFile: (from: string, to: string) => void;
   setSidebarOpen: (open: boolean) => void;
   setActiveTab: (tab: 'Files' | 'Steps') => void;
   setRequirements: (reqs: Requirement[]) => void;
@@ -46,6 +47,15 @@ export const useLessonStore = create<LessonState>((set) => ({
     set((state) => ({
       fileContents: { ...state.fileContents, [path]: value },
     })),
+  moveFile: (from, to) =>
+    set((state) => {
+      const contents = { ...state.fileContents };
+      const content = contents[from];
+      delete contents[from];
+      contents[to] = content;
+      const currentFile = state.currentFile === from ? to : state.currentFile;
+      return { fileContents: contents, currentFile };
+    }),
   setSidebarOpen: (open) =>
     set((state) => ({ ui: { ...state.ui, sidebarOpen: open } })),
   setActiveTab: (tab) =>

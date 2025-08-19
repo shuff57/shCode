@@ -7,6 +7,7 @@ import LessonSteps from './LessonSteps';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
 import RequirementsSection from './RequirementsSection';
+import Console from './Console';
 
 export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
   const setLesson = useLessonStore((s) => s.setLesson);
@@ -135,18 +136,40 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
       const css = files['style.css'] || '';
       const js = files['script.js'] || '';
       let doc = html;
-      if (doc.includes('</head>')) {
+      const linkRegex = /<link[^>]*href=["']style.css["'][^>]*>/i;
+      if (linkRegex.test(doc)) {
+        doc = doc.replace(
+          linkRegex,
+          `<style>body{background:white;}${css}</style>`
+        );
+      } else if (doc.includes('</head>')) {
         const headIdx = doc.indexOf('</head>');
-        const styles = `<style>body{background:white;}${css}</style>`;
-        doc = doc.slice(0, headIdx) + styles + doc.slice(headIdx);
+        doc =
+          doc.slice(0, headIdx) +
+          `<style>body{background:white;}</style>` +
+          doc.slice(headIdx);
       } else {
-        doc = `<!DOCTYPE html><html><head><style>body{background:white;}${css}</style></head><body>${doc}`;
+        doc =
+          `<!DOCTYPE html><html><head><style>body{background:white;}</style></head><body>${doc}`;
       }
+
+        const consoleIntercept = `(() => {
+    const send = (type, args) => {
+      window.parent.postMessage({ source: 'preview-console', type, args }, '*');
+    };
+    ['log','error','warn','info'].forEach(t => {
+      const fn = console[t];
+      console[t] = (...a) => { send(t, a); fn.apply(console, a); };
+    });
+    window.onerror = (m, s, l, c) => { send('error', [m + ' (' + l + ':' + c + ')']); };
+  })();`;
+
+      const scripts = `<script>${consoleIntercept}\n${js}</script>`;
       if (doc.includes('</body>')) {
         const bodyIdx = doc.indexOf('</body>');
-        doc = doc.slice(0, bodyIdx) + `<script>${js}</script>` + doc.slice(bodyIdx);
+        doc = doc.slice(0, bodyIdx) + scripts + doc.slice(bodyIdx);
       } else {
-        doc += `<script>${js}</script></body></html>`;
+        doc += `${scripts}</body></html>`;
       }
       setSrcDoc(doc);
       const to2 = setTimeout(() => {
@@ -219,29 +242,41 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
             <LessonSteps lesson={lesson} />
           )}
         </div>
+        {ui.activeSidebarTab === 'Files' && (
+          <div className="sidebar-actions">
+            <button type="button">Add file</button>
+            <button type="button">Upload file(s)</button>
+          </div>
+        )}
       </aside>
       <details className="editor-card" open>
         <summary>Starter Code &amp; Live Preview</summary>
         <div className="editor-body">
-          <div className="editor-preview-container" id="split">
-            <div className="pane" id="editorPane">
-              <CodeEditor />
-            </div>
-            <div
-              className="divider"
-              id="divider"
-              tabIndex={0}
-              aria-label="Resize editor and preview"
-            >
-              <span className="drag-handle" aria-hidden="true"></span>
-            </div>
-            <div className="pane" id="previewPane">
-              <LivePreview srcDoc={srcDoc} />
-            </div>
-            <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
+        <div className="editor-preview-container" id="split">
+          <div className="pane" id="editorPane">
+            <CodeEditor />
           </div>
+          <div
+            className="divider"
+            id="divider"
+            tabIndex={0}
+            aria-label="Resize editor and preview"
+          >
+            <span className="drag-handle" aria-hidden="true"></span>
+          </div>
+          <div className="pane" id="previewPane">
+            <LivePreview srcDoc={srcDoc} />
+          </div>
+          <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
         </div>
-      </details>
+        <details className="console">
+          <summary>Console</summary>
+          <div className="console-body">
+            <Console resetKey={srcDoc} />
+          </div>
+        </details>
+      </div>
+    </details>
       <RequirementsSection
         requirements={requirements}
         summary={summary}

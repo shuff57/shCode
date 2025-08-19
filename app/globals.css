@@ -84,6 +84,69 @@ code {
   padding: .5rem;
 }
 
+.sidebar-actions {
+  padding: .5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.sidebar-actions button {
+  padding: .25rem .5rem;
+  background: var(--brand);
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+/* File explorer items */
+.file-explorer {
+  padding: .5rem;
+}
+
+.file-explorer.drag-target {
+  border: 2px dashed var(--brand);
+}
+
+.file-explorer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.file-item {
+  display: block;
+  padding: .25rem .5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-bottom: .25rem;
+  background: var(--card);
+  cursor: pointer;
+}
+
+.file-item:hover {
+  background: var(--muted);
+}
+
+.file-item.active {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.folder.drag-over > .file-item {
+  border-color: var(--brand);
+  background: var(--muted);
+}
+
+.drop-indicator {
+  height: 2px;
+  background: var(--brand);
+  margin: .25rem 0;
+  width: 100%;
+  pointer-events: none;
+}
+
 /* Requirements styling */
 .requirement {
   background-color: var(--card);
@@ -216,6 +279,54 @@ details.editor-card > summary:hover::before {
 /* Requirement status overlays */
 .requirement.pass {
   border-left: 4px solid #16a34a;
+}
+
+/* Console styles */
+details.console {
+  margin-top: 1rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+details.console > summary {
+  cursor: pointer;
+  padding: 6px 8px;
+  font-weight: bold;
+  list-style: none;
+}
+details.console > summary::-webkit-details-marker { display: none; }
+
+.console-body {
+  border-top: 1px solid var(--border);
+  padding: 8px;
+  background: var(--card);
+}
+
+.console-root {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 160px;
+  overflow-y: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.console-controls {
+  margin-bottom: 4px;
+}
+
+.console-output {
+  white-space: pre-wrap;
+}
+
+.log-error {
+  color: #dc2626;
+}
+
+.log-warn {
+  color: #f59e0b;
 }
 
 .requirement.fail {
