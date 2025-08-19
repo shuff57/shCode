@@ -140,9 +140,11 @@ code {
 }
 
 .drop-indicator {
-  height: 0;
-  border-top: 2px solid var(--brand);
-  margin-bottom: .25rem;
+  height: 2px;
+  background: var(--brand);
+  margin: .25rem 0;
+  width: 100%;
+  pointer-events: none;
 }
 
 /* Requirements styling */

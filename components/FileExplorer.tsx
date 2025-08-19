@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, DragEvent, Fragment } from 'react';
+import { useState, useRef, DragEvent, Fragment, useEffect } from 'react';
 import { FileNode } from '../lib/lessons';
 import { useLessonStore } from '../lib/store';
 
@@ -7,6 +7,7 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
   const updateFile = useLessonStore((s) => s.updateFile);
   const moveFile = useLessonStore((s) => s.moveFile);
   const [nodes, setNodes] = useState<FileNode[]>(tree);
+  useEffect(() => setNodes(tree), [tree]);
   const [rootOver, setRootOver] = useState(false);
 
   async function traverse(entry: any, base = ''): Promise<FileNode | null> {
