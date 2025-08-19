@@ -15,6 +15,8 @@ interface LessonState {
   setLesson: (lesson: Lesson) => void;
   selectFile: (path: string) => void;
   updateFile: (path: string, value: string) => void;
+  moveFile: (from: string, to: string) => void;
+  deleteFile: (path: string) => void;
   setSidebarOpen: (open: boolean) => void;
   setActiveTab: (tab: 'Files' | 'Steps') => void;
   setRequirements: (reqs: Requirement[]) => void;
@@ -46,6 +48,45 @@ export const useLessonStore = create<LessonState>((set) => ({
     set((state) => ({
       fileContents: { ...state.fileContents, [path]: value },
     })),
+  moveFile: (from, to) =>
+    set((state) => {
+      const contents = { ...state.fileContents };
+      const content = contents[from];
+      delete contents[from];
+      contents[to] = content;
+      const currentFile = state.currentFile === from ? to : state.currentFile;
+      return { fileContents: contents, currentFile };
+    }),
+  deleteFile: (path) =>
+    set((state) => {
+      const contents = { ...state.fileContents };
+      for (const key of Object.keys(contents)) {
+        if (key === path || key.startsWith(path + '/')) {
+          delete contents[key];
+        }
+      }
+      let currentFile = state.currentFile;
+      if (
+        currentFile &&
+        (currentFile === path || currentFile.startsWith(path + '/'))
+      ) {
+        currentFile = Object.keys(contents)[0];
+      }
+      const removeFromTree = (nodes: FileNode[]): FileNode[] =>
+        nodes
+          .filter(
+            (n) => n.path !== path && !n.path.startsWith(path + '/')
+          )
+          .map((n) =>
+            n.type === 'folder' && n.children
+              ? { ...n, children: removeFromTree(n.children) }
+              : n
+          );
+      const lesson = state.lesson
+        ? { ...state.lesson, files: removeFromTree(state.lesson.files) }
+        : undefined;
+      return { fileContents: contents, currentFile, lesson };
+    }),
   setSidebarOpen: (open) =>
     set((state) => ({ ui: { ...state.ui, sidebarOpen: open } })),
   setActiveTab: (tab) =>
