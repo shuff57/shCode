@@ -1,4 +1,4 @@
-import { Requirement } from '../lib/lessons';
+import type { Requirement } from '../lib/types';
 import { CircleCheck, CircleX, Circle, Loader2 } from 'lucide-react';
 
 export default function RequirementCard({ req }: { req: Requirement }) {
@@ -17,11 +17,20 @@ export default function RequirementCard({ req }: { req: Requirement }) {
       <Circle />
     );
 
+  const hasPoints = req.points !== undefined && req.points > 0;
+
   return (
     <div className={classes.join(' ')} aria-live="polite">
       <h3 className="text-xl">{req.title}</h3>
       <p className="text-lg">{req.description}</p>
-      <div className="req-status">{statusIcon}</div>
+      <div className="req-status">
+        {statusIcon}
+        {hasPoints && (
+          <span className="req-points">
+            {req.status === 'passed' ? req.points : 0}/{req.points} pts
+          </span>
+        )}
+      </div>
       {req.messages && req.messages.length > 0 && (
         <ul>
           {req.messages.map((m, i) => (

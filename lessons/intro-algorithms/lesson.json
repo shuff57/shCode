@@ -1,0 +1,36 @@
+{
+  "id": "intro-algorithms",
+  "title": "1.2.2 Introduction to Algorithms",
+  "description": "Learn what algorithms are and practice writing pseudocode.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 25,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Control Flow",
+  "preview": "console",
+  "week": 5,
+  "slos": ["SLO-5"],
+  "steps": [
+    { "id": "s1", "title": "Read about algorithms" },
+    { "id": "s2", "title": "Write pseudocode for a daily task" },
+    { "id": "s3", "title": "Identify inputs and outputs" }
+  ],
+  "requirements": [
+    {
+      "id": "req1",
+      "title": "Algorithm content",
+      "description": "Page mentions algorithms",
+      "file": "index.html",
+      "pattern": "algorithm",
+      "flags": "i"
+    },
+    {
+      "id": "req2",
+      "title": "Pseudocode block",
+      "description": "Page includes a code or pre block with pseudocode",
+      "file": "index.html",
+      "pattern": "<(pre|code)[^>]*>",
+      "flags": "i"
+    }
+  ]
+}

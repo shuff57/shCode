@@ -1,0 +1,85 @@
+{
+  "id": "functions",
+  "title": "1.3.1 Functions",
+  "description": "Group code into reusable logic blocks with parameters and return values.",
+  "type": "assignment",
+  "difficulty": "intermediate",
+  "estimateMins": 40,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.3 Functions and Data",
+  "preview": "console",
+  "week": 7,
+  "slos": ["SLO-2", "SLO-6"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Declare a function",
+      "instructions": "Create a function called `greet` that takes a name parameter and returns a greeting string.",
+      "hints": [
+        "Functions use the `function` keyword.",
+        "Example: `function sayHi(name) { return 'Hi ' + name; }`"
+      ]
+    },
+    { "id": "s2", "title": "Add parameters" },
+    { "id": "s3", "title": "Return a value" },
+    { "id": "s4", "title": "Call your functions" }
+  ],
+  "requirements": [
+    {
+      "id": "req1",
+      "title": "greet function",
+      "description": "Declare a function called greet",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+greet\\s*\\(",
+      "flags": "i",
+      "points": 10
+    },
+    {
+      "id": "req2",
+      "title": "Return value",
+      "description": "Use a return statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "return\\s+",
+      "flags": "i",
+      "points": 5
+    },
+    {
+      "id": "req3",
+      "title": "Arrow function",
+      "description": "Write an arrow function",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "=>\\s*",
+      "flags": "i",
+      "points": 10
+    },
+    {
+      "id": "req4",
+      "title": "Call greet",
+      "description": "Call the greet function",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "greet\\s*\\(",
+      "flags": "i",
+      "points": 5
+    },
+    {
+      "id": "req5",
+      "title": "Multiple functions",
+      "description": "Define at least 2 functions",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(function\\s+\\w+\\s*\\(.*?\\)\\s*\\{.*?){2,}",
+      "flags": "is",
+      "points": 10
+    }
+  ],
+  "grading": {
+    "totalPoints": 40,
+    "passingScore": 25,
+    "allowLateSubmit": true,
+    "reviewCommitHistory": true
+  }
+}

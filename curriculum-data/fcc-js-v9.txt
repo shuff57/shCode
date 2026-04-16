@@ -1,0 +1,791 @@
+JavaScript Certification
+Continue Learning
+
+This course teaches you core JavaScript programming concepts such as working with variables, functions, objects, arrays, and control flow. You'll also learn how to manipulate the DOM, handle events, and apply techniques like asynchronous programming, functional programming, and accessibility best practices.
+
+To earn your JavaScript Certification:
+
+- Complete the five required projects to qualify for the certification exam.
+
+- Pass the JavaScript Certification exam.
+
+Courses
+JavaScript
+19 of 1235 steps complete
+Variables and Strings
+15 of 101 steps complete
+Introduction to JavaScript
+, Not started
+Theory
+Introduction to Strings
+, Not started
+Theory
+Understanding Code Clarity
+, Not started
+Theory
+Build a Greeting Bot
+, Completed
+Workshop
+Build a JavaScript Trivia Bot
+, Not started
+Lab
+Build a Sentence Maker
+, Not started
+Lab
+Working with Data Types
+, Not started
+Theory
+JavaScript Variables and Data Types Review
+, Not started
+Review
+JavaScript Variables and Data Types Quiz
+, Not started
+Quiz
+Working with Strings in JavaScript
+, Not started
+Theory
+Build a Teacher Chatbot
+, Not started
+Workshop
+Working with String Character Methods
+, Not started
+Theory
+Working with String Search and Slice Methods
+, Not started
+Theory
+Build a String Inspector
+, Not started
+Workshop
+Working with String Formatting Methods
+, Not started
+Theory
+Build a String Formatter
+, Not started
+Workshop
+Working with String Modification Methods
+, Not started
+Theory
+Build a String Transformer
+, Not started
+Workshop
+JavaScript Strings Review
+, Not started
+Review
+JavaScript Strings Quiz
+, Not started
+Quiz
+Booleans and Numbers
+0 of 54 steps complete
+Working with Numbers and Arithmetic Operators
+, Not started
+Theory
+Debug Type Coercion Errors in a Buggy App
+, Not started
+Lab
+Working with Operator Behavior
+, Not started
+Theory
+Debug Increment and Decrement Operator Errors in a Buggy App
+, Not started
+Lab
+Working with Comparison and Boolean Operators
+, Not started
+Theory
+Build a Logic Checker App
+, Not started
+Workshop
+Working with Unary and Bitwise Operators
+, Not started
+Theory
+Working with Conditional Logic and Math Methods
+, Not started
+Theory
+Build a Mathbot
+, Not started
+Workshop
+Build a Fortune Teller
+, Not started
+Lab
+Working with Numbers and Common Number Methods
+, Not started
+Theory
+JavaScript Math Review
+, Not started
+Review
+JavaScript Math Quiz
+, Not started
+Quiz
+Understanding Comparisons and Conditionals
+, Not started
+Theory
+JavaScript Comparisons and Conditionals Review
+, Not started
+Review
+JavaScript Comparisons and Conditionals Quiz
+, Not started
+Quiz
+Functions
+0 of 38 steps complete
+Working with Functions
+, Not started
+Theory
+Build a Calculator
+, Not started
+Workshop
+Build a Boolean Check Function
+, Not started
+Lab
+Build an Email Masker
+, Not started
+Lab
+Build a Loan Qualification Checker
+, Not started
+Workshop
+Build a Celsius to Fahrenheit Converter
+, Not started
+Lab
+Build a Card Counting Assistant
+, Not started
+Lab
+Build a Leap Year Calculator
+, Not started
+Lab
+Implement the Truncate String Algorithm
+, Not started
+Lab
+Build a Confirm the Ending Tool
+, Not started
+Lab
+JavaScript Functions Review
+, Not started
+Review
+JavaScript Functions Quiz
+, Not started
+Quiz
+Arrays
+0 of 34 steps complete
+Working with Arrays
+, Not started
+Theory
+Build a Shopping List
+, Not started
+Workshop
+Build a Lunch Picker Program
+, Not started
+Lab
+Build a Golf Score Translator
+, Not started
+Lab
+Working with Common Array Methods
+, Not started
+Theory
+JavaScript Arrays Review
+, Not started
+Review
+JavaScript Arrays Quiz
+, Not started
+Quiz
+Objects
+0 of 41 steps complete
+Introduction to JavaScript Objects and Their Properties
+, Not started
+Theory
+Build a Wildlife Tracker
+, Not started
+Workshop
+Build a Cargo Manifest Validator
+, Not started
+Lab
+Working with JSON
+, Not started
+Theory
+Working with Optional Chaining and Object Destructuring
+, Not started
+Theory
+Build a Recipe Tracker
+, Not started
+Workshop
+Build a Quiz Game
+, Not started
+Lab
+Build a Record Collection
+, Not started
+Lab
+JavaScript Objects Review
+, Not started
+Review
+JavaScript Objects Quiz
+, Not started
+Quiz
+Loops
+0 of 54 steps complete
+Working with Loops
+, Not started
+Theory
+Build a Sentence Analyzer
+, Not started
+Workshop
+Build a Space Mission Roster
+, Not started
+Workshop
+Build a Longest Word Finder App
+, Not started
+Lab
+Build a Factorial Calculator
+, Not started
+Lab
+Implement the Mutations Algorithm
+, Not started
+Lab
+Implement the Chunky Monkey Algorithm
+, Not started
+Lab
+Build a Profile Lookup
+, Not started
+Lab
+Build a String Repeating Function
+, Not started
+Lab
+Build a Missing Letter Detector
+, Not started
+Lab
+JavaScript Loops Review
+, Not started
+Review
+JavaScript Loops Quiz
+, Not started
+Quiz
+JavaScript Fundamentals Review
+0 of 31 steps complete
+Working with Types and Objects
+, Not started
+Theory
+Working with Arrays, Variables, and Naming Practices
+, Not started
+Theory
+Working with Code Quality and Execution Concepts
+, Not started
+Theory
+Build a String Inverter
+, Not started
+Lab
+Build the Largest Number Finder
+, Not started
+Lab
+Build a First Element Finder
+, Not started
+Lab
+Implement the Slice and Splice Algorithm
+, Not started
+Lab
+Build a Pyramid Generator
+, Not started
+Lab
+Build a Gradebook App
+, Not started
+Lab
+The var Keyword and Hoisting
+, Not started
+Theory
+Build a Title Case Converter
+, Not started
+Lab
+Implement a Falsy Remover
+, Not started
+Lab
+Build an Inventory Management Program
+, Not started
+Lab
+Understanding Modules, Imports, and Exports
+, Not started
+Theory
+Working With the Arguments Object and Rest Parameters
+, Not started
+Theory
+Implement a Unique Sorted Union
+, Not started
+Lab
+Build a Password Generator App
+, Not started
+Lab
+Design a Sum All Numbers Algorithm
+, Not started
+Lab
+Implement a DNA Pair Generator
+, Not started
+Lab
+Implement an HTML Entity Converter
+, Not started
+Lab
+Build an Odd Fibonacci Sum Calculator
+, Not started
+Lab
+Implement an Element Skipper
+, Not started
+Lab
+JavaScript Fundamentals Review
+, Not started
+Review
+JavaScript Fundamentals Quiz
+, Not started
+Quiz
+Higher Order Functions and Callbacks
+0 of 37 steps complete
+Working with Higher Order Functions and Callbacks
+, Not started
+Theory
+Build a Library Manager
+, Not started
+Workshop
+Build a Book Organizer
+, Not started
+Lab
+Implement a Sorted Index Finder
+, Not started
+Lab
+Build a Symmetric Difference Function
+, Not started
+Lab
+Implement a Value Remover Function
+, Not started
+Lab
+Implement a Matching Object Filter
+, Not started
+Lab
+Build a Prime Number Sum Calculator
+, Not started
+Lab
+Implement a Range-Based LCM Calculator
+, Not started
+Lab
+Create a Deep Flattening Tool
+, Not started
+Lab
+Build an All-True Property Validator
+, Not started
+Lab
+JavaScript Higher Order Functions Review
+, Not started
+Review
+JavaScript Higher Order Functions Quiz
+, Not started
+Quiz
+DOM Manipulation and Events
+0 of 87 steps complete
+Working with the DOM, Click Events, and Web APIs
+, Not started
+Theory
+Build a Storytelling App
+, Not started
+Workshop
+Build an Emoji Reactor
+, Not started
+Workshop
+Build a Favorite Icon Toggler
+, Not started
+Lab
+Understanding the Event Object and Event Delegation
+, Not started
+Theory
+Build a Music Instrument Filter
+, Not started
+Workshop
+Build a Real Time Counter
+, Not started
+Lab
+Build a Lightbox Viewer
+, Not started
+Lab
+Build a Rock, Paper, Scissors Game
+, Not started
+Workshop
+Build a Set of Football Team Cards
+, Not started
+Lab
+DOM Manipulation and Click Events with JavaScript Review
+, Not started
+Review
+DOM Manipulation and Click Events with JavaScript Quiz
+, Not started
+Quiz
+JavaScript and Accessibility
+4 of 42 steps complete
+Understanding aria-expanded, aria-live, and Common ARIA States
+, 80% Completed
+Theory
+Not Passed
+How Do You Make Dynamic and Interactive Content Accessible?
+What Is the aria-expanded Attribute, and How Does It Work?
+What Is the aria-live Attribute, and How Does It Work?
+What Are Some Common ARIA States Used on Custom Control Elements?
+What Is the aria-controls Attribute, and How Does It Work?
+Build a Planets Tablist
+, Not started
+Workshop
+Build a Note Taking App
+, Not started
+Workshop
+Build a Theme Switcher
+, Not started
+Lab
+JavaScript and Accessibility Review
+, Not started
+Review
+JavaScript and Accessibility Quiz
+, Not started
+Quiz
+Debugging
+0 of 8 steps complete
+Debugging Techniques
+, Not started
+Theory
+Debug a Random Background Color Changer
+, Not started
+Lab
+Debugging JavaScript Review
+, Not started
+Review
+Debugging JavaScript Quiz
+, Not started
+Quiz
+Basic Regex
+0 of 46 steps complete
+Working with Regular Expressions
+, Not started
+Theory
+Build a Spam Filter
+, Not started
+Workshop
+Build a Palindrome Checker
+, Not started
+Lab
+Build a RegEx Sandbox
+, Not started
+Lab
+Implement a Spinal Case Converter
+, Not started
+Lab
+Implement a Pig Latin Translator
+, Not started
+Lab
+Build a Smart Word Replacement Function
+, Not started
+Lab
+JavaScript Regular Expressions Review
+, Not started
+Review
+JavaScript Regular Expressions Quiz
+, Not started
+Quiz
+Build a Markdown to HTML Converter
+, Not started
+Certification Project
+Form Validation
+0 of 103 steps complete
+Understanding Form Validation
+, Not started
+Theory
+Build a Calorie Counter
+, Not started
+Workshop
+Build a Customer Complaint Form
+, Not started
+Lab
+Form Validation with JavaScript Review
+, Not started
+Review
+Form Validation with JavaScript Quiz
+, Not started
+Quiz
+Dates
+0 of 5 steps complete
+Working with Dates
+, Not started
+Theory
+Build a Date Conversion Program
+, Not started
+Lab
+JavaScript Dates Review
+, Not started
+Review
+JavaScript Dates Quiz
+, Not started
+Quiz
+Audio and Video Events
+0 of 54 steps complete
+Working with Audio and Video
+, Not started
+Theory
+Build a Music Player
+, Not started
+Workshop
+JavaScript Audio and Video Review
+, Not started
+Review
+JavaScript Audio and Video Quiz
+, Not started
+Quiz
+Build a Drum Machine
+, Not started
+Certification Project
+Maps and Sets
+0 of 36 steps complete
+Working with Maps and Sets
+, Not started
+Theory
+Build a Plant Nursery Catalog
+, Not started
+Workshop
+JavaScript Maps and Sets Review
+, Not started
+Review
+JavaScript Maps and Sets Quiz
+, Not started
+Quiz
+Build a Voting System
+, Not started
+Certification Project
+localStorage and CRUD Operations
+0 of 79 steps complete
+Working with Client-Side Storage and CRUD Operations
+, Not started
+Theory
+Build a Todo App using Local Storage
+, Not started
+Workshop
+Build a Bookmark Manager App
+, Not started
+Lab
+Local Storage and CRUD Review
+, Not started
+Review
+Local Storage and CRUD Quiz
+, Not started
+Quiz
+Classes
+0 of 67 steps complete
+Understanding How to Work with Classes in JavaScript
+, Not started
+Theory
+Build a Shopping Cart
+, Not started
+Workshop
+Build a Project Idea Board
+, Not started
+Lab
+JavaScript Classes Review
+, Not started
+Review
+JavaScript Classes Quiz
+, Not started
+Quiz
+Build a Bank Account Management Program
+, Not started
+Certification Project
+Recursion
+0 of 119 steps complete
+Understanding Recursion and the Call Stack
+, Not started
+Theory
+Build a Countup
+, Not started
+Workshop
+Build a Countdown
+, Not started
+Lab
+Build a Range of Numbers Generator
+, Not started
+Lab
+Build a Decimal to Binary Converter
+, Not started
+Workshop
+Build a Permutation Generator
+, Not started
+Lab
+Recursion Review
+, Not started
+Review
+Recursion Quiz
+, Not started
+Quiz
+Data Structures
+0 of 31 steps complete
+Working with Common Data Structures
+, Not started
+Theory
+Build a Linked List
+, Not started
+Workshop
+Implement Linked List Operations
+, Not started
+Lab
+Implement a Stack
+, Not started
+Lab
+Implement a Queue
+, Not started
+Lab
+Data Structures Review
+, Not started
+Review
+Data Structures Quiz
+, Not started
+Quiz
+Algorithms
+0 of 49 steps complete
+Introduction to Common Searching and Sorting Algorithms
+, Not started
+Theory
+Implement the Binary Search Algorithm
+, Not started
+Workshop
+Implement the Merge Sort Algorithm
+, Not started
+Workshop
+Implement the Bubble Sort Algorithm
+, Not started
+Lab
+Implement the Selection Sort Algorithm
+, Not started
+Lab
+Implement the Insertion Sort Algorithm
+, Not started
+Lab
+Implement the Quicksort Algorithm
+, Not started
+Lab
+Searching and Sorting Algorithms Review
+, Not started
+Review
+Searching and Sorting Algorithms Quiz
+, Not started
+Review
+Graphs and Trees
+0 of 50 steps complete
+Understanding Graphs and Trees
+, Not started
+Theory
+Implement the Shortest Path Algorithm
+, Not started
+Workshop
+Build an Adjacency List to Matrix Converter
+, Not started
+Lab
+Implement the Breadth-First Search Algorithm
+, Not started
+Workshop
+Implement the Depth-First Search Algorithm
+, Not started
+Lab
+Implement the N-Queens Problem
+, Not started
+Lab
+Graphs and Trees Review
+, Not started
+Review
+Graphs and Trees Quiz
+, Not started
+Quiz
+Dynamic Programming
+0 of 4 steps complete
+Understanding Dynamic Programming
+, Not started
+Theory
+Build an Nth Fibonacci Number Calculator
+, Not started
+Lab
+Dynamic Programming Review
+, Not started
+Review
+Dynamic Programming Quiz
+, Not started
+Quiz
+Functional Programming
+0 of 24 steps complete
+Understanding Functional Programming
+, Not started
+Theory
+Build a Recipe Ingredient Converter
+, Not started
+Workshop
+Build an Optional Arguments Sum Function
+, Not started
+Lab
+Build a Sorting Visualizer
+, Not started
+Lab
+JavaScript Functional Programming Review
+, Not started
+Review
+JavaScript Functional Programming Quiz
+, Not started
+Quiz
+Asynchronous JavaScript
+0 of 35 steps complete
+Understanding Asynchronous Programming
+, Not started
+Theory
+Build an fCC Authors Page
+, Not started
+Workshop
+Build an fCC Forum Leaderboard
+, Not started
+Lab
+Asynchronous JavaScript Review
+, Not started
+Review
+Asynchronous JavaScript Quiz
+, Not started
+Quiz
+Build a Weather App
+, Not started
+Certification Project
+JavaScript Review
+, Not started
+Review
+JavaScript Certification Exam
+Exam
+Browse our other free certifications
+Recommended curriculum:
+Responsive Web Design Certification
+JavaScript Certification
+Front-End Development Libraries Certification
+Python Certification
+Relational Databases Certification
+Back-End Development and APIs Certification
+Certified Full-Stack Developer Curriculum
+Try the coding challenge of the day:
+Go to Today's Challenge
+Go to Daily Coding Challenge Archive
+Learn English for Developers:
+A
+2
+E
+N
+A2 English for Developers Certification (Beta)
+B
+1
+E
+N
+B1 English for Developers Certification (Beta)
+Learn Professional Spanish:
+A
+1
+E
+S
+A1 Professional Spanish Certification (Beta)
+Learn Professional Chinese:
+A
+1
+Z
+H
+A1 Professional Chinese Certification (Beta)
+Prepare for the developer interview job search:
+The Odin Project - freeCodeCamp Remix
+Coding Interview Prep
+Project Euler
+Rosetta Code
+Professional certifications:
+Free Foundational C# with Microsoft Certification
+
+Looking for older coursework? Check out our archive page.

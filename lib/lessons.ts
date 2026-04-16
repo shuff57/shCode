@@ -1,36 +1,21 @@
 import fs from 'fs/promises';
 import path from 'path';
+import type { FileNode, FileType, Lesson } from './types';
 
-export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
+// Re-export types for backward compatibility
+export type { FileNode, Requirement, Lesson, Difficulty } from './types';
 
-export interface FileNode {
-  type: 'file' | 'folder';
-  name: string;
-  path: string;
-  content?: string;
-  children?: FileNode[];
-}
-
-export interface Requirement {
-  id: string;
-  title: string;
-  description: string;
-  status: 'pending' | 'running' | 'passed' | 'failed';
-  messages?: string[];
-  file?: string;
-  pattern?: string;
-  flags?: string;
-}
-
-export interface Lesson {
-  id: string;
-  title: string;
-  description: string;
-  difficulty: Difficulty;
-  estimateMins: number;
-  files: FileNode[];
-  steps: { id: string; title: string }[];
-  requirements: Requirement[];
+function inferLanguage(filename: string): FileType {
+  const ext = filename.split('.').pop()?.toLowerCase();
+  switch (ext) {
+    case 'html': return 'html';
+    case 'css': return 'css';
+    case 'js': return 'javascript';
+    case 'ts': return 'typescript';
+    case 'json': return 'json';
+    case 'py': return 'python';
+    default: return 'text';
+  }
 }
 
 let cache: Lesson[] | null = null;
@@ -42,9 +27,11 @@ async function readFiles(dir: string, rel = ''): Promise<FileNode[]> {
       .filter((e) => e.name !== 'lesson.json')
       .map(async (entry) => {
         const full = path.join(dir, entry.name);
-        const relative = path.join(rel, entry.name);
+        const relative = path.join(rel, entry.name).replace(/\\/g, '/');
         if (entry.isDirectory()) {
+          const id = relative.replace(/\//g, '-');
           return {
+            id,
             type: 'folder',
             name: entry.name,
             path: relative,
@@ -52,10 +39,13 @@ async function readFiles(dir: string, rel = ''): Promise<FileNode[]> {
           } as FileNode;
         }
         const content = await fs.readFile(full, 'utf8');
+        const id = relative.replace(/\//g, '-');
         return {
+          id,
           type: 'file',
           name: entry.name,
           path: relative,
+          language: inferLanguage(entry.name),
           content,
         } as FileNode;
       })

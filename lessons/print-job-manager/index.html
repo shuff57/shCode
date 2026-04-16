@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Print Job Manager</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Print Job Manager</h1>
+  <p>Build a print queue system. Use the buttons to add and process jobs.</p>
+
+  <div class="controls">
+    <input type="text" id="jobInput" placeholder="Enter document name">
+    <select id="prioritySelect">
+      <option value="normal">Normal</option>
+      <option value="high">High Priority</option>
+    </select>
+    <button onclick="addJob(document.getElementById('jobInput').value, document.getElementById('prioritySelect').value)">Add Job</button>
+    <button onclick="processJob()">Process Next Job</button>
+  </div>
+
+  <h2>Job Queue</h2>
+  <div id="queue">
+    <p>No jobs in queue.</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

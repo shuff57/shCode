@@ -18,19 +18,41 @@ app.prepare().then(() => {
       const meta = JSON.parse(
         await fs.readFile(path.join(lessonDir, 'lesson.json'), 'utf8')
       );
+      const passingScore = meta.grading?.passingScore || 0;
+
       const results = (meta.requirements || []).map((r) => {
-        const content = files?.[r.file] || '';
-        const regex = new RegExp(r.pattern, r.flags || 'i');
-        const passed = regex.test(content);
+        const type = r.type || 'regex';
+        let passed = false;
+
+        if (type === 'regex') {
+          const content = files?.[r.file] || '';
+          const regex = new RegExp(r.pattern, r.flags || 'i');
+          passed = regex.test(content);
+        }
+        // output and function types are handled client-side via Web Worker
+
+        const points = r.points || 0;
         return {
           id: r.id,
           status: passed ? 'passed' : 'failed',
           messages: passed ? [] : [r.description],
+          pointsEarned: passed ? points : 0,
+          pointsPossible: points,
         };
       });
-      res.json(results);
+
+      const totalScore = results.reduce((sum, r) => sum + r.pointsEarned, 0);
+      const totalPossible = results.reduce((sum, r) => sum + r.pointsPossible, 0);
+
+      res.json({
+        results,
+        totalScore,
+        totalPossible,
+        passed: totalScore >= passingScore,
+        passingScore,
+      });
     } catch {
-      res.json([]);
+      res.json({ results: [], totalScore: 0, totalPossible: 0, passed: false, passingScore: 0 });
     }
   });
 
@@ -38,7 +60,7 @@ app.prepare().then(() => {
     return handle(req, res);
   });
 
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 3002;
   server.listen(port, () => {
     console.log(`> Ready on http://localhost:${port}`);
   });

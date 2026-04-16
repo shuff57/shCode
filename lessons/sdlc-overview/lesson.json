@@ -1,0 +1,137 @@
+{
+  "id": "sdlc-overview",
+  "title": "1.1.1 What Is Programming / Software Lifecycle",
+  "description": "Learn what a program is, explore the SDLC, and write your first JavaScript using console.log().",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 30,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.1 Foundations",
+  "preview": "console",
+  "week": 1,
+  "slos": ["SLO-1", "SLO-4"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Hello, world!",
+      "instructions": "A **program** is a set of instructions that tells a computer what to do. **JavaScript** is the programming language you'll use this year.\n\nLet's write your first instruction. In `script.js`, under the Step 1 comment, type:\n\n```js\nconsole.log(\"Hello, world!\");\n```\n\n`console.log()` tells the computer to print whatever is inside the parentheses. Check the console panel below to see your output.",
+      "hints": [
+        "Make sure you use straight quotes (\"), not curly quotes.",
+        "Don't forget the semicolon at the end."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Print a number",
+      "instructions": "JavaScript can do math. Under the Step 2 comment, type:\n\n```js\nconsole.log(2 + 2);\n```\n\nNotice there are **no quotes** around `2 + 2`. That's because numbers aren't text — JavaScript calculates the answer and prints the result.\n\nTry changing the numbers or using other operators: `-`, `*`, `/`.",
+      "hints": [
+        "Numbers don't need quotes. Text (strings) do.",
+        "Try console.log(10 * 5); or console.log(100 / 4);"
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Join two strings",
+      "instructions": "Text values in JavaScript are called **strings**. You can join two strings together with `+`. Under the Step 3 comment, type:\n\n```js\nconsole.log(\"My name is \" + \"a programmer!\");\n```\n\nThis is called **concatenation**. Notice the space after \"is \" — without it the words smash together.",
+      "hints": [
+        "Both sides of the + must be in quotes.",
+        "If your output looks like 'My name isa programmer!' you forgot the space."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "True or false",
+      "instructions": "JavaScript can compare values and tell you if something is true or false. Under the Step 4 comment, type:\n\n```js\nconsole.log(100 > 50);\n```\n\nThe output is `true` — a **boolean** value. Booleans are either `true` or `false`. Try `console.log(10 < 5);` to see `false`.",
+      "hints": [
+        "Comparison operators: > (greater than), < (less than), === (equal to).",
+        "Booleans don't have quotes — they're not strings."
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "Print your name",
+      "instructions": "Now make it personal. Under the Step 5 comment, print your own name:\n\n```js\nconsole.log(\"Your Name Here\");\n```\n\nReplace \"Your Name Here\" with your actual name.",
+      "hints": [
+        "Keep the quotes around your name — it's a string.",
+        "Example: console.log(\"Maria Garcia\");"
+      ]
+    },
+    {
+      "id": "s6",
+      "title": "Print your hobby",
+      "instructions": "Under the Step 6 comment, print your favorite hobby:\n\n```js\nconsole.log(\"I love building robots.\");\n```\n\nYour program now has **6 lines of code** — each one an instruction the computer follows **in order**, top to bottom. This is called **sequential execution**.\n\nYou just wrote your first JavaScript program!",
+      "hints": [
+        "Each console.log() goes on its own line.",
+        "Put your actual hobby inside the quotes."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "req1",
+      "title": "Hello world",
+      "description": "Print \"Hello, world!\" using console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(['\"]Hello,?\\s*[Ww]orld!?['\"]\\)",
+      "flags": "i",
+      "points": 5
+    },
+    {
+      "id": "req2",
+      "title": "Math expression",
+      "description": "Use console.log with a math expression",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(\\d+\\s*[+\\-*/]\\s*\\d+\\)",
+      "flags": "i",
+      "points": 5
+    },
+    {
+      "id": "req3",
+      "title": "String concatenation",
+      "description": "Join two strings with the + operator",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(['\"].*['\"]\\s*\\+\\s*['\"].*['\"]\\)",
+      "flags": "i",
+      "points": 5
+    },
+    {
+      "id": "req4",
+      "title": "Boolean comparison",
+      "description": "Print a comparison that evaluates to true or false",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(\\d+\\s*[><=!]+\\s*\\d+\\)",
+      "flags": "i",
+      "points": 5
+    },
+    {
+      "id": "req5",
+      "title": "Your name",
+      "description": "Print your name to the console",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(console\\.log\\(.*\\).*){5,}",
+      "flags": "is",
+      "points": 5
+    },
+    {
+      "id": "req6",
+      "title": "Your hobby",
+      "description": "Print your hobby — at least 6 console.log statements total",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(console\\.log\\(.*\\).*){6,}",
+      "flags": "is",
+      "points": 5
+    }
+  ],
+  "grading": {
+    "totalPoints": 30,
+    "passingScore": 18,
+    "allowLateSubmit": true,
+    "reviewCommitHistory": false
+  }
+}

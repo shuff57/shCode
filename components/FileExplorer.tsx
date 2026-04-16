@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, DragEvent } from 'react';
 import { Tree, NodeRendererProps } from 'react-arborist';
-import { FileNode } from '../lib/lessons';
+import type { FileNode } from '../lib/types';
 import { useLessonStore } from '../lib/store';
 
 export default function FileExplorer({ tree }: { tree: FileNode[] }) {
@@ -24,6 +24,7 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
             const content = reader.result as string;
             updateFile(path, content);
             resolve({
+              id: path.replace(/\//g, '-'),
               type: 'file',
               name: entry.name,
               path,
@@ -45,6 +46,7 @@ export default function FileExplorer({ tree }: { tree: FileNode[] }) {
         if (child) children.push(child);
       }
       return {
+        id: (base + entry.name).replace(/\//g, '-'),
         type: 'folder',
         name: entry.name,
         path: base + entry.name,

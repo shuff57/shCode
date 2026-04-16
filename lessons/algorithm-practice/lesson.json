@@ -1,0 +1,66 @@
+{
+  "id": "algorithm-practice",
+  "title": "1.2.3 Algorithm Practice",
+  "description": "Implement simple algorithms following step-by-step pseudocode.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 35,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Control Flow",
+  "preview": "console",
+  "week": 5,
+  "slos": ["SLO-5"],
+  "steps": [
+    { "id": "s1", "title": "Find the maximum of two numbers" },
+    { "id": "s2", "title": "Check if a number is even or odd" },
+    { "id": "s3", "title": "Calculate the sum of 1 to N" }
+  ],
+  "requirements": [
+    {
+      "id": "req1",
+      "title": "findMax function",
+      "description": "Define a findMax function",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+findMax\\s*\\(",
+      "flags": "i",
+      "points": 10
+    },
+    {
+      "id": "req2",
+      "title": "isEven function",
+      "description": "Define an isEven function",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+isEven\\s*\\(",
+      "flags": "i",
+      "points": 10
+    },
+    {
+      "id": "req3",
+      "title": "sumToN function",
+      "description": "Define a sumToN function",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+sumToN\\s*\\(",
+      "flags": "i",
+      "points": 10
+    },
+    {
+      "id": "req4",
+      "title": "Use return",
+      "description": "Functions must return values",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "return\\s+",
+      "flags": "i",
+      "points": 5
+    }
+  ],
+  "grading": {
+    "totalPoints": 35,
+    "passingScore": 25,
+    "allowLateSubmit": true,
+    "reviewCommitHistory": true
+  }
+}

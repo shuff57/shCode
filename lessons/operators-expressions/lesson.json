@@ -1,0 +1,76 @@
+{
+  "id": "operators-expressions",
+  "title": "1.1.3 Operators and Expressions",
+  "description": "Practice arithmetic, string concatenation, and comparison operators.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 30,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.1 Foundations",
+  "preview": "console",
+  "week": 3,
+  "slos": ["SLO-2", "SLO-3"],
+  "steps": [
+    { "id": "s1", "title": "Arithmetic operators" },
+    { "id": "s2", "title": "String concatenation" },
+    { "id": "s3", "title": "Comparison operators" }
+  ],
+  "requirements": [
+    {
+      "id": "req1",
+      "title": "Use addition",
+      "description": "Use the + operator with numbers",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\s*\\+\\s*\\w+",
+      "flags": "i",
+      "points": 5
+    },
+    {
+      "id": "req2",
+      "title": "Use multiplication",
+      "description": "Use the * operator",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\s*\\*\\s*\\w+",
+      "flags": "i",
+      "points": 5
+    },
+    {
+      "id": "req3",
+      "title": "String concatenation",
+      "description": "Concatenate strings using +",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "[\"'].*[\"']\\s*\\+\\s*",
+      "flags": "i",
+      "points": 5
+    },
+    {
+      "id": "req4",
+      "title": "Comparison operator",
+      "description": "Use a comparison operator like ===, !==, <, >",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "[=!<>]=",
+      "flags": "i",
+      "points": 5
+    },
+    {
+      "id": "req5",
+      "title": "Log results",
+      "description": "Use console.log to display results",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(",
+      "flags": "i",
+      "points": 5
+    }
+  ],
+  "grading": {
+    "totalPoints": 25,
+    "passingScore": 15,
+    "allowLateSubmit": true,
+    "reviewCommitHistory": true
+  }
+}

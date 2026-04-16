@@ -1,0 +1,67 @@
+{
+  "id": "loops",
+  "title": "1.2.4 Loops",
+  "description": "Repeat actions using for, while, and do-while loops.",
+  "type": "assignment",
+  "difficulty": "intermediate",
+  "estimateMins": 35,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Control Flow",
+  "preview": "console",
+  "week": 6,
+  "slos": ["SLO-2", "SLO-4"],
+  "steps": [
+    { "id": "s1", "title": "Write a for loop" },
+    { "id": "s2", "title": "Write a while loop" },
+    { "id": "s3", "title": "Write a do-while loop" },
+    { "id": "s4", "title": "Use a loop to build output" }
+  ],
+  "requirements": [
+    {
+      "id": "req1",
+      "title": "for loop",
+      "description": "Write a for loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(",
+      "flags": "i",
+      "points": 10
+    },
+    {
+      "id": "req2",
+      "title": "while loop",
+      "description": "Write a while loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "while\\s*\\(",
+      "flags": "i",
+      "points": 10
+    },
+    {
+      "id": "req3",
+      "title": "do-while loop",
+      "description": "Write a do-while loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "do\\s*\\{",
+      "flags": "i",
+      "points": 5
+    },
+    {
+      "id": "req4",
+      "title": "console.log in loop",
+      "description": "Use console.log to display loop output",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(",
+      "flags": "i",
+      "points": 5
+    }
+  ],
+  "grading": {
+    "totalPoints": 30,
+    "passingScore": 20,
+    "allowLateSubmit": true,
+    "reviewCommitHistory": true
+  }
+}

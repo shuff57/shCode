@@ -1,5 +1,5 @@
 'use client';
-import { Requirement } from '../lib/lessons';
+import type { Requirement } from '../lib/types';
 import RequirementCard from './RequirementCard';
 
 export default function RequirementsSection({

@@ -1,15 +1,30 @@
 'use client';
-import { useEffect, useState } from 'react';
-import type { Lesson } from '../lib/lessons';
+import { useEffect, useState, useCallback } from 'react';
+import type { Lesson } from '../lib/types';
 import { useLessonStore } from '../lib/store';
+import { buildPreviewHtml } from '../lib/preview-builder';
+import { saveProgress } from '../lib/version-control';
+import { grade } from '../lib/grader';
+import type { GradeReport as GradeReportType } from '../lib/grader';
+import { exportAsZip } from '../lib/export-zip';
 import FileExplorer from './FileExplorer';
 import LessonSteps from './LessonSteps';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
 import RequirementsSection from './RequirementsSection';
 import Console from './Console';
+import CommitDialog from './CommitDialog';
+import HistoryPanel from './HistoryPanel';
+import AssignmentHeader from './AssignmentHeader';
+import SubmitDialog from './SubmitDialog';
+import GradeReportView from './GradeReport';
 
-export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
+interface LessonWorkspaceProps {
+  lesson: Lesson;
+  mode?: 'lesson' | 'assignment';
+}
+
+export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) {
   const setLesson = useLessonStore((s) => s.setLesson);
   const files = useLessonStore((s) => s.fileContents);
   const ui = useLessonStore((s) => s.ui);
@@ -17,7 +32,20 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
   const setActiveTab = useLessonStore((s) => s.setActiveTab);
   const requirements = useLessonStore((s) => s.requirements);
   const setRequirements = useLessonStore((s) => s.setRequirements);
+  const commits = useLessonStore((s) => s.commits);
+  const commitChanges = useLessonStore((s) => s.commitChanges);
+  const getDirtyCount = useLessonStore((s) => s.getDirtyCount);
+
   const [srcDoc, setSrcDoc] = useState('');
+  const [runKey, setRunKey] = useState(0);
+  const [consoleOutput, setConsoleOutput] = useState<Array<{type: string; message: string; timestamp: string}>>([]);
+  const [commitOpen, setCommitOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [submitOpen, setSubmitOpen] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [gradeReport, setGradeReport] = useState<GradeReportType | null>(null);
+
+  const isAssignment = mode === 'assignment' || lesson.type === 'assignment' || lesson.type === 'project';
 
   // enable pane resizing for editor and preview
   useEffect(() => {
@@ -129,48 +157,13 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lesson]);
 
-  // build preview and trigger tests with debounce
+  const isConsoleMode = lesson.preview === 'console';
+
+  // For HTML lessons: auto-build preview on every change (debounced)
   useEffect(() => {
+    if (isConsoleMode) return;
     const to = setTimeout(() => {
-      const html = files['index.html'] || '';
-      const css = files['style.css'] || '';
-      const js = files['script.js'] || '';
-      let doc = html;
-      const linkRegex = /<link[^>]*href=["']style.css["'][^>]*>/i;
-      if (linkRegex.test(doc)) {
-        doc = doc.replace(
-          linkRegex,
-          `<style>body{background:white;}${css}</style>`
-        );
-      } else if (doc.includes('</head>')) {
-        const headIdx = doc.indexOf('</head>');
-        doc =
-          doc.slice(0, headIdx) +
-          `<style>body{background:white;}</style>` +
-          doc.slice(headIdx);
-      } else {
-        doc =
-          `<!DOCTYPE html><html><head><style>body{background:white;}</style></head><body>${doc}`;
-      }
-
-        const consoleIntercept = `(() => {
-    const send = (type, args) => {
-      window.parent.postMessage({ source: 'preview-console', type, args }, '*');
-    };
-    ['log','error','warn','info'].forEach(t => {
-      const fn = console[t];
-      console[t] = (...a) => { send(t, a); fn.apply(console, a); };
-    });
-    window.onerror = (m, s, l, c) => { send('error', [m + ' (' + l + ':' + c + ')']); };
-  })();`;
-
-      const scripts = `<script>${consoleIntercept}\n${js}</script>`;
-      if (doc.includes('</body>')) {
-        const bodyIdx = doc.indexOf('</body>');
-        doc = doc.slice(0, bodyIdx) + scripts + doc.slice(bodyIdx);
-      } else {
-        doc += `${scripts}</body></html>`;
-      }
+      const doc = buildPreviewHtml(lesson.files, files);
       setSrcDoc(doc);
       const to2 = setTimeout(() => {
         runTests();
@@ -178,7 +171,87 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
       return () => clearTimeout(to2);
     }, 600);
     return () => clearTimeout(to);
-  }, [files]);
+  }, [files, isConsoleMode]);
+
+  // For console lessons: run JS directly and capture output.
+  // This is intentional — students write code in the editor and we execute it,
+  // similar to CodeHS, Replit, or any browser-based coding education tool.
+  function runCode() {
+    const logs: Array<{type: string; message: string; timestamp: string}> = [];
+    const time = () => new Date().toLocaleTimeString();
+
+    const scriptContent = files['script.js'] || '';
+
+    const origLog = console.log;
+    const origWarn = console.warn;
+    const origError = console.error;
+
+    const capture = (type: string) => (...args: unknown[]) => {
+      const text = args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' ');
+      logs.push({ type, message: text, timestamp: time() });
+    };
+
+    console.log = capture('log');
+    console.warn = capture('warn');
+    console.error = capture('error');
+
+    try {
+      const run = new Function(scriptContent); // student code execution (educational tool)
+      run();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logs.push({ type: 'error', message: msg, timestamp: time() });
+    }
+
+    console.log = origLog;
+    console.warn = origWarn;
+    console.error = origError;
+
+    setConsoleOutput(logs);
+    setRunKey((k) => k + 1);
+    setTimeout(() => runTests(), 200);
+  }
+
+  // Auto-save to localStorage (debounced)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const timer = setTimeout(() => {
+      const state = useLessonStore.getState();
+      if (state.lesson) {
+        saveProgress(state.lesson.id, {
+          fileContents: state.fileContents,
+          commits: state.commits,
+          lastCommittedFileContents: state.lastCommittedFileContents,
+          completedSteps: [],
+        });
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [files, commits]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        if (isConsoleMode) {
+          runCode();
+        } else {
+          setCommitOpen(true);
+        }
+      }
+      if (e.ctrlKey && e.shiftKey && e.key === 'H') {
+        e.preventDefault();
+        setHistoryOpen((prev) => !prev);
+      }
+      if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+        e.preventDefault();
+        runTests();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   async function runTests() {
     const res = await fetch('/api/grade', {
@@ -187,21 +260,90 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
       body: JSON.stringify({ lessonId: lesson.id, files }),
     });
     const data = await res.json();
-    setRequirements(
-      lesson.requirements.map((r) => ({ ...r, ...data.find((d: any) => d.id === r.id) }))
-    );
+    if (Array.isArray(data)) {
+      setRequirements(
+        lesson.requirements.map((r) => ({ ...r, ...data.find((d: any) => d.id === r.id) }))
+      );
+    } else if (data.results) {
+      setRequirements(
+        lesson.requirements.map((r) => ({ ...r, ...data.results.find((d: any) => d.id === r.id) }))
+      );
+      setGradeReport(data);
+    }
   }
+
+  const runClientGrade = useCallback(() => {
+    const report = grade(
+      lesson.requirements,
+      files,
+      lesson.grading?.passingScore || 0
+    );
+    setGradeReport(report);
+    return report;
+  }, [lesson, files]);
+
+  const handleCommit = (message: string) => {
+    commitChanges(message);
+  };
+
+  const handleSubmit = () => {
+    const report = runClientGrade();
+    setGradeReport(report);
+    setSubmitOpen(true);
+  };
+
+  const confirmSubmit = () => {
+    setSubmitted(true);
+    setSubmitOpen(false);
+    if (typeof window !== 'undefined' && lesson) {
+      const state = useLessonStore.getState();
+      saveProgress(lesson.id, {
+        fileContents: state.fileContents,
+        commits: state.commits,
+        lastCommittedFileContents: state.lastCommittedFileContents,
+        completedSteps: [],
+      });
+    }
+  };
 
   const summary = {
     passed: requirements.filter((r) => r.status === 'passed').length,
     total: requirements.length,
   };
 
+  const dirtyCount = getDirtyCount();
+  const totalScore = gradeReport?.totalScore || 0;
+  const totalPossible = gradeReport?.totalPossible || 0;
+
   return (
     <>
-      <div id="titleRow">
-        <h1>{lesson.title}</h1>
-      </div>
+      {isAssignment ? (
+        <AssignmentHeader
+          lesson={lesson}
+          dirtyCount={dirtyCount}
+          score={totalScore}
+          totalPossible={totalPossible}
+          onOpenCommit={() => setCommitOpen(true)}
+          onOpenHistory={() => setHistoryOpen(true)}
+          onSubmit={handleSubmit}
+          submitted={submitted}
+        />
+      ) : (
+        <div id="titleRow">
+          <h1>{lesson.title}</h1>
+          <div className="title-actions">
+            <button className="btn-secondary btn-sm" onClick={() => setCommitOpen(true)}>
+              Commit{dirtyCount > 0 ? ` (${dirtyCount})` : ''}
+            </button>
+            <button className="btn-secondary btn-sm" onClick={() => setHistoryOpen(true)}>
+              History
+            </button>
+            <button className="btn-secondary btn-sm" onClick={() => exportAsZip(files, `${lesson.id}.zip`)}>
+              Download ZIP
+            </button>
+          </div>
+        </div>
+      )}
       <div
         id="sidebarHover"
         aria-hidden="true"
@@ -250,37 +392,90 @@ export default function LessonWorkspace({ lesson }: { lesson: Lesson }) {
         )}
       </aside>
       <details className="editor-card" open>
-        <summary>Starter Code &amp; Live Preview</summary>
+        <summary>{isConsoleMode ? 'Code Editor' : 'Starter Code & Live Preview'}</summary>
         <div className="editor-body">
-        <div className="editor-preview-container" id="split">
-          <div className="pane" id="editorPane">
-            <CodeEditor />
+          {isConsoleMode && (
+            <div className="run-toolbar">
+              <button className="btn-run" onClick={runCode}>
+                ▶ Run
+              </button>
+              <span className="run-hint">Ctrl+Enter</span>
+            </div>
+          )}
+          <div className="editor-preview-container" id="split">
+            <div className="pane" id="editorPane">
+              <CodeEditor />
+            </div>
+            <div
+              className="divider"
+              id="divider"
+              tabIndex={0}
+              aria-label="Resize editor and preview"
+            >
+              <span className="drag-handle" aria-hidden="true"></span>
+            </div>
+            <div className="pane" id="previewPane">
+              {isConsoleMode ? (
+                <>
+                  <div className="output-header">Output</div>
+                  <pre className="console-output run-output">
+                    {consoleOutput.length === 0 ? (
+                      <div className="console-empty">Click Run to see output.</div>
+                    ) : (
+                      consoleOutput.map((log, i) => (
+                        <div key={i} className={`log-entry log-${log.type}`}>
+                          <span className="log-msg">{log.message}</span>
+                        </div>
+                      ))
+                    )}
+                  </pre>
+                </>
+              ) : (
+                <LivePreview srcDoc={srcDoc} />
+              )}
+            </div>
+            <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
           </div>
-          <div
-            className="divider"
-            id="divider"
-            tabIndex={0}
-            aria-label="Resize editor and preview"
-          >
-            <span className="drag-handle" aria-hidden="true"></span>
-          </div>
-          <div className="pane" id="previewPane">
-            <LivePreview srcDoc={srcDoc} />
-          </div>
-          <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
+          {!isConsoleMode && (
+            <details className="console">
+              <summary>Console</summary>
+              <div className="console-body">
+                <Console resetKey={srcDoc} />
+              </div>
+            </details>
+          )}
         </div>
-        <details className="console">
-          <summary>Console</summary>
-          <div className="console-body">
-            <Console resetKey={srcDoc} />
-          </div>
-        </details>
-      </div>
-    </details>
+      </details>
       <RequirementsSection
         requirements={requirements}
         summary={summary}
         onRerun={runTests}
+      />
+
+      {submitted && gradeReport && (
+        <GradeReportView
+          report={gradeReport}
+          commitCount={commits.length}
+          onReopen={() => setSubmitted(false)}
+          allowReopen={lesson.grading?.allowLateSubmit}
+        />
+      )}
+
+      <CommitDialog
+        isOpen={commitOpen}
+        onClose={() => setCommitOpen(false)}
+        onCommit={handleCommit}
+        dirtyCount={dirtyCount}
+      />
+      <HistoryPanel
+        isOpen={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+      />
+      <SubmitDialog
+        isOpen={submitOpen}
+        onClose={() => setSubmitOpen(false)}
+        onConfirm={confirmSubmit}
+        report={gradeReport}
       />
     </>
   );

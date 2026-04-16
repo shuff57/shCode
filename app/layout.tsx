@@ -4,7 +4,8 @@ import Footer from '../components/Footer';
 import { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'Lesson Coding App',
+  title: 'shCode',
+  description: 'Interactive coding lessons with version control and autograding',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
