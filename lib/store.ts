@@ -76,8 +76,8 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       files.map((f) => [f.path, f.content || ''])
     );
 
-    // For console-mode (JS-only) lessons, default to script.js
-    const defaultFile = lesson.preview === 'console'
+    // For console/jscad-mode (JS-only) lessons, default to script.js
+    const defaultFile = lesson.preview === 'console' || lesson.preview === 'jscad'
       ? (files.find((f) => f.path.endsWith('.js'))?.path || files[0]?.path)
       : files[0]?.path;
 

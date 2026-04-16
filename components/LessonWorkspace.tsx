@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import type { Lesson } from '../lib/types';
 import { useLessonStore } from '../lib/store';
-import { buildPreviewHtml } from '../lib/preview-builder';
+import { buildPreviewHtml, buildJscadPreviewHtml } from '../lib/preview-builder';
 import { saveProgress } from '../lib/version-control';
 import { grade } from '../lib/grader';
 import type { GradeReport as GradeReportType } from '../lib/grader';
@@ -11,6 +11,7 @@ import FileExplorer from './FileExplorer';
 import LessonSteps from './LessonSteps';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
+import JscadPreview from './JscadPreview';
 import RequirementsSection from './RequirementsSection';
 import Console from './Console';
 import CommitDialog from './CommitDialog';
@@ -158,10 +159,24 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
   }, [lesson]);
 
   const isConsoleMode = lesson.preview === 'console';
+  const isJscadMode = lesson.preview === 'jscad';
+
+  // For JSCAD lessons: auto-run on first load
+  useEffect(() => {
+    if (!isJscadMode) return;
+    const scriptContent = files['script.js'] || '';
+    if (!scriptContent.trim()) return;
+    const to = setTimeout(() => {
+      const doc = buildJscadPreviewHtml(scriptContent);
+      setSrcDoc(doc);
+      setTimeout(() => runTests(), 600);
+    }, 300);
+    return () => clearTimeout(to);
+  }, [isJscadMode]); // only on mount, not on every keystroke
 
   // For HTML lessons: auto-build preview on every change (debounced)
   useEffect(() => {
-    if (isConsoleMode) return;
+    if (isConsoleMode || isJscadMode) return;
     const to = setTimeout(() => {
       const doc = buildPreviewHtml(lesson.files, files);
       setSrcDoc(doc);
@@ -171,7 +186,7 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
       return () => clearTimeout(to2);
     }, 600);
     return () => clearTimeout(to);
-  }, [files, isConsoleMode]);
+  }, [files, isConsoleMode, isJscadMode]);
 
   // For console lessons: run JS directly and capture output.
   // This is intentional — students write code in the editor and we execute it,
@@ -212,6 +227,15 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
     setTimeout(() => runTests(), 200);
   }
 
+  // For JSCAD lessons: build 3D preview and render in iframe
+  function runJscad() {
+    const scriptContent = files['script.js'] || '';
+    const doc = buildJscadPreviewHtml(scriptContent);
+    setSrcDoc(doc);
+    setRunKey((k) => k + 1);
+    setTimeout(() => runTests(), 600);
+  }
+
   // Auto-save to localStorage (debounced)
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -236,6 +260,8 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
         e.preventDefault();
         if (isConsoleMode) {
           runCode();
+        } else if (isJscadMode) {
+          runJscad();
         } else {
           setCommitOpen(true);
         }
@@ -392,11 +418,11 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
         )}
       </aside>
       <details className="editor-card" open>
-        <summary>{isConsoleMode ? 'Code Editor' : 'Starter Code & Live Preview'}</summary>
+        <summary>{isConsoleMode ? 'Code Editor' : isJscadMode ? 'Code Editor & 3D Viewer' : 'Starter Code & Live Preview'}</summary>
         <div className="editor-body">
-          {isConsoleMode && (
+          {(isConsoleMode || isJscadMode) && (
             <div className="run-toolbar">
-              <button className="btn-run" onClick={runCode}>
+              <button className="btn-run" onClick={isJscadMode ? runJscad : runCode}>
                 ▶ Run
               </button>
               <span className="run-hint">Ctrl+Enter</span>
@@ -430,6 +456,8 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
                     )}
                   </pre>
                 </>
+              ) : isJscadMode ? (
+                <JscadPreview srcDoc={srcDoc} />
               ) : (
                 <LivePreview srcDoc={srcDoc} />
               )}
@@ -440,7 +468,7 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
             <details className="console">
               <summary>Console</summary>
               <div className="console-body">
-                <Console resetKey={srcDoc} />
+                <Console resetKey={isJscadMode ? String(runKey) : srcDoc} />
               </div>
             </details>
           )}

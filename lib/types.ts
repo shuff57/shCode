@@ -74,7 +74,7 @@ export interface Lesson {
   estimateMins: number;
   category?: string;
   unit?: string;
-  preview?: 'html' | 'console';
+  preview?: 'html' | 'console' | 'jscad';
   week?: number;
   slos?: string[];
   files: FileNode[];

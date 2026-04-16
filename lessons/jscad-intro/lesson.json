@@ -1,0 +1,119 @@
+{
+  "id": "jscad-intro",
+  "title": "2.1.1 Libraries and JSCAD Introduction",
+  "description": "Learn what a software library is, import @jscad/modeling, and write your first 3D program.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 35,
+  "category": "Unit 2: JSCAD — 2D to 3D",
+  "unit": "2.1 JSCAD Foundations",
+  "preview": "jscad",
+  "week": 10,
+  "slos": ["SLO-2"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Import the library",
+      "instructions": "Use `require('@jscad/modeling')` to import the JSCAD library and destructure the `primitives` module.",
+      "hints": [
+        "The syntax is: const { primitives } = require('@jscad/modeling')",
+        "Destructuring pulls out just the tools you need from the library."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Write the main() function",
+      "instructions": "Create a function called `main` that returns a shape. Every JSCAD program needs this function as its entry point.",
+      "hints": [
+        "function main() { return /* a shape here */; }",
+        "main() must return a geometry or an array of geometries."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Return a cube",
+      "instructions": "Inside `main()`, use `primitives.cube({ size: 10 })` to create your first 3D shape. Click Run to see it.",
+      "hints": [
+        "primitives.cube() creates a cube. The size property controls how big it is.",
+        "Try changing size to 20 or 5 and clicking Run again."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Export your main function",
+      "instructions": "Add `module.exports = { main }` at the bottom so JSCAD knows which function to call.",
+      "hints": [
+        "This line tells the system: 'my main function is the entry point.'",
+        "Without this, JSCAD won't know how to run your code."
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "Experiment with other shapes",
+      "instructions": "Try `primitives.sphere({ radius: 8 })` or `primitives.cylinder({ radius: 5, height: 15 })`. Import the `transforms` module and use `transforms.translate([10, 0, 0], shape)` to move shapes."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "req1",
+      "title": "Import @jscad/modeling",
+      "description": "Use require() to import the JSCAD modeling library",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "require\\s*\\(\\s*['\"]@jscad/modeling['\"]\\s*\\)",
+      "flags": "",
+      "points": 10,
+      "status": "pending"
+    },
+    {
+      "id": "req2",
+      "title": "Destructure primitives",
+      "description": "Pull out the primitives module from the import",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\{[^}]*primitives[^}]*\\}",
+      "flags": "",
+      "points": 5,
+      "status": "pending"
+    },
+    {
+      "id": "req3",
+      "title": "Define main function",
+      "description": "Write a main() function",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+main\\s*\\(",
+      "flags": "",
+      "points": 10,
+      "status": "pending"
+    },
+    {
+      "id": "req4",
+      "title": "Export main",
+      "description": "Export the main function with module.exports",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "module\\.exports\\s*=",
+      "flags": "",
+      "points": 5,
+      "status": "pending"
+    },
+    {
+      "id": "req5",
+      "title": "Use a 3D primitive",
+      "description": "Create at least one shape using primitives (cube, sphere, cylinder, etc.)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "primitives\\.(cube|sphere|cylinder|cuboid|roundedCuboid|geodesicSphere|ellipsoid|roundedCylinder|torus)\\s*\\(",
+      "flags": "",
+      "points": 10,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 40,
+    "passingScore": 25,
+    "allowLateSubmit": true,
+    "reviewCommitHistory": true
+  }
+}
