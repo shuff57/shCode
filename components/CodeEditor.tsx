@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter } from '@codemirror/view';
+import type { ChangeEvent } from 'react';
 import { EditorState } from '@codemirror/state';
 import { javascript } from '@codemirror/lang-javascript';
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
@@ -120,11 +121,43 @@ function makeExtensions(onChange: (doc: string) => void) {
 export default function CodeEditor() {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const currentFile = useLessonStore((s) => s.currentFile);
   const value = useLessonStore((s) => (currentFile ? s.fileContents[currentFile] : ''));
   const updateFile = useLessonStore((s) => s.updateFile);
   const fileRef = useRef(currentFile);
   fileRef.current = currentFile;
+
+  const handleDownload = () => {
+    if (!currentFile) return;
+    const blob = new Blob([value ?? ''], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = currentFile.split('/').pop() || 'file.txt';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file || !currentFile) return;
+    const text = await file.text();
+    updateFile(currentFile, text);
+    const view = viewRef.current;
+    if (view) {
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: text },
+      });
+    }
+  };
 
   // Create or recreate editor when file changes
   useEffect(() => {
@@ -161,5 +194,25 @@ export default function CodeEditor() {
     return <div style={{ padding: 16, color: '#888' }}>No file selected</div>;
   }
 
-  return <div ref={containerRef} id="editor" />;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div className="editor-file-toolbar">
+        <span className="editor-file-name">{currentFile}</span>
+        <button type="button" className="btn-secondary btn-sm" onClick={handleUploadClick}>
+          Upload
+        </button>
+        <button type="button" className="btn-secondary btn-sm" onClick={handleDownload}>
+          Download
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".js,.ts,.html,.css,.json,.txt,.md"
+          onChange={handleUpload}
+          style={{ display: 'none' }}
+        />
+      </div>
+      <div ref={containerRef} id="editor" style={{ flex: 1, minHeight: 0 }} />
+    </div>
+  );
 }

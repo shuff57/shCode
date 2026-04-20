@@ -432,6 +432,17 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
                 ▶ Run
               </button>
               <span className="run-hint">Ctrl+Enter</span>
+              {isQ5Mode && (
+                <a
+                  href="/q5play/docs/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-secondary btn-sm"
+                  style={{ marginLeft: 'auto' }}
+                >
+                  Docs ↗
+                </a>
+              )}
             </div>
           )}
           <div className="editor-preview-container" id="split">
