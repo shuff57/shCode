@@ -125,6 +125,7 @@ export default function CodeEditor() {
   const currentFile = useLessonStore((s) => s.currentFile);
   const value = useLessonStore((s) => (currentFile ? s.fileContents[currentFile] : ''));
   const updateFile = useLessonStore((s) => s.updateFile);
+  const previewMode = useLessonStore((s) => s.lesson?.preview);
   const fileRef = useRef(currentFile);
   fileRef.current = currentFile;
 
@@ -204,6 +205,16 @@ export default function CodeEditor() {
         <button type="button" className="btn-secondary btn-sm" onClick={handleDownload}>
           Download
         </button>
+        {previewMode === 'q5play' && (
+          <a
+            href="/q5play/docs/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-secondary btn-sm"
+          >
+            Docs ↗
+          </a>
+        )}
         <input
           ref={fileInputRef}
           type="file"

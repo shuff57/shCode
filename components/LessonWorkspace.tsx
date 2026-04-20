@@ -6,7 +6,6 @@ import { buildPreviewHtml, buildJscadPreviewHtml } from '../lib/preview-builder'
 import { saveProgress } from '../lib/version-control';
 import { grade } from '../lib/grader';
 import type { GradeReport as GradeReportType } from '../lib/grader';
-import { exportAsZip } from '../lib/export-zip';
 import FileExplorer from './FileExplorer';
 import LessonSteps from './LessonSteps';
 import CodeEditor from './CodeEditor';
@@ -370,9 +369,6 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
             <button className="btn-secondary btn-sm" onClick={() => setHistoryOpen(true)}>
               History
             </button>
-            <button className="btn-secondary btn-sm" onClick={() => exportAsZip(files, `${lesson.id}.zip`)}>
-              Download ZIP
-            </button>
           </div>
         </div>
       )}
@@ -432,17 +428,6 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
                 ▶ Run
               </button>
               <span className="run-hint">Ctrl+Enter</span>
-              {isQ5Mode && (
-                <a
-                  href="/q5play/docs/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-secondary btn-sm"
-                  style={{ marginLeft: 'auto' }}
-                >
-                  Docs ↗
-                </a>
-              )}
             </div>
           )}
           <div className="editor-preview-container" id="split">
