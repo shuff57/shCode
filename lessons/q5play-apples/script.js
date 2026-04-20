@@ -30,9 +30,9 @@ function update() {
   for (let a of [...apples]) {
     if (a.overlapping(basket)) {
       score++;
-      a.remove();
+      apples.remove(a);
     } else if (a.y > 450) {
-      a.remove();
+      apples.remove(a);
     }
   }
 }

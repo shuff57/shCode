@@ -32,7 +32,7 @@
     {
       "id": "s4",
       "title": "Overlap rules",
-      "instructions": "Bullet overlaps asteroid → both .remove(). Ship overlaps asteroid → game over (stop updating, show text).",
+      "instructions": "Bullet overlaps asteroid → bullets.remove(bullet) and asteroids.remove(asteroid). Ship overlaps asteroid → game over (stop updating, show text).",
       "hints": []
     }
   ],

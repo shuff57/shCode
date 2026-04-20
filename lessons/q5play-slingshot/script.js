@@ -41,7 +41,7 @@ function update() {
   if (dragging && !mouse.pressing()) {
     dragging = false;
     if (tether) {
-      tether.remove();
+      tether.delete();
       tether = null;
     }
   }

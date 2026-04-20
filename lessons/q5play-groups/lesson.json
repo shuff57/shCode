@@ -32,7 +32,7 @@
     {
       "id": "s4",
       "title": "Remove sprites that leave the screen",
-      "instructions": "for each sprite in the group: if sprite.y > height + 50, sprite.remove(). Otherwise your sketch slows to a crawl.",
+      "instructions": "for each sprite in the group: if sprite.y > height + 50, stars.remove(sprite). Otherwise your sketch slows to a crawl.",
       "hints": ["Iterate a copy when removing: [...stars].forEach(...)"]
     }
   ],

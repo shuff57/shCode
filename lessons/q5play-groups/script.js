@@ -27,7 +27,7 @@ function update() {
   // STEP 4: Remove stars that fall past the bottom
   //   Iterate a copy ([...group]) when removing — otherwise you skip items.
   //   for (let s of [...stars]) {
-  //     if (s.y > 450) s.remove();
+  //     if (s.y > 450) stars.remove(s);
   //   }
 }
 
