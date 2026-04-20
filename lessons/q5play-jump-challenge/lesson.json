@@ -1,6 +1,6 @@
 {
   "id": "q5play-jump-challenge",
-  "title": "5.1.3 Space Jumper — Challenge",
+  "title": "5.1.5 Space Jumper — Challenge",
   "description": "Build a one-sprite platformer: arrow keys move, space jumps — but only when on the ground.",
   "type": "assignment",
   "difficulty": "beginner",

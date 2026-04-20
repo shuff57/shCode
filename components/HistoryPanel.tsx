@@ -2,9 +2,20 @@
 
 import { useState, useMemo } from 'react';
 import { useLessonStore } from '../lib/store';
-import type { Commit, Version } from '../lib/types';
+import type { Commit, Version, FileNode } from '../lib/types';
 import { History, Clock, X, RotateCcw } from 'lucide-react';
 import DiffViewer from './DiffViewer';
+
+function findFileByPath(nodes: FileNode[], target: string): FileNode | null {
+  for (const n of nodes) {
+    if (n.type === 'file' && n.path === target) return n;
+    if (n.type === 'folder' && n.children) {
+      const hit = findFileByPath(n.children, target);
+      if (hit) return hit;
+    }
+  }
+  return null;
+}
 
 interface HistoryPanelProps {
   isOpen: boolean;
@@ -42,6 +53,14 @@ export default function HistoryPanel({ isOpen, onClose }: HistoryPanelProps) {
     }
     return versions;
   }, [commits, currentFile, currentFileId]);
+
+  // For `example` lessons, expose the starter code as a restore-to-default entry.
+  const defaultVersion = useMemo<Version | null>(() => {
+    if (!lesson || lesson.type !== 'example' || !currentFile) return null;
+    const node = findFileByPath(lesson.files, currentFile);
+    if (!node || node.content === undefined) return null;
+    return { timestamp: 0, content: node.content };
+  }, [lesson, currentFile]);
 
   if (!isOpen) return null;
 
@@ -84,23 +103,34 @@ export default function HistoryPanel({ isOpen, onClose }: HistoryPanelProps) {
         <div className="history-body">
           <div className="history-list">
             {tab === 'file' ? (
-              fileVersions.length === 0 ? (
+              fileVersions.length === 0 && !defaultVersion ? (
                 <p className="history-empty">No history for this file yet.</p>
               ) : (
-                fileVersions.map((v, i) => (
-                  <button
-                    key={v.timestamp}
-                    className={`history-item ${selectedVersion?.timestamp === v.timestamp ? 'active' : ''}`}
-                    onClick={() => { setSelectedVersion(v); setSelectedCommit(null); }}
-                  >
-                    <div className="history-item-title">
-                      {i === 0 ? 'Latest commit' : `Version ${fileVersions.length - i}`}
-                    </div>
-                    <div className="history-item-time">
-                      {timeAgo(v.timestamp)} - {formatTime(v.timestamp)}
-                    </div>
-                  </button>
-                ))
+                <>
+                  {fileVersions.map((v, i) => (
+                    <button
+                      key={v.timestamp}
+                      className={`history-item ${selectedVersion?.timestamp === v.timestamp ? 'active' : ''}`}
+                      onClick={() => { setSelectedVersion(v); setSelectedCommit(null); }}
+                    >
+                      <div className="history-item-title">
+                        {i === 0 ? 'Latest commit' : `Version ${fileVersions.length - i}`}
+                      </div>
+                      <div className="history-item-time">
+                        {timeAgo(v.timestamp)} - {formatTime(v.timestamp)}
+                      </div>
+                    </button>
+                  ))}
+                  {defaultVersion && (
+                    <button
+                      className={`history-item ${selectedVersion?.timestamp === 0 ? 'active' : ''}`}
+                      onClick={() => { setSelectedVersion(defaultVersion); setSelectedCommit(null); }}
+                    >
+                      <div className="history-item-title">Original (starter)</div>
+                      <div className="history-item-time">Restore to default</div>
+                    </button>
+                  )}
+                </>
               )
             ) : (
               [...commits].reverse().map((c) => (

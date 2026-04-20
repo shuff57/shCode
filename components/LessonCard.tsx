@@ -5,6 +5,7 @@ const typeBadgeColors: Record<string, string> = {
   lesson: '#5baafd',
   assignment: '#f59e0b',
   project: '#10b981',
+  example: '#a78bfa',
 };
 
 export default function LessonCard({ lesson }: { lesson: Lesson }) {

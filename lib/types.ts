@@ -31,7 +31,7 @@ export type FileHistory = Record<string, Version[]>;
 
 // ---- Lessons & Assignments ----
 
-export type LessonType = 'lesson' | 'assignment' | 'project';
+export type LessonType = 'lesson' | 'assignment' | 'project' | 'example';
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 export type RequirementType = 'regex' | 'output' | 'function' | 'custom';
 

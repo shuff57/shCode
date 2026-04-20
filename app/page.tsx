@@ -13,9 +13,13 @@ export default async function HomePage() {
     categorized.get(cat)!.push(lesson);
   }
 
-  // Sort lessons within each category by week
+  // Sort lessons within each category by week, then by title (so "5.1.1" precedes "5.1.2")
   categorized.forEach((catLessons) => {
-    catLessons.sort((a, b) => (a.week ?? 99) - (b.week ?? 99));
+    catLessons.sort((a, b) => {
+      const w = (a.week ?? 99) - (b.week ?? 99);
+      if (w !== 0) return w;
+      return a.title.localeCompare(b.title);
+    });
   });
 
   // Separate HTML (legacy hardcoded subcategories) from data-driven categories

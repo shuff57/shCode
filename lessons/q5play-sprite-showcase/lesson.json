@@ -1,0 +1,40 @@
+{
+  "id": "q5play-sprite-showcase",
+  "title": "5.1.1 Sprite Showcase — Example",
+  "description": "A tour of what a sprite can look like: colors, shapes, sizes. Read the code, run it, change things.",
+  "type": "example",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 5: q5play — Game Physics",
+  "unit": "5.1 Sprites & Movement",
+  "preview": "q5play",
+  "week": 13,
+  "slos": ["SLO-1"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "Click Run. You'll see six sprites: rectangles, squares, circles, in different colors.",
+      "hints": ["Nothing moves yet — we'll add movement in the next lesson."]
+    },
+    {
+      "id": "s2",
+      "title": "Change a color",
+      "instructions": "Edit any `.color = '...'` line. Try 'tomato', '#8ef', 'rgba(0,255,0,0.5)'.",
+      "hints": ["Any CSS color string works."]
+    },
+    {
+      "id": "s3",
+      "title": "Resize a sprite",
+      "instructions": "Change the width/height numbers in a `new Sprite(x, y, w, h)` call.",
+      "hints": ["`new Sprite(x, y, diameter)` with one size argument makes a circle collider."]
+    },
+    {
+      "id": "s4",
+      "title": "Restore to default",
+      "instructions": "Click History → File History → 'Original (starter)' → Restore to get the code back.",
+      "hints": ["This only appears on examples — feel free to experiment without fear."]
+    }
+  ],
+  "requirements": []
+}

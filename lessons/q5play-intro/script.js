@@ -1,6 +1,6 @@
 /// <reference path="/q5play/docs/q5play.d.ts" />
 
-// 5.1.1 Hello Sprite — your first q5play sketch.
+// 5.1.2 Hello Sprite — your first q5play sketch.
 // Uncomment each STEP and fill in the code.
 
 let player;
