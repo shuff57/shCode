@@ -13,34 +13,27 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Read the example",
-      "instructions": "A basket (arrow keys) at the bottom, an apples Group that spawns at the top. Overlap adds score.",
+      "title": "Run it",
+      "instructions": "Use arrow keys to move the basket. Every apple you catch increments the score.",
       "hints": ["The basket is kinematic — moves with keys, not gravity."]
     },
     {
       "id": "s2",
-      "title": "Speed up difficulty",
-      "instructions": "Make spawn rate increase over time — e.g., every 5 seconds drop the spawn interval.",
+      "title": "Speed up over time",
+      "instructions": "Make the spawn rate increase as the game progresses — e.g., every 5 seconds drop the spawn interval.",
       "hints": ["Use frameCount % spawnInterval === 0, then decrement spawnInterval periodically."]
     },
     {
       "id": "s3",
       "title": "Add rocks",
-      "instructions": "A second Group (rocks). Overlapping a rock costs a life.",
+      "instructions": "A second Group. Overlapping a rock costs a life.",
       "hints": ["Give rocks a gray color and slightly slower fall."]
     },
     {
       "id": "s4",
-      "title": "Display score",
-      "instructions": "In draw(), use text(score, 20, 30) to show the number.",
-      "hints": ["fill() or textColor() controls text color; textSize(24) sets the size."]
+      "title": "Style the HUD",
+      "instructions": "Change the text color, add a lives counter, anything that makes it feel like a game.",
+      "hints": ["fill() sets the text color; textSize() sets the size."]
     }
-  ],
-  "requirements": [
-    { "id": "r1", "title": "Create a Group of apples", "description": "At least one Group", "type": "regex", "file": "script.js", "pattern": "new\\s+Group\\s*\\(", "flags": "", "points": 10, "status": "pending" },
-    { "id": "r2", "title": "Use overlap detection", "description": "Call .overlapping(...) or .overlaps(...)", "type": "regex", "file": "script.js", "pattern": "\\.overlap(s|ping)\\s*\\(", "flags": "", "points": 15, "status": "pending" },
-    { "id": "r3", "title": "Arrow-key basket", "description": "Use kb.pressing for movement", "type": "regex", "file": "script.js", "pattern": "kb\\.pressing\\s*\\(", "flags": "", "points": 5, "status": "pending" },
-    { "id": "r4", "title": "Track a score variable", "description": "Uses a score (or points/lives) variable", "type": "regex", "file": "script.js", "pattern": "(score|points|lives)\\s*(\\+\\+|\\+=|=)", "flags": "", "points": 5, "status": "pending" }
-  ],
-  "grading": { "totalPoints": 35, "passingScore": 25, "allowLateSubmit": true }
+  ]
 }

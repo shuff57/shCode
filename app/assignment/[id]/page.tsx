@@ -1,5 +1,5 @@
 import LessonWorkspace from '../../../components/LessonWorkspace';
-import { getLesson, loadLessons } from '../../../lib/lessons';
+import { getLesson, getLessonNeighbors, loadLessons } from '../../../lib/lessons';
 
 export async function generateStaticParams() {
   const lessons = await loadLessons();
@@ -15,5 +15,14 @@ export default async function AssignmentPage({
   const lesson = await getLesson(id);
 
   if (!lesson) return <div className="p-4">Assignment not found</div>;
-  return <LessonWorkspace lesson={lesson} mode="assignment" />;
+  const { prev, next } = await getLessonNeighbors(id);
+  return (
+    <LessonWorkspace
+      lesson={lesson}
+      mode="assignment"
+      prev={prev}
+      next={next}
+      basePath="/assignment"
+    />
+  );
 }

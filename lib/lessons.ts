@@ -83,3 +83,33 @@ export async function getLesson(id: string): Promise<Lesson | undefined> {
   const lessons = await loadLessons();
   return lessons.find((l) => l.id === id);
 }
+
+export interface LessonNeighbor {
+  id: string;
+  title: string;
+}
+
+// Prev/next within the same `category`, ordered by week → unit → title.
+export async function getLessonNeighbors(
+  id: string
+): Promise<{ prev: LessonNeighbor | null; next: LessonNeighbor | null }> {
+  const lessons = await loadLessons();
+  const current = lessons.find((l) => l.id === id);
+  if (!current) return { prev: null, next: null };
+  const peers = lessons
+    .filter((l) => l.category === current.category)
+    .sort((a, b) => {
+      const w = (a.week ?? 999) - (b.week ?? 999);
+      if (w !== 0) return w;
+      const u = (a.unit || '').localeCompare(b.unit || '');
+      if (u !== 0) return u;
+      return a.title.localeCompare(b.title);
+    });
+  const idx = peers.findIndex((l) => l.id === id);
+  const toNeighbor = (l?: Lesson): LessonNeighbor | null =>
+    l ? { id: l.id, title: l.title } : null;
+  return {
+    prev: toNeighbor(idx > 0 ? peers[idx - 1] : undefined),
+    next: toNeighbor(idx < peers.length - 1 ? peers[idx + 1] : undefined),
+  };
+}

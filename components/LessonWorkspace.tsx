@@ -20,12 +20,26 @@ import AssignmentHeader from './AssignmentHeader';
 import SubmitDialog from './SubmitDialog';
 import GradeReportView from './GradeReport';
 
+interface Neighbor {
+  id: string;
+  title: string;
+}
+
 interface LessonWorkspaceProps {
   lesson: Lesson;
   mode?: 'lesson' | 'assignment';
+  prev?: Neighbor | null;
+  next?: Neighbor | null;
+  basePath?: string;
 }
 
-export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) {
+export default function LessonWorkspace({
+  lesson,
+  mode,
+  prev = null,
+  next = null,
+  basePath = '/lesson',
+}: LessonWorkspaceProps) {
   const setLesson = useLessonStore((s) => s.setLesson);
   const files = useLessonStore((s) => s.fileContents);
   const ui = useLessonStore((s) => s.ui);
@@ -491,6 +505,33 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
           onReopen={() => setSubmitted(false)}
           allowReopen={lesson.grading?.allowLateSubmit}
         />
+      )}
+
+      {(prev || next) && (
+        <nav className="lesson-nav">
+          {prev ? (
+            <a className="lesson-nav-link" href={`${basePath}/${prev.id}`}>
+              <span className="lesson-nav-arrow">←</span>
+              <span className="lesson-nav-label">
+                <span className="lesson-nav-kicker">Previous</span>
+                <span className="lesson-nav-title">{prev.title}</span>
+              </span>
+            </a>
+          ) : (
+            <span />
+          )}
+          {next ? (
+            <a className="lesson-nav-link lesson-nav-link-right" href={`${basePath}/${next.id}`}>
+              <span className="lesson-nav-label">
+                <span className="lesson-nav-kicker">Next</span>
+                <span className="lesson-nav-title">{next.title}</span>
+              </span>
+              <span className="lesson-nav-arrow">→</span>
+            </a>
+          ) : (
+            <span />
+          )}
+        </nav>
       )}
 
       <CommitDialog

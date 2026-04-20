@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import type { DocSection } from '../../../../lib/q5play-docs';
+import DocsSandbox from './DocsSandbox';
 
 interface Props {
   section: DocSection;
@@ -81,9 +82,10 @@ export default function DocsClient({ section, allSections }: Props) {
           ))}
         </div>
         {page.code && (
-          <pre className="docs-code">
-            <code>{page.code}</code>
-          </pre>
+          <DocsSandbox
+            key={`${section.slug}-${pageIndex}`}
+            initialCode={page.code}
+          />
         )}
 
         <footer className="docs-pagination">
