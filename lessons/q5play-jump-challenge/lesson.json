@@ -1,0 +1,49 @@
+{
+  "id": "q5play-jump-challenge",
+  "title": "5.1.3 Space Jumper — Challenge",
+  "description": "Build a one-sprite platformer: arrow keys move, space jumps — but only when on the ground.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 40,
+  "category": "Unit 5: q5play — Game Physics",
+  "unit": "5.1 Sprites & Movement",
+  "preview": "q5play",
+  "week": 13,
+  "slos": ["SLO-1", "SLO-3"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Set up the scene",
+      "instructions": "Create a canvas, set world.gravity.y, add a player (dynamic) and a ground (static).",
+      "hints": ["Re-use the pattern from 5.1.2 Falling Block."]
+    },
+    {
+      "id": "s2",
+      "title": "Horizontal movement",
+      "instructions": "In update(), read kb.pressing('left') / kb.pressing('right') and set player.vel.x accordingly.",
+      "hints": ["kb.pressing returns true while the key is held down.", "Set vel.x to 0 when neither key is pressed — or your player will coast."]
+    },
+    {
+      "id": "s3",
+      "title": "Ground-contact jump",
+      "instructions": "Use kb.presses(' ') (edge-triggered, fires once per tap) AND player.colliding(ground). Only then set player.vel.y = -8.",
+      "hints": ["kb.pressing(' ') would let the player hover forever — kb.presses(' ') fires only on the initial key-down.", "colliding(ground) checks physical contact this frame."]
+    },
+    {
+      "id": "s4",
+      "title": "Draw",
+      "instructions": "Clear the background each frame.",
+      "hints": []
+    }
+  ],
+  "requirements": [
+    { "id": "r1", "title": "Create a canvas", "description": "Call new Canvas(...)", "type": "regex", "file": "script.js", "pattern": "new\\s+Canvas\\s*\\(", "flags": "", "points": 5, "status": "pending" },
+    { "id": "r2", "title": "Set gravity", "description": "Assign a positive value to world.gravity.y", "type": "regex", "file": "script.js", "pattern": "world\\.gravity\\.y\\s*=", "flags": "", "points": 5, "status": "pending" },
+    { "id": "r3", "title": "Use a static ground", "description": "Create a static sprite", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\([^)]*['\"]static['\"]", "flags": "", "points": 5, "status": "pending" },
+    { "id": "r4", "title": "Horizontal movement with kb.pressing", "description": "Use kb.pressing for left/right movement", "type": "regex", "file": "script.js", "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:left|right)['\"]", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r5", "title": "Edge-triggered jump with kb.presses", "description": "Use kb.presses for the jump (not kb.pressing)", "type": "regex", "file": "script.js", "pattern": "kb\\.presses\\s*\\(", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r6", "title": "Check ground contact before jumping", "description": "Use .colliding(...) to gate the jump", "type": "regex", "file": "script.js", "pattern": "\\.colliding\\s*\\(", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r7", "title": "Set vertical velocity", "description": "Assign to a sprite's vel.y for the jump impulse", "type": "regex", "file": "script.js", "pattern": "\\.vel\\.y\\s*=", "flags": "", "points": 5, "status": "pending" }
+  ],
+  "grading": { "totalPoints": 50, "passingScore": 35, "allowLateSubmit": true, "reviewCommitHistory": true }
+}

@@ -1,0 +1,47 @@
+{
+  "id": "q5play-platformer-challenge",
+  "title": "5.4.3 Side-Scrolling Platformer — Challenge",
+  "description": "A multi-platform level with camera follow, a goal flag, and a win condition.",
+  "type": "assignment",
+  "difficulty": "advanced",
+  "estimateMins": 75,
+  "category": "Unit 5: q5play — Game Physics",
+  "unit": "5.4 Animation & Camera",
+  "preview": "q5play",
+  "week": 16,
+  "slos": ["SLO-1", "SLO-3", "SLO-4"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Level geometry",
+      "instructions": "Build a level ~2000px wide with at least 6 static platforms at varied heights.",
+      "hints": ["Use a loop to scatter them, or list them explicitly."]
+    },
+    {
+      "id": "s2",
+      "title": "Player + controls",
+      "instructions": "Dynamic player. Left/Right move; Space jumps when on a platform (use colliding vs. any static).",
+      "hints": ["Track an onGround flag each frame by checking collision."]
+    },
+    {
+      "id": "s3",
+      "title": "Camera follow",
+      "instructions": "camera.x eases toward player.x each frame.",
+      "hints": []
+    },
+    {
+      "id": "s4",
+      "title": "Goal flag + win",
+      "instructions": "At the far right, a static flag sprite. When player.overlapping(flag), display 'You Win!' in draw.",
+      "hints": []
+    }
+  ],
+  "requirements": [
+    { "id": "r1", "title": "Uses the camera", "description": "Reads or writes camera.x / camera.y", "type": "regex", "file": "script.js", "pattern": "camera\\.(x|y)", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r2", "title": "Multiple static platforms", "description": "Multiple 'static' sprites", "type": "regex", "file": "script.js", "pattern": "['\"]static['\"][\\s\\S]*['\"]static['\"][\\s\\S]*['\"]static['\"]", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r3", "title": "Ground-check jump", "description": "Uses kb.presses with .colliding", "type": "regex", "file": "script.js", "pattern": "kb\\.presses\\s*\\([\\s\\S]*\\.colliding\\s*\\(|\\.colliding\\s*\\([\\s\\S]*kb\\.presses\\s*\\(", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r4", "title": "Win condition via overlap", "description": "Uses .overlapping or .overlaps for the goal", "type": "regex", "file": "script.js", "pattern": "\\.overlap(s|ping)\\s*\\(", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r5", "title": "Displays text", "description": "Calls text(...) to display a message", "type": "regex", "file": "script.js", "pattern": "\\btext\\s*\\(", "flags": "", "points": 5, "status": "pending" }
+  ],
+  "grading": { "totalPoints": 45, "passingScore": 32, "allowLateSubmit": true, "reviewCommitHistory": true }
+}

@@ -1,0 +1,46 @@
+{
+  "id": "q5play-groups",
+  "title": "5.3.1 Introducing Groups",
+  "description": "Groups let you treat many sprites as one. Create, configure, and iterate a Group.",
+  "type": "lesson",
+  "difficulty": "intermediate",
+  "estimateMins": 25,
+  "category": "Unit 5: q5play — Game Physics",
+  "unit": "5.3 Groups & Overlaps",
+  "preview": "q5play",
+  "week": 15,
+  "slos": ["SLO-1", "SLO-4"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Make a Group",
+      "instructions": "stars = new Group(); — a Group is a sprite factory + a container.",
+      "hints": ["Groups inherit from Array — use stars.length, for..of, filter, etc."]
+    },
+    {
+      "id": "s2",
+      "title": "Set defaults on the Group",
+      "instructions": "stars.color = 'yellow'; stars.diameter = 10; — every sprite added to the group starts with these.",
+      "hints": ["Set defaults once rather than per-sprite."]
+    },
+    {
+      "id": "s3",
+      "title": "Spawn sprites into the Group",
+      "instructions": "In update(), every so often call new stars.Sprite(randomX, 0) — note capital-S Sprite on the group.",
+      "hints": ["Use world.frameCount % 20 === 0 to spawn every 20 frames."]
+    },
+    {
+      "id": "s4",
+      "title": "Remove sprites that leave the screen",
+      "instructions": "for each sprite in the group: if sprite.y > height + 50, sprite.remove(). Otherwise your sketch slows to a crawl.",
+      "hints": ["Iterate a copy when removing: [...stars].forEach(...)"]
+    }
+  ],
+  "requirements": [
+    { "id": "r1", "title": "Create a Group", "description": "Use new Group()", "type": "regex", "file": "script.js", "pattern": "new\\s+Group\\s*\\(", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r2", "title": "Spawn into the Group", "description": "Use groupName.Sprite(...) to spawn a sprite in the group", "type": "regex", "file": "script.js", "pattern": "new\\s+\\w+\\.Sprite\\s*\\(", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r3", "title": "Group default", "description": "Set a property on the Group itself (e.g. .color, .diameter)", "type": "regex", "file": "script.js", "pattern": "\\w+\\.(color|diameter|width|height)\\s*=", "flags": "", "points": 5, "status": "pending" },
+    { "id": "r4", "title": "Remove offscreen sprites", "description": "Call .remove() somewhere", "type": "regex", "file": "script.js", "pattern": "\\.remove\\s*\\(", "flags": "", "points": 5, "status": "pending" }
+  ],
+  "grading": { "totalPoints": 30, "passingScore": 20, "allowLateSubmit": true }
+}

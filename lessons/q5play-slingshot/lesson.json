@@ -1,0 +1,39 @@
+{
+  "id": "q5play-slingshot",
+  "title": "5.5.2 Slingshot — Worked Example",
+  "description": "Drag a ball back from a fixed anchor, release, and watch it launch.",
+  "type": "lesson",
+  "difficulty": "advanced",
+  "estimateMins": 30,
+  "category": "Unit 5: q5play — Game Physics",
+  "unit": "5.5 Joints & Advanced Input",
+  "preview": "q5play",
+  "week": 17,
+  "slos": ["SLO-1", "SLO-3"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Read the example",
+      "instructions": "A DistanceJoint tethers the ball to an anchor. On mouse drag, we set ball.x/y; on release we let physics take over.",
+      "hints": ["Removing the joint on release lets the ball fly free."]
+    },
+    {
+      "id": "s2",
+      "title": "Increase snap strength",
+      "instructions": "Try joint.damping = 0.1 to make the tether snappier. Or remove the joint entirely and set ball.vel directly based on drag distance.",
+      "hints": []
+    },
+    {
+      "id": "s3",
+      "title": "Add targets",
+      "instructions": "Stack a few dynamic blocks and knock them over with the slingshot.",
+      "hints": []
+    }
+  ],
+  "requirements": [
+    { "id": "r1", "title": "Uses a joint for the tether", "description": "DistanceJoint, GrabberJoint, or similar", "type": "regex", "file": "script.js", "pattern": "new\\s+(DistanceJoint|GrabberJoint|GlueJoint)\\s*\\(", "flags": "", "points": 15, "status": "pending" },
+    { "id": "r2", "title": "Uses mouse input", "description": "Reads mouse.x / mouse.y / mouse.presses / mouse.drags", "type": "regex", "file": "script.js", "pattern": "mouse\\.(x|y|presses|pressing|drags|releases|released)", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r3", "title": "Has target blocks or knockables", "description": "More than one dynamic sprite", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\([\\s\\S]*new\\s+Sprite\\s*\\(", "flags": "", "points": 5, "status": "pending" }
+  ],
+  "grading": { "totalPoints": 30, "passingScore": 20, "allowLateSubmit": true }
+}

@@ -1,0 +1,45 @@
+{
+  "id": "q5play-gravity",
+  "title": "5.1.2 Falling Block — Worked Example",
+  "description": "A dynamic block falls under gravity and lands on a static floor. Read the example, then experiment.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 5: q5play — Game Physics",
+  "unit": "5.1 Sprites & Movement",
+  "preview": "q5play",
+  "week": 13,
+  "slos": ["SLO-1"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Read the worked example",
+      "instructions": "The starter code is a full working sketch — a block falls and lands on a floor. Click Run to see it.",
+      "hints": ["Static sprites don't move; they push back on dynamic ones."]
+    },
+    {
+      "id": "s2",
+      "title": "Turn gravity off",
+      "instructions": "Change `world.gravity.y = 10` to `world.gravity.y = 0` and run again. The block floats.",
+      "hints": ["Gravity units are roughly pixels per second²."]
+    },
+    {
+      "id": "s3",
+      "title": "Change the floor to dynamic",
+      "instructions": "Remove the `'static'` argument from the ground sprite. Run. Both pieces fall now — that's why the floor is static.",
+      "hints": ["new Sprite(x, y, w, h) defaults to dynamic. Add 'static' to anchor it."]
+    },
+    {
+      "id": "s4",
+      "title": "Add a second falling block",
+      "instructions": "Declare another sprite and color it differently. Watch them stack.",
+      "hints": ["Give them different x positions so they don't spawn on top of each other."]
+    }
+  ],
+  "requirements": [
+    { "id": "r1", "title": "Sets world gravity", "description": "Assign a value to world.gravity.y or world.gravity.x", "type": "regex", "file": "script.js", "pattern": "world\\.gravity\\.(x|y)\\s*=", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r2", "title": "Uses a static sprite", "description": "Create at least one sprite with the 'static' collider type", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\([^)]*['\"]static['\"]", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r3", "title": "Uses a dynamic sprite", "description": "Create at least one dynamic sprite (no 'static' argument)", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*\\d+\\s*\\)", "flags": "", "points": 5, "status": "pending" }
+  ],
+  "grading": { "totalPoints": 25, "passingScore": 15, "allowLateSubmit": true }
+}

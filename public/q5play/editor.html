@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>q5play editor</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css" crossorigin="anonymous">
+	<style>
+		html, body { margin: 0; padding: 0; height: 100%; background: #111; color: #eee; font-family: system-ui, sans-serif; }
+		#app { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 40px 1fr; height: 100vh; }
+		#toolbar { grid-column: 1 / 3; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: #1b1b1b; border-bottom: 1px solid #333; }
+		#toolbar button { background: #2a2a2a; color: #eee; border: 1px solid #444; padding: 6px 14px; border-radius: 4px; cursor: pointer; font: inherit; }
+		#toolbar button:hover { background: #3a3a3a; }
+		#toolbar .hint { margin-left: auto; color: #888; font-size: 12px; }
+		#left-pane { display: grid; grid-template-rows: 28px 1fr 28px 200px; border-right: 1px solid #333; min-height: 0; min-width: 0; }
+		#left-pane.editor-only { grid-template-rows: 28px 1fr 28px 0; }
+		#left-pane.console-only { grid-template-rows: 28px 0 28px 1fr; }
+		#editor-header, #console-header { display: flex; align-items: center; gap: 8px; padding: 0 10px; background: #1b1b1b; border-bottom: 1px solid #333; font-size: 12px; color: #aaa; overflow: hidden; }
+		#console-header { border-top: 1px solid #333; }
+		#editor-header .spacer, #console-header .spacer { margin-left: auto; }
+		#editor-header button, #console-header button { background: transparent; color: #888; border: 1px solid #333; padding: 2px 8px; border-radius: 3px; cursor: pointer; font: inherit; font-size: 11px; }
+		#editor-header button:hover, #console-header button:hover { color: #eee; border-color: #555; }
+		#editor-pane { overflow: hidden; min-height: 0; }
+		.CodeMirror { height: 100%; font-size: 14px; }
+		#console-pane { display: flex; flex-direction: column; background: #0d0d0d; min-height: 0; overflow: hidden; }
+		#console { flex: 1; overflow-y: auto; padding: 6px 10px; font-family: Consolas, Menlo, monospace; font-size: 12px; line-height: 1.5; }
+		#console .line { white-space: pre-wrap; word-break: break-word; border-bottom: 1px solid #1a1a1a; padding: 2px 0; }
+		#console .log { color: #ddd; }
+		#console .warn { color: #f0c674; }
+		#console .error { color: #ff6b6b; }
+		#console .info { color: #81a2be; }
+		#console .meta { color: #555; font-size: 10px; margin-left: 8px; }
+		#preview-pane { background: #111; }
+		#preview { width: 100%; height: 100%; border: 0; background: #111; }
+	</style>
+</head>
+<body>
+	<div id="app">
+		<div id="toolbar">
+			<button id="run">Run &nbsp;▶</button>
+			<button id="reset">Reset</button>
+			<span class="hint">Ctrl+S / Ctrl+Enter to run · code persists in localStorage</span>
+		</div>
+		<div id="left-pane">
+			<div id="editor-header">
+				<span>Editor</span>
+				<span class="spacer"></span>
+				<button id="editor-expand" title="Maximize editor / restore">⛶</button>
+			</div>
+			<div id="editor-pane"><textarea id="code"></textarea></div>
+			<div id="console-header">
+				<span>Console</span>
+				<span class="spacer"></span>
+				<button id="console-clear">Clear</button>
+				<button id="console-expand" title="Maximize console / restore">⛶</button>
+			</div>
+			<div id="console-pane">
+				<div id="console"></div>
+			</div>
+		</div>
+		<div id="preview-pane"><iframe id="preview"></iframe></div>
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js" crossorigin="anonymous"></script>
+
+	<script>
+		const STORAGE_KEY = 'q5play-sketch';
+
+		const DEFAULT_SKETCH = `/// <reference path="./q5play.d.ts" />
+
+function setup() {
+	new Canvas(400, 400);
+	world.gravity.y = 10;
+
+	player = new Sprite(200, 100, 40, 40);
+	player.color = 'deepskyblue';
+
+	ground = new Sprite(200, 380, 400, 20, 'static');
+	ground.color = 'gray';
+}
+
+function update() {
+	if (kb.pressing('left')) player.vel.x = -5;
+	else if (kb.pressing('right')) player.vel.x = 5;
+
+	// literal space character — 'space' fails before the key is first pressed
+	if (kb.presses(' ') && player.colliding(ground)) {
+		player.vel.y = -8;
+	}
+}
+
+function draw() {
+	background('#222');
+}
+`;
+
+		const cm = CodeMirror.fromTextArea(document.getElementById('code'), {
+			value: '',
+			mode: 'javascript',
+			theme: 'dracula',
+			lineNumbers: true,
+			autoCloseBrackets: true,
+			matchBrackets: true,
+			indentUnit: 2,
+			tabSize: 2,
+			indentWithTabs: true,
+			extraKeys: {
+				'Ctrl-S': run,
+				'Cmd-S': run,
+				'Ctrl-Enter': run,
+				'Cmd-Enter': run
+			}
+		});
+
+		cm.setValue(localStorage.getItem(STORAGE_KEY) || DEFAULT_SKETCH);
+		cm.on('change', () => localStorage.setItem(STORAGE_KEY, cm.getValue()));
+
+		const consoleEl = document.getElementById('console');
+
+		function appendLine(level, text, meta) {
+			const el = document.createElement('div');
+			el.className = 'line ' + level;
+			el.textContent = text;
+			if (meta) {
+				const m = document.createElement('span');
+				m.className = 'meta';
+				m.textContent = meta;
+				el.appendChild(m);
+			}
+			consoleEl.appendChild(el);
+			consoleEl.scrollTop = consoleEl.scrollHeight;
+		}
+
+		function clearConsole() { consoleEl.replaceChildren(); }
+
+		document.getElementById('console-clear').addEventListener('click', clearConsole);
+
+		const leftPane = document.getElementById('left-pane');
+		function toggle(cls) {
+			const wasOn = leftPane.classList.contains(cls);
+			leftPane.classList.remove('editor-only', 'console-only');
+			if (!wasOn) leftPane.classList.add(cls);
+			cm.refresh();
+		}
+		document.getElementById('editor-expand').addEventListener('click', () => toggle('editor-only'));
+		document.getElementById('console-expand').addEventListener('click', () => toggle('console-only'));
+
+		window.addEventListener('message', (e) => {
+			const m = e.data;
+			if (!m || m.type !== 'q5-console') return;
+			appendLine(m.level, m.text, m.meta);
+		});
+
+		const CONSOLE_BOOTSTRAP = `
+			(function(){
+				function fmt(a){
+					if (a instanceof Error) return a.stack || a.message;
+					if (typeof a === 'object') { try { return JSON.stringify(a); } catch(e){ return String(a); } }
+					return String(a);
+				}
+				function send(level, args, meta){
+					parent.postMessage({ type:'q5-console', level: level, text: Array.from(args).map(fmt).join(' '), meta: meta||'' }, '*');
+				}
+				['log','warn','error','info'].forEach(function(level){
+					var orig = console[level].bind(console);
+					console[level] = function(){ send(level, arguments); orig.apply(console, arguments); };
+				});
+				window.addEventListener('error', function(e){
+					var where = (e.filename||'') + (e.lineno?':'+e.lineno:'') + (e.colno?':'+e.colno:'');
+					send('error', [e.error || e.message], where);
+				});
+				window.addEventListener('unhandledrejection', function(e){
+					send('error', [e.reason], 'unhandled promise rejection');
+				});
+			})();
+		`;
+
+		function run() {
+			clearConsole();
+			const code = cm.getValue();
+			const base = new URL('.', location.href).href;
+			const srcdoc = `<!DOCTYPE html>
+<html>
+<head>
+	<base href="${base}">
+	<meta charset="UTF-8">
+	<style>html,body{margin:0;padding:0;height:100%;background:#111;}body{display:flex;align-items:center;justify-content:center;}canvas{display:block;}</style>
+	<script>${CONSOLE_BOOTSTRAP}<\/script>
+	<script type="importmap">
+	{ "imports": { "box2d3-wasm": "./Box2D.deluxe.mjs" } }
+	<\/script>
+	<script src="./q5.js"><\/script>
+	<script type="module" src="./q5play.js"><\/script>
+</head>
+<body>
+<script>
+${code}
+<\/script>
+</body>
+</html>`;
+			const iframe = document.getElementById('preview');
+			iframe.srcdoc = srcdoc;
+			setTimeout(() => iframe.focus(), 300);
+		}
+
+		document.getElementById('run').addEventListener('click', run);
+		document.getElementById('reset').addEventListener('click', () => {
+			if (confirm('Reset to default sketch?')) {
+				cm.setValue(DEFAULT_SKETCH);
+				run();
+			}
+		});
+
+		run();
+	</script>
+</body>
+</html>

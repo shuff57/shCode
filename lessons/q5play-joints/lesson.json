@@ -1,0 +1,45 @@
+{
+  "id": "q5play-joints",
+  "title": "5.5.1 Joints: Distance, Hinge, Slider",
+  "description": "Connect two sprites with different joint types. See how each joint constrains motion.",
+  "type": "lesson",
+  "difficulty": "advanced",
+  "estimateMins": 30,
+  "category": "Unit 5: q5play — Game Physics",
+  "unit": "5.5 Joints & Advanced Input",
+  "preview": "q5play",
+  "week": 17,
+  "slos": ["SLO-1", "SLO-3"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "DistanceJoint",
+      "instructions": "new DistanceJoint(a, b) keeps two sprites at a fixed distance, like an invisible rigid bar.",
+      "hints": ["Use it for chains, ropes, tethers."]
+    },
+    {
+      "id": "s2",
+      "title": "HingeJoint",
+      "instructions": "new HingeJoint(a, b) pins them at a point but lets them rotate freely — door hinges, pendulums, ragdolls.",
+      "hints": []
+    },
+    {
+      "id": "s3",
+      "title": "SliderJoint",
+      "instructions": "new SliderJoint(a, b) lets them only translate along one axis — pistons, elevators, sliding drawers.",
+      "hints": []
+    },
+    {
+      "id": "s4",
+      "title": "Combine",
+      "instructions": "The starter sketch shows all three side by side. Add a second DistanceJoint to form a triangle of sprites.",
+      "hints": []
+    }
+  ],
+  "requirements": [
+    { "id": "r1", "title": "Uses DistanceJoint", "description": "Create at least one DistanceJoint", "type": "regex", "file": "script.js", "pattern": "new\\s+DistanceJoint\\s*\\(", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r2", "title": "Uses HingeJoint", "description": "Create at least one HingeJoint", "type": "regex", "file": "script.js", "pattern": "new\\s+HingeJoint\\s*\\(", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r3", "title": "Uses SliderJoint", "description": "Create at least one SliderJoint", "type": "regex", "file": "script.js", "pattern": "new\\s+SliderJoint\\s*\\(", "flags": "", "points": 10, "status": "pending" }
+  ],
+  "grading": { "totalPoints": 30, "passingScore": 20, "allowLateSubmit": true }
+}

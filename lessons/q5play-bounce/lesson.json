@@ -1,0 +1,46 @@
+{
+  "id": "q5play-bounce",
+  "title": "5.2.1 Bouncy Ball",
+  "description": "Learn how bounciness and friction change how sprites feel.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 25,
+  "category": "Unit 5: q5play — Game Physics",
+  "unit": "5.2 Physics Feel",
+  "preview": "q5play",
+  "week": 14,
+  "slos": ["SLO-1"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build a box with four walls",
+      "instructions": "Four static sprites — top, bottom, left, right — make a containment box.",
+      "hints": ["Re-use the same size; just change positions and rotations."]
+    },
+    {
+      "id": "s2",
+      "title": "Add a ball",
+      "instructions": "Create a dynamic sprite with a `diameter` (e.g. 30) — that makes it a circle collider instead of a rectangle.",
+      "hints": ["new Sprite(200, 100, 30) — one size argument = circle."]
+    },
+    {
+      "id": "s3",
+      "title": "Tune bounciness",
+      "instructions": "Set `ball.bounciness = 1`. Values above 0.9 make it bounce nearly forever; 0 means it sticks.",
+      "hints": ["bounciness is Box2D's restitution coefficient."]
+    },
+    {
+      "id": "s4",
+      "title": "Try friction",
+      "instructions": "Give the ball `ball.friction = 0`. Then try `ball.friction = 5`. Notice how it rolls vs. drags.",
+      "hints": []
+    }
+  ],
+  "requirements": [
+    { "id": "r1", "title": "Create multiple static walls", "description": "At least two 'static' sprites", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\([^)]*['\"]static['\"][\\s\\S]*new\\s+Sprite\\s*\\([^)]*['\"]static['\"]", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r2", "title": "Create a dynamic ball", "description": "A dynamic sprite is present", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(", "flags": "", "points": 5, "status": "pending" },
+    { "id": "r3", "title": "Set bounciness", "description": "Assign to .bounciness", "type": "regex", "file": "script.js", "pattern": "\\.bounciness\\s*=", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r4", "title": "Set friction", "description": "Assign to .friction", "type": "regex", "file": "script.js", "pattern": "\\.friction\\s*=", "flags": "", "points": 5, "status": "pending" }
+  ],
+  "grading": { "totalPoints": 30, "passingScore": 20, "allowLateSubmit": true }
+}

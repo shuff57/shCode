@@ -12,6 +12,7 @@ import LessonSteps from './LessonSteps';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
 import JscadPreview from './JscadPreview';
+import Q5PlayPreview from './Q5PlayPreview';
 import RequirementsSection from './RequirementsSection';
 import Console from './Console';
 import CommitDialog from './CommitDialog';
@@ -160,6 +161,7 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
 
   const isConsoleMode = lesson.preview === 'console';
   const isJscadMode = lesson.preview === 'jscad';
+  const isQ5Mode = lesson.preview === 'q5play';
 
   // For JSCAD lessons: auto-run on first load
   useEffect(() => {
@@ -176,7 +178,7 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
 
   // For HTML lessons: auto-build preview on every change (debounced)
   useEffect(() => {
-    if (isConsoleMode || isJscadMode) return;
+    if (isConsoleMode || isJscadMode || isQ5Mode) return;
     const to = setTimeout(() => {
       const doc = buildPreviewHtml(lesson.files, files);
       setSrcDoc(doc);
@@ -236,6 +238,12 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
     setTimeout(() => runTests(), 600);
   }
 
+  // For q5play lessons: bump runKey to reload the runner iframe with latest code
+  function runQ5() {
+    setRunKey((k) => k + 1);
+    setTimeout(() => runTests(), 400);
+  }
+
   // Auto-save to localStorage (debounced)
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -262,6 +270,8 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
           runCode();
         } else if (isJscadMode) {
           runJscad();
+        } else if (isQ5Mode) {
+          runQ5();
         } else {
           setCommitOpen(true);
         }
@@ -418,11 +428,11 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
         )}
       </aside>
       <details className="editor-card" open>
-        <summary>{isConsoleMode ? 'Code Editor' : isJscadMode ? 'Code Editor & 3D Viewer' : 'Starter Code & Live Preview'}</summary>
+        <summary>{isConsoleMode ? 'Code Editor' : isJscadMode ? 'Code Editor & 3D Viewer' : isQ5Mode ? 'Code Editor & q5play Preview' : 'Starter Code & Live Preview'}</summary>
         <div className="editor-body">
-          {(isConsoleMode || isJscadMode) && (
+          {(isConsoleMode || isJscadMode || isQ5Mode) && (
             <div className="run-toolbar">
-              <button className="btn-run" onClick={isJscadMode ? runJscad : runCode}>
+              <button className="btn-run" onClick={isJscadMode ? runJscad : isQ5Mode ? runQ5 : runCode}>
                 ▶ Run
               </button>
               <span className="run-hint">Ctrl+Enter</span>
@@ -458,6 +468,8 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
                 </>
               ) : isJscadMode ? (
                 <JscadPreview srcDoc={srcDoc} />
+              ) : isQ5Mode ? (
+                <Q5PlayPreview code={files['script.js'] || ''} runKey={runKey} />
               ) : (
                 <LivePreview srcDoc={srcDoc} />
               )}

@@ -5,48 +5,88 @@ import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLi
 import { EditorState } from '@codemirror/state';
 import { javascript } from '@codemirror/lang-javascript';
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
-import { bracketMatching, indentOnInput } from '@codemirror/language';
+import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { highlightSelectionMatches } from '@codemirror/search';
+import { tags as t } from '@lezer/highlight';
 import { useLessonStore } from '../lib/store';
+
+// Dracula palette — port of the CodeMirror 5 dracula theme used in public/q5play/editor.html.
+const dracula = {
+  bg: '#282a36',
+  fg: '#f8f8f2',
+  gutter: '#282a36',
+  gutterFg: '#6272a4',
+  activeLine: '#44475a55',
+  selection: '#44475a',
+  cursor: '#f8f8f0',
+  comment: '#6272a4',
+  cyan: '#8be9fd',
+  green: '#50fa7b',
+  orange: '#ffb86c',
+  pink: '#ff79c6',
+  purple: '#bd93f9',
+  red: '#ff5555',
+  yellow: '#f1fa8c',
+};
+
+const draculaHighlight = HighlightStyle.define([
+  { tag: [t.comment, t.lineComment, t.blockComment, t.docComment], color: dracula.comment, fontStyle: 'italic' },
+  { tag: [t.keyword, t.operatorKeyword, t.modifier, t.controlKeyword], color: dracula.pink },
+  { tag: [t.string, t.special(t.string), t.regexp], color: dracula.yellow },
+  { tag: [t.number, t.bool, t.null, t.atom], color: dracula.purple },
+  { tag: [t.function(t.variableName), t.function(t.propertyName), t.macroName], color: dracula.green },
+  { tag: [t.definition(t.variableName), t.definition(t.propertyName)], color: dracula.green },
+  { tag: [t.variableName, t.propertyName], color: dracula.fg },
+  { tag: [t.className, t.typeName, t.namespace], color: dracula.cyan, fontStyle: 'italic' },
+  { tag: [t.tagName, t.angleBracket], color: dracula.pink },
+  { tag: [t.attributeName], color: dracula.green },
+  { tag: [t.attributeValue], color: dracula.yellow },
+  { tag: [t.meta, t.documentMeta], color: dracula.comment },
+  { tag: [t.punctuation, t.separator, t.bracket], color: dracula.fg },
+  { tag: [t.operator], color: dracula.pink },
+  { tag: t.labelName, color: dracula.orange },
+  { tag: t.self, color: dracula.purple, fontStyle: 'italic' },
+  { tag: t.invalid, color: dracula.red },
+]);
 
 const darkTheme = EditorView.theme({
   '&': {
-    backgroundColor: '#1e1e1e',
-    color: '#d4d4d4',
+    backgroundColor: dracula.bg,
+    color: dracula.fg,
     height: '100%',
     fontSize: '14px',
   },
   '.cm-content': {
     fontFamily: "'Fira Code', 'Consolas', 'Courier New', monospace",
-    caretColor: '#fff',
+    caretColor: dracula.cursor,
     padding: '8px 0',
   },
   '.cm-gutters': {
-    backgroundColor: '#1e1e1e',
-    color: '#858585',
+    backgroundColor: dracula.gutter,
+    color: dracula.gutterFg,
     border: 'none',
     paddingRight: '8px',
   },
   '.cm-activeLineGutter': {
-    backgroundColor: '#2a2a2a',
-    color: '#c6c6c6',
+    backgroundColor: dracula.activeLine,
+    color: dracula.fg,
   },
   '.cm-activeLine': {
-    backgroundColor: '#2a2a2a44',
+    backgroundColor: dracula.activeLine,
   },
   '.cm-selectionMatch': {
-    backgroundColor: '#515c6a',
+    backgroundColor: dracula.selection,
   },
   '&.cm-focused .cm-selectionBackground, ::selection': {
-    backgroundColor: '#264f78',
+    backgroundColor: dracula.selection,
   },
   '.cm-cursor': {
-    borderLeftColor: '#fff',
+    borderLeftColor: dracula.cursor,
   },
   '.cm-matchingBracket': {
-    backgroundColor: '#3a3a3a',
-    outline: '1px solid #888',
+    backgroundColor: '#44475a',
+    outline: `1px solid ${dracula.purple}`,
   },
 }, { dark: true });
 
@@ -60,6 +100,7 @@ function makeExtensions(onChange: (doc: string) => void) {
     indentOnInput(),
     highlightSelectionMatches(),
     javascript(),
+    syntaxHighlighting(draculaHighlight),
     keymap.of([
       ...closeBracketsKeymap,
       ...defaultKeymap,
