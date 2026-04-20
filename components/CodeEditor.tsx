@@ -207,7 +207,7 @@ export default function CodeEditor() {
         </button>
         {previewMode === 'q5play' && (
           <a
-            href="/q5play/docs/"
+            href="/docs/q5play"
             target="_blank"
             rel="noopener noreferrer"
             className="btn-secondary btn-sm"

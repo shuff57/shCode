@@ -224,6 +224,27 @@ details.editor-card > summary:hover::before {
   margin-bottom: 8px;
 }
 
+.editor-file-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--muted);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.editor-file-toolbar .editor-file-name {
+  flex: 1;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--text);
+  opacity: 0.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .btn-run {
   background: #22c55e;
   color: #fff;
@@ -1007,5 +1028,276 @@ details.console > summary::-webkit-details-marker { display: none; }
   padding: 1px 6px;
   border-radius: 3px;
   margin-left: 4px;
+}
+
+/* Docs page (q5play) */
+.docs-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 20px 64px;
+  color: var(--text);
+}
+.docs-header h1 {
+  margin: 0 0 4px;
+  font-size: 2rem;
+}
+.docs-subtitle {
+  color: var(--text);
+  opacity: 0.6;
+  margin: 0 0 20px;
+  font-size: 0.9rem;
+}
+.docs-subtitle code {
+  font-family: 'Consolas', 'Courier New', monospace;
+  background: var(--muted);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+.docs-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.docs-tab {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  opacity: 0.65;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.docs-tab:hover {
+  opacity: 0.9;
+}
+.docs-tab.is-active {
+  opacity: 1;
+  border-bottom-color: #22c55e;
+  font-weight: 600;
+}
+.docs-status {
+  padding: 20px 0;
+  color: var(--text);
+  opacity: 0.7;
+}
+.docs-error {
+  color: #ef4444;
+  opacity: 1;
+}
+.docs-markdown {
+  line-height: 1.6;
+}
+.docs-markdown h1,
+.docs-markdown h2,
+.docs-markdown h3,
+.docs-markdown h4 {
+  margin-top: 1.6em;
+  margin-bottom: 0.5em;
+  line-height: 1.25;
+}
+.docs-markdown h1 { font-size: 1.75rem; }
+.docs-markdown h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+.docs-markdown h3 { font-size: 1.15rem; }
+.docs-markdown p { margin: 0 0 1em; }
+.docs-markdown ul,
+.docs-markdown ol { margin: 0 0 1em; padding-left: 1.5em; }
+.docs-markdown li { margin-bottom: 0.25em; }
+.docs-markdown a { color: #3b82f6; text-decoration: underline; }
+.docs-markdown code {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.9em;
+  background: var(--muted);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.docs-markdown pre {
+  background: var(--muted);
+  padding: 12px 14px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+.docs-markdown pre code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+}
+.docs-markdown blockquote {
+  border-left: 3px solid var(--border);
+  padding: 4px 12px;
+  margin: 0 0 1em;
+  color: var(--text);
+  opacity: 0.85;
+}
+.docs-markdown table {
+  border-collapse: collapse;
+  margin: 0 0 1em;
+}
+.docs-markdown th,
+.docs-markdown td {
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+}
+.docs-code {
+  background: var(--muted);
+  padding: 14px 16px;
+  border-radius: 4px;
+  overflow: auto;
+  max-height: calc(100vh - 260px);
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+/* Paginated q5play reference */
+.docs-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: calc(100vh - 40px);
+  color: var(--text);
+}
+.docs-sidebar {
+  border-right: 1px solid var(--border);
+  padding: 20px 16px;
+  background: var(--card);
+  font-size: 0.9rem;
+}
+.docs-sidebar-title {
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+  margin-bottom: 16px;
+}
+.docs-sidebar-section {
+  margin-bottom: 4px;
+}
+.docs-sidebar-section-title {
+  display: block;
+  padding: 6px 10px;
+  border-radius: 4px;
+  color: var(--text);
+  text-decoration: none;
+  opacity: 0.75;
+}
+.docs-sidebar-section-title:hover {
+  background: var(--muted);
+  opacity: 1;
+}
+.docs-sidebar-section.active .docs-sidebar-section-title {
+  opacity: 1;
+  font-weight: 600;
+  color: #bd93f9;
+}
+.docs-sidebar-pages {
+  list-style: none;
+  padding: 2px 0 4px 14px;
+  margin: 0;
+  border-left: 1px solid var(--border);
+  margin-left: 10px;
+}
+.docs-sidebar-pages li a {
+  display: block;
+  padding: 4px 10px;
+  border-radius: 3px;
+  color: var(--text);
+  text-decoration: none;
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+.docs-sidebar-pages li a:hover {
+  opacity: 1;
+}
+.docs-sidebar-pages li a.current {
+  opacity: 1;
+  font-weight: 600;
+  background: var(--muted);
+}
+.docs-sidebar-footer {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+.docs-sidebar-footer a {
+  color: var(--text);
+  opacity: 0.65;
+  text-decoration: none;
+}
+.docs-sidebar-footer a:hover {
+  opacity: 1;
+}
+.docs-main {
+  padding: 28px 36px 80px;
+  max-width: 760px;
+  line-height: 1.6;
+}
+.docs-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  opacity: 0.55;
+  margin-bottom: 6px;
+}
+.docs-page-pill {
+  padding: 2px 8px;
+  background: var(--muted);
+  border-radius: 10px;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  opacity: 0.9;
+}
+.docs-title {
+  margin: 0 0 16px;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+.docs-body p {
+  margin: 0 0 1em;
+}
+.docs-body code {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.9em;
+  background: var(--muted);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.docs-main .docs-code {
+  margin: 18px 0 24px;
+  background: #282a36;
+  color: #f8f8f2;
+  border: 1px solid #44475a;
+  font-size: 0.88rem;
+  max-height: none;
+}
+.docs-pagination {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+@media (max-width: 720px) {
+  .docs-layout {
+    grid-template-columns: 1fr;
+  }
+  .docs-sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .docs-main {
+    padding: 20px 18px 60px;
+  }
 }
 
