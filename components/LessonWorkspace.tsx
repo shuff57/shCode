@@ -289,23 +289,19 @@ export default function LessonWorkspace({ lesson, mode }: LessonWorkspaceProps) 
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  async function runTests() {
-    const res = await fetch('/api/grade', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ lessonId: lesson.id, files }),
-    });
-    const data = await res.json();
-    if (Array.isArray(data)) {
-      setRequirements(
-        lesson.requirements.map((r) => ({ ...r, ...data.find((d: any) => d.id === r.id) }))
-      );
-    } else if (data.results) {
-      setRequirements(
-        lesson.requirements.map((r) => ({ ...r, ...data.results.find((d: any) => d.id === r.id) }))
-      );
-      setGradeReport(data);
-    }
+  function runTests() {
+    const report = grade(
+      lesson.requirements,
+      files,
+      lesson.grading?.passingScore || 0
+    );
+    setRequirements(
+      lesson.requirements.map((r) => ({
+        ...r,
+        ...report.results.find((d) => d.id === r.id),
+      }))
+    );
+    setGradeReport(report);
   }
 
   const runClientGrade = useCallback(() => {

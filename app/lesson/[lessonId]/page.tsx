@@ -1,5 +1,10 @@
 import LessonWorkspace from '../../../components/LessonWorkspace';
-import { getLesson } from '../../../lib/lessons';
+import { getLesson, loadLessons } from '../../../lib/lessons';
+
+export async function generateStaticParams() {
+  const lessons = await loadLessons();
+  return lessons.map((l) => ({ lessonId: l.id }));
+}
 
 export default async function LessonPage({
   params,
