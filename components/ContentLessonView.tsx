@@ -1,24 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo } from 'react';
-import DOMPurify from 'isomorphic-dompurify';
-import { marked } from 'marked';
 import type { Lesson } from '../lib/types';
 import { badgeFor } from '../lib/lesson-badges';
 import CompletionPanel from './CompletionPanel';
 import WrittenGrader from './WrittenGrader';
+import MarkdownWithLiveBlocks from './MarkdownWithLiveBlocks';
 
 interface Props {
   lesson: Lesson;
   prev?: { id: string; title: string } | null;
   next?: { id: string; title: string } | null;
   basePath?: string;
-}
-
-function renderMarkdownSafe(src: string): string {
-  const html = String(marked.parse(src));
-  return DOMPurify.sanitize(html);
 }
 
 function findContent(lesson: Lesson): string {
@@ -36,9 +29,7 @@ export default function ContentLessonView({ lesson, prev, next, basePath = '/les
   const preview = lesson.preview as string;
   const badge = badgeFor(preview);
   const contentMd = findContent(lesson);
-  const safeHtml = useMemo(() => renderMarkdownSafe(contentMd), [contentMd]);
   const meta = lesson as any;
-  const cleanHtml = DOMPurify.sanitize(safeHtml);
 
   return (
     <main style={{ maxWidth: 960, margin: '0 auto', padding: '24px 20px', color: '#f8f8f2' }}>
@@ -134,12 +125,10 @@ export default function ContentLessonView({ lesson, prev, next, basePath = '/les
         </p>
       ) : null}
 
-      {cleanHtml ? (
-        <article
-          className="content-prose"
-          dangerouslySetInnerHTML={{ __html: cleanHtml }}
-          style={{ marginTop: 20 }}
-        />
+      {contentMd ? (
+        <div style={{ marginTop: 20 }}>
+          <MarkdownWithLiveBlocks src={contentMd} />
+        </div>
       ) : null}
 
       {meta.aiGrader ? (

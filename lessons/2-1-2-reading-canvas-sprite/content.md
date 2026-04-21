@@ -23,6 +23,22 @@ What you'll learn from it:
 - How sprites are rendered automatically each frame — you don't call a `render()` method.
 - When to store a sprite in a variable outside `setup()` vs inline inside `draw()`.
 
+**Try it:** edit the sprite's color, size, or position and hit Run.
+
+```js live
+let player;
+
+function setup() {
+  new Canvas(360, 360);
+  player = new Sprite(180, 180, 60, 60);
+  player.color = 'deepskyblue';
+}
+
+function draw() {
+  background('#222');
+}
+```
+
 ### R2 — "Input" chapter
 **Read before attempting `2.1.1b Make it Move`.**
 
