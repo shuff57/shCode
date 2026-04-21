@@ -14,34 +14,31 @@
     {
       "id": "s1",
       "title": "Create a canvas and two sprites",
-      "instructions": "In `setup()`: create a canvas (any size between 300×300 and 800×600) and two sprites — one named `player` (controllable) and one named `mover` (moves on its own).",
-      "hints": ["Remember to store the sprites in variables declared outside setup()."]
+      "instructions": "Make a canvas (any size between 300×300 and 800×600) and two sprites — one `player` (controllable) and one `mover` (moves on its own).",
+      "hints": []
     },
     {
       "id": "s2",
       "title": "Wire WASD movement to the player",
-      "instructions": "In `draw()`, check `kb.pressing('a')` / `'d'` / `'w'` / `'s'` and set `player.vel.x` / `player.vel.y`. Remember to include the else branch that resets velocity to 0!",
+      "instructions": "Use `kb.pressing('a')` / `'d'` / `'w'` / `'s'` to set the player's velocity. Include an else branch that resets velocity to 0 when no key is held.",
       "hints": ["Don't use arrow keys in this lab — they also scroll the browser iframe."]
     },
     {
       "id": "s3",
       "title": "Animate the mover sprite",
-      "instructions": "Use `frameCount` to drive automatic motion on `mover`. Pick any pattern: oscillate left-right, orbit in a circle, or spin.",
-      "hints": [
-        "`mover.pos.x = 400 + sin(frameCount * 0.05) * 80;` gives smooth horizontal oscillation.",
-        "`mover.rotation = frameCount * 2;` makes it spin."
-      ]
+      "instructions": "Drive the `mover` sprite with `frameCount` so it moves on its own. Pick any pattern: oscillate, orbit, or spin.",
+      "hints": []
     },
     {
       "id": "s4",
       "title": "Add an on-screen text label",
-      "instructions": "At the top of the canvas, display a message using `text()` and `textSize()`. Your choice of message.",
+      "instructions": "Display a message on the canvas using `text()` and `textSize()`. Your choice of message.",
       "hints": ["Set `fill(255)` before `text(...)` so it's visible on dark backgrounds."]
     },
     {
       "id": "s5",
-      "title": "Don't forget background()",
-      "instructions": "Make sure `background(...)` is called first in `draw()` so previous frames don't stack up.",
+      "title": "Clear the background each frame",
+      "instructions": "Make sure `background(...)` is called each frame so previous frames don't stack up.",
       "hints": []
     }
   ],
