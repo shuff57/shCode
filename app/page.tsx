@@ -36,48 +36,38 @@ export default async function HomePage() {
         <input className="border p-2" placeholder="Search lessons" />
       </div>
 
-      {/* Curriculum units — each expands inline to show its lessons */}
-      {units.length > 0 && (
-        <details className="bg-card border-border border rounded w-2/3 mx-auto mb-4" open>
-          <summary className="py-4 px-8 w-full list-none cursor-pointer hover:bg-muted text-5xl flex justify-between items-center">
-            <span className="font-bold">Curriculum</span>
-            <span className="text-lg">({units.length} units)</span>
-          </summary>
-          <div className="flex flex-col gap-2 p-4">
-            {units.map((u) => {
-              const unitLessons = lessonsForModule(lessons, u.id, u.category);
-              return (
-                <details key={u.id} className="bg-muted rounded overflow-hidden">
-                  <summary className="flex items-baseline gap-3 p-3 cursor-pointer hover:bg-accent transition list-none">
-                    <span className="font-bold text-lg">Unit {u.id}</span>
-                    <span className="text-base">{u.title}</span>
-                    <span className="ml-auto text-sm opacity-70">
-                      Q{u.quarter} · W{u.weeks?.[0]}–{u.weeks?.[u.weeks.length - 1]}
-                    </span>
-                  </summary>
-                  <div className="flex flex-col gap-3 p-3 border-t border-border bg-card">
-                    {unitLessons.length === 0 ? (
-                      <div className="text-sm opacity-60 italic px-1">
-                        No lessons authored yet.
-                      </div>
-                    ) : (
-                      unitLessons.map((lesson) => (
-                        <LessonCard key={lesson.id} lesson={lesson} />
-                      ))
-                    )}
-                    <Link
-                      href={`/module/${u.id}`}
-                      className="text-sm underline opacity-70 hover:opacity-100 self-start"
-                    >
-                      → View full module page
-                    </Link>
-                  </div>
-                </details>
-              );
-            })}
-          </div>
-        </details>
-      )}
+      {/* Curriculum units — each is its own top-level expandable section */}
+      {units.map((u) => {
+        const unitLessons = lessonsForModule(lessons, u.id, u.category);
+        return (
+          <details key={u.id} className="bg-card border-border border rounded w-2/3 mx-auto mb-3 overflow-hidden">
+            <summary className="flex items-baseline gap-3 p-4 cursor-pointer hover:bg-muted transition list-none">
+              <span className="font-bold text-lg">Unit {u.id}</span>
+              <span className="text-base">{u.title}</span>
+              <span className="ml-auto text-sm opacity-70">
+                Q{u.quarter} · W{u.weeks?.[0]}–{u.weeks?.[u.weeks.length - 1]}
+              </span>
+            </summary>
+            <div className="flex flex-col gap-3 p-4 border-t border-border">
+              {unitLessons.length === 0 ? (
+                <div className="text-sm opacity-60 italic px-1">
+                  No lessons authored yet.
+                </div>
+              ) : (
+                unitLessons.map((lesson) => (
+                  <LessonCard key={lesson.id} lesson={lesson} />
+                ))
+              )}
+              <Link
+                href={`/module/${u.id}`}
+                className="text-sm underline opacity-70 hover:opacity-100 self-start"
+              >
+                → View full module page
+              </Link>
+            </div>
+          </details>
+        );
+      })}
     </div>
   );
 }
