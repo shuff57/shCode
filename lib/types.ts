@@ -53,8 +53,9 @@ export interface Requirement {
   file?: string;
   pattern?: string;
   flags?: string;
-  /** For inFunction type: the name of the function whose body to scope against (e.g., "draw", "setup"). */
-  function?: string;
+  /** For inFunction type: a single function name ("draw") or a list of names
+   *  ("draw" + "update") whose bodies are concatenated before matching. */
+  function?: string | string[];
   expected?: string;
   testFn?: string;
   points?: number;

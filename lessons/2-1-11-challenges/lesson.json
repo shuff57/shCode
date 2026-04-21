@@ -70,8 +70,9 @@
     {
       "id": "r4",
       "title": "Use at least one advanced feature",
-      "description": "Your code uses kb.presses OR sin/cos OR mouse.x/y OR lerp OR frameCount OR text()",
-      "type": "regex",
+      "description": "Inside draw() or update(), use kb.presses OR sin/cos OR mouse.x/y OR lerp OR frameCount OR text()",
+      "type": "inFunction",
+      "function": ["draw", "update"],
       "file": "script.js",
       "pattern": "kb\\.presses\\s*\\(|\\bsin\\s*\\(|\\bcos\\s*\\(|mouse\\.(x|y|pressed|pressing)|\\blerp\\s*\\(|frameCount\\s*%|\\btext\\s*\\(",
       "flags": "",

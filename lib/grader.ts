@@ -91,10 +91,16 @@ function checkRegex(req: Requirement, files: Record<string, string>): boolean {
 function checkInFunction(req: Requirement, files: Record<string, string>): boolean {
   const raw = files[req.file || ''] || '';
   const content = stripJsComments(raw);
-  const body = extractFunctionBody(content, req.function || 'draw');
-  if (body === null) return false;
+  const names = Array.isArray(req.function)
+    ? req.function
+    : [req.function || 'draw'];
+  const bodies = names
+    .map((n) => extractFunctionBody(content, n))
+    .filter((b): b is string => b !== null);
+  if (bodies.length === 0) return false;
+  const combined = bodies.join('\n');
   const regex = new RegExp(req.pattern || '', req.flags ?? '');
-  return regex.test(body);
+  return regex.test(combined);
 }
 
 // ---- Main grader ----
