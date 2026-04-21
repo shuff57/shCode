@@ -31,7 +31,7 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
               background: pBadge.color + '22',
               color: pBadge.color,
               padding: '2px 8px',
-              borderRadius: 999,
+              borderRadius: 4,
               fontSize: 11,
               fontWeight: 600,
               border: '1px solid ' + pBadge.color + '55',
