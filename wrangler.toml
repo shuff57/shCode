@@ -19,14 +19,12 @@ binding = "DB"
 database_name = "shcode-commits"
 database_id = "de53517f-5d1f-4d70-a1f9-13d463abb76f"
 
-# Non-secret config the Functions read via env.
-# ACCESS_TEAM_DOMAIN: your Cloudflare Zero Trust team domain, e.g.
-#   "yourteam.cloudflareaccess.com"
-# ACCESS_AUD: the AUD (audience) tag from the Access application's
-#   "Application Audience (AUD) Tag" field in the dashboard.
-# ALLOWED_EMAIL_DOMAIN: substring check on the Access-provided email, e.g.
-#   "@chicousd.org". Leave as "@" to allow any signed-in email during setup.
-[vars]
-ACCESS_TEAM_DOMAIN = "REPLACE_WITH_YOUR_TEAM.cloudflareaccess.com"
-ACCESS_AUD = "REPLACE_WITH_YOUR_AUD_TAG"
-ALLOWED_EMAIL_DOMAIN = "@"
+# AUTH_SECRET is the HS256 signing key for session JWTs. It MUST be set as
+# a Pages secret (not a plain var) in production:
+#
+#   npx wrangler pages secret put AUTH_SECRET --project-name shcode
+#
+# For `wrangler pages dev` on localhost you can paste a throwaway value into
+# a .dev.vars file at repo root:
+#
+#   AUTH_SECRET=local-dev-secret-$(openssl rand -hex 16)
