@@ -6,7 +6,10 @@
     "dev": "node server.js",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
-    "test": "echo \"No tests\""
+    "test": "echo \"No tests\"",
+    "slides:2.1": "slidev slides/2.1/slides.md --port 3030",
+    "slides:2.1:build": "slidev build slides/2.1/slides.md --base /slides/2.1/ --out ../../public/slides/2.1",
+    "slides:2.1:export": "slidev export slides/2.1/slides.md --output slides/2.1/export.pdf"
   },
   "type": "module",
   "dependencies": {
@@ -21,8 +24,10 @@
     "codemirror": "^6.0.2",
     "date-fns": "^4.1.0",
     "express": "^4.21.2",
+    "isomorphic-dompurify": "^3.9.0",
     "jszip": "^3.10.1",
     "lucide-react": "^0.539.0",
+    "marked": "^18.0.2",
     "next": "^15.4.6",
     "react": "^19.1.1",
     "react-arborist": "^3.4.3",
@@ -30,6 +35,9 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
+    "@slidev/cli": "^52.14.2",
+    "@slidev/theme-default": "^0.25.0",
+    "@slidev/theme-seriph": "^0.25.0",
     "@types/node": "^24.3.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
