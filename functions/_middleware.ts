@@ -32,6 +32,10 @@ function isUnconfigured(env: Env): boolean {
   return !env.ACCESS_AUD || env.ACCESS_AUD.startsWith('REPLACE_WITH_');
 }
 
+function isLocalRequest(url: URL): boolean {
+  return url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+}
+
 export const onRequest: PagesFunction<Env, string, { email: string }> = async (context: Ctx) => {
   const { request, env, next, data } = context;
   const url = new URL(request.url);
@@ -41,7 +45,11 @@ export const onRequest: PagesFunction<Env, string, { email: string }> = async (c
   const jwt = request.headers.get('Cf-Access-Jwt-Assertion');
 
   if (!jwt) {
-    if (isUnconfigured(env)) {
+    // Dev fallback: only allow unauthenticated access when BOTH Access is
+    // unconfigured AND the request is to localhost. In production (pages.dev
+    // or a custom domain), missing JWT always means 401 so the URL isn't
+    // open to the internet while Access is still being set up.
+    if (isUnconfigured(env) && isLocalRequest(url)) {
       data.email = 'dev@localhost';
       return next();
     }
