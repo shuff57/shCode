@@ -33,7 +33,7 @@ export type FileHistory = Record<string, Version[]>;
 
 export type LessonType = 'lesson' | 'assignment' | 'project' | 'example' | 'challenge';
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
-export type RequirementType = 'regex' | 'output' | 'function' | 'custom';
+export type RequirementType = 'regex' | 'inFunction' | 'output' | 'function' | 'custom';
 
 export interface Step {
   id: string;
@@ -53,6 +53,8 @@ export interface Requirement {
   file?: string;
   pattern?: string;
   flags?: string;
+  /** For inFunction type: the name of the function whose body to scope against (e.g., "draw", "setup"). */
+  function?: string;
   expected?: string;
   testFn?: string;
   points?: number;
