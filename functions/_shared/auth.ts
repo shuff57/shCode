@@ -3,7 +3,10 @@
 
 import { SignJWT, jwtVerify } from 'jose';
 
-const PBKDF2_ITERATIONS = 200_000;
+// Cloudflare Workers cap PBKDF2 iterations at 100_000 — anything higher
+// throws NotSupportedError. Use the cap; students aren't a high-value
+// target and PBKDF2-SHA256 at 100k is still well above trivial brute-force.
+const PBKDF2_ITERATIONS = 100_000;
 const KEY_BITS = 256;
 
 // ---- Hex encoding ----
