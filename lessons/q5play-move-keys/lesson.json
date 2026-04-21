@@ -1,15 +1,15 @@
 {
   "id": "q5play-move-keys",
-  "title": "5.1.4 Make it Move",
+  "title": "2.1.9 Make it Move",
   "description": "Drive a sprite with the arrow keys by setting vel.x and vel.y based on what's pressed.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 25,
-  "category": "Unit 5: q5play — Game Physics",
-  "unit": "5.1 Sprites & Movement",
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.1 Foundations",
   "preview": "q5play",
-  "week": 13,
-  "slos": ["SLO-1"],
+  "week": 10,
+  "slos": ["SLO-3"],
   "steps": [
     {
       "id": "s1",
