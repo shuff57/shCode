@@ -25,6 +25,7 @@
     "date-fns": "^4.1.0",
     "express": "^4.21.2",
     "isomorphic-dompurify": "^3.9.0",
+    "jose": "^5.9.6",
     "jszip": "^3.10.1",
     "lucide-react": "^0.539.0",
     "marked": "^18.0.2",
@@ -35,6 +36,7 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250424.0",
     "@slidev/cli": "^52.14.2",
     "@slidev/theme-default": "^0.25.0",
     "@slidev/theme-seriph": "^0.25.0",
@@ -44,6 +46,7 @@
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.4.4",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "wrangler": "^3.90.0"
   }
 }
