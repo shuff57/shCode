@@ -7,6 +7,29 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
+// Extract the body of a named function by balancing braces. Returns just
+// the code between the opening { and matching closing }, or null if the
+// function isn't found. Used so requirements can scope a pattern match to
+// "inside draw()" or "inside setup()" rather than anywhere in the file.
+function extractFunctionBody(src, name) {
+  const re = new RegExp(`function\\s+${name}\\s*\\([^)]*\\)\\s*\\{`);
+  const m = src.match(re);
+  if (!m || m.index === undefined) return null;
+  let depth = 1;
+  let i = m.index + m[0].length;
+  const bodyStart = i;
+  while (i < src.length && depth > 0) {
+    const c = src[i];
+    if (c === '{') depth++;
+    else if (c === '}') {
+      depth--;
+      if (depth === 0) return src.slice(bodyStart, i);
+    }
+    i++;
+  }
+  return null;
+}
+
 // Strip JS line (//) and block (/* */) comments so regex autograder can't
 // be tricked by answer code commented out in the starter. Respects strings
 // so commented tokens inside "// not a comment" aren't dropped. Naive: no
@@ -62,11 +85,27 @@ app.prepare().then(() => {
         const type = r.type || 'regex';
         let passed = false;
 
+        // Default flags is '' (case-sensitive). Set "flags": "i" explicitly
+        // in lesson.json if you want case-insensitive matching — q5play
+        // identifiers like Canvas / Sprite / kb / world are case-sensitive
+        // so the default must be strict.
+        const flags = r.flags ?? '';
+
         if (type === 'regex') {
           const raw = files?.[r.file] || '';
           const content = stripJsComments(raw);
-          const regex = new RegExp(r.pattern, r.flags || 'i');
+          const regex = new RegExp(r.pattern, flags);
           passed = regex.test(content);
+        } else if (type === 'inFunction') {
+          // Scope the pattern to the named function's body. Use this for
+          // checks like "background() must be called inside draw()".
+          const raw = files?.[r.file] || '';
+          const content = stripJsComments(raw);
+          const body = extractFunctionBody(content, r.function || 'draw');
+          if (body !== null) {
+            const regex = new RegExp(r.pattern, flags);
+            passed = regex.test(body);
+          }
         }
         // output and function types are handled client-side via Web Worker
 
