@@ -31,7 +31,7 @@ export type FileHistory = Record<string, Version[]>;
 
 // ---- Lessons & Assignments ----
 
-export type LessonType = 'lesson' | 'assignment' | 'project' | 'example';
+export type LessonType = 'lesson' | 'assignment' | 'project' | 'example' | 'challenge';
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 export type RequirementType = 'regex' | 'output' | 'function' | 'custom';
 
@@ -74,13 +74,22 @@ export interface Lesson {
   estimateMins: number;
   category?: string;
   unit?: string;
-  preview?: 'html' | 'console' | 'jscad' | 'q5play';
+  preview?: 'html' | 'console' | 'jscad' | 'q5play' | 'reading' | 'video' | 'example' | 'challenge' | 'assignment' | 'slides';
   week?: number;
   slos?: string[];
   files: FileNode[];
   steps: Step[];
   requirements: Requirement[];
   grading?: Grading;
+  aiGrader?: AiGraderConfig;
+}
+
+export interface AiGraderConfig {
+  rubricTitle?: string;
+  model?: string;
+  contextDocs?: string[];
+  prompt?: string;              // the prompt students responded to (for the grader context)
+  rubric: Array<{ id: string; title: string; description?: string; points: number }>;
 }
 
 // ---- Student State (localStorage) ----
