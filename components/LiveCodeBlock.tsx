@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 import {
   EditorView,
   keymap,
@@ -85,7 +86,7 @@ interface Props {
   previewSize?: number;
 }
 
-export default function LiveCodeBlock({ code, label, height = 180, previewSize = 360 }: Props) {
+export default function LiveCodeBlock({ code, label, height = 360, previewSize = 360 }: Props) {
   const initialCode = code.trim();
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -127,11 +128,19 @@ export default function LiveCodeBlock({ code, label, height = 180, previewSize =
   return (
     <div className="livecodeblock">
       {label && <div className="livecodeblock-label">{label}</div>}
-      <div className="livecodeblock-body">
-        <div className="livecodeblock-editor" style={{ height }}>
-          <div ref={containerRef} style={{ height: '100%', overflow: 'auto' }} />
+      <div
+        className="livecodeblock-body"
+        style={
+          {
+            '--lcb-editor-h': `${height}px`,
+            '--lcb-preview-side': `${previewSize}px`,
+          } as CSSProperties
+        }
+      >
+        <div className="livecodeblock-editor">
+          <div ref={containerRef} className="livecodeblock-editor-mount" />
         </div>
-        <div className="livecodeblock-preview" style={{ width: previewSize, height: previewSize }}>
+        <div className="livecodeblock-preview">
           <Q5PlayPreview code={committedCode} runKey={runKey} />
         </div>
       </div>
@@ -159,13 +168,28 @@ export default function LiveCodeBlock({ code, label, height = 180, previewSize =
           color: #bd93f9;
           font-weight: 600;
         }
-        .livecodeblock-body { display: flex; flex-direction: column; }
-        .livecodeblock-editor { flex: 1; min-width: 0; background: #282a36; }
+
+        /* Column layout (default / narrow): editor stacked above preview.
+           Each child takes its own explicit height so nothing grows to
+           indeterminate parent size. */
+        .livecodeblock-body {
+          display: flex;
+          flex-direction: column;
+        }
+        .livecodeblock-editor {
+          height: var(--lcb-editor-h);
+          background: #282a36;
+          overflow: hidden;
+        }
+        .livecodeblock-editor-mount {
+          height: 100%;
+          overflow: auto;
+        }
         .livecodeblock-preview {
+          width: 100%;
+          height: var(--lcb-preview-side);
           background: #000;
-          max-width: 100%;
           position: relative;
-          flex-shrink: 0;
         }
         .livecodeblock-preview .jscad-frame,
         .livecodeblock-preview .jscad-empty {
@@ -173,6 +197,27 @@ export default function LiveCodeBlock({ code, label, height = 180, previewSize =
           height: 100%;
           display: block;
         }
+
+        /* Row layout: editor and preview side-by-side, both matching the
+           preview's square height so the iframe is never clipped. */
+        @media (min-width: 720px) {
+          .livecodeblock-body {
+            flex-direction: row;
+            height: var(--lcb-preview-side);
+          }
+          .livecodeblock-editor {
+            flex: 1 1 0;
+            min-width: 0;
+            height: 100%;
+            border-right: 1px solid #44475a;
+          }
+          .livecodeblock-preview {
+            width: var(--lcb-preview-side);
+            height: 100%;
+            flex-shrink: 0;
+          }
+        }
+
         .livecodeblock-toolbar {
           display: flex;
           align-items: center;
@@ -205,10 +250,6 @@ export default function LiveCodeBlock({ code, label, height = 180, previewSize =
           font-size: 12px;
           border: 1px solid #44475a;
           cursor: pointer;
-        }
-        @media (min-width: 720px) {
-          .livecodeblock-body { flex-direction: row; }
-          .livecodeblock-editor { border-right: 1px solid #44475a; }
         }
       `}</style>
     </div>
