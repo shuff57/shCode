@@ -1,9 +1,12 @@
+import Link from 'next/link';
 import LessonCard from '../components/LessonCard';
 import { loadLessons } from '../lib/lessons';
+import { listUnits } from '../lib/curriculum';
 import type { Lesson } from '../lib/types';
 
 export default async function HomePage() {
   const lessons = await loadLessons();
+  const units = await listUnits();
 
   // Group lessons by category
   const categorized = new Map<string, Lesson[]>();
@@ -13,12 +16,12 @@ export default async function HomePage() {
     categorized.get(cat)!.push(lesson);
   }
 
-  // Sort lessons within each category by week, then by title (so "5.1.1" precedes "5.1.2")
+  // Sort lessons within each category by week, then by title (numeric-aware so "2.1.2" precedes "2.1.10")
   categorized.forEach((catLessons) => {
     catLessons.sort((a, b) => {
       const w = (a.week ?? 99) - (b.week ?? 99);
       if (w !== 0) return w;
-      return a.title.localeCompare(b.title);
+      return a.title.localeCompare(b.title, undefined, { numeric: true });
     });
   });
 
@@ -53,6 +56,31 @@ export default async function HomePage() {
         <h1 className="text-2xl font-bold">Choose a lesson</h1>
         <input className="border p-2" placeholder="Search lessons" />
       </div>
+
+      {/* Curriculum units — links to the build-spec hub pages */}
+      {units.length > 0 && (
+        <details className="bg-card border-border border rounded w-2/3 mx-auto mb-4" open>
+          <summary className="py-4 px-8 w-full list-none cursor-pointer hover:bg-muted text-5xl flex justify-between items-center">
+            <span className="font-bold">Curriculum</span>
+            <span className="text-lg">({units.length} units)</span>
+          </summary>
+          <div className="flex flex-col gap-2 p-4">
+            {units.map((u) => (
+              <Link
+                key={u.id}
+                href={`/module/${u.id}`}
+                className="flex items-baseline gap-3 p-3 bg-muted rounded hover:bg-accent transition"
+              >
+                <span className="font-bold text-lg">Unit {u.id}</span>
+                <span className="text-base">{u.title}</span>
+                <span className="ml-auto text-sm opacity-70">
+                  Q{u.quarter} · W{u.weeks?.[0]}–{u.weeks?.[u.weeks.length - 1]}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </details>
+      )}
 
       {/* HTML section with legacy subcategories */}
       {htmlLessons.length > 0 && (
