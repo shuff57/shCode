@@ -6,9 +6,9 @@ import {
   restoreToCommit,
   getFileHistoryFromCommits,
   buildFileIdMap,
-  saveProgress,
   loadProgress,
 } from './version-control';
+import { listCommits, createCommit as apiCreateCommit } from './commits-api';
 
 interface UIState {
   sidebarOpen: boolean;
@@ -41,7 +41,7 @@ interface LessonState {
   // VC actions
   initVC: (fileContents: Record<string, string>) => void;
   markDirty: (fileId: string) => void;
-  commitChanges: (message: string) => boolean;
+  commitChanges: (message: string) => Promise<boolean>;
   restoreCommit: (commitId: string) => void;
   restoreVersion: (fileId: string, version: Version) => void;
   getFileHistory: (fileId: string) => Version[];
@@ -89,32 +89,32 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       requirements: lesson.requirements,
     });
 
-    // Check for saved progress
+    // Commits are owned by the server now — no localStorage fallback for
+    // history. File contents still load from localStorage so in-progress
+    // edits survive a reload even when offline.
     if (typeof window !== 'undefined') {
       const saved = loadProgress(lesson.id);
-      if (saved) {
-        set({
-          fileContents: saved.fileContents,
-          commits: saved.commits,
-          lastCommittedFileContents: saved.lastCommittedFileContents,
-          dirtyFileIds: new Set(),
+      set({
+        fileContents: saved ? saved.fileContents : fileContents,
+        lastCommittedFileContents: saved
+          ? saved.lastCommittedFileContents
+          : { ...fileContents },
+        commits: [],
+        dirtyFileIds: new Set(),
+        fileHistory: {},
+      });
+
+      // Fire-and-forget fetch of remote commits. Populates the store when
+      // it resolves. 401 / network failures leave commits empty — the
+      // UI renders "no history yet".
+      listCommits(lesson.id)
+        .then((commits) => {
+          // Ignore if the user has since navigated to another lesson.
+          if (get().lesson?.id === lesson.id) set({ commits });
+        })
+        .catch(() => {
+          /* unauthenticated or offline — history stays empty */
         });
-      } else {
-        // Create ID-keyed contents for initial commit
-        const idMap = buildFileIdMap(lesson.files);
-        const idContents: Record<string, string> = {};
-        for (const [filePath, content] of Object.entries(fileContents)) {
-          const id = idMap[filePath];
-          if (id) idContents[id] = content;
-        }
-        const initial = createCommit('Initial code', Object.keys(idContents), idContents);
-        set({
-          commits: [initial],
-          lastCommittedFileContents: { ...fileContents },
-          dirtyFileIds: new Set(),
-          fileHistory: {},
-        });
-      }
     }
   },
 
@@ -172,32 +172,43 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       dirtyFileIds: new Set(state.dirtyFileIds).add(fileId),
     })),
 
-  commitChanges: (message) => {
+  commitChanges: async (message) => {
     const state = get();
+    if (!state.lesson) return false;
     const changed = getChangedFiles(
       state.fileContents,
       state.lastCommittedFileContents,
-      state.dirtyFileIds
+      state.dirtyFileIds,
     );
     if (changed.length === 0) return false;
 
     const commit = createCommit(message, changed, state.fileContents);
+
+    // Optimistic local add so the UI updates immediately. If the POST
+    // fails we roll back and re-throw so callers can surface the error.
     set({
       commits: [...state.commits, commit],
       lastCommittedFileContents: { ...state.fileContents },
       dirtyFileIds: new Set(),
     });
 
-    // Persist to localStorage
-    if (state.lesson && typeof window !== 'undefined') {
-      saveProgress(state.lesson.id, {
-        fileContents: state.fileContents,
-        commits: [...state.commits, commit],
-        lastCommittedFileContents: { ...state.fileContents },
-        completedSteps: [],
-      });
+    try {
+      const stored = await apiCreateCommit(state.lesson.id, commit);
+      // Replace the optimistic entry with the server's authoritative copy
+      // (identical today, but keeps us honest if the server ever mutates).
+      set((s) => ({
+        commits: s.commits.map((c) => (c.id === commit.id ? stored : c)),
+      }));
+      return true;
+    } catch (err) {
+      // Roll back the optimistic commit on failure.
+      set((s) => ({
+        commits: s.commits.filter((c) => c.id !== commit.id),
+        lastCommittedFileContents: state.lastCommittedFileContents,
+        dirtyFileIds: state.dirtyFileIds,
+      }));
+      throw err;
     }
-    return true;
   },
 
   restoreCommit: (commitId) => {

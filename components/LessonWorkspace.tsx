@@ -330,8 +330,17 @@ export default function LessonWorkspace({
     return report;
   }, [lesson, files]);
 
-  const handleCommit = (message: string) => {
-    commitChanges(message);
+  const handleCommit = async (message: string) => {
+    try {
+      await commitChanges(message);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.startsWith('401')) {
+        alert('Please sign in to save your work. Reload the page to sign in, then try again.');
+      } else {
+        alert(`Commit failed: ${msg}`);
+      }
+    }
   };
 
   const handleSubmit = () => {
