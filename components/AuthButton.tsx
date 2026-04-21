@@ -1,0 +1,73 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { getCurrentUser, logout, CurrentUser } from '../lib/auth';
+import AuthModal from './AuthModal';
+
+export default function AuthButton() {
+  const [user, setUser] = useState<CurrentUser | null>(null);
+  const [loaded, setLoaded] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    getCurrentUser()
+      .then((u) => setUser(u))
+      .finally(() => setLoaded(true));
+  }, []);
+
+  async function handleLogout() {
+    await logout();
+    setUser(null);
+  }
+
+  if (!loaded) return <span style={{ fontSize: 13, opacity: 0.5 }}>…</span>;
+
+  if (user) {
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontSize: 13 }}>
+        <span style={{ opacity: 0.8 }}>{user.email}</span>
+        <button
+          type="button"
+          onClick={handleLogout}
+          style={{
+            background: 'transparent',
+            border: '1px solid rgba(255,255,255,0.3)',
+            color: 'inherit',
+            padding: '4px 10px',
+            borderRadius: 4,
+            cursor: 'pointer',
+            fontSize: 12,
+          }}
+        >
+          Sign out
+        </button>
+      </span>
+    );
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        style={{
+          background: '#50fa7b',
+          color: '#282a36',
+          border: 'none',
+          padding: '6px 14px',
+          borderRadius: 4,
+          fontWeight: 600,
+          fontSize: 13,
+          cursor: 'pointer',
+        }}
+      >
+        Sign in
+      </button>
+      <AuthModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        onAuthenticated={(email) => setUser({ email })}
+      />
+    </>
+  );
+}
