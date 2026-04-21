@@ -39,7 +39,7 @@
     {
       "id": "r1",
       "title": "Create a canvas",
-      "description": "Call `new Canvas(...)` inside `setup()`",
+      "description": "A canvas is created when the sketch starts.",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",
@@ -49,7 +49,7 @@
     {
       "id": "r2",
       "title": "Create at least one sprite",
-      "description": "Use `new Sprite(...)` somewhere in your code",
+      "description": "A sprite exists in the sketch.",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\(",
@@ -58,8 +58,8 @@
     },
     {
       "id": "r3",
-      "title": "Clear the background",
-      "description": "Call `background(...)` inside `draw()`",
+      "title": "Clear the background each frame",
+      "description": "Previous frames don't stack up.",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -70,7 +70,7 @@
     {
       "id": "r4",
       "title": "Use at least one advanced feature",
-      "description": "Inside draw() or update(), use kb.presses OR sin/cos OR mouse.x/y OR lerp OR frameCount OR text()",
+      "description": "Your sketch uses a technique beyond canvas + sprite + background.",
       "type": "inFunction",
       "function": ["draw", "update"],
       "file": "script.js",

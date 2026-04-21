@@ -46,7 +46,7 @@
     {
       "id": "r1",
       "title": "Create a canvas",
-      "description": "Call `new Canvas(width, height)` inside setup()",
+      "description": "A canvas is created when the sketch starts.",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",
@@ -56,7 +56,7 @@
     {
       "id": "r2",
       "title": "Create at least 2 sprites",
-      "description": "Use `new Sprite(...)` at least twice",
+      "description": "Two sprites exist in the sketch.",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\([\\s\\S]*?new\\s+Sprite\\s*\\(",
@@ -66,7 +66,7 @@
     {
       "id": "r3",
       "title": "Horizontal WASD input",
-      "description": "Use kb.pressing('a') or kb.pressing('d') inside draw() or update()",
+      "description": "A or D keys move the player horizontally each frame.",
       "type": "inFunction",
       "function": ["draw", "update"],
       "file": "script.js",
@@ -77,7 +77,7 @@
     {
       "id": "r4",
       "title": "Vertical WASD input",
-      "description": "Use kb.pressing('w') or kb.pressing('s') inside draw() or update()",
+      "description": "W or S keys move the player vertically each frame.",
       "type": "inFunction",
       "function": ["draw", "update"],
       "file": "script.js",
@@ -87,8 +87,8 @@
     },
     {
       "id": "r5",
-      "title": "Else-to-zero on velocity",
-      "description": "Reset player.vel.x (or .y) to 0 in an else branch inside draw() or update()",
+      "title": "Velocity resets to zero",
+      "description": "The player stops when no movement key is held.",
       "type": "inFunction",
       "function": ["draw", "update"],
       "file": "script.js",
@@ -98,8 +98,8 @@
     },
     {
       "id": "r6",
-      "title": "Use frameCount for auto-motion",
-      "description": "Reference frameCount inside draw() or update() (for the mover sprite)",
+      "title": "Automatic motion for the mover",
+      "description": "The mover sprite animates without keyboard input.",
       "type": "inFunction",
       "function": ["draw", "update"],
       "file": "script.js",
@@ -110,7 +110,7 @@
     {
       "id": "r7",
       "title": "On-screen text label",
-      "description": "Call text(...) inside draw() so it redraws each frame",
+      "description": "A text label is drawn on the canvas.",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -120,8 +120,8 @@
     },
     {
       "id": "r8",
-      "title": "Clear the background",
-      "description": "Call background(...) inside draw()",
+      "title": "Clear the background each frame",
+      "description": "Previous frames don't stack up.",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

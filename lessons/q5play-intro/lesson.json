@@ -37,10 +37,10 @@
     }
   ],
   "requirements": [
-    { "id": "r1", "title": "Create a canvas", "description": "Call new Canvas(...) inside setup()", "type": "regex", "file": "script.js", "pattern": "new\\s+Canvas\\s*\\(", "flags": "", "points": 10, "status": "pending" },
-    { "id": "r2", "title": "Create at least one Sprite", "description": "Use new Sprite(...) somewhere in your code", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(", "flags": "", "points": 10, "status": "pending" },
-    { "id": "r3", "title": "Set a sprite color", "description": "Assign to a sprite's .color property", "type": "regex", "file": "script.js", "pattern": "\\.color\\s*=", "flags": "", "points": 5, "status": "pending" },
-    { "id": "r4", "title": "Clear the background in draw()", "description": "Call background(...) inside draw()", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "background\\s*\\(", "flags": "", "points": 5, "status": "pending" }
+    { "id": "r1", "title": "Create a canvas", "description": "A canvas is created when the sketch starts.", "type": "regex", "file": "script.js", "pattern": "new\\s+Canvas\\s*\\(", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r2", "title": "Create at least one sprite", "description": "A sprite exists in the sketch.", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r3", "title": "Set a sprite color", "description": "A sprite has a color.", "type": "regex", "file": "script.js", "pattern": "\\.color\\s*=", "flags": "", "points": 5, "status": "pending" },
+    { "id": "r4", "title": "Clear the background each frame", "description": "Previous frames don't stack up.", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "background\\s*\\(", "flags": "", "points": 5, "status": "pending" }
   ],
   "grading": { "totalPoints": 30, "passingScore": 20, "allowLateSubmit": true }
 }
