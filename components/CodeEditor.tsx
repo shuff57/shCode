@@ -5,7 +5,7 @@ import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLi
 import type { ChangeEvent } from 'react';
 import { EditorState } from '@codemirror/state';
 import { javascript } from '@codemirror/lang-javascript';
-import { defaultKeymap, indentWithTab } from '@codemirror/commands';
+import { defaultKeymap, indentWithTab, history, historyKeymap } from '@codemirror/commands';
 import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { highlightSelectionMatches } from '@codemirror/search';
@@ -96,6 +96,7 @@ function makeExtensions(onChange: (doc: string) => void) {
     lineNumbers(),
     highlightActiveLine(),
     highlightActiveLineGutter(),
+    history(),
     bracketMatching(),
     closeBrackets(),
     indentOnInput(),
@@ -105,6 +106,7 @@ function makeExtensions(onChange: (doc: string) => void) {
     keymap.of([
       ...closeBracketsKeymap,
       ...defaultKeymap,
+      ...historyKeymap,
       indentWithTab,
     ]),
     darkTheme,
