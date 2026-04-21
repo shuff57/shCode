@@ -9,9 +9,11 @@ const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
   const server = express();
-  server.use(express.json());
 
-  server.post('/api/grade', async (req, res) => {
+  // Scope express.json() to the Express-owned route only. Applying it globally
+  // consumes the request body stream, which breaks Next App Router route
+  // handlers (they need to read the raw body themselves).
+  server.post('/api/grade', express.json(), async (req, res) => {
     const { lessonId, files } = req.body;
     try {
       const lessonDir = path.join(process.cwd(), 'lessons', lessonId);

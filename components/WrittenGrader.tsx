@@ -92,7 +92,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
     setError(null);
     setOffline(false);
     try {
-      const res = await fetch('/api/grade-written', {
+      const res = await fetch('/api/grade-written/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
