@@ -53,6 +53,22 @@ function draw() {
 
 Run. **One** sprite exists. It's rendered automatically every frame — you don't call any render function. The engine sees the sprite in its world and draws it for you.
 
+**Try the combined final — tweak and Run:**
+
+```js live
+let player;
+
+function setup() {
+  new Canvas(400, 400);
+  player = new Sprite(200, 200, 40, 40);
+  player.color = 'deepskyblue';
+}
+
+function draw() {
+  background('#222');
+}
+```
+
 ### Key takeaways
 
 - `setup()` runs **once**. Create long-lived things here.
@@ -113,6 +129,30 @@ function draw() {
 ```
 
 Remember: **up is negative y** in screen coordinates. This is different from math class.
+
+**Try the combined final — hold arrow keys to move:**
+
+```js live
+let player;
+
+function setup() {
+  new Canvas(400, 400);
+  player = new Sprite(200, 200, 40, 40);
+  player.color = 'deepskyblue';
+}
+
+function draw() {
+  background('#222');
+
+  if (kb.pressing('left'))       player.vel.x = -4;
+  else if (kb.pressing('right')) player.vel.x = 4;
+  else                           player.vel.x = 0;
+
+  if (kb.pressing('up'))         player.vel.y = -4;
+  else if (kb.pressing('down'))  player.vel.y = 4;
+  else                           player.vel.y = 0;
+}
+```
 
 ### Key takeaways
 
@@ -176,6 +216,31 @@ Result: the mover sprite slides smoothly left and right around x = 400, going 80
   mover.rotation = frameCount * 2;
   ```
 - **Faster / slower:** change `0.05` → smaller = slower, larger = faster. `0.1` moves twice as fast.
+
+**Try the combined final — WASD moves the player, the orange sprite moves on its own:**
+
+```js live
+let player, mover;
+
+function setup() {
+  new Canvas(500, 400);
+  player = new Sprite(100, 200, 40, 40);
+  player.color = 'deepskyblue';
+
+  mover = new Sprite(400, 200, 30, 30);
+  mover.color = 'orange';
+}
+
+function draw() {
+  background('#222');
+
+  if (kb.pressing('a')) player.vel.x = -4;
+  else if (kb.pressing('d')) player.vel.x = 4;
+  else player.vel.x = 0;
+
+  mover.pos.x = 400 + sin(frameCount * 0.05) * 80;
+}
+```
 
 ### Key takeaways
 
