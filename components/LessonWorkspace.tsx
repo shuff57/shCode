@@ -53,6 +53,7 @@ export default function LessonWorkspace({
 
   const [srcDoc, setSrcDoc] = useState('');
   const [runKey, setRunKey] = useState(0);
+  const [q5Code, setQ5Code] = useState('');
   const [consoleOutput, setConsoleOutput] = useState<Array<{type: string; message: string; timestamp: string}>>([]);
   const [commitOpen, setCommitOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -251,8 +252,10 @@ export default function LessonWorkspace({
     setTimeout(() => runTests(), 600);
   }
 
-  // For q5play lessons: bump runKey to reload the runner iframe with latest code
+  // For q5play lessons: snapshot the current code and bump runKey to reload the iframe.
+  // We snapshot so edits after Run don't re-trigger the iframe until the next Run.
   function runQ5() {
+    setQ5Code(files['script.js'] || '');
     setRunKey((k) => k + 1);
     setTimeout(() => runTests(), 400);
   }
@@ -475,7 +478,7 @@ export default function LessonWorkspace({
               ) : isJscadMode ? (
                 <JscadPreview srcDoc={srcDoc} />
               ) : isQ5Mode ? (
-                <Q5PlayPreview code={files['script.js'] || ''} runKey={runKey} />
+                <Q5PlayPreview code={q5Code} runKey={runKey} />
               ) : (
                 <LivePreview srcDoc={srcDoc} />
               )}
