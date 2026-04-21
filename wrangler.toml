@@ -1,0 +1,32 @@
+# Cloudflare Pages + Functions config.
+# The `functions/` directory is picked up automatically — each .ts file there
+# becomes a route handler. The `out/` dir is the static export from
+# `npm run build` (Next.js `output: 'export'`).
+
+name = "shcode"
+pages_build_output_dir = "out"
+compatibility_date = "2025-04-01"
+
+# D1 database binding for per-student commit history. Create the DB once:
+#
+#   npx wrangler d1 create shcode-commits
+#
+# Then paste the returned `database_id` here, and update the production copy
+# in the Cloudflare dashboard (Pages project -> Settings -> Functions ->
+# D1 database bindings -> add DB with same binding name "DB").
+[[d1_databases]]
+binding = "DB"
+database_name = "shcode-commits"
+database_id = "REPLACE_WITH_DB_ID_FROM_wrangler_d1_create"
+
+# Non-secret config the Functions read via env.
+# ACCESS_TEAM_DOMAIN: your Cloudflare Zero Trust team domain, e.g.
+#   "yourteam.cloudflareaccess.com"
+# ACCESS_AUD: the AUD (audience) tag from the Access application's
+#   "Application Audience (AUD) Tag" field in the dashboard.
+# ALLOWED_EMAIL_DOMAIN: substring check on the Access-provided email, e.g.
+#   "@chicousd.org". Leave as "@" to allow any signed-in email during setup.
+[vars]
+ACCESS_TEAM_DOMAIN = "REPLACE_WITH_YOUR_TEAM.cloudflareaccess.com"
+ACCESS_AUD = "REPLACE_WITH_YOUR_AUD_TAG"
+ALLOWED_EMAIL_DOMAIN = "@"
