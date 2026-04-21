@@ -1,0 +1,65 @@
+import type { ReactNode } from 'react';
+import {
+  BookOpen,
+  Film,
+  Lightbulb,
+  Star,
+  PenSquare,
+  Presentation,
+  Play,
+  Terminal,
+  Box,
+  Globe,
+  FileText,
+} from 'lucide-react';
+
+export interface PreviewBadge {
+  Icon: (props: { size?: number; strokeWidth?: number; color?: string; className?: string }) => ReactNode;
+  label: string;
+  color: string;
+}
+
+const ICON_PROPS = { size: 14, strokeWidth: 2 } as const;
+
+function makeBadge(Icon: any, label: string, color: string): PreviewBadge {
+  const Wrapped = (props: { size?: number; strokeWidth?: number; color?: string; className?: string }) => (
+    <Icon
+      size={props.size ?? ICON_PROPS.size}
+      strokeWidth={props.strokeWidth ?? ICON_PROPS.strokeWidth}
+      color={props.color ?? color}
+      className={props.className}
+    />
+  );
+  return { Icon: Wrapped, label, color };
+}
+
+export const PREVIEW_BADGES: Record<string, PreviewBadge> = {
+  reading:    makeBadge(BookOpen,     'Reading',        '#8be9fd'),
+  video:      makeBadge(Film,         'Video',          '#ff79c6'),
+  example:    makeBadge(Lightbulb,    'Worked Example', '#ffb86c'),
+  challenge:  makeBadge(Star,         'Challenge',      '#f1fa8c'),
+  assignment: makeBadge(PenSquare,    'Assignment',     '#50fa7b'),
+  slides:     makeBadge(Presentation, 'Slides',         '#bd93f9'),
+  q5play:     makeBadge(Play,         'Q5 Lesson',      '#ff79c6'),
+  console:    makeBadge(Terminal,     'Console',        '#50fa7b'),
+  jscad:      makeBadge(Box,          'JSCAD',          '#ffb86c'),
+  html:       makeBadge(Globe,        'HTML',           '#8be9fd'),
+};
+
+export const FALLBACK_BADGE: PreviewBadge = makeBadge(FileText, 'Content', '#888888');
+
+export function badgeFor(preview: string | undefined): PreviewBadge {
+  if (!preview) return FALLBACK_BADGE;
+  return PREVIEW_BADGES[preview] ?? FALLBACK_BADGE;
+}
+
+/**
+ * Derive the badge from a lesson's type + preview.
+ * Type wins when it maps to a known badge (challenge / assignment),
+ * so a q5play-runnable can still display as "Challenge" or "Assignment".
+ */
+export function badgeForLesson(opts: { type?: string; preview?: string }): PreviewBadge {
+  const typeBadge = opts.type ? PREVIEW_BADGES[opts.type] : undefined;
+  if (typeBadge) return typeBadge;
+  return badgeFor(opts.preview);
+}
