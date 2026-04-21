@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>q5play runner</title>
+<style>
+	html, body { margin: 0; padding: 0; height: 100%; background: #111; color: #eee; font-family: system-ui, sans-serif; }
+	body { display: flex; align-items: center; justify-content: center; }
+	canvas { display: block; }
+	#error { position: fixed; top: 0; left: 0; right: 0; background: rgba(220,38,38,0.92); color: #fff; padding: 8px 12px; font: 12px/1.4 monospace; white-space: pre-wrap; display: none; z-index: 100; }
+	#empty { color: #666; font: 13px system-ui; text-align: center; }
+</style>
+<script>
+// Pipe console + errors to parent (matches the existing preview-console protocol)
+(function() {
+	function send(type, args) {
+		try {
+			var safe = Array.prototype.slice.call(args).map(function(a) {
+				if (a instanceof Error) return a.stack || a.message;
+				if (typeof a === 'object') { try { return JSON.parse(JSON.stringify(a)); } catch(e){ return String(a); } }
+				return a;
+			});
+			window.parent.postMessage({ source: 'preview-console', type: type, args: safe }, '*');
+		} catch (e) { /* parent gone */ }
+	}
+	['log','warn','error','info'].forEach(function(t) {
+		var orig = console[t];
+		console[t] = function() { send(t, arguments); orig.apply(console, arguments); };
+	});
+	window.addEventListener('error', function(e) {
+		var where = (e.filename || '') + (e.lineno ? ':' + e.lineno : '') + (e.colno ? ':' + e.colno : '');
+		send('error', [(e.error && e.error.stack) || e.message]);
+		var el = document.getElementById('error');
+		if (el) { el.style.display = 'block'; el.textContent = (e.message || 'Error') + (where ? ' @ ' + where : ''); }
+	});
+	window.addEventListener('unhandledrejection', function(e) {
+		send('error', ['Unhandled rejection: ' + ((e.reason && e.reason.message) || e.reason)]);
+	});
+})();
+</script>
+<script type="importmap">
+{ "imports": { "box2d3-wasm": "./Box2D.deluxe.mjs" } }
+</script>
+<script src="./q5.js"></script>
+<script type="module" src="./q5play.js"></script>
+</head>
+<body>
+<div id="error"></div>
+<div id="empty">Click Run to execute your sketch.</div>
+<script>
+// Read student code from ?code=<base64url>, inject as a <script> so declarations become globals
+(function() {
+	var params = new URLSearchParams(location.search);
+	var encoded = params.get('code');
+	if (!encoded) return;
+	var code;
+	try {
+		var b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+		while (b64.length % 4) b64 += '=';
+		code = decodeURIComponent(escape(atob(b64)));
+	} catch (e) {
+		console.error('Failed to decode sketch: ' + (e.message || e));
+		return;
+	}
+	document.getElementById('empty').remove();
+	var s = document.createElement('script');
+	s.textContent = code;
+	document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>

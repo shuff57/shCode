@@ -1,0 +1,131 @@
+{
+  "id": "2-1-9-a10-1-sprite-playground",
+  "title": "2.1.10 Sprite Playground",
+  "description": "Build a sprite playground combining canvas, WASD-controlled sprite, auto-motion, and on-screen text. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 45,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.1 Foundations",
+  "preview": "q5play",
+  "week": 10,
+  "slos": ["SLO-3"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a canvas and two sprites",
+      "instructions": "In `setup()`: create a canvas (any size between 300×300 and 800×600) and two sprites — one named `player` (controllable) and one named `mover` (moves on its own).",
+      "hints": ["Remember to store the sprites in variables declared outside setup()."]
+    },
+    {
+      "id": "s2",
+      "title": "Wire WASD movement to the player",
+      "instructions": "In `draw()`, check `kb.pressing('a')` / `'d'` / `'w'` / `'s'` and set `player.vel.x` / `player.vel.y`. Remember to include the else branch that resets velocity to 0!",
+      "hints": ["Don't use arrow keys in this lab — they also scroll the browser iframe."]
+    },
+    {
+      "id": "s3",
+      "title": "Animate the mover sprite",
+      "instructions": "Use `frameCount` to drive automatic motion on `mover`. Pick any pattern: oscillate left-right, orbit in a circle, or spin.",
+      "hints": [
+        "`mover.pos.x = 400 + sin(frameCount * 0.05) * 80;` gives smooth horizontal oscillation.",
+        "`mover.rotation = frameCount * 2;` makes it spin."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Add an on-screen text label",
+      "instructions": "At the top of the canvas, display a message using `text()` and `textSize()`. Your choice of message.",
+      "hints": ["Set `fill(255)` before `text(...)` so it's visible on dark backgrounds."]
+    },
+    {
+      "id": "s5",
+      "title": "Don't forget background()",
+      "instructions": "Make sure `background(...)` is called first in `draw()` so previous frames don't stack up.",
+      "hints": []
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Create a canvas",
+      "description": "Call `new Canvas(width, height)` inside setup()",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Canvas\\s*\\(",
+      "flags": "",
+      "points": 2
+    },
+    {
+      "id": "r2",
+      "title": "Create at least 2 sprites",
+      "description": "Use `new Sprite(...)` at least twice",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Sprite\\s*\\([\\s\\S]*?new\\s+Sprite\\s*\\(",
+      "flags": "",
+      "points": 2
+    },
+    {
+      "id": "r3",
+      "title": "Horizontal WASD input",
+      "description": "Use kb.pressing('a') or kb.pressing('d')",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d)['\"]",
+      "flags": "",
+      "points": 2
+    },
+    {
+      "id": "r4",
+      "title": "Vertical WASD input",
+      "description": "Use kb.pressing('w') or kb.pressing('s')",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:w|s)['\"]",
+      "flags": "",
+      "points": 2
+    },
+    {
+      "id": "r5",
+      "title": "Else-to-zero on velocity",
+      "description": "Reset player.vel.x (or .y) to 0 in an else branch",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "else[\\s{]*\\w+\\.vel\\.[xy]\\s*=\\s*0",
+      "flags": "",
+      "points": 2
+    },
+    {
+      "id": "r6",
+      "title": "Use frameCount for auto-motion",
+      "description": "Reference frameCount somewhere (for the mover sprite)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bframeCount\\b",
+      "flags": "",
+      "points": 2
+    },
+    {
+      "id": "r7",
+      "title": "On-screen text label",
+      "description": "Call text(...) in draw()",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\btext\\s*\\(",
+      "flags": "",
+      "points": 2
+    },
+    {
+      "id": "r8",
+      "title": "Clear the background",
+      "description": "Call background(...) inside draw()",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+draw\\s*\\(\\s*\\)[\\s\\S]*?background\\s*\\(",
+      "flags": "",
+      "points": 1
+    }
+  ],
+  "grading": { "totalPoints": 15, "passingScore": 10, "allowLateSubmit": true }
+}

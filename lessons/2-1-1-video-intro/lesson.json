@@ -1,0 +1,18 @@
+{
+  "id": "2-1-1-video-intro",
+  "title": "2.1.2 Video — Your first q5play sketch",
+  "description": "5-min walkthrough introducing canvas, sprite, and run cycle. Watch before the Hello Sprite lesson.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.1 Foundations",
+  "preview": "video",
+  "week": 10,
+  "slos": ["SLO-3"],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the YouTube link, or open the classroom slide deck for the live demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}
