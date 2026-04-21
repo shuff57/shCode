@@ -127,7 +127,7 @@ export default function ContentLessonView({ lesson, prev, next, basePath = '/les
 
       {contentMd ? (
         <div style={{ marginTop: 20 }}>
-          <MarkdownWithLiveBlocks src={contentMd} />
+          <MarkdownWithLiveBlocks src={contentMd} lessonId={lesson.id} />
         </div>
       ) : null}
 

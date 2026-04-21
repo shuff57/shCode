@@ -5,11 +5,37 @@ import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
 import LiveCodeBlock from './LiveCodeBlock';
 
-const LIVE_FENCE = /```js live\n([\s\S]*?)```/g;
+// Fence accepts an optional id for persistent storage:
+//
+//     ```js live id=sprite-demo
+//     ...
+//     ```
+//
+// When id is omitted, we derive one by hashing the initial code so
+// edits persist across reloads without the author having to name it.
+const LIVE_FENCE = /```js live(?:\s+id=([\w-]+))?\n([\s\S]*?)```/g;
 
-interface Chunk {
-  kind: 'html' | 'live';
+interface LiveChunk {
+  kind: 'live';
   body: string;
+  id: string;
+}
+
+interface HtmlChunkData {
+  kind: 'html';
+  body: string;
+}
+
+type Chunk = LiveChunk | HtmlChunkData;
+
+// Short stable id derived from the code body. FNV-1a 32-bit. Only used
+// when the author didn't write an explicit `id=`.
+function hashCode(s: string): string {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+  }
+  return (h >>> 0).toString(16);
 }
 
 function parseChunks(src: string): Chunk[] {
@@ -20,7 +46,9 @@ function parseChunks(src: string): Chunk[] {
     if (start > lastIndex) {
       chunks.push({ kind: 'html', body: src.slice(lastIndex, start) });
     }
-    chunks.push({ kind: 'live', body: match[1].trim() });
+    const body = match[2].trim();
+    const id = match[1] || `auto-${hashCode(body)}`;
+    chunks.push({ kind: 'live', body, id });
     lastIndex = start + match[0].length;
   }
   if (lastIndex < src.length) {
@@ -41,9 +69,11 @@ function HtmlChunk({ html }: { html: string }) {
 
 interface Props {
   src: string;
+  /** Lesson id used to namespace localStorage keys for live blocks. */
+  lessonId?: string;
 }
 
-export default function MarkdownWithLiveBlocks({ src }: Props) {
+export default function MarkdownWithLiveBlocks({ src, lessonId }: Props) {
   const chunks = useMemo(() => parseChunks(src), [src]);
   return (
     <>
@@ -51,7 +81,12 @@ export default function MarkdownWithLiveBlocks({ src }: Props) {
         chunk.kind === 'html' ? (
           <HtmlChunk key={i} html={renderMarkdown(chunk.body)} />
         ) : (
-          <LiveCodeBlock key={i} code={chunk.body} />
+          <LiveCodeBlock
+            key={`${chunk.id}-${i}`}
+            code={chunk.body}
+            blockId={chunk.id}
+            lessonId={lessonId}
+          />
         )
       )}
     </>

@@ -84,13 +84,41 @@ interface Props {
   label?: string;
   height?: number;
   previewSize?: number;
+  /** Stable id for this block — combined with lessonId to key localStorage. */
+  blockId?: string;
+  /** Lesson id that hosts this block. When both lessonId and blockId are
+   *  provided, edits persist to localStorage under
+   *  `liveCodeBlock:<lessonId>:<blockId>`. */
+  lessonId?: string;
 }
 
-export default function LiveCodeBlock({ code, label, height = 360, previewSize = 360 }: Props) {
+function storageKeyFor(lessonId: string | undefined, blockId: string | undefined): string | null {
+  if (!lessonId || !blockId) return null;
+  return `liveCodeBlock:${lessonId}:${blockId}`;
+}
+
+export default function LiveCodeBlock({
+  code,
+  label,
+  height = 360,
+  previewSize = 360,
+  blockId,
+  lessonId,
+}: Props) {
   const initialCode = code.trim();
+  const storageKey = storageKeyFor(lessonId, blockId);
+
+  // Load any saved edit synchronously so the first render of the editor
+  // already reflects the student's in-progress work, avoiding a flash
+  // of the original starter code on reload.
+  const [editorCode, setEditorCode] = useState<string>(() => {
+    if (!storageKey || typeof window === 'undefined') return initialCode;
+    const saved = window.localStorage.getItem(storageKey);
+    return saved !== null ? saved : initialCode;
+  });
+
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
-  const [editorCode, setEditorCode] = useState(initialCode);
   const [committedCode, setCommittedCode] = useState('');
   const [runKey, setRunKey] = useState(0);
 
@@ -98,7 +126,9 @@ export default function LiveCodeBlock({ code, label, height = 360, previewSize =
     if (!containerRef.current) return;
     const view = new EditorView({
       state: EditorState.create({
-        doc: initialCode,
+        // Use the already-resolved editorCode so the editor starts with
+        // the saved doc when present.
+        doc: editorCode,
         extensions: makeExtensions(setEditorCode),
       }),
       parent: containerRef.current,
@@ -110,6 +140,21 @@ export default function LiveCodeBlock({ code, label, height = 360, previewSize =
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Persist edits to localStorage, debounced so we don't write on every
+  // keystroke. Removes the entry when the code is back at its starter so
+  // stale storage doesn't accumulate.
+  useEffect(() => {
+    if (!storageKey || typeof window === 'undefined') return;
+    const timer = setTimeout(() => {
+      if (editorCode === initialCode) {
+        window.localStorage.removeItem(storageKey);
+      } else {
+        window.localStorage.setItem(storageKey, editorCode);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [editorCode, initialCode, storageKey]);
 
   function run() {
     setCommittedCode(editorCode);
@@ -123,6 +168,9 @@ export default function LiveCodeBlock({ code, label, height = 360, previewSize =
     setEditorCode(initialCode);
     setCommittedCode('');
     setRunKey(0);
+    if (storageKey && typeof window !== 'undefined') {
+      window.localStorage.removeItem(storageKey);
+    }
   }
 
   return (
