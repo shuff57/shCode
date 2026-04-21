@@ -1,0 +1,122 @@
+# 2.1.1 Challenges (Optional Stretch)
+
+These are not graded. Attempt any you find interesting after you've finished the required work (both in-app lessons, [A10.1](A10.1_sprite-playground.md), [A10.2](A10.2_frame-loop-writeup.md)).
+
+If you get stuck on required work, STOP and ask for help — don't burn time here first.
+
+**Other 2.1.1 resources:** [overview](2.1.1_overview.md) · [readings](2.1.1_readings.md) · [worked examples](2.1.1_worked-examples.md)
+
+---
+
+## Challenge 1 — Color-changing sprite (easy)
+
+Make the player sprite change color every time any arrow key is pressed.
+
+**Hints:**
+- Use `kb.presses('left')` (not `pressing`) so the color only changes once per key tap, not 60 times per second.
+- Pick from an array of colors: `let colors = ['red', 'green', 'blue', 'hotpink'];`
+- Keep a counter and do `colors[counter % colors.length]` to cycle.
+
+**Stretch it further:** random color each press — `player.color = colors[Math.floor(Math.random() * colors.length)];`
+
+---
+
+## Challenge 2 — Orbiting companion (medium)
+
+Add a second sprite that moves in a **circle** around the player. It should follow the player wherever the player goes.
+
+**Hints:**
+- Use both `sin` and `cos`:
+  ```js
+  companion.pos.x = player.pos.x + cos(frameCount * 0.05) * 60;
+  companion.pos.y = player.pos.y + sin(frameCount * 0.05) * 60;
+  ```
+- Because `companion.pos.x/y` is set every frame, the companion won't respond to physics — that's fine for this challenge.
+
+**Stretch it further:** two companions orbiting in opposite directions (one uses `+frameCount`, one uses `-frameCount`).
+
+---
+
+## Challenge 3 — DevTools exploration (hard)
+
+While your sketch is running, open browser DevTools (`F12`).
+
+1. In the **Console** tab, type `player.color` and press Enter. What do you see?
+2. Type `player.color = 'red'` and press Enter. Does the canvas update?
+3. Type `player.constructor.name`. What does that tell you?
+4. Type `Object.keys(player)` — what properties does a Sprite have?
+
+Report back what you found. **You're not expected to understand all of it yet** — we'll cover classes and constructors in Week 12 (Module 2.2.1). This challenge is a preview.
+
+**Why it matters:** The DevTools console is a live connection to your running program. You can poke at anything while it's running. Every professional web developer uses DevTools constantly.
+
+---
+
+## Challenge 4 — On-screen HUD with multiple values (medium)
+
+Display three things at the top of your canvas:
+- The current `frameCount`
+- The current player `x` and `y` position (rounded to integers)
+- The current frame rate (`frameRate()` returns the actual fps)
+
+**Hints:**
+- Use `textSize(14); fill(255);` before drawing text.
+- `text()` can be called multiple times at different y positions.
+- `Math.round(player.pos.x)` keeps the number from jittering.
+
+**Example output:**
+```
+Frame: 432
+Player: (247, 103)
+FPS: 60.0
+```
+
+---
+
+## Challenge 5 — Trail effect (medium, creative)
+
+Make the player sprite leave a trail behind it as it moves.
+
+**The cheat:** instead of `background('#222')` each frame, use `background('#222', 20)` — the second argument is alpha (transparency). Older frames fade slowly instead of being overwritten fully.
+
+**Or the honest way:** keep an array of the last N positions and draw a circle at each one.
+
+```js
+let trail = [];
+
+function draw() {
+  background('#222');
+
+  trail.push({ x: player.pos.x, y: player.pos.y });
+  if (trail.length > 30) trail.shift();
+
+  for (let i = 0; i < trail.length; i++) {
+    fill(255, 255, 255, i * 8);  // fade older positions
+    circle(trail[i].x, trail[i].y, 6);
+  }
+}
+```
+
+---
+
+## Challenge 6 — Very hard, very stretchy — mouse-following
+
+Make a third sprite that always follows the **mouse cursor** — but smoothly, not snappily.
+
+**Hints:**
+- `mouse.x` and `mouse.y` give the mouse position each frame.
+- For smoothness, use linear interpolation — `lerp(a, b, t)` returns a value `t` of the way from `a` to `b`.
+  ```js
+  third.pos.x = lerp(third.pos.x, mouse.x, 0.05);
+  third.pos.y = lerp(third.pos.y, mouse.y, 0.05);
+  ```
+- Smaller `t` = laggier follow. Larger `t` = snappier.
+
+This is the same math you'll use in Module 2.4.1 for smooth camera follow.
+
+---
+
+## If you finish all six
+
+- Try pairing up — give your best challenge solution to a classmate to read. Explain what it does.
+- Browse `/docs/q5play` beyond the chapters this week. Find one feature that looks interesting. Read about it. Come tell the class next session what you found.

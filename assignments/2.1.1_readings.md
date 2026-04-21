@@ -1,0 +1,120 @@
+# 2.1.1 Readings
+
+Required and reference reading for Module 2.1.1.
+
+**Other 2.1.1 resources:** [overview](2.1.1_overview.md) · [worked examples](2.1.1_worked-examples.md) · [challenges](2.1.1_challenges.md) · [video manifest](2.1.1_video-manifest.md) · lab [A10.1](A10.1_sprite-playground.md) · writeup [A10.2](A10.2_frame-loop-writeup.md)
+
+---
+
+## Primary reading — in-app q5play docs
+
+The course platform hosts the complete q5play docs at:
+
+**[/docs/q5play](/docs/q5play)** (open in the same browser window you use for lessons)
+
+For this module, focus on two chapters:
+
+### R1 — "Canvas & Sprite" chapter
+**Read before attempting `2.1.1a Hello Sprite`.**
+
+What you'll learn from it:
+- How `new Canvas(width, height)` sets up the drawing area.
+- What properties a `Sprite` has (`color`, `pos`, `vel`, `rotation`, `layer`).
+- How sprites are rendered automatically each frame — you don't call a `render()` method.
+- When to store a sprite in a variable outside `setup()` vs inline inside `draw()`.
+
+### R2 — "Input" chapter
+**Read before attempting `2.1.1b Make it Move`.**
+
+What you'll learn from it:
+- `kb.pressing(key)` — returns `true` every frame the key is held.
+- `kb.presses(key)` — fires exactly once per key-down (you'll use this in W14).
+- Supported key names: `'left'`, `'right'`, `'up'`, `'down'`, `'a'`, `'w'`, `'s'`, `'d'`, `'space'`, etc.
+- Mouse input: `mouse.x`, `mouse.y`, `mouse.pressing()` (used in W17).
+
+---
+
+## Background reading — q5.js
+
+q5play is built on top of **q5.js**, a lightweight reimplementation of p5.js focused on performance. If you're curious about the engine underneath:
+
+- **[q5js.org](https://q5js.org)** — homepage with a short "getting started" guide
+- q5's design notes are useful context but **not required** for this module. Anything the platform docs don't cover, q5.js docs probably do.
+
+---
+
+## Background reading — p5.js (parent project)
+
+q5 is a drop-in-compatible fork of **p5.js**. Any p5.js tutorial you find online (the p5 reference, coding train videos, etc.) applies almost 1:1 — function names, drawing primitives, math helpers are identical.
+
+- **[p5js.org/reference](https://p5js.org/reference)** — full reference
+- Any "Hello world in p5.js" tutorial will work for q5play; the only real difference is that q5play adds the `Sprite` / `Group` / `world` physics layer on top.
+
+---
+
+## Short glossary (quick reference)
+
+| Term | Definition |
+|------|-----------|
+| **`setup()`** | Function you write. Runs **once** when the sketch starts. Build your world here. |
+| **`draw()`** | Function you write. Runs **every frame** (≈60 times/sec). Handle input and update state here. |
+| **`Canvas(w, h)`** | Creates the drawing area. Call once in `setup()`. |
+| **`Sprite(x, y, w, h)`** | Creates a visual + physics object. |
+| **`background(color)`** | Clears the canvas to a color. Must be called first inside `draw()` or old frames will stack. |
+| **`vel.x` / `vel.y`** | Velocity in pixels-per-frame. At 60 fps, `vel.x = 4` = 240 pixels/sec. |
+| **`frameCount`** | A global counter — increments by 1 each frame. Useful for timing and animation. |
+
+---
+
+## How to read the docs efficiently
+
+1. **Skim first** — get a sense of what sections exist.
+2. **Read the function signatures** — `Sprite(x, y, w, h)` tells you exactly what arguments it wants.
+3. **Copy the examples into the editor and run them** — reading alone is not enough. Modify one number, see what changes.
+4. **Search before asking** — `Ctrl+F` in the docs page will find most things faster than asking the teacher.
+
+---
+
+## CodeHS and freeCodeCamp coverage for this module
+
+**Important to know:** **CodeHS AP CSP and freeCodeCamp JavaScript v9 do not cover q5.js, q5play, or any game development.** Their curricula stop at general JavaScript and algorithms. That's why this module's primary reference is the in-app q5play docs, not an external platform.
+
+**This is expected, not a gap.** Do not look for "the CodeHS q5play lesson" — it doesn't exist. The q5play docs ARE the textbook for this module.
+
+### CHS / FCC material that reinforces THIS module
+
+Even though neither platform covers q5play directly, several of their existing lessons strengthen the underlying JS skills you're using this week. These are **reference only** — not required reading.
+
+| Skill used in 2.1.1 | Where to review on CHS or FCC |
+|---------------------|-------------------------------|
+| `let` variables + assignment | CHS-AP 3.4.1 "Variables" video (covered in Q1 W2) — re-skim if your `player = new Sprite(...)` line feels shaky |
+| Conditionals (`if / else if / else`) | CHS-AP 4.4.1 "If Statements" (Q1 W4) — the exact structure you use for `kb.pressing(...)` checks |
+| Writing functions | FCC "Working with Functions" theory (Q1 W6) — `setup()` and `draw()` ARE functions, just ones the engine calls for you |
+| `console.log()` for debugging | CHS-AP 3.3.3 "Hello World" example — useful because you'll `console.log(player.pos.x)` often this week to debug |
+| Arithmetic for motion math | CHS-AP 3.6.1 "Basic Math in JavaScript" + 3.6.3 "Order of Operations" — needed when you compute things like `frameCount * 0.05` |
+
+**CodeHS course URL:** `https://codehs.com/course/266371/` (requires enrollment — your teacher can add you)
+**freeCodeCamp URL:** `https://www.freecodecamp.org/learn/full-stack-developer/` → "JavaScript" certification (free; no login required)
+
+### CHS / FCC material that does NOT apply here
+
+Skip these for 2.1.1 — they cover unrelated topics (Karel, web dev, HTML/CSS, APIs):
+
+- All CHS-AP Unit 1 (Karel) — irrelevant to q5play; don't be confused by its "move forward / turn left" style
+- FCC HTML/CSS certifications — q5play doesn't use page layout
+- FCC React certification — also irrelevant
+
+---
+
+## If you want a game-dev specific tutorial
+
+Since CHS and FCC don't cover this, here are external sources that DO:
+
+| Source | What it is | When to use |
+|--------|-----------|-------------|
+| **[q5js.org](https://q5js.org)** | The engine's own site; short, high-quality | First stop for anything q5-specific |
+| **[The Coding Train on YouTube](https://thecodingtrain.com/)** | Daniel Shiffman's p5.js tutorials | Any p5.js video works — q5 is p5-compatible |
+| **[p5js.org/reference](https://p5js.org/reference)** | Full API reference for p5 (and by extension q5) | Look up any function by name |
+| **[Box2D Documentation](https://box2d.org/documentation/)** | Physics engine used by q5play | Advanced only — W11 physics module references specific concepts |
+
+**Remember:** your teacher didn't pick CHS or FCC because they teach q5play. They picked CHS and FCC because they teach the JavaScript foundations that make q5play possible. You already learned those in Q1 — now you're applying them.
