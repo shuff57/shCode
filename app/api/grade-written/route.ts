@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Missing rubric' }, { status: 400 });
   }
 
-  const model = body.model || 'gemma4:26b';
+  const model = body.model || 'qwen3-coder-next:cloud';
   const reachable = await isReachable();
   if (!reachable) {
     return NextResponse.json(
