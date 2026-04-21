@@ -51,8 +51,24 @@ function buildDocContext(slugs: string[] | undefined): string {
   return chunks.join('\n\n');
 }
 
+// Flat outline of every section + page in the in-app q5play docs. Included in
+// every grade request so the model knows what pages exist even when a topic
+// isn't in the lesson's contextDocs. The [slug] prefix is the section's URL
+// segment at /docs/q5play/[slug].
+function buildDocOutline(): string {
+  const lines: string[] = [];
+  for (const section of docSections) {
+    lines.push(`- [${section.slug}] ${section.title}`);
+    for (const page of section.pages) {
+      lines.push(`    - ${page.title}`);
+    }
+  }
+  return lines.join('\n');
+}
+
 function buildPrompt(req: GradeRequest): { system: string; user: string } {
   const docContext = buildDocContext(req.contextDocs);
+  const docOutline = buildDocOutline();
   const rubricText = req.rubric
     .map((r) => `- [${r.id}] (${r.points} pts) ${r.title}${r.description ? ' — ' + r.description : ''}`)
     .join('\n');
@@ -63,7 +79,7 @@ function buildPrompt(req: GradeRequest): { system: string; user: string } {
 Your job:
 1. Score each rubric item fairly. Partial credit is fine when intent is right but the answer is incomplete or imprecise. Award 0 only when the item is genuinely not attempted or wrong.
 2. Give SHORT, specific, encouraging feedback per item (max 2 sentences each).
-3. Suggest up to 2 actionable hints for things the student should re-read or re-think — reference the provided q5play docs by title when relevant.
+3. Suggest up to 2 actionable hints for things the student should re-read or re-think. When a hint points at the q5play docs, use the EXACT page title from the q5play docs outline so the student can find it. Prefer specific pages (subsections) over section names.
 4. Never reveal the full correct answer.
 5. Respond ONLY with valid JSON matching this shape:
 
@@ -85,7 +101,11 @@ ${req.prompt}
 ## Rubric (total ${totalPossible} pts)
 ${rubricText}
 
-${docContext ? `## q5play reference (use this to verify correctness)\n\n${docContext}\n\n` : ''}## Student response
+## q5play docs outline (all pages that exist in the in-app docs)
+
+${docOutline}
+
+${docContext ? `## q5play reference — deep content for this lesson\n\n${docContext}\n\n` : ''}## Student response
 
 """
 ${req.response.trim()}
