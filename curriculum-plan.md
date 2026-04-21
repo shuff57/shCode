@@ -1,5 +1,5 @@
 # CSCI 4 — Introduction to Programming Concepts and Methodologies
-## Curriculum Plan: JavaScript + JSCAD 3D Modeling
+## Curriculum Plan: JavaScript + q5play + JSCAD 3D Modeling
 ### Chico USD / Butte College Dual Enrollment | High School Juniors
 
 ---
@@ -7,13 +7,15 @@
 ## COURSE METADATA
 
 - **Language:** JavaScript (ES6+)
-- **Primary Environment:** JSCAD browser app (https://openjscad.xyz/) — no install required
-- **Secondary Environment:** Browser DevTools console for Q1 fundamentals
+- **Primary Environments:**
+  - Browser DevTools console (Q1 JavaScript fundamentals)
+  - q5play in-app editor (Q2 applied game development) — no install required
+  - JSCAD browser app (https://openjscad.xyz/) (Q3–Q4 3D modeling) — no install required
 - **Students:** High school juniors, little to no prior coding experience
 - **Contact Hours:** 3.5 hours/week × 36 weeks = 126 total contact hours
 - **Printers:** 10 FDM printers, 250×250mm build plates, ~3 students per printer
 - **Articulation:** Butte College CSCI 4 (dual enrollment)
-- **Pathway Destination:** FreeCAD / Mechatronics course (same teacher)
+- **Pathway Destination:** FreeCAD / Mechatronics course (same teacher, next course in sequence)
 
 ---
 
@@ -23,28 +25,59 @@ Each SLO must be covered by at least one graded assignment.
 
 | SLO | Description | Primary Coverage | Backup Coverage |
 |-----|-------------|-----------------|-----------------|
-| SLO 1 | Describe the software development life-cycle | W1 lecture + W1 assignment | W33 capstone doc |
-| SLO 2 | Describe principles of structured programming | W2 + W17 OOP unit | W10 functions unit |
-| SLO 3 | Describe, design, implement, and test structured programs | W8 first program + W26 project | W33 capstone |
-| SLO 4 | Explain what an algorithm is and its importance | W5 algorithm assignment | W22 sort/search unit |
+| SLO 1 | Describe the software development life-cycle | W1 lecture + A1.1 written | W18 Game Capstone + W36 3D Capstone reflection |
+| SLO 2 | Describe principles of structured programming | W12 OOP + A12.2 written | W6–7 functions + W31 JSCAD modules |
+| SLO 3 | Describe, design, implement, and test structured programs | W18 Game Capstone + W36 3D Capstone | W9 Q1 mini-project |
+| SLO 4 | Explain what an algorithm is and its importance | W5 algorithms + A5.1 written | W30 sort/search + q5play collision logic (W13) |
+
+### SLO Alignment Across Quarters
+
+A term-by-term view of how each SLO is introduced, reinforced, and assessed. **Bold** cells are the primary artifacts retained for dual-enrollment documentation.
+
+| SLO | Q1 (W1–9) Console Fundamentals | Q2 (W10–18) q5play Game Dev | Q3 (W19–27) JSCAD Foundations | Q4 (W28–36) Advanced JSCAD + Capstone |
+|-----|-------------------------------|------------------------------|-------------------------------|----------------------------------------|
+| **SLO 1** — SDLC | W1 lecture + **A1.1 written** (intro) | W18 Game Capstone design/build/test/reflect cycle (A18.1) | W24 first-print lifecycle observation | W33–36 full capstone lifecycle + **A36.2 closing reflection** |
+| **SLO 2** — Structured programming | W3 coding conventions; W6 functions; W7 pass-by-value/reference (A7.2) | **W12 OOP via q5play + A12.2 written (primary artifact)**; W16 game-state machines | W19 libraries; W22 parameters as function args | W31 multi-file module design |
+| **SLO 3** — Design / implement / test | W9 Print Job Manager with manual tests (A9.1) | **W18 Game Capstone (A18.1 — primary Sem 1 evidence)**: design doc + code + testing log + reflection | W26 error handling (A26.1); W27 testing principles (A27.1) | **W36 3D Capstone (A36.1 — primary Sem 2 evidence)**: spec → build → test → print → present |
+| **SLO 4** — Algorithms | W5 algorithm definition + **A5.1 written** (intro) | W13 collision detection as algorithm; W14 physics tuning | W23 loops generating geometry | **W30 Sort/Search on part data (A30.1 — primary applied evidence)** |
+
+### Assignment → SLO Trace
+
+Each graded artifact that anchors an SLO appears at least twice (primary + backup) so documentation survives a missing assignment.
+
+| Artifact | SLO(s) | Role |
+|----------|--------|------|
+| A1.1 | SLO 1 | Primary intro (SDLC written) |
+| A5.1 | SLO 4 | Primary intro (algorithm definition + JS) |
+| A7.2 | SLO 2, pass-by-ref | Written artifact |
+| A9.1 | SLO 3 | Sem 1 mini-project (console) |
+| A12.2 | SLO 2, OOP vs procedural | **Primary written artifact** |
+| A16.1 | SLO 3, File I/O | Persistent storage (q5play) |
+| A18.1 | SLO 1, SLO 2, SLO 3 | **Primary Sem 1 capstone evidence** |
+| A26.1 | Topic: Error handling | Primary lab |
+| A27.1 | Topic: Testing principles | Primary lab |
+| A30.1 | SLO 4 | **Primary applied algorithms artifact** |
+| A31.1 / A31.2 | Topic: File I/O (JSCAD) | Multi-file + written comparison |
+| A36.1 | SLO 1, SLO 3 | **Primary Sem 2 capstone evidence** |
+| A36.2 | SLO 1 | Closing lifecycle reflection |
 
 ### Topic Coverage Map
 
 | Topic | Weeks | Assignment Type |
 |-------|-------|----------------|
-| Software life-cycle | 1 | Written + discussion |
-| Procedural vs OOP | 17 | Code + written comparison |
-| Program design tools & environments | 1–2 | Lab setup + reflection |
-| Documentation | Throughout (formal: W3, W11) | Inline comments + README |
+| Software life-cycle | 1, 18, 36 | Written + discussion + capstone reflection |
+| Procedural vs OOP | 12 | Code + written comparison |
+| Program design tools & environments | 1–2, 10, 19 | Lab setup + reflection (console, q5play, JSCAD) |
+| Documentation | Throughout (formal: W3, W12, W19) | Inline comments + READMEs |
 | Coding conventions | 3 (formal), enforced throughout | Code review rubric |
 | Data types, variables, expressions, sequential processing | 2–3 | Exercises + quiz |
-| Arrays | 13–14 | Modeling + standalone exercises |
-| Control structures (if/switch/for/while/do...while) | 4–8 | Exercises + JSCAD patterns |
-| Algorithms: sorting and searching | 22 | Standalone JS assignment |
-| File I/O | 8, 19 (browser FileReader + JSCAD multi-file) | Lab + multi-file project |
-| Error handling | 23 | Debug exercise |
-| Parameters by value and reference | 10–11 | Functions deep dive |
-| Testing principles | 24 | Test case writing assignment |
+| Arrays | 8 (intro), 13 (q5play Groups), 23 (JSCAD parametric) | Exercises + applied modeling |
+| Control structures (if/switch/for/while/do...while) | 4–5, applied W11–14 (q5play) | Exercises + q5play mechanics |
+| Algorithms: sorting and searching | 30 | Applied to geometry data |
+| File I/O | 8 (FileReader), 16 (q5play save/load), 31 (JSCAD multi-file + STL export) | Lab + multi-file project |
+| Error handling | 26 | Debug exercise |
+| Parameters by value and reference | 7 | Functions deep dive |
+| Testing principles | 27 | Test case writing assignment |
 
 ### AP CSP Non-Coding Topic Integration
 
@@ -54,19 +87,19 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 |-----------------|-------|------|-------------------|
 | BI 2: Data (17–22%) | Binary number systems — how computers store data | 2 | Discussion + activity |
 | BI 2: Data | Data compression — lossy vs lossless | 8 | Discussion tied to file I/O |
-| BI 2: Data | Digital image representation — pixels, RGB | 11 | Discussion tied to JSCAD colors |
-| BI 2: Data | Metadata — data about data | 19 | Discussion tied to multi-file projects |
-| BI 4: CSN (11–15%) | How the Internet works — HTTP, DNS, client-server | 10 | Discussion: how does JSCAD reach your browser? |
+| BI 2: Data | Digital image representation — pixels, sprites, RGB | 15 | Discussion tied to q5play sprites + animation |
+| BI 2: Data | Metadata — data about data | 16 | Discussion tied to game save/load JSON |
+| BI 4: CSN (11–15%) | How the Internet works — HTTP, DNS, client-server | 10 | Discussion: how does q5play reach your browser? |
 | BI 4: CSN | Protocols and fault tolerance — TCP/IP, routing, redundancy | 11 | Bell-ringer activity |
-| BI 4: CSN | Parallel and distributed computing | 22 | Discussion tied to algorithm efficiency |
+| BI 4: CSN | Parallel and distributed computing | 30 | Discussion tied to algorithm efficiency + sort/search |
 | BI 5: IOC (21–26%) | Open source and licensing — Creative Commons, copyright | 3 | Discussion tied to documentation week |
-| BI 5: IOC | Beneficial and harmful effects of computing | 15 | Discussion: 3D printing ethics |
-| BI 5: IOC | Digital divide — who has access to technology | 25 | Written component |
-| BI 5: IOC | Computing bias — algorithmic bias, design bias | 33 | Discussion during capstone |
-| BI 5: IOC | Cybersecurity — encryption, PII, phishing, malware | 23 | Discussion tied to error handling |
-| BI 5: IOC | Intellectual property — DMCA, fair use, open source models | 19 | Discussion tied to importing external geometry |
-| BI 1: CRD (10–13%) | Collaboration in development | 34 | Practiced via peer review |
-| BI 1: CRD | Identifying and correcting errors | 23 | Directly covered (syntax, runtime, logic) |
+| BI 5: IOC | Beneficial and harmful effects of computing | 18 | Discussion: game design ethics + addictive patterns |
+| BI 5: IOC | Digital divide — who has access to technology | 34 | Written component tied to capstone |
+| BI 5: IOC | Computing bias — algorithmic bias, design bias | 35 | Discussion during capstone |
+| BI 5: IOC | Cybersecurity — encryption, PII, phishing, malware | 26 | Discussion tied to error handling |
+| BI 5: IOC | Intellectual property — DMCA, fair use, open source models | 31 | Discussion tied to STL export + asset sourcing |
+| BI 1: CRD (10–13%) | Collaboration in development | 35 | Practiced via peer review during capstone |
+| BI 1: CRD | Identifying and correcting errors | 26 | Directly covered (syntax, runtime, logic) |
 
 ---
 
@@ -78,6 +111,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ---
 
 ## Unit 1.1: Foundations
+> **SLO focus:** Introduces **SLO 1** (lifecycle, W1 primary artifact A1.1) and **SLO 2** (coding conventions and structured style foundations).
 
 ### 1.1.1 What Is Programming / Software Lifecycle (~3.5 hrs)
 **Contact hours:** 3.5
@@ -187,6 +221,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ---
 
 ## Unit 1.2: Control Flow
+> **SLO focus:** Introduces **SLO 4** (W5 algorithm definition, primary artifact A5.1); reinforces **SLO 3** (students implement first structured programs with branching and iteration).
 
 ### 1.2.1 Conditionals (~3.5 hrs)
 **Contact hours:** 3.5
@@ -263,6 +298,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ---
 
 ## Unit 1.3: Functions and Data
+> **SLO focus:** Reinforces **SLO 2** (functions as structured decomposition) and **SLO 3** (design/implement routines); covers the Butte outline topic **Pass by value/reference** (W7, primary artifact A7.2).
 
 ### 1.3.1 Functions: Definition and Calls (~3.5 hrs)
 **Contact hours:** 3.5
@@ -379,6 +415,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ---
 
 ## Unit 1.4: Synthesis
+> **SLO focus:** **SLO 3 backup artifact (A9.1 Print Job Manager)** — first complete design/implement/test program. Also reinforces SLO 1, 2, 4 in a single cohesive project.
 
 ### 1.4.1 Q1 Review and Mini-Project (~3.5 hrs)
 **Contact hours:** 3.5
@@ -419,52 +456,422 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 
 ---
 
-# Q2: JSCAD — 2D to 3D
-### ~31.5 contact hours | 9 weeks
-### Goal: Students transition from pure JS to JSCAD. Start with 2D shapes, learn the library concept, then go 3D.
-### Environment: JSCAD browser app (https://openjscad.xyz/). All work done in browser.
+# Q2: q5play — Applied Game Development
+### ~31.5 contact hours | 9 weeks (W10–W18)
+### Goal: Students extend Q1 fundamentals into a motivating visual/game context, learn OOP through hands-on use, practice File I/O, and ship a complete game as their Semester 1 capstone.
+### Environment: q5play in-app editor (built on q5.js + Box2D physics) — no install required.
 
 ---
 
-## Unit 2.1: JSCAD Foundations
+## Unit 2.1: q5play Foundations
+> **SLO focus:** Reinforces **SLO 3** (design/implement/test in a visual context); applies Q1 control structures (SLO backup) to interactive programs.
 
-### 2.1.1 Libraries and JSCAD Introduction (~3.5 hrs)
+### 2.1.1 Hello Sprite and Movement (~3.5 hrs)
 **Contact hours:** 3.5
-**SLOs covered:** SLO 2 (program design tools)
+**SLOs covered:** SLO 3 (design, implement, test)
+
+**Learning Objectives:**
+- Create a canvas with `new Canvas(width, height)`
+- Create a sprite with `new Sprite(x, y, w, h)` and set its properties
+- Use `setup()` and `draw()` as the q5play program skeleton
+- Drive sprite movement with the keyboard using `kb.pressing(...)` and `vel.x/y`
+- Explain the frame loop: `draw()` runs every frame
+
+**Topics:**
+- q5play program skeleton: `setup()`, `draw()`, optional `update()`
+- `Canvas(width, height)` — sets up the drawing area
+- `Sprite(x, y, w, h)` — creating sprites
+- Sprite properties: `color`, `pos`, `vel`, `rotation`, `layer`
+- `background()` inside `draw()`
+- Keyboard input: `kb.pressing('left' | 'right' | 'up' | 'down')`
+- Setting velocity: `player.vel.x = 4`; screen coords — up is negative y
+
+**In-Class Activities:**
+- Teacher demo: type the minimum working sprite program live, line by line
+- Students complete the in-app lesson **5.1.2 Hello Sprite**
+- Students complete the in-app lesson **5.1.4 Make it Move**
+- Pair exercise: change the canvas size, make the sprite a different shape, swap control keys
+- **AP CSP Discussion (15 min):** How the Internet works. Tracing how q5play loaded in your browser: DNS → HTTP → server → renderer. "Every time you open this page, all of this happens in milliseconds."
+
+**Assignments:**
+- **A10.1 (Lab):** Build a "sprite playground" in the in-app editor: a canvas, one controllable sprite with WASD keys, a second sprite that moves automatically using `frameCount`, and an on-screen text label displaying a message. Must run without errors on Run.
+- **A10.2 (Written):** Half page — in your own words, what is the difference between `setup()` and `draw()`, and what does "60 frames per second" actually mean for the values you pick?
+
+**Teacher Notes:**
+- `vel.x`/`vel.y` are pixels per frame. q5play targets ~60 fps — tell students this explicitly or they'll pick absurd values.
+- Omitting `vel.x = 0` in the else branch leaves the sprite drifting. Watch for this bug.
+- Some students will try `player.x =` — show that `player.pos.x` works too, but `vel` is the q5play idiom.
+
+---
+
+### 2.1.2 Physics Feel (~3.5 hrs)
+**Contact hours:** 3.5
+**SLOs covered:** SLO 3
+
+**Learning Objectives:**
+- Enable and disable gravity with `world.gravity.y`
+- Control bounciness and friction on sprites
+- Distinguish `dynamic`, `static`, and `kinematic` sprite bodies
+- Predict sprite motion given initial velocity + gravity
+- Debug physics behavior by adjusting single properties at a time
+
+**Topics:**
+- `world.gravity` — global physics setting
+- Sprite bodies: `dynamic` (affected by forces), `static` (immovable), `kinematic` (moves but ignores forces)
+- `bounciness` / restitution
+- `friction`, `drag` (air resistance)
+- Forces vs velocity: `applyForce(...)` vs assigning `vel`
+- Automatic collision response
+
+**In-Class Activities:**
+- Students complete in-app lesson **5.2.1 Bouncy Ball**
+- Students study the worked example **5.1.3 Falling Block**
+- Pair challenge: turn the bouncing ball into a "sticky" ball (low bounciness)
+- Discussion: why doesn't a ball bounce forever? (energy loss via friction/restitution)
+
+**Assignments:**
+- **A11.1 (Lab):** Using the provided template, build a pinball-like scene. Requirements: at least 3 static obstacle sprites, a dynamic ball with `bounciness > 0.8`, gravity enabled, a reset key that repositions the ball at the top. Test by running and observing for 30 seconds.
+- **A11.2 (Written):** Short paragraph — why does setting `vel` every frame "fight" the physics engine? When would you use `applyForce` instead?
+- **AP CSP Bell-Ringer (10 min):** Protocols and fault tolerance — what happens if one server on the Internet goes down? Introduce redundancy, routing, TCP/IP at a conceptual level.
+
+**Teacher Notes:**
+- Beginners often set `bounciness = 1` and expect perpetual motion. That's lossless collision; real friction still drains the system. Explain.
+- The pendulum worked example returns in W14 — don't front-load it here.
+- Physics is new vocabulary for most; lean on the visual feedback to anchor understanding.
+
+---
+
+## Unit 2.2: Object-Oriented Programming
+> **SLO focus:** **SLO 2 primary artifact (A12.2 written OOP-vs-procedural comparison)** — the structured-programming documentation anchor for dual enrollment.
+
+### 2.2.1 Classes and Objects via q5play (~3.5 hrs)
+**Contact hours:** 3.5
+**SLOs covered:** SLO 2 primary (OOP vs procedural), SLO 3
+
+**Learning Objectives:**
+- Define a class with a constructor and methods in JavaScript
+- Instantiate objects with `new` and access properties/methods via dot notation
+- Explain what happens under the hood when `new Sprite(x, y, w, h)` is called
+- Compare a procedural and an OOP solution to the same problem
+- Identify when OOP is more appropriate than procedural code
+
+**Topics:**
+- Class syntax: `class Name { constructor() { ... } method() { ... } }`
+- `this` keyword — binding
+- Instance vs class
+- Properties vs methods
+- Creating objects with `new`
+- Every q5play primitive (`Canvas`, `Sprite`, `Group`) is an instance of a class
+- Procedural pattern: parallel arrays + helper functions taking an index
+- OOP pattern: array of instances, each with its own state + behavior
+- Vocabulary (intro only): encapsulation, inheritance, polymorphism
+- Relevance: classes in JavaScript work almost identically to Python classes you'll see in downstream courses
+
+**In-Class Activities:**
+- Teacher demo: "Every sprite is an object." Console-log `player.constructor.name`, inspect properties, mutate `player.color` live.
+- Live code: build an `Enemy` class with `constructor(x, y, hp)`, a `damage(n)` method, a `render()` method.
+- Pair exercise: extend the `Enemy` class with a new property and method.
+- Revisit in-app lesson **5.1.1 Sprite Showcase** — now read it as an API tour of the `Sprite` class.
+- Reading (10 min): handout showing an "enemy fleet" written procedurally and with classes — students annotate which is which.
+
+**Assignments:**
+- **A12.1 (Lab):** Write a `Collectible` class — `constructor(x, y, value, color)` and a `collect()` method that returns the value and marks the item gone. Instantiate at least 5 in `setup()` and render them as sprites. Include at least one method call whose return value is used elsewhere.
+- **A12.2 (Written, graded, SLO 2 primary):** 1 page comparing procedural and OOP. Must include: definitions in your own words; a specific Q1 example that was procedural; a specific q5play example that is OOP; and one scenario where OOP is clearly the better choice, with reasoning.
+
+**Teacher Notes:**
+- Students have already used `new Sprite(...)` for two weeks. Lead with: "You've been using classes — now let's see what's really happening."
+- Don't go deep into inheritance or polymorphism — name them, don't require them.
+- A12.2 is the SLO 2 written artifact. Keep the essays.
+
+---
+
+## Unit 2.3: Collections and Physics Applications
+> **SLO focus:** Reinforces **SLO 3** (applied implementation) and **SLO 4** (collision detection + spawn logic are algorithms); also reinforces the Q1 Arrays topic in a new context.
+
+### 2.3.1 Groups and Overlaps (~3.5 hrs)
+**Contact hours:** 3.5
+**SLOs covered:** SLO 3, SLO 4 (algorithmic thinking in collision detection)
+
+**Learning Objectives:**
+- Use `Group` to manage collections of related sprites
+- Detect overlaps with `sprite.overlaps(group)`
+- Spawn and despawn sprites during gameplay
+- Explain how group iteration relates to the array loops from Q1
+
+**Topics:**
+- `new Group()` — a specialized sprite collection (an array-like with extras)
+- Adding sprites to a group (pass the group as a parent, or add explicitly)
+- Iterating over a group
+- `overlaps(other)` — returns boolean, or accepts a callback per overlap
+- `remove()` — despawn a sprite
+- Spawning logic: random positions, timed spawns via `frameCount % N === 0`
+- Collision detection as an algorithm (link back to SLO 4)
+
+**In-Class Activities:**
+- Students complete in-app lesson **5.3.1 Introducing Groups**
+- Students study the worked example **5.3.2 Apple Catcher**
+- Students attempt the challenge **5.3.3 Asteroid Field**
+- Discussion: how is a `Group` different from an `Array`? (It's an Array with extra methods.)
+
+**Assignments:**
+- **A13.1 (Lab, Asteroid Field — graded):** Complete the Asteroid Field challenge fully. Must: (1) spawn at least 10 asteroids at random positions, (2) detect overlap with the player ship and transition to a "hit" log or state, (3) despawn asteroids that leave the canvas.
+
+**Teacher Notes:**
+- Students often iterate a group and `remove` during iteration — index skipping results. Show the safe pattern: iterate backwards, or collect-then-remove.
+- The `overlaps` callback runs once per collision pair — good for scoring.
+- This module reinforces Q1 W8 arrays in a new, motivating context.
+
+---
+
+### 2.3.2 Physics Applications (~3.5 hrs)
+**Contact hours:** 3.5
+**SLOs covered:** SLO 3
+
+**Learning Objectives:**
+- Combine input, physics, and collision to build a playable scene
+- Distinguish `kb.presses(...)` (edge) from `kb.pressing(...)` (level)
+- Tune oscillation and angular motion (pendulum preview)
+- Debug interactions between input-driven and physics-driven motion
+
+**Topics:**
+- Edge-triggered input: `kb.presses('space')` fires once per press
+- Impulse forces for jumping
+- Ground detection: checking `touching` or collision with a group
+- Static platforms as level geometry
+- Slopes, angular motion (previews W17 joints)
+
+**In-Class Activities:**
+- Students attempt challenge **5.1.5 Space Jumper**
+- Students attempt challenge **5.2.3 Car on a Ramp**
+- Students study the worked example **5.2.2 Swinging Pendulum**
+- Discussion: what makes a jump "feel right"? (Coyote time, variable height, air control.)
+
+**Assignments:**
+- **A14.1 (Lab, Space Jumper OR Car challenge):** Complete ONE of the two challenges fully. Must include at least one static obstacle, at least one dynamic player sprite, working input-driven motion, and a visible win condition (flag, top, etc.).
+
+**Teacher Notes:**
+- This week is consolidation, not new concepts. Use it to rescue students who fell behind W10–13.
+- Car on a Ramp is harder — steer advanced students here.
+- The Pendulum study previews joints; tell students explicitly they'll return to it in W17.
+
+**Exam:**
+- **Semester 1 Midterm 3 (~1 hour, in class):** Covers Weeks 10–14 (q5play foundations, physics, OOP, groups/overlaps, physics applications). Format: 5 multiple-choice on q5play + OOP concepts, 3 code-reading (predict what this sprite/group code produces), 2 short-answer (explain OOP vs procedural, explain the frame loop), 1 write-code problem (fill in a sprite/input loop). Administer at the start or end of the week — teacher discretion.
+
+---
+
+## Unit 2.4: Animation & Camera
+> **SLO focus:** Reinforces **SLO 3** (implement + test the more polished systems needed for the capstone).
+
+### 2.4.1 Animated Sprites and Camera (~3.5 hrs)
+**Contact hours:** 3.5
+**SLOs covered:** SLO 3
+
+**Learning Objectives:**
+- Attach and switch animations on a sprite
+- Use `camera` to scroll a world larger than the canvas
+- Implement a camera that follows the player
+- Use `layer` to control render order
+- Explain why the camera is a coordinate transform
+
+**Topics:**
+- Sprite animations: `addAni(name, ...frames)`, `changeAni(name)`
+- Single-frame art: `sprite.image`
+- `camera.x`, `camera.y` — moving the view
+- Camera follow pattern: `camera.x = player.x - canvas.w / 2`
+- Smooth camera with linear interpolation (`lerp`)
+- Layer / depth sorting for render order
+
+**In-Class Activities:**
+- Students complete in-app lesson **5.4.1 Animated Sprites**
+- Students study the worked example **5.4.2 Camera Follow**
+- Students attempt the challenge **5.4.3 Side-Scrolling Platformer**
+- **AP CSP Discussion (15 min):** Digital image representation. Sprites are stored as pixel grids with RGBA values. A 64×64 animation frame × 4 bytes × 8 frames ≈ 131 KB per sprite sheet. Why do real games compress textures?
+
+**Assignments:**
+- **A15.1 (Lab, Platformer challenge):** Complete the Side-Scrolling Platformer challenge. Must include: at least 2 animation states on the player (idle, run); a camera that follows the player with a world larger than the canvas; at least 3 platforms; a visible end goal.
+
+**Teacher Notes:**
+- Camera math confuses students. Show visually: "the world doesn't move, the camera's window does."
+- Animation speed is tuned via `sprite.animation.frameDelay`.
+- Extend into W16 if students need more time; W16 content can absorb the slack.
+
+---
+
+## Unit 2.5: State and Persistence
+> **SLO focus:** **SLO 2** (state machines as structured programming) and **SLO 3** (File I/O primary artifact A16.1 persistent storage); covers Butte outline topic **File I/O (secondary location)**.
+
+### 2.5.1 Save, Load, and Game States (~3.5 hrs)
+**Contact hours:** 3.5
+**SLOs covered:** SLO 2 (structured programming), SLO 3 (design/implement/test), Topic: File I/O
+
+**Learning Objectives:**
+- Save data persistently with `storeItem(name, val)` (localStorage)
+- Retrieve saved data with `getItem(name)` and convert back to correct type
+- Export game data as JSON using `save(obj, 'filename.json')`
+- Load JSON at runtime using `loadJSON(url)` in `preload()`
+- Implement a game state machine (MENU, PLAY, PAUSE, WIN, LOSE)
+- Structure `draw()` around a game-state variable with a switch or if/else chain
+
+**Topics:**
+- q5play persistent storage: `storeItem`, `getItem`, `removeItem`, `clearStorage`
+- Serialization with JSON: `JSON.stringify`, `JSON.parse`
+- File export: `save(obj, 'level.json')` triggers a browser download
+- Async loading: `loadJSON` must run inside `preload()`
+- Game state as a variable: `let gameState = 'menu'`
+- State dispatch with `switch`
+- Transitions between states (input, timers, collision outcomes)
+
+**In-Class Activities:**
+- Live code: a high-score tracker using `storeItem('highScore', score)`
+- Students convert their game's player stats into a JSON string and log/download it
+- Live code: take a W15 game and add menu + play + game-over states via `switch`
+- Pair exercise: add a pause state triggered by `P`
+- **AP CSP Discussion (15 min):** Metadata. A save file stores values plus structure (what each field means). What other metadata do games keep — timestamps, versions, player IDs?
+
+**Assignments:**
+- **A16.1 (Lab, File I/O coverage):** Add persistent high scores to your W15 game — top 3 with player initials, reads on start, writes when a new score qualifies, and a "clear" button that calls `clearStorage`. Prove persistence by closing and reopening the browser.
+- **A16.2 (Lab):** Add states to your W15 game. Minimum: menu, play, end (win or lose). Use a `switch` or if/else chain in `draw()`. Menu → play on start key. Play → end on condition. End → menu on keypress.
+
+**Teacher Notes:**
+- `getItem` returns strings. Expect bugs from `getItem('x') + 1` concatenating. Teach `Number()` / `parseInt` explicitly.
+- `loadJSON` is async — it must live inside `preload()`, not `setup()`.
+- State machines often devolve into giant if-chains. Redirect students toward `switch` for readability.
+- State is a prerequisite for the capstone — do not allow students to skip it.
+- This module satisfies the SLO 3 File I/O requirement.
+
+---
+
+## Unit 2.6: Advanced Mechanics
+> **SLO focus:** Reinforces **SLO 3** (implement + debug a complex interactive system); final content week before capstone.
+
+### 2.6.1 Joints and Advanced Input (~3.5 hrs)
+**Contact hours:** 3.5
+**SLOs covered:** SLO 3
+
+**Learning Objectives:**
+- Create distance, hinge, and slider joints between sprites
+- Implement a slingshot: drag, release, apply force
+- Handle two-player input with separate key bindings
+- Debug joint behavior by visualizing the constraints
+
+**Topics:**
+- `new DistanceJoint(a, b, ...)` — fixed distance between two sprites
+- `new HingeJoint(a, b, ...)` — rotational pivot
+- `new SliderJoint(a, b, ...)` — linear track
+- Mouse input: `mouse.pressing()`, `mouse.pressed()`, `mouse.x/y`
+- Applied force on release: `sprite.applyForce(fx, fy)`
+- Two-player key mapping
+
+**In-Class Activities:**
+- Students complete in-app lesson **5.5.1 Joints: Distance, Hinge, Slider**
+- Students study worked example **5.5.2 Slingshot**
+- Students attempt challenge **5.5.3 Two-Player Pong-Sumo**
+- Discussion: what real mechanical systems do each of these joints model?
+
+**Assignments:**
+- **A17.1 (Lab, Sumo challenge):** Complete the Two-Player Pong-Sumo challenge. Must include: separate input schemes for two players (e.g., WASD vs arrows); a win condition when one sprite is knocked out of bounds; a visible score or round counter.
+
+**Teacher Notes:**
+- Joints are the most complex q5play concept. Aim for "understand enough to use in capstone," not full mastery.
+- The slingshot pattern (drag + release + force) appears in many classic games — encourage students to riff on it.
+- This is the last content week before capstone — wrap up any open challenges here.
+
+---
+
+## Unit 2.7: Synthesis
+> **SLO focus:** **SLO 3 primary Sem 1 evidence (A18.1 Game Capstone)** — design + implement + test cycle. Also contributes to SLO 1 (lived SDLC) and SLO 2 (classes + state machines in use).
+
+### 2.7.1 Capstone Game (~3.5 hrs in class + homework)
+**Contact hours:** 3.5
+**SLOs covered:** SLO 1 (lifecycle), SLO 2 (structured programming), SLO 3 (design/implement/test — **PRIMARY SLO 3 EVIDENCE FOR SEMESTER 1**)
+
+**Learning Objectives:**
+- Design a complete game specification
+- Implement the design using q5play patterns learned W10–W17
+- Run and document manual test cases on key logic
+- Document the design, code, and development reflection
+- Iterate based on peer and teacher feedback
+
+**Topics:**
+- Design-doc structure: premise, mechanics, controls, states, win condition, stretch goals
+- Time management across a multi-day build
+- Version control habits (commit frequency and message quality)
+- Playtesting as testing
+
+**In-Class Activities:**
+- **W17 evening homework:** students draft a 1–2 page design doc
+- **W18 Monday:** design review — 2-minute presentations, class Q&A
+- **W18 Tue–Thu:** supervised build time with office-hours support
+- **W18 Friday:** 3-minute capstone showcase
+- **AP CSP Discussion (15 min):** Beneficial and harmful effects of computing. Games shape player behavior — addictive loops vs fair challenge, inclusive design. What ethical choices did you make in your game?
+
+**Assignments:**
+- **A18.1 — Capstone Game (major grade, SLO 1/2/3 primary):**
+  - **Design doc (1–2 pp):** premise, mechanics, controls, all game states, win/lose condition, ≥2 stretch goals
+  - **Implementation:** ≥1 custom class (SLO 2), ≥1 Group (collections), persistent storage for ≥1 piece of data (SLO 3 file I/O), ≥3 game states, non-trivial win/lose logic
+  - **Testing log:** ≥5 manual test cases with expected vs actual outcome and fixes applied
+  - **Reflection (1 pp):** walk through the SDLC phases as you lived them — design, code, test, plan for maintenance
+  - **Commits:** ≥5 meaningful commits across the week
+  - **Showcase:** 3-minute demo to the class
+
+**Teacher Notes:**
+- This is the Semester 1 SLO 1/2/3 artifact. Retain design docs, testing logs, and reflections.
+- Students not finished by Friday still present what they have — the Testing log + Reflection describe what they would fix. Iteration is a graded step.
+- Rubric weights: Design doc 20% / Implementation 40% / Testing log 15% / Reflection 15% / Showcase 10%.
+
+**Exam:**
+- **Semester 1 Final (~1.5 hours, in class):** Cumulative exam covering all Semester 1 material (Weeks 1–18). Format: 20 multiple-choice (mix of JS fundamentals and q5play concepts), 5 code-tracing, 4 short-answer (SLO-aligned: lifecycle, structured programming, algorithms, OOP vs procedural), 2 write-code problems (one pure JS, one q5play snippet). Schedule the exam and capstone showcase on separate days within the week.
+
+---
+
+# Q3: JSCAD Foundations — 2D to 3D + Quality
+### ~31.5 contact hours | 9 weeks (W19–W27)
+### Goal: Transition from q5play into JSCAD. Learn the library model, 2D primitives, parametric design, extrusion into 3D, and 3D composition. Close Q3 with error handling and testing discipline.
+### Environment: JSCAD browser app (https://openjscad.xyz/) — no install required.
+
+---
+
+## Unit 3.1: JSCAD Foundations
+> **SLO focus:** Introduces **SLO 2** (program design tools — libraries and modularity) and reinforces **SLO 3** (implement parameterizable 2D designs).
+
+### 3.1.1 Libraries and JSCAD Introduction (~3.5 hrs)
+**Contact hours:** 3.5
+**SLOs covered:** SLO 2 (program design tools), Topic: Documentation
 
 **Learning Objectives:**
 - Explain what a software library is and why libraries exist
 - Import and use a named export from a library
 - Run a first JSCAD program in the browser
-- Identify the required structure of a JSCAD file: `main()` function
+- Identify the required structure of a JSCAD file: the `main()` function
 
 **Topics:**
 - What is a library: pre-written code organized into reusable modules
 - Why reinvent the wheel? The economics of open source
 - JSCAD's module structure: `@jscad/modeling` and its sub-modules
 - Destructured imports: `const { primitives } = require('@jscad/modeling')`
-- The JSCAD `main()` function: entry point, must return a geometry or array of geometries
+- The JSCAD `main()` function: entry point; returns a geometry or array of geometries
 - JSCAD browser UI tour: code editor, 3D viewport, export button
 
 **In-Class Activities:**
 - Teacher demo: build the simplest possible JSCAD program (return a cube)
 - Students type it themselves — do not copy-paste
 - Explore the viewport: rotate, zoom, pan
-- Change the cube dimensions — observe the live update
-- **AP CSP Discussion (15 min):** How the Internet works. JSCAD loaded in your browser from a server. Trace the path: DNS lookup → HTTP request → server response → browser renders. Draw it on the board. "Every time you open openjscad.xyz, all of this happens in milliseconds."
+- Change cube dimensions — observe the live update
 
 **Assignments:**
-- **A10.1 (Lab):** Write a JSCAD program that imports from at least 2 different sub-modules (e.g. primitives and transforms) and returns at least 3 different shapes. Write a comment above each import explaining what that module provides.
-- **A10.2 (Written):** In your own words, explain what a library is, why programmers use them, and what JSCAD's library provides. Half page.
+- **A19.1 (Lab):** Write a JSCAD program that imports from at least 2 different sub-modules (e.g. primitives and transforms) and returns at least 3 different shapes. Write a comment above each import explaining what that module provides.
+- **A19.2 (Written):** In your own words, explain what a library is, why programmers use them, and what JSCAD's library provides. Half page.
 
 **Teacher Notes:**
-- The `require()` syntax will look unfamiliar. Explain it as "asking for a toolbox from a toolshed." The destructuring `const { primitives }` pulls out just the tools you need.
+- The `require()` syntax will look unfamiliar. Explain it as "asking for a toolbox from a toolshed." Destructuring `const { primitives }` pulls out just the tools you need.
 - Students will want to immediately make complex things. Hold them to simple this week — the goal is understanding the structure, not the output.
+- Bridge back to q5play: "q5play was one big library — you imported classes by name. JSCAD is the same idea, different tool."
 
 ---
 
-### 2.1.2 2D Shapes and Transforms (~3.5 hrs)
+### 3.1.2 2D Shapes and Transforms (~3.5 hrs)
 **Contact hours:** 3.5
+**SLOs covered:** SLO 3
 
 **Learning Objectives:**
 - Create 2D primitives: rectangle, circle, ellipse, polygon, star
@@ -483,20 +890,20 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Live code: design a simple face using circles and rectangles
 - Students spend 20 minutes building any 2D composition using at least 5 shapes
 - Class share-out: project viewport on screen, students explain one decision they made
-- **AP CSP Bell-Ringer (10 min):** Protocols and fault tolerance. Quick discussion: "What happens if one server on the Internet goes down? Can your message still get through?" Introduce redundancy, routing, TCP/IP at a conceptual level. Tie to: digital images are data sent over these same protocols.
 
 **Assignments:**
-- **A11.1 (Lab):** Design a 2D logo or symbol using at least 6 shapes from at least 2 different primitive types. Must use translate and rotate on at least 2 shapes. Full comments. Export as SVG.
-- **A11.2 (Lab):** Using only the JSCAD documentation (no asking for code), find and use one primitive type NOT covered in class this week. Write a comment explaining what it does and how you figured it out.
+- **A20.1 (Lab):** Design a 2D logo or symbol using at least 6 shapes from at least 2 different primitive types. Must use translate and rotate on at least 2 shapes. Full comments. Export as SVG.
+- **A20.2 (Lab):** Using only the JSCAD documentation (no asking for code), find and use one primitive type NOT covered in class this week. Write a comment explaining what it does and how you figured it out.
 
 **Teacher Notes:**
-- A11.2 is a deliberate documentation-reading exercise. Students need to get comfortable reading API docs — this is a professional skill.
-- The coordinate system will confuse students who expect y to go down (like screen coordinates). Address this explicitly.
+- A20.2 is a deliberate documentation-reading exercise. Reading API docs is a professional skill.
+- The coordinate system will confuse students who expect y to go down (screen coordinates in q5play). Address this explicitly — JSCAD uses math-standard orientation.
 
 ---
 
-### 2.1.3 Boolean Operations in 2D (~3.5 hrs)
+### 3.1.3 Boolean Operations in 2D (~3.5 hrs)
 **Contact hours:** 3.5
+**SLOs covered:** SLO 3
 
 **Learning Objectives:**
 - Apply union, subtract, and intersect operations to 2D shapes
@@ -508,31 +915,33 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - `modeling/booleans`: union, subtract, intersect
 - Conceptual explanation: union = combine, subtract = cut, intersect = keep overlap
 - Order matters in subtract
-- Common failure: shapes must overlap for boolean to work
-- Using booleans to create holes, cutouts, complex profiles
+- Common failure: shapes must overlap for a boolean to produce anything
+- Using booleans for holes, cutouts, and complex profiles
 
 **In-Class Activities:**
 - Live code: rectangle minus circle = shape with round hole
 - Students reproduce 3 target shapes shown on screen using only primitives + booleans
-- Debugging exercise: provided code with broken boolean — find and fix
+- Debugging exercise: provided code with a broken boolean — find and fix
 
 **Assignments:**
-- **A12.1 (Lab):** Create a 2D gasket or plate design that uses all three boolean operations (union, subtract, intersect). Must be a design that could realistically be laser-cut or used as a profile for extrusion. Comments explaining each boolean operation used.
-- **A12.2 (Written):** Explain union, subtract, and intersect in your own words. Draw (by hand or digitally) what each operation produces given two overlapping circles.
+- **A21.1 (Lab):** Create a 2D gasket or plate design that uses all three boolean operations (union, subtract, intersect). Must be a design that could realistically be laser-cut or used as a profile for extrusion. Comments explaining each boolean operation used.
+- **A21.2 (Written):** Explain union, subtract, and intersect in your own words. Draw (by hand or digitally) what each operation produces given two overlapping circles.
 
 **Teacher Notes:**
-- Boolean operations are conceptually the most important JSCAD concept for the FreeCAD pathway. FreeCAD uses identical operations. Say this explicitly.
+- Boolean operations are conceptually the most important JSCAD idea for the downstream mechatronics pathway. Professional CAD tools use identical operations. Say this explicitly.
 - "Order matters in subtract" is the #1 gotcha. Demo it visually.
 
 **Quiz:**
-- **A12.3 (Quiz — in class, 15 min):** Given 3 pairs of overlapping shapes, sketch or describe the result of union, subtract, and intersect. Identify which boolean operation was used in 2 provided JSCAD code snippets. One question on coordinate system orientation.
+- **A21.3 (Quiz — in class, 15 min):** Given 3 pairs of overlapping shapes, sketch or describe the result of union, subtract, and intersect. Identify which boolean operation was used in 2 provided JSCAD snippets. One question on coordinate system orientation.
 
 ---
 
-## Unit 2.2: Parametric Design
+## Unit 3.2: Parametric Design
+> **SLO focus:** Reinforces **SLO 2** (parameters as function arguments — direct bridge from Q1 W6–7) and **SLO 3** (design/implement parametric models).
 
-### 2.2.1 Parameters and getParameterDefinitions (~3.5 hrs)
+### 3.2.1 Parameters and getParameterDefinitions (~3.5 hrs)
 **Contact hours:** 3.5
+**SLOs covered:** SLO 3
 
 **Learning Objectives:**
 - Write a `getParameterDefinitions()` function in JSCAD
@@ -545,25 +954,29 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Parameter types: number (with min/max/step), text, checkbox, choice (dropdown)
 - Accessing parameters: `params.paramName` in `main(params)`
 - The design value of parameterization: one model, infinite variations
-- Connecting back to functions: parameters are just function arguments with a UI
+- Connecting back to Q1 functions: parameters are just function arguments with a UI
 
 **In-Class Activities:**
-- Refactor a hardcoded design from W11 to use parameters
+- Refactor a hardcoded design from W20 to use parameters
 - Live demo: change parameter slider, watch model update in real time
 - Discussion: what would you parameterize in a real product?
 
 **Assignments:**
-- **A13.1 (Lab):** Take your A11.1 logo design and add at least 4 parameters using `getParameterDefinitions()`. At least one must be a number with min/max, one must be a checkbox that changes the design, one must be a choice/dropdown. The design must respond meaningfully to all parameters.
-- **A13.2 (Written):** Explain the connection between `getParameterDefinitions()` parameters and the function parameters you learned in Q1. What is the same? What is different?
+- **A22.1 (Lab):** Take your A20.1 logo design and add at least 4 parameters using `getParameterDefinitions()`. At least one must be a number with min/max, one must be a checkbox that changes the design, one must be a choice/dropdown. The design must respond meaningfully to all parameters.
+- **A22.2 (Written):** Explain the connection between `getParameterDefinitions()` parameters and the function parameters you learned in Q1 (W6–7). What is the same? What is different?
 
 **Teacher Notes:**
-- A13.2 is an explicit connection back to SLO content from Q1. Students should recognize that parameters are just arguments.
+- A22.2 is an explicit connection back to Q1 SLO content. Students should recognize that parameters are just arguments.
 - The checkbox parameter that changes the design is intentionally open-ended — encourage creativity.
+
+**Exam:**
+- **Semester 2 Midterm 1 (~1 hour, in class):** Covers Weeks 19–22 (JSCAD introduction, 2D shapes, transforms, booleans, parameters). Format: 5 multiple-choice on JSCAD concepts, 3 code-reading (what does this JSCAD code produce?), 2 short-answer (what is a library, explain parameterization), 1 write-a-JSCAD-function problem. Administer at start or end of week — teacher discretion.
 
 ---
 
-### 2.2.2 Arrays in JSCAD / Loops Generating Geometry (~3.5 hrs)
+### 3.2.2 Arrays in JSCAD / Loops Generating Geometry (~3.5 hrs)
 **Contact hours:** 3.5
+**SLOs covered:** SLO 3, Topic: Arrays
 
 **Learning Objectives:**
 - Use a for loop to generate an array of JSCAD shapes
@@ -584,26 +997,25 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Challenge: make the shapes vary in size based on their position
 
 **Assignments:**
-- **A14.1 (Lab):** Write a JSCAD program that generates a pattern of at least 20 shapes using loops. The pattern must have at least 2 parameters that control it (e.g., count, spacing, size). Full comments. This should be something that would be interesting to eventually extrude and print.
-- **A14.2 (Lab):** Rewrite A14.1's loop using `Array.from()` and `map()` instead of a for loop. Comment explaining what changed and which version you prefer and why.
+- **A23.1 (Lab):** Write a JSCAD program that generates a pattern of at least 20 shapes using loops. The pattern must have at least 2 parameters that control it (e.g., count, spacing, size). Full comments. This should be something that would be interesting to eventually extrude and print.
+- **A23.2 (Lab):** Rewrite A23.1's loop using `Array.from()` and `map()` instead of a for loop. Comment explaining what changed and which version you prefer and why.
 
 **Teacher Notes:**
 - This week is where students start seeing why code is more powerful than manual design tools. "Change one number, regenerate 20 shapes" lands well.
 - `map()` is a stretch for beginners but worth introducing. Don't require mastery — require exposure.
 
-**Exam:**
-- **Semester 1 Midterm 3 (~1 hour, in class):** Covers Weeks 10–14 (JSCAD introduction, 2D shapes, transforms, booleans, parameters, arrays/loops generating geometry). Format: 5 multiple-choice on JSCAD concepts, 3 code-reading (what does this JSCAD code produce?), 2 short-answer (what is a library, explain parameterization), 1 write-a-JSCAD-function problem. Administer at start or end of week — teacher discretion.
-
 ---
 
-## Unit 2.3: 3D Modeling
+## Unit 3.3: 3D Modeling
+> **SLO focus:** Reinforces **SLO 3** (design/implement/test 3D geometry) — first physical-artifact milestone arrives here in W24.
 
-### 2.3.1 First Extrusion: 2D to 3D (~3.5 hrs)
+### 3.3.1 First Extrusion: 2D to 3D (~3.5 hrs)
 **Contact hours:** 3.5
+**SLOs covered:** SLO 3
 
 **Learning Objectives:**
-- Extrude a 2D shape into a 3D solid using extrudeLinear
-- Use extrudeRotate to create rotationally symmetric 3D forms
+- Extrude a 2D shape into a 3D solid using `extrudeLinear`
+- Use `extrudeRotate` to create rotationally symmetric 3D forms
 - Understand the coordinate system transition from 2D to 3D
 - Export an STL file from JSCAD
 
@@ -615,25 +1027,25 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Print preparation overview: what makes a model printable (manifold, no holes, flat bottom)
 
 **In-Class Activities:**
-- Live code: extrude the W12 gasket design into a 3D part
-- Students extrude their own A12.1 design
-- Demo: extrudeRotate to make a vase profile
+- Live code: extrude the W21 gasket design into a 3D part
+- Students extrude their own A21.1 design
+- Demo: `extrudeRotate` to make a vase profile
 - Discuss what makes a good first print
-- **AP CSP Discussion (15 min):** Beneficial and harmful effects of computing. 3D printing enables prosthetics, housing, and custom medical devices — but also untraceable weapons, counterfeit parts, and copyright infringement. Discuss: "Just because you CAN print something, should you?"
 
 **Assignments:**
-- **A15.1 (Lab):** Take your A12.1 2D design and extrude it into a printable 3D part using extrudeLinear. Add a height parameter. Export STL. Write a print checklist comment at the top of the file: is it manifold? Does it have a flat bottom? What infill would you recommend?
-- **A15.2 (Lab):** Use extrudeRotate to create a rotationally symmetric object (bowl, cup profile, knob, etc.). At least 2 parameters must control the shape. Export STL.
+- **A24.1 (Lab):** Take your A21.1 2D design and extrude it into a printable 3D part using `extrudeLinear`. Add a height parameter. Export STL. Write a print checklist comment at the top of the file: is it manifold? Does it have a flat bottom? What infill would you recommend?
+- **A24.2 (Lab):** Use `extrudeRotate` to create a rotationally symmetric object (bowl, cup profile, knob, etc.). At least 2 parameters must control the shape. Export STL.
 
 **Teacher Notes:**
-- FIRST PRINT MILESTONE: A15.1 or A15.2 should be the first things students actually print. Coordinate print queue by printer group.
+- FIRST PRINT MILESTONE: A24.1 or A24.2 should be the first things students actually print. Coordinate the print queue by printer group (see Appendix B).
 - Failed prints are learning opportunities. Require students to document what failed and what they changed.
 - This is a major motivational moment — do not rush past it.
 
 ---
 
-### 2.3.2 3D Primitives and Transforms (~3.5 hrs)
+### 3.3.2 3D Primitives and Transforms (~3.5 hrs)
 **Contact hours:** 3.5
+**SLOs covered:** SLO 3
 
 **Learning Objectives:**
 - Create 3D primitives: cube, cuboid, sphere, cylinder, torus
@@ -643,8 +1055,8 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 
 **Topics:**
 - 3D primitives from `modeling/primitives`
-- 3D transforms: translate([x,y,z]), rotateX/Y/Z, scale
-- 3D booleans: same union/subtract/intersect but now in 3D
+- 3D transforms: `translate([x,y,z])`, `rotateX/Y/Z`, `scale`
+- 3D booleans: same union/subtract/intersect, now in 3D
 - Building assemblies: multiple parts positioned relative to each other
 - Thinking in 3D: spatial reasoning strategies
 
@@ -654,236 +1066,24 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Challenge: use subtract to cut a hole through a 3D solid
 
 **Assignments:**
-- **A16.1 (Lab):** Build a 3D assembly of at least 5 distinct primitives that together form a recognizable object (not just random shapes). Must use translate, at least one rotation, and at least one boolean operation. Fully parameterized with at least 3 parameters.
-- **A16.2 (Lab):** Model a simple functional part: a cylinder with a hole through the center (like a bushing or spacer). Parameterize outer diameter, inner diameter (hole size), and height. Demonstrate that subtract correctly creates the hole.
+- **A25.1 (Lab):** Build a 3D assembly of at least 5 distinct primitives that together form a recognizable object (not just random shapes). Must use translate, at least one rotation, and at least one boolean operation. Fully parameterized with at least 3 parameters.
+- **A25.2 (Lab):** Model a simple functional part: a cylinder with a hole through the center (like a bushing or spacer). Parameterize outer diameter, inner diameter (hole size), and height. Demonstrate that subtract correctly creates the hole.
 
 **Teacher Notes:**
-- A16.2 is the first "functional" part — it has a mechanical purpose. This connects to the mechatronics pathway destination.
+- A25.2 is the first "functional" part — it has a mechanical purpose. This connects to the mechatronics pathway destination.
 - Students will struggle with 3D spatial reasoning. Encourage drawing on paper before coding.
 
 **Quiz:**
-- **A16.3 (Quiz — in class, 15 min):** Identify 3D primitives from descriptions, predict the result of a translate + rotate sequence, explain the difference between 2D and 3D boolean operations. One code-tracing question on a multi-part 3D assembly.
+- **A25.3 (Quiz — in class, 15 min):** Identify 3D primitives from descriptions, predict the result of a translate + rotate sequence, explain the difference between 2D and 3D boolean operations. One code-tracing question on a multi-part 3D assembly.
 
 ---
 
-## Unit 2.4: Object-Oriented Programming
+## Unit 3.4: Quality and Rigor
+> **SLO focus:** Covers Butte outline topics **Error handling (W26, primary artifact A26.1)** and **Testing principles (W27, primary artifact A27.1)**. Reinforces SLO 3 (test structured programs).
 
-### 2.4.1 Classes and Objects (~3.5 hrs)
+### 3.4.1 Error Handling and Debugging (~3.5 hrs)
 **Contact hours:** 3.5
-**SLOs covered:** SLO 2 (OOP vs procedural), SLO 3
-
-**Learning Objectives:**
-- Define a class with a constructor and methods in JavaScript
-- Instantiate objects from a class
-- Access properties and call methods on an object
-- Compare OOP to the procedural approach used so far
-- Explain when OOP is more appropriate than procedural code
-
-**Topics:**
-- Class syntax: `class`, `constructor()`, `this`
-- Instance methods
-- Creating objects with `new`
-- Comparing OOP vs procedural: same problem, two approaches
-- OOP concepts introduced (not required to implement): encapsulation, inheritance, polymorphism
-- Relevance: Python classes in FreeCAD scripting use identical concepts
-
-**In-Class Activities:**
-- Live code: `PrintPart` class with constructor(name, width, height, depth), `volume()` method, `fitsOnPrinter(maxW, maxH, maxD)` method
-- Students extend the class: add one new property and one new method
-- Pair exercise: build a `PrintQueue` class that stores an array of `PrintPart` objects
-
-**Assignments:**
-- **A17.1 (Lab):** Write a `DesignComponent` class with: constructor taking name, x, y, z dimensions, and material; a `volume()` method; a `describe()` method that returns a formatted string; a `isLargerThan(otherComponent)` method. Instantiate at least 4 objects and demonstrate all methods.
-- **A17.2 (Written, graded):** Compare OOP and procedural programming. What problem does OOP solve that procedural code struggles with? Give a specific example from your own code this year. What did you use in Q1 that was procedural? (SLO 2 primary coverage for OOP vs procedural)
-
-**Teacher Notes:**
-- This is the OOP SLO coverage. A17.2 written response is the documentation artifact for SLO 2.
-- Do not go deep into inheritance or polymorphism — introduce the vocabulary, explain the concept, don't require implementation.
-- Explicitly bridge to FreeCAD: "When you use Python to script FreeCAD, you'll be creating and manipulating objects just like this."
-
----
-
-## Unit 2.5: Synthesis
-
-### 2.5.1 Q2 Review and Major Project (~3.5 hrs)
-**Contact hours:** 3.5
-**SLOs covered:** SLO 3 (design, implement, test)
-
-**Learning Objectives:**
-- Design and build a complete parameterized 3D object independently
-- Apply the full design process: plan → model → test → iterate → print
-- Write complete documentation for a JSCAD project
-
-**Assignments:**
-- **A18.1 — Q2 Major Project (major grade):** Design and build a parameterized, printable object of your choosing. Requirements:
-  - At least 8 parameters in `getParameterDefinitions()`
-  - Uses at least 3 different primitive types
-  - Uses at least 2 boolean operations
-  - Uses at least one loop to generate repeated geometry
-  - Fully documented with comments
-  - README describing: what the object is, what each parameter does, print settings used
-  - Must be actually printed and submitted with the physical print
-  - 1-page design log: what you planned, what changed, what you would improve
-
-**Teacher Notes:**
-- This is the first major print milestone. Allow 2 weeks of in-class work time if needed.
-- Grade on: parameterization quality, code documentation, design intent clarity, README, physical print.
-- Failed prints that are documented and iterated on should not be penalized — iteration is the skill.
-
-**Exam:**
-- **Semester 1 Final (~1.5 hours, in class):** Cumulative exam covering all Semester 1 material (Weeks 1–18). Format: 20 multiple-choice (mix of JS fundamentals and JSCAD concepts), 5 code-tracing, 4 short-answer (SLO-aligned: lifecycle, structured programming, algorithms, OOP vs procedural — include one question comparing OOP and procedural approaches as SLO 2 backup artifact), 2 write-code problems (one pure JS, one JSCAD). Schedule the exam and project submission on separate days within the week.
-
----
-
-# Q3: Advanced Modeling + CS Foundations
-### ~31.5 contact hours | 9 weeks
-### Goal: Advanced JSCAD modeling plus deliberate coverage of remaining SLO topics that don't fit naturally into the modeling spine.
-
----
-
-## Unit 3.1: Project Architecture
-
-### 3.1.1 Multi-File Projects and File I/O (~3.5 hrs)
-**Contact hours:** 3.5
-**SLOs covered:** Topic: File I/O
-
-**Learning Objectives:**
-- Split a JSCAD project across multiple files
-- Export data from one file and import it in another
-- Explain what file I/O means and why it matters in programming
-- Use JSCAD's file import system to load external geometry
-
-**Topics:**
-- Multi-file JSCAD projects: the `include` system
-- Modular design: separating component definitions from assembly
-- Exporting and importing JS modules
-- JSCAD's file import: loading SVG, STL as geometry input
-- Connecting to general File I/O concept: reading and writing external data
-- Version control intro: `git init`, `git add`, `git commit`, `git log` — why saving versions matters when projects span multiple files
-
-**In-Class Activities:**
-- Teacher demo: split a previous project into two files — components.js and main.js
-- Students refactor their A18.1 project into at least 2 files
-- Demo importing an external SVG into JSCAD as a 2D profile
-- Teacher demo: initialize a git repo, make two commits showing a before/after refactor
-- **AP CSP Discussion (15 min):** Metadata and intellectual property. When you import an SVG or STL, it carries metadata — author, creation date, software used. Discuss: who owns a 3D model on Thingiverse? What license is it under? What is DMCA? "Always check the license before using someone else's geometry."
-
-**Assignments:**
-- **A19.1 (Lab, File I/O coverage):** Refactor your Q2 major project into a multi-file structure: one file for component/helper functions, one file for parameters, one file for main assembly. Initialize a git repo and make at least 2 commits showing your refactoring progress. Write a README explaining what each file does and why you split it this way.
-- **A19.2 (Written):** Explain what file I/O means in programming. How does JSCAD's multi-file system relate to the general concept of reading from and writing to files? What are the limits of what JSCAD can do with files compared to a general-purpose program?
-
-**Teacher Notes:**
-- A19.2 written response is the File I/O SLO documentation artifact.
-- The "limits of JSCAD file I/O" question in A19.2 is intentional — students should be honest that JSCAD's I/O is limited and understand what real file I/O looks like.
-
----
-
-## Unit 3.2: Advanced JSCAD
-
-### 3.2.1 Hulls and Advanced Extrusions (~3.5 hrs)
-**Contact hours:** 3.5
-
-**Learning Objectives:**
-- Use hull() and hullChain() to create organic forms
-- Use extrudeHelical for spiral/spring forms
-- Use extrudeFromSlices for tapered or morphing extrusions
-- Select the right extrusion type for a given design intent
-
-**Topics:**
-- `modeling/hulls`: hull(), hullChain()
-- `extrudeHelical`: springs, threads, spirals
-- `extrudeFromSlices`: lofted forms, tapers
-- When to use each: form follows function
-- Design intent: matching tool to outcome
-
-**In-Class Activities:**
-- Live code: hullChain through 5 circles of varying radius to make organic tube
-- Students experiment freely for 30 minutes: build something they couldn't before
-- Share-out: show one thing that surprised you
-
-**Assignments:**
-- **A20.1 (Lab):** Build a design that uses at least 2 advanced extrusion/hull techniques from this week. The design must be intentional (not random exploration) — write a design brief explaining what you were trying to make and why you chose those techniques.
-- **A20.2 (Quiz — in class, 15 min):** Match each advanced technique (hull, hullChain, extrudeHelical, extrudeFromSlices) to the form it produces. Given a design goal, choose the correct technique and explain why.
-
----
-
-### 3.2.2 Measurements and Printability (~3.5 hrs)
-**Contact hours:** 3.5
-
-**Learning Objectives:**
-- Use JSCAD measurement functions to query geometry properties
-- Calculate volume, bounding box, and surface area programmatically
-- Identify common printability issues: overhangs, thin walls, unsupported spans
-- Write a printability checker function
-
-**Topics:**
-- `modeling/measurements`: measureVolume, measureBoundingBox, measureDimensions
-- Using measurement data in logic: "if volume > X, warn user"
-- Printability constraints: overhang angle, minimum wall thickness, support needs
-- Design for manufacturing: thinking about how a print will be built layer by layer
-
-**In-Class Activities:**
-- Live code: function that takes a geometry, measures it, and prints a report
-- Students add a printability warning system to a previous design using parameters
-- Discussion: what does a slicer actually do?
-
-**Assignments:**
-- **A21.1 (Lab):** Add a measurement report to your Q2 major project. The report should print: estimated volume, bounding box dimensions, whether it fits on the printer (using build volume check), and at least one design-specific measurement relevant to your part. Use `getParameterDefinitions()` to expose a "show measurements" toggle.
-
-**Teacher Notes:**
-- Light week by design — use extra time for print queue rotation, individual help, or catch-up on delayed assignments from W19–20.
-
----
-
-## Unit 3.3: Algorithms and Software Quality
-
-### 3.3.1 Sorting and Searching (~3.5 hrs)
-**Contact hours:** 3.5
-**SLOs covered:** Topic: algorithms including sorting and searching
-
-**Learning Objectives:**
-- Implement a linear search algorithm
-- Implement a bubble sort algorithm
-- Analyze why algorithm efficiency matters
-- Apply sorting and searching to design-relevant data
-
-**Topics:**
-- Linear search: iterate and compare
-- Binary search: concept only, implement optional
-- Bubble sort: compare adjacent, swap if out of order
-- Why efficiency matters: Big-O conceptually (not formally)
-- Applying algorithms to arrays of objects: sort by dimension, search by name
-
-**In-Class Activities:**
-- Physical simulation: 8 students hold cards with numbers, class talks through bubble sort steps
-- Live code: linear search on array of print job objects
-- Students trace bubble sort by hand on a 6-element array
-- **AP CSP Discussion (10 min):** Parallel and distributed computing. "What if you had 4 printers instead of 1 — how would you split the print queue?" Introduce the concept of parallel processing, speedup, and why you can't always parallelize everything (dependencies).
-
-**Assignments:**
-- **A22.1 (Lab, Algorithms SLO):** Write a JS program (not JSCAD — standalone) that:
-  - Stores at least 8 "design parts" as objects with name, volume, printTime properties
-  - Implements linear search by name (returns the part or null)
-  - Implements bubble sort by volume (ascending)
-  - Implements bubble sort by printTime (descending)
-  - Prints results before and after sorting
-  - Full comments explaining how each algorithm works step by step
-- **A22.2 (Written):** Explain in your own words how bubble sort works. Why would sorting a list be useful in a real program?
-
-**Teacher Notes:**
-- A22.1 is the formal sorting/searching SLO coverage artifact.
-- The physical card simulation is highly effective — do not skip it.
-- Students do not need to implement binary search, but should understand why it's faster.
-- **Enrichment (optional, not assessed):** Show a recursive implementation of factorial and linear search. Explain: "Some algorithms call themselves — this is called recursion. You'll see it again in CSCI 20." One live-code demo, no assignment required.
-
-**Exam:**
-- **Semester 2 Midterm 1 (~1 hour, in class):** Covers Weeks 19–22 (multi-file projects, file I/O concepts, advanced modeling, measurements, sorting and searching algorithms). Format: 10 multiple-choice, 3 code-tracing (trace a sort or search), 2 short-answer (explain bubble sort, what makes a model printable), 1 write-a-function problem (implement a search or sort on an array of objects). Administer at end of week after sorting/searching content.
-
----
-
-### 3.3.2 Error Handling and Debugging (~3.5 hrs)
-**Contact hours:** 3.5
-**SLOs covered:** Topic: error handling
+**SLOs covered:** Topic: Error handling
 
 **Learning Objectives:**
 - Distinguish between syntax errors, runtime errors, and logic errors
@@ -902,18 +1102,22 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 **In-Class Activities:**
 - Live demo: program that crashes without try/catch, then add it
 - Students use DevTools debugger to trace a provided buggy program
-- Add input validation to A6.2 design calculator
-- **AP CSP Discussion (15 min):** Cybersecurity basics. Error handling prevents crashes, but what about intentional attacks? Brief intro to: PII (personally identifiable information), phishing, malware, and why input validation is also a security practice. "Never trust user input — it might be an attack, not a mistake."
+- Add input validation to the A6.2 design calculator from Q1
+- **AP CSP Discussion (15 min):** Cybersecurity basics. Error handling prevents crashes, but what about intentional attacks? Brief intro to PII, phishing, malware, and why input validation is also a security practice. "Never trust user input — it might be an attack, not a mistake."
 
 **Assignments:**
-- **A23.1 (Lab, Error Handling SLO):** Take your W9 Print Job Manager and add: input validation to every function (throw errors for invalid inputs), try/catch around the main execution block, at least one custom error type, and a user-facing error message for each possible failure mode.
-- **A23.2 (Lab):** Add error handling to your JSCAD Q2 major project: validate all parameters (e.g., prevent negative dimensions, enforce min/max), add a try/catch around your main function, and display a meaningful message when parameters are invalid.
+- **A26.1 (Lab, Error Handling SLO):** Take your W9 Print Job Manager and add: input validation to every function (throw errors for invalid inputs), try/catch around the main execution block, at least one custom error type, and a user-facing error message for each possible failure mode.
+- **A26.2 (Lab):** Add error handling to one JSCAD project from W19–25: validate all parameters (e.g., prevent negative dimensions, enforce min/max), add a try/catch around your main function, and display a meaningful message when parameters are invalid.
+
+**Teacher Notes:**
+- A26.1 is the Error Handling SLO coverage artifact.
+- The three error types (syntax, runtime, logic) are recurring vocabulary — keep referencing them all year.
 
 ---
 
-### 3.3.3 Testing Principles (~3.5 hrs)
+### 3.4.2 Testing Principles (~3.5 hrs)
 **Contact hours:** 3.5
-**SLOs covered:** Topic: principles of testing and designing test data
+**SLOs covered:** Topic: Principles of testing and designing test data
 
 **Learning Objectives:**
 - Explain why software testing matters
@@ -935,32 +1139,180 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Pair exercise: write tests for partner's A6.2 design calculator
 
 **Assignments:**
-- **A24.1 (Lab, Testing SLO):** Write a complete test suite for your W9 Print Job Manager functions. For each function, write at least 3 test cases: one normal input, one edge case (boundary value), one invalid input. Implement a simple test runner that reports pass/fail. Submit test results showing at least one test catching a real bug you then fixed.
-- **A24.2 (Written):** Explain the difference between normal cases, edge cases, and error cases in testing. Why is it important to test all three?
+- **A27.1 (Lab, Testing SLO):** Write a complete test suite for your W9 Print Job Manager functions. For each function, write at least 3 test cases: one normal input, one edge case (boundary value), one invalid input. Implement a simple test runner that reports pass/fail. Submit test results showing at least one test catching a real bug you then fixed.
+- **A27.2 (Written):** Explain the difference between normal cases, edge cases, and error cases in testing. Why is it important to test all three?
 
 **Teacher Notes:**
-- A24.1 is the Testing SLO coverage artifact.
+- A27.1 is the Testing SLO coverage artifact.
 - "Submit test results showing at least one test catching a real bug" is intentional — students should experience tests as bug-finders, not box-checkers.
 
 **Quiz:**
-- **A24.3 (Quiz — in class, 15 min):** Classify 4 test cases as normal, edge, or error cases. Write 3 test cases for a provided function (one of each type). Explain why testing matters in one sentence.
+- **A27.3 (Quiz — in class, 15 min):** Classify 4 test cases as normal, edge, or error cases. Write 3 test cases for a provided function (one of each type). Explain why testing matters in one sentence.
+
+**Exam:**
+- **Semester 2 Midterm 2 (~1 hour, in class):** Covers Weeks 23–27 (arrays/loops in JSCAD, extrusion, 3D primitives, error handling, testing). Format: 10 multiple-choice, 3 code-tracing, 2 short-answer (classify a bug by type; explain an edge case), 1 write-code problem (validate inputs and test one function). Administer at end of week after testing content.
 
 ---
 
-## Unit 3.4: Presentation and Polish
+# Q4: Advanced JSCAD + 3D Capstone
+### ~31.5 contact hours | 9 weeks (W28–W36)
+### Goal: Advanced modeling techniques, sorting/searching applied to geometry, multi-file projects, and a student-directed 3D capstone ending the year.
+### Environment: JSCAD browser app + 3D printers.
 
-### 3.4.1 Colors, Text, and Export Formats (~3.5 hrs)
+---
+
+## Unit 4.1: Advanced Modeling
+> **SLO focus:** **SLO 4 primary applied artifact (A30.1 Sort/Search on geometry data)**. Reinforces SLO 3 through advanced modeling techniques and measurement-driven design.
+
+### 4.1.1 Hulls and Advanced Extrusions (~3.5 hrs)
 **Contact hours:** 3.5
+**SLOs covered:** SLO 3
 
 **Learning Objectives:**
-- Apply colors to JSCAD geometries using colorize()
-- Use vectorText to add text to a 3D model
+- Use `hull()` and `hullChain()` to create organic forms
+- Use `extrudeHelical` for spiral and spring forms
+- Use `extrudeFromSlices` for tapered or morphing extrusions
+- Select the right extrusion type for a given design intent
+
+**Topics:**
+- `modeling/hulls`: `hull()`, `hullChain()`
+- `extrudeHelical`: springs, threads, spirals
+- `extrudeFromSlices`: lofted forms, tapers
+- When to use each: form follows function
+- Design intent: matching tool to outcome
+
+**In-Class Activities:**
+- Live code: `hullChain` through 5 circles of varying radius to make an organic tube
+- Students experiment freely for 30 minutes: build something they couldn't before
+- Share-out: show one thing that surprised you
+
+**Assignments:**
+- **A28.1 (Lab):** Build a design that uses at least 2 advanced extrusion/hull techniques from this week. The design must be intentional (not random exploration) — write a short design brief explaining what you were trying to make and why you chose those techniques.
+- **A28.2 (Quiz — in class, 15 min):** Match each advanced technique (hull, hullChain, extrudeHelical, extrudeFromSlices) to the form it produces. Given a design goal, choose the correct technique and explain why.
+
+---
+
+### 4.1.2 Measurements and Printability (~3.5 hrs)
+**Contact hours:** 3.5
+**SLOs covered:** SLO 3
+
+**Learning Objectives:**
+- Use JSCAD measurement functions to query geometry properties
+- Calculate volume, bounding box, and surface area programmatically
+- Identify common printability issues: overhangs, thin walls, unsupported spans
+- Write a printability checker function
+
+**Topics:**
+- `modeling/measurements`: `measureVolume`, `measureBoundingBox`, `measureDimensions`
+- Using measurement data in logic: "if volume > X, warn the user"
+- Printability constraints: overhang angle, minimum wall thickness, support needs
+- Design for manufacturing: thinking about how a print will be built layer by layer
+
+**In-Class Activities:**
+- Live code: function that takes a geometry, measures it, and prints a report
+- Students add a printability warning system to a previous design using parameters
+- Discussion: what does a slicer actually do?
+
+**Assignments:**
+- **A29.1 (Lab):** Add a measurement report to one of your Q3 projects. The report should print: estimated volume, bounding box dimensions, whether it fits on the printer (using build-volume check), and at least one design-specific measurement relevant to the part. Use `getParameterDefinitions()` to expose a "show measurements" toggle.
+
+**Teacher Notes:**
+- Light week by design — use extra time for print queue rotation, individual help, or catch-up on any delayed Q3 assignments.
+
+---
+
+### 4.1.3 Sorting and Searching on Geometry (~3.5 hrs)
+**Contact hours:** 3.5
+**SLOs covered:** SLO 4 (algorithms, primary), Topic: sorting and searching
+
+**Learning Objectives:**
+- Implement a linear search algorithm
+- Implement a bubble sort algorithm
+- Analyze why algorithm efficiency matters
+- Apply sorting and searching to design-relevant data (parts, vertices, layers)
+
+**Topics:**
+- Linear search: iterate and compare
+- Binary search: concept only, implement optional
+- Bubble sort: compare adjacent, swap if out of order
+- Why efficiency matters: Big-O conceptually (not formally)
+- Applying algorithms to arrays of part objects: sort by dimension, search by name, sort by print time
+
+**In-Class Activities:**
+- Physical simulation: 8 students hold cards with numbers; the class talks through bubble sort step by step
+- Live code: linear search on an array of part objects (name, volume, printTime)
+- Students trace bubble sort by hand on a 6-element array
+- **AP CSP Discussion (10 min):** Parallel and distributed computing. "What if you had 4 printers instead of 1 — how would you split the print queue?" Introduce parallel processing, speedup, and why not everything parallelizes (dependencies).
+
+**Assignments:**
+- **A30.1 (Lab, Algorithms SLO primary):** Write a standalone JS program (not JSCAD) that:
+  - Stores at least 8 "design parts" as objects with `name`, `volume`, `printTime` properties
+  - Implements linear search by name (returns the part or `null`)
+  - Implements bubble sort by `volume` (ascending)
+  - Implements bubble sort by `printTime` (descending)
+  - Prints results before and after sorting
+  - Full comments explaining how each algorithm works step by step
+- **A30.2 (Written):** Explain in your own words how bubble sort works. Why would sorting a list be useful in a real program? Give a real-world example beyond this course.
+
+**Teacher Notes:**
+- A30.1 is the formal sorting/searching SLO coverage artifact.
+- The physical card simulation is highly effective — do not skip it.
+- Students do not need to implement binary search but should understand why it's faster.
+- **Enrichment (optional, not assessed):** Show a recursive implementation of factorial or linear search. Explain: "Some algorithms call themselves — this is called recursion. You'll see it again in the next course."
+
+---
+
+## Unit 4.2: Production Pipeline
+> **SLO focus:** Reinforces **SLO 2** (multi-file modular structure). Covers Butte outline topic **File I/O (W31 JSCAD location — A31.1/A31.2)**. Prepares the production pipeline used by the capstone.
+
+### 4.2.1 Multi-File Projects and File I/O (~3.5 hrs)
+**Contact hours:** 3.5
+**SLOs covered:** SLO 2 (structured programming), Topic: File I/O
+
+**Learning Objectives:**
+- Split a JSCAD project across multiple files
+- Export data from one file and import it in another
+- Explain what file I/O means and why it matters in programming
+- Use JSCAD's file import system to load external geometry
+
+**Topics:**
+- Multi-file JSCAD projects: the `include` system
+- Modular design: separating component definitions from assembly
+- Exporting and importing JS modules
+- JSCAD's file import: loading SVG, STL as geometry input
+- Connecting to the general File I/O concept: reading and writing external data
+- Version control intro: `git init`, `git add`, `git commit`, `git log` — why saving versions matters across multiple files
+
+**In-Class Activities:**
+- Teacher demo: split a previous project into two files — `components.js` and `main.js`
+- Students refactor one of their Q3 projects into at least 2 files
+- Demo importing an external SVG into JSCAD as a 2D profile
+- Teacher demo: initialize a git repo, make two commits showing a before/after refactor
+- **AP CSP Discussion (15 min):** Metadata and intellectual property. Imported SVG/STL files carry metadata — author, creation date, software used. Who owns a 3D model on Thingiverse? What license is it under? What is DMCA? "Always check the license before using someone else's geometry."
+
+**Assignments:**
+- **A31.1 (Lab, File I/O coverage):** Refactor one Q3 project into a multi-file structure: one file for component/helper functions, one file for parameters, one file for main assembly. Initialize a git repo and make at least 2 commits showing your refactoring progress. Write a README explaining what each file does and why you split it this way.
+- **A31.2 (Written):** Explain what file I/O means in programming. How does JSCAD's multi-file system relate to the general concept of reading from and writing to files? Compare briefly with the q5play `save`/`storeItem` approach you used in W16.
+
+**Teacher Notes:**
+- A31.2 comparing JSCAD multi-file to q5play save/load reinforces that file I/O takes many forms.
+- Students should leave this week with a working git workflow they can use on the capstone.
+
+---
+
+### 4.2.2 Colors, Text, and Export Formats (~3.5 hrs)
+**Contact hours:** 3.5
+**SLOs covered:** SLO 3
+
+**Learning Objectives:**
+- Apply colors to JSCAD geometries using `colorize()`
+- Use `vectorText` to add text to a 3D model
 - Design models intended for display/presentation vs function
 - Export in multiple formats (STL, 3MF, AMF)
 
 **Topics:**
-- `modeling/colors`: colorize(), named colors, RGB, hex
-- `modeling/text`: vectorChar, vectorText
+- `modeling/colors`: `colorize()`, named colors, RGB, hex
+- `modeling/text`: `vectorChar`, `vectorText`
 - Text as geometry: extruding text into 3D
 - Multi-color design: strategic use of color for visualization
 - Export formats: STL vs 3MF vs AMF — when to use each
@@ -969,161 +1321,47 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Live code: personalized nameplate with extruded text and color
 - Students build a colored, labeled version of a previous design
 - Export in two different formats, compare file sizes
-- **AP CSP Discussion (20 min):** Digital divide and access to technology. Not everyone has access to 3D printers, high-speed Internet, or even computers. Discuss: who benefits from the tools we're using? Who is excluded? What can be done about it? Connection: "We're in a lab with 10 printers — most schools have zero."
 
 **Assignments:**
-- **A25.1 (Lab):** Design a personalized nameplate or badge that includes: your name in 3D text (extruded), at least 2 colors, at least one design element beyond just text, parameters for text size and depth. Export as STL and print.
-- **A25.2 (Quiz — in class, 15 min):** Name 3 export formats and when to use each. Write a `colorize()` call given an RGB value. Explain one difference between STL and 3MF.
-- **A25.3 (Written, AP CSP IOC):** Half page: choose one computing innovation (3D printing, AI, social media, GPS, or your own) and describe one beneficial effect and one harmful effect. Explain who is helped and who might be harmed. Mention at least one legal or ethical concern (copyright, privacy, access, bias).
-
-**Teacher Notes:**
-- Light week by design — use extra time for print queue rotation, individual help, or catch-up on delayed assignments from W23–24.
-
----
-
-## Unit 3.5: Synthesis
-
-### 3.5.1 Q3 Major Project (~3.5 hrs)
-**Contact hours:** 3.5
-**SLOs covered:** SLO 3 (full design, implement, test cycle)
-
-**Learning Objectives:**
-- Complete a full design-to-print cycle independently
-- Apply error handling, testing, and documentation to a JSCAD project
-- Iterate based on print results
-
-**Assignments:**
-- **A26.1 — Q3 Major Project (major grade):** Design a functional mechanical part or assembly. Requirements:
-  - Must have a real function (not purely decorative)
-  - At least 10 parameters
-  - Multi-file structure (at least 2 files)
-  - Measurement report built in
-  - Input validation on all parameters
-  - README with: design intent, parameter documentation, print settings, iteration log
-  - Physical print required
-  - Must be able to explain every line of code if asked
-
-**Teacher Notes:**
-- "Functional" examples: a custom bracket, a cable clip, a tool holder, a modular shelf connector, a phone stand with specific angle.
-- Physical print + code are both graded. A beautiful print with undocumented spaghetti code is not full credit.
-
----
-
-### 3.5.2 Q3 Review (~3.5 hrs)
-**Contact hours:** 3.5
-**SLOs covered:** SLO 1, SLO 2, SLO 3, SLO 4 (synthesis)
-
-**Learning Objectives:**
-- Demonstrate mastery of Q3 concepts through review and examination
-- Identify connections between pure JS concepts and JSCAD applications
-- Self-assess readiness for the capstone project
-
-**Topics:**
-- Review: multi-file projects, advanced modeling, measurements, algorithms, error handling, testing
-- Connecting concepts: how Q1 fundamentals enabled Q3 complexity
-- Capstone project preview: what to expect in Q4
-
-**In-Class Activities:**
-- Q3 concept review: structured review of W19–W26 topics
-- Practice problems: mixed set of JS + JSCAD problems covering all Q3 topics
-- Capstone project overview and brainstorming session
-
-**Assignments:**
-- **A27.1 (Review Lab):** Complete a set of 8 review problems spanning Q3 topics: multi-file module design, measurement queries, sorting/searching, error handling with try/catch, test case writing, and JSCAD modeling. Self-grade using provided answer key and identify your weakest area.
+- **A32.1 (Lab):** Design a personalized nameplate or badge that includes: your name in 3D text (extruded), at least 2 colors, at least one design element beyond just text, parameters for text size and depth. Export as STL and print.
+- **A32.2 (Quiz — in class, 15 min):** Name 3 export formats and when to use each. Write a `colorize()` call given an RGB value. Explain one difference between STL and 3MF.
 
 **Exam:**
-- **Semester 2 Midterm 2 (~1 hour, in class):** Cumulative Q3 exam covering Weeks 19–26 (multi-file projects, advanced modeling, measurements, sorting/searching, error handling, testing, colors/text). Format: 15 multiple-choice, 5 code-tracing, 3 short-answer, 2 write-code problems (one algorithm, one JSCAD). Administer after the review activity.
-
-**Teacher Notes:**
-- This is the buffer week. Use it to catch up on any Q3 content that ran long.
-- The self-assessment in A27.1 helps students identify what to review before the midterm.
-- Use the capstone brainstorming to get students thinking early — they'll start design specs next week.
+- **Semester 2 Midterm 3 (~1 hour, in class):** Covers Weeks 28–32 (hulls/advanced extrusions, measurements, sorting/searching, multi-file projects, colors/text/export). Format: 10 multiple-choice, 3 code-tracing (trace a sort or search; predict a colorize result), 2 short-answer (explain bubble sort; explain when to use each export format), 1 write-a-function problem (sort an array of parts). Administer at end of Week 32.
 
 ---
 
-# Q4: FreeCAD Bridge + Capstone
-### ~28 contact hours | 8 weeks
-### Goal: FreeCAD bridge unit first to inform capstone thinking, then student-directed capstone project with no mid-project interruption.
+## Unit 4.3: Capstone
+> **SLO focus:** **SLO 3 primary Sem 2 evidence (A36.1 3D Capstone)**; **SLO 1 closing artifact (A36.2 lifecycle reflection)**. Every SLO must be demonstrable in the capstone deliverable.
 
----
-
-## Unit 4.1: FreeCAD Bridge
-
-### 4.1.1 FreeCAD Interface and Python Basics (~3.5 hrs)
-> **Compressed** from 2 weeks to 1. Preview, not mastery. A29.1 becomes a stretch goal within A28.1.
-**Contact hours:** 7.0
+### 4.3.1 Capstone Design Phase (~3.5 hrs)
+**Contact hours:** 3.5
+**SLOs covered:** SLO 1 (lifecycle), SLO 3 (design phase)
 
 **Learning Objectives:**
-- Open and navigate the FreeCAD interface
-- Identify the equivalent of JSCAD operations in FreeCAD's GUI
-- Write a basic FreeCAD Python macro that creates geometry
-- Explain what a Python macro is and how it relates to JS functions
-
-**Topics:**
-- FreeCAD interface tour: workbenches, model tree, 3D view
-- Sketch → Pad (same as 2D profile → extrudeLinear)
-- Part Design boolean operations: identical concepts, different UI
-- FreeCAD Python console: REPL, same concept as browser DevTools
-- Python syntax crash course: the 5 differences from JS that matter
-  - Indentation instead of braces
-  - `def` instead of `function`
-  - No semicolons
-  - `print()` not `console.log()`
-  - Different import syntax
-- Writing a macro: `FreeCAD.ActiveDocument.addObject()` to create a box programmatically
-- Parametric modeling in FreeCAD: Spreadsheet workbench as equivalent to `getParameterDefinitions()`
-
-**In-Class Activities:**
-- Side-by-side: JSCAD code on left, FreeCAD UI on right — find every equivalent operation
-- Students recreate their A16.2 bushing/spacer in FreeCAD using only the GUI
-- Students write a FreeCAD Python macro that creates a box with user-defined dimensions
-
-**Assignments:**
-- **A28.1 (Lab — Bridge Unit):** Complete a mapping document: for each JSCAD concept listed (primitives, translate, rotate, subtract, union, extrudeLinear, parameters, multi-file), write the FreeCAD equivalent. Include a screenshot of where to find it in FreeCAD.
-- **A29.1 (Lab — Bridge Unit):** Write a FreeCAD Python macro that creates a parametric cylinder with a hole (same as A16.2 in JSCAD). Comment the Python code with annotations explaining the JS equivalent of each line.
-
-**Teacher Notes:**
-- The bridge unit is explicitly a preview, not mastery. Students should leave knowing: "I've been here before, just with different syntax."
-- The Python syntax crash course should be framed as: "You already know programming. Python is just a different dialect."
-- A28.1 mapping document is the artifact that makes this a pathway unit. Keep it — it's also useful as a reference card for the mechatronics course.
-- Placing the bridge first means capstone design starts with FreeCAD concepts fresh — students may incorporate ideas from both tools into their capstone planning.
-
----
-
-## Unit 4.2: Capstone Project
-
-### 4.2.1 Design Phase (~7 hrs)
-> **Compressed** from 3 weeks to 2. Design spec and first milestone combined.
-**Contact hours:** 10.5
-
-**Learning Objectives:**
-- Define a project scope that is achievable and meaningful
+- Define a project scope that is achievable and meaningful in 3 weeks
 - Write a design specification before building
 - Break a large project into milestones
 
 **Topics:**
-- Project scoping: what's realistic in 6 weeks
+- Project scoping: what's realistic in 3 weeks of in-class work
 - Design specification document: what it is, why it exists
 - Milestone planning: working backwards from a deadline
 - Peer design review: giving and receiving feedback
 
 **Assignments:**
-- **A30.1 — Capstone Design Spec (major grade):** A 2-page design specification for your capstone project. Must include: project title and purpose, list of features/requirements, sketch of the design, parameter list (what will be parameterized and why), milestone plan with 3 checkpoints, and a printability analysis.
-- **A31.1 — Capstone Milestone 1:** Working JSCAD model with basic geometry — no polish required. Code review with teacher.
-- **A32.1 — Capstone Milestone 2:** All geometry complete, parameters working, documentation in progress.
-
-**Exam:**
-- **Semester 2 Midterm 3 (~1 hour, in class):** Covers Weeks 28–32 (FreeCAD bridge concepts, Python syntax basics, capstone design process). Format: 5 multiple-choice on FreeCAD/Python concepts, 3 concept-mapping questions (JSCAD concept → FreeCAD equivalent), 2 short-answer (explain a design decision from your capstone, compare JS and Python syntax), 1 write-a-macro problem (simple FreeCAD Python macro). Administer at end of Week 32.
+- **A33.1 — Capstone Design Spec (major grade component):** A 2-page design specification for your capstone project. Must include: project title and purpose, list of features/requirements, sketch of the design, parameter list (what will be parameterized and why), milestone plan with 3 checkpoints (M1 geometry, M2 parameters+validation, M3 polish+print), and a printability analysis (overhangs, supports, orientation).
 
 **Teacher Notes:**
-- Capstone design now follows the bridge directly — students can draw on both JSCAD and FreeCAD concepts when planning.
-- "6 weeks" = design (W30–32) + build (W33–35). W36 is presentations + final.
+- "Functional" examples to suggest: a custom bracket, a cable clip, a tool holder, a modular shelf connector, a phone stand with specific angle, a desk organizer, a small-part enclosure.
+- Require peer design review in class: students swap specs and flag one scope risk each.
+- Specs that can't be built in 3 weeks get revised before W34 begins — no exceptions.
 
 ---
 
-### 4.2.2 Build and Iterate (~14 hrs)
-> **Extended** from 3 weeks to 4. Extra week for print failures, iteration, and debugging.
-**Contact hours:** 10.5
+### 4.3.2 Capstone Build and Iterate (~7 hrs across W34–W35)
+**Contact hours:** 7.0 (2 weeks)
+**SLOs covered:** SLO 2 (structured programming), SLO 3 (implement + test)
 
 **Learning Objectives:**
 - Complete a full project through multiple design iterations
@@ -1132,28 +1370,45 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 
 **Topics:**
 - Iteration: design → build → test → revise cycle
-- Version control concepts: why you save versions
+- Version control discipline: why and when you commit
 - Peer code review: what to look for, how to give useful feedback
 - Presentation skills: explaining a technical project to a non-technical audience
-- **AP CSP Discussion (15 min, during W33):** Computing bias. Algorithms and designs reflect the assumptions of their creators. Examples: facial recognition accuracy varies by skin tone, voice assistants struggle with accents, autocomplete reinforces stereotypes. Ask: "What assumptions did YOU make in your capstone design? Who might struggle to use it?"
+- **AP CSP Discussion (15 min, during W34):** Digital divide. Not everyone has access to 3D printers, high-speed Internet, or even computers. Discuss: who benefits from the tools we're using? Who is excluded? What can be done about it? "We're in a lab with 10 printers — most schools have zero."
+- **AP CSP Discussion (15 min, during W35):** Computing bias. Designs reflect the assumptions of their creators. Examples: facial recognition accuracy varies by skin tone, voice assistants struggle with accents. Ask: "What assumptions did YOU make in your capstone? Who might struggle to use it?"
 
 **Assignments:**
-- **A33.1 — Capstone Milestone 3:** Feature-complete model, documentation complete, test suite for key functions.
-- **A34.1 — Peer Review:** Review two classmates' capstone projects. Write structured feedback: what works, what's unclear, one specific code improvement suggestion, one design improvement suggestion.
-- **A35.1 — Final Print:** Submit final printed capstone with iteration documentation.
+- **A34.1 — Capstone Milestone 1 (W34):** Working JSCAD model with basic geometry — no polish required. Code review with teacher.
+- **A34.2 — Capstone Milestone 2 (W34 end):** All geometry complete, parameters working, input validation in place. Documentation draft.
+- **A35.1 — Capstone Milestone 3 (W35):** Feature-complete model, README complete, test suite for key functions, first print attempted.
+- **A35.2 — Peer Review (W35):** Review two classmates' capstones. Written feedback: what works, what's unclear, one specific code improvement suggestion, one specific design improvement suggestion.
+- **A35.3 — Final Print (W35):** Submit final printed capstone with iteration documentation (photos of failed + successful prints + what changed between them).
+
+**Teacher Notes:**
+- Extra week built in for print failures, iteration, and debugging — this is the most error-prone part of the year.
+- Require daily commits during the build weeks; commit frequency is graded as part of A34/A35.
+- Students who finish early help classmates via peer review — do not assign new content.
 
 ---
 
-### 4.2.3 Presentations and Reflection (~3.5 hrs)
+### 4.3.3 Presentations and Reflection (~3.5 hrs)
 **Contact hours:** 3.5
-**SLOs covered:** SLO 1 (lifecycle reflection), SLO 3 (full program demonstration)
+**SLOs covered:** SLO 1 (lifecycle reflection), SLO 3 (full program demonstration) — **PRIMARY SLO 3 EVIDENCE FOR SEMESTER 2**
+
+**Learning Objectives:**
+- Present a technical project to a mixed audience
+- Reflect on the full software development lifecycle through a completed work
+- Connect the year's learning to the next course in the pathway
 
 **Assignments:**
-- **A36.1 — Capstone Presentation (major grade):** 5-minute presentation + Q&A. Must cover: what the object is and does, how you designed it (key code decisions), what changed from your original design spec and why, one thing you'd do differently, how this work connects to the FreeCAD/mechatronics course.
-- **A36.2 — Course Reflection (Written):** 1 page. Reflect on the software development life-cycle as you experienced it across the year. Give a specific example of each phase from your capstone project. (SLO 1 closing artifact)
+- **A36.1 — Capstone Presentation (major grade):** 5-minute presentation + Q&A. Must cover: what the object is and does; how you designed it (key code decisions); what changed from your original design spec and why; one thing you'd do differently; how this work connects to the FreeCAD/mechatronics pathway you're heading into.
+- **A36.2 — Course Reflection (Written, SLO 1 closing artifact):** 1 page. Reflect on the software development life-cycle as you experienced it across the year. Give a specific example of each phase (design, code, test, maintenance) drawn from either the Q2 game capstone, the Q4 3D capstone, or both.
 
 **Exam:**
-- **Semester 2 Final (~1.5 hours, in class):** Cumulative exam covering all Semester 2 material (Weeks 19–36), with selected questions from Semester 1 fundamentals. Format: 20 multiple-choice (JS fundamentals, JSCAD modeling, algorithms, FreeCAD concepts), 5 code-tracing (mix of JS and Python), 4 short-answer (SLO-aligned: lifecycle reflection, OOP vs procedural — include one question comparing OOP and procedural as SLO 2 backup artifact, algorithm analysis, testing principles), 2 write-code problems (one JSCAD modeling task, one standalone JS algorithm). Schedule on a separate day from capstone presentations.
+- **Semester 2 Final (~1.5 hours, in class):** Cumulative exam covering all Semester 2 material (Weeks 19–36), with selected questions from Semester 1 fundamentals. Format: 20 multiple-choice (JS fundamentals, q5play, JSCAD modeling, algorithms), 5 code-tracing (mix of JS and JSCAD), 4 short-answer (SLO-aligned: lifecycle reflection; OOP vs procedural — include one question comparing them as SLO 2 backup artifact; algorithm analysis; testing principles), 2 write-code problems (one JSCAD modeling task, one standalone JS algorithm). Schedule on a separate day from capstone presentations.
+
+**Teacher Notes:**
+- Capstone presentations can be split across two class meetings if the cohort is large — presentations day 1, final exam day 2 (or reversed).
+- Keep A36.2 reflections on file as the SLO 1 closing artifact for dual-enrollment documentation.
 
 ---
 
@@ -1161,15 +1416,14 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 
 | Category | Weight |
 |----------|--------|
-| Weekly Lab Assignments | 22% |
+| Weekly Lab Assignments | 25% |
 | Written Assignments | 10% |
 | Quizzes (8 total) | 5% |
 | Midterm Exams (6 total) | 15% |
 | Final Exams (2 total) | 10% |
-| Q1 Mini Project | 5% |
-| Q2 Major Project | 10% |
-| Q3 Major Project | 10% |
-| Capstone Project + Presentation | 13% |
+| Q1 Mini Project (W9 Print Job Manager) | 5% |
+| Q2 Game Capstone (W18) | 15% |
+| Q4 3D Capstone + Presentation (W33–W36) | 15% |
 
 > **Note:** Quizzes, midterms, and finals are required evaluation methods per the Butte College CSCI 4 course outline. All four evaluation categories (quizzes, homework, lab projects, mid-term and final examinations) must be represented in grading.
 
@@ -1180,36 +1434,35 @@ Exam weeks still include regular content. Plan for the exam to occupy the first 
 | Exam | Week | Scheduling Guidance |
 |------|------|-------------------|
 | S1 Midterm 1 | 5 | Exam first day, loops content second day |
-| S1 Midterm 2 | 9 | Exam first day, mini project work fills remaining time (may extend into W10 first session) |
-| S1 Midterm 3 | 14 | Exam first day, arrays-in-JSCAD content second day |
-| S1 Final | 18 | Exam and Q2 project submission on separate days within the week |
-| S2 Midterm 1 | 22 | Exam at end of week after sorting/searching content completes |
-| S2 Midterm 2 | 27 | Review activity first, exam second — this is a buffer week |
-| S2 Midterm 3 | 32 | Exam at end of week after capstone milestone 2 |
-| S2 Final | 36 | Exam and capstone presentations on separate days within the week |
+| S1 Midterm 2 | 9 | Exam first day, mini project work fills remaining time |
+| S1 Midterm 3 | 14 | Covers q5play W10–14 (foundations, physics, OOP, groups, physics applications) |
+| S1 Final | 18 | Exam and game capstone showcase on separate days within the week |
+| S2 Midterm 1 | 22 | Covers JSCAD foundations W19–22 (libraries, 2D, booleans, parameters) |
+| S2 Midterm 2 | 27 | Covers W23–27 (loops→geometry, extrusion, 3D primitives, error handling, testing) |
+| S2 Midterm 3 | 32 | Covers W28–32 (hulls, measurements, sort/search, multi-file, colors/export) |
+| S2 Final | 36 | Exam and 3D capstone presentations on separate days within the week |
 
 ---
 
 ## SLO COVERAGE FINAL VERIFICATION
 
-| SLO | Covered By | Assessment Artifact |
-|-----|-----------|-------------------|
-| SLO 1: Software lifecycle | W1 lecture, A1.1, A36.2 | A1.1 written, A36.2 written |
-| SLO 2: Structured programming / OOP | W2–3, W17, A17.2, S1 Final, S2 Final | A17.2 written (primary), S1/S2 Final exam questions (backup) |
-| SLO 3: Design, implement, test programs | A9.1 (with manual tests), A18.1, A26.1, A36.1 | All major projects |
-| SLO 4: Algorithms | W5, A5.1, A22.1 | A5.1 written, A22.1 lab |
-| Data types/variables | W2–3, A2.1, A2.2 | Lab assignments |
-| Arrays | W8, W14, A8.1, A14.1 | Lab assignments |
-| Control structures | W4–6 (incl. do...while W5), A4.1 | Lab + quiz |
-| Algorithms: sort/search | W22, A22.1 | A22.1 lab + A22.2 written |
-| File I/O | W8, W19, A8.2, A19.1, A19.2 | A8.2 lab (primary), A19.2 written |
-| Error handling | W23, A23.1 | A23.1 lab |
+| SLO / Topic | Covered By | Assessment Artifact |
+|-------------|-----------|-------------------|
+| SLO 1: Software lifecycle | W1 lecture, A1.1, W18 game capstone, A36.2 | A1.1 written (intro), A36.2 written (closing) |
+| SLO 2: Structured programming / OOP | W2–3, W12 (q5play OOP), A12.2, S1 Final, S2 Final | A12.2 written (primary), exam questions (backup) |
+| SLO 3: Design, implement, test programs | A9.1 (console mini-project), A18.1 (game capstone), A36.1 (3D capstone) | All major projects |
+| SLO 4: Algorithms | W5, A5.1 (intro), A30.1 (applied) | A5.1 written (intro), A30.1 lab (applied) |
+| Data types / variables | W2–3, A2.1, A2.2 | Lab assignments |
+| Arrays | W8 (intro), W13 (q5play groups), W23 (JSCAD loops→geometry) | A8.1, A13.1, A23.1 |
+| Control structures | W4–5 (core), applied W11–14 (q5play mechanics) | Lab + quiz |
+| Algorithms: sort/search | W30, A30.1 | A30.1 lab + A30.2 written |
+| File I/O | W8 (FileReader), W16 (q5play save/load), W31 (JSCAD multi-file) | A8.2 lab, A16.1 lab, A31.1 lab + A31.2 written |
+| Error handling | W26, A26.1 | A26.1 lab |
 | Pass by value/reference | W7, A7.1, A7.2 | A7.2 written |
-| Testing principles | W24, A24.1 | A24.1 lab + A24.2 written |
+| Testing principles | W27, A27.1 | A27.1 lab + A27.2 written |
 | Documentation | W3, enforced throughout | A3.1, inline in all projects |
 | Coding conventions | W3, enforced throughout | Style guide rubric |
-| OOP vs procedural | W17, A17.2, S1 Final, S2 Final | A17.2 written (primary), exam questions (backup) |
-| Software lifecycle | W1, W36 | A1.1, A36.2 |
+| OOP vs procedural | W12, A12.2, S1 Final, S2 Final | A12.2 written (primary), exam questions (backup) |
 
 ---
 
@@ -1219,19 +1472,21 @@ When generating individual assignments from this plan, use the following convent
 
 - Each assignment file should be named: `A[week].[number]_[short_title].md`
 - Include: learning objectives, instructions, starter code (if applicable), rubric, estimated time, and which SLO(s) it covers
-- Starter code for JSCAD assignments should use the browser app format (no npm required)
-- JSCAD starter code imports should use: `const { primitives, transforms, booleans, measurements, colors, text, extrusions } = require('@jscad/modeling')`
+- Starter code for **Q1 (console)** assignments should run in the browser DevTools console or a bare `<script>` tag
+- Starter code for **Q2 (q5play)** assignments should be a single `script.js` with `setup()`/`draw()`, runnable inside the in-app q5play editor
+- Starter code for **Q3/Q4 (JSCAD)** assignments should use the browser-app format (no npm required). JSCAD imports: `const { primitives, transforms, booleans, measurements, colors, text, extrusions, hulls } = require('@jscad/modeling')`
 - Written assignments should include a prompt, length guidance, and a simple rubric
 - Lab assignments should include: setup instructions, step-by-step task list, expected output description, rubric
 - All rubrics should reference the class coding style guide
-- Print milestone assignments should include a print checklist section
+- Print milestone assignments (starting W24) should include a print checklist section
 
 ### Priority build order for assignments:
-1. Q1 assignments first (A1.1 through A9.1) — needed before anything else
-2. Q2 transition assignments (A10.1 through A15.2) — needed for JSCAD intro
-3. SLO coverage assignments (A17, A19, A22, A23, A24) — needed for dual enrollment documentation
-4. Major projects (A18.1, A26.1, A36.1) — scaffolded by all preceding assignments
-5. Bridge unit (A28.1, A29.1) — now first in Q4, can be built in parallel with Q3 assignments
+1. **Q1 assignments first** (A1.1 through A9.1) — prerequisites for everything
+2. **Q2 q5play assignments** (A10.1 through A18.1) — needed for the game capstone
+3. **SLO coverage assignments** (A12.2 OOP written, A16.1 file I/O, A26.1 error handling, A27.1 testing, A30.1 sort/search) — required for dual-enrollment SLO documentation
+4. **Q3 JSCAD foundations** (A19.1 through A27.3)
+5. **Q4 advanced JSCAD + capstone** (A28.1 through A36.2)
+6. **Major capstones** (A18.1 game, A36.1 3D model) — scaffolded by all preceding assignments
 
 ---
 
@@ -1303,7 +1558,7 @@ This is the grading rubric for code style, distributed in Week 3 and enforced fo
 ## APPENDIX B: PRINT QUEUE MANAGEMENT
 
 ### Printer Group Assignments
-- Assign students to printer groups of 3 in Week 15 (first print milestone).
+- Assign students to printer groups of 3 in Week 24 (first print milestone — A24.1 / A24.2 extrusion lab).
 - Each group shares one printer for the semester. Groups rotate printers each quarter.
 - Post a group roster next to each printer.
 
@@ -1352,8 +1607,10 @@ Students may deviate from defaults with justification documented in their print 
 
 ### Catch-Up Opportunities
 - **Week 9** (Q1 Review): built-in review week. Use midterm results to target review topics.
-- **Week 27** (Q3 Review): built-in review + buffer week. Allows Q3 content to run long if needed.
-- **Weeks 21 and 25** are intentionally light — use extra time for individual help or catch-up.
+- **Week 14** (q5play Physics Applications): consolidation week, no brand-new concepts. Use it to rescue students lagging on W10–13.
+- **Week 18** (Game Capstone): entire week is build time — easy to fold catch-up sessions into supervised work.
+- **Week 29** (Measurements): light content; use extra time for print queue rotation and individual help.
+- **Week 32** (Colors/Text/Export): light content; last checkpoint before capstone design begins.
 
 ### Peer Tutoring
 - After S1 Midterm 1 results, pair struggling students with stronger peers for weekly 15-minute check-ins.
@@ -1374,7 +1631,10 @@ If a student falls behind, prioritize catching up on these gateway topics — ev
 ```
 W2 Variables → W4 Conditionals → W5 Loops → W6 Functions → W8 Arrays
                                                               ↓
-                                              W10 JSCAD Intro → W12 Booleans → W15 Extrusion → All Q3/Q4
+                                         W10 q5play Intro → W12 OOP → W16 State/Save → W18 Game Capstone
+                                                              ↓
+                                         W19 JSCAD Intro → W21 Booleans → W24 Extrusion → W28+ Advanced → W33 3D Capstone
 ```
 
-A student who doesn't understand functions (W6) cannot succeed in JSCAD. Catch this by Week 7 at the latest.
+A student who doesn't understand functions (W6) cannot succeed in q5play OOP (W12) or JSCAD. Catch this by Week 7 at the latest.
+A student who hasn't grasped classes by W12 will struggle through the rest of Q2 — flag them before W13 (Groups) and keep them in re-submission loops on A12.1.
