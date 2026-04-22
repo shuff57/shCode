@@ -1,8 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { CircleCheck, CircleX, Circle, Loader2, Lightbulb, Sparkles } from 'lucide-react';
-import { recordLessonCompleted } from '../lib/progress';
+import { CircleCheck, CircleX, Circle, Loader2, Lightbulb, Sparkles, Save } from 'lucide-react';
+import { recordLessonCompleted, useLessonState } from '../lib/progress';
+import {
+  fetchDraft,
+  saveDraft,
+  recordSubmission,
+} from '../lib/written-grader-store';
 
 export interface AiRubricItem {
   id: string;
@@ -65,6 +70,8 @@ function saveState(lessonId: string, state: StoredState) {
   } catch {}
 }
 
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+
 export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }: Props) {
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
@@ -72,20 +79,43 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
   const [error, setError] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
+  const progress = useLessonState();
   const totalPossible = config.rubric.reduce((s, r) => s + r.points, 0);
 
   useEffect(() => {
-    const s = loadState(lessonId);
-    setResponse(s.response);
-    if (s.lastResult) setResult(s.lastResult);
-    setLoaded(true);
-  }, [lessonId]);
+    // Local cache is the always-available fallback; server draft is canonical
+    // when signed in. Prefer server if it's newer (or exists at all).
+    let cancelled = false;
+    const local = loadState(lessonId);
+    (async () => {
+      const serverDraft = progress.authed ? await fetchDraft(lessonId) : null;
+      if (cancelled) return;
+      if (serverDraft && serverDraft.response) {
+        setResponse(serverDraft.response);
+      } else {
+        setResponse(local.response);
+      }
+      if (local.lastResult) setResult(local.lastResult);
+      setLoaded(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [lessonId, progress.authed]);
 
   useEffect(() => {
     if (!loaded) return;
     saveState(lessonId, { response, lastResult: result ?? undefined, lastSubmittedAt: Date.now() });
   }, [response, result, lessonId, loaded]);
+
+  async function saveNow() {
+    setSaveStatus('saving');
+    const ok = progress.authed ? await saveDraft(lessonId, response) : false;
+    setSaveStatus(ok ? 'saved' : 'error');
+    setTimeout(() => setSaveStatus('idle'), 2000);
+  }
 
   async function submit() {
     setLoading(true);
@@ -122,6 +152,18 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       setResult(data as GradeResult);
       if (data.totalEarned / data.totalPossible >= 0.7) {
         recordLessonCompleted(lessonId, data.totalEarned);
+      }
+      if (progress.authed) {
+        // Persist the submission + sync the draft so a resume shows the
+        // text that was graded. Fire-and-forget — local cache already has it.
+        recordSubmission({
+          lessonId,
+          response,
+          gradeJson: data,
+          score: data.totalEarned,
+          possible: data.totalPossible,
+        });
+        saveDraft(lessonId, response);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -166,7 +208,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         }}
       />
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10, flexWrap: 'wrap' }}>
         <button
           onClick={submit}
           disabled={loading || response.trim().length < 20}
@@ -185,6 +227,28 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         >
           {loading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
           {loading ? 'Grading…' : result ? 'Re-submit for feedback' : 'Submit for feedback'}
+        </button>
+        <button
+          onClick={saveNow}
+          disabled={!progress.authed || saveStatus === 'saving' || response.trim().length === 0}
+          title={progress.authed ? 'Save your draft without submitting' : 'Sign in to save drafts'}
+          style={{
+            padding: '8px 14px',
+            borderRadius: 6,
+            border: '1px solid #44475a',
+            fontWeight: 600,
+            cursor: !progress.authed ? 'not-allowed' : saveStatus === 'saving' ? 'wait' : 'pointer',
+            background: 'transparent',
+            color: !progress.authed ? '#6272a4' : '#f8f8f2',
+            opacity: !progress.authed ? 0.6 : 1,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 13,
+          }}
+        >
+          {saveStatus === 'saving' ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+          {saveStatus === 'saved' ? 'Saved ✓' : saveStatus === 'error' ? 'Save failed' : 'Save draft'}
         </button>
         <span style={{ color: '#666', fontSize: 12 }}>
           {response.trim().length} chars · {response.trim().split(/\s+/).filter(Boolean).length} words
