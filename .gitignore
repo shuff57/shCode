@@ -14,5 +14,9 @@ tsconfig.tsbuildinfo
 .playwright-mcp/
 tmp/
 
+# Wrangler local dev (contains AUTH_SECRET, D1 state, etc.)
+.dev.vars
+.wrangler/
+
 # Local reference screenshots
 unit-5-1-ordered.png
