@@ -25,6 +25,23 @@ export default function AuthButton() {
   if (user) {
     return (
       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontSize: 13 }}>
+        {user.role === 'admin' && (
+          <span
+            style={{
+              display: 'inline-block',
+              padding: '2px 8px',
+              borderRadius: 4,
+              background: '#bd93f9',
+              color: '#282a36',
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
+          >
+            Admin
+          </span>
+        )}
         <span style={{ opacity: 0.8 }}>{user.email}</span>
         <button
           type="button"

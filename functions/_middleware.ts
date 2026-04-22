@@ -12,11 +12,12 @@ interface Env {
   AUTH_SECRET: string;
 }
 
-type Ctx = EventContext<Env, string, { email: string }>;
+type SessionData = { email: string; role: 'admin' | 'student' };
+type Ctx = EventContext<Env, string, SessionData>;
 
 const PUBLIC_API_PREFIXES = ['/api/auth/'];
 
-export const onRequest: PagesFunction<Env, string, { email: string }> = async (context: Ctx) => {
+export const onRequest: PagesFunction<Env, string, SessionData> = async (context: Ctx) => {
   const { request, env, next, data } = context;
   const url = new URL(request.url);
 
@@ -34,6 +35,7 @@ export const onRequest: PagesFunction<Env, string, { email: string }> = async (c
   if (!session) return json({ error: 'Invalid session' }, 401);
 
   data.email = session.email;
+  data.role = session.role;
   return next();
 };
 

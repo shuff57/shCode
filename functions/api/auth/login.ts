@@ -35,17 +35,20 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   const password = String(body.password || '');
   if (!email || !password) return json({ error: 'Invalid email or password' }, 401);
 
-  const row = await env.DB.prepare('SELECT password_hash FROM students WHERE email = ?')
+  const row = await env.DB.prepare(
+    'SELECT password_hash, role FROM students WHERE email = ?',
+  )
     .bind(email)
-    .first<{ password_hash: string }>();
+    .first<{ password_hash: string; role: string }>();
   if (!row) return json({ error: 'Invalid email or password' }, 401);
 
   const ok = await verifyPassword(password, row.password_hash);
   if (!ok) return json({ error: 'Invalid email or password' }, 401);
 
-  const token = await signSession(email, env.AUTH_SECRET);
+  const role = row.role === 'admin' ? 'admin' : 'student';
+  const token = await signSession(email, role, env.AUTH_SECRET);
   const secure = new URL(request.url).protocol === 'https:';
-  return json({ email }, 200, {
+  return json({ email, role }, 200, {
     'Set-Cookie': buildSessionCookie(token, 60 * 60 * 24 * 30, secure),
   });
 };

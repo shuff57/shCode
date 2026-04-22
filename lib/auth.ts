@@ -2,8 +2,11 @@
 // Uses same-origin cookies — the session cookie is HttpOnly and managed
 // by the server.
 
+export type Role = 'admin' | 'student';
+
 export interface CurrentUser {
   email: string;
+  role: Role;
 }
 
 export class AuthError extends Error {
@@ -30,8 +33,9 @@ async function fetchCurrentUser(): Promise<CurrentUser | null> {
   try {
     const res = await fetch('/api/me', { credentials: 'same-origin' });
     if (!res.ok) return null;
-    const data = (await res.json()) as { email?: string };
-    return data.email ? { email: data.email } : null;
+    const data = (await res.json()) as { email?: string; role?: string };
+    if (!data.email) return null;
+    return { email: data.email, role: data.role === 'admin' ? 'admin' : 'student' };
   } catch {
     return null;
   }
@@ -50,11 +54,11 @@ async function postAuth(path: string, body: unknown): Promise<CurrentUser> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  let data: { email?: string; error?: string } = {};
+  let data: { email?: string; role?: string; error?: string } = {};
   try { data = await res.json(); } catch { /* empty body */ }
   if (!res.ok) throw new AuthError(res.status, data.error || `${res.status}`);
   if (!data.email) throw new AuthError(500, 'No email in response');
-  cache = { email: data.email };
+  cache = { email: data.email, role: data.role === 'admin' ? 'admin' : 'student' };
   return cache;
 }
 

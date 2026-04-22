@@ -84,20 +84,26 @@ function secretBytes(secret: string): Uint8Array {
   return new TextEncoder().encode(secret);
 }
 
-export async function signSession(email: string, secret: string): Promise<string> {
-  return new SignJWT({ email })
+export type Role = 'admin' | 'student';
+
+export async function signSession(email: string, role: Role, secret: string): Promise<string> {
+  return new SignJWT({ email, role })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(`${SESSION_TTL_SECONDS}s`)
     .sign(secretBytes(secret));
 }
 
-export async function verifySession(token: string, secret: string): Promise<{ email: string } | null> {
+export async function verifySession(
+  token: string,
+  secret: string,
+): Promise<{ email: string; role: Role } | null> {
   try {
     const { payload } = await jwtVerify(token, secretBytes(secret));
     const email = String(payload.email || '').toLowerCase();
     if (!email) return null;
-    return { email };
+    const role = payload.role === 'admin' ? 'admin' : 'student';
+    return { email, role };
   } catch {
     return null;
   }
@@ -132,4 +138,18 @@ export function readSessionCookie(request: Request): string | null {
 
 export function normalizeEmail(raw: string): string {
   return String(raw || '').trim().toLowerCase();
+}
+
+// ---- Role resolution ----
+
+/** True when the email appears in the ADMIN_EMAILS env var (comma-separated,
+ *  case-insensitive). Used at signup time to decide a new user's role. */
+export function isAdminEmail(email: string, adminEmailsVar: string | undefined): boolean {
+  if (!adminEmailsVar) return false;
+  const normalized = normalizeEmail(email);
+  return adminEmailsVar
+    .split(',')
+    .map((s) => normalizeEmail(s))
+    .filter(Boolean)
+    .includes(normalized);
 }

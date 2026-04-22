@@ -1,13 +1,14 @@
-// GET /api/me — returns the signed-in student's email so the client can
-// decide whether to show "sign in" or "welcome back" UI without having to
-// decode the Access cookie itself.
+// GET /api/me — returns the signed-in student's email + role so the client
+// can show admin UI without having to decode the session cookie itself.
 
-type Ctx = EventContext<Record<string, unknown>, string, { email: string }>;
+type Session = { email: string; role: 'admin' | 'student' };
+type Ctx = EventContext<Record<string, unknown>, string, Session>;
 
-export const onRequestGet: PagesFunction<Record<string, unknown>, string, { email: string }> = async (
+export const onRequestGet: PagesFunction<Record<string, unknown>, string, Session> = async (
   context: Ctx,
 ) => {
-  return new Response(JSON.stringify({ email: context.data.email }), {
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return new Response(
+    JSON.stringify({ email: context.data.email, role: context.data.role }),
+    { headers: { 'Content-Type': 'application/json' } },
+  );
 };
