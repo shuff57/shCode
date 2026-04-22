@@ -1,8 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { CircleCheck, Circle } from 'lucide-react';
-import { loadCourseProgress, markLessonComplete, saveCourseProgress } from '../lib/progress';
+import {
+  recordLessonCompleted,
+  resetLessonState,
+  useLessonState,
+} from '../lib/progress';
 
 interface Props {
   lessonId: string;
@@ -20,14 +23,8 @@ const TYPE_VERB: Record<string, string> = {
 };
 
 export default function CompletionPanel({ lessonId, lessonType, description }: Props) {
-  const [complete, setComplete] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    const progress = loadCourseProgress();
-    setComplete(progress.completedLessons.includes(lessonId));
-    setLoaded(true);
-  }, [lessonId]);
+  const snap = useLessonState();
+  const complete = snap.states[lessonId] === 'completed';
 
   const verb = TYPE_VERB[lessonType] ?? 'finished this lesson';
   const title = 'Mark as complete';
@@ -35,18 +32,13 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
 
   function toggle() {
     if (complete) {
-      // Undo completion
-      const progress = loadCourseProgress();
-      progress.completedLessons = progress.completedLessons.filter((id) => id !== lessonId);
-      saveCourseProgress(progress);
-      setComplete(false);
+      resetLessonState(lessonId);
     } else {
-      markLessonComplete(lessonId, 1);
-      setComplete(true);
+      recordLessonCompleted(lessonId, 1);
     }
   }
 
-  if (!loaded) return null;
+  if (!snap.loaded) return null;
 
   return (
     <section
@@ -75,12 +67,15 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
         </span>
         <button
           onClick={toggle}
+          disabled={!snap.authed}
+          title={snap.authed ? undefined : 'Sign in to track progress'}
           style={{
             padding: '8px 16px',
             borderRadius: 6,
             border: 'none',
             fontWeight: 600,
-            cursor: 'pointer',
+            cursor: snap.authed ? 'pointer' : 'not-allowed',
+            opacity: snap.authed ? 1 : 0.5,
             background: complete ? '#44475a' : '#50fa7b',
             color: complete ? '#f8f8f2' : '#282a36',
           }}

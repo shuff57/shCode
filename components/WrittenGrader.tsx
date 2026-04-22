@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { CircleCheck, CircleX, Circle, Loader2, Lightbulb, Sparkles } from 'lucide-react';
-import { markLessonComplete } from '../lib/progress';
+import { recordLessonCompleted } from '../lib/progress';
 
 export interface AiRubricItem {
   id: string;
@@ -121,7 +121,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       }
       setResult(data as GradeResult);
       if (data.totalEarned / data.totalPossible >= 0.7) {
-        markLessonComplete(lessonId, data.totalEarned);
+        recordLessonCompleted(lessonId, data.totalEarned);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));

@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { loadCourseProgress } from '../lib/progress';
+import { useLessonState } from '../lib/progress';
 
 interface Props {
   lessonIds: string[];
@@ -9,23 +8,13 @@ interface Props {
 }
 
 export default function UnitProgressBadge({ lessonIds, label }: Props) {
-  const [done, setDone] = useState(0);
-
-  useEffect(() => {
-    const read = () => {
-      const set = new Set(loadCourseProgress().completedLessons);
-      setDone(lessonIds.filter((id) => set.has(id)).length);
-    };
-    read();
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === null || e.key === 'shCode_courseProgress') read();
-    };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
-  }, [lessonIds]);
-
+  const snap = useLessonState();
   const total = lessonIds.length;
   if (total === 0) return null;
+  if (!snap.loaded || !snap.authed) return null;
+
+  const done = lessonIds.filter((id) => snap.states[id] === 'completed').length;
+  const started = lessonIds.filter((id) => snap.states[id] === 'started').length;
   const pct = Math.round((done / total) * 100);
   const allDone = done === total;
 
@@ -33,10 +22,15 @@ export default function UnitProgressBadge({ lessonIds, label }: Props) {
     <span
       className="inline-flex items-center gap-2"
       style={{ fontSize: 12, whiteSpace: 'nowrap' }}
-      title={label ? `${label}: ${done}/${total} complete (${pct}%)` : undefined}
+      title={
+        label
+          ? `${label}: ${done}/${total} complete (${pct}%)${started ? ` · ${started} in progress` : ''}`
+          : undefined
+      }
     >
       <span
         style={{
+          position: 'relative',
           display: 'inline-block',
           width: 80,
           height: 6,
@@ -45,11 +39,22 @@ export default function UnitProgressBadge({ lessonIds, label }: Props) {
           overflow: 'hidden',
         }}
       >
+        {started > 0 ? (
+          <span
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: `${Math.round(((done + started) / total) * 100)}%`,
+              background: '#f1fa8c55',
+            }}
+          />
+        ) : null}
         <span
           style={{
-            display: 'block',
-            height: '100%',
+            position: 'absolute',
+            inset: 0,
             width: `${pct}%`,
+            height: '100%',
             background: allDone ? '#50fa7b' : '#8be9fd',
             transition: 'width 200ms ease',
           }}
