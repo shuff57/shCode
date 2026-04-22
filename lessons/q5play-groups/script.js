@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 5.3.1 Introducing Groups — spawn many sprites from a factory.
 // Uncomment each STEP and fill in the code.
 

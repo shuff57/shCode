@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 5.4.3 Side-Scrolling Platformer — Challenge
 //
 // BUILD THIS:

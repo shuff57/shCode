@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 2.1.5 Hello Sprite — your first q5play sketch.
 
 let player;

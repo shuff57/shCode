@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 5.3.2 Apple Catcher — catch falling apples with a basket.
 
 let basket, apples, score = 0;

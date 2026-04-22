@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 2.1.9 Make it Move — arrow keys drive a sprite around.
 
 let player;

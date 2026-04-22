@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 5.4.2 Camera Follow — a scrolling side-view level.
 
 let player, ground;

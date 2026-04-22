@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 5.4.1 Animated Sprites — drive properties off frameCount.
 // Uncomment each STEP and fill in the code.
 

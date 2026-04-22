@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 5.3.3 Asteroid Field — Challenge
 //
 // BUILD THIS:

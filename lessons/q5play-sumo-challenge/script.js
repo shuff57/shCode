@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 5.5.3 Two-Player Pong-Sumo — Challenge
 //
 // BUILD THIS:

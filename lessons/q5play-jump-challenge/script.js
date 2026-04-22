@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 5.1.3 Space Jumper — Challenge
 //
 // BUILD THIS:

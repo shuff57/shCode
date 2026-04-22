@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 5.2.1 Bouncy Ball — build a closed box and drop a ball in it.
 // Uncomment each STEP and fill in the code.
 

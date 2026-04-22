@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 5.5.2 Slingshot — drag near the ball to grab, release to launch.
 
 let anchor, ball, tether;

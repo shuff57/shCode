@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 5.1.3 Falling Block — a worked example of gravity + static sprites.
 
 let block, ground;

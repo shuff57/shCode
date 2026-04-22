@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 5.5.1 Joints — connect two sprites with a constraint.
 // Build one of each: DistanceJoint, HingeJoint, SliderJoint.
 // Uncomment each STEP and fill in the code.

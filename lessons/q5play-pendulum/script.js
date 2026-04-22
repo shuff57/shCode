@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 5.2.2 Swinging Pendulum — Worked Example
 
 let anchor, rod, joint;

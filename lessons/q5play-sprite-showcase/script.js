@@ -1,5 +1,3 @@
-/// <reference path="/q5play/docs/q5play.d.ts" />
-
 // 5.1.1 Sprite Showcase — six sprites, three shapes, lots of color.
 
 function setup() {
