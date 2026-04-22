@@ -81,9 +81,6 @@ export default async function HomePage() {
                       <span className="text-base">{u.title}</span>
                       <span className="ml-auto flex items-center gap-4 text-sm opacity-80">
                         <UnitProgressBadge lessonIds={moduleLessonIds} label={`Module ${u.id}`} />
-                        <span className="opacity-70">
-                          Q{u.quarter} · W{u.weeks?.[0]}–{u.weeks?.[u.weeks.length - 1]}
-                        </span>
                       </span>
                     </summary>
                     <div className="flex flex-col gap-3 p-3 border-t border-border bg-card">
