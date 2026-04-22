@@ -3,6 +3,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import { listModules, getModule } from '../../../lib/curriculum';
 import { badgeForLesson } from '../../../lib/lesson-badges';
 import { notFound } from 'next/navigation';
+import ModuleProgressFooter from '../../../components/ModuleProgressFooter';
 
 export async function generateStaticParams() {
   const modules = await listModules();
@@ -21,7 +22,7 @@ export default async function ModulePage({
   const cleanModuleHtml = DOMPurify.sanitize(html);
 
   return (
-    <main style={{ maxWidth: 960, margin: '0 auto', padding: '24px 20px', color: '#f8f8f2' }}>
+    <main style={{ maxWidth: 960, margin: '0 auto', padding: '24px 20px 88px', color: '#f8f8f2' }}>
       <nav style={{ marginBottom: 16, fontSize: 13, color: '#888' }}>
         <Link href="/" style={{ color: '#8be9fd' }}>Home</Link>
         <span style={{ margin: '0 8px' }}>›</span>
@@ -123,6 +124,11 @@ export default async function ModulePage({
         .prose a { color: #8be9fd; }
         .prose blockquote { border-left: 3px solid #bd93f9; margin: 12px 0; padding: 4px 14px; color: #ccc; background: rgba(189,147,249,0.08); }
       `}</style>
+
+      <ModuleProgressFooter
+        moduleId={summary.id}
+        lessonIds={lessons.map((l) => l.id)}
+      />
     </main>
   );
 }

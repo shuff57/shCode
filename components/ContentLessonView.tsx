@@ -32,7 +32,7 @@ export default function ContentLessonView({ lesson, prev, next, basePath = '/les
   const meta = lesson as any;
 
   return (
-    <main style={{ maxWidth: 960, margin: '0 auto', padding: '24px 20px', color: '#f8f8f2' }}>
+    <main style={{ maxWidth: 960, margin: '0 auto', padding: '24px 20px 80px', color: '#f8f8f2' }}>
       <nav style={{ marginBottom: 12, fontSize: 13, color: '#888' }}>
         <Link href="/" style={{ color: '#8be9fd' }}>Home</Link>
         {lesson.unit ? (

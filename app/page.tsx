@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import LessonCard from '../components/LessonCard';
+import UnitProgressBadge from '../components/UnitProgressBadge';
 import { loadLessons } from '../lib/lessons';
 import { listUnits } from '../lib/curriculum';
 import type { Lesson } from '../lib/types';
@@ -49,7 +50,11 @@ export default async function HomePage() {
           }
           groups.get(top)!.modules.push(m);
         }
-        return Array.from(groups.entries()).map(([top, group]) => (
+        return Array.from(groups.entries()).map(([top, group]) => {
+          const unitLessonIds = group.modules.flatMap((u) =>
+            lessonsForModule(lessons, u.id, u.category).map((l) => l.id),
+          );
+          return (
           <details
             key={top}
             open
@@ -58,20 +63,27 @@ export default async function HomePage() {
             <summary className="flex items-baseline gap-3 p-4 cursor-pointer hover:bg-muted transition list-none">
               <span className="text-2xl font-bold">Unit {top}</span>
               {group.label && <span className="text-base opacity-80">{group.label}</span>}
-              <span className="ml-auto text-sm opacity-60">
-                {group.modules.length} module{group.modules.length === 1 ? '' : 's'}
+              <span className="ml-auto flex items-center gap-4 text-sm opacity-80">
+                <UnitProgressBadge lessonIds={unitLessonIds} label={`Unit ${top}`} />
+                <span className="opacity-60">
+                  {group.modules.length} module{group.modules.length === 1 ? '' : 's'}
+                </span>
               </span>
             </summary>
             <div className="flex flex-col gap-3 p-4 border-t border-border">
               {group.modules.map((u) => {
                 const unitLessons = lessonsForModule(lessons, u.id, u.category);
+                const moduleLessonIds = unitLessons.map((l) => l.id);
                 return (
                   <details key={u.id} className="bg-muted rounded overflow-hidden">
                     <summary className="flex items-baseline gap-3 p-3 cursor-pointer hover:bg-accent transition list-none">
                       <span className="font-bold">{u.id}</span>
                       <span className="text-base">{u.title}</span>
-                      <span className="ml-auto text-sm opacity-70">
-                        Q{u.quarter} · W{u.weeks?.[0]}–{u.weeks?.[u.weeks.length - 1]}
+                      <span className="ml-auto flex items-center gap-4 text-sm opacity-80">
+                        <UnitProgressBadge lessonIds={moduleLessonIds} label={`Module ${u.id}`} />
+                        <span className="opacity-70">
+                          Q{u.quarter} · W{u.weeks?.[0]}–{u.weeks?.[u.weeks.length - 1]}
+                        </span>
                       </span>
                     </summary>
                     <div className="flex flex-col gap-3 p-3 border-t border-border bg-card">
@@ -96,7 +108,8 @@ export default async function HomePage() {
               })}
             </div>
           </details>
-        ));
+          );
+        });
       })()}
 
       <footer className="flex items-center justify-between w-2/3 mx-auto mt-8 pt-4 border-t border-border text-sm opacity-70">
