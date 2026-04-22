@@ -7898,7 +7898,7 @@ async function q5playPreSetup($, q) {
 			// draw a triangle at the shape's center to indicate rotation
 			if (s.debug && cmd.type < 5 && !s._hasCapsuleChain) {
 				$._setFillIdx($._getStrokeIdx());
-				$._doFill();
+				if (typeof $._doFill === 'function') $._doFill(); else $._doFill = true;
 				$.noStroke();
 				if (!isSensor && isFirstShape) {
 					if (cmd.type != 4) {
@@ -7921,7 +7921,7 @@ async function q5playPreSetup($, q) {
 				} else {
 					$.circle(cmd.data[0], cmd.data[1], 0.03);
 				}
-				$._doStroke();
+				if (typeof $._doStroke === 'function') $._doStroke(); else $._doStroke = true;
 			}
 
 			if (!s.debug && s.text !== undefined) {
@@ -7938,7 +7938,7 @@ async function q5playPreSetup($, q) {
 				$.textSize(s._textSize / meterSize);
 				$.text(s.text, cmd.data[0], cmd.data[1]);
 
-				$._doStroke();
+				if (typeof $._doStroke === 'function') $._doStroke(); else $._doStroke = true;
 			}
 		}
 
