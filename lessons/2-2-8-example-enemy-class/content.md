@@ -1,4 +1,4 @@
-# 2.2.7 Worked Example — Write an Enemy class
+# 2.2.8 Worked Example — Write an Enemy class
 
 Now that you know `Sprite` is a class, you're going to write one of your own. The `Enemy` class below wraps a q5play sprite, stores hit points, and knows how to take damage and despawn itself. Type it line-by-line into the in-app editor — the goal is to feel every `this.` as you go.
 

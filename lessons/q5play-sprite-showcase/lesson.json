@@ -1,40 +1,17 @@
 {
   "id": "q5play-sprite-showcase",
-  "title": "2.2.5 Sprite Showcase — API tour of the Sprite class",
-  "description": "Six sprites, three shapes, lots of color — but now read it as a tour of the Sprite CLASS. Every .color/.vel/.layer is a property; every new Sprite(...) call is a constructor.",
-  "type": "example",
+  "title": "2.2.5 Worked Example — Sprite Showcase",
+  "description": "A tour of the Sprite class re-read as OOP. Every `new Sprite(...)` is a constructor call; every `.color` / `.stroke` is a property on an instance.",
+  "type": "lesson",
   "difficulty": "beginner",
-  "estimateMins": 10,
+  "estimateMins": 12,
   "category": "Unit 2: q5play — Applied Game Development",
   "unit": "2.2 Object-Oriented Programming",
-  "preview": "q5play",
+  "preview": "example",
   "week": 12,
   "slos": ["SLO-2", "SLO-3"],
-  "steps": [
-    {
-      "id": "s1",
-      "title": "Run it",
-      "instructions": "Click Run. You'll see six sprites: rectangles, squares, circles, in different colors.",
-      "hints": ["Nothing moves yet — we'll add movement in the next lesson."]
-    },
-    {
-      "id": "s2",
-      "title": "Change a color",
-      "instructions": "Edit any `.color = '...'` line. Try 'tomato', '#8ef', 'rgba(0,255,0,0.5)'.",
-      "hints": ["Any CSS color string works."]
-    },
-    {
-      "id": "s3",
-      "title": "Resize a sprite",
-      "instructions": "Change the width/height numbers in a `new Sprite(x, y, w, h)` call.",
-      "hints": ["`new Sprite(x, y, diameter)` with one size argument makes a circle collider."]
-    },
-    {
-      "id": "s4",
-      "title": "Restore to default",
-      "instructions": "Click History → File History → 'Original (starter)' → Restore to get the code back.",
-      "hints": ["This only appears on examples — feel free to experiment without fear."]
-    }
-  ],
-  "requirements": []
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
 }

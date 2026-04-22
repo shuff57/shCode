@@ -1,4 +1,4 @@
-# 2.2.9 Worked Example — Procedural vs OOP side-by-side
+# 2.2.10 Worked Example — Procedural vs OOP side-by-side
 
 Same problem, two approaches. An "enemy fleet" needs to be spawned, tracked, and damaged. Run both versions, then answer the questions at the bottom — there's no single right answer, but your reasoning will matter in the A12.2 written reflection.
 

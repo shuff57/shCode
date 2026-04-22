@@ -375,6 +375,249 @@ function draw() {
   text('Live bullets: ' + bullets.length, 14, 24);
 }`,
       },
+      {
+        title: 'Pass through contacts',
+        body: `Sometimes you want two sprites to detect each other without physically stopping each other — like a player passing through a one-way platform, or a ghost drifting through walls. sprite.passes(other) sets up a pass-through contact relationship between this sprite and a target sprite or group. From then on, their colliders slide through each other instead of bumping.
+
+This is different from colliding() and overlapping(). colliding(target) returns how many frames the sprite has been physically hitting the target — useful when sprites solidly block each other. overlapping(target) returns how many frames two sprites have been intersecting through sensors — useful for trigger zones where no push happens.
+
+pass() is an alias for passes(). You only need to call it once (typically in setup) — the relationship stays in place until you delete one of the sprites.`,
+        code: `let player, ghostWall, solidWall;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  player = new Sprite(60, 200, 30, 30);
+  player.color = 'deepskyblue';
+  player.vel.x = 2;
+
+  ghostWall = new Sprite(200, 200, 20, 160, 'static');
+  ghostWall.color = 'plum';
+  solidWall = new Sprite(320, 200, 20, 160, 'static');
+
+  player.passes(ghostWall);
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
+        title: 'Advanced movement helpers',
+        body: `Beyond setting velocity directly, sprites have helpers that do the math for you. sprite.moveTowards(x, y, tracking) moves a sprite a fraction of the way toward a point each frame — tracking is 0 to 1, where 0.1 means "close 10% of the gap this frame". It's perfect for homing enemies or smooth camera-like follow behavior.
+
+sprite.rotateTowards(target, tracking) turns the sprite toward an angle or a position the same way. Pair it with sprite.angleTo(other) to get the raw angle between two sprites, or read sprite.bearing to see the direction the sprite is currently pointing.
+
+sprite.attractTo(target, force) applies a gravitational-style pull toward a point each frame — great for magnets or tractor beams. Because it adds force instead of setting velocity, it stacks naturally with the physics engine.`,
+        code: `let hunter, target;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  target = new Sprite(320, 320, 20, 20);
+  target.color = 'gold';
+
+  hunter = new Sprite(60, 60, 24, 24);
+  hunter.color = 'tomato';
+}
+
+function update() {
+  hunter.moveTowards(target, 0.04);
+  hunter.rotateTowards(target, 0.2);
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
+        title: 'Chain colliders',
+        body: `A chain sprite is a thin, open line built from a list of points — think ropes, wires, or the jagged edge of a hillside. You create one by passing an array of [x, y] points whose first and last points are different, so the shape stays open.
+
+Chains only collide on one side, so dynamic sprites can land on terrain without snagging. They're usually static, because you rarely want a piece of terrain to move.
+
+Each point is an absolute canvas position, not an offset from the sprite's center. Keep the points in order from one end of the chain to the other.`,
+        code: `function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 10;
+
+  new Sprite([
+    [20, 260],
+    [120, 300],
+    [220, 240],
+    [320, 320],
+    [380, 280]
+  ], 'static');
+
+  const ball = new Sprite(80, 40, 24);
+  ball.color = 'gold';
+  ball.bounciness = 0.6;
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
+        title: 'Polygon colliders',
+        body: `A polygon sprite has a custom closed shape made from a list of points. Unlike a chain, the first and last points are the same — that closing loop tells q5play the shape is solid, not an open line.
+
+Polygons are great for slopes, ramps, arrowheads, and any non-rectangular solid. Keep the points in order around the outline, and keep the shape convex (no dents) — that's what the physics engine handles cleanly.
+
+Like chains, the points are absolute canvas coordinates. The physics body and the drawn outline both come from these points; you don't need to set width or height.`,
+        code: `function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 10;
+
+  new Sprite([
+    [40, 360],
+    [200, 200],
+    [360, 360],
+    [40, 360]
+  ], 'static');
+
+  const box = new Sprite(160, 60, 30, 30);
+  box.color = 'tomato';
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
+        title: 'Adding colliders',
+        body: `A sprite can have more than one collider on its physics body. sprite.addCollider(offsetX, offsetY, w, h) tacks on an extra rectangular collider at an offset from the sprite's center — useful for L-shapes, crosses, hammers, or any compound object that isn't a simple box.
+
+The offset is measured from the sprite's center, so (0, 0) sits right on top of the original collider. The new collider rotates and moves with the sprite automatically.
+
+Adding a collider recalculates the sprite's mass but leaves its center of mass alone by default, which keeps handling predictable while you're building up a shape.`,
+        code: `let hammer;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 10;
+
+  hammer = new Sprite(200, 120, 12, 80);
+  hammer.color = 'tan';
+  hammer.addCollider(0, -50, 60, 20);
+
+  new Sprite(200, 380, 400, 20, 'static');
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
+        title: 'Adding sensors',
+        body: `Sensors are like colliders that don't push. sprite.addSensor(offsetX, offsetY, w, h) attaches a trigger zone to the sprite — other sprites pass right through, but your code can still detect the overlap with overlaps() or overlapping().
+
+Use sensors for things like "aggro range" around an enemy, pickup radius around a coin, or detection cones on a guard. They move and rotate with the sprite just like colliders do.
+
+If you call an overlap detection function on a sprite that has no sensors, q5play calls sprite.addDefaultSensors() for you — it creates sensors the same size as each collider. You can call it manually if you want that behavior without waiting for the first overlap check.`,
+        code: `let guard, player;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  guard = new Sprite(200, 200, 30, 30);
+  guard.color = 'gray';
+  guard.addSensor(0, 0, 160, 160);
+
+  player = new Sprite(60, 200, 24, 24);
+  player.color = 'deepskyblue';
+  player.vel.x = 1;
+}
+
+function draw() {
+  background('#222');
+  if (guard.overlapping(player)) guard.color = 'tomato';
+  else guard.color = 'gray';
+}`,
+      },
+      {
+        title: 'Custom update per sprite',
+        body: `Every sprite has an update function that q5play calls right before each physics step. By default it does nothing, but you can replace it with your own logic: sprite.update = function() { ... }. Inside that function, this refers to the sprite, so you can read this.x, set this.vel.y, or check input.
+
+This is handy when different sprites need different per-frame behavior and you don't want one giant global update() switch statement. Each enemy, bullet, or door can own the logic that belongs to it.
+
+The global update() function still runs too — think of sprite.update as a place for that single sprite's logic, and the top-level update() as the place for orchestration between sprites.`,
+        code: `let floater;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  floater = new Sprite(200, 200, 30, 30);
+  floater.color = 'gold';
+  floater.startY = 200;
+
+  floater.update = function() {
+    this.y = this.startY + Math.sin(frameCount / 20) * 40;
+  };
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
+        title: 'Custom draw per sprite',
+        body: `Every sprite also has a draw function, called after the physics step to render it on the canvas. You can override it the same way: sprite.draw = function() { ... }. Inside, (0, 0) is the center of the sprite and the canvas is already translated and rotated for you — so you just draw shapes relative to the middle.
+
+This is the cleanest way to add decorations like eyes on a character, a glowing halo, or a health bar above a monster, without creating a whole separate sprite just for the decoration.
+
+Your custom draw replaces the default shape entirely, so if you still want the base body drawn, either redraw it yourself or call the original function you saved first.`,
+        code: `let bot;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  bot = new Sprite(200, 200, 60, 60);
+  bot.color = 'slateblue';
+
+  bot.draw = function() {
+    fill('slateblue');
+    rect(-30, -30, 60, 60);
+    fill('white');
+    circle(-12, -8, 10);
+    circle(12, -8, 10);
+  };
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
+        title: 'Awaiting animation sequences',
+        body: `Some sprite methods return Promises so you can sequence sprite actions with async/await instead of juggling frame counters. The main ones are animation methods: sprite.playAni('name') resolves when the animation finishes playing, and sprite.playAnis('a', 'b', 'c') resolves after the whole sequence completes.
+
+Inside an async function you can await those calls one after another, and the code reads top-to-bottom like a storyboard. This is much easier than setting flags like isOpening and checking them every frame.
+
+Remember that async code keeps running while the rest of the sketch continues — the physics world does not pause. Treat awaited steps as scheduled events, not as a freeze.`,
+        code: `let door;
+
+async function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  door = new Sprite(200, 200, 60, 80);
+  door.color = 'sienna';
+
+  await door.addAni('opening', '/sprites/door.png', 6);
+  await door.playAni('opening');
+  door.color = 'gold';
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
     ],
   },
   {
@@ -626,6 +869,212 @@ function draw() {
   text('Score: ' + score, 10, 24);
 }`,
       },
+      {
+        title: 'Sleeping sprites',
+        body: `Idle sprites are expensive to simulate for no reason. q5play fixes this by letting sprites "sleep" — they sit frozen in place and skip the physics step until something touches them again. It's on by default and you rarely need to think about it.
+
+world.allowSleeping flips the feature on or off globally. Turn it off only while debugging weird stuck-sprite bugs, then turn it back on. You can also check sprite.sleeping on a single sprite to see if it dozed off, or set it to false to force it awake.
+
+A pile of stacked crates that isn't being touched will sleep within a second or two, and your frame rate stays high even with hundreds of them on screen.`,
+        code: `let awake = 0;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 10;
+  new Sprite(200, 380, 400, 20, 'static');
+  for (let i = 0; i < 20; i++) {
+    new Sprite(100 + i * 10, 50 + i * 15, 22, 22);
+  }
+}
+
+function update() {
+  awake = 0;
+  for (let s of allSprites) if (!s.sleeping) awake++;
+  if (kb.presses('space')) {
+    for (let s of allSprites) s.sleeping = false;
+  }
+}
+
+function draw() {
+  background('#222');
+  fill('white');
+  textSize(14);
+  text('awake: ' + awake + '   space=wake all', 10, 20);
+}`,
+      },
+      {
+        title: 'Controlling time',
+        body: `world.timeScale stretches or squashes simulated time. 1 is normal, 0.3 is dreamy slow-mo, 2 is frantic. Your draw() and update() still run at 60 fps — only the physics step size changes.
+
+world.physicsUpdate(step) lets you advance the simulation manually. Pair it with world.autoStep = false for a turn-based game, or call it multiple times per frame to catch up after a pause.
+
+world.realTime is wall-clock seconds since setup. world.physicsTime is seconds inside the simulation, which drifts away from realTime whenever you change timeScale or pause. Compare them to show a "bullet time" clock.`,
+        code: `let ball;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 10;
+  ball = new Sprite(200, 60, 24);
+  ball.bounciness = 0.7;
+  new Sprite(200, 380, 400, 20, 'static');
+}
+
+function update() {
+  if (kb.pressing('shift')) world.timeScale = 0.2;
+  else world.timeScale = 1;
+}
+
+function draw() {
+  background('#222');
+  fill('white');
+  textSize(14);
+  text('hold shift for slow-mo', 10, 20);
+  text('real: ' + world.realTime.toFixed(1), 10, 40);
+  text('sim:  ' + world.physicsTime.toFixed(1), 10, 58);
+}`,
+      },
+      {
+        title: 'Performance testing',
+        body: `Set world.renderStats = true and q5play draws a tiny overlay with sprite counts and timings in the top-left of the canvas. It's the fastest way to spot a scene that's getting too heavy.
+
+For a custom HUD, frameRate() returns the current frames-per-second. Read it in draw() and render it with text(). If it dips below 60 you're spending too long in update() or drawing too many sprites.
+
+As a rule: fewer sprites + smaller canvas + images instead of shape-fills = faster. Your browser's performance tab will show you exactly which line is slow when you really need to dig in.`,
+        code: `function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 10;
+  world.renderStats = true;
+  new Sprite(200, 380, 400, 20, 'static');
+  for (let i = 0; i < 60; i++) {
+    new Sprite(random(50, 350), random(0, 200), 14, 14);
+  }
+}
+
+function draw() {
+  background('#222');
+  fill('white');
+  textSize(16);
+  text('fps: ' + floor(frameRate()), 10, 380);
+}`,
+      },
+      {
+        title: 'Finding sprites at a point',
+        body: `world.getSpriteAt(x, y) returns the top-most sprite that overlaps that point, or undefined if nothing is there. world.getSpritesAt(x, y) returns every overlapping sprite, ordered by layer. Both require the sprite to have a physics body, which any default Sprite has.
+
+This is the pattern you want for click-to-select in a level editor, tower-defense placement, or any "tap a unit" menu. Read mouse.x and mouse.y in update() and hand them straight to getSpriteAt.
+
+Pass a radius argument if you want a little slop around the cursor — useful on touch screens where a finger tip isn't precise.`,
+        code: `let selected;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+  for (let i = 0; i < 6; i++) {
+    let s = new Sprite(60 + i * 55, 200, 40, 40);
+    s.color = 'steelblue';
+  }
+}
+
+function update() {
+  if (mouse.presses()) {
+    if (selected) selected.color = 'steelblue';
+    selected = world.getSpriteAt(mouse.x, mouse.y, 4);
+    if (selected) selected.color = 'tomato';
+  }
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
+        title: 'Ray casting',
+        body: `A ray cast is a line fired from a point in some direction, asking "what's the first thing I hit?". world.rayCast(startPos, direction, maxDistance) returns the first sprite the ray touches, or undefined. direction is an angle in degrees; startPos is any {x, y}.
+
+Use it for line-of-sight checks — can the enemy see the player? Aim a ray from the enemy at the player and see what comes back. If it's the player, fire. If it's a wall, hold position.
+
+world.rayCastAll returns every sprite the ray crosses, sorted by distance. Handy for piercing bullets or laser sights that need to know about every target on the line.`,
+        code: `let enemy, player, wall, seen = false;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+  enemy = new Sprite(60, 200, 26, 26);
+  enemy.color = 'crimson';
+  wall = new Sprite(220, 200, 20, 120, 'static');
+  player = new Sprite(360, 200, 26, 26);
+  player.color = 'gold';
+}
+
+function update() {
+  if (kb.pressing('up')) player.y -= 3;
+  if (kb.pressing('down')) player.y += 3;
+  let angle = atan2(player.y - enemy.y, player.x - enemy.x);
+  let hit = world.rayCast(enemy, angle, 500);
+  seen = hit === player;
+}
+
+function draw() {
+  background('#222');
+  fill('white');
+  textSize(16);
+  text(seen ? 'SPOTTED' : 'hidden', 10, 24);
+}`,
+      },
+      {
+        title: 'Meter size',
+        body: `Box2D, the physics engine under q5play, is tuned for objects between 0.1 and 10 meters wide. world.meterSize is how many pixels equal one meter, and it defaults to 60. That's why a 60 px ball feels like a soccer ball under the default gravity of 10.
+
+If your game uses tiny sprites (say 10 px bullets and 20 px enemies), bump meterSize down to about 20. If you're making a game with huge 300 px characters, raise it to 120 or so. Sprites outside the 0.1–10 meter band simulate badly — they tunnel through walls or drift weirdly.
+
+Changing meterSize changes how gravity feels without touching world.gravity.y. Smaller meters make the same gravity number look faster and punchier.`,
+        code: `function setup() {
+  new Canvas(400, 400);
+  world.meterSize = 30;
+  world.gravity.y = 10;
+  new Sprite(200, 380, 400, 20, 'static');
+  for (let i = 0; i < 8; i++) {
+    let s = new Sprite(80 + i * 30, 40, 14, 14);
+    s.bounciness = 0.5;
+  }
+}
+
+function draw() {
+  background('#222');
+  fill('white');
+  textSize(14);
+  text('meterSize = ' + world.meterSize, 10, 22);
+}`,
+      },
+      {
+        title: 'Explosions',
+        body: `world.explodeAt(x, y, radius, magnitude, falloff) shoves every sprite inside the radius away from the center point. Sprites farther from the blast get pushed less, controlled by falloff (default 0.1 means 10% weaker per pixel).
+
+magnitude is the base strength — 1 is a gentle nudge, 20 launches crates across the screen. Because the force is applied as an impulse, heavier sprites move less, which looks right.
+
+Trigger it on a click, a timer, a collision between a rocket and anything — whatever makes sense. Static sprites ignore the force, so walls stay put while everything else flies.`,
+        code: `function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 10;
+  new Sprite(200, 380, 400, 20, 'static');
+  for (let i = 0; i < 18; i++) {
+    new Sprite(random(60, 340), random(60, 300), 20, 20);
+  }
+}
+
+function update() {
+  if (mouse.presses()) {
+    world.explodeAt(mouse.x, mouse.y, 160, 8, 0.05);
+  }
+}
+
+function draw() {
+  background('#222');
+  fill('white');
+  textSize(14);
+  text('click to explode', 10, 22);
+}`,
+      },
     ],
   },
   {
@@ -872,6 +1321,269 @@ function update() {
 
 function draw() {
   background('#112');
+}`,
+      },
+      {
+        title: 'Arrow function property setters',
+        body: `Group properties accept a function instead of a fixed value. When a sprite spawns into the group, q5play calls that function with the new sprite's index (its position in the group's array) and assigns the return value to that sprite.
+
+This is the easiest way to vary a property across members. Set enemies.color to an arrow function and every enemy picks its own color the moment it spawns, based on where it lands in the group.
+
+The function runs once per sprite, at spawn time. It's not a live binding — changing the function later won't retroactively repaint existing sprites.`,
+        code: `let enemies;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  enemies = new Group();
+  enemies.diameter = 24;
+  enemies.collider = 'none';
+  enemies.color = (i) => i % 2 ? 'red' : 'blue';
+
+  for (let i = 0; i < 6; i++) {
+    new enemies.Sprite(60 + i * 50, 200);
+  }
+}
+
+function draw() {
+  background('#112');
+}`,
+      },
+      {
+        title: 'Indexed arrow setters',
+        body: `The index passed to an arrow setter is a regular number, so you can do math with it. That turns a single property assignment into a whole spawn pattern.
+
+enemies.x = (i) => 50 + i * 40 staggers sprites across a row. Combine it with a y setter that uses Math.floor(i / cols) to fill a grid. No loop body needed — just set the defaults and spawn.
+
+This also lets you keep spawn code short. A ten-line for-loop becomes three lines of group setup plus enemies.amount = 20.`,
+        code: `let grid;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  grid = new Group();
+  grid.diameter = 24;
+  grid.collider = 'none';
+  grid.color = (i) => i % 3 ? 'teal' : 'orange';
+  grid.x = (i) => 60 + (i % 6) * 50;
+  grid.y = (i) => 60 + Math.floor(i / 6) * 50;
+
+  grid.amount = 24;
+}
+
+function draw() {
+  background('#112');
+}`,
+      },
+      {
+        title: 'Tiles',
+        body: `group.addTiles(textPattern) builds a whole level from an ASCII map. Each character in the string matches a group whose .tile property equals that character, and a sprite from that group gets spawned at the corresponding cell.
+
+Set group.tile on each group first, then call walls.addTiles(map) on any one of them — it walks the whole map and routes each character to the right group. Spaces are skipped.
+
+The column width and row height default to the first tile's width and height, so give your tile groups a diameter or width/height before calling addTiles.`,
+        code: `let walls, coins;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  walls = new Group();
+  walls.tile = '#';
+  walls.color = 'gray';
+  walls.w = 24;
+  walls.h = 24;
+
+  coins = new Group();
+  coins.tile = '*';
+  coins.color = 'gold';
+  coins.diameter = 14;
+  coins.collider = 'none';
+
+  walls.addTiles([
+    '##########',
+    '#  *   * #',
+    '#   ##   #',
+    '# *    * #',
+    '##########',
+  ]);
+}
+
+function draw() {
+  background('#112');
+}`,
+      },
+      {
+        title: 'Custom properties',
+        body: `You aren't limited to q5play's built-in properties. Assign any property you like on a group and it becomes a default for every sprite spawned afterward — enemies.hp = 3 gives every new enemy an hp of 3.
+
+Each sprite gets its own copy of the value on spawn, so changing one enemy's hp doesn't affect the others. The group just holds the template.
+
+This is how you keep gameplay data attached to the right sprite. Tag sprites with custom fields like .hp, .score, .kind, or anything else your game needs, and read them back off the individual sprite during collisions.`,
+        code: `let player, enemies;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+  player = new Sprite(200, 200, 20);
+  player.color = 'white';
+
+  enemies = new Group();
+  enemies.color = 'tomato';
+  enemies.diameter = 20;
+  enemies.hp = 3;
+
+  for (let i = 0; i < 4; i++) {
+    new enemies.Sprite(80 + i * 70, 80);
+  }
+}
+
+function update() {
+  if (player.overlaps(enemies)) {
+    for (const e of enemies) {
+      if (player.overlaps(e)) { e.hp -= 1; if (e.hp <= 0) e.delete(); }
+    }
+  }
+}
+
+function draw() {
+  background('#112');
+}`,
+      },
+      {
+        title: 'Sub groups',
+        body: `Pass a parent group to new Group(parent) and you get a subgroup whose sprites automatically belong to both the subgroup and the parent. Inheritance flows both ways: the subgroup reads defaults from its parent, and any sprite spawned into the subgroup also shows up in the parent's array.
+
+That means player.overlaps(enemies) picks up everything — the plain enemies and any subgroup members like flyers or walkers — without you wiring each subgroup up by hand.
+
+Subgroups can have their own subgroups, so you can build a small hierarchy: enemies → flyers → bossFlyers. Each level inherits from the one above and feeds into it on spawn.`,
+        code: `let player, enemies, flyers;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+  player = new Sprite(200, 200, 20);
+  player.color = 'white';
+
+  enemies = new Group();
+  enemies.collider = 'none';
+  enemies.diameter = 20;
+
+  flyers = new Group(enemies);
+  flyers.color = 'violet';
+
+  new enemies.Sprite(80, 80);
+  new flyers.Sprite(320, 80);
+  new flyers.Sprite(320, 320);
+}
+
+function update() {
+  if (player.overlaps(enemies)) player.color = 'yellow';
+  else player.color = 'white';
+}
+
+function draw() {
+  background('#112');
+}`,
+      },
+      {
+        title: 'The allSprites group',
+        body: `allSprites is a built-in Group that every sprite joins automatically the moment it's created. You never construct it — it's already there as soon as q5play loads.
+
+It's useful whenever you want to touch "every sprite in the scene" at once: allSprites.length for a live count, allSprites.debug = true to see every collider outline, or for (const s of allSprites) to iterate the whole world.
+
+Since it extends Array like any other Group, the same patterns apply. A few settings are exclusive to it though — autoCull in particular only does something on allSprites.`,
+        code: `let player, rocks;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+  player = new Sprite(200, 200, 20);
+  player.color = 'white';
+
+  rocks = new Group();
+  rocks.color = 'slategray';
+  rocks.diameter = 18;
+  rocks.collider = 'none';
+  for (let i = 0; i < 5; i++) {
+    new rocks.Sprite(60 + i * 60, 320);
+  }
+}
+
+function draw() {
+  background('#112');
+  fill('white');
+  textSize(14);
+  text('allSprites: ' + allSprites.length, 14, 22);
+}`,
+      },
+      {
+        title: 'Culling',
+        body: `Sprites that drift off-camera still sit in memory and keep updating. Culling deletes them once they're far enough away. allSprites.autoCull is on by default and removes any sprite more than 10,000 pixels from the camera — a safety net against infinite spawners. Set allSprites.autoCull = false to turn that off.
+
+For tighter control, call group.cull(top, bottom, left, right) each frame to delete sprites past those margins around the camera. The margins are in pixels and each argument is optional.
+
+Pass a callback as the last argument and it runs for each culled sprite instead of deleting — handy for recycling bullets or respawning enemies off-screen.`,
+        code: `let bullets;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  bullets = new Group();
+  bullets.color = 'yellow';
+  bullets.diameter = 6;
+  bullets.collider = 'none';
+}
+
+function update() {
+  if (frameCount % 4 === 0) {
+    let b = new bullets.Sprite(0, 200);
+    b.vel.x = 5;
+  }
+  bullets.cull(50, 50, 50, 50);
+}
+
+function draw() {
+  background('#112');
+  fill('white');
+  textSize(14);
+  text('alive: ' + bullets.length, 14, 22);
+}`,
+      },
+      {
+        title: 'Group lifecycle: life, draw, update',
+        body: `group.life sets a countdown on every new sprite in the group. Each physics step subtracts world.timeScale from it, and when it reaches zero the sprite is deleted. Setting projectiles.life = 120 gives every bullet roughly two seconds at 60fps — no manual cleanup needed.
+
+group.autoDraw and group.autoUpdate let you opt a whole group out of the per-frame draw or update pass. Set decor.autoDraw = false and q5play stops drawing those sprites automatically, leaving you to draw them yourself in draw(). Same idea for autoUpdate when you want to pause physics for a group.
+
+These three flags are the main knobs for controlling when a group acts. life handles time-to-live, autoUpdate pauses logic, autoDraw pauses rendering.`,
+        code: `let sparks;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  sparks = new Group();
+  sparks.color = 'yellow';
+  sparks.diameter = 6;
+  sparks.collider = 'none';
+  sparks.life = 60;
+}
+
+function update() {
+  let s = new sparks.Sprite(200, 200);
+  s.vel.x = Math.random() * 4 - 2;
+  s.vel.y = Math.random() * 4 - 2;
+}
+
+function draw() {
+  background('#112');
+  fill('white');
+  textSize(14);
+  text('sparks: ' + sparks.length, 14, 22);
 }`,
       },
     ],
@@ -1201,6 +1913,33 @@ function draw() {
   }
 }`,
       },
+      {
+        title: 'Grab sprites with the mouse',
+        body: `Set sprite.grabbable = true and q5play lets the player click-and-drag that sprite with the mouse or a touch pointer. Under the hood q5play creates a GrabberJoint that pulls the sprite toward the pointer with a spring force, so it still respects gravity, mass, and collisions with other sprites.
+
+You can also set group.grabbable = true to make every sprite in a group draggable at once. The pointer object exposes pointer.grabs(), pointer.grabbing(), and pointer.grabbed() so your code can react the frame grabbing starts, every frame it continues, and the frame it ends.
+
+The sandbox below makes a box grabbable — click and drag it around the canvas. It'll swing from the mouse like it's on a rubber band.`,
+        code: `let box, floor;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0.5;
+
+  floor = new Sprite(200, 380, 400, 20, 'static');
+  floor.color = 'gray';
+
+  box = new Sprite(200, 200, 60, 60);
+  box.color = 'tomato';
+  box.grabbable = true;
+}
+
+function draw() {
+  background('#222');
+  if (mouse.grabs()) box.color = 'gold';
+  if (mouse.grabbed()) box.color = 'tomato';
+}`,
+      },
     ],
   },
   {
@@ -1477,6 +2216,141 @@ function update() {
 
 function draw() {
   background('#222');
+}`,
+      },
+      {
+        title: 'Groups with animations',
+        body: `A Group holds sprites that share traits, and it can also hold a whole library of animations. When you call group.addAni('walk', frames) or group.addAnis('sheet.png', '32x32', {...}), every sprite in the group inherits those animations automatically.
+
+That means you can spawn ten enemies into the same Group, and each one can call sprite.changeAni('walk') or sprite.changeAni('attack') without loading frames again. New members added later inherit too.
+
+The sandbox below builds two hand-made Anis, attaches them to a Group's anis collection, and spawns three sprites that all share the same animations — each one can switch independently.`,
+        code: `let enemies;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  const idleA = EmojiImage('\u{1F47E}', 48);
+  const idleB = EmojiImage('\u{1F47D}', 48);
+  const zapA = EmojiImage('⚡', 48);
+  const zapB = EmojiImage('✨', 48);
+
+  enemies = new Group();
+  enemies.anis.idle = new Ani(idleA, idleB);
+  enemies.anis.zap = new Ani(zapA, zapB);
+  enemies.anis.idle.frameDelay = 20;
+  enemies.anis.zap.frameDelay = 6;
+
+  for (let i = 0; i < 3; i++) {
+    const e = new enemies.Sprite(100 + i * 100, 200, 48, 48);
+    e.collider = 'none';
+    e.changeAni(i === 1 ? 'zap' : 'idle');
+  }
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
+        title: 'Cut frames',
+        body: `By default q5play draws animation frames by rendering a region of the sprite sheet directly. That is fast, but rotating or scaling a sprite can cause pixels from neighboring frames to bleed in at the edges.
+
+Setting anis.cutFrames = true tells q5play to slice each frame out as its own image up front. It uses a bit more memory and takes slightly longer to load, but rotated and scaled sprites stay clean. You can also nudge where frames draw with ani.offset = { x, y } when a sheet is not perfectly centered.
+
+The sandbox can't fetch a sprite sheet, so the sample below shows the pattern you'd use: enable cutFrames on the anis collection, then add animations from a URL with a frame size.`,
+        code: `let hero;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  hero = new Sprite(200, 200, 64, 64);
+  hero.collider = 'none';
+  hero.anis.cutFrames = true;
+  hero.anis.offset = { x: 0, y: -4 };
+
+  // In a real project with a sheet on disk:
+  // await hero.addAnis('hero.png', '32x32', {
+  //   idle: { row: 0, frames: 4 },
+  //   run:  { row: 1, frames: 6 },
+  // });
+
+  hero.img = EmojiImage('\u{1F9D9}', 64);
+}
+
+function update() {
+  hero.rotation += 1;
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
+        title: 'Animation sequencing',
+        body: `sprite.playAni(name) returns a Promise that resolves when the animation finishes its last frame. That makes it trivial to write cutscenes or chained moves with async/await — the code reads top-to-bottom even though each step takes many frames.
+
+You can also call sprite.playAnis('windup', 'slash', 'recover') to run a sequence in order, or await sprite.changeAni('attack') when you want the non-looping ani to complete before moving on.
+
+The sandbox example waits on a two-frame "wave" to finish, then switches back to idle. In a real game this is how you'd block input during a finishing move or gate a door behind a boss's death animation.`,
+        code: `let hero;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  const idle = new Ani(EmojiImage('\u{1F642}', 64), EmojiImage('\u{1F60A}', 64));
+  const wave = new Ani(EmojiImage('\u{1F44B}', 64), EmojiImage('✋', 64));
+  idle.name = 'idle';
+  wave.name = 'wave';
+  wave.looping = false;
+  wave.frameDelay = 30;
+
+  hero = new Sprite(200, 200, 64, 64);
+  hero.collider = 'none';
+  hero.anis.idle = idle;
+  hero.anis.wave = wave;
+  hero.changeAni('idle');
+
+  runCutscene();
+}
+
+async function runCutscene() {
+  await hero.playAni('wave');
+  hero.changeAni('idle');
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
+        title: 'Visuals (no physics)',
+        body: `Sprite is the physics-aware drawable, but q5play also ships a plain Visual class — the same drawing features (img, ani, anis, position) without a Box2D body. Visuals are perfect for HUD icons, floating damage numbers, decorative particles, or anything that shouldn't collide.
+
+A Visuals collection works like a Group for Visuals. You can cull offscreen ones with visuals.cull(...), assign shared animations with visuals.addAni, and draw them all with visuals.draw().
+
+The sandbox below mixes a physics sprite with a floating HUD visual. The visual ignores gravity and colliders entirely — it's just an image positioned wherever you like.`,
+        code: `let player, coinIcon;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0.5;
+
+  player = new Sprite(200, 350, 40, 40);
+  player.color = 'skyblue';
+
+  coinIcon = new Visual();
+  coinIcon.img = EmojiImage('\u{1FA99}', 32);
+  coinIcon.x = 30;
+  coinIcon.y = 30;
+}
+
+function draw() {
+  background('#222');
+  coinIcon.draw();
 }`,
       },
     ],

@@ -1,6 +1,6 @@
 {
-  "id": "2-2-12-challenges",
-  "title": "2.2.12 Challenges — Optional Stretch",
+  "id": "2-2-13-challenges",
+  "title": "2.2.13 Challenges — Optional Stretch",
   "description": "Pick one (or more) OOP stretch challenges — extend your Enemy class, write a Player class, or try subclassing with `extends`. Auto-graded.",
   "type": "challenge",
   "difficulty": "intermediate",

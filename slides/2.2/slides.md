@@ -602,7 +602,7 @@ The rule of thumb: if you find yourself writing parallel arrays and helper funct
 
 Write a `Collectible` class, instantiate 5 or more, detect overlap with the player, and accumulate a score.
 
-Find the full lab in-app: **2.2.10 Collectible Class**.
+Find the full lab in-app: **2.2.11 Collectible Class**.
 
 ```js
 class Collectible {
@@ -659,7 +659,7 @@ If one is missing, partial credit applies per the rubric.
 
 # Challenge — optional stretch
 
-Done early? Three optional extensions from the 2.2.12 Challenges lesson:
+Done early? Three optional extensions from the 2.2.13 Challenges lesson:
 
 <v-click>
 

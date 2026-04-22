@@ -1,7 +1,7 @@
 {
-  "id": "2-2-9-example-proc-vs-oop",
-  "title": "2.2.9 Worked Example — Procedural vs OOP side-by-side",
-  "description": "The same 'enemy fleet' problem written two ways: parallel arrays (procedural) and an array of class instances (OOP). Side-by-side. Pick which one you'd want to extend.",
+  "id": "2-2-8-example-enemy-class",
+  "title": "2.2.8 Worked Example — Write an Enemy class",
+  "description": "A full working `Enemy` class with `constructor(x, y, hp)`, a `damage(n)` method that removes the sprite at 0 hp, and a `render()` method. Press space to damage.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 15,
