@@ -1,10 +1,13 @@
 /**
- * Minimal Ollama client for auto-grading written work.
- * Calls POST /api/chat with format: "json" so the model returns structured output.
- * Default endpoint: http://localhost:11434 — override with OLLAMA_HOST env var.
+ * Ollama client — works against both a local daemon (http://localhost:11434)
+ * and Ollama's hosted cloud API (https://ollama.com). Pass an apiKey to use
+ * the cloud; the call adds `Authorization: Bearer <key>` automatically.
+ *
+ * This module is imported from both the Next.js route handler (where
+ * process.env is available) and a Cloudflare Pages Function (where it
+ * isn't). Don't read process.env at module load — callers pass host/apiKey
+ * explicitly.
  */
-
-const DEFAULT_HOST = process.env.OLLAMA_HOST || 'http://localhost:11434';
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -16,6 +19,7 @@ export interface OllamaChatOptions {
   messages: ChatMessage[];
   temperature?: number;
   host?: string;
+  apiKey?: string;
   timeoutMs?: number;
   /** When true, request format: "json" for structured output. */
   json?: boolean;
@@ -29,15 +33,28 @@ export interface OllamaChatResponse {
   eval_count?: number;
 }
 
+function resolveHost(host: string | undefined, apiKey: string | undefined): string {
+  if (host) return host;
+  // If a key is provided, default to the cloud; otherwise default to local.
+  return apiKey ? 'https://ollama.com' : 'http://localhost:11434';
+}
+
+function authHeaders(apiKey: string | undefined): Record<string, string> {
+  return apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+}
+
 export async function chat(opts: OllamaChatOptions): Promise<OllamaChatResponse> {
-  const host = opts.host || DEFAULT_HOST;
+  const host = resolveHost(opts.host, opts.apiKey);
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), opts.timeoutMs ?? 120_000);
 
   try {
     const res = await fetch(`${host}/api/chat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders(opts.apiKey),
+      },
       body: JSON.stringify({
         model: opts.model,
         messages: opts.messages,
@@ -61,11 +78,19 @@ export async function chat(opts: OllamaChatOptions): Promise<OllamaChatResponse>
   }
 }
 
-export async function isReachable(host = DEFAULT_HOST, timeoutMs = 2000): Promise<boolean> {
+export async function isReachable(
+  host?: string,
+  apiKey?: string,
+  timeoutMs = 2000,
+): Promise<boolean> {
+  const resolved = resolveHost(host, apiKey);
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch(`${host}/api/tags`, { signal: controller.signal });
+    const res = await fetch(`${resolved}/api/tags`, {
+      signal: controller.signal,
+      headers: authHeaders(apiKey),
+    });
     return res.ok;
   } catch {
     return false;

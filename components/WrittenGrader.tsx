@@ -92,9 +92,10 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
     setError(null);
     setOffline(false);
     try {
-      const res = await fetch('/api/grade-written/', {
+      const res = await fetch('/api/grade-written', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify({
           lessonId,
           lessonTitle,
@@ -105,14 +106,20 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
           contextDocs: config.contextDocs,
         }),
       });
-      const data = await res.json();
-      if (!data.ok) {
-        setError(data.error || 'Grading failed.');
-        if (data.offline) setOffline(true);
+      const text = await res.text();
+      let data: any;
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch {
+        setError(`Grader returned a non-JSON response (HTTP ${res.status}). Ask your teacher — the Ollama key or endpoint may not be configured.`);
+        return;
+      }
+      if (!data || !data.ok) {
+        setError(data?.error || `Grading failed (HTTP ${res.status}).`);
+        if (data?.offline) setOffline(true);
         return;
       }
       setResult(data as GradeResult);
-      // Mark lesson complete if score is passing (70% by default)
       if (data.totalEarned / data.totalPossible >= 0.7) {
         markLessonComplete(lessonId, data.totalEarned);
       }

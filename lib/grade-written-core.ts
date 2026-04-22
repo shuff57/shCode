@@ -1,25 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { chat, isReachable } from '../../../lib/ollama';
-import { sections as docSections } from '../../../lib/q5play-docs';
+// Shared prompt construction + response shaping for the AI essay grader.
+// Used by the Next.js route handler (local dev via `npm run dev`) and the
+// Cloudflare Pages Function (prod). Keeping this in one place avoids the
+// two paths drifting.
 
-interface RubricItem {
+import { sections as docSections } from './q5play-docs';
+
+export interface RubricItem {
   id: string;
   title: string;
   description?: string;
   points: number;
 }
 
-interface GradeRequest {
+export interface GradeRequest {
   lessonId: string;
   lessonTitle: string;
-  prompt: string;            // the original assignment prompt
-  response: string;          // student response
+  prompt: string;
+  response: string;
   rubric: RubricItem[];
   model?: string;
-  contextDocs?: string[];    // q5play-docs section slugs to include as reference
+  contextDocs?: string[];
 }
 
-interface CriterionResult {
+export interface CriterionResult {
   id: string;
   earned: number;
   max: number;
@@ -27,7 +30,7 @@ interface CriterionResult {
   feedback: string;
 }
 
-interface GradeResponse {
+export interface GradeResponse {
   ok: true;
   totalEarned: number;
   totalPossible: number;
@@ -51,10 +54,9 @@ function buildDocContext(slugs: string[] | undefined): string {
   return chunks.join('\n\n');
 }
 
-// Flat outline of every section + page in the in-app q5play docs. Included in
-// every grade request so the model knows what pages exist even when a topic
-// isn't in the lesson's contextDocs. The [slug] prefix is the section's URL
-// segment at /docs/q5play/[slug].
+// Flat outline of every section + page in the in-app q5play docs, so the
+// model can cite specific pages by exact title even when a lesson doesn't
+// list them in contextDocs.
 function buildDocOutline(): string {
   const lines: string[] = [];
   for (const section of docSections) {
@@ -66,7 +68,7 @@ function buildDocOutline(): string {
   return lines.join('\n');
 }
 
-function buildPrompt(req: GradeRequest): { system: string; user: string } {
+export function buildPrompt(req: GradeRequest): { system: string; user: string } {
   const docContext = buildDocContext(req.contextDocs);
   const docOutline = buildDocOutline();
   const rubricText = req.rubric
@@ -116,80 +118,26 @@ Grade now. Return JSON only.`;
   return { system, user };
 }
 
-export async function POST(req: NextRequest) {
-  let body: GradeRequest;
+// Parse the model output (possibly wrapped in prose) into structured JSON,
+// or return null if no JSON object can be extracted.
+export function parseModelJson(raw: string): any | null {
   try {
-    body = await req.json();
+    return JSON.parse(raw);
+  } catch {}
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) return null;
+  try {
+    return JSON.parse(match[0]);
   } catch {
-    return NextResponse.json({ ok: false, error: 'Invalid JSON body' }, { status: 400 });
+    return null;
   }
+}
 
-  if (!body.response || body.response.trim().length < 20) {
-    return NextResponse.json(
-      { ok: false, error: 'Response is empty or too short. Write at least a few sentences.' },
-      { status: 400 },
-    );
-  }
-  if (!body.rubric || body.rubric.length === 0) {
-    return NextResponse.json({ ok: false, error: 'Missing rubric' }, { status: 400 });
-  }
-
-  const model = body.model || 'qwen3-coder-next:cloud';
-  const reachable = await isReachable();
-  if (!reachable) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: 'Ollama is not reachable at http://localhost:11434. Start Ollama and try again. Your teacher can grade manually as a fallback.',
-        offline: true,
-      },
-      { status: 503 },
-    );
-  }
-
-  const { system, user } = buildPrompt(body);
-
-  let raw: string;
-  try {
-    const response = await chat({
-      model,
-      json: true,
-      temperature: 0.2,
-      timeoutMs: 180_000,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: user },
-      ],
-    });
-    raw = response.message.content;
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ ok: false, error: `Ollama call failed: ${msg}` }, { status: 502 });
-  }
-
-  let parsed: any;
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    const match = raw.match(/\{[\s\S]*\}/);
-    if (!match) {
-      return NextResponse.json(
-        { ok: false, error: 'Model did not return JSON. Try again or ask your teacher.', raw: raw.slice(0, 500) },
-        { status: 502 },
-      );
-    }
-    try {
-      parsed = JSON.parse(match[0]);
-    } catch {
-      return NextResponse.json(
-        { ok: false, error: 'Could not parse model output', raw: raw.slice(0, 500) },
-        { status: 502 },
-      );
-    }
-  }
-
-  const criteria: CriterionResult[] = body.rubric.map((r) => {
-    const match = (parsed.criteria || []).find((c: any) => c.id === r.id);
+// Clamp + shape the model's output into our GradeResponse wire format.
+// Defensive: the model sometimes omits items or returns scores out of range.
+export function shapeResult(parsed: any, rubric: RubricItem[]): GradeResponse {
+  const criteria: CriterionResult[] = rubric.map((r) => {
+    const match = (parsed?.criteria || []).find((c: any) => c.id === r.id);
     const earnedRaw = Number(match?.earned ?? 0);
     const earned = Math.max(0, Math.min(r.points, isFinite(earnedRaw) ? earnedRaw : 0));
     const verdict: CriterionResult['verdict'] =
@@ -205,18 +153,26 @@ export async function POST(req: NextRequest) {
     };
   });
   const totalEarned = criteria.reduce((s, c) => s + c.earned, 0);
-  const totalPossible = body.rubric.reduce((s, r) => s + r.points, 0);
-  const hints = Array.isArray(parsed.hints)
+  const totalPossible = rubric.reduce((s, r) => s + r.points, 0);
+  const hints = Array.isArray(parsed?.hints)
     ? parsed.hints.slice(0, 3).map((h: any) => String(h).slice(0, 250))
     : [];
-
-  const result: GradeResponse = {
+  return {
     ok: true,
     totalEarned,
     totalPossible,
     criteria,
-    summary: String(parsed.summary || '').slice(0, 600),
+    summary: String(parsed?.summary || '').slice(0, 600),
     hints,
   };
-  return NextResponse.json(result);
+}
+
+export function validateRequest(body: Partial<GradeRequest>): string | null {
+  if (!body.response || body.response.trim().length < 20) {
+    return 'Response is empty or too short. Write at least a few sentences.';
+  }
+  if (!body.rubric || body.rubric.length === 0) {
+    return 'Missing rubric';
+  }
+  return null;
 }

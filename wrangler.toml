@@ -28,3 +28,11 @@ database_id = "de53517f-5d1f-4d70-a1f9-13d463abb76f"
 # a .dev.vars file at repo root:
 #
 #   AUTH_SECRET=local-dev-secret-$(openssl rand -hex 16)
+
+# OLLAMA_API_KEY powers the AI essay grader in functions/api/grade-written.ts.
+# Create a key at https://ollama.com/settings/keys and store it as a secret:
+#
+#   npx wrangler pages secret put OLLAMA_API_KEY --project-name shcode
+#
+# Optional: set OLLAMA_HOST if you ever want to point at something other than
+# https://ollama.com (e.g. a self-hosted proxy). Plain env var, not a secret.

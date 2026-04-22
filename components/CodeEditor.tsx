@@ -193,6 +193,19 @@ export default function CodeEditor() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFile]);
 
+  // Sync store-driven content changes (restore commit / restore version /
+  // upload) back into the CodeMirror doc. Skip when the change originated
+  // from the editor itself to avoid clobbering the cursor on every keystroke.
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    const next = value ?? '';
+    if (view.state.doc.toString() === next) return;
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: next },
+    });
+  }, [value]);
+
   if (!currentFile) {
     return <div style={{ padding: 16, color: '#888' }}>No file selected</div>;
   }
