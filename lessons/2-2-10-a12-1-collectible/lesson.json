@@ -1,0 +1,47 @@
+{
+  "id": "2-2-10-a12-1-collectible",
+  "title": "2.2.10 Collectible Class",
+  "description": "Write a Collectible class, instantiate at least 5, and detect overlap with the player. SLO-2 lab — the class is the point.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 45,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.2 Object-Oriented Programming",
+  "preview": "q5play",
+  "week": 12,
+  "slos": ["SLO-2", "SLO-3"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Define the Collectible class",
+      "instructions": "Write `class Collectible { }` with a `constructor(x, y, value, color)`. Store `x`, `y`, and `value` on `this`. Create `this.sprite = new Sprite(x, y, 20, 20)` and set its color.",
+      "hints": ["Inside the constructor, `this` refers to the new object being built.", "Sprite size is up to you — 15-25 works well."]
+    },
+    {
+      "id": "s2",
+      "title": "Add a collect() method",
+      "instructions": "Add a `collect()` method on the class that calls `this.sprite.remove()` and returns `this.value`.",
+      "hints": ["Method syntax: `collect() { ... }` — no `function` keyword inside a class.", "`sprite.remove()` despawns it from the world."]
+    },
+    {
+      "id": "s3",
+      "title": "Instantiate at least 5 Collectibles",
+      "instructions": "In `setup()` (after the player is created), push at least 5 `new Collectible(...)` into the `collectibles` array at different positions. Give them different values and colors.",
+      "hints": ["Use a loop if you want: `for (let i = 0; i < 5; i++) { collectibles.push(new Collectible(...)); }`"]
+    },
+    {
+      "id": "s4",
+      "title": "Detect overlaps and collect",
+      "instructions": "In `draw()`, iterate the `collectibles` array. If `player.overlaps(c.sprite)`, call `c.collect()`, add the return value to `totalScore`, and remove that item from the array.",
+      "hints": ["Iterate backwards when removing during iteration: `for (let i = collectibles.length - 1; i >= 0; i--)`.", "`sprite.overlaps(other)` returns a boolean."]
+    }
+  ],
+  "requirements": [
+    { "id": "r1", "title": "Class defined", "description": "A `Collectible` class exists.", "type": "regex", "file": "script.js", "pattern": "class\\s+Collectible\\s*\\{", "flags": "", "points": 8 },
+    { "id": "r2", "title": "Constructor present", "description": "The class has a constructor.", "type": "regex", "file": "script.js", "pattern": "constructor\\s*\\(", "flags": "", "points": 6 },
+    { "id": "r3", "title": "collect() method", "description": "A collect method exists in the class.", "type": "regex", "file": "script.js", "pattern": "collect\\s*\\(\\s*\\)", "flags": "", "points": 6 },
+    { "id": "r4", "title": "At least one instance", "description": "At least one Collectible is instantiated.", "type": "regex", "file": "script.js", "pattern": "new\\s+Collectible\\s*\\(", "flags": "", "points": 6 },
+    { "id": "r5", "title": "Overlap detection", "description": "The code checks for overlap between player and a sprite.", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "\\.overlaps\\s*\\(", "flags": "", "points": 4 }
+  ],
+  "grading": { "totalPoints": 30, "passingScore": 20, "allowLateSubmit": true }
+}

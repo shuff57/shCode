@@ -1,5 +1,7 @@
 'use client';
 
+import { forwardRef } from 'react';
+
 // Base64-url-safe encoder for UTF-8 strings.
 function encodeCode(code: string): string {
   const utf8 = unescape(encodeURIComponent(code));
@@ -12,7 +14,10 @@ interface Props {
   runKey: number;
 }
 
-export default function Q5PlayPreview({ code, runKey }: Props) {
+const Q5PlayPreview = forwardRef<HTMLIFrameElement, Props>(function Q5PlayPreview(
+  { code, runKey },
+  ref
+) {
   if (runKey === 0 || !code.trim()) {
     return (
       <div className="jscad-empty">
@@ -23,6 +28,7 @@ export default function Q5PlayPreview({ code, runKey }: Props) {
   const src = `/q5play/runner.html?code=${encodeCode(code)}&r=${runKey}`;
   return (
     <iframe
+      ref={ref}
       key={runKey}
       id="preview"
       className="jscad-frame"
@@ -30,4 +36,6 @@ export default function Q5PlayPreview({ code, runKey }: Props) {
       src={src}
     />
   );
-}
+});
+
+export default Q5PlayPreview;

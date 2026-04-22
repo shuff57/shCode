@@ -1,0 +1,17 @@
+{
+  "id": "2-2-8-reading-parallel-vs-classes",
+  "title": "2.2.8 Reading — Parallel Arrays vs Classes",
+  "description": "Side-by-side comparison of the same problem (an 'enemy fleet') solved two ways: with parallel arrays (procedural) and with an array of class instances (OOP). Read between the Enemy class example and the Procedural-vs-OOP example.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.2 Object-Oriented Programming",
+  "preview": "reading",
+  "week": 12,
+  "slos": ["SLO-2", "SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

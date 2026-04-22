@@ -1,0 +1,17 @@
+{
+  "id": "2-2-9-example-proc-vs-oop",
+  "title": "2.2.9 Worked Example — Procedural vs OOP side-by-side",
+  "description": "The same 'enemy fleet' problem written two ways: parallel arrays (procedural) and an array of class instances (OOP). Side-by-side. Pick which one you'd want to extend.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.2 Object-Oriented Programming",
+  "preview": "example",
+  "week": 12,
+  "slos": ["SLO-2", "SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

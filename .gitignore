@@ -3,6 +3,9 @@ node_modules
 out
 npm-debug.log*
 
+# Slidev build output — regenerated on each Pages deploy via `npm run prebuild`
+public/slides/
+
 # TypeScript incremental build info
 tsconfig.tsbuildinfo
 

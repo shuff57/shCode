@@ -1,15 +1,15 @@
 {
   "id": "q5play-sprite-showcase",
-  "title": "5.1.1 Sprite Showcase — Example",
-  "description": "A tour of what a sprite can look like: colors, shapes, sizes. Read the code, run it, change things.",
+  "title": "2.2.5 Sprite Showcase — API tour of the Sprite class",
+  "description": "Six sprites, three shapes, lots of color — but now read it as a tour of the Sprite CLASS. Every .color/.vel/.layer is a property; every new Sprite(...) call is a constructor.",
   "type": "example",
   "difficulty": "beginner",
   "estimateMins": 10,
-  "category": "Unit 5: q5play — Game Physics",
-  "unit": "5.1 Sprites & Movement",
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.2 Object-Oriented Programming",
   "preview": "q5play",
-  "week": 13,
-  "slos": ["SLO-1"],
+  "week": 12,
+  "slos": ["SLO-2", "SLO-3"],
   "steps": [
     {
       "id": "s1",

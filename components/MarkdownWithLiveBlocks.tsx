@@ -5,20 +5,23 @@ import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
 import LiveCodeBlock from './LiveCodeBlock';
 
-// Fence accepts an optional id for persistent storage:
+// Fence accepts an optional id for persistent storage and an optional
+// `console` flag that adds a DevTools-style REPL panel under the preview:
 //
 //     ```js live id=sprite-demo
-//     ...
+//     ```js live console
+//     ```js live console id=inspect-sprite
 //     ```
 //
 // When id is omitted, we derive one by hashing the initial code so
 // edits persist across reloads without the author having to name it.
-const LIVE_FENCE = /```js live(?:\s+id=([\w-]+))?\n([\s\S]*?)```/g;
+const LIVE_FENCE = /```js live([^\n]*)\n([\s\S]*?)```/g;
 
 interface LiveChunk {
   kind: 'live';
   body: string;
   id: string;
+  showConsole: boolean;
 }
 
 interface HtmlChunkData {
@@ -47,8 +50,15 @@ function parseChunks(src: string): Chunk[] {
       chunks.push({ kind: 'html', body: src.slice(lastIndex, start) });
     }
     const body = match[2].trim();
-    const id = match[1] || `auto-${hashCode(body)}`;
-    chunks.push({ kind: 'live', body, id });
+    const tokens = match[1].trim().split(/\s+/).filter(Boolean);
+    let authorId: string | null = null;
+    let showConsole = false;
+    for (const tok of tokens) {
+      if (tok === 'console') showConsole = true;
+      else if (tok.startsWith('id=')) authorId = tok.slice(3);
+    }
+    const id = authorId ?? `auto-${hashCode(body)}`;
+    chunks.push({ kind: 'live', body, id, showConsole });
     lastIndex = start + match[0].length;
   }
   if (lastIndex < src.length) {
@@ -86,6 +96,7 @@ export default function MarkdownWithLiveBlocks({ src, lessonId }: Props) {
             code={chunk.body}
             blockId={chunk.id}
             lessonId={lessonId}
+            showConsole={chunk.showConsole}
           />
         )
       )}

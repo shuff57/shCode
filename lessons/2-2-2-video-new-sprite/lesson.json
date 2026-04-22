@@ -1,0 +1,18 @@
+{
+  "id": "2-2-2-video-new-sprite",
+  "title": "2.2.2 Video — What `new Sprite()` actually does",
+  "description": "4-min DevTools walkthrough. Opens a running q5play sketch, inspects a Sprite instance, and names what a class is. Watch before the DevTools reveal example.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 4,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.2 Object-Oriented Programming",
+  "preview": "video",
+  "week": 12,
+  "slos": ["SLO-2", "SLO-3"],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the link, or follow along in the classroom live-demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

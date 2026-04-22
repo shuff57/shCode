@@ -36,62 +36,6 @@
 	window.addEventListener('unhandledrejection', function(e) {
 		send('error', ['Unhandled rejection: ' + ((e.reason && e.reason.message) || e.reason)]);
 	});
-
-	// REPL: parent posts { source: 'preview-eval', id, expr }. We eval at
-	// global scope and post back { source: 'preview-eval-result', id, ok, text }.
-	// Indirect eval ( (0, eval) ) resolves through the global lexical env, so it
-	// sees top-level `let`/`const`/`class` bindings declared by the student script.
-	function inspect(v, depth) {
-		depth = depth || 0;
-		if (v === null) return 'null';
-		if (v === undefined) return 'undefined';
-		var t = typeof v;
-		if (t === 'string') return JSON.stringify(v);
-		if (t === 'number' || t === 'bigint' || t === 'boolean' || t === 'symbol') return String(v);
-		if (t === 'function') return 'ƒ ' + (v.name || '(anonymous)') + '()';
-		if (t !== 'object') return String(v);
-		if (v instanceof Error) return v.stack || v.message;
-		// Walk the class chain for a non-empty name so objects built from
-		// anonymous subclasses still display as `Parent { … }`.
-		var c = v.constructor;
-		var name = '';
-		while (c && c !== Function.prototype) {
-			if (c.name) { name = c.name; break; }
-			c = Object.getPrototypeOf(c);
-		}
-		var ctor = (name && name !== 'Object') ? name : '';
-		if (depth >= 1) return ctor ? ctor + ' { … }' : '{…}';
-		if (Array.isArray(v)) {
-			var items = v.slice(0, 6).map(function(x) { return inspect(x, depth + 1); });
-			if (v.length > 6) items.push('… +' + (v.length - 6));
-			return '[' + items.join(', ') + ']';
-		}
-		var keys;
-		try { keys = Object.keys(v); } catch (_) { return ctor ? ctor + ' { … }' : '{…}'; }
-		var shown = keys.slice(0, 6);
-		var pairs = shown.map(function(k) {
-			var val;
-			try { val = inspect(v[k], depth + 1); } catch (_) { val = '<unreadable>'; }
-			return k + ': ' + val;
-		});
-		if (keys.length > 6) pairs.push('… +' + (keys.length - 6));
-		return (ctor ? ctor + ' ' : '') + '{ ' + pairs.join(', ') + ' }';
-	}
-	window.addEventListener('message', function(e) {
-		var d = e.data;
-		if (!d || d.source !== 'preview-eval') return;
-		var out, ok = true, text;
-		try {
-			out = (0, eval)(d.expr);
-			text = inspect(out);
-		} catch (x) {
-			ok = false;
-			text = (x && (x.stack || x.message)) || String(x);
-		}
-		try {
-			window.parent.postMessage({ source: 'preview-eval-result', id: d.id, ok: ok, text: text }, '*');
-		} catch (_) { /* parent gone */ }
-	});
 })();
 </script>
 <script type="importmap">

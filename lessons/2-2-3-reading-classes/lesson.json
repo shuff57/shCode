@@ -1,0 +1,17 @@
+{
+  "id": "2-2-3-reading-classes",
+  "title": "2.2.3 Reading — JavaScript classes",
+  "description": "A short reading on JavaScript class syntax: `constructor`, `this`, methods, and how `new` actually builds an object. Read before the DevTools reveal example.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 12,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.2 Object-Oriented Programming",
+  "preview": "reading",
+  "week": 12,
+  "slos": ["SLO-2", "SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

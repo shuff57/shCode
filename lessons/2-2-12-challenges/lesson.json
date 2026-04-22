@@ -1,0 +1,84 @@
+{
+  "id": "2-2-12-challenges",
+  "title": "2.2.12 Challenges — Optional Stretch",
+  "description": "Pick one (or more) OOP stretch challenges — extend your Enemy class, write a Player class, or try subclassing with `extends`. Auto-graded.",
+  "type": "challenge",
+  "difficulty": "intermediate",
+  "estimateMins": 30,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.2 Object-Oriented Programming",
+  "preview": "q5play",
+  "week": 12,
+  "slos": ["SLO-2", "SLO-3"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pick a challenge (or more)",
+      "instructions": "Read the full descriptions in `content.md`. Three options, varying difficulty:\n\n1. **isAlive method** (easy) — add an `isAlive()` method to an `Enemy` class that returns `this.hp > 0`.\n2. **Player class** (medium) — write a `Player` class with `constructor(x, y)`, a `move(dir)` method setting `vel.x`, and a `jump()` method setting `vel.y`.\n3. **PowerUp subclass** (hard) — write `PowerUp extends Collectible` with a `super(x, y, value, color)` call and a `boost()` method.\n\nYou're not required to attempt all three — pick what interests you.",
+      "hints": [
+        "Even completing one challenge passes the auto-grader.",
+        "Read the hints in each challenge section of the content page."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Build in the editor",
+      "instructions": "Start from the provided `script.js` scaffold. Write at least one class with a `constructor`, instantiate it with `new`, and wire up some interaction or behavior.\n\nYou need:\n- At least one class definition\n- At least one instance created with `new`\n- At least one method called on that instance",
+      "hints": [
+        "Keep your class small — one constructor and one or two methods is plenty.",
+        "You don't need to connect to q5play sprites for this to count."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Use OOP features",
+      "instructions": "Your code must:\n\n- Define at least one class using the `class` keyword\n- Use `this` inside the class body (in the constructor or a method)\n- Call at least one method on an instance (e.g., `enemy.isAlive()`, `player.move('left')`, `powerUp.boost()`)\n\nAll three requirements are auto-graded.",
+      "hints": [
+        "The auto-grader checks your script.js for class, new, constructor, and this — make sure all four appear."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Define at least one class",
+      "description": "script.js contains at least one class definition.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "class\\s+\\w+",
+      "flags": "",
+      "points": 5
+    },
+    {
+      "id": "r2",
+      "title": "Instantiate at least one class",
+      "description": "At least one object is created with new.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+\\w+\\s*\\(",
+      "flags": "",
+      "points": 5
+    },
+    {
+      "id": "r3",
+      "title": "Write a constructor",
+      "description": "At least one class has a constructor method.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "constructor\\s*\\(",
+      "flags": "",
+      "points": 5
+    },
+    {
+      "id": "r4",
+      "title": "Use this inside a class",
+      "description": "The class body references this to access instance properties.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "this\\.\\w+",
+      "flags": "",
+      "points": 10
+    }
+  ],
+  "grading": { "totalPoints": 25, "passingScore": 15, "allowLateSubmit": true }
+}

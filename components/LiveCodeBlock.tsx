@@ -18,6 +18,7 @@ import { highlightSelectionMatches } from '@codemirror/search';
 import { tags as t } from '@lezer/highlight';
 import { Play, RotateCcw } from 'lucide-react';
 import Q5PlayPreview from './Q5PlayPreview';
+import LiveConsole from './LiveConsole';
 
 const dracula = {
   bg: '#282a36', fg: '#f8f8f2', gutter: '#282a36', gutterFg: '#6272a4',
@@ -90,6 +91,8 @@ interface Props {
    *  provided, edits persist to localStorage under
    *  `liveCodeBlock:<lessonId>:<blockId>`. */
   lessonId?: string;
+  /** When true, render a DevTools-style console + REPL under the preview. */
+  showConsole?: boolean;
 }
 
 function storageKeyFor(lessonId: string | undefined, blockId: string | undefined): string | null {
@@ -104,6 +107,7 @@ export default function LiveCodeBlock({
   previewSize = 360,
   blockId,
   lessonId,
+  showConsole = false,
 }: Props) {
   const initialCode = code.trim();
   const storageKey = storageKeyFor(lessonId, blockId);
@@ -119,6 +123,7 @@ export default function LiveCodeBlock({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [committedCode, setCommittedCode] = useState('');
   const [runKey, setRunKey] = useState(0);
 
@@ -189,9 +194,10 @@ export default function LiveCodeBlock({
           <div ref={containerRef} className="livecodeblock-editor-mount" />
         </div>
         <div className="livecodeblock-preview">
-          <Q5PlayPreview code={committedCode} runKey={runKey} />
+          <Q5PlayPreview ref={iframeRef} code={committedCode} runKey={runKey} />
         </div>
       </div>
+      {showConsole && <LiveConsole iframeRef={iframeRef} resetKey={runKey} />}
       <div className="livecodeblock-toolbar">
         <button type="button" className="livecodeblock-run" onClick={run}>
           <Play size={13} strokeWidth={2.5} /> Run

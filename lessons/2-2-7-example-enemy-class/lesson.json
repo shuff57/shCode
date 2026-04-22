@@ -1,0 +1,17 @@
+{
+  "id": "2-2-7-example-enemy-class",
+  "title": "2.2.7 Worked Example — Write an Enemy class",
+  "description": "A full working `Enemy` class with `constructor(x, y, hp)`, a `damage(n)` method that removes the sprite at 0 hp, and a `render()` method. Press space to damage.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.2 Object-Oriented Programming",
+  "preview": "example",
+  "week": 12,
+  "slos": ["SLO-2", "SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

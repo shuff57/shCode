@@ -792,7 +792,7 @@ async function q5playPreSetup($, q) {
 		}
 	};
 
-	$.Sprite = class extends $.Visual {
+	$.Sprite = class Sprite extends $.Visual {
 		static maxColliders = 128;
 
 		constructor(x, y, w, h, physicsType) {
@@ -3874,7 +3874,7 @@ async function q5playPreSetup($, q) {
 		}
 	};
 
-	$.Group = class extends $.Visuals {
+	$.Group = class Group extends $.Visuals {
 		constructor(...args) {
 			let parent;
 			if (args[0] instanceof $.Group) {
@@ -3949,13 +3949,13 @@ async function q5playPreSetup($, q) {
 
 			let _this = this;
 
-			this.Sprite = class extends $.Sprite {
+			this.Sprite = class Sprite extends $.Sprite {
 				constructor() {
 					super(_this, ...arguments);
 				}
 			};
 
-			this.Group = class extends $.Group {
+			this.Group = class Group extends $.Group {
 				constructor() {
 					super(_this, ...arguments);
 				}

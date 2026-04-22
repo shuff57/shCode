@@ -4,12 +4,17 @@
   "main": "server.js",
   "scripts": {
     "dev": "node server.js",
+    "prebuild": "npm run slides:build-all",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
     "test": "echo \"No tests\"",
+    "slides:build-all": "npm run slides:2.1:build && npm run slides:2.2:build",
     "slides:2.1": "slidev slides/2.1/slides.md --port 3030",
     "slides:2.1:build": "slidev build slides/2.1/slides.md --base /slides/2.1/ --out ../../public/slides/2.1",
-    "slides:2.1:export": "slidev export slides/2.1/slides.md --output slides/2.1/export.pdf"
+    "slides:2.1:export": "slidev export slides/2.1/slides.md --output slides/2.1/export.pdf",
+    "slides:2.2": "slidev slides/2.2/slides.md --port 3031",
+    "slides:2.2:build": "slidev build slides/2.2/slides.md --base /slides/2.2/ --out ../../public/slides/2.2",
+    "slides:2.2:export": "slidev export slides/2.2/slides.md --output slides/2.2/export.pdf"
   },
   "type": "module",
   "dependencies": {
