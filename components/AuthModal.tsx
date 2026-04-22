@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { login, signup, AuthError } from '../lib/auth';
+import { login, signup, AuthError, CurrentUser } from '../lib/auth';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onAuthenticated: (email: string) => void;
+  onAuthenticated: (user: CurrentUser) => void;
 }
 
 export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
@@ -41,7 +41,7 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
     try {
       const fn = mode === 'login' ? login : signup;
       const user = await fn(email.trim(), password);
-      onAuthenticated(user.email);
+      onAuthenticated(user);
       onClose();
     } catch (err) {
       if (err instanceof AuthError) setError(err.serverMessage);

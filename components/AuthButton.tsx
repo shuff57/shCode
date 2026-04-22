@@ -83,7 +83,7 @@ export default function AuthButton() {
       <AuthModal
         isOpen={open}
         onClose={() => setOpen(false)}
-        onAuthenticated={(email) => setUser({ email })}
+        onAuthenticated={(u) => setUser(u)}
       />
     </>
   );
