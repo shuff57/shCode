@@ -48,7 +48,8 @@ interface GradeResult {
   hints: string[];
 }
 
-const STORAGE_PREFIX = 'shCode_writtenGrader:';
+const STORAGE_PREFIX = 'shCode:written:';
+const LEGACY_STORAGE_PREFIX = 'shCode_writtenGrader:';
 
 interface StoredState {
   response: string;
@@ -57,6 +58,18 @@ interface StoredState {
 }
 
 function loadState(lessonId: string): StoredState {
+  // One-time migration from the legacy key so in-progress drafts survive.
+  try {
+    const legacyKey = LEGACY_STORAGE_PREFIX + lessonId;
+    const legacy = localStorage.getItem(legacyKey);
+    if (legacy !== null) {
+      if (localStorage.getItem(STORAGE_PREFIX + lessonId) === null) {
+        localStorage.setItem(STORAGE_PREFIX + lessonId, legacy);
+      }
+      localStorage.removeItem(legacyKey);
+    }
+  } catch {}
+
   try {
     const raw = localStorage.getItem(STORAGE_PREFIX + lessonId);
     if (raw) return JSON.parse(raw);

@@ -101,7 +101,8 @@ export function filterCommitsByPath(
 }
 
 // ---- localStorage persistence ----
-const STORAGE_KEY = 'shCode_progress';
+const STORAGE_KEY = 'shCode:progress';
+const LEGACY_STORAGE_KEY = 'shCode_progress';
 
 export function saveProgress(
   lessonId: string,
@@ -130,6 +131,14 @@ export function loadProgress(
 }
 
 function loadAllProgress(): Record<string, any> {
+  // One-time migration from the old underscore key so existing drafts
+  // survive the rename.
+  const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+  if (legacy !== null && localStorage.getItem(STORAGE_KEY) === null) {
+    localStorage.setItem(STORAGE_KEY, legacy);
+  }
+  if (legacy !== null) localStorage.removeItem(LEGACY_STORAGE_KEY);
+
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
   } catch {

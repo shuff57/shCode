@@ -67,7 +67,17 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js" crossorigin="anonymous"></script>
 
 	<script>
-		const STORAGE_KEY = 'q5play-sketch';
+		const STORAGE_KEY = 'shCode:q5play';
+		const LEGACY_STORAGE_KEY = 'q5play-sketch';
+
+		// One-time migration from the old key so existing sketches survive.
+		const legacySketch = localStorage.getItem(LEGACY_STORAGE_KEY);
+		if (legacySketch !== null) {
+			if (localStorage.getItem(STORAGE_KEY) === null) {
+				localStorage.setItem(STORAGE_KEY, legacySketch);
+			}
+			localStorage.removeItem(LEGACY_STORAGE_KEY);
+		}
 
 		const DEFAULT_SKETCH = `/// <reference path="./q5play.d.ts" />
 

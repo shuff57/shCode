@@ -89,13 +89,18 @@ interface Props {
   blockId?: string;
   /** Lesson id that hosts this block. When both lessonId and blockId are
    *  provided, edits persist to localStorage under
-   *  `liveCodeBlock:<lessonId>:<blockId>`. */
+   *  `shCode:liveBlock:<lessonId>:<blockId>`. */
   lessonId?: string;
   /** When true, render a DevTools-style console + REPL under the preview. */
   showConsole?: boolean;
 }
 
 function storageKeyFor(lessonId: string | undefined, blockId: string | undefined): string | null {
+  if (!lessonId || !blockId) return null;
+  return `shCode:liveBlock:${lessonId}:${blockId}`;
+}
+
+function legacyStorageKeyFor(lessonId: string | undefined, blockId: string | undefined): string | null {
   if (!lessonId || !blockId) return null;
   return `liveCodeBlock:${lessonId}:${blockId}`;
 }
@@ -111,12 +116,23 @@ export default function LiveCodeBlock({
 }: Props) {
   const initialCode = code.trim();
   const storageKey = storageKeyFor(lessonId, blockId);
+  const legacyKey = legacyStorageKeyFor(lessonId, blockId);
 
   // Load any saved edit synchronously so the first render of the editor
   // already reflects the student's in-progress work, avoiding a flash
   // of the original starter code on reload.
   const [editorCode, setEditorCode] = useState<string>(() => {
     if (!storageKey || typeof window === 'undefined') return initialCode;
+    // One-time migration from the old `liveCodeBlock:*` key.
+    if (legacyKey) {
+      const legacyValue = window.localStorage.getItem(legacyKey);
+      if (legacyValue !== null) {
+        if (window.localStorage.getItem(storageKey) === null) {
+          window.localStorage.setItem(storageKey, legacyValue);
+        }
+        window.localStorage.removeItem(legacyKey);
+      }
+    }
     const saved = window.localStorage.getItem(storageKey);
     return saved !== null ? saved : initialCode;
   });
