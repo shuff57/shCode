@@ -15,9 +15,20 @@ export default function AuthButton() {
       .finally(() => setLoaded(true));
   }, []);
 
+  // A full reload is the simplest way to reset every module-scoped cache
+  // (lib/auth.ts user cache, lib/progress.ts lesson-state cache, HeaderNav
+  // enrollments, etc.) after an auth state change. Individual caches
+  // invalidating themselves would work too but adds a pub/sub for each
+  // one — not worth it for a state change the user triggers by hand.
   async function handleLogout() {
     await logout();
     setUser(null);
+    window.location.reload();
+  }
+
+  function handleAuthenticated(u: CurrentUser) {
+    setUser(u);
+    window.location.reload();
   }
 
   if (!loaded) return <span style={{ fontSize: 13, opacity: 0.5 }}>…</span>;
@@ -83,7 +94,7 @@ export default function AuthButton() {
       <AuthModal
         isOpen={open}
         onClose={() => setOpen(false)}
-        onAuthenticated={(u) => setUser(u)}
+        onAuthenticated={handleAuthenticated}
       />
     </>
   );

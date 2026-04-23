@@ -309,6 +309,8 @@ function DetailView({ classId }: { classId: string }) {
   const [enrolling, setEnrolling] = useState(false);
   const [enrollError, setEnrollError] = useState('');
   const [removingEmail, setRemovingEmail] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   const loadDetail = useCallback(async () => {
     setLoading(true);
@@ -378,6 +380,30 @@ function DetailView({ classId }: { classId: string }) {
     }
   }
 
+  async function handleDelete() {
+    if (!detail) return;
+    const name = detail.class.name;
+    const typed = window.prompt(
+      `Permanently delete "${name}"?\n\nThis removes the class, enrollments, and co-teacher rows. Student progress data (commits, completions) is preserved.\n\nType the class name to confirm:`,
+    );
+    if (typed === null) return;
+    if (typed.trim() !== name) {
+      setDeleteError('Name did not match. Nothing deleted.');
+      return;
+    }
+    setDeleting(true);
+    setDeleteError('');
+    const result = await apiFetch<{ ok: boolean }>(`/api/classes/${classId}/delete`, {
+      method: 'POST',
+    });
+    setDeleting(false);
+    if (result.error !== null) {
+      setDeleteError(result.error);
+    } else {
+      router.push('/teacher');
+    }
+  }
+
   async function handleRemove(email: string) {
     if (!window.confirm(`Remove ${email} from this class?`)) return;
     setRemovingEmail(email);
@@ -432,14 +458,24 @@ function DetailView({ classId }: { classId: string }) {
 
         {/* Owner-only actions */}
         {isOwner && (
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <button
-              style={archiving ? S.btnDisabled : S.btn(isArchived ? '#50fa7b' : '#f1fa8c')}
-              disabled={archiving}
-              onClick={() => { void handleArchiveToggle(); }}
-            >
-              {archiving ? '…' : isArchived ? 'Unarchive' : 'Archive'}
-            </button>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <button
+                style={archiving ? S.btnDisabled : S.btn(isArchived ? '#50fa7b' : '#f1fa8c')}
+                disabled={archiving}
+                onClick={() => { void handleArchiveToggle(); }}
+              >
+                {archiving ? '…' : isArchived ? 'Unarchive' : 'Archive'}
+              </button>
+              <button
+                style={deleting ? S.btnDisabled : { ...S.btn('#ff5555'), color: '#f8f8f2' }}
+                disabled={deleting}
+                onClick={() => { void handleDelete(); }}
+              >
+                {deleting ? 'Deleting…' : 'Delete permanently'}
+              </button>
+            </div>
+            {deleteError && <p style={S.error}>{deleteError}</p>}
           </div>
         )}
       </div>
