@@ -26,11 +26,17 @@ interface RosterRow {
   expires_at: string | null;
 }
 
+interface CoTeacherRow {
+  teacher_email: string;
+  added_at: number;
+  added_by: string | null;
+}
+
 interface ClassDetail {
   class: ClassSummary;
   isOwner: boolean;
   roster: RosterRow[];
-  coTeachers: unknown[];
+  coTeachers: CoTeacherRow[];
 }
 
 interface StudentProgress {
@@ -905,6 +911,12 @@ function DetailView({ classId }: { classId: string }) {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
 
+  // Co-teacher management state
+  const [coTeacherEmail, setCoTeacherEmail] = useState('');
+  const [addingCoTeacher, setAddingCoTeacher] = useState(false);
+  const [coTeacherError, setCoTeacherError] = useState('');
+  const [removingCoTeacher, setRemovingCoTeacher] = useState('');
+
   // Progress state
   const [progressMap, setProgressMap] = useState<Map<string, StudentProgress>>(new Map());
   const [lessonMap, setLessonMap] = useState<Map<string, LessonMeta>>(new Map());
@@ -1039,6 +1051,34 @@ function DetailView({ classId }: { classId: string }) {
     void loadDetail();
   }
 
+  async function handleAddCoTeacher(e: React.FormEvent) {
+    e.preventDefault();
+    if (!coTeacherEmail.trim()) return;
+    setAddingCoTeacher(true);
+    setCoTeacherError('');
+    const result = await apiFetch<{ ok: boolean; teacher: CoTeacherRow }>(
+      `/api/classes/${classId}/teachers`,
+      { method: 'POST', body: JSON.stringify({ email: coTeacherEmail.trim() }) },
+    );
+    setAddingCoTeacher(false);
+    if (result.error !== null) {
+      setCoTeacherError(result.error);
+    } else {
+      setCoTeacherEmail('');
+      void loadDetail();
+    }
+  }
+
+  async function handleRemoveCoTeacher(email: string) {
+    if (!window.confirm(`Remove ${email} as co-teacher?`)) return;
+    setRemovingCoTeacher(email);
+    await apiFetch(`/api/classes/${classId}/teachers/${encodeURIComponent(email)}`, {
+      method: 'DELETE',
+    });
+    setRemovingCoTeacher('');
+    void loadDetail();
+  }
+
   if (loading) return <div style={{ color: '#6272a4' }}>Loading…</div>;
   if (loadError)
     return (
@@ -1054,7 +1094,7 @@ function DetailView({ classId }: { classId: string }) {
     );
   if (!detail) return null;
 
-  const { class: cls, isOwner, roster } = detail;
+  const { class: cls, isOwner, roster, coTeachers } = detail;
   const isArchived = !!cls.archived_at;
 
   return (
@@ -1223,6 +1263,65 @@ function DetailView({ classId }: { classId: string }) {
           />
         </div>
       )}
+
+      {/* Co-teachers */}
+      <div style={{ ...S.card, marginBottom: 16 }}>
+        <h2 style={S.h2}>Co-teachers ({coTeachers.length})</h2>
+        {coTeachers.length === 0 ? (
+          <p style={{ color: '#6272a4', fontSize: 14, marginBottom: isOwner ? 16 : 0 }}>No co-teachers added yet.</p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: isOwner ? 16 : 0 }}>
+            {coTeachers.map((ct) => (
+              <div
+                key={ct.teacher_email}
+                style={{ background: '#282a36', borderRadius: 6, padding: '10px 14px', border: '1px solid #44475a33', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'monospace', fontSize: 14, color: '#f8f8f2', marginBottom: 2 }}>
+                    {ct.teacher_email}
+                  </div>
+                  <div style={{ fontSize: 12, color: '#6272a4' }}>
+                    added {fmtTs(ct.added_at)}{ct.added_by ? ` by ${ct.added_by}` : ''}
+                  </div>
+                </div>
+                {isOwner && (
+                  <button
+                    style={
+                      removingCoTeacher === ct.teacher_email
+                        ? S.btnDisabled
+                        : { ...S.btn('#ff5555'), color: '#f8f8f2' }
+                    }
+                    disabled={removingCoTeacher === ct.teacher_email}
+                    onClick={() => { void handleRemoveCoTeacher(ct.teacher_email); }}
+                  >
+                    {removingCoTeacher === ct.teacher_email ? '…' : 'Remove'}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        {isOwner && (
+          <form onSubmit={(e) => { void handleAddCoTeacher(e); }} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+            <input
+              style={S.input}
+              type="email"
+              placeholder="teacher@example.com"
+              value={coTeacherEmail}
+              onChange={(e) => setCoTeacherEmail(e.target.value)}
+              required
+            />
+            <button
+              type="submit"
+              disabled={addingCoTeacher || !coTeacherEmail.trim()}
+              style={addingCoTeacher || !coTeacherEmail.trim() ? S.btnDisabled : S.btn('#bd93f9')}
+            >
+              {addingCoTeacher ? 'Adding…' : 'Add co-teacher'}
+            </button>
+          </form>
+        )}
+        {coTeacherError && <p style={S.error}>{coTeacherError}</p>}
+      </div>
 
       {/* Add student */}
       <div style={S.card}>

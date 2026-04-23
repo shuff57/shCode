@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { getCurrentUser } from '../../lib/auth';
 import type { CurrentUser } from '../../lib/auth';
 import type { Commit } from '../../lib/types';
+import CodeMirrorPane from '../../components/CodeMirrorPane';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -521,28 +522,23 @@ function TeacherEditInner() {
               ))}
             </div>
 
-            {/* Textarea editor */}
+            {/* CodeMirror editor */}
             <div style={{ flex: 1, overflow: 'hidden', position: 'relative', minHeight: 0 }}>
-              <textarea
-                value={files[activeFile] ?? ''}
-                onChange={(e) => handleEditorChange(e.target.value)}
-                spellCheck={false}
+              <div
                 style={{
-                  width: '100%',
                   height: '100%',
-                  background: '#282a36',
-                  color: '#f8f8f2',
-                  fontFamily: '"Fira Code", "Cascadia Code", "Consolas", monospace',
-                  fontSize: 14,
-                  lineHeight: 1.6,
-                  border: 'none',
-                  outline: 'none',
-                  resize: 'none',
-                  padding: '16px',
-                  boxSizing: 'border-box',
-                  tabSize: 2,
+                  border: '1px solid #44475a',
+                  borderRadius: 4,
+                  overflow: 'hidden',
                 }}
-              />
+              >
+                <CodeMirrorPane
+                  key={activeFile}
+                  value={files[activeFile] ?? ''}
+                  onChange={handleEditorChange}
+                  fileKey={activeFile}
+                />
+              </div>
             </div>
 
             {/* Push bar */}
