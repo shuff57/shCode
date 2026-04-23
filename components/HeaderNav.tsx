@@ -46,6 +46,9 @@ export default function HeaderNav() {
       {loaded && user?.role === 'admin' && (
         <Link href="/teacher" className="text-white">Classes</Link>
       )}
+      {loaded && user?.role === 'admin' && (
+        <Link href="/admin/users" className="text-white">Users</Link>
+      )}
       {loaded && user?.role === 'student' && hasEnrollments === false && (
         <Link
           href="/join-class"
