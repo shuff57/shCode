@@ -8,9 +8,9 @@
 // Auth: caller must be an owner / co-teacher of the class OR an admin.
 // The student must be actively enrolled in the class.
 
-import { canManageClass } from '../../../../../_shared/classAuth';
-import { normalizeEmail } from '../../../../../_shared/auth';
-import { gzipJson, gunzipJson } from '../../../../../_shared/gzip';
+import { canManageClass } from '../../../../../../_shared/classAuth';
+import { normalizeEmail } from '../../../../../../_shared/auth';
+import { gzipJson, gunzipJson } from '../../../../../../_shared/gzip';
 
 interface Env {
   DB: D1Database;
