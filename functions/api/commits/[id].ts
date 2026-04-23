@@ -16,17 +16,18 @@ interface CommitRow {
   files_gz: ArrayBuffer | null;
   changed_file_ids: string;
   created_at: number;
+  authored_by_email: string | null;
 }
 
 export const onRequestGet: PagesFunction<Env, 'id', { email: string }> = async (context: Ctx) => {
   const { env, params, data } = context;
   const row = await env.DB.prepare(
-    'SELECT id, lesson_id, message, files_json, files_gz, changed_file_ids, created_at FROM commits WHERE id = ? AND student_email = ?',
+    'SELECT id, lesson_id, message, files_json, files_gz, changed_file_ids, created_at, authored_by_email FROM commits WHERE id = ? AND student_email = ?',
   )
     .bind(params.id, data.email)
     .first<CommitRow>();
   if (!row) return json({ error: 'Not found' }, 404);
-  return json({ commit: await rowToCommit(row) });
+  return json({ commit: await rowToCommit(row, data.email) });
 };
 
 export const onRequestDelete: PagesFunction<Env, 'id', { email: string }> = async (context: Ctx) => {
@@ -38,7 +39,7 @@ export const onRequestDelete: PagesFunction<Env, 'id', { email: string }> = asyn
   return json({ ok: true });
 };
 
-async function rowToCommit(row: CommitRow) {
+async function rowToCommit(row: CommitRow, studentEmail: string) {
   let files: Record<string, string>;
   if (row.files_gz != null) {
     files = await gunzipJson<Record<string, string>>(row.files_gz);
@@ -52,6 +53,7 @@ async function rowToCommit(row: CommitRow) {
     files,
     changedFileIds: JSON.parse(row.changed_file_ids) as string[],
     createdAt: row.created_at,
+    authoredByEmail: row.authored_by_email ?? studentEmail,
   };
 }
 

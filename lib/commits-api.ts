@@ -11,6 +11,7 @@ interface ApiCommit {
   files: Record<string, string>;
   changedFileIds: string[];
   createdAt: number;
+  authoredByEmail?: string;
 }
 
 function toClientCommit(api: ApiCommit): Commit {
@@ -20,6 +21,7 @@ function toClientCommit(api: ApiCommit): Commit {
     timestamp: api.createdAt,
     changedFileIds: api.changedFileIds,
     fileContentsSnapshot: api.files,
+    authoredByEmail: api.authoredByEmail,
   };
 }
 

@@ -20,6 +20,9 @@ export interface Commit {
   timestamp: number;
   changedFileIds: string[];
   fileContentsSnapshot: Record<string, string>;
+  /** Email of whoever wrote this commit. For teacher pushes, this is
+   *  the teacher's email and differs from the owning student's email. */
+  authoredByEmail?: string;
 }
 
 export interface Version {

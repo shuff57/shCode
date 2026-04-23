@@ -24,6 +24,7 @@ interface CommitRow {
   files_gz: ArrayBuffer | null;
   changed_file_ids: string;
   created_at: number;
+  authored_by_email: string | null;
 }
 
 export const onRequestGet: PagesFunction<Env, string, { email: string }> = async (context: Ctx) => {
@@ -32,13 +33,13 @@ export const onRequestGet: PagesFunction<Env, string, { email: string }> = async
   if (!lessonId) return json({ error: 'lessonId required' }, 400);
 
   const result = await env.DB.prepare(
-    'SELECT id, lesson_id, message, files_json, files_gz, changed_file_ids, created_at FROM commits WHERE student_email = ? AND lesson_id = ? ORDER BY created_at DESC',
+    'SELECT id, lesson_id, message, files_json, files_gz, changed_file_ids, created_at, authored_by_email FROM commits WHERE student_email = ? AND lesson_id = ? ORDER BY created_at DESC',
   )
     .bind(data.email, lessonId)
     .all<CommitRow>();
 
   return json({
-    commits: await Promise.all((result.results ?? []).map(rowToCommit)),
+    commits: await Promise.all((result.results ?? []).map((r) => rowToCommit(r, data.email))),
   });
 };
 
@@ -61,7 +62,7 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   const filesGz = await gzipJson(body.files);
   const createdAt = Date.now();
   await env.DB.prepare(
-    'INSERT INTO commits (id, student_email, lesson_id, message, files_json, files_gz, changed_file_ids, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    'INSERT INTO commits (id, student_email, lesson_id, message, files_json, files_gz, changed_file_ids, created_at, authored_by_email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
   )
     .bind(
       body.id,
@@ -72,6 +73,7 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
       filesGz,
       JSON.stringify(body.changedFileIds ?? []),
       createdAt,
+      data.email,
     )
     .run();
 
@@ -84,13 +86,14 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
         files: body.files,
         changedFileIds: body.changedFileIds ?? [],
         createdAt,
+        authoredByEmail: data.email,
       },
     },
     201,
   );
 };
 
-async function rowToCommit(row: CommitRow) {
+async function rowToCommit(row: CommitRow, studentEmail: string) {
   let files: Record<string, string>;
   if (row.files_gz != null) {
     files = await gunzipJson<Record<string, string>>(row.files_gz);
@@ -104,6 +107,7 @@ async function rowToCommit(row: CommitRow) {
     files,
     changedFileIds: JSON.parse(row.changed_file_ids) as string[],
     createdAt: row.created_at,
+    authoredByEmail: row.authored_by_email ?? studentEmail,
   };
 }
 
