@@ -11,7 +11,14 @@ export default function UnitProgressBadge({ lessonIds, label }: Props) {
   const snap = useLessonState();
   const total = lessonIds.length;
   if (total === 0) return null;
-  if (!snap.loaded || !snap.authed) return null;
+  if (!snap.loaded) return null;
+  if (!snap.authed) {
+    return (
+      <span style={{ fontSize: 12, color: '#6272a4', whiteSpace: 'nowrap' }}>
+        <span style={{ color: '#8be9fd' }}>Sign in</span> to track
+      </span>
+    );
+  }
 
   const done = lessonIds.filter((id) => snap.states[id] === 'completed').length;
   const started = lessonIds.filter((id) => snap.states[id] === 'started').length;
