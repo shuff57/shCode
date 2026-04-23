@@ -19,6 +19,7 @@ import HistoryPanel from './HistoryPanel';
 import AssignmentHeader from './AssignmentHeader';
 import SubmitDialog from './SubmitDialog';
 import GradeReportView from './GradeReport';
+import TeacherPushBanner from './TeacherPushBanner';
 
 interface Neighbor {
   id: string;
@@ -374,6 +375,7 @@ export default function LessonWorkspace({
 
   return (
     <>
+      <TeacherPushBanner />
       {isAssignment ? (
         <AssignmentHeader
           lesson={lesson}

@@ -434,6 +434,12 @@ function StudentDrawer({
                             {ls.score} pts
                           </span>
                         )}
+                        <a
+                          href={`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(email)}&lesson=${encodeURIComponent(lesson.id)}`}
+                          style={{ background: 'none', border: '1px solid #bd93f9', borderRadius: 4, color: '#bd93f9', fontSize: 12, cursor: 'pointer', padding: '3px 8px', flexShrink: 0, textDecoration: 'none' }}
+                        >
+                          Open in editor
+                        </a>
                         {sub && (
                           <button
                             style={{ background: 'none', border: '1px solid #6272a4', borderRadius: 4, color: '#8be9fd', fontSize: 12, cursor: 'pointer', padding: '3px 8px', flexShrink: 0 }}
