@@ -4,6 +4,7 @@
 // before returning any data (prevents cross-class data leaks).
 
 import { canManageClass } from '../../../../_shared/classAuth';
+import { normalizeEmail } from '../../../../_shared/auth';
 
 interface Env {
   DB: D1Database;
@@ -33,12 +34,15 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
 ) => {
   const { env, data, params } = context;
   const classId = params.id;
-  const studentEmail = params.email;
+  const rawEmail = params.email;
 
   if (typeof classId !== 'string' || !classId) return json({ error: 'classId required' }, 400);
-  if (typeof studentEmail !== 'string' || !studentEmail) {
+  if (typeof rawEmail !== 'string' || !rawEmail) {
     return json({ error: 'student email required' }, 400);
   }
+  // Pages Functions pass path params URL-encoded — decode before matching
+  // the DB's lowercased email. Matches the pattern in enrollments/[email].ts.
+  const studentEmail = normalizeEmail(decodeURIComponent(rawEmail));
 
   const acl = await canManageClass(env.DB, data.email, classId);
   if (!acl.class) return json({ error: 'Class not found' }, 404);
