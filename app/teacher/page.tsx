@@ -68,6 +68,22 @@ interface LessonMeta {
   unit: string | null;
 }
 
+interface GradebookCell {
+  state: 'completed' | 'started' | null;
+  score: number | null;
+  submitted_score: number | null;
+  possible: number | null;
+}
+
+interface GradebookStudent {
+  email: string;
+  cells: Record<string, GradebookCell>;
+}
+
+interface GradebookData {
+  students: GradebookStudent[];
+}
+
 interface GradeCriterion {
   id: string;
   title: string;
@@ -115,6 +131,38 @@ function fmt(iso: string) {
 
 function fmtTs(ms: number) {
   return new Date(ms).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+// ---------------------------------------------------------------------------
+// CSV helper — no libraries, ~30 lines
+// ---------------------------------------------------------------------------
+
+function buildGradebookCsv(students: GradebookStudent[], lessonIds: string[]): string {
+  const escape = (v: string) => (v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v);
+
+  const header = ['student_email', ...lessonIds].map(escape).join(',');
+  const rows = students.map((s) => {
+    const cols = [s.email, ...lessonIds.map((lid) => {
+      const c = s.cells[lid];
+      if (!c) return '';
+      if (c.score !== null) return String(c.score);
+      if (c.state === 'completed') return 'C';
+      if (c.state === 'started') return 'S';
+      return '';
+    })];
+    return cols.map(escape).join(',');
+  });
+  return [header, ...rows].join('\r\n');
+}
+
+function downloadCsv(csv: string, filename: string) {
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ---------------------------------------------------------------------------
@@ -445,6 +493,259 @@ function StudentDrawer({
 }
 
 // ---------------------------------------------------------------------------
+// GradebookView — sticky header + first column matrix
+// ---------------------------------------------------------------------------
+
+function GradebookView({
+  classId,
+  className,
+  lessonMap,
+  onOpenStudent,
+}: {
+  classId: string;
+  className: string;
+  lessonMap: Map<string, LessonMeta>;
+  onOpenStudent: (email: string) => void;
+}) {
+  const [gbData, setGbData] = useState<GradebookData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState('');
+
+  useEffect(() => {
+    setLoading(true);
+    setErr('');
+    apiFetch<GradebookData>(`/api/classes/${classId}/gradebook`)
+      .then((res) => {
+        if (res.error !== null) setErr(res.error);
+        else setGbData(res.data);
+        setLoading(false);
+      })
+      .catch(() => { setErr('Network error'); setLoading(false); });
+  }, [classId]);
+
+  if (loading) return <div style={{ color: '#6272a4' }}>Loading gradebook…</div>;
+  if (err) return <div style={{ color: '#ff5555', fontSize: 13 }}>{err}</div>;
+  if (!gbData) return null;
+  if (gbData.students.length === 0) {
+    return <p style={{ color: '#6272a4', fontSize: 14 }}>No students enrolled — roster is empty.</p>;
+  }
+
+  // Build ordered lesson list from the manifest, preserving unit grouping.
+  // Only include lessons that appear in the manifest (i.e. are known).
+  const unitOrder: string[] = [];
+  const byUnit: Record<string, LessonMeta[]> = {};
+  for (const meta of lessonMap.values()) {
+    const u = meta.unit ?? 'Other';
+    if (!byUnit[u]) { byUnit[u] = []; unitOrder.push(u); }
+    byUnit[u].push(meta);
+  }
+  // Sort lessons within each unit by id.
+  for (const u of unitOrder) byUnit[u].sort((a, b) => a.id.localeCompare(b.id));
+
+  // Flatten to an ordered array; track unit spans for colspan.
+  const orderedLessons: LessonMeta[] = [];
+  const unitSpans: Array<{ unit: string; count: number }> = [];
+  for (const u of unitOrder) {
+    orderedLessons.push(...byUnit[u]);
+    unitSpans.push({ unit: u, count: byUnit[u].length });
+  }
+
+  // If lesson manifest is empty (not yet loaded), fall back to lessons seen in data.
+  let displayLessons = orderedLessons;
+  let displaySpans = unitSpans;
+  if (displayLessons.length === 0) {
+    const allIds = new Set<string>();
+    for (const s of gbData.students) for (const lid of Object.keys(s.cells)) allIds.add(lid);
+    const fallback = Array.from(allIds).sort();
+    displayLessons = fallback.map((id) => ({ id, title: id, unit: null }));
+    displaySpans = displayLessons.length > 0
+      ? [{ unit: 'Lessons', count: displayLessons.length }]
+      : [];
+  }
+
+  // Sticky background must be solid so content doesn't bleed through.
+  const stickyBg = '#1e1f29';
+  const headerBg = '#282a36';
+
+  const CELL_W = 60;
+  const EMAIL_W = 220;
+
+  function cellContent(cell: GradebookCell | undefined): React.ReactNode {
+    if (!cell || (!cell.state && cell.submitted_score === null)) {
+      return <span style={{ color: '#44475a', fontFamily: 'monospace', fontSize: 14 }}>·</span>;
+    }
+    if (cell.state === 'completed') {
+      if (cell.score !== null) {
+        const hasSubDiff = cell.submitted_score !== null && cell.submitted_score !== cell.score;
+        return (
+          <span style={{ color: '#50fa7b', fontFamily: 'monospace', fontWeight: 700, fontSize: 13 }}>
+            {cell.score}
+            {hasSubDiff && (
+              <sub style={{ color: '#8be9fd', fontSize: 9, marginLeft: 2 }}>
+                s{cell.submitted_score}
+              </sub>
+            )}
+          </span>
+        );
+      }
+      return <span style={{ color: '#50fa7b', fontFamily: 'monospace', fontSize: 14 }}>✓</span>;
+    }
+    if (cell.state === 'started') {
+      return <span style={{ color: '#f1fa8c', fontFamily: 'monospace', fontSize: 14 }}>○</span>;
+    }
+    // Has submission data but no lesson_state (edge case)
+    if (cell.submitted_score !== null) {
+      return (
+        <span style={{ color: '#8be9fd', fontFamily: 'monospace', fontSize: 12 }}>
+          s{cell.submitted_score}
+        </span>
+      );
+    }
+    return <span style={{ color: '#44475a', fontFamily: 'monospace', fontSize: 14 }}>·</span>;
+  }
+
+  function cellTitle(cell: GradebookCell | undefined, lessonTitle: string): string {
+    if (!cell) return lessonTitle;
+    const parts: string[] = [lessonTitle];
+    if (cell.state) parts.push(`state: ${cell.state}`);
+    if (cell.score !== null) parts.push(`score: ${cell.score}`);
+    if (cell.submitted_score !== null) parts.push(`sub score: ${cell.submitted_score}`);
+    if (cell.possible !== null) parts.push(`possible: ${cell.possible}`);
+    return parts.join(' | ');
+  }
+
+  function handleDownloadCsv() {
+    const csv = buildGradebookCsv(gbData!.students, displayLessons.map((l) => l.id));
+    downloadCsv(csv, `gradebook-${className.replace(/\s+/g, '-')}.csv`);
+  }
+
+  return (
+    <div>
+      {/* Toolbar */}
+      <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
+        <button style={S.btn('#8be9fd')} onClick={handleDownloadCsv}>
+          Download as CSV
+        </button>
+        <span style={{ fontSize: 12, color: '#6272a4' }}>
+          {gbData.students.length} student{gbData.students.length !== 1 ? 's' : ''} · {displayLessons.length} lesson{displayLessons.length !== 1 ? 's' : ''}
+        </span>
+      </div>
+
+      {/* Scrollable matrix */}
+      <div style={{ overflow: 'auto', maxHeight: '70vh', border: '1px solid #44475a', borderRadius: 6 }}>
+        <table style={{ borderCollapse: 'collapse', fontSize: 12, tableLayout: 'fixed', minWidth: EMAIL_W + CELL_W * displayLessons.length }}>
+          {/* Unit-spanning header row */}
+          <thead>
+            <tr>
+              <th
+                style={{
+                  position: 'sticky', left: 0, top: 0, zIndex: 3,
+                  width: EMAIL_W, minWidth: EMAIL_W,
+                  background: headerBg, padding: '6px 10px',
+                  borderBottom: '1px solid #44475a', borderRight: '1px solid #44475a44',
+                  textAlign: 'left', color: '#6272a4', fontSize: 11, fontWeight: 700,
+                  textTransform: 'uppercase', letterSpacing: '0.06em',
+                }}
+              >
+                Student
+              </th>
+              {displaySpans.map(({ unit, count }) => (
+                <th
+                  key={unit}
+                  colSpan={count}
+                  style={{
+                    position: 'sticky', top: 0, zIndex: 2,
+                    background: headerBg, padding: '6px 4px',
+                    borderBottom: '1px solid #44475a', borderRight: '1px solid #44475a44',
+                    textAlign: 'center', color: '#bd93f9', fontSize: 11, fontWeight: 700,
+                    textTransform: 'uppercase', letterSpacing: '0.06em',
+                    width: CELL_W * count,
+                  }}
+                >
+                  {unit}
+                </th>
+              ))}
+            </tr>
+            {/* Per-lesson title row */}
+            <tr>
+              <th
+                style={{
+                  position: 'sticky', left: 0, top: 33, zIndex: 3,
+                  width: EMAIL_W, minWidth: EMAIL_W,
+                  background: stickyBg, padding: '4px 10px',
+                  borderBottom: '2px solid #44475a', borderRight: '1px solid #44475a44',
+                }}
+              />
+              {displayLessons.map((lesson) => (
+                <th
+                  key={lesson.id}
+                  title={lesson.title}
+                  style={{
+                    position: 'sticky', top: 33, zIndex: 2,
+                    width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
+                    background: stickyBg, padding: '4px 2px',
+                    borderBottom: '2px solid #44475a', borderRight: '1px solid #44475a11',
+                    textAlign: 'center', color: '#6272a4', fontSize: 10,
+                    fontWeight: 500, overflow: 'hidden', whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {lesson.title.length > 8 ? lesson.title.slice(0, 7) + '…' : lesson.title}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {gbData.students.map((student, i) => (
+              <tr
+                key={student.email}
+                style={{ background: i % 2 === 0 ? '#1e1f29' : '#252636' }}
+              >
+                {/* Sticky email cell */}
+                <td
+                  style={{
+                    position: 'sticky', left: 0, zIndex: 1,
+                    background: i % 2 === 0 ? '#1e1f29' : '#252636',
+                    width: EMAIL_W, minWidth: EMAIL_W,
+                    padding: '6px 10px',
+                    borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a44',
+                    fontFamily: 'monospace', fontSize: 12, color: '#8be9fd',
+                    overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => onOpenStudent(student.email)}
+                  title={student.email}
+                >
+                  {student.email}
+                </td>
+                {/* Cell per lesson */}
+                {displayLessons.map((lesson) => {
+                  const cell = student.cells[lesson.id];
+                  return (
+                    <td
+                      key={lesson.id}
+                      style={{
+                        width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
+                        padding: '4px 2px',
+                        borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a11',
+                        textAlign: 'center', verticalAlign: 'middle',
+                      }}
+                      title={cellTitle(cell, lesson.title)}
+                    >
+                      {cellContent(cell)}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // List view
 // ---------------------------------------------------------------------------
 
@@ -602,6 +903,9 @@ function DetailView({ classId }: { classId: string }) {
   const [progressMap, setProgressMap] = useState<Map<string, StudentProgress>>(new Map());
   const [lessonMap, setLessonMap] = useState<Map<string, LessonMeta>>(new Map());
   const [drawerEmail, setDrawerEmail] = useState<string | null>(null);
+
+  // View toggle: 'roster' | 'gradebook'
+  const [activeView, setActiveView] = useState<'roster' | 'gradebook'>('roster');
 
   const loadDetail = useCallback(async () => {
     setLoading(true);
@@ -810,68 +1114,109 @@ function DetailView({ classId }: { classId: string }) {
         </div>
       </div>
 
-      {/* Roster */}
-      <div style={{ ...S.card, marginBottom: 28 }}>
-        <h2 style={S.h2}>Roster ({roster.length})</h2>
-        {roster.length === 0 ? (
-          <p style={{ color: '#6272a4', fontSize: 14 }}>No students enrolled yet.</p>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {roster.map((row) => {
-              const prog = progressMap.get(row.student_email);
-              return (
-                <div
-                  key={row.student_email}
-                  style={{ background: '#282a36', borderRadius: 6, padding: '12px 16px', border: '1px solid #44475a33', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}
-                >
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: 'monospace', fontSize: 14, color: '#f8f8f2', marginBottom: 4 }}>
-                      {row.student_email}
-                    </div>
-                    <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#6272a4', flexWrap: 'wrap' }}>
-                      <span>
-                        Enrolled: {fmt(row.enrolled_at)} by {row.enrolled_by ?? 'self'}
-                      </span>
-                      {prog ? (
-                        <>
-                          <span style={{ color: '#50fa7b' }}>{prog.completed_count} completed</span>
-                          {prog.started_count > 0 && (
-                            <span style={{ color: '#f1fa8c' }}>{prog.started_count} started</span>
-                          )}
-                          {prog.last_active !== null && (
-                            <span>last active {fmtTs(prog.last_active)}</span>
-                          )}
-                        </>
-                      ) : (
-                        <span>No activity yet</span>
-                      )}
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                    <button
-                      style={S.btn('#8be9fd')}
-                      onClick={() => setDrawerEmail(row.student_email)}
-                    >
-                      Open
-                    </button>
-                    <button
-                      style={
-                        removingEmail === row.student_email
-                          ? S.btnDisabled
-                          : { ...S.btn('#ff5555'), color: '#f8f8f2' }
-                      }
-                      disabled={removingEmail === row.student_email}
-                      onClick={() => { void handleRemove(row.student_email); }}
-                    >
-                      {removingEmail === row.student_email ? '…' : 'Remove'}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+      {/* View toggle */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        <button
+          style={{
+            ...S.btn(activeView === 'roster' ? '#bd93f9' : 'transparent'),
+            color: activeView === 'roster' ? '#282a36' : '#bd93f9',
+            border: '1px solid #bd93f9',
+            borderRadius: 20,
+          }}
+          onClick={() => setActiveView('roster')}
+        >
+          Roster
+        </button>
+        <button
+          style={{
+            ...S.btn(activeView === 'gradebook' ? '#8be9fd' : 'transparent'),
+            color: activeView === 'gradebook' ? '#282a36' : '#8be9fd',
+            border: '1px solid #8be9fd',
+            borderRadius: 20,
+          }}
+          onClick={() => setActiveView('gradebook')}
+        >
+          Gradebook
+        </button>
       </div>
+
+      {/* Roster view */}
+      {activeView === 'roster' && (
+        <div style={{ ...S.card, marginBottom: 28 }}>
+          <h2 style={S.h2}>Roster ({roster.length})</h2>
+          {roster.length === 0 ? (
+            <p style={{ color: '#6272a4', fontSize: 14 }}>No students enrolled yet.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {roster.map((row) => {
+                const prog = progressMap.get(row.student_email);
+                return (
+                  <div
+                    key={row.student_email}
+                    style={{ background: '#282a36', borderRadius: 6, padding: '12px 16px', border: '1px solid #44475a33', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}
+                  >
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: 'monospace', fontSize: 14, color: '#f8f8f2', marginBottom: 4 }}>
+                        {row.student_email}
+                      </div>
+                      <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#6272a4', flexWrap: 'wrap' }}>
+                        <span>
+                          Enrolled: {fmt(row.enrolled_at)} by {row.enrolled_by ?? 'self'}
+                        </span>
+                        {prog ? (
+                          <>
+                            <span style={{ color: '#50fa7b' }}>{prog.completed_count} completed</span>
+                            {prog.started_count > 0 && (
+                              <span style={{ color: '#f1fa8c' }}>{prog.started_count} started</span>
+                            )}
+                            {prog.last_active !== null && (
+                              <span>last active {fmtTs(prog.last_active)}</span>
+                            )}
+                          </>
+                        ) : (
+                          <span>No activity yet</span>
+                        )}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                      <button
+                        style={S.btn('#8be9fd')}
+                        onClick={() => setDrawerEmail(row.student_email)}
+                      >
+                        Open
+                      </button>
+                      <button
+                        style={
+                          removingEmail === row.student_email
+                            ? S.btnDisabled
+                            : { ...S.btn('#ff5555'), color: '#f8f8f2' }
+                        }
+                        disabled={removingEmail === row.student_email}
+                        onClick={() => { void handleRemove(row.student_email); }}
+                      >
+                        {removingEmail === row.student_email ? '…' : 'Remove'}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Gradebook view */}
+      {activeView === 'gradebook' && (
+        <div style={{ ...S.card, marginBottom: 28 }}>
+          <h2 style={{ ...S.h2, marginBottom: 16 }}>Gradebook</h2>
+          <GradebookView
+            classId={classId}
+            className={cls.name}
+            lessonMap={lessonMap}
+            onOpenStudent={(email) => setDrawerEmail(email)}
+          />
+        </div>
+      )}
 
       {/* Add student */}
       <div style={S.card}>
