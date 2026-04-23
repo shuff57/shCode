@@ -5,6 +5,7 @@ import {
   buildSessionCookie,
   hashPassword,
   isAdminEmail,
+  isTeacherEmail,
   normalizeEmail,
   signSession,
 } from '../../_shared/auth';
@@ -13,6 +14,7 @@ interface Env {
   DB: D1Database;
   AUTH_SECRET: string;
   ADMIN_EMAILS?: string;
+  TEACHER_EMAILS?: string;
 }
 
 type Ctx = EventContext<Env, string, { email: string }>;
@@ -44,7 +46,11 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   if (existing) return json({ error: 'An account with that email already exists' }, 409);
 
   const passwordHash = await hashPassword(password);
-  const role = isAdminEmail(email, env.ADMIN_EMAILS) ? 'admin' : 'student';
+  const role = isAdminEmail(email, env.ADMIN_EMAILS)
+    ? 'admin'
+    : isTeacherEmail(email, env.TEACHER_EMAILS)
+    ? 'teacher'
+    : 'student';
   await env.DB.prepare(
     'INSERT INTO students (email, password_hash, created_at, role) VALUES (?, ?, ?, ?)',
   )

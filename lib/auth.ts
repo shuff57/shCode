@@ -2,7 +2,11 @@
 // Uses same-origin cookies — the session cookie is HttpOnly and managed
 // by the server.
 
-export type Role = 'admin' | 'student';
+export type Role = 'admin' | 'teacher' | 'student';
+
+function parseRole(raw: unknown): Role {
+  return raw === 'admin' || raw === 'teacher' ? raw : 'student';
+}
 
 export interface CurrentUser {
   email: string;
@@ -35,7 +39,7 @@ async function fetchCurrentUser(): Promise<CurrentUser | null> {
     if (!res.ok) return null;
     const data = (await res.json()) as { email?: string; role?: string };
     if (!data.email) return null;
-    return { email: data.email, role: data.role === 'admin' ? 'admin' : 'student' };
+    return { email: data.email, role: parseRole(data.role) };
   } catch {
     return null;
   }
@@ -58,7 +62,7 @@ async function postAuth(path: string, body: unknown): Promise<CurrentUser> {
   try { data = await res.json(); } catch { /* empty body */ }
   if (!res.ok) throw new AuthError(res.status, data.error || `${res.status}`);
   if (!data.email) throw new AuthError(500, 'No email in response');
-  cache = { email: data.email, role: data.role === 'admin' ? 'admin' : 'student' };
+  cache = { email: data.email, role: parseRole(data.role) };
   return cache;
 }
 

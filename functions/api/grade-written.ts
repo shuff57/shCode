@@ -23,7 +23,7 @@ interface Env {
   OLLAMA_HOST?: string;
 }
 
-type SessionData = { email: string; role: 'admin' | 'student' };
+type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 type Ctx = EventContext<Env, string, SessionData>;
 
 export const onRequestPost: PagesFunction<Env, string, SessionData> = async (context: Ctx) => {

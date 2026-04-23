@@ -45,7 +45,8 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   const ok = await verifyPassword(password, row.password_hash);
   if (!ok) return json({ error: 'Invalid email or password' }, 401);
 
-  const role = row.role === 'admin' ? 'admin' : 'student';
+  const role: 'admin' | 'teacher' | 'student' =
+    row.role === 'admin' || row.role === 'teacher' ? row.role : 'student';
   const token = await signSession(email, role, env.AUTH_SECRET);
   const secure = new URL(request.url).protocol === 'https:';
   return json({ email, role }, 200, {

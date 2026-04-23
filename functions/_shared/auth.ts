@@ -84,7 +84,7 @@ function secretBytes(secret: string): Uint8Array {
   return new TextEncoder().encode(secret);
 }
 
-export type Role = 'admin' | 'student';
+export type Role = 'admin' | 'teacher' | 'student';
 
 export async function signSession(email: string, role: Role, secret: string): Promise<string> {
   return new SignJWT({ email, role })
@@ -102,7 +102,8 @@ export async function verifySession(
     const { payload } = await jwtVerify(token, secretBytes(secret));
     const email = String(payload.email || '').toLowerCase();
     if (!email) return null;
-    const role = payload.role === 'admin' ? 'admin' : 'student';
+    const raw = payload.role;
+    const role: Role = raw === 'admin' || raw === 'teacher' ? raw : 'student';
     return { email, role };
   } catch {
     return null;
@@ -142,14 +143,24 @@ export function normalizeEmail(raw: string): string {
 
 // ---- Role resolution ----
 
-/** True when the email appears in the ADMIN_EMAILS env var (comma-separated,
- *  case-insensitive). Used at signup time to decide a new user's role. */
-export function isAdminEmail(email: string, adminEmailsVar: string | undefined): boolean {
-  if (!adminEmailsVar) return false;
+/** True when the email appears in the given comma-separated allowlist
+ *  env var (case-insensitive). */
+function emailInAllowlist(email: string, allowlistVar: string | undefined): boolean {
+  if (!allowlistVar) return false;
   const normalized = normalizeEmail(email);
-  return adminEmailsVar
+  return allowlistVar
     .split(',')
     .map((s) => normalizeEmail(s))
     .filter(Boolean)
     .includes(normalized);
+}
+
+/** Used at signup time to decide a new user's role. */
+export function isAdminEmail(email: string, adminEmailsVar: string | undefined): boolean {
+  return emailInAllowlist(email, adminEmailsVar);
+}
+
+/** Used at signup time to auto-promote teachers from a TEACHER_EMAILS env var. */
+export function isTeacherEmail(email: string, teacherEmailsVar: string | undefined): boolean {
+  return emailInAllowlist(email, teacherEmailsVar);
 }

@@ -12,7 +12,7 @@ interface Env {
   AUTH_SECRET: string;
 }
 
-type SessionData = { email: string; role: 'admin' | 'student' };
+type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 type Ctx = EventContext<Env, string, SessionData>;
 
 const PUBLIC_API_PREFIXES = ['/api/auth/'];
