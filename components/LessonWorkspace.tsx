@@ -20,6 +20,7 @@ import AssignmentHeader from './AssignmentHeader';
 import SubmitDialog from './SubmitDialog';
 import GradeReportView from './GradeReport';
 import TeacherPushBanner from './TeacherPushBanner';
+import CrossDeviceSyncBanner from './CrossDeviceSyncBanner';
 
 interface Neighbor {
   id: string;
@@ -375,6 +376,7 @@ export default function LessonWorkspace({
 
   return (
     <>
+      <CrossDeviceSyncBanner />
       <TeacherPushBanner />
       {isAssignment ? (
         <AssignmentHeader
