@@ -1,6 +1,8 @@
 // GET  /api/commits?lessonId=X   -> list the signed-in student's commits for a lesson
 // POST /api/commits              -> create a new commit (body: CreateBody)
 
+import { gzipJson, gunzipJson } from '../../_shared/gzip';
+
 interface Env {
   DB: D1Database;
 }
@@ -18,7 +20,8 @@ interface CommitRow {
   id: string;
   lesson_id: string;
   message: string;
-  files_json: string;
+  files_json: string | null;
+  files_gz: ArrayBuffer | null;
   changed_file_ids: string;
   created_at: number;
 }
@@ -29,13 +32,13 @@ export const onRequestGet: PagesFunction<Env, string, { email: string }> = async
   if (!lessonId) return json({ error: 'lessonId required' }, 400);
 
   const result = await env.DB.prepare(
-    'SELECT id, lesson_id, message, files_json, changed_file_ids, created_at FROM commits WHERE student_email = ? AND lesson_id = ? ORDER BY created_at DESC',
+    'SELECT id, lesson_id, message, files_json, files_gz, changed_file_ids, created_at FROM commits WHERE student_email = ? AND lesson_id = ? ORDER BY created_at DESC',
   )
     .bind(data.email, lessonId)
     .all<CommitRow>();
 
   return json({
-    commits: (result.results ?? []).map(rowToCommit),
+    commits: await Promise.all((result.results ?? []).map(rowToCommit)),
   });
 };
 
@@ -55,16 +58,18 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
     return json({ error: 'files object required' }, 400);
   }
 
+  const filesGz = await gzipJson(body.files);
   const createdAt = Date.now();
   await env.DB.prepare(
-    'INSERT INTO commits (id, student_email, lesson_id, message, files_json, changed_file_ids, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    'INSERT INTO commits (id, student_email, lesson_id, message, files_json, files_gz, changed_file_ids, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
   )
     .bind(
       body.id,
       data.email,
       body.lessonId,
       body.message,
-      JSON.stringify(body.files),
+      null,
+      filesGz,
       JSON.stringify(body.changedFileIds ?? []),
       createdAt,
     )
@@ -85,12 +90,18 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   );
 };
 
-function rowToCommit(row: CommitRow) {
+async function rowToCommit(row: CommitRow) {
+  let files: Record<string, string>;
+  if (row.files_gz != null) {
+    files = await gunzipJson<Record<string, string>>(row.files_gz);
+  } else {
+    files = JSON.parse(row.files_json!) as Record<string, string>;
+  }
   return {
     id: row.id,
     lessonId: row.lesson_id,
     message: row.message,
-    files: JSON.parse(row.files_json) as Record<string, string>,
+    files,
     changedFileIds: JSON.parse(row.changed_file_ids) as string[],
     createdAt: row.created_at,
   };

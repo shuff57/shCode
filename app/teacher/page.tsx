@@ -33,6 +33,55 @@ interface ClassDetail {
   coTeachers: unknown[];
 }
 
+interface StudentProgress {
+  student_email: string;
+  completed_count: number;
+  started_count: number;
+  last_active: number | null;
+  total_score: number;
+}
+
+interface LessonStateEntry {
+  state: 'started' | 'completed';
+  started_at: number | null;
+  completed_at: number | null;
+  score: number | null;
+}
+
+interface SubmissionEntry {
+  id: string;
+  submitted_at: number;
+  score: number | null;
+  possible: number | null;
+  grade_json: string | null;
+}
+
+interface StudentDetail {
+  student_email: string;
+  lessonState: Record<string, LessonStateEntry>;
+  latestSubmissions: Record<string, SubmissionEntry>;
+}
+
+interface LessonMeta {
+  id: string;
+  title: string;
+  unit: string | null;
+}
+
+interface GradeCriterion {
+  id: string;
+  title: string;
+  earned: number;
+  possible: number;
+  feedback?: string;
+}
+
+interface GradeResponse {
+  totalEarned: number;
+  totalPossible: number;
+  criteria?: GradeCriterion[];
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -62,6 +111,10 @@ async function apiFetch<T>(
 
 function fmt(iso: string) {
   return new Date(iso).toLocaleDateString();
+}
+
+function fmtTs(ms: number) {
+  return new Date(ms).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
 // ---------------------------------------------------------------------------
@@ -157,6 +210,239 @@ const S = {
   },
   td: { padding: '8px 12px', borderBottom: '1px solid #44475a22', verticalAlign: 'middle' as const },
 };
+
+// ---------------------------------------------------------------------------
+// StudentDrawer — right-side panel showing per-lesson progress
+// ---------------------------------------------------------------------------
+
+function StudentDrawer({
+  classId,
+  email,
+  lessonMap,
+  onClose,
+}: {
+  classId: string;
+  email: string;
+  lessonMap: Map<string, LessonMeta>;
+  onClose: () => void;
+}) {
+  const [detail, setDetail] = useState<StudentDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState('');
+  const [expandedSubs, setExpandedSubs] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    setLoading(true);
+    setErr('');
+    apiFetch<StudentDetail>(
+      `/api/classes/${classId}/students/${encodeURIComponent(email)}`,
+    ).then((res) => {
+      if (res.error !== null) {
+        setErr(res.error);
+      } else {
+        setDetail(res.data);
+      }
+      setLoading(false);
+    }).catch(() => {
+      setErr('Network error');
+      setLoading(false);
+    });
+  }, [classId, email]);
+
+  function toggleSub(lessonId: string) {
+    setExpandedSubs((prev) => {
+      const next = new Set(prev);
+      if (next.has(lessonId)) next.delete(lessonId);
+      else next.add(lessonId);
+      return next;
+    });
+  }
+
+  // Group active lessons by unit. Only show lessons that have some state.
+  const unitGroups: Array<{ unit: string; lessons: LessonMeta[] }> = [];
+  if (detail) {
+    const unitOrder: string[] = [];
+    const byUnit: Record<string, LessonMeta[]> = {};
+
+    for (const id of Object.keys(detail.lessonState)) {
+      const meta = lessonMap.get(id) ?? { id, title: id, unit: null };
+      const u = meta.unit ?? 'Other';
+      if (!byUnit[u]) {
+        byUnit[u] = [];
+        unitOrder.push(u);
+      }
+      byUnit[u].push(meta);
+    }
+
+    for (const u of unitOrder) {
+      unitGroups.push({ unit: u, lessons: byUnit[u].sort((a, b) => a.id.localeCompare(b.id)) });
+    }
+  }
+
+  const drawerStyle: React.CSSProperties = {
+    position: 'fixed',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    width: 600,
+    background: '#1e1f29',
+    borderLeft: '1px solid #44475a',
+    overflowY: 'auto',
+    zIndex: 1000,
+    display: 'flex',
+    flexDirection: 'column',
+  };
+
+  const overlayStyle: React.CSSProperties = {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,0.5)',
+    zIndex: 999,
+  };
+
+  function stateBadge(state: 'started' | 'completed' | undefined) {
+    if (state === 'completed') {
+      return (
+        <span style={{ background: '#50fa7b', color: '#282a36', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
+          Complete
+        </span>
+      );
+    }
+    if (state === 'started') {
+      return (
+        <span style={{ background: '#f1fa8c', color: '#282a36', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
+          In progress
+        </span>
+      );
+    }
+    return (
+      <span style={{ background: '#44475a', color: '#6272a4', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
+        Not started
+      </span>
+    );
+  }
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div style={overlayStyle} onClick={onClose} />
+
+      {/* Panel */}
+      <div style={drawerStyle}>
+        {/* Header */}
+        <div style={{ padding: '20px 24px', borderBottom: '1px solid #44475a', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#f8f8f2', marginBottom: 2 }}>
+              Student Progress
+            </div>
+            <div style={{ fontSize: 13, color: '#8be9fd', fontFamily: 'monospace' }}>{email}</div>
+          </div>
+          <button
+            style={{ background: 'none', border: 'none', color: '#6272a4', cursor: 'pointer', fontSize: 20, lineHeight: 1, padding: '4px 8px' }}
+            onClick={onClose}
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding: '20px 24px', flex: 1 }}>
+          {loading && <div style={{ color: '#6272a4' }}>Loading…</div>}
+          {err && <div style={{ color: '#ff5555', fontSize: 13 }}>{err}</div>}
+          {detail && unitGroups.length === 0 && (
+            <p style={{ color: '#6272a4', fontSize: 14 }}>No lesson activity yet.</p>
+          )}
+          {detail && unitGroups.map(({ unit, lessons }) => (
+            <div key={unit} style={{ marginBottom: 24 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#bd93f9', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
+                {unit}
+              </div>
+              <div>
+                {lessons.map((lesson) => {
+                  const ls = detail.lessonState[lesson.id];
+                  const sub = detail.latestSubmissions[lesson.id];
+                  const isExpanded = expandedSubs.has(lesson.id);
+
+                  let gradeData: GradeResponse | null = null;
+                  if (sub?.grade_json) {
+                    try {
+                      gradeData = JSON.parse(sub.grade_json) as GradeResponse;
+                    } catch {
+                      // malformed grade_json — skip
+                    }
+                  }
+
+                  return (
+                    <div key={lesson.id} style={{ marginBottom: 8, background: '#282a36', borderRadius: 6, padding: '10px 14px', border: '1px solid #44475a33' }}>
+                      {/* Lesson row */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                        <span style={{ flex: 1, fontSize: 13, color: '#f8f8f2', minWidth: 0 }}>
+                          {lesson.title}
+                        </span>
+                        {stateBadge(ls?.state)}
+                        {ls?.state === 'completed' && ls.score !== null && (
+                          <span style={{ fontSize: 12, color: '#8be9fd', fontFamily: 'monospace', flexShrink: 0 }}>
+                            {ls.score} pts
+                          </span>
+                        )}
+                        {sub && (
+                          <button
+                            style={{ background: 'none', border: '1px solid #6272a4', borderRadius: 4, color: '#8be9fd', fontSize: 12, cursor: 'pointer', padding: '3px 8px', flexShrink: 0 }}
+                            onClick={() => toggleSub(lesson.id)}
+                          >
+                            {isExpanded ? 'Hide' : 'View submission'}
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Submission detail */}
+                      {isExpanded && sub && (
+                        <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #44475a33' }}>
+                          <div style={{ fontSize: 11, color: '#6272a4', marginBottom: 8 }}>
+                            Submitted: {fmtTs(sub.submitted_at)}
+                            {sub.score !== null && sub.possible !== null && (
+                              <span style={{ marginLeft: 12, color: '#f1fa8c' }}>
+                                Score: {sub.score} / {sub.possible}
+                              </span>
+                            )}
+                          </div>
+
+                          {gradeData && (
+                            <div style={{ marginBottom: 8 }}>
+                              <div style={{ fontSize: 12, fontWeight: 600, color: '#50fa7b', marginBottom: 6 }}>
+                                {gradeData.totalEarned} / {gradeData.totalPossible} pts
+                              </div>
+                              {gradeData.criteria && gradeData.criteria.length > 0 && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                  {gradeData.criteria.map((c) => (
+                                    <div key={c.id} style={{ fontSize: 12, background: '#1e1f29', borderRadius: 4, padding: '6px 10px' }}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: c.feedback ? 3 : 0 }}>
+                                        <span style={{ color: '#f8f8f2' }}>{c.title}</span>
+                                        <span style={{ color: '#8be9fd', fontFamily: 'monospace' }}>{c.earned}/{c.possible}</span>
+                                      </div>
+                                      {c.feedback && (
+                                        <div style={{ color: '#6272a4', fontSize: 11 }}>{c.feedback}</div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // List view
@@ -312,6 +598,11 @@ function DetailView({ classId }: { classId: string }) {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
 
+  // Progress state
+  const [progressMap, setProgressMap] = useState<Map<string, StudentProgress>>(new Map());
+  const [lessonMap, setLessonMap] = useState<Map<string, LessonMeta>>(new Map());
+  const [drawerEmail, setDrawerEmail] = useState<string | null>(null);
+
   const loadDetail = useCallback(async () => {
     setLoading(true);
     setLoadError('');
@@ -328,6 +619,30 @@ function DetailView({ classId }: { classId: string }) {
   useEffect(() => {
     void loadDetail();
   }, [loadDetail]);
+
+  // Fetch progress roll-up whenever class loads successfully.
+  useEffect(() => {
+    if (!detail) return;
+    apiFetch<{ students: StudentProgress[] }>(`/api/classes/${classId}/progress`).then((res) => {
+      if (res.error === null) {
+        const m = new Map<string, StudentProgress>();
+        for (const s of res.data.students) m.set(s.student_email, s);
+        setProgressMap(m);
+      }
+    }).catch(() => undefined);
+  }, [classId, detail]);
+
+  // Load lesson manifest once (client-safe static JSON).
+  useEffect(() => {
+    fetch('/lessons-manifest.json')
+      .then((r) => r.json() as Promise<{ lessons: LessonMeta[] }>)
+      .then((data) => {
+        const m = new Map<string, LessonMeta>();
+        for (const l of data.lessons) m.set(l.id, l);
+        setLessonMap(m);
+      })
+      .catch(() => undefined);
+  }, []);
 
   async function handleRegenCode() {
     if (!window.confirm('Regenerate join code? The old code will stop working.')) return;
@@ -501,41 +816,59 @@ function DetailView({ classId }: { classId: string }) {
         {roster.length === 0 ? (
           <p style={{ color: '#6272a4', fontSize: 14 }}>No students enrolled yet.</p>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={S.table}>
-              <thead>
-                <tr>
-                  <th style={S.th}>Email</th>
-                  <th style={S.th}>Enrolled</th>
-                  <th style={S.th}>Enrolled by</th>
-                  <th style={S.th}></th>
-                </tr>
-              </thead>
-              <tbody>
-                {roster.map((row) => (
-                  <tr key={row.student_email}>
-                    <td style={S.td}>{row.student_email}</td>
-                    <td style={{ ...S.td, color: '#6272a4' }}>{fmt(row.enrolled_at)}</td>
-                    <td style={{ ...S.td, color: '#6272a4' }}>
-                      {row.enrolled_by ?? 'self via code'}
-                    </td>
-                    <td style={S.td}>
-                      <button
-                        style={
-                          removingEmail === row.student_email
-                            ? S.btnDisabled
-                            : { ...S.btn('#ff5555'), color: '#f8f8f2' }
-                        }
-                        disabled={removingEmail === row.student_email}
-                        onClick={() => { void handleRemove(row.student_email); }}
-                      >
-                        {removingEmail === row.student_email ? '…' : 'Remove'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {roster.map((row) => {
+              const prog = progressMap.get(row.student_email);
+              return (
+                <div
+                  key={row.student_email}
+                  style={{ background: '#282a36', borderRadius: 6, padding: '12px 16px', border: '1px solid #44475a33', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: 'monospace', fontSize: 14, color: '#f8f8f2', marginBottom: 4 }}>
+                      {row.student_email}
+                    </div>
+                    <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#6272a4', flexWrap: 'wrap' }}>
+                      <span>
+                        Enrolled: {fmt(row.enrolled_at)} by {row.enrolled_by ?? 'self'}
+                      </span>
+                      {prog ? (
+                        <>
+                          <span style={{ color: '#50fa7b' }}>{prog.completed_count} completed</span>
+                          {prog.started_count > 0 && (
+                            <span style={{ color: '#f1fa8c' }}>{prog.started_count} started</span>
+                          )}
+                          {prog.last_active !== null && (
+                            <span>last active {fmtTs(prog.last_active)}</span>
+                          )}
+                        </>
+                      ) : (
+                        <span>No activity yet</span>
+                      )}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                    <button
+                      style={S.btn('#8be9fd')}
+                      onClick={() => setDrawerEmail(row.student_email)}
+                    >
+                      Open
+                    </button>
+                    <button
+                      style={
+                        removingEmail === row.student_email
+                          ? S.btnDisabled
+                          : { ...S.btn('#ff5555'), color: '#f8f8f2' }
+                      }
+                      disabled={removingEmail === row.student_email}
+                      onClick={() => { void handleRemove(row.student_email); }}
+                    >
+                      {removingEmail === row.student_email ? '…' : 'Remove'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
@@ -562,6 +895,16 @@ function DetailView({ classId }: { classId: string }) {
         </form>
         {enrollError && <p style={S.error}>{enrollError}</p>}
       </div>
+
+      {/* Student drawer */}
+      {drawerEmail !== null && (
+        <StudentDrawer
+          classId={classId}
+          email={drawerEmail}
+          lessonMap={lessonMap}
+          onClose={() => setDrawerEmail(null)}
+        />
+      )}
     </div>
   );
 }
