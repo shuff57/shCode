@@ -1,6 +1,9 @@
+'use client';
+
 import Link from 'next/link';
 import type { Lesson } from '../lib/types';
 import { badgeForLesson } from '../lib/lesson-badges';
+import { useLessonState } from '../lib/progress';
 
 const typeBadgeColors: Record<string, string> = {
   lesson: '#5baafd',
@@ -9,17 +12,29 @@ const typeBadgeColors: Record<string, string> = {
   example: '#a78bfa',
 };
 
+// Right-edge stripe colors signal per-lesson progress state.
+const stateStripeColors: Record<string, string> = {
+  completed: '#50fa7b',
+  started: '#f1fa8c',
+};
+
 export default function LessonCard({ lesson }: { lesson: Lesson }) {
   const type = lesson.type || 'lesson';
   const isAssignment = type === 'assignment' || type === 'project';
   const href = isAssignment ? `/assignment/${lesson.id}` : `/lesson/${lesson.id}`;
   const pBadge = badgeForLesson({ type: lesson.type, preview: lesson.preview });
+  const progress = useLessonState();
+  const lessonState = progress.states[lesson.id];
+  const stripeColor = stateStripeColors[lessonState ?? ''] ?? 'var(--border)';
 
   return (
     <Link
       href={href}
-      className="bg-card border-border border rounded p-4 hover:bg-muted block border-l-4 shadow-lg"
-      style={{ borderLeftColor: pBadge?.color ?? typeBadgeColors[type] ?? 'var(--brand)' }}
+      className="bg-card border-border border rounded p-4 hover:bg-muted block border-l-4 border-r-4 shadow-lg"
+      style={{
+        borderLeftColor: pBadge?.color ?? typeBadgeColors[type] ?? 'var(--brand)',
+        borderRightColor: stripeColor,
+      }}
     >
       <div className="flex items-center gap-2 mb-1 flex-wrap">
         {pBadge && (
