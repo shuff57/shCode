@@ -60,7 +60,7 @@ Canonical rhythm — see `lessons/2-1-2-reading-canvas-sprite/content.md` for th
 2. **Per-topic subsections** — one `## <Topic Name>` per chapter/topic the student should focus on. Plain topic names; no `R1`/`R2`/`Chapter` labels.
    ```md
    ## Canvas & Sprite
-   **Read before attempting `2.1.1a Hello Sprite`.**
+   **Read before attempting `2.1.5 Hello Sprite`.**
    ```
    Under each topic:
    - A "What you'll learn from it:" bulleted list (3–5 items).

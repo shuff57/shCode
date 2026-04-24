@@ -15,7 +15,7 @@ The course platform hosts the complete q5play docs at:
 For this module, focus on two chapters:
 
 ### R1 — "Canvas & Sprite" chapter
-**Read before attempting `2.1.1a Hello Sprite`.**
+**Read before attempting `2.1.5 Hello Sprite`.**
 
 What you'll learn from it:
 - How `new Canvas(width, height)` sets up the drawing area.
@@ -40,7 +40,7 @@ function draw() {
 ```
 
 ### R2 — "Input" chapter
-**Read before attempting `2.1.1b Make it Move`.**
+**Read before attempting `2.1.9 Make it Move`.**
 
 What you'll learn from it:
 - `kb.pressing(key)` — returns `true` every frame the key is held.

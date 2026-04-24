@@ -11,7 +11,7 @@
 | **Due** | End of Week 10 |
 
 **Before you start:**
-- Complete both in-app lessons (`2.1.1a Hello Sprite` + `2.1.1b Make it Move`).
+- Complete both in-app lessons (`2.1.5 Hello Sprite` + `2.1.9 Make it Move`).
 - Read the "Canvas & Sprite" and "Input" chapters of the q5play docs (see [readings](2.1.1_readings.md)).
 - The math you need is demonstrated in [Worked Example 3](2.1.1_worked-examples.md#worked-example-3--automatic-motion-with-framecount).
 

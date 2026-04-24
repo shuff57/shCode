@@ -1,5 +1,5 @@
 ## Canvas & Sprite
-**Read before attempting `2.1.1a Hello Sprite`.**
+**Read before attempting `2.1.5 Hello Sprite`.**
 
 What you'll learn from it:
 - How `new Canvas(width, height)` sets up the drawing area.
@@ -24,7 +24,7 @@ function draw() {
 ```
 
 ## Input
-**Read before attempting `2.1.1b Make it Move`.**
+**Read before attempting `2.1.9 Make it Move`.**
 
 What you'll learn from it:
 - `kb.pressing(key)` — returns `true` every frame the key is held.
