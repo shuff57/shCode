@@ -66,7 +66,6 @@ Canonical rhythm — see `lessons/2-1-2-reading-canvas-sprite/content.md` for th
    - A "What you'll learn from it:" bulleted list (3–5 items).
    - Optional: a **Try it:** paragraph followed by a ```` ```js live ```` runnable code block so the student can edit + run without leaving the reading.
 3. **Optional: a short glossary table** covering the terms introduced across the topics. Keep to ~7 rows.
-4. **Optional: a "How to read the docs efficiently" numbered list** (3–5 items). Useful once per unit, not on every reading.
 
 ### `live` code fences
 

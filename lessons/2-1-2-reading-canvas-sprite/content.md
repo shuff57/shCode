@@ -70,11 +70,3 @@ function draw() {
 | **`vel.x` / `vel.y`** | Velocity in pixels-per-frame. At 60 fps, `vel.x = 4` = 240 pixels/sec. |
 | **`frameCount`** | A global counter — increments by 1 each frame. Useful for timing and animation. |
 
----
-
-## How to read the docs efficiently
-
-1. **Skim first** — get a sense of what sections exist.
-2. **Read the function signatures** — `Sprite(x, y, w, h)` tells you exactly what arguments it wants.
-3. **Copy the examples into the editor and run them** — reading alone is not enough. Modify one number, see what changes.
-4. **Search before asking** — `Ctrl+F` in the docs page will find most things faster than asking the teacher.
