@@ -1,10 +1,3 @@
-**⚠️ RETAINED FOR SLO-2 EVIDENCE** — your teacher keeps a digital copy of every submission as dual-enrollment evidence. Write accordingly.
-
-**Before you start:**
-
-- Complete 2.2.11 Collectible Class (A12.1). You'll reference that class in Question 3.
-- Re-skim 2.2.10 Worked Example (Procedural vs OOP) for concrete vocabulary.
-
 Write your response in the box below. Short paragraphs or a numbered structure both work — whichever is clearest. Cite specific examples from your own work; generic statements do not earn full credit.
 
 ---
