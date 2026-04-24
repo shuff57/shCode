@@ -71,6 +71,8 @@ Keep it under 40 lines. A reading lesson is a pointer plus framing, not a second
 
 ## 5. Title convention
 
+> **`<unit-numbering>` = three dotted numbers `U.M.N`** (e.g. `2.1.3`). Titles MUST start with that prefix or the lesson vanishes from `/module/U.M` and the home page. See [README §Title numbering](README.md#title-numbering--the-hard-rule).
+
 `"<unit-numbering> Reading — <source>: <topic>"` — the word "Reading" in the title keeps the type legible.
 
 Examples:

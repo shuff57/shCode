@@ -17,6 +17,34 @@ This directory collects the **reusable build conventions** for each lesson type 
 
 Authoritative badge list lives in `lib/lesson-badges.tsx` (`PREVIEW_BADGES`). Add a row there when introducing a new type.
 
+## Title numbering — the hard rule
+
+Every lesson's `title` field **MUST** start with a three-part dotted number `<unit>.<module>.<sequence>`. Wherever the per-type docs say `<numbering>` or `<unit-numbering>`, that's what they mean.
+
+```
+<unit>     U = 1, 2, 3, …  (top-level unit number)
+<module>   M = 1, 2, 3, …  (module within the unit)
+<sequence> N = 1, 2, 3, …  (lesson position within the module)
+```
+
+`lib/curriculum.ts` → `parseNumberedIdFromTitle` greps for this pattern and uses it to place the lesson into its module. **Any lesson whose title doesn't start with three dotted numbers is silently dropped** from `/module/U.M` AND the home page — students never see it.
+
+### Position conventions
+
+- `U.M.1` is the unit slide deck (see `slide-deck-conventions.md`).
+- `U.M.2` onward is every other lesson in the module, in intended presentation order.
+
+### Accepted / rejected examples
+
+✅ `"2.1.1 Slides — q5play Foundations"`
+✅ `"2.1.3 Reading — q5play docs: Canvas & Sprite"`
+✅ `"3.1.1 Slides — <Unit 3 Module 1 name>"` (future)
+❌ `"Unit 2.1 Slides — q5play Foundations"` (no numbered prefix)
+❌ `"2.1 Sprite Playground"` (needs three parts, not two)
+❌ `"Reading: 2.1.3 Canvas & Sprite"` (number must be at the start)
+
+If you rename or renumber a lesson after students have started, their progress/commits stay with the folder ID (the `id` field in `lesson.json`), not the title. So renumbering a title doesn't lose data — it only changes where the lesson shows up in listings.
+
 ## Purpose — why per-type docs, not per-module
 
 Module specs under `curriculum/modules/lessons/` used to repeat the same "Build Outputs" boilerplate (video manifest shape, written-assignment rubric shape, lab starter conventions, etc.) on every file. When a convention shifted, 13 module specs had to change in lockstep and drifted instead.

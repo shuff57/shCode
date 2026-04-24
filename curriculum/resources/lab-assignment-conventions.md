@@ -89,6 +89,8 @@ Not `['"](?:left|right)['"]`.
 
 ## 6. Title convention
 
+> **`<unit-numbering>` = three dotted numbers `U.M.N`** (e.g. `2.1.10`). Titles MUST start with that prefix or the lesson vanishes from `/module/U.M` and the home page. See [README §Title numbering](README.md#title-numbering--the-hard-rule).
+
 `"<unit-numbering> <Lab Name>"` — no "Lab" or "Assignment" word in the title; the badge handles that.
 
 Examples:

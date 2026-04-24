@@ -60,6 +60,8 @@ A `content.md` is allowed but rare — only when the video needs a short compreh
 
 ## 4. Title convention
 
+> **`<unit-numbering>` = three dotted numbers `U.M.N`** (e.g. `2.1.2`). Titles MUST start with that prefix or the lesson vanishes from `/module/U.M` and the home page. See [README §Title numbering](README.md#title-numbering--the-hard-rule).
+
 `"<unit-numbering> Video — <topic>"` — the word "Video" appears in the title so the type is legible in the sidebar even if the badge is stripped.
 
 Example: `"2.1.2 Video — Your first q5play sketch"`.
