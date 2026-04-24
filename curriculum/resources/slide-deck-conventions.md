@@ -113,7 +113,7 @@ mdc: true
 
 **[q5play] Runnable code:** import and use `<Q5Runner :code="..." :width="400" :height="400" />` only when the slide demonstrates a q5play sketch that should run inside the deck. Copy the exact `<script setup lang="ts">` + import pattern from 2.1. Non-q5play units skip this entirely — drop the `components/Q5Runner.vue` file and don't reference it.
 
-**Scaffold discipline:** show **conceptual** code in slides, not the graded-lab solution. Per `q5play-starter-conventions.md` (or the unit's equivalent starter doc), the graded starter is a scaffold; don't put the solution on a slide.
+**Scaffold discipline:** show **conceptual** code in slides, not the graded-lab solution. Per `q5play-lesson-conventions.md` (or the unit's equivalent starter doc), the graded starter is a scaffold; don't put the solution on a slide.
 
 ### Slide rhythm (adapt to unit content)
 

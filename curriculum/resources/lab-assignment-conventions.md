@@ -7,7 +7,7 @@ Canonical rules for **in-app auto-graded labs** — the Axxy series (A10.1, A11.
 
 **Canonical example:** `lessons/2-1-9-a10-1-sprite-playground/`.
 
-Labs **also** follow `q5play-starter-conventions.md` — starter `script.js` is a scaffold, never the solution.
+Labs **also** follow `q5play-lesson-conventions.md` — starter `script.js` is a scaffold, never the solution.
 
 ---
 
@@ -36,7 +36,7 @@ Labs **also** follow `q5play-starter-conventions.md` — starter `script.js` is 
 
 - `type` — **must be `"assignment"`**. This is what toggles the "Assignment" badge in `lib/lesson-badges.tsx`.
 - `estimateMins` — labs are the 30–60 min bucket. Shorter = challenge; longer = project/capstone.
-- `steps` — one step per requirement (rough 1:1). Each `step.id` should correspond to a `// STEP N:` breadcrumb in the starter `script.js` (per `q5play-starter-conventions.md` §1).
+- `steps` — one step per requirement (rough 1:1). Each `step.id` should correspond to a `// STEP N:` breadcrumb in the starter `script.js` (per `q5play-lesson-conventions.md` §1).
 - `requirements` — **strict**. Each requirement checks a specific pattern the student must produce. Use `type: "regex"` for anywhere-in-file checks and `type: "inFunction"` for per-function-body checks.
 - `grading.totalPoints` — sum of all `requirements[].points`. Verify by hand.
 - `grading.passingScore` — conventionally `~66–75%` of `totalPoints`. Allows one missed requirement without blocking progression.
@@ -81,7 +81,7 @@ Not `['"](?:left|right)['"]`.
 
 ## 5. Don'ts
 
-- **Do not ship a working solution.** Starter is a scaffold (see `q5play-starter-conventions.md` §1).
+- **Do not ship a working solution.** Starter is a scaffold (see `q5play-lesson-conventions.md` §1).
 - **Do not set `passingScore === totalPoints`.** Labs allow one missed requirement.
 - **Do not use arrow keys** — WASD only. See §4.
 - **Do not auto-grade velocity magnitudes** (e.g. `vel.x = 4`). Students should be free to pick any value in a reasonable range; the grader checks *that* velocity is set, not *what* it's set to.

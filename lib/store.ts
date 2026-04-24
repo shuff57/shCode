@@ -12,7 +12,13 @@ import { listCommits, createCommit as apiCreateCommit } from './commits-api';
 
 interface UIState {
   sidebarOpen: boolean;
-  activeSidebarTab: 'Files' | 'Steps';
+  activeSidebarTab: 'Files' | 'Grading';
+}
+
+/** Coerce stale persisted value 'Steps' → 'Grading'. */
+export function parseTab(raw: unknown): 'Files' | 'Grading' {
+  if (raw === 'Files') return 'Files';
+  return 'Grading';
 }
 
 interface LessonState {
@@ -35,7 +41,7 @@ interface LessonState {
   updateFile: (path: string, value: string) => void;
   moveFile: (from: string, to: string) => void;
   setSidebarOpen: (open: boolean) => void;
-  setActiveTab: (tab: 'Files' | 'Steps') => void;
+  setActiveTab: (tab: 'Files' | 'Grading') => void;
   setRequirements: (reqs: Requirement[]) => void;
 
   // VC actions
@@ -64,7 +70,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   currentFile: undefined,
   fileContents: {},
   requirements: [],
-  ui: { sidebarOpen: false, activeSidebarTab: 'Files' },
+  ui: { sidebarOpen: false, activeSidebarTab: 'Grading' },
   commits: [],
   lastCommittedFileContents: {},
   dirtyFileIds: new Set(),

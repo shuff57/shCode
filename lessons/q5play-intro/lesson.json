@@ -15,25 +15,25 @@
       "id": "s1",
       "title": "Create a canvas",
       "instructions": "Inside setup(), call `new Canvas(400, 400)` to make a 400×400 drawing area.",
-      "hints": ["new Canvas(width, height) — width and height are in pixels."]
+      "hints": ["Open the q5play docs drawer on the right and find the Canvas section."]
     },
     {
       "id": "s2",
       "title": "Make a sprite",
       "instructions": "Create a sprite at the center: `player = new Sprite(200, 200, 40, 40)`. The four numbers are x, y, width, height.",
-      "hints": ["Store it in a variable outside setup() so update()/draw() can use it."]
+      "hints": ["Check the Sprite section of the q5play docs drawer for constructor arguments."]
     },
     {
       "id": "s3",
       "title": "Color it",
       "instructions": "Set `player.color = 'deepskyblue'` (or any CSS color).",
-      "hints": ["Try 'red', '#ff00ff', or 'rgba(255,0,0,0.5)'."]
+      "hints": ["Look up sprite properties in the q5play docs drawer."]
     },
     {
       "id": "s4",
       "title": "Paint the background",
       "instructions": "Inside draw(), call `background('#222')` so you can see the sprite clearly.",
-      "hints": ["draw() runs every frame — clearing the background keeps old frames from stacking up."]
+      "hints": ["Search the q5play docs drawer for background()."]
     }
   ],
   "requirements": [

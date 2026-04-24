@@ -7,7 +7,7 @@ Canonical rules for in-app **optional-stretch challenge** lessons. A challenge i
 
 **Canonical example:** `lessons/2-1-11-challenges/`.
 
-Challenges **also** follow `q5play-starter-conventions.md` — the starter `script.js` is not a solution. §3 below records the one relaxation (the "BUILD THIS:" block comment is acceptable in place of `// STEP N:` breadcrumbs).
+Challenges **also** follow `q5play-lesson-conventions.md` — the starter `script.js` is not a solution. §3 below records the one relaxation (the "BUILD THIS:" block comment is acceptable in place of `// STEP N:` breadcrumbs).
 
 ---
 
@@ -109,7 +109,7 @@ function draw() {
 }
 ```
 
-Either is acceptable. Per `q5play-starter-conventions.md` §1 exception: "Challenge shells … that ship with a `BUILD THIS:` block-comment spec followed by empty bodies are also acceptable; the spec comment is itself the scaffold."
+Either is acceptable. Per `q5play-lesson-conventions.md` §1 exception: "Challenge shells … that ship with a `BUILD THIS:` block-comment spec followed by empty bodies are also acceptable; the spec comment is itself the scaffold."
 
 ## 4. `content.md` shape
 

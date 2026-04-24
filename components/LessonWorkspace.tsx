@@ -21,6 +21,8 @@ import SubmitDialog from './SubmitDialog';
 import GradeReportView from './GradeReport';
 import TeacherPushBanner from './TeacherPushBanner';
 import CrossDeviceSyncBanner from './CrossDeviceSyncBanner';
+import Q5DocsDrawer from './Q5DocsDrawer';
+import { RotateCcw } from 'lucide-react';
 
 interface Neighbor {
   id: string;
@@ -378,6 +380,7 @@ export default function LessonWorkspace({
     <>
       <CrossDeviceSyncBanner />
       <TeacherPushBanner />
+      {isQ5Mode && <Q5DocsDrawer />}
       {isAssignment ? (
         <AssignmentHeader
           lesson={lesson}
@@ -429,17 +432,40 @@ export default function LessonWorkspace({
             Files
           </button>
           <button
-            style={ui.activeSidebarTab === 'Steps' ? { fontWeight: 'bold' } : {}}
-            onClick={() => setActiveTab('Steps')}
+            style={ui.activeSidebarTab === 'Grading' ? { fontWeight: 'bold' } : {}}
+            onClick={() => setActiveTab('Grading')}
           >
-            Steps
+            Grading
           </button>
         </div>
         <div className="sidebar-content">
           {ui.activeSidebarTab === 'Files' ? (
             <FileExplorer tree={lesson.files} />
           ) : (
-            <LessonSteps lesson={lesson} />
+            <div className="grading-tab">
+              {lesson.steps.length === 0 && requirements.length === 0 ? (
+                <p className="grading-empty">No graded items for this lesson.</p>
+              ) : (
+                <>
+                  {lesson.steps.length > 0 && (
+                    <div className="grading-section">
+                      <h3 className="grading-subhead">Steps</h3>
+                      <LessonSteps lesson={lesson} />
+                    </div>
+                  )}
+                  {requirements.length > 0 && (
+                    <div className="grading-section">
+                      <h3 className="grading-subhead">Requirements</h3>
+                      <RequirementsSection
+                        requirements={requirements}
+                        summary={summary}
+                        onRerun={runTests}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           )}
         </div>
         {ui.activeSidebarTab === 'Files' && (
@@ -456,6 +482,28 @@ export default function LessonWorkspace({
             <div className="run-toolbar">
               <button className="btn-run" onClick={isJscadMode ? runJscad : isQ5Mode ? runQ5 : runCode}>
                 ▶ Run
+              </button>
+              <button
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 4,
+                  background: 'transparent',
+                  color: '#6272a4',
+                  border: '1px solid #44475a',
+                  cursor: 'pointer',
+                  fontSize: 13,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
+                }}
+                onClick={() => {
+                  if (window.confirm('Reset your code to the starter? Unsaved work will be lost.')) {
+                    setLesson(lesson);
+                  }
+                }}
+              >
+                <RotateCcw size={12} />
+                Reset
               </button>
               <span className="run-hint">Ctrl+Enter</span>
             </div>
@@ -508,12 +556,6 @@ export default function LessonWorkspace({
           )}
         </div>
       </details>
-      <RequirementsSection
-        requirements={requirements}
-        summary={summary}
-        onRerun={runTests}
-      />
-
       {submitted && gradeReport && (
         <GradeReportView
           report={gradeReport}

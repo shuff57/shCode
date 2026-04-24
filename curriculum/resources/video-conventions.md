@@ -53,7 +53,7 @@ A `content.md` is allowed but rare — only when the video needs a short compreh
 
 ## 3. Don'ts
 
-- **Do not invent a `videoUrl`.** Builder AI leaves it empty; teacher curates. Same rule as `q5play-starter-conventions.md` history column.
+- **Do not invent a `videoUrl`.** Builder AI leaves it empty; teacher curates. Same rule as `q5play-lesson-conventions.md` history column.
 - **Do not auto-grade videos.** No `steps`, no `requirements`, no `aiGrader`.
 - **Do not bundle a `script.js`.** There is nothing to run.
 - **Do not use `preview: "video"` for a slide deck.** Slides have their own type (see `slide-deck-conventions.md`).
