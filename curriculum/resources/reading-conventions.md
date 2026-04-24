@@ -73,7 +73,7 @@ A fenced block annotated ```` ```js live ```` renders as a runnable q5play sketc
 
 ### Length
 
-Aim for **under ~100 lines**. The canonical example is 83 lines. Going longer usually means you're duplicating the external source instead of pointing at it — revisit what belongs here vs what belongs in the link target.
+Aim for **under ~100 lines**. The canonical example is 72 lines. Going longer usually means you're duplicating the external source instead of pointing at it — revisit what belongs here vs what belongs in the link target.
 
 ## 4. Don'ts
 
@@ -100,3 +100,4 @@ Examples:
 |------|------|
 | Unit 2.1 buildout | Pattern crystallized in `2-1-2-reading-canvas-sprite`, `2-1-6-reading-input`, `2-2-3-reading-classes`, `2-2-9-reading-parallel-vs-classes`. |
 | This doc | Hoisted out of per-module specs. |
+| Scaffolding pass | Stripped hub-style lead header, sibling-resources hub line, "Primary reading" section wrapper, restated external link, R1/R2/"Chapter" subsection labels, and generic "how to read the docs efficiently" block from the canonical example. Reading now opens straight into per-topic `## <Topic>` subsections and ends on the optional glossary. §3 rhythm + §4 don'ts updated to match. |
