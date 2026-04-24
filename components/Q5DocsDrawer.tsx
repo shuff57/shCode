@@ -1,9 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { sections } from '../lib/q5play-docs';
 
 const LS_KEY = 'shCode:q5docs:closed';
+const WIDTH_KEY = 'shCode:q5docs:width';
+const MIN_W = 280;
+const MAX_W = 640;
+const DEFAULT_W = 420;
 
 export default function Q5DocsDrawer() {
   // Render nothing until we've hydrated on the client — reading localStorage
@@ -13,11 +17,42 @@ export default function Q5DocsDrawer() {
   const [open, setOpen] = useState<boolean>(true);
   const [activeSectionSlug, setActiveSectionSlug] = useState<string>(sections[0]?.slug ?? '');
   const [closeBtnHovered, setCloseBtnHovered] = useState(false);
+  const [width, setWidth] = useState<number>(DEFAULT_W);
+  const widthRef = useRef(width);
+  widthRef.current = width;
 
   useEffect(() => {
-    // After mount, read the persisted closed flag and flip `open` if needed.
+    // After mount, read persisted flags + width and flip state if needed.
     setOpen(localStorage.getItem(LS_KEY) !== '1');
+    const savedWidth = parseInt(localStorage.getItem(WIDTH_KEY) ?? '', 10);
+    if (!Number.isNaN(savedWidth)) {
+      setWidth(Math.max(MIN_W, Math.min(MAX_W, savedWidth)));
+    }
     setMounted(true);
+  }, []);
+
+  // Drag-to-resize handlers on the drawer's left edge.
+  const onHandlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    document.body.style.cursor = 'ew-resize';
+    document.body.style.userSelect = 'none';
+  }, []);
+
+  const onHandlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!(e.buttons & 1)) return; // primary button must be held
+    const next = Math.max(MIN_W, Math.min(MAX_W, window.innerWidth - e.clientX));
+    setWidth(next);
+  }, []);
+
+  const onHandlePointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      /* already released */
+    }
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    localStorage.setItem(WIDTH_KEY, String(widthRef.current));
   }, []);
 
   // Keep localStorage in sync with open state — but only after mount so the
@@ -51,7 +86,7 @@ export default function Q5DocsDrawer() {
           top: 0,
           right: 0,
           bottom: 0,
-          width: 'min(420px, 100vw)',
+          width: `min(${width}px, 100vw)`,
           background: '#21222c',
           borderLeft: '1px solid #44475a',
           display: 'flex',
@@ -62,6 +97,25 @@ export default function Q5DocsDrawer() {
           pointerEvents: open ? 'auto' : 'none',
         }}
       >
+        {/* Left-edge resize handle */}
+        <div
+          role="separator"
+          aria-label="Resize docs drawer"
+          aria-orientation="vertical"
+          onPointerDown={onHandlePointerDown}
+          onPointerMove={onHandlePointerMove}
+          onPointerUp={onHandlePointerUp}
+          onPointerCancel={onHandlePointerUp}
+          style={{
+            position: 'absolute',
+            left: -2,
+            top: 0,
+            bottom: 0,
+            width: 6,
+            cursor: 'ew-resize',
+            zIndex: 1,
+          }}
+        />
         {/* Header */}
         <div
           style={{

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import type { Lesson } from '../lib/types';
 import { useLessonStore } from '../lib/store';
 import { buildPreviewHtml, buildJscadPreviewHtml } from '../lib/preview-builder';
@@ -63,6 +63,40 @@ export default function LessonWorkspace({
   const [submitOpen, setSubmitOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [gradeReport, setGradeReport] = useState<GradeReportType | null>(null);
+
+  // Sidebar width — persisted to localStorage so reloads remember it.
+  const SIDEBAR_MIN = 200;
+  const SIDEBAR_MAX = 520;
+  const SIDEBAR_DEFAULT = 260;
+  const [sidebarWidth, setSidebarWidth] = useState<number>(SIDEBAR_DEFAULT);
+  const sidebarWidthRef = useRef(sidebarWidth);
+  sidebarWidthRef.current = sidebarWidth;
+  useEffect(() => {
+    const saved = parseInt(localStorage.getItem('shCode:sidebar:width') ?? '', 10);
+    if (!Number.isNaN(saved)) {
+      setSidebarWidth(Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, saved)));
+    }
+  }, []);
+  const onSidebarHandleDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    document.body.style.cursor = 'ew-resize';
+    document.body.style.userSelect = 'none';
+  }, []);
+  const onSidebarHandleMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!(e.buttons & 1)) return;
+    const next = Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, e.clientX));
+    setSidebarWidth(next);
+  }, []);
+  const onSidebarHandleUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      /* already released */
+    }
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    localStorage.setItem('shCode:sidebar:width', String(sidebarWidthRef.current));
+  }, []);
 
   const isAssignment = mode === 'assignment' || lesson.type === 'assignment' || lesson.type === 'project';
 
@@ -409,9 +443,30 @@ export default function LessonWorkspace({
         id="sidebar"
         className={ui.sidebarOpen ? 'open' : ''}
         aria-label="File explorer"
+        style={{ width: sidebarWidth }}
         onMouseEnter={() => setSidebarOpen(true)}
         onMouseLeave={() => setSidebarOpen(false)}
       >
+        {/* Right-edge resize handle — captures the pointer so drags continue
+            even if the cursor briefly leaves the sidebar element. */}
+        <div
+          role="separator"
+          aria-label="Resize sidebar"
+          aria-orientation="vertical"
+          onPointerDown={onSidebarHandleDown}
+          onPointerMove={onSidebarHandleMove}
+          onPointerUp={onSidebarHandleUp}
+          onPointerCancel={onSidebarHandleUp}
+          style={{
+            position: 'absolute',
+            right: -2,
+            top: 0,
+            bottom: 0,
+            width: 6,
+            cursor: 'ew-resize',
+            zIndex: 1,
+          }}
+        />
         <div className="sidebar-tabs">
           <button
             style={ui.activeSidebarTab === 'Files' ? { fontWeight: 'bold' } : {}}
