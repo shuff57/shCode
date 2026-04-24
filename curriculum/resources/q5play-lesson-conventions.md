@@ -54,7 +54,7 @@ Use **Hello Sprite (`lessons/q5play-intro/lesson.json`)** as a concrete working 
 - `steps` — authored alongside requirements for authoring consistency and so the `// STEP N:` breadcrumbs in `script.js` have matching `steps[].id` values (see §3). **Currently not rendered in the student UI** (the Grading tab shows only `requirements` — see §5). The `instructions` + `hints` still belong here because future UI may surface them; keep them clean and pointing at the docs (see §2).
 - `requirements` — auto-graded checks AND the student-facing task list (since `steps` are unrendered). Each requirement's `title` + `description` is what the student reads in the sidebar — write them as student-readable instructions, not terse grader labels. See `lab-assignment-conventions.md` for requirement-type grammar.
 - `grading.totalPoints` — sum of all `requirements[].points`. Hello Sprite: `10+10+5+5 = 30`. Verify by hand.
-- `grading.passingScore` — conventionally **~66% of `totalPoints`**. Hello Sprite: `20 / 30 = 67%`. Allows one missed requirement without blocking progression.
+- `grading.passingScore` — **does not gate Submit on q5 lessons.** Submit requires every requirement green (see §5). `passingScore` only affects the SubmitDialog's "below passing" warning, which can never fire for q5 since the Submit button stays disabled until all-green. Set it to `totalPoints` for new q5 lessons so the field reads as truthful; existing files using ~66% still work and don't need migration.
 
 ## 2. Hints rule — point at the docs, don't spoon-feed
 
@@ -175,6 +175,10 @@ function draw() {   // every frame
 
 This isn't something the lesson author configures — it's what the in-app workspace does automatically when `preview === "q5play"`. Knowing it helps you write requirements + hints correctly.
 
+- **Top assignment header with Submit button** renders on every q5play lesson (`components/AssignmentHeader.tsx`). It shows the lesson title, week + category, a live score bar (current grade / total), an "In Progress" / "Submitted" badge, and the Submit button.
+  - **Submit is disabled until every requirement is green.** The gate is `requirements.every(r => r.status === 'passed')`, not `score >= passingScore`. This is q5-specific (`components/LessonWorkspace.tsx` — see `canSubmit` for `isQ5Mode`).
+  - **Submit writes to the DB.** On confirm, the workspace POSTs the `script.js` content + full grade report to `/api/lesson-submissions` (append-only history) and marks `lesson_state` as `completed` with the earned score. If the server write fails, the student sees an alert and the lesson stays "In Progress" so they can retry.
+  - **Completion is sticky.** Once submitted, the lesson shows green-check completion in the lesson list / teacher gradebook views. There's no "unsubmit" UI from the workspace; teachers can clear `lesson_state` server-side if needed.
 - **Right-side q5play docs drawer** auto-opens on every q5play lesson (`components/Q5DocsDrawer.tsx`). Students pick a section from a dropdown and read pages inline. Close it with `×`; the closed state persists per-device in `localStorage` under `shCode:q5docs:closed` and reopens via a small vertical "Docs" tab on the right edge. Because of this, **hints should always assume the docs are one click away** — see §2.
 - **Left sidebar's Grading tab** (the default tab) shows `requirements[]` stacked top-to-bottom. Each requirement renders as a card with:
   - A **4px left border** colored green (passed), red (failed), or muted grey (not yet graded). No check/X circle, no point total.
@@ -219,7 +223,6 @@ Examples:
 - **Do not give specific hints.** Generic docs pointers only (see §2).
 - **Do not include `/// <reference path=...>`** in `script.js` (see §4.1).
 - **Do not include `authored_by_email` or other DB-side fields** in the starter. Those belong to the commit pipeline.
-- **Do not set `passingScore === totalPoints`.** Allow one missed requirement.
 - **Do not duplicate the module's teacher-led demo in `script.js`.** The demo is in the slide deck; the starter is what the student types from empty.
 
 ---
@@ -251,3 +254,4 @@ rg '"hints":\s*\[[^\]]*=\s*['"'"'"]'             lessons/    # leaks a literal v
 | Rename + expansion | File renamed `q5play-starter-conventions.md` → `q5play-lesson-conventions.md` and broadened to cover the full Q5 Lesson type: added §1 `lesson.json` shape, §2 hints-rule (generic docs pointers), §5 UI-behavior notes covering the right-side docs drawer, Grading tab (merged steps+requirements), and the Code Editor / Preview dropdown with Run + Reset buttons. All 15 references in other curriculum docs updated. |
 | UI refactor | Grading tab dropped the `Steps` subsection — now renders only `requirements[]`, stacked vertically. `RequirementCard` simplified: no status circle, no `N/M pts` label; pass/fail signalled only by the 4px left border (green / red / muted). Editor + preview + console unwrapped from their `<details>` dropdowns; Commit / History moved into the editor toolbar (right-aligned, opposite Run/Reset). §1 JSON shape rewritten to use Hello Sprite's concrete values; §1 field-by-field notes that `steps[]` is currently unrendered and `requirements[]` titles/descriptions must carry the student-facing task wording. §5 rewritten to match. |
 | Collapsible console + resizable sidebars | Console log put back inside a `<details>` (collapsed by default) so the editor/preview have maximum vertical room. Both side panels (left Files/Grading sidebar and right q5 docs drawer) gained 6px drag handles on their outer edges; widths persist per-device in `localStorage` under `shCode:sidebar:width` and `shCode:q5docs:width`. §5 notes the resize affordance and reminds authors not to assume a fixed viewport. |
+| Submit + DB-tracked completion on q5 lessons | Every q5 lesson (`preview === "q5play"`) now renders the AssignmentHeader with a Submit button — previously only `type: "assignment"` lessons did. Submit is gated on **all requirements green** (q5-specific rule, replacing the old `score >= passingScore` gate). On confirm, the workspace writes to `/api/lesson-submissions` and marks `lesson_state` completed; failure surfaces as an alert and keeps the lesson In Progress. §1 field-by-field notes that `passingScore` no longer gates Submit on q5; §5 documents the header + Submit behavior; §8 dropped the "don't set `passingScore === totalPoints`" rule since the gate is now all-green. |
