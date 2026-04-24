@@ -180,7 +180,8 @@ This isn't something the lesson author configures — it's what the in-app works
   - A **4px left border** colored green (passed), red (failed), or muted grey (not yet graded). No check/X circle, no point total.
   - The requirement's `title` (bold heading) + `description` (sub-line) + any grader `messages[]`.
   - This is the student's primary task list — `steps[]` is not currently rendered (see §1 field-by-field).
-- **Editor + live preview + console** render directly on the right side of the sidebar (no wrapping `<details>` dropdown). Above them sits a toolbar with `▶ Run` / `Reset` on the left (q5play / jscad / console modes) and `Commit (N) / History` on the right.
+- **Editor + live preview** render directly on the right side of the sidebar (no wrapping `<details>` dropdown). Above them sits a toolbar with `▶ Run` / `Reset` on the left (q5play / jscad / console modes) and `Commit (N) / History` on the right.
+- **Console log** sits below the editor/preview split inside its own `<details>` block (summary = "Console"). Students can expand it when they want to see `console.log` output or errors; collapsed by default so the editor + preview have maximum vertical room.
 
 Reset restores the starter `script.js` — warn students in a requirement `description` if you want them to iterate experimentally.
 

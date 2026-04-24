@@ -531,9 +531,12 @@ export default function LessonWorkspace({
             <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
           </div>
           {!isConsoleMode && (
-            <div className="console-body">
-              <Console resetKey={isJscadMode ? String(runKey) : srcDoc} />
-            </div>
+            <details className="console">
+              <summary>Console</summary>
+              <div className="console-body">
+                <Console resetKey={isJscadMode ? String(runKey) : srcDoc} />
+              </div>
+            </details>
           )}
         </div>
       </div>
