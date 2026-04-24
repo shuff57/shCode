@@ -130,7 +130,7 @@ Each unit's slide deck is surfaced through an in-app lesson at `lessons/2-X-1-sl
 ```json
 {
   "id": "2-X-1-slides",
-  "title": "Unit 2.X Slides — <Unit Name>",
+  "title": "2.X.1 Slides — <Unit Name>",
   "description": "Unit 2.X slides — <topics>. Includes runnable code examples.",
   "type": "lesson",
   "preview": "slides",
@@ -142,12 +142,18 @@ Each unit's slide deck is surfaced through an in-app lesson at `lessons/2-X-1-sl
 
 `slidesUrl` is a **relative path** (`/slides/2.X/`) — works in both dev (via Next.js public/ serving) and prod once the prebuild has run.
 
-### `title` must not collide with a module number
+### `title` MUST start with a numbered prefix
 
-The title uses the **unit** number (`Unit 2.X`), not a module number. Avoid "2.X.1 Slides …" — that collides with the curriculum's own Module 2.X.1 (the first module of the unit). Append the unit's full name for clarity.
+`lib/curriculum.ts` → `parseNumberedIdFromTitle` greps the title for a leading `X.Y.Z`. Any lesson whose title doesn't start with that pattern is silently dropped from the module listing page AND the home page — the student never sees it.
 
-✅ `"Unit 2.1 Slides — q5play Foundations"`
-❌ `"2.1.1 Slides — Module 2.1 Presentation"` (collides with Module 2.1.1 in the curriculum plan)
+Slides always occupy the `.1` position in their unit. All other lessons start at `.2`.
+
+✅ `"2.1.1 Slides — q5play Foundations"`
+✅ `"2.2.1 Slides — Object-Oriented Programming"`
+❌ `"Unit 2.1 Slides — q5play Foundations"` (no numbered prefix — lesson vanishes from /module/2.1)
+❌ `"2.1 Slides — q5play Foundations"` (needs three numbers, not two)
+
+The teacher-reference doc at `curriculum/modules/lessons/2.X.1_*.md` shares the same number but lives in a different namespace (never rendered to students), so there's no actual collision.
 
 ### `description` must be student-facing
 
@@ -175,7 +181,7 @@ Do NOT add a `slidesSource` field. It was previously rendered as "Edit source: �
 1. **Bootstrap:** `mkdir slides/2.X && cp -r slides/2.1/{components,public,setup} slides/2.X/`.
 2. **Author slides.md** — read `slides/2.1/slides.md` for reference; keep style parity.
 3. **Add 3 npm scripts** + chain into `slides:build-all`.
-4. **Update in-app lesson** `lessons/2-X-1-slides/lesson.json` with `slidesUrl` and `slidesDevUrl`. Title follows `"Unit 2.X Slides — <Unit Name>"`; description is student-facing (see §5).
+4. **Update in-app lesson** `lessons/2-X-1-slides/lesson.json` with `slidesUrl` and `slidesDevUrl`. Title MUST start with `"2.X.1 Slides — <Unit Name>"` (see §5 for why); description is student-facing (see §5).
 5. **Verify:** `npm run slides:2.X:build` should produce `public/slides/2.X/index.html` with no errors.
 6. **Verify deploy path:** run `npm run build` (triggers prebuild) and confirm `public/slides/2.X/index.html` exists.
 7. **Live-edit:** `npm run slides:2.X` on port 303N for authoring.
