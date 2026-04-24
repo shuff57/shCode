@@ -19,6 +19,11 @@ body {
   font-family: 'Courier', monospace;
   line-height: 1.6;
   padding: 20px;
+  /* Right padding grows with the open tabbed drawer (Docs/Quest/File share
+     one panel) so the editor and surrounding content reflow instead of being
+     covered. */
+  padding-right: calc(20px + var(--shd-tabbed, 0px));
+  transition: padding-right 0.22s ease;
   display: flex;
   flex-direction: column;
   gap: 20px;

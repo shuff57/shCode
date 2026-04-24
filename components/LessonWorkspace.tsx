@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import type { Lesson } from '../lib/types';
 import { useLessonStore } from '../lib/store';
 import { buildPreviewHtml, buildJscadPreviewHtml } from '../lib/preview-builder';
@@ -22,7 +22,8 @@ import SubmitDialog from './SubmitDialog';
 import GradeReportView from './GradeReport';
 import TeacherPushBanner from './TeacherPushBanner';
 import CrossDeviceSyncBanner from './CrossDeviceSyncBanner';
-import Q5DocsDrawer from './Q5DocsDrawer';
+import Q5DocsContent from './Q5DocsContent';
+import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import { RotateCcw } from 'lucide-react';
 
 interface Neighbor {
@@ -47,9 +48,6 @@ export default function LessonWorkspace({
 }: LessonWorkspaceProps) {
   const setLesson = useLessonStore((s) => s.setLesson);
   const files = useLessonStore((s) => s.fileContents);
-  const ui = useLessonStore((s) => s.ui);
-  const setSidebarOpen = useLessonStore((s) => s.setSidebarOpen);
-  const setActiveTab = useLessonStore((s) => s.setActiveTab);
   const requirements = useLessonStore((s) => s.requirements);
   const setRequirements = useLessonStore((s) => s.setRequirements);
   const commits = useLessonStore((s) => s.commits);
@@ -59,46 +57,14 @@ export default function LessonWorkspace({
   const [srcDoc, setSrcDoc] = useState('');
   const [runKey, setRunKey] = useState(0);
   const [q5Code, setQ5Code] = useState('');
+  const [isRunning, setIsRunning] = useState(false);
+  const [resetMsg, setResetMsg] = useState<string | null>(null);
   const [consoleOutput, setConsoleOutput] = useState<Array<{type: string; message: string; timestamp: string}>>([]);
   const [commitOpen, setCommitOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [gradeReport, setGradeReport] = useState<GradeReportType | null>(null);
-
-  // Sidebar width — persisted to localStorage so reloads remember it.
-  const SIDEBAR_MIN = 200;
-  const SIDEBAR_MAX = 520;
-  const SIDEBAR_DEFAULT = 260;
-  const [sidebarWidth, setSidebarWidth] = useState<number>(SIDEBAR_DEFAULT);
-  const sidebarWidthRef = useRef(sidebarWidth);
-  sidebarWidthRef.current = sidebarWidth;
-  useEffect(() => {
-    const saved = parseInt(localStorage.getItem('shCode:sidebar:width') ?? '', 10);
-    if (!Number.isNaN(saved)) {
-      setSidebarWidth(Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, saved)));
-    }
-  }, []);
-  const onSidebarHandleDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
-    document.body.style.cursor = 'ew-resize';
-    document.body.style.userSelect = 'none';
-  }, []);
-  const onSidebarHandleMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    if (!(e.buttons & 1)) return;
-    const next = Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, e.clientX));
-    setSidebarWidth(next);
-  }, []);
-  const onSidebarHandleUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch {
-      /* already released */
-    }
-    document.body.style.cursor = '';
-    document.body.style.userSelect = '';
-    localStorage.setItem('shCode:sidebar:width', String(sidebarWidthRef.current));
-  }, []);
 
   const isAssignment = mode === 'assignment' || lesson.type === 'assignment' || lesson.type === 'project';
 
@@ -288,6 +254,7 @@ export default function LessonWorkspace({
     const doc = buildJscadPreviewHtml(scriptContent);
     setSrcDoc(doc);
     setRunKey((k) => k + 1);
+    setIsRunning(true);
     setTimeout(() => runTests(), 600);
   }
 
@@ -296,7 +263,16 @@ export default function LessonWorkspace({
   function runQ5() {
     setQ5Code(files['script.js'] || '');
     setRunKey((k) => k + 1);
+    setIsRunning(true);
     setTimeout(() => runTests(), 400);
+  }
+
+  // Stop unloads the iframe back to its empty state without touching the editor.
+  function stopRun() {
+    setQ5Code('');
+    setSrcDoc('');
+    setRunKey(0);
+    setIsRunning(false);
   }
 
   // Auto-save to localStorage (debounced)
@@ -436,7 +412,42 @@ export default function LessonWorkspace({
     <>
       <CrossDeviceSyncBanner />
       <TeacherPushBanner />
-      {isQ5Mode && <Q5DocsDrawer />}
+      <TabbedRightDrawer
+        storageKey="shCode:drawer"
+        tabs={[
+          ...(isQ5Mode
+            ? ([
+                {
+                  key: 'docs',
+                  label: 'Docs',
+                  color: '#bd93f9',
+                  content: <Q5DocsContent />,
+                },
+              ] as DrawerTab[])
+            : []),
+          {
+            key: 'quest',
+            label: 'Quest',
+            color: '#50fa7b',
+            content:
+              requirements.length === 0 ? (
+                <p style={{ color: '#6272a4' }}>No graded items for this lesson.</p>
+              ) : (
+                <RequirementsSection
+                  requirements={requirements}
+                  summary={summary}
+                  onRerun={runTests}
+                />
+              ),
+          },
+          {
+            key: 'file',
+            label: 'File',
+            color: '#8be9fd',
+            content: <FileExplorer tree={lesson.files} />,
+          },
+        ]}
+      />
       {showAssignmentHeader ? (
         <AssignmentHeader
           lesson={lesson}
@@ -451,92 +462,53 @@ export default function LessonWorkspace({
           <h1>{lesson.title}</h1>
         </div>
       )}
-      <div
-        id="sidebarHover"
-        aria-hidden="true"
-        onMouseEnter={() => setSidebarOpen(true)}
-        onMouseLeave={(e) => {
-          const sidebar = document.getElementById('sidebar');
-          const to = e.relatedTarget;
-          if (!sidebar || !(to instanceof Node) || !sidebar.contains(to)) {
-            setSidebarOpen(false);
-          }
-        }}
-      ></div>
-      <aside
-        id="sidebar"
-        className={ui.sidebarOpen ? 'open' : ''}
-        aria-label="File explorer"
-        style={{ width: sidebarWidth }}
-        onMouseEnter={() => setSidebarOpen(true)}
-        onMouseLeave={() => setSidebarOpen(false)}
-      >
-        {/* Right-edge resize handle — captures the pointer so drags continue
-            even if the cursor briefly leaves the sidebar element. */}
-        <div
-          role="separator"
-          aria-label="Resize sidebar"
-          aria-orientation="vertical"
-          onPointerDown={onSidebarHandleDown}
-          onPointerMove={onSidebarHandleMove}
-          onPointerUp={onSidebarHandleUp}
-          onPointerCancel={onSidebarHandleUp}
-          style={{
-            position: 'absolute',
-            right: -2,
-            top: 0,
-            bottom: 0,
-            width: 6,
-            cursor: 'ew-resize',
-            zIndex: 1,
-          }}
-        />
-        <div className="sidebar-tabs">
-          <button
-            style={ui.activeSidebarTab === 'Files' ? { fontWeight: 'bold' } : {}}
-            onClick={() => setActiveTab('Files')}
-          >
-            Files
-          </button>
-          <button
-            style={ui.activeSidebarTab === 'Grading' ? { fontWeight: 'bold' } : {}}
-            onClick={() => setActiveTab('Grading')}
-          >
-            Grading
-          </button>
-        </div>
-        <div className="sidebar-content">
-          {ui.activeSidebarTab === 'Files' ? (
-            <FileExplorer tree={lesson.files} />
+      {(prev || next) && (
+        <nav className="lesson-nav">
+          {prev ? (
+            <a className="lesson-nav-link" href={`${basePath}/${prev.id}`}>
+              <span className="lesson-nav-arrow">←</span>
+              <span className="lesson-nav-label">
+                <span className="lesson-nav-kicker">Previous</span>
+                <span className="lesson-nav-title">{prev.title}</span>
+              </span>
+            </a>
           ) : (
-            <div className="grading-tab">
-              {requirements.length === 0 ? (
-                <p className="grading-empty">No graded items for this lesson.</p>
-              ) : (
-                <RequirementsSection
-                  requirements={requirements}
-                  summary={summary}
-                  onRerun={runTests}
-                />
-              )}
-            </div>
+            <span />
           )}
-        </div>
-        {ui.activeSidebarTab === 'Files' && (
-          <div className="sidebar-actions">
-            <button type="button">Add file</button>
-            <button type="button">Upload file(s)</button>
-          </div>
-        )}
-      </aside>
+          {next ? (
+            <a className="lesson-nav-link lesson-nav-link-right" href={`${basePath}/${next.id}`}>
+              <span className="lesson-nav-label">
+                <span className="lesson-nav-kicker">Next</span>
+                <span className="lesson-nav-title">{next.title}</span>
+              </span>
+              <span className="lesson-nav-arrow">→</span>
+            </a>
+          ) : (
+            <span />
+          )}
+        </nav>
+      )}
       <div className="editor-card">
         <div className="editor-body">
           <div className="run-toolbar">
             {(isConsoleMode || isJscadMode || isQ5Mode) && (
               <>
-                <button className="btn-run" onClick={isJscadMode ? runJscad : isQ5Mode ? runQ5 : runCode}>
-                  ▶ Run
-                </button>
+                {isRunning && (isJscadMode || isQ5Mode) ? (
+                  <button
+                    className="btn-run"
+                    style={{ background: '#ff5555', borderColor: '#ff5555' }}
+                    onClick={stopRun}
+                  >
+                    ■ Stop
+                  </button>
+                ) : (
+                  <button
+                    className="btn-run"
+                    onClick={isJscadMode ? runJscad : isQ5Mode ? runQ5 : runCode}
+                  >
+                    ▶ Run
+                  </button>
+                )}
                 <button
                   style={{
                     padding: '6px 14px',
@@ -553,6 +525,9 @@ export default function LessonWorkspace({
                   onClick={() => {
                     if (window.confirm('Reset your code to the starter? Unsaved work will be lost.')) {
                       setLesson(lesson);
+                      stopRun();
+                      setResetMsg('Code reset to starter.');
+                      setTimeout(() => setResetMsg(null), 2500);
                     }
                   }}
                 >
@@ -560,6 +535,20 @@ export default function LessonWorkspace({
                   Reset
                 </button>
                 <span className="run-hint">Ctrl+Enter</span>
+                {resetMsg && (
+                  <span
+                    role="status"
+                    aria-live="polite"
+                    style={{
+                      color: '#50fa7b',
+                      fontSize: 13,
+                      marginLeft: 8,
+                      fontWeight: 500,
+                    }}
+                  >
+                    ✓ {resetMsg}
+                  </span>
+                )}
               </>
             )}
             <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
@@ -626,33 +615,6 @@ export default function LessonWorkspace({
           onReopen={() => setSubmitted(false)}
           allowReopen={lesson.grading?.allowLateSubmit}
         />
-      )}
-
-      {(prev || next) && (
-        <nav className="lesson-nav">
-          {prev ? (
-            <a className="lesson-nav-link" href={`${basePath}/${prev.id}`}>
-              <span className="lesson-nav-arrow">←</span>
-              <span className="lesson-nav-label">
-                <span className="lesson-nav-kicker">Previous</span>
-                <span className="lesson-nav-title">{prev.title}</span>
-              </span>
-            </a>
-          ) : (
-            <span />
-          )}
-          {next ? (
-            <a className="lesson-nav-link lesson-nav-link-right" href={`${basePath}/${next.id}`}>
-              <span className="lesson-nav-label">
-                <span className="lesson-nav-kicker">Next</span>
-                <span className="lesson-nav-title">{next.title}</span>
-              </span>
-              <span className="lesson-nav-arrow">→</span>
-            </a>
-          ) : (
-            <span />
-          )}
-        </nav>
       )}
 
       <CommitDialog
