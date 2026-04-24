@@ -9,7 +9,7 @@ This directory collects the **reusable build conventions** for each lesson type 
 | `preview: "video"`                         | Video           | No       | [video-conventions.md](video-conventions.md)                                     |
 | `preview: "reading"`                       | Reading         | No       | [reading-conventions.md](reading-conventions.md)                                 |
 | `preview: "example"`                       | Worked Example  | No       | [example-conventions.md](example-conventions.md)                                 |
-| `preview: "slides"`                        | Slides          | No       | [q5play-slides-conventions.md](q5play-slides-conventions.md)                     |
+| `preview: "slides"`                        | Slides          | No       | [slide-deck-conventions.md](slide-deck-conventions.md)                     |
 | `preview: "q5play"` + `type: "lesson"`     | Q5 Lesson       | Yes      | [q5play-starter-conventions.md](q5play-starter-conventions.md)                   |
 | `preview: "q5play"` + `type: "challenge"`  | Challenge       | Yes      | [q5play-challenge-conventions.md](q5play-challenge-conventions.md)               |
 | `preview: "q5play"` + `type: "assignment"` | Assignment      | Yes      | [lab-assignment-conventions.md](lab-assignment-conventions.md)                   |
