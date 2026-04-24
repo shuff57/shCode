@@ -47,13 +47,3 @@ Why do you think the engine gives us `vel` (velocity) instead of letting us dire
 | Q3: At least one sensible reason for using velocity vs direct position | 1 |
 
 **Full credit = 5.** Partial credit awarded for each question independently.
-
----
-
-## Example response (style guide — do NOT copy text)
-
-> **Q1:** `setup()` runs one time at the very start of the program. It's where you build the world — canvas, sprites, initial values. `draw()` runs over and over, about 60 times per second, forever. It's where the action happens — input handling, movement, re-rendering.
->
-> **Q2:** `vel.x = 4` means 4 pixels per frame. 4 × 60 = **240 pixels per second**. In 5 seconds that's **1200 pixels**. On a 400-pixel canvas the sprite crosses it in 400 ÷ 240 ≈ **1.67 seconds**.
->
-> **Q3:** If I set `pos.x` directly every frame, the physics engine can't help me — it doesn't know I "want" to move there. Using `vel` lets gravity, collisions, and friction automatically affect the sprite.
