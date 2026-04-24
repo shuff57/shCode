@@ -6,28 +6,40 @@ import { sections } from '../lib/q5play-docs';
 const LS_KEY = 'shCode:q5docs:closed';
 
 export default function Q5DocsDrawer() {
-  // Read initial open state from localStorage — default open unless student has closed it
-  const [open, setOpen] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
-    return localStorage.getItem(LS_KEY) !== '1';
-  });
+  // Render nothing until we've hydrated on the client — reading localStorage
+  // during SSR (or during the first render on the client before mount) would
+  // produce a different tree than the server emitted and fail hydration.
+  const [mounted, setMounted] = useState(false);
+  const [open, setOpen] = useState<boolean>(true);
   const [activeSectionSlug, setActiveSectionSlug] = useState<string>(sections[0]?.slug ?? '');
   const [closeBtnHovered, setCloseBtnHovered] = useState(false);
 
-  // Keep localStorage in sync with open state
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    // After mount, read the persisted closed flag and flip `open` if needed.
+    setOpen(localStorage.getItem(LS_KEY) !== '1');
+    setMounted(true);
+  }, []);
+
+  // Keep localStorage in sync with open state — but only after mount so the
+  // initial flip from default-true doesn't clobber a persisted false.
+  useEffect(() => {
+    if (!mounted) return;
     if (open) {
       localStorage.removeItem(LS_KEY);
     } else {
       localStorage.setItem(LS_KEY, '1');
     }
-  }, [open]);
+  }, [open, mounted]);
 
   const close = useCallback(() => setOpen(false), []);
   const reopen = useCallback(() => setOpen(true), []);
 
   const activeSection = sections.find((s) => s.slug === activeSectionSlug) ?? sections[0];
+
+  // Don't render anything server-side or on the first client render. The
+  // drawer is a client-only convenience; no reason to ship it in the SSR
+  // HTML, and doing so is what caused the hydration mismatch.
+  if (!mounted) return null;
 
   return (
     <>
