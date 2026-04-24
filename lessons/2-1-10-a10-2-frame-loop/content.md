@@ -11,8 +11,8 @@ Write your response in the box below. Short, clear answers are fine — full par
 
 | Criterion | Pts |
 |-----------|-----|
-| Q1: Accurate explanation of setup (runs once) vs draw (runs every frame) | 2 |
-| Q2: Math shown for both 1-second and 5-second distances; canvas-crossing time given | 2 |
-| Q3: At least one sensible reason for using velocity vs direct position | 1 |
+| Q1: setup() vs draw() explained in your own words | 2 |
+| Q2: 60 fps math shown — 1-second and 5-second distances, canvas-crossing time | 2 |
+| Q3: One sensible reason for using velocity instead of direct position | 1 |
 
 **Full credit = 5.** Partial credit awarded for each question independently.
