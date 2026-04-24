@@ -63,10 +63,33 @@ Distinct from a q5play lab (`preview: "q5play"`) because there is no `script.js`
 ```
 lessons/<slug>/
 ├── lesson.json
-└── content.md       # optional framing / context / tips before the prompt
+└── content.md       # optional framing / context / rubric preview
 ```
 
-`content.md` is rendered above the writing area. Use it for context and worked examples — **not** to duplicate the prompt (the prompt comes from `aiGrader.prompt`).
+`content.md` is rendered above the writing area. Keep it small — prereqs the student should complete first, which docs to skim, and (optionally) the rubric so they know what's graded before submitting. Don't duplicate the prompt (the grader UI renders `aiGrader.prompt` separately) and don't include a "hub" H1 / metadata table / sibling-resources link line — the app chrome already shows the title, type, points, and week.
+
+### Canonical content.md shape
+
+See `lessons/2-1-10-a10-2-frame-loop/content.md` (~15 lines):
+
+```md
+**Before you start:**
+
+- Complete both in-app lessons (`2.1.5 Hello Sprite` + `2.1.9 Make it Move`).
+- Open the q5play docs drawer on the right and skim the Canvas & Sprite and Input sections.
+
+Write your response in the box below. Short, clear answers are fine. The rubric below shows what the grader is looking for.
+
+---
+
+## Rubric (5 pts)
+
+| Criterion | Pts |
+|-----------|-----|
+| Q1: … | 2 |
+| Q2: … | 2 |
+| Q3: … | 1 |
+```
 
 ## 3. Rubric shape
 
@@ -103,6 +126,8 @@ Typical shape for a Unit-2 weekly writeup:
 - **Do not let rubric totals drift from `totalPoints`.** Verify by hand on every edit.
 - **Do not invent Ollama model names.** Use the model already in production (`qwen3-coder-next:cloud`) unless switching deliberately and coordinating with the `OLLAMA_*` env vars.
 - **Do not put the prompt in `content.md`** — the grader reads from `aiGrader.prompt`. Duplicating invites drift.
+- **Do not include an example answer / model response in `content.md`.** No matter how you label it ("style guide", "do NOT copy"), a written-out answer is a cheat sheet. The rubric gives students what they're graded on; let them think the answer through.
+- **Do not add a hub-style lead header, metadata table, or sibling-resources link line** to `content.md`. The lesson title, type badge, points, and week are already visible in the app chrome.
 
 ## 6. Title convention
 
@@ -118,3 +143,4 @@ Example: `"2.1.11 Frame Loop Writeup"`.
 |------|------|
 | Unit 2.1 buildout | Pattern crystallized in `2-1-10-a10-2-frame-loop` (A10.2) and `2-2-12-a12-2-oop-writeup` (A12.2). |
 | This doc | Hoisted out of per-module specs. |
+| Scaffolding pass | 2.1.11 Frame Loop Writeup `content.md` stripped from 60 lines → 15: dropped the `# A10.2 —` hub H1, the Module/Week/Points metadata table, the "Other 2.1.1 resources" link line, the duplicated Prompt block (lives in `aiGrader.prompt`), and the "Example response" block that showed full Q1/Q2/Q3 answers. Kept the "Before you start" prereqs + rubric-preview. §2 gained a canonical content.md template; §5 Don'ts gained "no example answers" and "no hub header / metadata table / sibling-resources line". |
