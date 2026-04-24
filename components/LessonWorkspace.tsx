@@ -7,7 +7,6 @@ import { saveProgress } from '../lib/version-control';
 import { grade } from '../lib/grader';
 import type { GradeReport as GradeReportType } from '../lib/grader';
 import FileExplorer from './FileExplorer';
-import LessonSteps from './LessonSteps';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
 import JscadPreview from './JscadPreview';
@@ -432,27 +431,14 @@ export default function LessonWorkspace({
             <FileExplorer tree={lesson.files} />
           ) : (
             <div className="grading-tab">
-              {lesson.steps.length === 0 && requirements.length === 0 ? (
+              {requirements.length === 0 ? (
                 <p className="grading-empty">No graded items for this lesson.</p>
               ) : (
-                <>
-                  {lesson.steps.length > 0 && (
-                    <div className="grading-section">
-                      <h3 className="grading-subhead">Steps</h3>
-                      <LessonSteps lesson={lesson} />
-                    </div>
-                  )}
-                  {requirements.length > 0 && (
-                    <div className="grading-section">
-                      <h3 className="grading-subhead">Requirements</h3>
-                      <RequirementsSection
-                        requirements={requirements}
-                        summary={summary}
-                        onRerun={runTests}
-                      />
-                    </div>
-                  )}
-                </>
+                <RequirementsSection
+                  requirements={requirements}
+                  summary={summary}
+                  onRerun={runTests}
+                />
               )}
             </div>
           )}

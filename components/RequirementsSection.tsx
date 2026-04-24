@@ -20,7 +20,7 @@ export default function RequirementsSection({
         </span>
         <button onClick={onRerun}>Re-run tests</button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {requirements.map((req) => (
           <RequirementCard key={req.id} req={req} />
         ))}
