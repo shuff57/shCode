@@ -4,6 +4,8 @@ import type { Lesson } from '../lib/types';
 import { useLessonStore } from '../lib/store';
 import { buildPreviewHtml, buildJscadPreviewHtml } from '../lib/preview-builder';
 import { saveProgress } from '../lib/version-control';
+import { recordSubmission } from '../lib/written-grader-store';
+import { recordLessonCompleted } from '../lib/progress';
 import { grade } from '../lib/grader';
 import type { GradeReport as GradeReportType } from '../lib/grader';
 import FileExplorer from './FileExplorer';
@@ -386,18 +388,31 @@ export default function LessonWorkspace({
     setSubmitOpen(true);
   };
 
-  const confirmSubmit = () => {
-    setSubmitted(true);
+  const confirmSubmit = async () => {
     setSubmitOpen(false);
-    if (typeof window !== 'undefined' && lesson) {
-      const state = useLessonStore.getState();
-      saveProgress(lesson.id, {
-        fileContents: state.fileContents,
-        commits: state.commits,
-        lastCommittedFileContents: state.lastCommittedFileContents,
-        completedSteps: [],
+    if (typeof window === 'undefined' || !lesson) return;
+    const state = useLessonStore.getState();
+    saveProgress(lesson.id, {
+      fileContents: state.fileContents,
+      commits: state.commits,
+      lastCommittedFileContents: state.lastCommittedFileContents,
+      completedSteps: [],
+    });
+    if (gradeReport) {
+      const ok = await recordSubmission({
+        lessonId: lesson.id,
+        response: state.fileContents['script.js'] || '',
+        gradeJson: gradeReport,
+        score: gradeReport.totalScore,
+        possible: gradeReport.totalPossible,
       });
+      if (!ok) {
+        alert('Submission could not be recorded on the server. Please reload and try again.');
+        return;
+      }
+      await recordLessonCompleted(lesson.id, gradeReport.totalScore);
     }
+    setSubmitted(true);
   };
 
   const summary = {
@@ -408,19 +423,28 @@ export default function LessonWorkspace({
   const dirtyCount = getDirtyCount();
   const totalScore = gradeReport?.totalScore || 0;
   const totalPossible = gradeReport?.totalPossible || 0;
+  const allRequirementsPassed =
+    requirements.length > 0 && requirements.every((r) => r.status === 'passed');
+  // q5 lessons gate Submit on every requirement being green; existing
+  // assignments keep the score-vs-passingScore rule.
+  const canSubmit = isQ5Mode
+    ? allRequirementsPassed
+    : totalScore >= (lesson.grading?.passingScore ?? 0);
+  const showAssignmentHeader = isAssignment || isQ5Mode;
 
   return (
     <>
       <CrossDeviceSyncBanner />
       <TeacherPushBanner />
       {isQ5Mode && <Q5DocsDrawer />}
-      {isAssignment ? (
+      {showAssignmentHeader ? (
         <AssignmentHeader
           lesson={lesson}
           score={totalScore}
           totalPossible={totalPossible}
           onSubmit={handleSubmit}
           submitted={submitted}
+          canSubmit={canSubmit}
         />
       ) : (
         <div id="titleRow">

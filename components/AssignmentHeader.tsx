@@ -9,6 +9,7 @@ interface AssignmentHeaderProps {
   totalPossible: number;
   onSubmit: () => void;
   submitted: boolean;
+  canSubmit: boolean;
 }
 
 export default function AssignmentHeader({
@@ -17,8 +18,8 @@ export default function AssignmentHeader({
   totalPossible,
   onSubmit,
   submitted,
+  canSubmit,
 }: AssignmentHeaderProps) {
-  const passingScore = lesson.grading?.passingScore || 0;
   const pct = totalPossible > 0 ? Math.round((score / totalPossible) * 100) : 0;
 
   return (
@@ -51,7 +52,7 @@ export default function AssignmentHeader({
         <button
           className="btn-primary btn-sm"
           onClick={onSubmit}
-          disabled={submitted || score < passingScore}
+          disabled={submitted || !canSubmit}
         >
           <Send size={14} />
           Submit
