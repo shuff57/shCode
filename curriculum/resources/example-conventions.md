@@ -49,22 +49,25 @@ Code blocks inside `content.md` are rendered via `MarkdownWithLiveBlocks` — ru
 
 ## 3. `content.md` shape
 
-Canonical rhythm — see `lessons/2-1-3-example-minimum-sprite/content.md` for the live template (65 lines):
+Canonical rhythm — see `lessons/2-1-3-example-minimum-sprite/content.md` for the live template:
 
 1. **Lead with `**Goal:**`** — a one-line statement of what the walkthrough proves or builds. No hub-style heading, no `## Worked Example N —` label, no sibling-resources line.
-2. **Numbered `## Step` sections** — each step is one ## heading (`## Step 1 — Type this exactly`, `## Step 2 — Notice the bug`, etc.). Under each step: a short prose paragraph, one ```` ```js ```` reference block (not `live` yet), and the "run it and observe" pointer.
-3. **"Try the combined final" runnable block** — the full working version as a ```` ```js live ```` fence so the student can edit + run in place. Put it right after the last Step, before the takeaways.
-4. **`## Key takeaways`** — a 3–5 bullet list naming the reusable ideas, in imperative or declarative form ("`setup()` runs once").
+2. **Numbered `## Step` sections** — each step is one `##` heading (`## Step 1 — Type this exactly`, `## Step 2 — Notice the bug`, etc.). Under each step:
+   - A short prose paragraph explaining the intent of the step.
+   - **One ```` ```js live ```` fence** carrying the code for that step. Every step gets its own editor + preview so the student can run each variation independently — there's no "combined final" block at the end.
+3. **`## Key takeaways`** — a 3–5 bullet list naming the reusable ideas, in imperative or declarative form ("`setup()` runs once").
 
 Single topic per lesson. If you have multiple walkthroughs (minimum sprite, keyboard movement, frameCount motion), split them into separate lessons — don't stack them in one `content.md`.
 
 ### Length
 
-Aim for **under ~80 lines**. The canonical example is 65 lines. A worked example is a mental anchor, not a tutorial.
+Aim for **under ~80 lines**. The canonical example is 60 lines. A worked example is a mental anchor, not a tutorial.
 
 ### `live` code fences
 
-A fenced block annotated ```` ```js live ```` renders as a runnable q5play sketch inline. Use it for the "combined final" block a student wants to edit. Omit `live` on reference blocks inside the step walkthrough — those are for reading, and if the student hit Run on all of them the page would spawn several sketches.
+A fenced block annotated ```` ```js live ```` renders as a runnable q5play sketch inline — its own editor + preview, independent of any other block on the page. Give **every** step block the `live` annotation so each variation of the code can be executed and tweaked in place; skipping `live` forces the student to copy/paste to see the effect, which defeats the point.
+
+Reference-only snippets (pure prose-embedded code the student isn't meant to run — e.g. a one-liner showing a syntax form) can stay as plain ```` ```js ```` if a walkthrough needs them, but the canonical pattern has none.
 
 ## 4. Exception — fully-working q5play sketches
 
@@ -96,3 +99,4 @@ Examples:
 | Unit 2.1 / 2.2 buildout | Pattern crystallized in `2-1-3-example-minimum-sprite`, `2-1-7-example-keyboard`, `2-2-4-example-devtools-reveal`, `2-2-8-example-enemy-class`, `2-2-10-example-proc-vs-oop`. |
 | This doc | Hoisted out of per-module specs. |
 | Scaffolding pass | 2.1.4 canonical example pruned from 280 → 65 lines: dropped hub header, sibling-resources line, cross-example cheat sheet, and the "## Worked Example N —" labels; dropped unrelated walkthroughs (Keyboard Movement, frameCount) that belong in their own lessons. `description` field dropped from `lesson.json` (rendered as an ugly empty `<p>`; ContentLessonView now conditionally renders it). §1 / §3 / §5 updated to codify the new shape. |
+| Per-step live blocks | Each `## Step` now carries its own ```` ```js live ```` fence (instead of a trailing "combined final" block). Students can run and tweak every step independently. `public/q5play/runner.html` got `overflow: hidden` on html/body so oversized canvases get clipped rather than showing scrollbars inside the iframe. |
