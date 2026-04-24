@@ -1,5 +1,3 @@
-# 2.2.9 Reading — Parallel Arrays vs Classes
-
 Same problem, two shapes. An enemy fleet needs to spawn, take damage, and die. Below is the procedural version (three arrays moving in lockstep) next to the object-oriented version (one array of instances). Read both, then answer the discussion questions.
 
 ## Procedural — parallel arrays

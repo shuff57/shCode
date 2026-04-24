@@ -1,4 +1,4 @@
-// 2.2.10 Collectible Class — write the class, instantiate 5+, catch them.
+// 2.2.11 Collectible Class — write the class, instantiate 5+, catch them.
 
 class Collectible {
   constructor(x, y, value, color) {
@@ -28,12 +28,12 @@ function setup() {
 function draw() {
   background('#222');
 
-  if (kb.pressing('left'))       player.vel.x = -4;
-  else if (kb.pressing('right')) player.vel.x = 4;
-  else                            player.vel.x = 0;
-  if (kb.pressing('up'))         player.vel.y = -4;
-  else if (kb.pressing('down'))  player.vel.y = 4;
-  else                            player.vel.y = 0;
+  if (kb.pressing('a'))       player.vel.x = -4;
+  else if (kb.pressing('d'))  player.vel.x = 4;
+  else                         player.vel.x = 0;
+  if (kb.pressing('w'))       player.vel.y = -4;
+  else if (kb.pressing('s'))  player.vel.y = 4;
+  else                         player.vel.y = 0;
 
   // STEP 4: for each collectible, if player.overlaps(c.sprite), collect and score
 

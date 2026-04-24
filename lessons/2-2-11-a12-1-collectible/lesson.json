@@ -1,8 +1,8 @@
 {
   "id": "2-2-11-a12-1-collectible",
   "title": "2.2.11 Collectible Class",
-  "description": "Write a Collectible class, instantiate at least 5, and detect overlap with the player. SLO-2 lab — the class is the point.",
-  "type": "lesson",
+  "description": "Write a Collectible class, instantiate at least 5, and detect overlap with the player. SLO-2 lab — the class is the point. Auto-graded.",
+  "type": "assignment",
   "difficulty": "beginner",
   "estimateMins": 45,
   "category": "Unit 2: q5play — Applied Game Development",
@@ -14,26 +14,26 @@
     {
       "id": "s1",
       "title": "Define the Collectible class",
-      "instructions": "Write `class Collectible { }` with a `constructor(x, y, value, color)`. Store `x`, `y`, and `value` on `this`. Create `this.sprite = new Sprite(x, y, 20, 20)` and set its color.",
-      "hints": ["Inside the constructor, `this` refers to the new object being built.", "Sprite size is up to you — 15-25 works well."]
+      "instructions": "Write `class Collectible { }` with a `constructor(x, y, value, color)`. Store the data on `this` and create `this.sprite = new Sprite(...)`.",
+      "hints": ["Re-read 2.2.8 Worked Example — the `Enemy` constructor follows the same `this.x = x` / `this.sprite = new Sprite(...)` pattern."]
     },
     {
       "id": "s2",
       "title": "Add a collect() method",
-      "instructions": "Add a `collect()` method on the class that calls `this.sprite.remove()` and returns `this.value`.",
-      "hints": ["Method syntax: `collect() { ... }` — no `function` keyword inside a class.", "`sprite.remove()` despawns it from the world."]
+      "instructions": "Add a `collect()` method on the class that despawns the sprite and returns `this.value`.",
+      "hints": ["Check the Sprite section of the q5play docs drawer for how to despawn a sprite."]
     },
     {
       "id": "s3",
       "title": "Instantiate at least 5 Collectibles",
-      "instructions": "In `setup()` (after the player is created), push at least 5 `new Collectible(...)` into the `collectibles` array at different positions. Give them different values and colors.",
-      "hints": ["Use a loop if you want: `for (let i = 0; i < 5; i++) { collectibles.push(new Collectible(...)); }`"]
+      "instructions": "In `setup()` (after the player is created), push at least 5 `new Collectible(...)` into the `collectibles` array at different positions, with different values and colors.",
+      "hints": ["A `for` loop with `collectibles.push(new Collectible(...))` is one option — a `const` per item works too."]
     },
     {
       "id": "s4",
       "title": "Detect overlaps and collect",
-      "instructions": "In `draw()`, iterate the `collectibles` array. If `player.overlaps(c.sprite)`, call `c.collect()`, add the return value to `totalScore`, and remove that item from the array.",
-      "hints": ["Iterate backwards when removing during iteration: `for (let i = collectibles.length - 1; i >= 0; i--)`.", "`sprite.overlaps(other)` returns a boolean."]
+      "instructions": "In `draw()`, iterate the `collectibles` array. When the player overlaps a collectible's sprite, call its `collect()` method, add the returned value to `totalScore`, and remove that item from the array.",
+      "hints": ["Check the Sprite section of the q5play docs drawer for the overlap check.", "Removing items while iterating forwards skips neighbours — search for 'iterate backwards to splice' if you hit that bug."]
     }
   ],
   "requirements": [

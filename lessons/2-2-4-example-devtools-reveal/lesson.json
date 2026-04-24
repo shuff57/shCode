@@ -1,7 +1,6 @@
 {
   "id": "2-2-4-example-devtools-reveal",
   "title": "2.2.4 Worked Example — You've been using classes",
-  "description": "Open a running q5play sketch in DevTools. Inspect `player`. See that `player.constructor.name === 'Sprite'`. Every sprite you've made for 2 weeks has been an instance of a class.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 10,

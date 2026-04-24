@@ -14,36 +14,26 @@
     {
       "id": "s1",
       "title": "Create the canvas",
-      "instructions": "In `setup()`, call `new Canvas(400, 400)` as the first line. This is the same constructor-call pattern you saw in 2.2.4 / 2.2.5 — `Canvas` is a class, and `new Canvas(...)` stamps out an instance.",
-      "hints": ["Exactly one `new Canvas(...)` call, at the top of setup()."]
+      "instructions": "In `setup()`, create a canvas. `Canvas` is a class, and `new Canvas(...)` stamps out an instance — the same constructor-call pattern you saw in 2.2.4.",
+      "hints": ["Open the q5play docs drawer on the right and find the Canvas section."]
     },
     {
       "id": "s2",
       "title": "Instantiate a rectangle sprite",
-      "instructions": "Store a new rectangle sprite in a variable, using the 4-argument constructor form `new Sprite(x, y, width, height)`. Then set its `.color` to any CSS color string.",
-      "hints": [
-        "Use `const` or `let`: `const box = new Sprite(120, 200, 80, 50);`",
-        "`box.color = 'deepskyblue';`  — or any other color."
-      ]
+      "instructions": "Store a new rectangle sprite in a variable, using the 4-argument constructor form `new Sprite(x, y, width, height)`. Then set its `.color`.",
+      "hints": ["Check the Sprite section of the q5play docs drawer for the 4-argument constructor form."]
     },
     {
       "id": "s3",
       "title": "Instantiate a circle sprite",
-      "instructions": "Store a second sprite using the 3-argument constructor form `new Sprite(x, y, diameter)`. Give this instance its own `.color` (different from the first one, so you can tell them apart).",
-      "hints": [
-        "3 arguments = circle collider. 4 arguments = rectangle collider.",
-        "`const ball = new Sprite(280, 200, 60);`",
-        "Each instance owns its own properties — setting `ball.color` does NOT affect `box.color`."
-      ]
+      "instructions": "Store a second sprite using the 3-argument constructor form `new Sprite(x, y, diameter)`. Give this instance its own `.color` (different from the first, so you can tell them apart).",
+      "hints": ["Check the Sprite section of the q5play docs drawer for the 3-argument constructor form."]
     },
     {
       "id": "s4",
       "title": "Give one sprite a stroke",
-      "instructions": "Pick either sprite and set its `.stroke` (any color) AND `.strokeWeight` (any positive number). You'll see a visible outline on that sprite.",
-      "hints": [
-        "`ball.stroke = 'white'; ball.strokeWeight = 4;`",
-        "Stroke is the outline. strokeWeight is how thick the outline is."
-      ]
+      "instructions": "Pick either sprite and set its `.stroke` AND its `.strokeWeight`. You'll see a visible outline on that sprite.",
+      "hints": ["Look up sprite properties in the q5play docs drawer."]
     }
   ],
   "requirements": [

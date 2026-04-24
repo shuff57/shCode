@@ -13,29 +13,27 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Pick a challenge (or more)",
-      "instructions": "Read the full descriptions in `content.md`. Three options, varying difficulty:\n\n1. **isAlive method** (easy) — add an `isAlive()` method to an `Enemy` class that returns `this.hp > 0`.\n2. **Player class** (medium) — write a `Player` class with `constructor(x, y)`, a `move(dir)` method setting `vel.x`, and a `jump()` method setting `vel.y`.\n3. **PowerUp subclass** (hard) — write `PowerUp extends Collectible` with a `super(x, y, value, color)` call and a `boost()` method.\n\nYou're not required to attempt all three — pick what interests you.",
-      "hints": [
-        "Even completing one challenge passes the auto-grader.",
-        "Read the hints in each challenge section of the content page."
-      ]
+      "title": "Define a class",
+      "instructions": "Declare at least one class using the `class` keyword.",
+      "hints": ["Re-read 2.2.3 Reading for the `class Name { ... }` shape."]
     },
     {
       "id": "s2",
-      "title": "Build in the editor",
-      "instructions": "Start from the provided `script.js` scaffold. Write at least one class with a `constructor`, instantiate it with `new`, and wire up some interaction or behavior.\n\nYou need:\n- At least one class definition\n- At least one instance created with `new`\n- At least one method called on that instance",
-      "hints": [
-        "Keep your class small — one constructor and one or two methods is plenty.",
-        "You don't need to connect to q5play sprites for this to count."
-      ]
+      "title": "Instantiate the class",
+      "instructions": "Build an instance with `new ClassName(...)` and store it in a variable.",
+      "hints": ["2.2.4 Worked Example shows `new Sprite(...)` — the same pattern applies to your own class."]
     },
     {
       "id": "s3",
-      "title": "Use OOP features",
-      "instructions": "Your code must:\n\n- Define at least one class using the `class` keyword\n- Use `this` inside the class body (in the constructor or a method)\n- Call at least one method on an instance (e.g., `enemy.isAlive()`, `player.move('left')`, `powerUp.boost()`)\n\nAll three requirements are auto-graded.",
-      "hints": [
-        "The auto-grader checks your script.js for class, new, constructor, and this — make sure all four appear."
-      ]
+      "title": "Write a constructor",
+      "instructions": "Give the class a `constructor(...)` that stores its arguments on `this`.",
+      "hints": ["2.2.3 Reading walks through the three parts of a class: constructor, `this`, and methods."]
+    },
+    {
+      "id": "s4",
+      "title": "Use one OOP feature",
+      "instructions": "Pick a challenge from content.md and implement it using at least one of: `this.<property>` access, `extends` another class, or a `super(...)` call.",
+      "hints": ["content.md lists three challenges with hints for each. Pick whichever interests you — the auto-grader accepts `this.`, `extends`, or `super(`."]
     }
   ],
   "requirements": [
@@ -71,11 +69,11 @@
     },
     {
       "id": "r4",
-      "title": "Use this inside a class",
-      "description": "The class body references this to access instance properties.",
+      "title": "Use one OOP feature",
+      "description": "Your class uses at least one of: `this.<property>`, `extends`, or `super(`.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "this\\.\\w+",
+      "pattern": "this\\.\\w+|extends\\s+\\w+|super\\s*\\(",
       "flags": "",
       "points": 10
     }

@@ -1,5 +1,3 @@
-# 2.2.3 Reading — JavaScript Classes
-
 ## What is a class?
 
 A **class** is a blueprint. It describes what data an object holds and what it can do — but it is not the object itself. The actual object is called an **instance**, and you create one with the `new` keyword.

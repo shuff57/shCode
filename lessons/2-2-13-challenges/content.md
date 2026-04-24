@@ -1,16 +1,6 @@
-# 2.2.13 Challenges (Optional Stretch)
+## Challenge 1 — isAlive method (easy)
 
-These are optional. Attempt any you find interesting after you've finished the required work for Module 2.2.
-
-If you're still stuck on required lessons, stop and ask for help first — don't burn time here.
-
-**Other 2.2 resources:** refer to your class slides and any worked examples from earlier in the unit.
-
----
-
-## Challenge 1 — isAlive method
-
-**Goal:** Add an `isAlive()` method to an `Enemy` class that returns `true` when the enemy still has health.
+Add an `isAlive()` method to an `Enemy` class that returns `true` when the enemy still has health.
 
 **How it should work:**
 
@@ -32,13 +22,11 @@ Instantiate it with `new Enemy(...)` and check `enemy.isAlive()` in your draw lo
 - `this.hp > 0` is the entire method body.
 - Try setting `this.hp = 0` after a few seconds to see it flip.
 
-Difficulty: ⭐
-
 ---
 
-## Challenge 2 — Player class
+## Challenge 2 — Player class (medium)
 
-**Goal:** Write a `Player` class that wraps position and velocity, with a `move(dir)` method and a `jump()` method.
+Write a `Player` class that wraps position and velocity, with a `move(dir)` method and a `jump()` method.
 
 **Target shape:**
 
@@ -64,13 +52,11 @@ Instantiate with `new Player(200, 200)` and call `player.move('left')` or `playe
 - You can hook this into a q5play Sprite by storing the sprite inside the constructor.
 - Or keep it pure JS — just track `this.x`, `this.y`, `this.vel`.
 
-Difficulty: ⭐⭐
-
 ---
 
-## Challenge 3 — PowerUp subclass
+## Challenge 3 — PowerUp subclass (hard)
 
-**Goal:** Write a `PowerUp` class that extends a base `Collectible` class, adding a `boost()` method.
+Write a `PowerUp` class that extends a base `Collectible` class, adding a `boost()` method.
 
 **Target shape:**
 
@@ -97,10 +83,8 @@ Instantiate with `new PowerUp(100, 100, 10, 'gold')` and call `powerUp.boost()`.
 
 **Hints:**
 - `super(...)` must be called before you access `this` in the subclass constructor.
-- The auto-grader only needs `class`, `constructor`, `new`, and `this` — you don't need to wire it into the canvas to pass.
+- The auto-grader accepts `this.`, `extends`, or `super(` — you don't need to wire it into the canvas to pass.
 - Stretch: display `powerUp.boost()` result as HUD text with `text(...)`.
-
-Difficulty: ⭐⭐⭐
 
 ---
 
