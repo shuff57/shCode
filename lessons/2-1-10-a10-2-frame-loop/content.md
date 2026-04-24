@@ -1,8 +1,3 @@
-**Before you start:**
-
-- Complete both in-app lessons (`2.1.5 Hello Sprite` + `2.1.9 Make it Move`).
-- Open the q5play docs drawer on the right and skim the Canvas & Sprite and Input sections.
-
 Write your response in the box below. Short, clear answers are fine — full paragraphs not required. The rubric below shows what the grader is looking for.
 
 ---
