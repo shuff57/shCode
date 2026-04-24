@@ -475,8 +475,7 @@ export default function LessonWorkspace({
           </div>
         )}
       </aside>
-      <details className="editor-card" open>
-        <summary>{isConsoleMode ? 'Code Editor' : isJscadMode ? 'Code Editor & 3D Viewer' : isQ5Mode ? 'Code Editor & q5play Preview' : 'Starter Code & Live Preview'}</summary>
+      <div className="editor-card">
         <div className="editor-body">
           {(isConsoleMode || isJscadMode || isQ5Mode) && (
             <div className="run-toolbar">
@@ -547,15 +546,12 @@ export default function LessonWorkspace({
             <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
           </div>
           {!isConsoleMode && (
-            <details className="console">
-              <summary>Console</summary>
-              <div className="console-body">
-                <Console resetKey={isJscadMode ? String(runKey) : srcDoc} />
-              </div>
-            </details>
+            <div className="console-body">
+              <Console resetKey={isJscadMode ? String(runKey) : srcDoc} />
+            </div>
           )}
         </div>
-      </details>
+      </div>
       {submitted && gradeReport && (
         <GradeReportView
           report={gradeReport}
