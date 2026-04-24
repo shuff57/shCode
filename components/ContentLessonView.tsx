@@ -69,7 +69,9 @@ export default function ContentLessonView({ lesson, prev, next, basePath = '/les
       </div>
 
       <h1 style={{ margin: '4px 0 6px' }}>{lesson.title}</h1>
-      <p style={{ color: '#888', marginTop: 0 }}>{lesson.description}</p>
+      {lesson.description ? (
+        <p style={{ color: '#888', marginTop: 0 }}>{lesson.description}</p>
+      ) : null}
 
       {preview === 'video' ? (
         meta.videoUrl && meta.videoUrl.trim() ? (
