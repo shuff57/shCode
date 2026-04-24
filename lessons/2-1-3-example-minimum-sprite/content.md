@@ -1,8 +1,8 @@
 **Goal:** Prove that a canvas + sprite + background is the smallest possible q5play program.
 
-## Step 1 — Type this exactly
+## Step 1 — Hit Run
 
-Click Run. You'll see a dark canvas with a square in the middle.
+You'll see a dark canvas with a square in the middle.
 
 ```js live
 function setup() {

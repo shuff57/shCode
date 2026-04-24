@@ -52,7 +52,7 @@ Code blocks inside `content.md` are rendered via `MarkdownWithLiveBlocks` — ru
 Canonical rhythm — see `lessons/2-1-3-example-minimum-sprite/content.md` for the live template:
 
 1. **Lead with `**Goal:**`** — a one-line statement of what the walkthrough proves or builds. No hub-style heading, no `## Worked Example N —` label, no sibling-resources line.
-2. **Numbered `## Step` sections** — each step is one `##` heading (`## Step 1 — Type this exactly`, `## Step 2 — Notice the bug`, etc.). Under each step:
+2. **Numbered `## Step` sections** — each step is one `##` heading (`## Step 1 — Hit Run`, `## Step 2 — Notice the bug`, `## Step 3 — Hoist the sprite`, etc.). Heading phrasing should assume the student is **reading + running the embedded editor**, not typing code from scratch — so `Hit Run`, `Notice`, `Try`, `Break it on purpose`, `Refactor` all fit; `Type this exactly` does not. Under each step:
    - A short prose paragraph explaining the intent of the step.
    - **One ```` ```js live ```` fence** carrying the code for that step. Every step gets its own editor + preview so the student can run each variation independently — there's no "combined final" block at the end.
 3. **`## Key takeaways`** — a 3–5 bullet list naming the reusable ideas, in imperative or declarative form ("`setup()` runs once").
