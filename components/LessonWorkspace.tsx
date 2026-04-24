@@ -384,25 +384,14 @@ export default function LessonWorkspace({
       {isAssignment ? (
         <AssignmentHeader
           lesson={lesson}
-          dirtyCount={dirtyCount}
           score={totalScore}
           totalPossible={totalPossible}
-          onOpenCommit={() => setCommitOpen(true)}
-          onOpenHistory={() => setHistoryOpen(true)}
           onSubmit={handleSubmit}
           submitted={submitted}
         />
       ) : (
         <div id="titleRow">
           <h1>{lesson.title}</h1>
-          <div className="title-actions">
-            <button className="btn-secondary btn-sm" onClick={() => setCommitOpen(true)}>
-              Commit{dirtyCount > 0 ? ` (${dirtyCount})` : ''}
-            </button>
-            <button className="btn-secondary btn-sm" onClick={() => setHistoryOpen(true)}>
-              History
-            </button>
-          </div>
         </div>
       )}
       <div
@@ -477,36 +466,46 @@ export default function LessonWorkspace({
       </aside>
       <div className="editor-card">
         <div className="editor-body">
-          {(isConsoleMode || isJscadMode || isQ5Mode) && (
-            <div className="run-toolbar">
-              <button className="btn-run" onClick={isJscadMode ? runJscad : isQ5Mode ? runQ5 : runCode}>
-                ▶ Run
+          <div className="run-toolbar">
+            {(isConsoleMode || isJscadMode || isQ5Mode) && (
+              <>
+                <button className="btn-run" onClick={isJscadMode ? runJscad : isQ5Mode ? runQ5 : runCode}>
+                  ▶ Run
+                </button>
+                <button
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: 4,
+                    background: 'transparent',
+                    color: '#6272a4',
+                    border: '1px solid #44475a',
+                    cursor: 'pointer',
+                    fontSize: 13,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 5,
+                  }}
+                  onClick={() => {
+                    if (window.confirm('Reset your code to the starter? Unsaved work will be lost.')) {
+                      setLesson(lesson);
+                    }
+                  }}
+                >
+                  <RotateCcw size={12} />
+                  Reset
+                </button>
+                <span className="run-hint">Ctrl+Enter</span>
+              </>
+            )}
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+              <button className="btn-secondary btn-sm" onClick={() => setCommitOpen(true)}>
+                Commit{dirtyCount > 0 ? ` (${dirtyCount})` : ''}
               </button>
-              <button
-                style={{
-                  padding: '6px 14px',
-                  borderRadius: 4,
-                  background: 'transparent',
-                  color: '#6272a4',
-                  border: '1px solid #44475a',
-                  cursor: 'pointer',
-                  fontSize: 13,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 5,
-                }}
-                onClick={() => {
-                  if (window.confirm('Reset your code to the starter? Unsaved work will be lost.')) {
-                    setLesson(lesson);
-                  }
-                }}
-              >
-                <RotateCcw size={12} />
-                Reset
+              <button className="btn-secondary btn-sm" onClick={() => setHistoryOpen(true)}>
+                History
               </button>
-              <span className="run-hint">Ctrl+Enter</span>
             </div>
-          )}
+          </div>
           <div className="editor-preview-container" id="split">
             <div className="pane" id="editorPane">
               <CodeEditor />

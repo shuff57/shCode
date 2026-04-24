@@ -1,26 +1,20 @@
 'use client';
 
 import type { Lesson } from '../lib/types';
-import { GitCommitHorizontal, History, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 
 interface AssignmentHeaderProps {
   lesson: Lesson;
-  dirtyCount: number;
   score: number;
   totalPossible: number;
-  onOpenCommit: () => void;
-  onOpenHistory: () => void;
   onSubmit: () => void;
   submitted: boolean;
 }
 
 export default function AssignmentHeader({
   lesson,
-  dirtyCount,
   score,
   totalPossible,
-  onOpenCommit,
-  onOpenHistory,
   onSubmit,
   submitted,
 }: AssignmentHeaderProps) {
@@ -54,14 +48,6 @@ export default function AssignmentHeader({
         </span>
       </div>
       <div className="assignment-header-right">
-        <button className="btn-secondary btn-sm" onClick={onOpenCommit}>
-          <GitCommitHorizontal size={14} />
-          Commit{dirtyCount > 0 ? ` (${dirtyCount})` : ''}
-        </button>
-        <button className="btn-secondary btn-sm" onClick={onOpenHistory}>
-          <History size={14} />
-          History
-        </button>
         <button
           className="btn-primary btn-sm"
           onClick={onSubmit}
