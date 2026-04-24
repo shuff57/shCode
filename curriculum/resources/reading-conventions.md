@@ -54,20 +54,39 @@ lessons/<slug>/
 
 ## 3. `content.md` shape (when present)
 
-Recommended rhythm:
+Canonical rhythm — see `lessons/2-1-2-reading-canvas-sprite/content.md` for the live template:
 
-1. One-sentence framing ("This is the q5play docs chapter on Canvas & Sprite. Skim it before building your first sketch.").
-2. A short bulleted "while you read, notice…" list (3–5 items).
-3. Optional: 2–3 comprehension questions for a paired discussion (no auto-grading).
+1. **Lead with the link** — a bold markdown link to the external source as the first line, plus a short hint about where to open it. No hub-style heading, no "Required and reference reading for Module X.Y" preamble, no sibling-resource link line.
+   ```md
+   **[/docs/q5play](/docs/q5play)** — open in the same browser window you use for lessons.
+   ```
+2. **Per-topic subsections** — one `## <Topic Name>` per chapter/topic the student should focus on. Plain topic names; no `R1`/`R2`/`Chapter` labels.
+   ```md
+   ## Canvas & Sprite
+   **Read before attempting `2.1.1a Hello Sprite`.**
+   ```
+   Under each topic:
+   - A "What you'll learn from it:" bulleted list (3–5 items).
+   - Optional: a **Try it:** paragraph followed by a ```` ```js live ```` runnable code block so the student can edit + run without leaving the reading.
+3. **Optional: a short glossary table** covering the terms introduced across the topics. Keep to ~7 rows.
+4. **Optional: a "How to read the docs efficiently" numbered list** (3–5 items). Useful once per unit, not on every reading.
 
-Keep it under 40 lines. A reading lesson is a pointer plus framing, not a second copy of the source.
+### `live` code fences
+
+A fenced block annotated ```` ```js live ```` renders as a runnable q5play sketch inline in the lesson (same runtime used elsewhere in the app). Use it any time a code sample is worth running instead of just reading. Omit `live` for snippets meant purely as reference.
+
+### Length
+
+Aim for **under ~100 lines**. The canonical example is 83 lines. Going longer usually means you're duplicating the external source instead of pointing at it — revisit what belongs here vs what belongs in the link target.
 
 ## 4. Don'ts
 
-- **Do not duplicate the external reading into `content.md`.** Link to it; frame it. The link is the source of truth.
+- **Do not add a hub-style lead header** like `# X.Y.Z Readings` or "Other X.Y.Z resources: …". The lesson has its own title; the reading is the content, not a hub.
+- **Do not duplicate the external reading into `content.md`.** Point at the external link for depth; use `content.md` for focus ("read *these* two topics"), embedded runnable examples, and comprehension framing.
 - **Do not invent external URLs.** Teacher curates.
 - **Do not add `requirements`.** If you want an auto-check, convert the lesson to a challenge or written-assignment.
 - **Do not use `preview: "reading"` for a worked example.** Worked examples need `contentFile` but belong in their own type (`preview: "example"` — see `example-conventions.md`).
+- **Do not label topic subsections `R1`, `R2`, "Chapter N", etc.** The section heading is the topic name.
 
 ## 5. Title convention
 

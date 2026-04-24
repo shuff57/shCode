@@ -1,20 +1,6 @@
-# 2.1.1 Readings
+**[/docs/q5play](/docs/q5play)** — open in the same browser window you use for lessons.
 
-Required and reference reading for Module 2.1.1.
-
-**Other 2.1.1 resources:** [overview](2.1.1_overview.md) · [worked examples](2.1.1_worked-examples.md) · [challenges](2.1.1_challenges.md) · [video manifest](2.1.1_video-manifest.md) · lab [A10.1](A10.1_sprite-playground.md) · writeup [A10.2](A10.2_frame-loop-writeup.md)
-
----
-
-## Primary reading — in-app q5play docs
-
-The course platform hosts the complete q5play docs at:
-
-**[/docs/q5play](/docs/q5play)** (open in the same browser window you use for lessons)
-
-For this module, focus on two chapters:
-
-### R1 — "Canvas & Sprite" chapter
+## Canvas & Sprite
 **Read before attempting `2.1.1a Hello Sprite`.**
 
 What you'll learn from it:
@@ -39,7 +25,7 @@ function draw() {
 }
 ```
 
-### R2 — "Input" chapter
+## Input
 **Read before attempting `2.1.1b Make it Move`.**
 
 What you'll learn from it:
