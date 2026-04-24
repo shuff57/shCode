@@ -1,48 +1,75 @@
 # q5play Challenge Lesson Conventions
 
-Canonical rules for in-app **optional-stretch challenge** lessons. A challenge is a shorter, less-prescribed q5play task that accepts any of several solutions and is auto-graded by a lenient regex pattern (OR-alternation, not strict sequence). When a module spec lists a "challenges" entry or a `lessons/<slug>/` has `lesson.json.type === "challenge"`, these rules are binding.
+A **challenge is a harder q5play assignment** — same lesson-type shape as a lab (`lab-assignment-conventions.md`), but with a **permissive grader** (alternation / "any of these techniques passes") and `type === "challenge"` so the sidebar shows the ⭐ badge. Everything else — Steps scaffold in `script.js`, docs-pointer hints, UI behavior, title rule — comes from `q5play-lesson-conventions.md`. When a module spec lists a "challenges" entry or a `lessons/<slug>/` has `lesson.json.type === "challenge"`, these rules are binding.
 
 **Applies to:**
 - `lessons/<slug>/lesson.json` where `type === "challenge"` (and typically `preview === "q5play"`).
 
-**Canonical example:** `lessons/2-1-11-challenges/`.
+**Canonical example:** `lessons/2-1-11-challenges/` (2.1.12 Challenges — Optional Stretch).
 
-Challenges **also** follow `q5play-lesson-conventions.md` — the starter `script.js` is not a solution. §3 below records the one relaxation (the "BUILD THIS:" block comment is acceptable in place of `// STEP N:` breadcrumbs).
+Read `q5play-lesson-conventions.md` and `lab-assignment-conventions.md` first — this doc only covers the three things that make a challenge different from a lab.
 
 ---
 
 ## 1. Required `lesson.json` shape
 
+Same shape as a lab assignment; only the fields in the table below differ. Use `lessons/2-1-11-challenges/lesson.json` as the concrete template:
+
 ```json
 {
-  "id": "<slug>",
-  "title": "<numbering> Challenges — <tagline>",
-  "description": "<one line>. Auto-graded.",
+  "id": "2-1-11-challenges",
+  "title": "2.1.12 Challenges — Optional Stretch",
+  "description": "Pick one or more of the stretch challenges and implement them in the editor. Auto-graded.",
   "type": "challenge",
   "difficulty": "intermediate",
   "estimateMins": 30,
-  "category": "<unit category>",
-  "unit": "<unit label>",
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.1 Foundations",
   "preview": "q5play",
-  "week": <n>,
-  "slos": ["SLO-<n>"],
-  "steps": [ ... ],
-  "requirements": [ ... ],
-  "grading": { "totalPoints": <n>, "passingScore": <n>, "allowLateSubmit": true }
+  "week": 10,
+  "slos": ["SLO-3"],
+  "steps": [
+    { "id": "s1", "title": "Create a canvas", "instructions": "Inside setup(), create a canvas of any size.", "hints": ["Open the q5play docs drawer on the right and find the Canvas section."] },
+    { "id": "s2", "title": "Create at least one sprite", "instructions": "In setup(), create a sprite …", "hints": ["Check the Sprite section of the q5play docs drawer for constructor arguments."] },
+    { "id": "s3", "title": "Clear the background each frame", "instructions": "Call background() …", "hints": ["Search the q5play docs drawer for background()."] },
+    { "id": "s4", "title": "Use one advanced feature", "instructions": "Pick a challenge from content.md …", "hints": ["content.md lists six challenges with hints for each …"] }
+  ],
+  "requirements": [
+    { "id": "r1", "title": "Create a canvas", "type": "regex", "file": "script.js", "pattern": "new\\s+Canvas\\s*\\(", "points": 5 },
+    { "id": "r2", "title": "Create at least one sprite", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(", "points": 5 },
+    { "id": "r3", "title": "Clear the background each frame", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "background\\s*\\(", "points": 5 },
+    {
+      "id": "r4",
+      "title": "Use at least one advanced feature",
+      "description": "Your sketch uses a technique beyond canvas + sprite + background.",
+      "type": "inFunction",
+      "function": ["draw", "update"],
+      "file": "script.js",
+      "pattern": "kb\\.presses\\s*\\(|\\bsin\\s*\\(|\\bcos\\s*\\(|mouse\\.(x|y|pressed|pressing)|\\blerp\\s*\\(|frameCount\\s*%|\\btext\\s*\\(",
+      "points": 10
+    }
+  ],
+  "grading": { "totalPoints": 25, "passingScore": 15, "allowLateSubmit": true }
 }
 ```
 
-### Field-by-field
+### Fields that differ from a lab
 
-- `type` — **must be `"challenge"`**. This is what toggles the ⭐ Challenge badge in the sidebar (`lib/lesson-badges.tsx`).
-- `difficulty` — typically `"intermediate"`. Challenges are stretch work.
-- `steps` — three steps is the sweet spot: "pick a challenge", "build it in the editor", "use at least one advanced feature". See canonical example.
-- `requirements` — **permissive**. Use alternation (`a|b|c`) and `inFunction` with an array of function names. The grader should accept any one of several valid approaches.
-- `grading.passingScore` — set to `~60%` of `totalPoints`. A student who completes ONE challenge variant should pass.
+| Field | Lab | Challenge |
+|---|---|---|
+| `type` | `"assignment"` | `"challenge"` — toggles the ⭐ Challenge badge |
+| `difficulty` | `"beginner"` | `"intermediate"` (stretch work) |
+| `estimateMins` | 30–60 | ~30 |
+| `requirements` | strict per-feature regex | alternation — see §2 |
+| `grading.passingScore` | ~66% of `totalPoints` | **~60%** (one feature should pass) |
 
-### Permissive requirement pattern
+Everything else — `type: "lesson"` rules don't apply (this is `"challenge"`), but §1/§3/§4 of `q5play-lesson-conventions.md` do: Steps scaffold, no `/// <reference>`, header comment format, function order.
 
-The canonical "pick one of these advanced features" requirement:
+---
+
+## 2. Permissive requirement pattern — the one thing that makes a challenge a challenge
+
+The "pick one of these advanced features" requirement uses a **regex alternation** plus `inFunction` with an array of function names. Any single matching technique passes:
 
 ```json
 {
@@ -57,76 +84,62 @@ The canonical "pick one of these advanced features" requirement:
 }
 ```
 
-The alternation is the point — **any one** of the listed techniques passes.
+The other requirements (canvas, sprite, background) stay strict — the permissive one is typically just the **last** requirement where the student's chosen-variant creativity is tested. If every requirement is alternation-based, this is probably a lab with a weak grader, not a challenge.
 
-## 2. File layout
+---
 
-```
-lessons/<slug>/
-├── lesson.json
-├── content.md       # the full challenge menu (⭐ list with hints per option)
-└── script.js        # scaffold — see §3
-```
+## 3. `content.md` shape — the challenge menu
 
-## 3. Starter `script.js` — two acceptable shapes
+Every challenge lesson has a `content.md` listing the stretch options. Structure:
 
-### (A) Steps scaffold (same as graded q5play starters)
+1. No hub-style lead header. No sibling-resources line. (Matches `reading-conventions.md` §3 rules.)
+2. Numbered `## Challenge N — <Title> (<difficulty>)` headings, six or so per lesson.
+3. Under each:
+   - 2–4 sentences describing the challenge.
+   - A `**Hints:**` bulleted list — 2–3 items. Hints here **can** be more generous than the lesson.json hints (small code snippets are OK since the student is picking which challenge to attempt).
+   - Optional `**Stretch it further:**` line with a harder variation.
+4. Optional closer: "If you finish all six" suggestions for pairing / deeper exploration.
+
+See `lessons/2-1-11-challenges/content.md` for the live template.
+
+---
+
+## 4. Starter `script.js` — Steps scaffold only
+
+Use the same Steps scaffold pattern as a lab. **The old "BUILD THIS: block comment" alternative has been retired** — one shape only, for consistency with labs and graded lessons.
 
 ```js
-// 2.1.12 Challenges — pick one or more from content.md.
+// 2.1.12 Challenges — pick one (or more) from content.md and build it here.
 
 let player;
 
 function setup() {
   // STEP 1: Create a canvas
-  // STEP 2: Create a sprite
+
+  // STEP 2: Create at least one sprite
 }
 
 function draw() {
-  // STEP 3: Clear the background
-  // STEP 4: Add your chosen advanced feature
+  // STEP 3: Clear the background each frame
+
+  // STEP 4: Add one advanced feature — see the challenge menu (content.md)
+  //         for the list of qualifying techniques.
 }
 ```
 
-### (B) "BUILD THIS:" block-comment spec
+Empty `setup()` / `draw()` bodies. STEP comments map 1:1 to `requirements[].id` as with labs. No pre-written movement, no example snippets — the challenge menu is in `content.md`.
 
-```js
-// 2.1.12 Challenges — see content.md for the full menu.
-
-/*
-BUILD THIS:
-- Canvas
-- At least one sprite
-- background() in draw()
-- Pick ONE advanced feature:
-    kb.presses / sin/cos / mouse.x|y / lerp / frameCount % / text
-*/
-
-function setup() {
-}
-
-function draw() {
-}
-```
-
-Either is acceptable. Per `q5play-lesson-conventions.md` §1 exception: "Challenge shells … that ship with a `BUILD THIS:` block-comment spec followed by empty bodies are also acceptable; the spec comment is itself the scaffold."
-
-## 4. `content.md` shape
-
-The content page is the **menu**. Structure:
-
-- One-paragraph intro: "Pick one or more. You only need to complete one to pass the grader."
-- Numbered or ⭐-bulleted challenge list, each with:
-  - Difficulty tag (easy / medium / hard).
-  - 2–4 sentence description.
-  - 1–2 hint lines.
-- Closer: "The auto-grader checks for ANY of these techniques — pick whichever suits your challenge."
+---
 
 ## 5. Don'ts
 
-- **Do not make requirements strict.** If the regex demands one specific technique, it's a lab, not a challenge — convert it (see `lab-assignment-conventions.md`).
-- **Do not set `passingScore === totalPoints`.** Challenges accept partial completion.
-- **Do not ship working solutions in `script.js`.** Scaffold rules still apply.
+- **Do not make every requirement strict.** At least one requirement must be the permissive alternation; that's what makes it a challenge vs a lab. If all requirements demand a specific pattern, it's a lab — convert it (see `lab-assignment-conventions.md`).
+- **Do not set `passingScore === totalPoints`.** Challenges accept partial completion — one advanced feature passes.
+- **Do not ship working solutions in `script.js`.** Steps scaffold only.
+- **Do not use the legacy "BUILD THIS:" block-comment shape.** Retired — one scaffold shape only.
+- **Do not give specific hints in `lesson.json.steps[].hints[]`.** Generic docs-pointer only (see `q5play-lesson-conventions.md` §2). Challenge menu in `content.md` may be more generous.
+
+---
 
 ## 6. Title convention
 
@@ -136,9 +149,18 @@ The content page is the **menu**. Structure:
 
 Example: `"2.1.12 Challenges — Optional Stretch"`.
 
+---
+
+## 7. UI behavior
+
+See `q5play-lesson-conventions.md` §5. Challenges use the same workspace as graded q5 lessons: right-side docs drawer (auto-open, per-device persistence), left sidebar's Grading tab with vertically-stacked requirement cards (4px border = status), editor + live preview (always visible), collapsible Console, drag-resizable sidebars. Write requirements and content.md with the narrow-end-readable constraint in mind.
+
+---
+
 ## History
 
 | When | What |
 |------|------|
 | Unit 2.1 buildout | Challenge pattern crystallized in `2-1-11-challenges`. |
 | This doc | Hoisted out of per-module specs. |
+| Canonical alignment | Reframed as "harder assignment variant". Retired the "BUILD THIS:" starter alternative — Steps scaffold only, matching labs. §1 JSON shape rewritten as a verbatim copy of `lessons/2-1-11-challenges/lesson.json` (which was itself cleaned up: hub header stripped from content.md, working WASD demo replaced with empty Steps scaffold, meta-guidance steps replaced with four canvas/sprite/bg/feature steps matching the requirements 1:1, hints rewritten as docs-drawer pointers). §7 cross-references `q5play-lesson-conventions.md` §5 for UI behavior instead of duplicating it. |

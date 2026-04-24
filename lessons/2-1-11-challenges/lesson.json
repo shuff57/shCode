@@ -13,26 +13,27 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Pick a challenge (or more)",
-      "instructions": "Read the full list in `content.md` (the ⭐ Challenges page). Six options, varying difficulty:\n\n1. **Color-changing sprite** (easy) — cycle sprite color on each arrow-key press.\n2. **Orbiting companion** (medium) — second sprite circles the player using `sin`/`cos`.\n3. **DevTools exploration** (hard) — inspect `player` in the browser console.\n4. **HUD with multiple values** (medium) — frameCount, player pos, fps on-screen.\n5. **Trail effect** (medium) — sprite leaves fading trail.\n6. **Mouse-follower with lerp** (hard) — smooth cursor-chasing sprite.\n\nYou're not required to attempt all six — pick what interests you.",
-      "hints": [
-        "Even completing one challenge passes the auto-grader.",
-        "Read the hints in each challenge on the content page."
-      ]
+      "title": "Create a canvas",
+      "instructions": "Inside setup(), create a canvas of any size.",
+      "hints": ["Open the q5play docs drawer on the right and find the Canvas section."]
     },
     {
       "id": "s2",
-      "title": "Build in the editor",
-      "instructions": "Start from the provided `script.js` template. Delete the comments and write your own code. You need:\n\n- A canvas (`new Canvas(400, 400)`)\n- At least one sprite\n- Some interactivity OR animation OR inspection beyond a static sprite",
-      "hints": ["Keep velocity numbers small — 2 to 6 is plenty."]
+      "title": "Create at least one sprite",
+      "instructions": "In setup(), create a sprite and store it in the top-level `player` variable.",
+      "hints": ["Check the Sprite section of the q5play docs drawer for constructor arguments."]
     },
     {
       "id": "s3",
-      "title": "Use at least one advanced feature",
-      "instructions": "Your code must use ONE of these techniques (more is fine):\n\n- `kb.presses(...)` — edge-triggered input (used in color-cycling)\n- `sin(...)` or `cos(...)` — circular/oscillating motion\n- `mouse.x` / `mouse.y` — mouse position\n- `lerp(...)` — smooth interpolation\n- `frameCount` with modulo — timed events\n- `text(...)` + `textSize(...)` — on-screen HUD",
-      "hints": [
-        "The auto-grader checks for ANY of the above — pick whichever suits your challenge."
-      ]
+      "title": "Clear the background each frame",
+      "instructions": "Call background() as the first line of draw() so old frames don't stack up.",
+      "hints": ["Search the q5play docs drawer for background()."]
+    },
+    {
+      "id": "s4",
+      "title": "Use one advanced feature",
+      "instructions": "Pick a challenge from content.md and implement it using at least one technique beyond canvas + sprite + background: kb.presses, sin/cos, mouse.x/y, lerp, frameCount %, or text().",
+      "hints": ["content.md lists six challenges with hints for each. Pick whichever interests you — the auto-grader accepts any of the techniques above."]
     }
   ],
   "requirements": [

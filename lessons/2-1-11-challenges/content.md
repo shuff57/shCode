@@ -1,13 +1,3 @@
-# 2.1.1 Challenges (Optional Stretch)
-
-These are not graded. Attempt any you find interesting after you've finished the required work (both in-app lessons, [A10.1](A10.1_sprite-playground.md), [A10.2](A10.2_frame-loop-writeup.md)).
-
-If you get stuck on required work, STOP and ask for help — don't burn time here first.
-
-**Other 2.1.1 resources:** [overview](2.1.1_overview.md) · [readings](2.1.1_readings.md) · [worked examples](2.1.1_worked-examples.md)
-
----
-
 ## Challenge 1 — Color-changing sprite (easy)
 
 Make the player sprite change color every time any arrow key is pressed.
