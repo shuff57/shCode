@@ -27,18 +27,16 @@ Add a second sprite that moves in a **circle** around the player. It should foll
 
 ---
 
-## Challenge 3 — DevTools exploration (hard)
+## Challenge 3 — Inspect + display (hard)
 
-While your sketch is running, open browser DevTools (`F12`).
+Open browser DevTools (`F12`) with your sketch running, poke at `player` in the Console tab, then render one of the values you found **on the canvas** using `text()`.
 
-1. In the **Console** tab, type `player.color` and press Enter. What do you see?
-2. Type `player.color = 'red'` and press Enter. Does the canvas update?
-3. Type `player.constructor.name`. What does that tell you?
-4. Type `Object.keys(player)` — what properties does a Sprite have?
+**Hints:**
+- In DevTools: try `player.color`, `player.constructor.name`, `Object.keys(player)`. You don't need to understand all of it — you'll learn about classes in Week 12.
+- Back in the editor, `text('hello', 10, 20)` draws text at pixel (10, 20). Call `fill(255)` and `textSize(14)` first.
+- Render something dynamic: `text(\`x: ${Math.round(player.pos.x)}\`, 10, 20)` updates as the sprite moves.
 
-Report back what you found. **You're not expected to understand all of it yet** — we'll cover classes and constructors in Week 12 (Module 2.2.1). This challenge is a preview.
-
-**Why it matters:** The DevTools console is a live connection to your running program. You can poke at anything while it's running. Every professional web developer uses DevTools constantly.
+**Stretch it further:** Two lines of text — one for `player.color`, one for `player.pos`. Use a template string to combine them.
 
 ---
 
@@ -67,25 +65,12 @@ FPS: 60.0
 
 Make the player sprite leave a trail behind it as it moves.
 
-**The cheat:** instead of `background('#222')` each frame, use `background('#222', 20)` — the second argument is alpha (transparency). Older frames fade slowly instead of being overwritten fully.
+**Hints:**
+- Easy path: call `background('#222', 20)` instead of `background('#222')` — the second argument is alpha, so older frames fade instead of being overwritten fully.
+- Honest path: track the last N positions in an array. Each frame, `trail.push({x: player.pos.x, y: player.pos.y})` then `trail.shift()` once the array is longer than you want.
+- To draw the trail, `circle(x, y, 6)` works, and `fill(255, 255, 255, i * 8)` fades older positions.
 
-**Or the honest way:** keep an array of the last N positions and draw a circle at each one.
-
-```js
-let trail = [];
-
-function draw() {
-  background('#222');
-
-  trail.push({ x: player.pos.x, y: player.pos.y });
-  if (trail.length > 30) trail.shift();
-
-  for (let i = 0; i < trail.length; i++) {
-    fill(255, 255, 255, i * 8);  // fade older positions
-    circle(trail[i].x, trail[i].y, 6);
-  }
-}
-```
+**Stretch it further:** rainbow trail — vary `fill()` by `i` so each trail-point is a different hue.
 
 ---
 
