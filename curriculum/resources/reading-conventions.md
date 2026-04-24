@@ -56,10 +56,7 @@ lessons/<slug>/
 
 Canonical rhythm — see `lessons/2-1-2-reading-canvas-sprite/content.md` for the live template:
 
-1. **Lead with the link** — a bold markdown link to the external source as the first line, plus a short hint about where to open it. No hub-style heading, no "Required and reference reading for Module X.Y" preamble, no sibling-resource link line.
-   ```md
-   **[/docs/q5play](/docs/q5play)** — open in the same browser window you use for lessons.
-   ```
+1. **Open straight into per-topic subsections** — the UI already renders `lesson.json.externalLink` as a link button above the content, so don't duplicate it inside `content.md`. No hub-style heading, no "Required and reference reading for Module X.Y" preamble, no sibling-resource link line, no restated external link.
 2. **Per-topic subsections** — one `## <Topic Name>` per chapter/topic the student should focus on. Plain topic names; no `R1`/`R2`/`Chapter` labels.
    ```md
    ## Canvas & Sprite

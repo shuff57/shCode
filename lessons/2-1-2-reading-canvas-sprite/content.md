@@ -1,5 +1,3 @@
-**[/docs/q5play](/docs/q5play)** — open in the same browser window you use for lessons.
-
 ## Canvas & Sprite
 **Read before attempting `2.1.1a Hello Sprite`.**
 
