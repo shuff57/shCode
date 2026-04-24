@@ -13,52 +13,48 @@ Canonical rules for **graded q5play lessons** — the core "build a running sket
 
 ## 1. Required `lesson.json` shape
 
+Use **Hello Sprite (`lessons/q5play-intro/lesson.json`)** as a concrete working template. Below is the live shape verbatim from it — copy this, then swap the title/description/content per lesson:
+
 ```json
 {
-  "id": "<slug>",
-  "title": "<numbering> <Lesson Name>",
-  "description": "<one-line hook>",
+  "id": "q5play-intro",
+  "title": "2.1.5 Hello Sprite",
+  "description": "Your first q5play sketch: a canvas, a sprite, a background color.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 20,
-  "category": "<unit category>",
-  "unit": "<unit label>",
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.1 Foundations",
   "preview": "q5play",
-  "week": <n>,
-  "slos": ["SLO-<n>"],
+  "week": 10,
+  "slos": ["SLO-3"],
   "steps": [
     {
       "id": "s1",
-      "title": "<short imperative>",
-      "instructions": "<one sentence telling the student what to do>",
-      "hints": ["<generic doc pointer — see §2>"]
+      "title": "Create a canvas",
+      "instructions": "Inside setup(), call `new Canvas(400, 400)` to make a 400×400 drawing area.",
+      "hints": ["Open the q5play docs drawer on the right and find the Canvas section."]
     }
+    /* …s2–s4 follow the same shape */
   ],
   "requirements": [
-    {
-      "id": "r1",
-      "title": "<what passes>",
-      "description": "<one-line test description>",
-      "type": "regex" | "inFunction",
-      "file": "script.js",
-      "pattern": "<regex>",
-      "flags": "",
-      "points": <n>,
-      "status": "pending"
-    }
+    { "id": "r1", "title": "Create a canvas", "description": "A canvas is created when the sketch starts.", "type": "regex", "file": "script.js", "pattern": "new\\s+Canvas\\s*\\(", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r2", "title": "Create at least one sprite", "description": "A sprite exists in the sketch.", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(", "flags": "", "points": 10, "status": "pending" },
+    { "id": "r3", "title": "Set a sprite color", "description": "A sprite has a color.", "type": "regex", "file": "script.js", "pattern": "\\.color\\s*=", "flags": "", "points": 5, "status": "pending" },
+    { "id": "r4", "title": "Clear the background each frame", "description": "Previous frames don't stack up.", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "background\\s*\\(", "flags": "", "points": 5, "status": "pending" }
   ],
-  "grading": { "totalPoints": <n>, "passingScore": <n>, "allowLateSubmit": true }
+  "grading": { "totalPoints": 30, "passingScore": 20, "allowLateSubmit": true }
 }
 ```
 
 ### Field-by-field
 
 - `type` — **must be `"lesson"`**. `"assignment"` routes through `lab-assignment-conventions.md`; `"challenge"` through `q5play-challenge-conventions.md`.
-- `preview` — **must be `"q5play"`**. This is what mounts the q5play runtime, the file editor, AND the right-side docs drawer (see §5).
-- `steps` — the student-visible task list, rendered in the left sidebar's **Grading** tab. Each step has `id` (matches a `// STEP N:` breadcrumb in `script.js` — see §3), `title`, `instructions` (one sentence), and `hints[]` (see §2).
-- `requirements` — auto-graded checks. One requirement per step is the happy path; see `lab-assignment-conventions.md` for the detailed requirement-type grammar.
-- `grading.totalPoints` — sum of all `requirements[].points`. Verify by hand.
-- `grading.passingScore` — conventionally **~66% of `totalPoints`**. Allows one missed requirement without blocking progression.
+- `preview` — **must be `"q5play"`**. This mounts the q5play runtime, the file editor + live preview, and the right-side docs drawer (see §5).
+- `steps` — authored alongside requirements for authoring consistency and so the `// STEP N:` breadcrumbs in `script.js` have matching `steps[].id` values (see §3). **Currently not rendered in the student UI** (the Grading tab shows only `requirements` — see §5). The `instructions` + `hints` still belong here because future UI may surface them; keep them clean and pointing at the docs (see §2).
+- `requirements` — auto-graded checks AND the student-facing task list (since `steps` are unrendered). Each requirement's `title` + `description` is what the student reads in the sidebar — write them as student-readable instructions, not terse grader labels. See `lab-assignment-conventions.md` for requirement-type grammar.
+- `grading.totalPoints` — sum of all `requirements[].points`. Hello Sprite: `10+10+5+5 = 30`. Verify by hand.
+- `grading.passingScore` — conventionally **~66% of `totalPoints`**. Hello Sprite: `20 / 30 = 67%`. Allows one missed requirement without blocking progression.
 
 ## 2. Hints rule — point at the docs, don't spoon-feed
 
@@ -177,13 +173,16 @@ function draw() {   // every frame
 
 ## 5. UI behavior the student sees
 
-This isn't something the lesson author configures — it's what the in-app workspace does automatically when `preview === "q5play"`. Knowing it helps you write hints and steps correctly.
+This isn't something the lesson author configures — it's what the in-app workspace does automatically when `preview === "q5play"`. Knowing it helps you write requirements + hints correctly.
 
-- **Right-side q5play docs drawer** auto-opens on every q5play lesson (`components/Q5DocsDrawer.tsx`). Students pick a section from a dropdown and read pages inline. They can close it with `×`; the closed state persists per-device in `localStorage` under `shCode:q5docs:closed` and reopens with a "Docs" tab on the right edge.
-- **Left sidebar's Grading tab** lists `steps[]` AND `requirements[]` together (merged by the Grading-tab refactor). Students see the walkthrough and the auto-grader targets side-by-side — don't author hints assuming requirements are hidden, they aren't.
-- **`Code Editor & q5play Preview` dropdown** (the `<details>` block) contains the editor, the live preview iframe, AND Run / Reset buttons. Reset restores the starter — warn students about that in any step that asks them to iterate experimentally.
+- **Right-side q5play docs drawer** auto-opens on every q5play lesson (`components/Q5DocsDrawer.tsx`). Students pick a section from a dropdown and read pages inline. Close it with `×`; the closed state persists per-device in `localStorage` under `shCode:q5docs:closed` and reopens via a small vertical "Docs" tab on the right edge. Because of this, **hints should always assume the docs are one click away** — see §2.
+- **Left sidebar's Grading tab** (the default tab) shows `requirements[]` stacked top-to-bottom. Each requirement renders as a card with:
+  - A **4px left border** colored green (passed), red (failed), or muted grey (not yet graded). No check/X circle, no point total.
+  - The requirement's `title` (bold heading) + `description` (sub-line) + any grader `messages[]`.
+  - This is the student's primary task list — `steps[]` is not currently rendered (see §1 field-by-field).
+- **Editor + live preview + console** render directly on the right side of the sidebar (no wrapping `<details>` dropdown). Above them sits a toolbar with `▶ Run` / `Reset` on the left (q5play / jscad / console modes) and `Commit (N) / History` on the right.
 
-Because of the drawer, **hints should always assume the docs are one click away**. See §2.
+Reset restores the starter `script.js` — warn students in a requirement `description` if you want them to iterate experimentally.
 
 ---
 
@@ -248,3 +247,4 @@ rg '"hints":\s*\[[^\]]*=\s*['"'"'"]'             lessons/    # leaks a literal v
 | Commit `3cb9831` | Stripped `/// <reference path=...>` from all 18 q5play starters. |
 | Module 2.1.1 / 2.1.2 authoring | Scaffold-not-solution convention crystallized. Canonical example = `lessons/q5play-intro/script.js`. |
 | Rename + expansion | File renamed `q5play-starter-conventions.md` → `q5play-lesson-conventions.md` and broadened to cover the full Q5 Lesson type: added §1 `lesson.json` shape, §2 hints-rule (generic docs pointers), §5 UI-behavior notes covering the right-side docs drawer, Grading tab (merged steps+requirements), and the Code Editor / Preview dropdown with Run + Reset buttons. All 15 references in other curriculum docs updated. |
+| UI refactor | Grading tab dropped the `Steps` subsection — now renders only `requirements[]`, stacked vertically. `RequirementCard` simplified: no status circle, no `N/M pts` label; pass/fail signalled only by the 4px left border (green / red / muted). Editor + preview + console unwrapped from their `<details>` dropdowns; Commit / History moved into the editor toolbar (right-aligned, opposite Run/Reset). §1 JSON shape rewritten to use Hello Sprite's concrete values; §1 field-by-field notes that `steps[]` is currently unrendered and `requirements[]` titles/descriptions must carry the student-facing task wording. §5 rewritten to match. |
