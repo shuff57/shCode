@@ -127,33 +127,36 @@ Approximate pacing used in 2.1 and 2.2:
 
 Each unit's slide deck is surfaced through an in-app lesson at `lessons/2-X-1-slides/`:
 
+Where `U` = unit number (2, 3, 4, …) and `M` = module number within that unit (1, 2, …):
+
 ```json
 {
-  "id": "2-X-1-slides",
-  "title": "2.X.1 Slides — <Unit Name>",
-  "description": "Unit 2.X slides — <topics>. Includes runnable code examples.",
+  "id": "U-M-1-slides",
+  "title": "U.M.1 Slides — <Unit Name>",
+  "description": "Unit U.M slides — <topics>. Includes runnable code examples.",
   "type": "lesson",
   "preview": "slides",
-  "slidesUrl": "/slides/2.X/",
+  "slidesUrl": "/slides/U.M/",
   "slidesDevUrl": "http://localhost:303N",
   ...
 }
 ```
 
-`slidesUrl` is a **relative path** (`/slides/2.X/`) — works in both dev (via Next.js public/ serving) and prod once the prebuild has run.
+`slidesUrl` is a **relative path** (`/slides/U.M/`) — works in both dev (via Next.js public/ serving) and prod once the prebuild has run.
 
 ### `title` MUST start with a numbered prefix
 
-`lib/curriculum.ts` → `parseNumberedIdFromTitle` greps the title for a leading `X.Y.Z`. Any lesson whose title doesn't start with that pattern is silently dropped from the module listing page AND the home page — the student never sees it.
+`lib/curriculum.ts` → `parseNumberedIdFromTitle` greps the title for a leading `X.Y.Z` pattern and applies to every unit, not just Unit 2. Any lesson whose title doesn't start with three dotted numbers is silently dropped from the module listing page AND the home page — the student never sees it.
 
-Slides always occupy the `.1` position in their unit. All other lessons start at `.2`.
+Slides always occupy the `.1` position in their module. All other lessons in that module start at `.2`.
 
-✅ `"2.1.1 Slides — q5play Foundations"`
-✅ `"2.2.1 Slides — Object-Oriented Programming"`
+✅ `"2.1.1 Slides — q5play Foundations"` (Unit 2, Module 1)
+✅ `"2.2.1 Slides — Object-Oriented Programming"` (Unit 2, Module 2)
+✅ `"3.1.1 Slides — <Unit 3 Module 1 name>"` (Unit 3 when it ships)
 ❌ `"Unit 2.1 Slides — q5play Foundations"` (no numbered prefix — lesson vanishes from /module/2.1)
 ❌ `"2.1 Slides — q5play Foundations"` (needs three numbers, not two)
 
-The teacher-reference doc at `curriculum/modules/lessons/2.X.1_*.md` shares the same number but lives in a different namespace (never rendered to students), so there's no actual collision.
+The teacher-reference doc at `curriculum/modules/lessons/U.M.1_*.md` shares the same number but lives in a different namespace (never rendered to students), so there's no actual collision.
 
 ### `description` must be student-facing
 
@@ -181,7 +184,7 @@ Do NOT add a `slidesSource` field. It was previously rendered as "Edit source: �
 1. **Bootstrap:** `mkdir slides/2.X && cp -r slides/2.1/{components,public,setup} slides/2.X/`.
 2. **Author slides.md** — read `slides/2.1/slides.md` for reference; keep style parity.
 3. **Add 3 npm scripts** + chain into `slides:build-all`.
-4. **Update in-app lesson** `lessons/2-X-1-slides/lesson.json` with `slidesUrl` and `slidesDevUrl`. Title MUST start with `"2.X.1 Slides — <Unit Name>"` (see §5 for why); description is student-facing (see §5).
+4. **Update in-app lesson** `lessons/U-M-1-slides/lesson.json` with `slidesUrl` and `slidesDevUrl`. Title MUST start with `"U.M.1 Slides — <Unit Name>"` where U is the unit number and M is the module number (see §5 for why); description is student-facing (see §5).
 5. **Verify:** `npm run slides:2.X:build` should produce `public/slides/2.X/index.html` with no errors.
 6. **Verify deploy path:** run `npm run build` (triggers prebuild) and confirm `public/slides/2.X/index.html` exists.
 7. **Live-edit:** `npm run slides:2.X` on port 303N for authoring.
