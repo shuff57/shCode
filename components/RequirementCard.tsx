@@ -1,36 +1,24 @@
 import type { Requirement } from '../lib/types';
-import { CircleCheck, CircleX, Circle, Loader2 } from 'lucide-react';
 
 export default function RequirementCard({ req }: { req: Requirement }) {
+  // Border color alone encodes pass/fail — green if passed, red if
+  // failed, muted grey if neither (not yet graded / running). Keep the
+  // "pass"/"fail" class names so any existing CSS hooks still work.
   const classes = ['requirement', 'mb-4'];
   if (req.status === 'passed') classes.push('pass');
   if (req.status === 'failed') classes.push('fail');
 
-  const statusIcon =
-    req.status === 'passed' ? (
-      <CircleCheck className="text-green-500" />
-    ) : req.status === 'failed' ? (
-      <CircleX className="text-red-500" />
-    ) : req.status === 'running' ? (
-      <Loader2 className="animate-spin" />
-    ) : (
-      <Circle />
-    );
-
-  const hasPoints = req.points !== undefined && req.points > 0;
+  const borderColor =
+    req.status === 'passed' ? '#50fa7b' : req.status === 'failed' ? '#ff5555' : '#44475a';
 
   return (
-    <div className={classes.join(' ')} aria-live="polite">
+    <div
+      className={classes.join(' ')}
+      aria-live="polite"
+      style={{ borderLeft: `4px solid ${borderColor}` }}
+    >
       <h3 className="text-xl">{req.title}</h3>
       <p className="text-lg">{req.description}</p>
-      <div className="req-status">
-        {statusIcon}
-        {hasPoints && (
-          <span className="req-points">
-            {req.status === 'passed' ? req.points : 0}/{req.points} pts
-          </span>
-        )}
-      </div>
       {req.messages && req.messages.length > 0 && (
         <ul>
           {req.messages.map((m, i) => (
