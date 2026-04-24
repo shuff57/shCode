@@ -78,13 +78,16 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
           const state = snap.states[l.id];
           const isDone = state === 'completed';
           const isStarted = state === 'started';
-          const color = isCurrent
-            ? '#ff79c6'
-            : isDone
+          const borderColor = isDone
             ? '#50fa7b'
             : isStarted
             ? '#f1fa8c'
             : '#44475a';
+          const background = isCurrent
+            ? '#ff79c6'
+            : isDone
+            ? '#50fa7b'
+            : 'transparent';
           return (
             <Link
               key={l.id}
@@ -95,8 +98,8 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
                 width: 14,
                 height: 14,
                 borderRadius: '50%',
-                background: isDone || isCurrent ? color : 'transparent',
-                border: `2px solid ${color}`,
+                background,
+                border: `2px solid ${borderColor}`,
                 flexShrink: 0,
               }}
             />
