@@ -130,19 +130,37 @@ Each unit's slide deck is surfaced through an in-app lesson at `lessons/2-X-1-sl
 ```json
 {
   "id": "2-X-1-slides",
-  "title": "2.X.1 Slides — Module 2.X Presentation",
+  "title": "Unit 2.X Slides — <Unit Name>",
+  "description": "Unit 2.X slides — <topics>. Includes runnable code examples.",
   "type": "lesson",
   "preview": "slides",
   "slidesUrl": "/slides/2.X/",
   "slidesDevUrl": "http://localhost:303N",
-  "slidesSource": "slides/2.X/slides.md",
   ...
 }
 ```
 
 `slidesUrl` is a **relative path** (`/slides/2.X/`) — works in both dev (via Next.js public/ serving) and prod once the prebuild has run.
 
-`slidesDevUrl` is optional metadata pointing at the live-edit server. Not consumed by the UI yet — reserved for a future dev-mode toggle.
+### `title` must not collide with a module number
+
+The title uses the **unit** number (`Unit 2.X`), not a module number. Avoid "2.X.1 Slides …" — that collides with the curriculum's own Module 2.X.1 (the first module of the unit). Append the unit's full name for clarity.
+
+✅ `"Unit 2.1 Slides — q5play Foundations"`
+❌ `"2.1.1 Slides — Module 2.1 Presentation"` (collides with Module 2.1.1 in the curriculum plan)
+
+### `description` must be student-facing
+
+The `description` is rendered on the lesson card and at the top of the lesson page — students see it. Do NOT include implementation detail like "Built with Slidev", "Teachers edit content in slides/...", or "Live-editable deck". Describe what the student will see and do.
+
+✅ `"Unit 2.1 slides — canvas, sprites, keyboard input, and the frame loop. Includes runnable code examples."`
+❌ `"Live-editable slide deck with runnable q5play code. Built with Slidev. Teachers edit content in slides/2.1/slides.md."`
+
+### Metadata-only fields
+
+`slidesDevUrl` is **metadata-only**. The UI does not render it. Keep it for teacher/dev-server convenience; don't rely on it appearing on screen.
+
+Do NOT add a `slidesSource` field. It was previously rendered as "Edit source: …" beneath the slides iframe, but that render was removed because it leaked teacher-implementation detail into the student view. The source file path is derivable from the folder name (`lessons/2-X-1-slides/` → `slides/2.X/slides.md`), so the field is redundant.
 
 ---
 
@@ -157,7 +175,7 @@ Each unit's slide deck is surfaced through an in-app lesson at `lessons/2-X-1-sl
 1. **Bootstrap:** `mkdir slides/2.X && cp -r slides/2.1/{components,public,setup} slides/2.X/`.
 2. **Author slides.md** — read `slides/2.1/slides.md` for reference; keep style parity.
 3. **Add 3 npm scripts** + chain into `slides:build-all`.
-4. **Update in-app lesson** `lessons/2-X-1-slides/lesson.json` with `slidesUrl`, `slidesDevUrl`, `slidesSource` fields.
+4. **Update in-app lesson** `lessons/2-X-1-slides/lesson.json` with `slidesUrl` and `slidesDevUrl`. Title follows `"Unit 2.X Slides — <Unit Name>"`; description is student-facing (see §5).
 5. **Verify:** `npm run slides:2.X:build` should produce `public/slides/2.X/index.html` with no errors.
 6. **Verify deploy path:** run `npm run build` (triggers prebuild) and confirm `public/slides/2.X/index.html` exists.
 7. **Live-edit:** `npm run slides:2.X` on port 303N for authoring.

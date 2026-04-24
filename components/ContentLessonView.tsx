@@ -94,13 +94,10 @@ export default function ContentLessonView({ lesson, prev, next, basePath = '/les
       {preview === 'slides' ? (
         meta.slidesUrl ? (
           <div style={{ marginTop: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <div style={{ marginBottom: 8 }}>
               <a href={meta.slidesUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#50fa7b' }}>
                 → Open in new tab (full screen, editable code blocks)
               </a>
-              {meta.slidesSource ? (
-                <code style={{ color: '#6272a4', fontSize: 12 }}>Edit source: {meta.slidesSource}</code>
-              ) : null}
             </div>
             <div style={{ aspectRatio: '16 / 9', borderRadius: 8, overflow: 'hidden', background: '#000', border: '1px solid #44475a' }}>
               <iframe
