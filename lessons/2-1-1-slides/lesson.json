@@ -1,7 +1,7 @@
 {
-  "id": "2-1-12-slides",
-  "title": "2.1.1 Slides — Module 2.1 Presentation",
-  "description": "Live-editable slide deck with runnable q5play code. Built with Slidev. Teachers can edit content in slides/2.1/slides.md.",
+  "id": "2-1-1-slides",
+  "title": "2.1.1 Slides — q5play Foundations",
+  "description": "Unit 2.1 slides — canvas, sprites, keyboard input, and the frame loop. Includes runnable code examples.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 25,
@@ -12,7 +12,6 @@
   "slos": ["SLO-3"],
   "slidesUrl": "/slides/2.1/index.html",
   "slidesDevUrl": "http://localhost:3030",
-  "slidesSource": "slides/2.1/slides.md",
   "steps": [],
   "requirements": [],
   "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
