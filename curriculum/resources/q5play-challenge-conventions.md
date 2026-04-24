@@ -104,30 +104,18 @@ See `lessons/2-1-11-challenges/content.md` for the live template.
 
 ---
 
-## 4. Starter `script.js` — Steps scaffold only
+## 4. Starter `script.js` — **empty**
 
-Use the same Steps scaffold pattern as a lab. **The old "BUILD THIS: block comment" alternative has been retired** — one shape only, for consistency with labs and graded lessons.
+Challenges start the student from a **completely empty editor**. No header comment, no `let` declarations, no `setup()` / `draw()` skeletons, no `// STEP N:` breadcrumbs. The file exists (so the lesson loads) but its contents are blank.
 
 ```js
-// 2.1.12 Challenges — pick one (or more) from content.md and build it here.
-
-let player;
-
-function setup() {
-  // STEP 1: Create a canvas
-
-  // STEP 2: Create at least one sprite
-}
-
-function draw() {
-  // STEP 3: Clear the background each frame
-
-  // STEP 4: Add one advanced feature — see the challenge menu (content.md)
-  //         for the list of qualifying techniques.
-}
 ```
 
-Empty `setup()` / `draw()` bodies. STEP comments map 1:1 to `requirements[].id` as with labs. No pre-written movement, no example snippets — the challenge menu is in `content.md`.
+This is a deliberate divergence from `q5play-lesson-conventions.md` §3/§4 which mandates a Steps scaffold with breadcrumbs. Challenges are harder — the student has to invoke the docs drawer + the `content.md` challenge menu to figure out the shape of the program, not follow a predetermined walkthrough. The lenient grader (§2) gives them room to pick their own path.
+
+If a student needs the scaffold to start, they can click **Reset** (which re-loads this empty starter, unhelpful) or — more usefully — reference the Hello Sprite starter pattern from a prior lesson.
+
+**The old alternatives — Steps scaffold and "BUILD THIS:" block comment — are retired.** One shape only: empty.
 
 ---
 
@@ -136,7 +124,7 @@ Empty `setup()` / `draw()` bodies. STEP comments map 1:1 to `requirements[].id` 
 - **Do not make every requirement strict.** At least one requirement must be the permissive alternation; that's what makes it a challenge vs a lab. If all requirements demand a specific pattern, it's a lab — convert it (see `lab-assignment-conventions.md`).
 - **Do not set `passingScore === totalPoints`.** Challenges accept partial completion — one advanced feature passes.
 - **Do not ship working solutions in `script.js`.** Steps scaffold only.
-- **Do not use the legacy "BUILD THIS:" block-comment shape.** Retired — one scaffold shape only.
+- **Do not add any starter code to `script.js`.** Empty editor is the point (see §4). This includes the `// <numbering> <title>` header comment that graded q5 lessons use — challenges skip it.
 - **Do not give specific hints in `lesson.json.steps[].hints[]`.** Generic docs-pointer only (see `q5play-lesson-conventions.md` §2). Challenge menu in `content.md` may be more generous.
 
 ---
@@ -164,3 +152,4 @@ See `q5play-lesson-conventions.md` §5. Challenges use the same workspace as gra
 | Unit 2.1 buildout | Challenge pattern crystallized in `2-1-11-challenges`. |
 | This doc | Hoisted out of per-module specs. |
 | Canonical alignment | Reframed as "harder assignment variant". Retired the "BUILD THIS:" starter alternative — Steps scaffold only, matching labs. §1 JSON shape rewritten as a verbatim copy of `lessons/2-1-11-challenges/lesson.json` (which was itself cleaned up: hub header stripped from content.md, working WASD demo replaced with empty Steps scaffold, meta-guidance steps replaced with four canvas/sprite/bg/feature steps matching the requirements 1:1, hints rewritten as docs-drawer pointers). §7 cross-references `q5play-lesson-conventions.md` §5 for UI behavior instead of duplicating it. |
+| Empty-editor starter | Dropped the Steps scaffold from challenge starters too. Challenge `script.js` is now **fully empty** — the student invokes the docs drawer + challenge menu to structure the program themselves. §4 rewritten to mandate an empty file; §5 Don'ts updated. |
