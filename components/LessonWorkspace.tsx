@@ -76,6 +76,11 @@ export default function LessonWorkspace({
   const [isRunning, setIsRunning] = useState(false);
   const [resetMsg, setResetMsg] = useState<string | null>(null);
   const [consoleOutput, setConsoleOutput] = useState<Array<{type: string; message: string; timestamp: string}>>([]);
+  // Bumped on every Run/Stop (and on HTML auto-rebuild) so the Console
+  // component can clear scrollback. Also drives the auto-open behavior of
+  // the collapsible Console panel.
+  const [consoleResetKey, setConsoleResetKey] = useState(0);
+  const [consoleOpen, setConsoleOpen] = useState(false);
   const [commitOpen, setCommitOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
@@ -217,6 +222,7 @@ export default function LessonWorkspace({
     const to = setTimeout(() => {
       const doc = buildPreviewHtml(lesson.files, files);
       setSrcDoc(doc);
+      setConsoleResetKey((k) => k + 1);
       const to2 = setTimeout(() => {
         runTests();
       }, 600);
@@ -261,6 +267,8 @@ export default function LessonWorkspace({
 
     setConsoleOutput(logs);
     setRunKey((k) => k + 1);
+    setConsoleResetKey((k) => k + 1);
+    setConsoleOpen(true);
     setTimeout(() => runTests(), 200);
   }
 
@@ -270,6 +278,8 @@ export default function LessonWorkspace({
     const doc = buildJscadPreviewHtml(scriptContent);
     setSrcDoc(doc);
     setRunKey((k) => k + 1);
+    setConsoleResetKey((k) => k + 1);
+    setConsoleOpen(true);
     setIsRunning(true);
     setTimeout(() => runTests(), 600);
   }
@@ -279,6 +289,8 @@ export default function LessonWorkspace({
   function runQ5() {
     setQ5Code(files['script.js'] || '');
     setRunKey((k) => k + 1);
+    setConsoleResetKey((k) => k + 1);
+    setConsoleOpen(true);
     setIsRunning(true);
     setTimeout(() => runTests(), 400);
   }
@@ -288,6 +300,7 @@ export default function LessonWorkspace({
     setQ5Code('');
     setSrcDoc('');
     setRunKey(0);
+    setConsoleResetKey((k) => k + 1);
     setIsRunning(false);
   }
 
@@ -644,10 +657,14 @@ export default function LessonWorkspace({
             <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
           </div>
           {!isConsoleMode && (
-            <details className="console">
+            <details
+              className="console"
+              open={consoleOpen}
+              onToggle={(e) => setConsoleOpen((e.currentTarget as HTMLDetailsElement).open)}
+            >
               <summary>Console</summary>
               <div className="console-body">
-                <Console resetKey={isJscadMode ? String(runKey) : srcDoc} />
+                <Console resetKey={String(consoleResetKey)} />
               </div>
             </details>
           )}
