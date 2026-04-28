@@ -1,7 +1,7 @@
 import LessonWorkspace from '../../../components/LessonWorkspace';
 import ContentLessonView from '../../../components/ContentLessonView';
 import LessonProgressFooter from '../../../components/LessonProgressFooter';
-import { getLesson, getLessonNeighbors, loadLessons } from '../../../lib/lessons';
+import { getLesson, loadLessons } from '../../../lib/lessons';
 import { getModule } from '../../../lib/curriculum';
 
 // Content-only preview types (no code editor). Lessons with an aiGrader also
@@ -22,7 +22,6 @@ export default async function LessonPage({
   const lesson = await getLesson(lessonId);
 
   if (!lesson) return <div className="p-4">Lesson not found</div>;
-  const { prev, next } = await getLessonNeighbors(lessonId);
 
   const numMatch = lesson.title.match(/^(\d+)\.(\d+)\.\d+/);
   const moduleId = numMatch ? `${numMatch[1]}.${numMatch[2]}` : null;
@@ -44,7 +43,7 @@ export default async function LessonPage({
   if (isContentPreview || lesson.aiGrader) {
     return (
       <>
-        <ContentLessonView lesson={lesson} prev={prev} next={next} basePath="/lesson" />
+        <ContentLessonView lesson={lesson} />
         {footer}
       </>
     );

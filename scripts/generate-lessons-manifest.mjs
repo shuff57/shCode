@@ -23,8 +23,8 @@ const lessons = await Promise.all(
       title: meta.title ?? id,
       unit: meta.unit ?? null,
       preview: meta.preview ?? null,
-      // category + week are used client-side to compute prev/next neighbors
-      // for the in-header lesson nav. Same sort key as getLessonNeighbors().
+      // category is used client-side by HeaderLessonNav to scope prev/next
+      // to lessons within the same unit.
       category: meta.category ?? null,
       week: typeof meta.week === 'number' ? meta.week : null,
     };

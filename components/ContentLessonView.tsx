@@ -9,9 +9,6 @@ import MarkdownWithLiveBlocks from './MarkdownWithLiveBlocks';
 
 interface Props {
   lesson: Lesson;
-  prev?: { id: string; title: string } | null;
-  next?: { id: string; title: string } | null;
-  basePath?: string;
 }
 
 function findContent(lesson: Lesson): string {
@@ -25,7 +22,7 @@ function toEmbedUrl(url: string): string {
   return url;
 }
 
-export default function ContentLessonView({ lesson, prev, next, basePath = '/lesson' }: Props) {
+export default function ContentLessonView({ lesson }: Props) {
   const preview = lesson.preview as string;
   const badge = badgeFor(preview);
   const contentMd = findContent(lesson);
@@ -140,21 +137,6 @@ export default function ContentLessonView({ lesson, prev, next, basePath = '/les
       ) : (
         <CompletionPanel lessonId={lesson.id} lessonType={preview} />
       )}
-
-      {(prev || next) ? (
-        <nav style={{ display: 'flex', justifyContent: 'space-between', marginTop: 40, gap: 12 }}>
-          {prev ? (
-            <Link href={`${basePath}/${prev.id}`} style={{ padding: 12, background: '#282a36', borderRadius: 4, textDecoration: 'none', color: '#8be9fd', flex: 1 }}>
-              ← {prev.title}
-            </Link>
-          ) : <span style={{ flex: 1 }} />}
-          {next ? (
-            <Link href={`${basePath}/${next.id}`} style={{ padding: 12, background: '#282a36', borderRadius: 4, textDecoration: 'none', color: '#8be9fd', flex: 1, textAlign: 'right' }}>
-              {next.title} →
-            </Link>
-          ) : <span style={{ flex: 1 }} />}
-        </nav>
-      ) : null}
 
       <style>{`
         .content-prose h1 { font-size: 1.4em; margin-top: 28px; }

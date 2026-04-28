@@ -17,8 +17,14 @@ interface Neighbor {
   title: string;
 }
 
-// Mirrors lib/lessons.ts getLessonNeighbors so the client picks the same
-// prev/next as the server-rendered page once did.
+// Sorts siblings by the X.Y.Z numbered id parsed from the title, matching
+// the canonical order used by lib/curriculum.ts on the module listing page.
+// Titles without a numbered prefix sort to the end.
+function parseNumberedId(title: string): string | null {
+  const m = title.match(/^(\d+\.\d+\.\d+[a-zA-Z]?)/);
+  return m ? m[1] : null;
+}
+
 function computeNeighbors(
   lessons: ManifestLesson[],
   id: string
@@ -28,11 +34,12 @@ function computeNeighbors(
   const peers = lessons
     .filter((l) => l.category === current.category)
     .sort((a, b) => {
-      const w = (a.week ?? 999) - (b.week ?? 999);
-      if (w !== 0) return w;
-      const u = (a.unit || '').localeCompare(b.unit || '');
-      if (u !== 0) return u;
-      return a.title.localeCompare(b.title);
+      const an = parseNumberedId(a.title);
+      const bn = parseNumberedId(b.title);
+      if (an && bn) return an.localeCompare(bn, undefined, { numeric: true });
+      if (an) return -1;
+      if (bn) return 1;
+      return a.title.localeCompare(b.title, undefined, { numeric: true });
     });
   const idx = peers.findIndex((l) => l.id === id);
   const toN = (l?: ManifestLesson): Neighbor | null =>
