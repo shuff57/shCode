@@ -78,6 +78,71 @@ export async function chat(opts: OllamaChatOptions): Promise<OllamaChatResponse>
   }
 }
 
+/**
+ * Streaming chat. Returns a ReadableStream of UTF-8 bytes containing only the
+ * content tokens from each NDJSON frame, suitable for piping straight into a
+ * Response body. Throws on a non-2xx upstream response.
+ */
+export async function chatStream(opts: OllamaChatOptions): Promise<ReadableStream<Uint8Array>> {
+  const host = resolveHost(opts.host, opts.apiKey);
+  const upstream = await fetch(`${host}/api/chat`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders(opts.apiKey),
+    },
+    body: JSON.stringify({
+      model: opts.model,
+      messages: opts.messages,
+      stream: true,
+      format: opts.json ? 'json' : undefined,
+      options: {
+        temperature: opts.temperature ?? 0.3,
+      },
+    }),
+  });
+
+  if (!upstream.ok || !upstream.body) {
+    const body = await upstream.text().catch(() => '');
+    throw new Error(`Ollama ${upstream.status}: ${body.slice(0, 300)}`);
+  }
+
+  return new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const reader = upstream.body!.getReader();
+      const decoder = new TextDecoder();
+      const encoder = new TextEncoder();
+      let buf = '';
+      const flushLine = (line: string) => {
+        if (!line) return;
+        try {
+          const obj = JSON.parse(line) as { message?: { content?: string } };
+          const piece = obj.message?.content;
+          if (piece) controller.enqueue(encoder.encode(piece));
+        } catch {
+          // ignore malformed line
+        }
+      };
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+          let nl = buf.indexOf('\n');
+          while (nl >= 0) {
+            flushLine(buf.slice(0, nl).trim());
+            buf = buf.slice(nl + 1);
+            nl = buf.indexOf('\n');
+          }
+        }
+        flushLine(buf.trim());
+      } finally {
+        controller.close();
+      }
+    },
+  });
+}
+
 export async function isReachable(
   host?: string,
   apiKey?: string,

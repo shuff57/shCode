@@ -6,6 +6,7 @@
 // Streaming: response is text/plain; chunks are the model's content tokens.
 
 import { findRelevantDocs, type RelevantDoc } from '../../lib/q5play-docs';
+import { chatStream } from '../../lib/ollama';
 
 interface Env {
   OLLAMA_API_KEY: string;
@@ -144,76 +145,22 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   const docs = findRelevantDocs(keywords, 6);
   const { system, user } = buildPrompt(body, docs);
 
-  const host = env.OLLAMA_HOST || 'https://ollama.com';
-  const model = 'qwen3-coder-next:cloud';
-
-  const upstream = await fetch(`${host}/api/chat`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${env.OLLAMA_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model,
+  let stream: ReadableStream<Uint8Array>;
+  try {
+    stream = await chatStream({
+      model: 'qwen3-coder-next:cloud',
+      host: env.OLLAMA_HOST,
+      apiKey: env.OLLAMA_API_KEY,
+      temperature: 0.3,
       messages: [
         { role: 'system', content: system },
         { role: 'user', content: user },
       ],
-      stream: true,
-      options: { temperature: 0.3 },
-    }),
-  });
-
-  if (!upstream.ok || !upstream.body) {
-    const text = await upstream.text().catch(() => '');
-    return json(
-      { error: `Ollama ${upstream.status}: ${text.slice(0, 300)}` },
-      502,
-    );
+    });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return json({ error: msg }, 502);
   }
-
-  // Forward Ollama's NDJSON stream, unwrapping each line and emitting only
-  // the .message.content piece as plain text.
-  const stream = new ReadableStream<Uint8Array>({
-    async start(controller) {
-      const reader = upstream.body!.getReader();
-      const decoder = new TextDecoder();
-      const encoder = new TextEncoder();
-      let buf = '';
-      try {
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          buf += decoder.decode(value, { stream: true });
-          let nl = buf.indexOf('\n');
-          while (nl >= 0) {
-            const line = buf.slice(0, nl).trim();
-            buf = buf.slice(nl + 1);
-            nl = buf.indexOf('\n');
-            if (!line) continue;
-            try {
-              const obj = JSON.parse(line) as { message?: { content?: string } };
-              const piece = obj.message?.content;
-              if (piece) controller.enqueue(encoder.encode(piece));
-            } catch {
-              // skip malformed line
-            }
-          }
-        }
-        if (buf.trim()) {
-          try {
-            const obj = JSON.parse(buf) as { message?: { content?: string } };
-            const piece = obj.message?.content;
-            if (piece) controller.enqueue(encoder.encode(piece));
-          } catch {
-            /* ignore */
-          }
-        }
-      } finally {
-        controller.close();
-      }
-    },
-  });
 
   return new Response(stream, {
     headers: {
