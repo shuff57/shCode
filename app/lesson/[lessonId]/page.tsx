@@ -51,7 +51,7 @@ export default async function LessonPage({
   }
   return (
     <>
-      <LessonWorkspace lesson={lesson} prev={prev} next={next} basePath="/lesson" />
+      <LessonWorkspace lesson={lesson} />
       {footer}
     </>
   );

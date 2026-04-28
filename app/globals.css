@@ -21,13 +21,21 @@ body {
   padding: 20px;
   /* Right padding grows with the open tabbed drawer (Docs/Quest/File share
      one panel) so the editor and surrounding content reflow instead of being
-     covered. */
+     covered. The closed-state tab-strip clearance is applied per-workspace-element
+     (.assignment-header, .editor-card) instead of body-wide so the top
+     <Header> + lesson nav row don't get the extra padding. */
   padding-right: calc(20px + var(--shd-tabbed, 0px));
   transition: padding-right 0.22s ease;
   display: flex;
   flex-direction: column;
   gap: 20px;
   width: 100%;
+}
+
+/* Reserve bottom space for the fixed LessonProgressFooter (~36px tall) so an
+   expanded console at the bottom of the editor card isn't covered by it. */
+body:has(.lesson-progress-footer) {
+  padding-bottom: 60px;
 }
 
 code {
@@ -218,7 +226,12 @@ details.editor-card > summary:hover::before {
 .editor-body {
   background: var(--card);
   border-top: 1px solid var(--border);
-  padding: 16px;
+  /* Outer margin pulls the whole editor-body block (run-toolbar + editor +
+     preview + console) inward from the editor-card edges, so its right edge
+     clears the fixed TabbedRightDrawer tab strip uniformly for everything
+     inside. */
+  margin: 16px;
+  padding: 16px 28px 16px 16px;
 }
 
 /* Run toolbar for JS console-mode lessons */
@@ -807,7 +820,11 @@ details.console > summary::-webkit-details-marker { display: none; }
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
-  padding: 0.75rem 0;
+  /* Right padding clears the fixed TabbedRightDrawer vertical tab strip
+     (~28px wide) so right-aligned content (q5 score block, Submit button)
+     isn't covered. Scoped here, not on <body>, so the top page header
+     and lesson nav row stay flush with the body's normal 20px gutter. */
+  padding: 0.75rem 28px 0.75rem 0;
   border-bottom: 1px solid var(--border);
   margin-bottom: 1rem;
 }
@@ -1497,5 +1514,31 @@ details.console > summary::-webkit-details-marker { display: none; }
 }
 @media (max-width: 640px) {
   .lesson-nav { grid-template-columns: 1fr; }
+}
+
+/* In-header prev/next links — button look with no fill until hover. */
+.hdr-lesson-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 0.85rem;
+  border: 1px solid #374151;
+  border-radius: 4px;
+  background: transparent;
+  min-width: 0;
+  max-width: 45%;
+  transition: background-color 120ms, border-color 120ms, color 120ms;
+}
+.hdr-lesson-link:hover {
+  background: #1f2937;
+  border-color: #4b5563;
+  color: #f8f8f2;
+}
+.hdr-lesson-link-right {
+  justify-content: flex-end;
+  text-align: right;
 }
 

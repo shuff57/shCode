@@ -7,6 +7,7 @@ export interface DrawerTab {
   label: string;
   color?: string;
   content: ReactNode;
+  headerExtra?: ReactNode;
 }
 
 interface Props {
@@ -138,24 +139,27 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
           <span style={{ color: '#f8f8f2', fontWeight: 600, fontSize: '0.9rem', letterSpacing: '0.02em' }}>
             {active?.label}
           </span>
-          <button
-            aria-label="Close drawer"
-            onClick={() => setActiveKey(null)}
-            onMouseEnter={() => setCloseBtnHovered(true)}
-            onMouseLeave={() => setCloseBtnHovered(false)}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '1.25rem',
-              lineHeight: 1,
-              padding: '2px 4px',
-              color: closeBtnHovered ? '#f8f8f2' : '#6272a4',
-              transition: 'color 0.15s',
-            }}
-          >
-            &times;
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {active?.headerExtra}
+            <button
+              aria-label="Close drawer"
+              onClick={() => setActiveKey(null)}
+              onMouseEnter={() => setCloseBtnHovered(true)}
+              onMouseLeave={() => setCloseBtnHovered(false)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '1.25rem',
+                lineHeight: 1,
+                padding: '2px 4px',
+                color: closeBtnHovered ? '#f8f8f2' : '#6272a4',
+                transition: 'color 0.15s',
+              }}
+            >
+              &times;
+            </button>
+          </div>
         </div>
         <div
           style={{

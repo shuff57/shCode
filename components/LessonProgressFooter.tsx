@@ -33,6 +33,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
 
   return (
     <div
+      className="lesson-progress-footer"
       style={{
         position: 'fixed',
         left: 0,

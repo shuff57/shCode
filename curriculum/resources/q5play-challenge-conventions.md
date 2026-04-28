@@ -141,7 +141,7 @@ Example: `"2.1.12 Challenges — Optional Stretch"`.
 
 ## 7. UI behavior
 
-See `q5play-lesson-conventions.md` §5. Challenges use the same workspace as graded q5 lessons: right-side docs drawer (auto-open, per-device persistence), left sidebar's Grading tab with vertically-stacked requirement cards (4px border = status), editor + live preview (always visible), collapsible Console, drag-resizable sidebars. Write requirements and content.md with the narrow-end-readable constraint in mind.
+Challenges use the **exact same workspace** as graded q5 lessons. See `q5play-lesson-conventions.md` §5 for the full layout: top criteria-progress header, editor + live preview with `Run / Reset / Commit / History / Submit` toolbar, collapsible Console, right-edge `TabbedRightDrawer` (Docs / Quest / File tabs, closed by default), bottom `LessonProgressFooter`. Write requirements and `content.md` with the narrow-end-readable constraint in mind — the drawer is drag-resizable up to 600px, and an open drawer narrows the editor.
 
 ---
 
@@ -153,3 +153,4 @@ See `q5play-lesson-conventions.md` §5. Challenges use the same workspace as gra
 | This doc | Hoisted out of per-module specs. |
 | Canonical alignment | Reframed as "harder assignment variant". Retired the "BUILD THIS:" starter alternative — Steps scaffold only, matching labs. §1 JSON shape rewritten as a verbatim copy of `lessons/2-1-11-challenges/lesson.json` (which was itself cleaned up: hub header stripped from content.md, working WASD demo replaced with empty Steps scaffold, meta-guidance steps replaced with four canvas/sprite/bg/feature steps matching the requirements 1:1, hints rewritten as docs-drawer pointers). §7 cross-references `q5play-lesson-conventions.md` §5 for UI behavior instead of duplicating it. |
 | Empty-editor starter | Dropped the Steps scaffold from challenge starters too. Challenge `script.js` is now **fully empty** — the student invokes the docs drawer + challenge menu to structure the program themselves. §4 rewritten to mandate an empty file; §5 Don'ts updated. |
+| Workspace consolidation alignment | §7 trimmed to a thin pointer at the new `q5play-lesson-conventions.md` §5. Removed the stale recap of "auto-open docs drawer / left sidebar Grading tab / drag-resizable sidebars" — the workspace is now the single right-edge `TabbedRightDrawer` with Docs / Quest / File tabs (closed by default) plus the bottom `LessonProgressFooter`. |

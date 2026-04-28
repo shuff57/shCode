@@ -39,7 +39,7 @@ Labs **also** follow `q5play-lesson-conventions.md` — starter `script.js` is a
 - `steps` — one step per requirement (rough 1:1). Each `step.id` should correspond to a `// STEP N:` breadcrumb in the starter `script.js` (per `q5play-lesson-conventions.md` §1).
 - `requirements` — **strict**. Each requirement checks a specific pattern the student must produce. Use `type: "regex"` for anywhere-in-file checks and `type: "inFunction"` for per-function-body checks.
 - `grading.totalPoints` — sum of all `requirements[].points`. Verify by hand.
-- `grading.passingScore` — conventionally `~66–75%` of `totalPoints`. Allows one missed requirement without blocking progression.
+- `grading.passingScore` — **does not gate Submit on labs** (labs are q5 lessons; Submit is locked until every requirement is green — see `q5play-lesson-conventions.md` §1 + §5). It only feeds the SubmitDialog's "below passing" warning, which can never fire for q5. Set it to `totalPoints` for new labs so the field reads as truthful; existing files using ~66–75% still work and don't need migration.
 
 ### Requirement types
 
@@ -82,7 +82,6 @@ Not `['"](?:left|right)['"]`.
 ## 5. Don'ts
 
 - **Do not ship a working solution.** Starter is a scaffold (see `q5play-lesson-conventions.md` §1).
-- **Do not set `passingScore === totalPoints`.** Labs allow one missed requirement.
 - **Do not use arrow keys** — WASD only. See §4.
 - **Do not auto-grade velocity magnitudes** (e.g. `vel.x = 4`). Students should be free to pick any value in a reasonable range; the grader checks *that* velocity is set, not *what* it's set to.
 - **Do not include `authored_by_email` or other DB-side fields in the starter.** Those belong to the commit pipeline, not the lesson.
@@ -103,3 +102,4 @@ Examples:
 |------|------|
 | Unit 2.1 buildout | Lab pattern crystallized in `2-1-9-a10-1-sprite-playground`. |
 | This doc | Hoisted out of per-module specs. |
+| Q5 Submit-gate alignment | `grading.passingScore` no longer gates Submit on labs (labs are q5 lessons; the all-green rule applies — see `q5play-lesson-conventions.md` §5). §1 field-by-field rewritten to recommend setting `passingScore` to `totalPoints` for new labs and to flag the field as decorative; §5 Don'ts dropped the obsolete "Do not set `passingScore === totalPoints`" rule. UI behavior is unchanged — labs share the q5 lesson workspace (right-edge `TabbedRightDrawer` with Docs/Quest/File tabs, criteria-progress header, toolbar Submit) described in `q5play-lesson-conventions.md` §5. |

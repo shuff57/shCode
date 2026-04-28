@@ -2,288 +2,459 @@
   "lessons": [
     {
       "id": "2-1-1-slides",
-      "title": "Unit 2.1 Slides — q5play Foundations",
-      "unit": "2.1 Foundations"
+      "title": "2.1.1 Slides — q5play Foundations",
+      "unit": "2.1 Foundations",
+      "preview": "slides",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 10
     },
     {
       "id": "2-1-1-video-intro",
       "title": "2.1.2 Video — Your first q5play sketch",
-      "unit": "2.1 Foundations"
+      "unit": "2.1 Foundations",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 10
     },
     {
       "id": "2-1-10-a10-2-frame-loop",
       "title": "2.1.11 Frame Loop Writeup",
-      "unit": "2.1 Foundations"
+      "unit": "2.1 Foundations",
+      "preview": "assignment",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 10
     },
     {
       "id": "2-1-11-challenges",
       "title": "2.1.12 Challenges — Optional Stretch",
-      "unit": "2.1 Foundations"
+      "unit": "2.1 Foundations",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 10
     },
     {
       "id": "2-1-2-reading-canvas-sprite",
       "title": "2.1.3 Reading — q5play docs: Canvas & Sprite",
-      "unit": "2.1 Foundations"
+      "unit": "2.1 Foundations",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 10
     },
     {
       "id": "2-1-3-example-minimum-sprite",
       "title": "2.1.4 Worked Example — Minimum Sprite Program",
-      "unit": "2.1 Foundations"
+      "unit": "2.1 Foundations",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 10
     },
     {
       "id": "2-1-5-video-frame-loop",
       "title": "2.1.6 Video — The Frame Loop Explained",
-      "unit": "2.1 Foundations"
+      "unit": "2.1 Foundations",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 10
     },
     {
       "id": "2-1-6-reading-input",
       "title": "2.1.7 Reading — q5play docs: Input",
-      "unit": "2.1 Foundations"
+      "unit": "2.1 Foundations",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 10
     },
     {
       "id": "2-1-7-example-keyboard",
       "title": "2.1.8 Worked Example — Keyboard Movement",
-      "unit": "2.1 Foundations"
+      "unit": "2.1 Foundations",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 10
     },
     {
       "id": "2-1-9-a10-1-sprite-playground",
       "title": "2.1.10 Sprite Playground",
-      "unit": "2.1 Foundations"
+      "unit": "2.1 Foundations",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 10
     },
     {
       "id": "2-2-1-slides",
-      "title": "Unit 2.2 Slides — Object-Oriented Programming",
-      "unit": "2.2 Object-Oriented Programming"
+      "title": "2.2.1 Slides — Object-Oriented Programming",
+      "unit": "2.2 Object-Oriented Programming",
+      "preview": "slides",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 12
     },
     {
       "id": "2-2-10-example-proc-vs-oop",
       "title": "2.2.10 Worked Example — Procedural vs OOP side-by-side",
-      "unit": "2.2 Object-Oriented Programming"
+      "unit": "2.2 Object-Oriented Programming",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 12
     },
     {
       "id": "2-2-11-a12-1-collectible",
       "title": "2.2.11 Collectible Class",
-      "unit": "2.2 Object-Oriented Programming"
+      "unit": "2.2 Object-Oriented Programming",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 12
     },
     {
       "id": "2-2-12-a12-2-oop-writeup",
       "title": "2.2.12 Procedural vs OOP Writeup",
-      "unit": "2.2 Object-Oriented Programming"
+      "unit": "2.2 Object-Oriented Programming",
+      "preview": "assignment",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 12
     },
     {
       "id": "2-2-13-challenges",
       "title": "2.2.13 Challenges — Optional Stretch",
-      "unit": "2.2 Object-Oriented Programming"
+      "unit": "2.2 Object-Oriented Programming",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 12
     },
     {
       "id": "2-2-2-video-new-sprite",
       "title": "2.2.2 Video — What `new Sprite()` actually does",
-      "unit": "2.2 Object-Oriented Programming"
+      "unit": "2.2 Object-Oriented Programming",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 12
     },
     {
       "id": "2-2-3-reading-classes",
       "title": "2.2.3 Reading — JavaScript classes",
-      "unit": "2.2 Object-Oriented Programming"
+      "unit": "2.2 Object-Oriented Programming",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 12
     },
     {
       "id": "2-2-4-example-devtools-reveal",
       "title": "2.2.4 Worked Example — You've been using classes",
-      "unit": "2.2 Object-Oriented Programming"
+      "unit": "2.2 Object-Oriented Programming",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 12
     },
     {
       "id": "2-2-6-lab-build-sprite",
       "title": "2.2.6 Your Turn — Build a Sprite",
-      "unit": "2.2 Object-Oriented Programming"
+      "unit": "2.2 Object-Oriented Programming",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 12
     },
     {
       "id": "2-2-7-video-this-keyword",
       "title": "2.2.7 Video — The `this` keyword",
-      "unit": "2.2 Object-Oriented Programming"
+      "unit": "2.2 Object-Oriented Programming",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 12
     },
     {
       "id": "2-2-8-example-enemy-class",
       "title": "2.2.8 Worked Example — Write an Enemy class",
-      "unit": "2.2 Object-Oriented Programming"
+      "unit": "2.2 Object-Oriented Programming",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 12
     },
     {
       "id": "2-2-9-reading-parallel-vs-classes",
       "title": "2.2.9 Reading — Parallel Arrays vs Classes",
-      "unit": "2.2 Object-Oriented Programming"
+      "unit": "2.2 Object-Oriented Programming",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 12
     },
     {
       "id": "algorithm-practice",
       "title": "1.2.3 Algorithm Practice",
-      "unit": "1.2 Control Flow"
+      "unit": "1.2 Control Flow",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
     },
     {
       "id": "arrays",
       "title": "1.3.2 Arrays",
-      "unit": "1.3 Functions and Data"
+      "unit": "1.3 Functions and Data",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
     },
     {
       "id": "basic-html",
       "title": "Basic HTML",
-      "unit": null
+      "unit": null,
+      "preview": null,
+      "category": null,
+      "week": null
     },
     {
       "id": "build-a-cat-photo-app",
       "title": "Build a Cat Photo App",
-      "unit": null
+      "unit": null,
+      "preview": null,
+      "category": null,
+      "week": null
     },
     {
       "id": "conditionals",
       "title": "1.2.1 Conditionals",
-      "unit": "1.2 Control Flow"
+      "unit": "1.2 Control Flow",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
     },
     {
       "id": "debug-camper-bot",
       "title": "Debug Camper Bot",
-      "unit": null
+      "unit": null,
+      "preview": null,
+      "category": null,
+      "week": null
     },
     {
       "id": "debug-pet-adoption",
       "title": "Fix Image and Link Attributes",
-      "unit": null
+      "unit": null,
+      "preview": null,
+      "category": null,
+      "week": null
     },
     {
       "id": "functions",
       "title": "1.3.1 Functions",
-      "unit": "1.3 Functions and Data"
+      "unit": "1.3 Functions and Data",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
     },
     {
       "id": "html-intro",
       "title": "HTML Intro",
-      "unit": null
+      "unit": null,
+      "preview": null,
+      "category": null,
+      "week": null
     },
     {
       "id": "intro-algorithms",
       "title": "1.2.2 Introduction to Algorithms",
-      "unit": "1.2 Control Flow"
+      "unit": "1.2 Control Flow",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
     },
     {
       "id": "jscad-2d-shapes",
       "title": "2.1.2 2D Shapes and Transforms",
-      "unit": "2.1 JSCAD Foundations"
+      "unit": "2.1 JSCAD Foundations",
+      "preview": "jscad",
+      "category": "Unit 2: JSCAD — 2D to 3D",
+      "week": 11
     },
     {
       "id": "jscad-booleans",
       "title": "2.1.3 Boolean Operations",
-      "unit": "2.1 JSCAD Foundations"
+      "unit": "2.1 JSCAD Foundations",
+      "preview": "jscad",
+      "category": "Unit 2: JSCAD — 2D to 3D",
+      "week": 12
     },
     {
       "id": "jscad-intro",
       "title": "2.1.1 Libraries and JSCAD Introduction",
-      "unit": "2.1 JSCAD Foundations"
+      "unit": "2.1 JSCAD Foundations",
+      "preview": "jscad",
+      "category": "Unit 2: JSCAD — 2D to 3D",
+      "week": 10
     },
     {
       "id": "loops",
       "title": "1.2.4 Loops",
-      "unit": "1.2 Control Flow"
+      "unit": "1.2 Control Flow",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
     },
     {
       "id": "operators-expressions",
       "title": "1.1.3 Operators and Expressions",
-      "unit": "1.1 Foundations"
+      "unit": "1.1 Foundations",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 3
     },
     {
       "id": "print-job-manager",
       "title": "1.4.1 Print Job Manager",
-      "unit": "1.4 Synthesis"
+      "unit": "1.4 Synthesis",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
     },
     {
       "id": "q5play-animation",
       "title": "5.4.1 Animated Sprites",
-      "unit": "5.4 Animation & Camera"
+      "unit": "5.4 Animation & Camera",
+      "preview": "q5play",
+      "category": "Unit 5: q5play — Game Physics",
+      "week": 16
     },
     {
       "id": "q5play-apples",
       "title": "5.3.2 Apple Catcher — Worked Example",
-      "unit": "5.3 Groups & Overlaps"
+      "unit": "5.3 Groups & Overlaps",
+      "preview": "q5play",
+      "category": "Unit 5: q5play — Game Physics",
+      "week": 15
     },
     {
       "id": "q5play-asteroids-challenge",
       "title": "5.3.3 Asteroid Field — Challenge",
-      "unit": "5.3 Groups & Overlaps"
+      "unit": "5.3 Groups & Overlaps",
+      "preview": "q5play",
+      "category": "Unit 5: q5play — Game Physics",
+      "week": 15
     },
     {
       "id": "q5play-bounce",
       "title": "5.2.1 Bouncy Ball",
-      "unit": "5.2 Physics Feel"
+      "unit": "5.2 Physics Feel",
+      "preview": "q5play",
+      "category": "Unit 5: q5play — Game Physics",
+      "week": 14
     },
     {
       "id": "q5play-camera",
       "title": "5.4.2 Camera Follow — Worked Example",
-      "unit": "5.4 Animation & Camera"
+      "unit": "5.4 Animation & Camera",
+      "preview": "q5play",
+      "category": "Unit 5: q5play — Game Physics",
+      "week": 16
     },
     {
       "id": "q5play-car-challenge",
       "title": "5.2.3 Car on a Ramp — Challenge",
-      "unit": "5.2 Physics Feel"
+      "unit": "5.2 Physics Feel",
+      "preview": "q5play",
+      "category": "Unit 5: q5play — Game Physics",
+      "week": 14
     },
     {
       "id": "q5play-gravity",
       "title": "5.1.3 Falling Block — Example",
-      "unit": "5.1 Sprites & Movement"
+      "unit": "5.1 Sprites & Movement",
+      "preview": "q5play",
+      "category": "Unit 5: q5play — Game Physics",
+      "week": 13
     },
     {
       "id": "q5play-groups",
       "title": "5.3.1 Introducing Groups",
-      "unit": "5.3 Groups & Overlaps"
+      "unit": "5.3 Groups & Overlaps",
+      "preview": "q5play",
+      "category": "Unit 5: q5play — Game Physics",
+      "week": 15
     },
     {
       "id": "q5play-intro",
       "title": "2.1.5 Hello Sprite",
-      "unit": "2.1 Foundations"
+      "unit": "2.1 Foundations",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 10
     },
     {
       "id": "q5play-joints",
       "title": "5.5.1 Joints: Distance, Hinge, Slider",
-      "unit": "5.5 Joints & Advanced Input"
+      "unit": "5.5 Joints & Advanced Input",
+      "preview": "q5play",
+      "category": "Unit 5: q5play — Game Physics",
+      "week": 17
     },
     {
       "id": "q5play-jump-challenge",
       "title": "5.1.5 Space Jumper — Challenge",
-      "unit": "5.1 Sprites & Movement"
+      "unit": "5.1 Sprites & Movement",
+      "preview": "q5play",
+      "category": "Unit 5: q5play — Game Physics",
+      "week": 13
     },
     {
       "id": "q5play-move-keys",
       "title": "2.1.9 Make it Move",
-      "unit": "2.1 Foundations"
+      "unit": "2.1 Foundations",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 10
     },
     {
       "id": "q5play-pendulum",
       "title": "5.2.2 Swinging Pendulum — Worked Example",
-      "unit": "5.2 Physics Feel"
+      "unit": "5.2 Physics Feel",
+      "preview": "q5play",
+      "category": "Unit 5: q5play — Game Physics",
+      "week": 14
     },
     {
       "id": "q5play-platformer-challenge",
       "title": "5.4.3 Side-Scrolling Platformer — Challenge",
-      "unit": "5.4 Animation & Camera"
+      "unit": "5.4 Animation & Camera",
+      "preview": "q5play",
+      "category": "Unit 5: q5play — Game Physics",
+      "week": 16
     },
     {
       "id": "q5play-slingshot",
       "title": "5.5.2 Slingshot — Worked Example",
-      "unit": "5.5 Joints & Advanced Input"
+      "unit": "5.5 Joints & Advanced Input",
+      "preview": "q5play",
+      "category": "Unit 5: q5play — Game Physics",
+      "week": 17
     },
     {
       "id": "q5play-sprite-showcase",
       "title": "2.2.5 Worked Example — Sprite Showcase",
-      "unit": "2.2 Object-Oriented Programming"
+      "unit": "2.2 Object-Oriented Programming",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 12
     },
     {
       "id": "q5play-sumo-challenge",
       "title": "5.5.3 Two-Player Pong-Sumo — Challenge",
-      "unit": "5.5 Joints & Advanced Input"
+      "unit": "5.5 Joints & Advanced Input",
+      "preview": "q5play",
+      "category": "Unit 5: q5play — Game Physics",
+      "week": 17
     },
     {
       "id": "sdlc-overview",
       "title": "1.1.1 What Is Programming / Software Lifecycle",
-      "unit": "1.1 Foundations"
+      "unit": "1.1 Foundations",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 1
     },
     {
       "id": "variables-and-types",
       "title": "1.1.2 Variables and Types",
-      "unit": "1.1 Foundations"
+      "unit": "1.1 Foundations",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 2
     }
   ]
 }

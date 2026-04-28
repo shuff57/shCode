@@ -1,5 +1,6 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import type { ChangeEvent } from 'react';
 import type { Lesson } from '../lib/types';
 import { useLessonStore } from '../lib/store';
 import { buildPreviewHtml, buildJscadPreviewHtml } from '../lib/preview-builder';
@@ -24,35 +25,49 @@ import TeacherPushBanner from './TeacherPushBanner';
 import CrossDeviceSyncBanner from './CrossDeviceSyncBanner';
 import Q5DocsContent from './Q5DocsContent';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
-import { RotateCcw } from 'lucide-react';
-
-interface Neighbor {
-  id: string;
-  title: string;
-}
+import { RotateCcw, Send } from 'lucide-react';
 
 interface LessonWorkspaceProps {
   lesson: Lesson;
   mode?: 'lesson' | 'assignment';
-  prev?: Neighbor | null;
-  next?: Neighbor | null;
-  basePath?: string;
 }
 
 export default function LessonWorkspace({
   lesson,
   mode,
-  prev = null,
-  next = null,
-  basePath = '/lesson',
 }: LessonWorkspaceProps) {
   const setLesson = useLessonStore((s) => s.setLesson);
   const files = useLessonStore((s) => s.fileContents);
+  const currentFile = useLessonStore((s) => s.currentFile);
+  const updateFile = useLessonStore((s) => s.updateFile);
   const requirements = useLessonStore((s) => s.requirements);
   const setRequirements = useLessonStore((s) => s.setRequirements);
   const commits = useLessonStore((s) => s.commits);
   const commitChanges = useLessonStore((s) => s.commitChanges);
   const getDirtyCount = useLessonStore((s) => s.getDirtyCount);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDownload = () => {
+    if (!currentFile) return;
+    const blob = new Blob([files[currentFile] ?? ''], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = currentFile.split('/').pop() || 'file.txt';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file || !currentFile) return;
+    const text = await file.text();
+    updateFile(currentFile, text);
+  };
 
   const [srcDoc, setSrcDoc] = useState('');
   const [runKey, setRunKey] = useState(0);
@@ -391,22 +406,22 @@ export default function LessonWorkspace({
     setSubmitted(true);
   };
 
-  const summary = {
-    passed: requirements.filter((r) => r.status === 'passed').length,
-    total: requirements.length,
-  };
-
   const dirtyCount = getDirtyCount();
   const totalScore = gradeReport?.totalScore || 0;
   const totalPossible = gradeReport?.totalPossible || 0;
-  const allRequirementsPassed =
-    requirements.length > 0 && requirements.every((r) => r.status === 'passed');
+  const passedCriteria = requirements.filter((r) => r.status === 'passed').length;
+  const totalCriteria = requirements.length;
+  const allRequirementsPassed = totalCriteria > 0 && passedCriteria === totalCriteria;
   // q5 lessons gate Submit on every requirement being green; existing
   // assignments keep the score-vs-passingScore rule.
   const canSubmit = isQ5Mode
     ? allRequirementsPassed
     : totalScore >= (lesson.grading?.passingScore ?? 0);
   const showAssignmentHeader = isAssignment || isQ5Mode;
+  // q5 grading is binary/completion-based — show criteria counts, not points.
+  const headerScore = isQ5Mode ? passedCriteria : totalScore;
+  const headerTotal = isQ5Mode ? totalCriteria : totalPossible;
+  const headerUnitLabel = isQ5Mode ? '' : 'pts';
 
   return (
     <>
@@ -422,6 +437,16 @@ export default function LessonWorkspace({
                   label: 'Docs',
                   color: '#bd93f9',
                   content: <Q5DocsContent />,
+                  headerExtra: (
+                    <a
+                      href="/docs/q5play"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-secondary btn-sm"
+                    >
+                      Docs ↗
+                    </a>
+                  ),
                 },
               ] as DrawerTab[])
             : []),
@@ -433,60 +458,63 @@ export default function LessonWorkspace({
               requirements.length === 0 ? (
                 <p style={{ color: '#6272a4' }}>No graded items for this lesson.</p>
               ) : (
-                <RequirementsSection
-                  requirements={requirements}
-                  summary={summary}
-                  onRerun={runTests}
-                />
+                <RequirementsSection requirements={requirements} />
               ),
           },
           {
             key: 'file',
             label: 'File',
             color: '#8be9fd',
-            content: <FileExplorer tree={lesson.files} />,
+            content: (
+              <>
+                <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexShrink: 0 }}>
+                  <button
+                    type="button"
+                    className="btn-secondary btn-sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={!currentFile}
+                  >
+                    Upload
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-secondary btn-sm"
+                    onClick={handleDownload}
+                    disabled={!currentFile}
+                  >
+                    Download
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".js,.ts,.html,.css,.json,.txt,.md"
+                    onChange={handleUpload}
+                    style={{ display: 'none' }}
+                  />
+                </div>
+                <FileExplorer tree={lesson.files} />
+              </>
+            ),
           },
         ]}
       />
       {showAssignmentHeader ? (
         <AssignmentHeader
           lesson={lesson}
-          score={totalScore}
-          totalPossible={totalPossible}
+          score={headerScore}
+          totalPossible={headerTotal}
           onSubmit={handleSubmit}
           submitted={submitted}
           canSubmit={canSubmit}
+          unitLabel={headerUnitLabel}
+          showStatus={!isQ5Mode}
+          showSubmit={!isQ5Mode}
+          scoreAlign={isQ5Mode ? 'right' : 'center'}
         />
       ) : (
         <div id="titleRow">
           <h1>{lesson.title}</h1>
         </div>
-      )}
-      {(prev || next) && (
-        <nav className="lesson-nav">
-          {prev ? (
-            <a className="lesson-nav-link" href={`${basePath}/${prev.id}`}>
-              <span className="lesson-nav-arrow">←</span>
-              <span className="lesson-nav-label">
-                <span className="lesson-nav-kicker">Previous</span>
-                <span className="lesson-nav-title">{prev.title}</span>
-              </span>
-            </a>
-          ) : (
-            <span />
-          )}
-          {next ? (
-            <a className="lesson-nav-link lesson-nav-link-right" href={`${basePath}/${next.id}`}>
-              <span className="lesson-nav-label">
-                <span className="lesson-nav-kicker">Next</span>
-                <span className="lesson-nav-title">{next.title}</span>
-              </span>
-              <span className="lesson-nav-arrow">→</span>
-            </a>
-          ) : (
-            <span />
-          )}
-        </nav>
       )}
       <div className="editor-card">
         <div className="editor-body">
@@ -558,6 +586,16 @@ export default function LessonWorkspace({
               <button className="btn-secondary btn-sm" onClick={() => setHistoryOpen(true)}>
                 History
               </button>
+              {isQ5Mode && (
+                <button
+                  className="btn-primary btn-sm"
+                  onClick={handleSubmit}
+                  disabled={submitted || !canSubmit}
+                >
+                  <Send size={14} />
+                  Submit
+                </button>
+              )}
             </div>
           </div>
           <div className="editor-preview-container" id="split">

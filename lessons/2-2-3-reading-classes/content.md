@@ -1,12 +1,15 @@
-## What is a class?
+## Class syntax and `new`
+**Read before attempting `2.2.4 Worked Example — You've been using classes`.**
 
-A **class** is a blueprint. It describes what data an object holds and what it can do — but it is not the object itself. The actual object is called an **instance**, and you create one with the `new` keyword.
+What you'll learn from it:
+- A **class** is a blueprint; an **instance** is a specific object built from it with `new`.
+- `constructor(...)` runs once when `new ClassName(...)` is called — its job is to receive arguments and store them on `this`.
+- **Methods** are regular functions written inside the class body, without the `function` keyword.
+- Each instance gets its own copies of the constructor-assigned properties; two instances do not share state.
 
-Think of a class as a cookie cutter and an instance as the cookie. Every cookie has the same shape (same properties, same methods), but each one is a separate object with its own values.
+**Try it:** edit the values passed to `new Point(...)` or change what `distanceTo` returns, then hit Run.
 
-## Class syntax
-
-```js
+```js live
 class Point {
   constructor(x, y) {
     this.x = x;
@@ -19,58 +22,79 @@ class Point {
     return Math.sqrt(dx * dx + dy * dy);
   }
 }
-```
 
-Three parts to notice:
+let a, b;
 
-- **`constructor(...)`** — runs automatically when you write `new Point(...)`. Its job is to receive arguments and store them on `this`.
-- **`this`** — refers to the instance being built (or, inside a method, the instance the method was called on). Every property you want to keep must be attached to `this`.
-- **Methods** — regular functions written inside the class body, without the `function` keyword. They live on every instance.
+function setup() {
+  new Canvas(360, 200);
+  a = new Point(3, 4);
+  b = new Point(0, 0);
+}
 
-## What `new` does, step by step
-
-When JavaScript sees `new Point(3, 4)` it does four things:
-
-1. Allocates a fresh, empty object.
-2. Sets that object's internal prototype to `Point.prototype` (so it inherits the methods).
-3. Calls `constructor(3, 4)` with `this` bound to the new object.
-4. Returns the new object and assigns it to your variable.
-
-```js
-let a = new Point(3, 4);
-let b = new Point(0, 0);
-
-console.log(a.x);              // 3
-console.log(a.distanceTo(b));  // 5
-console.log(b.x);              // 0  — a separate object
-```
-
-`a` and `b` are independent. Changing `a.x` has no effect on `b.x`.
-
-## `this` inside a method
-
-```js
-class Point {
-  constructor(x, y) {
-    this.x = x;  // "my x"
-    this.y = y;  // "my y"
-  }
-
-  distanceTo(other) {
-    // "this" is whichever Point called distanceTo
-    let dx = this.x - other.x;
-    let dy = this.y - other.y;
-    return Math.sqrt(dx * dx + dy * dy);
-  }
+function draw() {
+  background('#222');
+  fill('white');
+  textSize(14);
+  text('a.x = ' + a.x, 20, 60);
+  text('b.x = ' + b.x, 20, 90);
+  text('a.distanceTo(b) = ' + a.distanceTo(b), 20, 120);
 }
 ```
 
-When you write `a.distanceTo(b)`, JavaScript sets `this = a` for the duration of that call. `this.x` is `a.x`; `other.x` is `b.x`.
+## `this` inside a method
+**Read before attempting `2.2.4 Worked Example — You've been using classes`.**
 
-## Connection to q5play
+What you'll learn from it:
+- Inside a method, `this` is whichever instance the method was called on (`a.move(...)` → `this = a`).
+- `this.x` reads (or writes) the property on the calling instance; an argument like `other.x` reads from a different instance.
+- Mutating `this.foo` only affects the calling instance — sibling instances are untouched.
+- This is exactly how `new Sprite(...)` works in q5play: each sprite is its own object with its own `pos`, `vel`, `color`.
 
-You have been writing `new Sprite(x, y, w, h)` since Week 10. `Sprite` is a class defined inside the q5play library. Every time you call `new Sprite(...)` you are creating an instance of that class — with its own `pos`, `vel`, `color`, and all the other properties.
+**Try it:** click the preview to focus it, then hold `→` to call `a.move(2, 0)` every frame. The orange point never moves — only the one whose method was called.
 
-Understanding the class/instance model explains why `player.color = 'red'` only changes the player sprite, not every sprite on the screen. Each sprite is its own object.
+```js live
+class Point {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
 
-In the next example you will write your own class — `Enemy` — and watch exactly these same steps happen in DevTools.
+  move(dx, dy) {
+    this.x += dx;   // "my x"
+    this.y += dy;
+  }
+}
+
+let a, b;
+
+function setup() {
+  new Canvas(360, 200);
+  a = new Point(60, 100);
+  b = new Point(260, 100);
+}
+
+function draw() {
+  background('#222');
+  fill('deepskyblue'); circle(a.x, a.y, 40);
+  fill('orange');      circle(b.x, b.y, 40);
+
+  fill('white'); textSize(12);
+  text('hold → to call a.move(2, 0)', 20, 180);
+
+  if (kb.pressing('right')) a.move(2, 0);
+}
+```
+
+---
+
+## Short glossary (quick reference)
+
+| Term | Definition |
+|------|-----------|
+| **Class** | Blueprint describing what data an instance holds and what it can do. |
+| **Instance** | A specific object built from a class with `new`. Has its own copies of the constructor-assigned properties. |
+| **`new`** | Operator that allocates a fresh object, runs the constructor with `this` bound to it, and returns it. |
+| **`constructor`** | Special method called by `new`. Receives arguments and stores them on `this`. |
+| **`this`** | Inside a constructor or method, refers to the specific instance being built or called. |
+| **Method** | A function defined inside a class body, available on every instance. |
+| **`Sprite`** | A class defined by q5play. `new Sprite(x, y, w, h)` creates an instance with its own `pos`, `vel`, `color`. |

@@ -72,7 +72,10 @@ interface LessonMeta {
   id: string;
   title: string;
   unit: string | null;
+  preview: string | null;
 }
+
+const NO_EDITOR_PREVIEWS = new Set(['slides', 'video', 'reading']);
 
 interface GradebookCell {
   state: 'completed' | 'started' | null;
@@ -319,7 +322,7 @@ function StudentDrawer({
     const byUnit: Record<string, LessonMeta[]> = {};
 
     for (const id of Object.keys(detail.lessonState)) {
-      const meta = lessonMap.get(id) ?? { id, title: id, unit: null };
+      const meta = lessonMap.get(id) ?? { id, title: id, unit: null, preview: null };
       const u = meta.unit ?? 'Other';
       if (!byUnit[u]) {
         byUnit[u] = [];
@@ -440,12 +443,14 @@ function StudentDrawer({
                             {ls.score} pts
                           </span>
                         )}
-                        <a
-                          href={`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(email)}&lesson=${encodeURIComponent(lesson.id)}`}
-                          style={{ background: 'none', border: '1px solid #bd93f9', borderRadius: 4, color: '#bd93f9', fontSize: 12, cursor: 'pointer', padding: '3px 8px', flexShrink: 0, textDecoration: 'none' }}
-                        >
-                          Open in editor
-                        </a>
+                        {!NO_EDITOR_PREVIEWS.has(lesson.preview ?? '') && (
+                          <a
+                            href={`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(email)}&lesson=${encodeURIComponent(lesson.id)}`}
+                            style={{ background: 'none', border: '1px solid #bd93f9', borderRadius: 4, color: '#bd93f9', fontSize: 12, cursor: 'pointer', padding: '3px 8px', flexShrink: 0, textDecoration: 'none' }}
+                          >
+                            Open in editor
+                          </a>
+                        )}
                         {sub && (
                           <button
                             style={{ background: 'none', border: '1px solid #6272a4', borderRadius: 4, color: '#8be9fd', fontSize: 12, cursor: 'pointer', padding: '3px 8px', flexShrink: 0 }}
@@ -569,7 +574,7 @@ function GradebookView({
     const allIds = new Set<string>();
     for (const s of gbData.students) for (const lid of Object.keys(s.cells)) allIds.add(lid);
     const fallback = Array.from(allIds).sort();
-    displayLessons = fallback.map((id) => ({ id, title: id, unit: null }));
+    displayLessons = fallback.map((id) => ({ id, title: id, unit: null, preview: null }));
     displaySpans = displayLessons.length > 0
       ? [{ unit: 'Lessons', count: displayLessons.length }]
       : [];

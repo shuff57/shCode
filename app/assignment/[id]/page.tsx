@@ -21,13 +21,5 @@ export default async function AssignmentPage({
   if (lesson.aiGrader) {
     return <ContentLessonView lesson={lesson} prev={prev} next={next} basePath="/assignment" />;
   }
-  return (
-    <LessonWorkspace
-      lesson={lesson}
-      mode="assignment"
-      prev={prev}
-      next={next}
-      basePath="/assignment"
-    />
-  );
+  return <LessonWorkspace lesson={lesson} mode="assignment" />;
 }

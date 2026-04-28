@@ -62,14 +62,14 @@ Canonical rhythm — see `lessons/2-1-2-reading-canvas-sprite/content.md` for th
    ## Canvas & Sprite
    **Read before attempting `2.1.5 Hello Sprite`.**
    ```
-   Under each topic:
+   Under each topic, in this order:
    - A "What you'll learn from it:" bulleted list (3–5 items).
-   - Optional: a **Try it:** paragraph followed by a ```` ```js live ```` runnable code block so the student can edit + run without leaving the reading.
-3. **Optional: a short glossary table** covering the terms introduced across the topics. Keep to ~7 rows.
+   - A **Try it:** paragraph followed by a ```` ```js live ```` runnable code block so the student can edit + run without leaving the reading. **Required** — every topic gets a live block. If you cannot think of one, the topic is probably not load-bearing enough to keep as its own subsection.
+3. **A short glossary table** at the end, separated from the topics by a `---` rule, under the heading `## Short glossary (quick reference)`. Covers the terms introduced across the topics; ~5–8 rows. **Required** — every reading ends here.
 
 ### `live` code fences
 
-A fenced block annotated ```` ```js live ```` renders as a runnable q5play sketch inline in the lesson (same runtime used elsewhere in the app). Use it any time a code sample is worth running instead of just reading. Omit `live` for snippets meant purely as reference.
+A fenced block annotated ```` ```js live ```` renders as a runnable q5play sketch inline in the lesson (same runtime used elsewhere in the app). Every per-topic subsection MUST have one — that is the only way the reading earns the "interactive" half of its name. A plain ```` ```js ```` fence is reference-only and never substitutes for the per-topic live block; use it only for short illustrative snippets *inside* prose, in addition to (not instead of) the topic's `js live` block.
 
 ### Length
 
@@ -83,6 +83,8 @@ Aim for **under ~100 lines**. The canonical example is 72 lines. Going longer us
 - **Do not add `requirements`.** If you want an auto-check, convert the lesson to a challenge or written-assignment.
 - **Do not use `preview: "reading"` for a worked example.** Worked examples need `contentFile` but belong in their own type (`preview: "example"` — see `example-conventions.md`).
 - **Do not label topic subsections `R1`, `R2`, "Chapter N", etc.** The section heading is the topic name.
+- **Do not ship a reading with zero `js live` blocks.** Long-form prose with only ```` ```js ```` reference fences is a textbook chapter, not a reading lesson. Either restructure into topics with runnable demos or convert the lesson to a different type.
+- **Do not omit the glossary.** Even a 4-row table is fine; "no glossary" is not.
 
 ## 5. Title convention
 
@@ -101,3 +103,4 @@ Examples:
 | Unit 2.1 buildout | Pattern crystallized in `2-1-2-reading-canvas-sprite`, `2-1-6-reading-input`, `2-2-3-reading-classes`, `2-2-9-reading-parallel-vs-classes`. |
 | This doc | Hoisted out of per-module specs. |
 | Scaffolding pass | Stripped hub-style lead header, sibling-resources hub line, "Primary reading" section wrapper, restated external link, R1/R2/"Chapter" subsection labels, and generic "how to read the docs efficiently" block from the canonical example. Reading now opens straight into per-topic `## <Topic>` subsections and ends on the optional glossary. §3 rhythm + §4 don'ts updated to match. |
+| Required-interactives pass | Promoted per-topic `js live` blocks and the closing glossary from "optional" to **required** after `2-2-3-reading-classes` shipped as long-form prose with neither. §3, §4 don'ts, and the `live` code fences subsection updated. |
