@@ -1,0 +1,16 @@
+{
+  "id": "2-3-18-example-ground-detection",
+  "title": "2.3.18 Worked Example — Ground Detection",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.3 Collections and Physics Applications",
+  "preview": "example",
+  "week": 14,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

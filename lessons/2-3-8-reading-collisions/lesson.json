@@ -1,0 +1,19 @@
+{
+  "id": "2-3-8-reading-collisions",
+  "title": "2.3.8 Reading — q5play docs: Collisions + Overlaps",
+  "description": "q5play docs chapter on collisions and overlap detection. Read before `2.3.10 Safe Despawn`.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.3 Collections and Physics Applications",
+  "preview": "reading",
+  "week": 13,
+  "slos": ["SLO-3", "SLO-4"],
+  "externalLink": "/docs/q5play/collisions",
+  "externalLinkLabel": "Open the in-app q5play Collisions docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -177,6 +177,22 @@
       "week": 12
     },
     {
+      "id": "2-3-1-slides",
+      "title": "2.3.1 Slides — Collections and Physics Applications",
+      "unit": "2.3 Collections and Physics Applications",
+      "preview": "slides",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 13
+    },
+    {
+      "id": "2-3-10-example-safe-despawn",
+      "title": "2.3.10 Worked Example — Safe Despawn",
+      "unit": "2.3 Collections and Physics Applications",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 13
+    },
+    {
       "id": "2-3-11-a13-1-asteroid-field",
       "title": "2.3.11 A13.1 Asteroid Field",
       "unit": "2.3 Collections and Physics Applications",
@@ -185,12 +201,76 @@
       "week": 13
     },
     {
+      "id": "2-3-12-challenges",
+      "title": "2.3.12 Challenges — Optional Stretch",
+      "unit": "2.3 Collections and Physics Applications",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 13
+    },
+    {
+      "id": "2-3-13-video-presses-vs-pressing",
+      "title": "2.3.13 Video — kb.presses vs kb.pressing",
+      "unit": "2.3 Collections and Physics Applications",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 14
+    },
+    {
+      "id": "2-3-14-reading-input-edges",
+      "title": "2.3.14 Reading — q5play docs: Input edges",
+      "unit": "2.3 Collections and Physics Applications",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 14
+    },
+    {
+      "id": "2-3-15-example-presses-vs-pressing",
+      "title": "2.3.15 Worked Example — Edge-triggered Input",
+      "unit": "2.3 Collections and Physics Applications",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 14
+    },
+    {
+      "id": "2-3-16-video-jump-ground",
+      "title": "2.3.16 Video — Why your jump feels wrong",
+      "unit": "2.3 Collections and Physics Applications",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 14
+    },
+    {
+      "id": "2-3-17-reading-touching",
+      "title": "2.3.17 Reading — q5play docs: Touching + Ground Detection",
+      "unit": "2.3 Collections and Physics Applications",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 14
+    },
+    {
+      "id": "2-3-18-example-ground-detection",
+      "title": "2.3.18 Worked Example — Ground Detection",
+      "unit": "2.3 Collections and Physics Applications",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 14
+    },
+    {
       "id": "2-3-19-example-pendulum",
       "title": "2.3.19 Worked Example — Swinging Pendulum",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "example",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 14
+    },
+    {
+      "id": "2-3-2-video-groups-intro",
+      "title": "2.3.2 Video — Groups in q5play",
+      "unit": "2.3 Collections and Physics Applications",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 13
     },
     {
       "id": "2-3-20-a14-1-space-jumper",
@@ -209,6 +289,22 @@
       "week": 14
     },
     {
+      "id": "2-3-3-reading-groups",
+      "title": "2.3.3 Reading — q5play docs: Groups",
+      "unit": "2.3 Collections and Physics Applications",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 13
+    },
+    {
+      "id": "2-3-4-example-iterate-group",
+      "title": "2.3.4 Worked Example — Iterating a Group",
+      "unit": "2.3 Collections and Physics Applications",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 13
+    },
+    {
       "id": "2-3-5-groups-sandbox",
       "title": "2.3.5 Groups Sandbox",
       "unit": "2.3 Collections and Physics Applications",
@@ -217,10 +313,34 @@
       "week": 13
     },
     {
+      "id": "2-3-6-video-overlaps",
+      "title": "2.3.6 Video — overlaps() boolean vs callback",
+      "unit": "2.3 Collections and Physics Applications",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 13
+    },
+    {
       "id": "2-3-7-example-apple-catcher",
       "title": "2.3.7 Worked Example — Apple Catcher",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 13
+    },
+    {
+      "id": "2-3-8-reading-collisions",
+      "title": "2.3.8 Reading — q5play docs: Collisions + Overlaps",
+      "unit": "2.3 Collections and Physics Applications",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 13
+    },
+    {
+      "id": "2-3-9-video-remove-bug",
+      "title": "2.3.9 Video — The remove-during-iteration bug",
+      "unit": "2.3 Collections and Physics Applications",
+      "preview": "video",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 13
     },

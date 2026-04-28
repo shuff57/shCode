@@ -1,0 +1,19 @@
+{
+  "id": "2-3-14-reading-input-edges",
+  "title": "2.3.14 Reading — q5play docs: Input edges",
+  "description": "q5play docs chapter on input — `kb.pressing` (level-triggered) vs `kb.presses` (edge-triggered). Read before `2.3.15 Edge-triggered Input`.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.3 Collections and Physics Applications",
+  "preview": "reading",
+  "week": 14,
+  "slos": ["SLO-3"],
+  "externalLink": "/docs/q5play/input",
+  "externalLinkLabel": "Open the in-app q5play Input docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

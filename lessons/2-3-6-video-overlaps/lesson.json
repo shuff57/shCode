@@ -1,0 +1,18 @@
+{
+  "id": "2-3-6-video-overlaps",
+  "title": "2.3.6 Video — overlaps() boolean vs callback",
+  "description": "The two flavors of `overlaps()` and why the callback form is cleaner for despawn-on-collide. Watch before `2.3.7 Apple Catcher`.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 3,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.3 Collections and Physics Applications",
+  "preview": "video",
+  "week": 13,
+  "slos": ["SLO-3", "SLO-4"],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the link, or follow along in the classroom live demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

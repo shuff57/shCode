@@ -1,0 +1,18 @@
+{
+  "id": "2-3-1-slides",
+  "title": "2.3.1 Slides — Collections and Physics Applications",
+  "description": "Unit 2.3 slides — Groups, overlap detection, safe despawn, edge-triggered input, and ground-gated jumping. Includes runnable code examples.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 25,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.3 Collections and Physics Applications",
+  "preview": "slides",
+  "week": 13,
+  "slos": ["SLO-3", "SLO-4"],
+  "slidesUrl": "/slides/2.3/index.html",
+  "slidesDevUrl": "http://localhost:3032",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}
