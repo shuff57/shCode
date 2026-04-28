@@ -451,9 +451,15 @@ details.console > summary::-webkit-details-marker { display: none; }
   font-size: 0.9rem;
 }
 
-/* Cap height when inside the collapsible console below editor */
+/* Cap height when inside the collapsible console below editor.
+   Resizable so the student can drag it taller when they need to read
+   a long stack trace. */
 .console-body .console-root {
-  max-height: 160px;
+  height: 320px;
+  max-height: 60vh;
+  min-height: 120px;
+  resize: vertical;
+  overflow: auto;
 }
 
 /* Fill the pane when used as the main output panel */
