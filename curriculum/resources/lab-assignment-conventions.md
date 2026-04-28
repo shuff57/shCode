@@ -5,9 +5,9 @@ Canonical rules for **in-app auto-graded labs** — the Axxy series (A10.1, A11.
 **Applies to:**
 - `lessons/<slug>/lesson.json` where `type === "assignment"` AND `preview === "q5play"`.
 
-**Canonical example:** `lessons/2-1-9-a10-1-sprite-playground/`.
+**Canonical example:** `lessons/2-2-11-a12-1-collectible/`.
 
-Labs **also** follow `q5play-lesson-conventions.md` — starter `script.js` is a scaffold, never the solution.
+Labs ship **scaffolded** — `script.js` has a header comment, top-level `let` declarations, `setup()` / `draw()` skeletons, and `// STEP N:` comments **in plain English describing each task** — but the function bodies are empty and **no commented-out solution code is shown.** The Quest tab carries the graded requirements; the STEP comments tell the student what each step should accomplish without giving them the line of code that does it. This is structurally different from a `type: "challenge"` lesson, which ships **fully empty** (see `q5play-challenge-conventions.md` §4) — challenges deliberately remove the scaffold so the student structures the program themselves.
 
 ---
 
@@ -36,7 +36,7 @@ Labs **also** follow `q5play-lesson-conventions.md` — starter `script.js` is a
 
 - `type` — **must be `"assignment"`**. This is what toggles the "Assignment" badge in `lib/lesson-badges.tsx`.
 - `estimateMins` — labs are the 30–60 min bucket. Shorter = challenge; longer = project/capstone.
-- `steps` — one step per requirement (rough 1:1). Each `step.id` should correspond to a `// STEP N:` breadcrumb in the starter `script.js` (per `q5play-lesson-conventions.md` §1).
+- `steps` — author-side documentation. **Not currently rendered in the student UI** (the Quest tab shows `requirements[]`, see `q5play-lesson-conventions.md` §5). Each `step.id` should still correspond to the matching `// STEP N:` comment in `script.js` so the scaffold's structure mirrors the spec.
 - `requirements` — **strict**. Each requirement checks a specific pattern the student must produce. Use `type: "regex"` for anywhere-in-file checks and `type: "inFunction"` for per-function-body checks.
 - `grading.totalPoints` — sum of all `requirements[].points`. Verify by hand.
 - `grading.passingScore` — **does not gate Submit on labs** (labs are q5 lessons; Submit is locked until every requirement is green — see `q5play-lesson-conventions.md` §1 + §5). It only feeds the SubmitDialog's "below passing" warning, which can never fire for q5. Set it to `totalPoints` for new labs so the field reads as truthful; existing files using ~66–75% still work and don't need migration.
@@ -51,21 +51,53 @@ Labs **also** follow `q5play-lesson-conventions.md` — starter `script.js` is a
 ```
 lessons/<slug>/
 ├── lesson.json
-└── script.js        # scaffold with // STEP N: breadcrumbs, empty setup/draw bodies
+└── script.js        # scaffold: header + lets + setup/draw skeletons + // STEP N: comments,
+                     # empty function bodies, NO commented-out solution code
 ```
 
-No `content.md` required — step instructions live in `steps[].instructions` inside `lesson.json`. A `content.md` is acceptable only if the lab needs a longer hint reference beyond inline step text.
+No `content.md` required — step instructions live in `steps[].instructions` inside `lesson.json` (and on the matching `// STEP N:` comments inside `script.js`). A `content.md` is acceptable only if the lab needs a longer hint reference beyond inline step text.
 
-## 3. Step ↔ requirement ↔ starter alignment
+## 3. The scaffold rule — describe, never show
 
-The canonical three-way contract:
+The line between an honest scaffold and a give-the-answer scaffold is whether the comments contain **runnable code that solves the step.** Plain-English descriptions of what to do are scaffolds. Commented-out lines that the student can uncomment are answer keys.
 
-| `lesson.json.steps[].id` | `script.js` breadcrumb | `lesson.json.requirements[]`       |
-|--------------------------|------------------------|------------------------------------|
-| `s1` Create a canvas     | `// STEP 1: …`         | `r1` `new Canvas(`                 |
-| `s2` Create sprites      | `// STEP 2: …`         | `r2` `new Sprite(` (×N)            |
-| `s3` Wire input          | `// STEP 3: …`         | `r3`, `r4` `kb.pressing(…)` checks |
-| …                        | …                      | …                                  |
+✅ Good — describes the task, no code:
+
+```js
+function setup() {
+  new Canvas(400, 400);
+
+  // STEP 1: Create a Group — assign new Group() to `stars`.
+
+  // STEP 2: Set defaults on the Group (color, diameter, collider).
+}
+```
+
+❌ Bad — commented-out solution:
+
+```js
+function setup() {
+  new Canvas(400, 400);
+
+  // STEP 1: Create a Group.
+  //   stars = new Group();             // ← this is the answer
+
+  // STEP 2: Set defaults on the Group.
+  //   stars.color = 'yellow';          // ← these are the answer too
+  //   stars.diameter = 10;
+}
+```
+
+The student should be able to read the STEP comment and know **what** to do, then write the **how** themselves. If the comment makes the work mechanical (uncomment lines, fill in literal values), it isn't a scaffold — it's a worksheet.
+
+### Step ↔ requirement ↔ scaffold alignment
+
+| `lesson.json.steps[].id` | `script.js` STEP comment       | `lesson.json.requirements[]`       |
+|--------------------------|--------------------------------|------------------------------------|
+| `s1` Create a canvas     | `// STEP 1: Create a canvas …` | `r1` `new Canvas(`                 |
+| `s2` Create sprites      | `// STEP 2: Create N sprites …` | `r2` `new Sprite(` (×N)            |
+| `s3` Wire input          | `// STEP 3: Read WASD and …`   | `r3`, `r4` `kb.pressing(…)` checks |
+| …                        | …                              | …                                  |
 
 Not every step needs a requirement (some are prose-only guidance), and not every requirement needs a step (e.g. "clear the background" may be implicit), but the happy path is 1:1.
 
@@ -81,7 +113,9 @@ Not `['"](?:left|right)['"]`.
 
 ## 5. Don'ts
 
-- **Do not ship a working solution.** Starter is a scaffold (see `q5play-lesson-conventions.md` §1).
+- **Do not include commented-out solution code in `script.js`.** STEP comments describe the task in plain English (see §3). Lines like `//   stars = new Group();` are answer keys, not scaffolds.
+- **Do not ship a working solution.** Empty function bodies; the student writes them.
+- **Do not include a `// BUILD THIS:` prose block** at the top of `script.js`. The header comment is one line (`// <numbering> <title> — <one-line tagline>` per `q5play-lesson-conventions.md` §4.2); longer task framing belongs in `steps[].instructions` and the matching `// STEP N:` comments inside the function bodies.
 - **Do not use arrow keys** — WASD only. See §4.
 - **Do not auto-grade velocity magnitudes** (e.g. `vel.x = 4`). Students should be free to pick any value in a reasonable range; the grader checks *that* velocity is set, not *what* it's set to.
 - **Do not include `authored_by_email` or other DB-side fields in the starter.** Those belong to the commit pipeline, not the lesson.
@@ -103,3 +137,4 @@ Examples:
 | Unit 2.1 buildout | Lab pattern crystallized in `2-1-9-a10-1-sprite-playground`. |
 | This doc | Hoisted out of per-module specs. |
 | Q5 Submit-gate alignment | `grading.passingScore` no longer gates Submit on labs (labs are q5 lessons; the all-green rule applies — see `q5play-lesson-conventions.md` §5). §1 field-by-field rewritten to recommend setting `passingScore` to `totalPoints` for new labs and to flag the field as decorative; §5 Don'ts dropped the obsolete "Do not set `passingScore === totalPoints`" rule. UI behavior is unchanged — labs share the q5 lesson workspace (right-edge `TabbedRightDrawer` with Docs/Quest/File tabs, criteria-progress header, toolbar Submit) described in `q5play-lesson-conventions.md` §5. |
+| Describe-don't-show scaffold rule | Codified the line between an honest scaffold and an answer-key scaffold: **`// STEP N:` comments describe the task in plain English; commented-out lines that contain runnable solution code are not allowed.** §1 / §2 / §3 / §5 rewritten with examples. The `type: "challenge"` lessons remain fully empty per `q5play-challenge-conventions.md` §4 — the empty/scaffold split is what distinguishes challenges from labs. Established precedent: `2-2-11-a12-1-collectible/script.js` is the canonical scaffold (`// STEP N:` comments in plain English, empty bodies). `2-1-9-a10-1-sprite-playground/script.js` is empty — known inconsistency from before this rule landed. |

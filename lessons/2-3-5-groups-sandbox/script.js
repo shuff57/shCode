@@ -5,28 +5,20 @@ let stars;
 function setup() {
   new Canvas(400, 400);
 
-  // STEP 1: Create a Group — it's both a container and a factory.
-  //   stars = new Group();
+  // STEP 1: Create a Group — assign new Group() to `stars`.
 
-  // STEP 2: Set defaults on the Group — every spawned sprite inherits these.
-  //   stars.color = 'yellow';
-  //   stars.diameter = 10;
-  //   stars.collider = 'none';
+  // STEP 2: Set defaults on the Group (color, diameter, collider).
+  // Every sprite spawned into the Group will inherit them.
+
 }
 
 function draw() {
-  // STEP 5: Clear to a dark blue background.
-  //   background('#001133');
+  // STEP 5: Clear to a dark background so old frames don't pile up.
 
-  // STEP 3: Every 10 frames, spawn a star at a random x at the top.
-  //   if (frameCount % 10 === 0) {
-  //     let s = new stars.Sprite(Math.random() * 400, 0);
-  //     s.vel.y = 2 + Math.random() * 2;
-  //   }
+  // STEP 3: Every N frames, spawn a star with the factory form
+  // (new groupName.Sprite(...)). Give it a downward velocity.
 
-  // STEP 4: Remove stars that fall past the bottom.
-  //   Iterate a copy ([...group]) when removing — otherwise you skip items.
-  //   for (let s of [...stars]) {
-  //     if (s.y > 450) stars.remove(s);
-  //   }
+  // STEP 4: Iterate the Group and remove stars that fell past the bottom.
+  // Iterate a copy ([...stars]) so removal doesn't skip items.
+
 }

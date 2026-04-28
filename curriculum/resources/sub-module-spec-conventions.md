@@ -117,6 +117,18 @@ Replaces the legacy "Build Outputs" section. Lists every in-app lesson the sub-m
 
 A unit that spans multiple sub-modules numbers lessons **flat across the whole unit**, not per sub-module — so 2.3.1 (W13) might fill slots 2.3.1–2.3.12 and 2.3.2 (W14) continues at 2.3.13–2.3.21. The first sub-module owns the `<U.M.1>` slides slot; subsequent sub-modules in the same unit do **not** get their own slides row — they inherit the unit-level deck.
 
+**Starter-file shape per type** — the spec's slot table assigns a `type`, and that determines whether `script.js` ships with content:
+
+| Slot type | `script.js` shape | Convention |
+|---|---|---|
+| `q5play (lesson)` (`type: "lesson"`) | scaffold: header + lets + `setup()` / `draw()` skeletons + `// STEP N:` comments **describing each task in plain English**, empty function bodies | `q5play-lesson-conventions.md` §3 |
+| `q5play (assignment)` (`type: "assignment"`) | scaffold: same shape as `lesson` — header + lets + skeletons + `// STEP N:` description-only comments. **No commented-out solution code.** | `lab-assignment-conventions.md` §2 + §3 |
+| `q5play (challenge)` (`type: "challenge"`) | **fully empty** — zero bytes (or single trailing newline). Challenges deliberately remove the scaffold so the student structures the program themselves. | `q5play-challenge-conventions.md` §4 |
+| `example` (`preview: "example"`) | fully working sketch (read-along) OR omitted entirely if `content.md` carries everything | `example-conventions.md` §4 |
+| `slides`, `video`, `reading` | no `script.js` at all | per-type convention |
+
+The split between scaffolded (lesson + assignment, with description-only STEP comments) and fully empty (challenge) is the structural difference. The split inside the scaffolded camp is the **commented-out-code rule**: comments may describe what to do, but never paste the line of code that does it. Authors get this wrong by carrying commented-out solutions into the scaffold "for clarity"; the result is an answer key, not a starter.
+
 ### 3.4 Carry-over migration notes
 
 Pre-existing `lessons/<old-slug>/` directories that pre-date the post-2.2 conventions need migration. The spec's **In-App Lessons** section MUST list each one with:
