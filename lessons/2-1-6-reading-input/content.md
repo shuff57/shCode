@@ -1,6 +1,6 @@
 # Input — keyboard + mouse
 
-Read this before `2.1.9 Make it Move`. About 5 minutes.
+Read this before `2.1.8 Worked Example — Keyboard Movement`. About 5 minutes.
 
 By the end of this reading you should be able to:
 
@@ -131,4 +131,4 @@ You won't use these this week, but they exist:
 
 ---
 
-Once you can explain why the `else` branch sets velocity to `0`, open `2.1.9 Make it Move` and start coding.
+Once you can explain why the `else` branch sets velocity to `0`, open `2.1.8 Worked Example — Keyboard Movement` and start coding.

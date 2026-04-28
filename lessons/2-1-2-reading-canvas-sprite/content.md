@@ -1,6 +1,6 @@
 # Canvas & Sprite
 
-Read this before `2.1.5 Hello Sprite`. About 5 minutes.
+Read this before `2.1.4 Worked Example — Minimum Sprite Program`. About 5 minutes.
 
 By the end of this reading you should be able to look at a q5play sketch and answer:
 
@@ -115,4 +115,4 @@ After `player = new Sprite(...)`, the sprite is an object with values you can re
 
 ---
 
-Once you can answer the four questions at the top, open `2.1.5 Hello Sprite` and start coding.
+Once you can answer the four questions at the top, open `2.1.4 Worked Example — Minimum Sprite Program` and start coding.
