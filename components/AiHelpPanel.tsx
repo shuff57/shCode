@@ -27,6 +27,7 @@ export default function AiHelpPanel({ lesson }: Props) {
   const [response, setResponse] = useState('');
   const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [quota, setQuota] = useState<{ limit: number; remaining: number } | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const responseRef = useRef<HTMLDivElement>(null);
 
@@ -67,6 +68,7 @@ export default function AiHelpPanel({ lesson }: Props) {
         body: JSON.stringify({
           lessonTitle: lesson.title,
           fileName: currentFile || 'script.js',
+          unit: lesson.unit ?? null,
           code: codeForFile,
           error: lastError,
           query: userQuery,
@@ -74,11 +76,21 @@ export default function AiHelpPanel({ lesson }: Props) {
         signal: ac.signal,
       });
 
+      // Pick up rate-limit headers when present.
+      const limitHdr = res.headers.get('X-RateLimit-Limit');
+      const remainingHdr = res.headers.get('X-RateLimit-Remaining');
+      if (limitHdr && remainingHdr) {
+        setQuota({ limit: parseInt(limitHdr, 10), remaining: parseInt(remainingHdr, 10) });
+      }
+
       if (!res.ok || !res.body) {
         let detail = '';
         try {
-          const j = (await res.json()) as { error?: string };
+          const j = (await res.json()) as { error?: string; remaining?: number; limit?: number };
           detail = j.error || '';
+          if (typeof j.limit === 'number' && typeof j.remaining === 'number') {
+            setQuota({ limit: j.limit, remaining: j.remaining });
+          }
         } catch {
           detail = `HTTP ${res.status}`;
         }
@@ -243,6 +255,19 @@ export default function AiHelpPanel({ lesson }: Props) {
           }}
         >
           {error}
+        </div>
+      ) : null}
+
+      {quota ? (
+        <div
+          style={{
+            fontSize: 11,
+            color: quota.remaining <= 2 ? '#ffb86c' : '#6272a4',
+            textAlign: 'right',
+          }}
+        >
+          {quota.remaining} of {quota.limit} AI helps left today
+          {lesson.unit ? ` (${lesson.unit})` : ''}
         </div>
       ) : null}
 

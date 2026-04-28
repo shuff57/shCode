@@ -41,6 +41,7 @@ Cloudflare dashboard env vars pane (plain vars):
 | `OLLAMA_HOST` | var (optional) | Override Ollama endpoint (defaults to `https://ollama.com`) |
 | `ADMIN_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='admin'` |
 | `TEACHER_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='teacher'` |
+| `AI_HELP_DAILY_LIMIT` | var (optional) | Per-student per-unit daily quota for `POST /api/ai-help`; default `10`. Each unit gets its own bucket. Teachers/admins are exempt. |
 
 ## D1 schema
 
@@ -57,6 +58,7 @@ are safe. Apply with `npx wrangler d1 migrations apply shcode-commits --remote`.
 | 0006 | `classes_and_enrollments.sql` | `classes` + `enrollments` + `class_teachers`; seeds a Legacy class + bulk-enrolls pre-existing students |
 | 0007 | `gzip_commits_files.sql` | Adds `commits.files_gz BLOB`, makes `files_json` nullable. New rows write gzipped snapshots via `CompressionStream`; read path prefers `files_gz`, falls back to `files_json` for legacy rows |
 | 0008 | `commit_author.sql` | `commits.authored_by_email TEXT` (nullable). Lets students distinguish teacher pushes from their own commits. Legacy NULLs coerce to `student_email` on read |
+| 0009 | `ai_help_usage.sql` | `ai_help_usage` — per-student per-unit per-UTC-day request counter for `POST /api/ai-help` rate limiting |
 
 ### Table highlights
 
@@ -86,6 +88,7 @@ Paths follow filenames under `functions/api/`.
 - `GET /api/lesson-state` — bulk per-student
 - `GET/PUT/DELETE /api/lesson-state/[lessonId]`
 - `POST /api/grade-written` — Ollama-backed essay grader
+- `POST /api/ai-help` — streaming Socratic-tutor help; pulls keyword-matched q5play docs into the prompt. Per-student per-unit daily quota (`AI_HELP_DAILY_LIMIT`, default 10); teachers/admins exempt. Output is streamed `text/plain` with code blocks trimmed to ≤3 lines so a successful jailbreak still can't deliver a copy-pasteable solution. `X-RateLimit-Limit` / `X-RateLimit-Remaining` headers expose remaining quota.
 
 ### Commits (student's own)
 - `GET  /api/commits?lessonId=X` — own history
