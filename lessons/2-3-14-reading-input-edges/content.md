@@ -1,13 +1,28 @@
-## Level-triggered with `kb.pressing`
-**Read before attempting `2.3.15 Edge-triggered Input`.**
+# Input edges — `pressing` vs `presses`
 
-What you'll learn from it:
-- `kb.pressing(k)` returns `true` **every frame the key is held** — at 60 fps, that's 60 reads per second of holding.
-- This is the right tool for **continuous** motion: walking, running, holding-to-charge, hold-to-aim.
-- It's the **wrong** tool for one-shot actions like jump or shoot — you'll fire 60 times per held second.
-- Common keys: `'a'`, `'d'`, `'w'`, `'s'`, `'space'`, single-letter aliases for arrows in some setups.
+Read this before `2.3.15 Worked Example — Edge-triggered Input`. About 5 minutes.
 
-**Try it:** hold left/right; the player slides smoothly because the velocity is set every frame. Try swapping `pressing` to `presses` — motion becomes one tiny twitch per tap.
+By the end of this reading you should be able to answer:
+
+- What does `kb.pressing(k)` return, and how often?
+- What does `kb.presses(k)` return, and how often?
+- Why does `kb.pressing('space')` cause an "infinite jump" bug, and how does swapping one word fix it?
+
+These two functions look almost identical and behave completely differently. Picking the wrong one is the source of more game-feel bugs than anything else this quarter.
+
+---
+
+## `kb.pressing(k)` — every frame the key is held
+
+`kb.pressing('a')` returns `true` for **every frame** the key is held down. At 60 fps, that's 60 readings per second of holding.
+
+This is the right tool for **continuous** actions:
+
+- Walking and running (`vel.x = -4` while held)
+- Holding to charge a shot
+- Hold-to-aim, hold-to-block
+
+It's the wrong tool for one-shot actions, because "the key is held" is true for many frames in a row.
 
 ```js live
 let player;
@@ -31,16 +46,41 @@ function draw() {
 }
 ```
 
-## Edge-triggered with `kb.presses`
-**Read before attempting `2.3.15 Edge-triggered Input`.**
+**What you'll see:** a blue square that slides smoothly while you hold A or D, and stops the moment you let go. The smoothness comes from `kb.pressing` re-setting velocity *every* frame.
 
-What you'll learn from it:
-- `kb.presses(k)` fires **exactly once** on each key-down — the moment the key transitions from "not held" to "held."
-- This is the right tool for **one-shot** actions: jump, shoot, fire, dash, toggle.
-- The classic super-jump bug: `if (kb.pressing('space')) player.vel.y = -10;` resets vel.y every frame the key is held → infinite upward acceleration.
-- The fix is changing exactly one word: `kb.pressing` → `kb.presses`.
+**Try this:** swap `kb.pressing` to `kb.presses` (note the **s** at the end). Tap A — the player makes one tiny twitch and stops. The new function only fired once, so the velocity was only set once, and the next frame's `else` branch reset it to 0.
 
-**Try it:** tap space — one jump per tap. Hold space — still one jump. Then swap `presses` → `pressing` in the editor and tap-and-hold again to see the bug.
+---
+
+## `kb.presses(k)` — once per key-down
+
+`kb.presses('space')` returns `true` for **exactly one frame** — the frame on which the key transitions from "not held" to "held." If you keep holding the key, the function returns `false` for every frame after the first.
+
+This is the right tool for **one-shot** actions:
+
+- Jumping
+- Shooting / firing
+- Toggling a flag
+- Triggering a dash
+
+The shape of the input — a single edge transition — matches the shape of the action.
+
+---
+
+## The infinite-jump bug
+
+The classic mistake:
+
+```js
+// BUG — fires every frame the key is held
+if (kb.pressing('space')) {
+  player.vel.y = -10;
+}
+```
+
+Hold space for one second and `vel.y = -10` is set 60 times. Gravity pulls the player back down between sets, but each frame the upward impulse beats it. Result: the player accelerates *up* and never lands.
+
+The fix is changing one word — `pressing` → `presses`:
 
 ```js live
 let player, ground;
@@ -72,13 +112,32 @@ function draw() {
 }
 ```
 
+**What you'll see:** a blue player on a grey ground. Tap space — one jump per tap. Hold space — still one jump (until you release and tap again).
+
+**Try this:** change `kb.presses('space')` to `kb.pressing('space')` and tap-and-hold space. Watch the player rocket upward and never come back. Switch it back to fix.
+
 ---
 
-## Short glossary (quick reference)
+## A rule of thumb
 
-| Term | Definition |
-|------|-----------|
-| **Edge-triggered input** | `kb.presses(k)` — fires exactly once on each key-down transition. Right for jump, shoot, toggle. |
-| **Level-triggered input** | `kb.pressing(k)` — `true` every frame the key is held. Right for continuous motion (walk, run). |
-| **Super-jump bug** | Setting `vel.y = -10` inside `if (kb.pressing('space'))` — fires 60×/sec, accelerates upward forever. The fix is `kb.presses`. |
-| **Impulse** | A sudden, one-frame velocity change (as opposed to continuous force). Edge-triggered input is how you usually deliver one. |
+| You want | Use |
+|----------|-----|
+| Continuous motion (slide, accelerate, hold-to-aim) | `kb.pressing(k)` |
+| One-shot action (jump, shoot, toggle) | `kb.presses(k)` |
+
+Note the spelling — **press*ing*** is the long-running one ("currently being pressed"); **press*es*** is the discrete one ("a press happened"). The verb tense matches the timing.
+
+---
+
+## Quick reference
+
+| Function | Returns `true`... |
+|----------|-------------------|
+| `kb.pressing('a')` | Every frame the key is held. |
+| `kb.presses('a')`  | The single frame the key was first pressed. |
+| `mouse.pressing()` | Every frame a mouse button is held. |
+| `mouse.presses()`  | The single frame a button was first pressed. |
+
+---
+
+Once you can explain the infinite-jump bug in one sentence, open `2.3.15 Worked Example — Edge-triggered Input`.

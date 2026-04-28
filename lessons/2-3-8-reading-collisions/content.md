@@ -1,13 +1,30 @@
-## `sprite.overlaps(other)` — boolean form
-**Read before attempting `2.3.10 Safe Despawn`.**
+# Collisions + Overlaps
 
-What you'll learn from it:
-- `overlaps` returns a **boolean** per frame: `true` if the bounding boxes intersect this frame, `false` otherwise.
-- Passing a Group as `other` checks the sprite against **every member** — `player.overlaps(enemies)` is `true` if any enemy is currently overlapping.
-- The boolean form is right when you only need a yes/no signal — game-over triggers, hit flashes, "did anything collide" gates.
-- It does NOT tell you *which* sprite was hit; for that, use the callback form below.
+Read this before `2.3.10 Worked Example — Safe Despawn`. About 6 minutes.
 
-**Try it:** click the canvas to focus, hold WASD to slide the player around, watch the boolean live below.
+By the end of this reading you should be able to answer:
+
+- What's the difference between `sprite.overlaps(other)` (boolean) and `sprite.overlaps(other, callback)` (callback)?
+- When should you reach for the callback form?
+- What do the callback's two arguments mean — `(self, other) => { ... }`?
+
+q5play's overlap detection has two faces. They share a name (`overlaps`) but solve different problems.
+
+---
+
+## Boolean form — "is anything overlapping right now?"
+
+`sprite.overlaps(other)` returns a boolean. It's `true` for the frames the bounding boxes intersect, `false` otherwise.
+
+When `other` is a Group, the answer is "true if **any** member is currently overlapping":
+
+```js
+if (player.overlaps(enemies)) {
+  // ANY enemy is currently overlapping the player
+}
+```
+
+This is the right tool when you only need a yes/no signal — "did the player touch a hazard?", "is the cursor over a button?", "did anything enter this trigger zone?". It does **not** tell you *which* sprite was hit.
 
 ```js live
 let player, enemies;
@@ -27,13 +44,13 @@ function setup() {
 function draw() {
   background('#222');
 
-  if (kb.pressing('a')) player.vel.x = -3;
+  if (kb.pressing('a'))      player.vel.x = -3;
   else if (kb.pressing('d')) player.vel.x = 3;
-  else player.vel.x = 0;
+  else                       player.vel.x = 0;
 
-  if (kb.pressing('w')) player.vel.y = -3;
+  if (kb.pressing('w'))      player.vel.y = -3;
   else if (kb.pressing('s')) player.vel.y = 3;
-  else player.vel.y = 0;
+  else                       player.vel.y = 0;
 
   fill('white');
   textSize(16);
@@ -41,16 +58,27 @@ function draw() {
 }
 ```
 
-## `overlaps(other, callback)` — callback form
-**Read before attempting `2.3.10 Safe Despawn`.**
+**What you'll see:** a blue player sprite, three red enemies in a row, and a live overlay reading `overlaps(enemies): false`. Click the canvas to focus, then move the player into an enemy with WASD — the overlay flips to `true`.
 
-What you'll learn from it:
-- The callback fires **once per overlapping pair**, with both sprites passed as arguments.
-- This is the clean place to call `target.remove()` — q5play has finished iterating internally, so you can't trip the iterate-then-remove bug.
-- Ideal for despawn-on-collect (apple catching), despawn-on-hit (bullets), score updates, particle spawns.
-- The callback signature is `(self, other) => { ... }` — `self` is always the sprite the method was called on; `other` is the member of the group that's overlapping this frame.
+**Try this:** change the line to `text('overlaps(enemies[0]): ' + player.overlaps(enemies[0]), 12, 24);`. The overlay only goes `true` when you touch the *first* red sprite — same method, different argument.
 
-**Try it:** the apple-catcher pattern — basket catches apples, score increments, apple removes itself. Edit `frameCount % 30` to change difficulty.
+---
+
+## Callback form — "do something for each overlapping pair"
+
+`sprite.overlaps(group, (self, other) => { ... })` calls your function **once per overlapping pair this frame**:
+
+- `self` — always the sprite the method was called on (`player` in the example below).
+- `other` — the group member that's currently overlapping.
+
+```js
+basket.overlaps(apples, (b, apple) => {
+  score++;
+  apple.remove();
+});
+```
+
+The callback fires *during* `overlaps`, after q5play has finished its internal iteration. That makes it the safe place to call `apple.remove()` — you can't trip the iterate-then-remove bug because q5play isn't iterating anymore.
 
 ```js live
 let basket, apples, score = 0;
@@ -69,9 +97,9 @@ function setup() {
 function draw() {
   background('#113311');
 
-  if (kb.pressing('a')) basket.vel.x = -4;
+  if (kb.pressing('a'))      basket.vel.x = -4;
   else if (kb.pressing('d')) basket.vel.x = 4;
-  else basket.vel.x = 0;
+  else                       basket.vel.x = 0;
 
   if (frameCount % 30 === 0) {
     let a = new apples.Sprite(20 + Math.random() * 320, -20);
@@ -93,15 +121,34 @@ function draw() {
 }
 ```
 
+**What you'll see:** a brown basket at the bottom and red apples falling. Move the basket with A/D — every apple it touches removes itself and the score goes up.
+
+**Try this:** change `frameCount % 30` to `frameCount % 10` for a faster rain. Then change `score++` to `score += 5` — each catch is now worth more. Notice you never had to touch the callback's removal logic.
+
 ---
 
-## Short glossary (quick reference)
+## Picking which form to use
 
-| Term | Definition |
-|------|-----------|
-| **Overlap** | When two sprites' bounding boxes intersect on the current frame. |
-| **Boolean form** | `sprite.overlaps(other)` — returns `true`/`false` per frame; right for yes/no signals. |
-| **Callback form** | `sprite.overlaps(group, (self, other) => { … })` — fires once per overlapping pair; right for per-pair work like despawning. |
-| **Iterate backwards** | Loop from `length - 1` down to `0` so removing items doesn't shift unprocessed indices. |
-| **Iterate-a-copy** | `for (let s of [...group])` — same effect as iterating backwards; reads more cleanly. |
-| **Callback** | A function passed as an argument to another function (e.g. the second argument to `overlaps`). |
+| You need | Use |
+|----------|-----|
+| A yes/no answer (game-over flag, hit indicator) | `sprite.overlaps(other)` — boolean |
+| To do something *per* hit (despawn, score, particle, sound) | `sprite.overlaps(other, callback)` — callback |
+| To know *which* sprite hit | Callback form — the second argument is the hit sprite |
+
+A common pitfall: writing `if (player.overlaps(enemies)) enemies.remove(enemies[0])`. This compiles, but you've thrown away information about *which* enemy was hit, and removing the wrong one is easy. Use the callback form whenever the work is per-pair.
+
+---
+
+## Quick reference
+
+| Term | Meaning |
+|------|---------|
+| **Overlap** | When two sprites' bounding boxes intersect this frame. |
+| **Boolean form** | `sprite.overlaps(other)` — `true`/`false` per frame. |
+| **Callback form** | `sprite.overlaps(group, (self, other) => { ... })` — fires once per overlapping pair. |
+| **Iterate-a-copy** | `for (let s of [...group])` — safe pattern when you might remove during the loop. |
+| **Callback** | A function passed as an argument to another function. |
+
+---
+
+Once you can explain why the callback form is the safe place to call `remove()`, open `2.3.10 Worked Example — Safe Despawn`.

@@ -1,12 +1,30 @@
-## Procedural — parallel arrays
-**Read before attempting `2.2.10 Example — Procedural vs OOP`.**
+# Parallel arrays vs classes
 
-What you'll learn from it:
-- How an "enemy" is represented implicitly by a shared index `i` across three separate arrays.
-- Why adding a new property (e.g. `element`) forces a fourth array and another lockstep update everywhere it is used.
-- Why a single delete takes three `splice` calls — and what breaks the moment one array falls out of sync.
+Read this before `2.2.10 Worked Example — Procedural vs OOP side-by-side`. About 6 minutes.
 
-**Try it:** click the canvas to spawn enemies. Press `space` to damage enemy `0` (watch three arrays stay in lockstep on delete).
+By the end of this reading you should be able to answer:
+
+- What is a "parallel array" data layout, and what bug does it invite?
+- Why does deletion get harder as you add more arrays?
+- How does packing data + behavior into a class change the same problem?
+
+Both versions below build the *same* thing — a list of enemies, each with HP. The first does it the old procedural way (separate arrays for each property). The second uses a class. Read them side by side.
+
+---
+
+## Procedural — three arrays sharing an index
+
+In the procedural version, "enemy 0" doesn't exist as a single object. It's *implied* by the agreement that index `0` of every array refers to the same enemy:
+
+```js
+let enemyX  = [];
+let enemyY  = [];
+let enemyHP = [];
+```
+
+Enemy `0`'s position is `(enemyX[0], enemyY[0])`, its HP is `enemyHP[0]`. Three arrays, one logical record.
+
+**The fragility:** if you ever update one array but not the others, the indices fall out of sync. Enemy 0's position is now stuck on what *used* to be enemy 1. Every operation has to remember to update *every* array in lockstep.
 
 ```js live
 let enemyX = [];
@@ -45,16 +63,17 @@ function draw() {
 }
 ```
 
-## Object-oriented — array of instances
-**Read before attempting `2.2.10 Example — Procedural vs OOP`.**
+**What you'll see:** three red circles in a row, each labelled with HP. Click anywhere to spawn another. Tap space to deal one damage to enemy `0`.
 
-What you'll learn from it:
-- How one class packs all of an enemy's data and behavior into a single object.
-- Why deletion is one operation on `enemies`, not three in lockstep.
-- How a method (`damage(n)`) keeps behavior next to the data it mutates.
-- Why adding a property means editing one constructor, not four arrays.
+**Try this:** delete one of the three `splice` calls inside `damageEnemy` — say, the `enemyX.splice(...)` line. Then keep tapping space until enemy 0 should die. The circle still shows up but at a different position than its label, because the arrays fell out of sync.
 
-**Try it:** same controls as above — click to spawn, `space` to damage enemy `0`. One object, one array, one delete.
+**Now imagine adding a property** — say, a `color` per enemy. You'd need a new `enemyColor` array, plus updates in `spawnEnemy`, `damageEnemy`, and anywhere else that touches enemy data. One conceptual change, four code changes.
+
+---
+
+## Object-oriented — one array of `Enemy` instances
+
+The OOP version makes "enemy 0" a real object. It owns its own position, HP, and behavior:
 
 ```js live
 let enemies = [];
@@ -69,7 +88,7 @@ class Enemy {
   damage(n) {
     this.hp -= n;
     if (this.hp <= 0) {
-      this.sprite.remove();
+      this.sprite.delete();
       enemies.splice(enemies.indexOf(this), 1);
     }
   }
@@ -98,15 +117,35 @@ function draw() {
 }
 ```
 
+**What you'll see:** the same gameplay — three red sprites, click to spawn, space to damage enemy 0. The behavior is identical; the *code shape* is what's different.
+
+**Try this:** add a property. Inside the `Enemy` constructor, add `this.maxHp = hp;` (so each enemy remembers its starting HP). Then change the label to read `'HP ' + e.hp + '/' + e.maxHp`. Notice you only edited two places — the constructor and the draw call — instead of needing to update a parallel `enemyMaxHp` array everywhere.
+
 ---
 
-## Short glossary (quick reference)
+## What changed
 
-| Term | Definition |
-|------|-----------|
-| **Class** | Blueprint describing what data an object holds and what it can do. |
-| **Instance** | A specific object built from a class with `new`. Each instance has its own copy of the data. |
-| **`constructor`** | Method that runs when `new` is called; stores initial values on `this`. |
-| **Method** | A function defined inside a class body; available on every instance. |
+| Concern | Procedural | OOP |
+|---------|-----------|-----|
+| One enemy's data | Spread across N arrays at index `i` | Packed into one object |
+| Deleting one | `splice` once per array | One `splice` on the array of objects |
+| Adding a property | New array + updates everywhere | New line in the constructor |
+| Behavior (`damage`) | Free-floating function that takes an index | Method on the object that owns the data |
+
+**Behavior + data live together** in the OOP version. That's the central idea, and it's why classes scale better than parallel arrays the moment you have more than one or two properties per record.
+
+---
+
+## Quick reference
+
+| Term | Meaning |
+|------|---------|
 | **Parallel arrays** | Several arrays representing one logical record by sharing an index. Fragile under deletion. |
-| **`splice(i, 1)`** | Removes one element at index `i`, shifting the rest down. |
+| **`splice(i, 1)`** | Removes one element at index `i`, shifting later elements down. |
+| **Class** | Blueprint for an object: constructor + methods. |
+| **Instance** | A specific object built from a class with `new`. |
+| **Method** | A function defined inside a class body. Has access to `this`. |
+
+---
+
+Once you can describe what goes wrong if one of the three `splice` calls is forgotten, open `2.2.10 Worked Example — Procedural vs OOP side-by-side`.
