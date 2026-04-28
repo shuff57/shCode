@@ -1,4 +1,4 @@
-// 5.2.2 Swinging Pendulum — Worked Example
+// 2.3.19 Worked Example — Swinging Pendulum
 
 let anchor, rod, joint;
 
@@ -15,12 +15,9 @@ function setup() {
   joint = new HingeJoint(anchor, rod);
 }
 
-function update() {
+function draw() {
+  background('#111');
   if (mouse.presses()) {
     rod.angularVelocity = 6;
   }
-}
-
-function draw() {
-  background('#111');
 }

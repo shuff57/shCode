@@ -1,0 +1,46 @@
+{
+  "id": "2-3-5-groups-sandbox",
+  "title": "2.3.5 Groups Sandbox",
+  "description": "Groups let you treat many sprites as one. Create, configure, spawn into, and clean up a Group.",
+  "type": "lesson",
+  "difficulty": "intermediate",
+  "estimateMins": 25,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.3 Collections and Physics Applications",
+  "preview": "q5play",
+  "week": 13,
+  "slos": ["SLO-3", "SLO-4"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Make a Group",
+      "instructions": "let stars = new Group(); — a Group is a sprite factory + a container.",
+      "hints": ["Open the q5play docs Groups chapter on the right (or run /docs/q5play/groups) for the API."]
+    },
+    {
+      "id": "s2",
+      "title": "Set defaults on the Group",
+      "instructions": "stars.color = 'yellow'; stars.diameter = 10; — every sprite added to the group starts with these.",
+      "hints": ["Set defaults once on the Group rather than per-sprite. Check the Groups docs section on defaults."]
+    },
+    {
+      "id": "s3",
+      "title": "Spawn sprites into the Group",
+      "instructions": "In draw(), every so often call new stars.Sprite(randomX, 0) — note capital-S Sprite on the group.",
+      "hints": ["The q5play docs has examples of timed spawning. Look for the frameCount % N === 0 idiom."]
+    },
+    {
+      "id": "s4",
+      "title": "Remove sprites that leave the screen",
+      "instructions": "Iterate the group and remove any sprite past the bottom of the canvas. Otherwise your sketch slows to a crawl.",
+      "hints": ["Iterating a Group while removing trips a subtle bug. The Groups docs has a section on safe removal."]
+    }
+  ],
+  "requirements": [
+    { "id": "r1", "title": "Create a Group", "description": "Use new Group()", "type": "regex", "file": "script.js", "pattern": "new\\s+Group\\s*\\(", "flags": "", "points": 1 },
+    { "id": "r2", "title": "Spawn into the Group", "description": "Use groupName.Sprite(...) to spawn a sprite in the group", "type": "regex", "file": "script.js", "pattern": "new\\s+\\w+\\.Sprite\\s*\\(", "flags": "", "points": 1 },
+    { "id": "r3", "title": "Group default", "description": "Set a property on the Group itself (e.g. .color, .diameter)", "type": "regex", "file": "script.js", "pattern": "\\w+\\.(color|diameter|width|height)\\s*=", "flags": "", "points": 1 },
+    { "id": "r4", "title": "Remove offscreen sprites", "description": "Call .remove() somewhere in draw()", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "\\.remove\\s*\\(", "flags": "", "points": 1 }
+  ],
+  "grading": { "totalPoints": 4, "passingScore": 4, "allowLateSubmit": true }
+}
