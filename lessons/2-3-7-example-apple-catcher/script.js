@@ -31,17 +31,19 @@ function draw() {
   }
 
   // Callback form: fires once per overlapping pair, with both sprites passed in.
-  // Cleaner than a manual loop because remove() inside the callback can't trip
-  // the iterate-then-remove bug.
+  // Cleaner than a manual loop because delete() inside the callback can't trip
+  // the iterate-then-remove bug — q5play has finished its own iteration first.
+  // delete() destroys the sprite (body + every group it's in); group.remove(s)
+  // would only unparent it, leaving it drawing via allSprites.
   basket.overlaps(apples, (b, apple) => {
     score++;
-    apple.remove();
+    apple.delete();
   });
 
-  // Off-screen cleanup still needs a manual loop — iterate a copy so removing
+  // Off-screen cleanup still needs a manual loop — iterate a copy so deleting
   // doesn't shift the array under us.
   for (let a of [...apples]) {
-    if (a.y > 450) apples.remove(a);
+    if (a.y > 450) a.delete();
   }
 
   fill('white');

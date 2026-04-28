@@ -44,12 +44,12 @@ function deleteEnemy(i) {
   enemyX.splice(i, 1);
   enemyY.splice(i, 1);
   enemyHP.splice(i, 1);
-  sprites[i].remove();
+  sprites[i].delete();
   sprites.splice(i, 1);
 }
 ```
 
-Look at `deleteEnemy`. Four arrays, four `splice`/`remove` calls — all aligned by index. Forget one and the arrays fall out of sync forever: `enemyX[0]` would refer to a different enemy than `enemyHP[0]`.
+Look at `deleteEnemy`. Four arrays, four `splice`/`delete` calls — all aligned by index. Forget one and the arrays fall out of sync forever: `enemyX[0]` would refer to a different enemy than `enemyHP[0]`.
 
 ## Step 2 — OOP with an array of instances
 
@@ -71,7 +71,7 @@ class Enemy {
   }
 
   despawn() {
-    this.sprite.remove();
+    this.sprite.delete();
     enemies.splice(enemies.indexOf(this), 1);
   }
 

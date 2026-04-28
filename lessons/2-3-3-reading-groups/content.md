@@ -18,7 +18,7 @@ A Group behaves like an array — `length`, `push`, `for…of`, spread `[...grou
 
 - Default properties (`group.color`, `group.diameter`) that apply to members.
 - A built-in factory `new groupName.Sprite(...)` that creates members with those defaults.
-- Methods like `group.remove(sprite)` that play nicely with the physics world.
+- Methods like `group.remove(sprite)` (unparent without destroying) that play nicely with the physics world. To actually destroy a sprite, call `sprite.delete()`.
 
 ```js live
 let enemies;
@@ -93,12 +93,12 @@ function draw() {
   }
 
   for (let s of [...stars]) {
-    if (s.y > 380) stars.remove(s);
+    if (s.y > 380) s.delete();
   }
 }
 ```
 
-**What you'll see:** a starfield. Every 8 frames a new yellow dot appears at the top with a random horizontal position and falls toward the bottom. Once it's past `y > 380` it's removed.
+**What you'll see:** a starfield. Every 8 frames a new yellow dot appears at the top with a random horizontal position and falls toward the bottom. Once it's past `y > 380` it's destroyed.
 
 **Try this:** change `frameCount % 8` to `frameCount % 2` for a blizzard. Then change `stars.color = 'yellow'` to `'white'` and re-run — both existing and future stars are white because the default is read on each spawn.
 
@@ -110,13 +110,13 @@ In the spawn example above, the despawn line is:
 
 ```js
 for (let s of [...stars]) {
-  if (s.y > 380) stars.remove(s);
+  if (s.y > 380) s.delete();
 }
 ```
 
 The brackets `[...stars]` make a **copy** of the group as a plain array, then iterate the copy. Why?
 
-If you iterate the live `stars` group directly and remove an element mid-loop, the remaining members shift down by one index. The loop's pointer keeps moving forward, so it skips the next sprite. By iterating a snapshot, removals don't affect what the loop sees next.
+If you iterate the live `stars` group directly and delete an element mid-loop, `delete()` splices that sprite out of every group it belongs to — including `stars` — and the remaining members shift down by one index. The loop's pointer keeps moving forward, so it skips the next sprite. By iterating a snapshot, deletions don't affect what the loop sees next.
 
 You'll see this same pattern in the next reading (`overlaps` + despawn).
 
@@ -129,8 +129,8 @@ You'll see this same pattern in the next reading (`overlaps` + despawn).
 | **Group** | A q5play collection that behaves like an array of sprites with shared defaults. |
 | **Factory pattern** | `new groupName.Sprite(...)` (capital S) — creates a sprite with the group's defaults applied. |
 | **Spawn** | Create a new sprite at runtime. Usually via the factory form. |
-| **Despawn** | Remove a sprite at runtime via `sprite.remove()` or `group.remove(sprite)`. |
-| **`[...group]`** | Spread copy. Iterate the copy when you might remove during the loop. |
+| **Despawn** | Destroy a sprite at runtime via `sprite.delete()` (full destruction). `group.remove(sprite)` only unparents — useful for moving between groups, not cleanup. |
+| **`[...group]`** | Spread copy. Iterate the copy when you might delete during the loop. |
 | **`frameCount % N === 0`** | Timed-spawn idiom. Fires once every N frames. |
 
 ---

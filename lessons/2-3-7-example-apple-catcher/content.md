@@ -34,11 +34,11 @@ function draw() {
 
   basket.overlaps(apples, (b, apple) => {
     score++;
-    apple.remove();
+    apple.delete();
   });
 
   for (let a of [...apples]) {
-    if (a.y > 450) apples.remove(a);
+    if (a.y > 450) a.delete();
   }
 
   fill('white');
@@ -56,36 +56,46 @@ The collision-handling line is:
 ```js
 basket.overlaps(apples, (b, apple) => {
   score++;
-  apple.remove();
+  apple.delete();
 });
 ```
 
-`overlaps(group, callback)` walks every sprite in the group, calls the callback once per pair currently overlapping, and passes both sprites in. The callback is the right place to call `apple.remove()` — q5play has already finished iterating, so removing doesn't trip the iteration bug.
+`overlaps(group, callback)` walks every sprite in the group, calls the callback once per pair currently overlapping, and passes both sprites in. The callback is the right place to call `apple.delete()` — q5play has already finished iterating, so destroying a sprite doesn't trip the iteration bug.
 
 The boolean form (`basket.overlaps(apples)`) returns `true` if any apple is overlapping. Use that for "did anything hit me this frame" gates (game-over checks, hit flashes). Use the callback form for per-pair work.
 
 ## Step 3 — Why two cleanup passes?
 
-The callback removes apples that the basket caught. But an apple that **misses** the basket and falls off the bottom never overlaps anything — it would live forever, slowing the sketch down.
+The callback deletes apples that the basket caught. But an apple that **misses** the basket and falls off the bottom never overlaps anything — it would live forever, slowing the sketch down.
 
 The trailing manual loop handles those:
 
 ```js
 for (let a of [...apples]) {
-  if (a.y > 450) apples.remove(a);
+  if (a.y > 450) a.delete();
 }
 ```
 
-`[...apples]` makes a shallow copy of the Group's array so removing during iteration doesn't shift the index under the loop. (You'll see the bug live in `2.3.10 Worked Example — Safe Despawn`.)
+`[...apples]` makes a shallow copy of the Group's array so deleting during iteration doesn't shift the index under the loop. (You'll see the bug live in `2.3.10 Worked Example — Safe Despawn`.)
 
-## Step 4 — Spawn rate as the difficulty knob
+## Step 4 — `sprite.delete()` vs `group.remove(sprite)`
+
+Two different operations that look almost identical at the call site:
+
+- **`sprite.delete()`** — destroys the sprite. Tears down its physics body and removes it from **every** group it belongs to (including the implicit `allSprites`). After this, the sprite is gone from the world. Use this whenever the sprite should disappear from the game (caught apple, defeated enemy, off-screen projectile).
+- **`group.remove(sprite)`** — only **unparents** the sprite from that one group. The sprite still exists, still draws, still runs physics. Use this when you want to move a sprite *between* groups (e.g., promoting an enemy out of the `easy` group into the `boss` group), not for cleanup.
+
+The catch callback and the off-screen loop both want the apple **gone**, so both call `apple.delete()`. There is no `sprite.remove()` — that name only exists on `Group`.
+
+## Step 5 — Spawn rate as the difficulty knob
 
 `if (frameCount % 30 === 0)` spawns once every 30 frames — about twice per second at 60 fps. Try `% 60` (one per second, easier) or `% 10` (six per second, frantic). The same pattern drives nearly every "spawn enemies on a timer" mechanic.
 
 ## Key takeaways
 
-- `overlaps(group, callback)` is the cleanest idiom for "do X to every sprite touching me right now." Remove inside the callback freely.
+- `overlaps(group, callback)` is the cleanest idiom for "do X to every sprite touching me right now." Call `sprite.delete()` inside the callback freely — q5play has finished its own iteration before invoking your callback.
 - Use the boolean form `overlaps(group)` only when you want a yes/no signal, not per-pair work.
-- Off-screen / out-of-bounds cleanup is a separate loop — iterate a copy `[...group]` so `remove()` doesn't shift the index.
+- Off-screen / out-of-bounds cleanup is a separate loop — iterate a copy `[...group]` so `delete()` doesn't shift the index.
+- `sprite.delete()` destroys; `group.remove(sprite)` only unparents. For cleanup, you almost always want `delete()`.
 - `frameCount % N === 0` is the q5play timed-spawn idiom. `N` is your difficulty knob.
 - A `kinematic` body moves with `vel` but isn't pushed by gravity or collisions — perfect for a controllable basket / paddle.

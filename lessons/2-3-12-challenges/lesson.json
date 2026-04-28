@@ -71,7 +71,7 @@
     {
       "id": "r4",
       "title": "Implement one stretch feature",
-      "description": "Use at least one of: a `lives` variable, a `random()`-driven property on spawn (varied size/value), OR a function named `cull` that calls .remove().",
+      "description": "Use at least one of: a `lives` variable, a `random()`-driven property on spawn (varied size/value), OR a function named `cull` that calls .delete().",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\blives\\s*=|random\\s*\\([^)]*\\).*\\.(diameter|width|height|color)|function\\s+cull\\s*\\(",

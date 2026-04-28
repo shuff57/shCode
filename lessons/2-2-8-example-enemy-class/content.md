@@ -44,7 +44,7 @@ class Enemy {
   damage(n) {
     this.hp -= n;
     if (this.hp <= 0) {
-      this.sprite.remove();
+      this.sprite.delete();
     }
   }
 }
@@ -78,7 +78,7 @@ class Enemy {
   damage(n) {
     this.hp -= n;
     if (this.hp <= 0) {
-      this.sprite.remove();
+      this.sprite.delete();
     }
   }
 }
@@ -113,7 +113,7 @@ class Enemy {
   damage(n) {
     this.hp -= n;
     if (this.hp <= 0) {
-      this.sprite.remove();
+      this.sprite.delete();
     }
   }
 
@@ -141,4 +141,4 @@ function draw() {
 - **`this.x = x`** — the constructor stores arguments on the *instance*. If you create `enemy2 = new Enemy(100, 100, 5)`, that instance gets its own `this.x = 100`. Neither enemy knows about the other's `x`.
 - **`this.sprite = new Sprite(...)`** — each `Enemy` owns exactly one q5play sprite. Storing it on `this` means every method in the class can reach it.
 - **`this` inside a method** — refers to whichever instance the method was called on. `enemy.damage(1)` sets `this` to `enemy`; `enemy2.damage(3)` would set `this` to `enemy2`. One method definition, works for every instance.
-- **`this.sprite.remove()`** — the object cleans up after itself. Behavior lives next to the data it mutates.
+- **`this.sprite.delete()`** — the object cleans up after itself. Behavior lives next to the data it mutates. (`delete()` destroys the sprite; the related `group.remove(sprite)` only unparents.)

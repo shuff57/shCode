@@ -31,16 +31,16 @@
     },
     {
       "id": "s4",
-      "title": "Remove sprites that leave the screen",
-      "instructions": "Iterate the group and remove any sprite past the bottom of the canvas. Otherwise your sketch slows to a crawl.",
-      "hints": ["Iterating a Group while removing trips a subtle bug. The Groups docs has a section on safe removal."]
+      "title": "Despawn sprites that leave the screen",
+      "instructions": "Iterate the group and call .delete() on any sprite past the bottom of the canvas. Otherwise your sketch slows to a crawl.",
+      "hints": ["Iterating a Group while deleting trips a subtle bug. The Groups docs has a section on safe removal. Use sprite.delete() to destroy — group.remove(sprite) only unparents."]
     }
   ],
   "requirements": [
     { "id": "r1", "title": "Create a Group", "description": "Use new Group()", "type": "regex", "file": "script.js", "pattern": "new\\s+Group\\s*\\(", "flags": "", "points": 1 },
     { "id": "r2", "title": "Spawn into the Group", "description": "Use groupName.Sprite(...) to spawn a sprite in the group", "type": "regex", "file": "script.js", "pattern": "new\\s+\\w+\\.Sprite\\s*\\(", "flags": "", "points": 1 },
     { "id": "r3", "title": "Group default", "description": "Set a property on the Group itself (e.g. .color, .diameter)", "type": "regex", "file": "script.js", "pattern": "\\w+\\.(color|diameter|width|height)\\s*=", "flags": "", "points": 1 },
-    { "id": "r4", "title": "Remove offscreen sprites", "description": "Call .remove() somewhere in draw()", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "\\.remove\\s*\\(", "flags": "", "points": 1 }
+    { "id": "r4", "title": "Despawn offscreen sprites", "description": "Call .delete() (or group.remove()) somewhere in draw()", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "\\.(delete|remove)\\s*\\(", "flags": "", "points": 1 }
   ],
   "grading": { "totalPoints": 4, "passingScore": 4, "allowLateSubmit": true }
 }

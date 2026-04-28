@@ -20,7 +20,7 @@ function draw() {
   // ...existing apple-catcher logic...
   basket.overlaps(rocks, (b, rock) => {
     lives--;
-    rock.remove();
+    rock.delete();
   });
 
   if (lives <= 0) {
@@ -60,7 +60,7 @@ function draw() {
 
   basket.overlaps(apples, (b, apple) => {
     score += apple.value;
-    apple.remove();
+    apple.delete();
   });
 }
 ```
@@ -74,7 +74,7 @@ function draw() {
 
 ## Challenge 3 — `cull()` helper (hard)
 
-Write a reusable function `cull(group)` that removes any sprite past the canvas edge. Use it in place of the manual backwards loop.
+Write a reusable function `cull(group)` that deletes any sprite past the canvas edge. Use it in place of the manual backwards loop.
 
 **Target shape:**
 
@@ -82,7 +82,7 @@ Write a reusable function `cull(group)` that removes any sprite past the canvas 
 function cull(group) {
   for (let s of [...group]) {
     if (s.x < -50 || s.x > width + 50 || s.y < -50 || s.y > height + 50) {
-      group.remove(s);
+      s.delete();
     }
   }
 }

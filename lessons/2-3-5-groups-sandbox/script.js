@@ -18,7 +18,7 @@ function draw() {
   // STEP 3: Every N frames, spawn a star with the factory form
   // (new groupName.Sprite(...)). Give it a downward velocity.
 
-  // STEP 4: Iterate the Group and remove stars that fell past the bottom.
-  // Iterate a copy ([...stars]) so removal doesn't skip items.
+  // STEP 4: Iterate the Group and call .delete() on stars that fell past the bottom.
+  // Iterate a copy ([...stars]) so deletion doesn't skip items.
 
 }

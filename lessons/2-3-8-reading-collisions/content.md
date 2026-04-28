@@ -74,11 +74,11 @@ function draw() {
 ```js
 basket.overlaps(apples, (b, apple) => {
   score++;
-  apple.remove();
+  apple.delete();
 });
 ```
 
-The callback fires *during* `overlaps`, after q5play has finished its internal iteration. That makes it the safe place to call `apple.remove()` — you can't trip the iterate-then-remove bug because q5play isn't iterating anymore.
+The callback fires *during* `overlaps`, after q5play has finished its internal iteration. That makes it the safe place to call `apple.delete()` — you can't trip the iterate-then-delete bug because q5play isn't iterating anymore. (`sprite.delete()` destroys the sprite; `group.remove(sprite)` only unparents it. For cleanup, you almost always want `delete()`.)
 
 ```js live
 let basket, apples, score = 0;
@@ -108,11 +108,11 @@ function draw() {
 
   basket.overlaps(apples, (b, apple) => {
     score++;
-    apple.remove();
+    apple.delete();
   });
 
   for (let a of [...apples]) {
-    if (a.y > 380) apples.remove(a);
+    if (a.y > 380) a.delete();
   }
 
   fill('white');
@@ -121,7 +121,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** a brown basket at the bottom and red apples falling. Move the basket with A/D — every apple it touches removes itself and the score goes up.
+**What you'll see:** a brown basket at the bottom and red apples falling. Move the basket with A/D — every apple it touches deletes itself and the score goes up.
 
 **Try this:** change `frameCount % 30` to `frameCount % 10` for a faster rain. Then change `score++` to `score += 5` — each catch is now worth more. Notice you never had to touch the callback's removal logic.
 
@@ -135,7 +135,7 @@ function draw() {
 | To do something *per* hit (despawn, score, particle, sound) | `sprite.overlaps(other, callback)` — callback |
 | To know *which* sprite hit | Callback form — the second argument is the hit sprite |
 
-A common pitfall: writing `if (player.overlaps(enemies)) enemies.remove(enemies[0])`. This compiles, but you've thrown away information about *which* enemy was hit, and removing the wrong one is easy. Use the callback form whenever the work is per-pair.
+A common pitfall: writing `if (player.overlaps(enemies)) enemies[0].delete()`. This compiles, but you've thrown away information about *which* enemy was hit, and deleting the wrong one is easy. Use the callback form whenever the work is per-pair.
 
 ---
 
@@ -146,9 +146,9 @@ A common pitfall: writing `if (player.overlaps(enemies)) enemies.remove(enemies[
 | **Overlap** | When two sprites' bounding boxes intersect this frame. |
 | **Boolean form** | `sprite.overlaps(other)` — `true`/`false` per frame. |
 | **Callback form** | `sprite.overlaps(group, (self, other) => { ... })` — fires once per overlapping pair. |
-| **Iterate-a-copy** | `for (let s of [...group])` — safe pattern when you might remove during the loop. |
+| **Iterate-a-copy** | `for (let s of [...group])` — safe pattern when you might delete during the loop. |
 | **Callback** | A function passed as an argument to another function. |
 
 ---
 
-Once you can explain why the callback form is the safe place to call `remove()`, open `2.3.10 Worked Example — Safe Despawn`.
+Once you can explain why the callback form is the safe place to call `delete()`, open `2.3.10 Worked Example — Safe Despawn`.
