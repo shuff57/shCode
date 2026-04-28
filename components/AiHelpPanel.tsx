@@ -1,0 +1,303 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import { useLessonStore } from '../lib/store';
+import type { Lesson } from '../lib/types';
+import { Sparkles, Square } from 'lucide-react';
+
+interface PreviewError {
+  name: string;
+  message: string;
+  file: string | null;
+  line: number | null;
+  col: number | null;
+  snippet: string;
+}
+
+interface Props {
+  lesson: Lesson;
+}
+
+export default function AiHelpPanel({ lesson }: Props) {
+  const fileContents = useLessonStore((s) => s.fileContents);
+  const currentFile = useLessonStore((s) => s.currentFile);
+
+  const [lastError, setLastError] = useState<PreviewError | null>(null);
+  const [query, setQuery] = useState('');
+  const [response, setResponse] = useState('');
+  const [streaming, setStreaming] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const responseRef = useRef<HTMLDivElement>(null);
+
+  // Track the most recent runtime error so the user can ask "what's wrong?"
+  // without having to retype anything.
+  useEffect(() => {
+    function handler(e: MessageEvent) {
+      const d = e.data;
+      if (d && d.source === 'preview-error' && d.error) {
+        setLastError(d.error as PreviewError);
+      }
+    }
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, []);
+
+  // Keep scroll pinned to the bottom while the answer streams in.
+  useEffect(() => {
+    if (!responseRef.current) return;
+    responseRef.current.scrollTop = responseRef.current.scrollHeight;
+  }, [response]);
+
+  async function ask(userQuery: string) {
+    if (streaming) return;
+    setError(null);
+    setResponse('');
+    setStreaming(true);
+
+    const ac = new AbortController();
+    abortRef.current = ac;
+
+    const codeForFile = (currentFile && fileContents[currentFile]) || fileContents['script.js'] || '';
+
+    try {
+      const res = await fetch('/api/ai-help', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lessonTitle: lesson.title,
+          fileName: currentFile || 'script.js',
+          code: codeForFile,
+          error: lastError,
+          query: userQuery,
+        }),
+        signal: ac.signal,
+      });
+
+      if (!res.ok || !res.body) {
+        let detail = '';
+        try {
+          const j = (await res.json()) as { error?: string };
+          detail = j.error || '';
+        } catch {
+          detail = `HTTP ${res.status}`;
+        }
+        setError(detail || `HTTP ${res.status}`);
+        setStreaming(false);
+        return;
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let acc = '';
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        acc += decoder.decode(value, { stream: true });
+        setResponse(acc);
+      }
+    } catch (e: unknown) {
+      if ((e as Error).name === 'AbortError') return;
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setStreaming(false);
+      abortRef.current = null;
+    }
+  }
+
+  function stop() {
+    abortRef.current?.abort();
+    setStreaming(false);
+  }
+
+  function onKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      const q = query.trim();
+      if (q) ask(q);
+    }
+  }
+
+  const askDefault = () => ask("What's wrong with my code, and how do I fix it?");
+  const submitQuery = () => {
+    const q = query.trim();
+    if (q) ask(q);
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, gap: 10 }}>
+      {lastError ? (
+        <div
+          style={{
+            background: '#2a1d1d',
+            border: '1px solid #ff5555',
+            borderRadius: 4,
+            padding: '8px 10px',
+            fontSize: 12.5,
+            lineHeight: 1.4,
+          }}
+        >
+          <div style={{ color: '#ff5555', fontWeight: 600, marginBottom: 2 }}>
+            {lastError.name}: {lastError.message}
+          </div>
+          {lastError.file && lastError.line ? (
+            <div style={{ color: '#8be9fd', fontFamily: 'monospace', fontSize: 11.5 }}>
+              {lastError.file}:{lastError.line}
+              {lastError.col ? `:${lastError.col}` : ''}
+            </div>
+          ) : null}
+          {lastError.snippet ? (
+            <pre
+              style={{
+                margin: '4px 0 0',
+                padding: '4px 6px',
+                background: '#282a36',
+                color: '#f8f8f2',
+                borderRadius: 3,
+                fontFamily: 'monospace',
+                fontSize: 11.5,
+                whiteSpace: 'pre-wrap',
+                overflowX: 'auto',
+              }}
+            >
+              {lastError.snippet}
+            </pre>
+          ) : null}
+        </div>
+      ) : (
+        <div style={{ color: '#6272a4', fontSize: 12.5, fontStyle: 'italic' }}>
+          No runtime errors yet. Ask anything below — the AI sees your current code and the q5play docs.
+        </div>
+      )}
+
+      <div style={{ display: 'flex', gap: 6 }}>
+        <button
+          type="button"
+          onClick={askDefault}
+          disabled={streaming}
+          style={btnPrimary(streaming)}
+        >
+          <Sparkles size={13} />
+          {lastError ? 'Help me fix this' : 'Help me'}
+        </button>
+        {streaming ? (
+          <button type="button" onClick={stop} style={btnSecondary}>
+            <Square size={11} />
+            Stop
+          </button>
+        ) : null}
+      </div>
+
+      <div>
+        <label
+          style={{
+            fontSize: 11,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            color: '#6272a4',
+            display: 'block',
+            marginBottom: 4,
+          }}
+        >
+          Ask a question
+        </label>
+        <textarea
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={onKey}
+          placeholder="e.g. Why isn't my sprite moving?  (Ctrl+Enter to send)"
+          rows={3}
+          style={{
+            width: '100%',
+            background: '#282a36',
+            color: '#f8f8f2',
+            border: '1px solid #44475a',
+            borderRadius: 4,
+            padding: '6px 8px',
+            fontSize: 12.5,
+            fontFamily: 'inherit',
+            outline: 'none',
+            resize: 'vertical',
+          }}
+        />
+        <button
+          type="button"
+          onClick={submitQuery}
+          disabled={streaming || !query.trim()}
+          style={{ ...btnPrimary(streaming || !query.trim()), marginTop: 6 }}
+        >
+          <Sparkles size={13} />
+          Ask
+        </button>
+      </div>
+
+      {error ? (
+        <div
+          style={{
+            background: '#2a1d1d',
+            border: '1px solid #ff5555',
+            color: '#ff5555',
+            padding: '6px 8px',
+            borderRadius: 4,
+            fontSize: 12.5,
+          }}
+        >
+          {error}
+        </div>
+      ) : null}
+
+      <div
+        ref={responseRef}
+        style={{
+          flex: 1,
+          minHeight: 120,
+          overflowY: 'auto',
+          background: '#282a36',
+          border: '1px solid #44475a',
+          borderRadius: 4,
+          padding: '8px 10px',
+          fontSize: 12.5,
+          lineHeight: 1.5,
+          whiteSpace: 'pre-wrap',
+          fontFamily: "'Fira Code', Consolas, monospace",
+        }}
+      >
+        {response || (
+          <span style={{ color: '#6272a4', fontStyle: 'italic', fontFamily: 'inherit' }}>
+            {streaming ? 'Thinking…' : 'Answer will appear here.'}
+          </span>
+        )}
+        {streaming && response ? <span style={{ color: '#bd93f9' }}>▍</span> : null}
+      </div>
+    </div>
+  );
+}
+
+function btnPrimary(disabled: boolean): React.CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 5,
+    background: disabled ? '#44475a' : '#bd93f9',
+    color: disabled ? '#6272a4' : '#282a36',
+    border: 'none',
+    borderRadius: 4,
+    padding: '6px 12px',
+    fontSize: 12.5,
+    fontWeight: 600,
+    cursor: disabled ? 'not-allowed' : 'pointer',
+  };
+}
+
+const btnSecondary: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 5,
+  background: 'transparent',
+  color: '#ff5555',
+  border: '1px solid #ff5555',
+  borderRadius: 4,
+  padding: '6px 10px',
+  fontSize: 12.5,
+  cursor: 'pointer',
+};

@@ -4,9 +4,18 @@ import { RefObject, useEffect, useRef, useState } from 'react';
 
 // One entry in the console scrollback. REPL input and result entries are
 // distinguished so we can prefix them with "> " and ":" like a real REPL.
+interface PreviewError {
+  name: string;
+  message: string;
+  file: string | null;
+  line: number | null;
+  col: number | null;
+  snippet: string;
+}
 interface Entry {
   kind: 'log' | 'warn' | 'error' | 'info' | 'input' | 'result' | 'result-err';
   text: string;
+  err?: PreviewError;
 }
 
 interface Props {
@@ -23,6 +32,7 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const pendingEvalIds = useRef<Set<string>>(new Set());
+  const lastStructured = useRef<string>('');
 
   useEffect(() => {
     function handler(e: MessageEvent) {
@@ -33,10 +43,26 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
       const d = e.data;
       if (!d || typeof d !== 'object') return;
 
+      if (d.source === 'preview-error' && d.error) {
+        const err = d.error as PreviewError;
+        lastStructured.current = `${err.name}: ${err.message}`;
+        appendEntry({ kind: 'error', text: `${err.name}: ${err.message}`, err });
+        return;
+      }
+
       if (d.source === 'preview-console') {
         const text = (d.args ?? [])
           .map((a: unknown) => (typeof a === 'object' ? JSON.stringify(a) : String(a)))
           .join(' ');
+        // Suppress the duplicate plain-string error that follows a structured one.
+        if (
+          d.type === 'error' &&
+          lastStructured.current &&
+          text.startsWith(lastStructured.current)
+        ) {
+          lastStructured.current = '';
+          return;
+        }
         appendEntry({ kind: d.type, text });
       } else if (d.source === 'preview-eval-result') {
         // Drop stray results not originating from a prompt we issued.
@@ -99,12 +125,31 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
             Type an expression below, or call <code>console.log(...)</code> in your sketch.
           </div>
         ) : (
-          entries.map((e, i) => (
-            <div key={i} className={`liveconsole-entry liveconsole-${e.kind}`}>
-              <span className="liveconsole-gutter">{prefixFor(e.kind)}</span>
-              <span className="liveconsole-text">{e.text}</span>
-            </div>
-          ))
+          entries.map((e, i) =>
+            e.err ? (
+              <div key={i} className="liveconsole-entry liveconsole-error liveconsole-error-rich">
+                <div className="liveconsole-error-line">
+                  <span className="liveconsole-gutter">!</span>
+                  <span className="liveconsole-error-name">{e.err.name}:</span>
+                  <span className="liveconsole-text">{e.err.message}</span>
+                </div>
+                {e.err.file && e.err.line ? (
+                  <div className="liveconsole-error-loc">
+                    {e.err.file}:{e.err.line}
+                    {e.err.col ? `:${e.err.col}` : ''}
+                  </div>
+                ) : null}
+                {e.err.snippet ? (
+                  <code className="liveconsole-error-snippet">{e.err.snippet}</code>
+                ) : null}
+              </div>
+            ) : (
+              <div key={i} className={`liveconsole-entry liveconsole-${e.kind}`}>
+                <span className="liveconsole-gutter">{prefixFor(e.kind)}</span>
+                <span className="liveconsole-text">{e.text}</span>
+              </div>
+            )
+          )
         )}
       </div>
       <div className="liveconsole-input-row">
@@ -209,6 +254,27 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
           padding: 4px 0;
         }
         .liveconsole-input::placeholder { color: #44475a; }
+        .liveconsole-error-rich {
+          flex-direction: column;
+          gap: 2px;
+          padding: 4px 0 4px 6px;
+          border-left: 2px solid #ff5555;
+          margin: 2px 0;
+        }
+        .liveconsole-error-line { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+        .liveconsole-error-name { color: #ff5555; font-weight: 600; }
+        .liveconsole-error-loc { color: #8be9fd; font-size: 11.5px; padding-left: 22px; }
+        .liveconsole-error-snippet {
+          display: block;
+          margin: 2px 0 0 22px;
+          padding: 3px 6px;
+          background: #282a36;
+          color: #f8f8f2;
+          border-radius: 3px;
+          font-size: 11.5px;
+          white-space: pre;
+          overflow-x: auto;
+        }
       `}</style>
     </div>
   );

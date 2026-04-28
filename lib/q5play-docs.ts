@@ -2795,6 +2795,55 @@ export interface DocSearchResult {
   matchLength: number;
 }
 
+// Server-side doc retrieval for the AI help endpoint. Scores each page by
+// how many keyword tokens hit its title (heavy), code (medium), or body
+// (light), then returns the top-N pages in full so the model can quote them.
+export interface RelevantDoc {
+  sectionTitle: string;
+  pageTitle: string;
+  body: string;
+  code?: string;
+}
+
+export function findRelevantDocs(keywords: string[], maxPages = 6): RelevantDoc[] {
+  const tokens = Array.from(
+    new Set(
+      keywords
+        .map((k) => (k || '').toLowerCase().trim())
+        .filter((k) => k.length >= 2),
+    ),
+  );
+  if (tokens.length === 0) return [];
+
+  const scored: { score: number; page: RelevantDoc }[] = [];
+  for (const section of sections) {
+    section.pages.forEach((page) => {
+      const title = page.title.toLowerCase();
+      const body = page.body.toLowerCase();
+      const code = (page.code || '').toLowerCase();
+      let score = 0;
+      for (const t of tokens) {
+        if (title.includes(t)) score += 5;
+        if (code.includes(t)) score += 3;
+        if (body.includes(t)) score += 1;
+      }
+      if (score > 0) {
+        scored.push({
+          score,
+          page: {
+            sectionTitle: section.title,
+            pageTitle: page.title,
+            body: page.body,
+            code: page.code,
+          },
+        });
+      }
+    });
+  }
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, maxPages).map((s) => s.page);
+}
+
 export function searchDocs(query: string, limit = 30): DocSearchResult[] {
   const q = query.trim();
   if (!q) return [];

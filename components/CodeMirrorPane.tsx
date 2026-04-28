@@ -190,5 +190,28 @@ export default function CodeMirrorPane({
     });
   }, [value]);
 
+  // Jump-to-line: Console click dispatches 'shcode:goto-line' once the right
+  // file is current. We position the selection and scroll the line into view.
+  useEffect(() => {
+    function handler(e: Event) {
+      const detail = (e as CustomEvent).detail as { file: string; line: number; col?: number };
+      if (!detail || detail.file !== fileKey) return;
+      const view = viewRef.current;
+      if (!view) return;
+      const doc = view.state.doc;
+      const lineNum = Math.min(Math.max(1, detail.line), doc.lines);
+      const docLine = doc.line(lineNum);
+      const col = Math.max(1, detail.col ?? 1);
+      const pos = Math.min(docLine.from + col - 1, docLine.to);
+      view.dispatch({
+        selection: { anchor: pos },
+        effects: EditorView.scrollIntoView(pos, { y: 'center' }),
+      });
+      view.focus();
+    }
+    window.addEventListener('shcode:goto-line', handler);
+    return () => window.removeEventListener('shcode:goto-line', handler);
+  }, [fileKey]);
+
   return <div ref={containerRef} style={{ height: '100%', minHeight: 0 }} />;
 }

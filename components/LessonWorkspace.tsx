@@ -24,6 +24,7 @@ import GradeReportView from './GradeReport';
 import TeacherPushBanner from './TeacherPushBanner';
 import CrossDeviceSyncBanner from './CrossDeviceSyncBanner';
 import Q5DocsContent from './Q5DocsContent';
+import AiHelpPanel from './AiHelpPanel';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import { RotateCcw, Send } from 'lucide-react';
 
@@ -430,6 +431,12 @@ export default function LessonWorkspace({
       <TabbedRightDrawer
         storageKey="shCode:drawer"
         tabs={[
+          {
+            key: 'help',
+            label: 'Help',
+            color: '#ffb86c',
+            content: <AiHelpPanel lesson={lesson} />,
+          },
           ...(isQ5Mode
             ? ([
                 {
