@@ -75,6 +75,10 @@ Then:
 - **Code changes.** These are read-only reference docs. If a convention implies a code change (e.g. "add a new preview mode to `ContentLessonView`"), that's tracked in the module spec that first needs it, not here.
 - **Runtime config.** `wrangler.toml`, D1 schema, env vars, etc. belong in `CLAUDE.md`.
 
+## Sub-module spec convention
+
+The per-sub-module specs that *consume* these per-type conventions have their own meta-convention: [`sub-module-spec-conventions.md`](sub-module-spec-conventions.md). It defines the required sections (frontmatter, Numbered Lesson List, per-reading content guidance, video description hooks, carry-over migration notes) and the slug naming rule (`<U>-<M>-<L>-<descriptor>`).
+
 ## Related
 
 - `curriculum/modules/lessons/*.md` — per-module build specs that consume these conventions.
