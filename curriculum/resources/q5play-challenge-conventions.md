@@ -21,7 +21,7 @@ Same shape as a lab assignment; only the fields in the table below differ. Use `
   "title": "2.1.12 Challenges — Optional Stretch",
   "description": "Pick one or more of the stretch challenges and implement them in the editor. Auto-graded.",
   "type": "challenge",
-  "difficulty": "intermediate",
+  "difficulty": "advanced",
   "estimateMins": 30,
   "category": "Unit 2: q5play — Applied Game Development",
   "unit": "2.1 Foundations",
@@ -55,15 +55,18 @@ Same shape as a lab assignment; only the fields in the table below differ. Use `
 
 ### Fields that differ from a lab
 
-| Field | Lab | Challenge |
-|---|---|---|
-| `type` | `"assignment"` | `"challenge"` — toggles the ⭐ Challenge badge |
-| `difficulty` | `"beginner"` | `"intermediate"` (stretch work) |
-| `estimateMins` | 30–60 | ~30 |
-| `requirements` | strict per-feature regex | alternation — see §2 |
-| `grading.passingScore` | ~66% of `totalPoints` | **~60%** (one feature should pass) |
+| Field | Practice (`type: "lesson"`) | Lab (`type: "assignment"`) | Challenge (`type: "challenge"`) |
+|---|---|---|---|
+| `type` | `"lesson"` | `"assignment"` | `"challenge"` — toggles the ⭐ Challenge badge |
+| `difficulty` | `"beginner"` | `"intermediate"` | `"advanced"` |
+| `estimateMins` | 20–30 | 30–60 | ~30 |
+| `requirements` | strict per-feature regex | strict per-feature regex | alternation — see §2 |
+| `grading.passingScore` | `totalPoints` (all-green) | `totalPoints` (all-green) | `totalPoints` (all-green) |
+| `script.js` | scaffold (description-only `// STEP N:`) | scaffold (description-only `// STEP N:`) | **fully empty** — see §4 |
 
-Everything else — `type: "lesson"` rules don't apply (this is `"challenge"`), but §1/§3/§4 of `q5play-lesson-conventions.md` do: Steps scaffold, no `/// <reference>`, header comment format, function order.
+The `difficulty` rung encodes the lesson/lab/challenge progression itself: same content surface, less scaffolding at each rung. A practice lesson scaffolds the work and tests one concept; a lab scaffolds and tests synthesis; a challenge removes the scaffold entirely.
+
+Everything else — §1/§3/§4 of `q5play-lesson-conventions.md` apply (no `/// <reference>`, header comment format, function order — same shape as a lesson scaffold *minus* the scaffold itself for challenges).
 
 ---
 
@@ -154,3 +157,4 @@ Challenges use the **exact same workspace** as graded q5 lessons. See `q5play-le
 | Canonical alignment | Reframed as "harder assignment variant". Retired the "BUILD THIS:" starter alternative — Steps scaffold only, matching labs. §1 JSON shape rewritten as a verbatim copy of `lessons/2-1-11-challenges/lesson.json` (which was itself cleaned up: hub header stripped from content.md, working WASD demo replaced with empty Steps scaffold, meta-guidance steps replaced with four canvas/sprite/bg/feature steps matching the requirements 1:1, hints rewritten as docs-drawer pointers). §7 cross-references `q5play-lesson-conventions.md` §5 for UI behavior instead of duplicating it. |
 | Empty-editor starter | Dropped the Steps scaffold from challenge starters too. Challenge `script.js` is now **fully empty** — the student invokes the docs drawer + challenge menu to structure the program themselves. §4 rewritten to mandate an empty file; §5 Don'ts updated. |
 | Workspace consolidation alignment | §7 trimmed to a thin pointer at the new `q5play-lesson-conventions.md` §5. Removed the stale recap of "auto-open docs drawer / left sidebar Grading tab / drag-resizable sidebars" — the workspace is now the single right-edge `TabbedRightDrawer` with Docs / Quest / File tabs (closed by default) plus the bottom `LessonProgressFooter`. |
+| Difficulty tiers slot-type | Challenges `difficulty` field bumped from `"intermediate"` to `"advanced"` to encode the lesson/lab/challenge progression: practice = `"beginner"`, lab = `"intermediate"`, challenge = `"advanced"`. §1 JSON shape + the "fields that differ from a lab" comparison table updated to a three-column lesson/lab/challenge view. Sister conventions `q5play-lesson-conventions.md` and `lab-assignment-conventions.md` carry the matching rule. Audit pass on existing unit-2 challenges (2.1.12, 2.2.13, 2.3.12) bumped `"intermediate"` → `"advanced"`. |

@@ -3,7 +3,7 @@
   "title": "2.1.10 Sprite Playground",
   "description": "Build a sprite playground combining canvas, WASD-controlled sprite, auto-motion, and on-screen text. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
+  "difficulty": "intermediate",
   "estimateMins": 45,
   "category": "Unit 2: q5play — Applied Game Development",
   "unit": "2.1 Foundations",

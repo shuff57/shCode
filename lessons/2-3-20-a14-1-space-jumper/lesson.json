@@ -3,7 +3,7 @@
   "title": "2.3.20 A14.1 Space Jumper",
   "description": "Build a one-sprite platformer: WASD moves, space jumps — but only when touching the ground.",
   "type": "assignment",
-  "difficulty": "beginner",
+  "difficulty": "intermediate",
   "estimateMins": 40,
   "category": "Unit 2: q5play — Applied Game Development",
   "unit": "2.3 Collections and Physics Applications",
