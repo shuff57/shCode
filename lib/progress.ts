@@ -8,15 +8,23 @@
 import { useEffect, useState } from 'react';
 
 export type LessonState = 'started' | 'completed';
+export type Role = 'admin' | 'teacher' | 'student';
 
 export interface LessonStateSnapshot {
   loaded: boolean;
   authed: boolean;
   states: Record<string, LessonState>;
   scores: Record<string, number>;
+  role: Role | null;
 }
 
-const empty: LessonStateSnapshot = { loaded: false, authed: false, states: {}, scores: {} };
+// Admins and teachers bypass green-to-advance gating in the UI. Used by
+// every lock-rendering component so they share one source of truth.
+export function bypassesLessonLock(role: Role | null): boolean {
+  return role === 'admin' || role === 'teacher';
+}
+
+const empty: LessonStateSnapshot = { loaded: false, authed: false, states: {}, scores: {}, role: null };
 let cache: LessonStateSnapshot = empty;
 let inflight: Promise<LessonStateSnapshot> | null = null;
 const subs = new Set<(s: LessonStateSnapshot) => void>();
@@ -29,13 +37,13 @@ async function load(): Promise<LessonStateSnapshot> {
   try {
     const res = await fetch('/api/lesson-state', { credentials: 'include' });
     if (res.status === 401) {
-      return { loaded: true, authed: false, states: {}, scores: {} };
+      return { loaded: true, authed: false, states: {}, scores: {}, role: null };
     }
     if (!res.ok) throw new Error(`lesson-state GET ${res.status}`);
-    const data = (await res.json()) as { states: Record<string, LessonState>; scores: Record<string, number> };
-    return { loaded: true, authed: true, states: data.states ?? {}, scores: data.scores ?? {} };
+    const data = (await res.json()) as { states: Record<string, LessonState>; scores: Record<string, number>; role?: Role };
+    return { loaded: true, authed: true, states: data.states ?? {}, scores: data.scores ?? {}, role: data.role ?? null };
   } catch {
-    return { loaded: true, authed: false, states: {}, scores: {} };
+    return { loaded: true, authed: false, states: {}, scores: {}, role: null };
   }
 }
 

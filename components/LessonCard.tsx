@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import type { Lesson } from '../lib/types';
 import { badgeForLesson } from '../lib/lesson-badges';
-import { useLessonState } from '../lib/progress';
+import { bypassesLessonLock, useLessonState } from '../lib/progress';
 
 const typeBadgeColors: Record<string, string> = {
   lesson: '#5baafd',
@@ -18,7 +18,14 @@ const stateStripeColors: Record<string, string> = {
   started: '#f1fa8c',
 };
 
-export default function LessonCard({ lesson }: { lesson: Lesson }) {
+interface Props {
+  lesson: Lesson;
+  // Home page passes `true` for every lesson except the first one in its
+  // module. Students see it as locked; admins/teachers bypass.
+  lockedForStudent?: boolean;
+}
+
+export default function LessonCard({ lesson, lockedForStudent = false }: Props) {
   const type = lesson.type || 'lesson';
   const isAssignment = type === 'assignment' || type === 'project';
   const href = isAssignment ? `/assignment/${lesson.id}` : `/lesson/${lesson.id}`;
@@ -26,16 +33,19 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
   const progress = useLessonState();
   const lessonState = progress.states[lesson.id];
   const stripeColor = stateStripeColors[lessonState ?? ''] ?? 'var(--border)';
+  // Lock = caller flagged it AND the viewer isn't an admin/teacher. Default
+  // to unlocked until the snapshot loads to avoid first-paint flicker.
+  const locked = progress.loaded && lockedForStudent && !bypassesLessonLock(progress.role);
 
-  return (
-    <Link
-      href={href}
-      className="bg-card border-border border rounded p-4 hover:bg-muted block border-l-4 border-r-4 shadow-lg"
-      style={{
-        borderLeftColor: pBadge?.color ?? typeBadgeColors[type] ?? 'var(--brand)',
-        borderRightColor: stripeColor,
-      }}
-    >
+  const cardStyle: React.CSSProperties = {
+    borderLeftColor: pBadge?.color ?? typeBadgeColors[type] ?? 'var(--brand)',
+    borderRightColor: stripeColor,
+    opacity: locked ? 0.5 : 1,
+    cursor: locked ? 'not-allowed' : undefined,
+  };
+
+  const inner = (
+    <>
       <div className="flex items-center gap-2 mb-1 flex-wrap">
         {pBadge && (
           <span
@@ -70,8 +80,50 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
         {lesson.week && (
           <span className="lesson-week-badge">Week {lesson.week}</span>
         )}
+        {locked && (
+          <span
+            style={{
+              fontSize: 11,
+              color: 'var(--muted-fg, #94a3b8)',
+              background: 'rgba(148,163,184,0.15)',
+              border: '1px solid rgba(148,163,184,0.35)',
+              borderRadius: 999,
+              padding: '2px 8px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+              marginLeft: 'auto',
+            }}
+            aria-label="Locked"
+            title="Open the module to start with the first lesson, then continue from there."
+          >
+            🔒 Locked
+          </span>
+        )}
       </div>
       <p className="text-med text-text/70">{lesson.description}</p>
+    </>
+  );
+
+  if (locked) {
+    return (
+      <div
+        className="bg-card border-border border rounded p-4 block border-l-4 border-r-4 shadow-lg"
+        style={cardStyle}
+        aria-disabled="true"
+      >
+        {inner}
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      href={href}
+      className="bg-card border-border border rounded p-4 hover:bg-muted block border-l-4 border-r-4 shadow-lg"
+      style={cardStyle}
+    >
+      {inner}
     </Link>
   );
 }

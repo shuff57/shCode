@@ -89,8 +89,16 @@ export default async function HomePage() {
                           No lessons authored yet.
                         </div>
                       ) : (
-                        unitLessons.map((lesson) => (
-                          <LessonCard key={lesson.id} lesson={lesson} />
+                        // Home view: only the first lesson in each module is
+                        // accessible to students. Admins/teachers bypass the
+                        // lock client-side via the role on the lesson-state
+                        // snapshot. Linear unlock continues on /module/X.
+                        unitLessons.map((lesson, idx) => (
+                          <LessonCard
+                            key={lesson.id}
+                            lesson={lesson}
+                            lockedForStudent={idx > 0}
+                          />
                         ))
                       )}
                       <Link

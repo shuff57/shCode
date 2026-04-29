@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { badgeForLesson } from '../lib/lesson-badges';
-import { useLessonState } from '../lib/progress';
+import { bypassesLessonLock, useLessonState } from '../lib/progress';
 
 interface LessonItem {
   id: string;
@@ -33,7 +33,7 @@ export default function ModuleLessonsList({ lessons }: { lessons: LessonItem[] }
   // Lessons advance linearly: get a green on the current lesson before
   // unlocking the next. A lesson at index j is unlocked iff every prior
   // lesson is 'completed'. Unauthed students see locks too — the progress
-  // footer already prompts sign-in.
+  // footer already prompts sign-in. Admins and teachers bypass the gate.
   const completed = (id: string) => progress.states[id] === 'completed';
   const firstUnlocked = (() => {
     for (let i = 0; i < lessons.length; i++) {
@@ -41,6 +41,7 @@ export default function ModuleLessonsList({ lessons }: { lessons: LessonItem[] }
     }
     return lessons.length; // all done
   })();
+  const lockBypass = bypassesLessonLock(progress.role);
 
   return (
     <ol style={{ listStyle: 'none', padding: 0, margin: 0 }}>
@@ -51,7 +52,7 @@ export default function ModuleLessonsList({ lessons }: { lessons: LessonItem[] }
         const lessonState = progress.states[l.id];
         const stripeColor = stateStripeColors[lessonState ?? ''] ?? 'var(--border)';
         const stateLabel = stateLabels[lessonState ?? ''];
-        const locked = progress.loaded && idx > firstUnlocked;
+        const locked = progress.loaded && idx > firstUnlocked && !lockBypass;
 
         const rowStyle: React.CSSProperties = {
           display: 'flex',

@@ -1,10 +1,13 @@
 // GET /api/lesson-state -> list the signed-in student's lesson state rows.
 // Middleware in functions/_middleware.ts 401s unauthenticated requests.
+// Response also carries the session role so the client can bypass lesson
+// locks for admins and teachers without a separate /api/me round-trip.
 
 interface Env {
   DB: D1Database;
 }
-type Ctx = EventContext<Env, string, { email: string }>;
+type Session = { email: string; role: 'admin' | 'teacher' | 'student' };
+type Ctx = EventContext<Env, string, Session>;
 
 interface Row {
   lesson_id: string;
@@ -14,7 +17,7 @@ interface Row {
   score: number | null;
 }
 
-export const onRequestGet: PagesFunction<Env, string, { email: string }> = async (context: Ctx) => {
+export const onRequestGet: PagesFunction<Env, string, Session> = async (context: Ctx) => {
   const { env, data } = context;
   const result = await env.DB.prepare(
     'SELECT lesson_id, state, started_at, completed_at, score FROM lesson_state WHERE student_email = ?',
@@ -29,7 +32,7 @@ export const onRequestGet: PagesFunction<Env, string, { email: string }> = async
     if (r.score !== null) scores[r.lesson_id] = r.score;
   }
 
-  return new Response(JSON.stringify({ states, scores }), {
+  return new Response(JSON.stringify({ states, scores, role: data.role }), {
     headers: { 'Content-Type': 'application/json' },
   });
 };

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { recordLessonStarted, useLessonState } from '../lib/progress';
+import { bypassesLessonLock, recordLessonStarted, useLessonState } from '../lib/progress';
 
 interface ModuleLesson {
   id: string;
@@ -34,6 +34,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
   // Linear progression: a dot is clickable iff every prior lesson is
   // completed. Unauthed (snap.loaded === false on the server) defaults
   // to "all unlocked" until state loads — avoids hydration churn.
+  // Admins and teachers bypass the gate entirely.
   const firstUnlocked = (() => {
     if (!snap.loaded) return lessons.length;
     for (let i = 0; i < lessons.length; i++) {
@@ -41,6 +42,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
     }
     return lessons.length;
   })();
+  const lockBypass = bypassesLessonLock(snap.role);
 
   return (
     <div
@@ -90,7 +92,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
           const state = snap.states[l.id];
           const isDone = state === 'completed';
           const isStarted = state === 'started';
-          const isLocked = i > firstUnlocked && !isCurrent;
+          const isLocked = i > firstUnlocked && !isCurrent && !lockBypass;
           const borderColor = isDone
             ? '#50fa7b'
             : isStarted

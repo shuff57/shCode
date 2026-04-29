@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { useLessonState } from '../lib/progress';
+import { bypassesLessonLock, useLessonState } from '../lib/progress';
 
 interface ManifestLesson {
   id: string;
@@ -96,9 +96,10 @@ export default function HeaderLessonNav() {
 
   // Next lesson is locked until the current lesson's state is 'completed'.
   // Unauthed users see the lock too — they're already prompted to sign in
-  // by the progress footer, so this isn't surprising.
+  // by the progress footer, so this isn't surprising. Admins and teachers
+  // bypass the gate.
   const currentCompleted = snap.states[route.id] === 'completed';
-  const nextLocked = !currentCompleted;
+  const nextLocked = !currentCompleted && !bypassesLessonLock(snap.role);
 
   return (
     <div
