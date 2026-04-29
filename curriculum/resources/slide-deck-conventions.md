@@ -129,9 +129,36 @@ Approximate pacing used in 2.1 and 2.2 — adapt per unit:
 8. Discussion / pair-exercise prompt
 9. Assignment preview (graded artifacts)
 10. Scaffold rule reminder
-11. Next-unit tease
-12. Quick reference card
-13. Wrap / questions
+11. **Lesson map** (granular `2.X.Y` + sub-letter ordering) — see §4a
+12. Next-unit tease
+13. **Quick reference glossary** (union of sub-letter glossaries) — see §4a
+14. Wrap / questions
+
+---
+
+## 4a. Granularity in slides
+
+For units whose lessons follow the §2a granularity bar in `sub-module-spec-conventions.md` (one new concept per lesson, with sub-letter inserts under integer slots), the slide deck **does not** ship one slide per atomic lesson. Decks are teacher-led narrative; the convention budget is 25–30 slides per unit and 1:1 with 20+ atomic lessons would blow that.
+
+**What slides MUST do for granular units:**
+
+1. **Include a lesson-map slide** — typically near the end of Session 1 / Session 2 content, or right before the "Next-unit tease" slide. Two columns by session. List every numbered lesson, including sub-letters, with one-line labels and emoji affordances (`📖` reading, `▶️` lab, `🎥` video, `💡` worked example, `✏️` graded lab, `✍️` written, `⭐` challenge). Lets students see "where am I in this list, what's next." Canonical example: `slides/2.1/slides.md` "Lesson map — Module 2.1" slide.
+2. **Include a quick-reference glossary slide** — three-column vocabulary card consolidating the union of `## Short glossary (quick reference)` rows from the unit's atomic readings. Group by topic (Frame loop / Canvas / Sprite / etc.), not alphabetically. Position near the end, before "What's next." Canonical example: `slides/2.1/slides.md` "Quick reference — vocabulary" slide.
+3. **Avoid multi-concept bundling on a single slide.** Same anti-pattern as bundled readings — if a slide currently teaches `let player = new Sprite(...); player.color = ...` in one breath, split it so the variable-binding moment and the property-set moment land on separate slides (or use `<v-click>` reveals to sequence them). Each slide owns one teaching beat.
+4. **Reference the owning lesson at the bottom of any slide that maps cleanly to one.** A subtle `<div class="text-xs opacity-60 mt-4">Lesson: <code>2.1.3f Reading — Sprite property tour</code></div>` lets the teacher (and curious student) jump from the slide to the in-app reading.
+
+**What slides do NOT need to do:**
+
+- Author one slide per atomic concept. The granularity bar is for student practice (vocabulary before write-from-scratch); slide decks are for teacher narrative. A 22-lesson unit may still ship as a 25-slide deck.
+- Re-implement the per-lesson `Try it:` pattern. Slides use `<Q5Runner>` or static code blocks — they're for demonstration, not isolated practice.
+- Audit for stale references to cut-from-scope content as a granularity task — that's a separate hygiene pass (e.g. removing physics references from 2.1's "What's next" slide when physics moved out of scope).
+
+**When auditing an existing deck for granularity:**
+
+- Find every slide whose body lists 3+ items from the same conceptual category (e.g. a "properties" table with 5 rows). Decide: does the unit have 5 atomic-concept readings for those 5 rows? If yes, the slide should match the readings' scope (drop the row that has its own dedicated lesson and isn't taught here yet) or split.
+- Find every slide whose `<v-click>` reveals introduce >1 concept. Split into separate slides if each beat is its own atomic concept in the lesson list.
+
+The 2.1 deck pilot under this rule swapped a single 5-row "Sprite properties" slide for a 4-row "Sprite property tour" matching `2.1.3f` (vel deferred), and split a single "Keyboard input" slide into a `kb.pressing` slide and a "movement pattern + else-to-zero" slide matching `2.1.7` / `2.1.7b` / `2.1.7c`. Net change: +2 slides for one unit; deck stayed inside the 25–30 budget.
 
 ---
 
@@ -208,3 +235,4 @@ Do NOT add a `slidesSource` field. It was previously rendered as "Edit source: �
 | Unit 2.1 (initial) | Single deck at `slides/2.1/slides.md`, 482 lines, 30 slides. Served via `slidesUrl: "http://localhost:3030"` — broken in prod. |
 | Unit 2.2 buildout | `public/slides/` gitignored. `prebuild` hook added. Both 2.1 and 2.2 `slidesUrl` switched to relative `/slides/U.M/`. Slides now live on the deployed site. |
 | Rename + generalize | File renamed from `q5play-slides-conventions.md` to `slide-deck-conventions.md`. Unit-2-specific assumptions tagged `[q5play]` so Unit 3+ (any subject) can follow the same rules. Title rule (`U.M.1 …`) made explicit after two lessons shipped with the wrong title and vanished from the module page. |
+| Granularity-aware decks | §4a added: when a unit's lessons follow the §2a granularity bar (sub-letter atomic readings), slides MUST include a lesson-map slide and a quick-reference glossary slide, MUST NOT bundle multiple atomic concepts on one slide, and SHOULD reference the owning lesson at the bottom of single-concept slides. Slide rhythm in §4 gained two named slots (Lesson map, Quick reference) reflecting the new requirement. The 2.1 deck was the first applied: 5-row properties slide trimmed to 4 (vel deferred), keyboard slide split into `kb.pressing` + movement-pattern, lesson map replacing "Today's in-app work," quick-reference glossary added before "What's next," stale physics references in "What's next" replaced with the actual 2.2/2.3/2.4 progression. |

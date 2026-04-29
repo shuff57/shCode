@@ -169,19 +169,32 @@ function draw() {
 
 ---
 
-# Sprite properties
+# Sprite property tour
 
-Every Sprite has these (change them any time):
+A sprite has properties you can read or set with `=` after creation:
 
 | Property | What it does |
 |----------|--------------|
 | `.color` | sprite color (CSS name, `#hex`, or `rgba(...)`) |
-| `.pos.x` / `.pos.y` | position in pixels |
-| `.vel.x` / `.vel.y` | velocity in pixels-per-frame |
+| `.pos.x` / `.pos.y` | centre position in pixels |
 | `.rotation` | rotation in degrees |
 | `.layer` | render order (higher = on top) |
 
-Try changing `player.color = 'deepskyblue'` to `'hotpink'` or `'#ff5555'`.
+```js
+player.color = 'tomato';
+player.rotation = 30;
+player.layer = 2;
+```
+
+<v-click>
+
+There's one more — `.vel` — but it's load-bearing enough to deserve its own beat. We'll meet it after the input section.
+
+</v-click>
+
+<div class="text-xs opacity-60 mt-4">
+Lesson: <code>2.1.3f Reading — Sprite property tour</code>
+</div>
 
 ---
 
@@ -218,21 +231,51 @@ If `player.vel.x = 4`:
 
 ---
 
-# Keyboard input — the q5play pattern
+# Keyboard input — `kb.pressing(key)`
+
+Inside `draw()`, ask the keyboard whether a specific key is held *right now*:
 
 ```js
-if (kb.pressing('left'))       player.vel.x = -4;
-else if (kb.pressing('right')) player.vel.x = 4;
-else                           player.vel.x = 0;
+if (kb.pressing('a')) {
+  // runs every frame the 'a' key is held
+}
+```
+
+- Returns `true` while the key is down, `false` otherwise.
+- Runs once per `draw()` call → ~60 checks per second while held.
+- Common keys: `'a'`, `'d'`, `'w'`, `'s'`, `'space'`.
+
+<div class="text-xs opacity-60 mt-4">
+Lesson: <code>2.1.7 Reading — kb.pressing(key)</code>
+</div>
+
+---
+
+# The movement pattern (and why the `else` matters)
+
+Map key presses to velocity changes inside `draw()`:
+
+```js
+if      (kb.pressing('a')) player.vel.x = -4;
+else if (kb.pressing('d')) player.vel.x =  4;
+else                       player.vel.x =  0;
 ```
 
 <v-click>
 
-- `kb.pressing('left')` returns **`true` every frame** the key is held
-- The `else` branch is **critical** — it resets velocity to 0 when no key is pressed
-- Skip the `else` → sprite drifts forever
+**Why that last line?** Velocity persists across frames. Set `vel.x = 4`, let go of the key, and the engine keeps applying the same velocity forever. The `else` resets it to `0` so the sprite stops.
 
 </v-click>
+
+<v-click>
+
+Skip the `else` → sprite drifts off-screen. Most common bug this week.
+
+</v-click>
+
+<div class="text-xs opacity-60 mt-4">
+Lessons: <code>2.1.7b Movement pattern</code> + <code>2.1.7c Else-to-zero rule</code> (with paired lab)
+</div>
 
 ---
 
@@ -394,31 +437,44 @@ function draw() {
 
 ---
 
-# Today's in-app work
+# Lesson map — Module 2.1
 
-<div class="grid grid-cols-2 gap-8">
+One new concept per lesson. The sub-letter slots (`2.1.3a` etc.) are short atomic readings — most are 5 minutes each.
+
+<div class="grid grid-cols-2 gap-6 text-sm">
 <div>
 
-## Session 1
+## Session 1 — Canvas & Sprite
 
-1. 🎥 Video: your first sketch
-2. 📖 Reading: Canvas & Sprite
-3. 💡 Worked example (this deck)
-4. ▶️ **Hello Sprite** lesson (~20 min)
-5. 🎥 Video: the frame loop
-6. AP CSP: how q5play reached your browser
+- `2.1.1` Slides (this deck)
+- `2.1.2` 🎥 Your first sketch
+- `2.1.3` 📖 Frame loop: `setup` & `draw`
+- `2.1.3a` 📖 Canvas
+- `2.1.3b` 📖 Sprite + `.color`
+- `2.1.3c` ▶️ Lab — drop one sprite
+- `2.1.3d` 📖 Storing in a `let`
+- `2.1.3e` 📖 `background()` wipe
+- `2.1.3f` 📖 Property tour
+- `2.1.4` 💡 Worked example
+- `2.1.5` ▶️ Hello Sprite (~20 min)
+- `2.1.6` 🎥 The frame loop
 
 </div>
 <div>
 
-## Session 2
+## Session 2 — Input & Motion
 
-1. 📖 Reading: Input
-2. 💡 Worked example: keyboard
-3. ▶️ **Make it Move** lesson (~25 min)
-4. ✏️ **A10.1 Sprite Playground** lab
-5. ✍️ **A10.2** writeup
-6. ⭐ Challenges (optional)
+- `2.1.7` 📖 `kb.pressing(key)`
+- `2.1.7a` 📖 `vel.x` / `vel.y`
+- `2.1.7b` 📖 Movement pattern
+- `2.1.7c` 📖 Else-to-zero rule
+- `2.1.7d` ▶️ Lab — delete the else
+- `2.1.7e` 📖 WASD-not-arrows
+- `2.1.8` 💡 Worked example: keyboard
+- `2.1.9` ▶️ Make it Move (~25 min)
+- `2.1.10` ✏️ **A10.1** Sprite Playground
+- `2.1.11` ✍️ **A10.2** Writeup
+- `2.1.12` ⭐ Challenges (optional)
 
 </div>
 </div>
@@ -457,16 +513,65 @@ Three questions, half a page total:
 
 ---
 
-# What's next — Week 11
+# Quick reference — vocabulary
 
-**Physics Feel** — module 2.2
+<div class="grid grid-cols-3 gap-4 text-sm">
+<div>
 
-- `world.gravity.y = 10` → things fall
-- `sprite.bounciness = 0.8` → things bounce
-- `dynamic` vs `static` vs `kinematic` sprite bodies
-- A11.1: build a pinball scene
+**Frame loop**
+- `setup()` — once at start
+- `draw()` — every frame
+- frame ≈ one run of `draw()`
+- frame rate ≈ 60 fps
 
-And beyond that (W12+): OOP, groups, animation, save/load, capstone.
+**Canvas**
+- `new Canvas(w, h)`
+- `(0, 0)` is top-left
+- y increases **downward**
+
+</div>
+<div>
+
+**Sprite**
+- `new Sprite(x, y, w, h)` — centre position
+- `.color` — CSS color string
+- `.pos`, `.rotation`, `.layer`
+- file-scope `let` to keep a reference
+
+**Background**
+- `background(color)` — first call in `draw()`
+- frame trail = no wipe
+- "wipe" = clear-and-redraw
+
+</div>
+<div>
+
+**Input + motion**
+- `kb.pressing(key)` — level-triggered
+- `vel.x` / `vel.y` — pixels per frame
+- if/else-if/else movement pattern
+- else-to-zero rule (or it drifts)
+- WASD for graded labs
+
+</div>
+</div>
+
+<div class="text-xs opacity-60 mt-6">
+The atomic readings (`2.1.3a`–`f`, `2.1.7a`–`e`) each own one of these terms. Use this slide as the union glossary.
+</div>
+
+---
+
+# What's next — Q2 ahead
+
+After today: foundations are built. Next up:
+
+- **Module 2.2 — Classes**: `new`, constructors, methods, building your own sprite types
+- **Module 2.3 — Groups & overlaps**: many sprites, collisions, edge input
+- **Module 2.4 — Animation & camera**: sprite animations, camera follow, gameplay polish
+- **Capstone**: a complete game of your own design
+
+Today gave you the runtime; the rest of Q2 gives you the patterns.
 
 ---
 layout: center
