@@ -1,12 +1,17 @@
 // GET  /api/commits?lessonId=X   -> list the signed-in student's commits for a lesson
 // POST /api/commits              -> create a new commit (body: CreateBody)
+//
+// POST is gated by isLessonAccessible — students can't push commits to a
+// locked lesson via curl/devtools.
 
 import { gzipJson, gunzipJson } from '../../_shared/gzip';
+import { isLessonAccessible, lockedResponse, type SessionData } from '../../_shared/lessonAccess';
 
 interface Env {
   DB: D1Database;
+  ASSETS?: Fetcher;
 }
-type Ctx = EventContext<Env, string, { email: string }>;
+type Ctx = EventContext<Env, string, SessionData>;
 
 interface CreateBody {
   id: string;
@@ -27,7 +32,7 @@ interface CommitRow {
   authored_by_email: string | null;
 }
 
-export const onRequestGet: PagesFunction<Env, string, { email: string }> = async (context: Ctx) => {
+export const onRequestGet: PagesFunction<Env, string, SessionData> = async (context: Ctx) => {
   const { request, env, data } = context;
   const lessonId = new URL(request.url).searchParams.get('lessonId');
   if (!lessonId) return json({ error: 'lessonId required' }, 400);
@@ -43,7 +48,7 @@ export const onRequestGet: PagesFunction<Env, string, { email: string }> = async
   });
 };
 
-export const onRequestPost: PagesFunction<Env, string, { email: string }> = async (context: Ctx) => {
+export const onRequestPost: PagesFunction<Env, string, SessionData> = async (context: Ctx) => {
   const { request, env, data } = context;
   let body: CreateBody;
   try {
@@ -57,6 +62,10 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   }
   if (!body.files || typeof body.files !== 'object') {
     return json({ error: 'files object required' }, 400);
+  }
+
+  if (!(await isLessonAccessible(env, request, data.role, data.email, body.lessonId))) {
+    return lockedResponse();
   }
 
   const filesGz = await gzipJson(body.files);

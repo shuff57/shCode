@@ -16,18 +16,20 @@ import {
   validateRequest,
   type GradeRequest,
 } from '../../lib/grade-written-core';
+import { isLessonAccessible, lockedResponse, type SessionData } from '../../_shared/lessonAccess';
 
 interface Env {
+  DB: D1Database;
   OLLAMA_API_KEY: string;
   // Optional override — defaults to https://ollama.com when unset.
   OLLAMA_HOST?: string;
+  ASSETS?: Fetcher;
 }
 
-type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 type Ctx = EventContext<Env, string, SessionData>;
 
 export const onRequestPost: PagesFunction<Env, string, SessionData> = async (context: Ctx) => {
-  const { request, env } = context;
+  const { request, env, data } = context;
 
   if (!env.OLLAMA_API_KEY) {
     return json(
@@ -49,6 +51,10 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
 
   const invalid = validateRequest(body);
   if (invalid) return json({ ok: false, error: invalid }, 400);
+
+  if (!(await isLessonAccessible(env, request, data.role, data.email, body.lessonId))) {
+    return lockedResponse();
+  }
 
   const host = env.OLLAMA_HOST || 'https://ollama.com';
   const model = body.model || 'qwen3-coder-next:cloud';

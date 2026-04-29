@@ -1,12 +1,18 @@
 // GET    /api/commits/:id — single commit, 404 if not the caller's
 // DELETE /api/commits/:id — remove a commit you own
+//
+// DELETE is gated by isLessonAccessible against the commit's own
+// lesson_id — defense in depth. A student can't curl to delete commit
+// rows on a lesson their progression doesn't entitle them to.
 
 import { gunzipJson } from '../../_shared/gzip';
+import { isLessonAccessible, lockedResponse, type SessionData } from '../../_shared/lessonAccess';
 
 interface Env {
   DB: D1Database;
+  ASSETS?: Fetcher;
 }
-type Ctx = EventContext<Env, 'id', { email: string }>;
+type Ctx = EventContext<Env, 'id', SessionData>;
 
 interface CommitRow {
   id: string;
@@ -19,7 +25,7 @@ interface CommitRow {
   authored_by_email: string | null;
 }
 
-export const onRequestGet: PagesFunction<Env, 'id', { email: string }> = async (context: Ctx) => {
+export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (context: Ctx) => {
   const { env, params, data } = context;
   const row = await env.DB.prepare(
     'SELECT id, lesson_id, message, files_json, files_gz, changed_file_ids, created_at, authored_by_email FROM commits WHERE id = ? AND student_email = ?',
@@ -30,8 +36,22 @@ export const onRequestGet: PagesFunction<Env, 'id', { email: string }> = async (
   return json({ commit: await rowToCommit(row, data.email) });
 };
 
-export const onRequestDelete: PagesFunction<Env, 'id', { email: string }> = async (context: Ctx) => {
-  const { env, params, data } = context;
+export const onRequestDelete: PagesFunction<Env, 'id', SessionData> = async (context: Ctx) => {
+  const { request, env, params, data } = context;
+
+  // Look up the commit's lesson_id so we can run the access gate against
+  // it before letting the delete proceed. The same WHERE clause guards
+  // ownership — a student can never see / delete another student's row.
+  const row = await env.DB
+    .prepare('SELECT lesson_id FROM commits WHERE id = ? AND student_email = ?')
+    .bind(params.id, data.email)
+    .first<{ lesson_id: string }>();
+  if (!row) return json({ error: 'Not found' }, 404);
+
+  if (!(await isLessonAccessible(env, request, data.role, data.email, row.lesson_id))) {
+    return lockedResponse();
+  }
+
   const result = await env.DB.prepare('DELETE FROM commits WHERE id = ? AND student_email = ?')
     .bind(params.id, data.email)
     .run();

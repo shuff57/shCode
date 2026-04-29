@@ -5,21 +5,31 @@
 // is a no-op (we don't downgrade on mount re-fires).
 // 'completed' always upserts, setting completed_at and optional score.
 // DELETE removes the row entirely (back to not_opened).
+//
+// Both verbs are gated by isLessonAccessible — students can't fabricate
+// completion on a lesson whose prior siblings aren't done.
+
+import { isLessonAccessible, lockedResponse, type SessionData } from '../../_shared/lessonAccess';
 
 interface Env {
   DB: D1Database;
+  ASSETS?: Fetcher;
 }
-type Ctx = EventContext<Env, 'lessonId', { email: string }>;
+type Ctx = EventContext<Env, 'lessonId', SessionData>;
 
 interface PostBody {
   state: 'started' | 'completed';
   score?: number;
 }
 
-export const onRequestPost: PagesFunction<Env, 'lessonId', { email: string }> = async (context: Ctx) => {
+export const onRequestPost: PagesFunction<Env, 'lessonId', SessionData> = async (context: Ctx) => {
   const { request, env, data, params } = context;
   const lessonId = params.lessonId;
   if (typeof lessonId !== 'string' || !lessonId) return json({ error: 'lessonId required' }, 400);
+
+  if (!(await isLessonAccessible(env, request, data.role, data.email, lessonId))) {
+    return lockedResponse();
+  }
 
   let body: PostBody;
   try {
@@ -57,10 +67,14 @@ export const onRequestPost: PagesFunction<Env, 'lessonId', { email: string }> = 
   return json({ ok: true });
 };
 
-export const onRequestDelete: PagesFunction<Env, 'lessonId', { email: string }> = async (context: Ctx) => {
-  const { env, data, params } = context;
+export const onRequestDelete: PagesFunction<Env, 'lessonId', SessionData> = async (context: Ctx) => {
+  const { request, env, data, params } = context;
   const lessonId = params.lessonId;
   if (typeof lessonId !== 'string' || !lessonId) return json({ error: 'lessonId required' }, 400);
+
+  if (!(await isLessonAccessible(env, request, data.role, data.email, lessonId))) {
+    return lockedResponse();
+  }
 
   await env.DB.prepare(
     'DELETE FROM lesson_state WHERE student_email = ? AND lesson_id = ?',
