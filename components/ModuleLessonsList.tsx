@@ -30,77 +30,128 @@ export default function ModuleLessonsList({ lessons }: { lessons: LessonItem[] }
     return <p style={{ opacity: 0.6 }}>No lessons yet.</p>;
   }
 
+  // Lessons advance linearly: get a green on the current lesson before
+  // unlocking the next. A lesson at index j is unlocked iff every prior
+  // lesson is 'completed'. Unauthed students see locks too — the progress
+  // footer already prompts sign-in.
+  const completed = (id: string) => progress.states[id] === 'completed';
+  const firstUnlocked = (() => {
+    for (let i = 0; i < lessons.length; i++) {
+      if (!completed(lessons[i].id)) return i;
+    }
+    return lessons.length; // all done
+  })();
+
   return (
     <ol style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-      {lessons.map((l) => {
+      {lessons.map((l, idx) => {
         const badge = badgeForLesson({ type: l.type, preview: l.preview });
         const isAssignment = l.type === 'assignment' || l.type === 'project';
         const href = isAssignment ? `/assignment/${l.id}` : `/lesson/${l.id}`;
         const lessonState = progress.states[l.id];
         const stripeColor = stateStripeColors[lessonState ?? ''] ?? 'var(--border)';
         const stateLabel = stateLabels[lessonState ?? ''];
+        const locked = progress.loaded && idx > firstUnlocked;
 
-        return (
-          <li key={l.id} style={{ marginBottom: 8 }}>
-            <Link
-              href={href}
-              className="bg-card border-border border rounded block hover:bg-muted shadow-lg"
+        const rowStyle: React.CSSProperties = {
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          padding: '10px 14px',
+          borderLeft: '4px solid ' + badge.color,
+          borderRight: '4px solid ' + stripeColor,
+          textDecoration: 'none',
+          color: 'var(--text)',
+          opacity: locked ? 0.5 : 1,
+          cursor: locked ? 'not-allowed' : undefined,
+        };
+
+        const inner = (
+          <>
+            <span
               style={{
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
-                gap: 12,
-                padding: '10px 14px',
-                borderLeft: '4px solid ' + badge.color,
-                borderRight: '4px solid ' + stripeColor,
-                textDecoration: 'none',
-                color: 'var(--text)',
+                gap: 6,
+                fontSize: 11,
+                color: badge.color,
+                background: badge.color + '22',
+                border: '1px solid ' + badge.color + '55',
+                borderRadius: 999,
+                padding: '3px 10px',
+                minWidth: 140,
+                textTransform: 'uppercase',
+                fontWeight: 600,
+                letterSpacing: '0.04em',
               }}
             >
+              <badge.Icon size={12} strokeWidth={2.25} />
+              {badge.label}
+            </span>
+            <span style={{ opacity: 0.5, fontFamily: 'monospace', minWidth: 50 }}>
+              {l.numberedId}
+            </span>
+            <span style={{ flex: 1, fontWeight: 500 }}>{l.displayTitle}</span>
+            {locked ? (
               <span
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
                   fontSize: 11,
-                  color: badge.color,
-                  background: badge.color + '22',
-                  border: '1px solid ' + badge.color + '55',
+                  color: 'var(--muted-fg, #94a3b8)',
+                  background: 'rgba(148,163,184,0.15)',
+                  border: '1px solid rgba(148,163,184,0.35)',
                   borderRadius: 999,
-                  padding: '3px 10px',
-                  minWidth: 140,
-                  textTransform: 'uppercase',
+                  padding: '2px 8px',
                   fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                }}
+                aria-label="Locked"
+                title="Get a green on the lesson above before this one unlocks"
+              >
+                🔒 Locked
+              </span>
+            ) : stateLabel ? (
+              <span
+                style={{
+                  fontSize: 11,
+                  color: stripeColor,
+                  background: stripeColor + '22',
+                  border: '1px solid ' + stripeColor + '55',
+                  borderRadius: 999,
+                  padding: '2px 8px',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
                   letterSpacing: '0.04em',
                 }}
               >
-                <badge.Icon size={12} strokeWidth={2.25} />
-                {badge.label}
+                {stateLabel}
               </span>
-              <span style={{ opacity: 0.5, fontFamily: 'monospace', minWidth: 50 }}>
-                {l.numberedId}
-              </span>
-              <span style={{ flex: 1, fontWeight: 500 }}>{l.displayTitle}</span>
-              {stateLabel && (
-                <span
-                  style={{
-                    fontSize: 11,
-                    color: stripeColor,
-                    background: stripeColor + '22',
-                    border: '1px solid ' + stripeColor + '55',
-                    borderRadius: 999,
-                    padding: '2px 8px',
-                    fontWeight: 600,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.04em',
-                  }}
-                >
-                  {stateLabel}
-                </span>
-              )}
-              {l.estimateMins ? (
-                <span style={{ opacity: 0.5, fontSize: 12 }}>~{l.estimateMins} min</span>
-              ) : null}
-            </Link>
+            ) : null}
+            {l.estimateMins ? (
+              <span style={{ opacity: 0.5, fontSize: 12 }}>~{l.estimateMins} min</span>
+            ) : null}
+          </>
+        );
+
+        return (
+          <li key={l.id} style={{ marginBottom: 8 }}>
+            {locked ? (
+              <div
+                className="bg-card border-border border rounded block"
+                style={rowStyle}
+                aria-disabled="true"
+              >
+                {inner}
+              </div>
+            ) : (
+              <Link
+                href={href}
+                className="bg-card border-border border rounded block hover:bg-muted shadow-lg"
+                style={rowStyle}
+              >
+                {inner}
+              </Link>
+            )}
           </li>
         );
       })}

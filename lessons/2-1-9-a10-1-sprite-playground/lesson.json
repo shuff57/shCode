@@ -51,7 +51,7 @@
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",
       "flags": "",
-      "points": 2
+      "points": 0
     },
     {
       "id": "r2",
@@ -61,7 +61,7 @@
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\([\\s\\S]*?new\\s+Sprite\\s*\\(",
       "flags": "",
-      "points": 2
+      "points": 0
     },
     {
       "id": "r3",
@@ -72,7 +72,7 @@
       "file": "script.js",
       "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d)['\"]",
       "flags": "",
-      "points": 2
+      "points": 0
     },
     {
       "id": "r4",
@@ -83,7 +83,7 @@
       "file": "script.js",
       "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:w|s)['\"]",
       "flags": "",
-      "points": 2
+      "points": 0
     },
     {
       "id": "r5",
@@ -94,7 +94,7 @@
       "file": "script.js",
       "pattern": "else[\\s{]*\\w+\\.vel\\.[xy]\\s*=\\s*0",
       "flags": "",
-      "points": 2
+      "points": 0
     },
     {
       "id": "r6",
@@ -105,7 +105,7 @@
       "file": "script.js",
       "pattern": "\\bframeCount\\b",
       "flags": "",
-      "points": 2
+      "points": 0
     },
     {
       "id": "r7",
@@ -116,7 +116,7 @@
       "file": "script.js",
       "pattern": "\\btext\\s*\\(",
       "flags": "",
-      "points": 2
+      "points": 0
     },
     {
       "id": "r8",
@@ -127,8 +127,8 @@
       "file": "script.js",
       "pattern": "background\\s*\\(",
       "flags": "",
-      "points": 1
+      "points": 0
     }
   ],
-  "grading": { "totalPoints": 15, "passingScore": 10, "allowLateSubmit": true }
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
 }

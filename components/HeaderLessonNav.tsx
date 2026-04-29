@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { useLessonState } from '../lib/progress';
 
 interface ManifestLesson {
   id: string;
@@ -61,6 +62,7 @@ function parseRoute(pathname: string): { id: string; basePath: string } | null {
 export default function HeaderLessonNav() {
   const pathname = usePathname();
   const [lessons, setLessons] = useState<ManifestLesson[] | null>(null);
+  const snap = useLessonState();
 
   useEffect(() => {
     if (!parseRoute(pathname || '')) return;
@@ -92,6 +94,12 @@ export default function HeaderLessonNav() {
     minWidth: 0,
   };
 
+  // Next lesson is locked until the current lesson's state is 'completed'.
+  // Unauthed users see the lock too — they're already prompted to sign in
+  // by the progress footer, so this isn't surprising.
+  const currentCompleted = snap.states[route.id] === 'completed';
+  const nextLocked = !currentCompleted;
+
   return (
     <div
       style={{
@@ -113,13 +121,31 @@ export default function HeaderLessonNav() {
         <span />
       )}
       {next ? (
-        <a
-          className="hdr-lesson-link hdr-lesson-link-right"
-          href={`${route.basePath}/${next.id}`}
-        >
-          <span style={titleStyle}>{next.title}</span>
-          <span style={{ opacity: 0.7 }}>→</span>
-        </a>
+        nextLocked ? (
+          <span
+            className="hdr-lesson-link hdr-lesson-link-right"
+            title="Get a green on this lesson before moving forward"
+            aria-disabled="true"
+            style={{
+              opacity: 0.45,
+              cursor: 'not-allowed',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <span style={titleStyle}>{next.title}</span>
+            <span style={{ opacity: 0.7 }} aria-hidden="true">🔒</span>
+          </span>
+        ) : (
+          <a
+            className="hdr-lesson-link hdr-lesson-link-right"
+            href={`${route.basePath}/${next.id}`}
+          >
+            <span style={titleStyle}>{next.title}</span>
+            <span style={{ opacity: 0.7 }}>→</span>
+          </a>
+        )
       ) : (
         <span />
       )}

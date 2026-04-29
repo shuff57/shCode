@@ -37,13 +37,13 @@
     }
   ],
   "requirements": [
-    { "id": "r1", "title": "Static geometry exists", "description": "Create at least one sprite with collider 'static'", "type": "regex", "file": "script.js", "pattern": "collider\\s*=\\s*['\"]static['\"]|new\\s+Sprite\\s*\\([^)]*['\"]static['\"]", "flags": "", "points": 3 },
-    { "id": "r2", "title": "Player sprite exists", "description": "A dynamic Sprite is created in setup()", "type": "inFunction", "function": "setup", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(", "flags": "", "points": 2 },
-    { "id": "r3", "title": "WASD horizontal input", "description": "Use kb.pressing with 'a' or 'd' inside draw()", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d)['\"]", "flags": "", "points": 4 },
-    { "id": "r4", "title": "Gravity enabled", "description": "Assign a positive value to world.gravity.y", "type": "regex", "file": "script.js", "pattern": "world\\.gravity\\.y\\s*=\\s*[1-9]", "flags": "", "points": 3 },
-    { "id": "r5", "title": "Edge-triggered jump", "description": "Use kb.presses for the jump (not kb.pressing)", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "kb\\.presses\\s*\\(\\s*['\"](?:w|space|\\s)['\"]", "flags": "", "points": 4 },
-    { "id": "r6", "title": "Ground-gated jump", "description": "Use .touching() to gate the jump", "type": "regex", "file": "script.js", "pattern": "\\.touching\\s*\\(", "flags": "", "points": 2 },
-    { "id": "r7", "title": "Win condition via overlap", "description": "Use .overlaps() somewhere — typically the goal-sprite check", "type": "regex", "file": "script.js", "pattern": "\\.overlaps\\s*\\(", "flags": "", "points": 2 }
+    { "id": "r1", "title": "Static geometry exists", "description": "Create at least one sprite with collider 'static'", "type": "regex", "file": "script.js", "pattern": "collider\\s*=\\s*['\"]static['\"]|new\\s+Sprite\\s*\\([^)]*['\"]static['\"]", "flags": "", "points": 0 },
+    { "id": "r2", "title": "Player sprite exists", "description": "A dynamic Sprite is created in setup()", "type": "inFunction", "function": "setup", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(", "flags": "", "points": 0 },
+    { "id": "r3", "title": "WASD horizontal input", "description": "Use kb.pressing with 'a' or 'd' inside draw()", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d)['\"]", "flags": "", "points": 0 },
+    { "id": "r4", "title": "Gravity enabled", "description": "Assign a positive value to world.gravity.y", "type": "regex", "file": "script.js", "pattern": "world\\.gravity\\.y\\s*=\\s*[1-9]", "flags": "", "points": 0 },
+    { "id": "r5", "title": "Edge-triggered jump", "description": "Use kb.presses for the jump (not kb.pressing)", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "kb\\.presses\\s*\\(\\s*['\"](?:w|space|\\s)['\"]", "flags": "", "points": 0 },
+    { "id": "r6", "title": "Ground-gated jump", "description": "Use .touching() to gate the jump", "type": "regex", "file": "script.js", "pattern": "\\.touching\\s*\\(", "flags": "", "points": 0 },
+    { "id": "r7", "title": "Win condition via overlap", "description": "Use .overlaps() somewhere — typically the goal-sprite check", "type": "regex", "file": "script.js", "pattern": "\\.overlaps\\s*\\(", "flags": "", "points": 0 }
   ],
-  "grading": { "totalPoints": 20, "passingScore": 20, "allowLateSubmit": true }
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
 }

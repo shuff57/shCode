@@ -1,0 +1,19 @@
+{
+  "id": "2-4-3-reading-animation",
+  "title": "2.4.3 Reading — q5play docs: Animation",
+  "description": "q5play docs chapter on Animation. Read before `2.4.5 Animated Sprites Sandbox`.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.4 Animation & Camera",
+  "preview": "reading",
+  "week": 15,
+  "slos": ["SLO-3"],
+  "externalLink": "/docs/q5play/animation",
+  "externalLinkLabel": "Open the in-app q5play Animation docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -345,6 +345,94 @@
       "week": 13
     },
     {
+      "id": "2-4-1-slides",
+      "title": "2.4.1 Slides — Animation & Camera",
+      "unit": "2.4 Animation & Camera",
+      "preview": "slides",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 15
+    },
+    {
+      "id": "2-4-10-a15-1-platformer",
+      "title": "2.4.10 A15.1 Side-Scrolling Platformer",
+      "unit": "2.4 Animation & Camera",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 15
+    },
+    {
+      "id": "2-4-11-challenges",
+      "title": "2.4.11 Challenges — Optional Stretch",
+      "unit": "2.4 Animation & Camera",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 15
+    },
+    {
+      "id": "2-4-2-video-animating-sprite",
+      "title": "2.4.2 Video — Animating a sprite in q5play",
+      "unit": "2.4 Animation & Camera",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 15
+    },
+    {
+      "id": "2-4-3-reading-animation",
+      "title": "2.4.3 Reading — q5play docs: Animation",
+      "unit": "2.4 Animation & Camera",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 15
+    },
+    {
+      "id": "2-4-4-example-animate-sprite",
+      "title": "2.4.4 Worked Example — Animating a Sprite",
+      "unit": "2.4 Animation & Camera",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 15
+    },
+    {
+      "id": "2-4-5-animated-sprites-sandbox",
+      "title": "2.4.5 Animated Sprites Sandbox",
+      "unit": "2.4 Animation & Camera",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 15
+    },
+    {
+      "id": "2-4-6-video-camera-flashlight",
+      "title": "2.4.6 Video — Camera follow explained with a flashlight",
+      "unit": "2.4 Animation & Camera",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 15
+    },
+    {
+      "id": "2-4-7-reading-camera",
+      "title": "2.4.7 Reading — q5play docs: Camera",
+      "unit": "2.4 Animation & Camera",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 15
+    },
+    {
+      "id": "2-4-8-example-camera-follow",
+      "title": "2.4.8 Worked Example — Camera Follow",
+      "unit": "2.4 Animation & Camera",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 15
+    },
+    {
+      "id": "2-4-9-example-smooth-camera",
+      "title": "2.4.9 Worked Example — Smooth Camera with lerp",
+      "unit": "2.4 Animation & Camera",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 15
+    },
+    {
       "id": "algorithm-practice",
       "title": "1.2.3 Algorithm Practice",
       "unit": "1.2 Control Flow",
@@ -473,28 +561,12 @@
       "week": 9
     },
     {
-      "id": "q5play-animation",
-      "title": "5.4.1 Animated Sprites",
-      "unit": "5.4 Animation & Camera",
-      "preview": "q5play",
-      "category": "Unit 5: q5play — Game Physics",
-      "week": 16
-    },
-    {
       "id": "q5play-bounce",
       "title": "5.2.1 Bouncy Ball",
       "unit": "5.2 Physics Feel",
       "preview": "q5play",
       "category": "Unit 5: q5play — Game Physics",
       "week": 14
-    },
-    {
-      "id": "q5play-camera",
-      "title": "5.4.2 Camera Follow — Worked Example",
-      "unit": "5.4 Animation & Camera",
-      "preview": "q5play",
-      "category": "Unit 5: q5play — Game Physics",
-      "week": 16
     },
     {
       "id": "q5play-gravity",
@@ -527,14 +599,6 @@
       "preview": "q5play",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 10
-    },
-    {
-      "id": "q5play-platformer-challenge",
-      "title": "5.4.3 Side-Scrolling Platformer — Challenge",
-      "unit": "5.4 Animation & Camera",
-      "preview": "q5play",
-      "category": "Unit 5: q5play — Game Physics",
-      "week": 16
     },
     {
       "id": "q5play-slingshot",

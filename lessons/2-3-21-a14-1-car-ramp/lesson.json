@@ -37,12 +37,12 @@
     }
   ],
   "requirements": [
-    { "id": "r1", "title": "Uses WheelJoint", "description": "Create at least one WheelJoint", "type": "regex", "file": "script.js", "pattern": "new\\s+WheelJoint\\s*\\(", "flags": "", "points": 4 },
-    { "id": "r2", "title": "Static geometry exists", "description": "Create at least one 'static' sprite (ground or ramp)", "type": "regex", "file": "script.js", "pattern": "collider\\s*=\\s*['\"]static['\"]|new\\s+Sprite\\s*\\([^)]*['\"]static['\"]", "flags": "", "points": 3 },
-    { "id": "r3", "title": "Tilted ramp via rotation", "description": "Assign to .rotation — tilting the ramp", "type": "regex", "file": "script.js", "pattern": "\\.rotation\\s*=", "flags": "", "points": 2 },
-    { "id": "r4", "title": "Gravity enabled", "description": "Assign a positive value to world.gravity.y", "type": "regex", "file": "script.js", "pattern": "world\\.gravity\\.y\\s*=\\s*[1-9]", "flags": "", "points": 3 },
-    { "id": "r5", "title": "WASD drives wheels", "description": "Use kb.pressing with 'a' or 'd' inside draw()", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d)['\"]", "flags": "", "points": 4 },
-    { "id": "r6", "title": "Applies angular velocity", "description": "Set .angularVelocity on a wheel", "type": "regex", "file": "script.js", "pattern": "\\.angularVelocity\\s*=", "flags": "", "points": 4 }
+    { "id": "r1", "title": "Uses WheelJoint", "description": "Create at least one WheelJoint", "type": "regex", "file": "script.js", "pattern": "new\\s+WheelJoint\\s*\\(", "flags": "", "points": 0 },
+    { "id": "r2", "title": "Static geometry exists", "description": "Create at least one 'static' sprite (ground or ramp)", "type": "regex", "file": "script.js", "pattern": "collider\\s*=\\s*['\"]static['\"]|new\\s+Sprite\\s*\\([^)]*['\"]static['\"]", "flags": "", "points": 0 },
+    { "id": "r3", "title": "Tilted ramp via rotation", "description": "Assign to .rotation — tilting the ramp", "type": "regex", "file": "script.js", "pattern": "\\.rotation\\s*=", "flags": "", "points": 0 },
+    { "id": "r4", "title": "Gravity enabled", "description": "Assign a positive value to world.gravity.y", "type": "regex", "file": "script.js", "pattern": "world\\.gravity\\.y\\s*=\\s*[1-9]", "flags": "", "points": 0 },
+    { "id": "r5", "title": "WASD drives wheels", "description": "Use kb.pressing with 'a' or 'd' inside draw()", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d)['\"]", "flags": "", "points": 0 },
+    { "id": "r6", "title": "Applies angular velocity", "description": "Set .angularVelocity on a wheel", "type": "regex", "file": "script.js", "pattern": "\\.angularVelocity\\s*=", "flags": "", "points": 0 }
   ],
-  "grading": { "totalPoints": 20, "passingScore": 20, "allowLateSubmit": true }
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
 }

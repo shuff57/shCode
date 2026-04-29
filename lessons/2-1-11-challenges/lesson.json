@@ -45,7 +45,7 @@
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",
       "flags": "",
-      "points": 5
+      "points": 0
     },
     {
       "id": "r2",
@@ -55,7 +55,7 @@
       "file": "script.js",
       "pattern": "new\\s+Sprite\\s*\\(",
       "flags": "",
-      "points": 5
+      "points": 0
     },
     {
       "id": "r3",
@@ -66,7 +66,7 @@
       "file": "script.js",
       "pattern": "background\\s*\\(",
       "flags": "",
-      "points": 5
+      "points": 0
     },
     {
       "id": "r4",
@@ -77,8 +77,8 @@
       "file": "script.js",
       "pattern": "kb\\.presses\\s*\\(|\\bsin\\s*\\(|\\bcos\\s*\\(|mouse\\.(x|y|pressed|pressing)|\\blerp\\s*\\(|frameCount\\s*%|\\btext\\s*\\(",
       "flags": "",
-      "points": 10
+      "points": 0
     }
   ],
-  "grading": { "totalPoints": 25, "passingScore": 15, "allowLateSubmit": true }
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
 }

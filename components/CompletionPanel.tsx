@@ -49,7 +49,7 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
       }}
     >
       <h2 style={{ fontSize: 20, marginBottom: 12, color: '#f8f8f2' }}>
-        Requirements to Pass
+        Mark complete to continue
       </h2>
       <div
         style={{
@@ -62,9 +62,7 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
         }}
         aria-live="polite"
       >
-        <span>
-          {complete ? '1' : '0'}/1 passed
-        </span>
+        <span>{complete ? 'Complete — next lesson is unlocked' : 'Not complete yet'}</span>
         <button
           onClick={toggle}
           disabled={!snap.authed}
@@ -107,12 +105,12 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
           {complete ? (
             <>
               <CircleCheck size={18} />
-              <span>Passed · 1/1 pts</span>
+              <span>Complete</span>
             </>
           ) : (
             <>
               <Circle size={18} />
-              <span>Pending · 0/1 pts</span>
+              <span>Pending</span>
             </>
           )}
         </div>

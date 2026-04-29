@@ -35,9 +35,9 @@ Same shape as a lab assignment; only the fields in the table below differ. Use `
     { "id": "s4", "title": "Use one advanced feature", "instructions": "Pick a challenge from content.md …", "hints": ["content.md lists six challenges with hints for each …"] }
   ],
   "requirements": [
-    { "id": "r1", "title": "Create a canvas", "type": "regex", "file": "script.js", "pattern": "new\\s+Canvas\\s*\\(", "points": 5 },
-    { "id": "r2", "title": "Create at least one sprite", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(", "points": 5 },
-    { "id": "r3", "title": "Clear the background each frame", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "background\\s*\\(", "points": 5 },
+    { "id": "r1", "title": "Create a canvas", "type": "regex", "file": "script.js", "pattern": "new\\s+Canvas\\s*\\(", "points": 0 },
+    { "id": "r2", "title": "Create at least one sprite", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(", "points": 0 },
+    { "id": "r3", "title": "Clear the background each frame", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "background\\s*\\(", "points": 0 },
     {
       "id": "r4",
       "title": "Use at least one advanced feature",
@@ -46,10 +46,10 @@ Same shape as a lab assignment; only the fields in the table below differ. Use `
       "function": ["draw", "update"],
       "file": "script.js",
       "pattern": "kb\\.presses\\s*\\(|\\bsin\\s*\\(|\\bcos\\s*\\(|mouse\\.(x|y|pressed|pressing)|\\blerp\\s*\\(|frameCount\\s*%|\\btext\\s*\\(",
-      "points": 10
+      "points": 0
     }
   ],
-  "grading": { "totalPoints": 25, "passingScore": 15, "allowLateSubmit": true }
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
 }
 ```
 
@@ -61,7 +61,7 @@ Same shape as a lab assignment; only the fields in the table below differ. Use `
 | `difficulty` | `"beginner"` | `"intermediate"` | `"advanced"` |
 | `estimateMins` | 20–30 | 30–60 | ~30 |
 | `requirements` | strict per-feature regex | strict per-feature regex | alternation — see §2 |
-| `grading.passingScore` | `totalPoints` (all-green) | `totalPoints` (all-green) | `totalPoints` (all-green) |
+| `requirements[].points` / `grading.totalPoints` / `grading.passingScore` | all `0` (all-green gate) | all `0` (all-green gate) | all `0` (all-green gate) |
 | `script.js` | scaffold (description-only `// STEP N:`) | scaffold (description-only `// STEP N:`) | **fully empty** — see §4 |
 
 The `difficulty` rung encodes the lesson/lab/challenge progression itself: same content surface, less scaffolding at each rung. A practice lesson scaffolds the work and tests one concept; a lab scaffolds and tests synthesis; a challenge removes the scaffold entirely.
@@ -83,7 +83,7 @@ The "pick one of these advanced features" requirement uses a **regex alternation
   "file": "script.js",
   "pattern": "kb\\.presses\\s*\\(|\\bsin\\s*\\(|\\bcos\\s*\\(|mouse\\.(x|y|pressed|pressing)|\\blerp\\s*\\(|frameCount\\s*%|\\btext\\s*\\(",
   "flags": "",
-  "points": 10
+  "points": 0
 }
 ```
 
@@ -125,7 +125,7 @@ If a student needs the scaffold to start, they can click **Reset** (which re-loa
 ## 5. Don'ts
 
 - **Do not make every requirement strict.** At least one requirement must be the permissive alternation; that's what makes it a challenge vs a lab. If all requirements demand a specific pattern, it's a lab — convert it (see `lab-assignment-conventions.md`).
-- **Do not set `passingScore === totalPoints`.** Challenges accept partial completion — one advanced feature passes.
+- **Do not assign non-zero `points` / `totalPoints` / `passingScore`.** All must be `0` per the no-points rule. The permissive r4 alternation is what allows partial completion: a student can pass r4 with any one of the alternation branches (one advanced feature is enough). The Submit gate is then all-green across all four requirements (canvas, sprite, background, one advanced feature).
 - **Do not ship working solutions in `script.js`.** Steps scaffold only.
 - **Do not add any starter code to `script.js`.** Empty editor is the point (see §4). This includes the `// <numbering> <title>` header comment that graded q5 lessons use — challenges skip it.
 - **Do not give specific hints in `lesson.json.steps[].hints[]`.** Generic docs-pointer only (see `q5play-lesson-conventions.md` §2). Challenge menu in `content.md` may be more generous.
@@ -158,3 +158,4 @@ Challenges use the **exact same workspace** as graded q5 lessons. See `q5play-le
 | Empty-editor starter | Dropped the Steps scaffold from challenge starters too. Challenge `script.js` is now **fully empty** — the student invokes the docs drawer + challenge menu to structure the program themselves. §4 rewritten to mandate an empty file; §5 Don'ts updated. |
 | Workspace consolidation alignment | §7 trimmed to a thin pointer at the new `q5play-lesson-conventions.md` §5. Removed the stale recap of "auto-open docs drawer / left sidebar Grading tab / drag-resizable sidebars" — the workspace is now the single right-edge `TabbedRightDrawer` with Docs / Quest / File tabs (closed by default) plus the bottom `LessonProgressFooter`. |
 | Difficulty tiers slot-type | Challenges `difficulty` field bumped from `"intermediate"` to `"advanced"` to encode the lesson/lab/challenge progression: practice = `"beginner"`, lab = `"intermediate"`, challenge = `"advanced"`. §1 JSON shape + the "fields that differ from a lab" comparison table updated to a three-column lesson/lab/challenge view. Sister conventions `q5play-lesson-conventions.md` and `lab-assignment-conventions.md` carry the matching rule. Audit pass on existing unit-2 challenges (2.1.12, 2.2.13, 2.3.12) bumped `"intermediate"` → `"advanced"`. |
+| No-points + green-to-advance | All `points`, `totalPoints`, and `passingScore` values must be `0` per the new no-points rule. §1 JSON shape zeroed out (former 5/5/5/10 → 0/0/0/0; former 25/15 → 0/0). §1 "fields that differ from a lab" table replaced the standalone `passingScore` row with a combined "all-zero" row that applies to all three slot types. §2 example zeroed. §5 Don'ts replaced "Do not set `passingScore === totalPoints`" with "Do not assign non-zero points" — the permissive r4 alternation is what enables partial completion now (one branch passes r4; all-green Submit gate fires when the four core requirements are met). |

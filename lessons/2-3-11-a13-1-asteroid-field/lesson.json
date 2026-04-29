@@ -43,11 +43,11 @@
     }
   ],
   "requirements": [
-    { "id": "r1", "title": "Asteroid Group exists", "description": "Create at least one Group with new Group()", "type": "regex", "file": "script.js", "pattern": "new\\s+Group\\s*\\(", "flags": "", "points": 3 },
-    { "id": "r2", "title": "Asteroids have velocity", "description": "Assign to .vel.x or .vel.y on a sprite", "type": "regex", "file": "script.js", "pattern": "\\.vel\\.(x|y)\\s*=", "flags": "", "points": 2 },
-    { "id": "r3", "title": "WASD ship input", "description": "Use kb.pressing with one of 'a', 'd', 'w', 's' inside draw()", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d|w|s)['\"]", "flags": "", "points": 3 },
-    { "id": "r4", "title": "Overlap detection", "description": "Use .overlaps() to detect a hit", "type": "regex", "file": "script.js", "pattern": "\\.overlaps\\s*\\(", "flags": "", "points": 4 },
-    { "id": "r5", "title": "Safe despawn loop", "description": "Iterate backwards (i = length - 1) OR iterate a copy ([...group].forEach / .map)", "type": "regex", "file": "script.js", "pattern": "(?:for\\s*\\(\\s*let\\s+\\w+\\s*=[^;]*\\.length\\s*-\\s*1)|(?:\\[\\.\\.\\.\\w+\\]\\.(forEach|map|some|filter))", "flags": "", "points": 3 }
+    { "id": "r1", "title": "Asteroid Group exists", "description": "Create at least one Group with new Group()", "type": "regex", "file": "script.js", "pattern": "new\\s+Group\\s*\\(", "flags": "", "points": 0 },
+    { "id": "r2", "title": "Asteroids have velocity", "description": "Assign to .vel.x or .vel.y on a sprite", "type": "regex", "file": "script.js", "pattern": "\\.vel\\.(x|y)\\s*=", "flags": "", "points": 0 },
+    { "id": "r3", "title": "WASD ship input", "description": "Use kb.pressing with one of 'a', 'd', 'w', 's' inside draw()", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d|w|s)['\"]", "flags": "", "points": 0 },
+    { "id": "r4", "title": "Overlap detection", "description": "Use .overlaps() to detect a hit", "type": "regex", "file": "script.js", "pattern": "\\.overlaps\\s*\\(", "flags": "", "points": 0 },
+    { "id": "r5", "title": "Safe despawn loop", "description": "Iterate backwards (i = length - 1) OR iterate a copy ([...group].forEach / .map)", "type": "regex", "file": "script.js", "pattern": "(?:for\\s*\\(\\s*let\\s+\\w+\\s*=[^;]*\\.length\\s*-\\s*1)|(?:\\[\\.\\.\\.\\w+\\]\\.(forEach|map|some|filter))", "flags": "", "points": 0 }
   ],
-  "grading": { "totalPoints": 15, "passingScore": 15, "allowLateSubmit": true }
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
 }

@@ -1,0 +1,16 @@
+{
+  "id": "2-4-9-example-smooth-camera",
+  "title": "2.4.9 Worked Example — Smooth Camera with lerp",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.4 Animation & Camera",
+  "preview": "example",
+  "week": 15,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

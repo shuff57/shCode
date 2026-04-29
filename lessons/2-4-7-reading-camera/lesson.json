@@ -1,0 +1,19 @@
+{
+  "id": "2-4-7-reading-camera",
+  "title": "2.4.7 Reading — q5play docs: Camera",
+  "description": "q5play docs chapter on Camera. Read before `2.4.8 Worked Example — Camera Follow`.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.4 Animation & Camera",
+  "preview": "reading",
+  "week": 15,
+  "slos": ["SLO-3"],
+  "externalLink": "/docs/q5play/camera",
+  "externalLinkLabel": "Open the in-app q5play Camera docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

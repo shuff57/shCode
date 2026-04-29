@@ -38,12 +38,12 @@ Use **Hello Sprite (`lessons/q5play-intro/lesson.json`)** as a concrete working 
     /* …s2–s4 follow the same shape */
   ],
   "requirements": [
-    { "id": "r1", "title": "Create a canvas", "description": "A canvas is created when the sketch starts.", "type": "regex", "file": "script.js", "pattern": "new\\s+Canvas\\s*\\(", "flags": "", "points": 10, "status": "pending" },
-    { "id": "r2", "title": "Create at least one sprite", "description": "A sprite exists in the sketch.", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(", "flags": "", "points": 10, "status": "pending" },
-    { "id": "r3", "title": "Set a sprite color", "description": "A sprite has a color.", "type": "regex", "file": "script.js", "pattern": "\\.color\\s*=", "flags": "", "points": 5, "status": "pending" },
-    { "id": "r4", "title": "Clear the background each frame", "description": "Previous frames don't stack up.", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "background\\s*\\(", "flags": "", "points": 5, "status": "pending" }
+    { "id": "r1", "title": "Create a canvas", "description": "A canvas is created when the sketch starts.", "type": "regex", "file": "script.js", "pattern": "new\\s+Canvas\\s*\\(", "flags": "", "points": 0, "status": "pending" },
+    { "id": "r2", "title": "Create at least one sprite", "description": "A sprite exists in the sketch.", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(", "flags": "", "points": 0, "status": "pending" },
+    { "id": "r3", "title": "Set a sprite color", "description": "A sprite has a color.", "type": "regex", "file": "script.js", "pattern": "\\.color\\s*=", "flags": "", "points": 0, "status": "pending" },
+    { "id": "r4", "title": "Clear the background each frame", "description": "Previous frames don't stack up.", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "background\\s*\\(", "flags": "", "points": 0, "status": "pending" }
   ],
-  "grading": { "totalPoints": 30, "passingScore": 20, "allowLateSubmit": true }
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
 }
 ```
 
@@ -54,8 +54,9 @@ Use **Hello Sprite (`lessons/q5play-intro/lesson.json`)** as a concrete working 
 - `preview` — **must be `"q5play"`**. This mounts the q5play runtime, the file editor + live preview, and the right-side `TabbedRightDrawer` whose tabs include Docs / Quest / File (see §5).
 - `steps` — authored alongside requirements for authoring consistency and so the `// STEP N:` breadcrumbs in `script.js` have matching `steps[].id` values (see §3). **Currently not rendered in the student UI** (the Quest tab shows only `requirements` — see §5). The `instructions` + `hints` still belong here because future UI may surface them; keep them clean and pointing at the docs (see §2).
 - `requirements` — auto-graded checks AND the student-facing task list (since `steps` are unrendered). Each requirement's `title` + `description` is what the student reads in the Quest tab — write them as student-readable instructions, not terse grader labels. See `lab-assignment-conventions.md` for requirement-type grammar.
-- `grading.totalPoints` — sum of all `requirements[].points`. Hello Sprite: `10+10+5+5 = 30`. Verify by hand.
-- `grading.passingScore` — **does not gate Submit on q5 lessons.** Submit requires every requirement green (see §5). `passingScore` only affects the SubmitDialog's "below passing" warning, which can never fire for q5 since the Submit button stays disabled until all-green. Set it to `totalPoints` for new q5 lessons so the field reads as truthful; existing files using ~66% still work and don't need migration.
+- `grading.totalPoints` — **always `0`.** The course is mastery-based: Submit is gated all-green (every requirement passed), not points-based. Keep the field for schema compatibility; never assign a non-zero value.
+- `grading.passingScore` — **always `0`.** Same reason. The all-green Submit gate is the only criterion that matters; `passingScore` is decorative.
+- `requirements[].points` — **always `0`.** Author by criterion, not by weight. The student UI shows a `passed/total` criteria count (no `pts` suffix) and the bottom-right progress badge under green-to-advance.
 
 ## 2. Hints rule — point at the docs, don't spoon-feed
 
@@ -94,7 +95,7 @@ Each `// STEP N:` must correspond one-to-one with a `lesson.json.steps[].id` ent
 
 ### Why
 
-Graded lessons define `grading.totalPoints > 0` and `requirements[]` entries — regex / `inFunction` patterns the auto-grader runs against `script.js`. If the starter already satisfies those patterns, the lesson is "complete" on page load. The student writes nothing. The grade is not earned.
+Graded lessons define `requirements[]` entries — regex / `inFunction` patterns the auto-grader runs against `script.js`. If the starter already satisfies those patterns, the lesson is "complete" on page load. The student writes nothing. The all-green Submit gate is reached for free, the next lesson unlocks for free, and the work is unearned.
 
 The STEP comments are the breadcrumb trail. The working program is the destination.
 
@@ -122,7 +123,7 @@ Matches `lesson.json.steps` IDs `s1`–`s4`. The four regex / `inFunction` requi
 
 ### Variants
 
-- **Worked examples** — lessons with `preview: "example"` and `grading.totalPoints === 0` (read-not-graded reference material) may ship fully working code. `lessons/2-3-19-example-pendulum/`, `lessons/q5play-gravity/`, `lessons/q5play-sprite-showcase/` etc.
+- **Worked examples** — lessons with `preview: "example"` (read-not-graded reference material; no `requirements[]`) may ship fully working code. `lessons/2-3-19-example-pendulum/`, `lessons/2-4-8-example-camera-follow/`, etc.
 - **Lab assignments** (`type: "assignment"`) — same scaffold shape as the canonical example above, **but the `// STEP N:` comments must describe the task in plain English without commented-out solution code**. See `lab-assignment-conventions.md` §3.
 - **Challenges** (`type: "challenge"`) — `script.js` ships **fully empty** (zero bytes); no header, no lets, no skeleton, no breadcrumbs. The student structures the entire program themselves. See `q5play-challenge-conventions.md` §4.
 
@@ -190,6 +191,12 @@ This isn't something the lesson author configures — it's what the in-app works
 - **Console log** sits below the editor/preview split inside its own `<details>` block (summary = "Console"). Students can expand it when they want to see `console.log` output or errors; collapsed by default so the editor + preview have maximum vertical room.
 - **Drawer is drag-resizable.** A 6px grab handle sits on the panel's left edge; dragging adjusts width within `[240, 600]` and persists to `shCode:drawer:width`. The body's right padding reflows with `--shd-tabbed` so the editor area shrinks to make room. Authors should still **not assume a fixed viewport** when writing requirement descriptions: students may have the drawer open at near-max width on a small laptop, leaving the editor + preview narrow. Requirement `title` + `description` should read cleanly at the narrow end.
 - **Bottom progress footer** (`components/LessonProgressFooter.tsx`) is fixed to the bottom of the viewport on every lesson page — module link, lesson position, completion dots, percentage. The body reserves bottom space (`body:has(.lesson-progress-footer) { padding-bottom: 60px }`) so the expanded console isn't covered by it.
+- **Green-to-advance lesson lock.** A student can only navigate forward to the next lesson once the current one is `lesson_state === 'completed'`. Three places enforce this:
+  - `components/HeaderLessonNav.tsx` — the **Next** link in the header chrome shows 🔒 + `cursor: not-allowed` until current is completed. Prev stays open for review.
+  - `components/LessonProgressFooter.tsx` — dots past the first not-completed lesson render as non-clickable `<span>`s with the same locked styling.
+  - `components/ModuleLessonsList.tsx` — on the module page, lessons after the first not-completed one render as non-Link `<div>` rows with a "🔒 Locked" pill and `aria-disabled="true"`.
+
+  Already-started, current, and previously-completed lessons all stay reachable. The unlocking rule is linear: a lesson at index `i` is unlocked iff every prior lesson in module order has `lesson_state === 'completed'`.
 
 Reset restores the starter `script.js` — warn students in a requirement `description` if you want them to iterate experimentally.
 
@@ -237,8 +244,13 @@ Examples:
 rg "reference path=.*q5play\\.d\\.ts" lessons/
 
 # graded starters should have empty setup/draw bodies (visual spot-check):
-# for each lessons/<slug>/ where lesson.json.grading.totalPoints > 0,
+# for each lessons/<slug>/ where lesson.json has `requirements[]`,
 # confirm script.js has only // STEP comments inside the function bodies.
+
+# all points must be 0 — points are deprecated; flag any non-zero values:
+rg '"points":\s*[1-9]'    lessons/
+rg '"totalPoints":\s*[1-9]' lessons/
+rg '"passingScore":\s*[1-9]' lessons/
 
 # hints should be generic docs pointers (no specific signatures / values):
 # grep for common tell-tales of answer-leaking hints:
@@ -262,3 +274,4 @@ rg '"hints":\s*\[[^\]]*=\s*['"'"'"]'             lessons/    # leaks a literal v
 | Right-side panel consolidation | Retired the separate left sidebar (Files / Grading) and the auto-opening `Q5DocsDrawer` in favor of a single right-edge `TabbedRightDrawer` carrying **Docs / Quest / File** tabs. Drawer starts closed on every lesson (no auto-open); students click a vertical tab on the right edge to open the shared panel. State persists under `shCode:drawer:active` + `shCode:drawer:width` (240–600, default 320), replacing the old `shCode:sidebar:width` and `shCode:q5docs:*` keys. §1 field-by-field updated ("the Quest tab" replaces "the sidebar" / "the Grading tab"); §2 hints rule updated (Docs is one click away, not auto-open); §5 fully rewritten to describe the three tabs, the closed-by-default behavior, and the bottom `LessonProgressFooter`. |
 | Scaffold variants split | §3 "Exceptions" renamed to "Variants" and split out the per-`type` rules: `lesson` ships a description-only scaffold (canonical), `assignment` ships the same scaffold shape but with the **describe-don't-show** rule made explicit (`// STEP N:` comments must not contain commented-out solution code — see `lab-assignment-conventions.md` §3), and `challenge` ships **fully empty** per `q5play-challenge-conventions.md` §4. The stale "Challenge shells with `BUILD THIS:` blocks" entry was removed — that pre-2.2 pattern is retired everywhere. |
 | Difficulty tiers slot-type | `difficulty` field now encodes the lesson/lab/challenge progression rather than absolute content difficulty: practice (`type: "lesson"`) is `"beginner"`, lab (`type: "assignment"`) is `"intermediate"`, challenge (`type: "challenge"`) is `"advanced"`. §1 field-by-field updated. Sister conventions `lab-assignment-conventions.md` and `q5play-challenge-conventions.md` carry the matching rule. |
+| No-points + green-to-advance | The course is now mastery-based, not score-based. **All `points`, `totalPoints`, and `passingScore` values must be `0`** — the all-green Submit gate is the only criterion. §1 JSON example zeroed out; §1 field-by-field reframes the three numeric fields as decorative-must-be-zero. §3 dropped "totalPoints > 0" framing. §5 added the green-to-advance lesson-nav lock (header next-link, footer dots, module-page list — all gated on prior lesson `lesson_state === 'completed'` per `components/HeaderLessonNav.tsx`, `LessonProgressFooter.tsx`, `ModuleLessonsList.tsx`). Audit grep added at §Auditing. Retrofit pass zeroed all `lessons/2-1-*` / `2-2-*` / `2-3-*` / `2-4-*` lesson.json files. Sister conventions `lab-assignment-conventions.md`, `q5play-challenge-conventions.md`, and `sub-module-spec-conventions.md` carry matching updates. |

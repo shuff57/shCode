@@ -28,7 +28,7 @@ Labs ship **scaffolded** — `script.js` has a header comment, top-level `let` d
   "slos": ["SLO-<n>"],
   "steps": [ ... ],
   "requirements": [ ... ],
-  "grading": { "totalPoints": <n>, "passingScore": <n>, "allowLateSubmit": true }
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
 }
 ```
 
@@ -39,8 +39,7 @@ Labs ship **scaffolded** — `script.js` has a header comment, top-level `let` d
 - `estimateMins` — labs are the 30–60 min bucket. Shorter = challenge; longer = project/capstone.
 - `steps` — author-side documentation. **Not currently rendered in the student UI** (the Quest tab shows `requirements[]`, see `q5play-lesson-conventions.md` §5). Each `step.id` should still correspond to the matching `// STEP N:` comment in `script.js` so the scaffold's structure mirrors the spec.
 - `requirements` — **strict**. Each requirement checks a specific pattern the student must produce. Use `type: "regex"` for anywhere-in-file checks and `type: "inFunction"` for per-function-body checks.
-- `grading.totalPoints` — sum of all `requirements[].points`. Verify by hand.
-- `grading.passingScore` — **does not gate Submit on labs** (labs are q5 lessons; Submit is locked until every requirement is green — see `q5play-lesson-conventions.md` §1 + §5). It only feeds the SubmitDialog's "below passing" warning, which can never fire for q5. Set it to `totalPoints` for new labs so the field reads as truthful; existing files using ~66–75% still work and don't need migration.
+- `grading.totalPoints` / `grading.passingScore` / `requirements[].points` — **always `0`.** The course is mastery-based: Submit is gated all-green (every requirement passed), not points-based. Keep the fields for schema compatibility; never assign a non-zero value. See `q5play-lesson-conventions.md` §1 field-by-field + §5 (green-to-advance lock).
 
 ### Requirement types
 
@@ -138,5 +137,6 @@ Examples:
 | Unit 2.1 buildout | Lab pattern crystallized in `2-1-9-a10-1-sprite-playground`. |
 | This doc | Hoisted out of per-module specs. |
 | Q5 Submit-gate alignment | `grading.passingScore` no longer gates Submit on labs (labs are q5 lessons; the all-green rule applies — see `q5play-lesson-conventions.md` §5). §1 field-by-field rewritten to recommend setting `passingScore` to `totalPoints` for new labs and to flag the field as decorative; §5 Don'ts dropped the obsolete "Do not set `passingScore === totalPoints`" rule. UI behavior is unchanged — labs share the q5 lesson workspace (right-edge `TabbedRightDrawer` with Docs/Quest/File tabs, criteria-progress header, toolbar Submit) described in `q5play-lesson-conventions.md` §5. |
+| No-points + green-to-advance | All `points`, `totalPoints`, and `passingScore` values must be `0`. §1 JSON shape + field-by-field rewritten — points fields are now decorative-must-be-zero. The all-green Submit gate is the only criterion. The next lesson stays locked until current is `lesson_state.completed` per `q5play-lesson-conventions.md` §5. |
 | Describe-don't-show scaffold rule | Codified the line between an honest scaffold and an answer-key scaffold: **`// STEP N:` comments describe the task in plain English; commented-out lines that contain runnable solution code are not allowed.** §1 / §2 / §3 / §5 rewritten with examples. The `type: "challenge"` lessons remain fully empty per `q5play-challenge-conventions.md` §4 — the empty/scaffold split is what distinguishes challenges from labs. Established precedent: `2-2-11-a12-1-collectible/script.js` is the canonical scaffold (`// STEP N:` comments in plain English, empty bodies). `2-1-9-a10-1-sprite-playground/script.js` is empty — known inconsistency from before this rule landed. |
 | Difficulty tiers slot-type | Labs `difficulty` field is now `"intermediate"` — one rung above practice q5 lessons (`"beginner"`) and one rung below challenges (`"advanced"`). §1 JSON shape + field-by-field updated. Sister conventions `q5play-lesson-conventions.md` and `q5play-challenge-conventions.md` carry the matching rule. Audit pass on existing unit-2 labs (2.1.10, 2.2.11, 2.3.20) bumped `"beginner"` → `"intermediate"`. |

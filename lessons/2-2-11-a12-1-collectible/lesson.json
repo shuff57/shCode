@@ -37,11 +37,11 @@
     }
   ],
   "requirements": [
-    { "id": "r1", "title": "Class defined", "description": "A `Collectible` class exists.", "type": "regex", "file": "script.js", "pattern": "class\\s+Collectible\\s*\\{", "flags": "", "points": 8 },
-    { "id": "r2", "title": "Constructor present", "description": "The class has a constructor.", "type": "regex", "file": "script.js", "pattern": "constructor\\s*\\(", "flags": "", "points": 6 },
-    { "id": "r3", "title": "collect() method", "description": "A collect method exists in the class.", "type": "regex", "file": "script.js", "pattern": "collect\\s*\\(\\s*\\)", "flags": "", "points": 6 },
-    { "id": "r4", "title": "At least one instance", "description": "At least one Collectible is instantiated.", "type": "regex", "file": "script.js", "pattern": "new\\s+Collectible\\s*\\(", "flags": "", "points": 6 },
-    { "id": "r5", "title": "Overlap detection", "description": "The code checks for overlap between player and a sprite.", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "\\.overlaps\\s*\\(", "flags": "", "points": 4 }
+    { "id": "r1", "title": "Class defined", "description": "A `Collectible` class exists.", "type": "regex", "file": "script.js", "pattern": "class\\s+Collectible\\s*\\{", "flags": "", "points": 0 },
+    { "id": "r2", "title": "Constructor present", "description": "The class has a constructor.", "type": "regex", "file": "script.js", "pattern": "constructor\\s*\\(", "flags": "", "points": 0 },
+    { "id": "r3", "title": "collect() method", "description": "A collect method exists in the class.", "type": "regex", "file": "script.js", "pattern": "collect\\s*\\(\\s*\\)", "flags": "", "points": 0 },
+    { "id": "r4", "title": "At least one instance", "description": "At least one Collectible is instantiated.", "type": "regex", "file": "script.js", "pattern": "new\\s+Collectible\\s*\\(", "flags": "", "points": 0 },
+    { "id": "r5", "title": "Overlap detection", "description": "The code checks for overlap between player and a sprite.", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "\\.overlaps\\s*\\(", "flags": "", "points": 0 }
   ],
-  "grading": { "totalPoints": 30, "passingScore": 20, "allowLateSubmit": true }
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
 }

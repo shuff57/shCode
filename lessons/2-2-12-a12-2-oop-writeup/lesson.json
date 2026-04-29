@@ -10,7 +10,7 @@
   "preview": "assignment",
   "week": 12,
   "slos": ["SLO-2"],
-  "points": 10,
+  "points": 5,
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Procedural vs OOP — AI-graded rubric",
@@ -22,25 +22,25 @@
         "id": "q1-definitions",
         "title": "Q1: Both terms defined in own words",
         "description": "Student defines procedural programming (code as a sequence of instructions, top-to-bottom or function-based flow) AND OOP (organizing code into classes/objects that bundle data and behavior) clearly and in their own words. Full credit requires both definitions to be accurate and personal. Half credit if one is clear and one is vague. Zero if definitions are missing or appear copied.",
-        "points": 2
+        "points": 1
       },
       {
         "id": "q2-proc-example",
         "title": "Q2: Specific Q1 procedural example named",
         "description": "Student names a specific Q1 assignment (by name or description) and provides a 1–2 sentence description of how it used a procedural approach. Full credit requires a specific reference — not a generic statement like 'I used procedural code in Q1.' Half credit for a vague but plausible reference. Zero for no example.",
-        "points": 2
+        "points": 1
       },
       {
         "id": "q3-oop-example",
         "title": "Q3: Specific q5play OOP example named",
         "description": "Student names a specific class from their q5play code (e.g., Collectible, Player, Enemy) and describes how that class organized their code — what properties and methods it contained, or how it reduced repetition. Full credit requires naming the class and explaining the organizational benefit. Half credit for a generic reference to using a class. Zero for no specific example.",
-        "points": 2
+        "points": 1
       },
       {
         "id": "q4-oop-wins",
         "title": "Q4: OOP-wins scenario with reasoning",
         "description": "Student describes a specific scenario (real or hypothetical) where OOP is clearly the better approach and explains WHY using at least one of: readability (code is easier to understand), extensibility (easy to add more objects/types), or separation of data and behavior (object owns its own state). Full credit (3 pts) for a specific scenario plus 2–3 clear reasons. Partial credit (1–2 pts) for a specific scenario with only one reason or vague reasoning. Zero for a generic or missing response.",
-        "points": 3
+        "points": 1
       },
       {
         "id": "writing-clarity",
@@ -50,7 +50,7 @@
       }
     ]
   },
-  "grading": { "totalPoints": 10, "passingScore": 6, "allowLateSubmit": true },
+  "grading": { "totalPoints": 5, "passingScore": 5, "allowLateSubmit": true },
   "steps": [],
   "requirements": []
 }

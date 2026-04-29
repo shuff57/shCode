@@ -1,13 +1,11 @@
-Write your response in the box below. Short, clear answers are fine — full paragraphs not required. The rubric below shows what the grader is looking for.
+Write your response in the box below. Short, clear answers are fine — full paragraphs not required. Every criterion in the rubric below must be met for the lesson to count as complete.
 
 ---
 
-## Rubric (5 pts)
+## Rubric
 
-| Criterion | Pts |
-|-----------|-----|
-| Q1: setup() vs draw() explained in your own words | 2 |
-| Q2: 60 fps math shown — 1-second and 5-second distances, canvas-crossing time | 2 |
-| Q3: One sensible reason for using velocity instead of direct position | 1 |
-
-**Full credit = 5.** Partial credit awarded for each question independently.
+| # | Criterion |
+|---|-----------|
+| 1 | Q1: setup() vs draw() explained in your own words |
+| 2 | Q2: 60 fps math shown — 1-second and 5-second distances, canvas-crossing time |
+| 3 | Q3: One sensible reason for using velocity instead of direct position |

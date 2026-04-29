@@ -31,6 +31,17 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
   const done = lessons.filter((l) => snap.states[l.id] === 'completed').length;
   const pct = Math.round((done / lessons.length) * 100);
 
+  // Linear progression: a dot is clickable iff every prior lesson is
+  // completed. Unauthed (snap.loaded === false on the server) defaults
+  // to "all unlocked" until state loads — avoids hydration churn.
+  const firstUnlocked = (() => {
+    if (!snap.loaded) return lessons.length;
+    for (let i = 0; i < lessons.length; i++) {
+      if (snap.states[lessons[i].id] !== 'completed') return i;
+    }
+    return lessons.length;
+  })();
+
   return (
     <div
       className="lesson-progress-footer"
@@ -74,35 +85,50 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
           overflowX: 'auto',
         }}
       >
-        {lessons.map((l) => {
+        {lessons.map((l, i) => {
           const isCurrent = l.id === currentLessonId;
           const state = snap.states[l.id];
           const isDone = state === 'completed';
           const isStarted = state === 'started';
+          const isLocked = i > firstUnlocked && !isCurrent;
           const borderColor = isDone
             ? '#50fa7b'
             : isStarted
             ? '#f1fa8c'
+            : isLocked
+            ? '#2a2d3a'
             : '#44475a';
           const background = isCurrent
             ? '#ff79c6'
             : isDone
             ? '#50fa7b'
             : 'transparent';
-          return (
+          const dotStyle: React.CSSProperties = {
+            width: 14,
+            height: 14,
+            borderRadius: '50%',
+            background,
+            border: `2px solid ${borderColor}`,
+            flexShrink: 0,
+            opacity: isLocked ? 0.4 : 1,
+            cursor: isLocked ? 'not-allowed' : undefined,
+          };
+          const titleText = `${l.numberedId} ${l.displayTitle}${isDone ? ' (complete)' : isStarted ? ' (in progress)' : ''}${isCurrent ? ' (current)' : ''}${isLocked ? ' (locked — get a green to unlock)' : ''}`;
+          return isLocked ? (
+            <span
+              key={l.id}
+              title={titleText}
+              aria-label={`${l.numberedId} ${l.displayTitle} (locked)`}
+              aria-disabled="true"
+              style={dotStyle}
+            />
+          ) : (
             <Link
               key={l.id}
               href={`/lesson/${l.id}`}
-              title={`${l.numberedId} ${l.displayTitle}${isDone ? ' (complete)' : isStarted ? ' (in progress)' : ''}${isCurrent ? ' (current)' : ''}`}
+              title={titleText}
               aria-label={`${l.numberedId} ${l.displayTitle}`}
-              style={{
-                width: 14,
-                height: 14,
-                borderRadius: '50%',
-                background,
-                border: `2px solid ${borderColor}`,
-                flexShrink: 0,
-              }}
+              style={dotStyle}
             />
           );
         })}
