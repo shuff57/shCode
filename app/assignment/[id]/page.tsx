@@ -1,6 +1,8 @@
 import LessonWorkspace from '../../../components/LessonWorkspace';
 import ContentLessonView from '../../../components/ContentLessonView';
+import LessonAccessGate from '../../../components/LessonAccessGate';
 import { getLesson, loadLessons } from '../../../lib/lessons';
+import { getModule } from '../../../lib/curriculum';
 
 export async function generateStaticParams() {
   const lessons = await loadLessons();
@@ -17,8 +19,22 @@ export default async function AssignmentPage({
 
   if (!lesson) return <div className="p-4">Assignment not found</div>;
 
-  if (lesson.aiGrader) {
-    return <ContentLessonView lesson={lesson} />;
-  }
-  return <LessonWorkspace lesson={lesson} mode="assignment" />;
+  const numMatch = lesson.title.match(/^(\d+)\.(\d+)\.\d+/);
+  const moduleId = numMatch ? `${numMatch[1]}.${numMatch[2]}` : null;
+  const mod = moduleId ? await getModule(moduleId) : null;
+  const siblingIds = mod ? mod.lessons.map((l) => l.id) : [];
+
+  const body = lesson.aiGrader
+    ? <ContentLessonView lesson={lesson} />
+    : <LessonWorkspace lesson={lesson} mode="assignment" />;
+
+  return (
+    <LessonAccessGate
+      currentLessonId={lesson.id}
+      siblings={siblingIds}
+      moduleId={moduleId}
+    >
+      {body}
+    </LessonAccessGate>
+  );
 }

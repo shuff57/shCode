@@ -1,6 +1,7 @@
 import LessonWorkspace from '../../../components/LessonWorkspace';
 import ContentLessonView from '../../../components/ContentLessonView';
 import LessonProgressFooter from '../../../components/LessonProgressFooter';
+import LessonAccessGate from '../../../components/LessonAccessGate';
 import { getLesson, loadLessons } from '../../../lib/lessons';
 import { getModule } from '../../../lib/curriculum';
 
@@ -39,18 +40,21 @@ export default async function LessonPage({
     />
   ) : null;
 
+  const siblingIds = mod ? mod.lessons.map((l) => l.id) : [];
   const isContentPreview = lesson.preview && CONTENT_PREVIEWS.has(lesson.preview);
-  if (isContentPreview || lesson.aiGrader) {
-    return (
-      <>
-        <ContentLessonView lesson={lesson} />
-        {footer}
-      </>
-    );
-  }
+  const body = isContentPreview || lesson.aiGrader
+    ? <ContentLessonView lesson={lesson} />
+    : <LessonWorkspace lesson={lesson} />;
+
   return (
     <>
-      <LessonWorkspace lesson={lesson} />
+      <LessonAccessGate
+        currentLessonId={lesson.id}
+        siblings={siblingIds}
+        moduleId={moduleId}
+      >
+        {body}
+      </LessonAccessGate>
       {footer}
     </>
   );
