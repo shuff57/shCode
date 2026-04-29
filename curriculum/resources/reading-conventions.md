@@ -11,6 +11,8 @@ etc.). When a module spec under `curriculum/modules/lessons/*.md` lists a
 
 **Canonical example:** `lessons/2-1-2-reading-canvas-sprite/`.
 
+**Scope (intro-level units):** A reading owns exactly one glossary term, syntactic form, or atomic concept. If you're tempted to cover two, split into two readings. See §2a in `sub-module-spec-conventions.md` for the granularity bar.
+
 ---
 
 ## 1. Required `lesson.json` shape

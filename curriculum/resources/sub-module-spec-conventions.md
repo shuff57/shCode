@@ -39,10 +39,10 @@ status: draft|ready|shipped
 
 ## 2. Required sections, in order
 
-1. **Header banner** — one or two block-quote lines stating the week, hours, environment, and SLO focus.
-2. **Context** — 1–3 paragraphs of *why this sub-module exists* + a `**Do NOT:**` bulleted list of pedagogical anti-patterns (the things teachers regret when they ignore them).
-3. **Learning Objectives** — numbered list ("Students will be able to: 1. … 2. …"). 4–7 items.
-4. **Topics Covered** — bulleted list of concepts and APIs introduced (no rubric content here — that's §Assignments).
+1. **Header banner** — one or two block-quote lines stating the week, hours, environment, and SLO focus. For intro-level units, include a third line stating the granularity bar ("each lesson ships exactly one new concept"). See §2a.
+2. **Context** — 1–3 paragraphs of *why this sub-module exists* + a `**Do NOT:**` bulleted list of pedagogical anti-patterns (the things teachers regret when they ignore them). For intro-level units, the Context block must also state the audience explicitly and reference the granularity bar (§2a).
+3. **Learning Objectives** — numbered list ("Students will be able to: 1. … 2. …"). 4–7 items for advanced units; 8–12 items typical for intro-level units (one objective per atomic concept the unit owns).
+4. **Topics Covered** — bulleted list of concepts and APIs introduced (no rubric content here — that's §Assignments). For intro-level units, **each bullet is a single atomic concept and corresponds 1:1 to a Numbered Lesson List slot** (§3.3). Group bullets under bold sub-headers when helpful (e.g. *Vocabulary*, *Methods, by shape*) but do not merge two concepts into one bullet.
 5. **Prerequisites** — bullet list of prior sub-modules + cross-unit prereqs (e.g. "Q1 W8 arrays comfortable").
 6. **Environment Setup** — anything beyond "standard q5play setup" (projector tabs, handouts, supporting tools).
 7. **Videos** — table per §3.1.
@@ -55,7 +55,31 @@ status: draft|ready|shipped
 14. **Vocabulary** — 5–10 row table `Term | Definition`. Doubles as the source rows for the closing glossary in matching reading lessons.
 15. **Teacher Notes** — bullet list of pacing tips, common student bugs, retention rules (for SLO-evidence artifacts).
 16. **Numbered Lesson List** — per §3.3. **This is the build target** — Claude reads this section when the user says "build 2.X.Y."
-17. **Status** — one bullet matching the YAML `status` field.
+17. **Lab and Reading Specs (per-lesson detail)** — required for intro-level units that use the §2a one-concept-per-lesson rule. One block per net-new lesson in the Numbered Lesson List, giving the single concept isolated, the starter shape (for q5play labs) or try-it shape (for readings), and the pass criterion. Lets each lesson be authored independently from this section without re-reading the rest of the spec. Optional for advanced units where each Numbered Lesson List row is self-explanatory.
+18. **Status** — one bullet matching the YAML `status` field.
+
+## 2a. Granularity bar (intro-level units)
+
+For introductory-level units — units where most students are seeing a category of concept (OOP, recursion, async, etc.) for the first time — the spec MUST follow the **one new concept per lesson** rule.
+
+**Definition.** A "new concept" is anything a student would have to be *told* (vocabulary), *shown* (a syntactic form, a runtime behavior), or *practiced in isolation* (e.g. "method that returns a value" is a different concept from "method with no params" because each requires its own first-encounter practice). If a lesson would introduce ≥2 such concepts, **split it**.
+
+**How to apply when authoring a spec:**
+
+1. List every atomic concept the sub-module owns. Do this *before* deciding lesson count.
+2. Allocate one Numbered Lesson List slot per concept. Most slots will be 5–10 minute readings or 1-step q5play labs.
+3. Vocabulary lessons come *before* any "write code from scratch" lesson on the same concept. Reading and try-it labs may pair (one concept can occupy a `reading` slot followed by a `lab` slot that practices it), but each slot still owns one concept.
+4. Reserve at most one "integration" lesson per session — the lesson that composes prior atomic concepts (typically a `worked example` or a `q5play (assignment)`). The integration lesson is the *only* place compound demonstrations appear.
+5. Pacing impact: intro-level units typically run 20–30 lessons across 3 sessions. Treat session count as a function of concept count, not the other way around.
+
+**How to apply when reviewing a spec:**
+
+- For each Numbered Lesson List row: ask "what is the single new concept this lesson teaches?" If the answer requires "and" or "plus", the row should be split.
+- For each `reading` row: confirm the corresponding §17 Lab/Reading Spec block names *one* glossary term or syntactic form being introduced. Multi-concept readings get split into multiple rows even if they share a `content.md` source.
+
+**Why.** Bundling concepts is the most common shCode authoring mistake on intro-level material — readings that try to cover class + instance + `new` + constructor + `this` + properties + methods in one go ("JavaScript classes — comprehensive intro") leave students with vocabulary they can't use because they never practiced it in isolation. The granularity bar is a hard rule for intro material, not a guideline.
+
+**Where this rule does not apply.** Advanced units (assumed prior comfort with the concept category — e.g. a unit on "advanced React patterns" for students who already know React) may bundle. State the bundling explicitly in the spec's Context block when doing so.
 
 ## 3. Per-section specifics
 
@@ -159,15 +183,16 @@ Example:
 Every `lessons/<slug>/` folder name (which is also `lesson.json.id`) MUST follow:
 
 ```
-<U>-<M>-<L>-<descriptor>
+<U>-<M>-<L>[<letter>]-<descriptor>
 ```
 
 - `<U>` = unit number (e.g. `2`)
 - `<M>` = module number within the unit (e.g. `3`)
 - `<L>` = sequential lesson position within the unit-module (e.g. `5`)
+- `<letter>` = optional lowercase a–z, used **only** for retroactive granularity inserts (§4.1). Net-new units do not use letters.
 - `<descriptor>` = kebab-case content hint (e.g. `groups-sandbox`, `reading-classes`, `a13-1-asteroid-field`)
 
-**Why this format:** the `<U>-<M>-<L>` triple is what the database, the `parseNumberedIdFromTitle` helper, and the teacher reading the slug all use to locate the lesson within the curriculum. The descriptor exists for human readability.
+**Why this format:** the `<U>-<M>-<L>` triple is what the database, the `parseNumberedIdFromTitle` helper, and the teacher reading the slug all use to locate the lesson within the curriculum. The descriptor exists for human readability. The optional `<letter>` is supported by the parser regex (`/^(\d+\.\d+\.\d+[a-zA-Z]?)/`) and by the `localeCompare(... { numeric: true })` sort, so `2.2.3 < 2.2.3a < 2.2.3b < 2.2.4` orders correctly without code changes.
 
 **Examples:**
 
@@ -178,10 +203,33 @@ Every `lessons/<slug>/` folder name (which is also `lesson.json.id`) MUST follow
 | `2-3-5-groups-sandbox` | `2.3.5 Groups Sandbox` | q5play (lesson) |
 | `2-3-11-a13-1-asteroid-field` | `2.3.11 A13.1 Asteroid Field` | q5play (assignment) |
 | `2-3-12-challenges` | `2.3.12 Challenges — Optional Stretch` | q5play (challenge) |
+| `2-2-3a-reading-new-operator` | `2.2.3a Reading — The \`new\` operator` | reading (granularity insert under 2.2.3) |
+| `2-2-7b-lab-method-no-params` | `2.2.7b Lab — Method with no params` | q5play (lesson) (granularity insert under 2.2.7) |
 
 **For a graded artifact (`A<W>.<N>`)** include the artifact id in the descriptor (e.g. `a13-1-asteroid-field`, `a14-1-space-jumper`) so the slug self-documents its grading-system identity.
 
 **Slug rename ⇒ data loss.** Renaming the folder changes `lesson.json.id`, which breaks the foreign-key that `commits` / `lesson_state` / `lesson_drafts` / `lesson_submissions` tables hold against the old id. The §3.4 migration notes MUST flag this when the lesson has shipped.
+
+### 4.1 Sub-letter slugs (granularity inserts)
+
+The optional `<letter>` suffix exists for **retroactive granularity inserts** — adding new lessons under an existing integer slot in a shipped unit, without renaming the slugs that the database already holds foreign keys against.
+
+**When to use a sub-letter slug:**
+
+- Splitting a shipped multi-concept lesson into atomic ones per the §2a granularity bar, *and* the original slug already has student commits / progress / drafts in production. Renaming would be data-destructive (§3.4).
+- Inserting a new atomic concept between two shipped integer slots when re-numbering those slots is also data-destructive.
+
+**When NOT to use a sub-letter slug:**
+
+- Authoring a new unit from scratch. Use sequential integer slots only — sub-letters are for retro work.
+- Pre-launch units with no student data yet. Renumber instead; integer-only slugs are simpler.
+- More than ~6 inserts under a single integer slot. If you need 2.2.7a through 2.2.7h, that is a sign the unit needed integer renumbering and you took the retro path because launch already happened — flag it in the spec's Context for future cleanup.
+
+**Pedagogical attachment.** A sub-letter slug attaches conceptually to its integer parent: 2.2.3a, 2.2.3b, 2.2.3c are *expansions of the topic* that 2.2.3 introduces. They share teacher framing, vocabulary, and source material; they do not introduce a new top-level topic. If you find a sub-letter row introducing a topic unrelated to its parent, promote it to a fresh integer slot instead.
+
+**Numbered Lesson List shape.** Sub-letter rows appear in the Numbered Lesson List immediately after their integer parent, in alphabetical order, and the row's "Notes" column states "new" or names the trim/reposition relative to the parent. Example pattern is the canonical `2.2.1_classes-via-q5play.md` post-granularity revision.
+
+**No code change required.** The parser at `lib/curriculum.ts:111` already accepts `[a-zA-Z]?` after the third dotted integer; sort is already `{ numeric: true }`. Adding sub-letter slugs needs no migration and no helper update.
 
 ## 5. Don'ts
 
@@ -212,3 +260,4 @@ When updating an existing spec for a build pass: §3.3 (Numbered Lesson List) is
 | Pre-2.2 | Each sub-module spec ended with a "Build Outputs (what Builder AI generates)" section listing 3-5 markdown deliverables (assignment doc + video manifest + lesson metadata updates). The actual 2.2 build produced 12 numbered in-app lessons; the spec section never matched what shipped. |
 | Post-2.2 / unit-2.3 prep | Spec convention codified (this doc). Required: §3.3 Numbered Lesson List replacing the legacy Build Outputs section, §3.2 Reading content guidance per reading, §3.1 Description-hook column on videos, §3.4 Carry-over migration notes per pre-existing slug. Slug naming rule §4 made explicit (`<U>-<M>-<L>-<descriptor>`) and tied to the DB / `parseNumberedIdFromTitle` constraints. |
 | No-points + green-to-advance | The course is now mastery-based. §1 frontmatter `artifacts[]` shape dropped the `points: <n>` field. §2 Required Sections #13 (Assignments) reframed: rubrics must use pass-criteria language, not point columns. §3.4 migration example updated to require `passingScore` AND `totalPoints` AND every `requirements[].points` to be `0`. The convention violation list at §3.4 now treats any non-zero point value as a violation. See `q5play-lesson-conventions.md` for the canonical wording and the green-to-advance lesson-nav lock. |
+| Granularity for intro-level units | §2a added: "one new concept per lesson" rule for intro-level material. §2 Required Sections gained #17 Lab/Reading Specs (per-lesson detail) for intro units. §4 slug rule now permits an optional lowercase `<letter>` suffix for retroactive granularity inserts under shipped integer slots (§4.1). The 2.2 OOP unit was the first to apply the granularity bar retroactively — its 13 shipped lessons were preserved by slug, with 13 new sub-letter inserts (2.2.3a, 2.2.3b, 2.2.4a–d, 2.2.5, 2.2.5a, 2.2.7a–h, 2.2.8a–c, 2.2.10a, 2.2.12a) splitting the dense readings and the Enemy-class worked example into atomic concept lessons. See `2.2.1_classes-via-q5play.md` for the canonical example. |

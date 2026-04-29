@@ -9,6 +9,8 @@ Canonical rules for **graded q5play lessons** — the core "build a running sket
 
 **Canonical example:** `lessons/q5play-intro/` (2.1.5 Hello Sprite).
 
+**Scope (intro-level units):** A practice q5 lesson exercises exactly one new concept in isolation. If completing a step requires two new concepts, split the lesson (or move the second concept to a preceding reading/lesson). Integration of multiple prior concepts belongs in the unit's Axxy `q5play (assignment)` slot — see `lab-assignment-conventions.md`, not here. See §2a in `sub-module-spec-conventions.md` for the granularity bar.
+
 ---
 
 ## 1. Required `lesson.json` shape

@@ -1,0 +1,66 @@
+{
+  "id": "2-1-7d-lab-else-to-zero",
+  "title": "2.1.7d Lab — Delete the else, watch drift",
+  "description": "Start from a working WASD movement pattern, delete the two else lines, observe drift, then restore them.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.1 Foundations",
+  "preview": "q5play",
+  "week": 10,
+  "slos": ["SLO-3"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run as-is and confirm movement stops",
+      "instructions": "Click Run (or the preview area). Hold a WASD key — the sprite moves. Release — it stops. Confirm the else-to-zero rule is working.",
+      "hints": ["Open the q5play docs drawer on the right and find the Sprite velocity section."]
+    },
+    {
+      "id": "s2",
+      "title": "Delete the two else lines",
+      "instructions": "Find the two lines that say `else player.vel.x = 0;` and `else player.vel.y = 0;`. Delete both lines, then click Run.",
+      "hints": ["Look in draw() for the lines starting with `else` that set vel to 0."]
+    },
+    {
+      "id": "s3",
+      "title": "Tap a key once and watch the sprite drift",
+      "instructions": "Click the preview to focus it. Tap one WASD key briefly and release. Watch what happens — the sprite keeps moving because vel was never reset.",
+      "hints": ["The sprite drifts because velocity is not automatically reset between frames."]
+    },
+    {
+      "id": "s4",
+      "title": "Restore the else lines",
+      "instructions": "Put both else lines back so the sprite stops when no key is held. The grader checks that both `else player.vel.x = 0` and `else player.vel.y = 0` are present in draw().",
+      "hints": ["Open the q5play docs drawer on the right and review the velocity section for the correct pattern."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Restore else player.vel.x = 0",
+      "description": "The draw() function must contain an else branch that sets player.vel.x to 0, so the sprite stops horizontally when no key is held.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "else\\s+player\\.vel\\.x\\s*=\\s*0",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "Restore else player.vel.y = 0",
+      "description": "The draw() function must contain an else branch that sets player.vel.y to 0, so the sprite stops vertically when no key is held.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "else\\s+player\\.vel\\.y\\s*=\\s*0",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}
