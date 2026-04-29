@@ -1,3 +1,5 @@
+*You've now built each of these pieces in isolation: a constructor (2.2.3b), properties (2.2.4a–d), `this` (2.2.5–5a), each method shape (2.2.7a–e), composition (2.2.7f–g), and cleanup (2.2.7h). This lesson assembles them into one class.*
+
 **Goal:** Write your first class from scratch. Prove the constructor creates per-instance state and that methods can reach that state via `this`.
 
 ## Step 1 — Stub the class and instantiate it

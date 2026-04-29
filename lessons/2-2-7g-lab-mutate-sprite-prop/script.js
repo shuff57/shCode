@@ -1,0 +1,25 @@
+// 2.2.7g Lab — Mutate this.sprite.x from a method.
+
+class Mover {
+  constructor(x, y) {
+    this.sprite = new Sprite(x, y, 30, 30);
+    this.sprite.color = 'deepskyblue';
+  }
+
+  // STEP 1: Write moveRight(dx) that adds dx to this.sprite.x.
+  //   Reach through the composition: this.sprite is the q5play Sprite;
+  //   this.sprite.x is that sprite's horizontal position.
+  //   Adding dx to it moves the sprite to the right.
+}
+
+let m;
+
+function setup() {
+  new Canvas(400, 200);
+  m = new Mover(50, 100);
+}
+
+function draw() {
+  background('#222');
+  if (kb.pressing('right')) m.moveRight(2);
+}

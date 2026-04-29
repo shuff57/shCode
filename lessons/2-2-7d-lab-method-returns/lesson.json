@@ -1,0 +1,35 @@
+{
+  "id": "2-2-7d-lab-method-returns",
+  "title": "2.2.7d Lab — Method that returns a value",
+  "description": "Add `Counter.isHigh()` which returns `true` when `this.n > 10`. The driver uses the return value to color the display red.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.2 Object-Oriented Programming",
+  "preview": "q5play",
+  "week": 12,
+  "slos": ["SLO-2", "SLO-3"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write the isHigh() method",
+      "instructions": "Inside the `Counter` class body, write an `isHigh()` method that returns `true` if `this.n` is greater than 10, and `false` otherwise. The driver already uses `c.isHigh()` to turn the number red — you supply the method.",
+      "hints": ["Open the q5play docs drawer on the right — methods that return values use the `return` keyword just like regular functions."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "isHigh() returns a comparison of this.n",
+      "description": "Write `isHigh()` inside `Counter` — it must use `return` and compare `this.n > 10`.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "isHigh[\\s\\S]*return\\s+this\\.n\\s*>",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

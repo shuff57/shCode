@@ -1,10 +1,9 @@
 {
-  "id": "q5play-sprite-showcase",
-  "title": "2.2.6a Worked Example — Sprite Showcase",
-  "description": "A tour of the Sprite class re-read as OOP. Every `new Sprite(...)` is a constructor call; every `.color` / `.stroke` is a property on an instance.",
+  "id": "2-2-5a-example-this-pronoun",
+  "title": "2.2.5a Worked Example — `this` is a pronoun",
   "type": "lesson",
   "difficulty": "beginner",
-  "estimateMins": 12,
+  "estimateMins": 8,
   "category": "Unit 2: q5play — Applied Game Development",
   "unit": "2.2 Object-Oriented Programming",
   "preview": "example",

@@ -1,7 +1,7 @@
 {
   "id": "2-2-3-reading-classes",
-  "title": "2.2.3 Reading — JavaScript classes",
-  "description": "A short reading on JavaScript class syntax: `constructor`, `this`, methods, and how `new` actually builds an object. Read before the DevTools reveal example.",
+  "title": "2.2.3 Reading — Class and instance",
+  "description": "The words class and instance and how they relate — a class is a blueprint; `new` builds one instance from it. Read before 2.2.3a.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 12,

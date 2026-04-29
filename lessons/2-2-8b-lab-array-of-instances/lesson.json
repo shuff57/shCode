@@ -1,0 +1,35 @@
+{
+  "id": "2-2-8b-lab-array-of-instances",
+  "title": "2.2.8b Lab — An array of Enemies",
+  "description": "Store five Enemy instances in a single array by pushing new Enemy(...) calls into `enemies` — practice managing many instances without separate named variables.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.2 Object-Oriented Programming",
+  "preview": "q5play",
+  "week": 12,
+  "slos": ["SLO-2", "SLO-3"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Push five Enemy instances into enemies[]",
+      "instructions": "In `setup()`, call `enemies.push(new Enemy(...))` five times with different x positions. After setup, `enemies.length` should be 5 and five red squares should appear on screen.",
+      "hints": ["Open the q5play docs drawer on the right and look at how arrays work — push adds one element to the end of an array."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "enemies.push(new Enemy(...)) used at least once",
+      "description": "Use `enemies.push(new Enemy(...))` to add Enemy instances to the array.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "enemies\\.push\\s*\\(\\s*new\\s+Enemy\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}
