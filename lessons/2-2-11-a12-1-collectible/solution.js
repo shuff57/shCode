@@ -10,7 +10,7 @@ class Collectible {
   }
 
   collect() {
-    this.sprite.remove();
+    this.sprite.delete();
     return this.value;
   }
 }
