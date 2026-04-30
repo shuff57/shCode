@@ -26,6 +26,7 @@ import CrossDeviceSyncBanner from './CrossDeviceSyncBanner';
 import Q5DocsContent from './Q5DocsContent';
 import AiHelpPanel from './AiHelpPanel';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
+import SolutionPanel from './SolutionPanel';
 import { RotateCcw, Send } from 'lucide-react';
 
 interface LessonWorkspaceProps {
@@ -86,6 +87,10 @@ export default function LessonWorkspace({
   const [submitOpen, setSubmitOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [gradeReport, setGradeReport] = useState<GradeReportType | null>(null);
+  // Set true when an admin/teacher inserts the reference solution; pauses
+  // localStorage autosave so their progress record stays clean. Cleared by
+  // the Reset button (which also restores the starter).
+  const [solutionLoaded, setSolutionLoaded] = useState(false);
 
   const isAssignment = mode === 'assignment' || lesson.type === 'assignment' || lesson.type === 'project';
 
@@ -304,9 +309,12 @@ export default function LessonWorkspace({
     setIsRunning(false);
   }
 
-  // Auto-save to localStorage (debounced)
+  // Auto-save to localStorage (debounced). Skipped while the reference
+  // solution is loaded so an admin/teacher reviewing it can't accidentally
+  // overwrite their own draft.
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (solutionLoaded) return;
     const timer = setTimeout(() => {
       const state = useLessonStore.getState();
       if (state.lesson) {
@@ -319,7 +327,7 @@ export default function LessonWorkspace({
       }
     }, 2000);
     return () => clearTimeout(timer);
-  }, [files, commits]);
+  }, [files, commits, solutionLoaded]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -574,6 +582,7 @@ export default function LessonWorkspace({
                     if (window.confirm('Reset your code to the starter? Unsaved work will be lost.')) {
                       setLesson(lesson);
                       stopRun();
+                      setSolutionLoaded(false);
                       setResetMsg('Code reset to starter.');
                       setTimeout(() => setResetMsg(null), 2500);
                     }
@@ -597,9 +606,31 @@ export default function LessonWorkspace({
                     ✓ {resetMsg}
                   </span>
                 )}
+                {solutionLoaded && (
+                  <span
+                    role="status"
+                    aria-live="polite"
+                    style={{
+                      color: '#ffb86c',
+                      fontSize: 13,
+                      marginLeft: 8,
+                      fontWeight: 500,
+                    }}
+                    title="Reset to clear and restore the starter."
+                  >
+                    👁 Viewing solution — autosave paused
+                  </span>
+                )}
               </>
             )}
             <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+              <SolutionPanel
+                lessonId={lesson.id}
+                onInsert={(code) => {
+                  updateFile('script.js', code);
+                  setSolutionLoaded(true);
+                }}
+              />
               <button className="btn-secondary btn-sm" onClick={() => setCommitOpen(true)}>
                 Commit{dirtyCount > 0 ? ` (${dirtyCount})` : ''}
               </button>

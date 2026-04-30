@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "node server.js",
-    "prebuild": "node scripts/generate-lessons-manifest.mjs && npm run slides:build-all",
+    "prebuild": "node scripts/generate-lessons-manifest.mjs && node scripts/generate-solutions.mjs && npm run slides:build-all",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
     "test": "echo \"No tests\"",
@@ -65,6 +65,6 @@
     "postcss": "^8.4.31",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.5.4",
-    "wrangler": "^3.90.0"
+    "wrangler": "^4.87.0"
   }
 }

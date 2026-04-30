@@ -6,6 +6,10 @@ npm-debug.log*
 # Slidev build output — regenerated on each Pages deploy via `npm run prebuild`
 public/slides/
 
+# Per-lesson reference solutions, bundled into a server-only map by
+# scripts/generate-solutions.mjs during prebuild.
+functions/_shared/solutions.generated.ts
+
 # TypeScript incremental build info
 tsconfig.tsbuildinfo
 

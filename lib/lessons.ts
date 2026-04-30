@@ -24,7 +24,9 @@ async function readFiles(dir: string, rel = ''): Promise<FileNode[]> {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const nodes = await Promise.all(
     entries
-      .filter((e) => e.name !== 'lesson.json')
+      // solution.js holds the reference answer — bundled separately for the
+      // admin/teacher-only /api/lesson-solution endpoint, never sent to clients.
+      .filter((e) => e.name !== 'lesson.json' && e.name !== 'solution.js')
       .map(async (entry) => {
         const full = path.join(dir, entry.name);
         const relative = path.join(rel, entry.name).replace(/\\/g, '/');
