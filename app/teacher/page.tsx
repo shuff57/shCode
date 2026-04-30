@@ -649,7 +649,7 @@ function GradebookView({
       </div>
 
       {/* Scrollable matrix */}
-      <div style={{ overflow: 'auto', maxHeight: '70vh', border: '1px solid #44475a', borderRadius: 6 }}>
+      <div style={{ overflow: 'auto', maxHeight: 'calc(100vh - 180px)', border: '1px solid #44475a', borderRadius: 6 }}>
         <table style={{ borderCollapse: 'collapse', fontSize: 12, tableLayout: 'fixed', minWidth: EMAIL_W + CELL_W * displayLessons.length }}>
           {/* Unit-spanning header row */}
           <thead>
@@ -700,14 +700,24 @@ function GradebookView({
                   style={{
                     position: 'sticky', top: 33, zIndex: 2,
                     width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
-                    background: stickyBg, padding: '4px 2px',
+                    height: 180, verticalAlign: 'bottom',
+                    background: stickyBg, padding: '6px 2px',
                     borderBottom: '2px solid #44475a', borderRight: '1px solid #44475a11',
-                    textAlign: 'center', color: '#6272a4', fontSize: 10,
-                    fontWeight: 500, overflow: 'hidden', whiteSpace: 'nowrap',
-                    textOverflow: 'ellipsis',
+                    textAlign: 'center', color: '#bd93f9', fontSize: 11,
+                    fontWeight: 500,
                   }}
                 >
-                  {lesson.title.length > 8 ? lesson.title.slice(0, 7) + '…' : lesson.title}
+                  <div
+                    style={{
+                      writingMode: 'vertical-rl',
+                      transform: 'rotate(180deg)',
+                      whiteSpace: 'nowrap',
+                      lineHeight: 1.1,
+                      margin: '0 auto',
+                    }}
+                  >
+                    {lesson.title}
+                  </div>
                 </th>
               ))}
             </tr>
