@@ -1,0 +1,18 @@
+{
+  "id": "2-5-2-video-storage",
+  "title": "2.5.2 Video — Saving between sessions",
+  "description": "Why a fresh page reload wipes everything in memory but not what's in localStorage — and how storeItem(name, value) writes a key students can read back next session. Watch before 2.5.3 Reading — storeItem and getItem.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.5 State and Persistence",
+  "preview": "video",
+  "week": 16,
+  "slos": ["SLO-3"],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the YouTube link, or open the classroom slide deck for the live demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

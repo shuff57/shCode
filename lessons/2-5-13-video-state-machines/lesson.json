@@ -1,0 +1,18 @@
+{
+  "id": "2-5-13-video-state-machines",
+  "title": "2.5.13 Video — State machines in games",
+  "description": "Reframes a tangled if/else chain as a three-case switch(gameState) — menu, play, win — and shows how each case owns its render and input logic. Watch before 2.5.14 Reading — The state variable.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.5 State and Persistence",
+  "preview": "video",
+  "week": 16,
+  "slos": ["SLO-2"],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the YouTube link, or open the classroom slide deck for the live demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

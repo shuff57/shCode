@@ -1,0 +1,116 @@
+{
+  "id": "2-5-20-a16-2-game-states",
+  "title": "2.5.20 A16.2 Game States",
+  "description": "Add a state machine with at least three states to your W15 game — menu, play, win/lose, and a return-to-menu transition. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "intermediate",
+  "estimateMins": 45,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.5 State and Persistence",
+  "preview": "q5play",
+  "week": 16,
+  "slos": ["SLO-2"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Declare a state variable",
+      "instructions": "At the top level (outside setup and draw), declare let gameState = 'menu'. This is the single variable that controls which part of the game is running.",
+      "hints": ["Open the q5play docs drawer on the right and find the State Machines section."]
+    },
+    {
+      "id": "s2",
+      "title": "Drive draw() with switch(gameState)",
+      "instructions": "Inside draw(), add switch(gameState) { ... } so that every state routes to its own case block. Add at least the case 'menu' block first.",
+      "hints": ["See 2.5.16 Reading — switch in draw() for the dispatch pattern."]
+    },
+    {
+      "id": "s3",
+      "title": "Implement three named cases",
+      "instructions": "Add case 'menu', case 'play', and at least one end state (case 'win' or case 'lose') inside the switch. Each case should render something different.",
+      "hints": ["Open the q5play docs drawer and look at the State Machines section for an example with multiple cases."]
+    },
+    {
+      "id": "s4",
+      "title": "Add an input-driven transition from menu to play",
+      "instructions": "Inside case 'menu', add an if(kb.presses(...)) block that sets gameState = 'play'. Use kb.presses (one-shot) not kb.pressing (held).",
+      "hints": ["See 2.5.18 Reading — Input-driven transitions for the kb.presses pattern."]
+    },
+    {
+      "id": "s5",
+      "title": "Add a condition-driven end transition",
+      "instructions": "Inside case 'play', add a condition (score check, lives check, or overlap check) that sets gameState = 'win' or gameState = 'lose' when the end condition is met.",
+      "hints": ["See 2.5.19 Reading — Condition-driven transitions for examples with score and lives."]
+    },
+    {
+      "id": "s6",
+      "title": "Add a return-to-menu transition",
+      "instructions": "From your win or lose case, add a way for the player to return to the menu — typically kb.presses on a key that sets gameState = 'menu'.",
+      "hints": ["Open the q5play docs drawer and find the State Machines section for the full loop pattern."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Declare a state variable",
+      "description": "Declare let gameState = '...' with a string literal initializer at the top level.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "let\\s+gameState\\s*=\\s*['\"]",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Drive draw() with switch(gameState)",
+      "description": "Inside draw(), use switch(gameState) to dispatch per-frame logic.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "switch\\s*\\(\\s*gameState",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Implement at least three named cases",
+      "description": "The switch contains at least three case '<label>': blocks.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:case\\s+['\"][^'\"]+['\"]\\s*:.*?){3}",
+      "flags": "s",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Input-driven transition (menu → play)",
+      "description": "Inside a case block, kb.presses(...) is followed by gameState = '...' to start the game.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "kb\\.presses\\s*\\([^)]+\\)[^;\\n{]*?(?:[\\s\\S]{0,100}?)gameState\\s*=",
+      "flags": "s",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Condition-driven end transition (play → win or lose)",
+      "description": "Inside the play case, a game condition sets gameState to 'win' or 'lose'.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "gameState\\s*=\\s*['\"]win['\"]|gameState\\s*=\\s*['\"]lose['\"]",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Return-to-menu transition",
+      "description": "From a non-menu case inside draw(), the player can return to the menu by setting gameState = 'menu'.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "gameState\\s*=\\s*['\"]menu['\"]",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

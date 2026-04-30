@@ -1,0 +1,19 @@
+{
+  "id": "2-5-3b-reading-cleanup",
+  "title": "2.5.3b Reading — removeItem and clearStorage",
+  "description": "How removeItem(name) deletes a single saved key and clearStorage() wipes all site storage — both essential for testing persistence and adding a clear button. Read before 2.5.12 A16.1 Persistent High Scores.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.5 State and Persistence",
+  "preview": "reading",
+  "week": 16,
+  "slos": ["SLO-3"],
+  "externalLink": "/docs/q5play",
+  "externalLinkLabel": "Open the in-app q5play docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

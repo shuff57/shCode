@@ -1,125 +1,33 @@
-## Moving the viewport
+## The world doesn't move — your window does
 
-**Read before attempting `2.4.8 Worked Example — Camera Follow`.**
+**Read before attempting `2.4.7a Reading — camera.x / camera.y`.**
 
-The **camera** is q5play's viewport — the slice of the world the canvas shows on any given frame. The world doesn't move when the player walks right; the *camera* does. A platform stays at `x = 1500` forever; what changes is which range of `x` values the canvas is currently painting.
+The **camera** in q5play is a coordinate transform, not a "real" object. The canvas always shows a viewport into a coordinate space; sprites have absolute world coordinates. The camera holds the *center* of that viewport. When the player walks right, no sprite moves — the camera shifts, and the canvas redraws the new slice of the world. It's the flashlight analogy: the room (the world) is dark and full of stuff; your flashlight (the camera) points at one patch at a time.
 
-Set `camera.x` and `camera.y` to slide the viewport. The canonical follow pattern:
+**What you'll learn from it:**
 
-```js
-camera.x = player.x;
-```
+- The world has absolute coordinates; sprites stay at their `pos.x` / `pos.y` regardless of where the camera is.
+- The camera object holds the center of the visible viewport.
+- The four atomic concepts each get their own reading next: `camera.x` / `camera.y` (2.4.7a), the follow pattern (2.4.7b), smoothing with `lerp` (2.4.7c), and render order with `sprite.layer` (2.4.7d).
+- The default camera is centered on the canvas — every sprite created with the default camera setting renders relative to that initial center.
 
-Run that every frame in `draw()` and the player stays centered on the canvas while the world appears to scroll past.
-
-What you'll learn from it:
-
-- `camera.x` / `camera.y` are the viewport's center, not its top-left corner.
-- Assigning to them shifts what the canvas displays without moving any sprite.
-- The standard follow line is one assignment per frame: `camera.x = player.x`.
-- A "world wider than the canvas" is just a scene where sprites exist at `x` values outside `[0, canvas.w]` — your camera math reveals them.
-
-**Try it:** the world is 1200px wide (a row of platforms). The canvas is only 360px wide. Press `D` and `A` to walk; the camera tracks `player.x` so the level scrolls past the canvas.
+**Try it:** five static sprites at known x positions. The default camera centers the visible window; you don't need to do any camera work to see them. The next reading shows what changes when you assign `camera.x`.
 
 ```js live
-let player;
-
 function setup() {
-  new Canvas(360, 240);
-  world.gravity.y = 10;
-
-  // A long ground 1200px wide.
-  let ground = new Sprite(600, 220, 1200, 20, 'static');
-  ground.color = '#554433';
-
-  // A few platforms scattered along the level.
-  for (let i = 0; i < 4; i++) {
-    let plat = new Sprite(150 + i * 280, 160 - (i % 2) * 50, 100, 14, 'static');
-    plat.color = '#776655';
+  new Canvas(400, 240);
+  for (let x = 60; x <= 340; x += 70) {
+    let s = new Sprite(x, 120, 30, 30);
+    s.collider = 'none';
   }
-
-  player = new Sprite(60, 180, 28, 32);
-  player.image = '🧍';
 }
 
 function draw() {
-  background('#224');
-
-  if (kb.pressing('d'))      player.vel.x = 4;
-  else if (kb.pressing('a')) player.vel.x = -4;
-  else                       player.vel.x = 0;
-
-  // The follow line — one assignment, every frame.
-  camera.x = player.x;
+  background('#112');
 }
 ```
 
-Click the preview, hold `D`, and watch the world slide past. Comment out the `camera.x = player.x` line — the player walks off the right edge and disappears. Same world, different camera.
-
----
-
-## Smoothing with `lerp` + render order with `layer`
-
-**Read before attempting `2.4.9 Worked Example — Smooth Camera with lerp`.**
-
-The hard `camera.x = player.x` follow is glued: the camera moves *exactly* as far as the player every frame. That feels rigid. Real games soften this by interpolating — the camera moves a *fraction* of the distance toward the target each frame, so it eases in.
-
-`lerp(current, target, t)` returns a value `t` of the way from `current` to `target` (where `t` is `0..1`). Small `t` lags more; larger `t` snaps faster. The smoothing line:
-
-```js
-camera.x = lerp(camera.x, player.x, 0.1);
-```
-
-Separately: `sprite.layer = N` controls draw order. Higher numbers draw on top of lower ones. Use this for HUD-style sprites (a score badge, a UI overlay) that you want above the world.
-
-What you'll learn from it:
-
-- `lerp(current, target, t)` returns a smoothly-interpolated value; small `t` (0.05–0.1) feels lagged, larger `t` (0.3–0.5) feels snappy.
-- Replace the hard `camera.x = player.x` with `camera.x = lerp(camera.x, player.x, 0.1)` for a softened follow.
-- `sprite.layer = N` sets the draw order — higher draws on top.
-- Layers are useful for HUD sprites that should always sit above the world.
-
-**Try it:** same world as Topic 1, but the camera lags. Watch the player drift toward the edge of the canvas before the camera catches up. A second sprite at high `layer` stays pinned to the upper-left as a fake HUD badge — it's a normal sprite, but its layer puts it on top.
-
-```js live
-let player, hud;
-
-function setup() {
-  new Canvas(360, 240);
-  world.gravity.y = 10;
-
-  let ground = new Sprite(600, 220, 1200, 20, 'static');
-  ground.color = '#554433';
-  for (let i = 0; i < 4; i++) {
-    let plat = new Sprite(150 + i * 280, 160 - (i % 2) * 50, 100, 14, 'static');
-    plat.color = '#776655';
-  }
-
-  player = new Sprite(60, 180, 28, 32);
-  player.image = '🧍';
-
-  hud = new Sprite(40, 28, 32, 32, 'static');
-  hud.layer = 100;
-  hud.image = '⭐';
-}
-
-function draw() {
-  background('#224');
-
-  if (kb.pressing('d'))      player.vel.x = 4;
-  else if (kb.pressing('a')) player.vel.x = -4;
-  else                       player.vel.x = 0;
-
-  // Smooth follow — change the 0.1 to feel the difference.
-  camera.x = lerp(camera.x, player.x, 0.1);
-
-  // Pin the HUD to the camera so it doesn't slide with the world.
-  hud.x = camera.x - 145;
-  hud.y = camera.y - 90;
-}
-```
-
-Try `0.05` (laggier), then `0.5` (snappier). Find a `t` that "feels right" — that's animation work, not math.
+The five sprites sit at `x = 60, 130, 200, 270, 340`. The default camera is centered on the canvas, so all five fall inside the viewport. In `2.4.7a` you'll move the camera and watch the same sprites slide out of view as the viewport shifts.
 
 ---
 
@@ -127,9 +35,7 @@ Try `0.05` (laggier), then `0.5` (snappier). Find a `t` that "feels right" — t
 
 | Term | Meaning |
 |------|---------|
-| **Camera** | The viewport into the world. Moving it scrolls the visible region. |
-| **`camera.x` / `camera.y`** | The world coordinates the camera is centered on. |
-| **Follow pattern** | `camera.x = player.x` — one assignment per frame keeps the player centered. |
-| **`lerp(a, b, t)`** | Linear interpolation — returns a value `t` (0..1) of the way from `a` to `b`. |
-| **Parallax** | Different layers moving at different speeds for an illusion of depth. |
-| **Layer** | Per-sprite draw order — higher numbers draw on top of lower ones. |
+| **Camera** | The viewport into the world — moving it scrolls the view, not the sprites. |
+| **Viewport** | The visible region of the world the canvas is currently rendering. |
+| **World coordinates** | A sprite's absolute `pos.x` / `pos.y` — independent of the camera. |
+| **Coordinate transform** | A shift applied at render time so the canvas can show a different slice of the same world without moving any sprite. |

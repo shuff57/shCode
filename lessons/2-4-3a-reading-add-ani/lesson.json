@@ -1,0 +1,19 @@
+{
+  "id": "2-4-3a-reading-add-ani",
+  "title": "2.4.3a Reading — addAni(name, frames)",
+  "description": "How sprite.addAni(name, frame1, ...) registers a named animation and makes it the active default. Read before 2.4.3b (changeAni).",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 6,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.4 Animation & Camera",
+  "preview": "reading",
+  "week": 15,
+  "slos": ["SLO-3"],
+  "externalLink": "/docs/q5play",
+  "externalLinkLabel": "Open the in-app q5play docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

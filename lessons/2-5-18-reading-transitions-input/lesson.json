@@ -1,0 +1,19 @@
+{
+  "id": "2-5-18-reading-transitions-input",
+  "title": "2.5.18 Reading — q5play docs: Input-driven transitions",
+  "description": "Shows how kb.presses inside a case body assigns a new gameState — one-shot input keeps the transition from firing every frame the key is held. Read before 2.5.19 Reading — Condition-driven transitions.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.5 State and Persistence",
+  "preview": "reading",
+  "week": 16,
+  "slos": ["SLO-2"],
+  "externalLink": "/docs/q5play",
+  "externalLinkLabel": "Open the in-app q5play docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

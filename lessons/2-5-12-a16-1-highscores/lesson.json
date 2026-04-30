@@ -1,0 +1,123 @@
+{
+  "id": "2-5-12-a16-1-highscores",
+  "title": "2.5.12 A16.1 Persistent High Scores",
+  "description": "Bolt a persistent top-3 high-score system onto your W15 game using storeItem, JSON, and clearStorage. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "intermediate",
+  "estimateMins": 45,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.5 State and Persistence",
+  "preview": "q5play",
+  "week": 16,
+  "slos": ["SLO-3"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Read saved high scores on game start",
+      "instructions": "Inside setup(), call getItem('highScores') to retrieve any previously saved scores. If nothing is stored yet, default to an empty array. This is where your game loads its memory from the last session.",
+      "hints": ["Open the q5play docs drawer and find the Storage section for getItem usage."]
+    },
+    {
+      "id": "s2",
+      "title": "Store high scores as JSON",
+      "instructions": "When you need to save scores, use JSON.stringify on your scores array and then pass the result to storeItem. Both calls must appear together so the data is serialized before it's written.",
+      "hints": ["Open the q5play docs drawer and find the JSON and Storage sections."]
+    },
+    {
+      "id": "s3",
+      "title": "Coerce stored values back to numbers",
+      "instructions": "When reading a score back from storage, wrap the getItem call in Number(...) or parseInt(...). getItem always returns a string — without coercion, arithmetic will concatenate instead of add.",
+      "hints": ["See the q5play docs drawer Storage section for the type-coercion note."]
+    },
+    {
+      "id": "s4",
+      "title": "Write a new top-3 entry only when the score qualifies",
+      "instructions": "Inside an if-block that checks whether the current score earns a spot in the top 3, call storeItem to save the updated list. The condition must reference score so the grader can confirm the save is gated.",
+      "hints": ["Open the q5play docs drawer and review the Storage section."]
+    },
+    {
+      "id": "s5",
+      "title": "Clear button wipes saved scores",
+      "instructions": "Inside draw(), give the player a way to reset all saved scores — call clearStorage() or removeItem('highScores') when a key is pressed. This lets you demo persistence: save scores, close the tab, reopen, then press the clear key to reset.",
+      "hints": ["Open the q5play docs drawer and find the Storage section for clearStorage and removeItem."]
+    },
+    {
+      "id": "s6",
+      "title": "Background cleared each frame",
+      "instructions": "Inside draw(), call background(...) so old frames do not pile up on screen. This should already be in your W15 game.",
+      "hints": ["Search the q5play docs drawer for background()."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Read saved high scores on game start",
+      "description": "Your setup() function calls getItem(...) to load any previously stored scores when the game starts.",
+      "type": "inFunction",
+      "function": "setup",
+      "file": "script.js",
+      "pattern": "getItem\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "Store high scores as JSON",
+      "description": "JSON.stringify(...) appears followed within about 200 characters by storeItem(...), ensuring scores are serialized before being saved.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "JSON\\.stringify\\s*\\([\\s\\S]{0,200}?storeItem\\s*\\(|storeItem\\s*\\([\\s\\S]{0,200}?JSON\\.stringify\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "Coerce stored values back to numbers",
+      "description": "Stored score values are converted from strings back to numbers using Number(getItem(...)) or parseInt(getItem(...)).",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:Number|parseInt)\\s*\\(\\s*getItem\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "Write a new top-3 entry only when the score qualifies",
+      "description": "storeItem(...) is called inside an if-block whose condition references score, so saves only happen when the score earns a top-3 spot.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\([^)]*score[^)]*\\)[\\s\\S]{0,300}?storeItem\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r5",
+      "title": "Clear button wipes saved scores",
+      "description": "Inside draw(), pressing a key calls clearStorage() or removeItem('highScores') so you can demo persistence by resetting and re-running.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "clearStorage\\s*\\(|removeItem\\s*\\(\\s*['\"]highScores['\"]",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r6",
+      "title": "Background cleared each frame",
+      "description": "background(...) is called inside draw() so old frames don't stack up on screen.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "background\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

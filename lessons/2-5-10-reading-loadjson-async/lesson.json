@@ -1,0 +1,19 @@
+{
+  "id": "2-5-10-reading-loadjson-async",
+  "title": "2.5.10 Reading — q5play docs: loadJSON is async",
+  "description": "Why loadJSON must live in preload() and what goes wrong when it doesn't. Read before 2.5.11 Worked Example — Load JSON in preload.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.5 State and Persistence",
+  "preview": "reading",
+  "week": 16,
+  "slos": ["SLO-3"],
+  "externalLink": "/docs/q5play",
+  "externalLinkLabel": "Open the in-app q5play docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}
