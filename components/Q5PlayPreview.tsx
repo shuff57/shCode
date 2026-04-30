@@ -3,7 +3,7 @@
 import { forwardRef } from 'react';
 
 // Base64-url-safe encoder for UTF-8 strings.
-function encodeCode(code: string): string {
+export function encodeCode(code: string): string {
   const utf8 = unescape(encodeURIComponent(code));
   const b64 = typeof window === 'undefined' ? '' : window.btoa(utf8);
   return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');

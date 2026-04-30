@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { sections, searchDocs, type DocSearchResult } from '../lib/q5play-docs';
+import Q5DocLiveSnippet from './Q5DocLiveSnippet';
 
 function Highlighted({ result }: { result: DocSearchResult }) {
   if (!result.matchLength) return <>{result.snippet}</>;
@@ -155,21 +156,10 @@ export default function Q5DocsContent() {
                     </p>
                   ))}
                   {page.code && (
-                    <pre
-                      style={{
-                        background: '#282a36',
-                        color: '#f8f8f2',
-                        padding: '10px 12px',
-                        borderRadius: 4,
-                        fontFamily: 'monospace',
-                        fontSize: '0.8rem',
-                        overflowX: 'auto',
-                        whiteSpace: 'pre',
-                        margin: '8px 0 0',
-                      }}
-                    >
-                      <code>{page.code}</code>
-                    </pre>
+                    <Q5DocLiveSnippet
+                      initialCode={page.code}
+                      fileKey={`q5doc-${activeSection.slug}-${pi}`}
+                    />
                   )}
                 </div>
               ))}
