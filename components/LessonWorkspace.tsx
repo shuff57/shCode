@@ -91,6 +91,11 @@ export default function LessonWorkspace({
   // localStorage autosave so their progress record stays clean. Cleared by
   // the Reset button (which also restores the starter).
   const [solutionLoaded, setSolutionLoaded] = useState(false);
+  // Last runtime error from the most recent run (uncaught exception in console
+  // mode, or a `preview-error` postMessage from the q5/jscad iframe). Blocks
+  // Submit even when every requirement is green — otherwise students could
+  // submit code that satisfies static graders but crashes at runtime.
+  const [runtimeError, setRuntimeError] = useState<string | null>(null);
 
   const isAssignment = mode === 'assignment' || lesson.type === 'assignment' || lesson.type === 'project';
 
@@ -228,6 +233,7 @@ export default function LessonWorkspace({
       const doc = buildPreviewHtml(lesson.files, files);
       setSrcDoc(doc);
       setConsoleResetKey((k) => k + 1);
+      setRuntimeError(null);
       const to2 = setTimeout(() => {
         runTests();
       }, 600);
@@ -240,6 +246,7 @@ export default function LessonWorkspace({
   // This is intentional — students write code in the editor and we execute it,
   // similar to CodeHS, Replit, or any browser-based coding education tool.
   function runCode() {
+    setRuntimeError(null);
     const logs: Array<{type: string; message: string; timestamp: string}> = [];
     const time = () => new Date().toLocaleTimeString();
 
@@ -262,8 +269,10 @@ export default function LessonWorkspace({
       const run = new Function(scriptContent); // student code execution (educational tool)
       run();
     } catch (e: unknown) {
+      const name = e instanceof Error ? e.name : 'Error';
       const msg = e instanceof Error ? e.message : String(e);
       logs.push({ type: 'error', message: msg, timestamp: time() });
+      setRuntimeError(`${name}: ${msg}`);
     }
 
     console.log = origLog;
@@ -279,6 +288,7 @@ export default function LessonWorkspace({
 
   // For JSCAD lessons: build 3D preview and render in iframe
   function runJscad() {
+    setRuntimeError(null);
     const scriptContent = files['script.js'] || '';
     const doc = buildJscadPreviewHtml(scriptContent);
     setSrcDoc(doc);
@@ -292,6 +302,7 @@ export default function LessonWorkspace({
   // For q5play lessons: snapshot the current code and bump runKey to reload the iframe.
   // We snapshot so edits after Run don't re-trigger the iframe until the next Run.
   function runQ5() {
+    setRuntimeError(null);
     setQ5Code(files['script.js'] || '');
     setRunKey((k) => k + 1);
     setConsoleResetKey((k) => k + 1);
@@ -307,7 +318,24 @@ export default function LessonWorkspace({
     setRunKey(0);
     setConsoleResetKey((k) => k + 1);
     setIsRunning(false);
+    setRuntimeError(null);
   }
+
+  // Listen for uncaught errors from the q5/jscad iframe runner. The runner
+  // posts `preview-error` for window.onerror + unhandledrejection events;
+  // those are the only signals that mean "code crashed", as opposed to
+  // student calls to console.error.
+  useEffect(() => {
+    const handler = (event: MessageEvent) => {
+      const data = event.data;
+      if (data && data.source === 'preview-error' && data.error) {
+        const err = data.error as { name?: string; message?: string };
+        setRuntimeError(`${err.name || 'Error'}: ${err.message || ''}`);
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, []);
 
   // Auto-save to localStorage (debounced). Skipped while the reference
   // solution is loaded so an admin/teacher reviewing it can't accidentally
@@ -435,10 +463,14 @@ export default function LessonWorkspace({
   const totalCriteria = requirements.length;
   const allRequirementsPassed = totalCriteria > 0 && passedCriteria === totalCriteria;
   // q5 lessons gate Submit on every requirement being green; existing
-  // assignments keep the score-vs-passingScore rule.
-  const canSubmit = isQ5Mode
-    ? allRequirementsPassed
-    : totalScore >= (lesson.grading?.passingScore ?? 0);
+  // assignments keep the score-vs-passingScore rule. Either way, an
+  // uncaught runtime error from the most recent run blocks Submit so
+  // students can't ship code that satisfies static graders but crashes.
+  const canSubmit =
+    !runtimeError &&
+    (isQ5Mode
+      ? allRequirementsPassed
+      : totalScore >= (lesson.grading?.passingScore ?? 0));
   const showAssignmentHeader = isAssignment || isQ5Mode;
   // q5 grading is binary/completion-based — show criteria counts, not points.
   const headerScore = isQ5Mode ? passedCriteria : totalScore;
@@ -622,6 +654,25 @@ export default function LessonWorkspace({
                   </span>
                 )}
               </>
+            )}
+            {runtimeError && (
+              <span
+                role="status"
+                aria-live="polite"
+                title={runtimeError}
+                style={{
+                  color: '#ff5555',
+                  fontSize: 13,
+                  marginLeft: 8,
+                  fontWeight: 500,
+                  maxWidth: 360,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                ✗ Fix runtime error before submitting
+              </span>
             )}
             <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
               <SolutionPanel
