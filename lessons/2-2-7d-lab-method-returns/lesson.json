@@ -21,11 +21,11 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "isHigh() returns a comparison of this.n",
-      "description": "Write `isHigh()` inside `Counter` — it must use `return` and compare `this.n > 10`.",
+      "title": "isHigh() compares this.n to 10",
+      "description": "Write an `isHigh()` method inside `Counter` whose body compares `this.n` to `10` (e.g. `return this.n > 10`). The driver paints the number red when it returns truthy.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "isHigh[\\s\\S]*return\\s+this\\.n\\s*>",
+      "pattern": "isHigh\\s*\\([^)]*\\)[\\s\\S]*?(this\\.n\\s*>\\s*10|10\\s*<\\s*this\\.n)",
       "flags": "",
       "points": 0,
       "status": "pending"
