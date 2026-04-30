@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import LessonCard from '../components/LessonCard';
+import HomeModuleLessons from '../components/HomeModuleLessons';
 import UnitProgressBadge from '../components/UnitProgressBadge';
 import { loadLessons } from '../lib/lessons';
 import { listUnits } from '../lib/curriculum';
@@ -89,17 +89,7 @@ export default async function HomePage() {
                           No lessons authored yet.
                         </div>
                       ) : (
-                        // Home view: only the first lesson in each module is
-                        // accessible to students. Admins/teachers bypass the
-                        // lock client-side via the role on the lesson-state
-                        // snapshot. Linear unlock continues on /module/X.
-                        unitLessons.map((lesson, idx) => (
-                          <LessonCard
-                            key={lesson.id}
-                            lesson={lesson}
-                            lockedForStudent={idx > 0}
-                          />
-                        ))
+                        <HomeModuleLessons lessons={unitLessons} />
                       )}
                       <Link
                         href={`/module/${u.id}`}

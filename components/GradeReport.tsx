@@ -11,16 +11,27 @@ interface GradeReportProps {
 }
 
 export default function GradeReport({ report, commitCount, onReopen, allowReopen }: GradeReportProps) {
+  const isNoPoints = report.totalPossible === 0;
+  const allPassed = report.results.every((r) => r.status === 'passed');
+  const overallPassed = isNoPoints ? allPassed : report.passed;
   return (
     <div className="grade-report">
       <h2>Grade Report</h2>
       <div className="grade-report-score">
-        <span className={`grade-score ${report.passed ? 'pass' : 'fail'}`}>
-          {report.totalScore}/{report.totalPossible}
-        </span>
-        <span className="grade-label">
-          {report.passed ? 'Passed' : 'Not Passing'}
-        </span>
+        {isNoPoints ? (
+          <span className={`grade-score ${overallPassed ? 'pass' : 'fail'}`}>
+            {overallPassed ? 'Complete' : 'Incomplete'}
+          </span>
+        ) : (
+          <>
+            <span className={`grade-score ${report.passed ? 'pass' : 'fail'}`}>
+              {report.totalScore}/{report.totalPossible}
+            </span>
+            <span className="grade-label">
+              {report.passed ? 'Passed' : 'Not Passing'}
+            </span>
+          </>
+        )}
       </div>
       <div className="grade-report-details">
         {report.results.map((r) => (
@@ -30,11 +41,22 @@ export default function GradeReport({ report, commitCount, onReopen, allowReopen
             ) : (
               <CircleX className="text-red-500" size={16} />
             )}
-            <span className="grade-result-pts">
-              {r.pointsEarned}/{r.pointsPossible} pts
-            </span>
-            {r.messages.length > 0 && (
-              <span className="grade-result-msg">{r.messages[0]}</span>
+            {isNoPoints ? (
+              <>
+                <span className="grade-result-msg">{r.title}</span>
+                <span className="grade-result-pts">
+                  {r.status === 'passed' ? 'Complete' : 'Incomplete'}
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="grade-result-pts">
+                  {r.pointsEarned}/{r.pointsPossible} pts
+                </span>
+                {r.messages.length > 0 && (
+                  <span className="grade-result-msg">{r.messages[0]}</span>
+                )}
+              </>
             )}
           </div>
         ))}

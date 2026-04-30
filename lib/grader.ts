@@ -2,6 +2,7 @@ import type { Requirement } from './types';
 
 export interface GradeResult {
   id: string;
+  title: string;
   status: 'passed' | 'failed';
   messages: string[];
   pointsEarned: number;
@@ -133,6 +134,7 @@ export function grade(
     const points = req.points || 0;
     return {
       id: req.id,
+      title: req.title,
       status: passed ? ('passed' as const) : ('failed' as const),
       messages: passed ? [] : [req.description],
       pointsEarned: passed ? points : 0,

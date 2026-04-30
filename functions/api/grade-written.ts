@@ -16,7 +16,7 @@ import {
   validateRequest,
   type GradeRequest,
 } from '../../lib/grade-written-core';
-import { isLessonAccessible, lockedResponse, type SessionData } from '../../_shared/lessonAccess';
+import { isLessonAccessible, lockedResponse, type SessionData } from '../_shared/lessonAccess';
 
 interface Env {
   DB: D1Database;

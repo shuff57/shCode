@@ -112,6 +112,7 @@ app.prepare().then(() => {
         const points = r.points || 0;
         return {
           id: r.id,
+          title: r.title,
           status: passed ? 'passed' : 'failed',
           messages: passed ? [] : [r.description],
           pointsEarned: passed ? points : 0,

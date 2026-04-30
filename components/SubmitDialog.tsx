@@ -22,7 +22,9 @@ export default function SubmitDialog({ isOpen, onClose, onConfirm, report }: Sub
 
   if (!report) return null;
 
-  const belowPassing = report.totalScore < report.passingScore;
+  const isNoPoints = report.totalPossible === 0;
+  const allPassed = report.results.every((r) => r.status === 'passed');
+  const belowPassing = !isNoPoints && report.totalScore < report.passingScore;
 
   return (
     <dialog
@@ -43,13 +45,17 @@ export default function SubmitDialog({ isOpen, onClose, onConfirm, report }: Sub
         )}
         <div className="submit-breakdown">
           <div className="submit-score">
-            Score: {report.totalScore}/{report.totalPossible}
+            {isNoPoints
+              ? (allPassed ? 'Complete' : 'Incomplete')
+              : `Score: ${report.totalScore}/${report.totalPossible}`}
           </div>
           <ul className="submit-results">
             {report.results.map((r) => (
               <li key={r.id} className={r.status === 'passed' ? 'pass' : 'fail'}>
                 {r.status === 'passed' ? '\u2713' : '\u2717'}{' '}
-                {r.pointsEarned}/{r.pointsPossible} pts
+                {isNoPoints
+                  ? `${r.title} \u2014 ${r.status === 'passed' ? 'Complete' : 'Incomplete'}`
+                  : `${r.pointsEarned}/${r.pointsPossible} pts`}
               </li>
             ))}
           </ul>
