@@ -70,11 +70,11 @@
     },
     {
       "id": "r4",
-      "title": "Implement one stretch feature",
-      "description": "Use at least one of: a `lives` variable, a `random()`-driven property on spawn (varied size/value), OR a function named `cull` that calls .delete().",
+      "title": "Define a cull() helper",
+      "description": "Declare a function named `cull` (function-statement form) — see Challenge 3 in content.md.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\blives\\s*=|random\\s*\\([^)]*\\).*\\.(diameter|width|height|color)|function\\s+cull\\s*\\(",
+      "pattern": "\\bfunction\\s+cull\\s*\\(",
       "flags": "",
       "points": 0
     }
