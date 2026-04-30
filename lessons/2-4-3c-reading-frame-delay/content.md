@@ -28,7 +28,11 @@ function draw() {
 
   // Toggle the active animation's frameDelay.
   // Default is 4 — pressing Space bumps to 24 (six times slower).
-  ghost.ani.frameDelay = kb.pressing(' ') ? 24 : 4;
+  if (kb.pressing(' ')) {
+    ghost.ani.frameDelay = 24;
+  } else {
+    ghost.ani.frameDelay = 4;
+  }
 
   fill(255);
   textSize(14);

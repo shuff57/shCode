@@ -87,6 +87,7 @@ Aim for **under ~100 lines**. The canonical example is 72 lines. Going longer us
 - **Do not label topic subsections `R1`, `R2`, "Chapter N", etc.** The section heading is the topic name.
 - **Do not ship a reading with zero `js live` blocks.** Long-form prose with only ```` ```js ```` reference fences is a textbook chapter, not a reading lesson. Either restructure into topics with runnable demos or convert the lesson to a different type.
 - **Do not omit the glossary.** Even a 4-row table is fine; "no glossary" is not.
+- **Do not use beginner-unfriendly idioms in `js live` blocks.** Spell things out with `if`/`else`, named variables, and ordinary `for` loops. Avoid ternaries (`a ? b : c`), logical-operator shortcuts (`x && doThing()`, `x ?? y`), destructuring, arrow callbacks for control flow, and chained `forEach`/`map`/`filter` unless the lesson is teaching that idiom. Compactness smuggles in a second concept under the guise of brevity — readings introduce one concept at a time.
 
 ## 5. Title convention
 
