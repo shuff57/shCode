@@ -136,7 +136,7 @@ export function grade(
       id: req.id,
       title: req.title,
       status: passed ? ('passed' as const) : ('failed' as const),
-      messages: passed ? [] : [req.description],
+      messages: [],
       pointsEarned: passed ? points : 0,
       pointsPossible: points,
     };

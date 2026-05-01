@@ -8131,7 +8131,7 @@ function q5playPostDraw() {
 }
 
 function q5playRemove() {
-	this.world.delete();
+	if (this.world) this.world.delete();
 }
 
 Q5.addHook('presetup', q5playPreSetup);

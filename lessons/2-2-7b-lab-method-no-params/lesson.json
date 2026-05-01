@@ -25,7 +25,7 @@
       "description": "Write a `tick()` method inside the `Counter` class that adds 1 to `this.n` using `+=` or `++`.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "tick\\s*\\(\\s*\\)\\s*\\{[^}]*this\\.n\\s*(\\+=|\\+\\+)",
+      "pattern": "tick\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?this\\.n\\s*(?:\\+=|=\\s*this\\.n\\s*\\+|\\+\\+)",
       "flags": "s",
       "points": 0,
       "status": "pending"

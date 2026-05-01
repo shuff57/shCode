@@ -1,4 +1,4 @@
-**Goal:** combine `kb.presses` + `player.touching(ground)` to build a jump that fires once per landing — the foundation pattern for any platformer.
+**Goal:** combine `kb.presses` + `player.colliding(ground)` to build a jump that fires once per landing — the foundation pattern for any platformer.
 
 ## Step 1 — Run it
 
@@ -25,8 +25,9 @@ function draw() {
   else if (kb.pressing('d')) player.vel.x = 5;
   else                       player.vel.x = 0;
 
-  // Only allow jump when touching ground.
-  if (kb.presses('space') && player.touching(ground)) {
+  // Only allow jump when in contact with ground.
+  // NOTE: pass a literal space ' ' to kb.presses — the string 'space' is not recognized.
+  if (kb.presses(' ') && player.colliding(ground)) {
     player.vel.y = -12;
   }
 }
@@ -36,7 +37,7 @@ This is the W14 baseline. Internalize this shape — every physics-y game you bu
 
 ## Step 2 — Break it on purpose
 
-Drop the `&& player.touching(ground)` gate. Now tap space repeatedly while in the air. The player jumps each time — infinite mid-air jumps.
+Drop the `&& player.colliding(ground)` gate. Now tap space repeatedly while in the air. The player jumps each time — infinite mid-air jumps.
 
 ```js live
 let player, ground;
@@ -57,17 +58,17 @@ function draw() {
   else                       player.vel.x = 0;
 
   // BAD — no ground gate. Player can jump in mid-air.
-  if (kb.presses('space')) {
+  if (kb.presses(' ')) {
     player.vel.y = -12;
   }
 }
 ```
 
-Notice that `kb.presses` still works correctly — it fires once per tap. The bug isn't in the input check; it's that we never asked "are we *allowed* to jump right now?" The `touching` gate answers that.
+Notice that `kb.presses` still works correctly — it fires once per tap. The bug isn't in the input check; it's that we never asked "are we *allowed* to jump right now?" The `colliding` gate answers that.
 
 ## Step 3 — Scale to many platforms
 
-Replace the single ground sprite with a Group of platforms. The same jump line works — `player.touching(platforms)` returns `true` if **any** platform is currently being touched.
+Replace the single ground sprite with a Group of platforms. The same jump line works — `player.colliding(platforms)` returns a frame-count that's truthy if the player is currently in contact with **any** platform in the group.
 
 ```js live
 let player, platforms;
@@ -96,7 +97,7 @@ function draw() {
   else if (kb.pressing('d')) player.vel.x = 5;
   else                       player.vel.x = 0;
 
-  if (kb.presses('space') && player.touching(platforms)) {
+  if (kb.presses(' ') && player.colliding(platforms)) {
     player.vel.y = -12;
   }
 }
@@ -128,7 +129,7 @@ function draw() {
   else                       player.vel.x = 0;
 
   // Tune impulse to taste — try -8 (light), -12 (default), -18 (heavy).
-  if (kb.presses('space') && player.touching(ground)) {
+  if (kb.presses(' ') && player.colliding(ground)) {
     player.vel.y = -10;
   }
 }
@@ -138,8 +139,8 @@ When tuning, change **one** value at a time. If you change gravity AND impulse t
 
 ## Key takeaways
 
-- The ground-gated jump pattern is one line: `if (kb.presses('space') && player.touching(ground)) player.vel.y = -<n>;`.
-- `kb.presses` handles "fire once per tap." `touching` handles "are you allowed to fire?" Both gates matter.
-- `touching` works with a single sprite OR a Group — same idiom, scales for free.
+- The ground-gated jump pattern is one line: `if (kb.presses(' ') && player.colliding(ground)) player.vel.y = -<n>;`. The space arg must be a literal space character — `'space'` is not recognized.
+- `kb.presses` handles "fire once per tap." `colliding` handles "are you allowed to fire?" Both gates matter.
+- `colliding` works with a single sprite OR a Group — same idiom, scales for free.
 - Tune gravity, jump impulse, and run speed **one knob at a time** — otherwise you can't tell which one fixed the feel.
 - This is the foundation for `2.3.20 A14.1 Space Jumper`. Internalize it before starting the lab.

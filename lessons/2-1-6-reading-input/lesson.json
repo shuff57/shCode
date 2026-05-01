@@ -1,6 +1,6 @@
 {
   "id": "2-1-6-reading-input",
-  "title": "2.1.7 Reading — kb.pressing(key)",
+  "title": "2.1.6 Reading — kb.pressing(key)",
   "description": "How `kb.pressing(key)` checks whether a key is held this frame. Read before 2.1.7a (Velocity).",
   "type": "lesson",
   "difficulty": "beginner",

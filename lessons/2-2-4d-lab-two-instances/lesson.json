@@ -31,7 +31,7 @@
       "description": "Create `b1` and `b2` with separate `new Box(...)` calls — each gets its own color argument.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+Box\\s*\\(",
+      "pattern": "new\\s+Box\\s*\\([\\s\\S]*?new\\s+Box\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"

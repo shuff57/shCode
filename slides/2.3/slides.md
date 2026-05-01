@@ -4,7 +4,7 @@ title: "Module 2.3 — Collections and Physics Applications"
 info: |
   Module 2.3: Groups, overlaps, safe despawn, edge-triggered input, ground-gated jumps.
   Weeks 13–14 · Q2 · 4 class sessions.
-  Covers: Group, overlaps callback form, iterate-then-delete bug, kb.presses vs kb.pressing, sprite.touching.
+  Covers: Group, overlaps callback form, iterate-then-delete bug, kb.presses vs kb.pressing, sprite.colliding.
 class: text-center
 transition: slide-left
 mdc: true
@@ -98,7 +98,7 @@ This week q5play gives you a smarter version of an array — one that knows what
 
 ## 4. Ground-gated jumps
 
-`sprite.touching(other)` — physics contact, not bounding-box overlap.
+`sprite.colliding(other)` — physics contact, not bounding-box overlap.
 
 </div>
 </div>
@@ -632,12 +632,14 @@ Wrong tool for one-shot actions, because "the key is held" stays `true` for many
 # `kb.presses(k)` — once per key-down
 
 ```js
-if (kb.presses('space')) {
+if (kb.presses(' ')) {
   player.vel.y = -10;
 }
 ```
 
-`kb.presses('space')` returns `true` for **exactly one frame** — the frame the key transitions from up → down. Hold it longer? Still just the first frame.
+`kb.presses(' ')` returns `true` for **exactly one frame** — the frame the key transitions from up → down. Hold it longer? Still just the first frame.
+
+(Pass a **literal space character** as the key. The string `'space'` looks readable but q5play stores the spacebar under `' '` and never aliases the word `'space'` — `kb.presses('space')` will silently return `false` forever.)
 
 <v-click>
 
@@ -658,7 +660,7 @@ The shape of the input — a single edge — matches the shape of the action.
 
 ```js
 // BUG — fires every frame the key is held.
-if (kb.pressing('space')) {
+if (kb.pressing(' ')) {
   player.vel.y = -10;
 }
 ```
@@ -677,7 +679,7 @@ The fix is one word — `pressing` → `presses`:
 
 ```js
 // FIXED — fires once per tap.
-if (kb.presses('space')) {
+if (kb.presses(' ')) {
   player.vel.y = -10;
 }
 ```
@@ -711,8 +713,8 @@ function draw() {
   else if (kb.pressing('d')) player.vel.x = 3;
   else                       player.vel.x = 0;
 
-  // EDGE-TRIGGERED — one jump per tap.
-  if (kb.presses('space')) {
+  // EDGE-TRIGGERED — one jump per tap. Note the literal space.
+  if (kb.presses(' ')) {
     player.vel.y = -10;
   }
 
@@ -741,7 +743,7 @@ layout: section
 # `presses` alone is not enough
 
 ```js
-if (kb.presses('space')) {
+if (kb.presses(' ')) {
   player.vel.y = -10;
 }
 ```
@@ -762,10 +764,10 @@ The missing gate: the player should **only jump if they are actually on the grou
 
 ---
 
-# `sprite.touching(other)` — physics contact
+# `sprite.colliding(other)` — physics contact
 
 ```js
-player.touching(ground)   // boolean: are these bodies in contact this frame?
+player.colliding(ground)   // truthy frame-count while these bodies are in contact
 ```
 
 <v-click>
@@ -773,13 +775,13 @@ player.touching(ground)   // boolean: are these bodies in contact this frame?
 Different from `overlaps`:
 
 - **`overlaps`** — bounding-box intersection. Generous. Fires for any spatial overlap, including non-solid trigger zones and frames *before* a sprite has actually landed.
-- **`touching`** — the physics engine says "yes, these bodies are in contact." Accurate for resting contact.
+- **`colliding`** — the physics engine says "yes, these bodies are in contact." Returns the number of frames they've been in contact (0 when apart). Treat it as truthy/falsy. Accurate for resting contact.
 
 </v-click>
 
 <v-click>
 
-For "is the player on the ground?" — use `touching`, not `overlaps`. An overlap-gated jump still lets you fly because the bounding boxes overlap *while you're falling*.
+For "is the player on the ground?" — use `colliding`, not `overlaps`. An overlap-gated jump still lets you fly because the bounding boxes overlap *while you're falling*.
 
 </v-click>
 
@@ -788,7 +790,7 @@ For "is the player on the ground?" — use `touching`, not `overlaps`. An overla
 # The ground-gated jump idiom
 
 ```js
-if (kb.presses('space') && player.touching(ground)) {
+if (kb.presses(' ') && player.colliding(ground)) {
   player.vel.y = -12;
 }
 ```
@@ -797,8 +799,8 @@ if (kb.presses('space') && player.touching(ground)) {
 
 Two gates, both must be true:
 
-- **`kb.presses('space')`** — tap edge, not "key is held"
-- **`player.touching(ground)`** — physically on the ground, not just spatially near it
+- **`kb.presses(' ')`** — tap edge, not "key is held". Literal space; `'space'` does not match.
+- **`player.colliding(ground)`** — physically on the ground, not just spatially near it
 
 </v-click>
 
@@ -807,7 +809,7 @@ Two gates, both must be true:
 Many platforms? Pass a Group instead of a single sprite:
 
 ```js
-if (kb.presses('space') && player.touching(platforms)) {
+if (kb.presses(' ') && player.colliding(platforms)) {
   player.vel.y = -12;
 }
 ```
@@ -840,13 +842,13 @@ function draw() {
   else                       player.vel.x = 0;
 
   // The ground-gated jump idiom.
-  if (kb.presses('space') && player.touching(ground)) {
+  if (kb.presses(' ') && player.colliding(ground)) {
     player.vel.y = -12;
   }
 
   fill('white');
   textSize(14);
-  text('touching: ' + player.touching(ground), 12, 22);
+  text('colliding: ' + player.colliding(ground), 12, 22);
 }`;
 </script>
 
@@ -854,7 +856,7 @@ function draw() {
 
 <Q5Runner :code="sketchGroundJump" :width="380" :height="260" />
 
-Tap **SPACE** on the ground → jump. Tap mid-air → nothing. Delete `&& player.touching(ground)` and try to double-jump. Put it back.
+Tap **SPACE** on the ground → jump. Tap mid-air → nothing. Delete `&& player.colliding(ground)` and try to double-jump. Put it back.
 
 ---
 layout: section
@@ -966,7 +968,8 @@ Bookmark this slide.
 | `for (let s of [...group])` | Iterate-a-copy — safe with deletion. |
 | `kb.pressing(k)` | Every frame the key is held (continuous). |
 | `kb.presses(k)` | One frame per tap (one-shot). |
-| `sprite.touching(other)` | Physics contact — use for ground gates. |
+| `sprite.colliding(other)` | Physics contact (truthy frame-count) — use for ground gates. |
+| `kb.presses(' ')` | Spacebar press. Pass a literal space — `'space'` does not match. |
 
 ---
 
@@ -983,7 +986,7 @@ You can spawn fleets, delete safely, and gate actions on edge-triggered input + 
 - `overlaps` callback form for per-pair work
 - The iterate-then-delete bug + two safe fixes
 - `presses` vs `pressing` (edge vs continuous)
-- `touching` for ground-gated jumps
+- `colliding` for ground-gated jumps
 
 </div>
 <div>

@@ -1,6 +1,6 @@
 {
   "id": "2-1-9-a10-1-sprite-playground",
-  "title": "2.1.10 Sprite Playground",
+  "title": "2.1.9 Sprite Playground",
   "description": "Build a sprite playground combining canvas, WASD-controlled sprite, auto-motion, and on-screen text. Auto-graded.",
   "type": "assignment",
   "difficulty": "intermediate",

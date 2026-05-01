@@ -39,6 +39,7 @@ export default function LessonWorkspace({
   mode,
 }: LessonWorkspaceProps) {
   const setLesson = useLessonStore((s) => s.setLesson);
+  const resetLesson = useLessonStore((s) => s.resetLesson);
   const files = useLessonStore((s) => s.fileContents);
   const currentFile = useLessonStore((s) => s.currentFile);
   const updateFile = useLessonStore((s) => s.updateFile);
@@ -612,7 +613,7 @@ export default function LessonWorkspace({
                   }}
                   onClick={() => {
                     if (window.confirm('Reset your code to the starter? Unsaved work will be lost.')) {
-                      setLesson(lesson);
+                      resetLesson(lesson);
                       stopRun();
                       setSolutionLoaded(false);
                       setResetMsg('Code reset to starter.');
@@ -671,7 +672,9 @@ export default function LessonWorkspace({
                   whiteSpace: 'nowrap',
                 }}
               >
-                ✗ Fix runtime error before submitting
+                {allRequirementsPassed
+                  ? '✗ Run your code again — the last run had an error'
+                  : '✗ Fix runtime error before submitting'}
               </span>
             )}
             <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>

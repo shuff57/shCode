@@ -1,6 +1,6 @@
 {
   "id": "2-1-5-video-frame-loop",
-  "title": "2.1.6 Video — The Frame Loop Explained",
+  "title": "2.1.5 Video — The Frame Loop Explained",
   "description": "3-min walkthrough of the setup/draw frame loop at 60 fps. Watch after Hello Sprite, before Make it Move.",
   "type": "lesson",
   "difficulty": "beginner",

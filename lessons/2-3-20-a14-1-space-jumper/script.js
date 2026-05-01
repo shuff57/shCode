@@ -19,8 +19,10 @@ function draw() {
   // STEP 2: WASD horizontal — set player.vel.x from kb.pressing('a' / 'd').
   // Else-to-zero when neither is held.
 
-  // STEP 3: Ground-gated jump — combine kb.presses('space') with
-  // player.touching(ground) so the player can only jump when on the ground.
+  // STEP 3: Ground-gated jump — combine kb.presses(' ') with
+  // player.colliding(ground) so the player can only jump when on the ground.
+  // Use a LITERAL space character as the key arg — the string 'space' is not
+  // recognized by q5play. .colliding() returns the frame count while in contact.
 
   // STEP 4: Win condition — when player overlaps the goal, trigger a clear
   // win state (change background, stop updating, show text, etc).

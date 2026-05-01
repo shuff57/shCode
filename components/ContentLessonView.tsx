@@ -6,6 +6,7 @@ import { badgeFor } from '../lib/lesson-badges';
 import CompletionPanel from './CompletionPanel';
 import WrittenGrader from './WrittenGrader';
 import MarkdownWithLiveBlocks from './MarkdownWithLiveBlocks';
+import HeaderLessonNav from './HeaderLessonNav';
 
 interface Props {
   lesson: Lesson;
@@ -137,6 +138,10 @@ export default function ContentLessonView({ lesson }: Props) {
       ) : (
         <CompletionPanel lessonId={lesson.id} lessonType={preview} />
       )}
+
+      <div style={{ marginTop: 24 }}>
+        <HeaderLessonNav />
+      </div>
 
       <style>{`
         .content-prose h1 { font-size: 1.4em; margin-top: 28px; }

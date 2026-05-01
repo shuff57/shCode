@@ -7,6 +7,8 @@ import {
   getFileHistoryFromCommits,
   buildFileIdMap,
   loadProgress,
+  saveProgress,
+  clearProgress,
 } from './version-control';
 import { listCommits, createCommit as apiCreateCommit } from './commits-api';
 
@@ -37,6 +39,8 @@ interface LessonState {
 
   // Lesson actions
   setLesson: (lesson: Lesson) => void;
+  /** Reset to the canonical starter from lesson.files, erasing any saved draft. */
+  resetLesson: (lesson: Lesson) => void;
   selectFile: (path: string) => void;
   updateFile: (path: string, value: string) => void;
   moveFile: (from: string, to: string) => void;
@@ -124,6 +128,40 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     }
   },
 
+  resetLesson: (lesson) => {
+    // Load the canonical starter from the lesson bundle — never from localStorage.
+    // Also wipes the stored draft so the next page-load starts fresh.
+    const files = flattenFiles(lesson.files);
+    const fileContents = Object.fromEntries(
+      files.map((f) => [f.path, f.content || ''])
+    );
+    const jsPreviewModes = ['console', 'jscad', 'q5play'];
+    const defaultFile = jsPreviewModes.includes(lesson.preview || '')
+      ? (files.find((f) => f.path.endsWith('.js'))?.path || files[0]?.path)
+      : files[0]?.path;
+
+    set({
+      lesson,
+      currentFile: defaultFile,
+      fileContents,
+      requirements: lesson.requirements,
+      lastCommittedFileContents: { ...fileContents },
+      commits: [],
+      dirtyFileIds: new Set(),
+      fileHistory: {},
+    });
+
+    if (typeof window !== 'undefined') {
+      clearProgress(lesson.id);
+      // Re-fetch remote history so the History panel stays accurate.
+      listCommits(lesson.id)
+        .then((commits) => {
+          if (get().lesson?.id === lesson.id) set({ commits });
+        })
+        .catch(() => { /* unauthenticated or offline */ });
+    }
+  },
+
   selectFile: (path) => set({ currentFile: path }),
 
   updateFile: (path, value) => {
@@ -205,6 +243,17 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       set((s) => ({
         commits: s.commits.map((c) => (c.id === commit.id ? stored : c)),
       }));
+      // Flush to localStorage immediately. The 2-second autosave in
+      // LessonWorkspace can lag a quick refresh, leaving a stale
+      // lastCommittedFileContents that makes CrossDeviceSyncBanner think
+      // we're behind the server.
+      const fresh = get();
+      saveProgress(state.lesson.id, {
+        fileContents: fresh.fileContents,
+        commits: fresh.commits,
+        lastCommittedFileContents: fresh.lastCommittedFileContents,
+        completedSteps: [],
+      });
       return true;
     } catch (err) {
       // Roll back the optimistic commit on failure.

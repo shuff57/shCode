@@ -26,8 +26,8 @@
     {
       "id": "s3",
       "title": "Ground-gated jump (kb.presses + touching)",
-      "instructions": "Use kb.presses('space') (edge-triggered, fires once per tap) AND player.touching(ground). Only then set player.vel.y to a negative number.",
-      "hints": ["The Input docs explains the difference between kb.pressing and kb.presses.", "The Collisions docs chapter covers .touching() for per-frame contact checks."]
+      "instructions": "Use kb.presses(' ') (edge-triggered, fires once per tap — pass a literal space character, the string 'space' will not match) AND player.colliding(ground). Only then set player.vel.y to a negative number.",
+      "hints": ["The Input docs explains the difference between kb.pressing and kb.presses. Use a literal space ' ' as the key — 'space' is not recognized.", "The Collisions docs chapter covers .colliding() for per-frame contact checks (returns the frame count while the bodies are in contact, falsy when apart)."]
     },
     {
       "id": "s4",
@@ -41,8 +41,8 @@
     { "id": "r2", "title": "Player sprite exists", "description": "A dynamic Sprite is created in setup()", "type": "inFunction", "function": "setup", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(", "flags": "", "points": 0 },
     { "id": "r3", "title": "WASD horizontal input", "description": "Use kb.pressing with 'a' or 'd' inside draw()", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d)['\"]", "flags": "", "points": 0 },
     { "id": "r4", "title": "Gravity enabled", "description": "Assign a positive value to world.gravity.y", "type": "regex", "file": "script.js", "pattern": "world\\.gravity\\.y\\s*=\\s*[1-9]", "flags": "", "points": 0 },
-    { "id": "r5", "title": "Edge-triggered jump", "description": "Use kb.presses for the jump (not kb.pressing)", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "kb\\.presses\\s*\\(\\s*['\"](?:w|space|\\s)['\"]", "flags": "", "points": 0 },
-    { "id": "r6", "title": "Ground-gated jump", "description": "Use .touching() to gate the jump", "type": "regex", "file": "script.js", "pattern": "\\.touching\\s*\\(", "flags": "", "points": 0 },
+    { "id": "r5", "title": "Edge-triggered jump", "description": "Use kb.presses for the jump (not kb.pressing). Key arg must be a literal space ' ' or 'w'.", "type": "inFunction", "function": "draw", "file": "script.js", "pattern": "kb\\.presses\\s*\\(\\s*(?:['\"]w['\"]|['\"] ['\"])", "flags": "", "points": 0 },
+    { "id": "r6", "title": "Ground-gated jump", "description": "Use .colliding() to gate the jump", "type": "regex", "file": "script.js", "pattern": "\\.colliding\\s*\\(", "flags": "", "points": 0 },
     { "id": "r7", "title": "Win condition via overlap", "description": "Use .overlaps() somewhere — typically the goal-sprite check", "type": "regex", "file": "script.js", "pattern": "\\.overlaps\\s*\\(", "flags": "", "points": 0 }
   ],
   "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }

@@ -25,7 +25,7 @@
       "description": "Write an `addBy(n)` method inside `Counter` that takes a parameter and uses it.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "addBy\\s*\\(\\s*\\w+\\s*\\)",
+      "pattern": "addBy\\s*\\(\\s*\\w+\\s*\\)\\s*\\{",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -36,7 +36,7 @@
       "description": "The parameter passed to `addBy` is referenced inside the method body (e.g. `this.n += n`).",
       "type": "regex",
       "file": "script.js",
-      "pattern": "addBy[\\s\\S]*?\\{[\\s\\S]*?this\\.n\\s*\\+=\\s*\\w+",
+      "pattern": "addBy[\\s\\S]*?\\{[\\s\\S]*?this\\.n\\s*(?:\\+=\\s*\\w+|=\\s*this\\.n\\s*\\+\\s*\\w+)",
       "flags": "",
       "points": 0,
       "status": "pending"

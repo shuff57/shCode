@@ -130,6 +130,12 @@ export function loadProgress(
   return all[lessonId] || null;
 }
 
+export function clearProgress(lessonId: string): void {
+  const all = loadAllProgress();
+  delete all[lessonId];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+}
+
 function loadAllProgress(): Record<string, any> {
   // One-time migration from the old underscore key so existing drafts
   // survive the rename.

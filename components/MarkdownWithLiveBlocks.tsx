@@ -44,6 +44,10 @@ function hashCode(s: string): string {
 function parseChunks(src: string): Chunk[] {
   const chunks: Chunk[] = [];
   let lastIndex = 0;
+  // Position among live blocks. Included in the auto-id so two fences with
+  // identical bodies don't collide on the same localStorage entry — which
+  // caused the "edit one block, both blocks change" bug.
+  let liveIndex = 0;
   for (const match of src.matchAll(LIVE_FENCE)) {
     const start = match.index ?? 0;
     if (start > lastIndex) {
@@ -57,9 +61,10 @@ function parseChunks(src: string): Chunk[] {
       if (tok === 'console') showConsole = true;
       else if (tok.startsWith('id=')) authorId = tok.slice(3);
     }
-    const id = authorId ?? `auto-${hashCode(body)}`;
+    const id = authorId ?? `auto-${liveIndex}-${hashCode(body)}`;
     chunks.push({ kind: 'live', body, id, showConsole });
     lastIndex = start + match[0].length;
+    liveIndex++;
   }
   if (lastIndex < src.length) {
     chunks.push({ kind: 'html', body: src.slice(lastIndex) });
