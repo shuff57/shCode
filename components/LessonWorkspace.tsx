@@ -7,6 +7,7 @@ import { buildPreviewHtml, buildJscadPreviewHtml } from '../lib/preview-builder'
 import { saveProgress } from '../lib/version-control';
 import { recordSubmission } from '../lib/written-grader-store';
 import { recordLessonCompleted } from '../lib/progress';
+import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import { grade } from '../lib/grader';
 import type { GradeReport as GradeReportType } from '../lib/grader';
 import FileExplorer from './FileExplorer';
@@ -455,6 +456,7 @@ export default function LessonWorkspace({
       await recordLessonCompleted(lesson.id, gradeReport.totalScore);
     }
     setSubmitted(true);
+    navigateToNextLesson(lesson.id);
   };
 
   const dirtyCount = getDirtyCount();

@@ -6,6 +6,7 @@ import {
   resetLessonState,
   useLessonState,
 } from '../lib/progress';
+import { navigateToNextLesson } from '../lib/lesson-neighbors';
 
 interface Props {
   lessonId: string;
@@ -30,11 +31,14 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
   const title = 'Mark as complete';
   const fullDescription = description ?? `Confirm you've ${verb}.`;
 
-  function toggle() {
+  async function toggle() {
     if (complete) {
       resetLessonState(lessonId);
     } else {
-      recordLessonCompleted(lessonId, 1);
+      // Await the server roundtrip so the next page's access gate sees this
+      // lesson as completed when it loads.
+      await recordLessonCompleted(lessonId, 1);
+      navigateToNextLesson(lessonId);
     }
   }
 

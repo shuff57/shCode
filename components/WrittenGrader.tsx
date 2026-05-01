@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { CircleCheck, CircleX, Circle, Loader2, Lightbulb, Sparkles, Save } from 'lucide-react';
 import { recordLessonCompleted, useLessonState } from '../lib/progress';
+import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import {
   fetchDraft,
   saveDraft,
@@ -163,8 +164,11 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         return;
       }
       setResult(data as GradeResult);
-      if (data.totalEarned / data.totalPossible >= 0.7) {
-        recordLessonCompleted(lessonId, data.totalEarned);
+      const passed = data.totalEarned / data.totalPossible >= 0.7;
+      if (passed) {
+        await recordLessonCompleted(lessonId, data.totalEarned);
+        // Brief pause so the AI feedback visibly renders before auto-advance.
+        setTimeout(() => navigateToNextLesson(lessonId), 1500);
       }
       if (progress.authed) {
         // Persist the submission + sync the draft so a resume shows the
