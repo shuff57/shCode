@@ -1,7 +1,7 @@
 {
   "id": "2-3-17-reading-touching",
-  "title": "2.3.17 Reading — q5play docs: Touching + Ground Detection",
-  "description": "q5play docs on `sprite.touching(other)` and the ground-gated jump idiom. Read before `2.3.18 Ground Detection`.",
+  "title": "2.3.17 Reading — q5play docs: Colliding + Ground Detection",
+  "description": "q5play docs on `sprite.colliding(other)` and the ground-gated jump idiom. Read before `2.3.18 Ground Detection`.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 10,

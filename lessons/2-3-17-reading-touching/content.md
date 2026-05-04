@@ -1,10 +1,10 @@
-# Touching + Ground Detection
+# Colliding + Ground Detection
 
 Read this before `2.3.18 Worked Example — Ground Detection`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
-- What does `sprite.touching(other)` return, and how is it different from `overlaps`?
+- What does `sprite.colliding(other)` return, and how is it different from `overlaps`?
 - Why does a jump button without a ground check let the player fly?
 - What's the one-line idiom for "single jump per landing"?
 
@@ -12,16 +12,14 @@ This reading is the bridge from "the player can jump" to "the player can jump *c
 
 ---
 
-## `sprite.touching(other)` — physical contact this frame
+## `sprite.colliding(other)` — physical contact this frame
 
-`touching` returns `true` while the sprite is **in physical contact** with `other`. Compared to `overlaps`:
+`colliding` returns a truthy value (a frame count) while the sprite is **in physical contact** with `other`. Compared to `overlaps`:
 
-- `overlaps` checks bounding-box intersection (fast, generous, fires for any spatial overlap).
-- `touching` asks the physics engine "are these two bodies actually in contact?" (more accurate for resting contact).
+- `overlaps` is for sensor-style sprites (`collider = 'none'`) — they pass through each other and report bounding-box intersection.
+- `colliding` asks the physics engine "are these two solid bodies actually pushing on each other?" — exactly what you want for "is the player standing on the ground?"
 
-For "is the player standing on the ground?", `touching` is the right call. Bounding boxes can intersect without bodies being in contact — for example, while passing through a non-solid trigger zone.
-
-`touching` accepts a Group, like `overlaps`. `player.touching(platforms)` is `true` if any platform is currently being touched.
+Both methods accept a Group, so `player.colliding(platforms)` is truthy if the player is in contact with any platform in the group.
 
 ```js live
 let player, ground;
@@ -46,13 +44,13 @@ function draw() {
 
   fill('white');
   textSize(16);
-  text('player.touching(ground): ' + player.touching(ground), 12, 28);
+  text('player.colliding(ground): ' + player.colliding(ground), 12, 28);
 }
 ```
 
-**What you'll see:** a blue player falls onto a grey platform. The white text reads `false` while falling, `true` while standing, and flips back to `false` if you walk off the edge.
+**What you'll see:** a blue player falls onto a grey platform. The number on screen reads `0` while falling, then climbs each frame the player is resting, and drops back to `0` if you walk off the edge.
 
-**Try this:** narrow the platform — change `new Sprite(200, 220, 280, 12, 'static')` to `new Sprite(200, 220, 80, 12, 'static')`. Now the player only has a small platform to stand on. Step off the edge with A/D and watch the boolean flip.
+**Try this:** narrow the platform — change `new Sprite(200, 220, 280, 12, 'static')` to `new Sprite(200, 220, 80, 12, 'static')`. Now the player only has a small platform to stand on. Step off the edge with A/D and watch the count fall to `0`.
 
 ---
 
@@ -69,7 +67,7 @@ if (kb.presses('space')) {
 }
 ```
 
-The player can chain unlimited jumps by tapping rapidly. The fix is gating on `touching` — only accept the jump when the player is actually on the ground.
+The player can chain unlimited jumps by tapping rapidly. The fix is gating on `colliding` — only accept the jump when the player is actually on the ground.
 
 ---
 
@@ -97,32 +95,32 @@ function draw() {
   else                       player.vel.x = 0;
 
   // The ground-gated jump idiom.
-  if (kb.presses('space') && player.touching(ground)) {
+  if (kb.presses(' ') && player.colliding(ground)) {
     player.vel.y = -12;
   }
 
   fill('white');
   textSize(14);
-  text('touching: ' + player.touching(ground), 14, 24);
+  text('colliding: ' + player.colliding(ground), 14, 24);
 }
 ```
 
-**What you'll see:** a blue player resting on a grey platform. Tap space on the ground — they jump. Tap space mid-air — nothing happens. The boolean overlay tells you whether the next press would be accepted.
+**What you'll see:** a blue player resting on a grey platform. Tap space on the ground — they jump. Tap space mid-air — nothing happens. The frame count overlay tells you whether the next press would be accepted.
 
-**Try this:** delete `&& player.touching(ground)` from the `if`. Tap space, and while in the air, tap space again. The player double-jumps because the ground gate is gone. Put it back.
+**Try this:** delete `&& player.colliding(ground)` from the `if`. Tap space, and while in the air, tap space again. The player double-jumps because the ground gate is gone. Put it back.
 
-If your level has many platforms, swap `ground` for a Group: `player.touching(platforms)`. Same idiom, scales for free.
+If your level has many platforms, swap `ground` for a Group: `player.colliding(platforms)`. Same idiom, scales for free.
 
 ---
 
-## A note on `touching` vs `overlaps` for jumps
+## A note on `colliding` vs `overlaps` for jumps
 
-You may be tempted to use `overlaps` instead of `touching` for the ground gate. Don't:
+You may be tempted to use `overlaps` instead of `colliding` for the ground gate. Don't:
 
-- `overlaps` fires when bounding boxes intersect. The player's box overlaps the ground's box for most of a fall, including frames *before* they actually land — letting them jump from mid-air.
-- `touching` fires only after the physics engine has put the bodies in contact.
+- `overlaps` is meant for sensor-style sprites (`collider = 'none'`) that pass through each other. Bounding boxes can intersect long before a fall actually lands — letting the player jump from mid-air.
+- `colliding` fires only after the physics engine has put the bodies in actual contact, which is what "standing on" means.
 
-Use `touching` for "am I standing on it?" and `overlaps` for "did I enter this trigger zone?".
+Use `colliding` for "am I standing on it?" and `overlaps` for "did I enter this trigger zone?"
 
 ---
 
@@ -130,11 +128,11 @@ Use `touching` for "am I standing on it?" and `overlaps` for "did I enter this t
 
 | Term | Meaning |
 |------|---------|
-| **`sprite.touching(other)`** | `true` while the sprite is in physical contact with `other` this frame. Pass a Group to test against many. |
+| **`sprite.colliding(other)`** | Truthy (a frame count) while the sprite is in physical contact with `other` this frame. Pass a Group to test against many. |
 | **Ground detection** | Checking whether the player is on the ground — the gate that prevents infinite mid-air jumps. |
-| **Ground-gated jump** | The `kb.presses('space') && player.touching(ground)` idiom. |
-| **`touching` vs `overlaps`** | `touching` = physics contact. `overlaps` = bounding-box intersection. Use `touching` for "am I standing on it?". |
+| **Ground-gated jump** | The `kb.presses(' ') && player.colliding(ground)` idiom. |
+| **`colliding` vs `overlaps`** | `colliding` = solid-body physics contact. `overlaps` = sensor-style (collider 'none') intersection. Use `colliding` for "am I standing on it?". |
 
 ---
 
-Once you can explain why an `overlaps`-gated jump still lets the player fly, open `2.3.18 Worked Example — Ground Detection`.
+Once you can explain why an `overlaps`-gated jump is wrong for this case, open `2.3.18 Worked Example — Ground Detection`.

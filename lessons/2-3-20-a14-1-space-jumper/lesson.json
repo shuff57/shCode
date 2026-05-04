@@ -25,7 +25,7 @@
     },
     {
       "id": "s3",
-      "title": "Ground-gated jump (kb.presses + touching)",
+      "title": "Ground-gated jump (kb.presses + colliding)",
       "instructions": "Use kb.presses(' ') (edge-triggered, fires once per tap — pass a literal space character, the string 'space' will not match) AND player.colliding(ground). Only then set player.vel.y to a negative number.",
       "hints": ["The Input docs explains the difference between kb.pressing and kb.presses. Use a literal space ' ' as the key — 'space' is not recognized.", "The Collisions docs chapter covers .colliding() for per-frame contact checks (returns the frame count while the bodies are in contact, falsy when apart)."]
     },

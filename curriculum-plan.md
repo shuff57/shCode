@@ -636,7 +636,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 **Topics:**
 - Edge-triggered input: `kb.presses('space')` fires once per press
 - Impulse forces for jumping
-- Ground detection: checking `touching` or collision with a group
+- Ground detection: checking `colliding` against a sprite or group
 - Static platforms as level geometry
 - Slopes, angular motion (previews W17 joints)
 

@@ -42,7 +42,7 @@ ship.overlaps(asteroids, (s, a) => a.delete());
 
 - You can manage many sprites with one Group.
 - `kb.presses` is edge-triggered; `kb.pressing` is level-triggered.
-- Ground-gated jumps with `colliding` / `touching`.
+- Ground-gated jumps with `colliding`.
 
 <v-click>
 

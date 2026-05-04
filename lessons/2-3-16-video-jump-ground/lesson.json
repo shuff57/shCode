@@ -1,7 +1,7 @@
 {
   "id": "2-3-16-video-jump-ground",
   "title": "2.3.16 Video — Why your jump feels wrong",
-  "description": "The infinite-jump bug live, and the `touching(ground)` fix. Watch before `2.3.18 Ground Detection`.",
+  "description": "The infinite-jump bug live, and the `colliding(ground)` fix. Watch before `2.3.18 Ground Detection`.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 3,
