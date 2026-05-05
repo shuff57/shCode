@@ -1,0 +1,19 @@
+{
+  "id": "2-5-15-reading-removeitem-clearstorage",
+  "title": "2.5.15 Reading — q5play docs: removeItem and clearStorage",
+  "description": "removeItem(key) deletes one saved key. clearStorage() wipes everything. When and how to use each.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.5 Game Saves",
+  "preview": "reading",
+  "week": 16,
+  "slos": ["SLO-3"],
+  "externalLink": "/docs/q5play",
+  "externalLinkLabel": "Open the in-app q5play docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

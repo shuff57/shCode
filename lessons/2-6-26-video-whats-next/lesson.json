@@ -1,0 +1,18 @@
+{
+  "id": "2-6-26-video-whats-next",
+  "title": "2.6.26 Video — What's Next: Looking Ahead to Unit 3",
+  "description": "You've built save systems and state machines — real game infrastructure. Unit 3 preview: what comes after the fundamentals.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.6 Game States",
+  "preview": "video",
+  "week": 17,
+  "slos": ["SLO-3"],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the YouTube link, or open the classroom slide deck for the live demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

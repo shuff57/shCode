@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "node server.js",
-    "prebuild": "node scripts/generate-lessons-manifest.mjs && node scripts/generate-solutions.mjs && npm run slides:build-all",
+    "prebuild": "node scripts/generate-lessons-manifest.mjs && node scripts/generate-solutions.mjs && node scripts/generate-lesson-starters.mjs && npm run slides:build-all",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
     "test": "echo \"No tests\"",

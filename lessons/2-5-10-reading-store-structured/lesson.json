@@ -1,0 +1,17 @@
+{
+  "id": "2-5-10-reading-store-structured",
+  "title": "2.5.10 Reading — q5play docs: Storing Structured Data",
+  "description": "The full pattern: build a save object, stringify it, store it. Then getItem, parse, and restore. Complete round-trip.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.5 Game Saves",
+  "preview": "reading",
+  "week": 16,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

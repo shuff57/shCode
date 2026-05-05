@@ -6,6 +6,7 @@ import { getCurrentUser } from '../../lib/auth';
 import type { CurrentUser } from '../../lib/auth';
 import type { Commit } from '../../lib/types';
 import CodeMirrorPane from '../../components/CodeMirrorPane';
+import DiffViewer from '../../components/DiffViewer';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -219,6 +220,19 @@ function TeacherEditInner() {
   // Toast
   const [toast, setToast] = useState('');
 
+  // Diff view mode
+  type ViewMode = 'student' | 'diff-starter' | 'diff-solution';
+  const [viewMode, setViewMode] = useState<ViewMode>('student');
+
+  // Starter files (fetched once on mount)
+  const [starterFiles, setStarterFiles] = useState<Record<string, string> | null>(null);
+  const [loadingStarters, setLoadingStarters] = useState(false);
+
+  // Solution (fetched on demand)
+  const [solutionCode, setSolutionCode] = useState<string | null>(null);
+  const [loadingSolution, setLoadingSolution] = useState(false);
+  const [solutionError, setSolutionError] = useState('');
+
   // Track if we've set initial editor contents
   const initializedRef = useRef(false);
 
@@ -228,6 +242,22 @@ function TeacherEditInner() {
       .then((u) => setUser(u))
       .finally(() => setAuthLoaded(true));
   }, []);
+
+  // Fetch starter files once the lessonId is known
+  useEffect(() => {
+    if (!lessonId) return;
+    setLoadingStarters(true);
+    fetch(`/api/lesson-starters/${encodeURIComponent(lessonId)}`, {
+      credentials: 'same-origin',
+    })
+      .then(async (res) => {
+        if (!res.ok) return;
+        const data = (await res.json()) as { files: Record<string, string> };
+        setStarterFiles(data.files);
+      })
+      .catch(() => { /* starters unavailable — diff vs starter won't be offered */ })
+      .finally(() => setLoadingStarters(false));
+  }, [lessonId]);
 
   // Fetch commits
   useEffect(() => {
@@ -327,6 +357,29 @@ function TeacherEditInner() {
       next.add(activeFile);
       return next;
     });
+  }
+
+  function handleViewModeChange(mode: ViewMode) {
+    setViewMode(mode);
+    if (mode === 'diff-solution' && solutionCode === null && !loadingSolution) {
+      setLoadingSolution(true);
+      setSolutionError('');
+      fetch(`/api/lesson-solution/${encodeURIComponent(lessonId!)}`, {
+        credentials: 'same-origin',
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            const body = (await res.json().catch(() => ({}))) as { error?: string };
+            throw new Error(body.error ?? `HTTP ${res.status}`);
+          }
+          const data = (await res.json()) as { solution: string };
+          setSolutionCode(data.solution);
+        })
+        .catch((e: unknown) => {
+          setSolutionError(e instanceof Error ? e.message : String(e));
+        })
+        .finally(() => setLoadingSolution(false));
+    }
   }
 
   async function handlePush() {
@@ -522,23 +575,222 @@ function TeacherEditInner() {
               ))}
             </div>
 
-            {/* CodeMirror editor */}
-            <div style={{ flex: 1, overflow: 'hidden', position: 'relative', minHeight: 0 }}>
-              <div
+            {/* View mode toggle */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0,
+                padding: '6px 16px',
+                background: '#282a36',
+                borderBottom: '1px solid #44475a',
+                flexShrink: 0,
+              }}
+            >
+              <span
                 style={{
-                  height: '100%',
-                  border: '1px solid #44475a',
-                  borderRadius: 4,
-                  overflow: 'hidden',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: '#6272a4',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  marginRight: 10,
+                  flexShrink: 0,
                 }}
               >
-                <CodeMirrorPane
-                  key={activeFile}
-                  value={files[activeFile] ?? ''}
-                  onChange={handleEditorChange}
-                  fileKey={activeFile}
-                />
+                View:
+              </span>
+              <div style={{ display: 'flex', gap: 0 }}>
+                {(
+                  [
+                    ['student', 'Student code'],
+                    ['diff-starter', 'Diff vs starter'],
+                    ['diff-solution', 'Diff vs solution'],
+                  ] as const
+                ).map(([mode, label]) => {
+                  const active = viewMode === mode;
+                  const disabled = Boolean(
+                    (mode === 'diff-starter' && !starterFiles) ||
+                    (mode === 'diff-solution' && solutionError)
+                  );
+                  return (
+                    <button
+                      key={mode}
+                      onClick={() => handleViewModeChange(mode)}
+                      disabled={disabled}
+                      style={{
+                        padding: '5px 12px',
+                        border: '1px solid #44475a',
+                        background: active ? '#bd93f9' : 'transparent',
+                        color: active ? '#282a36' : disabled ? '#44475a' : '#6272a4',
+                        fontWeight: active ? 700 : 400,
+                        fontSize: 12,
+                        cursor: disabled ? 'not-allowed' : 'pointer',
+                        marginLeft: -1, // overlap borders for seamless group
+                        position: 'relative',
+                        zIndex: active ? 1 : 0,
+                      }}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
               </div>
+              {loadingSolution && (
+                <span style={{ marginLeft: 10, fontSize: 11, color: '#f1fa8c' }}>
+                  Loading solution...
+                </span>
+              )}
+              {solutionError && (
+                <span style={{ marginLeft: 10, fontSize: 11, color: '#ff5555' }}>
+                  {solutionError}
+                </span>
+              )}
+            </div>
+
+            {/* Code area */}
+            <div style={{ flex: 1, overflow: 'hidden', position: 'relative', minHeight: 0 }}>
+              {viewMode === 'student' ? (
+                <div
+                  style={{
+                    height: '100%',
+                    border: '1px solid #44475a',
+                    borderRadius: 4,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <CodeMirrorPane
+                    key={activeFile}
+                    value={files[activeFile] ?? ''}
+                    onChange={handleEditorChange}
+                    fileKey={activeFile}
+                  />
+                </div>
+              ) : (
+                <div
+                  style={{
+                    height: '100%',
+                    display: 'flex',
+                    gap: 0,
+                    border: '1px solid #44475a',
+                    borderRadius: 4,
+                    overflow: 'hidden',
+                  }}
+                >
+                  {/* Left: student code (read-only) */}
+                  <div
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      borderRight: '1px solid #44475a',
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    <div
+                      style={{
+                        padding: '4px 10px',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.06em',
+                        color: '#6272a4',
+                        background: '#21222c',
+                        borderBottom: '1px solid #44475a',
+                        flexShrink: 0,
+                      }}
+                    >
+                      Student ({activeFile})
+                    </div>
+                    <div style={{ flex: 1, overflow: 'hidden' }}>
+                      <CodeMirrorPane
+                        key={activeFile}
+                        value={files[activeFile] ?? ''}
+                        onChange={() => {}}
+                        fileKey={activeFile}
+                        readOnly
+                      />
+                    </div>
+                  </div>
+                  {/* Right: diff */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    {viewMode === 'diff-starter' && starterFiles && (
+                      <DiffViewer
+                        original={
+                          starterFiles[activeFile] ??
+                          Object.values(starterFiles)[0] ??
+                          ''
+                        }
+                        modified={files[activeFile] ?? ''}
+                      />
+                    )}
+                    {viewMode === 'diff-starter' && !starterFiles && (
+                      <div
+                        style={{
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#6272a4',
+                          fontSize: 13,
+                        }}
+                      >
+                        Starter files unavailable for this lesson.
+                      </div>
+                    )}
+                    {viewMode === 'diff-solution' && solutionCode !== null && (
+                      <DiffViewer
+                        original={solutionCode}
+                        modified={files[activeFile] ?? ''}
+                      />
+                    )}
+                    {viewMode === 'diff-solution' && loadingSolution && (
+                      <div
+                        style={{
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#6272a4',
+                          fontSize: 13,
+                        }}
+                      >
+                        Loading solution...
+                      </div>
+                    )}
+                    {viewMode === 'diff-solution' && solutionError && (
+                      <div
+                        style={{
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#ff5555',
+                          fontSize: 13,
+                          padding: 16,
+                          textAlign: 'center',
+                        }}
+                      >
+                        {solutionError}
+                      </div>
+                    )}
+                    {viewMode === 'diff-solution' && !loadingSolution && solutionCode === null && !solutionError && (
+                      <div
+                        style={{
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#6272a4',
+                          fontSize: 13,
+                        }}
+                      >
+                        Click &quot;Diff vs solution&quot; to load reference solution.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Push bar */}

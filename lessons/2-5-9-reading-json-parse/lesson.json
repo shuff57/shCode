@@ -1,0 +1,17 @@
+{
+  "id": "2-5-9-reading-json-parse",
+  "title": "2.5.9 Reading — q5play docs: JSON.parse(str)",
+  "description": "JSON.parse unpacks a JSON string back into a JS object. It's the reverse of JSON.stringify.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.5 Game Saves",
+  "preview": "reading",
+  "week": 16,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "2-6-18-video-extended-states",
+  "title": "2.6.18 Video — More States: Pause, Inventory, Settings",
+  "description": "Real games have more than 3 states. Pause freezes the action. Inventory shows items. Settings adjusts volume. All use the same switch pattern you already know.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.6 Game States",
+  "preview": "video",
+  "week": 17,
+  "slos": ["SLO-3"],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the YouTube link, or open the classroom slide deck for the live demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

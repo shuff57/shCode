@@ -28,6 +28,7 @@ import Q5DocsContent from './Q5DocsContent';
 import AiHelpPanel from './AiHelpPanel';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import SolutionPanel from './SolutionPanel';
+import KeyboardShortcutModal from './KeyboardShortcutModal';
 import { RotateCcw, Send } from 'lucide-react';
 
 interface LessonWorkspaceProps {
@@ -98,6 +99,7 @@ export default function LessonWorkspace({
   // Submit even when every requirement is green — otherwise students could
   // submit code that satisfies static graders but crashes at runtime.
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
+  const [shortcutModalOpen, setShortcutModalOpen] = useState(false);
 
   const isAssignment = mode === 'assignment' || lesson.type === 'assignment' || lesson.type === 'project';
 
@@ -382,6 +384,13 @@ export default function LessonWorkspace({
         e.preventDefault();
         runTests();
       }
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
+        const tag = (e.target as HTMLElement)?.tagName;
+        if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+          e.preventDefault();
+          setShortcutModalOpen(true);
+        }
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
@@ -434,6 +443,11 @@ export default function LessonWorkspace({
   const confirmSubmit = async () => {
     setSubmitOpen(false);
     if (typeof window === 'undefined' || !lesson) return;
+    try {
+      await commitChanges('submitted');
+    } catch (err) {
+      console.warn('Auto-commit on submit failed:', err);
+    }
     const state = useLessonStore.getState();
     saveProgress(lesson.id, {
       fileContents: state.fileContents,
@@ -781,6 +795,10 @@ export default function LessonWorkspace({
         onClose={() => setSubmitOpen(false)}
         onConfirm={confirmSubmit}
         report={gradeReport}
+      />
+      <KeyboardShortcutModal
+        isOpen={shortcutModalOpen}
+        onClose={() => setShortcutModalOpen(false)}
       />
     </>
   );

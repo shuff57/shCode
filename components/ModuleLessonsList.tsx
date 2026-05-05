@@ -30,6 +30,15 @@ export default function ModuleLessonsList({ lessons }: { lessons: LessonItem[] }
     return <p style={{ opacity: 0.6 }}>No lessons yet.</p>;
   }
 
+  const totalMins = lessons.reduce((sum, l) => sum + (l.estimateMins ?? 0), 0);
+  const hrs = Math.floor(totalMins / 60);
+  const mins = totalMins % 60;
+  const durationLabel =
+    totalMins <= 0 ? null
+    : hrs === 0 ? `~${mins} min`
+    : mins === 0 ? `~${hrs} hr`
+    : `~${hrs} hr ${mins} min`;
+
   // Lessons advance linearly: get a green on the current lesson before
   // unlocking the next. A lesson at index j is unlocked iff every prior
   // lesson is 'completed'. Unauthed students see locks too — the progress
@@ -44,7 +53,13 @@ export default function ModuleLessonsList({ lessons }: { lessons: LessonItem[] }
   const lockBypass = bypassesLessonLock(progress.role);
 
   return (
-    <ol style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+    <>
+      {durationLabel && (
+        <p style={{ opacity: 0.5, fontSize: 13, margin: '0 0 10px 0' }}>
+          Estimated: {durationLabel}
+        </p>
+      )}
+      <ol style={{ listStyle: 'none', padding: 0, margin: 0 }}>
       {lessons.map((l, idx) => {
         const badge = badgeForLesson({ type: l.type, preview: l.preview });
         const isAssignment = l.type === 'assignment' || l.type === 'project';
@@ -157,5 +172,6 @@ export default function ModuleLessonsList({ lessons }: { lessons: LessonItem[] }
         );
       })}
     </ol>
+    </>
   );
 }

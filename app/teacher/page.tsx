@@ -2,6 +2,10 @@
 
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { NeedsAttentionPanel } from '../../components/NeedsAttentionPanel';
+import { BulkEnrollmentForm } from '../../components/BulkEnrollmentForm';
+import { SubmissionQueue } from '../../components/SubmissionQueue';
+import { AnnouncementsPanel } from '../../components/AnnouncementsPanel';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -524,6 +528,7 @@ function GradebookView({
   lessonMap: Map<string, LessonMeta>;
   onOpenStudent: (email: string) => void;
 }) {
+  const router = useRouter();
   const [gbData, setGbData] = useState<GradebookData | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
@@ -748,6 +753,7 @@ function GradebookView({
                 {/* Cell per lesson */}
                 {displayLessons.map((lesson) => {
                   const cell = student.cells[lesson.id];
+                  const isCodingLesson = !NO_EDITOR_PREVIEWS.has(lesson.preview ?? '');
                   return (
                     <td
                       key={lesson.id}
@@ -756,8 +762,12 @@ function GradebookView({
                         padding: '4px 2px',
                         borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a11',
                         textAlign: 'center', verticalAlign: 'middle',
+                        ...(isCodingLesson ? { cursor: 'pointer' } : {}),
                       }}
                       title={cellTitle(cell, lesson.title)}
+                      onClick={isCodingLesson ? () => {
+                        router.push(`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(student.email)}&lesson=${encodeURIComponent(lesson.id)}`);
+                      } : undefined}
                     >
                       {cellContent(cell)}
                     </td>
@@ -938,7 +948,7 @@ function DetailView({ classId }: { classId: string }) {
   const [drawerEmail, setDrawerEmail] = useState<string | null>(null);
 
   // View toggle: 'roster' | 'gradebook'
-  const [activeView, setActiveView] = useState<'roster' | 'gradebook'>('roster');
+  const [activeView, setActiveView] = useState<'roster' | 'gradebook' | 'attention'>('roster');
 
   const loadDetail = useCallback(async () => {
     setLoading(true);
@@ -1199,6 +1209,17 @@ function DetailView({ classId }: { classId: string }) {
         >
           Gradebook
         </button>
+        <button
+          style={{
+            ...S.btn(activeView === 'attention' ? '#ffb86c' : 'transparent'),
+            color: activeView === 'attention' ? '#282a36' : '#ffb86c',
+            border: '1px solid #ffb86c',
+            borderRadius: 20,
+          }}
+          onClick={() => setActiveView('attention')}
+        >
+          Needs Attention
+        </button>
       </div>
 
       {/* Roster view */}
@@ -1275,6 +1296,20 @@ function DetailView({ classId }: { classId: string }) {
             className={cls.name}
             lessonMap={lessonMap}
             onOpenStudent={(email) => setDrawerEmail(email)}
+          />
+        </div>
+      )}
+
+      {/* Needs Attention view */}
+      {activeView === 'attention' && (
+        <div style={{ ...S.card, marginBottom: 28 }}>
+          <h2 style={{ ...S.h2, marginBottom: 16 }}>Needs Attention</h2>
+          <NeedsAttentionPanel
+            classId={classId}
+            onOpenStudent={(email: string) => setDrawerEmail(email)}
+            onOpenTeacherEdit={(studentEmail: string, lessonId: string) => {
+              router.push(`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(studentEmail)}&lesson=${encodeURIComponent(lessonId)}`);
+            }}
           />
         </div>
       )}
@@ -1359,6 +1394,24 @@ function DetailView({ classId }: { classId: string }) {
           </button>
         </form>
         {enrollError && <p style={S.error}>{enrollError}</p>}
+      </div>
+
+      {/* Bulk enroll */}
+      <div style={S.card}>
+        <h2 style={S.h2}>Bulk enroll</h2>
+        <BulkEnrollmentForm classId={classId} onDone={() => { void loadDetail(); }} />
+      </div>
+
+      {/* Submission Review Queue */}
+      <div style={S.card}>
+        <h2 style={S.h2}>Submission Review Queue</h2>
+        <SubmissionQueue classId={classId} />
+      </div>
+
+      {/* Announcements */}
+      <div style={S.card}>
+        <h2 style={S.h2}>Announcements</h2>
+        <AnnouncementsPanel classId={classId} />
       </div>
 
       {/* Student drawer */}

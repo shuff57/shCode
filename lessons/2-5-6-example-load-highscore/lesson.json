@@ -1,0 +1,17 @@
+{
+  "id": "2-5-6-example-load-highscore",
+  "title": "2.5.6 Worked Example — Load and Display a High Score",
+  "description": "Read your saved high score on startup, coerce it with Number(), display it next to the current score, and update it when the player beats their record.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 12,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.5 Game Saves",
+  "preview": "example",
+  "week": 16,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

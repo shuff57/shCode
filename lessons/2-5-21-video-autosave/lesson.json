@@ -1,0 +1,18 @@
+{
+  "id": "2-5-21-video-autosave",
+  "title": "2.5.21 Video — Your Game, Automatically Saved",
+  "description": "Not every save needs a button press. Auto-save triggers on level transitions, checkpoints, or a timer — the player doesn't think about it.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.5 Game Saves",
+  "preview": "video",
+  "week": 16,
+  "slos": ["SLO-3"],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the YouTube link, or open the classroom slide deck for the live demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

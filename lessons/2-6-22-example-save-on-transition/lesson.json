@@ -1,0 +1,16 @@
+{
+  "id": "2-6-22-example-save-on-transition",
+  "title": "2.6.22 Worked Example — Save on State Transition",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 20,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.6 Game States",
+  "preview": "example",
+  "week": 17,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

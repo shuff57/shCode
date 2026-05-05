@@ -1,0 +1,17 @@
+{
+  "id": "2-6-6-reading-switch-break-default",
+  "title": "2.6.6 Reading — break and default in switch",
+  "description": "break exits the switch; without it, execution falls through to the next case. default handles unexpected values.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.6 Game States",
+  "preview": "reading",
+  "week": 17,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,5 +1,6 @@
 import './globals.css';
 import Header from '../components/Header';
+import { AnnouncementBanner } from '../components/AnnouncementBanner';
 import { ReactNode } from 'react';
 
 export const metadata = {
@@ -11,6 +12,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
+        <AnnouncementBanner />
         <Header />
         {children}
       </body>

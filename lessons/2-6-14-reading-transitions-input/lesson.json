@@ -1,0 +1,17 @@
+{
+  "id": "2-6-14-reading-transitions-input",
+  "title": "2.6.14 Reading — q5play docs: Input-Driven Transitions",
+  "description": "Input-driven transitions happen when the player presses a key. Title → Play (press Enter), Play → Pause (press P). The player is in control.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.6 Game States",
+  "preview": "reading",
+  "week": 17,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

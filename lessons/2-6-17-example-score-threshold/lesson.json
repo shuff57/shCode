@@ -1,0 +1,17 @@
+{
+  "id": "2-6-17-example-score-threshold",
+  "title": "2.6.17 Worked Example — Score Threshold Triggers Game Over",
+  "description": "Implement condition-driven transitions: score reaches 50 triggers a win screen, health drops to 0 triggers game over. The game decides when states change.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 20,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.6 Game States",
+  "preview": "example",
+  "week": 17,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

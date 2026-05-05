@@ -10,7 +10,7 @@
     },
     {
       "id": "2-1-1-video-intro",
-      "title": "2.1.2 Video — Your first q5play sketch",
+      "title": "2.1.1 Video — Your first q5play sketch",
       "unit": "2.1 Foundations",
       "preview": "video",
       "category": "Unit 2: q5play — Applied Game Development",
@@ -18,7 +18,7 @@
     },
     {
       "id": "2-1-10-a10-2-frame-loop",
-      "title": "2.1.11 Frame Loop Writeup",
+      "title": "2.1.10 Frame Loop Writeup",
       "unit": "2.1 Foundations",
       "preview": "assignment",
       "category": "Unit 2: q5play — Applied Game Development",
@@ -26,7 +26,7 @@
     },
     {
       "id": "2-1-11-challenges",
-      "title": "2.1.12 Challenges — Optional Stretch",
+      "title": "2.1.11 Challenges",
       "unit": "2.1 Foundations",
       "preview": "q5play",
       "category": "Unit 2: q5play — Applied Game Development",
@@ -34,7 +34,7 @@
     },
     {
       "id": "2-1-2-reading-canvas-sprite",
-      "title": "2.1.3 Reading — Frame loop: setup() and draw()",
+      "title": "2.1.2 Reading — Frame loop: setup() and draw()",
       "unit": "2.1 Foundations",
       "preview": "reading",
       "category": "Unit 2: q5play — Applied Game Development",
@@ -42,7 +42,7 @@
     },
     {
       "id": "2-1-3-example-minimum-sprite",
-      "title": "2.1.4 Worked Example — Minimum Sprite Program",
+      "title": "2.1.3 Worked Example — Minimum Sprite Program",
       "unit": "2.1 Foundations",
       "preview": "example",
       "category": "Unit 2: q5play — Applied Game Development",
@@ -98,7 +98,7 @@
     },
     {
       "id": "2-1-5-video-frame-loop",
-      "title": "2.1.6 Video — The Frame Loop Explained",
+      "title": "2.1.5 Video — The Frame Loop Explained",
       "unit": "2.1 Foundations",
       "preview": "video",
       "category": "Unit 2: q5play — Applied Game Development",
@@ -106,7 +106,7 @@
     },
     {
       "id": "2-1-6-reading-input",
-      "title": "2.1.7 Reading — kb.pressing(key)",
+      "title": "2.1.6 Reading — kb.pressing(key)",
       "unit": "2.1 Foundations",
       "preview": "reading",
       "category": "Unit 2: q5play — Applied Game Development",
@@ -114,7 +114,7 @@
     },
     {
       "id": "2-1-7-example-keyboard",
-      "title": "2.1.8 Worked Example — Keyboard Movement",
+      "title": "2.1.7 Worked Example — Keyboard Movement",
       "unit": "2.1 Foundations",
       "preview": "example",
       "category": "Unit 2: q5play — Applied Game Development",
@@ -162,7 +162,7 @@
     },
     {
       "id": "2-1-9-a10-1-sprite-playground",
-      "title": "2.1.10 Sprite Playground",
+      "title": "2.1.9 Sprite Playground",
       "unit": "2.1 Foundations",
       "preview": "q5play",
       "category": "Unit 2: q5play — Applied Game Development",
@@ -218,7 +218,7 @@
     },
     {
       "id": "2-2-13-challenges",
-      "title": "2.2.13 Challenges — Optional Stretch",
+      "title": "2.2.13 Challenges",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "q5play",
       "category": "Unit 2: q5play — Applied Game Development",
@@ -458,7 +458,7 @@
     },
     {
       "id": "2-3-12-challenges",
-      "title": "2.3.12 Challenges — Optional Stretch",
+      "title": "2.3.12 Challenges",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "q5play",
       "category": "Unit 2: q5play — Applied Game Development",
@@ -498,7 +498,7 @@
     },
     {
       "id": "2-3-17-reading-touching",
-      "title": "2.3.17 Reading — q5play docs: Touching + Ground Detection",
+      "title": "2.3.17 Reading — q5play docs: Colliding + Ground Detection",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "reading",
       "category": "Unit 2: q5play — Applied Game Development",
@@ -618,7 +618,7 @@
     },
     {
       "id": "2-4-11-challenges",
-      "title": "2.4.11 Challenges — Optional Stretch",
+      "title": "2.4.11 Challenges",
       "unit": "2.4 Animation & Camera",
       "preview": "q5play",
       "category": "Unit 2: q5play — Applied Game Development",
@@ -754,187 +754,419 @@
     },
     {
       "id": "2-5-1-slides",
-      "title": "2.5.1 Slides — State and Persistence",
-      "unit": "2.5 State and Persistence",
+      "title": "2.5.1 Slides — Your Game Forgets: The Problem",
+      "unit": "2.5 Game Saves",
       "preview": "slides",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-10-reading-loadjson-async",
-      "title": "2.5.10 Reading — q5play docs: loadJSON is async",
-      "unit": "2.5 State and Persistence",
+      "id": "2-5-10-reading-store-structured",
+      "title": "2.5.10 Reading — q5play docs: Storing Structured Data",
+      "unit": "2.5 Game Saves",
       "preview": "reading",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-11-example-load-json",
-      "title": "2.5.11 Worked Example — Load JSON in preload",
-      "unit": "2.5 State and Persistence",
+      "id": "2-5-11-example-save-player-state",
+      "title": "2.5.11 Worked Example — Save Full Player State",
+      "unit": "2.5 Game Saves",
       "preview": "example",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-12-a16-1-highscores",
-      "title": "2.5.12 A16.1 Persistent High Scores",
-      "unit": "2.5 State and Persistence",
-      "preview": "q5play",
+      "id": "2-5-12-example-restore-player-state",
+      "title": "2.5.12 Worked Example — Restore Full Player State from a Save",
+      "unit": "2.5 Game Saves",
+      "preview": "example",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-13-video-state-machines",
-      "title": "2.5.13 Video — State machines in games",
-      "unit": "2.5 State and Persistence",
+      "id": "2-5-13-reading-loadjson-async",
+      "title": "2.5.13 Reading — q5play docs: loadJSON is Async",
+      "unit": "2.5 Game Saves",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "2-5-14-video-save-slots",
+      "title": "2.5.14 Video — Save Slots: Multiple Save Files",
+      "unit": "2.5 Game Saves",
       "preview": "video",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-14-reading-state-variable",
-      "title": "2.5.14 Reading — q5play docs: The state variable",
-      "unit": "2.5 State and Persistence",
+      "id": "2-5-15-reading-removeitem-clearstorage",
+      "title": "2.5.15 Reading — q5play docs: removeItem and clearStorage",
+      "unit": "2.5 Game Saves",
       "preview": "reading",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-15-reading-switch-syntax",
-      "title": "2.5.15 Reading — MDN: The switch statement",
-      "unit": "2.5 State and Persistence",
-      "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-16-reading-switch-dispatch",
-      "title": "2.5.16 Reading — q5play docs: switch in draw()",
-      "unit": "2.5 State and Persistence",
-      "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-17-example-state-machine",
-      "title": "2.5.17 Worked Example — Three-state machine",
-      "unit": "2.5 State and Persistence",
+      "id": "2-5-16-example-three-slots",
+      "title": "2.5.16 Worked Example — Three Save Slots",
+      "unit": "2.5 Game Saves",
       "preview": "example",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-18-reading-transitions-input",
-      "title": "2.5.18 Reading — q5play docs: Input-driven transitions",
-      "unit": "2.5 State and Persistence",
-      "preview": "reading",
+      "id": "2-5-17-example-delete-overwrite",
+      "title": "2.5.17 Worked Example — Delete and Overwrite a Save Slot",
+      "unit": "2.5 Game Saves",
+      "preview": "example",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-19-reading-transitions-condition",
-      "title": "2.5.19 Reading — q5play docs: Condition-driven transitions",
-      "unit": "2.5 State and Persistence",
-      "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-2-video-storage",
-      "title": "2.5.2 Video — Saving between sessions",
-      "unit": "2.5 State and Persistence",
+      "id": "2-5-18-video-continue",
+      "title": "2.5.18 Video — New Game or Continue?",
+      "unit": "2.5 Game Saves",
       "preview": "video",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-20-a16-2-game-states",
-      "title": "2.5.20 A16.2 Game States",
-      "unit": "2.5 State and Persistence",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-21-challenges",
-      "title": "2.5.21 Challenges — Optional Stretch",
-      "unit": "2.5 State and Persistence",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-3-reading-storage",
-      "title": "2.5.3 Reading — q5play docs: storeItem and getItem",
-      "unit": "2.5 State and Persistence",
-      "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-3a-reading-getitem-string",
-      "title": "2.5.3a Reading — getItem returns a string",
-      "unit": "2.5 State and Persistence",
-      "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-3b-reading-cleanup",
-      "title": "2.5.3b Reading — removeItem and clearStorage",
-      "unit": "2.5 State and Persistence",
-      "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-4-example-highscore",
-      "title": "2.5.4 Worked Example — High Score with storeItem",
-      "unit": "2.5 State and Persistence",
+      "id": "2-5-19-example-title-detect-save",
+      "title": "2.5.19 Worked Example — Title Screen Detects Existing Saves",
+      "unit": "2.5 Game Saves",
       "preview": "example",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-5-video-json",
-      "title": "2.5.5 Video — JSON: objects and text",
-      "unit": "2.5 State and Persistence",
+      "id": "2-5-2-video-memory",
+      "title": "2.5.2 Video — Memory: What Stays, What Disappears",
+      "unit": "2.5 Game Saves",
       "preview": "video",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-6-reading-json-stringify",
-      "title": "2.5.6 Reading — q5play docs: JSON.stringify(obj)",
-      "unit": "2.5 State and Persistence",
-      "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-7-reading-json-parse",
-      "title": "2.5.7 Reading — q5play docs: JSON.parse(str)",
-      "unit": "2.5 State and Persistence",
-      "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-8-reading-store-structured",
-      "title": "2.5.8 Reading — q5play docs: Storing structured data",
-      "unit": "2.5 State and Persistence",
-      "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-9-example-save-json",
-      "title": "2.5.9 Worked Example — Export Level as JSON",
-      "unit": "2.5 State and Persistence",
+      "id": "2-5-20-example-confirm-overwrite",
+      "title": "2.5.20 Worked Example — Confirm Before Overwriting a Save",
+      "unit": "2.5 Game Saves",
       "preview": "example",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 16
+    },
+    {
+      "id": "2-5-21-video-autosave",
+      "title": "2.5.21 Video — Your Game, Automatically Saved",
+      "unit": "2.5 Game Saves",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "2-5-22-reading-checkpoint-saves",
+      "title": "2.5.22 Reading — Checkpoint Saves: Save on Milestones",
+      "unit": "2.5 Game Saves",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "2-5-23-example-autosave-level",
+      "title": "2.5.23 Worked Example — Auto-Save on Level Complete or Timer",
+      "unit": "2.5 Game Saves",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "2-5-24-a16-1-save-system",
+      "title": "2.5.24 A16.1 Save System — Build Save/Load with Slots",
+      "unit": "2.5 Game Saves",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "2-5-25-challenges",
+      "title": "2.5.25 Challenges — Extended Save Features",
+      "unit": "2.5 Game Saves",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "2-5-3-reading-storeitem",
+      "title": "2.5.3 Reading — storeItem: Save Game Data",
+      "unit": "2.5 Game Saves",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "2-5-4-example-save-highscore",
+      "title": "2.5.4 Worked Example — Save a High Score on Game Over",
+      "unit": "2.5 Game Saves",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "2-5-5-reading-getitem",
+      "title": "2.5.5 Reading — getItem: Load Saved Data",
+      "unit": "2.5 Game Saves",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "2-5-5a-reading-getitem-string",
+      "title": "2.5.5a Reading — getItem Returns a String",
+      "unit": "2.5 Game Saves",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "2-5-6-example-load-highscore",
+      "title": "2.5.6 Worked Example — Load and Display a High Score",
+      "unit": "2.5 Game Saves",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "2-5-7-video-complex-save",
+      "title": "2.5.7 Video — More Than a Number: Saving Your Whole Game",
+      "unit": "2.5 Game Saves",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "2-5-8-reading-json-stringify",
+      "title": "2.5.8 Reading — q5play docs: JSON.stringify(obj)",
+      "unit": "2.5 Game Saves",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "2-5-9-reading-json-parse",
+      "title": "2.5.9 Reading — q5play docs: JSON.parse(str)",
+      "unit": "2.5 Game Saves",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "2-6-1-slides",
+      "title": "2.6.1 Slides — One Game, Many Screens",
+      "unit": "2.6 Game States",
+      "preview": "slides",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-10-video-title-screen",
+      "title": "2.6.10 Video — Building a Title Screen",
+      "unit": "2.6 Game States",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-11-example-title-start-button",
+      "title": "2.6.11 Worked Example — Title Screen with Start Button",
+      "unit": "2.6 Game States",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-12-video-gameover-restart",
+      "title": "2.6.12 Video — Game Over and Restart",
+      "unit": "2.6 Game States",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-13-example-three-state-machine",
+      "title": "2.6.13 Worked Example — Three-State Machine: Title, Play, Game Over",
+      "unit": "2.6 Game States",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-14-reading-transitions-input",
+      "title": "2.6.14 Reading — q5play docs: Input-Driven Transitions",
+      "unit": "2.6 Game States",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-15-example-keyboard-transitions",
+      "title": "2.6.15 Worked Example — Keyboard-Driven State Changes",
+      "unit": "2.6 Game States",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-16-reading-transitions-condition",
+      "title": "2.6.16 Reading — q5play docs: Condition-Driven Transitions",
+      "unit": "2.6 Game States",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-17-example-score-threshold",
+      "title": "2.6.17 Worked Example — Score Threshold Triggers Game Over",
+      "unit": "2.6 Game States",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-18-video-extended-states",
+      "title": "2.6.18 Video — More States: Pause, Inventory, Settings",
+      "unit": "2.6 Game States",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-19-example-pause-state",
+      "title": "2.6.19 Worked Example — Adding a Pause State",
+      "unit": "2.6 Game States",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-2-video-state-machines",
+      "title": "2.6.2 Video — State Machines in Games",
+      "unit": "2.6 Game States",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-20-example-win-screen",
+      "title": "2.6.20 Worked Example — Win Screen State",
+      "unit": "2.6 Game States",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-21-video-states-decide-saves",
+      "title": "2.6.21 Video — States Decide When to Save",
+      "unit": "2.6 Game States",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-22-example-save-on-transition",
+      "title": "2.6.22 Worked Example — Save on State Transition",
+      "unit": "2.6 Game States",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-23-example-continue-right-state",
+      "title": "2.6.23 Worked Example — Continue Loads the Correct State",
+      "unit": "2.6 Game States",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-24-a16-2-game-states",
+      "title": "2.6.24 A16.2 Game States — State Machine with Persistence",
+      "unit": "2.6 Game States",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-25-challenges",
+      "title": "2.6.25 Challenges — Extended State Features",
+      "unit": "2.6 Game States",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-26-video-whats-next",
+      "title": "2.6.26 Video — What's Next: Looking Ahead to Unit 3",
+      "unit": "2.6 Game States",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-3-reading-switch-syntax",
+      "title": "2.6.3 Reading — MDN: The switch Statement",
+      "unit": "2.6 Game States",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-4-reading-switch-dispatch",
+      "title": "2.6.4 Reading — q5play docs: switch in draw()",
+      "unit": "2.6 Game States",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-5-example-switch-three-cases",
+      "title": "2.6.5 Worked Example — switch with Three Cases",
+      "unit": "2.6 Game States",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-6-reading-switch-break-default",
+      "title": "2.6.6 Reading — break and default in switch",
+      "unit": "2.6 Game States",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-7-reading-state-variable",
+      "title": "2.6.7 Reading — q5play docs: The state Variable",
+      "unit": "2.6 Game States",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-8-example-one-variable-many-screens",
+      "title": "2.6.8 Worked Example — One Variable, Many Screens",
+      "unit": "2.6 Game States",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-6-9-reading-naming-states",
+      "title": "2.6.9 Reading — Naming States: Conventions",
+      "unit": "2.6 Game States",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
     },
     {
       "id": "algorithm-practice",

@@ -1,0 +1,17 @@
+{
+  "id": "2-6-16-reading-transitions-condition",
+  "title": "2.6.16 Reading — q5play docs: Condition-Driven Transitions",
+  "description": "Condition-driven transitions happen automatically when something in the game changes. Score ≥ 100 → 'win', health ≤ 0 → 'gameover'. The game state triggers it.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.6 Game States",
+  "preview": "reading",
+  "week": 17,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

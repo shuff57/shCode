@@ -1,0 +1,105 @@
+{
+  "id": "2-6-24-a16-2-game-states",
+  "title": "2.6.24 A16.2 Game States — State Machine with Persistence",
+  "description": "Graded: build a game with at least 4 states (title, play, pause, gameover) with full save/load integration. Saves trigger on state transitions. Continue restores the right state.",
+  "type": "assignment",
+  "difficulty": "intermediate",
+  "estimateMins": 60,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.6 Game States",
+  "preview": "q5play",
+  "week": 17,
+  "slos": ["SLO-3"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Set up 4+ states with switch in draw()",
+      "instructions": "In draw(), write a switch(state) with at least four cases: 'title', 'play', 'pause', 'gameover'. Each case must end with break. Set state = 'title' in setup().",
+      "hints": ["Review 2.6.5 (switch with three cases) and 2.6.13 (three-state machine) for the switch pattern."]
+    },
+    {
+      "id": "s2",
+      "title": "Build the play state with player movement and score",
+      "instructions": "In the 'play' case, use kb.pressing for WASD or arrow-key movement. Increment score over time (frameCount % 60 === 0 is a simple timer). Display score with text().",
+      "hints": ["2.6.15 (keyboard-driven transitions) and 2.6.17 (score threshold) show movement + scoring patterns."]
+    },
+    {
+      "id": "s3",
+      "title": "Implement title screen with New Game / Continue",
+      "instructions": "In the 'title' case, display the game name and instructions. Show 'Press N for New Game'. If a save exists (check getItem), also show 'Press C to Continue'.",
+      "hints": ["2.6.11 (title screen) shows text layout for a start screen. Check localStorage with getItem()."]
+    },
+    {
+      "id": "s4",
+      "title": "Implement pause state (press P, game freezes)",
+      "instructions": "In the 'play' case, listen for kb.presses('p') to switch state to 'pause'. In the 'pause' case, stop all movement and draw a paused overlay. Press P again to return to 'play'.",
+      "hints": ["2.6.19 (pause state) shows the toggle pattern. Use kb.presses (edge-triggered) so P doesn't flicker."]
+    },
+    {
+      "id": "s5",
+      "title": "Implement game over state (condition-driven) with auto-save",
+      "instructions": "In the 'play' case, check a lose condition (e.g. score reaches a threshold, or player falls off screen). When it triggers, set state = 'gameover' AND call a save function. In the 'gameover' case, show final score and restart option.",
+      "hints": ["2.6.17 (score threshold) for condition-driven transition. 2.6.22 (save on transition) for wiring saveGame() to state changes."]
+    },
+    {
+      "id": "s6",
+      "title": "Add save/load integration so Continue restores the correct state and data",
+      "instructions": "Write a saveGame() function that uses storeItem + JSON.stringify to save { state, score, playerX, playerY, ... }. Write a loadGame() function that uses getItem + JSON.parse to restore. Call saveGame() on gameover and on win. Wire Continue to loadGame().",
+      "hints": ["2.5.16 (slots), 2.5.23 (auto-save), 2.6.22 (save on transition), 2.6.23 (continue loads correct state) cover the full save/load cycle."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "switch statement used",
+      "description": "Inside draw(), a switch statement controls which screen renders.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "switch\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Multiple cases with break",
+      "description": "At least three case blocks inside the switch, each ending with break.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s+.*:.*break",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "storeItem used",
+      "description": "storeItem is called to persist save data.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "storeItem\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "JSON.stringify used",
+      "description": "Save data is serialized with JSON.stringify before storing.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "JSON\\.stringify\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "JSON.parse used",
+      "description": "Save data is deserialized with JSON.parse when loading.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "JSON\\.parse\\s*\\(",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true, "reviewCommitHistory": true }
+}

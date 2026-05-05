@@ -1,6 +1,6 @@
 {
   "id": "2-3-12-challenges",
-  "title": "2.3.12 Challenges — Optional Stretch",
+  "title": "2.3.12 Challenges",
   "description": "Pick one (or more) Groups stretch challenges — add a lives counter to Apple Catcher, vary apple sizes for varied points, or implement a `cull()` helper. Auto-graded.",
   "type": "challenge",
   "difficulty": "advanced",

@@ -10,6 +10,10 @@ public/slides/
 # scripts/generate-solutions.mjs during prebuild.
 functions/_shared/solutions.generated.ts
 
+# Per-lesson starter file trees, bundled into a server-only map by
+# scripts/generate-lesson-starters.mjs during prebuild.
+functions/_shared/lesson-starters.generated.ts
+
 # TypeScript incremental build info
 tsconfig.tsbuildinfo
 
