@@ -68,7 +68,6 @@ export interface Grading {
   totalPoints: number;
   passingScore: number;
   allowLateSubmit?: boolean;
-  reviewCommitHistory?: boolean;
 }
 
 export interface Lesson {

@@ -25,7 +25,7 @@
       "description": "Use `enemies.push(new Enemy(...))` to add Enemy instances to the array.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:enemies\\.push\\s*\\(\\s*new\\s+Enemy[\\s\\S]*?){5}",
+      "pattern": "(?:enemies\\.push\\s*\\(\\s*new\\s+Enemy[\\s\\S]*?){5}|for\\s*\\([\\s\\S]{0,120}?\\)[\\s\\S]{0,60}?enemies\\.push\\s*\\(\\s*new\\s+Enemy",
       "flags": "",
       "points": 0,
       "status": "pending"

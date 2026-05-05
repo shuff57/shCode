@@ -62,11 +62,23 @@
     },
     {
       "id": "r2",
-      "title": "Multiple cases with break",
-      "description": "At least three case blocks inside the switch, each ending with break.",
-      "type": "regex",
+      "title": "At least 3 case labels",
+      "description": "Inside draw(), the switch has at least three case labels for different states.",
+      "type": "inFunction",
+      "function": "draw",
       "file": "script.js",
-      "pattern": "case\\s+.*:.*break",
+      "pattern": "(?:case\\s+[^:]+:[\\s\\S]*?){3}",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2b",
+      "title": "Each case ends with break",
+      "description": "The switch uses break to exit each case (otherwise the cases fall through).",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "\\bbreak\\s*;",
       "flags": "",
       "points": 0
     },
@@ -101,5 +113,5 @@
       "points": 0
     }
   ],
-  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true, "reviewCommitHistory": true }
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
 }

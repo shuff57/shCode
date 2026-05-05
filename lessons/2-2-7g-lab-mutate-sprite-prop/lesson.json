@@ -25,7 +25,7 @@
       "description": "Write a `moveRight(dx)` method that adds `dx` to `this.sprite.x` using `+=`.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "moveRight[\\s\\S]*this\\.sprite\\.x\\s*\\+=",
+      "pattern": "moveRight[\\s\\S]*?this\\.sprite\\.x\\s*(?:\\+=|=\\s*this\\.sprite\\.x\\s*\\+)",
       "flags": "",
       "points": 0,
       "status": "pending"

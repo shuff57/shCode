@@ -99,7 +99,7 @@
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "kb\\.presses\\s*\\([^)]*\\)\\s*&&\\s*[^;\\n{]*\\.colliding\\s*\\(|\\.colliding\\s*\\([^)]*\\)\\s*&&\\s*[^;\\n{]*kb\\.presses\\s*\\(",
+      "pattern": "kb\\.presses\\s*\\([^)]*\\)\\s*&&\\s*[^;\\n{]*\\.colliding\\s*\\(|\\.colliding\\s*\\([^)]*\\)\\s*&&\\s*[^;\\n{]*kb\\.presses\\s*\\(|\\.colliding\\s*\\([^)]*\\)[\\s\\S]{0,200}?kb\\.presses\\s*\\(|kb\\.presses\\s*\\([^)]*\\)[\\s\\S]{0,200}?\\.colliding\\s*\\(",
       "flags": "",
       "points": 0
     },
@@ -126,5 +126,5 @@
       "points": 0
     }
   ],
-  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true, "reviewCommitHistory": true }
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
 }

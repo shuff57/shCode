@@ -38,8 +38,8 @@
   ],
   "requirements": [
     { "id": "r1", "title": "Canvas created", "description": "`new Canvas(...)` appears in setup().", "type": "inFunction", "function": "setup", "file": "script.js", "pattern": "new\\s+Canvas\\s*\\(", "flags": "", "points": 0 },
-    { "id": "r2", "title": "Rectangle sprite (4-arg form)", "description": "At least one `new Sprite(x, y, w, h)` call with four numeric arguments.", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(\\s*-?\\d+(?:\\.\\d+)?\\s*,\\s*-?\\d+(?:\\.\\d+)?\\s*,\\s*-?\\d+(?:\\.\\d+)?\\s*,\\s*-?\\d+(?:\\.\\d+)?\\s*\\)", "flags": "", "points": 0 },
-    { "id": "r3", "title": "Circle sprite (3-arg form)", "description": "At least one `new Sprite(x, y, diameter)` call with exactly three numeric arguments.", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(\\s*-?\\d+(?:\\.\\d+)?\\s*,\\s*-?\\d+(?:\\.\\d+)?\\s*,\\s*-?\\d+(?:\\.\\d+)?\\s*\\)", "flags": "", "points": 0 },
+    { "id": "r2", "title": "Rectangle sprite (4-arg form)", "description": "At least one `new Sprite(x, y, w, h)` call with four arguments.", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(\\s*[^,()]+,\\s*[^,()]+,\\s*[^,()]+,\\s*[^,)]+\\s*\\)", "flags": "", "points": 0 },
+    { "id": "r3", "title": "Circle sprite (3-arg form)", "description": "At least one `new Sprite(x, y, diameter)` call with exactly three arguments.", "type": "regex", "file": "script.js", "pattern": "new\\s+Sprite\\s*\\(\\s*[^,()]+,\\s*[^,()]+,\\s*[^,)]+\\s*\\)", "flags": "", "points": 0 },
     { "id": "r4", "title": "Property set on an instance", "description": "At least one `.color` assignment on a sprite instance.", "type": "regex", "file": "script.js", "pattern": "\\.color\\s*=", "flags": "", "points": 0 },
     { "id": "r5", "title": "Stroke used", "description": "A `.stroke` or `.strokeWeight` property is assigned.", "type": "regex", "file": "script.js", "pattern": "\\.stroke(?:Weight)?\\s*=", "flags": "", "points": 0 }
   ],

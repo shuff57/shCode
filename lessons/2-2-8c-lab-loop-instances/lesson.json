@@ -38,7 +38,7 @@
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "\\w+\\.render\\s*\\(\\s*\\)",
+      "pattern": "(?:\\w|\\])\\.render\\s*\\(\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending"

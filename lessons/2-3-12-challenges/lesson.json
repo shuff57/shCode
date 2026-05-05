@@ -70,11 +70,11 @@
     },
     {
       "id": "r4",
-      "title": "Define a cull() helper",
-      "description": "Declare a function named `cull` (function-statement form) — see Challenge 3 in content.md.",
+      "title": "Implement one stretch challenge",
+      "description": "Pick any of the three challenges in content.md: a `lives` counter (Challenge 1), `Math.random()` driving a sprite property like .diameter / .color (Challenge 2), or a `function cull(...)` helper (Challenge 3).",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bfunction\\s+cull\\s*\\(",
+      "pattern": "\\blives\\s*(?:=|--|\\+\\+|[-+*/]=)|(?:Math\\.random|\\brandom)\\s*\\([^)]*\\)[\\s\\S]{0,120}?\\.(diameter|width|height|color)\\s*=|\\.(diameter|width|height|color)\\s*=[\\s\\S]{0,120}?(?:Math\\.random|\\brandom)\\s*\\(|\\bfunction\\s+cull\\s*\\(",
       "flags": "",
       "points": 0
     }
