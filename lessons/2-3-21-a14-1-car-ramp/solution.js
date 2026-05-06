@@ -32,14 +32,7 @@ function setup() {
 function draw() {
   background('#222');
 
-  if (kb.pressing('d')) {
-    leftWheel.angularVelocity  = 12;
-    rightWheel.angularVelocity = 12;
-  } else if (kb.pressing('a')) {
-    leftWheel.angularVelocity  = -12;
-    rightWheel.angularVelocity = -12;
-  } else {
-    leftWheel.angularVelocity  = 0;
-    rightWheel.angularVelocity = 0;
-  }
+  if      (kb.pressing('d')) chassis.vel.x =  4;
+  else if (kb.pressing('a')) chassis.vel.x = -4;
+  else                       chassis.vel.x =  0;
 }
