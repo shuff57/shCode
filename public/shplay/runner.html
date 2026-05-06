@@ -9,7 +9,6 @@
 	canvas { display: block; width: 100%; height: 100%; }
 	#error { position: fixed; top: 0; left: 0; right: 0; background: rgba(220,38,38,0.92); color: #fff; padding: 8px 12px; font: 12px/1.4 monospace; white-space: pre-wrap; display: none; z-index: 100; }
 	#empty { color: #666; font: 13px system-ui; text-align: center; }
-	#unsupported { color: #f87171; font: 14px system-ui; text-align: center; padding: 24px; max-width: 480px; }
 </style>
 <script>
 // Pipe console + errors to parent (matches the q5play runner's protocol).
@@ -82,6 +81,13 @@
 	});
 })();
 </script>
+<script type="importmap">
+{
+	"imports": {
+		"three": "https://unpkg.com/three@0.180.0/build/three.module.js"
+	}
+}
+</script>
 </head>
 <body>
 <canvas id="canvas"></canvas>
@@ -89,54 +95,45 @@
 <div id="empty">Click Run to start your sketch.</div>
 <script type="module">
 // Boot order:
-//   1. Detect WebGPU. Fail loudly if absent.
-//   2. Decode student code from ?code=<base64url>.
-//   3. Load the shPlay bundle (exposes Cube/Sphere/kb/background as globals).
-//   4. Inject the student script (so its setup()/draw() become globals).
-//   5. Boot — shPlay's plugin runs setup() once and then draw() every frame.
+//   1. Decode student code from ?code=<base64url>.
+//   2. Load shplay.js (registers globals: Cube/Sphere/Plane/kb/background/camera).
+//   3. Inject the student script (so its setup()/draw() become globals).
+//   4. Boot — the facade calls setup() once and runs draw() every frame.
 
-if (!('gpu' in navigator)) {
+(async function() {
+	const params = new URLSearchParams(location.search);
+	const encoded = params.get('code');
+	if (!encoded) return;
+
+	let code;
+	try {
+		let b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+		while (b64.length % 4) b64 += '=';
+		code = decodeURIComponent(escape(atob(b64)));
+	} catch (e) {
+		console.error('Failed to decode sketch:', e.message || e);
+		return;
+	}
+
 	document.getElementById('empty').remove();
-	var msg = document.createElement('div');
-	msg.id = 'unsupported';
-	msg.textContent = 'This browser does not support WebGPU. Use Chrome, Edge, or Safari 18.4+ to run shPlay sketches.';
-	document.body.appendChild(msg);
-} else {
-	(async function() {
-		const params = new URLSearchParams(location.search);
-		const encoded = params.get('code');
-		if (!encoded) return;
+	window.__previewSources = { 'sketch.js': code };
 
-		let code;
-		try {
-			let b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
-			while (b64.length % 4) b64 += '=';
-			code = decodeURIComponent(escape(atob(b64)));
-		} catch (e) {
-			console.error('Failed to decode sketch:', e.message || e);
-			return;
-		}
+	await import('./shplay.js');
 
-		document.getElementById('empty').remove();
-		window.__previewSources = { 'sketch.js': code };
+	// Inject student code as a script tag so top-level declarations become
+	// window globals (matches the q5play runner pattern). The trailing snippet
+	// copies setup/draw onto window so non-strict-mode declarations are
+	// reachable from our boot.
+	const s = document.createElement('script');
+	s.textContent = code +
+		'\n//# sourceURL=sketch.js\n' +
+		';if(typeof setup==="function"){window.setup=setup}' +
+		';if(typeof draw==="function"){window.draw=draw}';
+	document.head.appendChild(s);
 
-		await import('./shplay.js');
-
-		// Inject student code as a script tag so top-level declarations become
-		// window globals (matches the q5play runner pattern). The trailing
-		// snippet copies setup/draw onto window so non-strict-mode declarations
-		// are reachable from our plugin.
-		const s = document.createElement('script');
-		s.textContent = code +
-			'\n//# sourceURL=sketch.js\n' +
-			';if(typeof setup==="function"){window.setup=setup}' +
-			';if(typeof draw==="function"){window.draw=draw}';
-		document.head.appendChild(s);
-
-		try { await window.shplay.boot(); }
-		catch (e) { console.error(e); }
-	})();
-}
+	try { await window.shplay.boot(); }
+	catch (e) { console.error(e); }
+})();
 </script>
 </body>
 </html>
