@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>shPlay sandbox</title>
+<style>
+	* { box-sizing: border-box; }
+	html, body { margin: 0; padding: 0; height: 100%; background: #1a1a1a; color: #eee; font-family: system-ui, sans-serif; }
+	body { display: grid; grid-template-rows: auto 1fr; }
+	header { padding: 10px 14px; background: #0e0e0e; border-bottom: 1px solid #333; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+	header h1 { margin: 0; font: 600 14px system-ui; color: #f59e0b; }
+	header button { background: #16a34a; color: #fff; border: 0; padding: 6px 14px; border-radius: 4px; cursor: pointer; font: 600 13px system-ui; }
+	header button:hover { background: #15803d; }
+	header select { background: #1f1f1f; color: #eee; border: 1px solid #444; padding: 5px 8px; border-radius: 4px; font: 13px system-ui; cursor: pointer; }
+	header .hint { color: #888; font: 12px system-ui; margin-left: auto; }
+	#status { font: 12px ui-monospace; color: #888; }
+	main { display: grid; grid-template-columns: minmax(320px, 480px) 1fr; gap: 0; min-height: 0; }
+	textarea { background: #0a0a0a; color: #eee; border: 0; border-right: 1px solid #333; padding: 12px; font: 13px/1.5 ui-monospace, Menlo, monospace; resize: none; outline: none; tab-size: 2; }
+	#preview { width: 100%; height: 100%; border: 0; background: #111; display: block; }
+	#log { position: fixed; bottom: 0; right: 0; max-width: 50%; max-height: 30vh; overflow: auto; background: rgba(0,0,0,0.85); padding: 8px; font: 11px/1.4 ui-monospace; color: #eee; border-top-left-radius: 6px; pointer-events: none; }
+	#log .err { color: #fca5a5; }
+	#log .warn { color: #fcd34d; }
+</style>
+</head>
+<body>
+<header>
+	<h1>shPlay</h1>
+	<button id="run" title="Ctrl+Enter">▶ Run</button>
+	<select id="example" title="Load a preset sketch">
+		<option value="">— Examples —</option>
+		<option value="rotating">Rotating cube</option>
+		<option value="wasd">WASD movement</option>
+		<option value="spin3d">3-axis rotation</option>
+		<option value="grid">Grid of cubes</option>
+		<option value="primitives">Cube + Sphere + Plane</option>
+		<option value="bouncer">Bouncing cube</option>
+	</select>
+	<span id="status"></span>
+	<span class="hint">Ctrl+Enter to run · click the preview, then WASD/etc.</span>
+</header>
+<main>
+	<textarea id="code" spellcheck="false"></textarea>
+	<iframe id="preview"></iframe>
+</main>
+<div id="log"></div>
+<script>
+const EXAMPLES = {
+	rotating: `// Rotating cube — the "hello world" of shPlay.
+let cube;
+function setup() {
+  cube = new Cube(0, 0, 0);
+  cube.color = 'tomato';
+  cube.size = 1.5;
+}
+function draw() {
+  background('#222');
+  cube.rotation.y += 0.01;
+}
+`,
+	wasd: `// WASD moves the cube on the X/Z plane.
+let cube;
+function setup() {
+  cube = new Cube(0, 0, 0);
+  cube.color = 'deepskyblue';
+}
+function draw() {
+  background('#1a1a2e');
+  if (kb.pressing('a')) cube.position.x -= 0.08;
+  if (kb.pressing('d')) cube.position.x += 0.08;
+  if (kb.pressing('w')) cube.position.z -= 0.08;
+  if (kb.pressing('s')) cube.position.z += 0.08;
+  cube.rotation.y += 0.01;
+}
+`,
+	spin3d: `// Rotation around all three axes at different speeds.
+let cube;
+function setup() {
+  cube = new Cube(0, 0, 0);
+  cube.color = 'gold';
+  cube.size = 2;
+}
+function draw() {
+  background('#222');
+  cube.rotation.x += 0.005;
+  cube.rotation.y += 0.01;
+  cube.rotation.z += 0.003;
+}
+`,
+	grid: `// 5x5 grid of cubes, each with a unique color.
+let cubes = [];
+function setup() {
+  for (let x = -2; x <= 2; x++) {
+    for (let z = -2; z <= 2; z++) {
+      let c = new Cube(x * 1.5, 0, z * 1.5, 0.8);
+      c.color = '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
+      cubes.push(c);
+    }
+  }
+}
+function draw() {
+  background('#0e0e1a');
+  for (let c of cubes) c.rotation.y += 0.01;
+}
+`,
+	primitives: `// Cube, Sphere, Plane on a floor.
+let cube, ball, floor;
+function setup() {
+  floor = new Plane(0, -1, 0, 12, 12);
+  floor.color = '#444';
+
+  cube = new Cube(-2, 0, 0);
+  cube.color = 'tomato';
+
+  ball = new Sphere(2, 0, 0, 0.8);
+  ball.color = 'limegreen';
+}
+function draw() {
+  background('#222');
+  cube.rotation.y += 0.01;
+  ball.position.y = Math.sin(frameCount * 0.05) * 0.5;
+}
+`,
+	bouncer: `// Cube bounces back at the walls.
+let cube, vx = 0.06, vz = 0.04;
+function setup() {
+  cube = new Cube(0, 0, 0);
+  cube.color = 'hotpink';
+}
+function draw() {
+  background('#1a0e1a');
+  cube.position.x += vx;
+  cube.position.z += vz;
+  if (Math.abs(cube.position.x) > 4) vx = -vx;
+  if (Math.abs(cube.position.z) > 3) vz = -vz;
+  cube.rotation.x += 0.02;
+  cube.rotation.y += 0.03;
+}
+`,
+};
+
+const codeEl = document.getElementById('code');
+const previewEl = document.getElementById('preview');
+const runBtn = document.getElementById('run');
+const exampleEl = document.getElementById('example');
+const logEl = document.getElementById('log');
+const statusEl = document.getElementById('status');
+const STORAGE_KEY = 'shplay-sandbox-code';
+let runKey = 0;
+
+// Restore last edit from localStorage so refresh doesn't lose work.
+codeEl.value = localStorage.getItem(STORAGE_KEY) || EXAMPLES.rotating;
+
+codeEl.addEventListener('input', () => {
+	localStorage.setItem(STORAGE_KEY, codeEl.value);
+});
+
+function encode(s) {
+	const utf8 = unescape(encodeURIComponent(s));
+	const b64 = btoa(utf8);
+	return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function run() {
+	logEl.textContent = '';
+	statusEl.textContent = '';
+	runKey++;
+	previewEl.src = './runner.html?code=' + encode(codeEl.value) + '&r=' + runKey;
+	// Focus the preview so kb.pressing works without an extra click.
+	setTimeout(() => previewEl.focus(), 200);
+}
+
+function appendLog(text, cls) {
+	const d = document.createElement('div');
+	d.textContent = text;
+	if (cls) d.className = cls;
+	logEl.appendChild(d);
+	logEl.scrollTop = logEl.scrollHeight;
+}
+
+window.addEventListener('message', (e) => {
+	const d = e.data;
+	if (!d) return;
+	if (d.source === 'preview-console') {
+		const msg = '[' + d.type + '] ' + d.args.map(a => typeof a === 'string' ? a : JSON.stringify(a)).join(' ');
+		appendLog(msg, d.type === 'error' ? 'err' : (d.type === 'warn' ? 'warn' : ''));
+	} else if (d.source === 'preview-error') {
+		appendLog('ERR ' + d.error.name + ': ' + d.error.message + (d.error.file ? ' @ ' + d.error.file + ':' + d.error.line : ''), 'err');
+	} else if (d.source === 'shplay-status') {
+		statusEl.textContent = d.text;
+		statusEl.style.color = d.ok ? '#34d399' : '#f87171';
+	}
+});
+
+runBtn.addEventListener('click', run);
+exampleEl.addEventListener('change', () => {
+	const key = exampleEl.value;
+	if (!key) return;
+	codeEl.value = EXAMPLES[key];
+	localStorage.setItem(STORAGE_KEY, codeEl.value);
+	exampleEl.value = '';
+	run();
+});
+
+codeEl.addEventListener('keydown', (e) => {
+	if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); run(); }
+	// Tab inserts two spaces instead of leaving the textarea.
+	if (e.key === 'Tab') {
+		e.preventDefault();
+		const start = codeEl.selectionStart, end = codeEl.selectionEnd;
+		codeEl.value = codeEl.value.slice(0, start) + '  ' + codeEl.value.slice(end);
+		codeEl.selectionStart = codeEl.selectionEnd = start + 2;
+	}
+});
+
+run();
+</script>
+</body>
+</html>
