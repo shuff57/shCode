@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>shPlay runner</title>
+<style>
+	html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #111; color: #eee; font-family: system-ui, sans-serif; }
+	body { display: flex; align-items: center; justify-content: center; }
+	canvas { display: block; width: 100%; height: 100%; }
+	#error { position: fixed; top: 0; left: 0; right: 0; background: rgba(220,38,38,0.92); color: #fff; padding: 8px 12px; font: 12px/1.4 monospace; white-space: pre-wrap; display: none; z-index: 100; }
+	#empty { color: #666; font: 13px system-ui; text-align: center; }
+	#unsupported { color: #f87171; font: 14px system-ui; text-align: center; padding: 24px; max-width: 480px; }
+</style>
+<script>
+// Pipe console + errors to parent (matches the q5play runner's protocol).
+(function() {
+	function send(type, args) {
+		try {
+			var safe = Array.prototype.slice.call(args).map(function(a) {
+				if (a instanceof Error) return a.stack || a.message;
+				if (typeof a === 'object') { try { return JSON.parse(JSON.stringify(a)); } catch(e){ return String(a); } }
+				return a;
+			});
+			window.parent.postMessage({ source: 'preview-console', type: type, args: safe }, '*');
+		} catch (e) { /* parent gone */ }
+	}
+	['log','warn','error','info'].forEach(function(t) {
+		var orig = console[t];
+		console[t] = function() { send(t, arguments); orig.apply(console, arguments); };
+	});
+
+	function parseStudentFrame(stack) {
+		if (!stack) return null;
+		var sources = window.__previewSources || {};
+		var lines = String(stack).split('\n');
+		var rx = /([A-Za-z_][\w./-]*\.js):(\d+):(\d+)/;
+		for (var i = 0; i < lines.length; i++) {
+			var m = rx.exec(lines[i]);
+			if (m && Object.prototype.hasOwnProperty.call(sources, m[1])) {
+				return { file: m[1], line: parseInt(m[2], 10), col: parseInt(m[3], 10) };
+			}
+		}
+		return null;
+	}
+	function lineSnippet(file, line) {
+		var src = (window.__previewSources || {})[file];
+		if (!src || !line) return '';
+		var arr = src.split('\n');
+		return (arr[line - 1] || '').replace(/^\s+/, '').slice(0, 200);
+	}
+	function reportError(err, fallbackMsg, fbFile, fbLine, fbCol) {
+		var loc = parseStudentFrame(err && err.stack);
+		if (!loc && fbFile && (window.__previewSources || {})[fbFile]) {
+			loc = { file: fbFile, line: fbLine || 0, col: fbCol || 0 };
+		}
+		var name = (err && err.name) || 'Error';
+		var msg = (err && err.message) || fallbackMsg || String(err);
+		var file = loc ? loc.file : null;
+		var line = loc ? loc.line : null;
+		var col = loc ? loc.col : null;
+		try {
+			window.parent.postMessage({
+				source: 'preview-error',
+				error: { name: name, message: msg, file: file, line: line, col: col, snippet: file ? lineSnippet(file, line) : '' }
+			}, '*');
+		} catch (e) { /* parent gone */ }
+		var locStr = file ? file + ':' + line + (col ? ':' + col : '') : '';
+		send('error', [name + ': ' + msg + (locStr ? '  (' + locStr + ')' : '')]);
+		var el = document.getElementById('error');
+		if (el) {
+			el.style.display = 'block';
+			el.textContent = name + ': ' + msg + (locStr ? '  @ ' + locStr : '');
+		}
+	}
+	window.addEventListener('error', function(e) {
+		reportError(e.error, e.message, e.filename, e.lineno, e.colno);
+	});
+	window.addEventListener('unhandledrejection', function(e) {
+		var r = e.reason;
+		var err = (r && r.stack) ? r : new Error(r && r.message ? r.message : String(r));
+		reportError(err, 'Unhandled promise rejection');
+	});
+})();
+</script>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div id="error"></div>
+<div id="empty">Click Run to start your sketch.</div>
+<script type="module">
+// Boot order:
+//   1. Detect WebGPU. Fail loudly if absent.
+//   2. Decode student code from ?code=<base64url>.
+//   3. Load the shPlay bundle (exposes Cube/Sphere/kb/background as globals).
+//   4. Inject the student script (so its setup()/draw() become globals).
+//   5. Boot — shPlay's plugin runs setup() once and then draw() every frame.
+
+if (!('gpu' in navigator)) {
+	document.getElementById('empty').remove();
+	var msg = document.createElement('div');
+	msg.id = 'unsupported';
+	msg.textContent = 'This browser does not support WebGPU. Use Chrome, Edge, or Safari 18.4+ to run shPlay sketches.';
+	document.body.appendChild(msg);
+} else {
+	(async function() {
+		const params = new URLSearchParams(location.search);
+		const encoded = params.get('code');
+		if (!encoded) return;
+
+		let code;
+		try {
+			let b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+			while (b64.length % 4) b64 += '=';
+			code = decodeURIComponent(escape(atob(b64)));
+		} catch (e) {
+			console.error('Failed to decode sketch:', e.message || e);
+			return;
+		}
+
+		document.getElementById('empty').remove();
+		window.__previewSources = { 'sketch.js': code };
+
+		await import('./shplay.js');
+
+		// Inject student code as a script tag so top-level declarations become
+		// window globals (matches the q5play runner pattern). The trailing
+		// snippet copies setup/draw onto window so non-strict-mode declarations
+		// are reachable from our plugin.
+		const s = document.createElement('script');
+		s.textContent = code +
+			'\n//# sourceURL=sketch.js\n' +
+			';if(typeof setup==="function"){window.setup=setup}' +
+			';if(typeof draw==="function"){window.draw=draw}';
+		document.head.appendChild(s);
+
+		try { await window.shplay.boot(); }
+		catch (e) { console.error(e); }
+	})();
+}
+</script>
+</body>
+</html>

@@ -93,3 +93,7 @@ bun.lock
 # Local guarded SolidCraft preview; generated symlinks, not deploy assets.
 public/solidcraft-preview/
 scripts/ci-heldout/variants/
+
+# shplay-build artifacts: track source, not bundle outputs (regenerated)
+shplay-build/node_modules
+shplay-build/bun.lock
