@@ -278,18 +278,59 @@ export default function AiHelpPanel({ lesson }: Props) {
         </div>
       ) : null}
 
-      {quota ? (
-        <div
-          style={{
-            fontSize: 11,
-            color: quota.remaining <= 2 ? '#ffb86c' : '#6272a4',
-            textAlign: 'right',
-          }}
-        >
-          {quota.remaining} of {quota.limit} AI helps left today
-          {lesson.unit ? ` (${lesson.unit})` : ''}
-        </div>
-      ) : null}
+      {quota ? (() => {
+        const used = Math.max(0, quota.limit - quota.remaining);
+        const pct = Math.min(100, (used / Math.max(1, quota.limit)) * 100);
+        const fill =
+          quota.remaining === 0 ? '#ff5555' :
+          quota.remaining <= 2 ? '#ffb86c' :
+          '#50fa7b';
+        const labelColor = quota.remaining <= 2 ? '#ffb86c' : '#6272a4';
+        return (
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'baseline',
+                fontSize: 11,
+                color: '#6272a4',
+                marginBottom: 3,
+              }}
+            >
+              <span>
+                AI helps today{lesson.unit ? ` (${lesson.unit})` : ''}
+              </span>
+              <span style={{ color: labelColor, fontVariantNumeric: 'tabular-nums' }}>
+                {quota.remaining} of {quota.limit} left
+              </span>
+            </div>
+            <div
+              role="meter"
+              aria-valuemin={0}
+              aria-valuemax={quota.limit}
+              aria-valuenow={used}
+              aria-label="AI helps used today"
+              style={{
+                height: 6,
+                background: '#282a36',
+                border: '1px solid #44475a',
+                borderRadius: 3,
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  width: `${pct}%`,
+                  height: '100%',
+                  background: fill,
+                  transition: 'width 0.3s ease, background 0.3s ease',
+                }}
+              />
+            </div>
+          </div>
+        );
+      })() : null}
 
       <div
         ref={responseRef}

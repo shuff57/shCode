@@ -316,15 +316,18 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
 
   const filtered = trimLongCodeBlocks(raw, MAX_CODE_BLOCK_LINES);
 
-  return new Response(filtered, {
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-      'Cache-Control': 'no-cache, no-transform',
-      'X-Content-Type-Options': 'nosniff',
-      'X-RateLimit-Limit': String(dailyLimit),
-      'X-RateLimit-Remaining': String(remaining),
-    },
-  });
+  const headers: Record<string, string> = {
+    'Content-Type': 'text/plain; charset=utf-8',
+    'Cache-Control': 'no-cache, no-transform',
+    'X-Content-Type-Options': 'nosniff',
+  };
+  // Only students are rate-limited; exempt roles shouldn't see a meter.
+  if (data.role === 'student') {
+    headers['X-RateLimit-Limit'] = String(dailyLimit);
+    headers['X-RateLimit-Remaining'] = String(remaining);
+  }
+
+  return new Response(filtered, { headers });
 };
 
 function json(body: unknown, status = 200, extra?: Record<string, string>): Response {
