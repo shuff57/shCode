@@ -1,8 +1,8 @@
-{
+﻿{
   "id": "3-1-4d-reading-handedness",
   "title": "3.1.4d Reading — Handedness and the Right-Hand Rule",
   "description": "The right-hand rule explains why shPlay's coordinate system is oriented the way it is.",
-  "type": "reading",
+  "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 3: shPlay — 3D Game Development",

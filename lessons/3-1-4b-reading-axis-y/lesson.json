@@ -1,8 +1,8 @@
-{
+﻿{
   "id": "3-1-4b-reading-axis-y",
   "title": "3.1.4b Reading — The Y Axis",
   "description": "Positive Y is UP — the key mental shift from 2D screen coordinates where Y increases downward.",
-  "type": "reading",
+  "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 4,
   "category": "Unit 3: shPlay — 3D Game Development",

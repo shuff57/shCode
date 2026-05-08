@@ -1,8 +1,8 @@
-{
+﻿{
   "id": "3-1-10b-reading-background",
   "title": "3.1.10b Reading — background() in 3D",
   "description": "Calling background(color) every frame in draw() clears the 3D scene to a solid color and prevents motion trails.",
-  "type": "reading",
+  "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 4,
   "category": "Unit 3: shPlay — 3D Game Development",

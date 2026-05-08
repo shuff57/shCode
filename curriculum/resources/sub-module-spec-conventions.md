@@ -51,7 +51,7 @@ status: draft|ready|shipped
 10. **Worked Examples (teacher-led)** — numbered `### Worked Example N — <topic> (<minutes>)` blocks with full code samples in fenced ```js blocks. These are the live-in-class demos *and* the spec for the matching `preview: "example"` lessons.
 11. **Challenges (optional stretch)** — bulleted list of stretch ideas. Becomes the `<U-M-L>-challenges` lesson's `content.md`.
 12. **Session Plan** — 2 (or however many) tables, one per class session. Columns: `Time | Activity | Notes`.
-13. **Assignments** — for each `A<W>.<N>` artifact: type, est. time, due, task description, requirements, pass criteria. Lab assignments per `lab-assignment-conventions.md`; written per `written-assignment-conventions.md`. Do not author rubrics in points language — q5 lessons / labs / challenges are mastery-based (all-green Submit gate; see `q5play-lesson-conventions.md` §1 + §5).
+13. **Assignments** — for each `A<W>.<N>` artifact: type, est. time, due, task description, requirements, pass criteria. Lab assignments per `lab-assignment-conventions.md`; written per `written-assignment-conventions.md`. Do not author rubrics in points language — q5 lessons / labs / challenges are mastery-based (all-green Submit gate; see `sketch-lesson-conventions.md` §1 + §5).
 14. **Vocabulary** — 5–10 row table `Term | Definition`. Doubles as the source rows for the closing glossary in matching reading lessons.
 15. **Teacher Notes** — bullet list of pacing tips, common student bugs, retention rules (for SLO-evidence artifacts).
 16. **Numbered Lesson List** — per §3.3. **This is the build target** — Claude reads this section when the user says "build 2.X.Y."
@@ -145,9 +145,9 @@ A unit that spans multiple sub-modules numbers lessons **flat across the whole u
 
 | Slot type | `script.js` shape | Convention |
 |---|---|---|
-| `q5play (lesson)` (`type: "lesson"`) | scaffold: header + lets + `setup()` / `draw()` skeletons + `// STEP N:` comments **describing each task in plain English**, empty function bodies | `q5play-lesson-conventions.md` §3 |
+| `q5play (lesson)` (`type: "lesson"`) | scaffold: header + lets + `setup()` / `draw()` skeletons + `// STEP N:` comments **describing each task in plain English**, empty function bodies | `sketch-lesson-conventions.md` §3 |
 | `q5play (assignment)` (`type: "assignment"`) | scaffold: same shape as `lesson` — header + lets + skeletons + `// STEP N:` description-only comments. **No commented-out solution code.** | `lab-assignment-conventions.md` §2 + §3 |
-| `q5play (challenge)` (`type: "challenge"`) | **fully empty** — zero bytes (or single trailing newline). Challenges deliberately remove the scaffold so the student structures the program themselves. | `q5play-challenge-conventions.md` §4 |
+| `q5play (challenge)` (`type: "challenge"`) | **fully empty** — zero bytes (or single trailing newline). Challenges deliberately remove the scaffold so the student structures the program themselves. | `sketch-challenge-conventions.md` §4 |
 | `example` (`preview: "example"`) | fully working sketch (read-along) OR omitted entirely if `content.md` carries everything | `example-conventions.md` §4 |
 | `slides`, `video`, `reading` | no `script.js` at all | per-type convention |
 
@@ -174,7 +174,7 @@ Example:
   - `category: "Unit 5: q5play — Game Physics"` → `"Unit 2: q5play — Applied Game Development"`
   - `week: 15` → `13`
   - `script.js` uses `update()` separate from `draw()` — consolidate to `draw()` only (per §Do NOT in this spec).
-  - `passingScore: 20` → set to `0` (along with `totalPoints` and every `requirements[].points`) per `q5play-lesson-conventions.md` §1 (no-points; Submit is all-green-gated).
+  - `passingScore: 20` → set to `0` (along with `totalPoints` and every `requirements[].points`) per `sketch-lesson-conventions.md` §1 (no-points; Submit is all-green-gated).
 - **Data continuity:** renaming the folder changes `lesson.json.id`, which breaks any existing student commits/progress under the old id. Acceptable in pre-launch state; flag if students are already enrolled.
 ```
 
@@ -259,5 +259,5 @@ When updating an existing spec for a build pass: §3.3 (Numbered Lesson List) is
 |------|------|
 | Pre-2.2 | Each sub-module spec ended with a "Build Outputs (what Builder AI generates)" section listing 3-5 markdown deliverables (assignment doc + video manifest + lesson metadata updates). The actual 2.2 build produced 12 numbered in-app lessons; the spec section never matched what shipped. |
 | Post-2.2 / unit-2.3 prep | Spec convention codified (this doc). Required: §3.3 Numbered Lesson List replacing the legacy Build Outputs section, §3.2 Reading content guidance per reading, §3.1 Description-hook column on videos, §3.4 Carry-over migration notes per pre-existing slug. Slug naming rule §4 made explicit (`<U>-<M>-<L>-<descriptor>`) and tied to the DB / `parseNumberedIdFromTitle` constraints. |
-| No-points + green-to-advance | The course is now mastery-based. §1 frontmatter `artifacts[]` shape dropped the `points: <n>` field. §2 Required Sections #13 (Assignments) reframed: rubrics must use pass-criteria language, not point columns. §3.4 migration example updated to require `passingScore` AND `totalPoints` AND every `requirements[].points` to be `0`. The convention violation list at §3.4 now treats any non-zero point value as a violation. See `q5play-lesson-conventions.md` for the canonical wording and the green-to-advance lesson-nav lock. |
+| No-points + green-to-advance | The course is now mastery-based. §1 frontmatter `artifacts[]` shape dropped the `points: <n>` field. §2 Required Sections #13 (Assignments) reframed: rubrics must use pass-criteria language, not point columns. §3.4 migration example updated to require `passingScore` AND `totalPoints` AND every `requirements[].points` to be `0`. The convention violation list at §3.4 now treats any non-zero point value as a violation. See `sketch-lesson-conventions.md` for the canonical wording and the green-to-advance lesson-nav lock. |
 | Granularity for intro-level units | §2a added: "one new concept per lesson" rule for intro-level material. §2 Required Sections gained #17 Lab/Reading Specs (per-lesson detail) for intro units. §4 slug rule now permits an optional lowercase `<letter>` suffix for retroactive granularity inserts under shipped integer slots (§4.1). The 2.2 OOP unit was the first to apply the granularity bar retroactively — its 13 shipped lessons were preserved by slug, with 13 new sub-letter inserts (2.2.3a, 2.2.3b, 2.2.4a–d, 2.2.5, 2.2.5a, 2.2.7a–h, 2.2.8a–c, 2.2.10a, 2.2.12a) splitting the dense readings and the Enemy-class worked example into atomic concept lessons. See `2.2.1_classes-via-q5play.md` for the canonical example. |

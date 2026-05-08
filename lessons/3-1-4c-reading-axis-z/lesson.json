@@ -1,8 +1,8 @@
-{
+﻿{
   "id": "3-1-4c-reading-axis-z",
   "title": "3.1.4c Reading — The Z Axis",
   "description": "Positive Z comes toward the viewer; negative Z goes into the scene.",
-  "type": "reading",
+  "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 4,
   "category": "Unit 3: shPlay — 3D Game Development",

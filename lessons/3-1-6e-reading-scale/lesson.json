@@ -1,8 +1,8 @@
-{
+﻿{
   "id": "3-1-6e-reading-scale",
   "title": "3.1.6e Reading — What is .scale?",
   "description": "The .scale property stretches a shape on each axis independently; .size is the uniform-scale shorthand.",
-  "type": "reading",
+  "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 4,
   "category": "Unit 3: shPlay — 3D Game Development",

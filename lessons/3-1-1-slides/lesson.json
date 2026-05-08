@@ -1,8 +1,8 @@
-{
+﻿{
   "id": "3-1-1-slides",
   "title": "3.1.1 Module Slides",
   "description": "Module 3.1 orientation slides covering the coordinate system, transforms, and the Spinning Sculpture project.",
-  "type": "slides",
+  "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 3: shPlay — 3D Game Development",

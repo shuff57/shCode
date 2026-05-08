@@ -1,8 +1,8 @@
-{
+﻿{
   "id": "3-1-4a-reading-axis-x",
   "title": "3.1.4a Reading — The X Axis",
   "description": "Positive X is right, negative X is left — the same direction as 2D screen coordinates.",
-  "type": "reading",
+  "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 4,
   "category": "Unit 3: shPlay — 3D Game Development",

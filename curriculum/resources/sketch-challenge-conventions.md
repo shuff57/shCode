@@ -1,19 +1,21 @@
-# q5play Challenge Lesson Conventions
+# Sketch Challenge Lesson Conventions
 
-A **challenge is a harder q5play assignment** — same lesson-type shape as a lab (`lab-assignment-conventions.md`), but with a **permissive grader** (alternation / "any of these techniques passes") and `type === "challenge"` so the sidebar shows the ⭐ badge. Everything else — Steps scaffold in `script.js`, docs-pointer hints, UI behavior, title rule — comes from `q5play-lesson-conventions.md`. When a module spec lists a "challenges" entry or a `lessons/<slug>/` has `lesson.json.type === "challenge"`, these rules are binding.
+A **challenge is a harder sketch assignment** (q5play, shplay, or any future iframe-based runtime) — same lesson-type shape as a lab (`lab-assignment-conventions.md`), but with a **permissive grader** (alternation / "any of these techniques passes") and `type === "challenge"` so the sidebar shows the ⭐ badge. Everything else — Steps scaffold in `script.js`, docs-pointer hints, UI behavior, title rule — comes from `sketch-lesson-conventions.md`. When a module spec lists a "challenges" entry or a `lessons/<slug>/` has `lesson.json.type === "challenge"`, these rules are binding.
 
 **Applies to:**
-- `lessons/<slug>/lesson.json` where `type === "challenge"` (and typically `preview === "q5play"`).
+- `lessons/<slug>/lesson.json` where `type === "challenge"` AND `preview` is a registered sketch runtime (`"q5play"`, `"shplay"`, or any future iframe-based runtime value).
 
-**Canonical example:** `lessons/2-1-11-challenges/` (2.1.12 Challenges — Optional Stretch).
+**Canonical examples (per runtime):**
+- q5play: `lessons/2-1-11-challenges/` (2.1.12 Challenges — Optional Stretch)
+- shplay: `lessons/3-1-14-challenges/` (Unit 3.1 challenges lesson)
 
-Read `q5play-lesson-conventions.md` and `lab-assignment-conventions.md` first — this doc only covers the three things that make a challenge different from a lab.
+Read `sketch-lesson-conventions.md` and `lab-assignment-conventions.md` first — this doc only covers the three things that make a challenge different from a lab.
 
 ---
 
 ## 1. Required `lesson.json` shape
 
-Same shape as a lab assignment; only the fields in the table below differ. Use `lessons/2-1-11-challenges/lesson.json` as the concrete template:
+Same shape as a lab assignment; only the fields in the table below differ. Use the canonical example for your runtime: `lessons/2-1-11-challenges/lesson.json` (q5play) or `lessons/3-1-14-challenges/lesson.json` (shplay). Below is the q5play template (`preview: "q5play"`):
 
 ```json
 {
@@ -66,14 +68,17 @@ Same shape as a lab assignment; only the fields in the table below differ. Use `
 
 The `difficulty` rung encodes the lesson/lab/challenge progression itself: same content surface, less scaffolding at each rung. A practice lesson scaffolds the work and tests one concept; a lab scaffolds and tests synthesis; a challenge removes the scaffold entirely.
 
-Everything else — §1/§3/§4 of `q5play-lesson-conventions.md` apply (no `/// <reference>`, header comment format, function order — same shape as a lesson scaffold *minus* the scaffold itself for challenges).
+Everything else — §1/§3/§4 of `sketch-lesson-conventions.md` apply (no `/// <reference>`, header comment format, function order — same shape as a lesson scaffold *minus* the scaffold itself for challenges). This applies regardless of runtime.
 
 ---
 
 ## 2. Permissive requirement pattern — the one thing that makes a challenge a challenge
 
-The "pick one of these advanced features" requirement uses a **regex alternation** plus `inFunction` with an array of function names. Any single matching technique passes:
+The "pick one of these advanced features" requirement uses a **regex alternation** plus `inFunction` with an array of function names. Any single matching technique passes.
 
+The alternation pattern is composed from the **runtime's API surface** — substitute the appropriate APIs when authoring for a different runtime:
+
+q5play example (`preview: "q5play"`):
 ```json
 {
   "id": "r4",
@@ -87,7 +92,9 @@ The "pick one of these advanced features" requirement uses a **regex alternation
 }
 ```
 
-The other requirements (canvas, sprite, background) stay strict — the permissive one is typically just the **last** requirement where the student's chosen-variant creativity is tested. If every requirement is alternation-based, this is probably a lab with a weak grader, not a challenge.
+shplay example (`preview: "shplay"`): substitute shplay APIs in the alternation — e.g. `distance\\s*\\(|intersects\\s*\\(|Math\\.sin\\s*\\(|Math\\.cos\\s*\\(|frameCount\\s*%` — matching the stretch features listed in the challenge's `content.md`.
+
+The other requirements (the "must have" primitives for the runtime — e.g. canvas + sprite + background for q5play, or cube + rotation for a 3D challenge) stay strict — the permissive one is typically just the **last** requirement where the student's chosen-variant creativity is tested. If every requirement is alternation-based, this is probably a lab with a weak grader, not a challenge.
 
 ---
 
@@ -103,7 +110,7 @@ Every challenge lesson has a `content.md` listing the stretch options. Structure
    - Optional `**Stretch it further:**` line with a harder variation.
 4. Optional closer: "If you finish all six" suggestions for pairing / deeper exploration.
 
-See `lessons/2-1-11-challenges/content.md` for the live template.
+See `lessons/2-1-11-challenges/content.md` for the live q5play template. This structure applies regardless of runtime — substitute shplay API names in the hints when authoring shplay challenges.
 
 ---
 
@@ -114,9 +121,9 @@ Challenges start the student from a **completely empty editor**. No header comme
 ```js
 ```
 
-This is a deliberate divergence from `q5play-lesson-conventions.md` §3/§4 which mandates a Steps scaffold with breadcrumbs. Challenges are harder — the student has to invoke the docs drawer + the `content.md` challenge menu to figure out the shape of the program, not follow a predetermined walkthrough. The lenient grader (§2) gives them room to pick their own path.
+This is a deliberate divergence from `sketch-lesson-conventions.md` §3/§4 which mandates a Steps scaffold with breadcrumbs. Challenges are harder — the student has to invoke the docs drawer + the `content.md` challenge menu to figure out the shape of the program, not follow a predetermined walkthrough. The lenient grader (§2) gives them room to pick their own path. This rule applies identically for all runtimes.
 
-If a student needs the scaffold to start, they can click **Reset** (which re-loads this empty starter, unhelpful) or — more usefully — reference the Hello Sprite starter pattern from a prior lesson.
+If a student needs the scaffold to start, they can click **Reset** (which re-loads this empty starter, unhelpful) or — more usefully — reference a prior lesson's starter (e.g. Hello Sprite for q5play, or a Lab starter for shplay) from memory.
 
 **The old alternatives — Steps scaffold and "BUILD THIS:" block comment — are retired.** One shape only: empty.
 
@@ -128,7 +135,7 @@ If a student needs the scaffold to start, they can click **Reset** (which re-loa
 - **Do not assign non-zero `points` / `totalPoints` / `passingScore`.** All must be `0` per the no-points rule. The permissive r4 alternation is what allows partial completion: a student can pass r4 with any one of the alternation branches (one advanced feature is enough). The Submit gate is then all-green across all four requirements (canvas, sprite, background, one advanced feature).
 - **Do not ship working solutions in `script.js`.** Steps scaffold only.
 - **Do not add any starter code to `script.js`.** Empty editor is the point (see §4). This includes the `// <numbering> <title>` header comment that graded q5 lessons use — challenges skip it.
-- **Do not give specific hints in `lesson.json.steps[].hints[]`.** Generic docs-pointer only (see `q5play-lesson-conventions.md` §2). Challenge menu in `content.md` may be more generous.
+- **Do not give specific hints in `lesson.json.steps[].hints[]`.** Generic docs-pointer only (see `sketch-lesson-conventions.md` §2). Challenge menu in `content.md` may be more generous.
 
 ---
 
@@ -144,7 +151,7 @@ Example: `"2.1.12 Challenges — Optional Stretch"`.
 
 ## 7. UI behavior
 
-Challenges use the **exact same workspace** as graded q5 lessons. See `q5play-lesson-conventions.md` §5 for the full layout: top criteria-progress header, editor + live preview with `Run / Reset / Commit / History / Submit` toolbar, collapsible Console, right-edge `TabbedRightDrawer` (Docs / Quest / File tabs, closed by default), bottom `LessonProgressFooter`. Write requirements and `content.md` with the narrow-end-readable constraint in mind — the drawer is drag-resizable up to 600px, and an open drawer narrows the editor.
+Challenges use the **exact same workspace** as graded sketch lessons. See `sketch-lesson-conventions.md` §5 for the full layout: top criteria-progress header, editor + live preview with `Run / Reset / Commit / History / Submit` toolbar, collapsible Console, right-edge `TabbedRightDrawer` (Docs / Quest / File tabs, closed by default), bottom `LessonProgressFooter`. Write requirements and `content.md` with the narrow-end-readable constraint in mind — the drawer is drag-resizable up to 600px, and an open drawer narrows the editor.
 
 ---
 
@@ -154,8 +161,9 @@ Challenges use the **exact same workspace** as graded q5 lessons. See `q5play-le
 |------|------|
 | Unit 2.1 buildout | Challenge pattern crystallized in `2-1-11-challenges`. |
 | This doc | Hoisted out of per-module specs. |
-| Canonical alignment | Reframed as "harder assignment variant". Retired the "BUILD THIS:" starter alternative — Steps scaffold only, matching labs. §1 JSON shape rewritten as a verbatim copy of `lessons/2-1-11-challenges/lesson.json` (which was itself cleaned up: hub header stripped from content.md, working WASD demo replaced with empty Steps scaffold, meta-guidance steps replaced with four canvas/sprite/bg/feature steps matching the requirements 1:1, hints rewritten as docs-drawer pointers). §7 cross-references `q5play-lesson-conventions.md` §5 for UI behavior instead of duplicating it. |
+| Canonical alignment | Reframed as "harder assignment variant". Retired the "BUILD THIS:" starter alternative — Steps scaffold only, matching labs. §1 JSON shape rewritten as a verbatim copy of `lessons/2-1-11-challenges/lesson.json` (which was itself cleaned up: hub header stripped from content.md, working WASD demo replaced with empty Steps scaffold, meta-guidance steps replaced with four canvas/sprite/bg/feature steps matching the requirements 1:1, hints rewritten as docs-drawer pointers). §7 cross-references `sketch-lesson-conventions.md` §5 for UI behavior instead of duplicating it. |
 | Empty-editor starter | Dropped the Steps scaffold from challenge starters too. Challenge `script.js` is now **fully empty** — the student invokes the docs drawer + challenge menu to structure the program themselves. §4 rewritten to mandate an empty file; §5 Don'ts updated. |
-| Workspace consolidation alignment | §7 trimmed to a thin pointer at the new `q5play-lesson-conventions.md` §5. Removed the stale recap of "auto-open docs drawer / left sidebar Grading tab / drag-resizable sidebars" — the workspace is now the single right-edge `TabbedRightDrawer` with Docs / Quest / File tabs (closed by default) plus the bottom `LessonProgressFooter`. |
-| Difficulty tiers slot-type | Challenges `difficulty` field bumped from `"intermediate"` to `"advanced"` to encode the lesson/lab/challenge progression: practice = `"beginner"`, lab = `"intermediate"`, challenge = `"advanced"`. §1 JSON shape + the "fields that differ from a lab" comparison table updated to a three-column lesson/lab/challenge view. Sister conventions `q5play-lesson-conventions.md` and `lab-assignment-conventions.md` carry the matching rule. Audit pass on existing unit-2 challenges (2.1.12, 2.2.13, 2.3.12) bumped `"intermediate"` → `"advanced"`. |
+| Workspace consolidation alignment | §7 trimmed to a thin pointer at the new `sketch-lesson-conventions.md` §5. Removed the stale recap of "auto-open docs drawer / left sidebar Grading tab / drag-resizable sidebars" — the workspace is now the single right-edge `TabbedRightDrawer` with Docs / Quest / File tabs (closed by default) plus the bottom `LessonProgressFooter`. |
+| Difficulty tiers slot-type | Challenges `difficulty` field bumped from `"intermediate"` to `"advanced"` to encode the lesson/lab/challenge progression: practice = `"beginner"`, lab = `"intermediate"`, challenge = `"advanced"`. §1 JSON shape + the "fields that differ from a lab" comparison table updated to a three-column lesson/lab/challenge view. Sister conventions `sketch-lesson-conventions.md` and `lab-assignment-conventions.md` carry the matching rule. Audit pass on existing unit-2 challenges (2.1.12, 2.2.13, 2.3.12) bumped `"intermediate"` → `"advanced"`. |
 | No-points + green-to-advance | All `points`, `totalPoints`, and `passingScore` values must be `0` per the new no-points rule. §1 JSON shape zeroed out (former 5/5/5/10 → 0/0/0/0; former 25/15 → 0/0). §1 "fields that differ from a lab" table replaced the standalone `passingScore` row with a combined "all-zero" row that applies to all three slot types. §2 example zeroed. §5 Don'ts replaced "Do not set `passingScore === totalPoints`" with "Do not assign non-zero points" — the permissive r4 alternation is what enables partial completion now (one branch passes r4; all-green Submit gate fires when the four core requirements are met). |
+| Renamed q5play-challenge-conventions.md → sketch-challenge-conventions.md, loosened to cover any iframe-based runtime (q5play, shplay, …). Canonical examples now per-runtime: q5play → `lessons/2-1-11-challenges/`; shplay → `lessons/3-1-14-challenges/`. §1 "Applies to" predicate updated. §1 §7 cross-references updated to `sketch-lesson-conventions.md`. §2 permissive grader note added: regex alternation composed from runtime API surface; substitute shplay APIs (`distance(`, `intersects(`, `Math.sin(`, etc.) when authoring shplay challenges. §4 notes runtime-agnostic empty-starter rule. | |

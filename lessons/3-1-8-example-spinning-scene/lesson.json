@@ -1,8 +1,8 @@
-{
+﻿{
   "id": "3-1-8-example-spinning-scene",
   "title": "3.1.8 Example — Spinning Scene",
   "description": "A Cube spins on Y and Z simultaneously while a Sphere sits at an offset position. Watch the motion, then modify the code freely. Click your browser's Refresh button to reset the code.",
-  "type": "example",
+  "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 3: shPlay — 3D Game Development",

@@ -71,12 +71,12 @@ Reference-only snippets (pure prose-embedded code the student isn't meant to run
 
 ## 4. Exception — fully-working q5play sketches
 
-Per `q5play-lesson-conventions.md` §1, lessons with `preview: "example"` and `grading.totalPoints === 0` **may** ship a fully-working `script.js`. Reference/showcase examples live that way (`lessons/q5play-gravity/`, `q5play-camera/`, `q5play-pendulum/`, `q5play-sprite-showcase/`). When doing this, write `script.js` as solid, readable example code — this is the only lesson type where a complete program is the correct output.
+Per `sketch-lesson-conventions.md` §1, lessons with `preview: "example"` and `grading.totalPoints === 0` **may** ship a fully-working `script.js`. Reference/showcase examples live that way (`lessons/q5play-gravity/`, `q5play-camera/`, `q5play-pendulum/`, `q5play-sprite-showcase/`). When doing this, write `script.js` as solid, readable example code — this is the only lesson type where a complete program is the correct output.
 
 ## 5. Don'ts
 
 - **Do not auto-grade a worked example.** It's a reference, not a test.
-- **Do not use "Worked Example" as a synonym for "Starter".** Starters ship empty scaffolds and *are* graded (`preview: "q5play"` + `type: "lesson"`, see `q5play-lesson-conventions.md`).
+- **Do not use "Worked Example" as a synonym for "Starter".** Starters ship empty scaffolds and *are* graded (`preview: "q5play"` + `type: "lesson"`, see `sketch-lesson-conventions.md`).
 - **Do not duplicate the module's teacher-led demo.** Module specs describe the live-in-class demo; the worked-example lesson is the student's after-class reference version, not a transcript.
 - **Do not include a `description` field in `lesson.json`.** See §1 field-by-field.
 - **Do not label step sections `## Worked Example N — …`.** One walkthrough per lesson, so the heading is just `## Step N — …`.

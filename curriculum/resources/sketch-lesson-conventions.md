@@ -1,21 +1,23 @@
-# q5play Lesson Conventions
+# Sketch Lesson Conventions
 
-Canonical rules for **graded q5play lessons** — the core "build a running sketch" lesson type used throughout Unit 2. When a module spec references "q5play lesson", "starter", "scaffold", or a `lessons/<slug>/script.js` under `preview: "q5play"` + `type: "lesson"`, these rules are binding.
+Canonical rules for **graded sketch lessons** (q5play, shplay, or any future iframe-based runtime) — the core "build a running sketch" lesson type used throughout Units 2 and 3. When a module spec references a "sketch lesson", "starter", "scaffold", or a `lessons/<slug>/script.js` under a sketch-runtime `preview` + `type: "lesson"`, these rules are binding.
 
 **Applies to:**
-- `lessons/<slug>/lesson.json` where `preview === "q5play"` AND `type === "lesson"`
+- `lessons/<slug>/lesson.json` where `type === "lesson"` AND `preview` is a registered sketch runtime (`"q5play"`, `"shplay"`, or any future iframe-based runtime value)
 - `lessons/<slug>/script.js` bundled with the above
-- `assignments/*_starter.js` bundled with q5play lab assignments (A10.x, A11.x, A12.x, …) follow the same starter rules from §3 onward
+- `assignments/*_starter.js` bundled with sketch lab assignments (A10.x, A11.x, A12.x, …) follow the same starter rules from §3 onward
 
-**Canonical example:** `lessons/q5play-intro/` (2.1.5 Hello Sprite).
+**Canonical examples (per runtime):**
+- q5play: `lessons/q5play-intro/` (2.1.5 Hello Sprite)
+- shplay: `lessons/3-1-7c-lab-rotate-y/` (3.1.7c Lab — Rotate on Y)
 
-**Scope (intro-level units):** A practice q5 lesson exercises exactly one new concept in isolation. If completing a step requires two new concepts, split the lesson (or move the second concept to a preceding reading/lesson). Integration of multiple prior concepts belongs in the unit's Axxy `q5play (assignment)` slot — see `lab-assignment-conventions.md`, not here. See §2a in `sub-module-spec-conventions.md` for the granularity bar.
+**Scope (intro-level units):** A practice sketch lesson exercises exactly one new concept in isolation. If completing a step requires two new concepts, split the lesson (or move the second concept to a preceding reading/lesson). Integration of multiple prior concepts belongs in the unit's Axxy sketch assignment slot — see `lab-assignment-conventions.md`, not here. See §2a in `sub-module-spec-conventions.md` for the granularity bar.
 
 ---
 
 ## 1. Required `lesson.json` shape
 
-Use **Hello Sprite (`lessons/q5play-intro/lesson.json`)** as a concrete working template. Below is the live shape verbatim from it — copy this, then swap the title/description/content per lesson:
+Use the canonical example for your runtime as the concrete working template. The q5play canonical is **Hello Sprite (`lessons/q5play-intro/lesson.json`)**; the shplay canonical is **`lessons/3-1-7c-lab-rotate-y/lesson.json`**. Below is the q5play Hello Sprite shape verbatim (`preview: "q5play"`). For shplay substitute `preview: "shplay"` and use shplay API patterns (see §5 for runtime-specific UI notes):
 
 ```json
 {
@@ -51,9 +53,9 @@ Use **Hello Sprite (`lessons/q5play-intro/lesson.json`)** as a concrete working 
 
 ### Field-by-field
 
-- `type` — **must be `"lesson"`**. `"assignment"` routes through `lab-assignment-conventions.md`; `"challenge"` through `q5play-challenge-conventions.md`.
-- `difficulty` — **must be `"beginner"`**. Practice q5 lessons sit at the bottom rung of the lesson/lab/challenge progression. Labs (`type: "assignment"`) bump to `"intermediate"`; challenges (`type: "challenge"`) bump to `"advanced"`. The `difficulty` field encodes this slot-type tier, not the absolute content difficulty.
-- `preview` — **must be `"q5play"`**. This mounts the q5play runtime, the file editor + live preview, and the right-side `TabbedRightDrawer` whose tabs include Docs / Quest / File (see §5).
+- `type` — **must be `"lesson"`**. `"assignment"` routes through `lab-assignment-conventions.md`; `"challenge"` through `sketch-challenge-conventions.md`.
+- `difficulty` — **must be `"beginner"`**. Practice sketch lessons sit at the bottom rung of the lesson/lab/challenge progression. Labs (`type: "assignment"`) bump to `"intermediate"`; challenges (`type: "challenge"`) bump to `"advanced"`. The `difficulty` field encodes this slot-type tier, not the absolute content difficulty.
+- `preview` — **must be a registered sketch runtime value**: `"q5play"` (mounts the q5play runtime) or `"shplay"` (mounts the shplay/Three.js runtime). This mounts the runtime iframe, the file editor + live preview, and the right-side `TabbedRightDrawer` whose tabs include Docs / Quest / File (see §5).
 - `steps` — authored alongside requirements for authoring consistency and so the `// STEP N:` breadcrumbs in `script.js` have matching `steps[].id` values (see §3). **Currently not rendered in the student UI** (the Quest tab shows only `requirements` — see §5). The `instructions` + `hints` still belong here because future UI may surface them; keep them clean and pointing at the docs (see §2).
 - `requirements` — auto-graded checks AND the student-facing task list (since `steps` are unrendered). Each requirement's `title` + `description` is what the student reads in the Quest tab — write them as student-readable instructions, not terse grader labels. See `lab-assignment-conventions.md` for requirement-type grammar.
 - `grading.totalPoints` — **always `0`.** The course is mastery-based: Submit is gated all-green (every requirement passed), not points-based. Keep the field for schema compatibility; never assign a non-zero value.
@@ -62,15 +64,23 @@ Use **Hello Sprite (`lessons/q5play-intro/lesson.json`)** as a concrete working 
 
 ## 2. Hints rule — point at the docs, don't spoon-feed
 
-`steps[].hints[]` **must be generic pointers that send the student to the q5play docs**, not answers or near-answers. The Docs tab is one click away on every q5play lesson (vertical "Docs" button on the right edge of the workspace — see §5), so the shortest path to "find it yourself" is a one-liner pointing at it.
+`steps[].hints[]` **must be generic pointers that send the student to the runtime's docs**, not answers or near-answers. The Docs tab is one click away on every sketch lesson (vertical "Docs" button on the right edge of the workspace — see §5), so the shortest path to "find it yourself" is a one-liner pointing at it. Use the runtime-appropriate phrasing: "q5play docs drawer" for `preview: "q5play"`, "shplay docs drawer" for `preview: "shplay"`.
 
 ### ✅ Good hints (docs-pointer pattern)
 
+q5play (`preview: "q5play"`):
 ```json
 "hints": ["Open the q5play docs drawer on the right and find the Canvas section."]
 "hints": ["Check the Sprite section of the q5play docs drawer for constructor arguments."]
 "hints": ["Look up sprite properties in the q5play docs drawer."]
 "hints": ["Search the q5play docs drawer for background()."]
+```
+
+shplay (`preview: "shplay"`):
+```json
+"hints": ["Open the shplay docs drawer on the right and find the Cube section."]
+"hints": ["Check the rotation property in the shplay docs drawer."]
+"hints": ["Look up .scale in the shplay docs drawer."]
 ```
 
 ### ❌ Bad hints (hand-feeding the answer)
@@ -85,15 +95,15 @@ Use **Hello Sprite (`lessons/q5play-intro/lesson.json`)** as a concrete working 
 
 - Students learn **docs lookup** — the dominant professional skill. A hint that points at the docs trains that muscle; a hint that pastes the signature atrophies it.
 - The Docs tab is always one click away on the right edge of the workspace (see §5). The student just needs to be nudged toward it.
-- Generic hints survive curriculum refactors — if the q5play API changes, a "see Canvas section" pointer still works; a hardcoded signature doesn't.
+- Generic hints survive curriculum refactors — if the runtime API changes, a "see Canvas section" pointer still works; a hardcoded signature doesn't.
 
 ---
 
 ## 3. Starters are scaffolds, not solutions
 
-A graded q5play starter contains only **numbered `// STEP N:` comment breadcrumbs** inside empty `setup()` / `draw()` bodies. No pre-written calls to `new Canvas`, `new Sprite`, `background()`, etc.
+A graded sketch lesson starter contains only **numbered `// STEP N:` comment breadcrumbs** inside empty `setup()` / `draw()` bodies. No pre-written calls to `new Canvas`, `new Sprite`, `new Cube`, `background()`, etc.
 
-Each `// STEP N:` must correspond one-to-one with a `lesson.json.steps[].id` entry (or, for downloadable `assignments/*_starter.js` files, to a numbered requirement in the assignment markdown).
+Each `// STEP N:` must correspond one-to-one with a `lesson.json.steps[].id` entry (or, for downloadable `assignments/*_starter.js` files, to a numbered requirement in the assignment markdown). This rule applies identically regardless of runtime (`"q5play"` or `"shplay"`).
 
 ### Why
 
@@ -101,7 +111,9 @@ Graded lessons define `requirements[]` entries — regex / `inFunction` patterns
 
 The STEP comments are the breadcrumb trail. The working program is the destination.
 
-### Canonical example — `lessons/q5play-intro/script.js`
+### Canonical examples
+
+**q5play (`preview: "q5play"`) — `lessons/q5play-intro/script.js`:**
 
 ```js
 // 2.1.5 Hello Sprite — your first q5play sketch.
@@ -121,13 +133,31 @@ function draw() {
 }
 ```
 
-Matches `lesson.json.steps` IDs `s1`–`s4`. The four regex / `inFunction` requirements (`new Canvas(`, `new Sprite(`, `.color =`, `background(` inside `draw`) are the grading targets.
+Matches `lesson.json.steps` IDs `s1`–`s4`. Requirements target `new Canvas(`, `new Sprite(`, `.color =`, `background(` inside `draw`.
+
+**shplay (`preview: "shplay"`) — `lessons/3-1-7c-lab-rotate-y/script.js`:**
+
+```js
+// 3.1.7c Lab — Rotate on Y — spin a Cube on the Y axis each frame.
+
+let cube;
+
+function setup() {
+  // STEP 1: Create a Cube at the origin
+}
+
+function draw() {
+  // STEP 2: Increment cube.rotation.y by 0.01 each frame
+}
+```
+
+Matches `lesson.json.steps` IDs `s1`–`s2`. Requirements target `new Cube(` and `cube.rotation.y +=`.
 
 ### Variants
 
-- **Worked examples** — lessons with `preview: "example"` (read-not-graded reference material; no `requirements[]`) may ship fully working code. `lessons/2-3-19-example-pendulum/`, `lessons/2-4-8-example-camera-follow/`, etc.
-- **Lab assignments** (`type: "assignment"`) — same scaffold shape as the canonical example above, **but the `// STEP N:` comments must describe the task in plain English without commented-out solution code**. See `lab-assignment-conventions.md` §3.
-- **Challenges** (`type: "challenge"`) — `script.js` ships **fully empty** (zero bytes); no header, no lets, no skeleton, no breadcrumbs. The student structures the entire program themselves. See `q5play-challenge-conventions.md` §4.
+- **Worked examples** — lessons whose `preview` is a sketch runtime but have `requirements: []` (read-along reference; no grading) may ship fully working code. `lessons/2-3-19-example-pendulum/`, `lessons/3-1-8-example-spinning-scene/`, etc.
+- **Lab assignments** (`type: "assignment"`) — same scaffold shape as the canonical examples above, **but the `// STEP N:` comments must describe the task in plain English without commented-out solution code**. See `lab-assignment-conventions.md` §3.
+- **Challenges** (`type: "challenge"`) — `script.js` ships **fully empty** (zero bytes); no header, no lets, no skeleton, no breadcrumbs. The student structures the entire program themselves. See `sketch-challenge-conventions.md` §4.
 
 ---
 
@@ -142,7 +172,7 @@ Do not include a triple-slash TypeScript reference directive at the top of any `
 /// <reference path="/q5play/docs/q5play.d.ts" />
 ```
 
-The in-app editor injects q5play type definitions into Monaco automatically. The reference directive is redundant clutter visible at the top of the student-facing editor pane.
+The in-app editor injects runtime type definitions into Monaco automatically (q5play types for `preview: "q5play"`, shplay types for `preview: "shplay"`). The reference directive is redundant clutter visible at the top of the student-facing editor pane.
 
 **History:** stripped from all 18 q5play starters in commit `3cb9831`.
 
@@ -178,18 +208,21 @@ function draw() {   // every frame
 
 ## 5. UI behavior the student sees
 
-This isn't something the lesson author configures — it's what the in-app workspace does automatically when `preview === "q5play"`. Knowing it helps you write requirements + hints correctly.
+This isn't something the lesson author configures — it's what the in-app workspace does automatically when `preview` is a sketch runtime value (`"q5play"` or `"shplay"`). The behavior is identical for all sketch runtimes except where noted below.
 
-- **Top assignment header** renders on every q5play lesson (`components/AssignmentHeader.tsx`). It shows the lesson title on the left and a **right-aligned criteria-progress tracker** on the right — a live score bar plus a `passed/total` count of requirement cards (no `pts` suffix; q5 grading is binary/completion-based, so the count is criteria, not points). The "In Progress" / "Submitted" badge and the Submit button are **not** in this header on q5 lessons (see below).
-  - **Submit lives in the editor toolbar** on q5 lessons, to the right of the Commit and History buttons. It is the same `Submit` action — moved out of the header to keep the q5 header minimal (title + progress only). On regular `type: "assignment"` lessons (non-q5), Submit stays in the header along with the status badge.
-  - **Submit is disabled until every requirement is green.** The gate is `requirements.every(r => r.status === 'passed')`, not `score >= passingScore`. This is q5-specific (`components/LessonWorkspace.tsx` — see `canSubmit` for `isQ5Mode`).
+- **Top assignment header** renders on every sketch lesson (`components/AssignmentHeader.tsx`). It shows the lesson title on the left and a **right-aligned criteria-progress tracker** on the right — a live score bar plus a `passed/total` count of requirement cards (no `pts` suffix; grading is binary/completion-based, so the count is criteria, not points). The "In Progress" / "Submitted" badge and the Submit button are **not** in this header on sketch lessons (see below).
+  - **Submit lives in the editor toolbar** on sketch lessons, to the right of the Commit and History buttons. It is the same `Submit` action — moved out of the header to keep the sketch header minimal (title + progress only). On regular `type: "assignment"` lessons (non-sketch), Submit stays in the header along with the status badge.
+  - **Submit is disabled until every requirement is green.** The gate is `requirements.every(r => r.status === 'passed')`, not `score >= passingScore`. This is sketch-mode-specific (`components/LessonWorkspace.tsx` — see `canSubmit` for `isQ5Mode`).
   - **Submit writes to the DB.** On confirm, the workspace POSTs the `script.js` content + full grade report to `/api/lesson-submissions` (append-only history) and marks `lesson_state` as `completed` with the earned score. If the server write fails, the student sees an alert and the lesson stays unsubmitted so they can retry.
   - **Completion is sticky.** Once submitted, the lesson shows green-check completion in the lesson list / teacher gradebook views. There's no "unsubmit" UI from the workspace; teachers can clear `lesson_state` server-side if needed.
-- **Right-edge `TabbedRightDrawer`** (`components/TabbedRightDrawer.tsx`) is the single right-side panel; it replaces the old left sidebar + auto-open docs drawer. A vertical column of tab buttons sits on the right edge of the viewport at all times; clicking a tab slides a shared panel in from the right (only one tab open at a time). The drawer **starts closed** on every lesson — students click a tab to open it. State persists per-device under `shCode:drawer:active` (last-open tab key) and `shCode:drawer:width` (panel width, 240–600px, default 320). Tabs available on a q5play lesson, top-to-bottom:
-  - **Docs** (q5 only, purple) — q5play docs viewer (`Q5DocsContent`). Tab header has a `Docs ↗` button that opens the full `/docs/q5play` page in a new tab. Because of this, **hints should always assume the docs are one click away** — see §2.
+- **Right-edge `TabbedRightDrawer`** (`components/TabbedRightDrawer.tsx`) is the single right-side panel; it replaces the old left sidebar + auto-open docs drawer. A vertical column of tab buttons sits on the right edge of the viewport at all times; clicking a tab slides a shared panel in from the right (only one tab open at a time). The drawer **starts closed** on every lesson — students click a tab to open it. State persists per-device under `shCode:drawer:active` (last-open tab key) and `shCode:drawer:width` (panel width, 240–600px, default 320). Tabs available on a sketch lesson, top-to-bottom:
+  - **Docs** (runtime-specific, purple) — docs viewer conditioned on the runtime:
+    - `preview: "q5play"` → `Q5DocsContent` viewer; `Docs ↗` button opens `/docs/q5play` in a new tab.
+    - `preview: "shplay"` → shplay docs drawer; `Docs ↗` button opens `/docs/shplay` in a new tab.
+    - **Hints should always assume the docs are one click away** — see §2.
   - **Quest** (green) — the student's primary task list. Renders `requirements[]` stacked top-to-bottom via `RequirementsSection`. Each requirement is a card with a **4px left border** colored green (passed), red (failed), or muted grey (not yet graded) — no check/X circle, no point total. Card body = requirement `title` (bold) + `description` + any grader `messages[]`. `steps[]` is **not** rendered here (see §1 field-by-field). Empty state: "No graded items for this lesson."
   - **File** (cyan) — file picker / explorer (`FileExplorer`) plus Upload / Download buttons for the active file.
-- **Editor + live preview** render in the main content column to the left of the tab strip. Above them sits a toolbar with `▶ Run` / `Reset` on the left (q5play / jscad / console modes) and `Commit (N) / History / Submit` on the right (Submit only on q5 lessons; same disabled-until-all-green gate as before).
+- **Editor + live preview** render in the main content column to the left of the tab strip. Above them sits a toolbar with `▶ Run` / `Reset` on the left (sketch / jscad / console modes) and `Commit (N) / History / Submit` on the right (Submit only on sketch lessons; same disabled-until-all-green gate as before).
 - **Console log** sits below the editor/preview split inside its own `<details>` block (summary = "Console"). Students can expand it when they want to see `console.log` output or errors; collapsed by default so the editor + preview have maximum vertical room.
 - **Drawer is drag-resizable.** A 6px grab handle sits on the panel's left edge; dragging adjusts width within `[240, 600]` and persists to `shCode:drawer:width`. The body's right padding reflows with `--shd-tabbed` so the editor area shrinks to make room. Authors should still **not assume a fixed viewport** when writing requirement descriptions: students may have the drawer open at near-max width on a small laptop, leaving the editor + preview narrow. Requirement `title` + `description` should read cleanly at the narrow end.
 - **Bottom progress footer** (`components/LessonProgressFooter.tsx`) is fixed to the bottom of the viewport on every lesson page — module link, lesson position, completion dots, percentage. The body reserves bottom space (`body:has(.lesson-progress-footer) { padding-bottom: 60px }`) so the expanded console isn't covered by it.
@@ -274,6 +307,7 @@ rg '"hints":\s*\[[^\]]*=\s*['"'"'"]'             lessons/    # leaks a literal v
 | Submit + DB-tracked completion on q5 lessons | Every q5 lesson (`preview === "q5play"`) now renders the AssignmentHeader with a Submit button — previously only `type: "assignment"` lessons did. Submit is gated on **all requirements green** (q5-specific rule, replacing the old `score >= passingScore` gate). On confirm, the workspace writes to `/api/lesson-submissions` and marks `lesson_state` completed; failure surfaces as an alert and keeps the lesson In Progress. §1 field-by-field notes that `passingScore` no longer gates Submit on q5; §5 documents the header + Submit behavior; §8 dropped the "don't set `passingScore === totalPoints`" rule since the gate is now all-green. |
 | Q5 header simplification | On q5 lessons the AssignmentHeader stripped down to just **title + right-aligned criteria-progress tracker**: removed the "In Progress" / "Submitted" badge and changed the score from points (`N/M pts`) to a criteria pass count (`N/M`, no unit) since q5 grading is binary. The Submit button moved out of the header into the editor toolbar, immediately to the right of Commit and History. AssignmentHeader gained `unitLabel`, `showStatus`, `showSubmit`, and `scoreAlign` props; LessonWorkspace passes `unitLabel=""`, `showStatus=false`, `showSubmit=false`, `scoreAlign="right"` in q5 mode and renders its own toolbar Submit button (same `handleSubmit`, same all-green gate). Non-q5 assignments are unchanged. §5 rewritten to match. |
 | Right-side panel consolidation | Retired the separate left sidebar (Files / Grading) and the auto-opening `Q5DocsDrawer` in favor of a single right-edge `TabbedRightDrawer` carrying **Docs / Quest / File** tabs. Drawer starts closed on every lesson (no auto-open); students click a vertical tab on the right edge to open the shared panel. State persists under `shCode:drawer:active` + `shCode:drawer:width` (240–600, default 320), replacing the old `shCode:sidebar:width` and `shCode:q5docs:*` keys. §1 field-by-field updated ("the Quest tab" replaces "the sidebar" / "the Grading tab"); §2 hints rule updated (Docs is one click away, not auto-open); §5 fully rewritten to describe the three tabs, the closed-by-default behavior, and the bottom `LessonProgressFooter`. |
-| Scaffold variants split | §3 "Exceptions" renamed to "Variants" and split out the per-`type` rules: `lesson` ships a description-only scaffold (canonical), `assignment` ships the same scaffold shape but with the **describe-don't-show** rule made explicit (`// STEP N:` comments must not contain commented-out solution code — see `lab-assignment-conventions.md` §3), and `challenge` ships **fully empty** per `q5play-challenge-conventions.md` §4. The stale "Challenge shells with `BUILD THIS:` blocks" entry was removed — that pre-2.2 pattern is retired everywhere. |
-| Difficulty tiers slot-type | `difficulty` field now encodes the lesson/lab/challenge progression rather than absolute content difficulty: practice (`type: "lesson"`) is `"beginner"`, lab (`type: "assignment"`) is `"intermediate"`, challenge (`type: "challenge"`) is `"advanced"`. §1 field-by-field updated. Sister conventions `lab-assignment-conventions.md` and `q5play-challenge-conventions.md` carry the matching rule. |
-| No-points + green-to-advance | The course is now mastery-based, not score-based. **All `points`, `totalPoints`, and `passingScore` values must be `0`** — the all-green Submit gate is the only criterion. §1 JSON example zeroed out; §1 field-by-field reframes the three numeric fields as decorative-must-be-zero. §3 dropped "totalPoints > 0" framing. §5 added the green-to-advance lesson-nav lock (header next-link, footer dots, module-page list — all gated on prior lesson `lesson_state === 'completed'` per `components/HeaderLessonNav.tsx`, `LessonProgressFooter.tsx`, `ModuleLessonsList.tsx`). Audit grep added at §Auditing. Retrofit pass zeroed all `lessons/2-1-*` / `2-2-*` / `2-3-*` / `2-4-*` lesson.json files. Sister conventions `lab-assignment-conventions.md`, `q5play-challenge-conventions.md`, and `sub-module-spec-conventions.md` carry matching updates. |
+| Scaffold variants split | §3 "Exceptions" renamed to "Variants" and split out the per-`type` rules: `lesson` ships a description-only scaffold (canonical), `assignment` ships the same scaffold shape but with the **describe-don't-show** rule made explicit (`// STEP N:` comments must not contain commented-out solution code — see `lab-assignment-conventions.md` §3), and `challenge` ships **fully empty** per `sketch-challenge-conventions.md` §4. The stale "Challenge shells with `BUILD THIS:` blocks" entry was removed — that pre-2.2 pattern is retired everywhere. |
+| Difficulty tiers slot-type | `difficulty` field now encodes the lesson/lab/challenge progression rather than absolute content difficulty: practice (`type: "lesson"`) is `"beginner"`, lab (`type: "assignment"`) is `"intermediate"`, challenge (`type: "challenge"`) is `"advanced"`. §1 field-by-field updated. Sister conventions `lab-assignment-conventions.md` and `sketch-challenge-conventions.md` carry the matching rule. |
+| No-points + green-to-advance | The course is now mastery-based, not score-based. **All `points`, `totalPoints`, and `passingScore` values must be `0`** — the all-green Submit gate is the only criterion. §1 JSON example zeroed out; §1 field-by-field reframes the three numeric fields as decorative-must-be-zero. §3 dropped "totalPoints > 0" framing. §5 added the green-to-advance lesson-nav lock (header next-link, footer dots, module-page list — all gated on prior lesson `lesson_state === 'completed'` per `components/HeaderLessonNav.tsx`, `LessonProgressFooter.tsx`, `ModuleLessonsList.tsx`). Audit grep added at §Auditing. Retrofit pass zeroed all `lessons/2-1-*` / `2-2-*` / `2-3-*` / `2-4-*` lesson.json files. Sister conventions `lab-assignment-conventions.md`, `sketch-challenge-conventions.md`, and `sub-module-spec-conventions.md` carry matching updates. |
+| Renamed q5play-lesson-conventions.md → sketch-lesson-conventions.md and loosened to cover any iframe-based runtime (q5play, shplay, …). Canonical examples now per-runtime: q5play → `lessons/q5play-intro/`; shplay → `lessons/3-1-7c-lab-rotate-y/`. §1 "Applies to" predicate updated to `preview` is any registered sketch runtime. §2 hints rule generalized with both runtime variants. §5 UI behavior updated: Docs tab conditioned on runtime (q5play opens `Q5DocsContent`/`/docs/q5play`; shplay opens shplay docs drawer/`/docs/shplay`). §1 `preview` field-by-field updated. §3 Variants: `sketch-challenge-conventions.md` replaces `q5play-challenge-conventions.md`. History rows: sister conventions updated. | |
