@@ -1,0 +1,28 @@
+{
+  "id": "3-0-sandbox",
+  "title": "3.0 Sandbox — shPlay Pipeline Test",
+  "description": "Wave 0 smoke-test lesson. Verifies the shPlay render pipeline (shplay.js, vendored three.js, ShPlayPreview component) before any real Unit 3 content is authored. Not a graded lesson.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.0 Test",
+  "preview": "shplay",
+  "points": 0,
+  "files": [
+    {
+      "id": "script",
+      "type": "file",
+      "name": "script.js",
+      "path": "script.js",
+      "language": "javascript"
+    }
+  ],
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": false
+  }
+}
