@@ -1,0 +1,65 @@
+{
+  "id": "3-2-2a-lab-sphere-color",
+  "title": "3.2.2a Lab — Sphere with color",
+  "description": "Create a Sphere at the origin, give it a color, and spin it on Y — your first non-Cube 3D shape.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a Sphere",
+      "instructions": "In setup(), write `sphere = new Sphere(0, 0, 0, 1)` to place a sphere of radius 1 at the origin.",
+      "hints": ["Open the shplay docs drawer on the right and find the Sphere section for constructor arguments."]
+    },
+    {
+      "id": "s2",
+      "title": "Give it a color",
+      "instructions": "Set `sphere.color = 'deepskyblue'` (or any CSS color you like).",
+      "hints": ["Open the shplay docs drawer and look up the color property."]
+    },
+    {
+      "id": "s3",
+      "title": "Spin on Y in draw()",
+      "instructions": "In draw(), increment `sphere.rotation.y += 0.01` each frame.",
+      "hints": ["Open the shplay docs drawer and check the rotation property section."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Sphere is created",
+      "description": "A new Sphere is instantiated.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Sphere\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Color is set",
+      "description": "sphere.color is assigned.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.color\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Sphere spins on Y",
+      "description": "rotation.y is incremented in draw().",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.rotation\\.y\\s*\\+=",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

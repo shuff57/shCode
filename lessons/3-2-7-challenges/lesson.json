@@ -1,0 +1,44 @@
+{
+  "id": "3-2-7-challenges",
+  "title": "3.2.7 Challenges",
+  "description": "Three Solar System extension challenges: add a Saturn ring, spawn random asteroids, or build a two-planet system.",
+  "type": "challenge",
+  "difficulty": "advanced",
+  "estimateMins": 30,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "shplay",
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pick a challenge",
+      "instructions": "Read content.md and choose one (or more) of the three challenges. Each extends your Solar System sketch.",
+      "hints": ["Open the shplay docs drawer — the auto-grader accepts any of the three challenge signals."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Solar System base is intact",
+      "description": "Orbit math using Math.cos or Math.sin on position.x is still present.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.position\\.x\\s*=.*Math\\.(cos|sin)|Math\\.(cos|sin).*radians",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "At least one challenge implemented",
+      "description": "Code shows a Torus ring (Challenge 1), random() near Sphere creation (Challenge 2), or a named second planet like mars or asteroid (Challenge 3).",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Torus\\s*\\(|random\\s*\\(|\\bmars\\b|\\basteroid",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

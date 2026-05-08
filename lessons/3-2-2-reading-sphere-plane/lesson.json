@@ -1,0 +1,16 @@
+{
+  "id": "3-2-2-reading-sphere-plane",
+  "title": "3.2.2 Reading — Sphere and Plane",
+  "description": "Learn the Sphere and Plane constructors — your first two new 3D primitives beyond Cube.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 6,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "reading",
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

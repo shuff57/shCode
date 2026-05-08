@@ -1,0 +1,43 @@
+{
+  "id": "3-2-b1-lab-sun",
+  "title": "3.2.B1 Build-Up — Create the Sun",
+  "description": "Start the Solar System: create a large yellow Sphere at the origin with a black background.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create the sun Sphere",
+      "instructions": "In setup(), create `sun = new Sphere(0, 0, 0, 1.2)` for a large yellow sphere at the origin. Call `background('#000')` in setup() and in draw().",
+      "hints": ["Open the shplay docs drawer and find the Sphere section for the constructor arguments."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "sun is a Sphere",
+      "description": "A new Sphere is assigned to sun.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "sun\\s*=\\s*new\\s+Sphere\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "background is black",
+      "description": "background('#000') is called.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "background\\s*\\(",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "3-2-5-example-shape-zoo",
+  "title": "3.2.5 Example — Shape Zoo",
+  "description": "All six shPlay primitives in one scene — each at a different x position, different color, slowly rotating on Y. Modify freely. Click your browser's Refresh to reset the code.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": false }
+}

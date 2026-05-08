@@ -1,0 +1,49 @@
+{
+  "id": "3-2-b3-lab-moon-orbit",
+  "title": "3.2.B3 Build-Up — Moon Orbits Earth",
+  "description": "Add a gray Moon sphere that orbits the Earth using the anchor offset pattern from B0.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 12,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create the moon Sphere",
+      "instructions": "In setup(), add `moon = new Sphere(5.2, 0, 0, 0.3)` placed near earth. Set its color to 'lightgray'.",
+      "hints": ["Open the shplay docs drawer and find the Sphere section."]
+    },
+    {
+      "id": "s2",
+      "title": "Moon orbits earth using the anchor pattern",
+      "instructions": "In draw(), use the anchor offset: `moon.position.x = earth.position.x + Math.cos(radians(frameCount * 2)) * 1.2` and `moon.position.z = earth.position.z + Math.sin(radians(frameCount * 2)) * 1.2`.",
+      "hints": ["Open the shplay docs drawer and review the anchor offset pattern in the B0 reading."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "moon is a Sphere",
+      "description": "A new Sphere is assigned to moon.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "moon\\s*=\\s*new\\s+Sphere\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "moon uses anchor offset pattern",
+      "description": "moon.position.x is set using earth.position.x plus an offset.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "moon\\.position\\.[xz]\\s*=\\s*earth\\.position\\.[xz]",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

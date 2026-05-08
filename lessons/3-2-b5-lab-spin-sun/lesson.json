@@ -1,0 +1,33 @@
+{
+  "id": "3-2-b5-lab-spin-sun",
+  "title": "3.2.B5 Build-Up — Sun Rotates",
+  "description": "Add a slow Y-axis rotation to the sun so it spins in place while the planets orbit around it.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Spin the sun on Y",
+      "instructions": "In draw(), add `sun.rotation.y += 0.005` so the sun slowly rotates on its axis.",
+      "hints": ["Open the shplay docs drawer and check the rotation property section."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "sun rotates on Y",
+      "description": "sun.rotation.y is incremented in draw().",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "sun\\.rotation\\.y\\s*[+\\-]?=",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

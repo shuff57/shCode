@@ -1,0 +1,49 @@
+{
+  "id": "3-2-4b-lab-cylinder",
+  "title": "3.2.4b Lab — Add a Cylinder",
+  "description": "Create a Cylinder with distinct radius and height values — a uniform tube shape in 3D.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a Cylinder",
+      "instructions": "In setup(), write `cylinder = new Cylinder(0, 0, 0, 0.5, 3)` to create a cylinder with radius 0.5 and height 3.",
+      "hints": ["Open the shplay docs drawer and find the Cylinder section for the constructor order."]
+    },
+    {
+      "id": "s2",
+      "title": "Give it a color",
+      "instructions": "Set `cylinder.color = 'slategray'` or any color you like.",
+      "hints": ["Open the shplay docs drawer and check the color property."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Cylinder is created",
+      "description": "A new Cylinder is instantiated.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Cylinder\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Color is set",
+      "description": "cylinder.color is assigned.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.color\\s*=",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

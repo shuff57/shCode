@@ -1,0 +1,49 @@
+{
+  "id": "3-2-b2-lab-earth-orbit",
+  "title": "3.2.B2 Build-Up — Earth Orbits",
+  "description": "Add a blue Earth sphere that orbits the sun using Math.cos and Math.sin on frameCount.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 12,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create the earth Sphere",
+      "instructions": "In setup(), add `earth = new Sphere(4, 0, 0, 0.6)` placed at x=4 to start (we'll animate it). Set its color to 'dodgerblue'.",
+      "hints": ["Open the shplay docs drawer and find the Sphere section."]
+    },
+    {
+      "id": "s2",
+      "title": "Orbit earth around the sun in draw()",
+      "instructions": "In draw(), set `earth.position.x = Math.cos(radians(frameCount * 0.6)) * 4` and `earth.position.z = Math.sin(radians(frameCount * 0.6)) * 4`.",
+      "hints": ["Open the shplay docs drawer and check the radians() helper section."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "earth is a Sphere",
+      "description": "A new Sphere is assigned to earth.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "earth\\s*=\\s*new\\s+Sphere\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "earth orbits with cos/sin",
+      "description": "earth.position.x is set using Math.cos and radians.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "earth\\.position\\.x\\s*=.*Math\\.(cos|sin)",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

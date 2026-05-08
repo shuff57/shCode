@@ -1,0 +1,15 @@
+{
+  "id": "3-2-5a-sandbox-shapes",
+  "title": "3.2.5a Sandbox — Shape Gallery",
+  "description": "All six shapes pre-placed with editable constructor arguments. Change radius, height, and tube values and click Run to see the shape change live. Click your browser's Refresh to reset the code.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": false }
+}

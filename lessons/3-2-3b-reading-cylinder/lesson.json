@@ -1,0 +1,16 @@
+{
+  "id": "3-2-3b-reading-cylinder",
+  "title": "3.2.3b Reading — Cylinder",
+  "description": "Learn the Cylinder constructor — a shape with uniform radius and no taper, like a can or pillar.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 4,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "reading",
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

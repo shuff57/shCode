@@ -1,0 +1,129 @@
+{
+  "id": "3-2-6-solar-system",
+  "title": "3.2.6 Project — Solar System",
+  "description": "Build a complete Solar System: sun + earth + moon orbiting via frameCount-driven Math.sin/cos, black space background, color differentiation per body, plus a 4th body of your own choice.",
+  "type": "assignment",
+  "difficulty": "intermediate",
+  "estimateMins": 45,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create the sun",
+      "instructions": "In setup(), create `sun = new Sphere(0, 0, 0, 1.2)` and set it to yellow.",
+      "hints": ["Open the shplay docs drawer and find the Sphere section."]
+    },
+    {
+      "id": "s2",
+      "title": "Create the earth",
+      "instructions": "In setup(), create `earth = new Sphere(4, 0, 0, 0.6)` offset from the sun and set it to blue.",
+      "hints": ["Open the shplay docs drawer and find the Sphere section."]
+    },
+    {
+      "id": "s3",
+      "title": "Create the moon",
+      "instructions": "In setup(), create `moon = new Sphere(5.2, 0, 0, 0.3)` near earth and set it to gray.",
+      "hints": ["Open the shplay docs drawer and find the Sphere section."]
+    },
+    {
+      "id": "s4",
+      "title": "Orbit earth around the sun",
+      "instructions": "In draw(), set `earth.position.x = Math.cos(radians(frameCount * 0.6)) * 4` and `earth.position.z = Math.sin(radians(frameCount * 0.6)) * 4`.",
+      "hints": ["Open the shplay docs drawer and review the radians() helper and the B0 anchor reading."]
+    },
+    {
+      "id": "s5",
+      "title": "Orbit moon around earth",
+      "instructions": "In draw(), use the anchor offset: `moon.position.x = earth.position.x + Math.cos(radians(frameCount * 2)) * 1.2` and the matching z.",
+      "hints": ["Open the shplay docs drawer — the anchor pattern is: child = parent.position + offset."]
+    },
+    {
+      "id": "s6",
+      "title": "Spin the sun",
+      "instructions": "In draw(), add `sun.rotation.y += 0.005` so the sun slowly rotates.",
+      "hints": ["Open the shplay docs drawer and check the rotation property."]
+    },
+    {
+      "id": "s7",
+      "title": "Add a 4th orbiting body",
+      "instructions": "Create a 4th Sphere (Mars, Jupiter, a comet — your choice). Assign it to `myPlanet`, give it a unique color, orbit radius, and speed. Document it with a `// my planet:` comment.",
+      "hints": ["Open the shplay docs drawer and find the Sphere section. Choose your own orbit speed (frameCount multiplier) and radius."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "At least 3 Spheres present",
+      "description": "new Sphere() appears at least 3 times (sun, earth, moon minimum).",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Sphere\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r1b",
+      "title": "4th body is documented",
+      "description": "myPlanet variable or a '// my planet' comment is present.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "let\\s+myPlanet|\\/\\/\\s*my planet",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "radians() is used",
+      "description": "The radians() helper appears in the orbit math.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "radians\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Orbit math on at least one body",
+      "description": "position.x is set using Math.cos or Math.sin.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.position\\.x\\s*=.*Math\\.(cos|sin)",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Anchor offset used for moon",
+      "description": "Moon orbit uses earth's position as an anchor.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\.position\\.[xz]\\s*=\\s*\\w+\\.position\\.[xz]\\s*\\+\\s*Math\\.(cos|sin)|Math\\.(cos|sin).*\\+\\s*\\w+\\.position\\.[xz]",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Sun rotates on Y",
+      "description": "sun.rotation.y is modified in draw().",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\.rotation\\.y\\s*[+\\-]?=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "4th body orbits independently",
+      "description": "A 4th Sphere is created and given its own orbit (position.x or position.z updated in draw()).",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "myPlanet\\s*=\\s*new\\s+Sphere|myPlanet\\.position\\.[xz]\\s*=",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

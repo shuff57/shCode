@@ -1,0 +1,65 @@
+{
+  "id": "3-2-2b-lab-plane-floor",
+  "title": "3.2.2b Lab — Plane as floor",
+  "description": "Add a Plane below a Sphere to create a floor — combining two primitives in one scene.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create the floor Plane",
+      "instructions": "In setup(), write `floor = new Plane(0, -1, 0, 10, 10)` to place a 10×10 flat surface 1 unit below the origin.",
+      "hints": ["Open the shplay docs drawer and find the Plane section for the constructor parameters."]
+    },
+    {
+      "id": "s2",
+      "title": "Give the floor a color",
+      "instructions": "Set `floor.color = '#444'` so the floor is visible against the background.",
+      "hints": ["Open the shplay docs drawer and check the color property."]
+    },
+    {
+      "id": "s3",
+      "title": "Add a Sphere above the floor",
+      "instructions": "Create a Sphere at `(0, 0.5, 0)` with radius 0.7 so it sits just above the floor. Give it a color.",
+      "hints": ["Open the shplay docs drawer and find the Sphere section."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Plane is created",
+      "description": "A new Plane is instantiated.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Plane\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Sphere is created",
+      "description": "A new Sphere is also in the scene.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Sphere\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Both shapes have colors",
+      "description": "At least one .color assignment is present.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.color\\s*=",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

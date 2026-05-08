@@ -1,0 +1,17 @@
+{
+  "id": "3-2-1-slides",
+  "title": "3.2.1 Module Slides",
+  "description": "Module 3.2 orientation slides covering all five new primitives (Sphere, Plane, Cone, Cylinder, Torus), random(), anchor offsets, and the Solar System project.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "slides",
+  "points": 0,
+  "slidesUrl": "",
+  "_todo": "TODO(wave-2): slides URL pending",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": false }
+}

@@ -1,0 +1,49 @@
+{
+  "id": "3-2-b4-lab-orbit-speed",
+  "title": "3.2.B4 Build-Up — Tune Orbit Speeds",
+  "description": "Adjust the frameCount multipliers so earth orbits slowly and moon orbits quickly — giving the system realistic relative speeds.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Slow down earth's orbit",
+      "instructions": "Change earth's frameCount multiplier from 0.6 to 0.3 so it takes longer to circle the sun.",
+      "hints": ["Open the shplay docs drawer and review how frameCount drives animation speed."]
+    },
+    {
+      "id": "s2",
+      "title": "Speed up moon's orbit",
+      "instructions": "Change moon's frameCount multiplier from 2 to 3 so it laps earth more quickly.",
+      "hints": ["Open the shplay docs drawer and check the frameCount global section."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "earth orbit speed adjusted",
+      "description": "earth.position.x uses a multiplier different from 0.6 in the orbit math.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "earth\\.position\\.x\\s*=.*Math\\.(cos|sin).*radians",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "moon orbit speed adjusted",
+      "description": "moon.position.x uses the anchor offset pattern.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "moon\\.position\\.[xz]\\s*=\\s*earth\\.position\\.[xz]",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

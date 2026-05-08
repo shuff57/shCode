@@ -1,0 +1,59 @@
+{
+  "id": "3-2-4e-lab-random-colors",
+  "title": "3.2.4e Lab — random() colors",
+  "description": "Spawn 5 Spheres at random positions, each with a random color built from random() values.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 12,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create 5 Spheres at random positions",
+      "instructions": "In setup(), use a for loop to create 5 Spheres. Pass `random(-5, 5)` for x and z, and a fixed y (like 0). Store them in an array.",
+      "hints": ["Open the shplay docs drawer and check the random() helper section."]
+    },
+    {
+      "id": "s2",
+      "title": "Give each sphere a random color",
+      "instructions": "Inside the loop, build a color string using random values for R, G, B channels: `'rgb(' + Math.floor(random(50,255)) + ',' + Math.floor(random(50,255)) + ',' + Math.floor(random(50,255)) + ')'`.",
+      "hints": ["Open the shplay docs drawer and check the color property section."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "At least one Sphere is created",
+      "description": "new Sphere() is called at least once.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Sphere\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "random() is used for position",
+      "description": "random() appears in the sketch.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "random\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Color is assigned to each sphere",
+      "description": "A .color assignment is present.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.color\\s*=",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

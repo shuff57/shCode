@@ -1,0 +1,16 @@
+{
+  "id": "3-2-b0-reading-anchor",
+  "title": "3.2.B0 Reading — Anchor Offsets",
+  "description": "Learn the anchor offset pattern — how to orbit one shape around another by adding an offset to its position.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.2 Shapes & Composition",
+  "preview": "reading",
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}
