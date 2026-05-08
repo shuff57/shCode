@@ -8,6 +8,12 @@
 //
 // Both verbs are gated by isLessonAccessible — students can't fabricate
 // completion on a lesson whose prior siblings aren't done.
+//
+// Unit Final gate: lessons with IDs matching ^3-13- (Module 3.13, the 3D Platformer
+// Unit Final) are additionally gated behind Module 3.11 Mood Scene completion.
+// TODO(wave-0): Wave 11 will confirm/correct the exact Mood Scene lesson position number.
+// The placeholder ID below matches the convention file's worked example for 3.11.
+const MOOD_SCENE_LESSON_ID = '3-11-12-mood-scene';
 
 import { isLessonAccessible, lockedResponse, type SessionData } from '../../_shared/lessonAccess';
 
@@ -29,6 +35,23 @@ export const onRequestPost: PagesFunction<Env, 'lessonId', SessionData> = async 
 
   if (!(await isLessonAccessible(env, request, data.role, data.email, lessonId))) {
     return lockedResponse();
+  }
+
+  // Unit Final gate: students cannot mark 3-13-* lessons started or completed
+  // unless they have completed the Module 3.11 Mood Scene project first.
+  // Teachers and admins bypass this gate.
+  if (/^3-13-/.test(lessonId) && data.role === 'student') {
+    const moodRow = await env.DB.prepare(
+      "SELECT state FROM lesson_state WHERE student_email = ? AND lesson_id = ? AND state = 'completed'",
+    )
+      .bind(data.email, MOOD_SCENE_LESSON_ID)
+      .first<{ state: string }>();
+    if (!moodRow) {
+      return json(
+        { error: 'unit_final_locked', requires: MOOD_SCENE_LESSON_ID },
+        403,
+      );
+    }
   }
 
   let body: PostBody;

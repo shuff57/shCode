@@ -15,6 +15,7 @@ import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
 import JscadPreview from './JscadPreview';
 import Q5PlayPreview from './Q5PlayPreview';
+import ShPlayPreview from './ShPlayPreview';
 import RequirementsSection from './RequirementsSection';
 import Console from './Console';
 import CommitDialog from './CommitDialog';
@@ -77,6 +78,8 @@ export default function LessonWorkspace({
   const [srcDoc, setSrcDoc] = useState('');
   const [runKey, setRunKey] = useState(0);
   const [q5Code, setQ5Code] = useState('');
+  const [shplayCode, setShplayCode] = useState('');
+  const [shplayRunKey, setShplayRunKey] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [resetMsg, setResetMsg] = useState<string | null>(null);
   const [consoleOutput, setConsoleOutput] = useState<Array<{type: string; message: string; timestamp: string}>>([]);
@@ -216,6 +219,7 @@ export default function LessonWorkspace({
   const isConsoleMode = lesson.preview === 'console';
   const isJscadMode = lesson.preview === 'jscad';
   const isQ5Mode = lesson.preview === 'q5play';
+  const isShPlayMode = lesson.preview === 'shplay';
 
   // For JSCAD lessons: auto-run on first load
   useEffect(() => {
@@ -232,7 +236,7 @@ export default function LessonWorkspace({
 
   // For HTML lessons: auto-build preview on every change (debounced)
   useEffect(() => {
-    if (isConsoleMode || isJscadMode || isQ5Mode) return;
+    if (isConsoleMode || isJscadMode || isQ5Mode || isShPlayMode) return;
     const to = setTimeout(() => {
       const doc = buildPreviewHtml(lesson.files, files);
       setSrcDoc(doc);
@@ -315,11 +319,24 @@ export default function LessonWorkspace({
     setTimeout(() => runTests(), 400);
   }
 
+  // For shPlay lessons: identical shape to runQ5 — snapshot code, bump runKey.
+  function runShPlay() {
+    setRuntimeError(null);
+    setShplayCode(files['script.js'] || '');
+    setShplayRunKey((k) => k + 1);
+    setConsoleResetKey((k) => k + 1);
+    setConsoleOpen(true);
+    setIsRunning(true);
+    setTimeout(() => runTests(), 400);
+  }
+
   // Stop unloads the iframe back to its empty state without touching the editor.
   function stopRun() {
     setQ5Code('');
+    setShplayCode('');
     setSrcDoc('');
     setRunKey(0);
+    setShplayRunKey(0);
     setConsoleResetKey((k) => k + 1);
     setIsRunning(false);
     setRuntimeError(null);
@@ -372,6 +389,8 @@ export default function LessonWorkspace({
           runJscad();
         } else if (isQ5Mode) {
           runQ5();
+        } else if (isShPlayMode) {
+          runShPlay();
         } else {
           setCommitOpen(true);
         }
@@ -485,14 +504,14 @@ export default function LessonWorkspace({
   // students can't ship code that satisfies static graders but crashes.
   const canSubmit =
     !runtimeError &&
-    (isQ5Mode
+    (isQ5Mode || isShPlayMode
       ? allRequirementsPassed
       : totalScore >= (lesson.grading?.passingScore ?? 0));
-  const showAssignmentHeader = isAssignment || isQ5Mode;
-  // q5 grading is binary/completion-based — show criteria counts, not points.
-  const headerScore = isQ5Mode ? passedCriteria : totalScore;
-  const headerTotal = isQ5Mode ? totalCriteria : totalPossible;
-  const headerUnitLabel = isQ5Mode ? '' : 'pts';
+  const showAssignmentHeader = isAssignment || isQ5Mode || isShPlayMode;
+  // q5/shplay grading is binary/completion-based — show criteria counts, not points.
+  const headerScore = (isQ5Mode || isShPlayMode) ? passedCriteria : totalScore;
+  const headerTotal = (isQ5Mode || isShPlayMode) ? totalCriteria : totalPossible;
+  const headerUnitLabel = (isQ5Mode || isShPlayMode) ? '' : 'pts';
 
   return (
     <>
@@ -517,6 +536,25 @@ export default function LessonWorkspace({
                   headerExtra: (
                     <a
                       href="/docs/q5play"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-secondary btn-sm"
+                    >
+                      Docs ↗
+                    </a>
+                  ),
+                },
+              ] as DrawerTab[])
+            : isShPlayMode
+            ? ([
+                {
+                  key: 'docs',
+                  label: 'Docs',
+                  color: '#bd93f9',
+                  content: null, // shplay docs panel authored in Wave 1
+                  headerExtra: (
+                    <a
+                      href="/docs/shplay"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-secondary btn-sm"
@@ -584,9 +622,9 @@ export default function LessonWorkspace({
           submitted={submitted}
           canSubmit={canSubmit}
           unitLabel={headerUnitLabel}
-          showStatus={!isQ5Mode}
-          showSubmit={!isQ5Mode}
-          scoreAlign={isQ5Mode ? 'right' : 'center'}
+          showStatus={!isQ5Mode && !isShPlayMode}
+          showSubmit={!isQ5Mode && !isShPlayMode}
+          scoreAlign={(isQ5Mode || isShPlayMode) ? 'right' : 'center'}
         />
       ) : (
         <div id="titleRow">
@@ -596,9 +634,9 @@ export default function LessonWorkspace({
       <div className="editor-card">
         <div className="editor-body">
           <div className="run-toolbar">
-            {(isConsoleMode || isJscadMode || isQ5Mode) && (
+            {(isConsoleMode || isJscadMode || isQ5Mode || isShPlayMode) && (
               <>
-                {isRunning && (isJscadMode || isQ5Mode) ? (
+                {isRunning && (isJscadMode || isQ5Mode || isShPlayMode) ? (
                   <button
                     className="btn-run"
                     style={{ background: '#ff5555', borderColor: '#ff5555' }}
@@ -609,7 +647,7 @@ export default function LessonWorkspace({
                 ) : (
                   <button
                     className="btn-run"
-                    onClick={isJscadMode ? runJscad : isQ5Mode ? runQ5 : runCode}
+                    onClick={isJscadMode ? runJscad : isQ5Mode ? runQ5 : isShPlayMode ? runShPlay : runCode}
                   >
                     ▶ Run
                   </button>
@@ -707,7 +745,7 @@ export default function LessonWorkspace({
               <button className="btn-secondary btn-sm" onClick={() => setHistoryOpen(true)}>
                 History
               </button>
-              {isQ5Mode && (
+              {(isQ5Mode || isShPlayMode) && (
                 <button
                   className="btn-primary btn-sm"
                   onClick={handleSubmit}
@@ -751,6 +789,8 @@ export default function LessonWorkspace({
                 <JscadPreview srcDoc={srcDoc} />
               ) : isQ5Mode ? (
                 <Q5PlayPreview code={q5Code} runKey={runKey} />
+              ) : isShPlayMode ? (
+                <ShPlayPreview code={shplayCode} runKey={shplayRunKey} />
               ) : (
                 <LivePreview srcDoc={srcDoc} />
               )}

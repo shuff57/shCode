@@ -34,6 +34,19 @@
 		<option value="grid">Grid of cubes</option>
 		<option value="primitives">Cube + Sphere + Plane</option>
 		<option value="bouncer">Bouncing cube</option>
+		<optgroup label="Phase 0 demos">
+		<option value="shapes2">shapes2 — Cone/Cylinder/Torus</option>
+		<option value="randomColors">randomColors — 25 random cubes</option>
+		<option value="collide">collide — sphere overlap detection</option>
+		<option value="groupDemo">groupDemo — Group remove</option>
+		<option value="lights">lights — PointLight + ambient toggle</option>
+		<option value="materials">materials — metalness/roughness row</option>
+		<option value="cameraFollow">camera-follow — follow a moving cube</option>
+		<option value="cameraOrbit">camera-orbit — orbit around origin</option>
+		<option value="physicsFloor">physics-floor — drop a sphere</option>
+		<option value="physicsPlatforms">physics-platforms — WASD on platforms</option>
+		<option value="parenting">parenting — child follows parent</option>
+		</optgroup>
 	</select>
 	<span id="status"></span>
 	<span class="hint">Ctrl+Enter to run · click the preview, then WASD/etc.</span>
@@ -136,6 +149,220 @@ function draw() {
   cube.rotation.y += 0.03;
 }
 `,
+
+	// 2.1 — Cone, Cylinder, Torus each slowly rotating on Y
+	shapes2: `// shapes2 — Cone, Cylinder, and Torus side by side.
+let cone, cyl, torus;
+function setup() {
+  cone = new Cone(-2, 0, 0, 0.5, 2);
+  cone.color = 'orange';
+  cyl = new Cylinder(0, 0, 0, 0.5, 1.5);
+  cyl.color = 'deepskyblue';
+  torus = new Torus(2, 0, 0, 0.6, 0.2);
+  torus.color = 'gold';
+  new Plane(0, -1.5, 0, 10, 10);
+}
+function draw() {
+  background('#222');
+  cone.rotation.y += 0.01;
+  cyl.rotation.y += 0.015;
+  torus.rotation.y += 0.02;
+}
+`,
+
+	// 2.2 — 25 cubes with random colors using random()
+	randomColors: `// randomColors — 25 cubes with random() colors.
+function setup() {
+  background('#0e0e1a');
+  for (let x = -2; x <= 2; x++) {
+    for (let z = -2; z <= 2; z++) {
+      let c = new Cube(x * 1.8, 0, z * 1.8, 0.9);
+      c.color = '#' + Math.floor(random(0, 0xffffff)).toString(16).padStart(6, '0');
+    }
+  }
+}
+function draw() {
+  background('#0e0e1a');
+}
+`,
+
+	// 2.4 — Two spheres that turn red when they intersect
+	collide: `// collide — two spheres turn red when intersects() is true.
+let a, b;
+function setup() {
+  a = new Sphere(-2, 0, 0, 0.8);
+  a.color = 'limegreen';
+  b = new Sphere(2, 0, 0, 0.8);
+  b.color = 'limegreen';
+}
+function draw() {
+  background('#222');
+  // Drift toward each other
+  a.position.x += Math.sin(frameCount * 0.02) * 0.04;
+  b.position.x -= Math.sin(frameCount * 0.02) * 0.04;
+  const hit = intersects(a, b);
+  a.color = hit ? 'red' : 'limegreen';
+  b.color = hit ? 'red' : 'limegreen';
+}
+`,
+
+	// 2.5 — Group demo: spawn cubes, remove one per Space press
+	groupDemo: `// groupDemo — Group.remove() in action. Press Space to remove one cube.
+let g;
+function setup() {
+  g = new Group();
+  for (let x = -2; x <= 2; x++) {
+    for (let z = -2; z <= 2; z++) {
+      let c = new Cube(x * 1.3, 0, z * 1.3, 0.8);
+      c.color = '#' + Math.floor(random(0, 0xffffff)).toString(16).padStart(6, '0');
+      g.add(c);
+    }
+  }
+}
+function draw() {
+  background('#111');
+  if (kb.presses('space') && g.length > 0) {
+    // Remove the first cube in the group
+    const first = g.filter(() => true)[0];
+    g.remove(first);
+  }
+  for (let s of g) s.rotation.y += 0.01;
+}
+`,
+
+	// 2.6 — PointLight orbits a cube; L toggles ambient
+	lights: `// lights — orbiting PointLight; press L to toggle ambient.
+let cube, pt, ambOn = true;
+function setup() {
+  cube = new Cube(0, 0, 0, 1.5);
+  cube.color = 'white';
+  new Plane(0, -1, 0, 8, 8);
+  pt = new PointLight(0, 2, 3, 'white', 2);
+  sunLight.intensity = 0;
+}
+function draw() {
+  background('#111');
+  pt.position.x = Math.cos(frameCount * 0.03) * 3;
+  pt.position.z = Math.sin(frameCount * 0.03) * 3;
+  if (kb.presses('l')) {
+    ambOn = !ambOn;
+    ambientLight.intensity = ambOn ? 0.5 : 0;
+  }
+}
+`,
+
+	// 2.7 — Row of 5 spheres with metalness 0→1 and roughness 1→0
+	materials: `// materials — metalness/roughness spectrum across 5 spheres.
+function setup() {
+  for (let i = 0; i < 5; i++) {
+    let s = new Sphere(i * 1.5 - 3, 0, 0, 0.6);
+    s.color = '#ccc';
+    s.metalness = i / 4;   // 0, 0.25, 0.5, 0.75, 1
+    s.roughness = 1 - i / 4; // 1, 0.75, 0.5, 0.25, 0
+  }
+  new Plane(0, -0.7, 0, 10, 10);
+  sunLight.position.x = 5;
+  sunLight.intensity = 2;
+}
+function draw() {
+  background('#222');
+}
+`,
+
+	// 2.8a — camera.follow tracks a cube on a sine path
+	cameraFollow: `// camera-follow — camera tracks a moving cube.
+let cube;
+function setup() {
+  cube = new Cube(0, 0, 0, 1);
+  cube.color = 'tomato';
+  new Plane(0, -1, 0, 20, 20);
+  camera.follow(cube, 0, 3, 7);
+}
+function draw() {
+  background('#1a1a2e');
+  cube.position.x = Math.sin(frameCount * 0.02) * 5;
+  cube.position.z = Math.cos(frameCount * 0.015) * 3;
+  cube.rotation.y += 0.02;
+}
+`,
+
+	// 2.8b — camera.orbit rotates around a static scene
+	cameraOrbit: `// camera-orbit — camera rotates around the scene.
+function setup() {
+  let cube = new Cube(0, 0, 0, 1.5);
+  cube.color = 'gold';
+  new Sphere(2, 0.5, -1, 0.6).color = 'tomato';
+  new Plane(0, -1, 0, 10, 10);
+  camera.orbit(0.01);
+}
+function draw() {
+  background('#111');
+}
+`,
+
+	// 2.10a — Sphere drops from y=5 onto the floor
+	physicsFloor: `// physics-floor — sphere dropped from y=5; physics lands it.
+let ball;
+function setup() {
+  ball = new Sphere(0, 5, 0, 0.5);
+  ball.color = 'limegreen';
+  ball.usePhysics = true;
+  new Plane(0, -1, 0, 10, 10);
+  camera.follow(ball, 0, 3, 8);
+}
+function draw() {
+  background('#1a1a1a');
+}
+`,
+
+	// 2.10b — Sphere with WASD; three Cube platforms as ground
+	physicsPlatforms: `// physics-platforms — WASD walk between raised Cube platforms.
+let player;
+function setup() {
+  player = new Sphere(0, 4, 0, 0.4);
+  player.color = 'tomato';
+  player.usePhysics = true;
+  player.friction = 0.8;
+
+  // Floor
+  new Plane(0, 0, 0, 12, 12);
+
+  // Three elevated platforms
+  let p1 = new Cube(-3, 1, -2, 2, 0.4, 2); p1.color = '#888'; p1.isGround = true;
+  let p2 = new Cube(0, 2, 1, 2, 0.4, 2);   p2.color = '#888'; p2.isGround = true;
+  let p3 = new Cube(3, 3, -1, 2, 0.4, 2);  p3.color = '#888'; p3.isGround = true;
+
+  camera.follow(player, 0, 4, 8);
+}
+function draw() {
+  background('#111');
+  const spd = 4;
+  if (kb.pressing('a')) player.vel.x = -spd;
+  if (kb.pressing('d')) player.vel.x = spd;
+  if (kb.pressing('w')) player.vel.z = -spd;
+  if (kb.pressing('s')) player.vel.z = spd;
+  if (kb.presses('space') && player.onGround) player.vel.y = 6;
+}
+`,
+
+	// 2.12 — Sphere parented to a cube; parent oscillates
+	parenting: `// parenting — sphere follows its parent cube via parent().
+let body, head;
+function setup() {
+  body = new Cube(0, 0, 0, 1);
+  body.color = 'deepskyblue';
+  head = new Sphere(0, 1.2, 0, 0.5);
+  head.color = 'limegreen';
+  parent(head, body); // attach head to body
+  new Plane(0, -1, 0, 10, 10);
+}
+function draw() {
+  background('#222');
+  body.position.x = Math.sin(frameCount * 0.03) * 2;
+  body.rotation.y += 0.02;
+  // head automatically follows because it is parented to body
+}
+`,
 };
 
 const codeEl = document.getElementById('code');
@@ -159,6 +386,7 @@ function encode(s) {
 	const b64 = btoa(utf8);
 	return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
+
 
 function run() {
 	logEl.textContent = '';

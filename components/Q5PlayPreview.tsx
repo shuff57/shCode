@@ -1,13 +1,9 @@
 'use client';
 
 import { forwardRef } from 'react';
+import { encodeCode } from '../lib/encode-code';
 
-// Base64-url-safe encoder for UTF-8 strings.
-export function encodeCode(code: string): string {
-  const utf8 = unescape(encodeURIComponent(code));
-  const b64 = typeof window === 'undefined' ? '' : window.btoa(utf8);
-  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
+export { encodeCode };
 
 interface Props {
   code: string;

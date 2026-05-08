@@ -10,7 +10,8 @@
 // tokens, with any code block trimmed to MAX_CODE_BLOCK_LINES so a
 // successful jailbreak still can't yield a copy-pasteable solution.
 
-import { findRelevantDocs, type RelevantDoc } from '../../lib/q5play-docs';
+import { findRelevantDocs as findQ5Docs, type RelevantDoc } from '../../lib/q5play-docs';
+import { findRelevantDocs as findShplayDocs } from '../../lib/shplay-docs';
 import { chatStream } from '../../lib/ollama';
 
 interface Env {
@@ -31,6 +32,7 @@ interface ErrorInfo {
 }
 
 interface HelpRequest {
+  lessonId?: string;
   lessonTitle?: string;
   fileName?: string;
   unit?: string | null;
@@ -253,6 +255,13 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     return json({ error: 'Nothing to help with — write some code or ask a question first.' }, 400);
   }
 
+  // Unit-string allowlist validator: must match "M.N " pattern (e.g. "3.1 ", "2.3 ").
+  // Prevents lesson-author typos from creating separate quota buckets.
+  const UNIT_RE = /^[123]\.\d+ /;
+  if (body.unit && !UNIT_RE.test(body.unit)) {
+    return json({ error: 'invalid lesson.unit' }, 400);
+  }
+
   const unitKey = (body.unit || '').toString().slice(0, 120); // bucket key (defaults to '')
 
   // ----- Rate limit (students only) -----
@@ -294,6 +303,8 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   }
 
   const keywords = extractKeywords(body);
+  // Route to shplay docs for Unit 3 lessons (lessonId prefix '3-'), q5play docs otherwise.
+  const findRelevantDocs = (body.lessonId || '').startsWith('3-') ? findShplayDocs : findQ5Docs;
   const docs = findRelevantDocs(keywords, 6);
   const { system, user } = buildPrompt(body, docs);
 
