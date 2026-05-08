@@ -1,0 +1,49 @@
+{
+  "id": "3-3-6c-lab-write-property-3d",
+  "title": "3.3.6c Lab — Write a 3D property via method",
+  "description": "Add a setColor(c) method to Planet that sets this.shape.color, then call it from setup().",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Add setColor(c) to Planet",
+      "instructions": "Inside the Planet class body, write a method `setColor(c)` that sets `this.shape.color = c`.",
+      "hints": ["Open the shplay docs drawer on the right and look up the color property on shapes."]
+    },
+    {
+      "id": "s2",
+      "title": "Call p.setColor() in setup()",
+      "instructions": "After creating the instance, call `p.setColor('tomato')` (or any CSS color) in setup().",
+      "hints": ["Open the shplay docs drawer and review how methods are called on instances."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "setColor method sets this.shape.color",
+      "description": "Write a setColor(c) method inside Planet that does `this.shape.color = c`.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "setColor[\\s\\S]*this\\.shape\\.color\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "setColor() is called on the instance",
+      "description": "Call p.setColor(...) somewhere in the sketch.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "p\\.setColor\\s*\\(",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

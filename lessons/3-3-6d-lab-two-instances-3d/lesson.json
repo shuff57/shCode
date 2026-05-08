@@ -1,0 +1,43 @@
+{
+  "id": "3-3-6d-lab-two-instances-3d",
+  "title": "3.3.6d Lab — Two 3D instances",
+  "description": "Create two Planet instances at different x positions to show that each instance is independent.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create p1 and p2 at different x positions",
+      "instructions": "In setup(), write `p1 = new Planet(-2, 0, 0, 0.7)` and `p2 = new Planet(2, 0, 0, 0.5)`. Give each a different color.",
+      "hints": ["Open the shplay docs drawer on the right and look up the Planet class pattern from the reading."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Two Planet instances are created",
+      "description": "Create at least two instances of Planet using new Planet(...).",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Planet\\s*\\(",
+      "flags": "g",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Second Planet instance also created",
+      "description": "A second new Planet(...) call must appear in the code.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Planet\\s*\\([^)]+\\)[\\s\\S]*new\\s+Planet\\s*\\(",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "3-3-8d-lab-method-calls-method",
+  "title": "3.3.8d Lab — Method calling this.method",
+  "description": "Add a spin() method to Planet that rotates the shape AND calls this.recolor() — one method dispatching another on the same instance.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Add spin() that calls this.recolor()",
+      "instructions": "Inside the Planet class, write a `spin()` method that increments `this.shape.rotation.y += 0.05` and then calls `this.recolor()`. Both use `this.` because they operate on the same instance.",
+      "hints": ["Open the shplay docs drawer on the right — a method can call other methods on the same instance using `this.methodName()`."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "spin() calls this.recolor()",
+      "description": "Write spin() inside Planet. It must rotate this.shape AND call this.recolor().",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "spin[\\s\\S]*this\\.recolor\\s*\\(",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

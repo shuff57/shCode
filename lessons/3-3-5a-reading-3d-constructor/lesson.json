@@ -1,0 +1,16 @@
+{
+  "id": "3-3-5a-reading-3d-constructor",
+  "title": "3.3.5a Reading — The 3D Constructor Pattern",
+  "description": "Shows how to store a 3D shape as a data member using this.shape = new Cube(x, y, z) inside a class constructor.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 6,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "reading",
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "3-3-6b-lab-read-property-3d",
+  "title": "3.3.6b Lab — Read a 3D property",
+  "description": "Access and log p.shape.position.x each frame to see how to read a nested property through a class instance.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Log p.shape.position.x in draw()",
+      "instructions": "In draw(), write `console.log(p.shape.position.x)` to print the planet's X position each frame. Open the Console panel below the editor to see the output.",
+      "hints": ["Open the shplay docs drawer on the right and look up the position property."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "p.shape.position is logged",
+      "description": "Log p.shape.position.x (or .y or .z) using console.log.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*p\\.shape\\.position\\.[xyz]",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "3-3-3-refresher-oop",
+  "title": "3.3.3 Reading — Refresher: class, constructor, this",
+  "description": "Re-states the Unit 2.2 OOP pattern — class declaration, constructor, this, methods, and new — before applying it to 3D.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "reading",
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

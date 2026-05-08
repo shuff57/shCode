@@ -1,0 +1,43 @@
+{
+  "id": "3-3-9c-lab-loop-mutate",
+  "title": "3.3.9c Lab — Loop: mutate a property",
+  "description": "Loop over the planets array in setup() and set each planet's shape.color to a different value.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Loop and set shape.color on each planet",
+      "instructions": "In setup(), write a loop over the planets array that sets each planet's `.shape.color` to a value from a color array. For example: `const colors = ['deepskyblue','gold','tomato']; for (let i = 0; i < planets.length; i++) { planets[i].shape.color = colors[i]; }`",
+      "hints": ["Open the shplay docs drawer on the right and look up the color property on shapes."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Loop assigns shape.color to each planet",
+      "description": "Write a loop in setup() that sets .shape.color on each planet in the array.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.shape\\.color\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "A loop structure iterates over planets",
+      "description": "Use a for loop or for...of loop to iterate over the planets array.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

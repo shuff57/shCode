@@ -1,0 +1,15 @@
+{
+  "id": "3-3-7-example-planet-orbit",
+  "title": "3.3.7 Example — Planet Orbit Class",
+  "description": "A Planet class with an orbit() method that uses frameCount to drive circular motion. Two instances orbit at different radii. Click your browser's Refresh to reset the code.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": false }
+}

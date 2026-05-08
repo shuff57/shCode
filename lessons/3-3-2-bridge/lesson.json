@@ -1,0 +1,16 @@
+{
+  "id": "3-3-2-bridge",
+  "title": "3.3.2 Reading — Bridge: OOP from 2.2 in 3D",
+  "description": "Maps every familiar q5play OOP pattern to its shPlay equivalent so your class knowledge transfers cleanly.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "reading",
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

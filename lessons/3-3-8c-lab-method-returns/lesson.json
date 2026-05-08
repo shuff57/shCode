@@ -1,0 +1,33 @@
+{
+  "id": "3-3-8c-lab-method-returns",
+  "title": "3.3.8c Lab — Method that returns data",
+  "description": "Add an isAbove(y) method to Planet that returns true when this.shape.position.y is above the given threshold.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Add isAbove(y) to Planet",
+      "instructions": "Inside the Planet class, write a method `isAbove(threshold)` that returns `this.shape.position.y > threshold`.",
+      "hints": ["Open the shplay docs drawer on the right and look up the position property."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "isAbove() returns a boolean comparison",
+      "description": "Write isAbove(threshold) inside Planet. It must return this.shape.position.y > threshold.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "isAbove[\\s\\S]*return\\s+this\\.shape\\.position\\.y\\s*>",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "3-3-1-slides",
+  "title": "3.3.1 Module Slides",
+  "description": "Module 3.3 orientation slides covering OOP in 3D — single-shape class wrappers, constructors, methods, and arrays of instances.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "slides",
+  "points": 0,
+  "slidesUrl": "",
+  "_todo": "TODO(wave-3): slides URL pending",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": false }
+}

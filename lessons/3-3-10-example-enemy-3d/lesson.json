@@ -1,0 +1,15 @@
+{
+  "id": "3-3-10-example-enemy-3d",
+  "title": "3.3.10 Example — Enemy3D class",
+  "description": "An Enemy3D class with constructor and update(). Five instances stored in an array, each updated in draw(). Single-shape class — one Cone per enemy. Click your browser's Refresh to reset the code.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": false }
+}

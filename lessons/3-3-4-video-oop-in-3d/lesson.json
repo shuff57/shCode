@@ -1,0 +1,18 @@
+{
+  "id": "3-3-4-video-oop-in-3d",
+  "title": "3.3.4 Video — OOP in 3D",
+  "description": "A short video introducing why classes help when you have many 3D objects, and the single-shape wrapper pattern.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "video",
+  "points": 0,
+  "videoUrl": "",
+  "videoFallback": "Ask your teacher for the video link, or review the Module 3.3 slides.",
+  "_todo": "TODO(wave-3): video URL pending",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": false }
+}

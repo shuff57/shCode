@@ -1,0 +1,33 @@
+{
+  "id": "3-3-9b-lab-loop-instances",
+  "title": "3.3.9b Lab — Loop: call update() on each",
+  "description": "Write a for...of loop in draw() that calls update() on every planet in the planets array.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Loop over planets in draw()",
+      "instructions": "In draw(), write `for (let p of planets) { p.update(); }` to call update() on every planet each frame.",
+      "hints": ["Open the shplay docs drawer on the right and review the for...of loop pattern from the reading."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "for...of loop iterates over planets",
+      "description": "Write a for...of loop that iterates over the planets array.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(\\s*let\\s+\\w+\\s+of\\s+planets",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

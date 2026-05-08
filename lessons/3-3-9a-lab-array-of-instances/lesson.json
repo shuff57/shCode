@@ -1,0 +1,43 @@
+{
+  "id": "3-3-9a-lab-array-of-instances",
+  "title": "3.3.9a Lab — Array of 3 instances",
+  "description": "Push three Planet instances at different x positions into a planets array.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Push three planets into the array",
+      "instructions": "In setup(), call `planets.push(new Planet(...))` three times with different x positions (e.g. -3, 0, 3). Give each a different color after pushing.",
+      "hints": ["Open the shplay docs drawer on the right and review the arrays-of-instances reading."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "First planet pushed to array",
+      "description": "Call planets.push(new Planet(...)) at least once.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "planets\\.push\\s*\\(\\s*new\\s+Planet",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "At least three push calls",
+      "description": "planets.push(new Planet(...)) must appear at least three times.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "planets\\.push[\\s\\S]*planets\\.push[\\s\\S]*planets\\.push",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,0 +1,59 @@
+{
+  "id": "3-3-8b-lab-update-in-class",
+  "title": "3.3.8b Lab — update() inside a class",
+  "description": "Add an update() method to Planet that spins this.shape each frame, then call p.update() in draw().",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Add update() to Planet",
+      "instructions": "Inside the Planet class, write an `update()` method that increments `this.shape.rotation.y += 0.02` each call.",
+      "hints": ["Open the shplay docs drawer on the right and look up the rotation property."]
+    },
+    {
+      "id": "s2",
+      "title": "Call p.update() in draw()",
+      "instructions": "In draw(), write `p.update()` so the planet spins every frame.",
+      "hints": ["Open the shplay docs drawer and review the update() pattern from the reading."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "update() method is defined",
+      "description": "Write an update() method inside the Planet class.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "update\\s*\\(\\s*\\)\\s*\\{",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "update() rotates this.shape",
+      "description": "Inside update(), increment this.shape.rotation.y (or .x or .z).",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "this\\.shape\\.rotation\\.[xyz]\\s*\\+=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "p.update() is called in draw()",
+      "description": "Call p.update() inside the draw() function.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "p\\.update\\s*\\(\\s*\\)",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

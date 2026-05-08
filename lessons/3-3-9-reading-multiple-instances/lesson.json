@@ -1,0 +1,16 @@
+{
+  "id": "3-3-9-reading-multiple-instances",
+  "title": "3.3.9 Reading — Arrays of 3D Instances",
+  "description": "Shows how to store many class instances in an array and call update() on all of them with one for...of loop.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 6,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "reading",
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

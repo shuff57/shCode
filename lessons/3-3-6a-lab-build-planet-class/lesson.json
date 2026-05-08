@@ -1,0 +1,65 @@
+{
+  "id": "3-3-6a-lab-build-planet-class",
+  "title": "3.3.6a Lab — Build a Planet class",
+  "description": "Declare a Planet class whose constructor stores a Sphere as this.shape, then create one instance and give it a color.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.3 OOP in 3D — Foundations",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Declare the Planet class",
+      "instructions": "Write a class named Planet. Give it a constructor that takes (x, y, z, radius) and stores `this.shape = new Sphere(x, y, z, radius)`.",
+      "hints": ["Open the shplay docs drawer on the right and find the Sphere section for constructor arguments."]
+    },
+    {
+      "id": "s2",
+      "title": "Create an instance in setup()",
+      "instructions": "In setup(), write `p = new Planet(0, 0, 0, 1)` to create a planet at the origin with radius 1.",
+      "hints": ["Open the shplay docs drawer and review the class/instance pattern."]
+    },
+    {
+      "id": "s3",
+      "title": "Set a color on p.shape",
+      "instructions": "After creating the instance, set `p.shape.color = 'deepskyblue'` (or any CSS color).",
+      "hints": ["Open the shplay docs drawer and look up the color property on shapes."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Planet class is declared",
+      "description": "Write a class named Planet.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "class\\s+Planet",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Constructor stores this.shape as a Sphere",
+      "description": "Inside the constructor, write `this.shape = new Sphere(...)`.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "this\\.shape\\s*=\\s*new\\s+Sphere",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "p.shape.color is set",
+      "description": "Set a color on the planet's shape after creating the instance.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "p\\.shape\\.color\\s*=",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}
