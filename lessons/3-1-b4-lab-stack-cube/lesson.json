@@ -1,0 +1,65 @@
+{
+  "id": "3-1-b4-lab-stack-cube",
+  "title": "3.1.B4 Build-Up — Stack a Second Cube",
+  "description": "Use parent() to attach a smaller Cube on top of bigCube so it inherits bigCube's rotation and adds its own.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 12,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create smallCube",
+      "instructions": "In setup(), create `smallCube = new Cube(0, 0, 0)`. Set its color to 'orange' and its size to 0.6 (smaller than bigCube).",
+      "hints": ["smallCube.size = 0.6 sets all three scale axes to 0.6 — a uniform shrink."]
+    },
+    {
+      "id": "s2",
+      "title": "Parent smallCube to bigCube",
+      "instructions": "Call `parent(smallCube, bigCube)` in setup() AFTER both cubes are created. Then set `smallCube.position.y = 1.3` so it sits above bigCube.",
+      "hints": ["parent(child, parentObj) makes child inherit the parent's world transform. position is now relative to the parent."]
+    },
+    {
+      "id": "s3",
+      "title": "Spin smallCube in the opposite direction",
+      "instructions": "In draw(), set `smallCube.rotation.z = radians(-frameCount * 2)` so smallCube spins opposite to bigCube on Z.",
+      "hints": ["A negative multiplier reverses the direction. The minus sign makes it spin the other way."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "bigCube rotates on multiple axes",
+      "description": "bigCube.rotation.y and at least one other axis are set in draw().",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "bigCube\\.rotation\\.y\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "parent() is called",
+      "description": "parent() is called to attach smallCube to bigCube.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "parent\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "smallCube has its own rotation",
+      "description": "smallCube.rotation is set in draw().",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "smallCube\\.rotation\\.",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "3-1-2-bridge",
+  "title": "3.1.2 Reading — Bridge: q5play 2D to shPlay 3D",
+  "description": "Maps every familiar q5play concept to its shPlay equivalent so the mental model transfers cleanly.",
+  "type": "reading",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "reading",
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

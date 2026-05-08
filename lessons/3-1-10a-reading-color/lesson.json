@@ -1,0 +1,16 @@
+{
+  "id": "3-1-10a-reading-color",
+  "title": "3.1.10a Reading — Color in 3D",
+  "description": "The .color setter works on every shPlay shape and accepts named colors and hex strings.",
+  "type": "reading",
+  "difficulty": "beginner",
+  "estimateMins": 4,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "reading",
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

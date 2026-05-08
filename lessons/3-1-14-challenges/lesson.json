@@ -1,0 +1,44 @@
+{
+  "id": "3-1-14-challenges",
+  "title": "3.1.14 Challenges",
+  "description": "Three Spinning Sculpture extension challenges: chain a third Cube, drive scale with Math.sin, or add a keyboard freeze toggle.",
+  "type": "challenge",
+  "difficulty": "advanced",
+  "estimateMins": 30,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pick a challenge",
+      "instructions": "Read content.md and choose one (or more) of the three challenges. Each builds on your Spinning Sculpture code.",
+      "hints": ["The auto-grader accepts any of the three challenge signals — pick whichever interests you most."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Spinning Sculpture base present",
+      "description": "parent() is still called — the sculpture core is intact.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "parent\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "At least one challenge implemented",
+      "description": "Code shows a chained cube (second parent call), Math.sin driving .size, or a frozen/kb.pressing toggle.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "parent\\s*\\([^)]+\\)[\\s\\S]{0,500}parent\\s*\\(|\\.size\\s*=.*Math\\.sin|let\\s+frozen|kb\\.pressing\\s*\\(",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "3-1-10c-reading-framecount",
+  "title": "3.1.10c Reading — frameCount for Animation",
+  "description": "frameCount increments by 1 every draw() call — use it to drive steady, time-based rotation and animation.",
+  "type": "reading",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "reading",
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "3-1-6d-reading-radians",
+  "title": "3.1.6d Reading — Radians vs Degrees",
+  "description": "What a radian is, why 3D engines use them, and how the radians() helper converts degrees to radians.",
+  "type": "reading",
+  "difficulty": "beginner",
+  "estimateMins": 6,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "reading",
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

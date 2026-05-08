@@ -1,0 +1,43 @@
+{
+  "id": "3-1-b1-lab-base-cube",
+  "title": "3.1.B1 Build-Up — Base Cube",
+  "description": "Start the Spinning Sculpture: create a single yellow Cube at the origin with a black background.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create the base Cube",
+      "instructions": "In setup(), create `bigCube = new Cube(0, 0, 0)` and set its color to 'yellow'. Call `background('#000')` for a black scene.",
+      "hints": ["This is the foundation of the Spinning Sculpture — every build-up adds to this."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "bigCube is a Cube",
+      "description": "A new Cube is assigned to bigCube.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "bigCube\\s*=\\s*new\\s+Cube\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "background is black",
+      "description": "background('#000') is called.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "background\\s*\\(",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

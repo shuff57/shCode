@@ -1,0 +1,53 @@
+{
+  "id": "3-1-b3-lab-rotate-multi-axis",
+  "title": "3.1.B3 Build-Up — Rotate on Multiple Axes",
+  "description": "Add X and Z rotation with different speed multipliers so the Spinning Sculpture tumbles in 3D.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Add X and Z rotation",
+      "instructions": "In draw(), add two more rotation lines: `bigCube.rotation.x = radians(frameCount * 0.7)` and `bigCube.rotation.z = radians(frameCount * 0.3)`. Use different multipliers so each axis spins at a different speed.",
+      "hints": ["Slower multipliers on X and Z create an irregular tumbling motion that looks more interesting than a simple spin."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Y rotation present",
+      "description": "bigCube.rotation.y uses radians() and frameCount.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "bigCube\\.rotation\\.y\\s*=\\s*radians\\s*\\(\\s*frameCount",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "X rotation added",
+      "description": "bigCube.rotation.x is assigned.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "bigCube\\.rotation\\.x\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Z rotation added",
+      "description": "bigCube.rotation.z is assigned.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "bigCube\\.rotation\\.z\\s*=",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

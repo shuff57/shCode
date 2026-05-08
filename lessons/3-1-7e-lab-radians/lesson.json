@@ -1,0 +1,59 @@
+{
+  "id": "3-1-7e-lab-radians",
+  "title": "3.1.7e Lab — radians() Helper",
+  "description": "Use the radians() helper to set a fixed 45-degree rotation on the Y axis.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a Cube",
+      "instructions": "In setup(), write `cube = new Cube(0, 0, 0)` to place a cube at the origin.",
+      "hints": ["Give the cube a color so the rotation angle is easy to see."]
+    },
+    {
+      "id": "s2",
+      "title": "Set a 45-degree Y rotation using radians()",
+      "instructions": "Set `cube.rotation.y = radians(45)` to tilt the cube 45 degrees on the Y axis.",
+      "hints": ["radians(45) returns PI/4 ≈ 0.785. You could write 0.785 directly, but radians(45) is much clearer."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Cube is instantiated",
+      "description": "A new Cube is created.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Cube\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "radians() helper is called",
+      "description": "The radians() function is used somewhere in the sketch.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "radians\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "rotation.y is assigned",
+      "description": "cube.rotation.y is set to a value.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.rotation\\.y\\s*=",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

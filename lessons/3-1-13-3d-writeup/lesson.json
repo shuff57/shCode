@@ -1,0 +1,42 @@
+{
+  "id": "3-1-13-3d-writeup",
+  "title": "3.1.13 Writeup — 3D Foundations",
+  "description": "A written reflection on how 3D programming differs from 2D, illustrated with specific examples from your Spinning Sculpture.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 30,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "assignment",
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "3D Foundations — AI-graded rubric",
+    "model": "qwen3-coder-next:cloud",
+    "contextDocs": ["overview"],
+    "prompt": "Explain three ways that programming in 3D is different from 2D. Use specific examples from your Spinning Sculpture sketch to illustrate each difference.\n\nYour response should be 200–400 words. Address all three criteria below. Cite specific code or decisions from your own sketch — generic statements don't count.",
+    "rubric": [
+      {
+        "id": "q1-coordinate-system",
+        "title": "Coordinate system difference named with a specific axis",
+        "description": "Student identifies at least one concrete difference in the coordinate system (e.g., Y is up not down, there is a Z axis, or rotation has three separate axes) and names the specific axis or property. Full credit requires a specific axis named. Partial credit for a vague reference to '3D having more dimensions'. Zero if missing.",
+        "points": 0
+      },
+      {
+        "id": "q2-rotation-concept",
+        "title": "Rotation concept explained in own words",
+        "description": "Student explains, in their own words, what rotating on a specific axis means (e.g., rotating on Y is like a top spinning, rotating on X is like nodding). Connects it to their Spinning Sculpture code. Full credit for a specific axis explained with an analogy or description. Partial credit for a general statement about 3D rotation. Zero if missing.",
+        "points": 0
+      },
+      {
+        "id": "q3-specific-code",
+        "title": "Specific Spinning Sculpture code described correctly",
+        "description": "Student references a specific piece of code from their Spinning Sculpture (e.g., 'I used parent(smallCube, bigCube) to stack the second cube' or 'radians(frameCount * 1.5) on the Y axis'). The description must be accurate and specific — not a generic 'I wrote some code'. Full credit for a specific, accurate code reference. Partial credit for a vague reference. Zero if no code is cited.",
+        "points": 0
+      }
+    ]
+  },
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

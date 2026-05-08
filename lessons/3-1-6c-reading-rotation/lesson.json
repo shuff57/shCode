@@ -1,0 +1,16 @@
+{
+  "id": "3-1-6c-reading-rotation",
+  "title": "3.1.6c Reading — What is .rotation?",
+  "description": "The .rotation property has .x, .y, and .z fields — each controls tilt around one axis, measured in radians.",
+  "type": "reading",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "reading",
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

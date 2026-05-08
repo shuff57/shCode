@@ -1,0 +1,15 @@
+{
+  "id": "3-1-9a-sandbox-transform",
+  "title": "3.1.9a Sandbox — Transform Playground",
+  "description": "A Cube with commented position, rotation, and scale values you can tweak and re-run. No grading — just experiment. Click your browser's Refresh button to reset the code.",
+  "type": "sandbox",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": false }
+}

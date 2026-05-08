@@ -1,0 +1,71 @@
+{
+  "id": "3-1-11a-lab-color",
+  "title": "3.1.11a Lab — Color and background",
+  "description": "Create three Cubes at different positions and set a different color on each, with a dark background.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Set the background",
+      "instructions": "Call `background('#111')` in setup() to set the scene to a dark near-black.",
+      "hints": ["background() in setup() sets the initial scene color. Also call it in draw() to clear each frame."]
+    },
+    {
+      "id": "s2",
+      "title": "Create a crimson Cube on the left",
+      "instructions": "Create a Cube at (-2, 0, 0) and set its color to 'crimson'.",
+      "hints": ["Negative X is to the left."]
+    },
+    {
+      "id": "s3",
+      "title": "Create a gold Cube in the center",
+      "instructions": "Create a Cube at (0, 0, 0) and set its color to 'gold'.",
+      "hints": ["X=0 is the center of the scene."]
+    },
+    {
+      "id": "s4",
+      "title": "Create a deepskyblue Cube on the right",
+      "instructions": "Create a Cube at (2, 0, 0) and set its color to 'deepskyblue'.",
+      "hints": ["Positive X is to the right."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "At least one Cube created",
+      "description": "A Cube is instantiated with new Cube(...).",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Cube\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "At least one color set",
+      "description": "The .color property is assigned on a shape.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.color\\s*=\\s*['\"]",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "background() is called",
+      "description": "background() is called with a color argument.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "background\\s*\\(",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

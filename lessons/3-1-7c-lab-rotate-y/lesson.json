@@ -1,0 +1,49 @@
+{
+  "id": "3-1-7c-lab-rotate-y",
+  "title": "3.1.7c Lab — Rotate on Y",
+  "description": "Spin a Cube on the Y axis by incrementing rotation.y each frame in draw().",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a Cube",
+      "instructions": "In setup(), write `cube = new Cube(0, 0, 0)` to place it at the origin.",
+      "hints": ["Give it a color too — a colored cube shows rotation more clearly than a white one."]
+    },
+    {
+      "id": "s2",
+      "title": "Spin on Y in draw()",
+      "instructions": "In draw(), write `cube.rotation.y += 0.01` to spin the cube a little each frame.",
+      "hints": ["0.01 radians per frame is about 0.6 degrees per frame — a gentle spin. Try larger values to spin faster."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Cube is instantiated",
+      "description": "A new Cube is created.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Cube\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "rotation.y is incremented",
+      "description": "cube.rotation.y is incremented with += in draw().",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "cube\\.rotation\\.y\\s*\\+=",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,0 +1,113 @@
+{
+  "id": "3-1-12-spinning-sculpture",
+  "title": "3.1.12 Project — Spinning Sculpture",
+  "description": "Build a complete Spinning Sculpture: two stacked Cubes rotating on multiple axes with frameCount, color cycling, and one creative element of your own.",
+  "type": "assignment",
+  "difficulty": "intermediate",
+  "estimateMins": 45,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Rotate bigCube on Y",
+      "instructions": "In draw(), set `bigCube.rotation.y = radians(frameCount * 1.5)` to spin the base cube on the Y axis.",
+      "hints": ["radians(frameCount * 1.5) grows each frame, spinning the cube. Adjust the multiplier to taste."]
+    },
+    {
+      "id": "s2",
+      "title": "Also rotate bigCube on X",
+      "instructions": "Add `bigCube.rotation.x = radians(frameCount * 0.7)` with a different (slower) multiplier than Y.",
+      "hints": ["Using a different speed on X vs Y creates an interesting compound tumble."]
+    },
+    {
+      "id": "s3",
+      "title": "Stack smallCube on top",
+      "instructions": "Call `parent(smallCube, bigCube)` after both cubes are created. Set `smallCube.position.y = 1.3` to place it above bigCube.",
+      "hints": ["parent() makes smallCube's position relative to bigCube's coordinate space."]
+    },
+    {
+      "id": "s4",
+      "title": "Spin smallCube opposite-direction on Z",
+      "instructions": "In draw(), set `smallCube.rotation.z = radians(-frameCount * 2)` to spin it the other way on Z.",
+      "hints": ["The minus sign reverses the direction. Try different multipliers."]
+    },
+    {
+      "id": "s5",
+      "title": "Cycle colors",
+      "instructions": "In draw(), compute a sine-driven color channel and set `bigCube.color` to a dynamic rgb() or hex string so the colors shift over time.",
+      "hints": ["Math.sin(radians(frameCount * speed)) oscillates between -1 and +1. Map it to a 0–255 range with Math.floor(128 + 127 * Math.sin(...))."]
+    },
+    {
+      "id": "s6",
+      "title": "Add one creative element",
+      "instructions": "Add ONE new element of your own design and document it with a `// MY ELEMENT:` comment. Examples: a third Cube parented to smallCube, a pulsing scale using Math.sin on cube.size, or keyboard control that freezes rotation.",
+      "hints": ["Any creative addition counts — the comment is required so the grader can find it."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "At least 2 rotation axes on bigCube",
+      "description": "bigCube.rotation.y AND at least one of rotation.x or rotation.z are assigned.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.rotation\\.y\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r1b",
+      "title": "Second rotation axis on bigCube",
+      "description": "bigCube.rotation.x or .z is also assigned.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.rotation\\.[xz]\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "radians() used at least twice",
+      "description": "The radians() helper appears in the rotation math.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "radians\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "parent() called",
+      "description": "parent() is used to stack the second cube.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "parent\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Color cycling present",
+      "description": "A shape's color is driven by Math.sin, Math.cos, Math.floor, Math.abs, or frameCount.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.color\\s*=.*(?:Math\\.(?:sin|cos|floor|abs)|frameCount)",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Creative element documented",
+      "description": "A // MY ELEMENT: comment is present.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\/\\/\\s*MY ELEMENT",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

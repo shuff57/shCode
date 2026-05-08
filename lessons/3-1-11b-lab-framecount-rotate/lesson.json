@@ -1,0 +1,49 @@
+{
+  "id": "3-1-11b-lab-framecount-rotate",
+  "title": "3.1.11b Lab — Animate with frameCount",
+  "description": "Drive a Cube's Y rotation using frameCount so it spins at a steady rate each frame.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a Cube",
+      "instructions": "In setup(), create a Cube at (0, 0, 0) and store it in the `cube` variable.",
+      "hints": ["Give it a color — a colorful cube shows rotation more clearly."]
+    },
+    {
+      "id": "s2",
+      "title": "Animate with frameCount in draw()",
+      "instructions": "In draw(), set `cube.rotation.y = frameCount * 0.02` to spin the cube at a steady rate.",
+      "hints": ["frameCount grows by 1 each frame. Multiplying by 0.02 controls the spin speed. Try 0.01 for slower, 0.05 for faster."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Cube is instantiated",
+      "description": "A new Cube is created.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Cube\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "frameCount drives rotation.y",
+      "description": "cube.rotation.y is assigned using frameCount.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "cube\\.rotation\\.y\\s*=\\s*frameCount",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

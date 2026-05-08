@@ -1,0 +1,15 @@
+{
+  "id": "3-1-5a-sandbox-axes",
+  "title": "3.1.5a Sandbox — Axes Explorer",
+  "description": "A Cube at the origin with three colored axis guides (red=X, green=Y, blue=Z). Change cube.position.x/y/z values and click Run to see which direction each axis points. Click your browser's Refresh button to reset the code.",
+  "type": "sandbox",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": false }
+}

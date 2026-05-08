@@ -1,0 +1,65 @@
+{
+  "id": "3-1-7d-lab-scale-shape",
+  "title": "3.1.7d Lab — Scale a Shape",
+  "description": "Stretch a Cube non-uniformly by setting scale.x and scale.y to different values.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a Cube",
+      "instructions": "In setup(), write `cube = new Cube(0, 0, 0)` to place a unit cube at the origin.",
+      "hints": ["A unit cube starts at scale 1 in all directions — a perfect cube."]
+    },
+    {
+      "id": "s2",
+      "title": "Make it twice as wide",
+      "instructions": "Set `cube.scale.x = 2` to stretch the cube to twice its width along the X axis.",
+      "hints": ["scale.x = 2 means 'two times the original width'. The cube becomes a wide slab."]
+    },
+    {
+      "id": "s3",
+      "title": "Make it half as tall",
+      "instructions": "Set `cube.scale.y = 0.5` to squish the cube to half its height.",
+      "hints": ["scale.y = 0.5 means half the original height. Combined with scale.x = 2 you get a flat wide slab."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Cube is instantiated",
+      "description": "A new Cube is created.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Cube\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "scale.x is set",
+      "description": "cube.scale.x is assigned a value.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "cube\\.scale\\.x\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "scale.y is set",
+      "description": "cube.scale.y is assigned a value.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "cube\\.scale\\.y\\s*=",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

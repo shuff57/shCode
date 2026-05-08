@@ -1,0 +1,43 @@
+{
+  "id": "3-1-b2-lab-rotate-y",
+  "title": "3.1.B2 Build-Up — Rotate on Y",
+  "description": "Add Y-axis rotation driven by frameCount to make the Spinning Sculpture's base cube spin.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Spin bigCube on Y using frameCount",
+      "instructions": "In draw(), set `bigCube.rotation.y = radians(frameCount * 1.5)` to spin the cube on the Y axis at 1.5 degrees per frame.",
+      "hints": ["radians(frameCount * 1.5) converts degrees to radians each frame. At 60 fps this completes a full spin in about 4 seconds."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "bigCube exists",
+      "description": "bigCube is assigned a Cube.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "bigCube\\s*=\\s*new\\s+Cube\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Y rotation uses radians() and frameCount",
+      "description": "bigCube.rotation.y is set using radians() and frameCount.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "bigCube\\.rotation\\.y\\s*=\\s*radians\\s*\\(\\s*frameCount",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

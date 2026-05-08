@@ -1,0 +1,49 @@
+{
+  "id": "3-1-7b-lab-move-position",
+  "title": "3.1.7b Lab — Move with position.x",
+  "description": "Make a Cube slide to the right each frame by incrementing position.x in draw().",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a Cube at the origin",
+      "instructions": "In setup(), write `cube = new Cube(0, 0, 0)` to place it at the center.",
+      "hints": ["The Cube starts at position (0,0,0) — the center of the scene."]
+    },
+    {
+      "id": "s2",
+      "title": "Move the cube in draw()",
+      "instructions": "In draw(), write `cube.position.x += 0.05` so the cube slides right a little each frame.",
+      "hints": ["draw() runs ~60 times per second. Adding 0.05 each frame means the cube moves about 3 units per second."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Cube is instantiated",
+      "description": "A new Cube is created.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Cube\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "position.x is incremented",
+      "description": "cube.position.x is incremented with += in draw().",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "cube\\.position\\.x\\s*\\+=",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

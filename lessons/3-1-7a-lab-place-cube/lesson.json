@@ -1,0 +1,49 @@
+{
+  "id": "3-1-7a-lab-place-cube",
+  "title": "3.1.7a Lab — Place a Cube",
+  "description": "Create a Cube at a specific position and set its color.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a Cube at (2, 0, 0)",
+      "instructions": "In setup(), write `cube = new Cube(2, 0, 0)` to create a Cube two units to the right of the origin.",
+      "hints": ["The Cube constructor takes three numbers: Cube(x, y, z). Positive x moves right."]
+    },
+    {
+      "id": "s2",
+      "title": "Set the cube's color",
+      "instructions": "After creating the cube, set `cube.color = 'gold'`.",
+      "hints": ["The .color setter accepts named colors like 'gold', 'crimson', 'deepskyblue', or hex strings like '#ff6347'."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Cube is instantiated",
+      "description": "A new Cube is created with the new keyword.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Cube\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Color is set on the cube",
+      "description": "The .color property is assigned on the cube variable.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "cube\\.color\\s*=",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

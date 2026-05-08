@@ -1,0 +1,43 @@
+{
+  "id": "3-1-b5-lab-color-cycle",
+  "title": "3.1.B5 Build-Up — Color Cycle",
+  "description": "Use Math.sin(radians(frameCount)) mapped to an RGB channel to make the Spinning Sculpture shift color over time.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 12,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "shplay",
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build an RGB color string in draw()",
+      "instructions": "In draw(), compute `let r = Math.floor(128 + 127 * Math.sin(radians(frameCount * 1.2)));` then set `bigCube.color = 'rgb(' + r + ',80,200)';`",
+      "hints": ["Math.sin() oscillates between -1 and +1. Multiplying by 127 and adding 128 maps it to 1–255. The result is a red channel that pulses."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "bigCube and smallCube exist with parent()",
+      "description": "parent() is called — builds on B4.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "parent\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Color cycling uses Math.sin and frameCount",
+      "description": "The color is set using Math.sin with frameCount.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.color\\s*=.*Math\\.sin|\\.color\\s*=.*'rgb\\(|Math\\.sin\\s*\\(.*radians.*frameCount",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

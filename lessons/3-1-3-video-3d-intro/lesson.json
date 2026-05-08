@@ -1,0 +1,17 @@
+{
+  "id": "3-1-3-video-3d-intro",
+  "title": "3.1.3 Video — Welcome to 3D",
+  "description": "A short video introducing the 3D coordinate system and what shPlay is.",
+  "type": "video",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 3: shPlay — 3D Game Development",
+  "unit": "3.1 Coordinates & Transforms",
+  "preview": "video",
+  "points": 0,
+  "videoUrl": "",
+  "_todo": "TODO(wave-1): video URL pending",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": false }
+}
