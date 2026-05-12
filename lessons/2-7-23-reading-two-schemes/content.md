@@ -15,6 +15,8 @@ if (kb.pressing('w')) p1.vel.y = -4;
 if (kb.pressing('up')) p2.vel.y = -4;
 ```
 
+> **Why velocity, not position?** The paddles below are *dynamic* sprites (no `collider = 'static'`) so the ball can bounce off them. Dynamic sprites must move via `vel.y`, not `pos.y` — direct position writes bypass the physics engine and the ball will phase through.
+
 **Independent state means independent variables.** Anything that belongs to "this player" needs its own copy — its own sprite, its own score variable, its own position. The two players never share a variable.
 
 **What you'll learn from it:**
@@ -36,21 +38,21 @@ function setup() {
 
   p1 = new Sprite(60, 150, 20, 80);
   p1.color = '#bd93f9';
-  p1.collider = 'static';
 
   p2 = new Sprite(340, 150, 20, 80);
   p2.color = '#50fa7b';
-  p2.collider = 'static';
 }
 
 function draw() {
   background('#282a36');
 
-  if (kb.pressing('w')) p1.pos.y -= 3;
-  if (kb.pressing('s')) p1.pos.y += 3;
+  if      (kb.pressing('w')) p1.vel.y = -3;
+  else if (kb.pressing('s')) p1.vel.y =  3;
+  else                       p1.vel.y =  0;
 
-  if (kb.pressing('up'))   p2.pos.y -= 3;
-  if (kb.pressing('down')) p2.pos.y += 3;
+  if      (kb.pressing('up'))   p2.vel.y = -3;
+  else if (kb.pressing('down')) p2.vel.y =  3;
+  else                          p2.vel.y =  0;
 
   fill('#f8f8f2');
   textSize(14);

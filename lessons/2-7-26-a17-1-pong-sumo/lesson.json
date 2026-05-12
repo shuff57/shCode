@@ -84,7 +84,7 @@
       "description": "At least one sprite has its bounciness set (e.g. ball.bounciness = 0.9).",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\w+\\.bounciness\\s*=\\s*(?:0\\.[0-9]+|1(?:\\.0+)?)",
+      "pattern": "\\w+\\.bounciness\\s*=\\s*(?:0\\.[0-9]+|1(?:\\.0*)?)",
       "flags": "",
       "points": 0
     },
@@ -114,7 +114,7 @@
       "description": "A comparison against a winning number (e.g. p1Score >= 5) triggers the win condition.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "p[12]Score\\s*(?:>=|===|>)\\s*\\d+",
+      "pattern": "p[12]Score\\s*(?:>=|===|>)\\s*(?:\\d+|[A-Z][A-Z0-9_]*)",
       "flags": "",
       "points": 0
     },

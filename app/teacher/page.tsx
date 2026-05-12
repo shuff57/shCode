@@ -336,7 +336,7 @@ function StudentDrawer({
     }
 
     for (const u of unitOrder) {
-      unitGroups.push({ unit: u, lessons: byUnit[u].sort((a, b) => a.id.localeCompare(b.id)) });
+      unitGroups.push({ unit: u, lessons: byUnit[u].sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true })) });
     }
   }
 
@@ -562,7 +562,7 @@ function GradebookView({
     byUnit[u].push(meta);
   }
   // Sort lessons within each unit by id.
-  for (const u of unitOrder) byUnit[u].sort((a, b) => a.id.localeCompare(b.id));
+  for (const u of unitOrder) byUnit[u].sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
 
   // Flatten to an ordered array; track unit spans for colspan.
   const orderedLessons: LessonMeta[] = [];

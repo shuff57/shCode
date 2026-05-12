@@ -20,11 +20,10 @@ sprite.vel.y = 0;
 
 Do all four lines together, every frame the drag is active. The sprite stays glued to the cursor.
 
-**Try it:** click and hold on the square, then drag it around. Release to let gravity take over.
+**Try it:** hold the mouse button anywhere on the canvas — the square snaps to the cursor and follows it. Release to let gravity take over.
 
 ```js live
 let s;
-let dragging = false;
 
 function setup() {
   new Canvas(400, 300);
@@ -35,14 +34,7 @@ function setup() {
 function draw() {
   background('#282a36');
 
-  if (mouse.presses() && world.getSpriteAt(mouse.x, mouse.y) === s) {
-    dragging = true;
-  }
-  if (!mouse.pressing()) {
-    dragging = false;
-  }
-
-  if (dragging) {
+  if (mouse.pressing()) {
     s.pos.x = mouse.x;
     s.pos.y = mouse.y;
     s.vel.x = 0;
@@ -50,6 +42,8 @@ function draw() {
   }
 }
 ```
+
+This demo skips the hit-test on purpose — it isolates the snap-and-zero-vel mechanic so you can see it on its own. The full drag pattern (start only when the cursor is on the sprite, end on release) is built in the worked example next, on top of this four-line core.
 
 Notice what happens if you comment out the two `vel` lines — the sprite jitters every time you change direction. The zero-vel step is what makes the drag feel solid.
 
@@ -61,5 +55,3 @@ Notice what happens if you comment out the two `vel` lines — the sprite jitter
 |------|---------|
 | **Drag pattern** | While a drag is active: set `sprite.pos` to the cursor and zero `sprite.vel` each frame. |
 | **Snap-and-zero-vel** | The combined four-line block that positions the sprite and clears physics momentum simultaneously. |
-| **`mouse.pressing()`** | True every frame the mouse button is held down. Used to keep the drag active. |
-| **`mouse.presses()`** | True only on the frame the button first goes down. Used to start the drag. |

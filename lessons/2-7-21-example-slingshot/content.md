@@ -54,6 +54,8 @@ function draw() { background('#222'); }
 
 While dragging, the ball's position is forced to the cursor every frame and its velocity is zeroed. Without the velocity zero, the physics engine's own velocity would fight the position override and the ball would shake. The `world.getSpriteAt` hit-test ensures dragging only starts when the cursor is actually on the ball — clicking the anchor or empty canvas does nothing.
 
+> **Why `mouse.pressing()` here, not `mouse.presses()`?** 2.7.10 used `mouse.presses()` (one-shot, fires only on the first frame the button goes down) to start its drag. This slingshot uses `mouse.pressing()` (held, fires every frame the button is down) so the drag re-engages on any frame the cursor is over the ball while the button is held — more forgiving when the ball is small and the cursor slips off the first try. Either form works; the difference is how strict the start is.
+
 ```js live
 let ball, anchor, joint, dragging = false;
 function setup() {

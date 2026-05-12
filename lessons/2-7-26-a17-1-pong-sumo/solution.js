@@ -94,8 +94,8 @@ function draw() {
       textAlign(RIGHT);
       text('P2: ' + p2Score, W - 20, 36);
 
-      // Win condition (r6: literal >= 5 satisfies the auto-grader)
-      if (p1Score >= 5 || p2Score >= 5) {
+      // Win condition — using the WIN_SCORE constant declared at the top
+      if (p1Score >= WIN_SCORE || p2Score >= WIN_SCORE) {
         gameState = 'win';
       }
       break;
@@ -104,7 +104,7 @@ function draw() {
       fill('white');
       textSize(28);
       textAlign(CENTER);
-      let winner = (p1Score >= 5) ? 'Player 1' : 'Player 2';
+      let winner = (p1Score >= WIN_SCORE) ? 'Player 1' : 'Player 2';
       text(winner + ' wins!', W / 2, H / 2 - 20);
       textSize(16);
       text('Press R to play again', W / 2, H / 2 + 30);
