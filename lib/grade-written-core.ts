@@ -149,6 +149,7 @@ export function shapeResult(parsed: any, rubric: RubricItem[]): GradeResponse {
     const verdict: CriterionResult['verdict'] =
       (match?.verdict === 'met' || match?.verdict === 'partial' || match?.verdict === 'missing')
         ? match.verdict
+        : r.points === 0 ? 'missing'
         : earned === r.points ? 'met' : earned > 0 ? 'partial' : 'missing';
     return {
       id: r.id,

@@ -84,6 +84,18 @@ function saveState(lessonId: string, state: StoredState) {
   } catch {}
 }
 
+// totalPossible === 0 ⇒ pass/fail rubric (all rubric points are 0). Pass when
+// a majority of criteria are met-or-partial — loose threshold for very new
+// students. Otherwise fall back to the points-based 70% threshold.
+function isPassing(r: GradeResult): boolean {
+  if (r.totalPossible === 0) {
+    if (r.criteria.length === 0) return false;
+    const ok = r.criteria.filter((c) => c.verdict === 'met' || c.verdict === 'partial').length;
+    return ok >= Math.ceil(r.criteria.length / 2);
+  }
+  return r.totalEarned / r.totalPossible >= 0.7;
+}
+
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
 export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }: Props) {
@@ -164,7 +176,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         return;
       }
       setResult(data as GradeResult);
-      const passed = data.totalEarned / data.totalPossible >= 0.7;
+      const passed = isPassing(data as GradeResult);
       if (passed) {
         await recordLessonCompleted(lessonId, data.totalEarned);
         // Brief pause so the AI feedback visibly renders before auto-advance.
@@ -296,7 +308,13 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         </div>
       )}
 
-      {result && (
+      {result && (() => {
+        const passFail = result.totalPossible === 0;
+        const passed = isPassing(result);
+        const okCount = result.criteria.filter(
+          (c) => c.verdict === 'met' || c.verdict === 'partial',
+        ).length;
+        return (
         <div style={{ marginTop: 20 }}>
           <div
             style={{
@@ -310,11 +328,18 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
           >
             <span>
               <strong style={{ color: '#f8f8f2', fontSize: 16 }}>
-                {result.totalEarned} / {result.totalPossible}
-              </strong>{' '}
-              ({Math.round((result.totalEarned / result.totalPossible) * 100)}%)
+                {passFail
+                  ? `${okCount} / ${result.criteria.length} criteria met`
+                  : `${result.totalEarned} / ${result.totalPossible}`}
+              </strong>
+              {!passFail && (
+                <>
+                  {' '}
+                  ({Math.round((result.totalEarned / result.totalPossible) * 100)}%)
+                </>
+              )}
             </span>
-            <span>{result.totalEarned / result.totalPossible >= 0.7 ? '✓ passing' : 'needs revision'}</span>
+            <span>{passed ? '✓ passing' : 'needs revision'}</span>
           </div>
 
           {result.summary && (
@@ -358,7 +383,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
                     <Icon size={18} color={color} />
                     <strong style={{ color: '#f8f8f2' }}>{label?.title || c.id}</strong>
                     <span style={{ marginLeft: 'auto', color, fontWeight: 600, fontSize: 13 }}>
-                      {c.earned} / {c.max} pts
+                      {passFail
+                        ? c.verdict === 'met' ? 'met' : c.verdict === 'partial' ? 'partial' : 'missing'
+                        : `${c.earned} / ${c.max} pts`}
                     </span>
                   </div>
                   {c.feedback && (
@@ -383,7 +410,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
             </div>
           )}
         </div>
-      )}
+        );
+      })()}
     </section>
   );
 }
