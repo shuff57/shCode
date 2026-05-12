@@ -1,0 +1,85 @@
+{
+  "id": "2-7-27-challenges",
+  "title": "2.7.27 Challenges — SliderJoint, Trebuchet, Swinging Rope",
+  "description": "Three optional stretch prompts for Unit 2.7: build a SliderJoint piston sandbox, a trebuchet that uses a DistanceJoint + HingeJoint together, or a swinging rope chain with three or more HingeJoints.",
+  "type": "challenge",
+  "difficulty": "advanced",
+  "estimateMins": 30,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.7 Advanced Mechanics",
+  "preview": "q5play",
+  "week": 17,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a canvas",
+      "instructions": "Inside setup(), create a canvas of any size.",
+      "hints": ["Open the q5play docs drawer on the right and find the Canvas section."]
+    },
+    {
+      "id": "s2",
+      "title": "Create at least one sprite",
+      "instructions": "In setup(), create at least one sprite.",
+      "hints": ["Check the Sprite section of the q5play docs drawer for constructor arguments."]
+    },
+    {
+      "id": "s3",
+      "title": "Clear the background each frame",
+      "instructions": "Call background() inside draw() so old frames don't stack up.",
+      "hints": ["Search the q5play docs drawer for background()."]
+    },
+    {
+      "id": "s4",
+      "title": "Use one stretch joint feature",
+      "instructions": "Pick one challenge from content.md and implement it. Any of the three prompts — SliderJoint sandbox, trebuchet, or swinging rope — will satisfy this requirement.",
+      "hints": ["content.md describes all three challenges with API hints. Pick the one that interests you most."]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Create a canvas",
+      "description": "A canvas is created when the sketch starts.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Canvas\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Create at least one sprite",
+      "description": "A sprite exists in the sketch.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Sprite\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Clear the background each frame",
+      "description": "Previous frames don't stack up.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "background\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Use at least one stretch joint feature",
+      "description": "Your sketch uses a SliderJoint, a HingeJoint chain (3+ linked sprites), or a trebuchet combining DistanceJoint and HingeJoint.",
+      "type": "inFunction",
+      "function": ["setup", "draw"],
+      "file": "script.js",
+      "pattern": "new\\s+SliderJoint\\s*\\(|new\\s+HingeJoint\\s*\\([^)]+\\)[^]*new\\s+HingeJoint\\s*\\(|new\\s+DistanceJoint\\s*\\([^)]*\\)[^]*new\\s+HingeJoint\\s*\\(|new\\s+HingeJoint\\s*\\([^)]*\\)[^]*new\\s+DistanceJoint\\s*\\(",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

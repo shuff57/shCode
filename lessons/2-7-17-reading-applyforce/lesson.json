@@ -1,0 +1,19 @@
+{
+  "id": "2-7-17-reading-applyforce",
+  "title": "2.7.17 Reading — q5play docs: applyForce(fx, fy)",
+  "description": "applyForce(fx, fy) adds a one-frame impulse to a sprite — the physics engine turns it into motion. Read this before 2.7.19 Worked Example — Launch a Sprite with applyForce.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.7 Advanced Mechanics",
+  "preview": "reading",
+  "week": 17,
+  "slos": ["SLO-3"],
+  "externalLink": "/docs/q5play",
+  "externalLinkLabel": "Open the in-app q5play docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

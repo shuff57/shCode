@@ -1,0 +1,18 @@
+{
+  "id": "2-7-28-video-wrap",
+  "title": "2.7.28 Video — Wrap and Capstone Preview",
+  "description": "You've built every piece — mouse input, joints, forces, two-player games, state machines, saves. This short video closes Unit 2.7 and previews what Unit 2.8 asks you to do: design and pitch your own game from scratch.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.7 Advanced Mechanics",
+  "preview": "video",
+  "week": 17,
+  "slos": ["SLO-3"],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the YouTube link, or open the classroom slide deck for the live demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

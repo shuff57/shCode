@@ -1169,6 +1169,238 @@
       "week": 17
     },
     {
+      "id": "2-7-1-slides",
+      "title": "2.7.1 Slides — Advanced Mechanics: One Last Toolkit",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "slides",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-10-example-drag-sprite",
+      "title": "2.7.10 Worked Example — Drag a Sprite Around",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-11-video-joints-intro",
+      "title": "2.7.11 Video — Joints in q5play",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-12-reading-distance-joint",
+      "title": "2.7.12 Reading — q5play docs: DistanceJoint",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-13-example-distance-pendulum",
+      "title": "2.7.13 Worked Example — Pendulum with DistanceJoint",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-14-reading-hinge-joint",
+      "title": "2.7.14 Reading — q5play docs: HingeJoint",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-15-example-hinge-arm",
+      "title": "2.7.15 Worked Example — Rotating Arm with HingeJoint",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-16-reading-joint-delete",
+      "title": "2.7.16 Reading — q5play docs: joint.delete()",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-17-reading-applyforce",
+      "title": "2.7.17 Reading — q5play docs: applyForce(fx, fy)",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-18-reading-vector-ab",
+      "title": "2.7.18 Reading — Vector from A to B",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-19-example-launch-force",
+      "title": "2.7.19 Worked Example — Launch a Sprite with applyForce",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-2-video-intro",
+      "title": "2.7.2 Video — Why Mechanics Matter for the Capstone",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-20-video-slingshot",
+      "title": "2.7.20 Video — The Slingshot Pattern",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-21-example-slingshot",
+      "title": "2.7.21 Worked Example — Slingshot End-to-End",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-22-video-two-player",
+      "title": "2.7.22 Video — Two-Player Local Input",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-23-reading-two-schemes",
+      "title": "2.7.23 Reading — Two Key Schemes, Independent State",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-24-reading-bounciness",
+      "title": "2.7.24 Reading — q5play docs: sprite.bounciness",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-24a-example-bounciness-compare",
+      "title": "2.7.24a Worked Example — Bounciness Comparison",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-25-example-two-paddles",
+      "title": "2.7.25 Worked Example — Two Paddles, Two Schemes",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-26-a17-1-pong-sumo",
+      "title": "2.7.26 A17.1 Two-Player Pong-Sumo",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-27-challenges",
+      "title": "2.7.27 Challenges — SliderJoint, Trebuchet, Swinging Rope",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "q5play",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-28-video-wrap",
+      "title": "2.7.28 Video — Wrap and Capstone Preview",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-3-reading-mouse-pos",
+      "title": "2.7.3 Reading — q5play docs: mouse.x and mouse.y",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-4-reading-mouse-pressing",
+      "title": "2.7.4 Reading — q5play docs: mouse.pressing()",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-5-reading-mouse-presses",
+      "title": "2.7.5 Reading — q5play docs: mouse.presses()",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-6-reading-mouse-hittest",
+      "title": "2.7.6 Reading — Hit-Testing a Sprite with the Mouse",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-7-example-click-spawn",
+      "title": "2.7.7 Worked Example — Click to Spawn a Sprite",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "example",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-8-video-drag-release",
+      "title": "2.7.8 Video — Drag and Release",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "video",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
+      "id": "2-7-9-reading-snap-zero-vel",
+      "title": "2.7.9 Reading — Snap a Sprite to the Cursor",
+      "unit": "2.7 Advanced Mechanics",
+      "preview": "reading",
+      "category": "Unit 2: q5play — Applied Game Development",
+      "week": 17
+    },
+    {
       "id": "algorithm-practice",
       "title": "1.2.3 Algorithm Practice",
       "unit": "1.2 Control Flow",
@@ -1321,14 +1553,6 @@
       "week": 10
     },
     {
-      "id": "q5play-joints",
-      "title": "5.5.1 Joints: Distance, Hinge, Slider",
-      "unit": "5.5 Joints & Advanced Input",
-      "preview": "q5play",
-      "category": "Unit 5: q5play — Game Physics",
-      "week": 17
-    },
-    {
       "id": "q5play-move-keys",
       "title": "2.1.9 Make it Move",
       "unit": "2.1 Foundations",
@@ -1337,28 +1561,12 @@
       "week": 10
     },
     {
-      "id": "q5play-slingshot",
-      "title": "5.5.2 Slingshot — Worked Example",
-      "unit": "5.5 Joints & Advanced Input",
-      "preview": "q5play",
-      "category": "Unit 5: q5play — Game Physics",
-      "week": 17
-    },
-    {
       "id": "q5play-sprite-showcase",
       "title": "2.2.6a Worked Example — Sprite Showcase",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "example",
       "category": "Unit 2: q5play — Applied Game Development",
       "week": 12
-    },
-    {
-      "id": "q5play-sumo-challenge",
-      "title": "5.5.3 Two-Player Pong-Sumo — Challenge",
-      "unit": "5.5 Joints & Advanced Input",
-      "preview": "q5play",
-      "category": "Unit 5: q5play — Game Physics",
-      "week": 17
     },
     {
       "id": "sdlc-overview",

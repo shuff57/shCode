@@ -1,0 +1,18 @@
+{
+  "id": "2-7-11-video-joints-intro",
+  "title": "2.7.11 Video — Joints in q5play",
+  "description": "Three joint types in five minutes: a distance joint keeps two sprites a fixed length apart, a hinge lets one pivot around another, and a slider rides a track. You don't need to master all three — just watch and pick the one that fits your game.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.7 Advanced Mechanics",
+  "preview": "video",
+  "week": 17,
+  "slos": ["SLO-3"],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the YouTube link, or open the classroom slide deck for the live demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

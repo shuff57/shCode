@@ -1,0 +1,19 @@
+{
+  "id": "2-7-16-reading-joint-delete",
+  "title": "2.7.16 Reading — q5play docs: joint.delete()",
+  "description": "How joint.delete() releases a constraint at runtime so previously-joined sprites become independent. This is the release step in the slingshot pattern.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.7 Advanced Mechanics",
+  "preview": "reading",
+  "week": 17,
+  "slos": ["SLO-3"],
+  "externalLink": "/docs/q5play/joints",
+  "externalLinkLabel": "Open the in-app q5play docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

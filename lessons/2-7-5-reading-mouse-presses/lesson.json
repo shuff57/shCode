@@ -1,0 +1,19 @@
+{
+  "id": "2-7-5-reading-mouse-presses",
+  "title": "2.7.5 Reading — q5play docs: mouse.presses()",
+  "description": "mouse.presses() is true on exactly one frame — the moment the button first goes down. Read this after 2.7.4 to see how one-shot input differs from held input.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: q5play — Applied Game Development",
+  "unit": "2.7 Advanced Mechanics",
+  "preview": "reading",
+  "week": 17,
+  "slos": ["SLO-3"],
+  "externalLink": "/docs/q5play/mouse",
+  "externalLinkLabel": "Open the in-app q5play docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}
