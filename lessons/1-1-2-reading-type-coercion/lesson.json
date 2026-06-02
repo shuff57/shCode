@@ -1,0 +1,17 @@
+{
+  "id": "1-1-2-reading-type-coercion",
+  "title": "1.1.2e Reading — Operators & Type Coercion",
+  "description": "Learn arithmetic operators and the biggest JS beginner trap: why \"5\" + 3 equals \"53\". Read before the operators-expressions lesson.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.1 Foundations",
+  "preview": "reading",
+  "week": 2,
+  "slos": ["SLO-2"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}
