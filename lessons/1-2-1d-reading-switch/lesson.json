@@ -1,0 +1,17 @@
+{
+  "id": "1-2-1d-reading-switch",
+  "title": "1.2.1d Reading — switch Statements",
+  "description": "Learn how a switch statement picks one case from many without a long if/else chain. Read before the conditionals practice lesson.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Control Flow",
+  "preview": "reading",
+  "week": 4,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

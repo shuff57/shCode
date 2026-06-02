@@ -1,0 +1,17 @@
+{
+  "id": "1-2-4b-reading-while-loop",
+  "title": "1.2.4b Reading — while & do…while",
+  "description": "while checks the condition before each run; do…while runs once first. Learn both, and how to avoid an infinite loop.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Control Flow",
+  "preview": "reading",
+  "week": 6,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

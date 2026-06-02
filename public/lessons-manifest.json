@@ -89,6 +89,166 @@
       "week": null
     },
     {
+      "id": "1-2-1a-reading-if-else",
+      "title": "1.2.1a Reading — If / Else if / Else",
+      "unit": "1.2 Control Flow",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
+    },
+    {
+      "id": "1-2-1b-reading-comparison-operators",
+      "title": "1.2.1b Reading — Comparison Operators & === vs ==",
+      "unit": "1.2 Control Flow",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
+    },
+    {
+      "id": "1-2-1c-reading-logical-operators",
+      "title": "1.2.1c Reading — Logical Operators: && || !",
+      "unit": "1.2 Control Flow",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
+    },
+    {
+      "id": "1-2-1d-reading-switch",
+      "title": "1.2.1d Reading — switch Statements",
+      "unit": "1.2 Control Flow",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
+    },
+    {
+      "id": "1-2-2a-reading-what-is-algorithm",
+      "title": "1.2.2a Reading — What Is an Algorithm?",
+      "unit": "1.2 Control Flow",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "1-2-2b-a5-1-algorithm-writeup",
+      "title": "1.2.2b Algorithm in Plain English",
+      "unit": "1.2 Control Flow",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "1-2-4a-reading-for-loop",
+      "title": "1.2.4a Reading — The for Loop",
+      "unit": "1.2 Control Flow",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "1-2-4b-reading-while-loop",
+      "title": "1.2.4b Reading — while & do…while",
+      "unit": "1.2 Control Flow",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "1-3-1a-reading-function-basics",
+      "title": "1.3.1a Reading — Defining & Calling a Function",
+      "unit": "1.3 Functions and Data",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "1-3-1b-reading-parameters-return",
+      "title": "1.3.1b Reading — Parameters & Return Values",
+      "unit": "1.3 Functions and Data",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "1-3-1c-reading-scope",
+      "title": "1.3.1c Reading — Scope: Local vs Global",
+      "unit": "1.3 Functions and Data",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "1-3-1d-reading-pass-by-value-reference",
+      "title": "1.3.1d Reading — Pass by Value vs Reference",
+      "unit": "1.3 Functions and Data",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "1-3-1e-reading-defensive-copying",
+      "title": "1.3.1e Reading — Defensive Copying: [...] and {...}",
+      "unit": "1.3 Functions and Data",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "1-3-1f-a7-2-pass-by-reference-writeup",
+      "title": "1.3.1f Pass by Value vs Reference",
+      "unit": "1.3 Functions and Data",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "1-3-2a-reading-array-basics",
+      "title": "1.3.2a Reading — Array Basics: Index, push, pop",
+      "unit": "1.3 Functions and Data",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "1-3-2b-reading-array-iteration",
+      "title": "1.3.2b Reading — Looping Over Arrays (for / for…of)",
+      "unit": "1.3 Functions and Data",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "1-3-2c-reading-split-lines",
+      "title": "1.3.2c Reading — Splitting Text into Lines (.split)",
+      "unit": "1.3 Functions and Data",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "1-4-1a-reading-plan-before-code",
+      "title": "1.4.1a Reading — Plan Before You Code",
+      "unit": "1.4 Synthesis",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "1-4-1b-reading-manual-testing",
+      "title": "1.4.1b Reading — Manual Testing: PASS / FAIL Checks",
+      "unit": "1.4 Synthesis",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "1-4-3-q1-reflection-writeup",
+      "title": "1.4.3 Q1 Reflection",
+      "unit": "1.4 Synthesis",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
       "id": "2-1-1-slides",
       "title": "2.1.1 Slides — shplay Foundations",
       "unit": "2.1 Foundations",
@@ -1610,7 +1770,7 @@
     },
     {
       "id": "print-job-manager",
-      "title": "1.4.1 Print Job Manager",
+      "title": "1.4.2 Print Job Manager (Mini-Project)",
       "unit": "1.4 Synthesis",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",

@@ -1,0 +1,17 @@
+{
+  "id": "1-3-1d-reading-pass-by-value-reference",
+  "title": "1.3.1d Reading — Pass by Value vs Reference",
+  "description": "Primitives (numbers, strings, booleans) are copied when passed to a function — the original is safe. Objects and arrays are shared — a function can change the original.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.3 Functions and Data",
+  "preview": "reading",
+  "week": 7,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

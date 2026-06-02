@@ -1,0 +1,17 @@
+{
+  "id": "1-2-1b-reading-comparison-operators",
+  "title": "1.2.1b Reading — Comparison Operators & === vs ==",
+  "description": "Learn the six comparison operators and why === is safer than ==. Read before the conditionals practice lesson.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Control Flow",
+  "preview": "reading",
+  "week": 4,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

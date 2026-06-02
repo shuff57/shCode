@@ -1,0 +1,17 @@
+{
+  "id": "1-4-1a-reading-plan-before-code",
+  "title": "1.4.1a Reading — Plan Before You Code",
+  "description": "Write the steps as comments first, then fill in the code underneath. Read before the Print Job Manager project.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.4 Synthesis",
+  "preview": "reading",
+  "week": 9,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

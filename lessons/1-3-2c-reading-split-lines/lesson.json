@@ -1,0 +1,17 @@
+{
+  "id": "1-3-2c-reading-split-lines",
+  "title": "1.3.2c Reading — Splitting Text into Lines (.split)",
+  "description": "Learn how .split() turns one big string into an array of lines — the same pattern used when reading a text file. Read before the file-processing exercises.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.3 Functions and Data",
+  "preview": "reading",
+  "week": 8,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "1-3-2b-reading-array-iteration",
+  "title": "1.3.2b Reading — Looping Over Arrays (for / for…of)",
+  "description": "Learn two ways to visit every item in an array: a plain for loop using the index, and the cleaner for...of loop. Read before the array iteration exercises.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.3 Functions and Data",
+  "preview": "reading",
+  "week": 8,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

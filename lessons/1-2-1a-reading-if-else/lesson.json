@@ -1,0 +1,17 @@
+{
+  "id": "1-2-1a-reading-if-else",
+  "title": "1.2.1a Reading — If / Else if / Else",
+  "description": "Learn how to make your code choose a path: if, else if, and else. Read before the conditionals practice lesson.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Control Flow",
+  "preview": "reading",
+  "week": 4,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}
