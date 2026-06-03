@@ -2,7 +2,7 @@
   "id": "intro-algorithms",
   "title": "1.2.2 Introduction to Algorithms",
   "description": "Learn what algorithms are and practice writing pseudocode.",
-  "type": "lesson",
+  "type": "assignment",
   "difficulty": "beginner",
   "estimateMins": 25,
   "category": "Unit 1: JavaScript Fundamentals",
