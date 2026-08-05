@@ -121,7 +121,7 @@ Items from this official outline that are **missing or underserved** in the curr
 | **Mid-term exam** | "Mid-term and final examinations" listed as required evaluation method | No midterm exists anywhere in the plan |
 | **Final exam** | Same | No final exam exists anywhere in the plan |
 | **Quizzes** | "Quizzes" listed as required evaluation method | Only one quiz (A4.2, Week 4). No grading category for quizzes. |
-| **Sequential access files** | "File I/O including sequential access files" | W19 covers JSCAD multi-file and import/export, but not sequential file access (open, read line-by-line, write, close) |
+| **Sequential access files** | "File I/O including sequential access files" | W8 covers it fully — A8.2 (read) + A8.3 (write + round-trip) map open/read/write/close to browser JS (FileReader/Blob) |
 | **Sequential processing** | "Data types, variables, expressions, sequential processing" | Sequential processing (step-by-step execution flow) is implicit but never named or taught as a concept |
 
 ### HIGH — Standard intro-programming topics in the outline's spirit
@@ -130,7 +130,7 @@ Items from this official outline that are **missing or underserved** in the curr
 |-----|-------|
 | **`do...while` loops** | "Control structures: selective and repetitive" — `do...while` is a standard repetitive structure |
 | **Multiple-subscripted arrays** | Outline says "arrays including multiple-subscripted arrays" — W8 introduces 2D arrays briefly but doesn't go deep enough for 6.25 hours of lecture coverage |
-| **Text file I/O program** | Out-of-class assignment example: "design and implement a short program that opens a text file and searches for and counts the number of occurrences of a given string" — this specific type of exercise is not possible in pure JSCAD browser environment |
+| **Text file I/O program** | Out-of-class assignment example: "design and implement a short program that opens a text file and searches for and counts the number of occurrences of a given string" | A8.2 reads the file and counts/filters lines in-browser; A8.3 writes a new file (Blob download) and reads it back — the search-and-count program is fully achievable in browser JS |
 
 ### NOTES — Alignment items, not gaps
 
@@ -142,3 +142,71 @@ Items from this official outline that are **missing or underserved** in the curr
 | Error handling | 1.25 hours in outline — W23 covers this (may be over-allocated relative to outline) |
 | Testing | 2.50 hours in outline — W24 covers this adequately |
 | Contact hours | Outline requires 68 total; curriculum plan provides 126 (3.5 × 36). Exceeds requirement. |
+
+---
+
+## OpenStax Supplementary Mapping (JavaScript core)
+
+**Primary reference book:** *Introduction to Python Programming* (OpenStax, Das/Lawson/Mayfield/Norouzi, CC BY-NC-SA). Used as a structural model for the Q1 console sequence and converted to JavaScript. Python-specific syntax is translated (`print()`→`console.log`, `def`→`function`/arrow, `list`→array, `dict`→object); SLO/topic coverage is language-agnostic.
+
+### Python chapters → Q1 console sequence (A1.1–A9.1)
+
+| Python ch. | Title | Maps to | Status |
+|---|---:|---|---|
+| 1 | Statements (IO, variables, strings, numbers, error messages, comments) | W1–3 Foundations (1.1) | **Adopt** — includes a dedicated "Error messages" section worth folding into W1 as its own lesson |
+| 2 | Expressions | W2–3 (operators, types) | Adopt |
+| 3 | Objects | W2 variables (object/ref preview) | Adopt as a preview only — value-first ordering retained |
+| 4 | Decisions | W4 Conditionals | Adopt |
+| 5 | Loops | W5 Algorithms + Loops | Adopt (incl. `do...while`) |
+| 6 | Functions | W6 Functions | Adopt |
+| 7 | Modules | W19 JSCAD libraries | Defer — libraries taught in JSCAD context |
+| 8 | Strings | W2–3 string methods | Adopt |
+| 9 | Lists | W8 Arrays (incl. multiple-subscripted) | Adopt |
+| 10 | Dictionaries | — | **Excluded** — not in the CSCI 4 outline or SLOs |
+| 11 | Classes | W12 OOP (q5play) | Borrow framing only — q5play-grounded OOP retained over abstract OOP |
+| 12 | Recursion | — (W30 optional enrichment) | Optional, not assessed |
+| 13 | Inheritance | W12 (named, not required) | Name only |
+| 14 | Files | W8 File I/O, W16 q5play save, W31 JSCAD multi-file | Adopt concept — browser FileReader replaces Python `open()` |
+| 15 | Data Science | — | Excluded — out of CSCI 4 scope |
+
+### Excluded Python content
+- **Ch 10 Dictionaries** — no outline/SLO requirement.
+- **Ch 15 Data Science** — belongs to *Principles of Data Science*, not CSCI 4.
+- **Ch 12 Recursion / Ch 13 Inheritance** — beyond scope; handled as optional enrichment / q5play context.
+
+### Gap coverage the Python book helps close
+The outline's required topics that the book covers directly and the plan under-serves:
+- **`do...while` loops** (Ch 5) — "Control structures: selective and repetitive"
+- **Multiple-subscripted arrays** (Ch 9) — "Arrays including multiple-subscripted arrays" (6.25 hrs)
+- **Sequential access files** (Ch 14) — "File I/O including sequential access files" (open, read line-by-line, write, close)
+
+---
+
+## Open-Source JavaScript References
+
+Two free, open-source JS references supplement the plan. Both are read-in-the-browser resources that pair with the OpenStax structural model above — the Python book sets the Q1 chapter sequence; these supply the JS-native syntax, examples, and depth for each topic.
+
+### Primary: The Modern JavaScript Tutorial (javascript.info)
+Ilya Kantor. Open source (CC-BY-SA), free online. Modern, comprehensive, beginner-appropriate progression. Covers essentially the entire CSCI 4 outline in JS-native form.
+
+### Secondary: Eloquent JavaScript (Haverbeke)
+CC-BY-NC (code MIT), free online + free PDF/EPUB. Strong narrative prose with project chapters (robot, platform game, pixel editor). Best for motivated readers and optional enrichment; not the primary text.
+
+**Note:** *You Don't Know JS Yet* (Simpson, CC-BY-NC-ND) was considered but **excluded** — it is an advanced deep-dive into language internals (scope, closures, `this`), not an intro text.
+
+### javascript.info sections → outline gap coverage
+
+| Outline gap / underserved topic | javascript.info section |
+|---|---|
+| File I/O — sequential access files (FileReader, line-by-line) | [Binary data, files](/binary) → File and FileReader |
+| Error handling (1.25 hr outline topic) | [Error handling](/error-handling) → try...catch, custom errors |
+| Testing principles (W27) | [Code quality](/code-quality) → Automated testing with Mocha |
+| Debugging (W26) | [Code quality](/code-quality) → Debugging in the browser |
+| Multiple-subscripted arrays | [Arrays](/array) + [Array methods](/array-methods) |
+| JSON / serialization (W16 q5play save) | [JSON methods, toJSON](/json) |
+| LocalStorage / persistence (W16) | [Storing data in the browser](/data-storage) → LocalStorage |
+| Async / preload (W16 loadJSON) | [Promises, async/await](/async) → callbacks intro |
+| DOM / browser events (if HTML is added) | [Document](/document) + [Introduction to Events](/events) |
+
+### Unresolved constraint
+Browser JS cannot `open/write/close` sequential-access files the way C++/Python can. javascript.info's FileReader section is the closest fit, but true sequential file write is an inherent client-side limitation — a curriculum-design constraint to address separately (e.g., a `download`/Blob approach or server-side Pages Function), not a resource gap.

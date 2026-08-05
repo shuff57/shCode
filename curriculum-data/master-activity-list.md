@@ -1,11 +1,11 @@
 # Master Activity List
 
 ## Summary
-- **CodeHS AP CSP activities:** 571
+- **External platform activities:** 571
 - **freeCodeCamp JS v9 activities:** 226
 - **Grand total:** 797
 
-## CHS-AP: 1. Getting Started
+## 1. Getting Started
 
 - 1.1.1 Welcome to AP CSP [Video]
 - 1.2.1 Introduction to Programming With Karel [Video]
@@ -127,7 +127,7 @@
 - Flowcharts and Pseudocode [Notes]
 - Karel Performance Assessment [Exercise]
 
-## CHS-AP: 3. Programming with JavaScript
+## 3. Programming with JavaScript
 
 - 3.1.1 What is Code? [Video]
 - 3.1.2 What is Software [Connection]
@@ -180,7 +180,7 @@
 - 3.9.2 Graphics Badge [Badge]
 - Programming with JS Performance Assessment [Exercise]
 
-## CHS-AP: 4. JavaScript Control Structures
+## 4. JavaScript Control Structures
 
 - 4.1.1 Booleans [Video]
 - 4.1.2 Booleans Quiz [Check for Understanding]
@@ -255,7 +255,7 @@
 - Palindrome Checker [Exercise]
 - Magic 8 Ball [Free Response]
 
-## CHS-AP: 5. Functions and Parameters
+## 5. Functions and Parameters
 
 - 5.1.1 Functions and Parameters 1 [Video]
 - 5.1.2 Functions and Parameters Quiz 1 [Check for Understanding]
@@ -302,7 +302,7 @@
 - 5.8.4 JavaScript Challenges Badge [Badge]
 - 5.9.1 Functions and Parameters Quiz [Unit Quiz]
 
-## CHS-AP: 6. Practice PT: Tell a Story
+## 6. Practice PT: Tell a Story
 
 - 6.1.1 Tell a Story Demo [Demo]
 - 6.1.2 Create PT Scoring Guidelines [Connection]
@@ -313,7 +313,7 @@
 - 6.1.7 Reflection [Free Response]
 - Purpose and Function [Free Response]
 
-## CHS-AP: 7. Basic Data Structures
+## 7. Basic Data Structures
 
 - 7.1.1 Intro to Lists/Arrays [Video]
 - 7.1.2 Intro to Lists/Arrays Quiz [Check for Understanding]
@@ -372,7 +372,7 @@
 - 7.9.1 Basic Data Structures Quiz [Unit Quiz]
 - Simulation Performance Assessment [Exercise]
 
-## CHS-AP: 8. Digital Information
+## 8. Digital Information
 
 - 8.1.1 What is Digital Information? [Video]
 - 8.1.2 What is Digital Information Quiz [Check for Understanding]
@@ -399,7 +399,7 @@
 - 8.3.10 Encoding Badge [Badge]
 - 8.4.1 Pixel Images [Video]
 - 8.4.2 Pixel Images Quiz [Check for Understanding]
-- 8.4.4 CodeHS Logo [Example]
+- 8.4.4 Logo [Example]
 - 8.4.5 Checkerboard [Exercise]
 - 8.4.6 Ladder [Exercise]
 - 8.4.7 Create an Image! [Exercise]
@@ -451,20 +451,20 @@
 - 8.10.8 Guess the Passcode [Exercise]
 - 8.11.1 Digital Information Quiz [Unit Quiz]
 
-## CHS-AP: 9. Practice PT: Steganography
+## 9. Practice PT: Steganography
 
 - 9.1.1 Secret Message Steganography [Example]
 - 9.1.2 Create PT Scoring Guidelines [Connection]
 - 9.1.3 Secret Image Steganography Demo [Demo]
 - 9.1.4 Secret Image Steganography [Challenge]
 
-## CHS-AP: 10. Practice PT: Create an Image Filter
+## 10. Practice PT: Create an Image Filter
 
 - 10.1.1 Create PT Scoring Guidelines [Connection]
 - 10.1.2 Practice PT: Create an Image Filter! [Challenge]
 - 10.1.3 Reflection [Free Response]
 
-## CHS-AP: 11. The Internet
+## 11. The Internet
 
 - 11.1.1 Welcome to the Internet [Video]
 - 11.1.2 Welcome to the Internet Quiz [Check for Understanding]
@@ -523,14 +523,14 @@
 - The Social Dilemma Discussion [Free Response]
 - The Social Dilemma - Ethical Considerations [Free Response]
 
-## CHS-AP: 12. Project: Effects of Internet
+## 12. Project: Effects of Internet
 
 - 12.1.1 Topic Brainstorm [Free Response]
 - 12.1.2 Gathering Resources [Free Response]
 - 12.1.3 Make Your Artifact [Presentation]
 - 12.1.4 Written Responses [Free Response]
 
-## CHS-AP: 13. Data
+## 13. Data
 
 - 13.1.1 Getting Started with Data [Video]
 - 13.1.2 Getting Started with Data Quiz [Check for Understanding]
@@ -559,7 +559,7 @@
 - 13.3.11 Reflection: Importance of Metadata [Free Response]
 - 13.4.1 Data Quiz [Unit Quiz]
 
-## CHS-AP: 14. Project: Data-Driven Insight
+## 14. Project: Data-Driven Insight
 
 - 14.1.1 Topic Brainstorm [Free Response]
 - 14.1.2 Gathering Resources [Free Response]
@@ -567,22 +567,22 @@
 - 14.1.4 Written Responses [Free Response]
 - 14.1.5 Share Your Findings [Free Response]
 
-## CHS-AP: 15. Project: Impacts of Computing
+## 15. Project: Impacts of Computing
 
 - 15.1.1 Artifact Creation [Free Response]
 - 15.1.2 Selecting Computing Innovations [Free Response]
 - 15.1.3 Data as an Input and an Output [Free Response]
 - 15.1.4 Data Privacy and Security [Free Response]
 
-## CHS-AP: 16. Create Performance Task
+## 16. Create Performance Task
 
 - 16.1.1 Create Performance Task [Challenge]
 
-## CHS-AP: 17. AP Exam Review
+## 17. AP Exam Review
 
 - 17.2.1 Practice AP Exam [AP Practice]
 
-## CHS-AP: 18. Creative Development
+## 18. Creative Development
 
 - 18.1.1 Intro to Design Thinking [Video]
 - 18.1.2 Intro to Design Thinking [Check for Understanding]
@@ -612,13 +612,13 @@
 - 18.4.4 Present your Project [Presentation]
 - 18.4.5 Mindsets [Survey]
 
-## CHS-AP: 19. Final
+## 19. Final
 
 - 19.1.1 Final Pt 1: Multiple Choice [Final]
 - About the Posttest [Notes]
 - Computer Science Principles Knowledge & Skills [Quiz]
 
-## CHS-AP: 22. Extra Karel Puzzles
+## 22. Extra Karel Puzzles
 
 - 22.1.1 Midpoint Karel [Challenge]
 - 22.1.2 Target Karel [Challenge]

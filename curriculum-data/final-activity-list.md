@@ -3,13 +3,13 @@
 
 ### Summary
 - **328 recommended activities** across all subsections
-  - 172 code activities (CHS-AP + FCC) in Q1 + selected Q2-Q3 subsections
+  - 172 code activities in Q1 + selected Q2-Q3 subsections
   - 156 JSCAD/FreeCAD activities across 13 subsections
 - **12 combined pairs** (two provider activities merged into one)
 - **27 enrichment activities** (optional, not assessed)
 
 ### Sources
-- **[CHS-AP X.Y.Z]** = CodeHS AP CSP course
+- *(external platform activities carry no source tag)*
 - **[FCC]** = freeCodeCamp JavaScript v9
 - **[COMBINED]** = merged from both providers
 - **[AP CSP]** = non-coding discussion resource (15-20 min)
@@ -26,54 +26,54 @@
 ### 1.1.1 What is Programming / Software Lifecycle
 **~3.5 hrs (1 week)**
 
-1. [CHS-AP 1.1.1] Welcome to AP CSP [Video] — sets the stage, motivational framing
-2. [CHS-AP 3.1.1] What is Code? [Video] — conceptual intro to what code is
-3. [CHS-AP 3.1.2] What is Software [Connection] — software as concept distinct from hardware
-4. [CHS-AP 3.2.1] Uses of Programs [Video] — why programming matters, programs in daily life
-5. [CHS-AP 3.2.2] Why Should You Learn to Program? [Connection] — motivation, career relevance
+1. Welcome to AP CSP [Video] — sets the stage, motivational framing
+2. What is Code? [Video] — conceptual intro to what code is
+3. What is Software [Connection] — software as concept distinct from hardware
+4. Uses of Programs [Video] — why programming matters, programs in daily life
+5. Why Should You Learn to Program? [Connection] — motivation, career relevance
 6. [FCC] Introduction to JavaScript [Theory] — deeper explanation of JS, first statements, console output
-7. [CHS-AP 1.2.1] Introduction to Programming With Karel [Video] — first program concepts via visual environment
-8. [CHS-AP 1.2.3] Our First Karel Program [Example] — see a working program before writing one
-9. [CHS-AP 1.2.4] Your First Karel Program [Exercise] — write first program, sequential execution
-10. [CHS-AP 3.3.1] Hello World [Video] — transition from Karel to JS with console.log
-11. [CHS-AP 3.3.3] Hello World [Example] — see console.log in action
-12. [CHS-AP 3.3.4] Your Name and Hobby [Exercise] — first JS exercise, personalized output
+7. Introduction to Programming With Karel [Video] — first program concepts via visual environment
+8. Our First Karel Program [Example] — see a working program before writing one
+9. Your First Karel Program [Exercise] — write first program, sequential execution
+10. Hello World [Video] — transition from Karel to JS with console.log
+11. Hello World [Example] — see console.log in action
+12. Your Name and Hobby [Exercise] — first JS exercise, personalized output
 
 ### 1.1.2 Variables and Data Types
 **~3.5 hrs (1 week)**
 
-1. [CHS-AP 3.4.1] Variables [Video] — variable declaration, assignment, types
-2. [COMBINED] "Variables and Data Types Deep Dive" — [FCC] Working with Data Types [Theory] + [CHS-AP 3.4.3] Basic Variables [Example] — FCC theory on typeof/types + CHS hands-on example
-3. [CHS-AP 3.4.4] Apples and Oranges [Exercise] — hands-on variable practice
+1. Variables [Video] — variable declaration, assignment, types
+2. [COMBINED] "Variables and Data Types Deep Dive" — [FCC] Working with Data Types [Theory] + Basic Variables [Example] — FCC theory on typeof/types
+3. Apples and Oranges [Exercise] — hands-on variable practice
 4. [FCC] Introduction to Strings [Theory] — string fundamentals, quotes, escape characters
 5. [FCC] Build a Greeting Bot [Workshop] — variable practice with string output
-6. [CHS-AP 3.6.1] Basic Math in JavaScript [Video] — arithmetic operators, order of operations
-7. [CHS-AP 3.6.3] Order of Operations [Example] — operator precedence in action
-8. [CHS-AP 3.6.4] Dollars to Pounds [Example] — practical arithmetic with variables
-9. [COMBINED] "Type Coercion Deep Dive" — [FCC] Working with Data Types [Theory] + [CHS-AP 3.6.8] 24 vs "24" [Exercise] — FCC explains why coercion happens + CHS demonstrates it
-10. [CHS-AP 3.6.6] Sporting Goods Shop [Exercise] — applied arithmetic
-11. [CHS-AP 3.6.7] Running Speed [Exercise] — arithmetic operators practice
+6. Basic Math in JavaScript [Video] — arithmetic operators, order of operations
+7. Order of Operations [Example] — operator precedence in action
+8. Dollars to Pounds [Example] — practical arithmetic with variables
+9. [COMBINED] "Type Coercion Deep Dive" — [FCC] Working with Data Types [Theory] + 24 vs "24" [Exercise] — FCC explains why coercion happens + the example demonstrates it
+10. Sporting Goods Shop [Exercise] — applied arithmetic
+11. Running Speed [Exercise] — arithmetic operators practice
 12. [FCC] Build a JavaScript Trivia Bot [Lab] — variables + strings applied
 13. [FCC] Build a Sentence Maker [Lab] — template literals, concatenation
 14. [FCC] JavaScript Variables and Data Types Quiz [Quiz] — assessment
 
 **[AP CSP] Binary Number Systems:**
-15. [CHS-AP 8.1.1] What is Digital Information? [Video] — intro for binary discussion
-16. [CHS-AP 8.2.1] Number Systems [Video] — binary number systems
-17. [CHS-AP 8.2.4] Decimal to Binary [Video] — binary conversion
-18. [CHS-AP 8.2.6] Binary Game [Exercise] — hands-on binary practice
+15. What is Digital Information? [Video] — intro for binary discussion
+16. Number Systems [Video] — binary number systems
+17. Decimal to Binary [Video] — binary conversion
+18. Binary Game [Exercise] — hands-on binary practice
 
 ### 1.1.3 Documentation and Coding Conventions
 **~3.5 hrs (1 week)**
 
 1. [FCC] Understanding Code Clarity [Theory] — naming, readability, clean code principles
-2. [CHS-AP 1.8.1] Commenting Your Code [Video] — explicit comment instruction
-3. [CHS-AP 1.8.3] Hurdle Karel [Example] — well-commented code in practice
-4. [CHS-AP 1.8.4] The Two Towers + Comments [Exercise] — practice adding comments
-5. [CHS-AP 1.18.1] How to Indent Your Code [Video] — indentation rules and formatting
-6. [CHS-AP 1.18.3] Dance and Clean Karel [Example] — properly indented code
-7. [CHS-AP 1.7.1] Top Down Design and Decomposition in Karel [Video] — structured decomposition
-8. [CHS-AP 1.7.4] The Two Towers [Exercise] — practice decomposition
+2. Commenting Your Code [Video] — explicit comment instruction
+3. Hurdle Karel [Example] — well-commented code in practice
+4. The Two Towers + Comments [Exercise] — practice adding comments
+5. How to Indent Your Code [Video] — indentation rules and formatting
+6. Dance and Clean Karel [Example] — properly indented code
+7. Top Down Design and Decomposition in Karel [Video] — structured decomposition
+8. The Two Towers [Exercise] — practice decomposition
 
 ---
 
@@ -82,44 +82,44 @@
 ### 1.2.1 Conditionals
 **~3.5 hrs (1 week)**
 
-1. [CHS-AP 4.1.1] Booleans [Video] — boolean values intro
-2. [CHS-AP 4.1.3] First Boolean [Example] — booleans in code
-3. [CHS-AP 4.1.4] Do You Have a Cat? [Exercise] — simple boolean to build confidence
+1. Booleans [Video] — boolean values intro
+2. First Boolean [Example] — booleans in code
+3. Do You Have a Cat? [Exercise] — simple boolean to build confidence
 4. [FCC] Working with Comparison and Boolean Operators [Theory] — deep explanation of ===, !==, &&, ||, !
-5. [CHS-AP 4.2.1] Logical Operators [Video] — &&, ||, ! with visual examples
-6. [CHS-AP 4.2.3] Light Switch [Example] — logical operators in action
-7. [CHS-AP 4.2.6] Can You Graduate? [Exercise] — applied logical operators (graduated difficulty)
-8. [CHS-AP 4.3.1] Comparison Operators [Video] — ==, <, >, <=, >= with examples
-9. [CHS-AP 4.3.3] Voting Age [Example] — comparison operators in context
-10. [CHS-AP 4.3.5] Rolling Dice [Exercise] — comparison with random values
+5. Logical Operators [Video] — &&, ||, ! with visual examples
+6. Light Switch [Example] — logical operators in action
+7. Can You Graduate? [Exercise] — applied logical operators (graduated difficulty)
+8. Comparison Operators [Video] — ==, <, >, <=, >= with examples
+9. Voting Age [Example] — comparison operators in context
+10. Rolling Dice [Exercise] — comparison with random values
 11. [FCC] Understanding Comparisons and Conditionals [Theory] — if/else if/else, switch
-12. [CHS-AP 4.4.1] If Statements [Video] — if/else if/else syntax
-13. [CHS-AP 4.4.3] Negative Numbers [Example] — simple if/else
-14. [CHS-AP 4.4.5] Even and Odd [Example] — modulo + conditional
-15. [CHS-AP 4.4.7] Teenagers [Exercise] — multi-branch conditional (graduated)
-16. [CHS-AP 4.4.8] Meal Planner [Exercise] — complex conditional logic (highest difficulty)
+12. If Statements [Video] — if/else if/else syntax
+13. Negative Numbers [Example] — simple if/else
+14. Even and Odd [Example] — modulo + conditional
+15. Teenagers [Exercise] — multi-branch conditional (graduated)
+16. Meal Planner [Exercise] — complex conditional logic (highest difficulty)
 17. [FCC] Build a Fortune Teller [Lab] — conditionals applied
 
 ### 1.2.2 Algorithms and Loops
 **~3.5 hrs (1 week)**
 
-1. [CHS-AP 1.17.1] Karel Algorithms [Video] — algorithm concept via visual environment
-2. [CHS-AP 1.17.2] Quiz: Which Control Structure? [Check for Understanding] — cements algorithm thinking
-3. [CHS-AP 1.11.1] For Loops [Video] — visual for loop via Karel
-4. [CHS-AP 1.11.5] Take 'em All [Exercise] — simple Karel for loop
-5. [CHS-AP 4.6.1] Basic For Loop [Video] — JS for loop syntax
-6. [CHS-AP 4.6.3] For Loop [Example] — for loop in JS
-7. [CHS-AP 4.6.4] Meme Text Generator [Exercise] — applied for loop (engaging)
-8. [CHS-AP 4.7.1] General For Loop [Video] — countdown, count by twos, flexible increment
-9. [CHS-AP 4.7.5] Count By Sevens [Exercise] — general for loop
-10. [CHS-AP 4.7.6] Powers of Two [Exercise] — accumulation pattern
-11. [COMBINED] "Loop Accumulation Patterns" — [CHS-AP 4.8.3] For Loop Sum [Example] + [FCC] Working with Loops [Theory] — CHS shows the pattern + FCC covers do-while, break, continue
-12. [CHS-AP 4.8.5] Factorial [Exercise] — classic accumulation
-13. [CHS-AP 4.10.1] While Loops [Video] — while loop syntax
-14. [CHS-AP 4.10.4] Inventory [Exercise] — while loop applied
-15. [CHS-AP 4.10.5] Fibonacci [Exercise] — while + accumulation, classic algorithm
-16. [CHS-AP 4.11.1] Loop and a Half [Video] — break patterns, sentinel loops
-17. [CHS-AP 4.11.4] Snake Eyes [Exercise] — loop-and-a-half with random (engaging)
+1. Karel Algorithms [Video] — algorithm concept via visual environment
+2. Quiz: Which Control Structure? [Check for Understanding] — cements algorithm thinking
+3. For Loops [Video] — visual for loop via Karel
+4. Take 'em All [Exercise] — simple Karel for loop
+5. Basic For Loop [Video] — JS for loop syntax
+6. For Loop [Example] — for loop in JS
+7. Meme Text Generator [Exercise] — applied for loop (engaging)
+8. General For Loop [Video] — countdown, count by twos, flexible increment
+9. Count By Sevens [Exercise] — general for loop
+10. Powers of Two [Exercise] — accumulation pattern
+11. [COMBINED] "Loop Accumulation Patterns" — For Loop Sum [Example] + [FCC] Working with Loops [Theory] — FCC covers do-while, break, continue
+12. Factorial [Exercise] — classic accumulation
+13. While Loops [Video] — while loop syntax
+14. Inventory [Exercise] — while loop applied
+15. Fibonacci [Exercise] — while + accumulation, classic algorithm
+16. Loop and a Half [Video] — break patterns, sentinel loops
+17. Snake Eyes [Exercise] — loop-and-a-half with random (engaging)
 18. [FCC] Build a Factorial Calculator [Lab] — reinforces accumulation
 19. [FCC] Build a Longest Word Finder App [Lab] — searching pattern (applied)
 20. [FCC] JavaScript Loops Quiz [Quiz] — assessment
@@ -131,19 +131,19 @@
 ### 1.3.1 Functions: Definition and Calls
 **~3.5 hrs (1 week)**
 
-1. [CHS-AP 5.1.1] Functions and Parameters 1 [Video] — function definition, single parameter
-2. [CHS-AP 5.1.3] Double Number [Example] — simplest function
-3. [CHS-AP 5.1.4] Square [Exercise] — single parameter practice
-4. [CHS-AP 5.2.1] Functions and Parameters 2 [Video] — multiple parameters
-5. [CHS-AP 5.2.3] Sum Function [Example] — two-parameter function
-6. [CHS-AP 5.2.4] Area of Triangle [Exercise] — applied multi-parameter
+1. Functions and Parameters 1 [Video] — function definition, single parameter
+2. Double Number [Example] — simplest function
+3. Square [Exercise] — single parameter practice
+4. Functions and Parameters 2 [Video] — multiple parameters
+5. Sum Function [Example] — two-parameter function
+6. Area of Triangle [Exercise] — applied multi-parameter
 7. [FCC] Working with Functions [Theory] — comprehensive: declaration, parameters, return, arrow functions
-8. [CHS-AP 5.4.1] Functions and Return Values 1 [Video] — return values intro
-9. [CHS-AP 5.4.4] Square with Return Values [Exercise] — return values practice
-10. [CHS-AP 5.5.4] Is It Even? [Exercise] — return + boolean (bridges conditionals)
-11. [CHS-AP 5.5.5] Min [Exercise] — return + comparison logic
-12. [CHS-AP 5.6.1] Local Variables and Scope [Video] — scope: local vs global
-13. [CHS-AP 5.6.4] Local Variables [Exercise] — scope practice
+8. Functions and Return Values 1 [Video] — return values intro
+9. Square with Return Values [Exercise] — return values practice
+10. Is It Even? [Exercise] — return + boolean (bridges conditionals)
+11. Min [Exercise] — return + comparison logic
+12. Local Variables and Scope [Video] — scope: local vs global
+13. Local Variables [Exercise] — scope practice
 14. [FCC] Build a Calculator [Workshop] — functions with params and returns (applied)
 15. [FCC] Build a Celsius to Fahrenheit Converter [Lab] — simple function with return
 16. [FCC] Build an Email Masker [Lab] — string processing with functions (realistic)
@@ -160,26 +160,26 @@
 ### 1.3.3 Arrays and File I/O
 **~3.5 hrs (1 week)**
 
-1. [CHS-AP 7.1.1] Intro to Lists/Arrays [Video] — array declaration, literal syntax
-2. [CHS-AP 7.1.3] Making an Array [Example] — array creation in code
-3. [CHS-AP 7.1.4] List of Places to Travel [Exercise] — hands-on array creation
+1. Intro to Lists/Arrays [Video] — array declaration, literal syntax
+2. Making an Array [Example] — array creation in code
+3. List of Places to Travel [Exercise] — hands-on array creation
 4. [FCC] Working with Arrays [Theory] — declaration, indexing, push/pop/shift/unshift/includes
-5. [CHS-AP 7.2.1] Indexing Into an Array [Video] — zero-based indexing, bracket notation
-6. [CHS-AP 7.2.3] Array Indexing Practice [Example] — indexing in action
-7. [CHS-AP 7.2.4] Top Movies [Exercise] — indexing practice
-8. [CHS-AP 7.3.1] Adding/Removing From an Array [Video] — push, pop, splice
-9. [CHS-AP 7.3.4] Empty Array (Push/Pop) [Exercise] — array mutation
-10. [COMBINED] "Array Iteration Patterns" — [CHS-AP 7.4.1] Array Length and Looping [Video] + [FCC] Working with Common Array Methods [Theory] — CHS loop iteration + FCC adds map, filter, slice, indexOf
-11. [CHS-AP 7.4.5] Sum Array [Example] — accumulation with arrays
-12. [CHS-AP 7.4.7] Product of List [Exercise] — iteration practice
-13. [CHS-AP 7.4.10] Evens Only List [Exercise] — filtering pattern
-14. [CHS-AP 7.4.13] Reverse List [Exercise] — manipulation challenge
+5. Indexing Into an Array [Video] — zero-based indexing, bracket notation
+6. Array Indexing Practice [Example] — indexing in action
+7. Top Movies [Exercise] — indexing practice
+8. Adding/Removing From an Array [Video] — push, pop, splice
+9. Empty Array (Push/Pop) [Exercise] — array mutation
+10. [COMBINED] "Array Iteration Patterns" — Array Length and Looping [Video] + [FCC] Working with Common Array Methods [Theory] — FCC adds map, filter, slice, indexOf
+11. Sum Array [Example] — accumulation with arrays
+12. Product of List [Exercise] — iteration practice
+13. Evens Only List [Exercise] — filtering pattern
+14. Reverse List [Exercise] — manipulation challenge
 15. [FCC] Build a Shopping List [Workshop] — array manipulation (applied)
 16. [FCC] Build a Golf Score Translator [Lab] — array lookup (applied)
 
 **[AP CSP] Data Compression:**
-17. [CHS-AP 8.8.1] Data Compression [Video] — lossy vs lossless
-18. [CHS-AP 8.8.3] Run Length Encoding [Video] — concrete compression example
+17. Data Compression [Video] — lossy vs lossless
+18. Run Length Encoding [Video] — concrete compression example
 
 ---
 
@@ -188,18 +188,18 @@
 ### 1.4.1 Q1 Review and Mini-Project
 **~3.5 hrs (1 week)**
 
-1. [CHS-AP 3.9.1] Programming with JavaScript Quiz [Unit Quiz] — JS basics assessment
-2. [CHS-AP 4.12.1] JavaScript Control Structures Quiz [Unit Quiz] — control flow assessment
-3. [CHS-AP 5.9.1] Functions and Parameters Quiz [Unit Quiz] — functions assessment
-4. [CHS-AP 7.9.1] Basic Data Structures Quiz [Unit Quiz] — arrays assessment
+1. Programming with JavaScript Quiz [Unit Quiz] — JS basics assessment
+2. JavaScript Control Structures Quiz [Unit Quiz] — control flow assessment
+3. Functions and Parameters Quiz [Unit Quiz] — functions assessment
+4. Basic Data Structures Quiz [Unit Quiz] — arrays assessment
 5. [FCC] Working with Arrays, Variables, and Naming Practices [Theory] — Q1 concept consolidation
 6. [FCC] Working with Code Quality and Execution Concepts [Theory] — code quality review
 7. [FCC] Build a Gradebook App [Lab] — arrays + functions + conditionals synthesis
 8. [FCC] Build a Pyramid Generator [Lab] — loops + string manipulation synthesis
 9. [FCC] Build an Inventory Management Program [Lab] — arrays + objects + functions (closest to Print Job Manager)
-10. [CHS-AP 5.8.1] Ghosts [Challenge] — open-ended challenge (advanced)
-11. [CHS-AP 5.8.2] Guessing Game [Challenge] — multi-concept challenge
-12. [CHS-AP] Palindrome Checker [Exercise] — string + loop + function synthesis
+10. Ghosts [Challenge] — open-ended challenge (advanced)
+11. Guessing Game [Challenge] — multi-concept challenge
+12. Palindrome Checker [Exercise] — string + loop + function synthesis
 
 ---
 
@@ -224,12 +224,12 @@
 **~3.5 hrs (1 week)** | *Primary content: teacher-delivered JSCAD instruction*
 
 **[AP CSP] How the Internet Works:**
-1. [CHS-AP 11.1.1] Welcome to the Internet [Video] — how the Internet works discussion
-2. [CHS-AP 11.2.1] Devices and Networks [Video] — Internet hardware context
-3. [CHS-AP 11.2.2] Hardware of the Internet [Video] — physical infrastructure
-4. [CHS-AP 11.3.1] Internet Addresses [Video] — IP addresses, DNS intro
-5. [CHS-AP 11.5.1] DNS [Video] — how DNS works; "how does JSCAD reach your browser?"
-6. [CHS-AP 11.5.3] How Does DNS Work? [Connection] — interactive DNS exploration
+1. Welcome to the Internet [Video] — how the Internet works discussion
+2. Devices and Networks [Video] — Internet hardware context
+3. Hardware of the Internet [Video] — physical infrastructure
+4. Internet Addresses [Video] — IP addresses, DNS intro
+5. DNS [Video] — how DNS works; "how does JSCAD reach your browser?"
+6. How Does DNS Work? [Connection] — interactive DNS exploration
 
 ### 2.1.2 2D Shapes and Transforms
 
@@ -249,8 +249,8 @@
 **~3.5 hrs (1 week)** | *Primary content: teacher-delivered JSCAD instruction*
 
 **[AP CSP] Protocols and Fault Tolerance:**
-1. [CHS-AP 11.6.1] Packets and Protocols [Video] — TCP/IP, routing bell-ringer
-2. [CHS-AP 11.6.4] How the Internet Works [Connection] — Internet architecture
+1. Packets and Protocols [Video] — TCP/IP, routing bell-ringer
+2. How the Internet Works [Connection] — Internet architecture
 
 ### 2.1.3 Boolean Operations in 2D
 
@@ -333,8 +333,8 @@
 **~3.5 hrs (1 week)** | *Primary content: teacher-delivered JSCAD instruction*
 
 **[AP CSP] Beneficial and Harmful Effects of Computing:**
-1. [CHS-AP 12.1.1] Topic Brainstorm [Free Response] — effects of computing discussion starter
-2. [CHS-AP 12.1.2] Gathering Resources [Free Response] — research for effects discussion
+1. Topic Brainstorm [Free Response] — effects of computing discussion starter
+2. Gathering Resources [Free Response] — research for effects discussion
 
 ### 2.3.2 3D Primitives and Transforms
 
@@ -390,8 +390,8 @@
 ---
 **~3.5 hrs (1 week)** | *Primary content: teacher-delivered JSCAD project work*
 
-1. [CHS-AP 18.1.1] Intro to Design Thinking [Video] — design thinking, bridges to capstone
-2. [CHS-AP 18.2.1] Prototype [Video] — prototyping concept, design iteration
+1. Intro to Design Thinking [Video] — design thinking, bridges to capstone
+2. Prototype [Video] — prototyping concept, design iteration
 
 ---
 
@@ -418,8 +418,8 @@
 **~3.5 hrs (1 week)** | *Primary content: teacher-delivered JSCAD instruction*
 
 **[AP CSP] Metadata and Intellectual Property:**
-1. [CHS-AP 11.10.1] Creative Credit and Copyright [Video] — IP, DMCA, fair use
-2. [CHS-AP 11.10.4] Exploring Creative Commons [Connection] — CC licenses; importing external geometry
+1. Creative Credit and Copyright [Video] — IP, DMCA, fair use
+2. Exploring Creative Commons [Connection] — CC licenses; importing external geometry
 
 ---
 
@@ -469,10 +469,10 @@
 ### 3.3.1 Sorting and Searching
 **~3.5 hrs (1 week)**
 
-1. [CHS-AP 7.6.1] Finding an Element in a List [Video] — linear search, indexOf, efficiency
-2. [CHS-AP 7.6.3] Array indexOf [Example] — linear search in code
-3. [CHS-AP 7.6.4] Who is in Line? [Exercise] — linear search practice
-4. [CHS-AP 7.6.5] Algorithm Efficiency [Example] — why efficiency matters; Big-O intro
+1. Finding an Element in a List [Video] — linear search, indexOf, efficiency
+2. Array indexOf [Example] — linear search in code
+3. Who is in Line? [Exercise] — linear search practice
+4. Algorithm Efficiency [Example] — why efficiency matters; Big-O intro
 5. [FCC] Introduction to Common Searching and Sorting Algorithms [Theory] — binary search, bubble sort, merge sort, selection sort, quicksort
 6. [FCC] Implement the Binary Search Algorithm [Workshop] — guided binary search
 7. [FCC] Implement the Bubble Sort Algorithm [Lab] — bubble sort (required by curriculum)
@@ -483,20 +483,20 @@
 ### 3.3.2 Error Handling and Debugging
 **~3.5 hrs (1 week)**
 
-1. [CHS-AP 1.16.1] Debugging Basics [Video] — debugging strategies (transferable from Karel)
-2. [CHS-AP 1.16.5] Debugging From Error Messages [Video] — reading error messages
+1. Debugging Basics [Video] — debugging strategies (transferable from Karel)
+2. Debugging From Error Messages [Video] — reading error messages
 3. [FCC] Debugging Techniques [Theory] — strategies, common error types
-4. [COMBINED] "Type Error Debugging" — [FCC] Debug Type Coercion Errors in a Buggy App [Lab] + [CHS-AP 1.16.3] Debug: The Two Towers [Debugging] — JS-specific type debugging + general methodology
+4. [COMBINED] "Type Error Debugging" — [FCC] Debug Type Coercion Errors in a Buggy App [Lab] + Debug: The Two Towers [Debugging] — JS-specific type debugging + general methodology
 5. [FCC] Debug Increment and Decrement Operator Errors in a Buggy App [Lab] — logic error debugging
 6. [FCC] Debug a Random Background Color Changer [Lab] — applied debugging
 7. [FCC] Debugging JavaScript Quiz [Quiz] — assessment
 
 **[AP CSP] Cybersecurity:**
-8. [CHS-AP 11.8.1] Cybersecurity [Video] — cybersecurity intro
-9. [CHS-AP 11.8.3] You Can Be Tracked! [Example] — tracking and privacy
-10. [CHS-AP 11.8.9] Phishing Simulator [Example] — phishing; connects input validation to security
-11. [CHS-AP 8.10.1] Cryptography [Video] — encryption concepts
-12. [CHS-AP 8.10.5] Encrypting with a Caesar Cipher [Example] — concrete encryption example
+8. Cybersecurity [Video] — cybersecurity intro
+9. You Can Be Tracked! [Example] — tracking and privacy
+10. Phishing Simulator [Example] — phishing; connects input validation to security
+11. Cryptography [Video] — encryption concepts
+12. Encrypting with a Caesar Cipher [Example] — concrete encryption example
 
 ### 3.3.3 Testing Principles
 **~3.5 hrs (1 week)** | *Teacher-delivered content. No external activities.*
@@ -526,11 +526,11 @@
 **~3.5 hrs (1 week)** | *Primary content: teacher-delivered JSCAD instruction*
 
 **[AP CSP] Digital Divide and Impacts of Computing:**
-1. [CHS-AP 11.9.1] The Impact of the Internet [Video] — digital divide intro
-2. [CHS-AP 11.9.4] Crucial Steps to Close the Digital Divide [Connection] — concrete examples
-3. [CHS-AP 15.1.1] Artifact Creation [Free Response] — impacts; maps to A25.3
-4. [CHS-AP 15.1.2] Selecting Computing Innovations [Free Response] — choose an innovation to analyze
-5. [CHS-AP 15.1.4] Data Privacy and Security [Free Response] — privacy for impacts discussion
+1. The Impact of the Internet [Video] — digital divide intro
+2. Crucial Steps to Close the Digital Divide [Connection] — concrete examples
+3. Artifact Creation [Free Response] — impacts; maps to A25.3
+4. Selecting Computing Innovations [Free Response] — choose an innovation to analyze
+5. Data Privacy and Security [Free Response] — privacy for impacts discussion
 
 ---
 
@@ -632,8 +632,8 @@ Available for advanced students. Not part of the required sequence.
 11. [FCC] Implement a Queue [Lab] — connects to print queue concept
 
 ## AP CSP Practice Projects
-12. [CHS-AP 9.1.1] Secret Message Steganography [Example]
-13. [CHS-AP 10.1.2] Practice PT: Create an Image Filter! [Challenge]
+12. Secret Message Steganography [Example]
+13. Practice PT: Create an Image Filter! [Challenge]
 
 ## Deep Dives: Numbers and Operators
 14. [FCC] Working with Numbers and Arithmetic Operators [Theory]

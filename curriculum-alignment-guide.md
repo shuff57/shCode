@@ -1,12 +1,12 @@
 # CSCI 4 Curriculum Alignment Guide
-## freeCodeCamp (FCC) + CodeHS (CHS) Lesson Mapping
+## freeCodeCamp (FCC) Lesson Mapping
 
-This guide maps external lesson sections from freeCodeCamp's JavaScript Certification and CodeHS courses to the CSCI 4 curriculum plan. Alignment is at the section/module level. Multiple sources may align to the same week. JSCAD-specific weeks are omitted (mapped separately).
+This guide maps external lesson sections from freeCodeCamp's JavaScript Certification to the CSCI 4 curriculum plan. Alignment is at the section/module level. Multiple sources may align to the same week. JSCAD-specific weeks are omitted (mapped separately).
 
 **Sources:**
 - **FCC** = freeCodeCamp JavaScript Certification (v9)
-- **CHS-AP** = CodeHS "Huff AP Computer Science Principles in JavaScript" (course 266371)
-- **CHS-Intro** = CodeHS "Introduction to Computer Science (JS)" (course 274131)
+- *(external platform sections carry no source tag)*
+
 
 ---
 
@@ -16,14 +16,14 @@ This guide maps external lesson sections from freeCodeCamp's JavaScript Certific
 
 | Source | Section | Notes |
 |--------|---------|-------|
-| CHS-AP 1.1 | Welcome to AP CSP | Video intro to CS concepts |
-| CHS-AP 1.2 | Introduction to Programming With Karel | First program, commands, sequential execution |
-| CHS-AP 3.1 | What is Code | Video + written reflection on what code is |
-| CHS-AP 3.2 | Uses of Programs | Why learn to program, programs in daily life |
-| CHS-Intro 1.1 | Introduction to Programming With Karel | Same Karel intro, fewer activities |
+| 1.1 | Welcome to AP CSP | Video intro to CS concepts |
+| 1.2 | Introduction to Programming With Karel | First program, commands, sequential execution |
+| 3.1 | What is Code | Video + written reflection on what code is |
+| 3.2 | Uses of Programs | Why learn to program, programs in daily life |
+| 1.1 | Introduction to Programming With Karel | Same Karel intro, fewer activities |
 | FCC Variables and Strings | Introduction to JavaScript [Theory] | What JS is, first statements, console output |
 
-**Gap:** Neither FCC nor CHS explicitly teaches the software development lifecycle (design-code-test-maintain). This is teacher-delivered content per the curriculum plan.
+**Gap:** freeCodeCamp does not explicitly teach the software development lifecycle (design-code-test-maintain). This is teacher-delivered content per the curriculum plan.
 
 ---
 
@@ -38,14 +38,14 @@ This guide maps external lesson sections from freeCodeCamp's JavaScript Certific
 | FCC Variables and Strings | Build a Sentence Maker [Lab] | Template literals, concatenation |
 | FCC Variables and Strings | JavaScript Variables and Data Types Review [Review] | Consolidation |
 | FCC Variables and Strings | JavaScript Variables and Data Types Quiz [Quiz] | Assessment |
-| CHS-AP 3.3 | Hello World | console.log, first JS output |
-| CHS-AP 3.4 | Variables | Variable declaration, assignment, types |
-| CHS-AP 3.6 | Basic Math in JavaScript | Arithmetic operators, order of operations, type coercion (`24 vs "24"`) |
-| CHS-Intro 3.1 | Hello World | Same as AP 3.3 |
-| CHS-Intro 3.2 | Variables | Same as AP 3.4 |
-| CHS-Intro 3.4 | Basic Math in JavaScript | Same as AP 3.6 |
+| 3.3 | Hello World | console.log, first JS output |
+| 3.4 | Variables | Variable declaration, assignment, types |
+| 3.6 | Basic Math in JavaScript | Arithmetic operators, order of operations, type coercion (`24 vs "24"`) |
+| 3.1 | Hello World | Same as AP 3.3 |
+| 3.2 | Variables | Same as AP 3.4 |
+| 3.4 | Basic Math in JavaScript | Same as AP 3.6 |
 
-**Strong coverage from both sources.** FCC's "Working with Data Types" theory section directly addresses `typeof`, type coercion, and the four primary types. CHS 3.6 has the `24 vs "24"` exercise that hits type coercion specifically.
+**Strong coverage.** freeCodeCamp's "Working with Data Types" theory section directly addresses `typeof`, type coercion, and the four primary types.
 
 ---
 
@@ -54,13 +54,13 @@ This guide maps external lesson sections from freeCodeCamp's JavaScript Certific
 | Source | Section | Notes |
 |--------|---------|-------|
 | FCC Variables and Strings | Understanding Code Clarity [Theory] | Naming, readability, clean code principles |
-| CHS-AP 1.7 | Top Down Design and Decomposition in Karel | Structured decomposition (conceptual bridge) |
-| CHS-AP 1.8 | Commenting Your Code | Single-line/block comments, why comments matter |
-| CHS-AP 1.18 | How to Indent Your Code | Indentation rules and formatting |
-| CHS-Intro 1.7 | Commenting Your Code | Same as AP 1.8 |
-| CHS-Intro 1.15 | How to Indent Your Code | Same as AP 1.18 |
+| 1.7 | Top Down Design and Decomposition in Karel | Structured decomposition (conceptual bridge) |
+| 1.8 | Commenting Your Code | Single-line/block comments, why comments matter |
+| 1.18 | How to Indent Your Code | Indentation rules and formatting |
+| 1.7 | Commenting Your Code | Same as AP 1.8 |
+| 1.15 | How to Indent Your Code | Same as AP 1.18 |
 
-**Partial gap:** Neither source covers README writing or JSDoc-style documentation. The FCC "Understanding Code Clarity" theory is the closest to the curriculum plan's code readability focus. CHS has explicit commenting and indentation lessons. Teacher-created style guide still needed.
+**Partial gap:** Neither source covers README writing or JSDoc-style documentation. The FCC "Understanding Code Clarity" theory is the closest to the curriculum plan's code readability focus. Teacher-created style guide still needed.
 
 ---
 
@@ -74,16 +74,16 @@ This guide maps external lesson sections from freeCodeCamp's JavaScript Certific
 | FCC Booleans and Numbers | Build a Fortune Teller [Lab] | Conditionals in practice |
 | FCC Booleans and Numbers | JavaScript Comparisons and Conditionals Review [Review] | |
 | FCC Booleans and Numbers | JavaScript Comparisons and Conditionals Quiz [Quiz] | |
-| CHS-AP 4.1 | Booleans | Boolean values, true/false |
-| CHS-AP 4.2 | Logical Operators | `&&`, `\|\|`, `!` with exercises (Can You Graduate?, School's Out) |
-| CHS-AP 4.3 | Comparison Operators | `==`, `<`, `>`, `<=`, `>=` with exercises |
-| CHS-AP 4.4 | If Statements | if/else if/else, nested conditionals (10 activities including Teenagers, Meal Planner) |
-| CHS-Intro 5.1 | Booleans | Same as AP 4.1 |
-| CHS-Intro 5.2 | Logical Operators | Same as AP 4.2 |
-| CHS-Intro 5.3 | Comparison Operators | Same as AP 4.3 |
-| CHS-Intro 5.4 | If Statements | Same as AP 4.4, with 10 activities |
+| 4.1 | Booleans | Boolean values, true/false |
+| 4.2 | Logical Operators | `&&`, `\|\|`, `!` with exercises (Can You Graduate?, School's Out) |
+| 4.3 | Comparison Operators | `==`, `<`, `>`, `<=`, `>=` with exercises |
+| 4.4 | If Statements | if/else if/else, nested conditionals (10 activities including Teenagers, Meal Planner) |
+| 5.1 | Booleans | Same as AP 4.1 |
+| 5.2 | Logical Operators | Same as AP 4.2 |
+| 5.3 | Comparison Operators | Same as AP 4.3 |
+| 5.4 | If Statements | Same as AP 4.4, with 10 activities |
 
-**Excellent coverage from both sources.** CHS has more graduated exercises (simple to complex). FCC has stronger theory explanations. Neither emphasizes `===` vs `==` as strongly as the curriculum plan requires — teacher should supplement.
+**Excellent coverage.** freeCodeCamp has strong theory explanations. Neither emphasizes `===` vs `==` as strongly as the curriculum plan requires — teacher should supplement.
 
 ---
 
@@ -98,22 +98,22 @@ This guide maps external lesson sections from freeCodeCamp's JavaScript Certific
 | FCC Loops | Build a Longest Word Finder App [Lab] | Searching pattern with loops |
 | FCC Loops | JavaScript Loops Review [Review] | |
 | FCC Loops | JavaScript Loops Quiz [Quiz] | |
-| CHS-AP 4.6 | For Loops in JavaScript | Basic for loop syntax, exercises (Meme Text Generator, The Worm) |
-| CHS-AP 4.7 | General For Loops | Countdown, count by twos, powers of two |
-| CHS-AP 4.8 | For Loop Practice | Sum, factorial, nested concepts |
-| CHS-AP 4.10 | While Loops | While loop syntax, Inventory exercise, Fibonacci |
-| CHS-AP 4.11 | Loop and a Half | Break patterns, sentinel loops (Snake Eyes, Better Password) |
-| CHS-AP 1.11 | For Loops (Karel) | Visual loop concept reinforcement |
-| CHS-AP 1.14 | While Loops in Karel | Visual while loop reinforcement |
-| CHS-AP 1.17 | Karel Algorithms | Algorithm thinking with Karel |
-| CHS-Intro 5.5 | For Loops in JavaScript | Same as AP 4.6 |
-| CHS-Intro 5.6 | General For Loops | Same as AP 4.7 |
-| CHS-Intro 5.9 | While Loops | Same as AP 4.10 |
-| CHS-Intro 5.10 | Loop and a Half | Same as AP 4.11 |
+| 4.6 | For Loops in JavaScript | Basic for loop syntax, exercises (Meme Text Generator, The Worm) |
+| 4.7 | General For Loops | Countdown, count by twos, powers of two |
+| 4.8 | For Loop Practice | Sum, factorial, nested concepts |
+| 4.10 | While Loops | While loop syntax, Inventory exercise, Fibonacci |
+| 4.11 | Loop and a Half | Break patterns, sentinel loops (Snake Eyes, Better Password) |
+| 1.11 | For Loops (Karel) | Visual loop concept reinforcement |
+| 1.14 | While Loops in Karel | Visual while loop reinforcement |
+| 1.17 | Karel Algorithms | Algorithm thinking with Karel |
+| 5.5 | For Loops in JavaScript | Same as AP 4.6 |
+| 5.6 | General For Loops | Same as AP 4.7 |
+| 5.9 | While Loops | Same as AP 4.10 |
+| 5.10 | Loop and a Half | Same as AP 4.11 |
 
-**Strong coverage.** CHS has more individual exercises for practice. FCC has better applied projects (Factorial Calculator, Longest Word Finder). The curriculum plan's algorithm definition ("precise, ordered set of steps") is teacher-delivered — CHS Karel Algorithms is the closest external resource.
+**Strong coverage.** freeCodeCamp has better applied projects (Factorial Calculator, Longest Word Finder). The curriculum plan's algorithm definition ("precise, ordered set of steps") is teacher-delivered.
 
-**Gap:** Neither source explicitly covers the "what is an algorithm" conceptual discussion the curriculum plan requires for SLO 4. CHS 1.17 Karel Algorithms is the closest but is Karel-specific.
+**Gap:** Neither source explicitly covers the "what is an algorithm" conceptual discussion the curriculum plan requires for SLO 4.
 
 ---
 
@@ -129,15 +129,15 @@ This guide maps external lesson sections from freeCodeCamp's JavaScript Certific
 | FCC Functions | Build a Celsius to Fahrenheit Converter [Lab] | Simple function with return |
 | FCC Functions | JavaScript Functions Review [Review] | |
 | FCC Functions | JavaScript Functions Quiz [Quiz] | |
-| CHS-AP 5.1 | Functions and Parameters 1 | Function definition, single parameter (Double, Square, Triple) |
-| CHS-AP 5.2 | Functions and Parameters 2 | Multiple parameters (Sum, Area of Triangle) |
-| CHS-AP 5.3 | Functions and Parameters 3 | Functions with graphics — visual feedback |
-| CHS-AP 5.4 | Functions and Return Values 1 | Return values intro |
-| CHS-AP 5.5 | Functions and Return Values 2 | Return values applied (Is It Even?, Min) |
-| CHS-AP 5.6 | Local Variables and Scope | Scope intro — local vs global |
-| CHS-Intro 7.1-7.6 | Functions and Parameters 1-6 + Return Values + Scope | Same content as AP 5.x |
+| 5.1 | Functions and Parameters 1 | Function definition, single parameter (Double, Square, Triple) |
+| 5.2 | Functions and Parameters 2 | Multiple parameters (Sum, Area of Triangle) |
+| 5.3 | Functions and Parameters 3 | Functions with graphics — visual feedback |
+| 5.4 | Functions and Return Values 1 | Return values intro |
+| 5.5 | Functions and Return Values 2 | Return values applied (Is It Even?, Min) |
+| 5.6 | Local Variables and Scope | Scope intro — local vs global |
+| 7.1-7.6 | Functions and Parameters 1-6 + Return Values + Scope | Same content as AP 5.x |
 
-**Excellent coverage.** CHS breaks functions into 6 graduated lessons (params 1-3, returns 1-2, scope) which matches the curriculum plan's "Functions Part 1" perfectly. FCC has stronger applied projects (Calculator, Loan Checker). CHS 5.6 covers scope which the curriculum plan introduces this week.
+**Excellent coverage.** freeCodeCamp has strong applied projects (Calculator, Loan Checker).
 
 ---
 
@@ -149,7 +149,7 @@ This guide maps external lesson sections from freeCodeCamp's JavaScript Certific
 | FCC Objects | Working with Optional Chaining and Object Destructuring [Theory] | Spread operator, destructuring (partial) |
 | FCC JavaScript Fundamentals Review | Working with Types and Objects [Theory] | Value vs reference types revisited |
 
-**Significant gap.** Neither FCC nor CHS has a dedicated section on pass-by-value vs pass-by-reference. This is a curriculum plan-specific deep dive (SLO topic). FCC's Objects theory touches on reference types, and the Fundamentals Review revisits it, but neither explicitly contrasts primitive vs object mutation behavior. This week is primarily teacher-delivered with custom exercises.
+**Significant gap.** freeCodeCamp has no dedicated section on pass-by-value vs pass-by-reference. This is a curriculum plan-specific deep dive (SLO topic). FCC's Objects theory touches on reference types, and the Fundamentals Review revisits it, but it does not explicitly contrast primitive vs object mutation behavior. This week is primarily teacher-delivered with custom exercises.
 
 ---
 
@@ -164,16 +164,16 @@ This guide maps external lesson sections from freeCodeCamp's JavaScript Certific
 | FCC Arrays | Working with Common Array Methods [Theory] | map, filter, slice, splice, indexOf |
 | FCC Arrays | JavaScript Arrays Review [Review] | |
 | FCC Arrays | JavaScript Arrays Quiz [Quiz] | |
-| CHS-AP 7.1 | Intro to Lists/Arrays | Array declaration, literal syntax |
-| CHS-AP 7.2 | Indexing Into an Array | Zero-based indexing, bracket notation |
-| CHS-AP 7.3 | Adding/Removing From an Array | push, pop, splice |
-| CHS-AP 7.4 | Array Length and Looping Through Arrays | for loop iteration, sum, max, product (13 activities) |
-| CHS-AP 7.5 | Iterating Over an Array | Applied iteration with visualization |
-| CHS-AP 7.6 | Finding an Element in a List | indexOf, linear search, algorithm efficiency intro |
-| CHS-AP 7.7 | Removing an Element From an Array | splice for removal |
-| CHS-Intro (no array unit) | — | Intro CS course does not include arrays |
+| 7.1 | Intro to Lists/Arrays | Array declaration, literal syntax |
+| 7.2 | Indexing Into an Array | Zero-based indexing, bracket notation |
+| 7.3 | Adding/Removing From an Array | push, pop, splice |
+| 7.4 | Array Length and Looping Through Arrays | for loop iteration, sum, max, product (13 activities) |
+| 7.5 | Iterating Over an Array | Applied iteration with visualization |
+| 7.6 | Finding an Element in a List | indexOf, linear search, algorithm efficiency intro |
+| 7.7 | Removing an Element From an Array | splice for removal |
+| (no array unit) | - | Intro CS course does not include arrays |
 
-**Good coverage for arrays, gap for File I/O.** CHS-AP Unit 7 is excellent — 7 lessons with 50+ activities covering all array operations. FCC Arrays section covers the same ground more concisely. Neither source covers browser FileReader API or file I/O concepts — that content is curriculum plan-specific.
+**Good coverage for arrays, gap for File I/O.** The external array material is excellent — 7 lessons with 50+ activities covering all array operations. freeCodeCamp Arrays covers the same ground more concisely. freeCodeCamp does not cover the browser FileReader API or file I/O concepts — that content is curriculum plan-specific.
 
 ---
 
@@ -183,13 +183,13 @@ This guide maps external lesson sections from freeCodeCamp's JavaScript Certific
 |--------|---------|-------|
 | FCC JavaScript Fundamentals Review | Full section (24 items) | Comprehensive review: types, objects, arrays, variables, modules, rest params. Includes 15+ labs (Gradebook App, Pyramid Generator, Password Generator, Inventory Management) |
 | FCC Booleans and Numbers | Build a Mathbot [Workshop] | Multi-concept review project |
-| CHS-AP 3.9 | Programming with JavaScript Quiz | Unit quiz for JS basics |
-| CHS-AP 4.12 | JavaScript Control Structures Quiz | Unit quiz for control flow |
-| CHS-AP 5.9 | Functions and Parameters Quiz | Unit quiz for functions |
-| CHS-AP 7.9 | Basic Data Structures Quiz | Unit quiz for arrays |
-| CHS-AP 5.8 | Basic JavaScript and Graphics Challenges | Open-ended challenges (Ghosts, Guessing Game, Draw Something) |
+| 3.9 | Programming with JavaScript Quiz | Unit quiz for JS basics |
+| 4.12 | JavaScript Control Structures Quiz | Unit quiz for control flow |
+| 5.9 | Functions and Parameters Quiz | Unit quiz for functions |
+| 7.9 | Basic Data Structures Quiz | Unit quiz for arrays |
+| 5.8 | Basic JavaScript and Graphics Challenges | Open-ended challenges (Ghosts, Guessing Game, Draw Something) |
 
-**Good supplemental resources.** The FCC Fundamentals Review section is an excellent match — it's a synthesis of all Q1 concepts with challenging labs. CHS quizzes provide formal assessment practice. Neither matches the curriculum plan's "Print Job Manager" project specifically, but FCC's Gradebook App and Inventory Management labs are similar in scope.
+**Good supplemental resources.** The FCC Fundamentals Review section is an excellent match — it's a synthesis of all Q1 concepts with challenging labs. Neither matches the curriculum plan's "Print Job Manager" project specifically, but freeCodeCamp's Gradebook App and Inventory Management labs are similar in scope.
 
 ---
 
@@ -208,7 +208,7 @@ This guide maps external lesson sections from freeCodeCamp's JavaScript Certific
 | FCC Objects | Build a Wildlife Tracker [Workshop] | Object methods, properties |
 | FCC Objects | Build a Recipe Tracker [Workshop] | Object manipulation |
 
-**Strong FCC coverage.** FCC's Classes section directly maps to this week. CHS does not have a classes/OOP unit in either course. The FCC Shopping Cart workshop is a good analog to the curriculum plan's `PrintPart` / `PrintQueue` class exercises. FCC Objects section provides the foundation that leads into classes.
+**Strong FCC coverage.** FCC's Classes section directly maps to this week. The FCC Shopping Cart workshop is a good analog to the curriculum plan's `PrintPart` / `PrintQueue` class exercises. FCC Objects section provides the foundation that leads into classes.
 
 **Gap:** Neither source explicitly compares OOP vs procedural programming as the curriculum plan requires for SLO 2. This comparison is teacher-delivered.
 
@@ -229,9 +229,9 @@ This guide maps external lesson sections from freeCodeCamp's JavaScript Certific
 | FCC Algorithms | Implement the Quicksort Algorithm [Lab] | Advanced sort |
 | FCC Algorithms | Searching and Sorting Algorithms Review [Review] | |
 | FCC Algorithms | Searching and Sorting Algorithms Quiz [Quiz] | |
-| CHS-AP 7.6 | Finding an Element in a List | Linear search, indexOf, algorithm efficiency intro |
+| 7.6 | Finding an Element in a List | Linear search, indexOf, algorithm efficiency intro |
 
-**Excellent FCC coverage, limited CHS coverage.** FCC's Algorithms section is a near-perfect match for this week — it covers bubble sort (required by curriculum plan), plus binary search, merge sort, and more. CHS only has a brief linear search lesson (7.6). The FCC section goes beyond the curriculum plan's requirements (quicksort, insertion sort) which gives stretch material for advanced students.
+**Excellent coverage.** freeCodeCamp's Algorithms section is a near-perfect match for this week — it covers bubble sort (required by curriculum plan), plus binary search, merge sort, and more. The section goes beyond the curriculum plan's requirements (quicksort, insertion sort) which gives stretch material for advanced students.
 
 ---
 
@@ -245,9 +245,9 @@ This guide maps external lesson sections from freeCodeCamp's JavaScript Certific
 | FCC Debugging | Debugging JavaScript Quiz [Quiz] | |
 | FCC Booleans and Numbers | Debug Type Coercion Errors in a Buggy App [Lab] | Specific debugging — type errors |
 | FCC Booleans and Numbers | Debug Increment and Decrement Operator Errors in a Buggy App [Lab] | Specific debugging — logic errors |
-| CHS-AP 1.16 | Debugging Strategies | 8 activities on debugging approaches (Karel context but transferable) |
+| 1.16 | Debugging Strategies | 8 activities on debugging approaches (Karel context but transferable) |
 
-**Partial coverage.** FCC Debugging section is short (4 items) but directly relevant. The two FCC debugging labs in Booleans and Numbers add practical exercises. CHS 1.16 covers debugging strategies but in Karel, not JS. Neither source covers try/catch, throw, or custom errors — those are curriculum plan-specific topics.
+**Partial coverage.** FCC Debugging section is short (4 items) but directly relevant. The two FCC debugging labs in Booleans and Numbers add practical exercises. freeCodeCamp does not cover try/catch, throw, or custom errors — those are curriculum plan-specific topics.
 
 **Gap:** try/catch/finally syntax, throwing custom errors, and input validation are not covered by either source. Teacher-delivered.
 
@@ -259,15 +259,15 @@ This guide maps external lesson sections from freeCodeCamp's JavaScript Certific
 |--------|---------|-------|
 | (none) | — | — |
 
-**Complete gap.** Neither FCC nor CHS has a dedicated section on testing principles, writing test cases, or test-driven development. This entire week is teacher-delivered curriculum plan content. FCC's labs implicitly test code but never teach testing as a concept.
+**Complete gap.** freeCodeCamp has no dedicated section on testing principles, writing test cases, or test-driven development. This entire week is teacher-delivered curriculum plan content. freeCodeCamp's labs implicitly test code but never teach testing as a concept.
 
 ---
 
-## CHS Non-Programming Units → Curriculum Plan Integration
+## Non-Programming Units → Curriculum Plan Integration
 
-AP CSP non-coding topics are integrated into the curriculum plan as 10–20 minute discussions, bell-ringers, and one graded written assignment. The table below maps each CHS-AP unit to the curriculum plan week(s) where its topics are reinforced.
+AP CSP non-coding topics are integrated into the curriculum plan as 10–20 minute discussions, bell-ringers, and one graded written assignment. The table below maps each AP CSP unit to the curriculum plan week(s) where its topics are reinforced.
 
-| CHS-AP Unit | Topic | Curriculum Plan Week(s) | Integration |
+| Unit | Topic | Curriculum Plan Week(s) | Integration |
 |-------------|-------|------------------------|-------------|
 | Unit 8 | Digital Information: binary, hex, pixel images, compression, cryptography | W2 (binary), W8 (compression), W11 (image representation) | AP CSP Discussions in-class |
 | Unit 9 | Practice PT: Steganography | W8 (data compression context) | Conceptual connection only — no steganography project in CSCI 4 |
@@ -279,28 +279,28 @@ AP CSP non-coding topics are integrated into the curriculum plan as 10–20 minu
 | Unit 15 | Impacts of Computing | W15 (ethics), W25 (digital divide + A25.3), W33 (computing bias) | AP CSP Discussions + written |
 | Unit 18 | Creative Development: design thinking, prototyping | W1 (lifecycle), W3 (documentation), W34 (peer review/collaboration) | Already embedded in plan structure |
 
-### CHS Units NOT Integrated (and why)
+### Units NOT Integrated (and why)
 
-| CHS-AP Unit | Reason |
+| Unit | Reason |
 |-------------|--------|
 | Unit 9 (Steganography) | Requires image manipulation not available in JSCAD environment. Students get the underlying concepts (binary, compression, encryption) through other discussions. |
 | Unit 10 (Image Filter) | Same — image pixel manipulation doesn't map to JSCAD. Conceptually covered via W11 color/image discussion. |
 | Unit 14 (Data-Driven Insight) | No standalone data analysis project in CSCI 4. A25.3 written assignment covers the "present an insight" concept at smaller scale. |
 
-### Supplemental CHS Lessons for AP CSP Discussion Topics
+### Supplemental Lessons for AP CSP Discussion Topics
 
-Teachers may assign specific CHS lessons as homework to reinforce the in-class AP CSP discussions:
+Teachers may assign specific supplemental lessons as homework to reinforce the in-class AP CSP discussions:
 
-| Curriculum Plan Discussion | Recommended CHS Lesson | Notes |
+| Curriculum Plan Discussion | Recommended Lesson | Notes |
 |---------------------------|----------------------|-------|
-| W2: Binary number systems | CHS-AP 8.1–8.3 (Number Systems, Binary, Pixel Images) | Video + exercises on binary conversion |
-| W8: Data compression | CHS-AP 8.5 (Compression) | Lossy vs lossless with examples |
-| W10: How the Internet works | CHS-AP 11.1–11.3 (Internet hardware, DNS, protocols) | Video series on Internet infrastructure |
-| W11: Protocols & fault tolerance | CHS-AP 11.4–11.5 (Routing, fault tolerance) | Interactive simulations |
-| W15: Beneficial/harmful effects | CHS-AP 12.x (Effects of the Internet project) | Research + writing |
-| W23: Cybersecurity | CHS-AP 11.6+ (Cybersecurity, encryption) + CHS-AP 8.6 (Cryptography) | Video + exercises |
-| W25: Digital divide | CHS-AP 15.x (Impacts of Computing project) | Research + presentation |
-| W33: Computing bias | CHS-AP 15.x (Impacts of Computing project) | Discussion prompts |
+| W2: Binary number systems | 8.1–8.3 (Number Systems, Binary, Pixel Images) | Video + exercises on binary conversion |
+| W8: Data compression | 8.5 (Compression) | Lossy vs lossless with examples |
+| W10: How the Internet works | 11.1–11.3 (Internet hardware, DNS, protocols) | Video series on Internet infrastructure |
+| W11: Protocols & fault tolerance | 11.4–11.5 (Routing, fault tolerance) | Interactive simulations |
+| W15: Beneficial/harmful effects | 12.x (Effects of the Internet project) | Research + writing |
+| W23: Cybersecurity | 11.6+ (Cybersecurity, encryption) + 8.6 (Cryptography) | Video + exercises |
+| W25: Digital divide | 15.x (Impacts of Computing project) | Research + presentation |
+| W33: Computing bias | 15.x (Impacts of Computing project) | Discussion prompts |
 
 ---
 
@@ -308,7 +308,7 @@ Teachers may assign specific CHS lessons as homework to reinforce the in-class A
 
 ### Programming Content
 
-| Curriculum Week | Topic | FCC Coverage | CHS Coverage | Gaps |
+| Curriculum Week | Topic | Coverage | Gaps |
 |----------------|-------|--------------|--------------|------|
 | W1 | Programming / Lifecycle | Partial | Partial | Lifecycle is teacher-delivered |
 | W2 | Variables / Data Types | Strong | Strong | None |
@@ -326,22 +326,22 @@ Teachers may assign specific CHS lessons as homework to reinforce the in-class A
 
 ### AP CSP Non-Coding Integration
 
-| Curriculum Week | AP CSP Topic | CHS-AP Unit | Coverage |
+| Curriculum Week | AP CSP Topic | Unit | Coverage |
 |----------------|-------------|-------------|----------|
-| W2 | Binary number systems | Unit 8 (8.1–8.3) | CHS has video + exercises; plan adds 15-min discussion |
-| W3 | Open source / licensing | — | Teacher-delivered; no direct CHS lesson |
-| W8 | Data compression | Unit 8 (8.5) | CHS has dedicated lesson; plan adds 15-min discussion |
-| W10 | How the Internet works | Unit 11 (11.1–11.3) | CHS has video series; plan adds 15-min discussion |
-| W11 | Protocols / fault tolerance | Unit 11 (11.4–11.5) | CHS has simulations; plan adds 10-min bell-ringer |
-| W15 | Beneficial/harmful effects | Unit 12 | CHS has research project; plan adds 15-min discussion |
-| W19 | Metadata / intellectual property | Unit 13 (partial) | Teacher-delivered; CHS covers metadata but not IP |
-| W22 | Parallel computing | — | Teacher-delivered; no direct CHS lesson |
-| W23 | Cybersecurity basics | Unit 11 (11.6+), Unit 8 (8.6) | CHS has crypto + cybersecurity; plan adds 15-min discussion |
-| W25 | Digital divide + A25.3 written | Unit 12, Unit 15 | CHS has research projects; plan adds discussion + graded written |
-| W33 | Computing bias | Unit 15 | CHS has impacts project; plan adds 15-min discussion |
+| W2 | Binary number systems | Unit 8 (8.1–8.3) | Platform has video + exercises; plan adds 15-min discussion |
+| W3 | Open source / licensing | — | Teacher-delivered; no direct platform lesson |
+| W8 | Data compression | Unit 8 (8.5) | Platform has dedicated lesson; plan adds 15-min discussion |
+| W10 | How the Internet works | Unit 11 (11.1–11.3) | Platform has video series; plan adds 15-min discussion |
+| W11 | Protocols / fault tolerance | Unit 11 (11.4–11.5) | Platform has simulations; plan adds 10-min bell-ringer |
+| W15 | Beneficial/harmful effects | Unit 12 | Platform has research project; plan adds 15-min discussion |
+| W19 | Metadata / intellectual property | Unit 13 (partial) | Teacher-delivered; platform covers metadata but not IP |
+| W22 | Parallel computing | — | Teacher-delivered; no direct platform lesson |
+| W23 | Cybersecurity basics | Unit 11 (11.6+), Unit 8 (8.6) | Platform has crypto + cybersecurity; plan adds 15-min discussion |
+| W25 | Digital divide + A25.3 written | Unit 12, Unit 15 | Platform has research projects; plan adds discussion + graded written |
+| W33 | Computing bias | Unit 15 | Platform has impacts project; plan adds 15-min discussion |
 
 **Key takeaways:**
 
-- **Programming content:** FCC and CHS together provide strong coverage for Weeks 2–6 and 8 (core JS fundamentals). FCC is the primary source for W17 (Classes) and W22 (Algorithms). Weeks 7, 23–24, and the lifecycle/documentation/testing content require teacher-created materials regardless of external resources.
-- **AP CSP non-coding content:** CHS-AP Units 8, 11, 12, 13, and 15 provide substantial resources for the AP CSP discussions added to the curriculum plan. Teachers can assign CHS lessons as homework to deepen the in-class discussions. Two topics (open source/licensing, parallel computing) have no CHS equivalent and are teacher-delivered.
-- **Not integrated:** CHS-AP Units 9 (Steganography) and 10 (Image Filter) require image manipulation not available in the JSCAD environment. Students get the underlying concepts through other discussions.
+- **Programming content:** freeCodeCamp provides strong coverage for Weeks 2–6 and 8 (core JS fundamentals). FCC is the primary source for W17 (Classes) and W22 (Algorithms). Weeks 7, 23–24, and the lifecycle/documentation/testing content require teacher-created materials regardless of external resources.
+- **AP CSP non-coding content:** AP CSP Units 8, 11, 12, 13, and 15 provide substantial resources for the AP CSP discussions added to the curriculum plan. Two topics (open source/licensing, parallel computing) have no platform equivalent and are teacher-delivered.
+- **Not integrated:** Units 9 (Steganography) and 10 (Image Filter) require image manipulation not available in the JSCAD environment. Students get the underlying concepts through other discussions.

@@ -1,7 +1,7 @@
 # Reading Lesson Conventions
 
 Canonical rules for in-app lessons whose primary surface is a text reading
-(internal doc chapter, freeCodeCamp reading, CHS-AP passage, q5play docs,
+(internal doc chapter, freeCodeCamp reading, q5play docs,
 etc.). When a module spec under `curriculum/modules/lessons/*.md` lists a
 "reading" entry or a `lessons/<slug>/` has
 `lesson.json.preview === "reading"`, these rules are binding.

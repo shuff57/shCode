@@ -10,7 +10,7 @@
 - **Primary Environments:**
   - Browser DevTools console (Q1 JavaScript fundamentals)
   - q5play in-app editor (Q2 applied game development) — no install required
-  - JSCAD browser app (https://openjscad.xyz/) (Q3–Q4 3D modeling) — no install required
+  - JSCAD browser app (https://jscad.app/) (Q3–Q4 3D modeling) — no install required
 - **Students:** High school juniors, little to no prior coding experience
 - **Contact Hours:** 3.5 hours/week × 36 weeks = 126 total contact hours
 - **Printers:** 10 FDM printers, 250×250mm build plates, ~3 students per printer
@@ -74,7 +74,7 @@ Each graded artifact that anchors an SLO appears at least twice (primary + backu
 | Arrays | 8 (intro), 13 (q5play Groups), 23 (JSCAD parametric) | Exercises + applied modeling |
 | Control structures (if/switch/for/while/do...while) | 4–5, applied W11–14 (q5play) | Exercises + q5play mechanics |
 | Algorithms: sorting and searching | 30 | Applied to geometry data |
-| File I/O | 8 (FileReader), 16 (q5play save/load), 31 (JSCAD multi-file + STL export) | Lab + multi-file project |
+| File I/O | 8 (FileReader + Blob write), 16 (q5play save/load), 31 (JSCAD multi-file + STL export) | Lab + multi-file project |
 | Error handling | 26 | Debug exercise |
 | Parameters by value and reference | 7 | Functions deep dive |
 | Testing principles | 27 | Test case writing assignment |
@@ -116,6 +116,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 1.1.1 What Is Programming / Software Lifecycle (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 1, SLO 4 (intro)
+**Reading:** JS1 → An introduction → An Introduction to JavaScript; PY Ch 1 Statements (intro framing)
 
 **Learning Objectives:**
 - Define what a program is and what programming languages are
@@ -149,6 +150,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 1.1.2 Variables and Data Types (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 2 (intro to structured programming)
+**Reading:** JS1 → JavaScript Fundamentals → Variables, Data types, Basic operators, maths; JS2 Ch 1 Values, Types, and Operators; PY Ch 2 Expressions
 
 **Learning Objectives:**
 - Declare variables using `let` and `const`
@@ -188,6 +190,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 1.1.3 Documentation and Coding Conventions (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 2 (structured programming principles)
+**Reading:** JS1 → Code quality → Coding Style, Comments; PY Ch 1 Statements (comments)
 
 **Learning Objectives:**
 - Write single-line and multi-line comments
@@ -226,6 +229,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 1.2.1 Conditionals (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3 (implement structured programs)
+**Reading:** JS1 → JavaScript Fundamentals → Comparisons, Conditional branching: if '?', Logical operators; JS2 Ch 2 Program Structure (Conditional execution); PY Ch 4 Decisions
 
 **Learning Objectives:**
 - Write if, else if, and else statements
@@ -261,6 +265,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 > **Extended** to allow algorithm concepts + for/while/do...while without rushing.
 **Contact hours:** 3.5
 **SLOs covered:** SLO 4 (algorithms), SLO 3
+**Reading:** JS1 → JavaScript Fundamentals → Loops: while and for, The "switch" statement; JS2 Ch 2 Program Structure (while and do loops, for loops); PY Ch 5 Loops (incl. do...while)
 
 **Learning Objectives:**
 - Define what an algorithm is
@@ -303,6 +308,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 1.3.1 Functions: Definition and Calls (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 2, SLO 3
+**Reading:** JS1 → JavaScript Fundamentals → Functions, Function expressions, Arrow functions, the basics; JS2 Ch 3 Functions; PY Ch 6 Functions
 
 **Learning Objectives:**
 - Define and call a function
@@ -337,6 +343,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 1.3.2 Functions: Pass by Value/Reference (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3, Topic: parameters by value and reference
+**Reading:** JS1 → Objects: the basics → Object references and copying; JS2 Ch 4 Data Structures (Mutability); PY Ch 3 Objects
 
 **Learning Objectives:**
 - Explain what "pass by value" means
@@ -373,6 +380,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 > **Extended** to give File I/O (FileReader API) its own session separate from core array instruction.
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3, Topic: arrays, Topic: File I/O
+**Reading:** JS1 → Data types → Arrays, Array methods, Iterables; JS1 → Binary data, files → File and FileReader ⚠️FILE I/O; JS2 Ch 4 Data Structures: Objects and Arrays; JS2 Ch 18 File fields; PY Ch 9 Lists, Ch 14 Files
 
 **Learning Objectives:**
 - Declare and initialize arrays
@@ -382,6 +390,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Create a multi-dimensional array
 - Read a text file using the browser FileReader API
 - Process file contents line-by-line using arrays
+- Write text out to a downloadable file using `Blob` + `<a download>`
 
 **Topics:**
 - Array declaration and initialization
@@ -394,22 +403,28 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - `FileReader.readAsText()`: reading a file as a string
 - `.split('\n')` to convert file content into an array of lines — sequential access
 - Processing file data: searching, counting, filtering lines
+- Writing a file in the browser: `Blob` + `URL.createObjectURL` + `<a download>`
+- Sequential-access file model: open → read/write → close, mapped to browser JS
 
 **In-Class Activities:**
 - Live code: array of part names, loop through and print each
 - Introduce `[x, y, z]` as a coordinate array — "this is how JSCAD will talk to us"
 - Live code: build a simple HTML page with a file picker, read a .txt file, split into lines, display each line
 - Students load a provided text file of part measurements and use arrays to process it
+- Live code: build the write side — `Blob` from filtered lines, trigger download, then re-read the downloaded file back
 - **AP CSP Discussion (15 min):** Data compression. Compare the .txt file size to a compressed .zip of the same file. Explain lossy vs lossless compression. Preview: "STL files are huge because they store every triangle. 3MF uses compression — same model, smaller file."
 
 **Assignments:**
 - **A8.1 (Lab):** Write a program that stores 10 design measurements in an array. Use loops to find the maximum, minimum, and average. Must use at least 3 different array methods.
 - **A8.2 (Lab, File I/O coverage):** Build an HTML page with a file input that reads a `.txt` file containing one item per line (provided: a list of 20 part names and dimensions). Using FileReader and `.split('\n')`, load the file into an array, then: (a) count how many lines contain a user-specified search string, (b) find and display all lines matching a filter, (c) display the total number of lines read. Must use at least one loop and one array method. Comment explaining how FileReader works and what sequential file access means.
+- **A8.3 (Lab, File I/O write + round-trip):** Add the write side to the A8.2 page. (1) Reuse the filtered-lines result from A8.2 and build it into a single string. (2) Wrap the string in a `Blob` and trigger a download via `<a download>` so a real new `.txt` file lands on disk. (3) Add a *second* `<input type="file">` on the same page; re-select the just-downloaded file, read it back with FileReader, and display its line count — verify it matches what was written. (4) Comment block naming the four sequential-access concepts against browser reality: **open** = user picks the file via the input picker; **read** = `FileReader.onload` fires with the content; **write** = `Blob` built + download triggered; **close** = no explicit close call in browser JS (unlike Python's `f.close()` / C++'s `.close()`) — the download completing *is* the close. That contrast is the teaching moment. Requires the sandboxed iframe to allow downloads (`allow-downloads` in `LivePreview.tsx`).
 
 **Teacher Notes:**
 - The `[x, y, z]` array introduction is intentional foreshadowing. Say explicitly: "In a few weeks we'll be using arrays exactly like this to place shapes in 3D space."
-- A8.2 is the primary File I/O coverage artifact. Provide students with a pre-made .txt file so they focus on the reading/processing code, not file creation.
+- A8.2 + A8.3 together are the primary File I/O coverage artifacts (read + write + round-trip). Provide students with a pre-made .txt file so they focus on the reading/processing code, not file creation.
 - FileReader is asynchronous — students will encounter callbacks for the first time. Keep the explanation simple: "tell the browser what to do WHEN the file is ready." Do not go deep on async/promises.
+- A8.3's write side needs downloads allowed in the sandboxed preview iframe. `components/LivePreview.tsx` already sets `allow-downloads` — do not remove it, or A8.3 silently breaks.
+- The open→read→write→close mapping in A8.3's comment is the actual SLO teaching point: browser JS has no `f.close()`, and naming that explicitly is more valuable than pretending the analogy is exact.
 - Bridge to JSCAD: "When we import files in JSCAD later, the browser is doing exactly this behind the scenes."
 
 ---
@@ -420,6 +435,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 1.4.1 Q1 Review and Mini-Project (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 1, SLO 2, SLO 3, SLO 4 (synthesis)
+**Reading:** JS1 → Miscellaneous → JavaScript specials (review); JS2 Ch 4 Summary (review)
 
 **Learning Objectives:**
 - Apply all Q1 concepts in a single cohesive program
@@ -469,6 +485,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 2.1.1 Hello Sprite and Movement (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3 (design, implement, test)
+**Reading:** q5play → overview → The sketch lifecycle; q5play → canvas → Creating the canvas, Background and clearing; q5play → sprite → Your first sprite, Position, rotation, scale; q5play → input → Keyboard basics, Multi-key movement; JS2 Ch 13 JavaScript and the Browser (context)
 
 **Learning Objectives:**
 - Create a canvas with `new Canvas(width, height)`
@@ -507,6 +524,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 2.1.2 Physics Feel (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
+**Reading:** q5play → physics → Gravity and velocity, Bounciness and friction, Forces, torque, and rotation; q5play → sprite → Collider types: dynamic, static, kinematic, none; JS2 Ch 6 The Secret Life of Objects (classes preview, optional)
 
 **Learning Objectives:**
 - Enable and disable gravity with `world.gravity.y`
@@ -547,6 +565,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 2.2.1 Classes and Objects via q5play (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 2 primary (OOP vs procedural), SLO 3
+**Reading:** JS1 → Classes → Class basic syntax, Class inheritance (optional); JS2 Ch 6 The Secret Life of Objects (Methods, Classes, Prototypes); PY Ch 11 Classes (framing only); q5play → GitHub repo → q5play.d.ts → `Sprite` class (L227) — "what `new Sprite()` really is"
 
 **Learning Objectives:**
 - Define a class with a constructor and methods in JavaScript
@@ -591,6 +610,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 2.3.1 Groups and Overlaps (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3, SLO 4 (algorithmic thinking in collision detection)
+**Reading:** q5play → groups → Spawning and defaults, Iterating and removing, Filtering and searching; q5play → collisions → colliding vs overlapping, Collisions with groups; JS1 → Data types → Arrays, Array methods (review)
 
 **Learning Objectives:**
 - Use `Group` to manage collections of related sprites
@@ -626,6 +646,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 2.3.2 Physics Applications (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
+**Reading:** q5play → input → Keyboard basics, Mouse position and buttons; q5play → physics → Gravity and velocity, Bounciness and friction; JS1 → JavaScript Fundamentals → Comparisons, Conditional branching (review for input-driven logic)
 
 **Learning Objectives:**
 - Combine input, physics, and collision to build a playable scene
@@ -665,6 +686,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 2.4.1 Animated Sprites and Camera (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
+**Reading:** q5play → animation → Ani (sprite-sheet frames), Anis (named animation sets), Groups with animations; q5play → camera → Following a target, Screen space vs world space; JS1 → Animation → JavaScript animations (conceptual, optional)
 
 **Learning Objectives:**
 - Attach and switch animations on a sprite
@@ -703,6 +725,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 2.5.1 Save, Load, and Game States (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 2 (structured programming), SLO 3 (design/implement/test), Topic: File I/O
+**Reading:** JS1 → Data types → JSON methods, toJSON; JS1 → Storing data in the browser → LocalStorage, sessionStorage; JS2 Ch 18 File fields + Storing data client-side; PY Ch 14 Files (structural)
 
 **Learning Objectives:**
 - Save data persistently with `storeItem(name, val)` (localStorage)
@@ -747,6 +770,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 2.6.1 Joints and Advanced Input (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
+**Reading:** q5play → joints → DistanceJoint, HingeJoint, SliderJoint, GlueJoint, GrabberJoint; q5play → input → Dragging and clicks, Gamepad (Contro); q5play → patterns → Projectiles from a player (applied force pattern)
 
 **Learning Objectives:**
 - Create distance, hinge, and slider joints between sprites
@@ -784,6 +808,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 2.7.1 Capstone Game (~3.5 hrs in class + homework)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 1 (lifecycle), SLO 2 (structured programming), SLO 3 (design/implement/test — **PRIMARY SLO 3 EVIDENCE FOR SEMESTER 1**)
+**Reading:** q5play → patterns → Scene/state switching, Top-down movement, Platformer jump (reference during build); JS2 Ch 16 Project: A Platform Game (enrichment); JS2 Ch 8 Bugs and Errors (testing discipline)
 
 **Learning Objectives:**
 - Design a complete game specification
@@ -827,7 +852,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 # Q3: JSCAD Foundations — 2D to 3D + Quality
 ### ~31.5 contact hours | 9 weeks (W19–W27)
 ### Goal: Transition from q5play into JSCAD. Learn the library model, 2D primitives, parametric design, extrusion into 3D, and 3D composition. Close Q3 with error handling and testing discipline.
-### Environment: JSCAD browser app (https://openjscad.xyz/) — no install required.
+### Environment: JSCAD browser app (https://jscad.app/) — no install required.
 
 ---
 
@@ -837,6 +862,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 3.1.1 Libraries and JSCAD Introduction (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 2 (program design tools), Topic: Documentation
+**Reading:** JSCAD → parametric tutorial (entry point, `main()`); jscadui → jscad.app (browser UI: editor, viewport, parameters, export); JSCAD → GitHub repo → packages/modeling/src (module structure), packages/web (browser UI); JS1 → Modules → Modules, introduction, Export and Import; JS2 Ch 10 Modules (ES modules); PY Ch 7 Modules (structural)
 
 **Learning Objectives:**
 - Explain what a software library is and why libraries exist
@@ -872,6 +898,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 3.1.2 2D Shapes and Transforms (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
+**Reading:** JSCAD → primitives → rectangle, circle, ellipse, polygon, star; JSCAD → transforms → translate, rotate, scale, center; JS1 → Objects: the basics → Objects (object literals, review)
 
 **Learning Objectives:**
 - Create 2D primitives: rectangle, circle, ellipse, polygon, star
@@ -904,6 +931,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 3.1.3 Boolean Operations in 2D (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
+**Reading:** JSCAD → booleans → union, subtract, intersect; JS1 → JavaScript Fundamentals → Logical operators (conceptual parallel, review)
 
 **Learning Objectives:**
 - Apply union, subtract, and intersect operations to 2D shapes
@@ -942,6 +970,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 3.2.1 Parameters and getParameterDefinitions (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
+**Reading:** JSCAD → parametric tutorial → `getParameterDefinitions()`, `main(params)`, parameter types; JSCAD → GitHub repo → packages/core/src/parameters (runtime engine, not in JSDoc build); JS1 → JavaScript Fundamentals → Functions, Function expressions (parameters review)
 
 **Learning Objectives:**
 - Write a `getParameterDefinitions()` function in JSCAD
@@ -977,6 +1006,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 3.2.2 Arrays in JSCAD / Loops Generating Geometry (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3, Topic: Arrays
+**Reading:** JS1 → Data types → Arrays, Array methods; JS1 → Advanced working with functions → Rest parameters and spread syntax (optional); JS2 Ch 5 Higher-order Functions (map, filter, reduce); PY Ch 9 Lists → 9.5 List comprehensions (structural)
 
 **Learning Objectives:**
 - Use a for loop to generate an array of JSCAD shapes
@@ -1012,6 +1042,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 3.3.1 First Extrusion: 2D to 3D (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
+**Reading:** JSCAD → extrusions → extrudeLinear, extrudeRotate; JSCAD → primitives → circle, rectangle (profile inputs); JS1 → JavaScript Fundamentals → Numbers (angle/segment parameters, review)
 
 **Learning Objectives:**
 - Extrude a 2D shape into a 3D solid using `extrudeLinear`
@@ -1046,6 +1077,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 3.3.2 3D Primitives and Transforms (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
+**Reading:** JSCAD → primitives → cube, cuboid, sphere, cylinder, torus; JSCAD → transforms → translate, rotate, scale, scaleX/Y/Z; JSCAD → booleans → union, subtract, intersect (3D)
 
 **Learning Objectives:**
 - Create 3D primitives: cube, cuboid, sphere, cylinder, torus
@@ -1084,6 +1116,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 3.4.1 Error Handling and Debugging (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** Topic: Error handling
+**Reading:** JS1 → Error handling → Error handling "try...catch", Custom errors; JS1 → Code quality → Debugging in the browser; JS2 Ch 8 Bugs and Errors (Language, Exceptions, Assertions); PY Ch 14 Files → 14.4 Handling exceptions, 14.5 Raising exceptions (structural)
 
 **Learning Objectives:**
 - Distinguish between syntax errors, runtime errors, and logic errors
@@ -1118,6 +1151,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 3.4.2 Testing Principles (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** Topic: Principles of testing and designing test data
+**Reading:** JS1 → Code quality → Automated testing with Mocha; JS2 Ch 8 Bugs and Errors (Testing); PY Ch 14 Files → 14.4 Handling exceptions (structural)
 
 **Learning Objectives:**
 - Explain why software testing matters
@@ -1167,6 +1201,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 4.1.1 Hulls and Advanced Extrusions (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
+**Reading:** JSCAD → hulls → hull, hullChain; JSCAD → extrusions → extrudeHelical, extrudeFromSlices; JS2 Ch 5 Higher-order Functions (composability, optional)
 
 **Learning Objectives:**
 - Use `hull()` and `hullChain()` to create organic forms
@@ -1195,6 +1230,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 4.1.2 Measurements and Printability (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
+**Reading:** JSCAD → measurements → measureVolume, measureBoundingBox, measureDimensions; JS2 Ch 4 Data Structures: Objects and Arrays (object data, review)
 
 **Learning Objectives:**
 - Use JSCAD measurement functions to query geometry properties
@@ -1224,6 +1260,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 4.1.3 Sorting and Searching on Geometry (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 4 (algorithms, primary), Topic: sorting and searching
+**Reading:** JS1 → Data types → Array methods (sort, find, indexOf); JS2 Ch 5 Higher-order Functions (filter, map, reduce); JS2 Ch 4 Data Structures (Rest parameters, The Math object — optional); PY Ch 9 Lists → 9.2 Sorting and reversing lists (structural)
 
 **Learning Objectives:**
 - Implement a linear search algorithm
@@ -1268,6 +1305,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 4.2.1 Multi-File Projects and File I/O (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 2 (structured programming), Topic: File I/O
+**Reading:** JSCAD → GitHub repo → jsdoc/tutorials (Multi-File Projects source), packages/io (file import system); JS1 → Modules → Modules, introduction, Export and Import; JS2 Ch 10 Modules (ES + CommonJS); JS2 Ch 20 Node.js → The filesystem module (conceptual File I/O); PY Ch 14 Files (structural)
 
 **Learning Objectives:**
 - Split a JSCAD project across multiple files
@@ -1303,6 +1341,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 4.2.2 Colors, Text, and Export Formats (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
+**Reading:** JSCAD → colors → colorize; JSCAD → text → vectorChar, vectorText; JSCAD → GitHub repo → packages/io (STL/3MF/AMF/OBJ serializers — STL/OBJ not in JSDoc build, cite repo source) + User Guide `en:user_guide_formats`; JS1 → JavaScript Fundamentals → Data types (strings, review for text params)
 
 **Learning Objectives:**
 - Apply colors to JSCAD geometries using `colorize()`
@@ -1337,6 +1376,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 4.3.1 Capstone Design Phase (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 1 (lifecycle), SLO 3 (design phase)
+**Reading:** JS2 Ch 8 Bugs and Errors (design mindset / testing discipline, reference); JSCAD → parametric tutorial (parameter design review)
 
 **Learning Objectives:**
 - Define a project scope that is achievable and meaningful in 3 weeks
@@ -1362,6 +1402,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 4.3.2 Capstone Build and Iterate (~7 hrs across W34–W35)
 **Contact hours:** 7.0 (2 weeks)
 **SLOs covered:** SLO 2 (structured programming), SLO 3 (implement + test)
+**Reading:** JSCAD → measurements (printability reference); q5play → patterns → Scene/state switching (design-pattern reference); JS2 Ch 8 Bugs and Errors (iterative debugging)
 
 **Learning Objectives:**
 - Complete a full project through multiple design iterations
@@ -1456,7 +1497,7 @@ Exam weeks still include regular content. Plan for the exam to occupy the first 
 | Arrays | W8 (intro), W13 (q5play groups), W23 (JSCAD loops→geometry) | A8.1, A13.1, A23.1 |
 | Control structures | W4–5 (core), applied W11–14 (q5play mechanics) | Lab + quiz |
 | Algorithms: sort/search | W30, A30.1 | A30.1 lab + A30.2 written |
-| File I/O | W8 (FileReader), W16 (q5play save/load), W31 (JSCAD multi-file) | A8.2 lab, A16.1 lab, A31.1 lab + A31.2 written |
+| File I/O | W8 (FileReader + Blob write), W16 (q5play save/load), W31 (JSCAD multi-file) | A8.2 + A8.3 labs, A16.1 lab, A31.1 lab + A31.2 written |
 | Error handling | W26, A26.1 | A26.1 lab |
 | Pass by value/reference | W7, A7.1, A7.2 | A7.2 written |
 | Testing principles | W27, A27.1 | A27.1 lab + A27.2 written |
@@ -1465,6 +1506,43 @@ Exam weeks still include regular content. Plan for the exam to occupy the first 
 | OOP vs procedural | W12, A12.2, S1 Final, S2 Final | A12.2 written (primary), exam questions (backup) |
 
 ---
+
+## SOURCE ALIGNMENT (open references per chapter)
+
+The per-chapter reading map is **seeded from the full table of contents** in [`js-references-toc.md`](js-references-toc.md)
+as the single source of truth for the seven open references:
+
+- **JS1** → *The Modern JavaScript Tutorial* (javascript.info, Ilya Kantor, CC-BY-SA)
+- **JS2** → *Eloquent JavaScript* (Marijn Haverbeke, CC-BY-NC, code MIT)
+- **PY** → *Introduction to Python Programming* (OpenStax, CC BY-NC-SA) → structural model; Python syntax translated to JS
+- **q5play** → in-app docs at `/docs/q5play` (bundled `public/q5play/`, v4.0.1, built from the public `q5play.d.ts` API) + GitHub project `github.com/q5play/q5play` + q5.js learn pages (LGPL-3.0) for graphics-layer concepts. **The external "Learn q5play" textbook is NOT a course reference** — its Creator License forbids CS-teaching/textbook use without the [q5play Educational License](https://q5play.org/teach)
+- **JSCAD** → external API docs (openjscad.xyz, MIT) + GitHub monorepo `github.com/jscad/OpenJSCAD.org` → CDN-loaded, lessons need internet
+- **freeCodeCamp** → the Q1 content platform — week-by-week mapping in `curriculum-alignment-guide.md`, full activity list in `curriculum-data/master-activity-list.md`
+- **jscadui / jscad.app** → the Q3–Q4 JSCAD browser environment (`github.com/hrgdavor/jscadui`, MIT)
+
+To seed a chapter/section/subsection, pull the matching **JS1/JS2/PY → chapter/section** or
+**q5play → section → page** / **JSCAD → module → function** anchor from `js-references-toc.md`
+and drop it into that section reading/source row. Anchor notation: `JS1 → Fundamentals → Variables` ·
+`q5play → sprite → Your first sprite` · `JSCAD → extrusions → extrudeLinear`. Do **not** duplicate the TOC here.
+
+- **Chapter 1** Foundations (W1→3): JS1 Fundamentals; JS2 Ch 1→2; PY Ch 1→2
+- **Chapter 2** Control Flow (W4→5): JS1 Comparisons/Conditionals/Loops; JS2 Ch 2; PY Ch 4→5
+- **Chapter 3** Functions and Data (W6→8): JS1 Functions/Objects/Arrays + File and FileReader; JS2 Ch 3→4; PY Ch 3/6/9/14
+- **Chapter 4** Synthesis (W9): JS1 JavaScript specials; JS2 Ch 4
+- **Chapter 5** q5play Foundations (W10→11): q5play in-app docs; JS1 Functions
+- **Chapter 6** OOP (W12): JS1 Classes; JS2 Ch 6; PY Ch 11 (framing)
+- **Chapter 7** Collections & Physics (W13→14): JS1 Arrays/Map/Set; JS2 Ch 4
+- **Chapter 8** Animation & Camera (W15): q5play docs; JS1 Animation (optional)
+- **Chapter 9** State & Persistence (W16): JS1 JSON methods + LocalStorage; JS2 Ch 18; PY Ch 14
+- **Chapter 10** Advanced Mechanics (W17): q5play docs
+- **Chapter 11** Game Capstone (W18): JS2 Ch 16 (optional enrichment)
+- **Chapter 12** JSCAD Foundations (W19→21): JS1 Modules; JS2 Ch 10; PY Ch 7
+- **Chapter 13** Parametric Design (W22→23): JS1 Functions/Arrays; JS2 Ch 5 (map); PY Ch 6/9
+- **Chapter 14** 3D Modeling (W24→25): JSCAD API docs
+- **Chapter 15** Quality & Rigor (W26→27): JS1 Error handling + Debugging + Mocha testing; JS2 Ch 8
+- **Chapter 16** Advanced Modeling (W28→30): JS1 Array methods (sort); JS2 Ch 5
+- **Chapter 17** Production Pipeline (W31→32): JS1 Modules; JS2 Ch 10 + Ch 20 Node fs; PY Ch 14
+- **Chapter 18** 3D Capstone (W33→36): JS2 Ch 8 (design mindset); no reading for 4.3.3
 
 ## NOTES FOR CLAUDE CODE
 

@@ -29,18 +29,18 @@ By the end of this lesson, students will be able to:
 
 | # | Source | Title | Type | Est. Time |
 |---|--------|-------|------|-----------|
-| 1 | CHS-AP 1.1.1 | Welcome to AP CSP | Video | 10 min |
-| 2 | CHS-AP 3.1.1 | What is Code? | Video | 10 min |
-| 3 | CHS-AP 3.1.2 | What is Software | Connection | 10 min |
-| 4 | CHS-AP 3.2.1 | Uses of Programs | Video | 10 min |
-| 5 | CHS-AP 3.2.2 | Why Should You Learn to Program? | Connection | 10 min |
+| 1 | 1.1.1 | Welcome to AP CSP | Video | 10 min |
+| 2 | 3.1.1 | What is Code? | Video | 10 min |
+| 3 | 3.1.2 | What is Software | Connection | 10 min |
+| 4 | 3.2.1 | Uses of Programs | Video | 10 min |
+| 5 | 3.2.2 | Why Should You Learn to Program? | Connection | 10 min |
 | 6 | FCC | Introduction to JavaScript | Theory | 20 min |
-| 7 | CHS-AP 1.2.1 | Introduction to Programming With Karel | Video | 10 min |
-| 8 | CHS-AP 1.2.3 | Our First Karel Program | Example | 10 min |
-| 9 | CHS-AP 1.2.4 | Your First Karel Program | Exercise | 15 min |
-| 10 | CHS-AP 3.3.1 | Hello World | Video | 10 min |
-| 11 | CHS-AP 3.3.3 | Hello World | Example | 10 min |
-| 12 | CHS-AP 3.3.4 | Your Name and Hobby | Exercise | 15 min |
+| 7 | 1.2.1 | Introduction to Programming With Karel | Video | 10 min |
+| 8 | 1.2.3 | Our First Karel Program | Example | 10 min |
+| 9 | 1.2.4 | Your First Karel Program | Exercise | 15 min |
+| 10 | 3.3.1 | Hello World | Video | 10 min |
+| 11 | 3.3.3 | Hello World | Example | 10 min |
+| 12 | 3.3.4 | Your Name and Hobby | Exercise | 15 min |
 
 **Total activity time:** ~140 min (~2.3 hrs)
 **Remaining time:** ~70 min for discussion, transitions, and assignments

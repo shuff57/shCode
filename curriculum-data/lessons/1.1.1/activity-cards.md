@@ -8,16 +8,16 @@ Student-facing instruction cards for all 12 activities in section 1.1.1: What Is
 
 | | |
 |---|---|
-| **Source** | CodeHS AP CSP, Section 1.1.1 |
+| **Source** | Section 1.1.1 |
 | **Type** | Video |
 | **Time** | ~10 minutes |
-| **Link** | [CodeHS Course 266371 > Section 1.1.1](https://codehs.com/course/266371/) |
+| **Link** |  (external course platform) |
 
 ### Objective
 Understand what this computer science course is about and why learning to program matters.
 
 ### What To Do
-1. Watch the "Welcome to AP CSP" video on CodeHS
+1. Watch the "Welcome to AP CSP" video
 2. Pay attention to the examples of what computer scientists build
 3. Think about: what interests you about learning to code?
 
@@ -30,16 +30,16 @@ You can explain in one sentence what computer science is and why it is worth stu
 
 | | |
 |---|---|
-| **Source** | CodeHS AP CSP, Section 3.1.1 |
+| **Source** | Section 3.1.1 |
 | **Type** | Video |
 | **Time** | ~10 minutes |
-| **Link** | [CodeHS Course 266371 > Section 3.1.1](https://codehs.com/course/266371/) |
+| **Link** |  (external course platform) |
 
 ### Objective
 Understand what code is and what it does at a basic level.
 
 ### What To Do
-1. Watch the "What is Code?" video on CodeHS
+1. Watch the "What is Code?" video
 2. Write down the answer to these questions:
    - What is code?
    - What does a computer do with code?
@@ -54,16 +54,16 @@ You can explain what code is in your own words and give an example of what code 
 
 | | |
 |---|---|
-| **Source** | CodeHS AP CSP, Section 3.1.2 |
+| **Source** | Section 3.1.2 |
 | **Type** | Connection |
 | **Time** | ~10 minutes |
-| **Link** | [CodeHS Course 266371 > Section 3.1.2](https://codehs.com/course/266371/) |
+| **Link** |  (external course platform) |
 
 ### Objective
 Understand the difference between software and hardware.
 
 ### What To Do
-1. Read the "What is Software" connection on CodeHS
+1. Read the "What is Software" connection
 2. Make a quick T-chart in your notes:
 
 | Software | Hardware |
@@ -81,16 +81,16 @@ You can correctly classify things as software or hardware and explain the differ
 
 | | |
 |---|---|
-| **Source** | CodeHS AP CSP, Section 3.2.1 |
+| **Source** | Section 3.2.1 |
 | **Type** | Video |
 | **Time** | ~10 minutes |
-| **Link** | [CodeHS Course 266371 > Section 3.2.1](https://codehs.com/course/266371/) |
+| **Link** |  (external course platform) |
 
 ### Objective
 Recognize that programs are everywhere in daily life.
 
 ### What To Do
-1. Watch the "Uses of Programs" video on CodeHS
+1. Watch the "Uses of Programs" video
 2. After watching, list 5 programs (apps, websites, systems) that you used today
 3. For each one, write one sentence about what the program does
 
@@ -103,16 +103,16 @@ You recognize that programs power most technology you interact with daily and ca
 
 | | |
 |---|---|
-| **Source** | CodeHS AP CSP, Section 3.2.2 |
+| **Source** | Section 3.2.2 |
 | **Type** | Connection |
 | **Time** | ~10 minutes |
-| **Link** | [CodeHS Course 266371 > Section 3.2.2](https://codehs.com/course/266371/) |
+| **Link** |  (external course platform) |
 
 ### Objective
 Understand why programming is a valuable skill regardless of your career goals.
 
 ### What To Do
-1. Read the "Why Should You Learn to Program?" connection on CodeHS
+1. Read the "Why Should You Learn to Program?" connection
 2. Think about a job or career you're interested in
 3. Write 2-3 sentences: How could knowing how to program help you in that career?
 
@@ -155,16 +155,16 @@ You understand that JavaScript is a programming language used on the web, and yo
 
 | | |
 |---|---|
-| **Source** | CodeHS AP CSP, Section 1.2.1 |
+| **Source** | Section 1.2.1 |
 | **Type** | Video |
 | **Time** | ~10 minutes |
-| **Link** | [CodeHS Course 266371 > Section 1.2.1](https://codehs.com/course/266371/) |
+| **Link** |  (external course platform) |
 
 ### Objective
 Understand what a program looks like by watching a simple robot (Karel) follow instructions.
 
 ### What To Do
-1. Watch the "Introduction to Programming With Karel" video on CodeHS
+1. Watch the "Introduction to Programming With Karel" video
 2. Pay attention to:
    - Karel can only do a few basic things: move, turn, pick up, put down
    - A program is a list of these commands in a specific order
@@ -180,22 +180,22 @@ You understand that a program is a sequence of specific commands and that the or
 
 | | |
 |---|---|
-| **Source** | CodeHS AP CSP, Section 1.2.3 |
+| **Source** | Section 1.2.3 |
 | **Type** | Example |
 | **Time** | ~10 minutes |
-| **Link** | [CodeHS Course 266371 > Section 1.2.3](https://codehs.com/course/266371/) |
+| **Link** |  (external course platform) |
 
 ### Objective
 See a complete, working Karel program and understand how it runs.
 
 ### What To Do
-1. Open the "Our First Karel Program" example on CodeHS
+1. Open the "Our First Karel Program" example
 2. Read through the code before running it
 3. Predict: what will Karel do?
 4. Run the program and check your prediction
 5. Look at the code again — notice how each line is one command, and they run top to bottom
 
-### Starter Code (provided in CodeHS)
+### Starter Code 
 ```
 // Our First Karel Program
 move();
@@ -214,16 +214,16 @@ You can read a simple Karel program and predict what it will do before running i
 
 | | |
 |---|---|
-| **Source** | CodeHS AP CSP, Section 1.2.4 |
+| **Source** | Section 1.2.4 |
 | **Type** | Exercise |
 | **Time** | ~15 minutes |
-| **Link** | [CodeHS Course 266371 > Section 1.2.4](https://codehs.com/course/266371/) |
+| **Link** |  (external course platform) |
 
 ### Objective
 Write your first program! Guide Karel to complete a task using the commands you learned.
 
 ### What To Do
-1. Open the "Your First Karel Program" exercise on CodeHS
+1. Open the "Your First Karel Program" exercise
 2. Read the goal: where does Karel need to go, and what does Karel need to do?
 3. Write your program using Karel's commands:
    - `move();` — move forward one space
@@ -248,16 +248,16 @@ You have written a working Karel program that completes the given task. You wrot
 
 | | |
 |---|---|
-| **Source** | CodeHS AP CSP, Section 3.3.1 |
+| **Source** | Section 3.3.1 |
 | **Type** | Video |
 | **Time** | ~10 minutes |
-| **Link** | [CodeHS Course 266371 > Section 3.3.1](https://codehs.com/course/266371/) |
+| **Link** |  (external course platform) |
 
 ### Objective
 Transition from Karel's visual world to text-based JavaScript using `console.log()`.
 
 ### What To Do
-1. Watch the "Hello World" video on CodeHS
+1. Watch the "Hello World" video
 2. Key takeaways:
    - "Hello World" is traditionally the first program you write in any language
    - In JavaScript, you use `console.log()` to print text
@@ -273,16 +273,16 @@ You understand that `console.log()` is the JavaScript way to produce output and 
 
 | | |
 |---|---|
-| **Source** | CodeHS AP CSP, Section 3.3.3 |
+| **Source** | Section 3.3.3 |
 | **Type** | Example |
 | **Time** | ~10 minutes |
-| **Link** | [CodeHS Course 266371 > Section 3.3.3](https://codehs.com/course/266371/) |
+| **Link** |  (external course platform) |
 
 ### Objective
 See `console.log()` in action and understand how it works.
 
 ### What To Do
-1. Open the "Hello World" example on CodeHS
+1. Open the "Hello World" example
 2. Read the code before running it:
    ```js
    console.log("Hello, World!");
@@ -293,7 +293,7 @@ See `console.log()` in action and understand how it works.
    - Add a second `console.log()` on the next line
    - Run it again — both lines should print, in order
 
-### Starter Code (provided in CodeHS)
+### Starter Code 
 ```js
 console.log("Hello, World!");
 ```
@@ -317,16 +317,16 @@ You have run a `console.log()` statement and modified it to print your own messa
 
 | | |
 |---|---|
-| **Source** | CodeHS AP CSP, Section 3.3.4 |
+| **Source** | Section 3.3.4 |
 | **Type** | Exercise |
 | **Time** | ~15 minutes |
-| **Link** | [CodeHS Course 266371 > Section 3.3.4](https://codehs.com/course/266371/) |
+| **Link** |  (external course platform) |
 
 ### Objective
 Write your first real JavaScript program: print your name and hobby to the console.
 
 ### What To Do
-1. Open the "Your Name and Hobby" exercise on CodeHS
+1. Open the "Your Name and Hobby" exercise
 2. Write a program that:
    - Prints your name on the first line
    - Prints your favorite hobby on the second line

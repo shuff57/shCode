@@ -14,7 +14,7 @@
 
 **Module resources:**
 - 📋 [Module overview](2.1.1_overview.md) — recommended learning order
-- 📖 [Readings](2.1.1_readings.md) — q5play docs + CodeHS/FCC refs
+- 📖 [Readings](2.1.1_readings.md) — q5play docs + FCC refs
 - 💡 [Worked examples](2.1.1_worked-examples.md) — reference code from class walkthroughs
 - ⭐ [Challenges](2.1.1_challenges.md) — stretch problems if you finish early
 
