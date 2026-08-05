@@ -83,11 +83,24 @@
     released: () => MOUSE._released,
   };
 
-  // world.gravity in pixels/frame² → Box2D m/s² on write, px/frame² on read.
+  // world.gravity — raw Box2D m/s², exactly like q5play's world.gravity.
+  // `world.gravity.y = 10` is ~1g; `= 0` is zero-G. The px/frame² facade
+  // unit was 60x too strong (10 px/frame² = 1200 m/s² = 122g), which crushed
+  // wheel-joint suspensions and sent pong balls flying. Live proxy vector so
+  // `world.gravity.y = 0` sticks (a plain getter returning a fresh object
+  // made gravity writes silent no-ops).
   const world = {};
   Object.defineProperty(world, 'gravity', {
-    get() { const g = _world().getGravity(); return { x: g.x * PXM / (FPS * FPS), y: g.y * PXM / (FPS * FPS) }; },
-    set(v) { _world().setGravity(pl.Vec2(v.x * FPS * FPS / PXM, v.y * FPS * FPS / PXM)); },
+    get() {
+      const g = _world().getGravity();
+      return {
+        get x() { return g.x; },
+        get y() { return g.y; },
+        set x(v) { const c = _world().getGravity(); _world().setGravity(pl.Vec2(v, c.y)); },
+        set y(v) { const c = _world().getGravity(); _world().setGravity(pl.Vec2(c.x, v)); },
+      };
+    },
+    set(v) { _world().setGravity(pl.Vec2(v.x, v.y)); },
   });
 
   const camera = { x: 0, y: 0 };
@@ -271,10 +284,9 @@
     set angularVelocity(degPerFrame) { this._body.setAngularVelocity((degPerFrame * Math.PI / 180) * FPS); }
 
     applyForce(fx, fy) {
-      // facade units: accelerate like gravity f px/frame² at mass 1
-      const m = this._body.getMass();
-      const a = FPS * FPS / PXM;
-      this._body.applyForceToCenter(pl.Vec2(fx * m * a, fy * m * a), true);
+      // raw Box2D Newtons, like q5play's applyForce — the old px/frame²
+      // conversion (x120) made forces 120x too strong.
+      this._body.applyForceToCenter(pl.Vec2(fx, fy), true);
     }
 
     _bounds() {
@@ -505,7 +517,13 @@
   class DistanceJoint extends Joint {
     constructor(a, b, opt) {
       super();
-      const { localA, localB } = _anchor(a, b, opt);
+      this._bodyA = a._body;
+      this._bodyB = b._body;
+      // Anchor each body at ITS OWN center. Anchoring both at body A's
+      // center (the shared _anchor helper) makes planck's distance
+      // constraint dead — the joint never pulls the bodies together.
+      const localA = pl.Vec2(0, 0);
+      const localB = pl.Vec2(0, 0);
       const dx = b.x - a.x, dy = b.y - a.y;
       const sep = Math.sqrt(dx * dx + dy * dy) / PXM;
       const len = (opt && opt.length) ? opt.length / PXM : sep;
@@ -515,7 +533,13 @@
     // settable after construction (2.7.12/2.7.26: "set joint length after
     // construction" — `new DistanceJoint(a, b)` then `joint.length = 100`).
     get length() { return this._joint.getLength() * PXM; }
-    set length(v) { this._joint.setLength(v / PXM); }
+    set length(v) {
+      this._joint.setLength(v / PXM);
+      // planck doesn't wake bodies when a joint property changes — a settled
+      // (asleep) body would keep its old separation forever. Wake both ends.
+      if (this._bodyA && typeof this._bodyA.setAwake === 'function') this._bodyA.setAwake(true);
+      if (this._bodyB && typeof this._bodyB.setAwake === 'function') this._bodyB.setAwake(true);
+    }
   }
   class SliderJoint extends Joint {
     constructor(a, b, opt) {
@@ -529,9 +553,15 @@
   class WheelJoint extends Joint {
     constructor(a, b, opt) {
       super();
-      const { localA, localB } = _anchor(a, b, opt);
-      const axis = (opt && opt.axis) ? pl.Vec2(opt.axis.x, opt.axis.y) : pl.Vec2(1, 0);
-      this._joint = _world().createJoint(new pl.WheelJoint({ localAnchorA: localA, localAnchorB: localB, localAxisA: axis }, a._body, b._body));
+      // Anchor at the WHEEL's position (body B), not the chassis center:
+      // the axle lives at the wheel, and a zero-length spring (both anchors
+      // at the chassis center) collapses the suspension on ground contact.
+      const ax = (opt && opt.anchor && opt.anchor.x) || b.x;
+      const ay = (opt && opt.anchor && opt.anchor.y) || b.y;
+      const localA = a._body.getLocalPoint(pl.Vec2(ax / PXM, ay / PXM));
+      const localB = b._body.getLocalPoint(pl.Vec2(ax / PXM, ay / PXM));
+      const axis = (opt && opt.axis) ? pl.Vec2(opt.axis.x, opt.axis.y) : pl.Vec2(0, 1);
+      this._joint = _world().createJoint(new pl.WheelJoint({ localAnchorA: localA, localAnchorB: localB, localAxisA: axis, frequencyHz: 4, dampingRatio: 0.7 }, a._body, b._body));
       JOINTS_.push(this._joint);
     }
   }

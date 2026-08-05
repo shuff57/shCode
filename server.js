@@ -69,6 +69,43 @@ function stripJsComments(src) {
 app.prepare().then(() => {
   const server = express();
 
+  // ---- Dev-only auth + lesson-state stubs --------------------------------
+  // The real /api/auth/* and /api/lesson-state* are Cloudflare Pages
+  // Functions (functions/api/**), which this local Express server does NOT
+  // emulate. Without these stubs every lesson past the first in a module
+  // renders "Lesson locked" because the client sees role=null. Production
+  // (Cloudflare Pages) ignores this file entirely — dev convenience only.
+  server.get('/api/me', (_req, res) => {
+    res.json({ email: 'dev@local', role: 'teacher' });
+  });
+  server.post('/api/auth/login', (_req, res) => {
+    res.json({ email: 'dev@local', role: 'teacher' });
+  });
+  server.post('/api/auth/logout', (_req, res) => {
+    res.json({ ok: true });
+  });
+  server.get('/api/lesson-state', (_req, res) => {
+    res.json({ states: {}, scores: {}, role: 'teacher' });
+  });
+  server.post('/api/lesson-state/:lessonId', (_req, res) => {
+    res.json({ ok: true });
+  });
+  // Reference solutions (admin/teacher "View solution" button). Serves the
+  // same map the Pages Function reads, so the sandbox's solution panel works
+  // locally.
+  // Reference solutions (admin/teacher "View solution" button). Dev reads the
+  // lesson's solution.js straight from disk; the Pages Function serves the
+  // generated map instead.
+  server.get('/api/lesson-solution/:id', async (req, res) => {
+    const id = decodeURIComponent(req.params.id);
+    try {
+      const solution = await fs.readFile(path.join(process.cwd(), 'lessons', id, 'solution.js'), 'utf8');
+      res.json({ solution });
+    } catch {
+      res.status(404).json({ error: 'No solution for this lesson' });
+    }
+  });
+
   // Scope express.json() to the Express-owned route only. Applying it globally
   // consumes the request body stream, which breaks Next App Router route
   // handlers (they need to read the raw body themselves).

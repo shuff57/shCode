@@ -21,10 +21,12 @@ async function renderMarkdown(src: string): Promise<string> {
 }
 
 function parseFrontmatter(src: string): { data: Record<string, any>; body: string } {
-  const match = src.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+  // Line-ending agnostic: Windows checkouts (core.autocrlf) produce CRLF files,
+  // which the naive /^---\n/ form silently fails to parse -> zero modules.
+  const match = src.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
   if (!match) return { data: {}, body: src };
   const data: Record<string, any> = {};
-  for (const line of match[1].split('\n')) {
+  for (const line of match[1].split(/\r?\n/)) {
     const m = line.match(/^(\w[\w-]*)\s*:\s*(.*)$/);
     if (!m) continue;
     const [, key, raw] = m;

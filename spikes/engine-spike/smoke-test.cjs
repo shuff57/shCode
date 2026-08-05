@@ -173,7 +173,7 @@ test('gravity + bounce (pre-existing)', ({ sandbox: s, tick }) => {
   let ball;
   s.setup = () => {
     new s.Canvas(400, 300);
-    s.world.gravity.y = 0.6;
+    s.world.gravity.y = 10; // ~1g, raw m/s² (q5play semantics)
     const ground = new s.Sprite(200, 280, 400, 20);
     ground.body = 'static';
     ball = new s.Sprite(200, 40, 24, 24);
@@ -185,7 +185,7 @@ test('gravity + bounce (pre-existing)', ({ sandbox: s, tick }) => {
   s.start();
 
   const velY = [];
-  for (let i = 0; i < 180; i++) { tick(); velY.push(ball.vel.y); }
+  for (let i = 0; i < 240; i++) { tick(); velY.push(ball.vel.y); }
 
   assert.ok(finite2(ball.pos), 'ball position went NaN/Infinite');
   assert.ok(ball.y > 100, `expected the ball to fall under gravity, stayed at y=${ball.y}`);
@@ -574,7 +574,7 @@ test('gap: joint.delete() releases a joint; DistanceJoint.length is settable pos
     new s.Canvas(400, 400);
     s.world.gravity.y = 0;
     a = new s.Sprite(150, 100, 20, 20); a.body = 'static';
-    b = new s.Sprite(150, 100, 20, 20);
+    b = new s.Sprite(250, 100, 20, 20); // separated start (length ~100px)
     j = new s.DistanceJoint(a, b);
     j.length = 80; // set after construction — the real idiom (can't pass length as a 3rd ctor arg)
   };
