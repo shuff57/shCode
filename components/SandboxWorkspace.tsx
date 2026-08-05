@@ -5,13 +5,13 @@ import { RotateCcw } from 'lucide-react';
 import { useLessonStore } from '../lib/store';
 import type { Lesson } from '../lib/types';
 import CodeEditor from './CodeEditor';
-import Q5PlayPreview from './Q5PlayPreview';
+import ShPlayPreview from './ShPlayPreview';
 import Console from './Console';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
 import Q5DocsContent from './Q5DocsContent';
 
-const STARTER_CODE = `// q5play sandbox — try it out!
+const STARTER_CODE = `// shPlay sandbox — try it out!
 
 function setup() {
   new Canvas(400, 400);
@@ -271,7 +271,7 @@ export default function SandboxWorkspace() {
             <span className="drag-handle" aria-hidden="true"></span>
           </div>
           <div className="pane" id="previewPane">
-            <Q5PlayPreview code={q5Code} runKey={runKey} />
+            <ShPlayPreview code={q5Code} runKey={runKey} />
           </div>
           <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
         </div>

@@ -10,7 +10,7 @@ import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { highlightSelectionMatches } from '@codemirror/search';
 import { tags as t } from '@lezer/highlight';
 
-// Dracula palette — port of the CodeMirror 5 dracula theme used in public/q5play/editor.html.
+// Dracula palette — port of the CodeMirror 5 dracula theme used in public/shplay/editor.html.
 const dracula = {
   bg: '#282a36',
   fg: '#f8f8f2',

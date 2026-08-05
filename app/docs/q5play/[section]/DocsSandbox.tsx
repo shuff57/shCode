@@ -8,7 +8,7 @@ import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { tags as t } from '@lezer/highlight';
-import Q5PlayPreview from '../../../../components/Q5PlayPreview';
+import ShPlayPreview from '../../../../components/ShPlayPreview';
 
 // Dracula palette (mirrors CodeEditor.tsx — kept local to avoid coupling)
 const dracula = {
@@ -122,7 +122,7 @@ export default function DocsSandbox({ initialCode }: { initialCode: string }) {
       <div className="docs-sandbox-pane docs-sandbox-preview-pane">
         <div className="docs-sandbox-preview-header">Preview</div>
         <div className="docs-sandbox-preview-body">
-          <Q5PlayPreview code={code} runKey={runKey} />
+          <ShPlayPreview code={code} runKey={runKey} />
         </div>
       </div>
     </div>

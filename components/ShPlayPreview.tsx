@@ -14,18 +14,18 @@ interface Props {
   runKey: number;
 }
 
-const Q5PlayPreview = forwardRef<HTMLIFrameElement, Props>(function Q5PlayPreview(
+const ShPlayPreview = forwardRef<HTMLIFrameElement, Props>(function ShPlayPreview(
   { code, runKey },
   ref
 ) {
   if (runKey === 0 || !code.trim()) {
     return (
       <div className="jscad-empty">
-        <p>Click <strong>Run</strong> to execute your q5play sketch.</p>
+        <p>Click <strong>Run</strong> to execute your shPlay sketch.</p>
       </div>
     );
   }
-  const src = `/q5play/runner.html?code=${encodeCode(code)}&r=${runKey}`;
+  const src = `/shplay/runner.html?code=${encodeCode(code)}&r=${runKey}`;
   return (
     <iframe
       ref={ref}
@@ -38,4 +38,4 @@ const Q5PlayPreview = forwardRef<HTMLIFrameElement, Props>(function Q5PlayPrevie
   );
 });
 
-export default Q5PlayPreview;
+export default ShPlayPreview;

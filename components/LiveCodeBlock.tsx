@@ -17,7 +17,7 @@ import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { highlightSelectionMatches } from '@codemirror/search';
 import { tags as t } from '@lezer/highlight';
 import { Play, RotateCcw } from 'lucide-react';
-import Q5PlayPreview from './Q5PlayPreview';
+import ShPlayPreview from './ShPlayPreview';
 import LiveConsole from './LiveConsole';
 
 const dracula = {
@@ -210,7 +210,7 @@ export default function LiveCodeBlock({
           <div ref={containerRef} className="livecodeblock-editor-mount" />
         </div>
         <div className="livecodeblock-preview">
-          <Q5PlayPreview ref={iframeRef} code={committedCode} runKey={runKey} />
+          <ShPlayPreview ref={iframeRef} code={committedCode} runKey={runKey} />
         </div>
       </div>
       {showConsole && <LiveConsole iframeRef={iframeRef} resetKey={runKey} />}

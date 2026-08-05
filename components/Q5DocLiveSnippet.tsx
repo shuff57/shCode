@@ -3,14 +3,14 @@
 import { useState } from 'react';
 import { Play, RotateCcw } from 'lucide-react';
 import CodeMirrorPane from './CodeMirrorPane';
-import { encodeCode } from './Q5PlayPreview';
+import { encodeCode } from './ShPlayPreview';
 
 interface Props {
   initialCode: string;
   fileKey: string;
 }
 
-// Editor + preview pair for q5play snippets in the docs sidebar. Editor and
+// Editor + preview pair for shPlay snippets in the docs sidebar. Editor and
 // preview are stacked vertically, both square. Preview snapshots the code at
 // Run-click time — typing does not re-render the iframe.
 export default function Q5DocLiveSnippet({ initialCode, fileKey }: Props) {
@@ -63,8 +63,8 @@ export default function Q5DocLiveSnippet({ initialCode, fileKey }: Props) {
         ) : (
           <iframe
             key={runKey}
-            title="q5play preview"
-            src={`/q5play/runner.html?code=${encodeCode(runCode)}&r=${runKey}`}
+            title="shPlay preview"
+            src={`/shplay/runner.html?code=${encodeCode(runCode)}&r=${runKey}`}
             allow="autoplay; gamepad"
             style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
           />

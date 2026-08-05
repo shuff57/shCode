@@ -14,7 +14,7 @@ import FileExplorer from './FileExplorer';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
 import JscadPreview from './JscadPreview';
-import Q5PlayPreview from './Q5PlayPreview';
+import ShPlayPreview from './ShPlayPreview';
 import RequirementsSection from './RequirementsSection';
 import Console from './Console';
 import CommitDialog from './CommitDialog';
@@ -750,7 +750,7 @@ export default function LessonWorkspace({
               ) : isJscadMode ? (
                 <JscadPreview srcDoc={srcDoc} />
               ) : isQ5Mode ? (
-                <Q5PlayPreview code={q5Code} runKey={runKey} />
+                <ShPlayPreview code={q5Code} runKey={runKey} />
               ) : (
                 <LivePreview srcDoc={srcDoc} />
               )}
