@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>teaching-engine spike — q5play-style API demo</title>
+<style>
+  body { background:#101014; color:#ccc; font:14px/1.5 system-ui, monospace; margin:0; padding:24px; }
+  canvas { border:1px solid #333; display:block; margin:16px 0; }
+  code { background:#1c1c24; padding:2px 5px; border-radius:4px; }
+</style>
+</head>
+<body>
+
+<h2>teaching-engine spike</h2>
+<p>Reimplements the q5play-style API your curriculum already teaches (MIT, ours).
+Physics runs on <b>real Box2D</b> via <a href="https://piqnt.com/planck.js/" style="color:#9cf">planck.js</a> (MIT).<br>
+Demo echoes <code>A10.1</code> + physics, a <code>Group</code>/overlap, a <code>HingeJoint</code> (W17), edge input, and camera.</p>
+<ul>
+  <li><b>Player (pink square):</b> WASD to move, <code>kb.pressing()</code></li>
+  <li><b>Auto sprite (cyan circle):</b> orbits using <code>frameCount</code></li>
+  <li><b>Ground (grey):</b> static, physics; <b>ball (orange):</b> falls, bounces</li>
+  <li><b>Pendulum (gold):</b> real Box2D <code>HingeJoint</code> swinging under gravity (W17 proof)</li>
+  <li><b>Collectibles (green Group):</b> overlap to collect, <code>overlaps()</code> + <code>remove()</code></li>
+  <li><b>Space:</b> edge-triggered jump (<code>kb.presses()</code>)</li>
+  <li><b>Camera:</b> follows the player when they reach the right half</li>
+  <li><b>High score:</b> <code>storeItem</code>/<code>getItem</code> (localStorage)</li>
+</ul>
+
+<script src="vendor/planck.min.js"></script>
+<script src="engine.js"></script>
+<script>
+  // ---- sketch (this is the student-facing shape) ----
+
+  let player;
+  let orbiter;
+  let ball;
+  let coins;
+  let score = getItem('spikeScore') || 0;
+  let ground;
+  let pendulumBob;
+  let pendulumAnchor;
+
+  function setup() {
+    new Canvas(600, 400);
+    world.gravity.y = 0.4;
+
+    player = new Sprite(120, 300, 36, 36);
+    player.color = 'deeppink';
+
+    // static platform
+    ground = new Sprite(300, 380, 700, 24);
+    ground.body = 'static';
+    ground.color = '#666';
+
+    // auto sprite: orbits using frameCount (no physics)
+    orbiter = new Sprite(500, 120, 20, 20);
+    orbiter.shape = 'circle';
+    orbiter.color = 'cyan';
+
+    // W17 joint proof — swinging pendulum on a hinge
+    pendulumAnchor = new Sprite(120, 60, 10, 10);
+    pendulumAnchor.body = 'static';
+    pendulumAnchor.color = '#999';
+    pendulumBob = new Sprite(120, 170, 26, 26);
+    pendulumBob.shape = 'circle';
+    pendulumBob.color = 'gold';
+    new HingeJoint(pendulumAnchor, pendulumBob);
+
+    // physics demo: falls under gravity, bounces on the ground
+    ball = new Sprite(460, 60, 24, 24);
+    ball.shape = 'circle';
+    ball.color = 'orange';
+    ball.bounciness = 0.8;
+
+    // group of collectibles
+    coins = new Group();
+    for (let i = 0; i < 5; i++) {
+      coins.newSprite(90 + i * 45, 260, 16, 16);
+      coins[coins.length - 1].shape = 'circle';
+      coins[coins.length - 1].color = 'lime';
+    }
+  }
+
+  function update() {
+    // auto sprite: orbit the center using frameCount
+    orbiter.pos.x = 300 + Math.cos(frameCount * 0.02) * 140;
+    orbiter.pos.y = 180 + Math.sin(frameCount * 0.02) * 100;
+
+    // WASD movement with the else-to-zero pattern
+    if (kb.pressing('a')) player.vel.x = -3;
+    else if (kb.pressing('d')) player.vel.x = 3;
+    else player.vel.x = 0;
+
+    if (kb.pressing('w')) player.vel.y = -3;
+    else if (kb.pressing('s')) player.vel.y = 3;
+    else player.vel.y = 0;
+
+    // edge-triggered jump
+    if (kb.presses(' ')) player.vel.y = -6;
+
+    // collect coins on overlap
+    for (let i = coins.length - 1; i >= 0; i--) {
+      if (player.overlaps(coins[i])) {
+        coins.remove(coins[i]);
+        score++;
+        storeItem('spikeScore', score);
+      }
+    }
+
+    // camera follows player past the halfway point
+    camera.x = Math.max(0, player.x - 300);
+  }
+
+  function draw() {
+    background('#14141a');
+    text('score: ' + score, 10, 24);
+    text('frame: ' + frameCount, 10, 42);
+    text('camera.x: ' + Math.round(camera.x), 10, 60);
+  }
+
+  start();
+</script>
+
+</body>
+</html>
