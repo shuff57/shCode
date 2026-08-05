@@ -5,9 +5,9 @@
   "type": "assignment",
   "difficulty": "intermediate",
   "estimateMins": 45,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.2 Object-Oriented Programming",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 12,
   "slos": ["SLO-2", "SLO-3"],
   "steps": [
@@ -21,7 +21,7 @@
       "id": "s2",
       "title": "Add a collect() method",
       "instructions": "Add a `collect()` method on the class that despawns the sprite and returns `this.value`.",
-      "hints": ["Check the Sprite section of the q5play docs drawer for how to despawn a sprite."]
+      "hints": ["Check the Sprite section of the shplay docs drawer for how to despawn a sprite."]
     },
     {
       "id": "s3",
@@ -33,7 +33,7 @@
       "id": "s4",
       "title": "Detect overlaps and collect",
       "instructions": "In `draw()`, iterate the `collectibles` array. When the player overlaps a collectible's sprite, call its `collect()` method, add the returned value to `totalScore`, and remove that item from the array.",
-      "hints": ["Check the Sprite section of the q5play docs drawer for the overlap check.", "Removing items while iterating forwards skips neighbours — search for 'iterate backwards to splice' if you hit that bug."]
+      "hints": ["Check the Sprite section of the shplay docs drawer for the overlap check.", "Removing items while iterating forwards skips neighbours — search for 'iterate backwards to splice' if you hit that bug."]
     }
   ],
   "requirements": [

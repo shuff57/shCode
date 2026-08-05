@@ -1,11 +1,11 @@
 {
   "id": "2-3-2-video-groups-intro",
-  "title": "2.3.2 Video — Groups in q5play",
+  "title": "2.3.2 Video — Groups in shplay",
   "description": "Why a `Group` is a class with shared defaults — and how a single line creates fifty enemies. Watch before `2.3.5 Groups Sandbox`.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 4,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.3 Collections and Physics Applications",
   "preview": "video",
   "week": 13,

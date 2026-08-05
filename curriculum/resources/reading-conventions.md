@@ -1,7 +1,7 @@
 # Reading Lesson Conventions
 
 Canonical rules for in-app lessons whose primary surface is a text reading
-(internal doc chapter, freeCodeCamp reading, q5play docs,
+(internal doc chapter, freeCodeCamp reading, shplay docs,
 etc.). When a module spec under `curriculum/modules/lessons/*.md` lists a
 "reading" entry or a `lessons/<slug>/` has
 `lesson.json.preview === "reading"`, these rules are binding.
@@ -30,8 +30,8 @@ etc.). When a module spec under `curriculum/modules/lessons/*.md` lists a
   "preview": "reading",
   "week": <n>,
   "slos": ["SLO-<n>"],
-  "externalLink": "/docs/q5play",
-  "externalLinkLabel": "Open the in-app q5play docs",
+  "externalLink": "/docs/shplay",
+  "externalLinkLabel": "Open the in-app shplay docs",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],
@@ -41,7 +41,7 @@ etc.). When a module spec under `curriculum/modules/lessons/*.md` lists a
 
 ### Field-by-field
 
-- `externalLink` — URL or in-app path. Internal paths (e.g. `/docs/q5play`) are allowed when the canonical source is inside this app. External URLs open in a new tab — don't invent them.
+- `externalLink` — URL or in-app path. Internal paths (e.g. `/docs/shplay`) are allowed when the canonical source is inside this app. External URLs open in a new tab — don't invent them.
 - `externalLinkLabel` — human-readable label rendered with a `→` arrow (see `components/ContentLessonView.tsx` line 120). Defaults to the raw URL if omitted; always provide one.
 - `contentFile` — relative filename of a markdown file in the same lesson directory (conventionally `content.md`). Renders below the external link. Use for: framing the reading, comprehension questions, "what to notice" prompts. Keep it short — the reading itself lives behind `externalLink`.
 - `steps` / `requirements` / `grading.totalPoints` — always empty / zero. Readings are not auto-graded.
@@ -71,7 +71,7 @@ Canonical rhythm — see `lessons/2-1-2-reading-canvas-sprite/content.md` for th
 
 ### `live` code fences
 
-A fenced block annotated ```` ```js live ```` renders as a runnable q5play sketch inline in the lesson (same runtime used elsewhere in the app). Every per-topic subsection MUST have one — that is the only way the reading earns the "interactive" half of its name. A plain ```` ```js ```` fence is reference-only and never substitutes for the per-topic live block; use it only for short illustrative snippets *inside* prose, in addition to (not instead of) the topic's `js live` block.
+A fenced block annotated ```` ```js live ```` renders as a runnable shplay sketch inline in the lesson (same runtime used elsewhere in the app). Every per-topic subsection MUST have one — that is the only way the reading earns the "interactive" half of its name. A plain ```` ```js ```` fence is reference-only and never substitutes for the per-topic live block; use it only for short illustrative snippets *inside* prose, in addition to (not instead of) the topic's `js live` block.
 
 ### Length
 
@@ -96,7 +96,7 @@ Aim for **under ~100 lines**. The canonical example is 72 lines. Going longer us
 `"<unit-numbering> Reading — <source>: <topic>"` — the word "Reading" in the title keeps the type legible.
 
 Examples:
-- `"2.1.3 Reading — q5play docs: Canvas & Sprite"`
+- `"2.1.3 Reading — shplay docs: Canvas & Sprite"`
 - `"1.1.2 Reading — FCC: Variables and Strings"`
 
 ## History

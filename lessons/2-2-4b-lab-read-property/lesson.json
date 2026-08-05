@@ -5,9 +5,9 @@
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 5,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.2 Object-Oriented Programming",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 12,
   "slos": ["SLO-2", "SLO-3"],
   "steps": [
@@ -15,7 +15,7 @@
       "id": "s1",
       "title": "Print b.color and b.size to the console",
       "instructions": "Inside `draw()`, call `console.log` twice — once with `b.color` and once with `b.size`. Both values should appear in the on-canvas console every frame.",
-      "hints": ["Open the q5play docs drawer on the right and look at how console.log works inside a sketch."]
+      "hints": ["Open the shplay docs drawer on the right and look at how console.log works inside a sketch."]
     }
   ],
   "requirements": [

@@ -5,9 +5,9 @@
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 5,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.2 Object-Oriented Programming",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 12,
   "slos": ["SLO-2", "SLO-3"],
   "steps": [
@@ -15,7 +15,7 @@
       "id": "s1",
       "title": "Change b.color when space is pressed",
       "instructions": "Inside `draw()`, detect a space-bar press with `kb.presses('space')` and assign a new color to `b.color`. The box should change color on screen when you press space.",
-      "hints": ["Open the q5play docs drawer on the right and find the keyboard input section for detecting key presses."]
+      "hints": ["Open the shplay docs drawer on the right and find the keyboard input section for detecting key presses."]
     }
   ],
   "requirements": [

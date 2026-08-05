@@ -38,7 +38,7 @@ After all the apples have fallen past `y > 410`, you should see `apples remainin
 
 ## Step 2 — Why does it skip?
 
-When `apples[2].delete()` runs, q5play splices that sprite out of every group it belongs to — including `apples`. Everything to the right shifts down by one — what was at index `3` is now at index `2`. But the loop counter `i` keeps incrementing — next iteration is `i = 3`, which is *the sprite that used to be at index `4`*. The sprite that shifted into index `2` is never visited.
+When `apples[2].delete()` runs, shplay splices that sprite out of every group it belongs to — including `apples`. Everything to the right shifts down by one — what was at index `3` is now at index `2`. But the loop counter `i` keeps incrementing — next iteration is `i = 3`, which is *the sprite that used to be at index `4`*. The sprite that shifted into index `2` is never visited.
 
 Net effect: every other doomed sprite gets skipped.
 
@@ -116,8 +116,8 @@ Same correct behavior, more readable than the manual backwards loop.
 
 ## Key takeaways
 
-- **Iterating forward + deleting = bugs.** Every other doomed sprite gets skipped because the array shifts under your loop counter (q5play's `delete()` splices the sprite out of every group it's in).
+- **Iterating forward + deleting = bugs.** Every other doomed sprite gets skipped because the array shifts under your loop counter (shplay's `delete()` splices the sprite out of every group it's in).
 - **Backwards iteration is safe** because deleted indices are always *behind* you.
 - **Iterate-a-copy** (`[...group]`) is also safe and reads more cleanly — pick the style that's clearer at the call site.
-- **The `overlaps(group, callback)` callback form is *also* safe** — q5play has finished its own iteration before calling your callback. Use it when deletion is triggered by a collision (see `2.3.7 Apple Catcher`).
+- **The `overlaps(group, callback)` callback form is *also* safe** — shplay has finished its own iteration before calling your callback. Use it when deletion is triggered by a collision (see `2.3.7 Apple Catcher`).
 - **Pick one safe pattern per loop.** Don't mix backwards iteration and iterate-a-copy in the same block — pick whichever reads cleaner for the situation.

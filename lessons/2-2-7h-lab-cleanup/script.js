@@ -7,7 +7,7 @@ class Bubble {
   }
 
   // STEP 1: Write pop() that calls this.sprite.delete().
-  //   The object is responsible for cleaning up the q5play sprite it owns.
+  //   The object is responsible for cleaning up the shPlay sprite it owns.
   //   Once deleted, the sprite disappears from the canvas immediately.
 }
 

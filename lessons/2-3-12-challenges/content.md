@@ -104,5 +104,5 @@ function draw() {
 ## If you finish all three
 
 - Combine: a game with apples (scored), rocks (cost a life), and a `cull()` helper handling off-screen cleanup for both.
-- Read the q5play `Groups` docs section on `group.cull()` — the engine ships its own version. How does yours differ?
+- Read the shplay `Groups` docs section on `group.cull()` — the engine ships its own version. How does yours differ?
 - Show a classmate your favorite challenge and explain why you picked the iteration pattern you did.

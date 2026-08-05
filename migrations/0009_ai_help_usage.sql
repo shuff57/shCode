@@ -8,7 +8,7 @@
 -- pruned periodically; nothing relies on history.
 --
 -- `unit` is the lesson's unit string from curriculum frontmatter
--- (e.g. "2.1 q5play Foundations"). Lessons without a unit bucket under ''.
+-- (e.g. "2.1 shPlay Foundations"). Lessons without a unit bucket under ''.
 
 CREATE TABLE IF NOT EXISTS ai_help_usage (
   student_email TEXT NOT NULL,

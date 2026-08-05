@@ -5,9 +5,9 @@
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 8,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.2 Object-Oriented Programming",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 12,
   "slos": ["SLO-2", "SLO-3"],
   "steps": [
@@ -15,7 +15,7 @@
       "id": "s1",
       "title": "Write the moveRight(dx) method",
       "instructions": "Inside the `Mover` class body, write a `moveRight(dx)` method that adds `dx` to `this.sprite.x`. Hold the right arrow to see the sprite slide across the canvas.",
-      "hints": ["Open the q5play docs drawer on the right and find the Sprite properties section — look for how to read and write a sprite's position."]
+      "hints": ["Open the shplay docs drawer on the right and find the Sprite properties section — look for how to read and write a sprite's position."]
     }
   ],
   "requirements": [

@@ -1,4 +1,4 @@
-// 2.1.5 Hello Sprite — your first q5play sketch.
+// 2.1.5 Hello Sprite — your first shPlay sketch.
 
 let player;
 

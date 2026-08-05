@@ -5,9 +5,9 @@
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 8,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.2 Object-Oriented Programming",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 12,
   "slos": ["SLO-2", "SLO-3"],
   "steps": [
@@ -15,7 +15,7 @@
       "id": "s1",
       "title": "Write the tick() method",
       "instructions": "Inside the `Counter` class body, after the constructor, write a `tick()` method that adds 1 to `this.n`. Press space in the sketch to call it and watch the number on screen increase.",
-      "hints": ["Open the q5play docs drawer on the right and review the class syntax section for method declaration format."]
+      "hints": ["Open the shplay docs drawer on the right and review the class syntax section for method declaration format."]
     }
   ],
   "requirements": [

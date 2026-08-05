@@ -49,7 +49,7 @@ class Player {
 Instantiate with `new Player(200, 200)` and call `player.move('left')` or `player.jump()` from your draw loop.
 
 **Hints:**
-- You can hook this into a q5play Sprite by storing the sprite inside the constructor.
+- You can hook this into a shplay Sprite by storing the sprite inside the constructor.
 - Or keep it pure JS — just track `this.x`, `this.y`, `this.vel`.
 
 ---

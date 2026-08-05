@@ -39,6 +39,6 @@ This has a catch: comparing strings and numbers can give surprising results. `"4
 
 | Term | Meaning |
 |------|---------|
-| **`getItem(key)`** | q5play function — reads the value from the save slot named `key`. Returns a string, or `null` if nothing was saved yet. |
+| **`getItem(key)`** | shplay function — reads the value from the save slot named `key`. Returns a string, or `null` if nothing was saved yet. |
 | **key** | The string name of the save slot you want to read — must match the key you used with `storeItem`. |
 | **`null`** | JavaScript's way of saying "nothing here." `getItem` returns `null` when the key has never been used. |

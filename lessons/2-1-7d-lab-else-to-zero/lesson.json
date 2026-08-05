@@ -5,9 +5,9 @@
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 5,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.1 Foundations",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 10,
   "slos": ["SLO-3"],
   "steps": [
@@ -15,7 +15,7 @@
       "id": "s1",
       "title": "Run as-is and confirm movement stops",
       "instructions": "Click Run (or the preview area). Hold a WASD key — the sprite moves. Release — it stops. Confirm the else-to-zero rule is working.",
-      "hints": ["Open the q5play docs drawer on the right and find the Sprite velocity section."]
+      "hints": ["Open the shplay docs drawer on the right and find the Sprite velocity section."]
     },
     {
       "id": "s2",
@@ -33,7 +33,7 @@
       "id": "s4",
       "title": "Restore the else lines",
       "instructions": "Put both else lines back so the sprite stops when no key is held. The grader checks that both `else player.vel.x = 0` and `else player.vel.y = 0` are present in draw().",
-      "hints": ["Open the q5play docs drawer on the right and review the velocity section for the correct pattern."]
+      "hints": ["Open the shplay docs drawer on the right and review the velocity section for the correct pattern."]
     }
   ],
   "requirements": [

@@ -5,9 +5,9 @@
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 25,
-  "category": "Unit 5: q5play — Game Physics",
+  "category": "Unit 5: shplay — Game Physics",
   "unit": "5.2 Physics Feel",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 14,
   "slos": ["SLO-1"],
   "steps": [

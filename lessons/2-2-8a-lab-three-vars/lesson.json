@@ -5,9 +5,9 @@
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 6,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.2 Object-Oriented Programming",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 12,
   "slos": ["SLO-2", "SLO-3"],
   "steps": [
@@ -15,7 +15,7 @@
       "id": "s1",
       "title": "Create e1, e2, e3 at three different positions",
       "instructions": "In `setup()`, create three Enemy instances — `e1`, `e2`, and `e3` — at three different x/y positions. Each call to `new Enemy(x, y, hp)` produces a separate object with its own state.",
-      "hints": ["Open the q5play docs drawer on the right and review how constructor arguments work — each Enemy takes an x, y, and hp value."]
+      "hints": ["Open the shplay docs drawer on the right and review how constructor arguments work — each Enemy takes an x, y, and hp value."]
     }
   ],
   "requirements": [

@@ -211,7 +211,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       </h2>
       <p style={{ color: '#888', fontSize: 13, margin: '0 0 12px' }}>
         Paste or type your response below. The AI grader will score per-criterion and suggest
-        where to look in the q5play docs if you need more detail. You can revise and resubmit
+        where to look in the shPlay docs if you need more detail. You can revise and resubmit
         as many times as you want.
       </p>
 

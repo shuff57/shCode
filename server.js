@@ -86,7 +86,7 @@ app.prepare().then(() => {
         let passed = false;
 
         // Default flags is '' (case-sensitive). Set "flags": "i" explicitly
-        // in lesson.json if you want case-insensitive matching — q5play
+        // in lesson.json if you want case-insensitive matching — shPlay
         // identifiers like Canvas / Sprite / kb / world are case-sensitive
         // so the default must be strict.
         const flags = r.flags ?? '';

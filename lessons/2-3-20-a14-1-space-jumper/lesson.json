@@ -5,9 +5,9 @@
   "type": "assignment",
   "difficulty": "intermediate",
   "estimateMins": 40,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.3 Collections and Physics Applications",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 14,
   "slos": ["SLO-3"],
   "steps": [

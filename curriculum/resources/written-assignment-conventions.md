@@ -7,7 +7,7 @@ Canonical rules for in-app **written assignments** — short prose responses gra
 
 **Canonical example:** `lessons/2-1-10-a10-2-frame-loop/`.
 
-Distinct from a q5play lab (`preview: "q5play"`) because there is no `script.js` and no regex grading — the grade comes from an LLM evaluating the student's prose against a rubric. See `components/ContentLessonView.tsx` line 134 for the branch that routes an `aiGrader`-bearing lesson to `WrittenGrader`.
+Distinct from a shplay lab (`preview: "shplay"`) because there is no `script.js` and no regex grading — the grade comes from an LLM evaluating the student's prose against a rubric. See `components/ContentLessonView.tsx` line 134 for the branch that routes an `aiGrader`-bearing lesson to `WrittenGrader`.
 
 ---
 
@@ -52,9 +52,9 @@ Distinct from a q5play lab (`preview: "q5play"`) because there is no `script.js`
 
 ### Field-by-field
 
-- `preview` — **`"assignment"`**, not `"q5play"`. This is what routes the lesson to `WrittenGrader` instead of the regex grader.
-- `aiGrader.model` — the Ollama cloud model id. Default to `"qwen3-coder-next:cloud"` (the current standard for q5play modules). Don't invent model names. See the **Ollama grader** section of `CLAUDE.md` for the endpoint + secret wiring.
-- `aiGrader.contextDocs` — array of q5play doc keys (e.g. `"overview"`, `"sprite"`, `"input"`). These are interpolated into the grader's system prompt so the model knows the q5play vocabulary. See `lib/q5play-docs.ts` for the valid keys.
+- `preview` — **`"assignment"`**, not `"shplay"`. This is what routes the lesson to `WrittenGrader` instead of the regex grader.
+- `aiGrader.model` — the Ollama cloud model id. Default to `"qwen3-coder-next:cloud"` (the current standard for shplay modules). Don't invent model names. See the **Ollama grader** section of `CLAUDE.md` for the endpoint + secret wiring.
+- `aiGrader.contextDocs` — array of shplay doc keys (e.g. `"overview"`, `"sprite"`, `"input"`). These are interpolated into the grader's system prompt so the model knows the shplay vocabulary. See `lib/shplay-docs.ts` for the valid keys.
 - `aiGrader.prompt` — the exact text the student sees as the question set. Use `\n\n` between questions. The grader sees this prompt + the student's response.
 - `aiGrader.rubric[].points` — **always `1` per item.** This is a binary AI signal (the model returns 0 or 1 per criterion — earned or not), not a weight. The UI must never surface this number to students; it's grader-internal. Don't assign different weights to different criteria — every criterion is equally required to advance.
 - `points` (top-level) / `grading.totalPoints` / `grading.passingScore` — **all equal to `aiGrader.rubric.length` (count of criteria).** Setting `passingScore === totalPoints` enforces "every rubric item must be earned" — the all-green equivalent for written assignments. (Why not all `0` like q5 lessons? The Ollama grader sums per-rubric points to compute `totalScore`, and the workspace's non-q5 Submit gate is `totalScore >= passingScore`. With all-zero points, `0 >= 0` is always true and the gate is bypassed — green-to-advance breaks. The `1`-per-item carve-out preserves the all-green semantics through the existing scoring code path.)
@@ -122,7 +122,7 @@ This carve-out exists because the Ollama grader sums per-rubric points to comput
 
 ## 5. Don'ts
 
-- **Do not use `preview: "q5play"` for a writeup** — the UI won't mount `WrittenGrader` and there's no script to grade.
+- **Do not use `preview: "shplay"` for a writeup** — the UI won't mount `WrittenGrader` and there's no script to grade.
 - **Do not leave `points` / `grading.totalPoints` / `grading.passingScore` unset.** All three must be populated and equal to `aiGrader.rubric.length`.
 - **Do not assign different `points` values to different rubric rows.** Every row is `1` — binary AI signal. Weights aren't supported under the no-points policy.
 - **Do not show point columns in the student-facing rubric preview** in `content.md`. Use a `# | Criterion` two-column shape, not `Criterion | Pts`. Students see pass/fail per row, not weights.
@@ -149,4 +149,4 @@ Example: `"2.1.11 Frame Loop Writeup"`.
 | This doc | Hoisted out of per-module specs. |
 | Scaffolding pass | 2.1.11 Frame Loop Writeup `content.md` stripped from 60 lines → 15: dropped the `# A10.2 —` hub H1, the Module/Week/Points metadata table, the "Other 2.1.1 resources" link line, the duplicated Prompt block (lives in `aiGrader.prompt`), and the "Example response" block that showed full Q1/Q2/Q3 answers. Kept the "Before you start" prereqs + rubric-preview. §2 gained a canonical content.md template; §5 Don'ts gained "no example answers" and "no hub header / metadata table / sibling-resources line". |
 | Second simplification | Dropped the "Before you start" prereq block AND any teacher-facing SLO / evidence-retention warnings from the canonical shape. Student-facing copy now opens directly with the "Write your response below" nudge, then rubric. Applied across `2-1-10-a10-2-frame-loop` and `2-2-12-a12-2-oop-writeup`. §2 canonical template shortened (~15 → ~10 lines); §5 Don'ts gained "no pre-read block" and "no teacher-facing SLO warnings". |
-| No-points + green-to-advance (carve-out for written) | The course is now mastery-based — no points anywhere students can see. Written assignments are AI-graded, so the existing scoring code path needs *some* numeric signal to fire the Submit gate. Resolution: every `aiGrader.rubric[].points` is **`1`** (binary signal, never a weight); `grading.totalPoints = grading.passingScore = aiGrader.rubric.length`; top-level `points` mirrors `totalPoints`. With this shape `totalScore >= passingScore` requires every rubric item to be earned — the all-green equivalent for written. §1 JSON shape + field-by-field rewritten. §2 canonical content.md template dropped the `Pts` column (now `# | Criterion` only). §3 rubric example updated to `points: 1`. §4 renamed from "Point budget" → "Pass criterion" and prescribes the `<N>=rubric.length` pattern. §5 Don'ts gained the equal-rubric-weights and no-pts-column rules. Sister convention `q5play-lesson-conventions.md` carries the canonical reference for the green-to-advance lesson nav lock. |
+| No-points + green-to-advance (carve-out for written) | The course is now mastery-based — no points anywhere students can see. Written assignments are AI-graded, so the existing scoring code path needs *some* numeric signal to fire the Submit gate. Resolution: every `aiGrader.rubric[].points` is **`1`** (binary signal, never a weight); `grading.totalPoints = grading.passingScore = aiGrader.rubric.length`; top-level `points` mirrors `totalPoints`. With this shape `totalScore >= passingScore` requires every rubric item to be earned — the all-green equivalent for written. §1 JSON shape + field-by-field rewritten. §2 canonical content.md template dropped the `Pts` column (now `# | Criterion` only). §3 rubric example updated to `points: 1`. §4 renamed from "Point budget" → "Pass criterion" and prescribes the `<N>=rubric.length` pattern. §5 Don'ts gained the equal-rubric-weights and no-pts-column rules. Sister convention `shplay-lesson-conventions.md` carries the canonical reference for the green-to-advance lesson nav lock. |

@@ -5,9 +5,9 @@
   "type": "challenge",
   "difficulty": "advanced",
   "estimateMins": 30,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.7 Advanced Mechanics",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 17,
   "slos": ["SLO-3"],
   "contentFile": "content.md",
@@ -16,19 +16,19 @@
       "id": "s1",
       "title": "Create a canvas",
       "instructions": "Inside setup(), create a canvas of any size.",
-      "hints": ["Open the q5play docs drawer on the right and find the Canvas section."]
+      "hints": ["Open the shplay docs drawer on the right and find the Canvas section."]
     },
     {
       "id": "s2",
       "title": "Create at least one sprite",
       "instructions": "In setup(), create at least one sprite.",
-      "hints": ["Check the Sprite section of the q5play docs drawer for constructor arguments."]
+      "hints": ["Check the Sprite section of the shplay docs drawer for constructor arguments."]
     },
     {
       "id": "s3",
       "title": "Clear the background each frame",
       "instructions": "Call background() inside draw() so old frames don't stack up.",
-      "hints": ["Search the q5play docs drawer for background()."]
+      "hints": ["Search the shplay docs drawer for background()."]
     },
     {
       "id": "s4",

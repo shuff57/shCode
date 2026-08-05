@@ -44,5 +44,5 @@ if (score > highScore) {
 |------|---------|
 | **Save slot** | A named place in the browser's storage where your game keeps one value. Each key is a separate slot. |
 | **Persistence** | Data that survives a page reload or tab close. |
-| **`storeItem(key, value)`** | q5play function — writes `value` into the save slot named `key`. |
+| **`storeItem(key, value)`** | shplay function — writes `value` into the save slot named `key`. |
 | **key** | The string name you pick for a save slot — e.g. `'highScore'`, `'playerName'`, `'level'`. |

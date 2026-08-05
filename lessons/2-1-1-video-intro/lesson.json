@@ -1,11 +1,11 @@
 {
   "id": "2-1-1-video-intro",
-  "title": "2.1.1 Video — Your first q5play sketch",
+  "title": "2.1.1 Video — Your first shplay sketch",
   "description": "5-min walkthrough introducing canvas, sprite, and run cycle. Watch before the Hello Sprite lesson.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 5,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.1 Foundations",
   "preview": "video",
   "week": 10,

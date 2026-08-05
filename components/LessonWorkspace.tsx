@@ -215,7 +215,7 @@ export default function LessonWorkspace({
 
   const isConsoleMode = lesson.preview === 'console';
   const isJscadMode = lesson.preview === 'jscad';
-  const isQ5Mode = lesson.preview === 'q5play';
+  const isQ5Mode = lesson.preview === 'shplay';
 
   // For JSCAD lessons: auto-run on first load
   useEffect(() => {
@@ -303,7 +303,7 @@ export default function LessonWorkspace({
     setTimeout(() => runTests(), 600);
   }
 
-  // For q5play lessons: snapshot the current code and bump runKey to reload the iframe.
+  // For shPlay lessons: snapshot the current code and bump runKey to reload the iframe.
   // We snapshot so edits after Run don't re-trigger the iframe until the next Run.
   function runQ5() {
     setRuntimeError(null);

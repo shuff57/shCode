@@ -2,7 +2,7 @@
 
 Teacher-led walkthroughs for Module 2.1.1. Students can reference these after class when building [A10.1](A10.1_sprite-playground.md).
 
-All three examples are designed to be typed (not pasted) into the q5play in-app editor so the code sinks in line-by-line.
+All three examples are designed to be typed (not pasted) into the shplay in-app editor so the code sinks in line-by-line.
 
 **Other 2.1.1 resources:** [overview](2.1.1_overview.md) · [readings](2.1.1_readings.md) · [challenges](2.1.1_challenges.md) · [A10.2 writeup](A10.2_frame-loop-writeup.md)
 
@@ -10,7 +10,7 @@ All three examples are designed to be typed (not pasted) into the q5play in-app 
 
 ## Worked Example 1 — Minimum sprite program
 
-**Goal:** Prove that a canvas + sprite + background is the smallest possible q5play program.
+**Goal:** Prove that a canvas + sprite + background is the smallest possible shplay program.
 
 ### Step 1 — Type this exactly
 
@@ -73,7 +73,7 @@ function draw() {
 
 - `setup()` runs **once**. Create long-lived things here.
 - `draw()` runs **every frame**. Do per-frame things here (input, movement, scoring).
-- You don't call a render method on a sprite. q5play handles rendering.
+- You don't call a render method on a sprite. shplay handles rendering.
 - `background(...)` is the first thing in `draw()`. Skip it and old frames stack up like a long-exposure photo.
 
 ---

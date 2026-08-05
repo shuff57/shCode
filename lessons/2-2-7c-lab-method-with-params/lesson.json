@@ -5,9 +5,9 @@
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 8,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.2 Object-Oriented Programming",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 12,
   "slos": ["SLO-2", "SLO-3"],
   "steps": [
@@ -15,7 +15,7 @@
       "id": "s1",
       "title": "Write the addBy(n) method",
       "instructions": "Inside the `Counter` class body, write an `addBy(n)` method that adds the argument `n` to `this.n`. The driver already calls `c.addBy(1)`, `c.addBy(2)`, and `c.addBy(3)` on keys 1/2/3 — you just need the method.",
-      "hints": ["Open the q5play docs drawer on the right and review the class method section — methods can declare parameters just like regular functions."]
+      "hints": ["Open the shplay docs drawer on the right and review the class method section — methods can declare parameters just like regular functions."]
     }
   ],
   "requirements": [

@@ -5,9 +5,9 @@
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 15,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.2 Object-Oriented Programming",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 12,
   "slos": ["SLO-2", "SLO-3"],
   "steps": [
@@ -15,25 +15,25 @@
       "id": "s1",
       "title": "Create the canvas",
       "instructions": "In `setup()`, create a canvas. `Canvas` is a class, and `new Canvas(...)` stamps out an instance — the same constructor-call pattern you saw in 2.2.4.",
-      "hints": ["Open the q5play docs drawer on the right and find the Canvas section."]
+      "hints": ["Open the shplay docs drawer on the right and find the Canvas section."]
     },
     {
       "id": "s2",
       "title": "Instantiate a rectangle sprite",
       "instructions": "Store a new rectangle sprite in a variable, using the 4-argument constructor form `new Sprite(x, y, width, height)`. Then set its `.color`.",
-      "hints": ["Check the Sprite section of the q5play docs drawer for the 4-argument constructor form."]
+      "hints": ["Check the Sprite section of the shplay docs drawer for the 4-argument constructor form."]
     },
     {
       "id": "s3",
       "title": "Instantiate a circle sprite",
       "instructions": "Store a second sprite using the 3-argument constructor form `new Sprite(x, y, diameter)`. Give this instance its own `.color` (different from the first, so you can tell them apart).",
-      "hints": ["Check the Sprite section of the q5play docs drawer for the 3-argument constructor form."]
+      "hints": ["Check the Sprite section of the shplay docs drawer for the 3-argument constructor form."]
     },
     {
       "id": "s4",
       "title": "Give one sprite a stroke",
       "instructions": "Pick either sprite and set its `.stroke` AND its `.strokeWeight`. You'll see a visible outline on that sprite.",
-      "hints": ["Look up sprite properties in the q5play docs drawer."]
+      "hints": ["Look up sprite properties in the shplay docs drawer."]
     }
   ],
   "requirements": [

@@ -5,9 +5,9 @@
   "type": "example",
   "difficulty": "beginner",
   "estimateMins": 15,
-  "category": "Unit 5: q5play — Game Physics",
+  "category": "Unit 5: shplay — Game Physics",
   "unit": "5.1 Sprites & Movement",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 13,
   "slos": ["SLO-1"],
   "steps": [

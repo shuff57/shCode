@@ -45,7 +45,7 @@ lessons/<slug>/
 └── content.md       # the worked example (prose + code blocks)
 ```
 
-Code blocks inside `content.md` are rendered via `MarkdownWithLiveBlocks` — runnable q5play snippets work in place. No separate `script.js` is needed.
+Code blocks inside `content.md` are rendered via `MarkdownWithLiveBlocks` — runnable shplay snippets work in place. No separate `script.js` is needed.
 
 ## 3. `content.md` shape
 
@@ -65,18 +65,18 @@ Aim for **under ~80 lines**. The canonical example is 60 lines. A worked example
 
 ### `live` code fences
 
-A fenced block annotated ```` ```js live ```` renders as a runnable q5play sketch inline — its own editor + preview, independent of any other block on the page. Give **every** step block the `live` annotation so each variation of the code can be executed and tweaked in place; skipping `live` forces the student to copy/paste to see the effect, which defeats the point.
+A fenced block annotated ```` ```js live ```` renders as a runnable shplay sketch inline — its own editor + preview, independent of any other block on the page. Give **every** step block the `live` annotation so each variation of the code can be executed and tweaked in place; skipping `live` forces the student to copy/paste to see the effect, which defeats the point.
 
 Reference-only snippets (pure prose-embedded code the student isn't meant to run — e.g. a one-liner showing a syntax form) can stay as plain ```` ```js ```` if a walkthrough needs them, but the canonical pattern has none.
 
-## 4. Exception — fully-working q5play sketches
+## 4. Exception — fully-working shplay sketches
 
-Per `q5play-lesson-conventions.md` §1, lessons with `preview: "example"` and `grading.totalPoints === 0` **may** ship a fully-working `script.js`. Reference/showcase examples live that way (`lessons/q5play-gravity/`, `q5play-camera/`, `q5play-pendulum/`, `q5play-sprite-showcase/`). When doing this, write `script.js` as solid, readable example code — this is the only lesson type where a complete program is the correct output.
+Per `shplay-lesson-conventions.md` §1, lessons with `preview: "example"` and `grading.totalPoints === 0` **may** ship a fully-working `script.js`. Reference/showcase examples live that way (`lessons/shplay-gravity/`, `shplay-camera/`, `shplay-pendulum/`, `shplay-sprite-showcase/`). When doing this, write `script.js` as solid, readable example code — this is the only lesson type where a complete program is the correct output.
 
 ## 5. Don'ts
 
 - **Do not auto-grade a worked example.** It's a reference, not a test.
-- **Do not use "Worked Example" as a synonym for "Starter".** Starters ship empty scaffolds and *are* graded (`preview: "q5play"` + `type: "lesson"`, see `q5play-lesson-conventions.md`).
+- **Do not use "Worked Example" as a synonym for "Starter".** Starters ship empty scaffolds and *are* graded (`preview: "shplay"` + `type: "lesson"`, see `shplay-lesson-conventions.md`).
 - **Do not duplicate the module's teacher-led demo.** Module specs describe the live-in-class demo; the worked-example lesson is the student's after-class reference version, not a transcript.
 - **Do not include a `description` field in `lesson.json`.** See §1 field-by-field.
 - **Do not label step sections `## Worked Example N — …`.** One walkthrough per lesson, so the heading is just `## Step N — …`.
@@ -99,4 +99,4 @@ Examples:
 | Unit 2.1 / 2.2 buildout | Pattern crystallized in `2-1-3-example-minimum-sprite`, `2-1-7-example-keyboard`, `2-2-4-example-devtools-reveal`, `2-2-8-example-enemy-class`, `2-2-10-example-proc-vs-oop`. |
 | This doc | Hoisted out of per-module specs. |
 | Scaffolding pass | 2.1.4 canonical example pruned from 280 → 65 lines: dropped hub header, sibling-resources line, cross-example cheat sheet, and the "## Worked Example N —" labels; dropped unrelated walkthroughs (Keyboard Movement, frameCount) that belong in their own lessons. `description` field dropped from `lesson.json` (rendered as an ugly empty `<p>`; ContentLessonView now conditionally renders it). §1 / §3 / §5 updated to codify the new shape. |
-| Per-step live blocks | Each `## Step` now carries its own ```` ```js live ```` fence (instead of a trailing "combined final" block). Students can run and tweak every step independently. `public/q5play/runner.html` got `overflow: hidden` on html/body so oversized canvases get clipped rather than showing scrollbars inside the iframe. |
+| Per-step live blocks | Each `## Step` now carries its own ```` ```js live ```` fence (instead of a trailing "combined final" block). Students can run and tweak every step independently. `public/shplay/runner.html` got `overflow: hidden` on html/body so oversized canvases get clipped rather than showing scrollbars inside the iframe. |

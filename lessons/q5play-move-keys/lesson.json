@@ -5,9 +5,9 @@
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 25,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.1 Foundations",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 10,
   "slos": ["SLO-3"],
   "steps": [

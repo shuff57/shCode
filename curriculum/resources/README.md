@@ -10,9 +10,9 @@ This directory collects the **reusable build conventions** for each lesson type 
 | `preview: "reading"`                       | Reading         | No       | [reading-conventions.md](reading-conventions.md)                                 |
 | `preview: "example"`                       | Worked Example  | No       | [example-conventions.md](example-conventions.md)                                 |
 | `preview: "slides"`                        | Slides          | No       | [slide-deck-conventions.md](slide-deck-conventions.md)                     |
-| `preview: "q5play"` + `type: "lesson"`     | Q5 Lesson       | Yes      | [q5play-lesson-conventions.md](q5play-lesson-conventions.md)                   |
-| `preview: "q5play"` + `type: "challenge"`  | Challenge       | Yes      | [q5play-challenge-conventions.md](q5play-challenge-conventions.md)               |
-| `preview: "q5play"` + `type: "assignment"` | Assignment      | Yes      | [lab-assignment-conventions.md](lab-assignment-conventions.md)                   |
+| `preview: "shplay"` + `type: "lesson"`     | Q5 Lesson       | Yes      | [shplay-lesson-conventions.md](shplay-lesson-conventions.md)                   |
+| `preview: "shplay"` + `type: "challenge"`  | Challenge       | Yes      | [shplay-challenge-conventions.md](shplay-challenge-conventions.md)               |
+| `preview: "shplay"` + `type: "assignment"` | Assignment      | Yes      | [lab-assignment-conventions.md](lab-assignment-conventions.md)                   |
 | `preview: "assignment"` + `aiGrader`       | Assignment      | Yes (AI) | [written-assignment-conventions.md](written-assignment-conventions.md)           |
 
 Authoritative badge list lives in `lib/lesson-badges.tsx` (`PREVIEW_BADGES`). Add a row there when introducing a new type.
@@ -36,10 +36,10 @@ Every lesson's `title` field **MUST** start with a three-part dotted number `<un
 
 ### Accepted / rejected examples
 
-✅ `"2.1.1 Slides — q5play Foundations"`
-✅ `"2.1.3 Reading — q5play docs: Canvas & Sprite"`
+✅ `"2.1.1 Slides — shplay Foundations"`
+✅ `"2.1.3 Reading — shplay docs: Canvas & Sprite"`
 ✅ `"3.1.1 Slides — <Unit 3 Module 1 name>"` (future)
-❌ `"Unit 2.1 Slides — q5play Foundations"` (no numbered prefix)
+❌ `"Unit 2.1 Slides — shplay Foundations"` (no numbered prefix)
 ❌ `"2.1 Sprite Playground"` (needs three parts, not two)
 ❌ `"Reading: 2.1.3 Canvas & Sprite"` (number must be at the start)
 

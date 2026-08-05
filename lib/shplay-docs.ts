@@ -1,9 +1,9 @@
 // In-app shPlay reference — hand-authored against the real public/shplay/shplay.js API.
-// Content is written fresh, not mechanically renamed from q5play-docs, because the
+// Content is written fresh, not mechanically renamed from the old shPlay docs, because the
 // actual engine surface differs (planck.js-backed, gaps closed per the audit gate).
 
 // Scope-out (stated explicitly so a future maintainer doesn't rediscover the boundary):
-// These q5play API areas were dropped because no runnable lesson exercises them:
+// These shPlay API areas were dropped because no runnable lesson exercises them:
 //   Visual / Visuals, EmojiImage, multitouch pointer/pointers, kb.shift/control/alt/meta,
 //   world.renderStats / world.meterSize, palettes, world.timeScale / world.physicsTime /
 //   world.realTime / world.autoStep / world.physicsUpdate, world.allowSleeping /

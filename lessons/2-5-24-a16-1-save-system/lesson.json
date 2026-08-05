@@ -5,9 +5,9 @@
   "type": "assignment",
   "difficulty": "intermediate",
   "estimateMins": 60,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.5 Game Saves",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 16,
   "slos": ["SLO-3"],
   "steps": [
@@ -15,7 +15,7 @@
       "id": "s1",
       "title": "Set up the game world",
       "instructions": "Inside setup(), create a canvas, a player sprite, and a way to earn points (collectible sprites or a score counter that increases over time). This is the game that players will save and load.",
-      "hints": ["Open the q5play docs drawer and find the Canvas and Sprite sections."]
+      "hints": ["Open the shplay docs drawer and find the Canvas and Sprite sections."]
     },
     {
       "id": "s2",

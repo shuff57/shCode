@@ -21,7 +21,7 @@ quarter: <1-4>
 week: <N>                   # the school week this sub-module occupies
 contactHours: <hours>
 sessions: <N>               # typically 2 for a 3.5-hour week
-environment: q5play         # or "console", "html-css", etc.
+environment: shplay         # or "console", "html-css", etc.
 slos:
   primary: [SLO-N]          # SLOs this sub-module owns. Omit if pure reinforcement.
   reinforce: [SLO-N, ...]   # SLOs this sub-module reinforces.
@@ -30,7 +30,7 @@ artifacts:
 prerequisites:
   - "<plain-English prereq>"
 externalSources:
-  q5playDocsInApp: "/docs/q5play"   # only when relevant
+  shplayDocsInApp: "/docs/shplay"   # only when relevant
 status: draft|ready|shipped
 ---
 ```
@@ -44,18 +44,18 @@ status: draft|ready|shipped
 3. **Learning Objectives** — numbered list ("Students will be able to: 1. … 2. …"). 4–7 items for advanced units; 8–12 items typical for intro-level units (one objective per atomic concept the unit owns).
 4. **Topics Covered** — bulleted list of concepts and APIs introduced (no rubric content here — that's §Assignments). For intro-level units, **each bullet is a single atomic concept and corresponds 1:1 to a Numbered Lesson List slot** (§3.3). Group bullets under bold sub-headers when helpful (e.g. *Vocabulary*, *Methods, by shape*) but do not merge two concepts into one bullet.
 5. **Prerequisites** — bullet list of prior sub-modules + cross-unit prereqs (e.g. "Q1 W8 arrays comfortable").
-6. **Environment Setup** — anything beyond "standard q5play setup" (projector tabs, handouts, supporting tools).
+6. **Environment Setup** — anything beyond "standard shplay setup" (projector tabs, handouts, supporting tools).
 7. **Videos** — table per §3.1.
 8. **Readings** — table per §3.2 + per-reading **Reading content guidance** subsection per §3.2.
 9. **In-App Lessons (carry-overs)** — list of pre-existing `lessons/<slug>/` to migrate, per §3.4. Skip the section entirely if nothing is being carried over.
 10. **Worked Examples (teacher-led)** — numbered `### Worked Example N — <topic> (<minutes>)` blocks with full code samples in fenced ```js blocks. These are the live-in-class demos *and* the spec for the matching `preview: "example"` lessons.
 11. **Challenges (optional stretch)** — bulleted list of stretch ideas. Becomes the `<U-M-L>-challenges` lesson's `content.md`.
 12. **Session Plan** — 2 (or however many) tables, one per class session. Columns: `Time | Activity | Notes`.
-13. **Assignments** — for each `A<W>.<N>` artifact: type, est. time, due, task description, requirements, pass criteria. Lab assignments per `lab-assignment-conventions.md`; written per `written-assignment-conventions.md`. Do not author rubrics in points language — q5 lessons / labs / challenges are mastery-based (all-green Submit gate; see `q5play-lesson-conventions.md` §1 + §5).
+13. **Assignments** — for each `A<W>.<N>` artifact: type, est. time, due, task description, requirements, pass criteria. Lab assignments per `lab-assignment-conventions.md`; written per `written-assignment-conventions.md`. Do not author rubrics in points language — q5 lessons / labs / challenges are mastery-based (all-green Submit gate; see `shplay-lesson-conventions.md` §1 + §5).
 14. **Vocabulary** — 5–10 row table `Term | Definition`. Doubles as the source rows for the closing glossary in matching reading lessons.
 15. **Teacher Notes** — bullet list of pacing tips, common student bugs, retention rules (for SLO-evidence artifacts).
 16. **Numbered Lesson List** — per §3.3. **This is the build target** — Claude reads this section when the user says "build 2.X.Y."
-17. **Lab and Reading Specs (per-lesson detail)** — required for intro-level units that use the §2a one-concept-per-lesson rule. One block per net-new lesson in the Numbered Lesson List, giving the single concept isolated, the starter shape (for q5play labs) or try-it shape (for readings), and the pass criterion. Lets each lesson be authored independently from this section without re-reading the rest of the spec. Optional for advanced units where each Numbered Lesson List row is self-explanatory.
+17. **Lab and Reading Specs (per-lesson detail)** — required for intro-level units that use the §2a one-concept-per-lesson rule. One block per net-new lesson in the Numbered Lesson List, giving the single concept isolated, the starter shape (for shplay labs) or try-it shape (for readings), and the pass criterion. Lets each lesson be authored independently from this section without re-reading the rest of the spec. Optional for advanced units where each Numbered Lesson List row is self-explanatory.
 18. **Status** — one bullet matching the YAML `status` field.
 
 ## 2a. Granularity bar (intro-level units)
@@ -67,9 +67,9 @@ For introductory-level units — units where most students are seeing a category
 **How to apply when authoring a spec:**
 
 1. List every atomic concept the sub-module owns. Do this *before* deciding lesson count.
-2. Allocate one Numbered Lesson List slot per concept. Most slots will be 5–10 minute readings or 1-step q5play labs.
+2. Allocate one Numbered Lesson List slot per concept. Most slots will be 5–10 minute readings or 1-step shplay labs.
 3. Vocabulary lessons come *before* any "write code from scratch" lesson on the same concept. Reading and try-it labs may pair (one concept can occupy a `reading` slot followed by a `lab` slot that practices it), but each slot still owns one concept.
-4. Reserve at most one "integration" lesson per session — the lesson that composes prior atomic concepts (typically a `worked example` or a `q5play (assignment)`). The integration lesson is the *only* place compound demonstrations appear.
+4. Reserve at most one "integration" lesson per session — the lesson that composes prior atomic concepts (typically a `worked example` or a `shplay (assignment)`). The integration lesson is the *only* place compound demonstrations appear.
 5. Pacing impact: intro-level units typically run 20–30 lessons across 3 sessions. Treat session count as a function of concept count, not the other way around.
 
 **How to apply when reviewing a spec:**
@@ -101,7 +101,7 @@ The table:
 |---|---|---|
 | `#` | yes | `R1`, `R2`, … |
 | `Source` | yes | `Internal`, `FCC`, `Teacher`, etc. |
-| `Section` | yes | URL or chapter pointer (e.g. `/docs/q5play` for the in-app docs) |
+| `Section` | yes | URL or chapter pointer (e.g. `/docs/shplay` for the in-app docs) |
 | `Title` | yes | The section title from the source |
 | `Notes` | optional | One-liner if the source needs context |
 
@@ -135,9 +135,9 @@ Replaces the legacy "Build Outputs" section. Lists every in-app lesson the sub-m
 | `<U.M.2>` | video | `<U.M.2> Video — <V1 title>` | `<U-M-2-video-…>` | V1 (above) | |
 | `<U.M.3>` | reading | `<U.M.3> Reading — <R1 title>` | `<U-M-3-reading-…>` | R1 (above) | |
 | `<U.M.4>` | example | `<U.M.4> Worked Example — <WE1 topic>` | `<U-M-4-example-…>` | WE1 (above) | |
-| `<U.M.5>` | q5play (lesson) | `<U.M.5> <Lab Name>` | `<U-M-5-…>` | carry-over: `q5play-groups` | Migration: title, week, unit, draw()-only |
+| `<U.M.5>` | shplay (lesson) | `<U.M.5> <Lab Name>` | `<U-M-5-…>` | carry-over: `shplay-groups` | Migration: title, week, unit, draw()-only |
 | … | … | … | … | … | … |
-| `<U.M.N>` | q5play (challenge) | `<U.M.N> Challenges — Optional Stretch` | `<U-M-N>-challenges` | Challenges section (above) | |
+| `<U.M.N>` | shplay (challenge) | `<U.M.N> Challenges — Optional Stretch` | `<U-M-N>-challenges` | Challenges section (above) | |
 
 A unit that spans multiple sub-modules numbers lessons **flat across the whole unit**, not per sub-module — so 2.3.1 (W13) might fill slots 2.3.1–2.3.12 and 2.3.2 (W14) continues at 2.3.13–2.3.21. The first sub-module owns the `<U.M.1>` slides slot; subsequent sub-modules in the same unit do **not** get their own slides row — they inherit the unit-level deck.
 
@@ -145,9 +145,9 @@ A unit that spans multiple sub-modules numbers lessons **flat across the whole u
 
 | Slot type | `script.js` shape | Convention |
 |---|---|---|
-| `q5play (lesson)` (`type: "lesson"`) | scaffold: header + lets + `setup()` / `draw()` skeletons + `// STEP N:` comments **describing each task in plain English**, empty function bodies | `q5play-lesson-conventions.md` §3 |
-| `q5play (assignment)` (`type: "assignment"`) | scaffold: same shape as `lesson` — header + lets + skeletons + `// STEP N:` description-only comments. **No commented-out solution code.** | `lab-assignment-conventions.md` §2 + §3 |
-| `q5play (challenge)` (`type: "challenge"`) | **fully empty** — zero bytes (or single trailing newline). Challenges deliberately remove the scaffold so the student structures the program themselves. | `q5play-challenge-conventions.md` §4 |
+| `shplay (lesson)` (`type: "lesson"`) | scaffold: header + lets + `setup()` / `draw()` skeletons + `// STEP N:` comments **describing each task in plain English**, empty function bodies | `shplay-lesson-conventions.md` §3 |
+| `shplay (assignment)` (`type: "assignment"`) | scaffold: same shape as `lesson` — header + lets + skeletons + `// STEP N:` description-only comments. **No commented-out solution code.** | `lab-assignment-conventions.md` §2 + §3 |
+| `shplay (challenge)` (`type: "challenge"`) | **fully empty** — zero bytes (or single trailing newline). Challenges deliberately remove the scaffold so the student structures the program themselves. | `shplay-challenge-conventions.md` §4 |
 | `example` (`preview: "example"`) | fully working sketch (read-along) OR omitted entirely if `content.md` carries everything | `example-conventions.md` §4 |
 | `slides`, `video`, `reading` | no `script.js` at all | per-type convention |
 
@@ -165,16 +165,16 @@ Pre-existing `lessons/<old-slug>/` directories that pre-date the post-2.2 conven
 Example:
 
 ```markdown
-### `lessons/q5play-groups/` → `lessons/2-3-5-groups-sandbox/`
+### `lessons/shplay-groups/` → `lessons/2-3-5-groups-sandbox/`
 
 - **New title:** `2.3.5 Groups Sandbox`
 - **Convention violations to fix:**
   - Title prefix `5.3.1 …` → `2.3.5 …`
   - `unit: "5.3 Groups & Overlaps"` → `"2.3 Collections and Physics Applications"`
-  - `category: "Unit 5: q5play — Game Physics"` → `"Unit 2: q5play — Applied Game Development"`
+  - `category: "Unit 5: shplay — Game Physics"` → `"Unit 2: shplay — Applied Game Development"`
   - `week: 15` → `13`
   - `script.js` uses `update()` separate from `draw()` — consolidate to `draw()` only (per §Do NOT in this spec).
-  - `passingScore: 20` → set to `0` (along with `totalPoints` and every `requirements[].points`) per `q5play-lesson-conventions.md` §1 (no-points; Submit is all-green-gated).
+  - `passingScore: 20` → set to `0` (along with `totalPoints` and every `requirements[].points`) per `shplay-lesson-conventions.md` §1 (no-points; Submit is all-green-gated).
 - **Data continuity:** renaming the folder changes `lesson.json.id`, which breaks any existing student commits/progress under the old id. Acceptable in pre-launch state; flag if students are already enrolled.
 ```
 
@@ -199,12 +199,12 @@ Every `lessons/<slug>/` folder name (which is also `lesson.json.id`) MUST follow
 | Slug | Title | Type |
 |---|---|---|
 | `2-3-1-slides` | `2.3.1 Slides — Collections and Physics Applications` | slides |
-| `2-3-3-reading-groups` | `2.3.3 Reading — q5play docs: Groups` | reading |
-| `2-3-5-groups-sandbox` | `2.3.5 Groups Sandbox` | q5play (lesson) |
-| `2-3-11-a13-1-asteroid-field` | `2.3.11 A13.1 Asteroid Field` | q5play (assignment) |
-| `2-3-12-challenges` | `2.3.12 Challenges — Optional Stretch` | q5play (challenge) |
+| `2-3-3-reading-groups` | `2.3.3 Reading — shplay docs: Groups` | reading |
+| `2-3-5-groups-sandbox` | `2.3.5 Groups Sandbox` | shplay (lesson) |
+| `2-3-11-a13-1-asteroid-field` | `2.3.11 A13.1 Asteroid Field` | shplay (assignment) |
+| `2-3-12-challenges` | `2.3.12 Challenges — Optional Stretch` | shplay (challenge) |
 | `2-2-3a-reading-new-operator` | `2.2.3a Reading — The \`new\` operator` | reading (granularity insert under 2.2.3) |
-| `2-2-7b-lab-method-no-params` | `2.2.7b Lab — Method with no params` | q5play (lesson) (granularity insert under 2.2.7) |
+| `2-2-7b-lab-method-no-params` | `2.2.7b Lab — Method with no params` | shplay (lesson) (granularity insert under 2.2.7) |
 
 **For a graded artifact (`A<W>.<N>`)** include the artifact id in the descriptor (e.g. `a13-1-asteroid-field`, `a14-1-space-jumper`) so the slug self-documents its grading-system identity.
 
@@ -227,7 +227,7 @@ The optional `<letter>` suffix exists for **retroactive granularity inserts** �
 
 **Pedagogical attachment.** A sub-letter slug attaches conceptually to its integer parent: 2.2.3a, 2.2.3b, 2.2.3c are *expansions of the topic* that 2.2.3 introduces. They share teacher framing, vocabulary, and source material; they do not introduce a new top-level topic. If you find a sub-letter row introducing a topic unrelated to its parent, promote it to a fresh integer slot instead.
 
-**Numbered Lesson List shape.** Sub-letter rows appear in the Numbered Lesson List immediately after their integer parent, in alphabetical order, and the row's "Notes" column states "new" or names the trim/reposition relative to the parent. Example pattern is the canonical `2.2.1_classes-via-q5play.md` post-granularity revision.
+**Numbered Lesson List shape.** Sub-letter rows appear in the Numbered Lesson List immediately after their integer parent, in alphabetical order, and the row's "Notes" column states "new" or names the trim/reposition relative to the parent. Example pattern is the canonical `2.2.1_classes-via-shplay.md` post-granularity revision.
 
 **No code change required.** The parser at `lib/curriculum.ts:111` already accepts `[a-zA-Z]?` after the third dotted integer; sort is already `{ numeric: true }`. Adding sub-letter slugs needs no migration and no helper update.
 
@@ -259,5 +259,5 @@ When updating an existing spec for a build pass: §3.3 (Numbered Lesson List) is
 |------|------|
 | Pre-2.2 | Each sub-module spec ended with a "Build Outputs (what Builder AI generates)" section listing 3-5 markdown deliverables (assignment doc + video manifest + lesson metadata updates). The actual 2.2 build produced 12 numbered in-app lessons; the spec section never matched what shipped. |
 | Post-2.2 / unit-2.3 prep | Spec convention codified (this doc). Required: §3.3 Numbered Lesson List replacing the legacy Build Outputs section, §3.2 Reading content guidance per reading, §3.1 Description-hook column on videos, §3.4 Carry-over migration notes per pre-existing slug. Slug naming rule §4 made explicit (`<U>-<M>-<L>-<descriptor>`) and tied to the DB / `parseNumberedIdFromTitle` constraints. |
-| No-points + green-to-advance | The course is now mastery-based. §1 frontmatter `artifacts[]` shape dropped the `points: <n>` field. §2 Required Sections #13 (Assignments) reframed: rubrics must use pass-criteria language, not point columns. §3.4 migration example updated to require `passingScore` AND `totalPoints` AND every `requirements[].points` to be `0`. The convention violation list at §3.4 now treats any non-zero point value as a violation. See `q5play-lesson-conventions.md` for the canonical wording and the green-to-advance lesson-nav lock. |
-| Granularity for intro-level units | §2a added: "one new concept per lesson" rule for intro-level material. §2 Required Sections gained #17 Lab/Reading Specs (per-lesson detail) for intro units. §4 slug rule now permits an optional lowercase `<letter>` suffix for retroactive granularity inserts under shipped integer slots (§4.1). The 2.2 OOP unit was the first to apply the granularity bar retroactively — its 13 shipped lessons were preserved by slug, with 13 new sub-letter inserts (2.2.3a, 2.2.3b, 2.2.4a–d, 2.2.5, 2.2.5a, 2.2.7a–h, 2.2.8a–c, 2.2.10a, 2.2.12a) splitting the dense readings and the Enemy-class worked example into atomic concept lessons. See `2.2.1_classes-via-q5play.md` for the canonical example. |
+| No-points + green-to-advance | The course is now mastery-based. §1 frontmatter `artifacts[]` shape dropped the `points: <n>` field. §2 Required Sections #13 (Assignments) reframed: rubrics must use pass-criteria language, not point columns. §3.4 migration example updated to require `passingScore` AND `totalPoints` AND every `requirements[].points` to be `0`. The convention violation list at §3.4 now treats any non-zero point value as a violation. See `shplay-lesson-conventions.md` for the canonical wording and the green-to-advance lesson-nav lock. |
+| Granularity for intro-level units | §2a added: "one new concept per lesson" rule for intro-level material. §2 Required Sections gained #17 Lab/Reading Specs (per-lesson detail) for intro units. §4 slug rule now permits an optional lowercase `<letter>` suffix for retroactive granularity inserts under shipped integer slots (§4.1). The 2.2 OOP unit was the first to apply the granularity bar retroactively — its 13 shipped lessons were preserved by slug, with 13 new sub-letter inserts (2.2.3a, 2.2.3b, 2.2.4a–d, 2.2.5, 2.2.5a, 2.2.7a–h, 2.2.8a–c, 2.2.10a, 2.2.12a) splitting the dense readings and the Enemy-class worked example into atomic concept lessons. See `2.2.1_classes-via-shplay.md` for the canonical example. |

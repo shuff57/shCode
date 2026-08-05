@@ -28,11 +28,11 @@ function draw() {
 const SANDBOX_LESSON: Lesson = {
   id: 'sandbox',
   title: 'Sandbox',
-  description: 'A blank q5play canvas.',
+  description: 'A blank shPlay canvas.',
   difficulty: 'beginner',
   estimateMins: 0,
   unit: 'Sandbox',
-  preview: 'q5play',
+  preview: 'shplay',
   files: [
     {
       type: 'file',
@@ -224,7 +224,7 @@ export default function SandboxWorkspace() {
       <div className="sandbox-shell">
         <div className="sandbox-header">
           <h1 className="sandbox-title">Sandbox</h1>
-          <span className="sandbox-subtitle">A blank q5play canvas to try out ideas.</span>
+          <span className="sandbox-subtitle">A blank shPlay canvas to try out ideas.</span>
         </div>
         <div className="run-toolbar sandbox-toolbar">
           {isRunning ? (

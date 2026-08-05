@@ -2,18 +2,18 @@
   "lessons": [
     {
       "id": "2-1-1-slides",
-      "title": "2.1.1 Slides — q5play Foundations",
+      "title": "2.1.1 Slides — shplay Foundations",
       "unit": "2.1 Foundations",
       "preview": "slides",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
       "id": "2-1-1-video-intro",
-      "title": "2.1.1 Video — Your first q5play sketch",
+      "title": "2.1.1 Video — Your first shplay sketch",
       "unit": "2.1 Foundations",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -21,15 +21,15 @@
       "title": "2.1.10 Frame Loop Writeup",
       "unit": "2.1 Foundations",
       "preview": "assignment",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
       "id": "2-1-11-challenges",
       "title": "2.1.11 Challenges",
       "unit": "2.1 Foundations",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -37,7 +37,7 @@
       "title": "2.1.2 Reading — Frame loop: setup() and draw()",
       "unit": "2.1 Foundations",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -45,7 +45,7 @@
       "title": "2.1.3 Worked Example — Minimum Sprite Program",
       "unit": "2.1 Foundations",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -53,7 +53,7 @@
       "title": "2.1.3a Reading — Canvas: new Canvas(w, h)",
       "unit": "2.1 Foundations",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -61,15 +61,15 @@
       "title": "2.1.3b Reading — Sprite: new Sprite(x, y, w, h) + .color",
       "unit": "2.1 Foundations",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
       "id": "2-1-3c-lab-one-sprite",
       "title": "2.1.3c Lab — Drop one sprite, change its color",
       "unit": "2.1 Foundations",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -77,7 +77,7 @@
       "title": "2.1.3d Reading — Storing the sprite in a let variable",
       "unit": "2.1 Foundations",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -85,7 +85,7 @@
       "title": "2.1.3e Reading — background(color) wipe rule",
       "unit": "2.1 Foundations",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -93,7 +93,7 @@
       "title": "2.1.3f Reading — Sprite property tour: pos, rotation, layer",
       "unit": "2.1 Foundations",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -101,7 +101,7 @@
       "title": "2.1.5 Video — The Frame Loop Explained",
       "unit": "2.1 Foundations",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -109,7 +109,7 @@
       "title": "2.1.6 Reading — kb.pressing(key)",
       "unit": "2.1 Foundations",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -117,7 +117,7 @@
       "title": "2.1.7 Worked Example — Keyboard Movement",
       "unit": "2.1 Foundations",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -125,7 +125,7 @@
       "title": "2.1.7a Reading — Velocity: vel.x and vel.y",
       "unit": "2.1 Foundations",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -133,7 +133,7 @@
       "title": "2.1.7b Reading — Movement pattern (if / else if / else)",
       "unit": "2.1 Foundations",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -141,15 +141,15 @@
       "title": "2.1.7c Reading — The else-to-zero rule",
       "unit": "2.1 Foundations",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
       "id": "2-1-7d-lab-else-to-zero",
       "title": "2.1.7d Lab — Delete the else, watch drift",
       "unit": "2.1 Foundations",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -157,15 +157,15 @@
       "title": "2.1.7e Reading — WASD-not-arrows",
       "unit": "2.1 Foundations",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
       "id": "2-1-9-a10-1-sprite-playground",
       "title": "2.1.9 Sprite Playground",
       "unit": "2.1 Foundations",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -173,7 +173,7 @@
       "title": "2.2.1 Slides — Object-Oriented Programming",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "slides",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -181,7 +181,7 @@
       "title": "2.2.10 Worked Example — Procedural vs OOP side-by-side",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -189,15 +189,15 @@
       "title": "2.2.10a Reading — When to reach for OOP (3-question checklist)",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "2-2-11-a12-1-collectible",
       "title": "2.2.11 Collectible Class",
       "unit": "2.2 Object-Oriented Programming",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -205,7 +205,7 @@
       "title": "2.2.12 Procedural vs OOP Writeup",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "assignment",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -213,15 +213,15 @@
       "title": "2.2.12a Reading — Encapsulation, inheritance, polymorphism (vocabulary only)",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "2-2-13-challenges",
       "title": "2.2.13 Challenges",
       "unit": "2.2 Object-Oriented Programming",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -229,7 +229,7 @@
       "title": "2.2.2 Video — What `new Sprite()` actually does",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -237,7 +237,7 @@
       "title": "2.2.3 Reading — Class and instance",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -245,7 +245,7 @@
       "title": "2.2.3a Reading — The `new` operator",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -253,7 +253,7 @@
       "title": "2.2.3b Reading — `constructor` and its parameters",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -261,7 +261,7 @@
       "title": "2.2.4 Worked Example — You've been using classes",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -269,31 +269,31 @@
       "title": "2.2.4a Reading — Properties: data on `this`",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "2-2-4b-lab-read-property",
       "title": "2.2.4b Lab — Read a property",
       "unit": "2.2 Object-Oriented Programming",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "2-2-4c-lab-write-property",
       "title": "2.2.4c Lab — Write a property",
       "unit": "2.2 Object-Oriented Programming",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "2-2-4d-lab-two-instances",
       "title": "2.2.4d Lab — Two sprites, two property values",
       "unit": "2.2 Object-Oriented Programming",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -301,7 +301,7 @@
       "title": "2.2.5 Reading — `this` is a noun",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -309,15 +309,15 @@
       "title": "2.2.5a Worked Example — `this` is a pronoun",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "2-2-6-lab-build-sprite",
       "title": "2.2.6 Your Turn — Build a Sprite",
       "unit": "2.2 Object-Oriented Programming",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -325,7 +325,7 @@
       "title": "2.2.7 Video — The `this` keyword",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -333,39 +333,39 @@
       "title": "2.2.7a Reading — Methods: functions that live on a class",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "2-2-7b-lab-method-no-params",
       "title": "2.2.7b Lab — Method with no params",
       "unit": "2.2 Object-Oriented Programming",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "2-2-7c-lab-method-with-params",
       "title": "2.2.7c Lab — Method with parameters",
       "unit": "2.2 Object-Oriented Programming",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "2-2-7d-lab-method-returns",
       "title": "2.2.7d Lab — Method that returns a value",
       "unit": "2.2 Object-Oriented Programming",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "2-2-7e-lab-method-calls-method",
       "title": "2.2.7e Lab — A method calling `this.otherMethod()`",
       "unit": "2.2 Object-Oriented Programming",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -373,23 +373,23 @@
       "title": "2.2.7f Reading — Why `this.sprite`, not `extends Sprite`",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "2-2-7g-lab-mutate-sprite-prop",
       "title": "2.2.7g Lab — Mutate `this.sprite.x` from a method",
       "unit": "2.2 Object-Oriented Programming",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "2-2-7h-lab-cleanup",
       "title": "2.2.7h Lab — Cleanup with `this.sprite.delete()`",
       "unit": "2.2 Object-Oriented Programming",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -397,31 +397,31 @@
       "title": "2.2.8 Worked Example — Write an Enemy class (integration)",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "2-2-8a-lab-three-vars",
       "title": "2.2.8a Lab — Three Enemies in three variables",
       "unit": "2.2 Object-Oriented Programming",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "2-2-8b-lab-array-of-instances",
       "title": "2.2.8b Lab — An array of Enemies",
       "unit": "2.2 Object-Oriented Programming",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "2-2-8c-lab-loop-instances",
       "title": "2.2.8c Lab — Loop over an array of instances",
       "unit": "2.2 Object-Oriented Programming",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -429,7 +429,7 @@
       "title": "2.2.9 Reading — Parallel Arrays vs Classes",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
@@ -437,7 +437,7 @@
       "title": "2.3.1 Slides — Collections and Physics Applications",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "slides",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
@@ -445,23 +445,23 @@
       "title": "2.3.10 Worked Example — Safe Despawn",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
       "id": "2-3-11-a13-1-asteroid-field",
       "title": "2.3.11 A13.1 Asteroid Field",
       "unit": "2.3 Collections and Physics Applications",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
       "id": "2-3-12-challenges",
       "title": "2.3.12 Challenges",
       "unit": "2.3 Collections and Physics Applications",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
@@ -469,15 +469,15 @@
       "title": "2.3.13 Video — kb.presses vs kb.pressing",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
     {
       "id": "2-3-14-reading-input-edges",
-      "title": "2.3.14 Reading — q5play docs: Input edges",
+      "title": "2.3.14 Reading — shplay docs: Input edges",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
     {
@@ -485,7 +485,7 @@
       "title": "2.3.15 Worked Example — Edge-triggered Input",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
     {
@@ -493,15 +493,15 @@
       "title": "2.3.16 Video — Why your jump feels wrong",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
     {
       "id": "2-3-17-reading-touching",
-      "title": "2.3.17 Reading — q5play docs: Colliding + Ground Detection",
+      "title": "2.3.17 Reading — shplay docs: Colliding + Ground Detection",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
     {
@@ -509,7 +509,7 @@
       "title": "2.3.18 Worked Example — Ground Detection",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
     {
@@ -517,39 +517,39 @@
       "title": "2.3.19 Worked Example — Swinging Pendulum",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
     {
       "id": "2-3-2-video-groups-intro",
-      "title": "2.3.2 Video — Groups in q5play",
+      "title": "2.3.2 Video — Groups in shplay",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
       "id": "2-3-20-a14-1-space-jumper",
       "title": "2.3.20 A14.1 Space Jumper",
       "unit": "2.3 Collections and Physics Applications",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
     {
       "id": "2-3-21-a14-1-car-ramp",
       "title": "2.3.21 A14.1 Car on a Ramp",
       "unit": "2.3 Collections and Physics Applications",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
     {
       "id": "2-3-3-reading-groups",
-      "title": "2.3.3 Reading — q5play docs: Groups",
+      "title": "2.3.3 Reading — shplay docs: Groups",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
@@ -557,15 +557,15 @@
       "title": "2.3.4 Worked Example — Iterating a Group",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
       "id": "2-3-5-groups-sandbox",
       "title": "2.3.5 Groups Sandbox",
       "unit": "2.3 Collections and Physics Applications",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
@@ -573,7 +573,7 @@
       "title": "2.3.6 Video — overlaps() boolean vs callback",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
@@ -581,15 +581,15 @@
       "title": "2.3.7 Worked Example — Apple Catcher",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
       "id": "2-3-8-reading-collisions",
-      "title": "2.3.8 Reading — q5play docs: Collisions + Overlaps",
+      "title": "2.3.8 Reading — shplay docs: Collisions + Overlaps",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
@@ -597,7 +597,7 @@
       "title": "2.3.9 Video — The remove-during-iteration bug",
       "unit": "2.3 Collections and Physics Applications",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
@@ -605,39 +605,39 @@
       "title": "2.4.1 Slides — Animation & Camera",
       "unit": "2.4 Animation & Camera",
       "preview": "slides",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
       "id": "2-4-10-a15-1-platformer",
       "title": "2.4.10 A15.1 Side-Scrolling Platformer",
       "unit": "2.4 Animation & Camera",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
       "id": "2-4-11-challenges",
       "title": "2.4.11 Challenges",
       "unit": "2.4 Animation & Camera",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
       "id": "2-4-2-video-animating-sprite",
-      "title": "2.4.2 Video — Animating a sprite in q5play",
+      "title": "2.4.2 Video — Animating a sprite in shplay",
       "unit": "2.4 Animation & Camera",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
       "id": "2-4-3-reading-animation",
-      "title": "2.4.3 Reading — q5play docs: Animation",
+      "title": "2.4.3 Reading — shplay docs: Animation",
       "unit": "2.4 Animation & Camera",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
@@ -645,7 +645,7 @@
       "title": "2.4.3a Reading — addAni(name, frames)",
       "unit": "2.4 Animation & Camera",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
@@ -653,7 +653,7 @@
       "title": "2.4.3b Reading — changeAni(name)",
       "unit": "2.4 Animation & Camera",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
@@ -661,7 +661,7 @@
       "title": "2.4.3c Reading — frameDelay (cycle speed)",
       "unit": "2.4 Animation & Camera",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
@@ -669,7 +669,7 @@
       "title": "2.4.3d Reading — sprite.image (single-frame art)",
       "unit": "2.4 Animation & Camera",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
@@ -677,15 +677,15 @@
       "title": "2.4.4 Worked Example — Animating a Sprite",
       "unit": "2.4 Animation & Camera",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
       "id": "2-4-5-animated-sprites-sandbox",
       "title": "2.4.5 Animated Sprites Sandbox",
       "unit": "2.4 Animation & Camera",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
@@ -693,15 +693,15 @@
       "title": "2.4.6 Video — Camera follow explained with a flashlight",
       "unit": "2.4 Animation & Camera",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
       "id": "2-4-7-reading-camera",
-      "title": "2.4.7 Reading — q5play docs: Camera",
+      "title": "2.4.7 Reading — shplay docs: Camera",
       "unit": "2.4 Animation & Camera",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
@@ -709,7 +709,7 @@
       "title": "2.4.7a Reading — camera.x / camera.y",
       "unit": "2.4 Animation & Camera",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
@@ -717,7 +717,7 @@
       "title": "2.4.7b Reading — Camera-follow pattern",
       "unit": "2.4 Animation & Camera",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
@@ -725,7 +725,7 @@
       "title": "2.4.7c Reading — Smoothing with lerp",
       "unit": "2.4 Animation & Camera",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
@@ -733,7 +733,7 @@
       "title": "2.4.7d Reading — sprite.layer (render order)",
       "unit": "2.4 Animation & Camera",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
@@ -741,7 +741,7 @@
       "title": "2.4.8 Worked Example — Camera Follow",
       "unit": "2.4 Animation & Camera",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
@@ -749,7 +749,7 @@
       "title": "2.4.9 Worked Example — Smooth Camera with lerp",
       "unit": "2.4 Animation & Camera",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
@@ -757,15 +757,15 @@
       "title": "2.5.1 Slides — Your Game Forgets: The Problem",
       "unit": "2.5 Game Saves",
       "preview": "slides",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
       "id": "2-5-10-reading-store-structured",
-      "title": "2.5.10 Reading — q5play docs: Storing Structured Data",
+      "title": "2.5.10 Reading — shplay docs: Storing Structured Data",
       "unit": "2.5 Game Saves",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -773,7 +773,7 @@
       "title": "2.5.11 Worked Example — Save Full Player State",
       "unit": "2.5 Game Saves",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -781,15 +781,15 @@
       "title": "2.5.12 Worked Example — Restore Full Player State from a Save",
       "unit": "2.5 Game Saves",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
       "id": "2-5-13-reading-loadjson-async",
-      "title": "2.5.13 Reading — q5play docs: loadJSON is Async",
+      "title": "2.5.13 Reading — shplay docs: loadJSON is Async",
       "unit": "2.5 Game Saves",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -797,15 +797,15 @@
       "title": "2.5.14 Video — Save Slots: Multiple Save Files",
       "unit": "2.5 Game Saves",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
       "id": "2-5-15-reading-removeitem-clearstorage",
-      "title": "2.5.15 Reading — q5play docs: removeItem and clearStorage",
+      "title": "2.5.15 Reading — shplay docs: removeItem and clearStorage",
       "unit": "2.5 Game Saves",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -813,7 +813,7 @@
       "title": "2.5.16 Worked Example — Three Save Slots",
       "unit": "2.5 Game Saves",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -821,7 +821,7 @@
       "title": "2.5.17 Worked Example — Delete and Overwrite a Save Slot",
       "unit": "2.5 Game Saves",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -829,7 +829,7 @@
       "title": "2.5.18 Video — New Game or Continue?",
       "unit": "2.5 Game Saves",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -837,7 +837,7 @@
       "title": "2.5.19 Worked Example — Title Screen Detects Existing Saves",
       "unit": "2.5 Game Saves",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -845,7 +845,7 @@
       "title": "2.5.2 Video — Memory: What Stays, What Disappears",
       "unit": "2.5 Game Saves",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -853,7 +853,7 @@
       "title": "2.5.20 Worked Example — Confirm Before Overwriting a Save",
       "unit": "2.5 Game Saves",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -861,7 +861,7 @@
       "title": "2.5.21 Video — Your Game, Automatically Saved",
       "unit": "2.5 Game Saves",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -869,7 +869,7 @@
       "title": "2.5.22 Reading — Checkpoint Saves: Save on Milestones",
       "unit": "2.5 Game Saves",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -877,23 +877,23 @@
       "title": "2.5.23 Worked Example — Auto-Save on Level Complete or Timer",
       "unit": "2.5 Game Saves",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
       "id": "2-5-24-a16-1-save-system",
       "title": "2.5.24 A16.1 Save System — Build Save/Load with Slots",
       "unit": "2.5 Game Saves",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
       "id": "2-5-25-challenges",
       "title": "2.5.25 Challenges — Extended Save Features",
       "unit": "2.5 Game Saves",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -901,7 +901,7 @@
       "title": "2.5.3 Reading — storeItem: Save Game Data",
       "unit": "2.5 Game Saves",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -909,7 +909,7 @@
       "title": "2.5.4 Worked Example — Save a High Score on Game Over",
       "unit": "2.5 Game Saves",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -917,7 +917,7 @@
       "title": "2.5.5 Reading — getItem: Load Saved Data",
       "unit": "2.5 Game Saves",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -925,7 +925,7 @@
       "title": "2.5.5a Reading — getItem Returns a String",
       "unit": "2.5 Game Saves",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -933,7 +933,7 @@
       "title": "2.5.6 Worked Example — Load and Display a High Score",
       "unit": "2.5 Game Saves",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -941,23 +941,23 @@
       "title": "2.5.7 Video — More Than a Number: Saving Your Whole Game",
       "unit": "2.5 Game Saves",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
       "id": "2-5-8-reading-json-stringify",
-      "title": "2.5.8 Reading — q5play docs: JSON.stringify(obj)",
+      "title": "2.5.8 Reading — shplay docs: JSON.stringify(obj)",
       "unit": "2.5 Game Saves",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
       "id": "2-5-9-reading-json-parse",
-      "title": "2.5.9 Reading — q5play docs: JSON.parse(str)",
+      "title": "2.5.9 Reading — shplay docs: JSON.parse(str)",
       "unit": "2.5 Game Saves",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
@@ -965,7 +965,7 @@
       "title": "2.6.1 Slides — One Game, Many Screens",
       "unit": "2.6 Game States",
       "preview": "slides",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -973,7 +973,7 @@
       "title": "2.6.10 Video — Building a Title Screen",
       "unit": "2.6 Game States",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -981,7 +981,7 @@
       "title": "2.6.11 Worked Example — Title Screen with Start Button",
       "unit": "2.6 Game States",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -989,7 +989,7 @@
       "title": "2.6.12 Video — Game Over and Restart",
       "unit": "2.6 Game States",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -997,15 +997,15 @@
       "title": "2.6.13 Worked Example — Three-State Machine: Title, Play, Game Over",
       "unit": "2.6 Game States",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-6-14-reading-transitions-input",
-      "title": "2.6.14 Reading — q5play docs: Input-Driven Transitions",
+      "title": "2.6.14 Reading — shplay docs: Input-Driven Transitions",
       "unit": "2.6 Game States",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1013,15 +1013,15 @@
       "title": "2.6.15 Worked Example — Keyboard-Driven State Changes",
       "unit": "2.6 Game States",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-6-16-reading-transitions-condition",
-      "title": "2.6.16 Reading — q5play docs: Condition-Driven Transitions",
+      "title": "2.6.16 Reading — shplay docs: Condition-Driven Transitions",
       "unit": "2.6 Game States",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1029,7 +1029,7 @@
       "title": "2.6.17 Worked Example — Score Threshold Triggers Game Over",
       "unit": "2.6 Game States",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1037,7 +1037,7 @@
       "title": "2.6.18 Video — More States: Pause, Inventory, Settings",
       "unit": "2.6 Game States",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1045,7 +1045,7 @@
       "title": "2.6.19 Worked Example — Adding a Pause State",
       "unit": "2.6 Game States",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1053,7 +1053,7 @@
       "title": "2.6.2 Video — State Machines in Games",
       "unit": "2.6 Game States",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1061,7 +1061,7 @@
       "title": "2.6.20 Worked Example — Win Screen State",
       "unit": "2.6 Game States",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1069,7 +1069,7 @@
       "title": "2.6.21 Video — States Decide When to Save",
       "unit": "2.6 Game States",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1077,7 +1077,7 @@
       "title": "2.6.22 Worked Example — Save on State Transition",
       "unit": "2.6 Game States",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1085,23 +1085,23 @@
       "title": "2.6.23 Worked Example — Continue Loads the Correct State",
       "unit": "2.6 Game States",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-6-24-a16-2-game-states",
       "title": "2.6.24 A16.2 Game States — State Machine with Persistence",
       "unit": "2.6 Game States",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-6-25-challenges",
       "title": "2.6.25 Challenges — Extended State Features",
       "unit": "2.6 Game States",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1109,7 +1109,7 @@
       "title": "2.6.26 Video — What's Next: Looking Ahead to Unit 3",
       "unit": "2.6 Game States",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1117,15 +1117,15 @@
       "title": "2.6.3 Reading — MDN: The switch Statement",
       "unit": "2.6 Game States",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-6-4-reading-switch-dispatch",
-      "title": "2.6.4 Reading — q5play docs: switch in draw()",
+      "title": "2.6.4 Reading — shplay docs: switch in draw()",
       "unit": "2.6 Game States",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1133,7 +1133,7 @@
       "title": "2.6.5 Worked Example — switch with Three Cases",
       "unit": "2.6 Game States",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1141,15 +1141,15 @@
       "title": "2.6.6 Reading — break and default in switch",
       "unit": "2.6 Game States",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-6-7-reading-state-variable",
-      "title": "2.6.7 Reading — q5play docs: The state Variable",
+      "title": "2.6.7 Reading — shplay docs: The state Variable",
       "unit": "2.6 Game States",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1157,7 +1157,7 @@
       "title": "2.6.8 Worked Example — One Variable, Many Screens",
       "unit": "2.6 Game States",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1165,7 +1165,7 @@
       "title": "2.6.9 Reading — Naming States: Conventions",
       "unit": "2.6 Game States",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1173,7 +1173,7 @@
       "title": "2.7.1 Slides — Advanced Mechanics: One Last Toolkit",
       "unit": "2.7 Advanced Mechanics",
       "preview": "slides",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1181,23 +1181,23 @@
       "title": "2.7.10 Worked Example — Drag a Sprite Around",
       "unit": "2.7 Advanced Mechanics",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-7-11-video-joints-intro",
-      "title": "2.7.11 Video — Joints in q5play",
+      "title": "2.7.11 Video — Joints in shplay",
       "unit": "2.7 Advanced Mechanics",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-7-12-reading-distance-joint",
-      "title": "2.7.12 Reading — q5play docs: DistanceJoint",
+      "title": "2.7.12 Reading — shplay docs: DistanceJoint",
       "unit": "2.7 Advanced Mechanics",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1205,15 +1205,15 @@
       "title": "2.7.13 Worked Example — Pendulum with DistanceJoint",
       "unit": "2.7 Advanced Mechanics",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-7-14-reading-hinge-joint",
-      "title": "2.7.14 Reading — q5play docs: HingeJoint",
+      "title": "2.7.14 Reading — shplay docs: HingeJoint",
       "unit": "2.7 Advanced Mechanics",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1221,23 +1221,23 @@
       "title": "2.7.15 Worked Example — Rotating Arm with HingeJoint",
       "unit": "2.7 Advanced Mechanics",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-7-16-reading-joint-delete",
-      "title": "2.7.16 Reading — q5play docs: joint.delete()",
+      "title": "2.7.16 Reading — shplay docs: joint.delete()",
       "unit": "2.7 Advanced Mechanics",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-7-17-reading-applyforce",
-      "title": "2.7.17 Reading — q5play docs: applyForce(fx, fy)",
+      "title": "2.7.17 Reading — shplay docs: applyForce(fx, fy)",
       "unit": "2.7 Advanced Mechanics",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1245,7 +1245,7 @@
       "title": "2.7.18 Reading — Vector from A to B",
       "unit": "2.7 Advanced Mechanics",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1253,7 +1253,7 @@
       "title": "2.7.19 Worked Example — Launch a Sprite with applyForce",
       "unit": "2.7 Advanced Mechanics",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1261,7 +1261,7 @@
       "title": "2.7.2 Video — Why Mechanics Matter for the Capstone",
       "unit": "2.7 Advanced Mechanics",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1269,7 +1269,7 @@
       "title": "2.7.20 Video — The Slingshot Pattern",
       "unit": "2.7 Advanced Mechanics",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1277,7 +1277,7 @@
       "title": "2.7.21 Worked Example — Slingshot End-to-End",
       "unit": "2.7 Advanced Mechanics",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1285,7 +1285,7 @@
       "title": "2.7.22 Video — Two-Player Local Input",
       "unit": "2.7 Advanced Mechanics",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1293,15 +1293,15 @@
       "title": "2.7.23 Reading — Two Key Schemes, Independent State",
       "unit": "2.7 Advanced Mechanics",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-7-24-reading-bounciness",
-      "title": "2.7.24 Reading — q5play docs: sprite.bounciness",
+      "title": "2.7.24 Reading — shplay docs: sprite.bounciness",
       "unit": "2.7 Advanced Mechanics",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1309,7 +1309,7 @@
       "title": "2.7.24a Worked Example — Bounciness Comparison",
       "unit": "2.7 Advanced Mechanics",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1317,23 +1317,23 @@
       "title": "2.7.25 Worked Example — Two Paddles, Two Schemes",
       "unit": "2.7 Advanced Mechanics",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-7-26-a17-1-pong-sumo",
       "title": "2.7.26 A17.1 Two-Player Pong-Sumo",
       "unit": "2.7 Advanced Mechanics",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-7-27-challenges",
       "title": "2.7.27 Challenges — SliderJoint, Trebuchet, Swinging Rope",
       "unit": "2.7 Advanced Mechanics",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1341,31 +1341,31 @@
       "title": "2.7.28 Video — Wrap and Capstone Preview",
       "unit": "2.7 Advanced Mechanics",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-7-3-reading-mouse-pos",
-      "title": "2.7.3 Reading — q5play docs: mouse.x and mouse.y",
+      "title": "2.7.3 Reading — shplay docs: mouse.x and mouse.y",
       "unit": "2.7 Advanced Mechanics",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-7-4-reading-mouse-pressing",
-      "title": "2.7.4 Reading — q5play docs: mouse.pressing()",
+      "title": "2.7.4 Reading — shplay docs: mouse.pressing()",
       "unit": "2.7 Advanced Mechanics",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "2-7-5-reading-mouse-presses",
-      "title": "2.7.5 Reading — q5play docs: mouse.presses()",
+      "title": "2.7.5 Reading — shplay docs: mouse.presses()",
       "unit": "2.7 Advanced Mechanics",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1373,7 +1373,7 @@
       "title": "2.7.6 Reading — Hit-Testing a Sprite with the Mouse",
       "unit": "2.7 Advanced Mechanics",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1381,7 +1381,7 @@
       "title": "2.7.7 Worked Example — Click to Spawn a Sprite",
       "unit": "2.7 Advanced Mechanics",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1389,7 +1389,7 @@
       "title": "2.7.8 Video — Drag and Release",
       "unit": "2.7 Advanced Mechanics",
       "preview": "video",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1397,7 +1397,7 @@
       "title": "2.7.9 Reading — Snap a Sprite to the Cursor",
       "unit": "2.7 Advanced Mechanics",
       "preview": "reading",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
@@ -1532,32 +1532,32 @@
       "id": "q5play-bounce",
       "title": "5.2.1 Bouncy Ball",
       "unit": "5.2 Physics Feel",
-      "preview": "q5play",
-      "category": "Unit 5: q5play — Game Physics",
+      "preview": "shplay",
+      "category": "Unit 5: shplay — Game Physics",
       "week": 14
     },
     {
       "id": "q5play-gravity",
       "title": "5.1.3 Falling Block — Example",
       "unit": "5.1 Sprites & Movement",
-      "preview": "q5play",
-      "category": "Unit 5: q5play — Game Physics",
+      "preview": "shplay",
+      "category": "Unit 5: shplay — Game Physics",
       "week": 13
     },
     {
       "id": "q5play-intro",
       "title": "2.1.5 Hello Sprite",
       "unit": "2.1 Foundations",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
       "id": "q5play-move-keys",
       "title": "2.1.9 Make it Move",
       "unit": "2.1 Foundations",
-      "preview": "q5play",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
     {
@@ -1565,7 +1565,7 @@
       "title": "2.2.6a Worked Example — Sprite Showcase",
       "unit": "2.2 Object-Oriented Programming",
       "preview": "example",
-      "category": "Unit 2: q5play — Applied Game Development",
+      "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {

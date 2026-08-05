@@ -1,6 +1,6 @@
 # shCode — project notes for Claude
 
-A Next.js 15 (app router, `output: 'export'`) classroom app for a JavaScript + q5play
+A Next.js 15 (app router, `output: 'export'`) classroom app for a JavaScript + shplay
 high-school CS course. Static site served from Cloudflare Pages; every `/api/*`
 route is a Pages Function in `functions/`, backed by a single D1 database
 (`shcode-commits`, binding `DB`).
@@ -88,7 +88,7 @@ Paths follow filenames under `functions/api/`.
 - `GET /api/lesson-state` — bulk per-student
 - `GET/PUT/DELETE /api/lesson-state/[lessonId]`
 - `POST /api/grade-written` — Ollama-backed essay grader
-- `POST /api/ai-help` — streaming Socratic-tutor help; pulls keyword-matched q5play docs into the prompt. Per-student per-unit daily quota (`AI_HELP_DAILY_LIMIT`, default 10); teachers/admins exempt. Output is streamed `text/plain` with code blocks trimmed to ≤3 lines so a successful jailbreak still can't deliver a copy-pasteable solution. `X-RateLimit-Limit` / `X-RateLimit-Remaining` headers expose remaining quota.
+- `POST /api/ai-help` — streaming Socratic-tutor help; pulls keyword-matched shplay docs into the prompt. Per-student per-unit daily quota (`AI_HELP_DAILY_LIMIT`, default 10); teachers/admins exempt. Output is streamed `text/plain` with code blocks trimmed to ≤3 lines so a successful jailbreak still can't deliver a copy-pasteable solution. `X-RateLimit-Limit` / `X-RateLimit-Remaining` headers expose remaining quota.
 
 ### Commits (student's own)
 - `GET  /api/commits?lessonId=X` — own history

@@ -11,7 +11,7 @@
 
 **Try it:**
 
-A single static `star` sprite using `sprite.image` with the q5play `star.webp` asset. There's no `addAni`, no frame cycle — just one image rendered every frame.
+A single static `star` sprite using `sprite.image` with the shplay `star.webp` asset. There's no `addAni`, no frame cycle — just one image rendered every frame.
 
 ```js live
 let star;
@@ -21,7 +21,7 @@ function setup() {
   star = new Sprite(200, 100, 80, 80);
   star.collider = 'none';
   // Single still image — no animation system involved.
-  star.image = '/q5play/assets/star.webp';
+  star.image = '/shplay/assets/star.webp';
 }
 
 function draw() {

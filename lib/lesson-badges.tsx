@@ -40,7 +40,7 @@ export const PREVIEW_BADGES: Record<string, PreviewBadge> = {
   challenge:  makeBadge(Star,         'Challenge',      '#f1fa8c'),
   assignment: makeBadge(PenSquare,    'Assignment',     '#50fa7b'),
   slides:     makeBadge(Presentation, 'Slides',         '#bd93f9'),
-  q5play:     makeBadge(Play,         'Q5 Lesson',      '#ff79c6'),
+  shplay:     makeBadge(Play,         'shPlay Lesson',  '#ff79c6'),
   console:    makeBadge(Terminal,     'Console',        '#50fa7b'),
   jscad:      makeBadge(Box,          'JSCAD',          '#ffb86c'),
   html:       makeBadge(Globe,        'HTML',           '#8be9fd'),
@@ -56,7 +56,7 @@ export function badgeFor(preview: string | undefined): PreviewBadge {
 /**
  * Derive the badge from a lesson's type + preview.
  * Type wins when it maps to a known badge (challenge / assignment),
- * so a q5play-runnable can still display as "Challenge" or "Assignment".
+ * so a shplay-runnable can still display as "Challenge" or "Assignment".
  */
 export function badgeForLesson(opts: { type?: string; preview?: string }): PreviewBadge {
   const typeBadge = opts.type ? PREVIEW_BADGES[opts.type] : undefined;

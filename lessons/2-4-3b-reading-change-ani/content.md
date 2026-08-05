@@ -23,8 +23,8 @@ function setup() {
 
   // Register two named animations from separate sprite sheets.
   // Because 'idle' is the FIRST addAni call, it becomes the active animation.
-  ghost.addAni('idle', '/q5play/assets/ghost_idle.avif', 7);
-  ghost.addAni('fly',  '/q5play/assets/ghost_fly.avif',  4);
+  ghost.addAni('idle', '/shplay/assets/ghost_idle.avif', 7);
+  ghost.addAni('fly',  '/shplay/assets/ghost_fly.avif',  4);
 }
 
 function draw() {

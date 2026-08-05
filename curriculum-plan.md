@@ -1,5 +1,5 @@
 # CSCI 4 — Introduction to Programming Concepts and Methodologies
-## Curriculum Plan: JavaScript + q5play + JSCAD 3D Modeling
+## Curriculum Plan: JavaScript + shplay + JSCAD 3D Modeling
 ### Chico USD / Butte College Dual Enrollment | High School Juniors
 
 ---
@@ -9,7 +9,7 @@
 - **Language:** JavaScript (ES6+)
 - **Primary Environments:**
   - Browser DevTools console (Q1 JavaScript fundamentals)
-  - q5play in-app editor (Q2 applied game development) — no install required
+  - shplay in-app editor (Q2 applied game development) — no install required
   - JSCAD browser app (https://jscad.app/) (Q3–Q4 3D modeling) — no install required
 - **Students:** High school juniors, little to no prior coding experience
 - **Contact Hours:** 3.5 hours/week × 36 weeks = 126 total contact hours
@@ -28,16 +28,16 @@ Each SLO must be covered by at least one graded assignment.
 | SLO 1 | Describe the software development life-cycle | W1 lecture + A1.1 written | W18 Game Capstone + W36 3D Capstone reflection |
 | SLO 2 | Describe principles of structured programming | W12 OOP + A12.2 written | W6–7 functions + W31 JSCAD modules |
 | SLO 3 | Describe, design, implement, and test structured programs | W18 Game Capstone + W36 3D Capstone | W9 Q1 mini-project |
-| SLO 4 | Explain what an algorithm is and its importance | W5 algorithms + A5.1 written | W30 sort/search + q5play collision logic (W13) |
+| SLO 4 | Explain what an algorithm is and its importance | W5 algorithms + A5.1 written | W30 sort/search + shplay collision logic (W13) |
 
 ### SLO Alignment Across Quarters
 
 A term-by-term view of how each SLO is introduced, reinforced, and assessed. **Bold** cells are the primary artifacts retained for dual-enrollment documentation.
 
-| SLO | Q1 (W1–9) Console Fundamentals | Q2 (W10–18) q5play Game Dev | Q3 (W19–27) JSCAD Foundations | Q4 (W28–36) Advanced JSCAD + Capstone |
+| SLO | Q1 (W1–9) Console Fundamentals | Q2 (W10–18) shplay Game Dev | Q3 (W19–27) JSCAD Foundations | Q4 (W28–36) Advanced JSCAD + Capstone |
 |-----|-------------------------------|------------------------------|-------------------------------|----------------------------------------|
 | **SLO 1** — SDLC | W1 lecture + **A1.1 written** (intro) | W18 Game Capstone design/build/test/reflect cycle (A18.1) | W24 first-print lifecycle observation | W33–36 full capstone lifecycle + **A36.2 closing reflection** |
-| **SLO 2** — Structured programming | W3 coding conventions; W6 functions; W7 pass-by-value/reference (A7.2) | **W12 OOP via q5play + A12.2 written (primary artifact)**; W16 game-state machines | W19 libraries; W22 parameters as function args | W31 multi-file module design |
+| **SLO 2** — Structured programming | W3 coding conventions; W6 functions; W7 pass-by-value/reference (A7.2) | **W12 OOP via shplay + A12.2 written (primary artifact)**; W16 game-state machines | W19 libraries; W22 parameters as function args | W31 multi-file module design |
 | **SLO 3** — Design / implement / test | W9 Print Job Manager with manual tests (A9.1) | **W18 Game Capstone (A18.1 — primary Sem 1 evidence)**: design doc + code + testing log + reflection | W26 error handling (A26.1); W27 testing principles (A27.1) | **W36 3D Capstone (A36.1 — primary Sem 2 evidence)**: spec → build → test → print → present |
 | **SLO 4** — Algorithms | W5 algorithm definition + **A5.1 written** (intro) | W13 collision detection as algorithm; W14 physics tuning | W23 loops generating geometry | **W30 Sort/Search on part data (A30.1 — primary applied evidence)** |
 
@@ -52,7 +52,7 @@ Each graded artifact that anchors an SLO appears at least twice (primary + backu
 | A7.2 | SLO 2, pass-by-ref | Written artifact |
 | A9.1 | SLO 3 | Sem 1 mini-project (console) |
 | A12.2 | SLO 2, OOP vs procedural | **Primary written artifact** |
-| A16.1 | SLO 3, File I/O | Persistent storage (q5play) |
+| A16.1 | SLO 3, File I/O | Persistent storage (shplay) |
 | A18.1 | SLO 1, SLO 2, SLO 3 | **Primary Sem 1 capstone evidence** |
 | A26.1 | Topic: Error handling | Primary lab |
 | A27.1 | Topic: Testing principles | Primary lab |
@@ -67,14 +67,14 @@ Each graded artifact that anchors an SLO appears at least twice (primary + backu
 |-------|-------|----------------|
 | Software life-cycle | 1, 18, 36 | Written + discussion + capstone reflection |
 | Procedural vs OOP | 12 | Code + written comparison |
-| Program design tools & environments | 1–2, 10, 19 | Lab setup + reflection (console, q5play, JSCAD) |
+| Program design tools & environments | 1–2, 10, 19 | Lab setup + reflection (console, shplay, JSCAD) |
 | Documentation | Throughout (formal: W3, W12, W19) | Inline comments + READMEs |
 | Coding conventions | 3 (formal), enforced throughout | Code review rubric |
 | Data types, variables, expressions, sequential processing | 2–3 | Exercises + quiz |
-| Arrays | 8 (intro), 13 (q5play Groups), 23 (JSCAD parametric) | Exercises + applied modeling |
-| Control structures (if/switch/for/while/do...while) | 4–5, applied W11–14 (q5play) | Exercises + q5play mechanics |
+| Arrays | 8 (intro), 13 (shplay Groups), 23 (JSCAD parametric) | Exercises + applied modeling |
+| Control structures (if/switch/for/while/do...while) | 4–5, applied W11–14 (shplay) | Exercises + shplay mechanics |
 | Algorithms: sorting and searching | 30 | Applied to geometry data |
-| File I/O | 8 (FileReader + Blob write), 16 (q5play save/load), 31 (JSCAD multi-file + STL export) | Lab + multi-file project |
+| File I/O | 8 (FileReader + Blob write), 16 (shplay save/load), 31 (JSCAD multi-file + STL export) | Lab + multi-file project |
 | Error handling | 26 | Debug exercise |
 | Parameters by value and reference | 7 | Functions deep dive |
 | Testing principles | 27 | Test case writing assignment |
@@ -87,9 +87,9 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 |-----------------|-------|------|-------------------|
 | BI 2: Data (17–22%) | Binary number systems — how computers store data | 2 | Discussion + activity |
 | BI 2: Data | Data compression — lossy vs lossless | 8 | Discussion tied to file I/O |
-| BI 2: Data | Digital image representation — pixels, sprites, RGB | 15 | Discussion tied to q5play sprites + animation |
+| BI 2: Data | Digital image representation — pixels, sprites, RGB | 15 | Discussion tied to shplay sprites + animation |
 | BI 2: Data | Metadata — data about data | 16 | Discussion tied to game save/load JSON |
-| BI 4: CSN (11–15%) | How the Internet works — HTTP, DNS, client-server | 10 | Discussion: how does q5play reach your browser? |
+| BI 4: CSN (11–15%) | How the Internet works — HTTP, DNS, client-server | 10 | Discussion: how does shplay reach your browser? |
 | BI 4: CSN | Protocols and fault tolerance — TCP/IP, routing, redundancy | 11 | Bell-ringer activity |
 | BI 4: CSN | Parallel and distributed computing | 30 | Discussion tied to algorithm efficiency + sort/search |
 | BI 5: IOC (21–26%) | Open source and licensing — Creative Commons, copyright | 3 | Discussion tied to documentation week |
@@ -472,30 +472,30 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 
 ---
 
-# Q2: q5play — Applied Game Development
+# Q2: shplay — Applied Game Development
 ### ~31.5 contact hours | 9 weeks (W10–W18)
 ### Goal: Students extend Q1 fundamentals into a motivating visual/game context, learn OOP through hands-on use, practice File I/O, and ship a complete game as their Semester 1 capstone.
-### Environment: q5play in-app editor (built on q5.js + Box2D physics) — no install required.
+### Environment: shplay in-app editor (built on q5.js + Box2D physics) — no install required.
 
 ---
 
-## Unit 2.1: q5play Foundations
+## Unit 2.1: shplay Foundations
 > **SLO focus:** Reinforces **SLO 3** (design/implement/test in a visual context); applies Q1 control structures (SLO backup) to interactive programs.
 
 ### 2.1.1 Hello Sprite and Movement (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3 (design, implement, test)
-**Reading:** q5play → overview → The sketch lifecycle; q5play → canvas → Creating the canvas, Background and clearing; q5play → sprite → Your first sprite, Position, rotation, scale; q5play → input → Keyboard basics, Multi-key movement; JS2 Ch 13 JavaScript and the Browser (context)
+**Reading:** shplay → overview → The sketch lifecycle; shplay → canvas → Creating the canvas, Background and clearing; shplay → sprite → Your first sprite, Position, rotation, scale; shplay → input → Keyboard basics, Multi-key movement; JS2 Ch 13 JavaScript and the Browser (context)
 
 **Learning Objectives:**
 - Create a canvas with `new Canvas(width, height)`
 - Create a sprite with `new Sprite(x, y, w, h)` and set its properties
-- Use `setup()` and `draw()` as the q5play program skeleton
+- Use `setup()` and `draw()` as the shplay program skeleton
 - Drive sprite movement with the keyboard using `kb.pressing(...)` and `vel.x/y`
 - Explain the frame loop: `draw()` runs every frame
 
 **Topics:**
-- q5play program skeleton: `setup()`, `draw()`, optional `update()`
+- shplay program skeleton: `setup()`, `draw()`, optional `update()`
 - `Canvas(width, height)` — sets up the drawing area
 - `Sprite(x, y, w, h)` — creating sprites
 - Sprite properties: `color`, `pos`, `vel`, `rotation`, `layer`
@@ -508,23 +508,23 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Students complete the in-app lesson **5.1.2 Hello Sprite**
 - Students complete the in-app lesson **5.1.4 Make it Move**
 - Pair exercise: change the canvas size, make the sprite a different shape, swap control keys
-- **AP CSP Discussion (15 min):** How the Internet works. Tracing how q5play loaded in your browser: DNS → HTTP → server → renderer. "Every time you open this page, all of this happens in milliseconds."
+- **AP CSP Discussion (15 min):** How the Internet works. Tracing how shplay loaded in your browser: DNS → HTTP → server → renderer. "Every time you open this page, all of this happens in milliseconds."
 
 **Assignments:**
 - **A10.1 (Lab):** Build a "sprite playground" in the in-app editor: a canvas, one controllable sprite with WASD keys, a second sprite that moves automatically using `frameCount`, and an on-screen text label displaying a message. Must run without errors on Run.
 - **A10.2 (Written):** Half page — in your own words, what is the difference between `setup()` and `draw()`, and what does "60 frames per second" actually mean for the values you pick?
 
 **Teacher Notes:**
-- `vel.x`/`vel.y` are pixels per frame. q5play targets ~60 fps — tell students this explicitly or they'll pick absurd values.
+- `vel.x`/`vel.y` are pixels per frame. shplay targets ~60 fps — tell students this explicitly or they'll pick absurd values.
 - Omitting `vel.x = 0` in the else branch leaves the sprite drifting. Watch for this bug.
-- Some students will try `player.x =` — show that `player.pos.x` works too, but `vel` is the q5play idiom.
+- Some students will try `player.x =` — show that `player.pos.x` works too, but `vel` is the shplay idiom.
 
 ---
 
 ### 2.1.2 Physics Feel (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
-**Reading:** q5play → physics → Gravity and velocity, Bounciness and friction, Forces, torque, and rotation; q5play → sprite → Collider types: dynamic, static, kinematic, none; JS2 Ch 6 The Secret Life of Objects (classes preview, optional)
+**Reading:** shplay → physics → Gravity and velocity, Bounciness and friction, Forces, torque, and rotation; shplay → sprite → Collider types: dynamic, static, kinematic, none; JS2 Ch 6 The Secret Life of Objects (classes preview, optional)
 
 **Learning Objectives:**
 - Enable and disable gravity with `world.gravity.y`
@@ -562,10 +562,10 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ## Unit 2.2: Object-Oriented Programming
 > **SLO focus:** **SLO 2 primary artifact (A12.2 written OOP-vs-procedural comparison)** — the structured-programming documentation anchor for dual enrollment.
 
-### 2.2.1 Classes and Objects via q5play (~3.5 hrs)
+### 2.2.1 Classes and Objects via shplay (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 2 primary (OOP vs procedural), SLO 3
-**Reading:** JS1 → Classes → Class basic syntax, Class inheritance (optional); JS2 Ch 6 The Secret Life of Objects (Methods, Classes, Prototypes); PY Ch 11 Classes (framing only); q5play → GitHub repo → q5play.d.ts → `Sprite` class (L227) — "what `new Sprite()` really is"
+**Reading:** JS1 → Classes → Class basic syntax, Class inheritance (optional); JS2 Ch 6 The Secret Life of Objects (Methods, Classes, Prototypes); PY Ch 11 Classes (framing only); shplay → GitHub repo → shplay.d.ts → `Sprite` class (L227) — "what `new Sprite()` really is"
 
 **Learning Objectives:**
 - Define a class with a constructor and methods in JavaScript
@@ -580,7 +580,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Instance vs class
 - Properties vs methods
 - Creating objects with `new`
-- Every q5play primitive (`Canvas`, `Sprite`, `Group`) is an instance of a class
+- Every shplay primitive (`Canvas`, `Sprite`, `Group`) is an instance of a class
 - Procedural pattern: parallel arrays + helper functions taking an index
 - OOP pattern: array of instances, each with its own state + behavior
 - Vocabulary (intro only): encapsulation, inheritance, polymorphism
@@ -595,7 +595,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 
 **Assignments:**
 - **A12.1 (Lab):** Write a `Collectible` class — `constructor(x, y, value, color)` and a `collect()` method that returns the value and marks the item gone. Instantiate at least 5 in `setup()` and render them as sprites. Include at least one method call whose return value is used elsewhere.
-- **A12.2 (Written, graded, SLO 2 primary):** 1 page comparing procedural and OOP. Must include: definitions in your own words; a specific Q1 example that was procedural; a specific q5play example that is OOP; and one scenario where OOP is clearly the better choice, with reasoning.
+- **A12.2 (Written, graded, SLO 2 primary):** 1 page comparing procedural and OOP. Must include: definitions in your own words; a specific Q1 example that was procedural; a specific shplay example that is OOP; and one scenario where OOP is clearly the better choice, with reasoning.
 
 **Teacher Notes:**
 - Students have already used `new Sprite(...)` for two weeks. Lead with: "You've been using classes — now let's see what's really happening."
@@ -610,7 +610,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 2.3.1 Groups and Overlaps (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3, SLO 4 (algorithmic thinking in collision detection)
-**Reading:** q5play → groups → Spawning and defaults, Iterating and removing, Filtering and searching; q5play → collisions → colliding vs overlapping, Collisions with groups; JS1 → Data types → Arrays, Array methods (review)
+**Reading:** shplay → groups → Spawning and defaults, Iterating and removing, Filtering and searching; shplay → collisions → colliding vs overlapping, Collisions with groups; JS1 → Data types → Arrays, Array methods (review)
 
 **Learning Objectives:**
 - Use `Group` to manage collections of related sprites
@@ -646,7 +646,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 2.3.2 Physics Applications (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
-**Reading:** q5play → input → Keyboard basics, Mouse position and buttons; q5play → physics → Gravity and velocity, Bounciness and friction; JS1 → JavaScript Fundamentals → Comparisons, Conditional branching (review for input-driven logic)
+**Reading:** shplay → input → Keyboard basics, Mouse position and buttons; shplay → physics → Gravity and velocity, Bounciness and friction; JS1 → JavaScript Fundamentals → Comparisons, Conditional branching (review for input-driven logic)
 
 **Learning Objectives:**
 - Combine input, physics, and collision to build a playable scene
@@ -676,7 +676,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - The Pendulum study previews joints; tell students explicitly they'll return to it in W17.
 
 **Exam:**
-- **Semester 1 Midterm 3 (~1 hour, in class):** Covers Weeks 10–14 (q5play foundations, physics, OOP, groups/overlaps, physics applications). Format: 5 multiple-choice on q5play + OOP concepts, 3 code-reading (predict what this sprite/group code produces), 2 short-answer (explain OOP vs procedural, explain the frame loop), 1 write-code problem (fill in a sprite/input loop). Administer at the start or end of the week — teacher discretion.
+- **Semester 1 Midterm 3 (~1 hour, in class):** Covers Weeks 10–14 (shplay foundations, physics, OOP, groups/overlaps, physics applications). Format: 5 multiple-choice on shplay + OOP concepts, 3 code-reading (predict what this sprite/group code produces), 2 short-answer (explain OOP vs procedural, explain the frame loop), 1 write-code problem (fill in a sprite/input loop). Administer at the start or end of the week — teacher discretion.
 
 ---
 
@@ -686,7 +686,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 2.4.1 Animated Sprites and Camera (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
-**Reading:** q5play → animation → Ani (sprite-sheet frames), Anis (named animation sets), Groups with animations; q5play → camera → Following a target, Screen space vs world space; JS1 → Animation → JavaScript animations (conceptual, optional)
+**Reading:** shplay → animation → Ani (sprite-sheet frames), Anis (named animation sets), Groups with animations; shplay → camera → Following a target, Screen space vs world space; JS1 → Animation → JavaScript animations (conceptual, optional)
 
 **Learning Objectives:**
 - Attach and switch animations on a sprite
@@ -736,7 +736,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Structure `draw()` around a game-state variable with a switch or if/else chain
 
 **Topics:**
-- q5play persistent storage: `storeItem`, `getItem`, `removeItem`, `clearStorage`
+- shplay persistent storage: `storeItem`, `getItem`, `removeItem`, `clearStorage`
 - Serialization with JSON: `JSON.stringify`, `JSON.parse`
 - File export: `save(obj, 'level.json')` triggers a browser download
 - Async loading: `loadJSON` must run inside `preload()`
@@ -770,7 +770,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 2.6.1 Joints and Advanced Input (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
-**Reading:** q5play → joints → DistanceJoint, HingeJoint, SliderJoint, GlueJoint, GrabberJoint; q5play → input → Dragging and clicks, Gamepad (Contro); q5play → patterns → Projectiles from a player (applied force pattern)
+**Reading:** shplay → joints → DistanceJoint, HingeJoint, SliderJoint, GlueJoint, GrabberJoint; shplay → input → Dragging and clicks, Gamepad (Contro); shplay → patterns → Projectiles from a player (applied force pattern)
 
 **Learning Objectives:**
 - Create distance, hinge, and slider joints between sprites
@@ -796,7 +796,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - **A17.1 (Lab, Sumo challenge):** Complete the Two-Player Pong-Sumo challenge. Must include: separate input schemes for two players (e.g., WASD vs arrows); a win condition when one sprite is knocked out of bounds; a visible score or round counter.
 
 **Teacher Notes:**
-- Joints are the most complex q5play concept. Aim for "understand enough to use in capstone," not full mastery.
+- Joints are the most complex shplay concept. Aim for "understand enough to use in capstone," not full mastery.
 - The slingshot pattern (drag + release + force) appears in many classic games — encourage students to riff on it.
 - This is the last content week before capstone — wrap up any open challenges here.
 
@@ -808,11 +808,11 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 2.7.1 Capstone Game (~3.5 hrs in class + homework)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 1 (lifecycle), SLO 2 (structured programming), SLO 3 (design/implement/test — **PRIMARY SLO 3 EVIDENCE FOR SEMESTER 1**)
-**Reading:** q5play → patterns → Scene/state switching, Top-down movement, Platformer jump (reference during build); JS2 Ch 16 Project: A Platform Game (enrichment); JS2 Ch 8 Bugs and Errors (testing discipline)
+**Reading:** shplay → patterns → Scene/state switching, Top-down movement, Platformer jump (reference during build); JS2 Ch 16 Project: A Platform Game (enrichment); JS2 Ch 8 Bugs and Errors (testing discipline)
 
 **Learning Objectives:**
 - Design a complete game specification
-- Implement the design using q5play patterns learned W10–W17
+- Implement the design using shplay patterns learned W10–W17
 - Run and document manual test cases on key logic
 - Document the design, code, and development reflection
 - Iterate based on peer and teacher feedback
@@ -845,13 +845,13 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Rubric weights: Design doc 20% / Implementation 40% / Testing log 15% / Reflection 15% / Showcase 10%.
 
 **Exam:**
-- **Semester 1 Final (~1.5 hours, in class):** Cumulative exam covering all Semester 1 material (Weeks 1–18). Format: 20 multiple-choice (mix of JS fundamentals and q5play concepts), 5 code-tracing, 4 short-answer (SLO-aligned: lifecycle, structured programming, algorithms, OOP vs procedural), 2 write-code problems (one pure JS, one q5play snippet). Schedule the exam and capstone showcase on separate days within the week.
+- **Semester 1 Final (~1.5 hours, in class):** Cumulative exam covering all Semester 1 material (Weeks 1–18). Format: 20 multiple-choice (mix of JS fundamentals and shplay concepts), 5 code-tracing, 4 short-answer (SLO-aligned: lifecycle, structured programming, algorithms, OOP vs procedural), 2 write-code problems (one pure JS, one shplay snippet). Schedule the exam and capstone showcase on separate days within the week.
 
 ---
 
 # Q3: JSCAD Foundations — 2D to 3D + Quality
 ### ~31.5 contact hours | 9 weeks (W19–W27)
-### Goal: Transition from q5play into JSCAD. Learn the library model, 2D primitives, parametric design, extrusion into 3D, and 3D composition. Close Q3 with error handling and testing discipline.
+### Goal: Transition from shplay into JSCAD. Learn the library model, 2D primitives, parametric design, extrusion into 3D, and 3D composition. Close Q3 with error handling and testing discipline.
 ### Environment: JSCAD browser app (https://jscad.app/) — no install required.
 
 ---
@@ -891,7 +891,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 **Teacher Notes:**
 - The `require()` syntax will look unfamiliar. Explain it as "asking for a toolbox from a toolshed." Destructuring `const { primitives }` pulls out just the tools you need.
 - Students will want to immediately make complex things. Hold them to simple this week — the goal is understanding the structure, not the output.
-- Bridge back to q5play: "q5play was one big library — you imported classes by name. JSCAD is the same idea, different tool."
+- Bridge back to shplay: "shplay was one big library — you imported classes by name. JSCAD is the same idea, different tool."
 
 ---
 
@@ -924,7 +924,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 
 **Teacher Notes:**
 - A20.2 is a deliberate documentation-reading exercise. Reading API docs is a professional skill.
-- The coordinate system will confuse students who expect y to go down (screen coordinates in q5play). Address this explicitly — JSCAD uses math-standard orientation.
+- The coordinate system will confuse students who expect y to go down (screen coordinates in shplay). Address this explicitly — JSCAD uses math-standard orientation.
 
 ---
 
@@ -1330,10 +1330,10 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 
 **Assignments:**
 - **A31.1 (Lab, File I/O coverage):** Refactor one Q3 project into a multi-file structure: one file for component/helper functions, one file for parameters, one file for main assembly. Initialize a git repo and make at least 2 commits showing your refactoring progress. Write a README explaining what each file does and why you split it this way.
-- **A31.2 (Written):** Explain what file I/O means in programming. How does JSCAD's multi-file system relate to the general concept of reading from and writing to files? Compare briefly with the q5play `save`/`storeItem` approach you used in W16.
+- **A31.2 (Written):** Explain what file I/O means in programming. How does JSCAD's multi-file system relate to the general concept of reading from and writing to files? Compare briefly with the shplay `save`/`storeItem` approach you used in W16.
 
 **Teacher Notes:**
-- A31.2 comparing JSCAD multi-file to q5play save/load reinforces that file I/O takes many forms.
+- A31.2 comparing JSCAD multi-file to shplay save/load reinforces that file I/O takes many forms.
 - Students should leave this week with a working git workflow they can use on the capstone.
 
 ---
@@ -1402,7 +1402,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 4.3.2 Capstone Build and Iterate (~7 hrs across W34–W35)
 **Contact hours:** 7.0 (2 weeks)
 **SLOs covered:** SLO 2 (structured programming), SLO 3 (implement + test)
-**Reading:** JSCAD → measurements (printability reference); q5play → patterns → Scene/state switching (design-pattern reference); JS2 Ch 8 Bugs and Errors (iterative debugging)
+**Reading:** JSCAD → measurements (printability reference); shplay → patterns → Scene/state switching (design-pattern reference); JS2 Ch 8 Bugs and Errors (iterative debugging)
 
 **Learning Objectives:**
 - Complete a full project through multiple design iterations
@@ -1445,7 +1445,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - **A36.2 — Course Reflection (Written, SLO 1 closing artifact):** 1 page. Reflect on the software development life-cycle as you experienced it across the year. Give a specific example of each phase (design, code, test, maintenance) drawn from either the Q2 game capstone, the Q4 3D capstone, or both.
 
 **Exam:**
-- **Semester 2 Final (~1.5 hours, in class):** Cumulative exam covering all Semester 2 material (Weeks 19–36), with selected questions from Semester 1 fundamentals. Format: 20 multiple-choice (JS fundamentals, q5play, JSCAD modeling, algorithms), 5 code-tracing (mix of JS and JSCAD), 4 short-answer (SLO-aligned: lifecycle reflection; OOP vs procedural — include one question comparing them as SLO 2 backup artifact; algorithm analysis; testing principles), 2 write-code problems (one JSCAD modeling task, one standalone JS algorithm). Schedule on a separate day from capstone presentations.
+- **Semester 2 Final (~1.5 hours, in class):** Cumulative exam covering all Semester 2 material (Weeks 19–36), with selected questions from Semester 1 fundamentals. Format: 20 multiple-choice (JS fundamentals, shplay, JSCAD modeling, algorithms), 5 code-tracing (mix of JS and JSCAD), 4 short-answer (SLO-aligned: lifecycle reflection; OOP vs procedural — include one question comparing them as SLO 2 backup artifact; algorithm analysis; testing principles), 2 write-code problems (one JSCAD modeling task, one standalone JS algorithm). Schedule on a separate day from capstone presentations.
 
 **Teacher Notes:**
 - Capstone presentations can be split across two class meetings if the cohort is large — presentations day 1, final exam day 2 (or reversed).
@@ -1476,7 +1476,7 @@ Exam weeks still include regular content. Plan for the exam to occupy the first 
 |------|------|-------------------|
 | S1 Midterm 1 | 5 | Exam first day, loops content second day |
 | S1 Midterm 2 | 9 | Exam first day, mini project work fills remaining time |
-| S1 Midterm 3 | 14 | Covers q5play W10–14 (foundations, physics, OOP, groups, physics applications) |
+| S1 Midterm 3 | 14 | Covers shplay W10–14 (foundations, physics, OOP, groups, physics applications) |
 | S1 Final | 18 | Exam and game capstone showcase on separate days within the week |
 | S2 Midterm 1 | 22 | Covers JSCAD foundations W19–22 (libraries, 2D, booleans, parameters) |
 | S2 Midterm 2 | 27 | Covers W23–27 (loops→geometry, extrusion, 3D primitives, error handling, testing) |
@@ -1490,14 +1490,14 @@ Exam weeks still include regular content. Plan for the exam to occupy the first 
 | SLO / Topic | Covered By | Assessment Artifact |
 |-------------|-----------|-------------------|
 | SLO 1: Software lifecycle | W1 lecture, A1.1, W18 game capstone, A36.2 | A1.1 written (intro), A36.2 written (closing) |
-| SLO 2: Structured programming / OOP | W2–3, W12 (q5play OOP), A12.2, S1 Final, S2 Final | A12.2 written (primary), exam questions (backup) |
+| SLO 2: Structured programming / OOP | W2–3, W12 (shplay OOP), A12.2, S1 Final, S2 Final | A12.2 written (primary), exam questions (backup) |
 | SLO 3: Design, implement, test programs | A9.1 (console mini-project), A18.1 (game capstone), A36.1 (3D capstone) | All major projects |
 | SLO 4: Algorithms | W5, A5.1 (intro), A30.1 (applied) | A5.1 written (intro), A30.1 lab (applied) |
 | Data types / variables | W2–3, A2.1, A2.2 | Lab assignments |
-| Arrays | W8 (intro), W13 (q5play groups), W23 (JSCAD loops→geometry) | A8.1, A13.1, A23.1 |
-| Control structures | W4–5 (core), applied W11–14 (q5play mechanics) | Lab + quiz |
+| Arrays | W8 (intro), W13 (shplay groups), W23 (JSCAD loops→geometry) | A8.1, A13.1, A23.1 |
+| Control structures | W4–5 (core), applied W11–14 (shplay mechanics) | Lab + quiz |
 | Algorithms: sort/search | W30, A30.1 | A30.1 lab + A30.2 written |
-| File I/O | W8 (FileReader + Blob write), W16 (q5play save/load), W31 (JSCAD multi-file) | A8.2 + A8.3 labs, A16.1 lab, A31.1 lab + A31.2 written |
+| File I/O | W8 (FileReader + Blob write), W16 (shplay save/load), W31 (JSCAD multi-file) | A8.2 + A8.3 labs, A16.1 lab, A31.1 lab + A31.2 written |
 | Error handling | W26, A26.1 | A26.1 lab |
 | Pass by value/reference | W7, A7.1, A7.2 | A7.2 written |
 | Testing principles | W27, A27.1 | A27.1 lab + A27.2 written |
@@ -1515,26 +1515,26 @@ as the single source of truth for the seven open references:
 - **JS1** → *The Modern JavaScript Tutorial* (javascript.info, Ilya Kantor, CC-BY-SA)
 - **JS2** → *Eloquent JavaScript* (Marijn Haverbeke, CC-BY-NC, code MIT)
 - **PY** → *Introduction to Python Programming* (OpenStax, CC BY-NC-SA) → structural model; Python syntax translated to JS
-- **q5play** → in-app docs at `/docs/q5play` (bundled `public/q5play/`, v4.0.1, built from the public `q5play.d.ts` API) + GitHub project `github.com/q5play/q5play` + q5.js learn pages (LGPL-3.0) for graphics-layer concepts. **The external "Learn q5play" textbook is NOT a course reference** — its Creator License forbids CS-teaching/textbook use without the [q5play Educational License](https://q5play.org/teach)
+- **shplay** → in-app docs at `/docs/shplay` (bundled `public/shplay/`, v4.0.1, built from the public `shplay.d.ts` API) + GitHub project `github.com/shplay/shplay` + q5.js learn pages (LGPL-3.0) for graphics-layer concepts. **The external "Learn shplay" textbook is NOT a course reference** — its Creator License forbids CS-teaching/textbook use without the [shplay Educational License](https://shplay.org/teach)
 - **JSCAD** → external API docs (openjscad.xyz, MIT) + GitHub monorepo `github.com/jscad/OpenJSCAD.org` → CDN-loaded, lessons need internet
 - **freeCodeCamp** → the Q1 content platform — week-by-week mapping in `curriculum-alignment-guide.md`, full activity list in `curriculum-data/master-activity-list.md`
 - **jscadui / jscad.app** → the Q3–Q4 JSCAD browser environment (`github.com/hrgdavor/jscadui`, MIT)
 
 To seed a chapter/section/subsection, pull the matching **JS1/JS2/PY → chapter/section** or
-**q5play → section → page** / **JSCAD → module → function** anchor from `js-references-toc.md`
+**shplay → section → page** / **JSCAD → module → function** anchor from `js-references-toc.md`
 and drop it into that section reading/source row. Anchor notation: `JS1 → Fundamentals → Variables` ·
-`q5play → sprite → Your first sprite` · `JSCAD → extrusions → extrudeLinear`. Do **not** duplicate the TOC here.
+`shplay → sprite → Your first sprite` · `JSCAD → extrusions → extrudeLinear`. Do **not** duplicate the TOC here.
 
 - **Chapter 1** Foundations (W1→3): JS1 Fundamentals; JS2 Ch 1→2; PY Ch 1→2
 - **Chapter 2** Control Flow (W4→5): JS1 Comparisons/Conditionals/Loops; JS2 Ch 2; PY Ch 4→5
 - **Chapter 3** Functions and Data (W6→8): JS1 Functions/Objects/Arrays + File and FileReader; JS2 Ch 3→4; PY Ch 3/6/9/14
 - **Chapter 4** Synthesis (W9): JS1 JavaScript specials; JS2 Ch 4
-- **Chapter 5** q5play Foundations (W10→11): q5play in-app docs; JS1 Functions
+- **Chapter 5** shplay Foundations (W10→11): shplay in-app docs; JS1 Functions
 - **Chapter 6** OOP (W12): JS1 Classes; JS2 Ch 6; PY Ch 11 (framing)
 - **Chapter 7** Collections & Physics (W13→14): JS1 Arrays/Map/Set; JS2 Ch 4
-- **Chapter 8** Animation & Camera (W15): q5play docs; JS1 Animation (optional)
+- **Chapter 8** Animation & Camera (W15): shplay docs; JS1 Animation (optional)
 - **Chapter 9** State & Persistence (W16): JS1 JSON methods + LocalStorage; JS2 Ch 18; PY Ch 14
-- **Chapter 10** Advanced Mechanics (W17): q5play docs
+- **Chapter 10** Advanced Mechanics (W17): shplay docs
 - **Chapter 11** Game Capstone (W18): JS2 Ch 16 (optional enrichment)
 - **Chapter 12** JSCAD Foundations (W19→21): JS1 Modules; JS2 Ch 10; PY Ch 7
 - **Chapter 13** Parametric Design (W22→23): JS1 Functions/Arrays; JS2 Ch 5 (map); PY Ch 6/9
@@ -1551,7 +1551,7 @@ When generating individual assignments from this plan, use the following convent
 - Each assignment file should be named: `A[week].[number]_[short_title].md`
 - Include: learning objectives, instructions, starter code (if applicable), rubric, estimated time, and which SLO(s) it covers
 - Starter code for **Q1 (console)** assignments should run in the browser DevTools console or a bare `<script>` tag
-- Starter code for **Q2 (q5play)** assignments should be a single `script.js` with `setup()`/`draw()`, runnable inside the in-app q5play editor
+- Starter code for **Q2 (shplay)** assignments should be a single `script.js` with `setup()`/`draw()`, runnable inside the in-app shplay editor
 - Starter code for **Q3/Q4 (JSCAD)** assignments should use the browser-app format (no npm required). JSCAD imports: `const { primitives, transforms, booleans, measurements, colors, text, extrusions, hulls } = require('@jscad/modeling')`
 - Written assignments should include a prompt, length guidance, and a simple rubric
 - Lab assignments should include: setup instructions, step-by-step task list, expected output description, rubric
@@ -1560,7 +1560,7 @@ When generating individual assignments from this plan, use the following convent
 
 ### Priority build order for assignments:
 1. **Q1 assignments first** (A1.1 through A9.1) — prerequisites for everything
-2. **Q2 q5play assignments** (A10.1 through A18.1) — needed for the game capstone
+2. **Q2 shplay assignments** (A10.1 through A18.1) — needed for the game capstone
 3. **SLO coverage assignments** (A12.2 OOP written, A16.1 file I/O, A26.1 error handling, A27.1 testing, A30.1 sort/search) — required for dual-enrollment SLO documentation
 4. **Q3 JSCAD foundations** (A19.1 through A27.3)
 5. **Q4 advanced JSCAD + capstone** (A28.1 through A36.2)
@@ -1685,7 +1685,7 @@ Students may deviate from defaults with justification documented in their print 
 
 ### Catch-Up Opportunities
 - **Week 9** (Q1 Review): built-in review week. Use midterm results to target review topics.
-- **Week 14** (q5play Physics Applications): consolidation week, no brand-new concepts. Use it to rescue students lagging on W10–13.
+- **Week 14** (shplay Physics Applications): consolidation week, no brand-new concepts. Use it to rescue students lagging on W10–13.
 - **Week 18** (Game Capstone): entire week is build time — easy to fold catch-up sessions into supervised work.
 - **Week 29** (Measurements): light content; use extra time for print queue rotation and individual help.
 - **Week 32** (Colors/Text/Export): light content; last checkpoint before capstone design begins.
@@ -1709,10 +1709,10 @@ If a student falls behind, prioritize catching up on these gateway topics — ev
 ```
 W2 Variables → W4 Conditionals → W5 Loops → W6 Functions → W8 Arrays
                                                               ↓
-                                         W10 q5play Intro → W12 OOP → W16 State/Save → W18 Game Capstone
+                                         W10 shplay Intro → W12 OOP → W16 State/Save → W18 Game Capstone
                                                               ↓
                                          W19 JSCAD Intro → W21 Booleans → W24 Extrusion → W28+ Advanced → W33 3D Capstone
 ```
 
-A student who doesn't understand functions (W6) cannot succeed in q5play OOP (W12) or JSCAD. Catch this by Week 7 at the latest.
+A student who doesn't understand functions (W6) cannot succeed in shplay OOP (W12) or JSCAD. Catch this by Week 7 at the latest.
 A student who hasn't grasped classes by W12 will struggle through the rest of Q2 — flag them before W13 (Groups) and keep them in re-submission loops on A12.1.

@@ -5,9 +5,9 @@
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 25,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.4 Animation & Camera",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 15,
   "slos": ["SLO-3"],
   "steps": [
@@ -15,25 +15,25 @@
       "id": "s1",
       "title": "Create a player with an initial visual",
       "instructions": "In setup(), create a sprite. Give it an idle visual — either sprite.image = '🧍' (emoji placeholder) or addAni('idle', 'img/idle.png') if you have art assets. The two forms swap the same way; we use sprite.image here because the in-app sandbox doesn't host image files.",
-      "hints": ["Open the q5play docs drawer and find the Visual / image section."]
+      "hints": ["Open the shplay docs drawer and find the Visual / image section."]
     },
     {
       "id": "s2",
       "title": "Clear the background each frame",
       "instructions": "Inside draw(), call background(...) at the top so old frames don't pile up.",
-      "hints": ["Search the q5play docs drawer for background()."]
+      "hints": ["Search the shplay docs drawer for background()."]
     },
     {
       "id": "s3",
       "title": "Read WASD input every frame",
       "instructions": "Inside draw(), use kb.pressing('a') / 'd' / 'w' to read horizontal and jump-cue keys. Drive the player's horizontal motion (sprite.vel.x or sprite.x) from those checks.",
-      "hints": ["Open the q5play docs drawer and find the Input / Keyboard section."]
+      "hints": ["Open the shplay docs drawer and find the Input / Keyboard section."]
     },
     {
       "id": "s4",
       "title": "Swap the visual based on state",
       "instructions": "When the player is moving horizontally, swap sprite.image to a 'run' emoji (e.g. '🏃'). While 'w' is held, swap to a 'jump' emoji (e.g. '🤸'). Otherwise, swap back to idle. Don't forget the else branch — without it the visual won't reset. (With real art, this is changeAni('run') / changeAni('idle') / changeAni('jump').)",
-      "hints": ["Open the q5play docs drawer and find the Visual / image section. Single emoji strings work as visuals."]
+      "hints": ["Open the shplay docs drawer and find the Visual / image section. Single emoji strings work as visuals."]
     }
   ],
   "requirements": [

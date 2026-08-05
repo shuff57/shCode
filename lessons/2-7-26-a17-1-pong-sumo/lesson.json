@@ -5,9 +5,9 @@
   "type": "assignment",
   "difficulty": "intermediate",
   "estimateMins": 75,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.7 Advanced Mechanics",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 17,
   "slos": ["SLO-3"],
   "contentFile": "content.md",
@@ -18,19 +18,19 @@
       "id": "s1",
       "title": "Arena setup — canvas and gravity",
       "instructions": "Create a canvas (e.g. 600×400). Set world.gravity.y = 0 so paddles and ball glide instead of falling.",
-      "hints": ["Check the Canvas section of the q5play docs drawer. For no-gravity setup see 2.7.25."]
+      "hints": ["Check the Canvas section of the shplay docs drawer. For no-gravity setup see 2.7.25."]
     },
     {
       "id": "s2",
       "title": "Top and bottom walls",
       "instructions": "Add two static sprites along the top and bottom edges as walls so the ball can't escape vertically.",
-      "hints": ["Check the Sprite section of the q5play docs drawer. Set collider = 'static' on each wall."]
+      "hints": ["Check the Sprite section of the shplay docs drawer. Set collider = 'static' on each wall."]
     },
     {
       "id": "s3",
       "title": "Two paddles — Player 1 (WASD) and Player 2 (arrow keys)",
       "instructions": "Create two paddle sprites (one on the left, one on the right). In draw(), read kb.pressing for W/S (Player 1) and up/down (Player 2) and set each paddle's velocity accordingly.",
-      "hints": ["See 2.7.25 for the two-paddle pattern. Check kb.pressing in the q5play docs drawer."]
+      "hints": ["See 2.7.25 for the two-paddle pattern. Check kb.pressing in the shplay docs drawer."]
     },
     {
       "id": "s4",
@@ -48,7 +48,7 @@
       "id": "s6",
       "title": "Score variables and initial state",
       "instructions": "Declare p1Score and p2Score at the top (outside setup/draw). Initialize both to 0 in setup(). Set gameState to 'title' so the game starts on the title screen.",
-      "hints": ["The q5play docs drawer has sprite position properties. Compare ball.pos.x against 0 and the canvas width."]
+      "hints": ["The shplay docs drawer has sprite position properties. Compare ball.pos.x against 0 and the canvas width."]
     },
     {
       "id": "s7",

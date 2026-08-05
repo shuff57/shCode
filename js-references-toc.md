@@ -10,11 +10,11 @@ Three open, free-to-read book references support the CSCI 4 plan, plus four proj
 Four project references round out the source set:
 
 - **freeCodeCamp** (Source 6): the interactive platform driving Q1 activities
-- **q5play** (Source 3, bundled in-repo, browser docs): the game-dev engine (Q2)
+- **shplay** (Source 3, bundled in-repo, browser docs): the game-dev engine (Q2)
 - **JSCAD** (Source 4, CDN-loaded API docs + monorepo): the 3D-modeling library (Q3–Q4)
 - **jscadui / jscad.app** (Source 7): the browser UI students actually use for JSCAD (Q3–Q4)
 
-Engine dependencies cited from the q5play stack: **q5.js** (bundled in-repo, LGPL-3.0) and
+Engine dependencies cited from the shplay stack: **q5.js** (bundled in-repo, LGPL-3.0) and
 **Box2D v3 WASM** (bundled in-repo, Box2D MIT) — see the note inside Source 3.
 
 ---
@@ -268,43 +268,43 @@ Engine dependencies cited from the q5play stack: **q5.js** (bundled in-repo, LGP
 
 ---
 
-## Source 3 — q5play (in-repo engine + GitHub project + hosted docs)
-**In-repo:** `public/q5play/` (v4.0.1)  ·  **GitHub:** https://github.com/q5play/q5play  ·  **Author:** Quinton Ashley  ·  **License:** q5play Creator License — **CS education requires the [q5play Educational License](https://q5play.org/teach)** (`public/q5play/docs/LICENSE.md` §1d expressly forbids CS-teaching use under the Creator License alone)
+## Source 3 — shplay (in-repo engine + GitHub project + hosted docs)
+**In-repo:** `public/shplay/` (v4.0.1)  ·  **GitHub:** https://github.com/shplay/shplay  ·  **Author:** Quinton Ashley  ·  **License:** shplay Creator License — **CS education requires the [shplay Educational License](https://shplay.org/teach)** (`public/shplay/docs/LICENSE.md` §1d expressly forbids CS-teaching use under the Creator License alone)
 
 No internet required for the bundled engine — built on q5.js WebGPU + Box2D v3 WASM, ships fully offline.
 
-### In-repo files (`public/q5play/`)
+### In-repo files (`public/shplay/`)
 
 | File | Covers |
 |---|---|
-| `public/q5play/docs/q5play.d.ts` | Full public API (hand-authored types). Anchor notation: `q5play → q5play.d.ts → <ClassName>` |
-| `public/q5play/docs/README.md` | Project overview, credits, license links |
-| `public/q5play/docs/challenges.md` | Bundled challenge briefs (distinct numbering from the in-app "Learn q5play" lesson numbers cited in curriculum-plan.md activities, e.g. `5.1.2`) |
-| `public/q5play/docs/LICENSE.md` | q5play Creator License — full text, incl. the CS-education restriction above |
-| `public/q5play/docs/CLAUDE.md` | Engine architecture notes (lifecycle hooks, class map) — dev reference, not student-facing |
+| `public/shplay/docs/shplay.d.ts` | Full public API (hand-authored types). Anchor notation: `shplay → shplay.d.ts → <ClassName>` |
+| `public/shplay/docs/README.md` | Project overview, credits, license links |
+| `public/shplay/docs/challenges.md` | Bundled challenge briefs (distinct numbering from the in-app "Learn shplay" lesson numbers cited in curriculum-plan.md activities, e.g. `5.1.2`) |
+| `public/shplay/docs/LICENSE.md` | shplay Creator License — full text, incl. the CS-education restriction above |
+| `public/shplay/docs/CLAUDE.md` | Engine architecture notes (lifecycle hooks, class map) — dev reference, not student-facing |
 
 ### GitHub repo (canonical)
 
-**Repo:** https://github.com/q5play/q5play · branch `main` — **no `docs/` folder on `main`**; the engine source and types ship alone:
+**Repo:** https://github.com/shplay/shplay · branch `main` — **no `docs/` folder on `main`**; the engine source and types ship alone:
 
-- `q5play.js` — the entire engine (~8k lines, hand-authored, no build step). Reference source for any behavior the docs don't spell out.
-- `q5play.d.ts` — hand-authored public API types (source of the in-repo copy above).
+- `shplay.js` — the entire engine (~8k lines, hand-authored, no build step). Reference source for any behavior the docs don't spell out.
+- `shplay.d.ts` — hand-authored public API types (source of the in-repo copy above).
 - `LICENSE.md` — the Creator License (see header).
-- Wiki: https://github.com/q5play/q5play/wiki — 3 pages (Home, Get Started, What's new in q5play?) — setup + v4 changelog, not a citation target for lessons.
+- Wiki: https://github.com/shplay/shplay/wiki — 3 pages (Home, Get Started, What's new in shplay?) — setup + v4 changelog, not a citation target for lessons.
 
-### q5play.org hosted docs (external, online) — open sources only
+### shplay.org hosted docs (external, online) — open sources only
 
-> **Learn q5play textbook** (https://q5play.org/learn/) is **NOT used as a course reference**: it is
+> **Learn shplay textbook** (https://shplay.org/learn/) is **NOT used as a course reference**: it is
 > Creator-Licensed for personal learning/evaluation only (`LICENSE.md` §3) and **classroom or textbook
-> use requires the paid q5play Educational License** (§1d forbids CS-teaching use under the Creator
+> use requires the paid shplay Educational License** (§1d forbids CS-teaching use under the Creator
 > License). The `5.1.2`-style lesson numbers cited in `curriculum-plan.md` activities refer to the
-> **in-app** q5play lessons (built in-repo from the public `q5play.d.ts` API), not to this external textbook.
+> **in-app** shplay lessons (built in-repo from the public `shplay.d.ts` API), not to this external textbook.
 
-- **API reference** — https://q5play.org/docs/ — TypeDoc build (3 modules, 31 classes, 465 pages). Class pages map 1:1 to the `.d.ts` anchors below (e.g. `classes/q5play.Sprite.html` ↔ `Sprite` L227). Server-rendered; the in-app `/docs/q5play` pages are derived from the same public API surface, not scraped from the Learn site.
-- **q5.js learn pages** — https://q5js.org/learn/ — **open (LGPL-3.0)** interactive reference for the graphics layer q5play sits on: canvas, `setup()`/`draw()`, shapes, color, text, input. Use for any drawing/rendering concept the engine docs don't spell out. Does **not** cover the physics/sprite/Group/joints layer — those are q5play additions covered by the in-app docs below.
+- **API reference** — https://shplay.org/docs/ — TypeDoc build (3 modules, 31 classes, 465 pages). Class pages map 1:1 to the `.d.ts` anchors below (e.g. `classes/shplay.Sprite.html` ↔ `Sprite` L227). Server-rendered; the in-app `/docs/shplay` pages are derived from the same public API surface, not scraped from the Learn site.
+- **q5.js learn pages** — https://q5js.org/learn/ — **open (LGPL-3.0)** interactive reference for the graphics layer shplay sits on: canvas, `setup()`/`draw()`, shapes, color, text, input. Use for any drawing/rendering concept the engine docs don't spell out. Does **not** cover the physics/sprite/Group/joints layer — those are shplay additions covered by the in-app docs below.
 
-### q5play.d.ts class anchors
-- **Engine state:** `Q5Play` (L4)
+### shplay.d.ts class anchors
+- **Engine state:** `shplay` (L4)
 - **Drawables:** `Visual` (L129) → `Sprite` (L227)
 - **Animation:** `Ani` (L1063) · `Anis` (L1226)
 - **Collections:** `Visuals` (L1259) → `Group` (L1323)
@@ -313,16 +313,16 @@ No internet required for the bundled engine — built on q5.js WebGPU + Box2D v3
 - **Joints:** `Joint` (L2014) → `GlueJoint` (L2123) · `DistanceJoint` (L2137) · `WheelJoint` (L2229) · `HingeJoint` (L2331) · `SliderJoint` (L2369) · `GrabberJoint` (L2421)
 - **Input:** `InputDevice` (L2475) → `_Mouse` (L2521) · `_Pointer` (L2605) · `_Keyboard` (L2668) · `Contro` (L2693)
 
-Persistent storage (`storeItem`/`getItem`/`removeItem`/`clearStorage`) and `loadJSON`/`save` are q5.js core functions (bundled in `public/q5play/q5.js`), not part of `q5play.d.ts` — cite javascript.info's LocalStorage/JSON sections for those instead (see Source 1).
+Persistent storage (`storeItem`/`getItem`/`removeItem`/`clearStorage`) and `loadJSON`/`save` are q5.js core functions (bundled in `public/shplay/q5.js`), not part of `shplay.d.ts` — cite javascript.info's LocalStorage/JSON sections for those instead (see Source 1).
 
 ### In-app docs surface (student-facing anchor target)
 
-The app renders a student-facing q5play reference at `/docs/q5play` (built from `lib/q5play-docs.ts`).
-Anchor notation for reading rows: `q5play → <Section> → <Page title>`. All anchors below are verified against the current in-app sections.
+The app renders a student-facing shplay reference at `/docs/shplay` (built from `lib/shplay-docs.ts`).
+Anchor notation for reading rows: `shplay → <Section> → <Page title>`. All anchors below are verified against the current in-app sections.
 
 | Section (slug) | Page titles (anchor targets) |
 |---|---|
-| `overview` | What is q5play? · The sketch lifecycle · Global mode · Debugging your sketch |
+| `overview` | What is shplay? · The sketch lifecycle · Global mode · Debugging your sketch |
 | `canvas` | Creating the canvas · frameCount and frameRate · Background and clearing |
 | `sprite` | Your first sprite · Collider types: dynamic, static, kinematic, none · Position, rotation, scale · Color, visibility, and layer · Shape options · Removing and cleaning up sprites · Pass through contacts · Advanced movement helpers · Chain colliders · Polygon colliders · Adding colliders · Adding sensors · Custom update per sprite · Custom draw per sprite · Awaiting animation sequences |
 | `physics` | Gravity and velocity · Mass and density · Bounciness and friction · Drag and damping · Forces, torque, and rotation |
@@ -338,11 +338,11 @@ Anchor notation for reading rows: `q5play → <Section> → <Page title>`. All a
 | `text` | Displaying text |
 | `patterns` | Top-down movement · Platformer jump · Projectiles from a player · Score and timer HUD · Scene/state switching |
 
-For engine internals (dev-facing, not student-facing), use the `q5play.d.ts` class anchors above.
+For engine internals (dev-facing, not student-facing), use the `shplay.d.ts` class anchors above.
 
 ### Engine dependency stack (bundled in-repo)
 
-q5play is not a standalone runtime — it sits on three lower layers, all bundled in `public/q5play/`:
+shplay is not a standalone runtime — it sits on three lower layers, all bundled in `public/shplay/`:
 
 | Layer | Repo / site | In-repo artifact | License | When to cite |
 |---|---|---|---|---|
@@ -355,7 +355,7 @@ q5play is not a standalone runtime — it sits on three lower layers, all bundle
 ## Source 4 — JSCAD (GitHub monorepo + hosted API docs)
 **GitHub:** https://github.com/jscad/OpenJSCAD.org  ·  **API docs:** https://openjscad.xyz/docs/  ·  **Package:** `@jscad/modeling@2.13.0` (+ `@jscad/regl-renderer@2.6.15` for the viewport) via unpkg  ·  **License:** MIT
 
-Not vendored — loaded at runtime from unpkg, so JSCAD lessons need internet (unlike q5play). Anchor notation: `JSCAD → <module> → <fn>`, with a per-function fragment link of the form `<module docs page>#.<fn>` (verified against the generated jsdoc). E.g. `JSCAD → primitives → cube` → `https://openjscad.xyz/docs/module-modeling_primitives.html#.cube`.
+Not vendored — loaded at runtime from unpkg, so JSCAD lessons need internet (unlike shplay). Anchor notation: `JSCAD → <module> → <fn>`, with a per-function fragment link of the form `<module docs page>#.<fn>` (verified against the generated jsdoc). E.g. `JSCAD → primitives → cube` → `https://openjscad.xyz/docs/module-modeling_primitives.html#.cube`.
 
 ### GitHub repo (canonical) — the source behind every anchor
 
@@ -414,10 +414,10 @@ Programming* book sets the Q1 chapter sequence and is cited only for structure, 
 | 8 | Strings | W2–3 string methods |
 | 9 | Lists | W8 Arrays (1.3.3) — incl. multiple-subscripted (9.4 Nested lists) |
 | 10 | Dictionaries | — **Excluded** (not in CSCI 4 outline/SLOs) |
-| 11 | Classes | W12 OOP (q5play) — borrow framing only |
+| 11 | Classes | W12 OOP (shplay) — borrow framing only |
 | 12 | Recursion | W30 optional enrichment — not assessed |
 | 13 | Inheritance | W12 — named, not required |
-| 14 | Files | W8 File I/O, W16 q5play save, W31 JSCAD multi-file — concept adopted; browser FileReader replaces Python `open()` |
+| 14 | Files | W8 File I/O, W16 shplay save, W31 JSCAD multi-file — concept adopted; browser FileReader replaces Python `open()` |
 | 15 | Data Science | — **Excluded** (belongs to Principles of Data Science) |
 
 ### Section anchors (verified from the published chapter outlines)
@@ -460,8 +460,8 @@ The interactive platform supplying the **Q1 video/exercise activity layer** (W1�
 |---|---|---|---|
 | freeCodeCamp JS v9 | module names (e.g. `Variables and Strings`) | Q1 readings + external activities; W17 Classes; W22 Algorithms | Uses Theory / Workshop / Lab tags, not `Video` |
 
-**freeCodeCamp stops at general JS + algorithms — it does not cover q5.js, q5play, or game development** (the in-app q5play
-docs are the textbook for Q2). It was chosen to teach the JS foundations that make q5play possible.
+**freeCodeCamp stops at general JS + algorithms — it does not cover q5.js, shplay, or game development** (the in-app shplay
+docs are the textbook for Q2). It was chosen to teach the JS foundations that make shplay possible.
 
 ---
 
@@ -495,7 +495,7 @@ of `openjscad.xyz` (runs npm imports, ES modules, TypeScript, and preserves the 
 
 ### Recommended curriculum touch points (JS-native)
 - **W8 (Arrays + File I/O):** javascript.info *File and FileReader* + *Blob* + Eloquent Ch 18 *File fields* — read a `.txt` line-by-line via `FileReader.readAsText()` + `split('\n')` (A8.2), then write a new file via `Blob` + download (A8.3). Together A8.2 + A8.3 cover the full open → read → write → close sequential-access loop in browser JS.
-- **W16 (q5play save/load):** javascript.info *JSON methods* + *LocalStorage* — `storeItem`/`getItem` map to `localStorage`; `save()` to Blob download.
+- **W16 (shplay save/load):** javascript.info *JSON methods* + *LocalStorage* — `storeItem`/`getItem` map to `localStorage`; `save()` to Blob download.
 - **W26/W27 (error handling/testing):** Eloquent Ch 8 *Bugs and Errors* + javascript.info *Error handling* + *Automated testing with Mocha*.
 - **W31 (JSCAD multi-file / git):** Eloquent Ch 10 *Modules* (ES + CommonJS) — mirrors JSCAD's `require`/`include` system.
 

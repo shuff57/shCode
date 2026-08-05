@@ -1,11 +1,11 @@
 {
   "id": "2-5-13-reading-loadjson-async",
-  "title": "2.5.13 Reading — q5play docs: loadJSON is Async",
+  "title": "2.5.13 Reading — shplay docs: loadJSON is Async",
   "description": "loadJSON loads external JSON files (levels, dialogue, config) — different from save/load. It's async and needs a callback.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 10,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.5 Game Saves",
   "preview": "reading",
   "week": 16,

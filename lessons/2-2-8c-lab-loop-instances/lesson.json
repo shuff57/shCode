@@ -5,9 +5,9 @@
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 8,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.2 Object-Oriented Programming",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 12,
   "slos": ["SLO-2", "SLO-3"],
   "steps": [
@@ -15,7 +15,7 @@
       "id": "s1",
       "title": "Loop over enemies and call .render() on each",
       "instructions": "In `draw()`, write a `for...of` loop over the `enemies` array. Inside the loop, call `.render()` on the loop variable. All five HP labels should appear on screen.",
-      "hints": ["Open the q5play docs drawer on the right and review the array and loop sections — a for...of loop gives you each element one at a time."]
+      "hints": ["Open the shplay docs drawer on the right and review the array and loop sections — a for...of loop gives you each element one at a time."]
     }
   ],
   "requirements": [

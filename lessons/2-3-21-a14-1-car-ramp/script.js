@@ -1,5 +1,5 @@
 // 2.3.21 A14.1 Car on a Ramp
-// Open the Quest tab for the graded requirements; open the Docs tab for the q5play API.
+// Open the Quest tab for the graded requirements; open the Docs tab for the shPlay API.
 
 let ground, ramp, chassis, leftWheel, rightWheel, leftJoint, rightJoint;
 

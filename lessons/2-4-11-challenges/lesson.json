@@ -5,9 +5,9 @@
   "type": "challenge",
   "difficulty": "advanced",
   "estimateMins": 30,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.4 Animation & Camera",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 15,
   "slos": ["SLO-3"],
   "contentFile": "content.md",
@@ -34,7 +34,7 @@
       "id": "s4",
       "title": "Clear the background each frame",
       "instructions": "Call background(...) inside draw() so old frames don't pile up.",
-      "hints": ["Search the q5play docs drawer for background()."]
+      "hints": ["Search the shplay docs drawer for background()."]
     }
   ],
   "requirements": [

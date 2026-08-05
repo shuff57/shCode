@@ -79,7 +79,7 @@ export interface Lesson {
   estimateMins: number;
   category?: string;
   unit?: string;
-  preview?: 'html' | 'console' | 'jscad' | 'q5play' | 'reading' | 'video' | 'example' | 'challenge' | 'assignment' | 'slides';
+  preview?: 'html' | 'console' | 'jscad' | 'shplay' | 'reading' | 'video' | 'example' | 'challenge' | 'assignment' | 'slides';
   week?: number;
   slos?: string[];
   files: FileNode[];

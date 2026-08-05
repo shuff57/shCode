@@ -5,7 +5,7 @@
   "type": "assignment",
   "difficulty": "beginner",
   "estimateMins": 40,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.2 Object-Oriented Programming",
   "preview": "assignment",
   "week": 12,
@@ -16,7 +16,7 @@
     "rubricTitle": "Procedural vs OOP — AI-graded rubric",
     "model": "qwen3-coder-next:cloud",
     "contextDocs": ["overview", "sprite"],
-    "prompt": "Write a 1-page (300–500 words) comparison of procedural and object-oriented programming. Address all four sections below.\n\nQuestion 1 — Definitions in your own words: What does procedural programming mean? What does object-oriented programming (OOP) mean? Do not copy definitions from the internet — use your own words.\n\nQuestion 2 — A specific Q1 procedural example: Name a specific assignment or program you wrote in Q1 that used a procedural approach. Describe it in 1–2 sentences. Be specific — name the assignment.\n\nQuestion 3 — A specific q5play OOP example: Name a specific place in your q5play code (A12.1 Collectible class, or an earlier class you wrote) where you used OOP. Describe how the class organized your code — what data and behavior did it group together?\n\nQuestion 4 — When OOP wins: Describe one scenario (hypothetical is OK) where OOP is clearly the better choice over procedural code. Explain WHY in terms of at least one of the following: readability, extensibility, or separation of data and behavior.",
+    "prompt": "Write a 1-page (300–500 words) comparison of procedural and object-oriented programming. Address all four sections below.\n\nQuestion 1 — Definitions in your own words: What does procedural programming mean? What does object-oriented programming (OOP) mean? Do not copy definitions from the internet — use your own words.\n\nQuestion 2 — A specific Q1 procedural example: Name a specific assignment or program you wrote in Q1 that used a procedural approach. Describe it in 1–2 sentences. Be specific — name the assignment.\n\nQuestion 3 — A specific shplay OOP example: Name a specific place in your shplay code (A12.1 Collectible class, or an earlier class you wrote) where you used OOP. Describe how the class organized your code — what data and behavior did it group together?\n\nQuestion 4 — When OOP wins: Describe one scenario (hypothetical is OK) where OOP is clearly the better choice over procedural code. Explain WHY in terms of at least one of the following: readability, extensibility, or separation of data and behavior.",
     "rubric": [
       {
         "id": "q1-definitions",
@@ -32,8 +32,8 @@
       },
       {
         "id": "q3-oop-example",
-        "title": "Q3: Specific q5play OOP example named",
-        "description": "Student names a specific class from their q5play code (e.g., Collectible, Player, Enemy) and describes how that class organized their code — what properties and methods it contained, or how it reduced repetition. Full credit requires naming the class and explaining the organizational benefit. Half credit for a generic reference to using a class. Zero for no specific example.",
+        "title": "Q3: Specific shplay OOP example named",
+        "description": "Student names a specific class from their shplay code (e.g., Collectible, Player, Enemy) and describes how that class organized their code — what properties and methods it contained, or how it reduced repetition. Full credit requires naming the class and explaining the organizational benefit. Half credit for a generic reference to using a class. Zero for no specific example.",
         "points": 0
       },
       {

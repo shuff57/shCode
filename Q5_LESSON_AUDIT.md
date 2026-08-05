@@ -1,10 +1,10 @@
-# Q5play Lesson Audit — Findings & Fixes
+# shplay Lesson Audit — Findings & Fixes
 
 > **Status: All Critical, High, and Medium findings fixed.** See "Fixes Applied" at the bottom for the change log and post-fix verification.
 
 
 
-**Scope:** every Unit 2 lesson with `preview: 'q5play'` (30 labs/assignments/challenges) plus the two `preview: 'assignment'` written writeups (`2-1-10`, `2-2-12`).
+**Scope:** every Unit 2 lesson with `preview: 'shplay'` (30 labs/assignments/challenges) plus the two `preview: 'assignment'` written writeups (`2-1-10`, `2-2-12`).
 
 **Method:** static analysis. The grader (`lib/grader.ts`) is pure regex over `script.js` (after stripping JS comments), with optional scoping to a named function body. Every claim below was verified deterministically by loading the actual `lesson.json` pattern through `new RegExp(...)` against the named code shape — not the browser, not the LLM.
 
@@ -68,7 +68,7 @@ The starter ships with the working code (`else player.vel.x = 0` and `else playe
 2/2 reqs pre-pass: r1, r2
 ```
 
-This violates the global memory rule "graded q5play `script.js` files ship as `// STEP N:` breadcrumbs in empty `setup()`/`draw()`, never as pre-working code." It is *also* the lesson's pedagogical intent (delete the lines, watch drift, restore the lines), so the lesson concept is fine but the autograder cannot enforce it.
+This violates the global memory rule "graded shplay `script.js` files ship as `// STEP N:` breadcrumbs in empty `setup()`/`draw()`, never as pre-working code." It is *also* the lesson's pedagogical intent (delete the lines, watch drift, restore the lines), so the lesson concept is fine but the autograder cannot enforce it.
 
 **Fix options (pick one):**
 
@@ -112,7 +112,7 @@ Alternative: split r4 into three named requirements (one per challenge) and keep
 
 ### 4. `2-2-13-challenges` — `script.js` starter is 0 bytes
 
-`lessons/2-2-13-challenges/script.js` is an empty file. Same story for `lessons/2-3-12-challenges/script.js`. Neither has `setup()` or `draw()`. A student who clicks Run on the empty file gets… nothing — q5play needs at least an empty `function setup()` to bootstrap the canvas, and there are no STEP breadcrumbs to nudge them toward a structure.
+`lessons/2-2-13-challenges/script.js` is an empty file. Same story for `lessons/2-3-12-challenges/script.js`. Neither has `setup()` or `draw()`. A student who clicks Run on the empty file gets… nothing — shplay needs at least an empty `function setup()` to bootstrap the canvas, and there are no STEP breadcrumbs to nudge them toward a structure.
 
 The 2.1.11 challenges starter does have skeleton STEP comments. The 2.2.13 / 2.3.12 starters do not.
 
@@ -312,7 +312,7 @@ new Sprite(width/2, height/2, 40, 40);   // fails (width/2 not a numeric literal
 new Sprite(canvas.w/2, canvas.h/2, 40, 40);   // fails
 ```
 
-These are perfectly idiomatic q5play. The lesson is for beginners and the docs may use literals, but the regex is brittle.
+These are perfectly idiomatic shplay. The lesson is for beginners and the docs may use literals, but the regex is brittle.
 
 **Fix:** accept any expression for the position args:
 
@@ -352,13 +352,13 @@ Pattern requires `this.n` then `+=` / `=` / `++`. Prefix `++this.n` doesn't matc
 
 ### 20. `2-3-20-a14-1-space-jumper` r5 — only accepts `'w'` or `' '` for jump key
 
-That matches the lesson copy, which is explicit about why (q5play doesn't recognize `'space'`). No bug — flagging it because the same regex is reused and a student might naturally try `kb.presses('space')` and get a confusing failure. The hint text already calls this out, so leave as-is.
+That matches the lesson copy, which is explicit about why (shplay doesn't recognize `'space'`). No bug — flagging it because the same regex is reused and a student might naturally try `kb.presses('space')` and get a confusing failure. The hint text already calls this out, so leave as-is.
 
 ---
 
 ## What I did NOT verify
 
-- **Runtime behaviour.** I confirmed regex matches but did not run any of the student-equivalent code in q5play. A grader pass with a runtime error still blocks Submit (per `LessonWorkspace.tsx:101` + `:486`), so for grader-passes-but-game-crashes paths the gate exists; the *positive* case (everything green and the game runs) was not exercised in the browser.
+- **Runtime behaviour.** I confirmed regex matches but did not run any of the student-equivalent code in shplay. A grader pass with a runtime error still blocks Submit (per `LessonWorkspace.tsx:101` + `:486`), so for grader-passes-but-game-crashes paths the gate exists; the *positive* case (everything green and the game runs) was not exercised in the browser.
 - **AI grader behaviour for `2-1-10` and `2-2-12`.** I read both rubrics and the prompts; they are coherent and use the documented `qwen3-coder-next:cloud` model. I did not call `/api/grade-written` to test response shape.
 - **Live spot-check in the Playwriter tab.** A headless browser agent attempted to navigate to three of the buggiest lesson URLs but hit "Lesson locked" — the auth wall. The dev cookie isn't shared with new browser sessions. The Playwriter tab the user has open is presumably authenticated; live verification of the bugs above can be done there manually if desired.
 

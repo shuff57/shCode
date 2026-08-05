@@ -1,11 +1,11 @@
 {
   "id": "2-5-8-reading-json-stringify",
-  "title": "2.5.8 Reading — q5play docs: JSON.stringify(obj)",
+  "title": "2.5.8 Reading — shplay docs: JSON.stringify(obj)",
   "description": "JSON.stringify takes a JS object and turns it into a string you can store. Think of it as packing your game state into a box.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 10,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.5 Game Saves",
   "preview": "reading",
   "week": 16,

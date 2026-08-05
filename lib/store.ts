@@ -86,8 +86,8 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       files.map((f) => [f.path, f.content || ''])
     );
 
-    // For JS-only preview modes (console, jscad, q5play), default to script.js
-    const jsPreviewModes = ['console', 'jscad', 'q5play'];
+    // For JS-only preview modes (console, jscad, shplay), default to script.js
+    const jsPreviewModes = ['console', 'jscad', 'shplay'];
     const defaultFile = jsPreviewModes.includes(lesson.preview || '')
       ? (files.find((f) => f.path.endsWith('.js'))?.path || files[0]?.path)
       : files[0]?.path;
@@ -135,7 +135,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     const fileContents = Object.fromEntries(
       files.map((f) => [f.path, f.content || ''])
     );
-    const jsPreviewModes = ['console', 'jscad', 'q5play'];
+    const jsPreviewModes = ['console', 'jscad', 'shplay'];
     const defaultFile = jsPreviewModes.includes(lesson.preview || '')
       ? (files.find((f) => f.path.endsWith('.js'))?.path || files[0]?.path)
       : files[0]?.path;

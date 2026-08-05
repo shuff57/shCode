@@ -5,9 +5,9 @@
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 8,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.2 Object-Oriented Programming",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 12,
   "slos": ["SLO-2", "SLO-3"],
   "steps": [
@@ -15,7 +15,7 @@
       "id": "s1",
       "title": "Push five Enemy instances into enemies[]",
       "instructions": "In `setup()`, call `enemies.push(new Enemy(...))` five times with different x positions. After setup, `enemies.length` should be 5 and five red squares should appear on screen.",
-      "hints": ["Open the q5play docs drawer on the right and look at how arrays work — push adds one element to the end of an array."]
+      "hints": ["Open the shplay docs drawer on the right and look at how arrays work — push adds one element to the end of an array."]
     }
   ],
   "requirements": [

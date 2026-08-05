@@ -1,5 +1,5 @@
 // 2.3.20 A14.1 Space Jumper
-// Open the Quest tab for the graded requirements; open the Docs tab for the q5play API.
+// Open the Quest tab for the graded requirements; open the Docs tab for the shPlay API.
 
 let player, ground, goal;
 
@@ -22,7 +22,7 @@ function draw() {
   // STEP 3: Ground-gated jump — combine kb.presses(' ') with
   // player.colliding(ground) so the player can only jump when on the ground.
   // Use a LITERAL space character as the key arg — the string 'space' is not
-  // recognized by q5play. .colliding() returns the frame count while in contact.
+  // recognized by shPlay. .colliding() returns the frame count while in contact.
 
   // STEP 4: Win condition — when player overlaps the goal, trigger a clear
   // win state (change background, stop updating, show text, etc).

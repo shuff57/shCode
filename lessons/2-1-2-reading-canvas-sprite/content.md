@@ -7,7 +7,7 @@ By the end of this reading you should be able to answer:
 - Which of `setup()` and `draw()` runs once? Which runs every frame?
 - About how many times does `draw()` run in one second?
 
-You don't call `setup()` or `draw()` yourself. You **define** them, and q5play calls them on a schedule.
+You don't call `setup()` or `draw()` yourself. You **define** them, and shplay calls them on a schedule.
 
 **What you'll learn from it:**
 
@@ -46,5 +46,5 @@ function draw() {
 |------|---------|
 | **`setup()`** | Function you define. Engine calls it once at start. |
 | **`draw()`** | Function you define. Engine calls it every frame. |
-| **Frame** | One run of `draw()`. q5play does ~60 of them per second. |
-| **Frame rate** | Frames per second (fps). q5play targets 60. |
+| **Frame** | One run of `draw()`. shplay does ~60 of them per second. |
+| **Frame rate** | Frames per second (fps). shplay targets 60. |

@@ -1,6 +1,6 @@
 ## A button held down
 
-**Read before `2.7.5 Reading — q5play docs: mouse.presses()`.** About 5 minutes.
+**Read before `2.7.5 Reading — shplay docs: mouse.presses()`.** About 5 minutes.
 
 `mouse.pressing()` returns `true` every frame the mouse button is being held down. As long as your finger stays on the button, it stays `true`. The moment you release, it goes `false`.
 

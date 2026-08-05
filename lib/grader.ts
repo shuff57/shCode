@@ -22,7 +22,7 @@ export interface GradeReport {
 // Strip JS // and /* */ comments so a commented-out answer can't pass a
 // regex requirement. Respects strings so tokens inside "// not a comment"
 // survive. Naive: no template-literal or regex-literal handling, which
-// is fine for student q5play code.
+// is fine for student shPlay code.
 function stripJsComments(src: string): string {
   let out = '';
   let i = 0;
@@ -80,7 +80,7 @@ function extractFunctionBody(src: string, name: string): string | null {
 // ---- Checkers ----
 
 // Default flags is '' (case-sensitive). Set req.flags = 'i' explicitly if
-// you want case-insensitive. q5play identifiers (Canvas, Sprite, kb,
+// you want case-insensitive. shPlay identifiers (Canvas, Sprite, kb,
 // world) are case-sensitive so strict is the right default.
 function checkRegex(req: Requirement, files: Record<string, string>): boolean {
   const raw = files[req.file || ''] || '';

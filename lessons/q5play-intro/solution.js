@@ -1,5 +1,5 @@
 // 2.1.5 Hello Sprite (reference solution).
-// First q5play sketch — canvas, sprite, color, background.
+// First shPlay sketch — canvas, sprite, color, background.
 
 let player;
 

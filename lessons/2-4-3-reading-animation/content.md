@@ -2,7 +2,7 @@
 
 **Read before attempting `2.4.3a Reading — addAni(name, frames)`.**
 
-q5play's animation system is **state-driven**: a sprite carries a library of named animations, only one of which renders per frame. Games swap between named animations to express what the player is doing — `idle`, `run`, `jump`. The frame loop never decides what the sprite should look like; your input/state code does.
+shplay's animation system is **state-driven**: a sprite carries a library of named animations, only one of which renders per frame. Games swap between named animations to express what the player is doing — `idle`, `run`, `jump`. The frame loop never decides what the sprite should look like; your input/state code does.
 
 **What you'll learn from it:**
 
@@ -38,7 +38,7 @@ function draw() {
 }
 ```
 
-Click the preview, then hold `D`. The visual flips on press, back on release. That's the same pattern q5play's animation system uses — just with named animations instead of color strings. The next four readings introduce the real API: `2.4.3a` registers a named animation with `addAni`, `2.4.3b` switches between them with `changeAni`, `2.4.3c` controls cycle speed via `frameDelay`, and `2.4.3d` covers single-frame still art with `sprite.image`.
+Click the preview, then hold `D`. The visual flips on press, back on release. That's the same pattern shplay's animation system uses — just with named animations instead of color strings. The next four readings introduce the real API: `2.4.3a` registers a named animation with `addAni`, `2.4.3b` switches between them with `changeAni`, `2.4.3c` controls cycle speed via `frameDelay`, and `2.4.3d` covers single-frame still art with `sprite.image`.
 
 ---
 

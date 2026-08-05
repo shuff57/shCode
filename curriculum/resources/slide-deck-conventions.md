@@ -2,7 +2,7 @@
 
 Canonical rules for authoring Slidev decks for **any curriculum unit**. One deck per unit, served statically from `public/slides/U.M/` via the Next.js build (where U = unit number, M = module number). When a module spec under `curriculum/modules/lessons/U.M.Y_*.md` references "the unit slide deck" or a `lessons/U-M-1-slides/` in-app lesson, these rules are binding.
 
-**Canonical reference:** Unit 2.1 (`slides/2.1/slides.md`, ~440 lines, 30 slides) was the first deck built under this convention and remains the style reference. The q5play-specific patterns below (Q5Runner embed, sprite-heavy slide rhythm) are tagged **[q5play]** — skip them if the unit isn't q5play-based.
+**Canonical reference:** Unit 2.1 (`slides/2.1/slides.md`, ~440 lines, 30 slides) was the first deck built under this convention and remains the style reference. The shplay-specific patterns below (Q5Runner embed, sprite-heavy slide rhythm) are tagged **[shplay]** — skip them if the unit isn't shplay-based.
 
 ---
 
@@ -14,20 +14,20 @@ Each unit has exactly **one** Slidev deck covering all its modules. Decks live a
 slides/U.M/
 ├── slides.md         # the deck — ~400–500 lines, ~25–30 slides
 ├── setup/            # Slidev setup hooks
-├── components/       # [q5play] per-deck Vue components (e.g. Q5Runner.vue)
-└── public/           # [q5play] runtime assets (q5.js + Box2D)
+├── components/       # [shplay] per-deck Vue components (e.g. Q5Runner.vue)
+└── public/           # [shplay] runtime assets (q5.js + Box2D)
 ```
 
-For q5play units: copy `components/` and `public/` from `slides/2.1/`. For non-q5play units (Unit 1, future Unit 3+ that don't embed runnable sketches), the `components/` and `public/` folders are optional — omit them if the deck is pure content.
+For shplay units: copy `components/` and `public/` from `slides/2.1/`. For non-shplay units (Unit 1, future Unit 3+ that don't embed runnable sketches), the `components/` and `public/` folders are optional — omit them if the deck is pure content.
 
-**Bootstrap (q5play unit):**
+**Bootstrap (shplay unit):**
 
 ```bash
 mkdir -p slides/U.M
 cp -r slides/2.1/{components,public,setup} slides/U.M/
 ```
 
-**Bootstrap (non-q5play unit):**
+**Bootstrap (non-shplay unit):**
 
 ```bash
 mkdir -p slides/U.M/setup
@@ -111,9 +111,9 @@ mdc: true
 
 **Code blocks:** fenced with ```js (or whatever language).
 
-**[q5play] Runnable code:** import and use `<Q5Runner :code="..." :width="400" :height="400" />` only when the slide demonstrates a q5play sketch that should run inside the deck. Copy the exact `<script setup lang="ts">` + import pattern from 2.1. Non-q5play units skip this entirely — drop the `components/Q5Runner.vue` file and don't reference it.
+**[shplay] Runnable code:** import and use `<Q5Runner :code="..." :width="400" :height="400" />` only when the slide demonstrates a shplay sketch that should run inside the deck. Copy the exact `<script setup lang="ts">` + import pattern from 2.1. Non-shplay units skip this entirely — drop the `components/Q5Runner.vue` file and don't reference it.
 
-**Scaffold discipline:** show **conceptual** code in slides, not the graded-lab solution. Per `q5play-lesson-conventions.md` (or the unit's equivalent starter doc), the graded starter is a scaffold; don't put the solution on a slide.
+**Scaffold discipline:** show **conceptual** code in slides, not the graded-lab solution. Per `shplay-lesson-conventions.md` (or the unit's equivalent starter doc), the graded starter is a scaffold; don't put the solution on a slide.
 
 ### Slide rhythm (adapt to unit content)
 
@@ -124,7 +124,7 @@ Approximate pacing used in 2.1 and 2.2 — adapt per unit:
 3. Concept reveal + `<v-click>`
 4. DevTools / code-reveal walkthrough
 5. New syntax slides (blueprint → example)
-6. Live-code example (q5play: with `Q5Runner`; other units: static code + discussion)
+6. Live-code example (shplay: with `Q5Runner`; other units: static code + discussion)
 7. Comparison slide (old way vs new way)
 8. Discussion / pair-exercise prompt
 9. Assignment preview (graded artifacts)
@@ -187,11 +187,11 @@ Each unit's slide deck is surfaced through an in-app lesson at `lessons/U-M-1-sl
 
 Slides always occupy the `.1` position in their module. All other lessons in that module start at `.2`.
 
-✅ `"2.1.1 Slides — q5play Foundations"` (Unit 2, Module 1)
+✅ `"2.1.1 Slides — shplay Foundations"` (Unit 2, Module 1)
 ✅ `"2.2.1 Slides — Object-Oriented Programming"` (Unit 2, Module 2)
 ✅ `"3.1.1 Slides — <Unit 3 Module 1 name>"` (Unit 3 when it ships)
-❌ `"Unit 2.1 Slides — q5play Foundations"` (no numbered prefix — lesson vanishes from /module/2.1)
-❌ `"2.1 Slides — q5play Foundations"` (needs three numbers, not two)
+❌ `"Unit 2.1 Slides — shplay Foundations"` (no numbered prefix — lesson vanishes from /module/2.1)
+❌ `"2.1 Slides — shplay Foundations"` (needs three numbers, not two)
 
 The teacher-reference doc at `curriculum/modules/lessons/U.M.1_*.md` shares the same number but lives in a different namespace (never rendered to students), so there's no actual collision.
 
@@ -200,7 +200,7 @@ The teacher-reference doc at `curriculum/modules/lessons/U.M.1_*.md` shares the 
 The `description` is rendered on the lesson card and at the top of the lesson page — students see it. Do NOT include implementation detail like "Built with Slidev", "Teachers edit content in slides/...", or "Live-editable deck". Describe what the student will see and do.
 
 ✅ `"Unit 2.1 slides — canvas, sprites, keyboard input, and the frame loop. Includes runnable code examples."`
-❌ `"Live-editable slide deck with runnable q5play code. Built with Slidev. Teachers edit content in slides/2.1/slides.md."`
+❌ `"Live-editable slide deck with runnable shplay code. Built with Slidev. Teachers edit content in slides/2.1/slides.md."`
 
 ### Metadata-only fields
 
@@ -218,7 +218,7 @@ Do NOT add a `slidesSource` field. It was previously rendered as "Edit source: �
 
 ## 7. Authoring workflow
 
-1. **Bootstrap:** `mkdir slides/U.M && cp -r slides/2.1/{setup,components,public} slides/U.M/` (drop `components,public` for non-q5play units).
+1. **Bootstrap:** `mkdir slides/U.M && cp -r slides/2.1/{setup,components,public} slides/U.M/` (drop `components,public` for non-shplay units).
 2. **Author slides.md** — read `slides/2.1/slides.md` for reference; keep style parity.
 3. **Add 3 npm scripts** to `package.json` + chain into `slides:build-all`.
 4. **Update in-app lesson** `lessons/U-M-1-slides/lesson.json` with `slidesUrl` and `slidesDevUrl`. Title MUST start with `"U.M.1 Slides — <Unit Name>"` (see §5 for why); description is student-facing (see §5).
@@ -234,5 +234,5 @@ Do NOT add a `slidesSource` field. It was previously rendered as "Edit source: �
 |------|------|
 | Unit 2.1 (initial) | Single deck at `slides/2.1/slides.md`, 482 lines, 30 slides. Served via `slidesUrl: "http://localhost:3030"` — broken in prod. |
 | Unit 2.2 buildout | `public/slides/` gitignored. `prebuild` hook added. Both 2.1 and 2.2 `slidesUrl` switched to relative `/slides/U.M/`. Slides now live on the deployed site. |
-| Rename + generalize | File renamed from `q5play-slides-conventions.md` to `slide-deck-conventions.md`. Unit-2-specific assumptions tagged `[q5play]` so Unit 3+ (any subject) can follow the same rules. Title rule (`U.M.1 …`) made explicit after two lessons shipped with the wrong title and vanished from the module page. |
+| Rename + generalize | File renamed from `shplay-slides-conventions.md` to `slide-deck-conventions.md`. Unit-2-specific assumptions tagged `[shplay]` so Unit 3+ (any subject) can follow the same rules. Title rule (`U.M.1 …`) made explicit after two lessons shipped with the wrong title and vanished from the module page. |
 | Granularity-aware decks | §4a added: when a unit's lessons follow the §2a granularity bar (sub-letter atomic readings), slides MUST include a lesson-map slide and a quick-reference glossary slide, MUST NOT bundle multiple atomic concepts on one slide, and SHOULD reference the owning lesson at the bottom of single-concept slides. Slide rhythm in §4 gained two named slots (Lesson map, Quick reference) reflecting the new requirement. The 2.1 deck was the first applied: 5-row properties slide trimmed to 4 (vel deferred), keyboard slide split into `kb.pressing` + movement-pattern, lesson map replacing "Today's in-app work," quick-reference glossary added before "What's next," stale physics references in "What's next" replaced with the actual 2.2/2.3/2.4 progression. |

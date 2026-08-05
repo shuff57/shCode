@@ -1,6 +1,6 @@
 ## The `switch` statement
 
-**Read before `2.6.4 Reading — q5play docs: switch in draw()`.** About 5 minutes.
+**Read before `2.6.4 Reading — shplay docs: switch in draw()`.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

@@ -4,7 +4,7 @@
 |---|---|
 | **Module** | 2.1.1 Hello Sprite and Movement |
 | **Week** | 10 |
-| **Type** | Lab (in-app q5play editor) |
+| **Type** | Lab (in-app shplay editor) |
 | **Points** | 15 |
 | **Estimated time** | 45 min |
 | **SLO** | SLO 3 — design, implement, test |
@@ -14,7 +14,7 @@
 
 **Module resources:**
 - 📋 [Module overview](2.1.1_overview.md) — recommended learning order
-- 📖 [Readings](2.1.1_readings.md) — q5play docs + FCC refs
+- 📖 [Readings](2.1.1_readings.md) — shplay docs + FCC refs
 - 💡 [Worked examples](2.1.1_worked-examples.md) — reference code from class walkthroughs
 - ⭐ [Challenges](2.1.1_challenges.md) — stretch problems if you finish early
 
@@ -22,7 +22,7 @@
 
 ## Overview
 
-Build a "sprite playground" in the q5play in-app editor. You will combine everything from the two in-app lessons this week (`Hello Sprite` + `Make it Move`) and add two new things: a second sprite that moves on its own, and an on-screen text label.
+Build a "sprite playground" in the shplay in-app editor. You will combine everything from the two in-app lessons this week (`Hello Sprite` + `Make it Move`) and add two new things: a second sprite that moves on its own, and an on-screen text label.
 
 By the end of this lab, you'll have a single running sketch that demonstrates every concept from Module 2.1.1.
 
@@ -50,7 +50,7 @@ Create a new sketch in the in-app editor with the following features.
 
 ### Why WASD and not arrow keys?
 
-Arrow keys also scroll the browser iframe. Your controllable sprite will be fighting the page scroll. WASD is the safe default for q5play labs.
+Arrow keys also scroll the browser iframe. Your controllable sprite will be fighting the page scroll. WASD is the safe default for shplay labs.
 
 ---
 

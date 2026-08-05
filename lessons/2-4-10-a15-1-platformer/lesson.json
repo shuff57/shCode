@@ -5,9 +5,9 @@
   "type": "assignment",
   "difficulty": "intermediate",
   "estimateMins": 90,
-  "category": "Unit 2: q5play — Applied Game Development",
+  "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.4 Animation & Camera",
-  "preview": "q5play",
+  "preview": "shplay",
   "week": 15,
   "slos": ["SLO-3"],
   "steps": [
@@ -15,37 +15,37 @@
       "id": "s1",
       "title": "Create the player with an initial visual",
       "instructions": "In setup(), create the player sprite. Give it an initial visual — either addAni('idle', ...) or sprite.image = '🧍'.",
-      "hints": ["Open the q5play docs drawer and find the Visual / image section. Single emoji strings work as zero-asset placeholders."]
+      "hints": ["Open the shplay docs drawer and find the Visual / image section. Single emoji strings work as zero-asset placeholders."]
     },
     {
       "id": "s2",
       "title": "Build a level wider than the canvas",
       "instructions": "In setup(), create at least three static platforms ('static' as the 5th constructor argument) plus a ground. Spread them across an x-range wider than the canvas so the level requires scrolling.",
-      "hints": ["The Sprite constructor's 5th argument controls physics type. Open the q5play docs drawer and find the Sprite section."]
+      "hints": ["The Sprite constructor's 5th argument controls physics type. Open the shplay docs drawer and find the Sprite section."]
     },
     {
       "id": "s3",
       "title": "Place a visible end goal",
       "instructions": "In setup(), add a goal sprite far to the right. Give it sprite.collider = 'none' so it doesn't physically push the player away.",
-      "hints": ["Open the q5play docs drawer and find the Visual / image section for the goal's appearance."]
+      "hints": ["Open the shplay docs drawer and find the Visual / image section for the goal's appearance."]
     },
     {
       "id": "s4",
       "title": "Clear the background each frame",
       "instructions": "In draw(), call background(...) so old frames don't pile up.",
-      "hints": ["Search the q5play docs drawer for background()."]
+      "hints": ["Search the shplay docs drawer for background()."]
     },
     {
       "id": "s5",
       "title": "WASD movement + state-driven visual swap",
       "instructions": "In draw(), read WASD with kb.pressing. Set the player's horizontal motion AND swap its visual based on motion — sprite.image to a 'run' emoji when moving, back to 'idle' when not. The grader looks for at least two animation states inside draw().",
-      "hints": ["Open the q5play docs drawer's Input / Keyboard section for kb.pressing."]
+      "hints": ["Open the shplay docs drawer's Input / Keyboard section for kb.pressing."]
     },
     {
       "id": "s6",
       "title": "Ground-gated jump",
       "instructions": "In draw(), use kb.presses('w') (edge-triggered) AND player.colliding(allSprites) together to jump only when the player is touching the ground or a platform.",
-      "hints": ["Open the q5play docs drawer's Sprite section for colliding/overlaps. kb.presses fires once per press; kb.pressing fires every frame the key is held."]
+      "hints": ["Open the shplay docs drawer's Sprite section for colliding/overlaps. kb.presses fires once per press; kb.pressing fires every frame the key is held."]
     },
     {
       "id": "s7",
@@ -57,7 +57,7 @@
       "id": "s8",
       "title": "Goal overlap + win message",
       "instructions": "In draw(), check player.overlaps(goal). When it's truthy, call text('You win!', ...) so the win message is what the overlap triggers.",
-      "hints": ["Open the q5play docs drawer's Sprite section for overlaps. text() is the global drawing function for on-canvas text."]
+      "hints": ["Open the shplay docs drawer's Sprite section for overlaps. text() is the global drawing function for on-canvas text."]
     }
   ],
   "requirements": [

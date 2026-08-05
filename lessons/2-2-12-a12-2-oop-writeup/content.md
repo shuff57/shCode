@@ -8,6 +8,6 @@ Write your response in the box below. Short paragraphs or a numbered structure b
 |---|-----------|
 | 1 | Q1: Both terms defined clearly in own words |
 | 2 | Q2: Specific Q1 procedural example named and described |
-| 3 | Q3: Specific q5play OOP example named and described |
+| 3 | Q3: Specific shplay OOP example named and described |
 | 4 | Q4: OOP-wins scenario with clear reasoning |
 | 5 | Writing clarity (within word count, organized) |

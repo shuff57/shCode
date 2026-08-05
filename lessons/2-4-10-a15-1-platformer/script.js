@@ -1,5 +1,5 @@
 // 2.4.10 A15.1 Side-Scrolling Platformer
-// Open the Quest tab for the graded requirements; open the Docs tab for the q5play API.
+// Open the Quest tab for the graded requirements; open the Docs tab for the shPlay API.
 
 let player, goal;
 

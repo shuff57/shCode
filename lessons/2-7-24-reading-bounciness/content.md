@@ -18,7 +18,7 @@ One thing to know: even at `1.0`, the ball will slowly bleed energy. Air drag, c
 **What you'll learn from it:**
 - `bounciness` is a per-sprite property — each sprite can have a different value.
 - Lower values feel heavy or sticky; higher values feel light and lively.
-- The property is part of q5play's physics simulation — you do not write any bounce math yourself.
+- The property is part of shplay's physics simulation — you do not write any bounce math yourself.
 - Setting it in `setup` is enough; you can also change it during the game to make surfaces feel different.
 
 **Try it:** run the sketch. The ball drops onto the floor and bounces. Change `0.8` to `0.2` and run again — the ball barely comes back up. Change it to `1.0` and watch how long it keeps going.
@@ -54,6 +54,6 @@ function draw() {
 | Term | Meaning |
 |------|---------|
 | **`bounciness`** | Per-sprite property. Controls how much speed the sprite keeps after a collision. Range: 0 to 1. |
-| **Restitution** | Physics term for the same idea — how elastic a collision is. `bounciness` is q5play's name for restitution. |
+| **Restitution** | Physics term for the same idea — how elastic a collision is. `bounciness` is shplay's name for restitution. |
 | **`0`** | Dead thud — the sprite hits and stops, no energy returned. |
 | **`1`** | Nearly lossless — the sprite bounces back with almost the same speed (tiny bleed still occurs). |
