@@ -2,7 +2,7 @@
 theme: default
 title: "Module 2.2 — Object-Oriented Programming"
 info: |
-  Module 2.2: Object-Oriented Programming via q5play.
+  Module 2.2: Object-Oriented Programming via shplay.
   Week 12 · Q2 · 2 class sessions.
   Covers: classes, instances, this, procedural vs OOP.
 class: text-center
@@ -10,7 +10,7 @@ transition: slide-left
 mdc: true
 ---
 
-# Module 2.2 — Object-Oriented Programming via q5play
+# Module 2.2 — Object-Oriented Programming via shplay
 
 **Week 12 · Quarter 2 · Two sessions**
 
@@ -64,7 +64,7 @@ Open DevTools and try this:
 
 <v-click>
 
-Every q5play primitive — `Sprite`, `Canvas`, `Group` — is an instance of a class.
+Every shplay primitive — `Sprite`, `Canvas`, `Group` — is an instance of a class.
 This week you write your own.
 
 </v-click>
@@ -364,7 +364,7 @@ Click the canvas, then press **X** 10 times. Watch the HP count down and the spr
 Three uses of `this` on three different lines — all referring to the **same instance**:
 
 - `this.x = x` — stores the enemy's position as instance data. Each enemy remembers its own x.
-- `this.sprite = new Sprite(...)` — creates a q5play sprite that belongs to **this** enemy and no other.
+- `this.sprite = new Sprite(...)` — creates a shplay sprite that belongs to **this** enemy and no other.
 - `this.sprite.remove()` — despawns **this** enemy's sprite. Other enemies on screen are unaffected.
 
 <v-click>
@@ -390,7 +390,7 @@ A **value** stored on the instance.
 |------|--------------|
 | `.hp` | current hit points |
 | `.x` | x position |
-| `.sprite` | the q5play Sprite object |
+| `.sprite` | the shplay Sprite object |
 
 Access with dot notation: `enemy.hp`
 
@@ -591,7 +591,7 @@ The rule of thumb: if you find yourself writing parallel arrays and helper funct
 
 1. **Definitions in your own words** — what does procedural mean, and what does OOP mean? No copied definitions.
 2. **A specific Q1 example** — name an assignment you wrote in Q1 using the procedural approach. 1–2 sentences.
-3. **A specific q5play example** — name where in your q5play code you used OOP. Describe how the class organized your code.
+3. **A specific shplay example** — name where in your shplay code you used OOP. Describe how the class organized your code.
 4. **When OOP wins** — one scenario where OOP is clearly better, explained in terms of readability, extensibility, or separation of data and behavior.
 
 ---
@@ -740,7 +740,7 @@ class: text-center
 
 # Questions?
 
-Open **`/docs/q5play`** for the full Sprite class reference — read it now as a class API, not just a list of properties.
+Open **`/docs/shplay`** for the full Sprite class reference — read it now as a class API, not just a list of properties.
 
 **Next up:** Worked Example 2 live — write `Enemy` together.
 

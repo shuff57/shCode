@@ -70,7 +70,7 @@ This doesn't scale.
 
 You already know one fix from CS-1: **arrays**. Push enemies into one. Loop over them.
 
-This week q5play gives you a smarter version of an array — one that knows what a sprite is.
+This week shplay gives you a smarter version of an array — one that knows what a sprite is.
 
 </v-click>
 
@@ -496,7 +496,7 @@ You expect `apples remaining: 0`. You'll see **2–4 left over**.
 
 # Why it skips
 
-When `apples[2].delete()` runs, q5play splices that sprite out of the `apples` array. Everything to the right shifts down by one.
+When `apples[2].delete()` runs, shplay splices that sprite out of the `apples` array. Everything to the right shifts down by one.
 
 <div class="grid grid-cols-2 gap-6 mt-4 text-xs">
 <div>
@@ -570,7 +570,7 @@ This is the more readable form. Pick it unless you have a reason to write the ba
 
 <v-click>
 
-**The third safe place: inside an `overlaps` callback.** q5play has finished its own iteration before invoking your callback, so you can `delete()` freely. That's why Apple Catcher worked.
+**The third safe place: inside an `overlaps` callback.** shplay has finished its own iteration before invoking your callback, so you can `delete()` freely. That's why Apple Catcher worked.
 
 </v-click>
 
@@ -639,7 +639,7 @@ if (kb.presses(' ')) {
 
 `kb.presses(' ')` returns `true` for **exactly one frame** — the frame the key transitions from up → down. Hold it longer? Still just the first frame.
 
-(Pass a **literal space character** as the key. The string `'space'` looks readable but q5play stores the spacebar under `' '` and never aliases the word `'space'` — `kb.presses('space')` will silently return `false` forever.)
+(Pass a **literal space character** as the key. The string `'space'` looks readable but shplay stores the spacebar under `' '` and never aliases the word `'space'` — `kb.presses('space')` will silently return `false` forever.)
 
 <v-click>
 
@@ -1009,7 +1009,7 @@ class: text-center
 
 # Questions?
 
-Open **`/docs/q5play`** for the full `Group`, `overlaps`, and `kb` API reference.
+Open **`/docs/shplay`** for the full `Group`, `overlaps`, and `kb` API reference.
 
 **Next up:** 2.3.4 Worked Example — Iterating a Group, live in the in-app editor.
 

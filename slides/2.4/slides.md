@@ -91,7 +91,7 @@ State changes the visual.
 
 # Animation = swap on state change
 
-q5play's animation API is **state-driven**: register named animations once, then `changeAni(name)` whenever the player's state changes.
+shplay's animation API is **state-driven**: register named animations once, then `changeAni(name)` whenever the player's state changes.
 
 ```js
 sprite.addAni('idle', 'img/idle.png');

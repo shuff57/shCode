@@ -1,8 +1,8 @@
 ---
 theme: default
-title: "Module 2.1 — q5play Foundations"
+title: "Module 2.1 — shplay Foundations"
 info: |
-  Module 2.1: q5play Foundations.
+  Module 2.1: shplay Foundations.
   Week 10 · Q2 · 2 class sessions.
   Covers: canvas, sprites, frame loop, keyboard input.
 class: text-center
@@ -10,7 +10,7 @@ transition: slide-left
 mdc: true
 ---
 
-# Module 2.1 — q5play Foundations
+# Module 2.1 — shplay Foundations
 
 **Week 10 · Quarter 2 · Two sessions**
 
@@ -46,7 +46,7 @@ This week: the same JavaScript drives **a visual game engine**.
 
 ---
 
-# q5play — what it is
+# shplay — what it is
 
 <div class="grid grid-cols-2 gap-8 mt-4">
 <div>
@@ -76,7 +76,7 @@ Runs entirely in your browser. **No installs.**
 
 # The program skeleton
 
-Every q5play sketch has **two functions** (or three):
+Every shplay sketch has **two functions** (or three):
 
 ```js
 function setup() {
@@ -203,7 +203,7 @@ Lesson: <code>2.1.3f Reading — Sprite property tour</code>
 <div class="grid grid-cols-2 gap-8">
 <div>
 
-q5play runs at **≈60 frames per second**.
+shplay runs at **≈60 frames per second**.
 
 If `player.vel.x = 4`:
 
@@ -315,7 +315,7 @@ Click the game, then hold arrow keys. Try commenting out an `else` branch — wa
 <div class="grid grid-cols-2 gap-8 mt-4">
 <div>
 
-## Screen (q5play)
+## Screen (shplay)
 
 - Up → **negative** y (`vel.y = -4`)
 - Down → **positive** y (`vel.y = 4`)
