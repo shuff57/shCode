@@ -21,6 +21,7 @@
  *   world.gravity.y           frameCount        world.getSpriteAt(x,y)
  *   background(color)         camera.x / camera.y
  *   fill(c) textSize(px) textAlign(CENTER|LEFT|RIGHT)   text(str,x,y)
+ *   square(x,y,s)  cos/sin  mouseX/mouseY  width/height  noLoop()
  *   storeItem/getItem         (localStorage)
  *   sprite.addAni/changeAni   (2.4.x minimal sprite-sheet animation)
  *   sprite.image = url        (still image; a string with no '.' is an emoji
@@ -631,6 +632,15 @@
     CTX_.restore();
   }
 
+  // ---- q5.js drawing primitives (used by real lesson code) ---------------
+
+  function square(x, y, s) {
+    CTX_.save();
+    CTX_.translate(-camera.x, -camera.y);
+    CTX_.fillRect(x, y, s, s);
+    CTX_.restore();
+  }
+
   // ---- persistence ------------------------------------------------------
 
   function storeItem(name, val) { localStorage.setItem(name, JSON.stringify(val)); }
@@ -642,6 +652,10 @@
   function removeItem(name) { localStorage.removeItem(name); }
 
   // ---- main loop --------------------------------------------------------
+
+  let _loopRunning = true;
+
+  function noLoop() { _loopRunning = false; }
 
   function start() {
     const setupFn = window.setup || (() => {});
@@ -668,6 +682,7 @@
 
     let last = performance.now();
     function loop(now) {
+      if (!_loopRunning) return; // noLoop(): fully stop, don't idle-spin rAF
       const dt = (now - last) / 1000;
       last = now;
       const step = Math.min(dt, 0.05);
@@ -715,17 +730,25 @@
   global.mouse = mouse;
   global.allSprites = allSprites;
   Object.defineProperty(global, 'frameCount', { get: () => FRAME_ });
+  Object.defineProperty(global, 'width', { get: () => W_ });
+  Object.defineProperty(global, 'height', { get: () => H_ });
+  Object.defineProperty(global, 'mouseX', { get: () => MOUSE.x });
+  Object.defineProperty(global, 'mouseY', { get: () => MOUSE.y });
+  global.cos = Math.cos;
+  global.sin = Math.sin;
   global.background = background;
   global.text = text;
   global.fill = fill;
   global.textSize = textSize;
   global.textAlign = textAlign;
+  global.square = square;
   global.CENTER = CENTER;
   global.LEFT = LEFT;
   global.RIGHT = RIGHT;
   global.storeItem = storeItem;
   global.getItem = getItem;
   global.removeItem = removeItem;
+  global.noLoop = noLoop;
   global.start = start;
 
   /* SCOPE — 2D only; 3D is out of scope by design.

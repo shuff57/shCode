@@ -1,0 +1,1572 @@
+[
+  {
+    "file": "lessons\\2-1-11-challenges\\script.js",
+    "status": "THROWS-SCAFFOLD",
+    "error": "new Canvas(w, h) must be called in setup()",
+    "state": null
+  },
+  {
+    "file": "lessons\\2-1-11-challenges\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 2,
+      "samples": [
+        {
+          "x": 250,
+          "y": 205,
+          "w": 36,
+          "h": 36,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        },
+        {
+          "x": 191,
+          "y": 213,
+          "w": 18,
+          "h": 18,
+          "shape": "rect",
+          "color": "white",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-1-3c-lab-one-sprite\\script.js",
+    "status": "THROWS-SCAFFOLD",
+    "error": "new Canvas(w, h) must be called in setup()",
+    "state": null
+  },
+  {
+    "file": "lessons\\2-1-3c-lab-one-sprite\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 1,
+      "samples": [
+        {
+          "x": 180,
+          "y": 329,
+          "w": 50,
+          "h": 50,
+          "shape": "rect",
+          "color": "tomato",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-1-7d-lab-else-to-zero\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 1,
+      "samples": [
+        {
+          "x": 180,
+          "y": 329,
+          "w": 40,
+          "h": 40,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-1-7d-lab-else-to-zero\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 1,
+      "samples": [
+        {
+          "x": 180,
+          "y": 185,
+          "w": 40,
+          "h": 40,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-1-9-a10-1-sprite-playground\\script.js",
+    "status": "THROWS-SCAFFOLD",
+    "error": "new Canvas(w, h) must be called in setup()",
+    "state": null
+  },
+  {
+    "file": "lessons\\2-1-9-a10-1-sprite-playground\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 2,
+      "samples": [
+        {
+          "x": 250,
+          "y": 205,
+          "w": 40,
+          "h": 40,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        },
+        {
+          "x": 88,
+          "y": 349,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "orange",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-2-11-a12-1-collectible\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 1,
+      "samples": [
+        {
+          "x": 200,
+          "y": 205,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "white",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-2-11-a12-1-collectible\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 5,
+      "samples": [
+        {
+          "x": 200,
+          "y": 205,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "white",
+          "body": "dynamic"
+        },
+        {
+          "x": 80,
+          "y": 229,
+          "w": 20,
+          "h": 20,
+          "shape": "rect",
+          "color": "yellow",
+          "body": "dynamic"
+        },
+        {
+          "x": 320,
+          "y": 229,
+          "w": 20,
+          "h": 20,
+          "shape": "rect",
+          "color": "cyan",
+          "body": "dynamic"
+        },
+        {
+          "x": 80,
+          "y": 469,
+          "w": 20,
+          "h": 20,
+          "shape": "rect",
+          "color": "magenta",
+          "body": "dynamic"
+        },
+        {
+          "x": 320,
+          "y": 469,
+          "w": 20,
+          "h": 20,
+          "shape": "rect",
+          "color": "lime",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-2-13-challenges\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-13-challenges\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 3,
+      "samples": [
+        {
+          "x": 200,
+          "y": 449,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "white",
+          "body": "dynamic"
+        },
+        {
+          "x": 120,
+          "y": 269,
+          "w": 24,
+          "h": 24,
+          "shape": "rect",
+          "color": "crimson",
+          "body": "dynamic"
+        },
+        {
+          "x": 300,
+          "y": 269,
+          "w": 22,
+          "h": 22,
+          "shape": "circle",
+          "color": "gold",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-2-4b-lab-read-property\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-4b-lab-read-property\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-4c-lab-write-property\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-4c-lab-write-property\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-4d-lab-two-instances\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-4d-lab-two-instances\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-6-lab-build-sprite\\script.js",
+    "status": "THROWS-SCAFFOLD",
+    "error": "new Canvas(w, h) must be called in setup()",
+    "state": null
+  },
+  {
+    "file": "lessons\\2-2-6-lab-build-sprite\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 2,
+      "samples": [
+        {
+          "x": 120,
+          "y": 299,
+          "w": 80,
+          "h": 50,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        },
+        {
+          "x": 280,
+          "y": 299,
+          "w": 60,
+          "h": 60,
+          "shape": "circle",
+          "color": "tomato",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-2-7b-lab-method-no-params\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-7b-lab-method-no-params\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-7c-lab-method-with-params\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-7c-lab-method-with-params\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-7d-lab-method-returns\\script.js",
+    "status": "THROWS-SCAFFOLD",
+    "error": "c.isHigh is not a function",
+    "state": null
+  },
+  {
+    "file": "lessons\\2-2-7d-lab-method-returns\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-7e-lab-method-calls-method\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-7e-lab-method-calls-method\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-7g-lab-mutate-sprite-prop\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 1,
+      "samples": [
+        {
+          "x": 50,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-2-7g-lab-mutate-sprite-prop\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 1,
+      "samples": [
+        {
+          "x": 50,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-2-7h-lab-cleanup\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 1,
+      "samples": [
+        {
+          "x": 150,
+          "y": 299,
+          "w": 20,
+          "h": 20,
+          "shape": "circle",
+          "color": "lightblue",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-2-7h-lab-cleanup\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 1,
+      "samples": [
+        {
+          "x": 150,
+          "y": 299,
+          "w": 20,
+          "h": 20,
+          "shape": "circle",
+          "color": "lightblue",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-2-8a-lab-three-vars\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-8a-lab-three-vars\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 3,
+      "samples": [
+        {
+          "x": 80,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 200,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 320,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-2-8b-lab-array-of-instances\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-2-8b-lab-array-of-instances\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 5,
+      "samples": [
+        {
+          "x": 50,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 130,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 210,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 290,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 370,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-2-8c-lab-loop-instances\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 5,
+      "samples": [
+        {
+          "x": 50,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 130,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 210,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 290,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 370,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-2-8c-lab-loop-instances\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 5,
+      "samples": [
+        {
+          "x": 50,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 130,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 210,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 290,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 370,
+          "y": 249,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "red",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-3-11-a13-1-asteroid-field\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-3-11-a13-1-asteroid-field\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 10,
+      "samples": [
+        {
+          "x": 200,
+          "y": 205,
+          "w": 24,
+          "h": 24,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        },
+        {
+          "x": 222,
+          "y": 288,
+          "w": 22,
+          "h": 22,
+          "shape": "circle",
+          "color": "gray",
+          "body": "dynamic"
+        },
+        {
+          "x": -14,
+          "y": 276,
+          "w": 22,
+          "h": 22,
+          "shape": "circle",
+          "color": "gray",
+          "body": "dynamic"
+        },
+        {
+          "x": 229,
+          "y": 398,
+          "w": 22,
+          "h": 22,
+          "shape": "circle",
+          "color": "gray",
+          "body": "dynamic"
+        },
+        {
+          "x": -15,
+          "y": 311,
+          "w": 22,
+          "h": 22,
+          "shape": "circle",
+          "color": "gray",
+          "body": "dynamic"
+        },
+        {
+          "x": 290,
+          "y": 223,
+          "w": 22,
+          "h": 22,
+          "shape": "circle",
+          "color": "gray",
+          "body": "dynamic"
+        },
+        {
+          "x": 290,
+          "y": 163,
+          "w": 22,
+          "h": 22,
+          "shape": "circle",
+          "color": "gray",
+          "body": "dynamic"
+        },
+        {
+          "x": 198,
+          "y": 378,
+          "w": 22,
+          "h": 22,
+          "shape": "circle",
+          "color": "gray",
+          "body": "dynamic"
+        },
+        {
+          "x": 167,
+          "y": 278,
+          "w": 22,
+          "h": 22,
+          "shape": "circle",
+          "color": "gray",
+          "body": "dynamic"
+        },
+        {
+          "x": 376,
+          "y": 167,
+          "w": 22,
+          "h": 22,
+          "shape": "circle",
+          "color": "gray",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-3-12-challenges\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-3-12-challenges\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 3,
+      "samples": [
+        {
+          "x": 0,
+          "y": 370,
+          "w": 60,
+          "h": 16,
+          "shape": "rect",
+          "color": "saddlebrown",
+          "body": "static"
+        },
+        {
+          "x": 123,
+          "y": 108,
+          "w": 26.168240520102728,
+          "h": 26.168240520102728,
+          "shape": "circle",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 200,
+          "y": -20,
+          "w": 30.355843075070887,
+          "h": 30.355843075070887,
+          "shape": "circle",
+          "color": "red",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-3-19-example-pendulum\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 2,
+      "samples": [
+        {
+          "x": 200,
+          "y": 60,
+          "w": 20,
+          "h": 20,
+          "shape": "rect",
+          "color": "#888",
+          "body": "static"
+        },
+        {
+          "x": 200,
+          "y": 140,
+          "w": 20,
+          "h": 120,
+          "shape": "rect",
+          "color": "tomato",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-3-20-a14-1-space-jumper\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-3-20-a14-1-space-jumper\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 3,
+      "samples": [
+        {
+          "x": 300,
+          "y": 380,
+          "w": 600,
+          "h": 40,
+          "shape": "rect",
+          "color": "#444",
+          "body": "static"
+        },
+        {
+          "x": 60,
+          "y": 345,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        },
+        {
+          "x": 540,
+          "y": 489,
+          "w": 30,
+          "h": 60,
+          "shape": "rect",
+          "color": "lime",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-3-21-a14-1-car-ramp\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-3-21-a14-1-car-ramp\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 5,
+      "samples": [
+        {
+          "x": 300,
+          "y": 380,
+          "w": 600,
+          "h": 40,
+          "shape": "rect",
+          "color": "#444",
+          "body": "static"
+        },
+        {
+          "x": 450,
+          "y": 340,
+          "w": 200,
+          "h": 20,
+          "shape": "rect",
+          "color": "#666",
+          "body": "static"
+        },
+        {
+          "x": 120,
+          "y": 350,
+          "w": 70,
+          "h": 20,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        },
+        {
+          "x": 84,
+          "y": 350,
+          "w": 20,
+          "h": 20,
+          "shape": "circle",
+          "color": "orange",
+          "body": "dynamic"
+        },
+        {
+          "x": 156,
+          "y": 350,
+          "w": 20,
+          "h": 20,
+          "shape": "circle",
+          "color": "orange",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-3-5-groups-sandbox\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-3-5-groups-sandbox\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 7,
+      "samples": [
+        {
+          "x": 366,
+          "y": 218,
+          "w": 10,
+          "h": 10,
+          "shape": "circle",
+          "color": "yellow",
+          "body": "dynamic"
+        },
+        {
+          "x": 56,
+          "y": 211,
+          "w": 10,
+          "h": 10,
+          "shape": "circle",
+          "color": "yellow",
+          "body": "dynamic"
+        },
+        {
+          "x": 220,
+          "y": 168,
+          "w": 10,
+          "h": 10,
+          "shape": "circle",
+          "color": "yellow",
+          "body": "dynamic"
+        },
+        {
+          "x": 256,
+          "y": 108,
+          "w": 10,
+          "h": 10,
+          "shape": "circle",
+          "color": "yellow",
+          "body": "dynamic"
+        },
+        {
+          "x": 23,
+          "y": 70,
+          "w": 10,
+          "h": 10,
+          "shape": "circle",
+          "color": "yellow",
+          "body": "dynamic"
+        },
+        {
+          "x": 347,
+          "y": 41,
+          "w": 10,
+          "h": 10,
+          "shape": "circle",
+          "color": "yellow",
+          "body": "dynamic"
+        },
+        {
+          "x": 208,
+          "y": 13,
+          "w": 10,
+          "h": 10,
+          "shape": "circle",
+          "color": "yellow",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-3-7-example-apple-catcher\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 3,
+      "samples": [
+        {
+          "x": 200,
+          "y": 370,
+          "w": 70,
+          "h": 15,
+          "shape": "rect",
+          "color": "saddlebrown",
+          "body": "kinematic"
+        },
+        {
+          "x": 146,
+          "y": 108,
+          "w": 22,
+          "h": 22,
+          "shape": "circle",
+          "color": "red",
+          "body": "dynamic"
+        },
+        {
+          "x": 220,
+          "y": -20,
+          "w": 22,
+          "h": 22,
+          "shape": "circle",
+          "color": "red",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-4-10-a15-1-platformer\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-4-10-a15-1-platformer\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 7,
+      "samples": [
+        {
+          "x": 60,
+          "y": 248,
+          "w": 24,
+          "h": 24,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        },
+        {
+          "x": 600,
+          "y": 280,
+          "w": 1400,
+          "h": 40,
+          "shape": "rect",
+          "color": "#444",
+          "body": "static"
+        },
+        {
+          "x": 220,
+          "y": 220,
+          "w": 100,
+          "h": 12,
+          "shape": "rect",
+          "color": "#555",
+          "body": "static"
+        },
+        {
+          "x": 420,
+          "y": 180,
+          "w": 100,
+          "h": 12,
+          "shape": "rect",
+          "color": "#555",
+          "body": "static"
+        },
+        {
+          "x": 620,
+          "y": 150,
+          "w": 100,
+          "h": 12,
+          "shape": "rect",
+          "color": "#555",
+          "body": "static"
+        },
+        {
+          "x": 820,
+          "y": 200,
+          "w": 120,
+          "h": 12,
+          "shape": "rect",
+          "color": "#555",
+          "body": "static"
+        },
+        {
+          "x": 1100,
+          "y": 379,
+          "w": 28,
+          "h": 60,
+          "shape": "rect",
+          "color": "lime",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-4-11-challenges\\script.js",
+    "status": "THROWS-SCAFFOLD",
+    "error": "new Canvas(w, h) must be called in setup()",
+    "state": null
+  },
+  {
+    "file": "lessons\\2-4-5-animated-sprites-sandbox\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\2-4-5-animated-sprites-sandbox\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 1,
+      "samples": [
+        {
+          "x": 200,
+          "y": 369,
+          "w": 30,
+          "h": 30,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-5-24-a16-1-save-system\\script.js",
+    "status": "THROWS-SCAFFOLD",
+    "error": "new Canvas(w, h) must be called in setup()",
+    "state": null
+  },
+  {
+    "file": "lessons\\2-5-24-a16-1-save-system\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 1,
+      "samples": [
+        {
+          "x": 60,
+          "y": 205,
+          "w": 24,
+          "h": 24,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-5-25-challenges\\script.js",
+    "status": "THROWS-SCAFFOLD",
+    "error": "new Canvas(w, h) must be called in setup()",
+    "state": null
+  },
+  {
+    "file": "lessons\\2-6-24-a16-2-game-states\\script.js",
+    "status": "THROWS-SCAFFOLD",
+    "error": "new Canvas(w, h) must be called in setup()",
+    "state": null
+  },
+  {
+    "file": "lessons\\2-6-24-a16-2-game-states\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 1,
+      "samples": [
+        {
+          "x": 200,
+          "y": 349,
+          "w": 24,
+          "h": 24,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-6-25-challenges\\script.js",
+    "status": "THROWS-SCAFFOLD",
+    "error": "new Canvas(w, h) must be called in setup()",
+    "state": null
+  },
+  {
+    "file": "lessons\\2-7-26-a17-1-pong-sumo\\script.js",
+    "status": "THROWS-SCAFFOLD",
+    "error": "new Canvas(w, h) must be called in setup()",
+    "state": null
+  },
+  {
+    "file": "lessons\\2-7-26-a17-1-pong-sumo\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 9,
+      "samples": [
+        {
+          "x": 300,
+          "y": 10,
+          "w": 600,
+          "h": 20,
+          "shape": "rect",
+          "color": "deeppink",
+          "body": "static"
+        },
+        {
+          "x": 300,
+          "y": 390,
+          "w": 600,
+          "h": 20,
+          "shape": "rect",
+          "color": "deeppink",
+          "body": "static"
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "w": 1,
+          "h": 1,
+          "shape": "rect",
+          "color": "deeppink",
+          "body": "static"
+        },
+        {
+          "x": 600,
+          "y": 0,
+          "w": 1,
+          "h": 1,
+          "shape": "rect",
+          "color": "deeppink",
+          "body": "static"
+        },
+        {
+          "x": 0,
+          "y": 400,
+          "w": 1,
+          "h": 1,
+          "shape": "rect",
+          "color": "deeppink",
+          "body": "static"
+        },
+        {
+          "x": 600,
+          "y": 400,
+          "w": 1,
+          "h": 1,
+          "shape": "rect",
+          "color": "deeppink",
+          "body": "static"
+        },
+        {
+          "x": 40,
+          "y": 331,
+          "w": 16,
+          "h": 80,
+          "shape": "rect",
+          "color": "#bd93f9",
+          "body": "dynamic"
+        },
+        {
+          "x": 560,
+          "y": 331,
+          "w": 16,
+          "h": 80,
+          "shape": "rect",
+          "color": "#50fa7b",
+          "body": "dynamic"
+        },
+        {
+          "x": 540,
+          "y": 294,
+          "w": 20,
+          "h": 20,
+          "shape": "rect",
+          "color": "#f1fa8c",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\2-7-27-challenges\\script.js",
+    "status": "NO-OP",
+    "error": null,
+    "state": null,
+    "note": "non-q5play lesson (console/HTML)"
+  },
+  {
+    "file": "lessons\\algorithm-practice\\script.js",
+    "status": "NO-OP",
+    "error": null,
+    "state": null,
+    "note": "non-q5play lesson (console/HTML)"
+  },
+  {
+    "file": "lessons\\arrays\\script.js",
+    "status": "NO-OP",
+    "error": null,
+    "state": null,
+    "note": "non-q5play lesson (console/HTML)"
+  },
+  {
+    "file": "lessons\\basic-html\\script.js",
+    "status": "NO-OP",
+    "error": null,
+    "state": null,
+    "note": "non-q5play lesson (console/HTML)"
+  },
+  {
+    "file": "lessons\\conditionals\\script.js",
+    "status": "NO-OP",
+    "error": null,
+    "state": null,
+    "note": "non-q5play lesson (console/HTML)"
+  },
+  {
+    "file": "lessons\\debug-camper-bot\\script.js",
+    "status": "NO-OP",
+    "error": null,
+    "state": null,
+    "note": "non-q5play lesson (console/HTML)"
+  },
+  {
+    "file": "lessons\\functions\\script.js",
+    "status": "NO-OP",
+    "error": null,
+    "state": null,
+    "note": "non-q5play lesson (console/HTML)"
+  },
+  {
+    "file": "lessons\\html-intro\\script.js",
+    "status": "NO-OP",
+    "error": null,
+    "state": null,
+    "note": "non-q5play lesson (console/HTML)"
+  },
+  {
+    "file": "lessons\\intro-algorithms\\script.js",
+    "status": "NO-OP",
+    "error": null,
+    "state": null,
+    "note": "non-q5play lesson (console/HTML)"
+  },
+  {
+    "file": "lessons\\jscad-2d-shapes\\script.js",
+    "status": "EXCLUDED-JSCAD",
+    "error": null,
+    "state": null
+  },
+  {
+    "file": "lessons\\jscad-booleans\\script.js",
+    "status": "EXCLUDED-JSCAD",
+    "error": null,
+    "state": null
+  },
+  {
+    "file": "lessons\\jscad-intro\\script.js",
+    "status": "EXCLUDED-JSCAD",
+    "error": null,
+    "state": null
+  },
+  {
+    "file": "lessons\\loops\\script.js",
+    "status": "NO-OP",
+    "error": null,
+    "state": null,
+    "note": "non-q5play lesson (console/HTML)"
+  },
+  {
+    "file": "lessons\\operators-expressions\\script.js",
+    "status": "NO-OP",
+    "error": null,
+    "state": null,
+    "note": "non-q5play lesson (console/HTML)"
+  },
+  {
+    "file": "lessons\\print-job-manager\\script.js",
+    "status": "NO-OP",
+    "error": null,
+    "state": null,
+    "note": "non-q5play lesson (console/HTML)"
+  },
+  {
+    "file": "lessons\\q5play-bounce\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 0
+    }
+  },
+  {
+    "file": "lessons\\q5play-gravity\\script.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 2,
+      "samples": [
+        {
+          "x": 200,
+          "y": 209,
+          "w": 40,
+          "h": 40,
+          "shape": "rect",
+          "color": "orange",
+          "body": "dynamic"
+        },
+        {
+          "x": 200,
+          "y": 380,
+          "w": 400,
+          "h": 20,
+          "shape": "rect",
+          "color": "gray",
+          "body": "static"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\q5play-intro\\script.js",
+    "status": "THROWS-SCAFFOLD",
+    "error": "new Canvas(w, h) must be called in setup()",
+    "state": null
+  },
+  {
+    "file": "lessons\\q5play-intro\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 1,
+      "samples": [
+        {
+          "x": 200,
+          "y": 349,
+          "w": 40,
+          "h": 40,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\q5play-move-keys\\script.js",
+    "status": "THROWS-SCAFFOLD",
+    "error": "new Canvas(w, h) must be called in setup()",
+    "state": null
+  },
+  {
+    "file": "lessons\\q5play-move-keys\\solution.js",
+    "status": "RUNS-CLEAN",
+    "error": null,
+    "state": {
+      "spriteCount": 1,
+      "samples": [
+        {
+          "x": 200,
+          "y": 205,
+          "w": 40,
+          "h": 40,
+          "shape": "rect",
+          "color": "deepskyblue",
+          "body": "dynamic"
+        }
+      ]
+    }
+  },
+  {
+    "file": "lessons\\sdlc-overview\\script.js",
+    "status": "NO-OP",
+    "error": null,
+    "state": null,
+    "note": "non-q5play lesson (console/HTML)"
+  },
+  {
+    "file": "lessons\\variables-and-types\\script.js",
+    "status": "NO-OP",
+    "error": null,
+    "state": null,
+    "note": "non-q5play lesson (console/HTML)"
+  }
+]

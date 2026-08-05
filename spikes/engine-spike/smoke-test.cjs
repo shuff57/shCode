@@ -712,4 +712,56 @@ test('gap: sprite.angularVelocity — degrees-per-frame get/set on a dynamic bod
   assert.ok(angle < 180, `rotation should stay within plausible bounds (got ${angle})`);
 });
 
+// =========================================================================
+// regression-sweep gaps — q5.js globals real lesson code uses
+// =========================================================================
+
+test('gap: square(x,y,s) draws a filled rect (2.2.4b/2.2.4c/2.2.4d)', ({ sandbox: s, tick }) => {
+  s.setup = () => { new s.Canvas(200, 200); };
+  s.update = () => {};
+  s.draw = () => { s.square(80, 80, 40); };
+  s.start();
+  assert.doesNotThrow(() => tick(3));
+  assert.equal(typeof s.square, 'function');
+});
+
+test('gap: cos/sin are Math.cos/Math.sin (2.1.11 challenges solution)', ({ sandbox: s }) => {
+  assert.equal(s.cos(Math.PI), -1);
+  assert.equal(s.sin(Math.PI / 2), 1);
+});
+
+test('gap: mouseX/mouseY are live getters (2.3.12 challenges solution)', ({ sandbox: s, tick }) => {
+  s.setup = () => { new s.Canvas(400, 300); };
+  s.update = () => {};
+  s.draw = () => {};
+  s.start();
+  assert.equal(s.mouseX, 0);
+  assert.equal(s.mouseY, 0);
+});
+
+test('gap: width/height are live getters (2.3.12 challenges solution)', ({ sandbox: s }) => {
+  s.setup = () => { new s.Canvas(400, 300); };
+  s.update = () => {};
+  s.draw = () => {};
+  s.start();
+  assert.equal(s.width, 400);
+  assert.equal(s.height, 300);
+});
+
+test('gap: noLoop() stops the draw loop (2.3.12 challenges solution)', ({ sandbox: s, tick }) => {
+  let draws = 0;
+  let rafs = 0;
+  const origRaf = globalThis.requestAnimationFrame;
+  s.setup = () => { new s.Canvas(200, 200); };
+  s.update = () => {};
+  s.draw = () => { draws++; if (draws >= 3) s.noLoop(); };
+  s.start();
+  const wrappedRaf = (cb) => { rafs++; return origRaf(cb); };
+  globalThis.requestAnimationFrame = wrappedRaf;
+  tick(10);
+  globalThis.requestAnimationFrame = origRaf;
+  assert.equal(draws, 3, `noLoop() should stop the loop after 3 draws, got ${draws}`);
+  assert.ok(rafs <= 3, `noLoop() must fully stop the rAF chain, not idle-spin (${rafs} rafs after stop)`);
+});
+
 run();
