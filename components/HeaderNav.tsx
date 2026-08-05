@@ -41,7 +41,7 @@ export default function HeaderNav() {
     <>
       <Link href="/" className="text-white">Lessons</Link>
       <Link href="/sandbox" className="text-white">Sandbox</Link>
-      <Link href="/docs/q5play" className="text-white">Docs</Link>
+      <Link href="/docs/shplay" className="text-white">Docs</Link>
       {loaded && user?.role === 'teacher' && (
         <Link href="/teacher" className="text-white">Classes</Link>
       )}

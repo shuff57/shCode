@@ -10,7 +10,7 @@
 // tokens, with any code block trimmed to MAX_CODE_BLOCK_LINES so a
 // successful jailbreak still can't yield a copy-pasteable solution.
 
-import { findRelevantDocs, type RelevantDoc } from '../../lib/q5play-docs';
+import { findRelevantDocs, type RelevantDoc } from '../../lib/shplay-docs';
 import { chatStream } from '../../lib/ollama';
 
 interface Env {

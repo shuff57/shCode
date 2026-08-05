@@ -24,7 +24,7 @@ import SubmitDialog from './SubmitDialog';
 import GradeReportView from './GradeReport';
 import TeacherPushBanner from './TeacherPushBanner';
 import CrossDeviceSyncBanner from './CrossDeviceSyncBanner';
-import Q5DocsContent from './Q5DocsContent';
+import ShPlayDocsContent from './ShPlayDocsContent';
 import AiHelpPanel from './AiHelpPanel';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import SolutionPanel from './SolutionPanel';
@@ -513,10 +513,10 @@ export default function LessonWorkspace({
                   key: 'docs',
                   label: 'Docs',
                   color: '#bd93f9',
-                  content: <Q5DocsContent />,
+                  content: <ShPlayDocsContent />,
                   headerExtra: (
                     <a
-                      href="/docs/q5play"
+                      href="/docs/shplay"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-secondary btn-sm"

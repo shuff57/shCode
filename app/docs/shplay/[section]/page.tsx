@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { getAllSectionSlugs, getSection, sections } from '../../../../lib/q5play-docs';
+import { getAllSectionSlugs, getSection, sections } from '../../../../lib/shplay-docs';
 import DocsClient from './DocsClient';
 
 export function generateStaticParams() {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { sections, searchDocs, type DocSearchResult } from '../lib/q5play-docs';
+import { sections, searchDocs, type DocSearchResult } from '../lib/shplay-docs';
 import Q5DocLiveSnippet from './Q5DocLiveSnippet';
 
 function Highlighted({ result }: { result: DocSearchResult }) {
@@ -20,7 +20,7 @@ function Highlighted({ result }: { result: DocSearchResult }) {
   );
 }
 
-export default function Q5DocsContent() {
+export default function ShPlayDocsContent() {
   const [activeSlug, setActiveSlug] = useState<string>(sections[0]?.slug ?? '');
   const [query, setQuery] = useState('');
   const activeSection = sections.find((s) => s.slug === activeSlug) ?? sections[0];
@@ -33,7 +33,7 @@ export default function Q5DocsContent() {
     setQuery('');
     // Scroll the matched page into view after the section renders.
     requestAnimationFrame(() => {
-      const el = document.getElementById(`q5doc-page-${r.sectionSlug}-${r.pageIndex}`);
+      const el = document.getElementById(`shplaydoc-page-${r.sectionSlug}-${r.pageIndex}`);
       el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   }
@@ -144,7 +144,7 @@ export default function Q5DocsContent() {
               {activeSection.pages.map((page, pi) => (
                 <div
                   key={pi}
-                  id={`q5doc-page-${activeSection.slug}-${pi}`}
+                  id={`shplaydoc-page-${activeSection.slug}-${pi}`}
                   style={{ marginBottom: 24, scrollMarginTop: 70 }}
                 >
                   <h3 style={{ margin: '0 0 6px', fontSize: '0.9rem', color: '#bd93f9', fontWeight: 600 }}>
@@ -158,7 +158,7 @@ export default function Q5DocsContent() {
                   {page.code && (
                     <Q5DocLiveSnippet
                       initialCode={page.code}
-                      fileKey={`q5doc-${activeSection.slug}-${pi}`}
+                      fileKey={`shplaydoc-${activeSection.slug}-${pi}`}
                     />
                   )}
                 </div>

@@ -7,7 +7,7 @@ import {
   searchDocs,
   type DocSearchResult,
   type DocSection,
-} from '../../../../lib/q5play-docs';
+} from '../../../../lib/shplay-docs';
 import DocsSandbox from './DocsSandbox';
 
 interface Props {
@@ -17,8 +17,8 @@ interface Props {
 
 function pageHref(slug: string, pageIndex: number) {
   return pageIndex === 0
-    ? `/docs/q5play/${slug}`
-    : `/docs/q5play/${slug}?page=${pageIndex + 1}`;
+    ? `/docs/shplay/${slug}`
+    : `/docs/shplay/${slug}?page=${pageIndex + 1}`;
 }
 
 function HighlightedSnippet({ result }: { result: DocSearchResult }) {
@@ -162,7 +162,7 @@ export default function DocsClient({ section, allSections }: Props) {
             </div>
           ) : (
             <>
-              <div className="docs-sidebar-title">q5play reference</div>
+              <div className="docs-sidebar-title">shPlay reference</div>
               <nav>
                 {allSections.map((s) => {
                   const active = s.slug === section.slug;
@@ -172,7 +172,7 @@ export default function DocsClient({ section, allSections }: Props) {
                       className={`docs-sidebar-section${active ? ' active' : ''}`}
                     >
                       <Link
-                        href={`/docs/q5play/${s.slug}`}
+                        href={`/docs/shplay/${s.slug}`}
                         className="docs-sidebar-section-title"
                       >
                         {s.title}
@@ -182,7 +182,7 @@ export default function DocsClient({ section, allSections }: Props) {
                           {s.pages.map((p, i) => (
                             <li key={i}>
                               <Link
-                                href={`/docs/q5play/${s.slug}?page=${i + 1}`}
+                                href={`/docs/shplay/${s.slug}?page=${i + 1}`}
                                 className={i === pageIndex ? 'current' : ''}
                               >
                                 {p.title}
@@ -216,7 +216,7 @@ export default function DocsClient({ section, allSections }: Props) {
               }}
               onFocus={() => isSearching && setDropdownOpen(true)}
               onKeyDown={handleMainKey}
-              placeholder="Search the q5play docs…"
+              placeholder="Search the shPlay docs…"
               aria-label="Search documentation"
             />
             <kbd className="docs-main-search-kbd">⌘K</kbd>
@@ -282,14 +282,14 @@ export default function DocsClient({ section, allSections }: Props) {
           {hasPrev ? (
             <Link
               className="btn-secondary btn-sm"
-              href={`/docs/q5play/${section.slug}?page=${pageIndex}`}
+              href={`/docs/shplay/${section.slug}?page=${pageIndex}`}
             >
               ← {section.pages[pageIndex - 1].title}
             </Link>
           ) : prevSection ? (
             <Link
               className="btn-secondary btn-sm"
-              href={`/docs/q5play/${prevSection.slug}?page=${prevSection.pages.length}`}
+              href={`/docs/shplay/${prevSection.slug}?page=${prevSection.pages.length}`}
             >
               ← {prevSection.title}
             </Link>
@@ -299,14 +299,14 @@ export default function DocsClient({ section, allSections }: Props) {
           {hasNext ? (
             <Link
               className="btn-secondary btn-sm"
-              href={`/docs/q5play/${section.slug}?page=${pageIndex + 2}`}
+              href={`/docs/shplay/${section.slug}?page=${pageIndex + 2}`}
             >
               {section.pages[pageIndex + 1].title} →
             </Link>
           ) : nextSection ? (
             <Link
               className="btn-secondary btn-sm"
-              href={`/docs/q5play/${nextSection.slug}`}
+              href={`/docs/shplay/${nextSection.slug}`}
             >
               {nextSection.title} →
             </Link>

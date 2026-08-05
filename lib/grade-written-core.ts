@@ -3,7 +3,7 @@
 // Cloudflare Pages Function (prod). Keeping this in one place avoids the
 // two paths drifting.
 
-import { sections as docSections } from './q5play-docs';
+import { sections as docSections } from './shplay-docs';
 
 export interface RubricItem {
   id: string;
