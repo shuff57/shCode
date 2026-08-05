@@ -719,12 +719,12 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 
 ---
 
-## Unit 2.5: State and Persistence
-> **SLO focus:** **SLO 2** (state machines as structured programming) and **SLO 3** (File I/O primary artifact A16.1 persistent storage); covers Butte outline topic **File I/O (secondary location)**.
+## Unit 2.5: Game Saves
+> **SLO focus:** **SLO 3** (File I/O primary artifact A16.1 persistent storage); covers Butte outline topic **File I/O (secondary location)**.
 
-### 2.5.1 Save, Load, and Game States (~3.5 hrs)
+### 2.5.1 Save and Load (~3.5 hrs)
 **Contact hours:** 3.5
-**SLOs covered:** SLO 2 (structured programming), SLO 3 (design/implement/test), Topic: File I/O
+**SLOs covered:** SLO 3 (design/implement/test), Topic: File I/O
 **Reading:** JS1 → Data types → JSON methods, toJSON; JS1 → Storing data in the browser → LocalStorage, sessionStorage; JS2 Ch 18 File fields + Storing data client-side; PY Ch 14 Files (structural)
 
 **Learning Objectives:**
@@ -732,42 +732,63 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Retrieve saved data with `getItem(name)` and convert back to correct type
 - Export game data as JSON using `save(obj, 'filename.json')`
 - Load JSON at runtime using `loadJSON(url)` in `preload()`
-- Implement a game state machine (MENU, PLAY, PAUSE, WIN, LOSE)
-- Structure `draw()` around a game-state variable with a switch or if/else chain
 
 **Topics:**
 - shplay persistent storage: `storeItem`, `getItem`, `removeItem`, `clearStorage`
 - Serialization with JSON: `JSON.stringify`, `JSON.parse`
 - File export: `save(obj, 'level.json')` triggers a browser download
 - Async loading: `loadJSON` must run inside `preload()`
+
+**In-Class Activities:**
+- Live code: a high-score tracker using `storeItem('highScore', score)`
+- Students convert their game's player stats into a JSON string and log/download it
+- **AP CSP Discussion (15 min):** Metadata. A save file stores values plus structure (what each field means). What other metadata do games keep — timestamps, versions, player IDs?
+
+**Assignments:**
+- **A16.1 (Lab, File I/O coverage):** Add persistent high scores to your W15 game — top 3 with player initials, reads on start, writes when a new score qualifies, and a "clear" button that calls `clearStorage`. Prove persistence by closing and reopening the browser.
+
+**Teacher Notes:**
+- `getItem` returns strings. Expect bugs from `getItem('x') + 1` concatenating. Teach `Number()` / `parseInt` explicitly.
+- `loadJSON` is async — it must live inside `preload()`, not `setup()`.
+- This module satisfies the SLO 3 File I/O requirement.
+
+---
+
+## Unit 2.6: Game States
+> **SLO focus:** **SLO 2** (state machines as structured programming). State is a prerequisite for the capstone.
+
+### 2.6.1 Game State Machines (~3.5 hrs)
+**Contact hours:** 3.5
+**SLOs covered:** SLO 2 (structured programming), SLO 3 (design/implement/test)
+**Reading:** JS1 → Data types → JSON methods, toJSON (reference); JS2 Ch 4 Data Structures: Objects and Arrays (switch/state review, optional)
+
+**Learning Objectives:**
+- Implement a game state machine (MENU, PLAY, PAUSE, WIN, LOSE)
+- Structure `draw()` around a game-state variable with a switch or if/else chain
+- Handle transitions between states (input, timers, collision outcomes)
+
+**Topics:**
 - Game state as a variable: `let gameState = 'menu'`
 - State dispatch with `switch`
 - Transitions between states (input, timers, collision outcomes)
 
 **In-Class Activities:**
-- Live code: a high-score tracker using `storeItem('highScore', score)`
-- Students convert their game's player stats into a JSON string and log/download it
 - Live code: take a W15 game and add menu + play + game-over states via `switch`
 - Pair exercise: add a pause state triggered by `P`
-- **AP CSP Discussion (15 min):** Metadata. A save file stores values plus structure (what each field means). What other metadata do games keep — timestamps, versions, player IDs?
 
 **Assignments:**
-- **A16.1 (Lab, File I/O coverage):** Add persistent high scores to your W15 game — top 3 with player initials, reads on start, writes when a new score qualifies, and a "clear" button that calls `clearStorage`. Prove persistence by closing and reopening the browser.
 - **A16.2 (Lab):** Add states to your W15 game. Minimum: menu, play, end (win or lose). Use a `switch` or if/else chain in `draw()`. Menu → play on start key. Play → end on condition. End → menu on keypress.
 
 **Teacher Notes:**
-- `getItem` returns strings. Expect bugs from `getItem('x') + 1` concatenating. Teach `Number()` / `parseInt` explicitly.
-- `loadJSON` is async — it must live inside `preload()`, not `setup()`.
 - State machines often devolve into giant if-chains. Redirect students toward `switch` for readability.
 - State is a prerequisite for the capstone — do not allow students to skip it.
-- This module satisfies the SLO 3 File I/O requirement.
 
 ---
 
-## Unit 2.6: Advanced Mechanics
+## Unit 2.7: Advanced Mechanics
 > **SLO focus:** Reinforces **SLO 3** (implement + debug a complex interactive system); final content week before capstone.
 
-### 2.6.1 Joints and Advanced Input (~3.5 hrs)
+### 2.7.1 Joints and Advanced Input (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 3
 **Reading:** shplay → joints → DistanceJoint, HingeJoint, SliderJoint, GlueJoint, GrabberJoint; shplay → input → Dragging and clicks, Gamepad (Contro); shplay → patterns → Projectiles from a player (applied force pattern)
@@ -802,10 +823,10 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 
 ---
 
-## Unit 2.7: Synthesis
+## Unit 2.8: Synthesis
 > **SLO focus:** **SLO 3 primary Sem 1 evidence (A18.1 Game Capstone)** — design + implement + test cycle. Also contributes to SLO 1 (lived SDLC) and SLO 2 (classes + state machines in use).
 
-### 2.7.1 Capstone Game (~3.5 hrs in class + homework)
+### 2.8.1 Capstone Game (~3.5 hrs in class + homework)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 1 (lifecycle), SLO 2 (structured programming), SLO 3 (design/implement/test — **PRIMARY SLO 3 EVIDENCE FOR SEMESTER 1**)
 **Reading:** shplay → patterns → Scene/state switching, Top-down movement, Platformer jump (reference during build); JS2 Ch 16 Project: A Platform Game (enrichment); JS2 Ch 8 Bugs and Errors (testing discipline)
@@ -1453,6 +1474,790 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 
 ---
 
+## PART A - OFFICIAL COURSE OUTLINE (Butte College CSCI 4)
+
+> Folded in from `butte-csci4-slo.md` (now `.deprecated.md`). The official course-outline reference: SLO wording, contact hours, evaluation methods, and the gap analysis vs. this plan.
+
+## Butte College CSCI 4 — Course Outline Reference
+### Introduction to Programming Concepts and Methodologies
+
+> Source: [Butte College CurriQunet](https://butte.curriqunet.com/DynamicReports/AllFieldsReportByEntity/4467?entityType=Course&reportId=213)
+> Created/Revised by: Sathrum, Luke | Date: 05/02/2022
+
+---
+
+### Course Metadata
+
+| Field | Value |
+|-------|-------|
+| Title | Introduction to Programming Concepts and Methodologies |
+| Units | 3.00 (2.50 lecture + 0.50 lab) |
+| Lecture Hours | 42.50 contact / 85.00 out-of-class / 127.50 total |
+| Lab Hours | 25.50 contact / 0.00 out-of-class / 25.50 total |
+| Total Contact Hours | 68.00 |
+| Transfer Status | CSU / UC |
+| C-ID | COMP 112 |
+| Minimum Qualifications | Computer Science (Masters Required), or Computer Information Systems |
+
+---
+
+### Catalog Description
+
+This course introduces students to the fundamental concepts of programming. Students will learn about the software development life-cycle, algorithms, and the design, implementation, and testing of programs using an object-oriented programming language.
+
+---
+
+### Student Learning Outcomes (SLOs)
+
+Upon successful completion, students should be able to:
+
+| SLO | Exact Wording |
+|-----|---------------|
+| SLO 1 | Describe the software development life-cycle |
+| SLO 2 | Describe principles of structured programming |
+| SLO 3 | Describe, design, implement, and test structured programs using currently accepted methodology |
+| SLO 4 | Explain what an algorithm is and its importance in computer programming |
+
+---
+
+### Course Content — Lecture Topics
+
+| Topic | Hours |
+|-------|-------|
+| Software life-cycle | 2.50 |
+| Procedural vs. object-oriented programming | 2.50 |
+| Program design tools and programming environments | 2.50 |
+| Documentation | 2.50 |
+| Coding conventions | 2.50 |
+| Data types, variables, expressions, sequential processing | 2.50 |
+| Arrays including multiple-subscripted arrays | 6.25 |
+| Control structures: selective and repetitive | 5.00 |
+| Algorithms including simple sorting and searching | 5.00 |
+| File I/O including sequential access files | 2.50 |
+| Error handling | 1.25 |
+| Passing parameters by value and reference | 5.00 |
+| Principles of testing and designing test data | 2.50 |
+| **Total** | **42.50** |
+
+### Course Content — Lab Topics
+
+Same topics as lecture with lab-allocated hours totaling 25.50 hours.
+
+---
+
+### Methods of Instruction
+
+1. Collaborative Group Work
+2. Demonstrations
+3. Homework — students are required to complete two hours of outside-of-class homework for each hour of lecture
+4. Lecture
+5. Multimedia Presentations
+
+---
+
+### Methods of Evaluation
+
+1. **Quizzes**
+2. **Homework**
+3. **Lab Projects**
+4. **Mid-term and final examinations**
+
+---
+
+### Assignment Examples (from course outline)
+
+#### Reading Assignments
+- Read section on loops; discuss infinite loop problems
+- Read documentation on exception handling for programming language used
+
+#### Writing Assignments
+- Write out, in detail, an algorithm for searching for a specific value in an array of integers
+- Correct formatting per coding conventions and document functions
+
+#### Out-of-Class Assignments
+- Design and document test data; determine if sample program passes/fails
+- Design and implement a short program that opens a text file and searches for and counts the number of occurrences of a given string
+
+---
+
+### Required Textbooks
+
+1. Savitch & Mock (2017). *Problem Solving with C++*, Pearson, 10th edition
+2. Deitel & Deitel (2017). *C++ How to Program*, Prentice Hall, 10th edition
+3. Al Sweigart (2019). *Automate the Boring Stuff with Python*, No Starch Press, 2nd edition
+
+> **Note:** The textbook list reflects C++ and Python. This dual-enrollment section uses JavaScript as the programming language. The SLOs and topics are language-agnostic; coverage is what matters, not the specific language.
+
+---
+
+### Gap Analysis vs. Curriculum Plan
+
+Items from this official outline that are **missing or underserved** in the curriculum plan:
+
+#### CRITICAL — Required by course outline, not in curriculum plan
+
+| Gap | Outline Requirement | Curriculum Plan Status |
+|-----|---------------------|----------------------|
+| **Mid-term exam** | "Mid-term and final examinations" listed as required evaluation method | No midterm exists anywhere in the plan |
+| **Final exam** | Same | No final exam exists anywhere in the plan |
+| **Quizzes** | "Quizzes" listed as required evaluation method | Only one quiz (A4.2, Week 4). No grading category for quizzes. |
+| **Sequential access files** | "File I/O including sequential access files" | W8 covers it fully — A8.2 (read) + A8.3 (write + round-trip) map open/read/write/close to browser JS (FileReader/Blob) |
+| **Sequential processing** | "Data types, variables, expressions, sequential processing" | Sequential processing (step-by-step execution flow) is implicit but never named or taught as a concept |
+
+#### HIGH — Standard intro-programming topics in the outline's spirit
+
+| Gap | Notes |
+|-----|-------|
+| **`do...while` loops** | "Control structures: selective and repetitive" — `do...while` is a standard repetitive structure |
+| **Multiple-subscripted arrays** | Outline says "arrays including multiple-subscripted arrays" — W8 introduces 2D arrays briefly but doesn't go deep enough for 6.25 hours of lecture coverage |
+| **Text file I/O program** | Out-of-class assignment example: "design and implement a short program that opens a text file and searches for and counts the number of occurrences of a given string" | A8.2 reads the file and counts/filters lines in-browser; A8.3 writes a new file (Blob download) and reads it back — the search-and-count program is fully achievable in browser JS |
+
+#### NOTES — Alignment items, not gaps
+
+| Item | Status |
+|------|--------|
+| OOP coverage | Outline says "object-oriented programming language" and "procedural vs. OOP" — covered in W17 |
+| Pass by value/reference | 5.00 hours in outline — W7 covers this, allocation seems proportional |
+| Algorithms + sort/search | 5.00 hours in outline — W5 + W22 cover this adequately |
+| Error handling | 1.25 hours in outline — W23 covers this (may be over-allocated relative to outline) |
+| Testing | 2.50 hours in outline — W24 covers this adequately |
+| Contact hours | Outline requires 68 total; curriculum plan provides 126 (3.5 × 36). Exceeds requirement. |
+
+---
+
+### OpenStax Supplementary Mapping (JavaScript core)
+
+**Primary reference book:** *Introduction to Python Programming* (OpenStax, Das/Lawson/Mayfield/Norouzi, CC BY-NC-SA). Used as a structural model for the Q1 console sequence and converted to JavaScript. Python-specific syntax is translated (`print()`→`console.log`, `def`→`function`/arrow, `list`→array, `dict`→object); SLO/topic coverage is language-agnostic.
+
+#### Python chapters → Q1 console sequence (A1.1–A9.1)
+
+| Python ch. | Title | Maps to | Status |
+|---|---:|---|---|
+| 1 | Statements (IO, variables, strings, numbers, error messages, comments) | W1–3 Foundations (1.1) | **Adopt** — includes a dedicated "Error messages" section worth folding into W1 as its own lesson |
+| 2 | Expressions | W2–3 (operators, types) | Adopt |
+| 3 | Objects | W2 variables (object/ref preview) | Adopt as a preview only — value-first ordering retained |
+| 4 | Decisions | W4 Conditionals | Adopt |
+| 5 | Loops | W5 Algorithms + Loops | Adopt (incl. `do...while`) |
+| 6 | Functions | W6 Functions | Adopt |
+| 7 | Modules | W19 JSCAD libraries | Defer — libraries taught in JSCAD context |
+| 8 | Strings | W2–3 string methods | Adopt |
+| 9 | Lists | W8 Arrays (incl. multiple-subscripted) | Adopt |
+| 10 | Dictionaries | — | **Excluded** — not in the CSCI 4 outline or SLOs |
+| 11 | Classes | W12 OOP (shplay) | Borrow framing only — shplay-grounded OOP retained over abstract OOP |
+| 12 | Recursion | — (W30 optional enrichment) | Optional, not assessed |
+| 13 | Inheritance | W12 (named, not required) | Name only |
+| 14 | Files | W8 File I/O, W16 shplay save, W31 JSCAD multi-file | Adopt concept — browser FileReader replaces Python `open()` |
+| 15 | Data Science | — | Excluded — out of CSCI 4 scope |
+
+#### Excluded Python content
+- **Ch 10 Dictionaries** — no outline/SLO requirement.
+- **Ch 15 Data Science** — belongs to *Principles of Data Science*, not CSCI 4.
+- **Ch 12 Recursion / Ch 13 Inheritance** — beyond scope; handled as optional enrichment / shplay context.
+
+#### Gap coverage the Python book helps close
+The outline's required topics that the book covers directly and the plan under-serves:
+- **`do...while` loops** (Ch 5) — "Control structures: selective and repetitive"
+- **Multiple-subscripted arrays** (Ch 9) — "Arrays including multiple-subscripted arrays" (6.25 hrs)
+- **Sequential access files** (Ch 14) — "File I/O including sequential access files" (open, read line-by-line, write, close)
+
+---
+
+### Open-Source JavaScript References
+
+Two free, open-source JS references supplement the plan. Both are read-in-the-browser resources that pair with the OpenStax structural model above — the Python book sets the Q1 chapter sequence; these supply the JS-native syntax, examples, and depth for each topic.
+
+#### Primary: The Modern JavaScript Tutorial (javascript.info)
+Ilya Kantor. Open source (CC-BY-SA), free online. Modern, comprehensive, beginner-appropriate progression. Covers essentially the entire CSCI 4 outline in JS-native form.
+
+#### Secondary: Eloquent JavaScript (Haverbeke)
+CC-BY-NC (code MIT), free online + free PDF/EPUB. Strong narrative prose with project chapters (robot, platform game, pixel editor). Best for motivated readers and optional enrichment; not the primary text.
+
+**Note:** *You Don't Know JS Yet* (Simpson, CC-BY-NC-ND) was considered but **excluded** — it is an advanced deep-dive into language internals (scope, closures, `this`), not an intro text.
+
+#### javascript.info sections → outline gap coverage
+
+| Outline gap / underserved topic | javascript.info section |
+|---|---|
+| File I/O — sequential access files (FileReader, line-by-line) | [Binary data, files](/binary) → File and FileReader |
+| Error handling (1.25 hr outline topic) | [Error handling](/error-handling) → try...catch, custom errors |
+| Testing principles (W27) | [Code quality](/code-quality) → Automated testing with Mocha |
+| Debugging (W26) | [Code quality](/code-quality) → Debugging in the browser |
+| Multiple-subscripted arrays | [Arrays](/array) + [Array methods](/array-methods) |
+| JSON / serialization (W16 shplay save) | [JSON methods, toJSON](/json) |
+| LocalStorage / persistence (W16) | [Storing data in the browser](/data-storage) → LocalStorage |
+| Async / preload (W16 loadJSON) | [Promises, async/await](/async) → callbacks intro |
+| DOM / browser events (if HTML is added) | [Document](/document) + [Introduction to Events](/events) |
+
+#### Sequential-access constraint (resolved)
+Browser JS cannot `open/write/close` sequential-access files the way C++/Python can — there is no file-handle API and no `close()` call. **Resolved in this plan:** the write side is a `Blob` + `<a download>` (download completing = the close), read side is FileReader; A8.2 + A8.3 together cover the full open → read → write → close loop, gated by the `allow-downloads` sandbox flag in `LivePreview.tsx`. Node's `fs` (JS2 Ch 20) demonstrates the true C-style model as a conceptual contrast.
+
+
+---
+
+## PART B - ASSIGNMENT CALENDAR (2026-27)
+
+> Folded in from `cs_course_schedule.md` (now `.deprecated.md`). 13 chapters (1-4 Q1, 5-7 Q2, 8-10 Q3, 11-13 Q4), odd-day schedule, chapter tests + group PAs + 1-week synthesis capstones per quarter, 2 semester finals.
+
+## Introduction to Computer Science - 2026-27 Assignment Calendar
+
+### Course: CSCI 4 - Introduction to Programming Concepts and Methodologies
+
+_JavaScript + shPlay + JSCAD. Odd-day schedule only (CS meets on odd days). Assignment calendar grouped by 9 content chapters (1–3 Q1, 4–5 Q2, 6–7 Q3, 8–9 Q4) plus 4 Synthesis Projects (one per quarter). Section numbers match the platform module numbering._
+
+**Assessment types:**
+- **Ch N Test** — 1-day individual chapter test (in-class, closed book)
+- **Ch N Group PA** — 1-day collaborative group performance assessment (design + build + demo)
+- **Synthesis Project (chapters covered)** — 1-week individual performance assessment; one per quarter (Q1: Ch 1–3, Q2: Ch 4–5, Q3: Ch 6–7, Q4: Ch 8–9), separate from semester finals
+- **Semester Final** — finals week, 2 minimum days
+- Sections can run **2 modules per day** where stacked — the calendar is a floor, not a ceiling.
+
+### Semester 1 - Chapters 1-5 + Synthesis
+
+_33 assignments · 5 chapter tests · 5 group PAs · 2 review days · 2 finals._
+
+#### Chapter 1: Foundations (Q1)
+> **Sections:** 1.1.1 Software Lifecycle · 1.1.2 Variables and Data Types · 1.1.3 Documentation and Coding Conventions
+
+| # | Ch | Section | Assignment | Odd-day class |
+|---:|---:|---|---|---|
+| 1 | 1 | 1.1.1 | Software Lifecycle - A1.1 Software Lifecycle writeup (SDLC) | Wk 2 · Tue Aug 18 |
+| 2 | 1 | 1.1.1 | Software Lifecycle - A1.2 Browser console setup lab | Wk 2 · Thu Aug 20 |
+| 3 | 1 | 1.1.2 | Variables and Data Types - A2.1 Fix 10 buggy variable declarations | Wk 3 · Mon Aug 24 |
+| 4 | 1 | 1.1.2 | Variables and Data Types - A2.2 Object description program | Wk 3 · Wed Aug 26 |
+| 5 | 1 | 1.1.3 | Documentation and Coding Conventions - A3.1 Document a messy program | Wk 3 · Fri Aug 28 |
+| 6 | 1 | 1.1.3 | Documentation and Coding Conventions - A3.2 Why documentation matters (written) | Wk 4 · Tue Sep 01 |
+| 7 | 1 | 1.1.3 | Documentation and Coding Conventions - A3.3 Quiz: data types & conventions | Wk 4 · Tue Sep 01 |
+|  | 1 |  | **Ch 1 Test** | Wk 4 · Thu Sep 03 |
+|  | 1 |  | **Ch 1 Group PA** | Wk 5 · Tue Sep 08 |
+
+#### Chapter 2: Control Flow (Q1)
+> **Sections:** 1.2.1 Conditionals · 1.2.2 Algorithms and Loops
+
+| # | Ch | Section | Assignment | Odd-day class |
+|---:|---:|---|---|---|
+| 8 | 2 | 1.2.1 | Conditionals - A4.1 Grade advisor program | Wk 4 · Thu Sep 03 |
+| 9 | 2 | 1.2.1 | Conditionals - A4.2 Quiz: operators & code tracing | Wk 5 · Tue Sep 08 |
+| 10 | 2 | 1.2.2 | Algorithms and Loops - A5.1 Algorithm + loop program (SLO 4) | Wk 5 · Thu Sep 10 |
+| 11 | 2 | 1.2.2 | Algorithms and Loops - A5.2 Debug 5 loop programs | Wk 6 · Mon Sep 14 |
+|  | 2 |  | **Ch 2 Test** | Wk 6 · Mon Sep 14 |
+|  | 2 |  | **Ch 2 Group PA** | Wk 6 · Wed Sep 16 |
+
+#### Chapter 3: Functions and Data (Q1)
+> **Sections:** 1.3.1 Functions: Definition and Calls · 1.3.2 Functions: Pass by Value/Reference · 1.3.3 Arrays and File I/O
+
+| # | Ch | Section | Assignment | Odd-day class |
+|---:|---:|---|---|---|
+| 12 | 3 | 1.3.1 | Functions: Definition and Calls - A6.1 Refactor grade advisor into functions | Wk 6 · Wed Sep 16 |
+| 13 | 3 | 1.3.1 | Functions: Definition and Calls - A6.2 Design calculator program | Wk 6 · Fri Sep 18 |
+| 14 | 3 | 1.3.2 | Functions: Pass by Value/Reference - A7.1 Scale-a-design function | Wk 7 · Tue Sep 22 |
+| 15 | 3 | 1.3.2 | Functions: Pass by Value/Reference - A7.2 Pass-by-value vs reference (written) | Wk 7 · Thu Sep 24 |
+| 16 | 3 | 1.3.2 | Functions: Pass by Value/Reference - A7.3 Quiz: function tracing | Wk 7 · Thu Sep 24 |
+| 17 | 3 | 1.3.3 | Arrays and File I/O - A8.1 Design measurements array program | Wk 8 · Mon Sep 28 |
+| 18 | 3 | 1.3.3 | Arrays and File I/O - A8.2 FileReader file-processing lab | Wk 8 · Wed Sep 30 |
+| 19 | 3 | 1.3.3 | Arrays and File I/O - A8.3 File write + round-trip lab | Wk 8 · Fri Oct 02 |
+|  | 3 |  | **Ch 3 Test** | Wk 8 · Fri Oct 02 |
+|  | 3 |  | **Ch 3 Group PA** | Wk 9 · Tue Oct 06 |
+
+#### Synthesis Project (Q1 — Chapters 1–3: Foundations, Control Flow, Functions and Data)
+> **Section:** 1.4.1 Q1 Review and Mini-Project — **synthesis project (1 week, individual):** A9.1 Print Job Manager. Assesses all of Q1; covers Ch 1–3.
+
+| # | Ch | Section | Assignment | Odd-day class |
+|---:|---:|---|---|---|
+| 20 | — | 1.4.1 | Q1 Mini-Project - A9.1 Print Job Manager (major) | Wk 9 · Tue Oct 06 |
+
+#### Chapter 4: shPlay Foundations (Q2)
+> **Sections:** 2.1.1 Hello Sprite and Movement · 2.1.2 Physics Feel · 2.2.1 Classes and Objects via shPlay
+
+| # | Ch | Section | Assignment | Odd-day class |
+|---:|---:|---|---|---|
+| 21 | 4 | 2.1.1 | shPlay Foundations - A10.1 Sprite playground lab | Wk 9 · Thu Oct 08 |
+| 22 | 4 | 2.1.1 | shPlay Foundations - A10.2 setup() vs draw() (written) | Wk 10 · Mon Oct 12 |
+| 23 | 4 | 2.1.2 | Physics Feel - A11.1 Pinball scene lab | Wk 10 · Wed Oct 14 |
+| 24 | 4 | 2.1.2 | Physics Feel - A11.2 vel vs applyForce (written) | Wk 10 · Fri Oct 16 |
+| 25 | 4 | 2.2.1 | OOP: Classes and Objects - A12.1 Collectible class lab | Wk 11 · Tue Oct 20 |
+| 26 | 4 | 2.2.1 | OOP: Classes and Objects - A12.2 OOP vs procedural (written, SLO 2) | Wk 11 · Thu Oct 22 |
+|  | 4 |  | **Ch 4 Test** | Wk 12 · Mon Oct 26 |
+|  | 4 |  | **Ch 4 Group PA** | Wk 12 · Fri Oct 30 |
+
+#### Chapter 5: Game Mechanics (Q2)
+> **Sections:** 2.3.1 Groups and Overlaps · 2.3.2 Physics Applications · 2.4.1 Animated Sprites and Camera · 2.5.1 Game Saves · 2.6.1 Game States · 2.7.1 Joints and Advanced Input
+
+| # | Ch | Section | Assignment | Odd-day class |
+|---:|---:|---|---|---|
+| 27 | 5 | 2.3.1 | Groups and Overlaps - A13.1 Asteroid Field challenge | Wk 12 · Wed Oct 28 |
+| 28 | 5 | 2.3.2 | Physics Applications - A14.1 Space Jumper OR Car challenge | Wk 13 · Tue Nov 03 |
+| 29 | 5 | 2.4.1 | Animation & Camera - A15.1 Side-scrolling platformer | Wk 14 · Mon Nov 09 |
+| 30 | 5 | 2.5.1 | Game Saves - A16.1 Persistent high scores lab | Wk 14 · Thu Nov 12 |
+| 31 | 5 | 2.6.1 | Game States - A16.2 Game states lab | Wk 15 · Mon Nov 16 |
+| 32 | 5 | 2.7.1 | Joints and Advanced Input - A17.1 Two-Player Pong-Sumo | Wk 15 · Fri Nov 20 |
+|  | 5 |  | **Ch 5 Test** | Wk 16 · Tue Dec 01 |
+|  | 5 |  | **Ch 5 Group PA** | Wk 17 · Mon Dec 07 |
+
+#### Synthesis Project (Q2 — Chapters 4–5: shPlay Foundations, Game Mechanics)
+> **Section:** 2.8.1 Capstone Game — **synthesis project (1 week, individual):** A18.1 Game Capstone (SLO 1/2/3). Assesses all of Q2; covers Ch 4–5.
+
+| # | Ch | Section | Assignment | Odd-day class |
+|---:|---:|---|---|---|
+| 33 | — | 2.8.1 | Game Capstone - A18.1 Game Capstone (SLO 1/2/3) | Wk 16 · Thu Dec 03 |
+
+|  |  |  | _Full Review 1 of 2_ | Wk 17 · Wed Dec 09 |
+|  |  |  | _Full Review 2 of 2_ | Wk 17 · Fri Dec 11 |
+|  |  |  | **Semester 1 Final** | Wk 18 · Tue Dec 15 |
+|  |  |  | **Semester 1 Final (cont.)** | Wk 18 · Thu Dec 17 |
+
+### Semester 2 - Chapters 6-9 + Synthesis
+
+_42 assignments · 4 chapter tests · 4 group PAs · 3 review days · 2 finals._
+
+#### Chapter 6: JSCAD Foundations (Q3)
+> **Sections:** 3.1.1 Libraries and JSCAD Introduction · 3.1.2 2D Shapes and Transforms · 3.1.3 Boolean Operations in 2D · 3.2.1 Parameters and getParameterDefinitions · 3.2.2 Arrays in JSCAD / Loops
+
+| # | Ch | Section | Assignment | Odd-day class |
+|---:|---:|---|---|---|
+| 1 | 6 | 3.1.1 | Libraries and JSCAD Intro - A19.1 JSCAD multi-module program | Wk 1 · Tue Jan 05 |
+| 2 | 6 | 3.1.1 | Libraries and JSCAD Intro - A19.2 What is a library (written) | Wk 1 · Thu Jan 07 |
+| 3 | 6 | 3.1.2 | 2D Shapes and Transforms - A20.1 2D logo design | Wk 3 · Wed Jan 20 |
+| 4 | 6 | 3.1.2 | 2D Shapes and Transforms - A20.2 Doc-reading primitive lab | Wk 3 · Wed Jan 20 |
+| 5 | 6 | 3.1.3 | Boolean Operations in 2D - A21.1 2D gasket/plate design | Wk 4 · Thu Jan 28 |
+| 6 | 6 | 3.1.3 | Boolean Operations in 2D - A21.2 Boolean ops (written) | Wk 4 · Thu Jan 28 |
+| 7 | 6 | 3.1.3 | Boolean Operations in 2D - A21.3 Quiz: booleans & coordinates | Wk 4 · Thu Jan 28 |
+| 8 | 6 | 3.2.1 | Parameters and getParameterDefinitions - A22.1 Parameterized logo | Wk 5 · Fri Feb 05 |
+| 9 | 6 | 3.2.1 | Parameters and getParameterDefinitions - A22.2 Params connect to Q1 (written) | Wk 5 · Fri Feb 05 |
+| 10 | 6 | 3.2.2 | Arrays in JSCAD / Loops - A23.1 Pattern generation program | Wk 7 · Wed Feb 17 |
+| 11 | 6 | 3.2.2 | Arrays in JSCAD / Loops - A23.2 map() rewrite | Wk 7 · Wed Feb 17 |
+|  | 6 |  | **Ch 6 Test** | Wk 7 · Fri Feb 19 |
+|  | 6 |  | **Ch 6 Group PA** | Wk 8 · Tue Feb 23 |
+
+#### Chapter 7: 3D Modeling (Q3)
+> **Sections:** 3.3.1 First Extrusion: 2D to 3D · 3.3.2 3D Primitives and Transforms · 3.4.1 Error Handling and Debugging · 3.4.2 Testing Principles
+
+| # | Ch | Section | Assignment | Odd-day class |
+|---:|---:|---|---|---|
+| 12 | 7 | 3.3.1 | First Extrusion: 2D to 3D - A24.1 Extrude gasket to 3D (print) | Wk 8 · Thu Feb 25 |
+| 13 | 7 | 3.3.1 | First Extrusion: 2D to 3D - A24.2 extrudeRotate symmetric object (print) | Wk 8 · Thu Feb 25 |
+| 14 | 7 | 3.4.1 | Error Handling and Debugging - A26.1 Error handling on W9 manager | Wk 9 · Mon Mar 01 |
+| 15 | 7 | 3.4.1 | Error Handling and Debugging - A26.2 Error handling on a JSCAD project | Wk 9 · Mon Mar 01 |
+| 16 | 7 | 3.4.2 | Testing Principles - A27.1 Test suite for W9 manager | Wk 9 · Wed Mar 03 |
+| 17 | 7 | 3.4.2 | Testing Principles - A27.2 Normal/edge/error cases (written) | Wk 9 · Wed Mar 03 |
+| 18 | 7 | 3.4.2 | Testing Principles - A27.3 Quiz: test cases | Wk 9 · Wed Mar 03 |
+| 19 | 7 | 3.3.2 | 3D Primitives and Transforms - A25.1 3D assembly (5 primitives) | Wk 9 · Fri Mar 05 |
+| 20 | 7 | 3.3.2 | 3D Primitives and Transforms - A25.2 Functional bushing part | Wk 9 · Fri Mar 05 |
+| 21 | 7 | 3.3.2 | 3D Primitives and Transforms - A25.3 Quiz: 3D primitives | Wk 9 · Fri Mar 05 |
+|  | 7 |  | **Ch 7 Test** | Wk 12 · Tue Mar 30 |
+|  | 7 |  | **Ch 7 Group PA** | Wk 13 · Mon Apr 05 |
+
+#### Synthesis Project (Q3 — Chapters 6–7: JSCAD Foundations, 3D Modeling)
+> **Section:** [TITLE TBD] — synthesis project (1 week, individual). Themed placeholder — likely a design-and-print build tying Ch 7 (3D Modeling) together (e.g., "Parametric Part Family" or "Multi-part Assembly"). Spans spring recess Mar 15–19; students build over the break, test + submit after. Assesses Q3; covers Ch 6–7. No chapter test / group PA.
+
+| # | Ch | Section | Assignment | Odd-day class |
+|---:|---:|---|---|---|
+| 22 | — | TBD | **[CAPSTONE TBD] - Design spec + plan** | Wk 10 · Tue Mar 09 |
+| 23 | — | TBD | **[CAPSTONE TBD] - Build** | Wk 10 · Thu Mar 11 |
+| 24 | — | TBD | **[CAPSTONE TBD] - Test + refine** | Wk 11 · Mon Mar 22 |
+| 25 | — | TBD | **[CAPSTONE TBD] - Submit / present** | Wk 11 · Wed Mar 24 |
+
+#### Chapter 8: Advanced Modeling (Q4)
+> **Sections:** 4.1.1 Hulls and Advanced Extrusions · 4.1.2 Measurements and Printability · 4.1.3 Sorting and Searching on Geometry
+
+| # | Ch | Section | Assignment | Odd-day class |
+|---:|---:|---|---|---|
+| 26 | 8 | 4.1.1 | Hulls and Advanced Extrusions - A28.1 Design w/ 2 advanced techniques | Wk 12 · Thu Apr 01 |
+| 27 | 8 | 4.1.1 | Hulls and Advanced Extrusions - A28.2 Quiz: advanced techniques | Wk 12 · Thu Apr 01 |
+| 28 | 8 | 4.1.2 | Measurements and Printability - A29.1 Measurement report lab | Wk 13 · Wed Apr 07 |
+| 29 | 8 | 4.1.3 | Sorting and Searching - A30.1 Sort/search on geometry (SLO 4) | Wk 14 · Tue Apr 13 |
+| 30 | 8 | 4.1.3 | Sorting and Searching - A30.2 Bubble sort (written) | Wk 14 · Tue Apr 13 |
+|  | 8 |  | **Ch 8 Test** | Wk 14 · Thu Apr 15 |
+|  | 8 |  | **Ch 8 Group PA** | Wk 15 · Wed Apr 21 |
+
+#### Chapter 9: Production Pipeline (Q4)
+> **Sections:** 4.2.1 Multi-File Projects and File I/O · 4.2.2 Colors, Text, and Export Formats
+
+| # | Ch | Section | Assignment | Odd-day class |
+|---:|---:|---|---|---|
+| 31 | 9 | 4.2.1 | Multi-File Projects and File I/O - A31.1 Multi-file refactor + git | Wk 15 · Mon Apr 19 |
+| 32 | 9 | 4.2.1 | Multi-File Projects and File I/O - A31.2 File I/O comparison (written) | Wk 15 · Mon Apr 19 |
+| 33 | 9 | 4.2.2 | Colors, Text, Export Formats - A32.1 Nameplate/badge (print) | Wk 15 · Fri Apr 23 |
+| 34 | 9 | 4.2.2 | Colors, Text, Export Formats - A32.2 Quiz: export formats | Wk 15 · Fri Apr 23 |
+|  | 9 |  | **Ch 9 Test** | Wk 16 · Wed Apr 28 |
+|  | 9 |  | **Ch 9 Group PA** | Wk 18 · Fri May 14 |
+
+#### Synthesis Project (Q4 — Chapters 8–9: Advanced Modeling, Production Pipeline)
+> **Sections:** 4.3.1 Capstone Design Phase · 4.3.2 Capstone Build and Iterate · 4.3.3 Presentations and Reflection — **synthesis project (individual):** A33.1–A36.2 span the full build; A36.1 presentation is the performance assessment. Assesses Q4; covers Ch 8–9.
+
+| # | Ch | Section | Assignment | Odd-day class |
+|---:|---:|---|---|---|
+| 35 | — | 4.3.1 | Capstone Design Phase - A33.1 Capstone design spec | Wk 16 · Fri Apr 30 |
+| 36 | — | 4.3.2 | Capstone Build (part 1) - A34.1 Milestone 1: geometry | Wk 17 · Tue May 04 |
+| 37 | — | 4.3.2 | Capstone Build (part 1) - A34.2 Milestone 2: params + validation | Wk 17 · Thu May 06 |
+| 38 | — | 4.3.2 | Capstone Build (part 2) - A35.1 Milestone 3: complete + test | Wk 18 · Mon May 10 |
+| 39 | — | 4.3.2 | Capstone Build (part 2) - A35.2 Peer review | Wk 18 · Wed May 12 |
+| 40 | — | 4.3.2 | Capstone Build (part 2) - A35.3 Final print | Wk 18 · Wed May 12 |
+| 41 | — | 4.3.3 | Presentations and Reflection - A36.1 Capstone presentation | Wk 19 · Tue May 18 |
+| 42 | — | 4.3.3 | Presentations and Reflection - A36.2 Course reflection (SLO 1) | Wk 19 · Tue May 18 |
+
+|  |  |  | _Full Review 1 of 3_ | Wk 19 · Thu May 20 |
+|  |  |  | _Full Review 2 of 3_ | Wk 20 · Mon May 24 |
+|  |  |  | _Full Review 3 of 3_ | Wk 20 · Wed May 26 |
+|  |  |  | **Semester 2 Final** | Wk 20 · Fri May 28 |
+|  |  |  | **Semester 2 Final (cont.)** | Wk 21 · Wed Jun 02 |
+
+
+---
+
+## PART C - EXTERNAL ALIGNMENT (freeCodeCamp + AP CSP)
+
+> Folded in from `curriculum-alignment-guide.md` (now `.deprecated.md`). Week-by-week FCC activity mapping (its CodeHS rows were stripped during seeding), AP CSP non-coding integration, and the coverage summary.
+
+## CSCI 4 Curriculum Alignment Guide
+### freeCodeCamp (FCC) Lesson Mapping
+
+This guide maps external lesson sections from freeCodeCamp's JavaScript Certification to the CSCI 4 curriculum plan. Alignment is at the section/module level. Multiple sources may align to the same week. JSCAD-specific weeks are omitted (mapped separately).
+
+**Sources:**
+- **FCC** = freeCodeCamp JavaScript Certification (v9)
+- *(external platform sections carry no source tag)*
+
+
+---
+
+### QUARTER 1: JavaScript Fundamentals (Weeks 1-9)
+
+#### Week 1 — What Is Programming / Software Lifecycle
+
+| Source | Section | Notes |
+|--------|---------|-------|
+| 1.1 | Welcome to AP CSP | Video intro to CS concepts |
+| 1.2 | Introduction to Programming With Karel | First program, commands, sequential execution |
+| 3.1 | What is Code | Video + written reflection on what code is |
+| 3.2 | Uses of Programs | Why learn to program, programs in daily life |
+| 1.1 | Introduction to Programming With Karel | Same Karel intro, fewer activities |
+| FCC Variables and Strings | Introduction to JavaScript [Theory] | What JS is, first statements, console output |
+
+**Gap:** freeCodeCamp does not explicitly teach the software development lifecycle (design-code-test-maintain). This is teacher-delivered content per the curriculum plan.
+
+---
+
+#### Week 2 — Variables and Data Types
+
+| Source | Section | Notes |
+|--------|---------|-------|
+| FCC Variables and Strings | Introduction to JavaScript [Theory] | `let`, `const`, variable declaration |
+| FCC Variables and Strings | Working with Data Types [Theory] | Numbers, strings, booleans, typeof |
+| FCC Variables and Strings | Build a Greeting Bot [Workshop] | Variable practice with string output |
+| FCC Variables and Strings | Build a JavaScript Trivia Bot [Lab] | Variables + strings applied |
+| FCC Variables and Strings | Build a Sentence Maker [Lab] | Template literals, concatenation |
+| FCC Variables and Strings | JavaScript Variables and Data Types Review [Review] | Consolidation |
+| FCC Variables and Strings | JavaScript Variables and Data Types Quiz [Quiz] | Assessment |
+| 3.3 | Hello World | console.log, first JS output |
+| 3.4 | Variables | Variable declaration, assignment, types |
+| 3.6 | Basic Math in JavaScript | Arithmetic operators, order of operations, type coercion (`24 vs "24"`) |
+| 3.1 | Hello World | Same as AP 3.3 |
+| 3.2 | Variables | Same as AP 3.4 |
+| 3.4 | Basic Math in JavaScript | Same as AP 3.6 |
+
+**Strong coverage.** freeCodeCamp's "Working with Data Types" theory section directly addresses `typeof`, type coercion, and the four primary types.
+
+---
+
+#### Week 3 — Documentation and Coding Conventions
+
+| Source | Section | Notes |
+|--------|---------|-------|
+| FCC Variables and Strings | Understanding Code Clarity [Theory] | Naming, readability, clean code principles |
+| 1.7 | Top Down Design and Decomposition in Karel | Structured decomposition (conceptual bridge) |
+| 1.8 | Commenting Your Code | Single-line/block comments, why comments matter |
+| 1.18 | How to Indent Your Code | Indentation rules and formatting |
+| 1.7 | Commenting Your Code | Same as AP 1.8 |
+| 1.15 | How to Indent Your Code | Same as AP 1.18 |
+
+**Partial gap:** Neither source covers README writing or JSDoc-style documentation. The FCC "Understanding Code Clarity" theory is the closest to the curriculum plan's code readability focus. Teacher-created style guide still needed.
+
+---
+
+#### Week 4 — Conditionals
+
+| Source | Section | Notes |
+|--------|---------|-------|
+| FCC Booleans and Numbers | Working with Comparison and Boolean Operators [Theory] | `===`, `!==`, `<`, `>`, `&&`, `\|\|`, `!` |
+| FCC Booleans and Numbers | Understanding Comparisons and Conditionals [Theory] | if/else if/else, switch |
+| FCC Booleans and Numbers | Build a Logic Checker App [Workshop] | Applied boolean logic |
+| FCC Booleans and Numbers | Build a Fortune Teller [Lab] | Conditionals in practice |
+| FCC Booleans and Numbers | JavaScript Comparisons and Conditionals Review [Review] | |
+| FCC Booleans and Numbers | JavaScript Comparisons and Conditionals Quiz [Quiz] | |
+| 4.1 | Booleans | Boolean values, true/false |
+| 4.2 | Logical Operators | `&&`, `\|\|`, `!` with exercises (Can You Graduate?, School's Out) |
+| 4.3 | Comparison Operators | `==`, `<`, `>`, `<=`, `>=` with exercises |
+| 4.4 | If Statements | if/else if/else, nested conditionals (10 activities including Teenagers, Meal Planner) |
+| 5.1 | Booleans | Same as AP 4.1 |
+| 5.2 | Logical Operators | Same as AP 4.2 |
+| 5.3 | Comparison Operators | Same as AP 4.3 |
+| 5.4 | If Statements | Same as AP 4.4, with 10 activities |
+
+**Excellent coverage.** freeCodeCamp has strong theory explanations. Neither emphasizes `===` vs `==` as strongly as the curriculum plan requires — teacher should supplement.
+
+---
+
+#### Week 5 — Algorithms and Loops (For and While)
+
+| Source | Section | Notes |
+|--------|---------|-------|
+| FCC Loops | Working with Loops [Theory] | for, while, do-while, break, continue |
+| FCC Loops | Build a Sentence Analyzer [Workshop] | Loop-based string processing |
+| FCC Loops | Build a Space Mission Roster [Workshop] | Iterating and accumulating |
+| FCC Loops | Build a Factorial Calculator [Lab] | Classic accumulation pattern |
+| FCC Loops | Build a Longest Word Finder App [Lab] | Searching pattern with loops |
+| FCC Loops | JavaScript Loops Review [Review] | |
+| FCC Loops | JavaScript Loops Quiz [Quiz] | |
+| 4.6 | For Loops in JavaScript | Basic for loop syntax, exercises (Meme Text Generator, The Worm) |
+| 4.7 | General For Loops | Countdown, count by twos, powers of two |
+| 4.8 | For Loop Practice | Sum, factorial, nested concepts |
+| 4.10 | While Loops | While loop syntax, Inventory exercise, Fibonacci |
+| 4.11 | Loop and a Half | Break patterns, sentinel loops (Snake Eyes, Better Password) |
+| 1.11 | For Loops (Karel) | Visual loop concept reinforcement |
+| 1.14 | While Loops in Karel | Visual while loop reinforcement |
+| 1.17 | Karel Algorithms | Algorithm thinking with Karel |
+| 5.5 | For Loops in JavaScript | Same as AP 4.6 |
+| 5.6 | General For Loops | Same as AP 4.7 |
+| 5.9 | While Loops | Same as AP 4.10 |
+| 5.10 | Loop and a Half | Same as AP 4.11 |
+
+**Strong coverage.** freeCodeCamp has better applied projects (Factorial Calculator, Longest Word Finder). The curriculum plan's algorithm definition ("precise, ordered set of steps") is teacher-delivered.
+
+**Gap:** Neither source explicitly covers the "what is an algorithm" conceptual discussion the curriculum plan requires for SLO 4.
+
+---
+
+#### Week 6 — Functions Part 1 (Definition and Calls)
+
+| Source | Section | Notes |
+|--------|---------|-------|
+| FCC Functions | Working with Functions [Theory] | Function declaration, parameters, return values, arrow functions |
+| FCC Functions | Build a Calculator [Workshop] | Functions with parameters and returns |
+| FCC Functions | Build a Boolean Check Function [Lab] | Return values practice |
+| FCC Functions | Build an Email Masker [Lab] | String processing with functions |
+| FCC Functions | Build a Loan Qualification Checker [Workshop] | Multi-parameter functions |
+| FCC Functions | Build a Celsius to Fahrenheit Converter [Lab] | Simple function with return |
+| FCC Functions | JavaScript Functions Review [Review] | |
+| FCC Functions | JavaScript Functions Quiz [Quiz] | |
+| 5.1 | Functions and Parameters 1 | Function definition, single parameter (Double, Square, Triple) |
+| 5.2 | Functions and Parameters 2 | Multiple parameters (Sum, Area of Triangle) |
+| 5.3 | Functions and Parameters 3 | Functions with graphics — visual feedback |
+| 5.4 | Functions and Return Values 1 | Return values intro |
+| 5.5 | Functions and Return Values 2 | Return values applied (Is It Even?, Min) |
+| 5.6 | Local Variables and Scope | Scope intro — local vs global |
+| 7.1-7.6 | Functions and Parameters 1-6 + Return Values + Scope | Same content as AP 5.x |
+
+**Excellent coverage.** freeCodeCamp has strong applied projects (Calculator, Loan Checker).
+
+---
+
+#### Week 7 — Functions Part 2 (Pass by Value/Reference)
+
+| Source | Section | Notes |
+|--------|---------|-------|
+| FCC Objects | Introduction to JavaScript Objects and Their Properties [Theory] | Objects as reference types (partial) |
+| FCC Objects | Working with Optional Chaining and Object Destructuring [Theory] | Spread operator, destructuring (partial) |
+| FCC JavaScript Fundamentals Review | Working with Types and Objects [Theory] | Value vs reference types revisited |
+
+**Significant gap.** freeCodeCamp has no dedicated section on pass-by-value vs pass-by-reference. This is a curriculum plan-specific deep dive (SLO topic). FCC's Objects theory touches on reference types, and the Fundamentals Review revisits it, but it does not explicitly contrast primitive vs object mutation behavior. This week is primarily teacher-delivered with custom exercises.
+
+---
+
+#### Week 8 — Arrays and File I/O
+
+| Source | Section | Notes |
+|--------|---------|-------|
+| FCC Arrays | Working with Arrays [Theory] | Declaration, indexing, common methods (push, pop, shift, unshift, includes) |
+| FCC Arrays | Build a Shopping List [Workshop] | Array creation and manipulation |
+| FCC Arrays | Build a Lunch Picker Program [Lab] | Random access, array methods |
+| FCC Arrays | Build a Golf Score Translator [Lab] | Array lookup pattern |
+| FCC Arrays | Working with Common Array Methods [Theory] | map, filter, slice, splice, indexOf |
+| FCC Arrays | JavaScript Arrays Review [Review] | |
+| FCC Arrays | JavaScript Arrays Quiz [Quiz] | |
+| 7.1 | Intro to Lists/Arrays | Array declaration, literal syntax |
+| 7.2 | Indexing Into an Array | Zero-based indexing, bracket notation |
+| 7.3 | Adding/Removing From an Array | push, pop, splice |
+| 7.4 | Array Length and Looping Through Arrays | for loop iteration, sum, max, product (13 activities) |
+| 7.5 | Iterating Over an Array | Applied iteration with visualization |
+| 7.6 | Finding an Element in a List | indexOf, linear search, algorithm efficiency intro |
+| 7.7 | Removing an Element From an Array | splice for removal |
+| (no array unit) | - | Intro CS course does not include arrays |
+
+**Good coverage for arrays, gap for File I/O.** The external array material is excellent — 7 lessons with 50+ activities covering all array operations. freeCodeCamp Arrays covers the same ground more concisely. freeCodeCamp does not cover the browser FileReader API or file I/O concepts — that content is curriculum plan-specific.
+
+---
+
+#### Week 9 — Q1 Review and Mini-Project
+
+| Source | Section | Notes |
+|--------|---------|-------|
+| FCC JavaScript Fundamentals Review | Full section (24 items) | Comprehensive review: types, objects, arrays, variables, modules, rest params. Includes 15+ labs (Gradebook App, Pyramid Generator, Password Generator, Inventory Management) |
+| FCC Booleans and Numbers | Build a Mathbot [Workshop] | Multi-concept review project |
+| 3.9 | Programming with JavaScript Quiz | Unit quiz for JS basics |
+| 4.12 | JavaScript Control Structures Quiz | Unit quiz for control flow |
+| 5.9 | Functions and Parameters Quiz | Unit quiz for functions |
+| 7.9 | Basic Data Structures Quiz | Unit quiz for arrays |
+| 5.8 | Basic JavaScript and Graphics Challenges | Open-ended challenges (Ghosts, Guessing Game, Draw Something) |
+
+**Good supplemental resources.** The FCC Fundamentals Review section is an excellent match — it's a synthesis of all Q1 concepts with challenging labs. Neither matches the curriculum plan's "Print Job Manager" project specifically, but freeCodeCamp's Gradebook App and Inventory Management labs are similar in scope.
+
+---
+
+### QUARTER 2: Selected JS-Content Weeks
+
+#### Week 17 — OOP: Classes and Objects
+
+| Source | Section | Notes |
+|--------|---------|-------|
+| FCC Classes | Understanding How to Work with Classes in JavaScript [Theory] | Class syntax, constructor, this, methods, inheritance |
+| FCC Classes | Build a Shopping Cart [Workshop] | Class with methods, state management |
+| FCC Classes | Build a Project Idea Board [Lab] | Applied OOP |
+| FCC Classes | JavaScript Classes Review [Review] | |
+| FCC Classes | JavaScript Classes Quiz [Quiz] | |
+| FCC Objects | Introduction to JavaScript Objects and Their Properties [Theory] | Objects as data containers (bridge to classes) |
+| FCC Objects | Build a Wildlife Tracker [Workshop] | Object methods, properties |
+| FCC Objects | Build a Recipe Tracker [Workshop] | Object manipulation |
+
+**Strong FCC coverage.** FCC's Classes section directly maps to this week. The FCC Shopping Cart workshop is a good analog to the curriculum plan's `PrintPart` / `PrintQueue` class exercises. FCC Objects section provides the foundation that leads into classes.
+
+**Gap:** Neither source explicitly compares OOP vs procedural programming as the curriculum plan requires for SLO 2. This comparison is teacher-delivered.
+
+---
+
+### QUARTER 3: JS-Content Weeks
+
+#### Week 22 — Sorting and Searching Algorithms
+
+| Source | Section | Notes |
+|--------|---------|-------|
+| FCC Algorithms | Introduction to Common Searching and Sorting Algorithms [Theory] | Binary search, merge sort, bubble sort, selection sort, quicksort concepts |
+| FCC Algorithms | Implement the Binary Search Algorithm [Workshop] | Guided binary search implementation |
+| FCC Algorithms | Implement the Merge Sort Algorithm [Workshop] | Guided merge sort implementation |
+| FCC Algorithms | Implement the Bubble Sort Algorithm [Lab] | Independent bubble sort implementation |
+| FCC Algorithms | Implement the Selection Sort Algorithm [Lab] | Independent selection sort |
+| FCC Algorithms | Implement the Insertion Sort Algorithm [Lab] | Independent insertion sort |
+| FCC Algorithms | Implement the Quicksort Algorithm [Lab] | Advanced sort |
+| FCC Algorithms | Searching and Sorting Algorithms Review [Review] | |
+| FCC Algorithms | Searching and Sorting Algorithms Quiz [Quiz] | |
+| 7.6 | Finding an Element in a List | Linear search, indexOf, algorithm efficiency intro |
+
+**Excellent coverage.** freeCodeCamp's Algorithms section is a near-perfect match for this week — it covers bubble sort (required by curriculum plan), plus binary search, merge sort, and more. The section goes beyond the curriculum plan's requirements (quicksort, insertion sort) which gives stretch material for advanced students.
+
+---
+
+#### Week 23 — Error Handling and Debugging
+
+| Source | Section | Notes |
+|--------|---------|-------|
+| FCC Debugging | Debugging Techniques [Theory] | Debugging strategies, common error types |
+| FCC Debugging | Debug a Random Background Color Changer [Lab] | Applied debugging practice |
+| FCC Debugging | Debugging JavaScript Review [Review] | |
+| FCC Debugging | Debugging JavaScript Quiz [Quiz] | |
+| FCC Booleans and Numbers | Debug Type Coercion Errors in a Buggy App [Lab] | Specific debugging — type errors |
+| FCC Booleans and Numbers | Debug Increment and Decrement Operator Errors in a Buggy App [Lab] | Specific debugging — logic errors |
+| 1.16 | Debugging Strategies | 8 activities on debugging approaches (Karel context but transferable) |
+
+**Partial coverage.** FCC Debugging section is short (4 items) but directly relevant. The two FCC debugging labs in Booleans and Numbers add practical exercises. freeCodeCamp does not cover try/catch, throw, or custom errors — those are curriculum plan-specific topics.
+
+**Gap:** try/catch/finally syntax, throwing custom errors, and input validation are not covered by either source. Teacher-delivered.
+
+---
+
+#### Week 24 — Testing Principles
+
+| Source | Section | Notes |
+|--------|---------|-------|
+| (none) | — | — |
+
+**Complete gap.** freeCodeCamp has no dedicated section on testing principles, writing test cases, or test-driven development. This entire week is teacher-delivered curriculum plan content. freeCodeCamp's labs implicitly test code but never teach testing as a concept.
+
+---
+
+### Non-Programming Units → Curriculum Plan Integration
+
+AP CSP non-coding topics are integrated into the curriculum plan as 10–20 minute discussions, bell-ringers, and one graded written assignment. The table below maps each AP CSP unit to the curriculum plan week(s) where its topics are reinforced.
+
+| Unit | Topic | Curriculum Plan Week(s) | Integration |
+|-------------|-------|------------------------|-------------|
+| Unit 8 | Digital Information: binary, hex, pixel images, compression, cryptography | W2 (binary), W8 (compression), W11 (image representation) | AP CSP Discussions in-class |
+| Unit 9 | Practice PT: Steganography | W8 (data compression context) | Conceptual connection only — no steganography project in CSCI 4 |
+| Unit 10 | Practice PT: Image Filter | W11 (digital image representation via JSCAD colors) | Conceptual connection only — no image filter project in CSCI 4 |
+| Unit 11 | The Internet: hardware, DNS, protocols, cybersecurity | W10 (HTTP, DNS, client-server), W11 (TCP/IP, fault tolerance), W23 (cybersecurity) | AP CSP Discussions + bell-ringer |
+| Unit 12 | Effects of the Internet | W15 (beneficial/harmful effects), W25 (digital divide) | AP CSP Discussions |
+| Unit 13 | Data: visualization, collection, limitations | W19 (metadata), W22 (parallel computing) | AP CSP Discussions |
+| Unit 14 | Present a Data-Driven Insight | W25 (A25.3 written assignment on impacts) | Graded written assignment |
+| Unit 15 | Impacts of Computing | W15 (ethics), W25 (digital divide + A25.3), W33 (computing bias) | AP CSP Discussions + written |
+| Unit 18 | Creative Development: design thinking, prototyping | W1 (lifecycle), W3 (documentation), W34 (peer review/collaboration) | Already embedded in plan structure |
+
+#### Units NOT Integrated (and why)
+
+| Unit | Reason |
+|-------------|--------|
+| Unit 9 (Steganography) | Requires image manipulation not available in JSCAD environment. Students get the underlying concepts (binary, compression, encryption) through other discussions. |
+| Unit 10 (Image Filter) | Same — image pixel manipulation doesn't map to JSCAD. Conceptually covered via W11 color/image discussion. |
+| Unit 14 (Data-Driven Insight) | No standalone data analysis project in CSCI 4. A25.3 written assignment covers the "present an insight" concept at smaller scale. |
+
+#### Supplemental Lessons for AP CSP Discussion Topics
+
+Teachers may assign specific supplemental lessons as homework to reinforce the in-class AP CSP discussions:
+
+| Curriculum Plan Discussion | Recommended Lesson | Notes |
+|---------------------------|----------------------|-------|
+| W2: Binary number systems | 8.1–8.3 (Number Systems, Binary, Pixel Images) | Video + exercises on binary conversion |
+| W8: Data compression | 8.5 (Compression) | Lossy vs lossless with examples |
+| W10: How the Internet works | 11.1–11.3 (Internet hardware, DNS, protocols) | Video series on Internet infrastructure |
+| W11: Protocols & fault tolerance | 11.4–11.5 (Routing, fault tolerance) | Interactive simulations |
+| W15: Beneficial/harmful effects | 12.x (Effects of the Internet project) | Research + writing |
+| W23: Cybersecurity | 11.6+ (Cybersecurity, encryption) + 8.6 (Cryptography) | Video + exercises |
+| W25: Digital divide | 15.x (Impacts of Computing project) | Research + presentation |
+| W33: Computing bias | 15.x (Impacts of Computing project) | Discussion prompts |
+
+---
+
+### COVERAGE SUMMARY
+
+#### Programming Content
+
+| Curriculum Week | Topic | Coverage | Gaps |
+|----------------|-------|--------------|--------------|------|
+| W1 | Programming / Lifecycle | Partial | Partial | Lifecycle is teacher-delivered |
+| W2 | Variables / Data Types | Strong | Strong | None |
+| W3 | Documentation / Conventions | Partial | Partial | README, JSDoc not covered |
+| W4 | Conditionals | Strong | Strong | `===` vs `==` emphasis needed |
+| W5 | Algorithms / Loops | Strong | Strong | Algorithm definition is teacher-delivered |
+| W6 | Functions (Def/Call) | Strong | Strong | None |
+| W7 | Pass by Value/Reference | Weak | None | Almost entirely teacher-delivered |
+| W8 | Arrays / File I/O | Strong (arrays) | Strong (arrays) | File I/O not covered |
+| W9 | Q1 Review / Mini-Project | Strong | Good (quizzes) | Custom project needed |
+| W17 | OOP / Classes | Strong | None | OOP vs procedural comparison teacher-delivered |
+| W22 | Sorting / Searching | Excellent | Weak | FCC is the primary source here |
+| W23 | Error Handling / Debugging | Partial | Partial | try/catch teacher-delivered |
+| W24 | Testing Principles | None | None | Entirely teacher-delivered |
+
+#### AP CSP Non-Coding Integration
+
+| Curriculum Week | AP CSP Topic | Unit | Coverage |
+|----------------|-------------|-------------|----------|
+| W2 | Binary number systems | Unit 8 (8.1–8.3) | Platform has video + exercises; plan adds 15-min discussion |
+| W3 | Open source / licensing | — | Teacher-delivered; no direct platform lesson |
+| W8 | Data compression | Unit 8 (8.5) | Platform has dedicated lesson; plan adds 15-min discussion |
+| W10 | How the Internet works | Unit 11 (11.1–11.3) | Platform has video series; plan adds 15-min discussion |
+| W11 | Protocols / fault tolerance | Unit 11 (11.4–11.5) | Platform has simulations; plan adds 10-min bell-ringer |
+| W15 | Beneficial/harmful effects | Unit 12 | Platform has research project; plan adds 15-min discussion |
+| W19 | Metadata / intellectual property | Unit 13 (partial) | Teacher-delivered; platform covers metadata but not IP |
+| W22 | Parallel computing | — | Teacher-delivered; no direct platform lesson |
+| W23 | Cybersecurity basics | Unit 11 (11.6+), Unit 8 (8.6) | Platform has crypto + cybersecurity; plan adds 15-min discussion |
+| W25 | Digital divide + A25.3 written | Unit 12, Unit 15 | Platform has research projects; plan adds discussion + graded written |
+| W33 | Computing bias | Unit 15 | Platform has impacts project; plan adds 15-min discussion |
+
+**Key takeaways:**
+
+- **Programming content:** freeCodeCamp provides strong coverage for Weeks 2–6 and 8 (core JS fundamentals). FCC is the primary source for W17 (Classes) and W22 (Algorithms). Weeks 7, 23–24, and the lifecycle/documentation/testing content require teacher-created materials regardless of external resources.
+- **AP CSP non-coding content:** AP CSP Units 8, 11, 12, 13, and 15 provide substantial resources for the AP CSP discussions added to the curriculum plan. Two topics (open source/licensing, parallel computing) have no platform equivalent and are teacher-delivered.
+- **Not integrated:** Units 9 (Steganography) and 10 (Image Filter) require image manipulation not available in the JSCAD environment. Students get the underlying concepts through other discussions.
+
+
+
 ## GRADING STRUCTURE (Suggested)
 
 | Category | Weight |
@@ -1528,21 +2333,16 @@ and drop it into that section reading/source row. Anchor notation: `JS1 → Fund
 - **Chapter 1** Foundations (W1→3): JS1 Fundamentals; JS2 Ch 1→2; PY Ch 1→2
 - **Chapter 2** Control Flow (W4→5): JS1 Comparisons/Conditionals/Loops; JS2 Ch 2; PY Ch 4→5
 - **Chapter 3** Functions and Data (W6→8): JS1 Functions/Objects/Arrays + File and FileReader; JS2 Ch 3→4; PY Ch 3/6/9/14
-- **Chapter 4** Synthesis (W9): JS1 JavaScript specials; JS2 Ch 4
-- **Chapter 5** shplay Foundations (W10→11): shplay in-app docs; JS1 Functions
-- **Chapter 6** OOP (W12): JS1 Classes; JS2 Ch 6; PY Ch 11 (framing)
-- **Chapter 7** Collections & Physics (W13→14): JS1 Arrays/Map/Set; JS2 Ch 4
-- **Chapter 8** Animation & Camera (W15): shplay docs; JS1 Animation (optional)
-- **Chapter 9** State & Persistence (W16): JS1 JSON methods + LocalStorage; JS2 Ch 18; PY Ch 14
-- **Chapter 10** Advanced Mechanics (W17): shplay docs
-- **Chapter 11** Game Capstone (W18): JS2 Ch 16 (optional enrichment)
-- **Chapter 12** JSCAD Foundations (W19→21): JS1 Modules; JS2 Ch 10; PY Ch 7
-- **Chapter 13** Parametric Design (W22→23): JS1 Functions/Arrays; JS2 Ch 5 (map); PY Ch 6/9
-- **Chapter 14** 3D Modeling (W24→25): JSCAD API docs
-- **Chapter 15** Quality & Rigor (W26→27): JS1 Error handling + Debugging + Mocha testing; JS2 Ch 8
-- **Chapter 16** Advanced Modeling (W28→30): JS1 Array methods (sort); JS2 Ch 5
-- **Chapter 17** Production Pipeline (W31→32): JS1 Modules; JS2 Ch 10 + Ch 20 Node fs; PY Ch 14
-- **Chapter 18** 3D Capstone (W33→36): JS2 Ch 8 (design mindset); no reading for 4.3.3
+- **Chapter 4** Q1 Synthesis (W9): JS1 JavaScript specials; JS2 Ch 4
+- **Chapter 5** shPlay Foundations (W10→12): shplay in-app docs; JS1 Functions, Classes; JS2 Ch 6; PY Ch 11 (framing)
+- **Chapter 6** Game Mechanics (W13→17): shplay docs; JS1 Arrays/Map/Set, JSON methods + LocalStorage, Animation (optional); JS2 Ch 4, Ch 18; PY Ch 14
+- **Chapter 7** S1 Game Capstone (W18): JS2 Ch 16 (optional enrichment)
+- **Chapter 8** JSCAD Foundations (W19→23): JS1 Modules; JS2 Ch 10; PY Ch 7; JS1 Functions/Arrays, JS2 Ch 5 (map), PY Ch 6/9 (parametric)
+- **Chapter 9** 3D Modeling (W24→27): JSCAD API docs; JS1 Error handling + Debugging + Mocha testing; JS2 Ch 8
+- **Chapter 10** Q3 Capstone (W28→29): no reading — synthesis build
+- **Chapter 11** Advanced Modeling (W30→32): JS1 Array methods (sort); JS2 Ch 5
+- **Chapter 12** Production Pipeline (W33→34): JS1 Modules; JS2 Ch 10 + Ch 20 Node fs; PY Ch 14
+- **Chapter 13** S2 3D Capstone (W35→36): JS2 Ch 8 (design mindset); no reading for 4.3.3
 
 ## NOTES FOR CLAUDE CODE
 
@@ -1709,7 +2509,7 @@ If a student falls behind, prioritize catching up on these gateway topics — ev
 ```
 W2 Variables → W4 Conditionals → W5 Loops → W6 Functions → W8 Arrays
                                                               ↓
-                                         W10 shplay Intro → W12 OOP → W16 State/Save → W18 Game Capstone
+                                         W10 shplay Intro → W12 OOP → W16 Save/States → W18 Game Capstone
                                                               ↓
                                          W19 JSCAD Intro → W21 Booleans → W24 Extrusion → W28+ Advanced → W33 3D Capstone
 ```
