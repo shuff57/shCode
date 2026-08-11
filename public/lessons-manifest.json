@@ -1,6 +1,14 @@
 {
   "lessons": [
     {
+      "id": "1-1-4-reading-four-phases",
+      "title": "1.1.4 Reading — The Four Phases",
+      "unit": "1.1 Foundations",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "2-1-1-slides",
       "title": "2.1.1 Slides — shplay Foundations",
       "unit": "2.1 Foundations",

@@ -1,6 +1,9 @@
 # Curriculum build system
 
-Source of truth: `../curriculum-plan.md`
+Source of truth: `../curriculum-plan.md` (SLOs + calendar) and the bookSHelf textbook
+(concepts — the book is upstream of shCode). See [BOOK-TO-MODULE.md](BOOK-TO-MODULE.md)
+for how a written book chapter becomes modules here, and how to resync a built unit
+when the book changes.
 
 This directory contains the **build specs** used to generate individual learning artifacts (in-app lessons, assignment markdown, slide outlines, rubrics) from the curriculum plan.
 
