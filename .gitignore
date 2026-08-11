@@ -21,6 +21,7 @@ tsconfig.tsbuildinfo
 .claude/
 .playwright-mcp/
 tmp/
+.tmp/
 
 # Wrangler local dev (contains AUTH_SECRET, D1 state, etc.)
 .dev.vars
