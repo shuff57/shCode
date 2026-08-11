@@ -33,3 +33,6 @@ lesson-footer.png
 module-2.1-footer.png
 module-2.1-unauth.png
 graphify-out/
+
+# cross-CLI message log (Claude Code <-> opencode), local only
+.msgbox/
