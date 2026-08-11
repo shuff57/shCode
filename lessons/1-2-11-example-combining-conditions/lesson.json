@@ -1,0 +1,16 @@
+{
+  "id": "1-2-11-example-combining-conditions",
+  "title": "1.2.11 Worked Example — Combining conditions",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Control Flow",
+  "preview": "example",
+  "week": 4,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

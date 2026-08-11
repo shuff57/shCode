@@ -1,0 +1,42 @@
+{
+  "id": "1-2-12-lab-guard-and",
+  "title": "1.2.12 Guard with &&",
+  "description": "Write an if statement whose condition combines two checks with &&. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Control Flow",
+  "preview": "console",
+  "week": 4,
+  "slos": ["SLO-3"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Declare two variables",
+      "instructions": "Create two number variables — for example, age and score — and give each a value."
+    },
+    {
+      "id": "s2",
+      "title": "Guard with &&",
+      "instructions": "Write an if statement whose condition uses && to combine two comparison checks (one for each variable). Inside the if block, log a message that says both conditions are met."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "&& inside if condition",
+      "description": "if statement condition uses &&",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\([^)]*&&",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

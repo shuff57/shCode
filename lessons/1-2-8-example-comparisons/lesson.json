@@ -1,0 +1,16 @@
+{
+  "id": "1-2-8-example-comparisons",
+  "title": "1.2.8 Worked Example — What each comparison returns",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Control Flow",
+  "preview": "example",
+  "week": 4,
+  "slos": ["SLO-3"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

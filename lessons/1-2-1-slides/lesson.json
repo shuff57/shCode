@@ -1,0 +1,17 @@
+{
+  "id": "1-2-1-slides",
+  "title": "1.2.1 Slides — Control Flow",
+  "description": "Unit 1.2 slides — conditionals, comparison and logical operators, switch, algorithms, and loops.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Control Flow",
+  "preview": "slides",
+  "slidesUrl": "/slides/1.2/",
+  "week": 4,
+  "slos": ["SLO-3", "SLO-4"],
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

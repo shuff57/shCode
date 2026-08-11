@@ -1,0 +1,60 @@
+{
+  "id": "1-2-26-challenges",
+  "title": "1.2.26 Challenges — Optional Stretch",
+  "description": "Optional stretch problems. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Control Flow",
+  "preview": "console",
+  "week": 6,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "FizzBuzz 1 to 20",
+      "instructions": "Loop through the integers 1 to 20. For each number: if it is divisible by both 3 and 5, log 'FizzBuzz'. If divisible by only 3, log 'Fizz'. If divisible by only 5, log 'Buzz'. Otherwise log the number itself."
+    },
+    {
+      "id": "s2",
+      "title": "Count vowels",
+      "instructions": "Given a string, count how many characters are vowels (a, e, i, o, u — upper or lower case). Log the total count."
+    },
+    {
+      "id": "s3",
+      "title": "Sum even numbers",
+      "instructions": "Given an array of numbers, add up only the even numbers and log the total."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "for loop present",
+      "description": "Code contains a for loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "if statement present",
+      "description": "Code contains an if statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

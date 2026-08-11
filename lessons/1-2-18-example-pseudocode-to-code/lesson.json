@@ -1,0 +1,16 @@
+{
+  "id": "1-2-18-example-pseudocode-to-code",
+  "title": "1.2.18 Worked Example — Pseudocode → code",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Control Flow",
+  "preview": "example",
+  "week": 5,
+  "slos": ["SLO-4", "SLO-5"],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

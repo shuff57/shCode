@@ -1,0 +1,72 @@
+{
+  "id": "1-2-16-lab-convert-to-switch",
+  "title": "1.2.16 Convert an if-chain to switch",
+  "description": "Rewrite an if/else-if chain as a switch statement with at least two cases, a default, and break. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Control Flow",
+  "preview": "console",
+  "week": 4,
+  "slos": ["SLO-3"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a variable to switch on",
+      "instructions": "Create a variable called day and assign it a day-of-week string, for example 'Monday'."
+    },
+    {
+      "id": "s2",
+      "title": "Write a switch statement",
+      "instructions": "Write a switch statement that checks the value of day. Include at least two case labels (for example 'Monday' and 'Friday'), a default label, and a break statement after each case body. Inside each case, use console.log to print a message for that day."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "switch statement present",
+      "description": "Code contains a switch statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "switch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "case label present",
+      "description": "Code contains a case label",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "default label present",
+      "description": "Code contains a default label",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "default\\s*:",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "break present",
+      "description": "Code contains a break statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "break",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

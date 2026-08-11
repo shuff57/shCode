@@ -1,0 +1,52 @@
+{
+  "id": "1-2-9-lab-predict-comparisons",
+  "title": "1.2.9 Predict, Then Run",
+  "description": "Log four comparison expressions, including at least one ===, and observe the results. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Control Flow",
+  "preview": "console",
+  "week": 4,
+  "slos": ["SLO-3"],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write four comparisons",
+      "instructions": "Write four console.log statements, each printing the result of a comparison expression. At least one comparison must use === (strict equality)."
+    },
+    {
+      "id": "s2",
+      "title": "Predict the output",
+      "instructions": "Before you run the code, write a comment above each console.log guessing whether it will print true or false. Then run the code and see how you did."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "strict equality used",
+      "description": "Code contains at least one === comparison",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "===",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
