@@ -479,13 +479,19 @@ export default function LessonWorkspace({
   const passedCriteria = requirements.filter((r) => r.status === 'passed').length;
   const totalCriteria = requirements.length;
   const allRequirementsPassed = totalCriteria > 0 && passedCriteria === totalCriteria;
-  // q5 lessons gate Submit on every requirement being green; existing
-  // assignments keep the score-vs-passingScore rule. Either way, an
+  // q5 lessons and mastery-based lessons (zero-points convention: totalPossible
+  // === 0) gate Submit on every requirement being green. Legacy point-based
+  // assignments (nonzero totalPoints, e.g. sdlc-overview) keep the
+  // score-vs-passingScore rule so their existing partial-credit thresholds
+  // still work. Without the isNoPoints branch, a zero-points non-q5 lesson
+  // (e.g. any console lab) always satisfies totalScore >= passingScore as
+  // 0 >= 0, letting Submit through with nothing green. Either way, an
   // uncaught runtime error from the most recent run blocks Submit so
   // students can't ship code that satisfies static graders but crashes.
+  const isNoPoints = totalPossible === 0;
   const canSubmit =
     !runtimeError &&
-    (isQ5Mode
+    (isQ5Mode || isNoPoints
       ? allRequirementsPassed
       : totalScore >= (lesson.grading?.passingScore ?? 0));
   const showAssignmentHeader = isAssignment || isQ5Mode;

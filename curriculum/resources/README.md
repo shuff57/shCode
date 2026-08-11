@@ -13,6 +13,7 @@ This directory collects the **reusable build conventions** for each lesson type 
 | `preview: "shplay"` + `type: "lesson"`     | Q5 Lesson       | Yes      | [shplay-lesson-conventions.md](shplay-lesson-conventions.md)                   |
 | `preview: "shplay"` + `type: "challenge"`  | Challenge       | Yes      | [shplay-challenge-conventions.md](shplay-challenge-conventions.md)               |
 | `preview: "shplay"` + `type: "assignment"` | Assignment      | Yes      | [lab-assignment-conventions.md](lab-assignment-conventions.md)                   |
+| `preview: "console"` + `type: "assignment"` | Assignment      | Yes      | [lab-assignment-conventions.md](lab-assignment-conventions.md) (§7)             |
 | `preview: "assignment"` + `aiGrader`       | Assignment      | Yes (AI) | [written-assignment-conventions.md](written-assignment-conventions.md)           |
 
 Authoritative badge list lives in `lib/lesson-badges.tsx` (`PREVIEW_BADGES`). Add a row there when introducing a new type.

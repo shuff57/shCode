@@ -1,9 +1,12 @@
-# shplay Lab Assignment Conventions
+# Lab Assignment Conventions
 
 Canonical rules for **in-app auto-graded labs** — the Axxy series (A10.1, A11.1, A12.1, …) rendered with `preview: "shplay"`. These are the major graded artifacts of each shplay module. When a module spec's Artifacts table lists a `type: lab` entry, or a `lessons/<slug>/` has `lesson.json.type === "assignment"` + `preview === "shplay"`, these rules are binding.
 
+**Environment branches.** A module spec's `environment:` field picks the lab surface: sections 1–6 are the **shplay** sandbox; §7 is the **console** track (units 1.x). The lab's `preview` mirrors the spec's `environment:`.
+
 **Applies to:**
-- `lessons/<slug>/lesson.json` where `type === "assignment"` AND `preview === "shplay"`.
+- `lessons/<slug>/lesson.json` where `type === "assignment"` AND `preview === "shplay"` — sections 1–6.
+- `lessons/<slug>/lesson.json` where `type === "assignment"` AND `preview === "console"` — §7.
 
 **Canonical example:** `lessons/2-2-11-a12-1-collectible/`.
 
@@ -130,6 +133,94 @@ Examples:
 - `"2.1.10 Sprite Playground"` (A10.1)
 - `"2.2.11 Collectible Class"` (A12.1)
 
+## 7. Console environment branch
+
+For `preview: "console"` labs (the Q1 / units-1.x track, spec `environment: console`). All of the above applies except as amended here. Established from `1-2-5-lab-first-if`, `1-2-9-lab-predict-comparisons`, `1-2-12-lab-guard-and`, `1-2-22-lab-count-to-ten`.
+
+### 7.1 Surface
+
+The console lab is the same LessonWorkspace as shplay labs, but the preview runs the student's `script.js` **directly as JS** in the page context (`new Function`), capturing `console.log` / `console.warn` / `console.error` output into a console panel. There is no canvas, no `setup()` / `draw()`, no q5 API. The student's only output surface is the console panel; the grader reads `script.js` source text.
+
+### 7.2 Required `lesson.json` shape
+
+```json
+{
+  "id": "<slug>",
+  "title": "<numbering> <Lab Name>",
+  "description": "<one line>. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "<unit category>",
+  "unit": "<unit label>",
+  "preview": "console",
+  "week": <n>,
+  "slos": ["SLO-<n>"],
+  "steps": [ ... ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "<student-readable label>",
+      "description": "<what the check verifies, in one line>",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}
+```
+
+`flags: "i"` is the console-track convention — every canonical example sets it, unlike shplay requirements (case-sensitive by default, since shplay identifiers like `Sprite`/`Canvas` are case-sensitive). Console-track patterns check plain JS keywords, where case doesn't carry meaning, so case-insensitive is standard here.
+
+### 7.3 Field-by-field
+
+- `preview` — **must be `"console"`.** Badge is `PREVIEW_BADGES.assignment`, not `.console` — `badgeForLesson` (`lib/lesson-badges.tsx`, used by the module lesson list and lesson cards) resolves `type` before `preview`, and `type: "assignment"` always wins. Matches `README.md`'s own Type index (Badge = Assignment for this row). `PREVIEW_BADGES.console` never renders for a graded lab.
+- `type` — `"assignment"` (same as shplay).
+- `difficulty` — **`"beginner"`** for unit-1 console labs. Shplay's `"intermediate"` tiering assumes q5 familiarity; the console track starts at rung zero. Revisit the tiering if a console lab ever targets post-unit-1 material.
+- `estimateMins` — the 5–15 min bucket, not shplay's 30–60. Console labs are one-concept drills.
+- `steps` / `requirements` — identical semantics to §1: `steps[].id` ↔ `// STEP N:` comment; requirements are `"regex"` (anywhere in file) or `"inFunction"` (inside named function body). **Only `"regex"` has been used in console labs to date.**
+- `grading.totalPoints` / `passingScore` / `requirements[].points` — **all `0`**; the all-green Submit gate applies exactly as in §1.
+
+### 7.4 File layout
+
+```
+lessons/<slug>/
+├── lesson.json
+├── script.js        # scaffold: one-line header + // STEP N: comments,
+│                    # NO solution code — same describe-never-show rule as §3
+├── index.html        # stub: <script src="script.js"></script>, nothing else
+└── style.css         # stub: near-empty, one comment line
+```
+
+`index.html` and `style.css` aren't read by the console runner (`runCode()` in `LessonWorkspace.tsx` executes `script.js` directly via `new Function`, no iframe/`srcDoc`) — but every canonical example ships both as boilerplate stubs, so include them for consistency with the file-tree the student sees in the File tab.
+
+No `content.md` required (step instructions live in `steps[].instructions`), matching §2.
+
+### 7.5 Scaffold — same describe-never-show rule as §3
+
+`// STEP N:` comments describe the task in plain English; no commented-out solution lines. The §3 line between scaffold and answer key applies verbatim — a console lab is a scaffolded drill, not a worksheet.
+
+### 7.6 Don'ts (console-specific)
+
+- **Do not use `prompt()` in any graded console lab.** It blocks the runner (`new Function` runs in the page context; a modal prompt hangs the lesson until the student answers, and the auto-grader's post-run `setTimeout(runTests, 200)` fires against unfinished code). Confine `prompt()` to the worked example, where the teacher drives. Same for `alert()` and `confirm()` — window modals from the preview are equally hostile to a timed auto-grader.
+- **Do not require a specific console output.** The grader reads source text, not captured output. Design requirements as pattern checks (`console\\.log\\(`), not as "prints exactly X".
+- **Do not grade the literal value of a student-chosen open-ended variable** (e.g. `score = 70`, where any value in a reasonable range is fine). Say "any value between 50 and 100" and check the variable exists and is used. This does **not** apply to closed-answer content with exactly one correct value (e.g. a classification drill — "which phase is this task in?" → the literal string `"inception"` is the point of the check, not something to avoid grading).
+- **Do not reuse shplay vocabulary or API in instructions or requirements** — `Sprite`, `Canvas`, `draw()`, `kb.pressing` have no meaning in the console track. (This is the console mirror of the no-shplay-refs rule in `written-assignment-conventions.md`.)
+- Do not include `authored_by_email` or other DB-side fields in the starter (same as §5).
+- **Do not use `type: "output"`, `"function"`, or `"custom"` requirements.** `lib/grader.ts` stubs all three to always `passed = false` — they aren't "unused," they're broken, and using one permanently blocks Submit for that requirement (the console track's grader is source-text-only; there's no sandboxed execution path client-side). Stick to `"regex"` / `"inFunction"`.
+
+### 7.7 Canonical examples
+
+- `1-2-5-lab-first-if` — `if` statement + `console.log` inside the block; two regex requirements (`if\\s*\\(`, `console\\.log\\(`).
+- `1-2-22-lab-count-to-ten` — single-STEP `for` loop drill.
+- `1-2-12-lab-guard-and` — `&&` inside an `if` condition, one requirement (`if\\s*\\([^)]*&&`).
+- `1-2-9-lab-predict-comparisons` — predict-then-run pattern: STEP 2 asks for prediction comments before running, a nice low-stakes structure for comparison-operator labs. **The prediction itself is never graded** — the grader only checks source-text patterns (here, `===` and `console.log(`), and the comment-stripping preprocessor (`lib/grader.ts`) makes "a comment exists above each log" unenforceable by regex anyway. Treat predict-then-run as an instructional structure in `steps[].instructions`, not something to write a requirement for.
+
+**Known inconsistency:** `1-2-26-challenges` ships `preview: "console"` + `type: "assignment"` with `difficulty: "beginner"` and is titled "Challenges". It is a stretch bundle, not a challenge lesson (the real challenge type is `preview: "shplay"` + `type: "challenge"` per `shplay-challenge-conventions.md`). Accepted as-is; future stretch bundles should follow the same pattern and note it here if the type doc gains a home for them.
+
 ## History
 
 | When | What |
@@ -140,3 +231,6 @@ Examples:
 | No-points + green-to-advance | All `points`, `totalPoints`, and `passingScore` values must be `0`. §1 JSON shape + field-by-field rewritten — points fields are now decorative-must-be-zero. The all-green Submit gate is the only criterion. The next lesson stays locked until current is `lesson_state.completed` per `shplay-lesson-conventions.md` §5. |
 | Describe-don't-show scaffold rule | Codified the line between an honest scaffold and an answer-key scaffold: **`// STEP N:` comments describe the task in plain English; commented-out lines that contain runnable solution code are not allowed.** §1 / §2 / §3 / §5 rewritten with examples. The `type: "challenge"` lessons remain fully empty per `shplay-challenge-conventions.md` §4 — the empty/scaffold split is what distinguishes challenges from labs. Established precedent: `2-2-11-a12-1-collectible/script.js` is the canonical scaffold (`// STEP N:` comments in plain English, empty bodies). `2-1-9-a10-1-sprite-playground/script.js` is empty — known inconsistency from before this rule landed. |
 | Difficulty tiers slot-type | Labs `difficulty` field is now `"intermediate"` — one rung above practice q5 lessons (`"beginner"`) and one rung below challenges (`"advanced"`). §1 JSON shape + field-by-field updated. Sister conventions `shplay-lesson-conventions.md` and `shplay-challenge-conventions.md` carry the matching rule. Audit pass on existing unit-2 labs (2.1.10, 2.2.11, 2.3.20) bumped `"beginner"` → `"intermediate"`. |
+| Console environment branch | §7 added: `preview: "console"` labs (Q1 / units-1.x track) — direct-JS execution, console-panel output, `difficulty: "beginner"`, 5–15 min bucket, `prompt()`/`alert()`/`confirm()` banned (they block the runner). Codified from the existing `1-2-5` / `1-2-9` / `1-2-12` / `1-2-22` console labs, which predated the doc. Unblocks module spec `1.1.1`'s six `lab` slots (five of which are non-coding tasks — see spec §Status). |
+| Submit-gate fix + §7 audit | §7.3's "all-green Submit gate applies exactly as in §1" claim was false as written: `LessonWorkspace.tsx`'s `canSubmit` only used `allRequirementsPassed` for `isQ5Mode`; every non-q5 zero-points lesson (all console labs) fell into the `totalScore >= passingScore` branch, which is vacuously `0 >= 0` — Submit was never actually gated. Fixed by adding an `isNoPoints` (`totalPossible === 0`) check alongside `isQ5Mode`; legacy point-based lessons (`sdlc-overview`, `variables-and-types`, `jscad-intro`, etc., nonzero `totalPoints`) keep their score-vs-passingScore partial-credit behavior unchanged. §7.3's badge claim was also wrong (`badgeForLesson` resolves `type` before `preview`, so console labs show the Assignment badge, not Console — matches `README.md`'s own Type index); §7.4's file layout was incomplete (all 8 canonical examples ship `index.html` + `style.css` stubs, not just `lesson.json` + `script.js`); §7.6's "no literal values" Don't was scoped to open-ended values only, since it otherwise forecloses closed-answer/classification-style console labs. |
+| §7 minor cleanup pass | §7.2 gained a full example `requirements[]` object (`file`, `pattern`, `flags: "i"`, `points: 0`) — neither §1 nor §7 previously showed one, though every canonical example uses `flags: "i"` uniformly. §7.6 gained a Don't for `type: "output"`/`"function"`/`"custom"` requirements — `lib/grader.ts` stubs them to always-`false`, a silent permanent-lockout failure mode, not merely "unused to date." §7.7's predict-then-run note now states the prediction is ungraded by design (source-text-only grader + comment-stripping preprocessor make it unenforceable), so a builder doesn't try to write a requirement for it. |
