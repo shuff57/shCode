@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JSCAD docs</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #282a36; color: #f8f8f2; font-family: system-ui, -apple-system, sans-serif; }
+  main { max-width: 720px; margin: 40px auto; padding: 0 24px; }
+  h1 { margin: 0 0 6px; font-size: 28px; }
+  .sub { color: #6272a4; margin-bottom: 28px; }
+  a.card { display: block; text-decoration: none; color: inherit; background: #1e1f29; border: 1px solid #44475a; border-radius: 8px; padding: 16px 20px; margin-bottom: 12px; transition: border-color 120ms; }
+  a.card:hover { border-color: #bd93f9; }
+  a.card h2 { margin: 0 0 4px; font-size: 16px; color: #f8f8f2; }
+  a.card p { margin: 0; font-size: 13px; color: #6272a4; }
+  footer { margin-top: 32px; font-size: 12px; color: #6272a4; }
+  a { color: #8be9fd; }
+</style>
+</head>
+<body>
+<main>
+  <h1>JSCAD docs</h1>
+  <p class="sub">Reference material for the JSCAD 3D-modeling unit. Open any of these in a new tab while you work.</p>
+
+  <a class="card" href="./reference.md" target="_blank">
+    <h2>API Reference</h2>
+    <p>The function subset the course teaches — primitives, transforms, booleans, extrusions, hulls, measurements, colors, text, parameters — with signatures and examples.</p>
+  </a>
+
+  <a class="card" href="./challenges.md" target="_blank">
+    <h2>Challenges</h2>
+    <p>The 15-challenge ladder for the JSCAD units. Concepts + verifiable goals per tier.</p>
+  </a>
+
+  <a class="card" href="./CLAUDE.md" target="_blank">
+    <h2>Architecture Notes</h2>
+    <p>How the app integrates JSCAD: unpkg loading, the CJS shim, the preview builder.</p>
+  </a>
+
+  <a class="card" href="./README.md" target="_blank">
+    <h2>README</h2>
+    <p>Project overview, versions, and where the docs live.</p>
+  </a>
+
+  <a class="card" href="./LICENSE.md" target="_blank">
+    <h2>License</h2>
+    <p>MIT for @jscad/modeling and @jscad/regl-renderer (loaded from unpkg, not vendored).</p>
+  </a>
+
+  <footer>
+    In-app docs with live examples: <a href="/docs/jscad">/docs/jscad</a>. Canonical external API docs: <a href="https://openjscad.xyz/docs/">openjscad.xyz/docs</a>.
+  </footer>
+</main>
+</body>
+</html>

@@ -7,18 +7,21 @@ import {
   searchDocs,
   type DocSearchResult,
   type DocSection,
-} from '../../../../lib/shplay-docs';
+} from '../../../../lib/docs-core';
 import DocsSandbox from './DocsSandbox';
 
 interface Props {
   section: DocSection;
   allSections: DocSection[];
+  basePath: string;
+  docsTitle: string;
+  searchPlaceholder: string;
 }
 
-function pageHref(slug: string, pageIndex: number) {
+function pageHref(basePath: string, slug: string, pageIndex: number) {
   return pageIndex === 0
-    ? `/docs/shplay/${slug}`
-    : `/docs/shplay/${slug}?page=${pageIndex + 1}`;
+    ? `${basePath}/${slug}`
+    : `${basePath}/${slug}?page=${pageIndex + 1}`;
 }
 
 function HighlightedSnippet({ result }: { result: DocSearchResult }) {
@@ -35,7 +38,13 @@ function HighlightedSnippet({ result }: { result: DocSearchResult }) {
   );
 }
 
-export default function DocsClient({ section, allSections }: Props) {
+export default function DocsClient({
+  section,
+  allSections,
+  basePath,
+  docsTitle,
+  searchPlaceholder,
+}: Props) {
   const params = useSearchParams();
   const router = useRouter();
   const pageParam = Number(params.get('page') || '1');
@@ -56,7 +65,7 @@ export default function DocsClient({ section, allSections }: Props) {
   const mainInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const results = useMemo(() => searchDocs(query, 30), [query]);
+  const results = useMemo(() => searchDocs(allSections, query, 30), [allSections, query]);
   const isSearching = query.trim().length > 0;
 
   useEffect(() => {
@@ -100,7 +109,7 @@ export default function DocsClient({ section, allSections }: Props) {
   function gotoResult(r: DocSearchResult) {
     setDropdownOpen(false);
     setQuery('');
-    router.push(pageHref(r.sectionSlug, r.pageIndex));
+    router.push(pageHref(basePath, r.sectionSlug, r.pageIndex));
   }
 
   function handleMainKey(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -149,7 +158,7 @@ export default function DocsClient({ section, allSections }: Props) {
                   {results.map((r, i) => (
                     <li key={`${r.sectionSlug}:${r.pageIndex}:${i}`}>
                       <Link
-                        href={pageHref(r.sectionSlug, r.pageIndex)}
+                        href={pageHref(basePath, r.sectionSlug, r.pageIndex)}
                         onClick={() => setQuery('')}
                       >
                         <span className="docs-sidebar-result-title">{r.pageTitle}</span>
@@ -162,7 +171,7 @@ export default function DocsClient({ section, allSections }: Props) {
             </div>
           ) : (
             <>
-              <div className="docs-sidebar-title">shPlay reference</div>
+              <div className="docs-sidebar-title">{docsTitle}</div>
               <nav>
                 {allSections.map((s) => {
                   const active = s.slug === section.slug;
@@ -172,7 +181,7 @@ export default function DocsClient({ section, allSections }: Props) {
                       className={`docs-sidebar-section${active ? ' active' : ''}`}
                     >
                       <Link
-                        href={`/docs/shplay/${s.slug}`}
+                        href={`${basePath}/${s.slug}`}
                         className="docs-sidebar-section-title"
                       >
                         {s.title}
@@ -182,7 +191,7 @@ export default function DocsClient({ section, allSections }: Props) {
                           {s.pages.map((p, i) => (
                             <li key={i}>
                               <Link
-                                href={`/docs/shplay/${s.slug}?page=${i + 1}`}
+                                href={`${basePath}/${s.slug}?page=${i + 1}`}
                                 className={i === pageIndex ? 'current' : ''}
                               >
                                 {p.title}
@@ -216,7 +225,7 @@ export default function DocsClient({ section, allSections }: Props) {
               }}
               onFocus={() => isSearching && setDropdownOpen(true)}
               onKeyDown={handleMainKey}
-              placeholder="Search the shPlay docs…"
+              placeholder={searchPlaceholder}
               aria-label="Search documentation"
             />
             <kbd className="docs-main-search-kbd">⌘K</kbd>
@@ -282,14 +291,14 @@ export default function DocsClient({ section, allSections }: Props) {
           {hasPrev ? (
             <Link
               className="btn-secondary btn-sm"
-              href={`/docs/shplay/${section.slug}?page=${pageIndex}`}
+              href={`${basePath}/${section.slug}?page=${pageIndex}`}
             >
               ← {section.pages[pageIndex - 1].title}
             </Link>
           ) : prevSection ? (
             <Link
               className="btn-secondary btn-sm"
-              href={`/docs/shplay/${prevSection.slug}?page=${prevSection.pages.length}`}
+              href={`${basePath}/${prevSection.slug}?page=${prevSection.pages.length}`}
             >
               ← {prevSection.title}
             </Link>
@@ -299,14 +308,14 @@ export default function DocsClient({ section, allSections }: Props) {
           {hasNext ? (
             <Link
               className="btn-secondary btn-sm"
-              href={`/docs/shplay/${section.slug}?page=${pageIndex + 2}`}
+              href={`${basePath}/${section.slug}?page=${pageIndex + 2}`}
             >
               {section.pages[pageIndex + 1].title} →
             </Link>
           ) : nextSection ? (
             <Link
               className="btn-secondary btn-sm"
-              href={`/docs/shplay/${nextSection.slug}`}
+              href={`${basePath}/${nextSection.slug}`}
             >
               {nextSection.title} →
             </Link>

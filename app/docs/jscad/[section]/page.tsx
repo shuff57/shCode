@@ -1,13 +1,13 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { getAllSectionSlugs, getSection, sections } from '../../../../lib/shplay-docs';
-import DocsClient from './DocsClient';
+import { getAllSectionSlugs, getSection, sections } from '../../../../lib/jscad-docs';
+import DocsClient from '../../shplay/[section]/DocsClient';
 
 export function generateStaticParams() {
   return getAllSectionSlugs().map((section) => ({ section }));
 }
 
-export default async function DocsSectionPage({
+export default async function JscadDocsSectionPage({
   params,
 }: {
   params: Promise<{ section: string }>;
@@ -20,9 +20,9 @@ export default async function DocsSectionPage({
       <DocsClient
         section={section}
         allSections={sections}
-        basePath="/docs/shplay"
-        docsTitle="shPlay reference"
-        searchPlaceholder="Search the shPlay docs…"
+        basePath="/docs/jscad"
+        docsTitle="JSCAD reference"
+        searchPlaceholder="Search the JSCAD docs…"
       />
     </Suspense>
   );

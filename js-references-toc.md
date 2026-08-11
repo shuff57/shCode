@@ -268,52 +268,37 @@ Engine dependencies cited from the shplay stack: **q5.js** (bundled in-repo, LGP
 
 ---
 
-## Source 3 — shplay (in-repo engine + GitHub project + hosted docs)
-**In-repo:** `public/shplay/` (v4.0.1)  ·  **GitHub:** https://github.com/shplay/shplay  ·  **Author:** Quinton Ashley  ·  **License:** shplay Creator License — **CS education requires the [shplay Educational License](https://shplay.org/teach)** (`public/shplay/docs/LICENSE.md` §1d expressly forbids CS-teaching use under the Creator License alone)
+## Source 3 — shplay (in-repo engine + in-app docs)
+**In-repo:** `public/shplay/`  ·  **License:** MIT (original facade) + MIT (vendored planck.js) — **no q5play license obligations**; shPlay is an independent reimplementation of the q5play API design, not a fork
 
-No internet required for the bundled engine — built on q5.js WebGPU + Box2D v3 WASM, ships fully offline.
+No internet required — the engine and physics (planck.js, a pure-JS Box2D port) ship fully offline in `public/shplay/`.
 
 ### In-repo files (`public/shplay/`)
 
 | File | Covers |
 |---|---|
+| `public/shplay/shplay.js` | The entire engine (~800 lines, hand-authored, no build step). Reference source for any behavior the docs don't spell out |
+| `public/shplay/planck.min.js` | planck.js v1.5.0 (Box2D port, MIT) — the physics backend |
+| `public/shplay/runner.html` | Sandbox host: loads planck + shplay, injects a sketch from `?code=<base64url>` |
 | `public/shplay/docs/shplay.d.ts` | Full public API (hand-authored types). Anchor notation: `shplay → shplay.d.ts → <ClassName>` |
-| `public/shplay/docs/README.md` | Project overview, credits, license links |
-| `public/shplay/docs/challenges.md` | Bundled challenge briefs (distinct numbering from the in-app "Learn shplay" lesson numbers cited in curriculum-plan.md activities, e.g. `5.1.2`) |
-| `public/shplay/docs/LICENSE.md` | shplay Creator License — full text, incl. the CS-education restriction above |
-| `public/shplay/docs/CLAUDE.md` | Engine architecture notes (lifecycle hooks, class map) — dev reference, not student-facing |
-
-### GitHub repo (canonical)
-
-**Repo:** https://github.com/shplay/shplay · branch `main` — **no `docs/` folder on `main`**; the engine source and types ship alone:
-
-- `shplay.js` — the entire engine (~8k lines, hand-authored, no build step). Reference source for any behavior the docs don't spell out.
-- `shplay.d.ts` — hand-authored public API types (source of the in-repo copy above).
-- `LICENSE.md` — the Creator License (see header).
-- Wiki: https://github.com/shplay/shplay/wiki — 3 pages (Home, Get Started, What's new in shplay?) — setup + v4 changelog, not a citation target for lessons.
-
-### shplay.org hosted docs (external, online) — open sources only
-
-> **Learn shplay textbook** (https://shplay.org/learn/) is **NOT used as a course reference**: it is
-> Creator-Licensed for personal learning/evaluation only (`LICENSE.md` §3) and **classroom or textbook
-> use requires the paid shplay Educational License** (§1d forbids CS-teaching use under the Creator
-> License). The `5.1.2`-style lesson numbers cited in `curriculum-plan.md` activities refer to the
-> **in-app** shplay lessons (built in-repo from the public `shplay.d.ts` API), not to this external textbook.
-
-- **API reference** — https://shplay.org/docs/ — TypeDoc build (3 modules, 31 classes, 465 pages). Class pages map 1:1 to the `.d.ts` anchors below (e.g. `classes/shplay.Sprite.html` ↔ `Sprite` L227). Server-rendered; the in-app `/docs/shplay` pages are derived from the same public API surface, not scraped from the Learn site.
-- **q5.js learn pages** — https://q5js.org/learn/ — **open (LGPL-3.0)** interactive reference for the graphics layer shplay sits on: canvas, `setup()`/`draw()`, shapes, color, text, input. Use for any drawing/rendering concept the engine docs don't spell out. Does **not** cover the physics/sprite/Group/joints layer — those are shplay additions covered by the in-app docs below.
+| `public/shplay/docs/README.md` | Project overview, runtime layout, credits |
+| `public/shplay/docs/challenges.md` | Bundled challenge briefs (15-challenge ladder) |
+| `public/shplay/docs/LICENSE.md` | MIT for the facade; MIT (upstream) for planck.js; design attribution to q5play |
+| `public/shplay/docs/CLAUDE.md` | Engine architecture notes (lifecycle, class map, unit invariants) — dev reference, not student-facing |
+| `public/shplay/docs/index.html` | Docs index page (open `docs/` in a browser) |
 
 ### shplay.d.ts class anchors
-- **Engine state:** `shplay` (L4)
-- **Drawables:** `Visual` (L129) → `Sprite` (L227)
-- **Animation:** `Ani` (L1063) · `Anis` (L1226)
-- **Collections:** `Visuals` (L1259) → `Group` (L1323)
-- **Physics:** `World` (L1796)
-- **Camera:** `Camera` (L1944)
-- **Joints:** `Joint` (L2014) → `GlueJoint` (L2123) · `DistanceJoint` (L2137) · `WheelJoint` (L2229) · `HingeJoint` (L2331) · `SliderJoint` (L2369) · `GrabberJoint` (L2421)
-- **Input:** `InputDevice` (L2475) → `_Mouse` (L2521) · `_Pointer` (L2605) · `_Keyboard` (L2668) · `Contro` (L2693)
 
-Persistent storage (`storeItem`/`getItem`/`removeItem`/`clearStorage`) and `loadJSON`/`save` are q5.js core functions (bundled in `public/shplay/q5.js`), not part of `shplay.d.ts` — cite javascript.info's LocalStorage/JSON sections for those instead (see Source 1).
+- **Canvas:** `Canvas` (L139)
+- **Sprites:** `Sprite` (L27) — constructor dispatch `(x,y)` / `(x,y,d)` / `(x,y,w,h[,bodyType])`
+- **Animation:** `Ani` (L13) · `Anis` (L21)
+- **Collections:** `Group` (L68) `extends Array` — `.Sprite` factory, `newSprite`, `overlaps`
+- **Physics:** `World` (L117) — `gravity`, `getSpriteAt`
+- **Joints:** `Joint` (L86) → `HingeJoint` (L90) · `DistanceJoint` (L94) · `SliderJoint` (L99) · `WheelJoint` (L103) · `GrabberJoint` (L107) · `GlueJoint` (L111)
+- **Input:** `Kb` (L124) · `Mouse` (L129)
+- **Globals:** `world` (L145) · `camera` (L146) · `kb` (L147) · `mouse` (L148) · `allSprites` (L149) · `frameCount` (L150) · `background`/`text`/`fill`/`textSize`/`textAlign` (L152–156) · `storeItem`/`getItem`/`removeItem` (L162–164) · `start` (L166)
+
+Persistent storage (`storeItem`/`getItem`/`removeItem`) is part of the engine facade itself (localStorage-backed) — cite javascript.info's LocalStorage sections for the underlying concept (see Source 1).
 
 ### In-app docs surface (student-facing anchor target)
 
@@ -322,33 +307,31 @@ Anchor notation for reading rows: `shplay → <Section> → <Page title>`. All a
 
 | Section (slug) | Page titles (anchor targets) |
 |---|---|
-| `overview` | What is shplay? · The sketch lifecycle · Global mode · Debugging your sketch |
-| `canvas` | Creating the canvas · frameCount and frameRate · Background and clearing |
-| `sprite` | Your first sprite · Collider types: dynamic, static, kinematic, none · Position, rotation, scale · Color, visibility, and layer · Shape options · Removing and cleaning up sprites · Pass through contacts · Advanced movement helpers · Chain colliders · Polygon colliders · Adding colliders · Adding sensors · Custom update per sprite · Custom draw per sprite · Awaiting animation sequences |
-| `physics` | Gravity and velocity · Mass and density · Bounciness and friction · Drag and damping · Forces, torque, and rotation |
-| `world` | World settings · Contact callbacks · Sleeping sprites · Controlling time · Performance testing · Finding sprites at a point · Ray casting · Meter size · Explosions |
-| `collisions` | colliding vs overlapping · Collision callbacks · Collisions with groups |
-| `groups` | Spawning and defaults · Iterating and removing · Filtering and searching · Arrow function property setters · Indexed arrow setters · Tiles · Custom properties · Sub groups · The allSprites group · Culling · Group lifecycle |
-| `camera` | Following a target · Zoom · Screen space vs world space |
-| `input` | Keyboard basics · Multi-key movement · Mouse position and buttons · Dragging and clicks · Touch and pointer · Gamepad (Contro) · Grab sprites with the mouse |
-| `joints` | GlueJoint · DistanceJoint · WheelJoint · HingeJoint · SliderJoint · GrabberJoint |
-| `animation` | Procedural animation · Ani (sprite-sheet frames) · Anis (named animation sets) · Groups with animations · Cut frames · Animation sequencing · Visuals (no physics) |
-| `images` | Loading images · Emoji images and texture atlases |
-| `drawing` | Shapes and primitives · Colors and palettes |
-| `text` | Displaying text |
+| `overview` | What is shPlay? · The sketch lifecycle · Global mode · Debugging your sketch |
+| `canvas` | Creating the canvas · frameCount · Background and clearing |
+| `sprite` | Your first sprite · Collider types: dynamic, static, kinematic, none · Position, rotation, scale · Color, visibility, and layer · Shape options · Removing and cleaning up sprites · Angular velocity · Images and emoji on sprites |
+| `physics` | Gravity and velocity · Bounciness and friction · Applying forces |
+| `collisions` | colliding vs overlapping · Overlap callbacks · Collisions with groups |
+| `groups` | Spawning and defaults · Iterating and removing · The allSprites group · Custom properties |
+| `camera` | Following a target |
+| `input` | Keyboard basics · Mouse position and buttons · Hit-testing with the mouse |
+| `joints` | GlueJoint · DistanceJoint · HingeJoint · SliderJoint · WheelJoint · GrabberJoint |
+| `animation` | Procedural animation · addAni and changeAni |
+| `text` | Displaying text · HUDs that don't scroll |
+| `persistence` | Saving and loading data |
 | `patterns` | Top-down movement · Platformer jump · Projectiles from a player · Score and timer HUD · Scene/state switching |
 
 For engine internals (dev-facing, not student-facing), use the `shplay.d.ts` class anchors above.
 
 ### Engine dependency stack (bundled in-repo)
 
-shplay is not a standalone runtime — it sits on three lower layers, all bundled in `public/shplay/`:
+shPlay is a standalone runtime on one lower layer, bundled in `public/shplay/`:
 
 | Layer | Repo / site | In-repo artifact | License | When to cite |
 |---|---|---|---|---|
-| **q5.js** (graphics) | https://github.com/q5js/q5.js · https://q5js.org | `q5.js` (v4.5) | LGPL-3.0 | Any non-physics drawing: `background`, `text`, `frameCount`, `lerp` — the q5 learn pages + wiki cover them; p5.js docs apply ~1:1 (q5 is a p5-compatible fork) |
-| **Box2D v3 WASM** (physics) | https://github.com/Birch-san/box2d3-wasm | `Box2D.deluxe.wasm` + `Box2D.deluxe.mjs` | MIT (Box2D itself, Erin Catto) | W11+ physics feel — `bounciness`/`friction`/`gravity` are Box2D concepts; upstream docs at https://box2d.org/documentation/ (advanced only) |
-| **p5.js** (parent project) | https://github.com/processing/p5.js · https://p5js.org | — (not bundled) | LGPL-2 | Background only — q5 is a drop-in-compatible fork, so p5 references (`https://p5js.org/reference`, The Coding Train) apply almost 1:1 |
+| **planck.js** (physics) | https://github.com/shakiba/planck.js | `planck.min.js` (v1.5.0) | MIT (Box2D port; Box2D itself by Erin Catto) | W11+ physics feel — `bounciness`/`friction`/`gravity` are Box2D concepts; upstream docs at https://box2d.org/documentation/ (advanced only) |
+
+The drawing layer is the engine's own 2D-canvas renderer (no q5.js). For graphics concepts the engine doesn't spell out, q5.js learn pages (https://q5js.org/learn/, LGPL-3.0) apply ~1:1 — q5 is a p5-compatible fork and shPlay's API mirrors its conventions.
 
 ---
 
@@ -356,6 +339,18 @@ shplay is not a standalone runtime — it sits on three lower layers, all bundle
 **GitHub:** https://github.com/jscad/OpenJSCAD.org  ·  **API docs:** https://openjscad.xyz/docs/  ·  **Package:** `@jscad/modeling@2.13.0` (+ `@jscad/regl-renderer@2.6.15` for the viewport) via unpkg  ·  **License:** MIT
 
 Not vendored — loaded at runtime from unpkg, so JSCAD lessons need internet (unlike shplay). Anchor notation: `JSCAD → <module> → <fn>`, with a per-function fragment link of the form `<module docs page>#.<fn>` (verified against the generated jsdoc). E.g. `JSCAD → primitives → cube` → `https://openjscad.xyz/docs/module-modeling_primitives.html#.cube`.
+
+### In-repo docs (`public/jscad/docs/`)
+
+| File | Covers |
+|---|---|
+| `public/jscad/docs/reference.md` | Hand-authored API reference — the exact function subset the course teaches, with signatures + examples |
+| `public/jscad/docs/challenges.md` | 15-challenge ladder for the JSCAD units |
+| `public/jscad/docs/CLAUDE.md` | App integration notes (unpkg versions, CJS shim, preview builder) — dev reference |
+| `public/jscad/docs/LICENSE.md` | MIT notes for @jscad/modeling + @jscad/regl-renderer |
+| `public/jscad/docs/index.html` | Docs index page (open `docs/` in a browser) |
+
+The app also renders a student-facing JSCAD reference at `/docs/jscad` (built from `lib/jscad-docs.ts`, with live runnable examples in the same sandbox style as `/docs/shplay`). Anchor notation for reading rows: `JSCAD → <Section> → <Page title>`.
 
 ### GitHub repo (canonical) — the source behind every anchor
 
@@ -544,7 +539,7 @@ True sequential-access file writes (`open → write → close`) are **not possib
 |---|---|---|---|---|
 | **2.1.1** Hello Sprite and Movement | A10.1 (sprite playground) · A10.2 (written) | shplay → overview → The sketch lifecycle · shplay → canvas → Creating the canvas, Background and clearing · shplay → sprite → Your first sprite, Position, rotation, scale · shplay → input → Keyboard basics, Multi-key movement · JS2 Ch 13 (context) | — (shplay is the Q2 textbook; FCC covers no game dev) | **Primary** — in-app shplay docs carry the module |
 | **2.1.2** Physics Feel | A11.1 (pinball scene) · A11.2 (written) | shplay → physics → Gravity and velocity, Bounciness and friction, Forces, torque, and rotation · shplay → sprite → Collider types · JS2 Ch 6 (classes preview, optional) | — | **Primary** — in-app shplay docs carry the module |
-| **2.2.1** Classes and Objects via shPlay | A12.1 (collectible class) · A12.2 (written, SLO 2) | JS1 → Classes → Class basic syntax, Class inheritance (optional) · JS2 Ch 6 (Methods, Classes, Prototypes) · PY Ch 11 (framing only) · shplay → GitHub repo → shplay.d.ts → `Sprite` class | FCC Classes → Understanding How to Work with Classes in JavaScript [Theory], Build a Shopping Cart [Workshop], Build a Project Idea Board [Lab], Review, Quiz · FCC Objects → Introduction to JavaScript Objects and Their Properties [Theory], Build a Wildlife Tracker [Workshop], Build a Recipe Tracker [Workshop] | **Strong** — FCC Classes maps directly (Shopping Cart ≈ PrintPart/PrintQueue); OOP vs procedural comparison (SLO 2) teacher-delivered |
+| **2.2.1** Classes and Objects via shPlay | A12.1 (collectible class) · A12.2 (written, SLO 2) | JS1 → Classes → Class basic syntax, Class inheritance (optional) · JS2 Ch 6 (Methods, Classes, Prototypes) · PY Ch 11 (framing only) · shplay → in-app docs → `Sprite` class | FCC Classes → Understanding How to Work with Classes in JavaScript [Theory], Build a Shopping Cart [Workshop], Build a Project Idea Board [Lab], Review, Quiz · FCC Objects → Introduction to JavaScript Objects and Their Properties [Theory], Build a Wildlife Tracker [Workshop], Build a Recipe Tracker [Workshop] | **Strong** — FCC Classes maps directly (Shopping Cart ≈ PrintPart/PrintQueue); OOP vs procedural comparison (SLO 2) teacher-delivered |
 
 ### Chapter 5 — Game Mechanics (Q2)
 

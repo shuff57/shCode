@@ -9,6 +9,8 @@ import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting } fr
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { tags as t } from '@lezer/highlight';
 import ShPlayPreview from '../../../../components/ShPlayPreview';
+import JscadPreview from '../../../../components/JscadPreview';
+import { buildJscadPreviewHtml } from '../../../../lib/preview-builder';
 
 // Dracula palette (mirrors CodeEditor.tsx — kept local to avoid coupling)
 const dracula = {
@@ -40,15 +42,23 @@ const theme = EditorView.theme({
   '.cm-cursor': { borderLeftColor: dracula.cursor },
 }, { dark: true });
 
-export default function DocsSandbox({ initialCode }: { initialCode: string }) {
+export default function DocsSandbox({
+  initialCode,
+  preview = 'shplay',
+}: {
+  initialCode: string;
+  preview?: 'shplay' | 'jscad';
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const [code, setCode] = useState(initialCode);
   const [runKey, setRunKey] = useState(0);
+  const [srcDoc, setSrcDoc] = useState('');
 
   // Reset state when the active page changes (new initialCode prop)
   useEffect(() => {
     setCode(initialCode);
+    setSrcDoc('');
     setRunKey(0);
     if (viewRef.current) {
       const view = viewRef.current;
@@ -91,12 +101,18 @@ export default function DocsSandbox({ initialCode }: { initialCode: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const run = () => setRunKey((k) => k + 1);
+  const run = () => {
+    if (preview === 'jscad') {
+      setSrcDoc(buildJscadPreviewHtml(code));
+    }
+    setRunKey((k) => k + 1);
+  };
   const reset = () => {
     const view = viewRef.current;
     if (!view) return;
     view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: initialCode } });
     setCode(initialCode);
+    setSrcDoc('');
     setRunKey(0);
   };
 
@@ -122,7 +138,11 @@ export default function DocsSandbox({ initialCode }: { initialCode: string }) {
       <div className="docs-sandbox-pane docs-sandbox-preview-pane">
         <div className="docs-sandbox-preview-header">Preview</div>
         <div className="docs-sandbox-preview-body">
-          <ShPlayPreview code={code} runKey={runKey} />
+          {preview === 'jscad' ? (
+            <JscadPreview srcDoc={srcDoc} />
+          ) : (
+            <ShPlayPreview code={code} runKey={runKey} />
+          )}
         </div>
       </div>
     </div>

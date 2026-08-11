@@ -565,7 +565,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 2.2.1 Classes and Objects via shplay (~3.5 hrs)
 **Contact hours:** 3.5
 **SLOs covered:** SLO 2 primary (OOP vs procedural), SLO 3
-**Reading:** JS1 → Classes → Class basic syntax, Class inheritance (optional); JS2 Ch 6 The Secret Life of Objects (Methods, Classes, Prototypes); PY Ch 11 Classes (framing only); shplay → GitHub repo → shplay.d.ts → `Sprite` class (L227) — "what `new Sprite()` really is"
+**Reading:** JS1 → Classes → Class basic syntax, Class inheritance (optional); JS2 Ch 6 The Secret Life of Objects (Methods, Classes, Prototypes); PY Ch 11 Classes (framing only); shplay → in-app docs → `Sprite` class (L27) — "what `new Sprite()` really is"
 
 **Learning Objectives:**
 - Define a class with a constructor and methods in JavaScript
@@ -2320,8 +2320,8 @@ as the single source of truth for the seven open references:
 - **JS1** → *The Modern JavaScript Tutorial* (javascript.info, Ilya Kantor, CC-BY-SA)
 - **JS2** → *Eloquent JavaScript* (Marijn Haverbeke, CC-BY-NC, code MIT)
 - **PY** → *Introduction to Python Programming* (OpenStax, CC BY-NC-SA) → structural model; Python syntax translated to JS
-- **shplay** → in-app docs at `/docs/shplay` (bundled `public/shplay/`, v4.0.1, built from the public `shplay.d.ts` API) + GitHub project `github.com/shplay/shplay` + q5.js learn pages (LGPL-3.0) for graphics-layer concepts. **The external "Learn shplay" textbook is NOT a course reference** — its Creator License forbids CS-teaching/textbook use without the [shplay Educational License](https://shplay.org/teach)
-- **JSCAD** → external API docs (openjscad.xyz, MIT) + GitHub monorepo `github.com/jscad/OpenJSCAD.org` → CDN-loaded, lessons need internet
+- **shplay** → in-app docs at `/docs/shplay` (bundled `public/shplay/`, MIT facade + MIT planck.js, built from the public `shplay.d.ts` API) + in-repo docs at `public/shplay/docs/` + q5.js learn pages (LGPL-3.0) for graphics-layer concepts. The engine is an original MIT-licensed reimplementation of the q5play API design — no q5play license obligations
+- **JSCAD** → in-app docs at `/docs/jscad` + in-repo docs at `public/jscad/docs/` + external API docs (openjscad.xyz, MIT) + GitHub monorepo `github.com/jscad/OpenJSCAD.org` → CDN-loaded, lessons need internet
 - **freeCodeCamp** → the Q1 content platform — week-by-week mapping in `curriculum-alignment-guide.md`, full activity list in `curriculum-data/master-activity-list.md`
 - **jscadui / jscad.app** → the Q3–Q4 JSCAD browser environment (`github.com/hrgdavor/jscadui`, MIT)
 
