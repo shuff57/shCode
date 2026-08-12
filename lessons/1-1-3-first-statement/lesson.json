@@ -1,0 +1,113 @@
+{
+  "id": "1-1-3-first-statement",
+  "title": "1.1.3 Your First Statement",
+  "description": "Open the browser console, run five ready-made statements, then change two of them to print your own text. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.1 Foundations",
+  "preview": "console",
+  "slos": [
+    "SLO-1"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run the five statements",
+      "instructions": "Run the code below. Five messages appear in the console panel. This is your first time seeing a browser console print output."
+    },
+    {
+      "id": "s2",
+      "title": "Change the fourth statement",
+      "instructions": "Change the text inside the FOURTH console.log statement to say something about yourself. Keep the statement as a console.log call."
+    },
+    {
+      "id": "s3",
+      "title": "Change the fifth statement",
+      "instructions": "Change the text inside the FIFTH console.log statement to say something else about yourself. Keep it as a console.log call."
+    },
+    {
+      "id": "s4",
+      "title": "Run again and check",
+      "instructions": "Run again and watch the console show your two new messages. Leave the first three statements exactly as they are."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "First statement present",
+      "description": "The first console.log statement is still present",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(\\s*\"Welcome to the browser console!\"",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Second statement present",
+      "description": "The second console.log statement is still present",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(\\s*\"My name is shCode\\.\"",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Third statement present",
+      "description": "The third console.log statement is still present",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(\\s*\"Today we start Unit 1\\.\"",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Fourth statement is a console.log",
+      "description": "The fourth line is still a console.log call",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Fifth statement is a console.log",
+      "description": "The fifth line is still a console.log call",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Fourth statement changed",
+      "description": "The fourth statement no longer prints its original text",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*The console prints what I log\\.\\\"|\\\"\\s*\\))[\\s\\S]*$",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "Fifth statement changed",
+      "description": "The fifth statement no longer prints its original text",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*Coding is one phase of four\\.\\\"|\\\"\\s*\\))[\\s\\S]*$",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

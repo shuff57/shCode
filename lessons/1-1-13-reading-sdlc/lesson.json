@@ -1,0 +1,24 @@
+{
+  "id": "1-1-13-reading-sdlc",
+  "title": "1.1.13 Reading — SDLC Methodologies",
+  "description": "Read about SDLC methodologies and why teams follow one, before the Four Ps reading.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.1 Foundations",
+  "preview": "reading",
+  "slos": [
+    "SLO-1"
+  ],
+  "externalLink": "https://oerbookshelf.app/introduction-to-programming-concepts-and-methodologies/chapter-1-foundations/1.1_software_lifecycle",
+  "externalLinkLabel": "Read 1.1 Software Lifecycle in the book",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

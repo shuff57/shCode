@@ -73,6 +73,8 @@ Canonical rhythm — see `lessons/2-1-2-reading-canvas-sprite/content.md` for th
 
 A fenced block annotated ```` ```js live ```` renders as a runnable shplay sketch inline in the lesson (same runtime used elsewhere in the app). Every per-topic subsection MUST have one — that is the only way the reading earns the "interactive" half of its name. A plain ```` ```js ```` fence is reference-only and never substitutes for the per-topic live block; use it only for short illustrative snippets *inside* prose, in addition to (not instead of) the topic's `js live` block.
 
+**Console-track variant:** for a reading under a `preview: "console"` sub-module (no canvas, no q5 API — see `lab-assignment-conventions.md` §7), annotate the fence ```` ```js live console ```` instead of bare ```` ```js live ````. `components/MarkdownWithLiveBlocks.tsx`'s `LIVE_FENCE` regex parses the `console` flag and renders a console-output panel instead of a shplay canvas — using the bare `js live` (shplay) fence in a console-track reading either renders nothing meaningful or the wrong runtime. Established precedent: every reading under sub-module 1.1.1 and the pre-existing `lessons/1-1-2-*` / `1-1-3-*` set uses this variant. An optional trailing `id=<slug>` (e.g. ```` ```js live console id=inspect-sprite ````) is also supported by the same regex, for when a lesson needs to reference a specific block.
+
 ### Length
 
 Aim for **under ~100 lines**. The canonical example is 72 lines. Going longer usually means you're duplicating the external source instead of pointing at it — revisit what belongs here vs what belongs in the link target.

@@ -1,0 +1,43 @@
+{
+  "id": "1-1-12-write-a-task-set",
+  "title": "1.1.12 Write a Task Set",
+  "description": "List a task set for the requirements-definition action. AI-graded with hints.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.1 Foundations",
+  "preview": "assignment",
+  "slos": [
+    "SLO-1"
+  ],
+  "points": 2,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Write a Task Set — AI-graded rubric",
+    "model": "qwen3-coder-next:cloud",
+    "contextDocs": [],
+    "prompt": "A software engineering action is a named job inside a phase, and a task set is all the tasks required to accomplish one action.\n\nConsider the action \"requirements definition\" (which lives in the inception phase). List at least two tasks that would make up a task set for that action.\n\nEach task should be a concrete step that \"requirements definition\" would actually need — for example, interviewing users, writing a requirements document, or reviewing requirements with stakeholders. Other reasonable tasks are fine too.\n\nWrite in your own words.",
+    "rubric": [
+      {
+        "id": "two-concrete-tasks",
+        "title": "At least two concrete tasks listed",
+        "description": "Student lists at least two tasks for the 'requirements definition' action. Each task must be a concrete step (e.g. interviewing users, writing a requirements document, reviewing requirements) rather than a restatement of the action itself. Full credit for two or more concrete tasks. Deny if there are fewer than two tasks, or if a 'task' just restates the action ('define the requirements') with no concrete step behind it.",
+        "points": 1
+      },
+      {
+        "id": "plausible-for-requirements",
+        "title": "Tasks plausibly belong to requirements definition",
+        "description": "Each listed task is plausibly something 'requirements definition' would need — interviewing stakeholders, documenting needs, reviewing requirements, and similar. The rubric must NOT require an exact match to any specific examples; the book explicitly allows 'other reasonable tasks.' Full credit if the tasks are all plausible. Deny only if a task is clearly unrelated to figuring out what the software should do.",
+        "points": 1
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 2,
+    "passingScore": 2,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}
