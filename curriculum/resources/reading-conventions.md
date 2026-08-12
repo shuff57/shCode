@@ -2,7 +2,7 @@
 
 Canonical rules for in-app lessons whose primary surface is a text reading
 (internal doc chapter, freeCodeCamp reading, shplay docs,
-etc.). When a module spec under `curriculum/modules/lessons/*.md` lists a
+etc.). When a module spec under `curriculum/modules/*.md` lists a
 "reading" entry or a `lessons/<slug>/` has
 `lesson.json.preview === "reading"`, these rules are binding.
 

@@ -1,6 +1,6 @@
 # Per-lesson-type conventions
 
-This directory collects the **reusable build conventions** for each lesson type used under `lessons/<slug>/`. Builder AI reads these whenever a module spec under `curriculum/modules/lessons/*.md` references a lesson type — the module spec stays short, these docs are the source of truth.
+This directory collects the **reusable build conventions** for each lesson type used under `lessons/<slug>/`. Builder AI reads these whenever a module spec under `curriculum/modules/*.md` references a lesson type — the module spec stays short, these docs are the source of truth.
 
 ## Type index
 
@@ -37,18 +37,18 @@ Every lesson's `title` field **MUST** start with a three-part dotted number `<un
 
 ### Accepted / rejected examples
 
-✅ `"2.1.1 Slides — shplay Foundations"`
-✅ `"2.1.3 Reading — shplay docs: Canvas & Sprite"`
-✅ `"3.1.1 Slides — <Unit 3 Module 1 name>"` (future)
-❌ `"Unit 2.1 Slides — shplay Foundations"` (no numbered prefix)
-❌ `"2.1 Sprite Playground"` (needs three parts, not two)
-❌ `"Reading: 2.1.3 Canvas & Sprite"` (number must be at the start)
+✅ `"5.1.1 Slides — Hello Sprite Movement"`
+✅ `"5.1.3 Reading — shplay docs: Canvas & Sprite"`
+✅ `"2.1.1 Slides — Conditionals"` (Unit 2 = Control Flow, not shplay — see `BOOK-TO-MODULE.md`)
+❌ `"Unit 5.1 Slides — Hello Sprite Movement"` (no numbered prefix)
+❌ `"5.1 Sprite Playground"` (needs three parts, not two)
+❌ `"Reading: 5.1.3 Canvas & Sprite"` (number must be at the start)
 
 If you rename or renumber a lesson after students have started, their progress/commits stay with the folder ID (the `id` field in `lesson.json`), not the title. So renumbering a title doesn't lose data — it only changes where the lesson shows up in listings.
 
 ## Purpose — why per-type docs, not per-module
 
-Module specs under `curriculum/modules/lessons/` used to repeat the same "Build Outputs" boilerplate (video manifest shape, written-assignment rubric shape, lab starter conventions, etc.) on every file. When a convention shifted, 13 module specs had to change in lockstep and drifted instead.
+Module specs under `curriculum/modules/` used to repeat the same "Build Outputs" boilerplate (video manifest shape, written-assignment rubric shape, lab starter conventions, etc.) on every file. When a convention shifted, 13 module specs had to change in lockstep and drifted instead.
 
 These per-type docs are the fix: each module spec now **links** instead of restating. A convention only changes in one place.
 
@@ -72,7 +72,7 @@ Then:
 
 ## What NOT to put in these docs
 
-- **Per-module content.** Lesson-specific text, per-week rubric rows, and unit-specific stepping stones belong in `curriculum/modules/lessons/<id>.md`, not here.
+- **Per-module content.** Lesson-specific text, per-week rubric rows, and unit-specific stepping stones belong in `curriculum/modules/<id>.md`, not here.
 - **Code changes.** These are read-only reference docs. If a convention implies a code change (e.g. "add a new preview mode to `ContentLessonView`"), that's tracked in the module spec that first needs it, not here.
 - **Runtime config.** `wrangler.toml`, D1 schema, env vars, etc. belong in `CLAUDE.md`.
 
@@ -82,7 +82,7 @@ The per-sub-module specs that *consume* these per-type conventions have their ow
 
 ## Related
 
-- `curriculum/modules/lessons/*.md` — per-module build specs that consume these conventions.
+- `curriculum/modules/*.md` — per-module build specs that consume these conventions.
 - `curriculum/README.md` — how the curriculum build system works overall.
 - `lib/lesson-badges.tsx` — authoritative list of recognized `preview` values.
 - `CLAUDE.md` — project-wide infrastructure (D1, auth, Ollama grader, env vars).

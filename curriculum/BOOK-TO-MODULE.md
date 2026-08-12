@@ -50,7 +50,7 @@ graders stay regex/AI as they are today.
     N.2_topic.md   ──┤  (2) section → sub-module
     N.3_topic.md   ──┘         │
                                ▼
-  book_manifest.yaml    curriculum/modules/lessons/<U.M.Y>_<topic>.md
+  book_manifest.yaml    curriculum/modules/<U.M>_<topic>.md
     shCode: block  ────▶   the SPEC   (3) write/update it
     (1) chapter → unit          │
                                 │  (4) "build U.M.Y"
@@ -389,18 +389,34 @@ rewriting a working lab unless the concept it grades actually moved.
 
 ## 8. Known gaps
 
-- **§6.9 Timing and Async has no shCode home.** It is not in 2.7 (which covers joints
-  and advanced input, zero async content) and 2.8 is the capstone. Either it becomes
-  `2.7.2_timing-async.md` or it is book-only teaching with no graded work. Decide
-  before chapter 6 is rebuilt.
+- **§6.9 Timing and Async has no shCode home.** It is not in Module 6.7 (which covers
+  joints and advanced input, zero async content) and Module 7.1 is the capstone. Either
+  it becomes a new Module 6.8/6.9 spec or it is book-only teaching with no graded work.
+  Decide before chapter 6 is rebuilt.
 - **Only Q2 is mapped at section level.** Chapters 1–4 and 8–13 have the coarse
-  chapter→unit row and nothing finer. Unit 1.1 has three specs
-  (`1.1.1`–`1.1.3`) that predate the book and were written against the old
-  FCC/CodeHS activity lists; they need the same section-level join before ch1–3 is
-  rebuilt.
-- **Unit 2 statuses are stale.** 2.5/2.6/2.7 read `built`; 2.1/2.2/2.3/2.4/2.8 read
-  `draft` while 2.1–2.4 have shipped lessons on disk. Trust the disk, fix the
-  frontmatter during resync.
+  chapter→unit row and nothing finer. The old `curriculum/modules/lessons/1.1.1`–`1.1.5`
+  specs (pre-book, written against the old FCC/CodeHS activity lists) were removed
+  2026-08-12 rather than resynced — they predated the book-native scheme entirely and
+  described a retired "5 sub-modules under one Unit 1.1" structure that no longer
+  exists (see the renumber table above). Modules 1.2–1.5 need fresh section-level specs
+  authored against the book directly, not a resync of the deleted files.
+- **Module statuses are stale across the shplay units (5–7).** Several module spec
+  frontmatter `status:` fields don't match what's actually shipped on disk. Trust the
+  disk, fix the frontmatter during resync.
+- **Slide deck `slidesUrl` collision from the 2026-08-12 renumber.** The renumber moved
+  Unit 2 from shplay to Control Flow, but the physical `slides/` (Slidev source) and
+  `public/slides/` (built output) directories were out of scope for that migration and
+  still use the old shplay-era `2.1`–`2.5` paths. Result: `2-1-1-slides`, `2-2-1-slides`,
+  and `2-3-1-slides` (today's real Control Flow modules) all carry `slidesUrl` values
+  (`/slides/2.1/`, `/slides/2.2/`, `/slides/2.3/`) that point at the *same* physical
+  decks as `5-1-1-slides`, `5-3-1-slides`, and `6-1-1-slides` (today's real shplay
+  modules, correctly pointing at their own old-numbered decks). A student on Module 2.1
+  Conditionals sees the old shplay Hello-Sprite-Movement deck. Fix needs either: (a) a
+  bulk rename of `slides/`+`public/slides/` to the new module ids (`slides/5.1/`,
+  `slides/5.3/`, `slides/6.1/`, `slides/6.4/`, `slides/6.5/`, plus `6.6`/`6.7` which
+  were never built at all), or (b) pointing the new Unit 2 lessons at a placeholder
+  `slidesUrl` (matching `1-1-1-slides`'s pattern) until real Control Flow decks are
+  authored. Not yet fixed — flagged 2026-08-12, not actioned.
 - **No automated gate on any of this.** Nothing checks that a spec's concept list still
   matches its book section, and nothing checks that a built lesson matches its spec.
   The design for a builder/critic loop that would do it is in the book repo at

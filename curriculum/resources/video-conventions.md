@@ -1,7 +1,7 @@
 # Video Lesson Conventions
 
 Canonical rules for in-app lessons whose primary surface is a YouTube-embedded
-video. When a module spec under `curriculum/modules/lessons/*.md` lists a
+video. When a module spec under `curriculum/modules/*.md` lists a
 "video" entry or a `lessons/<slug>/` whose `lesson.json.preview === "video"`,
 these rules are binding.
 

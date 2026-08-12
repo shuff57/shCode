@@ -1,8 +1,8 @@
 # Slide Deck Conventions
 
-Canonical rules for authoring Slidev decks for **any curriculum unit**. One deck per unit, served statically from `public/slides/U.M/` via the Next.js build (where U = unit number, M = module number). When a module spec under `curriculum/modules/lessons/U.M.Y_*.md` references "the unit slide deck" or a `lessons/U-M-1-slides/` in-app lesson, these rules are binding.
+Canonical rules for authoring Slidev decks for **any curriculum module**. One deck per module, served statically from `public/slides/U.M/` via the Next.js build (where U = unit number, M = module number). When a module spec under `curriculum/modules/U.M_*.md` references "the module slide deck" or a `lessons/U-M-1-slides/` in-app lesson, these rules are binding.
 
-**Canonical reference:** Unit 2.1 (`slides/2.1/slides.md`, ~440 lines, 30 slides) was the first deck built under this convention and remains the style reference. The shplay-specific patterns below (Q5Runner embed, sprite-heavy slide rhythm) are tagged **[shplay]** — skip them if the unit isn't shplay-based.
+**Canonical reference:** Module 5.1's deck (source still on disk at `slides/2.1/slides.md` — pre-2026-08-12 this module was numbered 2.1, and the deck source/build directories were never renamed in that migration, see `BOOK-TO-MODULE.md` §"Not yet done") was the first deck built under this convention and remains the style reference. The shplay-specific patterns below (Q5Runner embed, sprite-heavy slide rhythm) are tagged **[shplay]** — skip them if the module isn't shplay-based.
 
 ---
 
@@ -187,13 +187,16 @@ Each unit's slide deck is surfaced through an in-app lesson at `lessons/U-M-1-sl
 
 Slides always occupy the `.1` position in their module. All other lessons in that module start at `.2`.
 
-✅ `"2.1.1 Slides — shplay Foundations"` (Unit 2, Module 1)
-✅ `"2.2.1 Slides — Object-Oriented Programming"` (Unit 2, Module 2)
-✅ `"3.1.1 Slides — <Unit 3 Module 1 name>"` (Unit 3 when it ships)
-❌ `"Unit 2.1 Slides — shplay Foundations"` (no numbered prefix — lesson vanishes from /module/2.1)
-❌ `"2.1 Slides — shplay Foundations"` (needs three numbers, not two)
+✅ `"5.1.1 Slides — Hello Sprite Movement"` (Unit 5, Module 1)
+✅ `"5.3.1 Slides — Classes and Objects"` (Unit 5, Module 3)
+✅ `"2.1.1 Slides — Conditionals"` (Unit 2, Module 1 — Control Flow, not shplay)
+❌ `"Unit 5.1 Slides — Hello Sprite Movement"` (no numbered prefix — lesson vanishes from /module/5.1)
+❌ `"5.1 Slides — Hello Sprite Movement"` (needs three numbers, not two)
 
-The teacher-reference doc at `curriculum/modules/lessons/U.M.1_*.md` shares the same number but lives in a different namespace (never rendered to students), so there's no actual collision.
+The module spec doc at `curriculum/modules/U.M_*.md` uses the two-part `U.M` id in its
+*filename*, not the lesson's three-part `U.M.1` title, so there's no collision — that spec
+file is what used to be a separate `curriculum/modules/lessons/U.M.1_*.md` doc before the
+two-tier unit-index/sub-module-spec split was retired (see `sub-module-spec-conventions.md`).
 
 ### `description` must be student-facing
 

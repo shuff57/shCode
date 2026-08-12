@@ -1,12 +1,12 @@
 # Sub-Module Spec Conventions
 
-Canonical rules for the per-sub-module Markdown specs at `curriculum/modules/lessons/<U.M.Y>_<topic>.md`. A sub-module spec is the **teacher-facing planning doc for ONE pedagogical sub-module**. Its job is to drive lesson authoring downstream — when the user says "build 2.3.1," the spec is what Claude reads + acts on. The artifact-type conventions in this directory cover *how* to author each lesson; this doc covers *what a sub-module spec must contain to make that authoring possible.*
+Canonical rules for the per-sub-module Markdown specs at `curriculum/modules/<U.M>_<topic>.md`. A sub-module spec is the **teacher-facing planning doc for ONE pedagogical sub-module**. Its job is to drive lesson authoring downstream — when the user says "build 2.3.1," the spec is what Claude reads + acts on. The artifact-type conventions in this directory cover *how* to author each lesson; this doc covers *what a sub-module spec must contain to make that authoring possible.*
 
-**Applies to:** every file under `curriculum/modules/lessons/*.md` (e.g. `2.3.1_groups-overlaps.md`, `2.3.2_physics-applications.md`).
+**Applies to:** every file under `curriculum/modules/*.md` (e.g. `6.1_groups-overlaps.md`, `6.3_physics-applications.md`).
 
-**Canonical reference:** `curriculum/modules/lessons/2.3.1_groups-overlaps.md` after the post-2.2 convention overhaul.
+**Canonical reference:** none currently — the pre-2026-08-12 example (`curriculum/modules/lessons/2.3.1_groups-overlaps.md`) was retired along with the old `Q.U.S` numbering scheme (see `BOOK-TO-MODULE.md`). The next module spec written to this convention under the book-native `<U.M>` scheme becomes the new canonical reference.
 
-**Distinct from:** `curriculum/modules/<U.M>_*.md` — those are short *unit-level* index docs, not per-sub-module build specs. Unit-level docs are out of scope here.
+**No longer distinct from a "unit-level index doc".** Before 2026-08-12, `curriculum/modules/<U.M>_*.md` was a short unit-level index and the full sub-module build spec lived in a separate `curriculum/modules/lessons/<U.M.Y>_*.md` file. Under the book-native scheme a sub-module now *is* one book section, which is exactly what `Module N.S` already means — so the two-tier split is gone. `curriculum/modules/<U.M>_*.md` is now the sub-module spec directly; there is no separate `lessons/` subdirectory.
 
 ---
 
@@ -24,30 +24,32 @@ any spec.
 This replaces the older "a sub-module is typically one week" rule. Specs written under
 that rule carry `week:`, `contactHours:` and `sessions:` — see §1.1 for how to migrate.
 
-## 0.1 A sub-module id is NOT a lesson slot
+## 0.1 A sub-module id IS its lesson-slot prefix
 
-Under the old scheme these were the same number: sub-module `2.3.1` began at lesson slot
-`2.3.1`. Under one-section-per-sub-module they diverge, because the sub-module id now comes
-from the **book section index** while lesson slots stay **flat across the unit**:
+Under the book-native scheme, a sub-module (`Module N.S`) owns exactly one book section and
+its own flat lesson-slot range starting at `N.S.1`:
 
 ```
-sub-module 1.1.1  (book §1.1)  →  lesson slots 1.1.1 – 1.1.19
-sub-module 1.1.2  (book §1.2)  →  lesson slots 1.1.20 – ...
-                  ▲                             ▲
-        book section index              unit-flat lesson counter
-        (fixed by the book)             (keeps counting up)
+Module 1.1  (book §1.1)  →  lesson slots 1.1.1 – 1.1.23
+Module 1.2  (book §1.2)  →  lesson slots 1.2.1 – ...
 ```
 
-They coincide only for the first sub-module in a unit. Every spec records its own range in
-`lessonSlots:` so the next author knows where to start.
+Every spec records its own range in `lessonSlots:` so the next author knows where the
+sequence ends.
+
+**History (pre-2026-08-12):** under the retired `Q.U.S` scheme, several sub-modules could
+share one wider "unit," and lesson slots counted up flat across the whole unit instead of
+resetting per sub-module — so a sub-module's id and its lesson-slot range could diverge
+(e.g. sub-module `2.3.1` might start mid-range at lesson slot `2.3.14`). That divergence no
+longer exists: `Unit N = book Chapter N`, `Module N.S = book Chapter N §S`, and each module's
+lesson slots are always its own `N.S.1 … N.S.K`.
 
 **No parser change is required.** `parseNumberedIdFromTitle` reads only the leading
 `<U>.<M>` to route a lesson to its module, and lesson titles still carry three dotted
 numbers. The `localeCompare(..., { numeric: true })` sort still orders slots correctly.
 
 Rejected alternative: four-part lesson numbering (`<U>.<M>.<Y>.<L>`). It reads better but
-changes the title contract that 175 built Q2 lessons already satisfy, for no functional
-gain.
+changes the title contract that built lessons already satisfy, for no functional gain.
 
 ## 1. YAML frontmatter — required shape
 
@@ -232,48 +234,42 @@ Every `lessons/<slug>/` folder name (which is also `lesson.json.id`) MUST follow
 <U>-<M>-<L>[<letter>]-<descriptor>
 ```
 
-- `<U>` = unit number (e.g. `2`)
-- `<M>` = module number within the unit (e.g. `3`)
-- `<L>` = sequential lesson position within the unit-module (e.g. `5`)
-- `<letter>` = optional lowercase a–z, used **only** for retroactive granularity inserts (§4.1). Net-new units do not use letters.
+- `<U>` = unit number (e.g. `6`)
+- `<M>` = module number within the unit (e.g. `1`)
+- `<L>` = sequential lesson position within the module (e.g. `5`)
 - `<descriptor>` = kebab-case content hint (e.g. `groups-sandbox`, `reading-classes`, `a13-1-asteroid-field`)
 
-**Why this format:** the `<U>-<M>-<L>` triple is what the database, the `parseNumberedIdFromTitle` helper, and the teacher reading the slug all use to locate the lesson within the curriculum. The descriptor exists for human readability. The optional `<letter>` is supported by the parser regex (`/^(\d+\.\d+\.\d+[a-zA-Z]?)/`) and by the `localeCompare(... { numeric: true })` sort, so `2.2.3 < 2.2.3a < 2.2.3b < 2.2.4` orders correctly without code changes.
+**Why this format:** the `<U>-<M>-<L>` triple is what the database, the `parseNumberedIdFromTitle` helper, and the teacher reading the slug all use to locate the lesson within the curriculum. The descriptor exists for human readability.
 
 **Examples:**
 
 | Slug | Title | Type |
 |---|---|---|
-| `2-3-1-slides` | `2.3.1 Slides — Collections and Physics Applications` | slides |
-| `2-3-3-reading-groups` | `2.3.3 Reading — shplay docs: Groups` | reading |
-| `2-3-5-groups-sandbox` | `2.3.5 Groups Sandbox` | shplay (lesson) |
-| `2-3-11-a13-1-asteroid-field` | `2.3.11 A13.1 Asteroid Field` | shplay (assignment) |
-| `2-3-12-challenges` | `2.3.12 Challenges — Optional Stretch` | shplay (challenge) |
-| `2-2-3a-reading-new-operator` | `2.2.3a Reading — The \`new\` operator` | reading (granularity insert under 2.2.3) |
-| `2-2-7b-lab-method-no-params` | `2.2.7b Lab — Method with no params` | shplay (lesson) (granularity insert under 2.2.7) |
+| `6-1-1-slides` | `6.1.1 Slides — Groups and Overlaps` | slides |
+| `6-1-3-reading-groups` | `6.1.3 Reading — shplay docs: Groups` | reading |
+| `6-1-5-groups-sandbox` | `6.1.5 Groups Sandbox` | shplay (lesson) |
+| `6-1-11-a13-1-asteroid-field` | `6.1.11 A13.1 Asteroid Field` | shplay (assignment) |
+| `6-1-12-challenges` | `6.1.12 Challenges — Optional Stretch` | shplay (challenge) |
 
 **For a graded artifact (`A<W>.<N>`)** include the artifact id in the descriptor (e.g. `a13-1-asteroid-field`, `a14-1-space-jumper`) so the slug self-documents its grading-system identity.
 
 **Slug rename ⇒ data loss.** Renaming the folder changes `lesson.json.id`, which breaks the foreign-key that `commits` / `lesson_state` / `lesson_drafts` / `lesson_submissions` tables hold against the old id. The §3.4 migration notes MUST flag this when the lesson has shipped.
 
-### 4.1 Sub-letter slugs (granularity inserts)
+### 4.1 Letter-suffix slugs — retired (2026-08-12)
 
-The optional `<letter>` suffix exists for **retroactive granularity inserts** — adding new lessons under an existing integer slot in a shipped unit, without renaming the slugs that the database already holds foreign keys against.
+The optional `<letter>` suffix (e.g. `2.2.3a`, `1.1.1a`) used to exist for two purposes:
+retroactive granularity inserts under a shipped integer slot, and (in Unit 1.1's original
+build) primary numbering. **Both uses are retired**, operator decision 2026-08-12 ("retire
+the lettered sub module"): Unit 1.2's Control Flow build renumbers into the book's real
+chapter number instead of working around a collision with letters, and Module 1.1's
+remaining `1.1.1a`/`1.1.1b`/`1.1.1c`/`1.1.3c` legacy inserts were renumbered into strict
+sequence (`a85cd42`, 2026-08-12).
 
-**When to use a sub-letter slug:**
-
-- Splitting a shipped multi-concept lesson into atomic ones per the §2a granularity bar, *and* the original slug already has student commits / progress / drafts in production. Renaming would be data-destructive (§3.4).
-- Inserting a new atomic concept between two shipped integer slots when re-numbering those slots is also data-destructive.
-
-**When NOT to use a sub-letter slug:**
-
-- Authoring a new unit from scratch. Use sequential integer slots only — sub-letters are for retro work.
-- Pre-launch units with no student data yet. Renumber instead; integer-only slugs are simpler.
-- More than ~6 inserts under a single integer slot. If you need 2.2.7a through 2.2.7h, that is a sign the unit needed integer renumbering and you took the retro path because launch already happened — flag it in the spec's Context for future cleanup.
-
-**Pedagogical attachment.** A sub-letter slug attaches conceptually to its integer parent: 2.2.3a, 2.2.3b, 2.2.3c are *expansions of the topic* that 2.2.3 introduces. They share teacher framing, vocabulary, and source material; they do not introduce a new top-level topic. If you find a sub-letter row introducing a topic unrelated to its parent, promote it to a fresh integer slot instead.
-
-**Numbered Lesson List shape.** Sub-letter rows appear in the Numbered Lesson List immediately after their integer parent, in alphabetical order, and the row's "Notes" column states "new" or names the trim/reposition relative to the parent. Example pattern is the canonical `2.2.1_classes-via-shplay.md` post-granularity revision.
+Net effect: **slugs are integer-only**, full stop. A future mid-module insertion needs a
+fresh renumbering decision — full sequential renumber (as done for Module 1.1) is now the
+only sanctioned mechanism, not a letter-suffix escape hatch. `parseNumberedIdFromTitle`
+still accepts an optional trailing letter for backward compatibility with historical data,
+but no lesson on disk uses one, and none should be authored going forward.
 
 **No code change required.** The parser at `lib/curriculum.ts:111` already accepts `[a-zA-Z]?` after the third dotted integer; sort is already `{ numeric: true }`. Adding sub-letter slugs needs no migration and no helper update.
 
