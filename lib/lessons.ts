@@ -60,12 +60,19 @@ export async function loadLessons(): Promise<Lesson[]> {
   const lessonsDir = path.join(process.cwd(), 'lessons');
   const entries = await fs.readdir(lessonsDir, { withFileTypes: true });
   const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
-  cache = await Promise.all(
+  const results = await Promise.all(
     dirs.map(async (id) => {
       const base = path.join(lessonsDir, id);
-      const meta = JSON.parse(
-        await fs.readFile(path.join(base, 'lesson.json'), 'utf8')
-      );
+      // A folder with no lesson.json directly inside it (e.g. lessons/_retired/,
+      // which nests retired lesson folders one level deeper) isn't a lesson —
+      // skip it rather than error, same as generate-lessons-manifest.mjs.
+      let raw: string;
+      try {
+        raw = await fs.readFile(path.join(base, 'lesson.json'), 'utf8');
+      } catch {
+        return null;
+      }
+      const meta = JSON.parse(raw);
       const files = await readFiles(base);
       return {
         ...meta,
@@ -78,6 +85,7 @@ export async function loadLessons(): Promise<Lesson[]> {
       } as Lesson;
     })
   );
+  cache = results.filter((l): l is Lesson => l !== null);
   return cache;
 }
 
