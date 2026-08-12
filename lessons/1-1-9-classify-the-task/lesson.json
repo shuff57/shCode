@@ -1,0 +1,83 @@
+{
+  "id": "1-1-9-classify-the-task",
+  "title": "1.1.9 Classify the Task",
+  "description": "Read each task from a school-lunch app and log which of the four phases it belongs to. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1 Foundations",
+  "preview": "console",
+  "slos": [
+    "SLO-1"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Classify the code-writing task",
+      "instructions": "Read the task. Log the name of the phase that task belongs to, using console.log. Choose from inception, elaboration, construction, or deployment."
+    },
+    {
+      "id": "s2",
+      "title": "Classify the school-servicing task",
+      "instructions": "Log the phase name for this task."
+    },
+    {
+      "id": "s3",
+      "title": "Classify the structure task",
+      "instructions": "Log the phase name for this task."
+    },
+    {
+      "id": "s4",
+      "title": "Classify the release task",
+      "instructions": "Log the phase name for this task."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Menu code is construction",
+      "description": "Logs the correct phase for writing the code that shows the menu",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*[\"']construction[\"']\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "School choice is inception",
+      "description": "Logs the correct phase for deciding which schools the app will serve",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*[\"']inception[\"']\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "App structure is elaboration",
+      "description": "Logs the correct phase for drawing the overall structure of the app",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*[\"']elaboration[\"']\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "App store release is deployment",
+      "description": "Logs the correct phase for putting the finished app in the app store",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*[\"']deployment[\"']\\s*\\)",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

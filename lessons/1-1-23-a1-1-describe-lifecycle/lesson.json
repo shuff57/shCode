@@ -1,0 +1,61 @@
+{
+  "id": "1-1-23-a1-1-describe-lifecycle",
+  "title": "1.1.23 A1.1 Describe the Lifecycle",
+  "description": "Describe the four framework activities and walk a real product through them. AI-graded with hints.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 45,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1 Foundations",
+  "preview": "assignment",
+  "slos": [
+    "SLO-1"
+  ],
+  "points": 5,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "A1.1 Describe the Lifecycle — AI-graded rubric",
+    "model": "qwen3-coder-next:cloud",
+    "contextDocs": [],
+    "prompt": "Describe the four framework activities (inception, elaboration, construction, deployment) in your own words.\n\nThen pick one real software product you use and walk it through all four phases, saying what you think happened in each phase for that product.\n\nIn about one page, your answer should:\n- name and describe all four framework activities\n- name one real product you use\n- give at least one concrete sentence per phase about that product\n- mention at least one umbrella activity by name\n\nWrite in your own words.",
+    "rubric": [
+      {
+        "id": "four-phases-named",
+        "title": "All four phases named and described",
+        "description": "Student names and describes all four framework activities: inception, elaboration, construction, deployment. Full credit if each of the four is named and given at least a short description in their own words. Deny if any of the four is missing or only listed with no description.",
+        "points": 1
+      },
+      {
+        "id": "real-product-named",
+        "title": "One named real product",
+        "description": "Student names one real software product they use (e.g. a specific app, game, or service). Full credit for a named product. Deny if no product is named, or the product is generic ('an app') with no actual name.",
+        "points": 1
+      },
+      {
+        "id": "sentence-per-phase",
+        "title": "One concrete sentence per phase for that product",
+        "description": "Student gives at least one concrete sentence per phase for the named product, saying what probably happened in that phase for it. Full credit for four concrete sentences (one per phase) tied to the product. Deny if any phase lacks a concrete sentence, or the sentences are generic and not about the product.",
+        "points": 1
+      },
+      {
+        "id": "umbrella-mentioned",
+        "title": "At least one umbrella activity mentioned by name",
+        "description": "Student mentions at least one umbrella activity by name (e.g. quality management, security management, risk management, configuration management, architecture management, training/communication). Full credit for naming at least one. Deny if no umbrella activity is named.",
+        "points": 1
+      },
+      {
+        "id": "own-words-roughly-page",
+        "title": "Own words, roughly one page",
+        "description": "The response is written in the student's own words and is roughly one page long (~250-400 words). Deny this criterion only for significant issues: far too short to cover the four phases and a product walkthrough, or writing too disorganized to follow. This is not a prose-quality score.",
+        "points": 1
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 5,
+    "passingScore": 5,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

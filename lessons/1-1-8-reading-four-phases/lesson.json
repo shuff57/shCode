@@ -1,0 +1,24 @@
+{
+  "id": "1-1-8-reading-four-phases",
+  "title": "1.1.8 Reading — The Four Phases",
+  "description": "Read about process models and the four framework activities before you classify project tasks in the next lab.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1 Foundations",
+  "preview": "reading",
+  "slos": [
+    "SLO-1"
+  ],
+  "externalLink": "https://oerbookshelf.app/introduction-to-programming-concepts-and-methodologies/chapter-1-foundations/1.1_software_lifecycle",
+  "externalLinkLabel": "Read 1.1 Software Lifecycle in the book",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

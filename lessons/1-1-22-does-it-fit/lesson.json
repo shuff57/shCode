@@ -1,0 +1,43 @@
+{
+  "id": "1-1-22-does-it-fit",
+  "title": "1.1.22 Does It Fit?",
+  "description": "Judge whether a prescriptive model fits a startup with changing requirements, with a reason. AI-graded with hints.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1 Foundations",
+  "preview": "assignment",
+  "slos": [
+    "SLO-1"
+  ],
+  "points": 2,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Does It Fit? — AI-graded rubric",
+    "model": "qwen3-coder-next:cloud",
+    "contextDocs": [],
+    "prompt": "Zara runs a startup whose product requirements change weekly as she talks to new customers. A prescriptive process model advocates an orderly, prescribed sequence of activities.\n\nIn your own words, would a prescriptive process model fit Zara's project? Give a clear answer, then explain your reason in terms of the model's rigidity against changing requirements.",
+    "rubric": [
+      {
+        "id": "clear-no",
+        "title": "Clear answer that it does not fit",
+        "description": "Student clearly answers 'no' (or an equivalent like 'poor fit' or 'not a good fit'). Full credit for an unambiguous no. Deny if the answer is 'yes', 'maybe', or too vague to tell.",
+        "points": 1
+      },
+      {
+        "id": "rigidity-reason",
+        "title": "Reason references rigidity against changing requirements",
+        "description": "Student's stated reason references the rigidity/inflexibility of prescriptive models against rapidly changing requirements — not a generic or unrelated justification. Full credit for a reason tied to the model being inflexible when requirements change weekly. Deny for a bare 'no' with no reason, or a reason that does not mention inflexibility vs. changing requirements.",
+        "points": 1
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 2,
+    "passingScore": 2,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

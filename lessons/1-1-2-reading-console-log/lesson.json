@@ -1,0 +1,23 @@
+{
+  "id": "1-1-2-reading-console-log",
+  "title": "1.1.2 Reading — Console: console.log & sequential execution",
+  "description": "How to print values with console.log and how JavaScript runs code top-to-bottom. Read before the A1.2 console lab.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1 Foundations",
+  "preview": "reading",
+  "week": 1,
+  "slos": [
+    "SLO-4"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
