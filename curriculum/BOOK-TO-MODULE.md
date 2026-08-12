@@ -198,6 +198,27 @@ Q2 put the 1:1 at the **unit** level instead — unit 2.4 ≈ book §6.4, with a
 match: its 175 lesson folders are `lesson.json.id`, and student commits hang off them.
 New quarters follow the Q1 rule; Q2 stays as built.
 
+### Q1's own Unit/Module/Submodule scheme is retired for anything not yet built (operator, 2026-08-12)
+
+The `Q.U` unit id above (e.g. `1.1`, `1.2`) prefixes a quarter digit that doesn't exist
+in the book. Going forward, new units drop it and use the book's own chapter/section
+numbering directly — the same three-part shape the book already uses internally for
+definitions and examples (`### Definition 1.2.1`, see §5):
+
+```
+Unit N            = book Chapter N
+Module N.S         = book Chapter N, Section S
+Submodule N.S.K     = book Chapter N, Section S, subsection/item K
+```
+
+**Units 1.1 (Foundations) and 1.2 (Control Flow) are grandfathered as built** — both
+have live lesson folders with real student progress in D1 (`lesson_state`, `commits`).
+Do not renumber them to match; the "sub-module `1.1.S`" ids in the table above stay as
+they are for those two units, same reasoning as the Q2 exception. Chapter 3 onward
+(whatever unit is built next) uses the new Unit N / Module N.S / Submodule N.S.K
+scheme — its exact ids get finalized when that unit's specs are actually written, not
+pre-assigned here.
+
 **Note the coarse table in `book_manifest.yaml` is wrong for Q1.** It reads
 `1.1 Foundations ← chapters 1,2,3` and `Q1-synth ← chapter 4`. Q1 is actually four units
 (1.1 Foundations, 1.2 Control Flow, 1.3 Functions and Data, 1.4 Synthesis) and chapter 4
