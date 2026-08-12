@@ -1,0 +1,54 @@
+{
+  "id": "2-2-10-lab-countdown",
+  "title": "2.2.10 Countdown with while",
+  "description": "Write a while loop that counts down from 10 to 1, logging each value. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.2 Algorithms and Loops",
+  "preview": "console",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Set up the counter",
+      "instructions": "Create a variable called count and set it to 10."
+    },
+    {
+      "id": "s2",
+      "title": "Write the while loop",
+      "instructions": "Write a while loop that keeps running as long as count is greater than 0. Inside the loop, log the current value of count, then decrease count by 1."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "while loop present",
+      "description": "Code contains a while loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "while\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

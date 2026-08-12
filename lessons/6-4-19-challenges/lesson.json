@@ -1,0 +1,98 @@
+{
+  "id": "6-4-19-challenges",
+  "title": "6.4.19 Challenges",
+  "description": "Pick one (or more) Animation & Camera stretches — parallax background, mirror the sprite when it walks left, or add vertical camera follow. Auto-graded.",
+  "type": "challenge",
+  "difficulty": "advanced",
+  "estimateMins": 30,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.4 Animated Sprites and Camera",
+  "preview": "shplay",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Set up a player and at least one platform",
+      "instructions": "You need somewhere to start: a canvas, a player sprite, and at least one static platform. Anything beyond that is up to the challenge you pick.",
+      "hints": [
+        "Re-read 2.4.7 Reading for the camera follow pattern."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Make the camera follow",
+      "instructions": "Inside draw(), assign camera.x from the player's x so the level can scroll.",
+      "hints": [
+        "See 2.4.8 Worked Example — Camera Follow if you need a refresher."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Pick a stretch from content.md",
+      "instructions": "Implement at least one: a parallax background (a second sprite at a lower layer that moves slower), mirroring the sprite with mirrorX when walking left, or vertical camera follow.",
+      "hints": [
+        "content.md describes three stretches with hints for each — pick whichever interests you."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Clear the background each frame",
+      "instructions": "Call background(...) inside draw() so old frames don't pile up.",
+      "hints": [
+        "Search the shplay docs drawer for background()."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Create a canvas",
+      "description": "Use new Canvas(...) in setup().",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Canvas\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Create at least one sprite",
+      "description": "Use new Sprite(...) somewhere.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Sprite\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Camera follows something",
+      "description": "Inside draw(), assign camera.x or camera.y in a way that depends on a sprite's position (or uses lerp).",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "camera\\.(x|y)\\s*=[^;\\n]*\\.(x|y)|camera\\.(x|y)\\s*=\\s*lerp\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Use one stretch feature",
+      "description": "Use at least one of: a sprite.layer assignment (parallax / depth), scale.x = -1 (mirror sprite when walking left), or camera.y inside draw() (vertical follow).",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.layer\\s*=|\\.scale\\.x\\s*=\\s*-?1|camera\\.y\\s*=",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

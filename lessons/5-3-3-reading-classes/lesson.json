@@ -1,0 +1,24 @@
+{
+  "id": "5-3-3-reading-classes",
+  "title": "5.3.3 Reading — Class and instance",
+  "description": "The words class and instance and how they relate — a class is a blueprint; `new` builds one instance from it. Read before 2.2.3a.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 12,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "5.3 Classes and Objects via shPlay",
+  "preview": "reading",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

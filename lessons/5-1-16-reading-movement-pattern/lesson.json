@@ -1,0 +1,25 @@
+{
+  "id": "5-1-16-reading-movement-pattern",
+  "title": "5.1.16 Reading — Movement pattern (if / else if / else)",
+  "description": "The canonical if/else-if/else pattern that maps key presses to velocity changes inside `draw()`. Read after 2.1.7a.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "5.1 Hello Sprite and Movement",
+  "preview": "reading",
+  "week": 10,
+  "slos": [
+    "SLO-3"
+  ],
+  "externalLink": "/docs/shplay",
+  "externalLinkLabel": "Open the in-app shplay docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

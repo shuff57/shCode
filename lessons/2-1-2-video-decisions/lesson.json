@@ -1,0 +1,24 @@
+{
+  "id": "2-1-2-video-decisions",
+  "title": "2.1.2 Video — Making Decisions in Code",
+  "description": "A short tour of how programs choose a path with if/else. Watch before 1.2.3 Reading — If / Else if / Else.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.1 Conditionals",
+  "preview": "video",
+  "week": 4,
+  "slos": [
+    "SLO-3"
+  ],
+  "videoUrl": "",
+  "videoFallback": "Ask your teacher for the video link, or open the 1.2.1 slide deck for the live demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

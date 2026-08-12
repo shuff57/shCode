@@ -1,0 +1,23 @@
+{
+  "id": "6-5-9-reading-json-stringify",
+  "title": "6.5.9 Reading — shplay docs: JSON.stringify(obj)",
+  "description": "JSON.stringify takes a JS object and turns it into a string you can store. Think of it as packing your game state into a box.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.5 Save and Load",
+  "preview": "reading",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

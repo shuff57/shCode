@@ -1,0 +1,22 @@
+{
+  "id": "6-3-8-example-pendulum",
+  "title": "6.3.8 Worked Example — Swinging Pendulum",
+  "type": "lesson",
+  "difficulty": "intermediate",
+  "estimateMins": 15,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.3 Physics Applications",
+  "preview": "example",
+  "week": 14,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

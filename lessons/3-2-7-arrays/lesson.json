@@ -1,0 +1,92 @@
+{
+  "id": "3-2-7-arrays",
+  "title": "3.2.7 Arrays",
+  "description": "Work with lists of values: create, add, remove, and iterate.",
+  "type": "assignment",
+  "difficulty": "intermediate",
+  "estimateMins": 40,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Arrays",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-2",
+    "SLO-4"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create an array"
+    },
+    {
+      "id": "s2",
+      "title": "Add and remove elements"
+    },
+    {
+      "id": "s3",
+      "title": "Iterate with a loop"
+    },
+    {
+      "id": "s4",
+      "title": "Use array methods"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "req1",
+      "title": "Create array",
+      "description": "Declare an array using square brackets",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[",
+      "flags": "i",
+      "points": 10
+    },
+    {
+      "id": "req2",
+      "title": "Use push",
+      "description": "Add elements using .push()",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.push\\(",
+      "flags": "i",
+      "points": 5
+    },
+    {
+      "id": "req3",
+      "title": "Use pop or splice",
+      "description": "Remove elements using .pop() or .splice()",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.(pop|splice)\\(",
+      "flags": "i",
+      "points": 5
+    },
+    {
+      "id": "req4",
+      "title": "Iterate array",
+      "description": "Loop through the array using for, forEach, or map",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(for\\s*\\(|\\.forEach\\(|\\.map\\()",
+      "flags": "i",
+      "points": 10
+    },
+    {
+      "id": "req5",
+      "title": "Use find or includes",
+      "description": "Search the array using .find() or .includes()",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.(find|includes)\\(",
+      "flags": "i",
+      "points": 5
+    }
+  ],
+  "grading": {
+    "totalPoints": 35,
+    "passingScore": 20,
+    "allowLateSubmit": true,
+    "reviewCommitHistory": true
+  }
+}

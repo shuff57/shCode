@@ -1,0 +1,53 @@
+{
+  "id": "5-1-22-a10-2-frame-loop",
+  "title": "5.1.22 Frame Loop Writeup",
+  "description": "Half-page written reflection on setup/draw and the 60fps math. AI-graded with hints.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 20,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "5.1 Hello Sprite and Movement",
+  "preview": "assignment",
+  "week": 10,
+  "slos": [
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Frame Loop Writeup — AI-graded rubric",
+    "model": "qwen3-coder-next:cloud",
+    "contextDocs": [
+      "overview",
+      "sprite"
+    ],
+    "prompt": "Answer all three questions in a typed response of approximately 100–200 words (half page).\n\nQuestion 1: In your own words, what is the difference between setup() and draw() in a shplay sketch? When does each one run?\n\nQuestion 2: shplay runs at about 60 frames per second. If you set player.vel.x = 4, how many pixels does the sprite move in one second? Show your math. How far in 5 seconds? If your canvas is 400 pixels wide, approximately how long until the sprite crosses the whole canvas?\n\nQuestion 3: Why do you think the engine gives us vel (velocity) instead of letting us directly set pos.x every frame? Give one reason.",
+    "rubric": [
+      {
+        "id": "q1-setup-vs-draw",
+        "title": "Q1: setup() vs draw() explained in your own words",
+        "description": "Student clearly states setup() runs once at start and draw() runs every frame (about 60 times/sec). Bonus for mentioning setup() builds the world and draw() handles per-frame updates.",
+        "points": 0
+      },
+      {
+        "id": "q2-fps-math",
+        "title": "Q2: 60 fps math shown — 1-second and 5-second distances, canvas-crossing time",
+        "description": "4 px/frame × 60 fps = 240 px/sec. 5 sec = 1200 px. 400 px canvas / 240 px/sec ≈ 1.67 sec. Student must show at least one multiplication step — not just final numbers.",
+        "points": 0
+      },
+      {
+        "id": "q3-why-vel",
+        "title": "Q3: One sensible reason for using velocity instead of direct position",
+        "description": "Any reasonable answer: lets physics/collisions integrate, smoother motion, avoids fighting the engine, frame-rate independence, etc. Looking for ONE clear reason — doesn't need to be the textbook answer.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

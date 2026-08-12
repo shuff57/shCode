@@ -1,0 +1,24 @@
+{
+  "id": "6-4-10-video-camera-flashlight",
+  "title": "6.4.10 Video — Camera follow explained with a flashlight",
+  "description": "Why the camera is a coordinate transform, not a 'real' object — the world stays put, only the viewport moves. Watch before `2.4.8 Worked Example — Camera Follow`.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 4,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.4 Animated Sprites and Camera",
+  "preview": "video",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the link, or follow along in the classroom live demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

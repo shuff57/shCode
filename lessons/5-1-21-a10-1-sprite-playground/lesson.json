@@ -1,0 +1,156 @@
+{
+  "id": "5-1-21-a10-1-sprite-playground",
+  "title": "5.1.21 Sprite Playground",
+  "description": "Build a sprite playground combining canvas, WASD-controlled sprite, auto-motion, and on-screen text. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "intermediate",
+  "estimateMins": 45,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "5.1 Hello Sprite and Movement",
+  "preview": "shplay",
+  "week": 10,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a canvas and two sprites",
+      "instructions": "Make a canvas (any size between 300×300 and 800×600) and two sprites — one `player` (controllable) and one `mover` (moves on its own).",
+      "hints": []
+    },
+    {
+      "id": "s2",
+      "title": "Wire WASD movement to the player",
+      "instructions": "Use `kb.pressing('a')` / `'d'` / `'w'` / `'s'` to set the player's velocity. Include an else branch that resets velocity to 0 when no key is held.",
+      "hints": [
+        "Don't use arrow keys in this lab — they also scroll the browser iframe."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Animate the mover sprite",
+      "instructions": "Drive the `mover` sprite with `frameCount` so it moves on its own. Pick any pattern: oscillate, orbit, or spin.",
+      "hints": []
+    },
+    {
+      "id": "s4",
+      "title": "Add an on-screen text label",
+      "instructions": "Display a message on the canvas using `text()` and `textSize()`. Your choice of message.",
+      "hints": [
+        "Set `fill(255)` before `text(...)` so it's visible on dark backgrounds."
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "Clear the background each frame",
+      "instructions": "Make sure `background(...)` is called each frame so previous frames don't stack up.",
+      "hints": []
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Create a canvas",
+      "description": "A canvas is created when the sketch starts.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Canvas\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Create at least 2 sprites",
+      "description": "Two sprites exist in the sketch.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Sprite\\s*\\([\\s\\S]*?new\\s+Sprite\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Horizontal WASD input",
+      "description": "A or D keys move the player horizontally each frame.",
+      "type": "inFunction",
+      "function": [
+        "draw",
+        "update"
+      ],
+      "file": "script.js",
+      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d)['\"]",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Vertical WASD input",
+      "description": "W or S keys move the player vertically each frame.",
+      "type": "inFunction",
+      "function": [
+        "draw",
+        "update"
+      ],
+      "file": "script.js",
+      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:w|s)['\"]",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Velocity resets to zero",
+      "description": "The player stops when no movement key is held.",
+      "type": "inFunction",
+      "function": [
+        "draw",
+        "update"
+      ],
+      "file": "script.js",
+      "pattern": "else[\\s{]*\\w+\\.vel\\.[xy]\\s*=\\s*0",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Automatic motion for the mover",
+      "description": "The mover sprite animates without keyboard input.",
+      "type": "inFunction",
+      "function": [
+        "draw",
+        "update"
+      ],
+      "file": "script.js",
+      "pattern": "\\bframeCount\\b",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "On-screen text label",
+      "description": "A text label is drawn on the canvas.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "\\btext\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r8",
+      "title": "Clear the background each frame",
+      "description": "Previous frames don't stack up.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "background\\s*\\(",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

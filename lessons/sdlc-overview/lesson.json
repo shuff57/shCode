@@ -6,10 +6,13 @@
   "difficulty": "beginner",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "1.1 Foundations",
+  "unit": "1 Foundations",
   "preview": "console",
   "week": 1,
-  "slos": ["SLO-1", "SLO-4"],
+  "slos": [
+    "SLO-1",
+    "SLO-4"
+  ],
   "steps": [
     {
       "id": "s1",

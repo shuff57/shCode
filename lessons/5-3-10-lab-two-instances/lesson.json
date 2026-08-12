@@ -1,0 +1,63 @@
+{
+  "id": "5-3-10-lab-two-instances",
+  "title": "5.3.10 Lab — Two sprites, two property values",
+  "description": "Instantiate b1 and b2 from the same class with different colors, then mutate only b1 to confirm each instance's state is independent.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "5.3 Classes and Objects via shPlay",
+  "preview": "shplay",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create two Box instances with different colors",
+      "instructions": "In `setup()`, create `b1 = new Box('red')` and `b2 = new Box('blue')`. Each instance gets its own color from the constructor argument.",
+      "hints": [
+        "Open the shplay docs drawer on the right and review how constructor arguments work in the class examples."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Mutate only b1 and confirm b2 is unaffected",
+      "instructions": "In `draw()`, press space to change `b1.color` to a new color. Watch the screen — `b2` should stay blue no matter what you do to `b1`.",
+      "hints": [
+        "Open the shplay docs drawer on the right and find the keyboard input section."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Two distinct new Box(...) calls",
+      "description": "Create `b1` and `b2` with separate `new Box(...)` calls — each gets its own color argument.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Box\\s*\\([\\s\\S]*?new\\s+Box\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "Only b1.color is reassigned",
+      "description": "Assign a new value to `b1.color` (not `b2.color`) to demonstrate independent instance state.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "b1\\s*\\.\\s*color\\s*=",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

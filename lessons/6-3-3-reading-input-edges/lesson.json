@@ -1,0 +1,25 @@
+{
+  "id": "6-3-3-reading-input-edges",
+  "title": "6.3.3 Reading — shplay docs: Input edges",
+  "description": "shplay docs chapter on input — `kb.pressing` (level-triggered) vs `kb.presses` (edge-triggered). Read before `2.3.15 Edge-triggered Input`.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.3 Physics Applications",
+  "preview": "reading",
+  "week": 14,
+  "slos": [
+    "SLO-3"
+  ],
+  "externalLink": "/docs/shplay/input",
+  "externalLinkLabel": "Open the in-app shplay Input docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "6-7-18-reading-vector-ab",
+  "title": "6.7.18 Reading — Vector from A to B",
+  "description": "Two numbers — dx and dy — encode the direction from one sprite to another. This is the math behind every force that points somewhere on purpose. Read this before 2.7.19 Worked Example — Launch a Sprite with applyForce.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 7,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.7 Advanced Input and Joints",
+  "preview": "reading",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

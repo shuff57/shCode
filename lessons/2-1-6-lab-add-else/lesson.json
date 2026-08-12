@@ -1,0 +1,54 @@
+{
+  "id": "2-1-6-lab-add-else",
+  "title": "2.1.6 Add an else",
+  "description": "Extend an if statement with an else branch to handle both outcomes. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.1 Conditionals",
+  "preview": "console",
+  "week": 4,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Keep your if statement",
+      "instructions": "Start with a variable called score holding a number and an if statement that checks score >= 70."
+    },
+    {
+      "id": "s2",
+      "title": "Add an else branch",
+      "instructions": "Directly after the closing brace of the if block, add an else block. Inside the else block, use console.log to print a message saying the score does not pass."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "if statement present",
+      "description": "Code contains an if statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "else branch present",
+      "description": "Code contains an else branch",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\}\\s*else\\s*\\{",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

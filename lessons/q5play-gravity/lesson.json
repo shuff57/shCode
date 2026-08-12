@@ -1,39 +1,49 @@
 {
   "id": "q5play-gravity",
-  "title": "5.1.3 Falling Block — Example",
+  "title": "5.1.22 Falling Block — Example",
   "description": "A dynamic block falls under gravity and lands on a static floor. Read the example, then experiment.",
   "type": "example",
   "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 5: shplay — Game Physics",
-  "unit": "5.1 Sprites & Movement",
+  "unit": "5.1 Hello Sprite and Movement",
   "preview": "shplay",
   "week": 13,
-  "slos": ["SLO-1"],
+  "slos": [
+    "SLO-1"
+  ],
   "steps": [
     {
       "id": "s1",
       "title": "Run it",
       "instructions": "Click Run. The block falls and the floor catches it.",
-      "hints": ["Static sprites don't move; they push back on dynamic ones."]
+      "hints": [
+        "Static sprites don't move; they push back on dynamic ones."
+      ]
     },
     {
       "id": "s2",
       "title": "Turn gravity off",
       "instructions": "Change `world.gravity.y = 10` to `world.gravity.y = 0`. The block floats.",
-      "hints": ["Gravity units are roughly pixels per second²."]
+      "hints": [
+        "Gravity units are roughly pixels per second²."
+      ]
     },
     {
       "id": "s3",
       "title": "Make the floor dynamic",
       "instructions": "Remove the `'static'` argument from the ground sprite. Both pieces fall now — that's why the floor is static.",
-      "hints": ["new Sprite(x, y, w, h) defaults to dynamic. Add 'static' to anchor it."]
+      "hints": [
+        "new Sprite(x, y, w, h) defaults to dynamic. Add 'static' to anchor it."
+      ]
     },
     {
       "id": "s4",
       "title": "Add a second falling block",
       "instructions": "Declare another sprite and color it differently. Watch them stack.",
-      "hints": ["Give them different x positions so they don't spawn on top of each other."]
+      "hints": [
+        "Give them different x positions so they don't spawn on top of each other."
+      ]
     }
   ]
 }

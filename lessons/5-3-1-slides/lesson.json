@@ -1,0 +1,25 @@
+{
+  "id": "5-3-1-slides",
+  "title": "5.3.1 Slides — Object-Oriented Programming",
+  "description": "Unit 2.2 slides — classes, objects, `this`, and procedural vs OOP. Includes runnable code examples.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 25,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "5.3 Classes and Objects via shPlay",
+  "preview": "slides",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "slidesUrl": "/slides/2.2/index.html",
+  "slidesDevUrl": "http://localhost:3031",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

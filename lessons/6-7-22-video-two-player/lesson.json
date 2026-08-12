@@ -1,0 +1,24 @@
+{
+  "id": "6-7-22-video-two-player",
+  "title": "6.7.22 Video — Two-Player Local Input",
+  "description": "One keyboard, two players — WASD on the left, arrow keys on the right, each with their own sprite and score. This video shows the pattern once so you can wire it up in A17.1 without guessing.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.7 Advanced Input and Joints",
+  "preview": "video",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the YouTube link, or open the classroom slide deck for the live demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

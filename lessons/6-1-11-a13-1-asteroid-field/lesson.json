@@ -1,0 +1,116 @@
+{
+  "id": "6-1-11-a13-1-asteroid-field",
+  "title": "6.1.11 A13.1 Asteroid Field",
+  "description": "Combine Groups, overlap detection, and safe despawn into a playable asteroid scene. WASD steers the ship; an overlap with any asteroid ends the game.",
+  "type": "assignment",
+  "difficulty": "intermediate",
+  "estimateMins": 60,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.1 Groups and Overlaps",
+  "preview": "shplay",
+  "week": 13,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Set up the scene",
+      "instructions": "Create a canvas, a player ship sprite, and an asteroids Group. Pick any visual style.",
+      "hints": [
+        "The Groups docs chapter (right drawer → Docs tab) covers Group creation and defaults."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "WASD steering",
+      "instructions": "In draw(), read kb.pressing('a' / 'd' / 'w' / 's') and set the ship's vel accordingly. Else-to-zero so the ship doesn't drift.",
+      "hints": [
+        "Open the Input docs chapter for the kb API. Don't use arrow keys — they scroll the editor."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Spawn at least 10 asteroids with varied velocity",
+      "instructions": "Either spawn a batch in setup() with a for loop, or drip-spawn in draw() using frameCount % N === 0. Each asteroid gets its own vel.x / vel.y.",
+      "hints": [
+        "Math.random() * range gives you variety. The Apple Catcher example (2.3.7) shows the timed-spawn idiom."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Overlap-driven hit state",
+      "instructions": "Use ship.overlaps(asteroids, callback) or the boolean form to detect a hit. On hit, transition to a 'hit' state — change background, log a message, or stop updating.",
+      "hints": [
+        "The Collisions docs chapter covers the boolean and callback forms of overlaps()."
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "Safe despawn for off-screen asteroids",
+      "instructions": "If asteroids leave the canvas, remove them. Iterate backwards or iterate a copy ([...asteroids]) to avoid the iterate-then-remove bug.",
+      "hints": [
+        "The Safe Despawn worked example (2.3.10) demonstrates both safe patterns."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Asteroid Group exists",
+      "description": "Create at least one Group with new Group()",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Group\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Asteroids have velocity",
+      "description": "Assign to .vel.x or .vel.y on a sprite",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.vel\\.(x|y)\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "WASD ship input",
+      "description": "Use kb.pressing with one of 'a', 'd', 'w', 's' inside draw()",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d|w|s)['\"]",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Overlap detection",
+      "description": "Use .overlaps() to detect a hit",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.overlaps\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Safe despawn loop",
+      "description": "Iterate backwards (i = length - 1) OR iterate a copy ([...group] via for…of, .forEach, .map, etc.)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:for\\s*\\(\\s*let\\s+\\w+\\s*=[^;]*\\.length\\s*-\\s*1)|(?:for\\s*\\(\\s*(?:(?:let|const|var)\\s+)?\\w+\\s+of\\s+\\[\\.\\.\\.\\w+\\])|(?:\\[\\.\\.\\.\\w+\\]\\.(forEach|map|some|filter))",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

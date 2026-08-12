@@ -1,0 +1,22 @@
+{
+  "id": "1-3-2-reading-camelcase",
+  "title": "1.3.2 Reading — camelCase Naming Style",
+  "description": "Write variable names in camelCase and see why descriptive names beat short mystery names.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.3 Documentation and Coding Conventions",
+  "preview": "reading",
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

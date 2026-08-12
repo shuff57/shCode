@@ -1,0 +1,22 @@
+{
+  "id": "3-2-1-slides",
+  "title": "3.2.1 Slides — Arrays",
+  "description": "Arrays slides. Placeholder until the deck is built from the book.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Arrays",
+  "preview": "slides",
+  "slidesUrl": "/slides/3.2/",
+  "slos": [
+    "SLO-1"
+  ],
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

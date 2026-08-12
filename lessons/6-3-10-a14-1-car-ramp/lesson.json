@@ -1,0 +1,120 @@
+{
+  "id": "6-3-10-a14-1-car-ramp",
+  "title": "6.3.10 A14.1 Car on a Ramp",
+  "description": "Build a two-wheeled car using WheelJoints and drive it up a ramp with WASD. The harder of the two A14.1 options.",
+  "type": "assignment",
+  "difficulty": "intermediate",
+  "estimateMins": 45,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.3 Physics Applications",
+  "preview": "shplay",
+  "week": 14,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Ground + ramp",
+      "instructions": "Two static sprites: a flat ground and a tilted ramp. Set the ramp's .rotation in radians to tilt it.",
+      "hints": [
+        "The Sprite docs chapter (right drawer → Docs tab) covers static colliders.",
+        "ramp.rotation = -Math.PI / 8 tilts up to the right; positive values tilt the other way."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Chassis + wheels",
+      "instructions": "Chassis: one dynamic rectangle. Two wheels: dynamic sprites with a `diameter` so they're circular.",
+      "hints": [
+        "Place the wheels slightly below the chassis corners so the joints have room.",
+        "The Physics docs chapter explains dynamic vs static bodies."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Join the wheels with WheelJoint",
+      "instructions": "new WheelJoint(chassis, leftWheel) and again for the right wheel.",
+      "hints": [
+        "The Joints docs chapter covers WheelJoint — including suspension travel options."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Drive with WASD",
+      "instructions": "In draw(), use kb.pressing('a') / kb.pressing('d') to set chassis.vel.x (positive = right, negative = left, 0 = stop).",
+      "hints": [
+        "Open the Input docs chapter for kb.pressing. Don't use arrow keys — they scroll the editor.",
+        "vel.x sets horizontal velocity directly each frame; the wheels will roll from friction as the chassis moves."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Uses WheelJoint",
+      "description": "Create at least one WheelJoint",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+WheelJoint\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Static geometry exists",
+      "description": "Create at least one 'static' sprite (ground or ramp)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "collider\\s*=\\s*['\"]static['\"]|new\\s+Sprite\\s*\\([^)]*['\"]static['\"]",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Tilted ramp via rotation",
+      "description": "Assign to .rotation — tilting the ramp",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.rotation\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Gravity enabled",
+      "description": "Assign a positive value to world.gravity.y",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "world\\.gravity\\.y\\s*=\\s*[1-9]",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "WASD drives the car",
+      "description": "Use kb.pressing with 'a' or 'd' inside draw()",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d)['\"]",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Sets horizontal velocity",
+      "description": "Assign to a sprite's .vel.x to move the car",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.vel\\.x\\s*=",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

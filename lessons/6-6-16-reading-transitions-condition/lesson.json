@@ -1,0 +1,23 @@
+{
+  "id": "6-6-16-reading-transitions-condition",
+  "title": "6.6.16 Reading — shplay docs: Condition-Driven Transitions",
+  "description": "Condition-driven transitions happen automatically when something in the game changes. Score ≥ 100 → 'win', health ≤ 0 → 'gameover'. The game state triggers it.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.6 Game State Machines",
+  "preview": "reading",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "id": "5-3-8-lab-read-property",
+  "title": "5.3.8 Lab — Read a property",
+  "description": "Read `b.color` and `b.size` off a Box instance and print them to the on-canvas console using `console.log`. First practice with dot-notation reads.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "5.3 Classes and Objects via shPlay",
+  "preview": "shplay",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Print b.color and b.size to the console",
+      "instructions": "Inside `draw()`, call `console.log` twice — once with `b.color` and once with `b.size`. Both values should appear in the on-canvas console every frame.",
+      "hints": [
+        "Open the shplay docs drawer on the right and look at how console.log works inside a sketch."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Read b.color or b.size with console.log",
+      "description": "Call `console.log(b.color)` or `console.log(b.size)` inside `draw()` to read a property off the instance.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*b\\s*\\.\\s*(color|size)",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

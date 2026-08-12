@@ -1,0 +1,24 @@
+{
+  "id": "6-4-2-video-animating-sprite",
+  "title": "6.4.2 Video — Animating a sprite in shplay",
+  "description": "How `addAni` registers named animations and `changeAni` swaps the active one — driven by player state (idle vs run). Watch before `2.4.5 Animated Sprites Sandbox`.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 4,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.4 Animated Sprites and Camera",
+  "preview": "video",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the link, or follow along in the classroom live demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

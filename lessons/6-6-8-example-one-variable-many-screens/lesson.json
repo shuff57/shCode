@@ -1,0 +1,23 @@
+{
+  "id": "6-6-8-example-one-variable-many-screens",
+  "title": "6.6.8 Worked Example — One Variable, Many Screens",
+  "description": "Build three distinct screens — red, green, blue backgrounds with different text — all controlled by one state variable with switch.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.6 Game State Machines",
+  "preview": "example",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "5-1-14-example-keyboard",
+  "title": "5.1.14 Worked Example — Keyboard Movement",
+  "description": "Teacher-led walkthrough of the if/else-if/else pattern for keyboard movement and the drift-bug. Read before Make it Move.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "5.1 Hello Sprite and Movement",
+  "preview": "example",
+  "week": 10,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

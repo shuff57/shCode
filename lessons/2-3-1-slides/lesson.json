@@ -1,18 +1,22 @@
 {
   "id": "2-3-1-slides",
-  "title": "2.3.1 Slides — Collections and Physics Applications",
-  "description": "Unit 2.3 slides — Groups, overlap detection, safe despawn, edge-triggered input, and ground-gated jumping. Includes runnable code examples.",
+  "title": "2.3.1 Slides — The Switch Statement",
+  "description": "The Switch Statement slides. Placeholder until the deck is built from the book.",
   "type": "lesson",
   "difficulty": "beginner",
-  "estimateMins": 25,
-  "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "2.3 Collections and Physics Applications",
+  "estimateMins": 5,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.3 The Switch Statement",
   "preview": "slides",
-  "week": 13,
-  "slos": ["SLO-3", "SLO-4"],
-  "slidesUrl": "/slides/2.3/index.html",
-  "slidesDevUrl": "http://localhost:3032",
+  "slidesUrl": "/slides/2.3/",
+  "slos": [
+    "SLO-1"
+  ],
   "steps": [],
   "requirements": [],
-  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
 }

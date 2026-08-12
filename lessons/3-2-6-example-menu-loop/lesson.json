@@ -1,0 +1,23 @@
+{
+  "id": "3-2-6-example-menu-loop",
+  "title": "3.2.6 Worked Example — A tiny menu loop",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Arrays",
+  "preview": "example",
+  "week": 8,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

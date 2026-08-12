@@ -1,0 +1,25 @@
+{
+  "id": "6-7-14-reading-hinge-joint",
+  "title": "6.7.14 Reading — shplay docs: HingeJoint",
+  "description": "How HingeJoint pins two sprites to a shared pivot point so they rotate around it. Read this before the rotating-arm worked example.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.7 Advanced Input and Joints",
+  "preview": "reading",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "externalLink": "/docs/shplay/joints",
+  "externalLinkLabel": "Open the in-app shplay docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

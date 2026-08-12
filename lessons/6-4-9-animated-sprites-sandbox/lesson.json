@@ -1,0 +1,98 @@
+{
+  "id": "6-4-9-animated-sprites-sandbox",
+  "title": "6.4.9 Animated Sprites Sandbox",
+  "description": "Drive a sprite's visual from input state — the same swap pattern used by addAni / changeAni, with sprite.image swapping as the asset-free placeholder. Idle when standing, run when moving, jump when 'w' is held.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 25,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.4 Animated Sprites and Camera",
+  "preview": "shplay",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a player with an initial visual",
+      "instructions": "In setup(), create a sprite. Give it an idle visual — either sprite.image = '🧍' (emoji placeholder) or addAni('idle', 'img/idle.png') if you have art assets. The two forms swap the same way; we use sprite.image here because the in-app sandbox doesn't host image files.",
+      "hints": [
+        "Open the shplay docs drawer and find the Visual / image section."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Clear the background each frame",
+      "instructions": "Inside draw(), call background(...) at the top so old frames don't pile up.",
+      "hints": [
+        "Search the shplay docs drawer for background()."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Read WASD input every frame",
+      "instructions": "Inside draw(), use kb.pressing('a') / 'd' / 'w' to read horizontal and jump-cue keys. Drive the player's horizontal motion (sprite.vel.x or sprite.x) from those checks.",
+      "hints": [
+        "Open the shplay docs drawer and find the Input / Keyboard section."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Swap the visual based on state",
+      "instructions": "When the player is moving horizontally, swap sprite.image to a 'run' emoji (e.g. '🏃'). While 'w' is held, swap to a 'jump' emoji (e.g. '🤸'). Otherwise, swap back to idle. Don't forget the else branch — without it the visual won't reset. (With real art, this is changeAni('run') / changeAni('idle') / changeAni('jump').)",
+      "hints": [
+        "Open the shplay docs drawer and find the Visual / image section. Single emoji strings work as visuals."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Player sprite has a visual",
+      "description": "Assign sprite.image (or sprite.img) somewhere in your sketch.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.(image|img)\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Two or more visual states",
+      "description": "Either register multiple animations with addAni, OR assign sprite.image to at least two different values across the file.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.addAni\\s*\\([^)]+\\)[\\s\\S]*\\.addAni\\s*\\(|\\.(image|img)\\s*=\\s*[^;\\n]+[\\s\\S]*\\.(image|img)\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Visual swap driven by input",
+      "description": "Inside draw(), assign sprite.image (or call changeAni) inside or in response to a kb.pressing check.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d|w|s)['\"][\\s\\S]*?(\\.(image|img)\\s*=|\\.changeAni\\s*\\()|(\\.(image|img)\\s*=|\\.changeAni\\s*\\()[\\s\\S]*?kb\\.pressing\\s*\\(\\s*['\"](?:a|d|w|s)['\"]",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Clear the background each frame",
+      "description": "Call background(...) inside draw().",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "background\\s*\\(",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

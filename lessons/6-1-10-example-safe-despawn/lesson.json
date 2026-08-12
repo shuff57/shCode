@@ -1,0 +1,23 @@
+{
+  "id": "6-1-10-example-safe-despawn",
+  "title": "6.1.10 Worked Example — Safe Despawn",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.1 Groups and Overlaps",
+  "preview": "example",
+  "week": 13,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

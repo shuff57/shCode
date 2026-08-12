@@ -1,0 +1,101 @@
+{
+  "id": "5-1-11-q5play-intro",
+  "title": "5.1.11 Hello Sprite",
+  "description": "Your first shplay sketch: a canvas, a sprite, a background color.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 20,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "5.1 Hello Sprite and Movement",
+  "preview": "shplay",
+  "week": 10,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a canvas",
+      "instructions": "Inside setup(), call `new Canvas(400, 400)` to make a 400×400 drawing area.",
+      "hints": [
+        "Open the shplay docs drawer on the right and find the Canvas section."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Make a sprite",
+      "instructions": "Create a sprite at the center: `player = new Sprite(200, 200, 40, 40)`. The four numbers are x, y, width, height.",
+      "hints": [
+        "Check the Sprite section of the shplay docs drawer for constructor arguments."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Color it",
+      "instructions": "Set `player.color = 'deepskyblue'` (or any CSS color).",
+      "hints": [
+        "Look up sprite properties in the shplay docs drawer."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Paint the background",
+      "instructions": "Inside draw(), call `background('#222')` so you can see the sprite clearly.",
+      "hints": [
+        "Search the shplay docs drawer for background()."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Create a canvas",
+      "description": "A canvas is created when the sketch starts.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Canvas\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "Create at least one sprite",
+      "description": "A sprite exists in the sketch.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Sprite\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "Set a sprite color",
+      "description": "A sprite has a color.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.color\\s*=",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r4",
+      "title": "Clear the background each frame",
+      "description": "Previous frames don't stack up.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "background\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

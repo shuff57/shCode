@@ -1,0 +1,24 @@
+{
+  "id": "5-1-12-video-frame-loop",
+  "title": "5.1.12 Video — The Frame Loop Explained",
+  "description": "3-min walkthrough of the setup/draw frame loop at 60 fps. Watch after Hello Sprite, before Make it Move.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 3,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "5.1 Hello Sprite and Movement",
+  "preview": "video",
+  "week": 10,
+  "slos": [
+    "SLO-3"
+  ],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the YouTube link.",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

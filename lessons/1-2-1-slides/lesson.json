@@ -1,17 +1,22 @@
 {
   "id": "1-2-1-slides",
-  "title": "1.2.1 Slides — Control Flow",
-  "description": "Unit 1.2 slides — conditionals, comparison and logical operators, switch, algorithms, and loops.",
+  "title": "1.2.1 Slides — Variables and Data Types",
+  "description": "Variables and Data Types slides. Placeholder until the deck is built from the book.",
   "type": "lesson",
   "difficulty": "beginner",
-  "estimateMins": 10,
+  "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "1.2 Control Flow",
+  "unit": "1.2 Variables and Data Types",
   "preview": "slides",
   "slidesUrl": "/slides/1.2/",
-  "week": 4,
-  "slos": ["SLO-3", "SLO-4"],
+  "slos": [
+    "SLO-1"
+  ],
   "steps": [],
   "requirements": [],
-  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
 }

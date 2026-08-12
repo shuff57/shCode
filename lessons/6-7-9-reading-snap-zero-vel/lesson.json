@@ -1,0 +1,23 @@
+{
+  "id": "6-7-9-reading-snap-zero-vel",
+  "title": "6.7.9 Reading — Snap a Sprite to the Cursor",
+  "description": "How to move a sprite exactly to the cursor position each frame during a drag. Zeroing the velocity is the step that keeps physics from fighting your snap.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.7 Advanced Input and Joints",
+  "preview": "reading",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

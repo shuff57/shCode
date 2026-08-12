@@ -1,0 +1,22 @@
+{
+  "id": "6-3-1-slides",
+  "title": "6.3.1 Slides — Physics Applications",
+  "description": "Physics Applications slides. Placeholder until the deck is built from the book.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.3 Physics Applications",
+  "preview": "slides",
+  "slidesUrl": "/slides/6.3/",
+  "slos": [
+    "SLO-1"
+  ],
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

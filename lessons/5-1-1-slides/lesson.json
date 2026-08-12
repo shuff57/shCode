@@ -1,0 +1,24 @@
+{
+  "id": "5-1-1-slides",
+  "title": "5.1.1 Slides — shplay Foundations",
+  "description": "Unit 2.1 slides — canvas, sprites, keyboard input, and the frame loop. Includes runnable code examples.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 25,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "5.1 Hello Sprite and Movement",
+  "preview": "slides",
+  "week": 10,
+  "slos": [
+    "SLO-3"
+  ],
+  "slidesUrl": "/slides/2.1/index.html",
+  "slidesDevUrl": "http://localhost:3030",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

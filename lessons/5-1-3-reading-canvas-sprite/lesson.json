@@ -1,0 +1,25 @@
+{
+  "id": "5-1-3-reading-canvas-sprite",
+  "title": "5.1.3 Reading — Frame loop: setup() and draw()",
+  "description": "How shplay calls `setup()` once and `draw()` every frame. Read before 2.1.3a (Canvas).",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "5.1 Hello Sprite and Movement",
+  "preview": "reading",
+  "week": 10,
+  "slos": [
+    "SLO-3"
+  ],
+  "externalLink": "/docs/shplay",
+  "externalLinkLabel": "Open the in-app shplay docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

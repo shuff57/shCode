@@ -1,0 +1,69 @@
+{
+  "id": "3-2-5-lab-sum-array",
+  "title": "3.2.5 Sum an Array",
+  "description": "Use a for loop and .length to add up all numbers in an array, then log the total. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.2 Arrays",
+  "preview": "console",
+  "week": 8,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a number array",
+      "instructions": "Create a variable called numbers and assign it an array containing at least four number values."
+    },
+    {
+      "id": "s2",
+      "title": "Sum with a for loop",
+      "instructions": "Create a variable called total and set it to 0. Write a for loop that visits every element in numbers using its index (from 0 up to numbers.length - 1). On each iteration, add the current element to total."
+    },
+    {
+      "id": "s3",
+      "title": "Log the result",
+      "instructions": "After the loop, use console.log to print the value of total."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "for loop present",
+      "description": "Code contains a for loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": ".length used",
+      "description": "Code uses .length",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.length",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

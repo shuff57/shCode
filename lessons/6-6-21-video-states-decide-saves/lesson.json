@@ -1,0 +1,24 @@
+{
+  "id": "6-6-21-video-states-decide-saves",
+  "title": "6.6.21 Video — States Decide When to Save",
+  "description": "States and saves work together: when the player reaches 'gameover', auto-save their score. When they hit 'win', save their victory. States trigger saves.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.6 Game State Machines",
+  "preview": "video",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the YouTube link, or open the classroom slide deck for the live demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

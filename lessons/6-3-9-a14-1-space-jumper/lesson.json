@@ -1,0 +1,130 @@
+{
+  "id": "6-3-9-a14-1-space-jumper",
+  "title": "6.3.9 A14.1 Space Jumper",
+  "description": "Build a one-sprite platformer: WASD moves, space jumps — but only when touching the ground.",
+  "type": "assignment",
+  "difficulty": "intermediate",
+  "estimateMins": 40,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.3 Physics Applications",
+  "preview": "shplay",
+  "week": 14,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Set up the scene",
+      "instructions": "Create a canvas, enable gravity (world.gravity.y), add a dynamic player sprite, and a static ground sprite.",
+      "hints": [
+        "Open the Sprite docs chapter (right drawer → Docs tab) for the constructor signature and collider types."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Horizontal motion (WASD)",
+      "instructions": "In draw(), read kb.pressing('a') / kb.pressing('d') and set player.vel.x accordingly. Else-to-zero so the player doesn't drift.",
+      "hints": [
+        "The Input docs chapter covers kb.pressing. Don't use arrow keys — they scroll the editor iframe."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Ground-gated jump (kb.presses + colliding)",
+      "instructions": "Use kb.presses(' ') (edge-triggered, fires once per tap — pass a literal space character, the string 'space' will not match) AND player.colliding(ground). Only then set player.vel.y to a negative number.",
+      "hints": [
+        "The Input docs explains the difference between kb.pressing and kb.presses. Use a literal space ' ' as the key — 'space' is not recognized.",
+        "The Collisions docs chapter covers .colliding() for per-frame contact checks (returns the frame count while the bodies are in contact, falsy when apart)."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Win condition",
+      "instructions": "Add a goal sprite the player can reach. When ship.overlaps(goal), trigger a clear win state — change the background, log a message, or stop updating.",
+      "hints": [
+        "overlaps() is in the Collisions docs chapter. Boolean form is fine for a one-shot win check."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Static geometry exists",
+      "description": "Create at least one sprite with collider 'static'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "collider\\s*=\\s*['\"]static['\"]|new\\s+Sprite\\s*\\([^)]*['\"]static['\"]",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Player sprite exists",
+      "description": "A dynamic Sprite is created in setup()",
+      "type": "inFunction",
+      "function": "setup",
+      "file": "script.js",
+      "pattern": "new\\s+Sprite\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "WASD horizontal input",
+      "description": "Use kb.pressing with 'a' or 'd' inside draw()",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](?:a|d)['\"]",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Gravity enabled",
+      "description": "Assign a positive value to world.gravity.y",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "world\\.gravity\\.y\\s*=\\s*[1-9]",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Edge-triggered jump",
+      "description": "Use kb.presses for the jump (not kb.pressing). Key arg must be a literal space ' ' or 'w'.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "kb\\.presses\\s*\\(\\s*(?:['\"]w['\"]|['\"] ['\"])",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Ground-gated jump",
+      "description": "Use .colliding() to gate the jump",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.colliding\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "Win condition via overlap",
+      "description": "Use .overlaps() somewhere — typically the goal-sprite check",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.overlaps\\s*\\(",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

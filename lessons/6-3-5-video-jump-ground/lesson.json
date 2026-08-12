@@ -1,0 +1,24 @@
+{
+  "id": "6-3-5-video-jump-ground",
+  "title": "6.3.5 Video — Why your jump feels wrong",
+  "description": "The infinite-jump bug live, and the `colliding(ground)` fix. Watch before `2.3.18 Ground Detection`.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 3,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.3 Physics Applications",
+  "preview": "video",
+  "week": 14,
+  "slos": [
+    "SLO-3"
+  ],
+  "videoUrl": "",
+  "videoFallback": "Teacher-recorded walkthrough. Ask your teacher for the link, or follow along in the classroom live demo.",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

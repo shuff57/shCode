@@ -1,0 +1,25 @@
+{
+  "id": "6-5-16-reading-removeitem-clearstorage",
+  "title": "6.5.16 Reading — shplay docs: removeItem and clearStorage",
+  "description": "removeItem(key) deletes one saved key. clearStorage() wipes everything. When and how to use each.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.5 Save and Load",
+  "preview": "reading",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "externalLink": "/docs/shplay",
+  "externalLinkLabel": "Open the in-app shplay docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

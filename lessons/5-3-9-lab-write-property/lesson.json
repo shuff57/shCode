@@ -1,0 +1,57 @@
+{
+  "id": "5-3-9-lab-write-property",
+  "title": "5.3.9 Lab — Write a property",
+  "description": "Mutate `b.color` on a space-bar press to practice assigning a new value to an instance property. First practice with dot-notation writes.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "5.3 Classes and Objects via shPlay",
+  "preview": "shplay",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Change b.color when space is pressed",
+      "instructions": "Inside `draw()`, detect a space-bar press with `kb.presses('space')` and assign a new color to `b.color`. The box should change color on screen when you press space.",
+      "hints": [
+        "Open the shplay docs drawer on the right and find the keyboard input section for detecting key presses."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Assign to b.color",
+      "description": "Write `b.color = ...` inside `draw()` to change the box's color property.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "b\\s*\\.\\s*color\\s*=",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "Detect a key press",
+      "description": "Use `kb.presses(...)` inside `draw()` to respond to keyboard input.",
+      "type": "inFunction",
+      "function": "draw",
+      "file": "script.js",
+      "pattern": "kb\\.presses",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

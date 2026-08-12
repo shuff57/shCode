@@ -1,0 +1,44 @@
+{
+  "id": "5-3-26-lab-array-of-instances",
+  "title": "5.3.26 Lab — An array of Enemies",
+  "description": "Store five Enemy instances in a single array by pushing new Enemy(...) calls into `enemies` — practice managing many instances without separate named variables.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "5.3 Classes and Objects via shPlay",
+  "preview": "shplay",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Push five Enemy instances into enemies[]",
+      "instructions": "In `setup()`, call `enemies.push(new Enemy(...))` five times with different x positions. After setup, `enemies.length` should be 5 and five red squares should appear on screen.",
+      "hints": [
+        "Open the shplay docs drawer on the right and look at how arrays work — push adds one element to the end of an array."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "enemies.push(new Enemy(...)) used at least once",
+      "description": "Use `enemies.push(new Enemy(...))` to add Enemy instances to the array.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:enemies\\.push\\s*\\(\\s*new\\s+Enemy[\\s\\S]*?){5}|for\\s*\\([\\s\\S]{0,120}?\\)[\\s\\S]{0,60}?enemies\\.push\\s*\\(\\s*new\\s+Enemy",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

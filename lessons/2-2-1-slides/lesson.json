@@ -1,18 +1,22 @@
 {
   "id": "2-2-1-slides",
-  "title": "2.2.1 Slides — Object-Oriented Programming",
-  "description": "Unit 2.2 slides — classes, objects, `this`, and procedural vs OOP. Includes runnable code examples.",
+  "title": "2.2.1 Slides — Algorithms and Loops",
+  "description": "Algorithms and Loops slides. Placeholder until the deck is built from the book.",
   "type": "lesson",
   "difficulty": "beginner",
-  "estimateMins": 25,
-  "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "2.2 Object-Oriented Programming",
+  "estimateMins": 5,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.2 Algorithms and Loops",
   "preview": "slides",
-  "week": 12,
-  "slos": ["SLO-2", "SLO-3"],
-  "slidesUrl": "/slides/2.2/index.html",
-  "slidesDevUrl": "http://localhost:3031",
+  "slidesUrl": "/slides/2.2/",
+  "slos": [
+    "SLO-1"
+  ],
   "steps": [],
   "requirements": [],
-  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
 }

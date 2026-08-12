@@ -1,0 +1,23 @@
+{
+  "id": "6-6-7-reading-state-variable",
+  "title": "6.6.7 Reading — shplay docs: The state Variable",
+  "description": "One variable controls which screen is visible. Every frame, draw() checks state to decide what to render. This is the single source of truth for your game's screen.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.6 Game State Machines",
+  "preview": "reading",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

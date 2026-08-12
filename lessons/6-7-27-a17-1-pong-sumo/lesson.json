@@ -1,0 +1,153 @@
+{
+  "id": "6-7-27-a17-1-pong-sumo",
+  "title": "6.7.27 A17.1 Two-Player Pong-Sumo",
+  "description": "Graded: build a two-player Pong-Sumo game — two paddles, one ball, push the ball past the opponent to score. Incorporates two-player input, push-collision physics, a win condition, and at least one joint. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "intermediate",
+  "estimateMins": 75,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.7 Advanced Input and Joints",
+  "preview": "shplay",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "starterFile": "script.js",
+  "solutionFile": "solution.js",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Arena setup — canvas and gravity",
+      "instructions": "Create a canvas (e.g. 600×400). Set world.gravity.y = 0 so paddles and ball glide instead of falling.",
+      "hints": [
+        "Check the Canvas section of the shplay docs drawer. For no-gravity setup see 2.7.25."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Top and bottom walls",
+      "instructions": "Add two static sprites along the top and bottom edges as walls so the ball can't escape vertically.",
+      "hints": [
+        "Check the Sprite section of the shplay docs drawer. Set collider = 'static' on each wall."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Two paddles — Player 1 (WASD) and Player 2 (arrow keys)",
+      "instructions": "Create two paddle sprites (one on the left, one on the right). In draw(), read kb.pressing for W/S (Player 1) and up/down (Player 2) and set each paddle's velocity accordingly.",
+      "hints": [
+        "See 2.7.25 for the two-paddle pattern. Check kb.pressing in the shplay docs drawer."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Ball — bouncy, dynamic, initial velocity",
+      "instructions": "Create a ball sprite in the center. Set a positive bounciness so it bounces off paddles and walls. Give it an initial vel.x so the game starts moving.",
+      "hints": [
+        "See 2.7.24 (bounciness) and 2.7.25 (two paddles) for the arena setup pattern."
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "Add at least one joint",
+      "instructions": "Use a DistanceJoint or HingeJoint somewhere in your game — a boundary chain, a moving obstacle, or an attachment between two sprites. Use new DistanceJoint(a, b) and set joint.length = N after construction if you want a specific length.",
+      "hints": [
+        "See 2.7.12 (DistanceJoint) or 2.7.14 (HingeJoint). Remember: joint.delete() releases the constraint. Set length with joint.length = N after new DistanceJoint(a, b)."
+      ]
+    },
+    {
+      "id": "s6",
+      "title": "Score variables and initial state",
+      "instructions": "Declare p1Score and p2Score at the top (outside setup/draw). Initialize both to 0 in setup(). Set gameState to 'title' so the game starts on the title screen.",
+      "hints": [
+        "The shplay docs drawer has sprite position properties. Compare ball.pos.x against 0 and the canvas width."
+      ]
+    },
+    {
+      "id": "s7",
+      "title": "State-machine draw() — title, play, win",
+      "instructions": "Wrap your draw() logic in a switch(gameState) with cases for 'title', 'play', and 'win'. In 'play': move paddles with kb.pressing, check ball edge zones to score, render scores with text(), check the win threshold. In 'win': show the winner and wire a key to reset.",
+      "hints": [
+        "See 2.6.1 (state machine pattern) for switch(state) with cases and break."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Two-player keyboard input",
+      "description": "Both players have keys assigned — kb.pressing is called with at least two different keys (one per player).",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "kb\\.pressing\\s*\\(\\s*['\"](\\w+)['\"]\\s*\\)[\\s\\S]*?kb\\.pressing\\s*\\(\\s*['\"](?!\\1\\b)\\w+['\"]\\s*\\)",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Independent per-player score variables",
+      "description": "p1Score and p2Score (or equivalent) are declared at module scope — one for each player.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?=[\\s\\S]*p1Score)(?=[\\s\\S]*p2Score)",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Push-collision physics tuned with bounciness",
+      "description": "At least one sprite has its bounciness set (e.g. ball.bounciness = 0.9).",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\w+\\.bounciness\\s*=\\s*(?:0\\.[0-9]+|1(?:\\.0*)?)",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Top-down arena — no gravity",
+      "description": "world.gravity.y is set to 0 so the sprites glide instead of falling.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "world\\.gravity\\.y\\s*=\\s*0",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Live score rendered with text()",
+      "description": "draw() calls text(...) with p1Score or p2Score so the current score is visible on screen.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "text\\([^)]*p[12]Score[^)]*\\)",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Win condition fires on a threshold",
+      "description": "A comparison against a winning number (e.g. p1Score >= 5) triggers the win condition.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "p[12]Score\\s*(?:>=|===|>)\\s*(?:\\d+|[A-Z][A-Z0-9_]*)",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "At least one joint is used",
+      "description": "A DistanceJoint or HingeJoint is created somewhere in the game (boundary, obstacle, or attachment).",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+(DistanceJoint|HingeJoint)\\s*\\(",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

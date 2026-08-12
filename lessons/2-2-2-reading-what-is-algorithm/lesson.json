@@ -1,0 +1,23 @@
+{
+  "id": "2-2-2-reading-what-is-algorithm",
+  "title": "2.2.2 Reading — What Is an Algorithm?",
+  "description": "An algorithm is a precise, ordered set of steps to solve a problem. See how that idea turns directly into code.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.2 Algorithms and Loops",
+  "preview": "reading",
+  "week": 5,
+  "slos": [
+    "SLO-4"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "6-5-1-slides",
+  "title": "6.5.1 Slides — Your Game Forgets: The Problem",
+  "description": "Unit 2.5 opening slides — why game data disappears on refresh, what persistence means, and the plan for building a save/load system your players can count on.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 25,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.5 Save and Load",
+  "preview": "slides",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "slidesUrl": "/slides/2.5/",
+  "slidesDevUrl": "http://localhost:3034",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

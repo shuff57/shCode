@@ -3,7 +3,7 @@
     {
       "id": "1-1-1-a1-1-sdlc-writeup",
       "title": "1.1.1b SDLC Writeup",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 1
@@ -11,7 +11,7 @@
     {
       "id": "1-1-1-reading-console-log",
       "title": "1.1.1a Reading — Console: console.log & sequential execution",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 1
@@ -19,7 +19,7 @@
     {
       "id": "1-1-1-slides",
       "title": "1.1.1 Slides — Foundations",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "slides",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -27,7 +27,7 @@
     {
       "id": "1-1-10-reading-task-sets",
       "title": "1.1.10 Reading — Task Sets",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -35,7 +35,7 @@
     {
       "id": "1-1-11-example-task-set-loop",
       "title": "1.1.11 Worked Example — Task Set for a Loop Bug",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -43,7 +43,7 @@
     {
       "id": "1-1-12-write-a-task-set",
       "title": "1.1.12 Write a Task Set",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -51,7 +51,7 @@
     {
       "id": "1-1-13-reading-sdlc",
       "title": "1.1.13 Reading — SDLC Methodologies",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -59,7 +59,7 @@
     {
       "id": "1-1-14-reading-four-ps",
       "title": "1.1.14 Reading — The Four Ps",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -67,7 +67,7 @@
     {
       "id": "1-1-15-same-framework",
       "title": "1.1.15 Same Framework, Different Weight",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -75,7 +75,7 @@
     {
       "id": "1-1-16-reading-prescriptive",
       "title": "1.1.16 Reading — Prescriptive Process Models",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -83,7 +83,7 @@
     {
       "id": "1-1-17-reading-prescriptive-limits",
       "title": "1.1.17 Reading — Where Prescriptive Models Break",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -91,7 +91,7 @@
     {
       "id": "1-1-18-does-it-fit",
       "title": "1.1.18 Does It Fit?",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -99,7 +99,7 @@
     {
       "id": "1-1-19-a1-1-describe-lifecycle",
       "title": "1.1.19 A1.1 Describe the Lifecycle",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -107,31 +107,15 @@
     {
       "id": "1-1-2-video-sdlc",
       "title": "1.1.2 Video — What is the SDLC?",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "video",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-1-20-reading-let-const",
-      "title": "1.1.20 Reading — Declaring Variables with let and const",
-      "unit": "1.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-1-24-reading-string-methods",
-      "title": "1.1.24 Reading — String Methods in Practice",
-      "unit": "1.1 Foundations",
-      "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-3-a3-3-unit-quiz",
       "title": "1.1.3c Unit 1.1 Quiz",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 3
@@ -139,79 +123,23 @@
     {
       "id": "1-1-3-first-statement",
       "title": "1.1.3 Your First Statement",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-1-31-reading-operators-coercion",
-      "title": "1.1.31 Reading — Arithmetic Operators and Type Coercion",
-      "unit": "1.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-1-32-lab-variables-types-check",
-      "title": "1.1.32 Variables and Types Check",
-      "unit": "1.1 Foundations",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-1-33-lab-operators-check",
-      "title": "1.1.33 Operators and Expressions Check",
-      "unit": "1.1 Foundations",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-1-35-reading-camelcase",
-      "title": "1.1.35 Reading — camelCase Naming Style",
-      "unit": "1.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-1-39-reading-code-layout",
-      "title": "1.1.39 Reading — Code Layout",
-      "unit": "1.1 Foundations",
-      "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-4-reading-four-phases",
       "title": "1.1.4 Reading — The Four Phases",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-1-40-reading-comments",
-      "title": "1.1.40 Reading — Comments: // and /* */",
-      "unit": "1.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-1-41-why-documentation",
-      "title": "1.1.41 Why Documentation Matters",
-      "unit": "1.1 Foundations",
-      "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-5-classify-the-task",
       "title": "1.1.5 Classify the Task",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -219,7 +147,7 @@
     {
       "id": "1-1-6-example-greeting-phases",
       "title": "1.1.6 Worked Example — Greeting App Through Four Phases",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -227,7 +155,7 @@
     {
       "id": "1-1-7-reading-umbrella",
       "title": "1.1.7 Reading — Umbrella Activities",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -235,7 +163,7 @@
     {
       "id": "1-1-8-name-that-umbrella",
       "title": "1.1.8 Name That Umbrella",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -243,1754 +171,1930 @@
     {
       "id": "1-1-9-reading-actions",
       "title": "1.1.9 Reading — Software Engineering Actions",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-2-1-slides",
-      "title": "1.2.1 Slides — Control Flow",
-      "unit": "1.2 Control Flow",
+      "title": "1.2.1 Slides — Variables and Data Types",
+      "unit": "1.2 Variables and Data Types",
       "preview": "slides",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": null
     },
     {
-      "id": "1-2-10-reading-logical-operators",
-      "title": "1.2.10 Reading — Logical Operators: && || !",
-      "unit": "1.2 Control Flow",
+      "id": "1-2-2-reading-let-const",
+      "title": "1.2.2 Reading — Declaring Variables with let and const",
+      "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": null
     },
     {
-      "id": "1-2-11-example-combining-conditions",
-      "title": "1.2.11 Worked Example — Combining conditions",
-      "unit": "1.2 Control Flow",
-      "preview": "example",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
-    },
-    {
-      "id": "1-2-12-lab-guard-and",
-      "title": "1.2.12 Guard with &&",
-      "unit": "1.2 Control Flow",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
-    },
-    {
-      "id": "1-2-13-lab-branch-or",
-      "title": "1.2.13 Branch with ||",
-      "unit": "1.2 Control Flow",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
-    },
-    {
-      "id": "1-2-14-reading-switch",
-      "title": "1.2.14 Reading — switch Statements",
-      "unit": "1.2 Control Flow",
+      "id": "1-2-3-reading-string-methods",
+      "title": "1.2.3 Reading — String Methods in Practice",
+      "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": null
     },
     {
-      "id": "1-2-15-example-switch-vs-if",
-      "title": "1.2.15 Worked Example — switch vs if-else-if",
-      "unit": "1.2 Control Flow",
-      "preview": "example",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
-    },
-    {
-      "id": "1-2-16-lab-convert-to-switch",
-      "title": "1.2.16 Convert an if-chain to switch",
-      "unit": "1.2 Control Flow",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
-    },
-    {
-      "id": "1-2-17-reading-what-is-algorithm",
-      "title": "1.2.17 Reading — What Is an Algorithm?",
-      "unit": "1.2 Control Flow",
+      "id": "1-2-4-reading-operators-coercion",
+      "title": "1.2.4 Reading — Arithmetic Operators and Type Coercion",
+      "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 5
+      "week": null
     },
     {
-      "id": "1-2-18-example-pseudocode-to-code",
-      "title": "1.2.18 Worked Example — Pseudocode → code",
-      "unit": "1.2 Control Flow",
-      "preview": "example",
+      "id": "1-2-5-lab-variables-types-check",
+      "title": "1.2.5 Variables and Types Check",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 5
+      "week": null
     },
     {
-      "id": "1-2-19-a5-1-algorithm-writeup",
-      "title": "1.2.19 Algorithm in Plain English",
-      "unit": "1.2 Control Flow",
+      "id": "1-2-6-lab-operators-check",
+      "title": "1.2.6 Operators and Expressions Check",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-1-slides",
+      "title": "1.3.1 Slides — Documentation and Coding Conventions",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "slides",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-2-reading-camelcase",
+      "title": "1.3.2 Reading — camelCase Naming Style",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-3-reading-code-layout",
+      "title": "1.3.3 Reading — Code Layout",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-4-reading-comments",
+      "title": "1.3.4 Reading — Comments: // and /* */",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-5-why-documentation",
+      "title": "1.3.5 Why Documentation Matters",
+      "unit": "1.3 Documentation and Coding Conventions",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 5
-    },
-    {
-      "id": "1-2-2-video-decisions",
-      "title": "1.2.2 Video — Making Decisions in Code",
-      "unit": "1.2 Control Flow",
-      "preview": "video",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
-    },
-    {
-      "id": "1-2-20-reading-for-loop",
-      "title": "1.2.20 Reading — The for Loop",
-      "unit": "1.2 Control Flow",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 6
-    },
-    {
-      "id": "1-2-21-example-trace-for",
-      "title": "1.2.21 Worked Example — Tracing a for-loop counter",
-      "unit": "1.2 Control Flow",
-      "preview": "example",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 6
-    },
-    {
-      "id": "1-2-22-lab-count-to-ten",
-      "title": "1.2.22 Count 1 to 10",
-      "unit": "1.2 Control Flow",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 6
-    },
-    {
-      "id": "1-2-23-reading-while-loop",
-      "title": "1.2.23 Reading — while & do…while",
-      "unit": "1.2 Control Flow",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 6
-    },
-    {
-      "id": "1-2-24-example-while-vs-for",
-      "title": "1.2.24 Worked Example — while vs for + the infinite-loop trap",
-      "unit": "1.2 Control Flow",
-      "preview": "example",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 6
-    },
-    {
-      "id": "1-2-25-lab-countdown",
-      "title": "1.2.25 Countdown with while",
-      "unit": "1.2 Control Flow",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 6
-    },
-    {
-      "id": "1-2-26-challenges",
-      "title": "1.2.26 Challenges — Optional Stretch",
-      "unit": "1.2 Control Flow",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 6
-    },
-    {
-      "id": "1-2-3-reading-if-else",
-      "title": "1.2.3 Reading — If / Else if / Else",
-      "unit": "1.2 Control Flow",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
-    },
-    {
-      "id": "1-2-4-example-trace-if-else",
-      "title": "1.2.4 Worked Example — Tracing an if/else chain",
-      "unit": "1.2 Control Flow",
-      "preview": "example",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
-    },
-    {
-      "id": "1-2-5-lab-first-if",
-      "title": "1.2.5 Write Your First if",
-      "unit": "1.2 Control Flow",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
-    },
-    {
-      "id": "1-2-6-lab-add-else",
-      "title": "1.2.6 Add an else",
-      "unit": "1.2 Control Flow",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
-    },
-    {
-      "id": "1-2-7-reading-comparison-operators",
-      "title": "1.2.7 Reading — Comparison Operators & === vs ==",
-      "unit": "1.2 Control Flow",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
-    },
-    {
-      "id": "1-2-8-example-comparisons",
-      "title": "1.2.8 Worked Example — What each comparison returns",
-      "unit": "1.2 Control Flow",
-      "preview": "example",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
-    },
-    {
-      "id": "1-2-9-lab-predict-comparisons",
-      "title": "1.2.9 Predict, Then Run",
-      "unit": "1.2 Control Flow",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
-    },
-    {
-      "id": "1-3-1a-reading-function-basics",
-      "title": "1.3.1a Reading — Defining & Calling a Function",
-      "unit": "1.3 Functions and Data",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 7
-    },
-    {
-      "id": "1-3-1b-reading-parameters-return",
-      "title": "1.3.1b Reading — Parameters & Return Values",
-      "unit": "1.3 Functions and Data",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 7
-    },
-    {
-      "id": "1-3-1c-reading-scope",
-      "title": "1.3.1c Reading — Scope: Local vs Global",
-      "unit": "1.3 Functions and Data",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 7
-    },
-    {
-      "id": "1-3-1d-reading-pass-by-value-reference",
-      "title": "1.3.1d Reading — Pass by Value vs Reference",
-      "unit": "1.3 Functions and Data",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 7
-    },
-    {
-      "id": "1-3-1e-reading-defensive-copying",
-      "title": "1.3.1e Reading — Defensive Copying: [...] and {...}",
-      "unit": "1.3 Functions and Data",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 7
-    },
-    {
-      "id": "1-3-1f-a7-2-pass-by-reference-writeup",
-      "title": "1.3.1f Pass by Value vs Reference",
-      "unit": "1.3 Functions and Data",
-      "preview": "assignment",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 7
-    },
-    {
-      "id": "1-3-1g-lab-findmax-iseven",
-      "title": "1.3.1g findMax & isEven",
-      "unit": "1.3 Functions and Data",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 7
-    },
-    {
-      "id": "1-3-1h-lab-sum-to-n",
-      "title": "1.3.1h Sum 1 to N",
-      "unit": "1.3 Functions and Data",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 7
-    },
-    {
-      "id": "1-3-2a-reading-array-basics",
-      "title": "1.3.2a Reading — Array Basics: Index, push, pop",
-      "unit": "1.3 Functions and Data",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 8
-    },
-    {
-      "id": "1-3-2b-reading-array-iteration",
-      "title": "1.3.2b Reading — Looping Over Arrays (for / for…of)",
-      "unit": "1.3 Functions and Data",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 8
-    },
-    {
-      "id": "1-3-2c-reading-split-lines",
-      "title": "1.3.2c Reading — Splitting Text into Lines (.split)",
-      "unit": "1.3 Functions and Data",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 8
-    },
-    {
-      "id": "1-3-2d-lab-sum-array",
-      "title": "1.3.2d Sum an Array",
-      "unit": "1.3 Functions and Data",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 8
-    },
-    {
-      "id": "1-3-2e-example-menu-loop",
-      "title": "1.3.2e Worked Example — A tiny menu loop",
-      "unit": "1.3 Functions and Data",
-      "preview": "example",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 8
-    },
-    {
-      "id": "1-4-1a-reading-plan-before-code",
-      "title": "1.4.1a Reading — Plan Before You Code",
-      "unit": "1.4 Synthesis",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 9
-    },
-    {
-      "id": "1-4-1b-reading-manual-testing",
-      "title": "1.4.1b Reading — Manual Testing: PASS / FAIL Checks",
-      "unit": "1.4 Synthesis",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 9
-    },
-    {
-      "id": "1-4-3-q1-reflection-writeup",
-      "title": "1.4.3 Q1 Reflection",
-      "unit": "1.4 Synthesis",
-      "preview": "assignment",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 9
+      "week": null
     },
     {
       "id": "2-1-1-slides",
-      "title": "2.1.1 Slides — shplay Foundations",
-      "unit": "2.1 Foundations",
+      "title": "2.1.1 Slides — Conditionals",
+      "unit": "2.1 Conditionals",
       "preview": "slides",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
     },
     {
-      "id": "2-1-1-video-intro",
-      "title": "2.1.1 Video — Your first shplay sketch",
-      "unit": "2.1 Foundations",
-      "preview": "video",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
-    },
-    {
-      "id": "2-1-10-a10-2-frame-loop",
-      "title": "2.1.10 Frame Loop Writeup",
-      "unit": "2.1 Foundations",
-      "preview": "assignment",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
-    },
-    {
-      "id": "2-1-11-challenges",
-      "title": "2.1.11 Challenges",
-      "unit": "2.1 Foundations",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
-    },
-    {
-      "id": "2-1-2-reading-canvas-sprite",
-      "title": "2.1.2 Reading — Frame loop: setup() and draw()",
-      "unit": "2.1 Foundations",
+      "id": "2-1-10-reading-logical-operators",
+      "title": "2.1.10 Reading — Logical Operators: && || !",
+      "unit": "2.1 Conditionals",
       "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
     },
     {
-      "id": "2-1-3-example-minimum-sprite",
-      "title": "2.1.3 Worked Example — Minimum Sprite Program",
-      "unit": "2.1 Foundations",
+      "id": "2-1-11-example-combining-conditions",
+      "title": "2.1.11 Worked Example — Combining conditions",
+      "unit": "2.1 Conditionals",
       "preview": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
     },
     {
-      "id": "2-1-3a-reading-canvas",
-      "title": "2.1.3a Reading — Canvas: new Canvas(w, h)",
-      "unit": "2.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
+      "id": "2-1-12-lab-guard-and",
+      "title": "2.1.12 Guard with &&",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
     },
     {
-      "id": "2-1-3b-reading-sprite",
-      "title": "2.1.3b Reading — Sprite: new Sprite(x, y, w, h) + .color",
-      "unit": "2.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
+      "id": "2-1-13-lab-branch-or",
+      "title": "2.1.13 Branch with ||",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
     },
     {
-      "id": "2-1-3c-lab-one-sprite",
-      "title": "2.1.3c Lab — Drop one sprite, change its color",
-      "unit": "2.1 Foundations",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
-    },
-    {
-      "id": "2-1-3d-reading-sprite-variable",
-      "title": "2.1.3d Reading — Storing the sprite in a let variable",
-      "unit": "2.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
-    },
-    {
-      "id": "2-1-3e-reading-background",
-      "title": "2.1.3e Reading — background(color) wipe rule",
-      "unit": "2.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
-    },
-    {
-      "id": "2-1-3f-reading-sprite-props",
-      "title": "2.1.3f Reading — Sprite property tour: pos, rotation, layer",
-      "unit": "2.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
-    },
-    {
-      "id": "2-1-5-video-frame-loop",
-      "title": "2.1.5 Video — The Frame Loop Explained",
-      "unit": "2.1 Foundations",
+      "id": "2-1-2-video-decisions",
+      "title": "2.1.2 Video — Making Decisions in Code",
+      "unit": "2.1 Conditionals",
       "preview": "video",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
     },
     {
-      "id": "2-1-6-reading-input",
-      "title": "2.1.6 Reading — kb.pressing(key)",
-      "unit": "2.1 Foundations",
+      "id": "2-1-3-reading-if-else",
+      "title": "2.1.3 Reading — If / Else if / Else",
+      "unit": "2.1 Conditionals",
       "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
     },
     {
-      "id": "2-1-7-example-keyboard",
-      "title": "2.1.7 Worked Example — Keyboard Movement",
-      "unit": "2.1 Foundations",
+      "id": "2-1-4-example-trace-if-else",
+      "title": "2.1.4 Worked Example — Tracing an if/else chain",
+      "unit": "2.1 Conditionals",
       "preview": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
     },
     {
-      "id": "2-1-7a-reading-velocity",
-      "title": "2.1.7a Reading — Velocity: vel.x and vel.y",
-      "unit": "2.1 Foundations",
+      "id": "2-1-5-lab-first-if",
+      "title": "2.1.5 Write Your First if",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
+    },
+    {
+      "id": "2-1-6-lab-add-else",
+      "title": "2.1.6 Add an else",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
+    },
+    {
+      "id": "2-1-7-reading-comparison-operators",
+      "title": "2.1.7 Reading — Comparison Operators & === vs ==",
+      "unit": "2.1 Conditionals",
       "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
     },
     {
-      "id": "2-1-7b-reading-movement-pattern",
-      "title": "2.1.7b Reading — Movement pattern (if / else if / else)",
-      "unit": "2.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
+      "id": "2-1-8-example-comparisons",
+      "title": "2.1.8 Worked Example — What each comparison returns",
+      "unit": "2.1 Conditionals",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
     },
     {
-      "id": "2-1-7c-reading-else-to-zero",
-      "title": "2.1.7c Reading — The else-to-zero rule",
-      "unit": "2.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
-    },
-    {
-      "id": "2-1-7d-lab-else-to-zero",
-      "title": "2.1.7d Lab — Delete the else, watch drift",
-      "unit": "2.1 Foundations",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
-    },
-    {
-      "id": "2-1-7e-reading-wasd",
-      "title": "2.1.7e Reading — WASD-not-arrows",
-      "unit": "2.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
-    },
-    {
-      "id": "2-1-9-a10-1-sprite-playground",
-      "title": "2.1.9 Sprite Playground",
-      "unit": "2.1 Foundations",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
+      "id": "2-1-9-lab-predict-comparisons",
+      "title": "2.1.9 Predict, Then Run",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
     },
     {
       "id": "2-2-1-slides",
-      "title": "2.2.1 Slides — Object-Oriented Programming",
-      "unit": "2.2 Object-Oriented Programming",
+      "title": "2.2.1 Slides — Algorithms and Loops",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "slides",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "2-2-10-lab-countdown",
+      "title": "2.2.10 Countdown with while",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-2-11-challenges",
+      "title": "2.2.11 Challenges — Optional Stretch",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-2-2-reading-what-is-algorithm",
+      "title": "2.2.2 Reading — What Is an Algorithm?",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-2-3-example-pseudocode-to-code",
+      "title": "2.2.3 Worked Example — Pseudocode → code",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-2-4-a5-1-algorithm-writeup",
+      "title": "2.2.4 Algorithm in Plain English",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-2-5-reading-for-loop",
+      "title": "2.2.5 Reading — The for Loop",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-2-6-example-trace-for",
+      "title": "2.2.6 Worked Example — Tracing a for-loop counter",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-2-7-lab-count-to-ten",
+      "title": "2.2.7 Count 1 to 10",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-2-8-reading-while-loop",
+      "title": "2.2.8 Reading — while & do…while",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-2-9-example-while-vs-for",
+      "title": "2.2.9 Worked Example — while vs for + the infinite-loop trap",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-1-slides",
+      "title": "2.3.1 Slides — The Switch Statement",
+      "unit": "2.3 The Switch Statement",
+      "preview": "slides",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "2-3-2-reading-switch",
+      "title": "2.3.2 Reading — switch Statements",
+      "unit": "2.3 The Switch Statement",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
+    },
+    {
+      "id": "2-3-3-example-switch-vs-if",
+      "title": "2.3.3 Worked Example — switch vs if-else-if",
+      "unit": "2.3 The Switch Statement",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
+    },
+    {
+      "id": "2-3-4-lab-convert-to-switch",
+      "title": "2.3.4 Convert an if-chain to switch",
+      "unit": "2.3 The Switch Statement",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 4
+    },
+    {
+      "id": "3-1-1-slides",
+      "title": "3.1.1 Slides — Functions",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "slides",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "3-1-10-functions",
+      "title": "3.1.10 Functions",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-2-reading-function-basics",
+      "title": "3.1.2 Reading — Defining & Calling a Function",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-3-reading-parameters-return",
+      "title": "3.1.3 Reading — Parameters & Return Values",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-4-reading-scope",
+      "title": "3.1.4 Reading — Scope: Local vs Global",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-5-reading-pass-by-value-reference",
+      "title": "3.1.5 Reading — Pass by Value vs Reference",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-6-reading-defensive-copying",
+      "title": "3.1.6 Reading — Defensive Copying: [...] and {...}",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-7-a7-2-pass-by-reference-writeup",
+      "title": "3.1.7 Pass by Value vs Reference",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-8-lab-findmax-iseven",
+      "title": "3.1.8 findMax & isEven",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-1-9-lab-sum-to-n",
+      "title": "3.1.9 Sum 1 to N",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "3-2-1-slides",
+      "title": "3.2.1 Slides — Arrays",
+      "unit": "3.2 Arrays",
+      "preview": "slides",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "3-2-2-reading-array-basics",
+      "title": "3.2.2 Reading — Array Basics: Index, push, pop",
+      "unit": "3.2 Arrays",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-2-3-reading-array-iteration",
+      "title": "3.2.3 Reading — Looping Over Arrays (for / for…of)",
+      "unit": "3.2 Arrays",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-2-4-reading-split-lines",
+      "title": "3.2.4 Reading — Splitting Text into Lines (.split)",
+      "unit": "3.2 Arrays",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-2-5-lab-sum-array",
+      "title": "3.2.5 Sum an Array",
+      "unit": "3.2 Arrays",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-2-6-example-menu-loop",
+      "title": "3.2.6 Worked Example — A tiny menu loop",
+      "unit": "3.2 Arrays",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "3-2-7-arrays",
+      "title": "3.2.7 Arrays",
+      "unit": "3.2 Arrays",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 8
+    },
+    {
+      "id": "4-1-1-slides",
+      "title": "4.1.1 Slides — Print Shop (Q1 Synthesis)",
+      "unit": "4.1 Print Shop (Q1 Synthesis)",
+      "preview": "slides",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "4-1-2-reading-plan-before-code",
+      "title": "4.1.2 Reading — Plan Before You Code",
+      "unit": "4.1 Print Shop (Q1 Synthesis)",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "4-1-3-reading-manual-testing",
+      "title": "4.1.3 Reading — Manual Testing: PASS / FAIL Checks",
+      "unit": "4.1 Print Shop (Q1 Synthesis)",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "4-1-4-print-job-manager",
+      "title": "4.1.4 Print Job Manager (Mini-Project)",
+      "unit": "4.1 Print Shop (Q1 Synthesis)",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "4-1-5-q1-reflection-writeup",
+      "title": "4.1.5 Q1 Reflection",
+      "unit": "4.1 Print Shop (Q1 Synthesis)",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 9
+    },
+    {
+      "id": "5-1-1-slides",
+      "title": "5.1.1 Slides — shplay Foundations",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "slides",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-10-reading-sprite-props",
+      "title": "5.1.10 Reading — Sprite property tour: pos, rotation, layer",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-11-q5play-intro",
+      "title": "5.1.11 Hello Sprite",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-12-video-frame-loop",
+      "title": "5.1.12 Video — The Frame Loop Explained",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "video",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-13-reading-input",
+      "title": "5.1.13 Reading — kb.pressing(key)",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-14-example-keyboard",
+      "title": "5.1.14 Worked Example — Keyboard Movement",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "example",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-15-reading-velocity",
+      "title": "5.1.15 Reading — Velocity: vel.x and vel.y",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-16-reading-movement-pattern",
+      "title": "5.1.16 Reading — Movement pattern (if / else if / else)",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-17-reading-else-to-zero",
+      "title": "5.1.17 Reading — The else-to-zero rule",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-18-lab-else-to-zero",
+      "title": "5.1.18 Lab — Delete the else, watch drift",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-19-reading-wasd",
+      "title": "5.1.19 Reading — WASD-not-arrows",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-2-video-intro",
+      "title": "5.1.2 Video — Your first shplay sketch",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "video",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-20-q5play-move-keys",
+      "title": "5.1.20 Make it Move",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-21-a10-1-sprite-playground",
+      "title": "5.1.21 Sprite Playground",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-22-a10-2-frame-loop",
+      "title": "5.1.22 Frame Loop Writeup",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "assignment",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-23-challenges",
+      "title": "5.1.23 Challenges",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-3-reading-canvas-sprite",
+      "title": "5.1.3 Reading — Frame loop: setup() and draw()",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-4-example-minimum-sprite",
+      "title": "5.1.4 Worked Example — Minimum Sprite Program",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "example",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-5-reading-canvas",
+      "title": "5.1.5 Reading — Canvas: new Canvas(w, h)",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-6-reading-sprite",
+      "title": "5.1.6 Reading — Sprite: new Sprite(x, y, w, h) + .color",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-7-lab-one-sprite",
+      "title": "5.1.7 Lab — Drop one sprite, change its color",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-8-reading-sprite-variable",
+      "title": "5.1.8 Reading — Storing the sprite in a let variable",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-1-9-reading-background",
+      "title": "5.1.9 Reading — background(color) wipe rule",
+      "unit": "5.1 Hello Sprite and Movement",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
+    },
+    {
+      "id": "5-3-1-slides",
+      "title": "5.3.1 Slides — Object-Oriented Programming",
+      "unit": "5.3 Classes and Objects via shPlay",
       "preview": "slides",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
-      "id": "2-2-10-example-proc-vs-oop",
-      "title": "2.2.10 Worked Example — Procedural vs OOP side-by-side",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-10a-reading-when-oop",
-      "title": "2.2.10a Reading — When to reach for OOP (3-question checklist)",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-11-a12-1-collectible",
-      "title": "2.2.11 Collectible Class",
-      "unit": "2.2 Object-Oriented Programming",
+      "id": "5-3-10-lab-two-instances",
+      "title": "5.3.10 Lab — Two sprites, two property values",
+      "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
-      "id": "2-2-12-a12-2-oop-writeup",
-      "title": "2.2.12 Procedural vs OOP Writeup",
-      "unit": "2.2 Object-Oriented Programming",
+      "id": "5-3-11-reading-this-noun",
+      "title": "5.3.11 Reading — `this` is a noun",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-12-example-this-pronoun",
+      "title": "5.3.12 Worked Example — `this` is a pronoun",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "example",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-13-lab-build-sprite",
+      "title": "5.3.13 Your Turn — Build a Sprite",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-14-q5play-sprite-showcase",
+      "title": "5.3.14 Worked Example — Sprite Showcase",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "example",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-15-video-this-keyword",
+      "title": "5.3.15 Video — The `this` keyword",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "video",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-16-reading-methods-intro",
+      "title": "5.3.16 Reading — Methods: functions that live on a class",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-17-lab-method-no-params",
+      "title": "5.3.17 Lab — Method with no params",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-18-lab-method-with-params",
+      "title": "5.3.18 Lab — Method with parameters",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-19-lab-method-returns",
+      "title": "5.3.19 Lab — Method that returns a value",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-2-video-new-sprite",
+      "title": "5.3.2 Video — What `new Sprite()` actually does",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "video",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-20-lab-method-calls-method",
+      "title": "5.3.20 Lab — A method calling `this.otherMethod()`",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-21-reading-composition",
+      "title": "5.3.21 Reading — Why `this.sprite`, not `extends Sprite`",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-22-lab-mutate-sprite-prop",
+      "title": "5.3.22 Lab — Mutate `this.sprite.x` from a method",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-23-lab-cleanup",
+      "title": "5.3.23 Lab — Cleanup with `this.sprite.delete()`",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-24-example-enemy-class",
+      "title": "5.3.24 Worked Example — Write an Enemy class (integration)",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "example",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-25-lab-three-vars",
+      "title": "5.3.25 Lab — Three Enemies in three variables",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-26-lab-array-of-instances",
+      "title": "5.3.26 Lab — An array of Enemies",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-27-lab-loop-instances",
+      "title": "5.3.27 Lab — Loop over an array of instances",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-28-reading-parallel-vs-classes",
+      "title": "5.3.28 Reading — Parallel Arrays vs Classes",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-29-example-proc-vs-oop",
+      "title": "5.3.29 Worked Example — Procedural vs OOP side-by-side",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "example",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-3-reading-classes",
+      "title": "5.3.3 Reading — Class and instance",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-30-reading-when-oop",
+      "title": "5.3.30 Reading — When to reach for OOP (3-question checklist)",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-31-a12-1-collectible",
+      "title": "5.3.31 Collectible Class",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 12
+    },
+    {
+      "id": "5-3-32-a12-2-oop-writeup",
+      "title": "5.3.32 Procedural vs OOP Writeup",
+      "unit": "5.3 Classes and Objects via shPlay",
       "preview": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
-      "id": "2-2-12a-reading-oop-vocab",
-      "title": "2.2.12a Reading — Encapsulation, inheritance, polymorphism (vocabulary only)",
-      "unit": "2.2 Object-Oriented Programming",
+      "id": "5-3-33-reading-oop-vocab",
+      "title": "5.3.33 Reading — Encapsulation, inheritance, polymorphism (vocabulary only)",
+      "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
-      "id": "2-2-13-challenges",
-      "title": "2.2.13 Challenges",
-      "unit": "2.2 Object-Oriented Programming",
+      "id": "5-3-34-challenges",
+      "title": "5.3.34 Challenges",
+      "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
-      "id": "2-2-2-video-new-sprite",
-      "title": "2.2.2 Video — What `new Sprite()` actually does",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "video",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-3-reading-classes",
-      "title": "2.2.3 Reading — Class and instance",
-      "unit": "2.2 Object-Oriented Programming",
+      "id": "5-3-4-reading-new-operator",
+      "title": "5.3.4 Reading — The `new` operator",
+      "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
-      "id": "2-2-3a-reading-new-operator",
-      "title": "2.2.3a Reading — The `new` operator",
-      "unit": "2.2 Object-Oriented Programming",
+      "id": "5-3-5-reading-constructor",
+      "title": "5.3.5 Reading — `constructor` and its parameters",
+      "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
-      "id": "2-2-3b-reading-constructor",
-      "title": "2.2.3b Reading — `constructor` and its parameters",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-4-example-devtools-reveal",
-      "title": "2.2.4 Worked Example — You've been using classes",
-      "unit": "2.2 Object-Oriented Programming",
+      "id": "5-3-6-example-devtools-reveal",
+      "title": "5.3.6 Worked Example — You've been using classes",
+      "unit": "5.3 Classes and Objects via shPlay",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
-      "id": "2-2-4a-reading-properties",
-      "title": "2.2.4a Reading — Properties: data on `this`",
-      "unit": "2.2 Object-Oriented Programming",
+      "id": "5-3-7-reading-properties",
+      "title": "5.3.7 Reading — Properties: data on `this`",
+      "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
-      "id": "2-2-4b-lab-read-property",
-      "title": "2.2.4b Lab — Read a property",
-      "unit": "2.2 Object-Oriented Programming",
+      "id": "5-3-8-lab-read-property",
+      "title": "5.3.8 Lab — Read a property",
+      "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
-      "id": "2-2-4c-lab-write-property",
-      "title": "2.2.4c Lab — Write a property",
-      "unit": "2.2 Object-Oriented Programming",
+      "id": "5-3-9-lab-write-property",
+      "title": "5.3.9 Lab — Write a property",
+      "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
-      "id": "2-2-4d-lab-two-instances",
-      "title": "2.2.4d Lab — Two sprites, two property values",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-5-reading-this-noun",
-      "title": "2.2.5 Reading — `this` is a noun",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-5a-example-this-pronoun",
-      "title": "2.2.5a Worked Example — `this` is a pronoun",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-6-lab-build-sprite",
-      "title": "2.2.6 Your Turn — Build a Sprite",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-7-video-this-keyword",
-      "title": "2.2.7 Video — The `this` keyword",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "video",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-7a-reading-methods-intro",
-      "title": "2.2.7a Reading — Methods: functions that live on a class",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-7b-lab-method-no-params",
-      "title": "2.2.7b Lab — Method with no params",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-7c-lab-method-with-params",
-      "title": "2.2.7c Lab — Method with parameters",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-7d-lab-method-returns",
-      "title": "2.2.7d Lab — Method that returns a value",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-7e-lab-method-calls-method",
-      "title": "2.2.7e Lab — A method calling `this.otherMethod()`",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-7f-reading-composition",
-      "title": "2.2.7f Reading — Why `this.sprite`, not `extends Sprite`",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-7g-lab-mutate-sprite-prop",
-      "title": "2.2.7g Lab — Mutate `this.sprite.x` from a method",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-7h-lab-cleanup",
-      "title": "2.2.7h Lab — Cleanup with `this.sprite.delete()`",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-8-example-enemy-class",
-      "title": "2.2.8 Worked Example — Write an Enemy class (integration)",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-8a-lab-three-vars",
-      "title": "2.2.8a Lab — Three Enemies in three variables",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-8b-lab-array-of-instances",
-      "title": "2.2.8b Lab — An array of Enemies",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-8c-lab-loop-instances",
-      "title": "2.2.8c Lab — Loop over an array of instances",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-2-9-reading-parallel-vs-classes",
-      "title": "2.2.9 Reading — Parallel Arrays vs Classes",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
-      "id": "2-3-1-slides",
-      "title": "2.3.1 Slides — Collections and Physics Applications",
-      "unit": "2.3 Collections and Physics Applications",
+      "id": "6-1-1-slides",
+      "title": "6.1.1 Slides — Groups and Overlaps",
+      "unit": "6.1 Groups and Overlaps",
       "preview": "slides",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
-      "id": "2-3-10-example-safe-despawn",
-      "title": "2.3.10 Worked Example — Safe Despawn",
-      "unit": "2.3 Collections and Physics Applications",
+      "id": "6-1-10-example-safe-despawn",
+      "title": "6.1.10 Worked Example — Safe Despawn",
+      "unit": "6.1 Groups and Overlaps",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
-      "id": "2-3-11-a13-1-asteroid-field",
-      "title": "2.3.11 A13.1 Asteroid Field",
-      "unit": "2.3 Collections and Physics Applications",
+      "id": "6-1-11-a13-1-asteroid-field",
+      "title": "6.1.11 A13.1 Asteroid Field",
+      "unit": "6.1 Groups and Overlaps",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
-      "id": "2-3-12-challenges",
-      "title": "2.3.12 Challenges",
-      "unit": "2.3 Collections and Physics Applications",
+      "id": "6-1-12-challenges",
+      "title": "6.1.12 Challenges",
+      "unit": "6.1 Groups and Overlaps",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
-      "id": "2-3-13-video-presses-vs-pressing",
-      "title": "2.3.13 Video — kb.presses vs kb.pressing",
-      "unit": "2.3 Collections and Physics Applications",
-      "preview": "video",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 14
-    },
-    {
-      "id": "2-3-14-reading-input-edges",
-      "title": "2.3.14 Reading — shplay docs: Input edges",
-      "unit": "2.3 Collections and Physics Applications",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 14
-    },
-    {
-      "id": "2-3-15-example-presses-vs-pressing",
-      "title": "2.3.15 Worked Example — Edge-triggered Input",
-      "unit": "2.3 Collections and Physics Applications",
-      "preview": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 14
-    },
-    {
-      "id": "2-3-16-video-jump-ground",
-      "title": "2.3.16 Video — Why your jump feels wrong",
-      "unit": "2.3 Collections and Physics Applications",
-      "preview": "video",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 14
-    },
-    {
-      "id": "2-3-17-reading-touching",
-      "title": "2.3.17 Reading — shplay docs: Colliding + Ground Detection",
-      "unit": "2.3 Collections and Physics Applications",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 14
-    },
-    {
-      "id": "2-3-18-example-ground-detection",
-      "title": "2.3.18 Worked Example — Ground Detection",
-      "unit": "2.3 Collections and Physics Applications",
-      "preview": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 14
-    },
-    {
-      "id": "2-3-19-example-pendulum",
-      "title": "2.3.19 Worked Example — Swinging Pendulum",
-      "unit": "2.3 Collections and Physics Applications",
-      "preview": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 14
-    },
-    {
-      "id": "2-3-2-video-groups-intro",
-      "title": "2.3.2 Video — Groups in shplay",
-      "unit": "2.3 Collections and Physics Applications",
+      "id": "6-1-2-video-groups-intro",
+      "title": "6.1.2 Video — Groups in shplay",
+      "unit": "6.1 Groups and Overlaps",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
-      "id": "2-3-20-a14-1-space-jumper",
-      "title": "2.3.20 A14.1 Space Jumper",
-      "unit": "2.3 Collections and Physics Applications",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 14
-    },
-    {
-      "id": "2-3-21-a14-1-car-ramp",
-      "title": "2.3.21 A14.1 Car on a Ramp",
-      "unit": "2.3 Collections and Physics Applications",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 14
-    },
-    {
-      "id": "2-3-3-reading-groups",
-      "title": "2.3.3 Reading — shplay docs: Groups",
-      "unit": "2.3 Collections and Physics Applications",
+      "id": "6-1-3-reading-groups",
+      "title": "6.1.3 Reading — shplay docs: Groups",
+      "unit": "6.1 Groups and Overlaps",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
-      "id": "2-3-4-example-iterate-group",
-      "title": "2.3.4 Worked Example — Iterating a Group",
-      "unit": "2.3 Collections and Physics Applications",
+      "id": "6-1-4-example-iterate-group",
+      "title": "6.1.4 Worked Example — Iterating a Group",
+      "unit": "6.1 Groups and Overlaps",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
-      "id": "2-3-5-groups-sandbox",
-      "title": "2.3.5 Groups Sandbox",
-      "unit": "2.3 Collections and Physics Applications",
+      "id": "6-1-5-groups-sandbox",
+      "title": "6.1.5 Groups Sandbox",
+      "unit": "6.1 Groups and Overlaps",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
-      "id": "2-3-6-video-overlaps",
-      "title": "2.3.6 Video — overlaps() boolean vs callback",
-      "unit": "2.3 Collections and Physics Applications",
+      "id": "6-1-6-video-overlaps",
+      "title": "6.1.6 Video — overlaps() boolean vs callback",
+      "unit": "6.1 Groups and Overlaps",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
-      "id": "2-3-7-example-apple-catcher",
-      "title": "2.3.7 Worked Example — Apple Catcher",
-      "unit": "2.3 Collections and Physics Applications",
+      "id": "6-1-7-example-apple-catcher",
+      "title": "6.1.7 Worked Example — Apple Catcher",
+      "unit": "6.1 Groups and Overlaps",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
-      "id": "2-3-8-reading-collisions",
-      "title": "2.3.8 Reading — shplay docs: Collisions + Overlaps",
-      "unit": "2.3 Collections and Physics Applications",
+      "id": "6-1-8-reading-collisions",
+      "title": "6.1.8 Reading — shplay docs: Collisions + Overlaps",
+      "unit": "6.1 Groups and Overlaps",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
-      "id": "2-3-9-video-remove-bug",
-      "title": "2.3.9 Video — The remove-during-iteration bug",
-      "unit": "2.3 Collections and Physics Applications",
+      "id": "6-1-9-video-remove-bug",
+      "title": "6.1.9 Video — The remove-during-iteration bug",
+      "unit": "6.1 Groups and Overlaps",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
-      "id": "2-4-1-slides",
-      "title": "2.4.1 Slides — Animation & Camera",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-3-1-slides",
+      "title": "6.3.1 Slides — Physics Applications",
+      "unit": "6.3 Physics Applications",
+      "preview": "slides",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": null
+    },
+    {
+      "id": "6-3-10-a14-1-car-ramp",
+      "title": "6.3.10 A14.1 Car on a Ramp",
+      "unit": "6.3 Physics Applications",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 14
+    },
+    {
+      "id": "6-3-2-video-presses-vs-pressing",
+      "title": "6.3.2 Video — kb.presses vs kb.pressing",
+      "unit": "6.3 Physics Applications",
+      "preview": "video",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 14
+    },
+    {
+      "id": "6-3-3-reading-input-edges",
+      "title": "6.3.3 Reading — shplay docs: Input edges",
+      "unit": "6.3 Physics Applications",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 14
+    },
+    {
+      "id": "6-3-4-example-presses-vs-pressing",
+      "title": "6.3.4 Worked Example — Edge-triggered Input",
+      "unit": "6.3 Physics Applications",
+      "preview": "example",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 14
+    },
+    {
+      "id": "6-3-5-video-jump-ground",
+      "title": "6.3.5 Video — Why your jump feels wrong",
+      "unit": "6.3 Physics Applications",
+      "preview": "video",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 14
+    },
+    {
+      "id": "6-3-6-reading-touching",
+      "title": "6.3.6 Reading — shplay docs: Colliding + Ground Detection",
+      "unit": "6.3 Physics Applications",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 14
+    },
+    {
+      "id": "6-3-7-example-ground-detection",
+      "title": "6.3.7 Worked Example — Ground Detection",
+      "unit": "6.3 Physics Applications",
+      "preview": "example",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 14
+    },
+    {
+      "id": "6-3-8-example-pendulum",
+      "title": "6.3.8 Worked Example — Swinging Pendulum",
+      "unit": "6.3 Physics Applications",
+      "preview": "example",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 14
+    },
+    {
+      "id": "6-3-9-a14-1-space-jumper",
+      "title": "6.3.9 A14.1 Space Jumper",
+      "unit": "6.3 Physics Applications",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 14
+    },
+    {
+      "id": "6-4-1-slides",
+      "title": "6.4.1 Slides — Animation & Camera",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "slides",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-10-a15-1-platformer",
-      "title": "2.4.10 A15.1 Side-Scrolling Platformer",
-      "unit": "2.4 Animation & Camera",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 15
-    },
-    {
-      "id": "2-4-11-challenges",
-      "title": "2.4.11 Challenges",
-      "unit": "2.4 Animation & Camera",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 15
-    },
-    {
-      "id": "2-4-2-video-animating-sprite",
-      "title": "2.4.2 Video — Animating a sprite in shplay",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-4-10-video-camera-flashlight",
+      "title": "6.4.10 Video — Camera follow explained with a flashlight",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-3-reading-animation",
-      "title": "2.4.3 Reading — shplay docs: Animation",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-4-11-reading-camera",
+      "title": "6.4.11 Reading — shplay docs: Camera",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-3a-reading-add-ani",
-      "title": "2.4.3a Reading — addAni(name, frames)",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-4-12-reading-camera-xy",
+      "title": "6.4.12 Reading — camera.x / camera.y",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-3b-reading-change-ani",
-      "title": "2.4.3b Reading — changeAni(name)",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-4-13-reading-camera-follow",
+      "title": "6.4.13 Reading — Camera-follow pattern",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-3c-reading-frame-delay",
-      "title": "2.4.3c Reading — frameDelay (cycle speed)",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-4-14-reading-lerp-smoothing",
+      "title": "6.4.14 Reading — Smoothing with lerp",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-3d-reading-sprite-image",
-      "title": "2.4.3d Reading — sprite.image (single-frame art)",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-4-15-reading-sprite-layer",
+      "title": "6.4.15 Reading — sprite.layer (render order)",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-4-example-animate-sprite",
-      "title": "2.4.4 Worked Example — Animating a Sprite",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-4-16-example-camera-follow",
+      "title": "6.4.16 Worked Example — Camera Follow",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-5-animated-sprites-sandbox",
-      "title": "2.4.5 Animated Sprites Sandbox",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-4-17-example-smooth-camera",
+      "title": "6.4.17 Worked Example — Smooth Camera with lerp",
+      "unit": "6.4 Animated Sprites and Camera",
+      "preview": "example",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 15
+    },
+    {
+      "id": "6-4-18-a15-1-platformer",
+      "title": "6.4.18 A15.1 Side-Scrolling Platformer",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-6-video-camera-flashlight",
-      "title": "2.4.6 Video — Camera follow explained with a flashlight",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-4-19-challenges",
+      "title": "6.4.19 Challenges",
+      "unit": "6.4 Animated Sprites and Camera",
+      "preview": "shplay",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 15
+    },
+    {
+      "id": "6-4-2-video-animating-sprite",
+      "title": "6.4.2 Video — Animating a sprite in shplay",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-7-reading-camera",
-      "title": "2.4.7 Reading — shplay docs: Camera",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-4-3-reading-animation",
+      "title": "6.4.3 Reading — shplay docs: Animation",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-7a-reading-camera-xy",
-      "title": "2.4.7a Reading — camera.x / camera.y",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-4-4-reading-add-ani",
+      "title": "6.4.4 Reading — addAni(name, frames)",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-7b-reading-camera-follow",
-      "title": "2.4.7b Reading — Camera-follow pattern",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-4-5-reading-change-ani",
+      "title": "6.4.5 Reading — changeAni(name)",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-7c-reading-lerp-smoothing",
-      "title": "2.4.7c Reading — Smoothing with lerp",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-4-6-reading-frame-delay",
+      "title": "6.4.6 Reading — frameDelay (cycle speed)",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-7d-reading-sprite-layer",
-      "title": "2.4.7d Reading — sprite.layer (render order)",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-4-7-reading-sprite-image",
+      "title": "6.4.7 Reading — sprite.image (single-frame art)",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-8-example-camera-follow",
-      "title": "2.4.8 Worked Example — Camera Follow",
-      "unit": "2.4 Animation & Camera",
+      "id": "6-4-8-example-animate-sprite",
+      "title": "6.4.8 Worked Example — Animating a Sprite",
+      "unit": "6.4 Animated Sprites and Camera",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-4-9-example-smooth-camera",
-      "title": "2.4.9 Worked Example — Smooth Camera with lerp",
-      "unit": "2.4 Animation & Camera",
-      "preview": "example",
+      "id": "6-4-9-animated-sprites-sandbox",
+      "title": "6.4.9 Animated Sprites Sandbox",
+      "unit": "6.4 Animated Sprites and Camera",
+      "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
     {
-      "id": "2-5-1-slides",
-      "title": "2.5.1 Slides — Your Game Forgets: The Problem",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-1-slides",
+      "title": "6.5.1 Slides — Your Game Forgets: The Problem",
+      "unit": "6.5 Save and Load",
       "preview": "slides",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-10-reading-store-structured",
-      "title": "2.5.10 Reading — shplay docs: Storing Structured Data",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-10-reading-json-parse",
+      "title": "6.5.10 Reading — shplay docs: JSON.parse(str)",
+      "unit": "6.5 Save and Load",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-11-example-save-player-state",
-      "title": "2.5.11 Worked Example — Save Full Player State",
-      "unit": "2.5 Game Saves",
-      "preview": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-12-example-restore-player-state",
-      "title": "2.5.12 Worked Example — Restore Full Player State from a Save",
-      "unit": "2.5 Game Saves",
-      "preview": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-13-reading-loadjson-async",
-      "title": "2.5.13 Reading — shplay docs: loadJSON is Async",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-11-reading-store-structured",
+      "title": "6.5.11 Reading — shplay docs: Storing Structured Data",
+      "unit": "6.5 Save and Load",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-14-video-save-slots",
-      "title": "2.5.14 Video — Save Slots: Multiple Save Files",
-      "unit": "2.5 Game Saves",
-      "preview": "video",
+      "id": "6-5-12-example-save-player-state",
+      "title": "6.5.12 Worked Example — Save Full Player State",
+      "unit": "6.5 Save and Load",
+      "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-15-reading-removeitem-clearstorage",
-      "title": "2.5.15 Reading — shplay docs: removeItem and clearStorage",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-13-example-restore-player-state",
+      "title": "6.5.13 Worked Example — Restore Full Player State from a Save",
+      "unit": "6.5 Save and Load",
+      "preview": "example",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "6-5-14-reading-loadjson-async",
+      "title": "6.5.14 Reading — shplay docs: loadJSON is Async",
+      "unit": "6.5 Save and Load",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-16-example-three-slots",
-      "title": "2.5.16 Worked Example — Three Save Slots",
-      "unit": "2.5 Game Saves",
-      "preview": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-17-example-delete-overwrite",
-      "title": "2.5.17 Worked Example — Delete and Overwrite a Save Slot",
-      "unit": "2.5 Game Saves",
-      "preview": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-18-video-continue",
-      "title": "2.5.18 Video — New Game or Continue?",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-15-video-save-slots",
+      "title": "6.5.15 Video — Save Slots: Multiple Save Files",
+      "unit": "6.5 Save and Load",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-19-example-title-detect-save",
-      "title": "2.5.19 Worked Example — Title Screen Detects Existing Saves",
-      "unit": "2.5 Game Saves",
-      "preview": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-2-video-memory",
-      "title": "2.5.2 Video — Memory: What Stays, What Disappears",
-      "unit": "2.5 Game Saves",
-      "preview": "video",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-20-example-confirm-overwrite",
-      "title": "2.5.20 Worked Example — Confirm Before Overwriting a Save",
-      "unit": "2.5 Game Saves",
-      "preview": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-21-video-autosave",
-      "title": "2.5.21 Video — Your Game, Automatically Saved",
-      "unit": "2.5 Game Saves",
-      "preview": "video",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-5-22-reading-checkpoint-saves",
-      "title": "2.5.22 Reading — Checkpoint Saves: Save on Milestones",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-16-reading-removeitem-clearstorage",
+      "title": "6.5.16 Reading — shplay docs: removeItem and clearStorage",
+      "unit": "6.5 Save and Load",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-23-example-autosave-level",
-      "title": "2.5.23 Worked Example — Auto-Save on Level Complete or Timer",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-17-example-three-slots",
+      "title": "6.5.17 Worked Example — Three Save Slots",
+      "unit": "6.5 Save and Load",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-24-a16-1-save-system",
-      "title": "2.5.24 A16.1 Save System — Build Save/Load with Slots",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-18-example-delete-overwrite",
+      "title": "6.5.18 Worked Example — Delete and Overwrite a Save Slot",
+      "unit": "6.5 Save and Load",
+      "preview": "example",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "6-5-19-video-continue",
+      "title": "6.5.19 Video — New Game or Continue?",
+      "unit": "6.5 Save and Load",
+      "preview": "video",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "6-5-2-video-memory",
+      "title": "6.5.2 Video — Memory: What Stays, What Disappears",
+      "unit": "6.5 Save and Load",
+      "preview": "video",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "6-5-20-example-title-detect-save",
+      "title": "6.5.20 Worked Example — Title Screen Detects Existing Saves",
+      "unit": "6.5 Save and Load",
+      "preview": "example",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "6-5-21-example-confirm-overwrite",
+      "title": "6.5.21 Worked Example — Confirm Before Overwriting a Save",
+      "unit": "6.5 Save and Load",
+      "preview": "example",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "6-5-22-video-autosave",
+      "title": "6.5.22 Video — Your Game, Automatically Saved",
+      "unit": "6.5 Save and Load",
+      "preview": "video",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "6-5-23-reading-checkpoint-saves",
+      "title": "6.5.23 Reading — Checkpoint Saves: Save on Milestones",
+      "unit": "6.5 Save and Load",
+      "preview": "reading",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "6-5-24-example-autosave-level",
+      "title": "6.5.24 Worked Example — Auto-Save on Level Complete or Timer",
+      "unit": "6.5 Save and Load",
+      "preview": "example",
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 16
+    },
+    {
+      "id": "6-5-25-a16-1-save-system",
+      "title": "6.5.25 A16.1 Save System — Build Save/Load with Slots",
+      "unit": "6.5 Save and Load",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-25-challenges",
-      "title": "2.5.25 Challenges — Extended Save Features",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-26-challenges",
+      "title": "6.5.26 Challenges — Extended Save Features",
+      "unit": "6.5 Save and Load",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-3-reading-storeitem",
-      "title": "2.5.3 Reading — storeItem: Save Game Data",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-3-reading-storeitem",
+      "title": "6.5.3 Reading — storeItem: Save Game Data",
+      "unit": "6.5 Save and Load",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-4-example-save-highscore",
-      "title": "2.5.4 Worked Example — Save a High Score on Game Over",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-4-example-save-highscore",
+      "title": "6.5.4 Worked Example — Save a High Score on Game Over",
+      "unit": "6.5 Save and Load",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-5-reading-getitem",
-      "title": "2.5.5 Reading — getItem: Load Saved Data",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-5-reading-getitem",
+      "title": "6.5.5 Reading — getItem: Load Saved Data",
+      "unit": "6.5 Save and Load",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-5a-reading-getitem-string",
-      "title": "2.5.5a Reading — getItem Returns a String",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-6-reading-getitem-string",
+      "title": "6.5.6 Reading — getItem Returns a String",
+      "unit": "6.5 Save and Load",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-6-example-load-highscore",
-      "title": "2.5.6 Worked Example — Load and Display a High Score",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-7-example-load-highscore",
+      "title": "6.5.7 Worked Example — Load and Display a High Score",
+      "unit": "6.5 Save and Load",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-7-video-complex-save",
-      "title": "2.5.7 Video — More Than a Number: Saving Your Whole Game",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-8-video-complex-save",
+      "title": "6.5.8 Video — More Than a Number: Saving Your Whole Game",
+      "unit": "6.5 Save and Load",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-8-reading-json-stringify",
-      "title": "2.5.8 Reading — shplay docs: JSON.stringify(obj)",
-      "unit": "2.5 Game Saves",
+      "id": "6-5-9-reading-json-stringify",
+      "title": "6.5.9 Reading — shplay docs: JSON.stringify(obj)",
+      "unit": "6.5 Save and Load",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
     {
-      "id": "2-5-9-reading-json-parse",
-      "title": "2.5.9 Reading — shplay docs: JSON.parse(str)",
-      "unit": "2.5 Game Saves",
-      "preview": "reading",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 16
-    },
-    {
-      "id": "2-6-1-slides",
-      "title": "2.6.1 Slides — One Game, Many Screens",
-      "unit": "2.6 Game States",
+      "id": "6-6-1-slides",
+      "title": "6.6.1 Slides — One Game, Many Screens",
+      "unit": "6.6 Game State Machines",
       "preview": "slides",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-10-video-title-screen",
-      "title": "2.6.10 Video — Building a Title Screen",
-      "unit": "2.6 Game States",
+      "id": "6-6-10-video-title-screen",
+      "title": "6.6.10 Video — Building a Title Screen",
+      "unit": "6.6 Game State Machines",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-11-example-title-start-button",
-      "title": "2.6.11 Worked Example — Title Screen with Start Button",
-      "unit": "2.6 Game States",
+      "id": "6-6-11-example-title-start-button",
+      "title": "6.6.11 Worked Example — Title Screen with Start Button",
+      "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-12-video-gameover-restart",
-      "title": "2.6.12 Video — Game Over and Restart",
-      "unit": "2.6 Game States",
+      "id": "6-6-12-video-gameover-restart",
+      "title": "6.6.12 Video — Game Over and Restart",
+      "unit": "6.6 Game State Machines",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-13-example-three-state-machine",
-      "title": "2.6.13 Worked Example — Three-State Machine: Title, Play, Game Over",
-      "unit": "2.6 Game States",
+      "id": "6-6-13-example-three-state-machine",
+      "title": "6.6.13 Worked Example — Three-State Machine: Title, Play, Game Over",
+      "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-14-reading-transitions-input",
-      "title": "2.6.14 Reading — shplay docs: Input-Driven Transitions",
-      "unit": "2.6 Game States",
+      "id": "6-6-14-reading-transitions-input",
+      "title": "6.6.14 Reading — shplay docs: Input-Driven Transitions",
+      "unit": "6.6 Game State Machines",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-15-example-keyboard-transitions",
-      "title": "2.6.15 Worked Example — Keyboard-Driven State Changes",
-      "unit": "2.6 Game States",
+      "id": "6-6-15-example-keyboard-transitions",
+      "title": "6.6.15 Worked Example — Keyboard-Driven State Changes",
+      "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-16-reading-transitions-condition",
-      "title": "2.6.16 Reading — shplay docs: Condition-Driven Transitions",
-      "unit": "2.6 Game States",
+      "id": "6-6-16-reading-transitions-condition",
+      "title": "6.6.16 Reading — shplay docs: Condition-Driven Transitions",
+      "unit": "6.6 Game State Machines",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-17-example-score-threshold",
-      "title": "2.6.17 Worked Example — Score Threshold Triggers Game Over",
-      "unit": "2.6 Game States",
+      "id": "6-6-17-example-score-threshold",
+      "title": "6.6.17 Worked Example — Score Threshold Triggers Game Over",
+      "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-18-video-extended-states",
-      "title": "2.6.18 Video — More States: Pause, Inventory, Settings",
-      "unit": "2.6 Game States",
+      "id": "6-6-18-video-extended-states",
+      "title": "6.6.18 Video — More States: Pause, Inventory, Settings",
+      "unit": "6.6 Game State Machines",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-19-example-pause-state",
-      "title": "2.6.19 Worked Example — Adding a Pause State",
-      "unit": "2.6 Game States",
+      "id": "6-6-19-example-pause-state",
+      "title": "6.6.19 Worked Example — Adding a Pause State",
+      "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-2-video-state-machines",
-      "title": "2.6.2 Video — State Machines in Games",
-      "unit": "2.6 Game States",
+      "id": "6-6-2-video-state-machines",
+      "title": "6.6.2 Video — State Machines in Games",
+      "unit": "6.6 Game State Machines",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-20-example-win-screen",
-      "title": "2.6.20 Worked Example — Win Screen State",
-      "unit": "2.6 Game States",
+      "id": "6-6-20-example-win-screen",
+      "title": "6.6.20 Worked Example — Win Screen State",
+      "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-21-video-states-decide-saves",
-      "title": "2.6.21 Video — States Decide When to Save",
-      "unit": "2.6 Game States",
+      "id": "6-6-21-video-states-decide-saves",
+      "title": "6.6.21 Video — States Decide When to Save",
+      "unit": "6.6 Game State Machines",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-22-example-save-on-transition",
-      "title": "2.6.22 Worked Example — Save on State Transition",
-      "unit": "2.6 Game States",
+      "id": "6-6-22-example-save-on-transition",
+      "title": "6.6.22 Worked Example — Save on State Transition",
+      "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-23-example-continue-right-state",
-      "title": "2.6.23 Worked Example — Continue Loads the Correct State",
-      "unit": "2.6 Game States",
+      "id": "6-6-23-example-continue-right-state",
+      "title": "6.6.23 Worked Example — Continue Loads the Correct State",
+      "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-24-a16-2-game-states",
-      "title": "2.6.24 A16.2 Game States — State Machine with Persistence",
-      "unit": "2.6 Game States",
+      "id": "6-6-24-a16-2-game-states",
+      "title": "6.6.24 A16.2 Game States — State Machine with Persistence",
+      "unit": "6.6 Game State Machines",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-25-challenges",
-      "title": "2.6.25 Challenges — Extended State Features",
-      "unit": "2.6 Game States",
+      "id": "6-6-25-challenges",
+      "title": "6.6.25 Challenges — Extended State Features",
+      "unit": "6.6 Game State Machines",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-26-video-whats-next",
-      "title": "2.6.26 Video — What's Next: Looking Ahead to Unit 3",
-      "unit": "2.6 Game States",
+      "id": "6-6-26-video-whats-next",
+      "title": "6.6.26 Video — What's Next: Looking Ahead to Unit 3",
+      "unit": "6.6 Game State Machines",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-3-reading-switch-syntax",
-      "title": "2.6.3 Reading — MDN: The switch Statement",
-      "unit": "2.6 Game States",
+      "id": "6-6-3-reading-switch-syntax",
+      "title": "6.6.3 Reading — MDN: The switch Statement",
+      "unit": "6.6 Game State Machines",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-4-reading-switch-dispatch",
-      "title": "2.6.4 Reading — shplay docs: switch in draw()",
-      "unit": "2.6 Game States",
+      "id": "6-6-4-reading-switch-dispatch",
+      "title": "6.6.4 Reading — shplay docs: switch in draw()",
+      "unit": "6.6 Game State Machines",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-5-example-switch-three-cases",
-      "title": "2.6.5 Worked Example — switch with Three Cases",
-      "unit": "2.6 Game States",
+      "id": "6-6-5-example-switch-three-cases",
+      "title": "6.6.5 Worked Example — switch with Three Cases",
+      "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-6-reading-switch-break-default",
-      "title": "2.6.6 Reading — break and default in switch",
-      "unit": "2.6 Game States",
+      "id": "6-6-6-reading-switch-break-default",
+      "title": "6.6.6 Reading — break and default in switch",
+      "unit": "6.6 Game State Machines",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-7-reading-state-variable",
-      "title": "2.6.7 Reading — shplay docs: The state Variable",
-      "unit": "2.6 Game States",
+      "id": "6-6-7-reading-state-variable",
+      "title": "6.6.7 Reading — shplay docs: The state Variable",
+      "unit": "6.6 Game State Machines",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-8-example-one-variable-many-screens",
-      "title": "2.6.8 Worked Example — One Variable, Many Screens",
-      "unit": "2.6 Game States",
+      "id": "6-6-8-example-one-variable-many-screens",
+      "title": "6.6.8 Worked Example — One Variable, Many Screens",
+      "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-6-9-reading-naming-states",
-      "title": "2.6.9 Reading — Naming States: Conventions",
-      "unit": "2.6 Game States",
+      "id": "6-6-9-reading-naming-states",
+      "title": "6.6.9 Reading — Naming States: Conventions",
+      "unit": "6.6 Game State Machines",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-1-slides",
-      "title": "2.7.1 Slides — Advanced Mechanics: One Last Toolkit",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-1-slides",
+      "title": "6.7.1 Slides — Advanced Mechanics: One Last Toolkit",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "slides",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-10-example-drag-sprite",
-      "title": "2.7.10 Worked Example — Drag a Sprite Around",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-10-example-drag-sprite",
+      "title": "6.7.10 Worked Example — Drag a Sprite Around",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-11-video-joints-intro",
-      "title": "2.7.11 Video — Joints in shplay",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-11-video-joints-intro",
+      "title": "6.7.11 Video — Joints in shplay",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-12-reading-distance-joint",
-      "title": "2.7.12 Reading — shplay docs: DistanceJoint",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-12-reading-distance-joint",
+      "title": "6.7.12 Reading — shplay docs: DistanceJoint",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-13-example-distance-pendulum",
-      "title": "2.7.13 Worked Example — Pendulum with DistanceJoint",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-13-example-distance-pendulum",
+      "title": "6.7.13 Worked Example — Pendulum with DistanceJoint",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-14-reading-hinge-joint",
-      "title": "2.7.14 Reading — shplay docs: HingeJoint",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-14-reading-hinge-joint",
+      "title": "6.7.14 Reading — shplay docs: HingeJoint",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-15-example-hinge-arm",
-      "title": "2.7.15 Worked Example — Rotating Arm with HingeJoint",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-15-example-hinge-arm",
+      "title": "6.7.15 Worked Example — Rotating Arm with HingeJoint",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-16-reading-joint-delete",
-      "title": "2.7.16 Reading — shplay docs: joint.delete()",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-16-reading-joint-delete",
+      "title": "6.7.16 Reading — shplay docs: joint.delete()",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-17-reading-applyforce",
-      "title": "2.7.17 Reading — shplay docs: applyForce(fx, fy)",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-17-reading-applyforce",
+      "title": "6.7.17 Reading — shplay docs: applyForce(fx, fy)",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-18-reading-vector-ab",
-      "title": "2.7.18 Reading — Vector from A to B",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-18-reading-vector-ab",
+      "title": "6.7.18 Reading — Vector from A to B",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-19-example-launch-force",
-      "title": "2.7.19 Worked Example — Launch a Sprite with applyForce",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-19-example-launch-force",
+      "title": "6.7.19 Worked Example — Launch a Sprite with applyForce",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-2-video-intro",
-      "title": "2.7.2 Video — Why Mechanics Matter for the Capstone",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-2-video-intro",
+      "title": "6.7.2 Video — Why Mechanics Matter for the Capstone",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-20-video-slingshot",
-      "title": "2.7.20 Video — The Slingshot Pattern",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-20-video-slingshot",
+      "title": "6.7.20 Video — The Slingshot Pattern",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-21-example-slingshot",
-      "title": "2.7.21 Worked Example — Slingshot End-to-End",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-21-example-slingshot",
+      "title": "6.7.21 Worked Example — Slingshot End-to-End",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-22-video-two-player",
-      "title": "2.7.22 Video — Two-Player Local Input",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-22-video-two-player",
+      "title": "6.7.22 Video — Two-Player Local Input",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-23-reading-two-schemes",
-      "title": "2.7.23 Reading — Two Key Schemes, Independent State",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-23-reading-two-schemes",
+      "title": "6.7.23 Reading — Two Key Schemes, Independent State",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-24-reading-bounciness",
-      "title": "2.7.24 Reading — shplay docs: sprite.bounciness",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-24-reading-bounciness",
+      "title": "6.7.24 Reading — shplay docs: sprite.bounciness",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-24a-example-bounciness-compare",
-      "title": "2.7.24a Worked Example — Bounciness Comparison",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-25-example-bounciness-compare",
+      "title": "6.7.25 Worked Example — Bounciness Comparison",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-25-example-two-paddles",
-      "title": "2.7.25 Worked Example — Two Paddles, Two Schemes",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-26-example-two-paddles",
+      "title": "6.7.26 Worked Example — Two Paddles, Two Schemes",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-26-a17-1-pong-sumo",
-      "title": "2.7.26 A17.1 Two-Player Pong-Sumo",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-27-a17-1-pong-sumo",
+      "title": "6.7.27 A17.1 Two-Player Pong-Sumo",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-27-challenges",
-      "title": "2.7.27 Challenges — SliderJoint, Trebuchet, Swinging Rope",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-28-challenges",
+      "title": "6.7.28 Challenges — SliderJoint, Trebuchet, Swinging Rope",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-28-video-wrap",
-      "title": "2.7.28 Video — Wrap and Capstone Preview",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-29-video-wrap",
+      "title": "6.7.29 Video — Wrap and Capstone Preview",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-3-reading-mouse-pos",
-      "title": "2.7.3 Reading — shplay docs: mouse.x and mouse.y",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-3-reading-mouse-pos",
+      "title": "6.7.3 Reading — shplay docs: mouse.x and mouse.y",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-4-reading-mouse-pressing",
-      "title": "2.7.4 Reading — shplay docs: mouse.pressing()",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-4-reading-mouse-pressing",
+      "title": "6.7.4 Reading — shplay docs: mouse.pressing()",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-5-reading-mouse-presses",
-      "title": "2.7.5 Reading — shplay docs: mouse.presses()",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-5-reading-mouse-presses",
+      "title": "6.7.5 Reading — shplay docs: mouse.presses()",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-6-reading-mouse-hittest",
-      "title": "2.7.6 Reading — Hit-Testing a Sprite with the Mouse",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-6-reading-mouse-hittest",
+      "title": "6.7.6 Reading — Hit-Testing a Sprite with the Mouse",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-7-example-click-spawn",
-      "title": "2.7.7 Worked Example — Click to Spawn a Sprite",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-7-example-click-spawn",
+      "title": "6.7.7 Worked Example — Click to Spawn a Sprite",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-8-video-drag-release",
-      "title": "2.7.8 Video — Drag and Release",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-8-video-drag-release",
+      "title": "6.7.8 Video — Drag and Release",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
-      "id": "2-7-9-reading-snap-zero-vel",
-      "title": "2.7.9 Reading — Snap a Sprite to the Cursor",
-      "unit": "2.7 Advanced Mechanics",
+      "id": "6-7-9-reading-snap-zero-vel",
+      "title": "6.7.9 Reading — Snap a Sprite to the Cursor",
+      "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
-    },
-    {
-      "id": "arrays",
-      "title": "1.3.2 Arrays",
-      "unit": "1.3 Functions and Data",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 8
     },
     {
       "id": "basic-html",
@@ -2025,52 +2129,12 @@
       "week": null
     },
     {
-      "id": "functions",
-      "title": "1.3.1 Functions",
-      "unit": "1.3 Functions and Data",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 7
-    },
-    {
       "id": "html-intro",
       "title": "HTML Intro",
       "unit": null,
       "preview": null,
       "category": null,
       "week": null
-    },
-    {
-      "id": "jscad-2d-shapes",
-      "title": "2.1.2 2D Shapes and Transforms",
-      "unit": "2.1 JSCAD Foundations",
-      "preview": "jscad",
-      "category": "Unit 2: JSCAD — 2D to 3D",
-      "week": 11
-    },
-    {
-      "id": "jscad-booleans",
-      "title": "2.1.3 Boolean Operations",
-      "unit": "2.1 JSCAD Foundations",
-      "preview": "jscad",
-      "category": "Unit 2: JSCAD — 2D to 3D",
-      "week": 12
-    },
-    {
-      "id": "jscad-intro",
-      "title": "2.1.1 Libraries and JSCAD Introduction",
-      "unit": "2.1 JSCAD Foundations",
-      "preview": "jscad",
-      "category": "Unit 2: JSCAD — 2D to 3D",
-      "week": 10
-    },
-    {
-      "id": "print-job-manager",
-      "title": "1.4.2 Print Job Manager (Mini-Project)",
-      "unit": "1.4 Synthesis",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 9
     },
     {
       "id": "q5play-bounce",
@@ -2082,40 +2146,16 @@
     },
     {
       "id": "q5play-gravity",
-      "title": "5.1.3 Falling Block — Example",
-      "unit": "5.1 Sprites & Movement",
+      "title": "5.1.22 Falling Block — Example",
+      "unit": "5.1 Hello Sprite and Movement",
       "preview": "shplay",
       "category": "Unit 5: shplay — Game Physics",
       "week": 13
     },
     {
-      "id": "q5play-intro",
-      "title": "2.1.5 Hello Sprite",
-      "unit": "2.1 Foundations",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
-    },
-    {
-      "id": "q5play-move-keys",
-      "title": "2.1.9 Make it Move",
-      "unit": "2.1 Foundations",
-      "preview": "shplay",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 10
-    },
-    {
-      "id": "q5play-sprite-showcase",
-      "title": "2.2.6a Worked Example — Sprite Showcase",
-      "unit": "2.2 Object-Oriented Programming",
-      "preview": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
-      "week": 12
-    },
-    {
       "id": "sdlc-overview",
       "title": "1.1.1c What Is Programming / Software Lifecycle",
-      "unit": "1.1 Foundations",
+      "unit": "1 Foundations",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 1

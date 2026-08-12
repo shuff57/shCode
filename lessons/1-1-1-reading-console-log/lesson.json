@@ -6,12 +6,18 @@
   "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "1.1 Foundations",
+  "unit": "1 Foundations",
   "preview": "reading",
   "week": 1,
-  "slos": ["SLO-4"],
+  "slos": [
+    "SLO-4"
+  ],
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],
-  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
 }

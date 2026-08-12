@@ -1,0 +1,23 @@
+{
+  "id": "6-5-12-example-save-player-state",
+  "title": "6.5.12 Worked Example — Save Full Player State",
+  "description": "Build a game with a moving player, score, and level. Save everything as one JSON object with storeItem.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.5 Save and Load",
+  "preview": "example",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

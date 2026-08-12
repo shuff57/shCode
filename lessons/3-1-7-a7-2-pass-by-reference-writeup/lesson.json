@@ -1,0 +1,56 @@
+{
+  "id": "3-1-7-a7-2-pass-by-reference-writeup",
+  "title": "3.1.7 Pass by Value vs Reference",
+  "description": "Explain pass by value and pass by reference in your own words, give one example of each, and describe a bug that could happen if you forget the difference.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 20,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.1 Functions: Definition and Calls",
+  "preview": "assignment",
+  "week": 7,
+  "slos": [
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Pass by Value vs Reference — AI-graded rubric",
+    "model": "qwen3-coder-next:cloud",
+    "contextDocs": [],
+    "prompt": "Explain, in your own words, the difference between pass by value and pass by reference in JavaScript.\n\n1. What does 'pass by value' mean, and which kinds of values does JavaScript pass this way?\n2. What does 'pass by reference' mean, and which kinds of values does JavaScript pass this way?\n3. Give one short example of each (you can describe code in words).\n4. Why does this matter? Describe one bug that could happen if a programmer forgets the difference.",
+    "rubric": [
+      {
+        "id": "value-defined",
+        "title": "Pass by value explained correctly",
+        "description": "Explains pass-by-value: the function gets a copy; changes inside don't affect the original. Correctly says primitives (number/string/boolean) are passed by value.",
+        "points": 0
+      },
+      {
+        "id": "reference-defined",
+        "title": "Pass by reference explained correctly",
+        "description": "Explains pass-by-reference: the function shares the same object/array; changes inside DO affect the original. Correctly says objects/arrays are passed by reference.",
+        "points": 0
+      },
+      {
+        "id": "example-each",
+        "title": "One example of each",
+        "description": "Gives a plausible example of each (e.g., changing a number param has no outside effect; pushing to an array param does).",
+        "points": 0
+      },
+      {
+        "id": "why-it-matters",
+        "title": "Describes a real consequence",
+        "description": "Describes a real consequence: an unintended-mutation bug, or why you'd copy before changing.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

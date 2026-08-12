@@ -1,0 +1,25 @@
+{
+  "id": "6-4-4-reading-add-ani",
+  "title": "6.4.4 Reading — addAni(name, frames)",
+  "description": "How sprite.addAni(name, frame1, ...) registers a named animation and makes it the active default. Read before 2.4.3b (changeAni).",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 6,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.4 Animated Sprites and Camera",
+  "preview": "reading",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "externalLink": "/docs/shplay",
+  "externalLinkLabel": "Open the in-app shplay docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

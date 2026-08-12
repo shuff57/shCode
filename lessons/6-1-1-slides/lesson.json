@@ -1,0 +1,25 @@
+{
+  "id": "6-1-1-slides",
+  "title": "6.1.1 Slides — Groups and Overlaps",
+  "description": "Unit 2.3 slides — Groups, overlap detection, safe despawn, edge-triggered input, and ground-gated jumping. Includes runnable code examples.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 25,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.1 Groups and Overlaps",
+  "preview": "slides",
+  "week": 13,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "slidesUrl": "/slides/2.3/index.html",
+  "slidesDevUrl": "http://localhost:3032",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

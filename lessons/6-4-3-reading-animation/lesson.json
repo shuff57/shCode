@@ -1,0 +1,25 @@
+{
+  "id": "6-4-3-reading-animation",
+  "title": "6.4.3 Reading — shplay docs: Animation",
+  "description": "shplay docs chapter on Animation. Read before `2.4.5 Animated Sprites Sandbox`.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.4 Animated Sprites and Camera",
+  "preview": "reading",
+  "week": 15,
+  "slos": [
+    "SLO-3"
+  ],
+  "externalLink": "/docs/shplay/animation",
+  "externalLinkLabel": "Open the in-app shplay Animation docs",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

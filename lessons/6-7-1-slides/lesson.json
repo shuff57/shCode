@@ -1,0 +1,24 @@
+{
+  "id": "6-7-1-slides",
+  "title": "6.7.1 Slides — Advanced Mechanics: One Last Toolkit",
+  "description": "Unit 2.7 opening slides — the three big ideas before capstone: mouse input, joints, and the slingshot pattern. Everything in this unit feeds directly into A17.1 and your capstone design.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 25,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "6.7 Advanced Input and Joints",
+  "preview": "slides",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "slidesUrl": "/slides/2.7/",
+  "slidesDevUrl": "http://localhost:3034",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

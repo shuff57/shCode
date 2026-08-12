@@ -191,19 +191,13 @@ about 3 days per week — at the top of the range, with no slack. The earlier "~
 figure was mostly an artifact of forced section pairing; 1:1 mapping plus honest day-sizing
 absorbs most of it. Re-total once real `days:` values replace the estimates.
 
-### Q2 is grandfathered, not conformant
+### The Q.U scheme above is retired — full book-native renumber (operator, 2026-08-12)
 
-Q2 put the 1:1 at the **unit** level instead — unit 2.4 ≈ book §6.4, with a single
-`2.4.1` sub-module beneath it. Different shape, same intent. Do **not** renumber Q2 to
-match: its 175 lesson folders are `lesson.json.id`, and student commits hang off them.
-New quarters follow the Q1 rule; Q2 stays as built.
-
-### Q1's own Unit/Module/Submodule scheme is retired for anything not yet built (operator, 2026-08-12)
-
-The `Q.U` unit id above (e.g. `1.1`, `1.2`) prefixes a quarter digit that doesn't exist
-in the book. Going forward, new units drop it and use the book's own chapter/section
-numbering directly — the same three-part shape the book already uses internally for
-definitions and examples (`### Definition 1.2.1`, see §5):
+The `Q.U` unit id used throughout this file (e.g. `1.1`, `1.2`, `2.4`) prefixes a
+quarter digit that doesn't exist in the book. It has been replaced everywhere,
+**including already-built content**, by the book's own chapter/section numbering —
+the same three-part shape the book already uses internally for definitions and
+examples (`### Definition 1.2.1`, see §5):
 
 ```
 Unit N            = book Chapter N
@@ -211,13 +205,39 @@ Module N.S         = book Chapter N, Section S
 Submodule N.S.K     = book Chapter N, Section S, subsection/item K
 ```
 
-**Units 1.1 (Foundations) and 1.2 (Control Flow) are grandfathered as built** — both
-have live lesson folders with real student progress in D1 (`lesson_state`, `commits`).
-Do not renumber them to match; the "sub-module `1.1.S`" ids in the table above stay as
-they are for those two units, same reasoning as the Q2 exception. Chapter 3 onward
-(whatever unit is built next) uses the new Unit N / Module N.S / Submodule N.S.K
-scheme — its exact ids get finalized when that unit's specs are actually written, not
-pre-assigned here.
+Every table above (§3, §4) describing `1.1`–`1.4` and `2.1`–`2.8` as *unit* ids is
+**historical** — it documents the mapping as planned before the renumber, not the ids
+on disk today. The actual result:
+
+| Old id (this file's tables) | New id | What it is |
+|---|---|---|
+| Unit 1.1 Foundations, sub-module 1.1.1 | Module 1.1 | book Ch.1 §1.1 (ids happened to already match — no rename needed) |
+| Unit 1.1, sub-modules 1.1.2 / 1.1.3 (carry-over content) | Module 1.2 / 1.3 | book Ch.1 §1.2 Variables, §1.3 Documentation |
+| Unit 1.2 Control Flow | Unit 2, modules 2.1 / 2.2 / 2.3 | book Ch.2 §2.1 Conditionals, §2.2 Algorithms/Loops, §2.3 Switch |
+| Unit 1.3 Functions and Data | Unit 3, modules 3.1 / 3.2 | book Ch.3 §3.1 Functions, §3.2 Arrays |
+| Unit 1.4 Synthesis | Unit 4, module 4.1 | book Ch.4 §4.1 Print Shop |
+| Unit 2.1 shPlay Foundations, 2.2 OOP | Unit 5, modules 5.1 / 5.3 | book Ch.5 §5.1 Hello Sprite, §5.3 Classes/Objects (§5.2 Physics Feel not built) |
+| Unit 2.3 Collections and Physics Applications | Unit 6, modules 6.1 / 6.3 | book Ch.6 §6.1+6.2 Groups/Overlaps combined, §6.3 Physics Applications |
+| Unit 2.4–2.7 | Unit 6, modules 6.4–6.7 | book Ch.6 §6.4–§6.8 (6.7 combines §6.7 Advanced Input + §6.8 Joints, per this doc's own combined-spec rule) |
+| Unit 2.8 (not built) | Unit 7, module 7.1 | book Ch.7 §7.1 Arcade Cabinet |
+
+176 shplay lesson folders and their D1 rows (`lesson_state`, `commits` — 35 real
+students, 3,858 rows) were renumbered and repointed in this pass; so were the smaller
+1.1–1.4 carry-overs. **This reverses the "Q2 is grandfathered" rule that used to be
+here** — that rule stood until 2026-08-12, when it was explicitly overridden because
+leaving two incompatible numbering schemes permanently in the same app was judged
+worse than a one-time repoint.
+
+One built-content wrinkle worth knowing: switch statements are taught directly after
+conditionals (module 2.1) in the actual lesson sequence, not after algorithms/loops
+(module 2.2) — module *numbers* follow the book's section order (2.1, 2.2, 2.3), but
+the taught *order* was kept as originally built rather than reshuffled to match.
+
+**Not yet done:** the `.md` sub-module spec files' prose (`curriculum/modules/*.md`)
+was updated enough to be accurate at the frontmatter/summary level (ids, titles,
+category) so every `/module/X.Y` route resolves, but was not rewritten section-by-
+section against the book for full pedagogical accuracy — several files carry a
+"flagged for a follow-up pass" note. Treat that prose as provisional.
 
 **Note the coarse table in `book_manifest.yaml` is wrong for Q1.** It reads
 `1.1 Foundations ← chapters 1,2,3` and `Q1-synth ← chapter 4`. Q1 is actually four units
