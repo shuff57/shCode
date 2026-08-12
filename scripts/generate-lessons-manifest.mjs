@@ -12,11 +12,21 @@ const lessonsDir = path.join(root, 'lessons');
 const outPath = path.join(root, 'public', 'lessons-manifest.json');
 
 const entries = await fs.readdir(lessonsDir, { withFileTypes: true });
-const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
+const dirs = entries
+  .filter((e) => e.isDirectory())
+  .map((e) => e.name);
 
-const lessons = await Promise.all(
+const results = await Promise.all(
   dirs.map(async (id) => {
-    const raw = await fs.readFile(path.join(lessonsDir, id, 'lesson.json'), 'utf8');
+    // A folder with no lesson.json directly inside it (e.g. lessons/_retired/,
+    // which nests retired lesson folders one level deeper) isn't a lesson —
+    // skip it rather than error, same as readIfExists() in lib/curriculum.ts.
+    let raw;
+    try {
+      raw = await fs.readFile(path.join(lessonsDir, id, 'lesson.json'), 'utf8');
+    } catch {
+      return null;
+    }
     const meta = JSON.parse(raw);
     return {
       id: meta.id ?? id,
@@ -30,6 +40,8 @@ const lessons = await Promise.all(
     };
   }),
 );
+
+const lessons = results.filter((l) => l !== null);
 
 // Sort by id for stable output.
 lessons.sort((a, b) => a.id.localeCompare(b.id));

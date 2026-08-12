@@ -1,0 +1,16 @@
+{
+  "id": "1-1-1-slides",
+  "title": "1.1.1 Slides — Foundations",
+  "description": "Unit 1.1 slides — software lifecycle, umbrella activities, task sets, SDLC methodologies, and the four Ps. Placeholder until the deck is built from the book.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.1 Foundations",
+  "preview": "slides",
+  "slidesUrl": "/slides/1.1/",
+  "slos": ["SLO-1"],
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,6 +1,6 @@
 {
   "id": "sdlc-overview",
-  "title": "1.1.1 What Is Programming / Software Lifecycle",
+  "title": "1.1.1c What Is Programming / Software Lifecycle",
   "description": "Learn what a program is, explore the SDLC, and write your first JavaScript using console.log().",
   "type": "assignment",
   "difficulty": "beginner",

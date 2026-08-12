@@ -1,6 +1,6 @@
 {
-  "id": "variables-and-types",
-  "title": "1.1.2 Variables and Types",
+  "id": "1-1-32-lab-variables-types-check",
+  "title": "1.1.32 Variables and Types Check",
   "description": "Understand how to store and work with data using let, const, and typeof.",
   "type": "assignment",
   "difficulty": "beginner",
@@ -8,7 +8,6 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.1 Foundations",
   "preview": "console",
-  "week": 2,
   "slos": ["SLO-2", "SLO-3"],
   "steps": [
     {
@@ -32,7 +31,7 @@
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+age\\s*=",
       "flags": "i",
-      "points": 10
+      "points": 0
     },
     {
       "id": "req2",
@@ -42,7 +41,7 @@
       "file": "script.js",
       "pattern": "(?:let|const|var)\\s+name\\s*=",
       "flags": "i",
-      "points": 10
+      "points": 0
     },
     {
       "id": "req3",
@@ -52,7 +51,7 @@
       "file": "script.js",
       "pattern": "typeof\\s+",
       "flags": "i",
-      "points": 5
+      "points": 0
     },
     {
       "id": "req4",
@@ -62,12 +61,12 @@
       "file": "script.js",
       "pattern": "console\\.log\\(",
       "flags": "i",
-      "points": 5
+      "points": 0
     }
   ],
   "grading": {
-    "totalPoints": 30,
-    "passingScore": 20,
+    "totalPoints": 0,
+    "passingScore": 0,
     "allowLateSubmit": true,
     "reviewCommitHistory": true
   }

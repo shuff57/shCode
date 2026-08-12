@@ -1,6 +1,6 @@
 {
-  "id": "operators-expressions",
-  "title": "1.1.2b Operators and Expressions",
+  "id": "1-1-33-lab-operators-check",
+  "title": "1.1.33 Operators and Expressions Check",
   "description": "Practice arithmetic, string concatenation, and comparison operators.",
   "type": "assignment",
   "difficulty": "beginner",
@@ -8,7 +8,6 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.1 Foundations",
   "preview": "console",
-  "week": 2,
   "slos": ["SLO-2", "SLO-3"],
   "steps": [
     { "id": "s1", "title": "Arithmetic operators" },
@@ -24,7 +23,7 @@
       "file": "script.js",
       "pattern": "\\w+\\s*\\+\\s*\\w+",
       "flags": "i",
-      "points": 5
+      "points": 0
     },
     {
       "id": "req2",
@@ -34,7 +33,7 @@
       "file": "script.js",
       "pattern": "\\w+\\s*\\*\\s*\\w+",
       "flags": "i",
-      "points": 5
+      "points": 0
     },
     {
       "id": "req3",
@@ -44,7 +43,7 @@
       "file": "script.js",
       "pattern": "[\"'].*[\"']\\s*\\+\\s*",
       "flags": "i",
-      "points": 5
+      "points": 0
     },
     {
       "id": "req4",
@@ -54,7 +53,7 @@
       "file": "script.js",
       "pattern": "[=!<>]=",
       "flags": "i",
-      "points": 5
+      "points": 0
     },
     {
       "id": "req5",
@@ -64,12 +63,12 @@
       "file": "script.js",
       "pattern": "console\\.log\\(",
       "flags": "i",
-      "points": 5
+      "points": 0
     }
   ],
   "grading": {
-    "totalPoints": 25,
-    "passingScore": 15,
+    "totalPoints": 0,
+    "passingScore": 0,
     "allowLateSubmit": true,
     "reviewCommitHistory": true
   }

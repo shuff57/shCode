@@ -17,6 +17,14 @@
       "week": 1
     },
     {
+      "id": "1-1-1-slides",
+      "title": "1.1.1 Slides — Foundations",
+      "unit": "1.1 Foundations",
+      "preview": "slides",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "1-1-10-reading-task-sets",
       "title": "1.1.10 Reading — Task Sets",
       "unit": "1.1 Foundations",
@@ -97,38 +105,6 @@
       "week": null
     },
     {
-      "id": "1-1-2-reading-data-types",
-      "title": "1.1.2d Reading — Data Types & typeof",
-      "unit": "1.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 2
-    },
-    {
-      "id": "1-1-2-reading-strings",
-      "title": "1.1.2f Reading — Strings & Template Literals",
-      "unit": "1.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 2
-    },
-    {
-      "id": "1-1-2-reading-type-coercion",
-      "title": "1.1.2e Reading — Operators & Type Coercion",
-      "unit": "1.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 2
-    },
-    {
-      "id": "1-1-2-reading-variables",
-      "title": "1.1.2c Reading — Variables: let & const",
-      "unit": "1.1 Foundations",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 2
-    },
-    {
       "id": "1-1-2-video-sdlc",
       "title": "1.1.2 Video — What is the SDLC?",
       "unit": "1.1 Foundations",
@@ -137,12 +113,20 @@
       "week": null
     },
     {
-      "id": "1-1-3-a3-2-why-documentation",
-      "title": "1.1.3b Why Documentation Matters",
+      "id": "1-1-20-reading-let-const",
+      "title": "1.1.20 Reading — Declaring Variables with let and const",
       "unit": "1.1 Foundations",
-      "preview": "assignment",
+      "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 3
+      "week": null
+    },
+    {
+      "id": "1-1-24-reading-string-methods",
+      "title": "1.1.24 Reading — String Methods in Practice",
+      "unit": "1.1 Foundations",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
     },
     {
       "id": "1-1-3-a3-3-unit-quiz",
@@ -161,26 +145,66 @@
       "week": null
     },
     {
-      "id": "1-1-3-reading-comments",
-      "title": "1.1.3 Reading — Comments: // and /* */",
+      "id": "1-1-31-reading-operators-coercion",
+      "title": "1.1.31 Reading — Arithmetic Operators and Type Coercion",
       "unit": "1.1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 3
+      "week": null
     },
     {
-      "id": "1-1-3-reading-naming-style",
-      "title": "1.1.3a Reading — Naming & Style: camelCase + indentation",
+      "id": "1-1-32-lab-variables-types-check",
+      "title": "1.1.32 Variables and Types Check",
+      "unit": "1.1 Foundations",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-1-33-lab-operators-check",
+      "title": "1.1.33 Operators and Expressions Check",
+      "unit": "1.1 Foundations",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-1-35-reading-camelcase",
+      "title": "1.1.35 Reading — camelCase Naming Style",
       "unit": "1.1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 3
+      "week": null
+    },
+    {
+      "id": "1-1-39-reading-code-layout",
+      "title": "1.1.39 Reading — Code Layout",
+      "unit": "1.1 Foundations",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
     },
     {
       "id": "1-1-4-reading-four-phases",
       "title": "1.1.4 Reading — The Four Phases",
       "unit": "1.1 Foundations",
       "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-1-40-reading-comments",
+      "title": "1.1.40 Reading — Comments: // and /* */",
+      "unit": "1.1 Foundations",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-1-41-why-documentation",
+      "title": "1.1.41 Why Documentation Matters",
+      "unit": "1.1 Foundations",
+      "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -2041,14 +2065,6 @@
       "week": 10
     },
     {
-      "id": "operators-expressions",
-      "title": "1.1.2b Operators and Expressions",
-      "unit": "1.1 Foundations",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 2
-    },
-    {
       "id": "print-job-manager",
       "title": "1.4.2 Print Job Manager (Mini-Project)",
       "unit": "1.4 Synthesis",
@@ -2098,19 +2114,11 @@
     },
     {
       "id": "sdlc-overview",
-      "title": "1.1.1 What Is Programming / Software Lifecycle",
+      "title": "1.1.1c What Is Programming / Software Lifecycle",
       "unit": "1.1 Foundations",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 1
-    },
-    {
-      "id": "variables-and-types",
-      "title": "1.1.2 Variables and Types",
-      "unit": "1.1 Foundations",
-      "preview": "console",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 2
     }
   ]
 }
