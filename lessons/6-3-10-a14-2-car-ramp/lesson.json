@@ -1,7 +1,7 @@
 {
-  "id": "6-3-10-a14-1-car-ramp",
-  "title": "6.3.10 A14.1 Car on a Ramp",
-  "description": "Build a two-wheeled car using WheelJoints and drive it up a ramp with WASD. The harder of the two A14.1 options.",
+  "id": "6-3-10-a14-2-car-ramp",
+  "title": "6.3.10 A14.2 Car on a Ramp",
+  "description": "Build a two-wheeled car using WheelJoints and drive it up a ramp with WASD. The harder of the two A14 options.",
   "type": "assignment",
   "difficulty": "intermediate",
   "estimateMins": 45,
