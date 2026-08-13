@@ -30,9 +30,9 @@ function lessonsForModule(lessons: Lesson[], moduleId: string, category?: string
       return !!nid && (nid === moduleId || nid.startsWith(moduleId + '.'));
     })
     .sort((a, b) => {
-      const w = (a.week ?? 99) - (b.week ?? 99);
-      if (w !== 0) return w;
-      return a.title.localeCompare(b.title, undefined, { numeric: true });
+      const nidA = parseNumberedId(a.title) ?? '';
+      const nidB = parseNumberedId(b.title) ?? '';
+      return nidA.localeCompare(nidB, undefined, { numeric: true });
     });
 }
 
