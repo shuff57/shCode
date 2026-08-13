@@ -1,19 +1,17 @@
 {
   "id": "6-4-1-slides",
   "title": "6.4.1 Slides — Animation & Camera",
-  "description": "Unit 2.4 slides — animated sprites with `addAni` / `changeAni`, camera follow, smoothing with `lerp`, and `layer` for render order. Includes runnable code examples.",
+  "description": "Animated Sprites and Camera slides — `addAni` / `changeAni`, camera follow, smoothing with `lerp`, and `layer` for render order. Placeholder until the deck is rebuilt from bookSHelf.",
   "type": "lesson",
   "difficulty": "beginner",
-  "estimateMins": 25,
+  "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
   "preview": "slides",
-  "week": 15,
   "slos": [
     "SLO-3"
   ],
-  "slidesUrl": "/slides/2.4/",
-  "slidesDevUrl": "http://localhost:3033",
+  "slidesUrl": "/slides/6.4/",
   "steps": [],
   "requirements": [],
   "grading": {
