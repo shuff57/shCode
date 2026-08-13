@@ -2154,11 +2154,11 @@
     },
     {
       "id": "q5play-gravity",
-      "title": "5.1.22 Falling Block — Example",
+      "title": "5.1.24 Falling Block — Example",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "shplay",
-      "category": "Unit 5: shplay — Game Physics",
-      "week": 13
+      "category": "Unit 2: shplay — Applied Game Development",
+      "week": 10
     }
   ]
 }

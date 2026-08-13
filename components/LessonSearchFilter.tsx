@@ -22,6 +22,18 @@ function parseNumberedId(title: string): string | null {
   return m ? m[1] : null;
 }
 
+// Chapter N = book Chapter N (see curriculum/BOOK-TO-MODULE.md). Short
+// subtitle shown next to each chapter's heading on the home page.
+const CHAPTER_SUBTITLES: Record<string, string> = {
+  '1': 'JavaScript Fundamentals',
+  '2': 'Control Flow',
+  '3': 'Functions and Data',
+  '4': 'Q1 Synthesis',
+  '5': 'shplay — Game Development Foundations',
+  '6': 'shplay — Game Mechanics',
+  '7': 'Q2 Synthesis — Game Capstone',
+};
+
 function lessonsForModule(lessons: Lesson[], moduleId: string, category?: string): Lesson[] {
   return lessons
     .filter((l) => {
@@ -67,14 +79,13 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
 
   const hasMatches = !trimmed || filteredLessons.length > 0;
 
-  // Group modules by top-level id (1.x, 2.x, ...) into Unit sections.
+  // Group modules by top-level id (1.x, 2.x, ...) into Chapter sections.
   const groups = useMemo(() => {
     const map = new Map<string, { label: string; modules: UnitEntry[] }>();
     for (const m of units) {
       const top = m.id.split('.')[0];
       if (!map.has(top)) {
-        const label = m.category?.replace(/^Unit \d+:\s*/, '') ?? '';
-        map.set(top, { label, modules: [] });
+        map.set(top, { label: CHAPTER_SUBTITLES[top] ?? '', modules: [] });
       }
       map.get(top)!.modules.push(m);
     }
@@ -127,10 +138,10 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
             className="bg-card border-border border rounded w-2/3 mx-auto mb-4 overflow-hidden"
           >
             <summary className="flex items-baseline gap-3 p-4 cursor-pointer hover:bg-muted transition list-none">
-              <span className="text-2xl font-bold">Unit {top}</span>
+              <span className="text-2xl font-bold">Chapter {top}</span>
               {group.label && <span className="text-base opacity-80">{group.label}</span>}
               <span className="ml-auto flex items-center gap-4 text-sm opacity-80">
-                <UnitProgressBadge lessonIds={unitLessonIds} label={`Unit ${top}`} />
+                <UnitProgressBadge lessonIds={unitLessonIds} label={`Chapter ${top}`} />
                 <span className="opacity-60">
                   {visibleModules.length} module{visibleModules.length === 1 ? '' : 's'}
                 </span>
