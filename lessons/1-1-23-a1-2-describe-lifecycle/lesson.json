@@ -14,7 +14,7 @@
   "points": 5,
   "contentFile": "content.md",
   "aiGrader": {
-    "rubricTitle": "A1.1 Describe the Lifecycle — AI-graded rubric",
+    "rubricTitle": "Describe the Lifecycle — AI-graded rubric",
     "model": "qwen3-coder-next:cloud",
     "contextDocs": [],
     "prompt": "Describe the four framework activities (inception, elaboration, construction, deployment) in your own words.\n\nThen pick one real software product you use and walk it through all four phases, saying what you think happened in each phase for that product.\n\nIn about one page, your answer should:\n- name and describe all four framework activities\n- name one real product you use\n- give at least one concrete sentence per phase about that product\n- mention at least one umbrella activity by name\n\nWrite in your own words.",
