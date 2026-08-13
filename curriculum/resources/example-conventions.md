@@ -65,7 +65,12 @@ Aim for **under ~80 lines**. The canonical example is 60 lines. A worked example
 
 ### `live` code fences
 
-A fenced block annotated ```` ```js live ```` renders as a runnable shplay sketch inline — its own editor + preview, independent of any other block on the page. Give **every** step block the `live` annotation so each variation of the code can be executed and tweaked in place; skipping `live` forces the student to copy/paste to see the effect, which defeats the point.
+A fenced block annotated ```` ```js live ```` renders inline — its own editor + preview, independent of any other block on the page. Give **every** step block the `live` annotation so each variation of the code can be executed and tweaked in place; skipping `live` forces the student to copy/paste to see the effect, which defeats the point.
+
+**Which runtime depends on the unit — use the flag that matches:**
+
+- **Console-track units (1–4, plain JS, no canvas):** ```` ```js live plain ````. Executes directly and shows a captured Output pane beside the editor, matching the in-app console-lesson layout (e.g. `1.1.4`). Do not use bare `js live` for these — it renders a useless blank shplay canvas.
+- **shplay-track units (5+, canvas/sprite code):** ```` ```js live ```` (no flag) renders a runnable shplay sketch in a canvas iframe. Add `console` only for the rare case where the walkthrough needs a REPL attached to the running sketch (see `5-3-6-example-devtools-reveal`); never combine `console` with `plain`.
 
 Reference-only snippets (pure prose-embedded code the student isn't meant to run — e.g. a one-liner showing a syntax form) can stay as plain ```` ```js ```` if a walkthrough needs them, but the canonical pattern has none.
 
@@ -100,3 +105,4 @@ Examples:
 | This doc | Hoisted out of per-module specs. |
 | Scaffolding pass | 2.1.4 canonical example pruned from 280 → 65 lines: dropped hub header, sibling-resources line, cross-example cheat sheet, and the "## Worked Example N —" labels; dropped unrelated walkthroughs (Keyboard Movement, frameCount) that belong in their own lessons. `description` field dropped from `lesson.json` (rendered as an ugly empty `<p>`; ContentLessonView now conditionally renders it). §1 / §3 / §5 updated to codify the new shape. |
 | Per-step live blocks | Each `## Step` now carries its own ```` ```js live ```` fence (instead of a trailing "combined final" block). Students can run and tweak every step independently. `public/shplay/runner.html` got `overflow: hidden` on html/body so oversized canvases get clipped rather than showing scrollbars inside the iframe. |
+| Plain-mode fix (2026-08-13) | Console-track examples (Units 1–4) were all authored with bare `js live`, rendering a useless blank shplay canvas for plain `console.log` code. Added a `plain` fence flag (`js live plain`) that executes directly and shows a captured Output pane beside the editor instead. Renamed the fence across every Unit 1–4 example content.md. §`live` code fences subsection rewritten to document both runtimes side-by-side. |
