@@ -15,9 +15,9 @@
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Describe the Lifecycle — AI-graded rubric",
-    "model": "qwen3-coder-next:cloud",
+    "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "Describe the four framework activities (inception, elaboration, construction, deployment) in your own words.\n\nThen pick one real software product you use and walk it through all four phases, saying what you think happened in each phase for that product.\n\nIn about one page, your answer should:\n- name and describe all four framework activities\n- name one real product you use\n- give at least one concrete sentence per phase about that product\n- mention at least one umbrella activity by name\n\nWrite in your own words.",
+    "prompt": "Describe the four framework activities (inception, elaboration, construction, deployment) in your own words.\n\nThen pick one real software product you use and walk it through all four phases, saying what you think happened in each phase for that product.\n\nYour answer should:\n- name and describe all four framework activities\n- name one real product you use\n- give at least one concrete sentence per phase about that product\n- mention at least one umbrella activity by name\n\nWrite in your own words.",
     "rubric": [
       {
         "id": "four-phases-named",
@@ -44,9 +44,9 @@
         "points": 1
       },
       {
-        "id": "own-words-roughly-page",
-        "title": "Own words, roughly one page",
-        "description": "The response is written in the student's own words and is roughly one page long (~250-400 words). Deny this criterion only for significant issues: far too short to cover the four phases and a product walkthrough, or writing too disorganized to follow. This is not a prose-quality score.",
+        "id": "own-words",
+        "title": "Own words",
+        "description": "The response is written in the student's own words, not copied from a source. Deny this criterion only for significant issues: text that reads as copied/dictionary-style, or writing too disorganized to follow. Do not deny for length — a short response that clearly covers the four phases and a product walkthrough is fine. This is not a prose-quality score.",
         "points": 1
       }
     ]

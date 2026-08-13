@@ -15,9 +15,9 @@
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Why Documentation Matters — AI-graded rubric",
-    "model": "qwen3-coder-next:cloud",
+    "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "In one paragraph (about 100–150 words), explain why documentation matters in professional software development.\n\nDocumentation means comments in the code and notes like a README that explain what the code does and how to use it.\n\nYour paragraph must include one specific example. You can use any of these:\n- A messy program you had to read and the comments (or missing comments) you wished it had.\n- Your own A3.1 refactor, where you added comments and a README to a messy program.\n- A hypothetical: imagine a teammate (or future-you, six months later) opening this code with no documentation — what goes wrong, and how does documentation prevent it?\n\nWrite in your own words. A generic 'documentation is good because it helps' with no concrete example will not be enough.",
+    "prompt": "In one paragraph, explain why documentation matters in professional software development.\n\nDocumentation means comments in the code and notes like a README that explain what the code does and how to use it.\n\nYour paragraph must include one specific example. You can use any of these:\n- A messy program you had to read and the comments (or missing comments) you wished it had.\n- Your own A3.1 refactor, where you added comments and a README to a messy program.\n- A hypothetical: imagine a teammate (or future-you, six months later) opening this code with no documentation — what goes wrong, and how does documentation prevent it?\n\nWrite in your own words. A generic 'documentation is good because it helps' with no concrete example will not be enough.",
     "rubric": [
       {
         "id": "why-explained",
@@ -32,9 +32,9 @@
         "points": 0
       },
       {
-        "id": "clarity-length",
-        "title": "Clear writing, roughly one paragraph",
-        "description": "The response is a coherent paragraph in roughly the 100–150 word range and is easy to read. Deny this criterion only for significant issues: a single sentence, far over/under length, or writing too disorganized to follow.",
+        "id": "clarity",
+        "title": "Clear writing, one paragraph",
+        "description": "The response is a coherent paragraph and is easy to read. Deny this criterion only for significant issues: a single sentence with no real content, or writing too disorganized to follow. Do not deny for length.",
         "points": 0
       }
     ]

@@ -1,7 +1,7 @@
 {
   "id": "5-1-22-a10-2-frame-loop",
   "title": "5.1.22 Frame Loop Writeup",
-  "description": "Half-page written reflection on setup/draw and the 60fps math. AI-graded with hints.",
+  "description": "Written reflection on setup/draw and the 60fps math. AI-graded with hints.",
   "type": "assignment",
   "difficulty": "beginner",
   "estimateMins": 20,
@@ -16,12 +16,12 @@
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Frame Loop Writeup — AI-graded rubric",
-    "model": "qwen3-coder-next:cloud",
+    "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [
       "overview",
       "sprite"
     ],
-    "prompt": "Answer all three questions in a typed response of approximately 100–200 words (half page).\n\nQuestion 1: In your own words, what is the difference between setup() and draw() in a shplay sketch? When does each one run?\n\nQuestion 2: shplay runs at about 60 frames per second. If you set player.vel.x = 4, how many pixels does the sprite move in one second? Show your math. How far in 5 seconds? If your canvas is 400 pixels wide, approximately how long until the sprite crosses the whole canvas?\n\nQuestion 3: Why do you think the engine gives us vel (velocity) instead of letting us directly set pos.x every frame? Give one reason.",
+    "prompt": "Answer all three questions in a typed response.\n\nQuestion 1: In your own words, what is the difference between setup() and draw() in a shplay sketch? When does each one run?\n\nQuestion 2: shplay runs at about 60 frames per second. If you set player.vel.x = 4, how many pixels does the sprite move in one second? Show your math. How far in 5 seconds? If your canvas is 400 pixels wide, approximately how long until the sprite crosses the whole canvas?\n\nQuestion 3: Why do you think the engine gives us vel (velocity) instead of letting us directly set pos.x every frame? Give one reason.",
     "rubric": [
       {
         "id": "q1-setup-vs-draw",

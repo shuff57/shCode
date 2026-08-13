@@ -1,7 +1,7 @@
 {
   "id": "5-3-32-a12-2-oop-writeup",
   "title": "5.3.32 Procedural vs OOP Writeup",
-  "description": "1-page comparison of procedural and object-oriented programming.",
+  "description": "Comparison of procedural and object-oriented programming.",
   "type": "assignment",
   "difficulty": "beginner",
   "estimateMins": 40,
@@ -16,12 +16,12 @@
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Procedural vs OOP — AI-graded rubric",
-    "model": "qwen3-coder-next:cloud",
+    "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [
       "overview",
       "sprite"
     ],
-    "prompt": "Write a 1-page (300–500 words) comparison of procedural and object-oriented programming. Address all four sections below.\n\nQuestion 1 — Definitions in your own words: What does procedural programming mean? What does object-oriented programming (OOP) mean? Do not copy definitions from the internet — use your own words.\n\nQuestion 2 — A specific Q1 procedural example: Name a specific assignment or program you wrote in Q1 that used a procedural approach. Describe it in 1–2 sentences. Be specific — name the assignment.\n\nQuestion 3 — A specific shplay OOP example: Name a specific place in your shplay code (A12.1 Collectible class, or an earlier class you wrote) where you used OOP. Describe how the class organized your code — what data and behavior did it group together?\n\nQuestion 4 — When OOP wins: Describe one scenario (hypothetical is OK) where OOP is clearly the better choice over procedural code. Explain WHY in terms of at least one of the following: readability, extensibility, or separation of data and behavior.",
+    "prompt": "Write a comparison of procedural and object-oriented programming. Address all four sections below.\n\nQuestion 1 — Definitions in your own words: What does procedural programming mean? What does object-oriented programming (OOP) mean? Do not copy definitions from the internet — use your own words.\n\nQuestion 2 — A specific Q1 procedural example: Name a specific assignment or program you wrote in Q1 that used a procedural approach. Describe it in 1–2 sentences. Be specific — name the assignment.\n\nQuestion 3 — A specific shplay OOP example: Name a specific place in your shplay code (A12.1 Collectible class, or an earlier class you wrote) where you used OOP. Describe how the class organized your code — what data and behavior did it group together?\n\nQuestion 4 — When OOP wins: Describe one scenario (hypothetical is OK) where OOP is clearly the better choice over procedural code. Explain WHY in terms of at least one of the following: readability, extensibility, or separation of data and behavior.",
     "rubric": [
       {
         "id": "q1-definitions",
@@ -50,7 +50,7 @@
       {
         "id": "writing-clarity",
         "title": "Writing clarity",
-        "description": "Response is within the 300–500 word target, clearly organized, and easy to follow. Deduct this point only for significant issues: responses far outside the word count, incoherent structure, or writing that makes it difficult to assess the content.",
+        "description": "Response is clearly organized and easy to follow. Deduct this point only for significant issues: incoherent structure, or writing that makes it difficult to assess the content. Do not deduct for length.",
         "points": 0
       }
     ]

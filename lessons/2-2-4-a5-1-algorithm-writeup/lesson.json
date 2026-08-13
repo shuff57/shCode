@@ -16,7 +16,7 @@
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Algorithm in Plain English — AI-graded rubric",
-    "model": "qwen3-coder-next:cloud",
+    "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
     "prompt": "Part 1 — In your own words, what is an algorithm? (1–2 sentences.)\n\nPart 2 — Write a precise, step-by-step algorithm in plain English (not code) for an everyday task you know well — making a sandwich, tying your shoes, logging into a website, etc. Number the steps. Someone who has never done the task should be able to follow your steps exactly and succeed. Be precise: don't skip steps or assume the reader 'just knows' something.",
     "rubric": [

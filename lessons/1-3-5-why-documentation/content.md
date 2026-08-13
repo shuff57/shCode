@@ -1,4 +1,4 @@
-Write your paragraph in the box below. Roughly 100–150 words, in your own words, with one specific example. Every criterion in the rubric below must be met for the lesson to count as complete.
+Write your paragraph in the box below, in your own words, with one specific example. Every criterion in the rubric below must be met for the lesson to count as complete.
 
 ---
 

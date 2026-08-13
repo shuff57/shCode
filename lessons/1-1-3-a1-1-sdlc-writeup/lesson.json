@@ -16,9 +16,9 @@
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Software Development Life-Cycle — AI-graded rubric",
-    "model": "qwen3-coder-next:cloud",
+    "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "In approximately one page (250–400 words), describe the software development life-cycle (SDLC) in your own words.\n\nPart 1 — Describe the phases. For each of the five phases below, write 1–2 sentences explaining what happens during that phase and why it matters:\n1. Design (Planning & Requirements) — figuring out what to build and how it should work\n2. Development (Coding) — writing the actual code that makes the software work\n3. Testing — checking that the software works correctly and fixing bugs\n4. Deployment — releasing the software so users can access it\n5. Maintenance — updating, fixing, and improving the software after release\n\nPart 2 — Real-world example. Choose one software product you actually use (Instagram, Spotify, Google Maps, Roblox, YouTube, Google Docs, etc.) and walk through how you think it went through each of the five phases. Best-guess reasoning is fine — no research required. Name the product and address all five phases.\n\nUse your own words throughout. Do not copy definitions from the internet.",
+    "prompt": "Describe the software development life-cycle (SDLC) in your own words.\n\nPart 1 — Describe the phases. For each of the five phases below, write 1–2 sentences explaining what happens during that phase and why it matters:\n1. Design (Planning & Requirements) — figuring out what to build and how it should work\n2. Development (Coding) — writing the actual code that makes the software work\n3. Testing — checking that the software works correctly and fixing bugs\n4. Deployment — releasing the software so users can access it\n5. Maintenance — updating, fixing, and improving the software after release\n\nPart 2 — Real-world example. Choose one software product you actually use (Instagram, Spotify, Google Maps, Roblox, YouTube, Google Docs, etc.) and walk through how you think it went through each of the five phases. Best-guess reasoning is fine — no research required. Name the product and address all five phases.\n\nUse your own words throughout. Do not copy definitions from the internet.",
     "rubric": [
       {
         "id": "phases-all-five",
@@ -47,7 +47,7 @@
       {
         "id": "clarity",
         "title": "Response is clear and organized",
-        "description": "The response is within the 250–400 word target, uses headings or numbered structure so phases are identifiable, and is easy to read. Deny this criterion only for significant issues: responses far outside the word count, no discernible structure, or writing that makes it impossible to evaluate the content.",
+        "description": "The response uses headings or numbered structure so phases are identifiable and is easy to read. Deny this criterion only for significant issues: no discernible structure, or writing that makes it impossible to evaluate the content. Do not deny for length — a short response that clearly covers the content is fine.",
         "points": 0
       }
     ]

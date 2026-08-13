@@ -16,7 +16,7 @@
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Unit 1.1 Quiz — AI-graded rubric",
-    "model": "qwen3-coder-next:cloud",
+    "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
     "prompt": "Answer all four parts. Label each part (A, B, C, D) in your response.\n\nPart A — Data types. For each expression, write what `typeof` returns:\n1. typeof \"42\"\n2. typeof 42\n3. typeof true\n4. typeof undefined\n5. typeof null\n\nPart B — Fix the declarations. Each line below is broken. Rewrite it correctly AND say in a few words what was wrong:\n1. let 2cool = true;\n2. const userName;\n3. let user-name = \"Al\";\n\nPart C — Vocabulary. Define each term in your own words (one sentence each):\n1. variable\n2. constant\n3. data type\n4. comment\n\nPart D — Style violations. Each snippet runs but breaks the class style guide. Name the violation in each:\n1. let x=5\n2. let UserName = \"Al\";\n3. let p = 29.99;",
     "rubric": [

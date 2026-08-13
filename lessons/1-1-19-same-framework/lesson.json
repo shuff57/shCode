@@ -15,7 +15,7 @@
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Same Framework, Different Weight — AI-graded rubric",
-    "model": "qwen3-coder-next:cloud",
+    "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
     "prompt": "Consider two software projects:\n\n- A small team building a simple app for a single school.\n- A large team building a banking system for thousands of customers.\n\nBoth follow the same four framework activities (inception, elaboration, construction, deployment). In your own words, explain why they would elaborate the same framework differently. Refer to the four Ps (problem, project, people, product) in your answer, and compare the two projects specifically.",
     "rubric": [

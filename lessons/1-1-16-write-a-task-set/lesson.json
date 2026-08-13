@@ -15,7 +15,7 @@
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Write a Task Set — AI-graded rubric",
-    "model": "qwen3-coder-next:cloud",
+    "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
     "prompt": "A software engineering action is a named job inside a phase, and a task set is all the tasks required to accomplish one action.\n\nConsider the action \"requirements definition\" (which lives in the inception phase). List at least two tasks that would make up a task set for that action.\n\nEach task should be a concrete step that \"requirements definition\" would actually need — for example, interviewing users, writing a requirements document, or reviewing requirements with stakeholders. Other reasonable tasks are fine too.\n\nWrite in your own words.",
     "rubric": [

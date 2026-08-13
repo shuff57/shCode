@@ -10,4 +10,4 @@ Write your response in the box below. Use headings or numbered sections so each 
 | 2 | Phase descriptions are in own words (not copied) |
 | 3 | A specific real software product named in Part 2 |
 | 4 | Real-world example walks through all five phases |
-| 5 | Response is clear and organized (within word count, phases identifiable) |
+| 5 | Response is clear and organized (phases identifiable) |

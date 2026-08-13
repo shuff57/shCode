@@ -15,7 +15,7 @@
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Does It Fit? — AI-graded rubric",
-    "model": "qwen3-coder-next:cloud",
+    "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
     "prompt": "Zara runs a startup whose product requirements change weekly as she talks to new customers. A prescriptive process model advocates an orderly, prescribed sequence of activities.\n\nIn your own words, would a prescriptive process model fit Zara's project? Give a clear answer, then explain your reason in terms of the model's rigidity against changing requirements.",
     "rubric": [
