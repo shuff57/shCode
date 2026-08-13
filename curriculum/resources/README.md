@@ -18,6 +18,12 @@ This directory collects the **reusable build conventions** for each lesson type 
 
 Authoritative badge list lives in `lib/lesson-badges.tsx` (`PREVIEW_BADGES`). Add a row there when introducing a new type.
 
+**Points policy — easy to get wrong when auditing a mixed-type module.** The course is mastery-based (no points visible to students), but the JSON-level shape differs by type:
+- `shplay` / `console` labs and challenges: `requirements[].points`, `grading.totalPoints`, `grading.passingScore` are **always `0`** (see `lab-assignment-conventions.md` §1/§7, `shplay-challenge-conventions.md`).
+- `aiGrader` written assignments: `aiGrader.rubric[].points` is **always `1`** per criterion (never `0`), and `grading.totalPoints` / `grading.passingScore` both equal `aiGrader.rubric.length` (see `written-assignment-conventions.md` §1/§4). This is a deliberate carve-out, not a violation — the Ollama grader needs a non-zero per-criterion signal to drive the same `totalScore >= passingScore` Submit gate the zero-points labs use a different way.
+
+A lesson with non-zero points is only a bug if it's a lab/challenge. A written assignment with all-zero rubric points is the actual bug there (the Submit gate becomes `0 >= 0`, always true, and green-to-advance silently breaks).
+
 ## Title numbering — the hard rule
 
 Every lesson's `title` field **MUST** start with a three-part dotted number `<unit>.<module>.<sequence>`. Wherever the per-type docs say `<numbering>` or `<unit-numbering>`, that's what they mean.
