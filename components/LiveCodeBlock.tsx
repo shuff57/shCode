@@ -2,83 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
-import {
-  EditorView,
-  keymap,
-  lineNumbers,
-  highlightActiveLine,
-  highlightActiveLineGutter,
-} from '@codemirror/view';
-import { EditorState } from '@codemirror/state';
-import { javascript } from '@codemirror/lang-javascript';
-import { defaultKeymap, indentWithTab, history, historyKeymap } from '@codemirror/commands';
-import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting } from '@codemirror/language';
-import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
-import { highlightSelectionMatches } from '@codemirror/search';
-import { tags as t } from '@lezer/highlight';
 import { Play, RotateCcw } from 'lucide-react';
 import ShPlayPreview from './ShPlayPreview';
 import LiveConsole from './LiveConsole';
-
-const dracula = {
-  bg: '#282a36', fg: '#f8f8f2', gutter: '#282a36', gutterFg: '#6272a4',
-  activeLine: '#44475a55', selection: '#44475a', cursor: '#f8f8f0', comment: '#6272a4',
-  cyan: '#8be9fd', green: '#50fa7b', orange: '#ffb86c', pink: '#ff79c6',
-  purple: '#bd93f9', red: '#ff5555', yellow: '#f1fa8c',
-};
-
-const draculaHighlight = HighlightStyle.define([
-  { tag: [t.comment, t.lineComment, t.blockComment, t.docComment], color: dracula.comment, fontStyle: 'italic' },
-  { tag: [t.keyword, t.operatorKeyword, t.modifier, t.controlKeyword], color: dracula.pink },
-  { tag: [t.string, t.special(t.string), t.regexp], color: dracula.yellow },
-  { tag: [t.number, t.bool, t.null, t.atom], color: dracula.purple },
-  { tag: [t.function(t.variableName), t.function(t.propertyName), t.macroName], color: dracula.green },
-  { tag: [t.definition(t.variableName), t.definition(t.propertyName)], color: dracula.green },
-  { tag: [t.variableName, t.propertyName], color: dracula.fg },
-  { tag: [t.className, t.typeName, t.namespace], color: dracula.cyan, fontStyle: 'italic' },
-  { tag: [t.punctuation, t.separator, t.bracket], color: dracula.fg },
-  { tag: [t.operator], color: dracula.pink },
-  { tag: t.invalid, color: dracula.red },
-]);
-
-const darkTheme = EditorView.theme(
-  {
-    '&': { backgroundColor: dracula.bg, color: dracula.fg, height: '100%', fontSize: '13px' },
-    '.cm-content': {
-      fontFamily: "'Fira Code', 'Consolas', 'Courier New', monospace",
-      caretColor: dracula.cursor,
-      padding: '6px 0',
-    },
-    '.cm-gutters': { backgroundColor: dracula.gutter, color: dracula.gutterFg, border: 'none', paddingRight: '8px' },
-    '.cm-activeLineGutter': { backgroundColor: dracula.activeLine, color: dracula.fg },
-    '.cm-activeLine': { backgroundColor: dracula.activeLine },
-    '&.cm-focused .cm-selectionBackground, ::selection': { backgroundColor: dracula.selection },
-    '.cm-cursor': { borderLeftColor: dracula.cursor },
-  },
-  { dark: true }
-);
-
-function makeExtensions(onChange: (doc: string) => void) {
-  return [
-    lineNumbers(),
-    highlightActiveLine(),
-    highlightActiveLineGutter(),
-    history(),
-    bracketMatching(),
-    closeBrackets(),
-    indentOnInput(),
-    highlightSelectionMatches(),
-    javascript(),
-    syntaxHighlighting(draculaHighlight),
-    keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap, indentWithTab]),
-    darkTheme,
-    EditorView.updateListener.of((update) => {
-      if (update.docChanged) onChange(update.state.doc.toString());
-    }),
-    EditorView.lineWrapping,
-    EditorState.tabSize.of(2),
-  ];
-}
+import CodeMirrorPane from './CodeMirrorPane';
 
 interface Props {
   code: string;
@@ -186,30 +113,9 @@ export default function LiveCodeBlock({
     return saved !== null ? saved : initialCode;
   });
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const viewRef = useRef<EditorView | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [committedCode, setCommittedCode] = useState('');
   const [runKey, setRunKey] = useState(0);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const view = new EditorView({
-      state: EditorState.create({
-        // Use the already-resolved editorCode so the editor starts with
-        // the saved doc when present.
-        doc: editorCode,
-        extensions: makeExtensions(setEditorCode),
-      }),
-      parent: containerRef.current,
-    });
-    viewRef.current = view;
-    return () => {
-      view.destroy();
-      viewRef.current = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Persist edits to localStorage, debounced so we don't write on every
   // keystroke. Removes the entry when the code is back at its starter so
@@ -240,9 +146,6 @@ export default function LiveCodeBlock({
   }
 
   function reset() {
-    const view = viewRef.current;
-    if (!view) return;
-    view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: initialCode } });
     setEditorCode(initialCode);
     setCommittedCode('');
     setRunKey(0);
@@ -266,7 +169,12 @@ export default function LiveCodeBlock({
         }
       >
         <div className="livecodeblock-editor">
-          <div ref={containerRef} className="livecodeblock-editor-mount" />
+          <CodeMirrorPane
+            value={editorCode}
+            onChange={setEditorCode}
+            fileKey={storageKey ?? blockId ?? 'live'}
+            language="javascript"
+          />
         </div>
         <div className={`livecodeblock-preview${plain ? ' livecodeblock-preview--plain' : ''}`}>
           {plain ? (
@@ -293,27 +201,31 @@ export default function LiveCodeBlock({
       </div>
       {showConsole && !plain && <LiveConsole iframeRef={iframeRef} resetKey={runKey} />}
       <div className="livecodeblock-toolbar">
-        <button type="button" className="livecodeblock-run" onClick={run}>
+        <button type="button" className="btn-run" onClick={run}>
           <Play size={13} strokeWidth={2.5} /> Run
         </button>
-        <button type="button" className="livecodeblock-reset" onClick={reset}>
+        <button type="button" className="btn-secondary btn-sm" onClick={reset}>
           <RotateCcw size={12} /> Reset
         </button>
       </div>
       <style>{`
+        /* Same chrome palette as the graded editor (.editor-card /
+           .editor-body / .editor-file-toolbar in globals.css) so a live
+           block in a reading looks like the same tool, not a different one. */
         .livecodeblock {
-          border: 1px solid #44475a;
-          border-radius: 6px;
+          border: 1px solid var(--border);
+          border-radius: 4px;
           margin: 16px 0;
-          background: #1e1f29;
+          background: var(--card);
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
           overflow: hidden;
         }
         .livecodeblock-label {
           padding: 6px 12px;
-          background: #282a36;
-          border-bottom: 1px solid #44475a;
+          background: var(--muted);
+          border-bottom: 1px solid var(--border);
           font-size: 12px;
-          color: #bd93f9;
+          color: var(--text);
           font-weight: 600;
         }
 
@@ -326,12 +238,8 @@ export default function LiveCodeBlock({
         }
         .livecodeblock-editor {
           height: var(--lcb-editor-h);
-          background: #282a36;
+          background: var(--card);
           overflow: hidden;
-        }
-        .livecodeblock-editor-mount {
-          height: 100%;
-          overflow: auto;
         }
         .livecodeblock-preview {
           width: 100%;
@@ -350,7 +258,7 @@ export default function LiveCodeBlock({
            a flexible Output column (like the in-app console lesson split)
            instead of a fixed square. */
         .livecodeblock-preview--plain {
-          background: #1e1e1e;
+          background: var(--card);
           display: flex;
           flex-direction: column;
         }
@@ -369,7 +277,7 @@ export default function LiveCodeBlock({
             flex: 1 1 0;
             min-width: 0;
             height: 100%;
-            border-right: 1px solid #44475a;
+            border-right: 1px solid var(--border);
           }
           .livecodeblock-preview {
             width: var(--lcb-preview-side);
@@ -388,33 +296,8 @@ export default function LiveCodeBlock({
           align-items: center;
           gap: 8px;
           padding: 8px;
-          background: #282a36;
-          border-top: 1px solid #44475a;
-        }
-        .livecodeblock-run {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          padding: 6px 14px;
-          border-radius: 4px;
-          background: #50fa7b;
-          color: #282a36;
-          font-weight: 600;
-          font-size: 13px;
-          border: none;
-          cursor: pointer;
-        }
-        .livecodeblock-reset {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          padding: 6px 12px;
-          border-radius: 4px;
-          background: transparent;
-          color: #6272a4;
-          font-size: 12px;
-          border: 1px solid #44475a;
-          cursor: pointer;
+          background: var(--card);
+          border-top: 1px solid var(--border);
         }
       `}</style>
     </div>

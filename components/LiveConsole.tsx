@@ -167,9 +167,9 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
       </div>
       <style>{`
         .liveconsole {
-          border-top: 1px solid #44475a;
-          background: #1e1f29;
-          color: #f8f8f2;
+          border-top: 1px solid var(--border);
+          background: var(--card);
+          color: var(--text);
           font-family: 'Fira Code', Consolas, 'Courier New', monospace;
           font-size: 12.5px;
         }
@@ -178,9 +178,9 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
           align-items: center;
           justify-content: space-between;
           padding: 4px 10px;
-          background: #282a36;
-          border-bottom: 1px solid #44475a;
-          color: #bd93f9;
+          background: var(--muted);
+          border-bottom: 1px solid var(--border);
+          color: var(--text);
           font-weight: 600;
           font-size: 11px;
           letter-spacing: 0.04em;
@@ -188,8 +188,9 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
         }
         .liveconsole-header button {
           background: transparent;
-          border: 1px solid #44475a;
-          color: #6272a4;
+          border: 1px solid var(--border);
+          color: var(--text);
+          opacity: 0.7;
           font-size: 11px;
           padding: 2px 8px;
           border-radius: 3px;
@@ -202,11 +203,12 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
           padding: 6px 10px;
         }
         .liveconsole-empty {
-          color: #6272a4;
+          color: var(--text);
+          opacity: 0.6;
           font-style: italic;
         }
         .liveconsole-empty code {
-          background: #282a36;
+          background: var(--muted);
           padding: 0 4px;
           border-radius: 2px;
         }
@@ -220,7 +222,8 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
         .liveconsole-gutter {
           flex: 0 0 auto;
           width: 14px;
-          color: #6272a4;
+          color: var(--text);
+          opacity: 0.6;
           user-select: none;
           text-align: right;
         }
@@ -237,11 +240,11 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
           align-items: center;
           gap: 6px;
           padding: 4px 10px;
-          border-top: 1px solid #44475a;
-          background: #282a36;
+          border-top: 1px solid var(--border);
+          background: var(--muted);
         }
         .liveconsole-prompt {
-          color: #50fa7b;
+          color: var(--brand);
           font-weight: 700;
         }
         .liveconsole-input {
@@ -249,11 +252,11 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
           background: transparent;
           border: none;
           outline: none;
-          color: #f8f8f2;
+          color: var(--text);
           font: inherit;
           padding: 4px 0;
         }
-        .liveconsole-input::placeholder { color: #44475a; }
+        .liveconsole-input::placeholder { color: var(--border); }
         .liveconsole-error-rich {
           flex-direction: column;
           gap: 2px;
@@ -263,13 +266,13 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
         }
         .liveconsole-error-line { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
         .liveconsole-error-name { color: #ff5555; font-weight: 600; }
-        .liveconsole-error-loc { color: #8be9fd; font-size: 11.5px; padding-left: 22px; }
+        .liveconsole-error-loc { color: var(--brand); font-size: 11.5px; padding-left: 22px; }
         .liveconsole-error-snippet {
           display: block;
           margin: 2px 0 0 22px;
           padding: 3px 6px;
-          background: #282a36;
-          color: #f8f8f2;
+          background: var(--muted);
+          color: var(--text);
           border-radius: 3px;
           font-size: 11.5px;
           white-space: pre;
