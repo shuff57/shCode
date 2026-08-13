@@ -1,8 +1,21 @@
-# Slide Deck Conventions
+# Slide Deck Conventions — RETIRED (2026-08-12)
+
+**This entire doc describes the Slidev pipeline, which is no longer used.** All Slidev
+source (`slides/`), built output (`public/slides/2.1`–`2.5`), npm scripts
+(`slides:build-all`, `slides:U.M:*`), the `@slidev/*` devDependencies, and
+`scripts/strip-slide-externals.mjs` were removed 2026-08-12. Slide decks are now **HTML
+sourced from bookSHelf's Introduction to Programming section slides**, not
+Slidev-authored Markdown. No replacement convention has been written yet — the shape of
+the new pipeline (how a bookSHelf section's slides become whatever
+`lessons/<U-M-1-slides>/lesson.json.slidesUrl` points at) is undecided. Everything below
+this line is kept only as historical reference for the old Q5Runner-embed / sprite-heavy
+slide-rhythm patterns, in case they're worth porting; do not follow it for new work.
+
+---
 
 Canonical rules for authoring Slidev decks for **any curriculum module**. One deck per module, served statically from `public/slides/U.M/` via the Next.js build (where U = unit number, M = module number). When a module spec under `curriculum/modules/U.M_*.md` references "the module slide deck" or a `lessons/U-M-1-slides/` in-app lesson, these rules are binding.
 
-**Canonical reference:** Module 5.1's deck (source still on disk at `slides/2.1/slides.md` — pre-2026-08-12 this module was numbered 2.1, and the deck source/build directories were never renamed in that migration, see `BOOK-TO-MODULE.md` §"Not yet done") was the first deck built under this convention and remains the style reference. The shplay-specific patterns below (Q5Runner embed, sprite-heavy slide rhythm) are tagged **[shplay]** — skip them if the module isn't shplay-based.
+**Canonical reference (historical):** Module 5.1's deck was the first built under this convention and was the style reference before the Slidev pipeline was retired. The shplay-specific patterns below (Q5Runner embed, sprite-heavy slide rhythm) are tagged **[shplay]** — skip them if the module isn't shplay-based.
 
 ---
 

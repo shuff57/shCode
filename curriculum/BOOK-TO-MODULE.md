@@ -403,20 +403,17 @@ rewriting a working lab unless the concept it grades actually moved.
 - **Module statuses are stale across the shplay units (5–7).** Several module spec
   frontmatter `status:` fields don't match what's actually shipped on disk. Trust the
   disk, fix the frontmatter during resync.
-- **Slide deck `slidesUrl` collision from the 2026-08-12 renumber.** The renumber moved
-  Unit 2 from shplay to Control Flow, but the physical `slides/` (Slidev source) and
-  `public/slides/` (built output) directories were out of scope for that migration and
-  still use the old shplay-era `2.1`–`2.5` paths. Result: `2-1-1-slides`, `2-2-1-slides`,
-  and `2-3-1-slides` (today's real Control Flow modules) all carry `slidesUrl` values
-  (`/slides/2.1/`, `/slides/2.2/`, `/slides/2.3/`) that point at the *same* physical
-  decks as `5-1-1-slides`, `5-3-1-slides`, and `6-1-1-slides` (today's real shplay
-  modules, correctly pointing at their own old-numbered decks). A student on Module 2.1
-  Conditionals sees the old shplay Hello-Sprite-Movement deck. Fix needs either: (a) a
-  bulk rename of `slides/`+`public/slides/` to the new module ids (`slides/5.1/`,
-  `slides/5.3/`, `slides/6.1/`, `slides/6.4/`, `slides/6.5/`, plus `6.6`/`6.7` which
-  were never built at all), or (b) pointing the new Unit 2 lessons at a placeholder
-  `slidesUrl` (matching `1-1-1-slides`'s pattern) until real Control Flow decks are
-  authored. Not yet fixed — flagged 2026-08-12, not actioned.
+- **Slides moved off Slidev entirely (2026-08-12).** The old shplay-era Slidev decks
+  (`slides/2.1`–`2.5`, `public/slides/2.1`–`2.5`) collided with the new Unit 2 (Control
+  Flow) module ids after the renumber and were removed rather than resynced — every
+  `*-1-slides` lesson now carries a placeholder `slidesUrl` (its own module id, e.g.
+  `/slides/5.1/`) pointing at nothing yet. `package.json`'s `slides:build-all` /
+  `slides:U.M:*` scripts, the `@slidev/*` devDependencies, and
+  `scripts/strip-slide-externals.mjs` were all removed the same day — **slide decks are
+  now HTML sourced from bookSHelf's Introduction to Programming section slides, not
+  Slidev-authored Markdown.** No build pipeline exists yet for the new source; authoring
+  that pipeline (how a bookSHelf section's slides become a `public/slides/<U.M>/`
+  directory, or whether they're served some other way) is unstarted.
 - **No automated gate on any of this.** Nothing checks that a spec's concept list still
   matches its book section, and nothing checks that a built lesson matches its spec.
   The design for a builder/critic loop that would do it is in the book repo at
