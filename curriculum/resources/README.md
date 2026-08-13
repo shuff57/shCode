@@ -18,11 +18,11 @@ This directory collects the **reusable build conventions** for each lesson type 
 
 Authoritative badge list lives in `lib/lesson-badges.tsx` (`PREVIEW_BADGES`). Add a row there when introducing a new type.
 
-**Points policy — easy to get wrong when auditing a mixed-type module.** The course is mastery-based (no points visible to students), but the JSON-level shape differs by type:
-- `shplay` / `console` labs and challenges: `requirements[].points`, `grading.totalPoints`, `grading.passingScore` are **always `0`** (see `lab-assignment-conventions.md` §1/§7, `shplay-challenge-conventions.md`).
-- `aiGrader` written assignments: `aiGrader.rubric[].points` is **always `1`** per criterion (never `0`), and `grading.totalPoints` / `grading.passingScore` both equal `aiGrader.rubric.length` (see `written-assignment-conventions.md` §1/§4). This is a deliberate carve-out, not a violation — the Ollama grader needs a non-zero per-criterion signal to drive the same `totalScore >= passingScore` Submit gate the zero-points labs use a different way.
+**Points policy — easy to get wrong when auditing a mixed-type module.** The course is mastery-based (no points visible to students), but the JSON-level shape *and* the pass threshold both differ by type:
+- `shplay` / `console` labs and challenges: `requirements[].points`, `grading.totalPoints`, `grading.passingScore` are **always `0`**, and `components/LessonWorkspace.tsx` gates Submit on **every requirement being green (100%)** (see `lab-assignment-conventions.md` §1/§7, `shplay-challenge-conventions.md`).
+- `aiGrader` written assignments: `aiGrader.rubric[].points` is **either `1` per criterion or `0` per criterion** (never mixed within a lesson) — see `written-assignment-conventions.md` §1/§4. Unlike labs, written work is gated by `components/WrittenGrader.tsx`, which **allows partial credit by design**: ≥70% of rubric points earned (`1`-per-item shape) or a bare majority of criteria met-or-partial (`0`-per-item shape). `lesson.json.grading.totalPoints`/`passingScore` are not read on this path at all — they're inert metadata, not a gate.
 
-A lesson with non-zero points is only a bug if it's a lab/challenge. A written assignment with all-zero rubric points is the actual bug there (the Submit gate becomes `0 >= 0`, always true, and green-to-advance silently breaks).
+A lesson with non-zero points is only a bug if it's a lab/challenge — labs must gate at 100%. There is no equivalent "bug" shape for written assignments' rubric points; both `0`-per-item and `1`-per-item are legitimate and land on a different (still partial-credit) threshold. Don't expect editing `grading.passingScore` to change a written assignment's pass threshold — it won't.
 
 ## Title numbering — the hard rule
 

@@ -56,8 +56,8 @@ Distinct from a shplay lab (`preview: "shplay"`) because there is no `script.js`
 - `aiGrader.model` — the Ollama cloud model id. Default to `"deepseek-v4-flash:0731-cloud"` (switched from `qwen3-coder-next:cloud` 2026-08-13 — see History). Don't invent model names. See the **Ollama grader** section of `CLAUDE.md` for the endpoint + secret wiring.
 - `aiGrader.contextDocs` — array of shplay doc keys (e.g. `"overview"`, `"sprite"`, `"input"`). These are interpolated into the grader's system prompt so the model knows the shplay vocabulary. See `lib/shplay-docs.ts` for the valid keys.
 - `aiGrader.prompt` — the exact text the student sees as the question set. Use `\n\n` between questions. The grader sees this prompt + the student's response.
-- `aiGrader.rubric[].points` — **always `1` per item.** This is a binary AI signal (the model returns 0 or 1 per criterion — earned or not), not a weight. The UI must never surface this number to students; it's grader-internal. Don't assign different weights to different criteria — every criterion is equally required to advance.
-- `points` (top-level) / `grading.totalPoints` / `grading.passingScore` — **all equal to `aiGrader.rubric.length` (count of criteria).** Setting `passingScore === totalPoints` enforces "every rubric item must be earned" — the all-green equivalent for written assignments. (Why not all `0` like q5 lessons? The Ollama grader sums per-rubric points to compute `totalScore`, and the workspace's non-q5 Submit gate is `totalScore >= passingScore`. With all-zero points, `0 >= 0` is always true and the gate is bypassed — green-to-advance breaks. The `1`-per-item carve-out preserves the all-green semantics through the existing scoring code path.)
+- `aiGrader.rubric[].points` — either **`1` per item** (recommended default) or **`0` per item**. This value is not a weight — it's what selects which pass threshold `WrittenGrader.tsx`'s `isPassing()` applies (see §4). Don't assign different nonzero weights to different criteria; every row must be either all `1` or all `0` within a lesson.
+- `points` (top-level) / `grading.totalPoints` / `grading.passingScore` — set to `aiGrader.rubric.length` (or `0`, matching whichever rubric shape you chose above) for consistency and gradebook readability. **These fields are inert for written assignments** — `WrittenGrader.tsx` never reads `lesson.grading` at all; only `components/LessonWorkspace.tsx` (the console/shplay lab path) reads `grading.passingScore`. Populate them anyway so the lesson.json stays self-describing, but don't expect changing `passingScore` to change grading behavior here — see §4 for what actually gates.
 - `steps` / `requirements` — empty arrays. No regex auto-grader runs on this path.
 
 The student-facing surface for a written assignment must read as **pass / not yet** — the rubric itself is published as criteria, not as a weighted point breakdown. See §4 for what the student-facing rubric preview should look like.
@@ -107,24 +107,40 @@ Each rubric row should be **independently checkable** — and binary-shaped (the
 
 The `description` is the LLM's grading guide. Be explicit about what counts and what doesn't — vague descriptions give inconsistent scores. The `points: 1` is a binary signal, not a weight; never use a different value.
 
-## 4. Pass criterion
+## 4. Pass criterion — genuinely partial credit, by design
 
-Every rubric row must be earned. Concretely:
+Unlike labs/challenges/console lessons (which gate at 100% — every requirement green), **written assignments intentionally allow partial credit.** The gate is computed client-side by `components/WrittenGrader.tsx`'s `isPassing()`, straight off the `/api/grade-written` response — it never reads `lesson.json.grading` at all:
 
-- `aiGrader.rubric[i].points = 1` for every item.
-- `grading.totalPoints = aiGrader.rubric.length`.
-- `grading.passingScore = grading.totalPoints` (so `totalScore >= passingScore` ⇒ all rows earned).
-- The top-level `points` field mirrors `grading.totalPoints`.
+```ts
+function isPassing(r: GradeResult): boolean {
+  if (r.totalPossible === 0) {
+    // rubric.points all 0 → pass/fail-per-criterion mode
+    const ok = r.criteria.filter(c => c.verdict === 'met' || c.verdict === 'partial').length;
+    return ok >= Math.ceil(r.criteria.length / 2);   // bare majority
+  }
+  return r.totalEarned / r.totalPossible >= 0.7;      // 70% of rubric points
+}
+```
 
-This carve-out exists because the Ollama grader sums per-rubric points to compute `totalScore` and the workspace's non-q5 Submit gate is `totalScore >= passingScore`. The `1`-per-item shape is the cheapest way to keep the all-green semantics through the existing scoring code path. The student-facing rubric preview in `content.md` does NOT show points — it lists criteria only.
+Two legitimate rubric shapes, each landing on a different (still partial-credit) threshold:
+
+| Rubric shape | `aiGrader.rubric[].points` | Threshold to advance |
+|---|---|---|
+| Points-weighted (recommended default) | `1` per item | **≥ 70%** of rubric points earned |
+| Zero-weighted | `0` per item | **≥ 50%** (bare majority, rounded up) of criteria met-or-partial |
+
+Neither threshold is 100%, and this is intentional — the operator decision (2026-08-13) was to leave written work more forgiving than labs, not to force it into the same all-green shape. Don't "fix" a written assignment's threshold by editing `grading.passingScore` — that field isn't consulted here (see §1). If a stricter or looser threshold is ever wanted, it has to change in `WrittenGrader.tsx`'s `isPassing()`, not in a lesson's JSON.
+
+The student-facing rubric preview in `content.md` does NOT show points or the threshold — it lists criteria only, and reads as pass/not-yet.
 
 `allowLateSubmit: true` is the default for written work.
 
 ## 5. Don'ts
 
 - **Do not use `preview: "shplay"` for a writeup** — the UI won't mount `WrittenGrader` and there's no script to grade.
-- **Do not leave `points` / `grading.totalPoints` / `grading.passingScore` unset.** All three must be populated and equal to `aiGrader.rubric.length`.
-- **Do not assign different `points` values to different rubric rows.** Every row is `1` — binary AI signal. Weights aren't supported under the no-points policy.
+- **Do not leave `points` / `grading.totalPoints` / `grading.passingScore` unset.** Populate all three consistently (matching `aiGrader.rubric.length`, or `0` if using the zero-weighted rubric shape) even though `WrittenGrader.tsx` doesn't read them — see §1.
+- **Do not assign different `points` values to different rubric rows within one lesson.** Every row is `1`, or every row is `0` — never mixed. See §4 for what each shape means for the pass threshold.
+- **Do not assume editing `grading.passingScore` changes the pass threshold.** It doesn't — see §4. The threshold is hardcoded in `WrittenGrader.tsx`.
 - **Do not show point columns in the student-facing rubric preview** in `content.md`. Use a `# | Criterion` two-column shape, not `Criterion | Pts`. Students see pass/fail per row, not weights.
 - **Do not invent Ollama model names.** Use the model already in production (`deepseek-v4-flash:0731-cloud`) unless switching deliberately and coordinating with the `OLLAMA_*` env vars.
 - **Do not grade or require length.** No rubric criterion may deny/deduct for word count, and no prompt may state a target length (e.g. "~250-400 words", "one page", "half page"). AI grading is content-only — a short response that clearly hits every rubric point earns full credit. (Operator decision, 2026-08-13: removed from `1-1-3-a1-1-sdlc-writeup`, `1-1-23-a1-2-describe-lifecycle`, `1-3-5-why-documentation`, `5-1-22-a10-2-frame-loop`, `5-3-32-a12-2-oop-writeup`.)
@@ -152,3 +168,4 @@ Example: `"2.1.11 Frame Loop Writeup"`.
 | Second simplification | Dropped the "Before you start" prereq block AND any teacher-facing SLO / evidence-retention warnings from the canonical shape. Student-facing copy now opens directly with the "Write your response below" nudge, then rubric. Applied across `2-1-10-a10-2-frame-loop` and `2-2-12-a12-2-oop-writeup`. §2 canonical template shortened (~15 → ~10 lines); §5 Don'ts gained "no pre-read block" and "no teacher-facing SLO warnings". |
 | Model switch + content-only grading (2026-08-13) | `aiGrader.model` default switched from `qwen3-coder-next:cloud` to `deepseek-v4-flash:0731-cloud` across all 12 written assignments, smoke-tested with a simple content-complete response per lesson. Also removed all word/page-count language from prompts and rubric criteria — AI grading is content-only, never length-based. §5 Don'ts gained the no-length-grading rule. |
 | No-points + green-to-advance (carve-out for written) | The course is now mastery-based — no points anywhere students can see. Written assignments are AI-graded, so the existing scoring code path needs *some* numeric signal to fire the Submit gate. Resolution: every `aiGrader.rubric[].points` is **`1`** (binary signal, never a weight); `grading.totalPoints = grading.passingScore = aiGrader.rubric.length`; top-level `points` mirrors `totalPoints`. With this shape `totalScore >= passingScore` requires every rubric item to be earned — the all-green equivalent for written. §1 JSON shape + field-by-field rewritten. §2 canonical content.md template dropped the `Pts` column (now `# | Criterion` only). §3 rubric example updated to `points: 1`. §4 renamed from "Point budget" → "Pass criterion" and prescribes the `<N>=rubric.length` pattern. §5 Don'ts gained the equal-rubric-weights and no-pts-column rules. Sister convention `shplay-lesson-conventions.md` carries the canonical reference for the green-to-advance lesson nav lock. |
+| Correction — written gate is not 100% (2026-08-13) | The row above was wrong about the runtime effect: `grading.totalPoints`/`passingScore` are never read on the written-assignment path — only `components/LessonWorkspace.tsx` (labs) reads `lesson.grading`. The actual gate is `WrittenGrader.tsx`'s `isPassing()`, which is hardcoded to **partial credit**: ≥70% of rubric points when `points:1`-per-item, or a bare majority of criteria when `points:0`-per-item. Found while auditing Module 1.1's sub-modules (`1-1-3-a1-1-sdlc-writeup` and `1-1-7-a3-3-unit-quiz` use the zero-weighted shape; `1-1-16`/`1-1-19`/`1-1-22`/`1-1-23` use the `1`-per-item shape — both are legitimate, neither is 100%). Operator decision: keep the partial-credit behavior in code as-is; §1 and §4 rewritten to describe reality instead of the intended-but-never-implemented all-green behavior. |

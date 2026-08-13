@@ -32,9 +32,9 @@ No `externalLink` (no invented URLs).
 type "assignment", preview "assignment", contentFile "content.md", points 0,
 slos [..], week N, unit "<unit label>", category "Unit 1: JavaScript Fundamentals",
 steps [], requirements [], grading { totalPoints:0, passingScore:0, allowLateSubmit:true },
-aiGrader { rubricTitle, model "qwen3-coder-next:cloud", contextDocs [], prompt, rubric:[{id,title,description,points:0}, ...] }
+aiGrader { rubricTitle, model "deepseek-v4-flash:0731-cloud", contextDocs [], prompt, rubric:[{id,title,description,points:0}, ...] }
 ```
-`contextDocs` MUST be `[]`. Every rubric `points` is `0`. content.md = one-line nudge + `# | Criterion` checklist (no points column, no copied prompt, no example answer).
+`contextDocs` MUST be `[]`. Every rubric `points` is `0` (all rubric rows the same — either all `0` or all `1`, never mixed; see `written-assignment-conventions.md` §1/§4). content.md = one-line nudge + `# | Criterion` checklist (no points column, no copied prompt, no example answer). Note: `WrittenGrader.tsx` grades this shape (`points:0`) at a bare-majority threshold, not 100% — written assignments allow partial credit by design, unlike this doc's console labs. Don't expect `grading.passingScore` above to change that; it isn't read on the written path.
 
 ---
 
