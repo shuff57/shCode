@@ -267,11 +267,16 @@ sequence (`a85cd42`, 2026-08-12).
 
 Net effect: **slugs are integer-only**, full stop. A future mid-module insertion needs a
 fresh renumbering decision — full sequential renumber (as done for Module 1.1) is now the
-only sanctioned mechanism, not a letter-suffix escape hatch. `parseNumberedIdFromTitle`
-still accepts an optional trailing letter for backward compatibility with historical data,
-but no lesson on disk uses one, and none should be authored going forward.
+only sanctioned mechanism, not a letter-suffix escape hatch.
 
-**No code change required.** The parser at `lib/curriculum.ts:111` already accepts `[a-zA-Z]?` after the third dotted integer; sort is already `{ numeric: true }`. Adding sub-letter slugs needs no migration and no helper update.
+**Code updated to match (2026-08-12).** `parseNumberedIdFromTitle` (`lib/curriculum.ts`)
+and every duplicate `parseNumberedId` helper (`functions/_shared/lessonAccess.ts`,
+`lib/lesson-neighbors.ts`, `components/HeaderLessonNav.tsx`,
+`components/LessonSearchFilter.tsx`) used to accept an optional trailing letter
+(`[a-zA-Z]?`) after the third dotted integer. That acceptance is now removed — the regex
+is strictly `\d+\.\d+\.\d+` — since no lesson on disk uses a letter suffix and none should
+be authored going forward. A title with a letter suffix no longer parses as numbered at
+all and is silently dropped from `/module/U.M`, same as any other malformed title.
 
 ## 5. Don'ts
 

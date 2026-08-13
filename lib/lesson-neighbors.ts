@@ -27,7 +27,7 @@ async function loadLessons(): Promise<ManifestLesson[]> {
 }
 
 function parseNumberedId(title: string): string | null {
-  const m = title.match(/^(\d+\.\d+\.\d+[a-zA-Z]?)/);
+  const m = title.match(/^(\d+\.\d+\.\d+)/);
   return m ? m[1] : null;
 }
 

@@ -110,7 +110,7 @@ export async function listModules(): Promise<ModuleSummary[]> {
 export const listUnits = listModules;
 
 function parseNumberedIdFromTitle(title: string): string | null {
-  const m = title.match(/^(\d+\.\d+\.\d+[a-zA-Z]?)/);
+  const m = title.match(/^(\d+\.\d+\.\d+)/);
   return m ? m[1] : null;
 }
 
@@ -133,7 +133,7 @@ async function listLessonsInModule(moduleId: string, requiredCategory?: string):
     if (!(numberedId === moduleId || numberedId.startsWith(moduleId + '.'))) continue;
     // If the module spec declares a required category, only include lessons that match.
     if (requiredCategory && parsed.category !== requiredCategory) continue;
-    const titleRest = String(parsed.title).replace(/^\d+\.\d+\.\d+[a-zA-Z]?\s*/, '').trim();
+    const titleRest = String(parsed.title).replace(/^\d+\.\d+\.\d+\s*/, '').trim();
     out.push({
       id: d.name,
       numberedId,
