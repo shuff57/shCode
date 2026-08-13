@@ -122,7 +122,7 @@
     },
     {
       "id": "1-1-23-a1-2-describe-lifecycle",
-      "title": "1.1.23 A1.2 Describe the Lifecycle",
+      "title": "1.1.23 Describe the Lifecycle",
       "unit": "1 Foundations",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -130,7 +130,7 @@
     },
     {
       "id": "1-1-3-a1-1-sdlc-writeup",
-      "title": "1.1.3 A1.1 SDLC Writeup",
+      "title": "1.1.3 SDLC Writeup",
       "unit": "1 Foundations",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -162,7 +162,7 @@
     },
     {
       "id": "1-1-7-a3-3-unit-quiz",
-      "title": "1.1.7 A3.3 Unit 1.1 Quiz",
+      "title": "1.1.7 Unit 1.1 Quiz",
       "unit": "1.1 Foundations",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -778,7 +778,7 @@
     },
     {
       "id": "5-1-21-a10-1-sprite-playground",
-      "title": "5.1.21 A10.1 Sprite Playground",
+      "title": "5.1.21 Sprite Playground",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -786,7 +786,7 @@
     },
     {
       "id": "5-1-22-a10-2-frame-loop",
-      "title": "5.1.22 A10.2 Frame Loop Writeup",
+      "title": "5.1.22 Frame Loop Writeup",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1050,7 +1050,7 @@
     },
     {
       "id": "5-3-31-a12-1-collectible",
-      "title": "5.3.31 A12.1 Collectible Class",
+      "title": "5.3.31 Collectible Class",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1058,7 +1058,7 @@
     },
     {
       "id": "5-3-32-a12-2-oop-writeup",
-      "title": "5.3.32 A12.2 Procedural vs OOP Writeup",
+      "title": "5.3.32 Procedural vs OOP Writeup",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1146,7 +1146,7 @@
     },
     {
       "id": "6-1-11-a13-1-asteroid-field",
-      "title": "6.1.11 A13.1 Asteroid Field",
+      "title": "6.1.11 Asteroid Field",
       "unit": "6.1 Groups and Overlaps",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1234,7 +1234,7 @@
     },
     {
       "id": "6-3-10-a14-2-car-ramp",
-      "title": "6.3.10 A14.2 Car on a Ramp",
+      "title": "6.3.10 Car on a Ramp",
       "unit": "6.3 Physics Applications",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1298,7 +1298,7 @@
     },
     {
       "id": "6-3-9-a14-1-space-jumper",
-      "title": "6.3.9 A14.1 Space Jumper",
+      "title": "6.3.9 Space Jumper",
       "unit": "6.3 Physics Applications",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1378,7 +1378,7 @@
     },
     {
       "id": "6-4-18-a15-1-platformer",
-      "title": "6.4.18 A15.1 Side-Scrolling Platformer",
+      "title": "6.4.18 Side-Scrolling Platformer",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1594,7 +1594,7 @@
     },
     {
       "id": "6-5-25-a16-1-save-system",
-      "title": "6.5.25 A16.1 Save System — Build Save/Load with Slots",
+      "title": "6.5.25 Save System — Build Save/Load with Slots",
       "unit": "6.5 Save and Load",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1794,7 +1794,7 @@
     },
     {
       "id": "6-6-24-a16-2-game-states",
-      "title": "6.6.24 A16.2 Game States — State Machine with Persistence",
+      "title": "6.6.24 Game States — State Machine with Persistence",
       "unit": "6.6 Game State Machines",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2026,7 +2026,7 @@
     },
     {
       "id": "6-7-27-a17-1-pong-sumo",
-      "title": "6.7.27 A17.1 Two-Player Pong-Sumo",
+      "title": "6.7.27 Two-Player Pong-Sumo",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",

@@ -1,6 +1,6 @@
 {
   "id": "6-3-9-a14-1-space-jumper",
-  "title": "6.3.9 A14.1 Space Jumper",
+  "title": "6.3.9 Space Jumper",
   "description": "Build a one-sprite platformer: WASD moves, space jumps — but only when touching the ground.",
   "type": "assignment",
   "difficulty": "intermediate",

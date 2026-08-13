@@ -1,6 +1,6 @@
 {
   "id": "6-4-18-a15-1-platformer",
-  "title": "6.4.18 A15.1 Side-Scrolling Platformer",
+  "title": "6.4.18 Side-Scrolling Platformer",
   "description": "Combine animated sprites, a camera that follows the player, three or more platforms, working jump mechanics, and a visible end goal into a playable side-scroller. Auto-graded.",
   "type": "assignment",
   "difficulty": "intermediate",

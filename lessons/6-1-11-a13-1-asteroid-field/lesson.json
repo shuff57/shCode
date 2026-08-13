@@ -1,6 +1,6 @@
 {
   "id": "6-1-11-a13-1-asteroid-field",
-  "title": "6.1.11 A13.1 Asteroid Field",
+  "title": "6.1.11 Asteroid Field",
   "description": "Combine Groups, overlap detection, and safe despawn into a playable asteroid scene. WASD steers the ship; an overlap with any asteroid ends the game.",
   "type": "assignment",
   "difficulty": "intermediate",

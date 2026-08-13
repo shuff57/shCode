@@ -1,6 +1,6 @@
 {
   "id": "5-1-21-a10-1-sprite-playground",
-  "title": "5.1.21 A10.1 Sprite Playground",
+  "title": "5.1.21 Sprite Playground",
   "description": "Build a sprite playground combining canvas, WASD-controlled sprite, auto-motion, and on-screen text. Auto-graded.",
   "type": "assignment",
   "difficulty": "intermediate",
