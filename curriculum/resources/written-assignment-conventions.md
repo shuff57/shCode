@@ -30,7 +30,7 @@ Distinct from a shplay lab (`preview: "shplay"`) because there is no `script.js`
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "<Lesson Name> — AI-graded rubric",
-    "model": "qwen3-coder-next:cloud",
+    "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": ["overview", "sprite"],
     "prompt": "<the student-facing questions, exactly as shown>",
     "rubric": [
@@ -53,7 +53,7 @@ Distinct from a shplay lab (`preview: "shplay"`) because there is no `script.js`
 ### Field-by-field
 
 - `preview` — **`"assignment"`**, not `"shplay"`. This is what routes the lesson to `WrittenGrader` instead of the regex grader.
-- `aiGrader.model` — the Ollama cloud model id. Default to `"qwen3-coder-next:cloud"` (the current standard for shplay modules). Don't invent model names. See the **Ollama grader** section of `CLAUDE.md` for the endpoint + secret wiring.
+- `aiGrader.model` — the Ollama cloud model id. Default to `"deepseek-v4-flash:0731-cloud"` (switched from `qwen3-coder-next:cloud` 2026-08-13 — see History). Don't invent model names. See the **Ollama grader** section of `CLAUDE.md` for the endpoint + secret wiring.
 - `aiGrader.contextDocs` — array of shplay doc keys (e.g. `"overview"`, `"sprite"`, `"input"`). These are interpolated into the grader's system prompt so the model knows the shplay vocabulary. See `lib/shplay-docs.ts` for the valid keys.
 - `aiGrader.prompt` — the exact text the student sees as the question set. Use `\n\n` between questions. The grader sees this prompt + the student's response.
 - `aiGrader.rubric[].points` — **always `1` per item.** This is a binary AI signal (the model returns 0 or 1 per criterion — earned or not), not a weight. The UI must never surface this number to students; it's grader-internal. Don't assign different weights to different criteria — every criterion is equally required to advance.
@@ -126,7 +126,7 @@ This carve-out exists because the Ollama grader sums per-rubric points to comput
 - **Do not leave `points` / `grading.totalPoints` / `grading.passingScore` unset.** All three must be populated and equal to `aiGrader.rubric.length`.
 - **Do not assign different `points` values to different rubric rows.** Every row is `1` — binary AI signal. Weights aren't supported under the no-points policy.
 - **Do not show point columns in the student-facing rubric preview** in `content.md`. Use a `# | Criterion` two-column shape, not `Criterion | Pts`. Students see pass/fail per row, not weights.
-- **Do not invent Ollama model names.** Use the model already in production (`qwen3-coder-next:cloud`) unless switching deliberately and coordinating with the `OLLAMA_*` env vars.
+- **Do not invent Ollama model names.** Use the model already in production (`deepseek-v4-flash:0731-cloud`) unless switching deliberately and coordinating with the `OLLAMA_*` env vars.
 - **Do not grade or require length.** No rubric criterion may deny/deduct for word count, and no prompt may state a target length (e.g. "~250-400 words", "one page", "half page"). AI grading is content-only — a short response that clearly hits every rubric point earns full credit. (Operator decision, 2026-08-13: removed from `1-1-3-a1-1-sdlc-writeup`, `1-1-23-a1-2-describe-lifecycle`, `1-3-5-why-documentation`, `5-1-22-a10-2-frame-loop`, `5-3-32-a12-2-oop-writeup`.)
 - **Do not put the prompt in `content.md`** — the grader reads from `aiGrader.prompt`. Duplicating invites drift.
 - **Do not include an example answer / model response in `content.md`.** No matter how you label it ("style guide", "do NOT copy"), a written-out answer is a cheat sheet. The rubric gives students what they're graded on; let them think the answer through.
@@ -150,4 +150,5 @@ Example: `"2.1.11 Frame Loop Writeup"`.
 | This doc | Hoisted out of per-module specs. |
 | Scaffolding pass | 2.1.11 Frame Loop Writeup `content.md` stripped from 60 lines → 15: dropped the `# A10.2 —` hub H1, the Module/Week/Points metadata table, the "Other 2.1.1 resources" link line, the duplicated Prompt block (lives in `aiGrader.prompt`), and the "Example response" block that showed full Q1/Q2/Q3 answers. Kept the "Before you start" prereqs + rubric-preview. §2 gained a canonical content.md template; §5 Don'ts gained "no example answers" and "no hub header / metadata table / sibling-resources line". |
 | Second simplification | Dropped the "Before you start" prereq block AND any teacher-facing SLO / evidence-retention warnings from the canonical shape. Student-facing copy now opens directly with the "Write your response below" nudge, then rubric. Applied across `2-1-10-a10-2-frame-loop` and `2-2-12-a12-2-oop-writeup`. §2 canonical template shortened (~15 → ~10 lines); §5 Don'ts gained "no pre-read block" and "no teacher-facing SLO warnings". |
+| Model switch + content-only grading (2026-08-13) | `aiGrader.model` default switched from `qwen3-coder-next:cloud` to `deepseek-v4-flash:0731-cloud` across all 12 written assignments, smoke-tested with a simple content-complete response per lesson. Also removed all word/page-count language from prompts and rubric criteria — AI grading is content-only, never length-based. §5 Don'ts gained the no-length-grading rule. |
 | No-points + green-to-advance (carve-out for written) | The course is now mastery-based — no points anywhere students can see. Written assignments are AI-graded, so the existing scoring code path needs *some* numeric signal to fire the Submit gate. Resolution: every `aiGrader.rubric[].points` is **`1`** (binary signal, never a weight); `grading.totalPoints = grading.passingScore = aiGrader.rubric.length`; top-level `points` mirrors `totalPoints`. With this shape `totalScore >= passingScore` requires every rubric item to be earned — the all-green equivalent for written. §1 JSON shape + field-by-field rewritten. §2 canonical content.md template dropped the `Pts` column (now `# | Criterion` only). §3 rubric example updated to `points: 1`. §4 renamed from "Point budget" → "Pass criterion" and prescribes the `<N>=rubric.length` pattern. §5 Don'ts gained the equal-rubric-weights and no-pts-column rules. Sister convention `shplay-lesson-conventions.md` carries the canonical reference for the green-to-advance lesson nav lock. |
