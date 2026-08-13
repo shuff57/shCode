@@ -4,7 +4,7 @@
 
 Here is the algorithm in plain English, written as comments. Read through it before touching any code. Notice how each step maps naturally to a JavaScript statement.
 
-```js live console
+```js live plain
 // Algorithm: find the largest of three numbers a, b, c
 // 1. Start by assuming a is the largest.
 // 2. If b is larger than our current largest, update largest to b.
@@ -20,7 +20,7 @@ let c = 9;
 
 Each comment becomes one or two lines of JavaScript. Run it and check that it prints `27`.
 
-```js live console
+```js live plain
 let a = 14;
 let b = 27;
 let c = 9;
@@ -46,7 +46,7 @@ console.log("Largest:", largest);
 
 Change `a`, `b`, `c` to `5`, `5`, `5` (a tie) and then to `99`, `1`, `2`. The algorithm handles both cases without any changes.
 
-```js live console
+```js live plain
 let a = 99;
 let b = 1;
 let c = 2;

@@ -26,7 +26,7 @@ Use `fruits[0]` to read the first item. `fruits[2]` reads the third. `fruits.len
 
 **Try it:** Run the block and trace what the array looks like after each step.
 
-```js live console
+```js live plain
 let fruits = ["apple", "banana", "cherry"];
 
 console.log(fruits[0]);        // first item

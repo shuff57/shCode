@@ -18,7 +18,7 @@ That one call turns the string into an **array** — one element per line. From 
 
 **Try it:** The block simulates a file by storing multiple lines in a template literal, then splits and numbers each line.
 
-```js live console
+```js live plain
 let fileContents = `Alice,90
 Bob,75
 Carol,88

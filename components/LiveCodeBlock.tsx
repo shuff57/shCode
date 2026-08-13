@@ -91,8 +91,56 @@ interface Props {
    *  provided, edits persist to localStorage under
    *  `shCode:liveBlock:<lessonId>:<blockId>`. */
   lessonId?: string;
-  /** When true, render a DevTools-style console + REPL under the preview. */
+  /** When true, render a DevTools-style console + REPL under the preview.
+   *  Only meaningful when `plain` is false — there's no running iframe to
+   *  attach a REPL to in plain mode. */
   showConsole?: boolean;
+  /** Plain console-track code (no q5play/canvas). Executes directly in the
+   *  main thread (no shplay iframe) and shows a captured Output pane
+   *  side-by-side with the editor — the same layout and execution model as
+   *  the in-app console-lesson workspace (see LessonWorkspace's isConsoleMode
+   *  branch). Use for Unit 1-4 `console.log`-only reading/example blocks;
+   *  leave false for shplay/canvas sketches. */
+  plain?: boolean;
+}
+
+interface PlainLogEntry {
+  type: 'log' | 'warn' | 'error';
+  message: string;
+}
+
+// Same execution model as LessonWorkspace.runCode(): swap console.* to
+// capture output, run the snippet, restore console.*. No sandboxing beyond
+// what the main app's console lessons already rely on.
+function runPlainCode(code: string): PlainLogEntry[] {
+  const logs: PlainLogEntry[] = [];
+  const origLog = console.log;
+  const origWarn = console.warn;
+  const origError = console.error;
+
+  const capture = (type: PlainLogEntry['type']) => (...args: unknown[]) => {
+    logs.push({
+      type,
+      message: args.map((a) => (typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a))).join(' '),
+    });
+  };
+  console.log = capture('log');
+  console.warn = capture('warn');
+  console.error = capture('error');
+
+  try {
+    const run = new Function(code); // student/reading code execution (educational tool)
+    run();
+  } catch (e: unknown) {
+    const name = e instanceof Error ? e.name : 'Error';
+    const msg = e instanceof Error ? e.message : String(e);
+    logs.push({ type: 'error', message: `${name}: ${msg}` });
+  } finally {
+    console.log = origLog;
+    console.warn = origWarn;
+    console.error = origError;
+  }
+  return logs;
 }
 
 function storageKeyFor(lessonId: string | undefined, blockId: string | undefined): string | null {
@@ -113,6 +161,7 @@ export default function LiveCodeBlock({
   blockId,
   lessonId,
   showConsole = false,
+  plain = false,
 }: Props) {
   const initialCode = code.trim();
   const storageKey = storageKeyFor(lessonId, blockId);
@@ -177,7 +226,15 @@ export default function LiveCodeBlock({
     return () => clearTimeout(timer);
   }, [editorCode, initialCode, storageKey]);
 
+  const [plainLogs, setPlainLogs] = useState<PlainLogEntry[]>([]);
+  const [hasRunPlain, setHasRunPlain] = useState(false);
+
   function run() {
+    if (plain) {
+      setPlainLogs(runPlainCode(editorCode));
+      setHasRunPlain(true);
+      return;
+    }
     setCommittedCode(editorCode);
     setRunKey((k) => k + 1);
   }
@@ -189,6 +246,8 @@ export default function LiveCodeBlock({
     setEditorCode(initialCode);
     setCommittedCode('');
     setRunKey(0);
+    setPlainLogs([]);
+    setHasRunPlain(false);
     if (storageKey && typeof window !== 'undefined') {
       window.localStorage.removeItem(storageKey);
     }
@@ -209,11 +268,30 @@ export default function LiveCodeBlock({
         <div className="livecodeblock-editor">
           <div ref={containerRef} className="livecodeblock-editor-mount" />
         </div>
-        <div className="livecodeblock-preview">
-          <ShPlayPreview ref={iframeRef} code={committedCode} runKey={runKey} />
+        <div className={`livecodeblock-preview${plain ? ' livecodeblock-preview--plain' : ''}`}>
+          {plain ? (
+            <>
+              <div className="output-header">Output</div>
+              <pre className="console-output run-output">
+                {!hasRunPlain ? (
+                  <div className="console-empty">Click Run to see output.</div>
+                ) : plainLogs.length === 0 ? (
+                  <div className="console-empty">(no output)</div>
+                ) : (
+                  plainLogs.map((log, i) => (
+                    <div key={i} className={`log-entry log-${log.type}`}>
+                      <span className="log-msg">{log.message}</span>
+                    </div>
+                  ))
+                )}
+              </pre>
+            </>
+          ) : (
+            <ShPlayPreview ref={iframeRef} code={committedCode} runKey={runKey} />
+          )}
         </div>
       </div>
-      {showConsole && <LiveConsole iframeRef={iframeRef} resetKey={runKey} />}
+      {showConsole && !plain && <LiveConsole iframeRef={iframeRef} resetKey={runKey} />}
       <div className="livecodeblock-toolbar">
         <button type="button" className="livecodeblock-run" onClick={run}>
           <Play size={13} strokeWidth={2.5} /> Run
@@ -268,6 +346,18 @@ export default function LiveCodeBlock({
           display: block;
         }
 
+        /* Plain console-track mode: no canvas, so the preview pane becomes
+           a flexible Output column (like the in-app console lesson split)
+           instead of a fixed square. */
+        .livecodeblock-preview--plain {
+          background: #1e1e1e;
+          display: flex;
+          flex-direction: column;
+        }
+        .livecodeblock-preview--plain .run-output {
+          height: 100%;
+        }
+
         /* Row layout: editor and preview side-by-side, both matching the
            preview's square height so the iframe is never clipped. */
         @media (min-width: 720px) {
@@ -285,6 +375,11 @@ export default function LiveCodeBlock({
             width: var(--lcb-preview-side);
             height: 100%;
             flex-shrink: 0;
+          }
+          .livecodeblock-preview--plain {
+            width: auto;
+            flex: 1 1 0;
+            min-width: 0;
           }
         }
 

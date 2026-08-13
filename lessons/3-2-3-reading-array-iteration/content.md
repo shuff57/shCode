@@ -30,7 +30,7 @@ for (const item of scores) {
 
 **Try it:** The block below sums an array with a `for` loop, then prints each item with `for...of`.
 
-```js live console
+```js live plain
 let scores = [10, 20, 30, 40, 50];
 
 // Sum using a for loop (needs the index to accumulate)

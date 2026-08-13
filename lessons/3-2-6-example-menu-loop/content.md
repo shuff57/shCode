@@ -4,7 +4,7 @@
 
 Here is a small array of menu choices. The `for` loop visits each one using an index `i`. Run it to confirm every item prints.
 
-```js live console
+```js live plain
 let menu = ["start", "help", "quit"];
 
 for (let i = 0; i < menu.length; i++) {
@@ -16,7 +16,7 @@ for (let i = 0; i < menu.length; i++) {
 
 Now put an `if/else if/else` inside the loop. The loop handles the repetition; the conditional handles the decision. Each item gets its own response.
 
-```js live console
+```js live plain
 let menu = ["start", "help", "quit"];
 
 for (let i = 0; i < menu.length; i++) {
@@ -38,7 +38,7 @@ for (let i = 0; i < menu.length; i++) {
 
 Add `"settings"` to the menu array. Because there is no matching case, it falls through to the `else` and prints the unknown-option message.
 
-```js live console
+```js live plain
 let menu = ["start", "help", "settings", "quit"];
 
 for (let i = 0; i < menu.length; i++) {

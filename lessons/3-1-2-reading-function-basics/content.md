@@ -26,7 +26,7 @@ If you define a function but never call it, nothing happens. You must call it.
 
 **Try it:** Run the block below. Then add a third call `greet();` at the bottom and run it again to see the function run three times.
 
-```js live console
+```js live plain
 function greet() {
   console.log("Hello from greet!");
 }

@@ -20,7 +20,7 @@ Those four plain-English steps map almost one-to-one to the code below.
 
 **Try it:** Read through the code and match each `if` to one of the four steps above. Then run it and change the three starting numbers to confirm it always finds the right answer.
 
-```js live console
+```js live plain
 let a = 14;
 let b = 27;
 let c = 9;

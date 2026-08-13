@@ -10,7 +10,7 @@ What you'll learn from it:
 
 **Try it:** Run the block below to see three tasks for the action "test the greeting app."
 
-```js live console
+```js live plain
 console.log("task 1: write test cases for the greeting");
 console.log("task 2: run the tests and record the results");
 console.log("task 3: fix any failures and re-run");
@@ -25,7 +25,7 @@ What you'll learn from it:
 
 **Try it:** Change the block to add a fourth task for the same action.
 
-```js live console
+```js live plain
 console.log("task 4: confirm the greeting shows correctly");
 ```
 

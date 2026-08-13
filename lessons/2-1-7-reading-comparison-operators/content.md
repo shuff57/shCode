@@ -23,7 +23,7 @@ A comparison operator compares two values and gives back `true` or `false`.
 
 **Try it:** Read each line, predict `true` or `false`, then run it and check.
 
-```js live console
+```js live plain
 console.log(5 === 5);       // same value, same type → true
 console.log(5 === "5");     // number vs string → false  (=== is strict)
 console.log(5 == "5");      // == converts types → true  (risky!)

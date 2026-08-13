@@ -10,7 +10,7 @@ What you'll learn from it:
 
 **Try it:** Run the block below to log the four objectives a prescriptive model helps a team hit.
 
-```js live console
+```js live plain
 console.log("objective 1: efficiency");
 console.log("objective 2: lower risk");
 console.log("objective 3: predictability");
@@ -26,7 +26,7 @@ What you'll learn from it:
 
 **Try it:** Change the block to log which example (waterfall, prototyping, spiral, or RUP) sounds most orderly to you.
 
-```js live console
+```js live plain
 console.log("waterfall sounds most orderly: one phase finishes before the next begins");
 ```
 

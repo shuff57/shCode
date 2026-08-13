@@ -4,7 +4,7 @@
 
 A "teen" check: the age must be at least 13 **and** at most 19. Try changing `age` to 12 or 20 and re-run.
 
-```js live console
+```js live plain
 let age = 16;
 
 if (age >= 13 && age <= 19) {
@@ -18,7 +18,7 @@ if (age >= 13 && age <= 19) {
 
 The weekend check fires when the day is Saturday **or** Sunday. Either one is enough.
 
-```js live console
+```js live plain
 let day = "Sat";
 
 if (day === "Sat" || day === "Sun") {
@@ -32,7 +32,7 @@ if (day === "Sat" || day === "Sun") {
 
 `!` turns `true` into `false` and `false` into `true`. Here, if `isRaining` is `false`, then `!isRaining` is `true` — so we go outside.
 
-```js live console
+```js live plain
 let isRaining = false;
 
 if (!isRaining) {

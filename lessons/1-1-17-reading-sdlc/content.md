@@ -10,7 +10,7 @@ What you'll learn from it:
 
 **Try it:** Run the block below to log the four objectives a team gets from following a methodology.
 
-```js live console
+```js live plain
 console.log("objective 1: efficiency");
 console.log("objective 2: lower risk");
 console.log("objective 3: predictability");
@@ -26,7 +26,7 @@ What you'll learn from it:
 
 **Try it:** Change the block to log which of the four objectives matters most to you, and why.
 
-```js live console
+```js live plain
 console.log("predictability matters most: it keeps the project on schedule");
 ```
 

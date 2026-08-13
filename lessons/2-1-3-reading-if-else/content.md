@@ -22,7 +22,7 @@ JavaScript checks each condition from top to bottom and stops at the **first** o
 
 **Try it:** Change `score` to different values (95, 70, 55, 40) and re-run to see which branch fires each time.
 
-```js live console
+```js live plain
 let score = 85;
 
 if (score >= 90) {

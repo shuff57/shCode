@@ -4,7 +4,7 @@
 
 Run this and notice the output is `true` or `false`, not a number or a word.
 
-```js live console
+```js live plain
 console.log(5 > 3);
 console.log(5 < 3);
 console.log(10 >= 10);
@@ -15,7 +15,7 @@ console.log(7 !== 8);
 
 `===` means "same value **and** same type." A number and a string that look the same are not `===` equal.
 
-```js live console
+```js live plain
 console.log(5 === 5);
 console.log(5 === "5");
 ```
@@ -24,7 +24,7 @@ console.log(5 === "5");
 
 `==` converts types before comparing. `5 == "5"` returns `true` because JavaScript quietly turns the string into a number. This is a common source of bugs.
 
-```js live console
+```js live plain
 console.log(5 == "5");
 console.log(5 === "5");
 ```

@@ -10,7 +10,7 @@
 
 **Try it:** Run the block below. Then change the text on line 1 to your own name and click Run again.
 
-```js live console
+```js live plain
 console.log("Hello, world!");
 console.log(2 + 2);
 console.log(10 > 5);
@@ -29,7 +29,7 @@ console.log(10 > 5);
 
 **Try it:** Read the three lines below and predict what order they will print. Then run the block and check.
 
-```js live console
+```js live plain
 console.log("Step 1: I run first.");
 console.log("Step 2: I run second.");
 console.log("Step 3: I run third.");

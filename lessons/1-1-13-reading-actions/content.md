@@ -10,7 +10,7 @@ What you'll learn from it:
 
 **Try it:** Run the block below to see one action you would expect inside each phase.
 
-```js live console
+```js live plain
 console.log("inception: define the requirements");
 console.log("elaboration: design the architecture");
 console.log("construction: code and build the software");
@@ -26,7 +26,7 @@ What you'll learn from it:
 
 **Try it:** Log one action you would expect inside construction.
 
-```js live console
+```js live plain
 console.log("an action in construction: code and build the software");
 ```
 

@@ -21,7 +21,7 @@ for (init; condition; increment) { ... }
 
 **Try it:** Run the block below. The first loop prints 1 through 5. The second loop adds those same numbers together and prints the total.
 
-```js live console
+```js live plain
 // Print 1 through 5
 for (let i = 1; i <= 5; i++) {
   console.log(i);

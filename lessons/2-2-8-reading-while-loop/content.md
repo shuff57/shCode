@@ -37,7 +37,7 @@ do {
 
 **Try it:** The first loop counts down from 3. The second `do…while` runs its body once even though its condition is already false from the start.
 
-```js live console
+```js live plain
 // while countdown
 let count = 3;
 while (count > 0) {

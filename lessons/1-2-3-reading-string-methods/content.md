@@ -40,7 +40,7 @@ A **method** is a built-in action you can call on a string. You write the string
 
 **Try it:** Run the block and read the output. Then change `itemName` to something else and see how each line responds.
 
-```js live console
+```js live plain
 let itemName = "Coffee Mug";
 let material = "ceramic";
 

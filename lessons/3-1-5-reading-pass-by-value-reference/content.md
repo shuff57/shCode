@@ -20,7 +20,7 @@ When you pass an **object** or an **array**, JavaScript hands the function a **r
 
 **Try it:** Read the code and predict what each `console.log` will print. Then run it and check.
 
-```js live console
+```js live plain
 // --- Pass by VALUE (number) ---
 function tryToDouble(n) {
   n = n * 2;

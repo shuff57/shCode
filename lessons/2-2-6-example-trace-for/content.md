@@ -4,7 +4,7 @@
 
 The loop starts with `i = 1`, checks `i <= 5` before each pass, and adds 1 to `i` at the end of each pass. Run it and confirm five lines print.
 
-```js live console
+```js live plain
 for (let i = 1; i <= 5; i++) {
   console.log(i);
 }
@@ -14,7 +14,7 @@ for (let i = 1; i <= 5; i++) {
 
 Add a `total` variable outside the loop. Each pass adds `i` to `total`. After the loop ends, print `total`.
 
-```js live console
+```js live plain
 let total = 0;
 
 for (let i = 1; i <= 5; i++) {
@@ -28,7 +28,7 @@ console.log("Sum 1 to 5:", total);
 
 Change the limit to `3` and add a log **inside** the loop so you can see `i` and `total` on every single pass. Notice that when `i` becomes `4`, the condition `i <= 3` is false and the loop stops — the body never runs for `i = 4`.
 
-```js live console
+```js live plain
 let total = 0;
 
 for (let i = 1; i <= 3; i++) {

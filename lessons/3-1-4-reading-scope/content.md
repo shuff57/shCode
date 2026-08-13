@@ -20,7 +20,7 @@ A variable declared outside any function is **global**. It exists for the whole 
 
 **Try it:** Run the block and read each line of output. Notice that `score` (global) is visible inside `showResult`, but `label` (local) is only used inside `describeScore` and never touched outside.
 
-```js live console
+```js live plain
 let score = 42;   // global — declared outside any function
 
 function showResult() {

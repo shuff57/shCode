@@ -18,7 +18,7 @@ Use `let` when the value will change over time. Use `const` when the value shoul
 
 **Try it:** Run the block below. Then change `score` to `const` and run again — notice the error.
 
-```js live console
+```js live plain
 let score = 0;
 const playerName = "Jordan";
 

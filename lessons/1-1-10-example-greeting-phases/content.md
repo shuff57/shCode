@@ -4,7 +4,7 @@
 
 Before any code, Amara decides what the app is *for*: it greets a user by name. Inception is the planning phase where goals and overall scope are defined. Here the whole scope fits in one sentence.
 
-```js live console
+```js live plain
 // Inception: the goal
 console.log("Goal: greet a user by name.");
 ```
@@ -13,7 +13,7 @@ console.log("Goal: greet a user by name.");
 
 Amara turns the goal into a requirement ("ask for a name, then say hello to it") and sketches the plan: get a name, combine it into a greeting, print it. Elaboration is where requirements are analyzed and the design takes shape.
 
-```js live console
+```js live plain
 // Elaboration: the requirement and the plan
 console.log("Requirement: ask for a name, then greet it.");
 console.log("Plan: get name -> build greeting -> print it.");
@@ -30,7 +30,7 @@ console.log("Hello, " + name + "!");
 
 In this editor, `prompt` is not available, so give `name` a value directly and run the same greeting logic:
 
-```js live console
+```js live plain
 let name = "Sam";
 console.log("Hello, " + name + "!");
 ```
@@ -39,7 +39,7 @@ console.log("Hello, " + name + "!");
 
 Deployment releases the software in a usable form to end users. For Amara, deployment is opening the finished page and watching the greeting appear. Notice: the code above is one phase out of four — students (and teams) tend to over-weight construction.
 
-```js live console
+```js live plain
 // Deployment: release it and see it run
 console.log("The page is live. A user opens it and sees the greeting.");
 ```

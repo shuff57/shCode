@@ -5,13 +5,23 @@ import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
 import LiveCodeBlock from './LiveCodeBlock';
 
-// Fence accepts an optional id for persistent storage and an optional
-// `console` flag that adds a DevTools-style REPL panel under the preview:
+// Fence accepts an optional id for persistent storage, an optional `console`
+// flag that adds a DevTools-style REPL panel under the (shplay canvas)
+// preview, and an optional `plain` flag for console-track code that has no
+// canvas at all:
 //
 //     ```js live id=sprite-demo
 //     ```js live console
 //     ```js live console id=inspect-sprite
+//     ```js live plain
+//     ```js live plain id=hello-world
 //     ```
+//
+// `plain` swaps the shplay-iframe preview pane for a captured Output pane
+// side-by-side with the editor (same execution model as the in-app console
+// lesson workspace) — use it for Unit 1-4 console.log-only blocks. `console`
+// is unrelated and only applies to shplay/canvas blocks that want a REPL
+// attached to the running sketch (e.g. 5-3-6-example-devtools-reveal).
 //
 // When id is omitted, we derive one by hashing the initial code so
 // edits persist across reloads without the author having to name it.
@@ -22,6 +32,7 @@ interface LiveChunk {
   body: string;
   id: string;
   showConsole: boolean;
+  plain: boolean;
 }
 
 interface HtmlChunkData {
@@ -57,12 +68,14 @@ function parseChunks(src: string): Chunk[] {
     const tokens = match[1].trim().split(/\s+/).filter(Boolean);
     let authorId: string | null = null;
     let showConsole = false;
+    let plain = false;
     for (const tok of tokens) {
       if (tok === 'console') showConsole = true;
+      else if (tok === 'plain') plain = true;
       else if (tok.startsWith('id=')) authorId = tok.slice(3);
     }
     const id = authorId ?? `auto-${liveIndex}-${hashCode(body)}`;
-    chunks.push({ kind: 'live', body, id, showConsole });
+    chunks.push({ kind: 'live', body, id, showConsole, plain });
     lastIndex = start + match[0].length;
     liveIndex++;
   }
@@ -102,6 +115,7 @@ export default function MarkdownWithLiveBlocks({ src, lessonId }: Props) {
             blockId={chunk.id}
             lessonId={lessonId}
             showConsole={chunk.showConsole}
+            plain={chunk.plain}
           />
         )
       )}

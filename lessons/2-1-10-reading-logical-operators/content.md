@@ -18,7 +18,7 @@ For example: `age >= 13 && age <= 17` is true only when age is between 13 and 17
 
 **Try it:** Change `age` and `hasTicket` to different values and re-run to see which messages appear.
 
-```js live console
+```js live plain
 let age = 16;
 let hasTicket = true;
 

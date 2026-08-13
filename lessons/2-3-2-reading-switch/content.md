@@ -25,7 +25,7 @@ switch (value) {
 
 **Try it:** Change `day` to other values (`"Mon"`, `"Fri"`, `"Sat"`, `"Sun"`, `"xyz"`) and re-run.
 
-```js live console
+```js live plain
 let day = "Wed";
 
 switch (day) {

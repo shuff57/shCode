@@ -38,7 +38,7 @@ console.log(result);   // 7
 
 **Try it:** Run the block. Then change the two numbers passed to `add` and run it again.
 
-```js live console
+```js live plain
 function add(a, b) {
   return a + b;
 }

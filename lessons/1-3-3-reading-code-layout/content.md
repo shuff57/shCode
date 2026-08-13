@@ -10,7 +10,7 @@ Consistent layout makes code easy to scan. The class style: **2 spaces** of inde
 
 **Try it:**
 
-```js live console
+```js live plain
 // Cramped and hard to read (but it still runs)
 let age=17;if(age>=18){console.log("adult");}else{console.log("minor");}
 

@@ -29,7 +29,7 @@ Same idea for plain objects. The `...` inside `{...}` copies every key-value pai
 
 **Try it:** Predict what each `console.log` will print, then run it.
 
-```js live console
+```js live plain
 var scores = [90, 85, 78];
 
 // Make a copy, then change the copy

@@ -10,7 +10,7 @@ When you write a function, how do you know it works? You test it. A **manual tes
 
 **Try it:** Run the block as-is first, then try breaking `double` on purpose (e.g., change `n * 2` to `n + 2`) and re-run to see the FAIL messages.
 
-```js live console
+```js live plain
 // The function we want to test
 function double(n) {
   return n * 2;

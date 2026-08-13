@@ -11,7 +11,7 @@ What you'll learn from it:
 
 **Try it:** Run the block below to print the four phase names in order, one per line.
 
-```js live
+```js live plain
 console.log("inception");
 console.log("elaboration");
 console.log("construction");
@@ -31,7 +31,7 @@ What you'll learn from it:
 
 **Try it:** The book uses `console.log("Hello, " + name + "!")` as a tiny construction example. First log your guess for which phase that line belongs to, then reveal the answer.
 
-```js live
+```js live plain
 var guess = "construction";
 var answer = "construction";
 console.log("My guess: " + guess);

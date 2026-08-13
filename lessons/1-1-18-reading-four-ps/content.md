@@ -10,7 +10,7 @@ What you'll learn from it:
 
 **Try it:** Run the block below to log the four Ps and one sentence on what each changes.
 
-```js live console
+```js live plain
 console.log("problem - changes how hard the work is");
 console.log("project - changes how it is managed");
 console.log("people - changes who works on it");
@@ -26,7 +26,7 @@ What you'll learn from it:
 
 **Try it:** Change the block to log which P you think matters most for a banking system.
 
-```js live console
+```js live plain
 console.log("for a banking system, the product matters most: it must be reliable");
 ```
 

@@ -4,7 +4,7 @@
 
 This chain checks `day` and logs a message. It works fine, but adding a third, fourth, or fifth case makes it repetitive.
 
-```js live console
+```js live plain
 let day = "Wed";
 
 if (day === "Mon") {
@@ -22,7 +22,7 @@ if (day === "Mon") {
 
 `switch` compares one value against many cases. Each `case` ends with `break` so JavaScript stops after the match and doesn't run the cases below it.
 
-```js live console
+```js live plain
 let day = "Wed";
 
 switch (day) {
@@ -44,7 +44,7 @@ switch (day) {
 
 Remove the `break` after `"Wed"` and run. JavaScript keeps executing the next case's body even though `day` is not `"Fri"`. This is called **fall-through** and is almost always a bug.
 
-```js live console
+```js live plain
 let day = "Wed";
 
 switch (day) {

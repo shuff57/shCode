@@ -19,7 +19,7 @@ The `typeof` operator returns the type of any value as a string. Write `typeof` 
 
 **Try it:** Run the block and read each output. Notice that `typeof null` returns `"object"` — that is a famous old JavaScript bug. Every other language would call it `"null"`.
 
-```js live console
+```js live plain
 let age = 17;
 let name = "Jordan";
 let enrolled = true;

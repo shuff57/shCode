@@ -29,7 +29,7 @@ The rule for `+` is: **if either side is a string, JavaScript joins them as text
 
 **Try it:** Before you run the block, write down what you think each line will print. Then run it and check your predictions.
 
-```js live console
+```js live plain
 console.log("5" + 3);
 console.log("5" - 3);
 console.log("10" * "2");

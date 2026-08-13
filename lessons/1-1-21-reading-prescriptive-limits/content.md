@@ -10,7 +10,7 @@ What you'll learn from it:
 
 **Try it:** Run the block below to log one project type that suits a prescriptive model and one that does not.
 
-```js live console
+```js live plain
 console.log("fits: a well-understood project with stable requirements");
 console.log("does not fit: a project where requirements change weekly");
 ```
@@ -24,7 +24,7 @@ What you'll learn from it:
 
 **Try it:** Change the block to log your own reason a strict process is hard to follow when requirements keep changing.
 
-```js live console
+```js live plain
 console.log("reason: re-planning takes longer than the plan saves");
 ```
 

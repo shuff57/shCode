@@ -4,7 +4,7 @@
 
 `score` is 85. Before you hit Run, read each condition top to bottom and decide which one is true first. Then run and check your prediction.
 
-```js live console
+```js live plain
 let score = 85;
 
 if (score >= 90) {
@@ -24,7 +24,7 @@ if (score >= 90) {
 
 Change `score` to `55`. Which branch will fire now? Predict first, then run.
 
-```js live console
+```js live plain
 let score = 55;
 
 if (score >= 90) {
@@ -44,7 +44,7 @@ if (score >= 90) {
 
 Set `score` to `30`. No `if` or `else if` condition will be true, so the `else` at the bottom catches it.
 
-```js live console
+```js live plain
 let score = 30;
 
 if (score >= 90) {

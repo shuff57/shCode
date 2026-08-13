@@ -10,7 +10,7 @@ A variable name should tell a reader what the value means. The JavaScript habit 
 
 **Try it:**
 
-```js live console
+```js live plain
 // Mystery names — what does this even calculate?
 let p = 29.99;
 let q = 3;

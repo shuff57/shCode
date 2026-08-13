@@ -4,7 +4,7 @@
 
 Before touching anything, run the code and see the failure yourself. Reproducing a bug confirms it is real and gives you a starting point. Each task in a task set produces a work product that gets checked — here the check is "I can trigger the bug."
 
-```js live console
+```js live plain
 // A loop that prints 1..5 but skips 3.
 for (let i = 1; i <= 5; i++) {
   if (i === 3) {
@@ -18,7 +18,7 @@ for (let i = 1; i <= 5; i++) {
 
 The work product for this step is *reading the loop carefully*. The check is that you can say what the loop condition and body actually do — the bug often lives right there.
 
-```js live console
+```js live plain
 console.log("The loop runs from 1 to 5.");
 console.log("The `continue` skips 3. That is the bug.");
 ```
@@ -27,7 +27,7 @@ console.log("The `continue` skips 3. That is the bug.");
 
 Write out what the loop should print, one value per line, without running it. This step's work product is your trace — the check is that it matches what you *want* to happen.
 
-```js live console
+```js live plain
 console.log("Hand trace (expected):");
 for (let i = 1; i <= 5; i++) {
   console.log("expected count: " + i);
@@ -38,7 +38,7 @@ for (let i = 1; i <= 5; i++) {
 
 Apply the fix, then run the loop again to confirm it now prints every number. The final work product is the corrected, tested loop.
 
-```js live console
+```js live plain
 // Fixed: no `continue`, so every number prints.
 for (let i = 1; i <= 5; i++) {
   console.log("count: " + i);

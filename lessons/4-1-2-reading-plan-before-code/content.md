@@ -10,7 +10,7 @@ Professional programmers rarely open a blank file and start typing. Instead they
 
 **Try it:** Read the comments first, predict what the code will print, then run it and check.
 
-```js live console
+```js live plain
 // Step 1: Set up the numbers we need
 var price = 12;
 var quantity = 5;

@@ -4,7 +4,7 @@
 
 `while` checks its condition before every pass. Here `count` starts at 3 and decreases by 1 each time. When `count` reaches 0, the condition is false and the loop stops.
 
-```js live console
+```js live plain
 let count = 3;
 
 while (count > 0) {
@@ -19,7 +19,7 @@ console.log("Liftoff!");
 
 `do...while` executes the body **first**, then checks the condition. Even if the condition starts false, the body runs once. Notice `count` starts at 0 but the message still prints one time.
 
-```js live console
+```js live plain
 let count = 0;
 
 do {
@@ -36,7 +36,7 @@ The code below is safe because it **does** update `count`. But if you removed `c
 
 The rule: every `while` loop **must** have at least one line inside it that moves the condition variable toward the stopping point.
 
-```js live console
+```js live plain
 let count = 3;
 
 // Safe: count decreases each pass, so the loop WILL end.

@@ -10,7 +10,7 @@ A single-line comment starts with `//`. Everything from `//` to the end of that 
 
 **Try it:**
 
-```js live console
+```js live plain
 // This line is a comment — the computer ignores it entirely.
 let age = 17; // age in years
 
@@ -32,7 +32,7 @@ A block comment starts with `/*` and ends with `*/`. Everything in between is ig
 
 **Try it:**
 
-```js live console
+```js live plain
 /*
   Program: Greeting
   Purpose: show a name and age in the console
