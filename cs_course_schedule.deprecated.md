@@ -200,3 +200,8 @@ _42 assignments · 4 chapter tests · 4 group PAs · 3 review days · 2 finals._
 |  |  |  | _Full Review 3 of 3_ | Wk 20 · Wed May 26 |
 |  |  |  | **Semester 2 Final** | Wk 20 · Fri May 28 |
 |  |  |  | **Semester 2 Final (cont.)** | Wk 21 · Wed Jun 02 |
+
+> **SUPERSEDED 2026-08-14.** Replaced by the generated `cs_course_schedule.md` in this directory
+> (produced by `scripts/cs_schedule.py`). This file used a numbering scheme independent of both the
+> book-native scheme and the platform modules, and dates that were never checked against the real
+> district calendar. Kept for reference only.
