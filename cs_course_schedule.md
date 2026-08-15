@@ -22,7 +22,7 @@ _JavaScript + shPlay + JSCAD. **CS meets on odd days only** (single track). Book
 
 | # | Meeting | Wk | Date |
 |---:|---|---:|---|
-| 1 | §1.1 Software Lifecycle | 1 | Fri Aug 14, 2026 |
+| 1 | Orientation and Syllabus + 1.1 Software Lifecycle | 1 | Fri Aug 14, 2026 |
 | 2 | §1.2 Variables and Data Types + §1.3 Documentation and Coding Conventions (day 1/2) | 2 | Tue Aug 18, 2026 |
 | 3 | §1.2 Variables and Data Types + §1.3 Documentation and Coding Conventions (day 2/2) | 2 | Thu Aug 20, 2026 |
 | 4 | §1.4 Programming Paradigms and Languages | 3 | Mon Aug 24, 2026 |

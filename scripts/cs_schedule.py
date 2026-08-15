@@ -40,9 +40,14 @@ That reading is the only one consistent with all three primary facts:
   2. Grey cells. Mon Oct 5 is shaded the same grey as Mon Apr 26 -- the legend's
      "No School for Students" colour. Both are closures. Oct 5 had been missing
      from the ported data; Apr 26 was present.
-  3. Rotation parity. shCode/course_schedule.md (the Intro Stats calendar, same
-     district and year) places Aug 18 on the odd track and Aug 17 on the even
-     track. With Aug 14 as rotation day 1: Aug 17 = 2 (even), Aug 18 = 3 (odd).
+  3. Rotation parity. The Intro Stats calendar for the same district and year
+     (bookSHelf/projects/Introduction to Stats/stats_course_schedule.md) puts
+     "Orientation and Syllabus" on the ODD track at Fri Aug 14 and Aug 17 on
+     the even track -- i.e. Aug 14 is rotation day 1, exactly as here. CS now
+     mirrors that orientation slot; see CHAPTERS below.
+     (A stale copy of that file used to sit at shCode/course_schedule.md and
+     was deleted 2026-08-14 -- wrong repo, and 36 assignments against
+     bookSHelf's 37. Cite the bookSHelf original, not a copy.)
 
   HISTORY: an earlier revision of this file had neither Aug 13 nor Oct 5, and
   "verified" against the PDF's 83/97 totals because the two omissions cancelled
@@ -171,7 +176,14 @@ MINIMUM_DAYS = {
 
 CHAPTERS = [
     ("1", "Foundations", [
-        ("1.1 Software Lifecycle", 1, "section"),                            # 253
+        # Day one carries orientation, matching the Intro Stats calendar which
+        # reserves the same Fri Aug 14 slot for "Orientation and Syllabus".
+        # It shares the meeting with 1.1 rather than taking one of its own:
+        # Semester 1 has no spare slot before the anchored Dec 16 final, and
+        # 1.1 is the lightest section in the book (253 lines) as well as the
+        # natural day-one hook -- syllabus and tools, then what programming is
+        # and how software actually gets made.
+        ("Orientation and Syllabus + 1.1 Software Lifecycle", 1, "orientation"),  # 253
         ("1.2 Variables and Data Types + 1.3 Documentation and Coding Conventions", 2, "pair"),  # 568+229
         ("1.4 Programming Paradigms and Languages", 1, "section"),           # 368
         ("1.5 Program Design Tools and Environments", 2, "section"),         # DENSE 980: pseudocode + flowcharts + first-week tooling setup

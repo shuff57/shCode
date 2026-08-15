@@ -142,6 +142,15 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### 1.1 What Is Programming / Software Lifecycle (~1.75 hrs)
 **Contact hours:** 1.75
 **Sizing note:** 253 lines, 1 meeting — revised down from 2 on 2026-08-14. This was the one day-count in BOOK-TO-MODULE.md derived from a real written spec rather than the line-count proxy; it is re-examined here because the proxy it anchored has been retired.
+
+> **This is day one of the course, and it also carries orientation** (added 2026-08-14, matching the
+> Intro Stats calendar, which reserves the same Fri Aug 14 slot for "Orientation and Syllabus").
+> Orientation shares this meeting rather than taking one of its own: Semester 1 has no spare slot
+> before the anchored Dec 16 final, and §1.1 is both the lightest section in the book (253 lines) and
+> the natural day-one hook. Run the meeting as **syllabus, expectations and tools first, then "what is
+> programming and how does software actually get made"** — the lifecycle content is the payoff, not an
+> afterthought. If §1.1 ever needs a full period of its own, a meeting has to come from elsewhere in
+> Chapters 1–5; see Part B.
 **Book section:** 1.1 Software Lifecycle
 **SLOs covered:** SLO 1, SLO 4 (intro)
 **Reading:** Book §1.1 Software Lifecycle
@@ -2287,7 +2296,8 @@ Browser JS cannot `open/write/close` sequential-access files the way C++/Python 
 
 ## PART B - ASSIGNMENT CALENDAR (2026-27)
 
-> Rebuilt 2026-08-14, replacing the folded-in `cs_course_schedule.md` (now `.deprecated.md`) table,
+> Rebuilt 2026-08-14, replacing an earlier hand-typed `cs_course_schedule.md` table (deleted; see
+> git history at `845a118~1` if it is ever needed),
 > which used a THIRD numbering scheme independent of both the old Q.U scheme in the main body and
 > the book-native scheme this document now uses throughout. This rebuild uses book-native chapter.section
 > IDs consistently and, unlike the old table, is **computed against the real CUSD 2026-27 calendar**
@@ -2467,7 +2477,7 @@ the per-section **Sizing notes** in the main body — they inform teaching empha
 
 | # | Ch | Chapter | Assignment | Wk | Date |
 |---:|---:|---|---|---:|---|
-| 1 | 1 | Foundations | §1.1 Software Lifecycle | 1 | Fri Aug 14, 2026 |
+| 1 | 1 | Foundations | Orientation and Syllabus + §1.1 Software Lifecycle | 1 | Fri Aug 14, 2026 |
 | 2 | 1 | Foundations | §1.2 Variables and Data Types + §1.3 Documentation and Coding Conventions (day 1/2) | 2 | Tue Aug 18, 2026 |
 | 3 | 1 | Foundations | §1.2 Variables and Data Types + §1.3 Documentation and Coding Conventions (day 2/2) | 2 | Thu Aug 20, 2026 |
 | 4 | 1 | Foundations | §1.4 Programming Paradigms and Languages | 3 | Mon Aug 24, 2026 |
