@@ -20,8 +20,22 @@ import type { DiagramDoc, FlowEdge, FlowNode, FlowShape } from './diagram-types'
 // excluded from the label's opening character class.
 const EDGE_OP = /--\s*([^>|\-][^>]*?)\s*-->|-->\s*\|\s*([^|]*?)\s*\||-->/g;
 
-const NODE_REF =
-  /^([A-Za-z_][A-Za-z0-9_]*)\s*(?:\(\[([\s\S]*)\]\)|\[\/([\s\S]*)\/\]|\[([\s\S]*)\]|\{([\s\S]*)\}|\(([\s\S]*)\))?$/;
+// Alternatives are ordered longest-delimiter-first: `[[x]]` must be tried
+// before `[x]`, `{{x}}` before `{x}`, and `((x))` before `(x)`, or the shorter
+// form matches and swallows a bracket into the label.
+const NODE_REF = new RegExp(
+  '^([A-Za-z_][A-Za-z0-9_]*)\\s*(?:' +
+    '\\[\\[([\\s\\S]*)\\]\\]' + // subroutine
+    '|\\{\\{([\\s\\S]*)\\}\\}' + // preparation (hexagon)
+    '|\\(\\(([\\s\\S]*)\\)\\)' + // connector (circle)
+    '|>([\\s\\S]*)\\]' + //        comment (asymmetric flag)
+    '|\\(\\[([\\s\\S]*)\\]\\)' + // terminal (stadium)
+    '|\\[\\/([\\s\\S]*)\\/\\]' + // io (parallelogram)
+    '|\\[([\\s\\S]*)\\]' + //      process
+    '|\\{([\\s\\S]*)\\}' + //      decision
+    '|\\(([\\s\\S]*)\\)' + //      terminal (rounded)
+    ')?$',
+);
 
 interface ParsedRef {
   id: string;
@@ -37,15 +51,27 @@ function unquote(raw: string): string {
   return s.replace(/#quot;/g, '"');
 }
 
+// Capture-group order must match the alternation order in NODE_REF.
+const REF_SHAPES: FlowShape[] = [
+  'subroutine',
+  'preparation',
+  'connector',
+  'comment',
+  'terminal',
+  'io',
+  'process',
+  'decision',
+  'terminal',
+];
+
 function parseRef(segment: string): ParsedRef | null {
   const m = NODE_REF.exec(segment.trim());
   if (!m) return null;
   const id = m[1];
-  if (m[2] !== undefined) return { id, shape: 'terminal', label: unquote(m[2]) };
-  if (m[3] !== undefined) return { id, shape: 'io', label: unquote(m[3]) };
-  if (m[4] !== undefined) return { id, shape: 'process', label: unquote(m[4]) };
-  if (m[5] !== undefined) return { id, shape: 'decision', label: unquote(m[5]) };
-  if (m[6] !== undefined) return { id, shape: 'terminal', label: unquote(m[6]) };
+  for (let i = 0; i < REF_SHAPES.length; i++) {
+    const captured = m[i + 2];
+    if (captured !== undefined) return { id, shape: REF_SHAPES[i], label: unquote(captured) };
+  }
   return { id }; // bare reference to a node declared elsewhere
 }
 
@@ -197,12 +223,20 @@ const OPEN: Record<FlowShape, string> = {
   process: '[',
   decision: '{',
   io: '[/',
+  subroutine: '[[',
+  preparation: '{{',
+  connector: '((',
+  comment: '>',
 };
 const CLOSE: Record<FlowShape, string> = {
   terminal: '])',
   process: ']',
   decision: '}',
   io: '/]',
+  subroutine: ']]',
+  preparation: '}}',
+  connector: '))',
+  comment: ']',
 };
 
 function quote(label: string): string {
@@ -245,6 +279,10 @@ export function describeDiagram(doc: DiagramDoc): string {
     process: 'Task (rectangle)',
     decision: 'Decision (diamond)',
     io: 'Input/Output (parallelogram)',
+    subroutine: 'Function call (predefined process)',
+    preparation: 'Loop setup (hexagon)',
+    connector: 'Connector (jump point; connectors sharing a label are the same point)',
+    comment: 'Note (annotation, deliberately outside the flow)',
   };
 
   const walk: string[] = [];

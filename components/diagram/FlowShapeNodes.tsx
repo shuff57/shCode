@@ -28,6 +28,10 @@ const PALETTE: Record<FlowShape, { fill: string; stroke: string; text: string }>
   process: { fill: '#343746', stroke: '#bd93f9', text: '#f2ecff' },
   decision: { fill: '#3d3a2c', stroke: '#f1fa8c', text: '#fbfbe6' },
   io: { fill: '#33403a', stroke: '#50fa7b', text: '#e6fbec' },
+  subroutine: { fill: '#3f3628', stroke: '#ffb86c', text: '#fdf0e2' },
+  preparation: { fill: '#3d2d38', stroke: '#ff92d0', text: '#fdeaf6' },
+  connector: { fill: '#2c3145', stroke: '#7d8bb5', text: '#dfe4f2' },
+  comment: { fill: 'transparent', stroke: '#6272a4', text: '#aeb7d0' },
 };
 
 const SIZE: Record<FlowShape, { w: number; h: number }> = {
@@ -35,6 +39,10 @@ const SIZE: Record<FlowShape, { w: number; h: number }> = {
   process: { w: 176, h: 72 },
   decision: { w: 190, h: 108 },
   io: { w: 186, h: 70 },
+  subroutine: { w: 190, h: 72 },
+  preparation: { w: 194, h: 76 },
+  connector: { w: 62, h: 62 },
+  comment: { w: 190, h: 66 },
 };
 
 const CLIP: Record<FlowShape, string | undefined> = {
@@ -42,7 +50,16 @@ const CLIP: Record<FlowShape, string | undefined> = {
   process: undefined,
   decision: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
   io: 'polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%)',
+  subroutine: undefined,
+  preparation: 'polygon(18% 0%, 82% 0%, 100% 50%, 82% 100%, 18% 100%, 0% 50%)',
+  connector: undefined,
+  comment: undefined,
 };
+
+/** Fully round for the stadium and the connector circle, softly round elsewhere. */
+function cornerRadius(shape: FlowShape): number {
+  return shape === 'terminal' || shape === 'connector' ? 999 : 8;
+}
 
 const BORDER = 2;
 
@@ -77,7 +94,21 @@ function ShapeNode({ id, data, selected }: NodeProps) {
   // Layered clip-path fakes a border: the outer layer is the stroke colour,
   // the inner layer is inset by BORDER and carries the fill.
   const layers =
-    clip !== undefined ? (
+    shape === 'comment' ? (
+      // A note is drawn as a bracket, not a box — it deliberately does not
+      // look like something an arrow connects to.
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderLeft: `3px solid ${stroke}`,
+          borderTop: `1px dashed ${stroke}`,
+          borderBottom: `1px dashed ${stroke}`,
+          borderRadius: 3,
+          background: 'rgba(98,114,164,0.10)',
+        }}
+      />
+    ) : clip !== undefined ? (
       <>
         <div style={{ position: 'absolute', inset: 0, background: stroke, clipPath: clip }} />
         <div
@@ -90,20 +121,37 @@ function ShapeNode({ id, data, selected }: NodeProps) {
         />
       </>
     ) : (
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: colors.fill,
-          border: `${BORDER}px solid ${stroke}`,
-          borderRadius: shape === 'terminal' ? 999 : 8,
-        }}
-      />
+      <>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: colors.fill,
+            border: `${BORDER}px solid ${stroke}`,
+            borderRadius: cornerRadius(shape),
+          }}
+        />
+        {/* The two inner rails are what make a subroutine box read as "this
+            work is defined somewhere else". */}
+        {shape === 'subroutine' && (
+          <>
+            <div style={{ position: 'absolute', top: BORDER, bottom: BORDER, left: 11, width: 2, background: stroke }} />
+            <div style={{ position: 'absolute', top: BORDER, bottom: BORDER, right: 11, width: 2, background: stroke }} />
+          </>
+        )}
+      </>
     );
 
   // The diamond's points are its extremes, so its text has to live in the
   // middle half or it spills past the clipped edges.
-  const textInset = shape === 'decision' ? '0 24%' : shape === 'io' ? '0 18%' : '0 12px';
+  const textInset =
+    shape === 'decision' ? '0 24%'
+    : shape === 'io' ? '0 18%'
+    : shape === 'preparation' ? '0 20%'
+    : shape === 'subroutine' ? '0 18px'
+    : shape === 'connector' ? '0 6px'
+    : shape === 'comment' ? '0 10px 0 12px'
+    : '0 12px';
 
   return (
     <div
@@ -114,7 +162,7 @@ function ShapeNode({ id, data, selected }: NodeProps) {
         filter: selected ? 'drop-shadow(0 0 0 2px #ff79c6)' : undefined,
         outline: selected && clip === undefined ? '2px solid #ff79c6' : undefined,
         outlineOffset: 2,
-        borderRadius: shape === 'terminal' ? 999 : 8,
+        borderRadius: cornerRadius(shape),
       }}
     >
       {layers}
@@ -187,24 +235,30 @@ function ShapeNode({ id, data, selected }: NodeProps) {
           press always grabs the visible source dot stacked on top of them.
           That costs nothing: React Flow matches a dropped connection to the
           nearest target by stored position, not by hit-testing the element. */}
-      {SIDES.map(({ id, position }) => (
-        <Handle
-          key={`t-${id}`}
-          type="target"
-          position={position}
-          id={`t-${id}`}
-          style={{ ...handleStyle(stroke), opacity: 0, pointerEvents: 'none' }}
-        />
-      ))}
-      {SIDES.map(({ id, position }) => (
-        <Handle
-          key={`s-${id}`}
-          type="source"
-          position={position}
-          id={`s-${id}`}
-          style={handleStyle(stroke)}
-        />
-      ))}
+      {/* A note is not part of the flow, so it offers nothing to connect to —
+          no dots at all, rather than dots that produce an illegal arrow. */}
+      {shape !== 'comment' && (
+        <>
+          {SIDES.map(({ id, position }) => (
+            <Handle
+              key={`t-${id}`}
+              type="target"
+              position={position}
+              id={`t-${id}`}
+              style={{ ...handleStyle(stroke), opacity: 0, pointerEvents: 'none' }}
+            />
+          ))}
+          {SIDES.map(({ id, position }) => (
+            <Handle
+              key={`s-${id}`}
+              type="source"
+              position={position}
+              id={`s-${id}`}
+              style={handleStyle(stroke)}
+            />
+          ))}
+        </>
+      )}
     </div>
   );
 }
@@ -218,6 +272,10 @@ export const nodeTypes = {
   process: Memoized,
   decision: Memoized,
   io: Memoized,
+  subroutine: Memoized,
+  preparation: Memoized,
+  connector: Memoized,
+  comment: Memoized,
 };
 
 export { PALETTE as SHAPE_COLORS, SIZE as SHAPE_SIZE };

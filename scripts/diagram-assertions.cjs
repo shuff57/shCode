@@ -222,6 +222,114 @@ section('checkDiagram — edge pointing at a deleted node');
      r.filter(x => !x.passed).map(x => x.id + ': ' + x.detail).join('; '));
 }
 
+// ---------- the four programming shapes added after the book's basic set ----------
+section('fromMermaid — subroutine / preparation / connector / comment');
+{
+  const d = fromMermaid(`
+flowchart TD
+  A([Start]) --> P{{i = 0 to 9}}
+  P --> S[[drawScore()]]
+  S --> C1((A))
+  C2((A)) --> Z([End])
+  N>remember to reset the score]
+`);
+  const byId = Object.fromEntries(d.nodes.map(n => [n.id, n]));
+  ok('subroutine parsed from [[..]]', byId.S.shape === 'subroutine', byId.S.shape);
+  ok('preparation parsed from {{..}}', byId.P.shape === 'preparation', byId.P.shape);
+  ok('connector parsed from ((..))', byId.C1.shape === 'connector', byId.C1.shape);
+  ok('comment parsed from >..]', byId.N.shape === 'comment', byId.N.shape);
+  ok('subroutine label intact', byId.S.label === 'drawScore()', byId.S.label);
+  ok('preparation label intact', byId.P.label === 'i = 0 to 9', byId.P.label);
+  ok('comment label intact', byId.N.label === 'remember to reset the score', byId.N.label);
+  // {{..}} must win over {..}, [[..]] over [..], ((..)) over (..)
+  ok('decision still parses as decision', fromMermaid('flowchart TD\n X{q}').nodes[0].shape === 'decision');
+  ok('process still parses as process', fromMermaid('flowchart TD\n X[t]').nodes[0].shape === 'process');
+  ok('rounded terminal still parses', fromMermaid('flowchart TD\n X(t)').nodes[0].shape === 'terminal');
+}
+
+section('toMermaid round trip — new shapes');
+{
+  const src = 'flowchart TD\n A([S]) --> P{{i = 0 to 9}}\n P --> S[[draw()]]\n S --> C((A))\n N>a note]';
+  const once = fromMermaid(src);
+  const twice = fromMermaid(toMermaid(once));
+  const shapes = s => s.nodes.map(n => n.shape).sort().join(',');
+  ok('shapes survive a round trip', shapes(once) === shapes(twice), shapes(once) + ' -> ' + shapes(twice));
+  const labels = s => s.nodes.map(n => n.label).sort().join('|');
+  ok('labels survive a round trip', labels(once) === labels(twice), labels(once) + ' -> ' + labels(twice));
+}
+
+section('checkDiagram — notes sit outside the flow');
+{
+  // A valid chart plus a floating note. The note must not read as a second
+  // start, a floating shape, or an unreachable shape.
+  const withNote = fromMermaid(`
+flowchart TD
+  A([Start]) --> B[do it]
+  B --> Z([End])
+  N>this is a note]
+`);
+  const r = checkDiagram(withNote, DEFAULT_RULES);
+  const failed = r.filter(x => !x.passed);
+  ok('a note does not break any default rule', allPassed(r),
+     failed.map(x => x.id + ': ' + x.detail).join('\n        '));
+  ok('note is not counted as a second start', only(withNote, 'one-start').passed);
+  ok('note is not called floating', only(withNote, 'no-orphans').passed);
+  ok('note is not called unreachable', only(withNote, 'reaches-end').passed);
+  ok('a blank note still fails all-labeled',
+     !only(fromMermaid('flowchart TD\n A([S]) --> Z([E])\n N>]'), 'all-labeled').passed);
+  ok('min-nodes ignores notes', !only(withNote, 'min-nodes', 4).passed,
+     JSON.stringify(only(withNote, 'min-nodes', 4)));
+}
+
+section('checkDiagram — connectors are one logical point');
+{
+  // Start -> A ... A -> End. Without pairing, "End" is unreachable and the
+  // landing connector looks like a second start.
+  const jump = fromMermaid(`
+flowchart TD
+  S([Start]) --> T[do it]
+  T --> C1((A))
+  C2((A)) --> Z([End])
+`);
+  const r = checkDiagram(jump, DEFAULT_RULES);
+  const failed = r.filter(x => !x.passed);
+  ok('a matched connector pair keeps the chart valid', allPassed(r),
+     failed.map(x => x.id + ': ' + x.detail).join('\n        '));
+  ok('landing connector is not a second start', only(jump, 'one-start').passed);
+  ok('flow crosses the jump to reach End', only(jump, 'reaches-end').passed);
+  ok('matched pair passes connector-pairs', only(jump, 'connector-pairs').passed);
+
+  const lonely = fromMermaid('flowchart TD\n S([Start]) --> C1((A))\n C1 --> Z([End])');
+  const lp = only(lonely, 'connector-pairs');
+  ok('a connector with no partner fails', !lp.passed, JSON.stringify(lp));
+
+  const blankConn = fromMermaid('flowchart TD\n S([Start]) --> C1(( ))\n C1 --> Z([End])');
+  ok('an unlabelled connector fails connector-pairs', !only(blankConn, 'connector-pairs').passed);
+
+  ok('connector-pairs vacuously passes with no connectors',
+     only(fromMermaid('flowchart TD\n A([S]) --> Z([E])'), 'connector-pairs').passed);
+
+  // Case and spacing should not stop two halves matching.
+  const casey = fromMermaid('flowchart TD\n S([Start]) --> C1((a))\n C2(( A )) --> Z([End])');
+  ok('pairing ignores case and spacing', only(casey, 'connector-pairs').passed,
+     JSON.stringify(only(casey, 'connector-pairs')));
+}
+
+section('checkDiagram — subroutine and loop setup behave like tasks');
+{
+  const d = fromMermaid(`
+flowchart TD
+  A([Start]) --> P{{i = 0 to 9}}
+  P --> S[[drawRow()]]
+  S --> Z([End])
+`);
+  const r = checkDiagram(d, DEFAULT_RULES);
+  ok('function call + loop setup chart is valid', allPassed(r),
+     r.filter(x => !x.passed).map(x => x.id + ': ' + x.detail).join('; '));
+  ok('a floating subroutine is still caught',
+     !only(fromMermaid('flowchart TD\n A([S]) --> Z([E])\n S[[orphan()]]'), 'no-orphans').passed);
+}
+
 section('describeDiagram');
 {
   const text = describeDiagram(good);

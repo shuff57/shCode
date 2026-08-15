@@ -37,7 +37,7 @@ import {
 } from 'lucide-react';
 
 import type { DiagramDoc, FlowShape, SideId } from '../../lib/diagram-types';
-import { SHAPE_LABELS } from '../../lib/diagram-types';
+import { SHAPE_HINTS, SHAPE_LABELS } from '../../lib/diagram-types';
 import { nodeTypes, SHAPE_COLORS, SHAPE_SIZE } from './FlowShapeNodes';
 import { edgeTypes } from './EditableEdge';
 
@@ -228,7 +228,12 @@ interface Props {
   onReset?: () => void;
 }
 
-const SHAPE_ORDER: FlowShape[] = ['terminal', 'process', 'decision', 'io'];
+// The four the book teaches come first and are always visible; the rest are
+// the ones the later modules need (functions, loops, long charts, notes) and
+// stay behind a toggle so a beginner's first look is still four buttons.
+const CORE_SHAPES: FlowShape[] = ['terminal', 'process', 'decision', 'io'];
+const MORE_SHAPES: FlowShape[] = ['subroutine', 'preparation', 'connector', 'comment'];
+const SHAPE_ORDER: FlowShape[] = [...CORE_SHAPES, ...MORE_SHAPES];
 
 function Canvas({
   value,
@@ -248,6 +253,11 @@ function Canvas({
   const [editEdge, setEditEdge] = useState<string | null>(null);
   const [spliceTarget, setSpliceTarget] = useState<string | null>(null);
   const [isFull, setIsFull] = useState(false);
+  // Opens itself if the diagram already uses one of the extra shapes, so a
+  // loaded starter never shows shapes the palette appears not to have.
+  const [showMore, setShowMore] = useState(() =>
+    value.nodes.some((n) => MORE_SHAPES.includes(n.shape)),
+  );
 
   const { screenToFlowPosition, fitView } = useReactFlow();
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -634,7 +644,7 @@ function Canvas({
           }}
         >
           <span style={{ fontSize: 12, color: '#8b93a7', marginRight: 2 }}>Add:</span>
-          {SHAPE_ORDER.map((shape) => (
+          {(showMore ? SHAPE_ORDER : CORE_SHAPES).map((shape) => (
             <button
               key={shape}
               type="button"
@@ -645,7 +655,7 @@ function Canvas({
               }}
               onDragEnd={() => setSpliceTarget(null)}
               onClick={() => addShape(shape)}
-              title="Click to add, or drag onto the canvas — drop it on an arrow to insert it mid-path"
+              title={`${SHAPE_HINTS[shape]}. Click to add, or drag onto the canvas — drop it on an arrow to insert it mid-path.`}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -664,6 +674,23 @@ function Canvas({
               {SHAPE_LABELS[shape]}
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => setShowMore((v) => !v)}
+            title={showMore ? 'Show only the four basic shapes' : 'Function calls, loop setup, connectors and notes'}
+            style={{
+              padding: '5px 10px',
+              background: 'transparent',
+              border: '1px dashed #44475a',
+              borderRadius: 6,
+              color: '#8b93a7',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            {showMore ? '− fewer' : '+ more shapes'}
+          </button>
 
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
             <IconButton onClick={undo} title="Undo" Icon={Undo2} />
@@ -908,6 +935,35 @@ function ShapeGlyph({ shape }: { shape: FlowShape }) {
     return (
       <svg {...common} viewBox="0 0 18 12" aria-hidden>
         <path d="M4 1 H17 L14 11 H1 Z" fill="none" stroke={c} strokeWidth="1.6" />
+      </svg>
+    );
+  }
+  if (shape === 'preparation') {
+    return (
+      <svg {...common} viewBox="0 0 18 12" aria-hidden>
+        <path d="M4 1 H14 L17 6 L14 11 H4 L1 6 Z" fill="none" stroke={c} strokeWidth="1.6" />
+      </svg>
+    );
+  }
+  if (shape === 'subroutine') {
+    return (
+      <svg {...common} viewBox="0 0 18 12" aria-hidden>
+        <rect x="1" y="1" width="16" height="10" rx="1.5" fill="none" stroke={c} strokeWidth="1.6" />
+        <path d="M4.5 1 V11 M13.5 1 V11" stroke={c} strokeWidth="1.4" />
+      </svg>
+    );
+  }
+  if (shape === 'connector') {
+    return (
+      <svg {...common} viewBox="0 0 18 12" aria-hidden>
+        <circle cx="9" cy="6" r="5" fill="none" stroke={c} strokeWidth="1.6" />
+      </svg>
+    );
+  }
+  if (shape === 'comment') {
+    return (
+      <svg {...common} viewBox="0 0 18 12" aria-hidden>
+        <path d="M5 1 H16 M5 11 H16 M5 1 V11" fill="none" stroke={c} strokeWidth="1.6" strokeDasharray="2.5 1.8" />
       </svg>
     );
   }

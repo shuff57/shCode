@@ -150,8 +150,28 @@ page — e.g. `/teacher?class=<id>`, `/teacher-edit?class=X&student=Y&lesson=Z`.
 ## Flowchart diagrams
 
 A `DiagramDoc` (`{nodes, edges}`, `lib/diagram-types.ts`) is the canonical form;
-Mermaid is a projection of it, so authors never hand-write JSON. Four shapes
-only — the ones the book teaches: terminal, process, decision, io.
+Mermaid is a projection of it, so authors never hand-write JSON.
+
+Eight shapes, and the Mermaid each maps to. The first four are the book's set
+and the only ones the palette shows until a student presses **+ more shapes**:
+
+| Shape | Mermaid | For |
+| --- | --- | --- |
+| `terminal` | `A([Start])` | start / end |
+| `process` | `A[do it]` | a task |
+| `decision` | `A{age < 13}` | yes/no branch |
+| `io` | `A[/print x/]` | input / output |
+| `subroutine` | `A[[drawScore()]]` | function call — module 3.1 |
+| `preparation` | `A{{i = 0 to 9}}` | loop setup — module 2.2 |
+| `connector` | `A((A))` | a jump; same label = same point |
+| `comment` | `A>a note]` | annotation, outside the flow |
+
+Two of those are not ordinary flow nodes, and `lib/diagram-check.ts` collapses
+the graph before any rule runs: a `comment` is dropped entirely (otherwise it
+reads as a floating shape and a second start), and `connector`s sharing a
+label merge into one logical node (otherwise the shape after a jump is
+reported unreachable). Offenders are expanded back to real node ids so
+highlighting still lands on the canvas.
 
 **In a reading or slides `content.md`** — a fence beside the existing
 ```` ```js live ````:

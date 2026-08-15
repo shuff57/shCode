@@ -18,6 +18,8 @@ You have written algorithms as numbered steps, and you have seen one drawn as a 
 
 Arrows carry the order. Every arrow points from the step that just happened to the step that happens next.
 
+These four cover almost everything you will draw this year. The toolbar hides four more behind **+ more shapes** — a *function call*, a *loop setup*, a *connector*, and a *note* — and you will meet each one in the unit that needs it. Ignore them until then.
+
 ### The two rules that matter
 
 **One Start, one End.** A flowchart has exactly one shape with no arrow coming into it — that is where a reader begins. Every path eventually arrives at an End oval. If you can start in two places, nobody knows which is the real beginning.

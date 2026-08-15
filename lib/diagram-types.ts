@@ -9,14 +9,47 @@
 // "1.5 Program Design Tools and Environments" — no more, so a student can't
 // wander off into general-purpose drawing.
 
-export type FlowShape = 'terminal' | 'process' | 'decision' | 'io';
+export type FlowShape =
+  | 'terminal'
+  | 'process'
+  | 'decision'
+  | 'io'
+  | 'subroutine'
+  | 'preparation'
+  | 'connector'
+  | 'comment';
 
 export const SHAPE_LABELS: Record<FlowShape, string> = {
   terminal: 'Start / End',
   process: 'Task',
   decision: 'Decision',
   io: 'Input / Output',
+  subroutine: 'Function call',
+  preparation: 'Loop setup',
+  connector: 'Connector',
+  comment: 'Note',
 };
+
+/** One-line hint shown on the palette button. */
+export const SHAPE_HINTS: Record<FlowShape, string> = {
+  terminal: 'The one place the program begins, and where it finishes',
+  process: 'Something the program does: set a value, calculate, print',
+  decision: 'A yes/no question. Exactly two arrows leave it',
+  io: 'Getting something in, or sending something out',
+  subroutine: 'Runs a function defined somewhere else, then comes back',
+  preparation: 'Sets up a loop, e.g. "i = 0 to 9"',
+  connector: 'A jump. Two connectors with the SAME letter are the same point',
+  comment: 'A note for the reader. Not part of the flow, so it takes no arrows',
+};
+
+/**
+ * A note sits beside the flowchart rather than in it, so every structural
+ * question — where does it start, can I reach the end, is anything floating —
+ * has to skip it.
+ */
+export function isFlowShape(shape: FlowShape): boolean {
+  return shape !== 'comment';
+}
 
 export interface FlowNode {
   id: string;
@@ -85,6 +118,7 @@ export type DiagramRuleId =
   | 'decision-labeled'
   | 'reaches-end'
   | 'no-self-loop'
+  | 'connector-pairs'
   | 'min-decisions'
   | 'min-process'
   | 'min-nodes';
@@ -105,6 +139,7 @@ export const DEFAULT_RULES: DiagramRule[] = [
   { id: 'no-orphans' },
   { id: 'decision-two-exits' },
   { id: 'decision-labeled' },
+  { id: 'connector-pairs' },
   { id: 'reaches-end' },
 ];
 

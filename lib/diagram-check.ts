@@ -2,8 +2,19 @@
 // with no network call — the student gets "your diamond only has one exit"
 // the moment they ask, and the AI grader is reserved for the question these
 // rules can never answer: does this diagram actually solve the problem.
+//
+// Two shapes are not ordinary flow nodes, and every rule here works on a
+// *collapsed* view that accounts for them:
+//
+//   comment    sits beside the chart, takes no arrows. Dropped entirely, or
+//              it would read as a floating shape and as a second start.
+//   connector  a jump. Two connectors sharing a label are one point, so they
+//              merge into a single logical node — otherwise "every shape is
+//              reachable" fails on exactly the diagrams connectors exist to
+//              make readable.
 
 import type { DiagramDoc, DiagramRule, DiagramRuleId, FlowNode } from './diagram-types';
+import { isFlowShape } from './diagram-types';
 
 export interface CheckResult {
   id: DiagramRuleId;
@@ -24,41 +35,86 @@ const DEFAULT_TITLES: Record<DiagramRuleId, string> = {
   'decision-labeled': 'Both diamond exits are labelled',
   'reaches-end': 'Every shape is on a path from Start to End',
   'no-self-loop': 'No arrow points back at its own shape',
+  'connector-pairs': 'Every connector has a matching partner',
   'min-decisions': 'Uses at least one decision diamond',
   'min-process': 'Uses at least one task rectangle',
   'min-nodes': 'Diagram has enough shapes',
 };
 
 interface Graph {
+  /** Every original node, for naming offenders. */
   byId: Map<string, FlowNode>;
+  /** Logical nodes: comments dropped, connector groups merged. */
+  flowNodes: FlowNode[];
   outgoing: Map<string, string[]>;
   incoming: Map<string, string[]>;
+  /** original id -> logical id (null for comments). */
+  logicalOf: Map<string, string | null>;
+  /** logical id -> original ids, so a merged connector highlights both halves. */
+  membersOf: Map<string, string[]>;
+}
+
+/** Connectors pair on their label, case- and space-insensitively. */
+function connectorKey(n: FlowNode): string | null {
+  const label = n.label.trim().toLowerCase();
+  return label ? `conn:${label}` : null;
 }
 
 function buildGraph(doc: DiagramDoc): Graph {
   const byId = new Map(doc.nodes.map((n) => [n.id, n]));
+  const logicalOf = new Map<string, string | null>();
+  const membersOf = new Map<string, string[]>();
+  const representative = new Map<string, FlowNode>();
+
+  for (const n of doc.nodes) {
+    if (!isFlowShape(n.shape)) {
+      logicalOf.set(n.id, null);
+      continue;
+    }
+    // An unlabelled connector cannot pair with anything, so it stays its own
+    // node and gets caught by connector-pairs rather than silently merging.
+    const key = n.shape === 'connector' ? (connectorKey(n) ?? n.id) : n.id;
+    logicalOf.set(n.id, key);
+    if (!membersOf.has(key)) {
+      membersOf.set(key, []);
+      representative.set(key, { ...n, id: key });
+    }
+    membersOf.get(key)!.push(n.id);
+  }
+
+  const flowNodes = [...representative.values()];
   const outgoing = new Map<string, string[]>();
   const incoming = new Map<string, string[]>();
-  for (const n of doc.nodes) {
+  for (const n of flowNodes) {
     outgoing.set(n.id, []);
     incoming.set(n.id, []);
   }
+
   for (const e of doc.edges) {
-    // Edges to deleted nodes are ignored rather than counted — the editor
-    // prunes them, but a hand-authored starter might not.
-    if (!byId.has(e.from) || !byId.has(e.to)) continue;
-    outgoing.get(e.from)!.push(e.to);
-    incoming.get(e.to)!.push(e.from);
+    // Edges to deleted nodes, or to/from a note, are ignored rather than
+    // counted — the editor prevents the latter, a hand-authored starter might not.
+    const from = logicalOf.get(e.from);
+    const to = logicalOf.get(e.to);
+    if (!from || !to) continue;
+    if (from === to) continue; // collapsing a connector pair can create this
+    outgoing.get(from)!.push(to);
+    incoming.get(to)!.push(from);
   }
-  return { byId, outgoing, incoming };
+
+  return { byId, flowNodes, outgoing, incoming, logicalOf, membersOf };
 }
 
-function startNodes(doc: DiagramDoc, g: Graph): FlowNode[] {
-  return doc.nodes.filter((n) => (g.incoming.get(n.id) ?? []).length === 0);
+/** Logical ids -> original ids, so highlighting lands on real canvas shapes. */
+function expand(ids: string[], g: Graph): string[] {
+  return ids.flatMap((id) => g.membersOf.get(id) ?? [id]);
 }
 
-function endNodes(doc: DiagramDoc, g: Graph): FlowNode[] {
-  return doc.nodes.filter((n) => (g.outgoing.get(n.id) ?? []).length === 0);
+function startNodes(g: Graph): FlowNode[] {
+  return g.flowNodes.filter((n) => (g.incoming.get(n.id) ?? []).length === 0);
+}
+
+function endNodes(g: Graph): FlowNode[] {
+  return g.flowNodes.filter((n) => (g.outgoing.get(n.id) ?? []).length === 0);
 }
 
 function reachableFrom(seeds: string[], g: Graph): Set<string> {
@@ -80,10 +136,12 @@ function plural(n: number, one: string, many: string): string {
   return n === 1 ? one : many;
 }
 
+/** Names a logical node by the label a student can actually see. */
 function nameList(ids: string[], g: Graph): string {
   return ids
     .map((id) => {
-      const label = g.byId.get(id)?.label?.trim();
+      const first = (g.membersOf.get(id) ?? [id])[0];
+      const label = (g.byId.get(first) ?? g.flowNodes.find((n) => n.id === id))?.label?.trim();
       return label ? `"${label}"` : '(unlabelled)';
     })
     .join(', ');
@@ -94,9 +152,9 @@ function evaluate(rule: DiagramRule, doc: DiagramDoc, g: Graph): Omit<CheckResul
 
   switch (id) {
     case 'one-start': {
-      const roots = startNodes(doc, g);
+      const roots = startNodes(g);
       const terminalRoots = roots.filter((n) => n.shape === 'terminal');
-      if (doc.nodes.length === 0) {
+      if (g.flowNodes.length === 0) {
         return { id, passed: false, detail: 'The canvas is empty — start with a Start oval.', offenders: [] };
       }
       if (roots.length === 0) {
@@ -112,7 +170,7 @@ function evaluate(rule: DiagramRule, doc: DiagramDoc, g: Graph): Omit<CheckResul
           id,
           passed: false,
           detail: `${roots.length} shapes have no incoming arrow (${nameList(roots.map((n) => n.id), g)}). A flowchart has exactly one starting point.`,
-          offenders: roots.map((n) => n.id),
+          offenders: expand(roots.map((n) => n.id), g),
         };
       }
       if (terminalRoots.length !== 1) {
@@ -120,17 +178,15 @@ function evaluate(rule: DiagramRule, doc: DiagramDoc, g: Graph): Omit<CheckResul
           id,
           passed: false,
           detail: `The first shape is ${nameList([roots[0].id], g)}, but it is not an oval. Start and End are drawn as ovals.`,
-          offenders: [roots[0].id],
+          offenders: expand([roots[0].id], g),
         };
       }
       return { id, passed: true, detail: `Starts at ${nameList([roots[0].id], g)}.`, offenders: [] };
     }
 
     case 'has-end': {
-      // An End oval is a terminal that something *arrives at* and nothing
-      // leaves. Requiring an incoming arrow is what stops a freshly-placed,
-      // still-unconnected Start oval from being reported as the finish.
-      const leaves = endNodes(doc, g).filter(
+      // An End oval is a terminal that something arrives at and nothing leaves.
+      const leaves = endNodes(g).filter(
         (n) => n.shape === 'terminal' && (g.incoming.get(n.id) ?? []).length > 0,
       );
       if (leaves.length === 0) {
@@ -150,6 +206,7 @@ function evaluate(rule: DiagramRule, doc: DiagramDoc, g: Graph): Omit<CheckResul
     }
 
     case 'all-labeled': {
+      // Notes are included: a blank note is as unhelpful as a blank task.
       const blank = doc.nodes.filter((n) => n.label.trim() === '');
       return blank.length === 0
         ? { id, passed: true, detail: `All ${doc.nodes.length} shapes are labelled.`, offenders: [] }
@@ -162,10 +219,10 @@ function evaluate(rule: DiagramRule, doc: DiagramDoc, g: Graph): Omit<CheckResul
     }
 
     case 'no-orphans': {
-      if (doc.nodes.length <= 1) {
+      if (g.flowNodes.length <= 1) {
         return { id, passed: true, detail: 'Nothing to connect yet.', offenders: [] };
       }
-      const loose = doc.nodes.filter(
+      const loose = g.flowNodes.filter(
         (n) => (g.incoming.get(n.id) ?? []).length === 0 && (g.outgoing.get(n.id) ?? []).length === 0,
       );
       return loose.length === 0
@@ -173,13 +230,49 @@ function evaluate(rule: DiagramRule, doc: DiagramDoc, g: Graph): Omit<CheckResul
         : {
             id,
             passed: false,
-            detail: `${nameList(loose.map((n) => n.id), g)} ${plural(loose.length, 'is', 'are')} floating with no arrows at all. Drag from a shape's dot to connect it.`,
-            offenders: loose.map((n) => n.id),
+            detail: `${nameList(loose.map((n) => n.id), g)} ${plural(loose.length, 'is', 'are')} floating with no arrows at all. Drag from a shape's dot to connect it. (Notes are exempt — they are meant to sit beside the chart.)`,
+            offenders: expand(loose.map((n) => n.id), g),
+          };
+    }
+
+    case 'connector-pairs': {
+      const connectors = doc.nodes.filter((n) => n.shape === 'connector');
+      if (connectors.length === 0) {
+        return { id, passed: true, detail: 'No connectors to check.', offenders: [] };
+      }
+      const unlabelled = connectors.filter((n) => !n.label.trim());
+      if (unlabelled.length > 0) {
+        return {
+          id,
+          passed: false,
+          detail: `${unlabelled.length} ${plural(unlabelled.length, 'connector has', 'connectors have')} no letter. A connector needs a label so its partner can be identified.`,
+          offenders: unlabelled.map((n) => n.id),
+        };
+      }
+      const groups = new Map<string, FlowNode[]>();
+      for (const n of connectors) {
+        const key = connectorKey(n)!;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key)!.push(n);
+      }
+      const lonely = [...groups.values()].filter((group) => group.length < 2);
+      return lonely.length === 0
+        ? {
+            id,
+            passed: true,
+            detail: `${groups.size} connector ${plural(groups.size, 'pair', 'pairs')} matched up.`,
+            offenders: [],
+          }
+        : {
+            id,
+            passed: false,
+            detail: `${nameList(lonely.map((group) => connectorKey(group[0])!), g)} has no partner. A jump needs two connectors with the same letter — one where the flow leaves, one where it lands.`,
+            offenders: lonely.flatMap((group) => group.map((n) => n.id)),
           };
     }
 
     case 'decision-two-exits': {
-      const diamonds = doc.nodes.filter((n) => n.shape === 'decision');
+      const diamonds = g.flowNodes.filter((n) => n.shape === 'decision');
       if (diamonds.length === 0) {
         return { id, passed: true, detail: 'No decision diamonds to check.', offenders: [] };
       }
@@ -195,31 +288,33 @@ function evaluate(rule: DiagramRule, doc: DiagramDoc, g: Graph): Omit<CheckResul
                 return `${nameList([n.id], g)} has ${count} ${plural(count, 'exit', 'exits')}`;
               })
               .join('; ') + '. A decision asks a yes/no question, so exactly two arrows leave it.',
-            offenders: bad.map((n) => n.id),
+            offenders: expand(bad.map((n) => n.id), g),
           };
     }
 
     case 'decision-labeled': {
-      const diamonds = doc.nodes.filter((n) => n.shape === 'decision');
-      if (diamonds.length === 0) {
+      const diamondIds = new Set(
+        g.flowNodes.filter((n) => n.shape === 'decision').map((n) => n.id),
+      );
+      if (diamondIds.size === 0) {
         return { id, passed: true, detail: 'No decision diamonds to check.', offenders: [] };
       }
-      const bad = diamonds.filter((n) =>
-        doc.edges.some((e) => e.from === n.id && !(e.label ?? '').trim()),
+      const bad = [...diamondIds].filter((did) =>
+        doc.edges.some((e) => g.logicalOf.get(e.from) === did && !(e.label ?? '').trim()),
       );
       return bad.length === 0
         ? { id, passed: true, detail: 'Every arrow out of a diamond says which answer it follows.', offenders: [] }
         : {
             id,
             passed: false,
-            detail: `${nameList(bad.map((n) => n.id), g)} has an unlabelled exit. Click the arrow and type yes or no so a reader knows which way each answer goes.`,
-            offenders: bad.map((n) => n.id),
+            detail: `${nameList(bad, g)} has an unlabelled exit. Click the arrow and type yes or no so a reader knows which way each answer goes.`,
+            offenders: expand(bad, g),
           };
     }
 
     case 'reaches-end': {
-      const roots = startNodes(doc, g);
-      if (doc.nodes.length === 0) {
+      const roots = startNodes(g);
+      if (g.flowNodes.length === 0) {
         return { id, passed: false, detail: 'The canvas is empty.', offenders: [] };
       }
       if (roots.length !== 1) {
@@ -231,16 +326,16 @@ function evaluate(rule: DiagramRule, doc: DiagramDoc, g: Graph): Omit<CheckResul
         };
       }
       const seen = reachableFrom([roots[0].id], g);
-      const stranded = doc.nodes.filter((n) => !seen.has(n.id));
+      const stranded = g.flowNodes.filter((n) => !seen.has(n.id));
       if (stranded.length > 0) {
         return {
           id,
           passed: false,
           detail: `${nameList(stranded.map((n) => n.id), g)} cannot be reached by following arrows from Start.`,
-          offenders: stranded.map((n) => n.id),
+          offenders: expand(stranded.map((n) => n.id), g),
         };
       }
-      const endsHit = doc.nodes.filter(
+      const endsHit = g.flowNodes.filter(
         (n) => seen.has(n.id) && n.shape === 'terminal' && (g.outgoing.get(n.id) ?? []).length === 0,
       );
       return endsHit.length > 0
@@ -254,13 +349,15 @@ function evaluate(rule: DiagramRule, doc: DiagramDoc, g: Graph): Omit<CheckResul
     }
 
     case 'no-self-loop': {
+      // Checked on the original edges: a connector pair legitimately collapses
+      // to a self-reference, and that is a jump, not a mistake.
       const loops = doc.edges.filter((e) => e.from === e.to);
       return loops.length === 0
         ? { id, passed: true, detail: 'No shape points at itself.', offenders: [] }
         : {
             id,
             passed: false,
-            detail: `${nameList(loops.map((e) => e.from), g)} has an arrow pointing back at itself.`,
+            detail: `${loops.map((e) => `"${g.byId.get(e.from)?.label ?? e.from}"`).join(', ')} has an arrow pointing back at itself.`,
             offenders: loops.map((e) => e.from),
           };
     }
@@ -269,12 +366,13 @@ function evaluate(rule: DiagramRule, doc: DiagramDoc, g: Graph): Omit<CheckResul
     case 'min-process':
     case 'min-nodes': {
       const want = rule.count ?? 1;
+      const flow = doc.nodes.filter((n) => isFlowShape(n.shape));
       const [have, noun] =
         id === 'min-decisions'
-          ? [doc.nodes.filter((n) => n.shape === 'decision').length, 'decision diamond']
+          ? [flow.filter((n) => n.shape === 'decision').length, 'decision diamond']
           : id === 'min-process'
-            ? [doc.nodes.filter((n) => n.shape === 'process').length, 'task rectangle']
-            : [doc.nodes.length, 'shape'];
+            ? [flow.filter((n) => n.shape === 'process').length, 'task rectangle']
+            : [flow.length, 'shape'];
       return have >= want
         ? { id, passed: true, detail: `${have} ${plural(have, noun, noun + 's')}.`, offenders: [] }
         : {
