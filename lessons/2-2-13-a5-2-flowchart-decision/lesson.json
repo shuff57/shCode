@@ -1,6 +1,6 @@
 {
-  "id": "2-2-12-a5-2-flowchart-decision",
-  "title": "2.2.12 Flowchart a Decision",
+  "id": "2-2-13-a5-2-flowchart-decision",
+  "title": "2.2.13 Flowchart a Decision",
   "description": "Draw the ticket-price algorithm as a flowchart. One start, one decision diamond with two labelled exits, one end.",
   "type": "assignment",
   "difficulty": "beginner",
