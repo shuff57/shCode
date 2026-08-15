@@ -24,6 +24,16 @@ export interface GradeRequest {
 
 export interface CriterionResult {
   id: string;
+  /**
+   * The rubric's wording at the moment this was graded. Carried into the
+   * stored result so a submission stays self-describing: the teacher's review
+   * queue can name each criterion without loading the lesson, and editing a
+   * rubric later can't relabel grades it was never applied to.
+   *
+   * Optional because rows written before this existed have only the id, which
+   * readers fall back to.
+   */
+  title?: string;
   earned: number;
   max: number;
   verdict: 'met' | 'partial' | 'missing';
@@ -167,6 +177,7 @@ export function shapeResult(parsed: any, rubric: RubricItem[]): GradeResponse {
         : earned === r.points ? 'met' : earned > 0 ? 'partial' : 'missing';
     return {
       id: r.id,
+      title: r.title,
       earned,
       max: r.points,
       verdict,

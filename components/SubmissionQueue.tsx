@@ -6,11 +6,17 @@ import { useEffect, useState } from 'react';
 // Types
 // ---------------------------------------------------------------------------
 
+// What /api/grade-written actually stores is {id, earned, max, verdict,
+// feedback} — the rubric's human title lives in lesson.json and never made it
+// into the blob, so this panel rendered blank names and `0/undefined`.
+// `title`/`points` stay optional so older or hand-written rows still render.
 interface GradeCriterion {
   id: string;
-  title: string;
-  points: number;
+  title?: string;
+  points?: number;
+  max?: number;
   earned?: number;
+  verdict?: string;
   feedback?: string;
 }
 
@@ -25,10 +31,13 @@ interface SubmissionItem {
   student_email: string;
   lesson_id: string;
   submitted_at: number;
-  ai_score: number;
-  ai_possible: number;
+  // These are the lesson_submissions column names, which is what
+  // /api/classes/[id]/submission-queue selects and returns verbatim. They are
+  // nullable: a submission recorded without a numeric grade stores NULL.
+  score: number | null;
+  possible: number | null;
   grade_json: string;
-  written_response: string;
+  response: string;
 }
 
 interface Props {
@@ -298,7 +307,7 @@ export function SubmissionQueue({ classId }: Props) {
                   fontWeight: 600,
                 }}
               >
-                AI score: {sub.ai_score} / {sub.ai_possible}
+                AI score: {sub.score ?? '—'} / {sub.possible ?? '—'}
               </div>
             </div>
 
@@ -316,17 +325,22 @@ export function SubmissionQueue({ classId }: Props) {
                 <div style={{ fontWeight: 600, color: '#f8f8f2', marginBottom: 6 }}>
                   Criteria (total: {gradeData.totalEarned}/{gradeData.totalPossible})
                 </div>
-                {gradeData.criteria.map((c) => (
-                  <div
-                    key={c.id}
-                    style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0', color: '#f8f8f2' }}
-                  >
-                    <span>{c.title}</span>
-                    <span style={{ color: '#6272a4' }}>
-                      {c.earned !== undefined ? c.earned : '?'}/{c.points}
-                    </span>
-                  </div>
-                ))}
+                {gradeData.criteria.map((c) => {
+                  const max = c.max ?? c.points;
+                  return (
+                    <div
+                      key={c.id}
+                      style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '2px 0', color: '#f8f8f2' }}
+                    >
+                      <span>{c.title || c.id}</span>
+                      <span style={{ color: '#6272a4', flex: '0 0 auto' }}>
+                        {/* Every rubric is zero-point under green-to-advance, so
+                            "3/0" says nothing — show the verdict instead. */}
+                        {max ? `${c.earned ?? '?'}/${max}` : (c.verdict ?? '—')}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             )}
 
@@ -352,7 +366,7 @@ export function SubmissionQueue({ classId }: Props) {
                   overflowY: 'auto',
                 }}
               >
-                {sub.written_response || '(no response)'}
+                {sub.response || '(no response)'}
               </div>
             </div>
 
