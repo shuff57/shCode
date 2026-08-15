@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { Lesson } from '../lib/types';
 import { badgeFor } from '../lib/lesson-badges';
@@ -29,6 +30,25 @@ export default function ContentLessonView({ lesson }: Props) {
   const badge = badgeFor(preview);
   const contentMd = findContent(lesson);
   const meta = lesson as any;
+
+  // A lesson can name a deck that hasn't been authored yet. Embedding that URL
+  // blind puts a raw 404 page inside the lesson, which is a worse first
+  // impression than saying plainly that the deck isn't ready — so check it
+  // exists before framing it. Self-healing: publish the deck and the lesson
+  // starts showing it with no edit to lesson.json.
+  const slidesUrl: string | undefined = preview === 'slides' ? meta.slidesUrl : undefined;
+  const [deckReady, setDeckReady] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!slidesUrl) return;
+    let cancelled = false;
+    fetch(slidesUrl, { method: 'HEAD' })
+      .then((r) => !cancelled && setDeckReady(r.ok))
+      .catch(() => !cancelled && setDeckReady(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [slidesUrl]);
 
   return (
     <main style={{ maxWidth: 960, margin: '0 auto', padding: '24px 20px 80px', color: '#f8f8f2' }}>
@@ -93,24 +113,32 @@ export default function ContentLessonView({ lesson }: Props) {
       ) : null}
 
       {preview === 'slides' ? (
-        meta.slidesUrl ? (
+        slidesUrl && deckReady === true ? (
           <div style={{ marginTop: 16 }}>
             <div style={{ marginBottom: 8 }}>
-              <a href={meta.slidesUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#50fa7b' }}>
+              <a href={slidesUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#50fa7b' }}>
                 → Open in new tab (full screen, editable code blocks)
               </a>
             </div>
             <div style={{ aspectRatio: '16 / 9', borderRadius: 8, overflow: 'hidden', background: '#000', border: '1px solid #44475a' }}>
               <iframe
-                src={meta.slidesUrl}
+                src={slidesUrl}
                 allow="autoplay; clipboard-write; fullscreen"
                 style={{ width: '100%', height: '100%', border: 0 }}
               />
             </div>
           </div>
+        ) : slidesUrl && deckReady === null ? (
+          <div style={{ marginTop: 16, padding: 20, background: '#282a36', borderRadius: 8, border: '1px solid #44475a', color: '#6272a4' }}>
+            Loading slides…
+          </div>
         ) : (
           <div style={{ marginTop: 16, padding: 20, background: '#282a36', borderRadius: 8, border: '1px dashed #555', color: '#aaa' }}>
-            <strong style={{ color: '#bd93f9' }}>Slides not configured.</strong>
+            <strong style={{ color: '#bd93f9' }}>These slides aren&apos;t published yet.</strong>
+            <p style={{ margin: '8px 0 0', fontSize: 14, lineHeight: 1.55 }}>
+              Nothing is missing on your end — your teacher hasn&apos;t built this deck yet. Everything
+              you need for this unit is in the lessons that follow, so mark this complete and carry on.
+            </p>
           </div>
         )
       ) : null}
