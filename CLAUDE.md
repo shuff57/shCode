@@ -86,8 +86,14 @@ Paths follow filenames under `functions/api/`.
 
 ### Lesson state + grader
 - `GET /api/lesson-state` — bulk per-student
-- `GET/PUT/DELETE /api/lesson-state/[lessonId]`
-- `POST /api/grade-written` — Ollama-backed essay grader
+- `POST/DELETE /api/lesson-state/[lessonId]` — POST body `{state:'started'|'completed', score?}`.
+  There is no PUT and no per-lesson GET; read state from the bulk endpoint above.
+- `GET/POST/DELETE /api/lesson-drafts/[lessonId]` — latest-draft-per-lesson autosave.
+  POST body `{response}`. Used by the written grader and by diagram lessons,
+  which store the serialized diagram here.
+- `GET /api/lesson-submissions?lessonId=X` — append-only submit history for the caller
+- `POST /api/grade-written` — Ollama-backed essay grader. Text in, rubric out;
+  diagram lessons send Mermaid plus a prose walk of the graph as the `response`.
 - `POST /api/ai-help` — streaming Socratic-tutor help; pulls keyword-matched shplay docs into the prompt. Per-student per-unit daily quota (`AI_HELP_DAILY_LIMIT`, default 10); teachers/admins exempt. Output is streamed `text/plain` with code blocks trimmed to ≤3 lines so a successful jailbreak still can't deliver a copy-pasteable solution. `X-RateLimit-Limit` / `X-RateLimit-Remaining` headers expose remaining quota.
 
 ### Commits (student's own)
@@ -140,6 +146,47 @@ npx wrangler d1 migrations apply shcode-commits --local         # local dev DB
 segments need `generateStaticParams()` at build time. For runtime-only IDs
 (classes, per-student views), use **query-string routing** on a single static
 page — e.g. `/teacher?class=<id>`, `/teacher-edit?class=X&student=Y&lesson=Z`.
+
+## Flowchart diagrams
+
+A `DiagramDoc` (`{nodes, edges}`, `lib/diagram-types.ts`) is the canonical form;
+Mermaid is a projection of it, so authors never hand-write JSON. Four shapes
+only — the ones the book teaches: terminal, process, decision, io.
+
+**In a reading or slides `content.md`** — a fence beside the existing
+```` ```js live ````:
+
+````
+```flow readonly caption="Figure 2.2.1 — the largest-of-three algorithm"
+flowchart TD
+  A([Start]) --> B[get the age]
+  B --> C{age >= 18}
+  C -- yes --> D[/print "You may vote"/]
+  C -- no --> E[print Too young]
+```
+````
+
+`readonly` renders a figure; without it the student gets a scratch canvas whose
+rearrangement persists per block. `height=520` pins the frame, otherwise it is
+sized to the diagram.
+
+**As an assignment** — `preview: "diagram"` plus a `diagram` block in
+`lesson.json`: `starter` (Mermaid), `rules` (structural checks, see
+`lib/diagram-check.ts`; omit for `DEFAULT_RULES`), and an optional `aiGrader`
+with the same rubric shape the written grader uses. See
+`lessons/2-2-12-a5-2-flowchart-decision/`.
+
+Grading is two-stage and the order matters: the structural rules run in the
+browser and **gate** the Ollama call, so a model call is never spent on a
+diagram with a floating box in it. The submission stores the diagram JSON in
+`lesson_drafts` / `lesson_submissions` — no diagram-specific table.
+
+`npm test` runs `scripts/test-diagram.mjs` over the parser and the rules.
+
+Routing note: `routeEdge` in `DiagramEditor.tsx` auto-picks which side an arrow
+attaches to, but **only for edges with no stored handles** (Mermaid starters,
+spliced edges). An arrow the student attached keeps the sides they chose —
+do not "tidy" those.
 
 ## Ollama grader
 
