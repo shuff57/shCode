@@ -1,0 +1,76 @@
+{
+  "id": "2-2-12-a5-2-flowchart-decision",
+  "title": "2.2.12 Flowchart a Decision",
+  "description": "Draw the ticket-price algorithm as a flowchart. One start, one decision diamond with two labelled exits, one end.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 25,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.2 Algorithms and Loops",
+  "preview": "diagram",
+  "week": 5,
+  "slos": [
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "diagram": {
+    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
+    "rules": [
+      { "id": "one-start" },
+      { "id": "has-end" },
+      { "id": "all-labeled" },
+      { "id": "no-orphans" },
+      { "id": "min-decisions", "count": 1 },
+      { "id": "decision-two-exits" },
+      { "id": "decision-labeled" },
+      { "id": "reaches-end" },
+      { "id": "no-self-loop" }
+    ],
+    "aiGrader": {
+      "rubricTitle": "Ticket-price flowchart — AI-graded rubric",
+      "model": "deepseek-v4-flash:0731-cloud",
+      "contextDocs": [],
+      "prompt": "Draw a flowchart for this algorithm:\n\n1. Start.\n2. Get the customer's age.\n3. If the age is under 13, the ticket costs $8. Otherwise the ticket costs $14.\n4. Print the ticket price.\n5. End.\n\nUse an oval for Start and for End, a rectangle for each task, and a diamond for the decision. Label both arrows leaving the diamond so a reader knows which answer goes which way.",
+      "rubric": [
+        {
+          "id": "gets-age",
+          "title": "Gets the age before deciding",
+          "description": "A task or input shape that obtains the customer's age appears on the path between Start and the decision diamond. Credit any reasonable wording — 'get age', 'ask for age', 'input age'. Deny if the diagram jumps straight from Start to the decision with no step that obtains the age.",
+          "points": 0
+        },
+        {
+          "id": "correct-condition",
+          "title": "Diamond asks the right question",
+          "description": "The decision diamond tests the customer's age against 13 — for example 'age < 13', 'under 13?', 'age less than 13'. Accept an equivalent inverted test such as 'age >= 13' as long as the branches below it are consistent with the direction of the test. Deny if the condition tests a different number or a different quantity.",
+          "points": 0
+        },
+        {
+          "id": "both-prices",
+          "title": "Both prices appear on the correct branches",
+          "description": "One branch out of the diamond leads to $8 and the other to $14, and the branch labels match the condition. If the diamond asks 'age < 13', the yes branch must reach $8 and the no branch $14; if it asks 'age >= 13', the mapping is reversed. Deny if a price is missing, both branches carry the same price, or the prices are swapped relative to the condition.",
+          "points": 0
+        },
+        {
+          "id": "rejoins-and-prints",
+          "title": "Both branches lead onward to the End",
+          "description": "Neither branch is a dead end — following either answer out of the diamond eventually reaches the End oval, whether the two paths rejoin at a shared 'print the price' step or each prints separately before ending. Deny only if a branch stops with nothing after it.",
+          "points": 0
+        },
+        {
+          "id": "shape-meaning",
+          "title": "Shapes are used for what they mean",
+          "description": "Ovals are used only for Start and End, the diamond is used only for the question, and rectangles (or input/output parallelograms) carry the actions. Deny if, for example, the question is drawn in a rectangle or an action is drawn in a diamond.",
+          "points": 0
+        }
+      ]
+    }
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

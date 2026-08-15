@@ -5,9 +5,10 @@ import LessonAccessGate from '../../../components/LessonAccessGate';
 import { getLesson, loadLessons } from '../../../lib/lessons';
 import { getModule } from '../../../lib/curriculum';
 
-// Content-only preview types (no code editor). Lessons with an aiGrader also
-// render through ContentLessonView so WrittenGrader shows up.
-const CONTENT_PREVIEWS = new Set(['reading', 'video', 'example', 'slides']);
+// Content-only preview types (no code editor). Lessons with an aiGrader or a
+// diagram also render through ContentLessonView so WrittenGrader /
+// DiagramAssignmentView show up.
+const CONTENT_PREVIEWS = new Set(['reading', 'video', 'example', 'slides', 'diagram']);
 
 export async function generateStaticParams() {
   const lessons = await loadLessons();
@@ -42,7 +43,7 @@ export default async function LessonPage({
 
   const siblingIds = mod ? mod.lessons.map((l) => l.id) : [];
   const isContentPreview = lesson.preview && CONTENT_PREVIEWS.has(lesson.preview);
-  const body = isContentPreview || lesson.aiGrader
+  const body = isContentPreview || lesson.aiGrader || lesson.diagram
     ? <ContentLessonView lesson={lesson} />
     : <LessonWorkspace lesson={lesson} />;
 

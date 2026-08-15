@@ -11,6 +11,7 @@ import {
   Box,
   Globe,
   FileText,
+  Workflow,
 } from 'lucide-react';
 
 export interface PreviewBadge {
@@ -44,6 +45,7 @@ export const PREVIEW_BADGES: Record<string, PreviewBadge> = {
   console:    makeBadge(Terminal,     'Console',        '#50fa7b'),
   jscad:      makeBadge(Box,          'JSCAD',          '#ffb86c'),
   html:       makeBadge(Globe,        'HTML',           '#8be9fd'),
+  diagram:    makeBadge(Workflow,     'Flowchart',      '#f1fa8c'),
 };
 
 export const FALLBACK_BADGE: PreviewBadge = makeBadge(FileText, 'Content', '#888888');

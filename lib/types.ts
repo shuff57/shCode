@@ -1,3 +1,5 @@
+import type { DiagramConfig } from './diagram-types';
+
 // ---- File System ----
 
 export type FileType = 'html' | 'css' | 'javascript' | 'typescript' | 'json' | 'text' | 'python';
@@ -79,7 +81,7 @@ export interface Lesson {
   estimateMins: number;
   category?: string;
   unit?: string;
-  preview?: 'html' | 'console' | 'jscad' | 'shplay' | 'reading' | 'video' | 'example' | 'challenge' | 'assignment' | 'slides';
+  preview?: 'html' | 'console' | 'jscad' | 'shplay' | 'reading' | 'video' | 'example' | 'challenge' | 'assignment' | 'slides' | 'diagram';
   week?: number;
   slos?: string[];
   files: FileNode[];
@@ -87,6 +89,8 @@ export interface Lesson {
   requirements: Requirement[];
   grading?: Grading;
   aiGrader?: AiGraderConfig;
+  /** Flowchart assignment. See lib/diagram-types.ts. */
+  diagram?: DiagramConfig;
 }
 
 export interface AiGraderConfig {

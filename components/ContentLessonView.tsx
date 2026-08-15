@@ -5,6 +5,7 @@ import type { Lesson } from '../lib/types';
 import { badgeFor } from '../lib/lesson-badges';
 import CompletionPanel from './CompletionPanel';
 import WrittenGrader from './WrittenGrader';
+import DiagramAssignmentView from './DiagramAssignmentView';
 import MarkdownWithLiveBlocks from './MarkdownWithLiveBlocks';
 import HeaderLessonNav from './HeaderLessonNav';
 
@@ -128,7 +129,14 @@ export default function ContentLessonView({ lesson }: Props) {
         </div>
       ) : null}
 
-      {meta.aiGrader ? (
+      {meta.diagram ? (
+        <DiagramAssignmentView
+          lessonId={lesson.id}
+          lessonTitle={lesson.title}
+          config={meta.diagram}
+          fallbackPrompt={contentMd.slice(0, 2000)}
+        />
+      ) : meta.aiGrader ? (
         <WrittenGrader
           lessonId={lesson.id}
           lessonTitle={lesson.title}

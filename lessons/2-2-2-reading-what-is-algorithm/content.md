@@ -16,6 +16,23 @@ You already write algorithms whenever you write code. The trick is learning to t
 3. Compare the current largest to the third number. If the third is larger, update again.
 4. Whatever is in "current largest" at the end is the answer.
 
+Those same four steps can be drawn instead of written. A **flowchart** shows the plan as a picture: ovals for the start and the end, rectangles for the things the program does, diamonds for the questions it asks, and arrows for the order it all happens in.
+
+```flow readonly caption="Figure 2.2.1 — the largest-of-three algorithm as a flowchart. Each diamond is one comparison; the yes branch updates the current largest, the no branch skips it."
+flowchart TD
+  A([Start]) --> B[set largest = a]
+  B --> C{is b bigger than largest?}
+  C -- yes --> D[set largest = b]
+  C -- no --> E{is c bigger than largest?}
+  D --> E
+  E -- yes --> F[set largest = c]
+  E -- no --> G[/print largest/]
+  F --> G
+  G --> H([End])
+```
+
+Drag the canvas to pan it, or scroll to zoom. Notice that every diamond has exactly two arrows leaving it, and both are labelled — that is what makes a flowchart readable by someone who has never seen your code.
+
 Those four plain-English steps map almost one-to-one to the code below.
 
 **Try it:** Read through the code and match each `if` to one of the four steps above. Then run it and change the three starting numbers to confirm it always finds the right answer.

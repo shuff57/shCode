@@ -1,15 +1,30 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { CircleCheck, CircleX } from 'lucide-react';
+import { parseDiagramGrade, parseDiagramResponse } from '../lib/diagram-submission';
+import { diagramFrameHeight } from '../lib/diagram-types';
+
+// Only pulled in when a flowchart submission is actually on screen — a class
+// with no diagram assignments never downloads React Flow.
+const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
+  ssr: false,
+  loading: () => (
+    <div style={{ height: 360, display: 'grid', placeItems: 'center', color: '#6272a4', fontSize: '0.82rem' }}>
+      Loading diagram…
+    </div>
+  ),
+});
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 // What /api/grade-written actually stores is {id, earned, max, verdict,
-// feedback} — the rubric's human title lives in lesson.json and never made it
-// into the blob, so this panel rendered blank names and `0/undefined`.
-// `title`/`points` stay optional so older or hand-written rows still render.
+// feedback} — the rubric's human title lives in lesson.json and never makes it
+// into the blob. `title`/`points` stay optional so older or hand-written rows
+// that do carry them still render.
 interface GradeCriterion {
   id: string;
   title?: string;
@@ -272,7 +287,20 @@ export function SubmissionQueue({ classId }: Props) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       {submissions.map((sub) => {
-        const gradeData = parseGradeJson(sub.grade_json);
+        // A flowchart submission nests its rubric under `ai`, so the plain
+        // top-level reader returns null for it; fall through to the diagram
+        // reader before deciding there is no criteria breakdown to show.
+        const diagramGrade = parseDiagramGrade(sub.grade_json);
+        const gradeData: GradeJson | null =
+          parseGradeJson(sub.grade_json) ??
+          (diagramGrade?.ai
+            ? {
+                totalEarned: diagramGrade.ai.totalEarned,
+                totalPossible: diagramGrade.ai.totalPossible,
+                criteria: diagramGrade.ai.criteria,
+              }
+            : null);
+        const diagram = parseDiagramResponse(sub.response);
 
         return (
           <div
@@ -354,21 +382,71 @@ export function SubmissionQueue({ classId }: Props) {
               }}
             >
               <div style={{ fontWeight: 600, color: '#f8f8f2', fontSize: '0.82rem', marginBottom: 4 }}>
-                Student response
+                {diagram ? 'Student diagram' : 'Student response'}
               </div>
+              {diagram ? (
+                <>
+                  <DiagramEditor
+                    value={diagram}
+                    readOnly
+                    height={diagramFrameHeight(diagram, 300, 560)}
+                    // A review card is short by design, so let the fit shrink
+                    // far enough to show the whole diagram; the teacher can
+                    // scroll-zoom into anything they need to read closely.
+                    fitMinZoom={0.3}
+                  />
+                  <div style={{ color: '#6272a4', fontSize: '0.76rem', marginTop: 5 }}>
+                    {diagram.nodes.length} shapes · {diagram.edges.length} arrows · scroll to zoom,
+                    drag to pan
+                  </div>
+                </>
+              ) : (
+                <div
+                  style={{
+                    color: '#f8f8f2',
+                    fontSize: '0.85rem',
+                    lineHeight: 1.5,
+                    whiteSpace: 'pre-wrap',
+                    maxHeight: 160,
+                    overflowY: 'auto',
+                  }}
+                >
+                  {sub.response || '(no response)'}
+                </div>
+              )}
+            </div>
+
+            {/* Structural checks — only a flowchart submission records these. */}
+            {diagramGrade?.structural && diagramGrade.structural.length > 0 && (
               <div
                 style={{
-                  color: '#f8f8f2',
-                  fontSize: '0.85rem',
-                  lineHeight: 1.5,
-                  whiteSpace: 'pre-wrap',
-                  maxHeight: 160,
-                  overflowY: 'auto',
+                  background: '#282a36',
+                  border: '1px solid #44475a',
+                  borderRadius: 4,
+                  padding: 10,
+                  fontSize: '0.82rem',
                 }}
               >
-                {sub.response || '(no response)'}
+                <div style={{ fontWeight: 600, color: '#f8f8f2', marginBottom: 6 }}>
+                  Flowchart structure (
+                  {diagramGrade.structural.filter((c) => c.passed).length}/
+                  {diagramGrade.structural.length} passed)
+                </div>
+                {diagramGrade.structural.map((c, i) => (
+                  <div
+                    key={c.id + i}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '2px 0', color: '#f8f8f2' }}
+                  >
+                    {c.passed ? (
+                      <CircleCheck size={13} color="#50fa7b" style={{ flex: '0 0 auto' }} />
+                    ) : (
+                      <CircleX size={13} color="#ff5555" style={{ flex: '0 0 auto' }} />
+                    )}
+                    <span>{c.title}</span>
+                  </div>
+                ))}
               </div>
-            </div>
+            )}
 
             {/* Override form */}
             <OverrideForm submissionId={sub.id} onOverride={handleOverride} />

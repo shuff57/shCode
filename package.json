@@ -7,7 +7,8 @@
     "prebuild": "node scripts/generate-lessons-manifest.mjs && node scripts/generate-solutions.mjs && node scripts/generate-lesson-starters.mjs",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
-    "test": "echo \"No tests\""
+    "test": "node scripts/test-diagram.mjs",
+    "test:diagram": "node scripts/test-diagram.mjs"
   },
   "type": "module",
   "dependencies": {
@@ -20,6 +21,7 @@
     "@codemirror/state": "^6.6.0",
     "@codemirror/view": "^6.41.0",
     "@types/diff": "^7.0.2",
+    "@xyflow/react": "^12.11.3",
     "codemirror": "^6.0.2",
     "date-fns": "^4.1.0",
     "diff": "^9.0.0",
