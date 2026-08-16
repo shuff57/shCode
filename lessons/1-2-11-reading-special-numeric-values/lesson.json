@@ -1,6 +1,6 @@
 {
   "id": "1-2-11-reading-special-numeric-values",
-  "title": "1.2.7 Reading — Infinity, -Infinity and NaN",
+  "title": "1.2.8 Reading — Infinity, -Infinity and NaN",
   "description": "Three values that are numbers without being numbers. Definition 1.2.1, and why JavaScript never crashes on bad maths.",
   "type": "lesson",
   "difficulty": "beginner",

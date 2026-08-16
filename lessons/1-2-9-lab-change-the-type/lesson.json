@@ -1,6 +1,6 @@
 {
   "id": "1-2-9-lab-change-the-type",
-  "title": "1.2.26 Change the Type",
+  "title": "1.2.5 Change the Type",
   "description": "Give one variable three different types in a row and print what typeof says each time. Auto-graded.",
   "type": "assignment",
   "difficulty": "beginner",
@@ -23,7 +23,12 @@
     {
       "id": "s2",
       "title": "Print its type",
-      "instructions": "Use console.log with typeof to print what type `thing` is right now."
+      "instructions": "Print what type the variable holds right now. The tool for this is typeof - it is formally taught at 1.2.23, so here is all you need for today:\n\nconsole.log(typeof thing);\n\nIt hands back a word describing the type, such as \"string\" or \"number\".",
+      "hints": [
+        "typeof goes immediately before the value you are asking about",
+        "The answer comes back as a word in quotes - that is normal",
+        "You will use this line three times, once after each change"
+      ]
     },
     {
       "id": "s3",

@@ -11,7 +11,7 @@
 
 // STEP 2: use at least TWO different string methods on your text.
 //         Options: length, toUpperCase, toLowerCase, includes
-//         (see lesson 1.2.13 for how each one is written)
+//         (see lesson 1.2.14 for how each one is written)
 
 // STEP 3: print ONE sentence describing the object, using a
 //         template literal (backticks) with your variables

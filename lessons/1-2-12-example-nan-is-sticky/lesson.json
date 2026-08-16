@@ -1,6 +1,6 @@
 {
   "id": "1-2-12-example-nan-is-sticky",
-  "title": "1.2.8 Worked Example — NaN Is Sticky",
+  "title": "1.2.9 Worked Example — NaN Is Sticky",
   "description": "Once NaN appears in a calculation it spreads to the whole result. Example 1.2.1, with the one exception.",
   "type": "lesson",
   "difficulty": "beginner",

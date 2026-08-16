@@ -12,7 +12,7 @@ Intentionally is the operative word. `null` is something you write. It is a stat
 - `null` is its own type, with one value.
 - It means "nothing", "empty", or "not known yet".
 - You write it deliberately — it is your statement, not JavaScript's.
-- `typeof null` gives a wrong answer, for historical reasons. See 1.2.22.
+- `typeof null` gives a wrong answer, for historical reasons. See 1.2.23.
 
 **Try it:**
 
@@ -26,7 +26,7 @@ console.log(chosenColour);
 console.log(typeof age);    // "object" — this is a known bug
 ```
 
-That last line is wrong and JavaScript knows it is wrong. `typeof null` reports `"object"`, which it is not — `null` is its own separate type. The bug dates from the very first version of the language and has been kept ever since, because fixing it would break a great deal of existing code. Lesson 1.2.22 has the full story.
+That last line is wrong and JavaScript knows it is wrong. `typeof null` reports `"object"`, which it is not — `null` is its own separate type. The bug dates from the very first version of the language and has been kept ever since, because fixing it would break a great deal of existing code. Lesson 1.2.23 has the full story.
 
 ---
 

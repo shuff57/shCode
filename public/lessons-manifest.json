@@ -194,7 +194,7 @@
     },
     {
       "id": "1-2-10-reading-number",
-      "title": "1.2.5 Reading — The number Type",
+      "title": "1.2.6 Reading — The number Type",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -202,7 +202,7 @@
     },
     {
       "id": "1-2-11-reading-special-numeric-values",
-      "title": "1.2.7 Reading — Infinity, -Infinity and NaN",
+      "title": "1.2.8 Reading — Infinity, -Infinity and NaN",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -210,7 +210,7 @@
     },
     {
       "id": "1-2-12-example-nan-is-sticky",
-      "title": "1.2.8 Worked Example — NaN Is Sticky",
+      "title": "1.2.9 Worked Example — NaN Is Sticky",
       "unit": "1.2 Variables and Data Types",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -218,7 +218,7 @@
     },
     {
       "id": "1-2-13-lab-predict-the-number",
-      "title": "1.2.9 Predict the Number",
+      "title": "1.2.10 Predict the Number",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -226,7 +226,7 @@
     },
     {
       "id": "1-2-14-reading-bigint",
-      "title": "1.2.10 Reading — BigInt",
+      "title": "1.2.11 Reading — BigInt",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -234,7 +234,7 @@
     },
     {
       "id": "1-2-15-reading-strings-and-quotes",
-      "title": "1.2.11 Reading — Strings and the Three Quotes",
+      "title": "1.2.12 Reading — Strings and the Three Quotes",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -242,7 +242,7 @@
     },
     {
       "id": "1-2-16-reading-template-literals",
-      "title": "1.2.12 Reading — Embedding Values with ${...}",
+      "title": "1.2.13 Reading — Embedding Values with ${...}",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -250,7 +250,7 @@
     },
     {
       "id": "1-2-17-lab-greeting-with-backticks",
-      "title": "1.2.14 Greeting with Backticks",
+      "title": "1.2.15 Greeting with Backticks",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -258,7 +258,7 @@
     },
     {
       "id": "1-2-18-reading-boolean",
-      "title": "1.2.16 Reading — The boolean Type",
+      "title": "1.2.17 Reading — The boolean Type",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -266,7 +266,7 @@
     },
     {
       "id": "1-2-19-example-comparisons-make-booleans",
-      "title": "1.2.17 Worked Example — Comparisons Produce Booleans",
+      "title": "1.2.18 Worked Example — Comparisons Produce Booleans",
       "unit": "1.2 Variables and Data Types",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -282,7 +282,7 @@
     },
     {
       "id": "1-2-20-reading-null",
-      "title": "1.2.18 Reading — The null Value",
+      "title": "1.2.19 Reading — The null Value",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -290,7 +290,7 @@
     },
     {
       "id": "1-2-21-reading-undefined",
-      "title": "1.2.19 Reading — The undefined Value",
+      "title": "1.2.20 Reading — The undefined Value",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -298,7 +298,7 @@
     },
     {
       "id": "1-2-22-null-vs-undefined",
-      "title": "1.2.20 null vs undefined",
+      "title": "1.2.21 null vs undefined",
       "unit": "1.2 Variables and Data Types",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -306,7 +306,7 @@
     },
     {
       "id": "1-2-23-reading-primitive-vs-object",
-      "title": "1.2.21 Reading — Primitive vs Object",
+      "title": "1.2.22 Reading — Primitive vs Object",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -314,7 +314,7 @@
     },
     {
       "id": "1-2-24-reading-typeof",
-      "title": "1.2.22 Reading — The typeof Operator",
+      "title": "1.2.23 Reading — The typeof Operator",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -322,7 +322,7 @@
     },
     {
       "id": "1-2-25-example-typeof-surprises",
-      "title": "1.2.23 Worked Example — The typeof Surprises",
+      "title": "1.2.24 Worked Example — The typeof Surprises",
       "unit": "1.2 Variables and Data Types",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -330,7 +330,7 @@
     },
     {
       "id": "1-2-26-lab-typeof-round-up",
-      "title": "1.2.24 typeof Round-Up",
+      "title": "1.2.25 typeof Round-Up",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -362,7 +362,7 @@
     },
     {
       "id": "1-2-3-reading-string-methods",
-      "title": "1.2.13 Reading — String Methods in Practice",
+      "title": "1.2.14 Reading — String Methods in Practice",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -378,7 +378,7 @@
     },
     {
       "id": "1-2-4-reading-operators-coercion",
-      "title": "1.2.6 Reading — Arithmetic Operators and Type Coercion",
+      "title": "1.2.7 Reading — Arithmetic Operators and Type Coercion",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -386,7 +386,7 @@
     },
     {
       "id": "1-2-5-lab-variables-types-check",
-      "title": "1.2.25 Variables and Types Check",
+      "title": "1.2.26 Variables and Types Check",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -394,7 +394,7 @@
     },
     {
       "id": "1-2-6-lab-operators-check",
-      "title": "1.2.15 Operators and Expressions Check",
+      "title": "1.2.16 Operators and Expressions Check",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -418,7 +418,7 @@
     },
     {
       "id": "1-2-9-lab-change-the-type",
-      "title": "1.2.26 Change the Type",
+      "title": "1.2.5 Change the Type",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",

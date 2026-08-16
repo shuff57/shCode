@@ -21,7 +21,7 @@ The next lessons take one row at a time. This one is the map, so that when you m
 - Every value in JavaScript has a type.
 - There are exactly eight basic data types.
 - Seven of them are *primitive* — they hold one single thing.
-- The eighth, `object`, holds collections. It gets its own lesson (1.2.21).
+- The eighth, `object`, holds collections. It gets its own lesson (1.2.22).
 
 **Try it:**
 
@@ -41,7 +41,7 @@ console.log(chosen);
 console.log(notSetYet);
 ```
 
-Notice the last one. `notSetYet` was declared and never given a value, and it still printed something. That is a type too — and it has its own lesson at 1.2.19.
+Notice the last one. `notSetYet` was declared and never given a value, and it still printed something. That is a type too — and it has its own lesson at 1.2.20.
 
 ---
 

@@ -32,7 +32,7 @@ console.log(empty.length);   // 0 — still a string
 
 The third one did something the first two cannot. Swap its backticks for double quotes and run it again: you will get the literal text `can embed another ${str}` instead of the value. Double and single quotes treat `${...}` as ordinary characters and do nothing with it.
 
-That embedding is worth its own lesson — 1.2.12.
+That embedding is worth its own lesson — 1.2.13.
 
 ---
 

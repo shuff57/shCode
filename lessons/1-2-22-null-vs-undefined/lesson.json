@@ -1,6 +1,6 @@
 {
   "id": "1-2-22-null-vs-undefined",
-  "title": "1.2.20 null vs undefined",
+  "title": "1.2.21 null vs undefined",
   "description": "Tell the two empties apart and say when you'd write each. AI-graded with hints.",
   "type": "assignment",
   "difficulty": "beginner",

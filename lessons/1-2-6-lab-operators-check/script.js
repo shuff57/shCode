@@ -11,4 +11,4 @@
 
 // Step 4: Compare two values with a comparison operator, and print
 //         the answer. It will be either true or false.
-//         The operators are listed in lesson 1.2.17.
+//         The operators are listed in lesson 1.2.18.

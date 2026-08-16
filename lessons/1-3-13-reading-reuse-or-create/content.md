@@ -38,7 +38,7 @@ console.log(isComplete);
 
 Both halves print the same three values. But point at the word `item` in the top half and ask "what does this hold?" — the honest answer is "depends which line you are on", and that is a question the bottom half never raises.
 
-Note the difference from 1.2.26, where changing a variable's type was the *point* of the exercise. Reassigning `score = score + 10` is fine — same purpose, new value. Reassigning `score = "Alice"` is not.
+Note the difference from 1.2.5, where changing a variable's type was the *point* of the exercise. Reassigning `score = score + 10` is fine — same purpose, new value. Reassigning `score = "Alice"` is not.
 
 ---
 

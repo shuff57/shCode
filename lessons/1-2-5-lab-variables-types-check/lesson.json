@@ -1,6 +1,6 @@
 {
   "id": "1-2-5-lab-variables-types-check",
-  "title": "1.2.25 Variables and Types Check",
+  "title": "1.2.26 Variables and Types Check",
   "description": "Understand how to store and work with data using let, const, and typeof.",
   "type": "assignment",
   "difficulty": "beginner",

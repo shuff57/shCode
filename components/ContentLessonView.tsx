@@ -25,6 +25,13 @@ function toEmbedUrl(url: string): string {
   return url;
 }
 
+// A self-hosted video file, as opposed to a YouTube/Vimeo page to be framed.
+// Cache-busting query strings (`?v=20260816`) are routine on these, so test the
+// path only — matching against the whole URL misses every versioned file.
+function isMediaFile(url: string): boolean {
+  return /\.(mp4|webm|ogv|mov|m4v)$/i.test(url.split(/[?#]/)[0]);
+}
+
 export default function ContentLessonView({ lesson }: Props) {
   const preview = lesson.preview as string;
   const badge = badgeFor(preview);
@@ -95,12 +102,38 @@ export default function ContentLessonView({ lesson }: Props) {
       {preview === 'video' ? (
         meta.videoUrl && meta.videoUrl.trim() ? (
           <div style={{ aspectRatio: '16 / 9', marginTop: 16, borderRadius: 8, overflow: 'hidden', background: '#000' }}>
-            <iframe
-              src={toEmbedUrl(meta.videoUrl)}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              style={{ width: '100%', height: '100%', border: 0 }}
-            />
+            {/* A YouTube link still gets an iframe. A direct file gets a real
+                <video>, because an mp4 dropped into an iframe renders the
+                browser's bare player and shows NO captions — a soft mov_text
+                track inside the container is ignored there, so the iframe path
+                would silently discard the CC. `captionsUrl` names a .vtt beside
+                the video; without one the player just has no caption track. */}
+            {isMediaFile(meta.videoUrl) ? (
+              <video
+                src={meta.videoUrl}
+                controls
+                playsInline
+                crossOrigin="anonymous"
+                style={{ width: '100%', height: '100%', display: 'block' }}
+              >
+                {meta.captionsUrl ? (
+                  <track
+                    kind="captions"
+                    src={meta.captionsUrl}
+                    srcLang="en"
+                    label="English"
+                    default
+                  />
+                ) : null}
+              </video>
+            ) : (
+              <iframe
+                src={toEmbedUrl(meta.videoUrl)}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{ width: '100%', height: '100%', border: 0 }}
+              />
+            )}
           </div>
         ) : (
           <div style={{ marginTop: 16, padding: 20, background: '#282a36', borderRadius: 8, border: '1px dashed #555', color: '#aaa' }}>

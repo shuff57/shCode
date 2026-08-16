@@ -1,6 +1,6 @@
 {
   "id": "1-2-17-lab-greeting-with-backticks",
-  "title": "1.2.14 Greeting with Backticks",
+  "title": "1.2.15 Greeting with Backticks",
   "description": "Build a greeting with a template literal, then prove single quotes cannot do the same job. Auto-graded.",
   "type": "assignment",
   "difficulty": "beginner",

@@ -19,7 +19,7 @@ They are the same. `typeof` is an **operator**, not a function — the parenthes
 - `typeof` returns a string naming the type.
 - Use it to find out what a variable actually holds at this moment.
 - `typeof x` and `typeof(x)` are identical — it is an operator, not a function.
-- Three of its answers are surprising. Those are 1.2.23.
+- Three of its answers are surprising. Those are 1.2.24.
 
 **Try it:**
 
