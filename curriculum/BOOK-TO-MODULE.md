@@ -423,9 +423,11 @@ rewriting a working lab unless the concept it grades actually moved.
   decks with `Access-Control-Allow-Origin: *` (the HEAD readiness probe needs it), no
   `X-Frame-Options`, and `must-revalidate`. Lessons with no deck yet simply omit
   `slidesUrl` and render the "not published yet" placeholder.
-- **Deck URLs end in a theme suffix, and the theme is per-section.** §1.2–§1.5 and
-  §2.1 are published as `.paper`; §1.1 is published as `.bookshelf` and has no
-  `.paper` build. Guess wrong and you do not get a 404 — see below.
+- **Deck URLs end in a theme suffix.** `.paper` is the house theme and everything
+  published so far uses it. Other themes exist (`bookshelf`, `grid`, `ledger`,
+  `letter`, `notebook`, `course-module`) and §1.1 also has an older `.bookshelf`
+  build still live alongside its `.paper` one — prefer `.paper`. Guess wrong and
+  you do not get a 404, see below.
 - **A wrong deck URL returns HTTP 200, not 404.** `oerbookshelf.app` serves its site
   landing page ("Hand-curated math textbooks…") for any unrecognised deck path, so a
   HEAD probe cannot tell a real deck from a typo. This bit for real: `1-1-1-slides`
@@ -434,7 +436,18 @@ rewriting a working lab unless the concept it grades actually moved.
   2026-08-16. **To verify a deck URL, GET it and compare byte length against a
   deliberately bogus path** — same length means the deck is not there. A real deck is
   150–250 KB and its `<title>` names the section.
-- **Linked as of 2026-08-16:** chapter 1 §1.1–§1.5 (all five) and §2.1.
+- **Deck inventory, checked 2026-08-16.** Six decks are published, and all six are
+  linked. The other thirteen `*-1-slides` lessons correctly carry no `slidesUrl`
+  and render the "not published yet" placeholder — **do not invent URLs for them.**
+
+  | Published + linked | No deck in any theme |
+  |---|---|
+  | §1.1 §1.2 §1.3 §1.4 §1.5 §2.1 | §2.2 §2.3 §3.1 §3.2 §4.1 §5.1 §5.3 §6.1 §6.3 §6.4 §6.5 §6.6 §6.7 |
+
+  Re-run the check by probing each section slug (the remastered `.md` filename,
+  minus the extension) with the GET-and-compare method above. When a deck is
+  published on the book side, the only shCode change needed is adding its URL to
+  that module's `*-1-slides` lesson.
 - **No automated gate on any of this.** Nothing checks that a spec's concept list still
   matches its book section, and nothing checks that a built lesson matches its spec.
   The design for a builder/critic loop that would do it is in the book repo at
