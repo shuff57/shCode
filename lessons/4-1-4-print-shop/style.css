@@ -1,0 +1,12 @@
+/* Print Shop — console-only, so the page is just a note to the reader. */
+body {
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+p {
+  color: #444;
+  line-height: 1.5;
+}

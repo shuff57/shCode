@@ -273,6 +273,46 @@
       "week": null
     },
     {
+      "id": "1-5-1-slides",
+      "title": "1.5.1 Slides — Program Design Tools and Environments",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "slides",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-2-reading-pseudocode-and-flowcharts",
+      "title": "1.5.2 Reading — Pseudocode and Flowcharts",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-3-reading-the-flowchart-convention",
+      "title": "1.5.3 Reading — The Class Flowchart Convention",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-4-a1-5-1-flowchart-gate",
+      "title": "1.5.4 A1.5.1 — Your First Flowchart",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "diagram",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-5-a1-5-2-computational-thinking",
+      "title": "1.5.5 A1.5.2 — Computational Thinking",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "2-1-1-slides",
       "title": "2.1.1 Slides — Conditionals",
       "unit": "2.1 Conditionals",
@@ -697,8 +737,8 @@
       "week": 9
     },
     {
-      "id": "4-1-4-print-job-manager",
-      "title": "4.1.4 Print Job Manager (Mini-Project)",
+      "id": "4-1-4-print-shop",
+      "title": "4.1.4 Print Shop (Q1 Synthesis)",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",

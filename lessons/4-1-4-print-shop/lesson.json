@@ -1,0 +1,161 @@
+{
+  "id": "4-1-4-print-shop",
+  "title": "4.1.4 Print Shop (Q1 Synthesis)",
+  "description": "Q1 synthesis: a console-only pricing and queue tool for the class printers. Arrays of objects, functions, sorting, save/load, and your own tests.",
+  "type": "project",
+  "difficulty": "advanced",
+  "estimateMins": 180,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "4.1 Print Shop (Q1 Synthesis)",
+  "preview": "console",
+  "week": 9,
+  "slos": [
+    "SLO-2",
+    "SLO-3",
+    "SLO-4",
+    "SLO-5",
+    "SLO-6"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Store at least 5 orders as objects in an array",
+      "instructions": "Each order needs name, width, height, depth, filament, and priority.",
+      "requiredCommit": true
+    },
+    {
+      "id": "s2",
+      "title": "estimateHours(order) — print time from volume"
+    },
+    {
+      "id": "s3",
+      "title": "priceOf(order) — grams x cost/gram + machine time",
+      "requiredCommit": true
+    },
+    {
+      "id": "s4",
+      "title": "fitsInVolume(order, maxW, maxH, maxD) — three parameters"
+    },
+    {
+      "id": "s5",
+      "title": "sortByPriority(list) — most urgent first"
+    },
+    {
+      "id": "s6",
+      "title": "Save and load the queue with localStorage + JSON"
+    },
+    {
+      "id": "s7",
+      "title": "Main program prints one formatted verdict",
+      "instructions": "e.g. \"You made $14.20; queue is 6 hours\".",
+      "requiredCommit": true
+    },
+    {
+      "id": "s8",
+      "title": "Three manual tests printing PASS or FAIL"
+    },
+    {
+      "id": "s9",
+      "title": "README, comments, and style guide compliance",
+      "instructions": "Appendix A applies. The README says what the tool does and how to run it, and — per Appendix D — what changed from your A4.1.0 chart and why."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "req1",
+      "title": "orders array",
+      "description": "An `orders` array holding order objects",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+orders\\s*=\\s*\\[",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "req2",
+      "title": "Five orders stored",
+      "description": "At least five objects with a priority field",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:priority\\s*:[\\s\\S]*?){5}",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "req3",
+      "title": "estimateHours function",
+      "description": "Estimates print time from the order's volume",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+estimateHours\\s*\\(|(?:let|const|var)\\s+estimateHours\\s*=\\s*(?:function\\s*)?\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "req4",
+      "title": "priceOf function",
+      "description": "Calculates a price from filament grams and machine time",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+priceOf\\s*\\(|(?:let|const|var)\\s+priceOf\\s*=\\s*(?:function\\s*)?\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "req5",
+      "title": "fitsInVolume takes three build-volume parameters",
+      "description": "fitsInVolume(order, maxW, maxH, maxD)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:function\\s+fitsInVolume\\s*\\(|(?:let|const|var)\\s+fitsInVolume\\s*=\\s*(?:function\\s*)?\\()\\s*\\w+\\s*,\\s*\\w+\\s*,\\s*\\w+\\s*,\\s*\\w+\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "req6",
+      "title": "sortByPriority function",
+      "description": "Sorts the queue by priority",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+sortByPriority\\s*\\(|(?:let|const|var)\\s+sortByPriority\\s*=\\s*(?:function\\s*)?\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "req7",
+      "title": "Saves and loads with localStorage + JSON",
+      "description": "Uses JSON.stringify/JSON.parse with localStorage",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "localStorage[\\s\\S]*JSON\\.(stringify|parse)|JSON\\.(stringify|parse)[\\s\\S]*localStorage",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "req8",
+      "title": "Prints a formatted verdict",
+      "description": "A console.log that reports money and queue length together",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\([\\s\\S]{0,200}(\\$|made)[\\s\\S]{0,200}(queue|hour)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "req9",
+      "title": "Tests report PASS or FAIL",
+      "description": "A check that prints PASS when it matches the known answer and FAIL when it does not. The checker cannot count your tests — three is on you, and the teacher reads for it.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "PASS[\\s\\S]{0,200}FAIL|FAIL[\\s\\S]{0,200}PASS",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true,
+    "reviewCommitHistory": true
+  }
+}
