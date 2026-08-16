@@ -3723,7 +3723,7 @@ These judge whether the drawing is a legal flowchart, never whether it solves th
 | `all-labeled` | No shape is blank — notes included |
 | `no-orphans` | No shape floats with no arrows at all (notes exempt) |
 | `decision-two-exits` | Every diamond has exactly two arrows leaving it |
-| `decision-labeled` | Every arrow out of a diamond says `yes` or `no` |
+| `decision-labeled` | Every arrow out of a diamond carries a label (any non-empty text — see below) |
 | `connector-pairs` | Every connector letter appears exactly twice |
 | `reaches-end` | Following arrows from Start reaches every shape and finishes at an End oval |
 
@@ -3734,6 +3734,19 @@ failing exactly the charts connectors exist to make readable).
 
 Assignments may add `min-decisions`, `min-process`, `min-nodes` or `no-self-loop` in `lesson.json`.
 Those are per-assignment floors, not part of the convention.
+
+> **`decision-labeled` checks that a label exists, not what it says** (verified against
+> `lib/diagram-check.ts` 2026-08-16 — the rule tests `!(e.label ?? '').trim()` and nothing more).
+> An earlier version of this row promised `yes` or `no`, which the checker has never enforced;
+> `true`/`false`, `over 18`/`under 18`, or a typo all pass. That leniency is defensible — those
+> are legitimate flowchart labels — but it is a **teaching decision that has not actually been
+> made**, so decide it rather than inherit it:
+>
+> - keep it lenient, and mark wording by eye under D.4, or
+> - tighten the rule to `yes`/`no` and accept that a student labelling a branch `true` goes red.
+>
+> Until it is decided, the on-screen failure message still advises "type yes or no", which is good
+> advice and not a promise of enforcement.
 
 ### D.4 What the checker cannot see — graded by eye
 
