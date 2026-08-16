@@ -1,0 +1,24 @@
+{
+  "id": "4-1-2a-reading-connectors-and-notes",
+  "title": "4.1.2a Reading — Connectors and Notes",
+  "description": "The last two shapes, for the first chart too big to fit on a page: a jump that replaces a long arrow, and a note for the reader.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 12,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "4.1 Print Shop (Q1 Synthesis)",
+  "preview": "reading",
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

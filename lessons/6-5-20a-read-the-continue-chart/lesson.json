@@ -1,0 +1,23 @@
+{
+  "id": "6-5-20a-read-the-continue-chart",
+  "title": "6.5.20a Read the Chart — Does Continue Show Up?",
+  "description": "No drawing. Read the title-screen save check and answer five questions about what a first-time player sees.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 2: shPlay Game Development",
+  "unit": "6.5 Save and Load",
+  "preview": "reading",
+  "slos": [
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "3-1-2a-reading-the-function-call-shape",
+  "title": "3.1.2a Reading — The Function-Call Shape",
+  "description": "A new shape arrives: the double-rail rectangle stands for a whole sequence defined somewhere else, and flow comes back from it.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 12,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "3.1 Functions: Definition and Calls",
+  "preview": "reading",
+  "slos": [
+    "SLO-2",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

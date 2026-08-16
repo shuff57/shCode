@@ -377,6 +377,14 @@
       "week": 4
     },
     {
+      "id": "2-1-4a-chart-the-if-else",
+      "title": "2.1.4a Chart the Code — if / else",
+      "unit": "2.1 Conditionals",
+      "preview": "diagram",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "2-1-5-lab-first-if",
       "title": "2.1.5 Write Your First if",
       "unit": "2.1 Conditionals",
@@ -569,6 +577,14 @@
       "week": 4
     },
     {
+      "id": "2-3-3a-chart-the-switch",
+      "title": "2.3.3a Chart the Code — a switch is a chain of diamonds",
+      "unit": "2.3 The Switch Statement",
+      "preview": "diagram",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "2-3-4-lab-convert-to-switch",
       "title": "2.3.4 Convert an if-chain to switch",
       "unit": "2.3 The Switch Statement",
@@ -599,6 +615,14 @@
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
+    },
+    {
+      "id": "3-1-2a-reading-the-function-call-shape",
+      "title": "3.1.2a Reading — The Function-Call Shape",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
     },
     {
       "id": "3-1-3-reading-parameters-return",
@@ -639,6 +663,14 @@
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
+    },
+    {
+      "id": "3-1-7a-a3-1-0-flowchart-gate",
+      "title": "3.1.7a A3.1.0 — Chart Before You Refactor",
+      "unit": "3.1 Functions: Definition and Calls",
+      "preview": "diagram",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
     },
     {
       "id": "3-1-8-lab-findmax-iseven",
@@ -705,6 +737,14 @@
       "week": 8
     },
     {
+      "id": "3-2-6a-chart-the-array-loop",
+      "title": "3.2.6a Chart the Code — Looping Over an Array",
+      "unit": "3.2 Arrays",
+      "preview": "diagram",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "3-2-7-arrays",
       "title": "3.2.7 Arrays",
       "unit": "3.2 Arrays",
@@ -729,12 +769,28 @@
       "week": 9
     },
     {
+      "id": "4-1-2a-reading-connectors-and-notes",
+      "title": "4.1.2a Reading — Connectors and Notes",
+      "unit": "4.1 Print Shop (Q1 Synthesis)",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "4-1-3-reading-manual-testing",
       "title": "4.1.3 Reading — Manual Testing: PASS / FAIL Checks",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 9
+    },
+    {
+      "id": "4-1-3a-a4-1-0-design-chart",
+      "title": "4.1.3a A4.1.0 — Print Shop Design Chart",
+      "unit": "4.1 Print Shop (Q1 Synthesis)",
+      "preview": "diagram",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
     },
     {
       "id": "4-1-4-print-shop",
@@ -1641,6 +1697,14 @@
       "week": 16
     },
     {
+      "id": "6-5-20a-read-the-continue-chart",
+      "title": "6.5.20a Read the Chart — Does Continue Show Up?",
+      "unit": "6.5 Save and Load",
+      "preview": "reading",
+      "category": "Unit 2: shPlay Game Development",
+      "week": null
+    },
+    {
       "id": "6-5-21-example-confirm-overwrite",
       "title": "6.5.21 Worked Example — Confirm Before Overwriting a Save",
       "unit": "6.5 Save and Load",
@@ -1785,6 +1849,14 @@
       "week": 17
     },
     {
+      "id": "6-6-13a-chart-the-state-machine",
+      "title": "6.6.13a Chart the Code — The Three-State Machine",
+      "unit": "6.6 Game State Machines",
+      "preview": "diagram",
+      "category": "Unit 2: shPlay Game Development",
+      "week": null
+    },
+    {
       "id": "6-6-14-reading-transitions-input",
       "title": "6.6.14 Reading — shplay docs: Input-Driven Transitions",
       "unit": "6.6 Game State Machines",
@@ -1831,6 +1903,14 @@
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
+    },
+    {
+      "id": "6-6-19a-fix-the-pause-chart",
+      "title": "6.6.19a Fix the Broken Chart — the Pause State",
+      "unit": "6.6 Game State Machines",
+      "preview": "diagram",
+      "category": "Unit 2: shPlay Game Development",
+      "week": null
     },
     {
       "id": "6-6-2-video-state-machines",

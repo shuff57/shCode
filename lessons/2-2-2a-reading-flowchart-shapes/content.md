@@ -5,7 +5,9 @@
 - Why a decision diamond always has exactly two labelled exits
 - How to read a flowchart from Start to End without guessing
 
-You have written algorithms as numbered steps, and you have seen one drawn as a picture. Before you draw your own, you need the vocabulary — because in a flowchart, **the shape is the meaning**. A reader who knows the shapes can follow your plan without you standing next to them explaining it.
+You met these shapes back in 1.5, and you drew your first chart there. This is the recap before you start using them every week — and the toolbar tour, because in a flowchart **the shape is the meaning**. A reader who knows the shapes can follow your plan without you standing next to them explaining it.
+
+If 1.5 is still fresh, skim the table and go straight to **the two rules that matter**.
 
 ### The four shapes
 

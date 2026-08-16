@@ -3801,3 +3801,45 @@ Teacher notes:
 - **Watch for the transcript tell** on projects: a flowchart whose shapes map one-to-one onto lines of
   finished code, in order, was drawn afterwards. Charts drawn first have a rectangle that says
   `work out the price` where the code has eleven lines.
+
+### D.8 Where the in-app chart lessons are
+
+Built 2026-08-15. Every one of these is Tier 1 or lower unless marked — structural checks only, run
+in the browser, no AI call and no points. Frequency is the point, so nothing here is rationed.
+
+| Lesson | Mode | Module |
+|---|---|---|
+| `1-5-2-reading-pseudocode-and-flowcharts` | figure + scratch canvas | 1.5 |
+| `1-5-3-reading-the-flowchart-convention` | this appendix, as a student handout | 1.5 |
+| `1-5-4-a1-5-1-flowchart-gate` | draw from a spec | 1.5 |
+| `2-1-4a-chart-the-if-else` | chart the code | 2.1 |
+| `2-2-2a-reading-flowchart-shapes` | recap + toolbar tour | 2.2 |
+| `2-2-3a-chart-the-algorithm` | chart the code | 2.2 |
+| `2-2-5-reading-for-loop` | figure — the loop drawn the long way | 2.2 |
+| `2-2-6a-chart-the-for-loop` | chart the code, hexagon released | 2.2 |
+| `2-2-8-reading-while-loop` | read and predict | 2.2 |
+| `2-2-11-fix-the-broken-chart` | find the defect | 2.2 |
+| `2-2-12-a5-2-flowchart-decision` | **Tier 2** — draw from a spec, AI-graded | 2.2 |
+| `2-3-3a-chart-the-switch` | chart the code | 2.3 |
+| `3-1-2a-reading-the-function-call-shape` | double-rail released | 3.1 |
+| `3-1-7a-a3-1-0-flowchart-gate` | **A3.1.0** — chart before you refactor | 3.1 |
+| `3-2-6a-chart-the-array-loop` | chart the code | 3.2 |
+| `4-1-2a-reading-connectors-and-notes` | connector + note released | 4.1 |
+| `4-1-3a-a4-1-0-design-chart` | **A4.1.0** — whole-program design, day 1 | 4.1 |
+| `6-5-20a-read-the-continue-chart` | read and predict | 6.5 |
+| `6-6-13a-chart-the-state-machine` | chart the code | 6.6 |
+| `6-6-19a-fix-the-pause-chart` | find the defect | 6.6 |
+
+**Five modes, not one exercise repeated.** Draw-from-a-spec is the only mode the course had before
+this, and a student who can only produce a chart from a spec has learned a drawing task. Chart-the-
+code, read-and-predict and find-the-defect run the arrow the other way, which is where fluency comes
+from — and read-and-predict needs no canvas at all.
+
+**Modules with no chart lesson yet:** 1.1–1.3, 5.1, 5.2, 5.3, 6.1, 6.3, 6.4, 6.7. 5.3 (classes) and
+6.7 (input and joints) are the two most worth doing next; 1.1–1.3 are before the vocabulary exists
+and should stay bare.
+
+**Tier 1 checks legality, not correctness.** A structurally perfect chart of the wrong algorithm
+passes. That is the deliberate trade for zero cost and unlimited retries — the judgement of *logic*
+happens at `2-2-12`, on the tests, and on the two graded gates. Never tell a student a green check
+means a right answer, and note that each of these lessons says so itself, in its own last paragraph.
