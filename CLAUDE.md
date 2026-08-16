@@ -208,6 +208,26 @@ attaches to, but **only for edges with no stored handles** (Mermaid starters,
 spliced edges). An arrow the student attached keeps the sides they chose —
 do not "tidy" those.
 
+The auto-routing convention, which is what keeps arrows from crossing:
+
+| Arrow | Leaves on |
+| --- | --- |
+| the ordinary next step | bottom → top |
+| a second way out of a branching shape (`no`, "leave the loop") | the side it leans toward |
+| a loop's return arrow | the **left**, always — the right belongs to the branch exit |
+| a bypass around an intervening shape | the right |
+
+A shape with only **one** way out never takes a side exit, even when its target
+sits well off to the side: the horizontal run would cut through whatever shape
+is between them and read as a connection that isn't there.
+
+`layout()` in `lib/diagram-mermaid.ts` is the other half. It puts each shape in
+its first parent's column, so a straight run falls in one line and a decision's
+*first-written* answer carries straight down while the second shifts right —
+which is what gives `routeEdge` a side to route to. Back edges get no vote on
+either rank or column; before that fix, a loop's return arrow dragged its own
+body to the bottom of the canvas and the chart appeared to run upward.
+
 ## Ollama grader
 
 The essay grader at `POST /api/grade-written` calls `https://ollama.com/api/chat`

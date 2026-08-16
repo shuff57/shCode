@@ -77,6 +77,52 @@ section('fromMermaid — robustness');
   ok('cycle lays out without hanging', cyc.nodes.length === 3);
 }
 
+section('layout — a loop reads downward');
+{
+  // The return arrow (D --> C) closes a cycle. Ranking through it used to push
+  // C and D one row lower on every trip around the loop until they hit the cap,
+  // landing the loop body BELOW the shapes that come after the loop — a chart
+  // that appears to run upward. Every loop figure in module 2.2 depends on this.
+  const d = fromMermaid(
+    'flowchart TD\n' +
+      '  A([Start]) --> B[total = 0]\n' +
+      '  B --> C{{i = 1 to 5}}\n' +
+      '  C --> D[total = total + i]\n' +
+      '  D --> C\n' +
+      '  C --> E[/print total/]\n' +
+      '  E --> F([End])',
+  );
+  const at = Object.fromEntries(d.nodes.map((n) => [n.id, n.y]));
+  ok('loop setup sits below its own init', at.B < at.C, at.B + ' vs ' + at.C);
+  ok('loop body sits below the loop setup', at.C < at.D, at.C + ' vs ' + at.D);
+  ok('the return arrow does not sink the body', at.D < at.F, at.D + ' vs ' + at.F);
+  ok('End is the lowest shape', Math.max(...Object.values(at)) === at.F, JSON.stringify(at));
+  // The back edge must still exist — it is only excluded from ranking.
+  ok('return arrow still drawn', d.edges.some((e) => e.from === 'D' && e.to === 'C'));
+}
+
+section('layout — a decision branches down and to the side');
+{
+  // The first answer written continues straight down in the parent's column;
+  // the second finds it taken and shifts right. That is what lets the two
+  // arrows leave the diamond on different sides instead of crossing.
+  const d = fromMermaid(
+    'flowchart TD\n' +
+      '  A([Start]) --> B[/get the age/]\n' +
+      '  B --> C{age >= 18}\n' +
+      '  C -- yes --> D[print "You may vote"]\n' +
+      '  C -- no --> E[print "Too young"]\n' +
+      '  D --> F([End])\n' +
+      '  E --> F',
+  );
+  const at = Object.fromEntries(d.nodes.map((n) => [n.id, { x: n.x, y: n.y }]));
+  ok('straight run shares one column', at.A.x === at.B.x && at.B.x === at.C.x, JSON.stringify(at));
+  ok('yes branch stays in the column', at.C.x === at.D.x, at.C.x + ' vs ' + at.D.x);
+  ok('no branch shifts to the side', at.E.x > at.D.x, at.D.x + ' vs ' + at.E.x);
+  ok('both answers sit on the same row', at.D.y === at.E.y, at.D.y + ' vs ' + at.E.y);
+  ok('End rejoins under the yes branch', at.F.x === at.D.x && at.F.y > at.D.y, JSON.stringify(at.F));
+}
+
 // ---------- round trip ----------
 section('toMermaid round trip');
 {

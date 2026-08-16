@@ -157,23 +157,44 @@ export function layout(doc: DiagramDoc): DiagramDoc {
   const { nodes, edges } = doc;
   if (nodes.length === 0) return doc;
 
-  const outgoing = new Map<string, string[]>();
+  const outgoing = new Map<string, { to: string; i: number }[]>();
   const indegree = new Map<string, number>();
   for (const n of nodes) {
     outgoing.set(n.id, []);
     indegree.set(n.id, 0);
   }
-  for (const e of edges) {
-    if (!outgoing.has(e.from) || !indegree.has(e.to)) continue;
-    outgoing.get(e.from)!.push(e.to);
+  edges.forEach((e, i) => {
+    if (!outgoing.has(e.from) || !indegree.has(e.to)) return;
+    outgoing.get(e.from)!.push({ to: e.to, i });
     indegree.set(e.to, (indegree.get(e.to) ?? 0) + 1);
-  }
+  });
 
   const rank = new Map<string, number>();
   const roots = nodes.filter((n) => (indegree.get(n.id) ?? 0) === 0);
   // A pure cycle has no zero-indegree node; fall back to the first node so
   // layout still produces something rather than an empty canvas.
   const seeds = roots.length > 0 ? roots : [nodes[0]];
+
+  // A loop's return arrow points back at a node we are already inside. Ranking
+  // through it would push every node around the loop one row lower, again on
+  // the next trip, and again until the cap — which sinks the loop body below
+  // the shapes that come after the loop and reads as though flow runs upward.
+  // Find those edges with a depth-first walk and rank as if they were absent.
+  // They still draw; they just don't get a vote on what row anything sits in.
+  const back = new Set<number>();
+  const state = new Map<string, 0 | 1 | 2>(); // unvisited | on the stack | done
+  function walk(id: string) {
+    state.set(id, 1);
+    for (const { to, i } of outgoing.get(id) ?? []) {
+      const s = state.get(to) ?? 0;
+      if (s === 1) back.add(i);
+      else if (s === 0) walk(to);
+    }
+    state.set(id, 2);
+  }
+  for (const s of seeds) if ((state.get(s.id) ?? 0) === 0) walk(s.id);
+  // Anything a seed couldn't reach (a detached fragment) still needs ranking.
+  for (const n of nodes) if ((state.get(n.id) ?? 0) === 0) walk(n.id);
 
   const queue: string[] = [];
   for (const s of seeds) {
@@ -186,7 +207,8 @@ export function layout(doc: DiagramDoc): DiagramDoc {
   while (queue.length > 0 && guard-- > 0) {
     const id = queue.shift()!;
     const r = rank.get(id) ?? 0;
-    for (const next of outgoing.get(id) ?? []) {
+    for (const { to: next, i } of outgoing.get(id) ?? []) {
+      if (back.has(i)) continue;
       const candidate = r + 1;
       if (candidate > nodes.length) continue;
       if ((rank.get(next) ?? -1) < candidate) {
@@ -203,14 +225,44 @@ export function layout(doc: DiagramDoc): DiagramDoc {
     byRank.get(r)!.push(n);
   }
 
+  // Column assignment. A shape sits in its parent's column whenever that column
+  // is free, so an unbranching run of steps falls in one straight line and a
+  // decision's *first* answer carries straight on down. A second answer finds
+  // the column taken and shifts right — which is exactly the "yes below, no out
+  // to the side" shape a hand-drawn flowchart uses, and it is what lets the two
+  // answers leave the diamond on different sides instead of crossing.
+  //
+  // Declaration order decides who wins the column, so `C -- yes --> D` written
+  // before `C -- no --> E` puts the yes branch in the main line. Back edges get
+  // no vote: a loop's return arrow must not drag its target out of the column
+  // its real parent put it in.
+  const firstParent = new Map<string, string>();
+  edges.forEach((e, i) => {
+    if (back.has(i) || firstParent.has(e.to)) return;
+    if (!rank.has(e.from) || !rank.has(e.to)) return;
+    firstParent.set(e.to, e.from);
+  });
+
+  const col = new Map<string, number>();
+  for (const r of [...byRank.keys()].sort((a, b) => a - b)) {
+    const taken = new Set<number>();
+    for (const n of byRank.get(r)!) {
+      const parent = firstParent.get(n.id);
+      let c = parent !== undefined ? (col.get(parent) ?? 0) : 0;
+      while (taken.has(c)) c++;
+      taken.add(c);
+      col.set(n.id, c);
+    }
+  }
+
   const placed = nodes.map((n) => ({ ...n }));
   const index = new Map(placed.map((n) => [n.id, n]));
   for (const [r, group] of byRank) {
-    group.forEach((n, i) => {
+    for (const n of group) {
       const target = index.get(n.id)!;
-      target.x = Math.round((i - (group.length - 1) / 2) * COL_W + 360);
+      target.x = Math.round((col.get(n.id) ?? 0) * COL_W + 360);
       target.y = r * ROW_H + 40;
-    });
+    }
   }
 
   return { ...doc, nodes: placed };

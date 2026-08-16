@@ -107,6 +107,13 @@ const EDGE_BASE = {
 
 /** How near a shape an arrow may pass before it counts as running through it. */
 const BYPASS_CLEARANCE = 72;
+/**
+ * How far off a decision's own column a target has to sit before its arrow
+ * leaves from the side rather than the bottom. Half a layout column, so a
+ * branch the layout deliberately pushed across counts and a shape the student
+ * has merely nudged a little does not.
+ */
+const SIDE_EXIT_OFFSET = 120;
 
 /** How close to an arrow a dropped shape has to land to splice into it. */
 const SPLICE_RADIUS = 46;
@@ -173,7 +180,7 @@ function edgeUnder(
  * long: two shapes far apart with clear space between them still get a
  * straight arrow.
  */
-function routeEdge(e: Edge, centers: Map<string, Point>): Edge {
+function routeEdge(e: Edge, centers: Map<string, Point>, exitCount: Map<string, number>): Edge {
   // An arrow the student attached themselves keeps the sides they chose. Only
   // arrows with no stated sides — a Mermaid starter, or the two halves created
   // by splicing a shape into a path — get routed automatically.
@@ -184,12 +191,35 @@ function routeEdge(e: Edge, centers: Map<string, Point>): Edge {
   if (!from || !to) return e;
 
   const goesUp = to.y - from.y <= 40;
+
+  // A loop's return arrow goes around the outside, and it goes around the LEFT.
+  // The right is spoken for: a decision's second answer leaves on that side
+  // (below), so a return arrow coming back up the right would meet the `no`
+  // arrow at the same point on the diamond and cross it.
+  if (goesUp) return { ...e, sourceHandle: 's-l', targetHandle: 't-l' };
+
+  // Where a shape has more than one way out, those ways out should not share an
+  // exit point. The arrow carrying straight on down keeps the bottom; one whose
+  // target the layout pushed off to a side leaves from that side. This is what
+  // puts a decision's `yes` and `no` on different edges of the diamond, and it
+  // separates a loop's "carry on round" from its "leave the loop" at the hexagon.
+  //
+  // A shape with a single way out is left alone deliberately. Sending its only
+  // arrow out sideways drags a horizontal run across the row it is leaving,
+  // straight through whatever shape sits between — which reads as a connection
+  // that isn't there. With one exit there is nothing to separate from anyway.
+  if ((exitCount.get(e.source) ?? 0) > 1 && Math.abs(to.x - from.x) > SIDE_EXIT_OFFSET) {
+    return to.x > from.x
+      ? { ...e, sourceHandle: 's-r', targetHandle: 't-t' }
+      : { ...e, sourceHandle: 's-l', targetHandle: 't-t' };
+  }
+
   const passesThrough = [...centers].some(
     ([id, c]) =>
       id !== e.source && id !== e.target && distToSegment(c, from, to) < BYPASS_CLEARANCE,
   );
 
-  return goesUp || passesThrough
+  return passesThrough
     ? { ...e, sourceHandle: 's-r', targetHandle: 't-r' }
     : { ...e, sourceHandle: 's-b', targetHandle: 't-t' };
 }
@@ -565,8 +595,10 @@ function Canvas({
 
   const renderedEdges = useMemo(() => {
     const centers = new Map(nodes.map((n) => [n.id, centerOf(n)] as const));
+    const exitCount = new Map<string, number>();
+    for (const e of edges) exitCount.set(e.source, (exitCount.get(e.source) ?? 0) + 1);
     return edges.map((e) => ({
-      ...styleEdge(routeEdge(e, centers), selEdge, spliceTarget),
+      ...styleEdge(routeEdge(e, centers, exitCount), selEdge, spliceTarget),
       data: {
         editing: editEdge === e.id,
         onLabelChange: setEdgeLabel,
