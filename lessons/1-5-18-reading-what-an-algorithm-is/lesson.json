@@ -1,0 +1,22 @@
+{
+  "id": "1-5-18-reading-what-an-algorithm-is",
+  "title": "1.5.18 Reading — What an Algorithm Is",
+  "description": "Finite, ordered, unambiguous. Definition 1.5.4, and why all three words are doing work.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.5 Program Design Tools and Environments",
+  "preview": "reading",
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "id": "1-5-31-a1-5-1-implement-your-plan",
+  "title": "1.5.31 A1.5.1 Part 2 — Implement Your Plan",
+  "description": "Turn the chart you just passed into working JavaScript, and confirm the code matches the plan. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 30,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.5 Program Design Tools and Environments",
+  "preview": "console",
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write the plan down first",
+      "instructions": "Before any code, write your chart out as pseudocode comments at the top of the file. One instruction per line, indented to show what is inside the decision."
+    },
+    {
+      "id": "s2",
+      "title": "Declare the inputs",
+      "instructions": "The printer-credit rule needs the pages the student wants to print and the credit they have left. Declare pagesRequested and creditRemaining with descriptive names and sensible values."
+    },
+    {
+      "id": "s3",
+      "title": "Write the decision",
+      "instructions": "Use an if/else that matches the diamond on your chart. Both branches must print something."
+    },
+    {
+      "id": "s4",
+      "title": "Confirm the code matches the plan",
+      "instructions": "Read your pseudocode comments and your code side by side. Every shape on your chart should appear once in the code, in the same order. Then change the values so the other branch runs, and check that it does."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r2",
+      "title": "pagesRequested is declared",
+      "description": "A descriptive variable holds how many pages were asked for",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+pagesRequested\\s*=\\s*\\d+",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "creditRemaining is declared",
+      "description": "A descriptive variable holds the credit left",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+creditRemaining\\s*=\\s*\\d+",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "The decision compares the two",
+      "description": "An if statement compares pagesRequested against creditRemaining",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\([^)]*(pagesRequested[^)]*creditRemaining|creditRemaining[^)]*pagesRequested)[^)]*\\)",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Both branches exist",
+      "description": "An else branch is present, matching the diamond's second exit",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\}\\s*else\\s*\\{",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "Both branches print",
+      "description": "Two or more console.log calls, so each path reports an outcome",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:[\\s\\S]*?console\\.log\\s*\\(){2}",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

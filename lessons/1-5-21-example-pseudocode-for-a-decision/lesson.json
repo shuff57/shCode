@@ -1,0 +1,22 @@
+{
+  "id": "1-5-21-example-pseudocode-for-a-decision",
+  "title": "1.5.21 Worked Example — Pseudocode for a Decision",
+  "description": "The voting check, planned before it is coded. Example 1.1, and what the plan deliberately does not say.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.5 Program Design Tools and Environments",
+  "preview": "example",
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

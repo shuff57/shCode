@@ -1,0 +1,83 @@
+{
+  "id": "1-5-39-lab-cause-a-reference-error",
+  "title": "1.5.39 Cause a ReferenceError on Purpose",
+  "description": "Break it, read the three parts, say which one solved it, then fix it. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.5 Program Design Tools and Environments",
+  "preview": "console",
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run the broken code",
+      "instructions": "The file below has a misspelled name. Run it and read the error message that appears."
+    },
+    {
+      "id": "s2",
+      "title": "Record the message",
+      "instructions": "In a comment, write down the error exactly as it appeared."
+    },
+    {
+      "id": "s3",
+      "title": "Say which part solved it",
+      "instructions": "In a comment, say which of the three parts — the kind, the detail, or the place — actually told you what to change, and why."
+    },
+    {
+      "id": "s4",
+      "title": "Fix it",
+      "instructions": "Correct the spelling so the program prints hello."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r2",
+      "title": "The misspelling is gone",
+      "description": "No use of the misspelled name remains anywhere in the file",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*console\\.log\\s*\\(\\s*gretting)[\\s\\S]*$",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "The corrected name is printed",
+      "description": "Logs greeting, spelled correctly",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*greeting\\s*\\)",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "The error message is recorded",
+      "description": "A comment naming ReferenceError",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "//[^\\n]*ReferenceError",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "The useful part is identified",
+      "description": "A comment saying which of the three parts solved it",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "//[^\\n]*(detail|kind|place|line number|spell)",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

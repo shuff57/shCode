@@ -1,0 +1,22 @@
+{
+  "id": "1-5-20-reading-the-two-pseudocode-rules",
+  "title": "1.5.20 Reading — The Two Pseudocode Rules",
+  "description": "One instruction per line, and indent what is inside something else. Definition 1.5.5 — that is the whole ruleset.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.5 Program Design Tools and Environments",
+  "preview": "reading",
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

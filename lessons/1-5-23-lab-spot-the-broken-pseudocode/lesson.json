@@ -1,0 +1,88 @@
+{
+  "id": "1-5-23-lab-spot-the-broken-pseudocode",
+  "title": "1.5.23 Spot the Broken Pseudocode",
+  "description": "A plan that never finishes, found by reading rather than running. Then fix it and prove it. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.5 Program Design Tools and Environments",
+  "preview": "console",
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Say what is wrong",
+      "instructions": "The broken plan is in a comment at the top. In a comment of your own, say what is wrong with it. The answer is not a syntax problem."
+    },
+    {
+      "id": "s2",
+      "title": "Write the fixed plan",
+      "instructions": "Write the corrected pseudocode as comments, with the missing step added and the indentation showing what is inside the loop."
+    },
+    {
+      "id": "s3",
+      "title": "Implement it",
+      "instructions": "Turn your fixed plan into JavaScript with a while loop that counts and prints, and actually stops."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "count starts at 1",
+      "description": "Declares count with an initial value",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "let\\s+count\\s*=\\s*1\\s*;",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "A while loop with the condition",
+      "description": "Uses a while loop testing count against 10",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "while\\s*\\(\\s*count\\s*<=?\\s*10\\s*\\)",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "count is printed inside the loop",
+      "description": "Logs count",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\([^)]*count",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "count actually changes",
+      "description": "The missing step: count is increased, so the loop terminates",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "count\\s*(=\\s*count\\s*\\+\\s*1|\\+=\\s*1|\\+\\+)",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "The diagnosis is written down",
+      "description": "A comment explains that count never changes so the plan never ends",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "//[^\\n]*(never|forever|infinite|does ?n[o']?t (stop|end|change)|always true)",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

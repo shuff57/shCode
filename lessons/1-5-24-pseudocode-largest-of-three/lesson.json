@@ -1,0 +1,67 @@
+{
+  "id": "1-5-24-pseudocode-largest-of-three",
+  "title": "1.5.24 Pseudocode: Largest of Three",
+  "description": "Write the plan, not the code. Then write a second plan for a password prompt. AI-graded with hints.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 25,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.5 Program Design Tools and Environments",
+  "preview": "assignment",
+  "slos": [
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Pseudocode: Largest of Three — AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "Write pseudocode, not JavaScript. No semicolons, no braces, no console.log - plain English laid out like code.\n\n1. Write pseudocode for finding the largest of three numbers. Use indentation to show which steps are inside a decision.\n\n2. Write pseudocode for a program that asks for a password and keeps asking until it is correct.\n\n3. Look at your answer to question 2. What makes it finite - what guarantees it eventually stops? If nothing does, fix it and say what you changed.\n\n4. In one sentence: why is it useful that nothing can run either of these plans?",
+    "rubric": [
+      {
+        "id": "largest-correct",
+        "title": "Q1: the plan actually finds the largest",
+        "description": "Following the steps literally on any three numbers yields the largest. A typical correct shape sets a running largest to the first number, then compares the second and third against it. Deny if the plan only compares two numbers, misses a case (such as the third being biggest), or reports the wrong one for some ordering.",
+        "points": 0
+      },
+      {
+        "id": "indentation-used",
+        "title": "Q1: indentation shows what is inside the decision",
+        "description": "The steps that happen only when a comparison succeeds are indented under it, and the final report is not indented. Deny if everything sits flush left, or if indentation is present but does not correspond to containment.",
+        "points": 0
+      },
+      {
+        "id": "password-loop",
+        "title": "Q2: the plan repeats until the password is correct",
+        "description": "The plan asks, checks, and asks again when wrong - a repetition containing a decision. Deny if it only asks once, or if it checks without any mechanism to return and ask again.",
+        "points": 0
+      },
+      {
+        "id": "finiteness-reasoned",
+        "title": "Q3: reasons about what makes the loop end",
+        "description": "Student identifies that the loop ends when the correct password is entered, and ideally notices this depends on the user - so it is finite in the sense that a correct entry stops it, but nothing bounds how many attempts occur. Credit either a clear statement of the exit condition or an added attempt limit. Deny if the question is not engaged with.",
+        "points": 0
+      },
+      {
+        "id": "not-runnable-value",
+        "title": "Q4: says why unrunnable is an advantage",
+        "description": "Student says something like: because no machine checks it, a human has to, and reading it aloud finds logic problems that a syntax check never would. Deny if the answer treats not being runnable as purely a limitation.",
+        "points": 0
+      },
+      {
+        "id": "is-pseudocode",
+        "title": "Both answers are pseudocode, not JavaScript",
+        "description": "The submissions read as plain structured English. Occasional keywords such as IF, WHILE, INPUT or OUTPUT are fine and expected. Deny if either answer is written as real JavaScript with braces, semicolons and console.log.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

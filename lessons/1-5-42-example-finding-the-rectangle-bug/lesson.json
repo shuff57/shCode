@@ -1,0 +1,22 @@
+{
+  "id": "1-5-42-example-finding-the-rectangle-bug",
+  "title": "1.5.42 Worked Example — Finding the Rectangle Bug",
+  "description": "A program that prints 9 instead of 20, found by narrowing rather than by staring.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.5 Program Design Tools and Environments",
+  "preview": "example",
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

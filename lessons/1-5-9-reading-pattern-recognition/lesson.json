@@ -1,0 +1,22 @@
+{
+  "id": "1-5-9-reading-pattern-recognition",
+  "title": "1.5.9 Reading — Pattern Recognition",
+  "description": "Categories are compression. Twelve unrelated facts become three groups you can hold.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.5 Program Design Tools and Environments",
+  "preview": "reading",
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

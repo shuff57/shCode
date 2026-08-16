@@ -1,0 +1,22 @@
+{
+  "id": "1-5-27-reading-when-to-use-which",
+  "title": "1.5.27 Reading — Pseudocode or Flowchart?",
+  "description": "Neither is better. They are good at different things, and most programmers use both.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.5 Program Design Tools and Environments",
+  "preview": "reading",
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

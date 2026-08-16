@@ -380,25 +380,34 @@ table with book cross-references in `curriculum/modules/1.4_programming-paradigm
 
 **Assignments:**
 - **A1.5.1 (Lab):** Given a word-problem prompt, write pseudocode AND a flowchart for the solution (no code yet). Then implement it in JS and confirm the code matches the plan. **The flowchart must pass all eight structural checks before the coding half unlocks** — this is the first and gentlest run of the Appendix D gate, with no grade attached to failing it.
-- **A1.5.2 (Written):** Half page — explain computational thinking's four components in your own words, with one example each from something you've already coded this quarter.
+- **A1.5.2 (Written):** Explain computational thinking's four components in your own words, with one example each from something you've already coded this quarter.
 
-**In-app (partially built 2026-08-15 — the flowchart spine only):**
+**In-app (built 2026-08-16 — complete, 44 lessons):** authored 1:1 against the book's
+nine subsections. Full lesson table with book cross-references in
+`curriculum/modules/1.5_program-design-tools.md`.
 
-| Lesson | Covers |
-|---|---|
-| `1-5-1-slides` | placeholder; no deck built yet |
-| `1-5-2-reading-pseudocode-and-flowcharts` | book §1.5.4–1.5.5 — pseudocode keywords, the three shapes, the diamond's two rules |
-| `1-5-3-reading-the-flowchart-convention` | Appendix D as a student handout — the rule, the eight checks, what the checker cannot see, scope, release schedule |
-| `1-5-4-a1-5-1-flowchart-gate` | A1.5.1's chart half (Tier 1, book's three shapes). **The JS half is not built** — A1.5.1 is currently chart-and-pseudocode only |
-| `1-5-5-a1-5-2-computational-thinking` | A1.5.2, AI-graded |
+| Lessons | Book | Covers |
+|---|---|---|
+| `1.5.2`–`1.5.7` | §1.5.1 | two difficulties; **Def 1.5.1**; four cornerstones; three As; the jam-sandwich robot |
+| `1.5.8`–`1.5.12` | §1.5.2 | **Def 1.5.2**; pattern recognition; induction vs deduction |
+| `1.5.13`–`1.5.16` | §1.5.3 | **Def 1.5.3**; layers of abstraction; chess; keep-two-drop-two |
+| `1.5.17` | — | **A1.5.2**, AI-graded |
+| `1.5.18`–`1.5.24` | §1.5.4 | **Def 1.5.4/1.5.5**; the two rules; decision and butter examples; pseudocode assignment |
+| `1.5.25`–`1.5.31` | §1.5.5 | **Def 1.5.6**; the diamond; the class convention; **A1.5.1 chart *and* JS half** |
+| `1.5.32`–`1.5.34` | §1.5.6 | parallel/concurrent; **Def 1.5.7** recursion; stack overflow on purpose |
+| `1.5.35`–`1.5.37` | §1.5.7 | **Def 1.5.8** console; code editors |
+| `1.5.38`–`1.5.39` | §1.5.8 | the three parts of an error message |
+| `1.5.40`–`1.5.44` | §1.5.9 | test cases; **Def 1.5.9**; a three-bug debug lab; module quiz |
 
-**Still unbuilt in this section:** book §1.5.1 (think before you type), §1.5.2 (decomposition and
-pattern recognition), §1.5.3 (abstraction), §1.5.6 (how algorithms get executed), §1.5.7 (where
-JavaScript runs), §1.5.8 (reading an error message), §1.5.9 (testing and debugging). A1.5.2 asks
-about the four components of computational thinking, which §1.5.1–1.5.3 are
-supposed to teach; until those exist the assignment's own page carries the definitions, and it
-accepts an everyday task rather than "something you've already coded", because by week 2 students
-have coded almost nothing. Restore the narrower wording once the rest of §1.5 is built.
+**A1.5.1 is now complete** — `1.5.30` is the chart half and `1.5.31` is the
+JavaScript half this section previously lacked.
+
+> **This module was renumbered, unlike 1.2 and 1.3.** No `1-5-*` lesson carried any
+> `lesson_state` row (verified against D1), and appending would have left A1.5.2
+> sitting before the lessons that teach it. The five pre-existing lessons moved into
+> book order; `lesson_state.lesson_id` was unaffected because there was nothing to
+> orphan. **A1.5.2's narrower wording is restored** as a result — it now asks for
+> examples from a program written this quarter, with an everyday task as fallback.
 
 **Teacher Notes:**
 - This week is the design-before-code habit the whole course leans on — planning with pseudocode/flowcharts before writing JS. **Appendix D turns that from advice into a gate**: from here on every challenge, Group PA, test and synthesis project opens with a flowchart, and the in-app coding lesson is locked until the flowchart is green. Say so explicitly today, so the pattern is a known rule rather than a recurring surprise.

@@ -1,0 +1,61 @@
+{
+  "id": "1-5-7-instructions-for-a-robot",
+  "title": "1.5.7 Instructions for a Robot",
+  "description": "Write instructions for a task, then find the first one that breaks when read literally. AI-graded with hints.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 20,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.5 Program Design Tools and Environments",
+  "preview": "assignment",
+  "slos": [
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Instructions for a Robot — AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "A robot is going to follow your instructions exactly. It knows nothing, it cannot guess, and it will not ask you a question.\n\n1. Pick an everyday task - making a jam sandwich, tying a shoelace, brushing your teeth, feeding a pet. Name it, then write at least five numbered instructions for the robot.\n\n2. Now read your own list back as if you were the robot, taking every word completely literally. Which instruction breaks first, and what exactly does the robot not know?\n\n3. Rewrite that one broken instruction so it works. It will probably become more than one instruction.\n\n4. In one or two sentences: why did you not notice the gap when you first wrote the list?",
+    "rubric": [
+      {
+        "id": "task-and-five-steps",
+        "title": "A task is named and at least five numbered instructions are given",
+        "description": "Student names one specific everyday task and writes five or more instructions as a numbered or clearly ordered list. Deny if fewer than five instructions, or if the task is not named.",
+        "points": 0
+      },
+      {
+        "id": "break-identified",
+        "title": "Identifies a specific instruction that breaks",
+        "description": "Student points at ONE of their own instructions and says it fails. It must be a specific instruction from their own list, not a general observation that 'the robot might get confused'. Deny if no particular instruction is singled out.",
+        "points": 0
+      },
+      {
+        "id": "unstated-knowledge-named",
+        "title": "Names the unstated knowledge the robot lacks",
+        "description": "Student says what the instruction assumed the reader already knew - where an object is, which hand to use, that a lid must be removed first, which side is up. Credit any concrete missing assumption. Deny vague answers such as 'it is not clear enough' or 'the robot would be confused'.",
+        "points": 0
+      },
+      {
+        "id": "rewrite-fixes-it",
+        "title": "The rewritten instruction actually closes the gap",
+        "description": "The rewrite supplies the missing knowledge, and would survive being read literally. Credit a rewrite that expands into several steps - that is the expected outcome. Deny if the rewrite repeats the same assumption in different words.",
+        "points": 0
+      },
+      {
+        "id": "why-not-noticed",
+        "title": "Q4: explains why the gap was invisible at first",
+        "description": "Student recognises that they were reading their own list with their own knowledge filled in - they knew what they meant, so the instruction looked complete. Credit any answer expressing that the assumption was invisible because the writer already held it. Deny 'I was careless' or 'I rushed' with nothing about assumed knowledge.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

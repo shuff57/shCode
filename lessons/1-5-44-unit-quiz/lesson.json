@@ -1,0 +1,79 @@
+{
+  "id": "1-5-44-unit-quiz",
+  "title": "1.5.44 Module 1.5 Quiz",
+  "description": "Computational thinking, pseudocode, flowcharts, recursion, errors and debugging. Eight short answers. AI-graded with hints.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 25,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.5 Program Design Tools and Environments",
+  "preview": "assignment",
+  "slos": [
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Module 1.5 Quiz — AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "Answer all eight. One or two sentences each is enough.\n\n1. Define computational thinking in one or two sentences, without using the word \"computer\".\n\n2. Name the four techniques of computational thinking, with a one-line description of each.\n\n3. Explain why working out a plan before typing is faster than typing your way to an answer.\n\n4. Name the three flowchart shapes and what each means. Which one has two arrows leaving it, and why?\n\n5. Give one advantage of pseudocode over a flowchart, and one advantage of a flowchart over pseudocode.\n\n6. What is a base case, and what happens to a recursive function that does not have one?\n\n7. Name the three parts of an error message and say what each one tells you.\n\n8. Why is console.log(\"total is \" + total) more useful than console.log(total)?",
+    "rubric": [
+      {
+        "id": "q1-definition",
+        "title": "Q1: defines computational thinking without saying 'computer'",
+        "description": "Student defines it as a problem-solving process that breaks a complex problem into smaller manageable parts and finds systematic approaches. The word 'computer' must not appear in the definition - that constraint is the point of the question. Deny if 'computer' is used, or if the definition is only 'thinking like a programmer'.",
+        "points": 0
+      },
+      {
+        "id": "q2-four-techniques",
+        "title": "Q2: all four techniques named and described",
+        "description": "Names decomposition, pattern recognition, abstraction and algorithms/algorithmic thinking, each with a one-line description that is broadly correct. Credit requires all four named; descriptions may be loose but must not be wrong (e.g. abstraction described as 'breaking things up' is wrong - that is decomposition).",
+        "points": 0
+      },
+      {
+        "id": "q3-plan-first",
+        "title": "Q3: explains why planning first is faster",
+        "description": "Student says a program has two difficulties - working out the steps and writing them - and that doing both at once means you cannot tell which one you are stuck on. Credit any answer expressing that separating the thinking from the syntax saves time. Deny if the answer is only 'it is more organised'.",
+        "points": 0
+      },
+      {
+        "id": "q4-shapes-and-diamond",
+        "title": "Q4: three shapes named, and the diamond explained",
+        "description": "Oval = start/end, rectangle = a step/action, diamond = a decision. Student must also say the diamond has two arrows leaving it because it is a decision with a yes path and a no path. Credit requires both halves.",
+        "points": 0
+      },
+      {
+        "id": "q5-tradeoff",
+        "title": "Q5: one real advantage each way",
+        "description": "For pseudocode: faster to write or edit, handles long programs without becoming enormous. For flowcharts: branching and looping obvious at a glance, better for explaining to someone else. Credit requires one genuine advantage of each. Deny if only one direction is answered.",
+        "points": 0
+      },
+      {
+        "id": "q6-base-case",
+        "title": "Q6: base case defined, and the consequence of omitting it",
+        "description": "A base case is an input simple enough to answer directly without calling itself again; without one the calls never stop and the program hits a stack overflow (RangeError: maximum call stack size exceeded). Credit requires both the definition and the consequence.",
+        "points": 0
+      },
+      {
+        "id": "q7-error-parts",
+        "title": "Q7: the three parts of an error message",
+        "description": "The kind of error (e.g. ReferenceError - what category of problem), the detail (the specific thing, usually naming the offending value or name), and the place (the line number). Credit requires all three with what each tells you.",
+        "points": 0
+      },
+      {
+        "id": "q8-labelled-print",
+        "title": "Q8: says why a labelled print is more useful",
+        "description": "Student says a bare value gives no clue which line or which variable it came from, especially once several prints are running, whereas a labelled one identifies itself. Deny if the answer is only 'it looks nicer' or 'it is clearer' with no reason.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

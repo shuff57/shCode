@@ -1,0 +1,56 @@
+{
+  "id": "1-5-28-chart-the-even-or-odd-test",
+  "title": "1.5.28 Chart the Even-or-Odd Test",
+  "description": "Five shapes: get a number, ask whether it is even, print one of two answers, rejoin. Your first chart, ungraded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 20,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.5 Program Design Tools and Environments",
+  "preview": "diagram",
+  "slos": [
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "diagram": {
+    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
+    "rules": [
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

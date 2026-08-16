@@ -777,34 +777,346 @@
       "week": null
     },
     {
-      "id": "1-5-2-reading-pseudocode-and-flowcharts",
-      "title": "1.5.2 Reading — Pseudocode and Flowcharts",
+      "id": "1-5-10-reading-inductive-and-deductive",
+      "title": "1.5.10 Reading — Inductive and Deductive Reasoning",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
-      "id": "1-5-3-reading-the-flowchart-convention",
-      "title": "1.5.3 Reading — The Class Flowchart Convention",
+      "id": "1-5-11-example-decomposing-the-sandwich",
+      "title": "1.5.11 Worked Example — Decomposing the Sandwich",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-12-decompose-getting-to-school",
+      "title": "1.5.12 Decompose Getting to School",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-13-reading-abstraction",
+      "title": "1.5.13 Reading — Abstraction",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
-      "id": "1-5-4-a1-5-1-flowchart-gate",
-      "title": "1.5.4 A1.5.1 — Your First Flowchart",
+      "id": "1-5-14-reading-layers-of-abstraction",
+      "title": "1.5.14 Reading — Layers of Abstraction",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-15-example-computational-thinking-in-chess",
+      "title": "1.5.15 Worked Example — Computational Thinking in Chess",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-16-keep-two-drop-two",
+      "title": "1.5.16 Keep Two, Drop Two",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-17-a1-5-2-computational-thinking",
+      "title": "1.5.17 A1.5.2 — Computational Thinking",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-18-reading-what-an-algorithm-is",
+      "title": "1.5.18 Reading — What an Algorithm Is",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-19-reading-pseudocode-and-flowcharts",
+      "title": "1.5.19 Reading — Pseudocode and Flowcharts",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-2-reading-think-before-you-type",
+      "title": "1.5.2 Reading — Think Before You Type",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-20-reading-the-two-pseudocode-rules",
+      "title": "1.5.20 Reading — The Two Pseudocode Rules",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-21-example-pseudocode-for-a-decision",
+      "title": "1.5.21 Worked Example — Pseudocode for a Decision",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-22-example-butter-or-no-butter",
+      "title": "1.5.22 Worked Example — Butter or No Butter",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-23-lab-spot-the-broken-pseudocode",
+      "title": "1.5.23 Spot the Broken Pseudocode",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-24-pseudocode-largest-of-three",
+      "title": "1.5.24 Pseudocode: Largest of Three",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-25-reading-the-three-shapes",
+      "title": "1.5.25 Reading — The Three Flowchart Shapes",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-26-reading-the-diamond",
+      "title": "1.5.26 Reading — The Diamond",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-27-reading-when-to-use-which",
+      "title": "1.5.27 Reading — Pseudocode or Flowchart?",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-28-chart-the-even-or-odd-test",
+      "title": "1.5.28 Chart the Even-or-Odd Test",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
-      "id": "1-5-5-a1-5-2-computational-thinking",
-      "title": "1.5.5 A1.5.2 — Computational Thinking",
+      "id": "1-5-29-reading-the-flowchart-convention",
+      "title": "1.5.29 Reading — The Class Flowchart Convention",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-3-reading-computational-thinking",
+      "title": "1.5.3 Reading — What Computational Thinking Is",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-30-a1-5-1-flowchart-gate",
+      "title": "1.5.30 A1.5.1 — Your First Flowchart",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "diagram",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-31-a1-5-1-implement-your-plan",
+      "title": "1.5.31 A1.5.1 Part 2 — Implement Your Plan",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-32-reading-sequential-parallel-concurrent",
+      "title": "1.5.32 Reading — Sequential, Parallel, Concurrent",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-33-reading-recursion",
+      "title": "1.5.33 Reading — Recursion and the Base Case",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-34-example-stack-overflow-on-purpose",
+      "title": "1.5.34 Worked Example — Stack Overflow on Purpose",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-35-reading-the-browser-console",
+      "title": "1.5.35 Reading — The Browser Console",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-36-reading-a-code-editor",
+      "title": "1.5.36 Reading — A Code Editor",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-37-lab-settle-it-in-the-console",
+      "title": "1.5.37 Settle It in the Console",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-38-reading-reading-an-error-message",
+      "title": "1.5.38 Reading — Reading an Error Message",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-39-lab-cause-a-reference-error",
+      "title": "1.5.39 Cause a ReferenceError on Purpose",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-4-reading-the-four-techniques",
+      "title": "1.5.4 Reading — The Four Cornerstones",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-40-reading-testing-and-test-cases",
+      "title": "1.5.40 Reading — Testing and Test Cases",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-41-reading-debugging-with-console-log",
+      "title": "1.5.41 Reading — Debugging with console.log",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-42-example-finding-the-rectangle-bug",
+      "title": "1.5.42 Worked Example — Finding the Rectangle Bug",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-43-lab-debug-the-order-total",
+      "title": "1.5.43 Debug the Order Total",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-44-unit-quiz",
+      "title": "1.5.44 Module 1.5 Quiz",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-5-reading-the-three-as",
+      "title": "1.5.5 Reading — The Three As",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-6-example-the-jam-sandwich-robot",
+      "title": "1.5.6 Worked Example — The Jam Sandwich Robot",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-7-instructions-for-a-robot",
+      "title": "1.5.7 Instructions for a Robot",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-8-reading-decomposition",
+      "title": "1.5.8 Reading — Decomposition",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-9-reading-pattern-recognition",
+      "title": "1.5.9 Reading — Pattern Recognition",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },

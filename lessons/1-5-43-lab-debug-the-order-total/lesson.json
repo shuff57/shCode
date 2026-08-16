@@ -1,0 +1,93 @@
+{
+  "id": "1-5-43-lab-debug-the-order-total",
+  "title": "1.5.43 Debug the Order Total",
+  "description": "Three bugs, none of which produce an error message. Narrow them down with labelled prints. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 25,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.5 Program Design Tools and Environments",
+  "preview": "console",
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write down what it should print",
+      "instructions": "Before changing anything, work out by hand what the correct total is for 3 notebooks at 4.00 with 10% off and 8% tax. Write it in a comment as your expected outcome."
+    },
+    {
+      "id": "s2",
+      "title": "Add labelled prints",
+      "instructions": "Print each intermediate value with a label — subtotal, discount, taxed — so you can see where the numbers stop matching your expectation."
+    },
+    {
+      "id": "s3",
+      "title": "Fix all three bugs",
+      "instructions": "There are three. One is an operator, one is a quantity that was never used, and one applies a percentage the wrong way round."
+    },
+    {
+      "id": "s4",
+      "title": "Prove it with a check",
+      "instructions": "Add an if/else that compares the final total against your expected value and prints PASS or FAIL."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "subtotal multiplies price by quantity",
+      "description": "The quantity is actually used, with multiplication",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "subtotal\\s*=[^;]*unitPrice[^;]*\\*[^;]*quantity|subtotal\\s*=[^;]*quantity[^;]*\\*[^;]*unitPrice",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "The discount is subtracted",
+      "description": "The discounted amount is the subtotal minus the discount, not plus",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "=\\s*subtotal\\s*-\\s*",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Tax is added to the discounted amount",
+      "description": "The final total adds tax rather than subtracting it",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "total\\s*=[^;]*\\+[^;]*tax",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "At least three labelled prints",
+      "description": "Three or more console.log calls whose text includes a label",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:[\\s\\S]*?console\\.log\\s*\\(\\s*[\"'][^\"']+[\"']\\s*\\+){3}",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "A PASS/FAIL check is present",
+      "description": "An if/else comparing the total against the expected value and printing PASS or FAIL",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?=[\\s\\S]*if\\s*\\()(?=[\\s\\S]*[\"']PASS)(?=[\\s\\S]*[\"']FAIL)[\\s\\S]*",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
