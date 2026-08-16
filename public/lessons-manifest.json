@@ -1097,6 +1097,14 @@
       "week": 12
     },
     {
+      "id": "5-3-20a-chart-the-method-chain",
+      "title": "5.3.20a Chart the Code — A Method That Calls a Method",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "diagram",
+      "category": "Unit 2: shPlay Game Development",
+      "week": null
+    },
+    {
       "id": "5-3-21-reading-composition",
       "title": "5.3.21 Reading — Why `this.sprite`, not `extends Sprite`",
       "unit": "5.3 Classes and Objects via shPlay",
@@ -1167,6 +1175,14 @@
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
+    },
+    {
+      "id": "5-3-29a-read-the-two-designs",
+      "title": "5.3.29a Read the Charts — Three Variables or Three Objects",
+      "unit": "5.3 Classes and Objects via shPlay",
+      "preview": "reading",
+      "category": "Unit 2: shPlay Game Development",
+      "week": null
     },
     {
       "id": "5-3-3-reading-classes",
@@ -2049,6 +2065,14 @@
       "week": 17
     },
     {
+      "id": "6-7-10a-fix-the-drag-chart",
+      "title": "6.7.10a Fix the Broken Chart — Dragging a Sprite",
+      "unit": "6.7 Advanced Input and Joints",
+      "preview": "diagram",
+      "category": "Unit 2: shPlay Game Development",
+      "week": null
+    },
+    {
       "id": "6-7-11-video-joints-intro",
       "title": "6.7.11 Video — Joints in shplay",
       "unit": "6.7 Advanced Input and Joints",
@@ -2143,6 +2167,14 @@
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
+    },
+    {
+      "id": "6-7-21a-chart-the-slingshot",
+      "title": "6.7.21a Chart the Code — The Slingshot",
+      "unit": "6.7 Advanced Input and Joints",
+      "preview": "diagram",
+      "category": "Unit 2: shPlay Game Development",
+      "week": null
     },
     {
       "id": "6-7-22-video-two-player",

@@ -1,0 +1,39 @@
+{
+  "id": "6-7-21a-chart-the-slingshot",
+  "title": "6.7.21a Chart the Code — The Slingshot",
+  "description": "Chart the three-stage slingshot: aim, stretch, release. The stage nobody draws is the one where nothing is happening yet.",
+  "type": "assignment",
+  "difficulty": "intermediate",
+  "estimateMins": 25,
+  "category": "Unit 2: shPlay Game Development",
+  "unit": "6.7 Advanced Input and Joints",
+  "preview": "diagram",
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "diagram": {
+    "starter": "flowchart TD\n  A([draw() runs])\n  Z([end of frame])",
+    "rules": [
+      { "id": "one-start" },
+      { "id": "has-end" },
+      { "id": "all-labeled" },
+      { "id": "no-orphans" },
+      { "id": "min-decisions", "count": 2 },
+      { "id": "decision-two-exits" },
+      { "id": "decision-labeled" },
+      { "id": "reaches-end" },
+      { "id": "no-self-loop" },
+      { "id": "min-nodes", "count": 8 }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

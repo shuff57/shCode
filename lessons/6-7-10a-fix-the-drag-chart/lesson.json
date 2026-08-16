@@ -1,0 +1,37 @@
+{
+  "id": "6-7-10a-fix-the-drag-chart",
+  "title": "6.7.10a Fix the Broken Chart — Dragging a Sprite",
+  "description": "Someone charted the grab half of drag-and-drop and never charted the letting go. Find what the red checks are pointing at.",
+  "type": "assignment",
+  "difficulty": "intermediate",
+  "estimateMins": 20,
+  "category": "Unit 2: shPlay Game Development",
+  "unit": "6.7 Advanced Input and Joints",
+  "preview": "diagram",
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "diagram": {
+    "starter": "flowchart TD\n  A([draw() runs]) --> B{mouse.pressing()}\n  B -- yes --> C{is the sprite under the mouse}\n  C -- yes --> D[move sprite to the mouse]\n  C -- no --> E([end of frame])\n  D --> D\n  F[set velocity to zero]",
+    "rules": [
+      { "id": "one-start" },
+      { "id": "has-end" },
+      { "id": "all-labeled" },
+      { "id": "no-orphans" },
+      { "id": "decision-two-exits" },
+      { "id": "decision-labeled" },
+      { "id": "reaches-end" },
+      { "id": "no-self-loop" }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

@@ -3826,18 +3826,31 @@ in the browser, no AI call and no points. Frequency is the point, so nothing her
 | `3-2-6a-chart-the-array-loop` | chart the code | 3.2 |
 | `4-1-2a-reading-connectors-and-notes` | connector + note released | 4.1 |
 | `4-1-3a-a4-1-0-design-chart` | **A4.1.0** — whole-program design, day 1 | 4.1 |
+| `5-3-20a-chart-the-method-chain` | chart the code — one method, not a program | 5.3 |
+| `5-3-29a-read-the-two-designs` | read and predict — procedural vs OOP, drawn | 5.3 |
 | `6-5-20a-read-the-continue-chart` | read and predict | 6.5 |
 | `6-6-13a-chart-the-state-machine` | chart the code | 6.6 |
 | `6-6-19a-fix-the-pause-chart` | find the defect | 6.6 |
+| `6-7-10a-fix-the-drag-chart` | find the defect | 6.7 |
+| `6-7-21a-chart-the-slingshot` | chart the code — one frame of a many-frame gesture | 6.7 |
 
 **Five modes, not one exercise repeated.** Draw-from-a-spec is the only mode the course had before
 this, and a student who can only produce a chart from a spec has learned a drawing task. Chart-the-
 code, read-and-predict and find-the-defect run the arrow the other way, which is where fluency comes
 from — and read-and-predict needs no canvas at all.
 
-**Modules with no chart lesson yet:** 1.1–1.3, 5.1, 5.2, 5.3, 6.1, 6.3, 6.4, 6.7. 5.3 (classes) and
-6.7 (input and joints) are the two most worth doing next; 1.1–1.3 are before the vocabulary exists
-and should stay bare.
+**Modules with no chart lesson yet:** 1.1–1.3, 5.1, 5.2, 6.1, 6.3, 6.4. 1.1–1.3 sit before the
+vocabulary exists and should stay bare. Of the rest, 6.1 (groups and overlaps) is the one with a
+real chart in it — collision handling branches hard — and 5.1, 5.2, 6.3 and 6.4 are mostly
+single-concept mechanics where pseudocode says it faster.
+
+**A note on the two Q2 modules, because they are the ones that justify the whole exercise.** In 5.3
+the chart is not the deliverable, the *comparison* is: the same feature drawn procedurally and with
+an array of objects, so the case for classes rests on "a fourth enemy costs three shapes or none"
+rather than on the word "cleaner". In 6.7 both lessons are about a gesture that spans hundreds of
+frames while the chart covers one — the idle path that runs most often is the one nobody draws, and
+`applyForce` sitting on the stretch path instead of the release path is the unit's most common
+physics bug, obvious in a picture and invisible in the code.
 
 **Tier 1 checks legality, not correctness.** A structurally perfect chart of the wrong algorithm
 passes. That is the deliberate trade for zero cost and unlimited retries — the judgement of *logic*
