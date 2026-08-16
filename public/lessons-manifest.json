@@ -393,28 +393,28 @@
       "week": 6
     },
     {
-      "id": "2-2-11-challenges",
-      "title": "2.2.11 Challenges — Optional Stretch",
+      "id": "2-2-11-fix-the-broken-chart",
+      "title": "2.2.11 Fix the Broken Chart",
       "unit": "2.2 Algorithms and Loops",
-      "preview": "console",
+      "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
     {
-      "id": "2-2-12-reading-flowchart-shapes",
-      "title": "2.2.12 Reading — Flowchart Shapes",
-      "unit": "2.2 Algorithms and Loops",
-      "preview": "reading",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 5
-    },
-    {
-      "id": "2-2-13-a5-2-flowchart-decision",
-      "title": "2.2.13 Flowchart a Decision",
+      "id": "2-2-12-a5-2-flowchart-decision",
+      "title": "2.2.12 Flowchart a Decision",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
+    },
+    {
+      "id": "2-2-13-challenges",
+      "title": "2.2.13 Challenges — Optional Stretch",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
     },
     {
       "id": "2-2-2-reading-what-is-algorithm",
@@ -425,10 +425,26 @@
       "week": 5
     },
     {
+      "id": "2-2-2a-reading-flowchart-shapes",
+      "title": "2.2.2a Reading — Flowchart Shapes",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
       "id": "2-2-3-example-pseudocode-to-code",
       "title": "2.2.3 Worked Example — Pseudocode → code",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-2-3a-chart-the-algorithm",
+      "title": "2.2.3a Chart the Code — Largest of Three",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -453,6 +469,14 @@
       "title": "2.2.6 Worked Example — Tracing a for-loop counter",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-2-6a-chart-the-for-loop",
+      "title": "2.2.6a Chart the Code — A for-loop That Accumulates",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },

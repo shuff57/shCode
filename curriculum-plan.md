@@ -397,17 +397,42 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - for loop: initialization, condition, increment
 - while loop: condition-based iteration
 - Common loop patterns: counting, accumulating, searching
+- **New shape (Appendix D): the loop-setup hexagon** `{{i = 0 to 9}}` — how a `for` loop's three parts (start, limit, step) collapse into one shape, and how the return arrow closes the loop
 
 **In-Class Activities:**
 - Algorithm discussion: write an algorithm in plain English for making a sandwich, then translate to pseudocode (callback to §1.5)
+- **Draw the same loop twice** — once as a bare decision diamond with a manual counter, once with the hexagon. The hexagon is not new logic, it is the same three parts named in one place; students should be able to say which diamond it replaced.
 - Live code: loop that prints numbers 1–20, then only even numbers
 - Students trace 3 loops by hand before running them
 
 **Assignments:**
-- **A2.2.1 (Written + Lab, SLO 4 primary):** Part A: Write a plain-English algorithm for a task of your choice (not programming). Part B: Write a JS program using at least one for loop and one while loop that solves a simple counting or accumulation problem. Document with comments.
+- **A2.2.0 (Flowchart, gate — 0 pts):** Chart the counting-or-accumulation problem you will write in A2.2.1, using the loop-setup hexagon. Must pass all eight structural checks. **A2.2.1 stays locked until this is green** (Appendix D).
+- **A2.2.1 (Written + Lab, SLO 4 primary):** Part A: Write a plain-English algorithm for a task of your choice (not programming). Part B: Write a JS program using at least one for loop and one while loop that solves a simple counting or accumulation problem. Document with comments. **The program must match the A2.2.0 chart** — if you changed your mind while coding, update the chart and say why in a comment.
+
+**In-app (built 2026-08-15 — §2.2 is the pilot module for diagram-native teaching):**
+Five modes of chart work, not five repeats of one. Only the last costs an AI call; the rest are
+free browser-side checks, so frequency is not rationed.
+
+| Lesson | Mode | Tier |
+|---|---|---|
+| `2-2-2a-reading-flowchart-shapes` | vocabulary + scratch canvas | 0 |
+| `2-2-3a-chart-the-algorithm` | **chart the code** — draw largest-of-three from its JS, then compare against Figure 2.2.1 | 1 |
+| `2-2-5-reading-for-loop` | Figure 2.2.3 — the loop drawn the long way, five shapes | 0 |
+| `2-2-6a-chart-the-for-loop` | **chart the code** — Figure 2.2.4 collapses three shapes into the hexagon | 1 |
+| `2-2-8-reading-while-loop` | **read and predict** — four trace questions, no drawing; question 4 is the infinite loop drawn | 0 |
+| `2-2-11-fix-the-broken-chart` | **find the defect** — starter opens with five red checks and one actual mistake | 1 |
+| `2-2-12-a5-2-flowchart-decision` | **draw from a spec** — the graded gate | 2 |
+
+The shapes reading moved to `2-2-2a` (from `2-2-11`) so the vocabulary exists before anything
+downstream uses it — a language taught in week 11 of 13 cannot be the module's thinking tool.
+The two in-class activities above are now in-app: "draw the same loop twice" is Figures 2.2.3 and
+2.2.4, and "break a good chart on purpose" is `2-2-11`.
 
 **Teacher Notes:**
 - This is SLO 4's primary coverage. Be explicit in class: "an algorithm is a precise sequence of steps." Students should be able to repeat this back.
+- **Tier-1 lessons check legality, not correctness.** A structurally legal chart of the wrong algorithm passes. That is the deliberate trade for zero cost and unlimited retries — the graded judgement of *logic* happens at `2-2-12` and on the test. Do not tell students a green check means a right answer.
+- **This is the section where the flowchart stops being a §1.5 exercise and becomes the working habit.** An algorithm that only exists as prose is exactly the thing SLO 4 asks students to make precise; the chart is the precision. Expect the first real resistance here — chart it anyway.
+- The loop-back arrow is the single hardest thing to draw correctly all year. It leaves the *bottom of the loop body* and returns to the *hexagon*, not into the middle of the body. Watch for it on every chart from here to §4.1.
 - do...while, break/continue, and nested loops now live in §2.4, immediately after this section — keep this week to for/while only.
 
 **Exam:**

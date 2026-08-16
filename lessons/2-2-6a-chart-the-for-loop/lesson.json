@@ -1,0 +1,40 @@
+{
+  "id": "2-2-6a-chart-the-for-loop",
+  "title": "2.2.6a Chart the Code — A for-loop That Accumulates",
+  "description": "Draw the sum-1-to-5 loop as a flowchart using the loop-setup hexagon, and get the return arrow landing in the right place.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 20,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.2 Algorithms and Loops",
+  "preview": "diagram",
+  "week": 6,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "diagram": {
+    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
+    "rules": [
+      { "id": "one-start" },
+      { "id": "has-end" },
+      { "id": "all-labeled" },
+      { "id": "no-orphans" },
+      { "id": "min-process", "count": 2 },
+      { "id": "min-nodes", "count": 6 },
+      { "id": "decision-two-exits" },
+      { "id": "decision-labeled" },
+      { "id": "reaches-end" },
+      { "id": "no-self-loop" }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

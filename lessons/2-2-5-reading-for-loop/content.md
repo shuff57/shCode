@@ -37,6 +37,30 @@ console.log("Sum of 1 to 5: " + total);
 
 The accumulator pattern — starting `total` at `0` and adding to it on every loop — is one of the most reused patterns in programming. Memorize the shape.
 
+## The same loop, drawn
+
+A `for` loop is three parts pretending to be one line, and a flowchart pulls them apart so you can see each one happen. Here is `for (let i = 1; i <= 5; i++)` drawn the long way — every part of the header as its own shape:
+
+```flow readonly caption="Figure 2.2.3 — a for loop drawn the long way. Init is a rectangle, the condition is a diamond, the increment is another rectangle, and the arrow from the increment back to the diamond is what makes it a loop."
+flowchart TD
+  A([Start]) --> B[i = 1]
+  B --> C{i <= 5}
+  C -- yes --> D[/print i/]
+  D --> E[i = i + 1]
+  E --> C
+  C -- no --> F([End])
+```
+
+Follow the arrows and say what happens: *set i to 1; is i at most 5? yes, so print it, add one to i, and ask again. Eventually i is 6, the answer is no, and we end.*
+
+Three things are worth noticing:
+
+- **The condition is checked before every pass, including the first.** If you set `i = 9`, the diamond answers `no` immediately and the body never runs once.
+- **The increment happens at the *bottom*, after the body.** That is why `i` is still `5` while the last line prints, not `6`.
+- **The arrow from `i = i + 1` goes back to the diamond, not to the body.** Skipping the re-check would mean the loop never stops.
+
+Five shapes for one line of code is a lot, which is why there is a shortcut — a single shape that holds the counter, the limit and the step together. You will meet it in the next lesson.
+
 ---
 
 ## Short glossary (quick reference)

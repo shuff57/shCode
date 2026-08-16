@@ -18,7 +18,16 @@ You have written algorithms as numbered steps, and you have seen one drawn as a 
 
 Arrows carry the order. Every arrow points from the step that just happened to the step that happens next.
 
-These four cover almost everything you will draw this year. The toolbar hides four more behind **+ more shapes** — a *function call*, a *loop setup*, a *connector*, and a *note* — and you will meet each one in the unit that needs it. Ignore them until then.
+These four cover almost everything you will draw this year. The toolbar hides four more behind **+ more shapes**, and each one unlocks in the section that needs it:
+
+| Shape | Arrives in | For |
+|---|---|---|
+| **Loop setup** (hexagon) | **later in this module**, once you have met `for` and `while` | The counter, its start, and its limit, all in one shape |
+| **Function call** (double rail) | 3.1, when you write your first function | One shape standing for a whole sequence defined elsewhere |
+| **Connector** (circle) | 4.1, on the first chart too big for one page | A jump — two circles with the same letter are the same point |
+| **Note** (bracket) | 4.1 | A remark for the reader, sitting beside the chart rather than in it |
+
+Reach for one only once it has arrived. A hexagon used as decoration is worse than no hexagon, because a reader who knows the shapes will trust it and go looking for a loop that isn't there.
 
 ### The two rules that matter
 
@@ -26,14 +35,14 @@ These four cover almost everything you will draw this year. The toolbar hides fo
 
 **Every diamond has two labelled exits.** A question has two answers, so exactly two arrows leave a diamond, and each one says which answer it follows: `yes` and `no`. An unlabelled branch is the single most common way a flowchart becomes unreadable — the shapes are all correct, but a reader cannot tell which way "true" goes.
 
-Here is the same voting example the book uses, drawn with all four rules applied:
+Here is the same voting example the book uses in §1.5, drawn with both rules applied:
 
 ```flow readonly caption="Figure 2.2.2 — the voting check. One Start, one End, and both exits of the diamond say which answer they follow."
 flowchart TD
   A([Start]) --> B[/get the age/]
   B --> C{age >= 18}
   C -- yes --> D[print "You may vote"]
-  C -- no --> E[print "Too young"]
+  C -- no --> E[print "Too young to vote"]
   D --> F([End])
   E --> F
 ```
