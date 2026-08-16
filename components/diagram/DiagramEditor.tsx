@@ -1,7 +1,7 @@
 'use client';
 
 // Drag-and-drop flowchart canvas. React Flow supplies pan/zoom/drag/connect;
-// everything else here exists to keep a beginner on the rails — four shapes
+// everything else here exists to keep a beginner on the rails — eight shapes
 // and nothing else, arrows that snap to a right-angle route, labels typed
 // straight onto the diagram, and a shape dropped on an arrow splicing itself
 // into the path.
@@ -258,9 +258,11 @@ interface Props {
   onReset?: () => void;
 }
 
-// The four the book teaches come first and are always visible; the rest are
-// the ones the later modules need (functions, loops, long charts, notes) and
-// stay behind a toggle so a beginner's first look is still four buttons.
+// The starter four come first and are always visible: the book's three
+// (oval, rectangle, diamond — Table 1.5.2) plus `io`, which the book never
+// teaches but every beginner chart needs. The rest are the ones the later
+// modules need (functions, loops, long charts, notes) and stay behind a
+// toggle so a beginner's first look is still four buttons.
 const CORE_SHAPES: FlowShape[] = ['terminal', 'process', 'decision', 'io'];
 const MORE_SHAPES: FlowShape[] = ['subroutine', 'preparation', 'connector', 'comment'];
 const SHAPE_ORDER: FlowShape[] = [...CORE_SHAPES, ...MORE_SHAPES];

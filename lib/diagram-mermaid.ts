@@ -1,12 +1,14 @@
-// Mermaid <-> DiagramDoc. A deliberately small subset — the four shapes the
-// book teaches, plus plain and labelled arrows. Authors write Mermaid in a
-// ```flow fence; students drag the parsed result; the grader reads the
+// Mermaid <-> DiagramDoc. A deliberately small subset — the eight shapes of
+// lib/diagram-types.ts, plus plain and labelled arrows. Authors write Mermaid
+// in a ```flow fence; students drag the parsed result; the grader reads the
 // re-serialized text.
 //
 // Supported node syntax:
-//   A([Start])      terminal      A(Start)     terminal
-//   B[get the age]  process       C{age >= 18} decision
-//   D[/print x/]    input/output
+//   A([Start])      terminal      A(Start)      terminal
+//   B[get the age]  process       C{age >= 18}  decision
+//   D[/print x/]    input/output  E[[draw()]]   subroutine
+//   F{{i = 0 to 9}} preparation   G((A))        connector
+//   H>a note]       comment
 //
 // Supported edges:
 //   A --> B         A -- yes --> B      A -->|yes| B

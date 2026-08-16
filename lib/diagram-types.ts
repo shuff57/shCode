@@ -5,9 +5,21 @@
 // to the AI grader. The JSON graph is canonical; Mermaid is a projection of
 // it (see lib/diagram-mermaid.ts) so authors never hand-write JSON.
 //
-// Shapes are exactly the four the book teaches in Table 1.5.2 of
-// "1.5 Program Design Tools and Environments" — no more, so a student can't
-// wander off into general-purpose drawing.
+// Eight shapes, deliberately capped, so a student can't wander off into
+// general-purpose drawing.
+//
+// The book is narrower than this and it is worth being honest about the gap
+// (verified against bookSHelf 2026-08-15): Table 1.5.2 of "1.5 Program Design
+// Tools and Environments" teaches THREE — oval, rectangle, diamond — and the
+// word "flowchart" does not appear anywhere in Chapters 2-13. An earlier
+// version of this comment claimed "exactly the four the book teaches in Table
+// 1.5.2", which was wrong on both counts.
+//
+// So: terminal/process/decision are the book's. `io` and the four behind
+// "+ more shapes" are shCode's extension, released on the schedule in
+// curriculum-plan.md Appendix D. Anything assessed against a book exercise
+// (e.g. Ch 1 Test, which mirrors book exercise 1.5.11 "name the three
+// flowchart shapes") must stay inside the book's three.
 
 export type FlowShape =
   | 'terminal'

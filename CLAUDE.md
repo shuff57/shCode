@@ -152,8 +152,10 @@ page — e.g. `/teacher?class=<id>`, `/teacher-edit?class=X&student=Y&lesson=Z`.
 A `DiagramDoc` (`{nodes, edges}`, `lib/diagram-types.ts`) is the canonical form;
 Mermaid is a projection of it, so authors never hand-write JSON.
 
-Eight shapes, and the Mermaid each maps to. The first four are the book's set
-and the only ones the palette shows until a student presses **+ more shapes**:
+Eight shapes, and the Mermaid each maps to. The first four are the starter set
+— the book's three (`terminal`, `process`, `decision`; Table 1.5.2) plus `io`,
+which is shCode's own — and the only ones the palette shows until a student
+presses **+ more shapes**:
 
 | Shape | Mermaid | For |
 | --- | --- | --- |
