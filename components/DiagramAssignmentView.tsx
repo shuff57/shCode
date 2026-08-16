@@ -319,7 +319,15 @@ export default function DiagramAssignmentView({
           }}
         >
           {grading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
-          {grading ? 'Grading…' : result ? 'Re-submit for feedback' : 'Submit for feedback'}
+          {/* Structure-only lessons have no feedback to offer — the checks are the
+              grade — so promising it on the button misnames what the click does. */}
+          {grading
+            ? 'Grading…'
+            : config.aiGrader
+              ? result
+                ? 'Re-submit for feedback'
+                : 'Submit for feedback'
+              : 'Submit'}
         </button>
 
         <button
@@ -386,8 +394,12 @@ export default function DiagramAssignmentView({
           </div>
           {!structureOk && (
             <p style={{ color: '#ffb86c', fontSize: 12.5, marginTop: 8 }}>
-              Shapes with a problem are outlined in red on the canvas. Fix the structure and the
-              diagram goes to the AI grader.
+              Shapes with a problem are outlined in red on the canvas.{' '}
+              {/* Most diagram lessons have no aiGrader — the checks ARE the grade. Promising
+                  an AI grader on those is a lie the student finds out about on submit. */}
+              {config.aiGrader
+                ? 'Fix the structure and the diagram goes to the AI grader.'
+                : 'Fix the structure and you can submit.'}
             </p>
           )}
         </div>
