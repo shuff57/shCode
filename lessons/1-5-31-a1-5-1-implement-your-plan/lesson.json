@@ -25,7 +25,12 @@
     {
       "id": "s3",
       "title": "Write the decision",
-      "instructions": "Use an if/else that matches the diamond on your chart. Both branches must print something."
+      "instructions": "Your chart's diamond becomes an if/else here. You have not been taught this as code yet - Chapter 2 does that properly - so here is the exact shape to copy and fill in:\n\nif (SOMETHING IS TRUE) {\n  console.log(\"what happens on the yes branch\");\n} else {\n  console.log(\"what happens on the no branch\");\n}\n\nReplace the condition with your comparison, and put a message in each branch. Both branches must print something.",
+      "hints": [
+        "The condition goes in the round brackets: pagesRequested <= creditRemaining",
+        "Each branch needs its own console.log",
+        "The word else has no condition of its own - it is everything the first case was not"
+      ]
     },
     {
       "id": "s4",

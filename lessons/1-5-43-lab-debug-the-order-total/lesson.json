@@ -30,7 +30,12 @@
     {
       "id": "s4",
       "title": "Prove it with a check",
-      "instructions": "Add an if/else that compares the final total against your expected value and prints PASS or FAIL."
+      "instructions": "Add a check that compares the final total against the expected value you wrote in step 1, and prints PASS or FAIL. You have not been taught if/else as code yet - Chapter 2 does that - so here is the exact shape, the same one lesson 1.5.40 showed you:\n\nif (total.toFixed(2) === \"YOUR EXPECTED VALUE\") {\n  console.log(\"PASS\");\n} else {\n  console.log(\"FAIL - got \" + total);\n}\n\nCopy it and put your own expected value in the quotes.",
+      "hints": [
+        "toFixed(2) rounds to two decimal places so the comparison is not thrown off by a long tail",
+        "=== means \"is exactly equal to\"",
+        "If it says FAIL, one of the three bugs is still there - use your labelled prints to find which"
+      ]
     }
   ],
   "requirements": [

@@ -1,88 +1,67 @@
 {
   "id": "1-5-23-lab-spot-the-broken-pseudocode",
   "title": "1.5.23 Spot the Broken Pseudocode",
-  "description": "A plan that never finishes, found by reading rather than running. Then fix it and prove it. Auto-graded.",
+  "description": "A plan that never finishes, found by reading rather than running. Diagnose it and rewrite it — in pseudocode, not code. AI-graded with hints.",
   "type": "assignment",
   "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
-  "preview": "console",
+  "preview": "assignment",
   "slos": [
     "SLO-3"
   ],
-  "steps": [
-    {
-      "id": "s1",
-      "title": "Say what is wrong",
-      "instructions": "The broken plan is in a comment at the top. In a comment of your own, say what is wrong with it. The answer is not a syntax problem."
-    },
-    {
-      "id": "s2",
-      "title": "Write the fixed plan",
-      "instructions": "Write the corrected pseudocode as comments, with the missing step added and the indentation showing what is inside the loop."
-    },
-    {
-      "id": "s3",
-      "title": "Implement it",
-      "instructions": "Turn your fixed plan into JavaScript with a while loop that counts and prints, and actually stops."
-    }
-  ],
-  "requirements": [
-    {
-      "id": "r1",
-      "title": "count starts at 1",
-      "description": "Declares count with an initial value",
-      "type": "regex",
-      "file": "script.js",
-      "pattern": "let\\s+count\\s*=\\s*1\\s*;",
-      "flags": "",
-      "points": 0
-    },
-    {
-      "id": "r2",
-      "title": "A while loop with the condition",
-      "description": "Uses a while loop testing count against 10",
-      "type": "regex",
-      "file": "script.js",
-      "pattern": "while\\s*\\(\\s*count\\s*<=?\\s*10\\s*\\)",
-      "flags": "",
-      "points": 0
-    },
-    {
-      "id": "r3",
-      "title": "count is printed inside the loop",
-      "description": "Logs count",
-      "type": "regex",
-      "file": "script.js",
-      "pattern": "console\\.log\\s*\\([^)]*count",
-      "flags": "",
-      "points": 0
-    },
-    {
-      "id": "r4",
-      "title": "count actually changes",
-      "description": "The missing step: count is increased, so the loop terminates",
-      "type": "regex",
-      "file": "script.js",
-      "pattern": "count\\s*(=\\s*count\\s*\\+\\s*1|\\+=\\s*1|\\+\\+)",
-      "flags": "",
-      "points": 0
-    },
-    {
-      "id": "r5",
-      "title": "The diagnosis is written down",
-      "description": "A comment explains that count never changes so the plan never ends",
-      "type": "regex",
-      "file": "script.js",
-      "pattern": "//[^\\n]*(never|forever|infinite|does ?n[o']?t (stop|end|change)|always true)",
-      "flags": "i",
-      "points": 0
-    }
-  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Spot the Broken Pseudocode — AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "Here is somebody's plan. It has no syntax errors, because pseudocode has no syntax. It is still wrong.\n\n  set count to 1\n  while count is less than 10\n      print count\n\n1. What is wrong with it? Read it back literally, one line at a time, and say what makes the loop never finish.\n\n2. Rewrite the plan correctly, in pseudocode. Use indentation to show which steps are inside the loop. Do not write JavaScript - no braces, no semicolons.\n\n3. Which line in your corrected plan is the one that guarantees it ends, and why does it guarantee that?\n\n4. This plan was caught by reading it aloud rather than by running it. Why would running it have been a worse way to find this particular problem?",
+    "rubric": [
+      {
+        "id": "diagnosis",
+        "title": "Q1: identifies that count never changes",
+        "description": "Student says nothing ever increases count, so the condition stays true and the plan repeats forever. Credit any wording that identifies the unchanging variable as the cause - 'count is always 1', 'nothing updates it', 'the condition can never become false'. Deny answers that blame the print statement, the starting value, or the number 10.",
+        "points": 0
+      },
+      {
+        "id": "rewrite-adds-step",
+        "title": "Q2: the rewritten plan adds the missing step",
+        "description": "The corrected pseudocode includes a step that increases count inside the loop - 'add 1 to count' or equivalent. Deny if the rewrite only reorders or reworks the existing three lines without adding a step that changes count.",
+        "points": 0
+      },
+      {
+        "id": "rewrite-indented",
+        "title": "Q2: indentation shows what is inside the loop",
+        "description": "The steps that repeat are indented under the while line, and anything that happens once is not. Deny if everything is flush left, or if the indentation does not correspond to what belongs inside the loop.",
+        "points": 0
+      },
+      {
+        "id": "is-pseudocode",
+        "title": "Q2: the answer is pseudocode, not JavaScript",
+        "description": "The rewrite reads as plain structured English. Keywords such as WHILE or IF are fine. Deny if the student submits real JavaScript with braces, semicolons and console.log - the point of the exercise is that this stage has no language.",
+        "points": 0
+      },
+      {
+        "id": "termination-reasoned",
+        "title": "Q3: names the line that guarantees termination, and why",
+        "description": "Student points at the step that increases count and explains that because count grows on every pass, it must eventually reach 10 and fail the condition. Credit any clear statement of that mechanism. Deny if a line is named with no reasoning, or the wrong line is named.",
+        "points": 0
+      },
+      {
+        "id": "why-reading-wins",
+        "title": "Q4: says why reading beat running here",
+        "description": "Student recognises that running this would hang or loop forever rather than report a useful error, so it would tell you little about the cause - whereas reading it exposes the missing step directly. Credit any answer along those lines, including 'it would never stop so you'd learn nothing' or 'there is no error message for a plan that is simply wrong'.",
+        "points": 0
+      }
+    ]
+  },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "steps": [],
+  "requirements": []
 }
