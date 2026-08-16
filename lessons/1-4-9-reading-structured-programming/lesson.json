@@ -1,0 +1,22 @@
+{
+  "id": "1-4-9-reading-structured-programming",
+  "title": "1.4.9 Reading — Structured Programming",
+  "description": "Procedural programming with a discipline attached, and a surprisingly strong claim. Definition 1.4.3 — and SLO-2.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.4 Programming Paradigms and Languages",
+  "preview": "reading",
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

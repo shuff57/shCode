@@ -1,0 +1,55 @@
+{
+  "id": "1-4-6-which-level-fits",
+  "title": "1.4.6 Which Level Fits?",
+  "description": "A team needs to ship a web app quickly. Pick a level of abstraction and name what they trade away. AI-graded with hints.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.4 Programming Paradigms and Languages",
+  "preview": "assignment",
+  "slos": [
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Which Level Fits? — AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "A small team has eight weeks to ship a working web app. They are arguing about which language to use. One person wants a low-level language because the program will run faster.\n\n1. Should they choose a high-level or a low-level language? Give a clear answer.\n2. Why? Say which resource is scarce for this team, and how the level of abstraction you chose helps with it.\n3. What are they trading away by choosing it? Name the cost honestly - every choice here has one.",
+    "rubric": [
+      {
+        "id": "clear-high-level",
+        "title": "Clear answer: high-level",
+        "description": "Student clearly answers high-level (or names a specific high-level language such as JavaScript or Python as their choice). Credit an unambiguous answer. Deny if the answer is low-level, 'it depends' with no decision, or too vague to tell which was chosen.",
+        "points": 0
+      },
+      {
+        "id": "scarce-resource",
+        "title": "Names the scarce resource",
+        "description": "Student identifies that programmer time / development speed is what is scarce for this team, given the eight-week deadline. Wording will vary - 'they don't have time to write it all', 'it's faster to build' both count. Deny if the reason given is unrelated to time or development effort.",
+        "points": 0
+      },
+      {
+        "id": "abstraction-connected",
+        "title": "Connects the choice to abstraction",
+        "description": "Student explains that a high-level language hides hardware detail (memory, how the machine does the work), which is WHY it is quicker to write. Credit any clear statement that the language handles detail so the programmer does not have to. Deny if high-level is only asserted to be 'easier' with no mention of what it hides or handles for you.",
+        "points": 0
+      },
+      {
+        "id": "cost-named",
+        "title": "Names the real cost",
+        "description": "Student names something genuinely given up - some run speed, or fine control over the hardware. Deny if the answer claims there is no downside, or names a cost that is not real (e.g. 'high-level languages can't do as much').",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

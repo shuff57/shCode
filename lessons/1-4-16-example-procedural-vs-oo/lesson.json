@@ -1,0 +1,22 @@
+{
+  "id": "1-4-16-example-procedural-vs-oo",
+  "title": "1.4.16 Worked Example — Procedural vs Object-Oriented",
+  "description": "Two snippets, same output, different paradigm. What actually tells them apart is not what you'd guess.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.4 Programming Paradigms and Languages",
+  "preview": "example",
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

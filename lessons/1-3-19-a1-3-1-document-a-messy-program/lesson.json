@@ -1,0 +1,143 @@
+{
+  "id": "1-3-19-a1-3-1-document-a-messy-program",
+  "title": "1.3.19 A1.3.1 — Document a Messy Program",
+  "description": "Twelve lines with no comments, no spacing and terrible names. Fix it to the class style guide and write the README. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 40,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.3 Documentation and Coding Conventions",
+  "preview": "console",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Rename everything",
+      "instructions": "Replace the single-letter names with descriptive camelCase names. The program calculates a book order: use bookTitle, unitPrice, quantity, subtotal and orderTotal, and make the tax rate a constant named TAX_RATE."
+    },
+    {
+      "id": "s2",
+      "title": "Fix the formatting",
+      "instructions": "Style guide: one space around every operator, a semicolon on every statement, and a blank line between logical sections."
+    },
+    {
+      "id": "s3",
+      "title": "Comment every non-obvious line",
+      "instructions": "Add inline // comments explaining what each calculation is for. Explain why, not just what the symbols do."
+    },
+    {
+      "id": "s4",
+      "title": "Write the README",
+      "instructions": "Open README.md and write at least three sentences: what this program is, how to run it, and what someone should know before changing it."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "TAX_RATE is an UPPER_SNAKE_CASE constant",
+      "description": "The rate that never changes is declared with const in UPPER_SNAKE_CASE",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "const\\s+TAX_RATE\\s*=\\s*[\\d.]+\\s*;",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "bookTitle holds the title",
+      "description": "Declares bookTitle with quoted text",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+bookTitle\\s*=\\s*[\"'][^\"']+[\"']\\s*;",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "unitPrice and quantity are named",
+      "description": "Declares both unitPrice and quantity",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?=[\\s\\S]*(?:let|const)\\s+unitPrice\\s*=)(?=[\\s\\S]*(?:let|const)\\s+quantity\\s*=)[\\s\\S]*",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "subtotal is computed from them",
+      "description": "subtotal is unitPrice times quantity",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+subtotal\\s*=[^;]*unitPrice[^;]*quantity",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "orderTotal uses the tax rate",
+      "description": "orderTotal is computed from subtotal and TAX_RATE",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+orderTotal\\s*=[^;]*subtotal[^;]*TAX_RATE",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "No single-letter variables remain",
+      "description": "No declaration of a one-letter variable is left in the file",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*(?:let|const|var)\\s+[a-z]\\s*=)[\\s\\S]*$",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "Operators are spaced",
+      "description": "No cramped arithmetic like a*b remains — every operator has a space on each side",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*[A-Za-z0-9_)][*/+][A-Za-z0-9_(])[\\s\\S]*$",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r8",
+      "title": "At least four explanatory comments",
+      "description": "Four or more // comments explaining the code",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:[\\s\\S]*?//[^\\n]{10,}){4}",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r9",
+      "title": "README has at least three sentences",
+      "description": "README.md contains three or more sentences of plain English",
+      "type": "regex",
+      "file": "README.md",
+      "pattern": "(?:[\\s\\S]*?[A-Za-z]{3}[^.!?\\n]*[.!?]){3}",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r10",
+      "title": "README mentions the tax rate",
+      "description": "README tells the reader about the tax rate they may need to change",
+      "type": "regex",
+      "file": "README.md",
+      "pattern": "tax",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

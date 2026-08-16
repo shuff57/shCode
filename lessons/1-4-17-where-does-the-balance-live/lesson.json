@@ -1,0 +1,55 @@
+{
+  "id": "1-4-17-where-does-the-balance-live",
+  "title": "1.4.17 Where Does the Balance Live?",
+  "description": "A bank account, two paradigms. Say where the depositing code goes in each, and when you'd want which. AI-graded with hints.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.4 Programming Paradigms and Languages",
+  "preview": "assignment",
+  "slos": [
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Where Does the Balance Live? — AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "A program keeps track of a bank account: it stores a balance, and it needs code that deposits money into that balance.\n\n1. In object-oriented style, where does the code that changes the balance live? Say where, and say why that placement is what makes the style object-oriented.\n\n2. In procedural style, where would that same code live instead?\n\n3. Name one situation where procedural is the better fit, and one where object-oriented is. Give a reason for each - not just a preference.",
+    "rubric": [
+      {
+        "id": "oo-placement",
+        "title": "Q1: the behaviour lives with the data",
+        "description": "Student says the depositing code lives in the account object itself, alongside the balance. Deny if the answer places it in a separate procedure, or is too vague to tell where it went.",
+        "points": 0
+      },
+      {
+        "id": "bundling-named",
+        "title": "Q1: names bundling as what makes it object-oriented",
+        "description": "Student connects the placement to the paradigm - that bundling data with the behaviour acting on it is exactly what makes the style object-oriented. Credit any clear statement of that link. Deny if Q1 only states the placement with no reason attached.",
+        "points": 0
+      },
+      {
+        "id": "procedural-contrast",
+        "title": "Q2: procedural keeps them separate",
+        "description": "Student says that in procedural style the depositing code sits in a separate procedure/function, away from the balance, which is held in its own variable. Deny if the contrast is missing or if the answer describes the same arrangement twice.",
+        "points": 0
+      },
+      {
+        "id": "fit-with-reasons",
+        "title": "Q3: one situation each, with reasons",
+        "description": "Student names a situation suiting procedural (typically a small, direct job or a short script) and one suiting object-oriented (typically a larger program, or many similar things each keeping their own data), and gives a reason for each. Deny if either situation is missing, or if reasons are bare preference such as 'it's cleaner'.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

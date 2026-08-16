@@ -1,0 +1,103 @@
+{
+  "id": "1-2-26-lab-typeof-round-up",
+  "title": "1.2.26 typeof Round-Up",
+  "description": "Run typeof over six different values and find the one answer that lies. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Variables and Data Types",
+  "preview": "console",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "A string and a number",
+      "instructions": "Log the type of a piece of text and the type of a number."
+    },
+    {
+      "id": "s2",
+      "title": "A boolean and an undefined",
+      "instructions": "Log the type of true, and the type of undefined."
+    },
+    {
+      "id": "s3",
+      "title": "null",
+      "instructions": "Log the type of null. Watch the answer — it is the one that lies."
+    },
+    {
+      "id": "s4",
+      "title": "An object",
+      "instructions": "Log the type of an object written with curly braces, such as { name: \"Sarah\" }."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "typeof a string",
+      "description": "Logs the type of a quoted piece of text",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*[\"'][^\"']*[\"']",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "typeof a number",
+      "description": "Logs the type of a plain number",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*\\d",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "typeof true",
+      "description": "Logs the type of the boolean true",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*true",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "typeof undefined",
+      "description": "Logs the type of undefined",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*undefined",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "typeof null",
+      "description": "Logs the type of null — the answer that is a known bug",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*null",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "typeof an object",
+      "description": "Logs the type of an object written with curly braces",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*typeof\\s*\\(?\\s*\\{",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

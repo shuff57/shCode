@@ -1,0 +1,22 @@
+{
+  "id": "1-4-7-reading-what-is-a-paradigm",
+  "title": "1.4.7 Reading — What a Paradigm Is",
+  "description": "Two programs can solve the same problem and be organised in completely different ways. Definition 1.4.2.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.4 Programming Paradigms and Languages",
+  "preview": "reading",
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

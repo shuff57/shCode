@@ -193,6 +193,86 @@
       "week": null
     },
     {
+      "id": "1-2-10-reading-number",
+      "title": "1.2.10 Reading — The number Type",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-11-reading-special-numeric-values",
+      "title": "1.2.11 Reading — Infinity, -Infinity and NaN",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-12-example-nan-is-sticky",
+      "title": "1.2.12 Worked Example — NaN Is Sticky",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-13-lab-predict-the-number",
+      "title": "1.2.13 Predict the Number",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-14-reading-bigint",
+      "title": "1.2.14 Reading — BigInt",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-15-reading-strings-and-quotes",
+      "title": "1.2.15 Reading — Strings and the Three Quotes",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-16-reading-template-literals",
+      "title": "1.2.16 Reading — Embedding Values with ${...}",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-17-lab-greeting-with-backticks",
+      "title": "1.2.17 Greeting with Backticks",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-18-reading-boolean",
+      "title": "1.2.18 Reading — The boolean Type",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-19-example-comparisons-make-booleans",
+      "title": "1.2.19 Worked Example — Comparisons Produce Booleans",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "1-2-2-reading-let-const",
       "title": "1.2.2 Reading — Declaring Variables with let and const",
       "unit": "1.2 Variables and Data Types",
@@ -201,10 +281,98 @@
       "week": null
     },
     {
+      "id": "1-2-20-reading-null",
+      "title": "1.2.20 Reading — The null Value",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-21-reading-undefined",
+      "title": "1.2.21 Reading — The undefined Value",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-22-null-vs-undefined",
+      "title": "1.2.22 null vs undefined",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-23-reading-primitive-vs-object",
+      "title": "1.2.23 Reading — Primitive vs Object",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-24-reading-typeof",
+      "title": "1.2.24 Reading — The typeof Operator",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-25-example-typeof-surprises",
+      "title": "1.2.25 Worked Example — The typeof Surprises",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-26-lab-typeof-round-up",
+      "title": "1.2.26 typeof Round-Up",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-27-reading-the-seven-primitives",
+      "title": "1.2.27 Reading — The Seven Primitives, Recapped",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-28-a1-2-1-fix-ten-declarations",
+      "title": "1.2.28 A1.2.1 — Fix Ten Declarations",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-29-a1-2-2-describe-an-object",
+      "title": "1.2.29 A1.2.2 — Describe a Real Object",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "1-2-3-reading-string-methods",
       "title": "1.2.3 Reading — String Methods in Practice",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-30-unit-quiz",
+      "title": "1.2.30 Module 1.2 Quiz",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -233,6 +401,30 @@
       "week": null
     },
     {
+      "id": "1-2-7-reading-every-value-has-a-type",
+      "title": "1.2.7 Reading — Every Value Has a Type",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-8-reading-dynamically-typed",
+      "title": "1.2.8 Reading — Dynamically Typed",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-9-lab-change-the-type",
+      "title": "1.2.9 Change the Type",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "1-3-1-slides",
       "title": "1.3.1 Slides — Documentation and Coding Conventions",
       "unit": "1.3 Documentation and Coding Conventions",
@@ -241,10 +433,98 @@
       "week": null
     },
     {
+      "id": "1-3-10-example-good-vs-bad-names",
+      "title": "1.3.10 Worked Example — Good vs Bad Names",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-11-lab-rename-the-mystery-variables",
+      "title": "1.3.11 Rename the Mystery Variables",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-12-rate-these-names",
+      "title": "1.3.12 Rate These Names",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-13-reading-reuse-or-create",
+      "title": "1.3.13 Reading — Reuse or Create?",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-14-reading-why-reuse-costs-you",
+      "title": "1.3.14 Reading — What Reuse Actually Costs",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-15-example-one-variable-three-meanings",
+      "title": "1.3.15 Worked Example — One Variable, Three Meanings",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-16-lab-split-the-reused-variable",
+      "title": "1.3.16 Split the Reused Variable",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-17-team-vocabulary",
+      "title": "1.3.17 Team Vocabulary",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-18-reading-what-a-readme-is",
+      "title": "1.3.18 Reading — What a README Is For",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-19-a1-3-1-document-a-messy-program",
+      "title": "1.3.19 A1.3.1 — Document a Messy Program",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "1-3-2-reading-camelcase",
       "title": "1.3.2 Reading — camelCase Naming Style",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-20-a1-3-3-unit-quiz",
+      "title": "1.3.20 A1.3.3 — Module 1.3 Quiz",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -269,6 +549,222 @@
       "title": "1.3.5 Why Documentation Matters",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-6-reading-human-readable-names",
+      "title": "1.3.6 Reading — Human-Readable Names",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-7-reading-avoid-abbreviations",
+      "title": "1.3.7 Reading — Avoid Single Letters and Abbreviations",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-8-reading-descriptive-but-concise",
+      "title": "1.3.8 Reading — Descriptive but Concise",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-9-reading-agree-on-terms",
+      "title": "1.3.9 Reading — Agree on Terms",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-1-slides",
+      "title": "1.4.1 Slides — Programming Paradigms and Languages",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "slides",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-10-reading-three-structures",
+      "title": "1.4.10 Reading — Sequence, Selection, Repetition",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-11-example-which-structures",
+      "title": "1.4.11 Worked Example — Which Structures Does This Use?",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-12-name-the-structure",
+      "title": "1.4.12 Name the Structure",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-13-reading-why-goto-went-away",
+      "title": "1.4.13 Reading — Why `goto` Went Away",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-14-three-structures-three-examples",
+      "title": "1.4.14 Three Structures, Three Examples",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-15-reading-object-oriented",
+      "title": "1.4.15 Reading — Object-Oriented Programming",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-16-example-procedural-vs-oo",
+      "title": "1.4.16 Worked Example — Procedural vs Object-Oriented",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-17-where-does-the-balance-live",
+      "title": "1.4.17 Where Does the Balance Live?",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-18-reading-functional-programming",
+      "title": "1.4.18 Reading — Functional Programming",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-19-reading-multi-paradigm",
+      "title": "1.4.19 Reading — JavaScript Is Multi-Paradigm",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-2-reading-why-so-many-languages",
+      "title": "1.4.2 Reading — Why There Are So Many Languages",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-20-sort-the-snippet",
+      "title": "1.4.20 Sort the Snippet",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-21-video-why-so-many-languages",
+      "title": "1.4.21 Video — Why Are There So Many Programming Languages?",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "video",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-22-unit-quiz",
+      "title": "1.4.22 Module 1.4 Quiz",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-23-a1-4-1-two-languages",
+      "title": "1.4.23 A1.4.1 — Two Languages, Two Purposes",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-3-match-the-language",
+      "title": "1.4.3 Match the Language to the Job",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-4-reading-levels-of-abstraction",
+      "title": "1.4.4 Reading — Level of Abstraction",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-5-reading-high-and-low-level",
+      "title": "1.4.5 Reading — High-Level and Low-Level Languages",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-6-which-level-fits",
+      "title": "1.4.6 Which Level Fits?",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-7-reading-what-is-a-paradigm",
+      "title": "1.4.7 Reading — What a Paradigm Is",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-8-reading-procedural-programming",
+      "title": "1.4.8 Reading — Procedural Programming",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-4-9-reading-structured-programming",
+      "title": "1.4.9 Reading — Structured Programming",
+      "unit": "1.4 Programming Paradigms and Languages",
+      "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },

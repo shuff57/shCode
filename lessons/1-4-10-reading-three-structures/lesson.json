@@ -1,0 +1,22 @@
+{
+  "id": "1-4-10-reading-three-structures",
+  "title": "1.4.10 Reading — Sequence, Selection, Repetition",
+  "description": "The three structures every program is built from, one at a time, with where Chapter 2 teaches each.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.4 Programming Paradigms and Languages",
+  "preview": "reading",
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

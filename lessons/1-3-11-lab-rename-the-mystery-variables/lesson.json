@@ -1,0 +1,108 @@
+{
+  "id": "1-3-11-lab-rename-the-mystery-variables",
+  "title": "1.3.11 Rename the Mystery Variables",
+  "description": "Two snippets of single-letter code. Rename every variable so each line explains itself. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.3 Documentation and Coding Conventions",
+  "preview": "console",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Rename the grade report",
+      "instructions": "The first snippet builds a grade sentence with a, b and c. Rename them to subjectName, finalGrade and gradeReport. Keep the output the same."
+    },
+    {
+      "id": "s2",
+      "title": "Rename the pay calculation",
+      "instructions": "The second snippet multiplies n by d. Rename them to hoursWorked, hourlyRate and totalPay."
+    },
+    {
+      "id": "s3",
+      "title": "Remove the single letters",
+      "instructions": "No variable named a, b, c, n, d or p should remain anywhere in the file."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "subjectName replaces a",
+      "description": "Declares subjectName holding the subject text",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+subjectName\\s*=\\s*[\"']",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "finalGrade replaces b",
+      "description": "Declares finalGrade holding the number",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+finalGrade\\s*=\\s*\\d+",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "gradeReport replaces c",
+      "description": "Declares gradeReport built from the other two",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+gradeReport\\s*=[^;]*subjectName[^;]*finalGrade",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "hoursWorked replaces n",
+      "description": "Declares hoursWorked holding the number of hours",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+hoursWorked\\s*=\\s*[\\d.]+",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "hourlyRate replaces d",
+      "description": "Declares hourlyRate holding the rate",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+hourlyRate\\s*=\\s*[\\d.]+",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "totalPay replaces p",
+      "description": "Declares totalPay as hoursWorked times hourlyRate",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+totalPay\\s*=[^;]*hoursWorked[^;]*hourlyRate",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "No single-letter variables left",
+      "description": "No declaration of a, b, c, n, d or p remains in the file",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*(?:let|const)\\s+[abcndp]\\s*=)[\\s\\S]*$",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

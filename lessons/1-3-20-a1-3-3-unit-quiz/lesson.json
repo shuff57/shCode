@@ -1,0 +1,67 @@
+{
+  "id": "1-3-20-a1-3-3-unit-quiz",
+  "title": "1.3.20 A1.3.3 — Module 1.3 Quiz",
+  "description": "Naming rules, variable reuse, and the performance myth. Six short answers. AI-graded with hints.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 20,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.3 Documentation and Coding Conventions",
+  "preview": "assignment",
+  "slos": [
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Module 1.3 Quiz — AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "Answer all six. One or two sentences each is enough.\n\n1. Why is `let a = 5;` a poor variable name? Give a better one and say what your version tells a reader that the original does not.\n\n2. What is the problem with reusing one variable to hold different kinds of values?\n\n3. True or false: using extra variables slows down your program. Explain your answer.\n\n4. Which of these names follow the \"descriptive but concise\" guideline, and why: x, userName, data, num, totalPrice, abc?\n\n5. Name the four data types in this list and say which variable name suits each: a person's name, whether a task is finished, how many items are in a cart, a price with cents.\n\n6. Someone says \"the comment above this line explains it, so the variable name does not matter.\" Give one reason a good name is still better than a comment.",
+    "rubric": [
+      {
+        "id": "q1-single-letter",
+        "title": "Q1: says why a single letter fails, with a better name",
+        "description": "Student explains that `a` carries no information about what the value is, and supplies a specific descriptive alternative. Credit requires both the reason and a replacement name. Deny if only 'it's bad' or only a new name with no reason.",
+        "points": 0
+      },
+      {
+        "id": "q2-reuse",
+        "title": "Q2: names the tracking/debugging cost of reuse",
+        "description": "Student says a reused variable forces the reader to track what it holds at each point, so the name stops describing the contents and bugs get harder to find. Deny if the answer says only that it is 'confusing' with no account of why.",
+        "points": 0
+      },
+      {
+        "id": "q3-performance-myth",
+        "title": "Q3: answers false, and explains",
+        "description": "Student answers FALSE and explains that modern engines and build tools optimise this away, and may even run separate single-purpose variables faster. Deny if the student answers true, or answers false with no explanation.",
+        "points": 0
+      },
+      {
+        "id": "q4-name-sorting",
+        "title": "Q4: sorts the six names with reasons",
+        "description": "Expected: userName and totalPrice follow the guideline; x, data and abc do not; num is weak/borderline. Credit an answer that gets the clear cases right (userName and totalPrice good; x, data, abc bad) and gives a reason grounded in the module's rules. Deny if good and bad are largely mixed up, or if no reasons are given.",
+        "points": 0
+      },
+      {
+        "id": "q5-types-and-names",
+        "title": "Q5: matches types to values with suitable names",
+        "description": "Expected: a person's name is a string (e.g. playerName), whether a task is finished is a boolean (e.g. isComplete), how many items is a number (e.g. itemCount), a price with cents is a number (e.g. unitPrice). Credit three or four correct type-and-name pairings. Deny two or fewer, or names that are single letters.",
+        "points": 0
+      },
+      {
+        "id": "q6-names-vs-comments",
+        "title": "Q6: gives a real reason names beat comments",
+        "description": "Student gives a genuine advantage - a comment can go stale when the code changes while a rename updates everywhere the variable is used, or the name is read at every use while the comment sits in one place. Deny vague answers such as 'names are cleaner' or 'comments are extra work'.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

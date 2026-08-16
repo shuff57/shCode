@@ -1,0 +1,143 @@
+{
+  "id": "1-2-28-a1-2-1-fix-ten-declarations",
+  "title": "1.2.28 A1.2.1 — Fix Ten Declarations",
+  "description": "Ten broken variable declarations. Fix each one and say in a comment what was wrong. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 30,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Variables and Data Types",
+  "preview": "console",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Fix the syntax errors",
+      "instructions": "Several declarations are missing a keyword, a quote mark, or an equals sign. Repair them so the file runs."
+    },
+    {
+      "id": "s2",
+      "title": "Fix the wrong types",
+      "instructions": "Some values are the wrong type for what the name says — a number written as text, a boolean written as text. Give each the type its name implies."
+    },
+    {
+      "id": "s3",
+      "title": "Fix the names",
+      "instructions": "Some names are single letters or not camelCase. Rename them to descriptive camelCase names."
+    },
+    {
+      "id": "s4",
+      "title": "Comment every fix",
+      "instructions": "Above each declaration you changed, write a // comment saying what was wrong. Ten fixes, ten comments."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "studentAge is a number",
+      "description": "studentAge is declared and holds a number, not text",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+studentAge\\s*=\\s*\\d+\\s*;",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "firstName is a string",
+      "description": "firstName is declared and holds properly quoted text",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+firstName\\s*=\\s*([\"'])[^\"']+\\1\\s*;",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "isEnrolled is a real boolean",
+      "description": "isEnrolled holds true or false without quotes",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+isEnrolled\\s*=\\s*(true|false)\\s*;",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "gradeLevel is declared with a keyword",
+      "description": "gradeLevel uses let or const rather than being assigned with no keyword",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+gradeLevel\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "MAX_STUDENTS is a const",
+      "description": "The value that never changes is declared with const",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "const\\s+MAX_STUDENTS\\s*=\\s*\\d+\\s*;",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "unitPrice replaces the single-letter name",
+      "description": "The mystery name p has been renamed to unitPrice",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+unitPrice\\s*=\\s*[\\d.]+\\s*;",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "itemCount replaces the second mystery name",
+      "description": "The mystery name q has been renamed to itemCount",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+itemCount\\s*=\\s*\\d+\\s*;",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r8",
+      "title": "favouriteColour is camelCase",
+      "description": "The snake_case or all-lowercase name has become camelCase",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+favouriteColour\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r9",
+      "title": "middleName is null, not the string \"null\"",
+      "description": "The deliberately-empty value uses the null keyword without quotes",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+middleName\\s*=\\s*null\\s*;",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r10",
+      "title": "finalScore is declared but left unassigned",
+      "description": "finalScore is declared with let and no value, so it holds undefined until set",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "let\\s+finalScore\\s*;",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

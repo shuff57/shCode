@@ -1,0 +1,67 @@
+{
+  "id": "1-4-22-unit-quiz",
+  "title": "1.4.22 Module 1.4 Quiz",
+  "description": "Six short answers covering languages, abstraction levels, and the three paradigms. AI-graded with hints.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 20,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.4 Programming Paradigms and Languages",
+  "preview": "assignment",
+  "slos": [
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Module 1.4 Quiz — AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "Answer all six. One or two sentences each is enough.\n\n1. Why can a program for a web page not simply be written in SQL?\n\n2. Explain the difference between a low-level and a high-level language, and give one advantage of each.\n\n3. What is a programming paradigm?\n\n4. Name the three structures of structured programming.\n\n5. Give one difference between procedural and object-oriented programming.\n\n6. What is the distinctive habit of functional programming, and why does it make a program easier to test?",
+    "rubric": [
+      {
+        "id": "q1-purpose-driven",
+        "title": "Q1: languages are purpose driven",
+        "description": "Student says SQL is designed for asking questions of a database and cannot build an interface / is not built for that job. Credit any answer resting on purpose rather than on age or speed. Deny answers claiming SQL is 'too slow' or 'too old'.",
+        "points": 0
+      },
+      {
+        "id": "q2-levels",
+        "title": "Q2: both levels defined, with an advantage each",
+        "description": "Student says low-level describes the work in hardware terms and high-level hides those details, AND gives one real advantage of each - typically run speed / control for low-level, and writing speed / fewer mistakes for high-level. Deny if only one level is described, or if no advantage is given for one of them.",
+        "points": 0
+      },
+      {
+        "id": "q3-paradigm",
+        "title": "Q3: paradigm defined as a way of organising code",
+        "description": "Student defines a paradigm as an approach to organising or structuring a program - how it is broken into pieces and how they fit together. Deny if the answer confuses a paradigm with a language, or with syntax.",
+        "points": 0
+      },
+      {
+        "id": "q4-three-structures",
+        "title": "Q4: all three structures named",
+        "description": "Student names sequence, selection and repetition. Accept 'choice'/'branching' for selection and 'loop'/'iteration' for repetition. Credit requires all three.",
+        "points": 0
+      },
+      {
+        "id": "q5-proc-vs-oo",
+        "title": "Q5: a real difference between procedural and object-oriented",
+        "description": "Student gives a genuine difference - typically that procedural keeps data and behaviour separate while object-oriented bundles them, or that a program is a sequence of steps versus a set of interacting objects. Deny vague answers such as 'object-oriented is more modern' or 'OOP uses objects' with nothing about what that changes.",
+        "points": 0
+      },
+      {
+        "id": "q6-functional",
+        "title": "Q6: functional habit named, and linked to testing",
+        "description": "Student names the habit - same input gives the same output, and/or it changes nothing outside itself / produces a new value rather than modifying one - AND connects it to testing: a function depending only on its inputs can be checked on its own, with no setup and nothing else to account for. Deny if the habit is named but the testing link is missing.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

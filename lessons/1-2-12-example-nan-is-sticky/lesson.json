@@ -1,0 +1,22 @@
+{
+  "id": "1-2-12-example-nan-is-sticky",
+  "title": "1.2.12 Worked Example — NaN Is Sticky",
+  "description": "Once NaN appears in a calculation it spreads to the whole result. Example 1.2.1, with the one exception.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Variables and Data Types",
+  "preview": "example",
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

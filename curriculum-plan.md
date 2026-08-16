@@ -222,6 +222,19 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - **A1.2.1 (Lab):** Given 10 variable declarations with bugs (wrong type, wrong syntax, poor names), fix all 10 and explain each fix in a comment.
 - **A1.2.2 (Lab):** Write a program that declares at least 6 variables describing a real object (at least 2 numbers, 2 strings, 1 boolean). Use template literals to print a description sentence. Must use at least 2 string methods. Must follow naming conventions.
 
+**In-app (built 2026-08-16 — complete, 30 lessons):** two blocks. `1.2.1`–`1.2.6`
+are the earlier plan-derived set (`let`/`const`, string methods, operators and
+coercion, two labs). `1.2.7`–`1.2.30` were authored against book §1.2 directly,
+1:1 with its eight subsections — the eight data types, dynamic typing, `NaN`,
+`BigInt`, the three quote marks, `null` vs `undefined`, primitive vs object, and
+`typeof` — closing with A1.2.1, A1.2.2 and a module quiz. Full lesson table with
+book cross-references in `curriculum/modules/1.2_variables-and-data-types.md`.
+
+> **Why the book block is appended, not interleaved.** `1-2-1-slides`,
+> `1-2-5-lab-variables-types-check` and `1-2-6-lab-operators-check` carry live
+> student progress in D1, and `lesson_state.lesson_id` is the folder name.
+> Renumbering them would orphan real student work (`BOOK-TO-MODULE.md` §7.3).
+
 **Teacher Notes:**
 - Type coercion in JS will confuse students. Address it directly rather than avoiding it.
 - Template literals (`\`Hello ${name}\``) are easier than concatenation for beginners. Lead with them.
@@ -258,6 +271,23 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - **A1.3.2 (Written):** 1 paragraph: why does documentation matter in professional software development? Use one specific example.
 - **A1.3.3 (Quiz — in class, 15 min):** Identify data types of 5 expressions, fix 3 variable declarations with syntax or naming errors, match 4 vocabulary terms (variable, constant, data type, comment) to definitions.
 
+**In-app (built 2026-08-16 — complete, 20 lessons):** `1.3.1`–`1.3.5` are the
+earlier set (slides, camelCase, layout, comments, A1.3.2). `1.3.6`–`1.3.20` were
+appended against book §1.3 — the four naming rules of Definition 1.3.1 one lesson
+each, Example 1.3.1, variable reuse and what it costs — plus a README reading,
+**A1.3.1** (rename, reformat, comment and document a messy program, README
+included) and **A1.3.3**. All three of this section's assignments now exist. Full
+lesson table in `curriculum/modules/1.3_documentation-conventions.md`.
+
+> **Scope note.** Book §1.3 has only two subsections — naming, and variable
+> reuse. Comments, indentation, spacing and READMEs are not in the book; they
+> come from this plan and `curriculum/resources/class-style-guide.md`. The module
+> is intentionally wider than its book section.
+>
+> **JSDoc is deliberately deferred.** This section lists it as a topic, but
+> students have no functions until §3.1, and the style guide already marks JSDoc
+> as enforced from Week 6. Build it against §3.1 rather than here.
+
 **Teacher Notes:**
 - Distribute the class coding style guide this week. It should cover: indentation (2 spaces), semicolons (required), naming (camelCase variables, UPPER_SNAKE for constants), comment requirements.
 - This style guide will be used as a grading rubric for all future assignments.
@@ -291,7 +321,28 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Bridge forward: "shplay next quarter uses classes — that's the object-oriented paradigm. JSCAD later is mostly procedural, like this quarter."
 
 **Assignments:**
-- **A1.4.1 (Written):** Half page. Pick two languages other than JavaScript. What is each typically used for, and why does that fit the paradigm(s) it supports?
+- **A1.4.1 (Written):** Pick two languages other than JavaScript. What is each typically used for, and why does that fit the paradigm(s) it supports?
+
+**In-app (built 2026-08-16 — complete, 23 lessons):** authored against book §1.4
+directly, 1:1 with its seven subsections, at module 1.1's density. Full lesson
+table with book cross-references in `curriculum/modules/1.4_programming-paradigms-and-languages.md`.
+
+| Lessons | Covers |
+|---|---|
+| `1-4-1` … `1-4-3` | §1.4.1 — languages are purpose driven; "best for what?"; a match-the-job lab |
+| `1-4-4` … `1-4-6` | §1.4.2 — level of abstraction, Definition 1.4.1, and the trade-off as a graded judgement call |
+| `1-4-7` | §1.4.3 — Definition 1.4.2, a paradigm is a way of organising code |
+| `1-4-8` … `1-4-14` | §1.4.4 — procedural; structured programming (Definition 1.4.3); sequence/selection/repetition; `goto`; a worked example and two graded checks |
+| `1-4-15` … `1-4-17` | §1.4.5 — Definition 1.4.4 and Table 1.4.1; procedural-vs-OO worked example; where the balance lives |
+| `1-4-18` | §1.4.6 — functional programming |
+| `1-4-19` … `1-4-20` | §1.4.7 — multi-paradigm, and a sort-the-snippet lab |
+| `1-4-21` … `1-4-23` | video (URL empty), module quiz, and A1.4.1 |
+
+> **Vocabulary note.** This plan frames §1.4 as imperative-versus-declarative. The
+> book does not use "declarative" in §1.4 at all — it organises the section around
+> **procedural / object-oriented / functional**. Per `curriculum/BOOK-TO-MODULE.md` §1
+> the book is upstream on concepts, so the built lessons use the book's three names.
+> Update this section's Topics list if the plan should follow.
 
 **Teacher Notes:**
 - Keep this conceptual and light — no new syntax this week. It's a zoom-out, not a coding week.
@@ -343,11 +394,11 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 
 **Still unbuilt in this section:** book §1.5.1 (think before you type), §1.5.2 (decomposition and
 pattern recognition), §1.5.3 (abstraction), §1.5.6 (how algorithms get executed), §1.5.7 (where
-JavaScript runs), §1.5.8 (reading an error message), §1.5.9 (testing and debugging) — and the whole
-of §1.4. A1.5.2 asks about the four components of computational thinking, which §1.5.1–1.5.3 are
+JavaScript runs), §1.5.8 (reading an error message), §1.5.9 (testing and debugging). A1.5.2 asks
+about the four components of computational thinking, which §1.5.1–1.5.3 are
 supposed to teach; until those exist the assignment's own page carries the definitions, and it
 accepts an everyday task rather than "something you've already coded", because by week 2 students
-have coded almost nothing. Restore the narrower wording once §1.4 and the rest of §1.5 are built.
+have coded almost nothing. Restore the narrower wording once the rest of §1.5 is built.
 
 **Teacher Notes:**
 - This week is the design-before-code habit the whole course leans on — planning with pseudocode/flowcharts before writing JS. **Appendix D turns that from advice into a gate**: from here on every challenge, Group PA, test and synthesis project opens with a flowchart, and the in-app coding lesson is locked until the flowchart is green. Say so explicitly today, so the pattern is a known rule rather than a recurring surprise.

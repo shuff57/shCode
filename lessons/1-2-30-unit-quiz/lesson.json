@@ -1,0 +1,73 @@
+{
+  "id": "1-2-30-unit-quiz",
+  "title": "1.2.30 Module 1.2 Quiz",
+  "description": "Seven short answers covering the eight types, dynamic typing, and the typeof bug. AI-graded with hints.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 20,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Variables and Data Types",
+  "preview": "assignment",
+  "slos": [
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Module 1.2 Quiz — AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "Answer all seven. One or two sentences each is enough.\n\n1. What does it mean that JavaScript is \"dynamically typed\"? Give an example.\n\n2. Name the seven primitive data types in JavaScript.\n\n3. What are the three special numeric values, and how does each one appear?\n\n4. What is the difference between null and undefined, and when would you use each?\n\n5. What will this code print, and why?\n   let x = 10;\n   x = \"ten\";\n   console.log(x);\n\n6. What is the difference between a backtick string and a double-quote string?\n\n7. What is the result of typeof null, and what is wrong with that answer?",
+    "rubric": [
+      {
+        "id": "q1-dynamic",
+        "title": "Q1: dynamic typing explained with an example",
+        "description": "Student says a variable is not locked to one type and can change type while the program runs, AND gives an example - a variable holding text then a number, or similar. Credit requires both the explanation and an example.",
+        "points": 0
+      },
+      {
+        "id": "q2-primitives",
+        "title": "Q2: the seven primitives named",
+        "description": "Student lists number, bigint, string, boolean, null, undefined and symbol. Credit six or seven correct with no wrong entries; deny if 'object' is included in the list of primitives, or if fewer than six are named.",
+        "points": 0
+      },
+      {
+        "id": "q3-special-numbers",
+        "title": "Q3: Infinity, -Infinity and NaN, with how each appears",
+        "description": "Student names all three and says how each arises - Infinity from dividing by zero or written directly, -Infinity likewise negative, NaN from an invalid maths operation such as multiplying text by a number. Deny if only the names are given with no account of where they come from.",
+        "points": 0
+      },
+      {
+        "id": "q4-null-undefined",
+        "title": "Q4: null vs undefined, including who sets each",
+        "description": "Student distinguishes them: undefined is what JavaScript assigns to a declared-but-unassigned variable; null is what the programmer assigns deliberately to mean empty. Deny if both are described only as 'empty' with no distinction of intent or origin.",
+        "points": 0
+      },
+      {
+        "id": "q5-trace",
+        "title": "Q5: predicts \"ten\" and explains why",
+        "description": "Student says the code prints ten, and explains that reassignment replaced the number with a string, which is allowed because JavaScript is dynamically typed. Deny if the output is wrong, or correct with no reason given.",
+        "points": 0
+      },
+      {
+        "id": "q6-quotes",
+        "title": "Q6: backticks evaluate ${...}, double quotes do not",
+        "description": "Student says backticks allow embedding variables or expressions with the dollar-brace syntax, and that double quotes treat that syntax as literal text. Deny if the answer only says backticks are 'newer' or 'better' without naming what they do.",
+        "points": 0
+      },
+      {
+        "id": "q7-typeof-null",
+        "title": "Q7: typeof null is \"object\", and that is a bug",
+        "description": "Student says typeof null returns \"object\" AND that this is wrong - null is its own type, and the wrong answer is a long-standing bug kept for compatibility. Credit requires both the result and the fact that it is incorrect.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

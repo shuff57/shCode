@@ -1,0 +1,61 @@
+{
+  "id": "1-4-23-a1-4-1-two-languages",
+  "title": "1.4.23 A1.4.1 — Two Languages, Two Purposes",
+  "description": "Pick two languages that aren't JavaScript and explain what each is for and why its paradigm fits. AI-graded with hints.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 30,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.4 Programming Paradigms and Languages",
+  "preview": "assignment",
+  "slos": [
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Two Languages, Two Purposes — AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "Pick two programming languages other than JavaScript.\n\nFor each of your two languages, answer all three:\n1. What is this language typically used for? Name a specific kind of software, not just 'programs'.\n2. Which paradigm or paradigms does it support? Choose from procedural, object-oriented, and functional - and you may name more than one.\n3. Why does that paradigm fit that kind of work? This is the important part. Connect the way the language organises a solution to the kind of problem it is usually pointed at.\n\nThen close with one sentence: name one thing that would make you pick a different language than either of these for a job.\n\nUse your own words. Do not copy descriptions from the internet. You are not expected to have written code in either language.",
+    "rubric": [
+      {
+        "id": "two-languages-named",
+        "title": "Two specific non-JavaScript languages are named",
+        "description": "Student names two distinct, real programming languages, neither of which is JavaScript. HTML and CSS do not count as programming languages and do not earn this criterion on their own; SQL does count. Deny if only one language is discussed, or if a language is referred to vaguely ('a systems language').",
+        "points": 0
+      },
+      {
+        "id": "typical-use-specific",
+        "title": "Each language's typical use is specific",
+        "description": "For BOTH languages the student names a concrete kind of software or task - 'analysing data sets', 'iPhone apps', 'operating systems', 'querying a database'. Deny if either one is generic filler such as 'making programs', 'websites and stuff', or 'lots of things'.",
+        "points": 0
+      },
+      {
+        "id": "paradigm-named",
+        "title": "A paradigm is named for each language",
+        "description": "For BOTH languages the student names at least one paradigm from the course vocabulary - procedural, object-oriented, or functional - and the pairing is defensible. Credit a reasonable pairing even if incomplete (e.g. calling Python object-oriented without also saying it is multi-paradigm). Deny if a paradigm is missing for one language, or if the pairing is plainly wrong (e.g. 'SQL is object-oriented').",
+        "points": 0
+      },
+      {
+        "id": "fit-explained",
+        "title": "The fit between paradigm and purpose is explained, not just asserted",
+        "description": "This is the core of the assignment. For at least one language, the student gives a real reason WHY the paradigm suits the work - for example that a database question is declarative because you want rows back and do not care how they are found, or that game and app code suits objects because there are many similar things each keeping their own state. Deny if the answer only states the pairing ('Python is object-oriented and that fits data science') without any reasoning connecting the two.",
+        "points": 0
+      },
+      {
+        "id": "own-words",
+        "title": "Written in the student's own words",
+        "description": "The writing reads as a beginner's own understanding, with personal phrasing and natural variation. Deny if it reads as copied marketing copy or encyclopedia text - polished, uniform, and using terminology well beyond anything else in the submission.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

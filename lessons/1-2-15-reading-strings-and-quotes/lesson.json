@@ -1,0 +1,22 @@
+{
+  "id": "1-2-15-reading-strings-and-quotes",
+  "title": "1.2.15 Reading — Strings and the Three Quotes",
+  "description": "Double, single and backtick. Two of them are interchangeable and one is not. Definition 1.2.3.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Variables and Data Types",
+  "preview": "reading",
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

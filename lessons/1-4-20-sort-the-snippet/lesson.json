@@ -1,0 +1,83 @@
+{
+  "id": "1-4-20-sort-the-snippet",
+  "title": "1.4.20 Sort the Snippet",
+  "description": "Three snippets, three paradigms. Log which is which, then name what JavaScript itself is. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.4 Programming Paradigms and Languages",
+  "preview": "console",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Snippet A — separate variables, steps in order",
+      "instructions": "Read the snippet in the comment. Log which paradigm it is, using console.log. Choose from: procedural, object-oriented, functional."
+    },
+    {
+      "id": "s2",
+      "title": "Snippet B — data bundled into one value",
+      "instructions": "Log which paradigm this snippet is."
+    },
+    {
+      "id": "s3",
+      "title": "Snippet C — a new list, original untouched",
+      "instructions": "Log which paradigm this snippet is."
+    },
+    {
+      "id": "s4",
+      "title": "The language itself",
+      "instructions": "All three snippets are valid JavaScript. Log the one word that describes a language supporting more than one paradigm."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Snippet A is procedural",
+      "description": "Logs procedural for separate variables acted on by steps in order",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*[\"']procedural[\"']\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Snippet B is object-oriented",
+      "description": "Logs object-oriented for data bundled into one value",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*[\"']object[- ]?oriented[\"']\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Snippet C is functional",
+      "description": "Logs functional for producing a new list and leaving the original alone",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*[\"']functional[\"']\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "JavaScript is multi-paradigm",
+      "description": "Logs multi-paradigm for a language supporting more than one style",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*[\"']multi[- ]?paradigm[\"']\\s*\\)",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

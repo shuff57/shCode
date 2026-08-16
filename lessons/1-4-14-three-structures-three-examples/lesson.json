@@ -1,0 +1,55 @@
+{
+  "id": "1-4-14-three-structures-three-examples",
+  "title": "1.4.14 Three Structures, Three Examples",
+  "description": "Name the three structures of structured programming and give an everyday example of each. AI-graded with hints.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.4 Programming Paradigms and Languages",
+  "preview": "assignment",
+  "slos": [
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Three Structures, Three Examples — AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "1. Name the three structures that structured programming says every program can be built from.\n\n2. For each one, give a one-sentence example from ordinary life - not from code. Making toast, getting to school, a game you play, a chore you do. The example should make it obvious which structure it is.\n\n3. Structured programming also forbids arbitrary jumps between parts of a program. In one or two sentences, why was giving that up worth it?",
+    "rubric": [
+      {
+        "id": "three-named",
+        "title": "All three structures are named",
+        "description": "Student names sequence, selection and repetition. Accept close synonyms - 'choice' or 'branching' for selection, 'loop' or 'iteration' for repetition. Credit requires all three. Naming two does not earn this criterion.",
+        "points": 0
+      },
+      {
+        "id": "examples-everyday",
+        "title": "Each example comes from ordinary life",
+        "description": "All three examples are drawn from everyday activity rather than code. Deny if the student illustrates a structure with an if statement or a for loop instead of a real-world situation, or if fewer than three examples are given.",
+        "points": 0
+      },
+      {
+        "id": "examples-match",
+        "title": "Each example actually matches its structure",
+        "description": "The sequence example is genuinely steps in order; the selection example genuinely involves choosing between paths based on a condition; the repetition example genuinely involves doing something more than once. Deny if any example is mismatched - for instance, a plain list of steps offered as the repetition example.",
+        "points": 0
+      },
+      {
+        "id": "jumps-explained",
+        "title": "Explains why forbidding arbitrary jumps was worth it",
+        "description": "Student says something about being able to follow or reason about the program - that you can tell how execution reached a line, that code becomes readable, that it prevents tangled flow. Deny if the answer only asserts it is 'better' or 'cleaner' without saying what it makes possible.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

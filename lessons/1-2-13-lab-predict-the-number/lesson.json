@@ -1,0 +1,83 @@
+{
+  "id": "1-2-13-lab-predict-the-number",
+  "title": "1.2.13 Predict the Number",
+  "description": "Four expressions. Write down what you expect, then run them and find out. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Variables and Data Types",
+  "preview": "console",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Divide 10 by 3",
+      "instructions": "Predict the answer first, then log `10 / 3` with console.log."
+    },
+    {
+      "id": "s2",
+      "title": "Divide 100 by 0",
+      "instructions": "Predict, then log `100 / 0`. This one does not crash."
+    },
+    {
+      "id": "s3",
+      "title": "Multiply text by a number",
+      "instructions": "Predict, then log `\"hello\" * 5`."
+    },
+    {
+      "id": "s4",
+      "title": "Add 1 to Infinity",
+      "instructions": "Predict, then log `Infinity + 1`."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Logs 10 / 3",
+      "description": "Prints the result of dividing 10 by 3",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*10\\s*/\\s*3\\s*\\)",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Logs 100 / 0",
+      "description": "Prints the result of dividing 100 by 0",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*100\\s*/\\s*0\\s*\\)",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Logs \"hello\" * 5",
+      "description": "Prints the result of multiplying text by a number",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*[\"']hello[\"']\\s*\\*\\s*5\\s*\\)",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "Logs Infinity + 1",
+      "description": "Prints the result of adding 1 to Infinity",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*Infinity\\s*\\+\\s*1\\s*\\)",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

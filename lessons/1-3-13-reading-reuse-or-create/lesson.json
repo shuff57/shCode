@@ -1,0 +1,22 @@
+{
+  "id": "1-3-13-reading-reuse-or-create",
+  "title": "1.3.13 Reading — Reuse or Create?",
+  "description": "A box labelled \"books\" that you keep putting shoes in. Book §1.3.2, and the habit to break early.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.3 Documentation and Coding Conventions",
+  "preview": "reading",
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

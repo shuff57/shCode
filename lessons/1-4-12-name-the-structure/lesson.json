@@ -1,0 +1,83 @@
+{
+  "id": "1-4-12-name-the-structure",
+  "title": "1.4.12 Name the Structure",
+  "description": "Four described programs. Log which of the three structures each one needs. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.4 Programming Paradigms and Languages",
+  "preview": "console",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Add tax, then print the total",
+      "instructions": "Read the description. Log which structure it needs, using console.log. Choose from: sequence, selection, repetition."
+    },
+    {
+      "id": "s2",
+      "title": "Print 'pass' or 'retake' depending on a score",
+      "instructions": "Log which structure this one needs."
+    },
+    {
+      "id": "s3",
+      "title": "Print every name on a list of thirty",
+      "instructions": "Log which structure this one needs."
+    },
+    {
+      "id": "s4",
+      "title": "Keep asking for a password until it is correct",
+      "instructions": "This one needs two of the three. Log both names in a single string, selection first: 'selection and repetition'."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Tax then total is sequence",
+      "description": "Logs sequence for a program that just runs its lines in order",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*[\"']sequence[\"']\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "Pass or retake is selection",
+      "description": "Logs selection for a program that chooses between two paths",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*[\"']selection[\"']\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Thirty names is repetition",
+      "description": "Logs repetition for a program that does the same thing many times",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*[\"']repetition[\"']\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "The password prompt needs both",
+      "description": "Logs a single string naming selection and repetition together — repetition to keep asking, selection to decide whether the password was right",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'][^\"']*selection[^\"']*repetition[^\"']*[\"']\\s*\\)",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "id": "1-2-29-a1-2-2-describe-an-object",
+  "title": "1.2.29 A1.2.2 — Describe a Real Object",
+  "description": "Six variables describing something in the room, printed as a sentence with a template literal. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 30,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Variables and Data Types",
+  "preview": "console",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pick a real object and declare six variables",
+      "instructions": "Choose something you can actually see. Declare at least six variables about it: at least two numbers, at least two strings, and at least one boolean. Use descriptive camelCase names."
+    },
+    {
+      "id": "s2",
+      "title": "Use two string methods",
+      "instructions": "Apply at least two different string methods to your text — for example .length, .toUpperCase(), .toLowerCase(), or .includes()."
+    },
+    {
+      "id": "s3",
+      "title": "Print a description sentence",
+      "instructions": "Use a template literal with backticks to print one sentence describing the object, embedding your variables with ${...}."
+    },
+    {
+      "id": "s4",
+      "title": "Check your types",
+      "instructions": "Log the typeof at least one number, one string and one boolean to confirm each holds what you intended."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "At least six variables declared",
+      "description": "Six or more variables declared with let or const",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:[\\s\\S]*?(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=){6}",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "At least two numbers",
+      "description": "Two or more variables hold plain numbers",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:[\\s\\S]*?(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[\\d.]+\\s*;){2}",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "At least two strings",
+      "description": "Two or more variables hold quoted text",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:[\\s\\S]*?(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[\"'][^\"']*[\"']\\s*;){2}",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "At least one boolean",
+      "description": "A variable holds true or false without quotes",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*(true|false)\\s*;",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Two different string methods used",
+      "description": "Uses two distinct string operations such as .length, .toUpperCase(), .toLowerCase() or .includes()",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.(length|toUpperCase|toLowerCase|includes|indexOf|slice)\\b[\\s\\S]*?\\.(length|toUpperCase|toLowerCase|includes|indexOf|slice)\\b",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "A template literal embeds a variable",
+      "description": "Prints a sentence using backticks with ${...} inside",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*`[^`]*\\$\\{[^}]+\\}[^`]*`",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "typeof is used to check a type",
+      "description": "Logs the type of at least one variable",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*typeof\\s",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

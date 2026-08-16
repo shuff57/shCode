@@ -1,0 +1,22 @@
+{
+  "id": "1-2-8-reading-dynamically-typed",
+  "title": "1.2.8 Reading — Dynamically Typed",
+  "description": "A variable is not locked to one type. Convenient, and the reason a whole class of bug only shows up when you run the code.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Variables and Data Types",
+  "preview": "reading",
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

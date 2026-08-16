@@ -1,0 +1,21 @@
+{
+  "id": "1-4-1-slides",
+  "title": "1.4.1 Slides — Programming Paradigms and Languages",
+  "description": "Programming Paradigms and Languages slides. Placeholder until the deck is built from the book.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.4 Programming Paradigms and Languages",
+  "preview": "slides",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

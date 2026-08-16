@@ -1,0 +1,23 @@
+{
+  "id": "1-4-21-video-why-so-many-languages",
+  "title": "1.4.21 Video — Why Are There So Many Programming Languages?",
+  "description": "A short survey of the language landscape. Watch after the readings, as a second pass over the same ground in someone else's words.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.4 Programming Paradigms and Languages",
+  "preview": "video",
+  "slos": [
+    "SLO-2"
+  ],
+  "videoUrl": "",
+  "videoFallback": "Ask your teacher for the link, or re-read 1.4.2 — Why There Are So Many Languages instead.",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
