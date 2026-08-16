@@ -1,14 +1,14 @@
 {
   "id": "1-1-1-slides",
   "title": "1.1.1 Slides — Foundations",
-  "description": "Unit 1.1 slides — software lifecycle, umbrella activities, task sets, SDLC methodologies, and the four Ps. Placeholder until the deck is built from the book.",
+  "description": "Unit 1.1 slides — software lifecycle, umbrella activities, task sets, SDLC methodologies, and the four Ps. Served live from bookSHelf; a push there updates this deck with no shCode rebuild.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1 Foundations",
   "preview": "slides",
-  "slidesUrl": "/slides/1.1/",
+  "slidesUrl": "https://oerbookshelf.app/introduction-to-programming-concepts-and-methodologies/decks/1.1_software_lifecycle.bookshelf",
   "slos": [
     "SLO-1"
   ],

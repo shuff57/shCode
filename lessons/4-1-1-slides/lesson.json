@@ -7,9 +7,7 @@
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "4.1 Print Shop (Q1 Synthesis)",
-  "preview": "slides",
-  "slidesUrl": "/slides/4.1/",
-  "slos": [
+  "preview": "slides",  "slos": [
     "SLO-1"
   ],
   "steps": [],

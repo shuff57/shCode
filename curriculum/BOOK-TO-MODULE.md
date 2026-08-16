@@ -414,6 +414,16 @@ rewriting a working lab unless the concept it grades actually moved.
   Slidev-authored Markdown.** No build pipeline exists yet for the new source; authoring
   that pipeline (how a bookSHelf section's slides become a `public/slides/<U.M>/`
   directory, or whether they're served some other way) is unstarted.
+- **Resolved 2026-08-16: there is no pipeline, by design.** `slidesUrl` holds the
+  absolute bookSHelf deck URL and `ContentLessonView` iframes it directly, so a push to
+  bookSHelf updates the deck with no shCode rebuild. Nothing is copied into
+  `public/slides/` — that directory is gone, along with the leftover `2.1`–`2.5` build
+  output (archived to `.archive/`, gitignored) and the retired
+  `curriculum/resources/slide-deck-conventions.md`. This works because bookSHelf serves
+  decks with `Access-Control-Allow-Origin: *` (the HEAD readiness probe needs it), no
+  `X-Frame-Options`, and `must-revalidate`. Use the extensionless URL — `.html`
+  308-redirects. Lessons with no deck yet simply omit `slidesUrl` and render the
+  "not published yet" placeholder; only 1.1 and 2.1 are linked so far.
 - **No automated gate on any of this.** Nothing checks that a spec's concept list still
   matches its book section, and nothing checks that a built lesson matches its spec.
   The design for a builder/critic loop that would do it is in the book repo at

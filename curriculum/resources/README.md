@@ -9,7 +9,7 @@ This directory collects the **reusable build conventions** for each lesson type 
 | `preview: "video"`                         | Video           | No       | [video-conventions.md](video-conventions.md)                                     |
 | `preview: "reading"`                       | Reading         | No       | [reading-conventions.md](reading-conventions.md)                                 |
 | `preview: "example"`                       | Worked Example  | No       | [example-conventions.md](example-conventions.md)                                 |
-| `preview: "slides"`                        | Slides          | No       | [slide-deck-conventions.md](slide-deck-conventions.md) — **retired, Slidev-only; new decks are bookSHelf HTML, pipeline TBD** |
+| `preview: "slides"`                        | Slides          | No       | No conventions doc. Set `slidesUrl` to the absolute bookSHelf deck URL (`https://oerbookshelf.app/<book-slug>/decks/<section>.<theme>`, no `.html`); omit it and the lesson renders the "not published yet" placeholder. |
 | `preview: "shplay"` + `type: "lesson"`     | Q5 Lesson       | Yes      | [shplay-lesson-conventions.md](shplay-lesson-conventions.md)                   |
 | `preview: "shplay"` + `type: "challenge"`  | Challenge       | Yes      | [shplay-challenge-conventions.md](shplay-challenge-conventions.md)               |
 | `preview: "shplay"` + `type: "assignment"` | Assignment      | Yes      | [lab-assignment-conventions.md](lab-assignment-conventions.md)                   |

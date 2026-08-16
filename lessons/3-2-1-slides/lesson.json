@@ -7,9 +7,7 @@
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Arrays",
-  "preview": "slides",
-  "slidesUrl": "/slides/3.2/",
-  "slos": [
+  "preview": "slides",  "slos": [
     "SLO-1"
   ],
   "steps": [],

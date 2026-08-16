@@ -11,9 +11,7 @@
   "slos": [
     "SLO-2",
     "SLO-3"
-  ],
-  "slidesUrl": "/slides/5.3/",
-  "steps": [],
+  ],  "steps": [],
   "requirements": [],
   "grading": {
     "totalPoints": 0,

@@ -3,8 +3,8 @@ node_modules
 out
 npm-debug.log*
 
-# Slidev build output — regenerated on each Pages deploy via `npm run prebuild`
-public/slides/
+# Local-only archive (e.g. retired Slidev build output, kept out of the deploy).
+.archive/
 
 # Per-lesson reference solutions, bundled into a server-only map by
 # scripts/generate-solutions.mjs during prebuild.

@@ -10,9 +10,7 @@
   "preview": "slides",
   "slos": [
     "SLO-3"
-  ],
-  "slidesUrl": "/slides/6.6/",
-  "steps": [],
+  ],  "steps": [],
   "requirements": [],
   "grading": {
     "totalPoints": 0,
