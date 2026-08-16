@@ -14,7 +14,7 @@ console.log(typeof Math);
 console.log(typeof null);
 ```
 
-`"object"` — and this one is simply **wrong**. `null` is not an object. It is its own separate type, as 1.2.20 said.
+`"object"` — and this one is simply **wrong**. `null` is not an object. It is its own separate type, as 1.2.18 said.
 
 This is a famous bug, present in the very first version of JavaScript in 1995 and never fixed. Not because nobody noticed, but because by the time it was noticed, enough code depended on the wrong answer that correcting it would have broken the web. So it stayed.
 

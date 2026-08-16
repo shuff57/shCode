@@ -26,7 +26,7 @@ message = 123456;
 console.log(message);
 ```
 
-One variable, two types, one program. Now imagine that second assignment is buried three hundred lines away in code somebody else wrote, and the line reading `message` expects text. That is the bug the flexibility buys you — and why `typeof` (1.2.24) exists.
+One variable, two types, one program. Now imagine that second assignment is buried three hundred lines away in code somebody else wrote, and the line reading `message` expects text. That is the bug the flexibility buys you — and why `typeof` (1.2.22) exists.
 
 ---
 

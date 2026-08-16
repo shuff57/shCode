@@ -2,12 +2,13 @@
 // Write your code below
 
 // Step 1: Create two number variables and add them together.
-//         Log the result with console.log().
+//         Print the result to the console.
 
-// Step 2: Multiply two numbers and log the result.
+// Step 2: Multiply two numbers and print the result.
 
-// Step 3: Concatenate two strings using the + operator.
-//         Example: "Hello, " + "World!"
+// Step 3: Join two pieces of text together using the plus operator,
+//         then print the result.
 
-// Step 4: Use a comparison operator (===, !==, <, >) to compare two values.
-//         Log the result (it should be true or false).
+// Step 4: Compare two values with a comparison operator, and print
+//         the answer. It will be either true or false.
+//         The operators are listed in lesson 1.2.17.

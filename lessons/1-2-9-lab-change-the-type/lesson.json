@@ -1,6 +1,6 @@
 {
   "id": "1-2-9-lab-change-the-type",
-  "title": "1.2.9 Change the Type",
+  "title": "1.2.26 Change the Type",
   "description": "Give one variable three different types in a row and print what typeof says each time. Auto-graded.",
   "type": "assignment",
   "difficulty": "beginner",

@@ -26,7 +26,7 @@ console.log( 5 );                      // still running
 
 Read that last line again. In many languages, dividing by zero **halts the program** with an error. In JavaScript, maths is "safe" — the script never crashes from a bad maths operation. Dividing by zero, multiplying a word by a number: at worst you get `Infinity` or `NaN`, and the code keeps going.
 
-Which sounds friendly, and is a double-edged thing. A crash tells you exactly where the problem was. A `NaN` quietly travels onward into your next calculation — see 1.2.12.
+Which sounds friendly, and is a double-edged thing. A crash tells you exactly where the problem was. A `NaN` quietly travels onward into your next calculation — see 1.2.8.
 
 ---
 

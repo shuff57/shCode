@@ -1,4 +1,4 @@
-// 1.2.13 Predict the Number
+// 1.2.9 Predict the Number
 
 // Write your prediction in the comment first. Then log the
 // expression with console.log and see whether you were right.

@@ -1,4 +1,4 @@
-// 1.2.26 typeof Round-Up
+// 1.2.24 typeof Round-Up
 
 // Six values. Log the type of each one directly — put the value
 // itself inside typeof, not a variable holding it.

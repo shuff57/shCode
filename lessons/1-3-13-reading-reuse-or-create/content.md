@@ -6,7 +6,7 @@ It is a bad habit, and it is worth breaking now, while your programs are small e
 
 Imagine a box labelled **"books"**. You use it to store shoes. Then dishes. Then toys. You never change the label. After a while nobody knows what is actually inside — including you — and the label has become worse than useless, because it is confidently wrong.
 
-That is exactly what a reused variable is. The name promised one thing. The contents are something else. And because JavaScript is dynamically typed (1.2.8), nothing stops you: the type can change too, silently, with no error.
+That is exactly what a reused variable is. The name promised one thing. The contents are something else. And because JavaScript is dynamically typed (1.2.4), nothing stops you: the type can change too, silently, with no error.
 
 A variable should have **one clear purpose** for its whole life. If you need a second thing, declare a second variable. They are free.
 
@@ -38,7 +38,7 @@ console.log(isComplete);
 
 Both halves print the same three values. But point at the word `item` in the top half and ask "what does this hold?" — the honest answer is "depends which line you are on", and that is a question the bottom half never raises.
 
-Note the difference from 1.2.9, where changing a variable's type was the *point* of the exercise. Reassigning `score = score + 10` is fine — same purpose, new value. Reassigning `score = "Alice"` is not.
+Note the difference from 1.2.26, where changing a variable's type was the *point* of the exercise. Reassigning `score = score + 10` is fine — same purpose, new value. Reassigning `score = "Alice"` is not.
 
 ---
 

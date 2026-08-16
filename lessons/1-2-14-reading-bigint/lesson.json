@@ -1,6 +1,6 @@
 {
   "id": "1-2-14-reading-bigint",
-  "title": "1.2.14 Reading — BigInt",
+  "title": "1.2.10 Reading — BigInt",
   "description": "Past 9007199254740991, ordinary numbers stop being exact. Definition 1.2.2 and the n suffix.",
   "type": "lesson",
   "difficulty": "beginner",

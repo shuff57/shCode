@@ -4,7 +4,7 @@
 
 Note "returns a string". `typeof 42` does not give you the number type itself — it gives you the six characters `"number"`. That is why you can print it, and why comparing types means comparing two strings.
 
-This is the tool for the problem 1.2.8 raised. In a dynamically typed language a variable's type can change while the program runs, so `typeof` is how you find out what you are actually holding right now rather than what you assumed.
+This is the tool for the problem 1.2.4 raised. In a dynamically typed language a variable's type can change while the program runs, so `typeof` is how you find out what you are actually holding right now rather than what you assumed.
 
 **The `typeof(x)` syntax.** You will see it written both ways:
 
@@ -19,7 +19,7 @@ They are the same. `typeof` is an **operator**, not a function — the parenthes
 - `typeof` returns a string naming the type.
 - Use it to find out what a variable actually holds at this moment.
 - `typeof x` and `typeof(x)` are identical — it is an operator, not a function.
-- Three of its answers are surprising. Those are 1.2.25.
+- Three of its answers are surprising. Those are 1.2.23.
 
 **Try it:**
 
