@@ -1,6 +1,6 @@
 {
   "id": "1-1-9-classify-the-task",
-  "title": "1.1.9 Classify the Task",
+  "title": "1.1.7 Classify the Task",
   "description": "Read each task from a school-lunch app and log which of the four phases it belongs to. Auto-graded.",
   "type": "assignment",
   "difficulty": "beginner",

@@ -1,6 +1,6 @@
 ## What a process model is
 
-**Read before attempting `1.1.5 Classify the Task`.**
+**Read before attempting `1.1.7 Classify the Task`.**
 
 What you'll learn from it:
 
@@ -20,7 +20,7 @@ console.log("deployment");
 
 ## The four phases named
 
-**Read before attempting `1.1.5 Classify the Task`.**
+**Read before attempting `1.1.7 Classify the Task`.**
 
 What you'll learn from it:
 

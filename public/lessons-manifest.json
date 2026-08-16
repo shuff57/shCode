@@ -10,7 +10,7 @@
     },
     {
       "id": "1-1-10-example-greeting-phases",
-      "title": "1.1.10 Worked Example — Greeting App Through Four Phases",
+      "title": "1.1.8 Worked Example — Greeting App Through Four Phases",
       "unit": "1 Foundations",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -18,7 +18,7 @@
     },
     {
       "id": "1-1-11-reading-umbrella",
-      "title": "1.1.11 Reading — Umbrella Activities",
+      "title": "1.1.10 Reading — Umbrella Activities",
       "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -26,7 +26,7 @@
     },
     {
       "id": "1-1-12-name-that-umbrella",
-      "title": "1.1.12 Name That Umbrella",
+      "title": "1.1.11 Name That Umbrella",
       "unit": "1 Foundations",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -34,7 +34,7 @@
     },
     {
       "id": "1-1-13-reading-actions",
-      "title": "1.1.13 Reading — Software Engineering Actions",
+      "title": "1.1.12 Reading — Software Engineering Actions",
       "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -42,7 +42,7 @@
     },
     {
       "id": "1-1-14-reading-task-sets",
-      "title": "1.1.14 Reading — Task Sets",
+      "title": "1.1.13 Reading — Task Sets",
       "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -50,7 +50,7 @@
     },
     {
       "id": "1-1-15-example-task-set-loop",
-      "title": "1.1.15 Worked Example — Task Set for a Loop Bug",
+      "title": "1.1.14 Worked Example — Task Set for a Loop Bug",
       "unit": "1 Foundations",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -58,7 +58,7 @@
     },
     {
       "id": "1-1-16-write-a-task-set",
-      "title": "1.1.16 Write a Task Set",
+      "title": "1.1.15 Write a Task Set",
       "unit": "1 Foundations",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -66,7 +66,7 @@
     },
     {
       "id": "1-1-17-reading-sdlc",
-      "title": "1.1.17 Reading — SDLC Methodologies",
+      "title": "1.1.16 Reading — SDLC Methodologies",
       "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -74,7 +74,7 @@
     },
     {
       "id": "1-1-18-reading-four-ps",
-      "title": "1.1.18 Reading — The Four Ps",
+      "title": "1.1.17 Reading — The Four Ps",
       "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -82,7 +82,7 @@
     },
     {
       "id": "1-1-19-same-framework",
-      "title": "1.1.19 Same Framework, Different Weight",
+      "title": "1.1.18 Same Framework, Different Weight",
       "unit": "1 Foundations",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -98,7 +98,7 @@
     },
     {
       "id": "1-1-20-reading-prescriptive",
-      "title": "1.1.20 Reading — Prescriptive Process Models",
+      "title": "1.1.19 Reading — Prescriptive Process Models",
       "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -106,7 +106,7 @@
     },
     {
       "id": "1-1-21-reading-prescriptive-limits",
-      "title": "1.1.21 Reading — Where Prescriptive Models Break",
+      "title": "1.1.20 Reading — Where Prescriptive Models Break",
       "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -114,7 +114,7 @@
     },
     {
       "id": "1-1-22-does-it-fit",
-      "title": "1.1.22 Does It Fit?",
+      "title": "1.1.21 Does It Fit?",
       "unit": "1 Foundations",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -122,7 +122,7 @@
     },
     {
       "id": "1-1-23-a1-2-describe-lifecycle",
-      "title": "1.1.23 Describe the Lifecycle",
+      "title": "1.1.22 Describe the Lifecycle",
       "unit": "1 Foundations",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -130,7 +130,7 @@
     },
     {
       "id": "1-1-3-a1-1-sdlc-writeup",
-      "title": "1.1.3 SDLC Writeup",
+      "title": "1.1.9 SDLC Writeup",
       "unit": "1 Foundations",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -154,7 +154,7 @@
     },
     {
       "id": "1-1-6-first-statement",
-      "title": "1.1.6 Your First Statement",
+      "title": "1.1.3 Your First Statement",
       "unit": "1 Foundations",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -162,7 +162,7 @@
     },
     {
       "id": "1-1-7-a3-3-unit-quiz",
-      "title": "1.1.7 Unit 1.1 Quiz",
+      "title": "1.1.23 Unit 1.1 Quiz",
       "unit": "1.1 Foundations",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -170,7 +170,7 @@
     },
     {
       "id": "1-1-8-reading-four-phases",
-      "title": "1.1.8 Reading — The Four Phases",
+      "title": "1.1.6 Reading — The Four Phases",
       "unit": "1 Foundations",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -178,7 +178,7 @@
     },
     {
       "id": "1-1-9-classify-the-task",
-      "title": "1.1.9 Classify the Task",
+      "title": "1.1.7 Classify the Task",
       "unit": "1 Foundations",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",

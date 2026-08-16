@@ -1,6 +1,6 @@
 ## SDLC methodology
 
-**Read before attempting `1.1.14 Reading — The Four Ps`.**
+**Read before attempting `1.1.17 Reading — The Four Ps`.**
 
 What you'll learn from it:
 

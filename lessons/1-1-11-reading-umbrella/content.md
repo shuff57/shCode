@@ -1,6 +1,6 @@
 ## What an umbrella activity is
 
-**Read before attempting `1.1.8 Name That Umbrella`.**
+**Read before attempting `1.1.11 Name That Umbrella`.**
 
 What you'll learn from it:
 

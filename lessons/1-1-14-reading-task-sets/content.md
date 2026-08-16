@@ -1,6 +1,6 @@
 ## Task set / workflow
 
-**Read before attempting `1.1.12 Write a Task Set`.**
+**Read before attempting `1.1.15 Write a Task Set`.**
 
 What you'll learn from it:
 

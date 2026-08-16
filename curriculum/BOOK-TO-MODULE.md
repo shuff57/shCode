@@ -389,6 +389,21 @@ rewriting a working lab unless the concept it grades actually moved.
 
 ## 8. Known gaps
 
+- **Book §1.1 has no JavaScript basics, but the course needs them on day one.**
+  §1.1 is purely the software lifecycle — zero occurrences of boolean, integer,
+  string or sequential execution, and `console.log` only inside two worked
+  examples. shCode's `1-1-2-reading-console-log` and `1-1-4-sdlc-overview`
+  therefore invent that teaching so week one has something runnable, which
+  `curriculum-plan.md` §1.1 explicitly asks for ("Teacher demo: type
+  `console.log("hello")`… Students open DevTools, run 3 provided statements").
+  The consequence is that the §1.1 **deck cannot cover what the labs demand** —
+  a teacher presenting from slides alone reaches a console lab having
+  introduced no JavaScript at all. **Book-side request:** a short JS-basics
+  opener in §1.1 (print a value, a string, a number, sequential execution)
+  would let the deck carry it. Until then the two shCode lessons are load-
+  bearing and **a resync must not delete them for being absent from the book**.
+  Raised 2026-08-16 from a module 1.1 review.
+
 - **§6.9 Timing and Async has no shCode home.** It is not in Module 6.7 (which covers
   joints and advanced input, zero async content) and Module 7.1 is the capstone. Either
   it becomes a new Module 6.8/6.9 spec or it is book-only teaching with no graded work.

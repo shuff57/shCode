@@ -1,6 +1,6 @@
 ## Where prescriptive models break
 
-**Read before attempting `1.1.18 Does It Fit?`.**
+**Read before attempting `1.1.21 Does It Fit?`.**
 
 What you'll learn from it:
 
