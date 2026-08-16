@@ -421,9 +421,20 @@ rewriting a working lab unless the concept it grades actually moved.
   output (archived to `.archive/`, gitignored) and the retired
   `curriculum/resources/slide-deck-conventions.md`. This works because bookSHelf serves
   decks with `Access-Control-Allow-Origin: *` (the HEAD readiness probe needs it), no
-  `X-Frame-Options`, and `must-revalidate`. Use the extensionless URL — `.html`
-  308-redirects. Lessons with no deck yet simply omit `slidesUrl` and render the
-  "not published yet" placeholder; only 1.1 and 2.1 are linked so far.
+  `X-Frame-Options`, and `must-revalidate`. Lessons with no deck yet simply omit
+  `slidesUrl` and render the "not published yet" placeholder.
+- **Deck URLs end in a theme suffix, and the theme is per-section.** §1.2–§1.5 and
+  §2.1 are published as `.paper`; §1.1 is published as `.bookshelf` and has no
+  `.paper` build. Guess wrong and you do not get a 404 — see below.
+- **A wrong deck URL returns HTTP 200, not 404.** `oerbookshelf.app` serves its site
+  landing page ("Hand-curated math textbooks…") for any unrecognised deck path, so a
+  HEAD probe cannot tell a real deck from a typo. This bit for real: `1-1-1-slides`
+  shipped pointing at `1.1_software_lifecycle.paper`, which does not exist, and
+  module 1.1 students were iframing the marketing landing page. Found and fixed
+  2026-08-16. **To verify a deck URL, GET it and compare byte length against a
+  deliberately bogus path** — same length means the deck is not there. A real deck is
+  150–250 KB and its `<title>` names the section.
+- **Linked as of 2026-08-16:** chapter 1 §1.1–§1.5 (all five) and §2.1.
 - **No automated gate on any of this.** Nothing checks that a spec's concept list still
   matches its book section, and nothing checks that a built lesson matches its spec.
   The design for a builder/critic loop that would do it is in the book repo at

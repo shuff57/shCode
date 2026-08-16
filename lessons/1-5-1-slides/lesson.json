@@ -1,13 +1,14 @@
 {
   "id": "1-5-1-slides",
   "title": "1.5.1 Slides — Program Design Tools and Environments",
-  "description": "Program Design Tools and Environments slides. Placeholder until the deck is built from the book.",
+  "description": "Program Design Tools and Environments slides.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
-  "preview": "slides",  "slos": [
+  "preview": "slides",
+  "slos": [
     "SLO-1"
   ],
   "steps": [],
@@ -16,5 +17,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "slidesUrl": "https://oerbookshelf.app/introduction-to-programming-concepts-and-methodologies/decks/1.5_program_design_tools_and_environments.paper"
 }
