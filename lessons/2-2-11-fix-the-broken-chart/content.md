@@ -20,7 +20,7 @@ This is the part worth slowing down for. Five things are red, but there are not 
 | Red check | What it is complaining about |
 |---|---|
 | `decision-two-exits` | The diamond has one arrow leaving it, not two |
-| `decision-labeled` | The arrow that *is* there does not say `yes` or `no` |
+| `decision-labeled` | The arrow that *is* there carries no label at all |
 | `no-orphans` | The "Too short" rectangle is floating with no arrows at all |
 | `one-start` | Two shapes have nothing pointing at them, so a reader cannot tell where to begin |
 | `reaches-end` | It gave up. This check needs one clear starting point before it can follow the paths at all, so it waits for `one-start` to go green |

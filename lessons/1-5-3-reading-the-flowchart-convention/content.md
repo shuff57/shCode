@@ -37,7 +37,7 @@ Press **Check my diagram** and the editor runs these in your browser. They are f
 | `all-labeled` | No shape is blank |
 | `no-orphans` | No shape floats with no arrows at all |
 | `decision-two-exits` | Every diamond has exactly two arrows leaving it |
-| `decision-labeled` | Every arrow out of a diamond says `yes` or `no` |
+| `decision-labeled` | Every arrow out of a diamond carries a label — in this class, `yes` or `no` |
 | `connector-pairs` | Every connector letter appears exactly twice |
 | `reaches-end` | Following the arrows from Start actually gets you to an End |
 

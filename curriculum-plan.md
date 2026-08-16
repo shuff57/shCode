@@ -3735,18 +3735,18 @@ failing exactly the charts connectors exist to make readable).
 Assignments may add `min-decisions`, `min-process`, `min-nodes` or `no-self-loop` in `lesson.json`.
 Those are per-assignment floors, not part of the convention.
 
-> **`decision-labeled` checks that a label exists, not what it says** (verified against
-> `lib/diagram-check.ts` 2026-08-16 — the rule tests `!(e.label ?? '').trim()` and nothing more).
-> An earlier version of this row promised `yes` or `no`, which the checker has never enforced;
-> `true`/`false`, `over 18`/`under 18`, or a typo all pass. That leniency is defensible — those
-> are legitimate flowchart labels — but it is a **teaching decision that has not actually been
-> made**, so decide it rather than inherit it:
+> **`decision-labeled` checks that a label exists, not what it says** — deliberately, decided
+> 2026-08-16. The rule tests `!(e.label ?? '').trim()` and nothing more, so `yes`/`no`,
+> `true`/`false`, `over 18`/`under 18` and a typo all pass. An earlier version of this row claimed
+> the checker enforced `yes` or `no`; it never has.
 >
-> - keep it lenient, and mark wording by eye under D.4, or
-> - tighten the rule to `yes`/`no` and accept that a student labelling a branch `true` goes red.
+> Kept lenient because `true`/`false` and a restated condition are legitimate flowchart labels, and
+> a checker that reddened them would be teaching a house style as though it were the notation.
+> **`yes`/`no` remains the class convention** — it is what every worked example uses and what the
+> on-screen message advises — it is simply graded by eye under D.4 rather than by the rule.
 >
-> Until it is decided, the on-screen failure message still advises "type yes or no", which is good
-> advice and not a promise of enforcement.
+> Do not "fix" this by tightening the rule later. Charts that were green when submitted would turn
+> red retroactively, which is the one thing a pass/fail gate must never do.
 
 ### D.4 What the checker cannot see — graded by eye
 
@@ -3756,6 +3756,8 @@ A chart can pass all eight checks and still be unreadable. These are the human h
   if it is connected correctly.
 - **`yes` continues down, `no` goes right.** The answer that carries the story forward stays on the
   spine; the exception branches out. Labels are lowercase `yes` and `no` — not `true`/`Y`/`✓`.
+  **This is the bullet the checker leaves entirely to you**: `decision-labeled` only tests that a
+  label exists, so `true`/`false` goes green and only a reader will catch it (see D.3).
 - **Ovals say exactly `Start` and `End`.** Nothing else.
 - **Task labels are imperative English, six words or fewer.** `add the score`, not `score = score + 1`
   and not `the program will then add one to the score`. **A label that is code is a defect** — the
