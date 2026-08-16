@@ -54,6 +54,8 @@ Each graded artifact that anchors an SLO appears at least twice (primary + backu
 | Artifact | SLO(s) | Role |
 |----------|--------|------|
 | A1.1.1 | SLO 1 | Primary intro (SDLC written) |
+| A1.5.1 | SLO 3, SLO 4 | First flowchart; Appendix D convention issued |
+| A2.2.0 / A3.1.0 / A4.1.0 / A10.1.0 / A13.1.2 | SLO 1 (design phase), SLO 3, SLO 4 | **Design-before-code evidence.** A chart dated before its code is the only artifact showing design as a *process* rather than a finished program |
 | A2.2.1 | SLO 4 | Primary intro (algorithm definition + JS) |
 | A3.6.2 | SLO 2, pass-by-ref | Written artifact |
 | A4.1.1 | SLO 3 | Q1 synthesis (Print Shop) |
@@ -76,6 +78,7 @@ Each graded artifact that anchors an SLO appears at least twice (primary + backu
 | Software life-cycle | §1.1, §7.1, §13.1–13.3 | Written + discussion + capstone reflection |
 | Procedural vs OOP | §5.3–5.4 | Code + written comparison |
 | Program design tools & environments | §1.5, §5.1, §8.1 | Lab setup + reflection (console, shplay, JSCAD) |
+| Flowcharting / design-before-code | §1.5 (convention + starter 4: the book's 3 + `io`), §2.2 (loop hexagon), §3.1 (function call), §4.1 (connectors, notes) | **Gate on every graded build artifact — see Appendix D.** Auto-checked in-app; hand-drawn on Part D of every test |
 | Documentation | Throughout (formal: §1.3, §5.3–5.4, §8.1) | Inline comments + READMEs |
 | Coding conventions | §1.3 (formal), enforced throughout | Code review rubric |
 | Data types, variables, expressions, sequential processing | §1.2–1.3 | Exercises + quiz |
@@ -313,20 +316,24 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Computational thinking: decomposition, pattern recognition, abstraction, algorithmic thinking
 - Pseudocode: writing steps in plain structured English before writing code
 - Flowcharts: start/end ovals, process rectangles, decision diamonds, directional arrows
+- **The class flowchart convention (Appendix D)** — handed out here, exactly as the style guide is handed out in §1.3, and enforced on every graded build artifact from this point on
+- The in-app flowchart editor: dragging shapes, connecting arrows, splicing a shape into an existing path, and reading the eight structural checks
 - The code editor + browser console as this course's IDE: what an IDE actually provides (editing, running, inspecting)
 - Debugging tools preview: `console.log` as a debugging technique, browser DevTools panels
 
 **In-Class Activities:**
 - Live demo: take a real task ("decide if a triangle is valid given 3 side lengths"), write pseudocode, then draw the flowchart together
 - Pair exercise: students write pseudocode + a flowchart for a provided problem before being shown any code
+- **Break a good chart on purpose:** delete one exit off a diamond, then a `no` label, then drag a shape loose — read the check that turns red each time. Students should meet every failure message once, on a chart they are not being graded on.
 - Tool tour: DevTools Elements/Console/Sources panels — just enough to know they exist and what each is for
 
 **Assignments:**
-- **A1.5.1 (Lab):** Given a word-problem prompt, write pseudocode AND a flowchart for the solution (no code yet). Then implement it in JS and confirm the code matches the plan.
+- **A1.5.1 (Lab):** Given a word-problem prompt, write pseudocode AND a flowchart for the solution (no code yet). Then implement it in JS and confirm the code matches the plan. **The flowchart must pass all eight structural checks before the coding half unlocks** — this is the first and gentlest run of the Appendix D gate, with no grade attached to failing it.
 - **A1.5.2 (Written):** Half page — explain computational thinking's four components in your own words, with one example each from something you've already coded this quarter.
 
 **Teacher Notes:**
-- This week is the design-before-code habit the whole course leans on — planning with pseudocode/flowcharts before writing JS. Reference it explicitly in later sections ("sketch it like §1.5 before you type it").
+- This week is the design-before-code habit the whole course leans on — planning with pseudocode/flowcharts before writing JS. **Appendix D turns that from advice into a gate**: from here on every challenge, Group PA, test and synthesis project opens with a flowchart, and the in-app coding lesson is locked until the flowchart is green. Say so explicitly today, so the pattern is a known rule rather than a recurring surprise.
+- Only four shapes exist this week — the book's three (oval, rectangle, diamond) plus the parallelogram, which is ours. The editor hides four more behind **+ more shapes**; the loop hexagon arrives at §2.2, the function-call shape at §3.1, connectors and notes at §4.1. Tell students they exist and to leave them alone until then — a student who finds them early will use a hexagon as decoration.
 - Butte's official outline names "program design tools and programming environments" as its own topic (see Part A) — this section is that topic's primary coverage.
 
 ---
@@ -524,17 +531,22 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Function declaration syntax
 - Void functions (no return yet — that's §3.2)
 - Basic scope: local vs global variables
+- **New shape (Appendix D): the function-call double-rail** `[[greetUser()]]` — one shape standing for a whole sequence defined elsewhere, and the fact that flow *comes back* from it
 
 **In-Class Activities:**
 - Live code: a simple greeting function, called several times with different hardcoded behavior
 - Students convert 2 hardcoded programs from §2.1–2.2 into functions
+- **Redraw an old chart with the new shape:** take the A2.1.1 chart, collapse the repeated block into one `[[ ]]` shape, and count how many rectangles disappeared. That count *is* the argument for functions — make students say the number out loud.
 - Pair exercise: write a function, swap with partner, write the function call
 
 **Assignments:**
-- **A3.1.1 (Lab):** Refactor your A2.1.1 grade advisor program to use at least 2 named functions (no parameters/return required yet — that's next section). Each function must have a comment documenting what it does.
+- **A3.1.0 (Flowchart, gate — 0 pts):** Redraw your A2.1.1 grade-advisor chart with each planned function as a single `[[ ]]` shape. Must pass all eight checks. **A3.1.1 stays locked until this is green** (Appendix D).
+- **A3.1.1 (Lab):** Refactor your A2.1.1 grade advisor program to use at least 2 named functions (no parameters/return required yet — that's next section). Each function must have a comment documenting what it does. **Every `[[ ]]` shape on your A3.1.0 chart must exist as a real function**, and vice versa.
 
 **Teacher Notes:**
 - Keep this week to definition + calling only. Parameters and return values get their own dedicated section next (§3.2) — the old combined treatment moved too fast for what's actually two distinct concepts.
+- The double-rail shape is the first time decomposition is *visible*. §1.5 taught decomposition as a word; this is the picture of it, and Appendix D's "past 20 shapes, decompose" rule now has a tool behind it.
+- A common error: students draw the function's *body* hanging off the `[[ ]]` shape. It doesn't — the body is a separate chart, or no chart at all. Flow enters the double-rail and leaves it, like any other single step.
 
 ---
 
@@ -799,12 +811,15 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Review: variables, conditionals, loops, functions, arrays, objects, array methods, JSON/localStorage
 - Code reading and debugging practice
 - Program design process: plan before coding (callback to §1.5's pseudocode/flowchart habit)
+- **Last two shapes (Appendix D): connectors and notes.** This is the first chart big enough to need them — a jump (`((A))` twice) instead of a long arrow across the page, and a bracket note for a decision a reader would otherwise question
 
 **In-Class Activities:**
+- **Day 1 is design day: chart before code.** Whole-period charting of the pricing and queue flow, teacher circulating. No JS is written on day 1.
 - Pair debugging challenge: 15-line program with 5 bugs of different types
 - Q1 concept map: students draw relationships between topics covered
 
 **Assignments:**
+- **A4.1.0 — Print Shop design chart (graded, 10% of the project):** A flowchart of the whole tool, drawn and submitted **on day 1, before any build time**. Must pass all eight structural checks, use at least one `[[ ]]` shape per planned function, and stay under 20 flow shapes — decompose with the double-rail if it doesn't. **Build days do not open until this is green** (Appendix D §D.1).
 - **A4.1.1 — Print Shop (Lab, major grade, SLO 3 primary):** Build a "Print Shop" pricing and queue tool in pure JS (no JSCAD). This is deliberately reframed from an office-admin chore into something with a real verdict: students run 10 shared printers starting in Q3, so this tool gets used. Requirements:
   - Store at least 5 print orders as objects in an array. Each order has: name (string), width/height/depth (numbers), filament type (string), priority (number)
   - Function to calculate estimated print time from volume, and a price from `grams × filament cost/gram + machine-time cost`
@@ -814,8 +829,10 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
   - Main program that calls all functions and prints a formatted verdict: e.g. "you made \$14.20; queue is 6 hours"
   - Full documentation and style guide compliance, plus a README
   - At least 3 manual test cases: call each key function with a known input, print PASS or FAIL against the expected result
+  - **Chart fidelity:** the shipped code matches A4.1.0, or the chart was updated and the README says what changed and why. A design that survived contact with the build unchanged is rare and suspicious; a design that was silently abandoned is the actual deduction.
 
 **Teacher Notes:**
+- **Guard day 1.** The single failure mode of this project is a student who "just starts coding and will chart it after" — that produces a transcript, not a design, and it is visible in the grading (Appendix D §D.7). Day 1 is charting; the editors stay closed.
 - Realigned from the old "Print Job Manager" framing (abstract office admin) to a pricing/queue tool with real stakes, per the book's own redesign of this section — an office-admin chore motivates nobody at 14; a program that tells you what you earned and how long the queue is does. Same underlying structures (arrays of objects, functions, sorting), different narrative.
 - Grade on: correctness, documentation, style guide compliance, README quality.
 - This is the "first complete program" for SLO 3 coverage documentation, and the first appearance of a text-only program delivering a verdict rather than a report — a deliberate console-only constraint before Q2 adds visuals.
@@ -831,6 +848,10 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### *Meeting counts and dates computed by `scripts/cs_schedule.py` against the real CUSD 2026-27 calendar. Sizing model: 1 meeting per book section (7 dense sections get 2) — see Part B.*
 ### Goal: Students extend Q1 fundamentals into a motivating visual/game context, learn OOP through hands-on use, practice save/load, and ship a complete game as their Semester 1 capstone.
 ### Environment: shplay in-app editor (built on q5.js + Box2D physics) — no install required.
+### Design-before-code (Appendix D): every in-app challenge in Ch 5–7 is preceded by its own flowchart
+### lesson, which must be green before the challenge unlocks. Game logic is where charts earn their
+### keep — a state machine, a collision consequence and a spawn loop are all far easier to argue about
+### as a picture than as prose. All eight shapes are released by now.
 ### Numbering note (2026-08-13): renumbered onto book Chapters 5–7, same convention as Q1 (see
 ### its numbering note). Book §5.4 (Writing Your Own Classes) and §6.9 (Timing and Async) are
 ### newly authored — neither had prior shCode coverage. §7.1's capstone assignment is rewritten
@@ -1320,7 +1341,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 
 **In-Class Activities:**
 - Homework: students draft a 1-page design doc mapping their chosen theme onto the required checklist
-- Design review day: 2-minute presentations, class Q&A
+- Design review day: 2-minute presentations, class Q&A — **each student presents their state-machine flowchart on screen**, which is faster to critique than prose and catches the missing lose-state before three build days are spent on it
 - Supervised build days with office-hours support
 - Capstone showcase day
 - **AP CSP Discussion (15 min):** Beneficial and harmful effects of computing. Games shape player behavior — addictive loops vs fair challenge, inclusive design. What ethical choices did you make in your game?
@@ -1335,6 +1356,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
   - BOTH a win state AND a lose state
   - A title → play → game-over state machine (§6.6)
   - A persistent high score (§6.5)
+  - **Design chart (submitted on design-review day, before build days open):** a flowchart of the state machine — every state a shape, every transition a labelled arrow, plus the win and lose conditions as diamonds. All eight structural checks green. This is the one required artifact that is faster to draw than to write, and it makes a missing lose-state impossible to hide (Appendix D §D.1).
   - **Testing log:** ≥5 manual test cases with expected vs. actual outcome and fixes applied
   - **Reflection (1 pp):** walk through the SDLC phases as you lived them — design, code, test, plan for maintenance
   - **Commits:** ≥5 meaningful commits across the build
@@ -1344,7 +1366,8 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - This is a major SLO 1/2/3 artifact — but it now lands in **Semester 2** (Feb 5–10, 2027), so Semester 1's SLO 1/2/3 artifacts are §4.1 Print Shop and the Semester 1 Review Project. Retain design docs, testing logs, and reflections for all three.
 - Students not finished by showcase day still present what they have — the testing log + reflection describe what they would fix. Iteration is a graded step.
 - The fixed checklist is a floor, not a ceiling — theme, art, and feel are entirely the student's; a custom class beyond the Group requirement, extra joints, or additional states are all welcome stretch goals.
-- Rubric weights: Implementation 40% / Testing log 15% / Reflection 15% / Showcase 10% / Commits 10% / Design doc 10%.
+- Rubric weights: Implementation 40% / Testing log 15% / Reflection 15% / Showcase 10% / Commits 10% / **Design doc + state-machine chart 10%**.
+- The chart is not extra work bolted onto the design doc — it *replaces* the prose paragraph students used to write describing their states, which nobody could critique on design-review day at 2 minutes each. Same 10%, better artifact.
 
 **Exam:**
 - **The Semester 1 Final no longer sits here.** It is now **Wed Dec 16, 2026**, covering **Chapters 1–5**, preceded by the 3-meeting Semester 1 Review Project (Dec 10–14). The semester breaks cleanly after Chapter 5, so §7.1 Arcade Cabinet is a Semester 2 event and this exam block has moved — see **Semester Close** for the full blueprint and **Part B** for the dates.
@@ -1357,6 +1380,10 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### *Meeting counts and dates computed by `scripts/cs_schedule.py` against the real CUSD 2026-27 calendar. Sizing model: 1 meeting per book section (7 dense sections get 2) — see Part B.*
 ### Goal: Transition from shplay into JSCAD. Learn the library model, 2D primitives, parametric design, extrusion into 3D, 3D composition, error handling/testing discipline, and a personal parametric-design synthesis project.
 ### Environment: JSCAD browser app (https://jscad.app/) — no install required.
+### Design-before-code (Appendix D): unchanged, and the charts change character here. A JSCAD chart is
+### a *build order* — measure, derive, profile, extrude, cut — not a control-flow chart, because the
+### expensive mistake in Q3 is a step done in the wrong order, not a missing branch. Grade them on
+### whether the arrows show what feeds what.
 ### Numbering note (2026-08-13): renumbered onto book Chapters 8–10, same convention as Q1/Q2.
 ### Chapters 8 and 9 map 1:1 onto the old Units 3.1+3.2 and 3.3+3.4 (no content gaps, no new
 ### sections — just renumbering off IDs that collided with book Ch.3 "Functions and Data"). Chapter
@@ -1752,6 +1779,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - **The graded core — swap test:** each student hands their JSCAD file to a classmate, who resizes it to fit THEIR object by changing parameters only, with no code edits. If it doesn't fit after a parameter change, the design wasn't actually parametric — that's the finding, not a failure.
 
 **Assignments:**
+- **A10.1.0 — Build-order chart (graded, 10% of the project; due on caliper day, before any modeling):** A flowchart of how the model gets built, not of what it looks like: measure → derive parameters → 2D profile → extrude → cut cavities → the loop that repeats slots. The loop-setup hexagon carries the repeated-slot loop; each parameter that feeds a step is a labelled arrow into it. All eight structural checks green (Appendix D §D.1).
 - **A10.1.1 — Fits-My-Stuff (major grade, SLO 2/3):** Design and print a parametric organizer sized to an object you own. Requirements:
   - A 2D profile extruded into 3D (`extrudeLinear`), with at least one boolean-cut cavity
   - A loop/array generating at least 2 repeated slots or compartments
@@ -1762,6 +1790,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 
 **Teacher Notes:**
 - This spans spring recess by design — no chapter test or group PA scheduled against it.
+- **The chart is what makes the swap test survivable.** A student who charted "measure → parameter → geometry" as a chain has already worked out which numbers are inputs and which are derived; a student who started modeling immediately has hardcoded their own measurements into the geometry and will fail the swap. Grade A10.1.0 on whether the arrows go *from* measurements *into* shapes.
 - The swap test is the actual teaching point: a design that only works for its own author isn't parametric yet, however many parameters it exposes. Make the swap mandatory, not optional.
 - This is the emotional peak many students will name at year's end — keep it personal (their own object), not an abstract assigned widget.
 
@@ -1773,6 +1802,9 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ### *Ends with the Semester 2 Close: capstone presentations May 21–25, then the **Semester 2 Final Exam on Wed May 26**. Chapters 11 and 12 share one assessment block; 2 spare meetings remain after the final. See Part B.*
 ### Goal: Advanced modeling techniques, sorting/searching applied to geometry, multi-file projects, and a student-directed 3D capstone ending the year.
 ### Environment: JSCAD browser app + 3D printers.
+### Design-before-code (Appendix D): still a gate on every challenge, and the §11.3 sort/search charts
+### are the year's best use of it — a sort is the one algorithm students cannot debug by staring at it,
+### and the chart is where an off-by-one in the comparison shows up before the code does.
 ### Numbering note (2026-08-13): renumbered onto book Chapters 11–13, same convention as the rest
 ### of the plan. All three chapters map 1:1 onto the old Units 4.1/4.2/4.3 (no content gaps) — the
 ### old IDs collided with book Chapter 4 "Print Shop Synthesis", which is the only reason this
@@ -2003,11 +2035,13 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 - Peer design review: giving and receiving feedback
 
 **Assignments:**
-- **A13.1.1 — Capstone Design Spec (major grade component):** A 2-page design specification for a capstone with **2+ printed parts that fit together via at least one real interface** (hinge, snap fit, threaded lid, or peg-and-socket). Must include: project title and purpose, list of features/requirements, sketch of the design, a bill of materials (each part, its role, and how it interfaces with the others), parameter list (what will be parameterized and why), milestone plan with 3 checkpoints (M1 geometry, M2 parameters+validation, M3 polish+print), and a printability analysis (overhangs, supports, orientation) for each part.
+- **A13.1.1 — Capstone Design Spec (major grade component):** A 2-page design specification for a capstone with **2+ printed parts that fit together via at least one real interface** (hinge, snap fit, threaded lid, or peg-and-socket). Must include: project title and purpose, list of features/requirements, sketch of the design, **a build-order flowchart (below)**, a bill of materials (each part, its role, and how it interfaces with the others), parameter list (what will be parameterized and why), milestone plan with 3 checkpoints (M1 geometry, M2 parameters+validation, M3 polish+print), and a printability analysis (overhangs, supports, orientation) for each part.
+- **A13.1.2 — Capstone build-order chart (10% of the capstone grade; the design-phase deliverable, due before §13.2 build days open):** One flowchart covering **both parts and their interface** — each part's geometry as a `[[ ]]` subroutine shape charted separately, the shared parameters that set the fit as arrows into both, and the tolerance decision as an actual diamond (`gap >= 0.4mm`). All eight structural checks green (Appendix D §D.1). This is the last flowchart of the year and the only one that has to hold two things at once.
 
 **Teacher Notes:**
 - "Functional" examples to suggest: a hinged box, a snap-fit cable organizer with a lid, a two-part bracket joined by a peg-and-socket, a threaded-lid container. Every example must have 2+ parts and a real interface — a single polished object does not satisfy this capstone.
-- Require peer design review in class: students swap specs and flag one scope risk each — specifically checking that the interface between parts is realistic to print and assemble.
+- Require peer design review in class: students swap specs and flag one scope risk each — specifically checking that the interface between parts is realistic to print and assemble. **Swap the charts, not the prose** — a scope risk is visible as a chart with thirty shapes in it, and invisible in two pages of confident writing.
+- **The tolerance diamond is the point of A13.1.2.** A capstone where the two parts' dimensions are set independently, with no shared parameter and no clearance decision, does not fit on the first print and the student has no idea why. On the chart that shows up as two subroutine shapes with no arrow between them — catch it here, three weeks before the print.
 - Specs that can't be built in 3 weeks get revised before the build phase begins — no exceptions.
 
 ---
@@ -2464,8 +2498,13 @@ the per-section **Sizing notes** in the main body — they inform teaching empha
   and what each one is allowed to assume — are in **"Individual chapter assessments"** below.
 - **Ch N Group PA** — 1-day **paired** performance assessment (design + build + demo), on every
   content chapter. Distinct from the synthesis projects, which are assessed individually.
+  **The "design" third is a flowchart** (Appendix D): the pair charts the solution together on one
+  screen, gets it green, and only then opens an editor — worth **25% of the PA**. Pairing is what
+  makes this the best flowchart of the chapter, because two students who disagree about what happens
+  next have to resolve it on the diagram before either can type.
 - **Synthesis Project** — the book's own capstone chapters (4, 7, 10, 13); no separate test/PA, the
-  project itself is the performance assessment.
+  project itself is the performance assessment. Each opens with a graded design chart submitted
+  before build days (A4.1.0, A7.1.1's state-machine chart, A10.1.0, A13.1.2) — **10% of the project**.
 - **Semester Review Project** — the demonstration assignment in the meetings immediately before a
   final. Semester 1 gets a dedicated 3-meeting one (Dec 10–14); Semester 2 uses §13.3 Capstone
   Presentations and Reflection, which already serves the purpose. Spec in **"Semester close"** below.
@@ -3052,10 +3091,22 @@ project *is* the assessment, and it is graded individually even when built in a 
 | **A — Vocabulary and concepts** | ~6 short-answer items. "What is X and when would you use it?" | 25% |
 | **B — Trace the code** | ~4 snippets; predict the exact output. No writing, only reading. | 25% |
 | **C — Find and fix** | ~3 short broken programs; identify the bug, name its type (syntax / runtime / logic), fix it. | 20% |
-| **D — Write it** | 1–2 short functions or snippets from a plain-English spec. | 30% |
+| **D — Design it, then write it** | **D1:** hand-draw a flowchart for the stated problem. **D2:** write the 1–2 functions or snippets it describes. | 30% (10 / 20) |
 
 Part B is deliberately as heavy as Part D. Intro students who can only write and never read produce
 code they cannot debug; tracing is the skill that generalizes.
+
+**Part D is charted before it is coded, on every test** (Appendix D §D.1) — the same order the whole
+course uses, so the test rehearses the habit rather than suspending it. Three consequences worth
+stating plainly:
+
+- **D1 is hand-drawn on paper.** Tests are closed-laptop, so the in-app checker isn't there. Grade D1
+  against the same eight checks by eye; the printed syntax reference includes the shape table.
+- **D1 is graded even when D2 is wrong.** A correct design with a botched implementation is a
+  different failure from no design at all, and the split marks make that visible — which is exactly
+  the diagnostic a teacher needs when deciding what to reteach.
+- **D2 is graded against the problem, not against D1.** A student who charts one approach and codes a
+  better one loses nothing. Only a *blank* D1 costs the 10.
 
 ### Per-chapter blueprints
 
@@ -3067,7 +3118,10 @@ Lifecycle stages in order and what happens in each; variable declaration and the
 why naming conventions and comments exist (evaluated on a supplied snippet, not recited); the
 difference between two paradigms and why a language is chosen for a job; reading a supplied flowchart
 and writing short pseudocode. **Part D is pseudocode and a flowchart, not JavaScript** — students have
-not yet written conditionals. **Assumes:** nothing prior.
+not yet written conditionals, so D1 is the chart and D2 is pseudocode for the same problem. **Only the
+book's three shapes — oval, rectangle, diamond** (Appendix D §D.2). This test mirrors book exercise
+1.5.11, which asks for exactly three; the parallelogram is a shCode addition and must not be required
+here even though the editor offers it. **Assumes:** nothing prior.
 
 **Ch 2 Test — Control Flow** (§2.1–2.5) · *SLO 2, SLO 3*
 `if`/`else if`/`else`; comparison and logical operators, including the truthiness traps; `for` vs
@@ -3174,16 +3228,18 @@ it exercises the semester.
 | 9 | A `try`/`catch` around something that can fail, with a friendly message | Part C |
 | 10 | A shPlay sprite that moves, and one class the student wrote with a constructor and a method | Part A, D |
 
-**Deliverables:** the program, a short design doc (what it does, which requirement each part satisfies),
-and a testing log of at least 3 bugs found and fixed with the error type named for each.
+**Deliverables:** the program, **a flowchart of it drawn on day 1 before any code** (Appendix D — all
+eight checks green; this is also the last flowchart rehearsal before Part D of the final), a short
+design doc (what it does, which requirement each part satisfies), and a testing log of at least 3 bugs
+found and fixed with the error type named for each.
 
 **Teacher notes:**
 
 - **Requirement 7 is the one to watch.** Pass-by-reference is the single most common Semester 1 exam
   failure, and it is the requirement students most often satisfy by accident without understanding.
   Check the comment, not just the code.
-- Day 1 is design + checklist mapping; day 2 is build; day 3 is finish, test, and self-mark the
-  checklist. Students who finish early extend rather than idle.
+- Day 1 is design + checklist mapping **+ the flowchart**; day 2 is build; day 3 is finish, test, and
+  self-mark the checklist. Students who finish early extend rather than idle.
 - **Hand back the checklist as the exam study guide on day 3.** The mapping above is not a secret — the
   entire point is that a student who completed the project honestly has already practised every exam
   question type.
@@ -3364,6 +3420,17 @@ When generating individual assignments from this plan, use the following convent
 - Written assignments should include a prompt, length guidance, and a simple rubric
 - Lab assignments should include: setup instructions, step-by-step task list, expected output description, rubric
 - All rubrics should reference the class coding style guide
+- **Every graded build artifact gets a paired flowchart lesson, and it must be numbered FIRST.** Lessons
+  unlock sequentially within a module (`functions/_shared/lessonAccess.ts`, server-enforced), so
+  `2-2-11-flowchart-…` before `2-2-12-challenges` *is* the gate — the same two lessons in the other
+  order is a suggestion with no teeth. Getting the numbering wrong is the one authoring mistake that
+  silently voids Appendix D.
+- Flowchart lessons use `preview: "diagram"` with a `diagram` block in `lesson.json`
+  (`starter` as Mermaid, `rules` omitted to inherit `DEFAULT_RULES`, optional `aiGrader`), **`points: 0`**
+  like every other lesson, and a `starter` that is a *scaffold* — a Start oval and an End oval, never a
+  worked chart the student only has to rearrange
+- Release shapes on schedule (Appendix D §D.2). A starter or rubric must not use a shape from a later
+  section: no hexagon before §2.2, no `[[ ]]` before §3.1, no connectors or notes before §4.1
 - Print milestone assignments (starting §9.1 First Extrusion) should include a print checklist section
 
 ### Priority build order for assignments:
@@ -3378,7 +3445,7 @@ When generating individual assignments from this plan, use the following convent
 
 ## APPENDIX A: CLASS CODING STYLE GUIDE
 
-This is the grading rubric for code style, distributed in §1.3 (Documentation and Coding Conventions) and enforced for all assignments thereafter. Print this as a 1-page handout.
+This is the grading rubric for code style, distributed in §1.3 (Documentation and Coding Conventions) and enforced for all assignments thereafter. Print this as a 1-page handout. Its companion is **Appendix D: Flowchart Convention**, issued two sections later in §1.5 — this one governs the code, that one governs the design that precedes it.
 
 ### Indentation
 - 2 spaces per indent level. No tabs.
@@ -3524,3 +3591,170 @@ If a student falls behind, prioritize catching up on these gateway topics — ev
 
 A student who doesn't understand functions (§3.1–3.2) cannot succeed in shplay OOP (§5.3–5.4) or JSCAD. Catch this before §3.6 (Pass by Value/Reference) at the latest.
 A student who hasn't grasped classes by §5.4 will struggle through the rest of Q2 — flag them before §6.1 (Groups) and keep them in re-submission loops on A5.4.1.
+
+---
+
+## APPENDIX D: FLOWCHART CONVENTION
+
+> Added 2026-08-15, when the in-app flowchart editor shipped. Before this, "draw a flowchart" appeared
+> in §1.5 and then nowhere else with any teeth — students drew one on day six and never again, which is
+> the failure mode §1.5's own teacher note warns about ("reference it explicitly in later sections").
+> This appendix is that reference, and the editor is what makes it enforceable rather than aspirational.
+
+This is the grading rubric for flowcharts and the companion to **Appendix A**. Distributed in **§1.5
+(Program Design Tools and Environments)**, enforced on every graded build artifact thereafter. Print
+it as a 1-page handout next to the style guide.
+
+### D.1 The rule — design before code
+
+**Every graded build artifact opens with a flowchart, and the flowchart is submitted before the code
+is.** Not alongside. Before.
+
+| Artifact | Where the flowchart lives | Weight |
+|---|---|---|
+| **Challenge / Lab** (in-app `A<ch>.<sec>.<n>`) | Its own lesson immediately *preceding* the coding lesson. The coding lesson is locked until the flowchart is green. | Pass/fail gate, 0 pts (green-to-advance) |
+| **Ch N Group PA** (paired) | The *design* third of design → build → demo. Drawn by the pair together, on one screen, before either partner types code. | 25% of the PA |
+| **Ch N Test** (individual) | **Part D's opening item** — flowchart the solution, then write the code for it. Ch 1's Part D is flowchart-and-pseudocode only, since conditionals have not been taught yet. | ~1/3 of Part D |
+| **Synthesis Project** (§4.1, §7.1, §10.1, §13.1) | A required deliverable of the design doc, reviewed on design-review day, **before build days begin**. | 10% of project grade |
+
+Three reasons this is a gate and not a suggestion:
+
+1. **It is the only place SLO 1 and SLO 3 are visible as a *process*.** A finished program is evidence
+   the student can code; a flowchart dated before the code is evidence they can *design*. Butte's
+   outline asks for both.
+2. **It is the cheapest debugging a beginner will ever do.** A missing `else` branch costs thirty
+   seconds to spot on a diagram and forty minutes to spot in code they have already grown attached to.
+3. **It cannot be bluffed after the fact.** A flowchart submitted after working code is a transcript,
+   not a plan, and reads exactly like one.
+
+### D.2 Shape vocabulary and release schedule
+
+Eight shapes, no more. The editor shows the starter four; the other four sit behind **+ more shapes**
+and are introduced in the section that needs them. A shape not yet released may not appear on a test
+or a required deliverable.
+
+| Shape | Mermaid | Means | Released at |
+|---|---|---|---|
+| Oval — `terminal` | `A([Start])` | The one place the program begins; the place it finishes | §1.5 |
+| Rectangle — `process` | `A[do it]` | Something the program *does*: set, calculate, print | §1.5 |
+| Diamond — `decision` | `A{age >= 18}` | A yes/no question. Exactly two exits | §1.5 |
+| Parallelogram — `io` | `A[/get the age/]` | Something in, or something out | §1.5 |
+| Hexagon — `preparation` | `A{{i = 0 to 9}}` | Loop setup: the counter, its start, its limit | §2.2 (with `for`/`while`) |
+| Double-rail — `subroutine` | `A[[drawScore()]]` | Call a function defined elsewhere; flow comes back | §3.1 (with functions) |
+| Circle — `connector` | `A((A))` | A jump. Two circles with the same letter are one point | §4.1 (first chart to outgrow a page) |
+| Bracket — `comment` | `A>a note]` | A note to the reader. Sits beside the chart, takes no arrows | §4.1 |
+
+**Do not invent shapes.** Document, manual-input, display and database symbols are systems-analysis
+notation this course never touches; a student reaching for one has almost always mis-sized a `process`
+rectangle instead.
+
+> **How much of this the book actually supports** (checked against bookSHelf's remastered chapters,
+> 2026-08-15). Book Table 1.5.2 teaches **three** shapes — oval, rectangle, diamond. The parallelogram
+> is not in the book at all, and the word "flowchart" does not appear anywhere in Chapters 2–13:
+> §1.5 is the book's entire flowchart coverage.
+>
+> **Everything past the first three shapes, and every flowchart after §1.5, is a shCode extension.**
+> That is a deliberate choice, not an oversight — the book's own §1.5 sells flowcharts as the tool you
+> reach for "when a piece of logic gets tangled enough that you cannot hold it in your head", and then
+> never asks for one again, which is precisely how a design habit dies in week three. But it has two
+> hard consequences:
+>
+> 1. **Assessment must not outrun the book.** Anything graded against a book exercise stays inside the
+>    three. Book exercise 1.5.11 is literally *"name the three flowchart shapes"* — a Ch 1 Test asking
+>    for four is testing shCode, not the text students read.
+> 2. **The reading is ours to write and ours to maintain.** `lessons/2-2-11-reading-flowchart-shapes`
+>    (renumbered from `2-2-12` on 2026-08-15 so it precedes the challenges lesson and the gate
+>    actually fires) has no book section behind it, so a book resync will never update it. Treat it
+>    as original course material in the resync checklist, not as derived content.
+
+### D.3 The eight structural checks (auto-graded, in-app, free)
+
+The editor runs these in the browser the instant a student asks, and **all eight must be green before
+the AI grader is called at all** — a model call is never spent on a diagram with a floating box in it.
+These judge whether the drawing is a legal flowchart, never whether it solves the assigned problem.
+
+| Check | Passes when |
+|---|---|
+| `one-start` | Exactly one shape has no incoming arrow, and it is an oval |
+| `has-end` | At least one oval has arrows in and none out |
+| `all-labeled` | No shape is blank — notes included |
+| `no-orphans` | No shape floats with no arrows at all (notes exempt) |
+| `decision-two-exits` | Every diamond has exactly two arrows leaving it |
+| `decision-labeled` | Every arrow out of a diamond says `yes` or `no` |
+| `connector-pairs` | Every connector letter appears exactly twice |
+| `reaches-end` | Following arrows from Start reaches every shape and finishes at an End oval |
+
+Two shapes are not ordinary flow nodes and the checker collapses the graph before any rule runs: a
+**note** is dropped (otherwise it reads as a floating shape *and* as a second start), and **connectors
+sharing a letter merge into one point** (otherwise everything after a jump is reported unreachable —
+failing exactly the charts connectors exist to make readable).
+
+Assignments may add `min-decisions`, `min-process`, `min-nodes` or `no-self-loop` in `lesson.json`.
+Those are per-assignment floors, not part of the convention.
+
+### D.4 What the checker cannot see — graded by eye
+
+A chart can pass all eight checks and still be unreadable. These are the human half:
+
+- **Top to bottom, always.** The main path runs down the page. A chart read left-to-right is wrong even
+  if it is connected correctly.
+- **`yes` continues down, `no` goes right.** The answer that carries the story forward stays on the
+  spine; the exception branches out. Labels are lowercase `yes` and `no` — not `true`/`Y`/`✓`.
+- **Ovals say exactly `Start` and `End`.** Nothing else.
+- **Task labels are imperative English, six words or fewer.** `add the score`, not `score = score + 1`
+  and not `the program will then add one to the score`. **A label that is code is a defect** — the
+  flowchart exists precisely to be language-independent.
+- **Diamonds hold a question, not a statement.** `age >= 18` or `is it a school day?` — a condition a
+  reader can answer yes or no to.
+- **A loop's return arrow leaves the bottom of the loop body and re-enters at the hexagon** (or at the
+  decision guarding the loop), never mid-body.
+- **Arrows do not cross where a connector would do.** Two crossings is a chart; five is a knot — use a
+  connector pair.
+
+### D.5 Scope — how much detail
+
+**One shape per step a reader could get wrong, not one shape per line of code.** Setting up three
+variables is one rectangle. A five-line calculation the student had to think about is one rectangle.
+A branch is always its own diamond.
+
+- **Target 6–15 flow shapes.** Under 6 and the chart isn't earning its place; over 20 and nobody reads it.
+- **Past 20, decompose.** Pull a coherent chunk into a `subroutine` shape and, if the assignment needs
+  it, chart that separately. This is the same decomposition §1.5 teaches as computational thinking —
+  make the connection out loud.
+- **The chart must fit one page or one screen.** If it doesn't, that is the signal to decompose, not
+  to shrink the font.
+
+### D.6 Grading deductions (per violation)
+
+| Violation | Deduction |
+|---|---|
+| No flowchart submitted on a graded build artifact | Code is not accepted until it is |
+| A structural check still red at submission | -5 pts (the app shows every failure *before* you submit) |
+| Diamond exit unlabelled, or labelled anything but `yes`/`no` | -2 pts each |
+| Label is code rather than English | -1 pt each |
+| Flowchart does not match the code that shipped | -5 pts |
+| Over 20 flow shapes with no `subroutine` decomposition | -3 pts |
+| Chart flows sideways or bottom-up | -3 pts |
+| A shape from outside the eight | -2 pts each |
+
+Re-submission follows Appendix C: labs accept corrections to 80% credit, major projects iterate in
+window instead.
+
+### D.7 Enforcement, and why the gate actually holds
+
+The lock is not honour-system. In-app lessons unlock sequentially within a module
+(`functions/_shared/lessonAccess.ts`, enforced server-side, admins and teachers exempt), so a
+flowchart lesson numbered immediately before its coding lesson genuinely blocks the coding lesson
+until the flowchart is `completed`. That is the whole mechanism — **numbering the flowchart lesson
+first is what creates the gate.** An authoring pass that appends the flowchart lesson after the
+challenge produces a requirement with no teeth.
+
+Teacher notes:
+
+- **Grade the flowchart on the design, not the neatness.** The editor auto-routes arrows; a student
+  cannot make it ugly and should not be rewarded for making it pretty.
+- **Hand back a red check as a question, not a mark.** "Your diamond has one exit — what happens when
+  the answer is no?" is the entire lesson, and the app has already phrased it that way on screen.
+- **Watch for the transcript tell** on projects: a flowchart whose shapes map one-to-one onto lines of
+  finished code, in order, was drawn afterwards. Charts drawn first have a rectangle that says
+  `work out the price` where the code has eleven lines.
