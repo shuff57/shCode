@@ -1,0 +1,23 @@
+{
+  "id": "1-2-30-video-every-value-has-a-type",
+  "title": "1.2.30 Video \u2014 Every Value Has a Type",
+  "description": "A four-minute tour of the whole type system: eight basic types, seven of them primitive, dynamic typing, and the typeof operator \u2014 including the one answer typeof gets wrong. Watch after the readings as a second pass over the same ground.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 5,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Variables and Data Types",
+  "preview": "video",
+  "slos": [
+    "SLO-2"
+  ],
+  "videoUrl": "https://youtu.be/qkVQCxfRi5U",
+  "videoFallback": "Ask your teacher for the link, or re-read 1.2.27 \u2014 The Seven Primitives, Recapped instead.",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

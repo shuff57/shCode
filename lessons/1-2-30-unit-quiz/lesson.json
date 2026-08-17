@@ -1,6 +1,6 @@
 {
   "id": "1-2-30-unit-quiz",
-  "title": "1.2.30 Module 1.2 Quiz",
+  "title": "1.2.31 Module 1.2 Quiz",
   "description": "Seven short answers covering the eight types, dynamic typing, and the typeof bug. AI-graded with hints.",
   "type": "assignment",
   "difficulty": "beginner",
@@ -14,7 +14,7 @@
   "points": 0,
   "contentFile": "content.md",
   "aiGrader": {
-    "rubricTitle": "Module 1.2 Quiz — AI-graded rubric",
+    "rubricTitle": "Module 1.2 Quiz \u2014 AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
     "prompt": "Answer all seven. One or two sentences each is enough.\n\n1. What does it mean that JavaScript is \"dynamically typed\"? Give an example.\n\n2. Name the seven primitive data types in JavaScript.\n\n3. What are the three special numeric values, and how does each one appear?\n\n4. What is the difference between null and undefined, and when would you use each?\n\n5. What will this code print, and why?\n   let x = 10;\n   x = \"ten\";\n   console.log(x);\n\n6. What is the difference between a backtick string and a double-quote string?\n\n7. What is the result of typeof null, and what is wrong with that answer?",
