@@ -18,7 +18,7 @@
     "rubricTitle": "Algorithm in Plain English — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "Part 1 — In your own words, what is an algorithm? (1–2 sentences.)\n\nPart 2 — Write a precise, step-by-step algorithm in plain English (not code) for an everyday task you know well — making a sandwich, tying your shoes, logging into a website, etc. Number the steps. Someone who has never done the task should be able to follow your steps exactly and succeed. Be precise: don't skip steps or assume the reader 'just knows' something.",
+    "prompt": "Everything you need is in 2.2.2 (What Is an Algorithm?), 2.2.3 (Programs Implement Algorithms) and the worked example in 2.2.5 — go back and reread them if you get stuck. Your own everyday words throughout.\n\nPart 1 — In your own words, what is an algorithm? One or two sentences. (2.2.2 and 2.2.3)\n\nPart 2 — Write a precise, step-by-step algorithm in plain English — not code — for an everyday task you know well: making a sandwich, tying your shoes, logging into a website, anything. Number the steps. Someone who has never done the task should be able to follow your steps exactly and succeed, so be precise: do not skip steps, and do not assume the reader \"just knows\" something. (2.2.5)",
     "rubric": [
       {
         "id": "defines-algorithm",

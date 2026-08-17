@@ -16,7 +16,7 @@
     "rubricTitle": "Pseudocode: Largest of Three — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "Write pseudocode, not JavaScript. No semicolons, no braces, no console.log - plain English laid out like code.\n\n1. Write pseudocode for finding the largest of three numbers. Use indentation to show which steps are inside a decision.\n\n2. Write pseudocode for a program that asks for a password and keeps asking until it is correct.\n\n3. Look at your answer to question 2. What makes it finite - what guarantees it eventually stops? If nothing does, fix it and say what you changed.\n\n4. In one sentence: why is it useful that nothing can run either of these plans?",
+    "prompt": "Everything you need is in 1.5.19 (Pseudocode and Flowcharts), 1.5.20 (The Two Pseudocode Rules) and the worked examples in 1.5.21 and 1.5.22 — go back and reread them if you get stuck.\n\nWrite pseudocode, not JavaScript. No semicolons, no braces, no console.log — plain English laid out like code. (1.5.20)\n\n1. Write pseudocode for finding the largest of three numbers. Use indentation to show which steps are inside a decision. (1.5.21 and 1.5.22)\n\n2. Write pseudocode for a program that asks for a password and keeps asking until it is correct.\n\n3. Look at your answer to question 2. What makes it finite — what guarantees it eventually stops? If nothing does, fix it and say what you changed.\n\n4. In one sentence: why is it useful that nothing can actually run either of these plans? (1.5.19)",
     "rubric": [
       {
         "id": "largest-correct",

@@ -18,7 +18,7 @@
     "rubricTitle": "switch or if...else? Justify Your Choice — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "Q1 — A program routes a support ticket by its priority, which is always one of 'low', 'medium', or 'high'. Which statement fits best, switch or if...else? Explain why in terms of what is being compared.\n\nQ2 — The grade chain from this section (score >= 90 prints A, score >= 80 prints B, and so on) cannot be rewritten as a switch. Explain why, in your own words.\n\nQ3 — Describe one program of your own choosing (real or made up) that could use either a switch or an if...else chain. Say which one you would pick and how you decided, using the same test from the reading.",
+    "prompt": "Answer all three, numbered Q1 to Q3. Everything you need is in 2.3.23 (Choosing Between if...else and switch) and the worked examples in 2.3.24 and 2.3.25 — go back and reread them if you get stuck. A few sentences each is plenty, in your own everyday words.\n\nQ1 — A program routes a support ticket by its priority, which is always one of 'low', 'medium', or 'high'. Which statement fits better, switch or if...else? Explain why, in terms of what is being compared. (2.3.23, and the worked example in 2.3.24)\n\nQ2 — The grade chain from this section (score >= 90 prints A, score >= 80 prints B, and so on) cannot be rewritten as a switch. Explain why, in your own words. (2.3.23, and the worked example in 2.3.25)\n\nQ3 — Describe one program of your own choosing, real or made up, that could use either a switch or an if...else chain. Say which one you would pick and how you decided, using the same test from the reading. (2.3.23)",
     "rubric": [
       {
         "id": "q1-priority-switch",

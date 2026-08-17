@@ -210,9 +210,10 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         {config.rubricTitle ?? 'Written response — AI-graded'}
       </h2>
       <p style={{ color: '#888', fontSize: 13, margin: '0 0 12px' }}>
-        Paste or type your response below. The AI grader will score per-criterion and suggest
-        where to look in the shPlay docs if you need more detail. You can revise and resubmit
-        as many times as you want.
+        Answer in your own everyday words — you are graded on having the right idea, not on
+        exact wording, spelling or length. The AI grader checks each criterion and points you
+        back at the lesson to reread if something is missing. You can revise and resubmit as
+        many times as you want.
       </p>
 
       {prompt.trim() ? (
@@ -220,17 +221,34 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
           style={{
             background: '#282a36',
             border: '1px solid #44475a',
-            borderLeft: '3px solid #bd93f9',
+            borderLeft: '4px solid #bd93f9',
             borderRadius: 6,
-            padding: '12px 14px',
+            padding: '14px 16px',
             margin: '0 0 16px',
-            color: '#f8f8f2',
-            fontSize: 14,
-            lineHeight: 1.6,
-            whiteSpace: 'pre-wrap',
           }}
         >
-          {prompt.trim()}
+          <div
+            style={{
+              fontSize: 12,
+              letterSpacing: 0.6,
+              textTransform: 'uppercase',
+              color: '#bd93f9',
+              fontWeight: 600,
+              marginBottom: 8,
+            }}
+          >
+            What to answer
+          </div>
+          <div
+            style={{
+              color: '#f8f8f2',
+              fontSize: 15,
+              lineHeight: 1.65,
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {prompt.trim()}
+          </div>
         </div>
       ) : null}
 

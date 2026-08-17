@@ -17,7 +17,7 @@
     "rubricTitle": "Q1 Reflection — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "Reflect on your first quarter of programming.\n\n1. Name one concept from Q1 (variables, conditionals, loops, functions, arrays, etc.) that you found hardest, and explain how you worked through it.\n2. Think about how you'd build a small program now. Describe how you would plan it, build it, and test it — connect this to the software-development life-cycle phases you learned in Week 1.\n3. What is one thing you want to get better at next quarter?",
+    "prompt": "This one is about your own work, so most of it comes from you rather than from a reading. 4.1.2 (Plan Before You Code) and 4.1.4 (Manual Testing) will help with question 2, and 1.1.6 (The Four Phases) is where the life-cycle phases were introduced. A few sentences per answer is plenty, in your own everyday words.\n\n1. Name one concept from this quarter — variables, conditionals, loops, functions, arrays, anything — that you found hardest, and explain how you worked through it.\n\n2. Think about how you would build a small program now. Describe how you would plan it, build it, and test it, and connect that to the software-development life-cycle phases from Week 1. (4.1.2, 4.1.4 and 1.1.6)\n\n3. What is one thing you want to get better at next quarter?",
     "rubric": [
       {
         "id": "hardest-concept",

@@ -17,7 +17,7 @@
     "rubricTitle": "Pass by Value vs Reference — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "Explain, in your own words, the difference between pass by value and pass by reference in JavaScript.\n\n1. What does 'pass by value' mean, and which kinds of values does JavaScript pass this way?\n2. What does 'pass by reference' mean, and which kinds of values does JavaScript pass this way?\n3. Give one short example of each (you can describe code in words).\n4. Why does this matter? Describe one bug that could happen if a programmer forgets the difference.",
+    "prompt": "Everything you need is in 3.6.1 (Pass by Value vs Reference) and 3.6.2 (Defensive Copying) — go back and reread them if you get stuck. One or two sentences per answer is plenty, in your own everyday words.\n\n1. What does \"pass by value\" mean, and which kinds of values does JavaScript pass this way? (3.6.1)\n\n2. What does \"pass by reference\" mean, and which kinds of values does JavaScript pass this way? (3.6.1)\n\n3. Give one short example of each. You may describe the code in words rather than writing it. (3.6.1)\n\n4. Why does this matter? Describe one bug that could happen if a programmer forgets the difference. (3.6.2)",
     "rubric": [
       {
         "id": "value-defined",

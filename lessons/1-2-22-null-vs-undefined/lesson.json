@@ -16,7 +16,7 @@
     "rubricTitle": "null vs undefined — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "Both null and undefined mean a variable has no useful value in it. They are not the same thing.\n\n1. What does undefined mean, and who puts it there?\n\n2. What does null mean, and who puts it there?\n\n3. Give one situation where you would write null yourself. Describe the variable and why null is the right value for it at that moment.\n\n4. A program prints undefined where you expected a name. What does that tell you about where the bug is?",
+    "prompt": "Everything you need is in 1.2.19 (The null Value) and 1.2.20 (The undefined Value) — go back and reread them if you get stuck. One or two sentences per answer is plenty, in your own everyday words.\n\nBoth null and undefined mean a variable has no useful value in it. They are not the same thing.\n\n1. What does undefined mean, and who puts it there — you, or JavaScript? (1.2.20)\n\n2. What does null mean, and who puts it there? (1.2.19)\n\n3. Give one situation where you would write null yourself. Describe the variable and why null is the right value for it at that moment. (1.2.19)\n\n4. A program prints undefined where you expected a name. What does that tell you about where the bug is? (1.2.20)",
     "rubric": [
       {
         "id": "undefined-defined",

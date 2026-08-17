@@ -16,7 +16,7 @@
     "rubricTitle": "Where Does the Balance Live? — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "A program keeps track of a bank account: it stores a balance, and it needs code that deposits money into that balance.\n\n1. In object-oriented style, where does the code that changes the balance live? Say where, and say why that placement is what makes the style object-oriented.\n\n2. In procedural style, where would that same code live instead?\n\n3. Name one situation where procedural is the better fit, and one where object-oriented is. Give a reason for each - not just a preference.",
+    "prompt": "Everything you need is in 1.4.8 (Procedural Programming), 1.4.15 (Object-Oriented Programming) and the worked example in 1.4.16 — go back and reread them if you get stuck. One or two sentences per answer is plenty, in your own everyday words.\n\nA program keeps track of a bank account. It stores a balance, and it needs code that deposits money into that balance.\n\n1. In object-oriented style, where does the code that changes the balance live? Say where, and say why putting it there is what makes the style object-oriented. (1.4.15)\n\n2. In procedural style, where would that same code live instead? (1.4.8)\n\n3. Name one situation where procedural is the better fit, and one where object-oriented is. Give a reason for each, not just a preference. (1.4.15 and 1.4.16)",
     "rubric": [
       {
         "id": "oo-placement",

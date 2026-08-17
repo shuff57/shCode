@@ -16,7 +16,7 @@
     "rubricTitle": "Write a Task Set — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "A software engineering action is a named job inside a phase, and a task set is all the tasks required to accomplish one action.\n\nConsider the action \"requirements definition\" (which lives in the inception phase). List at least two tasks that would make up a task set for that action.\n\nEach task should be a concrete step that \"requirements definition\" would actually need — for example, interviewing users, writing a requirements document, or reviewing requirements with stakeholders. Other reasonable tasks are fine too.\n\nWrite in your own words.",
+    "prompt": "Everything you need is in 1.1.12 (Software Engineering Actions), 1.1.13 (Task Sets) and the worked example in 1.1.14 — go back and reread them if you get stuck. Your own everyday words are fine.\n\nA software engineering action is a named job inside a phase, and a task set is all the tasks required to accomplish one action.\n\nConsider the action \"requirements definition\", which lives in the inception phase. List at least two tasks that would make up a task set for that action.\n\nEach task should be a concrete step that \"requirements definition\" would actually need — for example interviewing users, writing a requirements document, or reviewing requirements with stakeholders. Other reasonable tasks are fine too.",
     "rubric": [
       {
         "id": "two-concrete-tasks",

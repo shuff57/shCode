@@ -16,7 +16,7 @@
     "rubricTitle": "Three Structures, Three Examples — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "1. Name the three structures that structured programming says every program can be built from.\n\n2. For each one, give a one-sentence example from ordinary life - not from code. Making toast, getting to school, a game you play, a chore you do. The example should make it obvious which structure it is.\n\n3. Structured programming also forbids arbitrary jumps between parts of a program. In one or two sentences, why was giving that up worth it?",
+    "prompt": "Everything you need is in 1.4.9 (Structured Programming), 1.4.10 (the three structures) and 1.4.13 (Why goto Went Away) — go back and reread them if you get stuck. Your own everyday words are fine.\n\n1. Name the three structures that structured programming says every program can be built from. (1.4.9 and 1.4.10)\n\n2. For each one, give a one-sentence example from ordinary life — not from code. Making toast, getting to school, a game you play, a chore you do. The example should make it obvious which structure it is. (1.4.10)\n\n3. Structured programming also forbids arbitrary jumps between parts of a program. In one or two sentences, why was giving that up worth it? (1.4.13)",
     "rubric": [
       {
         "id": "three-named",

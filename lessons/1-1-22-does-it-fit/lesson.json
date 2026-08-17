@@ -16,7 +16,7 @@
     "rubricTitle": "Does It Fit? — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "Zara runs a startup whose product requirements change weekly as she talks to new customers. A prescriptive process model advocates an orderly, prescribed sequence of activities.\n\nIn your own words, would a prescriptive process model fit Zara's project? Give a clear answer, then explain your reason in terms of the model's rigidity against changing requirements.",
+    "prompt": "Everything you need is in 1.1.19 (Prescriptive Process Models) and 1.1.20 (Where Prescriptive Models Break) — go back and reread them if you get stuck. Two or three sentences is plenty, in your own everyday words.\n\nZara runs a startup. Her product requirements change every week as she talks to new customers. A prescriptive process model asks a team to follow an orderly, planned-out sequence of activities.\n\n1. Would a prescriptive process model fit Zara's project? Give a clear yes or no. (1.1.19)\n\n2. Why? Explain your answer in terms of how rigid that model is against requirements that keep changing. (1.1.20)",
     "rubric": [
       {
         "id": "clear-no",

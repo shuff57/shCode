@@ -16,7 +16,7 @@
     "rubricTitle": "Decompose Getting to School — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "The problem is: get to school on time tomorrow.\n\n1. Decompose it into at least six smaller tasks. List them.\n\n2. Group those tasks into two or three categories of your own choosing. Name each category.\n\n3. Now look at your groups. Name one thing the grouping showed you that the flat list did not - a task you had forgotten, a category that turned out much fuller than the others, or a task that turned out to belong somewhere surprising.\n\n4. Pick one of your tasks and say whether it is still too big - could it be decomposed further? If yes, break it down. If no, say why it is already small enough.",
+    "prompt": "Everything you need is in 1.5.8 (Decomposition) and the worked example in 1.5.11 — go back and reread them if you get stuck. Your own everyday words are fine.\n\nThe problem is: get to school on time tomorrow.\n\n1. Decompose it into at least six smaller tasks. List them. (1.5.8)\n\n2. Group those tasks into two or three categories of your own choosing. Name each category. (1.5.11)\n\n3. Now look at your groups. Name one thing the grouping showed you that the flat list did not — a task you had forgotten, a category that turned out much fuller than the others, or a task that belonged somewhere surprising.\n\n4. Pick one of your tasks and say whether it is still too big. Could it be decomposed further? If yes, break it down. If no, say why it is already small enough. (1.5.8)",
     "rubric": [
       {
         "id": "six-tasks",

@@ -16,7 +16,7 @@
     "rubricTitle": "Describe the Lifecycle — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "Describe the four framework activities (inception, elaboration, construction, deployment) in your own words.\n\nThen pick one real software product you use and walk it through all four phases, saying what you think happened in each phase for that product.\n\nYour answer should:\n- name and describe all four framework activities\n- name one real product you use\n- give at least one concrete sentence per phase about that product\n- mention at least one umbrella activity by name\n\nWrite in your own words.",
+    "prompt": "Everything you need is in the 1.1.5 video, 1.1.6 (The Four Phases), the worked example in 1.1.8, and 1.1.10 (Umbrella Activities) — go back and reread or rewatch if you get stuck. Your own everyday words throughout.\n\nPart 1 — Describe the four framework activities: inception, elaboration, construction and deployment. One or two sentences each about what happens in that activity. (1.1.5 and 1.1.6)\n\nPart 2 — Pick one real software product you actually use — Instagram, Spotify, Google Maps, Roblox, YouTube, Google Docs, anything. Name it, then walk it through all four activities, saying what you think happened in each one for that product. Best-guess reasoning is fine; no research needed. (1.1.8 shows this done for a greeting app)\n\nPart 3 — Name at least one umbrella activity, and say in one sentence why it runs across all four phases instead of sitting inside one of them. (1.1.10)",
     "rubric": [
       {
         "id": "four-phases-named",

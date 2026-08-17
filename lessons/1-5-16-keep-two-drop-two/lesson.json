@@ -16,7 +16,7 @@
     "rubricTitle": "Keep Two, Drop Two — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "You are describing a bus route to someone who has never been to your town.\n\n1. Name two details you would KEEP, and say why each one matters.\n\n2. Name two details you would LEAVE OUT, and say why each one does not matter.\n\n3. State the test you used to decide. One sentence.\n\n4. Now change the problem: the person is colour-blind and cannot read the route number from a distance. Does that change which details you keep? Say what moves, and why.",
+    "prompt": "Everything you need is in 1.5.13 (Abstraction), 1.5.14 (Layers of Abstraction) and the worked example in 1.5.15 — go back and reread them if you get stuck. One or two sentences per answer is plenty, in your own everyday words.\n\nYou are describing a bus route to someone who has never been to your town.\n\n1. Name two details you would KEEP, and say why each one matters. (1.5.13)\n\n2. Name two details you would LEAVE OUT, and say why each one does not matter. (1.5.13)\n\n3. State the test you used to decide. One sentence.\n\n4. Now change the problem: the person is colour-blind and cannot read the route number from a distance. Does that change which details you keep? Say what moves, and why. (1.5.14)",
     "rubric": [
       {
         "id": "two-kept-justified",

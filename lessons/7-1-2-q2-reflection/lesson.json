@@ -18,7 +18,7 @@
     "rubricTitle": "Q2 Reflection — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "Reflect on the game you built this quarter.\n\n1. Your game changed between the pitch in your README and the version you handed in. Name one thing that changed, and explain what made you change it.\n2. Describe one bug that took you more than a few minutes to find. How did you track it down?\n3. The checklist gave you twelve requirements and no design. Which requirement was hardest to fit into YOUR game idea, and what did you do about it?",
+    "prompt": "This one is entirely about the game you built, so there is no reading to look up — the answers come from your own project and your own memory of building it. A few sentences per answer is plenty, in your own everyday words. There is no wrong answer here as long as you are describing your actual project honestly.\n\n1. Your game changed between the pitch in your README and the version you handed in. Name one thing that changed, and explain what made you change it.\n\n2. Describe one bug that took you more than a few minutes to find. How did you track it down?\n\n3. The checklist gave you twelve requirements and no design. Which requirement was hardest to fit into YOUR game idea, and what did you do about it?",
     "rubric": [
       {
         "id": "design-changed",

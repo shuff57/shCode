@@ -16,7 +16,7 @@
     "rubricTitle": "Which Level Fits? — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "A small team has eight weeks to ship a working web app. They are arguing about which language to use. One person wants a low-level language because the program will run faster.\n\n1. Should they choose a high-level or a low-level language? Give a clear answer.\n2. Why? Say which resource is scarce for this team, and how the level of abstraction you chose helps with it.\n3. What are they trading away by choosing it? Name the cost honestly - every choice here has one.",
+    "prompt": "Everything you need is in 1.4.4 (Levels of Abstraction) and 1.4.5 (High and Low Level) — go back and reread them if you get stuck. One or two sentences per answer is plenty, in your own everyday words.\n\nA small team has eight weeks to ship a working web app. They are arguing about which language to use. One person wants a low-level language because the program will run faster.\n\n1. Should they choose a high-level or a low-level language? Give a clear answer. (1.4.5)\n\n2. Why? Say which resource is scarce for this team, and how the level you chose helps with it. (1.4.5)\n\n3. What are they trading away by choosing it? Name the cost honestly — every choice here has one. (1.4.4 and 1.4.5)",
     "rubric": [
       {
         "id": "clear-high-level",

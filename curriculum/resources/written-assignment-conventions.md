@@ -5,6 +5,12 @@ Canonical rules for in-app **written assignments** — short prose responses gra
 **Applies to:**
 - `lessons/<slug>/lesson.json` where `preview === "assignment"` AND `aiGrader` is present.
 
+**Not** module quizzes. Those are multiple choice, graded in the browser — see
+`quiz-conventions.md`. The split: a quiz checks recall of what the module taught and has
+one right answer per question; a written assignment is an application task where the
+student supplies the subject and the reasoning is what's graded. Don't write a recall
+check on this path.
+
 **Canonical example:** `lessons/2-1-10-a10-2-frame-loop/`.
 
 Distinct from a shplay lab (`preview: "shplay"`) because there is no `script.js` and no regex grading — the grade comes from an LLM evaluating the student's prose against a rubric. See `components/ContentLessonView.tsx` line 134 for the branch that routes an `aiGrader`-bearing lesson to `WrittenGrader`.
@@ -54,7 +60,7 @@ Distinct from a shplay lab (`preview: "shplay"`) because there is no `script.js`
 - `preview` — **`"assignment"`**, not `"shplay"`. This is what routes the lesson to `WrittenGrader` instead of the regex grader.
 - `aiGrader.model` — the Ollama cloud model id. Default to `"deepseek-v4-flash:0731-cloud"` (switched from `qwen3-coder-next:cloud` 2026-08-13 — see History). Don't invent model names. See the **Ollama grader** section of `CLAUDE.md` for the endpoint + secret wiring.
 - `aiGrader.contextDocs` — array of shplay doc keys (e.g. `"overview"`, `"sprite"`, `"input"`). These are interpolated into the grader's system prompt so the model knows the shplay vocabulary. See `lib/shplay-docs.ts` for the valid keys.
-- `aiGrader.prompt` — the exact text the student sees as the question set. Use `\n\n` between questions. The grader sees this prompt + the student's response.
+- `aiGrader.prompt` — the exact text the student sees as the question set, rendered in the **"What to answer"** box directly above the writing area. Use `\n\n` between questions. The grader sees this prompt + the student's response. See §2.5 for the required shape.
 - `aiGrader.rubric[].points` — either **`1` per item** (recommended default) or **`0` per item**. This value is not a weight — it's what selects which pass threshold `WrittenGrader.tsx`'s `isPassing()` applies (see §4). Don't assign different nonzero weights to different criteria; every row must be either all `1` or all `0` within a lesson.
 - `points` (top-level) / `grading.totalPoints` / `grading.passingScore` — set to `aiGrader.rubric.length` (or `0`, matching whichever rubric shape you chose above) for consistency and gradebook readability. **These fields are inert for written assignments** — `WrittenGrader.tsx` never reads `lesson.grading` at all; only `components/LessonWorkspace.tsx` (the console/shplay lab path) reads `grading.passingScore`. Populate them anyway so the lesson.json stays self-describing, but don't expect changing `passingScore` to change grading behavior here — see §4 for what actually gates.
 - `steps` / `requirements` — empty arrays. No regex auto-grader runs on this path.
@@ -91,6 +97,47 @@ Write your response in the box below. Short, clear answers are fine. The rubric 
 
 No point columns. The rubric is a checklist; every row is required. The student-facing surface treats this as pass / not yet.
 
+## 2.5 Prompt shape — the questions must be answerable from the course
+
+`aiGrader.prompt` is the whole student-facing question set. It renders in a purple-edged
+**"What to answer"** box above the writing area (`WrittenGrader.tsx`) — nothing else in the
+lesson shows the questions, so anything the student needs has to be in this string.
+
+Three rules, all of them about a first-year high-school student who knows only what this
+course has taught them:
+
+**1. Open by saying where the answers live.** The first line names the lessons the answer
+set comes from, and tells the student to go back. Two shapes:
+
+```
+# single-topic assignment, sitting right after its readings
+Everything you need is in 1.4.4 (Levels of Abstraction) and 1.4.5 (High and Low Level) —
+go back and reread them if you get stuck. One or two sentences per answer is plenty, in
+your own everyday words.
+
+# multi-part writeup, drawing on several lessons at once
+1.4.2 and the 1.4.21 video cover why languages are built for different jobs; 1.4.7,
+1.4.8, 1.4.15, 1.4.18 and 1.4.19 cover the paradigms. Go back and reread or rewatch
+if you get stuck. Your own everyday words throughout.
+```
+
+**2. Every question ends with its source lesson in parentheses** — `(1.4.5)`,
+`(1.2.19 and 1.2.20)`, `(1.5.33, and the worked example in 1.5.34)`. Cite the **displayed**
+lesson number from `lesson.json.title`, never the folder slug: the two routinely disagree
+(`lessons/1-1-7-a3-3-unit-quiz/` is displayed as *1.1.23*). Never cite a lesson that comes
+*after* this one — if the concept isn't taught yet, put the setup in the question instead.
+A reflection with no reading behind it says so outright ("the answers come from your own
+project — there is no reading to look up").
+
+**3. Hand over any setup the question depends on.** If a question turns on a fact, state
+the fact and ask for the reasoning. "SQL is a language built for asking questions of a
+database. Why could you not use it to build a web page?" is a question about purpose-driven
+languages. "Why can a program for a web page not simply be written in SQL?" is a vocabulary
+quiz on whether the student remembers what SQL is, which is not what the rubric grades.
+
+Before authoring, verify the pointers against the module's actual lesson list rather than
+assuming — `node -e` over `lessons/*/lesson.json` titles is the cheap way to get it.
+
 ## 3. Rubric shape
 
 Each rubric row should be **independently checkable** — and binary-shaped (the AI returns 0 or 1 for the row). A good row names the thing to look for in specific terms:
@@ -104,7 +151,25 @@ Each rubric row should be **independently checkable** — and binary-shaped (the
 }
 ```
 
-The `description` is the LLM's grading guide. Be explicit about what counts and what doesn't — vague descriptions give inconsistent scores. The `points: 1` is a binary signal, not a weight; never use a different value.
+The `description` is the LLM's grading guide. Be explicit about what counts — vague descriptions give inconsistent scores. The `points: 1` is a binary signal, not a weight; never use a different value.
+
+**Write descriptions to grade loosely.** These are beginners; the criterion is whether they
+landed in the right area, not whether they produced the textbook phrasing. A good description
+says what the right area is and lists the everyday synonyms to accept:
+
+```json
+{
+  "id": "q4-three-structures",
+  "title": "Q4: sequence, selection and repetition",
+  "description": "Grade loosely on wording, not on vocabulary. Accept any everyday synonym: 'in order' / 'one after another' for sequence, 'if' / 'choice' / 'decision' / 'branching' for selection, 'loop' / 'iteration' / 'repeat' for repetition. Mark met if all three ideas are there; partial if two are.",
+  "points": 0
+}
+```
+
+Don't write `Deny if…` gates that hinge on a specific word. The shared grader system prompt
+(`lib/grade-written-core.ts`) now instructs the model to read `requires` / `must` / `deny`
+language as a description of a strong answer rather than a hard gate, so a strict description
+mostly produces mixed signals rather than strict grading — write the leniency in directly.
 
 ## 4. Pass criterion — genuinely partial credit, by design
 
@@ -168,3 +233,7 @@ Example: `"2.1.11 Frame Loop Writeup"`.
 | Model switch + content-only grading (2026-08-13) | `aiGrader.model` default switched from `qwen3-coder-next:cloud` to `deepseek-v4-flash:0731-cloud` across all 12 written assignments, smoke-tested with a simple content-complete response per lesson. Also removed all word/page-count language from prompts and rubric criteria — AI grading is content-only, never length-based. §5 Don'ts gained the no-length-grading rule. |
 | No-points + green-to-advance (carve-out for written) | The course is now mastery-based — no points anywhere students can see. Written assignments are AI-graded, so the existing scoring code path needs *some* numeric signal to fire the Submit gate. Resolution: every `aiGrader.rubric[].points` is **`1`** (binary signal, never a weight); `grading.totalPoints = grading.passingScore = aiGrader.rubric.length`; top-level `points` mirrors `totalPoints`. With this shape `totalScore >= passingScore` requires every rubric item to be earned — the all-green equivalent for written. §1 JSON shape + field-by-field rewritten. §2 canonical content.md template dropped the `Pts` column (now `# | Criterion` only). §3 rubric example updated to `points: 1`. §4 renamed from "Point budget" → "Pass criterion" and prescribes the `<N>=rubric.length` pattern. §5 Don'ts gained the equal-rubric-weights and no-pts-column rules. Sister convention `shplay-lesson-conventions.md` carries the canonical reference for the green-to-advance lesson nav lock. |
 | Correction — written gate is not 100% (2026-08-13) | The row above was wrong about the runtime effect: `grading.totalPoints`/`passingScore` are never read on the written-assignment path — only `components/LessonWorkspace.tsx` (labs) reads `lesson.grading`. The actual gate is `WrittenGrader.tsx`'s `isPassing()`, which is hardcoded to **partial credit**: ≥70% of rubric points when `points:1`-per-item, or a bare majority of criteria when `points:0`-per-item. Found while auditing Module 1.1's sub-modules (`1-1-3-a1-1-sdlc-writeup` and `1-1-7-a3-3-unit-quiz` use the zero-weighted shape; `1-1-16`/`1-1-19`/`1-1-22`/`1-1-23` use the `1`-per-item shape — both are legitimate, neither is 100%). Operator decision: keep the partial-credit behavior in code as-is; §1 and §4 rewritten to describe reality instead of the intended-but-never-implemented all-green behavior. |
+| Questions were never rendered (2026-08-17) | `aiGrader.prompt` was only ever sent to `/api/grade-written` — `WrittenGrader.tsx` never displayed it, so every written assignment showed a rubric for questions the student could not see, and `content.md` was forbidden from restating them. Fixed by rendering the prompt in a **"What to answer"** box above the writing area. Found while reviewing 1.4.22. |
+| Answerable-from-the-course prompt sweep (2026-08-17) | All 32 written-assignment prompts rewritten to §2.5: an opening line naming the source lessons, a per-question `(1.4.5)`-style pointer using displayed lesson numbers, and any needed setup handed to the student instead of quizzed. Note `1-1-7-a3-3-unit-quiz` (displayed *1.1.23 Unit 1.1 Quiz*) asks module **1.2/1.3** material — typeof, declarations, naming style — none of which is in module 1.1; its pointers cite 1.2.x/1.3.x, and the lesson's placement is still open. |
+| Lean grading (2026-08-17) | Beginner-calibrated grading moved into the shared system prompt in `lib/grade-written-core.ts` — award "met" for the right idea in everyday words, treat rubric `requires`/`must`/`deny` language as describing a strong answer rather than a gate, never withhold credit for spelling/grammar/length. One edit covers all 32 lessons; 29 of them had strict per-item wording that would otherwise have had to be rewritten by hand. §3 gained the write-descriptions-loosely rule. Verified against the live model with four student personas on 1.4.22 — a weak beginner writing "if statements and loops" earns full credit; a non-answer still fails. |
+| Quizzes split off (2026-08-17) | The six module quizzes left this path entirely for multiple choice — `preview: "quiz"`, graded in the browser, no model call. See `quiz-conventions.md`. 26 written assignments remain, all of them application tasks. |

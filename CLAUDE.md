@@ -249,3 +249,11 @@ only — never exposed to the client.
 - Inline style convention for components, using the Dracula palette defined in
   `app/globals.css`. See `components/AuthButton.tsx`, `app/teacher/page.tsx` for
   the established look.
+- **Before assuming an authored `lesson.json` field reaches a student, check that
+  something imports the component that would render it.** `graphify explain
+  <Symbol>` prints the import/call edges and answers that in one shot; plain
+  `graphify query` is much weaker, so reach for `explain`. The graph under
+  `graphify-out/` is a point-in-time snapshot — run `graphify extract --force` if
+  it predates the code you are asking about. This is not hypothetical: `steps`
+  and `aiGrader.prompt` both sat in `lesson.json` for months with no live
+  renderer.
