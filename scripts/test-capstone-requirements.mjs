@@ -13,6 +13,11 @@
 //
 // So the happy path passing proves nothing on its own. Each case below removes
 // exactly ONE capability and asserts exactly ONE requirement notices.
+//
+// The starter case is the sharpest of them: the checklist lives in that file's
+// comments, so a pattern loose enough to read prose ticks itself off before the
+// student writes a line. `class you wrote yourself` and `PASS / FAIL tests`
+// both did exactly that until req1 and req11 were tightened.
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';

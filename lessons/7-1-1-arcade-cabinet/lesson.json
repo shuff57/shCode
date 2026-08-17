@@ -83,10 +83,10 @@
     {
       "id": "req1",
       "title": "A class of your own",
-      "description": "A class you declared yourself — any name, any purpose. The checker cannot tell whether you made two of them; the teacher reads for that.",
+      "description": "A class you declared yourself — any name, any purpose, capitalised like every class you have written since 5.4. The checker cannot tell whether you made two of them; the teacher reads for that.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bclass\\s+[A-Za-z_$][\\w$]*",
+      "pattern": "\\bclass\\s+[A-Z][\\w$]*\\s*(?:extends\\s+[\\w$.]+\\s*)?\\{",
       "flags": "",
       "points": 0
     },
@@ -183,10 +183,10 @@
     {
       "id": "req11",
       "title": "Tests report PASS or FAIL",
-      "description": "A check that prints PASS when it matches the known answer and FAIL when it does not. The checker cannot count your tests — three is on you, and the teacher reads for it.",
+      "description": "A check that prints PASS when it matches the known answer and FAIL when it does not — the words in quotes, because they get printed. The checker cannot count your tests; three is on you, and the teacher reads for it.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "PASS[\\s\\S]{0,200}FAIL|FAIL[\\s\\S]{0,200}PASS",
+      "pattern": "(['\"`][^'\"`\\n]*PASS[\\s\\S]{0,300}FAIL)|(['\"`][^'\"`\\n]*FAIL[\\s\\S]{0,300}PASS)",
       "flags": "",
       "points": 0
     }
