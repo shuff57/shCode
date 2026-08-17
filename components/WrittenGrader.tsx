@@ -215,6 +215,25 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         as many times as you want.
       </p>
 
+      {prompt.trim() ? (
+        <div
+          style={{
+            background: '#282a36',
+            border: '1px solid #44475a',
+            borderLeft: '3px solid #bd93f9',
+            borderRadius: 6,
+            padding: '12px 14px',
+            margin: '0 0 16px',
+            color: '#f8f8f2',
+            fontSize: 14,
+            lineHeight: 1.6,
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {prompt.trim()}
+        </div>
+      ) : null}
+
       <label style={{ display: 'block', fontSize: 13, color: '#aaa', marginBottom: 4 }}>
         Your response
       </label>

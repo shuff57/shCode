@@ -1,0 +1,200 @@
+{
+  "id": "7-1-1-arcade-cabinet",
+  "title": "7.1.1 Arcade Cabinet (Q2 Synthesis)",
+  "description": "Q2 synthesis: ship a game you designed. The checklist is the spec — twelve things the game must contain. Everything else is your call.",
+  "type": "project",
+  "estimateMins": 300,
+  "category": "Unit 2: shplay — Applied Game Development",
+  "unit": "7.1 Arcade Cabinet (Q2 Synthesis)",
+  "preview": "shplay",
+  "week": 18,
+  "slos": [
+    "SLO-1",
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pitch your game in README.md before you write code",
+      "instructions": "A paragraph: what it is, how a player wins, how a player loses. Written first, so the rest of this list has something to serve.",
+      "requiredCommit": true
+    },
+    {
+      "id": "s2",
+      "title": "A class you wrote yourself, used to make at least two objects"
+    },
+    {
+      "id": "s3",
+      "title": "A Group that manages many sprites at once"
+    },
+    {
+      "id": "s4",
+      "title": "An overlap or a collision that changes the game",
+      "instructions": "Changes something a player would notice — score, health, a sprite disappearing. Two sprites bumping and nothing happening does not count."
+    },
+    {
+      "id": "s5",
+      "title": "Player input that controls something"
+    },
+    {
+      "id": "s6",
+      "title": "Motion you tuned on purpose",
+      "instructions": "Gravity, friction, bounciness, drag, velocity — pick what your game needs and set it to a value you chose, not the default."
+    },
+    {
+      "id": "s7",
+      "title": "At least three game states, and a way to get between them",
+      "instructions": "Title, play, and game over is the usual three. Pause, win, and shop are all fair game too.",
+      "requiredCommit": true
+    },
+    {
+      "id": "s8",
+      "title": "Something that survives closing the tab",
+      "instructions": "storeItem to save it, getItem to read it back. A high score is the easy one; a save slot is more interesting."
+    },
+    {
+      "id": "s9",
+      "title": "A function of your own that takes a parameter and returns a value"
+    },
+    {
+      "id": "s10",
+      "title": "An array of game data that a loop reads",
+      "instructions": "Levels, waves, spawn points, dialogue lines — whatever your game has more than one of."
+    },
+    {
+      "id": "s11",
+      "title": "Any two of: an animated sprite, a camera that follows, a joint, a pause state",
+      "instructions": "Pick the two that fit the game you pitched. Do not pick the two that are easiest to bolt on."
+    },
+    {
+      "id": "s12",
+      "title": "Three PASS / FAIL tests of your own logic",
+      "instructions": "Call one of your functions with an input you know the answer to, and print PASS or FAIL."
+    },
+    {
+      "id": "s13",
+      "title": "README, comments, and Appendix A style",
+      "instructions": "The README says how to play and what changed from your pitch and why. Appendix A applies to the code.",
+      "requiredCommit": true
+    }
+  ],
+  "requirements": [
+    {
+      "id": "req1",
+      "title": "A class of your own",
+      "description": "A class you declared yourself — any name, any purpose. The checker cannot tell whether you made two of them; the teacher reads for that.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bclass\\s+[A-Za-z_$][\\w$]*",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "req2",
+      "title": "A Group",
+      "description": "A Group holding sprites you manage together",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+Group\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "req3",
+      "title": "An overlap or collision",
+      "description": "overlaps, collides, overlapping, or colliding between sprites or groups",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*(overlaps|collides|overlapping|colliding)\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "req4",
+      "title": "Player input",
+      "description": "Keyboard or mouse input the player uses to control the game",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(kb|keyboard)\\s*\\.\\s*(pressing|presses|pressed|released|releases)\\s*\\(|\\bmouse\\s*\\.\\s*(pressing|presses|pressed)\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "req5",
+      "title": "Motion tuned on purpose",
+      "description": "gravity, friction, bounciness, drag, or a velocity you set yourself",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "world\\s*\\.\\s*gravity|\\.\\s*(friction|bounciness|drag|rotationDrag|rotationSpeed)\\s*=|\\.\\s*vel\\s*(\\.\\s*[xy])?\\s*=|\\.\\s*speed\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "req6",
+      "title": "Game states",
+      "description": "A state variable set to a named state — 'title', 'play', 'gameover', or whatever you called yours. The checker cannot count your states; the teacher reads for three.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "state\\w*\\s*=\\s*['\"`]\\w+['\"`]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "req7",
+      "title": "Saves and loads",
+      "description": "storeItem writes it, getItem reads it back — both, or it does not survive the tab closing",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "storeItem\\s*\\([\\s\\S]*getItem\\s*\\(|getItem\\s*\\([\\s\\S]*storeItem\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "req8",
+      "title": "A function that takes a parameter and returns a value",
+      "description": "Your own function, with at least one parameter, that returns something. A named function, an arrow, or a method on your class all count.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:function\\s+\\w+\\s*\\(\\s*\\w|^[ \\t]*(?!(?:if|for|while|switch|catch|function|return|do)\\b)\\w+\\s*\\(\\s*\\w[^)\\n]*\\)\\s*\\{)[\\s\\S]*?\\breturn\\b\\s*[^;\\n]|(?:const|let|var)\\s+\\w+\\s*=\\s*(?:function\\s*\\(\\s*\\w[\\s\\S]*?\\breturn\\b\\s*[^;\\n]|\\(?\\s*\\w+[^)\\n]*\\)?\\s*=>\\s*(?:[^;{\\n]|\\{[\\s\\S]*?\\breturn\\b\\s*[^;\\n]))",
+      "flags": "m",
+      "points": 0
+    },
+    {
+      "id": "req9",
+      "title": "An array of game data",
+      "description": "An array you filled with more than one thing",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const|var)\\s+\\w+\\s*=\\s*\\[[^\\]]*,",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "req10",
+      "title": "A loop that reads it",
+      "description": "for, for...of, or forEach — an array nobody loops over is just storage",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bfor\\s*\\(|\\.\\s*forEach\\s*\\(",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "req11",
+      "title": "Tests report PASS or FAIL",
+      "description": "A check that prints PASS when it matches the known answer and FAIL when it does not. The checker cannot count your tests — three is on you, and the teacher reads for it.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "PASS[\\s\\S]{0,200}FAIL|FAIL[\\s\\S]{0,200}PASS",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true,
+    "reviewCommitHistory": true
+  }
+}
