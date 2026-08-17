@@ -1,6 +1,6 @@
 # Groups
 
-Read this before `2.3.4 Worked Example — Iterating a Group`. About 5 minutes.
+Read this before `6.1.4 Worked Example — Iterating a Group`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -135,4 +135,4 @@ You'll see this same pattern in the next reading (`overlaps` + despawn).
 
 ---
 
-Once you can explain the difference between bare `new Sprite(...)` and `new groupName.Sprite(...)`, open `2.3.4 Worked Example — Iterating a Group`.
+Once you can explain the difference between bare `new Sprite(...)` and `new groupName.Sprite(...)`, open `6.1.4 Worked Example — Iterating a Group`.

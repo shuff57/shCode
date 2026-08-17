@@ -2,13 +2,13 @@
 // Write your code below
 
 // Step 1: Create an array called "fruits" with at least 3 items.
-//         Example: let fruits = ["apple", "banana", "cherry"];
+//         Give it a name of your choosing and three or more items.
 
-// Step 2: Use .push() to add a new item to the array.
-//         Use .pop() or .splice() to remove an item.
+// Step 2: Add a new item to the end of the array.
+//         Then remove one. The reading covers both methods.
 
-// Step 3: Use a for loop or .forEach() to iterate through the array
+// Step 3: Visit every item in the array in turn
 //         and log each item.
 
-// Step 4: Use .find() or .includes() to search for an item in the array.
+// Step 4: Search the array for one particular item.
 //         Log whether the item was found.

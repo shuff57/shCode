@@ -28,9 +28,9 @@
 // STEP 5: Write `sortByPriority(list)` — return the queue sorted so the
 //         most urgent job comes first. Do not modify the original array.
 
-// STEP 6: Save and load the queue with localStorage and JSON.stringify /
-//         JSON.parse, the way you did in 3.8. `saveQueue()` writes it,
-//         `loadQueue()` reads it back and returns the array.
+// STEP 6: Persist the queue between reloads, converting it to text on
+//         the way out and back on the way in, as you did in 3.8.
+//         `saveQueue()` writes it; `loadQueue()` reads it back.
 
 // STEP 7: The main program. Call your functions and print ONE formatted
 //         verdict line, for example:
@@ -39,6 +39,7 @@
 //         actually runs.
 
 // STEP 8: Three manual tests. Call a function with an input whose answer
-//         you already know, compare against it, and print PASS or FAIL.
+//         you already know, compare against it, and report whether each
+//         check matched.
 //         A test that cannot fail is not a test — make one of them check
 //         an edge case, like an order that does not fit the build volume.

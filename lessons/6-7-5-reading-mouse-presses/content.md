@@ -1,6 +1,6 @@
 ## One frame, one click
 
-**Read after `2.7.4 Reading — shplay docs: mouse.pressing()`.** About 5 minutes.
+**Read after `6.7.4 Reading — shplay docs: mouse.pressing()`.** About 5 minutes.
 
 `mouse.presses()` returns `true` on exactly one frame — the frame the button first goes down. The very next frame it returns `false`, even if you are still holding. That makes it a one-shot signal.
 

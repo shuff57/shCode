@@ -1,6 +1,6 @@
 ## Is the cursor over a sprite?
 
-**Read before `2.7.7 Worked Example — Click to Spawn a Sprite`.** About 5 minutes.
+**Read before `6.7.7 Worked Example — Click to Spawn a Sprite`.** About 5 minutes.
 
 A hit-test answers one question: is the cursor currently over this sprite? You need the answer before starting a drag — you only want the drag to begin when the player clicks directly on the sprite, not anywhere on the canvas.
 

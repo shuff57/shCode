@@ -1,6 +1,6 @@
 ## `constructor` and its parameters
 
-**Read before `2.2.4 Worked Example — You've been using classes`.** About 4 minutes.
+**Read before `5.3.6 Worked Example — You've been using classes`.** About 4 minutes.
 
 By the end of this reading you should be able to answer:
 

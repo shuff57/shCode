@@ -143,4 +143,4 @@ When tuning, change **one** value at a time. If you change gravity AND impulse t
 - `kb.presses` handles "fire once per tap." `colliding` handles "are you allowed to fire?" Both gates matter.
 - `colliding` works with a single sprite OR a Group — same idiom, scales for free.
 - Tune gravity, jump impulse, and run speed **one knob at a time** — otherwise you can't tell which one fixed the feel.
-- This is the foundation for `2.3.20 A14.1 Space Jumper`. Internalize it before starting the lab.
+- This is the foundation for `6.3.9 Space Jumper`. Internalize it before starting the lab.

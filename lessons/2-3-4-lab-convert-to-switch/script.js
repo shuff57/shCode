@@ -4,8 +4,9 @@
 //         For example: "Monday", "Friday", or "Saturday".
 
 // STEP 2: Write a switch statement that checks the value of day.
-//         Include at least two case labels (one for each day you want to handle).
+//         Include at least two branches, one per day you want to
 //         Add a default label to handle any value you did not list.
-//         End each case body with a break statement.
-//         Inside each case and the default, use console.log to print
+//         End each branch the way the reading showed, so it stops there
+//         instead of falling through to the next one.
+//         Inside each branch, and the fallback, use console.log to print
 //         a message that makes sense for that day.

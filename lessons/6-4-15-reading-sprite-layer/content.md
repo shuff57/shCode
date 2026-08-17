@@ -1,6 +1,6 @@
 ## Drawing a HUD on Top of the World
 
-**Read before attempting `2.4.10 A15.1 Side-Scrolling Platformer`.**
+**Read before attempting `6.4.18 Side-Scrolling Platformer`.**
 
 **What you'll learn from it:**
 

@@ -50,12 +50,12 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "Canvas created",
-      "description": "`new Canvas(...)` appears in setup().",
+      "title": "Canvas created with a size",
+      "description": "Creates the canvas with explicit dimensions rather than leaving the placeholder",
       "type": "inFunction",
       "function": "setup",
       "file": "script.js",
-      "pattern": "new\\s+Canvas\\s*\\(",
+      "pattern": "new\\s+Canvas\\s*\\(\\s*\\d+\\s*,\\s*\\d+\\s*\\)",
       "flags": "",
       "points": 0
     },

@@ -2,12 +2,12 @@
 
 // STEP 1: Define a function called findMax that takes two parameters: a and b.
 //         Inside the function, compare a and b.
-//         Return whichever value is larger.
+//         Hand back whichever value is larger.
 
 // STEP 2: Define a function called isEven that takes one parameter: n.
 //         Inside the function, use the % (remainder) operator to check
 //         whether n is divisible by 2 with no remainder.
-//         Return true if n is even, or false if it is odd.
+//         Hand back true when n is even and false when it is odd.
 
 // STEP 3: Call findMax with two numbers and log the result.
 //         Call isEven with a number and log the result.

@@ -1,6 +1,6 @@
 ## Reading back a saved value
 
-**Read before attempting `2.5.6 Worked Example — Load and Display a High Score`.**
+**Read before attempting `6.5.7 Worked Example — Load and Display a High Score`.**
 
 Once your game has saved data with `storeItem`, you need a way to read it back. `getItem(key)` retrieves the value stored under the key name you gave it earlier.
 

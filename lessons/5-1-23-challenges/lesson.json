@@ -69,12 +69,12 @@
     },
     {
       "id": "r3",
-      "title": "Clear the background each frame",
-      "description": "Previous frames don't stack up.",
+      "title": "Background set each frame",
+      "description": "Calls background() inside draw() with a colour of the student choosing",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "background\\s*\\(",
+      "pattern": "function\\s+draw\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?background\\s*\\(",
       "flags": "",
       "points": 0
     },

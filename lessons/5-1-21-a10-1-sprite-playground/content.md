@@ -10,7 +10,7 @@
 | **SLO** | SLO 3 — design, implement, test |
 | **Due** | End of Week 10 |
 
-**Prerequisites:** complete both in-app lessons (`2.1.5 Hello Sprite` + `2.1.9 Make it Move`) before starting this lab.
+**Prerequisites:** complete both in-app lessons (`5.1.11 Hello Sprite` + `5.1.20 Make it Move`) before starting this lab.
 
 **Module resources:**
 - 📋 [Module overview](2.1.1_overview.md) — recommended learning order

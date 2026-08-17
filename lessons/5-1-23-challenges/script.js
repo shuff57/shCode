@@ -1,5 +1,5 @@
 function setup() {
-  // STEP 1: Create a player sprite (e.g. new Sprite(200, 200, 40, 40))
+  // STEP 1: Create a player sprite — position it and give it a size.
 
   // STEP 2: (Challenge 1) Create an array of colors to cycle through
 
@@ -19,7 +19,7 @@ function draw() {
 
   // STEP 8: (Challenge 2) Set companion position using sin/cos around the player
 
-  // STEP 9: (Challenge 3) Use text() to display a player property on the canvas
+  // STEP 9: (Challenge 3) Draw one of the player's properties on screen.
 
   // STEP 10: (Challenge 4) Display frameCount, player x/y, and frameRate() as a HUD
 

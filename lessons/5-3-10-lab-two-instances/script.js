@@ -12,7 +12,7 @@ let b1, b2;
 function setup() {
   new Canvas(300, 200);
 
-  // STEP 1: Create b1 = new Box('red') and b2 = new Box('blue').
+  // STEP 1: Create two Box objects, b1 and b2, giving each a different colour.
   //   Each constructor call produces a separate instance with its own color.
 }
 

@@ -1,14 +1,15 @@
 // 2.2.13 Challenges — pick at least one OOP stretch from content.md.
-// The grader looks for: a class, an instance via `new`, a constructor, and one
-// OOP feature (`this.<prop>`, `extends`, or `super(`).
+// You are graded on four things: defining a class, giving it a constructor,
+// building an object from it, and using one further OOP feature. The content
+// page lists which features count.
 
 function setup() {
   new Canvas(400, 400);
 
-  // STEP 1: Define your class above setup() (or here, before you instantiate).
-  //         Give it a constructor that stores arguments on `this`.
+  // STEP 1: Define your own type above setup(), or here before you build one.
+  //         Give it a constructor that stores its arguments on the object.
 
-  // STEP 2: Instantiate at least one object with `new YourClass(...)` and
+  // STEP 2: Build at least one object from it and
   //         store it in a variable.
 }
 

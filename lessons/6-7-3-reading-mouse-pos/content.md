@@ -1,6 +1,6 @@
 ## Cursor position every frame
 
-**Read before `2.7.4 Reading — shplay docs: mouse.pressing()`.** About 5 minutes.
+**Read before `6.7.4 Reading — shplay docs: mouse.pressing()`.** About 5 minutes.
 
 `mouse.x` and `mouse.y` are numbers that shplay updates every frame. They hold the cursor's position in canvas coordinates — the same coordinate space your sprites live in. Top-left of the canvas is `(0, 0)`. Bottom-right is `(width, height)`.
 

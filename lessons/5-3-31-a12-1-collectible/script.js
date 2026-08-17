@@ -21,7 +21,7 @@ function setup() {
   player = new Sprite(200, 200, 30, 30);
   player.color = 'white';
 
-  // STEP 3: push at least 5 new Collectible(...) into the collectibles array
+  // STEP 3: build at least 5 collectibles and put them in the array
 
 }
 
@@ -35,6 +35,7 @@ function draw() {
   else if (kb.pressing('s'))  player.vel.y = 4;
   else                         player.vel.y = 0;
 
-  // STEP 4: for each collectible, if player.overlaps(c.sprite), collect and score
+  // STEP 4: for each collectible, detect a hit against the player, then
+  //         collect it and add its value to the score
 
 }

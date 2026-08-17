@@ -1,35 +1,28 @@
 // 5.2.1 Bouncy Ball — build a closed box and drop a ball in it.
-// Uncomment each STEP and fill in the code.
 
 let ball;
 
 function setup() {
   new Canvas(400, 400);
 
-  // STEP 1: Turn on gravity
-  //   world.gravity.y = 10;
+  // STEP 1: Turn gravity on, pulling downward.
 
-  // STEP 2: Build four static walls — top, bottom, left, right
-  //   new Sprite(200, 10, 400, 20, 'static').color = '#444';
-  //   new Sprite(200, 390, 400, 20, 'static').color = '#444';
-  //   new Sprite(10, 200, 20, 400, 'static').color = '#444';
-  //   new Sprite(390, 200, 20, 400, 'static').color = '#444';
+  // STEP 2: Build four static walls — top, bottom, left and right — so the
+  //         ball cannot escape. Each is a long thin static sprite; give
+  //         them a colour so you can see them.
 
-  // STEP 3: Create a dynamic ball — one size argument makes it a circle
-  //   ball = new Sprite(200, 100, 30);
-  //   ball.color = 'orange';
+  // STEP 3: Create the ball as a dynamic sprite. One size argument instead
+  //         of two makes it a circle. Store it in `ball` and colour it.
 
-  // STEP 4: Make it bouncy (0 = sticky, 1 = perfectly elastic)
-  //   ball.bounciness = 0.9;
+  // STEP 4: Make it bouncy. The property runs 0 (sticky) to 1 (perfectly
+  //         elastic) — pick something near the top of that range.
 
-  // STEP 5: Low friction so it doesn't drag to a stop
-  //   ball.friction = 0;
+  // STEP 5: Give it very low friction, so it does not drag to a stop.
 
-  // STEP 6: Give it a starting horizontal kick
-  //   ball.vel.x = 4;
+  // STEP 6: Give it a starting horizontal kick, so it travels rather than
+  //         dropping straight down.
 }
 
 function draw() {
-  // STEP 7: Clear the background
-  //   background('#111');
+  // STEP 7: Clear the background each frame.
 }

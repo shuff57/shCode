@@ -1,6 +1,6 @@
 # Colliding + Ground Detection
 
-Read this before `2.3.18 Worked Example — Ground Detection`. About 5 minutes.
+Read this before `6.3.7 Worked Example — Ground Detection`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -135,4 +135,4 @@ Use `colliding` for "am I standing on it?" and `overlaps` for "did I enter this 
 
 ---
 
-Once you can explain why an `overlaps`-gated jump is wrong for this case, open `2.3.18 Worked Example — Ground Detection`.
+Once you can explain why an `overlaps`-gated jump is wrong for this case, open `6.3.7 Worked Example — Ground Detection`.

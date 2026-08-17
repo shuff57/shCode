@@ -1,6 +1,6 @@
 ## Sprite property tour: pos, rotation, layer
 
-Read before `2.1.4 Worked Example — Minimum Sprite Program`. About 5 minutes.
+Read before `5.1.4 Worked Example — Minimum Sprite Program`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

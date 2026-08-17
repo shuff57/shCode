@@ -6,7 +6,7 @@ class Bubble {
     this.sprite.color = 'lightblue';
   }
 
-  // STEP 1: Write pop() that calls this.sprite.delete().
+  // STEP 1: Write pop() so it despawns the sprite this object owns.
   //   The object is responsible for cleaning up the shPlay sprite it owns.
   //   Once deleted, the sprite disappears from the canvas immediately.
 }

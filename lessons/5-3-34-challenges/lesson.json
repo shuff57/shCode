@@ -60,11 +60,11 @@
     },
     {
       "id": "r2",
-      "title": "Instantiate at least one class",
-      "description": "At least one object is created with new.",
+      "title": "Instantiates a class of your own",
+      "description": "Builds an object from a class the student defined — new Canvas() and new Sprite() are boilerplate and do not count",
       "type": "regex",
       "file": "script.js",
-      "pattern": "new\\s+\\w+\\s*\\(",
+      "pattern": "new\\s+(?!Canvas\\b|Sprite\\b|Group\\b)[A-Z]\\w*\\s*\\(",
       "flags": "",
       "points": 0
     },

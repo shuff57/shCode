@@ -1,6 +1,6 @@
 ## Single-Frame Still Art
 
-**Read before attempting `2.4.5 Animated Sprites Sandbox`.**
+**Read before attempting `6.4.9 Animated Sprites Sandbox`.**
 
 **What you'll learn from it:**
 

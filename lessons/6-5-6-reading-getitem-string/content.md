@@ -1,6 +1,6 @@
 ## Why `getItem('highScore') > 100` can lie
 
-**Read before attempting `2.5.6 Worked Example — Load and Display a High Score`.**
+**Read before attempting `6.5.7 Worked Example — Load and Display a High Score`.**
 
 You stored a number — `storeItem('highScore', 250)`. You read it back with `getItem('highScore')` and get `"250"`. That is a string, not a number. This is the single most common save/load bug in student games.
 

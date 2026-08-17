@@ -38,7 +38,7 @@ Hit Run — the asterisk plays its 11-frame explosion cycle automatically. Two t
 1. The default colored rectangle is gone — the registered animation replaces it as soon as the sheet loads.
 2. You never had to call `changeAni` to start the animation — the **first** `addAni` activates automatically. The next reading covers `changeAni` for the moment when you want to swap to a *different* registered animation.
 
-**Sprite-sheet anatomy.** The image at `/shplay/assets/asterisk_explode.avif` is one wide PNG-style file containing 11 frames in a row. shplay divides the sheet's width by `frameCount` to compute each frame's slice size. If you have multiple animations packed into a multi-row sheet, use `addAnis` (plural) with an atlas object — that's covered in `2.4.5 Animated Sprites Sandbox`.
+**Sprite-sheet anatomy.** The image at `/shplay/assets/asterisk_explode.avif` is one wide PNG-style file containing 11 frames in a row. shplay divides the sheet's width by `frameCount` to compute each frame's slice size. If you have multiple animations packed into a multi-row sheet, use `addAnis` (plural) with an atlas object — that's covered in `6.4.9 Animated Sprites Sandbox`.
 
 ---
 

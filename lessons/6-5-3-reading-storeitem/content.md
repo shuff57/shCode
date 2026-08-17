@@ -1,6 +1,6 @@
 ## Saving a value that survives reload
 
-**Read before attempting `2.5.4 Worked Example — Save a High Score on Game Over`.**
+**Read before attempting `6.5.4 Worked Example — Save a High Score on Game Over`.**
 
 Your game runs, the player earns a score, and then they close the tab. Everything in your variables is gone — wiped from RAM. If you want the score to still be there tomorrow, you need to **save it**.
 

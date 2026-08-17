@@ -1,6 +1,6 @@
 # Input edges — `pressing` vs `presses`
 
-Read this before `2.3.15 Worked Example — Edge-triggered Input`. About 5 minutes.
+Read this before `6.3.4 Worked Example — Edge-triggered Input`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -140,4 +140,4 @@ Note the spelling — **press*ing*** is the long-running one ("currently being p
 
 ---
 
-Once you can explain the infinite-jump bug in one sentence, open `2.3.15 Worked Example — Edge-triggered Input`.
+Once you can explain the infinite-jump bug in one sentence, open `6.3.4 Worked Example — Edge-triggered Input`.

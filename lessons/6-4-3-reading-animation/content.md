@@ -9,7 +9,7 @@ shplay's animation system is **state-driven**: a sprite carries a library of nam
 - Sprites can register **multiple named animations**, but only one is **active** (rendering) at a time.
 - The four building blocks each get their own atomic reading next: `addAni`, `changeAni`, `frameDelay`, and `sprite.image`.
 - A sprite created without any `addAni` calls renders as a default colored rectangle — that's what you'll see in the try-it below.
-- State-driven games swap the active animation in response to input; you'll see this composed in `2.4.4 Worked Example — Animating a Sprite`.
+- State-driven games swap the active animation in response to input; you'll see this composed in `6.4.8 Worked Example — Animating a Sprite`.
 
 **Try it:** the mental model in action — one sprite, two visual "states" (idle and run), and the visible state swaps based on input. Hold `D` to put the sprite in its "run" state (orange); release for "idle" (cyan). This is the *idea* the animation system formalizes: one active visual at a time, swapped by your state code.
 

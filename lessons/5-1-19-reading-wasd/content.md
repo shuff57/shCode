@@ -1,6 +1,6 @@
 ## WASD-not-arrows
 
-Read before `2.1.8 Worked Example — Keyboard Movement`. About 5 minutes.
+Read before `5.1.14 Worked Example — Keyboard Movement`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

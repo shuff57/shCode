@@ -2,7 +2,7 @@ function setup() {
   // STEP 1: Build your foreground level (platforms, ground tile, player sprite)
 
   // STEP 2: (Challenge 1) Create a clouds array and push parallax background sprites
-  //         into it — use c.layer = -10 and c.collider = 'none'
+  //         into it — push it behind the action and stop it colliding
 
   // STEP 3: (Challenge 3) Build a tall level — stack platforms vertically
   //         so the player must climb upward to test camera.y follow
@@ -15,7 +15,7 @@ function draw() {
   //         'space' or 'w' for jump)
 
   // STEP 5: Follow the player horizontally
-  //         camera.x = lerp(camera.x, player.x, 0.1);
+  //         ease the camera toward the player instead of snapping to it.
 
   // STEP 6: (Challenge 1) Re-position each cloud using its base x plus a fraction
   //         of camera.x to create the parallax depth effect
@@ -24,5 +24,5 @@ function draw() {
 
   // STEP 8: (Challenge 3) Add vertical camera follow — use a small lerp factor
   //         (e.g. 0.05) so jumps don't shake the camera
-  //         camera.y = lerp(camera.y, player.y, 0.05);
+  //         ease the camera toward the player on both axes instead of snapping
 }

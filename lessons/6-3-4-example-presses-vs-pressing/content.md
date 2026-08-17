@@ -76,7 +76,7 @@ function draw() {
 }
 ```
 
-Hold the space bar — still one jump. Tap repeatedly — one jump each tap. Notice the player can also jump *mid-air* — that's a separate bug we'll fix in `2.3.18 Worked Example — Ground Detection`.
+Hold the space bar — still one jump. Tap repeatedly — one jump each tap. Notice the player can also jump *mid-air* — that's a separate bug we'll fix in `6.3.7 Worked Example — Ground Detection`.
 
 ## Step 4 — Mix the two intentionally
 
@@ -115,4 +115,4 @@ function draw() {
 - `kb.presses(k)` = "did the key just go down?" Use for jump, shoot, toggle, dash.
 - The super-jump bug is one wrong word — `pressing` instead of `presses` — and exactly one fix.
 - Both can live in the same `draw()` — they answer different questions.
-- The mid-air-jump bug (player can jump while falling) is a separate fix; see `2.3.18 Worked Example — Ground Detection`.
+- The mid-air-jump bug (player can jump while falling) is a separate fix; see `6.3.7 Worked Example — Ground Detection`.

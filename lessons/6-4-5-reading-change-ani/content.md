@@ -1,6 +1,6 @@
 ## Swapping the Active Animation
 
-**Read before attempting `2.4.4 Worked Example — Animating a Sprite`.**
+**Read before attempting `6.4.8 Worked Example — Animating a Sprite`.**
 
 **What you'll learn from it:**
 

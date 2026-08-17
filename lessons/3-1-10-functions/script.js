@@ -8,7 +8,7 @@
 //         that returns a value.
 
 // Step 3: Write an arrow function.
-//         Example: const double = (x) => x * 2;
+//         Use the short arrow form from the reading.
 
 // Step 4: Call your greet function and log the result.
-//         Example: console.log(greet("Alice"));
+//         Then call it and print what it hands back.

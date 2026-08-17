@@ -1,6 +1,6 @@
 ## Locking the Viewport to a Sprite
 
-**Read before attempting `2.4.8 Worked Example — Camera Follow`.**
+**Read before attempting `6.4.16 Worked Example — Camera Follow`.**
 
 **What you'll learn from it:**
 

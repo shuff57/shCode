@@ -1,6 +1,6 @@
 ## When to reach for OOP (3-question checklist)
 
-**Read after `2.2.10 Worked Example — Procedural vs OOP side-by-side`.** About 4 minutes.
+**Read after `5.3.29 Worked Example — Procedural vs OOP side-by-side`.** About 4 minutes.
 
 By the end of this reading you should be able to answer:
 

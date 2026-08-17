@@ -51,21 +51,21 @@
   "requirements": [
     {
       "id": "r1",
-      "title": "Class defined",
-      "description": "A `Collectible` class exists.",
+      "title": "Constructor stores state on the object",
+      "description": "The constructor body assigns at least one argument onto this — the class shell is provided, so this checks the part the student writes",
       "type": "regex",
       "file": "script.js",
-      "pattern": "class\\s+Collectible\\s*\\{",
+      "pattern": "constructor\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?this\\.\\w+\\s*=",
       "flags": "",
       "points": 0
     },
     {
       "id": "r2",
-      "title": "Constructor present",
-      "description": "The class has a constructor.",
+      "title": "Constructor creates the sprite",
+      "description": "The constructor creates the sprite this collectible owns",
       "type": "regex",
       "file": "script.js",
-      "pattern": "constructor\\s*\\(",
+      "pattern": "constructor\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?this\\.sprite\\s*=\\s*new\\s+Sprite",
       "flags": "",
       "points": 0
     },
