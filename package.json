@@ -7,8 +7,9 @@
     "prebuild": "node scripts/generate-lessons-manifest.mjs && node scripts/generate-solutions.mjs && node scripts/generate-lesson-starters.mjs",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
-    "test": "node scripts/test-diagram.mjs",
-    "test:diagram": "node scripts/test-diagram.mjs"
+    "test": "node scripts/test-diagram.mjs && node scripts/test-runner-timeout.mjs",
+    "test:diagram": "node scripts/test-diagram.mjs",
+    "test:runner": "node scripts/test-runner-timeout.mjs"
   },
   "type": "module",
   "dependencies": {

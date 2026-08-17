@@ -10,6 +10,54 @@ import { recordLessonCompleted } from '../lib/progress';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import { grade } from '../lib/grader';
 import type { GradeReport as GradeReportType } from '../lib/grader';
+
+// How long a console lesson's code may run before we stop it. Generous for
+// anything a beginner writes on purpose; short enough that a runaway loop
+// does not feel like a crash.
+const RUN_TIMEOUT_MS = 3000;
+
+// Ceiling on logs streamed back from the runner. `while (true) console.log(i)`
+// would otherwise post millions of messages and lock the main thread — which
+// is the exact failure the Worker exists to prevent.
+const RUN_MAX_LOGS = 1000;
+
+// Source of the console-lesson runner Worker. Kept as a string so it can be
+// turned into a Blob URL at run time; a separate file would need a public
+// asset path and a static-export route, and this has no imports to justify it.
+const RUNNER_SOURCE = `
+const MAX = ${RUN_MAX_LOGS};
+let sent = 0;
+const ser = (a) => {
+  if (typeof a !== 'object' || a === null) return String(a);
+  try { return JSON.stringify(a, null, 2); } catch (_) { return String(a); }
+};
+const cap = (type) => (...args) => {
+  if (sent >= MAX) return;
+  sent++;
+  self.postMessage({
+    kind: 'log',
+    type,
+    message: sent === MAX
+      ? '… output stopped after ' + MAX + ' lines. If you did not mean to print this much, check your loop.'
+      : args.map(ser).join(' '),
+  });
+};
+console.log = cap('log');
+console.warn = cap('warn');
+console.error = cap('error');
+self.onmessage = (e) => {
+  try {
+    new Function(e.data)(); // student code execution (educational tool)
+    self.postMessage({ kind: 'done' });
+  } catch (err) {
+    self.postMessage({
+      kind: 'error',
+      name: (err && err.name) || 'Error',
+      message: (err && err.message) || String(err),
+    });
+  }
+};
+`;
 import FileExplorer from './FileExplorer';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
@@ -52,6 +100,9 @@ export default function LessonWorkspace({
   const getDirtyCount = useLessonStore((s) => s.getDirtyCount);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Live console-lesson runner, so a re-run or an unmount can terminate it.
+  const workerRef = useRef<Worker | null>(null);
+  useEffect(() => () => { workerRef.current?.terminate(); }, []);
 
   const handleDownload = () => {
     if (!currentFile) return;
@@ -246,48 +297,99 @@ export default function LessonWorkspace({
     return () => clearTimeout(to);
   }, [files, isConsoleMode, isJscadMode]);
 
-  // For console lessons: run JS directly and capture output.
+  // For console lessons: run JS in a Worker and capture output.
   // This is intentional — students write code in the editor and we execute it,
   // similar to CodeHS, Replit, or any browser-based coding education tool.
+  //
+  // It runs in a Worker rather than on the main thread for one reason: a
+  // Worker can be terminated, and synchronous JS cannot be interrupted any
+  // other way. Module 2.4 teaches infinite loops deliberately, so students
+  // now write `while (true)` on purpose — on the main thread that locked the
+  // tab and cost them everything they had typed.
   function runCode() {
     setRuntimeError(null);
-    const logs: Array<{type: string; message: string; timestamp: string}> = [];
-    const time = () => new Date().toLocaleTimeString();
-
     const scriptContent = files['script.js'] || '';
+    const time = () => new Date().toLocaleTimeString();
+    const logs: Array<{type: string; message: string; timestamp: string}> = [];
 
-    const origLog = console.log;
-    const origWarn = console.warn;
-    const origError = console.error;
-
-    const capture = (type: string) => (...args: unknown[]) => {
-      const text = args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' ');
-      logs.push({ type, message: text, timestamp: time() });
+    const finish = () => {
+      setConsoleOutput(logs);
+      setRunKey((k) => k + 1);
+      setConsoleResetKey((k) => k + 1);
+      setConsoleOpen(true);
+      setTimeout(() => runTests(), 200);
     };
 
-    console.log = capture('log');
-    console.warn = capture('warn');
-    console.error = capture('error');
+    // A previous run may still be spinning; never leave two alive at once.
+    workerRef.current?.terminate();
+    workerRef.current = null;
 
-    try {
-      const run = new Function(scriptContent); // student code execution (educational tool)
-      run();
-    } catch (e: unknown) {
-      const name = e instanceof Error ? e.name : 'Error';
-      const msg = e instanceof Error ? e.message : String(e);
-      logs.push({ type: 'error', message: msg, timestamp: time() });
-      setRuntimeError(`${name}: ${msg}`);
+    if (typeof Worker === 'undefined') {
+      // No Worker (very old browser): fall back to the direct call. This is
+      // the path that can hang, so it is the fallback and not the default.
+      const orig = { log: console.log, warn: console.warn, error: console.error };
+      const capture = (type: string) => (...args: unknown[]) => {
+        logs.push({ type, message: args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' '), timestamp: time() });
+      };
+      console.log = capture('log'); console.warn = capture('warn'); console.error = capture('error');
+      try {
+        new Function(scriptContent)(); // student code execution (educational tool)
+      } catch (e: unknown) {
+        const name = e instanceof Error ? e.name : 'Error';
+        const msg = e instanceof Error ? e.message : String(e);
+        logs.push({ type: 'error', message: msg, timestamp: time() });
+        setRuntimeError(`${name}: ${msg}`);
+      }
+      console.log = orig.log; console.warn = orig.warn; console.error = orig.error;
+      finish();
+      return;
     }
 
-    console.log = origLog;
-    console.warn = origWarn;
-    console.error = origError;
+    const url = URL.createObjectURL(new Blob([RUNNER_SOURCE], { type: 'text/javascript' }));
+    const worker = new Worker(url);
+    workerRef.current = worker;
 
-    setConsoleOutput(logs);
-    setRunKey((k) => k + 1);
-    setConsoleResetKey((k) => k + 1);
-    setConsoleOpen(true);
-    setTimeout(() => runTests(), 200);
+    const cleanup = () => {
+      worker.terminate();
+      URL.revokeObjectURL(url);
+      if (workerRef.current === worker) workerRef.current = null;
+    };
+
+    const killer = setTimeout(() => {
+      logs.push({
+        type: 'error',
+        message: `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
+        timestamp: time(),
+      });
+      setRuntimeError('Stopped: your code ran too long (likely an infinite loop)');
+      cleanup();
+      finish();
+    }, RUN_TIMEOUT_MS);
+
+    worker.onmessage = (e: MessageEvent) => {
+      const d = e.data as { kind: string; type?: string; message?: string; name?: string };
+      if (d.kind === 'log') {
+        logs.push({ type: d.type || 'log', message: d.message || '', timestamp: time() });
+        return;
+      }
+      if (d.kind === 'error') {
+        logs.push({ type: 'error', message: d.message || '', timestamp: time() });
+        setRuntimeError(`${d.name || 'Error'}: ${d.message || ''}`);
+      }
+      clearTimeout(killer);
+      cleanup();
+      finish();
+    };
+
+    worker.onerror = (e: ErrorEvent) => {
+      clearTimeout(killer);
+      logs.push({ type: 'error', message: e.message || 'Error', timestamp: time() });
+      setRuntimeError(e.message || 'Error');
+      cleanup();
+      finish();
+    };
+
+    worker.postMessage(scriptContent);
   }
 
   // For JSCAD lessons: build 3D preview and render in iframe
