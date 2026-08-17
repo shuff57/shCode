@@ -1130,35 +1130,83 @@
     },
     {
       "id": "2-1-10-reading-logical-operators",
-      "title": "2.1.11 Reading — Logical Operators: && || !",
+      "title": "2.1.28 Reading — Logical Operators: && || !",
       "unit": "2.1 Conditionals",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": 5
     },
     {
       "id": "2-1-11-example-combining-conditions",
-      "title": "2.1.12 Worked Example — Combining conditions",
+      "title": "2.1.29 Worked Example — Combining conditions",
       "unit": "2.1 Conditionals",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": 5
     },
     {
       "id": "2-1-12-lab-guard-and",
-      "title": "2.1.13 Guard with &&",
+      "title": "2.1.30 Guard with &&",
       "unit": "2.1 Conditionals",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": 5
     },
     {
       "id": "2-1-13-lab-branch-or",
-      "title": "2.1.14 Branch with ||",
+      "title": "2.1.31 Branch with ||",
       "unit": "2.1 Conditionals",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": 5
+    },
+    {
+      "id": "2-1-14-lab-chain-else-if",
+      "title": "2.1.8 Chain Three Branches",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-15-reading-nested-conditionals",
+      "title": "2.1.9 Reading — Nested Conditionals",
+      "unit": "2.1 Conditionals",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-16-example-nested-conditionals",
+      "title": "2.1.10 Worked Example — Nested if Inside if",
+      "unit": "2.1 Conditionals",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-17-lab-nested-conditionals",
+      "title": "2.1.11 Nest a Check",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-18-reading-truthy-falsy",
+      "title": "2.1.12 Reading — Truthy and Falsy Values",
+      "unit": "2.1 Conditionals",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-19-example-falsy-values",
+      "title": "2.1.13 Worked Example — Falsy Value Surprises",
+      "unit": "2.1 Conditionals",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
     },
     {
       "id": "2-1-2-video-decisions",
@@ -1166,7 +1214,87 @@
       "unit": "2.1 Conditionals",
       "preview": "video",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": 5
+    },
+    {
+      "id": "2-1-20-lab-truthy-guard",
+      "title": "2.1.14 Guard with a Truthy Check",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-21-reading-precedence",
+      "title": "2.1.18 Reading — Parentheses and Operator Precedence",
+      "unit": "2.1 Conditionals",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-22-reading-ternary",
+      "title": "2.1.19 Reading — The Conditional Operator ?",
+      "unit": "2.1 Conditionals",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-23-example-ternary",
+      "title": "2.1.20 Worked Example — Ticket Price with ?",
+      "unit": "2.1 Conditionals",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-24-lab-ternary",
+      "title": "2.1.21 Write Your First Ternary",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-25-reading-ternary-chain",
+      "title": "2.1.22 Reading — Chaining Multiple ? Operators",
+      "unit": "2.1 Conditionals",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-26-example-ternary-chain",
+      "title": "2.1.23 Worked Example — Size Label with Chained ?",
+      "unit": "2.1 Conditionals",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-27-lab-ternary-chain",
+      "title": "2.1.24 Chain Your Ternaries",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-28-reading-ternary-vs-if",
+      "title": "2.1.25 Reading — When to Use ? vs if",
+      "unit": "2.1 Conditionals",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-29-example-ternary-vs-if",
+      "title": "2.1.26 Worked Example — Rewriting a Misused Ternary",
+      "unit": "2.1 Conditionals",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
     },
     {
       "id": "2-1-3-reading-if-else",
@@ -1174,7 +1302,87 @@
       "unit": "2.1 Conditionals",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": 5
+    },
+    {
+      "id": "2-1-30-lab-ternary-vs-if",
+      "title": "2.1.27 Rewrite It as if/else",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-31-lab-flip-not",
+      "title": "2.1.32 Flip It with !",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-32-example-or-trap",
+      "title": "2.1.33 Worked Example — The OR String-Literal Trap",
+      "unit": "2.1 Conditionals",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-33-lab-debug-door",
+      "title": "2.1.34 Debug the Door",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-34-lab-combine-logical",
+      "title": "2.1.35 Combine &&, ||, and !",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-35-lab-predict-chain",
+      "title": "2.1.36 Predict the Chain",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-36-lab-settings-advisor",
+      "title": "2.1.37 Print Settings Advisor",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-37-challenges",
+      "title": "2.1.38 Challenges — Optional Stretch",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-38-a2-1-1-grade-advisor",
+      "title": "2.1.39 A2.1.1 — Grade Recommendation Advisor",
+      "unit": "2.1 Conditionals",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
+    },
+    {
+      "id": "2-1-39-a2-1-2-quiz",
+      "title": "2.1.40 A2.1.2 — Conditionals Checkpoint Quiz",
+      "unit": "2.1 Conditionals",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 5
     },
     {
       "id": "2-1-4-example-trace-if-else",
@@ -1182,15 +1390,15 @@
       "unit": "2.1 Conditionals",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": 5
     },
     {
       "id": "2-1-4a-chart-the-if-else",
-      "title": "2.1.5a Chart the Code — if / else",
+      "title": "2.1.5 Chart the Code — if / else",
       "unit": "2.1 Conditionals",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
+      "week": 5
     },
     {
       "id": "2-1-5-lab-first-if",
@@ -1198,7 +1406,7 @@
       "unit": "2.1 Conditionals",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": 5
     },
     {
       "id": "2-1-6-lab-add-else",
@@ -1206,31 +1414,31 @@
       "unit": "2.1 Conditionals",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": 5
     },
     {
       "id": "2-1-7-reading-comparison-operators",
-      "title": "2.1.8 Reading — Comparison Operators & === vs ==",
+      "title": "2.1.15 Reading — Comparison Operators & === vs ==",
       "unit": "2.1 Conditionals",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": 5
     },
     {
       "id": "2-1-8-example-comparisons",
-      "title": "2.1.9 Worked Example — What each comparison returns",
+      "title": "2.1.16 Worked Example — What each comparison returns",
       "unit": "2.1 Conditionals",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": 5
     },
     {
       "id": "2-1-9-lab-predict-comparisons",
-      "title": "2.1.10 Predict, Then Run",
+      "title": "2.1.17 Predict, Then Run",
       "unit": "2.1 Conditionals",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": 5
     },
     {
       "id": "2-2-1-slides",
@@ -1242,7 +1450,7 @@
     },
     {
       "id": "2-2-10-lab-countdown",
-      "title": "2.2.13 Countdown with while",
+      "title": "2.2.16 Countdown with while",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1250,7 +1458,7 @@
     },
     {
       "id": "2-2-11-fix-the-broken-chart",
-      "title": "2.2.14 Fix the Broken Chart",
+      "title": "2.2.18 Fix the Broken Chart",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1258,17 +1466,49 @@
     },
     {
       "id": "2-2-12-a5-2-flowchart-decision",
-      "title": "2.2.15 Flowchart a Decision",
+      "title": "2.2.7 A2.2.0 — Flowchart a Decision",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 5
+      "week": 6
     },
     {
       "id": "2-2-13-challenges",
-      "title": "2.2.16 Challenges — Optional Stretch",
+      "title": "2.2.20 Challenges — Optional Stretch",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-2-14-reading-programs-implement-algorithms",
+      "title": "2.2.3 Reading — Programs Implement Algorithms",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-2-15-example-three-spellings",
+      "title": "2.2.15 Worked Example — Same Algorithm, Three Spellings",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-2-16-a2-2-1-loop-program",
+      "title": "2.2.17 A2.2.1 (Part B) — For + While Loop Program",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-2-17-reading-canonical-algorithms",
+      "title": "2.2.19 Reading — Canonical Algorithms & Linear Search",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1278,43 +1518,43 @@
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 5
+      "week": 6
     },
     {
       "id": "2-2-2a-reading-flowchart-shapes",
-      "title": "2.2.3a Reading — Flowchart Shapes",
+      "title": "2.2.4 Reading — Flowchart Shapes",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 5
+      "week": 6
     },
     {
       "id": "2-2-3-example-pseudocode-to-code",
-      "title": "2.2.4 Worked Example — Pseudocode → code",
+      "title": "2.2.5 Worked Example — Pseudocode → code",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 5
+      "week": 6
     },
     {
       "id": "2-2-3a-chart-the-algorithm",
-      "title": "2.2.5a Chart the Code — Largest of Three",
+      "title": "2.2.6 Chart the Code — Largest of Three",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 5
+      "week": 6
     },
     {
       "id": "2-2-4-a5-1-algorithm-writeup",
-      "title": "2.2.6 Algorithm in Plain English",
+      "title": "2.2.8 A2.2.1 (Part A) — Algorithm in Plain English",
       "unit": "2.2 Algorithms and Loops",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 5
+      "week": 6
     },
     {
       "id": "2-2-5-reading-for-loop",
-      "title": "2.2.7 Reading — The for Loop",
+      "title": "2.2.9 Reading — The for Loop",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1322,7 +1562,7 @@
     },
     {
       "id": "2-2-6-example-trace-for",
-      "title": "2.2.8 Worked Example — Tracing a for-loop counter",
+      "title": "2.2.10 Worked Example — Tracing a for-loop counter",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1330,7 +1570,7 @@
     },
     {
       "id": "2-2-6a-chart-the-for-loop",
-      "title": "2.2.9a Chart the Code — A for-loop That Accumulates",
+      "title": "2.2.11 Chart the Code — A for-loop That Accumulates",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1338,7 +1578,7 @@
     },
     {
       "id": "2-2-7-lab-count-to-ten",
-      "title": "2.2.10 Count 1 to 10",
+      "title": "2.2.12 Count 1 to 10",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1346,7 +1586,7 @@
     },
     {
       "id": "2-2-8-reading-while-loop",
-      "title": "2.2.11 Reading — while & do…while",
+      "title": "2.2.13 Reading — while & do…while",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1354,7 +1594,7 @@
     },
     {
       "id": "2-2-9-example-while-vs-for",
-      "title": "2.2.12 Worked Example — while vs for + the infinite-loop trap",
+      "title": "2.2.14 Worked Example — while vs for + the infinite-loop trap",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1363,42 +1603,730 @@
     {
       "id": "2-3-1-slides",
       "title": "2.3.1 Slides — The Switch Statement",
-      "unit": "2.3 The Switch Statement",
+      "unit": "2.3 The switch Statement",
       "preview": "slides",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
-      "id": "2-3-2-reading-switch",
-      "title": "2.3.2 Reading — switch Statements",
-      "unit": "2.3 The Switch Statement",
+      "id": "2-3-10-reading-fall-through",
+      "title": "2.3.9 Reading — break and Fall-Through",
+      "unit": "2.3 The switch Statement",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": 6
+    },
+    {
+      "id": "2-3-11-example-missing-break",
+      "title": "2.3.11 Worked Example — A Missing break in the Middle",
+      "unit": "2.3 The switch Statement",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-12-lab-predict-fall-through",
+      "title": "2.3.12 Predict the Fall-Through",
+      "unit": "2.3 The switch Statement",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-13-lab-fix-fall-through",
+      "title": "2.3.13 Fix the Fall-Through Bug",
+      "unit": "2.3 The switch Statement",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-14-reading-grouping-cases",
+      "title": "2.3.14 Reading — Grouping Cases",
+      "unit": "2.3 The switch Statement",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-15-example-weekend-weekday",
+      "title": "2.3.15 Worked Example — Weekend or Weekday",
+      "unit": "2.3 The switch Statement",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-16-example-days-in-month",
+      "title": "2.3.16 Worked Example — Days in a Month",
+      "unit": "2.3 The switch Statement",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-17-lab-vowel-consonant",
+      "title": "2.3.17 Group Cases: Vowel or Consonant",
+      "unit": "2.3 The switch Statement",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-18-reading-strict-equality",
+      "title": "2.3.18 Reading — switch Compares Strictly",
+      "unit": "2.3 The switch Statement",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-19-lab-false-vs-zero",
+      "title": "2.3.19 case false vs case 0: Predict, Then Run",
+      "unit": "2.3 The switch Statement",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-2-reading-switch",
+      "title": "2.3.3 Reading — switch Statements",
+      "unit": "2.3 The switch Statement",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-20-example-fix-case-type",
+      "title": "2.3.20 Worked Example — Fix 1: Match the Case Type to the Value",
+      "unit": "2.3 The switch Statement",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-21-example-fix-number-convert",
+      "title": "2.3.21 Worked Example — Fix 2: Convert the Value with Number()",
+      "unit": "2.3 The switch Statement",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-22-lab-fix-type-mismatch",
+      "title": "2.3.22 Fix the Type Mismatch",
+      "unit": "2.3 The switch Statement",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-23-reading-choosing",
+      "title": "2.3.23 Reading — Choosing Between if...else and switch",
+      "unit": "2.3 The switch Statement",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-24-example-command-dispatch",
+      "title": "2.3.24 Worked Example — When switch Fits: Command Dispatch",
+      "unit": "2.3 The switch Statement",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-25-example-grade-chain",
+      "title": "2.3.25 Worked Example — When switch Doesn't Fit: the Grade Chain",
+      "unit": "2.3 The switch Statement",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-26-lab-traffic-light",
+      "title": "2.3.26 Rewrite the Traffic Light as a Switch",
+      "unit": "2.3 The switch Statement",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-27-written-justify-choice",
+      "title": "2.3.27 switch or if...else? Justify Your Choice",
+      "unit": "2.3 The switch Statement",
+      "preview": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-28-lab-drink-size-switch",
+      "title": "2.3.28 Build a Four-Case Switch: Drink Sizes",
+      "unit": "2.3 The switch Statement",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-29-a2-3-1-print-settings-advisor",
+      "title": "2.3.30 A2.3.1 — Print Settings Advisor",
+      "unit": "2.3 The switch Statement",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
     },
     {
       "id": "2-3-3-example-switch-vs-if",
-      "title": "2.3.3 Worked Example — switch vs if-else-if",
-      "unit": "2.3 The Switch Statement",
+      "title": "2.3.10 Worked Example — switch vs if-else-if",
+      "unit": "2.3 The switch Statement",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": 6
+    },
+    {
+      "id": "2-3-30-challenges",
+      "title": "2.3.31 Challenges — Optional Stretch",
+      "unit": "2.3 The switch Statement",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
     },
     {
       "id": "2-3-3a-chart-the-switch",
-      "title": "2.3.4a Chart the Code — a switch is a chain of diamonds",
-      "unit": "2.3 The Switch Statement",
+      "title": "2.3.6 Chart the Code — a switch is a chain of diamonds",
+      "unit": "2.3 The switch Statement",
       "preview": "diagram",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-4-lab-convert-to-switch",
+      "title": "2.3.29 Convert an if-chain to switch",
+      "unit": "2.3 The switch Statement",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-5-reading-one-value-many-answers",
+      "title": "2.3.2 Reading — One Value, Many Answers",
+      "unit": "2.3 The switch Statement",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-6-example-menu-of-options",
+      "title": "2.3.4 Worked Example — A Menu of Options",
+      "unit": "2.3 The switch Statement",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-7-example-switch-on-expression",
+      "title": "2.3.5 Worked Example — The Switched Value Is an Expression",
+      "unit": "2.3 The switch Statement",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-8-lab-animal-sounds",
+      "title": "2.3.7 Build a Switch: Animal Sounds",
+      "unit": "2.3 The switch Statement",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-3-9-lab-predict-default-position",
+      "title": "2.3.8 Predict Where default Runs",
+      "unit": "2.3 The switch Statement",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-1-slides",
+      "title": "2.4.1 Slides — Loop Control and Nested Loops",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "slides",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
-      "id": "2-3-4-lab-convert-to-switch",
-      "title": "2.3.5 Convert an if-chain to switch",
-      "unit": "2.3 The Switch Statement",
+      "id": "2-4-10-example-search-until-found",
+      "title": "2.4.10 Worked Example — Searching Without a Known End",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-11-diagram-search-until-found",
+      "title": "2.4.11 Chart the Code — Search Until Found",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "diagram",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-12-lab-break-square",
+      "title": "2.4.12 Break When the Square Passes 50",
+      "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
-      "week": 4
+      "week": 6
+    },
+    {
+      "id": "2-4-13-reading-continue",
+      "title": "2.4.13 Reading — Skipping a Round with continue",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-14-example-filtering-while-loop",
+      "title": "2.4.14 Worked Example — Filtering While You Loop",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-15-diagram-continue",
+      "title": "2.4.15 Chart the Code — continue Skips, Doesn't Leave",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "diagram",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-16-reading-continue-while-trap",
+      "title": "2.4.16 Reading — The continue Trap in a while Loop",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-17-example-continue-trap-fix",
+      "title": "2.4.17 Worked Example — The continue Trap, and Its Fix",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-18-example-predict-break-vs-continue",
+      "title": "2.4.18 Worked Example — Predict: break vs continue",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-19-lab-multiples-of-three",
+      "title": "2.4.19 Multiples of 3 with continue",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-2-reading-for-vs-while",
+      "title": "2.4.2 Reading — for vs while: Choosing a Loop",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-20-reading-infinite-loops",
+      "title": "2.4.20 Reading — Infinite Loops: Three Causes",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-21-example-infinite-loop-safe",
+      "title": "2.4.21 Worked Example — Making an Infinite Loop Safe",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-22-diagram-fix-infinite-loop",
+      "title": "2.4.22 Fix the Infinite Loop",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "diagram",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-23-a2-4-1-debug-five-loops",
+      "title": "2.4.23 A2.4.1 — Debug Five Loops",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-24-reading-nested-loops",
+      "title": "2.4.24 Reading — Nested Loops",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-4-25-example-multiplication-table",
+      "title": "2.4.25 Worked Example — A Multiplication Table",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-4-26-diagram-nested-loops",
+      "title": "2.4.26 Chart the Code — Nested Loops",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "diagram",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-4-27-example-break-inner-loop",
+      "title": "2.4.27 Worked Example — break Leaves Only the Inner Loop",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-4-28-example-break-both-loops",
+      "title": "2.4.28 Worked Example — Breaking Out of Both Loops",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-4-29-reading-nested-loop-cost",
+      "title": "2.4.29 Reading — Nested Loops Get Expensive",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-4-3-example-predict-which-loop",
+      "title": "2.4.3 Worked Example — Predict: Which Loop Fits?",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-30-lab-triangle-of-stars",
+      "title": "2.4.30 Triangle of Stars",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-4-31-lab-fix-duplicate-pairs",
+      "title": "2.4.31 Fix the Duplicate Pairs",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-4-32-a2-4-2-grid-pattern",
+      "title": "2.4.32 A2.4.2 — Print a Grid Pattern",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-4-33-challenges",
+      "title": "2.4.33 Challenges — Optional Stretch",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-4-4-lab-write-both-loops",
+      "title": "2.4.4 Write Both: Known Count, Unknown Count",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-5-reading-do-while",
+      "title": "2.4.5 Reading — The do...while Loop",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-6-example-while-vs-do-while",
+      "title": "2.4.6 Worked Example — while vs do...while: The Difference in One Line",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-7-diagram-do-while",
+      "title": "2.4.7 Chart the Code — do...while",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "diagram",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-8-lab-do-while-count",
+      "title": "2.4.8 do...while: Count 1 to 5",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-4-9-reading-break",
+      "title": "2.4.9 Reading — Leaving Early with break",
+      "unit": "2.4 Loop Control and Nested Loops",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-5-1-slides",
+      "title": "2.5.1 Slides — Handling Errors with try/catch",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "slides",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "2-5-10-reading-empty-catch-trap",
+      "title": "2.5.10 Reading — The Empty catch Trap",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-11-lab-fix-silent-catch",
+      "title": "2.5.11 Fix the Silent Catch",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-12-reading-error-object",
+      "title": "2.5.12 Reading — Reading the Error Object",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-13-example-reporting-vs-guessing",
+      "title": "2.5.13 Worked Example — Reporting Instead of Guessing",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-14-lab-report-the-error",
+      "title": "2.5.14 Report the Error",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-15-reading-throwing-errors",
+      "title": "2.5.15 Reading — Throwing Your Own Errors",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-16-example-validate-then-trust",
+      "title": "2.5.16 Worked Example — Validate, Then Trust",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-17-chart-validate-before-trust",
+      "title": "2.5.17 Chart the Code — Validate Before You Trust",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "diagram",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-18-reading-throw-vs-if",
+      "title": "2.5.18 Reading — throw vs if: The Distance Rule",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-19-lab-reject-bad-input",
+      "title": "2.5.19 Reject the Bad Input",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-2-reading-what-errors-do",
+      "title": "2.5.2 Reading — What an Error Actually Does",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-20-lab-after-a-throw",
+      "title": "2.5.20 What Happens After a throw?",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-21-reading-finally",
+      "title": "2.5.21 Reading — Cleaning Up with finally",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-22-lab-when-finally-runs",
+      "title": "2.5.22 When Does finally Run?",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-23-reading-limits-of-try-catch",
+      "title": "2.5.23 Reading — What try...catch Cannot Do",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-24-lab-guard-only-inside",
+      "title": "2.5.24 Guard Only What's Inside",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-25-lab-predict-try-catch-finally",
+      "title": "2.5.25 Predict, Then Run: try/catch/finally Together",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-26-a2-5-1-loop-with-try-catch",
+      "title": "2.5.26 A2.5.1 — Loop with try/catch",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-27-challenges",
+      "title": "2.5.27 Challenges — Optional Stretch",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-3-lab-runtime-or-syntax",
+      "title": "2.5.3 Runtime or Syntax?",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-4-reading-try-catch",
+      "title": "2.5.4 Reading — try...catch: Attempt and Recover",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "reading",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-5-example-wrap-what-can-fail",
+      "title": "2.5.5 Worked Example — Only Wrap What Can Fail",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "example",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-6-lab-wrap-only-risk",
+      "title": "2.5.6 Wrap Only What Can Fail",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-7-chart-try-catch",
+      "title": "2.5.7 Chart the Code — try/catch as a Flowchart",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "diagram",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-8-lab-catch-first-error",
+      "title": "2.5.8 Catch Your First Error",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
+    },
+    {
+      "id": "2-5-9-lab-what-runs",
+      "title": "2.5.9 What Runs, What Doesn't",
+      "unit": "2.5 Handling Errors with try/catch",
+      "preview": "console",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 7
     },
     {
       "id": "3-1-1-slides",
