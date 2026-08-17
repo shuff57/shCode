@@ -1,12 +1,12 @@
 {
   "id": "3-2-5-lab-sum-array",
-  "title": "3.2.5 Sum an Array",
+  "title": "3.3.5 Sum an Array",
   "description": "Use a for loop and .length to add up all numbers in an array, then log the total. Auto-graded.",
   "type": "assignment",
   "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "3.2 Arrays",
+  "unit": "3.3 Arrays",
   "preview": "console",
   "week": 8,
   "slos": [

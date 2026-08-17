@@ -1,12 +1,12 @@
 {
   "id": "6-1-12-challenges",
-  "title": "6.1.12 Challenges",
+  "title": "6.2.7 Challenges",
   "description": "Pick one (or more) Groups stretch challenges — add a lives counter to Apple Catcher, vary apple sizes for varied points, or implement a `cull()` helper. Auto-graded.",
   "type": "challenge",
   "difficulty": "advanced",
   "estimateMins": 30,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "6.1 Groups and Overlaps",
+  "unit": "6.2 Overlaps and Collisions",
   "preview": "shplay",
   "week": 13,
   "slos": [

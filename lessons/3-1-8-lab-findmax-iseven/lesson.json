@@ -1,6 +1,6 @@
 {
   "id": "3-1-8-lab-findmax-iseven",
-  "title": "3.1.10 findMax & isEven",
+  "title": "3.1.5 findMax & isEven",
   "description": "Define two functions: findMax(a, b) that returns the larger number, and isEven(n) that returns true when n is even. Auto-graded.",
   "type": "assignment",
   "difficulty": "beginner",

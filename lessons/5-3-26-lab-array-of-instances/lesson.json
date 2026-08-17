@@ -1,12 +1,12 @@
 {
   "id": "5-3-26-lab-array-of-instances",
-  "title": "5.3.27 Lab — An array of Enemies",
+  "title": "5.4.12 Lab — An array of Enemies",
   "description": "Store five Enemy instances in a single array by pushing new Enemy(...) calls into `enemies` — practice managing many instances without separate named variables.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
+  "unit": "5.4 Writing Your Own Classes",
   "preview": "shplay",
   "week": 12,
   "slos": [

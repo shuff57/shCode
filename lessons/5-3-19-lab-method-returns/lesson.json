@@ -1,12 +1,12 @@
 {
   "id": "5-3-19-lab-method-returns",
-  "title": "5.3.19 Lab — Method that returns a value",
+  "title": "5.4.4 Lab — Method that returns a value",
   "description": "Add `Counter.isHigh()` which returns `true` when `this.n > 10`. The driver uses the return value to color the display red.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
+  "unit": "5.4 Writing Your Own Classes",
   "preview": "shplay",
   "week": 12,
   "slos": [

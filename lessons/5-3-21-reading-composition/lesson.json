@@ -1,12 +1,12 @@
 {
   "id": "5-3-21-reading-composition",
-  "title": "5.3.22 Reading — Why `this.sprite`, not `extends Sprite`",
+  "title": "5.4.7 Reading — Why `this.sprite`, not `extends Sprite`",
   "description": "Composition over inheritance: why wrapping a Sprite as `this.sprite` is safer than inheriting from it. Read before the sprite mutation labs.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 6,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
+  "unit": "5.4 Writing Your Own Classes",
   "preview": "reading",
   "week": 12,
   "slos": [

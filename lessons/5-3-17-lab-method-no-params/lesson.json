@@ -1,12 +1,12 @@
 {
   "id": "5-3-17-lab-method-no-params",
-  "title": "5.3.17 Lab — Method with no params",
+  "title": "5.4.2 Lab — Method with no params",
   "description": "Write `Counter.tick()` — a method that takes no arguments and mutates `this.n`. First method you write from scratch.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
+  "unit": "5.4 Writing Your Own Classes",
   "preview": "shplay",
   "week": 12,
   "slos": [

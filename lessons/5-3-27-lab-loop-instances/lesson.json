@@ -1,12 +1,12 @@
 {
   "id": "5-3-27-lab-loop-instances",
-  "title": "5.3.28 Lab — Loop over an array of instances",
+  "title": "5.4.13 Lab — Loop over an array of instances",
   "description": "Write a `for...of` loop in `draw()` that calls `.render()` on each enemy — dispatching a method to every element in the array with one loop.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
+  "unit": "5.4 Writing Your Own Classes",
   "preview": "shplay",
   "week": 12,
   "slos": [

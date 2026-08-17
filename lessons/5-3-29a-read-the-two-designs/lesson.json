@@ -1,12 +1,12 @@
 {
   "id": "5-3-29a-read-the-two-designs",
-  "title": "5.3.31a Read the Charts — Three Variables or Three Objects",
+  "title": "5.4.16a Read the Charts — Three Variables or Three Objects",
   "description": "The same feature drawn twice, procedural and object-oriented. No drawing — read both and answer what happens when a fourth enemy arrives.",
   "type": "lesson",
   "difficulty": "intermediate",
   "estimateMins": 15,
   "category": "Unit 2: shPlay Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
+  "unit": "5.4 Writing Your Own Classes",
   "preview": "reading",
   "slos": [
     "SLO-2",

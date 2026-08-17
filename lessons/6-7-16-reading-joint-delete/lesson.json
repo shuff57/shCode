@@ -1,12 +1,12 @@
 {
   "id": "6-7-16-reading-joint-delete",
-  "title": "6.7.17 Reading — shplay docs: joint.delete()",
+  "title": "6.8.6 Reading — shplay docs: joint.delete()",
   "description": "How joint.delete() releases a constraint at runtime so previously-joined sprites become independent. This is the release step in the slingshot pattern.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "6.7 Advanced Input and Joints",
+  "unit": "6.8 Joints",
   "preview": "reading",
   "week": 17,
   "slos": [

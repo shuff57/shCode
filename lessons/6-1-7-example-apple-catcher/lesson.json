@@ -1,11 +1,11 @@
 {
   "id": "6-1-7-example-apple-catcher",
-  "title": "6.1.7 Worked Example — Apple Catcher",
+  "title": "6.2.2 Worked Example — Apple Catcher",
   "type": "lesson",
   "difficulty": "intermediate",
   "estimateMins": 15,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "6.1 Groups and Overlaps",
+  "unit": "6.2 Overlaps and Collisions",
   "preview": "example",
   "week": 13,
   "slos": [

@@ -1,12 +1,12 @@
 {
   "id": "5-3-28-reading-parallel-vs-classes",
-  "title": "5.3.29 Reading — Parallel Arrays vs Classes",
+  "title": "5.4.14 Reading — Parallel Arrays vs Classes",
   "description": "Side-by-side comparison of the same problem (an 'enemy fleet') solved two ways: with parallel arrays (procedural) and with an array of class instances (OOP). Read between the Enemy class example and the Procedural-vs-OOP example.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
+  "unit": "5.4 Writing Your Own Classes",
   "preview": "reading",
   "week": 12,
   "slos": [

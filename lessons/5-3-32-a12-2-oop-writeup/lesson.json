@@ -1,12 +1,12 @@
 {
   "id": "5-3-32-a12-2-oop-writeup",
-  "title": "5.3.34 Procedural vs OOP Writeup",
+  "title": "5.4.19 Procedural vs OOP Writeup",
   "description": "Comparison of procedural and object-oriented programming.",
   "type": "assignment",
   "difficulty": "beginner",
   "estimateMins": 40,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
+  "unit": "5.4 Writing Your Own Classes",
   "preview": "assignment",
   "week": 12,
   "slos": [

@@ -1,12 +1,12 @@
 {
   "id": "3-1-6-reading-defensive-copying",
-  "title": "3.1.7 Reading — Defensive Copying: [...] and {...}",
+  "title": "3.6.2 Reading — Defensive Copying: [...] and {...}",
   "description": "Protect the original by copying before you change: spread [...arr] makes a new array so mutations stay in your copy.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "3.1 Functions: Definition and Calls",
+  "unit": "3.6 Functions: Pass by Value/Reference",
   "preview": "reading",
   "week": 7,
   "slos": [

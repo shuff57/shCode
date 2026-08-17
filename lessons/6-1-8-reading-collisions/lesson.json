@@ -1,12 +1,12 @@
 {
   "id": "6-1-8-reading-collisions",
-  "title": "6.1.8 Reading — shplay docs: Collisions + Overlaps",
+  "title": "6.2.3 Reading — shplay docs: Collisions + Overlaps",
   "description": "shplay docs chapter on collisions and overlap detection. Read before `2.3.10 Safe Despawn`.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "6.1 Groups and Overlaps",
+  "unit": "6.2 Overlaps and Collisions",
   "preview": "reading",
   "week": 13,
   "slos": [

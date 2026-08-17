@@ -1,12 +1,12 @@
 {
   "id": "3-2-7-arrays",
-  "title": "3.2.8 Arrays",
+  "title": "3.3.8 Arrays",
   "description": "Work with lists of values: create, add, remove, and iterate.",
   "type": "assignment",
   "difficulty": "intermediate",
   "estimateMins": 40,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "3.2 Arrays",
+  "unit": "3.3 Arrays",
   "preview": "console",
   "week": 8,
   "slos": [

@@ -1410,7 +1410,7 @@
     },
     {
       "id": "3-1-10-functions",
-      "title": "3.1.12 Functions",
+      "title": "3.1.7 Functions",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1434,47 +1434,47 @@
     },
     {
       "id": "3-1-3-reading-parameters-return",
-      "title": "3.1.4 Reading — Parameters & Return Values",
-      "unit": "3.1 Functions: Definition and Calls",
+      "title": "3.2.1 Reading — Parameters & Return Values",
+      "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
     {
       "id": "3-1-4-reading-scope",
-      "title": "3.1.5 Reading — Scope: Local vs Global",
-      "unit": "3.1 Functions: Definition and Calls",
+      "title": "3.2.2 Reading — Scope: Local vs Global",
+      "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
     {
       "id": "3-1-5-reading-pass-by-value-reference",
-      "title": "3.1.6 Reading — Pass by Value vs Reference",
-      "unit": "3.1 Functions: Definition and Calls",
+      "title": "3.6.1 Reading — Pass by Value vs Reference",
+      "unit": "3.6 Functions: Pass by Value/Reference",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
     {
       "id": "3-1-6-reading-defensive-copying",
-      "title": "3.1.7 Reading — Defensive Copying: [...] and {...}",
-      "unit": "3.1 Functions: Definition and Calls",
+      "title": "3.6.2 Reading — Defensive Copying: [...] and {...}",
+      "unit": "3.6 Functions: Pass by Value/Reference",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
     {
       "id": "3-1-7-a7-2-pass-by-reference-writeup",
-      "title": "3.1.8 Pass by Value vs Reference",
-      "unit": "3.1 Functions: Definition and Calls",
+      "title": "3.6.3 Pass by Value vs Reference",
+      "unit": "3.6 Functions: Pass by Value/Reference",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
     {
       "id": "3-1-7a-a3-1-0-flowchart-gate",
-      "title": "3.1.9a A3.1.0 — Chart Before You Refactor",
+      "title": "3.1.4a A3.1.0 — Chart Before You Refactor",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1482,7 +1482,7 @@
     },
     {
       "id": "3-1-8-lab-findmax-iseven",
-      "title": "3.1.10 findMax & isEven",
+      "title": "3.1.5 findMax & isEven",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1490,7 +1490,7 @@
     },
     {
       "id": "3-1-9-lab-sum-to-n",
-      "title": "3.1.11 Sum 1 to N",
+      "title": "3.1.6 Sum 1 to N",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1498,64 +1498,64 @@
     },
     {
       "id": "3-2-1-slides",
-      "title": "3.2.1 Slides — Arrays",
-      "unit": "3.2 Arrays",
+      "title": "3.3.1 Slides — Arrays",
+      "unit": "3.3 Arrays",
       "preview": "slides",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "3-2-2-reading-array-basics",
-      "title": "3.2.2 Reading — Array Basics: Index, push, pop",
-      "unit": "3.2 Arrays",
+      "title": "3.3.2 Reading — Array Basics: Index, push, pop",
+      "unit": "3.3 Arrays",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8
     },
     {
       "id": "3-2-3-reading-array-iteration",
-      "title": "3.2.3 Reading — Looping Over Arrays (for / for…of)",
-      "unit": "3.2 Arrays",
+      "title": "3.3.3 Reading — Looping Over Arrays (for / for…of)",
+      "unit": "3.3 Arrays",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8
     },
     {
       "id": "3-2-4-reading-split-lines",
-      "title": "3.2.4 Reading — Splitting Text into Lines (.split)",
-      "unit": "3.2 Arrays",
+      "title": "3.3.4 Reading — Splitting Text into Lines (.split)",
+      "unit": "3.3 Arrays",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8
     },
     {
       "id": "3-2-5-lab-sum-array",
-      "title": "3.2.5 Sum an Array",
-      "unit": "3.2 Arrays",
+      "title": "3.3.5 Sum an Array",
+      "unit": "3.3 Arrays",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8
     },
     {
       "id": "3-2-6-example-menu-loop",
-      "title": "3.2.6 Worked Example — A tiny menu loop",
-      "unit": "3.2 Arrays",
+      "title": "3.3.6 Worked Example — A tiny menu loop",
+      "unit": "3.3 Arrays",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8
     },
     {
       "id": "3-2-6a-chart-the-array-loop",
-      "title": "3.2.7a Chart the Code — Looping Over an Array",
-      "unit": "3.2 Arrays",
+      "title": "3.3.7a Chart the Code — Looping Over an Array",
+      "unit": "3.3 Arrays",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "3-2-7-arrays",
-      "title": "3.2.8 Arrays",
-      "unit": "3.2 Arrays",
+      "title": "3.3.8 Arrays",
+      "unit": "3.3 Arrays",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8
@@ -1858,32 +1858,32 @@
     },
     {
       "id": "5-3-16-reading-methods-intro",
-      "title": "5.3.16 Reading — Methods: functions that live on a class",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.1 Reading — Methods: functions that live on a class",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-17-lab-method-no-params",
-      "title": "5.3.17 Lab — Method with no params",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.2 Lab — Method with no params",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-18-lab-method-with-params",
-      "title": "5.3.18 Lab — Method with parameters",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.3 Lab — Method with parameters",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-19-lab-method-returns",
-      "title": "5.3.19 Lab — Method that returns a value",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.4 Lab — Method that returns a value",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
@@ -1898,96 +1898,96 @@
     },
     {
       "id": "5-3-20-lab-method-calls-method",
-      "title": "5.3.20 Lab — A method calling `this.otherMethod()`",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.5 Lab — A method calling `this.otherMethod()`",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-20a-chart-the-method-chain",
-      "title": "5.3.21a Chart the Code — A Method That Calls a Method",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.6a Chart the Code — A Method That Calls a Method",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "diagram",
       "category": "Unit 2: shPlay Game Development",
       "week": null
     },
     {
       "id": "5-3-21-reading-composition",
-      "title": "5.3.22 Reading — Why `this.sprite`, not `extends Sprite`",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.7 Reading — Why `this.sprite`, not `extends Sprite`",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-22-lab-mutate-sprite-prop",
-      "title": "5.3.23 Lab — Mutate `this.sprite.x` from a method",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.8 Lab — Mutate `this.sprite.x` from a method",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-23-lab-cleanup",
-      "title": "5.3.24 Lab — Cleanup with `this.sprite.delete()`",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.9 Lab — Cleanup with `this.sprite.delete()`",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-24-example-enemy-class",
-      "title": "5.3.25 Worked Example — Write an Enemy class (integration)",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.10 Worked Example — Write an Enemy class (integration)",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-25-lab-three-vars",
-      "title": "5.3.26 Lab — Three Enemies in three variables",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.11 Lab — Three Enemies in three variables",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-26-lab-array-of-instances",
-      "title": "5.3.27 Lab — An array of Enemies",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.12 Lab — An array of Enemies",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-27-lab-loop-instances",
-      "title": "5.3.28 Lab — Loop over an array of instances",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.13 Lab — Loop over an array of instances",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-28-reading-parallel-vs-classes",
-      "title": "5.3.29 Reading — Parallel Arrays vs Classes",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.14 Reading — Parallel Arrays vs Classes",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-29-example-proc-vs-oop",
-      "title": "5.3.30 Worked Example — Procedural vs OOP side-by-side",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.15 Worked Example — Procedural vs OOP side-by-side",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-29a-read-the-two-designs",
-      "title": "5.3.31a Read the Charts — Three Variables or Three Objects",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.16a Read the Charts — Three Variables or Three Objects",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "category": "Unit 2: shPlay Game Development",
       "week": null
@@ -2002,40 +2002,40 @@
     },
     {
       "id": "5-3-30-reading-when-oop",
-      "title": "5.3.32 Reading — When to reach for OOP (3-question checklist)",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.17 Reading — When to reach for OOP (3-question checklist)",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-31-a12-1-collectible",
-      "title": "5.3.33 Collectible Class",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.18 Collectible Class",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-32-a12-2-oop-writeup",
-      "title": "5.3.34 Procedural vs OOP Writeup",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.19 Procedural vs OOP Writeup",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-33-reading-oop-vocab",
-      "title": "5.3.35 Reading — Encapsulation, inheritance, polymorphism (vocabulary only)",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.20 Reading — Encapsulation, inheritance, polymorphism (vocabulary only)",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-34-challenges",
-      "title": "5.3.36 Challenges",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "title": "5.4.21 Challenges",
+      "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
@@ -2098,24 +2098,24 @@
     },
     {
       "id": "6-1-10-example-safe-despawn",
-      "title": "6.1.10 Worked Example — Safe Despawn",
-      "unit": "6.1 Groups and Overlaps",
+      "title": "6.2.5 Worked Example — Safe Despawn",
+      "unit": "6.2 Overlaps and Collisions",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-11-a13-1-asteroid-field",
-      "title": "6.1.11 Asteroid Field",
-      "unit": "6.1 Groups and Overlaps",
+      "title": "6.2.6 Asteroid Field",
+      "unit": "6.2 Overlaps and Collisions",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-12-challenges",
-      "title": "6.1.12 Challenges",
-      "unit": "6.1 Groups and Overlaps",
+      "title": "6.2.7 Challenges",
+      "unit": "6.2 Overlaps and Collisions",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
@@ -2154,32 +2154,32 @@
     },
     {
       "id": "6-1-6-video-overlaps",
-      "title": "6.1.6 Video — overlaps() boolean vs callback",
-      "unit": "6.1 Groups and Overlaps",
+      "title": "6.2.1 Video — overlaps() boolean vs callback",
+      "unit": "6.2 Overlaps and Collisions",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-7-example-apple-catcher",
-      "title": "6.1.7 Worked Example — Apple Catcher",
-      "unit": "6.1 Groups and Overlaps",
+      "title": "6.2.2 Worked Example — Apple Catcher",
+      "unit": "6.2 Overlaps and Collisions",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-8-reading-collisions",
-      "title": "6.1.8 Reading — shplay docs: Collisions + Overlaps",
-      "unit": "6.1 Groups and Overlaps",
+      "title": "6.2.3 Reading — shplay docs: Collisions + Overlaps",
+      "unit": "6.2 Overlaps and Collisions",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-9-video-remove-bug",
-      "title": "6.1.9 Video — The remove-during-iteration bug",
-      "unit": "6.1 Groups and Overlaps",
+      "title": "6.2.4 Video — The remove-during-iteration bug",
+      "unit": "6.2 Overlaps and Collisions",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
@@ -2882,72 +2882,72 @@
     },
     {
       "id": "6-7-11-video-joints-intro",
-      "title": "6.7.12 Video — Joints in shplay",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.8.1 Video — Joints in shplay",
+      "unit": "6.8 Joints",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-12-reading-distance-joint",
-      "title": "6.7.13 Reading — shplay docs: DistanceJoint",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.8.2 Reading — shplay docs: DistanceJoint",
+      "unit": "6.8 Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-13-example-distance-pendulum",
-      "title": "6.7.14 Worked Example — Pendulum with DistanceJoint",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.8.3 Worked Example — Pendulum with DistanceJoint",
+      "unit": "6.8 Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-14-reading-hinge-joint",
-      "title": "6.7.15 Reading — shplay docs: HingeJoint",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.8.4 Reading — shplay docs: HingeJoint",
+      "unit": "6.8 Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-15-example-hinge-arm",
-      "title": "6.7.16 Worked Example — Rotating Arm with HingeJoint",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.8.5 Worked Example — Rotating Arm with HingeJoint",
+      "unit": "6.8 Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-16-reading-joint-delete",
-      "title": "6.7.17 Reading — shplay docs: joint.delete()",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.8.6 Reading — shplay docs: joint.delete()",
+      "unit": "6.8 Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-17-reading-applyforce",
-      "title": "6.7.18 Reading — shplay docs: applyForce(fx, fy)",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.7.12 Reading — shplay docs: applyForce(fx, fy)",
+      "unit": "6.7 Advanced Input",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-18-reading-vector-ab",
-      "title": "6.7.19 Reading — Vector from A to B",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.7.13 Reading — Vector from A to B",
+      "unit": "6.7 Advanced Input",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-19-example-launch-force",
-      "title": "6.7.20 Worked Example — Launch a Sprite with applyForce",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.7.14 Worked Example — Launch a Sprite with applyForce",
+      "unit": "6.7 Advanced Input",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
@@ -2962,88 +2962,88 @@
     },
     {
       "id": "6-7-20-video-slingshot",
-      "title": "6.7.21 Video — The Slingshot Pattern",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.7.15 Video — The Slingshot Pattern",
+      "unit": "6.7 Advanced Input",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-21-example-slingshot",
-      "title": "6.7.22 Worked Example — Slingshot End-to-End",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.7.16 Worked Example — Slingshot End-to-End",
+      "unit": "6.7 Advanced Input",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-21a-chart-the-slingshot",
-      "title": "6.7.23a Chart the Code — The Slingshot",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.7.17a Chart the Code — The Slingshot",
+      "unit": "6.7 Advanced Input",
       "preview": "diagram",
       "category": "Unit 2: shPlay Game Development",
       "week": null
     },
     {
       "id": "6-7-22-video-two-player",
-      "title": "6.7.24 Video — Two-Player Local Input",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.7.18 Video — Two-Player Local Input",
+      "unit": "6.7 Advanced Input",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-23-reading-two-schemes",
-      "title": "6.7.25 Reading — Two Key Schemes, Independent State",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.7.19 Reading — Two Key Schemes, Independent State",
+      "unit": "6.7 Advanced Input",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-24-reading-bounciness",
-      "title": "6.7.26 Reading — shplay docs: sprite.bounciness",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.7.20 Reading — shplay docs: sprite.bounciness",
+      "unit": "6.7 Advanced Input",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-25-example-bounciness-compare",
-      "title": "6.7.27 Worked Example — Bounciness Comparison",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.7.21 Worked Example — Bounciness Comparison",
+      "unit": "6.7 Advanced Input",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-26-example-two-paddles",
-      "title": "6.7.28 Worked Example — Two Paddles, Two Schemes",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.7.22 Worked Example — Two Paddles, Two Schemes",
+      "unit": "6.7 Advanced Input",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-27-a17-1-pong-sumo",
-      "title": "6.7.29 Two-Player Pong-Sumo",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.7.23 Two-Player Pong-Sumo",
+      "unit": "6.7 Advanced Input",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-28-challenges",
-      "title": "6.7.30 Challenges — SliderJoint, Trebuchet, Swinging Rope",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.7.24 Challenges — SliderJoint, Trebuchet, Swinging Rope",
+      "unit": "6.7 Advanced Input",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-29-video-wrap",
-      "title": "6.7.31 Video — Wrap and Capstone Preview",
-      "unit": "6.7 Advanced Input and Joints",
+      "title": "6.7.25 Video — Wrap and Capstone Preview",
+      "unit": "6.7 Advanced Input",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17

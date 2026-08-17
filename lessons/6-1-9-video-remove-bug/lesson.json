@@ -1,12 +1,12 @@
 {
   "id": "6-1-9-video-remove-bug",
-  "title": "6.1.9 Video — The remove-during-iteration bug",
+  "title": "6.2.4 Video — The remove-during-iteration bug",
   "description": "Live demo of why `for (let i = 0; i < group.length; i++)` + `.delete()` skips items, and how to fix it. Watch before `2.3.10 Safe Despawn`.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 2,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "6.1 Groups and Overlaps",
+  "unit": "6.2 Overlaps and Collisions",
   "preview": "video",
   "week": 13,
   "slos": [

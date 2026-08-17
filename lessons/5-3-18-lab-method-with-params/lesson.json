@@ -1,12 +1,12 @@
 {
   "id": "5-3-18-lab-method-with-params",
-  "title": "5.3.18 Lab — Method with parameters",
+  "title": "5.4.3 Lab — Method with parameters",
   "description": "Add `Counter.addBy(n)` — a method that takes an argument and uses it to increment `this.n`. Keys 1/2/3 add different amounts.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
+  "unit": "5.4 Writing Your Own Classes",
   "preview": "shplay",
   "week": 12,
   "slos": [

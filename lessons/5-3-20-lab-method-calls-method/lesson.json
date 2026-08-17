@@ -1,12 +1,12 @@
 {
   "id": "5-3-20-lab-method-calls-method",
-  "title": "5.3.20 Lab — A method calling `this.otherMethod()`",
+  "title": "5.4.5 Lab — A method calling `this.otherMethod()`",
   "description": "Write `Counter.bigStep()` which calls `this.addBy(5)` and returns `this.isHigh()` — one method dispatching another on the same instance.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
+  "unit": "5.4 Writing Your Own Classes",
   "preview": "shplay",
   "week": 12,
   "slos": [

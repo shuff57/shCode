@@ -1,12 +1,12 @@
 {
   "id": "5-3-16-reading-methods-intro",
-  "title": "5.3.16 Reading — Methods: functions that live on a class",
+  "title": "5.4.1 Reading — Methods: functions that live on a class",
   "description": "Method declaration syntax: inside a class body, methods are written without the `function` keyword. Read before the method labs.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 6,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
+  "unit": "5.4 Writing Your Own Classes",
   "preview": "reading",
   "week": 12,
   "slos": [

@@ -1,12 +1,12 @@
 {
   "id": "5-3-25-lab-three-vars",
-  "title": "5.3.26 Lab — Three Enemies in three variables",
+  "title": "5.4.11 Lab — Three Enemies in three variables",
   "description": "Instantiate e1, e2, and e3 from the Enemy class at three different positions — three independent instances, each in its own named variable.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 6,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
+  "unit": "5.4 Writing Your Own Classes",
   "preview": "shplay",
   "week": 12,
   "slos": [

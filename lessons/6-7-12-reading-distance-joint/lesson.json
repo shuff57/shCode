@@ -1,12 +1,12 @@
 {
   "id": "6-7-12-reading-distance-joint",
-  "title": "6.7.13 Reading — shplay docs: DistanceJoint",
+  "title": "6.8.2 Reading — shplay docs: DistanceJoint",
   "description": "How DistanceJoint constrains two sprites to stay at a fixed distance from each other. Read this before the pendulum worked example.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "6.7 Advanced Input and Joints",
+  "unit": "6.8 Joints",
   "preview": "reading",
   "week": 17,
   "slos": [
