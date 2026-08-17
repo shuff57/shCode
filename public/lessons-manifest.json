@@ -3105,46 +3105,6 @@
       "week": 17
     },
     {
-      "id": "basic-html",
-      "title": "Basic HTML",
-      "unit": null,
-      "preview": null,
-      "category": null,
-      "week": null
-    },
-    {
-      "id": "build-a-cat-photo-app",
-      "title": "Build a Cat Photo App",
-      "unit": null,
-      "preview": null,
-      "category": null,
-      "week": null
-    },
-    {
-      "id": "debug-camper-bot",
-      "title": "Debug Camper Bot",
-      "unit": null,
-      "preview": null,
-      "category": null,
-      "week": null
-    },
-    {
-      "id": "debug-pet-adoption",
-      "title": "Fix Image and Link Attributes",
-      "unit": null,
-      "preview": null,
-      "category": null,
-      "week": null
-    },
-    {
-      "id": "html-intro",
-      "title": "HTML Intro",
-      "unit": null,
-      "preview": null,
-      "category": null,
-      "week": null
-    },
-    {
       "id": "q5play-bounce",
       "title": "5.2.1 Bouncy Ball",
       "unit": "5.2 Physics Feel",
