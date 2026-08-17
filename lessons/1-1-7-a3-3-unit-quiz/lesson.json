@@ -1,55 +1,158 @@
 {
   "id": "1-1-7-a3-3-unit-quiz",
   "title": "1.1.23 Unit 1.1 Quiz",
-  "description": "Short-answer check on types, variables, vocabulary, and style — closes Unit 1.1. AI-graded with hints.",
+  "description": "Ten multiple-choice questions on typeof, declarations, vocabulary and the class style guide. Checked instantly.",
   "type": "assignment",
-  "estimateMins": 20,
+  "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.1 Foundations",
-  "preview": "assignment",
+  "preview": "quiz",
   "week": 3,
   "slos": [
     "SLO-2"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "aiGrader": {
-    "rubricTitle": "Unit 1.1 Quiz — AI-graded rubric",
-    "model": "deepseek-v4-flash:0731-cloud",
-    "contextDocs": [],
-    "prompt": "Answer all four parts. Label each part (A, B, C, D) in your response.\n\nPart A — Data types. For each expression, write what `typeof` returns:\n1. typeof \"42\"\n2. typeof 42\n3. typeof true\n4. typeof undefined\n5. typeof null\n\nPart B — Fix the declarations. Each line below is broken. Rewrite it correctly AND say in a few words what was wrong:\n1. let 2cool = true;\n2. const userName;\n3. let user-name = \"Al\";\n\nPart C — Vocabulary. Define each term in your own words (one sentence each):\n1. variable\n2. constant\n3. data type\n4. comment\n\nPart D — Style violations. Each snippet runs but breaks the class style guide. Name the violation in each:\n1. let x=5\n2. let UserName = \"Al\";\n3. let p = 29.99;",
-    "rubric": [
-      {
-        "id": "part-a-types",
-        "title": "Part A: typeof results correct",
-        "description": "Correct answers: 1) \"string\", 2) \"number\", 3) \"boolean\", 4) \"undefined\", 5) \"object\" (the famous null-is-object quirk). Full credit if at least 4 of 5 are correct, including a reasonable attempt on null. Deny if Part A is missing or most answers are wrong.",
-        "points": 0
-      },
-      {
-        "id": "part-b-fixes",
-        "title": "Part B: declarations fixed with reasons",
-        "description": "Expected fixes: 1) a name cannot start with a digit (rename, e.g. twoCool / isCool); 2) a const must be initialized when declared (const userName = \"...\"); 3) names cannot contain a hyphen — use camelCase (userName). Full credit if at least 2 of 3 are corrected AND the student says what was wrong. Partial reasoning is fine for beginners.",
-        "points": 0
-      },
-      {
-        "id": "part-c-vocab",
-        "title": "Part C: four terms defined",
-        "description": "variable = a named container for a value; constant = a variable that cannot be reassigned (const); data type = the kind of value (number, string, boolean, etc.); comment = text the computer ignores, a note for humans. Full credit if all four are defined accurately in the student's own words. Three solid definitions earns partial.",
-        "points": 0
-      },
-      {
-        "id": "part-d-style",
-        "title": "Part D: style violations named",
-        "description": "Expected: 1) no spaces around `=` (and missing semicolon) — should be let x = 5; 2) variable name should be camelCase (userName), not PascalCase UserName; 3) `p` is not a descriptive name — use something like unitPrice. Full credit if at least 2 of 3 violations are correctly identified.",
-        "points": 0
-      }
-    ]
-  },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-typeof-string",
+        "source": "1.2.23",
+        "question": "What does `typeof \"42\"` give you?",
+        "options": [
+          "\"number\"",
+          "\"string\"",
+          "\"42\"",
+          "\"object\""
+        ],
+        "answer": 1,
+        "explanation": "The quotes make it a string, whatever is inside them. `typeof 42` without quotes is \"number\"."
+      },
+      {
+        "id": "q2-typeof-undefined",
+        "source": "1.2.23",
+        "question": "What does `typeof undefined` give you?",
+        "options": [
+          "\"undefined\"",
+          "\"object\"",
+          "\"null\"",
+          "An error"
+        ],
+        "answer": 0,
+        "explanation": "It answers \"undefined\". That is the one case where the type name and the value name are the same word."
+      },
+      {
+        "id": "q3-typeof-null",
+        "source": "1.2.23 and 1.2.24",
+        "question": "What does `typeof null` give you?",
+        "options": [
+          "\"null\"",
+          "\"undefined\"",
+          "\"object\"",
+          "\"empty\""
+        ],
+        "answer": 2,
+        "explanation": "It answers \"object\" — which is wrong, and is a bug in the language from 1995 that was never fixed because fixing it would break existing sites."
+      },
+      {
+        "id": "q4-bad-declaration",
+        "source": "1.2.2",
+        "question": "What is wrong with `let 2cool = true;`?",
+        "options": [
+          "true has to be in quotes",
+          "A variable name cannot start with a digit",
+          "You have to use const for a boolean",
+          "Nothing — it is valid"
+        ],
+        "answer": 1,
+        "explanation": "Names may contain digits but cannot start with one. `let cool2 = true;` is fine."
+      },
+      {
+        "id": "q5-const-no-value",
+        "source": "1.2.2",
+        "question": "What is wrong with `const userName;`?",
+        "options": [
+          "const names must be in capitals",
+          "userName is a reserved word",
+          "A const must be given its value on the line that declares it, because it can never be reassigned",
+          "Nothing — it is valid"
+        ],
+        "answer": 2,
+        "explanation": "A const gets exactly one chance to be given a value, and that is at declaration. If you need to fill it in later, use let."
+      },
+      {
+        "id": "q6-hyphen",
+        "source": "1.2.2",
+        "question": "What is wrong with `let user-name = \"Al\";`?",
+        "options": [
+          "The hyphen is read as a minus sign, so this is not a valid name",
+          "The value needs to be in single quotes",
+          "Names cannot contain more than one word",
+          "Nothing — it is valid"
+        ],
+        "answer": 0,
+        "explanation": "JavaScript sees `user - name`, a subtraction. Join the words with camelCase instead: `let userName = \"Al\";`"
+      },
+      {
+        "id": "q7-vocab-constant",
+        "source": "1.2.2",
+        "question": "What is a constant?",
+        "options": [
+          "A variable whose value can never be changed once it is set",
+          "A variable that holds a number",
+          "A variable that every part of the program can see",
+          "A value that is written directly into the code"
+        ],
+        "answer": 0,
+        "explanation": "A constant is declared with const and cannot be reassigned. Reach for it whenever a value is not meant to move."
+      },
+      {
+        "id": "q8-vocab-datatype",
+        "source": "1.2.3",
+        "question": "What is a data type?",
+        "options": [
+          "The name you give a variable",
+          "The kind of value something is — text, a number, true/false, and so on",
+          "The amount of memory a program uses",
+          "A comment describing what a variable is for"
+        ],
+        "answer": 1,
+        "explanation": "The type is what kind of thing the value is, which decides what you can do with it — you can add two numbers, but adding two booleans is not meaningful."
+      },
+      {
+        "id": "q9-style-spacing",
+        "source": "1.3.2 and 1.3.3",
+        "question": "What does the class style guide say is wrong with `let x=5`?",
+        "options": [
+          "Nothing — it runs, so it is fine",
+          "It needs spaces around the = and a semicolon at the end, and x is a name that says nothing",
+          "let should be const",
+          "5 needs to be in quotes"
+        ],
+        "answer": 1,
+        "explanation": "It runs, but three things break the guide at once: no spaces around the operator, no semicolon, and a single-letter name."
+      },
+      {
+        "id": "q10-style-case",
+        "source": "1.3.2",
+        "question": "What does the class style guide say is wrong with `let UserName = \"Al\";`?",
+        "options": [
+          "Variable names cannot contain capital letters",
+          "The name is too long",
+          "Variables use camelCase, so the first letter should be lower case — userName",
+          "It should be a const"
+        ],
+        "answer": 2,
+        "explanation": "camelCase means the first word is lower case and later words are capitalised. A capitalised first letter is by convention reserved for classes, which you meet in Chapter 5."
+      }
+    ]
+  }
 }

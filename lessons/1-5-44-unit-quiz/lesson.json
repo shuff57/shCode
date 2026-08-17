@@ -1,78 +1,144 @@
 {
   "id": "1-5-44-unit-quiz",
   "title": "1.5.45 Module 1.5 Quiz",
-  "description": "Computational thinking, pseudocode, flowcharts, recursion, errors and debugging. Eight short answers. AI-graded with hints.",
+  "description": "Nine multiple-choice questions on computational thinking, flowcharts, pseudocode, recursion and reading errors. Checked instantly.",
   "type": "assignment",
-  "estimateMins": 25,
+  "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
-  "preview": "assignment",
+  "preview": "quiz",
   "slos": [
     "SLO-3"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "aiGrader": {
-    "rubricTitle": "Module 1.5 Quiz — AI-graded rubric",
-    "model": "deepseek-v4-flash:0731-cloud",
-    "contextDocs": [],
-    "prompt": "Answer all eight. One or two sentences each is enough.\n\n1. Define computational thinking in one or two sentences, without using the word \"computer\".\n\n2. Name the four techniques of computational thinking, with a one-line description of each.\n\n3. Explain why working out a plan before typing is faster than typing your way to an answer.\n\n4. Name the three flowchart shapes and what each means. Which one has two arrows leaving it, and why?\n\n5. Give one advantage of pseudocode over a flowchart, and one advantage of a flowchart over pseudocode.\n\n6. What is a base case, and what happens to a recursive function that does not have one?\n\n7. Name the three parts of an error message and say what each one tells you.\n\n8. Why is console.log(\"total is \" + total) more useful than console.log(total)?",
-    "rubric": [
-      {
-        "id": "q1-definition",
-        "title": "Q1: defines computational thinking without saying 'computer'",
-        "description": "Student defines it as a problem-solving process that breaks a complex problem into smaller manageable parts and finds systematic approaches. The word 'computer' must not appear in the definition - that constraint is the point of the question. Deny if 'computer' is used, or if the definition is only 'thinking like a programmer'.",
-        "points": 0
-      },
-      {
-        "id": "q2-four-techniques",
-        "title": "Q2: all four techniques named and described",
-        "description": "Names decomposition, pattern recognition, abstraction and algorithms/algorithmic thinking, each with a one-line description that is broadly correct. Credit requires all four named; descriptions may be loose but must not be wrong (e.g. abstraction described as 'breaking things up' is wrong - that is decomposition).",
-        "points": 0
-      },
-      {
-        "id": "q3-plan-first",
-        "title": "Q3: explains why planning first is faster",
-        "description": "Student says a program has two difficulties - working out the steps and writing them - and that doing both at once means you cannot tell which one you are stuck on. Credit any answer expressing that separating the thinking from the syntax saves time. Deny if the answer is only 'it is more organised'.",
-        "points": 0
-      },
-      {
-        "id": "q4-shapes-and-diamond",
-        "title": "Q4: three shapes named, and the diamond explained",
-        "description": "Oval = start/end, rectangle = a step/action, diamond = a decision. Student must also say the diamond has two arrows leaving it because it is a decision with a yes path and a no path. Credit requires both halves.",
-        "points": 0
-      },
-      {
-        "id": "q5-tradeoff",
-        "title": "Q5: one real advantage each way",
-        "description": "For pseudocode: faster to write or edit, handles long programs without becoming enormous. For flowcharts: branching and looping obvious at a glance, better for explaining to someone else. Credit requires one genuine advantage of each. Deny if only one direction is answered.",
-        "points": 0
-      },
-      {
-        "id": "q6-base-case",
-        "title": "Q6: base case defined, and the consequence of omitting it",
-        "description": "A base case is an input simple enough to answer directly without calling itself again; without one the calls never stop and the program hits a stack overflow (RangeError: maximum call stack size exceeded). Credit requires both the definition and the consequence.",
-        "points": 0
-      },
-      {
-        "id": "q7-error-parts",
-        "title": "Q7: the three parts of an error message",
-        "description": "The kind of error (e.g. ReferenceError - what category of problem), the detail (the specific thing, usually naming the offending value or name), and the place (the line number). Credit requires all three with what each tells you.",
-        "points": 0
-      },
-      {
-        "id": "q8-labelled-print",
-        "title": "Q8: says why a labelled print is more useful",
-        "description": "Student says a bare value gives no clue which line or which variable it came from, especially once several prints are running, whereas a labelled one identifies itself. Deny if the answer is only 'it looks nicer' or 'it is clearer' with no reason.",
-        "points": 0
-      }
-    ]
-  },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-definition",
+        "source": "1.5.3",
+        "question": "Which is the best description of computational thinking?",
+        "options": [
+          "Learning to think the way a computer does",
+          "Memorising the syntax of a programming language",
+          "A way of tackling a problem: break it down, spot what repeats, ignore what does not matter, and lay out precise steps",
+          "Doing arithmetic quickly in your head"
+        ],
+        "answer": 2,
+        "explanation": "It is a way of approaching a problem, and it has nothing to do with thinking like a machine — people used it long before computers existed."
+      },
+      {
+        "id": "q2-four-techniques",
+        "source": "1.5.4",
+        "question": "What are the four techniques of computational thinking?",
+        "options": [
+          "Decomposition, pattern recognition, abstraction and algorithmic thinking",
+          "Design, development, testing and deployment",
+          "Sequence, selection, repetition and recursion",
+          "Reading, writing, running and debugging"
+        ],
+        "answer": 0,
+        "explanation": "Those four. The second list is the software life-cycle, and the third is structured programming — different ideas that are easy to mix up."
+      },
+      {
+        "id": "q3-plan-first",
+        "source": "1.5.2",
+        "question": "Why is working out a plan before typing usually faster than typing your way to an answer?",
+        "options": [
+          "Typing slowly is bad for your hands",
+          "You separate deciding what to do from getting it past the computer, so you only fight one problem at a time",
+          "Planning is required before the browser will run your code",
+          "It is not faster — it just looks more professional"
+        ],
+        "answer": 1,
+        "explanation": "Typing your way to an answer means solving the problem and satisfying the syntax at the same time. Planning first splits those apart, and a wrong plan is far cheaper to throw away than wrong code."
+      },
+      {
+        "id": "q4-shapes",
+        "source": "1.5.25",
+        "question": "In a flowchart, what do the oval, the rectangle and the diamond mean?",
+        "options": [
+          "Oval = a decision, rectangle = start or end, diamond = a step",
+          "Oval = start or end, rectangle = a step, diamond = a decision",
+          "Oval = a step, rectangle = a decision, diamond = start or end",
+          "Oval = input, rectangle = output, diamond = a step"
+        ],
+        "answer": 1,
+        "explanation": "Table 1.5.2: oval for start and end, rectangle for a step, diamond for a decision. (This course adds a parallelogram for input and output — see 1.5.29.)"
+      },
+      {
+        "id": "q5-diamond",
+        "source": "1.5.26",
+        "question": "Which flowchart shape has two arrows leaving it, and why?",
+        "options": [
+          "The oval, because a program can start in two places",
+          "The rectangle, because a step can succeed or fail",
+          "The diamond, because it asks a question and the answer sends you down the yes path or the no path",
+          "All of them have two arrows leaving"
+        ],
+        "answer": 2,
+        "explanation": "The diamond is the only one that branches. Everything else has exactly one way out — which is what keeps a chart readable."
+      },
+      {
+        "id": "q6-pseudocode-vs-flowchart",
+        "source": "1.5.27",
+        "question": "Which statement is true about pseudocode and flowcharts?",
+        "options": [
+          "Pseudocode is faster to write and edit; a flowchart makes branching obvious at a glance",
+          "A flowchart is faster to write; pseudocode is better for showing branches",
+          "Pseudocode is better in every way, which is why flowcharts are no longer used",
+          "They are the same thing — one is just drawn instead of typed"
+        ],
+        "answer": 0,
+        "explanation": "They fail in opposite directions. Pseudocode stays a list and scales to long programs; a flowchart gets enormous, but you can see a branch instead of tracing it."
+      },
+      {
+        "id": "q7-base-case",
+        "source": "1.5.33 and 1.5.34",
+        "question": "What is a base case, and what happens without one?",
+        "options": [
+          "The first line of any program — without one the program will not start",
+          "The stopping condition in a recursive function — without one it calls itself forever and crashes",
+          "The simplest test case you write — without one you cannot check your work",
+          "The default branch of an if statement — without one nothing happens"
+        ],
+        "answer": 1,
+        "explanation": "The base case is the case that does not recurse. Leave it out and the function keeps calling itself until the browser gives up with a stack overflow."
+      },
+      {
+        "id": "q8-error-parts",
+        "source": "1.5.38",
+        "question": "An error message has three useful parts. Which are they?",
+        "options": [
+          "The file, the author and the date",
+          "The warning, the suggestion and the fix",
+          "The kind of error, the detail about what went wrong, and the place it happened",
+          "The line number, the column number and the character"
+        ],
+        "answer": 2,
+        "explanation": "In `Uncaught ReferenceError: totl is not defined at line 3` — the kind is ReferenceError, the detail names your typo exactly, and the place is line 3."
+      },
+      {
+        "id": "q9-console-label",
+        "source": "1.5.41 and 1.5.42",
+        "question": "Why is `console.log(\"total is \" + total)` more useful than `console.log(total)`?",
+        "options": [
+          "It runs faster",
+          "It prints the value more accurately",
+          "When several values print, the label tells you which number you are looking at",
+          "Without the label the value will not print at all"
+        ],
+        "answer": 2,
+        "explanation": "A column of bare numbers tells you nothing about which is which. Labelling each one is the difference between output you can debug with and output you have to guess at."
+      }
+    ]
+  }
 }

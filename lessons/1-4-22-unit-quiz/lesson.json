@@ -1,66 +1,131 @@
 {
   "id": "1-4-22-unit-quiz",
   "title": "1.4.22 Module 1.4 Quiz",
-  "description": "Six short answers covering languages, abstraction levels, and the three paradigms. AI-graded with hints.",
+  "description": "Eight multiple-choice questions on purpose-driven languages, levels of abstraction, and the three paradigms. Checked instantly.",
   "type": "assignment",
-  "estimateMins": 20,
+  "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",
-  "preview": "assignment",
+  "preview": "quiz",
   "slos": [
     "SLO-2"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "aiGrader": {
-    "rubricTitle": "Module 1.4 Quiz — AI-graded rubric",
-    "model": "deepseek-v4-flash:0731-cloud",
-    "contextDocs": [],
-    "prompt": "Answer all six. One or two sentences each is enough.\n\n1. Why can a program for a web page not simply be written in SQL?\n\n2. Explain the difference between a low-level and a high-level language, and give one advantage of each.\n\n3. What is a programming paradigm?\n\n4. Name the three structures of structured programming.\n\n5. Give one difference between procedural and object-oriented programming.\n\n6. What is the distinctive habit of functional programming, and why does it make a program easier to test?",
-    "rubric": [
-      {
-        "id": "q1-purpose-driven",
-        "title": "Q1: languages are purpose driven",
-        "description": "Student says SQL is designed for asking questions of a database and cannot build an interface / is not built for that job. Credit any answer resting on purpose rather than on age or speed. Deny answers claiming SQL is 'too slow' or 'too old'.",
-        "points": 0
-      },
-      {
-        "id": "q2-levels",
-        "title": "Q2: both levels defined, with an advantage each",
-        "description": "Student says low-level describes the work in hardware terms and high-level hides those details, AND gives one real advantage of each - typically run speed / control for low-level, and writing speed / fewer mistakes for high-level. Deny if only one level is described, or if no advantage is given for one of them.",
-        "points": 0
-      },
-      {
-        "id": "q3-paradigm",
-        "title": "Q3: paradigm defined as a way of organising code",
-        "description": "Student defines a paradigm as an approach to organising or structuring a program - how it is broken into pieces and how they fit together. Deny if the answer confuses a paradigm with a language, or with syntax.",
-        "points": 0
-      },
-      {
-        "id": "q4-three-structures",
-        "title": "Q4: all three structures named",
-        "description": "Student names sequence, selection and repetition. Accept 'choice'/'branching' for selection and 'loop'/'iteration' for repetition. Credit requires all three.",
-        "points": 0
-      },
-      {
-        "id": "q5-proc-vs-oo",
-        "title": "Q5: a real difference between procedural and object-oriented",
-        "description": "Student gives a genuine difference - typically that procedural keeps data and behaviour separate while object-oriented bundles them, or that a program is a sequence of steps versus a set of interacting objects. Deny vague answers such as 'object-oriented is more modern' or 'OOP uses objects' with nothing about what that changes.",
-        "points": 0
-      },
-      {
-        "id": "q6-functional",
-        "title": "Q6: functional habit named, and linked to testing",
-        "description": "Student names the habit - same input gives the same output, and/or it changes nothing outside itself / produces a new value rather than modifying one - AND connects it to testing: a function depending only on its inputs can be checked on its own, with no setup and nothing else to account for. Deny if the habit is named but the testing link is missing.",
-        "points": 0
-      }
-    ]
-  },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-sql",
+        "source": "1.4.2",
+        "question": "SQL is a language built for asking questions of a database. Why could you not use it to build a web page?",
+        "options": [
+          "SQL is too old to run in a modern browser",
+          "SQL was designed for one job — asking a database questions — and has no way to build an interface",
+          "SQL runs too slowly to keep up with a web page",
+          "SQL can only be used by professional programmers"
+        ],
+        "answer": 1,
+        "explanation": "Languages are purpose driven. SQL does its one job well and simply has no way to build the parts of a page you click on — it is not a matter of age or speed."
+      },
+      {
+        "id": "q2-low-level",
+        "source": "1.4.5",
+        "question": "Which of these best describes a LOW-level language?",
+        "options": [
+          "One that hides hardware details so you say what should happen, not how",
+          "One that only beginners use",
+          "One that makes you describe the work in terms the hardware handles directly",
+          "One that can only run on older computers"
+        ],
+        "answer": 2,
+        "explanation": "Low-level means close to the hardware — you handle details like where each value sits in memory. The first option describes a high-level language."
+      },
+      {
+        "id": "q3-high-level-advantage",
+        "source": "1.4.5",
+        "question": "What do you gain by choosing a high-level language like JavaScript?",
+        "options": [
+          "You write it faster, and whole categories of mistake become impossible",
+          "The program always runs faster than a low-level one would",
+          "Complete control over which memory addresses hold your values",
+          "It is the only kind of language a browser can run"
+        ],
+        "answer": 0,
+        "explanation": "High-level buys writing speed and fewer mistakes; low-level buys run speed and control. Which one wins depends on which resource is scarce for that project."
+      },
+      {
+        "id": "q4-paradigm",
+        "source": "1.4.7",
+        "question": "What is a programming paradigm?",
+        "options": [
+          "The punctuation rules a particular language uses",
+          "Another word for a programming language",
+          "The program you type your code into",
+          "An approach to organising and structuring code"
+        ],
+        "answer": 3,
+        "explanation": "Definition 1.4.2 — a paradigm is an approach to organising and structuring code: how a program is broken into pieces and how those pieces fit together. It is not a language, and it is not syntax."
+      },
+      {
+        "id": "q5-three-structures",
+        "source": "1.4.9 and 1.4.10",
+        "question": "Structured programming says every program can be built from just three structures. Which three?",
+        "options": [
+          "Input, processing and output",
+          "Sequence, selection and repetition",
+          "Variables, functions and objects",
+          "Design, development and testing"
+        ],
+        "answer": 1,
+        "explanation": "Sequence, selection and repetition — and nothing more exotic. There is no fourth structure waiting in a later chapter."
+      },
+      {
+        "id": "q6-selection",
+        "source": "1.4.10",
+        "question": "Which of these is an example of SELECTION?",
+        "options": [
+          "Printing three lines one after another",
+          "Repeating a step until something becomes true",
+          "Choosing between two paths depending on a condition",
+          "Giving a group of steps a name so you can reuse it"
+        ],
+        "answer": 2,
+        "explanation": "Selection is the choice — `if` and `switch`. Doing things in order is sequence; doing something more than once is repetition."
+      },
+      {
+        "id": "q7-proc-vs-oo",
+        "source": "1.4.8 and 1.4.15",
+        "question": "What is the difference between procedural and object-oriented programming?",
+        "options": [
+          "Object-oriented is newer, so it is always the better choice",
+          "Procedural code cannot use variables",
+          "Procedural keeps data and behaviour separate; object-oriented bundles them together",
+          "Object-oriented programs do not need to store any data"
+        ],
+        "answer": 2,
+        "explanation": "That separation is the whole contrast. Procedural is a sequence of steps acting on data held elsewhere; object-oriented is objects that hold their own data and the behaviour that works on it. Neither is better in general."
+      },
+      {
+        "id": "q8-functional-testing",
+        "source": "1.4.18",
+        "question": "A function written in the functional style always gives the same answer for the same input, and changes nothing outside itself. Why does that make it easier to test?",
+        "options": [
+          "Functional programs are shorter, so there is less to test",
+          "You can check it on its own — there is no setup first, and nothing else can affect the answer",
+          "Functional code cannot contain bugs",
+          "The language tests functional code for you automatically"
+        ],
+        "answer": 1,
+        "explanation": "Because it depends on nothing but its inputs, you never have to ask what else happened first. That is exactly what makes it checkable on its own."
+      }
+    ]
+  }
 }

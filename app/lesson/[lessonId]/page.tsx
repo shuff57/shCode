@@ -8,7 +8,7 @@ import { getModule } from '../../../lib/curriculum';
 // Content-only preview types (no code editor). Lessons with an aiGrader or a
 // diagram also render through ContentLessonView so WrittenGrader /
 // DiagramAssignmentView show up.
-const CONTENT_PREVIEWS = new Set(['reading', 'video', 'example', 'slides', 'diagram']);
+const CONTENT_PREVIEWS = new Set(['reading', 'video', 'example', 'slides', 'diagram', 'quiz']);
 
 export async function generateStaticParams() {
   const lessons = await loadLessons();

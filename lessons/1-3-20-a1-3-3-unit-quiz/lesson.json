@@ -1,61 +1,17 @@
 {
   "id": "1-3-20-a1-3-3-unit-quiz",
   "title": "1.3.21 Module 1.3 Quiz",
-  "description": "Naming rules, variable reuse, and the performance myth. Six short answers. AI-graded with hints.",
+  "description": "Six multiple-choice questions on naming, variable reuse, and when a name beats a comment. Checked instantly.",
   "type": "assignment",
-  "estimateMins": 20,
+  "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.3 Documentation and Coding Conventions",
-  "preview": "assignment",
+  "preview": "quiz",
   "slos": [
     "SLO-2"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "aiGrader": {
-    "rubricTitle": "Module 1.3 Quiz — AI-graded rubric",
-    "model": "deepseek-v4-flash:0731-cloud",
-    "contextDocs": [],
-    "prompt": "Answer all six. One or two sentences each is enough.\n\n1. Why is `let a = 5;` a poor variable name? Give a better one and say what your version tells a reader that the original does not.\n\n2. What is the problem with reusing one variable to hold different kinds of values?\n\n3. True or false: using extra variables slows down your program. Explain your answer.\n\n4. Which of these names follow the \"descriptive but concise\" guideline, and why: x, userName, data, num, totalPrice, abc?\n\n5. Name the four data types in this list and say which variable name suits each: a person's name, whether a task is finished, how many items are in a cart, a price with cents.\n\n6. Someone says \"the comment above this line explains it, so the variable name does not matter.\" Give one reason a good name is still better than a comment.",
-    "rubric": [
-      {
-        "id": "q1-single-letter",
-        "title": "Q1: says why a single letter fails, with a better name",
-        "description": "Student explains that `a` carries no information about what the value is, and supplies a specific descriptive alternative. Credit requires both the reason and a replacement name. Deny if only 'it's bad' or only a new name with no reason.",
-        "points": 0
-      },
-      {
-        "id": "q2-reuse",
-        "title": "Q2: names the tracking/debugging cost of reuse",
-        "description": "Student says a reused variable forces the reader to track what it holds at each point, so the name stops describing the contents and bugs get harder to find. Deny if the answer says only that it is 'confusing' with no account of why.",
-        "points": 0
-      },
-      {
-        "id": "q3-performance-myth",
-        "title": "Q3: answers false, and explains",
-        "description": "Student answers FALSE and explains that modern engines and build tools optimise this away, and may even run separate single-purpose variables faster. Deny if the student answers true, or answers false with no explanation.",
-        "points": 0
-      },
-      {
-        "id": "q4-name-sorting",
-        "title": "Q4: sorts the six names with reasons",
-        "description": "Expected: userName and totalPrice follow the guideline; x, data and abc do not; num is weak/borderline. Credit an answer that gets the clear cases right (userName and totalPrice good; x, data, abc bad) and gives a reason grounded in the module's rules. Deny if good and bad are largely mixed up, or if no reasons are given.",
-        "points": 0
-      },
-      {
-        "id": "q5-types-and-names",
-        "title": "Q5: matches types to values with suitable names",
-        "description": "Expected: a person's name is a string (e.g. playerName), whether a task is finished is a boolean (e.g. isComplete), how many items is a number (e.g. itemCount), a price with cents is a number (e.g. unitPrice). Credit three or four correct type-and-name pairings. Deny two or fewer, or names that are single letters.",
-        "points": 0
-      },
-      {
-        "id": "q6-names-vs-comments",
-        "title": "Q6: gives a real reason names beat comments",
-        "description": "Student gives a genuine advantage - a comment can go stale when the code changes while a rename updates everywhere the variable is used, or the name is read at every use while the comment sits in one place. Deny vague answers such as 'names are cleaner' or 'comments are extra work'.",
-        "points": 0
-      }
-    ]
-  },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
@@ -63,5 +19,88 @@
   },
   "steps": [],
   "requirements": [],
-  "assignmentCode": "A1.3.3"
+  "assignmentCode": "A1.3.3",
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-bad-name",
+        "source": "1.3.6 and 1.3.7",
+        "question": "Why is `let a = 5;` a poor variable name?",
+        "options": [
+          "Single letters are illegal in JavaScript",
+          "It says nothing about what the 5 is, so a reader has to work it out from the rest of the code",
+          "It makes the program run more slowly",
+          "Variable names must be at least three characters"
+        ],
+        "answer": 1,
+        "explanation": "It is legal and it is fast — it is just silent. `let sideLength = 5;` tells the next reader what the 5 means without them having to reconstruct it."
+      },
+      {
+        "id": "q2-reuse",
+        "source": "1.3.13, 1.3.14 and 1.3.15",
+        "question": "What is the problem with reusing one variable to hold different kinds of values?",
+        "options": [
+          "JavaScript will refuse to run it",
+          "It uses more memory than separate variables",
+          "The name can only be true for one of them, so the code stops matching what it says",
+          "Nothing — it is good practice, because it keeps the program short"
+        ],
+        "answer": 2,
+        "explanation": "A variable called `temp` that holds a temperature, then a name, then a total is lying two thirds of the time. Separate meanings want separate names."
+      },
+      {
+        "id": "q3-extra-variables",
+        "source": "1.3.14",
+        "question": "True or false: using extra variables slows your program down.",
+        "options": [
+          "True — every variable costs measurable speed",
+          "False — the cost is far too small to matter, and clear names are worth much more",
+          "True — but only in the browser",
+          "False — extra variables actually make programs faster"
+        ],
+        "answer": 1,
+        "explanation": "False. Naming an intermediate value costs essentially nothing at runtime and buys a lot of readability. Do not trade clarity for a saving you cannot measure."
+      },
+      {
+        "id": "q4-concise",
+        "source": "1.3.8",
+        "question": "Which pair of names follows the \"descriptive but concise\" guideline?",
+        "options": [
+          "x and num",
+          "data and abc",
+          "userName and totalPrice",
+          "theNameOfTheCurrentlyLoggedInUser and theGrandTotalOfAllItems"
+        ],
+        "answer": 2,
+        "explanation": "userName and totalPrice say what they hold without becoming a sentence. x, num, data and abc say nothing; the last pair says it three times over."
+      },
+      {
+        "id": "q5-types-and-names",
+        "source": "1.2.3 and 1.3.6",
+        "question": "Which variable would sensibly hold a boolean?",
+        "options": [
+          "let studentName",
+          "let itemCount",
+          "let isTaskFinished",
+          "let priceWithCents"
+        ],
+        "answer": 2,
+        "explanation": "A boolean is true or false, so a yes/no name fits it — `isTaskFinished`. A name, a count and a price are a string and two numbers."
+      },
+      {
+        "id": "q6-name-vs-comment",
+        "source": "1.3.4 and 1.3.6",
+        "question": "Someone says \"the comment above this line explains it, so the variable name does not matter.\" Why is a good name still better?",
+        "options": [
+          "Comments are not allowed in professional code",
+          "The name travels with the variable everywhere it is used; the comment only sits in one place, and can drift out of date",
+          "Comments make the file too large",
+          "A good name makes the program run faster than a comment does"
+        ],
+        "answer": 1,
+        "explanation": "You read the name at every use and the comment only once, at the declaration — and when the code changes, the comment is the part that quietly stops being true."
+      }
+    ]
+  }
 }

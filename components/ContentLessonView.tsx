@@ -7,6 +7,7 @@ import { badgeFor } from '../lib/lesson-badges';
 import CompletionPanel from './CompletionPanel';
 import WrittenGrader from './WrittenGrader';
 import DiagramAssignmentView from './DiagramAssignmentView';
+import QuizView from './QuizView';
 import MarkdownWithLiveBlocks from './MarkdownWithLiveBlocks';
 import HeaderLessonNav from './HeaderLessonNav';
 
@@ -196,7 +197,9 @@ export default function ContentLessonView({ lesson }: Props) {
         </div>
       ) : null}
 
-      {meta.diagram ? (
+      {meta.quiz ? (
+        <QuizView lessonId={lesson.id} config={meta.quiz} />
+      ) : meta.diagram ? (
         <DiagramAssignmentView
           lessonId={lesson.id}
           lessonTitle={lesson.title}

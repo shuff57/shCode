@@ -12,6 +12,7 @@ import {
   Globe,
   FileText,
   Workflow,
+  ListChecks,
 } from 'lucide-react';
 
 export interface PreviewBadge {
@@ -46,6 +47,7 @@ export const PREVIEW_BADGES: Record<string, PreviewBadge> = {
   jscad:      makeBadge(Box,          'JSCAD',          '#ffb86c'),
   html:       makeBadge(Globe,        'HTML',           '#8be9fd'),
   diagram:    makeBadge(Workflow,     'Flowchart',      '#f1fa8c'),
+  quiz:       makeBadge(ListChecks,   'Quiz',           '#f1fa8c'),
 };
 
 export const FALLBACK_BADGE: PreviewBadge = makeBadge(FileText, 'Content', '#888888');
@@ -61,6 +63,9 @@ export function badgeFor(preview: string | undefined): PreviewBadge {
  * so a shplay-runnable can still display as "Challenge" or "Assignment".
  */
 export function badgeForLesson(opts: { type?: string; preview?: string }): PreviewBadge {
+  // A quiz keeps `type: "assignment"` so it still counts as graded work in the
+  // lists — but "Quiz" is the more useful label, so the preview wins here.
+  if (opts.preview === 'quiz') return PREVIEW_BADGES.quiz;
   const typeBadge = opts.type ? PREVIEW_BADGES[opts.type] : undefined;
   if (typeBadge) return typeBadge;
   return badgeFor(opts.preview);

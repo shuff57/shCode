@@ -82,7 +82,7 @@ export interface Lesson {
   assignmentCode?: string;
   category?: string;
   unit?: string;
-  preview?: 'html' | 'console' | 'jscad' | 'shplay' | 'reading' | 'video' | 'example' | 'challenge' | 'assignment' | 'slides' | 'diagram';
+  preview?: 'html' | 'console' | 'jscad' | 'shplay' | 'reading' | 'video' | 'example' | 'challenge' | 'assignment' | 'slides' | 'diagram' | 'quiz';
   week?: number;
   slos?: string[];
   files: FileNode[];
@@ -92,6 +92,29 @@ export interface Lesson {
   aiGrader?: AiGraderConfig;
   /** Flowchart assignment. See lib/diagram-types.ts. */
   diagram?: DiagramConfig;
+  /** Multiple-choice module quiz. Graded in the browser — see components/QuizView.tsx. */
+  quiz?: QuizConfig;
+}
+
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  /** Optional snippet rendered monospace above the options — for trace-the-code questions. */
+  code?: string;
+  /** Two or more. Exactly one is correct; the rest must be wrong, not merely worse. */
+  options: string[];
+  /** 0-based index into `options`. */
+  answer: number;
+  /** Shown after submitting, right or wrong. Says why, never just "correct". */
+  explanation: string;
+  /** Displayed lesson number to reread, e.g. "1.4.5". */
+  source?: string;
+}
+
+export interface QuizConfig {
+  /** Percent correct needed to advance. Default 70. */
+  passPercent?: number;
+  questions: QuizQuestion[];
 }
 
 export interface AiGraderConfig {
