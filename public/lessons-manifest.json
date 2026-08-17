@@ -2354,7 +2354,7 @@
     },
     {
       "id": "3-1-2a-reading-the-function-call-shape",
-      "title": "3.1.3a Reading — The Function-Call Shape",
+      "title": "3.1.3 Reading — The Function-Call Shape",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -2402,7 +2402,7 @@
     },
     {
       "id": "3-1-7a-a3-1-0-flowchart-gate",
-      "title": "3.1.4a A3.1.0 — Chart Before You Refactor",
+      "title": "3.1.4 A3.1.0 — Chart Before You Refactor",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -2474,7 +2474,7 @@
     },
     {
       "id": "3-2-6a-chart-the-array-loop",
-      "title": "3.3.7a Chart the Code — Looping Over an Array",
+      "title": "3.3.7 Chart the Code — Looping Over an Array",
       "unit": "3.3 Arrays",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -2506,7 +2506,7 @@
     },
     {
       "id": "4-1-2a-reading-connectors-and-notes",
-      "title": "4.1.3a Reading — Connectors and Notes",
+      "title": "4.1.3 Reading — Connectors and Notes",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -2522,7 +2522,7 @@
     },
     {
       "id": "4-1-3a-a4-1-0-design-chart",
-      "title": "4.1.5a A4.1.0 — Print Shop Design Chart",
+      "title": "4.1.5 A4.1.0 — Print Shop Design Chart",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -2834,7 +2834,7 @@
     },
     {
       "id": "5-3-20a-chart-the-method-chain",
-      "title": "5.4.6a Chart the Code — A Method That Calls a Method",
+      "title": "5.4.6 Chart the Code — A Method That Calls a Method",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "diagram",
       "category": "Unit 2: shPlay Game Development",
@@ -2914,7 +2914,7 @@
     },
     {
       "id": "5-3-29a-read-the-two-designs",
-      "title": "5.4.16a Read the Charts — Three Variables or Three Objects",
+      "title": "5.4.16 Read the Charts — Three Variables or Three Objects",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "category": "Unit 2: shPlay Game Development",
@@ -3450,7 +3450,7 @@
     },
     {
       "id": "6-5-20a-read-the-continue-chart",
-      "title": "6.5.21a Read the Chart — Does Continue Show Up?",
+      "title": "6.5.21 Read the Chart — Does Continue Show Up?",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "category": "Unit 2: shPlay Game Development",
@@ -3602,7 +3602,7 @@
     },
     {
       "id": "6-6-13a-chart-the-state-machine",
-      "title": "6.6.14a Chart the Code — The Three-State Machine",
+      "title": "6.6.14 Chart the Code — The Three-State Machine",
       "unit": "6.6 Game State Machines",
       "preview": "diagram",
       "category": "Unit 2: shPlay Game Development",
@@ -3658,7 +3658,7 @@
     },
     {
       "id": "6-6-19a-fix-the-pause-chart",
-      "title": "6.6.21a Fix the Broken Chart — the Pause State",
+      "title": "6.6.21 Fix the Broken Chart — the Pause State",
       "unit": "6.6 Game State Machines",
       "preview": "diagram",
       "category": "Unit 2: shPlay Game Development",
@@ -3802,7 +3802,7 @@
     },
     {
       "id": "6-7-10a-fix-the-drag-chart",
-      "title": "6.7.11a Fix the Broken Chart — Dragging a Sprite",
+      "title": "6.7.11 Fix the Broken Chart — Dragging a Sprite",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "diagram",
       "category": "Unit 2: shPlay Game Development",
@@ -3906,7 +3906,7 @@
     },
     {
       "id": "6-7-21a-chart-the-slingshot",
-      "title": "6.7.17a Chart the Code — The Slingshot",
+      "title": "6.7.17 Chart the Code — The Slingshot",
       "unit": "6.7 Advanced Input",
       "preview": "diagram",
       "category": "Unit 2: shPlay Game Development",

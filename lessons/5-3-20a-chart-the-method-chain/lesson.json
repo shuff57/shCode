@@ -1,6 +1,6 @@
 {
   "id": "5-3-20a-chart-the-method-chain",
-  "title": "5.4.6a Chart the Code — A Method That Calls a Method",
+  "title": "5.4.6 Chart the Code — A Method That Calls a Method",
   "description": "Draw a method calling another method. Two double-rails, and flow that comes back from both.",
   "type": "assignment",
   "difficulty": "intermediate",
