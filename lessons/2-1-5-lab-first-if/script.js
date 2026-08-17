@@ -1,4 +1,4 @@
-// 1.2.5 Write Your First if
+// 2.1.6 Write Your First if
 
 // STEP 1: Create a variable called score and give it a number value.
 //         Pick any number you like (try something between 50 and 100).

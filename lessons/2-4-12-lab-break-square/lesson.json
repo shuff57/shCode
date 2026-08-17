@@ -1,0 +1,65 @@
+{
+  "id": "2-4-12-lab-break-square",
+  "title": "2.4.12 Break When the Square Passes 50",
+  "description": "Count up from 1 and break as soon as the square of the count exceeds 50. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.4 Loop Control and Nested Loops",
+  "preview": "console",
+  "sourceRef": "book 2.4 — Try It Now 2.2",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Set up the counter",
+      "instructions": "Declare a variable called n and set it to 1."
+    },
+    {
+      "id": "s2",
+      "title": "Loop until the square passes 50",
+      "instructions": "Write a while (true) loop. Inside, check whether n * n is greater than 50. If it is, log n and its square, then break. Otherwise add 1 to n and let the loop continue."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "while (true) loop present",
+      "description": "Code contains a while (true) loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "while\\s*\\(\\s*true\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "break present",
+      "description": "Code contains a break statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "break\\s*;",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

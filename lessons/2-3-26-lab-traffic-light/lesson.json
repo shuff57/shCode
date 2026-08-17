@@ -1,0 +1,95 @@
+{
+  "id": "2-3-26-lab-traffic-light",
+  "title": "2.3.26 Rewrite the Traffic Light as a Switch",
+  "description": "Rewrite an if/else-if chain that checks a traffic light color as an equivalent switch statement. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.3 The switch Statement",
+  "preview": "console",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.3.6 — Try It Now 2.5",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Read the given if/else-if chain",
+      "instructions": "The comment at the top of script.js shows the chain you're rewriting. It's already there for reference — don't delete it."
+    },
+    {
+      "id": "s2",
+      "title": "Write the equivalent switch",
+      "instructions": "Below the comment, write a switch on light with cases for 'green', 'yellow', and 'red', plus a default for anything else. Match the same messages as the original chain."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "switch statement present",
+      "description": "Code contains a switch statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "switch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "case 'green' present",
+      "description": "Code contains a case for 'green'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]green['\"]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "case 'yellow' present",
+      "description": "Code contains a case for 'yellow'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]yellow['\"]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "case 'red' present",
+      "description": "Code contains a case for 'red'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]red['\"]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "default label present",
+      "description": "Code contains a default label",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "default\\s*:",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "break present",
+      "description": "Code contains a break statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "break",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

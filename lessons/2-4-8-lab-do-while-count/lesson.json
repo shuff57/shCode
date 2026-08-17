@@ -1,0 +1,65 @@
+{
+  "id": "2-4-8-lab-do-while-count",
+  "title": "2.4.8 do...while: Count 1 to 5",
+  "description": "Write a do...while loop that prints 1 through 5, then a second one whose condition starts false and still runs once. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.4 Loop Control and Nested Loops",
+  "preview": "console",
+  "sourceRef": "book 2.4 — Try It Now 2.1",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Count 1 to 5",
+      "instructions": "Write a do...while loop that logs the numbers 1 through 5. Declare a counter, log it inside the loop, then update it before the while condition checks it."
+    },
+    {
+      "id": "s2",
+      "title": "A do...while whose condition starts false",
+      "instructions": "Write a second do...while loop with a condition that is already false before the loop starts (for example, a counter that starts at 10 and a condition like counter < 0). Confirm in your console output that the body still runs exactly once."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "do...while loop present",
+      "description": "Code contains a do...while loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "do\\s*\\{",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "closing while present",
+      "description": "Code contains the closing while condition of a do...while loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\}\\s*while\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

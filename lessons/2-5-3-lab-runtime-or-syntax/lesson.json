@@ -1,0 +1,54 @@
+{
+  "id": "2-5-3-lab-runtime-or-syntax",
+  "title": "2.5.3 Runtime or Syntax?",
+  "description": "Write code that fails at runtime, not at parse time, and confirm which lines still run. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.5 Handling Errors with try/catch",
+  "preview": "console",
+  "week": 7,
+  "slos": ["SLO-3"],
+  "sourceRef": "designed — practice for 2.5.1 Concepts in Practice 'Telling them apart'",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Log a line before",
+      "instructions": "Use console.log to print any message. This line should run successfully."
+    },
+    {
+      "id": "s2",
+      "title": "Trigger a runtime error",
+      "instructions": "On the next line, use console.log to print a variable called mystery that you never declared anywhere in this file. In a comment above it, write whether this is a runtime error or a syntax error, and why."
+    },
+    {
+      "id": "s3",
+      "title": "Log a line after",
+      "instructions": "Add one more console.log line after that. Run your code and confirm this last line never prints — the error stopped everything below it."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "reads an undeclared variable",
+      "description": "Code logs a variable called mystery that is never declared",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(\\s*mystery\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "at least two console.log calls",
+      "description": "Code has a log line before and a log line after the risky line",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\([\\s\\S]*console\\.log\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

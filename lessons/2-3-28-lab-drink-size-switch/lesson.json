@@ -1,0 +1,105 @@
+{
+  "id": "2-3-28-lab-drink-size-switch",
+  "title": "2.3.28 Build a Four-Case Switch: Drink Sizes",
+  "description": "Write a switch with at least four cases and a default that prices a drink by size. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.3 The switch Statement",
+  "preview": "console",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "designed — practice writing a four-case-plus-default switch, ahead of 2.3.30 A2.3.1 Print Settings Advisor",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a variable to switch on",
+      "instructions": "Create a variable called size set to one of 'S', 'M', 'L', 'XL'."
+    },
+    {
+      "id": "s2",
+      "title": "Write the switch",
+      "instructions": "Write a switch on size with a case for each of 'S', 'M', 'L', 'XL', each printing a price you choose. Add a default that prints a message for a size that doesn't exist. End every case with a break."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "switch statement present",
+      "description": "Code contains a switch statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "switch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "case 'S' present",
+      "description": "Code contains a case for 'S'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]S['\"]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "case 'M' present",
+      "description": "Code contains a case for 'M'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]M['\"]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "case 'L' present",
+      "description": "Code contains a case for 'L'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]L['\"]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "case 'XL' present",
+      "description": "Code contains a case for 'XL'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]XL['\"]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "default label present",
+      "description": "Code contains a default label",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "default\\s*:",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "break present",
+      "description": "Code contains a break statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "break",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

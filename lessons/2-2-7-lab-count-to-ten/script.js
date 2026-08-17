@@ -1,4 +1,4 @@
-// 1.2.22 Count 1 to 10
+// 2.2.12 Count 1 to 10
 
 // STEP 1: Write a for loop.
 //         The loop counter should start at 1.

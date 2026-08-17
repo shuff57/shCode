@@ -1,0 +1,54 @@
+{
+  "id": "2-5-27-challenges",
+  "title": "2.5.27 Challenges — Optional Stretch",
+  "description": "Optional stretch problems. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.5 Handling Errors with try/catch",
+  "preview": "console",
+  "week": 7,
+  "slos": ["SLO-3"],
+  "sourceRef": "designed — stretch bundle drawing on Problem Set 2.5.11, 2.5.13, 2.5.14 intent",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Divide Safely",
+      "instructions": "JavaScript does NOT throw on division by zero — it returns Infinity. Write code that divides two hardcoded numbers where the divisor could be 0. Inside a try, throw your own error if the divisor is 0, before dividing. Catch it and log a friendly message."
+    },
+    {
+      "id": "s2",
+      "title": "Parse a Malformed Number",
+      "instructions": "Given a hardcoded string like \"12abc\", convert it with Number(). Check what Number(\"12abc\") actually produces, then use Number.isNaN to catch it and throw a clear error naming the bad text."
+    },
+    {
+      "id": "s3",
+      "title": "Cleanup Counter",
+      "instructions": "Write a try/catch/finally where the finally block always logs \"Attempt finished.\" — regardless of whether the try succeeded or the catch fired. Test it once with input that succeeds and once with input that fails."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "throw present",
+      "description": "Code throws at least one error deliberately",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "throw\\s+new\\s+Error\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "finally present",
+      "description": "Code uses a finally block for cleanup",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "finally\\s*\\{",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

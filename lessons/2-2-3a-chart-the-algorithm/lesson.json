@@ -1,6 +1,6 @@
 {
   "id": "2-2-3a-chart-the-algorithm",
-  "title": "2.2.5a Chart the Code — Largest of Three",
+  "title": "2.2.6 Chart the Code — Largest of Three",
   "description": "You just wrote the largest-of-three algorithm as code. Now draw the same algorithm as a flowchart, without looking at the code.",
   "type": "assignment",
   "difficulty": "beginner",
@@ -8,10 +8,11 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",
   "preview": "diagram",
-  "week": 5,
+  "week": 6,
   "slos": [
     "SLO-4"
   ],
+  "sourceRef": "designed — chart-from-code practice pairing with 2.2.5, per Appendix D diagram-native teaching",
   "points": 0,
   "contentFile": "content.md",
   "diagram": {

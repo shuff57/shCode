@@ -1,4 +1,4 @@
-// 1.2.25 Countdown with while
+// 2.2.16 Countdown with while
 
 // STEP 1: Create a variable called count and set it to 10.
 

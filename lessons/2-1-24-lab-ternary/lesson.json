@@ -1,0 +1,55 @@
+{
+  "id": "2-1-24-lab-ternary",
+  "title": "2.1.21 Write Your First Ternary",
+  "description": "Use the conditional operator ? to assign one of two values to a variable. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.1 Conditionals",
+  "preview": "console",
+  "week": 5,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.1.5 — 'Conditional Operator ?', Try It Now 2.5",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Declare isMember",
+      "instructions": "Create a variable called isMember and set it to true."
+    },
+    {
+      "id": "s2",
+      "title": "Use a ternary to set discount",
+      "instructions": "Create a variable called discount. Use the ternary operator so discount is 20 when isMember is true, and 0 otherwise. Log discount."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "ternary operator used",
+      "description": "Code contains a ? ... : ternary expression",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\?[^:?]*:",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

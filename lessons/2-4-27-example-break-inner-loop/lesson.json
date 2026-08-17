@@ -1,0 +1,23 @@
+{
+  "id": "2-4-27-example-break-inner-loop",
+  "title": "2.4.27 Worked Example — break Leaves Only the Inner Loop",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.4 Loop Control and Nested Loops",
+  "preview": "example",
+  "sourceRef": "book 2.4 — Example 2.7 part 1, 'break leaves only the inner loop'",
+  "week": 7,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

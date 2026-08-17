@@ -1,0 +1,95 @@
+{
+  "id": "2-3-8-lab-animal-sounds",
+  "title": "2.3.7 Build a Switch: Animal Sounds",
+  "description": "Write a switch that prints the sound an animal makes, with a default for anything else. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.3 The switch Statement",
+  "preview": "console",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.3.2 — Try It Now 2.1",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a variable to switch on",
+      "instructions": "Create a variable called animal and assign it one of: 'dog', 'cat', 'cow'."
+    },
+    {
+      "id": "s2",
+      "title": "Write the switch",
+      "instructions": "Write a switch statement on animal. case 'dog' prints Woof, case 'cat' prints Meow, case 'cow' prints Moo, and default prints I do not know that animal. End every case with a break."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "switch statement present",
+      "description": "Code contains a switch statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "switch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "case 'dog' present",
+      "description": "Code contains a case for 'dog'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]dog['\"]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "case 'cat' present",
+      "description": "Code contains a case for 'cat'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]cat['\"]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "case 'cow' present",
+      "description": "Code contains a case for 'cow'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]cow['\"]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "default label present",
+      "description": "Code contains a default label",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "default\\s*:",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "break present",
+      "description": "Code contains a break statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "break",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

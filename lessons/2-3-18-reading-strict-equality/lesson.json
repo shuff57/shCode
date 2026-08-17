@@ -1,0 +1,24 @@
+{
+  "id": "2-3-18-reading-strict-equality",
+  "title": "2.3.18 Reading — switch Compares Strictly",
+  "description": "See why a case can silently never match when the switched value is the wrong type. Read before 2.3.19 case false vs case 0: Predict, Then Run.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.3 The switch Statement",
+  "preview": "reading",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.3.5 — 'switch Compares Strictly', Context Pause on == vs ===, Concepts in Practice: Type and matching Q1",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

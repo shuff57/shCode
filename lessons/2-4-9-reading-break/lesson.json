@@ -1,0 +1,24 @@
+{
+  "id": "2-4-9-reading-break",
+  "title": "2.4.9 Reading — Leaving Early with break",
+  "description": "break ends a loop the moment you tell it to, even if the loop's own condition never becomes false. Read before Searching Without a Known End.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.4 Loop Control and Nested Loops",
+  "preview": "reading",
+  "sourceRef": "book 2.4 — §2.4.3 'Leaving Early with break' intro example, Definition 2.4.2",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

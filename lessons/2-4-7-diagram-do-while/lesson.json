@@ -1,0 +1,41 @@
+{
+  "id": "2-4-7-diagram-do-while",
+  "title": "2.4.7 Chart the Code — do...while",
+  "description": "Draw a do...while loop as a flowchart and see why the diamond sits at the bottom instead of the top.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.4 Loop Control and Nested Loops",
+  "preview": "diagram",
+  "sourceRef": "book 2.4 — Definition 2.4.1 do...while Loop (figure_def_2.4.1)",
+  "week": 6,
+  "slos": [
+    "SLO-2",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "diagram": {
+    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
+    "rules": [
+      { "id": "one-start" },
+      { "id": "has-end" },
+      { "id": "all-labeled" },
+      { "id": "no-orphans" },
+      { "id": "min-decisions", "count": 1 },
+      { "id": "min-process", "count": 2 },
+      { "id": "decision-two-exits" },
+      { "id": "decision-labeled" },
+      { "id": "reaches-end" },
+      { "id": "no-self-loop" }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

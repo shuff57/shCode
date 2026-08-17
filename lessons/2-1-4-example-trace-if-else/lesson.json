@@ -7,10 +7,11 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",
   "preview": "example",
-  "week": 4,
+  "week": 5,
   "slos": [
     "SLO-3"
   ],
+  "sourceRef": "book 2.1.4 — 'Several Conditions: else if', Example 2.4: Grade Letter",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

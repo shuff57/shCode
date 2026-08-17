@@ -1,0 +1,64 @@
+{
+  "id": "2-5-20-lab-after-a-throw",
+  "title": "2.5.20 What Happens After a throw?",
+  "description": "Build a try block where a throw sits between two other lines, and confirm exactly which lines run. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.5 Handling Errors with try/catch",
+  "preview": "console",
+  "week": 7,
+  "slos": ["SLO-3"],
+  "sourceRef": "designed — practice for 2.5.4 Concepts in Practice 'Throwing'",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Predict first",
+      "instructions": "In a comment, predict what prints from this sequence: log \"start\", throw new Error(\"stop right here\"), log \"after the throw\", catch logs \"caught: \" + err.message."
+    },
+    {
+      "id": "s2",
+      "title": "Build it",
+      "instructions": "Write a try block that logs \"start\", then throws new Error(\"stop right here\"), then logs \"after the throw\". In the catch block, log \"caught: \" + err.message."
+    },
+    {
+      "id": "s3",
+      "title": "Confirm and explain",
+      "instructions": "Run it. In a comment, explain why \"after the throw\" never prints — what does throw abandon, exactly like a runtime error?"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "logs start before the throw",
+      "description": "Code logs \"start\" before the throw statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "[\"']start[\"'][\\s\\S]*throw\\s+new\\s+Error\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "throws with the exact message",
+      "description": "Throws new Error with the message stop right here",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "throw\\s+new\\s+Error\\(\\s*[\"']stop right here[\"']\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "catch reports caught plus the message",
+      "description": "Catch block logs caught: followed by err.message",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "catch\\s*\\([^)]*\\)\\s*\\{[^}]*[\"']caught:[\\s\\S]*err\\.message",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

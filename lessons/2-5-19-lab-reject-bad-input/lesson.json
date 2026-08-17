@@ -1,0 +1,64 @@
+{
+  "id": "2-5-19-lab-reject-bad-input",
+  "title": "2.5.19 Reject the Bad Input",
+  "description": "Throw an error when a password is too short, and catch it with a clear message. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.5 Handling Errors with try/catch",
+  "preview": "console",
+  "week": 7,
+  "slos": ["SLO-3"],
+  "sourceRef": "book 2.5.4 — Try It Now 2.3",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Set up the password",
+      "instructions": "Create a constant called password set to \"abc\"."
+    },
+    {
+      "id": "s2",
+      "title": "Check the length and throw",
+      "instructions": "Inside a try block, if password.length is less than 8, throw new Error with a message saying the password must be at least 8 characters. Otherwise log \"Password accepted\"."
+    },
+    {
+      "id": "s3",
+      "title": "Catch and report",
+      "instructions": "In the catch block, log err.message. Test with \"abc\", then change password to a longer value and confirm it logs \"Password accepted\" instead."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "checks password length",
+      "description": "Code checks password.length against 8",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "password\\.length\\s*<\\s*8",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "throws a new Error",
+      "description": "Code throws a new Error when the password is too short",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "throw\\s+new\\s+Error\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "catch logs err.message",
+      "description": "The catch block logs err.message",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "catch\\s*\\([^)]*\\)\\s*\\{[^}]*err\\.message",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

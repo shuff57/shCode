@@ -1,0 +1,85 @@
+{
+  "id": "2-3-17-lab-vowel-consonant",
+  "title": "2.3.17 Group Cases: Vowel or Consonant",
+  "description": "Write a switch with grouped cases that prints Vowel for a, e, i, o, u and Consonant for anything else. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.3 The switch Statement",
+  "preview": "console",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.3.4 — Try It Now 2.3",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a variable to switch on",
+      "instructions": "Create a variable called letter and assign it a single lowercase letter, for example 'e'."
+    },
+    {
+      "id": "s2",
+      "title": "Write grouped cases for the vowels",
+      "instructions": "Write a switch on letter. Stack case labels for 'a', 'e', 'i', 'o', 'u' with no code between them, so all five fall into one block that prints Vowel. Add a default that prints Consonant. Use grouped cases, not ||."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "switch statement present",
+      "description": "Code contains a switch statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "switch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "'a' and 'e' cases grouped",
+      "description": "case 'a' is stacked directly above case 'e' with no code between them",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]a['\"]\\s*:\\s*case\\s*['\"]e['\"]\\s*:",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "'u' case reaches the shared block",
+      "description": "case 'u' is grouped in among the vowel cases",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]u['\"]\\s*:",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "default label present",
+      "description": "Code contains a default label",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "default\\s*:",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "break present",
+      "description": "Code contains a break statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "break",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

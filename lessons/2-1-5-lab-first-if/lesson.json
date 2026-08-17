@@ -8,10 +8,11 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",
   "preview": "console",
-  "week": 4,
+  "week": 5,
   "slos": [
     "SLO-3"
   ],
+  "sourceRef": "designed — practice for 'The if Statement', book 2.1.1",
   "steps": [
     {
       "id": "s1",

@@ -1,4 +1,4 @@
-// 1.2.16 Convert an if-chain to switch
+// 2.3.29 Convert an if-chain to switch
 
 // STEP 1: Create a variable called day and assign it a day-of-week string.
 //         For example: "Monday", "Friday", or "Saturday".

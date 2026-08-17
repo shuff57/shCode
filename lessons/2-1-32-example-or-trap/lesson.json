@@ -1,0 +1,23 @@
+{
+  "id": "2-1-32-example-or-trap",
+  "title": "2.1.33 Worked Example — The OR String-Literal Trap",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.1 Conditionals",
+  "preview": "example",
+  "week": 5,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.1.8 — 'Combining Conditions', Context Pause under Example 2.9 (day === \"Saturday\" || \"Sunday\")",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,6 +1,6 @@
 {
   "id": "2-1-9-lab-predict-comparisons",
-  "title": "2.1.10 Predict, Then Run",
+  "title": "2.1.17 Predict, Then Run",
   "description": "Log four comparison expressions, including at least one ===, and observe the results. Auto-graded.",
   "type": "assignment",
   "difficulty": "beginner",
@@ -8,10 +8,11 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",
   "preview": "console",
-  "week": 4,
+  "week": 5,
   "slos": [
     "SLO-3"
   ],
+  "sourceRef": "designed — practice for comparison operators used throughout book 2.1",
   "steps": [
     {
       "id": "s1",

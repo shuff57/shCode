@@ -1,0 +1,49 @@
+{
+  "id": "2-5-6-lab-wrap-only-risk",
+  "title": "2.5.6 Wrap Only What Can Fail",
+  "description": "Rewrite a try that wraps too much so the total still prints even when the risky line fails. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.5 Handling Errors with try/catch",
+  "preview": "console",
+  "week": 7,
+  "slos": ["SLO-3"],
+  "sourceRef": "designed — practice for Problem Set 2.5.12 (rewrite a too-wide try)",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Move the loop outside try",
+      "instructions": "The starter has a for loop that computes a total, wrapped inside one try block along with a risky console.log(label) line. Move the for loop and the let total = 0; declaration so they run before the try block, not inside it."
+    },
+    {
+      "id": "s2",
+      "title": "Keep only the risky line in try",
+      "instructions": "Inside try, keep only console.log(label) (label is never declared, so this is the risky line) with its catch. Log the total with console.log after the whole try...catch finishes, not inside it."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "for loop present",
+      "description": "The loop that computes the total is still in the file",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "total logged after catch",
+      "description": "The total is logged after the catch block, not inside the try",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "catch[\\s\\S]*console\\.log\\([\\s\\S]*total",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

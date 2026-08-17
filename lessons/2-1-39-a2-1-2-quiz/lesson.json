@@ -1,0 +1,63 @@
+{
+  "id": "2-1-39-a2-1-2-quiz",
+  "title": "2.1.40 A2.1.2 — Conditionals Checkpoint Quiz",
+  "description": "Short written quiz on === vs ==, operator precedence, and tracing conditional code. AI-graded with hints.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 20,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.1 Conditionals",
+  "preview": "assignment",
+  "week": 5,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "designed — capstone quiz, assignment code A2.1.2 per curriculum-plan §2.1 Assignments; questions draw on book 2.1 Problem Set 2.1.7-2.1.10 intent (=== vs ==, operator precedence, trace prediction)",
+  "points": 5,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Conditionals Checkpoint Quiz — AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "Q1 — What is the difference between === and ==? Give a short example where they give different results.\n\nQ2 — In the condition `age >= 13 && age <= 19 || hasException`, which operator runs first, && or ||? Explain why adding parentheses around the && part makes the condition easier to read even though it doesn't change the result.\n\nQ3 — Predict what each of these three snippets logs, and explain why in one sentence each.\n\nSnippet A:\nlet temp = 45;\nif (temp < 32) {\n  console.log(\"Freezing\");\n} else if (temp < 60) {\n  console.log(\"Cold\");\n} else if (temp < 80) {\n  console.log(\"Warm\");\n} else {\n  console.log(\"Hot\");\n}\n\nSnippet B:\nlet score = 72;\nlet grade = (score >= 90) ? \"A\" :\n  (score >= 80) ? \"B\" :\n  (score >= 70) ? \"C\" :\n  \"D\";\nconsole.log(grade);\n\nSnippet C:\nlet day = \"Friday\";\nconsole.log(day === \"Saturday\" || \"Sunday\");",
+    "rubric": [
+      {
+        "id": "q1-strict-vs-loose",
+        "title": "Q1: === vs == explained with an example",
+        "description": "Student states that === checks both value and type (strict equality) while == converts types before comparing (loose equality), and gives a concrete example where the two disagree (e.g. 5 === \"5\" is false but 5 == \"5\" is true). Credit any correct example with the same shape.",
+        "points": 1
+      },
+      {
+        "id": "q2-precedence",
+        "title": "Q2: Correctly identifies && runs before || and explains the parentheses",
+        "description": "Student correctly states that && has higher precedence than || (so && runs first), and explains that adding parentheses around the && part makes the grouping explicit for a reader without changing the result. Deny if the order is reversed or no reasoning is given.",
+        "points": 1
+      },
+      {
+        "id": "q3-snippet-a",
+        "title": "Q3 Snippet A: correctly traces the else if chain",
+        "description": "Student says Snippet A logs 'Cold' (45 is not < 32, but is < 60) and explains that the chain checks conditions top to bottom and stops at the first true one.",
+        "points": 1
+      },
+      {
+        "id": "q3-snippet-b",
+        "title": "Q3 Snippet B: correctly traces the chained ternary",
+        "description": "Student says Snippet B logs 'C' (72 is not >= 90 or >= 80, but is >= 70) and explains the chained ternary is evaluated the same way as an else if chain.",
+        "points": 1
+      },
+      {
+        "id": "q3-snippet-c",
+        "title": "Q3 Snippet C: correctly traces the OR string-literal trap",
+        "description": "Student says Snippet C logs 'true' and explains that the right side of || is the bare string \"Sunday\", which is truthy on its own regardless of what day is set to — not a real comparison against day.",
+        "points": 1
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 5,
+    "passingScore": 5,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

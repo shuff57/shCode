@@ -404,6 +404,38 @@ rewriting a working lab unless the concept it grades actually moved.
   bearing and **a resync must not delete them for being absent from the book**.
   Raised 2026-08-16 from a module 1.1 review.
 
+- **Book §2.1 never defines the comparison operators it relies on.** `===`, `==`,
+  `<`, `>`, `<=`, `>=` are used pervasively from 2.1.1 onward — every worked
+  example depends on them — but the section gives them no definition, no table
+  and no subsection of their own. A student reading the book cold has to infer
+  six operators from usage. shCode's `2.1.15`/`2.1.16`/`2.1.17`
+  (reading / worked example / lab) are therefore load-bearing scaffolding with
+  no book anchor, tagged `sourceRef: designed` rather than `book 2.1 —`.
+  **A resync must not delete them for being absent from the book.**
+  Same shape as the §1.1 JavaScript-basics gap above. **Book-side request:** a
+  short operator table in §2.1, before Example 2.1. Raised 2026-08-16 from a
+  module 2.1 build.
+
+- **`do…while` is in the curriculum plan but not in book §2.2.** The plan's §2.2
+  module goal asks for it explicitly; the book section does not contain it
+  anywhere. shCode teaches it at `2.2.11`/`2.2.12`, so those lessons are
+  likewise load-bearing and must survive a resync. Note the book *does* reach
+  `do…while` later — §2.4 covers it as part of loop entry (Definition 2.4.1) —
+  so the gap is one of **placement**, not absence: the plan wants it a section
+  earlier than the book delivers it. Decide whether the plan moves to match the
+  book or §2.2 keeps its own treatment. Raised 2026-08-16 from a module 2.2 build.
+
+- **Book §2.4 Example 2.3 needs arrays three weeks before arrays are taught.**
+  "Filtering while you loop" is written over `readings = [4, -2, 7, 0, -9, 3]`,
+  but arrays are book §3.3 and §2.4 teaches Sep 18. shCode's
+  `2-4-14-example-filtering-while-loop` teaches the same continue-vs-keep idea
+  over a numeric range instead. The book's §2.2 linear-search example (Example
+  2.5) has the same problem and additionally uses `break`, which is itself §2.4
+  — `2.2.14a` adapts it to a `found`-flag search over a range. Both adaptations
+  are deliberate and should not be "corrected" back toward the book's text.
+  **Book-side request:** either move these examples after §3.3, or rewrite them
+  on ranges. Raised 2026-08-16 from the chapter 2 build.
+
 - **§6.9 Timing and Async has no shCode home.** It is not in Module 6.7 (which covers
   joints and advanced input, zero async content) and Module 7.1 is the capstone. Either
   it becomes a new Module 6.8/6.9 spec or it is book-only teaching with no graded work.

@@ -6,7 +6,8 @@
   "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "2.3 The Switch Statement",
+  "unit": "2.3 The switch Statement",
+  "sourceRef": "book 2.3 — section banner",
   "preview": "slides",
   "slos": [
     "SLO-1"

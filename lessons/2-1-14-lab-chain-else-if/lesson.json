@@ -1,0 +1,65 @@
+{
+  "id": "2-1-14-lab-chain-else-if",
+  "title": "2.1.8 Chain Three Branches",
+  "description": "Write an else if chain with at least three branches. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.1 Conditionals",
+  "preview": "console",
+  "week": 5,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "designed — practice for 'Several Conditions: else if', book 2.1.4",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Declare a battery level",
+      "instructions": "Create a variable called batteryPercent and set it to a number from 0 to 100."
+    },
+    {
+      "id": "s2",
+      "title": "Chain at least three branches",
+      "instructions": "Write an if / else if / else if / else chain that logs a status: below 20 logs 'Low battery', below 50 logs 'Battery ok', below 90 logs 'Battery good', and anything else logs 'Battery full'. Check the highest cutoff first, same as the grade example."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "if statement present",
+      "description": "Code contains an if statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "at least two else if branches",
+      "description": "Code contains two or more else if branches",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "else\\s+if\\s*\\([\\s\\S]*else\\s+if\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "final else present",
+      "description": "Code contains a closing else branch",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\}\\s*else\\s*\\{",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

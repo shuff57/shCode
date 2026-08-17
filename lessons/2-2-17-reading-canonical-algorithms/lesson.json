@@ -1,0 +1,25 @@
+{
+  "id": "2-2-17-reading-canonical-algorithms",
+  "title": "2.2.19 Reading — Canonical Algorithms & Linear Search",
+  "description": "A canonical algorithm is a well-known pattern worth knowing by name. Meet linear search: check one item at a time until you find what you're looking for.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.2 Algorithms and Loops",
+  "preview": "reading",
+  "week": 6,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "sourceRef": "book 2.2.5 — 'Canonical Algorithms', Definition 2.2.4: Canonical Algorithm, Example 2.5, Try It Now 2.5, Problem Set 2.2.8; searches a number range instead of an array with break, which aren't taught until 3.3/2.4 — see build report gap",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

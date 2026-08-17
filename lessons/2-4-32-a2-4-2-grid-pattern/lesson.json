@@ -1,0 +1,90 @@
+{
+  "id": "2-4-32-a2-4-2-grid-pattern",
+  "title": "2.4.32 A2.4.2 — Print a Grid Pattern",
+  "description": "Write a nested-loop program that prints a grid of at least 5x5, with the dimensions controlled by variables, not hardcoded loop bounds. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.4 Loop Control and Nested Loops",
+  "preview": "console",
+  "sourceRef": "designed — A2.4.2, curriculum-plan.md §2.4 Assignments",
+  "week": 7,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Declare the grid's dimensions as variables",
+      "instructions": "Declare a variable called rows and a variable called cols. Set each to a number of at least 5. Do not write the numbers directly into the loop headers — the loops must read them from these variables."
+    },
+    {
+      "id": "s2",
+      "title": "Build the grid with a nested loop",
+      "instructions": "Write an outer for loop with counter row that runs while row is less than rows. Inside it, build a string called line, and write an inner for loop with counter col that runs while col is less than cols, appending a character (like \"#\" or \"*\") to line on every pass."
+    },
+    {
+      "id": "s3",
+      "title": "Print each row",
+      "instructions": "After the inner loop closes, log line so each row of the grid prints on its own line. Change rows and cols to different values (still at least 5) and confirm the grid resizes without touching the loops themselves."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "rows variable declared",
+      "description": "A variable named rows is declared",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "let\\s+rows\\s*=",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "cols variable declared",
+      "description": "A variable named cols is declared",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "let\\s+cols\\s*=",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "outer loop reads rows",
+      "description": "The outer loop's condition compares row against the rows variable, not a hardcoded number",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "row\\s*<\\s*rows",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "inner loop reads cols",
+      "description": "The inner loop's condition compares col against the cols variable, not a hardcoded number",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "col\\s*<\\s*cols",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

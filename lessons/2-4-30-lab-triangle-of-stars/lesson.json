@@ -1,0 +1,70 @@
+{
+  "id": "2-4-30-lab-triangle-of-stars",
+  "title": "2.4.30 Triangle of Stars",
+  "description": "Use a nested loop to print a triangle of stars, one row at a time, where the inner loop's limit depends on the outer loop's counter. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.4 Loop Control and Nested Loops",
+  "preview": "console",
+  "sourceRef": "book 2.4 — Try It Now 2.4 + Concepts in Practice 'Counting nested work'",
+  "week": 7,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Outer loop — the rows",
+      "instructions": "Write an outer for loop with counter row running from 1 to 5."
+    },
+    {
+      "id": "s2",
+      "title": "Inner loop — bound by row, not a fixed number",
+      "instructions": "Inside the outer loop, declare an empty string called line. Write an inner for loop with counter star that runs from 1 up to row (not a fixed number like 5) — that is what makes each row longer than the last. Append a \"*\" to line on every inner pass."
+    },
+    {
+      "id": "s3",
+      "title": "Print the row",
+      "instructions": "After the inner loop closes, log line. You should see 1 star on the first line, up to 5 stars on the last."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "outer loop present",
+      "description": "Code contains an outer for loop using row",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(\\s*let\\s+row\\s*=\\s*1",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "inner loop bound depends on row",
+      "description": "The inner loop's condition compares star to row, not to a fixed number",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "star\\s*<=\\s*row",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

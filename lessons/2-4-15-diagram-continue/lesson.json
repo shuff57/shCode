@@ -1,0 +1,41 @@
+{
+  "id": "2-4-15-diagram-continue",
+  "title": "2.4.15 Chart the Code — continue Skips, Doesn't Leave",
+  "description": "Draw the skip-the-evens loop and route continue's arrow back to the hexagon, not to End. Compare it against a break chart.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 20,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.4 Loop Control and Nested Loops",
+  "preview": "diagram",
+  "sourceRef": "designed — charts Definition 2.4.3's figure (continue), contrasted with the break chart in 2.4.11",
+  "week": 6,
+  "slos": [
+    "SLO-2",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "diagram": {
+    "starter": "flowchart TD\n  A([Start])\n  Z([End])",
+    "rules": [
+      { "id": "one-start" },
+      { "id": "has-end" },
+      { "id": "all-labeled" },
+      { "id": "no-orphans" },
+      { "id": "min-decisions", "count": 1 },
+      { "id": "min-nodes", "count": 5 },
+      { "id": "decision-two-exits" },
+      { "id": "decision-labeled" },
+      { "id": "reaches-end" },
+      { "id": "no-self-loop" }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

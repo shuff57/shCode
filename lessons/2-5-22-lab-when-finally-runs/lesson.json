@@ -1,0 +1,64 @@
+{
+  "id": "2-5-22-lab-when-finally-runs",
+  "title": "2.5.22 When Does finally Run?",
+  "description": "Build a try/catch/finally and confirm finally runs in both the success and the failure case. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.5 Handling Errors with try/catch",
+  "preview": "console",
+  "week": 7,
+  "slos": ["SLO-3"],
+  "sourceRef": "designed — practice for 2.5.5 Concepts in Practice 'When finally runs'",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Predict first",
+      "instructions": "In a comment, predict which blocks run when the try block succeeds: try and catch, try and finally, or all three."
+    },
+    {
+      "id": "s2",
+      "title": "Build the success case",
+      "instructions": "Write a try block that logs \"Work done.\" with no error. Give it a catch block that logs \"Handling error.\" and a finally block that logs \"Cleanup ran.\""
+    },
+    {
+      "id": "s3",
+      "title": "Confirm",
+      "instructions": "Run it. Confirm catch was skipped but finally still ran."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "try/catch/finally present",
+      "description": "Code has a try, catch, and finally block",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "try\\s*\\{[\\s\\S]*catch\\s*\\([\\s\\S]*finally\\s*\\{",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "try block cannot fail",
+      "description": "The try block logs Work done. with nothing that can error",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "try\\s*\\{[^}]*Work done\\.[^}]*\\}",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "finally logs cleanup",
+      "description": "The finally block logs Cleanup ran.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "finally\\s*\\{[^}]*Cleanup ran\\.",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

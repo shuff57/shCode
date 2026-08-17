@@ -1,0 +1,18 @@
+{
+  "id": "2-5-15-reading-throwing-errors",
+  "title": "2.5.15 Reading — Throwing Your Own Errors",
+  "description": "Raise your own error with throw when a value breaks the program's rules, not the language's. Read before 2.5.16 Worked Example — Validate, Then Trust.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.5 Handling Errors with try/catch",
+  "preview": "reading",
+  "week": 7,
+  "slos": ["SLO-3"],
+  "sourceRef": "book 2.5.4 — 'Throwing Your Own Errors', Definition 2.5.3, age demo",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

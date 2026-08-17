@@ -1,0 +1,85 @@
+{
+  "id": "2-3-19-lab-false-vs-zero",
+  "title": "2.3.19 case false vs case 0: Predict, Then Run",
+  "description": "Write a switch with case false, case 0, and case '0', then predict which one a number, a boolean, and a string each match. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.3 The switch Statement",
+  "preview": "console",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.3.5 — Concepts in Practice: Type and matching, Q1",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write a switch with three type-sensitive cases",
+      "instructions": "Create a variable called value. Write a switch on value with three cases in this order: case false, case 0, case '0' (the string). Each case should log which one matched, and end with a break. Add a default too."
+    },
+    {
+      "id": "s2",
+      "title": "Predict three runs",
+      "instructions": "Before running, write three comments predicting what happens when value is the number 0, when it is the boolean false, and when it is the string '0'. Then set value to each in turn, run, and check your predictions."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "switch statement present",
+      "description": "Code contains a switch statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "switch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "case false present",
+      "description": "Code contains a case for the boolean false",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s+false\\s*:",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "case 0 present",
+      "description": "Code contains a case for the number 0",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s+0\\s*:",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "case '0' present",
+      "description": "Code contains a case for the string '0'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]0['\"]\\s*:",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "break present",
+      "description": "Code contains at least one break statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "break",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

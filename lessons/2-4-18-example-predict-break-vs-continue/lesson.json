@@ -1,0 +1,23 @@
+{
+  "id": "2-4-18-example-predict-break-vs-continue",
+  "title": "2.4.18 Worked Example — Predict: break vs continue",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.4 Loop Control and Nested Loops",
+  "preview": "example",
+  "sourceRef": "book 2.4 — Concepts in Practice 'break vs continue' Q1 & Q2",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "id": "2-1-17-lab-nested-conditionals",
+  "title": "2.1.11 Nest a Check",
+  "description": "Write an if statement inside another if statement to ask a follow-up question. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.1 Conditionals",
+  "preview": "console",
+  "week": 5,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "designed — composition of book 2.1.1 'The if Statement' and 2.1.3 'The else Clause'; curriculum-plan §2.1 Topics: Nested conditionals",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Declare two variables",
+      "instructions": "Create a variable called isLoggedIn (true or false) and a variable called isAdmin (true or false)."
+    },
+    {
+      "id": "s2",
+      "title": "Nest the admin check inside the login check",
+      "instructions": "Write an outer if that checks isLoggedIn. Inside that block, write a nested if / else that checks isAdmin: log 'Welcome, admin.' if true, log 'Welcome, user.' if false. Add an outer else that logs 'Please log in.'"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "outer if statement present",
+      "description": "Code contains at least one if statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "a second if statement is nested inside the first",
+      "description": "Code contains a second if that opens after the first if's opening brace and before its closing brace",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\([^)]*\\)\\s*\\{[^{}]*if\\s*\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

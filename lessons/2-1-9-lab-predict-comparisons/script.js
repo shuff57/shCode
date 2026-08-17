@@ -1,4 +1,4 @@
-// 1.2.9 Predict, Then Run
+// 2.1.17 Predict, Then Run
 
 // STEP 1: Write four console.log statements.
 //         Each one should print the result of a comparison expression.

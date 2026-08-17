@@ -1,0 +1,74 @@
+{
+  "id": "2-5-26-a2-5-1-loop-with-try-catch",
+  "title": "2.5.26 A2.5.1 — Loop with try/catch",
+  "description": "Loop over three raw readings and use try/catch to reject bad input with a friendly message instead of crashing. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.5 Handling Errors with try/catch",
+  "preview": "console",
+  "week": 7,
+  "slos": ["SLO-3"],
+  "sourceRef": "designed — curriculum-plan.md A2.5.1 (loop + try/catch on bad input), informed by Problem Set 2.5.13",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Loop over three readings",
+      "instructions": "Write a for loop with i from 1 to 3. Inside, set a variable raw to \"12\" when i is 1, \"abc\" when i is 2, and \"-4\" when i is 3 (three separate if statements)."
+    },
+    {
+      "id": "s2",
+      "title": "Convert and validate inside try",
+      "instructions": "Inside a try block, convert raw to a number with Number(raw). If the result is NaN, throw new Error naming the bad value. If it is 0 or less, throw new Error saying it must be positive. Otherwise log the reading number and its value."
+    },
+    {
+      "id": "s3",
+      "title": "Report instead of crashing",
+      "instructions": "In the catch block, log a friendly message using err.message that names which reading was skipped — do not just log a generic \"Error!\"."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "for loop present",
+      "description": "Code loops over the three readings with a for loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "try/catch inside the loop",
+      "description": "The loop body has a try block and a catch block",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\([\\s\\S]*try\\s*\\{[\\s\\S]*catch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "checks for NaN",
+      "description": "Code checks the converted value with Number.isNaN",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "Number\\.isNaN\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "catch reports err.message",
+      "description": "The catch block logs a friendly message that includes err.message, not a generic string",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "catch\\s*\\([^)]*\\)\\s*\\{[^}]*err\\.message",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,0 +1,60 @@
+{
+  "id": "2-1-36-lab-settings-advisor",
+  "title": "2.1.37 Print Settings Advisor",
+  "description": "Given filament type and layer height, print a recommended print temperature using else if and logical operators. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.1 Conditionals",
+  "preview": "console",
+  "week": 5,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "designed — practice for else if chains (book 2.1.4) and combining conditions (book 2.1.8); scenario named in curriculum-plan §2.1 In-Class Activities: 'print settings advisor'",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Declare filament and layer height",
+      "instructions": "Create a variable called filamentType set to 'PLA', 'PETG', or 'ABS', and a variable called layerHeight set to a number of millimeters (e.g. 0.2)."
+    },
+    {
+      "id": "s2",
+      "title": "Chain the recommendation",
+      "instructions": "Write an else if chain that checks filamentType and recommends a print temperature: 'PLA' -> 200, 'PETG' -> 235, 'ABS' -> 250, anything else -> log 'Unknown filament type'. Log the recommended temperature."
+    },
+    {
+      "id": "s3",
+      "title": "Add a layer-height warning",
+      "instructions": "Add a separate if statement that uses && or || to warn when layerHeight is outside a safe range (for example, less than 0.1 or greater than 0.4). Log a warning message when that's true."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "else if chain present",
+      "description": "Code contains an else if chain",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "else\\s+if\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "logical operator used in a second condition",
+      "description": "Code contains an if condition using && or ||",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\([^)]*(&&|\\|\\|)",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

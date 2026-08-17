@@ -1,0 +1,24 @@
+{
+  "id": "2-4-5-reading-do-while",
+  "title": "2.4.5 Reading — The do...while Loop",
+  "description": "while and do...while test their condition at different ends, and that changes whether the body ever runs at all. Read before Predict: while vs do...while.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.4 Loop Control and Nested Loops",
+  "preview": "reading",
+  "sourceRef": "book 2.4 — §2.4.2 'The do...while Loop', Definition 2.4.1, Context Pause",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

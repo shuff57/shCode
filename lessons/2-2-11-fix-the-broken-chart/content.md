@@ -43,6 +43,6 @@ Press **Check my diagram** after each fix and watch the count come down. Notice 
 
 ### Why this lesson exists
 
-When you draw your own chart in the next lesson and five things go red, your instinct will be that you have made five mistakes and the whole thing is ruined. Usually you have made one. Read the checks, find the single idea they all point at, and fix that.
+The next time you draw a chart from scratch and five things go red, your instinct will be that you have made five mistakes and the whole thing is ruined. Usually you have made one. Read the checks, find the single idea they all point at, and fix that.
 
 No points, no AI grader — get all nine checks green and you are done.

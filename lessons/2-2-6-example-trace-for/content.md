@@ -39,9 +39,30 @@ for (let i = 1; i <= 3; i++) {
 console.log("Done. Total:", total);
 ```
 
+## Step 4 — Change the step, not just the limit
+
+The increment doesn't have to add 1. Run this loop that counts by twos:
+
+```js live plain
+for (let i = 2; i <= 10; i += 2) {
+  console.log(i);
+}
+```
+
+Now count down instead — start high, subtract each pass, and stop once you pass 1:
+
+```js live plain
+for (let i = 5; i >= 1; i--) {
+  console.log(i);
+}
+```
+
+Same three parts every time — init, condition, increment — just different numbers in each slot.
+
 ## Key takeaways
 
 - The `for` header has three parts: **init** (runs once), **condition** (checked before every pass), **increment** (runs after every pass).
 - The loop body runs only while the condition is true.
 - Variables declared outside the loop (like `total`) survive after the loop ends.
+- The increment can go up, down, or by any step size — the loop only cares that init, condition, and increment agree with each other.
 - Logging inside the loop is the fastest way to trace what is happening on each pass.

@@ -1,0 +1,64 @@
+{
+  "id": "2-5-8-lab-catch-first-error",
+  "title": "2.5.8 Catch Your First Error",
+  "description": "Write a try...catch that falls back gracefully when a variable doesn't exist, and confirm the program still finishes. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.5 Handling Errors with try/catch",
+  "preview": "console",
+  "week": 7,
+  "slos": ["SLO-3"],
+  "sourceRef": "book 2.5.2 — Try It Now 2.1",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Attempt the risky read",
+      "instructions": "Write a try block that uses console.log to print a variable called username. Never declare username anywhere in this file."
+    },
+    {
+      "id": "s2",
+      "title": "Fall back in catch",
+      "instructions": "In the catch block, use console.log to print exactly \"Falling back to Guest\"."
+    },
+    {
+      "id": "s3",
+      "title": "Confirm the program continues",
+      "instructions": "After the whole try...catch block, use console.log to print exactly \"Welcome!\" and confirm it still appears when you run the code."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "try/catch present",
+      "description": "Code contains a try block and a catch block",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "try\\s*\\{[\\s\\S]*catch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "reads username inside try",
+      "description": "The try block logs a variable called username",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(\\s*username\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Welcome! logged after the block",
+      "description": "Welcome! is logged after the catch block closes",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "catch[\\s\\S]*Welcome!",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

@@ -1,0 +1,65 @@
+{
+  "id": "2-3-22-lab-fix-type-mismatch",
+  "title": "2.3.22 Fix the Type Mismatch",
+  "description": "This code should print Second place and prints No medal instead. Fix it without changing the case values. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.3 The switch Statement",
+  "preview": "console",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.3.5 — Try It Now 2.4",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Explain why it fails",
+      "instructions": "Run the code and confirm it prints No medal. place is the string '2', and the cases are the numbers 1 and 2 — strict equality means neither case can match."
+    },
+    {
+      "id": "s2",
+      "title": "Fix it without changing the case values",
+      "instructions": "The case values must stay exactly as they are. Fix the bug by converting the switched value itself so it becomes a number before any case is checked."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "switched value converted with Number()",
+      "description": "switch(...) wraps place in Number(...)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "switch\\s*\\(\\s*Number\\s*\\(\\s*place\\s*\\)\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "case 1 unchanged",
+      "description": "case 1 is still a plain number",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s+1\\s*:",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "case 2 unchanged",
+      "description": "case 2 is still a plain number",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s+2\\s*:",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

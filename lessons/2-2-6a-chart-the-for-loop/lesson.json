@@ -1,6 +1,6 @@
 {
   "id": "2-2-6a-chart-the-for-loop",
-  "title": "2.2.9a Chart the Code — A for-loop That Accumulates",
+  "title": "2.2.11 Chart the Code — A for-loop That Accumulates",
   "description": "Draw the sum-1-to-5 loop as a flowchart using the loop-setup hexagon, and get the return arrow landing in the right place.",
   "type": "assignment",
   "difficulty": "beginner",
@@ -13,6 +13,7 @@
     "SLO-3",
     "SLO-4"
   ],
+  "sourceRef": "designed — chart-from-code practice (loop-setup hexagon, Appendix D), pairing with 2.2.10",
   "points": 0,
   "contentFile": "content.md",
   "diagram": {

@@ -37,6 +37,8 @@ console.log("Sum of 1 to 5: " + total);
 
 The accumulator pattern — starting `total` at `0` and adding to it on every loop — is one of the most reused patterns in programming. Memorize the shape.
 
+> **Watch the condition.** `i <= 5` runs five times; `i < 5` runs only four. Changing one character changes the answer — when a loop runs one too many or one too few times, check the condition before anything else.
+
 ## The same loop, drawn
 
 A `for` loop is three parts pretending to be one line, and a flowchart pulls them apart so you can see each one happen. Here is `for (let i = 1; i <= 5; i++)` drawn the long way — every part of the header as its own shape:
@@ -67,6 +69,7 @@ Five shapes for one line of code is a lot, which is why there is a shortcut — 
 
 | Term | Meaning |
 |------|---------|
+| **loop** | A construct that repeats a block of code as long as a condition stays true |
 | **for loop** | A loop that repeats a fixed, controlled number of times |
 | **init** | The setup expression that runs once before the loop starts |
 | **condition** | A true/false check evaluated before every repetition |

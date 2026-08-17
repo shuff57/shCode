@@ -1,0 +1,24 @@
+{
+  "id": "2-4-24-reading-nested-loops",
+  "title": "2.4.24 Reading — Nested Loops",
+  "description": "A loop inside a loop is a nested loop, and the inner one runs all the way through for every single round of the outer one. Read before A Multiplication Table.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.4 Loop Control and Nested Loops",
+  "preview": "reading",
+  "sourceRef": "book 2.4 — §2.4.6 intro example, Definition 2.4.5, 'multiply, do not add' counting note",
+  "week": 7,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

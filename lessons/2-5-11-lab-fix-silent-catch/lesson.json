@@ -1,0 +1,49 @@
+{
+  "id": "2-5-11-lab-fix-silent-catch",
+  "title": "2.5.11 Fix the Silent Catch",
+  "description": "An empty catch block is hiding a failure. Add a report so the next person can see it. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.5 Handling Errors with try/catch",
+  "preview": "console",
+  "week": 7,
+  "slos": ["SLO-3"],
+  "sourceRef": "designed — practice for 2.5.2 Context Pause (the empty catch block)",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Find the silent catch",
+      "instructions": "The starter's catch block is empty. Nothing tells you the order total failed to calculate."
+    },
+    {
+      "id": "s2",
+      "title": "Report it",
+      "instructions": "Add a console.log inside the catch block that says what happened, for example \"Could not calculate the total.\""
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "try/catch present",
+      "description": "Code still has a try block and a catch block",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "try\\s*\\{[\\s\\S]*catch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "catch is no longer empty",
+      "description": "The catch block now logs something",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "catch\\s*\\([^)]*\\)\\s*\\{[^}]*console\\.log\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

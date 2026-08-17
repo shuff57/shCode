@@ -1,0 +1,18 @@
+{
+  "id": "2-5-18-reading-throw-vs-if",
+  "title": "2.5.18 Reading — throw vs if: The Distance Rule",
+  "description": "Decide when a problem deserves a throw and when a plain if is simpler. Read before 2.5.19 Reject the Bad Input.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.5 Handling Errors with try/catch",
+  "preview": "reading",
+  "week": 7,
+  "slos": ["SLO-3"],
+  "sourceRef": "book 2.5.4 — Context Pause (throw vs if, the distance rule)",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

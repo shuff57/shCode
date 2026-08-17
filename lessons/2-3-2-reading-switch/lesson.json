@@ -1,17 +1,18 @@
 {
   "id": "2-3-2-reading-switch",
-  "title": "2.3.2 Reading — switch Statements",
-  "description": "Learn how a switch statement picks one case from many without a long if/else chain. Read before the conditionals practice lesson.",
+  "title": "2.3.3 Reading — switch Statements",
+  "description": "Learn how a switch statement picks one case from many without a long if/else chain. Read before 2.3.4 Worked Example — A Menu of Options.",
   "type": "lesson",
   "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "2.3 The Switch Statement",
+  "unit": "2.3 The switch Statement",
   "preview": "reading",
-  "week": 4,
+  "week": 6,
   "slos": [
     "SLO-3"
   ],
+  "sourceRef": "book 2.3.2 — 'The switch Statement', Definition 2.3.1, Concepts in Practice: Reading a switch",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

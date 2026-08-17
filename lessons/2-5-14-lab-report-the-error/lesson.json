@@ -1,0 +1,59 @@
+{
+  "id": "2-5-14-lab-report-the-error",
+  "title": "2.5.14 Report the Error",
+  "description": "Cause a TypeError on purpose and print both err.name and err.message. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.5 Handling Errors with try/catch",
+  "preview": "console",
+  "week": 7,
+  "slos": ["SLO-3"],
+  "sourceRef": "book 2.5.3 — Try It Now 2.2",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Cause a TypeError on purpose",
+      "instructions": "Inside a try block, declare a constant set to null, then read a property off it (for example .name). Reading a property of null always raises a TypeError."
+    },
+    {
+      "id": "s2",
+      "title": "Report both parts",
+      "instructions": "In the catch block, use console.log to print err.name, then use console.log to print err.message."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "reads a property of null",
+      "description": "Code reads a property off a value set to null, inside try",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "=\\s*null[\\s\\S]*\\.\\w+",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "logs err.name",
+      "description": "Catch block logs err.name",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(\\s*err\\.name\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "logs err.message",
+      "description": "Catch block logs err.message",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(\\s*err\\.message\\s*\\)",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

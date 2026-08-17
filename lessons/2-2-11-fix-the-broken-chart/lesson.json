@@ -1,6 +1,6 @@
 {
   "id": "2-2-11-fix-the-broken-chart",
-  "title": "2.2.14 Fix the Broken Chart",
+  "title": "2.2.18 Fix the Broken Chart",
   "description": "A flowchart arrives with five red checks and one actual mistake. Find the mistake, and learn to read the checker instead of guessing.",
   "type": "assignment",
   "difficulty": "beginner",
@@ -12,6 +12,7 @@
   "slos": [
     "SLO-4"
   ],
+  "sourceRef": "designed — defect-repair diagram practice (Appendix D), reinforcing decision-chart rules from 2.2.4/2.2.6",
   "points": 0,
   "contentFile": "content.md",
   "diagram": {

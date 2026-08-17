@@ -1,0 +1,55 @@
+{
+  "id": "2-1-31-lab-flip-not",
+  "title": "2.1.32 Flip It with !",
+  "description": "Use the ! operator to flip a boolean inside an if condition. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.1 Conditionals",
+  "preview": "console",
+  "week": 5,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.1.8 — 'Combining Conditions', Example 2.10: Flipping a condition with !",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Declare a boolean",
+      "instructions": "Create a variable called isRaining and set it to true or false."
+    },
+    {
+      "id": "s2",
+      "title": "Flip it with !",
+      "instructions": "Write an if statement whose condition is !isRaining. Inside the block, log a message about walking to school. After the if, log isRaining and !isRaining on separate lines to see the flip."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "! used inside an if condition",
+      "description": "if statement condition uses the ! operator",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\(\\s*!\\s*\\w",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "console.log present",
+      "description": "Code calls console.log",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\(",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

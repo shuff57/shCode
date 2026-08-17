@@ -1,0 +1,55 @@
+{
+  "id": "2-1-20-lab-truthy-guard",
+  "title": "2.1.14 Guard with a Truthy Check",
+  "description": "Write an if statement that tests a variable directly, relying on truthy/falsy conversion. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.1 Conditionals",
+  "preview": "console",
+  "week": 5,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.1.2 — 'Boolean Conversion', Try It Now 2.2",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Declare a string variable",
+      "instructions": "Create a variable called searchTerm and set it to an empty string \"\"."
+    },
+    {
+      "id": "s2",
+      "title": "Test it directly",
+      "instructions": "Write an if statement whose condition is just searchTerm (no comparison operator). Log a message for when it's truthy, and add an else that logs a message for when it's falsy."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "if statement tests a variable directly",
+      "description": "if statement condition is a bare variable with no comparison operator",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\(\\s*searchTerm\\s*\\)",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "else branch present",
+      "description": "Code contains an else branch",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\}\\s*else\\s*\\{",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

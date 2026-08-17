@@ -1,0 +1,24 @@
+{
+  "id": "2-2-15-example-three-spellings",
+  "title": "2.2.15 Worked Example — Same Algorithm, Three Spellings",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.2 Algorithms and Loops",
+  "preview": "example",
+  "week": 6,
+  "slos": [
+    "SLO-3",
+    "SLO-4"
+  ],
+  "sourceRef": "book 2.2.3 — 'Common Ideas Across Languages', Example 2.3, Try It Now 2.3, Context Pause",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

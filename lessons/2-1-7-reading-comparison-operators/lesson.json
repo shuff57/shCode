@@ -1,6 +1,6 @@
 {
   "id": "2-1-7-reading-comparison-operators",
-  "title": "2.1.8 Reading — Comparison Operators & === vs ==",
+  "title": "2.1.15 Reading — Comparison Operators & === vs ==",
   "description": "Learn the six comparison operators and why === is safer than ==. Read before the conditionals practice lesson.",
   "type": "lesson",
   "difficulty": "beginner",
@@ -8,10 +8,11 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",
   "preview": "reading",
-  "week": 4,
+  "week": 5,
   "slos": [
     "SLO-3"
   ],
+  "sourceRef": "designed — vocabulary scaffold for comparison operators used throughout book 2.1 (===, ==, <, >, <=, >=; no dedicated book subsection)",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

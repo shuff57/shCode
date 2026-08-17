@@ -1,17 +1,18 @@
 {
   "id": "2-3-4-lab-convert-to-switch",
-  "title": "2.3.5 Convert an if-chain to switch",
+  "title": "2.3.29 Convert an if-chain to switch",
   "description": "Rewrite an if/else-if chain as a switch statement with at least two cases, a default, and break. Auto-graded.",
   "type": "assignment",
   "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "2.3 The Switch Statement",
+  "unit": "2.3 The switch Statement",
   "preview": "console",
-  "week": 4,
+  "week": 6,
   "slos": [
     "SLO-3"
   ],
+  "sourceRef": "designed — practice converting an if/else-if chain to switch, ahead of 2.3.30 A2.3.1 Print Settings Advisor",
   "steps": [
     {
       "id": "s1",

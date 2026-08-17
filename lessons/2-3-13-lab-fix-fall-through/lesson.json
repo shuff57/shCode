@@ -1,0 +1,65 @@
+{
+  "id": "2-3-13-lab-fix-fall-through",
+  "title": "2.3.13 Fix the Fall-Through Bug",
+  "description": "This code should print exactly one line but prints two. Find the missing break and fix it. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.3 The switch Statement",
+  "preview": "console",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.3.3 — Try It Now 2.2",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Find the missing break",
+      "instructions": "Run the code first and read the two lines it prints. Only one of them should print."
+    },
+    {
+      "id": "s2",
+      "title": "Fix it",
+      "instructions": "Add the one missing break so the switch prints exactly one line. Do not change anything else — not the case values, not the messages."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "switch statement present",
+      "description": "Code still contains a switch statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "switch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "break added after the apple case",
+      "description": "A break statement now appears between the apple case and the banana case",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]apple['\"]\\s*:[\\s\\S]*?break[\\s\\S]*?case\\s*['\"]banana['\"]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "default label still present",
+      "description": "Code still contains a default label",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "default\\s*:",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

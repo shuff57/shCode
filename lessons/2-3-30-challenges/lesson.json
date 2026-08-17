@@ -1,0 +1,71 @@
+{
+  "id": "2-3-30-challenges",
+  "title": "2.3.31 Challenges — Optional Stretch",
+  "description": "Optional stretch problems. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.3 The switch Statement",
+  "preview": "console",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "designed — stretch practice synthesizing switch, grouped cases, and fall-through debugging",
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "HTTP Status Advisor",
+      "instructions": "Write a switch on a variable code. 200 prints OK, 404 prints Not Found, 500 prints Server Error, and default prints Unknown status."
+    },
+    {
+      "id": "s2",
+      "title": "Season from Month",
+      "instructions": "Write a switch on a variable month (a number 1-12) that groups months into four seasons using grouped cases, then prints the season."
+    },
+    {
+      "id": "s3",
+      "title": "Find the Fall-Through",
+      "instructions": "content.md gives you a broken three-case switch that prints too much. Find and fix the missing break without changing anything else."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "switch statement present",
+      "description": "Code contains a switch statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "switch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "case label present",
+      "description": "Code contains a case label",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "break present",
+      "description": "Code contains a break statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "break",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

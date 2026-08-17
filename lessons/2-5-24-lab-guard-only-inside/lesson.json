@@ -1,0 +1,54 @@
+{
+  "id": "2-5-24-lab-guard-only-inside",
+  "title": "2.5.24 Guard Only What's Inside",
+  "description": "Write two risky lines: one guarded by try...catch, one left outside it, and see which one crashes. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.5 Handling Errors with try/catch",
+  "preview": "console",
+  "week": 7,
+  "slos": ["SLO-3"],
+  "sourceRef": "designed — practice for 2.5.6 (only catches code that runs inside it) + Concepts in Practice 'The limits'",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Guard one risky line",
+      "instructions": "Write a try block that logs a variable called firstMissing (never declared). In the catch, log \"Caught the first one.\""
+    },
+    {
+      "id": "s2",
+      "title": "Leave a second one unguarded",
+      "instructions": "After the whole try...catch, log a second variable called secondMissing (also never declared) — with no try around it."
+    },
+    {
+      "id": "s3",
+      "title": "Run and explain",
+      "instructions": "Run the code. The first error is caught; the second is not. In a comment, explain why the same kind of mistake is handled once and not the second time."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "guards firstMissing",
+      "description": "try block logs firstMissing, caught in catch",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "try\\s*\\{[^}]*firstMissing[\\s\\S]*catch",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "secondMissing left unguarded",
+      "description": "secondMissing is logged after the try...catch closes, not inside it",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "catch[\\s\\S]*\\}[\\s\\S]*console\\.log\\(\\s*secondMissing\\s*\\)",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+}

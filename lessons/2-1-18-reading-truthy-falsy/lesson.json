@@ -1,0 +1,24 @@
+{
+  "id": "2-1-18-reading-truthy-falsy",
+  "title": "2.1.12 Reading — Truthy and Falsy Values",
+  "description": "Learn the six falsy values and how if converts any value to true or false. Read before the truthy-check practice lesson.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.1 Conditionals",
+  "preview": "reading",
+  "week": 5,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.1.2 — 'Boolean Conversion', Definition 2.1.1: Truthy and Falsy",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

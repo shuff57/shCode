@@ -1,0 +1,51 @@
+{
+  "id": "2-3-27-written-justify-choice",
+  "title": "2.3.27 switch or if...else? Justify Your Choice",
+  "description": "Explain which statement fits a given problem and why. AI-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.3 The switch Statement",
+  "preview": "assignment",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.3.6 — Concepts in Practice: Picking the right tool; why the grade chain can't become a switch",
+  "points": 3,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "switch or if...else? Justify Your Choice — AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "Q1 — A program routes a support ticket by its priority, which is always one of 'low', 'medium', or 'high'. Which statement fits best, switch or if...else? Explain why in terms of what is being compared.\n\nQ2 — The grade chain from this section (score >= 90 prints A, score >= 80 prints B, and so on) cannot be rewritten as a switch. Explain why, in your own words.\n\nQ3 — Describe one program of your own choosing (real or made up) that could use either a switch or an if...else chain. Say which one you would pick and how you decided, using the same test from the reading.",
+    "rubric": [
+      {
+        "id": "q1-priority-switch",
+        "title": "Q1: Picks switch and explains why",
+        "description": "Answer picks switch and explains that priority is a single value compared against a fixed, finite list of exact strings ('low', 'medium', 'high') with no ranges involved. Deny if the answer picks if...else, or picks switch without explaining the finite-list reasoning.",
+        "points": 1
+      },
+      {
+        "id": "q2-grade-chain-explanation",
+        "title": "Q2: Explains why the grade chain can't become a switch",
+        "description": "Answer explains that score >= 80 (and similar) is a range covering many values, not one exact value, so there is no finite list of case values that could represent it. Accept any phrasing that identifies the range/boundary nature of the condition as the blocker. Deny an answer that only says 'switch doesn't support >=' without explaining why that matters (the finite-list requirement).",
+        "points": 1
+      },
+      {
+        "id": "q3-own-example",
+        "title": "Q3: Gives an own-choice example with a justified pick",
+        "description": "Describes a concrete program scenario (not the priority or grade example already used), states which statement it would use, and justifies the pick by asking whether the test can be written as a finite list of exact values. Deny if no reasoning is given for the choice, or if the example is just restated from Q1/Q2.",
+        "points": 1
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 3,
+    "passingScore": 3,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

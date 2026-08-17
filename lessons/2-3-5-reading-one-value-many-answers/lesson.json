@@ -1,0 +1,24 @@
+{
+  "id": "2-3-5-reading-one-value-many-answers",
+  "title": "2.3.2 Reading — One Value, Many Answers",
+  "description": "See why a long else-if chain that keeps testing the same variable is a sign JavaScript has a better tool for the job. Read before 2.3.3 Reading — switch Statements.",
+  "type": "lesson",
+  "difficulty": "beginner",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.3 The switch Statement",
+  "preview": "reading",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.3.1 — 'One Value, Many Answers'",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

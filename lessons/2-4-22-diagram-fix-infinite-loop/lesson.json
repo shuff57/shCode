@@ -1,0 +1,40 @@
+{
+  "id": "2-4-22-diagram-fix-infinite-loop",
+  "title": "2.4.22 Fix the Infinite Loop",
+  "description": "A chart arrives whose diamond only has one exit — the loop can never leave. Add the missing branch so a reader can see where it stops.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.4 Loop Control and Nested Loops",
+  "preview": "diagram",
+  "sourceRef": "designed — practice diagnosing an infinite loop on a chart, mirrors the 2.2.14 'Fix the Broken Chart' pattern",
+  "week": 6,
+  "slos": [
+    "SLO-2",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "diagram": {
+    "starter": "flowchart TD\n  A([Start]) --> B[count = 5]\n  B --> C{count > 0}\n  C -- yes --> D[print count]\n  D --> E[count = count - 1]\n  E --> C",
+    "rules": [
+      { "id": "one-start" },
+      { "id": "has-end" },
+      { "id": "all-labeled" },
+      { "id": "no-orphans" },
+      { "id": "min-decisions", "count": 1 },
+      { "id": "decision-two-exits" },
+      { "id": "decision-labeled" },
+      { "id": "reaches-end" },
+      { "id": "no-self-loop" }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

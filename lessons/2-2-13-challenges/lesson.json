@@ -1,6 +1,6 @@
 {
   "id": "2-2-13-challenges",
-  "title": "2.2.16 Challenges — Optional Stretch",
+  "title": "2.2.20 Challenges — Optional Stretch",
   "description": "Optional stretch problems. Auto-graded.",
   "type": "assignment",
   "difficulty": "beginner",
@@ -13,6 +13,7 @@
     "SLO-3",
     "SLO-4"
   ],
+  "sourceRef": "designed — stretch problems informed by book Problem Set 2.2.1 (FizzBuzz-style) and Key Terms review",
   "steps": [
     {
       "id": "s1",
@@ -27,7 +28,7 @@
     {
       "id": "s3",
       "title": "Sum even numbers",
-      "instructions": "Given an array of numbers, add up only the even numbers and log the total."
+      "instructions": "Loop through every integer from 1 to 20. Add up only the even numbers (use the % operator to test) and log the total."
     }
   ],
   "requirements": [

@@ -1,0 +1,130 @@
+{
+  "id": "2-3-29-a2-3-1-print-settings-advisor",
+  "title": "2.3.30 A2.3.1 — Print Settings Advisor",
+  "description": "Write a switch on filamentType with at least four cases and a default, printing a recommended temperature and speed for each. Auto-graded.",
+  "type": "assignment",
+  "difficulty": "beginner",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.3 The switch Statement",
+  "preview": "console",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "designed — A2.3.1, curriculum-plan.md §2.3 Assignments",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Create a variable to switch on",
+      "instructions": "Create a variable called filamentType and assign it one of: 'PLA', 'ABS', 'PETG', 'TPU'."
+    },
+    {
+      "id": "s2",
+      "title": "Write the switch",
+      "instructions": "Write a switch on filamentType with a case for 'PLA', 'ABS', 'PETG', and 'TPU'. Each case must print a recommended temperature and a recommended print speed for that filament — you choose reasonable numbers. Add a default that prints a message for a filament type you don't recognize. End every case with a break."
+    },
+    {
+      "id": "s3",
+      "title": "Comment where fall-through would happen",
+      "instructions": "Above one of your case labels, write a comment explaining exactly what would print for that filament (and which cases below it) if its break were removed. Don't actually remove the break — the comment is the deliverable."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "switch statement present",
+      "description": "Code contains a switch statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "switch\\s*\\(",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "case 'PLA' present",
+      "description": "Code contains a case for 'PLA'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]PLA['\"]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "case 'ABS' present",
+      "description": "Code contains a case for 'ABS'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]ABS['\"]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "case 'PETG' present",
+      "description": "Code contains a case for 'PETG'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]PETG['\"]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "case 'TPU' present",
+      "description": "Code contains a case for 'TPU'",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "case\\s*['\"]TPU['\"]",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r6",
+      "title": "default label present",
+      "description": "Code contains a default label",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "default\\s*:",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r7",
+      "title": "break present",
+      "description": "Code contains at least one break statement",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "break",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r8",
+      "title": "mentions temperature",
+      "description": "Code prints a recommended temperature somewhere",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "temp",
+      "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r9",
+      "title": "mentions speed",
+      "description": "Code prints a recommended print speed somewhere",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "speed",
+      "flags": "i",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
