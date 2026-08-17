@@ -3,7 +3,6 @@
   "title": "6.4.13 Reading — Camera-follow pattern",
   "description": "How camera.x = player.pos.x inside draw() locks the viewport onto a moving sprite. Read before 2.4.8 (Worked Example — Camera Follow).",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 6,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",

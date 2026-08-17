@@ -20,7 +20,7 @@ function parseArgs(argv: string[]) {
 const args = parseArgs(process.argv);
 
 if (!args.id || !args.title) {
-  console.error('Usage: npx tsx scripts/create-lesson.ts --id <id> --title <title> [--week <n>] [--type lesson|assignment|project] [--category <cat>] [--difficulty beginner|intermediate|advanced] [--mins <n>]');
+  console.error('Usage: npx tsx scripts/create-lesson.ts --id <id> --title <title> [--week <n>] [--type lesson|assignment|project] [--category <cat>] [--mins <n>]');
   process.exit(1);
 }
 
@@ -29,7 +29,6 @@ const title = args.title;
 const week = args.week ? parseInt(args.week, 10) : undefined;
 const type = args.type || 'lesson';
 const category = args.category || (week ? `Q${Math.ceil(week / 9)}-Fundamentals` : undefined);
-const difficulty = args.difficulty || 'beginner';
 const mins = args.mins ? parseInt(args.mins, 10) : 30;
 
 const lessonDir = path.join(process.cwd(), 'lessons', id);
@@ -47,7 +46,6 @@ const meta: Record<string, any> = {
   title,
   description: '',
   type,
-  difficulty,
   estimateMins: mins,
 };
 if (category) meta.category = category;

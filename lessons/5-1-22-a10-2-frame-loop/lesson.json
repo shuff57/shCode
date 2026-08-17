@@ -3,7 +3,6 @@
   "title": "5.1.22 Frame Loop Writeup",
   "description": "Written reflection on setup/draw and the 60fps math. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 20,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

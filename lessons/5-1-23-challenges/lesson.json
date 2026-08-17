@@ -3,7 +3,6 @@
   "title": "5.1.23 Challenges",
   "description": "Pick one or more of the stretch challenges and implement them in the editor. Auto-graded.",
   "type": "challenge",
-  "difficulty": "advanced",
   "estimateMins": 30,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

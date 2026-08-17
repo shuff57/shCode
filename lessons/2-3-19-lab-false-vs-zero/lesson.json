@@ -3,7 +3,6 @@
   "title": "2.3.19 case false vs case 0: Predict, Then Run",
   "description": "Write a switch with case false, case 0, and case '0', then predict which one a number, a boolean, and a string each match. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

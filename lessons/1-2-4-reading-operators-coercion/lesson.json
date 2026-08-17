@@ -3,7 +3,6 @@
   "title": "1.2.7 Reading — Arithmetic Operators and Type Coercion",
   "description": "Learn arithmetic operators and the biggest JS beginner trap: why \"5\" + 3 equals \"53\". Read before the operators-expressions lesson.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

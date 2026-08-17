@@ -3,7 +3,6 @@
   "title": "1.4.6 Which Level Fits?",
   "description": "A team needs to ship a web app quickly. Pick a level of abstraction and name what they trade away. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

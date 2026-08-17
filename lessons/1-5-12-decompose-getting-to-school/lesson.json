@@ -3,7 +3,6 @@
   "title": "1.5.12 Decompose Getting to School",
   "description": "Six tasks, your own categories, and one thing the grouping tells you that the list did not. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

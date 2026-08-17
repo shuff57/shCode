@@ -3,7 +3,6 @@
   "title": "1.4.17 Where Does the Balance Live?",
   "description": "A bank account, two paradigms. Say where the depositing code goes in each, and when you'd want which. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

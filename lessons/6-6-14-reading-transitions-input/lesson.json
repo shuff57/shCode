@@ -3,7 +3,6 @@
   "title": "6.6.15 Reading — shplay docs: Input-Driven Transitions",
   "description": "Input-driven transitions happen when the player presses a key. Title → Play (press Enter), Play → Pause (press P). The player is in control.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.6 Game State Machines",

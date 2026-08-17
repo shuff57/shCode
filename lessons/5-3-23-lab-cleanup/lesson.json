@@ -3,7 +3,6 @@
   "title": "5.4.9 Lab — Cleanup with `this.sprite.delete()`",
   "description": "Write `Bubble.pop()` which calls `this.sprite.delete()` so the object removes its own sprite on click.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 6,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",

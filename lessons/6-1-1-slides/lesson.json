@@ -3,7 +3,6 @@
   "title": "6.1.1 Slides — Groups and Overlaps",
   "description": "Groups and Overlaps slides — overlap detection, safe despawn, edge-triggered input, and ground-gated jumping. Placeholder until the deck is rebuilt from bookSHelf.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.1 Groups and Overlaps",
@@ -11,7 +10,8 @@
   "slos": [
     "SLO-3",
     "SLO-4"
-  ],  "steps": [],
+  ],
+  "steps": [],
   "requirements": [],
   "grading": {
     "totalPoints": 0,

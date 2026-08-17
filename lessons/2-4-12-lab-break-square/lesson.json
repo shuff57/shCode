@@ -3,7 +3,6 @@
   "title": "2.4.12 Break When the Square Passes 50",
   "description": "Count up from 1 and break as soon as the square of the count exceeds 50. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

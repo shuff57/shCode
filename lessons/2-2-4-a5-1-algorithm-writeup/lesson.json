@@ -1,9 +1,8 @@
 {
   "id": "2-2-4-a5-1-algorithm-writeup",
-  "title": "2.2.8 A2.2.1 (Part A) — Algorithm in Plain English",
+  "title": "2.2.8 Algorithm in Plain English (Part A)",
   "description": "Define algorithm in your own words, then write a precise numbered algorithm for an everyday task. AI-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",
@@ -53,5 +52,6 @@
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "assignmentCode": "A2.2.1"
 }

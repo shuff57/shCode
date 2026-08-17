@@ -3,7 +3,6 @@
   "title": "5.3.13 Your Turn — Build a Sprite",
   "description": "Low-stakes autograded practice. Instantiate the Sprite class twice (rectangle form and circle form), set properties on each instance, and give one sprite a stroke. Bridges the 2.2.4 / 2.2.5 worked examples and the 2.2.8 Enemy class lab.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.3 Classes and Objects via shPlay",

@@ -3,7 +3,6 @@
   "title": "1.2.6 Reading — The number Type",
   "description": "Whole numbers and decimals are the same type in JavaScript. One type, not two.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

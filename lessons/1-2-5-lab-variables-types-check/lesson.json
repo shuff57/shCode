@@ -3,7 +3,6 @@
   "title": "1.2.26 Variables and Types Check",
   "description": "Understand how to store and work with data using let, const, and typeof.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

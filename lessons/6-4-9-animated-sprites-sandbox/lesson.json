@@ -3,7 +3,6 @@
   "title": "6.4.9 Animated Sprites Sandbox",
   "description": "Drive a sprite's visual from input state — the same swap pattern used by addAni / changeAni, with sprite.image swapping as the asset-free placeholder. Idle when standing, run when moving, jump when 'w' is held.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 25,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",

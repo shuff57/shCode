@@ -1,9 +1,8 @@
 {
   "id": "2-3-29-a2-3-1-print-settings-advisor",
-  "title": "2.3.30 A2.3.1 — Print Settings Advisor",
+  "title": "2.3.30 Print Settings Advisor",
   "description": "Write a switch on filamentType with at least four cases and a default, printing a recommended temperature and speed for each. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",
@@ -126,5 +125,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "assignmentCode": "A2.3.1"
 }

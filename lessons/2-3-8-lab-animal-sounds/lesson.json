@@ -3,7 +3,6 @@
   "title": "2.3.7 Build a Switch: Animal Sounds",
   "description": "Write a switch that prints the sound an animal makes, with a default for anything else. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

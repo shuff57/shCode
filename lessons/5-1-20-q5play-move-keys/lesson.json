@@ -3,7 +3,6 @@
   "title": "5.1.20 Make it Move",
   "description": "Drive a sprite with the arrow keys by setting vel.x and vel.y based on what's pressed.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 25,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

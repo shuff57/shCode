@@ -1,9 +1,8 @@
 {
   "id": "1-5-31-a1-5-1-implement-your-plan",
-  "title": "1.5.31 A1.5.1 Part 2 — Implement Your Plan",
+  "title": "1.5.31 Implement Your Plan (Part 2)",
   "description": "Turn the chart you just passed into working JavaScript, and confirm the code matches the plan. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
@@ -94,5 +93,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "assignmentCode": "A1.5.1"
 }

@@ -2,7 +2,6 @@
   "id": "2-1-19-example-falsy-values",
   "title": "2.1.13 Worked Example — Falsy Value Surprises",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

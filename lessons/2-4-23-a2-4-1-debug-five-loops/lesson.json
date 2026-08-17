@@ -1,9 +1,8 @@
 {
   "id": "2-4-23-a2-4-1-debug-five-loops",
-  "title": "2.4.23 A2.4.1 — Debug Five Loops",
+  "title": "2.4.23 Debug Five Loops",
   "description": "Five loop programs are broken: two never stop, two are off by one, one has a do...while logic error. Fix all five and explain each bug in a comment. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
@@ -96,5 +95,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "assignmentCode": "A2.4.1"
 }

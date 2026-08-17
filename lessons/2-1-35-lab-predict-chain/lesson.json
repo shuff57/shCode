@@ -3,7 +3,6 @@
   "title": "2.1.36 Predict the Chain",
   "description": "Predict the output of an else if chain and a chained ternary before running them. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

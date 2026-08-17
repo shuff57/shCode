@@ -3,7 +3,6 @@
   "title": "2.2.13 Reading — while & do…while",
   "description": "while checks the condition before each run; do…while runs once first. Learn both, and how to avoid an infinite loop.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

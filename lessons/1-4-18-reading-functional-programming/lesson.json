@@ -3,7 +3,6 @@
   "title": "1.4.18 Reading — Functional Programming",
   "description": "Same input, same output, nothing else disturbed. The paradigm that is careful about change.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

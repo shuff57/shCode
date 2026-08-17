@@ -1,9 +1,8 @@
 {
   "id": "1-4-23-a1-4-1-two-languages",
-  "title": "1.4.23 A1.4.1 — Two Languages, Two Purposes",
+  "title": "1.4.23 Two Languages, Two Purposes",
   "description": "Pick two languages that aren't JavaScript and explain what each is for and why its paradigm fits. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",
@@ -57,5 +56,6 @@
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "assignmentCode": "A1.4.1"
 }

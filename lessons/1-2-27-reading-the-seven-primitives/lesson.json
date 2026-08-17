@@ -3,7 +3,6 @@
   "title": "1.2.27 Reading — The Seven Primitives, Recapped",
   "description": "The whole type system on one page, now that you have met every row of it.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

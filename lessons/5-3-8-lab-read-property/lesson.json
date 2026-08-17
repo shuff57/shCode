@@ -3,7 +3,6 @@
   "title": "5.3.8 Lab — Read a property",
   "description": "Read `b.color` and `b.size` off a Box instance and print them to the on-canvas console using `console.log`. First practice with dot-notation reads.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.3 Classes and Objects via shPlay",

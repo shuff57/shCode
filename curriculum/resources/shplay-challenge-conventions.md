@@ -21,7 +21,6 @@ Same shape as a lab assignment; only the fields in the table below differ. Use `
   "title": "2.1.12 Challenges — Optional Stretch",
   "description": "Pick one or more of the stretch challenges and implement them in the editor. Auto-graded.",
   "type": "challenge",
-  "difficulty": "advanced",
   "estimateMins": 30,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.1 Foundations",
@@ -58,13 +57,12 @@ Same shape as a lab assignment; only the fields in the table below differ. Use `
 | Field | Practice (`type: "lesson"`) | Lab (`type: "assignment"`) | Challenge (`type: "challenge"`) |
 |---|---|---|---|
 | `type` | `"lesson"` | `"assignment"` | `"challenge"` — toggles the ⭐ Challenge badge |
-| `difficulty` | `"beginner"` | `"intermediate"` | `"advanced"` |
 | `estimateMins` | 20–30 | 30–60 | ~30 |
 | `requirements` | strict per-feature regex | strict per-feature regex | alternation — see §2 |
 | `requirements[].points` / `grading.totalPoints` / `grading.passingScore` | all `0` (all-green gate) | all `0` (all-green gate) | all `0` (all-green gate) |
 | `script.js` | scaffold (description-only `// STEP N:`) | scaffold (description-only `// STEP N:`) | **fully empty** — see §4 |
 
-The `difficulty` rung encodes the lesson/lab/challenge progression itself: same content surface, less scaffolding at each rung. A practice lesson scaffolds the work and tests one concept; a lab scaffolds and tests synthesis; a challenge removes the scaffold entirely.
+`type` is what encodes the lesson/lab/challenge progression: same content surface, less scaffolding at each rung. A practice lesson scaffolds the work and tests one concept; a lab scaffolds and tests synthesis; a challenge removes the scaffold entirely.
 
 Everything else — §1/§3/§4 of `shplay-lesson-conventions.md` apply (no `/// <reference>`, header comment format, function order — same shape as a lesson scaffold *minus* the scaffold itself for challenges).
 

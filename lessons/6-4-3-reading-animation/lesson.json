@@ -3,7 +3,6 @@
   "title": "6.4.3 Reading — shplay docs: Animation",
   "description": "shplay docs chapter on Animation. Read before `2.4.5 Animated Sprites Sandbox`.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",

@@ -22,7 +22,6 @@ Labs ship **scaffolded** — `script.js` has a header comment, top-level `let` d
   "title": "<numbering> <Lab Name>",
   "description": "<one line>. Auto-graded.",
   "type": "assignment",
-  "difficulty": "intermediate",
   "estimateMins": 45,
   "category": "<unit category>",
   "unit": "<unit label>",
@@ -38,7 +37,6 @@ Labs ship **scaffolded** — `script.js` has a header comment, top-level `let` d
 ### Field-by-field
 
 - `type` — **must be `"assignment"`**. This is what toggles the "Assignment" badge in `lib/lesson-badges.tsx`.
-- `difficulty` — **must be `"intermediate"`**. Labs sit one rung above practice q5 lessons (`"beginner"`) and one rung below challenges (`"advanced"`). The tiering encodes the lesson/lab/challenge progression: same content surface, less scaffolding at each rung.
 - `estimateMins` — labs are the 30–60 min bucket. Shorter = challenge; longer = project/capstone.
 - `steps` — author-side documentation. **Not currently rendered in the student UI** (the Quest tab shows `requirements[]`, see `shplay-lesson-conventions.md` §5). Each `step.id` should still correspond to the matching `// STEP N:` comment in `script.js` so the scaffold's structure mirrors the spec.
 - `requirements` — **strict**. Each requirement checks a specific pattern the student must produce. Use `type: "regex"` for anywhere-in-file checks and `type: "inFunction"` for per-function-body checks.
@@ -149,7 +147,6 @@ The console lab is the same LessonWorkspace as shplay labs, but the preview runs
   "title": "<numbering> <Lab Name>",
   "description": "<one line>. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "<unit category>",
   "unit": "<unit label>",
@@ -179,7 +176,6 @@ The console lab is the same LessonWorkspace as shplay labs, but the preview runs
 
 - `preview` — **must be `"console"`.** Badge is `PREVIEW_BADGES.assignment`, not `.console` — `badgeForLesson` (`lib/lesson-badges.tsx`, used by the module lesson list and lesson cards) resolves `type` before `preview`, and `type: "assignment"` always wins. Matches `README.md`'s own Type index (Badge = Assignment for this row). `PREVIEW_BADGES.console` never renders for a graded lab.
 - `type` — `"assignment"` (same as shplay).
-- `difficulty` — **`"beginner"`** for unit-1 console labs. Shplay's `"intermediate"` tiering assumes q5 familiarity; the console track starts at rung zero. Revisit the tiering if a console lab ever targets post-unit-1 material.
 - `estimateMins` — the 5–15 min bucket, not shplay's 30–60. Console labs are one-concept drills.
 - `steps` / `requirements` — identical semantics to §1: `steps[].id` ↔ `// STEP N:` comment; requirements are `"regex"` (anywhere in file) or `"inFunction"` (inside named function body). **Only `"regex"` has been used in console labs to date.**
 - `grading.totalPoints` / `passingScore` / `requirements[].points` — **all `0`**; the all-green Submit gate applies exactly as in §1.
@@ -219,7 +215,7 @@ No `content.md` required (step instructions live in `steps[].instructions`), mat
 - `1-2-12-lab-guard-and` — `&&` inside an `if` condition, one requirement (`if\\s*\\([^)]*&&`).
 - `1-2-9-lab-predict-comparisons` — predict-then-run pattern: STEP 2 asks for prediction comments before running, a nice low-stakes structure for comparison-operator labs. **The prediction itself is never graded** — the grader only checks source-text patterns (here, `===` and `console.log(`), and the comment-stripping preprocessor (`lib/grader.ts`) makes "a comment exists above each log" unenforceable by regex anyway. Treat predict-then-run as an instructional structure in `steps[].instructions`, not something to write a requirement for.
 
-**Known inconsistency:** `1-2-26-challenges` ships `preview: "console"` + `type: "assignment"` with `difficulty: "beginner"` and is titled "Challenges". It is a stretch bundle, not a challenge lesson (the real challenge type is `preview: "shplay"` + `type: "challenge"` per `shplay-challenge-conventions.md`). Accepted as-is; future stretch bundles should follow the same pattern and note it here if the type doc gains a home for them.
+**Known inconsistency:** `1-2-26-challenges` ships `preview: "console"` + `type: "assignment"` and is titled "Challenges". It is a stretch bundle, not a challenge lesson (the real challenge type is `preview: "shplay"` + `type: "challenge"` per `shplay-challenge-conventions.md`). Accepted as-is; future stretch bundles should follow the same pattern and note it here if the type doc gains a home for them.
 
 ## History
 

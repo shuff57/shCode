@@ -3,7 +3,6 @@
   "title": "1.5.16 Keep Two, Drop Two",
   "description": "Describe a bus route to a stranger. Two details stay, two go, and you have to justify all four. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

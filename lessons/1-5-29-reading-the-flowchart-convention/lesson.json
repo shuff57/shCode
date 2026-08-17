@@ -3,7 +3,6 @@
   "title": "1.5.29 Reading — The Class Flowchart Convention",
   "description": "The rule for the rest of the course: every graded build opens with a flowchart, and the flowchart goes first. What gets checked, what does not, and how big a chart should be.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

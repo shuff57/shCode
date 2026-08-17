@@ -3,7 +3,6 @@
   "title": "6.7.12 Reading — shplay docs: applyForce(fx, fy)",
   "description": "applyForce(fx, fy) adds a one-frame impulse to a sprite — the physics engine turns it into motion. Read this before 2.7.19 Worked Example — Launch a Sprite with applyForce.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.7 Advanced Input",

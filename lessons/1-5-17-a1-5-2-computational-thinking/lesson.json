@@ -1,9 +1,8 @@
 {
   "id": "1-5-17-a1-5-2-computational-thinking",
-  "title": "1.5.17 A1.5.2 — Computational Thinking",
+  "title": "1.5.17 Computational Thinking",
   "description": "Explain the four parts of computational thinking in your own words, with a worked example of each. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
@@ -57,5 +56,6 @@
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "assignmentCode": "A1.5.2"
 }

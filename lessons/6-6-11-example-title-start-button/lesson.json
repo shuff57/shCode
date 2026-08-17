@@ -3,7 +3,6 @@
   "title": "6.6.11 Worked Example — Title Screen with Start Button",
   "description": "Build a title screen state that shows the game name and 'Press ENTER to start'. When they press Enter, change state to 'play'.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.6 Game State Machines",

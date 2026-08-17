@@ -3,7 +3,6 @@
   "title": "2.4.16 Reading — The continue Trap in a while Loop",
   "description": "In a for loop, continue still runs the increment. In a while loop it can jump straight past your update line — and hang the program. Read before The continue Trap, and Its Fix.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

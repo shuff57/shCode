@@ -3,7 +3,6 @@
   "title": "1.2.5 Change the Type",
   "description": "Give one variable three different types in a row and print what typeof says each time. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

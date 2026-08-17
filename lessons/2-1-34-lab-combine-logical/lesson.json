@@ -3,7 +3,6 @@
   "title": "2.1.35 Combine &&, ||, and !",
   "description": "Write one if condition that uses all three logical operators together. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

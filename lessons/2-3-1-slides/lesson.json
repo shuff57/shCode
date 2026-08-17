@@ -3,7 +3,6 @@
   "title": "2.3.1 Slides — The Switch Statement",
   "description": "The Switch Statement slides. Placeholder until the deck is built from the book.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

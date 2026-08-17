@@ -3,7 +3,6 @@
   "title": "6.6.5 Worked Example — switch with Three Cases",
   "description": "A plain switch with three cases that each draw different text. Not a game yet — just getting comfortable with the syntax.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.6 Game State Machines",

@@ -3,7 +3,6 @@
   "title": "3.2.2 Reading — Scope: Local vs Global",
   "description": "A variable declared inside a function is local — it only exists while that function runs and is invisible outside it. Global variables are accessible everywhere.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",

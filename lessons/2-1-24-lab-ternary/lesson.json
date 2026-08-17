@@ -3,7 +3,6 @@
   "title": "2.1.21 Write Your First Ternary",
   "description": "Use the conditional operator ? to assign one of two values to a variable. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

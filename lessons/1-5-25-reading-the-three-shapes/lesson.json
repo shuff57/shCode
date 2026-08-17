@@ -3,7 +3,6 @@
   "title": "1.5.25 Reading — The Three Flowchart Shapes",
   "description": "Oval, rectangle, diamond. Definition 1.5.6, and Table 1.5.2 — nearly every flowchart is these three.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

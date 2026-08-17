@@ -3,7 +3,6 @@
   "title": "5.1.7 Lab — Drop one sprite, change its color",
   "description": "Practice from 2.1.3b: create a canvas, drop a single sprite at the centre, and set its color. Three steps, no movement yet.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

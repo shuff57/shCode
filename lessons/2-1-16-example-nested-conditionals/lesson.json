@@ -2,7 +2,6 @@
   "id": "2-1-16-example-nested-conditionals",
   "title": "2.1.10 Worked Example — Nested if Inside if",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

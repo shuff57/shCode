@@ -3,7 +3,6 @@
   "title": "6.5.15 Video — Save Slots: Multiple Save Files",
   "description": "One save isn't enough — games have multiple slots. Each slot is just a different key name passed to storeItem/getItem.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.5 Save and Load",

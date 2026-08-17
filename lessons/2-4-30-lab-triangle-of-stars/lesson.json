@@ -3,7 +3,6 @@
   "title": "2.4.30 Triangle of Stars",
   "description": "Use a nested loop to print a triangle of stars, one row at a time, where the inner loop's limit depends on the outer loop's counter. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

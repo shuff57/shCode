@@ -3,7 +3,6 @@
   "title": "2.3.18 Reading — switch Compares Strictly",
   "description": "See why a case can silently never match when the switched value is the wrong type. Read before 2.3.19 case false vs case 0: Predict, Then Run.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

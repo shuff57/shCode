@@ -3,7 +3,6 @@
   "title": "1.2.21 null vs undefined",
   "description": "Tell the two empties apart and say when you'd write each. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

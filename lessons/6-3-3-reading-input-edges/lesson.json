@@ -3,7 +3,6 @@
   "title": "6.3.3 Reading — shplay docs: Input edges",
   "description": "shplay docs chapter on input — `kb.pressing` (level-triggered) vs `kb.presses` (edge-triggered). Read before `2.3.15 Edge-triggered Input`.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.3 Physics Applications",

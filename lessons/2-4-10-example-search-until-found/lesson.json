@@ -2,7 +2,6 @@
   "id": "2-4-10-example-search-until-found",
   "title": "2.4.10 Worked Example — Searching Without a Known End",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

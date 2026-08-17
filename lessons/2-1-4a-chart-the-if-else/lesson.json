@@ -3,7 +3,6 @@
   "title": "2.1.5 Chart the Code — if / else",
   "description": "Draw the if/else you just traced as a flowchart. One diamond, two labelled exits, both branches rejoining.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

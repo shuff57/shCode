@@ -3,7 +3,6 @@
   "title": "1.5.24 Pseudocode: Largest of Three",
   "description": "Write the plan, not the code. Then write a second plan for a password prompt. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 25,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

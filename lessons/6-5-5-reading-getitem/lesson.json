@@ -3,7 +3,6 @@
   "title": "6.5.5 Reading — getItem: Load Saved Data",
   "description": "How getItem(key) reads back a value your game saved earlier. Covers the basics of retrieving save data — the string type gotcha is in 2.5.5a.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.5 Save and Load",

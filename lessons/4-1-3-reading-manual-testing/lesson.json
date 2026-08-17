@@ -3,7 +3,6 @@
   "title": "4.1.4 Reading — Manual Testing: PASS / FAIL Checks",
   "description": "Call a function with a known input and print PASS or FAIL based on whether the result matches what you expected. Read before the Print Job Manager project.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "4.1 Print Shop (Q1 Synthesis)",

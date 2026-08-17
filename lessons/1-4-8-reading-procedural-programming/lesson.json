@@ -3,7 +3,6 @@
   "title": "1.4.8 Reading — Procedural Programming",
   "description": "The style you have been writing since §1.2: steps in order, acting on data held somewhere else.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

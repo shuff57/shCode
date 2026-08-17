@@ -3,7 +3,6 @@
   "title": "6.5.1 Slides — Your Game Forgets: The Problem",
   "description": "Save and Load opening slides — why game data disappears on refresh, what persistence means, and the plan for building a save/load system your players can count on. Placeholder until the deck is rebuilt from bookSHelf.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.5 Save and Load",

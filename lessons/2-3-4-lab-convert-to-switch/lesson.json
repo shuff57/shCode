@@ -3,7 +3,6 @@
   "title": "2.3.29 Convert an if-chain to switch",
   "description": "Rewrite an if/else-if chain as a switch statement with at least two cases, a default, and break. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

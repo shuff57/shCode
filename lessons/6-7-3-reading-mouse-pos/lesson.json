@@ -3,7 +3,6 @@
   "title": "6.7.3 Reading — shplay docs: mouse.x and mouse.y",
   "description": "mouse.x and mouse.y give you the cursor's position on the canvas every frame. Read this before the mouse input worked examples.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.7 Advanced Input and Joints",

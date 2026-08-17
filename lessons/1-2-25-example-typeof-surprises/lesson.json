@@ -3,7 +3,6 @@
   "title": "1.2.24 Worked Example — The typeof Surprises",
   "description": "Three answers that need explaining, including a bug the language has kept on purpose since 1995.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

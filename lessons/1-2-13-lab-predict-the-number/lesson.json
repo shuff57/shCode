@@ -3,7 +3,6 @@
   "title": "1.2.10 Predict the Number",
   "description": "Four expressions. Write down what you expect, then run them and find out. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

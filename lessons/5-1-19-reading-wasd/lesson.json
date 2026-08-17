@@ -3,7 +3,6 @@
   "title": "5.1.19 Reading — WASD-not-arrows",
   "description": "Why graded labs use 'a'/'d'/'w'/'s' instead of arrow keys, and how to swap them into the movement pattern. Read after 2.1.7d.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

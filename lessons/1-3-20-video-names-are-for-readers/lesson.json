@@ -1,9 +1,8 @@
 {
   "id": "1-3-20-video-names-are-for-readers",
-  "title": "1.3.20 Video \u2014 Names Are for Readers",
+  "title": "1.3.20 Video — Names Are for Readers",
   "description": "Three minutes on why good variable names matter and why giving one variable several jobs costs more than it saves. Watch after the readings.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.3 Documentation and Coding Conventions",
@@ -12,7 +11,7 @@
     "SLO-2"
   ],
   "videoUrl": "https://youtu.be/qN018DOAwWQ",
-  "videoFallback": "Ask your teacher for the link, or re-read 1.3.6 \u2014 Human-Readable Names instead.",
+  "videoFallback": "Ask your teacher for the link, or re-read 1.3.6 — Human-Readable Names instead.",
   "steps": [],
   "requirements": [],
   "grading": {

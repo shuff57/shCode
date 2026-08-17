@@ -3,7 +3,6 @@
   "title": "6.1.5 Groups Sandbox",
   "description": "Groups let you treat many sprites as one. Create, configure, spawn into, and clean up a Group.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 25,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.1 Groups and Overlaps",

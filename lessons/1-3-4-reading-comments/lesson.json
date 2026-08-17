@@ -3,7 +3,6 @@
   "title": "1.3.4 Reading — Comments: // and /* */",
   "description": "What single-line and block comments do, and why they matter. Read before A3.1.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.3 Documentation and Coding Conventions",

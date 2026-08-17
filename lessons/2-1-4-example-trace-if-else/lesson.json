@@ -2,7 +2,6 @@
   "id": "2-1-4-example-trace-if-else",
   "title": "2.1.4 Worked Example — Tracing an if/else chain",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

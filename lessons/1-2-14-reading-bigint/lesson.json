@@ -3,7 +3,6 @@
   "title": "1.2.11 Reading — BigInt",
   "description": "Past 9007199254740991, ordinary numbers stop being exact. Definition 1.2.2 and the n suffix.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

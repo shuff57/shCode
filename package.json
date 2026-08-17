@@ -4,11 +4,12 @@
   "main": "server.js",
   "scripts": {
     "dev": "node server.js",
-    "prebuild": "node scripts/check-lesson-numbers.mjs && node scripts/generate-lessons-manifest.mjs && node scripts/generate-solutions.mjs && node scripts/generate-lesson-starters.mjs",
+    "prebuild": "node scripts/check-lesson-numbers.mjs && node scripts/check-assignment-codes.mjs && node scripts/generate-lessons-manifest.mjs && node scripts/generate-solutions.mjs && node scripts/generate-lesson-starters.mjs",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
-    "test": "node scripts/check-lesson-numbers.mjs && node scripts/test-diagram.mjs && node scripts/test-runner-timeout.mjs && node scripts/test-capstone-requirements.mjs",
+    "test": "node scripts/check-lesson-numbers.mjs && node scripts/check-assignment-codes.mjs && node scripts/test-diagram.mjs && node scripts/test-runner-timeout.mjs && node scripts/test-capstone-requirements.mjs",
     "test:lessons": "node scripts/check-lesson-numbers.mjs",
+    "test:codes": "node scripts/check-assignment-codes.mjs",
     "test:diagram": "node scripts/test-diagram.mjs",
     "test:runner": "node scripts/test-runner-timeout.mjs"
   },

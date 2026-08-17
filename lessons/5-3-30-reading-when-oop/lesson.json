@@ -3,7 +3,6 @@
   "title": "5.4.17 Reading — When to reach for OOP (3-question checklist)",
   "description": "Three yes-or-no questions that tell you whether a class is the right tool. Read after the Procedural vs OOP example.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 6,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",

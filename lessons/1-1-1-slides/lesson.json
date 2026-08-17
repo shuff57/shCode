@@ -3,7 +3,6 @@
   "title": "1.1.1 Slides — Foundations",
   "description": "Unit 1.1 slides — software lifecycle, umbrella activities, task sets, SDLC methodologies, and the four Ps. Served live from bookSHelf; a push there updates this deck with no shCode rebuild.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1 Foundations",

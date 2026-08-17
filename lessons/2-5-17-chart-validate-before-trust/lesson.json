@@ -3,31 +3,56 @@
   "title": "2.5.17 Chart the Code — Validate Before You Trust",
   "description": "Draw two validation checks in a row, each throwing on the branch that fails.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",
   "preview": "diagram",
   "week": 7,
-  "slos": ["SLO-2", "SLO-4"],
+  "slos": [
+    "SLO-2",
+    "SLO-4"
+  ],
   "points": 0,
   "sourceRef": "designed — practice for 2.5.4 Example 2.3 (two sequential validation checks)",
   "contentFile": "content.md",
   "diagram": {
     "starter": "flowchart TD\n  A([Start])\n  Z([End])",
     "rules": [
-      { "id": "one-start" },
-      { "id": "has-end" },
-      { "id": "all-labeled" },
-      { "id": "no-orphans" },
-      { "id": "min-decisions", "count": 2 },
-      { "id": "decision-two-exits" },
-      { "id": "decision-labeled" },
-      { "id": "reaches-end" },
-      { "id": "no-self-loop" }
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-decisions",
+        "count": 2
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      }
     ]
   },
-  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
   "steps": [],
   "requirements": []
 }

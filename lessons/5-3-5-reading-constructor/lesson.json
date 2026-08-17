@@ -3,7 +3,6 @@
   "title": "5.3.5 Reading — `constructor` and its parameters",
   "description": "How the constructor receives arguments from `new` and stores them on `this`. Read right after 2.2.3a.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 6,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.3 Classes and Objects via shPlay",

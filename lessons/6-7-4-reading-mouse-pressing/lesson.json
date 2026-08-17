@@ -3,7 +3,6 @@
   "title": "6.7.4 Reading — shplay docs: mouse.pressing()",
   "description": "mouse.pressing() is true every frame the mouse button is held down. Read this before 2.7.5 so you understand the held vs. one-shot difference.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.7 Advanced Input and Joints",

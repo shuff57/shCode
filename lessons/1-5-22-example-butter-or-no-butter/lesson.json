@@ -3,7 +3,6 @@
   "title": "1.5.22 Worked Example — Butter or No Butter",
   "description": "The sandwich grows a decision, and pseudocode grows keywords: START, INPUT, IF, THEN, ELSE, OUTPUT.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

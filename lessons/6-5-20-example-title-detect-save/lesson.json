@@ -3,7 +3,6 @@
   "title": "6.5.20 Worked Example — Title Screen Detects Existing Saves",
   "description": "Build a title screen that checks for a save on startup. If save exists, show 'Press C to Continue'. Always show 'Press N for New Game'.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.5 Save and Load",

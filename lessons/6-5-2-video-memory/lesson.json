@@ -3,7 +3,6 @@
   "title": "6.5.2 Video — Memory: What Stays, What Disappears",
   "description": "A game resets to zero on refresh. Variables live in RAM — gone when the tab closes. Saved data lives on disk — still there tomorrow. This short video contrasts both so you understand what persistence actually means.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.5 Save and Load",

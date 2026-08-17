@@ -3,7 +3,6 @@
   "title": "1.1.11 Name That Umbrella",
   "description": "Read a testing scenario and log which umbrella activity it belongs to. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1 Foundations",

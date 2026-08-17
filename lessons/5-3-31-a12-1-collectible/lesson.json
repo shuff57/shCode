@@ -3,7 +3,6 @@
   "title": "5.4.18 Collectible Class",
   "description": "Write a Collectible class, instantiate at least 5, and detect overlap with the player. SLO-2 lab — the class is the point. Auto-graded.",
   "type": "assignment",
-  "difficulty": "intermediate",
   "estimateMins": 45,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",

@@ -3,7 +3,6 @@
   "title": "1.2.15 Greeting with Backticks",
   "description": "Build a greeting with a template literal, then prove single quotes cannot do the same job. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

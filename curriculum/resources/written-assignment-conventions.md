@@ -19,7 +19,6 @@ Distinct from a shplay lab (`preview: "shplay"`) because there is no `script.js`
   "title": "<numbering> <Writeup Name>",
   "description": "<one line>. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 20,
   "category": "<unit category>",
   "unit": "<unit label>",

@@ -3,7 +3,6 @@
   "title": "6.4.4 Reading — addAni(name, frames)",
   "description": "How sprite.addAni(name, frame1, ...) registers a named animation and makes it the active default. Read before 2.4.3b (changeAni).",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 6,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",

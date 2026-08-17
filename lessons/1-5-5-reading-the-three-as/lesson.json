@@ -3,7 +3,6 @@
   "title": "1.5.5 Reading — The Three As",
   "description": "Abstraction, automation, analysis — the shorter framing, and the step people skip.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

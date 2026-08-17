@@ -3,7 +3,6 @@
   "title": "1.5.45 Module 1.5 Quiz",
   "description": "Computational thinking, pseudocode, flowcharts, recursion, errors and debugging. Eight short answers. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 25,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
@@ -14,7 +13,7 @@
   "points": 0,
   "contentFile": "content.md",
   "aiGrader": {
-    "rubricTitle": "Module 1.5 Quiz \u2014 AI-graded rubric",
+    "rubricTitle": "Module 1.5 Quiz — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
     "prompt": "Answer all eight. One or two sentences each is enough.\n\n1. Define computational thinking in one or two sentences, without using the word \"computer\".\n\n2. Name the four techniques of computational thinking, with a one-line description of each.\n\n3. Explain why working out a plan before typing is faster than typing your way to an answer.\n\n4. Name the three flowchart shapes and what each means. Which one has two arrows leaving it, and why?\n\n5. Give one advantage of pseudocode over a flowchart, and one advantage of a flowchart over pseudocode.\n\n6. What is a base case, and what happens to a recursive function that does not have one?\n\n7. Name the three parts of an error message and say what each one tells you.\n\n8. Why is console.log(\"total is \" + total) more useful than console.log(total)?",

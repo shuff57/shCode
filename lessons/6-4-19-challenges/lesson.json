@@ -3,7 +3,6 @@
   "title": "6.4.19 Challenges",
   "description": "Pick one (or more) Animation & Camera stretches — parallax background, mirror the sprite when it walks left, or add vertical camera follow. Auto-graded.",
   "type": "challenge",
-  "difficulty": "advanced",
   "estimateMins": 30,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",

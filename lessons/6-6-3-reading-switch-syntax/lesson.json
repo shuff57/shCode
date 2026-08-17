@@ -3,7 +3,6 @@
   "title": "6.6.3 Reading — MDN: The switch Statement",
   "description": "switch is like if/else but cleaner when checking one variable against many values. Syntax: switch(variable) { case VALUE: ... break; }",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.6 Game State Machines",

@@ -3,7 +3,6 @@
   "title": "1.4.12 Name the Structure",
   "description": "Four described programs. Log which of the three structures each one needs. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

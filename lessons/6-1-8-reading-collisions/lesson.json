@@ -3,7 +3,6 @@
   "title": "6.2.3 Reading — shplay docs: Collisions + Overlaps",
   "description": "shplay docs chapter on collisions and overlap detection. Read before `2.3.10 Safe Despawn`.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.2 Overlaps and Collisions",

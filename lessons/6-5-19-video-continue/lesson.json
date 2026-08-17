@@ -3,7 +3,6 @@
   "title": "6.5.19 Video — New Game or Continue?",
   "description": "If a save exists, show 'Continue'. If not, only 'New Game'. The title screen pattern every game uses.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.5 Save and Load",

@@ -3,7 +3,6 @@
   "title": "1.5.2 Reading — Think Before You Type",
   "description": "A program has two separate difficulties. Typing solves one of them, and doing both at once is why you get stuck.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

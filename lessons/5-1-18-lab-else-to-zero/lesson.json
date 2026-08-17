@@ -3,7 +3,6 @@
   "title": "5.1.18 Lab — Delete the else, watch drift",
   "description": "Start from a working WASD movement pattern, delete the two else lines, observe drift, then restore them.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

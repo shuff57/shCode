@@ -3,7 +3,6 @@
   "title": "6.6.21 Fix the Broken Chart — the Pause State",
   "description": "Someone half-wired a pause feature and the chart shows it. Find what the red checks are pointing at and repair it.",
   "type": "assignment",
-  "difficulty": "intermediate",
   "estimateMins": 20,
   "category": "Unit 2: shPlay Game Development",
   "unit": "6.6 Game State Machines",

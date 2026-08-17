@@ -1,15 +1,16 @@
 {
   "id": "2-5-26-a2-5-1-loop-with-try-catch",
-  "title": "2.5.26 A2.5.1 — Loop with try/catch",
+  "title": "2.5.26 Loop with try/catch",
   "description": "Loop over three raw readings and use try/catch to reject bad input with a friendly message instead of crashing. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",
   "preview": "console",
   "week": 7,
-  "slos": ["SLO-3"],
+  "slos": [
+    "SLO-3"
+  ],
   "sourceRef": "designed — curriculum-plan.md A2.5.1 (loop + try/catch on bad input), informed by Problem Set 2.5.13",
   "steps": [
     {
@@ -70,5 +71,10 @@
       "points": 0
     }
   ],
-  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "assignmentCode": "A2.5.1"
 }

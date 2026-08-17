@@ -3,7 +3,6 @@
   "title": "5.1.11 Hello Sprite",
   "description": "Your first shplay sketch: a canvas, a sprite, a background color.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 20,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

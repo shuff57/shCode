@@ -3,7 +3,6 @@
   "title": "1.5.34 Worked Example — Stack Overflow on Purpose",
   "description": "Cause the error deliberately, so you recognise it when it happens by accident.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

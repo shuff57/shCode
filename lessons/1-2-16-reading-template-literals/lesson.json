@@ -3,7 +3,6 @@
   "title": "1.2.13 Reading — Embedding Values with ${...}",
   "description": "Drop a variable or a whole calculation into the middle of a string. Backticks only.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

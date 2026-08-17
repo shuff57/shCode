@@ -2,7 +2,6 @@
   "id": "2-3-20-example-fix-case-type",
   "title": "2.3.20 Worked Example — Fix 1: Match the Case Type to the Value",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

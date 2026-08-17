@@ -3,7 +3,6 @@
   "title": "6.5.13 Worked Example — Restore Full Player State from a Save",
   "description": "Load a saved game: getItem, JSON.parse, coerce numbers, then apply to your game objects.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.5 Save and Load",

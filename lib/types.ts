@@ -37,7 +37,6 @@ export type FileHistory = Record<string, Version[]>;
 // ---- Lessons & Assignments ----
 
 export type LessonType = 'lesson' | 'assignment' | 'project' | 'example' | 'challenge';
-export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 export type RequirementType = 'regex' | 'inFunction' | 'output' | 'function' | 'custom';
 
 export interface Step {
@@ -77,8 +76,10 @@ export interface Lesson {
   title: string;
   description: string;
   type?: LessonType;
-  difficulty: Difficulty;
   estimateMins: number;
+  /** Curriculum-plan assignment code (e.g. "A2.2.1"). Not shown to students;
+   *  it exists so the plan and the lesson still resolve to each other. */
+  assignmentCode?: string;
   category?: string;
   unit?: string;
   preview?: 'html' | 'console' | 'jscad' | 'shplay' | 'reading' | 'video' | 'example' | 'challenge' | 'assignment' | 'slides' | 'diagram';

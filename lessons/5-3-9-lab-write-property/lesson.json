@@ -3,7 +3,6 @@
   "title": "5.3.9 Lab — Write a property",
   "description": "Mutate `b.color` on a space-bar press to practice assigning a new value to an instance property. First practice with dot-notation writes.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.3 Classes and Objects via shPlay",

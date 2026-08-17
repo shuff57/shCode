@@ -3,7 +3,6 @@
   "title": "1.3.6 Reading — Human-Readable Names",
   "description": "A name should say what it holds without needing a comment. Definition 1.3.1, first rule.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.3 Documentation and Coding Conventions",

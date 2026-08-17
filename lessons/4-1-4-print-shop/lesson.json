@@ -3,7 +3,6 @@
   "title": "4.1.6 Print Shop (Q1 Synthesis)",
   "description": "Q1 synthesis: a console-only pricing and queue tool for the class printers. Arrays of objects, functions, sorting, save/load, and your own tests.",
   "type": "project",
-  "difficulty": "advanced",
   "estimateMins": 180,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "4.1 Print Shop (Q1 Synthesis)",

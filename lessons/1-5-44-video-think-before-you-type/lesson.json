@@ -1,9 +1,8 @@
 {
   "id": "1-5-44-video-think-before-you-type",
-  "title": "1.5.44 Video \u2014 Think Before You Type",
+  "title": "1.5.44 Video — Think Before You Type",
   "description": "Three and a half minutes on the four cornerstones of computational thinking, the three words that define an algorithm, and when to reach for pseudocode versus a flowchart. Covers the design half of this module.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
@@ -12,7 +11,7 @@
     "SLO-3"
   ],
   "videoUrl": "https://youtu.be/HGrUWOXrM34",
-  "videoFallback": "Ask your teacher for the link, or re-read 1.5.19 \u2014 Pseudocode and Flowcharts instead.",
+  "videoFallback": "Ask your teacher for the link, or re-read 1.5.19 — Pseudocode and Flowcharts instead.",
   "steps": [],
   "requirements": [],
   "grading": {

@@ -3,7 +3,6 @@
   "title": "5.1.21 Sprite Playground",
   "description": "Build a sprite playground combining canvas, WASD-controlled sprite, auto-motion, and on-screen text. Auto-graded.",
   "type": "assignment",
-  "difficulty": "intermediate",
   "estimateMins": 45,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

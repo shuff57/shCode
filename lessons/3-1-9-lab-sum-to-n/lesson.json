@@ -3,7 +3,6 @@
   "title": "3.1.6 Sum 1 to N",
   "description": "Define sumToN(n) that uses a for loop to add every integer from 1 to n and returns the total. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.1 Functions: Definition and Calls",

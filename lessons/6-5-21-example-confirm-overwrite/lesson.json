@@ -3,7 +3,6 @@
   "title": "6.5.22 Worked Example — Confirm Before Overwriting a Save",
   "description": "When the player tries to save over an existing slot, show an 'Are you sure?' prompt before writing.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.5 Save and Load",

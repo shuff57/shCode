@@ -2,7 +2,6 @@
   "id": "2-3-3-example-switch-vs-if",
   "title": "2.3.10 Worked Example — switch vs if-else-if",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

@@ -3,7 +3,6 @@
   "title": "1.2.19 Reading — The null Value",
   "description": "Deliberately nothing. A type with exactly one value in it. Definition 1.2.5.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

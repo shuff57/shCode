@@ -3,7 +3,6 @@
   "title": "1.1.21 Does It Fit?",
   "description": "Judge whether a prescriptive model fits a startup with changing requirements, with a reason. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1 Foundations",

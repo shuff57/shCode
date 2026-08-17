@@ -3,7 +3,6 @@
   "title": "2.3.6 Chart the Code — a switch is a chain of diamonds",
   "description": "Draw a three-case switch as a flowchart and see why `break` matters: without it, the arrows fall straight into the next case.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

@@ -3,7 +3,6 @@
   "title": "1.1.2 Reading — Console: console.log & sequential execution",
   "description": "How to print values with console.log and how JavaScript runs code top-to-bottom. Read before the A1.2 console lab.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1 Foundations",

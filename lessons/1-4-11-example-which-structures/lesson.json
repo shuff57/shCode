@@ -3,7 +3,6 @@
   "title": "1.4.11 Worked Example — Which Structures Does This Use?",
   "description": "Three programs, read one at a time, naming the structures in each. The identification habit, done out loud.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

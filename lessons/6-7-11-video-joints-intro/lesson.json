@@ -3,7 +3,6 @@
   "title": "6.8.1 Video — Joints in shplay",
   "description": "Three joint types in five minutes: a distance joint keeps two sprites a fixed length apart, a hinge lets one pivot around another, and a slider rides a track. You don't need to master all three — just watch and pick the one that fits your game.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.8 Joints",

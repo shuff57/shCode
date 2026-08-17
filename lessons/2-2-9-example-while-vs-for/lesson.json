@@ -2,7 +2,6 @@
   "id": "2-2-9-example-while-vs-for",
   "title": "2.2.14 Worked Example — while vs for + the infinite-loop trap",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

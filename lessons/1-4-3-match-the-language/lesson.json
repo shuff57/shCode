@@ -3,7 +3,6 @@
   "title": "1.4.3 Match the Language to the Job",
   "description": "Four jobs, four languages. Log the language each job was designed for. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

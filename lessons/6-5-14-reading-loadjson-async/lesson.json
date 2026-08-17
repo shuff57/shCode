@@ -3,7 +3,6 @@
   "title": "6.5.14 Reading — shplay docs: loadJSON is Async",
   "description": "loadJSON loads external JSON files (levels, dialogue, config) — different from save/load. It's async and needs a callback.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.5 Save and Load",

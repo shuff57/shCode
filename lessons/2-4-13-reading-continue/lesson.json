@@ -3,7 +3,6 @@
   "title": "2.4.13 Reading — Skipping a Round with continue",
   "description": "continue is gentler than break — it skips only the current round and keeps the loop running. Read before Filtering While You Loop.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

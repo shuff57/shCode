@@ -3,7 +3,6 @@
   "title": "1.5.38 Reading — Reading an Error Message",
   "description": "The kind, the detail, the place. Usually the most useful sentence available, and usually skimmed.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

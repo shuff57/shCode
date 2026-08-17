@@ -3,7 +3,6 @@
   "title": "2.4.26 Chart the Code — Nested Loops",
   "description": "Draw the row/col nested loop with two loop-setup hexagons, one nested inside the other's body.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 25,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
@@ -19,15 +18,34 @@
   "diagram": {
     "starter": "flowchart TD\n  A([Start])\n  Z([End])",
     "rules": [
-      { "id": "one-start" },
-      { "id": "has-end" },
-      { "id": "all-labeled" },
-      { "id": "no-orphans" },
-      { "id": "min-nodes", "count": 5 },
-      { "id": "decision-two-exits" },
-      { "id": "decision-labeled" },
-      { "id": "reaches-end" },
-      { "id": "no-self-loop" }
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-nodes",
+        "count": 5
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      }
     ]
   },
   "grading": {

@@ -3,7 +3,6 @@
   "title": "1.5.15 Worked Example — Computational Thinking in Chess",
   "description": "All four techniques on a problem nobody would call programming, which is the point.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

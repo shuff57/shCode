@@ -3,7 +3,6 @@
   "title": "2.3.2 Reading — One Value, Many Answers",
   "description": "See why a long else-if chain that keeps testing the same variable is a sign JavaScript has a better tool for the job. Read before 2.3.3 Reading — switch Statements.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

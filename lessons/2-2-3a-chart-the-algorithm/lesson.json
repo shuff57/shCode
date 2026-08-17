@@ -3,7 +3,6 @@
   "title": "2.2.6 Chart the Code — Largest of Three",
   "description": "You just wrote the largest-of-three algorithm as code. Now draw the same algorithm as a flowchart, without looking at the code.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

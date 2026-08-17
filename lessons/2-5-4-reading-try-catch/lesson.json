@@ -3,16 +3,21 @@
   "title": "2.5.4 Reading — try...catch: Attempt and Recover",
   "description": "Learn how try...catch lets a program recover from a runtime error instead of stopping cold. Read before 2.5.5 Worked Example — Only Wrap What Can Fail.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",
   "preview": "reading",
   "week": 7,
-  "slos": ["SLO-3"],
+  "slos": [
+    "SLO-3"
+  ],
   "sourceRef": "book 2.5.2 — 'Catching an Error with try...catch', Definition 2.5.2, both runnable examples",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],
-  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
 }

@@ -3,7 +3,6 @@
   "title": "1.2.18 Worked Example — Comparisons Produce Booleans",
   "description": "Four comparisons, four boolean answers, and the habit of reading a comparison as a value.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

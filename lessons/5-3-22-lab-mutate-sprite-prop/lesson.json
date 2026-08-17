@@ -3,7 +3,6 @@
   "title": "5.4.8 Lab — Mutate `this.sprite.x` from a method",
   "description": "Write `Mover.moveRight(dx)` which adds `dx` to `this.sprite.x`, reaching through composition to move the wrapped sprite.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",

@@ -3,7 +3,6 @@
   "title": "5.1.8 Reading — Storing the sprite in a let variable",
   "description": "Why you declare a let at file scope and assign the sprite in setup() — and what goes wrong when you create sprites inside draw(). Read before 2.1.3e.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

@@ -23,7 +23,6 @@ etc.). When a module spec under `curriculum/modules/*.md` lists a
   "title": "<numbering> Reading — <source>: <topic>",
   "description": "<one-line hook ending with when-to-read>",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "<unit category>",
   "unit": "<unit label>",

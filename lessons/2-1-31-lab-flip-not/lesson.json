@@ -3,7 +3,6 @@
   "title": "2.1.32 Flip It with !",
   "description": "Use the ! operator to flip a boolean inside an if condition. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

@@ -3,7 +3,6 @@
   "title": "6.7.17 Chart the Code — The Slingshot",
   "description": "Chart the three-stage slingshot: aim, stretch, release. The stage nobody draws is the one where nothing is happening yet.",
   "type": "assignment",
-  "difficulty": "intermediate",
   "estimateMins": 25,
   "category": "Unit 2: shPlay Game Development",
   "unit": "6.7 Advanced Input",

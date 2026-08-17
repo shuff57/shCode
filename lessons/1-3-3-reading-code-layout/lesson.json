@@ -3,7 +3,6 @@
   "title": "1.3.3 Reading — Code Layout",
   "description": "Apply consistent indentation, operator spacing, and semicolons so code is easy to scan.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.3 Documentation and Coding Conventions",

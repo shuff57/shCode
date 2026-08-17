@@ -3,7 +3,6 @@
   "title": "6.1.3 Reading — shplay docs: Groups",
   "description": "shplay docs chapter on Groups. Read before `2.3.5 Groups Sandbox`.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.1 Groups and Overlaps",

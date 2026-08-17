@@ -3,7 +3,6 @@
   "title": "2.4.33 Challenges — Optional Stretch",
   "description": "Optional stretch problems. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

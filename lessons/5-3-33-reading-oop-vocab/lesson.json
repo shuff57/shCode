@@ -3,7 +3,6 @@
   "title": "5.4.20 Reading — Encapsulation, inheritance, polymorphism (vocabulary only)",
   "description": "Name the three OOP pillars you'll encounter in downstream courses — no implementation required this week. Read at the close of Unit 2.2.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 6,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",

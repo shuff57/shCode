@@ -3,7 +3,7 @@ import path from 'path';
 import type { FileNode, FileType, Lesson } from './types';
 
 // Re-export types for backward compatibility
-export type { FileNode, Requirement, Lesson, Difficulty } from './types';
+export type { FileNode, Requirement, Lesson } from './types';
 
 function inferLanguage(filename: string): FileType {
   const ext = filename.split('.').pop()?.toLowerCase();

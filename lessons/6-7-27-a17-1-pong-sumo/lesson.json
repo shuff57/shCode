@@ -3,7 +3,6 @@
   "title": "6.7.23 Two-Player Pong-Sumo",
   "description": "Graded: build a two-player Pong-Sumo game — two paddles, one ball, push the ball past the opponent to score. Incorporates two-player input, push-collision physics, a win condition, and at least one joint. Auto-graded.",
   "type": "assignment",
-  "difficulty": "intermediate",
   "estimateMins": 75,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.7 Advanced Input",

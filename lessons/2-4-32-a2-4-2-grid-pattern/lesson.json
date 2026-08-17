@@ -1,9 +1,8 @@
 {
   "id": "2-4-32-a2-4-2-grid-pattern",
-  "title": "2.4.32 A2.4.2 — Print a Grid Pattern",
+  "title": "2.4.32 Print a Grid Pattern",
   "description": "Write a nested-loop program that prints a grid of at least 5x5, with the dimensions controlled by variables, not hardcoded loop bounds. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
@@ -86,5 +85,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "assignmentCode": "A2.4.2"
 }

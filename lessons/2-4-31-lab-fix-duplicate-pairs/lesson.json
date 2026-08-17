@@ -3,7 +3,6 @@
   "title": "2.4.31 Fix the Duplicate Pairs",
   "description": "A nested loop is supposed to print each pair once but prints every pair twice, including pairs of a number with itself. Fix the inner loop's starting value. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

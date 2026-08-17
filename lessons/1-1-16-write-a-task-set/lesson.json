@@ -3,7 +3,6 @@
   "title": "1.1.15 Write a Task Set",
   "description": "List a task set for the requirements-definition action. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1 Foundations",

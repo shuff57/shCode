@@ -3,7 +3,6 @@
   "title": "1.2.2 Reading — Declaring Variables with let and const",
   "description": "Declare variables with let and const, reassign a let, and choose between the two. Read before the variables-and-types lesson.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

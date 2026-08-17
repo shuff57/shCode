@@ -3,7 +3,6 @@
   "title": "5.1.13 Reading — kb.pressing(key)",
   "description": "How `kb.pressing(key)` checks whether a key is held this frame. Read before 2.1.7a (Velocity).",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

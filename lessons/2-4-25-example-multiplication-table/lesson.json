@@ -2,7 +2,6 @@
   "id": "2-4-25-example-multiplication-table",
   "title": "2.4.25 Worked Example — A Multiplication Table",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

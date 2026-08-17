@@ -3,7 +3,6 @@
   "title": "2.1.9 Reading — Nested Conditionals",
   "description": "Learn how to put one if statement inside another to ask a follow-up question. Read before the nested-if practice lesson.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

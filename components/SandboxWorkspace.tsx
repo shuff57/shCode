@@ -29,7 +29,6 @@ const SANDBOX_LESSON: Lesson = {
   id: 'sandbox',
   title: 'Sandbox',
   description: 'A blank shPlay canvas.',
-  difficulty: 'beginner',
   estimateMins: 0,
   unit: 'Sandbox',
   preview: 'shplay',

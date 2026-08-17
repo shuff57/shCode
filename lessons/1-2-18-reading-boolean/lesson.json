@@ -3,7 +3,6 @@
   "title": "1.2.17 Reading — The boolean Type",
   "description": "Exactly two values, and most of them come out of a comparison rather than being typed by hand. Definition 1.2.4.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

@@ -1,9 +1,8 @@
 {
   "id": "2-2-16-a2-2-1-loop-program",
-  "title": "2.2.17 A2.2.1 (Part B) — For + While Loop Program",
+  "title": "2.2.17 For + While Loop Program (Part B)",
   "description": "Write a JS program with at least one for loop and one while loop that solves a counting or accumulation problem. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",
@@ -67,5 +66,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "assignmentCode": "A2.2.1"
 }

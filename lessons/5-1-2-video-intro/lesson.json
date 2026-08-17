@@ -3,7 +3,6 @@
   "title": "5.1.2 Video — Your first shplay sketch",
   "description": "5-min walkthrough introducing canvas, sprite, and run cycle. Watch before the Hello Sprite lesson.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

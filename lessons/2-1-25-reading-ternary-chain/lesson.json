@@ -3,7 +3,6 @@
   "title": "2.1.22 Reading — Chaining Multiple ? Operators",
   "description": "Learn how to chain conditional operators to pick from more than two values. Read before the chained-ternary practice lesson.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

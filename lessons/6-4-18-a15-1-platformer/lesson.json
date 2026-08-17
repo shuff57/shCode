@@ -3,7 +3,6 @@
   "title": "6.4.18 Side-Scrolling Platformer",
   "description": "Combine animated sprites, a camera that follows the player, three or more platforms, working jump mechanics, and a visible end goal into a playable side-scroller. Auto-graded.",
   "type": "assignment",
-  "difficulty": "intermediate",
   "estimateMins": 90,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",

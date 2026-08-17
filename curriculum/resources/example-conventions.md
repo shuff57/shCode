@@ -16,7 +16,6 @@ Canonical rules for in-app **worked-example** lessons — teacher-led code walkt
   "id": "<slug>",
   "title": "<numbering> Worked Example — <topic>",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "<unit category>",
   "unit": "<unit label>",

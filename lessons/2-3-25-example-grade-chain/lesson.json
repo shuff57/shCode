@@ -2,7 +2,6 @@
   "id": "2-3-25-example-grade-chain",
   "title": "2.3.25 Worked Example — When switch Doesn't Fit: the Grade Chain",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

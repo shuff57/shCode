@@ -3,7 +3,6 @@
   "title": "1.3.5 Why Documentation Matters",
   "description": "One paragraph on why documentation matters in real software work, with a specific example. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.3 Documentation and Coding Conventions",
@@ -45,5 +44,6 @@
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "assignmentCode": "A1.3.2"
 }

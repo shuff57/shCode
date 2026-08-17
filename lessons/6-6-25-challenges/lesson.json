@@ -3,7 +3,6 @@
   "title": "6.6.27 Challenges — Extended State Features",
   "description": "Extend your state machine: animated transitions, a loading screen state, state history (undo last transition), or an options/settings state that modifies gameplay.",
   "type": "challenge",
-  "difficulty": "advanced",
   "estimateMins": 30,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.6 Game State Machines",

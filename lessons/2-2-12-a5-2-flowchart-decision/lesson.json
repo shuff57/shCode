@@ -1,9 +1,8 @@
 {
   "id": "2-2-12-a5-2-flowchart-decision",
-  "title": "2.2.7 A2.2.0 — Flowchart a Decision",
+  "title": "2.2.7 Flowchart a Decision",
   "description": "Draw the ticket-price algorithm as a flowchart. One start, one decision diamond with two labelled exits, one end. Green here unlocks 2.2.8 A2.2.1 (Part A).",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 25,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",
@@ -92,5 +91,6 @@
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "assignmentCode": "A2.2.0"
 }

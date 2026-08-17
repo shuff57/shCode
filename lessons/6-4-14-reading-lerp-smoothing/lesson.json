@@ -3,7 +3,6 @@
   "title": "6.4.14 Reading — Smoothing with lerp",
   "description": "How lerp(current, target, t) replaces a hard-set camera follow with a smooth elastic trail. Read before 2.4.9 (Worked Example — Smooth Camera).",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 6,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",

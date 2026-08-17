@@ -3,31 +3,56 @@
   "title": "2.5.7 Chart the Code — try/catch as a Flowchart",
   "description": "Draw try/catch as a flowchart: attempt a step, then branch on whether it failed.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",
   "preview": "diagram",
   "week": 7,
-  "slos": ["SLO-2", "SLO-4"],
+  "slos": [
+    "SLO-2",
+    "SLO-4"
+  ],
   "points": 0,
   "sourceRef": "designed — practice for Definition 2.5.2 (try...catch control flow)",
   "contentFile": "content.md",
   "diagram": {
     "starter": "flowchart TD\n  A([Start])\n  Z([End])",
     "rules": [
-      { "id": "one-start" },
-      { "id": "has-end" },
-      { "id": "all-labeled" },
-      { "id": "no-orphans" },
-      { "id": "min-decisions", "count": 1 },
-      { "id": "decision-two-exits" },
-      { "id": "decision-labeled" },
-      { "id": "reaches-end" },
-      { "id": "no-self-loop" }
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      }
     ]
   },
-  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
   "steps": [],
   "requirements": []
 }

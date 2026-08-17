@@ -3,7 +3,6 @@
   "title": "1.2.20 Reading — The undefined Value",
   "description": "What JavaScript puts in a variable you declared but never filled. Definition 1.2.6, and why not to write it yourself.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

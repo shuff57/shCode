@@ -3,7 +3,6 @@
   "title": "1.2.16 Operators and Expressions Check",
   "description": "Practice arithmetic, string concatenation, and comparison operators.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

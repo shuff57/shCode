@@ -3,7 +3,6 @@
   "title": "1.1.7 Classify the Task",
   "description": "Read each task from a school-lunch app and log which of the four phases it belongs to. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1 Foundations",

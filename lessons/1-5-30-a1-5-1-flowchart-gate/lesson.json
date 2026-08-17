@@ -1,9 +1,8 @@
 {
   "id": "1-5-30-a1-5-1-flowchart-gate",
-  "title": "1.5.30 A1.5.1 — Your First Flowchart",
+  "title": "1.5.30 Your First Flowchart (Part 1)",
   "description": "Chart the printer-credit rule using only the three shapes the book teaches. The first and gentlest run of the flowchart gate: nothing is graded, and you can redraw as often as you like.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 25,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
@@ -53,5 +52,6 @@
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "assignmentCode": "A1.5.1"
 }

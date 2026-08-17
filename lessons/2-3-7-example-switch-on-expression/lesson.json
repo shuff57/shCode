@@ -2,7 +2,6 @@
   "id": "2-3-7-example-switch-on-expression",
   "title": "2.3.5 Worked Example — The Switched Value Is an Expression",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

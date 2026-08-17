@@ -3,7 +3,6 @@
   "title": "5.1.15 Reading — Velocity: vel.x and vel.y",
   "description": "How `sprite.vel.x` and `vel.y` work as pixels-per-frame values the engine integrates into position. Read after 2.1.7.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

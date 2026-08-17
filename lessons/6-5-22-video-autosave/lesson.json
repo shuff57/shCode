@@ -3,7 +3,6 @@
   "title": "6.5.23 Video — Your Game, Automatically Saved",
   "description": "Not every save needs a button press. Auto-save triggers on level transitions, checkpoints, or a timer — the player doesn't think about it.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.5 Save and Load",

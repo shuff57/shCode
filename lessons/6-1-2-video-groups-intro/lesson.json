@@ -3,7 +3,6 @@
   "title": "6.1.2 Video — Groups in shplay",
   "description": "Why a `Group` is a class with shared defaults — and how a single line creates fifty enemies. Watch before `2.3.5 Groups Sandbox`.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 4,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.1 Groups and Overlaps",

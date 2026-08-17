@@ -3,7 +3,6 @@
   "title": "1.5.37 Settle It in the Console",
   "description": "Two expressions, one pair of brackets, and a question answered in four seconds. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

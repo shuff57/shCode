@@ -3,7 +3,6 @@
   "title": "1.1.22 Describe the Lifecycle",
   "description": "Describe the four framework activities and walk a real product through them. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 45,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1 Foundations",

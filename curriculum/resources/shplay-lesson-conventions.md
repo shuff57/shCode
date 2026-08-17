@@ -23,7 +23,6 @@ Use **Hello Sprite (`lessons/shplay-intro/lesson.json`)** as a concrete working 
   "title": "2.1.5 Hello Sprite",
   "description": "Your first shplay sketch: a canvas, a sprite, a background color.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 20,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "2.1 Foundations",
@@ -52,7 +51,6 @@ Use **Hello Sprite (`lessons/shplay-intro/lesson.json`)** as a concrete working 
 ### Field-by-field
 
 - `type` — **must be `"lesson"`**. `"assignment"` routes through `lab-assignment-conventions.md`; `"challenge"` through `shplay-challenge-conventions.md`.
-- `difficulty` — **must be `"beginner"`**. Practice q5 lessons sit at the bottom rung of the lesson/lab/challenge progression. Labs (`type: "assignment"`) bump to `"intermediate"`; challenges (`type: "challenge"`) bump to `"advanced"`. The `difficulty` field encodes this slot-type tier, not the absolute content difficulty. **Exception:** console-track labs (`preview: "console"`, Q1/units-1.x) stay `"beginner"` even though `type` is `"assignment"` — the console track starts at rung zero regardless of type; see `lab-assignment-conventions.md` §7.3.
 - `preview` — **must be `"shplay"`**. This mounts the shplay runtime, the file editor + live preview, and the right-side `TabbedRightDrawer` whose tabs include Docs / Quest / File (see §5).
 - `steps` — authored alongside requirements for authoring consistency and so the `// STEP N:` breadcrumbs in `script.js` have matching `steps[].id` values (see §3). **Currently not rendered in the student UI** (the Quest tab shows only `requirements` — see §5). The `instructions` + `hints` still belong here because future UI may surface them; keep them clean and pointing at the docs (see §2).
 - `requirements` — auto-graded checks AND the student-facing task list (since `steps` are unrendered). Each requirement's `title` + `description` is what the student reads in the Quest tab — write them as student-readable instructions, not terse grader labels. See `lab-assignment-conventions.md` for requirement-type grammar.

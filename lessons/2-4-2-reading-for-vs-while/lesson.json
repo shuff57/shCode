@@ -3,7 +3,6 @@
   "title": "2.4.2 Reading — for vs while: Choosing a Loop",
   "description": "for and while can do the same job. Learn the test that tells you which one to reach for. Read before Predict: Which Loop Fits?",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

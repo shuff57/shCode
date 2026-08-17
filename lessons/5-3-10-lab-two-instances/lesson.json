@@ -3,7 +3,6 @@
   "title": "5.3.10 Lab — Two sprites, two property values",
   "description": "Instantiate b1 and b2 from the same class with different colors, then mutate only b1 to confirm each instance's state is independent.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.3 Classes and Objects via shPlay",

@@ -3,7 +3,6 @@
   "title": "2.3.26 Rewrite the Traffic Light as a Switch",
   "description": "Rewrite an if/else-if chain that checks a traffic light color as an equivalent switch statement. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

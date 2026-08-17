@@ -3,7 +3,6 @@
   "title": "6.5.6 Reading — getItem Returns a String",
   "description": "getItem always gives you a string, even when you stored a number. String comparisons give wrong results — here's the Number() fix and the || 0 fallback.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.5 Save and Load",

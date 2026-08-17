@@ -3,7 +3,6 @@
   "title": "6.6.10 Video — Building a Title Screen",
   "description": "A title screen is just a state. It shows the game name, maybe instructions, and waits for the player to press a key to start playing.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.6 Game State Machines",

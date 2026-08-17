@@ -1,9 +1,8 @@
 {
   "id": "1-2-29-a1-2-2-describe-an-object",
-  "title": "1.2.29 A1.2.2 — Describe a Real Object",
+  "title": "1.2.29 Describe a Real Object",
   "description": "Six variables describing something in the room, printed as a sentence with a template literal. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",
@@ -109,5 +108,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "assignmentCode": "A1.2.2"
 }

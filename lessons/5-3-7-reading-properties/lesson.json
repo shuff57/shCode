@@ -3,7 +3,6 @@
   "title": "5.3.7 Reading — Properties: data on `this`",
   "description": "A property is data stored on a single instance via `this.name = value`. Read before the property labs.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 6,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.3 Classes and Objects via shPlay",

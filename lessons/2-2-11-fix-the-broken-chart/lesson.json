@@ -3,7 +3,6 @@
   "title": "2.2.18 Fix the Broken Chart",
   "description": "A flowchart arrives with five red checks and one actual mistake. Find the mistake, and learn to read the checker instead of guessing.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

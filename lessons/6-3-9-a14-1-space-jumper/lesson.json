@@ -3,7 +3,6 @@
   "title": "6.3.9 Space Jumper",
   "description": "Build a one-sprite platformer: WASD moves, space jumps — but only when touching the ground.",
   "type": "assignment",
-  "difficulty": "intermediate",
   "estimateMins": 40,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.3 Physics Applications",

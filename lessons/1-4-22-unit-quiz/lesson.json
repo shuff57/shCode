@@ -3,7 +3,6 @@
   "title": "1.4.22 Module 1.4 Quiz",
   "description": "Six short answers covering languages, abstraction levels, and the three paradigms. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

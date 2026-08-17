@@ -3,7 +3,6 @@
   "title": "2.3.8 Predict Where default Runs",
   "description": "Write two switch statements, predicting the output before you run each one — including one where default is written in the middle. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

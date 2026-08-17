@@ -1,9 +1,8 @@
 {
   "id": "1-3-19-a1-3-1-document-a-messy-program",
-  "title": "1.3.19 A1.3.1 — Document a Messy Program",
+  "title": "1.3.19 Document a Messy Program",
   "description": "Twelve lines with no comments, no spacing and terrible names. Fix it to the class style guide and write the README. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 40,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.3 Documentation and Coding Conventions",
@@ -139,5 +138,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "assignmentCode": "A1.3.1"
 }

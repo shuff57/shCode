@@ -3,7 +3,6 @@
   "title": "6.7.6 Reading — Hit-Testing a Sprite with the Mouse",
   "description": "A hit-test checks whether the cursor is currently over a sprite. This technique gates click-and-drag — the drag only starts when the mouse is on the sprite.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.7 Advanced Input and Joints",

@@ -3,7 +3,6 @@
   "title": "2.1.1 Slides — Conditionals",
   "description": "Conditionals slides. Placeholder until the deck is built from the book.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

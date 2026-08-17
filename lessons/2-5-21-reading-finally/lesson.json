@@ -3,16 +3,21 @@
   "title": "2.5.21 Reading — Cleaning Up with finally",
   "description": "Run cleanup code whether try succeeded or failed. Read before 2.5.22 When Does finally Run?.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",
   "preview": "reading",
   "week": 7,
-  "slos": ["SLO-3"],
+  "slos": [
+    "SLO-3"
+  ],
   "sourceRef": "book 2.5.5 — 'Cleaning Up with finally', Definition 2.5.4, both runnable examples, insight note",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],
-  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
 }

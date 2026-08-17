@@ -3,7 +3,6 @@
   "title": "2.2.3 Reading — Programs Implement Algorithms",
   "description": "An algorithm is the plan. A program is that plan written in a language a computer can run. See the same decision as English, then as JS.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

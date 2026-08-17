@@ -3,7 +3,6 @@
   "title": "6.6.4 Reading — shplay docs: switch in draw()",
   "description": "In shplay games, switch goes inside draw(). Each frame, it checks the state variable and draws the right screen.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.6 Game State Machines",

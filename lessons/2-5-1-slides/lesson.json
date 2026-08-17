@@ -3,14 +3,19 @@
   "title": "2.5.1 Slides — Handling Errors with try/catch",
   "description": "Handling Errors with try/catch slides. Placeholder until the deck is built from the book.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",
   "preview": "slides",
-  "slos": ["SLO-3"],
+  "slos": [
+    "SLO-3"
+  ],
   "sourceRef": "book 2.5 — overview (all subsections)",
   "steps": [],
   "requirements": [],
-  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
 }

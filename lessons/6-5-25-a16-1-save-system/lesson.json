@@ -3,7 +3,6 @@
   "title": "6.5.26 Save System — Build Save/Load with Slots",
   "description": "Graded: build a game with a complete save system — at least 3 save slots, load functionality, auto-save on level complete, and a Continue option on the title screen.",
   "type": "assignment",
-  "difficulty": "intermediate",
   "estimateMins": 60,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.5 Save and Load",

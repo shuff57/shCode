@@ -3,13 +3,14 @@
   "title": "2.5.19 Reject the Bad Input",
   "description": "Throw an error when a password is too short, and catch it with a clear message. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",
   "preview": "console",
   "week": 7,
-  "slos": ["SLO-3"],
+  "slos": [
+    "SLO-3"
+  ],
   "sourceRef": "book 2.5.4 — Try It Now 2.3",
   "steps": [
     {
@@ -60,5 +61,9 @@
       "points": 0
     }
   ],
-  "grading": { "totalPoints": 0, "passingScore": 0, "allowLateSubmit": true }
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
 }

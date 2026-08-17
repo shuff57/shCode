@@ -3,7 +3,6 @@
   "title": "2.1.25 Reading — When to Use ? vs if",
   "description": "Learn the rule of thumb: use ? to pick a value, use if to run different code. Read before the rewrite practice lesson.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

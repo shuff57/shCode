@@ -3,7 +3,6 @@
   "title": "5.4.6 Chart the Code — A Method That Calls a Method",
   "description": "Draw a method calling another method. Two double-rails, and flow that comes back from both.",
   "type": "assignment",
-  "difficulty": "intermediate",
   "estimateMins": 20,
   "category": "Unit 2: shPlay Game Development",
   "unit": "5.4 Writing Your Own Classes",

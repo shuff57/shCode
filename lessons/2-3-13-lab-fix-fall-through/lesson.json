@@ -3,7 +3,6 @@
   "title": "2.3.13 Fix the Fall-Through Bug",
   "description": "This code should print exactly one line but prints two. Find the missing break and fix it. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

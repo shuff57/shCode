@@ -2,7 +2,6 @@
   "id": "2-4-3-example-predict-which-loop",
   "title": "2.4.3 Worked Example — Predict: Which Loop Fits?",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

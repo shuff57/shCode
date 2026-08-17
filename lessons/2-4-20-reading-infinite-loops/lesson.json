@@ -3,7 +3,6 @@
   "title": "2.4.20 Reading — Infinite Loops: Three Causes",
   "description": "An infinite loop never crashes and never errors — it just never finishes. Learn the three usual reasons before you have to debug one. Read before Making an Infinite Loop Safe.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

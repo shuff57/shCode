@@ -3,7 +3,6 @@
   "title": "5.1.24 Falling Block — Example",
   "description": "A dynamic block falls under gravity and lands on a static floor. Read the example, then experiment.",
   "type": "example",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

@@ -3,7 +3,6 @@
   "title": "6.4.12 Reading — camera.x / camera.y",
   "description": "How assigning camera.x and camera.y shifts the viewport center each frame. Read before 2.4.7b (Camera-follow pattern).",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 6,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",

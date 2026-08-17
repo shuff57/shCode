@@ -3,7 +3,6 @@
   "title": "1.4.14 Three Structures, Three Examples",
   "description": "Name the three structures of structured programming and give an everyday example of each. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

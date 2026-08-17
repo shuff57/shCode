@@ -3,7 +3,6 @@
   "title": "2.3.31 Challenges — Optional Stretch",
   "description": "Optional stretch problems. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

@@ -2,7 +2,6 @@
   "id": "6-7-19-example-launch-force",
   "title": "6.7.14 Worked Example — Launch a Sprite with applyForce",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.7 Advanced Input",

@@ -3,7 +3,6 @@
   "title": "1.2.3 Reading — Every Value Has a Type",
   "description": "Eight types, and the whole language is built from them. The map before the tour.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

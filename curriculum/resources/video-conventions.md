@@ -20,7 +20,6 @@ these rules are binding.
   "title": "<numbering> Video — <topic>",
   "description": "<one-line hook ending with when-to-watch>",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "<unit category>",
   "unit": "<unit label>",

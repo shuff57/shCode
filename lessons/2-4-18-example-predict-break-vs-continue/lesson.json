@@ -2,7 +2,6 @@
   "id": "2-4-18-example-predict-break-vs-continue",
   "title": "2.4.18 Worked Example — Predict: break vs continue",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

@@ -3,7 +3,6 @@
   "title": "2.1.19 Reading — The Conditional Operator ?",
   "description": "Learn the ternary operator: condition ? value1 : value2. Read before the ternary practice lesson.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

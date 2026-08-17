@@ -3,7 +3,6 @@
   "title": "1.4.19 Reading — JavaScript Is Multi-Paradigm",
   "description": "Some languages commit to one style. JavaScript supports all three — and real programs mix them.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

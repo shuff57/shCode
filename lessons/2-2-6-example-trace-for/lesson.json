@@ -2,7 +2,6 @@
   "id": "2-2-6-example-trace-for",
   "title": "2.2.10 Worked Example — Tracing a for-loop counter",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

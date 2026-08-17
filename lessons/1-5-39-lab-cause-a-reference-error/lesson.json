@@ -3,7 +3,6 @@
   "title": "1.5.39 Cause a ReferenceError on Purpose",
   "description": "Break it, read the three parts, say which one solved it, then fix it. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

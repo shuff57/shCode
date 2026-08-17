@@ -3,7 +3,6 @@
   "title": "1.1.9 SDLC Writeup",
   "description": "Describe the five SDLC phases in your own words, then walk a real app through all five. AI-graded with hints.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1 Foundations",

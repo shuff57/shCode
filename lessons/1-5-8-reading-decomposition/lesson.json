@@ -3,7 +3,6 @@
   "title": "1.5.8 Reading — Decomposition",
   "description": "Redefining one hard task as a set of easy ones. Definition 1.5.2.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

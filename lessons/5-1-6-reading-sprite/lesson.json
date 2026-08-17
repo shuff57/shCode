@@ -3,7 +3,6 @@
   "title": "5.1.6 Reading — Sprite: new Sprite(x, y, w, h) + .color",
   "description": "How new Sprite(x, y, w, h) creates a rectangle the engine renders for you, and how .color sets its fill. Read before 2.1.3c (lab).",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 5,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

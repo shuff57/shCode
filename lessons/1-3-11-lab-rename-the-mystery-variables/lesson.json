@@ -3,7 +3,6 @@
   "title": "1.3.11 Rename the Mystery Variables",
   "description": "Two snippets of single-letter code. Rename every variable so each line explains itself. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.3 Documentation and Coding Conventions",

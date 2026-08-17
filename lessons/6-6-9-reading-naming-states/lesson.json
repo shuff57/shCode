@@ -3,7 +3,6 @@
   "title": "6.6.9 Reading — Naming States: Conventions",
   "description": "Use lowercase strings for state names: 'title', 'play', 'pause', 'gameover'. Be consistent. Good names make the switch statement self-documenting.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.6 Game State Machines",

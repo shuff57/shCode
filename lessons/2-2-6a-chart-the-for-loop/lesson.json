@@ -3,7 +3,6 @@
   "title": "2.2.11 Chart the Code — A for-loop That Accumulates",
   "description": "Draw the sum-1-to-5 loop as a flowchart using the loop-setup hexagon, and get the return arrow landing in the right place.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

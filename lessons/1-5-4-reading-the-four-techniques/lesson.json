@@ -3,7 +3,6 @@
   "title": "1.5.4 Reading — The Four Cornerstones",
   "description": "Decomposition, pattern recognition, abstraction, algorithms — and the table analogy that explains why you need all four.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

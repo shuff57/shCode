@@ -3,7 +3,6 @@
   "title": "2.4.11 Chart the Code — Search Until Found",
   "description": "Draw a while (true) + break search as a flowchart. The loop has no condition of its own — the diamond inside the body is the only way out.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
@@ -19,16 +18,38 @@
   "diagram": {
     "starter": "flowchart TD\n  A([Start])\n  Z([End])",
     "rules": [
-      { "id": "one-start" },
-      { "id": "has-end" },
-      { "id": "all-labeled" },
-      { "id": "no-orphans" },
-      { "id": "min-decisions", "count": 1 },
-      { "id": "min-process", "count": 1 },
-      { "id": "decision-two-exits" },
-      { "id": "decision-labeled" },
-      { "id": "reaches-end" },
-      { "id": "no-self-loop" }
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1
+      },
+      {
+        "id": "min-process",
+        "count": 1
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      }
     ]
   },
   "grading": {

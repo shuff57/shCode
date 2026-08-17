@@ -3,7 +3,6 @@
   "title": "2.4.8 do...while: Count 1 to 5",
   "description": "Write a do...while loop that prints 1 through 5, then a second one whose condition starts false and still runs once. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

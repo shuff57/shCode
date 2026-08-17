@@ -3,7 +3,6 @@
   "title": "1.3.10 Worked Example — Good vs Bad Names",
   "description": "Three lines, twice. Nothing about how it runs changes — only how fast a reader understands it. Example 1.3.1.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.3 Documentation and Coding Conventions",

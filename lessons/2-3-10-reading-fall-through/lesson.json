@@ -3,7 +3,6 @@
   "title": "2.3.9 Reading — break and Fall-Through",
   "description": "See what JavaScript actually does when a case has no break, and why the bug is easy to miss. Read before 2.3.10 Worked Example — switch vs if-else-if.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

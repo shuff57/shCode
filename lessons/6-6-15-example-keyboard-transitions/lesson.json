@@ -3,7 +3,6 @@
   "title": "6.6.16 Worked Example — Keyboard-Driven State Changes",
   "description": "Build a game where every state transition is triggered by the keyboard: Enter (start), P (pause/unpause), Escape (quit to title).",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 15,
   "category": "Unit 2: shplay — Applied Game Development",
   "unit": "6.6 Game State Machines",

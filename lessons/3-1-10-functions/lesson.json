@@ -3,7 +3,6 @@
   "title": "3.1.7 Functions",
   "description": "Group code into reusable logic blocks with parameters and return values.",
   "type": "assignment",
-  "difficulty": "intermediate",
   "estimateMins": 40,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.1 Functions: Definition and Calls",

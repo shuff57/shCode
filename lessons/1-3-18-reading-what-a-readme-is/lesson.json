@@ -3,7 +3,6 @@
   "title": "1.3.18 Reading — What a README Is For",
   "description": "The one file written for someone who has not read your code yet. Three questions it has to answer.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.3 Documentation and Coding Conventions",

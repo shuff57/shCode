@@ -3,7 +3,6 @@
   "title": "1.4.20 Sort the Snippet",
   "description": "Three snippets, three paradigms. Log which is which, then name what JavaScript itself is. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

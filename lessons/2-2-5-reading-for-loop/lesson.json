@@ -3,7 +3,6 @@
   "title": "2.2.9 Reading — The for Loop",
   "description": "Learn the three-part for loop: init, condition, increment. Count to five, then sum a range — the two moves you'll use everywhere.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

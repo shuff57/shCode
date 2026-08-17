@@ -3,7 +3,6 @@
   "title": "1.5.10 Reading — Inductive and Deductive Reasoning",
   "description": "The two directions logical thinking runs, and where each one shows up when you are debugging.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

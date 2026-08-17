@@ -3,7 +3,6 @@
   "title": "2.1.7 Add an else",
   "description": "Extend an if statement with an else branch to handle both outcomes. Auto-graded.",
   "type": "assignment",
-  "difficulty": "beginner",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

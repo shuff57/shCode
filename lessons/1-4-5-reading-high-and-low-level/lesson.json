@@ -3,7 +3,6 @@
   "title": "1.4.5 Reading — High-Level and Low-Level Languages",
   "description": "One runs fast, one is written fast. Definition 1.4.1 and the trade-off behind it.",
   "type": "lesson",
-  "difficulty": "beginner",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",
