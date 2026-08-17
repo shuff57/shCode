@@ -1,6 +1,6 @@
 {
   "id": "6-7-27-a17-1-pong-sumo",
-  "title": "6.7.27 Two-Player Pong-Sumo",
+  "title": "6.7.29 Two-Player Pong-Sumo",
   "description": "Graded: build a two-player Pong-Sumo game — two paddles, one ball, push the ball past the opponent to score. Incorporates two-player input, push-collision physics, a win condition, and at least one joint. Auto-graded.",
   "type": "assignment",
   "difficulty": "intermediate",

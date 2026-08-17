@@ -1,6 +1,6 @@
 {
   "id": "2-2-11-fix-the-broken-chart",
-  "title": "2.2.11 Fix the Broken Chart",
+  "title": "2.2.14 Fix the Broken Chart",
   "description": "A flowchart arrives with five red checks and one actual mistake. Find the mistake, and learn to read the checker instead of guessing.",
   "type": "assignment",
   "difficulty": "beginner",
@@ -17,15 +17,34 @@
   "diagram": {
     "starter": "flowchart TD\n  A([Start]) --> B[/get the rider's height/]\n  B --> C{height >= 48}\n  C --> D[print \"You may ride\"]\n  E[print \"Too short\"]\n  D --> Z([End])",
     "rules": [
-      { "id": "one-start" },
-      { "id": "has-end" },
-      { "id": "all-labeled" },
-      { "id": "no-orphans" },
-      { "id": "min-decisions", "count": 1 },
-      { "id": "decision-two-exits" },
-      { "id": "decision-labeled" },
-      { "id": "reaches-end" },
-      { "id": "no-self-loop" }
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      }
     ]
   },
   "grading": {

@@ -1,6 +1,6 @@
 {
   "id": "6-5-21-example-confirm-overwrite",
-  "title": "6.5.21 Worked Example — Confirm Before Overwriting a Save",
+  "title": "6.5.22 Worked Example — Confirm Before Overwriting a Save",
   "description": "When the player tries to save over an existing slot, show an 'Are you sure?' prompt before writing.",
   "type": "lesson",
   "difficulty": "beginner",

@@ -1,6 +1,6 @@
 {
   "id": "6-6-13a-chart-the-state-machine",
-  "title": "6.6.13a Chart the Code — The Three-State Machine",
+  "title": "6.6.14a Chart the Code — The Three-State Machine",
   "description": "Draw the title / play / gameover machine. This is the chart that pays for itself: a state machine is far easier to argue about as a picture than as a switch.",
   "type": "assignment",
   "difficulty": "intermediate",
@@ -17,16 +17,38 @@
   "diagram": {
     "starter": "flowchart TD\n  A([draw() runs])\n  Z([end of frame])",
     "rules": [
-      { "id": "one-start" },
-      { "id": "has-end" },
-      { "id": "all-labeled" },
-      { "id": "no-orphans" },
-      { "id": "min-decisions", "count": 3 },
-      { "id": "decision-two-exits" },
-      { "id": "decision-labeled" },
-      { "id": "reaches-end" },
-      { "id": "no-self-loop" },
-      { "id": "min-nodes", "count": 9 }
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-decisions",
+        "count": 3
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      },
+      {
+        "id": "min-nodes",
+        "count": 9
+      }
     ]
   },
   "grading": {

@@ -1,6 +1,6 @@
 {
   "id": "3-1-9-lab-sum-to-n",
-  "title": "3.1.9 Sum 1 to N",
+  "title": "3.1.11 Sum 1 to N",
   "description": "Define sumToN(n) that uses a for loop to add every integer from 1 to n and returns the total. Auto-graded.",
   "type": "assignment",
   "difficulty": "beginner",

@@ -1,6 +1,6 @@
 {
   "id": "2-3-4-lab-convert-to-switch",
-  "title": "2.3.4 Convert an if-chain to switch",
+  "title": "2.3.5 Convert an if-chain to switch",
   "description": "Rewrite an if/else-if chain as a switch statement with at least two cases, a default, and break. Auto-graded.",
   "type": "assignment",
   "difficulty": "beginner",

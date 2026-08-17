@@ -10,7 +10,8 @@
   "preview": "slides",
   "slos": [
     "SLO-3"
-  ],  "steps": [],
+  ],
+  "steps": [],
   "requirements": [],
   "grading": {
     "totalPoints": 0,

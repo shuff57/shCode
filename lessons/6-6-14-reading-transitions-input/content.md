@@ -1,6 +1,6 @@
 ## Player presses a key → state changes
 
-Read before `6.6.16 Reading — shplay docs: Condition-Driven Transitions`. About 8 minutes.
+Read before `6.6.17 Reading — shplay docs: Condition-Driven Transitions`. About 8 minutes.
 
 **What you'll learn from it:**
 

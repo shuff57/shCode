@@ -1,6 +1,6 @@
 {
   "id": "2-2-7-lab-count-to-ten",
-  "title": "2.2.7 Count 1 to 10",
+  "title": "2.2.10 Count 1 to 10",
   "description": "Write a for loop that logs every integer from 1 to 10. Auto-graded.",
   "type": "assignment",
   "difficulty": "beginner",

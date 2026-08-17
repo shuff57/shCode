@@ -1,6 +1,6 @@
 {
   "id": "3-1-7-a7-2-pass-by-reference-writeup",
-  "title": "3.1.7 Pass by Value vs Reference",
+  "title": "3.1.8 Pass by Value vs Reference",
   "description": "Explain pass by value and pass by reference in your own words, give one example of each, and describe a bug that could happen if you forget the difference.",
   "type": "assignment",
   "difficulty": "beginner",

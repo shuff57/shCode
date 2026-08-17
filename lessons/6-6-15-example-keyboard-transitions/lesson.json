@@ -1,6 +1,6 @@
 {
   "id": "6-6-15-example-keyboard-transitions",
-  "title": "6.6.15 Worked Example — Keyboard-Driven State Changes",
+  "title": "6.6.16 Worked Example — Keyboard-Driven State Changes",
   "description": "Build a game where every state transition is triggered by the keyboard: Enter (start), P (pause/unpause), Escape (quit to title).",
   "type": "lesson",
   "difficulty": "beginner",

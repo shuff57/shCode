@@ -1,6 +1,6 @@
 {
   "id": "2-2-10-lab-countdown",
-  "title": "2.2.10 Countdown with while",
+  "title": "2.2.13 Countdown with while",
   "description": "Write a while loop that counts down from 10 to 1, logging each value. Auto-graded.",
   "type": "assignment",
   "difficulty": "beginner",

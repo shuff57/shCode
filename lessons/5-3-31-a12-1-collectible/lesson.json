@@ -1,6 +1,6 @@
 {
   "id": "5-3-31-a12-1-collectible",
-  "title": "5.3.31 Collectible Class",
+  "title": "5.3.33 Collectible Class",
   "description": "Write a Collectible class, instantiate at least 5, and detect overlap with the player. SLO-2 lab — the class is the point. Auto-graded.",
   "type": "assignment",
   "difficulty": "intermediate",

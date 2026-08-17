@@ -1,6 +1,6 @@
 {
   "id": "6-7-24-reading-bounciness",
-  "title": "6.7.24 Reading — shplay docs: sprite.bounciness",
+  "title": "6.7.26 Reading — shplay docs: sprite.bounciness",
   "description": "sprite.bounciness controls how much energy a sprite keeps after a collision — 0 is a dead thud, 1 is nearly lossless. Read this before 2.7.24a Worked Example — Bounciness Comparison.",
   "type": "lesson",
   "difficulty": "beginner",

@@ -1,6 +1,6 @@
 {
   "id": "3-1-4-reading-scope",
-  "title": "3.1.4 Reading — Scope: Local vs Global",
+  "title": "3.1.5 Reading — Scope: Local vs Global",
   "description": "A variable declared inside a function is local — it only exists while that function runs and is invisible outside it. Global variables are accessible everywhere.",
   "type": "lesson",
   "difficulty": "beginner",

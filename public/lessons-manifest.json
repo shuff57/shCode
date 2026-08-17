@@ -1130,7 +1130,7 @@
     },
     {
       "id": "2-1-10-reading-logical-operators",
-      "title": "2.1.10 Reading — Logical Operators: && || !",
+      "title": "2.1.11 Reading — Logical Operators: && || !",
       "unit": "2.1 Conditionals",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1138,7 +1138,7 @@
     },
     {
       "id": "2-1-11-example-combining-conditions",
-      "title": "2.1.11 Worked Example — Combining conditions",
+      "title": "2.1.12 Worked Example — Combining conditions",
       "unit": "2.1 Conditionals",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1146,7 +1146,7 @@
     },
     {
       "id": "2-1-12-lab-guard-and",
-      "title": "2.1.12 Guard with &&",
+      "title": "2.1.13 Guard with &&",
       "unit": "2.1 Conditionals",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1154,7 +1154,7 @@
     },
     {
       "id": "2-1-13-lab-branch-or",
-      "title": "2.1.13 Branch with ||",
+      "title": "2.1.14 Branch with ||",
       "unit": "2.1 Conditionals",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1186,7 +1186,7 @@
     },
     {
       "id": "2-1-4a-chart-the-if-else",
-      "title": "2.1.4a Chart the Code — if / else",
+      "title": "2.1.5a Chart the Code — if / else",
       "unit": "2.1 Conditionals",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1194,7 +1194,7 @@
     },
     {
       "id": "2-1-5-lab-first-if",
-      "title": "2.1.5 Write Your First if",
+      "title": "2.1.6 Write Your First if",
       "unit": "2.1 Conditionals",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1202,7 +1202,7 @@
     },
     {
       "id": "2-1-6-lab-add-else",
-      "title": "2.1.6 Add an else",
+      "title": "2.1.7 Add an else",
       "unit": "2.1 Conditionals",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1210,7 +1210,7 @@
     },
     {
       "id": "2-1-7-reading-comparison-operators",
-      "title": "2.1.7 Reading — Comparison Operators & === vs ==",
+      "title": "2.1.8 Reading — Comparison Operators & === vs ==",
       "unit": "2.1 Conditionals",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1218,7 +1218,7 @@
     },
     {
       "id": "2-1-8-example-comparisons",
-      "title": "2.1.8 Worked Example — What each comparison returns",
+      "title": "2.1.9 Worked Example — What each comparison returns",
       "unit": "2.1 Conditionals",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1226,7 +1226,7 @@
     },
     {
       "id": "2-1-9-lab-predict-comparisons",
-      "title": "2.1.9 Predict, Then Run",
+      "title": "2.1.10 Predict, Then Run",
       "unit": "2.1 Conditionals",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1242,7 +1242,7 @@
     },
     {
       "id": "2-2-10-lab-countdown",
-      "title": "2.2.10 Countdown with while",
+      "title": "2.2.13 Countdown with while",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1250,7 +1250,7 @@
     },
     {
       "id": "2-2-11-fix-the-broken-chart",
-      "title": "2.2.11 Fix the Broken Chart",
+      "title": "2.2.14 Fix the Broken Chart",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1258,7 +1258,7 @@
     },
     {
       "id": "2-2-12-a5-2-flowchart-decision",
-      "title": "2.2.12 Flowchart a Decision",
+      "title": "2.2.15 Flowchart a Decision",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1266,7 +1266,7 @@
     },
     {
       "id": "2-2-13-challenges",
-      "title": "2.2.13 Challenges — Optional Stretch",
+      "title": "2.2.16 Challenges — Optional Stretch",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1282,7 +1282,7 @@
     },
     {
       "id": "2-2-2a-reading-flowchart-shapes",
-      "title": "2.2.2a Reading — Flowchart Shapes",
+      "title": "2.2.3a Reading — Flowchart Shapes",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1290,7 +1290,7 @@
     },
     {
       "id": "2-2-3-example-pseudocode-to-code",
-      "title": "2.2.3 Worked Example — Pseudocode → code",
+      "title": "2.2.4 Worked Example — Pseudocode → code",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1298,7 +1298,7 @@
     },
     {
       "id": "2-2-3a-chart-the-algorithm",
-      "title": "2.2.3a Chart the Code — Largest of Three",
+      "title": "2.2.5a Chart the Code — Largest of Three",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1306,7 +1306,7 @@
     },
     {
       "id": "2-2-4-a5-1-algorithm-writeup",
-      "title": "2.2.4 Algorithm in Plain English",
+      "title": "2.2.6 Algorithm in Plain English",
       "unit": "2.2 Algorithms and Loops",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1314,7 +1314,7 @@
     },
     {
       "id": "2-2-5-reading-for-loop",
-      "title": "2.2.5 Reading — The for Loop",
+      "title": "2.2.7 Reading — The for Loop",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1322,7 +1322,7 @@
     },
     {
       "id": "2-2-6-example-trace-for",
-      "title": "2.2.6 Worked Example — Tracing a for-loop counter",
+      "title": "2.2.8 Worked Example — Tracing a for-loop counter",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1330,7 +1330,7 @@
     },
     {
       "id": "2-2-6a-chart-the-for-loop",
-      "title": "2.2.6a Chart the Code — A for-loop That Accumulates",
+      "title": "2.2.9a Chart the Code — A for-loop That Accumulates",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1338,7 +1338,7 @@
     },
     {
       "id": "2-2-7-lab-count-to-ten",
-      "title": "2.2.7 Count 1 to 10",
+      "title": "2.2.10 Count 1 to 10",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1346,7 +1346,7 @@
     },
     {
       "id": "2-2-8-reading-while-loop",
-      "title": "2.2.8 Reading — while & do…while",
+      "title": "2.2.11 Reading — while & do…while",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1354,7 +1354,7 @@
     },
     {
       "id": "2-2-9-example-while-vs-for",
-      "title": "2.2.9 Worked Example — while vs for + the infinite-loop trap",
+      "title": "2.2.12 Worked Example — while vs for + the infinite-loop trap",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1386,7 +1386,7 @@
     },
     {
       "id": "2-3-3a-chart-the-switch",
-      "title": "2.3.3a Chart the Code — a switch is a chain of diamonds",
+      "title": "2.3.4a Chart the Code — a switch is a chain of diamonds",
       "unit": "2.3 The Switch Statement",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1394,7 +1394,7 @@
     },
     {
       "id": "2-3-4-lab-convert-to-switch",
-      "title": "2.3.4 Convert an if-chain to switch",
+      "title": "2.3.5 Convert an if-chain to switch",
       "unit": "2.3 The Switch Statement",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1410,7 +1410,7 @@
     },
     {
       "id": "3-1-10-functions",
-      "title": "3.1.10 Functions",
+      "title": "3.1.12 Functions",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1426,7 +1426,7 @@
     },
     {
       "id": "3-1-2a-reading-the-function-call-shape",
-      "title": "3.1.2a Reading — The Function-Call Shape",
+      "title": "3.1.3a Reading — The Function-Call Shape",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1434,7 +1434,7 @@
     },
     {
       "id": "3-1-3-reading-parameters-return",
-      "title": "3.1.3 Reading — Parameters & Return Values",
+      "title": "3.1.4 Reading — Parameters & Return Values",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1442,7 +1442,7 @@
     },
     {
       "id": "3-1-4-reading-scope",
-      "title": "3.1.4 Reading — Scope: Local vs Global",
+      "title": "3.1.5 Reading — Scope: Local vs Global",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1450,7 +1450,7 @@
     },
     {
       "id": "3-1-5-reading-pass-by-value-reference",
-      "title": "3.1.5 Reading — Pass by Value vs Reference",
+      "title": "3.1.6 Reading — Pass by Value vs Reference",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1458,7 +1458,7 @@
     },
     {
       "id": "3-1-6-reading-defensive-copying",
-      "title": "3.1.6 Reading — Defensive Copying: [...] and {...}",
+      "title": "3.1.7 Reading — Defensive Copying: [...] and {...}",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1466,7 +1466,7 @@
     },
     {
       "id": "3-1-7-a7-2-pass-by-reference-writeup",
-      "title": "3.1.7 Pass by Value vs Reference",
+      "title": "3.1.8 Pass by Value vs Reference",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1474,7 +1474,7 @@
     },
     {
       "id": "3-1-7a-a3-1-0-flowchart-gate",
-      "title": "3.1.7a A3.1.0 — Chart Before You Refactor",
+      "title": "3.1.9a A3.1.0 — Chart Before You Refactor",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1482,7 +1482,7 @@
     },
     {
       "id": "3-1-8-lab-findmax-iseven",
-      "title": "3.1.8 findMax & isEven",
+      "title": "3.1.10 findMax & isEven",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1490,7 +1490,7 @@
     },
     {
       "id": "3-1-9-lab-sum-to-n",
-      "title": "3.1.9 Sum 1 to N",
+      "title": "3.1.11 Sum 1 to N",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1546,7 +1546,7 @@
     },
     {
       "id": "3-2-6a-chart-the-array-loop",
-      "title": "3.2.6a Chart the Code — Looping Over an Array",
+      "title": "3.2.7a Chart the Code — Looping Over an Array",
       "unit": "3.2 Arrays",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1554,7 +1554,7 @@
     },
     {
       "id": "3-2-7-arrays",
-      "title": "3.2.7 Arrays",
+      "title": "3.2.8 Arrays",
       "unit": "3.2 Arrays",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1578,7 +1578,7 @@
     },
     {
       "id": "4-1-2a-reading-connectors-and-notes",
-      "title": "4.1.2a Reading — Connectors and Notes",
+      "title": "4.1.3a Reading — Connectors and Notes",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1586,7 +1586,7 @@
     },
     {
       "id": "4-1-3-reading-manual-testing",
-      "title": "4.1.3 Reading — Manual Testing: PASS / FAIL Checks",
+      "title": "4.1.4 Reading — Manual Testing: PASS / FAIL Checks",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "reading",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1594,7 +1594,7 @@
     },
     {
       "id": "4-1-3a-a4-1-0-design-chart",
-      "title": "4.1.3a A4.1.0 — Print Shop Design Chart",
+      "title": "4.1.5a A4.1.0 — Print Shop Design Chart",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "diagram",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1602,7 +1602,7 @@
     },
     {
       "id": "4-1-4-print-shop",
-      "title": "4.1.4 Print Shop (Q1 Synthesis)",
+      "title": "4.1.6 Print Shop (Q1 Synthesis)",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "console",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1610,7 +1610,7 @@
     },
     {
       "id": "4-1-5-q1-reflection-writeup",
-      "title": "4.1.5 Q1 Reflection",
+      "title": "4.1.7 Q1 Reflection",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
@@ -1906,7 +1906,7 @@
     },
     {
       "id": "5-3-20a-chart-the-method-chain",
-      "title": "5.3.20a Chart the Code — A Method That Calls a Method",
+      "title": "5.3.21a Chart the Code — A Method That Calls a Method",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "diagram",
       "category": "Unit 2: shPlay Game Development",
@@ -1914,7 +1914,7 @@
     },
     {
       "id": "5-3-21-reading-composition",
-      "title": "5.3.21 Reading — Why `this.sprite`, not `extends Sprite`",
+      "title": "5.3.22 Reading — Why `this.sprite`, not `extends Sprite`",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1922,7 +1922,7 @@
     },
     {
       "id": "5-3-22-lab-mutate-sprite-prop",
-      "title": "5.3.22 Lab — Mutate `this.sprite.x` from a method",
+      "title": "5.3.23 Lab — Mutate `this.sprite.x` from a method",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1930,7 +1930,7 @@
     },
     {
       "id": "5-3-23-lab-cleanup",
-      "title": "5.3.23 Lab — Cleanup with `this.sprite.delete()`",
+      "title": "5.3.24 Lab — Cleanup with `this.sprite.delete()`",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1938,7 +1938,7 @@
     },
     {
       "id": "5-3-24-example-enemy-class",
-      "title": "5.3.24 Worked Example — Write an Enemy class (integration)",
+      "title": "5.3.25 Worked Example — Write an Enemy class (integration)",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1946,7 +1946,7 @@
     },
     {
       "id": "5-3-25-lab-three-vars",
-      "title": "5.3.25 Lab — Three Enemies in three variables",
+      "title": "5.3.26 Lab — Three Enemies in three variables",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1954,7 +1954,7 @@
     },
     {
       "id": "5-3-26-lab-array-of-instances",
-      "title": "5.3.26 Lab — An array of Enemies",
+      "title": "5.3.27 Lab — An array of Enemies",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1962,7 +1962,7 @@
     },
     {
       "id": "5-3-27-lab-loop-instances",
-      "title": "5.3.27 Lab — Loop over an array of instances",
+      "title": "5.3.28 Lab — Loop over an array of instances",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1970,7 +1970,7 @@
     },
     {
       "id": "5-3-28-reading-parallel-vs-classes",
-      "title": "5.3.28 Reading — Parallel Arrays vs Classes",
+      "title": "5.3.29 Reading — Parallel Arrays vs Classes",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1978,7 +1978,7 @@
     },
     {
       "id": "5-3-29-example-proc-vs-oop",
-      "title": "5.3.29 Worked Example — Procedural vs OOP side-by-side",
+      "title": "5.3.30 Worked Example — Procedural vs OOP side-by-side",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -1986,7 +1986,7 @@
     },
     {
       "id": "5-3-29a-read-the-two-designs",
-      "title": "5.3.29a Read the Charts — Three Variables or Three Objects",
+      "title": "5.3.31a Read the Charts — Three Variables or Three Objects",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
       "category": "Unit 2: shPlay Game Development",
@@ -2002,7 +2002,7 @@
     },
     {
       "id": "5-3-30-reading-when-oop",
-      "title": "5.3.30 Reading — When to reach for OOP (3-question checklist)",
+      "title": "5.3.32 Reading — When to reach for OOP (3-question checklist)",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2010,7 +2010,7 @@
     },
     {
       "id": "5-3-31-a12-1-collectible",
-      "title": "5.3.31 Collectible Class",
+      "title": "5.3.33 Collectible Class",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2018,7 +2018,7 @@
     },
     {
       "id": "5-3-32-a12-2-oop-writeup",
-      "title": "5.3.32 Procedural vs OOP Writeup",
+      "title": "5.3.34 Procedural vs OOP Writeup",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2026,7 +2026,7 @@
     },
     {
       "id": "5-3-33-reading-oop-vocab",
-      "title": "5.3.33 Reading — Encapsulation, inheritance, polymorphism (vocabulary only)",
+      "title": "5.3.35 Reading — Encapsulation, inheritance, polymorphism (vocabulary only)",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2034,7 +2034,7 @@
     },
     {
       "id": "5-3-34-challenges",
-      "title": "5.3.34 Challenges",
+      "title": "5.3.36 Challenges",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2522,7 +2522,7 @@
     },
     {
       "id": "6-5-20a-read-the-continue-chart",
-      "title": "6.5.20a Read the Chart — Does Continue Show Up?",
+      "title": "6.5.21a Read the Chart — Does Continue Show Up?",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "category": "Unit 2: shPlay Game Development",
@@ -2530,7 +2530,7 @@
     },
     {
       "id": "6-5-21-example-confirm-overwrite",
-      "title": "6.5.21 Worked Example — Confirm Before Overwriting a Save",
+      "title": "6.5.22 Worked Example — Confirm Before Overwriting a Save",
       "unit": "6.5 Save and Load",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2538,7 +2538,7 @@
     },
     {
       "id": "6-5-22-video-autosave",
-      "title": "6.5.22 Video — Your Game, Automatically Saved",
+      "title": "6.5.23 Video — Your Game, Automatically Saved",
       "unit": "6.5 Save and Load",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2546,7 +2546,7 @@
     },
     {
       "id": "6-5-23-reading-checkpoint-saves",
-      "title": "6.5.23 Reading — Checkpoint Saves: Save on Milestones",
+      "title": "6.5.24 Reading — Checkpoint Saves: Save on Milestones",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2554,7 +2554,7 @@
     },
     {
       "id": "6-5-24-example-autosave-level",
-      "title": "6.5.24 Worked Example — Auto-Save on Level Complete or Timer",
+      "title": "6.5.25 Worked Example — Auto-Save on Level Complete or Timer",
       "unit": "6.5 Save and Load",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2562,7 +2562,7 @@
     },
     {
       "id": "6-5-25-a16-1-save-system",
-      "title": "6.5.25 Save System — Build Save/Load with Slots",
+      "title": "6.5.26 Save System — Build Save/Load with Slots",
       "unit": "6.5 Save and Load",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2570,7 +2570,7 @@
     },
     {
       "id": "6-5-26-challenges",
-      "title": "6.5.26 Challenges — Extended Save Features",
+      "title": "6.5.27 Challenges — Extended Save Features",
       "unit": "6.5 Save and Load",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2674,7 +2674,7 @@
     },
     {
       "id": "6-6-13a-chart-the-state-machine",
-      "title": "6.6.13a Chart the Code — The Three-State Machine",
+      "title": "6.6.14a Chart the Code — The Three-State Machine",
       "unit": "6.6 Game State Machines",
       "preview": "diagram",
       "category": "Unit 2: shPlay Game Development",
@@ -2682,7 +2682,7 @@
     },
     {
       "id": "6-6-14-reading-transitions-input",
-      "title": "6.6.14 Reading — shplay docs: Input-Driven Transitions",
+      "title": "6.6.15 Reading — shplay docs: Input-Driven Transitions",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2690,7 +2690,7 @@
     },
     {
       "id": "6-6-15-example-keyboard-transitions",
-      "title": "6.6.15 Worked Example — Keyboard-Driven State Changes",
+      "title": "6.6.16 Worked Example — Keyboard-Driven State Changes",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2698,7 +2698,7 @@
     },
     {
       "id": "6-6-16-reading-transitions-condition",
-      "title": "6.6.16 Reading — shplay docs: Condition-Driven Transitions",
+      "title": "6.6.17 Reading — shplay docs: Condition-Driven Transitions",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2706,7 +2706,7 @@
     },
     {
       "id": "6-6-17-example-score-threshold",
-      "title": "6.6.17 Worked Example — Score Threshold Triggers Game Over",
+      "title": "6.6.18 Worked Example — Score Threshold Triggers Game Over",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2714,7 +2714,7 @@
     },
     {
       "id": "6-6-18-video-extended-states",
-      "title": "6.6.18 Video — More States: Pause, Inventory, Settings",
+      "title": "6.6.19 Video — More States: Pause, Inventory, Settings",
       "unit": "6.6 Game State Machines",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2722,7 +2722,7 @@
     },
     {
       "id": "6-6-19-example-pause-state",
-      "title": "6.6.19 Worked Example — Adding a Pause State",
+      "title": "6.6.20 Worked Example — Adding a Pause State",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2730,7 +2730,7 @@
     },
     {
       "id": "6-6-19a-fix-the-pause-chart",
-      "title": "6.6.19a Fix the Broken Chart — the Pause State",
+      "title": "6.6.21a Fix the Broken Chart — the Pause State",
       "unit": "6.6 Game State Machines",
       "preview": "diagram",
       "category": "Unit 2: shPlay Game Development",
@@ -2746,7 +2746,7 @@
     },
     {
       "id": "6-6-20-example-win-screen",
-      "title": "6.6.20 Worked Example — Win Screen State",
+      "title": "6.6.22 Worked Example — Win Screen State",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2754,7 +2754,7 @@
     },
     {
       "id": "6-6-21-video-states-decide-saves",
-      "title": "6.6.21 Video — States Decide When to Save",
+      "title": "6.6.23 Video — States Decide When to Save",
       "unit": "6.6 Game State Machines",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2762,7 +2762,7 @@
     },
     {
       "id": "6-6-22-example-save-on-transition",
-      "title": "6.6.22 Worked Example — Save on State Transition",
+      "title": "6.6.24 Worked Example — Save on State Transition",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2770,7 +2770,7 @@
     },
     {
       "id": "6-6-23-example-continue-right-state",
-      "title": "6.6.23 Worked Example — Continue Loads the Correct State",
+      "title": "6.6.25 Worked Example — Continue Loads the Correct State",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2778,7 +2778,7 @@
     },
     {
       "id": "6-6-24-a16-2-game-states",
-      "title": "6.6.24 Game States — State Machine with Persistence",
+      "title": "6.6.26 Game States — State Machine with Persistence",
       "unit": "6.6 Game State Machines",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2786,7 +2786,7 @@
     },
     {
       "id": "6-6-25-challenges",
-      "title": "6.6.25 Challenges — Extended State Features",
+      "title": "6.6.27 Challenges — Extended State Features",
       "unit": "6.6 Game State Machines",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2794,7 +2794,7 @@
     },
     {
       "id": "6-6-26-video-whats-next",
-      "title": "6.6.26 Video — What's Next: Looking Ahead to Unit 3",
+      "title": "6.6.28 Video — What's Next: Looking Ahead to Unit 3",
       "unit": "6.6 Game State Machines",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2874,7 +2874,7 @@
     },
     {
       "id": "6-7-10a-fix-the-drag-chart",
-      "title": "6.7.10a Fix the Broken Chart — Dragging a Sprite",
+      "title": "6.7.11a Fix the Broken Chart — Dragging a Sprite",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "diagram",
       "category": "Unit 2: shPlay Game Development",
@@ -2882,7 +2882,7 @@
     },
     {
       "id": "6-7-11-video-joints-intro",
-      "title": "6.7.11 Video — Joints in shplay",
+      "title": "6.7.12 Video — Joints in shplay",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2890,7 +2890,7 @@
     },
     {
       "id": "6-7-12-reading-distance-joint",
-      "title": "6.7.12 Reading — shplay docs: DistanceJoint",
+      "title": "6.7.13 Reading — shplay docs: DistanceJoint",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2898,7 +2898,7 @@
     },
     {
       "id": "6-7-13-example-distance-pendulum",
-      "title": "6.7.13 Worked Example — Pendulum with DistanceJoint",
+      "title": "6.7.14 Worked Example — Pendulum with DistanceJoint",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2906,7 +2906,7 @@
     },
     {
       "id": "6-7-14-reading-hinge-joint",
-      "title": "6.7.14 Reading — shplay docs: HingeJoint",
+      "title": "6.7.15 Reading — shplay docs: HingeJoint",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2914,7 +2914,7 @@
     },
     {
       "id": "6-7-15-example-hinge-arm",
-      "title": "6.7.15 Worked Example — Rotating Arm with HingeJoint",
+      "title": "6.7.16 Worked Example — Rotating Arm with HingeJoint",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2922,7 +2922,7 @@
     },
     {
       "id": "6-7-16-reading-joint-delete",
-      "title": "6.7.16 Reading — shplay docs: joint.delete()",
+      "title": "6.7.17 Reading — shplay docs: joint.delete()",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2930,7 +2930,7 @@
     },
     {
       "id": "6-7-17-reading-applyforce",
-      "title": "6.7.17 Reading — shplay docs: applyForce(fx, fy)",
+      "title": "6.7.18 Reading — shplay docs: applyForce(fx, fy)",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2938,7 +2938,7 @@
     },
     {
       "id": "6-7-18-reading-vector-ab",
-      "title": "6.7.18 Reading — Vector from A to B",
+      "title": "6.7.19 Reading — Vector from A to B",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2946,7 +2946,7 @@
     },
     {
       "id": "6-7-19-example-launch-force",
-      "title": "6.7.19 Worked Example — Launch a Sprite with applyForce",
+      "title": "6.7.20 Worked Example — Launch a Sprite with applyForce",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2962,7 +2962,7 @@
     },
     {
       "id": "6-7-20-video-slingshot",
-      "title": "6.7.20 Video — The Slingshot Pattern",
+      "title": "6.7.21 Video — The Slingshot Pattern",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2970,7 +2970,7 @@
     },
     {
       "id": "6-7-21-example-slingshot",
-      "title": "6.7.21 Worked Example — Slingshot End-to-End",
+      "title": "6.7.22 Worked Example — Slingshot End-to-End",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2978,7 +2978,7 @@
     },
     {
       "id": "6-7-21a-chart-the-slingshot",
-      "title": "6.7.21a Chart the Code — The Slingshot",
+      "title": "6.7.23a Chart the Code — The Slingshot",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "diagram",
       "category": "Unit 2: shPlay Game Development",
@@ -2986,7 +2986,7 @@
     },
     {
       "id": "6-7-22-video-two-player",
-      "title": "6.7.22 Video — Two-Player Local Input",
+      "title": "6.7.24 Video — Two-Player Local Input",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -2994,7 +2994,7 @@
     },
     {
       "id": "6-7-23-reading-two-schemes",
-      "title": "6.7.23 Reading — Two Key Schemes, Independent State",
+      "title": "6.7.25 Reading — Two Key Schemes, Independent State",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -3002,7 +3002,7 @@
     },
     {
       "id": "6-7-24-reading-bounciness",
-      "title": "6.7.24 Reading — shplay docs: sprite.bounciness",
+      "title": "6.7.26 Reading — shplay docs: sprite.bounciness",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -3010,7 +3010,7 @@
     },
     {
       "id": "6-7-25-example-bounciness-compare",
-      "title": "6.7.25 Worked Example — Bounciness Comparison",
+      "title": "6.7.27 Worked Example — Bounciness Comparison",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -3018,7 +3018,7 @@
     },
     {
       "id": "6-7-26-example-two-paddles",
-      "title": "6.7.26 Worked Example — Two Paddles, Two Schemes",
+      "title": "6.7.28 Worked Example — Two Paddles, Two Schemes",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -3026,7 +3026,7 @@
     },
     {
       "id": "6-7-27-a17-1-pong-sumo",
-      "title": "6.7.27 Two-Player Pong-Sumo",
+      "title": "6.7.29 Two-Player Pong-Sumo",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -3034,7 +3034,7 @@
     },
     {
       "id": "6-7-28-challenges",
-      "title": "6.7.28 Challenges — SliderJoint, Trebuchet, Swinging Rope",
+      "title": "6.7.30 Challenges — SliderJoint, Trebuchet, Swinging Rope",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "shplay",
       "category": "Unit 2: shplay — Applied Game Development",
@@ -3042,7 +3042,7 @@
     },
     {
       "id": "6-7-29-video-wrap",
-      "title": "6.7.29 Video — Wrap and Capstone Preview",
+      "title": "6.7.31 Video — Wrap and Capstone Preview",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
       "category": "Unit 2: shplay — Applied Game Development",

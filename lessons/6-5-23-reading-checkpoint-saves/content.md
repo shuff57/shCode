@@ -1,6 +1,6 @@
 ## Auto-save: saving without asking
 
-**Read before attempting `6.5.24 Worked Example — Auto-Save on Level Complete or Timer`.**
+**Read before attempting `6.5.25 Worked Example — Auto-Save on Level Complete or Timer`.**
 
 Until now, every save in your games has been player-initiated: press a key, pick a slot, confirm. That works, but it puts the burden on the player to remember to save — and nobody remembers every time.
 

@@ -1,6 +1,6 @@
 {
   "id": "5-3-21-reading-composition",
-  "title": "5.3.21 Reading — Why `this.sprite`, not `extends Sprite`",
+  "title": "5.3.22 Reading — Why `this.sprite`, not `extends Sprite`",
   "description": "Composition over inheritance: why wrapping a Sprite as `this.sprite` is safer than inheriting from it. Read before the sprite mutation labs.",
   "type": "lesson",
   "difficulty": "beginner",

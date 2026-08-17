@@ -1,6 +1,6 @@
 {
   "id": "6-7-17-reading-applyforce",
-  "title": "6.7.17 Reading — shplay docs: applyForce(fx, fy)",
+  "title": "6.7.18 Reading — shplay docs: applyForce(fx, fy)",
   "description": "applyForce(fx, fy) adds a one-frame impulse to a sprite — the physics engine turns it into motion. Read this before 2.7.19 Worked Example — Launch a Sprite with applyForce.",
   "type": "lesson",
   "difficulty": "beginner",

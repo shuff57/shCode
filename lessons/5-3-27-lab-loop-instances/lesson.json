@@ -1,6 +1,6 @@
 {
   "id": "5-3-27-lab-loop-instances",
-  "title": "5.3.27 Lab — Loop over an array of instances",
+  "title": "5.3.28 Lab — Loop over an array of instances",
   "description": "Write a `for...of` loop in `draw()` that calls `.render()` on each enemy — dispatching a method to every element in the array with one loop.",
   "type": "lesson",
   "difficulty": "beginner",

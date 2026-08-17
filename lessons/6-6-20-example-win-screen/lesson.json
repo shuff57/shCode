@@ -1,6 +1,6 @@
 {
   "id": "6-6-20-example-win-screen",
-  "title": "6.6.20 Worked Example — Win Screen State",
+  "title": "6.6.22 Worked Example — Win Screen State",
   "description": "A win screen shows when the player reaches the goal. It's a distinct state with congratulations, final stats, and a 'Play Again?' option.",
   "type": "lesson",
   "difficulty": "beginner",

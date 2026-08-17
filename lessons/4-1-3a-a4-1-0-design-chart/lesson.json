@@ -1,6 +1,6 @@
 {
   "id": "4-1-3a-a4-1-0-design-chart",
-  "title": "4.1.3a A4.1.0 — Print Shop Design Chart",
+  "title": "4.1.5a A4.1.0 — Print Shop Design Chart",
   "description": "Design day: chart the whole Print Shop before any build time. One double-rail per planned function, under twenty shapes. The build lessons open when this is green.",
   "type": "assignment",
   "difficulty": "intermediate",
@@ -18,17 +18,41 @@
   "diagram": {
     "starter": "flowchart TD\n  A([Start])\n  Z([End])",
     "rules": [
-      { "id": "one-start" },
-      { "id": "has-end" },
-      { "id": "all-labeled" },
-      { "id": "no-orphans" },
-      { "id": "connector-pairs" },
-      { "id": "min-decisions", "count": 1 },
-      { "id": "decision-two-exits" },
-      { "id": "decision-labeled" },
-      { "id": "reaches-end" },
-      { "id": "no-self-loop" },
-      { "id": "min-nodes", "count": 10 }
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "connector-pairs"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      },
+      {
+        "id": "min-nodes",
+        "count": 10
+      }
     ]
   },
   "grading": {

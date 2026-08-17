@@ -1,6 +1,6 @@
 {
   "id": "3-1-7a-a3-1-0-flowchart-gate",
-  "title": "3.1.7a A3.1.0 — Chart Before You Refactor",
+  "title": "3.1.9a A3.1.0 — Chart Before You Refactor",
   "description": "Redraw your grade-advisor plan with each function as one double-rail shape. The gate for A3.1.1: chart first, refactor second.",
   "type": "assignment",
   "difficulty": "beginner",
@@ -18,16 +18,38 @@
   "diagram": {
     "starter": "flowchart TD\n  A([Start])\n  Z([End])",
     "rules": [
-      { "id": "one-start" },
-      { "id": "has-end" },
-      { "id": "all-labeled" },
-      { "id": "no-orphans" },
-      { "id": "min-decisions", "count": 1 },
-      { "id": "decision-two-exits" },
-      { "id": "decision-labeled" },
-      { "id": "reaches-end" },
-      { "id": "no-self-loop" },
-      { "id": "min-nodes", "count": 7 }
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      },
+      {
+        "id": "min-nodes",
+        "count": 7
+      }
     ]
   },
   "grading": {

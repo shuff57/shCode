@@ -1,6 +1,6 @@
 {
   "id": "2-2-12-a5-2-flowchart-decision",
-  "title": "2.2.12 Flowchart a Decision",
+  "title": "2.2.15 Flowchart a Decision",
   "description": "Draw the ticket-price algorithm as a flowchart. One start, one decision diamond with two labelled exits, one end.",
   "type": "assignment",
   "difficulty": "beginner",
@@ -17,15 +17,34 @@
   "diagram": {
     "starter": "flowchart TD\n  A([Start])\n  Z([End])",
     "rules": [
-      { "id": "one-start" },
-      { "id": "has-end" },
-      { "id": "all-labeled" },
-      { "id": "no-orphans" },
-      { "id": "min-decisions", "count": 1 },
-      { "id": "decision-two-exits" },
-      { "id": "decision-labeled" },
-      { "id": "reaches-end" },
-      { "id": "no-self-loop" }
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      }
     ],
     "aiGrader": {
       "rubricTitle": "Ticket-price flowchart — AI-graded rubric",

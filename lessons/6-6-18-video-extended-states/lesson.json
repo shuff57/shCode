@@ -1,6 +1,6 @@
 {
   "id": "6-6-18-video-extended-states",
-  "title": "6.6.18 Video — More States: Pause, Inventory, Settings",
+  "title": "6.6.19 Video — More States: Pause, Inventory, Settings",
   "description": "Real games have more than 3 states. Pause freezes the action. Inventory shows items. Settings adjusts volume. All use the same switch pattern you already know.",
   "type": "lesson",
   "difficulty": "beginner",

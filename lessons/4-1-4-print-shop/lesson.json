@@ -1,6 +1,6 @@
 {
   "id": "4-1-4-print-shop",
-  "title": "4.1.4 Print Shop (Q1 Synthesis)",
+  "title": "4.1.6 Print Shop (Q1 Synthesis)",
   "description": "Q1 synthesis: a console-only pricing and queue tool for the class printers. Arrays of objects, functions, sorting, save/load, and your own tests.",
   "type": "project",
   "difficulty": "advanced",

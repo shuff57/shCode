@@ -1,6 +1,6 @@
 {
   "id": "6-5-26-challenges",
-  "title": "6.5.26 Challenges — Extended Save Features",
+  "title": "6.5.27 Challenges — Extended Save Features",
   "description": "Extend your save system: save file previews (show slot contents before loading), save timestamps, multiple profiles, or a 'delete all saves' with double-confirmation.",
   "type": "challenge",
   "difficulty": "advanced",

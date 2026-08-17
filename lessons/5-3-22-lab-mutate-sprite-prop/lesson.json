@@ -1,6 +1,6 @@
 {
   "id": "5-3-22-lab-mutate-sprite-prop",
-  "title": "5.3.22 Lab — Mutate `this.sprite.x` from a method",
+  "title": "5.3.23 Lab — Mutate `this.sprite.x` from a method",
   "description": "Write `Mover.moveRight(dx)` which adds `dx` to `this.sprite.x`, reaching through composition to move the wrapped sprite.",
   "type": "lesson",
   "difficulty": "beginner",

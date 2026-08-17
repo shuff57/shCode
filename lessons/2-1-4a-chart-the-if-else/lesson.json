@@ -1,6 +1,6 @@
 {
   "id": "2-1-4a-chart-the-if-else",
-  "title": "2.1.4a Chart the Code — if / else",
+  "title": "2.1.5a Chart the Code — if / else",
   "description": "Draw the if/else you just traced as a flowchart. One diamond, two labelled exits, both branches rejoining.",
   "type": "assignment",
   "difficulty": "beginner",
@@ -17,15 +17,34 @@
   "diagram": {
     "starter": "flowchart TD\n  A([Start])\n  Z([End])",
     "rules": [
-      { "id": "one-start" },
-      { "id": "has-end" },
-      { "id": "all-labeled" },
-      { "id": "no-orphans" },
-      { "id": "min-decisions", "count": 1 },
-      { "id": "decision-two-exits" },
-      { "id": "decision-labeled" },
-      { "id": "reaches-end" },
-      { "id": "no-self-loop" }
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-decisions",
+        "count": 1
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      }
     ]
   },
   "grading": {

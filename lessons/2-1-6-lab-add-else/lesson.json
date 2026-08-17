@@ -1,6 +1,6 @@
 {
   "id": "2-1-6-lab-add-else",
-  "title": "2.1.6 Add an else",
+  "title": "2.1.7 Add an else",
   "description": "Extend an if statement with an else branch to handle both outcomes. Auto-graded.",
   "type": "assignment",
   "difficulty": "beginner",

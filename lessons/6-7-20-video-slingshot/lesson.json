@@ -1,6 +1,6 @@
 {
   "id": "6-7-20-video-slingshot",
-  "title": "6.7.20 Video — The Slingshot Pattern",
+  "title": "6.7.21 Video — The Slingshot Pattern",
   "description": "This is the moment the unit snaps together: a joint holds the ball, you drag it back with the mouse, release removes the joint, and a force vector launches it toward the target. Watch the whole pattern before you read the code.",
   "type": "lesson",
   "difficulty": "beginner",

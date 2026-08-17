@@ -1,6 +1,6 @@
 {
   "id": "6-7-28-challenges",
-  "title": "6.7.28 Challenges — SliderJoint, Trebuchet, Swinging Rope",
+  "title": "6.7.30 Challenges — SliderJoint, Trebuchet, Swinging Rope",
   "description": "Three optional stretch prompts for Unit 2.7: build a SliderJoint piston sandbox, a trebuchet that uses a DistanceJoint + HingeJoint together, or a swinging rope chain with three or more HingeJoints.",
   "type": "challenge",
   "difficulty": "advanced",

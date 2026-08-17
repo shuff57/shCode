@@ -1,6 +1,6 @@
 {
   "id": "2-3-3a-chart-the-switch",
-  "title": "2.3.3a Chart the Code — a switch is a chain of diamonds",
+  "title": "2.3.4a Chart the Code — a switch is a chain of diamonds",
   "description": "Draw a three-case switch as a flowchart and see why `break` matters: without it, the arrows fall straight into the next case.",
   "type": "assignment",
   "difficulty": "beginner",
@@ -17,15 +17,34 @@
   "diagram": {
     "starter": "flowchart TD\n  A([Start])\n  Z([End])",
     "rules": [
-      { "id": "one-start" },
-      { "id": "has-end" },
-      { "id": "all-labeled" },
-      { "id": "no-orphans" },
-      { "id": "min-decisions", "count": 3 },
-      { "id": "decision-two-exits" },
-      { "id": "decision-labeled" },
-      { "id": "reaches-end" },
-      { "id": "no-self-loop" }
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
+      {
+        "id": "min-decisions",
+        "count": 3
+      },
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      }
     ]
   },
   "grading": {

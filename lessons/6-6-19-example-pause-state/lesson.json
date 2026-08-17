@@ -1,6 +1,6 @@
 {
   "id": "6-6-19-example-pause-state",
-  "title": "6.6.19 Worked Example — Adding a Pause State",
+  "title": "6.6.20 Worked Example — Adding a Pause State",
   "description": "Add a pause state to your game. When paused, stop movement and physics, show a PAUSED overlay. Press P to toggle pause on and off.",
   "type": "lesson",
   "difficulty": "beginner",
