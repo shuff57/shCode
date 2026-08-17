@@ -18,6 +18,14 @@
 // `1.2.31`. Anyone "tidying" that mismatch by renumbering the title back lands
 // it on top of the video. This check turns that into a failed build.
 //
+// The same hazard exists one level up, in curriculum/modules/*.md. A module's id
+// lives in its frontmatter, not its filename, so a renumber that refiles a module
+// leaves the old file declaring the old id — and listModules() emits BOTH while
+// getModule() resolves the id with .find(), i.e. whichever readdir returns first.
+// That is not hypothetical: 3.2_arrays.md outlived the move of Arrays to 3.3 and
+// shadowed the real 3.2, so /module/3.2 rendered the Arrays prose above the
+// Parameters lessons. Checks 4 and 5 cover it.
+//
 // Run by `npm run prebuild` (so it cannot ship) and by `npm test`.
 
 import fs from 'fs/promises';
@@ -26,6 +34,7 @@ import { fileURLToPath } from 'url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const lessonsDir = path.join(root, 'lessons');
+const modulesDir = path.join(root, 'curriculum', 'modules');
 
 const NUMBERED = /^(\d+\.\d+)\.(\d+)/;      // same shape lib/curriculum.ts parses
 const UNIT_NUM = /^(\d+\.\d+)/;
@@ -92,6 +101,39 @@ for (const l of lessons) {
   }
 }
 
+// --- 4/5. the module files those numbers land on
+const moduleFiles = await fs.readdir(modulesDir).catch(() => []);
+const modulesById = new Map();
+for (const f of moduleFiles.filter((f) => f.endsWith('.md'))) {
+  const src = await fs.readFile(path.join(modulesDir, f), 'utf8');
+  const fm = src.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  const id = fm && fm[1].match(/^id:\s*['"]?([\d.]+)['"]?\s*$/m);
+  if (!id) continue;                          // no id -> listModules() skips it too
+  if (!modulesById.has(id[1])) modulesById.set(id[1], []);
+  modulesById.get(id[1]).push(f);
+}
+
+// 4. two files claiming one id — one of them silently wins
+for (const [id, files] of [...modulesById].sort()) {
+  if (files.length > 1) {
+    errors.push(`duplicate module id ${id} declared by ${files.length}: `
+      + `${files.join(', ')} — getModule() picks whichever readdir returns first`);
+  }
+}
+
+// 5. a lesson numbered for a module that does not exist never appears anywhere.
+// Grouped by module — one missing file is one problem, not one per lesson.
+const homeless = new Map();
+for (const num of byNumber.keys()) {
+  const mod = num.match(UNIT_NUM)[1];
+  if (modulesById.has(mod)) continue;
+  homeless.set(mod, (homeless.get(mod) ?? 0) + 1);
+}
+for (const [mod, n] of [...homeless].sort()) {
+  errors.push(`module ${mod} has no file in curriculum/modules/, so its ${n} `
+    + `lesson(s) appear on no module page`);
+}
+
 for (const w of warnings) console.warn(`[check-lesson-numbers] WARN  ${w}`);
 for (const e of errors) console.error(`[check-lesson-numbers] ERROR ${e}`);
 
@@ -101,5 +143,5 @@ if (errors.length) {
   process.exit(1);
 }
 console.log(`[check-lesson-numbers] ${lessons.length} lessons, `
-  + `${byNumber.size} distinct numbers, no collisions`
+  + `${byNumber.size} distinct numbers, ${modulesById.size} modules, no collisions`
   + (warnings.length ? ` (${warnings.length} warning(s))` : ''));
