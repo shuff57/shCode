@@ -19,9 +19,15 @@ function findContent(lesson: Lesson): string {
   return node?.content ?? '';
 }
 
+// youtube-nocookie, not youtube.com, for two reasons that both matter in a
+// school: it holds off on tracking cookies until a student presses play, and it
+// is the same host bookSHelf frames from — so a network allowlist has one
+// YouTube domain to name instead of two. The video id is identical either way.
 function toEmbedUrl(url: string): string {
-  const yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
-  if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
+  // `youtube(-nocookie)?\.com` so a teacher pasting an already-nocookie link
+  // still gets normalized rather than falling through unmatched.
+  const yt = url.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
+  if (yt) return `https://www.youtube-nocookie.com/embed/${yt[1]}`;
   return url;
 }
 

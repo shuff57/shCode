@@ -87,4 +87,4 @@ No `draw()` change. The loop body is the **interface** — the Group is the **co
 - Per-sprite uniqueness comes from each sprite's own state (position, index, custom property), not from the loop.
 - Group size is invisible to the loop — 5 sprites or 500 sprites use the same code.
 - Group iteration in `draw()` runs every frame. Keep the per-sprite work cheap.
-- For the safe iteration pattern when you also need to *remove* during the loop, see `6.1.10 Worked Example — Safe Despawn`.
+- For the safe iteration pattern when you also need to *remove* during the loop, see `6.2.5 Worked Example — Safe Despawn`.

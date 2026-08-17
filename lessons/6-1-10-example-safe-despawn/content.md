@@ -119,5 +119,5 @@ Same correct behavior, more readable than the manual backwards loop.
 - **Iterating forward + deleting = bugs.** Every other doomed sprite gets skipped because the array shifts under your loop counter (shplay's `delete()` splices the sprite out of every group it's in).
 - **Backwards iteration is safe** because deleted indices are always *behind* you.
 - **Iterate-a-copy** (`[...group]`) is also safe and reads more cleanly — pick the style that's clearer at the call site.
-- **The `overlaps(group, callback)` callback form is *also* safe** — shplay has finished its own iteration before calling your callback. Use it when deletion is triggered by a collision (see `6.1.7 Worked Example — Apple Catcher`).
+- **The `overlaps(group, callback)` callback form is *also* safe** — shplay has finished its own iteration before calling your callback. Use it when deletion is triggered by a collision (see `6.2.2 Worked Example — Apple Catcher`).
 - **Pick one safe pattern per loop.** Don't mix backwards iteration and iterate-a-copy in the same block — pick whichever reads cleaner for the situation.

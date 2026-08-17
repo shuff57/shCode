@@ -1,6 +1,6 @@
 # Collisions + Overlaps
 
-Read this before `6.1.10 Worked Example — Safe Despawn`. About 6 minutes.
+Read this before `6.2.5 Worked Example — Safe Despawn`. About 6 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -151,4 +151,4 @@ A common pitfall: writing `if (player.overlaps(enemies)) enemies[0].delete()`. T
 
 ---
 
-Once you can explain why the callback form is the safe place to call `delete()`, open `6.1.10 Worked Example — Safe Despawn`.
+Once you can explain why the callback form is the safe place to call `delete()`, open `6.2.5 Worked Example — Safe Despawn`.

@@ -76,7 +76,7 @@ for (let a of [...apples]) {
 }
 ```
 
-`[...apples]` makes a shallow copy of the Group's array so deleting during iteration doesn't shift the index under the loop. (You'll see the bug live in `6.1.10 Worked Example — Safe Despawn`.)
+`[...apples]` makes a shallow copy of the Group's array so deleting during iteration doesn't shift the index under the loop. (You'll see the bug live in `6.2.5 Worked Example — Safe Despawn`.)
 
 ## Step 4 — `sprite.delete()` vs `group.remove(sprite)`
 

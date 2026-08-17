@@ -142,7 +142,7 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 ## Unit 1: Foundations (book Chapter 1)
 > **SLO focus:** Introduces **SLO 1** (lifecycle, W1 primary artifact A1.1.1) and **SLO 2** (coding conventions and structured style foundations).
 
-### 1.1 What Is Programming / Software Lifecycle (~1.75 hrs)
+### 1.1 Software Lifecycle (~1.75 hrs)
 **Contact hours:** 1.75
 **Sizing note:** 253 lines, 1 meeting — revised down from 2 on 2026-08-14. This was the one day-count in BOOK-TO-MODULE.md derived from a real written spec rather than the line-count proxy; it is re-examined here because the proxy it anchored has been retired.
 
@@ -518,7 +518,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 
 ---
 
-### 2.3 The switch Statement (~3.5 hrs)
+### 2.3 The switch Statement (~1.75 hrs)
 **Contact hours:** 3.5
 **Sizing note:** **1 meeting.** 1024 book lines puts this in 2-meeting range, but `switch` is a syntactic variant of the if/else-if chain from §2.1 and much of the section is repeated worked examples. It was pre-registered as the first candidate to cut "if a meeting is ever needed elsewhere" — and on 2026-08-14 one was, to schedule the semester-close blocks. Teach the syntax and the fall-through trap; do not re-teach the decision logic.
 **Book section:** 2.3 The switch Statement
@@ -1188,7 +1188,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 
 ---
 
-### 6.3 Physics Applications (~3.5 hrs)
+### 6.3 Physics Applications (~1.75 hrs)
 **Contact hours:** 3.5
 **Sizing note:** **1 meeting.** 812 lines makes this the largest section in Ch 6, but it is pure *application* of §5.2 (physics properties) and §6.2 (collisions) and introduces no new API — the only one of the dense candidates for which that was true. Cut from 2 on 2026-08-14 to help fund the semester-close blocks. See Part B.
 **Book section:** 6.3 Physics Applications
@@ -1649,7 +1649,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 
 ---
 
-### 8.5 Arrays in JSCAD / Loops Generating Geometry (~1.75 hrs)
+### 8.5 Arrays in JSCAD / Loops (~1.75 hrs)
 **Contact hours:** 1.75
 **Sizing note:** 461 lines, 1 meeting.
 **Book section:** 8.5 Arrays in JSCAD / Loops

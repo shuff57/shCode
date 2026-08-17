@@ -1,6 +1,6 @@
 ## Two players, one keyboard
 
-**Read before attempting `6.7.28 Worked Example — Two Paddles, Two Schemes`.**
+**Read before attempting `6.7.22 Worked Example — Two Paddles, Two Schemes`.**
 
 A two-player local game means two people share one keyboard. They can't use the same keys — they'd fight each other. The fix is simple: give each player their own set of keys.
 

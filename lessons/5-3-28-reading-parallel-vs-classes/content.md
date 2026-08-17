@@ -1,6 +1,6 @@
 # Parallel arrays vs classes
 
-Read this before `5.3.30 Worked Example — Procedural vs OOP side-by-side`. About 6 minutes.
+Read this before `5.4.15 Worked Example — Procedural vs OOP side-by-side`. About 6 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -148,4 +148,4 @@ function draw() {
 
 ---
 
-Once you can describe what goes wrong if one of the three `splice` calls is forgotten, open `5.3.30 Worked Example — Procedural vs OOP side-by-side`.
+Once you can describe what goes wrong if one of the three `splice` calls is forgotten, open `5.4.15 Worked Example — Procedural vs OOP side-by-side`.
