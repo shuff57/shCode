@@ -1,54 +1,92 @@
 {
   "id": "1-5-16-keep-two-drop-two",
   "title": "1.5.16 Keep Two, Drop Two",
-  "description": "Describe a bus route to a stranger. Two details stay, two go, and you have to justify all four. AI-graded with hints.",
+  "description": "Five multiple-choice questions on abstraction, the drop test, and why it is relative to the problem. Checked instantly.",
   "type": "assignment",
-  "estimateMins": 20,
+  "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
-  "preview": "assignment",
+  "preview": "quiz",
   "slos": [
     "SLO-3"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "aiGrader": {
-    "rubricTitle": "Keep Two, Drop Two — AI-graded rubric",
-    "model": "deepseek-v4-flash:0731-cloud",
-    "contextDocs": [],
-    "prompt": "Everything you need is in 1.5.13 (Abstraction), 1.5.14 (Layers of Abstraction) and the worked example in 1.5.15 — go back and reread them if you get stuck. One or two sentences per answer is plenty, in your own everyday words.\n\nYou are describing a bus route to someone who has never been to your town.\n\n1. Name two details you would KEEP, and say why each one matters. (1.5.13)\n\n2. Name two details you would LEAVE OUT, and say why each one does not matter. (1.5.13)\n\n3. State the test you used to decide. One sentence.\n\n4. Now change the problem: the person is colour-blind and cannot read the route number from a distance. Does that change which details you keep? Say what moves, and why. (1.5.14)",
-    "rubric": [
-      {
-        "id": "two-kept-justified",
-        "title": "Two kept details, each with a reason",
-        "description": "Student names two specific details they would keep - typically the stop to get on at and the stop to get off at - and says why each matters. Credit any pair whose absence would genuinely leave the listener unable to complete the journey. Deny if fewer than two, or if reasons are missing.",
-        "points": 0
-      },
-      {
-        "id": "two-dropped-justified",
-        "title": "Two dropped details, each with a reason",
-        "description": "Student names two specific details they would leave out - the colour of the bus, the name of each street, the driver, the upholstery - and says why each does not matter. The reason must be about the listener's actions, not about the detail being boring or obvious. Deny if fewer than two, or if a dropped detail is actually load-bearing.",
-        "points": 0
-      },
-      {
-        "id": "test-stated",
-        "title": "Q3: states the abstraction test",
-        "description": "Student articulates the test: does dropping this detail change what the person has to do? Wording will vary - 'would they still be able to get there', 'does it change their actions'. Deny if the stated test is about whether a detail is interesting, true, or short.",
-        "points": 0
-      },
-      {
-        "id": "problem-change-handled",
-        "title": "Q4: recognises that abstraction is relative to the problem",
-        "description": "Student sees that changing the person changes which details are load-bearing - a detail previously dropped (such as the bus colour, or the route number's appearance) may now need keeping, or a new detail is needed. Credit any answer showing the kept/dropped line moved because the problem moved. Deny if the student says nothing changes, or repeats their first answer unchanged.",
-        "points": 0
-      }
-    ]
-  },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-what-abstraction-is",
+        "source": "1.5.13",
+        "question": "What does abstraction mean?",
+        "options": [
+          "Making something simpler by using shorter words",
+          "Keeping the details relevant to the problem at hand and discarding the rest",
+          "Hiding information so other people cannot copy your work",
+          "Describing something without using any examples"
+        ],
+        "answer": 1,
+        "explanation": "Definition 1.5.3. It is leaving something out on purpose — and you should be able to name what you left out."
+      },
+      {
+        "id": "q2-the-test",
+        "source": "1.5.13",
+        "question": "You are deciding whether to keep a detail. What is the test?",
+        "options": [
+          "Does dropping this detail change the action the reader has to take?",
+          "Is this detail true?",
+          "Is this detail interesting?",
+          "Would leaving it out make the description shorter?"
+        ],
+        "answer": 0,
+        "explanation": "One question settles every case. Being true is not the standard; being load-bearing is."
+      },
+      {
+        "id": "q3-bus-route",
+        "source": "1.5.13",
+        "question": "You are describing a bus route to a stranger. Which detail earns its place?",
+        "options": [
+          "The colour of the bus",
+          "The name of every street the bus turns down",
+          "How many seats the bus has",
+          "The stop where they get off"
+        ],
+        "answer": 3,
+        "explanation": "Without the stop the description is useless. The other three are all true and none of them change what the person does."
+      },
+      {
+        "id": "q4-true-but-droppable",
+        "source": "1.5.13",
+        "question": "Can a detail be completely true and still be worth leaving out?",
+        "options": [
+          "No — if it is true it belongs in the description",
+          "Yes, but only if the description is running out of room",
+          "Yes — truth is not the standard, load-bearing is",
+          "No — leaving out true things is what makes a description wrong"
+        ],
+        "answer": 2,
+        "explanation": "The colour of the bus is a fact. It is also irrelevant to catching it."
+      },
+      {
+        "id": "q5-abstraction-is-relative",
+        "source": "1.5.14",
+        "question": "Now the person you are describing the route to is colour-blind and cannot read the route number from a distance. What does that do to your abstraction?",
+        "options": [
+          "Nothing — the route is the same route",
+          "A detail you had dropped may become load-bearing — what you keep depends on the problem, not on the bus",
+          "It means you should include every detail from now on, to be safe",
+          "It means abstraction does not work for describing directions"
+        ],
+        "answer": 1,
+        "explanation": "Change the problem and the same fact changes category. Abstraction is relative to the job in front of you."
+      }
+    ]
+  }
 }

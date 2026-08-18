@@ -1,48 +1,92 @@
 {
   "id": "1-1-19-same-framework",
   "title": "1.1.18 Same Framework, Different Weight",
-  "description": "Compare two teams and explain why they elaborate the same framework differently. AI-graded with hints.",
+  "description": "Five multiple-choice questions on the four Ps and why two teams elaborate the same framework differently. Checked instantly.",
   "type": "assignment",
-  "estimateMins": 15,
+  "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.1 Software Lifecycle",
-  "preview": "assignment",
+  "preview": "quiz",
   "slos": [
     "SLO-1"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "aiGrader": {
-    "rubricTitle": "Same Framework, Different Weight — AI-graded rubric",
-    "model": "deepseek-v4-flash:0731-cloud",
-    "contextDocs": [],
-    "prompt": "Everything you need is in 1.1.6 (The Four Phases) and 1.1.17 (The Four Ps) — go back and reread them if you get stuck. A few sentences is plenty, in your own everyday words.\n\nConsider two software projects:\n\n- A small team building a simple app for a single school.\n- A large team building a banking system for thousands of customers.\n\nBoth follow the same four framework activities (inception, elaboration, construction, deployment).\n\nExplain why those two teams would handle the same four activities differently. Use the four Ps — problem, project, people, product — in your answer, and say something specific about each of the two projects.",
-    "rubric": [
-      {
-        "id": "four-ps-referenced",
-        "title": "References the four Ps",
-        "description": "Student names or clearly paraphrases the four Ps (problem, project, people, product). Full credit for naming them or describing them in plain words. Deny if the four Ps never appear and are not paraphrased.",
-        "points": 0
-      },
-      {
-        "id": "compares-two-projects",
-        "title": "Compares the two projects specifically",
-        "description": "Student compares the small school app against the large banking system specifically — not a generic 'bigger projects need more planning' with no reference to either scenario. Full credit for an answer that ties its reasoning to both given projects. Deny for a generic claim with no reference to the two scenarios.",
-        "points": 0
-      },
-      {
-        "id": "concludes-heavier-process",
-        "title": "Concludes the banking system needs heavier process",
-        "description": "Student concludes the banking system needs heavier (more elaborate) process. Stating that light process for the small app is fine is acceptable, but the response must address both sides. Full credit for a clear conclusion that the banking system gets the heavier elaboration. Deny if the answer ignores which project needs the heavier process.",
-        "points": 0
-      }
-    ]
-  },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-four-ps-named",
+        "source": "1.1.17",
+        "question": "What are the four Ps?",
+        "options": [
+          "Planning, programming, publishing, patching",
+          "Purpose, process, product, price",
+          "Problem, project, people, product",
+          "Problem, plan, program, product"
+        ],
+        "answer": 2,
+        "explanation": "Problem, project, people, product. They are the four factors a framework gets elaborated around."
+      },
+      {
+        "id": "q2-four-activities",
+        "source": "1.1.6",
+        "question": "What are the four framework activities, in order?",
+        "options": [
+          "Design, development, testing, maintenance",
+          "Inception, elaboration, construction, deployment",
+          "Planning, coding, shipping, fixing",
+          "Requirements, architecture, release, support"
+        ],
+        "answer": 1,
+        "explanation": "Inception, elaboration, construction, deployment — the book's names. The five-phase list in the 1.1.5 video (design, development, testing, deployment, maintenance) is the same lifecycle under industry names."
+      },
+      {
+        "id": "q3-why-teams-differ",
+        "source": "1.1.17",
+        "question": "Two teams follow the same four framework activities but work very differently. What explains the difference?",
+        "options": [
+          "The four Ps differ between the projects, so each activity gets more or less weight",
+          "One team skips activities the other performs",
+          "The activities mean different things at different companies",
+          "They are writing in different programming languages"
+        ],
+        "answer": 0,
+        "explanation": "Both teams keep all four activities. The four Ps decide how much weight each one carries."
+      },
+      {
+        "id": "q4-heavier-elaboration",
+        "source": "1.1.17",
+        "question": "A small team builds an app for one school. A large team builds a banking system for thousands of customers. Which project gets the heavier elaboration, and why?",
+        "options": [
+          "The school app — schools have stricter rules about software",
+          "Neither — the framework fixes how much work each activity gets",
+          "The banking system — banking software is written in more programming languages",
+          "The banking system — the product has to be reliable for thousands of people, so the phases carry more weight"
+        ],
+        "answer": 3,
+        "explanation": "Same four activities, heavier elaboration. The product and the people it serves are what raise the stakes."
+      },
+      {
+        "id": "q5-which-p",
+        "source": "1.1.17",
+        "question": "Which of the four Ps is about who does the work?",
+        "options": [
+          "Project",
+          "Problem",
+          "People",
+          "Product"
+        ],
+        "answer": 2,
+        "explanation": "People. Problem is how hard the work is, project is how it is managed, product is what gets built."
+      }
+    ]
+  }
 }

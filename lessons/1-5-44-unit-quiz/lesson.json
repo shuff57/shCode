@@ -1,7 +1,7 @@
 {
   "id": "1-5-44-unit-quiz",
   "title": "1.5.45 Module 1.5 Quiz",
-  "description": "Nine multiple-choice questions on computational thinking, flowcharts, pseudocode, recursion and reading errors. Checked instantly.",
+  "description": "Twelve multiple-choice questions on computational thinking, decomposition, abstraction, pseudocode, flowcharts, recursion and debugging. Checked instantly.",
   "type": "assignment",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -138,6 +138,45 @@
         ],
         "answer": 2,
         "explanation": "A column of bare numbers tells you nothing about which is which. Labelling each one is the difference between output you can debug with and output you have to guess at."
+      },
+      {
+        "id": "q10-self-contained",
+        "source": "1.5.8",
+        "question": "You have broken a problem into parts. What tells you a part is genuinely self-contained?",
+        "options": [
+          "You could hand it to someone else with no further explanation and get it back working",
+          "It fits on one line",
+          "It takes less than five minutes",
+          "It comes first in the list"
+        ],
+        "answer": 0,
+        "explanation": "A part you can only understand while holding three others in your head has been chopped, not decomposed."
+      },
+      {
+        "id": "q11-drop-test",
+        "source": "1.5.13",
+        "question": "Deciding whether to keep a detail, what is the test?",
+        "options": [
+          "Does dropping it change what the reader has to do?",
+          "Is it true?",
+          "Is it interesting?",
+          "Does it make the description shorter?"
+        ],
+        "answer": 0,
+        "explanation": "Being true is not the standard. A detail can be perfectly true and still worth discarding."
+      },
+      {
+        "id": "q12-indentation-containment",
+        "source": "1.5.20",
+        "question": "In pseudocode, what is indentation doing?",
+        "options": [
+          "Showing which steps are inside which",
+          "Making the plan look tidy",
+          "Marking the most important lines",
+          "Standing in for semicolons"
+        ],
+        "answer": 0,
+        "explanation": "Move one line in or out by four spaces and you have described a different program."
       }
     ]
   }

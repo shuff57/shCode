@@ -1,18 +1,28 @@
-Write your response in the box below. You can revise and resubmit as many times as you like.
+Two plans, written as pseudocode. Read them before you answer.
 
-**Pseudocode, not JavaScript.** No braces, no semicolons, no `console.log`. If you find yourself typing punctuation, you have drifted into step 2.
+**Plan A — largest of three**
 
-Pseudocode has no single right form — only clearer and less clear ones. The test for question 1 is whether someone could follow your steps literally, on any three numbers, and end up with the right answer.
+```
+INPUT a, b, c
+set largest to a
+IF b > largest THEN
+    set largest to b
+END IF
+IF c > largest THEN
+    set largest to c
+END IF
+OUTPUT largest
+```
 
----
+**Plan B — keep asking for the password**
 
-## Rubric
+```
+INPUT password
+WHILE password is not correct
+    OUTPUT "Try again"
+    INPUT password
+END WHILE
+OUTPUT "Welcome"
+```
 
-| # | Criterion |
-|---|-----------|
-| 1 | Q1: the plan actually finds the largest, for any three numbers |
-| 2 | Q1: indentation shows which steps are inside the decision |
-| 3 | Q2: the plan keeps asking until the password is correct |
-| 4 | Q3: reasons about what makes the loop end |
-| 5 | Q4: says why being unrunnable is an advantage |
-| 6 | Both answers are pseudocode rather than JavaScript |
+Each question names the lesson to reread if you get it wrong.

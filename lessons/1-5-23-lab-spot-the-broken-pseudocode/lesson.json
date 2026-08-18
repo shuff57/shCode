@@ -1,66 +1,92 @@
 {
   "id": "1-5-23-lab-spot-the-broken-pseudocode",
   "title": "1.5.23 Spot the Broken Pseudocode",
-  "description": "A plan that never finishes, found by reading rather than running. Diagnose it and rewrite it — in pseudocode, not code. AI-graded with hints.",
+  "description": "Five multiple-choice questions on reading a broken plan, indentation, and why nothing running it is the point. Checked instantly.",
   "type": "assignment",
-  "estimateMins": 15,
+  "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
-  "preview": "assignment",
+  "preview": "quiz",
   "slos": [
     "SLO-3"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "aiGrader": {
-    "rubricTitle": "Spot the Broken Pseudocode — AI-graded rubric",
-    "model": "deepseek-v4-flash:0731-cloud",
-    "contextDocs": [],
-    "prompt": "Everything you need is in 1.5.19 (Pseudocode and Flowcharts), 1.5.20 (The Two Pseudocode Rules) and the worked examples in 1.5.21 and 1.5.22 — go back and reread them if you get stuck. Your own everyday words are fine.\n\nHere is somebody's plan. It has no syntax errors, because pseudocode has no syntax. It is still wrong.\n\n  set count to 1\n  while count is less than 10\n      print count\n\n1. What is wrong with it? Read it back literally, one line at a time, and say what makes the loop never finish.\n\n2. Rewrite the plan correctly, in pseudocode. Use indentation to show which steps are inside the loop. Do not write JavaScript — no braces, no semicolons. (1.5.20)\n\n3. Which line in your corrected plan is the one that guarantees it ends, and why does it guarantee that?\n\n4. This plan was caught by reading it aloud rather than by running it. Why would running it have been a worse way to find this particular problem? (1.5.2)",
-    "rubric": [
-      {
-        "id": "diagnosis",
-        "title": "Q1: identifies that count never changes",
-        "description": "Student says nothing ever increases count, so the condition stays true and the plan repeats forever. Credit any wording that identifies the unchanging variable as the cause - 'count is always 1', 'nothing updates it', 'the condition can never become false'. Deny answers that blame the print statement, the starting value, or the number 10.",
-        "points": 0
-      },
-      {
-        "id": "rewrite-adds-step",
-        "title": "Q2: the rewritten plan adds the missing step",
-        "description": "The corrected pseudocode includes a step that increases count inside the loop - 'add 1 to count' or equivalent. Deny if the rewrite only reorders or reworks the existing three lines without adding a step that changes count.",
-        "points": 0
-      },
-      {
-        "id": "rewrite-indented",
-        "title": "Q2: indentation shows what is inside the loop",
-        "description": "The steps that repeat are indented under the while line, and anything that happens once is not. Deny if everything is flush left, or if the indentation does not correspond to what belongs inside the loop.",
-        "points": 0
-      },
-      {
-        "id": "is-pseudocode",
-        "title": "Q2: the answer is pseudocode, not JavaScript",
-        "description": "The rewrite reads as plain structured English. Keywords such as WHILE or IF are fine. Deny if the student submits real JavaScript with braces, semicolons and console.log - the point of the exercise is that this stage has no language.",
-        "points": 0
-      },
-      {
-        "id": "termination-reasoned",
-        "title": "Q3: names the line that guarantees termination, and why",
-        "description": "Student points at the step that increases count and explains that because count grows on every pass, it must eventually reach 10 and fail the condition. Credit any clear statement of that mechanism. Deny if a line is named with no reasoning, or the wrong line is named.",
-        "points": 0
-      },
-      {
-        "id": "why-reading-wins",
-        "title": "Q4: says why reading beat running here",
-        "description": "Student recognises that running this would hang or loop forever rather than report a useful error, so it would tell you little about the cause - whereas reading it exposes the missing step directly. Credit any answer along those lines, including 'it would never stop so you'd learn nothing' or 'there is no error message for a plan that is simply wrong'.",
-        "points": 0
-      }
-    ]
-  },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-what-is-wrong",
+        "source": "1.5.20",
+        "question": "Read the plan above literally, one line at a time. What makes the loop never finish?",
+        "options": [
+          "count starts at 1 instead of 0",
+          "The loop is missing a closing brace",
+          "print cannot be used inside a loop",
+          "Nothing ever changes count, so \"count is less than 10\" stays true forever"
+        ],
+        "answer": 3,
+        "explanation": "The condition tests count, and no line touches count. It is true on the first pass and true on every pass after."
+      },
+      {
+        "id": "q2-the-fix",
+        "source": "1.5.20",
+        "question": "Which change fixes it?",
+        "options": [
+          "Add \"add 1 to count\" at the end, not indented",
+          "Change \"less than 10\" to \"less than 100\"",
+          "Add \"add 1 to count\" indented inside the loop, under print count",
+          "Move \"set count to 1\" inside the loop"
+        ],
+        "answer": 2,
+        "explanation": "It has to be inside the loop, or it runs once after the loop is already stuck. Indentation is what puts it inside."
+      },
+      {
+        "id": "q3-indentation",
+        "source": "1.5.20",
+        "question": "What is indentation doing in pseudocode?",
+        "options": [
+          "Making the plan look tidy for the reader",
+          "Showing which steps are inside which — it is containment, not decoration",
+          "Marking which lines are the most important",
+          "Standing in for the semicolons that pseudocode does not use"
+        ],
+        "answer": 1,
+        "explanation": "Move one line in or out by four spaces and you have described a different program. That is how much work it is doing."
+      },
+      {
+        "id": "q4-no-compiler",
+        "source": "1.5.20",
+        "question": "Nothing checks pseudocode — there is no compiler for it. Why is that an advantage rather than a problem?",
+        "options": [
+          "A syntax error tells you nothing about whether the plan makes sense, so a human reading it is the check that matters",
+          "It means you can write the plan as carelessly as you like",
+          "It makes pseudocode faster for the computer to run",
+          "It means mistakes in pseudocode cannot happen"
+        ],
+        "answer": 0,
+        "explanation": "The bug here is a planning bug. No compiler would have caught it; reading it aloud catches it in seconds."
+      },
+      {
+        "id": "q5-why-reading-beat-running",
+        "source": "1.5.2",
+        "question": "This plan was caught by reading it, not by running it. Why would running it have been the worse way to find this particular bug?",
+        "options": [
+          "It would refuse to start, giving no information at all",
+          "It would produce the right answer and hide the problem",
+          "It would take too long to type in",
+          "It would print forever without ever pointing at the line responsible"
+        ],
+        "answer": 3,
+        "explanation": "An endless stream of numbers tells you something is wrong and nothing about what. The plan tells you exactly what."
+      }
+    ]
+  }
 }

@@ -1,54 +1,92 @@
 {
   "id": "1-5-12-decompose-getting-to-school",
   "title": "1.5.12 Decompose Getting to School",
-  "description": "Six tasks, your own categories, and one thing the grouping tells you that the list did not. AI-graded with hints.",
+  "description": "Five multiple-choice questions on decomposition and what makes a part self-contained. Checked instantly.",
   "type": "assignment",
-  "estimateMins": 20,
+  "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
-  "preview": "assignment",
+  "preview": "quiz",
   "slos": [
     "SLO-3"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "aiGrader": {
-    "rubricTitle": "Decompose Getting to School — AI-graded rubric",
-    "model": "deepseek-v4-flash:0731-cloud",
-    "contextDocs": [],
-    "prompt": "Everything you need is in 1.5.8 (Decomposition) and the worked example in 1.5.11 — go back and reread them if you get stuck. Your own everyday words are fine.\n\nThe problem is: get to school on time tomorrow.\n\n1. Decompose it into at least six smaller tasks. List them. (1.5.8)\n\n2. Group those tasks into two or three categories of your own choosing. Name each category. (1.5.11)\n\n3. Now look at your groups. Name one thing the grouping showed you that the flat list did not — a task you had forgotten, a category that turned out much fuller than the others, or a task that belonged somewhere surprising.\n\n4. Pick one of your tasks and say whether it is still too big. Could it be decomposed further? If yes, break it down. If no, say why it is already small enough. (1.5.8)",
-    "rubric": [
-      {
-        "id": "six-tasks",
-        "title": "At least six tasks, and they are genuinely separate",
-        "description": "Student lists six or more distinct tasks that together make up getting to school. Deny if fewer than six, or if items are restatements of each other ('leave the house' and 'go outside').",
-        "points": 0
-      },
-      {
-        "id": "categories-named",
-        "title": "Tasks are grouped into two or three named categories",
-        "description": "Student sorts the tasks into two or three groups and gives each group a name. Any sensible grouping counts - by time (night before / morning / journey), by place, by who does it. Deny if the tasks are simply relisted, or if the groups have no names.",
-        "points": 0
-      },
-      {
-        "id": "grouping-revealed",
-        "title": "Q3: names something the grouping revealed",
-        "description": "Student identifies a specific discovery from grouping - a forgotten task, an unexpectedly full category, or a task that belonged somewhere surprising. The most common real answer is that a large share of tasks belong to the night before. Deny if the answer only restates the categories or says grouping made it 'more organised' with no specific finding.",
-        "points": 0
-      },
-      {
-        "id": "further-decomposition",
-        "title": "Q4: judges one task's size, with reasoning",
-        "description": "Student picks one task and either breaks it down further into sub-steps, or argues it is already small enough. Credit either answer if the reasoning refers to whether the task is self-contained or whether someone could carry it out without asking a question. Deny if no judgement is given, or the judgement has no reason attached.",
-        "points": 0
-      }
-    ]
-  },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-what-decomposition-is",
+        "source": "1.5.8",
+        "question": "What does decomposition mean?",
+        "options": [
+          "Rewriting a problem in simpler words",
+          "Removing the parts of a problem that are too hard",
+          "Breaking a complex problem into smaller parts that can be understood and solved on their own",
+          "Solving a problem the fastest way you can find"
+        ],
+        "answer": 2,
+        "explanation": "Definition 1.5.2 — one hard task redefined as a set of easy ones."
+      },
+      {
+        "id": "q2-self-contained",
+        "source": "1.5.8",
+        "question": "The definition says the parts must be self-contained. What is the test for that?",
+        "options": [
+          "Each part takes about the same amount of time",
+          "You could hand one part to someone else, with no further explanation, and get it back working",
+          "There are at least six parts",
+          "The parts are listed in the order they happen"
+        ],
+        "answer": 1,
+        "explanation": "A part you can only understand while holding three others in your head has been chopped, not decomposed."
+      },
+      {
+        "id": "q3-chopped-not-decomposed",
+        "source": "1.5.8",
+        "question": "Which of these is a genuine decomposition of \"make a jam sandwich\"?",
+        "options": [
+          "\"Open the jar\" — it can be understood and done on its own",
+          "\"Start making it\", then \"finish making it\"",
+          "\"Make the sandwich quickly\"",
+          "\"Make half the sandwich\", then \"make the other half\""
+        ],
+        "answer": 0,
+        "explanation": "Start and finish are not solvable on their own. Opening the jar is."
+      },
+      {
+        "id": "q4-still-too-big",
+        "source": "1.5.8",
+        "question": "You decompose \"get to school on time\" and one of your tasks is \"get ready\". Is that task finished being decomposed?",
+        "options": [
+          "Yes — everyone knows what getting ready means",
+          "Yes — a task only needs breaking down if it takes over an hour",
+          "No — but only because it does not mention school",
+          "No — \"get ready\" hides several separate tasks, so it is not yet self-contained"
+        ],
+        "answer": 3,
+        "explanation": "Wash, dress, pack the bag, eat. Each is separately doable; \"get ready\" is a label over the top of them."
+      },
+      {
+        "id": "q5-why-group",
+        "source": "1.5.11",
+        "question": "After listing your tasks you group them into named categories. What does grouping give you that the flat list did not?",
+        "options": [
+          "It makes the list shorter",
+          "It puts the tasks into the correct time order",
+          "It exposes gaps and lopsidedness — a category with one task in it usually means you forgot something",
+          "It proves every task is self-contained"
+        ],
+        "answer": 2,
+        "explanation": "The shape of the groups is information. A nearly empty category is the flat list telling you it is incomplete."
+      }
+    ]
+  }
 }

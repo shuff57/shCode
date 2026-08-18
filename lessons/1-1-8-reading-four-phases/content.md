@@ -56,7 +56,7 @@ just pulls two jobs out into names of their own — **testing**, which the four-
 treats as an umbrella activity running throughout (see `1.1.10`), and **maintenance**, the work
 that keeps going after release.
 
-Know both names. `1.1.9` asks you for the five, `1.1.22` asks you for the four.
+Know both names. `1.1.22` asks you for the four, then asks you to line them up against the five.
 
 ---
 

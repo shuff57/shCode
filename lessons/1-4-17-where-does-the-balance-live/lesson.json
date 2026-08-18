@@ -1,54 +1,92 @@
 {
   "id": "1-4-17-where-does-the-balance-live",
   "title": "1.4.17 Where Does the Balance Live?",
-  "description": "A bank account, two paradigms. Say where the depositing code goes in each, and when you'd want which. AI-graded with hints.",
+  "description": "Five multiple-choice questions on where behaviour lives in procedural versus object-oriented style. Checked instantly.",
   "type": "assignment",
-  "estimateMins": 15,
+  "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",
-  "preview": "assignment",
+  "preview": "quiz",
   "slos": [
     "SLO-2"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "aiGrader": {
-    "rubricTitle": "Where Does the Balance Live? — AI-graded rubric",
-    "model": "deepseek-v4-flash:0731-cloud",
-    "contextDocs": [],
-    "prompt": "Everything you need is in 1.4.8 (Procedural Programming), 1.4.15 (Object-Oriented Programming) and the worked example in 1.4.16 — go back and reread them if you get stuck. One or two sentences per answer is plenty, in your own everyday words.\n\nA program keeps track of a bank account. It stores a balance, and it needs code that deposits money into that balance.\n\n1. In object-oriented style, where does the code that changes the balance live? Say where, and say why putting it there is what makes the style object-oriented. (1.4.15)\n\n2. In procedural style, where would that same code live instead? (1.4.8)\n\n3. Name one situation where procedural is the better fit, and one where object-oriented is. Give a reason for each, not just a preference. (1.4.15 and 1.4.16)",
-    "rubric": [
-      {
-        "id": "oo-placement",
-        "title": "Q1: the behaviour lives with the data",
-        "description": "Student says the depositing code lives in the account object itself, alongside the balance. Deny if the answer places it in a separate procedure, or is too vague to tell where it went.",
-        "points": 0
-      },
-      {
-        "id": "bundling-named",
-        "title": "Q1: names bundling as what makes it object-oriented",
-        "description": "Student connects the placement to the paradigm - that bundling data with the behaviour acting on it is exactly what makes the style object-oriented. Credit any clear statement of that link. Deny if Q1 only states the placement with no reason attached.",
-        "points": 0
-      },
-      {
-        "id": "procedural-contrast",
-        "title": "Q2: procedural keeps them separate",
-        "description": "Student says that in procedural style the depositing code sits in a separate procedure/function, away from the balance, which is held in its own variable. Deny if the contrast is missing or if the answer describes the same arrangement twice.",
-        "points": 0
-      },
-      {
-        "id": "fit-with-reasons",
-        "title": "Q3: one situation each, with reasons",
-        "description": "Student names a situation suiting procedural (typically a small, direct job or a short script) and one suiting object-oriented (typically a larger program, or many similar things each keeping their own data), and gives a reason for each. Deny if either situation is missing, or if reasons are bare preference such as 'it's cleaner'.",
-        "points": 0
-      }
-    ]
-  },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-oo-where",
+        "source": "1.4.15",
+        "question": "A program tracks a bank account balance and needs code that deposits money into it. In object-oriented style, where does the depositing code live?",
+        "options": [
+          "Inside the account object, alongside the balance it changes",
+          "In a separate variable next to the balance",
+          "Anywhere in the file — object-oriented style does not care",
+          "In a comment above the balance"
+        ],
+        "answer": 0,
+        "explanation": "The behaviour goes where the data is. The account holds the balance and knows how to deposit into it."
+      },
+      {
+        "id": "q2-what-makes-it-oo",
+        "source": "1.4.15",
+        "question": "What is it about that arrangement that makes the style object-oriented?",
+        "options": [
+          "The code ends up shorter than it would otherwise be",
+          "The program runs faster",
+          "The variable names are longer and more descriptive",
+          "Data and the behaviour that operates on it are bundled into one value"
+        ],
+        "answer": 3,
+        "explanation": "Bundling is the whole idea — properties and methods in one object, per Definition 1.4.4."
+      },
+      {
+        "id": "q3-procedural-where",
+        "source": "1.4.8",
+        "question": "In procedural style, where would that same depositing code live?",
+        "options": [
+          "Inside the balance variable itself",
+          "Procedural style cannot change a balance at all",
+          "Separate from the balance — the balance sits in a variable, and the code reaches in from outside",
+          "In a second copy of the balance"
+        ],
+        "answer": 2,
+        "explanation": "Procedural keeps them apart: variables hold values, statements do work, nothing owns anything."
+      },
+      {
+        "id": "q4-procedural-defining",
+        "source": "1.4.8",
+        "question": "What is the defining feature of procedural programming?",
+        "options": [
+          "It can only be used for very small programs",
+          "Data and instructions are separate things",
+          "It does not allow variables",
+          "It always runs faster than object-oriented code"
+        ],
+        "answer": 1,
+        "explanation": "Separation is the feature — and it is exactly what the next two paradigms change."
+      },
+      {
+        "id": "q5-when-which",
+        "source": "1.4.15",
+        "question": "When does each style fit best?",
+        "options": [
+          "Procedural is direct and easy to follow for a small job; object-oriented pays off as a program grows",
+          "Object-oriented is always better, so procedural is only taught for history",
+          "Procedural is for games, object-oriented is for websites",
+          "Whichever one you learned first is the right one to keep using"
+        ],
+        "answer": 0,
+        "explanation": "Neither wins in the abstract. Bundling starts paying once the program is big enough to be annoying without it."
+      }
+    ]
+  }
 }

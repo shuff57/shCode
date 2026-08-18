@@ -1,54 +1,92 @@
 {
   "id": "1-4-6-which-level-fits",
   "title": "1.4.6 Which Level Fits?",
-  "description": "A team needs to ship a web app quickly. Pick a level of abstraction and name what they trade away. AI-graded with hints.",
+  "description": "Five multiple-choice questions on levels of abstraction and picking a language level against a deadline. Checked instantly.",
   "type": "assignment",
-  "estimateMins": 15,
+  "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",
-  "preview": "assignment",
+  "preview": "quiz",
   "slos": [
     "SLO-2"
   ],
   "points": 0,
   "contentFile": "content.md",
-  "aiGrader": {
-    "rubricTitle": "Which Level Fits? — AI-graded rubric",
-    "model": "deepseek-v4-flash:0731-cloud",
-    "contextDocs": [],
-    "prompt": "Everything you need is in 1.4.4 (Levels of Abstraction) and 1.4.5 (High and Low Level) — go back and reread them if you get stuck. One or two sentences per answer is plenty, in your own everyday words.\n\nA small team has eight weeks to ship a working web app. They are arguing about which language to use. One person wants a low-level language because the program will run faster.\n\n1. Should they choose a high-level or a low-level language? Give a clear answer. (1.4.5)\n\n2. Why? Say which resource is scarce for this team, and how the level you chose helps with it. (1.4.5)\n\n3. What are they trading away by choosing it? Name the cost honestly — every choice here has one. (1.4.4 and 1.4.5)",
-    "rubric": [
-      {
-        "id": "clear-high-level",
-        "title": "Clear answer: high-level",
-        "description": "Student clearly answers high-level (or names a specific high-level language such as JavaScript or Python as their choice). Credit an unambiguous answer. Deny if the answer is low-level, 'it depends' with no decision, or too vague to tell which was chosen.",
-        "points": 0
-      },
-      {
-        "id": "scarce-resource",
-        "title": "Names the scarce resource",
-        "description": "Student identifies that programmer time / development speed is what is scarce for this team, given the eight-week deadline. Wording will vary - 'they don't have time to write it all', 'it's faster to build' both count. Deny if the reason given is unrelated to time or development effort.",
-        "points": 0
-      },
-      {
-        "id": "abstraction-connected",
-        "title": "Connects the choice to abstraction",
-        "description": "Student explains that a high-level language hides hardware detail (memory, how the machine does the work), which is WHY it is quicker to write. Credit any clear statement that the language handles detail so the programmer does not have to. Deny if high-level is only asserted to be 'easier' with no mention of what it hides or handles for you.",
-        "points": 0
-      },
-      {
-        "id": "cost-named",
-        "title": "Names the real cost",
-        "description": "Student names something genuinely given up - some run speed, or fine control over the hardware. Deny if the answer claims there is no downside, or names a cost that is not real (e.g. 'high-level languages can't do as much').",
-        "points": 0
-      }
-    ]
-  },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-which-level",
+        "source": "1.4.5",
+        "question": "A small team has eight weeks to ship a working web app. One member wants a low-level language because the program will run faster. Which level should they choose?",
+        "options": [
+          "Low-level",
+          "Neither — the level makes no difference to how long it takes to write",
+          "Whichever one runs fastest, always",
+          "High-level"
+        ],
+        "answer": 3,
+        "explanation": "High-level. The deadline is the binding constraint, and high-level languages are faster to write."
+      },
+      {
+        "id": "q2-scarce-resource",
+        "source": "1.4.5",
+        "question": "What is the scarce resource for that team?",
+        "options": [
+          "Machine speed",
+          "Memory",
+          "Programmer time",
+          "Disk space"
+        ],
+        "answer": 2,
+        "explanation": "Eight weeks is what they are short of. The right level is the one that spends the scarce resource most carefully."
+      },
+      {
+        "id": "q3-abstraction-means",
+        "source": "1.4.4",
+        "question": "What does a language's \"level of abstraction\" mean?",
+        "options": [
+          "How difficult the language is for a beginner to learn",
+          "How much machine detail the language hides from you",
+          "How many built-in commands the language has",
+          "How recently the language was invented"
+        ],
+        "answer": 1,
+        "explanation": "How far the language sits from the hardware. The detail still happens — you are just not the one describing it."
+      },
+      {
+        "id": "q4-the-cost",
+        "source": "1.4.5",
+        "question": "What is the team trading away by choosing a high-level language?",
+        "options": [
+          "Some run speed, and direct control over the hardware",
+          "Nothing — high-level languages are better in every way",
+          "The ability to build a web app at all",
+          "The ability to use variables"
+        ],
+        "answer": 0,
+        "explanation": "Every choice on this scale has a cost. Here it is a little run speed and the fine-grained control."
+      },
+      {
+        "id": "q5-when-low-level",
+        "source": "1.4.5",
+        "question": "Which job is the better argument for a low-level language?",
+        "options": [
+          "Building a school website over one term",
+          "Writing a program that adds two numbers together",
+          "Any project with a tight deadline",
+          "Writing the code that drives a hard disk, where control over the hardware is the point"
+        ],
+        "answer": 3,
+        "explanation": "When hardware control IS the job, low-level earns its cost. Neither end of the scale wins in general."
+      }
+    ]
+  }
 }
