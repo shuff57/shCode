@@ -7,6 +7,7 @@ import { recordLessonCompleted, useLessonState } from '../lib/progress';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import { fetchDraft, saveDraft, recordSubmission } from '../lib/written-grader-store';
 import { countCorrect, passThreshold } from '../lib/quiz-grade';
+import { withInlineCode } from './InlineCode';
 
 interface Props {
   lessonId: string;
@@ -165,7 +166,7 @@ export default function QuizView({ lessonId, config }: Props) {
               }}
             >
               <span style={{ color: '#6272a4', fontWeight: 600, minWidth: 22 }}>{qi + 1}.</span>
-              <span>{q.question}</span>
+              <span>{withInlineCode(q.question)}</span>
             </div>
 
             {q.code ? (
@@ -224,7 +225,7 @@ export default function QuizView({ lessonId, config }: Props) {
                       onChange={() => pick(q.id, oi)}
                       style={{ marginTop: 3, accentColor: '#bd93f9' }}
                     />
-                    <span>{opt}</span>
+                    <span>{withInlineCode(opt)}</span>
                   </label>
                 );
               })}
@@ -251,7 +252,7 @@ export default function QuizView({ lessonId, config }: Props) {
                   <CircleX size={16} color="#ff5555" style={{ flexShrink: 0, marginTop: 2 }} />
                 )}
                 <span>
-                  {q.explanation}
+                  {withInlineCode(q.explanation)}
                   {q.source ? (
                     <span style={{ color: '#6272a4' }}> (reread {q.source})</span>
                   ) : null}

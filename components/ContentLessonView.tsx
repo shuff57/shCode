@@ -10,6 +10,7 @@ import DiagramAssignmentView from './DiagramAssignmentView';
 import QuizView from './QuizView';
 import MarkdownWithLiveBlocks from './MarkdownWithLiveBlocks';
 import HeaderLessonNav from './HeaderLessonNav';
+import { withInlineCode } from './InlineCode';
 
 interface Props {
   lesson: Lesson;
@@ -103,7 +104,7 @@ export default function ContentLessonView({ lesson }: Props) {
 
       <h1 style={{ margin: '4px 0 6px' }}>{lesson.title}</h1>
       {lesson.description ? (
-        <p style={{ color: '#888', marginTop: 0 }}>{lesson.description}</p>
+        <p style={{ color: '#888', marginTop: 0 }}>{withInlineCode(lesson.description)}</p>
       ) : null}
 
       {preview === 'video' ? (

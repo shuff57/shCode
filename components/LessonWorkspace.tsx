@@ -64,6 +64,7 @@ import LivePreview from './LivePreview';
 import JscadPreview from './JscadPreview';
 import ShPlayPreview from './ShPlayPreview';
 import RequirementsSection from './RequirementsSection';
+import LessonSteps from './LessonSteps';
 import Console from './Console';
 import CommitDialog from './CommitDialog';
 import HistoryPanel from './HistoryPanel';
@@ -632,6 +633,21 @@ export default function LessonWorkspace({
                       Docs ↗
                     </a>
                   ),
+                },
+              ] as DrawerTab[])
+            : []),
+          // The teaching for a console lesson lives in lesson.json's `steps` —
+          // what console.log does, why numbers take no quotes, what a boolean
+          // is. Nothing mounted LessonSteps, so all of it was invisible and the
+          // student got requirement titles and a comment-only starter file.
+          // Only offered when the lesson actually has steps.
+          ...((lesson.steps?.length ?? 0) > 0
+            ? ([
+                {
+                  key: 'steps',
+                  label: 'Steps',
+                  color: '#f1fa8c',
+                  content: <LessonSteps lesson={lesson} />,
                 },
               ] as DrawerTab[])
             : []),

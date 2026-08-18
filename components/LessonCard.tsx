@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { Lesson } from '../lib/types';
 import { badgeForLesson } from '../lib/lesson-badges';
 import { bypassesLessonLock, useLessonState } from '../lib/progress';
+import { withInlineCode } from './InlineCode';
 
 const typeBadgeColors: Record<string, string> = {
   lesson: '#5baafd',
@@ -101,7 +102,7 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
           </span>
         )}
       </div>
-      <p className="text-med text-text/70">{lesson.description}</p>
+      <p className="text-med text-text/70">{withInlineCode(lesson.description)}</p>
     </>
   );
 
