@@ -14,7 +14,19 @@ interface UserRecord {
   created_at: number;
   classes_owned: number;
   active_enrollments: number;
+  active_classes: string | null;
 }
+
+interface ClassRecord {
+  id: string;
+  name: string;
+  student_count: number;
+}
+
+// 'active' = every class I currently teach, 'all' = no filter at all, anything
+// else is a class id. Default is 'active' so last year's roster stops being the
+// first thing on the page.
+type Scope = 'active' | 'all' | string;
 
 type Role = 'admin' | 'teacher' | 'student';
 
@@ -136,6 +148,8 @@ function AdminUsersInner() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [search, setSearch] = useState('');
+  const [classes, setClasses] = useState<ClassRecord[]>([]);
+  const [scope, setScope] = useState<Scope>('active');
 
   // Per-row state keyed by email
   const [rowStates, setRowStates] = useState<Record<string, RowState>>({});
@@ -148,13 +162,25 @@ function AdminUsersInner() {
     });
   }, []);
 
-  // Fetch users once auth confirmed as admin
+  // Classes for the switcher. Archived ones are left out — the point of the
+  // filter is to stop showing classes that finished.
+  useEffect(() => {
+    if (!authChecked) return;
+    if (currentUser?.role !== 'admin') return;
+    apiFetch<{ classes: ClassRecord[] }>('/api/classes').then((res) => {
+      if (res.error === null) setClasses(res.data.classes);
+    });
+  }, [authChecked, currentUser]);
+
+  // Fetch users once auth confirmed as admin, and again whenever the scope changes
   useEffect(() => {
     if (!authChecked) return;
     if (currentUser?.role !== 'admin') return;
 
     setLoading(true);
-    apiFetch<{ users: UserRecord[] }>('/api/admin/users').then((res) => {
+    apiFetch<{ users: UserRecord[] }>(
+      `/api/admin/users?scope=${encodeURIComponent(scope)}`,
+    ).then((res) => {
       if (res.error !== null) {
         setLoadError(res.error);
       } else {
@@ -164,10 +190,11 @@ function AdminUsersInner() {
           initial[u.email] = { role: u.role, saving: false, savedOk: false, error: '' };
         }
         setRowStates(initial);
+        setLoadError('');
       }
       setLoading(false);
     });
-  }, [authChecked, currentUser]);
+  }, [authChecked, currentUser, scope]);
 
   // Patch one field of a row's state
   function patchRow(email: string, patch: Partial<RowState>) {
@@ -245,12 +272,35 @@ function AdminUsersInner() {
     ? users.filter((u) => u.email.toLowerCase().includes(search.toLowerCase()))
     : users;
 
+  const studentCount = users.filter((u) => u.role === 'student').length;
+  const staffCount = users.length - studentCount;
+
   return (
     <div style={S.page}>
       <h1 style={S.h1}>Admin · Users</h1>
 
-      {/* Search */}
-      <div style={{ marginBottom: 20 }}>
+      {/* Class switcher + search */}
+      <div style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <label style={{ fontSize: 13, color: '#6272a4' }} htmlFor="admin-class-scope">
+          Class
+        </label>
+        <select
+          id="admin-class-scope"
+          style={{ ...S.select, minWidth: 220, padding: '7px 10px', fontSize: 14 }}
+          value={scope}
+          onChange={(e) => setScope(e.target.value)}
+        >
+          <option value="active">Active classes (all)</option>
+          {classes.length > 0 && <option disabled>──────────</option>}
+          {classes.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name} ({c.student_count})
+            </option>
+          ))}
+          <option disabled>──────────</option>
+          <option value="all">All accounts (incl. past)</option>
+        </select>
+
         <input
           style={S.input}
           type="search"
@@ -259,19 +309,43 @@ function AdminUsersInner() {
           onChange={(e) => setSearch(e.target.value)}
           aria-label="Filter users by email"
         />
-        {search && (
-          <span style={{ marginLeft: 12, fontSize: 13, color: '#6272a4' }}>
-            {filtered.length} of {users.length}
-          </span>
-        )}
+
+        <span style={{ fontSize: 13, color: '#6272a4' }}>
+          {search ? `${filtered.length} of ${users.length}` : `${studentCount} students · ${staffCount} staff`}
+        </span>
       </div>
+
+      {scope !== 'all' && (
+        <p style={{ fontSize: 13, color: '#6272a4', margin: '-8px 0 20px' }}>
+          Students with no current enrollment are hidden. Teachers and admins always show.{' '}
+          <button
+            type="button"
+            onClick={() => setScope('all')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#8be9fd',
+              cursor: 'pointer',
+              padding: 0,
+              font: 'inherit',
+              textDecoration: 'underline',
+            }}
+          >
+            Show every account
+          </button>
+        </p>
+      )}
 
       {/* States */}
       {loading && <div style={{ color: '#6272a4' }}>Loading users…</div>}
       {loadError && <div style={{ color: '#ff5555', fontSize: 14 }}>{loadError}</div>}
 
       {!loading && !loadError && users.length === 0 && (
-        <p style={{ color: '#6272a4', fontSize: 14 }}>No accounts found.</p>
+        <p style={{ color: '#6272a4', fontSize: 14 }}>
+          {scope === 'all'
+            ? 'No accounts found.'
+            : 'Nobody is enrolled here yet. Students appear once they join with the class code.'}
+        </p>
       )}
 
       {!loading && !loadError && users.length > 0 && (
@@ -282,6 +356,7 @@ function AdminUsersInner() {
                 <th style={S.th}>Email</th>
                 <th style={S.th}>Role</th>
                 <th style={S.th}>Created</th>
+                <th style={S.th}>Active classes</th>
                 <th style={S.th}>Classes owned</th>
                 <th style={S.th}>Active enrollments</th>
                 <th style={{ ...S.th, width: 60 }}>Saved</th>
@@ -335,6 +410,11 @@ function AdminUsersInner() {
                     {/* Created */}
                     <td style={{ ...S.td, color: '#6272a4', fontSize: 13 }}>
                       {fmtDate(u.created_at)}
+                    </td>
+
+                    {/* Active classes this student is currently in */}
+                    <td style={{ ...S.td, color: u.active_classes ? '#f8f8f2' : '#6272a4', fontSize: 13 }}>
+                      {u.active_classes || (u.role === 'student' ? 'none' : '—')}
                     </td>
 
                     {/* Classes owned */}
