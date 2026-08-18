@@ -3,184 +3,207 @@
     {
       "id": "1-1-1-slides",
       "title": "1.1.1 Slides — Foundations",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-10-example-greeting-phases",
       "title": "1.1.8 Worked Example — Greeting App Through Four Phases",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-11-reading-umbrella",
       "title": "1.1.10 Reading — Umbrella Activities",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-12-name-that-umbrella",
       "title": "1.1.11 Name That Umbrella",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-13-reading-actions",
       "title": "1.1.12 Reading — Software Engineering Actions",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-14-reading-task-sets",
       "title": "1.1.13 Reading — Task Sets",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-15-example-task-set-loop",
       "title": "1.1.14 Worked Example — Task Set for a Loop Bug",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-16-write-a-task-set",
       "title": "1.1.15 Write a Task Set",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-17-reading-sdlc",
       "title": "1.1.16 Reading — SDLC Methodologies",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-18-reading-four-ps",
       "title": "1.1.17 Reading — The Four Ps",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-19-same-framework",
       "title": "1.1.18 Same Framework, Different Weight",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-2-reading-console-log",
       "title": "1.1.2 Reading — Console: console.log & sequential execution",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 1
     },
     {
       "id": "1-1-20-reading-prescriptive",
       "title": "1.1.19 Reading — Prescriptive Process Models",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-21-reading-prescriptive-limits",
       "title": "1.1.20 Reading — Where Prescriptive Models Break",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-22-does-it-fit",
       "title": "1.1.21 Does It Fit?",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-23-a1-2-describe-lifecycle",
       "title": "1.1.22 Describe the Lifecycle",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-3-a1-1-sdlc-writeup",
       "title": "1.1.9 SDLC Writeup",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 1
     },
     {
       "id": "1-1-4-sdlc-overview",
       "title": "1.1.4 What a Program Is",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 1
     },
     {
       "id": "1-1-5-video-sdlc",
       "title": "1.1.5 Video — What is the SDLC?",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-6-first-statement",
       "title": "1.1.3 Your First Statement",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-7-a3-3-unit-quiz",
       "title": "1.1.23 Unit 1.1 Quiz",
-      "unit": "1.1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "quiz",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 3
     },
     {
       "id": "1-1-8-reading-four-phases",
       "title": "1.1.6 Reading — The Four Phases",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
       "id": "1-1-9-classify-the-task",
       "title": "1.1.7 Classify the Task",
-      "unit": "1 Foundations",
+      "unit": "1.1 Software Lifecycle",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -189,6 +212,7 @@
       "title": "1.2.1 Slides — Variables and Data Types",
       "unit": "1.2 Variables and Data Types",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -197,6 +221,7 @@
       "title": "1.2.6 Reading — The number Type",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -205,6 +230,7 @@
       "title": "1.2.8 Reading — Infinity, -Infinity and NaN",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -213,6 +239,7 @@
       "title": "1.2.9 Worked Example — NaN Is Sticky",
       "unit": "1.2 Variables and Data Types",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -221,6 +248,7 @@
       "title": "1.2.10 Predict the Number",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -229,6 +257,7 @@
       "title": "1.2.11 Reading — BigInt",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -237,6 +266,7 @@
       "title": "1.2.12 Reading — Strings and the Three Quotes",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -245,6 +275,7 @@
       "title": "1.2.13 Reading — Embedding Values with ${...}",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -253,6 +284,7 @@
       "title": "1.2.15 Greeting with Backticks",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -261,6 +293,7 @@
       "title": "1.2.17 Reading — The boolean Type",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -269,6 +302,7 @@
       "title": "1.2.18 Worked Example — Comparisons Produce Booleans",
       "unit": "1.2 Variables and Data Types",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -277,6 +311,7 @@
       "title": "1.2.2 Reading — Declaring Variables with let and const",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -285,6 +320,7 @@
       "title": "1.2.19 Reading — The null Value",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -293,6 +329,7 @@
       "title": "1.2.20 Reading — The undefined Value",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -301,6 +338,7 @@
       "title": "1.2.21 null vs undefined",
       "unit": "1.2 Variables and Data Types",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -309,6 +347,7 @@
       "title": "1.2.22 Reading — Primitive vs Object",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -317,6 +356,7 @@
       "title": "1.2.23 Reading — The typeof Operator",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -325,6 +365,7 @@
       "title": "1.2.24 Worked Example — The typeof Surprises",
       "unit": "1.2 Variables and Data Types",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -333,6 +374,7 @@
       "title": "1.2.25 typeof Round-Up",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -341,6 +383,7 @@
       "title": "1.2.27 Reading — The Seven Primitives, Recapped",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -349,6 +392,7 @@
       "title": "1.2.28 Fix Ten Declarations",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -357,6 +401,7 @@
       "title": "1.2.29 Describe a Real Object",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -365,6 +410,7 @@
       "title": "1.2.14 Reading — String Methods in Practice",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -373,6 +419,7 @@
       "title": "1.2.31 Module 1.2 Quiz",
       "unit": "1.2 Variables and Data Types",
       "preview": "quiz",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -381,6 +428,7 @@
       "title": "1.2.30 Video — Every Value Has a Type",
       "unit": "1.2 Variables and Data Types",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -389,6 +437,7 @@
       "title": "1.2.7 Reading — Arithmetic Operators and Type Coercion",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -397,6 +446,7 @@
       "title": "1.2.26 Variables and Types Check",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -405,6 +455,7 @@
       "title": "1.2.16 Operators and Expressions Check",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -413,6 +464,7 @@
       "title": "1.2.3 Reading — Every Value Has a Type",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -421,6 +473,7 @@
       "title": "1.2.4 Reading — Dynamically Typed",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -429,6 +482,7 @@
       "title": "1.2.5 Change the Type",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -437,6 +491,7 @@
       "title": "1.3.1 Slides — Documentation and Coding Conventions",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -445,6 +500,7 @@
       "title": "1.3.10 Worked Example — Good vs Bad Names",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -453,6 +509,7 @@
       "title": "1.3.11 Rename the Mystery Variables",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -461,6 +518,7 @@
       "title": "1.3.12 Rate These Names",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -469,6 +527,7 @@
       "title": "1.3.13 Reading — Reuse or Create?",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -477,6 +536,7 @@
       "title": "1.3.14 Reading — What Reuse Actually Costs",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -485,6 +545,7 @@
       "title": "1.3.15 Worked Example — One Variable, Three Meanings",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -493,6 +554,7 @@
       "title": "1.3.16 Split the Reused Variable",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -501,6 +563,7 @@
       "title": "1.3.17 Team Vocabulary",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -509,6 +572,7 @@
       "title": "1.3.18 Reading — What a README Is For",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -517,6 +581,7 @@
       "title": "1.3.19 Document a Messy Program",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -525,6 +590,7 @@
       "title": "1.3.2 Reading — camelCase Naming Style",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -533,6 +599,7 @@
       "title": "1.3.21 Module 1.3 Quiz",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "quiz",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -541,6 +608,7 @@
       "title": "1.3.20 Video — Names Are for Readers",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -549,6 +617,7 @@
       "title": "1.3.3 Reading — Code Layout",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -557,6 +626,7 @@
       "title": "1.3.4 Reading — Comments: // and /* */",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -565,6 +635,7 @@
       "title": "1.3.5 Why Documentation Matters",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -573,6 +644,7 @@
       "title": "1.3.6 Reading — Human-Readable Names",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -581,6 +653,7 @@
       "title": "1.3.7 Reading — Avoid Single Letters and Abbreviations",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -589,6 +662,7 @@
       "title": "1.3.8 Reading — Descriptive but Concise",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -597,6 +671,7 @@
       "title": "1.3.9 Reading — Agree on Terms",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -605,6 +680,7 @@
       "title": "1.4.1 Slides — Programming Paradigms and Languages",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -613,6 +689,7 @@
       "title": "1.4.10 Reading — Sequence, Selection, Repetition",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -621,6 +698,7 @@
       "title": "1.4.11 Worked Example — Which Structures Does This Use?",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -629,6 +707,7 @@
       "title": "1.4.12 Name the Structure",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -637,6 +716,7 @@
       "title": "1.4.13 Reading — Why goto Went Away",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -645,6 +725,7 @@
       "title": "1.4.14 Three Structures, Three Examples",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -653,6 +734,7 @@
       "title": "1.4.15 Reading — Object-Oriented Programming",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -661,6 +743,7 @@
       "title": "1.4.16 Worked Example — Procedural vs Object-Oriented",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -669,6 +752,7 @@
       "title": "1.4.17 Where Does the Balance Live?",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -677,6 +761,7 @@
       "title": "1.4.18 Reading — Functional Programming",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -685,6 +770,7 @@
       "title": "1.4.19 Reading — JavaScript Is Multi-Paradigm",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -693,6 +779,7 @@
       "title": "1.4.2 Reading — Why There Are So Many Languages",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -701,6 +788,7 @@
       "title": "1.4.20 Sort the Snippet",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -709,6 +797,7 @@
       "title": "1.4.21 Video — Why Are There So Many Programming Languages?",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -717,6 +806,7 @@
       "title": "1.4.22 Module 1.4 Quiz",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "quiz",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -725,6 +815,7 @@
       "title": "1.4.23 Two Languages, Two Purposes",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -733,6 +824,7 @@
       "title": "1.4.3 Match the Language to the Job",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -741,6 +833,7 @@
       "title": "1.4.4 Reading — Level of Abstraction",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -749,6 +842,7 @@
       "title": "1.4.5 Reading — High-Level and Low-Level Languages",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -757,6 +851,7 @@
       "title": "1.4.6 Which Level Fits?",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -765,6 +860,7 @@
       "title": "1.4.7 Reading — What a Paradigm Is",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -773,6 +869,7 @@
       "title": "1.4.8 Reading — Procedural Programming",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -781,6 +878,7 @@
       "title": "1.4.9 Reading — Structured Programming",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -789,6 +887,7 @@
       "title": "1.5.1 Slides — Program Design Tools and Environments",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -797,6 +896,7 @@
       "title": "1.5.10 Reading — Inductive and Deductive Reasoning",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -805,6 +905,7 @@
       "title": "1.5.11 Worked Example — Decomposing the Sandwich",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -813,6 +914,7 @@
       "title": "1.5.12 Decompose Getting to School",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -821,6 +923,7 @@
       "title": "1.5.13 Reading — Abstraction",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -829,6 +932,7 @@
       "title": "1.5.14 Reading — Layers of Abstraction",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -837,6 +941,7 @@
       "title": "1.5.15 Worked Example — Computational Thinking in Chess",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -845,6 +950,7 @@
       "title": "1.5.16 Keep Two, Drop Two",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -853,6 +959,7 @@
       "title": "1.5.17 Computational Thinking",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -861,6 +968,7 @@
       "title": "1.5.18 Reading — What an Algorithm Is",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -869,6 +977,7 @@
       "title": "1.5.19 Reading — Pseudocode and Flowcharts",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -877,6 +986,7 @@
       "title": "1.5.2 Reading — Think Before You Type",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -885,6 +995,7 @@
       "title": "1.5.20 Reading — The Two Pseudocode Rules",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -893,6 +1004,7 @@
       "title": "1.5.21 Worked Example — Pseudocode for a Decision",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -901,6 +1013,7 @@
       "title": "1.5.22 Worked Example — Butter or No Butter",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -909,6 +1022,7 @@
       "title": "1.5.23 Spot the Broken Pseudocode",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -917,6 +1031,7 @@
       "title": "1.5.24 Pseudocode: Largest of Three",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -925,6 +1040,7 @@
       "title": "1.5.25 Reading — The Three Flowchart Shapes",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -933,6 +1049,7 @@
       "title": "1.5.26 Reading — The Diamond",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -941,6 +1058,7 @@
       "title": "1.5.27 Reading — Pseudocode or Flowchart?",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -949,6 +1067,7 @@
       "title": "1.5.28 Chart the Even-or-Odd Test",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -957,6 +1076,7 @@
       "title": "1.5.29 Reading — The Class Flowchart Convention",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -965,6 +1085,7 @@
       "title": "1.5.3 Reading — What Computational Thinking Is",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -973,6 +1094,7 @@
       "title": "1.5.30 Your First Flowchart (Part 1)",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -981,6 +1103,7 @@
       "title": "1.5.31 Implement Your Plan (Part 2)",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -989,6 +1112,7 @@
       "title": "1.5.32 Reading — Sequential, Parallel, Concurrent",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -997,6 +1121,7 @@
       "title": "1.5.33 Reading — Recursion and the Base Case",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1005,6 +1130,7 @@
       "title": "1.5.34 Worked Example — Stack Overflow on Purpose",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1013,6 +1139,7 @@
       "title": "1.5.35 Reading — The Browser Console",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1021,6 +1148,7 @@
       "title": "1.5.36 Reading — A Code Editor",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1029,6 +1157,7 @@
       "title": "1.5.37 Settle It in the Console",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1037,6 +1166,7 @@
       "title": "1.5.38 Reading — Reading an Error Message",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1045,6 +1175,7 @@
       "title": "1.5.39 Cause a ReferenceError on Purpose",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1053,6 +1184,7 @@
       "title": "1.5.4 Reading — The Four Cornerstones",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1061,6 +1193,7 @@
       "title": "1.5.40 Reading — Testing and Test Cases",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1069,6 +1202,7 @@
       "title": "1.5.41 Reading — Debugging with console.log",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1077,6 +1211,7 @@
       "title": "1.5.42 Worked Example — Finding the Rectangle Bug",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1085,6 +1220,7 @@
       "title": "1.5.43 Debug the Order Total",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1093,6 +1229,7 @@
       "title": "1.5.45 Module 1.5 Quiz",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "quiz",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1101,6 +1238,7 @@
       "title": "1.5.44 Video — Think Before You Type",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1109,6 +1247,7 @@
       "title": "1.5.5 Reading — The Three As",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1117,6 +1256,7 @@
       "title": "1.5.6 Worked Example — The Jam Sandwich Robot",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1125,6 +1265,7 @@
       "title": "1.5.7 Instructions for a Robot",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1133,6 +1274,7 @@
       "title": "1.5.8 Reading — Decomposition",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1141,6 +1283,7 @@
       "title": "1.5.9 Reading — Pattern Recognition",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1149,6 +1292,7 @@
       "title": "2.1.1 Slides — Conditionals",
       "unit": "2.1 Conditionals",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1157,6 +1301,7 @@
       "title": "2.1.28 Reading — Logical Operators: && || !",
       "unit": "2.1 Conditionals",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1165,6 +1310,7 @@
       "title": "2.1.29 Worked Example — Combining conditions",
       "unit": "2.1 Conditionals",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1173,6 +1319,7 @@
       "title": "2.1.30 Guard with &&",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1181,6 +1328,7 @@
       "title": "2.1.31 Branch with ||",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1189,6 +1337,7 @@
       "title": "2.1.8 Chain Three Branches",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1197,6 +1346,7 @@
       "title": "2.1.9 Reading — Nested Conditionals",
       "unit": "2.1 Conditionals",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1205,6 +1355,7 @@
       "title": "2.1.10 Worked Example — Nested if Inside if",
       "unit": "2.1 Conditionals",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1213,6 +1364,7 @@
       "title": "2.1.11 Nest a Check",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1221,6 +1373,7 @@
       "title": "2.1.12 Reading — Truthy and Falsy Values",
       "unit": "2.1 Conditionals",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1229,6 +1382,7 @@
       "title": "2.1.13 Worked Example — Falsy Value Surprises",
       "unit": "2.1 Conditionals",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1237,6 +1391,7 @@
       "title": "2.1.2 Video — Making Decisions in Code",
       "unit": "2.1 Conditionals",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1245,6 +1400,7 @@
       "title": "2.1.14 Guard with a Truthy Check",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1253,6 +1409,7 @@
       "title": "2.1.18 Reading — Parentheses and Operator Precedence",
       "unit": "2.1 Conditionals",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1261,6 +1418,7 @@
       "title": "2.1.19 Reading — The Conditional Operator ?",
       "unit": "2.1 Conditionals",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1269,6 +1427,7 @@
       "title": "2.1.20 Worked Example — Ticket Price with ?",
       "unit": "2.1 Conditionals",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1277,6 +1436,7 @@
       "title": "2.1.21 Write Your First Ternary",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1285,6 +1445,7 @@
       "title": "2.1.22 Reading — Chaining Multiple ? Operators",
       "unit": "2.1 Conditionals",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1293,6 +1454,7 @@
       "title": "2.1.23 Worked Example — Size Label with Chained ?",
       "unit": "2.1 Conditionals",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1301,6 +1463,7 @@
       "title": "2.1.24 Chain Your Ternaries",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1309,6 +1472,7 @@
       "title": "2.1.25 Reading — When to Use ? vs if",
       "unit": "2.1 Conditionals",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1317,6 +1481,7 @@
       "title": "2.1.26 Worked Example — Rewriting a Misused Ternary",
       "unit": "2.1 Conditionals",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1325,6 +1490,7 @@
       "title": "2.1.3 Reading — If / Else if / Else",
       "unit": "2.1 Conditionals",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1333,6 +1499,7 @@
       "title": "2.1.27 Rewrite It as if/else",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1341,6 +1508,7 @@
       "title": "2.1.32 Flip It with !",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1349,6 +1517,7 @@
       "title": "2.1.33 Worked Example — The OR String-Literal Trap",
       "unit": "2.1 Conditionals",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1357,6 +1526,7 @@
       "title": "2.1.34 Debug the Door",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1365,6 +1535,7 @@
       "title": "2.1.35 Combine &&, ||, and !",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1373,6 +1544,7 @@
       "title": "2.1.36 Predict the Chain",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1381,6 +1553,7 @@
       "title": "2.1.37 Print Settings Advisor",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1389,6 +1562,7 @@
       "title": "2.1.38 Challenges — Optional Stretch",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1397,6 +1571,7 @@
       "title": "2.1.39 Grade Recommendation Advisor",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1405,6 +1580,7 @@
       "title": "2.1.40 Conditionals Checkpoint Quiz",
       "unit": "2.1 Conditionals",
       "preview": "quiz",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1413,6 +1589,7 @@
       "title": "2.1.4 Worked Example — Tracing an if/else chain",
       "unit": "2.1 Conditionals",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1421,6 +1598,7 @@
       "title": "2.1.5 Chart the Code — if / else",
       "unit": "2.1 Conditionals",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1429,6 +1607,7 @@
       "title": "2.1.6 Write Your First if",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1437,6 +1616,7 @@
       "title": "2.1.7 Add an else",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1445,6 +1625,7 @@
       "title": "2.1.15 Reading — Comparison Operators & === vs ==",
       "unit": "2.1 Conditionals",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1453,6 +1634,7 @@
       "title": "2.1.16 Worked Example — What each comparison returns",
       "unit": "2.1 Conditionals",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1461,6 +1643,7 @@
       "title": "2.1.17 Predict, Then Run",
       "unit": "2.1 Conditionals",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1469,6 +1652,7 @@
       "title": "2.2.1 Slides — Algorithms and Loops",
       "unit": "2.2 Algorithms and Loops",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1477,6 +1661,7 @@
       "title": "2.2.16 Countdown with while",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1485,6 +1670,7 @@
       "title": "2.2.18 Fix the Broken Chart",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1493,6 +1679,7 @@
       "title": "2.2.7 Flowchart a Decision",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1501,6 +1688,7 @@
       "title": "2.2.20 Challenges — Optional Stretch",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1509,6 +1697,7 @@
       "title": "2.2.3 Reading — Programs Implement Algorithms",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1517,6 +1706,7 @@
       "title": "2.2.15 Worked Example — Same Algorithm, Three Spellings",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1525,6 +1715,7 @@
       "title": "2.2.17 For + While Loop Program (Part B)",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1533,6 +1724,7 @@
       "title": "2.2.19 Reading — Canonical Algorithms & Linear Search",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1541,6 +1733,7 @@
       "title": "2.2.2 Reading — What Is an Algorithm?",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1549,6 +1742,7 @@
       "title": "2.2.4 Reading — Flowchart Shapes",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1557,6 +1751,7 @@
       "title": "2.2.5 Worked Example — Pseudocode → code",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1565,6 +1760,7 @@
       "title": "2.2.6 Chart the Code — Largest of Three",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1573,6 +1769,7 @@
       "title": "2.2.8 Algorithm in Plain English (Part A)",
       "unit": "2.2 Algorithms and Loops",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1581,6 +1778,7 @@
       "title": "2.2.9 Reading — The for Loop",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1589,6 +1787,7 @@
       "title": "2.2.10 Worked Example — Tracing a for-loop counter",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1597,6 +1796,7 @@
       "title": "2.2.11 Chart the Code — A for-loop That Accumulates",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1605,6 +1805,7 @@
       "title": "2.2.12 Count 1 to 10",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1613,6 +1814,7 @@
       "title": "2.2.13 Reading — while & do…while",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1621,6 +1823,7 @@
       "title": "2.2.14 Worked Example — while vs for + the infinite-loop trap",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1629,6 +1832,7 @@
       "title": "2.3.1 Slides — The Switch Statement",
       "unit": "2.3 The switch Statement",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1637,6 +1841,7 @@
       "title": "2.3.9 Reading — break and Fall-Through",
       "unit": "2.3 The switch Statement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1645,6 +1850,7 @@
       "title": "2.3.11 Worked Example — A Missing break in the Middle",
       "unit": "2.3 The switch Statement",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1653,6 +1859,7 @@
       "title": "2.3.12 Predict the Fall-Through",
       "unit": "2.3 The switch Statement",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1661,6 +1868,7 @@
       "title": "2.3.13 Fix the Fall-Through Bug",
       "unit": "2.3 The switch Statement",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1669,6 +1877,7 @@
       "title": "2.3.14 Reading — Grouping Cases",
       "unit": "2.3 The switch Statement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1677,6 +1886,7 @@
       "title": "2.3.15 Worked Example — Weekend or Weekday",
       "unit": "2.3 The switch Statement",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1685,6 +1895,7 @@
       "title": "2.3.16 Worked Example — Days in a Month",
       "unit": "2.3 The switch Statement",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1693,6 +1904,7 @@
       "title": "2.3.17 Group Cases: Vowel or Consonant",
       "unit": "2.3 The switch Statement",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1701,6 +1913,7 @@
       "title": "2.3.18 Reading — switch Compares Strictly",
       "unit": "2.3 The switch Statement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1709,6 +1922,7 @@
       "title": "2.3.19 case false vs case 0: Predict, Then Run",
       "unit": "2.3 The switch Statement",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1717,6 +1931,7 @@
       "title": "2.3.3 Reading — switch Statements",
       "unit": "2.3 The switch Statement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1725,6 +1940,7 @@
       "title": "2.3.20 Worked Example — Fix 1: Match the Case Type to the Value",
       "unit": "2.3 The switch Statement",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1733,6 +1949,7 @@
       "title": "2.3.21 Worked Example — Fix 2: Convert the Value with Number()",
       "unit": "2.3 The switch Statement",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1741,6 +1958,7 @@
       "title": "2.3.22 Fix the Type Mismatch",
       "unit": "2.3 The switch Statement",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1749,6 +1967,7 @@
       "title": "2.3.23 Reading — Choosing Between if...else and switch",
       "unit": "2.3 The switch Statement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1757,6 +1976,7 @@
       "title": "2.3.24 Worked Example — When switch Fits: Command Dispatch",
       "unit": "2.3 The switch Statement",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1765,6 +1985,7 @@
       "title": "2.3.25 Worked Example — When switch Doesn't Fit: the Grade Chain",
       "unit": "2.3 The switch Statement",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1773,6 +1994,7 @@
       "title": "2.3.26 Rewrite the Traffic Light as a Switch",
       "unit": "2.3 The switch Statement",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1781,6 +2003,7 @@
       "title": "2.3.27 switch or if...else? Justify Your Choice",
       "unit": "2.3 The switch Statement",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1789,6 +2012,7 @@
       "title": "2.3.28 Build a Four-Case Switch: Drink Sizes",
       "unit": "2.3 The switch Statement",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1797,6 +2021,7 @@
       "title": "2.3.30 Print Settings Advisor",
       "unit": "2.3 The switch Statement",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1805,6 +2030,7 @@
       "title": "2.3.10 Worked Example — switch vs if-else-if",
       "unit": "2.3 The switch Statement",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1813,6 +2039,7 @@
       "title": "2.3.31 Challenges — Optional Stretch",
       "unit": "2.3 The switch Statement",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1821,6 +2048,7 @@
       "title": "2.3.6 Chart the Code — a switch is a chain of diamonds",
       "unit": "2.3 The switch Statement",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1829,6 +2057,7 @@
       "title": "2.3.29 Convert an if-chain to switch",
       "unit": "2.3 The switch Statement",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1837,6 +2066,7 @@
       "title": "2.3.2 Reading — One Value, Many Answers",
       "unit": "2.3 The switch Statement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1845,6 +2075,7 @@
       "title": "2.3.4 Worked Example — A Menu of Options",
       "unit": "2.3 The switch Statement",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1853,6 +2084,7 @@
       "title": "2.3.5 Worked Example — The Switched Value Is an Expression",
       "unit": "2.3 The switch Statement",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1861,6 +2093,7 @@
       "title": "2.3.7 Build a Switch: Animal Sounds",
       "unit": "2.3 The switch Statement",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1869,6 +2102,7 @@
       "title": "2.3.8 Predict Where default Runs",
       "unit": "2.3 The switch Statement",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1877,6 +2111,7 @@
       "title": "2.4.1 Slides — Loop Control and Nested Loops",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1885,6 +2120,7 @@
       "title": "2.4.10 Worked Example — Searching Without a Known End",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1893,6 +2129,7 @@
       "title": "2.4.11 Chart the Code — Search Until Found",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1901,6 +2138,7 @@
       "title": "2.4.12 Break When the Square Passes 50",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1909,6 +2147,7 @@
       "title": "2.4.13 Reading — Skipping a Round with continue",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1917,6 +2156,7 @@
       "title": "2.4.14 Worked Example — Filtering While You Loop",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1925,6 +2165,7 @@
       "title": "2.4.15 Chart the Code — continue Skips, Doesn't Leave",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1933,6 +2174,7 @@
       "title": "2.4.16 Reading — The continue Trap in a while Loop",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1941,6 +2183,7 @@
       "title": "2.4.17 Worked Example — The continue Trap, and Its Fix",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1949,6 +2192,7 @@
       "title": "2.4.18 Worked Example — Predict: break vs continue",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1957,6 +2201,7 @@
       "title": "2.4.19 Multiples of 3 with continue",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1965,6 +2210,7 @@
       "title": "2.4.2 Reading — for vs while: Choosing a Loop",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1973,6 +2219,7 @@
       "title": "2.4.20 Reading — Infinite Loops: Three Causes",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1981,6 +2228,7 @@
       "title": "2.4.21 Worked Example — Making an Infinite Loop Safe",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1989,6 +2237,7 @@
       "title": "2.4.22 Fix the Infinite Loop",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1997,6 +2246,7 @@
       "title": "2.4.23 Debug Five Loops",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2005,6 +2255,7 @@
       "title": "2.4.24 Reading — Nested Loops",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2013,6 +2264,7 @@
       "title": "2.4.25 Worked Example — A Multiplication Table",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2021,6 +2273,7 @@
       "title": "2.4.26 Chart the Code — Nested Loops",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2029,6 +2282,7 @@
       "title": "2.4.27 Worked Example — break Leaves Only the Inner Loop",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2037,6 +2291,7 @@
       "title": "2.4.28 Worked Example — Breaking Out of Both Loops",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2045,6 +2300,7 @@
       "title": "2.4.29 Reading — Nested Loops Get Expensive",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2053,6 +2309,7 @@
       "title": "2.4.3 Worked Example — Predict: Which Loop Fits?",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2061,6 +2318,7 @@
       "title": "2.4.30 Triangle of Stars",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2069,6 +2327,7 @@
       "title": "2.4.31 Fix the Duplicate Pairs",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2077,6 +2336,7 @@
       "title": "2.4.32 Print a Grid Pattern",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2085,6 +2345,7 @@
       "title": "2.4.33 Challenges — Optional Stretch",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2093,6 +2354,7 @@
       "title": "2.4.4 Write Both: Known Count, Unknown Count",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2101,6 +2363,7 @@
       "title": "2.4.5 Reading — The do...while Loop",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2109,6 +2372,7 @@
       "title": "2.4.6 Worked Example — while vs do...while: The Difference in One Line",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2117,6 +2381,7 @@
       "title": "2.4.7 Chart the Code — do...while",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2125,6 +2390,7 @@
       "title": "2.4.8 do...while: Count 1 to 5",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2133,6 +2399,7 @@
       "title": "2.4.9 Reading — Leaving Early with break",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2141,6 +2408,7 @@
       "title": "2.5.1 Slides — Handling Errors with try/catch",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -2149,6 +2417,7 @@
       "title": "2.5.10 Reading — The Empty catch Trap",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2157,6 +2426,7 @@
       "title": "2.5.11 Fix the Silent Catch",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2165,6 +2435,7 @@
       "title": "2.5.12 Reading — Reading the Error Object",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2173,6 +2444,7 @@
       "title": "2.5.13 Worked Example — Reporting Instead of Guessing",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2181,6 +2453,7 @@
       "title": "2.5.14 Report the Error",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2189,6 +2462,7 @@
       "title": "2.5.15 Reading — Throwing Your Own Errors",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2197,6 +2471,7 @@
       "title": "2.5.16 Worked Example — Validate, Then Trust",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2205,6 +2480,7 @@
       "title": "2.5.17 Chart the Code — Validate Before You Trust",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2213,6 +2489,7 @@
       "title": "2.5.18 Reading — throw vs if: The Distance Rule",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2221,6 +2498,7 @@
       "title": "2.5.19 Reject the Bad Input",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2229,6 +2507,7 @@
       "title": "2.5.2 Reading — What an Error Actually Does",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2237,6 +2516,7 @@
       "title": "2.5.20 What Happens After a throw?",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2245,6 +2525,7 @@
       "title": "2.5.21 Reading — Cleaning Up with finally",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2253,6 +2534,7 @@
       "title": "2.5.22 When Does finally Run?",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2261,6 +2543,7 @@
       "title": "2.5.23 Reading — What try...catch Cannot Do",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2269,6 +2552,7 @@
       "title": "2.5.24 Guard Only What's Inside",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2277,6 +2561,7 @@
       "title": "2.5.25 Predict, Then Run: try/catch/finally Together",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2285,6 +2570,7 @@
       "title": "2.5.26 Loop with try/catch",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2293,6 +2579,7 @@
       "title": "2.5.27 Challenges — Optional Stretch",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2301,6 +2588,7 @@
       "title": "2.5.3 Runtime or Syntax?",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2309,6 +2597,7 @@
       "title": "2.5.4 Reading — try...catch: Attempt and Recover",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2317,6 +2606,7 @@
       "title": "2.5.5 Worked Example — Only Wrap What Can Fail",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2325,6 +2615,7 @@
       "title": "2.5.6 Wrap Only What Can Fail",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2333,6 +2624,7 @@
       "title": "2.5.7 Chart the Code — try/catch as a Flowchart",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2341,6 +2633,7 @@
       "title": "2.5.8 Catch Your First Error",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2349,6 +2642,7 @@
       "title": "2.5.9 What Runs, What Doesn't",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2357,6 +2651,7 @@
       "title": "3.1.1 Slides — Functions",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -2365,6 +2660,7 @@
       "title": "3.1.7 Functions",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2373,6 +2669,7 @@
       "title": "3.1.2 Reading — Defining & Calling a Function",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2381,6 +2678,7 @@
       "title": "3.1.3 Reading — The Function-Call Shape",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -2389,6 +2687,7 @@
       "title": "3.2.1 Reading — Parameters & Return Values",
       "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2397,6 +2696,7 @@
       "title": "3.2.2 Reading — Scope: Local vs Global",
       "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2405,6 +2705,7 @@
       "title": "3.6.1 Reading — Pass by Value vs Reference",
       "unit": "3.6 Functions: Pass by Value/Reference",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2413,6 +2714,7 @@
       "title": "3.6.2 Reading — Defensive Copying: [...] and {...}",
       "unit": "3.6 Functions: Pass by Value/Reference",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2421,6 +2723,7 @@
       "title": "3.6.3 Pass by Value vs Reference",
       "unit": "3.6 Functions: Pass by Value/Reference",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2429,6 +2732,7 @@
       "title": "3.1.4 Chart Before You Refactor",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -2437,6 +2741,7 @@
       "title": "3.1.5 findMax & isEven",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2445,6 +2750,7 @@
       "title": "3.1.6 Sum 1 to N",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2453,6 +2759,7 @@
       "title": "3.3.1 Slides — Arrays",
       "unit": "3.3 Arrays",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -2461,6 +2768,7 @@
       "title": "3.3.2 Reading — Array Basics: Index, push, pop",
       "unit": "3.3 Arrays",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8
     },
@@ -2469,6 +2777,7 @@
       "title": "3.3.3 Reading — Looping Over Arrays (for / for…of)",
       "unit": "3.3 Arrays",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8
     },
@@ -2477,6 +2786,7 @@
       "title": "3.3.4 Reading — Splitting Text into Lines (.split)",
       "unit": "3.3 Arrays",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8
     },
@@ -2485,6 +2795,7 @@
       "title": "3.3.5 Sum an Array",
       "unit": "3.3 Arrays",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8
     },
@@ -2493,6 +2804,7 @@
       "title": "3.3.6 Worked Example — A tiny menu loop",
       "unit": "3.3 Arrays",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8
     },
@@ -2501,6 +2813,7 @@
       "title": "3.3.7 Chart the Code — Looping Over an Array",
       "unit": "3.3 Arrays",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -2509,6 +2822,7 @@
       "title": "3.3.8 Arrays",
       "unit": "3.3 Arrays",
       "preview": "console",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 8
     },
@@ -2517,6 +2831,7 @@
       "title": "4.1.1 Slides — Print Shop (Q1 Synthesis)",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -2525,6 +2840,7 @@
       "title": "4.1.2 Reading — Plan Before You Code",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 9
     },
@@ -2533,6 +2849,7 @@
       "title": "4.1.3 Reading — Connectors and Notes",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -2541,6 +2858,7 @@
       "title": "4.1.4 Reading — Manual Testing: PASS / FAIL Checks",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 9
     },
@@ -2549,6 +2867,7 @@
       "title": "4.1.5 Print Shop Design Chart",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -2557,6 +2876,7 @@
       "title": "4.1.6 Print Shop (Q1 Synthesis)",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "console",
+      "type": "project",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 9
     },
@@ -2565,6 +2885,7 @@
       "title": "4.1.7 Q1 Reflection",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 9
     },
@@ -2573,6 +2894,7 @@
       "title": "5.1.1 Slides — shplay Foundations",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": null
     },
@@ -2581,6 +2903,7 @@
       "title": "5.1.10 Reading — Sprite property tour: pos, rotation, layer",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2589,6 +2912,7 @@
       "title": "5.1.11 Hello Sprite",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2597,6 +2921,7 @@
       "title": "5.1.12 Video — The Frame Loop Explained",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2605,6 +2930,7 @@
       "title": "5.1.13 Reading — kb.pressing(key)",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2613,6 +2939,7 @@
       "title": "5.1.14 Worked Example — Keyboard Movement",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2621,6 +2948,7 @@
       "title": "5.1.15 Reading — Velocity: vel.x and vel.y",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2629,6 +2957,7 @@
       "title": "5.1.16 Reading — Movement pattern (if / else if / else)",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2637,6 +2966,7 @@
       "title": "5.1.17 Reading — The else-to-zero rule",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2645,6 +2975,7 @@
       "title": "5.1.18 Lab — Delete the else, watch drift",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2653,6 +2984,7 @@
       "title": "5.1.19 Reading — WASD-not-arrows",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2661,6 +2993,7 @@
       "title": "5.1.2 Video — Your first shplay sketch",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2669,6 +3002,7 @@
       "title": "5.1.20 Make it Move",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2677,6 +3011,7 @@
       "title": "5.1.21 Sprite Playground",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "shplay",
+      "type": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2685,6 +3020,7 @@
       "title": "5.1.22 Frame Loop Writeup",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2693,6 +3029,7 @@
       "title": "5.1.23 Challenges",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "shplay",
+      "type": "challenge",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2701,6 +3038,7 @@
       "title": "5.1.3 Reading — Frame loop: setup() and draw()",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2709,6 +3047,7 @@
       "title": "5.1.4 Worked Example — Minimum Sprite Program",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2717,6 +3056,7 @@
       "title": "5.1.5 Reading — Canvas: new Canvas(w, h)",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2725,6 +3065,7 @@
       "title": "5.1.6 Reading — Sprite: new Sprite(x, y, w, h) + .color",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2733,6 +3074,7 @@
       "title": "5.1.7 Lab — Drop one sprite, change its color",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2741,6 +3083,7 @@
       "title": "5.1.8 Reading — Storing the sprite in a let variable",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2749,6 +3092,7 @@
       "title": "5.1.9 Reading — background(color) wipe rule",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     },
@@ -2757,6 +3101,7 @@
       "title": "5.3.1 Slides — Object-Oriented Programming",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": null
     },
@@ -2765,6 +3110,7 @@
       "title": "5.3.10 Lab — Two sprites, two property values",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2773,6 +3119,7 @@
       "title": "5.3.11 Reading — `this` is a noun",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2781,6 +3128,7 @@
       "title": "5.3.12 Worked Example — `this` is a pronoun",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2789,6 +3137,7 @@
       "title": "5.3.13 Your Turn — Build a Sprite",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2797,6 +3146,7 @@
       "title": "5.3.14 Worked Example — Sprite Showcase",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2805,6 +3155,7 @@
       "title": "5.3.15 Video — The `this` keyword",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2813,6 +3164,7 @@
       "title": "5.4.1 Reading — Methods: functions that live on a class",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2821,6 +3173,7 @@
       "title": "5.4.2 Lab — Method with no params",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2829,6 +3182,7 @@
       "title": "5.4.3 Lab — Method with parameters",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2837,6 +3191,7 @@
       "title": "5.4.4 Lab — Method that returns a value",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2845,6 +3200,7 @@
       "title": "5.3.2 Video — What `new Sprite()` actually does",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2853,6 +3209,7 @@
       "title": "5.4.5 Lab — A method calling `this.otherMethod()`",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2861,6 +3218,7 @@
       "title": "5.4.6 Chart the Code — A Method That Calls a Method",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 2: shPlay Game Development",
       "week": null
     },
@@ -2869,6 +3227,7 @@
       "title": "5.4.7 Reading — Why `this.sprite`, not `extends Sprite`",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2877,6 +3236,7 @@
       "title": "5.4.8 Lab — Mutate `this.sprite.x` from a method",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2885,6 +3245,7 @@
       "title": "5.4.9 Lab — Cleanup with `this.sprite.delete()`",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2893,6 +3254,7 @@
       "title": "5.4.10 Worked Example — Write an Enemy class (integration)",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2901,6 +3263,7 @@
       "title": "5.4.11 Lab — Three Enemies in three variables",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2909,6 +3272,7 @@
       "title": "5.4.12 Lab — An array of Enemies",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2917,6 +3281,7 @@
       "title": "5.4.13 Lab — Loop over an array of instances",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2925,6 +3290,7 @@
       "title": "5.4.14 Reading — Parallel Arrays vs Classes",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2933,6 +3299,7 @@
       "title": "5.4.15 Worked Example — Procedural vs OOP side-by-side",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2941,6 +3308,7 @@
       "title": "5.4.16 Read the Charts — Three Variables or Three Objects",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shPlay Game Development",
       "week": null
     },
@@ -2949,6 +3317,7 @@
       "title": "5.3.3 Reading — Class and instance",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2957,6 +3326,7 @@
       "title": "5.4.17 Reading — When to reach for OOP (3-question checklist)",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2965,6 +3335,7 @@
       "title": "5.4.18 Collectible Class",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
+      "type": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2973,6 +3344,7 @@
       "title": "5.4.19 Procedural vs OOP Writeup",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2981,6 +3353,7 @@
       "title": "5.4.20 Reading — Encapsulation, inheritance, polymorphism (vocabulary only)",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2989,6 +3362,7 @@
       "title": "5.4.21 Challenges",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
+      "type": "challenge",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -2997,6 +3371,7 @@
       "title": "5.3.4 Reading — The `new` operator",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -3005,6 +3380,7 @@
       "title": "5.3.5 Reading — `constructor` and its parameters",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -3013,6 +3389,7 @@
       "title": "5.3.6 Worked Example — You've been using classes",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -3021,6 +3398,7 @@
       "title": "5.3.7 Reading — Properties: data on `this`",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -3029,6 +3407,7 @@
       "title": "5.3.8 Lab — Read a property",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -3037,6 +3416,7 @@
       "title": "5.3.9 Lab — Write a property",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 12
     },
@@ -3045,6 +3425,7 @@
       "title": "6.1.1 Slides — Groups and Overlaps",
       "unit": "6.1 Groups and Overlaps",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": null
     },
@@ -3053,6 +3434,7 @@
       "title": "6.2.5 Worked Example — Safe Despawn",
       "unit": "6.2 Overlaps and Collisions",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
@@ -3061,6 +3443,7 @@
       "title": "6.2.6 Asteroid Field",
       "unit": "6.2 Overlaps and Collisions",
       "preview": "shplay",
+      "type": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
@@ -3069,6 +3452,7 @@
       "title": "6.2.7 Challenges",
       "unit": "6.2 Overlaps and Collisions",
       "preview": "shplay",
+      "type": "challenge",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
@@ -3077,6 +3461,7 @@
       "title": "6.1.2 Video — Groups in shplay",
       "unit": "6.1 Groups and Overlaps",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
@@ -3085,6 +3470,7 @@
       "title": "6.1.3 Reading — shplay docs: Groups",
       "unit": "6.1 Groups and Overlaps",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
@@ -3093,6 +3479,7 @@
       "title": "6.1.4 Worked Example — Iterating a Group",
       "unit": "6.1 Groups and Overlaps",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
@@ -3101,6 +3488,7 @@
       "title": "6.1.5 Groups Sandbox",
       "unit": "6.1 Groups and Overlaps",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
@@ -3109,6 +3497,7 @@
       "title": "6.2.1 Video — overlaps() boolean vs callback",
       "unit": "6.2 Overlaps and Collisions",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
@@ -3117,6 +3506,7 @@
       "title": "6.2.2 Worked Example — Apple Catcher",
       "unit": "6.2 Overlaps and Collisions",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
@@ -3125,6 +3515,7 @@
       "title": "6.2.3 Reading — shplay docs: Collisions + Overlaps",
       "unit": "6.2 Overlaps and Collisions",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
@@ -3133,6 +3524,7 @@
       "title": "6.2.4 Video — The remove-during-iteration bug",
       "unit": "6.2 Overlaps and Collisions",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 13
     },
@@ -3141,6 +3533,7 @@
       "title": "6.3.1 Slides — Physics Applications",
       "unit": "6.3 Physics Applications",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": null
     },
@@ -3149,6 +3542,7 @@
       "title": "6.3.10 Car on a Ramp",
       "unit": "6.3 Physics Applications",
       "preview": "shplay",
+      "type": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
@@ -3157,6 +3551,7 @@
       "title": "6.3.2 Video — kb.presses vs kb.pressing",
       "unit": "6.3 Physics Applications",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
@@ -3165,6 +3560,7 @@
       "title": "6.3.3 Reading — shplay docs: Input edges",
       "unit": "6.3 Physics Applications",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
@@ -3173,6 +3569,7 @@
       "title": "6.3.4 Worked Example — Edge-triggered Input",
       "unit": "6.3 Physics Applications",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
@@ -3181,6 +3578,7 @@
       "title": "6.3.5 Video — Why your jump feels wrong",
       "unit": "6.3 Physics Applications",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
@@ -3189,6 +3587,7 @@
       "title": "6.3.6 Reading — shplay docs: Colliding + Ground Detection",
       "unit": "6.3 Physics Applications",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
@@ -3197,6 +3596,7 @@
       "title": "6.3.7 Worked Example — Ground Detection",
       "unit": "6.3 Physics Applications",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
@@ -3205,6 +3605,7 @@
       "title": "6.3.8 Worked Example — Swinging Pendulum",
       "unit": "6.3 Physics Applications",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
@@ -3213,6 +3614,7 @@
       "title": "6.3.9 Space Jumper",
       "unit": "6.3 Physics Applications",
       "preview": "shplay",
+      "type": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 14
     },
@@ -3221,6 +3623,7 @@
       "title": "6.4.1 Slides — Animation & Camera",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": null
     },
@@ -3229,6 +3632,7 @@
       "title": "6.4.10 Video — Camera follow explained with a flashlight",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3237,6 +3641,7 @@
       "title": "6.4.11 Reading — shplay docs: Camera",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3245,6 +3650,7 @@
       "title": "6.4.12 Reading — camera.x / camera.y",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3253,6 +3659,7 @@
       "title": "6.4.13 Reading — Camera-follow pattern",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3261,6 +3668,7 @@
       "title": "6.4.14 Reading — Smoothing with lerp",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3269,6 +3677,7 @@
       "title": "6.4.15 Reading — sprite.layer (render order)",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3277,6 +3686,7 @@
       "title": "6.4.16 Worked Example — Camera Follow",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3285,6 +3695,7 @@
       "title": "6.4.17 Worked Example — Smooth Camera with lerp",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3293,6 +3704,7 @@
       "title": "6.4.18 Side-Scrolling Platformer",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "shplay",
+      "type": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3301,6 +3713,7 @@
       "title": "6.4.19 Challenges",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "shplay",
+      "type": "challenge",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3309,6 +3722,7 @@
       "title": "6.4.2 Video — Animating a sprite in shplay",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3317,6 +3731,7 @@
       "title": "6.4.3 Reading — shplay docs: Animation",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3325,6 +3740,7 @@
       "title": "6.4.4 Reading — addAni(name, frames)",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3333,6 +3749,7 @@
       "title": "6.4.5 Reading — changeAni(name)",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3341,6 +3758,7 @@
       "title": "6.4.6 Reading — frameDelay (cycle speed)",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3349,6 +3767,7 @@
       "title": "6.4.7 Reading — sprite.image (single-frame art)",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3357,6 +3776,7 @@
       "title": "6.4.8 Worked Example — Animating a Sprite",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3365,6 +3785,7 @@
       "title": "6.4.9 Animated Sprites Sandbox",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 15
     },
@@ -3373,6 +3794,7 @@
       "title": "6.5.1 Slides — Your Game Forgets: The Problem",
       "unit": "6.5 Save and Load",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": null
     },
@@ -3381,6 +3803,7 @@
       "title": "6.5.10 Reading — shplay docs: JSON.parse(str)",
       "unit": "6.5 Save and Load",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3389,6 +3812,7 @@
       "title": "6.5.11 Reading — shplay docs: Storing Structured Data",
       "unit": "6.5 Save and Load",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3397,6 +3821,7 @@
       "title": "6.5.12 Worked Example — Save Full Player State",
       "unit": "6.5 Save and Load",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3405,6 +3830,7 @@
       "title": "6.5.13 Worked Example — Restore Full Player State from a Save",
       "unit": "6.5 Save and Load",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3413,6 +3839,7 @@
       "title": "6.5.14 Reading — shplay docs: loadJSON is Async",
       "unit": "6.5 Save and Load",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3421,6 +3848,7 @@
       "title": "6.5.15 Video — Save Slots: Multiple Save Files",
       "unit": "6.5 Save and Load",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3429,6 +3857,7 @@
       "title": "6.5.16 Reading — shplay docs: removeItem and clearStorage",
       "unit": "6.5 Save and Load",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3437,6 +3866,7 @@
       "title": "6.5.17 Worked Example — Three Save Slots",
       "unit": "6.5 Save and Load",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3445,6 +3875,7 @@
       "title": "6.5.18 Worked Example — Delete and Overwrite a Save Slot",
       "unit": "6.5 Save and Load",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3453,6 +3884,7 @@
       "title": "6.5.19 Video — New Game or Continue?",
       "unit": "6.5 Save and Load",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3461,6 +3893,7 @@
       "title": "6.5.2 Video — Memory: What Stays, What Disappears",
       "unit": "6.5 Save and Load",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3469,6 +3902,7 @@
       "title": "6.5.20 Worked Example — Title Screen Detects Existing Saves",
       "unit": "6.5 Save and Load",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3477,6 +3911,7 @@
       "title": "6.5.21 Read the Chart — Does Continue Show Up?",
       "unit": "6.5 Save and Load",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shPlay Game Development",
       "week": null
     },
@@ -3485,6 +3920,7 @@
       "title": "6.5.22 Worked Example — Confirm Before Overwriting a Save",
       "unit": "6.5 Save and Load",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3493,6 +3929,7 @@
       "title": "6.5.23 Video — Your Game, Automatically Saved",
       "unit": "6.5 Save and Load",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3501,6 +3938,7 @@
       "title": "6.5.24 Reading — Checkpoint Saves: Save on Milestones",
       "unit": "6.5 Save and Load",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3509,6 +3947,7 @@
       "title": "6.5.25 Worked Example — Auto-Save on Level Complete or Timer",
       "unit": "6.5 Save and Load",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3517,6 +3956,7 @@
       "title": "6.5.26 Save System — Build Save/Load with Slots",
       "unit": "6.5 Save and Load",
       "preview": "shplay",
+      "type": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3525,6 +3965,7 @@
       "title": "6.5.27 Challenges — Extended Save Features",
       "unit": "6.5 Save and Load",
       "preview": "shplay",
+      "type": "challenge",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3533,6 +3974,7 @@
       "title": "6.5.3 Reading — storeItem: Save Game Data",
       "unit": "6.5 Save and Load",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3541,6 +3983,7 @@
       "title": "6.5.4 Worked Example — Save a High Score on Game Over",
       "unit": "6.5 Save and Load",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3549,6 +3992,7 @@
       "title": "6.5.5 Reading — getItem: Load Saved Data",
       "unit": "6.5 Save and Load",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3557,6 +4001,7 @@
       "title": "6.5.6 Reading — getItem Returns a String",
       "unit": "6.5 Save and Load",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3565,6 +4010,7 @@
       "title": "6.5.7 Worked Example — Load and Display a High Score",
       "unit": "6.5 Save and Load",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3573,6 +4019,7 @@
       "title": "6.5.8 Video — More Than a Number: Saving Your Whole Game",
       "unit": "6.5 Save and Load",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3581,6 +4028,7 @@
       "title": "6.5.9 Reading — shplay docs: JSON.stringify(obj)",
       "unit": "6.5 Save and Load",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 16
     },
@@ -3589,6 +4037,7 @@
       "title": "6.6.1 Slides — One Game, Many Screens",
       "unit": "6.6 Game State Machines",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": null
     },
@@ -3597,6 +4046,7 @@
       "title": "6.6.10 Video — Building a Title Screen",
       "unit": "6.6 Game State Machines",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3605,6 +4055,7 @@
       "title": "6.6.11 Worked Example — Title Screen with Start Button",
       "unit": "6.6 Game State Machines",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3613,6 +4064,7 @@
       "title": "6.6.12 Video — Game Over and Restart",
       "unit": "6.6 Game State Machines",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3621,6 +4073,7 @@
       "title": "6.6.13 Worked Example — Three-State Machine: Title, Play, Game Over",
       "unit": "6.6 Game State Machines",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3629,6 +4082,7 @@
       "title": "6.6.14 Chart the Code — The Three-State Machine",
       "unit": "6.6 Game State Machines",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 2: shPlay Game Development",
       "week": null
     },
@@ -3637,6 +4091,7 @@
       "title": "6.6.15 Reading — shplay docs: Input-Driven Transitions",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3645,6 +4100,7 @@
       "title": "6.6.16 Worked Example — Keyboard-Driven State Changes",
       "unit": "6.6 Game State Machines",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3653,6 +4109,7 @@
       "title": "6.6.17 Reading — shplay docs: Condition-Driven Transitions",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3661,6 +4118,7 @@
       "title": "6.6.18 Worked Example — Score Threshold Triggers Game Over",
       "unit": "6.6 Game State Machines",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3669,6 +4127,7 @@
       "title": "6.6.19 Video — More States: Pause, Inventory, Settings",
       "unit": "6.6 Game State Machines",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3677,6 +4136,7 @@
       "title": "6.6.20 Worked Example — Adding a Pause State",
       "unit": "6.6 Game State Machines",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3685,6 +4145,7 @@
       "title": "6.6.21 Fix the Broken Chart — the Pause State",
       "unit": "6.6 Game State Machines",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 2: shPlay Game Development",
       "week": null
     },
@@ -3693,6 +4154,7 @@
       "title": "6.6.2 Video — State Machines in Games",
       "unit": "6.6 Game State Machines",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3701,6 +4163,7 @@
       "title": "6.6.22 Worked Example — Win Screen State",
       "unit": "6.6 Game State Machines",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3709,6 +4172,7 @@
       "title": "6.6.23 Video — States Decide When to Save",
       "unit": "6.6 Game State Machines",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3717,6 +4181,7 @@
       "title": "6.6.24 Worked Example — Save on State Transition",
       "unit": "6.6 Game State Machines",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3725,6 +4190,7 @@
       "title": "6.6.25 Worked Example — Continue Loads the Correct State",
       "unit": "6.6 Game State Machines",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3733,6 +4199,7 @@
       "title": "6.6.26 Game States — State Machine with Persistence",
       "unit": "6.6 Game State Machines",
       "preview": "shplay",
+      "type": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3741,6 +4208,7 @@
       "title": "6.6.27 Challenges — Extended State Features",
       "unit": "6.6 Game State Machines",
       "preview": "shplay",
+      "type": "challenge",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3749,6 +4217,7 @@
       "title": "6.6.28 Video — What's Next: Looking Ahead to Unit 3",
       "unit": "6.6 Game State Machines",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3757,6 +4226,7 @@
       "title": "6.6.3 Reading — MDN: The switch Statement",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3765,6 +4235,7 @@
       "title": "6.6.4 Reading — shplay docs: switch in draw()",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3773,6 +4244,7 @@
       "title": "6.6.5 Worked Example — switch with Three Cases",
       "unit": "6.6 Game State Machines",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3781,6 +4253,7 @@
       "title": "6.6.6 Reading — break and default in switch",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3789,6 +4262,7 @@
       "title": "6.6.7 Reading — shplay docs: The state Variable",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3797,6 +4271,7 @@
       "title": "6.6.8 Worked Example — One Variable, Many Screens",
       "unit": "6.6 Game State Machines",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3805,6 +4280,7 @@
       "title": "6.6.9 Reading — Naming States: Conventions",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3813,6 +4289,7 @@
       "title": "6.7.1 Slides — Advanced Mechanics: One Last Toolkit",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "slides",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": null
     },
@@ -3821,6 +4298,7 @@
       "title": "6.7.10 Worked Example — Drag a Sprite Around",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3829,6 +4307,7 @@
       "title": "6.7.11 Fix the Broken Chart — Dragging a Sprite",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 2: shPlay Game Development",
       "week": null
     },
@@ -3837,6 +4316,7 @@
       "title": "6.8.1 Video — Joints in shplay",
       "unit": "6.8 Joints",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3845,6 +4325,7 @@
       "title": "6.8.2 Reading — shplay docs: DistanceJoint",
       "unit": "6.8 Joints",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3853,6 +4334,7 @@
       "title": "6.8.3 Worked Example — Pendulum with DistanceJoint",
       "unit": "6.8 Joints",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3861,6 +4343,7 @@
       "title": "6.8.4 Reading — shplay docs: HingeJoint",
       "unit": "6.8 Joints",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3869,6 +4352,7 @@
       "title": "6.8.5 Worked Example — Rotating Arm with HingeJoint",
       "unit": "6.8 Joints",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3877,6 +4361,7 @@
       "title": "6.8.6 Reading — shplay docs: joint.delete()",
       "unit": "6.8 Joints",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3885,6 +4370,7 @@
       "title": "6.7.12 Reading — shplay docs: applyForce(fx, fy)",
       "unit": "6.7 Advanced Input",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3893,6 +4379,7 @@
       "title": "6.7.13 Reading — Vector from A to B",
       "unit": "6.7 Advanced Input",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3901,6 +4388,7 @@
       "title": "6.7.14 Worked Example — Launch a Sprite with applyForce",
       "unit": "6.7 Advanced Input",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3909,6 +4397,7 @@
       "title": "6.7.2 Video — Why Mechanics Matter for the Capstone",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3917,6 +4406,7 @@
       "title": "6.7.15 Video — The Slingshot Pattern",
       "unit": "6.7 Advanced Input",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3925,6 +4415,7 @@
       "title": "6.7.16 Worked Example — Slingshot End-to-End",
       "unit": "6.7 Advanced Input",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3933,6 +4424,7 @@
       "title": "6.7.17 Chart the Code — The Slingshot",
       "unit": "6.7 Advanced Input",
       "preview": "diagram",
+      "type": "assignment",
       "category": "Unit 2: shPlay Game Development",
       "week": null
     },
@@ -3941,6 +4433,7 @@
       "title": "6.7.18 Video — Two-Player Local Input",
       "unit": "6.7 Advanced Input",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3949,6 +4442,7 @@
       "title": "6.7.19 Reading — Two Key Schemes, Independent State",
       "unit": "6.7 Advanced Input",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3957,6 +4451,7 @@
       "title": "6.7.20 Reading — shplay docs: sprite.bounciness",
       "unit": "6.7 Advanced Input",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3965,6 +4460,7 @@
       "title": "6.7.21 Worked Example — Bounciness Comparison",
       "unit": "6.7 Advanced Input",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3973,6 +4469,7 @@
       "title": "6.7.22 Worked Example — Two Paddles, Two Schemes",
       "unit": "6.7 Advanced Input",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3981,6 +4478,7 @@
       "title": "6.7.23 Two-Player Pong-Sumo",
       "unit": "6.7 Advanced Input",
       "preview": "shplay",
+      "type": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3989,6 +4487,7 @@
       "title": "6.7.24 Challenges — SliderJoint, Trebuchet, Swinging Rope",
       "unit": "6.7 Advanced Input",
       "preview": "shplay",
+      "type": "challenge",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -3997,6 +4496,7 @@
       "title": "6.7.25 Video — Wrap and Capstone Preview",
       "unit": "6.7 Advanced Input",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -4005,6 +4505,7 @@
       "title": "6.7.3 Reading — shplay docs: mouse.x and mouse.y",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -4013,6 +4514,7 @@
       "title": "6.7.4 Reading — shplay docs: mouse.pressing()",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -4021,6 +4523,7 @@
       "title": "6.7.5 Reading — shplay docs: mouse.presses()",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -4029,6 +4532,7 @@
       "title": "6.7.6 Reading — Hit-Testing a Sprite with the Mouse",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -4037,6 +4541,7 @@
       "title": "6.7.7 Worked Example — Click to Spawn a Sprite",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -4045,6 +4550,7 @@
       "title": "6.7.8 Video — Drag and Release",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -4053,6 +4559,7 @@
       "title": "6.7.9 Reading — Snap a Sprite to the Cursor",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
+      "type": "lesson",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 17
     },
@@ -4061,6 +4568,7 @@
       "title": "7.1.1 Arcade Cabinet (Q2 Synthesis)",
       "unit": "7.1 Arcade Cabinet (Q2 Synthesis)",
       "preview": "shplay",
+      "type": "project",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 18
     },
@@ -4069,6 +4577,7 @@
       "title": "7.1.2 Q2 Reflection",
       "unit": "7.1 Arcade Cabinet (Q2 Synthesis)",
       "preview": "assignment",
+      "type": "assignment",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 18
     },
@@ -4077,6 +4586,7 @@
       "title": "5.2.1 Bouncy Ball",
       "unit": "5.2 Physics Feel",
       "preview": "shplay",
+      "type": "lesson",
       "category": "Unit 5: shplay — Game Physics",
       "week": 14
     },
@@ -4085,6 +4595,7 @@
       "title": "5.1.24 Falling Block — Example",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "shplay",
+      "type": "example",
       "category": "Unit 2: shplay — Applied Game Development",
       "week": 10
     }

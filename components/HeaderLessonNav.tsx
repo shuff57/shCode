@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { bypassesLessonLock, useLessonState } from '../lib/progress';
+import { lessonHref } from '../lib/lesson-href';
 
 interface ManifestLesson {
   id: string;
@@ -11,11 +12,13 @@ interface ManifestLesson {
   preview: string | null;
   category: string | null;
   week: number | null;
+  type?: string | null;
 }
 
 interface Neighbor {
   id: string;
   title: string;
+  type?: string | null;
 }
 
 // Sorts siblings by the X.Y.Z numbered id parsed from the title, matching
@@ -44,19 +47,19 @@ function computeNeighbors(
     });
   const idx = peers.findIndex((l) => l.id === id);
   const toN = (l?: ManifestLesson): Neighbor | null =>
-    l ? { id: l.id, title: l.title } : null;
+    l ? { id: l.id, title: l.title, type: l.type } : null;
   return {
     prev: toN(idx > 0 ? peers[idx - 1] : undefined),
     next: toN(idx < peers.length - 1 ? peers[idx + 1] : undefined),
   };
 }
 
-function parseRoute(pathname: string): { id: string; basePath: string } | null {
-  const lessonMatch = pathname.match(/^\/lesson\/([^/]+)\/?$/);
-  if (lessonMatch) return { id: lessonMatch[1], basePath: '/lesson' };
-  const assignmentMatch = pathname.match(/^\/assignment\/([^/]+)\/?$/);
-  if (assignmentMatch) return { id: assignmentMatch[1], basePath: '/assignment' };
-  return null;
+// Only the id matters. The prefix a neighbour needs comes from that
+// neighbour's own type, never from the page we happen to be standing on —
+// a reading and the assignment after it live under different prefixes.
+function parseRoute(pathname: string): { id: string } | null {
+  const m = pathname.match(/^\/(?:lesson|assignment)\/([^/]+)\/?$/);
+  return m ? { id: m[1] } : null;
 }
 
 export default function HeaderLessonNav() {
@@ -114,7 +117,7 @@ export default function HeaderLessonNav() {
       }}
     >
       {prev ? (
-        <a className="hdr-lesson-link" href={`${route.basePath}/${prev.id}`}>
+        <a className="hdr-lesson-link" href={lessonHref(prev)}>
           <span style={{ opacity: 0.7 }}>←</span>
           <span style={titleStyle}>{prev.title}</span>
         </a>
@@ -141,7 +144,7 @@ export default function HeaderLessonNav() {
         ) : (
           <a
             className="hdr-lesson-link hdr-lesson-link-right"
-            href={`${route.basePath}/${next.id}`}
+            href={lessonHref(next)}
           >
             <span style={titleStyle}>{next.title}</span>
             <span style={{ opacity: 0.7 }}>→</span>

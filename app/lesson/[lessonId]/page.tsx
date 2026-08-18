@@ -37,6 +37,7 @@ export default async function LessonPage({
         id: l.id,
         numberedId: l.numberedId,
         displayTitle: l.displayTitle,
+        type: l.type,
       }))}
     />
   ) : null;

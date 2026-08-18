@@ -5,6 +5,7 @@ import type { Lesson } from '../lib/types';
 import { badgeForLesson } from '../lib/lesson-badges';
 import { bypassesLessonLock, useLessonState } from '../lib/progress';
 import { withInlineCode } from './InlineCode';
+import { lessonHref } from '../lib/lesson-href';
 
 const typeBadgeColors: Record<string, string> = {
   lesson: '#5baafd',
@@ -28,8 +29,7 @@ interface Props {
 
 export default function LessonCard({ lesson, lockedForStudent = false }: Props) {
   const type = lesson.type || 'lesson';
-  const isAssignment = type === 'assignment' || type === 'project';
-  const href = isAssignment ? `/assignment/${lesson.id}` : `/lesson/${lesson.id}`;
+  const href = lessonHref(lesson);
   const pBadge = badgeForLesson({ type: lesson.type, preview: lesson.preview });
   const progress = useLessonState();
   const lessonState = progress.states[lesson.id];

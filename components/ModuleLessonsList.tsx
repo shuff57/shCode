@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { badgeForLesson } from '../lib/lesson-badges';
 import { bypassesLessonLock, useLessonState } from '../lib/progress';
+import { lessonHref } from '../lib/lesson-href';
 
 interface LessonItem {
   id: string;
@@ -62,8 +63,7 @@ export default function ModuleLessonsList({ lessons }: { lessons: LessonItem[] }
       <ol style={{ listStyle: 'none', padding: 0, margin: 0 }}>
       {lessons.map((l, idx) => {
         const badge = badgeForLesson({ type: l.type, preview: l.preview });
-        const isAssignment = l.type === 'assignment' || l.type === 'project';
-        const href = isAssignment ? `/assignment/${l.id}` : `/lesson/${l.id}`;
+        const href = lessonHref(l);
         const lessonState = progress.states[l.id];
         const stripeColor = stateStripeColors[lessonState ?? ''] ?? 'var(--border)';
         const stateLabel = stateLabels[lessonState ?? ''];

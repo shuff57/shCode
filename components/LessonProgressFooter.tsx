@@ -3,11 +3,13 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { bypassesLessonLock, recordLessonStarted, useLessonState } from '../lib/progress';
+import { lessonHref } from '../lib/lesson-href';
 
 interface ModuleLesson {
   id: string;
   numberedId: string;
   displayTitle: string;
+  type?: string | null;
 }
 
 interface Props {
@@ -127,7 +129,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
           ) : (
             <Link
               key={l.id}
-              href={`/lesson/${l.id}`}
+              href={lessonHref(l)}
               title={titleText}
               aria-label={`${l.numberedId} ${l.displayTitle}`}
               style={dotStyle}

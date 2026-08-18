@@ -1,10 +1,13 @@
 // Tiny helper for finding the next lesson in the same category, used by the
 // auto-advance-after-submit flow. Mirrors the sort order in HeaderLessonNav.
 
+import { lessonHref } from './lesson-href';
+
 interface ManifestLesson {
   id: string;
   title: string;
   category: string | null;
+  type?: string | null;
 }
 
 let cached: ManifestLesson[] | null = null;
@@ -31,7 +34,7 @@ function parseNumberedId(title: string): string | null {
   return m ? m[1] : null;
 }
 
-export async function getNextLessonId(currentId: string): Promise<string | null> {
+export async function getNextLesson(currentId: string): Promise<ManifestLesson | null> {
   const lessons = await loadLessons();
   const current = lessons.find((l) => l.id === currentId);
   if (!current) return null;
@@ -46,21 +49,14 @@ export async function getNextLessonId(currentId: string): Promise<string | null>
       return a.title.localeCompare(b.title, undefined, { numeric: true });
     });
   const idx = peers.findIndex((l) => l.id === currentId);
-  return idx >= 0 && idx < peers.length - 1 ? peers[idx + 1].id : null;
-}
-
-// Decide whether the current page is /lesson/X or /assignment/X. The next
-// lesson keeps the same prefix — categories don't mix the two in practice.
-function currentBasePath(): string {
-  if (typeof window === 'undefined') return '/lesson';
-  return window.location.pathname.startsWith('/assignment/') ? '/assignment' : '/lesson';
+  return idx >= 0 && idx < peers.length - 1 ? peers[idx + 1] : null;
 }
 
 export async function navigateToNextLesson(currentId: string): Promise<boolean> {
   if (typeof window === 'undefined') return false;
-  const nextId = await getNextLessonId(currentId);
+  const next = await getNextLesson(currentId);
   // Last lesson in the category → land on home so the student can pick
   // the next module.
-  window.location.href = nextId ? `${currentBasePath()}/${nextId}` : '/';
+  window.location.href = next ? lessonHref(next) : '/';
   return true;
 }

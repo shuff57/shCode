@@ -3,10 +3,12 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { bypassesLessonLock, useLessonState } from '../lib/progress';
+import { lessonHref } from '../lib/lesson-href';
 
 interface ManifestLesson {
   id: string;
   title: string;
+  type?: string | null;
 }
 
 interface Props {
@@ -108,8 +110,12 @@ export default function LessonAccessGate({
       {/* Build a title lookup from the manifest (fetched above). */}
       {(() => {
         const titleMap: Record<string, string> = {};
+        const typeMap: Record<string, string | null | undefined> = {};
         if (manifest) {
-          for (const m of manifest) titleMap[m.id] = m.title;
+          for (const m of manifest) {
+            titleMap[m.id] = m.title;
+            typeMap[m.id] = m.type;
+          }
         }
         const completedCount = siblings.filter((id) => snap.states[id] === 'completed').length;
         const total = siblings.length;
@@ -192,7 +198,7 @@ export default function LessonAccessGate({
                 return (
                   <Link
                     key={id}
-                    href={`/lesson/${id}`}
+                    href={lessonHref({ id, type: typeMap[id] })}
                     style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
                   >
                     {row}
