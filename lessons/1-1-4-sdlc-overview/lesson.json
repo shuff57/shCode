@@ -1,7 +1,7 @@
 {
   "id": "1-1-4-sdlc-overview",
-  "title": "1.1.4 What Is Programming / Software Lifecycle",
-  "description": "Learn what a program is, explore the SDLC, and write your first JavaScript using console.log().",
+  "title": "1.1.4 What a Program Is",
+  "description": "Learn what a program is, then write six lines of JavaScript with console.log() — text, math, joined strings and a true/false comparison — and watch them run in order.",
   "type": "assignment",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",

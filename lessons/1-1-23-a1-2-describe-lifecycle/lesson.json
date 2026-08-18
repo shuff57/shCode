@@ -10,7 +10,7 @@
   "slos": [
     "SLO-1"
   ],
-  "points": 5,
+  "points": 0,
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Describe the Lifecycle — AI-graded rubric",
@@ -22,39 +22,40 @@
         "id": "four-phases-named",
         "title": "All four phases named and described",
         "description": "Student names and describes all four framework activities: inception, elaboration, construction, deployment. Full credit if each of the four is named and given at least a short description in their own words. Deny if any of the four is missing or only listed with no description.",
-        "points": 1
+        "points": 0
       },
       {
         "id": "real-product-named",
         "title": "One named real product",
         "description": "Student names one real software product they use (e.g. a specific app, game, or service). Full credit for a named product. Deny if no product is named, or the product is generic ('an app') with no actual name.",
-        "points": 1
+        "points": 0
       },
       {
         "id": "sentence-per-phase",
         "title": "One concrete sentence per phase for that product",
         "description": "Student gives at least one concrete sentence per phase for the named product, saying what probably happened in that phase for it. Full credit for four concrete sentences (one per phase) tied to the product. Deny if any phase lacks a concrete sentence, or the sentences are generic and not about the product.",
-        "points": 1
+        "points": 0
       },
       {
         "id": "umbrella-mentioned",
         "title": "At least one umbrella activity mentioned by name",
         "description": "Student mentions at least one umbrella activity by name (e.g. quality management, security management, risk management, configuration management, architecture management, training/communication). Full credit for naming at least one. Deny if no umbrella activity is named.",
-        "points": 1
+        "points": 0
       },
       {
         "id": "own-words",
         "title": "Own words",
         "description": "The response is written in the student's own words, not copied from a source. Deny this criterion only for significant issues: text that reads as copied/dictionary-style, or writing too disorganized to follow. Do not deny for length — a short response that clearly covers the four phases and a product walkthrough is fine. This is not a prose-quality score.",
-        "points": 1
+        "points": 0
       }
     ]
   },
   "grading": {
-    "totalPoints": 5,
-    "passingScore": 5,
+    "totalPoints": 0,
+    "passingScore": 0,
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "assignmentCode": "A1.1.2"
 }

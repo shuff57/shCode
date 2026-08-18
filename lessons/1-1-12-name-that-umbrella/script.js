@@ -1,4 +1,4 @@
-// 1.1.8 Name That Umbrella
+// 1.1.11 Name That Umbrella
 
 // STEP 1: Miguel is on a team building a payment app. Every week he runs
 //         the full test suite to catch bugs before the app is released.

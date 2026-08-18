@@ -1,7 +1,7 @@
 {
   "id": "1-1-7-a3-3-unit-quiz",
   "title": "1.1.23 Unit 1.1 Quiz",
-  "description": "Ten multiple-choice questions on typeof, declarations, vocabulary and the class style guide. Checked instantly.",
+  "description": "Ten multiple-choice questions on the four phases, umbrella activities, actions and task sets, the four Ps, and prescriptive models. Checked instantly.",
   "type": "assignment",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -9,150 +9,150 @@
   "preview": "quiz",
   "week": 3,
   "slos": [
-    "SLO-2"
+    "SLO-1"
   ],
   "points": 0,
   "contentFile": "content.md",
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-process-model",
+        "source": "1.1.6",
+        "question": "What is a process model?",
+        "options": [
+          "A plan for what happens when in a software project",
+          "The programming language a team has chosen",
+          "A drawing of what the finished app will look like",
+          "The person who decides what gets built"
+        ],
+        "answer": 0,
+        "explanation": "A process model gives the project its shape — it says what happens when. Teams do not build in random order."
+      },
+      {
+        "id": "q2-four-phases",
+        "source": "1.1.6",
+        "question": "What are the four framework activities, in order?",
+        "options": [
+          "Design, development, testing, deployment",
+          "Inception, elaboration, construction, deployment",
+          "Planning, drawing, typing, shipping",
+          "Problem, project, people, product"
+        ],
+        "answer": 1,
+        "explanation": "Inception, elaboration, construction, deployment. Every process model uses these same four — what changes is how much work each one gets."
+      },
+      {
+        "id": "q3-which-phase-is-code",
+        "source": "1.1.6 and 1.1.8",
+        "question": "Which phase does the line `console.log(\"Hello, \" + name + \"!\")` belong to?",
+        "options": [
+          "Inception — it is the goal of the app",
+          "Elaboration — it is the design",
+          "Construction — it is the actual code being written",
+          "Deployment — it is what the user sees"
+        ],
+        "answer": 2,
+        "explanation": "Construction is where the software is coded and built from the design. Worth noticing: that line is one phase out of four — teams tend to over-weight construction."
+      },
+      {
+        "id": "q4-elaboration",
+        "source": "1.1.6",
+        "question": "Which phase is where requirements are analyzed and the architecture is designed?",
+        "options": [
+          "Inception",
+          "Elaboration",
+          "Construction",
+          "Deployment"
+        ],
+        "answer": 1,
+        "explanation": "Elaboration. Inception sets the goals and scope; elaboration turns them into requirements and a design."
+      },
+      {
+        "id": "q5-umbrella-definition",
+        "source": "1.1.10",
+        "question": "What makes an umbrella activity different from a phase?",
+        "options": [
+          "It runs alongside every phase instead of sitting inside one",
+          "It happens only at the very end of a project",
+          "It is work only managers do",
+          "It is a phase that can be skipped on small projects"
+        ],
+        "answer": 0,
+        "explanation": "An umbrella activity never starts and ends — it runs the whole project. The kitchen analogy: the four phases are cooking the meal, umbrella activities are the cleanup that keeps the kitchen usable throughout."
+      },
+      {
+        "id": "q6-umbrella-example",
+        "source": "1.1.10",
+        "question": "Which of these is an umbrella activity?",
+        "options": [
+          "Construction",
+          "Risk management",
+          "Inception",
+          "Writing the greeting function"
+        ],
+        "answer": 1,
+        "explanation": "Risk management is one of the six: training/communication, risk management, configuration management, quality management, architecture management, security management."
+      },
+      {
+        "id": "q7-action-definition",
+        "source": "1.1.12",
+        "question": "What is a software engineering action?",
+        "options": [
+          "A single keystroke or line of code",
+          "Another word for a phase",
+          "A named job inside a phase, such as \"define the requirements\"",
+          "A meeting held at the start of a project"
+        ],
+        "answer": 2,
+        "explanation": "An action answers what job gets done inside a phase. It is not the whole phase and not a single keystroke — \"define the requirements\" lives inside inception."
+      },
+      {
+        "id": "q8-task-set",
+        "source": "1.1.13",
+        "question": "What is a task set?",
+        "options": [
+          "All the tasks required to accomplish one software engineering action",
+          "The list of every phase in the project",
+          "The set of tools a team has installed",
+          "A single task that finishes a whole phase"
+        ],
+        "answer": 0,
+        "explanation": "One action = one task set. Each task in the set produces a real work product, and that work product is checked before moving on."
+      },
+      {
+        "id": "q9-four-ps",
+        "source": "1.1.17",
+        "question": "What are the four Ps?",
+        "options": [
+          "Plan, program, publish, patch",
+          "Problem, project, people, product",
+          "Process, prototype, production, polish",
+          "Purpose, priority, progress, proof"
+        ],
+        "answer": 1,
+        "explanation": "Problem, project, people, product. They are the reason two teams following the same four phases still work very differently."
+      },
+      {
+        "id": "q10-prescriptive-limits",
+        "source": "1.1.19 and 1.1.20",
+        "question": "Why is a prescriptive process model a poor fit for a project whose requirements change every week?",
+        "options": [
+          "It only works for very large teams",
+          "It requires a programming language the team may not know",
+          "It advocates an orderly, prescribed sequence, and that rigidity cannot bend when requirements keep moving",
+          "It has no testing phase"
+        ],
+        "answer": 2,
+        "explanation": "Prescriptive means it hands you a prescribed order to follow. That is a strength when requirements are stable and a weakness when they are not — the strict-recipe problem."
+      }
+    ]
+  },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": [],
-  "quiz": {
-    "passPercent": 70,
-    "questions": [
-      {
-        "id": "q1-typeof-string",
-        "source": "1.2.23",
-        "question": "What does `typeof \"42\"` give you?",
-        "options": [
-          "\"number\"",
-          "\"string\"",
-          "\"42\"",
-          "\"object\""
-        ],
-        "answer": 1,
-        "explanation": "The quotes make it a string, whatever is inside them. `typeof 42` without quotes is \"number\"."
-      },
-      {
-        "id": "q2-typeof-undefined",
-        "source": "1.2.23",
-        "question": "What does `typeof undefined` give you?",
-        "options": [
-          "\"undefined\"",
-          "\"object\"",
-          "\"null\"",
-          "An error"
-        ],
-        "answer": 0,
-        "explanation": "It answers \"undefined\". That is the one case where the type name and the value name are the same word."
-      },
-      {
-        "id": "q3-typeof-null",
-        "source": "1.2.23 and 1.2.24",
-        "question": "What does `typeof null` give you?",
-        "options": [
-          "\"null\"",
-          "\"undefined\"",
-          "\"object\"",
-          "\"empty\""
-        ],
-        "answer": 2,
-        "explanation": "It answers \"object\" — which is wrong, and is a bug in the language from 1995 that was never fixed because fixing it would break existing sites."
-      },
-      {
-        "id": "q4-bad-declaration",
-        "source": "1.2.2",
-        "question": "What is wrong with `let 2cool = true;`?",
-        "options": [
-          "true has to be in quotes",
-          "A variable name cannot start with a digit",
-          "You have to use const for a boolean",
-          "Nothing — it is valid"
-        ],
-        "answer": 1,
-        "explanation": "Names may contain digits but cannot start with one. `let cool2 = true;` is fine."
-      },
-      {
-        "id": "q5-const-no-value",
-        "source": "1.2.2",
-        "question": "What is wrong with `const userName;`?",
-        "options": [
-          "const names must be in capitals",
-          "userName is a reserved word",
-          "A const must be given its value on the line that declares it, because it can never be reassigned",
-          "Nothing — it is valid"
-        ],
-        "answer": 2,
-        "explanation": "A const gets exactly one chance to be given a value, and that is at declaration. If you need to fill it in later, use let."
-      },
-      {
-        "id": "q6-hyphen",
-        "source": "1.2.2",
-        "question": "What is wrong with `let user-name = \"Al\";`?",
-        "options": [
-          "The hyphen is read as a minus sign, so this is not a valid name",
-          "The value needs to be in single quotes",
-          "Names cannot contain more than one word",
-          "Nothing — it is valid"
-        ],
-        "answer": 0,
-        "explanation": "JavaScript sees `user - name`, a subtraction. Join the words with camelCase instead: `let userName = \"Al\";`"
-      },
-      {
-        "id": "q7-vocab-constant",
-        "source": "1.2.2",
-        "question": "What is a constant?",
-        "options": [
-          "A variable whose value can never be changed once it is set",
-          "A variable that holds a number",
-          "A variable that every part of the program can see",
-          "A value that is written directly into the code"
-        ],
-        "answer": 0,
-        "explanation": "A constant is declared with const and cannot be reassigned. Reach for it whenever a value is not meant to move."
-      },
-      {
-        "id": "q8-vocab-datatype",
-        "source": "1.2.3",
-        "question": "What is a data type?",
-        "options": [
-          "The name you give a variable",
-          "The kind of value something is — text, a number, true/false, and so on",
-          "The amount of memory a program uses",
-          "A comment describing what a variable is for"
-        ],
-        "answer": 1,
-        "explanation": "The type is what kind of thing the value is, which decides what you can do with it — you can add two numbers, but adding two booleans is not meaningful."
-      },
-      {
-        "id": "q9-style-spacing",
-        "source": "1.3.2 and 1.3.3",
-        "question": "What does the class style guide say is wrong with `let x=5`?",
-        "options": [
-          "Nothing — it runs, so it is fine",
-          "It needs spaces around the = and a semicolon at the end, and x is a name that says nothing",
-          "let should be const",
-          "5 needs to be in quotes"
-        ],
-        "answer": 1,
-        "explanation": "It runs, but three things break the guide at once: no spaces around the operator, no semicolon, and a single-letter name."
-      },
-      {
-        "id": "q10-style-case",
-        "source": "1.3.2",
-        "question": "What does the class style guide say is wrong with `let UserName = \"Al\";`?",
-        "options": [
-          "Variable names cannot contain capital letters",
-          "The name is too long",
-          "Variables use camelCase, so the first letter should be lower case — userName",
-          "It should be a const"
-        ],
-        "answer": 2,
-        "explanation": "camelCase means the first word is lower case and later words are capitalised. A capitalised first letter is by convention reserved for classes, which you meet in Chapter 5."
-      }
-    ]
-  }
+  "requirements": []
 }

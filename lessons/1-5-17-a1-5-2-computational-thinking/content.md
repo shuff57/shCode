@@ -1,4 +1,4 @@
-## A1.5.2 — Computational Thinking
+## Computational Thinking
 
 **What you'll practise:**
 - Naming the four moves you have just been shown, in your own words

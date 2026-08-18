@@ -17,7 +17,7 @@
     "rubricTitle": "Software Development Life-Cycle — AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "Everything you need is in 1.1.4 (What Is Programming / Software Lifecycle) and the 1.1.5 video — go back and reread or rewatch if you get stuck. Your own everyday words throughout; do not copy definitions from the internet.\n\nPart 1 — Describe the phases. For each of the five phases below, write one or two sentences saying what happens during that phase and why it matters: (1.1.4 and 1.1.5)\n1. Design (Planning & Requirements) — figuring out what to build and how it should work\n2. Development (Coding) — writing the actual code that makes the software work\n3. Testing — checking that the software works correctly and fixing bugs\n4. Deployment — releasing the software so users can access it\n5. Maintenance — updating, fixing, and improving the software after release\n\nPart 2 — Real-world example. Choose one software product you actually use (Instagram, Spotify, Google Maps, Roblox, YouTube, Google Docs, etc.). Name it, then walk through how you think it went through each of the five phases. Best-guess reasoning is fine — no research required.",
+    "prompt": "Everything you need is in the 1.1.5 video and the five-phase primer on this page — rewatch or reread if you get stuck. 1.1.6 shows how these five line up with the book four framework activities. Your own everyday words throughout; do not copy definitions from the internet.\n\nPart 1 — Describe the phases. For each of the five phases below, write one or two sentences saying what happens during that phase and why it matters: (1.1.5 and the primer above the response box)\n1. Design (Planning & Requirements) — figuring out what to build and how it should work\n2. Development (Coding) — writing the actual code that makes the software work\n3. Testing — checking that the software works correctly and fixing bugs\n4. Deployment — releasing the software so users can access it\n5. Maintenance — updating, fixing, and improving the software after release\n\nPart 2 — Real-world example. Choose one software product you actually use (Instagram, Spotify, Google Maps, Roblox, YouTube, Google Docs, etc.). Name it, then walk through how you think it went through each of the five phases. Best-guess reasoning is fine — no research required.",
     "rubric": [
       {
         "id": "phases-all-five",
@@ -57,5 +57,6 @@
     "allowLateSubmit": true
   },
   "steps": [],
-  "requirements": []
+  "requirements": [],
+  "assignmentCode": "A1.1.1"
 }

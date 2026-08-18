@@ -10,7 +10,7 @@
   "slos": [
     "SLO-1"
   ],
-  "points": 2,
+  "points": 0,
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Write a Task Set — AI-graded rubric",
@@ -22,19 +22,19 @@
         "id": "two-concrete-tasks",
         "title": "At least two concrete tasks listed",
         "description": "Student lists at least two tasks for the 'requirements definition' action. Each task must be a concrete step (e.g. interviewing users, writing a requirements document, reviewing requirements) rather than a restatement of the action itself. Full credit for two or more concrete tasks. Deny if there are fewer than two tasks, or if a 'task' just restates the action ('define the requirements') with no concrete step behind it.",
-        "points": 1
+        "points": 0
       },
       {
         "id": "plausible-for-requirements",
         "title": "Tasks plausibly belong to requirements definition",
         "description": "Each listed task is plausibly something 'requirements definition' would need — interviewing stakeholders, documenting needs, reviewing requirements, and similar. The rubric must NOT require an exact match to any specific examples; the book explicitly allows 'other reasonable tasks.' Full credit if the tasks are all plausible. Deny only if a task is clearly unrelated to figuring out what the software should do.",
-        "points": 1
+        "points": 0
       }
     ]
   },
   "grading": {
-    "totalPoints": 2,
-    "passingScore": 2,
+    "totalPoints": 0,
+    "passingScore": 0,
     "allowLateSubmit": true
   },
   "steps": [],

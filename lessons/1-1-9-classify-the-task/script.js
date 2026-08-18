@@ -1,4 +1,4 @@
-// 1.1.5 Classify the Task
+// 1.1.7 Classify the Task
 
 // A team is building a school-lunch app. For each task below,
 // log the name of the phase that task belongs to.

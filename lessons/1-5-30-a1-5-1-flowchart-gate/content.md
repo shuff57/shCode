@@ -1,4 +1,4 @@
-## A1.5.1 — Your First Flowchart
+## Your First Flowchart
 
 **What you'll practise:**
 - Turning a rule written in English into pseudocode, then into a chart

@@ -10,7 +10,7 @@
   "slos": [
     "SLO-1"
   ],
-  "points": 3,
+  "points": 0,
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Same Framework, Different Weight — AI-graded rubric",
@@ -22,25 +22,25 @@
         "id": "four-ps-referenced",
         "title": "References the four Ps",
         "description": "Student names or clearly paraphrases the four Ps (problem, project, people, product). Full credit for naming them or describing them in plain words. Deny if the four Ps never appear and are not paraphrased.",
-        "points": 1
+        "points": 0
       },
       {
         "id": "compares-two-projects",
         "title": "Compares the two projects specifically",
         "description": "Student compares the small school app against the large banking system specifically — not a generic 'bigger projects need more planning' with no reference to either scenario. Full credit for an answer that ties its reasoning to both given projects. Deny for a generic claim with no reference to the two scenarios.",
-        "points": 1
+        "points": 0
       },
       {
         "id": "concludes-heavier-process",
         "title": "Concludes the banking system needs heavier process",
         "description": "Student concludes the banking system needs heavier (more elaborate) process. Stating that light process for the small app is fine is acceptable, but the response must address both sides. Full credit for a clear conclusion that the banking system gets the heavier elaboration. Deny if the answer ignores which project needs the heavier process.",
-        "points": 1
+        "points": 0
       }
     ]
   },
   "grading": {
-    "totalPoints": 3,
-    "passingScore": 3,
+    "totalPoints": 0,
+    "passingScore": 0,
     "allowLateSubmit": true
   },
   "steps": [],

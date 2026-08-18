@@ -1,4 +1,4 @@
-// 1.1.1 What Is Programming / Software Lifecycle
+// 1.1.4 What a Program Is
 // Follow the steps on the left. Write your code below each comment.
 
 // Step 1: Print "Hello, world!" to the console.

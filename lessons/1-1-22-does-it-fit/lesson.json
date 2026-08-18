@@ -10,7 +10,7 @@
   "slos": [
     "SLO-1"
   ],
-  "points": 2,
+  "points": 0,
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "Does It Fit? — AI-graded rubric",
@@ -22,19 +22,19 @@
         "id": "clear-no",
         "title": "Clear answer that it does not fit",
         "description": "Student clearly answers 'no' (or an equivalent like 'poor fit' or 'not a good fit'). Full credit for an unambiguous no. Deny if the answer is 'yes', 'maybe', or too vague to tell.",
-        "points": 1
+        "points": 0
       },
       {
         "id": "rigidity-reason",
         "title": "Reason references rigidity against changing requirements",
         "description": "Student's stated reason references the rigidity/inflexibility of prescriptive models against rapidly changing requirements — not a generic or unrelated justification. Full credit for a reason tied to the model being inflexible when requirements change weekly. Deny for a bare 'no' with no reason, or a reason that does not mention inflexibility vs. changing requirements.",
-        "points": 1
+        "points": 0
       }
     ]
   },
   "grading": {
-    "totalPoints": 2,
-    "passingScore": 2,
+    "totalPoints": 0,
+    "passingScore": 0,
     "allowLateSubmit": true
   },
   "steps": [],
