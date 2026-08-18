@@ -134,6 +134,23 @@ for (const [mod, n] of [...homeless].sort()) {
     + `lesson(s) appear on no module page`);
 }
 
+// 6. a lesson page breadcrumb links to /module/<first token of the unit field>
+// (ContentLessonView). A static export has no page for an id no module declares,
+// so that link 404s. All 23 lessons of module 1.1 shipped filed under the unit
+// "1 Foundations", whose breadcrumb pointed at /module/1 — a page that has never
+// existed. Check 3 misses this: its UNIT_NUM wants d+.d+ and skips a bare "1".
+const strayUnits = new Map();
+for (const l of lessons) {
+  if (!l.unit) continue;
+  const id = String(l.unit).split(" ")[0];
+  if (modulesById.has(id)) continue;
+  strayUnits.set(String(l.unit), (strayUnits.get(String(l.unit)) ?? 0) + 1);
+}
+for (const [unit, n] of [...strayUnits].sort()) {
+  errors.push(`unit ${JSON.stringify(unit)} on ${n} lesson(s) leads with an id no `
+    + `module declares, so their breadcrumb links to /module/${unit.split(" ")[0]} — a 404`);
+}
+
 for (const w of warnings) console.warn(`[check-lesson-numbers] WARN  ${w}`);
 for (const e of errors) console.error(`[check-lesson-numbers] ERROR ${e}`);
 
