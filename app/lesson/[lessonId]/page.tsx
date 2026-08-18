@@ -4,11 +4,7 @@ import LessonProgressFooter from '../../../components/LessonProgressFooter';
 import LessonAccessGate from '../../../components/LessonAccessGate';
 import { getLesson, loadLessons } from '../../../lib/lessons';
 import { getModule } from '../../../lib/curriculum';
-
-// Content-only preview types (no code editor). Lessons with an aiGrader or a
-// diagram also render through ContentLessonView so WrittenGrader /
-// DiagramAssignmentView show up.
-const CONTENT_PREVIEWS = new Set(['reading', 'video', 'example', 'slides', 'diagram', 'quiz']);
+import { rendersAsContent } from '../../../lib/lesson-view';
 
 export async function generateStaticParams() {
   const lessons = await loadLessons();
@@ -43,8 +39,7 @@ export default async function LessonPage({
   ) : null;
 
   const siblingIds = mod ? mod.lessons.map((l) => l.id) : [];
-  const isContentPreview = lesson.preview && CONTENT_PREVIEWS.has(lesson.preview);
-  const body = isContentPreview || lesson.aiGrader || lesson.diagram
+  const body = rendersAsContent(lesson)
     ? <ContentLessonView lesson={lesson} />
     : <LessonWorkspace lesson={lesson} />;
 
