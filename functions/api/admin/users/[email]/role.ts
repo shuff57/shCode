@@ -14,21 +14,25 @@ interface Env {
 }
 
 type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
-type Ctx = EventContext<Env, '[email]', SessionData>;
+type Ctx = EventContext<Env, 'email', SessionData>;
 
 const VALID_ROLES = new Set(['admin', 'teacher', 'student']);
 
-export const onRequestPost: PagesFunction<Env, '[email]', SessionData> = async (context: Ctx) => {
+export const onRequestPost: PagesFunction<Env, 'email', SessionData> = async (context: Ctx) => {
   const { request, env, data, params } = context;
 
   if (data.role !== 'admin') {
     return json({ error: 'Admin only' }, 403);
   }
 
-  const targetEmail = normalizeEmail(decodeURIComponent(params['[email]'] as string));
-  if (!targetEmail) {
+  // The param key is the folder name WITHOUT the brackets. Reading params['[email]']
+  // yields undefined, which decodeURIComponent turns into the string 'undefined' —
+  // past the missing-param guard, into the lookup, and a 404 for every account.
+  const raw = params.email as string | undefined;
+  if (!raw) {
     return json({ error: 'Missing email parameter' }, 400);
   }
+  const targetEmail = normalizeEmail(decodeURIComponent(raw));
 
   let body: { role?: unknown };
   try {
