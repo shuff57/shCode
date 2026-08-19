@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react';
 import { CircleCheck, CircleX, Circle, ListChecks } from 'lucide-react';
 import type { QuizConfig } from '../lib/types';
 import { recordLessonCompleted, useLessonState } from '../lib/progress';
-import { navigateToNextLesson } from '../lib/lesson-neighbors';
+import { getHrefsByLessonNumber, navigateToNextLesson } from '../lib/lesson-neighbors';
 import { fetchDraft, saveDraft, recordSubmission } from '../lib/written-grader-store';
 import { countCorrect, passThreshold } from '../lib/quiz-grade';
 import { withInlineCode } from './InlineCode';
-import { sourceHintParts } from '../lib/book-links';
+import { sourceHintNumbers, sourceHintParts } from '../lib/source-hint';
 
 interface Props {
   lessonId: string;
@@ -44,6 +44,7 @@ export default function QuizView({ lessonId, config }: Props) {
   const [answers, setAnswers] = useState<Answers>({});
   const [graded, setGraded] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [sourceHrefs, setSourceHrefs] = useState<Record<string, string>>({});
   const progress = useLessonState();
 
   const questions = config.questions ?? [];
@@ -52,6 +53,22 @@ export default function QuizView({ lessonId, config }: Props) {
   const correctCount = countCorrect(questions, answers);
   const needed = passThreshold(questions.length, config.passPercent);
   const passed = graded && correctCount >= needed;
+
+  // The reread hints name lessons by number; the manifest is what turns those
+  // into hrefs, and it is already cached by the header nav on most pages.
+  useEffect(() => {
+    let cancelled = false;
+    const numbers = Array.from(
+      new Set((config.questions ?? []).flatMap((q) => (q.source ? sourceHintNumbers(q.source) : []))),
+    );
+    if (numbers.length === 0) return;
+    getHrefsByLessonNumber(numbers).then((hrefs) => {
+      if (!cancelled) setSourceHrefs(hrefs);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [config]);
 
   useEffect(() => {
     let cancelled = false;
@@ -257,22 +274,23 @@ export default function QuizView({ lessonId, config }: Props) {
                   {q.source ? (
                     <span style={{ color: '#6272a4' }}>
                       {' (reread '}
-                      {sourceHintParts(q.source).map((part, pi) =>
-                        part.link ? (
+                      {sourceHintParts(q.source).map((part, pi) => {
+                        const href = part.isNumber ? sourceHrefs[part.text] : undefined;
+                        return href ? (
                           <a
                             key={pi}
-                            href={part.link.url}
+                            href={href}
                             target="_blank"
                             rel="noopener noreferrer"
-                            title={`Read ${part.link.sectionTitle} in the book (opens in a new tab)`}
+                            title="Open this lesson in a new tab"
                             style={{ color: '#8be9fd', textDecoration: 'underline' }}
                           >
                             {part.text}
                           </a>
                         ) : (
                           <span key={pi}>{part.text}</span>
-                        ),
-                      )}
+                        );
+                      })}
                       {')'}
                     </span>
                   ) : null}

@@ -34,6 +34,23 @@ function parseNumberedId(title: string): string | null {
   return m ? m[1] : null;
 }
 
+/**
+ * Maps display lesson numbers ("1.1.17") to their in-app href, for the reread
+ * hints on a quiz. Numbers with no matching lesson are left out of the result.
+ */
+export async function getHrefsByLessonNumber(
+  numbers: string[],
+): Promise<Record<string, string>> {
+  if (numbers.length === 0) return {};
+  const lessons = await loadLessons();
+  const hrefs: Record<string, string> = {};
+  for (const number of numbers) {
+    const match = lessons.find((l) => parseNumberedId(l.title) === number);
+    if (match) hrefs[number] = lessonHref(match);
+  }
+  return hrefs;
+}
+
 export async function getNextLesson(currentId: string): Promise<ManifestLesson | null> {
   const lessons = await loadLessons();
   const current = lessons.find((l) => l.id === currentId);
