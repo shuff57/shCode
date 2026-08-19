@@ -8,6 +8,7 @@ import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import { fetchDraft, saveDraft, recordSubmission } from '../lib/written-grader-store';
 import { countCorrect, passThreshold } from '../lib/quiz-grade';
 import { withInlineCode } from './InlineCode';
+import { sourceHintParts } from '../lib/book-links';
 
 interface Props {
   lessonId: string;
@@ -254,7 +255,26 @@ export default function QuizView({ lessonId, config }: Props) {
                 <span>
                   {withInlineCode(q.explanation)}
                   {q.source ? (
-                    <span style={{ color: '#6272a4' }}> (reread {q.source})</span>
+                    <span style={{ color: '#6272a4' }}>
+                      {' (reread '}
+                      {sourceHintParts(q.source).map((part, pi) =>
+                        part.link ? (
+                          <a
+                            key={pi}
+                            href={part.link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title={`Read ${part.link.sectionTitle} in the book (opens in a new tab)`}
+                            style={{ color: '#8be9fd', textDecoration: 'underline' }}
+                          >
+                            {part.text}
+                          </a>
+                        ) : (
+                          <span key={pi}>{part.text}</span>
+                        ),
+                      )}
+                      {')'}
+                    </span>
                   ) : null}
                 </span>
               </div>

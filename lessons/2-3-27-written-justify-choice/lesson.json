@@ -12,7 +12,7 @@
     "SLO-3"
   ],
   "sourceRef": "book 2.3.6 — Concepts in Practice: Picking the right tool; why the grade chain can't become a switch",
-  "points": 3,
+  "points": 0,
   "contentFile": "content.md",
   "aiGrader": {
     "rubricTitle": "switch or if...else? Justify Your Choice — AI-graded rubric",
@@ -24,19 +24,19 @@
         "id": "q1-priority-switch",
         "title": "Q1: Picks switch and explains why",
         "description": "Answer picks switch and explains that priority is a single value compared against a fixed, finite list of exact strings ('low', 'medium', 'high') with no ranges involved. Deny if the answer picks if...else, or picks switch without explaining the finite-list reasoning.",
-        "points": 1
+        "points": 0
       },
       {
         "id": "q2-grade-chain-explanation",
         "title": "Q2: Explains why the grade chain can't become a switch",
         "description": "Answer explains that score >= 80 (and similar) is a range covering many values, not one exact value, so there is no finite list of case values that could represent it. Accept any phrasing that identifies the range/boundary nature of the condition as the blocker. Deny an answer that only says 'switch doesn't support >=' without explaining why that matters (the finite-list requirement).",
-        "points": 1
+        "points": 0
       },
       {
         "id": "q3-own-example",
         "title": "Q3: Gives an own-choice example with a justified pick",
         "description": "Describes a concrete program scenario (not the priority or grade example already used), states which statement it would use, and justifies the pick by asking whether the test can be written as a finite list of exact values. Deny if no reasoning is given for the choice, or if the example is just restated from Q1/Q2.",
-        "points": 1
+        "points": 0
       }
     ]
   },
