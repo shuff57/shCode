@@ -1,6 +1,6 @@
 {
   "id": "5-3-11-reading-this-noun",
-  "title": "5.3.11 Reading — `this` is a noun",
+  "title": "5.3.11 Reading — this is a noun",
   "description": "`this` always refers to one specific thing — the instance the method was called on. Read before the substitution rule example.",
   "type": "lesson",
   "estimateMins": 6,

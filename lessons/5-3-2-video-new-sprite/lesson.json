@@ -1,6 +1,6 @@
 {
   "id": "5-3-2-video-new-sprite",
-  "title": "5.3.2 Video — What `new Sprite()` actually does",
+  "title": "5.3.2 Video — What new Sprite() actually does",
   "description": "4-min DevTools walkthrough. Opens a running shplay sketch, inspects a Sprite instance, and names what a class is. Watch before the DevTools reveal example.",
   "type": "lesson",
   "estimateMins": 4,

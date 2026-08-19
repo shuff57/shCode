@@ -1,6 +1,6 @@
 {
   "id": "5-3-4-reading-new-operator",
-  "title": "5.3.4 Reading — The `new` operator",
+  "title": "5.3.4 Reading — The new operator",
   "description": "What `new` does mechanically: allocate, run constructor, return. Read right after 2.2.3.",
   "type": "lesson",
   "estimateMins": 6,

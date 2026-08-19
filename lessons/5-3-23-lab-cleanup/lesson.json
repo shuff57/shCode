@@ -1,6 +1,6 @@
 {
   "id": "5-3-23-lab-cleanup",
-  "title": "5.4.9 Lab — Cleanup with `this.sprite.delete()`",
+  "title": "5.4.9 Lab — Cleanup with this.sprite.delete()",
   "description": "Write `Bubble.pop()` which calls `this.sprite.delete()` so the object removes its own sprite on click.",
   "type": "lesson",
   "estimateMins": 6,

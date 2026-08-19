@@ -3107,7 +3107,7 @@
     },
     {
       "id": "5-3-11-reading-this-noun",
-      "title": "5.3.11 Reading — `this` is a noun",
+      "title": "5.3.11 Reading — this is a noun",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
       "type": "lesson",
@@ -3116,7 +3116,7 @@
     },
     {
       "id": "5-3-12-example-this-pronoun",
-      "title": "5.3.12 Worked Example — `this` is a pronoun",
+      "title": "5.3.12 Worked Example — this is a pronoun",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "example",
       "type": "lesson",
@@ -3143,7 +3143,7 @@
     },
     {
       "id": "5-3-15-video-this-keyword",
-      "title": "5.3.15 Video — The `this` keyword",
+      "title": "5.3.15 Video — The this keyword",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "video",
       "type": "lesson",
@@ -3188,7 +3188,7 @@
     },
     {
       "id": "5-3-2-video-new-sprite",
-      "title": "5.3.2 Video — What `new Sprite()` actually does",
+      "title": "5.3.2 Video — What new Sprite() actually does",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "video",
       "type": "lesson",
@@ -3197,7 +3197,7 @@
     },
     {
       "id": "5-3-20-lab-method-calls-method",
-      "title": "5.4.5 Lab — A method calling `this.otherMethod()`",
+      "title": "5.4.5 Lab — A method calling this.otherMethod()",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
       "type": "lesson",
@@ -3215,7 +3215,7 @@
     },
     {
       "id": "5-3-21-reading-composition",
-      "title": "5.4.7 Reading — Why `this.sprite`, not `extends Sprite`",
+      "title": "5.4.7 Reading — Why this.sprite, not extends Sprite",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
@@ -3224,7 +3224,7 @@
     },
     {
       "id": "5-3-22-lab-mutate-sprite-prop",
-      "title": "5.4.8 Lab — Mutate `this.sprite.x` from a method",
+      "title": "5.4.8 Lab — Mutate this.sprite.x from a method",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
       "type": "lesson",
@@ -3233,7 +3233,7 @@
     },
     {
       "id": "5-3-23-lab-cleanup",
-      "title": "5.4.9 Lab — Cleanup with `this.sprite.delete()`",
+      "title": "5.4.9 Lab — Cleanup with this.sprite.delete()",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "shplay",
       "type": "lesson",
@@ -3359,7 +3359,7 @@
     },
     {
       "id": "5-3-4-reading-new-operator",
-      "title": "5.3.4 Reading — The `new` operator",
+      "title": "5.3.4 Reading — The new operator",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
       "type": "lesson",
@@ -3368,7 +3368,7 @@
     },
     {
       "id": "5-3-5-reading-constructor",
-      "title": "5.3.5 Reading — `constructor` and its parameters",
+      "title": "5.3.5 Reading — constructor and its parameters",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
       "type": "lesson",
@@ -3386,7 +3386,7 @@
     },
     {
       "id": "5-3-7-reading-properties",
-      "title": "5.3.7 Reading — Properties: data on `this`",
+      "title": "5.3.7 Reading — Properties: data on this",
       "unit": "5.3 Classes and Objects via shPlay",
       "preview": "reading",
       "type": "lesson",
