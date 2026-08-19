@@ -56,7 +56,12 @@ for (const e of entries) {
     lessons.push({ folder: e.name, parseError: String(err.message) });
     continue;
   }
-  lessons.push({ folder: e.name, title: String(meta.title ?? ''), unit: meta.unit ?? null });
+  lessons.push({
+    folder: e.name,
+    title: String(meta.title ?? ''),
+    unit: meta.unit ?? null,
+    graders: [meta.aiGrader, meta.diagram?.aiGrader].filter(Boolean),
+  });
 }
 
 const errors = [];
@@ -149,6 +154,35 @@ for (const l of lessons) {
 for (const [unit, n] of [...strayUnits].sort()) {
   errors.push(`unit ${JSON.stringify(unit)} on ${n} lesson(s) leads with an id no `
     + `module declares, so their breadcrumb links to /module/${unit.split(" ")[0]} — a 404`);
+}
+
+// 7. every aiGrader rubric item needs a numeric `points`. An item authored
+// without one makes lib/grade-written-core.ts's totalPossible NaN, and
+// components/WrittenGrader.tsx decides pass/fail as:
+//
+//     if (r.totalPossible === 0) { ...count met/partial verdicts... }
+//     return r.totalEarned / r.totalPossible >= 0.7;
+//
+// NaN === 0 is false, so the pass/fail branch that every green-to-advance
+// lesson relies on is skipped, and NaN >= 0.7 is false as well. The student
+// writes the essay, gets graded, and is told "needs revision" no matter what
+// they wrote — then green-to-advance walls them there permanently. It is
+// invisible in review: the rubric item reads perfectly, it is just missing
+// one key. 1.1.22 shipped that way.
+for (const l of lessons) {
+  for (const g of l.graders ?? []) {
+    if (!Array.isArray(g.rubric) || g.rubric.length === 0) {
+      errors.push(`${l.folder} has an aiGrader with no rubric array, so nothing can be graded`);
+      continue;
+    }
+    for (const r of g.rubric) {
+      if (typeof r.points !== 'number' || !Number.isFinite(r.points)) {
+        errors.push(`${l.folder} rubric item ${JSON.stringify(r.id)} has no numeric `
+          + `points (got ${JSON.stringify(r.points)}) — totalPossible goes NaN and the `
+          + `lesson can never be passed`);
+      }
+    }
+  }
 }
 
 for (const w of warnings) console.warn(`[check-lesson-numbers] WARN  ${w}`);

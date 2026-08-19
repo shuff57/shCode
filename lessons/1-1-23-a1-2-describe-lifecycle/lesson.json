@@ -51,7 +51,8 @@
       {
         "id": "four-to-five-mapping",
         "title": "Maps the four activities onto the five-phase naming",
-        "description": "Student identifies testing and maintenance as the two phases the four-activity list does not name separately, and says where each lives in the four-activity view — testing as an umbrella activity running across the phases (or inside construction), maintenance as the work continuing after deployment. Full credit for naming both and placing both. Deny if only one is named, or if neither is placed."
+        "description": "Student identifies testing and maintenance as the two phases the four-activity list does not name separately, and says where each lives in the four-activity view — testing as an umbrella activity running across the phases (or inside construction), maintenance as the work continuing after deployment. Full credit for naming both and placing both. Deny if only one is named, or if neither is placed.",
+        "points": 0
       }
     ]
   },
