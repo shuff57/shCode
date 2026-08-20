@@ -77,7 +77,7 @@
       "description": "At some point thing holds true or false",
       "type": "regex",
       "file": "script.js",
-      "pattern": "thing\\s*=\\s*(true|false)\\s*;",
+      "pattern": "(^|\\n)\\s*thing\\s*=\\s*(true|false)\\s*;?",
       "flags": "",
       "points": 0
     },
