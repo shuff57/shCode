@@ -174,6 +174,7 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
                       )}
                       <Link
                         href={`/module/${u.id}`}
+                        prefetch={false}
                         className="text-sm underline opacity-70 hover:opacity-100 self-start"
                       >
                         → View full module page

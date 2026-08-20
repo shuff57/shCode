@@ -14,15 +14,18 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Arithmetic operators"
+      "title": "Arithmetic operators",
+      "instructions": "Create two number variables and add them together with +. Print the result with console.log."
     },
     {
       "id": "s2",
-      "title": "String concatenation"
+      "title": "String concatenation",
+      "instructions": "Join two pieces of text together using the + operator (the same + you just used for addition — with text on either side it glues the words together instead), then print the joined result."
     },
     {
       "id": "s3",
-      "title": "Comparison operators"
+      "title": "Comparison operators",
+      "instructions": "Compare two values and print the answer, which will be true or false. Comparison operators are formally taught at 1.2.18, so here is what you need for today: === means \"is exactly equal to\", !== means \"is not equal to\", and < / > mean \"less than\" / \"greater than\", the same way they do in math. Example: console.log(5 === 5); or console.log(3 < 10);"
     }
   ],
   "requirements": [

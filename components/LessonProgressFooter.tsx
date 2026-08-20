@@ -68,6 +68,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
     >
       <Link
         href={`/module/${moduleId}`}
+        prefetch={false}
         style={{
           color: '#8be9fd',
           textDecoration: 'none',

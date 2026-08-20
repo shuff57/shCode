@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Declare a variable",
-      "instructions": "Use `let` or `const` to create a variable called `age` and set it to your age.",
+      "instructions": "Use `let` or `const` to create a variable called `age` and set it to your age. Then create a second variable called `name` and set it to your name in quotes.",
       "hints": [
         "Variables are declared with `let`, `const`, or `var`.",
         "Example: `let name = 'Alice';`"
@@ -23,11 +23,13 @@
     },
     {
       "id": "s2",
-      "title": "Use typeof to check types"
+      "title": "Use typeof to check types",
+      "instructions": "Use `typeof` on `age` and on `name` to check what type each one holds. Example: `typeof age`."
     },
     {
       "id": "s3",
-      "title": "Print values to console"
+      "title": "Print values to console",
+      "instructions": "Use `console.log` to print `age`, `name`, and the two `typeof` results you just found, so you can see the values and their types together."
     }
   ],
   "requirements": [

@@ -72,7 +72,7 @@ export default function ContentLessonView({ lesson }: Props) {
         {lesson.unit ? (
           <>
             <span style={{ margin: '0 8px' }}>›</span>
-            <Link href={`/module/${lesson.unit.split(' ')[0]}`} style={{ color: '#8be9fd' }}>
+            <Link href={`/module/${lesson.unit.split(' ')[0]}`} prefetch={false} style={{ color: '#8be9fd' }}>
               {lesson.unit}
             </Link>
           </>

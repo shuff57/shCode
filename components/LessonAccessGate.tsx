@@ -215,6 +215,7 @@ export default function LessonAccessGate({
       {moduleId ? (
         <Link
           href={`/module/${moduleId}`}
+          prefetch={false}
           style={{
             display: 'inline-block',
             padding: '0.6rem 1.2rem',
