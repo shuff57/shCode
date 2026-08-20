@@ -74,10 +74,10 @@
     {
       "id": "r4",
       "title": "thing is given a boolean",
-      "description": "At some point thing holds true or false",
+      "description": "At some point thing holds true or false, either literally or from a comparison",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(^|\\n)\\s*thing\\s*=\\s*(true|false)\\s*;?",
+      "pattern": "(^|\\n)\\s*thing\\s*=\\s*(true|false|[^;\\n]*(===|!==|==|!=|<=|>=|<|>)[^;\\n]*)\\s*;?",
       "flags": "",
       "points": 0
     },
