@@ -47,17 +47,17 @@
       "description": "Declares a variable called thing using let",
       "type": "regex",
       "file": "script.js",
-      "pattern": "let\\s+thing\\s*=",
+      "pattern": "let\\s+thing\\b",
       "flags": "",
       "points": 0
     },
     {
       "id": "r2",
       "title": "thing starts as a string",
-      "description": "The first value assigned to thing is text in quotes",
+      "description": "thing holds text in quotes, whether from its own let or a later assignment",
       "type": "regex",
       "file": "script.js",
-      "pattern": "let\\s+thing\\s*=\\s*[\"'`]",
+      "pattern": "(^|\\n)\\s*(let\\s+)?thing\\s*=\\s*[\"'`]",
       "flags": "",
       "points": 0
     },
