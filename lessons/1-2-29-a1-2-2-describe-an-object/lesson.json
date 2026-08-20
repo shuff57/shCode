@@ -49,17 +49,17 @@
       "description": "Two or more variables hold plain numbers",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:[\\s\\S]*?(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[\\d.]+\\s*;){2}",
+      "pattern": "(?:[\\s\\S]*?(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*-?[\\d.]+\\s*;){2}",
       "flags": "",
       "points": 0
     },
     {
       "id": "r3",
       "title": "At least two strings",
-      "description": "Two or more variables hold quoted text",
+      "description": "Two or more variables hold text, in quotes or backticks",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:[\\s\\S]*?(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[\"'][^\"']*[\"']\\s*;){2}",
+      "pattern": "(?:[\\s\\S]*?(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*(?:[\"'][^\"']*[\"']|`[^`]*`)\\s*;){2}",
       "flags": "",
       "points": 0
     },
