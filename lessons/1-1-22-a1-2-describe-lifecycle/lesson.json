@@ -1,0 +1,67 @@
+{
+  "id": "1-1-22-a1-2-describe-lifecycle",
+  "title": "1.1.22 Describe the Lifecycle",
+  "description": "Describe the four framework activities, walk a real product through them, and map them onto the five-phase naming. AI-graded with hints.",
+  "type": "assignment",
+  "estimateMins": 50,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.1 Software Lifecycle",
+  "preview": "assignment",
+  "slos": [
+    "SLO-1"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Describe the Lifecycle — AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "Everything you need is in the 1.1.5 video, 1.1.6 (The Four Phases), the worked example in 1.1.8, and 1.1.10 (Umbrella Activities) — go back and reread or rewatch if you get stuck. Your own everyday words throughout.\n\nPart 1 — Describe the four framework activities: inception, elaboration, construction and deployment. One or two sentences each about what happens in that activity. (1.1.5 and 1.1.6)\n\nPart 2 — Pick one real software product you actually use — Instagram, Spotify, Google Maps, Roblox, YouTube, Google Docs, anything. Name it, then walk it through all four activities, saying what you think happened in each one for that product. Best-guess reasoning is fine; no research needed. (1.1.8 shows this done for a greeting app)\n\nPart 3 — Name at least one umbrella activity, and say in one sentence why it runs across all four phases instead of sitting inside one of them. (1.1.10)\n\nPart 4 — Two namings, one lifecycle. The 1.1.5 video counts five phases (design, development, testing, deployment, maintenance); 1.1.6 counts four framework activities. They describe the same lifecycle. Name the two phases the four-activity list does not give a name of its own to, and say in one sentence each where that work happens in the four-activity view. (1.1.6, the table on this page)",
+    "rubric": [
+      {
+        "id": "four-phases-named",
+        "title": "All four phases named and described",
+        "description": "Student names and describes all four framework activities: inception, elaboration, construction, deployment. Full credit if each of the four is named and given at least a short description in their own words. Deny if any of the four is missing or only listed with no description.",
+        "points": 0
+      },
+      {
+        "id": "real-product-named",
+        "title": "One named real product",
+        "description": "Student names one real software product they use (e.g. a specific app, game, or service). Full credit for a named product. Deny if no product is named, or the product is generic ('an app') with no actual name.",
+        "points": 0
+      },
+      {
+        "id": "sentence-per-phase",
+        "title": "One concrete sentence per phase for that product",
+        "description": "Student gives at least one concrete sentence per phase for the named product, saying what probably happened in that phase for it. Full credit for four concrete sentences (one per phase) tied to the product. Deny if any phase lacks a concrete sentence, or the sentences are generic and not about the product.",
+        "points": 0
+      },
+      {
+        "id": "umbrella-mentioned",
+        "title": "At least one umbrella activity mentioned by name",
+        "description": "Student mentions at least one umbrella activity by name (e.g. quality management, security management, risk management, configuration management, architecture management, training/communication). Full credit for naming at least one. Deny if no umbrella activity is named.",
+        "points": 0
+      },
+      {
+        "id": "own-words",
+        "title": "Own words",
+        "description": "The response is written in the student's own words, not copied from a source. Deny this criterion only for significant issues: text that reads as copied/dictionary-style, or writing too disorganized to follow. Do not deny for length — a short response that clearly covers the four phases and a product walkthrough is fine. This is not a prose-quality score.",
+        "points": 0
+      },
+      {
+        "id": "four-to-five-mapping",
+        "title": "Maps the four activities onto the five-phase naming",
+        "description": "Student identifies testing and maintenance as the two phases the four-activity list does not name separately, and says where each lives in the four-activity view — testing as an umbrella activity running across the phases (or inside construction), maintenance as the work continuing after deployment. Full credit for naming both and placing both. Deny if only one is named, or if neither is placed.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A1.1.2"
+}

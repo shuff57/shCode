@@ -149,4 +149,4 @@ recall check. Deliberate; revisit if quizzes ever carry real weight.
 | When | What |
 |------|------|
 | Created (2026-08-17) | Six module quizzes converted from AI-graded prose to multiple choice: 1.1.23, 1.2.31, 1.3.21, 1.4.22, 1.5.45, 2.1.40 — 46 questions. New `preview: "quiz"` type, `components/QuizView.tsx`, `lib/quiz-grade.ts`, `scripts/test-quiz.mjs`. Writeups stayed with the AI grader. |
-| 1.1.23 placement (2026-08-17, open) | `1-1-7-a3-3-unit-quiz` is displayed as *1.1.23 Unit 1.1 Quiz* but every question is module **1.2/1.3** material — `typeof`, declarations, naming style — none of which module 1.1 teaches. Its `source` pointers cite 1.2.x/1.3.x accordingly. The lesson's position in the course is still unresolved. |
+| 1.1.23 placement (2026-08-17, open) | `1-1-23-a3-3-unit-quiz` is displayed as *1.1.23 Unit 1.1 Quiz* but every question is module **1.2/1.3** material — `typeof`, declarations, naming style — none of which module 1.1 teaches. Its `source` pointers cite 1.2.x/1.3.x accordingly. The lesson's position in the course is still unresolved. |

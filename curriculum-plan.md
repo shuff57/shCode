@@ -231,7 +231,7 @@ coercion, two labs). `1.2.7`–`1.2.30` were authored against book §1.2 directl
 book cross-references in `curriculum/modules/1.2_variables-and-data-types.md`.
 
 > **Why the book block is appended, not interleaved.** `1-2-1-slides`,
-> `1-2-5-lab-variables-types-check` and `1-2-6-lab-operators-check` carry live
+> `1-2-26-lab-variables-types-check` and `1-2-16-lab-operators-check` carry live
 > student progress in D1, and `lesson_state.lesson_id` is the folder name.
 > Renumbering them would orphan real student work (`BOOK-TO-MODULE.md` §7.3).
 

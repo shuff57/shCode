@@ -1,0 +1,21 @@
+{
+  "id": "1-2-14-reading-string-methods",
+  "title": "1.2.14 Reading — String Methods in Practice",
+  "description": "Build strings with backtick template literals and use .length, .toUpperCase(), and .includes(). Read before the variables-and-types lesson.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Variables and Data Types",
+  "preview": "reading",
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

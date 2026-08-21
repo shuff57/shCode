@@ -1,0 +1,82 @@
+{
+  "id": "1-2-15-lab-greeting-with-backticks",
+  "title": "1.2.15 Greeting with Backticks",
+  "description": "Build a greeting with a template literal, then prove single quotes cannot do the same job. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Variables and Data Types",
+  "preview": "console",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Declare myName",
+      "instructions": "Declare a variable called `myName` and set it to your name in quotes."
+    },
+    {
+      "id": "s2",
+      "title": "Greet with a template literal",
+      "instructions": "Log a greeting using backticks, embedding myName with ${...}."
+    },
+    {
+      "id": "s3",
+      "title": "Embed a calculation too",
+      "instructions": "In the same greeting or a second one, embed a calculation such as ${2024 + 1}."
+    },
+    {
+      "id": "s4",
+      "title": "Now try it with single quotes",
+      "instructions": "Log the same text again using single quotes instead of backticks. Read both outputs and note the difference."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "myName is declared",
+      "description": "Declares a variable called myName",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+myName\\s*=",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "A backtick string embeds myName",
+      "description": "Uses a template literal containing ${myName}",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "`[^`]*\\$\\{\\s*myName\\s*\\}[^`]*`",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "A calculation is embedded",
+      "description": "Embeds an expression containing an operator, such as ${2024 + 1}",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\$\\{[^}]*[-+*/][^}]*\\}",
+      "flags": "",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "The single-quote version is logged too",
+      "description": "Logs a single-quoted string containing a literal ${ so the difference is visible",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*'[^']*\\$\\{[^']*'\\s*\\)",
+      "flags": "",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

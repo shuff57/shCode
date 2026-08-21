@@ -1,0 +1,21 @@
+{
+  "id": "1-2-22-reading-primitive-vs-object",
+  "title": "1.2.22 Reading — Primitive vs Object",
+  "description": "Seven types hold one thing each. The eighth holds collections. Definition 1.2.7.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Variables and Data Types",
+  "preview": "reading",
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

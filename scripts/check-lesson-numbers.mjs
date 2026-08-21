@@ -13,10 +13,14 @@
 //
 // The live case this was written for: units 1.2, 1.3 and 1.5 each gained a video
 // lesson that took the number their quiz used to have, and the quiz moved up one
-// — TITLE only, because lesson ids key student progress in D1 and renaming a
-// folder would orphan it. So `1-2-30-unit-quiz` legitimately carries the title
-// `1.2.31`. Anyone "tidying" that mismatch by renumbering the title back lands
-// it on top of the video. This check turns that into a failed build.
+// — TITLE only at first, because lesson ids key student progress in D1 and a
+// bare folder rename orphans it. Migrations 0011 and 0013 have since moved the
+// D1 ids onto the title numbering and the folders were renamed to match, so
+// `1-2-31-unit-quiz` now agrees with its title `1.2.31`. Do not read that as
+// permission to renumber freely: a title renumber still has to ship with a
+// migration, or every completion on the lessons it passes goes dead. Anyone
+// "tidying" a number without one lands a lesson on top of another. This check
+// turns the collision into a failed build; it cannot see the orphaning.
 //
 // The same hazard exists one level up, in curriculum/modules/*.md. A module's id
 // lives in its frontmatter, not its filename, so a renumber that refiles a module

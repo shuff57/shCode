@@ -1,0 +1,21 @@
+{
+  "id": "1-2-18-example-comparisons-make-booleans",
+  "title": "1.2.18 Worked Example — Comparisons Produce Booleans",
+  "description": "Four comparisons, four boolean answers, and the habit of reading a comparison as a value.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Variables and Data Types",
+  "preview": "example",
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

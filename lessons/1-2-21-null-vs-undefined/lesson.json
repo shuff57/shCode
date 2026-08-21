@@ -1,0 +1,54 @@
+{
+  "id": "1-2-21-null-vs-undefined",
+  "title": "1.2.21 null vs undefined",
+  "description": "Tell the two empties apart and say when you'd write each. AI-graded with hints.",
+  "type": "assignment",
+  "estimateMins": 15,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.2 Variables and Data Types",
+  "preview": "assignment",
+  "slos": [
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "null vs undefined — AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "Everything you need is in 1.2.19 (The null Value) and 1.2.20 (The undefined Value) — go back and reread them if you get stuck. One or two sentences per answer is plenty, in your own everyday words.\n\nBoth null and undefined mean a variable has no useful value in it. They are not the same thing.\n\n1. What does undefined mean, and who puts it there — you, or JavaScript? (1.2.20)\n\n2. What does null mean, and who puts it there? (1.2.19)\n\n3. Give one situation where you would write null yourself. Describe the variable and why null is the right value for it at that moment. (1.2.19)\n\n4. A program prints undefined where you expected a name. What does that tell you about where the bug is? (1.2.20)",
+    "rubric": [
+      {
+        "id": "undefined-defined",
+        "title": "Q1: undefined means no value assigned, and JavaScript supplies it",
+        "description": "Student says undefined means the variable was declared but never given a value, AND that JavaScript sets it automatically. Credit requires both halves - the meaning and the fact that the language, not the programmer, put it there.",
+        "points": 0
+      },
+      {
+        "id": "null-defined",
+        "title": "Q2: null means deliberately empty, and the programmer writes it",
+        "description": "Student says null means nothing / empty / value unknown, AND that the programmer assigns it on purpose. Credit requires both halves. Deny if null is described only as 'empty' with no sense that it is a deliberate choice.",
+        "points": 0
+      },
+      {
+        "id": "null-situation",
+        "title": "Q3: a concrete situation for writing null",
+        "description": "Student describes a specific variable and moment - a chosen colour before the user picks one, a middle name that does not exist, a score before the game starts - and says why null fits. Deny generic answers such as 'when you want it to be empty' with no situation attached.",
+        "points": 0
+      },
+      {
+        "id": "debugging-inference",
+        "title": "Q4: infers that a value was never assigned",
+        "description": "Student concludes that seeing undefined means the variable never got a value - the assignment did not happen, ran too late, or the wrong name was used - so the bug is upstream of the line that printed it. Deny if the answer only says 'there is a bug' without saying what undefined specifically implies.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": []
+}

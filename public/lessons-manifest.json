@@ -10,16 +10,7 @@
       "week": null
     },
     {
-      "id": "1-1-10-example-greeting-phases",
-      "title": "1.1.8 Worked Example — Greeting App Through Four Phases",
-      "unit": "1.1 Software Lifecycle",
-      "preview": "example",
-      "type": "lesson",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-1-11-reading-umbrella",
+      "id": "1-1-10-reading-umbrella",
       "title": "1.1.10 Reading — Umbrella Activities",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
@@ -28,7 +19,7 @@
       "week": null
     },
     {
-      "id": "1-1-12-name-that-umbrella",
+      "id": "1-1-11-name-that-umbrella",
       "title": "1.1.11 Name That Umbrella",
       "unit": "1.1 Software Lifecycle",
       "preview": "console",
@@ -37,7 +28,7 @@
       "week": null
     },
     {
-      "id": "1-1-13-reading-actions",
+      "id": "1-1-12-reading-actions",
       "title": "1.1.12 Reading — Software Engineering Actions",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
@@ -46,7 +37,7 @@
       "week": null
     },
     {
-      "id": "1-1-14-reading-task-sets",
+      "id": "1-1-13-reading-task-sets",
       "title": "1.1.13 Reading — Task Sets",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
@@ -55,7 +46,7 @@
       "week": null
     },
     {
-      "id": "1-1-15-example-task-set-loop",
+      "id": "1-1-14-example-task-set-loop",
       "title": "1.1.14 Worked Example — Task Set for a Loop Bug",
       "unit": "1.1 Software Lifecycle",
       "preview": "example",
@@ -64,7 +55,7 @@
       "week": null
     },
     {
-      "id": "1-1-16-write-a-task-set",
+      "id": "1-1-15-write-a-task-set",
       "title": "1.1.15 Write a Task Set",
       "unit": "1.1 Software Lifecycle",
       "preview": "assignment",
@@ -73,7 +64,7 @@
       "week": null
     },
     {
-      "id": "1-1-17-reading-sdlc",
+      "id": "1-1-16-reading-sdlc",
       "title": "1.1.16 Reading — SDLC Methodologies",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
@@ -82,7 +73,7 @@
       "week": null
     },
     {
-      "id": "1-1-18-reading-four-ps",
+      "id": "1-1-17-reading-four-ps",
       "title": "1.1.17 Reading — The Four Ps",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
@@ -91,11 +82,20 @@
       "week": null
     },
     {
-      "id": "1-1-19-same-framework",
+      "id": "1-1-18-same-framework",
       "title": "1.1.18 Same Framework, Different Weight",
       "unit": "1.1 Software Lifecycle",
       "preview": "quiz",
       "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-1-19-reading-prescriptive",
+      "title": "1.1.19 Reading — Prescriptive Process Models",
+      "unit": "1.1 Software Lifecycle",
+      "preview": "reading",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -109,16 +109,7 @@
       "week": 1
     },
     {
-      "id": "1-1-20-reading-prescriptive",
-      "title": "1.1.19 Reading — Prescriptive Process Models",
-      "unit": "1.1 Software Lifecycle",
-      "preview": "reading",
-      "type": "lesson",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-1-21-reading-prescriptive-limits",
+      "id": "1-1-20-reading-prescriptive-limits",
       "title": "1.1.20 Reading — Where Prescriptive Models Break",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
@@ -127,7 +118,7 @@
       "week": null
     },
     {
-      "id": "1-1-22-does-it-fit",
+      "id": "1-1-21-does-it-fit",
       "title": "1.1.21 Does It Fit?",
       "unit": "1.1 Software Lifecycle",
       "preview": "quiz",
@@ -136,10 +127,28 @@
       "week": null
     },
     {
-      "id": "1-1-23-a1-2-describe-lifecycle",
+      "id": "1-1-22-a1-2-describe-lifecycle",
       "title": "1.1.22 Describe the Lifecycle",
       "unit": "1.1 Software Lifecycle",
       "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-1-23-a3-3-unit-quiz",
+      "title": "1.1.23 Unit 1.1 Quiz",
+      "unit": "1.1 Software Lifecycle",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 3
+    },
+    {
+      "id": "1-1-3-first-statement",
+      "title": "1.1.3 Your First Statement",
+      "unit": "1.1 Software Lifecycle",
+      "preview": "console",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -163,25 +172,7 @@
       "week": null
     },
     {
-      "id": "1-1-6-first-statement",
-      "title": "1.1.3 Your First Statement",
-      "unit": "1.1 Software Lifecycle",
-      "preview": "console",
-      "type": "assignment",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-1-7-a3-3-unit-quiz",
-      "title": "1.1.23 Unit 1.1 Quiz",
-      "unit": "1.1 Software Lifecycle",
-      "preview": "quiz",
-      "type": "assignment",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": 3
-    },
-    {
-      "id": "1-1-8-reading-four-phases",
+      "id": "1-1-6-reading-four-phases",
       "title": "1.1.6 Reading — The Four Phases",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
@@ -190,11 +181,20 @@
       "week": null
     },
     {
-      "id": "1-1-9-classify-the-task",
+      "id": "1-1-7-classify-the-task",
       "title": "1.1.7 Classify the Task",
       "unit": "1.1 Software Lifecycle",
       "preview": "console",
       "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-1-8-example-greeting-phases",
+      "title": "1.1.8 Worked Example — Greeting App Through Four Phases",
+      "unit": "1.1 Software Lifecycle",
+      "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -208,34 +208,7 @@
       "week": null
     },
     {
-      "id": "1-2-10-reading-number",
-      "title": "1.2.6 Reading — The number Type",
-      "unit": "1.2 Variables and Data Types",
-      "preview": "reading",
-      "type": "lesson",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-2-11-reading-special-numeric-values",
-      "title": "1.2.8 Reading — Infinity, -Infinity and NaN",
-      "unit": "1.2 Variables and Data Types",
-      "preview": "reading",
-      "type": "lesson",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-2-12-example-nan-is-sticky",
-      "title": "1.2.9 Worked Example — NaN Is Sticky",
-      "unit": "1.2 Variables and Data Types",
-      "preview": "example",
-      "type": "lesson",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-2-13-lab-predict-the-number",
+      "id": "1-2-10-lab-predict-the-number",
       "title": "1.2.10 Predict the Number",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
@@ -244,7 +217,7 @@
       "week": null
     },
     {
-      "id": "1-2-14-reading-bigint",
+      "id": "1-2-11-reading-bigint",
       "title": "1.2.11 Reading — BigInt",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
@@ -253,7 +226,7 @@
       "week": null
     },
     {
-      "id": "1-2-15-reading-strings-and-quotes",
+      "id": "1-2-12-reading-strings-and-quotes",
       "title": "1.2.12 Reading — Strings and the Three Quotes",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
@@ -262,7 +235,7 @@
       "week": null
     },
     {
-      "id": "1-2-16-reading-template-literals",
+      "id": "1-2-13-reading-template-literals",
       "title": "1.2.13 Reading — Embedding Values with ${...}",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
@@ -271,7 +244,16 @@
       "week": null
     },
     {
-      "id": "1-2-17-lab-greeting-with-backticks",
+      "id": "1-2-14-reading-string-methods",
+      "title": "1.2.14 Reading — String Methods in Practice",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-15-lab-greeting-with-backticks",
       "title": "1.2.15 Greeting with Backticks",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
@@ -280,7 +262,16 @@
       "week": null
     },
     {
-      "id": "1-2-18-reading-boolean",
+      "id": "1-2-16-lab-operators-check",
+      "title": "1.2.16 Operators and Expressions Check",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-17-reading-boolean",
       "title": "1.2.17 Reading — The boolean Type",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
@@ -289,10 +280,19 @@
       "week": null
     },
     {
-      "id": "1-2-19-example-comparisons-make-booleans",
+      "id": "1-2-18-example-comparisons-make-booleans",
       "title": "1.2.18 Worked Example — Comparisons Produce Booleans",
       "unit": "1.2 Variables and Data Types",
       "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-19-reading-null",
+      "title": "1.2.19 Reading — The null Value",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
       "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
@@ -307,16 +307,7 @@
       "week": null
     },
     {
-      "id": "1-2-20-reading-null",
-      "title": "1.2.19 Reading — The null Value",
-      "unit": "1.2 Variables and Data Types",
-      "preview": "reading",
-      "type": "lesson",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-2-21-reading-undefined",
+      "id": "1-2-20-reading-undefined",
       "title": "1.2.20 Reading — The undefined Value",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
@@ -325,7 +316,7 @@
       "week": null
     },
     {
-      "id": "1-2-22-null-vs-undefined",
+      "id": "1-2-21-null-vs-undefined",
       "title": "1.2.21 null vs undefined",
       "unit": "1.2 Variables and Data Types",
       "preview": "assignment",
@@ -334,7 +325,7 @@
       "week": null
     },
     {
-      "id": "1-2-23-reading-primitive-vs-object",
+      "id": "1-2-22-reading-primitive-vs-object",
       "title": "1.2.22 Reading — Primitive vs Object",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
@@ -343,7 +334,7 @@
       "week": null
     },
     {
-      "id": "1-2-24-reading-typeof",
+      "id": "1-2-23-reading-typeof",
       "title": "1.2.23 Reading — The typeof Operator",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
@@ -352,7 +343,7 @@
       "week": null
     },
     {
-      "id": "1-2-25-example-typeof-surprises",
+      "id": "1-2-24-example-typeof-surprises",
       "title": "1.2.24 Worked Example — The typeof Surprises",
       "unit": "1.2 Variables and Data Types",
       "preview": "example",
@@ -361,8 +352,17 @@
       "week": null
     },
     {
-      "id": "1-2-26-lab-typeof-round-up",
+      "id": "1-2-25-lab-typeof-round-up",
       "title": "1.2.25 typeof Round-Up",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-26-lab-variables-types-check",
+      "title": "1.2.26 Variables and Types Check",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
       "type": "assignment",
@@ -397,20 +397,11 @@
       "week": null
     },
     {
-      "id": "1-2-3-reading-string-methods",
-      "title": "1.2.14 Reading — String Methods in Practice",
+      "id": "1-2-3-reading-every-value-has-a-type",
+      "title": "1.2.3 Reading — Every Value Has a Type",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-2-30-unit-quiz",
-      "title": "1.2.31 Module 1.2 Quiz",
-      "unit": "1.2 Variables and Data Types",
-      "preview": "quiz",
-      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -424,43 +415,16 @@
       "week": null
     },
     {
-      "id": "1-2-4-reading-operators-coercion",
-      "title": "1.2.7 Reading — Arithmetic Operators and Type Coercion",
+      "id": "1-2-31-unit-quiz",
+      "title": "1.2.31 Module 1.2 Quiz",
       "unit": "1.2 Variables and Data Types",
-      "preview": "reading",
-      "type": "lesson",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-2-5-lab-variables-types-check",
-      "title": "1.2.26 Variables and Types Check",
-      "unit": "1.2 Variables and Data Types",
-      "preview": "console",
+      "preview": "quiz",
       "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
     {
-      "id": "1-2-6-lab-operators-check",
-      "title": "1.2.16 Operators and Expressions Check",
-      "unit": "1.2 Variables and Data Types",
-      "preview": "console",
-      "type": "assignment",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-2-7-reading-every-value-has-a-type",
-      "title": "1.2.3 Reading — Every Value Has a Type",
-      "unit": "1.2 Variables and Data Types",
-      "preview": "reading",
-      "type": "lesson",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
-      "id": "1-2-8-reading-dynamically-typed",
+      "id": "1-2-4-reading-dynamically-typed",
       "title": "1.2.4 Reading — Dynamically Typed",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
@@ -469,11 +433,47 @@
       "week": null
     },
     {
-      "id": "1-2-9-lab-change-the-type",
+      "id": "1-2-5-lab-change-the-type",
       "title": "1.2.5 Change the Type",
       "unit": "1.2 Variables and Data Types",
       "preview": "console",
       "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-6-reading-number",
+      "title": "1.2.6 Reading — The number Type",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-7-reading-operators-coercion",
+      "title": "1.2.7 Reading — Arithmetic Operators and Type Coercion",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-8-reading-special-numeric-values",
+      "title": "1.2.8 Reading — Infinity, -Infinity and NaN",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-2-9-example-nan-is-sticky",
+      "title": "1.2.9 Worked Example — NaN Is Sticky",
+      "unit": "1.2 Variables and Data Types",
+      "preview": "example",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -586,20 +586,20 @@
       "week": null
     },
     {
-      "id": "1-3-20-a1-3-3-unit-quiz",
-      "title": "1.3.21 Module 1.3 Quiz",
-      "unit": "1.3 Documentation and Coding Conventions",
-      "preview": "quiz",
-      "type": "assignment",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
       "id": "1-3-20-video-names-are-for-readers",
       "title": "1.3.20 Video — Names Are for Readers",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "video",
       "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-3-21-a1-3-3-unit-quiz",
+      "title": "1.3.21 Module 1.3 Quiz",
+      "unit": "1.3 Documentation and Coding Conventions",
+      "preview": "quiz",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1216,20 +1216,20 @@
       "week": null
     },
     {
-      "id": "1-5-44-unit-quiz",
-      "title": "1.5.45 Module 1.5 Quiz",
-      "unit": "1.5 Program Design Tools and Environments",
-      "preview": "quiz",
-      "type": "assignment",
-      "category": "Unit 1: JavaScript Fundamentals",
-      "week": null
-    },
-    {
       "id": "1-5-44-video-think-before-you-type",
       "title": "1.5.44 Video — Think Before You Type",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "video",
       "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-5-45-unit-quiz",
+      "title": "1.5.45 Module 1.5 Quiz",
+      "unit": "1.5 Program Design Tools and Environments",
+      "preview": "quiz",
+      "type": "assignment",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },

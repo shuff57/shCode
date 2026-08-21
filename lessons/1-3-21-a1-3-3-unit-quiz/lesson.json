@@ -1,0 +1,145 @@
+{
+  "id": "1-3-21-a1-3-3-unit-quiz",
+  "title": "1.3.21 Module 1.3 Quiz",
+  "description": "Nine multiple-choice questions on naming, comments, documentation and READMEs. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.3 Documentation and Coding Conventions",
+  "preview": "quiz",
+  "slos": [
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A1.3.3",
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-bad-name",
+        "source": "1.3.6 and 1.3.7",
+        "question": "Why is `let a = 5;` a poor variable name?",
+        "options": [
+          "Single letters are illegal in JavaScript",
+          "It says nothing about what the 5 is, so a reader has to work it out from the rest of the code",
+          "It makes the program run more slowly",
+          "Variable names must be at least three characters"
+        ],
+        "answer": 1,
+        "explanation": "It is legal and it is fast — it is just silent. `let sideLength = 5;` tells the next reader what the 5 means without them having to reconstruct it."
+      },
+      {
+        "id": "q2-reuse",
+        "source": "1.3.13, 1.3.14 and 1.3.15",
+        "question": "What is the problem with reusing one variable to hold different kinds of values?",
+        "options": [
+          "JavaScript will refuse to run it",
+          "It uses more memory than separate variables",
+          "The name can only be true for one of them, so the code stops matching what it says",
+          "Nothing — it is good practice, because it keeps the program short"
+        ],
+        "answer": 2,
+        "explanation": "A variable called `temp` that holds a temperature, then a name, then a total is lying two thirds of the time. Separate meanings want separate names."
+      },
+      {
+        "id": "q3-extra-variables",
+        "source": "1.3.14",
+        "question": "True or false: using extra variables slows your program down.",
+        "options": [
+          "True — every variable costs measurable speed",
+          "False — the cost is far too small to matter, and clear names are worth much more",
+          "True — but only in the browser",
+          "False — extra variables actually make programs faster"
+        ],
+        "answer": 1,
+        "explanation": "False. Naming an intermediate value costs essentially nothing at runtime and buys a lot of readability. Do not trade clarity for a saving you cannot measure."
+      },
+      {
+        "id": "q4-concise",
+        "source": "1.3.8",
+        "question": "Which pair of names follows the \"descriptive but concise\" guideline?",
+        "options": [
+          "x and num",
+          "data and abc",
+          "userName and totalPrice",
+          "theNameOfTheCurrentlyLoggedInUser and theGrandTotalOfAllItems"
+        ],
+        "answer": 2,
+        "explanation": "userName and totalPrice say what they hold without becoming a sentence. x, num, data and abc say nothing; the last pair says it three times over."
+      },
+      {
+        "id": "q5-types-and-names",
+        "source": "1.2.3 and 1.3.6",
+        "question": "Which variable would sensibly hold a boolean?",
+        "options": [
+          "let studentName",
+          "let itemCount",
+          "let isTaskFinished",
+          "let priceWithCents"
+        ],
+        "answer": 2,
+        "explanation": "A boolean is true or false, so a yes/no name fits it — `isTaskFinished`. A name, a count and a price are a string and two numbers."
+      },
+      {
+        "id": "q6-name-vs-comment",
+        "source": "1.3.4 and 1.3.6",
+        "question": "Someone says \"the comment above this line explains it, so the variable name does not matter.\" Why is a good name still better?",
+        "options": [
+          "Comments are not allowed in professional code",
+          "The name travels with the variable everywhere it is used; the comment only sits in one place, and can drift out of date",
+          "Comments make the file too large",
+          "A good name makes the program run faster than a comment does"
+        ],
+        "answer": 1,
+        "explanation": "You read the name at every use and the comment only once, at the declaration — and when the code changes, the comment is the part that quietly stops being true."
+      },
+      {
+        "id": "q7-single-letters",
+        "source": "1.3.7",
+        "question": "The guide says to avoid single-letter names like `d`. What is the one exception you will meet in Chapter 2?",
+        "options": [
+          "`x` and `y`, because everyone knows they are coordinates",
+          "A loop counter called `i`, because its scope is tiny and the convention is universal",
+          "Any name inside a comment block",
+          "There is no exception — single letters are always wrong"
+        ],
+        "answer": 1,
+        "explanation": "Tiny scope plus universal convention is what \"a very good reason\" looks like. It is not a licence for `d` — and half-abbreviations like `usrNm` or `calcTot` are the sneakier version of the same problem."
+      },
+      {
+        "id": "q8-readme",
+        "source": "1.3.18",
+        "question": "What three questions does a README answer, in order?",
+        "options": [
+          "Who wrote it, when, and how long it took",
+          "What is this, how do I run it, and what should I know before changing it",
+          "Which language, which editor, and which browser",
+          "What it costs, who owns it, and where to report bugs"
+        ],
+        "answer": 1,
+        "explanation": "A README is written for the person standing outside your code deciding whether to go in. Good names and comments help someone already inside it — the README comes first."
+      },
+      {
+        "id": "q9-comment-the-reason",
+        "source": "1.3.5",
+        "question": "Which comment earns its place in the code?",
+        "options": [
+          "// Free shipping over 50 - the store owner asked for this, do not remove",
+          "// multiplies price by quantity",
+          "// this is a variable",
+          "// set total"
+        ],
+        "answer": 0,
+        "explanation": "Comment the reason, not the line. A comment that restates the code just gives you two things to keep in step instead of one."
+      }
+    ]
+  }
+}
