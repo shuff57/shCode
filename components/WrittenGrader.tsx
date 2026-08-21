@@ -179,8 +179,6 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       const passed = isPassing(data as GradeResult);
       if (passed) {
         await recordLessonCompleted(lessonId, data.totalEarned);
-        // Brief pause so the AI feedback visibly renders before auto-advance.
-        setTimeout(() => navigateToNextLesson(lessonId), 1500);
       }
       if (progress.authed) {
         // Persist the submission + sync the draft so a resume shows the
@@ -434,6 +432,31 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
               );
             })}
           </div>
+
+          {passed && (
+            <div style={{ marginTop: 16 }}>
+              <button
+                onClick={() => navigateToNextLesson(lessonId)}
+                style={{
+                  padding: '10px 18px',
+                  borderRadius: 6,
+                  border: 'none',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  background: '#50fa7b',
+                  color: '#282a36',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                Continue to next lesson →
+              </button>
+              <p style={{ margin: '8px 0 0', color: '#888', fontSize: 12 }}>
+                You've passed — keep revising to push your score higher if you want, or move on whenever you're ready.
+              </p>
+            </div>
+          )}
 
           {result.hints && result.hints.length > 0 && (
             <div style={{ marginTop: 14, padding: 12, background: '#282a36', borderRadius: 6, border: '1px solid #ffb86c55' }}>
