@@ -36,40 +36,40 @@
     {
       "id": "r1",
       "title": "At least six variables declared",
-      "description": "Six or more variables declared with let or const",
+      "description": "Six or more variables declared with let or const, initialized on the declaration line or assigned later",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:[\\s\\S]*?(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=){6}",
+      "pattern": "(?:[\\s\\S]*?(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*(?:=|;)){6}",
       "flags": "",
       "points": 0
     },
     {
       "id": "r2",
       "title": "At least two numbers",
-      "description": "Two or more variables hold plain numbers",
+      "description": "Two or more variables hold plain numbers, assigned on the declaration line or later",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:[\\s\\S]*?(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*-?[\\d.]+\\s*;){2}",
+      "pattern": "(?:[\\s\\S]*?(?:(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*-?[\\d.]+\\s*;|(?:let|const)\\s+([a-z][A-Za-z0-9]*)\\s*;[\\s\\S]*?\\1\\s*=\\s*-?[\\d.]+\\s*;)){2}",
       "flags": "",
       "points": 0
     },
     {
       "id": "r3",
       "title": "At least two strings",
-      "description": "Two or more variables hold text, in quotes or backticks",
+      "description": "Two or more variables hold text, in quotes or backticks, assigned on the declaration line or later",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:[\\s\\S]*?(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*(?:[\"'][^\"']*[\"']|`[^`]*`)\\s*;){2}",
+      "pattern": "(?:[\\s\\S]*?(?:(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*(?:[\"'][^\"']*[\"']|`[^`]*`)\\s*;|(?:let|const)\\s+([a-z][A-Za-z0-9]*)\\s*;[\\s\\S]*?\\1\\s*=\\s*(?:[\"'][^\"']*[\"']|`[^`]*`)\\s*;)){2}",
       "flags": "",
       "points": 0
     },
     {
       "id": "r4",
       "title": "At least one boolean",
-      "description": "A variable holds true or false, either literally or from a comparison",
+      "description": "A variable holds true or false, either literally or from a comparison, assigned on the declaration line or later",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*(?:true|false|[^;\\n]*(?:===|!==|==|!=|<=|>=|<|>)[^;\\n]*)\\s*;",
+      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*(?:true|false|[^;\\n]*(?:===|!==|==|!=|<=|>=|<|>)[^;\\n]*)\\s*;|(?:let|const)\\s+([a-z][A-Za-z0-9]*)\\s*;[\\s\\S]*?\\1\\s*=\\s*(?:true|false|[^;\\n]*(?:===|!==|==|!=|<=|>=|<|>)[^;\\n]*)\\s*;",
       "flags": "",
       "points": 0
     },
