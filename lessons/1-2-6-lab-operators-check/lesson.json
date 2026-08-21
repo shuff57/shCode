@@ -57,10 +57,10 @@
     {
       "id": "req3",
       "title": "String concatenation",
-      "description": "Concatenate strings using +",
+      "description": "Concatenate strings using +, either inline literals or two previously-declared string variables",
       "type": "regex",
       "file": "script.js",
-      "pattern": "[\"'].*[\"']\\s*\\+\\s*",
+      "pattern": "[\"'].*[\"']\\s*\\+\\s*|(?:let|const|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*[\"'][^\"']*[\"']\\s*;[\\s\\S]*?\\b\\1\\s*\\+",
       "flags": "i",
       "points": 0
     },
