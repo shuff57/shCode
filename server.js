@@ -130,7 +130,7 @@ app.prepare().then(() => {
 
         if (type === 'regex') {
           const raw = files?.[r.file] || '';
-          const content = stripJsComments(raw);
+          const content = r.stripComments === false ? raw : stripJsComments(raw);
           const regex = new RegExp(r.pattern, flags);
           passed = regex.test(content);
         } else if (type === 'inFunction') {

@@ -63,6 +63,11 @@ export interface Requirement {
   expected?: string;
   testFn?: string;
   points?: number;
+  /** Set false to test the raw source instead of the comment-stripped
+   *  version — needed for requirements that check for comments themselves
+   *  (e.g. "at least four // comments"), since stripping runs first and
+   *  would delete the very thing being matched for. Defaults to true. */
+  stripComments?: boolean;
 }
 
 export interface Grading {

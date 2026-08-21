@@ -84,7 +84,7 @@ function extractFunctionBody(src: string, name: string): string | null {
 // world) are case-sensitive so strict is the right default.
 function checkRegex(req: Requirement, files: Record<string, string>): boolean {
   const raw = files[req.file || ''] || '';
-  const content = stripJsComments(raw);
+  const content = req.stripComments === false ? raw : stripJsComments(raw);
   const regex = new RegExp(req.pattern || '', req.flags ?? '');
   return regex.test(content);
 }
