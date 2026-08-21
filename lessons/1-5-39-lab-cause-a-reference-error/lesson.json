@@ -61,6 +61,7 @@
       "file": "script.js",
       "pattern": "//[^\\n]*ReferenceError",
       "flags": "",
+      "stripComments": false,
       "points": 0
     },
     {
@@ -71,6 +72,7 @@
       "file": "script.js",
       "pattern": "//[^\\n]*(detail|kind|place|line number|spell)",
       "flags": "i",
+      "stripComments": false,
       "points": 0
     }
   ],

@@ -61,6 +61,7 @@
       "file": "script.js",
       "pattern": "//[^\\n]*(precedence|order of operations|multipl\\w*\\s+(happens|comes|goes|is done)|brackets? (first|change)|parenthes\\w* (first|change))",
       "flags": "i",
+      "stripComments": false,
       "points": 0
     },
     {
