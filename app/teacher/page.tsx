@@ -81,6 +81,20 @@ interface LessonMeta {
 
 const NO_EDITOR_PREVIEWS = new Set(['slides', 'video', 'reading']);
 
+// A student's lesson_state/commits rows can reference an id from before a
+// renumbering (ids recycle across years — see project memory). That id no
+// longer appears in the manifest, so meta.unit is null. Rather than dump it
+// in "Other", borrow the unit label from any manifest lesson sharing the
+// same "<unit>-<submodule>-" id prefix (e.g. "1-1-3-..." -> "1-1-").
+function inferUnit(id: string, lessonMap: Map<string, LessonMeta>): string {
+  const prefix = id.match(/^(\d+-\d+)-/)?.[1];
+  if (!prefix) return 'Other';
+  for (const meta of lessonMap.values()) {
+    if (meta.unit && meta.id.startsWith(`${prefix}-`)) return meta.unit;
+  }
+  return 'Other';
+}
+
 interface GradebookCell {
   state: 'completed' | 'started' | null;
   score: number | null;
@@ -327,13 +341,21 @@ function StudentDrawer({
 
     for (const id of Object.keys(detail.lessonState)) {
       const meta = lessonMap.get(id) ?? { id, title: id, unit: null, preview: null };
-      const u = meta.unit ?? 'Other';
+      const u = meta.unit ?? inferUnit(id, lessonMap);
       if (!byUnit[u]) {
         byUnit[u] = [];
         unitOrder.push(u);
       }
       byUnit[u].push(meta);
     }
+
+    // Natural-sort unit labels ("1.1" < "1.2" < ... < "2.1"); "Other" always last
+    // so genuinely unrecognized ids don't scatter mid-list.
+    unitOrder.sort((a, b) => {
+      if (a === 'Other') return b === 'Other' ? 0 : 1;
+      if (b === 'Other') return -1;
+      return a.localeCompare(b, undefined, { numeric: true });
+    });
 
     for (const u of unitOrder) {
       unitGroups.push({ unit: u, lessons: byUnit[u].sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true })) });
@@ -447,13 +469,20 @@ function StudentDrawer({
                             {ls.score} pts
                           </span>
                         )}
-                        {!NO_EDITOR_PREVIEWS.has(lesson.preview ?? '') && (
+                        {/* lessonMap.has(...) guards against a stale/renumbered id with
+                            no current lesson.json — nothing real to open there. */}
+                        {lessonMap.has(lesson.id) && !NO_EDITOR_PREVIEWS.has(lesson.preview ?? '') && (
                           <a
                             href={`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(email)}&lesson=${encodeURIComponent(lesson.id)}`}
                             style={{ background: 'none', border: '1px solid #bd93f9', borderRadius: 4, color: '#bd93f9', fontSize: 12, cursor: 'pointer', padding: '3px 8px', flexShrink: 0, textDecoration: 'none' }}
                           >
                             Open in editor
                           </a>
+                        )}
+                        {!lessonMap.has(lesson.id) && (
+                          <span style={{ fontSize: 11, color: '#6272a4', fontStyle: 'italic', flexShrink: 0 }}>
+                            legacy id — lesson since renamed
+                          </span>
                         )}
                         {sub && (
                           <button
