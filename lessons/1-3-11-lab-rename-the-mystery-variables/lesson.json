@@ -54,7 +54,7 @@
       "description": "Declares gradeReport built from the other two",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+gradeReport\\s*=[^;]*subjectName[^;]*finalGrade",
+      "pattern": "(?:let|const)\\s+gradeReport\\s*=[^;]*(?:subjectName[^;]*finalGrade|finalGrade[^;]*subjectName)",
       "flags": "",
       "points": 0
     },
@@ -84,7 +84,7 @@
       "description": "Declares totalPay as hoursWorked times hourlyRate",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+totalPay\\s*=[^;]*hoursWorked[^;]*hourlyRate",
+      "pattern": "(?:let|const)\\s+totalPay\\s*=[^;]*(?:hoursWorked[^;]*hourlyRate|hourlyRate[^;]*hoursWorked)",
       "flags": "",
       "points": 0
     },
