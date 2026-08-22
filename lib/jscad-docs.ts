@@ -11,10 +11,19 @@
 // jscad.app, and it is what the reference teaches.
 //
 // Scope-out (stated explicitly so a future maintainer doesn't rediscover
-// the boundary): the full @jscad/modeling surface is much larger than this
-// (curves, connectors, modifiers, minkowski, extrudeHelical, ...). Only the
-// functions the course teaches are documented here. If a future lesson needs
-// more, add pages then.
+// the boundary). Every section up to 'projects' is the taught surface. The
+// final section, 'beyond', is the 17 exports the course does NOT teach —
+// modifiers, minkowski, three more measurements, five more colour
+// conversions and the utils helpers — documented as what they are: past the
+// course, needed by no lesson, and there so that a student who goes looking
+// finds something. Together those cover every function the fifteen modules
+// export directly, which is what scripts/test-jscad-docs.mjs measures.
+//
+// What is still undocumented is one level deeper: the sub-namespaces
+// (curves.bezier, geometries.geom3, maths.vec3, extrusions.slice,
+// colors.cssColors). Those are the machinery the modules are built from,
+// they are not counted by the coverage check, and nothing in Q3-Q4 needs
+// them. If a future lesson does, add pages then.
 //
 // extrudeHelical is the deliberate omission worth naming, because
 // docs/reference.md carried a row for it and that row was wrong: it named
@@ -4713,6 +4722,519 @@ function main() {
   return transforms.translate([-depth / 2, -width / 2, 0],
     booleans.subtract(wedge, lip, cable)
   )
+}
+
+module.exports = { main }`,
+      },
+    ],
+  },
+  {
+    slug: 'beyond',
+    title: 'Beyond the course',
+    pages: [
+      {
+        title: 'What this section is',
+        body: `Everything before this page is the part of JSCAD the course teaches. This section is the rest of it.
+
+Seventeen functions sit in @jscad/modeling that no lesson uses and no assignment needs. They are here because they are real, they are in the same library, and until now a student who went looking for them found nothing. That is the whole reason for the section. None of it is required, none of it is on any test, and a good model can be built without ever opening it.
+
+They come in five groups.
+
+1. modifiers — snap, generalize and retessellate, which tidy up the faces a solid is made of.
+2. minkowski — minkowskiSum, which grows one solid by the shape of another.
+3. Three more measurements — measureBoundingSphere, measureAggregateArea and measureAggregateEpsilon.
+4. Five more colour conversions — rgbToHex, rgbToHsl, rgbToHsv, hsvToRgb and hueToColorComponent.
+5. utils — flatten, fnNumberSort, insertSorted, radiusToSegments and areAllShapesTheSameType, which are the library's own plumbing rather than anything aimed at you.
+
+The first four are worth reading if you are curious. The fifth is worth reading mainly so you know what it is when you meet it.
+
+That is the whole of what the fifteen modules export directly. What is still undocumented here sits one level deeper — curves.bezier, geometries.geom3, maths.vec3 and their neighbours, which are the machinery the modules themselves are built out of.`,
+        code: `const { primitives, colors, measurements, utils } = require('@jscad/modeling')
+
+function main() {
+  const radius = 12
+
+  // utils: how many flat sides does a 12 mm curve need to look round?
+  const segments = utils.radiusToSegments(radius, 0.3, 0.3)
+  console.log('segments:', segments)
+
+  const disc = primitives.cylinder({ radius, height: 4, segments })
+
+  // colors: a colour picked by hue instead of by three separate numbers.
+  const paint = colors.hsvToRgb([0.58, 0.7, 0.9])
+  console.log('paint:', paint)
+
+  // measurements: the smallest ball the disc fits inside — centre, then radius.
+  console.log('bounding sphere:', measurements.measureBoundingSphere(disc))
+
+  return colors.colorize(paint, disc)
+}
+
+module.exports = { main }`,
+      },
+      {
+        title: 'Repairing a mesh: three call shapes',
+        body: `A solid is a bag of flat faces. Most of the time you never think about that, because everything in this app hands back a bag that has already been tidied. modifiers is the drawer for when it has not been.
+
+Three functions live there, and they take three different call shapes. That is the part worth writing down, because no two of them are spelled the same way.
+
+snap(shape) — geometries only, no options object. It takes as many as you like: one shape in, one shape out; two in, an array of two out.
+
+generalize(options, shape) — the options object comes first, and it is not optional. generalize(shape) throws. Geometries after it, as many as you like.
+
+retessellate(shape) — exactly one solid. No options object, no array, no second shape.
+
+What the three of them do:
+
+snap rounds every corner onto a fine grid, so corners that were nearly in the same place end up exactly in the same place.
+
+generalize does whatever its options ask for, and nothing at all if they ask for nothing. The next page but one takes the options apart.
+
+retessellate re-cuts the faces so that faces lying flat against one another merge into fewer, larger ones. It short-circuits: a solid the library built already carries a flag saying this has been done, and retessellate hands such a solid straight back untouched.
+
+The example builds a solid the library has never seen — two cubes' faces poured into one bag by hand — so that there is something left to fix. Twelve faces go in and eight come out, with the volume and the overall size unchanged.`,
+        code: `const { primitives, geometries, modifiers } = require('@jscad/modeling')
+
+function main() {
+  const lower = primitives.cuboid({ size: [10, 10, 10] })
+  const upper = primitives.cuboid({ size: [10, 10, 10], center: [0, 0, 10] })
+
+  // Both boxes' faces tipped into one bag: a solid nothing has tidied yet.
+  const raw = geometries.geom3.create([
+    ...geometries.geom3.toPolygons(lower),
+    ...geometries.geom3.toPolygons(upper),
+  ])
+
+  // snap: geometries only, no options object, one or several.
+  const snapped = modifiers.snap(raw)
+
+  // generalize: options FIRST, and the object is not optional.
+  const merged = modifiers.generalize({ simplify: true }, snapped)
+
+  // retessellate: exactly one solid, and nothing else.
+  const tidy = modifiers.retessellate(raw)
+
+  console.log('as built:    ', raw.polygons.length)
+  console.log('generalize:  ', merged.polygons.length)
+  console.log('retessellate:', tidy.polygons.length)
+
+  return tidy
+}
+
+module.exports = { main }`,
+      },
+      {
+        title: 'What the wrong call shape gets you',
+        body: `Call these the wrong way and three of the mistakes stop you with a message. Two do not, and those two are the reason the previous page is worth reading twice.
+
+generalize(shape), with the options object left off, throws wrong number of arguments.
+
+retessellate({}, shape), with an options object added, throws Cannot read properties of undefined (reading '0'). That is the library reading your options object as if it were a solid and finding no faces on it.
+
+retessellate handed a flat 2D shape throws Cannot read properties of undefined (reading 'map'), for the same reason: it only knows about solids.
+
+snap({}, shape) throws nothing. snap takes any number of geometries, so an options object is simply another item in the list, and what comes back is an array of two: your options object, untouched, followed by the snapped solid. Return that array from main() and half of it is not a shape. There is no message and no red bar — just something missing from the viewport.
+
+retessellate(a, b) throws nothing either, and this one is quieter still. It takes exactly one solid, so the second is not merged, not returned, and not complained about — it is simply dropped, and what comes back is a tidied a. Measured: a union measuring 15 by 10 by 10 handed a radius-8 sphere as a second argument comes back 15 by 10 by 10, with the sphere gone. Wrap the pair in an array instead and it does throw — retessellate([a, b]) gives Cannot read properties of undefined (reading '0') — so the array form fails loudly and the comma form fails silently, which is the opposite of what you would guess.
+
+The example runs all four calls and prints what each one actually said.`,
+        code: `const { primitives, modifiers } = require('@jscad/modeling')
+
+function main() {
+  const block = primitives.cuboid({ size: [20, 20, 20] })
+  const flat = primitives.rectangle({ size: [10, 10] })
+
+  try {
+    modifiers.generalize(block)
+  } catch (e) {
+    console.log('generalize(block)      ->', e.message)
+  }
+
+  try {
+    modifiers.retessellate({}, block)
+  } catch (e) {
+    console.log('retessellate({}, block) ->', e.message)
+  }
+
+  try {
+    modifiers.retessellate(flat)
+  } catch (e) {
+    console.log('retessellate(flat)      ->', e.message)
+  }
+
+  // snap does not complain. It hands the options object straight back.
+  const wrong = modifiers.snap({}, block)
+  console.log('snap({}, block) gave back', wrong.length, 'things')
+  console.log('the first one is a shape?', Array.isArray(wrong[0].polygons))
+
+  return modifiers.snap(block)
+}
+
+module.exports = { main }`,
+      },
+      {
+        title: 'generalize and its three switches',
+        body: `generalize reads three switches out of its options object, and all three start off.
+
+snap — round every corner onto a grid, which is the same thing snap does on its own.
+simplify — merge faces that lie flat against one another.
+triangulate — cut every face into triangles.
+
+Because they all start off, generalize({}, shape) does nothing: it copies the solid and hands it back the same size it was. Ask for something and the face count moves. On the hand-built pair of stacked cubes from two pages ago, twelve faces become twelve with snap alone, eight with simplify, and twenty-four with triangulate.
+
+simplify and retessellate land on the same eight faces here, because on a solid this simple they have the same work in front of them. They are still not the same function, and retessellate is the one the library reaches for itself: anything that comes out of union, subtract or intersect already carries the flag saying it has been retessellated.
+
+triangulate is the switch with a use outside this drawer. An STL file stores nothing but triangles, so saving one triangulates the model anyway; doing it yourself first lets you count the triangles before you save.
+
+A flat shape is left alone entirely. Hand generalize a 2D shape or a path with all three switches on and you get back the very same object, not a copy — the library has no generalizing to do on something flat and does not pretend otherwise.`,
+        code: `const { primitives, geometries, modifiers } = require('@jscad/modeling')
+
+function main() {
+  const lower = primitives.cuboid({ size: [10, 10, 10] })
+  const upper = primitives.cuboid({ size: [10, 10, 10], center: [0, 0, 10] })
+  const raw = geometries.geom3.create([
+    ...geometries.geom3.toPolygons(lower),
+    ...geometries.geom3.toPolygons(upper),
+  ])
+
+  console.log('as built:   ', raw.polygons.length)
+  console.log('no switches:', modifiers.generalize({}, raw).polygons.length)
+  console.log('snap:       ', modifiers.generalize({ snap: true }, raw).polygons.length)
+  console.log('simplify:   ', modifiers.generalize({ simplify: true }, raw).polygons.length)
+  console.log('triangulate:', modifiers.generalize({ triangulate: true }, raw).polygons.length)
+
+  // A flat shape comes back exactly as it went in, whatever you ask for.
+  const flat = primitives.rectangle({ size: [10, 10] })
+  const asked = modifiers.generalize({ snap: true, simplify: true, triangulate: true }, flat)
+  console.log('the same 2D shape back?', asked === flat)
+
+  return modifiers.generalize({ simplify: true, triangulate: true }, raw)
+}
+
+module.exports = { main }`,
+      },
+      {
+        title: 'minkowskiSum: growing a solid',
+        body: `minkowskiSum(a, b) sweeps one solid over every point of the other and keeps everything the sweep touched. The short version: it grows a by the shape of b.
+
+Exactly two solids, and both have to be solids. A flat shape throws minkowskiSum requires geom3 geometries, and a third argument throws minkowskiSum requires exactly two geometries.
+
+The use worth knowing is clearance. A 10 mm peg will not go into a 10 mm hole — a printer lays plastic a little wide, and the part comes out a little large — so the hole has to be bigger than the peg in every direction, including around whatever shape the peg happens to be. Sweeping a small ball over the peg is exactly that: minkowskiSum(peg, sphere({ radius: 0.4 })) is the peg grown by 0.4 mm everywhere, so a 10 x 10 x 20 peg becomes a 10.8 x 10.8 x 20.8 hole. Cut that out of the block instead of the peg itself and the two parts fit.
+
+The cost is faces, and it is not a product. The 96-face peg below comes out at 202 faces swept with an 8-segment ball (32 faces of its own) and 546 swept with a 32-segment one (512 faces), for exactly the same finished size — sixteen times the ball for under three times the result. Double the peg instead, to a 64-segment 192-face cylinder, sweep it with that same 8-segment ball, and the answer is 362. Both shapes cost, roughly in step with the two face counts added rather than multiplied, and per face added it is the peg's own faces that cost more: the ball's extra 480 faces bought 344, the peg's extra 96 bought 160. Keeping the growing shape coarse is still right, though — nobody can see it, because the shape you see is the peg's.`,
+        code: `const { primitives, transforms, booleans, minkowski, measurements } = require('@jscad/modeling')
+
+function main() {
+  const peg = primitives.cylinder({ radius: 5, height: 20, segments: 32 })
+
+  // Grow a copy of the peg by 0.4 mm all round, then cut THAT out of the block.
+  const clearance = minkowski.minkowskiSum(peg, primitives.sphere({ radius: 0.4, segments: 8 }))
+  console.log('peg: ', measurements.measureDimensions(peg))
+  console.log('hole:', measurements.measureDimensions(clearance))
+
+  // What the faces actually do. Count them yourself rather than taking my word.
+  const finerBall = minkowski.minkowskiSum(peg, primitives.sphere({ radius: 0.4, segments: 32 }))
+  const finerPeg = minkowski.minkowskiSum(
+    primitives.cylinder({ radius: 5, height: 20, segments: 64 }),
+    primitives.sphere({ radius: 0.4, segments: 8 })
+  )
+  console.log('peg faces:      ', peg.polygons.length)
+  console.log('with a coarse ball:', clearance.polygons.length)
+  console.log('with a fine ball:  ', finerBall.polygons.length)
+  console.log('finer peg, coarse ball:', finerPeg.polygons.length)
+
+  const socket = booleans.subtract(primitives.cuboid({ size: [30, 30, 20] }), clearance)
+
+  return [transforms.translate([-25, 0, 0], peg), socket]
+}
+
+module.exports = { main }`,
+      },
+      {
+        title: 'measureBoundingSphere',
+        body: `measureBoundingSphere(shape) hands back two things in one array: a centre point, and a radius. Together they describe a ball the shape fits inside.
+
+Read it by index, the way a bounding box is read. answer[0] is the centre and answer[1] is the radius. A 10 mm cube measures [[0, 0, 0], 8.660254037844387] — half the length of the cube's diagonal, because the eight corners are the only part of a cube that touches the ball around it.
+
+It is a looser fit than measureBoundingBox: a ball around a long thin part is mostly empty air. What it buys you is a single number for how far a shape reaches from one point, which is the question a spinning part asks (does it clear the case?) and the question a camera asks (how far back do I have to stand?).
+
+Hand it an array of shapes and you get an array of answers back, one per shape — not one ball around the group. There is no aggregate version of this one.
+
+The example measures a blob built by hull(), whose size appears nowhere in the code, and puts the ball it found beside it.`,
+        code: `const { primitives, transforms, hulls, measurements } = require('@jscad/modeling')
+
+function main() {
+  const blob = hulls.hull(
+    primitives.sphere({ radius: 10, segments: 24 }),
+    transforms.translate([30, 0, 0], primitives.sphere({ radius: 4, segments: 24 }))
+  )
+
+  const answer = measurements.measureBoundingSphere(blob)
+  const centre = answer[0]
+  const radius = answer[1]
+  console.log('centre:', centre)
+  console.log('radius:', radius)
+
+  const ball = primitives.sphere({ radius, segments: 16, center: centre })
+  return [blob, transforms.translate([0, 70, 0], ball)]
+}
+
+module.exports = { main }`,
+      },
+      {
+        title: 'The other two aggregates',
+        body: `The Measurements section covered measureAggregateBoundingBox and measureAggregateVolume. Two more exist.
+
+measureAggregateArea(a, b, ...) is the area of several shapes at once, and it adds rather than fuses: two overlapping shapes count their overlap twice, exactly the way measureAggregateVolume does. It works on both kinds of shape — for a flat shape it is the area enclosed, for a solid it is the surface area. A 4 x 4 rectangle measures 16 and a 32-segment circle of radius 3 measures 28.09300637032248, and the two together measure 44.093006370322485, which is the one added to the other.
+
+measureAggregateEpsilon(a, b, ...) is the same idea for the comparison margin. measureEpsilon sizes a margin for one shape; the aggregate version sizes one margin from everything together, so the biggest shape in the group decides it. A 10 mm cube on its own gets 0.0001 and a 200 mm cube gets 0.002, and the two of them together get 0.002.
+
+That is what it is for: when you are comparing measured numbers across a whole assembly, one margin for the lot is more honest than a different margin per part.`,
+        code: `const { primitives, transforms, measurements } = require('@jscad/modeling')
+
+function main() {
+  const plate = primitives.rectangle({ size: [4, 4] })
+  const disc = primitives.circle({ radius: 3, segments: 32 })
+
+  console.log('one at a time:', measurements.measureArea(plate), measurements.measureArea(disc))
+  console.log('added up:     ', measurements.measureAggregateArea(plate, disc))
+  console.log('epsilon each: ', measurements.measureEpsilon(plate), measurements.measureEpsilon(disc))
+  console.log('epsilon group:', measurements.measureAggregateEpsilon(plate, disc))
+
+  return [transforms.translate([-5, 0, 0], plate), transforms.translate([5, 0, 0], disc)]
+}
+
+module.exports = { main }`,
+      },
+      {
+        title: 'Colour, the other way round',
+        body: `colorNameToRgb, hexToRgb and hslToRgb all turn something into the [r, g, b] array colorize wants. Three more go the other way: they take that array and tell you what is in it.
+
+rgbToHex([r, g, b]) gives a string such as #ff6347. Add a fourth number and the alpha is appended to the end of the string, so [1, 0, 0, 1] gives #ff0000ff — eight digits, not six. Read the next page before you trust it on a colour you calculated.
+
+rgbToHsl([r, g, b]) gives [hue, saturation, lightness].
+
+rgbToHsv([r, g, b]) gives [hue, saturation, value].
+
+Hue is a fraction of a turn in both — 0 to 1, not 0 to 360 — and a fourth number you passed in comes back on the end untouched.
+
+Going out to hsl and back is how you shift a colour rather than pick a new one. Add half a turn to the hue and leave saturation and lightness alone, and you have the colour opposite it on the wheel: a second colour that goes with the first without anybody guessing at numbers. Tomato is [1, 0.388, 0.278]; the opposite comes back as [0.278, 0.890, 1], which is the same colour read backwards.`,
+        code: `const { primitives, colors } = require('@jscad/modeling')
+
+function main() {
+  const base = colors.colorNameToRgb('tomato')
+  console.log('as rgb:', base)
+  console.log('as hex:', colors.rgbToHex(base))
+  console.log('as hsl:', colors.rgbToHsl(base))
+  console.log('as hsv:', colors.rgbToHsv(base))
+
+  // Same saturation, same lightness, half a turn round the wheel.
+  const hsl = colors.rgbToHsl(base)
+  const opposite = colors.hslToRgb([(hsl[0] + 0.5) % 1, hsl[1], hsl[2]])
+  console.log('the opposite:', opposite)
+
+  return [
+    colors.colorize(base, primitives.cube({ size: 10, center: [-8, 0, 5] })),
+    colors.colorize(opposite, primitives.cube({ size: 10, center: [8, 0, 5] })),
+  ]
+}
+
+module.exports = { main }`,
+      },
+      {
+        title: 'rgbToHex is exact for some colours only',
+        body: `rgbToHex is right for some colours and quietly wrong for others, and it is worth knowing which is which before you print one.
+
+Inside, it multiplies each of your three numbers by 255 and adds the three results into one big number — red times 65536, green times 256, blue as it is — then reads that number back as hex. That works perfectly as long as all three multiplications land on whole numbers. It falls apart when one of them does not, because the fraction left over from the green runs into the digits that belong to the red.
+
+Middle grey is the shortest demonstration. [0.5, 0.5, 0.5] should be #808080. rgbToHex hands back #7fffff, which is a bright cyan. No error, no warning, nothing in the console.
+
+Colours you did not calculate are safe: colorNameToRgb and hexToRgb both hand back numbers that are already whole 255ths, so anything from those converts exactly — which is why the tomato on the previous page came out right. A colour that came out of hslToRgb, hsvToRgb, or arithmetic of your own, usually will not.
+
+The fix is one line. Round each number onto the 255 grid first, and the result is exact:
+
+  const stepped = paint.map(function (c) { return Math.round(c * 255) / 255 })
+
+The fourth number has the same fault and shows it more plainly: rgbToHex([1, 0, 0, 0.5]) hands back #ff00007f.8, with a decimal point in the middle of a colour code.`,
+        code: `const { primitives, colors } = require('@jscad/modeling')
+
+function main() {
+  const grey = [0.5, 0.5, 0.5]
+
+  // Middle grey, twice. One of these two hex codes is a bright cyan.
+  console.log('straight in:  ', colors.rgbToHex(grey))
+  const stepped = grey.map(function (c) { return Math.round(c * 255) / 255 })
+  console.log('rounded first:', colors.rgbToHex(stepped))
+
+  // A colour that came from colorNameToRgb or hexToRgb is already on the grid.
+  console.log('a named colour:', colors.rgbToHex(colors.colorNameToRgb('tomato')))
+
+  // The fourth number has the same problem, and can grow a decimal point.
+  console.log('half see-through:', colors.rgbToHex([1, 0, 0, 0.5]))
+
+  return [
+    colors.colorize(colors.hexToRgb(colors.rgbToHex(grey)),
+      primitives.cube({ size: 14, center: [-10, 0, 7] })),
+    colors.colorize(colors.hexToRgb(colors.rgbToHex(stepped)),
+      primitives.cube({ size: 14, center: [10, 0, 7] })),
+  ]
+}
+
+module.exports = { main }`,
+      },
+      {
+        title: 'hsvToRgb: a set of shades from one hue',
+        body: `hsvToRgb goes from [hue, saturation, value] to the [r, g, b] array colorize wants. It is the partner of hslToRgb, and the difference between the two is entirely in the third number.
+
+Lightness, in hsl, runs from black at 0, through the colour at 0.5, to white at 1. Value, in hsv, runs from black at 0 up to the colour at 1 and stops — there is no white end. So turning value down gives you the same colour, darker, which is exactly what a set of shades that belong together needs. Turning lightness down does the same thing, but turning it up washes the colour out instead of brightening it.
+
+Either call shape works: hsvToRgb([0, 1, 1]) and hsvToRgb(0, 1, 1) both give [1, 0, 0]. A fourth number is carried through as alpha.
+
+One hue and four values is a palette. The four bars below are the same blue at a quarter, a half, three quarters and full value.`,
+        code: `const { primitives, colors } = require('@jscad/modeling')
+
+function main() {
+  const hue = 0.58
+
+  return [0.25, 0.5, 0.75, 1].map(function (value, i) {
+    const paint = colors.hsvToRgb([hue, 0.7, value])
+    console.log('value', value, 'gives', paint)
+    return colors.colorize(paint, primitives.cuboid({
+      size: [8, 8, 24], center: [i * 10 - 15, 0, 12],
+    }))
+  })
+}
+
+module.exports = { main }`,
+      },
+      {
+        title: 'hueToColorComponent, which is not for you',
+        body: `hueToColorComponent is not really a function anybody meant to offer you. It is one step of the arithmetic inside hslToRgb, exported along with everything else in the module because that is how the module is put together.
+
+It takes three numbers and returns one colour component. hslToRgb works the first two out from your saturation and lightness, then calls this three times: once at hue + 1/3 for the red, once at hue for the green, once at hue - 1/3 for the blue.
+
+The example rebuilds hslToRgb by hand out of it and prints both answers so you can see they match. That is the only thing it is good for — understanding what hslToRgb is doing. If what you want is a colour, call hslToRgb.
+
+It is in this section for the same reason as the rest: it is exported, so somebody was going to find it, and finding it with no explanation is worse than finding it with one.`,
+        code: `const { primitives, colors } = require('@jscad/modeling')
+
+function main() {
+  const h = 0.6
+  const s = 0.8
+  const l = 0.5
+
+  // This is hslToRgb, written out by hand.
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s
+  const p = 2 * l - q
+  const byHand = [
+    colors.hueToColorComponent(p, q, h + 1 / 3),
+    colors.hueToColorComponent(p, q, h),
+    colors.hueToColorComponent(p, q, h - 1 / 3),
+  ]
+
+  console.log('by hand: ', byHand)
+  console.log('hslToRgb:', colors.hslToRgb([h, s, l]))
+
+  return colors.colorize(byHand, primitives.roundedCuboid({ size: [24, 24, 24], roundRadius: 3 }))
+}
+
+module.exports = { main }`,
+      },
+      {
+        title: 'The helper drawer',
+        body: `The utils module holds seven functions. The Transforms section already covered two of them, degToRad and radToDeg, because the course uses those. The other five are the library's own plumbing: JSCAD needed a way to flatten a list and a way to sort numbers, wrote them, and exported them along with everything else. They are not aimed at you, and none of them does anything the JavaScript you already know cannot do.
+
+Three of them still read clearly enough to be worth a look.
+
+flatten(list) turns a list of lists into one flat list, however deeply it is nested. A loop inside a loop leaves exactly that shape and JSCAD wants one flat array of shapes, so this is the one you might genuinely reach for. Plain JavaScript spells it list.flat(Infinity).
+
+fnNumberSort(a, b) is a comparison function, not a sort. It returns a minus b, and its use is as the argument to sort. This matters because plain sort() compares numbers as if they were text: [12, 3, 30, 7].sort() gives 12, 3, 30, 7, and [12, 3, 30, 7].sort(fnNumberSort) gives 3, 7, 12, 30.
+
+areAllShapesTheSameType(list) is true when every shape in the list is the same kind — all solids, or all flat shapes, or all paths — and false when they are mixed. It answers the same question the booleans ask before refusing a mixed list with only unions of the same type are supported. An empty list is true.
+
+The remaining two get a page each, because both of them behave in a way that is worth being warned about.`,
+        code: `const { primitives, booleans, utils } = require('@jscad/modeling')
+
+function main() {
+  // A list of lists, the shape a loop inside a loop leaves behind.
+  const nested = [0, 1, 2].map(function (row) {
+    return [0, 1, 2].map(function (col) {
+      return primitives.cube({ size: 6, center: [col * 10 - 10, row * 10 - 10, 3] })
+    })
+  })
+
+  const flat = utils.flatten(nested)
+  console.log('rows:', nested.length, ' shapes:', flat.length)
+  console.log('all one kind?', utils.areAllShapesTheSameType(flat))
+  console.log('mixed?', utils.areAllShapesTheSameType([flat[0], primitives.circle({ radius: 2 })]))
+
+  const heights = [12, 3, 30, 7]
+  console.log('sorted the default way:', heights.slice().sort())
+  console.log('sorted as numbers:     ', heights.slice().sort(utils.fnNumberSort))
+
+  return booleans.union(flat)
+}
+
+module.exports = { main }`,
+      },
+      {
+        title: 'insertSorted returns nothing',
+        body: `insertSorted(list, item, compare) drops one item into an already-sorted list, in the right place. It finds the place by repeatedly halving the list rather than walking down it, then splices the item in.
+
+The surprise is what it hands back: nothing. It returns undefined every time, and the list you passed in is what changed. So
+
+  const sorted = insertSorted(heights, 8, fnNumberSort)
+
+leaves sorted holding undefined while heights quietly became the answer you were after. That catches people, because nearly everything else in JSCAD hands back a new thing and leaves what you gave it alone — translate, colorize, subtract, all of them.
+
+The compare argument is not optional. Leave it off and it throws, because it has nothing to compare the item with.
+
+Plain JavaScript does the same job in two steps that are harder to misread: list.push(item) and then list.sort(fnNumberSort).`,
+        code: `const { primitives, utils } = require('@jscad/modeling')
+
+function main() {
+  const heights = [4, 12, 24]
+
+  // insertSorted hands back nothing at all. The array is what changed.
+  const answer = utils.insertSorted(heights, 8, utils.fnNumberSort)
+  console.log('what it returned:', answer)
+  console.log('what the array is now:', heights)
+
+  return heights.map(function (h, i) {
+    return primitives.cuboid({ size: [6, 6, h], center: [i * 10 - 15, 0, h / 2] })
+  })
+}
+
+module.exports = { main }`,
+      },
+      {
+        title: 'radiusToSegments',
+        body: `Every curve in JSCAD is really a run of short straight sides, and segments is how many. Too few and a cylinder looks like a nut; too many and the file grows for no visible gain. radiusToSegments works the number out from what you actually care about instead.
+
+radiusToSegments(radius, maxSideLength, maxAngle) returns whichever of these three is largest:
+
+1. the number of sides needed for no side to be longer than maxSideLength,
+2. the number needed for no side to span more than maxAngle radians,
+3. and 4.
+
+So the two limits are demands rather than suggestions, and the stricter one wins. At a radius of 20, radiusToSegments(20, 0.3, 0.3) is 419 and radiusToSegments(20, 4, 0.6) is 32. Leave both limits off and you get 4 — not an error, just the floor, and a four-sided cylinder is a square post.
+
+It earns its place when a design's size comes from a parameter. Hard-coding segments: 32 is right for the size you tested it at and wrong everywhere else: on a 3 mm knob it is wasted detail, and on a 200 mm ring it is visibly faceted. Asking for a maximum side length of 0.3 mm is right at every size, because the number of sides then follows the radius on its own.`,
+        code: `const { primitives, transforms, utils } = require('@jscad/modeling')
+
+function main() {
+  const radius = 20
+
+  // No side longer than 0.3 mm, and no side wider than 0.3 radians.
+  const fine = utils.radiusToSegments(radius, 0.3, 0.3)
+  const coarse = utils.radiusToSegments(radius, 4, 0.6)
+  console.log('fine:', fine, ' coarse:', coarse)
+  console.log('asked for nothing:', utils.radiusToSegments(radius))
+
+  return [
+    transforms.translate([-25, 0, 0], primitives.cylinder({ radius, height: 6, segments: coarse })),
+    transforms.translate([25, 0, 0], primitives.cylinder({ radius, height: 6, segments: fine })),
+  ]
 }
 
 module.exports = { main }`,

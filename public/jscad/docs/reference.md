@@ -4,8 +4,11 @@ Hand-authored reference for the `@jscad/modeling` surface the course teaches
 (Q3–Q4). Every example below runs in the in-app docs sandbox (`/docs/jscad`)
 and was verified against `@jscad/modeling@2.13.0`.
 
-The full library surface is much larger — see https://openjscad.xyz/docs/ for
-everything else.
+The seventeen exports the course does **not** teach are at the bottom, under
+[Beyond the course](#beyond-the-course) — between the two, every function the
+fifteen modules export directly is covered here. For the sub-namespaces below
+that (`curves.bezier`, `geometries.geom3`, `maths.vec3`, …) see
+https://openjscad.xyz/docs/.
 
 ## Program skeleton
 
@@ -754,3 +757,204 @@ that is wrong. Change one thing, then run again.
 `console.log` works normally and its output lands in the console pane. Print
 the numbers you calculated, especially inside a loop. Printing a shape itself
 gives you a wall of polygon data; print `measureDimensions(shape)` instead.
+
+## Beyond the course
+
+Seventeen exports the course does not teach and no assignment needs. They are
+documented because they are real and exported, not because they are worth a
+lesson. The in-app docs (`/docs/jscad`, Beyond the course) work each one
+through with a runnable example.
+
+Between this section and the ones above, every function the fifteen modules
+export directly is documented. What is left is one level deeper —
+`curves.bezier`, `geometries.geom3`, `maths.vec3`, `extrusions.slice`,
+`colors.cssColors` — the machinery the modules are built from.
+
+### modifiers — repairing a mesh
+
+Three functions, **three different call shapes**. This is the part that costs
+an afternoon if you guess:
+
+| Call | Shape | Wrong call |
+|---|---|---|
+| `snap(...shapes)` | geometries only, **no options object**, variadic | `snap({}, shape)` does **not** throw — it returns `[yourOptionsObject, snappedShape]` |
+| `generalize(options, ...shapes)` | options **first**, and required | `generalize(shape)` throws `wrong number of arguments` |
+| `retessellate(shape)` | exactly **one** geom3, no options, no array | `retessellate({}, shape)` throws `Cannot read properties of undefined (reading '0')`; a 2D shape throws the same with `'map'`; `retessellate(a, b)` throws **nothing** and silently discards `b`, while `retessellate([a, b])` throws — the comma form fails quietly, the array form loudly |
+
+- `snap` rounds every vertex onto a fine grid, so vertices that were nearly
+  coincident become exactly coincident.
+- `generalize` reads `{ snap, simplify, triangulate }`, **all default `false`**
+  — so `generalize({}, shape)` is a no-op copy. A 2D shape or a path is
+  returned as the *same object*, whatever the switches say.
+- `retessellate` re-cuts faces so coplanar ones merge. It short-circuits on a
+  solid that already carries `isRetesselated`, which every result of `union` /
+  `subtract` / `intersect` does.
+
+Measured on a geom3 hand-assembled from two stacked 10 mm cubes (12 faces,
+never tidied): `retessellate` → 8, `generalize({ simplify: true })` → 8,
+`generalize({ triangulate: true })` → 24, `generalize({ snap: true })` → 12.
+Volume and dimensions unchanged.
+
+```js
+const { primitives, geometries, modifiers } = require('@jscad/modeling')
+
+function main() {
+  const raw = geometries.geom3.create([
+    ...geometries.geom3.toPolygons(primitives.cuboid({ size: [10, 10, 10] })),
+    ...geometries.geom3.toPolygons(primitives.cuboid({ size: [10, 10, 10], center: [0, 0, 10] })),
+  ])
+  console.log('as built:', raw.polygons.length, '-> tidy:', modifiers.retessellate(raw).polygons.length)
+  return modifiers.retessellate(modifiers.snap(raw))
+}
+
+module.exports = { main }
+```
+
+### minkowski — growing a solid
+
+`minkowskiSum(a, b)` sweeps `a` over every point of `b`. **Exactly two, and
+both geom3**: a 2D shape throws `minkowskiSum requires geom3 geometries`, a
+third argument throws `minkowskiSum requires exactly two geometries`.
+
+The print-clearance use is the one worth knowing. A 10 mm peg does not fit a
+10 mm hole, so grow the peg and subtract *that*:
+
+- `cylinder({ radius: 5, height: 20 })` measures `[10, 10, 20]`.
+- Swept with `sphere({ radius: 0.4 })` it measures `[10.8, 10.8, 20.8]` — 0.4 mm
+  of clearance in every direction, around whatever shape the peg happens to be.
+
+Faces add, they do not multiply. That 96-face peg comes out at 202 faces
+swept with an 8-segment (32-face) ball and 546 with a 32-segment (512-face)
+one, for the same finished size; a 64-segment 192-face peg swept with the same
+8-segment ball comes out at 362. Both operands cost. Keep the sweeping shape
+coarse anyway — nobody sees it, the visible shape is the swept one's.
+
+`booleans.minkowski` is the same function under a second name; bare
+`minkowski` in the shim is the module, so bare `minkowskiSum` is the function.
+
+```js
+const { primitives, booleans, minkowski } = require('@jscad/modeling')
+
+function main() {
+  const peg = primitives.cylinder({ radius: 5, height: 20, segments: 32 })
+  const clearance = minkowski.minkowskiSum(peg, primitives.sphere({ radius: 0.4, segments: 8 }))
+  return booleans.subtract(primitives.cuboid({ size: [30, 30, 20] }), clearance)
+}
+
+module.exports = { main }
+```
+
+### measurements — the three that are left
+
+| Function | Returns |
+|---|---|
+| `measureBoundingSphere` | `[[cx, cy, cz], radius]` — centre point, then radius |
+| `measureAggregateArea` | one total area across many shapes, **added, not fused** |
+| `measureAggregateEpsilon` | one comparison margin sized from the whole group |
+
+`measureBoundingSphere` on a 10 mm cube is `[[0, 0, 0], 8.660254037844387]` —
+half the diagonal. Handed an **array** it returns one answer per shape; there
+is no aggregate version.
+
+`measureAggregateArea` is surface area for a solid and enclosed area for a
+flat shape: a 4x4 rectangle (16) plus a 32-segment circle of radius 3
+(28.09300637032248) aggregates to 44.093006370322485, the plain sum.
+
+`measureAggregateEpsilon` is sized from everything together, so the largest
+shape sets it: a 10 mm cube alone gets 0.0001, a 200 mm cube gets 0.002, and
+the two together get 0.002.
+
+### colors — reading a colour back out
+
+| Function | Arguments | Notes |
+|---|---|---|
+| `rgbToHex` | `([r, g, b])` or `([r, g, b, a])` | hex string; a 4th component appends alpha, so 8 digits not 6 |
+| `rgbToHsl` | `([r, g, b])` | `[hue, saturation, lightness]`, hue a fraction of a turn |
+| `rgbToHsv` | `([r, g, b])` | `[hue, saturation, value]` |
+| `hsvToRgb` | `([h, s, v])` or `(h, s, v)` | the `[r, g, b]` array `colorize` wants |
+| `hueToColorComponent` | `(p, q, t)` | internal step of `hslToRgb`; not aimed at callers |
+
+**`rgbToHex` is exact only on whole 255ths.** It sums `65536 * 255r + 256 * 255g
++ 255b` and reads the total back as hex, so a fractional component bleeds into
+the digits above it. `rgbToHex([0.5, 0.5, 0.5])` returns `#7fffff` — a bright
+cyan where `#808080` was meant, with no error. `colorNameToRgb` and `hexToRgb`
+hand back exact 255ths and convert correctly; anything out of `hslToRgb`,
+`hsvToRgb` or your own arithmetic generally does not. Round first:
+`c.map((n) => Math.round(n * 255) / 255)`. The alpha slot shows the same fault
+more plainly — `rgbToHex([1, 0, 0, 0.5])` returns `#ff00007f.8`.
+
+`hsvToRgb` differs from `hslToRgb` in the third number only: lightness runs
+black → colour → white, value runs black → colour and stops, so dropping the
+value gives a set of shades that belong together. A 4th component is carried
+through as alpha by all of these.
+
+`hueToColorComponent(p, q, t)` is one step inside `hslToRgb`, which calls it at
+`hue + 1/3`, `hue` and `hue - 1/3` for red, green and blue. If you want a
+colour, call `hslToRgb`.
+
+```js
+const { primitives, colors } = require('@jscad/modeling')
+
+function main() {
+  const base = colors.colorNameToRgb('tomato')
+  const hsl = colors.rgbToHsl(base)
+  console.log(colors.rgbToHex(base), hsl, colors.rgbToHsv(base))
+
+  // Half a turn round the wheel: a second colour that goes with the first.
+  const opposite = colors.hslToRgb([(hsl[0] + 0.5) % 1, hsl[1], hsl[2]])
+  return [
+    colors.colorize(base, primitives.cube({ size: 10, center: [-8, 0, 5] })),
+    colors.colorize(opposite, primitives.cube({ size: 10, center: [8, 0, 5] })),
+    colors.colorize(colors.hsvToRgb([0.58, 0.7, 0.9]),
+      primitives.cube({ size: 10, center: [0, 16, 5] })),
+  ]
+}
+
+module.exports = { main }
+```
+
+### utils — the library's own plumbing
+
+Exported, but not aimed at you. `degToRad` / `radToDeg` are covered under
+transforms; these five are the rest.
+
+| Function | Notes |
+|---|---|
+| `flatten` | list of lists → one flat list, any depth. `list.flat(Infinity)` does the same |
+| `fnNumberSort` | a **comparator**, not a sort: returns `a - b`. `[12, 3, 30, 7].sort()` gives `12, 3, 30, 7` (text order); `.sort(fnNumberSort)` gives `3, 7, 12, 30` |
+| `insertSorted` | binary-search insert. **Returns `undefined` and mutates the array** |
+| `radiusToSegments` | `(radius, maxSideLength, maxAngle)` → segment count |
+| `areAllShapesTheSameType` | `true` when every shape in the list is the same kind; `true` for `[]` |
+
+`insertSorted(list, item, compare)` is the one genuine trap:
+`const sorted = insertSorted([4, 12, 24], 8, fnNumberSort)` leaves `sorted`
+holding `undefined` while the original array becomes `[4, 8, 12, 24]`. The
+comparator is not optional — leave it off and it throws.
+
+`radiusToSegments` returns the largest of three things: the count needed for no
+side longer than `maxSideLength`, the count needed for no side wider than
+`maxAngle` radians, and 4. So `radiusToSegments(20, 0.3, 0.3)` is 419,
+`radiusToSegments(20, 4, 0.6)` is 32, and `radiusToSegments(20)` is 4 — the
+floor, not an error. Worth it when a size comes from a parameter: a hard-coded
+`segments: 32` is right at one size only.
+
+```js
+const { primitives, booleans, utils } = require('@jscad/modeling')
+
+function main() {
+  const nested = [0, 1, 2].map((row) =>
+    [0, 1, 2].map((col) => primitives.cube({ size: 6, center: [col * 10 - 10, row * 10 - 10, 3] })))
+  const flat = utils.flatten(nested)
+  console.log(flat.length, utils.areAllShapesTheSameType(flat))
+
+  const radius = 20
+  const segments = utils.radiusToSegments(radius, 0.3, 0.3)
+  const heights = [4, 24]
+  utils.insertSorted(heights, 12, utils.fnNumberSort)   // returns undefined
+  console.log('segments:', segments, ' heights:', heights)
+
+  return [booleans.union(flat), primitives.cylinder({ radius, height: 4, segments, center: [0, 40, 2] })]
+}
+
+module.exports = { main }
+```
