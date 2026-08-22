@@ -51,11 +51,21 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const contentType = (ALLOWED_TYPES as readonly string[]).includes(stored) ? stored : null;
   if (!contentType) return new Response('Not found', { status: 404 });
 
-  // Immutable: the id is content-addressed by construction (a new upload gets
-  // a new id), so a URL's bytes never change and can be cached forever.
+  // `no-cache` means "reuse the bytes, but check with me first" — not "don't
+  // cache". With the ETag below, a repeat load is a 304 with no body, so the
+  // bandwidth saving is kept.
+  //
+  // This started as `max-age=31536000, immutable`, which is what you want for
+  // a content-addressed URL: a given id's bytes never change. Measured in a
+  // real browser, that was wrong in the one case that matters — after the
+  // owner deleted an image, their browser kept serving it from cache. The R2
+  // object was genuinely gone (a cache-busted request 404s), but `immutable`
+  // tells the browser not to revalidate for a YEAR, so the student who
+  // deleted it would keep seeing it. `immutable` promises the response will
+  // not change; deletion changes it to a 404, so the promise was false.
   const headers = new Headers({
     'Content-Type': contentType,
-    'Cache-Control': 'public, max-age=31536000, immutable',
+    'Cache-Control': 'public, no-cache',
     'X-Content-Type-Options': 'nosniff',
     // Belt and braces: even if a browser somehow treated this as a document,
     // this CSP leaves it nothing to execute.

@@ -132,6 +132,15 @@ console.log('\n=== serve route keeps its two load-bearing headers ===');
   const { readFileSync } = await import('node:fs');
   const src = readFileSync('functions/uploads/[name].ts', 'utf8');
   ok('sets X-Content-Type-Options: nosniff', /X-Content-Type-Options'?\s*:\s*'nosniff'/.test(src));
+  // Measured in a real browser: with `immutable`, a deleted image kept being
+  // served from the owner's own cache for as long as the max-age said. The
+  // object was really gone from R2; the browser just never asked again.
+  // Match the HEADER VALUE, not the word. A first version matched /immutable/
+  // anywhere and failed on the comment that explains why it is not used.
+  const cacheControl = (src.match(/'Cache-Control':\s*'([^']*)'/) || [])[1] || '';
+  ok('does not promise the response is immutable', !/immutable/.test(cacheControl),
+    `Cache-Control is '${cacheControl}'; a URL that 404s after a delete is not immutable`);
+  ok('still sends an ETag so revalidation is a cheap 304', /ETag:\s*object\.httpEtag/.test(src));
   ok('pins Content-Type from stored metadata', /object\.httpMetadata\?\.contentType/.test(src));
   ok('re-checks the stored type against the allowlist', /ALLOWED_TYPES[\s\S]{0,80}includes\(stored\)/.test(src));
   ok('does not read a type from the request', !/request\.headers\.get\(['"]Content-Type/.test(src));

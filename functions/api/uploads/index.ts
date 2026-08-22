@@ -155,7 +155,9 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   // is invisible and costs a few KB. The other order would give a row that
   // 404s — a broken image in a student's sketch with no way to fix it.
   await env.UPLOADS.put(id, body, {
-    httpMetadata: { contentType, cacheControl: 'public, max-age=31536000, immutable' },
+    // See the serve route for why this is not `immutable`: a deleted image
+    // must stop appearing, and immutable tells the browser not to ask.
+    httpMetadata: { contentType, cacheControl: 'public, no-cache' },
     customMetadata: { owner: data.email },
   });
 
