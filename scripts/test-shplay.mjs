@@ -198,10 +198,15 @@ function firstUserFrame(err) {
 // It still runs and still reports — it just never fails the gate. Keeping the
 // measurement while dropping the verdict is the point: deleting it would hide
 // the delta, and gating on it would force a change that breaks the course.
-function runSemantic(check) {
+// `await` on a non-promise is a no-op, so sync checks are unaffected. Without
+// it an async check "failed" with the reason "[object Promise]" and its body
+// never ran — a check that cannot pass is nearly as bad as one that cannot
+// fail. Async is needed by anything that has to let fetch/decode microtasks
+// settle, e.g. the Web Audio graph.
+async function runSemantic(check) {
   const base = { name: check.name, area: check.area, informational: !!check.informational };
   try {
-    const res = check.run({ runSketch, createSandbox });
+    const res = await check.run({ runSketch, createSandbox });
     if (res === true || res === undefined) return { ...base, pass: true };
     return { ...base, pass: false, reason: String(res) };
   } catch (e) {
@@ -213,7 +218,7 @@ function runSemantic(check) {
 
 const C = { r: '\x1b[31m', g: '\x1b[32m', y: '\x1b[33m', d: '\x1b[2m', b: '\x1b[1m', x: '\x1b[0m' };
 
-function main() {
+async function main() {
   const report = { corpus: [], semantic: [], summary: {} };
 
   if (ONLY !== 'semantic') {
@@ -224,7 +229,11 @@ function main() {
   if (ONLY !== 'corpus') {
     let checks = [...SEMANTIC_CHECKS, ...PARITY_CHECKS, ...SURFACE_CHECKS];
     if (FILTER) checks = checks.filter((c) => c.name.includes(FILTER) || c.area.includes(FILTER));
-    report.semantic = checks.map(runSemantic);
+        // Sequential, not Promise.all: several checks build a sandbox and pump
+    // frames, and interleaving those would make one check''s timers land
+    // inside another''s run.
+    report.semantic = [];
+    for (const c of checks) report.semantic.push(await runSemantic(c));
   }
 
   const cPass = report.corpus.filter((r) => r.pass).length;
@@ -282,4 +291,4 @@ ${C.b}DELTAS vs p5play${C.x} ${C.d}(deliberate — see _workspace/gauntlet/DECIS
   process.exit(ok ? 0 : 1);
 }
 
-main();
+await main();

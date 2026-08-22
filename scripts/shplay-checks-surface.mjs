@@ -848,66 +848,110 @@ export const SURFACE_CHECKS = [
 
   // ---- sound ----------------------------------------------------------------
   {
-    name: 'sound: overlapping shots, looping music, volume and rate',
+    name: 'sound: web-audio graph, overlapping shots, clips, pan and fade',
     area: 'sound',
-    // Asserted against what the sketch asked the SPEAKERS to do, not against
-    // property read-back. The two things games get wrong are both here: a
-    // rapid-fire effect must open a new voice per shot (one element cannot
-    // play twice at once, so the naive version silently restarts instead of
-    // overlapping), and loop() called from draw() must not re-issue play()
-    // sixty times a second.
-    run({ createSandbox }) {
+    // The backend moved from HTMLAudioElement to Web Audio, so this asserts
+    // against the recorded NODE GRAPH rather than element method calls. The
+    // behavioural claims are unchanged: overlapping one-shots, an idempotent
+    // loop, master volume that scales without overwriting.
+    //
+    // Two of these caught real bugs in the rewrite:
+    //   - `music.loop()` in setup() ALWAYS runs before fetch+decode finishes,
+    //     so the naive version left the music silent for the whole session.
+    //   - a mistyped clip name fell through to playing the WHOLE sprite
+    //     sheet, i.e. every sound at once.
+    run: async ({ createSandbox }) => {
       const box = createSandbox();
       box.run(`
         function setup(){ new Canvas(400,200); world.gravity.y = 0;
-          coin = loadSound('coin.mp3');
+          coin  = loadSound('coin.mp3');
           music = loadSound('music.mp3');
+          sfx   = loadSound('sfx.mp3', { clips: { jump: [0, 0.25], hit: [0.5, 0.9] } });
+          // the killer case: loop() before anything is decoded
           music.volume = 0.4;
-          music.loop();
-          afterLoop = { playing: music.playing, duration: music.duration };
+          music.loop(); music.loop(); music.loop();
         }
         function draw(){
-          if (frameCount >= 3 && frameCount <= 5) coin.play();
-          if (frameCount === 8) { coin.rate = 1.5; coin.play(); }
-          if (frameCount === 12) masterVolume(0.5);
-          if (frameCount === 14) ducked = { own: music.volume, master: masterVolume() };
-          if (frameCount === 16) { music.stop(); stopped = music.playing; }
-          if (frameCount >= 18) music.loop();   // called every frame from here
+          if (frameCount === 5) { coin.play(); coin.play(); coin.play(); }
+          if (frameCount === 6) { coin.pan = -1; coin.rate = 1.5; coin.play(); }
+          if (frameCount === 7) sfx.play('jump');
+          if (frameCount === 8) sfx.play('hit');
+          if (frameCount === 9) sfx.play('typo');     // must play NOTHING
+          if (frameCount === 10) { masterVolume(0.5); music.fade(0.1, 2); }
+          if (frameCount === 12) state = { music: music.playing, coin: coin.playing, own: music.volume };
+          if (frameCount === 13) { music.stop(); stopped = music.playing; }
         }
       `);
-      box.pump(24);
+      box.pump(4);
+      // Let the fetch/decode promises settle, as real frames separated by
+      // real time would.
+      await new Promise((r) => setImmediate(r));
+      box.pump(12);
+
       const b = box.sandbox;
-      const log = box.audioLog;
-      if (b.afterLoop.playing !== true) return 'music.playing was false right after loop()';
-      if (!(b.afterLoop.duration > 0)) return 'sound.duration read ' + b.afterLoop.duration;
+      const L = box.audioLog;
+      const starts = L.filter((e) => e.op === 'start');
 
-      // three shots in three frames must be three separate voices
-      const shots = log.filter((e) => e.op === 'play' && e.src === 'coin.mp3');
-      if (shots.length !== 4)
-        return 'expected 4 coin play() calls (3 rapid + 1 at a new rate), saw ' + shots.length +
-          '. A single element restarting itself would show fewer.';
-      const voices = log.filter((e) => e.op === 'new' && e.src === 'coin.mp3');
-      if (voices.length < 4)
-        return 'only ' + voices.length + ' audio element(s) were created for 4 overlapping plays; ' +
-          'rapid fire needs a voice per shot or the shots cut each other off';
-      if (shots[3].rate !== 1.5) return 'sound.rate did not reach the voice (rate ' + shots[3].rate + ')';
+      if (L.filter((e) => e.op === 'context').length !== 1)
+        return 'expected exactly one AudioContext, saw ' + L.filter((e) => e.op === 'context').length;
+      if (!L.some((e) => e.op === 'resume'))
+        return 'the AudioContext was never resumed — it starts suspended, so nothing would ever be audible';
+      if (L.filter((e) => e.op === 'decode').length !== 3)
+        return 'expected 3 decodes for 3 sounds, saw ' + L.filter((e) => e.op === 'decode').length;
 
-      // master volume scales the element without rewriting the sound's own
-      if (b.ducked.own !== 0.4) return 'masterVolume changed the sound\'s own volume to ' + b.ducked.own;
-      if (b.ducked.master !== 0.5) return 'masterVolume() read back ' + b.ducked.master;
-      const musicPlays = log.filter((e) => e.op === 'play' && e.src === 'music.mp3');
-      if (!musicPlays.some((e) => Math.abs(e.volume - 0.2) < 1e-9))
-        return 'volume 0.4 under masterVolume 0.5 should reach the element as 0.2; saw ' +
-          JSON.stringify(musicPlays.map((e) => e.volume));
+      const looped = starts.filter((s) => s.loop);
+      if (looped.length !== 1)
+        return 'expected exactly 1 looping start, saw ' + looped.length +
+          '. 0 means loop() before decode was dropped and the music is silent forever; ' +
+          '>1 means loop() is not idempotent and stacks a copy per call.';
 
+      const oneShots = starts.filter((s) => !s.loop);
+      // 3 rapid + 1 at a new rate + 2 clips = 6. The mistyped clip adds none.
+      if (oneShots.length !== 6)
+        return 'expected 6 one-shot starts, saw ' + oneShots.length +
+          ' — a mistyped clip name must play nothing rather than the whole sprite sheet';
+      if (!oneShots.some((s) => s.rate === 1.5)) return 'sound.rate never reached a voice';
+
+      const jump = oneShots.find((s) => s.duration === 0.25);
+      const hit = oneShots.find((s) => Math.abs((s.offset ?? 0) - 0.5) < 1e-9);
+      if (!jump) return 'the "jump" clip did not start with its own duration; audio sprites are not slicing';
+      if (!hit || Math.abs(hit.duration - 0.4) > 1e-9)
+        return 'the "hit" clip should start at 0.5 for 0.4s, got ' + JSON.stringify(hit);
+
+      if (!L.some((e) => e.op === 'create' && e.node === 'panner'))
+        return 'no panner node was ever created, so sound.pan cannot do anything';
+      const ramp = L.find((e) => e.op === 'ramp');
+      if (!ramp) return 'fade() scheduled no ramp on any gain';
+      if (Math.abs(ramp.to - 0.1) > 1e-9) return 'fade(0.1, 2) ramped to ' + ramp.to;
+      if (!L.some((e) => e.op === 'cancel'))
+        return 'fade() did not cancel scheduled values first; a second fade would jump instead of continuing';
+
+      if (b.state.music !== true) return 'music.playing was false while it should be looping';
+      if (b.state.own !== 0.1) return "after fade(0.1) the sound's own volume reads " + b.state.own;
       if (b.stopped !== false) return 'music.playing stayed true after stop()';
-      if (!log.some((e) => e.op === 'pause' && e.src === 'music.mp3')) return 'stop() never paused the element';
-
-      // loop() called every frame for ~6 frames must issue ONE play
-      const afterRestart = musicPlays.length;
-      if (afterRestart > 3)
-        return 'loop() issued ' + afterRestart + ' play() calls; called from draw() it must be idempotent';
       return true;
+    },
+  },
+  {
+    name: 'sound: the OLD element-based expectations are gone',
+    area: 'sound',
+    informational: true,
+    // Marker, not a gate. The first sound implementation used
+    // HTMLAudioElement and cloned a DOM node per voice; this records that the
+    // backend changed so anyone reading an old DECISIONS entry (D30) knows it
+    // was superseded by D31 rather than wondering why the log looks different.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        function setup(){ new Canvas(200,200); s = loadSound('x.mp3'); s.play(); }
+        function draw(){}
+      `);
+      box.pump(3);
+      const elementOps = box.audioLog.filter((e) => e.op === 'new' || e.op === 'play' || e.op === 'pause');
+      if (elementOps.length === 0) {
+        return 'backend is Web Audio (no HTMLAudioElement ops recorded) — D30 superseded by D31';
+      }
+      return 'HTMLAudioElement ops are still being recorded: ' + JSON.stringify(elementOps.slice(0, 3));
     },
   },
 

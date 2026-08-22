@@ -307,30 +307,52 @@ declare class GlueJoint extends Joint {
 
 // ---- sound ---------------------------------------------------------------
 
+/** One file, many clips: { jump: [startSeconds, endSeconds], ... } */
+interface SoundClips {
+  [name: string]: [number, number];
+}
+
 declare class Sound {
-  constructor(url: string);
+  constructor(url: string, opts?: { clips?: SoundClips });
   readonly url: string;
   /** Starts a NEW voice each call, so rapid repeats overlap instead of
-   *  cutting each other off. Returns that voice. */
-  play(): unknown;
-  /** Starts the one looping voice. Idempotent — safe to call from draw(). */
-  loop(): unknown;
+   *  cutting each other off. With a clip name, plays just that slice.
+   *  A no-op until the file has loaded — a late sound effect is worse than
+   *  none — and a no-op for a clip name that isn't defined. */
+  play(clip?: string): unknown;
+  /** Starts the one looping voice. Idempotent, so it is safe to call from
+   *  draw(). Unlike play(), a loop() issued before the file has loaded is
+   *  remembered and starts as soon as it lands — `music.loop()` in setup()
+   *  always runs before the download finishes. */
+  loop(clip?: string): unknown;
+  /** Web Audio cannot resume a stopped source, so this is stop(). Kept
+   *  because it is the word people reach for. */
   pause(): void;
-  /** pause() plus a rewind, so the next play() starts at the beginning. */
   stop(): void;
   readonly playing: boolean;
-  /** 0 to 1, this sound's own level. Multiplied by masterVolume(). */
+  /** 0 to 1, this sound's own level. Scaled by masterVolume(). */
   volume: number;
+  /** -1 hard left, 0 centre, 1 hard right. */
+  pan: number;
   /** Playback speed. Also shifts pitch — cheap variety from one effect. */
   rate: number;
+  /** Ramp to a volume over `seconds` (default 0.5). Fading to 0 stops the
+   *  voices when it lands, so a silent source isn't left running. */
+  fade(to: number, seconds?: number): Sound;
+  /** 0 until the file has downloaded and decoded. */
   readonly duration: number;
-  /** True if the browser refused to play (audio is blocked until the user
-   *  has interacted with the page). Not an error — check it if silence on
-   *  the first frame is confusing you. */
+  readonly loaded: boolean;
+  /** Resolves when the file is downloaded and decoded (null if it failed). */
+  readonly ready: Promise<unknown>;
+  /** Set if the download or decode failed; the sound then stays silent. */
+  readonly error: string | null;
+  /** True if the browser refused to start audio. Sound is blocked until the
+   *  player has clicked or pressed a key — shPlay unlocks it automatically on
+   *  the first input, so this is rare. */
   readonly blocked: boolean;
 }
 
-declare function loadSound(url: string): Sound;
+declare function loadSound(url: string, opts?: { clips?: SoundClips }): Sound;
 /** Scales every sound at once without disturbing their individual volumes.
  *  Call with no argument to read the current value. */
 declare function masterVolume(v?: number): number;

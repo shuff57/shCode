@@ -2134,131 +2134,290 @@
 
   // ---- sound --------------------------------------------------------------
   //
-  // shPlay's own design: q5play ships no sound surface at all (nothing in its
-  // .d.ts), so there is nothing to port and nothing to be faithful to.
+  // shPlay's own design: q5play ships no sound surface at all, so there is
+  // nothing to port and nothing to be faithful to.
   //
-  // Built on HTMLAudioElement rather than the Web Audio API. Web Audio buys
-  // precise scheduling and effects, and costs an AudioContext that must be
-  // resumed on a user gesture, a buffer-decode step, and a graph to explain.
-  // For "play a coin sound when the player picks up a coin", an <audio> tag
-  // is the whole job.
+  // Built on the Web Audio API. The first version used HTMLAudioElement,
+  // which is simpler and got play/loop/volume right, but three things it
+  // cannot do are exactly the things a game wants: position a sound in the
+  // stereo field, fade one in or out, and hold many short clips in one file.
   //
-  // Two details that are not obvious and that games get wrong:
+  // Three facts about Web Audio that shape everything below:
   //
-  // 1. One element cannot play twice at once. Fire a laser twice in three
-  //    frames and the second play() just restarts the first. So play() clones
-  //    the element for each overlapping shot. loop() does NOT clone — a
-  //    looping track is one thing you start and stop.
-  // 2. Browsers block audio until the user has interacted with the page, and
-  //    the blocked play() returns a REJECTED promise. Unhandled, that prints
-  //    an error in the console of every sketch that makes a sound on frame 1.
-  //    We swallow it and set `.blocked` so a sketch can tell.
+  // 1. The context starts SUSPENDED. Browsers will not make noise until the
+  //    user has interacted with the page, so the context has to be resumed
+  //    from inside a real input event. We hook that once, globally, on the
+  //    first key or click — a sketch never has to think about it.
+  // 2. Sound has to be fetched and DECODED before it can play. That is async
+  //    and takes a moment. A play() before the buffer is ready is a silent
+  //    no-op, not an error and not a queued sound: a sound effect arriving
+  //    300ms late is worse than one that never arrives.
+  // 3. A BufferSource is single-use. Every play() builds a new one. That is
+  //    the intended design, not waste — it is also what makes overlapping
+  //    shots free, where the old element-based version had to clone a DOM
+  //    node per voice.
 
+  let AUDIO_CTX_ = null;
+  let MASTER_GAIN_ = null;
   let MASTER_VOLUME_ = 1;
   const SOUNDS_ = [];
 
+  function _audioCtx() {
+    if (AUDIO_CTX_) return AUDIO_CTX_;
+    const Ctor = typeof AudioContext !== 'undefined'
+      ? AudioContext
+      : (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : null);
+    if (!Ctor) return null; // no Web Audio at all: every sound becomes a no-op
+    AUDIO_CTX_ = new Ctor();
+    MASTER_GAIN_ = AUDIO_CTX_.createGain();
+    MASTER_GAIN_.gain.value = MASTER_VOLUME_;
+    MASTER_GAIN_.connect(AUDIO_CTX_.destination);
+    return AUDIO_CTX_;
+  }
+
+  // Browsers only honour resume() from inside a user-gesture handler, so this
+  // is wired to the same keydown/mousedown the input system already listens
+  // for (see _unlockAudio() calls in start()). Cheap and idempotent.
+  function _unlockAudio() {
+    const ctx = AUDIO_CTX_;
+    if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+  }
+
   class Sound {
-    constructor(url) {
+    constructor(url, opts) {
       this.url = url;
       this._volume = 1;
       this._rate = 1;
-      this._el = typeof Audio === 'function' ? new Audio(url) : null;
-      this._playing = [];   // clones currently sounding
-      this.blocked = false; // set true if the browser refused to play
+      this._pan = 0;
+      this._buffer = null;
+      this._voices = [];      // live BufferSources
+      this._loopVoice = null; // the single looping one, if any
+      this.blocked = false;
+      this.error = null;
+
+      // Audio sprites: one file, many clips, each [startSeconds, endSeconds].
+      // Downloading one 40KB file beats twelve 4KB ones, and the clips stay
+      // sample-accurate because they are offsets into a decoded buffer.
+      this.clips = (opts && opts.clips) || null;
+
       SOUNDS_.push(this);
+      this.ready = this._load();
     }
 
-    // A fresh voice per call so rapid repeats overlap instead of cutting each
-    // other off. Returns the element so a caller can stop one specific shot.
-    play() {
-      if (!this._el) return null;
-      const voice = this._el.cloneNode();
-      voice.volume = this._clampedVolume();
-      voice.playbackRate = this._rate;
-      voice.loop = false;
-      this._playing.push(voice);
-      this._start(voice);
-      // Keep the list from growing forever in a long session. A voice is done
-      // when it reports paused again; anything still sounding is kept.
-      if (this._playing.length > 16) this._playing = this._playing.filter((v) => !v.paused);
-      return voice;
+    async _load() {
+      const ctx = _audioCtx();
+      if (!ctx || typeof fetch !== 'function') return null;
+      try {
+        const res = await fetch(this.url);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const bytes = await res.arrayBuffer();
+        this._buffer = await ctx.decodeAudioData(bytes);
+        return this._buffer;
+      } catch (e) {
+        // A missing or unplayable file must not take the sketch down; the
+        // sound just never makes noise. `error` is there for a sketch that
+        // wants to say so.
+        this.error = e && e.message ? e.message : String(e);
+        return null;
+      }
     }
 
-    // One looping voice, not a new one per call — calling loop() twice must
-    // not stack two copies of the same music track on top of each other.
-    loop() {
-      if (!this._el) return null;
-      // Idempotent. A sketch that calls loop() from draw() calls it 60 times
-      // a second; each one must not be a fresh play() request. Browsers
-      // tolerate that, but it buries the audio log and invites the same
-      // mistake somewhere it is not tolerated.
-      if (this._el.loop && !this._el.paused) return this._el;
-      this._el.loop = true;
-      this._el.volume = this._clampedVolume();
-      this._el.playbackRate = this._rate;
-      this._start(this._el);
-      return this._el;
+    get loaded() { return this._buffer !== null; }
+    get duration() { return this._buffer ? this._buffer.duration : 0; }
+
+    // Builds source -> panner -> gain -> master for one voice. Each voice has
+    // its own gain and panner so a fade or a pan on one shot cannot disturb
+    // another that is already sounding.
+    _voice() {
+      const ctx = _audioCtx();
+      if (!ctx || !this._buffer) return null;
+      const src = ctx.createBufferSource();
+      src.buffer = this._buffer;
+      src.playbackRate.value = this._rate;
+
+      const gain = ctx.createGain();
+      gain.gain.value = this._volume;
+
+      let head = src;
+      // createStereoPanner is missing on older Safari. Panning is a nicety;
+      // losing it must not cost the sound itself.
+      if (typeof ctx.createStereoPanner === 'function') {
+        const panner = ctx.createStereoPanner();
+        panner.pan.value = this._pan;
+        head.connect(panner);
+        head = panner;
+        src.__panner = panner;
+      }
+      head.connect(gain);
+      gain.connect(MASTER_GAIN_);
+      src.__gain = gain;
+      return src;
     }
 
-    pause() {
-      if (this._el && !this._el.paused) this._el.pause();
-      for (const v of this._playing) if (!v.paused) v.pause();
+    // Returns a {offset, duration} for a named clip, or the string 'unknown'
+    // when this sound HAS clips but not that one. Callers treat 'unknown' as
+    // "play nothing": falling through to the whole file would blast the
+    // entire sprite sheet — every sound at once — because a name was
+    // mistyped. Silence is the debuggable failure.
+    _clip(name) {
+      if (!name) return null;
+      const c = this.clips && this.clips[name];
+      if (!c) return this.clips ? 'unknown' : null;
+      const start = Number(c[0]) || 0;
+      const end = Number(c[1]);
+      return { offset: start, duration: Number.isFinite(end) ? Math.max(0, end - start) : undefined };
     }
 
-    // stop() is pause() plus a rewind, so the next play() starts at the top.
+    /**
+     * play() or play('clipName'). A fresh voice every time, so rapid repeats
+     * overlap. Returns the voice, or null if the sound is not loaded yet.
+     */
+    play(clipName) {
+      const src = this._voice();
+      if (!src) return null;
+      _unlockAudio();
+      const clip = this._clip(clipName);
+      if (clip === 'unknown') return null;
+      src.loop = false;
+      try {
+        if (clip) src.start(0, clip.offset, clip.duration);
+        else src.start(0);
+      } catch {
+        this.blocked = true;
+        return null;
+      }
+      this._voices.push(src);
+      src.onended = () => {
+        const i = this._voices.indexOf(src);
+        if (i >= 0) this._voices.splice(i, 1);
+      };
+      return src;
+    }
+
+    /**
+     * One looping voice, not a new one per call — a sketch calling loop()
+     * from draw() calls it 60 times a second and must not stack 60 copies.
+     */
+    loop(clipName) {
+      if (this._loopVoice) return this._loopVoice;
+      const src = this._voice();
+      if (!src) {
+        // The overwhelmingly common line is `music.loop()` in setup(), which
+        // ALWAYS runs before the fetch+decode has finished — so the naive
+        // version left the music silent for the entire session and gave the
+        // author nothing to look at. Remember the intent and start it when
+        // the buffer lands.
+        //
+        // play() deliberately does NOT do this. A looping track starting a
+        // beat late is correct; a coin chime arriving 300ms after the coin
+        // is worse than no chime, so one-shots stay no-ops.
+        if (!this._pendingLoop && this._buffer === null) {
+          this._pendingLoop = true;
+          this.ready.then(() => {
+            this._pendingLoop = false;
+            if (this._buffer && !this._loopVoice) this.loop(clipName);
+          });
+        }
+        return null;
+      }
+      _unlockAudio();
+      const clip = this._clip(clipName);
+      if (clip === 'unknown') return null;
+      src.loop = true;
+      if (clip) {
+        src.loopStart = clip.offset;
+        src.loopEnd = clip.offset + (clip.duration || 0);
+      }
+      try {
+        if (clip) src.start(0, clip.offset, undefined);
+        else src.start(0);
+      } catch {
+        this.blocked = true;
+        return null;
+      }
+      this._loopVoice = src;
+      src.onended = () => { if (this._loopVoice === src) this._loopVoice = null; };
+      return src;
+    }
+
+    // Web Audio has no pause: a stopped BufferSource cannot be restarted.
+    // pause() is therefore stop(), and is kept because it is the word a
+    // student reaches for. Documented rather than faked with an offset,
+    // which would be a resume() that silently drifts.
+    pause() { this.stop(); }
+
     stop() {
-      this.pause();
-      if (this._el) this._el.currentTime = 0;
-      for (const v of this._playing) v.currentTime = 0;
-      this._playing = [];
+      for (const v of this._voices.slice()) { try { v.stop(); } catch { /* already ended */ } }
+      this._voices = [];
+      if (this._loopVoice) { try { this._loopVoice.stop(); } catch { /* already ended */ } }
+      this._loopVoice = null;
     }
 
-    get playing() {
-      if (this._el && !this._el.paused) return true;
-      return this._playing.some((v) => !v.paused);
-    }
+    get playing() { return this._voices.length > 0 || this._loopVoice !== null; }
 
     get volume() { return this._volume; }
     set volume(v) {
       this._volume = Math.max(0, Math.min(1, Number(v) || 0));
-      const applied = this._clampedVolume();
-      if (this._el) this._el.volume = applied;
-      for (const voice of this._playing) voice.volume = applied;
+      for (const s of this._allVoices()) if (s.__gain) s.__gain.gain.value = this._volume;
     }
 
-    // Playback speed. Also shifts the pitch, which is the cheap way to get
-    // variety out of one sound effect.
+    /** -1 hard left, 0 centre, 1 hard right. */
+    get pan() { return this._pan; }
+    set pan(v) {
+      this._pan = Math.max(-1, Math.min(1, Number(v) || 0));
+      for (const s of this._allVoices()) if (s.__panner) s.__panner.pan.value = this._pan;
+    }
+
+    /** Playback speed. Also shifts pitch — cheap variety from one effect. */
     get rate() { return this._rate; }
     set rate(v) {
       this._rate = Number(v) || 1;
-      if (this._el) this._el.playbackRate = this._rate;
-      for (const voice of this._playing) voice.playbackRate = this._rate;
+      for (const s of this._allVoices()) s.playbackRate.value = this._rate;
     }
 
-    get duration() { return this._el ? this._el.duration || 0 : 0; }
-
-    _clampedVolume() { return Math.max(0, Math.min(1, this._volume * MASTER_VOLUME_)); }
-
-    _start(el) {
-      try {
-        const p = el.play();
-        // A rejected promise here is the autoplay policy, not a bug in the
-        // sketch. Record it and move on rather than spraying the console.
-        if (p && typeof p.catch === 'function') p.catch(() => { this.blocked = true; });
-      } catch {
-        this.blocked = true;
+    /**
+     * Ramp to a target volume over `seconds`. Fading to 0 stops the voices
+     * when it lands, otherwise a silent source keeps running forever.
+     *
+     * cancelScheduledValues + setValueAtTime(current) first: without that,
+     * a second fade starting mid-ramp jumps to wherever the first one was
+     * scheduled instead of continuing from what you can actually hear.
+     */
+    fade(to, seconds) {
+      const ctx = _audioCtx();
+      const target = Math.max(0, Math.min(1, Number(to) || 0));
+      const secs = Math.max(0, Number(seconds) === 0 ? 0 : Number(seconds) || 0.5);
+      if (!ctx) { this.volume = target; return this; }
+      const now = ctx.currentTime;
+      for (const s of this._allVoices()) {
+        if (!s.__gain) continue;
+        const g = s.__gain.gain;
+        g.cancelScheduledValues(now);
+        g.setValueAtTime(g.value, now);
+        g.linearRampToValueAtTime(target, now + secs);
       }
+      this._volume = target;
+      if (target === 0) {
+        const stopAt = secs * 1000;
+        setTimeout(() => { if (this._volume === 0) this.stop(); }, stopAt);
+      }
+      return this;
+    }
+
+    _allVoices() {
+      return this._loopVoice ? this._voices.concat([this._loopVoice]) : this._voices;
     }
   }
 
-  function loadSound(url) { return new Sound(url); }
+  function loadSound(url, opts) { return new Sound(url, opts); }
 
-  // Scales every sound at once, without disturbing their individual volumes —
-  // a mute button, or ducking the music under a cutscene.
+  // Scales every sound at once without disturbing their individual volumes —
+  // a mute button, or ducking under a cutscene. One gain node at the end of
+  // the graph, so it costs nothing per voice.
   function masterVolume(v) {
     if (v === undefined) return MASTER_VOLUME_;
     MASTER_VOLUME_ = Math.max(0, Math.min(1, Number(v) || 0));
-    for (const s of SOUNDS_) s.volume = s.volume; // re-apply through the clamp
+    if (MASTER_GAIN_) MASTER_GAIN_.gain.value = MASTER_VOLUME_;
     return MASTER_VOLUME_;
   }
 
@@ -2300,6 +2459,10 @@
       KEYS_[n] = v >= kb.holdThreshold ? -2 : v > 1 ? -1 : -3;
     };
     window.addEventListener('keydown', (e) => {
+      // Browsers only honour AudioContext.resume() from inside a real user
+      // gesture. Hooking it here means a sketch never has to think about it:
+      // the first key or click the player presses unlocks sound for good.
+      _unlockAudio();
       const k = _key(e.key);
       _pressKey(k);
       // ...and the direction name it doubles as, so 'right' and 'd' both answer.
@@ -2351,6 +2514,7 @@
       MOUSE.scrollDelta.y += e.deltaY;
     });
     CANVAS_.addEventListener('mousedown', (e) => {
+      _unlockAudio(); // same reason as keydown above
       if (!MOUSE._c || MOUSE._c < 0) MOUSE._c = 1;
       const b = MOUSE_BTN_[(e && e.button) || 0];
       if (b && (!MOUSE[b] || MOUSE[b] < 0)) MOUSE[b] = 1;

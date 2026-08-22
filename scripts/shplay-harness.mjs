@@ -181,6 +181,58 @@ export function createSandbox({ width = 800, height = 600 } = {}) {
     removeEventListener() {}
   }
 
+  // A Web Audio graph, recorded rather than heard. Every node creation,
+  // connection, parameter write and start/stop lands in `audioLog`, which is
+  // the only observable there is headlessly.
+  //
+  // The context starts SUSPENDED, like a real one does before the user has
+  // interacted with the page. An engine that assumes 'running' works in
+  // testing and is silent in a browser.
+  class FakeAudioParam {
+    constructor(name, node, value) { this._name = name; this._node = node; this.value = value; }
+    setValueAtTime(v, t) { this.value = v; audioLog.push({ op: 'param', node: this._node, name: this._name, set: v, at: t }); return this; }
+    linearRampToValueAtTime(v, t) { this.value = v; audioLog.push({ op: 'ramp', node: this._node, name: this._name, to: v, at: t }); return this; }
+    cancelScheduledValues(t) { audioLog.push({ op: 'cancel', node: this._node, name: this._name, at: t }); return this; }
+  }
+  class FakeNode {
+    constructor(kind) { this.__kind = kind; audioLog.push({ op: 'create', node: kind }); }
+    connect(dest) { audioLog.push({ op: 'connect', from: this.__kind, to: dest && dest.__kind ? dest.__kind : 'destination' }); return dest; }
+    disconnect() { audioLog.push({ op: 'disconnect', from: this.__kind }); }
+  }
+  class FakeAudioContext {
+    constructor() {
+      this.__isAudioContext = true;
+      this.state = 'suspended';
+      this.currentTime = 0;
+      this.sampleRate = 48000;
+      this.destination = new FakeNode('destination');
+      audioLog.push({ op: 'context' });
+    }
+    resume() { this.state = 'running'; audioLog.push({ op: 'resume' }); return Promise.resolve(); }
+    suspend() { this.state = 'suspended'; return Promise.resolve(); }
+    createGain() { const n = new FakeNode('gain'); n.gain = new FakeAudioParam('gain', 'gain', 1); return n; }
+    createStereoPanner() { const n = new FakeNode('panner'); n.pan = new FakeAudioParam('pan', 'panner', 0); return n; }
+    createBufferSource() {
+      const n = new FakeNode('source');
+      n.buffer = null;
+      n.loop = false;
+      n.loopStart = 0;
+      n.loopEnd = 0;
+      n.playbackRate = new FakeAudioParam('playbackRate', 'source', 1);
+      n.onended = null;
+      n.start = (when = 0, offset = 0, duration) => {
+        n.__started = true;
+        audioLog.push({ op: 'start', when, offset, duration, loop: n.loop, rate: n.playbackRate.value });
+      };
+      n.stop = () => { n.__started = false; audioLog.push({ op: 'stop' }); if (typeof n.onended === 'function') n.onended(); };
+      return n;
+    }
+    decodeAudioData(buf) {
+      audioLog.push({ op: 'decode', bytes: buf && buf.byteLength ? buf.byteLength : 0 });
+      return Promise.resolve({ duration: 1.5, sampleRate: 48000, numberOfChannels: 2, length: 72000 });
+    }
+  }
+
   // Images resolve synchronously with a plausible size so spritesheet slicing
   // runs for real instead of sitting in a never-fired onload.
   class FakeImage {
@@ -217,6 +269,18 @@ export function createSandbox({ width = 800, height = 600 } = {}) {
     document,
     Image: FakeImage,
     Audio: FakeAudio,
+    AudioContext: FakeAudioContext,
+    // A sketch fetching an audio file gets plausible bytes back rather than a
+    // network error, so the decode path runs for real.
+    fetch: (url) =>
+      Promise.resolve({
+        ok: true,
+        status: 200,
+        url: String(url),
+        arrayBuffer: () => Promise.resolve(new ArrayBuffer(2048)),
+        json: () => Promise.resolve({}),
+        text: () => Promise.resolve(''),
+      }),
     performance: { now: () => clock },
     Date: Object.assign(function Date_() { return new global.Date(0); }, { now: () => clock, prototype: global.Date.prototype }),
     requestAnimationFrame: (fn) => { rafQueue.push(fn); return rafQueue.length; },

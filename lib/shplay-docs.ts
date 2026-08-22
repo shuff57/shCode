@@ -935,9 +935,15 @@ function draw() {
 
 .play() starts a fresh copy every time it's called, so firing a laser three times in three frames gives you three overlapping shots rather than one restarting over and over. .loop() is the opposite — it's the single track you start once and stop later, and calling it again while it's already going does nothing.
 
-.volume runs 0 to 1. .rate is playback speed, and because it shifts the pitch too it's the cheapest way to get variety out of one sound: coin.rate = 1 + Math.random() * 0.3 makes every pickup sound slightly different. masterVolume(0.5) halves everything at once without touching any individual .volume — that's your mute button.
+.volume runs 0 to 1. .pan runs -1 (hard left) to 1 (hard right), so a sound can come from where the thing is: enemy.x < player.x ? -0.6 : 0.6. .rate is playback speed, and because it shifts the pitch too it's the cheapest way to get variety out of one sound: coin.rate = 1 + Math.random() * 0.3 makes every pickup sound slightly different. masterVolume(0.5) halves everything at once without touching any individual .volume — that's your mute button.
 
-One thing that will confuse you the first time: browsers refuse to play audio until you have clicked, tapped, or pressed a key on the page. A sound triggered on frame 1 stays silent, and nothing errors. That's the browser, not your code — the sound will work the moment the player presses something. sound.blocked is true when this has happened.`,
+.fade(to, seconds) ramps the volume instead of jumping it. music.fade(0, 2) is a two-second fade out, and it stops the sound when it lands so nothing keeps running silently.
+
+If you have a lot of short effects, put them in one file and describe where each one lives: loadSound('sfx.mp3', { clips: { jump: [0, 0.25], hit: [0.5, 0.9] } }), then sfx.play('jump'). One download instead of a dozen. A clip name you haven't defined plays nothing, rather than blasting the whole file.
+
+Two things that will confuse you the first time. Sound files have to download before they can play, so a .play() in the first moment of a sketch is silently ignored — that's why you load in setup() and play on an event. .loop() is the exception: it remembers, and starts as soon as the file arrives, because music.loop() in setup() would otherwise never play at all.
+
+And browsers refuse to make any noise until the player has clicked or pressed a key. shPlay unlocks the audio automatically on the first input, so mostly you won't notice — but it does mean a sound cannot play before the player has touched anything.`,
         code: `let coin, music, player, coins;
 
 function setup() {
@@ -963,13 +969,17 @@ function update() {
   player.moveTowards(mouse, 0.08);
 
   coins.overlaps(player, (c) => {
-    coin.rate = 1 + Math.random() * 0.3;  // a slightly different chime each time
+    coin.rate = 1 + Math.random() * 0.3;   // a slightly different chime each time
+    coin.pan = (c.x - 200) / 200;          // and it comes from where the coin was
     coin.play();
     c.delete();
   });
 
-  // music can only start once the player has interacted with the page
-  if (mouse.presses() && !music.playing) music.loop();
+  // safe to call every frame — loop() only ever starts one voice
+  music.loop();
+
+  // fade the music down as the coins run out
+  if (coins.length === 1 && music.volume > 0.1) music.fade(0.05, 1.5);
 }
 
 function draw() {
