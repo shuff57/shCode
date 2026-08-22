@@ -109,6 +109,8 @@ interface GradebookCell {
   possible: number | null;
   /** Past due and not completed, or completed after the due date. */
   late?: boolean;
+  /** Handed in, but the AI grader failed on it — no score exists yet. */
+  pending?: boolean;
 }
 
 interface GradebookStudent {
@@ -201,6 +203,10 @@ function buildGradebookCsv(
       // "L" suffix = late. Kept as a suffix rather than its own column so the
       // matrix stays one cell per lesson.
       const suffix = c.late ? 'L' : '';
+      // Before the C branch. An outage row is state=completed with a NULL
+      // score, so it would otherwise export as "C" — a finished lesson — into
+      // the one file a teacher pastes straight into a grade system.
+      if (c.pending) return 'P' + suffix;
       if (c.score !== null) return String(c.score) + suffix;
       if (c.state === 'completed') return 'C' + suffix;
       if (c.state === 'started') return 'S' + suffix;
@@ -682,6 +688,20 @@ function GradebookView({
   }
 
   function cellContent(cell: GradebookCell | undefined): React.ReactNode {
+    // Checked before every other branch. A grader outage leaves the row
+    // completed with a NULL score, which reads as a plain green tick, and it
+    // leaves submitted_score NULL, which reads as the same "·" a student who
+    // never opened the lesson gets. Either way the teacher is told nothing
+    // happened when in fact an answer is sitting in the review queue.
+    if (cell?.pending) {
+      return withLate(cell, (
+        <span
+          style={{ color: '#ffb86c', fontFamily: 'monospace', fontWeight: 700, fontSize: 14 }}
+        >
+          ⋯
+        </span>
+      ));
+    }
     if (!cell || (!cell.state && cell.submitted_score === null)) {
       return withLate(cell, <span style={{ color: cell?.late ? '#ff5555' : '#44475a', fontFamily: 'monospace', fontSize: 14 }}>·</span>);
     }
@@ -732,6 +752,10 @@ function GradebookView({
     const dueAt = lessonId ? gbData?.dueDates?.[lessonId] : undefined;
     if (!cell) return dueAt ? `${lessonTitle} | due ${formatDue(dueAt)}` : lessonTitle;
     const parts: string[] = [lessonTitle];
+    // First, because it is the only thing in the tooltip that asks the teacher
+    // to do something. There is no legend above the matrix, so "⋯" has to
+    // explain itself here.
+    if (cell.pending) parts.push('AI grading failed - needs a manual grade (see the review queue)');
     if (cell.state) parts.push(`state: ${cell.state}`);
     if (cell.score !== null) parts.push(`score: ${cell.score}`);
     if (cell.submitted_score !== null) parts.push(`sub score: ${cell.submitted_score}`);

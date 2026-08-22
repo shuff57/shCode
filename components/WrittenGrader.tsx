@@ -177,6 +177,20 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
     // it before the POST would mean a student whose network dropped never got
     // a second chance to record the attempt.
     if (recorded) lastFailedRef.current = response;
+
+    // Unlock the next lesson. Green-to-advance gates on lesson_state, and a
+    // failed grade wrote no row at all, so an Ollama outage used to stop a
+    // whole class dead behind a locked door for a failure that is ours, not
+    // theirs. The row goes in with NO score: the student may proceed, but
+    // nothing has been graded and nothing counts as earned until the teacher
+    // marks it from the review queue.
+    //
+    // Skipped when the lesson is already completed. The lesson_state upsert
+    // does `score = excluded.score`, so writing a scoreless row over a student
+    // who had already passed would erase the score they earned.
+    if (recorded && progress.states[lessonId] !== 'completed') {
+      await recordLessonCompleted(lessonId);
+    }
   }
 
   async function submit() {

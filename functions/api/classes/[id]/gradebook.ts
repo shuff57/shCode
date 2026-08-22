@@ -26,6 +26,7 @@ interface SubRow {
   lesson_id: string;
   score: number | null;
   possible: number | null;
+  grade_json: string | null;
 }
 
 export interface GradebookCell {
@@ -35,6 +36,24 @@ export interface GradebookCell {
   possible: number | null;
   /** Past due and not completed, or completed after the due date. */
   late: boolean;
+  /**
+   * The student's latest submission is an attempt the AI grader failed on, so
+   * the score is NULL because nothing graded it — not because nothing was
+   * handed in. Without this the cell is indistinguishable from an untouched
+   * lesson, which is the same thing the gradebook shows for a student who
+   * never opened it.
+   */
+  pending: boolean;
+}
+
+/** True when a submission's grade_json carries the WrittenGrader outage marker. */
+function isGradingFailed(raw: string | null): boolean {
+  if (!raw) return false;
+  try {
+    return (JSON.parse(raw) as { gradingFailed?: unknown })?.gradingFailed === true;
+  } catch {
+    return false;
+  }
 }
 
 export interface GradebookStudent {
@@ -85,10 +104,10 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
 
   // Latest submission per (student_email, lesson_id) using ROW_NUMBER window function.
   const subResult = await env.DB.prepare(
-    `SELECT student_email, lesson_id, score, possible
+    `SELECT student_email, lesson_id, score, possible, grade_json
        FROM (
          SELECT
-           student_email, lesson_id, score, possible,
+           student_email, lesson_id, score, possible, grade_json,
            ROW_NUMBER() OVER (
              PARTITION BY student_email, lesson_id
              ORDER BY submitted_at DESC
@@ -172,6 +191,11 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
         // time rather than late — `?? dueAt` reads as "finished by the
         // deadline". Guessing late on missing data would accuse a student.
         late: isPastDue(dueAt, sr?.state === 'completed' ? (sr.completed_at ?? dueAt) : null, now),
+        // Only the LATEST submission votes, and only while it still has no
+        // score. A regrade that succeeded replaces the row; a teacher override
+        // writes a score onto this one but leaves the gradingFailed marker in
+        // place, so the marker alone would keep claiming "pending" forever.
+        pending: sub?.score == null && isGradingFailed(sub?.grade_json ?? null),
       };
     }
 
