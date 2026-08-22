@@ -36,6 +36,7 @@
 //   node scripts/test-jscad.mjs --json         # machine-readable, for critics
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { join, relative } from 'node:path';
 import {
   REPO, PATHS, extractShim, runnerSource, loadModeling, loadRenderer,
@@ -43,6 +44,7 @@ import {
   docExamples, apiNames, documentedNames, docText, captureConsole,
 } from './jscad-harness.mjs';
 import {
+  EXPECTED_BUNDLES,
   EXPECTED_MODULE_ORDER, DOCUMENTED_COLLISIONS, EXPECTED_BARE_NAME_COUNT,
   CORE_TAUGHT, taughtFromReference, REGL_ALIASES, MIN_REGL_SYMBOLS,
   ENTITY_GEOMETRY_KEYS, DOC_SYNC_EXCEPTIONS, MIN_DOC_EXAMPLES, FENCE_TAGS,
@@ -77,6 +79,37 @@ const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 // ===========================================================================
 
 at('bundle');
+
+// The check that stops the rest of this gate being self-referential. Every
+// other BUNDLE/API/DOCS check measures the vendored file against itself, so a
+// swapped bundle would pass them all. This one pins identity.
+check('vendored bundles match their recorded hashes', () => {
+  const bad = [];
+  for (const b of EXPECTED_BUNDLES) {
+    const p = join(REPO, 'public/jscad/lib', b.file);
+    if (!existsSync(p)) { bad.push(`${b.file}: missing`); continue; }
+    const buf = readFileSync(p);
+    if (buf.length !== b.bytes) bad.push(`${b.file}: ${buf.length} bytes, expected ${b.bytes}`);
+    const got = createHash('sha256').update(buf).digest('hex');
+    if (got !== b.sha256) {
+      const who = b.version ? `${b.pkg}@${b.version}` : b.pkg;
+      bad.push(`${b.file}: sha256 ${got.slice(0, 16)}… but ${who} is recorded as ${b.sha256.slice(0, 16)}… — if this is a deliberate upgrade, update version AND sha256 in jscad-checks.mjs together, never the hash alone`);
+    }
+  }
+  return bad.length ? bad.join(' | ') : true;
+});
+
+// Reported, never gating: two of the three are byte-verified against their
+// published artifact; @jscad/io is not, because upstream publishes no such
+// file. Saying so on every run beats it living only in a comment.
+check('bundle provenance is recorded', () => {
+  const unverified = EXPECTED_BUNDLES.filter((b) => !b.verified).map((b) => b.file);
+  if (unverified.length) {
+    console.log(`       note: hash-pinned but upstream-unverified: ${unverified.join(', ')}`);
+  }
+  return EXPECTED_BUNDLES.every((b) => /^[0-9a-f]{64}$/.test(b.sha256))
+    || 'every bundle needs a recorded sha256';
+});
 
 check('modeling bundle is vendored and full-size', () => {
   if (!existsSync(PATHS.modeling)) return `missing ${relative(REPO, PATHS.modeling)}`;

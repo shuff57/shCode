@@ -9,7 +9,9 @@
 // It is NOT part of `npm test`, because it needs a browser binary that is not
 // a repo dependency. Run it by hand when runner.html's rendering changes:
 //
-//     node scripts/jscad-render-check.mjs
+//     node scripts/jscad-render-check.mjs                     # chromium
+//     node scripts/jscad-render-check.mjs --browser=firefox
+//     node scripts/jscad-render-check.mjs --browser=webkit
 //
 // Playwright is resolved from the repo first, then from a global install. If
 // neither is present the script says so and exits 2 (skipped), never 0 —
@@ -30,6 +32,17 @@
 // test-jscad.mjs asserts that wire from source; this one watches it happen.
 // It checks /docs/shplay in the same pass, because the failure that shipped
 // last time was two wires crossed, not one wire missing.
+//
+// Cross-browser, measured 2026-08-22 on playwright chromium / firefox / webkit:
+// all three PASS 7/7. Two engine differences a student would actually notice,
+// neither of them a break:
+//   * error WORDING differs for the same fault — chromium and firefox say
+//     "primtives is not defined", webkit says "Can't find variable: primtives".
+//     The assertion matches the identifier, not the phrasing.
+//   * error LOCATION is weaker on webkit: it reports "script.js:0" where the
+//     other two give "script.js:2:3". A student on Safari or an iPad gets the
+//     right message pointing at the wrong line. Not worth working around, but
+//     worth knowing before believing a bug report from an iPad.
 //
 // Note on the harness, not on the runner: swiftshader's FIRST WebGL context in
 // a fresh browser is reliably lost. Measuring without burning a warm-up page
@@ -52,12 +65,23 @@ const CANDIDATES = [
   'C:/Users/shuff57/AppData/Roaming/npm/node_modules/@playwright/cli/node_modules/playwright/index.js',
 ].filter(Boolean);
 
+// --browser=chromium|firefox|webkit. Chromium is the default because it is the
+// only engine guaranteed to be installed; the other two need
+// `npx playwright install firefox webkit` first. Run all three when the runner
+// or its iframe attributes change — sandbox + WebGL is the most engine-variable
+// part of this stack, and Chromium alone does not speak for a classroom iPad.
+const ENGINE = (process.argv.find((a) => a.startsWith('--browser=')) || '').slice(10) || 'chromium';
+if (!['chromium', 'firefox', 'webkit'].includes(ENGINE)) {
+  console.error(`unknown --browser=${ENGINE}; expected chromium, firefox or webkit`);
+  process.exit(2);
+}
+
 let chromium = null;
 for (const p of CANDIDATES) {
   if (!existsSync(p)) continue;
   try {
-    chromium = createRequire(p)(p).chromium;
-    console.log('playwright:', p);
+    chromium = createRequire(p)(p)[ENGINE];
+    console.log('playwright:', p, `(${ENGINE})`);
     break;
   } catch { /* try the next one */ }
 }
@@ -112,7 +136,15 @@ module.exports = { main }`,
   return primtives.cube({ size: 10 })
 }`,
     expectDrawn: false,
-    expectError: /not defined/i,
+    // Engine-specific WORDING for the same fault, so match either — and still
+    // require the offending identifier by name, which is the part a student
+    // actually needs and which neither engine is allowed to drop:
+    //   chromium/firefox  "primtives is not defined"
+    //   webkit            "Can't find variable: primtives"
+    // Broadening this is fixing a Chromium-centric assertion, not loosening a
+    // check: the runner behaves identically on all three, only the message text
+    // differs. Measured 2026-08-22 on playwright chromium/firefox/webkit.
+    expectError: /primtives/i,
   },
   {
     name: 'main() returns nothing',
@@ -127,9 +159,11 @@ await new Promise((r) => server.listen(0, '127.0.0.1', r));
 const port = server.address().port;
 const base = `http://127.0.0.1:${port}`;
 
-const browser = await chromium.launch({
-  args: ['--enable-unsafe-swiftshader', '--use-gl=swiftshader', '--ignore-gpu-blocklist'],
-});
+// The swiftshader flags are chromium-only; firefox and webkit reject unknown
+// args outright, so they get a plain launch and use whatever GL they have.
+const browser = await chromium.launch(ENGINE === 'chromium'
+  ? { args: ['--enable-unsafe-swiftshader', '--use-gl=swiftshader', '--ignore-gpu-blocklist'] }
+  : {});
 
 // Swiftshader's first WebGL context in a fresh browser is reliably lost
 // ("CONTEXT_LOST_WEBGL: loseContext") — an artifact of this harness, not of
@@ -314,7 +348,7 @@ server.close();
 
 const total = CASES.length + reachTotal;
 const bad = failures + reachBad;
-console.log(`\nrender-check: ${bad ? 'FAIL' : 'PASS'} - ${total - bad}/${total}` +
+console.log(`\nrender-check [${ENGINE}]: ${bad ? 'FAIL' : 'PASS'} - ${total - bad}/${total}` +
   (reachTotal
     ? ` (${CASES.length - failures}/${CASES.length} render, ${reachTotal - reachBad}/${reachTotal} reach)`
     : ' (reach phase skipped)'));

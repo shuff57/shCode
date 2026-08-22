@@ -1,1 +1,9 @@
 graphify-out/graph.json merge=graphify
+
+# Vendored minified libraries. These are byte-exact upstream artifacts, hash-
+# pinned in scripts/jscad-checks.mjs and verified against unpkg. With Windows
+# core.autocrlf=true git rewrites every LF on checkout — measured: the modeling
+# bundle came back 252016 bytes instead of 250793, a different file from the one
+# that was vendored, and the hash check goes red on a fresh clone. Never let git
+# translate these.
+public/jscad/lib/*.js -text

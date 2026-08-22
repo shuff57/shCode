@@ -14,6 +14,59 @@
 // The library
 // ---------------------------------------------------------------------------
 
+/**
+ * Provenance of the vendored bundles.
+ *
+ * Without this, the whole gate is quietly self-referential: EXPECTED_MODULE_ORDER
+ * is checked against the bundle's own key order and all 208 doc examples run
+ * against that same bundle, so swapping in a different @jscad/modeling build
+ * would leave every check green while the docs described a different library
+ * than jscad.app runs. The version was a prose comment and nothing more.
+ *
+ * `sha256` is the measured hash of the file in public/jscad/lib/. For the two
+ * marked verified:true it is a BYTE-EXACT match against the published artifact
+ * at `source`, fetched and compared 2026-08-22 — so the version is a
+ * measurement, not a claim.
+ *
+ * jscad-io is deliberately verified:false and honest about it: @jscad/io
+ * publishes no dist/jscad-io.min.js at any version (unpkg 404s on that path),
+ * so where this file came from is not established. Its hash is still pinned,
+ * which is what catches a swap; only the upstream identity is unknown.
+ *
+ * To re-verify or to bump: fetch `source`, sha256 it, compare, and update both
+ * fields together. Never update the hash alone to make this check go green —
+ * a changed hash with an unchanged version IS the finding.
+ */
+export const EXPECTED_BUNDLES = [
+  {
+    file: 'jscad-modeling.min.js',
+    pkg: '@jscad/modeling',
+    version: '2.13.0',
+    bytes: 250793,
+    sha256: '3c4e2acfeadafe519b2e05f557d765390e5cb0e3d223dc148c631b6ebb12e482',
+    source: 'https://unpkg.com/@jscad/modeling@2.13.0/dist/jscad-modeling.min.js',
+    verified: true,
+  },
+  {
+    file: 'jscad-regl-renderer.min.js',
+    pkg: '@jscad/regl-renderer',
+    version: '2.6.15',
+    bytes: 140673,
+    sha256: '6a837d1c30fbf966e1d61b56ee2c4b89bc03e435066bf09b9f496202b24e7aee',
+    source: 'https://unpkg.com/@jscad/regl-renderer@2.6.15/dist/jscad-regl-renderer.min.js',
+    verified: true,
+  },
+  {
+    file: 'jscad-io.min.js',
+    pkg: '@jscad/io',
+    version: null,
+    bytes: 37992,
+    sha256: '773490bb084c2f1c311bb872b095516cd52d523ceb3155d225102ff66083b66b',
+    source: null,
+    verified: false,
+  },
+];
+
 /** @jscad/modeling@2.13.0 — declaration order of src/index.js. */
 export const EXPECTED_MODULE_ORDER = [
   'colors', 'curves', 'geometries', 'maths', 'measurements', 'primitives',
