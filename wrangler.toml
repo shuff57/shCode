@@ -19,6 +19,17 @@ binding = "DB"
 database_name = "shcode-commits"
 database_id = "de53517f-5d1f-4d70-a1f9-13d463abb76f"
 
+# R2 bucket for student image uploads. The bytes live here; ownership and
+# quota live in D1's `uploads` table (migrations/0015_uploads.sql).
+#
+#   npx wrangler r2 bucket create shcode-uploads
+#
+# Then add the same binding in the dashboard (Pages project -> Settings ->
+# Functions -> R2 bucket bindings -> binding name "UPLOADS").
+[[r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "shcode-uploads"
+
 # AUTH_SECRET is the HS256 signing key for session JWTs. It MUST be set as
 # a Pages secret (not a plain var) in production:
 #

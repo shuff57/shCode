@@ -59,6 +59,7 @@ are safe. Apply with `npx wrangler d1 migrations apply shcode-commits --remote`.
 | 0007 | `gzip_commits_files.sql` | Adds `commits.files_gz BLOB`, makes `files_json` nullable. New rows write gzipped snapshots via `CompressionStream`; read path prefers `files_gz`, falls back to `files_json` for legacy rows |
 | 0008 | `commit_author.sql` | `commits.authored_by_email TEXT` (nullable). Lets students distinguish teacher pushes from their own commits. Legacy NULLs coerce to `student_email` on read |
 | 0009 | `ai_help_usage.sql` | `ai_help_usage` — per-student per-unit per-UTC-day request counter for `POST /api/ai-help` rate limiting |
+| 0015 | `uploads.sql` | `uploads` — ownership + quota ledger for student image uploads. Bytes live in R2 (binding `UPLOADS`), never in D1 |
 
 ### Table highlights
 
@@ -125,6 +126,31 @@ Paths follow filenames under `functions/api/`.
 - `POST /api/join-class` — join by 6-char code
 - `GET  /api/my-enrollments` — active classes for the caller
 
+### Image uploads
+- `GET /api/uploads` — caller's images + quota (40 files / 20 MB, 2 MB each)
+- `POST /api/uploads` — store one image. Raw body with `X-Filename`, or
+  multipart. Content type is decided by a **magic-byte sniff**, never the
+  client's header; PNG/JPEG/GIF/WebP only. SVG is refused — it is a document
+  and can carry script.
+- `DELETE /api/uploads/[id]` — owner or admin. Ownership is in the SQL
+  `WHERE`, and a missing id and someone else's id both 404 so ids can't be probed.
+- `GET /uploads/[id].[ext]` — **public, no auth**, deliberately outside `/api/`.
+
+  It has to be. The sketch iframe (`components/ShPlayPreview.tsx`) is
+  sandboxed *without* `allow-same-origin` so student code can't call the API
+  as the student — which makes it an opaque origin, so the `SameSite=Lax`
+  session cookie is never sent and an auth-gated image would 401 inside every
+  sketch. The 128-bit random id is therefore the access control: unlisted and
+  unguessable, but anyone with the link can view it.
+
+  **Do not add `allow-same-origin` to that iframe to "fix" this.** Two things
+  in the serve route are load-bearing: `Content-Type` comes from R2's stored
+  metadata (set from the sniff), and `X-Content-Type-Options: nosniff`.
+  Without both, a crafted file could be served as HTML from our origin.
+
+  `scripts/test-uploads.mjs` covers the sniffer against renamed HTML, SVG,
+  polyglots and near-miss signatures; it runs in `npm test`.
+
 ## Build + deploy
 
 ```bash
@@ -138,6 +164,13 @@ npx wrangler pages deploy out --project-name shcode --branch cs-3d
 # D1 migrations
 npx wrangler d1 migrations apply shcode-commits --remote        # prod
 npx wrangler d1 migrations apply shcode-commits --local         # local dev DB
+
+# R2 bucket for image uploads — ONE TIME, before uploads will work at all.
+# Without it POST /api/uploads returns 500 "Uploads are not configured".
+npx wrangler r2 bucket create shcode-uploads
+# ...then add the binding in the dashboard too: Pages project -> Settings ->
+# Functions -> R2 bucket bindings -> binding name "UPLOADS". wrangler.toml
+# alone covers local dev; production reads the dashboard binding.
 ```
 
 ## Static-export gotcha

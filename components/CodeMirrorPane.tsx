@@ -190,6 +190,27 @@ export default function CodeMirrorPane({
     });
   }, [value]);
 
+  // Insert-at-cursor: the image library dispatches 'shcode:insert' with the
+  // public path of a chosen upload. Goes through view.dispatch rather than
+  // rewriting `value`, so it lands at the caret, replaces a selection if
+  // there is one, and joins the undo history as a single step.
+  useEffect(() => {
+    function handler(e: Event) {
+      const detail = (e as CustomEvent).detail as { text?: string };
+      const view = viewRef.current;
+      if (!view || !detail?.text) return;
+      const { from, to } = view.state.selection.main;
+      view.dispatch({
+        changes: { from, to, insert: detail.text },
+        selection: { anchor: from + detail.text.length },
+        scrollIntoView: true,
+      });
+      view.focus();
+    }
+    window.addEventListener('shcode:insert', handler);
+    return () => window.removeEventListener('shcode:insert', handler);
+  }, []);
+
   // Jump-to-line: Console click dispatches 'shcode:goto-line' once the right
   // file is current. We position the selection and scroll the line into view.
   useEffect(() => {
