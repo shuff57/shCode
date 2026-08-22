@@ -1,0 +1,192 @@
+[
+  {
+    "results": [
+      {
+        "student_email": "ajfowler1210@gmail.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787085747977,
+        "completed_at": 1787086371286,
+        "score": 0
+      },
+      {
+        "student_email": "astellerskye@gmail.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787085437602,
+        "completed_at": 1787086500488,
+        "score": 0
+      },
+      {
+        "student_email": "austinott19@gmail.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787085458634,
+        "completed_at": 1787086281776,
+        "score": 0
+      },
+      {
+        "student_email": "brandonstrider08@outlook.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "started",
+        "started_at": 1787085459982,
+        "completed_at": null,
+        "score": null
+      },
+      {
+        "student_email": "brstueber@gmail.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787085652598,
+        "completed_at": 1787086004656,
+        "score": 0
+      },
+      {
+        "student_email": "bv84659@gmail.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787085291737,
+        "completed_at": 1787086142784,
+        "score": 0
+      },
+      {
+        "student_email": "cadenalexandergamer@gmail.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "started",
+        "started_at": 1787085731726,
+        "completed_at": null,
+        "score": null
+      },
+      {
+        "student_email": "coltenq317@gmail.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787083997665,
+        "completed_at": 1787085131192,
+        "score": 0
+      },
+      {
+        "student_email": "dominicotto799@gmail.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787084745467,
+        "completed_at": 1787085177249,
+        "score": 0
+      },
+      {
+        "student_email": "goofyahhmonkey100123@gmail.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787084849469,
+        "completed_at": 1787085563380,
+        "score": 0
+      },
+      {
+        "student_email": "grimtorch672@gmail.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787085287583,
+        "completed_at": 1787085843520,
+        "score": 0
+      },
+      {
+        "student_email": "leonalthelion@gmail.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "started",
+        "started_at": 1787086235514,
+        "completed_at": null,
+        "score": null
+      },
+      {
+        "student_email": "logandcecklund@gmail.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787085511272,
+        "completed_at": 1787086328428,
+        "score": 0
+      },
+      {
+        "student_email": "lukatscholz@icloud.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787085132992,
+        "completed_at": 1787085458343,
+        "score": 0
+      },
+      {
+        "student_email": "maxlugo7@me.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "started",
+        "started_at": 1787086475635,
+        "completed_at": null,
+        "score": null
+      },
+      {
+        "student_email": "orionkrok@outlook.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787085912322,
+        "completed_at": 1787086291318,
+        "score": 0
+      },
+      {
+        "student_email": "qintianzheng45@gmail.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787085089524,
+        "completed_at": 1787085438722,
+        "score": 0
+      },
+      {
+        "student_email": "railfanner946@outlook.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787084916088,
+        "completed_at": 1787085589803,
+        "score": 0
+      },
+      {
+        "student_email": "sh82618@outlook.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787085252535,
+        "completed_at": 1787085723946,
+        "score": 0
+      },
+      {
+        "student_email": "wolfsethw@gmail.com",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787085535909,
+        "completed_at": 1787086034117,
+        "score": 0
+      },
+      {
+        "student_email": "za103868@chicousd.net",
+        "lesson_id": "1-1-3-a1-1-sdlc-writeup",
+        "state": "completed",
+        "started_at": 1787085790556,
+        "completed_at": 1787086552609,
+        "score": 0
+      }
+    ],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "WNAM",
+      "served_by_colo": "SJC",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 14.8983
+      },
+      "duration": 14.8983,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 5754880,
+      "rows_read": 4686,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  }
+]

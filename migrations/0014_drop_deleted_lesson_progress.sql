@@ -1,0 +1,29 @@
+-- 0014: a lesson that was cut from the course must not count in the grade.
+--
+-- `1-1-3-a1-1-sdlc-writeup` ("1.1.9 SDLC Writeup") was removed from the
+-- curriculum in d134e23, "cut chapter 1 write-ups to two per module" — a few
+-- hours after 21 of the 25 students in Intro Prog 2627 had already worked it.
+-- Their lesson_state rows outlived the lesson.
+--
+-- That is not harmless. /api/classes/[id]/progress builds completed_count as a
+-- plain COUNT over lesson_state joined to enrollments, with no join against the
+-- lesson manifest, so the cut lesson still counted toward those 21 students'
+-- totals while the other 4 were measured against a course that no longer
+-- contains it. Same class, two different denominators. The gradebook grid
+-- meanwhile renders columns FROM the manifest, so the lesson had no column and
+-- the discrepancy was invisible there.
+--
+-- Deleting the state rows takes it out of the grade for everyone, which is the
+-- consistent answer: nobody is credited for it and nobody is marked short.
+--
+-- Deliberately NOT touching lesson_submissions (26 rows) or lesson_drafts (19).
+-- Those hold what the students actually wrote. They are already unreachable
+-- from the UI for want of a lesson to render them, they do not feed any grade
+-- computation, and destroying student writing is not reversible. Leave them.
+--
+-- Rows backed up before this ran:
+--   backups/lesson_state_1-1-3-a1-1-sdlc-writeup.json
+--
+-- Re-runnable: a second pass matches nothing.
+
+DELETE FROM lesson_state WHERE lesson_id = '1-1-3-a1-1-sdlc-writeup';
