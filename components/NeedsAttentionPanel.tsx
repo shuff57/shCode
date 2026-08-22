@@ -10,6 +10,8 @@ export interface NeedsAttentionData {
   inactive: Array<{ student_email: string; last_active: number; days_since_active: number }>;
   failed_submission: Array<{ student_email: string; lesson_id: string; score: number; possible: number; submitted_at: number }>;
   stuck: Array<{ student_email: string; lesson_id: string; started_at: number; days_since_started: number }>;
+  /** Newest submission is an attempt the AI grader failed on — needs a human. */
+  awaiting_grade?: Array<{ student_email: string; lesson_id: string; submitted_at: number; days_waiting: number }>;
 }
 
 interface Props {
@@ -76,6 +78,14 @@ const mutedStyle: React.CSSProperties = {
   fontSize: '0.78rem',
 };
 
+// Orange, matching the gradebook's "⋯" cell and the review queue's badge, so
+// the three places that talk about an ungraded attempt look like one thing.
+const awaitingSummaryStyle: React.CSSProperties = {
+  ...summaryStyle,
+  borderColor: '#ffb86c',
+  color: '#ffb86c',
+};
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -133,10 +143,13 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
 
   if (!data) return null;
 
+  const awaiting = data.awaiting_grade ?? [];
+
   const hasAny =
     data.inactive.length > 0 ||
     data.failed_submission.length > 0 ||
-    data.stuck.length > 0;
+    data.stuck.length > 0 ||
+    awaiting.length > 0;
 
   if (!hasAny) {
     return (
@@ -148,6 +161,55 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
 
   return (
     <div>
+      {/* Awaiting a grade — first, and open by default. Every other category
+          describes a student who is behind; this one describes work that is
+          already done and waiting on us, so it is the only one a teacher can
+          clear the same minute they see it. */}
+      {awaiting.length > 0 && (
+        <details open style={sectionStyle}>
+          <summary style={awaitingSummaryStyle}>
+            Awaiting a grade ({awaiting.length})
+          </summary>
+          <div style={listStyle}>
+            <div style={{ ...mutedStyle, padding: '0 10px' }}>
+              The AI grader failed on these, so nothing scored them. The answers are
+              in the review queue — open a lesson to mark it by hand.
+            </div>
+            {awaiting.map((item, i) => (
+              <div key={`${item.student_email}-${item.lesson_id}-${i}`} style={itemStyle}>
+                <span
+                  style={clickableStyle}
+                  onClick={() => onOpenStudent(item.student_email)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') onOpenStudent(item.student_email);
+                  }}
+                >
+                  {item.student_email}
+                </span>
+                <span style={mutedStyle}>{' '}&middot; lesson{' '}</span>
+                <span
+                  style={clickableStyle}
+                  onClick={() => onOpenTeacherEdit(item.student_email, item.lesson_id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') onOpenTeacherEdit(item.student_email, item.lesson_id);
+                  }}
+                >
+                  {item.lesson_id}
+                </span>
+                <span style={mutedStyle}>
+                  {' '}&middot; waiting {item.days_waiting} day{item.days_waiting === 1 ? '' : 's'}
+                  {' '}&middot; {formatTs(item.submitted_at)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
+
       {/* Inactive */}
       {data.inactive.length > 0 && (
         <details open style={sectionStyle}>

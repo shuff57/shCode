@@ -30,7 +30,31 @@ interface StuckRow {
   started_at: number;
 }
 
+interface AwaitingRow {
+  student_email: string;
+  lesson_id: string;
+  grade_json: string | null;
+  submitted_at: number;
+}
+
 const MS_PER_DAY = 86_400_000;
+
+/**
+ * True when a submission carries the WrittenGrader outage marker.
+ *
+ * Parsed in JS rather than with json_extract in SQL: SQLite raises on
+ * malformed JSON, and one bad legacy row would take down the whole panel.
+ * Same shape as the gradebook's check, deliberately — the two views must
+ * agree on what "ungraded" means.
+ */
+function isGradingFailed(raw: string | null): boolean {
+  if (!raw) return false;
+  try {
+    return (JSON.parse(raw) as { gradingFailed?: unknown })?.gradingFailed === true;
+  } catch {
+    return false;
+  }
+}
 
 export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (context: Ctx) => {
   const { env, data, params } = context;
@@ -77,8 +101,15 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
       ),
     }));
 
-  // 2. Failed submissions: latest submission per student per lesson where
-  //    score < possible * 0.6 (below 60%).
+  // 2. Failed submissions: latest SCORED submission per student per lesson
+  //    where score < possible * 0.6 (below 60%).
+  //
+  //    Only scored rows are ranked. An attempt the grader failed on has a NULL
+  //    score, and `NULL < NULL * 0.6` is NULL rather than true, so it could
+  //    never match this rule anyway — but as the newest row it used to take
+  //    rn = 1 and push a genuine 3/10 down to rn = 2, silently removing a
+  //    struggling student from this list. An outage must not make anyone look
+  //    fine. Those rows are reported by rule 4 instead.
   const failedResult = await env.DB.prepare(
     `SELECT student_email, lesson_id, score, possible, submitted_at
        FROM (
@@ -89,10 +120,11 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
              ORDER BY submitted_at DESC
            ) AS rn
          FROM lesson_submissions
-         WHERE student_email IN (
-           SELECT student_email FROM enrollments
-            WHERE class_id = ?1 AND expires_at > ?2
-         )
+         WHERE score IS NOT NULL
+           AND student_email IN (
+             SELECT student_email FROM enrollments
+              WHERE class_id = ?1 AND expires_at > ?2
+           )
        )
       WHERE rn = 1 AND score < possible * 0.6`,
   )
@@ -133,7 +165,45 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
     days_since_started: Math.floor((now - row.started_at) / MS_PER_DAY),
   }));
 
-  return json({ inactive, failed_submission, stuck });
+  // 4. Awaiting a grade: the student's NEWEST submission on a lesson is an
+  //    attempt the AI grader failed on, so nothing has scored it. This is the
+  //    only category where the work is done and the hold-up is ours — the
+  //    answer is sitting in the review queue waiting for a human.
+  //
+  //    Ranks every submission, not just scored ones: if a later attempt graded
+  //    successfully it takes rn = 1 and the lesson is no longer awaiting.
+  //    Same definition as the gradebook's `pending` cell, on purpose.
+  const awaitingResult = await env.DB.prepare(
+    `SELECT student_email, lesson_id, grade_json, submitted_at
+       FROM (
+         SELECT
+           student_email, lesson_id, grade_json, score, submitted_at,
+           ROW_NUMBER() OVER (
+             PARTITION BY student_email, lesson_id
+             ORDER BY submitted_at DESC
+           ) AS rn
+         FROM lesson_submissions
+         WHERE student_email IN (
+           SELECT student_email FROM enrollments
+            WHERE class_id = ?1 AND expires_at > ?2
+         )
+       )
+      WHERE rn = 1 AND score IS NULL AND grade_json IS NOT NULL`,
+  )
+    .bind(classId, now)
+    .all<AwaitingRow>();
+
+  const awaiting_grade = (awaitingResult.results ?? [])
+    .filter((row) => isGradingFailed(row.grade_json))
+    .map((row) => ({
+      student_email: row.student_email,
+      lesson_id: row.lesson_id,
+      lesson_title: row.lesson_id,
+      submitted_at: row.submitted_at,
+      days_waiting: Math.floor((now - row.submitted_at) / MS_PER_DAY),
+    }));
+
+  return json({ inactive, failed_submission, stuck, awaiting_grade });
 };
 
 function json(body: unknown, status = 200): Response {
