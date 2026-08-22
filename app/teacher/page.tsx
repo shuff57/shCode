@@ -746,16 +746,25 @@ function GradebookView({
         <button style={S.btn('#8be9fd')} onClick={handleDownloadCsv}>
           Download as CSV
         </button>
+        <span style={{ fontSize: 12, color: '#6272a4' }}>
+          {gbData.students.length} student{gbData.students.length !== 1 ? 's' : ''} · {displayLessons.length} lesson{displayLessons.length !== 1 ? 's' : ''}
+        </span>
+        {/* marginLeft:auto parks it on the right edge of the toolbar, above the
+            matrix's own right edge, whatever the counts above widen to. */}
         <button
-          style={S.btn(fullScreen ? '#ff79c6' : 'transparent')}
+          style={{
+            ...S.btn(fullScreen ? '#ff79c6' : 'transparent'),
+            marginLeft: 'auto',
+            // S.btn hardcodes color:#282a36 for its dark-text-on-bright-fill
+            // case. With a transparent fill that is black on near-black, so
+            // the outline state has to restate both colour and border.
+            ...(fullScreen ? {} : { color: '#8be9fd', border: '1px solid #8be9fd' }),
+          }}
           onClick={() => setFullScreen((v) => !v)}
           title={fullScreen ? 'Esc also exits' : 'Fill the window with the matrix'}
         >
           {fullScreen ? '✕ Exit full screen' : '⛶ Full screen'}
         </button>
-        <span style={{ fontSize: 12, color: '#6272a4' }}>
-          {gbData.students.length} student{gbData.students.length !== 1 ? 's' : ''} · {displayLessons.length} lesson{displayLessons.length !== 1 ? 's' : ''}
-        </span>
       </div>
 
       {/* Scrollable matrix */}
