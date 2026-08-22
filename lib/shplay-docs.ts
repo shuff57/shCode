@@ -4,23 +4,36 @@
 
 // Scope-out (stated explicitly so a future maintainer doesn't rediscover the boundary):
 // These shPlay API areas were dropped because no runnable lesson exercises them:
-//   Visual / Visuals, EmojiImage, multitouch pointer/pointers, kb.shift/control/alt/meta,
+//   Visual / Visuals, EmojiImage, multitouch pointer/pointers,
 //   world.renderStats / world.meterSize, palettes, world.timeScale / world.physicsTime /
 //   world.realTime / world.autoStep / world.physicsUpdate, world.allowSleeping /
 //   sprite.sleeping, world.explodeAt, world.rayCast / world.rayCastAll,
-//   world.getSpritesAt, sprite.passes / pass, sprite.moveTowards / rotateTowards /
-//   attractTo / angleTo / bearing, sprite.addCollider / addSensor / addDefaultSensors,
+//   world.getSpritesAt, sprite.passes / pass, sprite.angleTo /
+//   bearing, sprite.addCollider / addSensor / addDefaultSensors,
 //   sprite.update / sprite.draw overrides, sprite.playAni / playAnis (Promise-based),
-//   sprite.mass / density / drag / rotationDrag / applyTorque / rotationSpeed,
-//   sprite.opacity / removed, sprite.grabbable, group.addTiles / tile, group.cull /
+//   sprite.drag / rotationDrag / applyTorque / rotationSpeed,
+//   sprite.grabbable, group.addTiles / tile,
 //   autoCull, group.life / autoDraw / autoUpdate, group.amount, subgroups (Group(parent)),
 //   camera.zoom / camera.off / camera.on, mouse.drags / dragging / dragged,
-//   mouse button-specific args, kb.released, contros (gamepad), pointer,
+//   contros (gamepad), pointer,
 //   joint.springiness / damping / limitsEnabled / range / forceThreshold / torqueThreshold /
-//   offsetA / offsetB, frameRate(), color(), rect/circle/line/triangle/noStroke/stroke
-//   drawing primitives, textFont, parseTextureAtlas, loadImage, EmojiImage,
+//   offsetA / offsetB, color(), triangle drawing primitive,
+//   textFont, parseTextureAtlas, loadImage, EmojiImage,
 //   sprite.addAnis, anis.cutFrames / offset.
-// If a future lesson needs one of these, that's a new gap to close then.
+// sprite.mass / density / opacity, sprite.moveTowards, sprite.rotateTo, sprite.debug, and
+// frameRate() were in this list too — a lesson audit found them reachable
+// (6-5-21, 5-1-23, and six sprite.text label lessons) and they're built now; see the
+// sprite/physics/text sections and Canvas > frameCount below.
+//
+// A second pass removed more of the list, on a different criterion — not "a
+// lesson runs it" but "a student reaches for it because the API's own shape
+// promised it". Built and no longer scoped out:
+//   group.cull (6-1-12-challenges already tells students to read these docs
+//     for it), sprite.moveAway / attractTo / repelFrom / rotateTowards (the
+//     opposites and siblings of methods the course teaches), the cascading
+//     Group forms of those, mouse.left / center / right / pos, and
+//     kb.shift / control / alt plus the other named-key properties.
+// If a future lesson needs one of the still-listed items, that's a new gap to close then.
 
 import {
   searchDocs as coreSearchDocs,
@@ -165,7 +178,9 @@ function draw() {
         title: 'frameCount',
         body: `frameCount is a global number that starts at 0 and goes up by 1 every frame. It's the simplest way to animate: use it to offset a position, wrap a counter with %, or trigger something every N frames.
 
-Combine frameCount with Math.sin or Math.cos to get smooth back-and-forth motion without any physics.`,
+Combine frameCount with Math.sin or Math.cos to get smooth back-and-forth motion without any physics.
+
+frameRate() (no arguments) returns how many frames per second your sketch is actually managing right now — call it inside draw() and print it if you want to see whether a busy scene is slowing things down.`,
         code: `let ball;
 
 function setup() {
@@ -302,7 +317,9 @@ function draw() {
 
 .stroke is the outline color and .strokeWeight is its thickness in pixels. Set strokeWeight to 0 for no outline.
 
-.visible = false hides a sprite without removing it — physics still runs. .layer controls draw order — higher layer values draw on top.`,
+.visible = false hides a sprite without removing it — physics still runs. .layer controls draw order — higher layer values draw on top.
+
+.opacity fades a sprite from 0 (invisible) to 1 (fully solid, the default) — good for a hit-flash, a fade-out before delete(), or a ghosted preview. .debug = true draws the sprite's actual physics collider as a lime outline, which is the fastest way to check whether the shape you're seeing matches the shape you're colliding with.`,
         code: `function setup() {
   new Canvas(400, 400);
   world.gravity.y = 0;
@@ -316,6 +333,11 @@ function draw() {
   front.stroke = 'black';
   front.strokeWeight = 3;
   front.layer = 1;
+  front.opacity = 0.6;
+
+  const ball = new Sprite(340, 200, 40);
+  ball.color = 'tomato';
+  ball.debug = true; // outlines the real collider, useful while tuning shapes
 }
 
 function draw() {
@@ -409,6 +431,110 @@ function draw() {
 }`,
       },
       {
+        title: 'Speed, direction, and moveTowards',
+        body: `.speed and .direction are another way to read and set .vel, in polar form instead of x/y. .speed is how fast the sprite is moving (pixels per frame, always 0 or positive — a negative speed just points direction the other way). .direction is the heading in degrees, where 0 points right, 90 points down, matching .rotation's convention.
+
+Setting .speed keeps the current direction; setting .direction keeps the current speed. That makes "turn without slowing down" or "speed up without turning" a one-line change instead of redoing the vector math.
+
+sprite.moveTowards(x, y, tracking) nudges a sprite toward a point without touching physics at all — each call moves it tracking (default 0.1, so 10%) of the remaining distance. Call it once per update() frame for a smooth chase that naturally slows down as it arrives.`,
+        code: `let hunter, target;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  hunter = new Sprite(60, 200, 30);
+  hunter.color = 'tomato';
+  hunter.collider = 'none';
+
+  target = new Sprite(340, 200, 16);
+  target.color = 'gold';
+  target.collider = 'none';
+}
+
+function update() {
+  target.x = 200 + Math.cos(frameCount / 40) * 150;
+  target.y = 200 + Math.sin(frameCount / 40) * 150;
+  hunter.moveTowards(target.x, target.y, 0.05);
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
+        title: 'Chasing, fleeing, and pulling',
+        body: `Two questions come first: how far away is it, and which way is it? sprite.distanceTo(other) gives the straight-line distance in pixels, and sprite.angleTo(other) gives the direction in degrees, measured the same way as sprite.rotation. Both take a pair of numbers or anything with x and y — another sprite, or mouse.
+
+moveTowards has three relatives that work the same way, and all four accept either a pair of numbers or a target with .x and .y — so enemy.moveTowards(player, 0.02) is a complete chase.
+
+moveTowards(target, tracking) closes that fraction of the remaining gap each call. moveAway(target, repel) is its mirror: it opens the gap by the same fraction. Both set position directly, so they ignore physics — the sprite arrives no matter what is in the way.
+
+attractTo(target, force) and repelFrom(target, force) work through physics instead, applying a real force in newtons toward or away from the point. The sprite accelerates, keeps its momentum, and bounces off whatever it hits on the way. Use these when the pull should feel like gravity or magnetism rather than a leash.
+
+rotateTowards(target, tracking) turns to face a point over several frames by setting a spin speed — unlike rotateTo, which steps or snaps the angle directly. Like rotateTo, it always turns the short way round.
+
+Passing mouse itself (not mouse.x and mouse.y) is worth doing: the sprite then ignores the cursor until it has actually moved over the canvas, instead of lunging at the top-left corner on the first frame.`,
+        code: `let hunter, prey, magnet;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  prey = new Sprite(200, 120, 18);
+  prey.color = 'gold';
+  prey.collider = 'none';
+
+  hunter = new Sprite(60, 120, 22);
+  hunter.color = 'tomato';
+  hunter.collider = 'none';
+
+  magnet = new Sprite(200, 300, 20);
+  magnet.color = 'deepskyblue';
+}
+
+function update() {
+  // prey runs from the cursor, hunter chases the prey
+  prey.moveAway(mouse, 0.04);
+  hunter.moveTowards(prey, 0.03);
+  hunter.rotateTowards(prey, 0.2);
+
+  // the blue one is pulled by physics, so it overshoots and swings back
+  magnet.attractTo(mouse, 30);
+}
+
+function draw() {
+  background('#222');
+  fill('white');
+  textSize(13);
+  text('move the mouse', 14, 22);
+}`,
+      },
+      {
+        title: 'rotateTo',
+        body: `sprite.rotateTo(angle, speed) turns a sprite toward angle, in degrees, using the shorter direction. Pass speed to cap how many degrees it turns per call — call it every update() frame and it eases into the target angle instead of snapping. Leave speed out and it snaps immediately, same as setting .rotation directly.
+
+It returns a Promise, so await sprite.rotateTo(90) works if you like that style — but the rotation itself already happened by the time you'd await it, so most lesson code just calls it and moves on.`,
+        code: `let turret;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+  turret = new Sprite(200, 200, 60, 16);
+  turret.color = 'slategray';
+}
+
+function update() {
+  const dx = mouseX - turret.x, dy = mouseY - turret.y;
+  const angleToMouse = Math.atan2(dy, dx) * 180 / Math.PI;
+  turret.rotateTo(angleToMouse, 4); // turns at most 4°/frame toward the mouse
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
         title: 'Images and emoji on sprites',
         body: `sprite.image = 'player.png' loads an image from a URL and draws it in place of the default colored shape. The image stretches to fill the sprite's width and height.
 
@@ -447,7 +573,9 @@ function draw() {
 
 Each sprite has a .vel vector with .x and .y components, measured in pixels per frame. At 60 fps, vel.x = 4 means the sprite moves 240 pixels per second. Reading .vel tells you how fast a sprite is moving; writing it overrides physics for that frame.
 
-Assigning vel every frame is fine for player controls — you're telling the engine exactly what you want.`,
+Assigning vel every frame is fine for player controls — you're telling the engine exactly what you want.
+
+There's a top speed. The physics engine won't let a sprite move faster than about 60 pixels per frame, no matter how high you set vel.x — it just quietly caps there. That's a safety limit so fast sprites can't tunnel through walls in a single frame. If a sprite feels stuck at the same speed no matter what number you try, this is why — it's not a bug.`,
         code: `let player, ground;
 
 function setup() {
@@ -505,8 +633,34 @@ function draw() {
 }`,
       },
       {
+        title: 'Mass and density',
+        body: `.mass is how heavy a sprite is — read it to see how physics will treat the sprite (a heavier sprite reacts less to the same applyForce push, see below). Setting .mass adjusts the sprite's density so its actual mass matches what you asked for. Static and kinematic sprites always have 0 mass, since gravity and pushes don't affect them.
+
+.density is the more direct knob underneath .mass — mass is density times the sprite's area, so a bigger sprite at the same density weighs more. New sprites default to a density of 1.
+
+You'll reach for .mass far more often than .density — it's the number that actually means something ("this rock should be twice as heavy as that crate").`,
+        code: `function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 10;
+
+  new Sprite(200, 380, 400, 20, 'static');
+
+  const feather = new Sprite(120, 80, 30);
+  feather.color = 'lightyellow';
+  feather.mass = 0.2;
+
+  const rock = new Sprite(280, 80, 30);
+  rock.color = 'gray';
+  rock.mass = 5;
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
         title: 'Applying forces',
-        body: `sprite.applyForce(fx, fy) pushes a sprite with a force in pixels per frame squared. Pass the x and y components as two separate numbers. Call it every frame for continuous thrust, or once for a shove.
+        body: `sprite.applyForce(fx, fy) pushes a sprite with a force in newtons — the physics engine's own force unit, not pixels. Pass the x and y components as two separate numbers. Call it every frame for continuous thrust, or once for a shove.
 
 Forces respect mass — heavier sprites react less to the same push than light ones do. This is different from setting .vel directly, which overrides physics entirely.
 
@@ -579,7 +733,7 @@ function draw() {
       },
       {
         title: 'Overlap callbacks',
-        body: `sprite.overlaps(other) returns true if the two sprites' bounding boxes intersect. Pass a Group and it returns true if any member overlaps.
+        body: `sprite.overlaps(other) returns true if the two sprites intersect (bounding-box math for rectangles, real circle-distance math for two circles). Pass a Group and it returns true if any member overlaps.
 
 You can also pass a callback as the second argument: sprite.overlaps(group, (self, other) => { ... }). The callback fires once per overlapping pair, after the method has finished its own iteration — so it's safe to delete() sprites inside the callback.
 
@@ -739,6 +893,43 @@ function draw() {
 }`,
       },
       {
+        title: 'Culling sprites that leave the screen',
+        body: `Every spawner has the same problem: sprites that drift off the edge are invisible but still alive, still costing physics every frame. Left alone, a game that fires a bullet every 10 frames is dragging thousands of dead bullets around after a few minutes.
+
+group.cull(margin) deletes the members that have gone that far outside the canvas, and returns how many it deleted. cull(0) means "the moment they leave", cull(50) gives them a 50-pixel grace border so a sprite that is only halfway off doesn't vanish mid-view.
+
+Give it a function and it runs that instead of deleting: cull(0, s => s.y = 0). That's how you wrap a sprite around to the other side, or send it back to the spawn point, rather than destroying it. The sprite stays in the group either way.
+
+It measures against the camera, so a scrolling game culls against what's actually on screen, not against the origin.`,
+        code: `let drops;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+  drops = new Group();
+  drops.color = 'deepskyblue';
+  drops.diameter = 14;
+  drops.collider = 'none';
+}
+
+function update() {
+  if (frameCount % 10 === 0) {
+    new drops.Sprite(Math.random() * 400, 0);
+  }
+  for (const d of drops) d.y += 3;
+
+  // one line replaces the remove-while-iterating loop
+  drops.cull(20);
+}
+
+function draw() {
+  background('#112');
+  fill('white');
+  textSize(14);
+  text('alive: ' + drops.length, 14, 22);
+}`,
+      },
+      {
         title: 'The allSprites group',
         body: `allSprites is a built-in Group that every sprite joins automatically the moment it's created. You never construct it — it's already there as soon as shPlay loads.
 
@@ -859,7 +1050,13 @@ kb.pressing('key') returns true while the key is held down. Use it for continuou
 
 kb.presses('key') is true only on the first frame of a press (edge-triggered). Use it for single-shot actions like jumping or firing.
 
-Key names are lowercase strings: 'left', 'right', 'up', 'down', 'a', 'w', 'enter', and ' ' (a single space) for the space bar. Arrow keys and space bar are automatically prevented from scrolling the page.`,
+Key names are lowercase strings: 'left', 'right', 'up', 'down', 'a', 'w', 'enter', 'shift', 'escape', and either 'space' or ' ' for the space bar. Spelling is forgiving — 'space', 'ArrowRight' and 'arrowright' all find the key they name.
+
+'left', 'right', 'up' and 'down' answer for the arrow key OR its WASD twin, so kb.pressing('left') is true whether the player pressed the left arrow or 'a'. You get both control schemes without writing either one twice.
+
+There are shorthand properties too: kb.space, kb.enter, kb.shift, kb.arrowUp and friends give the same number kb.pressing() would.
+
+Arrow keys and space bar are automatically prevented from scrolling the page.`,
         code: `let player;
 
 function setup() {
@@ -882,10 +1079,40 @@ function draw() {
 }`,
       },
       {
+        title: 'Holding a key',
+        body: `kb.pressing('key') isn't just true/false — it's the number of frames the key has been held (0 when idle), so it's still truthy in an if-check but also useful as a charge-up timer.
+
+kb.holds('key') fires exactly once, the frame the hold crosses kb.holdThreshold (12 frames by default — about a fifth of a second at 60fps). kb.holding('key') is the frame count while held past that threshold (0 before it). kb.held('key') fires exactly once, the frame the key comes back up after having been held past the threshold — use it to tell a quick tap apart from a held press.
+
+mouse has the same four: mouse.holds(), mouse.holding(), mouse.held(), mouse.holdThreshold.`,
+        code: `let charge = 0;
+
+function setup() {
+  new Canvas(400, 200);
+}
+
+function update() {
+  if (kb.holds(' ')) charge = 0;
+  if (kb.holding(' ')) charge = kb.holding(' ');
+  if (kb.held(' ')) console.log('released a full charge:', charge);
+}
+
+function draw() {
+  background('#222');
+  fill('gold');
+  textSize(16);
+  text('hold space — charge: ' + charge, 14, 24);
+}`,
+      },
+      {
         title: 'Mouse position and buttons',
         body: `mouse.x and mouse.y are the cursor's position in world coordinates (already camera-aware).
 
-mouse.pressing() returns true while the primary mouse button is held. mouse.presses() is true only on the first frame of a click — use it for single-shot actions. mouse.released() is true on the frame the button is released.
+mouse.pressing() returns true while any mouse button is held. mouse.presses() is true only on the first frame of a click — use it for single-shot actions. mouse.released() is true on the frame the button is released.
+
+To tell the buttons apart, mouse.left, mouse.center and mouse.right each count one button on their own. mouse.pos is the cursor as an {x, y} object, handy for passing straight to a method that takes a target.
+
+mouse.x and mouse.y are world coordinates — they already include the camera, so comparing them to a sprite's x and y always works. mouse.canvasPos is the same cursor measured in screen pixels instead. Use it for anything pinned to the screen rather than the world, like a HUD button: once the camera scrolls, mouse.x is somewhere out in the level while canvasPos is still where the cursor looks like it is.
 
 Combine mouse position with world.getSpriteAt(x, y) to build click-to-select or drag interactions.`,
         code: `let dot;
@@ -1262,6 +1489,34 @@ function draw() {
   fill('white');
   textSize(16);
   text('x: ' + Math.round(player.x), 10, 24);
+}`,
+      },
+      {
+        title: 'Labels on sprites',
+        body: `sprite.text puts a label directly on a sprite — a name tag, an HP counter, a damage number — without you tracking its x/y yourself. It's centered over the sprite and follows it automatically as the sprite moves, and it stays right-side-up even if the sprite rotates. Set it to null (the default) to remove the label.
+
+sprite.textColor and sprite.textSize style it, same idea as fill()/textSize() for the global text() function but scoped to just this one sprite. It respects sprite.opacity too, so a fading sprite's label fades with it.
+
+This is a different tool from the global text() function above: text() is for one-off draws you position yourself (titles, HUDs); sprite.text is for a label that's tied to a specific sprite.`,
+        code: `let enemy;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  enemy = new Sprite(200, 200, 50, 50);
+  enemy.color = 'firebrick';
+  enemy.text = 'HP 3';
+  enemy.textColor = 'white';
+  enemy.textSize = 14;
+}
+
+function update() {
+  if (kb.presses(' ')) enemy.text = 'HP 2';
+}
+
+function draw() {
+  background('#222');
 }`,
       },
     ],

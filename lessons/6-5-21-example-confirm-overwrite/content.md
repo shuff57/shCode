@@ -18,8 +18,13 @@ function setup() {
 function draw() {
   background('#222');
 
-  player.vel.x = (kb.pressing('right') - kb.pressing('left')) * 4;
-  player.vel.y = (kb.pressing('down') - kb.pressing('up')) * 4;
+  if (kb.pressing('right'))     player.vel.x = 4;
+  else if (kb.pressing('left')) player.vel.x = -4;
+  else                          player.vel.x = 0;
+
+  if (kb.pressing('down'))      player.vel.y = 4;
+  else if (kb.pressing('up'))   player.vel.y = -4;
+  else                          player.vel.y = 0;
 
   if (kb.presses('space')) score = score + 1;
 
@@ -66,8 +71,13 @@ function draw() {
   background('#222');
 
   if (!confirming) {
-    player.vel.x = (kb.pressing('right') - kb.pressing('left')) * 4;
-    player.vel.y = (kb.pressing('down') - kb.pressing('up')) * 4;
+    if (kb.pressing('right'))     player.vel.x = 4;
+    else if (kb.pressing('left')) player.vel.x = -4;
+    else                          player.vel.x = 0;
+
+    if (kb.pressing('down'))      player.vel.y = 4;
+    else if (kb.pressing('up'))   player.vel.y = -4;
+    else                          player.vel.y = 0;
     if (kb.presses('space')) score = score + 1;
   }
 
@@ -135,8 +145,13 @@ function draw() {
   background('#222');
 
   if (!confirming) {
-    player.vel.x = (kb.pressing('right') - kb.pressing('left')) * 4;
-    player.vel.y = (kb.pressing('down') - kb.pressing('up')) * 4;
+    if (kb.pressing('right'))     player.vel.x = 4;
+    else if (kb.pressing('left')) player.vel.x = -4;
+    else                          player.vel.x = 0;
+
+    if (kb.pressing('down'))      player.vel.y = 4;
+    else if (kb.pressing('up'))   player.vel.y = -4;
+    else                          player.vel.y = 0;
     if (kb.presses('space')) score = score + 1;
   }
 
@@ -217,8 +232,13 @@ function draw() {
   background('#222');
 
   if (!confirming) {
-    player.vel.x = (kb.pressing('right') - kb.pressing('left')) * 4;
-    player.vel.y = (kb.pressing('down') - kb.pressing('up')) * 4;
+    if (kb.pressing('right'))     player.vel.x = 4;
+    else if (kb.pressing('left')) player.vel.x = -4;
+    else                          player.vel.x = 0;
+
+    if (kb.pressing('down'))      player.vel.y = 4;
+    else if (kb.pressing('up'))   player.vel.y = -4;
+    else                          player.vel.y = 0;
     if (kb.presses('space')) score = score + 1;
   }
 
