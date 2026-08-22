@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import type { ChangeEvent } from 'react';
 import type { Lesson } from '../lib/types';
 import { useLessonStore } from '../lib/store';
-import { buildPreviewHtml, buildJscadPreviewHtml } from '../lib/preview-builder';
+import { buildPreviewHtml } from '../lib/preview-builder';
 import { saveProgress } from '../lib/version-control';
 import { recordSubmission } from '../lib/written-grader-store';
 import { recordLessonCompleted } from '../lib/progress';
@@ -129,6 +129,7 @@ export default function LessonWorkspace({
   const [srcDoc, setSrcDoc] = useState('');
   const [runKey, setRunKey] = useState(0);
   const [q5Code, setQ5Code] = useState('');
+  const [jscadCode, setJscadCode] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [resetMsg, setResetMsg] = useState<string | null>(null);
   const [consoleOutput, setConsoleOutput] = useState<Array<{type: string; message: string; timestamp: string}>>([]);
@@ -275,8 +276,9 @@ export default function LessonWorkspace({
     const scriptContent = files['script.js'] || '';
     if (!scriptContent.trim()) return;
     const to = setTimeout(() => {
-      const doc = buildJscadPreviewHtml(scriptContent);
-      setSrcDoc(doc);
+      setJscadCode(scriptContent);
+      setRunKey((k) => k + 1);
+      setIsRunning(true);
       setTimeout(() => runTests(), 600);
     }, 300);
     return () => clearTimeout(to);
@@ -393,12 +395,12 @@ export default function LessonWorkspace({
     worker.postMessage(scriptContent);
   }
 
-  // For JSCAD lessons: build 3D preview and render in iframe
+  // For JSCAD lessons: snapshot the current code and bump runKey to reload the
+  // iframe. Same shape as runQ5 — the runner lives at /jscad/runner.html and
+  // reads the code from its ?code= param.
   function runJscad() {
     setRuntimeError(null);
-    const scriptContent = files['script.js'] || '';
-    const doc = buildJscadPreviewHtml(scriptContent);
-    setSrcDoc(doc);
+    setJscadCode(files['script.js'] || '');
     setRunKey((k) => k + 1);
     setConsoleResetKey((k) => k + 1);
     setConsoleOpen(true);
@@ -421,6 +423,7 @@ export default function LessonWorkspace({
   // Stop unloads the iframe back to its empty state without touching the editor.
   function stopRun() {
     setQ5Code('');
+    setJscadCode('');
     setSrcDoc('');
     setRunKey(0);
     setConsoleResetKey((k) => k + 1);
@@ -872,7 +875,7 @@ export default function LessonWorkspace({
                   </pre>
                 </>
               ) : isJscadMode ? (
-                <JscadPreview srcDoc={srcDoc} />
+                <JscadPreview code={jscadCode} runKey={runKey} />
               ) : isQ5Mode ? (
                 <ShPlayPreview code={q5Code} runKey={runKey} />
               ) : (

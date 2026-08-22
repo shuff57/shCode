@@ -1,7 +1,8 @@
 # JSCAD Licensing
 
-JSCAD is loaded from unpkg at runtime — nothing is vendored in this repo.
-The two libraries the app uses are both MIT-licensed:
+JSCAD is vendored in this repo, under `public/jscad/lib/`, and served from
+there at runtime. The two libraries the app redistributes are both
+MIT-licensed:
 
 ## @jscad/modeling@2.13.0 — MIT
 

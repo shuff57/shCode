@@ -11,7 +11,7 @@ everything else.
 
 Every JSCAD program has the same shape:
 
-```js
+```js skeleton
 const { primitives, transforms } = require('@jscad/modeling')
 
 function main() {
@@ -27,6 +27,39 @@ module.exports = { main }
   geometries.
 - `module.exports = { main }` tells the runner which function to call.
 
+### The shortcut, and why the long form is still worth writing
+
+The in-app runner (`public/jscad/runner.html`) pre-loads every JSCAD module
+into scope, so inside shCode both of these do the same thing:
+
+```js shcode-only
+function main() {
+  return cube({ size: 10 })          // shortcut — no require() needed
+}
+```
+
+```js
+const { primitives } = require('@jscad/modeling')
+
+function main() {
+  return primitives.cube({ size: 10 })
+}
+
+module.exports = { main }            // the portable form
+```
+
+The shortcut is additive: nothing is renamed and nothing is wrapped, so the
+`require` / `module.exports` version keeps working here exactly as written.
+Write the portable form when you want the file to also run on
+https://jscad.app/ — that editor has no such shortcut. Two names inside
+`@jscad/modeling` collide with each other, so the bare `utils` and bare
+`minkowski` are the top-level modules of those names; `maths.utils` and
+`booleans.minkowski` stay reachable through their modules.
+
+That first block is the only shortcut example in this file, and its fence is
+tagged `shcode-only` for a reason: `npm test` runs every other example here in
+a require-only sandbox and fails the build if one of them needs the shim.
+
 ## Modules
 
 ### primitives — basic shapes
@@ -34,15 +67,71 @@ module.exports = { main }
 | Function | Options | Notes |
 |---|---|---|
 | `circle` | `{ radius, segments }` | 2D disc; `segments` controls smoothness |
-| `rectangle` | `{ size: [w, h] }` | 2D rectangle |
 | `ellipse` | `{ radius: [rx, ry], segments }` | 2D squashed circle |
+| `rectangle` | `{ size: [w, h] }` | 2D rectangle |
+| `square` | `{ size }` | 2D rectangle, all sides equal — `size` is one number |
+| `roundedRectangle` | `{ size: [w, h], roundRadius, segments }` | 2D rectangle with rounded corners |
 | `polygon` | `{ points: [[x, y], ...] }` | 2D shape from corner points |
+| `triangle` | `{ type: 'SSS', values: [a, b, c] }` | 2D triangle from sides and angles |
 | `star` | `{ vertices, outerRadius, innerRadius }` | 2D star |
+| `arc` | `{ radius, startAngle, endAngle, segments }` | a 2D **path**, not a shape |
+| `line` | `([[x, y], ...])` | a 2D **path**, from a bare array |
 | `cube` | `{ size }` | 3D cube, all sides equal |
 | `cuboid` | `{ size: [x, y, z] }` | 3D box |
-| `sphere` | `{ radius, segments }` | 3D ball |
-| `cylinder` | `{ radius, height, segments }` | 3D cylinder; `radius: [r1, r2]` makes a cone |
+| `roundedCuboid` | `{ size: [x, y, z], roundRadius }` | 3D box with rounded edges |
+| `sphere` | `{ radius, segments }` | 3D ball, built as a stack of rings |
+| `geodesicSphere` | `{ radius, frequency }` | 3D ball, built as near-equal triangles |
+| `ellipsoid` | `{ radius: [rx, ry, rz], segments }` | 3D ball with a radius per axis |
+| `cylinder` | `{ radius, height, segments }` | 3D cylinder |
+| `cylinderElliptic` | `{ height, startRadius: [x, y], endRadius: [x, y] }` | 3D cone or oval tube |
+| `roundedCylinder` | `{ radius, height, roundRadius, segments }` | 3D cylinder with rounded rims |
 | `torus` | `{ innerRadius, outerRadius }` | 3D donut |
+| `polyhedron` | `{ points, faces, orientation }` | 3D solid listed corner by corner |
+
+Every primitive is centred on the origin unless you say otherwise, so half
+of it sits below the grid. `center: [x, y, z]` moves it as it is built —
+two numbers, not three, for a flat shape — and `transforms.translate`
+afterwards does the same job. Three of them take `center` and quietly ignore
+it: `geodesicSphere`, `polyhedron`, and `triangle`, which puts its first
+corner on the origin rather than its middle.
+
+`segments` is how many flat sides stand in for a curve — 32 by default,
+6 for a hexagonal nut, 128 when smoothness matters more than speed. It is
+the single biggest lever on how long a model takes to build.
+`geodesicSphere` is the exception: it ignores `segments` and takes
+`frequency` instead — six or more, rounded down to a multiple of six, so 6
+and 11 both give the same 20 triangles. At frequency 6 a radius-10 ball
+measures 17.01 across rather than 20, because 20 flat faces cut the corners
+off.
+
+`roundRadius` must stay well under half the smallest side; JSCAD stops
+rather than guessing. `roundedRectangle` is the flat version, same rule.
+
+A single number where an array was wanted is the commonest primitive error,
+and it runs both ways: `square({ size: [10, 20] })` stops with *size must be
+positive*, `ellipsoid({ radius: 5 })` with *radius must be an array of X, Y
+and Z values*.
+
+`cylinder` does not make a cone — `radius: [12, 0]` stops with *radius must
+be positive*. Cones are `cylinderElliptic`, whose two ends are set separately
+and each take an `[x, y]` pair: `endRadius: [0, 0]` pulls one end to a
+point, `startRadius: [15, 5]` gives an oval tube. Both ends at zero is
+refused, and a plain `radius` option is ignored without a word — so a tube
+that comes back 2 mm wide is a misspelling, not a bug.
+
+`polyhedron` is the escape hatch when no ready-made shape fits. `points` is
+a list of corners; `faces` says which of them to join, written as positions
+in that list. List each face's corners counter-clockwise as seen from outside.
+Going the other way builds without complaint and points the face inward;
+`orientation: 'inward'` does the same thing deliberately, and reports a
+negative volume.
+
+`arc` and `line` hand back a path — a line with no inside. Only a closed
+path can be extruded: a part-turn `arc` or an open `line` gives *extruded
+path must be closed*. With no `endAngle` at all `arc` draws a whole circle,
+and that one is closed. `line([[0, 0], [10, 0], [10, 10]])` takes a bare
+array with no options object; `line({ points: [...] })` stops with *points
+must be an array*. When you want a filled outline, use `polygon`.
 
 ```js
 const { primitives } = require('@jscad/modeling')
@@ -59,15 +148,71 @@ module.exports = { main }
 | Function | Arguments | Notes |
 |---|---|---|
 | `translate` | `([x, y, z], shape)` | move; `[x, y]` for 2D |
+| `translateX` / `translateY` / `translateZ` | `(distance, shape)` | single-axis shortcuts |
 | `rotate` | `([x, y, z], shape)` | radians, around the origin |
 | `rotateX` / `rotateY` / `rotateZ` | `(angle, shape)` | single-axis shortcuts |
 | `scale` | `([x, y, z], shape)` | stretch per axis |
 | `scaleX` / `scaleY` / `scaleZ` | `(f, shape)` | single-axis shortcuts |
-| `mirror` | `({ normal: [x, y, z] }, shape)` | flip across a plane |
+| `mirror` | `({ normal: [x, y, z], origin: [x, y, z] }, shape)` | flip across a plane |
+| `mirrorX` / `mirrorY` / `mirrorZ` | `(shape)` | flip across a plane through the origin |
 | `center` | `({ axes: [bool, bool, bool] }, shape)` | center at origin |
+| `centerX` / `centerY` / `centerZ` | `(shape)` | single-axis shortcuts |
+| `align` | `({ modes, relativeTo, grouped }, ...shapes)` | line several shapes up |
+| `transform` | `(matrix, shape)` | apply a stored `maths.mat4` move |
 
 Transforms return a new shape; the original is untouched. Nest them:
 `transforms.translate([0, 0, 10], primitives.cube({ size: 5 }))`.
+
+**Rotation happens around the origin, never around the shape's own middle.**
+That one fact is behind most transform bugs. `rotateZ(a, translate([50, 0, 0], s))`
+swings `s` around in a wide arc; `translate([50, 0, 0], rotateZ(a, s))` spins it
+in place and then moves it. Build parts centred on the origin, rotate them
+there, and translate them into position last.
+
+Angles are radians. `utils.degToRad(90)` converts from degrees, and
+`utils.radToDeg` goes back the other way. Written bare inside shCode, `utils`
+is the top-level module that owns them; `maths.utils` is a different module
+reachable through `maths`.
+
+`mirrorX` flips left-to-right across the plane through the origin, `mirrorY`
+front-to-back, `mirrorZ` top-to-bottom. Build the first half entirely on one
+side of the origin, so the mirror plane falls exactly where the two halves are
+meant to meet. The long form puts the plane where you like: `normal` is the
+direction the mirror faces, `origin` any point it passes through, defaulting
+to `[0, 0, 0]`.
+
+That options object belongs to the long form **only**, and the shortcuts do
+not police it. `mirrorX({ normal: [1, 0, 0] }, half)` reads the object as a
+second shape to mirror, throws nothing, and hands back an array holding your
+options object and one correctly mirrored shape. The viewport draws the shape
+and ignores the object, so it looks right — until you `union` that array and
+get an empty solid measuring `[[0,0,0],[0,0,0]]`.
+
+`center({}, shape)` moves a shape's middle onto the origin; `axes` restricts
+it to the axes you mark `true`, and `centerX` / `centerY` / `centerZ` are
+the shortcuts. Handed several shapes it centres each one separately, stacking
+them all on the origin — almost never what an assembly wants.
+
+`align` is the one for several parts at once. Each axis of `modes` takes
+`'min'`, `'max'`, `'center'` or `'none'`, and the line is the origin unless
+`relativeTo` moves it, with `null` meaning leave that coordinate alone. So
+`align({ modes: ['none', 'none', 'min'] }, a, b, c)` drops three parts of
+three different heights flat onto the grid in one call, and
+`relativeTo: [null, null, 42]` seats one on top of a shelf. The defaults are
+`['center', 'center', 'min']` — sensible, and invisible, so write the modes
+out. `grouped: true` moves the shapes as one set, keeping the gaps between
+them. One shape in gives one shape back; two or more give an **array**. A
+misspelled mode is caught, though the message it prints names only three of
+the four legal words.
+
+`transform(matrix, shape)` applies a move built by `maths.mat4`:
+`mat4.fromTranslation(mat4.create(), [0, 0, 12])` is *go up 12 mm*, and there
+is `fromXRotation`, `fromYRotation`, `fromZRotation` and `fromScaling` to
+match. Every builder writes its answer into its first argument, which is why
+`mat4.create()` sits inside the call, and `mat4.multiply(out, move, turn)`
+joins two into one — rightmost first, the same inside-out order as nesting the
+named transforms. The payoff is that a move becomes a value you can name,
+store, and apply to twenty parts knowing every one got the same treatment.
 
 ```js
 const { primitives, transforms } = require('@jscad/modeling')
@@ -90,6 +235,16 @@ module.exports = { main }
 | `union` | `(...shapes)` | merge into one solid |
 | `subtract` | `(base, ...cutters)` | cut cutters out of base — **order matters** |
 | `intersect` | `(...shapes)` | keep only the shared volume |
+| `scission` | `(solid)` | split one solid into its separate lumps |
+
+`scission` is the odd one out — every other boolean puts shapes together and
+this one takes a solid apart. Saw a 140 mm bar in half with `subtract` and
+JSCAD does not hand you two objects: the viewport shows two lumps, and
+`measureDimensions` still reads 140, the distance from one far end to the
+other straight across the gap. `scission` finds the lumps and hands them back
+as an array, 65 mm each, which `main()` can return exactly as it comes. A
+solid already in one piece gives an array of one, so index it rather than
+testing whether it is an array.
 
 ```js
 const { primitives, transforms, booleans } = require('@jscad/modeling')
@@ -109,8 +264,28 @@ module.exports = { main }
 |---|---|---|
 | `extrudeLinear` | `{ height }` | push a 2D profile straight up Z |
 | `extrudeRotate` | `{ angle, segments }` | spin a profile around the Y axis (vases, bowls) |
-| `extrudeHelical` | `{ height, startAngle, endAngle, segmentPoints }` | spiral (springs, threads) |
+| `extrudeHelical` | `{ angle, pitch, radius, height, startAngle, endOffset, segmentsPerRotation }` | spin a profile **and** climb at the same time — springs, threads, screws |
 | `extrudeFromSlices` | `{ numberOfSlices, callback }` | morph between shapes (tapers, lofts) |
+| `extrudeRectangular` | `{ size, height }` | give a 2D **path** width and depth — this is the one for text |
+| `project` | `({ axis, origin }, solid)` | flatten a solid to its 2D shadow |
+
+`extrudeHelical` has two traps worth naming. `height` and `pitch` both set how
+far the climb goes, and when you pass both, **`height` wins and `pitch` is
+discarded** — measured: `{angle: 4PI, height: 40, pitch: 999}` and
+`{angle: 4PI, height: 40}` give the same 4 x 4 x 44 solid. And there is no
+`endAngle` and no `segmentPoints`: pass either one and it is silently ignored,
+with no error and no change to the shape. The turn is set by `angle` alone, and
+smoothness by `segmentsPerRotation` (measured: 4 -> 140 polygons, the default
+-> 1036, 64 -> 2060).
+
+`project` runs the other way round: a solid in, and out comes the outline you
+would see looking straight down at it. That is the base plate that matches a
+part exactly, or the footprint that says whether two parts collide on the bed.
+What comes back is 2D, so it needs an extrude of its own before it is solid
+again, and a hole that does not go all the way through leaves no mark in the
+shadow. `axis` is the direction you are looking from and defaults to
+`[0, 0, 1]`; handed a shape that is flat already, `project` returns it
+unchanged.
 
 ```js
 const { primitives, extrusions } = require('@jscad/modeling')
@@ -123,12 +298,83 @@ function main() {
 module.exports = { main }
 ```
 
+### expansions — rounding, and the fillet that isn't
+
+| Function | Arguments | Notes |
+|---|---|---|
+| `offset` | `({ delta, corners, segments }, outline)` | grow or shrink a 2D outline |
+| `expand` | `({ delta, segments }, shape)` | a rounded skin on a shape |
+
+JSCAD has no fillet function and no chamfer function. The only names in the
+library with *round* in them are `roundedCuboid`, `roundedCylinder` and
+`roundedRectangle`, which cover a box and a cylinder and nothing else. These
+two are the general answer, and which one you call depends on what you already
+have: `offset` takes a flat outline, `expand` takes a solid.
+
+`delta` is how far, in millimetres, and it lands on both sides at once: a
+60 mm square offset by 10 comes back 80, and a 40 mm cube expanded by 4
+measures 48. To finish at the size you meant, build at `size - 2 * delta`.
+Negative `delta` pulls a 2D outline inward — never further than half the
+narrowest part of the shape, past which the outline folds through itself — and
+on a solid it is refused with *radius must be positive*.
+
+`corners` is 2D only. `'edge'` keeps the sharp point and is what you get by
+leaving it out, `'chamfer'` slices the point off flat, and `'round'` lays a
+curve built from `segments` short straight pieces — 16 is smooth enough for
+anything you will print. On a solid the only style is round, and asking for
+another stops with *corners must be "round" for 3D geometries*.
+
+Each has one silent failure worth knowing. `offset` handed a solid gives that
+same solid straight back, unchanged and without a word. `expand` handed a
+path gives back a 2D shape rather than a thicker path.
+
+The recipe worth memorising, and the closest thing to a fillet you get: sketch
+the part flat, `offset` the sketch with `corners: 'round'`, then extrude. It
+rounds the four upright edges and leaves the top and bottom flat and sharp,
+which is what a plate that has to sit on a print bed wants — `expand` would
+round those two faces as well, and add twice `delta` to the thickness
+besides. Anything to be cut into the plate goes in between the offset and the
+extrude, while it is still flat and cheap to cut.
+
+```js
+const { primitives, expansions, extrusions, transforms } = require('@jscad/modeling')
+
+function main() {
+  const r = 6
+  // Sketched one radius smaller on every side, so the offset lands it on 60 x 40.
+  const sketch = primitives.rectangle({ size: [60 - 2 * r, 40 - 2 * r] })
+  const rounded = expansions.offset({ delta: r, corners: 'round', segments: 16 }, sketch)
+  const plate = extrusions.extrudeLinear({ height: 5 }, rounded)
+
+  // 10 x 10 x 4, expanded by 3: it comes out 16 x 16 x 10.
+  const knob = expansions.expand({ delta: 3, segments: 12 },
+    primitives.cuboid({ size: [10, 10, 4] })
+  )
+
+  return [plate, transforms.translate([0, 0, 14], knob)]
+}
+
+module.exports = { main }
+```
+
 ### hulls — organic forms
 
 | Function | Arguments | Notes |
 |---|---|---|
 | `hull` | `(...shapes)` | smallest convex shape containing all inputs |
 | `hullChain` | `(...shapes)` | hull each neighbor pair, keep the shapes visible |
+| `hullPoints2` | `([[x, y], ...])` | the outer points of a 2D list |
+| `hullPoints3` | `([[x, y, z], ...])` | the outer faces of a 3D list |
+
+The bottom two work a level below the other two: no shapes go in, and no shape
+comes out. `hullPoints2` hands back an array of `[x, y]` pairs — feed it
+seven points and five come back, the two sitting inside the outline dropped —
+and `hullPoints3` hands back an array of faces. That is the trap: return
+either straight from `main()` and the viewport shows the grid and the axes
+and nothing else, with no error, because a list of numbers is not geometry.
+`geometries.geom2.fromPoints(points)` turns the 2D one into a real shape —
+one argument, unlike `path2.fromPoints`, which takes an options object first
+— and `geometries.geom3.create(faces)` builds the solid from the 3D one.
 
 ```js
 const { primitives, transforms, hulls } = require('@jscad/modeling')
@@ -147,11 +393,36 @@ module.exports = { main }
 | Function | Returns |
 |---|---|
 | `measureVolume` | volume in cubic units |
-| `measureBoundingBox` | `{ min: [x, y, z], max: [x, y, z] }` |
+| `measureBoundingBox` | `[[minX, minY, minZ], [maxX, maxY, maxZ]]` — two corner arrays, **not** a `{min, max}` object |
 | `measureDimensions` | `[dx, dy, dz]` |
 | `measureArea` | surface area |
 | `measureCenter` | center point |
-| `measureAggregateBoundingBox` | bounding box across many shapes |
+| `measureCenterOfMass` | `[x, y, z]` — the balance point, which is not the center |
+| `measureAggregateBoundingBox` | one bounding box across many shapes, in the same corner-pair form |
+| `measureAggregateVolume` | one total volume across many shapes |
+| `measureEpsilon` | a comparison margin sized for that shape |
+
+Read a bounding box by index: `box[0][2]` is the lowest Z, `box[1][0] - box[0][0]`
+is the width. Translating a shape up by `-box[0][2]` sits it exactly on the grid.
+
+Hand `measureBoundingBox` an **array** of shapes and it returns one box per
+shape. When you want the extent of a whole group — and anything built by
+`extrudeRectangular` from a list of paths is a group — use
+`measureAggregateBoundingBox` instead. `measureAggregateVolume` is its
+partner for material: it adds the parts up rather than fusing them, so two
+overlapping 10 mm cubes aggregate to 2000 where their `union` measures 1500.
+
+`measureCenter` is the middle of the bounding box. `measureCenterOfMass` is
+where the shape would balance on the end of a pencil; on an L-shaped bracket
+the two answers sit about 8 mm apart, and neither is guaranteed to be inside
+the shape at all. Handed something it cannot weigh — a path — it returns
+`[0, 0, 0]` rather than complaining.
+
+Never compare two measured numbers with `===`. Rounding accumulates: spin a
+30 mm brick by 30 degrees twelve times, so that it is back exactly where it
+started, and its width reads 30.00000000000002. `measureEpsilon(shape)` hands
+you a margin sized for that shape — 0.0002 for this brick, larger for a larger
+one — so ask whether the gap is under the epsilon instead.
 
 ```js
 const { primitives, measurements } = require('@jscad/modeling')
@@ -167,8 +438,36 @@ module.exports = { main }
 
 ### colors — paint geometry
 
-`colors.colorize(color, shape)` — color is RGBA floats 0–1, a named color
-string, or a hex string. Color is display metadata; it doesn't change geometry.
+| Function | Arguments | Notes |
+|---|---|---|
+| `colorize` | `(color, shape)` | **an array only** — `[r, g, b]` or `[r, g, b, a]`, every number 0–1 |
+| `colorNameToRgb` | `('tomato')` | CSS colour name → the array `colorize` wants |
+| `hexToRgb` | `('#3366ff')` | hex code → the same array form |
+| `hslToRgb` | `(hue, saturation, lightness)` | hue is a **fraction of a turn, 0–1**, not degrees |
+
+`colorize` does **not** accept a colour string. `colorize('red', shape)` and
+`colorize('#ff0000', shape)` both throw `color must be an array`; so does a
+misspelled name, because `colorNameToRgb` returns `undefined` rather than
+throwing. Convert first, then colorize. Numbers are 0–1, never 0–255, and a
+0–255 array is stored unchecked — no error, just the wrong colour.
+
+Colour is display metadata. It does not change geometry and is ignored by a
+single-material printer. What it buys you is being able to tell parts apart
+while you work, so colour each part as you build it and keep the palette in
+one object at the top of the file.
+
+**Build, cut, then paint.** Colour survives moving, turning, scaling and
+mirroring, so a coloured part can be copied anywhere. It does **not**
+survive a boolean: `union`, `subtract` and `intersect` each build
+a new solid and hand it back with no colour at all, silently. Do the booleans
+first and colorize the finished part last.
+
+For a different colour on each face, go one level below `colorize`: a solid is
+a bag of flat faces, `geometries.geom3.toPolygons(solid)` hands you that bag
+(six items for a cuboid), each face may carry its own `color` array, and
+`geometries.geom3.create(faces)` puts them back together. The rebuilt solid
+measures identically and has no top-level colour of its own. The in-app docs
+(`/docs/jscad`, Colors) work this through.
 
 ```js
 const { primitives, colors } = require('@jscad/modeling')
@@ -184,18 +483,30 @@ module.exports = { main }
 
 | Function | Options | Notes |
 |---|---|---|
-| `vectorText` | `{ height, input }` | string → array of 2D letter shapes |
-| `vectorChar` | `{ height, input }` | single character, with segment detail |
+| `vectorText` | `{ height, input }` | string → one array of points per pen stroke |
+| `vectorChar` | `{ height, input }` | single character, same stroke form |
 
-Letters are real geometry — extrude them for 3D text.
+Letters come out as **strokes**, not solid shapes: `vectorText` gives you a list
+of point arrays, one per pen line. Two steps turn them into something you can
+print — make each stroke a path with `geometries.path2.fromPoints`, then give
+the strokes width and depth with `extrusions.extrudeRectangular`.
+
+(`extrudeLinear` is the wrong tool here. It wants a closed 2D area; handed a
+raw list of points it returns something the viewer cannot draw, with no error.)
+
+`extrudeRectangular` over a list of paths returns a **list of solids**, one
+per stroke — not one lump of lettering. Measure the group with
+`measureAggregateBoundingBox`; `measureBoundingBox` would give you a box per
+letter and the centring arithmetic that follows would quietly be nonsense.
 
 ```js
-const { text, extrusions, transforms } = require('@jscad/modeling')
+const { text, extrusions, geometries, transforms } = require('@jscad/modeling')
 
 function main() {
-  const letters = text.vectorText({ height: 12, input: 'HI' })
-  return letters.map((l) =>
-    transforms.translate([0, 0, 2], extrusions.extrudeLinear({ height: 4 }, l))
+  const strokes = text.vectorText({ height: 12, input: 'HI' })
+  const paths = strokes.map((points) => geometries.path2.fromPoints({}, points))
+  return transforms.translate([0, 0, 2],
+    extrusions.extrudeRectangular({ size: 1, height: 4 }, paths)
   )
 }
 
@@ -252,15 +563,194 @@ module.exports = { main }
 
 ## Export formats
 
-- **STL** — the universal 3D-printing format. Use this to print.
-- **3MF** — carries color, materials, metadata. Use when color matters.
-- **AMF** — XML format with color/material support; less common.
-- **OBJ** — general 3D format for graphics software, not printing.
-- **SVG / DXF** — 2D exports for laser cutting and other flat fabrication.
+The viewport has a **Save STL**, a **Save 3MF** and a **Save OBJ** button in its
+top right corner, live once `main()` has returned something drawable. They run
+the real `@jscad/{stl,3mf,obj}-serializer` (vendored in
+`public/jscad/lib/jscad-io.min.js`), so the bytes are the same bytes jscad.app
+writes.
+
+| Format | Carries | Use it for |
+|---|---|---|
+| **STL** | triangles, nothing else | printing — every slicer reads it |
+| **3MF** | triangles + colour + materials, zipped | printing in colour; also the smaller file |
+| **OBJ** | a corner list + faces, plain text | handing the model to graphics software |
+| **AMF** | XML with colour/material | rare; 3MF replaced it |
+| **SVG / DXF** | 2D outlines | laser cutting and other flat fabrication |
+
+A binary STL is a 84-byte header and then 50 bytes per triangle, and nothing
+else — `84 + 50 * n` is the whole file. The 10 mm cube below is 684 bytes
+(12 triangles); the same cube as OBJ is 214, because OBJ lists each of the
+eight corners once and STL writes all three corners of every triangle out in
+full.
+
+A 3MF is a zip. Rename one to `.zip`, open it, and `3D/3dmodel.model` inside is
+readable XML with a `displaycolor="#RRGGBBAA"` per part.
+
+```js
+const { primitives } = require('@jscad/modeling')
+
+function main() {
+  return primitives.cuboid({ size: [10, 10, 10], center: [0, 0, 5] })
+}
+
+module.exports = { main }
+```
+
+## What reaches a printer
+
+Four rules that decide whether a saved file prints:
+
+1. **Millimetres.** There is no units setting. The grid's large squares are
+   10 mm and its small ones 1 mm, so you can read a size straight off the
+   floor. A common school printer takes about 220 x 220 x 250 mm.
+2. **On the plate.** Anything below `z = 0` is under the build plate. Build
+   the part where it will print — `center: [0, 0, height / 2]`, or translate it
+   up afterwards.
+3. **Joined, not touching.** Parts that must print as one piece have to
+   overlap. Two shapes that only kiss export as two shells.
+4. **Thicker than the nozzle.** A school printer's nozzle is 0.4 mm, so that
+   is one line of plastic and the absolute floor for a wall. 1.2 mm (three
+   lines) is the thinnest wall worth handling.
 
 ## Multi-file projects
 
-Split big designs across files with the include system: `components.js`
-(part builders), `parameters.js` (the parameter list), `main.js` (assembly).
-Each file has one job — the same modular idea as Q1 modules. Track the
-refactor with git.
+The in-app viewport runs a single file, so split a long design into *functions*
+here: one that knows what a peg is, one that knows what a plate is, and a
+`main()` that only says how they go together.
+
+jscad.app takes a whole folder, and the split then becomes real files with no
+other change: `peg.js` ends with `module.exports = { peg }`, `index.js` starts
+with `const { peg } = require('./peg.js')`. Same modular idea as the JavaScript
+modules in Q1 — one job per file — and each file gets its own git history.
+
+## Recipes
+
+Short answers to the things people ask first. Every one of these is worked
+through at more length in the in-app docs (`/docs/jscad`).
+
+### Make a hole
+
+Build the solid, build a cutter where the hole goes, subtract. Make the cutter
+longer than the material at **both** ends — a cutter exactly as tall as the
+plate leaves two faces touching at zero thickness, and the result is not
+reliably a hole.
+
+```js
+const { primitives, transforms, booleans } = require('@jscad/modeling')
+
+function main() {
+  const plate = primitives.cuboid({ size: [60, 40, 6] })
+  const drill = primitives.cylinder({ radius: 5, height: 20, segments: 32 })
+  return booleans.subtract(plate, transforms.translate([15, 0, 0], drill))
+}
+
+module.exports = { main }
+```
+
+### Combine an array of shapes
+
+`union`, `subtract` and `intersect` all take any number of arguments, so spread
+the array: `booleans.union(...parts)`.
+
+Returning an array from `main()` shows every shape and is much faster, because
+JSCAD never works out where the surfaces meet. Union when you need one solid —
+for a later boolean, or for export as a single printable object.
+
+### Sit a part on the grid
+
+```js
+const { primitives, transforms, measurements } = require('@jscad/modeling')
+
+function main() {
+  const part = primitives.sphere({ radius: 12, segments: 32 })
+  const box = measurements.measureBoundingBox(part)
+  return transforms.translate([0, 0, -box[0][2]], part)
+}
+
+module.exports = { main }
+```
+
+Measuring beats hard-coding a number, because it keeps working after somebody
+edits the size ten lines above.
+
+### Place copies around a circle
+
+For a circle of radius `r` at angle `a`: `x = r * Math.cos(a)`, `y = r * Math.sin(a)`.
+Take the angle from the loop counter: `a = i / count * 2 * Math.PI`. Rotate each
+copy **before** translating it if it should face outward.
+
+```js
+const { primitives, transforms } = require('@jscad/modeling')
+
+function main() {
+  const parts = []
+  for (let i = 0; i < 12; i++) {
+    const a = i / 12 * 2 * Math.PI
+    parts.push(transforms.translate(
+      [40 * Math.cos(a), 40 * Math.sin(a), 0],
+      transforms.rotateZ(a, primitives.cuboid({ size: [14, 5, 5] }))
+    ))
+  }
+  return parts
+}
+
+module.exports = { main }
+```
+
+### Round the corners of a box
+
+`primitives.roundedCuboid({ size, roundRadius })` is the one-line answer. The
+long way — hulling a sphere at each corner — is worth knowing because it is not
+limited to boxes: anything you can place, `hull` will wrap.
+
+```js
+const { primitives, transforms, hulls } = require('@jscad/modeling')
+
+function main() {
+  const r = 4
+  const corner = primitives.sphere({ radius: r, segments: 24 })
+  const pts = []
+  for (const sx of [-1, 1]) {
+    for (const sy of [-1, 1]) {
+      for (const sz of [-1, 1]) {
+        pts.push(transforms.translate([sx * 16, sy * 8, sz * 2], corner))
+      }
+    }
+  }
+  return hulls.hull(...pts)
+}
+
+module.exports = { main }
+```
+
+## Troubleshooting
+
+### Nothing appears
+
+In rough order of likelihood:
+
+1. `main()` did not return anything — check every path through it, including
+   the one inside an `if`.
+2. Shapes were built and pushed to an array that was never returned.
+3. The shape is 2D and you are looking at it edge-on. Orbit, or extrude it.
+4. A boolean consumed it: `subtract` in the wrong order leaves nearly nothing.
+5. It is off screen. `measureBoundingBox` will tell you where it went.
+
+### Common errors
+
+| Message | Usually means |
+|---|---|
+| `cube is not defined` | typo, or the module was never destructured out of `require` |
+| `Cannot read properties of undefined` | a misspelled module name — `primtives.cube` |
+| `No main() function found` | `main` is missing or misspelled; the runner looks for exactly `main` |
+| `main() returned nothing` | a missing `return`, see above |
+| `size must be an array of X, Y and Z values` | a single number where `[x, y, z]` was wanted — `cube` vs `cuboid` |
+
+The reported line is where the program gave up, which is not always the line
+that is wrong. Change one thing, then run again.
+
+### Print what you cannot see
+
+`console.log` works normally and its output lands in the console pane. Print
+the numbers you calculated, especially inside a loop. Printing a shape itself
+gives you a wall of polygon data; print `measureDimensions(shape)` instead.

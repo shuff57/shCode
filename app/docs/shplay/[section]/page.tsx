@@ -23,6 +23,7 @@ export default async function DocsSectionPage({
         basePath="/docs/shplay"
         docsTitle="shPlay reference"
         searchPlaceholder="Search the shPlay docs…"
+        preview="shplay"
       />
     </Suspense>
   );

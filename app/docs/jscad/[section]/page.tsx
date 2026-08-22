@@ -23,6 +23,7 @@ export default async function JscadDocsSectionPage({
         basePath="/docs/jscad"
         docsTitle="JSCAD reference"
         searchPlaceholder="Search the JSCAD docs…"
+        preview="jscad"
       />
     </Suspense>
   );

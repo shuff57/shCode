@@ -16,6 +16,11 @@ interface Props {
   basePath: string;
   docsTitle: string;
   searchPlaceholder: string;
+  /** Which runner the live sandbox on each page loads. JSCAD source needs
+   *  /jscad/runner.html; shPlay source needs /shplay/runner.html. Neither
+   *  runtime can execute the other's examples, so this is required, not a
+   *  convenience — a wrong value throws on every Run. */
+  preview: 'shplay' | 'jscad';
 }
 
 function pageHref(basePath: string, slug: string, pageIndex: number) {
@@ -44,6 +49,7 @@ export default function DocsClient({
   basePath,
   docsTitle,
   searchPlaceholder,
+  preview,
 }: Props) {
   const params = useSearchParams();
   const router = useRouter();
@@ -284,6 +290,7 @@ export default function DocsClient({
           <DocsSandbox
             key={`${section.slug}-${pageIndex}`}
             initialCode={page.code}
+            preview={preview}
           />
         )}
 

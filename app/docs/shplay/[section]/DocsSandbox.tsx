@@ -10,7 +10,6 @@ import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { tags as t } from '@lezer/highlight';
 import ShPlayPreview from '../../../../components/ShPlayPreview';
 import JscadPreview from '../../../../components/JscadPreview';
-import { buildJscadPreviewHtml } from '../../../../lib/preview-builder';
 
 // Dracula palette (mirrors CodeEditor.tsx — kept local to avoid coupling)
 const dracula = {
@@ -44,21 +43,23 @@ const theme = EditorView.theme({
 
 export default function DocsSandbox({
   initialCode,
-  preview = 'shplay',
+  preview,
 }: {
   initialCode: string;
-  preview?: 'shplay' | 'jscad';
+  /** Required on purpose — there is no safe default. A defaulted 'shplay'
+   *  here is what silently piped the JSCAD docs into the shPlay runner, where
+   *  every example died on `require is not defined`. Leave it required so the
+   *  compiler catches the next caller that forgets. */
+  preview: 'shplay' | 'jscad';
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const [code, setCode] = useState(initialCode);
   const [runKey, setRunKey] = useState(0);
-  const [srcDoc, setSrcDoc] = useState('');
 
   // Reset state when the active page changes (new initialCode prop)
   useEffect(() => {
     setCode(initialCode);
-    setSrcDoc('');
     setRunKey(0);
     if (viewRef.current) {
       const view = viewRef.current;
@@ -102,9 +103,6 @@ export default function DocsSandbox({
   }, []);
 
   const run = () => {
-    if (preview === 'jscad') {
-      setSrcDoc(buildJscadPreviewHtml(code));
-    }
     setRunKey((k) => k + 1);
   };
   const reset = () => {
@@ -112,7 +110,6 @@ export default function DocsSandbox({
     if (!view) return;
     view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: initialCode } });
     setCode(initialCode);
-    setSrcDoc('');
     setRunKey(0);
   };
 
@@ -139,7 +136,7 @@ export default function DocsSandbox({
         <div className="docs-sandbox-preview-header">Preview</div>
         <div className="docs-sandbox-preview-body">
           {preview === 'jscad' ? (
-            <JscadPreview srcDoc={srcDoc} />
+            <JscadPreview code={code} runKey={runKey} />
           ) : (
             <ShPlayPreview code={code} runKey={runKey} />
           )}
