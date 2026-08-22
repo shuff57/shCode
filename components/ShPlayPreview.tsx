@@ -32,6 +32,9 @@ const ShPlayPreview = forwardRef<HTMLIFrameElement, Props>(function ShPlayPrevie
       key={runKey}
       id="preview"
       className="jscad-frame"
+      // See JscadPreview for the reasoning: allow-same-origin is deliberately
+      // absent so student code cannot reach /api/* with the session cookie.
+      sandbox="allow-scripts allow-downloads"
       allow="autoplay; fullscreen; gamepad; clipboard-write"
       src={src}
     />

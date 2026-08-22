@@ -148,6 +148,19 @@
 <script>
 // Read student code from ?code=<base64url>, inject as a <script> so declarations become globals
 (function() {
+	// Never execute ?code= as a top-level document. See the matching guard in
+	// public/jscad/runner.html for the full reasoning: embedded, this frame is
+	// sandboxed into an opaque origin; opened directly by a link, the injected
+	// script would run on the app's origin with the viewer's SameSite=Lax
+	// session cookie available to any same-origin fetch.
+	if (window.top === window.self) {
+		document.body.innerHTML = '';
+		var warn = document.createElement('p');
+		warn.style.cssText = 'font:14px system-ui;color:#f8f8f2;background:#282a36;margin:0;padding:24px';
+		warn.textContent = 'This preview only runs inside shCode. Open a lesson or the docs instead.';
+		document.body.appendChild(warn);
+		return;
+	}
 	var params = new URLSearchParams(location.search);
 	var encoded = params.get('code');
 	if (!encoded) return;

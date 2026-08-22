@@ -159,6 +159,11 @@ for (const c of CASES) {
   // from about:blank, so the iframe's absolute URL is what puts it on the
   // local origin — and any request that leaves that origin shows up in
   // `external`, which is how the no-CDN claim gets measured rather than read.
+  //
+  // The sandbox attribute below must MIRROR components/JscadPreview.tsx. Drop
+  // it and this check quietly starts proving a configuration that never ships:
+  // the runner would run same-origin here and opaque-origin in the app, so a
+  // regression that only breaks under the sandbox would pass.
   await page.setContent(`<body style="margin:0">
     <script>
       window.__msgs = [];
@@ -167,6 +172,7 @@ for (const c of CASES) {
       });
     </script>
     <iframe id="f" style="width:640px;height:480px;border:0"
+      sandbox="allow-scripts allow-downloads"
       src="${base}/jscad/runner.html?code=${b64url(c.code)}&r=1"></iframe>
   </body>`, { waitUntil: 'load' });
 

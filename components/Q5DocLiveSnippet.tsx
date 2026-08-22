@@ -65,6 +65,8 @@ export default function Q5DocLiveSnippet({ initialCode, fileKey }: Props) {
             key={runKey}
             title="shPlay preview"
             src={`/shplay/runner.html?code=${encodeCode(runCode)}&r=${runKey}`}
+            // See JscadPreview: allow-same-origin is deliberately absent.
+            sandbox="allow-scripts allow-downloads"
             allow="autoplay; gamepad"
             style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
           />
