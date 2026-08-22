@@ -9,6 +9,7 @@ import { AnnouncementsPanel } from '../../components/AnnouncementsPanel';
 import DueDatesPanel from '../../components/DueDatesPanel';
 import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
+import { lessonHref } from '../../lib/lesson-href';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -80,6 +81,9 @@ interface LessonMeta {
   title: string;
   unit: string | null;
   preview: string | null;
+  /** 'lesson' | 'assignment' | 'project'. Decides the /lesson vs /assignment
+   *  prefix — see lib/lesson-href.ts for why guessing it is not safe. */
+  type?: string | null;
 }
 
 const NO_EDITOR_PREVIEWS = new Set(['slides', 'video', 'reading']);
@@ -600,6 +604,25 @@ function GradebookView({
       .catch(() => { setErr('Network error'); setLoading(false); });
   }, [classId]);
 
+  // Full screen is an in-page overlay, not the browser Fullscreen API: the API
+  // needs a user gesture that survives to the call, drops out whenever the tab
+  // loses focus, and swallows Esc for its own exit. A fixed overlay is
+  // predictable, and Esc closing it is something we control.
+  // Hooks must sit above the early returns below.
+  const [fullScreen, setFullScreen] = useState(false);
+  useEffect(() => {
+    if (!fullScreen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setFullScreen(false); };
+    window.addEventListener('keydown', onKey);
+    // Stop the page behind the overlay from scrolling under it.
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [fullScreen]);
+
   if (loading) return <div style={{ color: '#6272a4' }}>Loading gradebook…</div>;
   if (err) return <div style={{ color: '#ff5555', fontSize: 13 }}>{err}</div>;
   if (!gbData) return null;
@@ -711,11 +734,24 @@ function GradebookView({
   }
 
   return (
-    <div>
+    <div
+      style={fullScreen ? {
+        position: 'fixed', inset: 0, zIndex: 60,
+        background: '#282a36', padding: 16,
+        display: 'flex', flexDirection: 'column',
+      } : undefined}
+    >
       {/* Toolbar */}
       <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
         <button style={S.btn('#8be9fd')} onClick={handleDownloadCsv}>
           Download as CSV
+        </button>
+        <button
+          style={S.btn(fullScreen ? '#ff79c6' : 'transparent')}
+          onClick={() => setFullScreen((v) => !v)}
+          title={fullScreen ? 'Esc also exits' : 'Fill the window with the matrix'}
+        >
+          {fullScreen ? '✕ Exit full screen' : '⛶ Full screen'}
         </button>
         <span style={{ fontSize: 12, color: '#6272a4' }}>
           {gbData.students.length} student{gbData.students.length !== 1 ? 's' : ''} · {displayLessons.length} lesson{displayLessons.length !== 1 ? 's' : ''}
@@ -731,7 +767,16 @@ function GradebookView({
         before you scroll to it, freezes a box shorter than its contents, and
         slices the last student off while the window sits half empty.
       */}
-      <div style={{ overflow: 'auto', maxHeight: 'calc(100vh - 140px)', border: '1px solid #44475a', borderRadius: 6 }}>
+      <div
+        style={{
+          overflow: 'auto',
+          // In the overlay the box owns the window, so it takes the remaining
+          // flex space instead of guessing at how much chrome sits above it.
+          ...(fullScreen ? { flex: 1, minHeight: 0 } : { maxHeight: 'calc(100vh - 140px)' }),
+          border: '1px solid #44475a',
+          borderRadius: 6,
+        }}
+      >
         <table style={{ borderCollapse: 'collapse', fontSize: 12, tableLayout: 'fixed', minWidth: EMAIL_W + CELL_W * displayLessons.length }}>
           {/* Unit-spanning header row */}
           <thead>
@@ -793,8 +838,21 @@ function GradebookView({
                     fontWeight: 500,
                   }}
                 >
-                  <div
+                  {/*
+                    A plain <a>, not next/link: Link prefetches every href that
+                    scrolls into view, and this header holds 510 of them.
+                    Opens in a new tab so checking what an assignment asks for
+                    does not cost the teacher their scroll position in a table
+                    that is 30,000px wide.
+                  */}
+                  <a
+                    href={lessonHref(lesson)}
+                    target="_blank"
+                    rel="noreferrer"
                     style={{
+                      color: 'inherit',
+                      textDecoration: 'none',
+                      display: 'block',
                       writingMode: 'vertical-rl',
                       transform: 'rotate(180deg)',
                       whiteSpace: 'nowrap',
@@ -809,7 +867,7 @@ function GradebookView({
                     }}
                   >
                     {lesson.title}
-                  </div>
+                  </a>
                 </th>
               ))}
             </tr>
