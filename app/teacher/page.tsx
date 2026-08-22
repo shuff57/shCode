@@ -86,7 +86,19 @@ interface LessonMeta {
   type?: string | null;
 }
 
-const NO_EDITOR_PREVIEWS = new Set(['slides', 'video', 'reading']);
+/**
+ * Previews that open a real code workspace in /teacher-edit — which is a code
+ * editor and nothing else: a file list, CodeMirror, and the student's commits.
+ *
+ * An allowlist, not a blocklist. The blocklist it replaced named only slides,
+ * video and reading, so `diagram` (23 lessons), `assignment` (16) and `quiz`
+ * (14) all counted as code: their gradebook cells were clickable and the
+ * student drawer offered "Open in editor", and every one of those clicks left
+ * the teacher in an empty editor with no commits, having lost their place in
+ * the matrix. Listing what IS code means the next preview type added defaults
+ * to "not code" instead of silently joining that list.
+ */
+const CODE_PREVIEWS = new Set(['console', 'example', 'shplay']);
 
 // A student's lesson_state/commits rows can reference an id from before a
 // renumbering (ids recycle across years — see project memory). That id no
@@ -507,7 +519,7 @@ function StudentDrawer({
                         )}
                         {/* lessonMap.has(...) guards against a stale/renumbered id with
                             no current lesson.json — nothing real to open there. */}
-                        {lessonMap.has(lesson.id) && !NO_EDITOR_PREVIEWS.has(lesson.preview ?? '') && (
+                        {lessonMap.has(lesson.id) && CODE_PREVIEWS.has(lesson.preview ?? '') && (
                           <a
                             href={`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(email)}&lesson=${encodeURIComponent(lesson.id)}`}
                             style={{ background: 'none', border: '1px solid #bd93f9', borderRadius: 4, color: '#bd93f9', fontSize: 12, cursor: 'pointer', padding: '3px 8px', flexShrink: 0, textDecoration: 'none' }}
@@ -944,7 +956,7 @@ function GradebookView({
                 {/* Cell per lesson */}
                 {displayLessons.map((lesson) => {
                   const cell = student.cells[lesson.id];
-                  const isCodingLesson = !NO_EDITOR_PREVIEWS.has(lesson.preview ?? '');
+                  const isCodingLesson = CODE_PREVIEWS.has(lesson.preview ?? '');
                   return (
                     <td
                       key={lesson.id}
