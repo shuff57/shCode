@@ -4,6 +4,11 @@ import Link from 'next/link';
 import { badgeForLesson } from '../lib/lesson-badges';
 import { bypassesLessonLock, useLessonState } from '../lib/progress';
 import { lessonHref } from '../lib/lesson-href';
+import { resolveDue, resolveModuleSummary, useDueDates } from '../lib/due-dates';
+import DueBadge, { ModuleDueBadge } from './DueBadge';
+import DueClassPicker from './DueClassPicker';
+import DueDateChip from './DueDateChip';
+import { moduleSummaryForClass, ownDate, resolveForClass, useTeacherDue } from '../lib/due-dates-edit';
 
 interface LessonItem {
   id: string;
@@ -24,8 +29,19 @@ const stateLabels: Record<string, string> = {
   started: 'In progress',
 };
 
-export default function ModuleLessonsList({ lessons }: { lessons: LessonItem[] }) {
+export default function ModuleLessonsList({
+  lessons,
+  moduleId,
+  unitId,
+}: {
+  lessons: LessonItem[];
+  /** Dotted module id, e.g. "1.1". Omit and lessons can only show their own overrides. */
+  moduleId?: string | null;
+  /** lesson.json `category`, e.g. "Unit 1: JavaScript Fundamentals". */
+  unitId?: string | null;
+}) {
   const progress = useLessonState();
+  const due = useDueDates();
 
   if (lessons.length === 0) {
     return <p style={{ opacity: 0.6 }}>No lessons yet.</p>;
@@ -53,11 +69,44 @@ export default function ModuleLessonsList({ lessons }: { lessons: LessonItem[] }
   })();
   const lockBypass = bypassesLessonLock(progress.role);
 
+  // Module header summary: one date if every lesson agrees, otherwise "Mixed"
+  // with the range it spans. Computed, never stored — see lib/due-dates-core.
+  const teacherDue = useTeacherDue();
+  const lessonIds = lessons.map((l) => l.id);
+  const teacherModuleDue = moduleId ? moduleSummaryForClass(teacherDue, moduleId, lessonIds, unitId) : null;
+  const moduleDue = moduleId
+    ? resolveModuleSummary(due, moduleId, lessons.map((l) => l.id), unitId)
+    : null;
+
   return (
     <>
-      {durationLabel && (
-        <p style={{ opacity: 0.5, fontSize: 13, margin: '0 0 10px 0' }}>
-          Estimated: {durationLabel}
+      {(durationLabel || moduleDue || teacherDue.canEdit) && (
+        <p style={{ fontSize: 13, margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          {durationLabel && <span style={{ opacity: 0.5 }}>Estimated: {durationLabel}</span>}
+          {moduleDue && (
+            <ModuleDueBadge
+              kind={moduleDue.kind}
+              dueAt={moduleDue.dueAt}
+              min={moduleDue.min}
+              max={moduleDue.max}
+            />
+          )}
+          {/* Teacher-only: the class this module's dates belong to, and the
+              module's own date. Both render null for a student. */}
+          <DueClassPicker />
+          {moduleId && teacherModuleDue && (
+            <DueDateChip
+              scope="module"
+              scopeId={moduleId}
+              resolvedAt={teacherModuleDue.ownDueAt ?? teacherModuleDue.dueAt}
+              ownAt={ownDate(teacherDue, 'module', moduleId)}
+              mixed={teacherModuleDue.kind === 'mixed'}
+              min={teacherModuleDue.min}
+              max={teacherModuleDue.max}
+              moduleLessonIds={lessonIds}
+              size="md"
+            />
+          )}
         </p>
       )}
       <ol style={{ listStyle: 'none', padding: 0, margin: 0 }}>
@@ -68,6 +117,7 @@ export default function ModuleLessonsList({ lessons }: { lessons: LessonItem[] }
         const stripeColor = stateStripeColors[lessonState ?? ''] ?? 'var(--border)';
         const stateLabel = stateLabels[lessonState ?? ''];
         const locked = progress.loaded && idx > firstUnlocked && !lockBypass;
+        const lessonDue = resolveDue(due, l.id, moduleId, unitId);
 
         const rowStyle: React.CSSProperties = {
           display: 'flex',
@@ -143,9 +193,22 @@ export default function ModuleLessonsList({ lessons }: { lessons: LessonItem[] }
                 {stateLabel}
               </span>
             ) : null}
+            <DueBadge
+              dueAt={lessonDue?.dueAt ?? null}
+              completed={lessonState === 'completed'}
+              className={lessonDue?.className}
+              ambiguous={lessonDue?.ambiguous}
+            />
             {l.estimateMins ? (
               <span style={{ opacity: 0.5, fontSize: 12 }}>~{l.estimateMins} min</span>
             ) : null}
+            <DueDateChip
+              scope="lesson"
+              scopeId={l.id}
+              resolvedAt={resolveForClass(teacherDue, l.id, moduleId, unitId)}
+              ownAt={ownDate(teacherDue, 'lesson', l.id)}
+              pushRight
+            />
           </>
         );
 

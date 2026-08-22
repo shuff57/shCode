@@ -44,7 +44,7 @@ export default async function ModulePage({
         >
           Lessons in this module
         </h2>
-        <ModuleLessonsList lessons={lessons} />
+        <ModuleLessonsList lessons={lessons} moduleId={summary.id} unitId={summary.category ?? null} />
       </section>
 
       <TeacherOnly>

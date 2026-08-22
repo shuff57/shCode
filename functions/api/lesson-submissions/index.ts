@@ -4,8 +4,11 @@
 //
 // Append-only history. WrittenGrader POSTs here after each successful grade.
 
+import { resolveDueForStudent } from '../../_shared/dueDates';
+
 interface Env {
   DB: D1Database;
+  ASSETS?: Fetcher;
 }
 type Ctx = EventContext<Env, string, { email: string }>;
 
@@ -65,10 +68,22 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   }
 
   const now = Date.now();
+
+  // Stamp the due date that was in force at this instant. Stored as the
+  // resolved timestamp, not an is_late flag, so moving a due date later never
+  // rewrites what already happened. Never blocks the submit — a resolution
+  // failure just records NULL.
+  let dueAtSubmit: number | null = null;
+  try {
+    dueAtSubmit = await resolveDueForStudent(env, request, data.email, body.lessonId);
+  } catch {
+    dueAtSubmit = null;
+  }
+
   await env.DB.prepare(
     `INSERT INTO lesson_submissions
-       (id, student_email, lesson_id, response, grade_json, score, possible, submitted_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       (id, student_email, lesson_id, response, grade_json, score, possible, submitted_at, due_at_submit)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   )
     .bind(
       body.id,
@@ -79,10 +94,11 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
       body.score ?? null,
       body.possible ?? null,
       now,
+      dueAtSubmit,
     )
     .run();
 
-  return json({ ok: true, submittedAt: now }, 201);
+  return json({ ok: true, submittedAt: now, dueAtSubmit, late: dueAtSubmit !== null && now > dueAtSubmit }, 201);
 };
 
 function json(body: unknown, status = 200): Response {

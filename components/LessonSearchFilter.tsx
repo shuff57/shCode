@@ -4,6 +4,9 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import HomeModuleLessons from './HomeModuleLessons';
 import UnitProgressBadge from './UnitProgressBadge';
+import DueClassPicker from './DueClassPicker';
+import DueDateChip from './DueDateChip';
+import { moduleSummaryForClass, ownDate, useTeacherDue } from '../lib/due-dates-edit';
 import type { Lesson } from '../lib/types';
 
 /** Subset of ModuleSummary needed by the home page accordion. */
@@ -55,6 +58,9 @@ interface Props {
 
 export default function LessonSearchFilter({ units, lessons }: Props) {
   const [query, setQuery] = useState('');
+  // Due dates are per class, so every chip on this page reads one chosen
+  // class. Renders nothing at all for a student.
+  const teacherDue = useTeacherDue();
 
   const trimmed = query.trim().toLowerCase();
 
@@ -94,8 +100,9 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4" id="titleRow">
+      <div className="flex items-center justify-between gap-4 mb-4" id="titleRow">
         <h1 className="text-2xl font-bold">Choose a lesson</h1>
+        <DueClassPicker />
         <input
           className="border p-2"
           placeholder="Search lessons"
@@ -162,6 +169,12 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
                       <span className="text-base">{u.title}</span>
                       <span className="ml-auto flex items-center gap-4 text-sm opacity-80">
                         <UnitProgressBadge lessonIds={moduleLessonIds} label={`Module ${u.id}`} />
+                        <ModuleDueChip
+                          snap={teacherDue}
+                          moduleId={u.id}
+                          lessonIds={moduleLessonIds}
+                          unitId={u.category ?? null}
+                        />
                       </span>
                     </summary>
                     <div className="flex flex-col gap-3 p-3 border-t border-border bg-card">
@@ -188,5 +201,34 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
         );
       })}
     </>
+  );
+}
+
+// The module row's chip. Kept out of the main render so the summary stays
+// readable; "Mixed" is computed from the children, never stored.
+function ModuleDueChip({
+  snap,
+  moduleId,
+  lessonIds,
+  unitId,
+}: {
+  snap: ReturnType<typeof useTeacherDue>;
+  moduleId: string;
+  lessonIds: string[];
+  unitId: string | null;
+}) {
+  const summary = moduleSummaryForClass(snap, moduleId, lessonIds, unitId);
+  return (
+    <DueDateChip
+      scope="module"
+      scopeId={moduleId}
+      resolvedAt={summary.ownDueAt ?? summary.dueAt}
+      ownAt={ownDate(snap, 'module', moduleId)}
+      mixed={summary.kind === 'mixed'}
+      min={summary.min}
+      max={summary.max}
+      moduleLessonIds={lessonIds}
+      size="md"
+    />
   );
 }

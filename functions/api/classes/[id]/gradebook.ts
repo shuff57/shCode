@@ -3,9 +3,12 @@
 // Only the class owner, co-teachers, or an admin may call this endpoint.
 
 import { canManageClass } from '../../../_shared/classAuth';
+import { loadClassDueRows, loadLessonScopeMap } from '../../../_shared/dueDates';
+import { buildDueIndex, isPastDue, resolveDueAt } from '../../../../lib/due-dates-core';
 
 interface Env {
   DB: D1Database;
+  ASSETS?: Fetcher;
 }
 type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 type Ctx = EventContext<Env, 'id', SessionData>;
@@ -15,6 +18,7 @@ interface StateRow {
   lesson_id: string;
   state: 'started' | 'completed';
   score: number | null;
+  completed_at: number | null;
 }
 
 interface SubRow {
@@ -29,6 +33,8 @@ export interface GradebookCell {
   score: number | null;
   submitted_score: number | null;
   possible: number | null;
+  /** Past due and not completed, or completed after the due date. */
+  late: boolean;
 }
 
 export interface GradebookStudent {
@@ -37,7 +43,7 @@ export interface GradebookStudent {
 }
 
 export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (context: Ctx) => {
-  const { env, data, params } = context;
+  const { request, env, data, params } = context;
   const classId = params.id;
 
   if (typeof classId !== 'string' || !classId) return json({ error: 'classId required' }, 400);
@@ -62,12 +68,12 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
   const roster: string[] = (rosterResult.results ?? []).map((r) => r.student_email);
 
   if (roster.length === 0) {
-    return json({ students: [] });
+    return json({ students: [], dueDates: {} });
   }
 
   // lesson_state rows for all students in this class.
   const stateResult = await env.DB.prepare(
-    `SELECT student_email, lesson_id, state, score
+    `SELECT student_email, lesson_id, state, score, completed_at
        FROM lesson_state
       WHERE student_email IN (
         SELECT student_email FROM enrollments
@@ -119,6 +125,23 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
     inner.set(row.lesson_id, row);
   }
 
+  // Resolve every lesson's due date for this class once, up front. The
+  // lesson -> module inheritance lives in the lesson title prefix, which D1
+  // cannot see, so this is a JS pass over the static manifest rather than a
+  // join. No due dates set -> an empty map and every cell is late:false.
+  const dueRows = await loadClassDueRows(env.DB, classId);
+  const dueDates: Record<string, number> = {};
+  if (dueRows.length > 0) {
+    const scopeMap = await loadLessonScopeMap(env, request);
+    if (scopeMap) {
+      const index = buildDueIndex(dueRows);
+      for (const [lessonId, scope] of scopeMap) {
+        const dueAt = resolveDueAt(index, { lessonId, moduleId: scope.moduleId, unitId: scope.unitId });
+        if (dueAt !== null) dueDates[lessonId] = dueAt;
+      }
+    }
+  }
+
   // Assemble the response matrix.
   const students: GradebookStudent[] = roster.map((email) => {
     const stateByLesson = stateMap.get(email);
@@ -126,27 +149,36 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
 
     const cells: Record<string, GradebookCell> = {};
 
-    // Merge all lesson ids from both state and submission maps for this student.
+    // Merge all lesson ids from both state and submission maps for this
+    // student, plus every already-past-due lesson — a student who never
+    // opened an overdue lesson has no row anywhere, and that absence is
+    // exactly what the teacher needs to see.
     const lessonIds = new Set<string>([
       ...(stateByLesson ? stateByLesson.keys() : []),
       ...(subByLesson ? subByLesson.keys() : []),
+      ...Object.keys(dueDates).filter((id) => dueDates[id] < now),
     ]);
 
     for (const lessonId of lessonIds) {
       const sr = stateByLesson?.get(lessonId);
       const sub = subByLesson?.get(lessonId);
+      const dueAt = dueDates[lessonId] ?? null;
       cells[lessonId] = {
         state: sr?.state ?? null,
         score: sr?.score ?? null,
         submitted_score: sub?.score ?? null,
         possible: sub?.possible ?? null,
+        // A completed row with a NULL completed_at (legacy data) counts as on
+        // time rather than late — `?? dueAt` reads as "finished by the
+        // deadline". Guessing late on missing data would accuse a student.
+        late: isPastDue(dueAt, sr?.state === 'completed' ? (sr.completed_at ?? dueAt) : null, now),
       };
     }
 
     return { email, cells };
   });
 
-  return json({ students });
+  return json({ students, dueDates });
 };
 
 function json(body: unknown, status = 200): Response {

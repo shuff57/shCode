@@ -6,6 +6,9 @@ import { NeedsAttentionPanel } from '../../components/NeedsAttentionPanel';
 import { BulkEnrollmentForm } from '../../components/BulkEnrollmentForm';
 import { SubmissionQueue } from '../../components/SubmissionQueue';
 import { AnnouncementsPanel } from '../../components/AnnouncementsPanel';
+import DueDatesPanel from '../../components/DueDatesPanel';
+import PastDuePanel from '../../components/PastDuePanel';
+import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -100,6 +103,8 @@ interface GradebookCell {
   score: number | null;
   submitted_score: number | null;
   possible: number | null;
+  /** Past due and not completed, or completed after the due date. */
+  late?: boolean;
 }
 
 interface GradebookStudent {
@@ -109,6 +114,8 @@ interface GradebookStudent {
 
 interface GradebookData {
   students: GradebookStudent[];
+  /** lessonId -> resolved due date (epoch ms). Absent lessons have no date. */
+  dueDates?: Record<string, number>;
 }
 
 interface GradeCriterion {
@@ -164,22 +171,41 @@ function fmtTs(ms: number) {
 // CSV helper — no libraries, ~30 lines
 // ---------------------------------------------------------------------------
 
-function buildGradebookCsv(students: GradebookStudent[], lessonIds: string[]): string {
+function buildGradebookCsv(
+  students: GradebookStudent[],
+  lessonIds: string[],
+  dueDates?: Record<string, number>,
+): string {
   const escape = (v: string) => (v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v);
 
   const header = ['student_email', ...lessonIds].map(escape).join(',');
+
+  // Second header row carries each lesson's due date, so the export is
+  // self-contained — a spreadsheet opened in March still says what was due.
+  // Blank for lessons with no due date. Omitted entirely if the class sets none.
+  const hasDue = dueDates && Object.keys(dueDates).length > 0;
+  const dueRow = hasDue
+    ? ['due_date', ...lessonIds.map((lid) => (dueDates![lid] ? schoolDateString(dueDates![lid]) : ''))]
+        .map(escape)
+        .join(',')
+    : null;
+
   const rows = students.map((s) => {
     const cols = [s.email, ...lessonIds.map((lid) => {
       const c = s.cells[lid];
       if (!c) return '';
-      if (c.score !== null) return String(c.score);
-      if (c.state === 'completed') return 'C';
-      if (c.state === 'started') return 'S';
-      return '';
+      // "L" suffix = late. Kept as a suffix rather than its own column so the
+      // matrix stays one cell per lesson.
+      const suffix = c.late ? 'L' : '';
+      if (c.score !== null) return String(c.score) + suffix;
+      if (c.state === 'completed') return 'C' + suffix;
+      if (c.state === 'started') return 'S' + suffix;
+      return suffix || '';
     })];
     return cols.map(escape).join(',');
   });
-  return [header, ...rows].join('\r\n');
+
+  return [header, ...(dueRow ? [dueRow] : []), ...rows].join('\r\n');
 }
 
 function downloadCsv(csv: string, filename: string) {
@@ -621,14 +647,25 @@ function GradebookView({
   const CELL_W = 60;
   const EMAIL_W = 220;
 
+  // Late cells keep their normal glyph and gain a red underline, so scanning
+  // the matrix for red still works without a second symbol to learn.
+  function withLate(cell: GradebookCell | undefined, node: React.ReactNode): React.ReactNode {
+    if (!cell?.late) return node;
+    return (
+      <span style={{ borderBottom: '2px solid #ff5555', paddingBottom: 1, display: 'inline-block' }}>
+        {node}
+      </span>
+    );
+  }
+
   function cellContent(cell: GradebookCell | undefined): React.ReactNode {
     if (!cell || (!cell.state && cell.submitted_score === null)) {
-      return <span style={{ color: '#44475a', fontFamily: 'monospace', fontSize: 14 }}>·</span>;
+      return withLate(cell, <span style={{ color: cell?.late ? '#ff5555' : '#44475a', fontFamily: 'monospace', fontSize: 14 }}>·</span>);
     }
     if (cell.state === 'completed') {
       if (cell.score !== null) {
         const hasSubDiff = cell.submitted_score !== null && cell.submitted_score !== cell.score;
-        return (
+        return withLate(cell, (
           <span style={{ color: '#50fa7b', fontFamily: 'monospace', fontWeight: 700, fontSize: 13 }}>
             {cell.score}
             {hasSubDiff && (
@@ -637,36 +674,39 @@ function GradebookView({
               </sub>
             )}
           </span>
-        );
+        ));
       }
-      return <span style={{ color: '#50fa7b', fontFamily: 'monospace', fontSize: 14 }}>✓</span>;
+      return withLate(cell, <span style={{ color: '#50fa7b', fontFamily: 'monospace', fontSize: 14 }}>✓</span>);
     }
     if (cell.state === 'started') {
-      return <span style={{ color: '#f1fa8c', fontFamily: 'monospace', fontSize: 14 }}>○</span>;
+      return withLate(cell, <span style={{ color: '#f1fa8c', fontFamily: 'monospace', fontSize: 14 }}>○</span>);
     }
     // Has submission data but no lesson_state (edge case)
     if (cell.submitted_score !== null) {
-      return (
+      return withLate(cell, (
         <span style={{ color: '#8be9fd', fontFamily: 'monospace', fontSize: 12 }}>
           s{cell.submitted_score}
         </span>
-      );
+      ));
     }
-    return <span style={{ color: '#44475a', fontFamily: 'monospace', fontSize: 14 }}>·</span>;
+    return withLate(cell, <span style={{ color: '#44475a', fontFamily: 'monospace', fontSize: 14 }}>·</span>);
   }
 
-  function cellTitle(cell: GradebookCell | undefined, lessonTitle: string): string {
-    if (!cell) return lessonTitle;
+  function cellTitle(cell: GradebookCell | undefined, lessonTitle: string, lessonId?: string): string {
+    const dueAt = lessonId ? gbData?.dueDates?.[lessonId] : undefined;
+    if (!cell) return dueAt ? `${lessonTitle} | due ${formatDue(dueAt)}` : lessonTitle;
     const parts: string[] = [lessonTitle];
     if (cell.state) parts.push(`state: ${cell.state}`);
     if (cell.score !== null) parts.push(`score: ${cell.score}`);
     if (cell.submitted_score !== null) parts.push(`sub score: ${cell.submitted_score}`);
     if (cell.possible !== null) parts.push(`possible: ${cell.possible}`);
+    if (dueAt) parts.push(`due ${formatDue(dueAt)}`);
+    if (cell.late) parts.push('LATE');
     return parts.join(' | ');
   }
 
   function handleDownloadCsv() {
-    const csv = buildGradebookCsv(gbData!.students, displayLessons.map((l) => l.id));
+    const csv = buildGradebookCsv(gbData!.students, displayLessons.map((l) => l.id), gbData!.dueDates);
     downloadCsv(csv, `gradebook-${className.replace(/\s+/g, '-')}.csv`);
   }
 
@@ -683,7 +723,15 @@ function GradebookView({
       </div>
 
       {/* Scrollable matrix */}
-      <div style={{ overflow: 'auto', maxHeight: 'calc(100vh - 180px)', border: '1px solid #44475a', borderRadius: 6 }}>
+      {/*
+        A cap, not a height: a small class gets a box the size of its own rows
+        and nothing is clipped, and only a roster tall enough to outgrow the
+        window scrolls internally under the sticky header. Deliberately NOT
+        measured from this element's own top — that reads the position it has
+        before you scroll to it, freezes a box shorter than its contents, and
+        slices the last student off while the window sits half empty.
+      */}
+      <div style={{ overflow: 'auto', maxHeight: 'calc(100vh - 140px)', border: '1px solid #44475a', borderRadius: 6 }}>
         <table style={{ borderCollapse: 'collapse', fontSize: 12, tableLayout: 'fixed', minWidth: EMAIL_W + CELL_W * displayLessons.length }}>
           {/* Unit-spanning header row */}
           <thead>
@@ -734,7 +782,11 @@ function GradebookView({
                   style={{
                     position: 'sticky', top: 33, zIndex: 2,
                     width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
-                    height: 180, verticalAlign: 'bottom',
+                    // `height` on a <th> is a MINIMUM, not a maximum — the row
+                    // grew to whatever the longest sideways title needed (574px
+                    // measured), pushing every student below the fold. The cap
+                    // that actually binds is maxHeight on the rotated div below.
+                    height: 180, verticalAlign: 'bottom', overflow: 'hidden',
                     background: stickyBg, padding: '6px 2px',
                     borderBottom: '2px solid #44475a', borderRight: '1px solid #44475a11',
                     textAlign: 'center', color: '#bd93f9', fontSize: 11,
@@ -748,6 +800,12 @@ function GradebookView({
                       whiteSpace: 'nowrap',
                       lineHeight: 1.1,
                       margin: '0 auto',
+                      // Sideways text runs along the block's HEIGHT, so height
+                      // is the inline size that text-overflow clips. The full
+                      // title stays reachable via the th's title= tooltip.
+                      maxHeight: 168,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
                     }}
                   >
                     {lesson.title}
@@ -793,7 +851,7 @@ function GradebookView({
                         textAlign: 'center', verticalAlign: 'middle',
                         ...(isCodingLesson ? { cursor: 'pointer' } : {}),
                       }}
-                      title={cellTitle(cell, lesson.title)}
+                      title={cellTitle(cell, lesson.title, lesson.id)}
                       onClick={isCodingLesson ? () => {
                         router.push(`/teacher-edit?class=${encodeURIComponent(classId)}&student=${encodeURIComponent(student.email)}&lesson=${encodeURIComponent(lesson.id)}`);
                       } : undefined}
@@ -1435,6 +1493,18 @@ function DetailView({ classId }: { classId: string }) {
       <div style={S.card}>
         <h2 style={S.h2}>Submission Review Queue</h2>
         <SubmissionQueue classId={classId} />
+      </div>
+
+      {/* Past due */}
+      <div style={S.card}>
+        <h2 style={S.h2}>Past due</h2>
+        <PastDuePanel classId={classId} />
+      </div>
+
+      {/* Due dates */}
+      <div style={S.card}>
+        <h2 style={S.h2}>Due dates</h2>
+        <DueDatesPanel classId={classId} />
       </div>
 
       {/* Announcements */}

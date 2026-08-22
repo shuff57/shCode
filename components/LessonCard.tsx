@@ -6,6 +6,10 @@ import { badgeForLesson } from '../lib/lesson-badges';
 import { bypassesLessonLock, useLessonState } from '../lib/progress';
 import { withInlineCode } from './InlineCode';
 import { lessonHref } from '../lib/lesson-href';
+import { moduleIdFromTitle, resolveDue, useDueDates } from '../lib/due-dates';
+import DueBadge from './DueBadge';
+import DueDateChip from './DueDateChip';
+import { ownDate, resolveForClass, useTeacherDue } from '../lib/due-dates-edit';
 
 const typeBadgeColors: Record<string, string> = {
   lesson: '#5baafd',
@@ -32,8 +36,14 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
   const href = lessonHref(lesson);
   const pBadge = badgeForLesson({ type: lesson.type, preview: lesson.preview });
   const progress = useLessonState();
+  const due = useDueDates();
+  const teacherDue = useTeacherDue();
   const lessonState = progress.states[lesson.id];
   const stripeColor = stateStripeColors[lessonState ?? ''] ?? 'var(--border)';
+  // The card only has the lesson itself, so its module comes off the numbered
+  // title prefix — "1.1.4 What a Program Is" -> "1.1".
+  const moduleId = moduleIdFromTitle(lesson.title);
+  const lessonDue = resolveDue(due, lesson.id, moduleId, lesson.category ?? null);
   // Lock = caller flagged it AND the viewer isn't an admin/teacher. Default
   // to unlocked until the snapshot loads to avoid first-paint flicker.
   const locked = progress.loaded && lockedForStudent && !bypassesLessonLock(progress.role);
@@ -81,6 +91,21 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
         {lesson.week && (
           <span className="lesson-week-badge">Week {lesson.week}</span>
         )}
+        <DueBadge
+          dueAt={lessonDue?.dueAt ?? null}
+          completed={lessonState === 'completed'}
+          className={lessonDue?.className}
+          ambiguous={lessonDue?.ambiguous}
+        />
+        {/* Teacher only, and pushed to the right edge of the card. Renders
+            null for a student, so it costs no layout there. */}
+        <DueDateChip
+          scope="lesson"
+          scopeId={lesson.id}
+          resolvedAt={resolveForClass(teacherDue, lesson.id, moduleId, lesson.category ?? null)}
+          ownAt={ownDate(teacherDue, 'lesson', lesson.id)}
+          pushRight
+        />
         {locked && (
           <span
             style={{
