@@ -39,10 +39,13 @@
 //   * error WORDING differs for the same fault — chromium and firefox say
 //     "primtives is not defined", webkit says "Can't find variable: primtives".
 //     The assertion matches the identifier, not the phrasing.
-//   * error LOCATION is weaker on webkit: it reports "script.js:0" where the
-//     other two give "script.js:2:3". A student on Safari or an iPad gets the
-//     right message pointing at the wrong line. Not worth working around, but
-//     worth knowing before believing a bug report from an iPad.
+//   * error LOCATION used to be broken on webkit — "script.js:0" where the
+//     other two gave "script.js:2:3" — because webkit ignores the
+//     //# sourceURL pragma and labels an injected script with the DOCUMENT
+//     url, so runner.html's stack regex found no *.js it recognised. Fixed by
+//     engineFrame() in public/jscad/runner.html. All three engines now blame
+//     the same LINE; only the column differs (JSC points at the identifier,
+//     V8 at the start of the call), which nothing depends on.
 //
 // Note on the harness, not on the runner: swiftshader's FIRST WebGL context in
 // a fresh browser is reliably lost. Measuring without burning a warm-up page
@@ -145,6 +148,8 @@ module.exports = { main }`,
     // check: the runner behaves identically on all three, only the message text
     // differs. Measured 2026-08-22 on playwright chromium/firefox/webkit.
     expectError: /primtives/i,
+    // The typo is on line 2 of the program above. All three engines must agree.
+    expectLine: 2,
   },
   {
     name: 'main() returns nothing',
@@ -257,6 +262,12 @@ for (const c of CASES) {
     if (errs.length) problems.push(`unexpected preview-error: ${errs[0].error.message}`);
   } else {
     if (!errs.length) problems.push('expected a preview-error message and got none');
+    else if (c.expectLine && errs[0].error.line !== c.expectLine) {
+      // Locks in the engineFrame() fix in runner.html. Before it, webkit
+      // reported line 0 here while chromium and firefox reported 2 — a silent
+      // degradation that a message-only assertion could never catch.
+      problems.push(`blamed line ${errs[0].error.line}, expected ${c.expectLine} (snippet: ${JSON.stringify(errs[0].error.snippet)})`);
+    }
     else if (c.expectError && !c.expectError.test(errs[0].error.message)) {
       problems.push(`preview-error message was ${JSON.stringify(errs[0].error.message)}`);
     }

@@ -35,6 +35,45 @@
 		console[t] = function() { send(t, arguments); orig.apply(console, arguments); };
 	});
 
+	// WebKit ignores the //# sourceURL pragma on an injected script and blames
+	// the DOCUMENT instead, so its stack reads "main@…/runner.html:2:19" and
+	// parseStudentFrame — which needs a *.js name it recognises — finds nothing.
+	// The line and column are not lost, they are on the Error itself under
+	// JavaScriptCore's own spelling. Measured 2026-08-22: webkit gives
+	// line 2 / column 19 where chromium gives 2:3, same line, different column
+	// convention (JSC points at the identifier, V8 at the start of the call).
+	//
+	// The guard matters more than the fallback. Without it a throw from inside
+	// a vendored bundle would be reported at "script.js:<some line>", pointing a
+	// student at their own code for a fault that is not theirs. Only student
+	// source lives outside ./lib/, and the runner injects exactly one such file.
+	function engineFrame(err) {
+		if (!err) return null;
+		if (!Object.prototype.hasOwnProperty.call(window.__previewSources || {}, 'script.js')) return null;
+
+		// (a) Walk the stack for the first frame that is NOT inside a vendored
+		// bundle. When the library throws because of something the student
+		// passed it, that frame is the student's calling line — which is the
+		// answer chromium and firefox already give, and the one worth matching.
+		var lines = String(err.stack || '').split('\n');
+		var rx = /:(\d+):(\d+)\)?\s*$/;
+		for (var i = 0; i < lines.length; i++) {
+			if (lines[i].indexOf('/lib/') !== -1) continue;
+			var m = rx.exec(lines[i].replace(/\s+$/, ''));
+			if (m) return { file: 'script.js', line: parseInt(m[1], 10), col: parseInt(m[2], 10) };
+		}
+
+		// (b) No usable stack: JavaScriptCore still carries the location on the
+		// Error itself. Skip it when it points into a bundle, so a library fault
+		// is left unattributed rather than pinned on the student.
+		var src = String(err.sourceURL || err.fileName || '');
+		if (src.indexOf('/lib/') !== -1) return null;
+		var line = (typeof err.line === 'number') ? err.line : err.lineNumber;
+		var col = (typeof err.column === 'number') ? err.column : err.columnNumber;
+		if (typeof line !== 'number' || !line) return null;
+		return { file: 'script.js', line: line, col: (typeof col === 'number') ? col : 0 };
+	}
+
 	function parseStudentFrame(stack) {
 		if (!stack) return null;
 		var sources = window.__previewSources || {};
@@ -55,7 +94,7 @@
 		return (arr[line - 1] || '').replace(/^\s+/, '').slice(0, 200);
 	}
 	function reportError(err, fallbackMsg, fbFile, fbLine, fbCol) {
-		var loc = parseStudentFrame(err && err.stack);
+		var loc = parseStudentFrame(err && err.stack) || engineFrame(err);
 		if (!loc && fbFile && (window.__previewSources || {})[fbFile]) {
 			loc = { file: fbFile, line: fbLine || 0, col: fbCol || 0 };
 		}
