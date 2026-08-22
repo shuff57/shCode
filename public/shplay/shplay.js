@@ -590,7 +590,14 @@
     // canvasPos: this sprite's position in SCREEN pixels (camera-relative),
     // mirroring mouse.canvasPos above — a HUD element parented to a sprite
     // needs this the same way a HUD hit-test against the cursor does.
-    get canvasPos() { return { x: this.x - camera.x, y: this.y - camera.y }; }
+    // A screenSpace sprite is drawn WITHOUT the camera transform, so the
+    // pixel it appears at is its own x/y. Subtracting the camera from it
+    // reported a HUD button at x=-440 while it was plainly visible at x=60.
+    // canvasPos means "where is this on screen"; for these it is identity.
+    get canvasPos() {
+      if (this.screenSpace) return { x: this.x, y: this.y };
+      return { x: this.x - camera.x, y: this.y - camera.y };
+    }
 
     // prevPos/previousPosition, prevRotation/previousRotation: the position
     // and rotation as of the END of the PREVIOUS frame. Snapshotted once per
@@ -772,8 +779,32 @@
     // underlying bodyType — collider is just the taught name for it).
     get collider() { return this._sensor ? 'none' : this._bodyType; }
     set collider(v) {
-      if (v === 'none') { this._sensor = true; }
-      else { this._sensor = false; this._bodyType = v; }
+      if (v === 'none') {
+        this._sensor = true;
+        // A 'none' sprite is a trigger zone, a pickup, a decoration — the
+        // curriculum's own words are "sensor-style" and "did I enter this
+        // trigger zone?". It kept a DYNAMIC body, so in any world with
+        // gravity it quietly fell out of the level.
+        //
+        // Measured in lessons/6-4-18-a15-1-platformer: the goal sprite the
+        // student has to reach starts at y=230 and is at y=1588 by frame 180,
+        // 1188px below a 400px canvas. Nothing threw, so all 271 corpus
+        // sketches passed over it.
+        //
+        // The body stays dynamic so `vel` still drives 'none' sprites (bullets
+        // and moving pickups rely on that) — only gravity is switched off.
+        if (this._body.getGravityScale() !== 0) {
+          this._gravityBeforeNone = this._body.getGravityScale();
+          this._body.setGravityScale(0);
+        }
+      } else {
+        this._sensor = false;
+        this._bodyType = v;
+        if (this._gravityBeforeNone !== undefined) {
+          this._body.setGravityScale(this._gravityBeforeNone);
+          this._gravityBeforeNone = undefined;
+        }
+      }
       this._buildFixture();
     }
 
@@ -1455,6 +1486,28 @@
     const pool = group instanceof Group ? [...group] : ALL_;
     const hits = pool.filter((s) => {
       if (s._dead) return false;
+      // Screen-space sprites live at screen pixels, so the query point has to
+      // be converted before it can hit one. Without this, a HUD button was
+      // simply unclickable the moment the camera moved: the natural call,
+      // getSpritesAt(mouse.x, mouse.y), tests a world coordinate against a
+      // sprite that is not in world space. Doing it here means the natural
+      // call keeps working for both kinds at once.
+      if (s.screenSpace) {
+        const sx = x - camera.x, sy = y - camera.y;
+        if (radius > 0) {
+          if (s.shape === 'circle') return Math.hypot(sx - s.x, sy - s.y) <= s.w / 2 + radius;
+          const sb = s._bounds();
+          const cx = Math.max(sb.l, Math.min(sx, sb.r));
+          const cy = Math.max(sb.t, Math.min(sy, sb.b));
+          return Math.hypot(sx - cx, sy - cy) <= radius;
+        }
+        if (s.shape === 'circle') {
+          const dx = sx - s.x, dy = sy - s.y;
+          return dx * dx + dy * dy <= (s.w / 2) ** 2;
+        }
+        const sb = s._bounds();
+        return sx >= sb.l && sx <= sb.r && sy >= sb.t && sy <= sb.b;
+      }
       if (radius > 0) {
         // Distance to the NEAREST point of the sprite's shape, not
         // center-to-center — a big sprite whose edge only grazes the

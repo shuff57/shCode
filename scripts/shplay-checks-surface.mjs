@@ -588,6 +588,9 @@ export const SURFACE_CHECKS = [
           if (frameCount === 3) {
             hudScreen = Math.round(hud.canvasPos.x);
             worldScreen = Math.round(world_.canvasPos.x);
+            // the natural hit-test call must find BOTH kinds
+            hudHit = world.getSpritesAt(hud.x + camera.x, hud.y + camera.y).includes(hud);
+            worldHit = world.getSpritesAt(world_.x, world_.y).includes(world_);
           }
         }
       `, { frames: 6 });
@@ -606,11 +609,69 @@ export const SURFACE_CHECKS = [
       if (passes < 2)
         return 'render() emitted ' + passes + ' save() call(s); a screen-space sprite needs its own pass ' +
           'outside the camera transform';
-      // canvasPos is unaffected by screenSpace (it is a world->screen convert),
-      // so both read the same — the difference is in the TRANSFORM, above.
-      if (b.hudScreen !== b.worldScreen)
-        return 'canvasPos should be identical for both sprites (' + b.hudScreen + ' vs ' + b.worldScreen +
-          '); screenSpace changes how a sprite is DRAWN, not where it lives';
+      // canvasPos means "where is this on screen". A screen-space sprite is
+      // drawn without the camera, so its screen pixel IS its x — identity.
+      // An earlier version of this check asserted the opposite (that both
+      // sprites read the same) and encoded the wrong model: it would have
+      // locked in a HUD reporting itself at x=-440 while visibly at x=60.
+      if (b.hudScreen !== 40)
+        return 'a screenSpace sprite at x=40 reported canvasPos.x ' + b.hudScreen +
+          '; it is drawn without the camera, so its screen position is its own x';
+      if (b.worldScreen !== 40 - 300)
+        return 'a world sprite at x=40 with camera.x=300 reported canvasPos.x ' + b.worldScreen + ', expected -260';
+      // and the consequence that actually matters: can you click the button?
+      if (!b.hudHit)
+        return 'world.getSpritesAt() could not find a screenSpace sprite under the cursor — ' +
+          'a HUD button is unclickable as soon as the camera moves';
+      if (!b.worldHit) return 'world.getSpritesAt() stopped finding ordinary world sprites';
+      return true;
+    },
+  },
+
+  {
+    name: "collider 'none' ignores gravity but still moves under vel",
+    area: 'physics',
+    // A 'none' sprite is what the course calls a trigger zone or a pickup. It
+    // kept a dynamic body, so in a gravity world it silently fell out of the
+    // level: lessons/6-4-18-a15-1-platformer's goal sprite went from y=230 to
+    // y=1588 by frame 180 on a 400px canvas, and the corpus never noticed
+    // because nothing throws when a sprite leaves the screen.
+    //
+    // The body stays dynamic on purpose — moving pickups and sensor-bullets
+    // set .vel — so this asserts BOTH halves: no gravity, but vel still works.
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(400,300); world.gravity.y = 10;
+          zone   = new Sprite(100,100,20); zone.collider = 'none';
+          mover  = new Sprite(200,100,20); mover.collider = 'none'; mover.vel.x = 3;
+          faller = new Sprite(300,100,20);
+          // switching back must restore gravity, not strand the sprite
+          flip = new Sprite(350,100,20); flip.collider = 'none'; flip.collider = 'dynamic';
+          // an explicit gravityScale must survive the sensor switch
+          heavy = new Sprite(50,100,20); heavy.gravityScale = 2; heavy.collider = 'none';
+        }
+        function draw(){ if (frameCount === 50) out = {
+          zone: Math.round(zone.y), moverX: Math.round(mover.x), moverY: Math.round(mover.y),
+          faller: Math.round(faller.y), flip: Math.round(flip.y), heavy: Math.round(heavy.y),
+          gScale: zone.gravityScale }; }
+      `, { frames: 54 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      const o = r.box.sandbox.out;
+      if (!o) return 'probe never ran';
+      if (o.faller <= 105)
+        return 'the control sprite did not fall (y=' + o.faller + '); gravity is not on and the check proves nothing';
+      if (o.zone !== 100)
+        return "a collider 'none' sprite fell to y=" + o.zone + '. Trigger zones and pickups must stay put.';
+      if (o.moverY !== 100)
+        return "a moving 'none' sprite fell to y=" + o.moverY;
+      if (!(o.moverX > 200))
+        return "a 'none' sprite stopped responding to vel (x=" + o.moverX + '); only gravity should be switched off, ' +
+          'not the whole body';
+      if (o.flip <= 105)
+        return "switching collider back to 'dynamic' left the sprite weightless (y=" + o.flip + ')';
+      if (o.heavy !== 100)
+        return "gravityScale=2 then collider='none' still fell to y=" + o.heavy;
+      if (o.gScale !== 0) return "a 'none' sprite reports gravityScale " + o.gScale + ', expected 0';
       return true;
     },
   },
