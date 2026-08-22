@@ -16,11 +16,11 @@ export default function DueClassPicker() {
 
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
-      <label htmlFor="due-class" style={{ color: '#6272a4' }}>
-        Due dates for
-      </label>
+      {/* No visible label — the chips beside it already say what the class is
+          for. The name survives as aria-label so a screen reader still gets it. */}
       <select
         id="due-class"
+        aria-label="Class these due dates apply to"
         value={due.activeClassId ?? ''}
         disabled={due.saving}
         onChange={(e) => void selectClass(e.target.value)}
