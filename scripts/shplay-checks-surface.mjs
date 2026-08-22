@@ -676,6 +676,112 @@ export const SURFACE_CHECKS = [
     },
   },
 
+  {
+    name: 'joints hold under load, and tear down cleanly',
+    area: 'joints',
+    // Six joint types shipped with no integration coverage at all. This
+    // assembles the three structures a physics puzzle is actually made of —
+    // a sagging rope, a swinging pendulum, a cart on a rail — and asserts the
+    // CONSTRAINT each one is supposed to enforce, not merely that it built.
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(600,400); world.gravity.y = 10;
+          rope = new Group(); rope.diameter = 10;
+          anchorL = new Sprite(150,150,10); anchorL.collider='static';
+          anchorR = new Sprite(330,150,10); anchorR.collider='static';
+          prev = anchorL;
+          for (let i = 0; i < 5; i++) { const l = new rope.Sprite(170+i*30,150); new DistanceJoint(prev,l); prev = l; }
+          new DistanceJoint(rope[rope.length-1], anchorR);
+
+          pivot = new Sprite(450,120,8); pivot.collider='static';
+          bob = new Sprite(510,120,20);
+          swing = new HingeJoint(pivot, bob, { anchor: { x:450, y:120 } });
+
+          rail = new Sprite(100,300,10,10); rail.collider='static';
+          cart = new Sprite(140,300,30,16);
+          new SliderJoint(rail, cart, { axis: { x:1, y:0 } });
+
+          gA = new Sprite(300,200,20,20); gB = new Sprite(322,200,20,20);
+          new GlueJoint(gA, gB);
+
+          start = { ropeY: Math.round(rope[2].y), bobY: Math.round(bob.y),
+                    cartX: Math.round(cart.x), cartY: Math.round(cart.y),
+                    gap: Math.round(gB.x - gA.x), bobJoints: bob.joints.length };
+        }
+        function draw(){
+          if (frameCount === 40) cart.applyForce(60, 0);
+          if (frameCount === 100) {
+            mid = { ropeY: Math.round(rope[2].y), ropeX0: Math.round(rope[0].x),
+                    bobY: Math.round(bob.y),
+                    bobRadius: Math.round(Math.hypot(bob.x - pivot.x, bob.y - pivot.y)),
+                    cartX: Math.round(cart.x), cartY: Math.round(cart.y),
+                    gap: Math.round(gB.x - gA.x) };
+            swing.delete();
+            afterCut = bob.joints.length;
+          }
+          if (frameCount === 150) cutFall = Math.round(bob.y);
+        }
+      `, { frames: 155 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      const { start, mid, afterCut, cutFall } = r.box.sandbox;
+      if (start.bobJoints !== 1) return 'sprite.joints reported ' + start.bobJoints + ' after one HingeJoint';
+      if (!(mid.ropeY > start.ropeY)) return 'a rope of DistanceJoints did not sag under gravity (y ' + start.ropeY + ' -> ' + mid.ropeY + ')';
+      if (Math.abs(mid.ropeX0 - 170) > 60) return 'the rope tore away from its anchor (first link x=' + mid.ropeX0 + ')';
+      if (!(mid.bobY > start.bobY)) return 'the pendulum never swung (y ' + start.bobY + ' -> ' + mid.bobY + ')';
+      // the hinge's whole job: distance to the pivot is fixed
+      if (Math.abs(mid.bobRadius - 60) > 2)
+        return 'HingeJoint let the bob drift to radius ' + mid.bobRadius + ' from the pivot, expected 60';
+      if (!(mid.cartX > start.cartX + 10)) return 'the cart did not slide along its rail (x ' + start.cartX + ' -> ' + mid.cartX + ')';
+      if (mid.cartY !== start.cartY)
+        return 'SliderJoint let the cart leave its axis (y ' + start.cartY + ' -> ' + mid.cartY + ')';
+      if (Math.abs(mid.gap - start.gap) > 1)
+        return 'GlueJoint let its two sprites drift apart (' + start.gap + ' -> ' + mid.gap + ')';
+      // teardown
+      if (afterCut !== 0) return 'joint.delete() left ' + afterCut + ' entr(ies) in sprite.joints';
+      if (!(cutFall > mid.bobY + 20))
+        return 'after joint.delete() the bob did not fall free (y ' + mid.bobY + ' -> ' + cutFall + ')';
+      return true;
+    },
+  },
+  {
+    name: 'sprite text paints with its own fill, outline and layer order',
+    area: 'sprite',
+    // Asserted against RECORDED canvas ops. sprite.text was already once a
+    // silent no-op in six lessons' starters AND their reference solutions,
+    // which is exactly the failure a property read-back cannot see.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        function setup(){ new Canvas(300,200); world.gravity.y = 0;
+          slot = new Sprite(80,100,70,50); slot.collider='none';
+          slot.text = 'slot'; slot.textFill = 'white'; slot.layer = 1;
+          label = new Sprite(150,100,80,30); label.collider='none'; label.color='#111';
+          label.text = 'HI'; label.textFill = 'cyan';
+          label.textStroke = 'crimson'; label.textStrokeWeight = 4;
+          label.layer = 5;
+        }
+        function draw(){}
+      `);
+      box.pump(3);
+      const stroke = box.ops.filter((o) => o.op === 'strokeText');
+      const fill = box.ops.filter((o) => o.op === 'fillText');
+      if (!fill.length) return 'no fillText was recorded — sprite.text is not painting at all';
+      if (!stroke.length) return 'textStroke was set but no strokeText was recorded';
+      if (stroke[0].stroke !== 'crimson')
+        return 'text outline drew with strokeStyle ' + stroke[0].stroke + ', expected crimson';
+      const hi = fill.find((o) => o.args[0] === 'HI');
+      if (!hi) return 'the label text never reached fillText';
+      if (hi.fill !== 'cyan') return 'text drew with fillStyle ' + hi.fill + ', expected the sprite\'s textFill (cyan)';
+      const lw = box.ops.filter((o) => o.op === 'set:lineWidth').map((o) => o.args[0]);
+      if (!lw.includes(4)) return 'textStrokeWeight 4 never reached lineWidth (saw ' + JSON.stringify([...new Set(lw)]) + ')';
+      // outline must go down BEFORE the fill or it paints over the letters
+      const firstStroke = box.ops.indexOf(stroke[0]);
+      if (firstStroke > box.ops.indexOf(hi))
+        return 'strokeText ran after fillText; the outline would cover the letters';
+      return true;
+    },
+  },
+
   // ---- input and globals --------------------------------------------------
   {
     name: 'kb.releases and mouse.releases fire on exactly one frame',
