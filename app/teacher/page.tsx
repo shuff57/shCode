@@ -702,6 +702,19 @@ function GradebookView({
       return withLate(cell, <span style={{ color: '#50fa7b', fontFamily: 'monospace', fontSize: 14 }}>✓</span>);
     }
     if (cell.state === 'started') {
+      // A score can exist while the row is still 'started', and the glyph alone
+      // hid it: WrittenGrader only flips the row to completed when the grade
+      // passes, and a teacher override updates score without touching state.
+      // So a 60% AI grade and a hand-graded submission both used to read as a
+      // bare "in progress" until you hovered for the tooltip.
+      const partial = cell.score ?? cell.submitted_score;
+      if (partial !== null) {
+        return withLate(cell, (
+          <span style={{ color: '#f1fa8c', fontFamily: 'monospace', fontWeight: 700, fontSize: 13 }}>
+            {partial}
+          </span>
+        ));
+      }
       return withLate(cell, <span style={{ color: '#f1fa8c', fontFamily: 'monospace', fontSize: 14 }}>○</span>);
     }
     // Has submission data but no lesson_state (edge case)
