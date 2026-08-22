@@ -2132,6 +2132,136 @@
     return result;
   }
 
+  // ---- sound --------------------------------------------------------------
+  //
+  // shPlay's own design: q5play ships no sound surface at all (nothing in its
+  // .d.ts), so there is nothing to port and nothing to be faithful to.
+  //
+  // Built on HTMLAudioElement rather than the Web Audio API. Web Audio buys
+  // precise scheduling and effects, and costs an AudioContext that must be
+  // resumed on a user gesture, a buffer-decode step, and a graph to explain.
+  // For "play a coin sound when the player picks up a coin", an <audio> tag
+  // is the whole job.
+  //
+  // Two details that are not obvious and that games get wrong:
+  //
+  // 1. One element cannot play twice at once. Fire a laser twice in three
+  //    frames and the second play() just restarts the first. So play() clones
+  //    the element for each overlapping shot. loop() does NOT clone — a
+  //    looping track is one thing you start and stop.
+  // 2. Browsers block audio until the user has interacted with the page, and
+  //    the blocked play() returns a REJECTED promise. Unhandled, that prints
+  //    an error in the console of every sketch that makes a sound on frame 1.
+  //    We swallow it and set `.blocked` so a sketch can tell.
+
+  let MASTER_VOLUME_ = 1;
+  const SOUNDS_ = [];
+
+  class Sound {
+    constructor(url) {
+      this.url = url;
+      this._volume = 1;
+      this._rate = 1;
+      this._el = typeof Audio === 'function' ? new Audio(url) : null;
+      this._playing = [];   // clones currently sounding
+      this.blocked = false; // set true if the browser refused to play
+      SOUNDS_.push(this);
+    }
+
+    // A fresh voice per call so rapid repeats overlap instead of cutting each
+    // other off. Returns the element so a caller can stop one specific shot.
+    play() {
+      if (!this._el) return null;
+      const voice = this._el.cloneNode();
+      voice.volume = this._clampedVolume();
+      voice.playbackRate = this._rate;
+      voice.loop = false;
+      this._playing.push(voice);
+      this._start(voice);
+      // Keep the list from growing forever in a long session. A voice is done
+      // when it reports paused again; anything still sounding is kept.
+      if (this._playing.length > 16) this._playing = this._playing.filter((v) => !v.paused);
+      return voice;
+    }
+
+    // One looping voice, not a new one per call — calling loop() twice must
+    // not stack two copies of the same music track on top of each other.
+    loop() {
+      if (!this._el) return null;
+      // Idempotent. A sketch that calls loop() from draw() calls it 60 times
+      // a second; each one must not be a fresh play() request. Browsers
+      // tolerate that, but it buries the audio log and invites the same
+      // mistake somewhere it is not tolerated.
+      if (this._el.loop && !this._el.paused) return this._el;
+      this._el.loop = true;
+      this._el.volume = this._clampedVolume();
+      this._el.playbackRate = this._rate;
+      this._start(this._el);
+      return this._el;
+    }
+
+    pause() {
+      if (this._el && !this._el.paused) this._el.pause();
+      for (const v of this._playing) if (!v.paused) v.pause();
+    }
+
+    // stop() is pause() plus a rewind, so the next play() starts at the top.
+    stop() {
+      this.pause();
+      if (this._el) this._el.currentTime = 0;
+      for (const v of this._playing) v.currentTime = 0;
+      this._playing = [];
+    }
+
+    get playing() {
+      if (this._el && !this._el.paused) return true;
+      return this._playing.some((v) => !v.paused);
+    }
+
+    get volume() { return this._volume; }
+    set volume(v) {
+      this._volume = Math.max(0, Math.min(1, Number(v) || 0));
+      const applied = this._clampedVolume();
+      if (this._el) this._el.volume = applied;
+      for (const voice of this._playing) voice.volume = applied;
+    }
+
+    // Playback speed. Also shifts the pitch, which is the cheap way to get
+    // variety out of one sound effect.
+    get rate() { return this._rate; }
+    set rate(v) {
+      this._rate = Number(v) || 1;
+      if (this._el) this._el.playbackRate = this._rate;
+      for (const voice of this._playing) voice.playbackRate = this._rate;
+    }
+
+    get duration() { return this._el ? this._el.duration || 0 : 0; }
+
+    _clampedVolume() { return Math.max(0, Math.min(1, this._volume * MASTER_VOLUME_)); }
+
+    _start(el) {
+      try {
+        const p = el.play();
+        // A rejected promise here is the autoplay policy, not a bug in the
+        // sketch. Record it and move on rather than spraying the console.
+        if (p && typeof p.catch === 'function') p.catch(() => { this.blocked = true; });
+      } catch {
+        this.blocked = true;
+      }
+    }
+  }
+
+  function loadSound(url) { return new Sound(url); }
+
+  // Scales every sound at once, without disturbing their individual volumes —
+  // a mute button, or ducking the music under a cutscene.
+  function masterVolume(v) {
+    if (v === undefined) return MASTER_VOLUME_;
+    MASTER_VOLUME_ = Math.max(0, Math.min(1, Number(v) || 0));
+    for (const s of SOUNDS_) s.volume = s.volume; // re-apply through the clamp
+    return MASTER_VOLUME_;
+  }
+
   // ---- persistence ------------------------------------------------------
 
   function storeItem(name, val) { localStorage.setItem(name, JSON.stringify(val)); }
@@ -2399,6 +2529,9 @@
   global.createVector = createVector;
   global.Vector = Vector;
   global.loadJSON = loadJSON;
+  global.loadSound = loadSound;
+  global.masterVolume = masterVolume;
+  global.Sound = Sound;
 
   // Auto-boot: if the student sketch defines window.setup (the real q5play
   // convention — sketches never call start() themselves), start the engine.

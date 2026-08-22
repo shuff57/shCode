@@ -305,6 +305,36 @@ declare class GlueJoint extends Joint {
 
 // ---- world ---------------------------------------------------------------
 
+// ---- sound ---------------------------------------------------------------
+
+declare class Sound {
+  constructor(url: string);
+  readonly url: string;
+  /** Starts a NEW voice each call, so rapid repeats overlap instead of
+   *  cutting each other off. Returns that voice. */
+  play(): unknown;
+  /** Starts the one looping voice. Idempotent — safe to call from draw(). */
+  loop(): unknown;
+  pause(): void;
+  /** pause() plus a rewind, so the next play() starts at the beginning. */
+  stop(): void;
+  readonly playing: boolean;
+  /** 0 to 1, this sound's own level. Multiplied by masterVolume(). */
+  volume: number;
+  /** Playback speed. Also shifts pitch — cheap variety from one effect. */
+  rate: number;
+  readonly duration: number;
+  /** True if the browser refused to play (audio is blocked until the user
+   *  has interacted with the page). Not an error — check it if silence on
+   *  the first frame is confusing you. */
+  readonly blocked: boolean;
+}
+
+declare function loadSound(url: string): Sound;
+/** Scales every sound at once without disturbing their individual volumes.
+ *  Call with no argument to read the current value. */
+declare function masterVolume(v?: number): number;
+
 interface World {
   gravity: Vec2;
   getSpriteAt(x: number, y: number): Sprite | undefined;

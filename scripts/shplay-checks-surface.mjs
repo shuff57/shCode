@@ -782,6 +782,135 @@ export const SURFACE_CHECKS = [
     },
   },
 
+  {
+    name: 'animations advance, switch, and slice a real source rect',
+    area: 'sprite',
+    // The source-rect half is the point. `fw = naturalWidth / frameCount` was
+    // NaN for the whole life of the harness, because the fake Image defined
+    // width/height and the engine reads naturalWidth/naturalHeight. Every
+    // animated sprite drew nothing, headlessly, in silence. Asserting the
+    // frame COUNTER alone would still have passed.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        function setup(){ new Canvas(400,200); world.gravity.y = 0;
+          s = new Sprite(100,100,32,32);
+          s.addAni('long', 'long.png', 4);
+          s.addAni('short', 'short.png', 2);
+          autoActive = s.ani.name;          // first addAni activates
+          imgCleared = s.image;             // ani and a still image are exclusive
+          s.changeAni('short'); switched = s.ani.name;
+          s.changeAni('nope');  bogus = s.ani.name;
+          s.changeAni('long');
+          seen = [];
+        }
+        function draw(){
+          seen.push(s.ani.frame);
+          if (frameCount === 30) { atSwitch = s.ani.frame; s.changeAni('short'); afterSwitch = s.ani.frame; }
+        }
+      `);
+      box.pump(34);
+      const b = box.sandbox;
+      if (b.autoActive !== 'long') return 'the first addAni did not auto-activate (active: ' + b.autoActive + ')';
+      if (b.imgCleared !== null) return 'adding an ani left sprite.image as ' + b.imgCleared + '; they are exclusive';
+      if (b.switched !== 'short') return "changeAni('short') left " + b.switched + ' active';
+      if (b.bogus !== 'short') return 'changeAni with an unknown name changed the active ani to ' + b.bogus;
+
+      // frameDelay 4 over 4 frames: each index must be held, and all 4 seen
+      const first16 = b.seen.slice(0, 16);
+      if (new Set(first16).size !== 4)
+        return 'over 16 frames a 4-frame ani showed ' + new Set(first16).size + ' distinct frames: ' + JSON.stringify(first16);
+      if (first16[0] !== first16[3] || first16[0] === first16[4])
+        return 'frameDelay is not being honoured; frames went ' + JSON.stringify(first16.slice(0, 6));
+
+      // switching to a SHORTER ani must not carry an out-of-range index over
+      if (b.atSwitch < 2) return 'the test never reached a frame index beyond the short ani; it proves nothing';
+      if (b.afterSwitch >= 2)
+        return 'switching from frame ' + b.atSwitch + ' to a 2-frame ani left frame ' + b.afterSwitch +
+          ' — that would slice past the end of the sheet';
+
+      // the actual pixels: a real, in-bounds source rectangle
+      const draws = box.ops.filter((o) => o.op === 'drawImage' && o.args.length === 9);
+      if (!draws.length) return 'no 9-argument drawImage was recorded — sprite sheets are not being sliced at all';
+      for (const d of draws) {
+        const [, sx, sy, sw, sh] = d.args;
+        if ([sx, sy, sw, sh].some((n) => typeof n !== 'number' || !Number.isFinite(n)))
+          return 'a sprite-sheet source rect was non-finite: ' + JSON.stringify(d.args.slice(1, 5));
+        if (sw <= 0 || sh <= 0) return 'a source rect had zero or negative size: ' + JSON.stringify(d.args.slice(1, 5));
+      }
+      // frame 1 of a 4-frame, 256px-wide sheet starts at x=64
+      if (!draws.some((d) => d.args[1] === 64 && d.args[3] === 64))
+        return 'no frame sliced at the expected offset; source x values seen: ' +
+          JSON.stringify([...new Set(draws.map((d) => d.args[1]))]);
+      return true;
+    },
+  },
+
+  // ---- sound ----------------------------------------------------------------
+  {
+    name: 'sound: overlapping shots, looping music, volume and rate',
+    area: 'sound',
+    // Asserted against what the sketch asked the SPEAKERS to do, not against
+    // property read-back. The two things games get wrong are both here: a
+    // rapid-fire effect must open a new voice per shot (one element cannot
+    // play twice at once, so the naive version silently restarts instead of
+    // overlapping), and loop() called from draw() must not re-issue play()
+    // sixty times a second.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        function setup(){ new Canvas(400,200); world.gravity.y = 0;
+          coin = loadSound('coin.mp3');
+          music = loadSound('music.mp3');
+          music.volume = 0.4;
+          music.loop();
+          afterLoop = { playing: music.playing, duration: music.duration };
+        }
+        function draw(){
+          if (frameCount >= 3 && frameCount <= 5) coin.play();
+          if (frameCount === 8) { coin.rate = 1.5; coin.play(); }
+          if (frameCount === 12) masterVolume(0.5);
+          if (frameCount === 14) ducked = { own: music.volume, master: masterVolume() };
+          if (frameCount === 16) { music.stop(); stopped = music.playing; }
+          if (frameCount >= 18) music.loop();   // called every frame from here
+        }
+      `);
+      box.pump(24);
+      const b = box.sandbox;
+      const log = box.audioLog;
+      if (b.afterLoop.playing !== true) return 'music.playing was false right after loop()';
+      if (!(b.afterLoop.duration > 0)) return 'sound.duration read ' + b.afterLoop.duration;
+
+      // three shots in three frames must be three separate voices
+      const shots = log.filter((e) => e.op === 'play' && e.src === 'coin.mp3');
+      if (shots.length !== 4)
+        return 'expected 4 coin play() calls (3 rapid + 1 at a new rate), saw ' + shots.length +
+          '. A single element restarting itself would show fewer.';
+      const voices = log.filter((e) => e.op === 'new' && e.src === 'coin.mp3');
+      if (voices.length < 4)
+        return 'only ' + voices.length + ' audio element(s) were created for 4 overlapping plays; ' +
+          'rapid fire needs a voice per shot or the shots cut each other off';
+      if (shots[3].rate !== 1.5) return 'sound.rate did not reach the voice (rate ' + shots[3].rate + ')';
+
+      // master volume scales the element without rewriting the sound's own
+      if (b.ducked.own !== 0.4) return 'masterVolume changed the sound\'s own volume to ' + b.ducked.own;
+      if (b.ducked.master !== 0.5) return 'masterVolume() read back ' + b.ducked.master;
+      const musicPlays = log.filter((e) => e.op === 'play' && e.src === 'music.mp3');
+      if (!musicPlays.some((e) => Math.abs(e.volume - 0.2) < 1e-9))
+        return 'volume 0.4 under masterVolume 0.5 should reach the element as 0.2; saw ' +
+          JSON.stringify(musicPlays.map((e) => e.volume));
+
+      if (b.stopped !== false) return 'music.playing stayed true after stop()';
+      if (!log.some((e) => e.op === 'pause' && e.src === 'music.mp3')) return 'stop() never paused the element';
+
+      // loop() called every frame for ~6 frames must issue ONE play
+      const afterRestart = musicPlays.length;
+      if (afterRestart > 3)
+        return 'loop() issued ' + afterRestart + ' play() calls; called from draw() it must be idempotent';
+      return true;
+    },
+  },
+
   // ---- input and globals --------------------------------------------------
   {
     name: 'kb.releases and mouse.releases fire on exactly one frame',

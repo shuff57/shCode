@@ -50,6 +50,15 @@ function makeCtx(ops) {
   // check passed. Treat a NaN transform as the failure it actually is.
   const TRANSFORM_OPS = new Set(['scale', 'translate', 'rotate', 'setTransform', 'transform']);
 
+  // drawImage was deliberately left out of the guard at first, on the
+  // reasoning that a bad argument to one draw call only drops one shape while
+  // a bad transform corrupts the whole frame. That reasoning was right about
+  // blast radius and wrong about detectability: a NaN source rect draws
+  // NOTHING and reports nothing, and that is exactly how animated sprites
+  // went untested. Now that it has actually happened, the guard is no longer
+  // speculative. Only the numeric args are checked; arg 0 is the image.
+  const RECT_OPS = new Set(['drawImage']);
+
   const ctx = {};
   for (const m of methods) {
     ctx[m] = (...args) => {
@@ -57,6 +66,12 @@ function makeCtx(ops) {
         throw new TypeError(
           `ctx.${m}(${args.map(String).join(', ')}) — a non-finite transform argument. ` +
           'In a browser this sets a NaN transform and everything drawn afterwards disappears silently.'
+        );
+      }
+      if (RECT_OPS.has(m) && args.slice(1).some((a) => typeof a !== 'number' || !Number.isFinite(a))) {
+        throw new TypeError(
+          `ctx.${m}(image, ${args.slice(1).map(String).join(', ')}) — a non-finite rectangle. ` +
+          'In a browser this draws nothing at all, with no error.'
         );
       }
       ops.push({ op: m, args: args.map(simplify), fill: state.fillStyle, stroke: state.strokeStyle });
@@ -136,12 +151,49 @@ export function createSandbox({ width = 800, height = 600 } = {}) {
     removeEventListener: () => {},
   };
 
+  // Audio, recorded rather than played. Every call lands in `audioLog` so a
+  // check can assert what a sketch actually asked the speakers to do — which
+  // is the only observable there is headlessly.
+  //
+  // play() returns a resolved Promise deliberately: a real browser returns a
+  // Promise that REJECTS when autoplay is blocked before a user gesture, and
+  // an engine that ignores it produces unhandled rejections in the console of
+  // every sketch that makes a sound on frame 1.
+  const audioLog = [];
+  class FakeAudio {
+    constructor(src) {
+      this.__isAudio = true;
+      this.src = src || '';
+      this.volume = 1;
+      this.playbackRate = 1;
+      this.loop = false;
+      this.currentTime = 0;
+      this.duration = 1.5;
+      this.paused = true;
+      this.muted = false;
+      audioLog.push({ op: 'new', src: this.src });
+    }
+    play() { this.paused = false; audioLog.push({ op: 'play', src: this.src, volume: this.volume, loop: this.loop, rate: this.playbackRate }); return Promise.resolve(); }
+    pause() { this.paused = true; audioLog.push({ op: 'pause', src: this.src }); }
+    load() { audioLog.push({ op: 'load', src: this.src }); }
+    cloneNode() { const c = new FakeAudio(this.src); c.volume = this.volume; c.playbackRate = this.playbackRate; c.loop = this.loop; return c; }
+    addEventListener(type, fn) { if (type === 'canplaythrough' || type === 'loadedmetadata') timers.push(fn); }
+    removeEventListener() {}
+  }
+
   // Images resolve synchronously with a plausible size so spritesheet slicing
   // runs for real instead of sitting in a never-fired onload.
   class FakeImage {
     constructor() {
       this.__isImage = true;
+      // naturalWidth/naturalHeight, not just width/height. The engine slices
+      // sprite sheets with `img.naturalWidth / ani.frameCount`, and this stub
+      // only ever defined width/height — so fw was NaN and EVERY animated
+      // sprite drew with a NaN source rect, silently, for as long as the
+      // harness has existed. The comment above claimed slicing "runs for
+      // real"; it missed by two property names.
       this.width = 256; this.height = 64;
+      this.naturalWidth = 256; this.naturalHeight = 64;
       this.complete = false;
       this._src = '';
       this.onload = null; this.onerror = null;
@@ -164,6 +216,7 @@ export function createSandbox({ width = 800, height = 600 } = {}) {
     },
     document,
     Image: FakeImage,
+    Audio: FakeAudio,
     performance: { now: () => clock },
     Date: Object.assign(function Date_() { return new global.Date(0); }, { now: () => clock, prototype: global.Date.prototype }),
     requestAnimationFrame: (fn) => { rafQueue.push(fn); return rafQueue.length; },
@@ -239,7 +292,7 @@ export function createSandbox({ width = 800, height = 600 } = {}) {
   };
 
   return {
-    sandbox, ops, consoleLines, errors, input, pump, step, drainTimers,
+    sandbox, ops, consoleLines, errors, input, audioLog, pump, step, drainTimers,
     get canvas() { return createdCanvas; },
     get frames() { return Math.round(clock / FRAME_MS); },
     run(code, filename = 'sketch.js') {

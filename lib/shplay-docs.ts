@@ -930,6 +930,56 @@ function draw() {
 }`,
       },
       {
+        title: 'Sound',
+        body: `loadSound('file.mp3') gives you a Sound. Call .play() for a one-off effect and .loop() for music that should keep going.
+
+.play() starts a fresh copy every time it's called, so firing a laser three times in three frames gives you three overlapping shots rather than one restarting over and over. .loop() is the opposite — it's the single track you start once and stop later, and calling it again while it's already going does nothing.
+
+.volume runs 0 to 1. .rate is playback speed, and because it shifts the pitch too it's the cheapest way to get variety out of one sound: coin.rate = 1 + Math.random() * 0.3 makes every pickup sound slightly different. masterVolume(0.5) halves everything at once without touching any individual .volume — that's your mute button.
+
+One thing that will confuse you the first time: browsers refuse to play audio until you have clicked, tapped, or pressed a key on the page. A sound triggered on frame 1 stays silent, and nothing errors. That's the browser, not your code — the sound will work the moment the player presses something. sound.blocked is true when this has happened.`,
+        code: `let coin, music, player, coins;
+
+function setup() {
+  new Canvas(400, 300);
+  world.gravity.y = 0;
+
+  coin = loadSound('coin.mp3');
+  music = loadSound('music.mp3');
+  music.volume = 0.3;
+
+  player = new Sprite(60, 150, 24, 24);
+  player.color = 'deepskyblue';
+  player.collider = 'none';
+
+  coins = new Group();
+  coins.diameter = 14;
+  coins.color = 'gold';
+  coins.collider = 'none';
+  for (let i = 0; i < 4; i++) new coins.Sprite(140 + i * 60, 150);
+}
+
+function update() {
+  player.moveTowards(mouse, 0.08);
+
+  coins.overlaps(player, (c) => {
+    coin.rate = 1 + Math.random() * 0.3;  // a slightly different chime each time
+    coin.play();
+    c.delete();
+  });
+
+  // music can only start once the player has interacted with the page
+  if (mouse.presses() && !music.playing) music.loop();
+}
+
+function draw() {
+  background('#111');
+  fill('white');
+  textSize(13);
+  text('click to start the music, move to collect', 14, 24);
+}`,
+      },
+      {
         title: 'The allSprites group',
         body: `allSprites is a built-in Group that every sprite joins automatically the moment it's created. You never construct it — it's already there as soon as shPlay loads.
 
