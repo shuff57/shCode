@@ -22,7 +22,7 @@ The class style guide requires a README on any multi-project submission, and the
 
 **Try it:**
 
-Here is a small program. Read it, then read the three-sentence README under it and notice what the README tells you that the code cannot.
+Here is a small program. Read it, then read the three-sentence README under it and notice what the README tells you that the code cannot. (`TAX_RATE` is in UPPER_SNAKE_CASE because it is set once and never changes — the constant style from `1.3.2`.)
 
 ```js live plain
 const TAX_RATE = 0.0725;

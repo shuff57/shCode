@@ -578,7 +578,7 @@
     },
     {
       "id": "1-3-2-reading-camelcase",
-      "title": "1.3.2 Reading — camelCase Naming Style",
+      "title": "1.3.2 Reading — camelCase and UPPER_SNAKE_CASE",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
       "type": "lesson",

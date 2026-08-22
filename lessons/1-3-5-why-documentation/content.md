@@ -23,20 +23,21 @@ load-bearing or leftovers. Delete them and something breaks in a way you will no
 
 One comment saying *why* those lines exist would have cost fifteen seconds.
 
-**Try it:** run this, then ask which version you could safely change six months from now.
+**Try it:** run this, then ask whether you would dare to touch that middle line six months from now.
 
 ```js live plain
 let price = 20;
 let shipping = 7;
 
-// Free shipping over 50 - the store owner asked for this, do not remove
-let total = price > 50 ? price : price + shipping;
+// Summer sale: the store owner asked us to take $2 off shipping.
+// Ends in September - remove the discount then, not before.
+let total = price + shipping - 2;
 
 console.log("Total: " + total);
 ```
 
 Without that comment the line still runs correctly, and the next person to read it cannot tell
-whether the rule is deliberate or a bug.
+whether the `- 2` is a deliberate discount or somebody's typo.
 
 ## What documentation is not
 
