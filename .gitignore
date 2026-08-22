@@ -42,3 +42,6 @@ graphify-out/
 scripts/cs_schedule_output.md
 __pycache__/
 .dev.vars.bak
+
+# playwright-cli scratch (console logs + page snapshots), local only
+.playwright-cli/
