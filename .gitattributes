@@ -7,3 +7,11 @@ graphify-out/graph.json merge=graphify
 # that was vendored, and the hash check goes red on a fresh clone. Never let git
 # translate these.
 public/jscad/lib/*.js -text
+
+# The preview runners. The gate cuts the scope shim live out of these files and
+# matches on newline boundaries, so a CRLF checkout used to collapse the whole
+# SHIM group. scripts/jscad-harness.mjs normalises on read so the gate no longer
+# depends on this — keeping the working tree consistent as well is belt and
+# braces, and stops the whole file showing as changed on a Windows clone.
+public/jscad/runner.html   text eol=lf
+public/shplay/runner.html  text eol=lf

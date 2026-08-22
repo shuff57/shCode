@@ -43,7 +43,18 @@ export const PATHS = {
 
 // ---- artifacts ------------------------------------------------------------
 
-const read = (p) => readFileSync(p, 'utf8');
+// Normalise line endings on the way in. Git's core.autocrlf=true rewrites text
+// files on checkout, so a fresh clone on Windows gets CRLF while the tree these
+// checks were written in has LF. extractShim() matches `<script>\n` literally;
+// against `<script>\r\n` it finds zero blocks, throws, and takes the whole SHIM
+// group and everything built on the shim context down with it.
+//
+// Measured 2026-08-22, and only because a deploy was built from a fresh
+// worktree: same commit, 248/248 here and 30/248 there. A gate that depends on
+// the checkout config of the machine it runs on is not a gate. Reading through
+// this keeps it checkout-agnostic; .gitattributes keeps the working trees
+// consistent as well, but the gate must not need that to be true.
+const read = (p) => readFileSync(p, 'utf8').replace(/\r\n/g, '\n');
 
 let _modelingScript = null;
 function modelingScript() {
