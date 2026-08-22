@@ -2,7 +2,10 @@
 // POST /api/classes/[id]/submission-queue   body: { submissionId, score, feedback? }
 //
 // Teacher review queue for AI-graded written submissions.
-// GET returns the 50 most recent graded submissions across all enrolled students.
+// GET returns the 50 most recent graded submissions across all enrolled
+// students. That includes attempts the grader FAILED on: those carry a
+// gradingFailed marker in grade_json with score NULL, so they match this
+// query unchanged and surface as "needs manual grade" in the UI.
 // POST lets a teacher override the AI score and optionally attach feedback.
 //
 // Auth: caller must be an owner / co-teacher of the class OR an admin.
@@ -156,13 +159,21 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (
     .bind(body.score, updatedGradeJson, body.submissionId)
     .run();
 
-  // Update lesson_state.score so the override is reflected in gradebook / progress views.
+  // Sync lesson_state so the override reaches the gradebook and progress views.
+  //
+  // Upsert rather than UPDATE: a submission recorded because grading FAILED
+  // never created a lesson_state row, so the old UPDATE matched nothing and a
+  // hand-set score silently went nowhere. On insert the row is marked
+  // completed — a teacher setting a score by hand is the act of finishing the
+  // lesson, and green-to-advance needs it to unlock the next one. On conflict
+  // only the score moves, so an existing row's state is left exactly as it was.
   await env.DB.prepare(
-    `UPDATE lesson_state
-        SET score = ?1
-      WHERE student_email = ?2 AND lesson_id = ?3`,
+    `INSERT INTO lesson_state (student_email, lesson_id, state, started_at, completed_at, score)
+     VALUES (?1, ?2, 'completed', ?3, ?3, ?4)
+     ON CONFLICT (student_email, lesson_id)
+     DO UPDATE SET score = excluded.score`,
   )
-    .bind(body.score, submission.student_email, submission.lesson_id)
+    .bind(submission.student_email, submission.lesson_id, now, body.score)
     .run();
 
   return json({

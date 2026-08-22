@@ -2,7 +2,10 @@
 // POST /api/lesson-submissions            -> record one, body:
 //   { id, lessonId, response, gradeJson?, score?, possible? }
 //
-// Append-only history. WrittenGrader POSTs here after each successful grade.
+// Append-only history. WrittenGrader POSTs here after each successful grade,
+// and also when grading FAILS — that row carries score/possible NULL and a
+// gradingFailed marker in gradeJson, so the answer survives an Ollama outage
+// and reaches the teacher's review queue instead of dying in localStorage.
 
 import { resolveDueForStudent } from '../../_shared/dueDates';
 

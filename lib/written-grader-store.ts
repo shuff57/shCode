@@ -60,12 +60,15 @@ export async function fetchSubmissions(lessonId: string): Promise<SubmissionReco
   }
 }
 
+/** score/possible are omitted for an ungraded attempt — a submission recorded
+ *  because grading failed. The endpoint stores NULL for both, and the teacher
+ *  queue treats a row with no score as one that still needs marking. */
 export async function recordSubmission(input: {
   lessonId: string;
   response: string;
   gradeJson: unknown;
-  score: number;
-  possible: number;
+  score?: number;
+  possible?: number;
 }): Promise<boolean> {
   const id =
     typeof crypto !== 'undefined' && 'randomUUID' in crypto

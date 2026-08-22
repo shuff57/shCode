@@ -83,16 +83,38 @@ function parseGradeJson(raw: string): GradeJson | null {
   }
 }
 
+interface FailedGrade {
+  gradingFailed: true;
+  error?: string;
+  httpStatus?: number;
+  attemptedAt?: number;
+}
+
+/** A submission recorded because grading FAILED — the student's answer reached
+ *  the server but never got a score. WrittenGrader writes this marker into
+ *  grade_json (see the comment there for why a marker and not a NULL), so these
+ *  rows arrive in this queue through the existing query and are the ones a
+ *  teacher has to mark by hand. */
+function parseFailedGrade(raw: string): FailedGrade | null {
+  try {
+    const parsed = JSON.parse(raw) as FailedGrade;
+    return parsed && parsed.gradingFailed === true ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Override form inline component
 // ---------------------------------------------------------------------------
 
 interface OverrideFormProps {
+  classId: string;
   submissionId: string;
   onOverride: () => void;
 }
 
-function OverrideForm({ submissionId, onOverride }: OverrideFormProps) {
+function OverrideForm({ classId, submissionId, onOverride }: OverrideFormProps) {
   const [score, setScore] = useState('');
   const [feedback, setFeedback] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -110,14 +132,19 @@ function OverrideForm({ submissionId, onOverride }: OverrideFormProps) {
     setMsg(null);
 
     try {
-      const res = await fetch(`/api/classes/${encodeURIComponent(submissionId)}/submission-queue`, {
+      // The path takes the CLASS id and the body uses the endpoint's own field
+      // names. Both were wrong here: the submission id was being interpolated
+      // as the class id, and {id, overrideScore, overrideFeedback} does not
+      // match the {submissionId, score, feedback} the handler validates — so
+      // every override 400'd or 404'd and no teacher could correct a grade.
+      const res = await fetch(`/api/classes/${encodeURIComponent(classId)}/submission-queue`, {
         method: 'POST',
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: submissionId,
-          overrideScore: parsedScore,
-          overrideFeedback: feedback || undefined,
+          submissionId,
+          score: parsedScore,
+          feedback: feedback || undefined,
         }),
       });
 
@@ -284,8 +311,28 @@ export function SubmissionQueue({ classId }: Props) {
     );
   }
 
+  // Ungraded attempts are the ones with a deadline attached — a student is
+  // waiting on a human for these — so say how many there are rather than making
+  // a teacher spot orange badges down a list of fifty.
+  const needsManual = submissions.filter((s) => parseFailedGrade(s.grade_json)).length;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {needsManual > 0 && (
+        <div
+          style={{
+            background: '#ffb86c',
+            color: '#282a36',
+            borderRadius: 6,
+            padding: '10px 14px',
+            fontSize: '0.86rem',
+            fontWeight: 600,
+          }}
+        >
+          {needsManual} submission{needsManual === 1 ? '' : 's'} the AI grader could not score.
+          Set a score by hand below — the students&apos; answers were saved.
+        </div>
+      )}
       {submissions.map((sub) => {
         // A flowchart submission nests its rubric under `ai`, so the plain
         // top-level reader returns null for it; fall through to the diagram
@@ -301,6 +348,7 @@ export function SubmissionQueue({ classId }: Props) {
               }
             : null);
         const diagram = parseDiagramResponse(sub.response);
+        const failed = parseFailedGrade(sub.grade_json);
 
         return (
           <div
@@ -327,17 +375,43 @@ export function SubmissionQueue({ classId }: Props) {
               </div>
               <div
                 style={{
-                  background: '#44475a',
-                  color: '#f8f8f2',
+                  background: failed ? '#ffb86c' : '#44475a',
+                  color: failed ? '#282a36' : '#f8f8f2',
                   padding: '3px 10px',
                   borderRadius: 4,
                   fontSize: '0.82rem',
                   fontWeight: 600,
                 }}
               >
-                AI score: {sub.score ?? '—'} / {sub.possible ?? '—'}
+                {failed
+                  ? 'Needs manual grade'
+                  : `AI score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`}
               </div>
             </div>
+
+            {failed && (
+              <div
+                style={{
+                  background: '#282a36',
+                  border: '1px solid #ffb86c',
+                  borderLeft: '4px solid #ffb86c',
+                  borderRadius: 4,
+                  padding: '8px 10px',
+                  fontSize: '0.8rem',
+                  color: '#f8f8f2',
+                  lineHeight: 1.5,
+                }}
+              >
+                The AI grader could not score this. The student&apos;s answer is below and is
+                safe — read it and set a score yourself.
+                {failed.error && (
+                  <div style={{ color: '#6272a4', marginTop: 4, fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                    {failed.error}
+                    {failed.httpStatus ? ` (HTTP ${failed.httpStatus})` : ''}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Grading criteria */}
             {gradeData && (
@@ -449,7 +523,7 @@ export function SubmissionQueue({ classId }: Props) {
             )}
 
             {/* Override form */}
-            <OverrideForm submissionId={sub.id} onOverride={handleOverride} />
+            <OverrideForm classId={classId} submissionId={sub.id} onOverride={handleOverride} />
           </div>
         );
       })}

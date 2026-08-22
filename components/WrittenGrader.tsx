@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CircleCheck, CircleX, Circle, Loader2, Lightbulb, Sparkles, Save } from 'lucide-react';
 import { recordLessonCompleted, useLessonState } from '../lib/progress';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
@@ -143,6 +143,42 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
     setTimeout(() => setSaveStatus('idle'), 2000);
   }
 
+  // When grading fails, the answer still has to reach the server. Before this,
+  // recordSubmission() only ran inside the success branch, so an Ollama outage
+  // left the student's work in localStorage and nowhere else — invisible to the
+  // teacher, and gone if they opened the lesson on another machine.
+  //
+  // The row is written with score/possible NULL and a gradingFailed marker in
+  // grade_json. The marker (rather than a NULL grade_json) is deliberate: the
+  // teacher queue already selects `WHERE grade_json IS NOT NULL`, so these rows
+  // show up there with no query change, while staying distinguishable from a
+  // real grade and from the lab submissions that also live in this table.
+  const lastFailedRef = useRef<string | null>(null);
+
+  async function recordFailedAttempt(reason: string, httpStatus: number) {
+    if (!progress.authed) return;
+    // A student who hits Submit four times against a dead grader should not
+    // land four identical rows in the teacher's queue. Same text = one row.
+    if (lastFailedRef.current === response) return;
+    const [recorded] = await Promise.all([
+      recordSubmission({
+        lessonId,
+        response,
+        gradeJson: {
+          gradingFailed: true,
+          error: reason,
+          httpStatus,
+          attemptedAt: Date.now(),
+        },
+      }),
+      saveDraft(lessonId, response),
+    ]);
+    // Only suppress the retry once the row is actually on the server. Marking
+    // it before the POST would mean a student whose network dropped never got
+    // a second chance to record the attempt.
+    if (recorded) lastFailedRef.current = response;
+  }
+
   async function submit() {
     setLoading(true);
     setError(null);
@@ -167,14 +203,20 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       try {
         data = text ? JSON.parse(text) : null;
       } catch {
-        setError(`Grader returned a non-JSON response (HTTP ${res.status}). Ask your teacher — the Ollama key or endpoint may not be configured.`);
+        const reason = `Grader returned a non-JSON response (HTTP ${res.status}).`;
+        setError(`${reason} Ask your teacher — the Ollama key or endpoint may not be configured. Your answer has been saved and sent to your teacher for marking.`);
+        await recordFailedAttempt(reason, res.status);
         return;
       }
       if (!data || !data.ok) {
-        setError(data?.error || `Grading failed (HTTP ${res.status}).`);
+        const reason = data?.error || `Grading failed (HTTP ${res.status}).`;
+        setError(`${reason} Your answer has been saved and sent to your teacher for marking.`);
         if (data?.offline) setOffline(true);
+        await recordFailedAttempt(reason, res.status);
         return;
       }
+      // A successful grade supersedes any failed attempt for this text.
+      lastFailedRef.current = null;
       setResult(data as GradeResult);
       const passed = isPassing(data as GradeResult);
       if (passed) {
@@ -193,7 +235,12 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         saveDraft(lessonId, response);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      const reason = e instanceof Error ? e.message : String(e);
+      setError(reason);
+      // Best effort — if the network is genuinely down this fails too, and
+      // recordFailedAttempt leaves the retry guard clear so the next submit
+      // tries again.
+      await recordFailedAttempt(reason, 0);
     } finally {
       setLoading(false);
     }
