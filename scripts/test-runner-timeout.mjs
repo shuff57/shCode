@@ -3,7 +3,8 @@
 // Module 2.4 teaches infinite loops on purpose, so students write `while (true)`
 // deliberately. Synchronous JavaScript cannot be interrupted — the only way to
 // stop it is to terminate the worker running it, which is why
-// LessonWorkspace.tsx runs student code in a Worker rather than calling
+// The console runner (lib/js-runner-source.ts, used by LessonWorkspace and the
+// sandbox's JavaScript mode) runs student code in a Worker rather than calling
 // `new Function(...)()` on the main thread.
 //
 // This checks that contract. It runs the real RUNNER_SOURCE extracted from the
@@ -17,12 +18,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const component = readFileSync(path.join(root, 'components', 'LessonWorkspace.tsx'), 'utf8');
+const component = readFileSync(path.join(root, 'lib', 'js-runner-source.ts'), 'utf8');
 
 // Pull the runner source and the two limits straight out of the component, so
 // this test fails if they are edited apart rather than silently testing a copy.
 const m = component.match(/const RUNNER_SOURCE = `([\s\S]*?)\n`;/);
-if (!m) { console.error('FAIL  could not find RUNNER_SOURCE in LessonWorkspace.tsx'); process.exit(1); }
+if (!m) { console.error('FAIL  could not find RUNNER_SOURCE in lib/js-runner-source.ts'); process.exit(1); }
 const TIMEOUT = Number((component.match(/const RUN_TIMEOUT_MS = (\d+);/) || [])[1]);
 const MAX_LOGS = Number((component.match(/const RUN_MAX_LOGS = (\d+);/) || [])[1]);
 if (!TIMEOUT || !MAX_LOGS) { console.error('FAIL  could not read RUN_TIMEOUT_MS / RUN_MAX_LOGS'); process.exit(1); }
