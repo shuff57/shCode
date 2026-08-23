@@ -1,62 +1,226 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { useLessonStore } from '../lib/store';
-import type { Lesson } from '../lib/types';
 import CodeEditor from './CodeEditor';
 import ShPlayPreview from './ShPlayPreview';
+import JscadPreview from './JscadPreview';
+import JscadParamsPanel, { type ParamDef, type ParamValues } from './JscadParamsPanel';
 import Console from './Console';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
 import ShPlayDocsContent from './ShPlayDocsContent';
+import { RUNNER_SOURCE, RUN_TIMEOUT_MS } from '../lib/js-runner-source';
+import {
+  SANDBOX_MODES,
+  getMode,
+  sandboxLesson,
+  type SandboxModeId,
+} from '../lib/sandbox-modes';
 
-const STARTER_CODE = `// shPlay sandbox — try it out!
+const MODE_KEY = 'shCode:sandbox-mode';
 
-function setup() {
-  new Canvas(400, 400);
+interface LogLine {
+  type: string;
+  message: string;
 }
-
-function draw() {
-  background(40, 42, 54);
-  fill(80, 250, 123);
-  noStroke();
-  circle(mouseX, mouseY, 40);
-}
-`;
-
-const SANDBOX_LESSON: Lesson = {
-  id: 'sandbox',
-  title: 'Sandbox',
-  description: 'A blank shPlay canvas.',
-  estimateMins: 0,
-  unit: 'Sandbox',
-  preview: 'shplay',
-  files: [
-    {
-      type: 'file',
-      id: 'sandbox-script',
-      name: 'script.js',
-      path: 'script.js',
-      content: STARTER_CODE,
-    },
-  ],
-  steps: [],
-  requirements: [],
-};
 
 export default function SandboxWorkspace() {
   const setLesson = useLessonStore((s) => s.setLesson);
   const fileContents = useLessonStore((s) => s.fileContents);
 
-  const [q5Code, setQ5Code] = useState('');
+  const [modeId, setModeId] = useState<SandboxModeId>('shplay');
+  const mode = useMemo(() => getMode(modeId), [modeId]);
+  const lesson = useMemo(() => sandboxLesson(mode), [mode]);
+
+  const [code, setCode] = useState('');
   const [runKey, setRunKey] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [consoleResetKey, setConsoleResetKey] = useState(0);
+  const [logs, setLogs] = useState<LogLine[]>([]);
+
+  // JSCAD dimensions, published by the runner on every load.
+  const [paramDefs, setParamDefs] = useState<ParamDef[]>([]);
+  const [paramValues, setParamValues] = useState<ParamValues>({});
+  const [rebuildMs, setRebuildMs] = useState<number | null>(null);
+  const [stale, setStale] = useState<'empty' | 'error' | null>(null);
+  const frameRef = useRef<HTMLIFrameElement | null>(null);
+  const workerRef = useRef<Worker | null>(null);
+
+  useEffect(() => () => { workerRef.current?.terminate(); }, []);
+
+  // Restore the last mode before the first paint that matters. Reading in an
+  // effect rather than useState's initialiser keeps the server and client
+  // markup identical, which a static export needs.
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(MODE_KEY);
+      if (saved && SANDBOX_MODES.some((m) => m.id === saved)) {
+        setModeId(saved as SandboxModeId);
+      }
+    } catch { /* private mode */ }
+  }, []);
+
+  // Each mode is its own lesson id, so the store keeps three independent
+  // drafts and switching back finds your code where you left it.
+  useEffect(() => {
+    setLesson(lesson);
+    setCode('');
+    setRunKey(0);
+    setIsRunning(false);
+    setLogs([]);
+    setParamDefs([]);
+    setParamValues({});
+    setRebuildMs(null);
+    setStale(null);
+  }, [lesson, setLesson]);
+
+  function chooseMode(next: SandboxModeId) {
+    if (next === modeId) return;
+    workerRef.current?.terminate();
+    workerRef.current = null;
+    try { window.localStorage.setItem(MODE_KEY, next); } catch { /* private mode */ }
+    setModeId(next);
+  }
+
+  // ---- JSCAD: dimensions in, rebuild timings out ----------------------------
 
   useEffect(() => {
-    setLesson(SANDBOX_LESSON);
-  }, [setLesson]);
+    if (mode.preview !== 'jscad') return;
+    const onMessage = (e: MessageEvent) => {
+      // Filter by source, not origin: the runner frame is sandboxed without
+      // allow-same-origin, so its origin is opaque ("null") by design.
+      if (frameRef.current && e.source !== frameRef.current.contentWindow) return;
+      const d = e.data as {
+        source?: string; defs?: ParamDef[]; values?: ParamValues;
+        ms?: number; empty?: boolean; failed?: boolean;
+      };
+      if (d?.source === 'jscad-params') {
+        setParamDefs(Array.isArray(d.defs) ? d.defs : []);
+        setParamValues(d.values ?? {});
+        setRebuildMs(null);
+        setStale(null);
+      } else if (d?.source === 'jscad-rebuilt' && typeof d.ms === 'number') {
+        setStale(d.failed ? 'error' : d.empty ? 'empty' : null);
+        if (!d.empty && !d.failed) setRebuildMs(d.ms);
+      }
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [mode.preview]);
+
+  const setParams = useCallback((next: ParamValues) => {
+    setParamValues((prev) => ({ ...prev, ...next }));
+    frameRef.current?.contentWindow?.postMessage(
+      { source: 'jscad-set-params', params: next },
+      '*'
+    );
+  }, []);
+
+  // ---- Running --------------------------------------------------------------
+
+  const runJs = useCallback((script: string) => {
+    workerRef.current?.terminate();
+    const collected: LogLine[] = [];
+    setLogs([]);
+    setIsRunning(true);
+
+    const url = URL.createObjectURL(new Blob([RUNNER_SOURCE], { type: 'text/javascript' }));
+    const worker = new Worker(url);
+    workerRef.current = worker;
+
+    const cleanup = () => {
+      worker.terminate();
+      URL.revokeObjectURL(url);
+      if (workerRef.current === worker) workerRef.current = null;
+      setIsRunning(false);
+    };
+
+    const killer = setTimeout(() => {
+      collected.push({
+        type: 'error',
+        message: `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
+      });
+      setLogs([...collected]);
+      cleanup();
+    }, RUN_TIMEOUT_MS);
+
+    worker.onmessage = (e: MessageEvent) => {
+      const d = e.data as { kind: string; type?: string; message?: string; name?: string };
+      if (d.kind === 'log') {
+        collected.push({ type: d.type || 'log', message: d.message || '' });
+        setLogs([...collected]);
+        return;
+      }
+      if (d.kind === 'error') {
+        collected.push({ type: 'error', message: `${d.name || 'Error'}: ${d.message || ''}` });
+        setLogs([...collected]);
+      }
+      clearTimeout(killer);
+      cleanup();
+    };
+
+    worker.onerror = (e: ErrorEvent) => {
+      clearTimeout(killer);
+      collected.push({ type: 'error', message: e.message || 'Error' });
+      setLogs([...collected]);
+      cleanup();
+    };
+
+    worker.postMessage(script);
+  }, []);
+
+  const run = useCallback(() => {
+    const script = fileContents['script.js'] || '';
+    if (mode.preview === 'console') {
+      runJs(script);
+      return;
+    }
+    // A fresh runKey remounts the frame. This is the slow path — it reparses
+    // the whole script — and is why a dimension change goes by postMessage
+    // instead of coming through here.
+    setParamDefs([]);
+    setParamValues({});
+    setRebuildMs(null);
+    setStale(null);
+    setCode(script);
+    setRunKey((k) => k + 1);
+    setConsoleResetKey((k) => k + 1);
+    setIsRunning(true);
+  }, [fileContents, mode.preview, runJs]);
+
+  function stopRun() {
+    workerRef.current?.terminate();
+    workerRef.current = null;
+    setCode('');
+    setRunKey(0);
+    setConsoleResetKey((k) => k + 1);
+    setIsRunning(false);
+    setParamDefs([]);
+    setParamValues({});
+    setRebuildMs(null);
+    setStale(null);
+  }
+
+  function reset() {
+    if (window.confirm('Reset code to the starter? Unsaved work will be lost.')) {
+      setLesson(lesson);
+      stopRun();
+      setLogs([]);
+    }
+  }
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        run();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [run]);
 
   // Pane resize — same drag-handle plumbing as LessonWorkspace.
   useEffect(() => {
@@ -158,64 +322,42 @@ export default function SandboxWorkspace() {
     };
   }, []);
 
-  function runQ5() {
-    setQ5Code(fileContents['script.js'] || '');
-    setRunKey((k) => k + 1);
-    setConsoleResetKey((k) => k + 1);
-    setIsRunning(true);
-  }
-
-  function stopRun() {
-    setQ5Code('');
-    setRunKey(0);
-    setConsoleResetKey((k) => k + 1);
-    setIsRunning(false);
-  }
-
-  function reset() {
-    if (window.confirm('Reset code to the starter? Unsaved work will be lost.')) {
-      setLesson(SANDBOX_LESSON);
-      stopRun();
-    }
-  }
-
-  // Ctrl+Enter to run
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 'Enter') {
-        e.preventDefault();
-        runQ5();
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fileContents]);
-
   const drawerTabs: DrawerTab[] = [
     {
       key: 'help',
       label: 'Help',
       color: '#ffb86c',
-      content: <AiHelpPanel lesson={SANDBOX_LESSON} />,
+      content: <AiHelpPanel lesson={lesson} />,
     },
     {
       key: 'docs',
       label: 'Docs',
       color: '#bd93f9',
-      content: <ShPlayDocsContent />,
-      headerExtra: (
+      content:
+        mode.id === 'shplay' ? (
+          <ShPlayDocsContent />
+        ) : (
+          <div style={{ padding: '12px 14px', color: '#6272a4', fontSize: 13, lineHeight: 1.6 }}>
+            {mode.docsHref
+              ? 'Open the full reference in a new tab.'
+              : 'This mode is plain JavaScript — no library reference needed.'}
+          </div>
+        ),
+      headerExtra: mode.docsHref ? (
         <a
-          href="/docs/shplay"
+          href={mode.docsHref}
           target="_blank"
           rel="noopener noreferrer"
           className="btn-secondary btn-sm"
         >
           Docs ↗
         </a>
-      ),
+      ) : undefined,
     },
   ];
+
+  const isConsole = mode.preview === 'console';
+  const isJscad = mode.preview === 'jscad';
 
   return (
     <>
@@ -223,9 +365,24 @@ export default function SandboxWorkspace() {
       <div className="sandbox-shell">
         <div className="sandbox-header">
           <h1 className="sandbox-title">Sandbox</h1>
-          <span className="sandbox-subtitle">A blank shPlay canvas to try out ideas.</span>
+          <span className="sandbox-subtitle">{mode.blurb}</span>
         </div>
+
         <div className="run-toolbar sandbox-toolbar">
+          <div className="sandbox-modes" role="group" aria-label="Program type">
+            {SANDBOX_MODES.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                aria-pressed={m.id === modeId}
+                className={m.id === modeId ? 'sandbox-mode is-active' : 'sandbox-mode'}
+                onClick={() => chooseMode(m.id)}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+
           {isRunning ? (
             <button
               className="btn-run"
@@ -235,7 +392,7 @@ export default function SandboxWorkspace() {
               ■ Stop
             </button>
           ) : (
-            <button className="btn-run" onClick={runQ5}>▶ Run</button>
+            <button className="btn-run" onClick={run}>▶ Run</button>
           )}
           <button
             style={{
@@ -257,6 +414,7 @@ export default function SandboxWorkspace() {
           </button>
           <span className="run-hint">Ctrl+Enter</span>
         </div>
+
         <div className="editor-preview-container sandbox-split" id="split">
           <div className="pane" id="editorPane">
             <CodeEditor />
@@ -270,16 +428,53 @@ export default function SandboxWorkspace() {
             <span className="drag-handle" aria-hidden="true"></span>
           </div>
           <div className="pane" id="previewPane">
-            <ShPlayPreview code={q5Code} runKey={runKey} />
+            {isConsole ? (
+              <>
+                <div className="output-header">Output</div>
+                <pre className="console-output run-output">
+                  {logs.length === 0 ? (
+                    <div className="console-empty">Click Run to see output.</div>
+                  ) : (
+                    logs.map((log, i) => (
+                      <div key={i} className={`log-entry log-${log.type}`}>
+                        <span className="log-msg">{log.message}</span>
+                      </div>
+                    ))
+                  )}
+                </pre>
+              </>
+            ) : isJscad ? (
+              <div className="jscad-pane">
+                <div className="jscad-pane-view">
+                  <JscadPreview ref={frameRef} code={code} runKey={runKey} />
+                </div>
+                {runKey > 0 && (
+                  <aside className="jscad-pane-params">
+                    <JscadParamsPanel
+                      defs={paramDefs}
+                      values={paramValues}
+                      onChange={setParams}
+                      lastMs={rebuildMs}
+                      stale={stale}
+                    />
+                  </aside>
+                )}
+              </div>
+            ) : (
+              <ShPlayPreview code={code} runKey={runKey} />
+            )}
           </div>
           <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
         </div>
-        <div className="sandbox-console-wrap">
-          <div className="output-header">Console</div>
-          <div className="sandbox-console-body">
-            <Console resetKey={String(consoleResetKey)} />
+
+        {!isConsole && (
+          <div className="sandbox-console-wrap">
+            <div className="output-header">Console</div>
+            <div className="sandbox-console-body">
+              <Console resetKey={String(consoleResetKey)} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
       <style>{`
         .sandbox-shell {
@@ -294,10 +489,41 @@ export default function SandboxWorkspace() {
         .sandbox-title { margin: 0; font-size: 1.4rem; color: var(--text); }
         .sandbox-subtitle { color: #6272a4; font-size: 0.85rem; }
         .sandbox-toolbar { margin-bottom: 0; flex-shrink: 0; }
+        .sandbox-modes {
+          display: inline-flex;
+          border: 1px solid #44475a;
+          border-radius: 4px;
+          overflow: hidden;
+          margin-right: 10px;
+        }
+        .sandbox-mode {
+          padding: 6px 13px;
+          background: transparent;
+          color: #6272a4;
+          border: 0;
+          border-right: 1px solid #44475a;
+          cursor: pointer;
+          font-size: 13px;
+        }
+        .sandbox-mode:last-child { border-right: 0; }
+        .sandbox-mode:hover { color: var(--text); }
+        .sandbox-mode.is-active { background: #44475a; color: #f8f8f2; }
         .sandbox-split.editor-preview-container {
           height: auto;
           flex: 1 1 auto;
           min-height: 280px;
+        }
+        .jscad-pane { display: flex; height: 100%; min-height: 0; }
+        .jscad-pane-view { flex: 1 1 auto; min-width: 0; display: flex; }
+        .jscad-pane-view .jscad-frame, .jscad-pane-view .jscad-empty { flex: 1; }
+        .jscad-pane-params {
+          flex: 0 0 208px;
+          min-width: 0;
+          border-left: 1px solid var(--border);
+          background: var(--card);
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
         }
         .sandbox-console-wrap {
           display: flex;

@@ -494,9 +494,9 @@
 		return null;
 	}
 
-	// jscad.app calls main(params). Nothing here draws a parameter panel, so
-	// the defaults declared by getParameterDefinitions() are what main() gets.
-	function defaultParams() {
+	// jscad.app calls main(params). The declared list is published to the parent
+	// so it can draw a Dimensions panel; the defaults are what the first run uses.
+	function paramDefs() {
 		var defs = null;
 		var exp = window.module && window.module.exports;
 		if (exp && typeof exp.getParameterDefinitions === 'function') defs = exp.getParameterDefinitions;
@@ -506,13 +506,23 @@
 				if (typeof g === 'function') defs = g;
 			} catch (e) { /* not declared */ }
 		}
+		if (!defs) return [];
+		try { return defs() || []; } catch (e) { return []; }
+	}
+
+	function initialOf(d) {
+		if (!d || d.name === undefined) return undefined;
+		if (d.initial !== undefined) return d.initial;
+		if (d.default !== undefined) return d.default;
+		return undefined;
+	}
+
+	function defaultParams() {
 		var params = {};
-		if (!defs) return params;
-		var list = defs() || [];
+		var list = paramDefs();
 		for (var i = 0; i < list.length; i++) {
-			var d = list[i];
-			if (d && d.name !== undefined && d.initial !== undefined) params[d.name] = d.initial;
-			else if (d && d.name !== undefined && d.default !== undefined) params[d.name] = d.default;
+			var v = initialOf(list[i]);
+			if (v !== undefined) params[list[i].name] = v;
 		}
 		return params;
 	}
@@ -523,10 +533,29 @@
 		return;
 	}
 
+	// Set by render() once regl is up. Swapping renderOptions.entities is enough
+	// to change what is on screen — the rAF loop re-reads it every frame — so a
+	// parameter change never reloads the iframe or re-initialises the renderer.
+	var swapGeometry = null;
+
+	// Hand the declared dimensions to the parent panel. Serialised through JSON
+	// first: a def may carry a function (jscad allows it) and postMessage throws
+	// DataCloneError on one, which would take the whole run down with it.
+	var liveParams = defaultParams();
+	try {
+		window.parent.postMessage({
+			source: 'jscad-params',
+			defs: JSON.parse(JSON.stringify(paramDefs(), function(k, v) {
+				return typeof v === 'function' ? undefined : v;
+			})),
+			values: liveParams
+		}, '*');
+	} catch (_) { /* parent gone, or nothing serialisable */ }
+
 	statusEl.textContent = 'Running your code…';
 	var result;
 	try {
-		result = mainFn(defaultParams());
+		result = mainFn(liveParams);
 	} catch (e) {
 		// Route through window.onerror so the reporter can read the stack and
 		// blame the right line of script.js.
@@ -545,6 +574,92 @@
 		draw(result);
 	}
 
+	var rebuildPending = false;
+
+	function rebuild(params) {
+		for (var k in params) { if (Object.prototype.hasOwnProperty.call(params, k)) liveParams[k] = params[k]; }
+		// The panel is on screen before the first render finishes. An edit made in
+		// that window used to merge into liveParams and then vanish, because the
+		// first build had already been handed the old values — panel and model
+		// disagreeing, silently, until the field was touched again.
+		if (typeof mainFn !== 'function' || !swapGeometry) { rebuildPending = true; return; }
+		var t0 = (window.performance && performance.now) ? performance.now() : 0;
+		var out;
+		try {
+			out = mainFn(liveParams);
+		} catch (e) {
+			rebuildFailed(e);
+			return;
+		}
+		if (out && typeof out.then === 'function') {
+			out.then(function(g) { applyRebuild(g, t0); }, rebuildFailed);
+		} else {
+			applyRebuild(out, t0);
+		}
+	}
+
+	// subtract() that removes everything hands back a geom3 object with no
+	// polygons in it — truthy, not an array, and indistinguishable from a real
+	// solid until you count. Anything unrecognised counts as drawable so an
+	// unfamiliar geometry type is never silently reported as nothing.
+	function isEmptyGeometry(g) {
+		var list = Array.isArray(g) ? g : [g];
+		if (list.length === 0) return true;
+		var geoms = jscad.geometries || {};
+		var total = 0;
+		for (var i = 0; i < list.length; i++) {
+			var item = list[i];
+			if (!item) continue;
+			try {
+				if (geoms.geom3 && geoms.geom3.isA(item)) total += geoms.geom3.toPolygons(item).length;
+				else if (geoms.geom2 && geoms.geom2.isA(item)) total += geoms.geom2.toSides(item).length;
+				else total += 1;
+			} catch (e) { total += 1; }
+		}
+		return total === 0;
+	}
+
+	// Throwing and returning nothing are the same thing to a student: the numbers
+	// in the panel no longer describe the shape on screen. Report both.
+	function rebuildFailed(e) {
+		window.dispatchEvent(new ErrorEvent('error', { error: e, message: e && e.message, filename: 'script.js' }));
+		try {
+			window.parent.postMessage({ source: 'jscad-rebuilt', ms: 0, failed: true }, '*');
+		} catch (_) { /* parent gone */ }
+	}
+
+	function applyRebuild(geometry, t0) {
+		// An empty result is a real answer, not a no-op: with these dimensions the
+		// cut removed everything. Leaving the previous model on screen would show a
+		// shape the numbers no longer describe.
+		if (!geometry || isEmptyGeometry(geometry)) {
+			try {
+				window.parent.postMessage({ source: 'jscad-rebuilt', ms: 0, empty: true }, '*');
+			} catch (_) { /* parent gone */ }
+			return;
+		}
+		try {
+			swapGeometry(geometry);
+			window.__jscadEnableSaving(geometry);
+		} catch (e) {
+			fail('Render error: ' + (e.message || e));
+			return;
+		}
+		var t1 = (window.performance && performance.now) ? performance.now() : 0;
+		try {
+			window.parent.postMessage({ source: 'jscad-rebuilt', ms: t1 - t0 }, '*');
+		} catch (_) { /* parent gone */ }
+	}
+
+	window.addEventListener('message', function(e) {
+		var d = e.data;
+		if (!d || d.source !== 'jscad-set-params' || !d.params) return;
+		// ponytail: every message is applied in order. The sender coalesces to one
+		// per frame and rebuilds run ~20ms, so nothing queues today. If a heavy
+		// model ever pushes a rebuild past a frame, drop to latest-wins here.
+		rebuild(d.params);
+	});
+
 	function draw(geometry) {
 		if (!geometry || (Array.isArray(geometry) && geometry.length === 0)) {
 			fail('main() returned nothing. Make sure you return a shape.\n\nExample:  return cube({ size: 10 })');
@@ -558,6 +673,35 @@
 		} catch (e) {
 			fail('Render error: ' + (e.message || e));
 		}
+	}
+
+	// Largest edge of the model's bounding box, across every solid it returns.
+	function modelSpan(solids) {
+		var measure = jscad.measurements && jscad.measurements.measureBoundingBox;
+		if (!measure) return 200;
+		var span = 0;
+		for (var i = 0; i < solids.length; i++) {
+			var box;
+			try { box = measure(solids[i]); } catch (e) { continue; }
+			if (!box || !box[0] || !box[1]) continue;
+			for (var a = 0; a < 3; a++) {
+				span = Math.max(span, Math.abs(box[1][a] - box[0][a]));
+				// An off-centre part needs a grid that reaches it, not just one as
+				// wide as the part itself.
+				span = Math.max(span, Math.abs(box[0][a]) * 2, Math.abs(box[1][a]) * 2);
+			}
+		}
+		return span;
+	}
+
+	// Round up to the next 1/2/5 x 10^n so the grid lands on readable numbers.
+	function niceSpan(span) {
+		var target = span * 2;
+		if (!isFinite(target) || target <= 0) return 200;
+		var mag = Math.pow(10, Math.floor(Math.log(target) / Math.LN10));
+		var mult = target / mag;
+		var step = mult <= 1 ? 1 : mult <= 2 ? 2 : mult <= 5 ? 5 : 10;
+		return Math.max(20, step * mag);
 	}
 
 	// ---- regl renderer: camera, orbit controls, grid, dark theme ----
@@ -606,19 +750,26 @@
 		var solids = Array.isArray(geometry) ? geometry : [geometry];
 		var entities = entitiesFromSolids({ color: [1, 0.4, 0, 1] }, solids);
 
-		// Grid — jscad.app dark theme: white lines, cyan sub-grid
+		// Grid sized to the model rather than fixed at 200. A 12mm part on a 200mm
+		// grid reads as a speck on a runway; a 400mm part runs off the edge of one.
+		var gridSpan = niceSpan(modelSpan(solids));
 		var gridOptions = {
 			visuals: { drawCmd: 'drawGrid', show: true, transparent: true },
-			size: [200, 200],
-			ticks: [10, 1],
+			size: [gridSpan, gridSpan],
+			// 10 major cells, 5 minor per cell. The old 20/200 split was tuned for a
+			// camera parked far away; once the view is fitted to the model that same
+			// ratio puts 200 lines across the frame and reads as a solid mat.
+			ticks: [gridSpan / 10, gridSpan / 50],
 			color: [1, 1, 1, 0.5],
-			subColor: [0, 1, 1, 0.5]
+			// Softer than the original 0.5: the fitted camera sits much closer, and
+			// at that distance the sub-grid was reading as a solid mat behind the part.
+			subColor: [0, 1, 1, 0.22]
 		};
 
 		// Axes — RGB for XYZ, always visible
 		var axisOptions = {
 			visuals: { drawCmd: 'drawAxis', show: true },
-			size: 100,
+			size: gridSpan / 2,
 			alwaysVisible: true
 		};
 
@@ -633,6 +784,29 @@
 			},
 			entities: [gridOptions, axisOptions].concat(entities)
 		};
+
+		// Frame the model. Done once, on the first render only: refitting on every
+		// parameter change would yank the view out from under anyone dragging a
+		// slider. Run remounts the frame, so a re-run reframes.
+		try {
+			var fitted = orbitControls.zoomToFit({
+				controls: controlsState, camera: camera, entities: entities
+			});
+			if (fitted && fitted.camera && fitted.camera.target) {
+				camera.target = fitted.camera.target;
+				controlsState = Object.assign({}, controlsState, fitted.controls);
+			}
+		} catch (e) { /* keep the default framing rather than failing to draw */ }
+
+		// The one hook the Dimensions panel needs: rebuild entities in place.
+		swapGeometry = function(geometry) {
+			var next = Array.isArray(geometry) ? geometry : [geometry];
+			renderOptions.entities = [gridOptions, axisOptions].concat(
+				entitiesFromSolids({ color: [1, 0.4, 0, 1] }, next)
+			);
+		};
+
+		if (rebuildPending) { rebuildPending = false; rebuild({}); }
 
 		// ---- Orbit controls input ----
 		var pointerDown = false;

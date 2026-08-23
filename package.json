@@ -17,7 +17,9 @@
     "test:shplay": "node scripts/test-shplay.mjs",
     "test:uploads": "node scripts/test-uploads.mjs",
     "test:jscad": "node scripts/test-jscad.mjs",
-    "test:jscad-docs": "node scripts/test-jscad-docs.mjs"
+    "test:jscad-docs": "node scripts/test-jscad-docs.mjs",
+    "test:sandbox": "python scripts/sandbox-checks.py",
+    "test:sandbox-mutations": "python scripts/sandbox-mutations.py"
   },
   "type": "module",
   "dependencies": {
