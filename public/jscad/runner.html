@@ -880,7 +880,7 @@
 				var px = Math.sqrt(dx * dx + dy * dy);
 				if (px < 0.001) continue;  // axis points at the camera; undraggable
 				points.push({
-					param: a.param, label: a.label,
+					param: a.param, label: a.label, kind: a.kind,
 					x: aHere[0], y: aHere[1],
 					dirX: dx / px, dirY: dy / px, pxPerUnit: px
 				});

@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from 'react';
 export interface AnchorPoint {
   param: string;
   label: string;
+  kind?: 'size' | 'move';
   x: number;
   y: number;
   dirX: number;
@@ -77,7 +78,9 @@ export default function HandleOverlay({ points, values, scales, onDrag, onCommit
           <button
             key={a.param}
             type="button"
-            className={on ? 'handle is-on' : 'handle'}
+            className={
+              (a.kind === 'move' ? 'handle is-move' : 'handle') + (on ? ' is-on' : '')
+            }
             style={{ left, top }}
             aria-label={`Drag ${a.label}`}
             title={`${a.label}${typeof raw === 'number' ? ` — ${Math.round(raw * 100) / 100}` : ''}`}
@@ -121,6 +124,16 @@ export default function HandleOverlay({ points, values, scales, onDrag, onCommit
           box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
         }
         .handle:hover { background: #8be9fd; }
+        /* Position reads as a different job from size, so it gets a different
+           shape and colour rather than another green dot to guess at. */
+        .handle.is-move {
+          background: #bd93f9;
+          border-radius: 2px;
+          transform: rotate(45deg);
+          width: 11px; height: 11px; margin: -6px 0 0 -6px;
+        }
+        .handle.is-move:hover { background: #ff79c6; }
+        .handle.is-move.is-on { background: #ff79c6; transform: rotate(45deg) scale(1.25); }
         .handle:focus-visible { outline: 2px solid #bd93f9; outline-offset: 2px; }
         .handle.is-on { background: #8be9fd; cursor: grabbing; transform: scale(1.25); }
       `}</style>

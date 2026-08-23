@@ -42,6 +42,26 @@ export interface SphereFeature {
   center: Vec3;
 }
 
+export interface ConeFeature {
+  id: string;
+  kind: 'cone';
+  name?: string;
+  radius: number;
+  height: number;
+  center: Vec3;
+}
+
+export interface TorusFeature {
+  id: string;
+  kind: 'torus';
+  name?: string;
+  /** Distance from the centre of the ring to the centre of the tube. */
+  ringRadius: number;
+  /** Thickness of the tube itself. */
+  tubeRadius: number;
+  center: Vec3;
+}
+
 export interface CombineFeature {
   id: string;
   kind: 'combine';
@@ -51,7 +71,9 @@ export interface CombineFeature {
   targets: string[];
 }
 
-export type Feature = BoxFeature | CylinderFeature | SphereFeature | CombineFeature;
+export type Feature =
+  | BoxFeature | CylinderFeature | SphereFeature
+  | ConeFeature | TorusFeature | CombineFeature;
 
 export interface ModelDoc {
   version: 1;
@@ -60,7 +82,7 @@ export interface ModelDoc {
 
 export const EMPTY_DOC: ModelDoc = { version: 1, features: [] };
 
-export function isShape(f: Feature): f is BoxFeature | CylinderFeature | SphereFeature {
+export function isShape(f: Feature): f is Exclude<Feature, CombineFeature> {
   return f.kind !== 'combine';
 }
 
@@ -83,8 +105,11 @@ export function whyCannotRound(f: Feature): string | null {
   if (f.kind === 'combine') {
     return 'Rounding works on a shape, not on a combination. Round the box before you cut the hole.';
   }
-  if (f.kind === 'sphere') {
-    return 'A sphere has no edges to round.';
+  if (f.kind === 'sphere' || f.kind === 'torus') {
+    return 'That shape has no edges to round — it is curved all the way round.';
+  }
+  if (f.kind === 'cone') {
+    return 'Rounding a cone is not supported yet.';
   }
   return null;
 }
@@ -107,12 +132,20 @@ export function nextId(doc: ModelDoc, prefix: string): string {
   }
 }
 
-export function newShape(doc: ModelDoc, kind: 'box' | 'cylinder' | 'sphere'): Feature {
+export type ShapeKind = 'box' | 'cylinder' | 'sphere' | 'cone' | 'torus';
+
+export function newShape(doc: ModelDoc, kind: ShapeKind): Feature {
   if (kind === 'box') {
     return { id: nextId(doc, 'box'), kind, size: [40, 40, 20], center: [0, 0, 0] };
   }
   if (kind === 'cylinder') {
     return { id: nextId(doc, 'cyl'), kind, radius: 10, height: 40, center: [0, 0, 0] };
+  }
+  if (kind === 'cone') {
+    return { id: nextId(doc, 'cone'), kind, radius: 12, height: 30, center: [0, 0, 0] };
+  }
+  if (kind === 'torus') {
+    return { id: nextId(doc, 'ring'), kind, ringRadius: 14, tubeRadius: 4, center: [0, 0, 0] };
   }
   return { id: nextId(doc, 'ball'), kind, radius: 15, center: [0, 0, 0] };
 }
@@ -121,7 +154,11 @@ function labelOf(f: Feature): string {
   if (f.kind === 'combine') {
     return f.op === 'union' ? 'Join' : f.op === 'subtract' ? 'Cut' : 'Overlap';
   }
-  return f.kind === 'box' ? 'Box' : f.kind === 'cylinder' ? 'Cylinder' : 'Sphere';
+  return f.kind === 'box' ? 'Box'
+    : f.kind === 'cylinder' ? 'Cylinder'
+    : f.kind === 'cone' ? 'Cone'
+    : f.kind === 'torus' ? 'Ring'
+    : 'Sphere';
 }
 
 /**

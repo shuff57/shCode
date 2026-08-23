@@ -61,6 +61,14 @@ export function generatedParams(doc: ModelDoc): GeneratedParam[] {
       push('height', 'height', f.height);
       pushCentre(out, f.id, label, f.center);
       if (f.round !== undefined) push('round', 'corner', f.round, { min: 0, max: 40, step: 0.5 });
+    } else if (f.kind === 'cone') {
+      push('radius', 'radius', f.radius);
+      push('height', 'height', f.height);
+      pushCentre(out, f.id, label, f.center);
+    } else if (f.kind === 'torus') {
+      push('ring', 'ring', f.ringRadius);
+      push('tube', 'tube', f.tubeRadius);
+      pushCentre(out, f.id, label, f.center);
     } else if (f.kind === 'sphere') {
       push('radius', 'radius', f.radius);
       pushCentre(out, f.id, label, f.center);
@@ -127,6 +135,14 @@ export function applyParam(doc: ModelDoc, name: string, value: number): ModelDoc
       if (slot === 'height') { changed = true; return { ...f, height: value }; }
       if (slot === 'round') { changed = true; return { ...f, round: value }; }
     }
+    if (f.kind === 'cone') {
+      if (slot === 'radius') { changed = true; return { ...f, radius: value }; }
+      if (slot === 'height') { changed = true; return { ...f, height: value }; }
+    }
+    if (f.kind === 'torus') {
+      if (slot === 'ring') { changed = true; return { ...f, ringRadius: value }; }
+      if (slot === 'tube') { changed = true; return { ...f, tubeRadius: value }; }
+    }
     if (f.kind === 'sphere' && slot === 'radius') {
       changed = true;
       return { ...f, radius: value };
@@ -164,6 +180,22 @@ function featureExpr(f: Feature, needs: Set<string>): string {
       return `chamferCylinder(${r}, ${h}, ${c}, p.${pname(f.id, 'round')})`;
     }
     return `primitives.roundedCylinder({ radius: ${r}, height: ${h}, center: ${c}, roundRadius: p.${pname(f.id, 'round')} })`;
+  }
+
+  if (f.kind === 'cone') {
+    // JSCAD has no cone(): a cylinder whose far end has zero radius is one.
+    return `primitives.cylinderElliptic({ startRadius: [p.${pname(f.id, 'radius')}, p.${pname(f.id, 'radius')}], `
+      + `endRadius: [0, 0], height: p.${pname(f.id, 'height')}, center: ${c} })`;
+  }
+
+  if (f.kind === 'torus') {
+    // JSCAD takes inner/outer, the doc holds ring-centre and tube thickness --
+    // which is what a student can actually picture. torus() also takes no
+    // center, so it has to be moved afterwards or its position parameters would
+    // be declared and never read, and the move handles would do nothing.
+    needs.add('transforms');
+    return `transforms.translate(${c}, primitives.torus({ innerRadius: p.${pname(f.id, 'tube')}, `
+      + `outerRadius: p.${pname(f.id, 'ring')} }))`;
   }
 
   if (f.kind === 'sphere') {
@@ -229,7 +261,7 @@ export function toJscad(doc: ModelDoc): string {
 
   const modules = ['primitives', 'booleans'];
   if (needs.has('chamferCylinder')) modules.push('hulls');
-  if (needs.has('chamferBox')) modules.push('transforms');
+  if (needs.has('chamferBox') || needs.has('transforms')) modules.push('transforms');
 
   const defs = params
     .map(

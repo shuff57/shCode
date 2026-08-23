@@ -21,6 +21,35 @@ module.exports = function run(dir) {
   });
   const doc = (...features) => ({ version: 1, features });
 
+  const fs = require('fs');
+  const vm = require('vm');
+  const bundlePath = path.join(__dirname, '..', 'public', 'jscad', 'lib', 'jscad-modeling.min.js');
+  const sandbox = {};
+  sandbox.window = sandbox;
+  sandbox.self = sandbox;
+  sandbox.globalThis = sandbox;
+  vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(bundlePath, 'utf8'), sandbox);
+  const M = sandbox.jscadModeling;
+
+  function build(src) {
+    const mod = { exports: {} };
+    new Function('require', 'module', src)((n) => {
+      if (n !== '@jscad/modeling') throw new Error('unexpected require: ' + n);
+      return M;
+    }, mod);
+    const params = {};
+    for (const d of mod.exports.getParameterDefinitions()) params[d.name] = d.initial;
+    const g = mod.exports.main(params);
+    const list = Array.isArray(g) ? g : [g];
+    return {
+      polys: list.reduce((n, s) => n + M.geometries.geom3.toPolygons(s).length, 0),
+      volume: list.reduce((n, s) => n + M.measurements.measureVolume(s), 0),
+      bbox: M.measurements.measureBoundingBox(list[0]),
+    };
+  }
+
+
   console.log('\n=== codegen shape ===');
 
   const plain = gen.toJscad(doc(box('b1')));
@@ -60,6 +89,37 @@ module.exports = function run(dir) {
   const empty = gen.toJscad(doc());
   check('an empty doc still returns something', empty.includes('return primitives.cuboid('));
 
+  console.log('\n=== cone and ring ===');
+
+  const cone = (id) => ({ id, kind: 'cone', radius: 12, height: 30, center: [0, 0, 0] });
+  const ring = (id) => ({ id, kind: 'torus', ringRadius: 14, tubeRadius: 4, center: [0, 0, 0] });
+
+  const coneSrc = gen.toJscad(doc(cone('k1')));
+  const ringSrc = gen.toJscad(doc(ring('r1')));
+  check('a cone is a cylinderElliptic with a zero end', coneSrc.includes('endRadius: [0, 0]'));
+  check('a ring is a torus', ringSrc.includes('primitives.torus('));
+  check('ring/tube map onto outer/inner',
+    ringSrc.includes('innerRadius: p.r1_tube') && ringSrc.includes('outerRadius: p.r1_ring'));
+
+  // The doc talks in ring-centre and tube thickness because that is what a
+  // student can picture; JSCAD wants inner/outer. Getting that mapping backwards
+  // still builds a torus, just the wrong one — so measure it.
+  const coneBuilt = build(coneSrc);
+  const ringBuilt = build(ringSrc);
+  check('a cone builds and has volume', coneBuilt.volume > 100, String(coneBuilt.volume));
+  check('a ring builds and has volume', ringBuilt.volume > 100, String(ringBuilt.volume));
+  check('the ring is 36 across, not 8',
+    Math.abs((ringBuilt.bbox[1][0] - ringBuilt.bbox[0][0]) - 36) < 1.5,
+    `width ${(ringBuilt.bbox[1][0] - ringBuilt.bbox[0][0]).toFixed(1)}`);
+  check('the ring is 8 thick',
+    Math.abs((ringBuilt.bbox[1][2] - ringBuilt.bbox[0][2]) - 8) < 1.5,
+    `thickness ${(ringBuilt.bbox[1][2] - ringBuilt.bbox[0][2]).toFixed(1)}`);
+  check('a cone tapers to a point',
+    coneBuilt.volume < Math.PI * 12 * 12 * 30 * 0.45,
+    `${coneBuilt.volume.toFixed(0)} vs a full cylinder ${(Math.PI * 144 * 30).toFixed(0)}`);
+
+  check('a ring refuses to round', types.whyCannotRound(ring('r1')) !== null);
+
   console.log('\n=== names count per kind, not per row ===');
 
   const mixed = doc(box('b1'), cyl('c1'), box('b2'), cyl('c2'));
@@ -72,7 +132,12 @@ module.exports = function run(dir) {
 
   console.log('\n=== parameters ===');
 
-  const d = doc(box('b1'), cyl('c1'));
+  // Every shape kind, so a parameter that is declared but never read cannot
+  // hide behind a doc that happens not to contain that shape. A ring's centre
+  // did exactly that: torus() takes no center, so its move handles drove
+  // parameters main() never looked at.
+  const d = doc(box('b1'), cyl('c1'), cone('k1'), ring('r1'),
+                { id: 's1', kind: 'sphere', radius: 9, center: [0, 0, 0] });
   const params = gen.generatedParams(d);
   const names = params.map((p) => p.name);
   check('names are keyed by id, not position',
@@ -80,7 +145,9 @@ module.exports = function run(dir) {
 
   // Reordering must not rename anything: a rename would send a pushed value to
   // the wrong slot the moment a feature moves in the list.
-  const reordered = gen.generatedParams(doc(cyl('c1'), box('b1')));
+  const reordered = gen.generatedParams(doc(
+    ring('r1'), cone('k1'), cyl('c1'),
+    { id: 's1', kind: 'sphere', radius: 9, center: [0, 0, 0] }, box('b1')));
   check('reordering renames nothing',
     reordered.map((p) => p.name).sort().join() === names.slice().sort().join());
 
@@ -112,33 +179,6 @@ module.exports = function run(dir) {
   // Parsing proves nothing about whether JSCAD accepts the calls. Run the real
   // vendored bundle and count polygons -- that is what catches a hull helper
   // that is syntactically perfect and geometrically empty.
-  const fs = require('fs');
-  const vm = require('vm');
-  const bundlePath = path.join(__dirname, '..', 'public', 'jscad', 'lib', 'jscad-modeling.min.js');
-  const sandbox = {};
-  sandbox.window = sandbox;
-  sandbox.self = sandbox;
-  sandbox.globalThis = sandbox;
-  vm.createContext(sandbox);
-  vm.runInContext(fs.readFileSync(bundlePath, 'utf8'), sandbox);
-  const M = sandbox.jscadModeling;
-
-  function build(src) {
-    const mod = { exports: {} };
-    new Function('require', 'module', src)((n) => {
-      if (n !== '@jscad/modeling') throw new Error('unexpected require: ' + n);
-      return M;
-    }, mod);
-    const params = {};
-    for (const d of mod.exports.getParameterDefinitions()) params[d.name] = d.initial;
-    const g = mod.exports.main(params);
-    const list = Array.isArray(g) ? g : [g];
-    return {
-      polys: list.reduce((n, s) => n + M.geometries.geom3.toPolygons(s).length, 0),
-      volume: list.reduce((n, s) => n + M.measurements.measureVolume(s), 0),
-      bbox: M.measurements.measureBoundingBox(list[0]),
-    };
-  }
 
   const built = {};
   for (const [label, src] of [

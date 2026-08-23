@@ -12,6 +12,8 @@ import {
   Box as BoxIcon,
   Circle,
   Cylinder as CylIcon,
+  Cone as ConeIcon,
+  Torus as TorusIcon,
   Combine,
   Scissors,
   SquareDashedBottom,
@@ -30,6 +32,7 @@ import {
   nameMap,
   newShape,
   nextId,
+  type ShapeKind,
   topLevel,
   whyCannotRound,
 } from '../../lib/model-types';
@@ -60,7 +63,7 @@ export default function ModelEditor({
     setNote(msg);
   }
 
-  function addShape(kind: 'box' | 'cylinder' | 'sphere') {
+  function addShape(kind: ShapeKind) {
     const f = newShape(doc, kind);
     onChange({ ...doc, features: [...doc.features, f] });
     setSelected([f.id]);
@@ -159,6 +162,12 @@ export default function ModelEditor({
           </button>
           <button onClick={() => addShape('sphere')} title="Add a sphere">
             <Circle size={14} /> Sphere
+          </button>
+          <button onClick={() => addShape('cone')} title="Add a cone">
+            <ConeIcon size={14} /> Cone
+          </button>
+          <button onClick={() => addShape('torus')} title="Add a ring">
+            <TorusIcon size={14} /> Ring
           </button>
         </div>
 

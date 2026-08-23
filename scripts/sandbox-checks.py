@@ -296,6 +296,23 @@ def run(url, headed):
         page.wait_for_timeout(2500)
         rows = page.query_selector_all(".model-row")
         check("TOOLBAR_ADDS_SHAPES", len(rows) == 2, f"{len(rows)} rows")
+
+        # Five primitives, matching what WebCAD's rail offers.
+        tools = [b.inner_text().strip() for b in page.query_selector_all(".model-tools button")]
+        check("FIVE_PRIMITIVES",
+              all(t in tools for t in ["Box", "Cylinder", "Sphere", "Cone", "Ring"]),
+              str(tools[:6]))
+
+        # A ring exercises the one shape JSCAD cannot place directly.
+        before_ring = canvas_png(page)
+        page.click(".model-tools button:has-text('Ring')")
+        page.wait_for_timeout(3500)
+        check("RING_BUILDS", canvas_png(page) != before_ring
+              and page.query_selector(".jscad-params-empty-warn") is None)
+        page.click('.model-tools button[aria-label="Undo"]')
+        page.wait_for_timeout(2500)
+        rows = page.query_selector_all(".model-row")
+        check("UNDO_REMOVES_THE_RING", len(rows) == 2, f"{len(rows)} rows")
         check("NAMES_COUNT_PER_KIND",
               "Cylinder 1" in rows[1].inner_text(), rows[1].inner_text().strip())
 
@@ -345,10 +362,17 @@ def run(url, headed):
         # ---- drag handles ----------------------------------------------------
         # box1 is selected and chamfered by this point.
         handles = page.query_selector_all(".handle")
-        check("HANDLES_FOR_A_SELECTED_BOX", len(handles) == 3, f"{len(handles)} handles")
+        check("HANDLES_FOR_A_SELECTED_BOX", len(handles) == 6, f"{len(handles)} handles")
         labels = sorted((h.get_attribute("aria-label") or "") for h in handles)
-        check("HANDLES_ARE_LABELLED",
-              labels == ["Drag depth", "Drag height", "Drag width"], str(labels))
+        check("SIZE_HANDLES_ARE_LABELLED",
+              labels[:3] == ["Drag depth", "Drag height", "Drag move x"]
+              and "Drag width" in labels, str(labels))
+        check("MOVE_HANDLES_EXIST",
+              sorted(l for l in labels if "move" in l)
+              == ["Drag move x", "Drag move y", "Drag move z"], str(labels))
+        check("MOVE_HANDLES_LOOK_DIFFERENT",
+              len(page.query_selector_all(".handle.is-move")) == 3,
+              f"{len(page.query_selector_all('.handle.is-move'))} move-styled")
 
         def handle(name):
             for h in page.query_selector_all(".handle"):
@@ -384,6 +408,25 @@ def run(url, headed):
                     abs(depth_after["y"] - depth_before["y"]))
         check("HANDLE_DRAG_DID_NOT_ORBIT", drift < 2.0, f"{drift:.1f}px drift")
 
+        # A move handle changes where the shape sits, not how big it is.
+        w_before = float(page.input_value("#p-box1_width"))
+        x_before = float(page.input_value("#p-box1_x"))
+        mh = handle("Drag move x")
+        mb = mh.bounding_box()
+        page.mouse.move(mb["x"] + 6, mb["y"] + 6)
+        page.mouse.down()
+        for k in range(1, 6):
+            page.mouse.move(mb["x"] + 6 - k * 10, mb["y"] + 6)
+            page.wait_for_timeout(90)
+        page.mouse.up()
+        page.wait_for_timeout(1500)
+        check("MOVE_HANDLE_MOVES_THE_SHAPE",
+              abs(float(page.input_value("#p-box1_x")) - x_before) > 1,
+              f"x {x_before} -> {page.input_value('#p-box1_x')}")
+        check("MOVE_HANDLE_LEAVES_SIZE_ALONE",
+              abs(float(page.input_value("#p-box1_width")) - w_before) < 0.01,
+              f"width {w_before} -> {page.input_value('#p-box1_width')}")
+
         # A combination has no shape of its own to grab.
         page.query_selector_all(".model-row")[2].click()
         page.wait_for_timeout(800)
@@ -397,13 +440,15 @@ def run(url, headed):
         # A whole drag is one undo, not sixty: the doc is written once, on
         # release. Structure and dimensions share the same history, because to
         # a student both are just "put it back".
-        before_undo = float(page.input_value("#p-box1_width"))
+        # The most recent committed gesture is the move, so that is what undo
+        # must reverse -- not whatever the test happened to do first.
+        before_undo = float(page.input_value("#p-box1_x"))
         rows_before = len(page.query_selector_all(".model-row"))
         page.click('.model-tools button[aria-label="Undo"]')
         page.wait_for_timeout(2500)
         check("UNDO_REVERSES_A_DRAG",
-              abs(float(page.input_value("#p-box1_width")) - before_undo) > 1,
-              f"{before_undo} -> {page.input_value('#p-box1_width')}")
+              abs(float(page.input_value("#p-box1_x")) - before_undo) > 1,
+              f"x {before_undo} -> {page.input_value('#p-box1_x')}")
         check("UNDO_DID_NOT_LOSE_THE_STRUCTURE",
               len(page.query_selector_all(".model-row")) == rows_before,
               f"{len(page.query_selector_all('.model-row'))} rows")
@@ -411,8 +456,8 @@ def run(url, headed):
         page.click('.model-tools button[aria-label="Redo"]')
         page.wait_for_timeout(2500)
         check("REDO_RESTORES_IT",
-              abs(float(page.input_value("#p-box1_width")) - before_undo) < 0.01,
-              page.input_value("#p-box1_width"))
+              abs(float(page.input_value("#p-box1_x")) - before_undo) < 0.01,
+              page.input_value("#p-box1_x"))
 
         # Undo all the way out, then check it stops rather than going negative.
         # Each undo regenerates and reloads, so give it room -- clicking faster
