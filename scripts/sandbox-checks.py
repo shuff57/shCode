@@ -78,10 +78,6 @@ def press_run(page):
 
     After a run the button reads Stop, and .btn-run matches it -- so a bare
     click on .btn-run for a second run stops the first one instead."""
-    btn = page.query_selector(".run-toolbar .btn-run")
-    if btn and "Stop" in btn.inner_text():
-        btn.click()
-        page.wait_for_timeout(400)
     page.query_selector(".run-toolbar .btn-run").click()
 
 
@@ -345,6 +341,102 @@ def run(url, headed):
               canvas_png(page) != fillet_shot
               and page.query_selector(".jscad-params-empty-warn") is None,
               "stale" if page.query_selector(".jscad-params-empty-warn") else "")
+
+        # ---- drag handles ----------------------------------------------------
+        # box1 is selected and chamfered by this point.
+        handles = page.query_selector_all(".handle")
+        check("HANDLES_FOR_A_SELECTED_BOX", len(handles) == 3, f"{len(handles)} handles")
+        labels = sorted((h.get_attribute("aria-label") or "") for h in handles)
+        check("HANDLES_ARE_LABELLED",
+              labels == ["Drag depth", "Drag height", "Drag width"], str(labels))
+
+        def handle(name):
+            for h in page.query_selector_all(".handle"):
+                if h.get_attribute("aria-label") == name:
+                    return h
+            return None
+
+        depth_before = handle("Drag depth").bounding_box()
+        width_before = float(page.input_value("#p-box1_width"))
+        fr = frame_of(page)
+        fr.evaluate("window.__dragSentinel = 'alive'")
+
+        hb = handle("Drag width").bounding_box()
+        page.mouse.move(hb["x"] + 6, hb["y"] + 6)
+        page.mouse.down()
+        for k in range(1, 7):
+            page.mouse.move(hb["x"] + 6 - k * 9, hb["y"] + 6)
+            page.wait_for_timeout(90)
+        page.mouse.up()
+        page.wait_for_timeout(1500)
+
+        width_after = float(page.input_value("#p-box1_width"))
+        check("HANDLE_DRAG_CHANGES_THE_DIMENSION",
+              abs(width_after - width_before) > 1, f"{width_before} -> {width_after}")
+        check("HANDLE_DRAG_DID_NOT_RELOAD",
+              (fr.evaluate("window.__dragSentinel") if fr else None) == "alive")
+
+        # The depth face sits at cy + depth/2, which does not depend on width --
+        # so if the camera stayed put, the depth handle must not have moved. A
+        # drag that leaked through to the orbit controls would shift it.
+        depth_after = handle("Drag depth").bounding_box()
+        drift = max(abs(depth_after["x"] - depth_before["x"]),
+                    abs(depth_after["y"] - depth_before["y"]))
+        check("HANDLE_DRAG_DID_NOT_ORBIT", drift < 2.0, f"{drift:.1f}px drift")
+
+        # A combination has no shape of its own to grab.
+        page.query_selector_all(".model-row")[2].click()
+        page.wait_for_timeout(800)
+        check("NO_HANDLES_ON_A_COMBINATION",
+              len(page.query_selector_all(".handle")) == 0,
+              f"{len(page.query_selector_all('.handle'))} handles")
+        page.query_selector_all(".model-row")[0].click()
+        page.wait_for_timeout(600)
+
+        # ---- undo ------------------------------------------------------------
+        # A whole drag is one undo, not sixty: the doc is written once, on
+        # release. Structure and dimensions share the same history, because to
+        # a student both are just "put it back".
+        before_undo = float(page.input_value("#p-box1_width"))
+        rows_before = len(page.query_selector_all(".model-row"))
+        page.click('.model-tools button[aria-label="Undo"]')
+        page.wait_for_timeout(2500)
+        check("UNDO_REVERSES_A_DRAG",
+              abs(float(page.input_value("#p-box1_width")) - before_undo) > 1,
+              f"{before_undo} -> {page.input_value('#p-box1_width')}")
+        check("UNDO_DID_NOT_LOSE_THE_STRUCTURE",
+              len(page.query_selector_all(".model-row")) == rows_before,
+              f"{len(page.query_selector_all('.model-row'))} rows")
+
+        page.click('.model-tools button[aria-label="Redo"]')
+        page.wait_for_timeout(2500)
+        check("REDO_RESTORES_IT",
+              abs(float(page.input_value("#p-box1_width")) - before_undo) < 0.01,
+              page.input_value("#p-box1_width"))
+
+        # Undo all the way out, then check it stops rather than going negative.
+        # Each undo regenerates and reloads, so give it room -- clicking faster
+        # than the reload lands measures the test's patience, not the feature.
+        steps = 0
+        for _ in range(30):
+            b = page.query_selector('.model-tools button[aria-label="Undo"]')
+            if b is None or b.is_disabled():
+                break
+            b.click()
+            steps += 1
+            page.wait_for_timeout(1100)
+        b = page.query_selector('.model-tools button[aria-label="Undo"]')
+        check("UNDO_STOPS_AT_THE_BEGINNING",
+              b is not None and b.is_disabled(), f"after {steps} undos")
+        check("EMPTY_MODEL_IS_NOT_AN_ERROR",
+              page.query_selector(".model-empty") is not None
+              or len(page.query_selector_all(".model-row")) == 0)
+        for _ in range(30):
+            b = page.query_selector('.model-tools button[aria-label="Redo"]')
+            if b is None or b.is_disabled():
+                break
+            b.click()
+            page.wait_for_timeout(1100)
 
         # Leaving Build hands the generated file over; the dialog auto-accepts.
         page.click(".sandbox-mode:has-text('Code')")

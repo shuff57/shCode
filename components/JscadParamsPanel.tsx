@@ -25,6 +25,8 @@ interface Props {
   defs: ParamDef[];
   values: ParamValues;
   onChange: (next: ParamValues) => void;
+  /** End of a gesture — a whole slider drag is one undo, not sixty. */
+  onCommit: () => void;
   lastMs: number | null;
   /** Why the shape on screen no longer matches the numbers, if it doesn't. */
   stale?: 'empty' | 'error' | null;
@@ -61,7 +63,9 @@ function settle(n: number, d: ParamDef) {
   return v;
 }
 
-export default function JscadParamsPanel({ defs, values, onChange, lastMs, stale }: Props) {
+export default function JscadParamsPanel({
+  defs, values, onChange, onCommit, lastMs, stale,
+}: Props) {
   // What is in the text box, deliberately NOT the same as the model value:
   // half-typed input like "" or "-" has to survive on screen without being
   // pushed into the model or snapped to min.
@@ -133,7 +137,7 @@ export default function JscadParamsPanel({ defs, values, onChange, lastMs, stale
               <input
                 type="checkbox"
                 checked={Boolean(raw)}
-                onChange={(e) => push(d.name, e.target.checked)}
+                onChange={(e) => { push(d.name, e.target.checked); onCommit(); }}
               />
               <span>{label}</span>
             </label>

@@ -533,6 +533,13 @@
 		return;
 	}
 
+	// Drag handles: the parent knows the model and sends points in world space,
+	// the runner owns the camera and projects them. Neither has to learn the
+	// other's half, and nothing ever hit-tests a mesh.
+	var anchors = [];
+	var anchorsDirty = false;
+	var projectAnchors = null;
+
 	// Set by render() once regl is up. Swapping renderOptions.entities is enough
 	// to change what is on screen — the rAF loop re-reads it every frame — so a
 	// parameter change never reloads the iframe or re-initialises the renderer.
@@ -552,27 +559,6 @@
 		}, '*');
 	} catch (_) { /* parent gone, or nothing serialisable */ }
 
-	statusEl.textContent = 'Running your code…';
-	var result;
-	try {
-		result = mainFn(liveParams);
-	} catch (e) {
-		// Route through window.onerror so the reporter can read the stack and
-		// blame the right line of script.js.
-		window.dispatchEvent(new ErrorEvent('error', { error: e, message: e && e.message, filename: 'script.js' }));
-		statusEl.textContent = '';
-		return;
-	}
-
-	// V2 allows main() to be async.
-	if (result && typeof result.then === 'function') {
-		result.then(draw, function(e) {
-			window.dispatchEvent(new ErrorEvent('error', { error: e, message: e && e.message, filename: 'script.js' }));
-			statusEl.textContent = '';
-		});
-	} else {
-		draw(result);
-	}
 
 	var rebuildPending = false;
 
@@ -653,6 +639,12 @@
 
 	window.addEventListener('message', function(e) {
 		var d = e.data;
+		if (d && d.source === 'jscad-set-anchors') {
+			anchors = Array.isArray(d.anchors) ? d.anchors : [];
+			anchorsDirty = true;
+			if (projectAnchors) projectAnchors();
+			return;
+		}
 		if (!d || d.source !== 'jscad-set-params' || !d.params) return;
 		// ponytail: every message is applied in order. The sender coalesces to one
 		// per frame and rebuilds run ~20ms, so nothing queues today. If a heavy
@@ -712,6 +704,7 @@
 		var controls = regl.controls;
 		var entitiesFromSolids = regl.entitiesFromSolids;
 
+		var mat4 = jscad.maths.mat4;
 		var perspectiveCamera = cameras.perspective;
 		var orbitControls = controls.orbit;
 
@@ -804,6 +797,7 @@
 			renderOptions.entities = [gridOptions, axisOptions].concat(
 				entitiesFromSolids({ color: [1, 0.4, 0, 1] }, next)
 			);
+			anchorsDirty = true;
 		};
 
 		if (rebuildPending) { rebuildPending = false; rebuild({}); }
@@ -849,7 +843,55 @@
 		var panSpeed = 1;
 		var zoomSpeed = 0.08;
 
+		// Screen position of a world point, plus how many pixels one unit along
+		// the handle's axis covers there. Projecting origin AND origin+axis gives
+		// both the anchor and its on-screen direction in one go.
+		// Done by hand rather than with vec3.transform, which divides by w inside
+		// and throws away the sign -- and the sign is the only thing separating a
+		// point in front of the camera from its mirror image behind it.
+		// JSCAD matrices are column-major, so m[0..3] is the first column.
+		var clip = mat4.create();
+		function toScreen(p, out) {
+			var m = clip;
+			var w = m[3] * p[0] + m[7] * p[1] + m[11] * p[2] + m[15];
+			if (!w) return false;
+			var x = m[0] * p[0] + m[4] * p[1] + m[8] * p[2] + m[12];
+			var y = m[1] * p[0] + m[5] * p[1] + m[9] * p[2] + m[13];
+			out[0] = (x / w * 0.5 + 0.5) * container.clientWidth;
+			out[1] = (0.5 - y / w * 0.5) * container.clientHeight;
+			return w > 0;
+		}
+
+		var aHere = [0, 0], aThere = [0, 0];
+		projectAnchors = function() {
+			if (!anchors.length) {
+				try { window.parent.postMessage({ source: 'jscad-anchors', points: [] }, '*'); } catch (_) {}
+				return;
+			}
+			mat4.multiply(clip, camera.projection, camera.view);
+			var points = [];
+			for (var i = 0; i < anchors.length; i++) {
+				var a = anchors[i];
+				if (!toScreen(a.origin, aHere)) continue;
+				toScreen([
+					a.origin[0] + a.axis[0], a.origin[1] + a.axis[1], a.origin[2] + a.axis[2]
+				], aThere);
+				var dx = aThere[0] - aHere[0], dy = aThere[1] - aHere[1];
+				var px = Math.sqrt(dx * dx + dy * dy);
+				if (px < 0.001) continue;  // axis points at the camera; undraggable
+				points.push({
+					param: a.param, label: a.label,
+					x: aHere[0], y: aHere[1],
+					dirX: dx / px, dirY: dy / px, pxPerUnit: px
+				});
+			}
+			try { window.parent.postMessage({ source: 'jscad-anchors', points: points }, '*'); } catch (_) {}
+		};
+
 		function updateAndRender() {
+			if (rotateDelta[0] || rotateDelta[1] || panDelta[0] || panDelta[1] || zoomDelta) {
+				anchorsDirty = true;
+			}
 			if (rotateDelta[0] || rotateDelta[1]) {
 				var rotated = orbitControls.rotate({
 					controls: controlsState, camera: camera, speed: rotateSpeed
@@ -883,6 +925,10 @@
 
 			renderOptions.camera = camera;
 			renderer(renderOptions);
+			// Once per frame at most, and only when the view or the model moved --
+			// a message per frame regardless would be 60/s of pure noise.
+			// Guarded: a throw in here stops the rAF loop and freezes the view.
+			if (anchorsDirty && projectAnchors) { anchorsDirty = false; projectAnchors(); }
 			window.requestAnimationFrame(updateAndRender);
 		}
 
@@ -894,6 +940,40 @@
 			perspectiveCamera.setProjection(camera, camera, { width: w, height: h });
 		});
 	}
+	// EVERYTHING ABOVE THIS LINE IS A DECLARATION. The run goes last, and must
+	// stay last.
+	//
+	// This file used to call draw() from the middle of the IIFE, with `var x =
+	// null` statements below it. Those re-run at their own position -- after
+	// render() has already assigned them -- so they silently wipe live state.
+	// It cost two bugs: swapGeometry (a parameter change drew nothing) and
+	// projectAnchors (a null got called inside the rAF loop, the loop threw, and
+	// rendering froze, which read as "the slider does nothing").
+	//
+	// scripts/check-runner-hoisting.mjs fails the build if an initialised `var`
+	// appears after this point.
+	statusEl.textContent = 'Running your code…';
+	var result;
+	try {
+		result = mainFn(liveParams);
+	} catch (e) {
+		// Route through window.onerror so the reporter can read the stack and
+		// blame the right line of script.js.
+		window.dispatchEvent(new ErrorEvent('error', { error: e, message: e && e.message, filename: 'script.js' }));
+		statusEl.textContent = '';
+		return;
+	}
+
+	// V2 allows main() to be async.
+	if (result && typeof result.then === 'function') {
+		result.then(draw, function(e) {
+			window.dispatchEvent(new ErrorEvent('error', { error: e, message: e && e.message, filename: 'script.js' }));
+			statusEl.textContent = '';
+		});
+	} else {
+		draw(result);
+	}
+
 })();
 </script>
 </body>

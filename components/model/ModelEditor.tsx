@@ -16,6 +16,8 @@ import {
   Scissors,
   SquareDashedBottom,
   Trash2,
+  Undo2,
+  Redo2,
   ChevronUp,
   ChevronDown,
 } from 'lucide-react';
@@ -35,11 +37,20 @@ import {
 interface Props {
   doc: ModelDoc;
   onChange: (next: ModelDoc) => void;
+  /** Lifted so the preview knows whose drag handles to draw. */
+  selected: string[];
+  onSelect: (ids: string[]) => void;
+  onUndo: () => void;
+  onRedo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
-export default function ModelEditor({ doc, onChange }: Props) {
-  const [selected, setSelected] = useState<string[]>([]);
+export default function ModelEditor({
+  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo,
+}: Props) {
   const [note, setNote] = useState<string | null>(null);
+  const setSelected = onSelect;
 
   const chosen = doc.features.filter((f) => selected.includes(f.id));
   const names = nameMap(doc);
@@ -124,9 +135,9 @@ export default function ModelEditor({ doc, onChange }: Props) {
   }
 
   function pick(id: string, additive: boolean) {
-    setSelected((prev) =>
+    setSelected(
       additive
-        ? prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+        ? selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]
         : [id]
     );
     say(null);
@@ -181,7 +192,13 @@ export default function ModelEditor({ doc, onChange }: Props) {
         </div>
 
         <div className="model-tool-group model-tool-end">
-          <button onClick={remove} disabled={!chosen.length} title="Delete the selected">
+          <button onClick={onUndo} disabled={!canUndo} title="Undo (Ctrl+Z)" aria-label="Undo">
+            <Undo2 size={14} />
+          </button>
+          <button onClick={onRedo} disabled={!canRedo} title="Redo (Ctrl+Shift+Z)" aria-label="Redo">
+            <Redo2 size={14} />
+          </button>
+          <button onClick={remove} disabled={!chosen.length} title="Delete the selected" aria-label="Delete">
             <Trash2 size={14} />
           </button>
         </div>

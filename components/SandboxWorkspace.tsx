@@ -12,6 +12,8 @@ import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
 import ShPlayDocsContent from './ShPlayDocsContent';
 import ModelEditor from './model/ModelEditor';
+import HandleOverlay, { type AnchorPoint } from './model/HandleOverlay';
+import { handlesFor } from '../lib/model-handles';
 import { EMPTY_DOC, type ModelDoc } from '../lib/model-types';
 import { applyParam, paramValues as docParams, toJscad } from '../lib/model-codegen';
 import { RUNNER_SOURCE, RUN_TIMEOUT_MS } from '../lib/js-runner-source';
@@ -56,6 +58,19 @@ export default function SandboxWorkspace() {
   // need the code parsed back into features, which is a permanent non-goal.
   const [build, setBuild] = useState(false);
   const [doc, setDoc] = useState<ModelDoc>(EMPTY_DOC);
+  const [selected, setSelected] = useState<string[]>([]);
+  // Undo covers structure and dimensions together, because to a student they
+  // are the same act: "put it back how it was". Dimension drags land here once,
+  // on release, so a drag is one undo rather than sixty.
+  const past = useRef<ModelDoc[]>([]);
+  const future = useRef<ModelDoc[]>([]);
+  const [depth, setDepth] = useState({ back: 0, forward: 0 });
+  const [anchors, setAnchors] = useState<AnchorPoint[]>([]);
+  // The frame reloads on every structural edit, so specs posted at the moment
+  // runKey changes arrive before the runner has a listener and are simply lost.
+  // Held in a ref and re-sent when the runner announces its parameters, which
+  // is the first moment it is known to be listening.
+  const specsRef = useRef<unknown[]>([]);
   const frameRef = useRef<HTMLIFrameElement | null>(null);
   const workerRef = useRef<Worker | null>(null);
 
@@ -107,9 +122,13 @@ export default function SandboxWorkspace() {
       if (frameRef.current && e.source !== frameRef.current.contentWindow) return;
       const d = e.data as {
         source?: string; defs?: ParamDef[]; values?: ParamValues;
-        ms?: number; empty?: boolean; failed?: boolean;
+        ms?: number; empty?: boolean; failed?: boolean; points?: AnchorPoint[];
       };
       if (d?.source === 'jscad-params') {
+        frameRef.current?.contentWindow?.postMessage(
+          { source: 'jscad-set-anchors', anchors: specsRef.current },
+          '*'
+        );
         setParamDefs(Array.isArray(d.defs) ? d.defs : []);
         setParamValues(d.values ?? {});
         setRebuildMs(null);
@@ -117,6 +136,8 @@ export default function SandboxWorkspace() {
       } else if (d?.source === 'jscad-rebuilt' && typeof d.ms === 'number') {
         setStale(d.failed ? 'error' : d.empty ? 'empty' : null);
         if (!d.empty && !d.failed) setRebuildMs(d.ms);
+      } else if (d?.source === 'jscad-anchors') {
+        setAnchors(Array.isArray(d.points) ? d.points : []);
       } else if (d?.source === 'preview-error') {
         // A script that throws on load never reaches jscad-rebuilt, so without
         // this the failure is visible only inside the frame — and the panel
@@ -128,27 +149,113 @@ export default function SandboxWorkspace() {
     return () => window.removeEventListener('message', onMessage);
   }, [mode.preview]);
 
-  const setParams = useCallback((next: ParamValues) => {
+  // Read inside callbacks that must not rebuild on every doc change, and to
+  // keep history bookkeeping out of a state updater -- React may call one twice.
+  const docRef = useRef(doc);
+  useEffect(() => { docRef.current = doc; }, [doc]);
+
+  // Regenerate and reload. The slow path, and the only one structure takes.
+  const loadDoc = useCallback((next: ModelDoc) => {
+    setDoc(next);
+    docRef.current = next;
+    uncommitted.current = {};
+    setParamDefs([]);
+    // Updater form: React reads a bare object of unknowns as a possible
+    // updater function, and picks the wrong overload.
+    setParamValues(() => docParams(next));
+    setRebuildMs(null);
+    setStale(null);
+    setCode(toJscad(next));
+    setRunKey((k) => k + 1);
+    setIsRunning(true);
+  }, []);
+
+  const remember = useCallback((prev: ModelDoc) => {
+    past.current = [...past.current.slice(-49), prev];
+    future.current = [];
+    setDepth({ back: past.current.length, forward: 0 });
+  }, []);
+
+  const applyDoc = useCallback((next: ModelDoc) => {
+    remember(docRef.current);
+    loadDoc(next);
+  }, [remember, loadDoc]);
+
+  const undo = useCallback(() => {
+    const prev = past.current.pop();
+    if (!prev) return;
+    future.current = [docRef.current, ...future.current];
+    setDepth({ back: past.current.length, forward: future.current.length });
+    loadDoc(prev);
+  }, [loadDoc]);
+
+  const redo = useCallback(() => {
+    const [next, ...rest] = future.current;
+    if (!next) return;
+    past.current = [...past.current, docRef.current];
+    future.current = rest;
+    setDepth({ back: past.current.length, forward: rest.length });
+    loadDoc(next);
+  }, [loadDoc]);
+
+  // Values changed since the doc was last folded up to date. During a drag the
+  // doc is deliberately left alone: rewriting it per frame changes `specs`,
+  // which re-posts the anchors, which comes back as another render. Measured at
+  // 62 anchor round-trips for 24 pointer moves before this split.
+  const uncommitted = useRef<ParamValues>({});
+
+  const sendParams = useCallback((next: ParamValues) => {
     setParamValues((prev) => ({ ...prev, ...next }));
-    // Keep the doc in step, or the generated code would still describe the old
-    // numbers the next time a structural edit regenerates it.
-    setDoc((prev) => {
-      let d = prev;
-      for (const [k, v] of Object.entries(next)) {
-        if (typeof v === 'number') d = applyParam(d, k, v);
-      }
-      return d;
-    });
+    uncommitted.current = { ...uncommitted.current, ...next };
     frameRef.current?.contentWindow?.postMessage(
       { source: 'jscad-set-params', params: next },
       '*'
     );
   }, []);
 
+  // Fold pending values into the doc, so the generated code describes the same
+  // numbers the panel does. Cheap and rare -- once per drag, or per typed edit.
+  const commitParams = useCallback(() => {
+    const pending = uncommitted.current;
+    uncommitted.current = {};
+    if (!Object.keys(pending).length) return;
+    let next = docRef.current;
+    for (const [k, v] of Object.entries(pending)) {
+      if (typeof v === 'number') next = applyParam(next, k, v);
+    }
+    // applyParam hands back the same object when nothing matched, so identity
+    // is the test. Without it, editing the starter's dimensions in Code mode
+    // filled the history with entries that undo to exactly the same model.
+    if (next === docRef.current) return;
+    remember(docRef.current);
+    setDoc(next);
+    docRef.current = next;
+  }, [remember]);
+
   // Leaving Build with something built is the one-way door. The generated file
   // is handed over to be edited by hand, and the shape tools stop driving it --
   // going back the other way would mean parsing JavaScript into features, which
   // is a permanent non-goal.
+  // Only the selected shape gets handles: every shape at once is a screenful
+  // of dots with no way to tell which belongs to what.
+  const specs = useMemo(
+    () => (build ? doc.features.filter((f) => selected.includes(f.id)).flatMap(handlesFor) : []),
+    [build, doc, selected]
+  );
+  const scales = useMemo(
+    () => Object.fromEntries(specs.map((h) => [h.param, h.scale])),
+    [specs]
+  );
+
+  useEffect(() => {
+    specsRef.current = specs;
+    frameRef.current?.contentWindow?.postMessage(
+      { source: 'jscad-set-anchors', anchors: specs },
+      '*'
+    );
+    if (specs.length === 0) setAnchors([]);
+  }, [specs]);
+
   function chooseBuild(on: boolean) {
     if (!on && doc.features.length > 0) {
       const ok = window.confirm(
@@ -158,6 +265,10 @@ export default function SandboxWorkspace() {
       if (!ok) return;
       updateFile('script.js', toJscad(doc));
       setDoc(EMPTY_DOC);
+      setSelected([]);
+      past.current = [];
+      future.current = [];
+      setDepth({ back: 0, forward: 0 });
     }
     try { window.localStorage.setItem(BUILD_KEY, on ? '1' : '0'); } catch { /* private mode */ }
     setBuild(on);
@@ -165,16 +276,6 @@ export default function SandboxWorkspace() {
 
   // Adding, deleting or reordering changes the shape of the file, so this is
   // the slow path: regenerate and reload. Changing a number never comes here.
-  const applyDoc = useCallback((next: ModelDoc) => {
-    setDoc(next);
-    setParamDefs([]);
-    setParamValues(() => docParams(next));
-    setRebuildMs(null);
-    setStale(null);
-    setCode(toJscad(next));
-    setRunKey((k) => k + 1);
-    setIsRunning(true);
-  }, []);
 
   // ---- Running --------------------------------------------------------------
 
@@ -274,11 +375,18 @@ export default function SandboxWorkspace() {
       if (e.ctrlKey && e.key === 'Enter') {
         e.preventDefault();
         run();
+        return;
       }
+      // Only in Build. In Code the editor owns undo, and stealing it there
+      // would rewind the model out from under someone editing text.
+      if (!(mode.preview === 'jscad' && build) || !(e.ctrlKey || e.metaKey)) return;
+      const k = e.key.toLowerCase();
+      if (k === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
+      else if ((k === 'z' && e.shiftKey) || k === 'y') { e.preventDefault(); redo(); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [run]);
+  }, [run, undo, redo, mode.preview, build]);
 
   // Pane resize — same drag-handle plumbing as LessonWorkspace.
   useEffect(() => {
@@ -462,16 +570,15 @@ export default function SandboxWorkspace() {
             </div>
           )}
 
-          {isRunning ? (
+          <button className="btn-run" onClick={run}>▶ Run</button>
+          {isRunning && (
             <button
-              className="btn-run"
-              style={{ background: '#ff5555', borderColor: '#ff5555' }}
+              className="btn-secondary btn-sm"
+              style={{ color: '#ff5555', borderColor: '#ff5555' }}
               onClick={stopRun}
             >
               ■ Stop
             </button>
-          ) : (
-            <button className="btn-run" onClick={run}>▶ Run</button>
           )}
           <button
             style={{
@@ -497,7 +604,16 @@ export default function SandboxWorkspace() {
         <div className="editor-preview-container sandbox-split" id="split">
           <div className="pane" id="editorPane">
             {isJscad && build ? (
-              <ModelEditor doc={doc} onChange={applyDoc} />
+              <ModelEditor
+                doc={doc}
+                onChange={applyDoc}
+                selected={selected}
+                onSelect={setSelected}
+                onUndo={undo}
+                onRedo={redo}
+                canUndo={depth.back > 0}
+                canRedo={depth.forward > 0}
+              />
             ) : (
               <CodeEditor />
             )}
@@ -530,13 +646,23 @@ export default function SandboxWorkspace() {
               <div className="jscad-pane">
                 <div className="jscad-pane-view">
                   <JscadPreview ref={frameRef} code={code} runKey={runKey} />
+                  {build && (
+                    <HandleOverlay
+                      points={anchors}
+                      values={paramValues}
+                      scales={scales}
+                      onDrag={(param, value) => sendParams({ [param]: value })}
+                      onCommit={commitParams}
+                    />
+                  )}
                 </div>
                 {runKey > 0 && (
                   <aside className="jscad-pane-params">
                     <JscadParamsPanel
                       defs={paramDefs}
                       values={paramValues}
-                      onChange={setParams}
+                      onChange={sendParams}
+                      onCommit={commitParams}
                       lastMs={rebuildMs}
                       stale={stale}
                     />
@@ -597,7 +723,7 @@ export default function SandboxWorkspace() {
           min-height: 280px;
         }
         .jscad-pane { display: flex; height: 100%; min-height: 0; }
-        .jscad-pane-view { flex: 1 1 auto; min-width: 0; display: flex; }
+        .jscad-pane-view { flex: 1 1 auto; min-width: 0; display: flex; position: relative; }
         .jscad-pane-view .jscad-frame, .jscad-pane-view .jscad-empty { flex: 1; }
         .jscad-pane-params {
           flex: 0 0 208px;

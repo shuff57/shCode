@@ -112,6 +112,27 @@ MUTATIONS = [
         {"UNLINK_WRITES_THE_GENERATED_CODE"},
     ),
     (
+        "let the frame swallow the drag instead of capturing it",
+        "components/model/HandleOverlay.tsx",
+        "              e.currentTarget.setPointerCapture(e.pointerId);",
+        "              void 0;",
+        {"HANDLE_DRAG_DID_NOT_ORBIT"},
+    ),
+    (
+        "put handles on a combination",
+        "lib/model-handles.ts",
+        "  if (f.kind === 'combine') return [];",
+        "  if (f.kind === 'combine') return [{ param: 'x', origin: [0, 0, 0], axis: [1, 0, 0], scale: 1, label: 'x' }];",
+        {"NO_HANDLES_ON_A_COMBINATION"},
+    ),
+    (
+        "never re-send anchors once the runner is listening",
+        "components/SandboxWorkspace.tsx",
+        "          { source: 'jscad-set-anchors', anchors: specsRef.current },",
+        "          { source: 'never-mind', anchors: specsRef.current },",
+        {"HANDLES_FOR_A_SELECTED_BOX"},
+    ),
+    (
         "treat an emptied model as a no-op",
         "public/jscad/runner.html",
         "\t\tif (!geometry || isEmptyGeometry(geometry)) {",
@@ -131,7 +152,11 @@ LOCK = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".mutations-in-f
 
 
 def claim(path, original):
-    with io.open(LOCK, "w", encoding="utf8") as fh:
+    # newline="" on BOTH ends, or Python translates the separator to \r\n on
+    # Windows, recover() splits on \n, and the path comes back carrying a
+    # trailing \r. It then restores a file whose name ends in a carriage
+    # return, reports success, and leaves the real file mutated. Measured.
+    with io.open(LOCK, "w", encoding="utf8", newline="") as fh:
         fh.write(path + "\n")
         fh.write(original)
 
@@ -148,9 +173,19 @@ def recover():
     with io.open(LOCK, encoding="utf8", newline="") as fh:
         body = fh.read()
     path, original = body.split("\n", 1)
-    print(f"  a previous run was killed holding a mutation in {path}")
+    path = path.strip()
+    if not path or not os.path.exists(path):
+        print(f"  lock names a file that is not here: {path!r}")
+        print("  leaving it alone; restore by hand and delete " + LOCK)
+        return False
     write(path, original)
     release()
+    # Verified, not assumed: this guard already reported a restore it had not
+    # performed once, which is worse than having no guard at all.
+    if read(path) != original:
+        print(f"  FAILED to restore {path} -- restore it by hand")
+        return False
+    print(f"  a previous run was killed holding a mutation in {path}")
     print("  restored it; re-run to verify\n")
     return False
 
