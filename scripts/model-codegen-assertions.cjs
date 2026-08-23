@@ -120,6 +120,38 @@ module.exports = function run(dir) {
 
   check('a ring refuses to round', types.whyCannotRound(ring('r1')) !== null);
 
+  console.log('\n=== turning a shape ===');
+
+  const flat = gen.toJscad(doc(box('b1')));
+  const turnedSrc = gen.toJscad(doc(box('b1', { rotate: [0, 0, 45] })));
+  check('an unrotated shape carries no rotate call', !flat.includes('transforms.rotate('));
+  check('a turned shape is rotated', turnedSrc.includes('transforms.rotate('));
+  check('...in degrees, converted', turnedSrc.includes('Math.PI / 180'));
+  // Built at the origin then moved, never the other way round: JSCAD rotates
+  // about the world origin, so a shape built at its final position would swing
+  // around the middle of the scene instead of its own centre.
+  check('...built at the origin, then placed',
+    turnedSrc.includes('center: [0, 0, 0]') && turnedSrc.includes('transforms.translate([p.b1_x'));
+  check('an unrotated shape declares no angles',
+    !gen.generatedParams(doc(box('b1'))).some((p) => p.name.endsWith('_rz')));
+  check('a turned one does',
+    gen.generatedParams(doc(box('b1', { rotate: [0, 0, 45] }))).some((p) => p.name === 'b1_rz'));
+
+  const offCentre = build(gen.toJscad(doc(box('b1', {
+    center: [50, 0, 0], rotate: [0, 0, 90],
+  }))));
+  // A 40x40x20 box turned 90 degrees about its own centre is still centred on
+  // x=50. If it swung about the world origin it would land near x=0 instead.
+  const mid = (offCentre.bbox[0][0] + offCentre.bbox[1][0]) / 2;
+  check('a turned shape spins about itself, not the scene',
+    Math.abs(mid - 50) < 1.5, `centre x = ${mid.toFixed(1)}`);
+  check('turning 90 degrees swaps width and depth',
+    Math.abs((offCentre.bbox[1][1] - offCentre.bbox[0][1]) - 40) < 1.5,
+    `depth ${(offCentre.bbox[1][1] - offCentre.bbox[0][1]).toFixed(1)}`);
+
+  const turnedRing = build(gen.toJscad(doc(ring('r1'))));
+  check('a ring still builds with the rotation path in place', turnedRing.volume > 100);
+
   console.log('\n=== names count per kind, not per row ===');
 
   const mixed = doc(box('b1'), cyl('c1'), box('b2'), cyl('c2'));

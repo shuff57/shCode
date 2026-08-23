@@ -18,6 +18,8 @@ export interface BoxFeature {
   name?: string;
   size: Vec3;
   center: Vec3;
+  /** Degrees about x, y, z. Absent means unrotated, and keeps the code simple. */
+  rotate?: Vec3;
   /** Edge radius. 0 or absent leaves the edges sharp. */
   round?: number;
   roundStyle?: RoundStyle;
@@ -30,6 +32,7 @@ export interface CylinderFeature {
   radius: number;
   height: number;
   center: Vec3;
+  rotate?: Vec3;
   round?: number;
   roundStyle?: RoundStyle;
 }
@@ -49,6 +52,7 @@ export interface ConeFeature {
   radius: number;
   height: number;
   center: Vec3;
+  rotate?: Vec3;
 }
 
 export interface TorusFeature {
@@ -60,6 +64,7 @@ export interface TorusFeature {
   /** Thickness of the tube itself. */
   tubeRadius: number;
   center: Vec3;
+  rotate?: Vec3;
 }
 
 export interface CombineFeature {
@@ -112,6 +117,12 @@ export function whyCannotRound(f: Feature): string | null {
     return 'Rounding a cone is not supported yet.';
   }
   return null;
+}
+
+/** A sphere looks identical however it is turned, so offering the control
+ *  would only teach that some buttons do nothing. */
+export function canRotate(f: Feature): boolean {
+  return f.kind === 'box' || f.kind === 'cylinder' || f.kind === 'cone' || f.kind === 'torus';
 }
 
 /** Largest round that still leaves a shape. Past this JSCAD throws. */

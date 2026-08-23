@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from 'react';
 export interface AnchorPoint {
   param: string;
   label: string;
-  kind?: 'size' | 'move';
+  kind?: 'size' | 'move' | 'turn';
   x: number;
   y: number;
   dirX: number;
@@ -79,7 +79,9 @@ export default function HandleOverlay({ points, values, scales, onDrag, onCommit
             key={a.param}
             type="button"
             className={
-              (a.kind === 'move' ? 'handle is-move' : 'handle') + (on ? ' is-on' : '')
+              'handle'
+              + (a.kind === 'move' ? ' is-move' : a.kind === 'turn' ? ' is-turn' : '')
+              + (on ? ' is-on' : '')
             }
             style={{ left, top }}
             aria-label={`Drag ${a.label}`}
@@ -134,6 +136,14 @@ export default function HandleOverlay({ points, values, scales, onDrag, onCommit
         }
         .handle.is-move:hover { background: #ff79c6; }
         .handle.is-move.is-on { background: #ff79c6; transform: rotate(45deg) scale(1.25); }
+        /* Turn is a ring, because that is the shape of what it does. */
+        .handle.is-turn {
+          background: transparent;
+          border: 3px solid #f1fa8c;
+          width: 15px; height: 15px; margin: -8px 0 0 -8px;
+        }
+        .handle.is-turn:hover { border-color: #ffb86c; background: transparent; }
+        .handle.is-turn.is-on { border-color: #ffb86c; background: transparent; transform: scale(1.25); }
         .handle:focus-visible { outline: 2px solid #bd93f9; outline-offset: 2px; }
         .handle.is-on { background: #8be9fd; cursor: grabbing; transform: scale(1.25); }
       `}</style>

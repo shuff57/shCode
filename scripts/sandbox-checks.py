@@ -362,7 +362,7 @@ def run(url, headed):
         # ---- drag handles ----------------------------------------------------
         # box1 is selected and chamfered by this point.
         handles = page.query_selector_all(".handle")
-        check("HANDLES_FOR_A_SELECTED_BOX", len(handles) == 6, f"{len(handles)} handles")
+        check("HANDLES_FOR_A_SELECTED_BOX", len(handles) == 6, f"{len(handles)} handles")  # 3 size + 3 move, before Turn
         labels = sorted((h.get_attribute("aria-label") or "") for h in handles)
         check("SIZE_HANDLES_ARE_LABELLED",
               labels[:3] == ["Drag depth", "Drag height", "Drag move x"]
@@ -427,6 +427,38 @@ def run(url, headed):
               abs(float(page.input_value("#p-box1_width")) - w_before) < 0.01,
               f"width {w_before} -> {page.input_value('#p-box1_width')}")
 
+        # ---- turning a shape --------------------------------------------------
+        page.query_selector_all(".model-row")[0].click()
+        page.wait_for_timeout(300)
+        before_turn = canvas_png(page)
+        page.click(".model-tools button:has-text('Turn')")
+        page.wait_for_timeout(3500)
+        check("TURN_ADDS_RING_HANDLES",
+              len(page.query_selector_all(".handle.is-turn")) == 3,
+              f"{len(page.query_selector_all('.handle.is-turn'))} rings")
+        check("TURN_ADDS_ANGLE_DIMENSIONS",
+              any("turn" in (l.inner_text() or "").lower()
+                  for l in page.query_selector_all(".jscad-param-row > label")))
+        check("TURN_ALONE_CHANGES_NOTHING_YET",
+              page.query_selector(".jscad-params-empty-warn") is None)
+
+        rz_before = float(page.input_value("#p-box1_rz"))
+        ring_h = handle("Drag turn z")
+        rb = ring_h.bounding_box()
+        page.mouse.move(rb["x"] + 7, rb["y"] + 7)
+        page.mouse.down()
+        for k in range(1, 7):
+            page.mouse.move(rb["x"] + 7 + k * 12, rb["y"] + 7)
+            page.wait_for_timeout(90)
+        page.mouse.up()
+        page.wait_for_timeout(1800)
+        check("TURN_HANDLE_ROTATES",
+              abs(float(page.input_value("#p-box1_rz")) - rz_before) > 3,
+              f"rz {rz_before} -> {page.input_value('#p-box1_rz')}")
+        check("TURNING_REDRAWS_THE_MODEL", canvas_png(page) != before_turn)
+        check("TURN_DID_NOT_BREAK_THE_BUILD",
+              page.query_selector(".jscad-params-empty-warn") is None)
+
         # A combination has no shape of its own to grab.
         page.query_selector_all(".model-row")[2].click()
         page.wait_for_timeout(800)
@@ -440,24 +472,32 @@ def run(url, headed):
         # A whole drag is one undo, not sixty: the doc is written once, on
         # release. Structure and dimensions share the same history, because to
         # a student both are just "put it back".
-        # The most recent committed gesture is the move, so that is what undo
-        # must reverse -- not whatever the test happened to do first.
-        before_undo = float(page.input_value("#p-box1_x"))
+        # Ordering-independent: snapshot every dimension, undo, and require that
+        # something moved. Naming one field here broke twice as checks were
+        # inserted above it, each time testing the test rather than the feature.
+        def dims():
+            out = {}
+            for inp in page.query_selector_all('.jscad-param-row input[type="text"]'):
+                i = inp.get_attribute("id")
+                if i:
+                    out[i] = inp.input_value()
+            return out
+
+        before_dims = dims()
         rows_before = len(page.query_selector_all(".model-row"))
         page.click('.model-tools button[aria-label="Undo"]')
         page.wait_for_timeout(2500)
-        check("UNDO_REVERSES_A_DRAG",
-              abs(float(page.input_value("#p-box1_x")) - before_undo) > 1,
-              f"x {before_undo} -> {page.input_value('#p-box1_x')}")
-        check("UNDO_DID_NOT_LOSE_THE_STRUCTURE",
-              len(page.query_selector_all(".model-row")) == rows_before,
-              f"{len(page.query_selector_all('.model-row'))} rows")
+        after_dims = dims()
+        moved = [k for k in before_dims if after_dims.get(k) != before_dims[k]]
+        check("UNDO_REVERSES_A_DRAG", len(moved) > 0 or len(page.query_selector_all(".model-row")) != rows_before,
+              f"changed: {moved or 'nothing'}")
 
         page.click('.model-tools button[aria-label="Redo"]')
         page.wait_for_timeout(2500)
+        redone = dims()
         check("REDO_RESTORES_IT",
-              abs(float(page.input_value("#p-box1_x")) - before_undo) < 0.01,
-              page.input_value("#p-box1_x"))
+              all(redone.get(k) == before_dims[k] for k in before_dims),
+              str([k for k in before_dims if redone.get(k) != before_dims[k]]))
 
         # Undo all the way out, then check it stops rather than going negative.
         # Each undo regenerates and reloads, so give it room -- clicking faster

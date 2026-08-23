@@ -17,6 +17,7 @@ import {
   Combine,
   Scissors,
   SquareDashedBottom,
+  RotateCw,
   Trash2,
   Undo2,
   Redo2,
@@ -27,6 +28,7 @@ import {
   type Feature,
   type ModelDoc,
   type RoundStyle,
+  canRotate,
   isRoundable,
   maxRound,
   nameMap,
@@ -101,6 +103,30 @@ export default function ModelEditor({
       ...doc,
       features: doc.features.map((x) =>
         x.id === f.id ? { ...x, round: size, roundStyle: style } : x
+      ),
+    });
+    say(null);
+  }
+
+  // Rotation is opt-in per shape, the same way rounding is: three angle rows
+  // and three ring handles on every shape from the start would be clutter for
+  // the many models that never turn anything.
+  function turn() {
+    if (chosen.length !== 1) {
+      say('Pick one shape to turn.');
+      return;
+    }
+    const f = chosen[0];
+    if (!canRotate(f)) {
+      say('A sphere looks the same whichever way you turn it.');
+      return;
+    }
+    onChange({
+      ...doc,
+      features: doc.features.map((x) =>
+        x.id === f.id && x.kind !== 'combine' && x.kind !== 'sphere'
+          ? { ...x, rotate: x.rotate ?? [0, 0, 0] }
+          : x
       ),
     });
     say(null);
@@ -198,6 +224,13 @@ export default function ModelEditor({
           >
             Chamfer
           </button>
+          <button
+            onClick={turn}
+            disabled={chosen.length !== 1 || !canRotate(chosen[0])}
+            title="Turn this shape"
+          >
+            <RotateCw size={14} /> Turn
+          </button>
         </div>
 
         <div className="model-tool-group model-tool-end">
@@ -241,6 +274,9 @@ export default function ModelEditor({
                     {f.targets.map((t) => names[t] ?? t).join(f.op === 'subtract' ? ' − ' : f.op === 'union' ? ' + ' : ' ∩ ')}
                   </em>
                 )}
+                {'rotate' in f && f.rotate && f.rotate.some((v) => v !== 0) ? (
+                  <em className="model-detail"> turned</em>
+                ) : null}
                 {'round' in f && f.round ? (
                   <em className="model-detail"> {f.roundStyle === 'chamfer' ? 'chamfered' : 'filleted'}</em>
                 ) : null}

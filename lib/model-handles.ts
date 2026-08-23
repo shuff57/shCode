@@ -11,7 +11,7 @@
 
 import type { Feature } from './model-types';
 
-export type HandleKind = 'size' | 'move';
+export type HandleKind = 'size' | 'move' | 'turn';
 
 export interface HandleSpec {
   kind: HandleKind;
@@ -42,6 +42,28 @@ function moveHandles(id: string, centre: [number, number, number], reach: number
     axis: v,
     scale: 1,
     label: `move ${n}`,
+  }));
+}
+
+// One handle per axis, sitting out on the circle it would sweep and sliding
+// along the tangent there. Not a ring like WebCAD's gizmo -- a ring needs an
+// arc projected into screen space, where a tangent is the same projection the
+// other handles already use. Degrees per world unit is 180/(PI*r), so a handle
+// further out turns the shape more slowly, which is what a real ring does too.
+function turnHandles(id: string, centre: [number, number, number], reach: number): HandleSpec[] {
+  const r = Math.max(reach, 1);
+  const perAxis: Array<[('rx' | 'ry' | 'rz'), [number, number, number], [number, number, number]]> = [
+    ['rx', [0, r, 0], [0, 0, 1]],
+    ['ry', [0, 0, r], [1, 0, 0]],
+    ['rz', [r, 0, 0], [0, 1, 0]],
+  ];
+  return perAxis.map(([slot, off, tangent]) => ({
+    kind: 'turn' as const,
+    param: `${id}_${slot}`,
+    origin: [centre[0] + off[0], centre[1] + off[1], centre[2] + off[2]],
+    axis: tangent,
+    scale: 180 / (Math.PI * r),
+    label: `turn ${slot[1]}`,
   }));
 }
 
@@ -84,5 +106,8 @@ export function handlesFor(f: Feature): HandleSpec[] {
     );
   }
 
-  return [...size, ...moveHandles(f.id, f.center, reach)];
+  const turn = f.kind !== 'sphere' && f.rotate
+    ? turnHandles(f.id, f.center, reach * 1.25)
+    : [];
+  return [...size, ...moveHandles(f.id, f.center, reach), ...turn];
 }

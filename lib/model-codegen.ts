@@ -56,15 +56,18 @@ export function generatedParams(doc: ModelDoc): GeneratedParam[] {
       AXIS.forEach((a, ax) => push(a, a, f.size[ax]));
       pushCentre(out, f.id, label, f.center);
       if (f.round !== undefined) push('round', 'corner', f.round, { min: 0, max: 40, step: 0.5 });
+      pushTurn(out, f.id, label, f.rotate);
     } else if (f.kind === 'cylinder') {
       push('radius', 'radius', f.radius);
       push('height', 'height', f.height);
       pushCentre(out, f.id, label, f.center);
       if (f.round !== undefined) push('round', 'corner', f.round, { min: 0, max: 40, step: 0.5 });
+      pushTurn(out, f.id, label, f.rotate);
     } else if (f.kind === 'cone') {
       push('radius', 'radius', f.radius);
       push('height', 'height', f.height);
       pushCentre(out, f.id, label, f.center);
+      pushTurn(out, f.id, label, f.rotate);
     } else if (f.kind === 'torus') {
       push('ring', 'ring', f.ringRadius);
       push('tube', 'tube', f.tubeRadius);
@@ -75,6 +78,22 @@ export function generatedParams(doc: ModelDoc): GeneratedParam[] {
     }
   });
   return out;
+}
+
+// Only when the shape has actually been given a rotation, so an unrotated model
+// does not carry three dead angle rows per shape.
+function pushTurn(out: GeneratedParam[], id: string, label: string, r?: Vec3) {
+  if (!r) return;
+  (['rx', 'ry', 'rz'] as const).forEach((a, i) => {
+    out.push({
+      name: pname(id, a),
+      caption: `${label} turn ${a[1]}`,
+      value: r[i],
+      min: -180,
+      max: 180,
+      step: 5,
+    });
+  });
 }
 
 function pushCentre(out: GeneratedParam[], id: string, label: string, c: Vec3) {
@@ -113,6 +132,15 @@ export function applyParam(doc: ModelDoc, name: string, value: number): ModelDoc
 
   const features = doc.features.map((f) => {
     if (f.id !== id) return f;
+    const turn = slot === 'rx' ? 0 : slot === 'ry' ? 1 : slot === 'rz' ? 2 : null;
+    // A sphere has no rotate field, which is the type system saying the same
+    // thing canRotate() does: turning it would change nothing to look at.
+    if (turn !== null && f.kind !== 'combine' && f.kind !== 'sphere' && f.rotate) {
+      const rotate: Vec3 = [f.rotate[0], f.rotate[1], f.rotate[2]];
+      rotate[turn] = value;
+      changed = true;
+      return { ...f, rotate };
+    }
     const axis = slot === 'x' ? 0 : slot === 'y' ? 1 : slot === 'z' ? 2 : null;
     if (axis !== null && f.kind !== 'combine') {
       const center: Vec3 = [...f.center];
@@ -159,33 +187,45 @@ function centreExpr(id: string): string {
 
 /** The expression that builds one feature, and which helpers it needs. */
 function featureExpr(f: Feature, needs: Set<string>): string {
-  const c = f.kind === 'combine' ? '' : centreExpr(f.id);
+  // A rotated shape is built at the origin, turned, then moved into place --
+  // JSCAD rotates about the world origin, so a shape built at its final
+  // position would swing around the middle of the scene instead of its own.
+  const turned = f.kind !== 'combine' && f.kind !== 'sphere' && f.rotate !== undefined;
+  const c = f.kind === 'combine' ? '' : turned ? '[0, 0, 0]' : centreExpr(f.id);
+
+  const place = (expr: string) => {
+    if (!turned) return expr;
+    needs.add('transforms');
+    const deg = (a: string) => `p.${pname(f.id, a)} * Math.PI / 180`;
+    return `transforms.translate(${centreExpr(f.id)}, `
+      + `transforms.rotate([${deg('rx')}, ${deg('ry')}, ${deg('rz')}], ${expr}))`;
+  };
 
   if (f.kind === 'box') {
     const size = `[p.${pname(f.id, 'width')}, p.${pname(f.id, 'depth')}, p.${pname(f.id, 'height')}]`;
-    if (!f.round) return `primitives.cuboid({ size: ${size}, center: ${c} })`;
+    if (!f.round) return place(`primitives.cuboid({ size: ${size}, center: ${c} })`);
     if (f.roundStyle === 'chamfer') {
       needs.add('chamferBox');
-      return `chamferBox(${size}, ${c}, p.${pname(f.id, 'round')})`;
+      return place(`chamferBox(${size}, ${c}, p.${pname(f.id, 'round')})`);
     }
-    return `primitives.roundedCuboid({ size: ${size}, center: ${c}, roundRadius: p.${pname(f.id, 'round')} })`;
+    return place(`primitives.roundedCuboid({ size: ${size}, center: ${c}, roundRadius: p.${pname(f.id, 'round')} })`);
   }
 
   if (f.kind === 'cylinder') {
     const r = `p.${pname(f.id, 'radius')}`;
     const h = `p.${pname(f.id, 'height')}`;
-    if (!f.round) return `primitives.cylinder({ radius: ${r}, height: ${h}, center: ${c} })`;
+    if (!f.round) return place(`primitives.cylinder({ radius: ${r}, height: ${h}, center: ${c} })`);
     if (f.roundStyle === 'chamfer') {
       needs.add('chamferCylinder');
-      return `chamferCylinder(${r}, ${h}, ${c}, p.${pname(f.id, 'round')})`;
+      return place(`chamferCylinder(${r}, ${h}, ${c}, p.${pname(f.id, 'round')})`);
     }
-    return `primitives.roundedCylinder({ radius: ${r}, height: ${h}, center: ${c}, roundRadius: p.${pname(f.id, 'round')} })`;
+    return place(`primitives.roundedCylinder({ radius: ${r}, height: ${h}, center: ${c}, roundRadius: p.${pname(f.id, 'round')} })`);
   }
 
   if (f.kind === 'cone') {
     // JSCAD has no cone(): a cylinder whose far end has zero radius is one.
-    return `primitives.cylinderElliptic({ startRadius: [p.${pname(f.id, 'radius')}, p.${pname(f.id, 'radius')}], `
-      + `endRadius: [0, 0], height: p.${pname(f.id, 'height')}, center: ${c} })`;
+    return place(`primitives.cylinderElliptic({ startRadius: [p.${pname(f.id, 'radius')}, p.${pname(f.id, 'radius')}], `
+      + `endRadius: [0, 0], height: p.${pname(f.id, 'height')}, center: ${c} })`);
   }
 
   if (f.kind === 'torus') {
@@ -194,12 +234,15 @@ function featureExpr(f: Feature, needs: Set<string>): string {
     // center, so it has to be moved afterwards or its position parameters would
     // be declared and never read, and the move handles would do nothing.
     needs.add('transforms');
-    return `transforms.translate(${c}, primitives.torus({ innerRadius: p.${pname(f.id, 'tube')}, `
-      + `outerRadius: p.${pname(f.id, 'ring')} }))`;
+    const ring = `primitives.torus({ innerRadius: p.${pname(f.id, 'tube')}, `
+      + `outerRadius: p.${pname(f.id, 'ring')} })`;
+    // torus() has no center of its own either way, so an unrotated one still
+    // needs the translate that place() would otherwise add.
+    return turned ? place(ring) : `transforms.translate(${c}, ${ring})`;
   }
 
   if (f.kind === 'sphere') {
-    return `primitives.sphere({ radius: p.${pname(f.id, 'radius')}, center: ${c} })`;
+    return place(`primitives.sphere({ radius: p.${pname(f.id, 'radius')}, center: ${c} })`);
   }
 
   const args = f.targets.join(', ');
