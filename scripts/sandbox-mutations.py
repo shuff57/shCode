@@ -15,6 +15,7 @@ Every mutation is reverted, including on Ctrl-C.
 """
 
 import io
+import os
 import re
 import subprocess
 import sys
@@ -83,6 +84,34 @@ MUTATIONS = [
         {"THROWN_REBUILD_IS_LABELLED"},
     ),
     (
+        "let a combination be rounded",
+        "lib/model-types.ts",
+        "  if (f.kind === 'combine') {",
+        "  if (false) {",
+        {"FILLET_REFUSES_ON_A_COMBINATION", "FILLET_SAYS_WHY"},
+    ),
+    (
+        "number features by row instead of by kind",
+        "lib/model-types.ts",
+        "    out[f.id] = f.name ?? `${label} ${seen[label]}`;",
+        "    out[f.id] = f.name ?? `${label} ${doc.features.indexOf(f) + 1}`;",
+        {"NAMES_COUNT_PER_KIND"},
+    ),
+    (
+        "stop emitting the chamfer helper",
+        "lib/model-codegen.ts",
+        "      needs.add('chamferBox');",
+        "      void 0;",
+        {"CHAMFER_DIFFERS_FROM_FILLET"},
+    ),
+    (
+        "drop what Build made instead of handing it over",
+        "components/SandboxWorkspace.tsx",
+        "      updateFile('script.js', toJscad(doc));",
+        "      void 0;",
+        {"UNLINK_WRITES_THE_GENERATED_CODE"},
+    ),
+    (
         "treat an emptied model as a no-op",
         "public/jscad/runner.html",
         "\t\tif (!geometry || isEmptyGeometry(geometry)) {",
@@ -90,6 +119,40 @@ MUTATIONS = [
         {"EMPTY_RESULT_IS_FLAGGED"},
     ),
 ]
+
+
+# A mutation is only reverted by the `finally` below, which a hard kill skips.
+# The leftover then looks like ordinary uncommitted work: one of these edits
+# replaces a condition with a shorter valid one, so there is no marker to grep
+# for, and `git diff` is the only thing that shows it. This file is written
+# before any edit and removed on a clean exit -- if it is here at startup, a
+# previous run died holding a mutation.
+LOCK = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".mutations-in-flight")
+
+
+def claim(path, original):
+    with io.open(LOCK, "w", encoding="utf8") as fh:
+        fh.write(path + "\n")
+        fh.write(original)
+
+
+def release():
+    if os.path.exists(LOCK):
+        os.remove(LOCK)
+
+
+def recover():
+    """Put back whatever a killed run left mutated, before doing anything else."""
+    if not os.path.exists(LOCK):
+        return True
+    with io.open(LOCK, encoding="utf8", newline="") as fh:
+        body = fh.read()
+    path, original = body.split("\n", 1)
+    print(f"  a previous run was killed holding a mutation in {path}")
+    write(path, original)
+    release()
+    print("  restored it; re-run to verify\n")
+    return False
 
 
 def read(p):
@@ -105,6 +168,8 @@ def failed_checks(output):
 
 
 def main():
+    if not recover():
+        return 1
     ok = True
     for name, path, find, repl, expect in MUTATIONS:
         original = read(path)
@@ -113,11 +178,13 @@ def main():
             ok = False
             continue
         try:
+            claim(path, original)
             write(path, original.replace(find, repl, 1))
             out = subprocess.run(GATE, capture_output=True, text=True).stdout
             red = failed_checks(out)
         finally:
             write(path, original)
+            release()
 
         missed = expect - red
         if missed:

@@ -7,7 +7,7 @@
     "prebuild": "node scripts/check-lesson-numbers.mjs && node scripts/check-assignment-codes.mjs && node scripts/generate-lessons-manifest.mjs && node scripts/generate-solutions.mjs && node scripts/generate-lesson-starters.mjs",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
-    "test": "node scripts/check-lesson-numbers.mjs && node scripts/check-assignment-codes.mjs && node scripts/test-diagram.mjs && node scripts/test-due-dates.mjs && node scripts/test-quiz.mjs && node scripts/test-grader.mjs && node scripts/test-runner-timeout.mjs && node scripts/test-capstone-requirements.mjs && node scripts/test-shplay.mjs && node scripts/test-uploads.mjs && node scripts/test-jscad.mjs && node scripts/test-jscad-docs.mjs",
+    "test": "node scripts/check-lesson-numbers.mjs && node scripts/check-assignment-codes.mjs && node scripts/test-diagram.mjs && node scripts/test-model-codegen.mjs && node scripts/test-due-dates.mjs && node scripts/test-quiz.mjs && node scripts/test-grader.mjs && node scripts/test-runner-timeout.mjs && node scripts/test-capstone-requirements.mjs && node scripts/test-shplay.mjs && node scripts/test-uploads.mjs && node scripts/test-jscad.mjs && node scripts/test-jscad-docs.mjs",
     "test:lessons": "node scripts/check-lesson-numbers.mjs",
     "test:codes": "node scripts/check-assignment-codes.mjs",
     "test:diagram": "node scripts/test-diagram.mjs",
@@ -19,7 +19,8 @@
     "test:jscad": "node scripts/test-jscad.mjs",
     "test:jscad-docs": "node scripts/test-jscad-docs.mjs",
     "test:sandbox": "python scripts/sandbox-checks.py",
-    "test:sandbox-mutations": "python scripts/sandbox-mutations.py"
+    "test:sandbox-mutations": "python scripts/sandbox-mutations.py",
+    "test:model": "node scripts/test-model-codegen.mjs"
   },
   "type": "module",
   "dependencies": {

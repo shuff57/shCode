@@ -11,6 +11,9 @@ import Console from './Console';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
 import ShPlayDocsContent from './ShPlayDocsContent';
+import ModelEditor from './model/ModelEditor';
+import { EMPTY_DOC, type ModelDoc } from '../lib/model-types';
+import { applyParam, paramValues as docParams, toJscad } from '../lib/model-codegen';
 import { RUNNER_SOURCE, RUN_TIMEOUT_MS } from '../lib/js-runner-source';
 import {
   SANDBOX_MODES,
@@ -20,6 +23,7 @@ import {
 } from '../lib/sandbox-modes';
 
 const MODE_KEY = 'shCode:sandbox-mode';
+const BUILD_KEY = 'shCode:sandbox-jscad-build';
 
 interface LogLine {
   type: string;
@@ -29,6 +33,7 @@ interface LogLine {
 export default function SandboxWorkspace() {
   const setLesson = useLessonStore((s) => s.setLesson);
   const fileContents = useLessonStore((s) => s.fileContents);
+  const updateFile = useLessonStore((s) => s.updateFile);
 
   const [modeId, setModeId] = useState<SandboxModeId>('shplay');
   const mode = useMemo(() => getMode(modeId), [modeId]);
@@ -45,6 +50,12 @@ export default function SandboxWorkspace() {
   const [paramValues, setParamValues] = useState<ParamValues>({});
   const [rebuildMs, setRebuildMs] = useState<number | null>(null);
   const [stale, setStale] = useState<'empty' | 'error' | null>(null);
+
+  // Build mode: the model is a ModelDoc and the code is generated from it.
+  // Toggling to Code shows that generated source, read-only -- editing it would
+  // need the code parsed back into features, which is a permanent non-goal.
+  const [build, setBuild] = useState(false);
+  const [doc, setDoc] = useState<ModelDoc>(EMPTY_DOC);
   const frameRef = useRef<HTMLIFrameElement | null>(null);
   const workerRef = useRef<Worker | null>(null);
 
@@ -59,6 +70,8 @@ export default function SandboxWorkspace() {
       if (saved && SANDBOX_MODES.some((m) => m.id === saved)) {
         setModeId(saved as SandboxModeId);
       }
+      const b = window.localStorage.getItem(BUILD_KEY);
+      if (b === '1') setBuild(true);
     } catch { /* private mode */ }
   }, []);
 
@@ -104,6 +117,11 @@ export default function SandboxWorkspace() {
       } else if (d?.source === 'jscad-rebuilt' && typeof d.ms === 'number') {
         setStale(d.failed ? 'error' : d.empty ? 'empty' : null);
         if (!d.empty && !d.failed) setRebuildMs(d.ms);
+      } else if (d?.source === 'preview-error') {
+        // A script that throws on load never reaches jscad-rebuilt, so without
+        // this the failure is visible only inside the frame — and the panel
+        // goes on showing numbers for a model that was never built.
+        setStale('error');
       }
     };
     window.addEventListener('message', onMessage);
@@ -112,10 +130,50 @@ export default function SandboxWorkspace() {
 
   const setParams = useCallback((next: ParamValues) => {
     setParamValues((prev) => ({ ...prev, ...next }));
+    // Keep the doc in step, or the generated code would still describe the old
+    // numbers the next time a structural edit regenerates it.
+    setDoc((prev) => {
+      let d = prev;
+      for (const [k, v] of Object.entries(next)) {
+        if (typeof v === 'number') d = applyParam(d, k, v);
+      }
+      return d;
+    });
     frameRef.current?.contentWindow?.postMessage(
       { source: 'jscad-set-params', params: next },
       '*'
     );
+  }, []);
+
+  // Leaving Build with something built is the one-way door. The generated file
+  // is handed over to be edited by hand, and the shape tools stop driving it --
+  // going back the other way would mean parsing JavaScript into features, which
+  // is a permanent non-goal.
+  function chooseBuild(on: boolean) {
+    if (!on && doc.features.length > 0) {
+      const ok = window.confirm(
+        'Copy what you built into the code editor? You can edit the code freely '
+        + 'after this, but the shape tools will no longer be driving it.'
+      );
+      if (!ok) return;
+      updateFile('script.js', toJscad(doc));
+      setDoc(EMPTY_DOC);
+    }
+    try { window.localStorage.setItem(BUILD_KEY, on ? '1' : '0'); } catch { /* private mode */ }
+    setBuild(on);
+  }
+
+  // Adding, deleting or reordering changes the shape of the file, so this is
+  // the slow path: regenerate and reload. Changing a number never comes here.
+  const applyDoc = useCallback((next: ModelDoc) => {
+    setDoc(next);
+    setParamDefs([]);
+    setParamValues(() => docParams(next));
+    setRebuildMs(null);
+    setStale(null);
+    setCode(toJscad(next));
+    setRunKey((k) => k + 1);
+    setIsRunning(true);
   }, []);
 
   // ---- Running --------------------------------------------------------------
@@ -383,6 +441,27 @@ export default function SandboxWorkspace() {
             ))}
           </div>
 
+          {isJscad && (
+            <div className="sandbox-modes" role="group" aria-label="Editing mode">
+              <button
+                type="button"
+                aria-pressed={!build}
+                className={!build ? 'sandbox-mode is-active' : 'sandbox-mode'}
+                onClick={() => chooseBuild(false)}
+              >
+                Code
+              </button>
+              <button
+                type="button"
+                aria-pressed={build}
+                className={build ? 'sandbox-mode is-active' : 'sandbox-mode'}
+                onClick={() => chooseBuild(true)}
+              >
+                Build
+              </button>
+            </div>
+          )}
+
           {isRunning ? (
             <button
               className="btn-run"
@@ -417,7 +496,11 @@ export default function SandboxWorkspace() {
 
         <div className="editor-preview-container sandbox-split" id="split">
           <div className="pane" id="editorPane">
-            <CodeEditor />
+            {isJscad && build ? (
+              <ModelEditor doc={doc} onChange={applyDoc} />
+            ) : (
+              <CodeEditor />
+            )}
           </div>
           <div
             className="divider"

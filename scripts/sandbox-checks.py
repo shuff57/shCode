@@ -288,6 +288,75 @@ def run(url, headed):
             (warn.inner_text()[:60].replace(chr(10), " ") if warn else "no warning shown"),
         )
 
+        # ---- the mouse toolbar -----------------------------------------------
+        page.on("dialog", lambda d: d.accept())
+        page.click(".sandbox-mode:has-text('Build')")
+        page.wait_for_selector(".model-tools", timeout=20_000)
+        check("BUILD_TOGGLE_SHOWS_TOOLBAR", page.query_selector(".model-tools") is not None)
+
+        page.click(".model-tools button:has-text('Box')")
+        page.wait_for_timeout(2500)
+        page.click(".model-tools button:has-text('Cylinder')")
+        page.wait_for_timeout(2500)
+        rows = page.query_selector_all(".model-row")
+        check("TOOLBAR_ADDS_SHAPES", len(rows) == 2, f"{len(rows)} rows")
+        check("NAMES_COUNT_PER_KIND",
+              "Cylinder 1" in rows[1].inner_text(), rows[1].inner_text().strip())
+
+        rows[0].click()
+        page.keyboard.down("Control"); rows[1].click(); page.keyboard.up("Control")
+        page.wait_for_timeout(200)
+        page.click(".model-tools button:has-text('Cut')")
+        page.wait_for_timeout(3500)
+        rows = page.query_selector_all(".model-row")
+        check("CUT_ADDS_A_STEP", len(rows) == 3, f"{len(rows)} rows")
+        check("CUT_NAMES_ITS_INPUTS",
+              "Box 1" in rows[2].inner_text() and "Cylinder 1" in rows[2].inner_text(),
+              rows[2].inner_text().strip())
+        cut_shot = canvas_png(page)
+        check("TOOLBAR_BUILT_A_MODEL", len(cut_shot) > 0)
+
+        # Rounding a combination is the refusal that carries the lesson: order
+        # changes the result, so round the box before you cut the hole.
+        rows[2].click(); page.wait_for_timeout(200)
+        fil = page.query_selector(".model-tools button:has-text('Fillet')")
+        check("FILLET_REFUSES_ON_A_COMBINATION", fil.is_disabled())
+        check("FILLET_SAYS_WHY",
+              "not on a combination" in (fil.get_attribute("title") or ""),
+              (fil.get_attribute("title") or "")[:50])
+
+        rows[0].click(); page.wait_for_timeout(200)
+        check("FILLET_ALLOWED_ON_A_BOX",
+              not page.query_selector(".model-tools button:has-text('Fillet')").is_disabled())
+        page.click(".model-tools button:has-text('Fillet')")
+        page.wait_for_timeout(3500)
+        check("FILLET_CHANGES_THE_MODEL", canvas_png(page) != cut_shot)
+        check("FILLET_ADDS_A_DIMENSION",
+              any("corner" in (l.inner_text() or "")
+                  for l in page.query_selector_all(".jscad-param-row > label")))
+
+        fillet_shot = canvas_png(page)
+        page.click(".model-tools button:has-text('Chamfer')")
+        page.wait_for_timeout(3500)
+        # "Different from the fillet" alone is satisfied by "blew up and drew an
+        # error", which is how a broken chamfer helper slips through. Require a
+        # healthy model as well as a changed one.
+        check("CHAMFER_DIFFERS_FROM_FILLET",
+              canvas_png(page) != fillet_shot
+              and page.query_selector(".jscad-params-empty-warn") is None,
+              "stale" if page.query_selector(".jscad-params-empty-warn") else "")
+
+        # Leaving Build hands the generated file over; the dialog auto-accepts.
+        page.click(".sandbox-mode:has-text('Code')")
+        page.wait_for_timeout(1200)
+        # CodeMirror virtualises, so inner_text is only the rendered viewport --
+        # assert on the banner at the top, not on a helper 40 lines down.
+        src = page.inner_text(".cm-content")
+        check("UNLINK_WRITES_THE_GENERATED_CODE",
+              "Built with the shape tools" in src and "JSCAD sandbox" not in src,
+              src[:60].strip().replace(chr(10), " "))
+        check("UNLINK_EMPTIES_THE_TOOLBAR", page.query_selector(".model-tools") is None)
+
         # ---- an edit made before the first render is not dropped -------------
         # Type into the panel while the first build is still running. The edit
         # used to merge into the runner's params and then vanish, because the

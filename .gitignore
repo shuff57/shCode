@@ -45,3 +45,4 @@ __pycache__/
 
 # playwright-cli scratch (console logs + page snapshots), local only
 .playwright-cli/
+scripts/.mutations-in-flight
