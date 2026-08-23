@@ -18,6 +18,14 @@ import { EMPTY_DOC, type ModelDoc } from '../lib/model-types';
 import { applyParam, paramValues as docParams, toJscad } from '../lib/model-codegen';
 import { RUNNER_SOURCE, RUN_TIMEOUT_MS } from '../lib/js-runner-source';
 import {
+  NO_TEACHER_MODES,
+  canUseBuild,
+  canUseCode,
+  resolveMode,
+  whyLocked,
+  type TeacherModes,
+} from '../lib/lesson-mode';
+import {
   SANDBOX_MODES,
   getMode,
   sandboxLesson,
@@ -59,6 +67,9 @@ export default function SandboxWorkspace() {
   const [build, setBuild] = useState(false);
   const [doc, setDoc] = useState<ModelDoc>(EMPTY_DOC);
   const [selected, setSelected] = useState<string[]>([]);
+  // What the student's teachers have set. A failed or missing fetch resolves to
+  // 'both', so a gate that cannot be read never locks anyone out of their work.
+  const [teacherModes, setTeacherModes] = useState<TeacherModes>(NO_TEACHER_MODES);
   // Undo covers structure and dimensions together, because to a student they
   // are the same act: "put it back how it was". Dimension drags land here once,
   // on release, so a drag is one undo rather than sixty.
@@ -75,6 +86,24 @@ export default function SandboxWorkspace() {
   const workerRef = useRef<Worker | null>(null);
 
   useEffect(() => () => { workerRef.current?.terminate(); }, []);
+
+  // A gate arriving after the page has rendered must not leave a student on a
+  // side they are no longer allowed on.
+  useEffect(() => {
+    if (mode.preview !== 'jscad') return;
+    const g = resolveMode('sandbox', teacherModes);
+    if (build && !canUseBuild(g)) setBuild(false);
+    if (!build && !canUseCode(g)) setBuild(true);
+  }, [teacherModes, build, mode.preview]);
+
+  useEffect(() => {
+    let live = true;
+    fetch('/api/my-lesson-modes')
+      .then((r) => (r.ok ? r.json() : NO_TEACHER_MODES))
+      .then((m) => { if (live) setTeacherModes(m ?? NO_TEACHER_MODES); })
+      .catch(() => { /* no gate readable, so no gate applied */ });
+    return () => { live = false; };
+  }, []);
 
   // Restore the last mode before the first paint that matters. Reading in an
   // effect rather than useState's initialiser keeps the server and client
@@ -525,6 +554,13 @@ export default function SandboxWorkspace() {
   const isConsole = mode.preview === 'console';
   const isJscad = mode.preview === 'jscad';
 
+  // The sandbox has no assignment, so only the class-wide gate can reach it.
+  // Per-assignment overrides apply in lessons, where a lesson id exists.
+  const gate = resolveMode('sandbox', teacherModes);
+  const mayBuild = canUseBuild(gate);
+  const mayCode = canUseCode(gate);
+  const lockNote = whyLocked(gate);
+
   return (
     <>
       <TabbedRightDrawer storageKey="shCode:sandbox-drawer" tabs={drawerTabs} />
@@ -550,24 +586,31 @@ export default function SandboxWorkspace() {
           </div>
 
           {isJscad && (
-            <div className="sandbox-modes" role="group" aria-label="Editing mode">
-              <button
-                type="button"
-                aria-pressed={!build}
-                className={!build ? 'sandbox-mode is-active' : 'sandbox-mode'}
-                onClick={() => chooseBuild(false)}
-              >
-                Code
-              </button>
-              <button
-                type="button"
-                aria-pressed={build}
-                className={build ? 'sandbox-mode is-active' : 'sandbox-mode'}
-                onClick={() => chooseBuild(true)}
-              >
-                Build
-              </button>
-            </div>
+            <>
+              <div className="sandbox-modes" role="group" aria-label="Editing mode">
+                <button
+                  type="button"
+                  aria-pressed={!build}
+                  disabled={!mayCode}
+                  title={mayCode ? undefined : lockNote ?? undefined}
+                  className={!build ? 'sandbox-mode is-active' : 'sandbox-mode'}
+                  onClick={() => chooseBuild(false)}
+                >
+                  Code
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={build}
+                  disabled={!mayBuild}
+                  title={mayBuild ? undefined : lockNote ?? undefined}
+                  className={build ? 'sandbox-mode is-active' : 'sandbox-mode'}
+                  onClick={() => chooseBuild(true)}
+                >
+                  Build
+                </button>
+              </div>
+              {lockNote && <span className="sandbox-lock">{lockNote}</span>}
+            </>
           )}
 
           <button className="btn-run" onClick={run}>▶ Run</button>
@@ -717,6 +760,8 @@ export default function SandboxWorkspace() {
         .sandbox-mode:last-child { border-right: 0; }
         .sandbox-mode:hover { color: var(--text); }
         .sandbox-mode.is-active { background: #44475a; color: #f8f8f2; }
+        .sandbox-mode:disabled { opacity: 0.35; cursor: not-allowed; }
+        .sandbox-lock { color: #ffb86c; font-size: 12px; margin-right: 10px; }
         .sandbox-split.editor-preview-container {
           height: auto;
           flex: 1 1 auto;

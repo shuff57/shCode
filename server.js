@@ -84,6 +84,25 @@ app.prepare().then(() => {
   server.post('/api/auth/logout', (_req, res) => {
     res.json({ ok: true });
   });
+  // Teacher gates (migrations/0016_lesson_modes.sql). Held in memory rather
+  // than D1 because this server does not have a D1 binding; the real routes
+  // are functions/api/classes/[id]/lesson-modes.ts and my-lesson-modes.ts.
+  // POST here is dev-only and matches the real POST's body shape so the client
+  // and the browser gate exercise the same path.
+  const devLessonModes = { classDefault: null, lessons: {} };
+  server.get('/api/my-lesson-modes', (_req, res) => {
+    res.json(devLessonModes);
+  });
+  server.post('/api/dev/lesson-modes', express.json(), (req, res) => {
+    const { lessonId, mode } = req.body || {};
+    if (lessonId === '*') devLessonModes.classDefault = mode ?? null;
+    else if (typeof lessonId === 'string') {
+      if (mode) devLessonModes.lessons[lessonId] = mode;
+      else delete devLessonModes.lessons[lessonId];
+    }
+    res.json({ ok: true, ...devLessonModes });
+  });
+
   server.get('/api/lesson-state', (_req, res) => {
     res.json({ states: {}, scores: {}, role: 'teacher' });
   });

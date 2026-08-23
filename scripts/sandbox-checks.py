@@ -534,6 +534,54 @@ def run(url, headed):
               src[:60].strip().replace(chr(10), " "))
         check("UNLINK_EMPTIES_THE_TOOLBAR", page.query_selector(".model-tools") is None)
 
+        # ---- the teacher gate --------------------------------------------------
+        # Both gates share one table; the sandbox has no assignment, so only the
+        # class-wide one can reach it. A gate that cannot be read must never
+        # lock a student out, which is why the default is both.
+        import json as _json
+
+        def set_gate(mode):
+            page.evaluate(
+                """async (m) => {
+                     await fetch('/api/dev/lesson-modes', {
+                       method: 'POST',
+                       headers: {'Content-Type': 'application/json'},
+                       body: JSON.stringify({ lessonId: '*', mode: m }),
+                     });
+                   }""",
+                mode,
+            )
+            page.reload(wait_until="domcontentloaded")
+            page.wait_for_selector(".sandbox-mode", timeout=60_000)
+            page.wait_for_timeout(1200)
+
+        def toggle(name):
+            for b in page.query_selector_all(".sandbox-modes button"):
+                if b.inner_text().strip() == name:
+                    return b
+            return None
+
+        set_gate("visual")
+        check("GATE_VISUAL_DISABLES_CODE", toggle("Code").is_disabled())
+        check("GATE_VISUAL_KEEPS_BUILD", not toggle("Build").is_disabled())
+        check("GATE_FORCES_THE_ALLOWED_SIDE",
+              page.query_selector(".model-tools") is not None
+              or toggle("Build").get_attribute("aria-pressed") == "true")
+        check("GATE_SAYS_WHY",
+              page.query_selector(".sandbox-lock") is not None
+              and "class" in page.inner_text(".sandbox-lock"),
+              page.inner_text(".sandbox-lock") if page.query_selector(".sandbox-lock") else "no note")
+
+        set_gate("code")
+        check("GATE_CODE_DISABLES_BUILD", toggle("Build").is_disabled())
+        check("GATE_CODE_KEEPS_CODE", not toggle("Code").is_disabled())
+        check("GATE_MOVED_STUDENT_OFF_BUILD", page.query_selector(".model-tools") is None)
+
+        set_gate(None)
+        check("NO_GATE_ALLOWS_BOTH",
+              not toggle("Code").is_disabled() and not toggle("Build").is_disabled())
+        check("NO_GATE_SHOWS_NO_NOTE", page.query_selector(".sandbox-lock") is None)
+
         # ---- an edit made before the first render is not dropped -------------
         # Type into the panel while the first build is still running. The edit
         # used to merge into the runner's params and then vanish, because the
