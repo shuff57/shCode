@@ -32,9 +32,33 @@ module.exports = function run(dir) {
   vm.runInContext(fs.readFileSync(bundlePath, 'utf8'), sandbox);
   const M = sandbox.jscadModeling;
 
+  // The generator emits shCAD names (box, tube, ball, extrude, turn), which are
+  // globals installed by simple.js — so the geometry checks below cannot run
+  // without it. That is a real dependency, not a test convenience: the code we
+  // generate genuinely does not work without simple.js loaded, which is also
+  // why it no longer runs unmodified on jscad.app.
+  const simplePath = path.join(__dirname, '..', 'public', 'jscad', 'simple.js');
+  if (!fs.existsSync(simplePath)) {
+    console.log('  FAIL  public/jscad/simple.js is missing — the generated code needs it');
+    return false;
+  }
+  vm.runInContext(fs.readFileSync(simplePath, 'utf8'), sandbox);
+  for (const n of ['box', 'tube', 'ball', 'extrude', 'turn']) {
+    if (typeof sandbox[n] !== 'function') {
+      console.log(`  FAIL  simple.js did not expose ${n}()`);
+      return false;
+    }
+  }
+
   function build(src) {
     const mod = { exports: {} };
-    new Function('require', 'module', src)((n) => {
+    // Run inside the same context simple.js populated, so the shCAD globals the
+    // generated code calls are actually in scope.
+    const run = vm.runInContext(
+      '(function (require, module) {' + src + String.fromCharCode(10) + '})',
+      sandbox
+    );
+    run((n) => {
       if (n !== '@jscad/modeling') throw new Error('unexpected require: ' + n);
       return M;
     }, mod);
@@ -53,11 +77,12 @@ module.exports = function run(dir) {
   console.log('\n=== codegen shape ===');
 
   const plain = gen.toJscad(doc(box('b1')));
-  check('a plain box is a cuboid', plain.includes('primitives.cuboid('));
+  check('a plain box is a shCAD box', plain.includes('box(p.b1_width, p.b1_depth, p.b1_height'));
+  check('...positional, never the object form box() refuses', !plain.includes('box({'));
   check('no hulls import when nothing needs it', !plain.includes('hulls'));
 
   const filleted = gen.toJscad(doc(box('b1', { round: 4, roundStyle: 'fillet' })));
-  check('a filleted box is roundedCuboid', filleted.includes('primitives.roundedCuboid('));
+  check('a filleted box passes roundRadius to box', filleted.includes('roundRadius: p.b1_round'));
 
   const chamfered = gen.toJscad(doc(box('b1', { round: 4, roundStyle: 'chamfer' })));
   check('a chamfered box uses the hull helper', chamfered.includes('function chamferBox('));
@@ -68,7 +93,8 @@ module.exports = function run(dir) {
   check('a chamfered cylinder uses its own helper', chamCyl.includes('function chamferCylinder('));
 
   const filCyl = gen.toJscad(doc(cyl('c1', { round: 2, roundStyle: 'fillet' })));
-  check('a filleted cylinder is roundedCylinder', filCyl.includes('primitives.roundedCylinder('));
+  check('a filleted cylinder passes roundRadius to tube',
+    filCyl.includes('tube(') && filCyl.includes('roundRadius: p.c1_round'));
 
   console.log('\n=== order is the lesson ===');
 
@@ -179,14 +205,18 @@ module.exports = function run(dir) {
 
   const flat = gen.toJscad(doc(box('b1')));
   const turnedSrc = gen.toJscad(doc(box('b1', { rotate: [0, 0, 45] })));
-  check('an unrotated shape carries no rotate call', !flat.includes('transforms.rotate('));
-  check('a turned shape is rotated', turnedSrc.includes('transforms.rotate('));
-  check('...in degrees, converted', turnedSrc.includes('Math.PI / 180'));
-  // Built at the origin then moved, never the other way round: JSCAD rotates
-  // about the world origin, so a shape built at its final position would swing
-  // around the middle of the scene instead of its own centre.
-  check('...built at the origin, then placed',
-    turnedSrc.includes('center: [0, 0, 0]') && turnedSrc.includes('transforms.translate([p.b1_x'));
+  check('an unrotated shape carries no turn call', !flat.includes('turn('));
+  check('a turned shape is turned', turnedSrc.includes('turn([p.b1_rx, p.b1_ry, p.b1_rz]'));
+  // shCAD's turn takes degrees. The conversion this used to emit is gone, and
+  // its absence is worth asserting: a stray Math.PI/180 would silently divide
+  // every angle by 57 and still produce a plausible-looking model.
+  check('...in degrees, with no conversion left behind',
+    !turnedSrc.includes('Math.PI / 180'));
+  // The build-at-origin scaffolding is gone because turn() does that work
+  // itself. It was never wrong -- only redundant once turn arrived. The shape
+  // is now built where it belongs and turned in place.
+  check('...built where it belongs, not at the origin and moved',
+    !turnedSrc.includes('center: [0, 0, 0]') && turnedSrc.includes('center: [p.b1_x'));
   check('an unrotated shape declares no angles',
     !gen.generatedParams(doc(box('b1'))).some((p) => p.name.endsWith('_rz')));
   check('a turned one does',

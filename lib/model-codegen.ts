@@ -7,8 +7,16 @@
 // source stays byte-identical while any number moves, so nothing reloads. Only
 // adding, deleting or reordering a feature regenerates the file.
 //
-// The generated file is a legitimate parametric JSCAD script and runs unmodified
-// on jscad.app.
+// It emits shCAD spellings -- box, tube, ball, extrude, turn -- which are
+// globals installed by public/jscad/simple.js, so a student reads the same names
+// the lessons teach rather than a second dialect alongside them.
+//
+// THE COST, stated because it used to be a selling point: the generated file no
+// longer runs unmodified on jscad.app. Those names exist only in our runner.
+// Cone, Ring and the sketch outline have no shCAD twin yet (cylinderElliptic,
+// torus, polygon), so those lines are still raw JSCAD and the file is currently
+// mixed. Booleans and translate stay JSCAD deliberately -- they are already
+// short and array-first, and have no shCAD twin by design.
 
 import { solveSketch, type Point } from './sketch-solve';
 import {
@@ -289,39 +297,47 @@ function centreExpr(id: string): string {
 
 /** The expression that builds one feature, and which helpers it needs. */
 function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>): string {
-  // A rotated shape is built at the origin, turned, then moved into place --
-  // JSCAD rotates about the world origin, so a shape built at its final
-  // position would swing around the middle of the scene instead of its own.
+  // shCAD's turn() measures the shape's own middle, brings it to the origin,
+  // rotates, and puts it back -- so it commutes with translate and the shape is
+  // simply built where it belongs. Measured on a 40x20x10 box moved to x=50 and
+  // turned 90: turn lands on [[40,-20,-5],[60,20,5]], identical to the
+  // build-at-origin-then-translate order this used to emit, and NOT on the
+  // [[-10,30,-5],[10,70,5]] that raw rotate-after-translate gives.
+  //
+  // The scaffolding that ordering required was never wrong -- it is newly
+  // redundant, because turn now does that work inside itself.
   const turned = canRotate(f) && f.rotate !== undefined;
-  const c = !isShape(f) ? '' : turned ? '[0, 0, 0]' : centreExpr(f.id);
+  const c = !isShape(f) ? '' : centreExpr(f.id);
 
   const place = (expr: string) => {
     if (!turned) return expr;
-    needs.add('transforms');
-    const deg = (a: string) => `p.${pname(f.id, a)} * Math.PI / 180`;
-    return `transforms.translate(${centreExpr(f.id)}, `
-      + `transforms.rotate([${deg('rx')}, ${deg('ry')}, ${deg('rz')}], ${expr}))`;
+    // Degrees, and turn takes all three axes as an array.
+    const d = (a: string) => `p.${pname(f.id, a)}`;
+    return `turn([${d('rx')}, ${d('ry')}, ${d('rz')}], ${expr})`;
   };
 
   if (f.kind === 'box') {
     const size = `[p.${pname(f.id, 'width')}, p.${pname(f.id, 'depth')}, p.${pname(f.id, 'height')}]`;
-    if (!f.round) return place(`primitives.cuboid({ size: ${size}, center: ${c} })`);
+    // shCAD takes plain numbers; the { size: [...] } spelling belongs to cuboid
+    // and box() throws on it deliberately, so there is one way to write each.
+    const dims = `p.${pname(f.id, 'width')}, p.${pname(f.id, 'depth')}, p.${pname(f.id, 'height')}`;
+    if (!f.round) return place(`box(${dims}, { center: ${c} })`);
     if (f.roundStyle === 'chamfer') {
       needs.add('chamferBox');
       return place(`chamferBox(${size}, ${c}, p.${pname(f.id, 'round')})`);
     }
-    return place(`primitives.roundedCuboid({ size: ${size}, center: ${c}, roundRadius: p.${pname(f.id, 'round')} })`);
+    return place(`box(${dims}, { center: ${c}, roundRadius: p.${pname(f.id, 'round')} })`);
   }
 
   if (f.kind === 'cylinder') {
     const r = `p.${pname(f.id, 'radius')}`;
     const h = `p.${pname(f.id, 'height')}`;
-    if (!f.round) return place(`primitives.cylinder({ radius: ${r}, height: ${h}, center: ${c} })`);
+    if (!f.round) return place(`tube(${r}, ${h}, { center: ${c} })`);
     if (f.roundStyle === 'chamfer') {
       needs.add('chamferCylinder');
       return place(`chamferCylinder(${r}, ${h}, ${c}, p.${pname(f.id, 'round')})`);
     }
-    return place(`primitives.roundedCylinder({ radius: ${r}, height: ${h}, center: ${c}, roundRadius: p.${pname(f.id, 'round')} })`);
+    return place(`tube(${r}, ${h}, { center: ${c}, roundRadius: p.${pname(f.id, 'round')} })`);
   }
 
   if (f.kind === 'cone') {
@@ -344,7 +360,7 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
   }
 
   if (f.kind === 'sphere') {
-    return place(`primitives.sphere({ radius: p.${pname(f.id, 'radius')}, center: ${c} })`);
+    return place(`ball(p.${pname(f.id, 'radius')}, { center: ${c} })`);
   }
 
   if (f.kind === 'sketch') {
@@ -406,7 +422,7 @@ function chamferBox(size, center, c) {
 // plane is extruded flat first and the SOLID turned afterwards. Turning the
 // outline first is not possible -- a geom2 has no third axis to turn into.
 function extrudeOnPlane(sketch, height, plane, offset) {
-  const solid = extrusions.extrudeLinear({ height }, sketch)
+  const solid = extrude(height, sketch)
   if (plane === 'xz') return transforms.translate([0, offset, 0], transforms.rotateX(Math.PI / 2, solid))
   if (plane === 'yz') return transforms.translate([offset, 0, 0], transforms.rotateY(-Math.PI / 2, solid))
   return transforms.translate([0, 0, offset], solid)
