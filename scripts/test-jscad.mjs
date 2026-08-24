@@ -37,6 +37,7 @@
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import vm from 'node:vm';
 import { join, relative } from 'node:path';
 import {
   REPO, PATHS, extractShim, runnerSource, loadModeling, loadRenderer,
@@ -50,6 +51,30 @@ import {
   ENTITY_GEOMETRY_KEYS, DOC_SYNC_EXCEPTIONS, MIN_DOC_EXAMPLES, FENCE_TAGS,
   REACH_CHAIN, REACH_LESSON, REACH_SHPLAY,
 } from './jscad-checks.mjs';
+import {
+  SIMPLE_PATH, SHCAD_NAMES, EXPECTED_SHCAD_NAME_COUNT, SHCAD_REPORT_GLOBALS,
+  SHCAD_OPTION_KEYS, EQUIVALENTS, TURN_IN_PLACE, POSITIONAL_CONTRACT, GUARDS,
+  NO_OPTIONS_CONTRACT, ARITY_GUARDS, RING_ARITHMETIC, POLY_BARE_ARRAY, WRAPS_BOX,
+  SILENTLY_DROPPED,
+  REFUSALS_OVERTURNED, ASSIGNMENT_POOL,
+  INTEROP, SEEDED_COLLISION, GRADUATION, GRADUATION_TRIPWIRES,
+  TURN_COMPOSITION, REFUSALS_NAME_THE_REAL_CALL, REVERSE_LOOKUP, readReverseTable,
+  BORROWED_ASSERTIONS, createSvgContext, SVG_CASES, SVG_MARGIN,
+  readGraduationTable, createGraduationContext, createSimpleContext, sameGeometry,
+  sameModel,
+  BOOK_CENSUS, BRIDGE, readBridgeTable, BRIDGE_WARNINGS, SIT_VS_BOOK_ALIGN,
+  BOOK_IDENTIFIERS, REFUSAL_CALLS, evaluateInShcad,
+  BOOK_OPTION_KEYS, OBJECT_DEPTH, PARAM_DEFAULTS, shcadSection, liveObjectLiterals,
+  PARAM_TYPES, readFirstColumn, paramProgram,
+  BOOK_OPTION_WORDS,
+  PORTABLE, PORTABLE_FIXTURES, PORTABLE_LEAVES_ALONE, PORTABLE_REFUSES,
+  PORTABLE_RESPONDS, numericLiterals, replaceLiteral,
+  moduleWitnesses, PORTABLE_OPTION_PROBES, sampleCall,
+  equivalentText, normaliseCall, programAround, returnedExpression,
+} from './jscad-simple-checks.mjs';
+import {
+  convert, RULES, RULE_NAMES, MODULE_OF, MODULE_ORDER, TURN_HELPER,
+} from '../lib/jscad-portable.mjs';
 
 const argv = process.argv.slice(2);
 const WANT_JSON = argv.includes('--json');
@@ -648,6 +673,2080 @@ check('the shPlay docs still load the shPlay runner', () => assertHop(REACH_SHPL
 check('a lesson with preview:"jscad" would mount the JSCAD runner', () => assertHop(REACH_LESSON, REACH_LESSON.file));
 
 // ===========================================================================
+// SIMPLE  (shCAD — public/jscad/simple.js, the layer Q3 actually teaches)
+// ===========================================================================
+//
+// The six groups above all measure the REAL API. shCAD is a second, simplified
+// vocabulary sitting on top of it, and the whole reason it is safe is three
+// claims that were previously only prose:
+//
+//   ADDITIVE  none of its nine names exists before simple.js runs, and no real
+//             JSCAD name is a different value afterwards. The API group's
+//             "same reference bare as namespaced" check is re-run downstream
+//             of simple.js here, so a shCAD name that shadowed a real one
+//             would fail loudly instead of quietly.
+//   REAL      every call returns byte-identical geometry to the real API call
+//             it stands for — compared the same way the API group compares
+//             bare and namespaced construction, only stricter, because a
+//             polygon count alone would not notice a synthesised center.
+//   OBJECTS   required values are positional and every named extra rides in an
+//             optional trailing { }. box(40,20,10) has no punctuation in it;
+//             box(40,20,10,{center:…}) is the first object literal a student
+//             writes, and it arrives because the model needed it.
+//
+// turn() is the one name deliberately EXEMPT from the identity bar, because it
+// rotates in place rather than about the world origin. It is asserted against
+// the opposite expectation instead — including a counter-case that fails if it
+// ever silently becomes a pure rename of transforms.rotate.
+//
+// Expectations live in scripts/jscad-simple-checks.mjs. A red check here is
+// closed by fixing public/jscad/simple.js, never by loosening one of them.
+
+at('simple');
+
+check('simple.js is vendored in public/jscad and loaded by the runner', () => {
+  if (!existsSync(SIMPLE_PATH)) return `missing ${relative(REPO, SIMPLE_PATH)}`;
+  const html = runnerSource();
+  const tag = html.indexOf('src="./simple.js"');
+  if (tag === -1) return 'runner.html does not load ./simple.js';
+  // Order is the whole contract: after the shim, so shCAD can see every real
+  // name and refuse to overwrite one; before the ?code= injection, so a
+  // student's own declaration still wins over a shCAD name.
+  const shimEnds = html.indexOf('window.__jscadBareNamesLost = lost;');
+  const codeInjection = html.indexOf("params.get('code')");
+  if (!(shimEnds < tag)) return 'simple.js is loaded before the shim has finished installing';
+  if (!(tag < codeInjection)) return 'simple.js is loaded after the student code is injected';
+  return true;
+});
+
+check('none of the shCAD names exists before simple.js loads', () => {
+  const { before } = createSimpleContext();
+  const already = SHCAD_NAMES.filter((n) => before.includes(n.name)).map((n) => n.name);
+  return already.length
+    ? `${already.join(', ')} already existed — shCAD must only ever add NEW names`
+    : true;
+});
+
+check('simple.js adds exactly the shCAD names and nothing else', () => {
+  const { added } = createSimpleContext();
+  const want = [...SHCAD_NAMES.map((n) => n.name), ...SHCAD_REPORT_GLOBALS].sort();
+  const got = [...added].sort();
+  return same(got, want) ? true : `globals added: ${JSON.stringify(got)}, expected ${JSON.stringify(want)}`;
+});
+
+check('the shCAD surface is the expected size', () => {
+  const { window: w } = createSimpleContext();
+  const installed = SHCAD_NAMES.filter((n) => typeof w[n.name] === 'function');
+  if (installed.length !== SHCAD_NAMES.length) {
+    const missing = SHCAD_NAMES.filter((n) => typeof w[n.name] !== 'function').map((n) => n.name);
+    return `not installed as functions: ${missing.join(', ')}`;
+  }
+  return eq(installed.length, EXPECTED_SHCAD_NAME_COUNT, 'shCAD names');
+});
+
+// The decisive additive-ness check, run on the far side of simple.js. The API
+// group asserts bare === namespaced with only the shim loaded; this asserts
+// that loading shCAD on top changed none of those answers.
+check('no real JSCAD name was overwritten by shCAD', () => {
+  const { window: w, jscad } = createSimpleContext();
+  const collisions = new Set(DOCUMENTED_COLLISIONS.map((c) => c.name));
+  const bad = [];
+  for (const mod of EXPECTED_MODULE_ORDER) {
+    if (jscad[mod] !== undefined && w[mod] !== jscad[mod]) bad.push(mod);
+    for (const k of Object.keys(jscad[mod] || {})) {
+      if (collisions.has(k)) continue;
+      if (w[k] !== undefined && w[k] !== jscad[mod][k]) bad.push(`${mod}.${k}`);
+    }
+  }
+  return bad.length ? `shCAD changed what these names resolve to: ${bad.join(', ')}` : true;
+});
+
+check('none of the shCAD names is a real JSCAD name in disguise', () => {
+  const { jscad } = loadModeling();
+  const clashes = [];
+  for (const n of SHCAD_NAMES) {
+    if (jscad[n.name] !== undefined) clashes.push(`<module> ${n.name}`);
+    for (const mod of EXPECTED_MODULE_ORDER) {
+      if ((jscad[mod] || {})[n.name] !== undefined) clashes.push(`${mod}.${n.name}`);
+    }
+  }
+  return clashes.length
+    ? `shCAD name shadows the library: ${clashes.join(', ')} — every shCAD name must be a NEW word`
+    : true;
+});
+
+check('shCAD does not move the shim tripwires', () => {
+  const { window: w, jscad, skipped } = createSimpleContext();
+  if (!same(skipped, DOCUMENTED_COLLISIONS.map((c) => c.name))) {
+    return `__jscadBareNamesSkipped changed to ${JSON.stringify(skipped)}`;
+  }
+  let n = 0;
+  for (const m of EXPECTED_MODULE_ORDER) {
+    if (w[m] !== undefined) n++;
+    for (const k of Object.keys(jscad[m] || {})) if (w[k] !== undefined) n++;
+  }
+  n -= DOCUMENTED_COLLISIONS.length;
+  return eq(n, EXPECTED_BARE_NAME_COUNT, 'bare names after simple.js');
+});
+
+check('a shCAD name that cannot be installed is reported, not swallowed', () => {
+  const cap = captureConsole();
+  const { window: w } = createSimpleContext({
+    preSeed: { [SEEDED_COLLISION.name]: SEEDED_COLLISION.value },
+    consoleImpl: cap.console,
+  });
+  const report = w.__shcadNamesSkipped;
+  if (!Array.isArray(report)) return 'simple.js publishes no __shcadNamesSkipped';
+  if (!report.includes(SEEDED_COLLISION.name)) {
+    return `expected '${SEEDED_COLLISION.name}' in the skipped list, got ${JSON.stringify(report)}`;
+  }
+  if (w[SEEDED_COLLISION.name] !== SEEDED_COLLISION.value) {
+    return 'shCAD overwrote a name something else already owned';
+  }
+  const warned = cap.lines.filter((l) => l.type === 'warn' && /shCAD/.test(l.text));
+  return warned.length ? true : 'nothing was written to the console about the skipped name';
+});
+
+check('nothing is skipped in a clean context', () => {
+  const { window: w } = createSimpleContext();
+  return same(w.__shcadNamesSkipped, []) ? true : `skipped ${JSON.stringify(w.__shcadNamesSkipped)}`;
+});
+
+check('shCAD invents no option key of its own', () => {
+  const invented = [];
+  for (const n of SHCAD_NAMES) {
+    for (const k of n.options) if (!SHCAD_OPTION_KEYS.includes(k)) invented.push(`${n.name}.${k}`);
+  }
+  if (invented.length) return `option keys outside the sanctioned set: ${invented.join(', ')}`;
+  // And the keys are really the ones the file offers, not just the ones this
+  // gate hoped for: a key shCAD refuses is named in its own error message.
+  const { window: w } = createSimpleContext();
+  try {
+    w.box(10, 10, 10, { thickness: 2 });
+    return 'box accepted an option it does not have';
+  } catch (e) {
+    return SHCAD_OPTION_KEYS.every((k) => e.message.includes(k))
+      ? true
+      : `box's refusal does not list its real keys: ${e.message}`;
+  }
+});
+
+// The identity bar. Same idea as API's "bare and namespaced calls build
+// identical geometry", one step stricter: the whole serialised geometry, not
+// just a polygon count, because a count would not notice a changed default.
+for (const e of EQUIVALENTS) {
+  check(`${e.label} builds exactly what the real API builds`, () => {
+    const { window: w, jscad } = createSimpleContext();
+    const mine = e.shcad(w);
+    if (!isGeometry(mine)) return 'shCAD returned nothing the renderer could draw';
+    const theirs = e.real(jscad);
+    return sameGeometry(mine, theirs);
+  });
+}
+
+// turn() is exempt from the bar above BY DESIGN, so it is pinned to the
+// opposite expectation here. `orbits` is the counter-case: the day it equals
+// `expect`, turn has become a pure rename and the silent wrong answer it was
+// built to close is back.
+for (const t of TURN_IN_PLACE) {
+  check(`turn rotates in place — ${t.label}`, () => {
+    const { window: w } = createSimpleContext();
+    const turned = t.shcad(w);
+    if (!isGeometry(turned)) return 'turn returned nothing the renderer could draw';
+    const box = Array.isArray(turned)
+      ? w.measureAggregateBoundingBox(turned)
+      : w.measureBoundingBox(turned);
+    if (!same(box, t.expect)) {
+      return `turned to ${JSON.stringify(box)}, expected ${JSON.stringify(t.expect)}`;
+    }
+    const orbited = t.orbit(w);
+    const orbitBox = Array.isArray(orbited)
+      ? w.measureAggregateBoundingBox(orbited)
+      : w.measureBoundingBox(orbited);
+    if (!same(orbitBox, t.orbits)) {
+      return `the real rotate now lands on ${JSON.stringify(orbitBox)} — the measurement this name is built on has moved`;
+    }
+    return same(box, orbitBox)
+      ? 'turn and transforms.rotate now agree — turn has silently become a pure rename'
+      : true;
+  });
+}
+
+// turn's SECOND divergence from rotate, which for a while was neither
+// documented nor tested: rotating about the shape's own middle COMMUTES with
+// translate, and rotating about the world origin does not. So the "order
+// matters" phenomenon — §9.2's composition topic — cannot be shown with turn at
+// all. Both halves are pinned: turn must commute, and the real rotate must
+// still not, because the whole argument rests on the second one being true.
+for (const t of TURN_COMPOSITION) {
+  check(`turn commutes with translate, rotate does not — ${t.label}`, () => {
+    const { window: w, jscad } = createSimpleContext();
+
+    const turnedThenMoved = w.translate(t.move, w.turn(t.degrees, t.build(w)));
+    const movedThenTurned = w.turn(t.degrees, w.translate(t.move, t.build(w)));
+    if (!sameModel(jscad, turnedThenMoved, movedThenTurned)) {
+      return 'turn no longer commutes with translate — it has stopped rotating in place, '
+        + 'and the banner in simple.js plus the reference.md section on it are now wrong';
+    }
+
+    const spunThenMoved = w.translate(t.move, w.rotate(t.radians, t.build(w)));
+    const movedThenSpun = w.rotate(t.radians, w.translate(t.move, t.build(w)));
+    if (sameModel(jscad, spunThenMoved, movedThenSpun)) {
+      return 'transforms.rotate now commutes with translate too — the world-origin pivot '
+        + 'this whole name is built on has changed under it';
+    }
+    return true;
+  });
+}
+
+check('the loss turn causes is written down where a student will read it', () => {
+  const md = readFileSync(GRADUATION.path, 'utf8');
+  // The claim that used to stand here — "`turn` teaches why you build at the
+  // origin and translate last" — is a claim turn makes UNOBSERVABLE, because
+  // with turn the order makes no difference at all. It must not come back.
+  // (\s+ spans the line wrap either way round, CRLF included.)
+  if (/teaches why you build\s+at the origin/.test(md)) {
+    return 'reference.md still claims turn teaches the build-at-the-origin lesson — '
+      + 'turn is the one name that makes that lesson impossible to observe';
+  }
+  return /cannot be shown with `turn`/i.test(md)
+    ? true
+    : 'reference.md does not say that the order of transforms cannot be shown with turn';
+});
+
+// reference.md cites another session's assertion instead of restating the
+// world-origin fact. That citation is only worth more than a paragraph while
+// the thing it points at still exists — so the rename breaks OUR build, which
+// is where the maintenance burden belongs.
+at('svg');
+
+// stl/3mf/obj all serialize polygons, so a geom2 — every §8.2 and §8.3 design —
+// had no way out of the app at all. A8.2.1 asks for exactly that file.
+for (const t of SVG_CASES) {
+  check(`svg: ${t.label}`, () => {
+    const { svg, window: w, jscad } = createSvgContext();
+    const out = svg.serialize(jscad, t.build(w));
+    if (out === null) return 'serialize returned null for a 2D design';
+    const paths = (out.match(/<path /g) || []).length;
+    const subpaths = (out.match(/M /g) || []).length;
+    // paths = shapes, subpaths = loops. A hole is where they differ, and
+    // fill-rule only resolves loops inside ONE element — see SVG_CASES.
+    if (paths !== t.paths) return `${paths} <path> elements, expected ${t.paths}`;
+    if (subpaths !== t.subpaths) {
+      return `${subpaths} subpaths, expected ${t.subpaths} — a hole emitted as its own `
+        + '<path> is drawn as a filled shape in the fill colour, not as a hole';
+    }
+    return true;
+  });
+}
+
+check('svg: up is up — the y axis is flipped for SVG', () => {
+  const { svg, window: w, jscad } = createSvgContext();
+  const meanY = (g) => {
+    const ys = [...svg.serialize(jscad, g).matchAll(/[ML] [-\d.]+ ([-\d.]+)/g)].map((m) => +m[1]);
+    return ys.reduce((a, b) => a + b, 0) / ys.length;
+  };
+  const up = meanY(w.translate([0, 20], w.disc(3)));
+  const down = meanY(w.translate([0, -20], w.disc(3)));
+  // SVG y grows DOWN, so the disc JSCAD put at y=+20 must have the SMALLER y.
+  // Without the flip these swap and the design is mirrored — which still looks
+  // like a design, and is wrong in the way nobody notices until it is cut out.
+  if (!(up < 0 && down > 0)) return `mirrored: y=+20 came out at ${up}, y=-20 at ${down}`;
+  return up < down ? true : `mirrored: +20 -> ${up}, -20 -> ${down}`;
+});
+
+check('svg: a solid is refused rather than written empty', () => {
+  const { svg, window: w, jscad } = createSvgContext();
+  if (svg.serialize(jscad, w.ball(5)) !== null) return 'a geom3 produced an SVG';
+  const mixed = svg.serialize(jscad, [w.rect(10, 10), w.ball(5)]);
+  return /<path /.test(mixed) ? true : 'a mixed 2D/3D return dropped the 2D half';
+});
+
+check('svg: the viewBox is the design plus a margin', () => {
+  const { svg, window: w, jscad } = createSvgContext();
+  const g = w.rect(40, 20);
+  const vb = /viewBox="([^"]+)"/.exec(svg.serialize(jscad, g))[1].split(/\s+/).map(Number);
+  const bb = jscad.measurements.measureBoundingBox(g);
+  const wantW = (bb[1][0] - bb[0][0]) + SVG_MARGIN * 2;
+  const wantH = (bb[1][1] - bb[0][1]) + SVG_MARGIN * 2;
+  return Math.abs(vb[2] - wantW) < 0.01 && Math.abs(vb[3] - wantH) < 0.01
+    ? true
+    : `viewBox is ${vb[2]} x ${vb[3]}, the design plus margin is ${wantW} x ${wantH}`;
+});
+
+check('svg: the runner offers the button and loads the file', () => {
+  const html = readFileSync(join(REPO, 'public/jscad/runner.html'), 'utf8');
+  if (!/<script src="\.\/svg\.js">/.test(html)) return 'runner.html does not load svg.js';
+  if (!/data-format="svg"/.test(html)) return 'there is no Save SVG button';
+  return /svg:\s*\{\s*name: 'design\.svg'/.test(html) ? true : 'svg is not in FORMATS';
+});
+
+for (const b of BORROWED_ASSERTIONS) {
+  check(`the borrowed assertion still exists: "${b.name}"`, () => {
+    const md = readFileSync(GRADUATION.path, 'utf8');
+    if (!md.includes(b.name)) {
+      return `reference.md no longer cites "${b.name}" in ${b.cited} — if the citation was `
+        + 'removed on purpose, remove its BORROWED_ASSERTIONS entry too; a half-removed '
+        + 'citation is the rot';
+    }
+    let src;
+    try {
+      src = readFileSync(join(REPO, b.file), 'utf8');
+    } catch {
+      return `${b.file} is gone, and reference.md sends a student to it. `
+        + `Owned by ${b.owner} — ask them where it went, then fix both.`;
+    }
+    return src.includes(b.name)
+      ? true
+      : `${b.file} no longer contains the assertion "${b.name}". It was renamed or deleted `
+        + `by ${b.owner}. Find the new name, then update BORROWED_ASSERTIONS and the citation `
+        + 'in reference.md TOGETHER. Do not delete this check to go green — that is the '
+        + 'citation rotting, which is what it exists to catch.';
+  });
+}
+
+// Every refusal has to hand the student the real function. Measured before
+// this existed: only the object-first errors did, so revolve(profile, {angle})
+// — which §9.1's own worked example invites — was a dead end in the one
+// chapter revolve exists for.
+for (const r of REFUSALS_NAME_THE_REAL_CALL) {
+  check(`refusal names the real call: ${r.what}`, () => {
+    const { window: w } = createSimpleContext();
+    let out;
+    try {
+      out = r.run(w);
+    } catch (e) {
+      if (!e.message.includes(r.names)) {
+        return `the message never names ${r.names}, so there is nowhere to go: ${e.message}`;
+      }
+      if (r.spells && !r.spells.test(e.message)) {
+        return `the message names ${r.names} but does not spell out the call: ${e.message}`;
+      }
+      return true;
+    }
+    return `accepted and ignored${r.why ? ` — ${r.why}` : ''}. Got ${isGeometry(out) ? 'geometry' : String(out)}`;
+  });
+}
+
+// The positional-plus-options contract, on five of the nine names.
+for (const c of POSITIONAL_CONTRACT) {
+  check(`${c.name}: positional day one, one brace day two`, () => {
+    const { window: w } = createSimpleContext();
+
+    const plain = c.bare(w);
+    if (!isGeometry(plain)) return `${c.name}(...) with no options returned nothing drawable`;
+    if (!same(w.measureBoundingBox(plain), c.bareBox)) {
+      return `bare call measured ${JSON.stringify(w.measureBoundingBox(plain))}, expected ${JSON.stringify(c.bareBox)}`;
+    }
+
+    const withOpts = c.withOptions(w);
+    if (!isGeometry(withOpts)) return 'the options form returned nothing drawable';
+    if (!same(w.measureBoundingBox(withOpts), c.optionBox)) {
+      return `the option did not move the model: ${JSON.stringify(w.measureBoundingBox(withOpts))}`;
+    }
+    if (same(w.measureBoundingBox(withOpts), c.bareBox)) {
+      return 'the trailing { } changed nothing — the option is being ignored';
+    }
+
+    // No alias. An object-shaped first argument must NOT work: allowing it
+    // would delete the day-one/day-two contrast shCAD exists to teach, and
+    // would make the arity guard unwriteable.
+    try {
+      c.objectFirst(w);
+      return `${c.name}({ … }) worked — shCAD must not accept the real API's object form`;
+    } catch (e) {
+      if (!c.objectFirstSays.test(e.message)) return `unhelpful object-first message: ${e.message}`;
+    }
+
+    try {
+      c.short(w);
+      return `${c.name} accepted a call with a missing argument`;
+    } catch (e) {
+      if (!c.shortSays.test(e.message)) return `the missing argument is not named: ${e.message}`;
+    }
+
+    try {
+      c.badKey(w);
+      return `${c.name} accepted an option it does not have`;
+    } catch (e) {
+      if (!c.badKeySays.test(e.message)) return `the refused key is not named: ${e.message}`;
+    }
+    return true;
+  });
+}
+
+// The other half of the contract: the names with no trailing { } at all. The
+// loop above needs a `withOptions` case, so it can only speak for names that
+// have options. "No options" is a claim that rots in two directions — a { }
+// silently accepted and dropped, or a refusal that stops naming the real call.
+for (const c of NO_OPTIONS_CONTRACT) {
+  check(`${c.name}: positional only, and the { } is refused by name`, () => {
+    const { window: w } = createSimpleContext();
+
+    const plain = c.bare(w);
+    if (!isGeometry(plain)) return `${c.name}(...) returned nothing drawable`;
+    if (!same(w.measureBoundingBox(plain), c.bareBox)) {
+      return `bare call measured ${JSON.stringify(w.measureBoundingBox(plain))}, expected ${JSON.stringify(c.bareBox)}`;
+    }
+
+    try {
+      c.trailing(w);
+      return `${c.name} accepted a trailing { } — the library drops it silently (${c.why}), `
+        + 'which is the exact defect this layer exists to close';
+    } catch (e) {
+      if (!c.trailingSays.test(e.message)) return `unhelpful refusal for the trailing { }: ${e.message}`;
+    }
+
+    try {
+      c.objectFirst(w);
+      return `${c.name}({ … }) worked — shCAD must not accept the real API's object form`;
+    } catch (e) {
+      if (!c.objectFirstSays.test(e.message)) return `unhelpful object-first message: ${e.message}`;
+    }
+
+    try {
+      c.short(w);
+      return `${c.name} accepted a call with a missing argument`;
+    } catch (e) {
+      if (!c.shortSays.test(e.message)) return `the missing argument is not named: ${e.message}`;
+    }
+    return true;
+  });
+}
+
+// A guard that names somebody else's parameters is not a guard. requireNumbers
+// builds its message out of the list it is handed, so `ring needs two numbers:
+// ring(radius, height)` is a perfectly plausible-looking wrong answer. Every
+// parameter the name declares in SHCAD_NAMES has to appear in its own message.
+for (const g of ARITY_GUARDS) {
+  check(`the arity guard for ${g.name} names its own parameters`, () => {
+    const spec = SHCAD_NAMES.find((n) => n.name === g.name);
+    if (!spec) return `${g.name} is not in SHCAD_NAMES`;
+    const { window: w } = createSimpleContext();
+    let message;
+    try {
+      g.run(w);
+      return `${g.name} accepted a call with a missing argument`;
+    } catch (e) {
+      message = e.message;
+    }
+    const want = spec.positional.filter((p) => !p.startsWith('...'));
+    const absent = want.filter((p) => !message.includes(p));
+    if (absent.length) {
+      return `the message never names ${absent.join(', ')} — SHCAD_NAMES says ${g.name} takes `
+        + `${want.join(', ')}, and a guard that names the wrong parameters sends a student `
+        + `to fix the wrong thing: ${message}`;
+    }
+    return message.includes(`${g.name}(`)
+      ? true
+      : `the message does not show the call shape ${g.name}(…): ${message}`;
+  });
+}
+
+// The three names added because /sandbox was generating half an shCAD call and
+// half a raw namespaced one in the same expression. EQUIVALENTS above compares
+// the whole serialised geometry, which is stricter — but it reports "shape 1
+// differs" and nothing else, and the thing a reader of a failure needs here is
+// the SIZE. A ring 8 across instead of 36 is the defect the argument order was
+// chosen to prevent.
+for (const wb of WRAPS_BOX) {
+  check(`${wb.label} measures what the real call measures`, () => {
+    const { window: w, jscad } = createSimpleContext();
+    const mine = wb.shcad(w);
+    if (!isGeometry(mine)) return 'shCAD returned nothing the renderer could draw';
+    const box = w.measureBoundingBox(mine);
+    if (!same(box, wb.box)) {
+      return `measured ${JSON.stringify(box)}, expected ${JSON.stringify(wb.box)}`;
+    }
+    const theirBox = w.measureBoundingBox(wb.real(jscad));
+    return same(box, theirBox)
+      ? true
+      : `the real call it wraps measures ${JSON.stringify(theirBox)} instead`;
+  });
+}
+
+// ring's whole justification is that JSCAD's labels mislead — and the honest
+// version of that, which the first draft of this group overstated, is that ONE
+// of ring's two words is true where torus's is a lie: `tubeRadius` is the tube,
+// `innerRadius` claims to be the hole and is not. `ringRadius` carries the same
+// outer-edge ambiguity `outerRadius` does. So the finished model is measured
+// rather than described, and BOTH sides' misreadings are pinned as
+// counter-cases, because the fact that they BUILD SILENTLY is the argument.
+check('ring(14, 4) is 36 across and 8 thick, not 8 across', () => {
+  const { window: w } = createSimpleContext();
+  const dims = w.measureDimensions(RING_ARITHMETIC.build(w));
+  if (!same(dims, RING_ARITHMETIC.dimensions)) {
+    return `ring(14, 4) measures ${JSON.stringify(dims)}, expected `
+      + `${JSON.stringify(RING_ARITHMETIC.dimensions)} — ringRadius maps to torus's `
+      + 'outerRadius and tubeRadius to its innerRadius, and that order is the whole name';
+  }
+  if (dims[0] !== RING_ARITHMETIC.across || dims[2] !== RING_ARITHMETIC.thick) {
+    return `across ${dims[0]} / thick ${dims[2]}`;
+  }
+  return true;
+});
+
+for (const m of RING_ARITHMETIC.misread) {
+  check(`the torus misreading builds silently — ${m.what}`, () => {
+    const { window: w } = createSimpleContext();
+    let out;
+    try {
+      out = m.run(w);
+    } catch (e) {
+      return `it throws now (${e.message}) — the argument for ring rests on this building `
+        + 'silently at the wrong size, so re-measure RING_ARITHMETIC rather than deleting it';
+    }
+    const dims = w.measureDimensions(out);
+    return same(dims, m.dimensions)
+      ? true
+      : `the misreading now measures ${JSON.stringify(dims)}, not ${JSON.stringify(m.dimensions)}`;
+  });
+}
+
+// AND RING'S OWN MISREADINGS, which the first version of this group did not
+// measure at all. It measured torus's three failure modes exhaustively and
+// ring's none, which made the case for ring look stronger than it is: reading
+// `ringRadius` as the donut's outer edge is exactly as available as reading
+// `outerRadius` that way, and it builds the byte-identical wrong model. The
+// published table in reference.md carries these two rows for the same reason.
+for (const m of RING_ARITHMETIC.ownMisread) {
+  check(`ring's OWN misreading builds silently too — ${m.what}`, () => {
+    const { window: w } = createSimpleContext();
+    let out;
+    try {
+      out = m.run(w);
+    } catch (e) {
+      return `it throws now (${e.message}). That would be good news, but reference.md and `
+        + "simple.js's banner both publish this as a SILENT wrong answer — re-measure and "
+        + 'rewrite all three together rather than deleting the row';
+    }
+    const dims = w.measureDimensions(out);
+    if (!same(dims, m.dimensions)) {
+      return `it now measures ${JSON.stringify(dims)}, not ${JSON.stringify(m.dimensions)} — `
+        + 'the misread table in reference.md prints this number';
+    }
+    if (m.sameAs) {
+      const twin = w.measureDimensions(m.sameAs(w));
+      return same(twin, dims)
+        ? true
+        : `it no longer matches the torus misreading it is published as identical to `
+          + `(${JSON.stringify(twin)} vs ${JSON.stringify(dims)})`;
+    }
+    return true;
+  });
+}
+
+check('only the full swap throws, and it names circles nobody typed', () => {
+  const { window: w } = createSimpleContext();
+  try {
+    RING_ARITHMETIC.swapped(w);
+    return 'torus({ outerRadius: 4, innerRadius: 14 }) builds now — every misreading is '
+      + 'silent, so the one message a student could ever have got has gone';
+  } catch (e) {
+    if (!RING_ARITHMETIC.swappedSays.test(e.message)) {
+      return `the library's message changed: ${e.message}`;
+    }
+  }
+  try {
+    RING_ARITHMETIC.shcadSwapped(w);
+    return 'ring(4, 14) builds — the backwards call has stopped being caught';
+  } catch (e) {
+    return RING_ARITHMETIC.shcadSwappedSays.test(e.message)
+      ? true
+      : `ring does not rethrow it with the student's own numbers: ${e.message}`;
+  }
+});
+
+// Why ring and poly ship no { } at all, measured rather than asserted. torus
+// ACCEPTS center and segments and ignores both; offering either would be the
+// defect the layer exists to close. `drops: false` is the other kind — a real
+// key that really works, refused for a vocabulary reason, recorded here so the
+// two reasons are never confused.
+for (const d of SILENTLY_DROPPED) {
+  check(`${d.real} ${d.drops ? 'silently drops' : 'really honours'} ${d.key}, so ${d.name} ${d.drops ? 'must not offer it' : 'hands it over'}`, () => {
+    const { window: w } = createSimpleContext();
+    const a = JSON.stringify(d.a(w));
+    const b = JSON.stringify(d.b(w));
+    if (d.drops) {
+      return a === b
+        ? true
+        : `${d.real} honours ${d.key} now — ${d.name}'s refusal says it does not, so rewrite `
+          + `the refusal rather than leave it saying something false (${d.why})`;
+    }
+    return a !== b
+      ? true
+      : `${d.real} ignores ${d.key} now, so ${d.name}'s refusal is handing over a key that `
+        + `does nothing (${d.why})`;
+  });
+}
+
+// Two refusals in simple.js's banner were overturned this round. A refusal
+// overturned QUIETLY leaves nobody able to audit the decision later, and the
+// poly one has a live cost — it takes a target out of A8.2.2. So the banner has
+// to keep saying it, and these are the sentences it must keep.
+for (const s of REFUSALS_OVERTURNED.says) {
+  check(`simple.js's banner records ${s.what}`, () => {
+    const src = readFileSync(REFUSALS_OVERTURNED.path, 'utf8').replace(/\r\n/g, '\n');
+    return s.rx.test(src)
+      ? true
+      : 'the banner no longer says it — an overturned refusal that is simply deleted is a '
+        + 'decision nobody can audit afterwards';
+  });
+}
+
+check('the names that were overturned are not still listed as refused', () => {
+  const src = readFileSync(REFUSALS_OVERTURNED.path, 'utf8').replace(/\r\n/g, '\n');
+  const m = REFUSALS_OVERTURNED.refusalLine.exec(src);
+  if (!m) return 'simple.js no longer has a "Deliberately NOT here" list at all';
+  const still = REFUSALS_OVERTURNED.notRefusedAnyMore.filter((n) => new RegExp(`\\b${n}\\b`).test(m[1]));
+  return still.length
+    ? `still on the not-here list after being added: ${still.join(', ')}`
+    : true;
+});
+
+// ---------------------------------------------------------------------------
+// A8.2.2, WHICH THE FIRST VERSION OF THIS GROUP GOT BACKWARDS.
+//
+// It asserted that ellipse and star were the surviving pool and that poly had
+// taken the assignment's best target. Both are false, and both are false for
+// one reason: simple.js's banner quoted the assignment as "NOT covered in
+// class" when curriculum-plan.md says "NOT covered in class THIS WEEK", and
+// §8.2 — the assignment's own section — teaches ellipse, polygon and star with
+// worked solutions. BOOK_CENSUS.calls is a flat per-name total with no chapter
+// attribution, so the old check could not have asked the question that decides
+// it and instead asked a different one confidently.
+//
+// The fix is the data model, not the numbers. The two sentences that decide
+// everything are READ OUT OF curriculum-plan.md here and matched against the
+// banner's quotation of them, so dropping two words from a quote is a red check
+// rather than a plausible paragraph.
+
+check(`${ASSIGNMENT_POOL.assignment} is quoted from the plan, word for word`, () => {
+  if (!existsSync(ASSIGNMENT_POOL.planPath)) {
+    return `no ${relative(REPO, ASSIGNMENT_POOL.planPath)} — this check reads the assignment `
+      + 'out of the plan rather than trusting a copy of it';
+  }
+  const plan = readFileSync(ASSIGNMENT_POOL.planPath, 'utf8').replace(/\r\n/g, '\n');
+  if (!plan.includes(ASSIGNMENT_POOL.wording)) {
+    return `the plan no longer says "${ASSIGNMENT_POOL.wording}". Re-read A8.2.2 and redo the `
+      + 'eligibility accounting in ASSIGNMENT_POOL and in simple.js — every number below '
+      + 'depends on which week counts as "covered in class"';
+  }
+  if (!plan.includes(ASSIGNMENT_POOL.objectiveLine)) {
+    return `§8.2's learning objective is no longer "${ASSIGNMENT_POOL.objectiveLine}", so what `
+      + 'the assignment\'s own week teaches has changed and the eligible pool moved with it';
+  }
+  const taught = ASSIGNMENT_POOL.objectiveLine.split(':')[1].split(',').map((s) => s.trim()).sort();
+  if (!same(taught, [...ASSIGNMENT_POOL.taughtThisWeek].sort())) {
+    return `the objective now names ${JSON.stringify(taught)}, the record says `
+      + `${JSON.stringify(ASSIGNMENT_POOL.taughtThisWeek)}`;
+  }
+  // The banner is a wrapped // comment, so the quotation is compared with the
+  // wrapping taken out — the words have to match, not the line breaks.
+  const banner = readFileSync(SIMPLE_PATH, 'utf8')
+    .replace(/\r\n/g, '\n')
+    .replace(/\n\s*\/\/\s*/g, ' ')
+    .replace(/\s+/g, ' ');
+  return banner.includes(ASSIGNMENT_POOL.wording)
+    ? true
+    : 'simple.js quotes A8.2.2 in words that are not the plan\'s words. That is exactly how '
+      + 'this went wrong the first time: "NOT covered in class" and "NOT covered in class this '
+      + 'week" are different assignments, and only one of them is the one being set';
+});
+
+// spoiledByOurOwnDocs was recorded and then read by nothing — the one cost
+// sentence in the banner with no check behind it, which is the state every
+// other claim here exists to avoid. A recorded cost nobody asserts is a
+// paragraph, and a paragraph is what drifts.
+check(`${ASSIGNMENT_POOL.assignment}'s largest softener is still written down`, () => {
+  if (!ASSIGNMENT_POOL.spoiledByOurOwnDocs) {
+    return 'ASSIGNMENT_POOL.spoiledByOurOwnDocs is false. If shCode genuinely stopped '
+      + 'publishing the option signatures of A8.2.2\'s eligible primitives, delete this check '
+      + 'with it — but verify that first, because reference.md and lib/jscad-docs.ts both '
+      + 'carried them and /docs/jscad served them in-app.';
+  }
+  const banner = readFileSync(SIMPLE_PATH, 'utf8')
+    .replace(/\r\n/g, '\n')
+    .replace(/\n\s*\/\/\s*/g, ' ')
+    .replace(/\s+/g, ' ');
+  return /satisfied by scrolling one bundled page/.test(banner)
+    ? true
+    : 'simple.js no longer records that shCode\'s own docs are what soften A8.2.2 most — '
+      + 'that "using only the JSCAD documentation" is satisfiable without leaving the app. '
+      + 'It is the biggest cost to that assignment and none of the three new names caused it. '
+      + 'Do not delete this check to go green: either restore the sentence, or set '
+      + 'spoiledByOurOwnDocs to false because the docs really did stop publishing them.';
+});
+
+check(`${ASSIGNMENT_POOL.assignment} still has primitives left that its own week did not teach`, () => {
+  const { jscad } = loadModeling();
+  const claimed = new Set(Object.keys(REVERSE_LOOKUP.expect));
+  const taught = new Set(ASSIGNMENT_POOL.taughtThisWeek);
+  const prims = Object.keys(jscad.primitives).filter((k) => typeof jscad.primitives[k] === 'function');
+  // ELIGIBLE is both conditions at once, which is the correction: a primitive
+  // shCAD has no word for is useless as a target if §8.2 taught it anyway.
+  const eligible = prims.filter((p) => !claimed.has(p) && !taught.has(p)).sort();
+  if (!same(eligible, [...ASSIGNMENT_POOL.eligible].sort())) {
+    return `the eligible pool is now ${JSON.stringify(eligible)}, the record says `
+      + `${JSON.stringify(ASSIGNMENT_POOL.eligible)} — re-measure ASSIGNMENT_POOL and simple.js's `
+      + 'banner together, they are the same accounting';
+  }
+  const twoD = ASSIGNMENT_POOL.eligible2d.filter((p) => eligible.includes(p));
+  if (twoD.length < ASSIGNMENT_POOL.minEligible2d) {
+    return `only ${twoD.length} of the 2D targets are left (${twoD.join(', ') || 'none'}). §8.2 `
+      + 'is a 2D week, so a 2D lab that asks for a primitive it did not teach has nothing left '
+      + 'to ask for';
+  }
+  // Pinned because it went from one to zero this round: torus was the only
+  // book-called primitive that was ever eligible, and ring took it.
+  const bookUsed = eligible.filter((p) => p in BOOK_CENSUS.calls).sort();
+  if (!same(bookUsed, [...ASSIGNMENT_POOL.bookUsedEligible].sort())) {
+    return `${JSON.stringify(bookUsed)} of the eligible pool are names the chapters call, the `
+      + `record says ${JSON.stringify(ASSIGNMENT_POOL.bookUsedEligible)}`;
+  }
+  // The two claims the corrected accounting rests on, checked rather than said.
+  const wrongly = ASSIGNMENT_POOL.neverEligible.filter((p) => !taught.has(p));
+  if (wrongly.length) {
+    return `${wrongly.join(', ')} is recorded as having cost A8.2.2 nothing because its own week `
+      + 'taught it, and the week does not teach it any more — that claim has to be re-argued';
+  }
+  const notTaken = ASSIGNMENT_POOL.taken.filter((p) => !claimed.has(p) || taught.has(p));
+  return notTaken.length
+    ? `${notTaken.join(', ')} is recorded as taken from the eligible pool, but it is not a name `
+      + 'shCAD claims, or its own week teaches it — either way the cost is misstated'
+    : true;
+});
+
+// The graduation-day cost of poly, which is the one it does not pay in shCode.
+// It is the only shCAD name whose positional argument is a list, so it is the
+// only one that teaches "hand the array over bare" — and polygon answers a bare
+// array with a valid, EMPTY shape and no error at all.
+check('polygon answers the bare list poly trains with a silently empty shape', () => {
+  const { jscad } = loadModeling();
+  const right = POLY_BARE_ARRAY.right(jscad);
+  if (jscad.geometries.geom2.toSides(right).length < 3) {
+    return 'polygon({ points: … }) is not building the shape either, so this comparison is '
+      + 'measuring nothing';
+  }
+  let bare;
+  try {
+    bare = POLY_BARE_ARRAY.bare(jscad);
+  } catch (e) {
+    return `polygon([[…]]) throws now (${e.message}) — that would be GOOD NEWS, and it means `
+      + "reference.md's poly crossover table and simple.js's banner are both saying something "
+      + 'false. Rewrite them rather than deleting this check';
+  }
+  if (!isGeometry(bare)) return 'the bare call no longer returns geometry at all';
+  const sides = jscad.geometries.geom2.toSides(bare).length;
+  if (sides !== POLY_BARE_ARRAY.bareSides) {
+    return `the bare call now has ${sides} sides, the record says ${POLY_BARE_ARRAY.bareSides}`;
+  }
+  const box = jscad.measurements.measureBoundingBox(bare);
+  if (!same(box, POLY_BARE_ARRAY.bareBox)) {
+    return `its bounding box is ${JSON.stringify(box)}, the record says `
+      + `${JSON.stringify(POLY_BARE_ARRAY.bareBox)}`;
+  }
+  // And the reason "always wrap the list" is not the lesson: line really does
+  // take its points bare, two rows away in the same catalogue.
+  const line = POLY_BARE_ARRAY.alsoBare(jscad);
+  return isGeometry(line)
+    ? true
+    : 'line() no longer takes a bare array, so reference.md\'s "some of them do" is wrong and '
+      + 'the honest rule really would be "always wrap it"';
+});
+
+// The guards, each of which exists because the library's own answer is a
+// silent wrong result or a message a fourteen-year-old cannot act on.
+for (const g of GUARDS) {
+  check(`guard: ${g.what}`, () => {
+    const { window: w } = createSimpleContext();
+    let out;
+    try {
+      out = g.run(w);
+    } catch (e) {
+      return g.says.test(e.message) ? true : `wrong message (${g.why}): ${e.message}`;
+    }
+    return `no error at all — ${g.why}. Got ${isGeometry(out) ? 'geometry' : String(out)}`;
+  });
+}
+
+// "Returns real geometry" has to mean this in practice, not just isGeometry():
+// a shCAD result is a first-class citizen of the real API.
+for (const i of INTEROP) {
+  check(`the real API accepts a shCAD shape — ${i.label}`, () => {
+    const { window: w } = createSimpleContext();
+    const out = i.run(w);
+    return isGeometry(out) ? true : 'the real call did not hand back drawable geometry';
+  });
+}
+
+// ---------------------------------------------------------------------------
+// The graduation table in reference.md, executed rather than read.
+//
+// EQUIVALENTS above proves simple.js matches the real API. It proves nothing
+// about what the DOCS say the real API is — and that table is the only place a
+// student is handed the real call to copy. The two drifted once already: the
+// `sit` row was missing `grouped`, which is right for one shape and silently
+// collapses an assembly onto the bed, in the two sections that are entirely
+// about assemblies. The gate was green throughout.
+//
+// So both halves of every row are evaluated here, against the same bound
+// `profile` / `shape` / `parts`, and compared as whole geometry.
+
+const graduation = readGraduationTable();
+
+check('the graduation table in reference.md parses, and covers every shCAD name', () => {
+  if (graduation.error) return graduation.error;
+  const { rows } = graduation;
+  if (!rows.length) return `no rows found under "${GRADUATION.heading}"`;
+  const missing = GRADUATION.namesInTable.filter(
+    (n) => !rows.some((r) => new RegExp(`^${n}\\s*\\(`).test(r.shcad))
+  );
+  if (missing.length) return `not in the graduation table: ${missing.join(', ')}`;
+  const noReal = rows.filter((r) => !r.real && !(r.shcad in GRADUATION.prose));
+  return noReal.length
+    ? `no real call given for: ${noReal.map((r) => r.shcad).join(', ')} — a row with no right-hand call must be listed in GRADUATION.prose with a reason`
+    : true;
+});
+
+check('every prose exemption names a row that is really in the table', () => {
+  if (graduation.error) return graduation.error;
+  const stale = Object.keys(GRADUATION.prose).filter(
+    (k) => !graduation.rows.some((r) => r.shcad === k)
+  );
+  return stale.length
+    ? `GRADUATION.prose excuses rows that no longer exist: ${stale.join(', ')} — a stale exemption would quietly excuse a new row`
+    : true;
+});
+
+for (const row of graduation.rows || []) {
+  if (row.shcad in GRADUATION.prose) continue;
+  check(`graduation: ${row.shcad}  ->  ${row.real}`, () => {
+    const g = createGraduationContext();
+    let mine;
+    let theirs;
+    try {
+      mine = g.evaluate(row.shcad);
+    } catch (e) {
+      return `reference.md:${row.line} — the shCAD half does not run: ${e.message}`;
+    }
+    try {
+      theirs = g.evaluate(row.real);
+    } catch (e) {
+      return `reference.md:${row.line} — the real call a student would copy does not run: ${e.message}`;
+    }
+    if (!isGeometry(mine)) return `reference.md:${row.line} — the shCAD half built nothing drawable`;
+    if (!isGeometry(theirs)) return `reference.md:${row.line} — the real half built nothing drawable`;
+    const verdict = sameGeometry(mine, theirs);
+    return verdict === true
+      ? true
+      : `reference.md:${row.line} — a student copying this row gets a different model: ${verdict}`;
+  });
+}
+
+for (const t of GRADUATION_TRIPWIRES) {
+  check(`graduation tripwire: ${t.what}`, () => {
+    if (graduation.error) return graduation.error;
+    const row = (graduation.rows || []).find((r) => r.shcad === t.row);
+    if (!row) return `the row this guards is gone: ${t.row}`;
+    const g = createGraduationContext();
+    const mine = g.evaluate(row.shcad);
+    let other;
+    try {
+      other = g.evaluate(t.without);
+    } catch (e) {
+      return t.throws
+        ? true
+        : `the counter-case no longer runs at all (${t.why}): ${e.message}`;
+    }
+    if (t.throws) return `${t.without} no longer fails — ${t.why}`;
+    return sameGeometry(mine, other) === true
+      ? `${t.without} now builds the same model — the row is decoration (${t.why})`
+      : true;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// The reverse of the graduation table.
+//
+// The graduation table answers "I wrote box — what is that really?". The seven
+// written Q3 chapters ask the opposite: they are in the real API, so a student
+// READS cuboid and has to write box. Measured on the chapter sources, roughly
+// half the calls in the assigned reading are in a spelling shCAD replaces, and
+// three of the mappings — extrudeRotate -> revolve, align -> sit, rotate ->
+// turn — cannot be guessed backwards at all. reference.md carries both
+// directions; this is the check that it keeps carrying the second one.
+
+const reverse = readReverseTable();
+
+check('reference.md maps every real name shCAD replaces back to its shCAD word', () => {
+  if (reverse.error) return reverse.error;
+  const rows = new Map(reverse.rows.map((r) => [r.real, r]));
+  const problems = [];
+  for (const [real, shcad] of Object.entries(REVERSE_LOOKUP.expect)) {
+    const row = rows.get(real);
+    if (!row) {
+      problems.push(`${real} has no row — a student reading the book cannot get from it to ${shcad}`);
+      continue;
+    }
+    if (!new RegExp(`\\b${shcad}\\b`).test(row.says)) {
+      problems.push(`reference.md:${row.line} — ${real} does not point at ${shcad}: ${row.says}`);
+    }
+  }
+  return problems.length ? problems.join('; ') : true;
+});
+
+check('the reverse table points only at names shCAD really has', () => {
+  if (reverse.error) return reverse.error;
+  const known = new Set(SHCAD_NAMES.map((n) => n.name));
+  const bad = reverse.rows.filter((r) => {
+    const named = (r.says.match(/`([A-Za-z_$][\w$]*)/g) || []).map((m) => m.slice(1));
+    return named.length > 0 && !named.some((n) => known.has(n));
+  });
+  return bad.length
+    ? `rows naming no shCAD word: ${bad.map((r) => `reference.md:${r.line} ${r.real}`).join(', ')}`
+    : true;
+});
+
+check('every real name in the reverse table is one shCAD actually stands in for', () => {
+  const want = new Set(SHCAD_NAMES.map((n) => n.real));
+  const missing = [...want].filter((r) => !(r in REVERSE_LOOKUP.expect));
+  return missing.length
+    ? `shCAD stands in for ${missing.join(', ')} but the reverse table is not asked about them`
+    : true;
+});
+
+// The shcode-only examples were asserted to FAIL portably and never asserted to
+// WORK anywhere — so the turn example, the one a student is most likely to copy
+// out of the hardest section, was never executed at all. Run them where they
+// are meant to run.
+for (const e of examples.filter((x) => x.source.endsWith('reference.md') && x.tags.includes('shcode-only'))) {
+  check(`the shCAD example at ${e.source}:${e.line} actually runs`, () => {
+    const cap = captureConsole();
+    const { ctx } = createSimpleContext({ consoleImpl: cap.console });
+    const r = runProgram(ctx, e.code, `${e.source}:${e.line}`, { lineOffset: e.line - 1 });
+    if (!r.ok) return `${r.phase}: ${r.error.message}`;
+    if (!r.main) return 'no main() to call';
+    const errs = cap.lines.filter((l) => l.type === 'error');
+    if (errs.length) return `console.error: ${errs[0].text.slice(0, 120)}`;
+    return isGeometry(r.geometry)
+      ? true
+      : 'main() ran but returned nothing the renderer could draw';
+  });
+}
+
+check('reference.md documents every shCAD name in a shcode-only fence', () => {
+  const fenced = examples
+    .filter((e) => e.source.endsWith('reference.md') && e.tags.includes('shcode-only'))
+    .map((e) => e.code)
+    .join('\n');
+  const missing = SHCAD_NAMES.filter((n) => !new RegExp(`\\b${n.name}\\s*\\(`).test(fenced));
+  return missing.length
+    ? `not shown in reference.md: ${missing.map((n) => n.name).join(', ')} — every shCAD example needs the shcode-only tag or the portability check fails it`
+    : true;
+});
+
+
+// ---------------------------------------------------------------------------
+// THE BRIDGE — is every call in the assigned reading answerable from shCode?
+//
+// REVERSE_LOOKUP above asks the narrow question: does every name shCAD stands
+// in for have a row? A student reading the book asks the wide one: does every
+// name I can TYPE have a row? Measured before these checks existed, eight did
+// not — `cube` at 12 calls among them, in the opening runnable block of the
+// whole unit — and none of the eight was in the closing "everything else"
+// sentence either. Silence on a table that otherwise answers everything reads
+// as "nothing to worry about".
+//
+// The census is data (BOOK_CENSUS) rather than a live read of the textbook,
+// deliberately: the seven chapters live in another repository and `npm test`
+// must not need it checked out. Its method is recorded beside it.
+
+check('every name in the book census is really a @jscad/modeling export', () => {
+  const { jscad } = loadModeling();
+  const names = apiNames(jscad);
+  const bad = Object.keys(BOOK_CENSUS.calls).filter((n) => !names.has(n));
+  for (const [label, path] of Object.entries(BOOK_CENSUS.dottedCalls)) {
+    let v = jscad;
+    for (const step of path.slice(0, -1)) v = v && v[step];
+    if (typeof v !== 'function') bad.push(label);
+  }
+  return bad.length
+    ? `the census claims the book calls these and the library does not export them: ${bad.join(', ')}`
+    : true;
+});
+
+check('the book census adds up to the total it reports', () => {
+  const bare = Object.values(BOOK_CENSUS.calls).reduce((a, b) => a + b, 0);
+  const dotted = Object.values(BOOK_CENSUS.dottedCalls).reduce((a, p) => a + p[p.length - 1], 0);
+  const chapters = Object.values(BOOK_CENSUS.perChapter).reduce((a, b) => a + b, 0);
+  if (chapters !== bare) return `per-chapter counts sum to ${chapters}, the name counts to ${bare}`;
+  return eq(bare + dotted, BOOK_CENSUS.totalCalls, 'total calls in the seven chapters');
+});
+
+const bridgeWord = readBridgeTable(BRIDGE.shcadWordHeading);
+const bridgeNoWord = readBridgeTable(BRIDGE.noWordHeading);
+
+check('reference.md carries both halves of the bridge', () => {
+  if (bridgeWord.error) return bridgeWord.error;
+  if (bridgeNoWord.error) return bridgeNoWord.error;
+  if (!bridgeWord.rows.length) return `no rows under "${BRIDGE.shcadWordHeading}"`;
+  if (!bridgeNoWord.rows.length) return `no rows under "${BRIDGE.noWordHeading}"`;
+  return true;
+});
+
+check('every call the seven chapters make has a row in reference.md', () => {
+  if (bridgeWord.error || bridgeNoWord.error) return bridgeWord.error || bridgeNoWord.error;
+  const word = new Set(bridgeWord.rows.map((r) => r.left));
+  const noWord = new Set(bridgeNoWord.rows.map((r) => r.left));
+  const census = [...Object.keys(BOOK_CENSUS.calls), ...Object.keys(BOOK_CENSUS.dottedCalls)];
+  const missing = census.filter((n) => !word.has(n) && !noWord.has(n));
+  return missing.length
+    ? `no row anywhere for: ${missing.join(', ')} — a student reading the book can type these `
+      + 'and shCode says nothing about them, which reads as "nothing to worry about"'
+    : true;
+});
+
+check('no name is answered twice, in two different directions', () => {
+  if (bridgeWord.error || bridgeNoWord.error) return bridgeWord.error || bridgeNoWord.error;
+  const noWord = new Set(bridgeNoWord.rows.map((r) => r.left));
+  const both = bridgeWord.rows.map((r) => r.left).filter((n) => noWord.has(n));
+  return both.length
+    ? `on both bridge tables, so one of them is lying: ${both.join(', ')}`
+    : true;
+});
+
+check('the "no shCAD word" table names only real library functions', () => {
+  if (bridgeNoWord.error) return bridgeNoWord.error;
+  const { jscad } = loadModeling();
+  const names = apiNames(jscad);
+  const bad = [];
+  for (const row of bridgeNoWord.rows) {
+    if (names.has(row.left)) continue;
+    const path = BOOK_CENSUS.dottedCalls[row.left];
+    let v = jscad;
+    if (path) for (const step of path.slice(0, -1)) v = v && v[step];
+    if (!path || typeof v !== 'function') bad.push(`reference.md:${row.line} ${row.left}`);
+  }
+  return bad.length ? `rows for things the library does not export: ${bad.join(', ')}` : true;
+});
+
+check('nothing on the "no shCAD word" table actually has one', () => {
+  if (bridgeNoWord.error) return bridgeNoWord.error;
+  const has = bridgeNoWord.rows.filter((r) => r.left in REVERSE_LOOKUP.expect);
+  return has.length
+    ? `told to "type what the book typed" for names shCAD does replace: ${has.map((r) => r.left).join(', ')}`
+    : true;
+});
+
+check('the size of the bridge in reference.md is the measured size', () => {
+  if (bridgeWord.error) return bridgeWord.error;
+  const word = new Set(bridgeWord.rows.map((r) => r.left));
+  const replaced = Object.entries(BOOK_CENSUS.calls)
+    .filter(([n]) => word.has(n))
+    .reduce((a, [, c]) => a + c, 0);
+  if (replaced !== BOOK_CENSUS.replacedCalls) {
+    return `the shCAD-word table now covers ${replaced} of the book's calls, but the census `
+      + `records ${BOOK_CENSUS.replacedCalls} — move the row back, or re-measure and update both`;
+  }
+  const md = readFileSync(BRIDGE.path, 'utf8');
+  if (!new RegExp(`\\*\\*${BOOK_CENSUS.totalCalls} library calls\\*\\*`).test(md)) {
+    return `reference.md does not print the measured total (${BOOK_CENSUS.totalCalls})`;
+  }
+  return new RegExp(`\\*\\*${replaced} of them`).test(md)
+    ? true
+    : `reference.md does not print the measured ${replaced} calls shCAD replaces`;
+});
+
+// The rows that are not renames. Each of these is a real call and a shCAD word
+// that do DIFFERENT things, silently — the model comes out wrong and nothing
+// throws. A row that does not say so is worse than a missing row, because the
+// table reads as authoritative.
+for (const wrn of BRIDGE_WARNINGS) {
+  check(`the ${wrn.real} row warns that its shCAD word is not a rename`, () => {
+    if (bridgeWord.error) return bridgeWord.error;
+    const row = bridgeWord.rows.find((r) => r.left === wrn.real);
+    if (!row) return `${wrn.real} has no row at all`;
+    const silent = wrn.says.filter((rx) => !rx.test(row.right));
+    return silent.length
+      ? `reference.md:${row.line} — the row says nothing about ${silent.join(' / ')}. ${wrn.why}`
+      : true;
+  });
+}
+
+// The align row, measured. It was true about a call the book never makes.
+check('sit is not the align the seven chapters print', () => {
+  const { window: w } = createSimpleContext();
+  const shape = SIT_VS_BOOK_ALIGN.build(w);
+
+  const seated = w.measureBoundingBox(w.sit(shape));
+  if (!same(seated, SIT_VS_BOOK_ALIGN.sitBox)) {
+    return `sit now lands on ${JSON.stringify(seated)}, not ${JSON.stringify(SIT_VS_BOOK_ALIGN.sitBox)}`;
+  }
+  for (const m of SIT_VS_BOOK_ALIGN.bookModes) {
+    const aligned = w.measureBoundingBox(w.align({ modes: m.modes }, shape));
+    if (same(aligned, seated)) {
+      return `align({ modes: ${JSON.stringify(m.modes)} }) and sit now agree — the warning on `
+        + 'the align row has become decoration, and the row can go back to being a plain rename';
+    }
+  }
+  const first = w.measureBoundingBox(
+    w.align({ modes: SIT_VS_BOOK_ALIGN.bookModes[0].modes }, shape)
+  );
+  return same(first, SIT_VS_BOOK_ALIGN.bookBox)
+    ? true
+    : `the book's own modes now land on ${JSON.stringify(first)}, not `
+      + `${JSON.stringify(SIT_VS_BOOK_ALIGN.bookBox)} — re-measure SIT_VS_BOOK_ALIGN`;
+});
+
+// TAU: a value the book types eleven times and never defines, which is not a
+// name this runner installs. The fix is documentation plus a refusal that
+// spells something runnable, because runner.html owns the scope and shCAD adds
+// no tenth name.
+for (const id of BOOK_IDENTIFIERS) {
+  check(`${id.name} is not in scope here, and reference.md says what to type instead`, () => {
+    const { ctx } = createSimpleContext();
+    const inScope = vm.runInContext(`typeof ${id.name} !== 'undefined'`, ctx);
+    if (inScope !== id.inScope) {
+      return inScope
+        ? `${id.name} IS in scope now — runner.html changed, so delete this check and the `
+          + 'reference.md section it guards rather than leaving them saying something false'
+        : `${id.name} is no longer measurable`;
+    }
+    for (const spelling of [id.write, id.portable, id.alsoWrite]) {
+      let v;
+      try {
+        v = vm.runInContext(`(${spelling})`, ctx);
+      } catch (e) {
+        return `reference.md tells a student to write ${spelling}, and it throws: ${e.message}`;
+      }
+      if (v !== id.value) return `${spelling} is ${v}, not ${id.value}`;
+    }
+    const md = readFileSync(BRIDGE.path, 'utf8');
+    if (!md.includes(BRIDGE.tauHeading)) return `reference.md has no "${BRIDGE.tauHeading}" section`;
+    const missing = [id.write, id.portable, id.alsoWrite].filter((s) => !md.includes(s));
+    return missing.length
+      ? `reference.md never gives the working spelling: ${missing.join(', ')}`
+      : true;
+  });
+}
+
+// A refusal that hands over a call the student cannot run is not an escape
+// hatch. Both of these were written with the book's bare TAU and threw.
+for (const r of REFUSAL_CALLS) {
+  check(`${r.what} is spelled out, and runs`, () => {
+    const { window: w } = createSimpleContext();
+    let message;
+    try {
+      r.trigger(w);
+      return `no refusal at all — ${r.why}`;
+    } catch (e) {
+      message = e.message;
+    }
+    if (!message.includes(r.call)) {
+      return `the message does not spell the call out (${r.why}): ${message}`;
+    }
+    let out;
+    try {
+      out = evaluateInShcad(r.bindings, r.call).value;
+    } catch (e) {
+      return `the call the refusal hands over does not run in this runner: ${e.message}`;
+    }
+    return isGeometry(out)
+      ? true
+      : 'the call the refusal hands over runs but builds nothing drawable';
+  });
+}
+
+// A name is only translated if the KEYS beside it do something. Every option
+// key the seven chapters print is built twice with two different values and the
+// results compared, because JSCAD ignores an unknown option without a word.
+// Thirteen of the fourteen pairs are fine. The fourteenth is §8.1's glyph
+// exercise, which prints `inputText` — not an option — so "swap 'J' for 'H' and
+// run again" changes nothing and reports nothing.
+for (const k of BOOK_OPTION_KEYS) {
+  check(`the book's option keys really do something: ${k.what}`, () => {
+    const { window: w } = createSimpleContext();
+    const a = JSON.stringify(k.a(w));
+    const b = JSON.stringify(k.b(w));
+    if (k.changes) {
+      return a !== b
+        ? true
+        : `two different values for this key build the identical model — the library is `
+          + 'ignoring it, silently, and the row that names it is not a translation';
+    }
+    if (a !== b) {
+      return `this key WORKS now, so the warning reference.md carries about it is out of date `
+        + `— delete the warning rather than leave it saying something false (${k.why})`;
+    }
+    if (!k.row) return true;
+    const row = (bridgeNoWord.rows || []).find((r) => r.left === k.row);
+    if (!row) return `${k.row} has no row to carry the warning`;
+    const silent = k.says.filter((rx) => !rx.test(row.right));
+    return silent.length
+      ? `reference.md:${row.line} — the ${k.row} row says nothing about ${silent.join(' / ')}. `
+        + `A student copying the book's spelling gets no letter and no error (${k.why})`
+      : true;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// OBJECT DEPTH — the layer's justification, measured rather than asserted.
+//
+// shCAD's defence is that it postpones the object literal rather than hiding
+// it. Measured before this existed, the section making that argument held
+// exactly ONE live object literal, because every other brace on the page was
+// inside a // comment showing the real API — while 197 of the book's own calls
+// lead with one.
+
+const shcad = shcadSection();
+const shcadFences = shcad.error
+  ? []
+  : [...shcad.body.matchAll(/^```js([^\n]*)\n([\s\S]*?)^```/gm)].map((m) => ({
+    tags: (m[1] || '').trim().split(/\s+/).filter(Boolean),
+    code: m[2],
+  }));
+
+check('every example in the shCAD section is tagged shcode-only', () => {
+  if (shcad.error) return shcad.error;
+  if (!shcadFences.length) return 'no examples in the shCAD section at all';
+  const untagged = shcadFences.filter((f) => !f.tags.includes('shcode-only'));
+  return untagged.length
+    ? `${untagged.length} example(s) in the shCAD section are not tagged shcode-only — they are `
+      + 'run in the require-only sandbox, where every shCAD name is undefined'
+    : true;
+});
+
+check('the shCAD section writes option objects rather than describing them', () => {
+  if (shcad.error) return shcad.error;
+  const objects = shcadFences.flatMap((f) => liveObjectLiterals(f.code));
+  if (objects.length < OBJECT_DEPTH.minLiveObjects) {
+    return `only ${objects.length} live option object(s) in the whole section, expected at least `
+      + `${OBJECT_DEPTH.minLiveObjects} — a brace inside a // comment is not an example of `
+      + 'writing one';
+  }
+  const single = objects.filter((k) => k.length === 1).length;
+  const multi = objects.filter((k) => k.length >= 2).length;
+  const widest = objects.reduce((a, k) => Math.max(a, k.length), 0);
+  if (single < OBJECT_DEPTH.minSingleKey) {
+    return `only ${single} one-key object(s) — the day-two call is the whole point of the layer`;
+  }
+  if (multi < OBJECT_DEPTH.minMultiKey) {
+    return `only ${multi} object(s) carry two or more keys, expected ${OBJECT_DEPTH.minMultiKey} — `
+      + 'without them there is no progression, just a brace';
+  }
+  return widest >= OBJECT_DEPTH.minKeysInOneObject
+    ? true
+    : `the widest object in the section has ${widest} key(s), expected ${OBJECT_DEPTH.minKeysInOneObject}`;
+});
+
+check('every shCAD option key is worked in a runnable example, not just tabled', () => {
+  if (shcad.error) return shcad.error;
+  const keys = new Set(shcadFences.flatMap((f) => liveObjectLiterals(f.code)).flat());
+  const missing = OBJECT_DEPTH.keys.filter((k) => !keys.has(k));
+  return missing.length
+    ? `shCAD ships these keys and no runnable example writes them: ${missing.join(', ')}`
+    : true;
+});
+
+check('the parameter panel example is a real array of objects, and its defaults reach main()', () => {
+  const { marker, minDefinitions, everyDefinition, someDefinition, modelBox } = OBJECT_DEPTH.parameters;
+  const fence = shcadFences.find((f) => new RegExp(`function\\s+${marker}`).test(f.code));
+  if (!fence) return `no runnable ${marker} example in the shCAD section`;
+
+  const cap = captureConsole();
+  const ctx = createSimpleContext({ consoleImpl: cap.console });
+  const r = runProgram(ctx.ctx, fence.code, 'reference.md', { lineOffset: 0 });
+  if (!r.ok) return `${r.phase}: ${r.error.message}`;
+
+  let defs;
+  try {
+    defs = ctx.window[marker]();
+  } catch (e) {
+    return `${marker}() threw: ${e.message}`;
+  }
+  if (!Array.isArray(defs)) return `${marker}() returned ${typeof defs}, not an array`;
+  if (defs.length < minDefinitions) {
+    return `${defs.length} definition(s) — an array of objects needs to look like one`;
+  }
+  for (const d of defs) {
+    if (!d || typeof d !== 'object' || Array.isArray(d)) return 'a definition is not an object';
+    const missing = everyDefinition.filter((k) => d[k] === undefined);
+    if (missing.length) return `the "${d.name}" definition is missing ${missing.join(', ')}`;
+  }
+  for (const shape of someDefinition) {
+    if (!defs.some((d) => shape.every((k) => d[k] !== undefined))) {
+      return `no definition carries ${shape.join(' / ')} — every control is the same object `
+        + 'shape, so the example is not showing that they differ';
+    }
+  }
+  // And the defaults have to actually arrive: main(params) is called with them
+  // and nothing else, so a parameter that changes nothing is a broken example.
+  if (!isGeometry(r.geometry)) return 'main(defaults) built nothing drawable';
+  const box = ctx.window.measureBoundingBox(r.geometry);
+  return same(box, modelBox)
+    ? true
+    : `main(defaults) measured ${JSON.stringify(box)}, expected ${JSON.stringify(modelBox)} — the `
+      + 'declared defaults are not reaching the shape';
+});
+
+check('the parameter trap reference.md names is really in runner.html', () => {
+  const html = runnerSource();
+  const fn = html.slice(html.indexOf('function initialOf('));
+  const body = fn.slice(0, fn.indexOf('\n\t}'));
+  const unread = PARAM_DEFAULTS.reads.filter((k) => !body.includes(`d.${k}`));
+  if (unread.length) {
+    return `runner.html's initialOf no longer reads ${unread.join(', ')} — reference.md says it does`;
+  }
+  if (body.includes(`d.${PARAM_DEFAULTS.ignores}`)) {
+    return `runner.html now reads d.${PARAM_DEFAULTS.ignores} too, so reference.md's warning that `
+      + 'a checkbox default never arrives is out of date — delete it rather than leave it wrong';
+  }
+  return PARAM_DEFAULTS.saysInReference.test(readFileSync(BRIDGE.path, 'utf8'))
+    ? true
+    : 'reference.md does not warn that a checkbox default never reaches main() in this runner';
+});
+
+// ---------------------------------------------------------------------------
+// THE PARAMETER PANEL — the half of the reading that is not a call.
+//
+// Every bridge check above answers a NAME. BOOK_CENSUS counts CALLS. §8.4 and
+// §8.5 also print words that are neither: the `type:` values inside
+// getParameterDefinitions, which are strings in an object literal. So the
+// coverage claim was true and a student still stalled — a shCAD-only reader
+// translated all 28 of §8.5's calls and then stopped on `type: 'float'`, which
+// appeared nowhere shCode ships, while the in-app docs said "THREE of the types
+// hand you a number" and thereby denied it existed.
+//
+// What these pin is the sentence rather than the table: TYPE PICKS THE CONTROL,
+// INITIAL CARRIES THE VALUE. That is what makes a type nobody listed harmless,
+// and the day runner.html starts branching on `type` it stops being true.
+
+const paramBookTable = readFirstColumn(PARAM_TYPES.heading);
+const paramRefTable = readFirstColumn(PARAM_TYPES.referenceHeading);
+
+check('the parameter-type census adds up', () => {
+  const sum = Object.values(PARAM_TYPES.spellings).reduce((a, s) => a + s.defs, 0);
+  return sum === PARAM_TYPES.totalDefinitions
+    ? true
+    : `the spellings sum to ${sum} definitions, the census records `
+      + `${PARAM_TYPES.totalDefinitions} — re-measure both together`;
+});
+
+// One per spelling, because a missing row is the failure being closed here and
+// a single aggregate check reports it as one number rather than as the word.
+for (const [type, m] of Object.entries(PARAM_TYPES.spellings)) {
+  check(`the book's type: '${type}' has a row in the shCAD section`, () => {
+    if (paramBookTable.error) return paramBookTable.error;
+    const want = `type: '${type}'`;
+    const row = paramBookTable.rows.find((r) => r.left === want);
+    if (!row) {
+      return `no row for ${want} — §${m.chapter} prints it ${m.defs} time(s) in a runnable `
+        + 'editor, and a word missing from this table reads as "do not type this"';
+    }
+    if (!row.rest.includes(`§${m.chapter}`)) {
+      return `reference.md:${row.line} — the row does not say where the book prints it (§${m.chapter})`;
+    }
+    if (!row.rest.includes(want)) {
+      return `reference.md:${row.line} — the row names no spelling to type in shCode`;
+    }
+    // A row that cites the book's own parameters has to cite the RIGHT ones,
+    // and ONLY those. Written from memory the first time, this row named a
+    // `spacing` knob §8.5 has not got — and a fabricated example is worse than
+    // no example, because it reads exactly like the true ones beside it and is
+    // the half a student trusts hardest. So the citation is compared as a set:
+    // a missing name and an invented one both fail.
+    if (!m.names) return true;
+    const marker = `§${m.chapter}'s`;
+    const at = row.rest.indexOf(marker);
+    if (at === -1) {
+      return `reference.md:${row.line} — the row does not point at the parameters §${m.chapter} `
+        + `declares with this type (${m.names.join(', ')})`;
+    }
+    const cited = [...row.rest.slice(at).matchAll(/`([^`]+)`/g)].map((c) => c[1]);
+    const invented = cited.filter((n) => !m.names.includes(n));
+    const absent = m.names.filter((n) => !cited.includes(n));
+    if (invented.length) {
+      return `reference.md:${row.line} — the row cites ${invented.join(', ')}, and §${m.chapter} `
+        + `declares no such parameter. It declares ${m.names.join(', ')}`;
+    }
+    return absent.length
+      ? `reference.md:${row.line} — the row does not name §${m.chapter}'s ${absent.join(', ')}`
+      : true;
+  });
+}
+
+check("reference.md's own type table lists every type either surface teaches", () => {
+  if (paramRefTable.error) return paramRefTable.error;
+  const have = new Set(paramRefTable.rows.map((r) => r.left));
+  const missing = PARAM_TYPES.documented.filter((t) => !have.has(t));
+  return missing.length
+    ? `§Parameters has no row for: ${missing.join(', ')} — the in-app docs teach these and `
+      + 'reference.md is the file the shCAD section tells a student to keep open. Two doc '
+      + 'surfaces disagreeing about the list is how int and float went missing'
+    : true;
+});
+
+check('runner.html reads a definition initial and never its type', () => {
+  const html = runnerSource();
+  const fn = html.slice(html.indexOf('function initialOf('));
+  const body = fn.slice(0, fn.indexOf('\n\t}'));
+  if (body.includes(`d.${PARAM_DEFAULTS.neverReads}`)) {
+    return `initialOf now reads d.${PARAM_DEFAULTS.neverReads}, so an unlisted type is no longer `
+      + 'harmless — every "type what the book typed" row in reference.md just became a guess. '
+      + 'Fix the docs, not this check';
+  }
+  return PARAM_DEFAULTS.saysTypeIsIgnored.test(readFileSync(BRIDGE.path, 'utf8'))
+    ? true
+    : 'reference.md does not say that type picks the control and initial carries the value — '
+      + 'which is the one sentence that makes the type table safe to stop consulting';
+});
+
+// The same fact from the other end: declared, run, and read back out of main().
+// A structural check on runner.html proves the field is unread; this proves the
+// value arrives. The last entry is deliberately not a JSCAD type at all.
+for (const a of PARAM_TYPES.arrives) {
+  check(`type: '${a.type}' picks a control and leaves the value alone`, () => {
+    const { ctx } = createSimpleContext();
+    const literal = `{ name: 'v', type: ${JSON.stringify(a.type)}, initial: ${JSON.stringify(a.initial)} }`;
+    const r = runProgram(ctx, paramProgram(literal), 'param-type');
+    if (!r.ok) return `${r.phase}: ${r.error.message}`;
+    const seen = vm.runInContext('__seen', ctx);
+    if (!seen || !('v' in seen)) {
+      return `main(params) was handed no v at all — a type this runner does not recognise is `
+        + 'supposed to be a differently-shaped knob, never a value that fails to arrive';
+    }
+    if (seen.v !== a.initial) return `v arrived as ${JSON.stringify(seen.v)}, not ${JSON.stringify(a.initial)}`;
+    return typeof seen.v === typeof a.initial
+      ? true
+      : `v arrived as a ${typeof seen.v}, not a ${typeof a.initial}`;
+  });
+}
+
+// And the two documented exceptions, which are exceptions because they declare
+// no `initial` — not because their type is special.
+for (const d of PARAM_TYPES.declaresNothing) {
+  check(`${d.what} reaches main() as nothing at all`, () => {
+    const { ctx } = createSimpleContext();
+    const r = runProgram(ctx, paramProgram(d.def), 'param-type');
+    if (!r.ok) return `${r.phase}: ${r.error.message}`;
+    const seen = vm.runInContext('__seen', ctx);
+    const name = (d.def.match(/name:\s*'([^']+)'/) || [])[1];
+    return seen && name in seen
+      ? `${name} DOES arrive now (${JSON.stringify(seen[name])}), so reference.md's warning about `
+        + 'it is out of date — delete the warning rather than leave it saying something false'
+      : true;
+  });
+}
+
+check('the in-app docs count the numeric types and get the list right', () => {
+  const ts = readFileSync(PARAM_TYPES.inApp, 'utf8');
+  const m = ts.match(PARAM_TYPES.numericSentence);
+  if (!m) return 'the in-app docs no longer count the numeric types — if that sentence went away '
+    + 'on purpose, retire numericSentence with it rather than leaving this asking about nothing';
+  return m[1] === PARAM_TYPES.numericWord
+    ? true
+    : `the in-app docs say "${m[1]} of the types hand you a number" and there are `
+      + `${PARAM_TYPES.numeric.length} (${PARAM_TYPES.numeric.join(', ')}). A count that is wrong `
+      + 'does not merely omit a type, it tells a student the type does not exist';
+});
+
+check('both doc surfaces name every numeric parameter type', () => {
+  const surfaces = [
+    ['reference.md', readFileSync(PARAM_TYPES.path, 'utf8')],
+    ['lib/jscad-docs.ts', readFileSync(PARAM_TYPES.inApp, 'utf8')],
+  ];
+  const bad = [];
+  for (const [where, text] of surfaces) {
+    for (const t of PARAM_TYPES.numeric) {
+      if (!new RegExp(`type:\\s*'${t}'`).test(text)) bad.push(`${t} is never written in ${where}`);
+    }
+  }
+  return bad.length
+    ? `${bad.join('; ')} — a type taught on one surface and absent from the other is exactly `
+      + 'how int and float went missing, and a student reading the short file stalls'
+    : true;
+});
+
+check('the shCAD section works the four numeric types in one runnable example', () => {
+  if (shcad.error) return shcad.error;
+  const { findBy, declares, everyValueIsA } = PARAM_TYPES.example;
+  const fence = shcadFences.find((f) => findBy.test(f.code));
+  if (!fence) return `no runnable example in the shCAD section declares ${findBy} — the table `
+    + 'says these are safe to type and nothing on the page types one';
+  if (!fence.tags.includes('shcode-only')) return 'that example is not tagged shcode-only';
+  const missing = declares.filter((t) => !new RegExp(`type:\\s*'${t}'`).test(fence.code));
+  if (missing.length) return `the example does not declare ${missing.join(', ')}`;
+
+  const cap = captureConsole();
+  const ctx = createSimpleContext({ consoleImpl: cap.console });
+  const r = runProgram(ctx.ctx, fence.code, 'reference.md', { lineOffset: 0 });
+  if (!r.ok) return `${r.phase}: ${r.error.message}`;
+  if (!isGeometry(r.geometry)) return 'main(defaults) built nothing drawable';
+
+  const defs = ctx.window.getParameterDefinitions();
+  const wrong = defs
+    .filter((d) => declares.includes(String(d.type)))
+    .filter((d) => typeof d.initial !== everyValueIsA);
+  return wrong.length
+    ? `${wrong.map((d) => `${d.name} (${d.type})`).join(', ')} declared an initial that is not a `
+      + `${everyValueIsA} — the point of the example is that all four are one kind of thing`
+    : true;
+});
+
+
+// The generalised wall behind both hand-found stalls. A word the book prints
+// inside an object literal is not a call, so BOOK_CENSUS does not count it and
+// no bridge table covers it — which is how `type: 'float'` and then
+// `twistAngle` each got through with the gate fully green. Swept, one check per
+// word, because the failure being closed is a MISSING word and an aggregate
+// reports it as a number instead of as the word.
+for (const [key, takenBy] of Object.entries({
+  ...BOOK_OPTION_WORDS.keys, ...BOOK_OPTION_WORDS.alsoFromGraduation,
+  ...BOOK_OPTION_WORDS.alsoFromRefusals,
+})) {
+  check(`reference.md writes the option key ${key}`, () => {
+    const md = readFileSync(BOOK_OPTION_WORDS.path, 'utf8');
+    return new RegExp('`[^`\\n]*\\b' + key + '\\b[^`\\n]*`').test(md)
+      ? true
+      : `${key} is never written in reference.md, and the seven chapters type it (${takenBy}). `
+        + 'The in-app docs are not a substitute: reference.md is the file the shCAD section '
+        + 'tells a student to keep open while reading, so a word only the other surface '
+        + 'carries is a word that student cannot reach';
+  });
+}
+
+
+// ===========================================================================
+// PORTABLE — the shCAD program, rewritten so it runs on jscad.app
+// ===========================================================================
+//
+// shCAD is additive, so nothing has to be undone to graduate — but a shCode
+// file still does not RUN on https://jscad.app/, which curriculum-plan.md names
+// as the Q3-Q4 environment. Two things stand in the way and a converter that
+// fixes only one of them is useless: the twelve shCAD names, and the 124 bare
+// names runner.html's shim installs. EQUIVALENTS' own revolve row carries one
+// of each in a single expression.
+//
+// The converter is lib/jscad-portable.mjs, and its rules are DERIVED FROM
+// EQUIVALENTS rather than written a second time: the rows are arrow functions,
+// so Function.prototype.toString() is the bridge from "functions" to "text",
+// and the real halves are already module-qualified — which is the portable
+// spelling. Four checks come off each row, and three interlocks stop the
+// converter falling behind the layer.
+//
+// A red check here is closed by fixing lib/jscad-portable.mjs, never by
+// trimming a row out of the corpus.
+
+at('portable');
+
+const collectedBranches = new Set();
+
+check('lib/jscad-portable.mjs is there and adds no dependency', () => {
+  if (!existsSync(PORTABLE.path)) return `missing ${relative(REPO, PORTABLE.path)}`;
+  const src = readFileSync(PORTABLE.path, 'utf8');
+  const imports = [...src.matchAll(/^\s*import\s[^\n]*from\s+['"]([^'"]+)['"]/gm)].map((m) => m[1]);
+  return imports.length
+    ? `it imports ${imports.join(', ')} — the converter is pure text in, text out, and the `
+      + 'browser page has no bundle loaded'
+    : true;
+});
+
+// INTERLOCK 1 — one rule per shCAD name. This is the tie to Job A: adding a
+// name to SHCAD_NAMES without a converter rule fails the gate, and every future
+// name inherits that automatically.
+check('there is exactly one converter rule per shCAD name', () => {
+  const want = SHCAD_NAMES.map((n) => n.name).sort();
+  const got = [...RULE_NAMES].sort();
+  if (same(got, want)) return true;
+  const missing = want.filter((n) => !got.includes(n));
+  const extra = got.filter((n) => !want.includes(n));
+  return `${missing.length ? `no converter rule for: ${missing.join(', ')}. ` : ''}`
+    + `${extra.length ? `rules for names shCAD has not got: ${extra.join(', ')}. ` : ''}`
+    + 'A student who writes a name the layer installs and the converter cannot read gets a '
+    + 'file that still says "box is not defined" on jscad.app';
+});
+
+// INTERLOCK 2 — every rule is exercised by the corpus. A rule with no proof is
+// not shippable. turn is the one exception and it is named rather than assumed.
+check('every converter rule is proved by a corpus row', () => {
+  const covered = new Set(EQUIVALENTS.map((e) => e.name));
+  const unproved = RULE_NAMES.filter((n) => !covered.has(n));
+  if (!same(unproved.sort(), [...PORTABLE.provedElsewhere].sort())) {
+    return `rules with no EQUIVALENTS row: ${unproved.join(', ')} — add a row, or list the name `
+      + 'in PORTABLE.provedElsewhere and say which table proves it instead';
+  }
+  const turnRows = TURN_IN_PLACE.length + TURN_COMPOSITION.length;
+  return turnRows > 0
+    ? true
+    : 'turn is exempt from EQUIVALENTS and TURN_IN_PLACE / TURN_COMPOSITION are now empty, so '
+      + 'nothing proves its conversion at all';
+});
+
+// THE CORPUS, four checks a row.
+for (const e of EQUIVALENTS) {
+  check(`portable: ${e.label}`, () => {
+    const shcad = equivalentText(e.shcad);
+    const real = equivalentText(e.real);
+    if (shcad.error) return `the shCAD half: ${shcad.error}`;
+    if (real.error) return `the real half: ${real.error}`;
+
+    const program = programAround(shcad.text);
+    const r = convert(program);
+    for (const b of r.branches) collectedBranches.add(b);
+    if (r.refusals.length) {
+      return `the converter refused its own corpus row: ${r.refusals.map((x) => x.why).join('; ')}`;
+    }
+
+    // A. TEXT. The rule's spelling has to be the call the gate executes.
+    const got = normaliseCall(returnedExpression(r.code));
+    const want = normaliseCall(real.text);
+    if (got !== want) {
+      return `the rule and the identity bar disagree about the real call.\n       converter: ${got}\n       EQUIVALENTS: ${want}`;
+    }
+
+    // B. GEOMETRY, in the environment the student is actually going to.
+    const run = runProgram(createRequireOnlyContext(), r.code, 'converted');
+    if (!run.ok) return `the converted program does not run on jscad.app — ${run.phase}: ${run.error.message}`;
+    const { window: w } = createSimpleContext();
+    const verdict = sameGeometry(run.geometry, e.shcad(w));
+    if (verdict !== true) return `the converted program builds a different model: ${verdict}`;
+
+    // C. NEGATIVE CONTROL. The unconverted program must FAIL there.
+    const before = runProgram(createRequireOnlyContext(), program, 'unconverted');
+    if (before.ok && isGeometry(before.geometry)) {
+      return 'the UNCONVERTED program runs on jscad.app too — either the shim has leaked into '
+        + 'the require-only context or this row needs no conversion, and both should be loud';
+    }
+
+    // D. HEADER. Derived by scanning what was emitted, never written by hand.
+    return r.modules.length && r.code.startsWith('const { ')
+      ? true
+      : 'the require header was not derived — a converted file with no require() cannot run';
+  });
+}
+
+for (const f of PORTABLE_FIXTURES) {
+  check(`portable fixture: ${f.label}`, () => {
+    const r = convert(f.program);
+    for (const b of r.branches) collectedBranches.add(b);
+    if (r.refusals.length) return `refused: ${r.refusals.map((x) => x.why).join('; ')}`;
+    const run = runProgram(createRequireOnlyContext(), r.code, 'converted');
+    if (!run.ok) return `${run.phase}: ${run.error.message}\n${r.code}`;
+    const { window: w } = createSimpleContext();
+    const verdict = sameGeometry(run.geometry, f.shcad(w));
+    if (verdict !== true) return `different model: ${verdict}`;
+    const before = runProgram(createRequireOnlyContext(), f.program, 'unconverted');
+    if (before.ok && isGeometry(before.geometry)) return 'the unconverted program ran there too';
+    for (const rx of f.notes || []) {
+      if (!r.notes.some((n) => rx.test(n))) return `nothing in notes matches ${rx} — the page has `
+        + 'nowhere to tell the student what the converter decided for them';
+    }
+    if (f.exports && !f.exports.test(r.code)) return `the export line is wrong: ${r.code.split('\n').pop()}`;
+    for (const text of f.keep || []) {
+      if (!r.code.includes(text)) {
+        return `\`${text}\` is not in the output. A fixture's \`keep\` is the half of it that `
+          + `must survive the rewrite untouched:\n${r.code}`;
+      }
+    }
+    return true;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// THE MAPPING, CHECKED AS A MAPPING.
+//
+// Everything above compares a rule's emitted text to one row's real half, for
+// that row's own literals — which proves the pair agrees at a point and says
+// nothing about whether the rule is a FUNCTION of its arguments. Measured on
+// this tree before this check existed: cone's startRadius could be spelled
+// `[10, 10]`, cone's height `20`, tube's radius `5`, tube's height `20`, poly's
+// points the corpus's own three corners, turn's angle `90`, and revolve's whole
+// profile the corpus's own translate(...) — each alone, and all at once — with
+// the gate at a full PASS. A student's disc(7) profile would vanish, silently,
+// replaced by a rectangle from a test fixture.
+//
+// ring, disc and ball survived that only because each happens to have two rows
+// with different numbers. Adding a second row for the other five would close
+// today's holes and leave tomorrow's open. So instead: bump every numeric
+// literal in the shCAD source, one at a time, and require the converted text to
+// CHANGE. A slot that tracks its argument moves; a slot that has been spelled
+// out does not, and this says which literal it stopped tracking.
+const respondsTo = (label, shcadText) => {
+  check(`portable tracks its arguments: ${label}`, () => {
+    const slots = numericLiterals(shcadText);
+    if (!slots.length) {
+      return PORTABLE_RESPONDS.noLiteralsAllowed.includes(label)
+        ? true
+        : `${label} has no numeric literal, so bumping one proves nothing about it. Give the `
+          + 'row a number, or list it in PORTABLE_RESPONDS.noLiteralsAllowed with a reason';
+    }
+    const base = convert(programAround(shcadText));
+    if (base.refusals.length) return `the row itself is refused: ${base.refusals.map((x) => x.why).join('; ')}`;
+    for (const slot of slots) {
+      const moved = replaceLiteral(shcadText, slot, PORTABLE_RESPONDS.bump(slot.text));
+      const after = convert(programAround(moved));
+      if (after.refusals.length) {
+        return `changing ${slot.text} to ${PORTABLE_RESPONDS.bump(slot.text)} makes the converter `
+          + `refuse: ${after.refusals.map((x) => x.why).join('; ')}`;
+      }
+      if (after.code === base.code) {
+        return `${slot.text} at offset ${slot.start} does not reach the output: changing it to `
+          + `${PORTABLE_RESPONDS.bump(slot.text)} converts to the SAME text. Some rule has that `
+          + 'value spelled out instead of reading it off the call, so it converts every '
+          + "student's program to this one";
+      }
+    }
+    return true;
+  });
+};
+
+for (const e of EQUIVALENTS) {
+  const shcad = equivalentText(e.shcad);
+  if (!shcad.error) respondsTo(e.label, shcad.text);
+}
+for (const t of TURN_IN_PLACE) {
+  const shcad = equivalentText(t.shcad);
+  if (!shcad.error) respondsTo(`turn — ${t.label}`, shcad.text);
+}
+for (const f of PORTABLE_FIXTURES) {
+  check(`portable tracks its arguments: fixture ${f.label}`, () => {
+    const slots = numericLiterals(f.program);
+    if (!slots.length) return 'this fixture has no numeric literal to bump';
+    const base = convert(f.program);
+    if (base.refusals.length) return `the fixture itself is refused`;
+    for (const slot of slots) {
+      const moved = replaceLiteral(f.program, slot, PORTABLE_RESPONDS.bump(slot.text));
+      const after = convert(moved);
+      if (after.refusals.length) {
+        return `changing ${slot.text} to ${PORTABLE_RESPONDS.bump(slot.text)} makes the converter `
+          + `refuse: ${after.refusals.map((x) => x.why).join('; ')}`;
+      }
+      if (after.code === base.code) {
+        return `${slot.text} at offset ${slot.start} does not reach the output — a rule has it `
+          + 'spelled out rather than reading it off the call';
+      }
+    }
+    return true;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// turn, which has no single-call equivalent and is therefore proved against the
+// two tables that already own it.
+//
+// The group case is the one that matters: it is the only one that exercises
+// measureAggregateBoundingBox, and a helper that used measureBoundingBox on an
+// array would produce null coordinates with no error — the same defect
+// middleOf() in simple.js carries a comment about.
+for (const t of TURN_IN_PLACE) {
+  check(`portable turn: ${t.label}`, () => {
+    const shcad = equivalentText(t.shcad);
+    if (shcad.error) return shcad.error;
+    const program = programAround(shcad.text);
+    const r = convert(program);
+    for (const b of r.branches) collectedBranches.add(b);
+    if (r.refusals.length) return `refused: ${r.refusals.map((x) => x.why).join('; ')}`;
+
+    if (!r.code.includes(`function ${PORTABLE.helper}(`)) {
+      return `the helper ${PORTABLE.helper} was not written into the file, so turn has nothing `
+        + 'to call on jscad.app';
+    }
+    if (PORTABLE.notAPlainRotate.test(normaliseCall(returnedExpression(r.code)))) {
+      return 'turn was converted to a bare transforms.rotate — that pivots on the WORLD origin, '
+        + 'which is the silent wrong answer turn exists to close';
+    }
+    const run = runProgram(createRequireOnlyContext(), r.code, 'converted-turn');
+    if (!run.ok) return `${run.phase}: ${run.error.message}`;
+    const { window: w } = createSimpleContext();
+    const verdict = sameGeometry(run.geometry, t.shcad(w));
+    return verdict === true ? true : `the converted turn builds a different model: ${verdict}`;
+  });
+}
+
+// And the property turn's whole banner rests on, carried across the conversion:
+// turnInPlace must still COMMUTE with translate. Both orders are built from
+// TURN_COMPOSITION's own data rather than from new fixtures.
+for (const t of TURN_COMPOSITION) {
+  check(`the converted turn still commutes with translate — ${t.label}`, () => {
+    const build = equivalentText(t.build);
+    if (build.error) return build.error;
+    const move = JSON.stringify(t.move);
+    // JSON.stringify the ANGLE too, not just the move. A bare ${t.degrees} is
+    // Array.prototype.toString for the [x, y, z] form, so turn([0, 90, 0], s)
+    // was emitted as turn(0, 90, 0, s) — four arguments — and came back as a
+    // refusal blaming turn. The bug was latent until the first row carrying an
+    // array angle; every earlier row span a single number about Z.
+    const degrees = JSON.stringify(t.degrees);
+    const first = `translate(${move}, turn(${degrees}, ${build.text}))`;
+    const second = `turn(${degrees}, translate(${move}, ${build.text}))`;
+
+    const out = [];
+    for (const expr of [first, second]) {
+      const r = convert(programAround(expr));
+      for (const b of r.branches) collectedBranches.add(b);
+      if (r.refusals.length) return `refused: ${r.refusals.map((x) => x.why).join('; ')}`;
+      const run = runProgram(createRequireOnlyContext(), r.code, 'converted-commute');
+      if (!run.ok) return `${expr} — ${run.phase}: ${run.error.message}`;
+      out.push(run.geometry);
+    }
+    const { window: w, jscad } = createSimpleContext();
+    const mine = w.translate(t.move, w.turn(t.degrees, t.build(w)));
+    if (sameGeometry(out[0], mine) !== true) {
+      return 'the converted program does not build what shCode built for the same source';
+    }
+    return sameModel(jscad, out[0], out[1])
+      ? true
+      : 'the converted turn no longer commutes with translate, so the helper is not rotating '
+        + 'in place — reference.md and simple.js both claim it does';
+  });
+}
+
+// ---------------------------------------------------------------------------
+// THE REQUIRE HEADER, PROVED FOR EVERY MODULE AND NOT ONLY THE ONES THE CORPUS
+// HAPPENS TO REACH.
+//
+// The corpus and the fixtures between them touch ten of the fifteen modules, so
+// the derivation is unproved for the other five. Measured before this loop
+// existed: deleting `text` from MODULE_ORDER left the gate at a FULL PASS.
+// Nothing calls vectorText, so nothing noticed — and a student's nameplate
+// program would have converted to a file with no `text` in its header and died
+// on jscad.app with every check green.
+//
+// One witness per module, derived from MODULE_OF rather than listed, so the
+// next module nobody happens to use is covered the day the bundle ships it.
+for (const w of moduleWitnesses(MODULE_OF, MODULE_ORDER)) {
+  check(`the derived require header reaches ${w.module}`, () => {
+    if (!w.name) {
+      return `no bare name in MODULE_OF is filed under ${w.module}, so nothing witnesses that `
+        + 'the header can pull it in — either the map lost a name or MODULE_ORDER has one the '
+        + 'shim no longer installs';
+    }
+    const program = programAround(`typeof ${w.name}`);
+    const r = convert(program);
+    if (r.refusals.length) return `refused its own witness: ${r.refusals.map((x) => x.why).join('; ')}`;
+    if (!r.code.includes(w.path)) return `\`${w.name}\` was not qualified to ${w.path}`;
+    if (!r.modules.includes(w.module)) {
+      return `the header destructures ${r.modules.join(', ') || 'nothing'} — ${w.module} is `
+        + `missing, so ${w.path} cannot resolve and the file dies on load`;
+    }
+
+    const run = runProgram(createRequireOnlyContext(), r.code, `header-${w.module}`);
+    if (!run.ok) return `${run.phase}: ${run.error.message}`;
+    const { window: shim } = createShimContext();
+    if (run.geometry === 'undefined') {
+      return `${w.path} is undefined on jscad.app, so the map points somewhere the require-only `
+        + 'context has not got';
+    }
+    if (run.geometry !== typeof shim[w.name]) {
+      return `converted, ${w.name} is a ${run.geometry}; the shim's bare one is a `
+        + `${typeof shim[w.name]}`;
+    }
+    // The negative control, same as every corpus row: the UNCONVERTED name has
+    // to be missing there, or this witness is proving nothing.
+    const before = runProgram(createRequireOnlyContext(), program, 'unconverted');
+    return before.ok && before.geometry !== 'undefined'
+      ? `bare ${w.name} already exists in the require-only context, so either the shim leaked `
+        + 'or this name needs no conversion'
+      : true;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// THE LAYER AND THE CONVERTER, ON THE SAME PROGRAM.
+//
+// simple.js refuses an unknown option BY NAME; the converter re-implements
+// option handling from text. Measured before the rules declared their keys:
+// fourteen name/key pairs THREW in shCode and converted CLEAN — among them
+// `revolve(profile, { center: [1, 2, 3] })`, which becomes
+// extrudeRotate({ center: … }, profile) and is silently ignored by the library.
+// A student is told the file is fine and gets a model shCode refused to build.
+//
+// The property is one-directional on purpose: the converter must never ACCEPT
+// what the layer REFUSES. Refusing more is safe — a refusal is reported with a
+// line number and the text is left alone. And where both accept, the bar is the
+// same geometry bar the corpus uses, which is what stops a passed-through key
+// from being passed through wrongly.
+check('the converter allows exactly the option keys shCAD allows', () => {
+  const wrong = [];
+  for (const n of SHCAD_NAMES) {
+    const rule = RULES[n.name];
+    if (!rule) { wrong.push(`${n.name} has no rule`); continue; }
+    if (!Array.isArray(rule.options)) { wrong.push(`${n.name}'s rule declares no option list`); continue; }
+    if (!same([...rule.options].sort(), [...n.options].sort())) {
+      wrong.push(`${n.name}: the rule takes ${JSON.stringify(rule.options)}, shCAD takes ${JSON.stringify(n.options)}`);
+    }
+  }
+  return wrong.length
+    ? `${wrong.join('; ')} — the list the converter checks against has to BE shCAD's, or the `
+      + 'two disagree about which programs are legal'
+    : true;
+});
+
+for (const n of SHCAD_NAMES) {
+  check(`the converter never accepts an option ${n.name} refuses`, () => {
+    for (const [key, value] of Object.entries(PORTABLE_OPTION_PROBES)) {
+      const built = sampleCall(n, `{ ${key}: ${value} }`);
+      if (built.error) return built.error;
+      const program = programAround(built.text);
+
+      const layer = runProgram(createSimpleContext().ctx, program, 'shCAD');
+      const layerBuilt = layer.ok && isGeometry(layer.geometry);
+      const r = convert(program);
+      const refused = r.refusals.length > 0;
+
+      if (!layerBuilt && !refused) {
+        return `${built.text} does not build in shCode (${layer.ok ? 'it returned nothing drawable' : layer.error.message.split('.')[0]}), `
+          + 'and the converter accepted it anyway. A key shCAD refuses by name is a key the '
+          + 'library ignores, so the portable file builds a DIFFERENT model and says nothing';
+      }
+      if (!layerBuilt) continue;                     // refused by both — nothing more to ask
+      if (refused) continue;                         // stricter, which is always allowed
+      const run = runProgram(createRequireOnlyContext(), r.code, 'converted-option');
+      if (!run.ok) return `${built.text} converted to a file that does not run — ${run.phase}: ${run.error.message}`;
+      const verdict = sameGeometry(run.geometry, layer.geometry);
+      if (verdict !== true) {
+        return `${built.text} builds a different model once converted: ${verdict} — the key was `
+          + 'carried across, but not to the same place';
+      }
+    }
+    return true;
+  });
+}
+
+// INTERLOCK 3 — every declared branch is taken by the corpus above. Branch
+// coverage with no coverage tool and no dependency: a rule that declares a
+// branch nothing reaches is a rule half of which has never been run.
+check('every branch every converter rule declares is exercised', () => {
+  const missing = [];
+  for (const [name, rule] of Object.entries(RULES)) {
+    for (const b of rule.branches) {
+      if (!collectedBranches.has(`${name}:${b}`)) missing.push(`${name}:${b}`);
+    }
+  }
+  return missing.length
+    ? `never taken by any corpus row: ${missing.join(', ')} — add a row that reaches it, or `
+      + 'delete the branch'
+    : true;
+});
+
+// ---------------------------------------------------------------------------
+// The pinned module map, which is the one piece of data not derived from
+// EQUIVALENTS. It ships in the lib file because the browser has no bundle
+// loaded, and it is regenerated here from the vendored bundle and diffed.
+check('the bare-name map matches the vendored bundle', () => {
+  const { jscad } = loadModeling();
+  const want = {};
+  for (const m of EXPECTED_MODULE_ORDER) want[m] = m;
+  for (const m of EXPECTED_MODULE_ORDER) {
+    for (const k of Object.keys(jscad[m] || {})) if (!(k in want)) want[k] = `${m}.${k}`;
+  }
+  const problems = [];
+  for (const [k, v] of Object.entries(want)) {
+    if (!(k in MODULE_OF)) problems.push(`${k} is missing`);
+    else if (MODULE_OF[k] !== v) problems.push(`${k} says ${MODULE_OF[k]}, the bundle says ${v}`);
+  }
+  for (const k of Object.keys(MODULE_OF)) if (!(k in want)) problems.push(`${k} is not in the bundle`);
+  return problems.length
+    ? `REGENERATE MODULE_OF in lib/jscad-portable.mjs from the vendored bundle — a name has `
+      + `moved: ${problems.slice(0, 6).join('; ')}`
+    : true;
+});
+
+check('the map covers every bare name the shim installs, and nothing else', () => {
+  const { window: w, jscad } = createShimContext();
+  const bad = [];
+  for (const [name, path] of Object.entries(MODULE_OF)) {
+    let v = jscad;
+    for (const step of path.split('.')) v = v && v[step];
+    if (w[name] !== v) bad.push(name);
+  }
+  if (bad.length) return `bare ${bad.slice(0, 6).join(', ')} is not what the map says it is`;
+  return eq(Object.keys(MODULE_OF).length, EXPECTED_BARE_NAME_COUNT, 'names in MODULE_OF');
+});
+
+// The documented collisions are the reason this is a map rather than a guess.
+for (const c of DOCUMENTED_COLLISIONS) {
+  check(`the map keeps the documented collision: bare ${c.name} is the module`, () => {
+    return MODULE_OF[c.name] === c.name
+      ? true
+      : `MODULE_OF says bare ${c.name} is ${MODULE_OF[c.name]}, and runner.html's shim gives the `
+        + `${c.winner} — a converted file would reach for the wrong one and die on jscad.app`;
+  });
+}
+
+check('degToRad is on the top-level utils module, not maths.utils', () => {
+  const { jscad } = loadModeling();
+  if (typeof (jscad.maths.utils || {}).degToRad === 'function') {
+    return 'maths.utils.degToRad exists now, so the collision the turn helper steps around has '
+      + 'gone — re-read reference.md\'s note about it before changing anything';
+  }
+  if (MODULE_OF.degToRad !== 'utils.degToRad') return `the map says ${MODULE_OF.degToRad}`;
+  return TURN_HELPER.includes('utils.degToRad') && !/maths\.utils\.degToRad/.test(TURN_HELPER)
+    ? true
+    : 'the turn helper reaches for the wrong degToRad, and the converted file would die on '
+      + 'jscad.app with no clue why';
+});
+
+// Refusal rather than cleverness. There is no parser here, so these are the
+// sharp edges — and both halves are asserted: untouched text must come through
+// byte-identical, and unclassifiable text must be reported with a line number.
+for (const p of PORTABLE_LEAVES_ALONE) {
+  check(`the converter leaves alone: ${p.what}`, () => {
+    const r = convert(p.program);
+    return r.code.includes(p.keep)
+      ? true
+      : `\`${p.keep}\` was rewritten. The scanner has to skip strings, comments, member access `
+        + `and property keys, and it did not here:\n${r.code}`;
+  });
+}
+
+for (const p of PORTABLE_REFUSES) {
+  check(`the converter refuses rather than guesses: ${p.what}`, () => {
+    const r = convert(p.program);
+    if (!r.refusals.length) return 'no refusal at all — it guessed';
+    const text = r.refusals.map((x) => x.why).join(' | ');
+    const silent = p.says.filter((rx) => !rx.test(text));
+    if (silent.length) return `the refusal does not say ${silent.join(' / ')}: ${text}`;
+    if (r.refusals.some((x) => !(x.line > 0))) return 'a refusal carries no line number';
+    return !p.keep || r.code.includes(p.keep)
+      ? true
+      : `it refused AND rewrote: \`${p.keep}\` is gone from the output`;
+  });
+}
+
+// A converter nothing can load is the REACH group's lesson applied here: every
+// other check in this group measures whether the conversion is CORRECT, and
+// none of them would notice that a student has no way to run it.
+check('a student can actually reach the converter', () => {
+  const page = join(REPO, 'app/portable/page.tsx');
+  if (!existsSync(page)) return 'app/portable/page.tsx is gone — the converter is a module '
+    + 'nobody outside npm test can run';
+  const src = readFileSync(page, 'utf8');
+  if (!/from '\.\.\/\.\.\/lib\/jscad-portable\.mjs'/.test(src)) {
+    return 'app/portable/page.tsx no longer imports the converter, so the page and the thing '
+      + 'this group tests are two different pieces of code';
+  }
+  const md = readFileSync(GRADUATION.path, 'utf8');
+  return /\]\(\/portable\/\)/.test(md)
+    ? true
+    : 'reference.md never links /portable/, and the graduation section is where a student is '
+      + 'standing when they need it';
+});
+
+check('the converter says what it did, in notes a page can print', () => {
+  const r = convert(programAround('turn(45, sit(ball(10)))'));
+  if (r.refusals.length) return `refused: ${r.refusals[0].why}`;
+  const turnNote = r.notes.find((n) => n.includes(PORTABLE.helper));
+  if (!turnNote) return 'nothing in notes explains where turnInPlace came from — it is a function '
+    + "the student did not write, appearing in their own file";
+  return r.notes.some((n) => /ONE file/.test(n))
+    ? true
+    : 'notes never says the converter handles one file rather than a project, and reference.md '
+      + 'says jscad.app takes a folder';
+});
+
+// ===========================================================================
 // report
 // ===========================================================================
 
@@ -664,7 +2763,7 @@ if (WANT_JSON) {
   process.exit(ok ? 0 : 1);
 }
 
-const GROUPS = ['bundle', 'shim', 'api', 'renderer', 'docs', 'sync', 'reach'];
+const GROUPS = ['bundle', 'shim', 'api', 'renderer', 'docs', 'sync', 'reach', 'simple', 'portable'];
 const TITLES = {
   bundle: 'BUNDLE   — the vendored libraries, and no CDN anywhere',
   shim: 'SHIM     — cut live out of runner.html',
@@ -673,6 +2772,8 @@ const TITLES = {
   docs: 'DOCS     — every example runs on jscad.app',
   sync: 'SYNC     — in-app docs vs docs/reference.md',
   reach: 'REACH    — a student can actually load this runtime',
+  simple: 'SIMPLE   — shCAD adds names, and only names',
+  portable: 'PORTABLE — the same program, running on jscad.app',
 };
 
 for (const g of GROUPS) {

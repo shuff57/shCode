@@ -3290,7 +3290,9 @@ module.exports = { main }`,
 
 Stand an arm 30 mm long on the origin and turn it by 1 radian. The tip travels 30 mm around the rim — one arm's length of rim. Turn it by 2 radians and the tip travels 60 mm. That is the whole definition: the angle is how far around you went, counted in arm lengths. Which is also why the numbers look untidy. All the way round is 6.283185… arm lengths of rim, never a round number, while 360 is a figure somebody made up because it divides nicely.
 
-A whole turn has a name in the library: maths.constants.TAU, which is that 6.283185… So half a turn is TAU / 2 and a quarter is TAU / 4. All three ways of writing a quarter turn below — Math.PI / 2, utils.degToRad(90), TAU / 4 — are the same number, and the run proves it: three arms land on top of each other and you see one.
+A whole turn has a name in the library: maths.constants.TAU, which is that 6.283185… So half a turn is maths.constants.TAU / 2 and a quarter is maths.constants.TAU / 4. All three ways of writing a quarter turn below — Math.PI / 2, utils.degToRad(90), maths.constants.TAU / 4 — are the same number, and the run proves it: three arms land on top of each other and you see one.
+
+Write the whole path, not a bare TAU. Books and forum answers write angle: TAU because most JSCAD editors put it in scope; this runner does not, so a bare TAU is not defined and you get TAU is not defined with nothing else to go on. Destructure maths the way the block below does and write maths.constants.TAU, or take the shorter constants.TAU that this runner also puts in scope.
 
 The fourth arm is the mistake this page exists to prevent. rotateZ(90) is perfectly legal and means 90 radians, which is fourteen whole turns and a bit, finishing at 116.6 degrees. Nothing warns you. You just get an arm pointing somewhere odd.
 
@@ -3450,29 +3452,36 @@ module.exports = { main, getParameterDefinitions }`,
       },
       {
         title: 'Asking for a number',
-        body: `Three of the types hand you a number. They differ only in how the panel asks for it.
+        body: `Four of the types hand you a number. They differ only in how the panel asks for it — and the number that reaches main() is the same ordinary JavaScript number every time.
 
-number is a box you type into. slider is a bar you drag — the same value, but far better when you are hunting for a size by eye. int is for counts: sides, teeth, holes, anything with no sensible half.
+number is a box you type into. slider is a bar you drag — the same value, but far better when you are hunting for a size by eye. int is for counts: sides, teeth, holes, anything with no sensible half. float is for the ones where half makes perfect sense: a radius of 62.5 mm, a gap of 1.6 mm.
 
-All three take min, max and step. min and max are the ends of the range, and step is how far one nudge moves. Pick them from what the model can actually survive rather than from what looks tidy. A cylinder needs at least four segments — segments is how many flat faces it is built from — and asking for three stops the build with "segments must be four or more". That is why sides starts at min: 4.
+Do not read int and float as two kinds of number. JavaScript has one kind. The word is telling the panel whether to let you type a decimal point, nothing more, which is why choosing the wrong one changes the knob and never changes the value.
+
+All four take min, max and step. min and max are the ends of the range, and step is how far one nudge moves. Pick them from what the model can actually survive rather than from what looks tidy. A cylinder needs at least four segments — segments is how many flat faces it is built from — and asking for three stops the build with "segments must be four or more". That is why sides starts at min: 4.
 
 Turn sides up to 24 and run it. The cylinder stops looking like a pencil and starts looking round.`,
-        code: `const { primitives } = require('@jscad/modeling')
+        code: `const { primitives, transforms } = require('@jscad/modeling')
 
 function getParameterDefinitions() {
   return [
     { name: 'radius', type: 'number', initial: 14, min: 4, max: 30, step: 1, caption: 'Radius (mm)' },
     { name: 'height', type: 'slider', initial: 20, min: 5, max: 60, step: 1, caption: 'Height (mm)' },
-    { name: 'sides', type: 'int', initial: 6, min: 4, max: 24, step: 1, caption: 'Number of sides' }
+    { name: 'sides', type: 'int', initial: 6, min: 4, max: 24, step: 1, caption: 'Number of sides' },
+    { name: 'lift', type: 'float', initial: 2.5, min: 0, max: 10, caption: 'Lift off the bed (mm)' }
   ]
 }
 
 function main(params) {
-  return primitives.cylinder({
+  // All four are typeof 'number'. The type only decided the control.
+  console.log(typeof params.radius, typeof params.height,
+    typeof params.sides, typeof params.lift)
+
+  return transforms.translateZ(params.lift, primitives.cylinder({
     radius: params.radius,
     height: params.height,
     segments: params.sides
-  })
+  }))
 }
 
 module.exports = { main, getParameterDefinitions }`,

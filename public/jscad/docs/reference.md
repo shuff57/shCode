@@ -59,9 +59,817 @@ https://jscad.app/ — that editor has no such shortcut. Two names inside
 `minkowski` are the top-level modules of those names; `maths.utils` and
 `booleans.minkowski` stay reachable through their modules.
 
-That first block is the only shortcut example in this file, and its fence is
-tagged `shcode-only` for a reason: `npm test` runs every other example here in
-a require-only sandbox and fails the build if one of them needs the shim.
+That first block, and the shCAD section below, are the only examples in this
+file that depend on shCode, and their fences are tagged `shcode-only` for a
+reason: `npm test` runs every other example here in a require-only sandbox and
+fails the build if one of them needs the shim.
+
+### Converting a whole file to the portable form
+
+Doing that by hand, one name at a time, is the slow way. **[/portable](/portable/)**
+does it for a whole program — paste the shCAD file in on the left, copy the
+portable form out on the right. The conversion itself is
+`lib/jscad-portable.mjs`, and `convert(source)` hands back
+`{ code, notes, refusals }` if you want to call it yourself.
+
+It undoes **two** shortcuts, and a file that only had the first one undone still
+does not run. The obvious one is the shCAD names — `box(40, 20, 10)` becomes
+`primitives.cuboid({ size: [40, 20, 10] })`. The one that is easy to forget is
+the shim above: `translate` and `subtract` and `measureVolume` are bare in
+shCode and do not exist on jscad.app at all. Both halves show up in one line
+more often than not — `revolve(translate([10, 0, 0], rect(4, 10)))` is an shCAD
+name wrapped around a bare real one.
+
+Here is a program in shCAD:
+
+```js shcode-only
+function main() {
+  const arm = translate([50, 0, 0], box(40, 20, 20))
+  const cap = sit(ring(14, 4))
+
+  return [turn(90, arm), cap]
+}
+```
+
+…and here is exactly what the converter makes of it — `require` header derived
+from what was actually emitted, nothing added that is not used:
+
+```js
+const { measurements, primitives, utils, transforms } = require('@jscad/modeling')
+
+// shCAD's turn(), written out in the real API. It rotates a shape about its
+// OWN middle; transforms.rotate rotates about the world origin.
+function turnInPlace(degrees, shape) {
+  const spin = Array.isArray(degrees) ? degrees : [0, 0, degrees]
+  const bounds = Array.isArray(shape)
+    ? measurements.measureAggregateBoundingBox(shape)
+    : measurements.measureBoundingBox(shape)
+  const mid = [
+    (bounds[0][0] + bounds[1][0]) / 2,
+    (bounds[0][1] + bounds[1][1]) / 2,
+    (bounds[0][2] + bounds[1][2]) / 2
+  ]
+  const radians = [
+    utils.degToRad(spin[0]), utils.degToRad(spin[1]), utils.degToRad(spin[2])
+  ]
+  return transforms.translate(mid,
+    transforms.rotate(radians,
+      transforms.translate([-mid[0], -mid[1], -mid[2]], shape)))
+}
+
+function main() {
+  const arm = transforms.translate([50, 0, 0], primitives.cuboid({ size: [40, 20, 20] }))
+  const cap = transforms.align({ modes: ['none', 'none', 'min'], relativeTo: [0, 0, 0], grouped: false }, primitives.torus({ outerRadius: 14, innerRadius: 4 }))
+
+  return [turnInPlace(90, arm), cap]
+}
+
+module.exports = { main }
+```
+
+**`turn` is the one name that becomes a function rather than a call**, and it is
+worth reading rather than skipping. `turn` is three calls around a measurement —
+measure the shape, bring it to the origin, rotate, put it back — so there is no
+one call to swap it for. Writing it inline would evaluate your shape three
+times, which is wrong the moment the argument is `turn(45, subtract(a, b))`. So
+the converter writes an ordinary local function into your file. `turnInPlace` is
+not a shim and not shCAD in disguise: it is the real API, it travels with the
+file, and it is the honest answer to "what was `turn` actually doing". Swapping
+it for a plain `transforms.rotate` is **not** the same thing — that pivots on
+the world origin.
+
+Two more things it tells you rather than hides:
+
+- **`sit` on a bare name.** `sit(parts)` becomes
+  `grouped: Array.isArray(parts)`, because whether `parts` is one shape or a
+  list cannot be read off the text — and `grouped: false` on a list drops every
+  part separately onto `z = 0` with no error. That decision is printed in
+  `notes`.
+- **It refuses rather than guesses.** A name your file declares for itself, a
+  shorthand property, an options object that is a variable rather than a written
+  `{ }` — each is reported in `refusals` with a line number and left exactly as
+  you wrote it. Nothing is rewritten on a hunch.
+
+It converts one file. jscad.app also takes a whole folder for a multi-file
+project, and nothing here converts a project layout.
+
+## shCAD — the simplified names
+
+Everything else in this file is the real `@jscad/modeling` API, and it is what
+you take to jscad.app, to a job, and to Q4. **shCAD** is twelve extra names that
+sit on top of it, loaded from `public/jscad/simple.js` after the shim. They
+exist for one reason: to put the object literal where a beginner can see why it
+is worth having, instead of on line one where it is just punctuation.
+
+Compare the first line a student writes:
+
+```js shcode-only
+function main() {
+  return box(40, 20, 10)                      // shCAD — no braces, no arrays
+  // return cuboid({ size: [40, 20, 10] })    // the real API — both required
+}
+```
+
+…with the second one, the first time they need to move something:
+
+```js shcode-only
+function main() {
+  return box(40, 20, 10, { center: [0, 0, 10] })
+  // return cuboid({ size: [40, 20, 10], center: [0, 0, 10] })
+}
+```
+
+That contrast — no brace, then a brace because the model needed one — is the
+whole point, and the real API cannot teach it, because there the brace is
+mandatory from the start. So the rule is: **the values a shape cannot exist
+without are positional; every named extra rides in an optional trailing `{ }`.**
+The option keys are the library's own: `center`, `roundRadius`, `segments`.
+
+Nothing is renamed and nothing is wrapped. Every call below returns exactly
+what the real call beside it returns — a `geom2` or a `geom3` — so a shCAD
+shape goes straight into `subtract`, `hull`, `colorize` or `extrudeLinear`, and
+the two vocabularies mix freely in one file.
+
+#### The twelve names
+
+| shCAD | The real call it stands for |
+| --- | --- |
+| `box(40, 20, 10)` | `cuboid({ size: [40, 20, 10] })` |
+| `box(20, 20, 20, { roundRadius: 3 })` | `roundedCuboid({ size: [20, 20, 20], roundRadius: 3 })` |
+| `rect(40, 20)` | `rectangle({ size: [40, 20] })` |
+| `rect(40, 20, { roundRadius: 3 })` | `roundedRectangle({ size: [40, 20], roundRadius: 3 })` |
+| `disc(6)` | `circle({ radius: 6 })` |
+| `ball(20)` | `sphere({ radius: 20 })` |
+| `tube(5, 20)` | `cylinder({ radius: 5, height: 20 })` |
+| `tube(5, 20, { roundRadius: 1 })` | `roundedCylinder({ radius: 5, height: 20, roundRadius: 1 })` |
+| `cone(10, 20)` | `cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20 })` |
+| `ring(14, 4)` | `torus({ outerRadius: 14, innerRadius: 4 })` — read the warning below; the pair is inverted |
+| `poly(corners)` | `polygon({ points: corners })` |
+| `extrude(10, profile)` | `extrudeLinear({ height: 10 }, profile)` |
+| `revolve(profile)` | `extrudeRotate({}, profile)` — a full turn is already the default |
+| `revolve(profile, { segments: 16 })` | `extrudeRotate({ segments: 16 }, profile)` — the `{ }` swaps ends |
+| `sit(shape)` | `align({ modes: ['none','none','min'], relativeTo: [0,0,0] }, shape)` |
+| `sit(parts)` — a list of shapes | `align({ modes: ['none','none','min'], relativeTo: [0,0,0], grouped: true }, parts)` |
+| `turn(45, shape)` | **not** a plain `rotate` — see below |
+
+Every row of that table is executed by `npm test`, both halves, and the two
+results are compared as whole geometry — so it is an answer key, not a
+description. `turn` is the one row that is prose, because it is the one name
+that has no plain equivalent.
+
+You do not have to walk that table by hand to leave. **[/portable](/portable/)**
+converts a whole shCAD program into the form that runs on https://jscad.app/ —
+these twelve names, plus the shim's bare names put back behind their modules,
+plus the `require` header. Its rules are proved against the same table this one
+is, so the two cannot drift apart. See
+[Converting a whole file to the portable form](#converting-a-whole-file-to-the-portable-form)
+above for what the output looks like.
+
+Every option is passed through untouched: `segments`, `center` and
+`roundRadius` mean exactly what they mean in the real call, with the same
+defaults. A key a name does not have is refused by name rather than ignored,
+**and the refusal tells you the real function that does have it** — so a dead
+end in shCAD is always one function name from an answer. A `roundRadius` that
+is too big is reported with your own numbers in it instead of the library's
+"must be smaller than the radius of all dimensions".
+
+Nothing here is accepted and quietly dropped. `turn`, `sit`, `ring` and `poly`
+have no `{ }` at all, so `turn(45, shape, 30)`, `sit(shape, { modes: [...] })`
+and `ring(14, 4, { segments: 64 })` are errors, not no-ops — the second one
+especially, because `modes` is `align`'s own key and looks like it ought to
+work, and the third because `torus` really does accept a `segments` key and
+really does throw it away.
+
+Four rows need reading twice.
+
+**`sit` on a list needs `grouped: true`.** shCAD does this for you: handed one
+shape it aligns that shape, handed a list it moves the whole assembly as one.
+The real `align` defaults to `grouped: false`, which drops *every part
+separately* onto `z = 0` — the model collapses into itself, and nothing throws.
+That is the single most likely way to graduate a working assembly into a broken
+one, so copy the `grouped: true` row, not the plain one.
+
+**`revolve` is the one name whose `{ }` changes ends.** In shCAD every extra
+rides in a *trailing* `{ }`, with no exceptions — that is the whole grammar.
+The real `extrudeRotate` and `extrudeLinear` take theirs *first*. `extrude`
+hides that, because its one required value becomes the leading `{ height: … }`;
+`revolve` cannot, because its required value is the shape. So
+`revolve(profile, { segments: 16 })` graduates to
+`extrudeRotate({ segments: 16 }, profile)` — the same two things, in the other
+order. Writing `revolve({ segments: 16 }, profile)` is refused by name rather
+than half-working.
+
+**`revolve` makes a full turn, and only a full turn.** `angle` is not one of
+shCAD's option keys and it is not going to become one — a part turn is
+`extrudeRotate`'s job, and §9.1's own worked example is written that way:
+`extrudeRotate({ segments: 8, angle: constants.TAU / 2 }, profile)` sweeps half
+way round. (The book writes that angle `TAU / 2`; bare `TAU` is not a name this
+runner installs — see [`TAU` is a value, not a name in scope](#tau-is-a-value-not-a-name-in-scope).)
+Typing `revolve(profile, { angle: … })` does not half-work either; it is refused
+with that real call spelled out in the message. That is the shape of every
+refusal here — a name shCAD does not have is answered with the name that does.
+
+**`ring` inverts `torus`'s two radiuses, on purpose, because `torus`'s names are
+not true.** JSCAD's `outerRadius` is the radius of the circle the tube travels
+*along* — it is not the outside edge of the finished donut, and it is not
+anything you can put a caliper on. Its `innerRadius` is the radius of the tube
+itself, not the hole. So `ring(ringRadius, tubeRadius)` maps the ring radius to
+`outerRadius` and the tube radius to `innerRadius`.
+
+**`tubeRadius` is a true word where `innerRadius` is a false one — and that is
+the whole of `ring`'s advantage, not more.** `ringRadius` carries exactly the
+same ambiguity `outerRadius` does: read as *"the radius of the ring I am
+making"*, meaning its outside edge, it is wrong in the same direction and by the
+same amount. So the arithmetic is printed here rather than left to the name to
+imply: **the ring radius is `(across − thick) / 2`.**
+
+Read this table twice, because every row but the last builds without
+complaining. Measured on the vendored bundle, for a donut **36 across with an
+8-thick tube**:
+
+| what you write | what you get |
+| --- | --- |
+| `ring(14, 4)` — or `torus({ outerRadius: 14, innerRadius: 4 })` | 36 × 36 × 8 — right |
+| `ring(18, 4)` — `ringRadius` read as the outer edge | 44 × 44 × 8, silently |
+| `ring(14, 8)` — `tubeRadius` read as the tube's *thickness* | 44 × 44 × 16, silently |
+| `torus({ outerRadius: 18, innerRadius: 4 })` — `outerRadius` read as the outer edge | 44 × 44 × 8, silently — the same wrong model as `ring(18, 4)` |
+| `torus({ outerRadius: 18, innerRadius: 10 })` — and `innerRadius` read as the hole | 56 × 56 × 20, silently |
+| `ring(4, 14)` — the full swap | throws, and it says *"a tube 14 thick will not fit round a ring of radius 4 — in `ring(ringRadius, tubeRadius)` the ring radius comes first. `ring(14, 4)` is the one you meant"* |
+| `torus({ outerRadius: 4, innerRadius: 14 })` — the same swap | throws too, and it says *"inner circle is too large to rotate about the outer circle"* — two circles you never typed |
+
+Read the two throwing rows together: **`ring` does not catch a swap `torus`
+misses.** Both throw. What `ring` wins there is the *message* — your own two
+numbers, and the call you meant. The one real safety difference is higher up
+the table: there is no `ring` row that means what `innerRadius` read as the hole
+means, because `ring` has no word claiming to be the hole.
+
+`ring` has no `{ }` at all, and that is
+measured rather than stylistic: `torus` accepts `center` and `segments` and
+**silently drops both**, so a `ring` that took them would build a model at the
+wrong place with no error. `torus` spells its own segment counts
+`outerSegments` and `innerSegments`, and it has no `center` at any spelling —
+`translate` it to move it:
+
+```js shcode-only
+function main() {
+  const donut = ring(14, 4)                                   // shCAD
+  // torus({ outerRadius: 14, innerRadius: 4 })
+
+  const chunky = torus({ outerRadius: 14, innerRadius: 4, outerSegments: 8 })
+  const fine = torus({ outerRadius: 14, innerRadius: 4, innerSegments: 6 })
+
+  // 36 across and 8 thick. Read it rather than trusting the picture.
+  console.log('across and thick:', measureDimensions(donut))
+
+  return [translate([0, 40, 0], donut), chunky, translate([0, -40, 0], fine)]
+}
+```
+
+**`cone` is the one whose real call is worth seeing before you need it.** A cone
+is `cylinderElliptic` with its top radius set to zero, and there is no shorter
+way to write it in the real API: `cylinder({ radius: [12, 0] })` is not a cone,
+it is an error. `cone(10, 20)` takes `center` and `segments` and nothing else.
+Anything else a cone-shaped thing might be — a cut-off point, an oval base, a
+pie slice — is `cylinderElliptic`'s job, and each one is spelled out in the
+refusal you get for asking:
+
+| what you want | the real call |
+| --- | --- |
+| a cone | `cone(10, 20)`, or `cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20 })` |
+| the point cut off (a frustum) | `cylinderElliptic({ startRadius: [10, 10], endRadius: [4, 4], height: 20 })` |
+| an oval base | `cylinderElliptic({ startRadius: [10, 6], endRadius: [0, 0], height: 20 })` |
+| half of it, like a pie slice | `cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20, startAngle: 0, endAngle: constants.TAU / 2 })` |
+
+`roundRadius` is refused too, and for a reason worth knowing: it is a real
+shCAD option key on three other names, and `cylinderElliptic` **ignores it
+silently** — same bounding box, same polygon count, no error. A key that does
+nothing is the same class of bug as a missing height.
+
+**`poly` is the one whose positional argument is a list, and that is a smaller
+win than the others.** `box(40, 20, 10)` has no punctuation in it at all;
+`poly([[0, 0], [20, 0], [10, 15]])` plainly does. What it removes is the object
+literal wrapped around a list you already have — `polygon({ points: corners })`
+becomes `poly(corners)` — which is worth having and is not the same thing as
+"no punctuation". It has no `{ }`, so `polygon`'s other two keys, `paths` and
+`orientation`, are on the far side of it; the refusal names `polygon`.
+
+Three of its guards exist because the library's own answer is silence.
+`polygon({ points: [] })` hands back a perfectly valid flat shape with no sides
+at all and an all-zero bounding box. `polygon({ points: [[0,0],[20,0],[10,'x']] })`
+hands back real geometry whose bounding box reads `[[0,null,0],[20,null,0]]`.
+Only the two-corner case throws, and it says *"list of points 0 must contain
+three or more points"* — naming a list index `poly` has not got.
+
+**The one thing `poly` teaches you that graduation day punishes: `polygon` does
+not take a bare list, and it does not say so.** Every other shCAD name
+graduates by a rename plus a bracket, and forgetting the bracket throws. This
+one does not. Measured on the vendored bundle:
+
+| what you write, after graduating | what you get |
+| --- | --- |
+| `polygon({ points: corners })` | the shape — this is the right call |
+| `polygon(corners)` — the habit `poly(corners)` builds | a real, **valid, empty** shape: 0 sides, bounding box `[[0,0,0],[0,0,0]]`, no error, nothing on screen |
+
+And "always wrap the list" is not the rule either, because `line`, two rows away
+from `polygon` in the **primitives** catalogue below, really does take its
+points bare: `line([[0, 0], [20, 0]])`. Some of them do. Read the
+signature rather than guessing — which is what `polygon(options)` in the book's
+own heading is telling you.
+
+```js shcode-only
+function main() {
+  const corners = [[0, 0], [20, 0], [10, 15]]
+
+  const flat = poly(corners)                     // shCAD
+  // polygon({ points: corners })
+
+  const wedge = extrude(6, flat)
+  const spun = revolve(translate([30, 0, 0], poly(corners)))
+  const spike = cone(10, 20)
+
+  return sit([wedge, translate([70, 0, 0], spun), translate([-30, 0, 0], spike)])
+}
+```
+
+#### Side by side
+
+```js shcode-only
+function main() {
+  const plate = subtract(rect(40, 20), disc(6))       // shCAD
+  // subtract(rectangle({ size: [40, 20] }), circle({ radius: 6 }))
+
+  const part = extrude(10, plate)                     // shCAD
+  // extrudeLinear({ height: 10 }, plate)
+
+  const bushing = subtract(tube(10, 20), tube(4, 22)) // shCAD
+  // subtract(cylinder({ radius: 10, height: 20 }),
+  //          cylinder({ radius: 4,  height: 22 }))
+
+  const bowl = revolve(translate([10, 0, 0], rect(4, 10)))
+  // extrudeRotate({}, translate([10, 0, 0], rectangle({ size: [4, 10] })))
+
+  return [sit(part), sit(bushing), sit(bowl), sit(ball(10))]
+  // align({ modes: ['none', 'none', 'min'], relativeTo: [0, 0, 0] }, …)
+}
+```
+
+`sit` drops a shape until its lowest point rests on `z = 0` — `ball` and `tube`
+are built centred on the origin, so half of them starts under the print bed.
+Handed a list, it moves the whole assembly as one group rather than dropping
+each part separately (that is the `grouped: true` row above, and the reason it
+is a separate row).
+
+#### Writing the `{ }`
+
+The layer's whole justification is that it still teaches objects — so here is
+the object literal five times, in the order a student meets it. Every key below
+is the library's own; nothing on this page is a name shCAD made up.
+
+**One key, because the model needed one.** A `tube` is built centred on the
+origin, so half of it starts under the print bed. Nothing is wrong with the
+call — the model is wrong, and `center` is what fixes it.
+
+```js shcode-only
+function main() {
+  const sunk = tube(6, 30)                        // no brace anywhere
+  const seated = tube(6, 30, { center: [0, 0, 15] })   // one key, one reason
+
+  // Half of `sunk` is below z = 0. Read it rather than trusting the picture.
+  console.log('sunk  ', measureBoundingBox(sunk)[0][2])
+  console.log('seated', measureBoundingBox(seated)[0][2])
+
+  return [translate([-20, 0, 0], sunk), translate([20, 0, 0], seated)]
+}
+```
+
+**A second key, because one was not enough.** `roundRadius` rounds the edges;
+`segments` decides how many flat strips stand in for each curve. They are two
+separate wishes, so they are two keys in the same `{ }` — not two calls, and
+not a second positional number.
+
+```js shcode-only
+function main() {
+  const sharp = box(30, 20, 10)
+  const soft = box(30, 20, 10, { roundRadius: 3 })
+  const smooth = box(30, 20, 10, { roundRadius: 3, segments: 24 })
+
+  // Rounding removes material, so the volume falls; segments only changes how
+  // finely the curve is drawn, so it barely moves the number at all.
+  console.log('sharp ', measureVolume(sharp))
+  console.log('soft  ', measureVolume(soft))
+  console.log('smooth', measureVolume(smooth))
+
+  return sit([translate([-40, 0, 0], sharp), soft, translate([40, 0, 0], smooth)])
+}
+```
+
+**`segments` on its own is a shape decision, not a quality setting.** Six
+segments is not a rough circle, it is a hexagon — which is how a nut gets made.
+
+```js shcode-only
+function main() {
+  const nut = extrude(6, disc(10, { segments: 6 }))
+  const bolt = extrude(24, disc(4, { segments: 48 }))
+
+  console.log('nut across the corners:', measureDimensions(nut))
+
+  return sit([nut, translate([0, 0, 6], bolt)])
+}
+```
+
+**Everything at once.** Three keys, one object, and the call still reads left to
+right: the two numbers the tube cannot exist without, then everything it merely
+wants.
+
+```js shcode-only
+function main() {
+  return tube(8, 24, { center: [0, 0, 12], roundRadius: 2, segments: 48 })
+}
+```
+
+**And the richest object writing in the quarter — `getParameterDefinitions`.**
+This one is not shCAD's; it is the real JSCAD parameter panel, and §8.4 is
+entirely about it. It hands back an **array of objects**, one per control, and
+each kind of control is a different set of keys: a `number` carries
+`min` / `max` / `step`, a `choice` carries `values` and `captions`. Read it as
+the same object literal as above, written five keys at a time and collected in
+a list.
+
+```js shcode-only
+function getParameterDefinitions() {
+  return [
+    { name: 'width', type: 'number', initial: 40, min: 10, max: 80, step: 5, caption: 'Width' },
+    { name: 'corner', type: 'number', initial: 4, min: 0, max: 9, step: 1, caption: 'Corner radius' },
+    { name: 'finish', type: 'choice', values: ['sharp', 'round'],
+      captions: ['Sharp', 'Round'], initial: 'round', caption: 'Finish' }
+  ]
+}
+
+function main(params) {
+  // The trailing { } built a key at a time instead of written out. It is the
+  // same object either way — box cannot tell the difference.
+  const extras = {}
+  if (params.finish === 'round' && params.corner > 0) extras.roundRadius = params.corner
+
+  return sit(box(params.width, 20, 10, extras))
+}
+```
+
+Two things about that panel are worth knowing before you rely on it. There is
+no parameter UI in the in-app viewport: the runner reads each definition's
+`initial` (or `default`) and calls `main` with those values once, so an example
+has to look right at its defaults. And that is exactly why a `checkbox`
+misbehaves here — its default is spelled `checked`, which the runner does not
+read, so `params.engrave` arrives as `undefined` no matter what you wrote. A
+two-value `choice` carries a real `initial` and is the way to say the same
+thing in a sketch you want to run in shCode.
+
+#### `turn` is the one that is not a rename
+
+`transforms.rotate` spins geometry around the **world origin**, not around the
+shape's own middle. Measured on the vendored bundle: a 40 × 20 × 20 box moved
+to `x = 50` occupies `[[30,-10,-10],[70,10,10]]`; rotate it 90° about Z and it
+becomes `[[-10,30,-10],[10,70,10]]` — it orbited to `y = 50` instead of turning
+where it stood, and nothing threw.
+
+This is not only shCAD's finding. The `/sandbox` visual modeller hit it first
+and builds every rotated shape at the origin before moving it into place for
+exactly this reason; the rule is pinned there by an assertion named
+**"a turned shape spins about itself, not the scene"** in
+`scripts/model-codegen-assertions.cjs`, which fails the build if that ordering
+is ever reversed. Read that check rather than trusting this paragraph — a
+paragraph can go stale, and `npm test` fails here too if that assertion is ever
+renamed out from under this citation.
+
+```js shcode-only
+function main() {
+  const arm = translate([50, 0, 0], box(40, 20, 20))
+
+  return turn(90, arm)                     // turns where it stands
+  // rotate([0, 0, Math.PI / 2], arm)      // orbits to y = 50 instead
+}
+```
+
+So `turn` measures the shape's own middle, brings it to the origin, rotates,
+and puts it back — and it takes **degrees**, converted with the library's own
+`utils.degToRad`. `turn(45, shape)` spins about Z, which is the 2D case and the
+common 3D one; `turn([0, 90, 0], shape)` picks the axis, the same three-slot
+order `rotate` uses. It accepts a single shape or a whole assembly. Turning a
+flat 2D shape about X or Y is refused, because the real call returns an
+invisible degenerate line for it.
+
+#### `turn` also makes the order stop mattering, and that is a loss
+
+That is the *second* way `turn` differs from `rotate`, and unlike the pivot it
+is something `turn` takes away. It is written down here rather than left to be
+discovered.
+
+Turning a shape about its **own** middle commutes with `translate`: turn then
+move, and move then turn, are the same model — every time, for every angle and
+every distance. Turning it about the **world** origin does not. Measured on the
+vendored bundle with a 40 × 20 × 10 box:
+
+| what you write | where it ends up |
+| --- | --- |
+| `translate([50, 0, 0], rotate([0, 0, Math.PI / 2], s))` | `[[40,-20,-5],[60,20,5]]` |
+| `rotate([0, 0, Math.PI / 2], translate([50, 0, 0], s))` | `[[-10,30,-5],[10,70,5]]` |
+| `translate([50, 0, 0], turn(90, s))` | `[[40,-20,-5],[60,20,5]]` |
+| `turn(90, translate([50, 0, 0], s))` | `[[40,-20,-5],[60,20,5]]` |
+
+Two different models with `rotate`; one model, twice, with `turn`. So **"the
+order you apply transforms in changes the answer" cannot be shown with `turn`.**
+No angle and no distance will make it appear.
+
+That fixes what `turn`'s graduation lesson honestly is. It is *not* "this is why
+you build at the origin and translate last" — with `turn` that advice makes no
+difference, so a whole quarter of shCAD would quietly contradict it. It runs the
+other way round:
+
+> `turn` spins your shape around its own middle, which is why it never mattered
+> whether you turned it before or after you moved it. `rotate` spins it around
+> the middle of the *world*, so with `rotate` it matters very much — and that is
+> why every JSCAD example you are about to read builds at the origin and
+> translates last.
+
+The order lesson itself is still fully teachable in Q3, because shCAD renames
+nothing: `rotate` and `translate` are both bare, both real, and both what the
+textbook prints. Show it in `rotate` — that is the only place it exists:
+
+```js shcode-only
+function main() {
+  const s = box(40, 20, 10)
+
+  // The same two transforms, in the two orders. With rotate these are two
+  // different models: the first stands at x = 50, the second has swung round
+  // to y = 50. Swap both rotates for turn(90, …) and they become one model.
+  const spunThenMoved = translate([50, 0, 0], rotate([0, 0, Math.PI / 2], s))
+  const movedThenSpun = rotate([0, 0, Math.PI / 2], translate([50, 0, 0], s))
+
+  return [spunThenMoved, movedThenSpun]
+}
+```
+
+#### `turn` for shapes, `rotate` for frames
+
+Everything above says `rotate` is the one that surprises you, which makes
+swapping in `turn` feel like the safe move everywhere. It is not, and this is
+the one place the substitution quietly builds the wrong model.
+
+The two calls answer different questions:
+
+| | turns | use it to |
+| --- | --- | --- |
+| `turn(degrees, shape)` | the **shape**, about its own middle | tilt a part, stand a lid on edge, angle a bracket |
+| `rotate(radians, shape)` | the **world**, about the origin | move a *coordinate frame* — put a flat outline on the xz or yz plane |
+
+Standing a 2D sketch up is the second kind. A flat outline is drawn on the xy
+plane, and that plane passes **through the origin** — so turning about the
+origin is exactly what "stand this up" means. Use `turn` and the outline pivots
+about its own centre instead, landing on no plane at all. Nothing throws; the
+extrusion just comes out somewhere it should not be.
+
+The rule is not *prefer `turn`*. It is **`turn` for shapes, `rotate` for
+frames** — and if you cannot tell which you have, ask whether the origin is
+part of the answer. If it is, you want `rotate`.
+
+This is not hypothetical: shCode's own `/sandbox` builds sketches this way and
+keeps a raw `rotateX`/`rotateY` for exactly this step, guarded by an assertion
+named "an xz sketch stands up in z, not y" in
+`scripts/model-codegen-assertions.cjs`, which fails if that call is ever
+replaced with `turn`.
+
+#### Reading the book
+
+The seven Q3 chapters are written in the real API, so a student reads `cuboid`
+and writes `box`. That table goes the other way — real name on the left, the
+shCAD word for it on the right — and it is the one to keep open while reading.
+Three of these are not guessable backwards, which is exactly why they are here.
+
+| what the book prints | the shCAD word |
+| --- | --- |
+| `cuboid` | `box` |
+| `cube` | `box(10, 10, 10)` — one number in the book, three here. It is the first 3D shape §8.1 prints and the opening runnable block of the whole unit |
+| `roundedCuboid` | `box(w, d, h, { roundRadius: n })` |
+| `rectangle` | `rect` |
+| `roundedRectangle` | `rect(w, h, { roundRadius: n })` |
+| `circle` | `disc` |
+| `sphere` | `ball` |
+| `cylinder` | `tube` |
+| `roundedCylinder` | `tube(r, h, { roundRadius: n })` |
+| `cylinderElliptic` | `cone(radius, height)` — **when, and only when, it is a cone.** `cone` sets `endRadius` to `[0, 0]` for you. A frustum, an oval tube or a pie slice is still `cylinderElliptic`; type the book's own call |
+| `torus` | `ring(ringRadius, tubeRadius)` — **the pair is inverted, and neither of `torus`'s names is true.** `outerRadius` is the radius of the circle the tube travels along, not the outer edge; `innerRadius` is the tube, not the hole. `ring(14, 4)` is 36 across and 8 thick. Read the warning above before swapping one for the other |
+| `polygon` | `poly(corners)` — a straight rename, minus the `{ points: … }` wrapper. `polygon`'s other two keys, `paths` and `orientation`, have no shCAD spelling; type the book's own call for those |
+| `extrudeLinear` | `extrude` — **a straight extrusion only.** Three of §9.1's five `extrudeLinear` calls also pass `twistAngle` / `twistSteps`, and `extrude` has no such key; type the book's own call, below |
+| `extrudeRotate` | `revolve` — **a full turn only.** §9.1 spins one profile half way round, and `revolve` cannot do it; type the book's own call, below |
+| `align` | `sit`, but **only when the modes are `['none','none','min']`** — with any other modes `sit` is the wrong answer, and not one of the four `align` calls the seven chapters print is written that way. Read the warning below before you swap one for the other |
+| `rotate` | `turn` — **degrees, and about the shape's own middle**, see above |
+| `rotateZ` / `rotateX` / `rotateY` | `turn` — same warning. These are single-axis shortcuts for `rotate` and they orbit the world origin exactly the way it does. `rotateZ(a, s)` is `turn(degrees, s)`; `rotateX` / `rotateY` are `turn([d, 0, 0], s)` / `turn([0, d, 0], s)` |
+
+`rotateZ` is typed in two runnable blocks in §8.1, and the three shortcuts are
+named nine more times across §8.1, §8.2 and §9.2 in prose and in option tables,
+so a student translating a chapter WILL meet them. They are listed separately
+because the row above does not cover them by name, and a missing row on this
+table reads as "nothing to worry about" — which is the exact opposite of true.
+Every one of them swings an off-centre shape around the middle of the scene
+with no error.
+
+Four rows above carry a warning rather than a rename. They are the places
+where the real call and its shCAD twin do **different things**, quietly.
+
+**`rotate` → `turn` changes the pivot.** That is the warning above, worked
+through two sections up: `rotate` spins about the world origin and `turn` spins
+about the shape's own middle, so an off-centre shape orbits under one and stays
+put under the other, with no error either way.
+
+**`align` → `sit` changes which axes move, and this is the one most likely to
+be swapped without noticing.** `sit` is hard-wired to
+`modes: ['none','none','min']` — straight down onto `z = 0`, X and Y left
+exactly where they were. Not one `align` in the seven chapters is written that
+way. All four are `align({ modes: ['center','center','min'] }, s)` (three of
+them, in §8.2 and §9.2) or `align({ modes: ['center','min','min'] }, s)` (one,
+in §8.2), and both of those also pull the shape onto the middle line. Write
+`sit` and the part lands on the bed still off to one side; nothing throws and
+the picture looks plausible. So: `sit` when you want a shape brought down and
+left alone horizontally, and the book's own `align` for anything else. `align`
+is bare and real in here — it needs no translation at all.
+
+**`extrudeRotate` → `revolve` drops the part turn.** `revolve(profile)` is a
+full turn, which is already `extrudeRotate`'s default angle, and five of the six
+`extrudeRotate` calls in the chapters are exactly that. The sixth, §9.1's first
+worked example, is a half turn, and `angle` is not one of shCAD's option keys.
+Type the real call for it — it is bare and in scope here:
+
+```js shcode-only
+function main() {
+  const profile = disc(3, { center: [4, 0] })
+
+  const half = extrudeRotate({ segments: 8, angle: constants.TAU / 2 }, profile)
+  const full = revolve(profile, { segments: 16 })
+
+  return [translate([0, -12, 0], half), translate([0, 12, 0], full)]
+}
+```
+
+**`extrudeLinear` → `extrude` drops the twist, and it is the same shape of
+warning one section later.** `extrude(10, profile)` raises a profile straight
+up, which is what `extrudeLinear` does when you give it nothing but a height —
+and six of the book's nine `extrudeLinear` calls are exactly that. The other
+three are §9.1's twisted block and twisted disc, which add `twistAngle` and
+`twistSteps`, turning the profile a little at each of `twistSteps` layers on
+the way up. Neither is a shCAD option key, and neither is going to become one:
+a twist is `extrudeLinear`'s job, so `extrude(10, profile, { twistAngle: … })`
+is refused by name with the real call spelled out rather than quietly building
+a straight block. Type the book's own call:
+
+```js shcode-only
+function main() {
+  const profile = rect(10, 20)
+
+  const straight = extrude(10, profile)                                  // shCAD
+  const twisted = extrudeLinear(
+    { height: 10, twistAngle: constants.TAU / 4, twistSteps: 20 }, profile
+  )
+
+  // The twist costs nothing in material — it is the same volume, wrung round.
+  console.log(measureVolume(straight), measureVolume(twisted))
+
+  return sit([translate([-15, 0, 0], straight), translate([15, 0, 0], twisted)])
+}
+```
+
+`twistSteps` is the one to read twice: it is how many separate layers the twist
+is cut into, so a large `twistAngle` with the default `twistSteps` comes out
+visibly faceted. §9.1 pairs a quarter turn with `twistSteps: 10`.
+
+#### `TAU` is a value, not a name in scope
+
+§9.1 types a bare `TAU` in five runnable blocks and never says where it comes
+from, because in the book it is only ever a default listed in an option table.
+It is **not** a name this runner installs. Paste `angle: TAU` in here and you
+get `TAU is not defined`, which is a real dead end in the one chapter that needs
+it most.
+
+It lives at `maths.constants.TAU`, and the shim puts the module's members one
+level into scope, so in shCode you write `constants.TAU`. `Math.PI * 2` is the
+same number and travels anywhere.
+
+| what the book prints | what to type in shCode |
+| --- | --- |
+| `TAU` | `constants.TAU`, or `Math.PI * 2` — the portable form is `maths.constants.TAU` |
+| `TAU / 2` | `constants.TAU / 2`, or just `Math.PI` — a half turn |
+
+```js shcode-only
+function main() {
+  console.log(constants.TAU, Math.PI * 2, maths.constants.TAU)
+  return revolve(disc(3, { center: [8, 0] }), { segments: 24 })
+}
+```
+
+#### The book's other names — type what the book typed
+
+shCAD has no word for these, and that is deliberate: they already read as
+English, or they belong to a corner of the library the layer does not model.
+Every one of them is bare and real inside shCode, so the answer is always the
+same — type what the book typed. They get rows anyway, because a name missing
+from a table reads as a name with nothing to worry about, and "there is nothing
+to translate here" is worth saying out loud once per name.
+
+| what the book prints | what to type in shCode |
+| --- | --- |
+| `translate` | `translate` — the same call. shCAD ships no `move`; this one is short already |
+| `subtract` | `subtract` — unchanged, and order still matters |
+| `union` | `union` — unchanged |
+| `mirror` | `mirror({ normal: [...] }, s)` — unchanged |
+| `intersect` | `intersect` — unchanged |
+| `scale` | `scale` — unchanged, and it scales about the **world origin**, the same trap `rotate` has. `turn` has no counterpart here |
+| `center` | `center({ axes: [...] }, s)` — unchanged. Handed several shapes it stacks them all on the origin; `sit` and `align` are the ones for an assembly |
+| `star` | `star({ vertices: n, outerRadius: a, innerRadius: b })` — unchanged |
+| `ellipse` | `ellipse({ radius: [rx, ry] })` — unchanged. A `disc` has one radius; an ellipse has two, and shCAD does not model it |
+| `measureVolume` | `measureVolume(shape)` — unchanged |
+| `measureDimensions` | `measureDimensions(shape)` — unchanged |
+| `hullChain` | `hullChain(a, b, c)` — unchanged. `hull` wraps everything in one skin, `hullChain` joins neighbours pair by pair; they are not synonyms |
+| `vectorText` | `vectorText({ height: 8, input: 'J' })` — unchanged, **but the book prints `inputText`, and there is no such option.** Measured on the vendored bundle: `vectorText({ height: 8, inputText: 'J' })` and the same call with `'H'` come back byte-identical, so §8.1's "swap 'J' for 'H' and run again" changes nothing and reports nothing. The real key is `input`. Letters come out as pen strokes, not shapes |
+| `extrudeRectangular` | `extrudeRectangular({ size: w, height: h }, shape)` — unchanged. §9.1 uses it to turn a flat outline into a wall `size` thick and `height` tall. Handed a list of paths instead — `vectorText`'s strokes — it returns one solid per path rather than one lump, so measure the group with `measureAggregateBoundingBox`. `extrude` is the wrong tool for a path and fails silently |
+| `path2.fromPoints` | `path2.fromPoints({ closed: true }, points)` — unchanged; bare `path2` is in scope here, and `geometries.path2.fromPoints` is the portable spelling. Its `{ }` comes **first**, unlike every shCAD call |
+
+#### The parameter panel — the words that are not calls
+
+Everything above answers a **name**: something with a `(` after it. §8.4 and
+§8.5 also print words that are not names and never will be — the `type:`
+values inside `getParameterDefinitions`, which are strings sitting in an object
+literal. No table of function names can cover them, and the census below counts
+calls, so it counts none of them either. That is a real hole and this is the
+table that fills it, because a student who has translated every call in §8.5
+still has to get past `type: 'float'` on the second line of its first
+parameter block.
+
+Measured on the same seven chapters: **27 parameter definitions**, in **seven**
+distinct `type:` spellings. Every one of them is typed into shCode exactly as
+the book prints it. There is nothing to translate here, and that is worth
+saying out loud once per spelling.
+
+| what the book prints | where | what to type in shCode |
+| --- | --- | --- |
+| `type: 'number'` | §8.4, nine times | `type: 'number'` — unchanged |
+| `type: 'int'` | §8.5, six times | `type: 'int'` — unchanged. A whole number: sides, teeth, copies. §8.5's `count`, `rows` and `cols` |
+| `type: 'choice'` | §8.4, four times | `type: 'choice'` — unchanged. It is the one that carries `values` and `captions` |
+| `type: 'slider'` | §8.4, twice | `type: 'slider'` — unchanged. The same number as `number`, dragged instead of typed |
+| `type: 'float'` | §8.5, twice | `type: 'float'` — unchanged. A number allowed a decimal part. §8.5's `ringRadius` |
+| `type: 'checkbox'` | §8.4, twice | `type: 'checkbox'` — unchanged, **but its default is spelled `checked`, which this sandbox does not read**; `params.engrave` arrives `undefined`. Say it with a two-value `choice` instead |
+| `type: 'group'` | §8.4, twice | `type: 'group'` — unchanged. A heading, not a value: it declares no parameter, so `main(params)` never sees one |
+
+Six of the seven are "type what the book typed" for one reason, and it is the
+reason worth carrying out of this section instead of the table: **`type` picks
+the control, `initial` carries the value.** Nothing in a JSCAD program reads
+`type` — `main(params)` is handed whatever `initial` said — so an unfamiliar
+type is a differently-shaped knob, never a value that fails to arrive. The
+seventh, `checkbox`, is the exception precisely because it breaks that rule: it
+is the one type that spells its default something other than `initial`.
+
+Run it. This is §8.5's circular arrangement in shCAD words — its `count` and
+`ringRadius` copied out of the chapter character for character, `int` and
+`float` and all — with two more knobs added so that all four numeric spellings
+sit in one block and can be compared. The chapter's version is flat; this one
+gives the discs a thickness, so `number` has something to do.
+
+```js shcode-only
+function getParameterDefinitions() {
+  return [
+    // §8.5's own two, exactly as the book writes them.
+    { name: 'count', type: 'int', initial: 8, min: 3, max: 24 },
+    { name: 'ringRadius', type: 'float', initial: 60, min: 20, max: 200 },
+    // Two more, so that all four ways of asking for a number are side by side.
+    { name: 'size', type: 'slider', initial: 5, min: 2, max: 20, step: 1, caption: 'Disc size' },
+    { name: 'thick', type: 'number', initial: 4, min: 1, max: 10, step: 1, caption: 'Thickness' }
+  ]
+}
+
+function main(params) {
+  // int, float, slider, number — four controls, one kind of value. Read it
+  // rather than taking the table's word for it.
+  console.log(typeof params.count, typeof params.ringRadius,
+    typeof params.size, typeof params.thick)
+
+  const shapes = []
+  for (let i = 0; i < params.count; i++) {
+    const angle = (i / params.count) * Math.PI * 2
+    const x = params.ringRadius * Math.cos(angle)
+    const y = params.ringRadius * Math.sin(angle)
+    // The book's line here is translate([x, y], circle({ radius: 5 })).
+    shapes.push(translate([x, y, 0], extrude(params.thick, disc(params.size))))
+  }
+  return shapes
+}
+```
+
+Measured on the chapter sources, so that the size of the bridge is a number
+rather than an impression: the seven chapters make **273 library calls** in
+their runnable editors, **191 of them — 70% — in a spelling shCAD replaces**,
+and 82 in a name it has none for. Every name a student can type in
+those chapters is on one of the three tables above, and every `type:` the
+parameter panel takes is on the fourth. That is the cost of the layer, and
+those tables plus the graduation table are what pay it: one of them is always
+the right way round.
 
 ## Modules
 
@@ -522,12 +1330,49 @@ module.exports = { main }
 renders a panel (sliders, text boxes, checkboxes, dropdowns) and passes the
 values to `main(params)`.
 
-| Type | Example |
-|---|---|
-| number | `{ name: 'size', type: 'number', initial: 10, min: 1, max: 50, step: 1, caption: 'Size' }` |
-| text | `{ name: 'label', type: 'text', initial: 'HI', caption: 'Label' }` |
-| checkbox | `{ name: 'engrave', type: 'checkbox', checked: true, caption: 'Engrave' }` |
-| choice | `{ name: 'shape', type: 'choice', values: ['cube', 'sphere'], captions: ['Cube', 'Sphere'], initial: 'cube', caption: 'Shape' }` |
+**`type` decides how the panel ASKS for a value. `initial` decides what the
+value IS.** Keep those apart and the whole table below stops being something
+to memorise: nothing in your program ever reads `type`, so picking the wrong
+one gives you a differently-shaped control, never a value that fails to
+arrive. The in-app sandbox takes that to its limit — it has no panel at all,
+so it reads `initial` (or `default`) and never looks at `type` once.
+
+Nine types, and the four in the first block are the same number asked for four
+different ways. Every one of them is spelled exactly as the textbook spells it.
+
+| Type | What the panel asks for | Example |
+|---|---|---|
+| `number` | a number, in a box you type into | `{ name: 'size', type: 'number', initial: 10, min: 1, max: 50, step: 1, caption: 'Size' }` |
+| `slider` | the same number, on a bar you drag | `{ name: 'height', type: 'slider', initial: 20, min: 5, max: 60, step: 1, caption: 'Height (mm)' }` |
+| `int` | a whole number — sides, teeth, holes, copies | `{ name: 'sides', type: 'int', initial: 6, min: 4, max: 24, step: 1, caption: 'Number of sides' }` |
+| `float` | a number allowed a decimal part | `{ name: 'ringRadius', type: 'float', initial: 60, min: 20, max: 200, caption: 'Ring radius' }` |
+| `text` | a line of text | `{ name: 'label', type: 'text', initial: 'HI', caption: 'Label' }` |
+| `checkbox` | a tick — **its default is `checked`, not `initial`; see below** | `{ name: 'engrave', type: 'checkbox', checked: true, caption: 'Engrave' }` |
+| `choice` | one of a list, as a dropdown | `{ name: 'shape', type: 'choice', values: ['cube', 'sphere'], captions: ['Cube', 'Sphere'], initial: 'cube', caption: 'Shape' }` |
+| `color` | a colour, written `'#rrggbb'` | `{ name: 'shade', type: 'color', initial: '#ff5555', caption: 'Plate colour' }` |
+| `group` | nothing. It is a heading that splits a long panel up | `{ name: 'plateGroup', type: 'group', caption: 'Plate' }` |
+
+`int` and `float` are the two the book reaches for in §8.5 and neither is a
+special case: `int` is the one to write when half of something is meaningless
+(you cannot have 7.5 sides), `float` when it is not (a radius of 62.5 mm is
+fine). Both hand `main(params)` an ordinary JavaScript number.
+
+`group` declares no value, so `main(params)` never sees one — it has no
+`initial` and the sandbox skips it. Everything listed after a `group` belongs
+to it, until the next one.
+
+`checkbox` is the single type whose default does not reach `main()` in the
+in-app sandbox, and it is a spelling problem rather than a missing feature:
+its default is spelled `checked`, which is neither `initial` nor `default`, so
+`params.engrave` arrives as `undefined` no matter what you wrote. A two-value
+`choice` says the same thing and carries a real `initial`.
+
+That is the whole list a 3D model has any use for. JSCAD also accepts `radio`
+(a `choice` drawn as a row of buttons instead of a dropdown) and four types
+built for web forms — `date`, `email`, `url`, `password`. They are named here
+only so that meeting one is not a dead end: they are controls, they still hand
+`main(params)` whatever `initial` said, and nothing in the seven Q3 chapters
+uses any of them.
 
 ```js
 const { primitives } = require('@jscad/modeling')
@@ -543,6 +1388,37 @@ function main(params) {
 }
 
 module.exports = { main }
+```
+
+And the three numeric spellings side by side, so that "`type` only picks the
+control" is something you can run rather than something you were told. All
+three arrive at `main` as plain numbers, and the `console.log` prints their
+JavaScript types — which are identical.
+
+```js
+const { primitives, transforms } = require('@jscad/modeling')
+
+function getParameterDefinitions() {
+  return [
+    { name: 'radius', type: 'number', initial: 14, min: 4, max: 30, step: 1, caption: 'Radius (mm)' },
+    { name: 'height', type: 'slider', initial: 20, min: 5, max: 60, step: 1, caption: 'Height (mm)' },
+    { name: 'sides', type: 'int', initial: 6, min: 4, max: 24, step: 1, caption: 'Number of sides' },
+    { name: 'lift', type: 'float', initial: 2.5, min: 0, max: 10, caption: 'Lift off the bed (mm)' }
+  ]
+}
+
+function main(params) {
+  console.log(typeof params.radius, typeof params.height,
+    typeof params.sides, typeof params.lift)
+
+  return transforms.translateZ(params.lift, primitives.cylinder({
+    radius: params.radius,
+    height: params.height,
+    segments: params.sides
+  }))
+}
+
+module.exports = { main, getParameterDefinitions }
 ```
 
 ## Patterns

@@ -214,6 +214,7 @@
 	<button type="button" data-format="stl">Save STL</button>
 	<button type="button" data-format="3mf">Save 3MF</button>
 	<button type="button" data-format="obj">Save OBJ</button>
+	<button type="button" data-format="svg">Save SVG</button>
 </div>
 <div id="__jscadSaveNote"></div>
 <script>
@@ -346,6 +347,7 @@
      below so a student's own declarations still win. Its banner explains the
      design; scripts/jscad-simple-checks.mjs holds its expectations. -->
 <script src="./simple.js"></script>
+<script src="./svg.js"></script>
 <script>
 // Read student code from ?code=<base64url> (written by encodeCode() in
 // components/ShPlayPreview.tsx) and inject it as a <script> so its top-level
@@ -422,7 +424,19 @@
 		'3mf': { name: 'model.3mf', mime: 'application/vnd.ms-package.3dmanufacturing-3dmodel+xml',
 		       run: function(s) { return jscadIO.m3fSerializer.serialize({}, s); } },
 		obj: { name: 'model.obj', mime: 'text/plain',
-		       run: function(s) { return jscadIO.objSerializer.serialize({}, s); } }
+		       run: function(s) { return jscadIO.objSerializer.serialize({}, s); } },
+		// The only format here that is not a 3D mesh, and the only way a 2D
+		// design gets out of the app at all: stl/3mf/obj all serialize polygons,
+		// and a geom2 has none. §8.2 and §8.3 are entirely 2D.
+		svg: { name: 'design.svg', mime: 'image/svg+xml',
+		       run: function(s) {
+		           var out = shcadSvg.serialize(jscadModeling, s);
+		           if (out === null) {
+		               throw new Error('this design has no flat shapes in it. SVG is for 2D ' +
+		                   'outlines — save STL for a solid, or extrude a 2D shape first.');
+		           }
+		           return [out];
+		       } }
 	};
 
 	function kb(bytes) { return bytes < 1024 ? bytes + ' bytes' : (bytes / 1024).toFixed(1) + ' KB'; }
