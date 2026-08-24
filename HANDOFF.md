@@ -1,3 +1,158 @@
+# Handoff — 2026-08-24 · shCAD shipped; no lesson uses it yet
+
+shCAD — a plain-words surface over `@jscad/modeling`, the JSCAD equivalent of what
+shPlay is to planck — was designed, built, gauntleted three times and committed on
+2026-08-24. The gate is green and a student can reach every part of it. **What does
+not exist is a single Q3 lesson that uses it.** The layer is done; the curriculum
+work it was built for has not started. That is the handoff.
+
+Two commits, both on `cs-3d`, neither pushed:
+
+| Commit | What |
+| --- | --- |
+| `e5056e5` | `feat(jscad): shCAD, a plain-words surface over @jscad/modeling` — 10 files, +8133/-30 |
+| `2892e67` | `fix(jscad): give /portable a way in` — 4 files, +61/-1 |
+
+This section sits above the module-1.3 review of the same date; the two are unrelated
+and both are current.
+
+---
+
+## 1. What shCAD is
+
+Twelve names, additive only, in their own file: `box rect disc ball tube extrude
+revolve turn sit cone ring poly`. Positional arguments for what a shape cannot exist
+without, everything else in a trailing options object keyed with the textbook's own
+words. `simple.js` loads beside the bare-name shim and skips any name already taken,
+reporting into `window.__shcadNamesSkipped` the way the shim reports into
+`__jscadBareNamesSkipped`.
+
+The design decision the operator made, and it drives everything else: **shCAD
+everywhere in Q3, with the real API as the "why"** — not shCAD-as-fallback. So the
+real names stay fully reachable, every shCAD call has a proven real-API equivalent,
+and a student's program can be converted to portable form and pasted into jscad.app.
+
+| Path | What it is |
+| --- | --- |
+| `public/jscad/simple.js` | the layer itself, ~934 lines, IIFE, banner carries the REFUSALS list |
+| `public/jscad/svg.js` | geom2 to SVG, hand-rolled, ~139 lines |
+| `lib/jscad-portable.mjs` | source-text in, portable source-text out, ~1016 lines |
+| `app/portable/page.tsx` | the `/portable` converter page |
+| `scripts/jscad-simple-checks.mjs` | expectations as data — the builder must not own the gate |
+| `scripts/test-jscad.mjs` | SIMPLE + PORTABLE groups appended; nothing existing weakened |
+| `public/jscad/docs/reference.md` | the shCAD section, the graduation table, the reading table |
+
+### `turn` is the one that is not a rename
+
+Every other shCAD name maps onto one real call. `turn` does not: it rotates a shape
+**in place** (bbox centre to origin, rotate, back) and takes **degrees**, where
+`transforms.rotate` orbits the world origin in radians. The slogan in the docs is
+**"turn for shapes, rotate for frames"**, and it is load-bearing — a student who
+reads `turn` as a rename of `rotate` will build a scene that flies apart. The
+portable converter emits a `turnInPlace()` helper rather than inlining the
+translate-rotate-translate, so the exported program still reads.
+
+### SVG export
+
+The save bar shipped `stl`, `3mf` and `obj` — all three serialize polygons, and a
+`geom2` has none. So every 2D design in §8.2 and §8.3 could be built, rendered and
+graded in shCode and **never leave it**, while A8.2.1 asks in so many words for an
+SVG file. `svg.js` closes that. It is hand-written rather than vendored because
+`public/jscad/lib/jscad-io.min.js` contains no SVG serializer and is already the one
+entry in `EXPECTED_BUNDLES` with `verified: false` — a second unverified binary to
+solve a fifty-line problem is the wrong trade.
+
+## 2. Constraints that must not be broken
+
+These are the things a future change will step on. Each one is enforced by the gate,
+but the gate failure will not explain why.
+
+- **`EXPECTED_BARE_NAME_COUNT = 124` counts the shim, not shCAD.** shCAD lives in its
+  own file precisely so it does not move that number. If a shCAD name ever needs to
+  come from the shim, the count and the reasoning both change.
+- **`taughtFromReference()` derives the taught set from the module tables in
+  `reference.md`.** Restructuring those tables silently redefines what the API group
+  tests. Add sections around them; do not reformat them.
+- **`scripts/jscad-checks.mjs` is not editable to make a red check go green.** Its
+  header says so. The same rule applies to `jscad-simple-checks.mjs`: the builder
+  does not own the gate.
+- **The API group asserts every taught function is the SAME REFERENCE bare as
+  namespaced.** A facade is legal only as additive new names — never as a wrapper
+  replacing a taught one.
+- **`REACH_CHAIN` and `REACH_PORTABLE` fail the build if a page loses its last inbound
+  link.** `REACH_PORTABLE` exists because `/portable` shipped in `e5056e5` with no nav
+  link and no docs link, while its own header comment described three ways a student
+  arrives. Do not delete either link and leave the page.
+- **`check-runner-hoisting.mjs`** anchors on the "Running your code…" status line in
+  `runner.html`. The three shCAD edits there (script tag, `FORMATS` entry, Save SVG
+  button) were made above it deliberately.
+
+## 3. Verified green
+
+`npm test` exit 0, `npx tsc --noEmit` exit 0, working tree clean, re-run after the
+peer's later commits landed.
+
+```
+  JSCAD gate ...........................  675/675
+    BUNDLE 7 · SHIM 11 · API 5 · RENDERER 6 · DOCS 227
+    SYNC 2 · REACH 9 · SIMPLE 42 · PORTABLE 126
+```
+
+SVG checks live inside the PORTABLE group (the `at('svg')` subsection), not a group
+of their own. The rendering was also checked by eye in a real browser — see §5, that
+is not decoration.
+
+## 4. What is NOT done
+
+1. **No Q3 lesson uses shCAD.** The layer, the docs, the converter and the export all
+   exist; §8.2 and §8.3 still teach the raw API. This is the whole remaining job and
+   it is curriculum work, not build work.
+2. **A8.2.1's assignment text has not been re-read against what shipped.** It says
+   "Export as SVG". That now works. Nobody has checked that the rest of the wording
+   matches the button the student will actually see.
+3. **`model-codegen` was retargeted to shCAD** at the operator's confirmation; the
+   sandbox generator now emits shCAD. Two of its assertions are borrowed by the JSCAD
+   gate (`BORROWED_ASSERTIONS` in `jscad-simple-checks.mjs`) so a change in one place
+   fails in both. Worth knowing before editing either file.
+4. **Nothing is pushed.** Both commits are local on `cs-3d`.
+
+## 5. Traps measured this session
+
+All three are now memory files, but they cost real cycles here and the specific
+instances are worth keeping:
+
+- **A green check whose fixture cannot fail.** The first "turn rotates in place" test
+  translated along x and tilted about **X** — the offset lay on the rotation axis, so
+  the counter-case commuted too and the row would have passed on a `turn` that had
+  stopped rotating entirely. Fixed by tilting about **y**. Before trusting a new
+  check, ask what value would make a broken implementation pass it.
+- **A correct-looking SVG with an invisible hole.** `svg.js` first emitted one
+  `<path>` per loop with `fill-rule="evenodd"`. Both assertions — "two paths" and
+  "fill-rule is present" — were true, and the hole in a plate rendered as a filled
+  shape in the fill colour on top of what it should have cut. `evenodd` resolves
+  subpaths *within* one `<path>` and does nothing across elements. Found only by
+  rendering the file and looking at it. The real check (paths = shapes, subpaths =
+  loops) exists because of the looking.
+- **A test-harness bug that blamed the product.** `test-jscad.mjs` interpolated a
+  degrees value into source text raw, so an array angle became four positional
+  arguments and `turn` correctly refused — which read as a `turn` defect.
+  `JSON.stringify` fixed it. *Coverage of a feature is not coverage of its forms*: a
+  29-row form sweep found a latent bug that per-feature rows had passed over.
+
+## 6. Two process notes for the next parallel session
+
+- **`msg.mjs release --as <name> --all` is per-identity and the identity is
+  unauthenticated free text.** A peer probing the guard under the identity
+  `claude-shcad` released all six of this session's claims as collateral. Claims are
+  a coordination convention, not a lock.
+- **The ownership guard path in `settings.json` was wrong** (`shuff57` where the home
+  directory is `shuff`), so it had never blocked anything while looking configured.
+  `PreToolUse` blocks on exit **2**; a bad path throws MODULE_NOT_FOUND and exits 1,
+  which is a non-blocking error. Fixed, but re-prove it on any new machine — the
+  probe is in the global `CLAUDE.md`.
+
+---
+
 # Handoff — 2026-08-24 · Module 1.3 review, all six items shipped and verified
 
 Module 1.3 (Documentation and Coding Conventions, 21 lessons) was reviewed end to end
