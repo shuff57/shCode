@@ -13,10 +13,10 @@
 //
 // THE COST, stated because it used to be a selling point: the generated file no
 // longer runs unmodified on jscad.app. Those names exist only in our runner.
-// Cone, Ring and the sketch outline have no shCAD twin yet (cylinderElliptic,
-// torus, polygon), so those lines are still raw JSCAD and the file is currently
-// mixed. Booleans and translate stay JSCAD deliberately -- they are already
-// short and array-first, and have no shCAD twin by design.
+// Every shape it emits now has a shCAD spelling. Booleans and translate stay
+// JSCAD deliberately -- they are already short and array-first and have no
+// shCAD twin by design -- and `ring` takes no options, so a positioned ring is
+// a translate around one rather than an argument to it.
 
 import { solveSketch, type Point } from './sketch-solve';
 import {
@@ -342,8 +342,7 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
 
   if (f.kind === 'cone') {
     // JSCAD has no cone(): a cylinder whose far end has zero radius is one.
-    return place(`primitives.cylinderElliptic({ startRadius: [p.${pname(f.id, 'radius')}, p.${pname(f.id, 'radius')}], `
-      + `endRadius: [0, 0], height: p.${pname(f.id, 'height')}, center: ${c} })`);
+    return place(`cone(p.${pname(f.id, 'radius')}, p.${pname(f.id, 'height')}, { center: ${c} })`);
   }
 
   if (f.kind === 'torus') {
@@ -352,11 +351,12 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
     // center, so it has to be moved afterwards or its position parameters would
     // be declared and never read, and the move handles would do nothing.
     needs.add('transforms');
-    const ring = `primitives.torus({ innerRadius: p.${pname(f.id, 'tube')}, `
-      + `outerRadius: p.${pname(f.id, 'ring')} })`;
-    // torus() has no center of its own either way, so an unrotated one still
-    // needs the translate that place() would otherwise add.
-    return turned ? place(ring) : `transforms.translate(${c}, ${ring})`;
+    // ring() refuses an options object, and rightly: torus accepts `center` and
+    // silently drops it. So the position has to be a translate around the ring,
+    // not an argument to it.
+    const donut = `ring(p.${pname(f.id, 'ring')}, p.${pname(f.id, 'tube')})`;
+    return turned ? place(`transforms.translate(${c}, ${donut})`)
+                  : `transforms.translate(${c}, ${donut})`;
   }
 
   if (f.kind === 'sphere') {
@@ -367,7 +367,7 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
     const pts = f.points
       .map((_, n) => `[p.${pname(f.id, `p${n}u`)}, p.${pname(f.id, `p${n}v`)}]`)
       .join(', ');
-    return `primitives.polygon({ points: [${pts}] })`;
+    return `poly([${pts}])`;
   }
 
   if (f.kind === 'extrude') {
@@ -484,7 +484,7 @@ export function toJscad(doc: ModelDoc): string {
     helpers ? '' : null,
     'function main(p) {',
     lines.join('\n') || '  // Nothing here yet — add a shape.',
-    result ? `  return ${result}` : '  return primitives.cuboid({ size: [1, 1, 1] })',
+    result ? `  return ${result}` : '  return box(1, 1, 1)',
     '}',
     '',
     'module.exports = { main, getParameterDefinitions }',

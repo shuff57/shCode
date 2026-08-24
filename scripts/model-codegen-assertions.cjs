@@ -43,7 +43,7 @@ module.exports = function run(dir) {
     return false;
   }
   vm.runInContext(fs.readFileSync(simplePath, 'utf8'), sandbox);
-  for (const n of ['box', 'tube', 'ball', 'extrude', 'turn']) {
+  for (const n of ['box', 'tube', 'ball', 'extrude', 'turn', 'cone', 'ring', 'poly']) {
     if (typeof sandbox[n] !== 'function') {
       console.log(`  FAIL  simple.js did not expose ${n}()`);
       return false;
@@ -113,7 +113,7 @@ module.exports = function run(dir) {
   check('two loose shapes are unioned', loose.includes('booleans.union(b1, c1)'));
 
   const empty = gen.toJscad(doc());
-  check('an empty doc still returns something', empty.includes('return primitives.cuboid('));
+  check('an empty doc still returns something', empty.includes('return box(1, 1, 1)'));
 
   console.log('\n=== cone and ring ===');
 
@@ -122,10 +122,12 @@ module.exports = function run(dir) {
 
   const coneSrc = gen.toJscad(doc(cone('k1')));
   const ringSrc = gen.toJscad(doc(ring('r1')));
-  check('a cone is a cylinderElliptic with a zero end', coneSrc.includes('endRadius: [0, 0]'));
-  check('a ring is a torus', ringSrc.includes('primitives.torus('));
-  check('ring/tube map onto outer/inner',
-    ringSrc.includes('innerRadius: p.r1_tube') && ringSrc.includes('outerRadius: p.r1_ring'));
+  check('a cone is a shCAD cone', coneSrc.includes('cone(p.k1_radius, p.k1_height'));
+  check('a ring is a shCAD ring', ringSrc.includes('ring(p.r1_ring, p.r1_tube)'));
+  // ring() refuses an options object because torus accepts `center` and drops
+  // it silently. A positioned ring must therefore be a translate around one.
+  check('a ring is positioned by translate, not by an argument',
+    ringSrc.includes('transforms.translate([p.r1_x') && !ringSrc.includes('ring(p.r1_ring, p.r1_tube, {'));
 
   // The doc talks in ring-centre and tube thickness because that is what a
   // student can picture; JSCAD wants inner/outer. Getting that mapping backwards
@@ -157,7 +159,9 @@ module.exports = function run(dir) {
   const pull = (id, target, height = 12) => ({ id, kind: 'extrude', target, height });
 
   const flatOnly = gen.toJscad(doc(sketch('s1')));
-  check('a sketch is a polygon', flatOnly.includes('primitives.polygon('));
+  check('a sketch is a shCAD poly', flatOnly.includes('poly([[p.s1_p0u'));
+  check('...taking the list positionally, never an options object',
+    !flatOnly.includes('poly({'));
   check('a bare sketch is not returned as the model',
     !/return s1\b/.test(flatOnly), flatOnly.slice(flatOnly.indexOf('return')).split('\n')[0]);
 
