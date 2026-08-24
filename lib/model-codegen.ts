@@ -14,6 +14,8 @@ import {
   type Feature,
   type ModelDoc,
   type Vec3,
+  canRotate,
+  isShape,
   nameMap,
   topLevel,
 } from './model-types';
@@ -75,6 +77,16 @@ export function generatedParams(doc: ModelDoc): GeneratedParam[] {
     } else if (f.kind === 'sphere') {
       push('radius', 'radius', f.radius);
       pushCentre(out, f.id, label, f.center);
+    } else if (f.kind === 'sketch') {
+      // Two per corner. A sketch with a dozen corners is a long panel, which is
+      // why the corners are dragged rather than typed most of the time.
+      f.points.forEach(([u, v], n) => {
+        out.push({ name: pname(f.id, `p${n}u`), caption: `${label} corner ${n + 1} across`, value: u, min: -500, max: 500, step: 1 });
+        out.push({ name: pname(f.id, `p${n}v`), caption: `${label} corner ${n + 1} up`, value: v, min: -500, max: 500, step: 1 });
+      });
+      push('offset', 'offset', f.offset, { min: -500, max: 500, step: 1 });
+    } else if (f.kind === 'extrude') {
+      push('height', 'height', f.height);
     }
   });
   return out;
@@ -135,14 +147,14 @@ export function applyParam(doc: ModelDoc, name: string, value: number): ModelDoc
     const turn = slot === 'rx' ? 0 : slot === 'ry' ? 1 : slot === 'rz' ? 2 : null;
     // A sphere has no rotate field, which is the type system saying the same
     // thing canRotate() does: turning it would change nothing to look at.
-    if (turn !== null && f.kind !== 'combine' && f.kind !== 'sphere' && f.rotate) {
+    if (turn !== null && canRotate(f) && f.rotate) {
       const rotate: Vec3 = [f.rotate[0], f.rotate[1], f.rotate[2]];
       rotate[turn] = value;
       changed = true;
       return { ...f, rotate };
     }
     const axis = slot === 'x' ? 0 : slot === 'y' ? 1 : slot === 'z' ? 2 : null;
-    if (axis !== null && f.kind !== 'combine') {
+    if (axis !== null && isShape(f)) {
       const center: Vec3 = [...f.center];
       center[axis] = value;
       changed = true;
@@ -171,6 +183,27 @@ export function applyParam(doc: ModelDoc, name: string, value: number): ModelDoc
       if (slot === 'ring') { changed = true; return { ...f, ringRadius: value }; }
       if (slot === 'tube') { changed = true; return { ...f, tubeRadius: value }; }
     }
+    if (f.kind === 'sketch') {
+      // slot is p<n>u or p<n>v
+      const m = /^p(\d+)([uv])$/.exec(slot);
+      if (m) {
+        const n = Number(m[1]);
+        if (n >= 0 && n < f.points.length) {
+          const points = f.points.map((pt, i) =>
+            i === n
+              ? (m[2] === 'u' ? [value, pt[1]] : [pt[0], value]) as [number, number]
+              : pt
+          );
+          changed = true;
+          return { ...f, points };
+        }
+      }
+      if (slot === 'offset') { changed = true; return { ...f, offset: value }; }
+    }
+    if (f.kind === 'extrude' && slot === 'height') {
+      changed = true;
+      return { ...f, height: value };
+    }
     if (f.kind === 'sphere' && slot === 'radius') {
       changed = true;
       return { ...f, radius: value };
@@ -186,12 +219,12 @@ function centreExpr(id: string): string {
 }
 
 /** The expression that builds one feature, and which helpers it needs. */
-function featureExpr(f: Feature, needs: Set<string>): string {
+function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>): string {
   // A rotated shape is built at the origin, turned, then moved into place --
   // JSCAD rotates about the world origin, so a shape built at its final
   // position would swing around the middle of the scene instead of its own.
-  const turned = f.kind !== 'combine' && f.kind !== 'sphere' && f.rotate !== undefined;
-  const c = f.kind === 'combine' ? '' : turned ? '[0, 0, 0]' : centreExpr(f.id);
+  const turned = canRotate(f) && f.rotate !== undefined;
+  const c = !isShape(f) ? '' : turned ? '[0, 0, 0]' : centreExpr(f.id);
 
   const place = (expr: string) => {
     if (!turned) return expr;
@@ -245,6 +278,25 @@ function featureExpr(f: Feature, needs: Set<string>): string {
     return place(`primitives.sphere({ radius: p.${pname(f.id, 'radius')}, center: ${c} })`);
   }
 
+  if (f.kind === 'sketch') {
+    const pts = f.points
+      .map((_, n) => `[p.${pname(f.id, `p${n}u`)}, p.${pname(f.id, `p${n}v`)}]`)
+      .join(', ');
+    return `primitives.polygon({ points: [${pts}] })`;
+  }
+
+  if (f.kind === 'extrude') {
+    // extrudeLinear always pulls along +Z from the XY plane, so a sketch on
+    // another plane is built flat and the SOLID is turned afterwards. Turning
+    // the flat outline first is not an option -- a geom2 has no third axis to
+    // turn into.
+    const sketch = byId.get(f.target);
+    const plane = sketch && sketch.kind === 'sketch' ? sketch.plane : 'xy';
+    needs.add('extrudeOnPlane');
+    return `extrudeOnPlane(${f.target}, p.${pname(f.id, 'height')}, `
+      + `'${plane}', p.${pname(f.target, 'offset')})`;
+  }
+
   const args = f.targets.join(', ');
   return `booleans.${f.op}(${args})`;
 }
@@ -279,6 +331,17 @@ function chamferBox(size, center, c) {
     transforms.rotateZ(Math.PI / 4, primitives.cuboid({ size: [kz * d, kz * d, long] }))))
   return s
 }`,
+  extrudeOnPlane: `// Pull a flat outline into a solid, on one of the three planes.
+//
+// extrudeLinear only ever pulls along +Z from XY, so a sketch meant for another
+// plane is extruded flat first and the SOLID turned afterwards. Turning the
+// outline first is not possible -- a geom2 has no third axis to turn into.
+function extrudeOnPlane(sketch, height, plane, offset) {
+  const solid = extrusions.extrudeLinear({ height }, sketch)
+  if (plane === 'xz') return transforms.translate([0, offset, 0], transforms.rotateX(Math.PI / 2, solid))
+  if (plane === 'yz') return transforms.translate([offset, 0, 0], transforms.rotateY(-Math.PI / 2, solid))
+  return transforms.translate([0, 0, offset], solid)
+}`,
   chamferCylinder: `// A cylinder with both rims sliced off: the hull of a short full-width one
 // and a tall narrow one.
 function chamferCylinder(radius, height, center, c) {
@@ -293,9 +356,10 @@ export function toJscad(doc: ModelDoc): string {
   const params = generatedParams(doc);
   const needs = new Set<string>();
 
+  const byId = new Map(doc.features.map((f) => [f.id, f]));
   const lines: string[] = [];
   for (const f of doc.features) {
-    lines.push(`  const ${f.id} = ${featureExpr(f, needs)}`);
+    lines.push(`  const ${f.id} = ${featureExpr(f, needs, byId)}`);
   }
 
   const shown = topLevel(doc).map((f) => f.id);
@@ -304,7 +368,10 @@ export function toJscad(doc: ModelDoc): string {
 
   const modules = ['primitives', 'booleans'];
   if (needs.has('chamferCylinder')) modules.push('hulls');
-  if (needs.has('chamferBox') || needs.has('transforms')) modules.push('transforms');
+  if (needs.has('extrudeOnPlane')) modules.push('extrusions', 'transforms');
+  if ((needs.has('chamferBox') || needs.has('transforms')) && !modules.includes('transforms')) {
+    modules.push('transforms');
+  }
 
   const defs = params
     .map(

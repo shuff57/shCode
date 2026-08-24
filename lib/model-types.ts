@@ -67,6 +67,30 @@ export interface TorusFeature {
   rotate?: Vec3;
 }
 
+/** Which flat plane a sketch is drawn on. Extrusion runs perpendicular to it. */
+export type SketchPlane = 'xy' | 'xz' | 'yz';
+
+/** A closed outline, drawn flat. Not a solid until something extrudes it. */
+export interface SketchFeature {
+  id: string;
+  kind: 'sketch';
+  name?: string;
+  plane: SketchPlane;
+  /** How far the plane sits from the origin along its own normal. */
+  offset: number;
+  /** Corners in plane coordinates, in order. The outline always closes. */
+  points: Array<[number, number]>;
+}
+
+export interface ExtrudeFeature {
+  id: string;
+  kind: 'extrude';
+  name?: string;
+  /** The sketch this pulls into a solid. */
+  target: string;
+  height: number;
+}
+
 export interface CombineFeature {
   id: string;
   kind: 'combine';
@@ -78,7 +102,13 @@ export interface CombineFeature {
 
 export type Feature =
   | BoxFeature | CylinderFeature | SphereFeature
-  | ConeFeature | TorusFeature | CombineFeature;
+  | ConeFeature | TorusFeature
+  | SketchFeature | ExtrudeFeature | CombineFeature;
+
+/** Anything that consumes an earlier feature rather than standing alone. */
+export function isDerived(f: Feature): f is CombineFeature | ExtrudeFeature {
+  return f.kind === 'combine' || f.kind === 'extrude';
+}
 
 export interface ModelDoc {
   version: 1;
@@ -87,8 +117,11 @@ export interface ModelDoc {
 
 export const EMPTY_DOC: ModelDoc = { version: 1, features: [] };
 
-export function isShape(f: Feature): f is Exclude<Feature, CombineFeature> {
-  return f.kind !== 'combine';
+/** A positioned primitive: has a centre, and can carry handles. */
+export function isShape(
+  f: Feature
+): f is Exclude<Feature, CombineFeature | SketchFeature | ExtrudeFeature> {
+  return f.kind !== 'combine' && f.kind !== 'sketch' && f.kind !== 'extrude';
 }
 
 /** Only a primitive can be rounded — see canRound() for why a combine cannot. */
@@ -110,6 +143,9 @@ export function whyCannotRound(f: Feature): string | null {
   if (f.kind === 'combine') {
     return 'Rounding works on a shape, not on a combination. Round the box before you cut the hole.';
   }
+  if (f.kind === 'sketch' || f.kind === 'extrude') {
+    return 'Rounding works on a shape. Round the corners of the sketch instead.';
+  }
   if (f.kind === 'sphere' || f.kind === 'torus') {
     return 'That shape has no edges to round — it is curved all the way round.';
   }
@@ -121,7 +157,9 @@ export function whyCannotRound(f: Feature): string | null {
 
 /** A sphere looks identical however it is turned, so offering the control
  *  would only teach that some buttons do nothing. */
-export function canRotate(f: Feature): boolean {
+export function canRotate(
+  f: Feature
+): f is BoxFeature | CylinderFeature | ConeFeature | TorusFeature {
   return f.kind === 'box' || f.kind === 'cylinder' || f.kind === 'cone' || f.kind === 'torus';
 }
 
@@ -145,6 +183,33 @@ export function nextId(doc: ModelDoc, prefix: string): string {
 
 export type ShapeKind = 'box' | 'cylinder' | 'sphere' | 'cone' | 'torus';
 
+/** A rectangle to start from. An empty canvas with no corners gives a student
+ *  nothing to grab, and every real sketch begins by editing a shape anyway. */
+export function newSketch(doc: ModelDoc, plane: SketchPlane = 'xy'): SketchFeature {
+  return {
+    id: nextId(doc, 'sk'),
+    kind: 'sketch',
+    plane,
+    offset: 0,
+    points: [[0, 0], [40, 0], [40, 25], [0, 25]],
+  };
+}
+
+export function newExtrude(doc: ModelDoc, target: string): ExtrudeFeature {
+  return { id: nextId(doc, 'pull'), kind: 'extrude', target, height: 12 };
+}
+
+/** Insert a corner halfway along the edge after `index`, which is where a
+ *  student expects a new one to land when they ask for it. */
+export function addCorner(f: SketchFeature, index: number): SketchFeature {
+  const a = f.points[index];
+  const b = f.points[(index + 1) % f.points.length];
+  const mid: [number, number] = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  const points = [...f.points];
+  points.splice(index + 1, 0, mid);
+  return { ...f, points };
+}
+
 export function newShape(doc: ModelDoc, kind: ShapeKind): Feature {
   if (kind === 'box') {
     return { id: nextId(doc, 'box'), kind, size: [40, 40, 20], center: [0, 0, 0] };
@@ -165,7 +230,9 @@ function labelOf(f: Feature): string {
   if (f.kind === 'combine') {
     return f.op === 'union' ? 'Join' : f.op === 'subtract' ? 'Cut' : 'Overlap';
   }
-  return f.kind === 'box' ? 'Box'
+  return f.kind === 'sketch' ? 'Sketch'
+    : f.kind === 'extrude' ? 'Pull'
+    : f.kind === 'box' ? 'Box'
     : f.kind === 'cylinder' ? 'Cylinder'
     : f.kind === 'cone' ? 'Cone'
     : f.kind === 'torus' ? 'Ring'
@@ -198,6 +265,11 @@ export function topLevel(doc: ModelDoc): Feature[] {
   const consumed = new Set<string>();
   for (const f of doc.features) {
     if (f.kind === 'combine') f.targets.forEach((t) => consumed.add(t));
+    if (f.kind === 'extrude') consumed.add(f.target);
   }
-  return doc.features.filter((f) => !consumed.has(f.id));
+  // A bare sketch is never returned. It is a flat outline, not a solid, and
+  // handing one to the renderer draws nothing -- the outline is drawn as an
+  // overlay instead, so an un-extruded sketch is still visible while being
+  // honestly absent from the model.
+  return doc.features.filter((f) => !consumed.has(f.id) && f.kind !== 'sketch');
 }

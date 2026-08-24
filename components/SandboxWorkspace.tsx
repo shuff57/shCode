@@ -276,6 +276,18 @@ export default function SandboxWorkspace() {
     [specs]
   );
 
+  // One entry per selected sketch, listing its corner parameters in order so
+  // the overlay can close the loop.
+  const outlines = useMemo(
+    () =>
+      doc.features
+        .filter((f) => f.kind === 'sketch' && selected.includes(f.id))
+        .map((f) =>
+          f.kind === 'sketch' ? f.points.map((_, i) => `${f.id}_p${i}u`) : []
+        ),
+    [doc, selected]
+  );
+
   useEffect(() => {
     specsRef.current = specs;
     frameRef.current?.contentWindow?.postMessage(
@@ -696,6 +708,7 @@ export default function SandboxWorkspace() {
                       scales={scales}
                       onDrag={(param, value) => sendParams({ [param]: value })}
                       onCommit={commitParams}
+                      outlines={outlines}
                     />
                   )}
                 </div>

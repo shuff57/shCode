@@ -534,6 +534,73 @@ def run(url, headed):
               src[:60].strip().replace(chr(10), " "))
         check("UNLINK_EMPTIES_THE_TOOLBAR", page.query_selector(".model-tools") is None)
 
+        # ---- sketch, corner, pull ---------------------------------------------
+        # The unlink above left Build, so re-enter. The doc is empty now, which
+        # makes this a clean start rather than a continuation.
+        if page.query_selector(".model-tools") is None:
+            page.click(".sandbox-mode:has-text('Build')")
+            page.wait_for_selector(".model-tools", timeout=20_000)
+            page.wait_for_timeout(600)
+
+        page.click(".model-tools button:has-text('Sketch')")
+        page.wait_for_timeout(3500)
+        corners = page.query_selector_all(".handle.is-point")
+        check("SKETCH_HAS_FOUR_CORNERS", len(corners) == 4, f"{len(corners)} corners")
+        check("SKETCH_OUTLINE_IS_DRAWN",
+              page.query_selector(".sketch-lines polygon") is not None)
+
+        # A corner moves in two directions at once -- the one thing the
+        # single-axis handles cannot express, and the reason the pointer is
+        # solved onto both projected axes rather than dotted with each.
+        u0 = float(page.input_value("#p-sk1_p2u"))
+        v0 = float(page.input_value("#p-sk1_p2v"))
+        cb = page.query_selector_all(".handle.is-point")[2].bounding_box()
+        page.mouse.move(cb["x"] + 5, cb["y"] + 5)
+        page.mouse.down()
+        for k in range(1, 7):
+            page.mouse.move(cb["x"] + 5 + k * 9, cb["y"] + 5 - k * 7)
+            page.wait_for_timeout(80)
+        page.mouse.up()
+        page.wait_for_timeout(1500)
+        du = abs(float(page.input_value("#p-sk1_p2u")) - u0)
+        dv = abs(float(page.input_value("#p-sk1_p2v")) - v0)
+        check("CORNER_MOVES_IN_BOTH_DIRECTIONS", du > 1 and dv > 1, f"du={du:.1f} dv={dv:.1f}")
+        # Sane magnitude: a 50px drag at a fitted zoom is tens of units, not
+        # hundreds. Catches the camera framing a placeholder instead of the work.
+        check("CORNER_DRAG_IS_PROPORTIONATE", du < 200 and dv < 200, f"du={du:.1f} dv={dv:.1f}")
+
+        page.click(".model-tools button:has-text('Corner')")
+        page.wait_for_timeout(3000)
+        check("CORNER_BUTTON_ADDS_ONE",
+              len(page.query_selector_all(".handle.is-point")) == 5,
+              f"{len(page.query_selector_all('.handle.is-point'))} corners")
+
+        before_pull = canvas_png(page)
+        page.click(".model-tools button:has-text('Pull')")
+        page.wait_for_timeout(4000)
+        check("PULL_MAKES_A_SOLID",
+              canvas_png(page) != before_pull
+              and page.query_selector(".jscad-params-empty-warn") is None)
+        rows = [r.inner_text().replace(chr(10), " ") for r in page.query_selector_all(".model-row")]
+        check("PULL_NAMES_ITS_SKETCH", any("Pull" in r and "Sketch" in r for r in rows), str(rows[-1:]))
+        check("PULL_ADDS_A_HEIGHT",
+              any("height" in (l.inner_text() or "").lower()
+                  for l in page.query_selector_all(".jscad-param-row > label")))
+
+        # Pulling the same outline twice would make a second solid from it,
+        # which is never what the click meant.
+        for r in page.query_selector_all(".model-row"):
+            if "Sketch" in r.inner_text() and "Pull" not in r.inner_text():
+                r.click()
+                break
+        page.wait_for_timeout(400)
+        page.click(".model-tools button:has-text('Pull')")
+        page.wait_for_timeout(1200)
+        note = page.query_selector(".model-note")
+        check("PULLING_TWICE_IS_REFUSED",
+              note is not None and "already been pulled" in note.inner_text(),
+              note.inner_text()[:50] if note else "no note")
+
         # ---- the teacher gate --------------------------------------------------
         # Both gates share one table; the sandbox has no assignment, so only the
         # class-wide one can reach it. A gate that cannot be read must never
@@ -587,6 +654,14 @@ def run(url, headed):
         # used to merge into the runner's params and then vanish, because the
         # build already had the old values -- panel and model disagreeing with
         # nothing on screen admitting it.
+        # The gate tests may have left the sandbox in Build, where there is no
+        # code editor to type into. The stored preference survives a reload, so
+        # this is not stale state -- it is where the student would actually be.
+        if page.query_selector(".model-tools") is not None:
+            page.click(".sandbox-modes button:has-text('Code')")
+            page.wait_for_timeout(1200)
+        page.wait_for_selector(".cm-content", timeout=20_000)
+
         page.click(".cm-content")
         page.keyboard.press("Control+a")
         page.keyboard.insert_text(SLOW_SKETCH)

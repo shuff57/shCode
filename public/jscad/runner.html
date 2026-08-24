@@ -340,6 +340,12 @@
 	}
 })();
 </script>
+<!-- shCAD: the simplified names the course teaches in Q3 (box, ball, tube, …).
+     Additive, in its own file, loaded AFTER the shim above so it can see every
+     real name and refuse to overwrite one, and BEFORE the ?code= injection
+     below so a student's own declarations still win. Its banner explains the
+     design; scripts/jscad-simple-checks.mjs holds its expectations. -->
+<script src="./simple.js"></script>
 <script>
 // Read student code from ?code=<base64url> (written by encodeCode() in
 // components/ShPlayPreview.tsx) and inject it as a <script> so its top-level
@@ -745,7 +751,8 @@
 
 		// Grid sized to the model rather than fixed at 200. A 12mm part on a 200mm
 		// grid reads as a speck on a runway; a 400mm part runs off the edge of one.
-		var gridSpan = niceSpan(modelSpan(solids));
+		var rawSpan = modelSpan(solids);
+		var gridSpan = niceSpan(rawSpan);
 		var gridOptions = {
 			visuals: { drawCmd: 'drawGrid', show: true, transparent: true },
 			size: [gridSpan, gridSpan],
@@ -781,8 +788,15 @@
 		// Frame the model. Done once, on the first render only: refitting on every
 		// parameter change would yank the view out from under anyone dragging a
 		// slider. Run remounts the frame, so a re-run reframes.
+		// A model under 4 units across is the placeholder main() returns when there
+		// is nothing solid yet -- a sketch on its own, for instance. Framing THAT
+		// puts everything else behind the camera and the sketch corners stop
+		// projecting at all. In that case the anchors are the only real extent
+		// there is, so fitAnchors() below frames those instead.
+		// niceSpan floors at 20, so it cannot answer this -- ask the model.
+		var fitWorth = rawSpan > 4;
 		try {
-			var fitted = orbitControls.zoomToFit({
+			var fitted = fitWorth && orbitControls.zoomToFit({
 				controls: controlsState, camera: camera, entities: entities
 			});
 			if (fitted && fitted.camera && fitted.camera.target) {
@@ -862,12 +876,44 @@
 			return w > 0;
 		}
 
+		// Frame a set of world points. Only used when the model itself is the
+		// placeholder: a sketch has no solid to fit, but its corners have extent.
+		// Same arithmetic zoomToFit uses, on points rather than entities.
+		var anchorsFitted = false;
+		function fitAnchors() {
+			if (anchorsFitted || fitWorth || anchors.length < 2) return;
+			var lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+			for (var i = 0; i < anchors.length; i++) {
+				for (var k = 0; k < 3; k++) {
+					lo[k] = Math.min(lo[k], anchors[i].origin[k]);
+					hi[k] = Math.max(hi[k], anchors[i].origin[k]);
+				}
+			}
+			var dia = Math.sqrt(
+				Math.pow(hi[0] - lo[0], 2) + Math.pow(hi[1] - lo[1], 2) + Math.pow(hi[2] - lo[2], 2)
+			);
+			if (!isFinite(dia) || dia < 0.001) return;
+			var target = [(lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, (lo[2] + hi[2]) / 2];
+			var d = Math.sqrt(
+				Math.pow(camera.position[0] - target[0], 2)
+				+ Math.pow(camera.position[1] - target[1], 2)
+				+ Math.pow(camera.position[2] - target[2], 2)
+			);
+			if (!d) return;
+			camera.target = target;
+			controlsState = Object.assign({}, controlsState, {
+				scale: dia * 1.5 / Math.tan(camera.fov / 2) / d
+			});
+			anchorsFitted = true;
+		}
+
 		var aHere = [0, 0], aThere = [0, 0];
 		projectAnchors = function() {
 			if (!anchors.length) {
 				try { window.parent.postMessage({ source: 'jscad-anchors', points: [] }, '*'); } catch (_) {}
 				return;
 			}
+			fitAnchors();
 			mat4.multiply(clip, camera.projection, camera.view);
 			var points = [];
 			for (var i = 0; i < anchors.length; i++) {
@@ -879,11 +925,24 @@
 				var dx = aThere[0] - aHere[0], dy = aThere[1] - aHere[1];
 				var px = Math.sqrt(dx * dx + dy * dy);
 				if (px < 0.001) continue;  // axis points at the camera; undraggable
-				points.push({
+				var pt = {
 					param: a.param, label: a.label, kind: a.kind,
 					x: aHere[0], y: aHere[1],
-					dirX: dx / px, dirY: dy / px, pxPerUnit: px
-				});
+					dirX: dx / px, dirY: dy / px, pxPerUnit: px,
+					// Screen pixels per world unit along the axis, as a vector. A
+					// handle that moves in a plane needs both of these, and they are
+					// not perpendicular on screen once the camera turns.
+					ux: dx, uy: dy
+				};
+				if (a.axisV && a.paramV) {
+					toScreen([
+						a.origin[0] + a.axisV[0], a.origin[1] + a.axisV[1], a.origin[2] + a.axisV[2]
+					], aThere);
+					pt.paramV = a.paramV;
+					pt.vx = aThere[0] - aHere[0];
+					pt.vy = aThere[1] - aHere[1];
+				}
+				points.push(pt);
 			}
 			try { window.parent.postMessage({ source: 'jscad-anchors', points: points }, '*'); } catch (_) {}
 		};

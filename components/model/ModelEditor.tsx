@@ -17,6 +17,9 @@ import {
   Combine,
   Scissors,
   SquareDashedBottom,
+  PenLine,
+  MoveUp,
+  Plus,
   RotateCw,
   Trash2,
   Undo2,
@@ -28,11 +31,14 @@ import {
   type Feature,
   type ModelDoc,
   type RoundStyle,
+  addCorner,
   canRotate,
   isRoundable,
   maxRound,
   nameMap,
+  newExtrude,
   newShape,
+  newSketch,
   nextId,
   type ShapeKind,
   topLevel,
@@ -124,10 +130,48 @@ export default function ModelEditor({
     onChange({
       ...doc,
       features: doc.features.map((x) =>
-        x.id === f.id && x.kind !== 'combine' && x.kind !== 'sphere'
+        x.id === f.id && canRotate(x)
           ? { ...x, rotate: x.rotate ?? [0, 0, 0] }
           : x
       ),
+    });
+    say(null);
+  }
+
+  function startSketch() {
+    const f = newSketch(doc);
+    onChange({ ...doc, features: [...doc.features, f] });
+    setSelected([f.id]);
+    say('Drag the blue corners to shape it, then press Pull to make it solid.');
+  }
+
+  function pull() {
+    const f = chosen[0];
+    if (chosen.length !== 1 || !f || f.kind !== 'sketch') {
+      say('Pick a sketch to pull into a solid.');
+      return;
+    }
+    // A sketch already pulled would produce a second solid from the same
+    // outline, which is never what the click meant.
+    if (doc.features.some((x) => x.kind === 'extrude' && x.target === f.id)) {
+      say('That sketch has already been pulled. Change its height instead.');
+      return;
+    }
+    const e = newExtrude(doc, f.id);
+    onChange({ ...doc, features: [...doc.features, e] });
+    setSelected([e.id]);
+    say(null);
+  }
+
+  function corner() {
+    const f = chosen[0];
+    if (chosen.length !== 1 || !f || f.kind !== 'sketch') {
+      say('Pick a sketch to add a corner to.');
+      return;
+    }
+    onChange({
+      ...doc,
+      features: doc.features.map((x) => (x.id === f.id ? addCorner(f, x === f ? 0 : 0) : x)),
     });
     say(null);
   }
@@ -194,6 +238,26 @@ export default function ModelEditor({
           </button>
           <button onClick={() => addShape('torus')} title="Add a ring">
             <TorusIcon size={14} /> Ring
+          </button>
+        </div>
+
+        <div className="model-tool-group">
+          <button onClick={startSketch} title="Draw a flat outline to pull into a solid">
+            <PenLine size={14} /> Sketch
+          </button>
+          <button
+            onClick={pull}
+            disabled={chosen.length !== 1 || chosen[0]?.kind !== 'sketch'}
+            title="Pull the selected sketch into a solid"
+          >
+            <MoveUp size={14} /> Pull
+          </button>
+          <button
+            onClick={corner}
+            disabled={chosen.length !== 1 || chosen[0]?.kind !== 'sketch'}
+            title="Add a corner to the selected sketch"
+          >
+            <Plus size={14} /> Corner
           </button>
         </div>
 
@@ -268,13 +332,19 @@ export default function ModelEditor({
               <span className="model-step">{i + 1}</span>
               <span className="model-name">
                 {names[f.id]}
+                {f.kind === 'sketch' && (
+                  <em className="model-detail"> {f.points.length} corners, {f.plane}</em>
+                )}
+                {f.kind === 'extrude' && (
+                  <em className="model-detail"> {names[f.target] ?? f.target}</em>
+                )}
                 {f.kind === 'combine' && (
                   <em className="model-detail">
                     {' '}
                     {f.targets.map((t) => names[t] ?? t).join(f.op === 'subtract' ? ' − ' : f.op === 'union' ? ' + ' : ' ∩ ')}
                   </em>
                 )}
-                {'rotate' in f && f.rotate && f.rotate.some((v) => v !== 0) ? (
+                {canRotate(f) && f.rotate && f.rotate.some((v) => v !== 0) ? (
                   <em className="model-detail"> turned</em>
                 ) : null}
                 {'round' in f && f.round ? (

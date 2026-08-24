@@ -120,6 +120,61 @@ module.exports = function run(dir) {
 
   check('a ring refuses to round', types.whyCannotRound(ring('r1')) !== null);
 
+  console.log('\n=== sketch and extrude ===');
+
+  // An L, so a wrong winding or a dropped corner shows up in the volume rather
+  // than only in a picture nobody looks at.
+  const L = [[0, 0], [40, 0], [40, 10], [15, 10], [15, 25], [0, 25]];
+  const sketch = (id, plane = 'xy', offset = 0) => ({
+    id, kind: 'sketch', plane, offset, points: L,
+  });
+  const pull = (id, target, height = 12) => ({ id, kind: 'extrude', target, height });
+
+  const flatOnly = gen.toJscad(doc(sketch('s1')));
+  check('a sketch is a polygon', flatOnly.includes('primitives.polygon('));
+  check('a bare sketch is not returned as the model',
+    !/return s1\b/.test(flatOnly), flatOnly.slice(flatOnly.indexOf('return')).split('\n')[0]);
+
+  const pulled = gen.toJscad(doc(sketch('s1'), pull('e1', 's1')));
+  check('an extrude uses the plane helper', pulled.includes('function extrudeOnPlane('));
+  check('...and pulls extrusions in', /const \{[^}]*extrusions[^}]*\} = require/.test(pulled));
+  check('the sketch it consumed is not also returned', /return e1\b/.test(pulled));
+  check('every corner is a parameter, not a literal',
+    pulled.includes('p.s1_p0u') && pulled.includes('p.s1_p5v'));
+
+  const pulledSolid = build(pulled);
+  // 40x25 minus the 25x15 notch = 625, times 12 high.
+  check('the L extrudes to the right volume',
+    Math.abs(pulledSolid.volume - 625 * 12) < 40, `${pulledSolid.volume.toFixed(0)} vs 7500`);
+  check('...and the right footprint',
+    Math.abs(pulledSolid.bbox[1][0] - 40) < 0.5 && Math.abs(pulledSolid.bbox[1][1] - 25) < 0.5,
+    JSON.stringify(pulledSolid.bbox));
+  check('...standing 12 tall on xy',
+    Math.abs(pulledSolid.bbox[1][2] - pulledSolid.bbox[0][2] - 12) < 0.5, JSON.stringify(pulledSolid.bbox));
+
+  // The plane is the whole point of choosing one, so measure that it moved.
+  const onXZ = build(gen.toJscad(doc(sketch('s1', 'xz'), pull('e1', 's1'))));
+  check('an xz sketch stands up in z, not y',
+    Math.abs(onXZ.bbox[1][2] - onXZ.bbox[0][2] - 25) < 0.5
+    && Math.abs(onXZ.bbox[1][1] - onXZ.bbox[0][1] - 12) < 0.5,
+    JSON.stringify(onXZ.bbox));
+  const onYZ = build(gen.toJscad(doc(sketch('s1', 'yz'), pull('e1', 's1'))));
+  check('a yz sketch is thin in x',
+    Math.abs(onYZ.bbox[1][0] - onYZ.bbox[0][0] - 12) < 0.5, JSON.stringify(onYZ.bbox));
+
+  const raised = build(gen.toJscad(doc(sketch('s1', 'xy', 30), pull('e1', 's1'))));
+  check('offset lifts the sketch off the origin',
+    Math.abs(raised.bbox[0][2] - 30) < 0.5, JSON.stringify(raised.bbox));
+
+  // An extruded sketch is a solid like any other, so it must cut and be cut.
+  const cutBySketch = build(gen.toJscad(doc(
+    box('b1'), sketch('s1'), pull('e1', 's1'),
+    { id: 'x1', kind: 'combine', op: 'subtract', targets: ['b1', 'e1'] },
+  )));
+  check('an extruded sketch composes with the booleans',
+    cutBySketch.volume > 0 && cutBySketch.volume < 40 * 40 * 20,
+    `${cutBySketch.volume.toFixed(0)}`);
+
   console.log('\n=== turning a shape ===');
 
   const flat = gen.toJscad(doc(box('b1')));

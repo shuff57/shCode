@@ -9,9 +9,9 @@
 // box grows both ways at once, so its face only keeps up with the pointer if
 // the width changes by twice the drag.
 
-import type { Feature } from './model-types';
+import { isShape, type Feature } from './model-types';
 
-export type HandleKind = 'size' | 'move' | 'turn';
+export type HandleKind = 'size' | 'move' | 'turn' | 'point';
 
 export interface HandleSpec {
   kind: HandleKind;
@@ -21,6 +21,10 @@ export interface HandleSpec {
   origin: [number, number, number];
   /** Unit direction the handle slides along, world space. */
   axis: [number, number, number];
+  /** Second direction, for handles that move in a plane rather than a line. */
+  axisV?: [number, number, number];
+  /** Parameter the second direction drives. */
+  paramV?: string;
   scale: number;
   label: string;
 }
@@ -67,8 +71,43 @@ function turnHandles(id: string, centre: [number, number, number], reach: number
   }));
 }
 
+// Sketch corners move in two directions at once, which is the one thing the
+// single-axis handles cannot express. Each corner therefore carries a second
+// axis, and the drag decomposes the pointer onto both.
+const PLANE_AXES: Record<string, { u: [number, number, number]; v: [number, number, number] }> = {
+  xy: { u: [1, 0, 0], v: [0, 1, 0] },
+  xz: { u: [1, 0, 0], v: [0, 0, 1] },
+  yz: { u: [0, 1, 0], v: [0, 0, 1] },
+};
+
+export function planeAxes(plane: string) {
+  return PLANE_AXES[plane] ?? PLANE_AXES.xy;
+}
+
+function sketchHandles(f: Extract<Feature, { kind: 'sketch' }>): HandleSpec[] {
+  const { u, v } = planeAxes(f.plane);
+  const n: [number, number, number] =
+    f.plane === 'xy' ? [0, 0, 1] : f.plane === 'xz' ? [0, 1, 0] : [1, 0, 0];
+  return f.points.map(([pu, pv], i) => ({
+    kind: 'point' as const,
+    param: `${f.id}_p${i}u`,
+    paramV: `${f.id}_p${i}v`,
+    origin: [
+      u[0] * pu + v[0] * pv + n[0] * f.offset,
+      u[1] * pu + v[1] * pv + n[1] * f.offset,
+      u[2] * pu + v[2] * pv + n[2] * f.offset,
+    ],
+    axis: u,
+    axisV: v,
+    scale: 1,
+    label: `corner ${i + 1}`,
+  }));
+}
+
 export function handlesFor(f: Feature): HandleSpec[] {
-  if (f.kind === 'combine') return [];
+  // A sketch gets its own two-axis corner handles; see sketchHandles.
+  if (f.kind === 'sketch') return sketchHandles(f);
+  if (!isShape(f)) return [];
   const [cx, cy, cz] = f.center;
   const size: HandleSpec[] = [];
   let reach: number;
