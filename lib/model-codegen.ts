@@ -400,6 +400,10 @@ const HELPERS: Record<string, string> = {
 // boxes is full size on two axes, so it reaches every edge and only the eight
 // corners get cut. On a 40x40x20 box that removes 0.27% of the volume and looks
 // almost right, which is worse than looking wrong.
+// The three rotates below turn a coordinate frame, not a shape: each prism is
+// built at the origin and tilted about it to become a 45-degree cutter. turn()
+// pivots about a shape's own middle and would put every cutter somewhere else.
+// "turn for shapes, rotate for frames" -- this is the frames case.
 function chamferBox(size, center, c) {
   const [x, y, z] = size
   const d = Math.SQRT2
@@ -407,13 +411,13 @@ function chamferBox(size, center, c) {
   const kx = y / 2 + z / 2 - c
   const ky = x / 2 + z / 2 - c
   const kz = x / 2 + y / 2 - c
-  let s = primitives.cuboid({ size, center })
+  let s = box(x, y, z, { center })
   s = booleans.intersect(s, transforms.translate(center,
-    transforms.rotateX(Math.PI / 4, primitives.cuboid({ size: [long, kx * d, kx * d] }))))
+    transforms.rotateX(Math.PI / 4, box(long, kx * d, kx * d))))
   s = booleans.intersect(s, transforms.translate(center,
-    transforms.rotateY(Math.PI / 4, primitives.cuboid({ size: [ky * d, long, ky * d] }))))
+    transforms.rotateY(Math.PI / 4, box(ky * d, long, ky * d))))
   s = booleans.intersect(s, transforms.translate(center,
-    transforms.rotateZ(Math.PI / 4, primitives.cuboid({ size: [kz * d, kz * d, long] }))))
+    transforms.rotateZ(Math.PI / 4, box(kz * d, kz * d, long))))
   return s
 }`,
   extrudeOnPlane: `// Pull a flat outline into a solid, on one of the three planes.
@@ -431,8 +435,8 @@ function extrudeOnPlane(sketch, height, plane, offset) {
 // and a tall narrow one.
 function chamferCylinder(radius, height, center, c) {
   return hulls.hull(
-    primitives.cylinder({ radius, height: height - 2 * c, center }),
-    primitives.cylinder({ radius: radius - c, height, center })
+    tube(radius, height - 2 * c, { center }),
+    tube(radius - c, height, { center })
   )
 }`,
 };

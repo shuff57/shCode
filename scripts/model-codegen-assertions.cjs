@@ -241,6 +241,34 @@ module.exports = function run(dir) {
   const turnedRing = build(gen.toJscad(doc(ring('r1'))));
   check('a ring still builds with the rotation path in place', turnedRing.volume > 100);
 
+  console.log('\n=== one dialect, everywhere ===');
+
+  // The property, not the spellings. These keep holding if a name moves; a
+  // check that greps for `box(` would go red on a rename and teach nothing.
+  const everything = gen.toJscad(doc(
+    box('b1'), cyl('c1'), cone('k1'), ring('r1'),
+    { id: 'sp1', kind: 'sphere', radius: 9, center: [0, 0, 0] },
+    sketch('s1'), pull('e1', 's1')));
+  const mainBody = everything.slice(everything.indexOf('function main'));
+  check('no raw primitives survive in main()',
+    !mainBody.includes('primitives.'),
+    (mainBody.match(/primitives\.[a-zA-Z]+/g) || []).join(','));
+
+  // The WHOLE file, not just main(). Helper bodies are generated code sitting
+  // in a student's own file, so a second spelling there is the same second
+  // dialect — and a main()-only check cannot see it. Coverage of a property is
+  // not coverage of every place the property has to hold.
+  const withHelpers = gen.toJscad(doc(
+    box('b2', { round: 4, roundStyle: 'chamfer' }),
+    cyl('c2', { round: 2, roundStyle: 'chamfer' }),
+    sketch('s2'), pull('e2', 's2')));
+  check('no raw primitives anywhere, helper bodies included',
+    !withHelpers.includes('primitives.'),
+    (withHelpers.match(/primitives\.[a-zA-Z]+/g) || []).join(','));
+
+  check('not even the empty-doc placeholder is raw',
+    !gen.toJscad(doc()).includes('primitives.'));
+
   console.log('\n=== names count per kind, not per row ===');
 
   const mixed = doc(box('b1'), cyl('c1'), box('b2'), cyl('c2'));
