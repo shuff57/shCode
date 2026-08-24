@@ -94,6 +94,22 @@ export default function JscadParamsPanel({
     });
   }
 
+  // End of a gesture. The value is carried by the frame callback above, which
+  // has NOT run yet when a blur or a pointerup arrives — those fire
+  // synchronously. Committing without flushing first therefore commits an empty
+  // queue, and the edit is dropped at the next structural change with nothing
+  // on screen admitting it.
+  function commit() {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    const next = pendingRef.current;
+    pendingRef.current = null;
+    if (next) onChange(next);
+    onCommit();
+  }
+
   if (defs.length === 0) {
     return (
       <div className="jscad-params-empty">
@@ -137,7 +153,7 @@ export default function JscadParamsPanel({
               <input
                 type="checkbox"
                 checked={Boolean(raw)}
-                onChange={(e) => { push(d.name, e.target.checked); onCommit(); }}
+                onChange={(e) => { push(d.name, e.target.checked); commit(); }}
               />
               <span>{label}</span>
             </label>
@@ -232,6 +248,10 @@ export default function JscadParamsPanel({
                     const v = settle(parsed, d);
                     if (v !== num) push(d.name, v);
                   }
+                  // Leaving the field ends the gesture. Without this the typed
+                  // value lives only in the panel's optimistic state and is
+                  // dropped the next time the doc is regenerated.
+                  commit();
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {

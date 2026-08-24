@@ -10,6 +10,7 @@
 // The generated file is a legitimate parametric JSCAD script and runs unmodified
 // on jscad.app.
 
+import { solveSketch, type Point } from './sketch-solve';
 import {
   type Feature,
   type ModelDoc,
@@ -212,6 +213,74 @@ export function applyParam(doc: ModelDoc, name: string, value: number): ModelDoc
   });
 
   return changed ? { ...doc, features } : doc;
+}
+
+/**
+ * Make every constrained sketch in a doc obey its own rules.
+ *
+ * Applied wherever a doc is adopted, so "the points satisfy the constraints as
+ * far as they can" is an invariant of the doc rather than something each caller
+ * has to remember. Solving at the call site instead meant a caller holding a
+ * stale copy could solve the wrong points and write the result back -- which is
+ * exactly how a typed corner value went missing the moment a rule was applied.
+ */
+export function solveDoc(doc: ModelDoc): ModelDoc {
+  let changed = false;
+  const features = doc.features.map((f) => {
+    if (f.kind !== 'sketch' || !f.constraints || f.constraints.length === 0) return f;
+    const solved = solveSketch(f.points.map((p) => [p[0], p[1]]), f.constraints);
+    if (solved.residual === 0 && solved.iterations === 0) return f;
+    const points = solved.points.map((p) => [p[0], p[1]] as [number, number]);
+    if (points.every((p, i) => p[0] === f.points[i][0] && p[1] === f.points[i][1])) return f;
+    changed = true;
+    return { ...f, points };
+  });
+  return changed ? { ...doc, features } : doc;
+}
+
+/**
+ * Run a corner change past the sketch's constraints.
+ *
+ * Returns every corner parameter the solver ended up moving, not just the one
+ * that was dragged — a constrained edge moves its far end too, and the frame
+ * has to be told about both or the model and the outline disagree.
+ *
+ * The dragged corners are pinned, so the solver moves everything else to meet
+ * them. Without that the pointer fights the constraint and the corner crawls.
+ */
+export function solveSketchDrag(
+  doc: ModelDoc,
+  changed: Record<string, number>
+): Record<string, number> {
+  const out: Record<string, number> = { ...changed };
+
+  for (const f of doc.features) {
+    if (f.kind !== 'sketch' || !f.constraints || f.constraints.length === 0) continue;
+
+    const pinned: number[] = [];
+    const pts: Point[] = f.points.map((p) => [p[0], p[1]]);
+    let touched = false;
+
+    for (const [name, value] of Object.entries(changed)) {
+      if (!name.startsWith(`${f.id}_p`)) continue;
+      const m = /^p(\d+)([uv])$/.exec(name.slice(f.id.length + 1));
+      if (!m) continue;
+      const n = Number(m[1]);
+      if (n < 0 || n >= pts.length) continue;
+      pts[n][m[2] === 'u' ? 0 : 1] = value;
+      pinned.push(n);
+      touched = true;
+    }
+    if (!touched) continue;
+
+    const solved = solveSketch(pts, f.constraints, pinned);
+    solved.points.forEach((p, n) => {
+      if (Math.abs(p[0] - f.points[n][0]) > 1e-9) out[pname(f.id, `p${n}u`)] = p[0];
+      if (Math.abs(p[1] - f.points[n][1]) > 1e-9) out[pname(f.id, `p${n}v`)] = p[1];
+    });
+  }
+
+  return out;
 }
 
 function centreExpr(id: string): string {

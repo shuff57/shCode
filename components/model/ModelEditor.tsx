@@ -27,6 +27,8 @@ import {
   ChevronUp,
   ChevronDown,
 } from 'lucide-react';
+import SketchConstraints from './SketchConstraints';
+import type { Constraint } from '../../lib/sketch-solve';
 import {
   type Feature,
   type ModelDoc,
@@ -216,6 +218,19 @@ export default function ModelEditor({
     say(null);
   }
 
+  // Only records the rules. Solving happens where the doc is adopted, which is
+  // the one place guaranteed to hold the current points -- solving here would
+  // use whatever this render was given, and lose any edit still in flight.
+  function setConstraints(f: Extract<Feature, { kind: 'sketch' }>, next: Constraint[]) {
+    onChange({
+      ...doc,
+      features: doc.features.map((x) => (x.id === f.id ? { ...x, constraints: next } : x)),
+    });
+  }
+
+  const activeSketch =
+    chosen.length === 1 && chosen[0].kind === 'sketch' ? chosen[0] : null;
+
   const canCombine = chosen.length >= 2;
   const canRound = chosen.length === 1 && whyCannotRound(chosen[0]) === null;
   const roundBlockedBy = chosen.length === 1 ? whyCannotRound(chosen[0]) : null;
@@ -333,7 +348,10 @@ export default function ModelEditor({
               <span className="model-name">
                 {names[f.id]}
                 {f.kind === 'sketch' && (
-                  <em className="model-detail"> {f.points.length} corners, {f.plane}</em>
+                  <em className="model-detail">
+                    {' '}{f.points.length} corners, {f.plane}
+                    {f.constraints?.length ? `, ${f.constraints.length} rules` : ''}
+                  </em>
                 )}
                 {f.kind === 'extrude' && (
                   <em className="model-detail"> {names[f.target] ?? f.target}</em>
@@ -371,6 +389,14 @@ export default function ModelEditor({
           );
         })}
       </ol>
+
+      {activeSketch && (
+        <SketchConstraints
+          points={activeSketch.points}
+          constraints={activeSketch.constraints ?? []}
+          onChange={(next) => setConstraints(activeSketch, next)}
+        />
+      )}
 
       <style>{`
         .model-editor { display: flex; flex-direction: column; height: 100%; min-height: 0; overflow: hidden; }

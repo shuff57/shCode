@@ -329,6 +329,24 @@ def run(url, headed):
         cut_shot = canvas_png(page)
         check("TOOLBAR_BUILT_A_MODEL", len(cut_shot) > 0)
 
+        # A typed value must reach the DOC, not just the panel. The panel is
+        # optimistic, so every check that reads it passes whether the edit was
+        # committed or dropped -- which is how a blur that never committed
+        # survived this gate for three phases. A structural change regenerates
+        # from the doc, so it is the only honest witness.
+        wf = page.query_selector("#p-box1_width")
+        wf.click(); wf.press("Control+a"); wf.type("57", delay=25); wf.press("Enter")
+        page.wait_for_timeout(2000)
+        check("TYPED_VALUE_SHOWS", page.input_value("#p-box1_width") == "57",
+              page.input_value("#p-box1_width"))
+        page.click(".model-tools button:has-text('Sphere')")
+        page.wait_for_timeout(3500)
+        check("TYPED_VALUE_SURVIVES_A_REBUILD",
+              page.input_value("#p-box1_width") == "57",
+              f"width is {page.input_value('#p-box1_width')} after adding a shape")
+        page.click('.model-tools button[aria-label="Undo"]')
+        page.wait_for_timeout(2500)
+
         # Rounding a combination is the refusal that carries the lesson: order
         # changes the result, so round the box before you cut the hole.
         rows[2].click(); page.wait_for_timeout(200)
@@ -574,6 +592,73 @@ def run(url, headed):
         check("CORNER_BUTTON_ADDS_ONE",
               len(page.query_selector_all(".handle.is-point")) == 5,
               f"{len(page.query_selector_all('.handle.is-point'))} corners")
+
+        # ---- rules on a sketch -------------------------------------------------
+        # Constraints exist so a corner drag stops being free-hand. The rule
+        # panel appears only for a selected sketch, because an edge is what a
+        # rule is about and there is nothing on the canvas to click for one.
+        check("RULES_PANEL_APPEARS", page.query_selector(".sk-rules") is not None)
+        rows = page.query_selector_all(".sk-table tbody tr")
+        check("ONE_ROW_PER_EDGE", len(rows) == 5, f"{len(rows)} rows")
+
+        # Knock edge 1 out of level FIRST. It starts flat, so applying "across"
+        # to it would pass whether the rule worked or not -- right and wrong
+        # looking identical, which is the whole reason to set the state up.
+        tilt = page.query_selector("#p-sk1_p1v")
+        tilt.click(); tilt.press("Control+a"); tilt.type("9", delay=25); tilt.press("Enter")
+        page.wait_for_timeout(2000)
+        v_a = float(page.input_value("#p-sk1_p0v"))
+        v_b = float(page.input_value("#p-sk1_p1v"))
+        check("EDGE_STARTS_UNLEVEL", abs(v_a - v_b) > 0.5, f"{v_a} vs {v_b}")
+        page.click('.sk-table button[aria-label="Edge 1 across"]')
+        page.wait_for_timeout(3000)
+        v_a2 = float(page.input_value("#p-sk1_p0v"))
+        v_b2 = float(page.input_value("#p-sk1_p1v"))
+        check("ACROSS_LEVELS_THE_EDGE", abs(v_a2 - v_b2) < 0.05, f"{v_a2} vs {v_b2}")
+
+        # A dragged corner is pinned, so the solver moves the far end to meet it
+        # rather than dragging the pointer back.
+        before_u = float(page.input_value("#p-sk1_p0u"))
+        before_v = float(page.input_value("#p-sk1_p0v"))
+        cb2 = handle("Drag corner 1").bounding_box()
+        page.mouse.move(cb2["x"] + 5, cb2["y"] + 5)
+        page.mouse.down()
+        for k in range(1, 6):
+            page.mouse.move(cb2["x"] + 5 + k * 8, cb2["y"] + 5 + k * 5)
+            page.wait_for_timeout(80)
+        page.mouse.up()
+        page.wait_for_timeout(1800)
+        # Either axis: the screen direction a drag lands on depends on the
+        # camera, so demanding movement in u specifically tests the view angle
+        # rather than the solver.
+        moved_u = abs(float(page.input_value("#p-sk1_p0u")) - before_u)
+        moved_v = abs(float(page.input_value("#p-sk1_p0v")) - before_v)
+        check("DRAGGED_CORNER_IS_NOT_PULLED_BACK",
+              moved_u > 1 or moved_v > 1,
+              f"moved u {moved_u:.2f}, v {moved_v:.2f}")
+        va = float(page.input_value("#p-sk1_p0v"))
+        vb = float(page.input_value("#p-sk1_p1v"))
+        check("RULE_STILL_HOLDS_AFTER_A_DRAG", abs(va - vb) < 0.2, f"{va} vs {vb}")
+
+        # A length rule is the dimension a real sketch is built from.
+        li = page.query_selector('.sk-table input[aria-label="Edge 2 length"]')
+        li.click(); li.press("Control+a"); li.type("60", delay=25); li.press("Enter")
+        page.wait_for_timeout(3000)
+        import math
+        u1 = float(page.input_value("#p-sk1_p1u")); w1 = float(page.input_value("#p-sk1_p1v"))
+        u2 = float(page.input_value("#p-sk1_p2u")); w2 = float(page.input_value("#p-sk1_p2v"))
+        edge2 = math.hypot(u2 - u1, w2 - w1)
+        check("LENGTH_RULE_IS_HONOURED", abs(edge2 - 60) < 0.5, f"edge 2 = {edge2:.2f}")
+
+        # A rule that cannot hold must say so rather than quietly settling.
+        page.click('.sk-table button[aria-label="Edge 2 across"]')
+        page.wait_for_timeout(1200)
+        page.click('.sk-table button[aria-label="Edge 2 up"]')
+        page.wait_for_timeout(2500)
+        check("ACROSS_AND_UP_DO_NOT_STACK",
+              page.get_attribute('.sk-table button[aria-label="Edge 2 across"]', "aria-pressed") == "false"
+              or page.query_selector('.sk-table button[aria-label="Edge 2 across"].on') is None,
+              "across should have come off when up went on")
 
         before_pull = canvas_png(page)
         page.click(".model-tools button:has-text('Pull')")

@@ -81,6 +81,22 @@ export default function HandleOverlay({
     });
   }
 
+  // Same trap as the panel: pointerup is synchronous and the frame callback
+  // above has not run, so committing without flushing commits nothing.
+  function commit() {
+    if (raf.current !== null) {
+      cancelAnimationFrame(raf.current);
+      raf.current = null;
+    }
+    const p = pending.current;
+    const q = pendingV.current;
+    pending.current = null;
+    pendingV.current = null;
+    if (p) onDrag(p.param, p.value);
+    if (q) onDrag(q.param, q.value);
+    onCommit();
+  }
+
   if (!points.length) return null;
 
   const at = new Map(points.map((p) => [p.param, p]));
@@ -176,10 +192,10 @@ export default function HandleOverlay({
               setDragging(null);
               setAlongPx(0);
               setAlongV(0);
-              onCommit();
+              commit();
             }}
             onPointerCancel={() => {
-              setDragging(null); setAlongPx(0); setAlongV(0); onCommit();
+              setDragging(null); setAlongPx(0); setAlongV(0); commit();
             }}
           />
         );

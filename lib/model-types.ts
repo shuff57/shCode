@@ -7,6 +7,11 @@
 // value, and subtract(a, b) is not subtract(b, a). That is the whole reason the
 // visual mode belongs in a CS course rather than beside one.
 
+import type { Constraint as SketchConstraint } from './sketch-solve';
+
+/** Re-exported so a caller needs one import to work with a sketch. */
+export type { Constraint as SketchConstraint } from './sketch-solve';
+
 export type Vec3 = [number, number, number];
 
 /** How a shape's edges are killed. JSCAD has no fillet(); see model-codegen. */
@@ -80,6 +85,8 @@ export interface SketchFeature {
   offset: number;
   /** Corners in plane coordinates, in order. The outline always closes. */
   points: Array<[number, number]>;
+  /** Rules the corners must obey. Absent means free-hand. */
+  constraints?: SketchConstraint[];
 }
 
 export interface ExtrudeFeature {

@@ -15,7 +15,13 @@ import ModelEditor from './model/ModelEditor';
 import HandleOverlay, { type AnchorPoint } from './model/HandleOverlay';
 import { handlesFor } from '../lib/model-handles';
 import { EMPTY_DOC, type ModelDoc } from '../lib/model-types';
-import { applyParam, paramValues as docParams, toJscad } from '../lib/model-codegen';
+import {
+  applyParam,
+  paramValues as docParams,
+  solveDoc,
+  solveSketchDrag,
+  toJscad,
+} from '../lib/model-codegen';
 import { RUNNER_SOURCE, RUN_TIMEOUT_MS } from '../lib/js-runner-source';
 import {
   NO_TEACHER_MODES,
@@ -184,7 +190,10 @@ export default function SandboxWorkspace() {
   useEffect(() => { docRef.current = doc; }, [doc]);
 
   // Regenerate and reload. The slow path, and the only one structure takes.
-  const loadDoc = useCallback((next: ModelDoc) => {
+  const loadDoc = useCallback((raw: ModelDoc) => {
+    // Solve here, not at the call site. Every path into the doc goes through
+    // this one, so the invariant holds no matter who is adopting it.
+    const next = solveDoc(raw);
     setDoc(next);
     docRef.current = next;
     uncommitted.current = {};
@@ -234,10 +243,20 @@ export default function SandboxWorkspace() {
   const uncommitted = useRef<ParamValues>({});
 
   const sendParams = useCallback((next: ParamValues) => {
-    setParamValues((prev) => ({ ...prev, ...next }));
-    uncommitted.current = { ...uncommitted.current, ...next };
+    // A constrained corner drags its neighbours with it, so the solver decides
+    // what actually moved -- the pointer only proposes.
+    const numeric: Record<string, number> = {};
+    for (const [k, v] of Object.entries(next)) {
+      if (typeof v === 'number') numeric[k] = v;
+    }
+    const solved: ParamValues = Object.keys(numeric).length
+      ? { ...next, ...solveSketchDrag(docRef.current, numeric) }
+      : next;
+
+    setParamValues((prev) => ({ ...prev, ...solved }));
+    uncommitted.current = { ...uncommitted.current, ...solved };
     frameRef.current?.contentWindow?.postMessage(
-      { source: 'jscad-set-params', params: next },
+      { source: 'jscad-set-params', params: solved },
       '*'
     );
   }, []);
