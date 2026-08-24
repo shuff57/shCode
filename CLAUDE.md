@@ -5,6 +5,12 @@ high-school CS course. Static site served from Cloudflare Pages; every `/api/*`
 route is a Pages Function in `functions/`, backed by a single D1 database
 (`shcode-commits`, binding `DB`).
 
+> **Check `HANDOFF.md` at the repo root before starting work.** Nothing loads it
+> automatically, so this line is the only pointer to it. It is a point-in-time state
+> report — open questions, unapplied fixes, and traps that each cost a real debugging
+> cycle. The top section is the most recent. When a section is stale or its decisions
+> are made, delete that section; when the file is empty, delete the file and this note.
+
 ## Runtime layout
 
 - **Client** — React 19 (+ CodeMirror, Zustand, lucide-react). Builds to `out/` via
