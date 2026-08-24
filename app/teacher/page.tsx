@@ -1,5 +1,6 @@
 'use client';
 
+import LessonModeControl from '../../components/LessonModeControl';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { NeedsAttentionPanel } from '../../components/NeedsAttentionPanel';
@@ -1424,6 +1425,18 @@ function DetailView({ classId }: { classId: string }) {
           Needs Attention
         </button>
       </div>
+
+      {/* Shape tools vs code. Only JSCAD assignments can be gated — the setting
+          decides which editor a JSCAD lesson opens in, and means nothing to a
+          shPlay or console one. */}
+      {activeView === 'roster' && (
+        <LessonModeControl
+          classId={classId}
+          lessons={[...lessonMap.values()]
+            .filter((l) => l.preview === 'jscad')
+            .map((l) => ({ id: l.id, title: l.title }))}
+        />
+      )}
 
       {/* Roster view */}
       {activeView === 'roster' && (
