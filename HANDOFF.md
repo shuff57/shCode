@@ -258,14 +258,20 @@ this module. Not a defect; noted so "no gate row on 1.3.11" is not read as one.
 
 ## F. Environment left behind
 
-- `wrangler pages dev` on **:8788 was started for the section G pass and stopped
-  again**. Nothing is listening on :8788 or :3002.
+- `wrangler pages dev` (:8788) and the Ollama stub (:8899) were started for the
+  section G and H passes and **stopped again**. Nothing is listening on :8788,
+  :8899 or :3002.
 - **`.dev.vars` exists at repo root and contains a real Ollama key.** Gitignored, but it
   is on disk on this machine. `TEACHER_EMAILS=teacher.tester@shcode.local` was
-  appended to it during the section G pass.
-- Local D1 holds the two test accounts, one class, and the student walkthrough's
-  progress and submissions. A probe commit pushed into 1.3.19 during the teacher pass
-  was deleted; `commits` holds only 1.3.16's two rows.
+  appended to it during the section G pass. Note `OLLAMA_HOST` in that file
+  points at the local stub on :8899, NOT ollama.com — see section H.
+- Local D1 now holds several throwaway accounts: `teacher.tester@`,
+  `student.tester@`, and `student.walk@` / `walk2@` / `walk3@` / `walk4@`
+  (all `@shcode.local`, password `TestPass123!`). **`student.walk4@` is the
+  clean one** — 21/21 module 1.3 lessons, 6 submissions, 3 commits, nothing
+  flagged `gradingFailed`. The walk2/walk3 accounts are half-finished runs
+  from a stub that was returning the wrong criterion ids; delete them if the
+  clutter matters.
 
 ## G. Browser pass, run after 0eb175a was pushed
 
@@ -358,9 +364,13 @@ and no reference answer or `solution/` path in any page.
 `GET /api/lesson-solution/<id>` unauthenticated returns **401** with no answer
 content, so the new `files` shape did not widen the gate.
 
-Caveat: that confirms the lesson *data* is live. The `getChangedFiles` and
-`normalizeEol` changes are minified JavaScript and were inferred live from
-being in the same commit and build — not read out of the deployed bundle.
+The `normalizeEol` regex was later read directly out of the deployed chunk:
+`744-56959d57aa512cac.js` contains `/\r\n?/g` and the chunk it replaced,
+`744-2a7230ad886bd024.js`, does not. So the store fix is confirmed live, not
+inferred.
+
+Pages rebuilt ~200 seconds after the push, and exactly one chunk changed —
+consistent with a store-only diff.
 
 **Trap worth keeping:** the RSC payload is double-escaped in the page HTML, so
 a naive `grep` for the backtick character class counts **zero** on a page that
@@ -368,6 +378,85 @@ plainly contains it. Unescape twice before asserting anything about a deployed
 pattern; the first attempt here read as a failed deploy and was not one.
 
 ---
+
+## H. Student walk, end to end — the last open item, now closed
+
+Every earlier pass ran as a **teacher**, because sequential gating locks a fresh
+student out of 1.3.19. That caveat is gone: a real student account walked all
+**21 lessons of module 1.3 in order**, in a browser, against real Functions and
+local D1. **36 checks, 0 failures.**
+
+`scripts/`-external harness lives in the session scratchpad
+(`student_walk.py`); it is not committed, because it depends on a local stub
+and two throwaway accounts.
+
+### What was actually done, per lesson type
+
+| Type | Count | How it was completed |
+| --- | --- | --- |
+| slides / reading / example / video | 15 | scrolled, clicked **Mark as complete** |
+| console lab | 3 | real answer typed in, Run, Submit |
+| AI-graded writeup | 2 | prose answer, graded through `/api/grade-written` |
+| quiz | 1 | 9 questions answered, **Check my answers** |
+
+**Ground truth in D1** for `student.walk4@shcode.local`: `role=student`,
+**21 completed**, **6 submissions**, **3 commits**, quiz scored 9, and **no row
+carries `gradingFailed`**.
+
+### What this proves that nothing before it did
+
+- **The gate is real and it opens.** 1.3.19 returned "Lesson locked · Finish the
+  prior lessons in this module" on a fresh account, and opened only after the 18
+  lessons before it were completed.
+- **The backtick fix works for a student.** Every lab answer was typed with
+  template literals — the construct 1.2.13 teaches and all three labs used to
+  reject. 1.3.11 scored 7/7, 1.3.16 6/6, 1.3.19 **10/10**. The stored commit
+  snapshot contains `` let bookTitle = `The Hobbit`; `` verbatim.
+- **C2 works for a student.** 1.3.19's README was answered as a **bullet list** —
+  the format the old r9 rejected and the old starter itself modelled — and it
+  passed.
+- **The commit fix works for a student.** Three `commits` rows, one per lab,
+  `authored_by_email` = the student. The defect that opened this whole review
+  was a student finishing a lesson with **zero** commits.
+- **No `\r` reached the store.** The gzipped snapshot is LF throughout.
+- **The teacher can recover the prose half.** `lesson_submissions.response`
+  holds `script.js` only, but the commit snapshot holds all four files including
+  `README.md`.
+
+### Two things that looked like defects and are not
+
+- **A grader outage completes the lesson with no score.** Deliberate, and the
+  reasoning is in `WrittenGrader.recordFailedAttempt`: green-to-advance gates on
+  `lesson_state`, so a failed grade used to leave a whole class behind a locked
+  door for an outage that is ours, not theirs. The row goes in scoreless and
+  flagged `gradingFailed`, the student is told "your answer has been saved and
+  sent to your teacher for marking", and it lands in the teacher's review queue.
+  Worth knowing it exists, because it is why the FIRST walk showed 21/21 while
+  two lessons had never been graded.
+- **`GET /api/lesson-drafts/<id>` 404s** for a lesson with no saved draft. Normal.
+
+### Traps this cost, all environmental
+
+- **`.dev.vars` sets `OLLAMA_HOST=http://127.0.0.1:8899`** — a local stub from an
+  earlier session, not ollama.com. With nothing on that port, `/api/grade-written`
+  returns 502 and the outage path above fires. **A green walk means nothing about
+  the AI lessons unless the stub is actually running.**
+- A stub must echo the rubric's criterion **ids** back. `buildPrompt` serialises
+  them as `- [the-id] (N pts) Title`, and `shapeResult` credits only an id that
+  matches the rubric exactly. A stub that returns a fixed blob scores every item
+  `missing` and reads as a failing student rather than a broken stub.
+- **`pkill` does not work from Git Bash on this box.** A stale stub kept :8899 and
+  the corrected one exited 1 on EADDRINUSE, so a fixed harness reproduced the old
+  failure exactly. Free a port from PowerShell (`Get-NetTCPConnection -State
+  Listen -LocalPort N` → `Stop-Process -Force`) and re-check it before rerunning.
+- The **File** sidebar tab **toggles**; calling it twice in one lesson closes the
+  explorer and README.md reads as unreachable. Requirement cards live behind
+  **Quest** and are absent from the DOM until it is opened — a count taken
+  without it reads a meaningless 0/0.
+- Quiz options are markdown, so `` `i` `` renders without its backticks; match
+  option text with backticks stripped. Answers are `input[type=radio]` — clicking
+  the `<label>` does not check them. The button says **Check my answers**, not
+  Submit.
 
 # Handoff — 2026-08-23
 
