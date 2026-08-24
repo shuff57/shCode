@@ -34,7 +34,7 @@
       "description": "Declares subjectName holding the subject text",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+subjectName\\s*=\\s*[\"']",
+      "pattern": "(?:let|const)\\s+subjectName\\s*=\\s*[\"'`]",
       "flags": "",
       "points": 0
     },

@@ -14,13 +14,17 @@ export function buildFileIdMap(nodes: FileNode[]): Record<string, string> {
 }
 
 // ---- Detect changed files ----
+// Compares the two content maps directly. It deliberately does NOT consult a
+// dirty-id set: `dirtyFileIds` is reset to empty on every lesson mount, so any
+// edit made before a reload was invisible here and commitChanges() silently
+// no-opped — a student could finish a lesson with zero rows in `commits`.
 export function getChangedFiles(
   currentContents: Record<string, string>,
-  lastCommitted: Record<string, string>,
-  dirtyIds: Set<string>
+  lastCommitted: Record<string, string>
 ): string[] {
+  const ids = new Set([...Object.keys(currentContents), ...Object.keys(lastCommitted)]);
   const changed: string[] = [];
-  dirtyIds.forEach((fileId) => {
+  ids.forEach((fileId) => {
     if (currentContents[fileId] !== lastCommitted[fileId]) {
       changed.push(fileId);
     }

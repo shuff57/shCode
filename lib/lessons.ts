@@ -24,9 +24,17 @@ async function readFiles(dir: string, rel = ''): Promise<FileNode[]> {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const nodes = await Promise.all(
     entries
-      // solution.js holds the reference answer — bundled separately for the
-      // admin/teacher-only /api/lesson-solution endpoint, never sent to clients.
-      .filter((e) => e.name !== 'lesson.json' && e.name !== 'solution.js')
+      // solution.js, and the solution/ directory that replaces it for
+      // multi-file assignments, hold the reference answer — bundled separately
+      // for the admin/teacher-only /api/lesson-solution endpoint, never sent to
+      // clients. Both walkers recurse, so the directory must be excluded by
+      // name or the answer key ships in every student's lesson payload.
+      .filter(
+        (e) =>
+          e.name !== 'lesson.json' &&
+          e.name !== 'solution.js' &&
+          !(e.isDirectory() && e.name === 'solution'),
+      )
       .map(async (entry) => {
         const full = path.join(dir, entry.name);
         const relative = path.join(rel, entry.name).replace(/\\/g, '/');

@@ -1,11 +1,12 @@
-# Handoff — 2026-08-24 · Module 1.3 review, three decisions pending
+# Handoff — 2026-08-24 · Module 1.3 review, all six items shipped (uncommitted)
 
 Module 1.3 (Documentation and Coding Conventions, 21 lessons) was reviewed end to end
 on 2026-08-24: static audit of every lesson and all routing, plus two browser passes —
-one walking the module as a student, one exercising the teacher surfaces. **Nothing was
-fixed.** Three fixes are verified and ready to apply; three questions need an operator
-decision first. This section exists so that decision can be made in a new session
-without redoing the work.
+one walking the module as a student, one exercising the teacher surfaces. The three
+settled fixes (section B) and the three operator decisions (section C) are **all
+applied and verified in the working tree, and not yet committed**. `npm test`,
+`npx tsc --noEmit` and `npm run build` are green. Sections B and C are kept only
+as a record of what changed and why; delete them once this is committed.
 
 The 2026-08-23 handoff below is still current — branches, deploy traps, R2 — and is
 unchanged. Read it too if you are on a fresh machine.
@@ -74,7 +75,16 @@ Two traps that cost time on 2026-08-24, both already documented and both hit any
   tracked modification whose `git diff --numstat` is empty. Do not commit it;
   `git checkout --` it.
 
-## B. Findings that are settled — no decision needed, just fixes
+## B. Findings that are settled — ALL THREE APPLIED 2026-08-24, uncommitted
+
+> **Status: done.** All three fixes below are in the working tree and verified.
+> `npm test` is green and now includes `scripts/test-version-control.mjs`, a new
+> regression gate for fix 1 — confirmed to FAIL against the pre-fix code, so it is
+> not hollow. The backtick and comment-length fixes were re-checked offline against
+> the compiled `lib/grader.ts`: all three reference solutions score full marks
+> (1.3.19 is now 10/10, see C1), all three untouched starters still score zero,
+> backticks now pass, `// tax rate` now passes, `// a` still fails. Keep this
+> section only until the work is committed, then delete it.
 
 Verified twice each (once offline against `lib/grader.ts`, once in a browser), so these
 need no further investigation:
@@ -110,69 +120,82 @@ need no further investigation:
    `// tax rate` (9) fails, and the message never mentions length. Verified safe at a
    threshold of 6: `// tax rate` passes, `// a` still fails, starter still scores zero.
 
-## C. The three decisions
+## C. The three decisions — ANSWERED AND SHIPPED 2026-08-24, uncommitted
 
-### C1 — 1.3.19 has no full-credit reference path
+All three were decided by the operator and implemented in the same session. Nothing
+here is still open. Delete this section once the work is committed.
 
-`components/LessonWorkspace.tsx:781` hardcodes the solution insert to
-`updateFile('script.js', code)`, and the solution mechanism itself is single-file:
-`scripts/generate-solutions.mjs` reads only `lessons/<id>/solution.js`, and
-`functions/api/lesson-solution/[id].ts` serves only that string. But r9 and r10 grade
-`README.md`. So the reference answer scores **8/10**, Submit stays disabled, and there
-is no way to demonstrate a passing submission of the module's main graded assignment
-(A1.3.1). Browser-confirmed as a teacher.
+### C1 — 1.3.19 had no full-credit reference path → solution/ directory built
 
-This does not hurt students — they write their own README, and the student walkthrough
-completed the lesson normally. It hurts the teacher, and it means the assignment has no
-worked answer.
+Decision: extend the solution mechanism to a directory (the "correct fix" option).
+The model README is authored once, in `solution/README.md`, rather than also being
+pasted into `solution.js` as a comment block — two copies of a reference answer
+drift, and the directory delivers the same teacher outcome.
 
-| Option | Cost | Consequence |
-| --- | --- | --- |
-| Append the model README to `solution.js` as a trailing `/* */` block | one edit, zero new machinery | Teacher can read and paste it. Submit still blocked until they paste. Grading-neutral: r8 counts `//` only, r6/r7 strip comments — but **re-run the offline harness to confirm**. |
-| Extend the solution mechanism to a `solution/` directory | touches generator, Function, and `SolutionPanel`'s `onInsert` | Correct fix, benefits every future multi-file assignment. Real work. |
-| Drop r9/r10 to advisory | one edit | Guts the README requirement, which is the point of A1.3.1 and of 1.3.18. Do not pick this without deciding the README no longer matters. |
+- `lessons/1-3-19-*/solution.js` → `lessons/1-3-19-*/solution/script.js` (git mv),
+  plus a new `solution/README.md`.
+- `scripts/generate-solutions.mjs` now emits `Record<id, Record<path, text>>`,
+  reading `solution/` when present and falling back to `solution.js` recorded as
+  `script.js`. It **exits non-zero** if a lesson has both.
+- `/api/lesson-solution/[id]` returns `{ files, solution }`; `solution` stays the
+  script text for older callers.
+- `SolutionPanel` shows every file with its path and inserts all of them;
+  `LessonWorkspace`'s `onInsert` loops over the map instead of hardcoding
+  `updateFile('script.js', code)`.
 
-Recommendation: option 1 now, option 2 when another multi-file assignment appears.
+**The trap this created, and the guard for it.** `lib/lessons.ts` and
+`scripts/generate-lesson-starters.mjs` both recurse into subdirectories and only
+skipped files literally named `solution.js`. A `solution/` folder would therefore
+have shipped the answer key to every student with nothing failing. Both now
+exclude a directory named `solution`, and `scripts/check-solution-leak.mjs` — new,
+wired into **both** `prebuild` and `npm test` — measures it: no `solution/` path
+appears as a key in the starters bundle, no solution file's full text appears
+there, and the answer *is* present in `solutions.generated.ts` so the guard cannot
+pass because the answer went missing. Proven real by deleting the exclusion and
+watching it fail 4 ways. It deliberately does not compare line by line; that first
+attempt produced 79 false alarms, because a scaffold legitimately shares lines with
+its solution.
 
-### C2 — r9 rejects a bullet-list README, and the regex cannot be fixed alone
+Verified: reference now scores **10/10**, Submit reachable; `out/` contains none of
+the solution's distinctive strings after a full `npm run build`.
 
-`1-3-19` r9 requires three `[.!?]`-terminated sentences. A student who answers in
-bullets — which is what the **shipped starter README models**, since it presents its
-three prompts as a bullet list — fails.
+### C2 — r9 rejected a bullet-list README → starter rewritten, then r9 relaxed
 
-**A regex-only relaxation is a regression, and this was tested, not assumed.** Accepting
-line-terminated bullets makes the *untouched starter README* start passing r9, because
-the starter contains two long prose lines ("Replace everything below with at least three
-sentences of plain English" and "Delete these prompts when you write your answer") that
-satisfy any line-based check. That trades a false rejection for a false acceptance,
-which is worse.
+Decision: the two-part fix. Both halves are in.
 
-The fix has to be two-part: **rewrite the starter README so it contains no long prose
-lines and does not model bullets, then relax r9.** That changes what students are asked
-to produce on a graded assignment, so it is a curriculum call, not a build one. Whoever
-takes it must re-run the offline harness with the untouched starter as a must-fail case.
+- `lessons/1-3-19-*/README.md` is now four short headings and nothing else. Its
+  longest run of prose is 10 characters, so it cannot satisfy the new pattern.
+  The old starter's two long prose lines are gone — those were what made a
+  regex-only relaxation a false-accept.
+- r9 is now `(?:[\s\S]*?[A-Za-z][^\n.!?]{19,}(?:[.!?]|\n|$)){3}` — three answers,
+  each ≥20 characters of running text, ended by `.` `!` `?` a line break, or end of
+  file. The length floor is what keeps the starter's headings out. Title and
+  description reworded to stop promising "sentences".
+- `steps[3]` now says to answer the three headings, and **mentions the tax rate** —
+  r10 requires it and s4 never said so, which was its own undiagnosable fail.
 
-### C3 — A1.3.2 does not exist
+Verified against the compiled grader: untouched starter fails (LF *and* CRLF —
+`\r` counts toward the run length), bullets pass, bullets with no trailing newline
+pass, prose still passes, two answers still fail, bare headings still fail, r10
+still satisfied.
 
-`curriculum/modules/1.3_documentation-conventions.md:57` lists `1-3-5-why-documentation`
-as an assignment carrying **A1.3.2**, and line 74 states all three of the plan's
-assignments now exist. `curriculum-plan.md:271,279` says the same. They are wrong:
-`lessons/1-3-5-why-documentation/lesson.json` is `type: lesson`, `preview: reading`, no
-`aiGrader`, no `requirements`, no `assignmentCode`. A repo-wide sweep of
-`assignmentCode` finds A1.3.1 and A1.3.3 only.
+### C3 — A1.3.2 does not exist → both docs corrected, not built
 
-`curriculum-plan.md:271` specifies what it should be: *"1 paragraph: why does
-documentation matter in professional software development? Use one specific example."*
-The reading at 1.3.5 already teaches exactly that, including the six-months-later story
-that would serve as the specific example.
+Decision: correct the docs; module 1.3 ships **two** assignments, A1.3.1 (1.3.19)
+and A1.3.3 (1.3.21).
 
-Either **build it** — an AI-graded writeup modelled on 1.3.12/1.3.17, which are working
-well (a weak plain-words beginner answer scored 4/4 on both) — or **correct both docs**
-to admit only two of the three assignments exist. Do not leave the docs claiming a
-lesson that isn't there; that is what made this take an afternoon to notice.
+- `curriculum/modules/1.3_documentation-conventions.md`: the 1.3.5 row no longer
+  claims A1.3.2, the "all three now exist" paragraph is replaced with what is
+  actually true plus a note that `scripts/check-assignment-codes.mjs` cannot detect
+  a missing code. Two adjacent errors in the same table fixed while there: the
+  missing `1-3-20-video-names-are-for-readers` row (20 rows for 21 folders), and
+  A1.3.3 placed at 1.3.20 when it is at 1.3.21.
+- `curriculum-plan.md`: the A1.3.2 bullet is marked **NOT BUILT**, and the in-app
+  paragraph now says 21 lessons, names the real assignment lesson ids, and drops
+  the "all three exist" claim.
 
-Note `scripts/check-assignment-codes.mjs` validates codes that exist and cannot detect a
-missing one. If A1.3.2 gets built, that gap stays open for the next module.
+Not fixed, not verified by this session: the same table still calls the 1.3.1 slide
+deck a placeholder. Section D says it is live; nobody re-checked.
 
 ## D. Also found, lower priority, no decision needed
 

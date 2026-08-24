@@ -276,6 +276,28 @@ with `Authorization: Bearer $OLLAMA_API_KEY`. Model comes from the lesson's
 `aiGrader.model` field (e.g. `qwen3-coder-next:cloud`). The key lives server-side
 only — never exposed to the client.
 
+## Reference solutions
+
+Two authoring forms, both admin/teacher-only, both served by
+`GET /api/lesson-solution/[id]` as `{ files, solution }`:
+
+| Form | When | Recorded as |
+| --- | --- | --- |
+| `lessons/<id>/solution.js` | the assignment only grades `script.js` | `{ "script.js": ... }` |
+| `lessons/<id>/solution/` | the assignment grades more than one file | every file, keyed by path relative to `solution/` |
+
+A lesson with both fails the build — two copies of an answer drift. The
+directory form exists because A1.3.1 (`1-3-19`) grades `README.md` as well as
+`script.js`, so a script-only reference scored 8/10 and Submit could never be
+demonstrated.
+
+**Adding a new exclusion is the dangerous part.** `lib/lessons.ts` and
+`scripts/generate-lesson-starters.mjs` both walk the lesson tree *recursively*
+and ship what they find to students. A `solution/` directory is kept out of
+their output only by being skipped by name. `scripts/check-solution-leak.mjs`
+(in `prebuild` and `npm test`) measures that it stays out — if you add another
+private folder convention, teach that script about it too.
+
 ## Conventions
 
 - Pages Functions: export `onRequestGet`/`onRequestPost`/`onRequestDelete`, use

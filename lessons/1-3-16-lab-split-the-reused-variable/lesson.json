@@ -44,7 +44,7 @@
       "description": "Declares playerName with quoted text",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+playerName\\s*=\\s*[\"'][^\"']+[\"']",
+      "pattern": "(?:let|const)\\s+playerName\\s*=\\s*[\"'`][^\"'`]+[\"'`]",
       "flags": "",
       "points": 0
     },

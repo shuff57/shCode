@@ -1,9 +1,7 @@
-# (give this program a name)
+# (name it)
 
-Replace everything below with at least three sentences of plain English
+## What is it?
 
-- what is this program
-- how do I run it
-- what should someone know before they change it
+## How to run?
 
-Delete these prompts when you write your answer
+## Know first?

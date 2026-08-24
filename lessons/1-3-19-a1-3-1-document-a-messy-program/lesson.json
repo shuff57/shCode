@@ -29,7 +29,7 @@
     {
       "id": "s4",
       "title": "Write the README",
-      "instructions": "Open README.md and write at least three sentences: what this program is, how to run it, and what someone should know before changing it."
+      "instructions": "Open README.md and answer the three headings that are already there -- one sentence or one bullet each is enough, as long as it actually says something. Under the last one, mention the tax rate: it is the number most likely to need changing later."
     }
   ],
   "requirements": [
@@ -49,7 +49,7 @@
       "description": "Declares bookTitle with quoted text",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+bookTitle\\s*=\\s*[\"'][^\"']+[\"']\\s*;",
+      "pattern": "(?:let|const)\\s+bookTitle\\s*=\\s*[\"'`][^\"'`]+[\"'`]\\s*;",
       "flags": "",
       "points": 0
     },
@@ -109,18 +109,18 @@
       "description": "Four or more // comments explaining the code",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:[\\s\\S]*?//[^\\n]{10,}){4}",
+      "pattern": "(?:[\\s\\S]*?//[^\\n]{6,}){4}",
       "flags": "",
       "stripComments": false,
       "points": 0
     },
     {
       "id": "r9",
-      "title": "README has at least three sentences",
-      "description": "README.md contains three or more sentences of plain English",
+      "title": "README answers all three prompts",
+      "description": "README.md answers all three prompts in plain English -- a sentence or a bullet each",
       "type": "regex",
       "file": "README.md",
-      "pattern": "(?:[\\s\\S]*?[A-Za-z]{3}[^.!?\\n]*[.!?]){3}",
+      "pattern": "(?:[\\s\\S]*?[A-Za-z][^\\n.!?]{19,}(?:[.!?]|\\n|$)){3}",
       "flags": "",
       "points": 0
     },

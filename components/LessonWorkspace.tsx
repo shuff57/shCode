@@ -777,8 +777,13 @@ export default function LessonWorkspace({
             <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
               <SolutionPanel
                 lessonId={lesson.id}
-                onInsert={(code) => {
-                  updateFile('script.js', code);
+                onInsert={(solutionFiles) => {
+                  // Every file, not just script.js. A1.3.1 grades README.md
+                  // too, so a script-only insert scored 8/10 and left Submit
+                  // disabled with no way to demonstrate a passing answer.
+                  for (const [path, text] of Object.entries(solutionFiles)) {
+                    updateFile(path, text);
+                  }
                   setSolutionLoaded(true);
                 }}
               />

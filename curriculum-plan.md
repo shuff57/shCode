@@ -268,16 +268,18 @@ book cross-references in `curriculum/modules/1.2_variables-and-data-types.md`.
 
 **Assignments:**
 - **A1.3.1 (Lab):** Take the provided undocumented program (10–15 lines), add inline comments explaining every line, fix formatting to match style guide, write a 3-sentence README.
-- **A1.3.2 (Written):** 1 paragraph: why does documentation matter in professional software development? Use one specific example.
+- **A1.3.2 (Written) — NOT BUILT.** 1 paragraph: why does documentation matter in professional software development? Use one specific example. The reading at 1.3.5 teaches exactly this and would be the place for it, but no graded lesson was ever created.
 - **A1.3.3 (Quiz — in class, 15 min):** Identify data types of 5 expressions, fix 3 variable declarations with syntax or naming errors, match 4 vocabulary terms (variable, constant, data type, comment) to definitions.
 
-**In-app (built 2026-08-16 — complete, 20 lessons):** `1.3.1`–`1.3.5` are the
-earlier set (slides, camelCase, layout, comments, A1.3.2). `1.3.6`–`1.3.20` were
-appended against book §1.3 — the four naming rules of Definition 1.3.1 one lesson
-each, Example 1.3.1, variable reuse and what it costs — plus a README reading,
-**A1.3.1** (rename, reformat, comment and document a messy program, README
-included) and **A1.3.3**. All three of this section's assignments now exist. Full
-lesson table in `curriculum/modules/1.3_documentation-conventions.md`.
+**In-app (21 lessons):** `1.3.1`–`1.3.5` are the earlier set (slides, camelCase,
+layout, comments, and a *reading* on why documentation matters). `1.3.6`–`1.3.21`
+were appended against book §1.3 — the four naming rules of Definition 1.3.1 one
+lesson each, Example 1.3.1, variable reuse and what it costs — plus a README
+reading, **A1.3.1** at 1.3.19 (rename, reformat, comment and document a messy
+program, README included) and **A1.3.3** at 1.3.21. **Two of the three
+assignments exist; A1.3.2 was never built** — 1.3.5 is a reading, not a graded
+lesson. Full lesson table in
+`curriculum/modules/1.3_documentation-conventions.md`.
 
 > **Scope note.** Book §1.3 has only two subsections — naming, and variable
 > reuse. Comments, indentation, spacing and READMEs are not in the book; they

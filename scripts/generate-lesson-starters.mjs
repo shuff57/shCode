@@ -18,8 +18,11 @@ async function readFiles(dir, rel = '') {
   const files = {};
   const entries = await fs.readdir(dir, { withFileTypes: true });
   for (const entry of entries) {
-    // Skip metadata files
+    // Skip metadata and the reference answer. solution/ is the multi-file form
+    // of solution.js; this loop recurses, so it must be skipped by name or the
+    // answer key lands in the starter bundle every student downloads.
     if (entry.name === 'lesson.json' || entry.name === 'solution.js') continue;
+    if (entry.isDirectory() && entry.name === 'solution') continue;
     const full = path.join(dir, entry.name);
     const relative = path.join(rel, entry.name).replace(/\\/g, '/');
     if (entry.isDirectory()) {

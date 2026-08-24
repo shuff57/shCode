@@ -222,7 +222,6 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     const changed = getChangedFiles(
       state.fileContents,
       state.lastCommittedFileContents,
-      state.dirtyFileIds,
     );
     if (changed.length === 0) return false;
 
@@ -308,8 +307,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     const state = get();
     return getChangedFiles(
       state.fileContents,
-      state.lastCommittedFileContents,
-      state.dirtyFileIds
+      state.lastCommittedFileContents
     ).length;
   },
 
