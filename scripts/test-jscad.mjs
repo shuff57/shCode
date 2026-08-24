@@ -59,7 +59,7 @@ import {
   REFUSALS_OVERTURNED, ASSIGNMENT_POOL,
   INTEROP, SEEDED_COLLISION, GRADUATION, GRADUATION_TRIPWIRES,
   TURN_COMPOSITION, REFUSALS_NAME_THE_REAL_CALL, REVERSE_LOOKUP, readReverseTable,
-  BORROWED_ASSERTIONS, createSvgContext, SVG_CASES, SVG_MARGIN,
+  BORROWED_ASSERTIONS, createSvgContext, SVG_CASES, SVG_MARGIN, REACH_PORTABLE,
   readGraduationTable, createGraduationContext, createSimpleContext, sameGeometry,
   sameModel,
   BOOK_CENSUS, BRIDGE, readBridgeTable, BRIDGE_WARNINGS, SIT_VS_BOOK_ALIGN,
@@ -918,6 +918,21 @@ check('the loss turn causes is written down where a student will read it', () =>
 // world-origin fact. That citation is only worth more than a paragraph while
 // the thing it points at still exists — so the rename breaks OUR build, which
 // is where the maintenance burden belongs.
+check('a student can actually reach /portable', () => {
+  for (const f of [REACH_PORTABLE.page, REACH_PORTABLE.converter]) {
+    if (!existsSync(join(REPO, f))) return `${f} is gone, and the links below point at it`;
+  }
+  const missing = REACH_PORTABLE.links.filter((l) => {
+    const p = join(REPO, l.file);
+    return !existsSync(p) || !l.rx.test(readFileSync(p, 'utf8'));
+  });
+  return missing.length === 0
+    ? true
+    : `/portable has no ${missing.map((m) => `${m.what} (${m.file})`).join(' and no ')}. `
+      + 'The converter works and the page renders; nothing opens it. That is the '
+      + 'authored-with-no-renderer failure the project CLAUDE.md warns about, rebuilt.';
+});
+
 at('svg');
 
 // stl/3mf/obj all serialize polygons, so a geom2 — every §8.2 and §8.3 design —

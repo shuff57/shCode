@@ -2606,3 +2606,24 @@ export const SVG_CASES = [
 
 /** Margin the serializer adds around the bounding box, in mm. */
 export const SVG_MARGIN = 2;
+
+/**
+ * /portable is REACHABLE.
+ *
+ * The page shipped with a header comment claiming "a student arrives one of
+ * three ways: from the docs link in reference.md, from the nav, or with
+ * ?code=" — and none of the three existed. A converter nobody can open is the
+ * `steps` / `aiGrader.prompt` failure in project CLAUDE.md, rebuilt: authored,
+ * correct, tested, and wired to nothing.
+ *
+ * REACH_CHAIN covers the runner the same way. This is the same idea for the one
+ * page whose whole job is to be navigated to.
+ */
+export const REACH_PORTABLE = {
+  page: 'app/portable/page.tsx',
+  converter: 'lib/jscad-portable.mjs',
+  links: [
+    { file: 'components/HeaderNav.tsx', what: 'a nav link', rx: /href="\/portable"/ },
+    { file: 'public/jscad/docs/reference.md', what: 'a docs link', rx: /\(\/portable\)/ },
+  ],
+};

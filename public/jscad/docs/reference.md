@@ -638,6 +638,29 @@ named "an xz sketch stands up in z, not y" in
 `scripts/model-codegen-assertions.cjs`, which fails if that call is ever
 replaced with `turn`.
 
+#### Taking your work to jscad.app
+
+shCAD's twelve names live in this runner and nowhere else, so a shCAD program
+pasted into <https://jscad.app/> does not run — `box is not defined`. The course
+names that editor as the Q3 environment, and your file should outlive this app,
+so there is a converter: **[/portable](/portable)**.
+
+Paste a shCAD program in and it hands back the same program written in the real
+`@jscad/modeling` API — the form that runs there, and the form the book prints.
+Nothing is approximated: every name it rewrites is one the gate already proves
+builds identical geometry both ways.
+
+Two things it will tell you rather than guess:
+
+- `turn` has no single real-API call, so the converter writes a small
+  `turnInPlace()` function into your file instead of pretending `rotate` is the
+  same thing. It is not — see above.
+- `sit` cannot be read from the text alone, because whether a name holds one
+  shape or a list is a runtime fact, so it emits the check rather than choosing.
+
+Anything it cannot convert it refuses **by name and line**, and names the real
+call you want, rather than emitting something that half-works.
+
 #### Reading the book
 
 The seven Q3 chapters are written in the real API, so a student reads `cuboid`

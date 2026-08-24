@@ -43,6 +43,7 @@ export default function HeaderNav() {
       <Link href="/sandbox" className="text-white">Sandbox</Link>
       <Link href="/docs/shplay" className="text-white">Docs</Link>
       <Link href="/docs/jscad" className="text-white">JSCAD</Link>
+      <Link href="/portable" className="text-white">Portable</Link>
       {loaded && user?.role === 'teacher' && (
         <Link href="/teacher" className="text-white">Classes</Link>
       )}
