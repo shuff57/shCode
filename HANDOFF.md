@@ -1,12 +1,14 @@
-# Handoff — 2026-08-24 · Module 1.3 review, all six items shipped (uncommitted)
+# Handoff — 2026-08-24 · Module 1.3 review, all six items shipped and verified
 
 Module 1.3 (Documentation and Coding Conventions, 21 lessons) was reviewed end to end
 on 2026-08-24: static audit of every lesson and all routing, plus two browser passes —
 one walking the module as a student, one exercising the teacher surfaces. The three
 settled fixes (section B) and the three operator decisions (section C) are **all
-applied and verified in the working tree, and not yet committed**. `npm test`,
-`npx tsc --noEmit` and `npm run build` are green. Sections B and C are kept only
-as a record of what changed and why; delete them once this is committed.
+applied, committed as `0eb175a`, and pushed to `origin/cs-3d`**. `npm test`,
+`npx tsc --noEmit` and `npm run build` are green, and a browser pass against
+real Functions has since been run — see section G, which also supersedes that
+commit's `Not-tested: no browser pass` trailer. Sections B and C are kept only
+as a record of what changed and why; delete them when they stop being useful.
 
 The 2026-08-23 handoff below is still current — branches, deploy traps, R2 — and is
 unchanged. Read it too if you are on a fresh machine.
@@ -75,9 +77,9 @@ Two traps that cost time on 2026-08-24, both already documented and both hit any
   tracked modification whose `git diff --numstat` is empty. Do not commit it;
   `git checkout --` it.
 
-## B. Findings that are settled — ALL THREE APPLIED 2026-08-24, uncommitted
+## B. Findings that are settled — ALL THREE APPLIED, committed as 0eb175a
 
-> **Status: done.** All three fixes below are in the working tree and verified.
+> **Status: done.** All three fixes below are committed as `0eb175a` and verified.
 > `npm test` is green and now includes `scripts/test-version-control.mjs`, a new
 > regression gate for fix 1 — confirmed to FAIL against the pre-fix code, so it is
 > not hollow. The backtick and comment-length fixes were re-checked offline against
@@ -120,10 +122,10 @@ need no further investigation:
    `// tax rate` (9) fails, and the message never mentions length. Verified safe at a
    threshold of 6: `// tax rate` passes, `// a` still fails, starter still scores zero.
 
-## C. The three decisions — ANSWERED AND SHIPPED 2026-08-24, uncommitted
+## C. The three decisions — ANSWERED AND SHIPPED, committed as 0eb175a
 
-All three were decided by the operator and implemented in the same session. Nothing
-here is still open. Delete this section once the work is committed.
+All three were decided by the operator and implemented in the same session, then
+committed as `0eb175a`. Nothing here is still open.
 
 ### C1 — 1.3.19 had no full-credit reference path → solution/ directory built
 
@@ -256,13 +258,78 @@ this module. Not a defect; noted so "no gate row on 1.3.11" is not read as one.
 
 ## F. Environment left behind
 
-- `wrangler pages dev` may still be serving on **:8788**. The Express dev server on
-  **:3002 was stopped** to get a clean build and was not restarted.
+- `wrangler pages dev` on **:8788 was started for the section G pass and stopped
+  again**. Nothing is listening on :8788 or :3002.
 - **`.dev.vars` exists at repo root and contains a real Ollama key.** Gitignored, but it
-  is on disk on this machine.
+  is on disk on this machine. `TEACHER_EMAILS=teacher.tester@shcode.local` was
+  appended to it during the section G pass.
 - Local D1 holds the two test accounts, one class, and the student walkthrough's
   progress and submissions. A probe commit pushed into 1.3.19 during the teacher pass
   was deleted; `commits` holds only 1.3.16's two rows.
+
+## G. Browser pass, run after 0eb175a was pushed
+
+`npx wrangler pages dev out --port 8788` against local D1 + R2, Playwright
+(Python — it is not in `node_modules`). Accounts `teacher.tester@shcode.local`
+and `student.tester@shcode.local`, both `TestPass123!`. `TEACHER_EMAILS` was
+absent from `.dev.vars` and was added there (gitignored, local only) —
+without it a signup cannot become a teacher and none of this is reachable.
+
+**Verified green, 15 checks:**
+
+- The multi-file solution works end to end. `/api/lesson-solution/<id>` returns
+  `{ files, solution }` with both `script.js` and `README.md`; the dialog lists
+  both paths and renders two code blocks; the button reads "Insert all files";
+  after inserting, `script.js` holds the reference code **and `README.md` holds
+  the reference prose**, which is the thing that was impossible before.
+- **A1.3.1 reaches full marks in the browser.** All 10 requirement cards carry
+  the Dracula-green border `rgb(80,250,123)` and **Submit is enabled** — it was
+  disabled at 8/10 before. The relabelled r9 ("README answers all three
+  prompts") renders correctly.
+- **The commit regression is fixed for real.** Edit → reload → Commit now lands
+  a row: `/api/commits` went 0 → 1 → 2 across two runs, and the stored commit
+  lists `script.js` as changed. No console errors.
+
+**Two things the browser pass could NOT establish, stated plainly:**
+
+- **It ran as a teacher, not a student.** A fresh student account cannot open
+  1.3.19 at all — sequential gating shows "Lesson locked · Finish the prior
+  lessons in this module", which is working as designed. The commit path is
+  client-side store logic and is not role-specific, so what is proven is the
+  store + API path, not the student role. Walking a student through 21 lessons
+  to unlock it was not done.
+- `SolutionPanel`'s fallback to the older `{ solution }` response shape is still
+  untested — nothing serves that shape any more.
+
+### The one new defect it turned up: a phantom dirty file on every load
+
+**`Commit (1)` on a lesson you have never touched.** Measured on 1.3.11, 1.3.16
+and 1.3.19, each from cleared `localStorage`. The two content maps differ on
+`script.js` by line endings alone:
+
+```
+fileContents        len 547   '...Mystery Variables\n\n// Two working snippets...'
+lastCommitted       len 566   '...Mystery Variables\r\n\r\n// Two working snippets...'
+```
+
+The lesson bundle ships CRLF. CodeMirror normalises its document to LF, its
+`onChange` fires on mount (`components/CodeEditor.tsx:90-93`), and `updateFile`
+writes the LF copy into `fileContents` while `lastCommittedFileContents` keeps
+the CRLF original. The 2-second autosave then persists that mismatch, so it
+survives every later load.
+
+**This is NOT caused by the `getChangedFiles` fix.** That `onChange` also calls
+`markDirty`, so `script.js` was in `dirtyFileIds` under the old code too and the
+old comparison would have counted it the same way. It is pre-existing and was
+simply never looked at.
+
+Why it is worth fixing: the Commit counter is permanently wrong by one, so it
+carries no information; and a "commit" can be created that contains no actual
+student change. The fix is a normalisation — either strip `\r` when building
+`fileContents`/`lastCommittedFileContents` in `lib/store.ts:84-111`, or ship the
+lesson bundles LF-only. Prefer normalising in the store: the bundles are written
+by many hands on Windows and will drift back. Not attempted here — it touches
+every lesson's load path and deserves its own change with its own test.
 
 ---
 
