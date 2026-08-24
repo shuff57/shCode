@@ -76,6 +76,44 @@ module.exports = function run(dir) {
 
   check('two empty maps are unchanged', same(m.getChangedFiles({}, {}), []));
 
+  console.log('\n=== line endings must never register as a change ===');
+
+  // Lesson bundles ship CRLF; CodeMirror normalises its document to LF and
+  // fires onChange on mount. Before normalizeEol, that made every lesson open
+  // showing "Commit (1)" on work nobody had touched, and the 2s autosave
+  // persisted the mismatch so it survived every later load.
+  const CRLF = 'let a = 1;\r\nlet b = 2;\r\n';
+  const LF = 'let a = 1;\nlet b = 2;\n';
+  const CR = 'let a = 1;\rlet b = 2;\r';
+
+  check('normalizeEol turns CRLF into LF', m.normalizeEol(CRLF) === LF);
+  check('normalizeEol turns a lone CR into LF', m.normalizeEol(CR) === LF);
+  check('normalizeEol leaves LF alone', m.normalizeEol(LF) === LF);
+  check('normalizeEol tolerates undefined', m.normalizeEol(undefined) === '');
+  check('normalizeEol does not touch anything but line endings',
+    m.normalizeEol('a\r\nb') === 'a\nb' && m.normalizeEol('a b') === 'a b');
+
+  check('normalizeContents normalises every value',
+    JSON.stringify(m.normalizeContents({ 'a.js': CRLF, 'b.js': CR, 'c.js': LF }))
+    === JSON.stringify({ 'a.js': LF, 'b.js': LF, 'c.js': LF }));
+  check('normalizeContents tolerates an empty map',
+    JSON.stringify(m.normalizeContents({})) === '{}');
+
+  // The defect, stated as the property that was violated.
+  check('THE BUG: CRLF vs LF of the same file is no longer a change',
+    same(m.getChangedFiles(m.normalizeContents({ 'script.js': LF }),
+                           m.normalizeContents({ 'script.js': CRLF })), []),
+    'normalised on both sides');
+
+  check('a real edit is still a change once both sides are normalised',
+    same(m.getChangedFiles(m.normalizeContents({ 'script.js': 'let a = 99;\r\n' }),
+                           m.normalizeContents({ 'script.js': CRLF })), ['script.js']));
+
+  // Guard the guard: without normalisation the two DO differ, so the check
+  // above is not passing because the inputs were identical to begin with.
+  check('un-normalised CRLF vs LF really does differ (harness sanity)',
+    same(m.getChangedFiles({ 'script.js': LF }, { 'script.js': CRLF }), ['script.js']));
+
   console.log(`\n${pass} passed, ${fails.length} failed`);
   return fails.length === 0;
 };

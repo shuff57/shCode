@@ -13,6 +13,35 @@ export function buildFileIdMap(nodes: FileNode[]): Record<string, string> {
   return map;
 }
 
+// ---- Line endings ----
+//
+// Lesson bundles are authored on Windows and ship CRLF. CodeMirror normalises
+// its document to LF and fires onChange on mount, so `fileContents` became LF
+// while `lastCommittedFileContents` kept CRLF, and every lesson opened showing
+// "Commit (1)" on work nobody had touched -- measured on 1.3.11, 1.3.16 and
+// 1.3.19 from cleared localStorage. The autosave then persisted the mismatch,
+// so it survived every later load.
+//
+// Normalise on the way IN rather than inside getChangedFiles: fixing the
+// comparison alone would hide the counter while still storing CRLF snapshots in
+// `commits`, and would leave grader patterns like `//[^\n]{6,}` counting the
+// stray \r as a character.
+//
+// \r\n and a lone \r (classic Mac) both collapse to \n.
+export function normalizeEol(text: string): string {
+  return (text ?? '').replace(/\r\n?/g, '\n');
+}
+
+export function normalizeContents(
+  files: Record<string, string>
+): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const path of Object.keys(files ?? {})) {
+    out[path] = normalizeEol(files[path]);
+  }
+  return out;
+}
+
 // ---- Detect changed files ----
 // Compares the two content maps directly. It deliberately does NOT consult a
 // dirty-id set: `dirtyFileIds` is reset to empty on every lesson mount, so any

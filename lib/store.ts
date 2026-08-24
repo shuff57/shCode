@@ -3,6 +3,8 @@ import type { Lesson, Requirement, FileNode, Commit, Version, FileHistory } from
 import {
   createCommit,
   getChangedFiles,
+  normalizeEol,
+  normalizeContents,
   restoreToCommit,
   getFileHistoryFromCommits,
   buildFileIdMap,
@@ -82,8 +84,10 @@ export const useLessonStore = create<LessonState>((set, get) => ({
 
   setLesson: (lesson) => {
     const files = flattenFiles(lesson.files);
+    // Bundles ship CRLF; the editor works in LF. Normalise here so the
+    // two content maps can never differ by line endings alone.
     const fileContents = Object.fromEntries(
-      files.map((f) => [f.path, f.content || ''])
+      files.map((f) => [f.path, normalizeEol(f.content || '')])
     );
 
     // For JS-only preview modes (console, jscad, shplay), default to script.js
@@ -105,9 +109,11 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     if (typeof window !== 'undefined') {
       const saved = loadProgress(lesson.id);
       set({
-        fileContents: saved ? saved.fileContents : fileContents,
+        // normalizeContents on the saved branch repairs drafts written
+        // before this fix, which persisted the mismatch to localStorage.
+        fileContents: saved ? normalizeContents(saved.fileContents) : fileContents,
         lastCommittedFileContents: saved
-          ? saved.lastCommittedFileContents
+          ? normalizeContents(saved.lastCommittedFileContents)
           : { ...fileContents },
         commits: [],
         dirtyFileIds: new Set(),
@@ -132,8 +138,10 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     // Load the canonical starter from the lesson bundle — never from localStorage.
     // Also wipes the stored draft so the next page-load starts fresh.
     const files = flattenFiles(lesson.files);
+    // Bundles ship CRLF; the editor works in LF. Normalise here so the
+    // two content maps can never differ by line endings alone.
     const fileContents = Object.fromEntries(
-      files.map((f) => [f.path, f.content || ''])
+      files.map((f) => [f.path, normalizeEol(f.content || '')])
     );
     const jsPreviewModes = ['console', 'jscad', 'shplay'];
     const defaultFile = jsPreviewModes.includes(lesson.preview || '')
@@ -165,8 +173,11 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   selectFile: (path) => set({ currentFile: path }),
 
   updateFile: (path, value) => {
+    // Every write goes through here -- typing, an uploaded file, and the
+    // reference-solution insert, which hands over raw CRLF bundle text.
+    const text = normalizeEol(value);
     set((state) => ({
-      fileContents: { ...state.fileContents, [path]: value },
+      fileContents: { ...state.fileContents, [path]: text },
     }));
     // Mark dirty by file ID
     const state = get();
@@ -201,7 +212,8 @@ export const useLessonStore = create<LessonState>((set, get) => ({
 
   // ---- Version Control ----
 
-  initVC: (fileContents) => {
+  initVC: (rawFileContents) => {
+    const fileContents = normalizeContents(rawFileContents);
     const initial = createCommit('Initial code', Object.keys(fileContents), fileContents);
     set({
       commits: [initial],
@@ -270,10 +282,12 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     const result = restoreToCommit(commitId, state.commits);
     if (!result) return;
 
+    // Snapshots committed before this fix still hold CRLF.
+    const restored = normalizeContents(result.restoredContents);
     set({
-      fileContents: result.restoredContents,
+      fileContents: restored,
       commits: result.truncatedCommits,
-      lastCommittedFileContents: { ...result.restoredContents },
+      lastCommittedFileContents: { ...restored },
       dirtyFileIds: new Set(),
     });
   },
@@ -286,7 +300,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     const path = Object.entries(idMap).find(([, id]) => id === fileId)?.[0];
     if (path) {
       set((s) => ({
-        fileContents: { ...s.fileContents, [path]: version.content },
+        fileContents: { ...s.fileContents, [path]: normalizeEol(version.content) },
         dirtyFileIds: new Set(s.dirtyFileIds).add(fileId),
       }));
     }

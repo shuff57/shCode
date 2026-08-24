@@ -301,35 +301,71 @@ without it a signup cannot become a teacher and none of this is reachable.
 - `SolutionPanel`'s fallback to the older `{ solution }` response shape is still
   untested — nothing serves that shape any more.
 
-### The one new defect it turned up: a phantom dirty file on every load
+### The phantom dirty file — FOUND HERE, FIXED HERE
 
-**`Commit (1)` on a lesson you have never touched.** Measured on 1.3.11, 1.3.16
-and 1.3.19, each from cleared `localStorage`. The two content maps differ on
-`script.js` by line endings alone:
+**Symptom:** `Commit (1)` on a lesson nobody had touched. Measured on 1.3.11,
+1.3.16 and 1.3.19, each from cleared `localStorage`. The two content maps
+differed on `script.js` by line endings alone:
 
 ```
 fileContents        len 547   '...Mystery Variables\n\n// Two working snippets...'
 lastCommitted       len 566   '...Mystery Variables\r\n\r\n// Two working snippets...'
 ```
 
-The lesson bundle ships CRLF. CodeMirror normalises its document to LF, its
-`onChange` fires on mount (`components/CodeEditor.tsx:90-93`), and `updateFile`
-writes the LF copy into `fileContents` while `lastCommittedFileContents` keeps
-the CRLF original. The 2-second autosave then persists that mismatch, so it
-survives every later load.
+Lesson bundles are authored on Windows and ship CRLF. CodeMirror normalises its
+document to LF and fires `onChange` on mount
+(`components/CodeEditor.tsx:90-93`), so `updateFile` wrote the LF copy into
+`fileContents` while `lastCommittedFileContents` kept the CRLF original. The
+2-second autosave then persisted the mismatch, so it survived every later load.
 
-**This is NOT caused by the `getChangedFiles` fix.** That `onChange` also calls
-`markDirty`, so `script.js` was in `dirtyFileIds` under the old code too and the
-old comparison would have counted it the same way. It is pre-existing and was
-simply never looked at.
+**It was NOT caused by the `getChangedFiles` fix.** That same `onChange` also
+calls `markDirty`, so `script.js` was in `dirtyFileIds` under the old code too
+and the old comparison counted it identically. Pre-existing; simply never
+looked at.
 
-Why it is worth fixing: the Commit counter is permanently wrong by one, so it
-carries no information; and a "commit" can be created that contains no actual
-student change. The fix is a normalisation — either strip `\r` when building
-`fileContents`/`lastCommittedFileContents` in `lib/store.ts:84-111`, or ship the
-lesson bundles LF-only. Prefer normalising in the store: the bundles are written
-by many hands on Windows and will drift back. Not attempted here — it touches
-every lesson's load path and deserves its own change with its own test.
+**Fix:** `normalizeEol` / `normalizeContents` in `lib/version-control.ts`,
+applied at all seven points where file text enters the store
+(`lib/store.ts`): the bundle in `loadLesson` and `resetLesson`, the saved
+draft on both sides, `updateFile`, `initVC`, `restoreCommit`, and
+`restoreVersion`. `\r\n` and a lone `\r` both collapse to `\n`.
+
+Normalised on the way **in**, deliberately, not inside `getChangedFiles`:
+fixing only the comparison would have hidden the counter while still writing
+CRLF snapshots into `commits`, and would have left grader patterns like
+`//[^\n]{6,}` counting the stray `\r` as a character — which is a real
+off-by-one, since `// abcd\r` would have satisfied a six-character floor.
+
+The saved-draft branch calls `normalizeContents` rather than trusting storage,
+which repairs drafts written before this change.
+
+**Verified in the browser** (`crlf_verify.py`, 14 checks): all three lessons
+open with no pending change, their persisted maps are byte-identical, no `\r`
+survives anywhere in the store, and they are still clean after a reload. The
+fix does not over-reach — a typed edit still shows exactly 1, before and after
+a reload. `browser_test2.py` (13) and `submit_probe.py` (2) re-run green
+afterwards, so B1 and C1 did not regress.
+
+### Prod state
+
+Cloudflare Pages **auto-deploys `cs-3d` on push** — `0eb175a` was live on
+`shcode.pages.dev` without anyone running `wrangler pages deploy`. Do not
+assume a push is inert.
+
+Verified live against the deployed pages, 26 checks: backtick classes on all
+three labs, `{6,}` and `{19,}` on 1.3.19 with the old `{10,}` and the old r9
+title gone, the new starter README in place, step 4 mentioning the tax rate,
+and no reference answer or `solution/` path in any page.
+`GET /api/lesson-solution/<id>` unauthenticated returns **401** with no answer
+content, so the new `files` shape did not widen the gate.
+
+Caveat: that confirms the lesson *data* is live. The `getChangedFiles` and
+`normalizeEol` changes are minified JavaScript and were inferred live from
+being in the same commit and build — not read out of the deployed bundle.
+
+**Trap worth keeping:** the RSC payload is double-escaped in the page HTML, so
+a naive `grep` for the backtick character class counts **zero** on a page that
+plainly contains it. Unescape twice before asserting anything about a deployed
+pattern; the first attempt here read as a failed deploy and was not one.
 
 ---
 
