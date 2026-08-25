@@ -288,11 +288,11 @@ for (const id of Object.values(L)) {
 
 
 // ---------------------------------------------------------------- unit 1.4
-// Three one-word-answer labs. Each requirement looks for its literal anywhere
-// in the file, so the ANSWERS ARE NOT BOUND TO THEIR STEPS -- a student can
-// map every job to the wrong language and still score full marks. That is a
-// separate defect from tolerance and is deliberately NOT asserted here; see
-// the "answers are not bound to their steps" note below.
+// Three one-word-answer labs. Each requirement is pinned to an ordinal
+// console.log -- r3 means "the THIRD console.log", not "the word appears
+// somewhere". Before that, every pattern searched the whole file, so a student
+// who mapped every job to the wrong language still scored full marks. The
+// swap cases below are what hold that shut; they passed before the fix.
 {
   const labs = [
     { id: L.match, answers: ['SQL', 'Swift', 'C', 'JavaScript', 'Python'] },
@@ -302,6 +302,7 @@ for (const id of Object.values(L)) {
 
   for (const { id, answers } of labs) {
     const log = (q, a) => `console.log(${q}${a}${q});`;
+    const inOrder = (list) => ({ 'script.js': list.map((a) => log('"', a)).join(nl) });
     accept(id, 'answers in double quotes',
       { 'script.js': answers.map((a) => log('"', a)).join(nl) });
     accept(id, 'answers in single quotes',
@@ -316,6 +317,34 @@ for (const id of Object.values(L)) {
       { 'script.js': answers.slice(0, -1).map((a) => log('"', a)).join(nl) });
     reject(id, 'answers written as bare comments', null,
       { 'script.js': answers.map((a) => `// ${a}`).join(nl) });
+
+    // Every answer present, every one under the wrong step. This scored full
+    // marks until the requirements were bound to ordinal console.log calls.
+    const swapped = answers.slice();
+    [swapped[0], swapped[answers.length - 1]] = [swapped[answers.length - 1], swapped[0]];
+    reject(id, 'first and last answers swapped', 'r1', inOrder(swapped));
+
+    const rotated = answers.slice(1).concat(answers[0]);
+    reject(id, 'every answer shifted one step', 'r1', inOrder(rotated));
+
+    reject(id, 'answers reversed', 'r1', inOrder(answers.slice().reverse()));
+
+    // The right answers, in the right order, but with a chatty log in front:
+    // ordinal binding cannot tell that apart from a wrong first answer. Pinned
+    // here so the cost of the binding stays visible rather than being
+    // rediscovered by a student.
+    reject(id, '[cost of binding] a header log before the answers', 'r1',
+      { 'script.js': [`console.log("My answers:");`, ...answers.map((a) => log('"', a))].join(nl) });
+
+    // Corrupt one answer at a time: the requirement that fails must be the one
+    // for THAT position. A swap case only proves "something failed", so an
+    // off-by-one in the ordinal counting would slip past it silently.
+    const reqIds = lesson(id).requirements.map((r) => r.id);
+    answers.forEach((_, i) => {
+      const a = answers.slice();
+      a[i] = 'wrongword';
+      reject(id, `only answer ${i + 1} wrong`, reqIds[i], inOrder(a));
+    });
   }
 
   // 1.4.20 already tolerated a space for the hyphen; keep it that way.
