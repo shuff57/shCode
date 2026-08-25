@@ -39,7 +39,7 @@
       "description": "Logs procedural for separate variables acted on by steps in order",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*[\"']procedural[\"']\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`]procedural[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -49,7 +49,7 @@
       "description": "Logs object-oriented for data bundled into one value",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*[\"']object[- ]?oriented[\"']\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`]object[- ]?oriented[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -59,7 +59,7 @@
       "description": "Logs functional for producing a new list and leaving the original alone",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*[\"']functional[\"']\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`]functional[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -69,7 +69,7 @@
       "description": "Logs multi-paradigm for a language supporting more than one style",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*[\"']multi[- ]?paradigm[\"']\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`]multi[- ]?paradigm[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     }

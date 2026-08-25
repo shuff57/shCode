@@ -44,7 +44,7 @@
       "description": "Logs SQL for asking questions of a database",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*[\"']sql[\"']\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`]sql[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -54,7 +54,7 @@
       "description": "Logs Swift for an iOS app",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*[\"']swift[\"']\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`]swift[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -64,7 +64,7 @@
       "description": "Logs C for work that talks closely to the hardware",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*[\"']c[\"']\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`]c[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -74,7 +74,7 @@
       "description": "Logs JavaScript for making a web page interactive",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*[\"']javascript[\"']\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`]javascript[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -84,7 +84,7 @@
       "description": "Logs Python for analysing a large set of data",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*[\"']python[\"']\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`]python[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     }

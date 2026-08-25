@@ -39,7 +39,7 @@
       "description": "Logs sequence for a program that just runs its lines in order",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*[\"']sequence[\"']\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`]sequence[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -49,7 +49,7 @@
       "description": "Logs selection for a program that chooses between two paths",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*[\"']selection[\"']\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`]selection[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -59,7 +59,7 @@
       "description": "Logs repetition for a program that does the same thing many times",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*[\"']repetition[\"']\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`]repetition[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -69,7 +69,7 @@
       "description": "Logs a single string naming selection and repetition together — repetition to keep asking, selection to decide whether the password was right",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*[\"'][^\"']*selection[^\"']*repetition[^\"']*[\"']\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`][^\"'`]*selection[^\"'`]*repetition[^\"'`]*[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     }

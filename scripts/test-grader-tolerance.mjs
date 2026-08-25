@@ -71,6 +71,9 @@ function edit(files, from, to) {
 }
 
 const L = {
+  match: '1-4-3-match-the-language',
+  structure: '1-4-12-name-the-structure',
+  snippet: '1-4-20-sort-the-snippet',
   fix10: '1-2-28-a1-2-1-fix-ten-declarations',
   object: '1-2-29-a1-2-2-describe-an-object',
   rename: '1-3-11-lab-rename-the-mystery-variables',
@@ -281,6 +284,61 @@ for (const id of Object.values(L)) {
     readme(S['README.md'].replace(/tax/gi, 'extra')));
   reject(L.messy, 'total ignores the rate', 'r5',
     edit(S, total, 'const orderTotal = subtotal; // no tax yet'));
+}
+
+
+// ---------------------------------------------------------------- unit 1.4
+// Three one-word-answer labs. Each requirement looks for its literal anywhere
+// in the file, so the ANSWERS ARE NOT BOUND TO THEIR STEPS -- a student can
+// map every job to the wrong language and still score full marks. That is a
+// separate defect from tolerance and is deliberately NOT asserted here; see
+// the "answers are not bound to their steps" note below.
+{
+  const labs = [
+    { id: L.match, answers: ['SQL', 'Swift', 'C', 'JavaScript', 'Python'] },
+    { id: L.structure, answers: ['sequence', 'selection', 'repetition', 'selection and repetition'] },
+    { id: L.snippet, answers: ['procedural', 'object-oriented', 'functional', 'multi-paradigm'] },
+  ];
+
+  for (const { id, answers } of labs) {
+    const log = (q, a) => `console.log(${q}${a}${q});`;
+    accept(id, 'answers in double quotes',
+      { 'script.js': answers.map((a) => log('"', a)).join(nl) });
+    accept(id, 'answers in single quotes',
+      { 'script.js': answers.map((a) => log(AP, a)).join(nl) });
+    // taught at 1.2.13, refused by every one of these labs until 2026-08-24
+    accept(id, 'answers in backticks (taught in 1.2.13)',
+      { 'script.js': answers.map((a) => log(BT, a)).join(nl) });
+    accept(id, 'answers logged with spacing round the call',
+      { 'script.js': answers.map((a) => `console.log( "${a}" );`).join(nl) });
+
+    reject(id, 'one answer missing', null,
+      { 'script.js': answers.slice(0, -1).map((a) => log('"', a)).join(nl) });
+    reject(id, 'answers written as bare comments', null,
+      { 'script.js': answers.map((a) => `// ${a}`).join(nl) });
+  }
+
+  // 1.4.20 already tolerated a space for the hyphen; keep it that way.
+  accept(L.snippet, 'hyphenated answers written with a space', { 'script.js': [
+    'console.log("procedural");',
+    'console.log("object oriented");',
+    'console.log("functional");',
+    'console.log("multi paradigm");',
+  ].join(nl) });
+
+  // 1.4.12 step 4 wants both names in ONE string, selection first.
+  accept(L.structure, 'both structures in one string, comma instead of "and"', { 'script.js': [
+    'console.log("sequence");',
+    'console.log("selection");',
+    'console.log("repetition");',
+    'console.log("selection, then repetition");',
+  ].join(nl) });
+  reject(L.structure, 'step 4 logged as two separate calls', 'r4', { 'script.js': [
+    'console.log("sequence");',
+    'console.log("selection");',
+    'console.log("repetition");',
+    'console.log("selection");' + nl + 'console.log("repetition");',
+  ].join(nl) });
 }
 
 // ---------------------------------------------------------------- run
