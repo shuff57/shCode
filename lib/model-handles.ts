@@ -10,8 +10,9 @@
 // the width changes by twice the drag.
 
 import { isShape, type Feature } from './model-types';
+import { maxFilletRadius } from './sketch-arc';
 
-export type HandleKind = 'size' | 'move' | 'turn' | 'point';
+export type HandleKind = 'size' | 'move' | 'turn' | 'point' | 'radius';
 
 export interface HandleSpec {
   kind: HandleKind;
@@ -84,24 +85,92 @@ export function planeAxes(plane: string) {
   return PLANE_AXES[plane] ?? PLANE_AXES.xy;
 }
 
+// The band a radius handle is worth offering in. Outside it the handle is
+// there but useless in one of two ways, both of which read as a broken
+// control: dr = d(trim) * tan(interior/2), so at a near-hairpin corner the
+// dot slides a long way for almost no radius, and at a near-flat one a pixel
+// of drag jumps the radius across its whole range. The number is still
+// typeable in the Rules panel and draggable on the Dimensions slider at any
+// angle -- this only decides whether a dot appears on the canvas.
+const RADIUS_HANDLE_MIN = (20 * Math.PI) / 180;
+const RADIUS_HANDLE_MAX = (130 * Math.PI) / 180;
+
 function sketchHandles(f: Extract<Feature, { kind: 'sketch' }>): HandleSpec[] {
   const { u, v } = planeAxes(f.plane);
   const n: [number, number, number] =
     f.plane === 'xy' ? [0, 0, 1] : f.plane === 'xz' ? [0, 1, 0] : [1, 0, 0];
-  return f.points.map(([pu, pv], i) => ({
+  const world = (pu: number, pv: number): [number, number, number] => [
+    u[0] * pu + v[0] * pv + n[0] * f.offset,
+    u[1] * pu + v[1] * pv + n[1] * f.offset,
+    u[2] * pu + v[2] * pv + n[2] * f.offset,
+  ];
+
+  // Emitted from f.points, which is now the DESIGN polygon -- so a rounded
+  // corner contributes exactly one handle, on the corner the student placed,
+  // and there is no handle anywhere on the arc. That is the M1 fix: the two
+  // trim points used to be in this list, each with a free two-axis drag that
+  // moved an arc endpoint while the bulge beside it stayed put (radius 8 ->
+  // 28.15 across one drag, tangent break 0 -> 33.4 degrees).
+  const corners: HandleSpec[] = f.points.map(([pu, pv], i) => ({
     kind: 'point' as const,
     param: `${f.id}_p${i}u`,
     paramV: `${f.id}_p${i}v`,
-    origin: [
-      u[0] * pu + v[0] * pv + n[0] * f.offset,
-      u[1] * pu + v[1] * pv + n[1] * f.offset,
-      u[2] * pu + v[2] * pv + n[2] * f.offset,
-    ],
+    origin: world(pu, pv),
     axis: u,
     axisV: v,
     scale: 1,
     label: `corner ${i + 1}`,
   }));
+
+  // One radius handle per corner the student HAS rounded. Not per roundable
+  // corner: the parameter it drives only exists for corners in `rounds`
+  // (docParams emits r<n> from the same map), so a dot on an unrounded corner
+  // would be a handle with nothing behind it -- the exact "control that claims
+  // to work and silently doesn't" this codebase keeps closing.
+  const count = f.points.length;
+  const radii: HandleSpec[] = [];
+  for (const [key, want] of Object.entries(f.rounds ?? {})) {
+    const k = Number(key);
+    if (!Number.isInteger(k) || k < 0 || k >= count || !(want > 0)) continue;
+    const ceiling = maxFilletRadius(f.points, k, f.bulges);
+    if (!(ceiling > 0)) continue;
+
+    const C = f.points[k];
+    const P = f.points[(k - 1 + count) % count];
+    const N = f.points[(k + 1) % count];
+    const vIn: [number, number] = [P[0] - C[0], P[1] - C[1]];
+    const vOut: [number, number] = [N[0] - C[0], N[1] - C[1]];
+    const lenIn = Math.hypot(vIn[0], vIn[1]);
+    const lenOut = Math.hypot(vOut[0], vOut[1]);
+    if (lenIn === 0 || lenOut === 0) continue;
+    const cosInterior = (vIn[0] * vOut[0] + vIn[1] * vOut[1]) / (lenIn * lenOut);
+    const interior = Math.acos(Math.max(-1, Math.min(1, cosInterior)));
+    if (interior < RADIUS_HANDLE_MIN || interior > RADIUS_HANDLE_MAX) continue;
+
+    // Where the arc actually leaves the outgoing edge, using the clamped
+    // radius outlineOf() would use -- so the dot sits on the drawn outline
+    // rather than out in space past a clamp nobody can see.
+    const half = Math.tan(interior / 2);
+    const trim = Math.min(want, ceiling) / half;
+    const du = vOut[0] / lenOut;
+    const dv = vOut[1] / lenOut;
+    radii.push({
+      kind: 'radius',
+      param: `${f.id}_r${k}`,
+      origin: world(C[0] + du * trim, C[1] + dv * trim),
+      // Sliding AWAY from the corner along the outgoing edge lengthens the
+      // trim, and radius = trim * tan(interior/2) -- which is the scale.
+      axis: [
+        u[0] * du + v[0] * dv,
+        u[1] * du + v[1] * dv,
+        u[2] * du + v[2] * dv,
+      ],
+      scale: half,
+      label: `round corner ${k + 1}`,
+    });
+  }
+
+  return [...corners, ...radii];
 }
 
 export function handlesFor(f: Feature): HandleSpec[] {

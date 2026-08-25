@@ -13,6 +13,7 @@ import AiHelpPanel from './AiHelpPanel';
 import ShPlayDocsContent from './ShPlayDocsContent';
 import ModelEditor from './model/ModelEditor';
 import HandleOverlay, { type AnchorPoint, type SketchOutline } from './model/HandleOverlay';
+import { outlineOf } from '../lib/sketch-arc';
 import { handlesFor } from '../lib/model-handles';
 import { EMPTY_DOC, type Feature, type ModelDoc } from '../lib/model-types';
 import {
@@ -275,6 +276,13 @@ export default function SandboxWorkspace() {
     // is the test. Without it, editing the starter's dimensions in Code mode
     // filled the history with entries that undo to exactly the same model.
     if (next === docRef.current) return;
+    // Through the same gate loadDoc() uses. This path used to call setDoc()
+    // directly, so applyParam's output was the ONE way into the doc that was
+    // never solved and never checked -- a doc adopted here could carry a rule
+    // it did not obey and a design the outline builder would have refused.
+    // Two adoption paths, one gate, is how a fix gets quietly bypassed.
+    next = solveDoc(next);
+    if (next === docRef.current) return;
     remember(docRef.current);
     setDoc(next);
     docRef.current = next;
@@ -303,14 +311,21 @@ export default function SandboxWorkspace() {
     () =>
       doc.features
         .filter((f): f is Feature & { kind: 'sketch' } => f.kind === 'sketch' && selected.includes(f.id))
-        .map(
-          (f): SketchOutline => ({
+        .map((f): SketchOutline => {
+          // outlineOf() is the ONLY producer of an arc's endpoints -- see its
+          // comment in lib/sketch-arc.ts. The overlay draws what it returns
+          // and never writes any of it back; `corners` still names the design
+          // params, because those are the only points that carry a handle.
+          const o = outlineOf(f);
+          return {
             corners: f.points.map((_, i) => `${f.id}_p${i}u`),
-            points: f.points,
+            design: f.points,
+            points: o.points,
+            basis: o.basis,
             shape: f.shape,
-            bulges: f.bulges,
-          })
-        ),
+            bulges: o.bulges,
+          };
+        }),
     [doc, selected]
   );
 

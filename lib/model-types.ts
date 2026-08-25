@@ -88,7 +88,17 @@ export interface SketchFeature {
   plane: SketchPlane;
   /** How far the plane sits from the origin along its own normal. */
   offset: number;
-  /** Corners in plane coordinates, in order. The outline always closes. */
+  /**
+   * The DESIGN corners, in plane coordinates and in order -- the points the
+   * student actually placed, and the only ones any mover may touch. The
+   * outline always closes.
+   *
+   * This is not the same list as the outline once `rounds` is non-empty: a
+   * rounded corner is still ONE point here, and outlineOf() (lib/sketch-arc.ts)
+   * turns it into the two trim points and the arc between them. Constraint
+   * edge/corner indices, the drag handles and the Rules panel rows are all
+   * indices into THIS list.
+   */
   points: Array<[number, number]>;
   /**
    * How the outline is read. Absent = a straight-edged polyline, which is
@@ -108,6 +118,22 @@ export interface SketchFeature {
    * truth there, so the two cannot disagree. See lib/sketch-arc.ts.
    */
   bulges?: Record<number, number>;
+  /**
+   * Radius the student asked for on design corner n. Absent or empty means
+   * nothing is rounded.
+   *
+   * This is a REQUEST, not geometry: outlineOf() turns it into trim points and
+   * a bulge every time the outline is needed, and clamps it to what the corner
+   * can actually take at that moment. Storing the request rather than the
+   * result is the whole fix -- a stored trim point is a point some other mover
+   * will eventually move without moving the arc with it, and three separate
+   * movers did exactly that.
+   *
+   * A doc carrying `bulges` and NO `rounds` is a legacy or imported outline:
+   * somebody else already built those arcs, so it passes through untouched and
+   * generates exactly the polyArc() it always did.
+   */
+  rounds?: Record<number, number>;
   /** Rules the corners must obey. Absent means free-hand. */
   constraints?: SketchConstraint[];
 }

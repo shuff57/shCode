@@ -24,6 +24,8 @@ export interface SketchLike {
   points: Point[];
   shape?: 'circle';
   bulges?: Record<number, number>;
+  /** Radius the student asked for on DESIGN corner n. See outlineOf(). */
+  rounds?: Record<number, number>;
   constraints?: Constraint[];
 }
 
@@ -57,7 +59,17 @@ export function arcFromBulge(
   const py = ux;
   const half = d / 2;
   const toCentre = Math.sqrt(Math.max(0, radius * radius - half * half));
-  const sign = bulge >= 0 ? 1 : -1;
+  // Past a half turn (|bulge| > 1) the centre is on the OTHER side of the
+  // chord: a major arc's centre sits behind its own chord, not in front of
+  // it. Without the flip, bulge 2 on a 10-unit chord builds a 106.26-degree
+  // arc where tan(sweep/4) = 2 asks for 253.74, and puts the sagitta at 2.5
+  // where the bulge definition (sagitta = halfChord * |bulge|) requires 20.
+  // Unreachable from filletCorner(), whose sweep is always pi - interior and
+  // so always under a half turn -- but reachable from a hand-written or
+  // imported doc, and shared by tessellate(), splitEdge() and the overlay.
+  // The generated polyArc() helper in model-codegen.ts carried the same line
+  // and has the same fix.
+  const sign = (bulge >= 0 ? 1 : -1) * (Math.abs(bulge) > 1 ? -1 : 1);
   const center: Point = [mx + px * toCentre * sign, my + py * toCentre * sign];
   const startAngle = Math.atan2(a[1] - center[1], a[0] - center[0]);
   const endAngle = Math.atan2(b[1] - center[1], b[0] - center[0]);
@@ -249,10 +261,21 @@ export function reindex<T extends SketchLike>(f: T, insertedAt: number): T {
       )
     : f.bulges;
 
+  // `rounds` is keyed by CORNER, not edge, so it shifts on the corner rule.
+  // Getting this wrong would slide a student's radius onto a neighbouring
+  // corner the first time they pressed Corner -- the same silent mis-keying
+  // this function's own warning above is about, one field over.
+  const rounds = f.rounds
+    ? Object.fromEntries(
+        Object.entries(f.rounds).map(([k, v]) => [shiftCorner(Number(k)), v])
+      )
+    : f.rounds;
+
   return {
     ...f,
     ...(constraints ? { constraints } : {}),
     ...(bulges ? { bulges } : {}),
+    ...(rounds ? { rounds } : {}),
   };
 }
 
@@ -447,4 +470,149 @@ export function tessellate(f: SketchLike): Point[] {
     }
   }
   return out;
+}
+
+/**
+ * Rounds asked for on the DESIGN corners, and the outline they add up to.
+ * Nothing else in the app may build or hold an arc endpoint.
+ *
+ * A sketch stores only what the student placed -- its corners, and a radius on
+ * the corners they rounded -- and outlineOf() is the only code that may produce
+ * or read an arc's endpoint, so no mover can hold, move, or invalidate a point
+ * it did not create.
+ *
+ * That sentence is the whole design. Before it, a fillet baked its two trim
+ * points straight into f.points, where they were indistinguishable from
+ * corners the student had drawn -- so the drag handles offered one per trim
+ * point, the constraint solver relaxed them like any other corner, and the
+ * Rules panel listed the arc as an edge. Each of those moved a trim point
+ * while the bulge factor beside it stayed put, and a bulge is a factor of ITS
+ * OWN CHORD: same factor, shorter chord, smaller radius, broken tangency, no
+ * error anywhere. Measured: dragging one trim point of an r=8 fillet took the
+ * radius to 28.15 and opened a 33.4-degree kink at the joint; one length rule
+ * on the STRAIGHT edge next door took it to 6.32 in the same click that
+ * created it. Refusing each mover one at a time is a losing game -- there is
+ * always a fourth. Taking the points away from them is not.
+ *
+ * `basis` says which design corner each outline point came from, which is what
+ * lets the overlay project a derived point through a real anchor: both trim
+ * points of corner k carry basis k.
+ *
+ * `ok: false` means the DESIGN has collapsed -- two corners on top of each
+ * other, so an edge has no length and the outline has stopped being a shape.
+ * Callers keep whatever they had rather than adopting it (see solveDoc()).
+ * The message names no remedy on purpose: this is reached from the constraint
+ * solver, from a drag and from a load, and only one of those has something to
+ * undo. The caller that knows which one it is adds the remedy.
+ */
+export interface Outline {
+  ok: boolean;
+  points: Point[];
+  bulges?: Record<number, number>;
+  /** Parallel to `points`: the design corner each one projects from. */
+  basis: number[];
+  /** One per round that could not be honoured in full. `got` is what the
+   *  outline actually used -- 0 when the corner took no round at all. */
+  notes: Array<{ corner: number; want: number; got: number }>;
+  /** Present only when ok is false. */
+  why?: string;
+}
+
+/**
+ * A design edge with no length at all.
+ *
+ * Asked of the DESIGN polygon rather than the finished outline, because that
+ * is where the collapse happens (the solver moves design corners) and because
+ * an arc's own chord is legitimately allowed to be tiny -- a 0.01 round on a
+ * 40-unit rectangle is a real thing to ask for, and judging it by the same
+ * absolute-ish tolerance would refuse it.
+ *
+ * Relative, so it means the same thing on a 4-unit sketch and a 400-unit one.
+ * Strictly less-than: at tol = 0 a genuinely zero-length edge must still be
+ * caught, which is what makes "set the tolerance to zero" a sabotage that
+ * turns the check red rather than one it shrugs off.
+ */
+function collapsedEdge(points: Point[]): string | null {
+  const n = points.length;
+  if (n < 3) return null;
+  let minU = Infinity, maxU = -Infinity, minV = Infinity, maxV = -Infinity;
+  for (const [u, v] of points) {
+    if (u < minU) minU = u;
+    if (u > maxU) maxU = u;
+    if (v < minV) minV = v;
+    if (v > maxV) maxV = v;
+  }
+  const tol = 1e-6 * Math.max(maxU - minU, maxV - minV);
+  for (let i = 0; i < n; i++) {
+    const a = points[i];
+    const b = points[(i + 1) % n];
+    if (Math.hypot(b[0] - a[0], b[1] - a[1]) < tol) {
+      return 'That would pull two corners of this sketch on top of each other, '
+        + 'leaving an edge with no length at all -- the outline would stop being '
+        + 'a shape. It has been left as it was.';
+    }
+  }
+  return null;
+}
+
+export function outlineOf(f: SketchLike): Outline {
+  const identity = f.points.map((_, i) => i);
+
+  // A circle is a TAG, not a polygon -- its two points are diameter ends, and
+  // neither the round loop nor the edge gate means anything about them.
+  if (f.shape === 'circle') {
+    return { ok: true, points: f.points, bulges: f.bulges, basis: identity, notes: [] };
+  }
+
+  const collapsed = collapsedEdge(f.points);
+
+  const asked = f.rounds ?? {};
+  // Descending, and that is load-bearing: filletCorner() splices one extra
+  // point in at `corner`, so every index ABOVE it shifts. Working downwards
+  // means the corner about to be rounded still sits at its own design index
+  // when its turn comes, and no bookkeeping is needed to find it.
+  const corners = Object.keys(asked)
+    .map(Number)
+    .filter((k) => Number.isInteger(k) && k >= 0 && k < f.points.length && asked[k] > 0)
+    .sort((a, b) => b - a);
+
+  if (corners.length === 0) {
+    // Legacy / imported: a doc carrying `bulges` and no `rounds` is an outline
+    // somebody else already built, and it passes through untouched. This is
+    // what keeps a pre-rounds saved sandbox generating exactly the polyArc it
+    // always did.
+    return collapsed
+      ? { ok: false, points: f.points, bulges: f.bulges, basis: identity, notes: [], why: collapsed }
+      : { ok: true, points: f.points, bulges: f.bulges, basis: identity, notes: [] };
+  }
+
+  let points: Point[] = f.points.map((p) => [p[0], p[1]]);
+  let bulges: Record<number, number> = { ...(f.bulges ?? {}) };
+  let basis = identity.slice();
+  const notes: Outline['notes'] = [];
+
+  for (const k of corners) {
+    const want = asked[k];
+    // Asked of the WORKING points, not the design: a neighbour rounded a
+    // moment ago has already eaten part of the shared edge, so the honest
+    // ceiling here is smaller than the design alone would suggest. This is
+    // the number the caller reports, precisely because it is the one that
+    // took the other rounds into account.
+    const ceiling = maxFilletRadius(points, k, bulges);
+    const got = Math.min(want, Math.max(0, ceiling));
+    if (got < want - 1e-9) notes.push({ corner: k, want, got });
+    if (!(got > 0)) continue;
+
+    const before = points.length;
+    const next = filletCorner({ points, bulges }, k, got);
+    if (next.points.length === before) continue; // filletCorner refused
+    points = next.points;
+    bulges = next.bulges ?? {};
+    // The one sharp corner became two trim points; both belong to it.
+    basis = [...basis.slice(0, k), basis[k], basis[k], ...basis.slice(k + 1)];
+  }
+
+  return collapsed
+    ? { ok: false, points, bulges, basis, notes, why: collapsed }
+    : { ok: true, points, bulges, basis, notes };
 }

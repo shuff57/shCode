@@ -20,11 +20,21 @@ import { arcFromBulge, type Point } from '../../lib/sketch-arc';
  * this is a plain data carrier, not a re-derivation of the doc.
  */
 export interface SketchOutline {
-  /** Param name of each corner's u-value, in order -- the key AnchorPoint is
-   *  looked up by, same as before this carried plane geometry too. */
+  /** Param name of each DESIGN corner's u-value, in order -- the key
+   *  AnchorPoint is looked up by. One per corner the student placed; a
+   *  rounded corner is still one entry, not two. */
   corners: string[];
-  /** The same corners' plane coordinates, parallel to `corners`. */
+  /** The same design corners' plane coordinates, parallel to `corners`. */
+  design: Point[];
+  /** The DERIVED outline in plane coordinates -- what actually gets drawn.
+   *  Equal to `design` for a sketch with nothing rounded. Never a source of
+   *  truth: outlineOf() produces it, and nothing may write it back. */
   points: Point[];
+  /** Parallel to `points`: which design corner each outline point projects
+   *  through. Both trim points of a rounded corner carry that corner, which
+   *  is what lets a derived point ride a real anchor -- there is no anchor of
+   *  its own to ride, and that is the whole point of the split. */
+  basis: number[];
   shape?: 'circle';
   bulges?: Record<number, number>;
 }
@@ -32,7 +42,7 @@ export interface SketchOutline {
 export interface AnchorPoint {
   param: string;
   label: string;
-  kind?: 'size' | 'move' | 'turn' | 'point';
+  kind?: 'size' | 'move' | 'turn' | 'point' | 'radius';
   x: number;
   y: number;
   dirX: number;
@@ -89,7 +99,7 @@ function projectOutline(o: SketchOutline, at: Map<string, AnchorPoint>): { x: nu
   const A = anchors as AnchorPoint[];
 
   if (o.shape === 'circle' && o.points.length === 2) {
-    const [c0, c1] = o.points;
+    const [c0, c1] = o.design;
     const center: Point = [(c0[0] + c1[0]) / 2, (c0[1] + c1[1]) / 2];
     const radius = Math.hypot(c1[0] - c0[0], c1[1] - c0[1]) / 2;
     const start = Math.atan2(c0[1] - center[1], c0[0] - center[0]);
@@ -101,15 +111,23 @@ function projectOutline(o: SketchOutline, at: Map<string, AnchorPoint>): { x: nu
       // Half the ring off each real anchor's own basis, so neither half ever
       // carries the affine assumption further than a quarter turn.
       const half = i < samples / 2 ? 0 : 1;
-      out.push(projectFrom(A[half], o.points[half], q));
+      out.push(projectFrom(A[half], o.design[half], q));
     }
     return out;
   }
 
   const out: { x: number; y: number }[] = [];
   const count = o.points.length;
+  // Every point is projected through its BASIS corner's anchor, not through
+  // an anchor of its own: an outline point derived from a fillet has no
+  // anchor, because it is not a handle and must never become one.
+  const basisOf = (i: number) => {
+    const b = o.basis[i];
+    return Number.isInteger(b) && b >= 0 && b < A.length ? b : 0;
+  };
   for (let i = 0; i < count; i++) {
-    out.push(projectFrom(A[i], o.points[i], o.points[i]));
+    const bi = basisOf(i);
+    out.push(projectFrom(A[bi], o.design[bi], o.points[i]));
     const bulge = o.bulges?.[i];
     if (!bulge) continue;
     const a = o.points[i];
@@ -122,8 +140,9 @@ function projectOutline(o: SketchOutline, at: Map<string, AnchorPoint>): { x: nu
     for (let s = 1; s < samples; s++) {
       const t = startAngle + sweep * (s / samples);
       const q: Point = [center[0] + radius * Math.cos(t), center[1] + radius * Math.sin(t)];
-      // The edge's OWN start corner is the basis for every sample on it.
-      out.push(projectFrom(A[i], o.points[i], q));
+      // The edge's own start point rides its basis corner, and so does every
+      // sample along it -- which for a fillet arc is the corner it rounded.
+      out.push(projectFrom(A[bi], o.design[bi], q));
     }
   }
   return out;
@@ -226,7 +245,8 @@ export default function HandleOverlay({
               'handle'
               + (a.kind === 'move' ? ' is-move'
                  : a.kind === 'turn' ? ' is-turn'
-                 : a.kind === 'point' ? ' is-point' : '')
+                 : a.kind === 'point' ? ' is-point'
+                 : a.kind === 'radius' ? ' is-radius' : '')
               + (on ? ' is-on' : '')
             }
             style={{ left, top }}
@@ -299,6 +319,15 @@ export default function HandleOverlay({
           width: 10px; height: 10px; margin: -5px 0 0 -5px;
         }
         .handle.is-point:hover, .handle.is-point.is-on { background: #ff79c6; }
+        /* Round, not square, and orange: it sits ON the outline where a corner
+           handle would look like a corner, and it drives a radius rather than a
+           position. The title attribute above carries the live number, which is
+           the only place in the app a student could read a fillet radius. */
+        .handle.is-radius {
+          background: transparent; border-color: #ffb86c;
+          width: 11px; height: 11px; margin: -6px 0 0 -6px;
+        }
+        .handle.is-radius:hover, .handle.is-radius.is-on { background: #ffb86c; }
         .handle {
           position: absolute;
           width: 13px; height: 13px; margin: -7px 0 0 -7px; padding: 0;

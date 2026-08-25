@@ -15,15 +15,23 @@ import {
 import { maxFilletRadius, whyCannotRoundCorner } from '../../lib/sketch-arc';
 
 interface Props {
+  /** The DESIGN corners -- one row per edge between them, one Round box per
+   *  corner. A rounded corner is still one corner here; its arc is derived
+   *  (lib/sketch-arc.ts, outlineOf) and has no row of its own, which is why
+   *  every index in this panel is a design index and stays put when a corner
+   *  is rounded. */
   points: Point[];
   /** Bulge of the edge leaving corner n -- present and nonzero means curved.
    *  Absent entirely for a sketch that has never had a corner rounded. */
   bulges?: Record<number, number>;
+  /** Radius asked for on each rounded design corner, so the Round boxes can
+   *  show what is currently set instead of always reading empty. */
+  rounds?: Record<number, number>;
   constraints: Constraint[];
   onChange: (next: Constraint[]) => void;
-  /** Round corner `corner` to `radius` -- the caller owns the actual
-   *  point/bulge rewrite (lib/sketch-arc.ts's filletCorner), same division
-   *  of labour onChange already has for constraints. */
+  /** Round corner `corner` to `radius`, or un-round it at 0 -- the caller
+   *  owns writing it into the feature, same division of labour onChange
+   *  already has for constraints. Nothing here computes geometry. */
   onRound: (corner: number, radius: number) => void;
 }
 
@@ -31,7 +39,7 @@ function has(cs: Constraint[], kind: Constraint['kind'], edge: number) {
   return cs.some((c) => 'edge' in c && c.edge === edge && c.kind === kind);
 }
 
-export default function SketchConstraints({ points, bulges, constraints, onChange, onRound }: Props) {
+export default function SketchConstraints({ points, bulges, rounds, constraints, onChange, onRound }: Props) {
   const count = points.length;
   const residual = residualOf(points, constraints);
   const fighting = residual > 1e-3;
@@ -147,7 +155,12 @@ export default function SketchConstraints({ points, bulges, constraints, onChang
                     onKeyDown={(ev) => {
                       if (ev.key === 'Enter') (ev.target as HTMLInputElement).blur();
                     }}
-                    disabled={curved}
+                    // A curved edge cannot TAKE a new length -- but one that
+                    // already carries one has to stay reachable, because the
+                    // note above says "remove one to settle it" and clearing
+                    // this box is how you remove it. A disabled box makes that
+                    // sentence name a control the student cannot use.
+                    disabled={curved && !fixed}
                     title={curvedTitle}
                   />
                 </td>
@@ -183,29 +196,40 @@ export default function SketchConstraints({ points, bulges, constraints, onChang
           // arc. The panel already has the bulges; it just was not asking.
           const ceiling = maxFilletRadius(points, i, bulges);
           const why = whyCannotRoundCorner(points, i, bulges);
+          const set = rounds?.[i];
           return (
             <input
-              key={i}
+              // Keyed on the stored radius so the box re-mounts showing the
+              // new number after a round -- it is a persistent value now, not
+              // a fire-and-forget request, and a box that always read empty
+              // was the only reason nothing in the app could show a student
+              // what radius a corner actually had.
+              key={`${i}:${set ?? ''}`}
               type="number"
               inputMode="decimal"
               aria-label={`Round corner ${i + 1}`}
               // Not disabled when the answer is no -- a disabled box explains
               // nothing. Left live so a typed radius still reaches onRound(),
               // which says the reason out loud in the message line.
-              title={why ?? `Round corner ${i + 1} -- up to ${ceiling.toFixed(1)}`}
+              title={why ?? `Round corner ${i + 1} -- up to ${ceiling.toFixed(1)}, or 0 to undo it`}
               min={0}
               max={ceiling}
               step="0.5"
               placeholder="0"
+              defaultValue={set !== undefined ? String(set) : ''}
               onBlur={(ev) => {
                 const v = Number(ev.target.value);
-                ev.target.value = '';
-                if (!Number.isFinite(v) || v <= 0) return;
+                if (!Number.isFinite(v)) { ev.target.value = set !== undefined ? String(set) : ''; return; }
+                // 0 (or an emptied box) is un-round, and it reaches onRound()
+                // like any other value. It could not before -- the old guard
+                // returned early on v <= 0 -- so a corner, once rounded, could
+                // never be made sharp again, and no message anywhere said so.
+                if (v <= 0 && set === undefined) { ev.target.value = ''; return; }
                 // Pass what the student TYPED, not the clamped value. Clamping
                 // here made a request for 500 and a request for 10 arrive
                 // identically, so no caller could tell a clamp had happened and
                 // nothing could say so (sketch gauntlet round 3, blind judge).
-                onRound(i, v);
+                onRound(i, Math.max(0, v));
               }}
               onKeyDown={(ev) => {
                 if (ev.key === 'Enter') (ev.target as HTMLInputElement).blur();

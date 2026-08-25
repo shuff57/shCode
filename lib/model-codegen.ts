@@ -19,6 +19,7 @@
 // a translate around one rather than an argument to it.
 
 import { solveSketch, type Point } from './sketch-solve';
+import { maxFilletRadius, outlineOf } from './sketch-arc';
 import {
   type Feature,
   type ModelDoc,
@@ -93,6 +94,29 @@ export function generatedParams(doc: ModelDoc): GeneratedParam[] {
         out.push({ name: pname(f.id, `p${n}u`), caption: `${label} corner ${n + 1} across`, value: u, min: -500, max: 500, step: 1 });
         out.push({ name: pname(f.id, `p${n}v`), caption: `${label} corner ${n + 1} up`, value: v, min: -500, max: 500, step: 1 });
       });
+      // One slider per corner the student rounded. Emitted from `rounds`, the
+      // request -- so the radius is a live parameter the frame can be handed
+      // without regenerating the source, exactly like every other dimension.
+      // Before this the radius existed only baked into a bulge literal, which
+      // is why nothing anywhere in the app could show a student what it was.
+      for (const [key, want] of Object.entries(f.rounds ?? {})) {
+        const k = Number(key);
+        if (!Number.isInteger(k) || k < 0 || k >= f.points.length || !(want > 0)) continue;
+        const ceiling = maxFilletRadius(f.points, k, f.bulges);
+        out.push({
+          name: pname(f.id, `r${k}`),
+          caption: `${label} corner ${k + 1} round`,
+          value: want,
+          min: 0,
+          // The ceiling can sit BELOW what is currently stored (another round
+          // on the shared edge, or a corner the solver has since sharpened).
+          // Clamping the slider's max below its own value would snap the
+          // radius down the first time the panel rendered, silently -- which
+          // is the shape of bug this whole round exists to stop.
+          max: Math.max(ceiling, want),
+          step: 0.5,
+        });
+      }
       push('offset', 'offset', f.offset, { min: -500, max: 500, step: 1 });
     } else if (f.kind === 'extrude') {
       push('height', 'height', f.height);
@@ -234,6 +258,23 @@ export function applyParam(doc: ModelDoc, name: string, value: number): ModelDoc
           return { ...f, points };
         }
       }
+      // r<n>: the radius asked for on DESIGN corner n. Writes the request,
+      // never geometry -- outlineOf() turns it into trim points and a bulge
+      // wherever the outline is needed, so a drag on this handle cannot leave
+      // a stale arc endpoint behind for another mover to find.
+      const r = /^r(\d+)$/.exec(slot);
+      if (r) {
+        const k = Number(r[1]);
+        if (k >= 0 && k < f.points.length) {
+          const rounds = { ...(f.rounds ?? {}) };
+          // Dragged to nothing is un-rounded, not rounded-by-zero: a zero left
+          // in the map would keep emitting a dead slider and a dead handle.
+          if (value > 0) rounds[k] = value;
+          else delete rounds[k];
+          changed = true;
+          return { ...f, rounds };
+        }
+      }
       if (slot === 'offset') { changed = true; return { ...f, offset: value }; }
     }
     if (f.kind === 'extrude' && slot === 'height') {
@@ -310,6 +351,19 @@ export function solveDoc(doc: ModelDoc): ModelDoc {
     if (solved.residual === 0 && solved.iterations === 0) return f;
     const points = solved.points.map((p) => [p[0], p[1]] as [number, number]);
     if (points.every((p, i) => p[0] === f.points[i][0] && p[1] === f.points[i][1])) return f;
+    // The solver is happy to satisfy a rule by collapsing an edge to nothing:
+    // one Up toggle on a horizontal edge of a fresh rectangle drives both its
+    // corners to the same point, residual 0, over-constrained false, no
+    // message -- and Pull then extrudes the degenerate outline into a solid
+    // (M3). residual cannot catch it, because the collapse is what SATISFIES
+    // the rule. So the gate is geometric: if the solved design is no longer a
+    // shape, keep the one that was.
+    //
+    // Refusing here rather than at the toggle is deliberate -- solveDoc runs
+    // on EVERY doc adoption, so a load, an undo and a drag are covered by the
+    // same line. The toggle says so out loud (ModelEditor.setConstraints);
+    // this is the belt under that belt, and stays silent.
+    if (!outlineOf({ ...f, points }).ok) return f;
     changed = true;
     return { ...f, points };
   });
@@ -447,15 +501,41 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
     const pts = f.points
       .map((_, n) => `[p.${pname(f.id, `p${n}u`)}, p.${pname(f.id, `p${n}v`)}]`)
       .join(', ');
-    // Bulges are literal, not parameters -- Round a corner rewrites the
-    // sketch's points/bulges structurally (like Corner does), it does not
-    // hand a number to a live drag handle, so there is no p.sk1_bulge0 to
-    // reference here.
-    const bulgeEntries = Object.entries(f.bulges ?? {}).filter(([, v]) => v);
+    const legacyBulges = Object.entries(f.bulges ?? {}).filter(([, v]) => v);
+    const legacyLiteral = '{' + legacyBulges.map(([k, v]) => `${k}: ${num(v)}`).join(', ') + '}';
+
+    // A rounded sketch emits its DESIGN corners as parameters and its radii as
+    // parameters, and lets roundPoly() derive the trim points at build time.
+    //
+    // The alternative -- deriving them here and emitting the trim points as
+    // literals -- was the trap: the corner parameters would then be referenced
+    // by nothing, so dragging a corner would post a value the running frame
+    // ignores, and the shape would freeze mid-drag and only catch up when the
+    // doc was regenerated on release. Same reason every other dimension in
+    // this file is a parameter rather than a number.
+    const roundEntries = Object.entries(f.rounds ?? {}).filter(
+      ([k, v]) => v > 0 && Number.isInteger(Number(k))
+        && Number(k) >= 0 && Number(k) < f.points.length
+    );
+    if (roundEntries.length > 0) {
+      needs.add('roundPoly');
+      needs.add('polyArc');
+      const rounds = '{'
+        + roundEntries.map(([k]) => `${k}: p.${pname(f.id, `r${k}`)}`).join(', ')
+        + '}';
+      // The third argument carries any LEGACY arc the doc already had, keyed
+      // by design edge. Dropping it would silently flatten an imported curve
+      // the moment a student rounded some unrelated corner of the same sketch.
+      return `roundPoly([${pts}], ${rounds}, ${legacyLiteral})`;
+    }
+
+    // Bulges with no rounds are a legacy or imported outline: somebody else
+    // built those arcs, so they stay literal and pass straight through. There
+    // is no radius to hand a drag handle here -- the doc never recorded one.
+    const bulgeEntries = legacyBulges;
     if (bulgeEntries.length > 0) {
       needs.add('polyArc');
-      const bulges = '{' + bulgeEntries.map(([k, v]) => `${k}: ${num(v)}`).join(', ') + '}';
-      return `polyArc([${pts}], ${bulges})`;
+      return `polyArc([${pts}], ${legacyLiteral})`;
     }
     // Byte-identical to every doc saved before shape/bulges existed -- see
     // check-sketch-compat.mjs, which pins exactly this.
@@ -868,7 +948,12 @@ function polyArc(corners, bulges) {
     const ux = dx / d, uy = dy / d
     const px = -uy, py = ux
     const h = Math.sqrt(Math.max(0, r * r - (d / 2) * (d / 2)))
-    const sign = g >= 0 ? 1 : -1
+    // Past a half turn (|bulge| > 1) the centre is on the OTHER side of the
+    // chord -- a major arc's centre sits behind its own chord. Without the
+    // flip, bulge 2 on a 10-unit chord builds a 106-degree arc where 253.7
+    // was asked for, sagitta 2.5 instead of 20. See arcFromBulge() in
+    // lib/sketch-arc.ts, which carried the identical error.
+    const sign = (g >= 0 ? 1 : -1) * (Math.abs(g) > 1 ? -1 : 1)
     const cx = mx + px * h * sign, cy = my + py * h * sign
     const a0 = Math.atan2(a[1] - cy, a[0] - cx)
     const a1 = Math.atan2(b[1] - cy, b[0] - cx)
@@ -882,6 +967,69 @@ function polyArc(corners, bulges) {
     }
   }
   return geometries.geom2.fromPoints(out)
+}`,
+  roundPoly: `// A closed outline whose corners can be rounded. The first argument is the
+// DESIGN corners -- the points the student placed -- and rounds[k] is the
+// radius asked for on corner k. The two trim points and the arc between them
+// are DERIVED here, every build, and stored nowhere.
+//
+// That split is the point. A trim point that lives in the corner list is
+// indistinguishable from a corner somebody drew, so every tool that moves a
+// corner moves it too -- while the bulge beside it, which is a factor of its
+// own chord and not a radius, stays put. Same factor, shorter chord, smaller
+// radius, broken tangency, no error. Deriving instead means there is nothing
+// left behind to move.
+//
+// The third argument carries any arc the doc already had (an imported
+// outline), keyed by design edge. A corner next to one is left sharp,
+// because this construction reads both adjacent edges as straight chords.
+function roundPoly(corners, rounds, bulges) {
+  let pts = corners.map(function (p) { return [p[0], p[1]] })
+  let curves = Object.assign({}, bulges || {})
+  // Descending, and that is load-bearing: rounding corner k splices one extra
+  // point in at k, so every index above it shifts. Working downwards means
+  // each corner is still at its own index when its turn comes.
+  const asked = Object.keys(rounds).map(Number)
+    .filter(function (k) { return rounds[k] > 0 })
+    .sort(function (a, b) { return b - a })
+  for (let i = 0; i < asked.length; i++) {
+    const k = asked[i]
+    const n = pts.length
+    const prev = (k - 1 + n) % n
+    if (curves[prev] || curves[k]) continue
+    const P = pts[prev], C = pts[k], N = pts[(k + 1) % n]
+    const vIn = [P[0] - C[0], P[1] - C[1]]
+    const vOut = [N[0] - C[0], N[1] - C[1]]
+    const lenIn = Math.hypot(vIn[0], vIn[1])
+    const lenOut = Math.hypot(vOut[0], vOut[1])
+    if (lenIn === 0 || lenOut === 0) continue
+    const cosI = (vIn[0] * vOut[0] + vIn[1] * vOut[1]) / (lenIn * lenOut)
+    const interior = Math.acos(Math.max(-1, Math.min(1, cosI)))
+    if (Math.PI - interior < 1e-6) continue
+    const half = Math.tan(interior / 2)
+    // Clamped to what the corner can actually take -- trim grows much faster
+    // than radius as a corner sharpens, and an unclamped trim runs past the
+    // far corner and self-crosses the outline.
+    const r = Math.min(rounds[k], (Math.min(lenIn, lenOut) / 2) * half)
+    if (!(r > 0)) continue
+    const trim = r / half
+    if (!(trim > 1e-9 * Math.min(lenIn, lenOut))) continue
+    const cross = (C[0] - P[0]) * (N[1] - C[1]) - (C[1] - P[1]) * (N[0] - C[0])
+    const g = (cross >= 0 ? 1 : -1) * Math.tan((Math.PI - interior) / 4)
+    const shifted = {}
+    const keys = Object.keys(curves)
+    for (let j = 0; j < keys.length; j++) {
+      const e = Number(keys[j])
+      shifted[e > k - 1 ? e + 1 : e] = curves[keys[j]]
+    }
+    shifted[k] = g
+    curves = shifted
+    pts = pts.slice(0, k).concat([
+      [C[0] + (vIn[0] / lenIn) * trim, C[1] + (vIn[1] / lenIn) * trim],
+      [C[0] + (vOut[0] / lenOut) * trim, C[1] + (vOut[1] / lenOut) * trim],
+    ], pts.slice(k + 1))
+  }
+  return polyArc(pts, curves)
 }`,
 };
 

@@ -57,8 +57,8 @@ import {
   Octagon,
 } from 'lucide-react';
 import SketchConstraints from './SketchConstraints';
-import type { Constraint } from '../../lib/sketch-solve';
-import { filletCorner, maxFilletRadius, whyCannotRoundCorner } from '../../lib/sketch-arc';
+import { solveSketch, type Constraint, type Point } from '../../lib/sketch-solve';
+import { maxFilletRadius, outlineOf, whyCannotRoundCorner } from '../../lib/sketch-arc';
 import {
   type Feature,
   type ModelDoc,
@@ -476,33 +476,75 @@ export default function ModelEditor({
 
   function roundSketchCorner(f: Extract<Feature, { kind: 'sketch' }>, corner: number, radius: number) {
     // f.bulges, not just the points: a corner whose neighbour is already an
-    // arc cannot be rounded (filletCorner() reads adjacent edges as straight
-    // chords), and without the bulges this asks about a different sketch
-    // than the one on screen and gets told yes.
+    // imported arc cannot be rounded (the fillet construction reads both
+    // adjacent edges as straight chords), and without the bulges this asks
+    // about a different sketch than the one on screen and gets told yes.
+    // Un-rounding comes first and is never refused: a corner that HAS a round
+    // may since have been dragged somewhere unroundable, and refusing to take
+    // the round off it would strand the student with a shape they cannot undo.
+    if (!(radius > 0)) {
+      if ((f.rounds?.[corner] ?? 0) <= 0) { say(null); return; }
+      const rounds = { ...(f.rounds ?? {}) };
+      delete rounds[corner];
+      onChange({
+        ...doc,
+        features: doc.features.map((x) => (x.id === f.id ? { ...x, rounds } : x)),
+      });
+      say(null);
+      return;
+    }
+
     const why = whyCannotRoundCorner(f.points, corner, f.bulges);
     if (why) { say(why); return; }
-    // A pin on the corner being rounded away has no surviving point to hold
-    // -- filletCorner() drops it rather than silently reassigning it to a
-    // trim point the student never chose (Finding 2, sketch gauntlet round
-    // 2). Read that BEFORE the call so the message matches what actually
-    // happened, not a guess.
-    const hadPin = (f.constraints ?? []).some((c) => c.kind === 'lock' && c.corner === corner);
-    // filletCorner() clamps internally and always did, but silently -- and it
-    // returns the identical sketch for 500 and for 10, so the clamp could not
-    // be reported from its result. Ask the ceiling directly and say it. The
-    // remedy is real: the same Rules panel this came from has a length box per
-    // edge.
-    const ceiling = maxFilletRadius(f.points, corner, f.bulges);
-    const clamped = radius > ceiling
-      ? `That corner can only take a round of ${ceiling.toFixed(1)}, so that is what I used. Make its two edges longer if you want a bigger one.`
-      : null;
-    const next = filletCorner(f, corner, radius);
+
+    // Record the REQUEST, not the geometry. This used to call filletCorner()
+    // and write its trim points straight into f.points, where nothing could
+    // tell them apart from corners the student had placed -- so the drag
+    // handles, the constraint solver and the Rules panel all moved them, each
+    // one rescaling the arc it belonged to without touching its bulge.
+    // outlineOf() derives them instead, every time they are needed.
+    //
+    // Two things fall out for free. The corner is not deleted any more, so a
+    // pin on it survives the round (it used to be dropped, with a message
+    // saying so). And rounding the same corner again just overwrites the
+    // number, which is what makes the radius editable at all.
+    const next = { ...f, rounds: { ...(f.rounds ?? {}), [corner]: radius } };
     onChange({
       ...doc,
       features: doc.features.map((x) => (x.id === f.id ? next : x)),
     });
-    const pinned = hadPin ? 'That corner was pinned -- the pin came off when you rounded it away.' : null;
-    say([clamped, pinned].filter(Boolean).join(' ') || null);
+
+    // What this corner could take ON ITS OWN, from the design polygon.
+    const ceiling = maxFilletRadius(f.points, corner, f.bulges);
+    const ownLimit = radius > ceiling;
+    // What it could take once every OTHER round had its share of the shared
+    // edges -- the number outlineOf() actually used, which is smaller when a
+    // neighbour got there first. Reporting the design-only ceiling here would
+    // name a radius the student cannot actually have.
+    const note = outlineOf(next).notes.find((x) => x.corner === corner);
+    const n = f.points.length;
+    const neighbour = [(corner - 1 + n) % n, (corner + 1) % n]
+      .find((c) => (f.rounds?.[c] ?? 0) > 0);
+
+    let clamped: string | null = null;
+    if (note && (ownLimit || neighbour === undefined)) {
+      // Its own two edges are the limit. Both remedies are reachable from
+      // here: this panel has a Length box per edge, and every design corner
+      // carries a drag handle on the canvas.
+      clamped = `That corner can only take a round of ${note.got.toFixed(1)}, so that is `
+        + 'what I used. Make its two edges longer if you want a bigger one.';
+    } else if (note && neighbour !== undefined && note.got > 0) {
+      // The remedy names the Round box on the neighbouring corner, which is
+      // in this same panel and takes a new number at any time.
+      clamped = `That corner can only take a round of ${note.got.toFixed(1)} once corner `
+        + `${neighbour + 1} has taken its share of the edge between them. Put a smaller `
+        + `round on corner ${neighbour + 1} if you want a bigger one here.`;
+    } else if (note && neighbour !== undefined) {
+      clamped = `There is no room left to round that corner -- corner ${neighbour + 1}'s `
+        + `round has taken the whole edge between them. Put a smaller round on corner `
+        + `${neighbour + 1} first.`;
+    }
+    say(clamped);
   }
 
   function mirror(plane: SketchPlane) {
@@ -627,10 +669,31 @@ export default function ModelEditor({
   // the one place guaranteed to hold the current points -- solving here would
   // use whatever this render was given, and lose any edit still in flight.
   function setConstraints(f: Extract<Feature, { kind: 'sketch' }>, next: Constraint[]) {
+    // The solver will happily satisfy a rule by pulling an edge to zero
+    // length: one Up on a horizontal edge of a fresh rectangle lands both its
+    // corners on the same point, residual 0, nothing over-constrained, no
+    // complaint -- and Pull then extrudes the collapsed outline into a solid.
+    // Residual cannot catch it, because the collapse is what SATISFIES the
+    // rule. So the rule is tried here first and refused with a reason; the
+    // same gate runs again inside solveDoc(), silently, for every other way a
+    // doc gets adopted.
+    const solved = solveSketch(f.points.map((p): Point => [p[0], p[1]]), next);
+    const points = solved.points.map((p) => [p[0], p[1]] as [number, number]);
+    const outline = outlineOf({ ...f, points });
+    if (!outline.ok) {
+      // The remedy is the corner handles, which really are on screen right
+      // now: this panel only renders for a selected sketch, and
+      // sketchHandles() emits one two-axis handle per design corner, drawn by
+      // HandleOverlay as the blue squares.
+      say(`${outline.why} Drag that edge into the direction you want first -- `
+        + 'the blue corner handles move it -- then set the rule.');
+      return;
+    }
     onChange({
       ...doc,
       features: doc.features.map((x) => (x.id === f.id ? { ...x, constraints: next } : x)),
     });
+    say(null);
   }
 
   const activeSketch =
@@ -1021,6 +1084,7 @@ export default function ModelEditor({
         <SketchConstraints
           points={activeSketch.points}
           bulges={activeSketch.bulges}
+          rounds={activeSketch.rounds}
           constraints={activeSketch.constraints ?? []}
           onChange={(next) => setConstraints(activeSketch, next)}
           onRound={(corner, radius) => roundSketchCorner(activeSketch, corner, radius)}
