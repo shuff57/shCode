@@ -459,7 +459,7 @@ module.exports = function run(dir) {
   check('an Overlap names overlapping', /overlap/i.test(overlapMsg), overlapMsg);
 
   // ROOT CAUSE A / finding 1: the sketch/Pull/Spin message used to send a
-  // student to round "the corners of the sketch" -- a tool that does not
+  // student to round "the corners of the sketch" -- a tool that did not
   // exist anywhere in the sketch editor. A value that would make a broken
   // implementation pass: either message below still containing the word
   // "corners" paired with an instruction to use them, since that is the
@@ -469,10 +469,30 @@ module.exports = function run(dir) {
   const spinMsg = types.whyCannotRound({ id: 'r', kind: 'revolve', target: 's', angle: 360 });
   const fabricatedRemedy = /round the corners of the sketch/i;
   for (const [label, msg] of [['sketch', sketchMsg], ['Pull result', pullMsg], ['Spin result', spinMsg]]) {
-    check(`a ${label} does not send the student to round a sketch's corners (no such tool exists)`,
+    check(`a ${label} does not send the student to round a sketch's corners the OLD way`,
       !fabricatedRemedy.test(msg), msg);
-    check(`...and the ${label} message says outright there is no such tool`, /no way/i.test(msg), msg);
   }
+
+  // shCAD sketch build 1 (lib/sketch-arc.ts, the Rules panel's Round a corner
+  // field): a real remedy now exists, so "there is no such tool" stopped
+  // being true and the message must say so. A value that would make a
+  // broken implementation pass: any of the three messages below still
+  // containing the literal phrase "no way to round a corner" -- the exact
+  // string this build was required to remove (see the parity map's `fillet`
+  // -> `chamfer2d` split and its "load-bearing" why). Superseding, not
+  // deleting, the check this replaces: the OLD assertion here required "no
+  // way" to appear in all three messages, which was correct advice about a
+  // product that had no such tool and became WRONG advice the moment this
+  // build shipped one.
+  for (const [label, msg] of [['sketch', sketchMsg], ['Pull result', pullMsg], ['Spin result', spinMsg]]) {
+    check(`...and the ${label} message no longer claims there is no such tool`,
+      !/no way to round a corner/i.test(msg), msg);
+    check(`...and instead names the real remedy: Round a corner in the Rules panel`,
+      /round a corner/i.test(msg) && /rules panel/i.test(msg), msg);
+  }
+  check('the fabricated-tool sentence is gone from the whole codebase',
+    !fs.readFileSync(path.join(__dirname, '..', 'lib', 'model-types.ts'), 'utf8')
+      .includes('no way to round a corner'));
 
   // ROOT CAUSE A / finding 3: the Move message used to always say "before
   // you move it," even for a Copy -- contradicting the "(copy)" label the
@@ -986,6 +1006,134 @@ module.exports = function run(dir) {
     newKindIds.every((id) => types.isDerived(labelDoc.features.find((f) => f.id === id))));
   check('isShape excludes every new feature -- none of them has a plain centre',
     newKindIds.every((id) => !types.isShape(labelDoc.features.find((f) => f.id === id))));
+
+  console.log('\n=== sketch build 1: circle (shape tag) ===');
+
+  const circleSketch = { id: 'sk2', kind: 'sketch', plane: 'xy', offset: 0, shape: 'circle', points: [[15, 12.5], [25, 12.5]] };
+  const circleDoc = doc(circleSketch, pull('e2', 'sk2'));
+  const circleSrc = gen.toJscad(circleDoc);
+  check('#7 a tagged circle emits discAcross, not poly',
+    circleSrc.includes('discAcross([p.sk2_p0u, p.sk2_p0v], [p.sk2_p1u, p.sk2_p1v])')
+    && !/\bpoly\(\[\[?p\.sk2/.test(circleSrc));
+  check('...and the helper is defined', circleSrc.includes('function discAcross('));
+  // Built through the extrude, not the bare sketch -- a bare sketch is never
+  // top-level (see topLevel()'s doc comment), so measuring it directly would
+  // silently measure the empty-doc placeholder box(1,1,1) instead.
+  const circleBuilt = build(circleSrc);
+  check('#7 the disc is 10 wide (radius from HALF the point distance), not 20 (the whole distance)',
+    Math.abs((circleBuilt.bbox[1][0] - circleBuilt.bbox[0][0]) - 10) < 0.5,
+    `width ${(circleBuilt.bbox[1][0] - circleBuilt.bbox[0][0]).toFixed(1)} -- a broken implementation ` +
+    `that reads the point distance itself as the radius would draw one twice this size`);
+
+  check('#8 a circle keeps its four corner params -- p0u/p0v/p1u/p1v -- not derived r/cx/cy',
+    gen.generatedParams(doc(circleSketch)).map((p) => p.name).sort().join() === 'sk2_offset,sk2_p0u,sk2_p0v,sk2_p1u,sk2_p1v',
+    `got ${gen.generatedParams(doc(circleSketch)).map((p) => p.name).sort().join()} -- a derived-params implementation ` +
+    `would emit sk2_r/sk2_cx/sk2_cy instead, and sketchHandles() (lib/model-handles.ts) builds every drag handle ` +
+    `from f.points, so a circle built that way would have no draggable handles at all`);
+
+  console.log('\n=== sketch build 1: Corner refuses on a circle (Finding 3, sketch gauntlet round 2) ===');
+
+  // addCorner() has no idea it is being asked to splice a third point into a
+  // two-point diameter -- ModelEditor.tsx's corner() is supposed to refuse
+  // before ever calling it. addCorner() itself is the belt-and-suspenders:
+  // called anyway, it must leave a circle untouched rather than degrade it
+  // into a collinear "polygon" that Pull then extrudes into a flat wedge.
+  const cornerOnCircle = types.addCorner(circleSketch, 0);
+  check('#11 addCorner() refuses a circle sketch outright -- same points, same length',
+    cornerOnCircle.points.length === 2
+    && cornerOnCircle.points[0][0] === circleSketch.points[0][0]
+    && cornerOnCircle.points[1][0] === circleSketch.points[1][0],
+    `got ${JSON.stringify(cornerOnCircle.points)} -- an implementation that does not check ` +
+    `shape === 'circle' splices a midpoint in, leaving 3 points where circleOf() still only reads the first two as the diameter`);
+
+  console.log('\n=== whyCannotRound: a circle sketch names a reachable remedy (Finding 4, sketch gauntlet round 2) ===');
+
+  // The Rules panel (SketchConstraints, which carries "Round a corner") is
+  // rendered in ModelEditor.tsx only when shape !== 'circle' -- see
+  // `activeSketch && activeSketch.shape !== 'circle'` there. A value that
+  // would make a broken implementation pass: the circle message below still
+  // naming "Rules panel", the same fabricated-remedy shape Finding 1 of the
+  // PREVIOUS gauntlet round fixed for combine/extrude/revolve.
+  const circleRoundMsg = types.whyCannotRound(circleSketch);
+  check('#12 a circle sketch does not send the student to a Rules panel it cannot reach',
+    !/rules panel/i.test(circleRoundMsg), circleRoundMsg);
+  check('...and still gives a real, followable remedy',
+    typeof circleRoundMsg === 'string' && circleRoundMsg.length > 10, String(circleRoundMsg));
+  check('...while a plain (non-circle) sketch keeps naming the Rules panel -- this must NOT regress',
+    /rules panel/i.test(sketchMsg), sketchMsg);
+
+  console.log('\n=== sketch build 1: a rounded corner (bulge) ===');
+
+  // Same non-90-degree triangle the sketch-arc suite uses -- a rectangle
+  // corner cannot tell a correct trim from a trim-by-r bug.
+  const filletedDoc = doc({
+    id: 'sk3', kind: 'sketch', plane: 'xy', offset: 0,
+    points: [[0, 0], [25, 0], [28, 9], [0, 30]],
+    bulges: { 1: Math.tan((143.1301 * Math.PI / 180) / 4) },
+  }, pull('e3', 'sk3'));
+  const filletedSrc = gen.toJscad(filletedDoc);
+  check('a bulged sketch emits polyArc, not poly', filletedSrc.includes('polyArc([') && filletedSrc.includes('function polyArc('));
+  check('...literal bulge values, keyed by edge, not routed through a param',
+    /polyArc\(\[.*\], \{1: 0\.72/.test(filletedSrc), filletedSrc.slice(filletedSrc.indexOf('polyArc(')));
+  check('...and pulls geometries in for geom2.fromPoints', /const \{[^}]*geometries[^}]*\} = require/.test(filletedSrc));
+
+  const filletedBuilt = build(filletedSrc);
+  // A 40x30 right triangle (area 600) minus the sliver the r=5 fillet cuts off
+  // the corner -- the rounded footprint has to come out smaller than 600 and
+  // comfortably bigger than a fillet-ate-the-whole-corner degenerate result.
+  const footprint = filletedBuilt.bbox[1][0] - filletedBuilt.bbox[0][0];
+  check('the filleted profile still stands up as a real solid, not a degenerate sliver',
+    filletedBuilt.volume > 0 && footprint > 25 && footprint <= 40,
+    `volume ${filletedBuilt.volume.toFixed(0)}, footprint ${footprint.toFixed(1)}`);
+
+  console.log('\n=== sketch build 1: old docs are untouched ===');
+
+  const plainSketchSrc = gen.toJscad(doc(sketch('s1')));
+  check('#9 no shape, no bulges: still poly([, byte-identical to before this build',
+    plainSketchSrc.includes(`poly([${sketch('s1').points.map((_, n) => `[p.s1_p${n}u, p.s1_p${n}v]`).join(', ')}])`));
+  check('...and neither new helper is pulled in for a doc that never uses them',
+    !plainSketchSrc.includes('function discAcross(') && !plainSketchSrc.includes('function polyArc('));
+
+  console.log('\n=== sketch build 1: addCorner reindexes past the seam ===');
+
+  const cornerRect = { id: 'sk4', kind: 'sketch', plane: 'xy', offset: 0, points: [[0, 0], [40, 0], [40, 25], [0, 25]],
+    constraints: [{ kind: 'lock', corner: 2 }] };
+  const afterAddCorner = types.addCorner(cornerRect, 0);
+  check('#6 a lock past the insertion seam shifts from corner 2 to corner 3',
+    afterAddCorner.constraints.some((c) => c.kind === 'lock' && c.corner === 3)
+    && !afterAddCorner.constraints.some((c) => c.kind === 'lock' && c.corner === 2),
+    `got ${JSON.stringify(afterAddCorner.constraints)} -- the pre-existing bug this closes left it ` +
+    `reading corner: 2, which after the splice is a different point than the one it used to lock`);
+
+  console.log('\n=== sketch build 1: solveDoc leaves bulges and shape alone ===');
+
+  const solvedFilleted = gen.solveDoc({ version: 1, features: [{
+    id: 'sk5', kind: 'sketch', plane: 'xy', offset: 0,
+    points: [[0, 0], [25, 0], [28, 9], [0, 30]],
+    bulges: { 1: 0.72 },
+    constraints: [{ kind: 'length', edge: 3, value: 30 }],
+  }] });
+  const solvedSketch = solvedFilleted.features[0];
+  check('#10 a rule applied through solveDoc does not silently flatten a fillet',
+    solvedSketch.bulges && solvedSketch.bulges[1] === 0.72,
+    `got bulges = ${JSON.stringify(solvedSketch.bulges)} -- a broken write-back path that ` +
+    `does not spread the rest of the feature would drop this to undefined`);
+
+  console.log('\n=== sketch build 1: the refusal message is actually true ===');
+
+  // #13. grep, not a spot check on one message: the old sentence had TWO
+  // homes (the sketch branch and the extrude/revolve branch both carried it)
+  // and shipping fillet while either survived would leave the app naming a
+  // remedy it had just made false again in the other direction.
+  const libSrc = fs.readFileSync(path.join(__dirname, '..', 'lib', 'model-types.ts'), 'utf8');
+  check('#13 "no way to round a corner" has no hits left in lib/model-types.ts',
+    !libSrc.includes('no way to round a corner'));
+
+  const overlaySrc = fs.readFileSync(path.join(__dirname, '..', 'components', 'model', 'ModelEditor.tsx'), 'utf8');
+  check('#14 the sketch tool group is searchable by "Circle" -- sketchVisible includes it',
+    /sketchVisible\s*=\s*\[[^\]]*'Circle'[^\]]*\]/.test(overlaySrc),
+    'a stale sketchVisible list would hide the whole sketch group, including the button being searched for, ' +
+    'the moment a student typed "circle" into Search tools');
 
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;

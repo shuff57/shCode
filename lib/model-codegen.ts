@@ -434,9 +434,31 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
   }
 
   if (f.kind === 'sketch') {
+    // A circle is TAGGED, not inferred -- circleOf() in sketch-arc.ts is the
+    // only other place that reads f.shape, and this is where the tag turns
+    // into geometry. Two points is a diameter here, never "the outline";
+    // poly() on two points would draw a degenerate line, not a circle.
+    if (f.shape === 'circle' && f.points.length === 2) {
+      needs.add('discAcross');
+      const a = `[p.${pname(f.id, 'p0u')}, p.${pname(f.id, 'p0v')}]`;
+      const b = `[p.${pname(f.id, 'p1u')}, p.${pname(f.id, 'p1v')}]`;
+      return `discAcross(${a}, ${b})`;
+    }
     const pts = f.points
       .map((_, n) => `[p.${pname(f.id, `p${n}u`)}, p.${pname(f.id, `p${n}v`)}]`)
       .join(', ');
+    // Bulges are literal, not parameters -- Round a corner rewrites the
+    // sketch's points/bulges structurally (like Corner does), it does not
+    // hand a number to a live drag handle, so there is no p.sk1_bulge0 to
+    // reference here.
+    const bulgeEntries = Object.entries(f.bulges ?? {}).filter(([, v]) => v);
+    if (bulgeEntries.length > 0) {
+      needs.add('polyArc');
+      const bulges = '{' + bulgeEntries.map(([k, v]) => `${k}: ${num(v)}`).join(', ') + '}';
+      return `polyArc([${pts}], ${bulges})`;
+    }
+    // Byte-identical to every doc saved before shape/bulges existed -- see
+    // check-sketch-compat.mjs, which pins exactly this.
     return `poly([${pts}])`;
   }
 
@@ -819,6 +841,48 @@ function rotateAbout(pivot, spin, shape) {
   const back = [-pivot[0], -pivot[1], -pivot[2]]
   return transforms.translate(pivot, transforms.rotate(spin, transforms.translate(back, shape)))
 }`,
+  discAcross: `// A circle drawn as its two ends: the corners are a diameter, not a line
+// -- see SketchFeature.shape. The tag is the only source of truth for "is
+// this a circle," so this never has to guess from the point count.
+function discAcross(a, b) {
+  return disc(Math.hypot(b[0] - a[0], b[1] - a[1]) / 2,
+              { center: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2] })
+}`,
+  polyArc: `// A closed outline whose edges can bend. bulges[i], if present and
+// nonzero, curves the edge LEAVING corner i into an arc instead of a
+// straight line -- 0 or a missing key is a straight edge, same as poly().
+// bulge is tan(includedAngle / 4), the same convention lib/sketch-arc.ts
+// uses to build the corner's trim points in the first place.
+function polyArc(corners, bulges) {
+  const out = []
+  for (let i = 0; i < corners.length; i++) {
+    const a = corners[i]
+    const b = corners[(i + 1) % corners.length]
+    out.push(a)
+    const g = bulges[i]
+    if (!g) continue
+    const dx = b[0] - a[0], dy = b[1] - a[1]
+    const d = Math.hypot(dx, dy)
+    const r = d * (1 + g * g) / (4 * Math.abs(g))
+    const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2
+    const ux = dx / d, uy = dy / d
+    const px = -uy, py = ux
+    const h = Math.sqrt(Math.max(0, r * r - (d / 2) * (d / 2)))
+    const sign = g >= 0 ? 1 : -1
+    const cx = mx + px * h * sign, cy = my + py * h * sign
+    const a0 = Math.atan2(a[1] - cy, a[0] - cx)
+    const a1 = Math.atan2(b[1] - cy, b[0] - cx)
+    let sweep = a1 - a0
+    if (g > 0 && sweep < 0) sweep += Math.PI * 2
+    if (g < 0 && sweep > 0) sweep -= Math.PI * 2
+    const n = Math.max(8, Math.ceil(Math.abs(sweep) / (7.5 * Math.PI / 180)))
+    for (let s = 1; s < n; s++) {
+      const t = a0 + sweep * (s / n)
+      out.push([cx + r * Math.cos(t), cy + r * Math.sin(t)])
+    }
+  }
+  return geometries.geom2.fromPoints(out)
+}`,
 };
 
 export function toJscad(doc: ModelDoc): string {
@@ -852,6 +916,9 @@ export function toJscad(doc: ModelDoc): string {
     modules.push('transforms');
   }
   if (needs.has('extrusions') && !modules.includes('extrusions')) modules.push('extrusions');
+  // polyArc closes its sampled points into a geom2 by hand -- discAcross needs
+  // no raw jscad import at all, it only calls the shCAD global disc().
+  if (needs.has('polyArc') && !modules.includes('geometries')) modules.push('geometries');
 
   const defs = params
     .map(

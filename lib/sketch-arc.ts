@@ -1,0 +1,291 @@
+// Curved sketch geometry, kept out of sketch-solve.ts on purpose: the solver
+// there is a relaxation loop over STRAIGHT edges (horizontal/vertical/length/
+// equal/lock) and stays exactly that. A circle or a rounded corner is a
+// second, unrelated kind of math -- bulge/arc trigonometry, not constraint
+// relaxation -- so it lives beside the solver, not inside it. Nothing here is
+// called by solveSketch(), and solveSketch() is never called from here.
+//
+// A curved edge is expressed the way DXF/AutoCAD express one: a "bulge" on
+// the edge LEAVING a corner. bulge = tan(includedAngle / 4), where
+// includedAngle is the arc's own signed sweep. 0 or absent means straight.
+// That single number is enough to rebuild the arc's center and radius from
+// nothing but its two endpoints -- which is exactly why SketchFeature can
+// carry it as one extra field per edge instead of a separate curve type.
+
+import type { Constraint } from './sketch-solve';
+
+export type Point = [number, number];
+
+/** The minimal shape reindex()/circleOf()/tessellate() need. A SketchFeature
+ *  satisfies this structurally, without either file importing the other --
+ *  model-types.ts imports FROM here (reindex, for addCorner), so this file
+ *  must never import model-types.ts back. */
+export interface SketchLike {
+  points: Point[];
+  shape?: 'circle';
+  bulges?: Record<number, number>;
+  constraints?: Constraint[];
+}
+
+/**
+ * Rebuild an arc from the two endpoints of its chord and its bulge.
+ *
+ * Derivation (the identity that makes bulge useful at all): with half-chord
+ * h = |b-a|/2 and half-angle t = includedAngle/4, the sagitta is h*bulge and
+ * the radius is h*(bulge + 1/bulge)/2 = |b-a|*(1+bulge^2)/(4*|bulge|). The
+ * center sits on the chord's perpendicular bisector, on the LEFT of a->b for
+ * a positive (CCW) bulge -- verified against a hand-worked fillet: a=[25,0],
+ * b=[28,9], bulge=0.720748 puts the center at exactly [25,5], radius 5.
+ * Flipping the sign puts it at [28,4] instead -- outside the corner instead
+ * of inside it, which is the sign-error failure this shape of bug produces.
+ */
+export function arcFromBulge(
+  a: Point,
+  b: Point,
+  bulge: number
+): { center: Point; radius: number; startAngle: number; endAngle: number } {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const d = Math.hypot(dx, dy);
+  const radius = (d * (1 + bulge * bulge)) / (4 * Math.abs(bulge));
+  const mx = (a[0] + b[0]) / 2;
+  const my = (a[1] + b[1]) / 2;
+  const ux = dx / d;
+  const uy = dy / d;
+  // 90 degrees CCW of the chord direction a->b.
+  const px = -uy;
+  const py = ux;
+  const half = d / 2;
+  const toCentre = Math.sqrt(Math.max(0, radius * radius - half * half));
+  const sign = bulge >= 0 ? 1 : -1;
+  const center: Point = [mx + px * toCentre * sign, my + py * toCentre * sign];
+  const startAngle = Math.atan2(a[1] - center[1], a[0] - center[0]);
+  const endAngle = Math.atan2(b[1] - center[1], b[0] - center[0]);
+  return { center, radius, startAngle, endAngle };
+}
+
+/** The CCW-normalised sweep from startAngle to endAngle that a bulge of this
+ *  sign actually means -- raw atan2 output can land on either side of zero,
+ *  so a positive bulge's sweep must come out positive and a negative one's
+ *  negative, regardless of which quadrant the endpoints fell in. */
+function signedSweep(startAngle: number, endAngle: number, bulge: number): number {
+  let sweep = endAngle - startAngle;
+  if (bulge > 0 && sweep < 0) sweep += Math.PI * 2;
+  if (bulge < 0 && sweep > 0) sweep -= Math.PI * 2;
+  return sweep;
+}
+
+/** Reads f.shape and nothing else -- the tag IS the answer, never a distance
+ *  comparison on the points. A non-circle sketch (shape absent) is null,
+ *  never guessed at from having exactly two points. */
+export function circleOf(f: { shape?: 'circle'; points: Point[] }): { center: Point; radius: number } | null {
+  if (f.shape !== 'circle') return null;
+  const [a, b] = f.points;
+  if (!a || !b) return null;
+  return {
+    center: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2],
+    radius: Math.hypot(b[0] - a[0], b[1] - a[1]) / 2,
+  };
+}
+
+/**
+ * The real ceiling on this corner's fillet radius: the radius whose trim
+ * distance (r / tan(interior/2), filletCorner()'s own formula) reaches
+ * exactly half the shorter adjacent edge.
+ *
+ * This USED to be angle-blind -- half the shorter edge, full stop -- on the
+ * theory that the corner's own angle didn't need to factor in. That was
+ * wrong: trim grows much faster than radius as a corner sharpens, so a sharp
+ * corner's true safe radius is far SMALLER than half its edge, and the old
+ * formula let a radius through that trimmed straight past the far corner and
+ * self-crossed the outline (Finding 1, sketch gauntlet round 2). At a
+ * 90-degree corner tan(45deg) = 1, so this returns the same number the old
+ * formula did -- verified by the existing rectangle assertion below, which a
+ * fix that broke the 90-degree case would fail.
+ */
+export function maxFilletRadius(points: Point[], corner: number): number {
+  const n = points.length;
+  const prev = points[(corner - 1 + n) % n];
+  const c = points[corner];
+  const next = points[(corner + 1) % n];
+  const lenIn = Math.hypot(c[0] - prev[0], c[1] - prev[1]);
+  const lenOut = Math.hypot(next[0] - c[0], next[1] - c[1]);
+  if (lenIn === 0 || lenOut === 0) return 0;
+  const vIn: Point = [prev[0] - c[0], prev[1] - c[1]];
+  const vOut: Point = [next[0] - c[0], next[1] - c[1]];
+  const cosInterior = (vIn[0] * vOut[0] + vIn[1] * vOut[1]) / (lenIn * lenOut);
+  const interior = Math.acos(Math.max(-1, Math.min(1, cosInterior)));
+  return (Math.min(lenIn, lenOut) / 2) * Math.tan(interior / 2);
+}
+
+/**
+ * Plain words for why THIS corner cannot take a fillet at all, or null when
+ * some positive radius would work. maxFilletRadius() returning 0 already
+ * disables the slider (min === max === 0), but a caller that reaches this
+ * corner anyway -- a stale value already in the field, a future caller that
+ * skips the slider -- needs something to say instead of quietly building
+ * nothing, the same complaint whyCannotRound() in model-types.ts exists to
+ * answer for a whole feature.
+ */
+export function whyCannotRoundCorner(points: Point[], corner: number): string | null {
+  if (maxFilletRadius(points, corner) > 0) return null;
+  return "This corner is too sharp to round -- its two edges nearly double back on each other. Drag it into a wider angle first.";
+}
+
+/**
+ * Shift every constraint and bulge index past `insertedAt` by one.
+ *
+ * "Past a seam" is the one operation both callers need, because both add
+ * exactly one corner and one edge at the same seam:
+ *   - addCorner(f, index) splits edge `index` into two straight edges,
+ *     insertedAt = index.
+ *   - filletCorner(f, corner, r) deletes corner `corner` and replaces it with
+ *     two trim points plus a new arc edge between them, insertedAt =
+ *     corner - 1. (Corner `corner` itself, and edge `corner` -- its own
+ *     outgoing edge -- both count as "past" corner-1, so they shift forward
+ *     onto the new positions the split created; there is no old index that
+ *     legitimately still means "the arc," because the arc never existed
+ *     before this call. Its caller fills that slot in separately.)
+ * A corner or edge index <= insertedAt is untouched either way.
+ */
+export function reindex<T extends SketchLike>(f: T, insertedAt: number): T {
+  const shiftCorner = (c: number) => (c > insertedAt ? c + 1 : c);
+  const shiftEdge = (e: number) => (e > insertedAt ? e + 1 : e);
+
+  const constraints = f.constraints?.map((c): Constraint => {
+    if (c.kind === 'lock') return { ...c, corner: shiftCorner(c.corner) };
+    if (c.kind === 'equal') return { ...c, edge: shiftEdge(c.edge), other: shiftEdge(c.other) };
+    // horizontal | vertical | length all carry a bare `edge`.
+    return { ...c, edge: shiftEdge(c.edge) };
+  });
+
+  const bulges = f.bulges
+    ? Object.fromEntries(
+        Object.entries(f.bulges).map(([k, v]) => [shiftEdge(Number(k)), v])
+      )
+    : f.bulges;
+
+  return {
+    ...f,
+    ...(constraints ? { constraints } : {}),
+    ...(bulges ? { bulges } : {}),
+  };
+}
+
+/**
+ * Round one sharp corner into an arc: trim both adjacent edges back by the
+ * tangent distance, drop the sharp corner, and insert the two trim points
+ * plus a bulge for the arc between them.
+ *
+ * Trim distance is r / tan(interiorAngle / 2) -- the standard fillet
+ * construction, verified against a non-90-degree corner on purpose (a
+ * rectangle's 90-degree corners cannot tell trim-by-r apart from the correct
+ * trim-by-r/tan(45deg)=r, since they are numerically identical there).
+ */
+export function filletCorner<T extends SketchLike>(f: T, corner: number, radius: number): T {
+  const n = f.points.length;
+  const prevI = (corner - 1 + n) % n;
+  const nextI = (corner + 1) % n;
+  const C = f.points[corner];
+  const P = f.points[prevI];
+  const N = f.points[nextI];
+
+  const vIn: Point = [P[0] - C[0], P[1] - C[1]];
+  const vOut: Point = [N[0] - C[0], N[1] - C[1]];
+  const lenIn = Math.hypot(vIn[0], vIn[1]);
+  const lenOut = Math.hypot(vOut[0], vOut[1]);
+  if (lenIn === 0 || lenOut === 0) return f; // a zero-length adjacent edge: no corner here to round
+
+  const cosInterior = (vIn[0] * vOut[0] + vIn[1] * vOut[1]) / (lenIn * lenOut);
+  const interior = Math.acos(Math.max(-1, Math.min(1, cosInterior)));
+
+  // Never trust the caller's radius past what this corner can actually take.
+  // Same formula maxFilletRadius() advertises, computed inline since this
+  // function already has lenIn/lenOut/interior in hand -- a radius beyond it
+  // trims past the far corner and self-crosses the outline (Finding 1,
+  // sketch gauntlet round 2), so clamp instead of splicing garbage, and
+  // refuse (return f unchanged) when even the smallest positive radius has
+  // nowhere safe to go.
+  const safeRadius = (Math.min(lenIn, lenOut) / 2) * Math.tan(interior / 2);
+  const clampedRadius = Math.min(Math.max(0, radius), safeRadius);
+  if (clampedRadius <= 0) return f;
+  const trim = clampedRadius / Math.tan(interior / 2);
+
+  const pointIn: Point = [C[0] + (vIn[0] / lenIn) * trim, C[1] + (vIn[1] / lenIn) * trim];
+  const pointOut: Point = [C[0] + (vOut[0] / lenOut) * trim, C[1] + (vOut[1] / lenOut) * trim];
+
+  // Sign of the turn at C: positive (CCW) for a convex corner on a
+  // CCW-wound outline. The arc's sweep is the corner's exterior angle
+  // (pi - interior), signed the same way.
+  const inEdge: Point = [C[0] - P[0], C[1] - P[1]];
+  const outEdge: Point = [N[0] - C[0], N[1] - C[1]];
+  const cross = inEdge[0] * outEdge[1] - inEdge[1] * outEdge[0];
+  const sweep = Math.PI - interior;
+  const bulge = (cross >= 0 ? 1 : -1) * Math.tan(sweep / 4);
+
+  const points = [...f.points];
+  points.splice(corner, 1, pointIn, pointOut);
+
+  // The seam is right before the corner being rounded -- see reindex()'s own
+  // comment for why this exact insertedAt makes ONE shared function correct
+  // for both callers.
+  const insertedAt = corner - 1;
+
+  // A 'lock' on the corner being rounded away has no surviving point to
+  // point at -- the corner itself is deleted, replaced by two new trim
+  // points. reindex()'s generic "shift anything past insertedAt" rule
+  // cannot tell that deletion apart from addCorner()'s plain insertion
+  // shift, so left to it a lock here is silently reassigned to pointOut, a
+  // point the student never selected (Finding 2, sketch gauntlet round 2).
+  // Strip it before reindexing the rest -- every OTHER constraint still
+  // needs the ordinary shift, which is why this filters rather than
+  // replacing reindex() itself. The caller decides whether and how to tell
+  // the student their pin is gone.
+  const constraintsMinusRoundedPin = f.constraints?.filter(
+    (c) => !(c.kind === 'lock' && c.corner === corner)
+  );
+  const reindexed = reindex({ ...f, constraints: constraintsMinusRoundedPin }, insertedAt);
+  const bulges = { ...(reindexed.bulges ?? {}) };
+  bulges[corner] = bulge;
+
+  return { ...reindexed, points, bulges };
+}
+
+/**
+ * The outline in plane coordinates, curves sampled into short straight runs
+ * -- what the preview overlay and (conceptually) the generated geometry both
+ * draw. A circle samples 48 points around its centre; a bulged edge samples
+ * max(8, ceil(|sweep| / 7.5deg)), so a barely-curved edge still gets a
+ * believable arc and a near-full circle does not look faceted.
+ */
+export function tessellate(f: SketchLike): Point[] {
+  const circle = circleOf(f);
+  if (circle) {
+    const samples = 48;
+    const out: Point[] = [];
+    for (let i = 0; i < samples; i++) {
+      const t = (i / samples) * Math.PI * 2;
+      out.push([circle.center[0] + circle.radius * Math.cos(t), circle.center[1] + circle.radius * Math.sin(t)]);
+    }
+    return out;
+  }
+
+  const pts = f.points;
+  const n = pts.length;
+  const out: Point[] = [];
+  for (let i = 0; i < n; i++) {
+    out.push(pts[i]);
+    const bulge = f.bulges?.[i];
+    if (!bulge) continue;
+    const a = pts[i];
+    const b = pts[(i + 1) % n];
+    const { center, radius, startAngle, endAngle } = arcFromBulge(a, b, bulge);
+    const sweep = signedSweep(startAngle, endAngle, bulge);
+    const samples = Math.max(8, Math.ceil(Math.abs(sweep) / ((7.5 * Math.PI) / 180)));
+    for (let s = 1; s < samples; s++) {
+      const t = startAngle + sweep * (s / samples);
+      out.push([center[0] + radius * Math.cos(t), center[1] + radius * Math.sin(t)]);
+    }
+  }
+  return out;
+}

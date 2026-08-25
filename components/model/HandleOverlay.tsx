@@ -11,6 +11,23 @@
 // the drag, which is what keeps the model still while a dimension moves.
 
 import { useEffect, useRef, useState } from 'react';
+import { arcFromBulge, type Point } from '../../lib/sketch-arc';
+
+/**
+ * One selected sketch's outline, in plane coordinates -- what the overlay
+ * needs to draw it, alongside the corner param names used to look up each
+ * corner's projected anchor. `shape`/`bulges` mirror SketchFeature exactly;
+ * this is a plain data carrier, not a re-derivation of the doc.
+ */
+export interface SketchOutline {
+  /** Param name of each corner's u-value, in order -- the key AnchorPoint is
+   *  looked up by, same as before this carried plane geometry too. */
+  corners: string[];
+  /** The same corners' plane coordinates, parallel to `corners`. */
+  points: Point[];
+  shape?: 'circle';
+  bulges?: Record<number, number>;
+}
 
 export interface AnchorPoint {
   param: string;
@@ -37,10 +54,79 @@ interface Props {
   /** How much the dimension moves per unit the handle moves. */
   scales: Record<string, number>;
   onDrag: (param: string, value: number) => void;
-  /** Corners of any sketch on screen, so the outline can be drawn. */
-  outlines?: string[][];
+  /** Any sketch on screen, so the outline can be drawn. */
+  outlines?: SketchOutline[];
   /** Called once when the drag ends, to fold the result back into the doc. */
   onCommit: () => void;
+}
+
+/**
+ * A plane point Q, projected through corner `basis`'s own screen anchor --
+ * P0.screen + (Q.u - P0.u)*(ux,uy) + (Q.v - P0.v)*(vx,vy). Pure client
+ * arithmetic: the runner projects only the real corner anchors, and this
+ * reuses that one affine step for every sampled point along a curve, rather
+ * than round-tripping 48 points per circle through the runner every frame.
+ *
+ * `basis` is deliberately the curve's OWN nearby corner, not one shared
+ * origin for the whole sketch -- that bounds how far the affine assumption
+ * has to carry a point before perspective drift shows up on screen.
+ */
+function projectFrom(basis: AnchorPoint, basisPlane: Point, q: Point): { x: number; y: number } {
+  const du = q[0] - basisPlane[0];
+  const dv = q[1] - basisPlane[1];
+  return {
+    x: basis.x + du * (basis.ux ?? 0) + dv * (basis.vx ?? 0),
+    y: basis.y + du * (basis.uy ?? 0) + dv * (basis.vy ?? 0),
+  };
+}
+
+/** The outline's screen points, or null when a corner anchor is not on
+ *  screen (edge-on plane, same fallback the old flat rendering already had
+ *  via its `pts.length < 2` skip). */
+function projectOutline(o: SketchOutline, at: Map<string, AnchorPoint>): { x: number; y: number }[] | null {
+  const anchors = o.corners.map((c) => at.get(c));
+  if (anchors.some((a) => !a || a.ux === undefined || a.uy === undefined)) return null;
+  const A = anchors as AnchorPoint[];
+
+  if (o.shape === 'circle' && o.points.length === 2) {
+    const [c0, c1] = o.points;
+    const center: Point = [(c0[0] + c1[0]) / 2, (c0[1] + c1[1]) / 2];
+    const radius = Math.hypot(c1[0] - c0[0], c1[1] - c0[1]) / 2;
+    const start = Math.atan2(c0[1] - center[1], c0[0] - center[0]);
+    const samples = 48;
+    const out: { x: number; y: number }[] = [];
+    for (let i = 0; i < samples; i++) {
+      const t = start + (i / samples) * Math.PI * 2;
+      const q: Point = [center[0] + radius * Math.cos(t), center[1] + radius * Math.sin(t)];
+      // Half the ring off each real anchor's own basis, so neither half ever
+      // carries the affine assumption further than a quarter turn.
+      const half = i < samples / 2 ? 0 : 1;
+      out.push(projectFrom(A[half], o.points[half], q));
+    }
+    return out;
+  }
+
+  const out: { x: number; y: number }[] = [];
+  const count = o.points.length;
+  for (let i = 0; i < count; i++) {
+    out.push(projectFrom(A[i], o.points[i], o.points[i]));
+    const bulge = o.bulges?.[i];
+    if (!bulge) continue;
+    const a = o.points[i];
+    const b = o.points[(i + 1) % count];
+    const { center, radius, startAngle, endAngle } = arcFromBulge(a, b, bulge);
+    let sweep = endAngle - startAngle;
+    if (bulge > 0 && sweep < 0) sweep += Math.PI * 2;
+    if (bulge < 0 && sweep > 0) sweep -= Math.PI * 2;
+    const samples = Math.max(8, Math.ceil(Math.abs(sweep) / ((7.5 * Math.PI) / 180)));
+    for (let s = 1; s < samples; s++) {
+      const t = startAngle + sweep * (s / samples);
+      const q: Point = [center[0] + radius * Math.cos(t), center[1] + radius * Math.sin(t)];
+      // The edge's OWN start corner is the basis for every sample on it.
+      out.push(projectFrom(A[i], o.points[i], q));
+    }
+  }
+  return out;
 }
 
 export default function HandleOverlay({
@@ -108,9 +194,9 @@ export default function HandleOverlay({
           extrudes it -- but a student needs to see what they are drawing. */}
       {outlines && outlines.length > 0 && (
         <svg className="sketch-lines" aria-hidden="true">
-          {outlines.map((corners, n) => {
-            const pts = corners.map((c) => at.get(c)).filter(Boolean) as AnchorPoint[];
-            if (pts.length < 2) return null;
+          {outlines.map((o, n) => {
+            const pts = projectOutline(o, at);
+            if (!pts || pts.length < 2) return null;
             return (
               <polygon
                 key={n}

@@ -12,9 +12,9 @@ import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
 import ShPlayDocsContent from './ShPlayDocsContent';
 import ModelEditor from './model/ModelEditor';
-import HandleOverlay, { type AnchorPoint } from './model/HandleOverlay';
+import HandleOverlay, { type AnchorPoint, type SketchOutline } from './model/HandleOverlay';
 import { handlesFor } from '../lib/model-handles';
-import { EMPTY_DOC, type ModelDoc } from '../lib/model-types';
+import { EMPTY_DOC, type Feature, type ModelDoc } from '../lib/model-types';
 import {
   applyParam,
   paramValues as docParams,
@@ -295,14 +295,21 @@ export default function SandboxWorkspace() {
     [specs]
   );
 
-  // One entry per selected sketch, listing its corner parameters in order so
-  // the overlay can close the loop.
+  // One entry per selected sketch: its corner parameters (so the overlay can
+  // look up each corner's projected anchor) alongside the plane geometry
+  // that decides what gets drawn between them -- straight, an arc, or the
+  // full circle a two-point diameter tag means.
   const outlines = useMemo(
     () =>
       doc.features
-        .filter((f) => f.kind === 'sketch' && selected.includes(f.id))
-        .map((f) =>
-          f.kind === 'sketch' ? f.points.map((_, i) => `${f.id}_p${i}u`) : []
+        .filter((f): f is Feature & { kind: 'sketch' } => f.kind === 'sketch' && selected.includes(f.id))
+        .map(
+          (f): SketchOutline => ({
+            corners: f.points.map((_, i) => `${f.id}_p${i}u`),
+            points: f.points,
+            shape: f.shape,
+            bulges: f.bulges,
+          })
         ),
     [doc, selected]
   );

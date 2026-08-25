@@ -36,6 +36,17 @@
       "onshape": "Dimension",
       "shcad": "Length",
       "where": "sketch-solve.ts constraint 'length' -- distance only, no angle"
+    },
+    {
+      "onshape": "Center Point Circle",
+      "shcad": "Circle",
+      "where": "SketchFeature.shape 'circle' -- two points read as a diameter (lib/sketch-arc.ts circleOf()) -- plus the toolbar's Circle button (ModelEditor.tsx startCircleSketch()). Not a centre-plus-drag click: that needs the click-to-draw surface chrome2d names below, which still does not exist"
+    },
+    {
+      "onshape": "Sketch Fillet",
+      "shcad": "Round a corner",
+      "where": "lib/sketch-arc.ts filletCorner() -- trims both adjacent edges and inserts an arc via a bulge (tan(includedAngle/4)) -- wired to a per-corner radius field in the Rules panel (SketchConstraints.tsx).",
+      "partial": "corner-bearing sketches only, and reachable only from the Rules panel -- there is no click-a-corner-on-the-canvas surface, because there is no 2D canvas. A circle sketch renders no Rules panel and has no corners, so Round is unreachable for it by design. The refusal message that explains this has been wrong three times in a row, each generation naming a remedy the student could not reach; it now names none and just states what is true. This entry is an artefact under test like any other -- it overclaimed twice before saying this much."
     }
   ],
   "build": [
@@ -43,7 +54,7 @@
       "id": "shape",
       "name": "the representation",
       "covers": [],
-      "why": "SketchFeature.points is Array<[number,number]> -- a closed polyline and nothing else. No arc, circle, rectangle or fillet can exist until that changes. Every other item below is blocked on it, so it is decided first, by a judged panel rather than by whoever builds first."
+      "why": "DECIDED (build 1, panel-reviewed): SketchFeature gained two optional fields, additive to the existing points: Array<[number,number]> -- shape?: 'circle' (a tag, not an inference, read by circleOf()) and bulges?: Record<edge, number> (tan(includedAngle/4) on the edge leaving a corner, read by arcFromBulge()/tessellate() in lib/sketch-arc.ts). A sketch saved before this field existed has neither key and still loads, builds and renders exactly as before -- see scripts/check-sketch-compat.mjs. lib/sketch-solve.ts (the constraint relaxation solver) is UNCHANGED; both write-back paths already spread {...f, points}, so shape/bulges survive a solve untouched. Circle and Round a corner (fillet) ship on this. Arc, Rectangle and Polygon are unblocked by it but wait on chrome2d below, which is a different blocker"
     },
     {
       "id": "rect",
@@ -52,15 +63,7 @@
         "Corner Rectangle",
         "Center Point Rectangle"
       ],
-      "why": "the starter sketch is already a rectangle typed in by hand; drawing one is the first thing anybody tries"
-    },
-    {
-      "id": "circle",
-      "name": "Circle",
-      "covers": [
-        "Center Point Circle"
-      ],
-      "why": "needed by almost every part a student wants to make, and impossible in a polyline"
+      "why": "CORRECTED: never representation-blocked. newSketch() already emits a rectangle (four points, typed in by hand), and a straight-edged polyline was always exactly the right shape for one -- the representation panel added nothing this needed. Blocked on chrome2d: there is no click-to-draw surface, only a 3D-projected drag overlay (HandleOverlay.tsx) over the preview iframe, and two clicks on empty sketch-plane space is not something that overlay can place yet"
     },
     {
       "id": "arc",
@@ -69,16 +72,7 @@
         "3 Point Arc",
         "Tangent Arc"
       ],
-      "why": "the other half of a real outline; tangent arc is what makes a slot or a rounded tab"
-    },
-    {
-      "id": "fillet",
-      "name": "Round a corner",
-      "covers": [
-        "Sketch Fillet",
-        "Sketch Chamfer"
-      ],
-      "why": "load-bearing: the app currently REFUSES to round a solid built from a sketch and tells the student to round the sketch's corners instead. That remedy does not exist. Building it is what makes our own refusal message true."
+      "why": "CORRECTED: representation-UNBLOCKED. bulges (see the shape item) expresses an arc exactly -- filletCorner() already builds one, tessellate() already samples one, HandleOverlay already draws one. What is missing is the same interaction surface rect and polygon are waiting on: a 3-Point or Tangent arc is drawn by clicking points on an empty sketch plane, and there is no click-to-draw surface yet, only a 3D-projected drag overlay with fixed handles at existing corners"
     },
     {
       "id": "polygon",
@@ -87,7 +81,15 @@
         "Inscribed Polygon",
         "Circumscribed Polygon"
       ],
-      "why": "a loop with n sides, which is a for-loop the student can see; cheap once the representation allows it"
+      "why": "CORRECTED: never representation-blocked -- N points is exactly what a closed polyline already is, and generating them is a for-loop the student can see. Blocked on chrome2d, same as Rectangle: there is nowhere to click to place the shape before the loop can size it"
+    },
+    {
+      "id": "chamfer2d",
+      "name": "Slice a corner",
+      "covers": [
+        "Sketch Chamfer"
+      ],
+      "why": "split out of the old 'fillet' item: Sketch Fillet shipped (Round a corner, via filletCorner() in lib/sketch-arc.ts -- rounds with an arc). A sketch-level CHAMFER slices the corner off flat instead: a straight replacement edge between two trim points, no bulge, no arc math. Same shape of work as the solid Angled Corner tool already does for a box or cylinder, not yet built for a sketch outline"
     },
     {
       "id": "construction",
@@ -132,7 +134,7 @@
       "id": "chrome2d",
       "name": "the bar itself",
       "covers": [],
-      "why": "the sketch bar appears only while a sketch is open, groups by draw/modify/constrain, and carries its own search. Ours has no bar at all -- constraints live in a side panel."
+      "why": "CORRECTED: the bar already exists -- ModelEditor.tsx's .model-tools has grouped buttons, a FlyoutButton that collapses variants under a caret (the same drop-down pattern Onshape's own tools.htm describes), and a search box with matches() filtering, same as the feature toolbar. The Sketch group is the first group on it and now has three buttons (Sketch, Circle, Corner). What is genuinely missing: a click-to-draw SURFACE. The sketch editing surface is a 3D-projected drag overlay (HandleOverlay.tsx) over the preview iframe -- corners are dragged, not placed by clicking empty sketch-plane space -- so Rectangle, Arc and Polygon above are blocked here, on interaction, not on the representation panel this item used to gate them on"
     }
   ],
   "outOfScope": [

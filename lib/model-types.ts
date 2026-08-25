@@ -8,6 +8,7 @@
 // visual mode belongs in a CS course rather than beside one.
 
 import type { Constraint as SketchConstraint } from './sketch-solve';
+import { reindex } from './sketch-arc';
 
 /** Re-exported so a caller needs one import to work with a sketch. */
 export type { Constraint as SketchConstraint } from './sketch-solve';
@@ -89,6 +90,24 @@ export interface SketchFeature {
   offset: number;
   /** Corners in plane coordinates, in order. The outline always closes. */
   points: Array<[number, number]>;
+  /**
+   * How the outline is read. Absent = a straight-edged polyline, which is
+   * every sketch saved before this field existed. 'circle' = exactly two
+   * points, which are the ends of a diameter.
+   *
+   * This is a TAG, not an inference. The two-point-plus-bulges form was
+   * considered and rejected: it made "is this a circle" a float comparison
+   * repeated at three call sites with nothing tying them together.
+   */
+  shape?: 'circle';
+  /**
+   * Bulge of the edge LEAVING corner n (edge n = corner n -> corner n+1,
+   * wrapping -- the same convention edgeCorners() in sketch-solve.ts already
+   * uses). tan(includedAngle / 4). 0 or a missing key is a straight edge.
+   * Never written when shape === 'circle': the tag is the only source of
+   * truth there, so the two cannot disagree. See lib/sketch-arc.ts.
+   */
+  bulges?: Record<number, number>;
   /** Rules the corners must obey. Absent means free-hand. */
   constraints?: SketchConstraint[];
 }
@@ -315,13 +334,36 @@ export function whyCannotRound(f: Feature): string | null {
     return `Rounding works on a shape, not a combination. Round the shapes before you ${verb} them.`;
   }
   if (f.kind === 'sketch') {
-    // There is no corner-rounding tool anywhere in the sketch editor -- do
-    // not send a student looking for a button that does not exist.
-    return "Rounding works on a solid shape, not a flat sketch. The sketch tool has no way to round a corner yet.";
+    // A circle sketch has no Rules panel -- ModelEditor.tsx only renders
+    // SketchConstraints (the panel that carries Round a corner) when
+    // shape !== 'circle', because a circle has no corners for that panel's
+    // per-edge rows to describe. Naming that remedy for a circle anyway
+    // points the student at a control they cannot reach.
+    //
+    // This message has now been wrong three times, each time narrower: first
+    // it named a corner-rounding tool that did not exist; then it named the
+    // Rules panel, which a circle never renders; then it said to pull the
+    // circle into a solid and round THAT, which isRoundable() refuses for
+    // anything but a box or a cylinder. Three generations of naming a
+    // remedy that cannot be reached. So this one names none: it states what
+    // is true about a circle and stops.
+    if (f.shape === 'circle') {
+      return 'A circle has no corners to round — it is already round the whole way. Rounding is for shapes with edges, like a box.';
+    }
+    // A real remedy now exists -- Round a corner in the Rules panel, below
+    // the sketch's own edge table -- so this names it rather than the older
+    // sentence claiming no such tool existed, which stopped being true the
+    // day that panel shipped.
+    return 'Rounding works on a solid shape, not a flat sketch. To round a corner here, use Round a corner in the Rules panel.';
   }
   if (f.kind === 'extrude' || f.kind === 'revolve') {
-    const verb = f.kind === 'extrude' ? 'pulled' : 'spun';
-    return `Rounding works on a shape you build with a tool like Box or Cylinder, not one ${verb} from a sketch. The sketch tool has no way to round a corner yet.`;
+    const past = f.kind === 'extrude' ? 'pulled' : 'spun';
+    const bare = f.kind === 'extrude' ? 'pull' : 'spin';
+    // Conditional on purpose: this function is handed one feature and cannot
+    // see whether the sketch behind it has corners at all. A circle-sourced
+    // pull has none, so an unconditional "go round its corners" would be the
+    // same false remedy again, one level up.
+    return `Rounding works on a shape you build with a tool like Box or Cylinder, not one ${past} from a sketch. If its sketch has corners, use Round a corner in the Rules panel before you ${bare} it.`;
   }
   if (f.kind === 'sphere' || f.kind === 'torus') {
     return 'That shape has no edges to round — it is curved all the way round.';
@@ -424,6 +466,20 @@ export function newSketch(doc: ModelDoc, plane: SketchPlane = 'xy'): SketchFeatu
   };
 }
 
+/** A circle, drawn as the two ends of a diameter -- see SketchFeature.shape.
+ *  Not a rectangle-with-round-corners and not four points: the tag is the
+ *  only thing that makes it a circle, so the data says so directly. */
+export function newCircleSketch(doc: ModelDoc, plane: SketchPlane = 'xy'): SketchFeature {
+  return {
+    id: nextId(doc, 'sk'),
+    kind: 'sketch',
+    plane,
+    offset: 0,
+    points: [[-10, 0], [10, 0]],
+    shape: 'circle',
+  };
+}
+
 export function newExtrude(doc: ModelDoc, target: string): ExtrudeFeature {
   return { id: nextId(doc, 'pull'), kind: 'extrude', target, height: 12 };
 }
@@ -484,14 +540,25 @@ export function newMove(doc: ModelDoc, target: string, copy = false): MoveFeatur
 }
 
 /** Insert a corner halfway along the edge after `index`, which is where a
- *  student expects a new one to land when they ask for it. */
+ *  student expects a new one to land when they ask for it. A circle sketch
+ *  is refused as a no-op: its two points are diameter ends, read that way
+ *  ONLY because shape === 'circle' says so (see SketchFeature.shape), and
+ *  splicing a third point in would leave that tag pointing at a pair of
+ *  points that are no longer the diameter (Finding 3, sketch gauntlet round
+ *  2). ModelEditor.tsx's corner() already refuses before calling this, with
+ *  a message the student sees -- this is the belt under that belt. */
 export function addCorner(f: SketchFeature, index: number): SketchFeature {
+  if (f.shape === 'circle') return f;
   const a = f.points[index];
   const b = f.points[(index + 1) % f.points.length];
   const mid: [number, number] = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
   const points = [...f.points];
   points.splice(index + 1, 0, mid);
-  return { ...f, points };
+  // Reindex constraints and bulges through the same seam filletCorner() uses
+  // in lib/sketch-arc.ts -- fixes a bug that predates this build: a
+  // constraint used to go on pointing at its OLD corner/edge number even
+  // after the splice moved that number to a different point.
+  return { ...reindex(f, index), points };
 }
 
 export function newShape(doc: ModelDoc, kind: ShapeKind): Feature {

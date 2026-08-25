@@ -58,6 +58,7 @@ import {
 } from 'lucide-react';
 import SketchConstraints from './SketchConstraints';
 import type { Constraint } from '../../lib/sketch-solve';
+import { filletCorner, whyCannotRoundCorner } from '../../lib/sketch-arc';
 import {
   type Feature,
   type ModelDoc,
@@ -69,6 +70,7 @@ import {
   isRoundable,
   maxRound,
   nameMap,
+  newCircleSketch,
   newExtrude,
   newHole,
   newHoleCorners,
@@ -401,6 +403,13 @@ export default function ModelEditor({
     say('Drag the blue corners to shape it, then press Pull or Spin to make it solid.');
   }
 
+  function startCircleSketch() {
+    const f = newCircleSketch(doc);
+    onChange({ ...doc, features: [...doc.features, f] });
+    setSelected([f.id]);
+    say('Drag either handle to resize it, then press Pull or Spin to make it solid.');
+  }
+
   function pull() {
     const f = chosen[0];
     if (chosen.length !== 1 || !f || f.kind !== 'sketch') {
@@ -445,11 +454,41 @@ export default function ModelEditor({
       say('Pick a sketch to add a corner to.');
       return;
     }
+    // A circle sketch has no corners -- its two points are diameter ends,
+    // not a polyline, and splicing a third point in degrades that reading
+    // silently (Finding 3, sketch gauntlet round 2): circleOf() would then
+    // read points[0]/points[1] as the diameter, which the splice just moved.
+    if (f.shape === 'circle') {
+      say('A circle has no corners to add. Start a Sketch instead if you want straight edges to work with.');
+      return;
+    }
+    // Always inserts after corner 0 -- there is no way yet to click a
+    // specific edge to split, so this is deliberately a fixed choice rather
+    // than the `x === f ? 0 : 0` dead ternary that used to sit here (always
+    // 0 either way, which read as if it meant something). A specific corner
+    // is chosen in the Rules panel, not here.
     onChange({
       ...doc,
-      features: doc.features.map((x) => (x.id === f.id ? addCorner(f, x === f ? 0 : 0) : x)),
+      features: doc.features.map((x) => (x.id === f.id ? addCorner(f, 0) : x)),
     });
     say(null);
+  }
+
+  function roundSketchCorner(f: Extract<Feature, { kind: 'sketch' }>, corner: number, radius: number) {
+    const why = whyCannotRoundCorner(f.points, corner);
+    if (why) { say(why); return; }
+    // A pin on the corner being rounded away has no surviving point to hold
+    // -- filletCorner() drops it rather than silently reassigning it to a
+    // trim point the student never chose (Finding 2, sketch gauntlet round
+    // 2). Read that BEFORE the call so the message matches what actually
+    // happened, not a guess.
+    const hadPin = (f.constraints ?? []).some((c) => c.kind === 'lock' && c.corner === corner);
+    const next = filletCorner(f, corner, radius);
+    onChange({
+      ...doc,
+      features: doc.features.map((x) => (x.id === f.id ? next : x)),
+    });
+    say(hadPin ? 'That corner was pinned -- the pin came off when you rounded it away.' : null);
   }
 
   function mirror(plane: SketchPlane) {
@@ -599,7 +638,7 @@ export default function ModelEditor({
 
   // Group visibility for the search filter: a group's divider and wrapper
   // only render when at least one of its tools' names still matches.
-  const sketchVisible = ['Sketch', 'Corner'].some(matches);
+  const sketchVisible = ['Sketch', 'Corner', 'Circle'].some(matches);
   const createVisible = [...SHAPE_KINDS.map(shapeLabel), 'Pull', 'Spin'].some(matches);
   const modifyVisible = ['Round', 'Fillet', 'Chamfer', 'Turn', 'Hole', 'Four Corners', 'Hollow'].some(matches);
   // Split so a divider can mark the selection-rule boundary Onshape draws
@@ -621,10 +660,18 @@ export default function ModelEditor({
                   <PenLine size={14} /> Sketch
                 </button>
               )}
+              {matches('Circle') && (
+                <button onClick={startCircleSketch} title="Draw a circle to pull or spin into a solid">
+                  <Circle size={14} /> Circle
+                </button>
+              )}
               {matches('Corner') && (
                 <button
                   onClick={corner}
-                  disabled={chosen.length !== 1 || chosen[0]?.kind !== 'sketch'}
+                  disabled={
+                    chosen.length !== 1 || chosen[0]?.kind !== 'sketch' ||
+                    (chosen[0].kind === 'sketch' && chosen[0].shape === 'circle')
+                  }
                   title="Add a corner to the selected sketch"
                 >
                   <Plus size={14} /> Corner
@@ -956,11 +1003,13 @@ export default function ModelEditor({
         })}
       </ol>
 
-      {activeSketch && (
+      {activeSketch && activeSketch.shape !== 'circle' && (
         <SketchConstraints
           points={activeSketch.points}
+          bulges={activeSketch.bulges}
           constraints={activeSketch.constraints ?? []}
           onChange={(next) => setConstraints(activeSketch, next)}
+          onRound={(corner, radius) => roundSketchCorner(activeSketch, corner, radius)}
         />
       )}
 
