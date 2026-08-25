@@ -8,7 +8,7 @@
 // visual mode belongs in a CS course rather than beside one.
 
 import type { Constraint as SketchConstraint } from './sketch-solve';
-import { reindex } from './sketch-arc';
+import { splitEdge } from './sketch-arc';
 
 /** Re-exported so a caller needs one import to work with a sketch. */
 export type { Constraint as SketchConstraint } from './sketch-solve';
@@ -549,16 +549,13 @@ export function newMove(doc: ModelDoc, target: string, copy = false): MoveFeatur
  *  a message the student sees -- this is the belt under that belt. */
 export function addCorner(f: SketchFeature, index: number): SketchFeature {
   if (f.shape === 'circle') return f;
-  const a = f.points[index];
-  const b = f.points[(index + 1) % f.points.length];
-  const mid: [number, number] = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-  const points = [...f.points];
-  points.splice(index + 1, 0, mid);
-  // Reindex constraints and bulges through the same seam filletCorner() uses
-  // in lib/sketch-arc.ts -- fixes a bug that predates this build: a
-  // constraint used to go on pointing at its OLD corner/edge number even
-  // after the splice moved that number to a different point.
-  return { ...reindex(f, index), points };
+  // The geometry lives in splitEdge() (lib/sketch-arc.ts), because on an
+  // edge that is already a rounded corner's arc, "halfway along" is a point
+  // on the CURVE and the arc has to be divided into two arcs that retrace
+  // it. Doing it here with a chord midpoint and a shifted bulge key -- which
+  // is what this used to do -- halved that arc's radius silently. Constraint
+  // and bulge reindexing past the seam comes along with it.
+  return splitEdge(f, index);
 }
 
 export function newShape(doc: ModelDoc, kind: ShapeKind): Feature {

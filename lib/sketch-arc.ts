@@ -88,6 +88,14 @@ export function circleOf(f: { shape?: 'circle'; points: Point[] }): { center: Po
   };
 }
 
+/** Radians. Two edges meeting at a corner whose directions differ by less
+ *  than this are one straight line as far as anything in this file is
+ *  concerned. Deliberately tiny: a corner that is merely FLAT (say 179deg)
+ *  really can take a large fillet, and saying otherwise would refuse work
+ *  that is perfectly buildable. What this catches is exact collinearity,
+ *  which is what addCorner() produces on every straight edge. */
+const STRAIGHT_TOL = 1e-6;
+
 /**
  * The real ceiling on this corner's fillet radius: the radius whose trim
  * distance (r / tan(interior/2), filletCorner()'s own formula) reaches
@@ -102,9 +110,34 @@ export function circleOf(f: { shape?: 'circle'; points: Point[] }): { center: Po
  * 90-degree corner tan(45deg) = 1, so this returns the same number the old
  * formula did -- verified by the existing rectangle assertion below, which a
  * fix that broke the 90-degree case would fail.
+ *
+ * Two whole-corner refusals live here rather than in the caller, because
+ * every caller of this number treats 0 as "this corner cannot be rounded":
+ *
+ *   - A STRAIGHT corner (interior 180deg). This used to fall out as
+ *     tan(PI/2) = Infinity, i.e. "any radius you like" -- and filletCorner()
+ *     then trimmed by r/tan(PI/2) = 0 and spliced two IDENTICAL points with
+ *     a zero bulge, leaving a duplicate point and a zero-length edge that
+ *     made every later round of the neighbours no-op forever. Every corner
+ *     addCorner() creates on a straight edge is exactly this corner, so it
+ *     was not a corner case, it was the common case.
+ *   - A corner with an already-CURVED edge on either side. filletCorner()'s
+ *     whole construction reads the two adjacent edges as straight chords, so
+ *     next to an arc it neither meets the arc tangentially nor leaves that
+ *     arc's radius alone (trimming its chord while its bulge factor stays
+ *     put silently rescales it). Refusing is the honest answer; see
+ *     whyCannotRoundCorner() for the words.
+ *
+ * `bulges` is optional so a caller with only a point list still gets the
+ * straight/sharp answers; pass it whenever you have it.
  */
-export function maxFilletRadius(points: Point[], corner: number): number {
+export function maxFilletRadius(
+  points: Point[], corner: number, bulges?: Record<number, number>
+): number {
   const n = points.length;
+  // Edge i runs points[i] -> points[i+1], so this corner's two edges are
+  // `corner - 1` coming in and `corner` going out.
+  if (bulges && (bulges[(corner - 1 + n) % n] || bulges[corner])) return 0;
   const prev = points[(corner - 1 + n) % n];
   const c = points[corner];
   const next = points[(corner + 1) % n];
@@ -115,6 +148,7 @@ export function maxFilletRadius(points: Point[], corner: number): number {
   const vOut: Point = [next[0] - c[0], next[1] - c[1]];
   const cosInterior = (vIn[0] * vOut[0] + vIn[1] * vOut[1]) / (lenIn * lenOut);
   const interior = Math.acos(Math.max(-1, Math.min(1, cosInterior)));
+  if (Math.PI - interior < STRAIGHT_TOL) return 0;
   return (Math.min(lenIn, lenOut) / 2) * Math.tan(interior / 2);
 }
 
@@ -126,9 +160,44 @@ export function maxFilletRadius(points: Point[], corner: number): number {
  * skips the slider -- needs something to say instead of quietly building
  * nothing, the same complaint whyCannotRound() in model-types.ts exists to
  * answer for a whole feature.
+ *
+ * On remedies: only the two ANGLE answers name one, and the remedy they name
+ * is dragging the corner, which is a real handle a student can grab --
+ * sketchHandles() in lib/model-handles.ts emits a two-axis 'point' handle per
+ * sketch corner and HandleOverlay.tsx draws it. The CURVED-neighbour answer
+ * deliberately names no remedy: there is no un-round action in the app, so
+ * "straighten that edge first" would be an instruction with nothing behind
+ * it. It states the limit and stops.
  */
-export function whyCannotRoundCorner(points: Point[], corner: number): string | null {
-  if (maxFilletRadius(points, corner) > 0) return null;
+export function whyCannotRoundCorner(
+  points: Point[], corner: number, bulges?: Record<number, number>
+): string | null {
+  if (maxFilletRadius(points, corner, bulges) > 0) return null;
+  const n = points.length;
+  if (bulges && (bulges[(corner - 1 + n) % n] || bulges[corner])) {
+    return "One of the two edges at this corner is already a curve, and shCode can only round a corner where both of its edges are straight.";
+  }
+  const prev = points[(corner - 1 + n) % n];
+  const c = points[corner];
+  const next = points[(corner + 1) % n];
+  const lenIn = Math.hypot(c[0] - prev[0], c[1] - prev[1]);
+  const lenOut = Math.hypot(next[0] - c[0], next[1] - c[1]);
+  // A zero-length edge is NOT a sharp angle -- there is no angle at all, the
+  // two points are on top of each other. Saying "drag it into a wider angle"
+  // here is a false diagnosis of a real state the Rules panel can produce in
+  // one click (sketch gauntlet round 3, live lens). The remedy named is the
+  // corner handle, which sketchHandles() really does emit for every point.
+  if (lenIn === 0 || lenOut === 0) {
+    return "Two corners of this sketch are sitting on top of each other, so one of the edges here has no length at all. Drag them apart first.";
+  }
+  if (lenIn > 0 && lenOut > 0) {
+    const cosInterior = ((prev[0] - c[0]) * (next[0] - c[0]) + (prev[1] - c[1]) * (next[1] - c[1]))
+      / (lenIn * lenOut);
+    const interior = Math.acos(Math.max(-1, Math.min(1, cosInterior)));
+    if (Math.PI - interior < STRAIGHT_TOL) {
+      return "This corner is straight -- both of its edges run in one line, so there is no corner sticking out to round off. Drag the corner away from that line first.";
+    }
+  }
   return "This corner is too sharp to round -- its two edges nearly double back on each other. Drag it into a wider angle first.";
 }
 
@@ -147,6 +216,21 @@ export function whyCannotRoundCorner(points: Point[], corner: number): string | 
  *     legitimately still means "the arc," because the arc never existed
  *     before this call. Its caller fills that slot in separately.)
  * A corner or edge index <= insertedAt is untouched either way.
+ *
+ * WHAT THIS FUNCTION IS NOT ALLOWED TO BE ASKED. It moves a bulge's KEY and
+ * never its VALUE -- and a bulge's value is shape-relative, a factor of its
+ * own chord (tan(sweep/4)), not an absolute radius. So it is only correct
+ * while every surviving edge still spans the same two points it spanned
+ * before. Hand it an operation that MOVED an edge's endpoints and that
+ * edge's arc silently rescales: same factor, different chord, different
+ * radius, different centre, no error and nothing on screen to notice.
+ *
+ * That is one bug, and it wore three faces (sketch gauntlet round 2 -> 3):
+ * splitting a bulged edge halved its radius, and rounding a corner next to a
+ * bulged edge shortened that arc's chord by the trim. Both are now handled
+ * where the endpoints actually move -- splitEdge() below owns the split, and
+ * filletCorner() refuses a curved neighbour outright -- which leaves this
+ * function a pure index shift, correctly, for both callers.
  */
 export function reindex<T extends SketchLike>(f: T, insertedAt: number): T {
   const shiftCorner = (c: number) => (c > insertedAt ? c + 1 : c);
@@ -170,6 +254,68 @@ export function reindex<T extends SketchLike>(f: T, insertedAt: number): T {
     ...(constraints ? { constraints } : {}),
     ...(bulges ? { bulges } : {}),
   };
+}
+
+/**
+ * Put one new corner halfway along edge `index`, leaving the OUTLINE exactly
+ * where it was. This is addCorner()'s whole body; it lives here because the
+ * hard half of it is bulge arithmetic.
+ *
+ * Halfway along the edge AS DRAWN, which on a curved edge is not halfway
+ * along its chord:
+ *
+ *   - Straight edge: the chord midpoint. A point already on the line adds a
+ *     corner without moving the outline a micron. It is exactly collinear,
+ *     which is a real corner in the point list and NOT a roundable one --
+ *     see maxFilletRadius()'s straight case. Nudging it off the line to make
+ *     it roundable was the alternative and it is worse: asking for a corner
+ *     would change the shape you already drew.
+ *   - Curved edge: the point ON THE ARC at half its sweep, and the arc is
+ *     divided into two arcs that together retrace the original curve. Each
+ *     half turns through half the angle, so each half's bulge is
+ *     tan(sweep/8) where the whole was tan(sweep/4) -- the half-angle
+ *     identity tan(x/2) = (sqrt(1+t^2) - 1)/t with t = tan(x) gives that
+ *     straight from the stored number: b' = (sqrt(1+b^2) - 1)/b.
+ *
+ * Before this, both halves inherited the WHOLE edge's bulge factor across
+ * HALF the chord -- half the radius each, moved centres, a visibly different
+ * outline, and no error anywhere. The check that catches a regression is a
+ * before/after tessellate() area+perimeter comparison, not a look at the
+ * bulge numbers: a wrong split still produces plausible-looking numbers.
+ *
+ * A circle sketch is refused (unchanged): its two points are diameter ends
+ * because shape === 'circle' says so, and a third point makes that tag a lie.
+ */
+export function splitEdge<T extends SketchLike>(f: T, index: number): T {
+  if (f.shape === 'circle') return f;
+  const n = f.points.length;
+  const a = f.points[index];
+  const b = f.points[(index + 1) % n];
+  if (!a || !b) return f;
+  const bulge = f.bulges?.[index] ?? 0;
+
+  if (!bulge) {
+    const mid: Point = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+    const points = [...f.points];
+    points.splice(index + 1, 0, mid);
+    return { ...reindex(f, index), points };
+  }
+
+  const { center, radius, startAngle, endAngle } = arcFromBulge(a, b, bulge);
+  const sweep = signedSweep(startAngle, endAngle, bulge);
+  const half = startAngle + sweep / 2;
+  const mid: Point = [center[0] + radius * Math.cos(half), center[1] + radius * Math.sin(half)];
+  const halfBulge = (Math.sqrt(1 + bulge * bulge) - 1) / bulge;
+
+  const points = [...f.points];
+  points.splice(index + 1, 0, mid);
+
+  // reindex() shifts every OTHER edge's bulge past the seam correctly,
+  // because no other edge's endpoints moved. The two it cannot know about
+  // are the two halves of the edge just split, which this owns.
+  const shifted = reindex(f, index);
+  const bulges = { ...(shifted.bulges ?? {}), [index]: halfBulge, [index + 1]: halfBulge };
+  return { ...shifted, points, bulges };
 }
 
 /**
@@ -199,17 +345,30 @@ export function filletCorner<T extends SketchLike>(f: T, corner: number, radius:
   const cosInterior = (vIn[0] * vOut[0] + vIn[1] * vOut[1]) / (lenIn * lenOut);
   const interior = Math.acos(Math.max(-1, Math.min(1, cosInterior)));
 
-  // Never trust the caller's radius past what this corner can actually take.
-  // Same formula maxFilletRadius() advertises, computed inline since this
-  // function already has lenIn/lenOut/interior in hand -- a radius beyond it
-  // trims past the far corner and self-crosses the outline (Finding 1,
-  // sketch gauntlet round 2), so clamp instead of splicing garbage, and
-  // refuse (return f unchanged) when even the smallest positive radius has
-  // nowhere safe to go.
-  const safeRadius = (Math.min(lenIn, lenOut) / 2) * Math.tan(interior / 2);
+  // Never trust the caller's radius past what this corner can actually take:
+  // a radius beyond it trims past the far corner and self-crosses the
+  // outline (Finding 1, sketch gauntlet round 2), so clamp instead of
+  // splicing garbage, and refuse (return f unchanged) when even the smallest
+  // positive radius has nowhere safe to go.
+  //
+  // Asked of maxFilletRadius() rather than recomputed inline, which is the
+  // change that makes this function refuse a STRAIGHT corner and a corner
+  // next to an already-curved edge: both come back as 0 there, and 0 lands
+  // in the clampedRadius <= 0 refusal below. Two copies of this formula is
+  // exactly how the straight-corner hole opened -- the copy here had no
+  // 180-degree case because the copy there did not either.
+  const safeRadius = maxFilletRadius(f.points, corner, f.bulges);
   const clampedRadius = Math.min(Math.max(0, radius), safeRadius);
   if (clampedRadius <= 0) return f;
   const trim = clampedRadius / Math.tan(interior / 2);
+  // Belt under the belt, and the one invariant this function must never
+  // break: the two points about to be spliced in are pointIn and pointOut,
+  // both `trim` away from C along different rays. A trim of zero (or NaN)
+  // makes them the same point, which is a duplicate point and a zero-length
+  // edge in the outline -- and a zero-length edge is what makes lenIn === 0
+  // for the neighbours, so every later round of them silently no-ops
+  // forever. Relative to the edges so it means the same thing at any scale.
+  if (!(trim > 1e-9 * Math.min(lenIn, lenOut))) return f;
 
   const pointIn: Point = [C[0] + (vIn[0] / lenIn) * trim, C[1] + (vIn[1] / lenIn) * trim];
   const pointOut: Point = [C[0] + (vOut[0] / lenOut) * trim, C[1] + (vOut[1] / lenOut) * trim];

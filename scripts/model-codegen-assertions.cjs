@@ -1135,6 +1135,51 @@ module.exports = function run(dir) {
     'a stale sketchVisible list would hide the whole sketch group, including the button being searched for, ' +
     'the moment a student typed "circle" into Search tools');
 
+  console.log('\n=== sketch build 1: addCorner on a ROUNDED edge keeps the outline ===');
+
+  // The button a student presses is Corner, and it calls addCorner() -- not
+  // splitEdge(), which is where the arc arithmetic lives. So the outline
+  // guarantee is asserted here too, at the entry point the app actually
+  // reaches, and against tessellate(): a bulge is a factor of its own chord,
+  // so a split that shifts the KEY and keeps the VALUE hands each half the
+  // whole edge's factor over half the chord -- half the radius each. That
+  // reads as a perfectly plausible pair of bulge numbers. Only the shape
+  // gives it away.
+  const arcLib = require(path.join(dir, 'sketch-arc.js'));
+  const area = (pts) => {
+    let a = 0;
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i], q = pts[(i + 1) % pts.length];
+      a += p[0] * q[1] - q[0] * p[1];
+    }
+    return Math.abs(a) / 2;
+  };
+
+  // A rectangle with corner 1 rounded at r = 8, then Corner pressed on the
+  // arc edge. Built through the real functions, not hand-written numbers.
+  const roundedRect = arcLib.filletCorner(
+    { id: 'sk6', kind: 'sketch', plane: 'xy', offset: 0, points: [[0, 0], [40, 0], [40, 25], [0, 25]] },
+    1, 8,
+  );
+  const arcEdge = Number(Object.keys(roundedRect.bulges)[0]);
+  const beforeArea = area(arcLib.tessellate(roundedRect));
+  const afterCorner = types.addCorner(roundedRect, arcEdge);
+  const afterArea = area(arcLib.tessellate(afterCorner));
+
+  check('#15 pressing Corner on a rounded edge adds one corner',
+    afterCorner.points.length === roundedRect.points.length + 1,
+    `got ${afterCorner.points.length} from ${roundedRect.points.length}`);
+  check('#15 ...and does not change the outline it was pressed on',
+    Math.abs(afterArea - beforeArea) / beforeArea < 2e-3,
+    `area moved ${((Math.abs(afterArea - beforeArea) / beforeArea) * 100).toFixed(3)}% ` +
+    `(${beforeArea.toFixed(3)} -> ${afterArea.toFixed(3)}) -- a key-only reindex halves the ` +
+    `arc's radius and moves its centre, silently`);
+  check('#15 ...and leaves no duplicate point behind',
+    afterCorner.points.every((p, i) => {
+      const q = afterCorner.points[(i + 1) % afterCorner.points.length];
+      return Math.hypot(p[0] - q[0], p[1] - q[1]) > 1e-9;
+    }), JSON.stringify(afterCorner.points));
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };

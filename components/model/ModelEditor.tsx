@@ -58,7 +58,7 @@ import {
 } from 'lucide-react';
 import SketchConstraints from './SketchConstraints';
 import type { Constraint } from '../../lib/sketch-solve';
-import { filletCorner, whyCannotRoundCorner } from '../../lib/sketch-arc';
+import { filletCorner, maxFilletRadius, whyCannotRoundCorner } from '../../lib/sketch-arc';
 import {
   type Feature,
   type ModelDoc,
@@ -475,7 +475,11 @@ export default function ModelEditor({
   }
 
   function roundSketchCorner(f: Extract<Feature, { kind: 'sketch' }>, corner: number, radius: number) {
-    const why = whyCannotRoundCorner(f.points, corner);
+    // f.bulges, not just the points: a corner whose neighbour is already an
+    // arc cannot be rounded (filletCorner() reads adjacent edges as straight
+    // chords), and without the bulges this asks about a different sketch
+    // than the one on screen and gets told yes.
+    const why = whyCannotRoundCorner(f.points, corner, f.bulges);
     if (why) { say(why); return; }
     // A pin on the corner being rounded away has no surviving point to hold
     // -- filletCorner() drops it rather than silently reassigning it to a
@@ -483,12 +487,22 @@ export default function ModelEditor({
     // 2). Read that BEFORE the call so the message matches what actually
     // happened, not a guess.
     const hadPin = (f.constraints ?? []).some((c) => c.kind === 'lock' && c.corner === corner);
+    // filletCorner() clamps internally and always did, but silently -- and it
+    // returns the identical sketch for 500 and for 10, so the clamp could not
+    // be reported from its result. Ask the ceiling directly and say it. The
+    // remedy is real: the same Rules panel this came from has a length box per
+    // edge.
+    const ceiling = maxFilletRadius(f.points, corner, f.bulges);
+    const clamped = radius > ceiling
+      ? `That corner can only take a round of ${ceiling.toFixed(1)}, so that is what I used. Make its two edges longer if you want a bigger one.`
+      : null;
     const next = filletCorner(f, corner, radius);
     onChange({
       ...doc,
       features: doc.features.map((x) => (x.id === f.id ? next : x)),
     });
-    say(hadPin ? 'That corner was pinned -- the pin came off when you rounded it away.' : null);
+    const pinned = hadPin ? 'That corner was pinned -- the pin came off when you rounded it away.' : null;
+    say([clamped, pinned].filter(Boolean).join(' ') || null);
   }
 
   function mirror(plane: SketchPlane) {
