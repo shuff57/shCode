@@ -4,8 +4,8 @@
   "description": "3-min whiteboard walkthrough of `this` inside methods. Shows why `this.color` and `this.hp` refer to the specific instance the method was called on.",
   "type": "lesson",
   "estimateMins": 3,
-  "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
+  "category": "Unit 2: moSHion — Applied Game Development",
+  "unit": "5.3 Classes and Objects via moSHion",
   "preview": "video",
   "week": 12,
   "slos": [

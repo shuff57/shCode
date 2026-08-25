@@ -55,12 +55,12 @@ export const PATHS = {
 // this keeps it checkout-agnostic; .gitattributes keeps the working trees
 // consistent as well, but the gate must not need that to be true.
 //
-// The commit that added this warned in a Not-tested trailer that the shPlay
+// The commit that added this warned in a Not-tested trailer that the moSHion
 // gate "may have the same exposure". That was a guess, and it was wrong on both
-// counts — measured 2026-08-22 in a fresh CRLF worktree: scripts/test-shplay.mjs
+// counts — measured 2026-08-22 in a fresh CRLF worktree: scripts/test-moshion.mjs
 // never reads runner.html and never cuts a shim out of anything, it executes
-// public/shplay/shplay.js in a vm where CRLF is just whitespace, and its one
-// newline-sensitive regex (test-shplay.mjs:88, the ```js live fence extractor)
+// public/moshion/moshion.js in a vm where CRLF is just whitespace, and its one
+// newline-sensitive regex (test-moshion.mjs:88, the ```js live fence extractor)
 // absorbs the CR in its `[^\n]*` group. CRLF checkout: PASS, corpus 271/271 and
 // semantic 85/85 — byte-identical counts to an LF tree, so it is not passing by
 // silently collecting fewer blocks. Nothing to fix there; do not go looking.

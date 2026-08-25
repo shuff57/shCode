@@ -84,7 +84,7 @@ The player exists at `x = 80, 100, 200, 500, 1300, …` regardless of where the 
 
 ## Step 3 — Add a horizontal offset
 
-`camera.x = player.x` keeps the player dead-center. To bias the camera toward "show more of the level ahead," subtract or add a constant — `camera.x = player.x + 100` puts the player at the *left* of the canvas, revealing 200px more world to the right.
+`camera.x = player.x` keeps the player dead-center. To bias the camera toward "show more of the level ahead," subtract or add a constant — `camera.x = player.x + 100` pushes the viewport 100px further right, so the player sits 100px *left* of center and you can see 100px more of what is coming.
 
 ```js live
 let player;

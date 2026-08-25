@@ -31,15 +31,21 @@ function setup() {
   player.color = 'gold';
   player.rotationLock = true;
 
-  // STEP 2 — Challenge 1. Each cloud remembers the x it was BORN at. Its
+  // STEP 2 — Challenge 1. Each cloud remembers the spot it was BORN at. Its
   // drawn position is that base plus a fraction of the camera, which is what
   // makes it drift slower than the ground and read as further away.
+  //
+  // BOTH axes, because the camera in this sketch follows on y as well. Clouds
+  // pinned to a fixed world y sit in the sky of a level you never look at:
+  // the camera lives down by the ground, and a cloud at y = 120 is simply
+  // never on screen. Fixed after watching it run.
   for (let i = 0; i < 8; i++) {
-    let cloud = new Sprite(i * 160, 120 + (i % 3) * 60, 90, 30);
+    let cloud = new Sprite(i * 160 - 200, 200 + (i % 3) * 50, 90, 30);
     cloud.color = '#8898b8';
     cloud.collider = 'none';   // scenery: nothing should bump into it
     cloud.layer = 0;           // STEP 7 feature — draw it behind the action
     cloud.baseX = cloud.x;
+    cloud.baseY = cloud.y;
     clouds.push(cloud);
   }
 }
@@ -60,10 +66,11 @@ function draw() {
   camera.x = lerp(camera.x, player.x, 0.1);
   camera.y = lerp(camera.y, player.y, 0.05);
 
-  // STEP 6 — Challenge 1. A smaller multiplier means the cloud moves less
-  // per unit of camera travel, which reads as further away.
+  // STEP 6 — Challenge 1. The cloud tracks 30% of the camera, so on screen it
+  // slides at only 70% of the ground's speed — and slower means further away.
   for (let cloud of clouds) {
     cloud.x = cloud.baseX + camera.x * 0.3;
+    cloud.y = cloud.baseY + camera.y * 0.3;
   }
 
   // STEP 7 — Challenge 2. -1 mirrors the sprite horizontally, so it faces

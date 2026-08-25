@@ -1,6 +1,6 @@
 ## Game value → state change
 
-Read after `6.6.15 Reading — shplay docs: Input-Driven Transitions`. About 8 minutes.
+Read after `6.6.15 Reading — moSHion docs: Input-Driven Transitions`. About 8 minutes.
 
 **What you'll learn from it:**
 

@@ -4,7 +4,7 @@
   "description": "Implement condition-driven transitions: score reaches 50 triggers a win screen, health drops to 0 triggers game over. The game decides when states change.",
   "type": "lesson",
   "estimateMins": 20,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "example",
   "week": 17,

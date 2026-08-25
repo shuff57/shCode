@@ -4,9 +4,9 @@
   "description": "Store five Enemy instances in a single array by pushing new Enemy(...) calls into `enemies` — practice managing many instances without separate named variables.",
   "type": "lesson",
   "estimateMins": 8,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 12,
   "slos": [
     "SLO-2",
@@ -18,7 +18,7 @@
       "title": "Push five Enemy instances into enemies[]",
       "instructions": "In `setup()`, call `enemies.push(new Enemy(...))` five times with different x positions. After setup, `enemies.length` should be 5 and five red squares should appear on screen.",
       "hints": [
-        "Open the shplay docs drawer on the right and look at how arrays work — push adds one element to the end of an array."
+        "Open the moSHion docs drawer on the right and look at how arrays work — push adds one element to the end of an array."
       ]
     }
   ],

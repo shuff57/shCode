@@ -4,9 +4,9 @@
   "description": "Practice from 2.1.3b: create a canvas, drop a single sprite at the centre, and set its color. Three steps, no movement yet.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 10,
   "slos": [
     "SLO-3"
@@ -17,7 +17,7 @@
       "title": "Make a canvas",
       "instructions": "Inside `setup()`, call `new Canvas(...)` with a width and height of your choice (anything from 300 to 600 works).",
       "hints": [
-        "Open the shplay docs drawer on the right and find the Canvas section."
+        "Open the moSHion docs drawer on the right and find the Canvas section."
       ]
     },
     {
@@ -25,7 +25,7 @@
       "title": "Create one sprite at the centre",
       "instructions": "Still inside `setup()`, call `new Sprite(x, y, w, h)` to place a sprite roughly in the middle of your canvas.",
       "hints": [
-        "Check the Sprite section of the shplay docs drawer for what the four arguments mean."
+        "Check the Sprite section of the moSHion docs drawer for what the four arguments mean."
       ]
     },
     {
@@ -33,7 +33,7 @@
       "title": "Set the sprite's color",
       "instructions": "Store the sprite in a variable, then assign a CSS color string to its `.color` property — try `'tomato'`, `'deepskyblue'`, or any color you like.",
       "hints": [
-        "Look up sprite properties in the shplay docs drawer."
+        "Look up sprite properties in the moSHion docs drawer."
       ]
     }
   ],

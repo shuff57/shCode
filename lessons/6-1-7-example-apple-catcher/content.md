@@ -60,7 +60,7 @@ basket.overlaps(apples, (b, apple) => {
 });
 ```
 
-`overlaps(group, callback)` walks every sprite in the group, calls the callback once per pair currently overlapping, and passes both sprites in. The callback is the right place to call `apple.delete()` — shplay has already finished iterating, so destroying a sprite doesn't trip the iteration bug.
+`overlaps(group, callback)` walks every sprite in the group, calls the callback once per pair currently overlapping, and passes both sprites in. The callback is the right place to call `apple.delete()` — moSHion has already finished iterating, so destroying a sprite doesn't trip the iteration bug.
 
 The boolean form (`basket.overlaps(apples)`) returns `true` if any apple is overlapping. Use that for "did anything hit me this frame" gates (game-over checks, hit flashes). Use the callback form for per-pair work.
 
@@ -93,9 +93,9 @@ The catch callback and the off-screen loop both want the apple **gone**, so both
 
 ## Key takeaways
 
-- `overlaps(group, callback)` is the cleanest idiom for "do X to every sprite touching me right now." Call `sprite.delete()` inside the callback freely — shplay has finished its own iteration before invoking your callback.
+- `overlaps(group, callback)` is the cleanest idiom for "do X to every sprite touching me right now." Call `sprite.delete()` inside the callback freely — moSHion has finished its own iteration before invoking your callback.
 - Use the boolean form `overlaps(group)` only when you want a yes/no signal, not per-pair work.
 - Off-screen / out-of-bounds cleanup is a separate loop — iterate a copy `[...group]` so `delete()` doesn't shift the index.
 - `sprite.delete()` destroys; `group.remove(sprite)` only unparents. For cleanup, you almost always want `delete()`.
-- `frameCount % N === 0` is the shplay timed-spawn idiom. `N` is your difficulty knob.
+- `frameCount % N === 0` is the moSHion timed-spawn idiom. `N` is your difficulty knob.
 - A `kinematic` body moves with `vel` but isn't pushed by gravity or collisions — perfect for a controllable basket / paddle.

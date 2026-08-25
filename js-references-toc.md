@@ -10,11 +10,11 @@ Three open, free-to-read book references support the CSCI 4 plan, plus four proj
 Four project references round out the source set:
 
 - **freeCodeCamp** (Source 6): the interactive platform driving Q1 activities
-- **shplay** (Source 3, bundled in-repo, browser docs): the game-dev engine (Q2)
+- **moSHion** (Source 3, bundled in-repo, browser docs): the game-dev engine (Q2)
 - **JSCAD** (Source 4, CDN-loaded API docs + monorepo): the 3D-modeling library (Q3–Q4)
 - **jscadui / jscad.app** (Source 7): the browser UI students actually use for JSCAD (Q3–Q4)
 
-Engine dependencies cited from the shplay stack: **q5.js** (bundled in-repo, LGPL-3.0) and
+Engine dependencies cited from the moSHion stack: **q5.js** (bundled in-repo, LGPL-3.0) and
 **Box2D v3 WASM** (bundled in-repo, Box2D MIT) — see the note inside Source 3.
 
 ---
@@ -268,26 +268,26 @@ Engine dependencies cited from the shplay stack: **q5.js** (bundled in-repo, LGP
 
 ---
 
-## Source 3 — shplay (in-repo engine + in-app docs)
-**In-repo:** `public/shplay/`  ·  **License:** MIT (original facade) + MIT (vendored planck.js) — **no q5play license obligations**; shPlay is an independent reimplementation of the q5play API design, not a fork
+## Source 3 — moSHion (in-repo engine + in-app docs)
+**In-repo:** `public/moshion/`  ·  **License:** MIT (original facade) + MIT (vendored planck.js). moSHion is an original engine **inspired by q5play**; it contains no q5play code. See `public/moshion/docs/LICENSE.md` §4 for the unresolved status of `assets/`
 
-No internet required — the engine and physics (planck.js, a pure-JS Box2D port) ship fully offline in `public/shplay/`.
+No internet required — the engine and physics (planck.js, a pure-JS Box2D port) ship fully offline in `public/moshion/`.
 
-### In-repo files (`public/shplay/`)
+### In-repo files (`public/moshion/`)
 
 | File | Covers |
 |---|---|
-| `public/shplay/shplay.js` | The entire engine (~800 lines, hand-authored, no build step). Reference source for any behavior the docs don't spell out |
-| `public/shplay/planck.min.js` | planck.js v1.5.0 (Box2D port, MIT) — the physics backend |
-| `public/shplay/runner.html` | Sandbox host: loads planck + shplay, injects a sketch from `?code=<base64url>` |
-| `public/shplay/docs/shplay.d.ts` | Full public API (hand-authored types). Anchor notation: `shplay → shplay.d.ts → <ClassName>` |
-| `public/shplay/docs/README.md` | Project overview, runtime layout, credits |
-| `public/shplay/docs/challenges.md` | Bundled challenge briefs (15-challenge ladder) |
-| `public/shplay/docs/LICENSE.md` | MIT for the facade; MIT (upstream) for planck.js; design attribution to q5play |
-| `public/shplay/docs/CLAUDE.md` | Engine architecture notes (lifecycle, class map, unit invariants) — dev reference, not student-facing |
-| `public/shplay/docs/index.html` | Docs index page (open `docs/` in a browser) |
+| `public/moshion/moshion.js` | The entire engine (~800 lines, hand-authored, no build step). Reference source for any behavior the docs don't spell out |
+| `public/moshion/planck.min.js` | planck.js v1.5.0 (Box2D port, MIT) — the physics backend |
+| `public/moshion/runner.html` | Sandbox host: loads planck + moSHion, injects a sketch from `?code=<base64url>` |
+| `public/moshion/docs/moshion.d.ts` | Full public API (hand-authored types). Anchor notation: `moshion → moshion.d.ts → <ClassName>` |
+| `public/moshion/docs/README.md` | Project overview, runtime layout, credits |
+| `public/moshion/docs/challenges.md` | Bundled challenge briefs (15-challenge ladder) |
+| `public/moshion/docs/LICENSE.md` | MIT for the facade; MIT (upstream) for planck.js; credit to q5play as the inspiration; `assets/` unresolved |
+| `public/moshion/docs/CLAUDE.md` | Engine architecture notes (lifecycle, class map, unit invariants) — dev reference, not student-facing |
+| `public/moshion/docs/index.html` | Docs index page (open `docs/` in a browser) |
 
-### shplay.d.ts class anchors
+### moshion.d.ts class anchors
 
 - **Canvas:** `Canvas` (L139)
 - **Sprites:** `Sprite` (L27) — constructor dispatch `(x,y)` / `(x,y,d)` / `(x,y,w,h[,bodyType])`
@@ -302,12 +302,12 @@ Persistent storage (`storeItem`/`getItem`/`removeItem`) is part of the engine fa
 
 ### In-app docs surface (student-facing anchor target)
 
-The app renders a student-facing shplay reference at `/docs/shplay` (built from `lib/shplay-docs.ts`).
-Anchor notation for reading rows: `shplay → <Section> → <Page title>`. All anchors below are verified against the current in-app sections.
+The app renders a student-facing moSHion reference at `/docs/moshion` (built from `lib/moshion-docs.ts`).
+Anchor notation for reading rows: `moshion → <Section> → <Page title>`. All anchors below are verified against the current in-app sections.
 
 | Section (slug) | Page titles (anchor targets) |
 |---|---|
-| `overview` | What is shPlay? · The sketch lifecycle · Global mode · Debugging your sketch |
+| `overview` | What is moSHion? · The sketch lifecycle · Global mode · Debugging your sketch |
 | `canvas` | Creating the canvas · frameCount · Background and clearing |
 | `sprite` | Your first sprite · Collider types: dynamic, static, kinematic, none · Position, rotation, scale · Color, visibility, and layer · Shape options · Removing and cleaning up sprites · Angular velocity · Images and emoji on sprites |
 | `physics` | Gravity and velocity · Bounciness and friction · Applying forces |
@@ -321,24 +321,24 @@ Anchor notation for reading rows: `shplay → <Section> → <Page title>`. All a
 | `persistence` | Saving and loading data |
 | `patterns` | Top-down movement · Platformer jump · Projectiles from a player · Score and timer HUD · Scene/state switching |
 
-For engine internals (dev-facing, not student-facing), use the `shplay.d.ts` class anchors above.
+For engine internals (dev-facing, not student-facing), use the `moshion.d.ts` class anchors above.
 
 ### Engine dependency stack (bundled in-repo)
 
-shPlay is a standalone runtime on one lower layer, bundled in `public/shplay/`:
+moSHion is a standalone runtime on one lower layer, bundled in `public/moshion/`:
 
 | Layer | Repo / site | In-repo artifact | License | When to cite |
 |---|---|---|---|---|
 | **planck.js** (physics) | https://github.com/shakiba/planck.js | `planck.min.js` (v1.5.0) | MIT (Box2D port; Box2D itself by Erin Catto) | W11+ physics feel — `bounciness`/`friction`/`gravity` are Box2D concepts; upstream docs at https://box2d.org/documentation/ (advanced only) |
 
-The drawing layer is the engine's own 2D-canvas renderer (no q5.js). For graphics concepts the engine doesn't spell out, q5.js learn pages (https://q5js.org/learn/, LGPL-3.0) apply ~1:1 — q5 is a p5-compatible fork and shPlay's API mirrors its conventions.
+The drawing layer is the engine's own 2D-canvas renderer (no q5.js). For graphics concepts the engine doesn't spell out, q5.js learn pages (https://q5js.org/learn/, LGPL-3.0) apply ~1:1 — q5 is a p5-compatible fork and moSHion's API mirrors its conventions.
 
 ---
 
 ## Source 4 — JSCAD (GitHub monorepo + hosted API docs)
 **GitHub:** https://github.com/jscad/OpenJSCAD.org  ·  **API docs:** https://openjscad.xyz/docs/  ·  **Package:** `@jscad/modeling@2.13.0` (+ `@jscad/regl-renderer@2.6.15` for the viewport) via unpkg  ·  **License:** MIT
 
-Not vendored — loaded at runtime from unpkg, so JSCAD lessons need internet (unlike shplay). Anchor notation: `JSCAD → <module> → <fn>`, with a per-function fragment link of the form `<module docs page>#.<fn>` (verified against the generated jsdoc). E.g. `JSCAD → primitives → cube` → `https://openjscad.xyz/docs/module-modeling_primitives.html#.cube`.
+Not vendored — loaded at runtime from unpkg, so JSCAD lessons need internet (unlike moSHion). Anchor notation: `JSCAD → <module> → <fn>`, with a per-function fragment link of the form `<module docs page>#.<fn>` (verified against the generated jsdoc). E.g. `JSCAD → primitives → cube` → `https://openjscad.xyz/docs/module-modeling_primitives.html#.cube`.
 
 ### In-repo docs (`public/jscad/docs/`)
 
@@ -350,7 +350,7 @@ Not vendored — loaded at runtime from unpkg, so JSCAD lessons need internet (u
 | `public/jscad/docs/LICENSE.md` | MIT notes for @jscad/modeling + @jscad/regl-renderer |
 | `public/jscad/docs/index.html` | Docs index page (open `docs/` in a browser) |
 
-The app also renders a student-facing JSCAD reference at `/docs/jscad` (built from `lib/jscad-docs.ts`, with live runnable examples in the same sandbox style as `/docs/shplay`). Anchor notation for reading rows: `JSCAD → <Section> → <Page title>`.
+The app also renders a student-facing JSCAD reference at `/docs/jscad` (built from `lib/jscad-docs.ts`, with live runnable examples in the same sandbox style as `/docs/moshion`). Anchor notation for reading rows: `JSCAD → <Section> → <Page title>`.
 
 ### GitHub repo (canonical) — the source behind every anchor
 
@@ -409,10 +409,10 @@ Programming* book sets the Q1 chapter sequence and is cited only for structure, 
 | 8 | Strings | W2–3 string methods |
 | 9 | Lists | W8 Arrays (1.3.3) — incl. multiple-subscripted (9.4 Nested lists) |
 | 10 | Dictionaries | — **Excluded** (not in CSCI 4 outline/SLOs) |
-| 11 | Classes | W12 OOP (shplay) — borrow framing only |
+| 11 | Classes | W12 OOP (moSHion) — borrow framing only |
 | 12 | Recursion | W30 optional enrichment — not assessed |
 | 13 | Inheritance | W12 — named, not required |
-| 14 | Files | W8 File I/O, W16 shplay save, W31 JSCAD multi-file — concept adopted; browser FileReader replaces Python `open()` |
+| 14 | Files | W8 File I/O, W16 moSHion save, W31 JSCAD multi-file — concept adopted; browser FileReader replaces Python `open()` |
 | 15 | Data Science | — **Excluded** (belongs to Principles of Data Science) |
 
 ### Section anchors (verified from the published chapter outlines)
@@ -455,8 +455,8 @@ The interactive platform supplying the **Q1 video/exercise activity layer** (W1�
 |---|---|---|---|
 | freeCodeCamp JS v9 | module names (e.g. `Variables and Strings`) | Q1 readings + external activities; W17 Classes; W22 Algorithms | Uses Theory / Workshop / Lab tags, not `Video` |
 
-**freeCodeCamp stops at general JS + algorithms — it does not cover q5.js, shplay, or game development** (the in-app shplay
-docs are the textbook for Q2). It was chosen to teach the JS foundations that make shplay possible.
+**freeCodeCamp stops at general JS + algorithms — it does not cover q5.js, moSHion, or game development** (the in-app moSHion
+docs are the textbook for Q2). It was chosen to teach the JS foundations that make moSHion possible.
 
 ---
 
@@ -490,7 +490,7 @@ of `openjscad.xyz` (runs npm imports, ES modules, TypeScript, and preserves the 
 
 ### Recommended curriculum touch points (JS-native)
 - **W8 (Arrays + File I/O):** javascript.info *File and FileReader* + *Blob* + Eloquent Ch 18 *File fields* — read a `.txt` line-by-line via `FileReader.readAsText()` + `split('\n')` (A8.2), then write a new file via `Blob` + download (A8.3). Together A8.2 + A8.3 cover the full open → read → write → close sequential-access loop in browser JS.
-- **W16 (shplay save/load):** javascript.info *JSON methods* + *LocalStorage* — `storeItem`/`getItem` map to `localStorage`; `save()` to Blob download.
+- **W16 (moSHion save/load):** javascript.info *JSON methods* + *LocalStorage* — `storeItem`/`getItem` map to `localStorage`; `save()` to Blob download.
 - **W26/W27 (error handling/testing):** Eloquent Ch 8 *Bugs and Errors* + javascript.info *Error handling* + *Automated testing with Mocha*.
 - **W31 (JSCAD multi-file / git):** Eloquent Ch 10 *Modules* (ES + CommonJS) — mirrors JSCAD's `require`/`include` system.
 
@@ -501,7 +501,7 @@ True sequential-access file writes (`open → write → close`) are **not possib
 
 ## Curriculum Map: Chapter → Section → Subsection → Assignments → Seeded Sources
 
-9 content chapters (1–3 Q1 · 4–5 Q2 · 6–7 Q3 · 8–9 Q4) + 4 Synthesis Projects (one per quarter). Subsection = plan section (e.g. 1.1.1); full descriptions live in `curriculum-plan.md`, dates in its Part B calendar. Anchor notation: `JS1 → <topic> → <page>` · `shplay → <section> → <page>` · `JSCAD → <module> → <fn>` · `PY → Ch N → Section` · `JS2 → Ch N` · FCC activity tags per `curriculum-alignment-guide.md`.
+9 content chapters (1–3 Q1 · 4–5 Q2 · 6–7 Q3 · 8–9 Q4) + 4 Synthesis Projects (one per quarter). Subsection = plan section (e.g. 1.1.1); full descriptions live in `curriculum-plan.md`, dates in its Part B calendar. Anchor notation: `JS1 → <topic> → <page>` · `moshion → <section> → <page>` · `JSCAD → <module> → <fn>` · `PY → Ch N → Section` · `JS2 → Ch N` · FCC activity tags per `curriculum-alignment-guide.md`.
 
 ### Chapter 1 — Foundations (Q1)
 
@@ -533,31 +533,31 @@ True sequential-access file writes (`open → write → close`) are **not possib
 |---|---|---|---|---|
 | **1.4.1** Q1 Review and Mini-Project | A9.1 (Print Job Manager — synthesis) | JS1 → Miscellaneous → JavaScript specials (review) · JS2 Ch 4 Summary (review) | FCC Fundamentals Review → full section (24 items: Gradebook App, Pyramid Generator, Password Generator, Inventory Management) · FCC Booleans and Numbers → Build a Mathbot [Workshop] | **Good supplemental** — FCC labs similar in scope; Print Job Manager itself is custom |
 
-### Chapter 4 — shPlay Foundations (Q2)
+### Chapter 4 — moSHion Foundations (Q2)
 
 | Subsection | Assignments | Seeded sources | FCC layer | Coverage |
 |---|---|---|---|---|
-| **2.1.1** Hello Sprite and Movement | A10.1 (sprite playground) · A10.2 (written) | shplay → overview → The sketch lifecycle · shplay → canvas → Creating the canvas, Background and clearing · shplay → sprite → Your first sprite, Position, rotation, scale · shplay → input → Keyboard basics, Multi-key movement · JS2 Ch 13 (context) | — (shplay is the Q2 textbook; FCC covers no game dev) | **Primary** — in-app shplay docs carry the module |
-| **2.1.2** Physics Feel | A11.1 (pinball scene) · A11.2 (written) | shplay → physics → Gravity and velocity, Bounciness and friction, Forces, torque, and rotation · shplay → sprite → Collider types · JS2 Ch 6 (classes preview, optional) | — | **Primary** — in-app shplay docs carry the module |
-| **2.2.1** Classes and Objects via shPlay | A12.1 (collectible class) · A12.2 (written, SLO 2) | JS1 → Classes → Class basic syntax, Class inheritance (optional) · JS2 Ch 6 (Methods, Classes, Prototypes) · PY Ch 11 (framing only) · shplay → in-app docs → `Sprite` class | FCC Classes → Understanding How to Work with Classes in JavaScript [Theory], Build a Shopping Cart [Workshop], Build a Project Idea Board [Lab], Review, Quiz · FCC Objects → Introduction to JavaScript Objects and Their Properties [Theory], Build a Wildlife Tracker [Workshop], Build a Recipe Tracker [Workshop] | **Strong** — FCC Classes maps directly (Shopping Cart ≈ PrintPart/PrintQueue); OOP vs procedural comparison (SLO 2) teacher-delivered |
+| **2.1.1** Hello Sprite and Movement | A10.1 (sprite playground) · A10.2 (written) | moSHion → overview → The sketch lifecycle · moSHion → canvas → Creating the canvas, Background and clearing · moSHion → sprite → Your first sprite, Position, rotation, scale · moSHion → input → Keyboard basics, Multi-key movement · JS2 Ch 13 (context) | — (moSHion is the Q2 textbook; FCC covers no game dev) | **Primary** — in-app moSHion docs carry the module |
+| **2.1.2** Physics Feel | A11.1 (pinball scene) · A11.2 (written) | moSHion → physics → Gravity and velocity, Bounciness and friction, Forces, torque, and rotation · moSHion → sprite → Collider types · JS2 Ch 6 (classes preview, optional) | — | **Primary** — in-app moSHion docs carry the module |
+| **2.2.1** Classes and Objects via moSHion | A12.1 (collectible class) · A12.2 (written, SLO 2) | JS1 → Classes → Class basic syntax, Class inheritance (optional) · JS2 Ch 6 (Methods, Classes, Prototypes) · PY Ch 11 (framing only) · moSHion → in-app docs → `Sprite` class | FCC Classes → Understanding How to Work with Classes in JavaScript [Theory], Build a Shopping Cart [Workshop], Build a Project Idea Board [Lab], Review, Quiz · FCC Objects → Introduction to JavaScript Objects and Their Properties [Theory], Build a Wildlife Tracker [Workshop], Build a Recipe Tracker [Workshop] | **Strong** — FCC Classes maps directly (Shopping Cart ≈ PrintPart/PrintQueue); OOP vs procedural comparison (SLO 2) teacher-delivered |
 
 ### Chapter 5 — Game Mechanics (Q2)
 
 | Subsection | Assignments | Seeded sources | FCC layer | Coverage |
 |---|---|---|---|---|
-| **2.3.1** Groups and Overlaps | A13.1 (asteroid field) | shplay → groups → Spawning and defaults, Iterating and removing, Filtering and searching · shplay → collisions → colliding vs overlapping, Collisions with groups · JS1 → Data types → Arrays, Array methods (review) | — | **Primary** — in-app shplay docs carry the module |
-| **2.3.2** Physics Applications | A14.1 (Space Jumper OR Car) | shplay → input → Keyboard basics, Mouse position and buttons · shplay → physics → Gravity and velocity, Bounciness and friction · JS1 → JavaScript Fundamentals → Comparisons, Conditional branching (review) | — | **Primary** — consolidation week; midterm 3 + AP CSP effects-of-computing discussion (W15) |
-| **2.4.1** Animated Sprites and Camera | A15.1 (side-scrolling platformer) | shplay → animation → Ani, Anis, Groups with animations · shplay → camera → Following a target, Screen space vs world space · JS1 → Animation → JavaScript animations (conceptual, optional) | — | **Primary** — in-app shplay docs carry the module |
+| **2.3.1** Groups and Overlaps | A13.1 (asteroid field) | moSHion → groups → Spawning and defaults, Iterating and removing, Filtering and searching · moSHion → collisions → colliding vs overlapping, Collisions with groups · JS1 → Data types → Arrays, Array methods (review) | — | **Primary** — in-app moSHion docs carry the module |
+| **2.3.2** Physics Applications | A14.1 (Space Jumper OR Car) | moSHion → input → Keyboard basics, Mouse position and buttons · moSHion → physics → Gravity and velocity, Bounciness and friction · JS1 → JavaScript Fundamentals → Comparisons, Conditional branching (review) | — | **Primary** — consolidation week; midterm 3 + AP CSP effects-of-computing discussion (W15) |
+| **2.4.1** Animated Sprites and Camera | A15.1 (side-scrolling platformer) | moSHion → animation → Ani, Anis, Groups with animations · moSHion → camera → Following a target, Screen space vs world space · JS1 → Animation → JavaScript animations (conceptual, optional) | — | **Primary** — in-app moSHion docs carry the module |
 | **2.5.1** Save and Load | A16.1 (persistent high scores — File I/O) | JS1 → Data types → JSON methods, toJSON · JS1 → Storing data in the browser → LocalStorage, sessionStorage · JS2 Ch 18 File fields · PY Ch 14 Files (structural) | — | **Strong** — JSON/LocalStorage fully covered by JS1 + JS2; + AP CSP metadata discussion (W16) |
-| **2.6.1** Game State Machines | A16.2 (game states lab) | JS1 → Data types → JSON methods, toJSON (reference) · JS2 Ch 4 (switch/state review, optional) | — | **Teacher-delivered** — state-machine pattern is shplay/plan-specific; JS2 Ch 4 switch review supports |
-| **2.7.1** Joints and Advanced Input | A17.1 (Two-Player Pong-Sumo) | shplay → joints → DistanceJoint, HingeJoint, SliderJoint, GlueJoint, GrabberJoint · shplay → input → Dragging and clicks, Gamepad · shplay → patterns → Projectiles from a player | — | **Primary** — in-app shplay docs carry the module; most complex shplay concept, mastery not expected |
+| **2.6.1** Game State Machines | A16.2 (game states lab) | JS1 → Data types → JSON methods, toJSON (reference) · JS2 Ch 4 (switch/state review, optional) | — | **Teacher-delivered** — state-machine pattern is moshion/plan-specific; JS2 Ch 4 switch review supports |
+| **2.7.1** Joints and Advanced Input | A17.1 (Two-Player Pong-Sumo) | moSHion → joints → DistanceJoint, HingeJoint, SliderJoint, GlueJoint, GrabberJoint · moSHion → input → Dragging and clicks, Gamepad · moSHion → patterns → Projectiles from a player | — | **Primary** — in-app moSHion docs carry the module; most complex moSHion concept, mastery not expected |
 
 ### Synthesis Project (Q2 — Chapters 4–5)
 > 2.8.1 Capstone Game — A18.1 Game Capstone (SLO 1/2/3). Synthesis of Q2.
 
 | Subsection | Assignments | Seeded sources | FCC layer | Coverage |
 |---|---|---|---|---|
-| **2.8.1** Capstone Game | A18.1 (Game Capstone — synthesis, SLO 1/2/3) | shplay → patterns → Scene/state switching, Top-down movement, Platformer jump · JS2 Ch 16 Project: A Platform Game (enrichment) · JS2 Ch 8 Bugs and Errors (testing discipline) | — | **Synthesis** — 1-week build; JS2 Ch 16 is the design/iteration analog; + AP CSP beneficial/harmful effects discussion |
+| **2.8.1** Capstone Game | A18.1 (Game Capstone — synthesis, SLO 1/2/3) | moSHion → patterns → Scene/state switching, Top-down movement, Platformer jump · JS2 Ch 16 Project: A Platform Game (enrichment) · JS2 Ch 8 Bugs and Errors (testing discipline) | — | **Synthesis** — 1-week build; JS2 Ch 16 is the design/iteration analog; + AP CSP beneficial/harmful effects discussion |
 
 ### Chapter 6 — JSCAD Foundations (Q3)
 
@@ -606,7 +606,7 @@ True sequential-access file writes (`open → write → close`) are **not possib
 | Subsection | Assignments | Seeded sources | FCC layer | Coverage |
 |---|---|---|---|---|
 | **4.3.1** Capstone Design Phase | A33.1 (design spec) | JS2 Ch 8 Bugs and Errors (design mindset, reference) · JSCAD → parametric tutorial (parameter design review) | — | **Synthesis** — design phase; + AP CSP digital-divide discussion (W33) |
-| **4.3.2** Capstone Build and Iterate | A34.1 (M1 geometry) · A34.2 (M2 params + validation) · A35.1 (M3 complete + test) · A35.2 (peer review) · A35.3 (final print) | JSCAD → measurements (printability reference) · shplay → patterns → Scene/state switching (design-pattern reference) · JS2 Ch 8 (iterative debugging) | — | **Synthesis** — build/iterate; + AP CSP computing-bias discussion (W34) |
+| **4.3.2** Capstone Build and Iterate | A34.1 (M1 geometry) · A34.2 (M2 params + validation) · A35.1 (M3 complete + test) · A35.2 (peer review) · A35.3 (final print) | JSCAD → measurements (printability reference) · moSHion → patterns → Scene/state switching (design-pattern reference) · JS2 Ch 8 (iterative debugging) | — | **Synthesis** — build/iterate; + AP CSP computing-bias discussion (W34) |
 | **4.3.3** Presentations and Reflection | A36.1 (capstone presentation) · A36.2 (course reflection, SLO 1) | No reading — presentation + reflection | — | **Synthesis** — no external sources |
 
 **Coverage note:** all 71 assignments (A1.1–A36.2) trace to a chapter + subsection above; the only undefined row is Chapter 10's placeholder capstone (gets a subsection number + sources once the theme is chosen). FCC activity tags mirror `curriculum-alignment-guide.md` (its CodeHS rows were stripped during seeding; its AP CSP integration table remains the source of truth for the non-coding layer).

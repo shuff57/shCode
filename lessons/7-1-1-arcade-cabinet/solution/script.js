@@ -25,7 +25,9 @@ const MAX_MISSES = 3;
 class Crate {
   constructor(kind, x) {
     this.kind = kind;
-    this.sprite = new Sprite(x, -20, kind.size);
+    // Two size arguments, so a crate is a crate. One argument would make a
+    // circle -- see the bouncy-ball lab, which relies on exactly that.
+    this.sprite = new Sprite(x, -20, kind.size, kind.size);
     this.sprite.color = kind.color;
     this.sprite.collider = 'kinematic';   // falls at MY speed, not gravity's
     this.sprite.vel.y = kind.speed;
@@ -117,6 +119,12 @@ function updatePlay() {
   if (kb.pressing('a') || kb.pressing('left')) collector.vel.x = -7;
   else if (kb.pressing('d') || kb.pressing('right')) collector.vel.x = 7;
   else collector.vel.x = 0;
+
+  // Hold a direction long enough and the collector simply leaves. A kinematic
+  // sprite ignores walls, so the edges have to be arithmetic. Half the
+  // collector's own width keeps it fully on screen rather than half out.
+  if (collector.x < 45) collector.x = 45;
+  if (collector.x > 755) collector.x = 755;
 
   if (kb.presses('p')) {
     state = 'paused';

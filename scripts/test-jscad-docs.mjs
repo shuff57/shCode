@@ -104,7 +104,7 @@ const REMOTE_LOAD = [
 // reaches a student.
 const PREVIEW_PATH = [
   path.join(root, 'components/JscadPreview.tsx'),
-  path.join(root, 'components/ShPlayPreview.tsx'),
+  path.join(root, 'components/MoshionPreview.tsx'),
   path.join(root, 'lib/preview-builder.ts'),
 ];
 

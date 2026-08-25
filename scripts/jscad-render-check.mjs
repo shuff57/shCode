@@ -30,7 +30,7 @@
 // reachability proof: it opens the BUILT /docs/jscad pages, clicks Run, and
 // reads which runner the sandbox actually mounted. The REACH group in
 // test-jscad.mjs asserts that wire from source; this one watches it happen.
-// It checks /docs/shplay in the same pass, because the failure that shipped
+// It checks /docs/moshion in the same pass, because the failure that shipped
 // last time was two wires crossed, not one wire missing.
 //
 // Cross-browser, measured 2026-08-22 on playwright chromium / firefox / webkit:
@@ -310,7 +310,7 @@ if (!existsSync(join(OUT, 'docs/jscad'))) {
   const TARGETS = [
     { url: '/docs/jscad/overview/', expect: '/jscad/runner.html', label: 'JSCAD docs - overview' },
     { url: '/docs/jscad/booleans/', expect: '/jscad/runner.html', label: 'JSCAD docs - booleans' },
-    { url: '/docs/shplay/overview/', expect: '/shplay/runner.html', label: 'shPlay docs - wires not crossed' },
+    { url: '/docs/moshion/overview/', expect: '/moshion/runner.html', label: 'moSHion docs - wires not crossed' },
   ];
   reachTotal = TARGETS.length;
 

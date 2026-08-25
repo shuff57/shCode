@@ -4,9 +4,9 @@
   "description": "Graded: build a two-player Pong-Sumo game — two paddles, one ball, push the ball past the opponent to score. Incorporates two-player input, push-collision physics, a win condition, and at least one joint. Auto-graded.",
   "type": "assignment",
   "estimateMins": 75,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.7 Advanced Input",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 17,
   "slos": [
     "SLO-3"
@@ -20,7 +20,7 @@
       "title": "Arena setup — canvas and gravity",
       "instructions": "Create a canvas (e.g. 600×400). Set world.gravity.y = 0 so paddles and ball glide instead of falling.",
       "hints": [
-        "Check the Canvas section of the shplay docs drawer. For no-gravity setup see 2.7.25."
+        "Check the Canvas section of the moSHion docs drawer. For no-gravity setup see 2.7.25."
       ]
     },
     {
@@ -28,7 +28,7 @@
       "title": "Top and bottom walls",
       "instructions": "Add two static sprites along the top and bottom edges as walls so the ball can't escape vertically.",
       "hints": [
-        "Check the Sprite section of the shplay docs drawer. Set collider = 'static' on each wall."
+        "Check the Sprite section of the moSHion docs drawer. Set collider = 'static' on each wall."
       ]
     },
     {
@@ -36,7 +36,7 @@
       "title": "Two paddles — Player 1 (WASD) and Player 2 (arrow keys)",
       "instructions": "Create two paddle sprites (one on the left, one on the right). In draw(), read kb.pressing for W/S (Player 1) and up/down (Player 2) and set each paddle's velocity accordingly.",
       "hints": [
-        "See 2.7.25 for the two-paddle pattern. Check kb.pressing in the shplay docs drawer."
+        "See 2.7.25 for the two-paddle pattern. Check kb.pressing in the moSHion docs drawer."
       ]
     },
     {
@@ -60,7 +60,7 @@
       "title": "Score variables and initial state",
       "instructions": "Declare p1Score and p2Score at the top (outside setup/draw). Initialize both to 0 in setup(). Set gameState to 'title' so the game starts on the title screen.",
       "hints": [
-        "The shplay docs drawer has sprite position properties. Compare ball.pos.x against 0 and the canvas width."
+        "The moSHion docs drawer has sprite position properties. Compare ball.pos.x against 0 and the canvas width."
       ]
     },
     {

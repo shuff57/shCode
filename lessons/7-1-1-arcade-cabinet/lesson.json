@@ -4,9 +4,9 @@
   "description": "Q2 synthesis: ship a game you designed. The checklist is the spec — twelve things the game must contain. Everything else is your call.",
   "type": "project",
   "estimateMins": 300,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "7.1 Arcade Cabinet (Q2 Synthesis)",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 18,
   "slos": [
     "SLO-1",

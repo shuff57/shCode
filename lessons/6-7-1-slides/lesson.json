@@ -4,7 +4,7 @@
   "description": "Advanced Input and Joints opening slides — the three big ideas before capstone: mouse input, joints, and the slingshot pattern. Everything in this unit feeds directly into A17.1 and your capstone design. Placeholder until the deck is rebuilt from bookSHelf.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.7 Advanced Input and Joints",
   "preview": "slides",
   "slos": [

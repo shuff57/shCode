@@ -1,10 +1,10 @@
 {
   "id": "6-6-4-reading-switch-dispatch",
-  "title": "6.6.4 Reading — shplay docs: switch in draw()",
-  "description": "In shplay games, switch goes inside draw(). Each frame, it checks the state variable and draws the right screen.",
+  "title": "6.6.4 Reading — moSHion docs: switch in draw()",
+  "description": "In moSHion games, switch goes inside draw(). Each frame, it checks the state variable and draws the right screen.",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "reading",
   "week": 17,

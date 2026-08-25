@@ -44,7 +44,7 @@ lessons/<slug>/
 └── content.md       # the worked example (prose + code blocks)
 ```
 
-Code blocks inside `content.md` are rendered via `MarkdownWithLiveBlocks` — runnable shplay snippets work in place. No separate `script.js` is needed.
+Code blocks inside `content.md` are rendered via `MarkdownWithLiveBlocks` — runnable moSHion snippets work in place. No separate `script.js` is needed.
 
 ## 3. `content.md` shape
 
@@ -68,19 +68,19 @@ A fenced block annotated ```` ```js live ```` renders inline — its own editor 
 
 **Which runtime depends on the unit — use the flag that matches:**
 
-- **Console-track units (1–4, plain JS, no canvas):** ```` ```js live plain ````. Executes directly and shows a captured Output pane beside the editor, matching the in-app console-lesson layout (e.g. `1.1.4`). Do not use bare `js live` for these — it renders a useless blank shplay canvas.
-- **shplay-track units (5+, canvas/sprite code):** ```` ```js live ```` (no flag) renders a runnable shplay sketch in a canvas iframe. Add `console` only for the rare case where the walkthrough needs a REPL attached to the running sketch (see `5-3-6-example-devtools-reveal`); never combine `console` with `plain`.
+- **Console-track units (1–4, plain JS, no canvas):** ```` ```js live plain ````. Executes directly and shows a captured Output pane beside the editor, matching the in-app console-lesson layout (e.g. `1.1.4`). Do not use bare `js live` for these — it renders a useless blank moSHion canvas.
+- **moshion-track units (5+, canvas/sprite code):** ```` ```js live ```` (no flag) renders a runnable moSHion sketch in a canvas iframe. Add `console` only for the rare case where the walkthrough needs a REPL attached to the running sketch (see `5-3-6-example-devtools-reveal`); never combine `console` with `plain`.
 
 Reference-only snippets (pure prose-embedded code the student isn't meant to run — e.g. a one-liner showing a syntax form) can stay as plain ```` ```js ```` if a walkthrough needs them, but the canonical pattern has none.
 
-## 4. Exception — fully-working shplay sketches
+## 4. Exception — fully-working moSHion sketches
 
-Per `shplay-lesson-conventions.md` §1, lessons with `preview: "example"` and `grading.totalPoints === 0` **may** ship a fully-working `script.js`. Reference/showcase examples live that way (`lessons/shplay-gravity/`, `shplay-camera/`, `shplay-pendulum/`, `shplay-sprite-showcase/`). When doing this, write `script.js` as solid, readable example code — this is the only lesson type where a complete program is the correct output.
+Per `moshion-lesson-conventions.md` §1, lessons with `preview: "example"` and `grading.totalPoints === 0` **may** ship a fully-working `script.js`. Reference/showcase examples live that way (`lessons/moshion-gravity/`, `moshion-camera/`, `moshion-pendulum/`, `moshion-sprite-showcase/`). When doing this, write `script.js` as solid, readable example code — this is the only lesson type where a complete program is the correct output.
 
 ## 5. Don'ts
 
 - **Do not auto-grade a worked example.** It's a reference, not a test.
-- **Do not use "Worked Example" as a synonym for "Starter".** Starters ship empty scaffolds and *are* graded (`preview: "shplay"` + `type: "lesson"`, see `shplay-lesson-conventions.md`).
+- **Do not use "Worked Example" as a synonym for "Starter".** Starters ship empty scaffolds and *are* graded (`preview: "moSHion"` + `type: "lesson"`, see `moshion-lesson-conventions.md`).
 - **Do not duplicate the module's teacher-led demo.** Module specs describe the live-in-class demo; the worked-example lesson is the student's after-class reference version, not a transcript.
 - **Do not include a `description` field in `lesson.json`.** See §1 field-by-field.
 - **Do not label step sections `## Worked Example N — …`.** One walkthrough per lesson, so the heading is just `## Step N — …`.
@@ -103,5 +103,5 @@ Examples:
 | Unit 2.1 / 2.2 buildout | Pattern crystallized in `2-1-3-example-minimum-sprite`, `2-1-7-example-keyboard`, `2-2-4-example-devtools-reveal`, `2-2-8-example-enemy-class`, `2-2-10-example-proc-vs-oop`. |
 | This doc | Hoisted out of per-module specs. |
 | Scaffolding pass | 2.1.4 canonical example pruned from 280 → 65 lines: dropped hub header, sibling-resources line, cross-example cheat sheet, and the "## Worked Example N —" labels; dropped unrelated walkthroughs (Keyboard Movement, frameCount) that belong in their own lessons. `description` field dropped from `lesson.json` (rendered as an ugly empty `<p>`; ContentLessonView now conditionally renders it). §1 / §3 / §5 updated to codify the new shape. |
-| Per-step live blocks | Each `## Step` now carries its own ```` ```js live ```` fence (instead of a trailing "combined final" block). Students can run and tweak every step independently. `public/shplay/runner.html` got `overflow: hidden` on html/body so oversized canvases get clipped rather than showing scrollbars inside the iframe. |
-| Plain-mode fix (2026-08-13) | Console-track examples (Units 1–4) were all authored with bare `js live`, rendering a useless blank shplay canvas for plain `console.log` code. Added a `plain` fence flag (`js live plain`) that executes directly and shows a captured Output pane beside the editor instead. Renamed the fence across every Unit 1–4 example content.md. §`live` code fences subsection rewritten to document both runtimes side-by-side. |
+| Per-step live blocks | Each `## Step` now carries its own ```` ```js live ```` fence (instead of a trailing "combined final" block). Students can run and tweak every step independently. `public/moshion/runner.html` got `overflow: hidden` on html/body so oversized canvases get clipped rather than showing scrollbars inside the iframe. |
+| Plain-mode fix (2026-08-13) | Console-track examples (Units 1–4) were all authored with bare `js live`, rendering a useless blank moSHion canvas for plain `console.log` code. Added a `plain` fence flag (`js live plain`) that executes directly and shows a captured Output pane beside the editor instead. Renamed the fence across every Unit 1–4 example content.md. §`live` code fences subsection rewritten to document both runtimes side-by-side. |

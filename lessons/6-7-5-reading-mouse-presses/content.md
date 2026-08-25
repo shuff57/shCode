@@ -1,6 +1,6 @@
 ## One frame, one click
 
-**Read after `6.7.4 Reading — shplay docs: mouse.pressing()`.** About 5 minutes.
+**Read after `6.7.4 Reading — moSHion docs: mouse.pressing()`.** About 5 minutes.
 
 `mouse.presses()` returns `true` on exactly one frame — the frame the button first goes down. The very next frame it returns `false`, even if you are still holding. That makes it a one-shot signal.
 
@@ -31,7 +31,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** one sprite per click, no matter how long you hold. The background clears each frame, but sprites persist because shplay keeps them in the world until deleted.
+**What you'll see:** one sprite per click, no matter how long you hold. The background clears each frame, but sprites persist because moSHion keeps them in the world until deleted.
 
 ---
 

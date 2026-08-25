@@ -1,5 +1,5 @@
 // 2.3.11 A13.1 Asteroid Field
-// Open the Quest tab for the graded requirements; open the Docs tab for the shPlay API.
+// Open the Quest tab for the graded requirements; open the Docs tab for the moSHion API.
 
 let ship, asteroids;
 

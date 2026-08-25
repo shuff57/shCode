@@ -4,15 +4,15 @@
   "description": "How sprite.addAni(name, frame1, ...) registers a named animation and makes it the active default. Read before 2.4.3b (changeAni).",
   "type": "lesson",
   "estimateMins": 6,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
   "preview": "reading",
   "week": 15,
   "slos": [
     "SLO-3"
   ],
-  "externalLink": "/docs/shplay",
-  "externalLinkLabel": "Open the in-app shplay docs",
+  "externalLink": "/docs/moshion",
+  "externalLinkLabel": "Open the in-app moSHion docs",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

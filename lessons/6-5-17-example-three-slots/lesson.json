@@ -4,7 +4,7 @@
   "description": "Build three save slots. Each slot is a differently-named key. Press 1/2/3 to save, load with a simple text menu.",
   "type": "lesson",
   "estimateMins": 20,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "example",
   "week": 16,

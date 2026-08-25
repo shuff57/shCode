@@ -16,7 +16,7 @@ import FileExplorer from './FileExplorer';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
 import JscadPreview from './JscadPreview';
-import ShPlayPreview from './ShPlayPreview';
+import MoshionPreview from './MoshionPreview';
 import RequirementsSection from './RequirementsSection';
 import LessonSteps from './LessonSteps';
 import Console from './Console';
@@ -27,7 +27,7 @@ import SubmitDialog from './SubmitDialog';
 import GradeReportView from './GradeReport';
 import TeacherPushBanner from './TeacherPushBanner';
 import CrossDeviceSyncBanner from './CrossDeviceSyncBanner';
-import ShPlayDocsContent from './ShPlayDocsContent';
+import MoshionDocsContent from './MoshionDocsContent';
 import AiHelpPanel from './AiHelpPanel';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import SolutionPanel from './SolutionPanel';
@@ -222,7 +222,7 @@ export default function LessonWorkspace({
 
   const isConsoleMode = lesson.preview === 'console';
   const isJscadMode = lesson.preview === 'jscad';
-  const isQ5Mode = lesson.preview === 'shplay';
+  const isMoshionMode = lesson.preview === 'moshion';
 
   // For JSCAD lessons: auto-run on first load
   useEffect(() => {
@@ -240,7 +240,7 @@ export default function LessonWorkspace({
 
   // For HTML lessons: auto-build preview on every change (debounced)
   useEffect(() => {
-    if (isConsoleMode || isJscadMode || isQ5Mode) return;
+    if (isConsoleMode || isJscadMode || isMoshionMode) return;
     const to = setTimeout(() => {
       const doc = buildPreviewHtml(lesson.files, files);
       setSrcDoc(doc);
@@ -362,7 +362,7 @@ export default function LessonWorkspace({
     setTimeout(() => runTests(), 600);
   }
 
-  // For shPlay lessons: snapshot the current code and bump runKey to reload the iframe.
+  // For moSHion lessons: snapshot the current code and bump runKey to reload the iframe.
   // We snapshot so edits after Run don't re-trigger the iframe until the next Run.
   function runQ5() {
     setRuntimeError(null);
@@ -430,7 +430,7 @@ export default function LessonWorkspace({
           runCode();
         } else if (isJscadMode) {
           runJscad();
-        } else if (isQ5Mode) {
+        } else if (isMoshionMode) {
           runQ5();
         } else {
           setCommitOpen(true);
@@ -551,14 +551,14 @@ export default function LessonWorkspace({
   const isNoPoints = totalPossible === 0;
   const canSubmit =
     !runtimeError &&
-    (isQ5Mode || isNoPoints
+    (isMoshionMode || isNoPoints
       ? allRequirementsPassed
       : totalScore >= (lesson.grading?.passingScore ?? 0));
-  const showAssignmentHeader = isAssignment || isQ5Mode;
+  const showAssignmentHeader = isAssignment || isMoshionMode;
   // q5 grading is binary/completion-based — show criteria counts, not points.
-  const headerScore = isQ5Mode ? passedCriteria : totalScore;
-  const headerTotal = isQ5Mode ? totalCriteria : totalPossible;
-  const headerUnitLabel = isQ5Mode ? '' : 'pts';
+  const headerScore = isMoshionMode ? passedCriteria : totalScore;
+  const headerTotal = isMoshionMode ? totalCriteria : totalPossible;
+  const headerUnitLabel = isMoshionMode ? '' : 'pts';
 
   return (
     <>
@@ -573,16 +573,16 @@ export default function LessonWorkspace({
             color: '#ffb86c',
             content: <AiHelpPanel lesson={lesson} />,
           },
-          ...(isQ5Mode
+          ...(isMoshionMode
             ? ([
                 {
                   key: 'docs',
                   label: 'Docs',
                   color: '#bd93f9',
-                  content: <ShPlayDocsContent />,
+                  content: <MoshionDocsContent />,
                   headerExtra: (
                     <a
-                      href="/docs/shplay"
+                      href="/docs/moshion"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-secondary btn-sm"
@@ -665,9 +665,9 @@ export default function LessonWorkspace({
           submitted={submitted}
           canSubmit={canSubmit}
           unitLabel={headerUnitLabel}
-          showStatus={!isQ5Mode}
-          showSubmit={!isQ5Mode}
-          scoreAlign={isQ5Mode ? 'right' : 'center'}
+          showStatus={!isMoshionMode}
+          showSubmit={!isMoshionMode}
+          scoreAlign={isMoshionMode ? 'right' : 'center'}
         />
       ) : (
         <div id="titleRow">
@@ -677,9 +677,9 @@ export default function LessonWorkspace({
       <div className="editor-card">
         <div className="editor-body">
           <div className="run-toolbar">
-            {(isConsoleMode || isJscadMode || isQ5Mode) && (
+            {(isConsoleMode || isJscadMode || isMoshionMode) && (
               <>
-                {isRunning && (isJscadMode || isQ5Mode) ? (
+                {isRunning && (isJscadMode || isMoshionMode) ? (
                   <button
                     className="btn-run"
                     style={{ background: '#ff5555', borderColor: '#ff5555' }}
@@ -690,7 +690,7 @@ export default function LessonWorkspace({
                 ) : (
                   <button
                     className="btn-run"
-                    onClick={isJscadMode ? runJscad : isQ5Mode ? runQ5 : runCode}
+                    onClick={isJscadMode ? runJscad : isMoshionMode ? runQ5 : runCode}
                   >
                     ▶ Run
                   </button>
@@ -793,7 +793,7 @@ export default function LessonWorkspace({
               <button className="btn-secondary btn-sm" onClick={() => setHistoryOpen(true)}>
                 History
               </button>
-              {isQ5Mode && (
+              {isMoshionMode && (
                 <button
                   className="btn-primary btn-sm"
                   onClick={handleSubmit}
@@ -835,8 +835,8 @@ export default function LessonWorkspace({
                 </>
               ) : isJscadMode ? (
                 <JscadPreview code={jscadCode} runKey={runKey} />
-              ) : isQ5Mode ? (
-                <ShPlayPreview code={q5Code} runKey={runKey} />
+              ) : isMoshionMode ? (
+                <MoshionPreview code={q5Code} runKey={runKey} />
               ) : (
                 <LivePreview srcDoc={srcDoc} />
               )}

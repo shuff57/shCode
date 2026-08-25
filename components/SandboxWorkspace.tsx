@@ -4,13 +4,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { useLessonStore } from '../lib/store';
 import CodeEditor from './CodeEditor';
-import ShPlayPreview from './ShPlayPreview';
+import MoshionPreview from './MoshionPreview';
 import JscadPreview from './JscadPreview';
 import JscadParamsPanel, { type ParamDef, type ParamValues } from './JscadParamsPanel';
 import Console from './Console';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
-import ShPlayDocsContent from './ShPlayDocsContent';
+import MoshionDocsContent from './MoshionDocsContent';
 import ModelEditor from './model/ModelEditor';
 import HandleOverlay, { type AnchorPoint } from './model/HandleOverlay';
 import { handlesFor } from '../lib/model-handles';
@@ -51,7 +51,7 @@ export default function SandboxWorkspace() {
   const fileContents = useLessonStore((s) => s.fileContents);
   const updateFile = useLessonStore((s) => s.updateFile);
 
-  const [modeId, setModeId] = useState<SandboxModeId>('shplay');
+  const [modeId, setModeId] = useState<SandboxModeId>('moshion');
   const mode = useMemo(() => getMode(modeId), [modeId]);
   const lesson = useMemo(() => sandboxLesson(mode), [mode]);
 
@@ -560,8 +560,8 @@ export default function SandboxWorkspace() {
       label: 'Docs',
       color: '#bd93f9',
       content:
-        mode.id === 'shplay' ? (
-          <ShPlayDocsContent />
+        mode.id === 'moshion' ? (
+          <MoshionDocsContent />
         ) : (
           <div style={{ padding: '12px 14px', color: '#6272a4', fontSize: 13, lineHeight: 1.6 }}>
             {mode.docsHref
@@ -745,7 +745,7 @@ export default function SandboxWorkspace() {
                 )}
               </div>
             ) : (
-              <ShPlayPreview code={code} runKey={runKey} />
+              <MoshionPreview code={code} runKey={runKey} />
             )}
           </div>
           <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>

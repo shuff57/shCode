@@ -4,7 +4,7 @@
   "description": "The complete beginner state machine: title screen → gameplay → game over → restart. The classic arcade loop.",
   "type": "lesson",
   "estimateMins": 20,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "example",
   "week": 17,

@@ -14,7 +14,7 @@ There are two ways to give your class access to a Sprite: *wrap one* (compositio
 - **Composition:** your class stores a `Sprite` as a property (`this.sprite = new Sprite(...)`). Your class is the owner; the Sprite is a tool it holds.
 - **Inheritance:** your class extends `Sprite`, inheriting every property and method that `Sprite` has. Your class *is* a Sprite.
 - Inheritance with a complex class like `Sprite` is risky early on — you inherit behavior you may not understand and can accidentally override things the physics engine depends on.
-- Composition gives you a clear boundary: `this.sprite` is the shplay API surface. Everything outside `this.sprite` is your class's own logic.
+- Composition gives you a clear boundary: `this.sprite` is the moSHion API surface. Everything outside `this.sprite` is your class's own logic.
 - **Rule of thumb:** wrap first. When you've mastered the wrapped class, you can consider inheriting.
 
 **Try it:**
@@ -46,7 +46,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** a red square with HP text below it. `e` is your `Enemy`; the sprite is a tool it holds. You access the sprite via `e.sprite.color`, `e.sprite.x`, etc. — you always know you're in shplay territory the moment you see `.sprite.`.
+**What you'll see:** a red square with HP text below it. `e` is your `Enemy`; the sprite is a tool it holds. You access the sprite via `e.sprite.color`, `e.sprite.x`, etc. — you always know you're in moSHion territory the moment you see `.sprite.`.
 
 **Try this:** read the code and answer — if a `HealthBar` class needed to display a progress bar for the enemy's HP, would it `extends Enemy` or hold a reference `this.enemy = someEnemy`? Think about which creates a cleaner boundary, then open the next lab.
 

@@ -15,7 +15,7 @@ That's it. `dx` is how far right B is from A. `dy` is how far down B is from A. 
 a.applyForce(dx * k, dy * k);
 ```
 
-This is pure math — no special shplay function needed beyond reading `.pos.x` and `.pos.y`.
+This is pure math — no special moSHion function needed beyond reading `.pos.x` and `.pos.y`.
 
 **What you'll learn from it:**
 - Subtracting A's position from B's position gives the direction vector from A to B.

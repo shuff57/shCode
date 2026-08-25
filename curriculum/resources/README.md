@@ -10,16 +10,16 @@ This directory collects the **reusable build conventions** for each lesson type 
 | `preview: "reading"`                       | Reading         | No       | [reading-conventions.md](reading-conventions.md)                                 |
 | `preview: "example"`                       | Worked Example  | No       | [example-conventions.md](example-conventions.md)                                 |
 | `preview: "slides"`                        | Slides          | No       | No conventions doc. Set `slidesUrl` to the absolute bookSHelf deck URL (`https://oerbookshelf.app/<book-slug>/decks/<section>.<theme>`, no `.html`); omit it and the lesson renders the "not published yet" placeholder. |
-| `preview: "shplay"` + `type: "lesson"`     | Q5 Lesson       | Yes      | [shplay-lesson-conventions.md](shplay-lesson-conventions.md)                   |
-| `preview: "shplay"` + `type: "challenge"`  | Challenge       | Yes      | [shplay-challenge-conventions.md](shplay-challenge-conventions.md)               |
-| `preview: "shplay"` + `type: "assignment"` | Assignment      | Yes      | [lab-assignment-conventions.md](lab-assignment-conventions.md)                   |
+| `preview: "moSHion"` + `type: "lesson"`     | Q5 Lesson       | Yes      | [moshion-lesson-conventions.md](moshion-lesson-conventions.md)                   |
+| `preview: "moSHion"` + `type: "challenge"`  | Challenge       | Yes      | [moshion-challenge-conventions.md](moshion-challenge-conventions.md)               |
+| `preview: "moSHion"` + `type: "assignment"` | Assignment      | Yes      | [lab-assignment-conventions.md](lab-assignment-conventions.md)                   |
 | `preview: "console"` + `type: "assignment"` | Assignment      | Yes      | [lab-assignment-conventions.md](lab-assignment-conventions.md) (§7)             |
 | `preview: "assignment"` + `aiGrader`       | Assignment      | Yes (AI) | [written-assignment-conventions.md](written-assignment-conventions.md)           |
 
 Authoritative badge list lives in `lib/lesson-badges.tsx` (`PREVIEW_BADGES`). Add a row there when introducing a new type.
 
 **Points policy — easy to get wrong when auditing a mixed-type module.** The course is mastery-based (no points visible to students), but the JSON-level shape *and* the pass threshold both differ by type:
-- `shplay` / `console` labs and challenges: `requirements[].points`, `grading.totalPoints`, `grading.passingScore` are **always `0`**, and `components/LessonWorkspace.tsx` gates Submit on **every requirement being green (100%)** (see `lab-assignment-conventions.md` §1/§7, `shplay-challenge-conventions.md`).
+- `moshion` / `console` labs and challenges: `requirements[].points`, `grading.totalPoints`, `grading.passingScore` are **always `0`**, and `components/LessonWorkspace.tsx` gates Submit on **every requirement being green (100%)** (see `lab-assignment-conventions.md` §1/§7, `moshion-challenge-conventions.md`).
 - `aiGrader` written assignments: `aiGrader.rubric[].points` is **either `1` per criterion or `0` per criterion** (never mixed within a lesson) — see `written-assignment-conventions.md` §1/§4. Unlike labs, written work is gated by `components/WrittenGrader.tsx`, which **allows partial credit by design**: ≥70% of rubric points earned (`1`-per-item shape) or a bare majority of criteria met-or-partial (`0`-per-item shape). `lesson.json.grading.totalPoints`/`passingScore` are not read on this path at all — they're inert metadata, not a gate.
 
 A lesson with non-zero points is only a bug if it's a lab/challenge — labs must gate at 100%. There is no equivalent "bug" shape for written assignments' rubric points; both `0`-per-item and `1`-per-item are legitimate and land on a different (still partial-credit) threshold. Don't expect editing `grading.passingScore` to change a written assignment's pass threshold — it won't.
@@ -44,8 +44,8 @@ Every lesson's `title` field **MUST** start with a three-part dotted number `<un
 ### Accepted / rejected examples
 
 ✅ `"5.1.1 Slides — Hello Sprite Movement"`
-✅ `"5.1.3 Reading — shplay docs: Canvas & Sprite"`
-✅ `"2.1.1 Slides — Conditionals"` (Unit 2 = Control Flow, not shplay — see `BOOK-TO-MODULE.md`)
+✅ `"5.1.3 Reading — moSHion docs: Canvas & Sprite"`
+✅ `"2.1.1 Slides — Conditionals"` (Unit 2 = Control Flow, not moSHion — see `BOOK-TO-MODULE.md`)
 ❌ `"Unit 5.1 Slides — Hello Sprite Movement"` (no numbered prefix)
 ❌ `"5.1 Sprite Playground"` (needs three parts, not two)
 ❌ `"Reading: 5.1.3 Canvas & Sprite"` (number must be at the start)

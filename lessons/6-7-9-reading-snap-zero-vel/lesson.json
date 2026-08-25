@@ -4,7 +4,7 @@
   "description": "How to move a sprite exactly to the cursor position each frame during a drag. Zeroing the velocity is the step that keeps physics from fighting your snap.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.7 Advanced Input and Joints",
   "preview": "reading",
   "week": 17,

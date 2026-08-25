@@ -1,6 +1,6 @@
 'use strict';
 /* Headless regression sweep — runs all 86 real lesson script.js/solution.js
- * files through the promoted public/shplay/shplay.js engine.
+ * files through the promoted public/moshion/moshion.js engine.
  *
  * Run: node spikes/engine-spike/sweep.cjs
  */
@@ -10,8 +10,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const REPO = path.resolve(__dirname, '..', '..');
-const PLANCK_PATH = path.join(REPO, 'public', 'shplay', 'planck.min.js');
-const ENGINE_PATH = path.join(REPO, 'public', 'shplay', 'shplay.js');
+const PLANCK_PATH = path.join(REPO, 'public', 'moshion', 'planck.min.js');
+const ENGINE_PATH = path.join(REPO, 'public', 'moshion', 'moshion.js');
 const LESSONS_DIR = path.join(REPO, 'lessons');
 
 const planckSrc = fs.readFileSync(PLANCK_PATH, 'utf8');
@@ -68,7 +68,7 @@ function createSandbox() {
   let rafCallback = null;
   sandbox.requestAnimationFrame = (cb) => { rafCallback = cb; return 1; };
 
-  // shplay.js uses setTimeout(fn, 0) for auto-boot deferral.
+  // moshion.js uses setTimeout(fn, 0) for auto-boot deferral.
   // Queue callbacks so they fire AFTER student code is loaded, not during
   // engine evaluation (when window.setup doesn't exist yet).
   const timeoutQueue = [];
@@ -100,7 +100,7 @@ function isJSCAD(filePath) {
   return src.includes('@jscad/modeling') || src.includes('module.exports');
 }
 
-function isNonQ5Play(filePath) {
+function isNonthe reference API(filePath) {
   const folder = path.basename(path.dirname(filePath));
   const src = fs.readFileSync(filePath, 'utf8');
   // These are console/HTML lessons — no setup()/draw() pattern
@@ -144,9 +144,9 @@ function runFile(filePath) {
 
   const src = fs.readFileSync(filePath, 'utf8');
 
-  // Non-q5play lessons (console/HTML) — no setup/draw pattern
-  if (isNonQ5Play(filePath)) {
-    return { file: relPath, status: 'NO-OP', error: null, state: null, note: 'non-q5play lesson (console/HTML)' };
+  // Non-the reference API lessons (console/HTML) — no setup/draw pattern
+  if (isNonthe reference API(filePath)) {
+    return { file: relPath, status: 'NO-OP', error: null, state: null, note: 'non-moSHion lesson (console/HTML)' };
   }
 
   const isScaffold = isStarterScaffold(src);

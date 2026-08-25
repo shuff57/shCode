@@ -18,7 +18,7 @@ paths. Nothing loads from a CDN at runtime.
 ## Where the docs live in the app
 
 - **In-app:** `/docs/jscad` — built from `lib/jscad-docs.ts`, with live
-  runnable examples in the same sandbox style as `/docs/shplay`.
+  runnable examples in the same sandbox style as `/docs/moshion`.
 - **External (canonical):** https://openjscad.xyz/docs/ — the generated JSDoc
   for the full `@jscad/modeling` surface. The in-app docs cover only what the
   course teaches; the external docs cover everything.

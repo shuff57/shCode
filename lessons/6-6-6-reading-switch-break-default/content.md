@@ -1,6 +1,6 @@
 ## `break` and `default` in `switch`
 
-**Read before `6.6.7 Reading — shplay docs: The state Variable`.** About 5 minutes.
+**Read before `6.6.7 Reading — moSHion docs: The state Variable`.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

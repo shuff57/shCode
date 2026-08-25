@@ -1,10 +1,10 @@
 {
   "id": "6-5-10-reading-json-parse",
-  "title": "6.5.10 Reading — shplay docs: JSON.parse(str)",
+  "title": "6.5.10 Reading — moSHion docs: JSON.parse(str)",
   "description": "JSON.parse unpacks a JSON string back into a JS object. It's the reverse of JSON.stringify.",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "reading",
   "week": 16,

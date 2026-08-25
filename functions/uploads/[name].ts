@@ -4,7 +4,7 @@
 // (its first line returns next() for anything not under /api/).
 //
 // It has to be unauthenticated. The sketch iframe in
-// components/ShPlayPreview.tsx is sandboxed WITHOUT allow-same-origin, on
+// components/MoshionPreview.tsx is sandboxed WITHOUT allow-same-origin, on
 // purpose, so student code cannot call /api/* as the signed-in student. An
 // opaque-origin document is cross-site for cookie purposes and the session
 // cookie is SameSite=Lax, so it is never sent — an auth-gated image URL

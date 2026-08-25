@@ -33,7 +33,7 @@ console.log(book.title);
 console.log(book.pages);
 ```
 
-That object holds data and nothing else — no behaviour yet. Methods arrive in Chapter 5, which is where OOP stops being a description and becomes something you write. Next quarter's shplay work is built this way: every sprite is an object with its own data and its own behaviour.
+That object holds data and nothing else — no behaviour yet. Methods arrive in Chapter 5, which is where OOP stops being a description and becomes something you write. Next quarter's moSHion work is built this way: every sprite is an object with its own data and its own behaviour.
 
 It is fine — expected, even — to find this abstract right now. You cannot really see the point of bundling data with behaviour until you have written a program big enough to be annoying without it. Chapter 5 builds one.
 

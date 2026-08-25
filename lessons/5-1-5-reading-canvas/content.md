@@ -8,7 +8,7 @@ By the end of this reading you should be able to answer:
 - Where is `(0, 0)` on the canvas — top-left, bottom-left, or centre?
 - If `y = 0` is the top edge, what does a larger `y` value mean?
 
-Every shplay sketch needs a canvas — the rectangular drawing area where sprites appear. You create one with `new Canvas(width, height)` on the first line of `setup()`.
+Every moSHion sketch needs a canvas — the rectangular drawing area where sprites appear. You create one with `new Canvas(width, height)` on the first line of `setup()`.
 
 **What you'll learn from it:**
 

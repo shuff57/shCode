@@ -5,7 +5,7 @@
 
 ## Hard rules (every lesson)
 
-- **CONSOLE track — Q1 JS fundamentals. NO q5play, NO game-dev, NO JSCAD anywhere.** No `player`, `sprite`, `Canvas`, etc.
+- **CONSOLE track — Q1 JS fundamentals. NO moSHion, NO game-dev, NO JSCAD anywhere.** No `player`, `sprite`, `Canvas`, etc.
 - Titles MUST start with the exact `U.M.N` shown (integer-only — no letter suffix; that mechanism was retired 2026-08-12, see `sub-module-spec-conventions.md` §4.1), or the lesson vanishes from its module.
 - Do NOT hand-edit `public/lessons-manifest.json` (auto-generated). Do NOT modify the existing console lessons (`conditionals`, `intro-algorithms`, `algorithm-practice`, `loops`, `functions`, `arrays`, `print-job-manager`).
 - Mirror the shape of the already-built 1.1 lessons EXACTLY:

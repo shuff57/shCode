@@ -4,8 +4,8 @@
   "description": "A property is data stored on a single instance via `this.name = value`. Read before the property labs.",
   "type": "lesson",
   "estimateMins": 6,
-  "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
+  "category": "Unit 2: moSHion — Applied Game Development",
+  "unit": "5.3 Classes and Objects via moSHion",
   "preview": "reading",
   "week": 12,
   "slos": [

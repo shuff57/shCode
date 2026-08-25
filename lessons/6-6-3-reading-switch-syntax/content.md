@@ -1,6 +1,6 @@
 ## The `switch` statement
 
-**Read before `6.6.4 Reading — shplay docs: switch in draw()`.** About 5 minutes.
+**Read before `6.6.4 Reading — moSHion docs: switch in draw()`.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

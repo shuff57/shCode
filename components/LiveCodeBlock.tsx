@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { Play, RotateCcw } from 'lucide-react';
-import ShPlayPreview from './ShPlayPreview';
+import MoshionPreview from './MoshionPreview';
 import LiveConsole from './LiveConsole';
 import CodeMirrorPane from './CodeMirrorPane';
 
@@ -22,12 +22,12 @@ interface Props {
    *  Only meaningful when `plain` is false — there's no running iframe to
    *  attach a REPL to in plain mode. */
   showConsole?: boolean;
-  /** Plain console-track code (no q5play/canvas). Executes directly in the
-   *  main thread (no shplay iframe) and shows a captured Output pane
+  /** Plain console-track code (no moSHion/canvas). Executes directly in the
+   *  main thread (no moshion iframe) and shows a captured Output pane
    *  side-by-side with the editor — the same layout and execution model as
    *  the in-app console-lesson workspace (see LessonWorkspace's isConsoleMode
    *  branch). Use for Unit 1-4 `console.log`-only reading/example blocks;
-   *  leave false for shplay/canvas sketches. */
+   *  leave false for moshion/canvas sketches. */
   plain?: boolean;
 }
 
@@ -195,7 +195,7 @@ export default function LiveCodeBlock({
               </pre>
             </>
           ) : (
-            <ShPlayPreview ref={iframeRef} code={committedCode} runKey={runKey} />
+            <MoshionPreview ref={iframeRef} code={committedCode} runKey={runKey} />
           )}
         </div>
       </div>

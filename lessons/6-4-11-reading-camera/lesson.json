@@ -1,18 +1,18 @@
 {
   "id": "6-4-11-reading-camera",
-  "title": "6.4.11 Reading — shplay docs: Camera",
-  "description": "shplay docs chapter on Camera. Read before `2.4.8 Worked Example — Camera Follow`.",
+  "title": "6.4.11 Reading — moSHion docs: Camera",
+  "description": "moshion docs chapter on Camera. Read before `2.4.8 Worked Example — Camera Follow`.",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
   "preview": "reading",
   "week": 15,
   "slos": [
     "SLO-3"
   ],
-  "externalLink": "/docs/shplay/camera",
-  "externalLinkLabel": "Open the in-app shplay Camera docs",
+  "externalLink": "/docs/moshion/camera",
+  "externalLinkLabel": "Open the in-app moSHion Camera docs",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

@@ -4,7 +4,7 @@
   "description": "The infinite-jump bug live, and the `colliding(ground)` fix. Watch before `2.3.18 Ground Detection`.",
   "type": "lesson",
   "estimateMins": 3,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.3 Physics Applications",
   "preview": "video",
   "week": 14,

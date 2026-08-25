@@ -1,7 +1,7 @@
 # Reading Lesson Conventions
 
 Canonical rules for in-app lessons whose primary surface is a text reading
-(internal doc chapter, freeCodeCamp reading, shplay docs,
+(internal doc chapter, freeCodeCamp reading, moSHion docs,
 etc.). When a module spec under `curriculum/modules/*.md` lists a
 "reading" entry or a `lessons/<slug>/` has
 `lesson.json.preview === "reading"`, these rules are binding.
@@ -29,8 +29,8 @@ etc.). When a module spec under `curriculum/modules/*.md` lists a
   "preview": "reading",
   "week": <n>,
   "slos": ["SLO-<n>"],
-  "externalLink": "/docs/shplay",
-  "externalLinkLabel": "Open the in-app shplay docs",
+  "externalLink": "/docs/moshion",
+  "externalLinkLabel": "Open the in-app moSHion docs",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],
@@ -40,7 +40,7 @@ etc.). When a module spec under `curriculum/modules/*.md` lists a
 
 ### Field-by-field
 
-- `externalLink` — URL or in-app path. Internal paths (e.g. `/docs/shplay`) are allowed when the canonical source is inside this app. External URLs open in a new tab — don't invent them.
+- `externalLink` — URL or in-app path. Internal paths (e.g. `/docs/moshion`) are allowed when the canonical source is inside this app. External URLs open in a new tab — don't invent them.
 - `externalLinkLabel` — human-readable label rendered with a `→` arrow (see `components/ContentLessonView.tsx` line 120). Defaults to the raw URL if omitted; always provide one.
 - `contentFile` — relative filename of a markdown file in the same lesson directory (conventionally `content.md`). Renders below the external link. Use for: framing the reading, comprehension questions, "what to notice" prompts. Keep it short — the reading itself lives behind `externalLink`.
 - `steps` / `requirements` / `grading.totalPoints` — always empty / zero. Readings are not auto-graded.
@@ -75,11 +75,11 @@ A fenced block annotated ```` ```js live ```` renders as a runnable code block i
 **Two runtimes, chosen by a fence flag — get this right or the block renders wrong:**
 
 - **Console-track units (1–4, plain JS, no canvas):** use ```` ```js live plain ````. Executes the code directly and shows a captured Output pane side-by-side with the editor — same layout and execution model as the in-app console lessons (e.g. `1.1.4`). This is the default for anything that's just `console.log`.
-- **shplay-track units (5+, canvas/sprite code):** use ```` ```js live ```` (no flag) — renders a runnable shplay sketch in a canvas iframe. Add `console` (```` ```js live console ````) only when the lesson specifically needs a DevTools-style REPL attached to the running sketch (rare — see `5-3-6-example-devtools-reveal`). Never combine `console` with `plain`; there's no iframe in plain mode for a REPL to attach to.
+- **moshion-track units (5+, canvas/sprite code):** use ```` ```js live ```` (no flag) — renders a runnable moSHion sketch in a canvas iframe. Add `console` (```` ```js live console ````) only when the lesson specifically needs a DevTools-style REPL attached to the running sketch (rare — see `5-3-6-example-devtools-reveal`). Never combine `console` with `plain`; there's no iframe in plain mode for a REPL to attach to.
 
 Getting this backwards is a real, previously-shipped bug: every console-track reading originally used `js live console`, which rendered a blank canvas box plus an unusable REPL instead of the intended Output pane. Fixed 2026-08-13 across all Unit 1–4 content — see History.
 
-**Console-track variant:** for a reading under a `preview: "console"` sub-module (no canvas, no q5 API — see `lab-assignment-conventions.md` §7), annotate the fence ```` ```js live console ```` instead of bare ```` ```js live ````. `components/MarkdownWithLiveBlocks.tsx`'s `LIVE_FENCE` regex parses the `console` flag and renders a console-output panel instead of a shplay canvas — using the bare `js live` (shplay) fence in a console-track reading either renders nothing meaningful or the wrong runtime. Established precedent: every reading under sub-module 1.1.1 and the pre-existing `lessons/1-1-2-*` / `1-1-3-*` set uses this variant. An optional trailing `id=<slug>` (e.g. ```` ```js live console id=inspect-sprite ````) is also supported by the same regex, for when a lesson needs to reference a specific block.
+**Console-track variant:** for a reading under a `preview: "console"` sub-module (no canvas, no q5 API — see `lab-assignment-conventions.md` §7), annotate the fence ```` ```js live console ```` instead of bare ```` ```js live ````. `components/MarkdownWithLiveBlocks.tsx`'s `LIVE_FENCE` regex parses the `console` flag and renders a console-output panel instead of a moSHion canvas — using the bare `js live` (moSHion) fence in a console-track reading either renders nothing meaningful or the wrong runtime. Established precedent: every reading under sub-module 1.1.1 and the pre-existing `lessons/1-1-2-*` / `1-1-3-*` set uses this variant. An optional trailing `id=<slug>` (e.g. ```` ```js live console id=inspect-sprite ````) is also supported by the same regex, for when a lesson needs to reference a specific block.
 
 ### Length
 
@@ -104,7 +104,7 @@ Aim for **under ~100 lines**. The canonical example is 72 lines. Going longer us
 `"<unit-numbering> Reading — <source>: <topic>"` — the word "Reading" in the title keeps the type legible.
 
 Examples:
-- `"2.1.3 Reading — shplay docs: Canvas & Sprite"`
+- `"2.1.3 Reading — moSHion docs: Canvas & Sprite"`
 - `"1.1.2 Reading — FCC: Variables and Strings"`
 
 ## History
@@ -115,4 +115,4 @@ Examples:
 | This doc | Hoisted out of per-module specs. |
 | Scaffolding pass | Stripped hub-style lead header, sibling-resources hub line, "Primary reading" section wrapper, restated external link, R1/R2/"Chapter" subsection labels, and generic "how to read the docs efficiently" block from the canonical example. Reading now opens straight into per-topic `## <Topic>` subsections and ends on the optional glossary. §3 rhythm + §4 don'ts updated to match. |
 | Required-interactives pass | Promoted per-topic `js live` blocks and the closing glossary from "optional" to **required** after `2-2-3-reading-classes` shipped as long-form prose with neither. §3, §4 don'ts, and the `live` code fences subsection updated. |
-| Plain-mode fix (2026-08-13) | Found every console-track (Units 1–4) reading was authored with `js live console`, which renders the shplay-canvas-iframe + REPL runtime meant for Unit 5+ — a blank canvas box plus an unusable REPL, since there's no sketch to run. Added a `plain` fence flag (`components/LiveCodeBlock.tsx`, `components/MarkdownWithLiveBlocks.tsx`) that executes directly and shows a captured Output pane side-by-side with the editor. Renamed the fence across all Unit 1–4 content.md files (`js live console` → `js live plain`); left the one legitimate shplay-REPL usage (`5-3-6-example-devtools-reveal`) on `js live console`. §`live` code fences subsection rewritten to document both runtimes. |
+| Plain-mode fix (2026-08-13) | Found every console-track (Units 1–4) reading was authored with `js live console`, which renders the moshion-canvas-iframe + REPL runtime meant for Unit 5+ — a blank canvas box plus an unusable REPL, since there's no sketch to run. Added a `plain` fence flag (`components/LiveCodeBlock.tsx`, `components/MarkdownWithLiveBlocks.tsx`) that executes directly and shows a captured Output pane side-by-side with the editor. Renamed the fence across all Unit 1–4 content.md files (`js live console` → `js live plain`); left the one legitimate moshion-REPL usage (`5-3-6-example-devtools-reveal`) on `js live console`. §`live` code fences subsection rewritten to document both runtimes. |

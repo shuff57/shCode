@@ -4,7 +4,7 @@
   "description": "Two players on one keyboard means two separate key sets and two separate sets of variables — one for each player. Read this before 2.7.25 Worked Example — Two Paddles, Two Schemes.",
   "type": "lesson",
   "estimateMins": 7,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.7 Advanced Input",
   "preview": "reading",
   "week": 17,

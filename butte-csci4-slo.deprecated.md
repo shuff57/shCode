@@ -163,16 +163,16 @@ Items from this official outline that are **missing or underserved** in the curr
 | 8 | Strings | W2–3 string methods | Adopt |
 | 9 | Lists | W8 Arrays (incl. multiple-subscripted) | Adopt |
 | 10 | Dictionaries | — | **Excluded** — not in the CSCI 4 outline or SLOs |
-| 11 | Classes | W12 OOP (shplay) | Borrow framing only — shplay-grounded OOP retained over abstract OOP |
+| 11 | Classes | W12 OOP (moSHion) | Borrow framing only — moshion-grounded OOP retained over abstract OOP |
 | 12 | Recursion | — (W30 optional enrichment) | Optional, not assessed |
 | 13 | Inheritance | W12 (named, not required) | Name only |
-| 14 | Files | W8 File I/O, W16 shplay save, W31 JSCAD multi-file | Adopt concept — browser FileReader replaces Python `open()` |
+| 14 | Files | W8 File I/O, W16 moSHion save, W31 JSCAD multi-file | Adopt concept — browser FileReader replaces Python `open()` |
 | 15 | Data Science | — | Excluded — out of CSCI 4 scope |
 
 ### Excluded Python content
 - **Ch 10 Dictionaries** — no outline/SLO requirement.
 - **Ch 15 Data Science** — belongs to *Principles of Data Science*, not CSCI 4.
-- **Ch 12 Recursion / Ch 13 Inheritance** — beyond scope; handled as optional enrichment / shplay context.
+- **Ch 12 Recursion / Ch 13 Inheritance** — beyond scope; handled as optional enrichment / moSHion context.
 
 ### Gap coverage the Python book helps close
 The outline's required topics that the book covers directly and the plan under-serves:
@@ -203,7 +203,7 @@ CC-BY-NC (code MIT), free online + free PDF/EPUB. Strong narrative prose with pr
 | Testing principles (W27) | [Code quality](/code-quality) → Automated testing with Mocha |
 | Debugging (W26) | [Code quality](/code-quality) → Debugging in the browser |
 | Multiple-subscripted arrays | [Arrays](/array) + [Array methods](/array-methods) |
-| JSON / serialization (W16 shplay save) | [JSON methods, toJSON](/json) |
+| JSON / serialization (W16 moSHion save) | [JSON methods, toJSON](/json) |
 | LocalStorage / persistence (W16) | [Storing data in the browser](/data-storage) → LocalStorage |
 | Async / preload (W16 loadJSON) | [Promises, async/await](/async) → callbacks intro |
 | DOM / browser events (if HTML is added) | [Document](/document) + [Introduction to Events](/events) |

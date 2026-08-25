@@ -5,9 +5,9 @@ import DOMPurify from 'isomorphic-dompurify';
 
 /**
  * Hierarchy:
- *   Unit    = top-level (e.g. "Unit 2: shPlay — Applied Game Development") — category field on lessons
- *   Module  = mid-level (e.g. "2.1 shPlay Foundations") — one .md file in curriculum/modules/
- *   Lesson  = leaf     (e.g. "2.1.1 Video: Your first shPlay sketch") — one folder under lessons/
+ *   Unit    = top-level (e.g. "Unit 2: moSHion — Applied Game Development") — category field on lessons
+ *   Module  = mid-level (e.g. "2.1 moSHion Foundations") — one .md file in curriculum/modules/
+ *   Lesson  = leaf     (e.g. "2.1.1 Video: Your first moSHion sketch") — one folder under lessons/
  */
 
 const ROOT = process.cwd();
@@ -56,7 +56,7 @@ export interface ModuleSummary {
   weeks?: number[];
   environment?: string;
   category?: string;     // category lesson.json must match to appear in this module
-  slug: string;          // e.g. "2.1_shplay-foundations"
+  slug: string;          // e.g. "2.1_moshion-foundations"
 }
 
 export interface LessonInModule {

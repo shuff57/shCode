@@ -4,9 +4,9 @@
   "description": "Instantiate b1 and b2 from the same class with different colors, then mutate only b1 to confirm each instance's state is independent.",
   "type": "lesson",
   "estimateMins": 8,
-  "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
-  "preview": "shplay",
+  "category": "Unit 2: moSHion — Applied Game Development",
+  "unit": "5.3 Classes and Objects via moSHion",
+  "preview": "moshion",
   "week": 12,
   "slos": [
     "SLO-2",
@@ -18,7 +18,7 @@
       "title": "Create two Box instances with different colors",
       "instructions": "In `setup()`, create `b1 = new Box('red')` and `b2 = new Box('blue')`. Each instance gets its own color from the constructor argument.",
       "hints": [
-        "Open the shplay docs drawer on the right and review how constructor arguments work in the class examples."
+        "Open the moSHion docs drawer on the right and review how constructor arguments work in the class examples."
       ]
     },
     {
@@ -26,7 +26,7 @@
       "title": "Mutate only b1 and confirm b2 is unaffected",
       "instructions": "In `draw()`, press space to change `b1.color` to a new color. Watch the screen — `b2` should stay blue no matter what you do to `b1`.",
       "hints": [
-        "Open the shplay docs drawer on the right and find the keyboard input section."
+        "Open the moSHion docs drawer on the right and find the keyboard input section."
       ]
     }
   ],

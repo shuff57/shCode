@@ -1139,7 +1139,7 @@ details.console > summary::-webkit-details-marker { display: none; }
   margin-left: 4px;
 }
 
-/* Docs page (shPlay) */
+/* Docs page (moSHion) */
 .docs-page {
   max-width: 960px;
   margin: 0 auto;
@@ -1264,7 +1264,7 @@ details.console > summary::-webkit-details-marker { display: none; }
   white-space: pre;
 }
 
-/* Paginated shPlay reference — uses the main site tokens (--bg, --card, --muted, --border, --text, --brand) */
+/* Paginated moSHion reference — uses the main site tokens (--bg, --card, --muted, --border, --text, --brand) */
 .docs-layout {
   display: grid;
   grid-template-columns: 240px 1fr;

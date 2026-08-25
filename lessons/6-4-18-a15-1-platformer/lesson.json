@@ -4,9 +4,9 @@
   "description": "Combine animated sprites, a camera that follows the player, three or more platforms, working jump mechanics, and a visible end goal into a playable side-scroller. Auto-graded.",
   "type": "assignment",
   "estimateMins": 90,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 15,
   "slos": [
     "SLO-3"
@@ -17,7 +17,7 @@
       "title": "Create the player with an initial visual",
       "instructions": "In setup(), create the player sprite. Give it an initial visual — either addAni('idle', ...) or sprite.image = '🧍'.",
       "hints": [
-        "Open the shplay docs drawer and find the Visual / image section. Single emoji strings work as zero-asset placeholders."
+        "Open the moSHion docs drawer and find the Visual / image section. Single emoji strings work as zero-asset placeholders."
       ]
     },
     {
@@ -25,7 +25,7 @@
       "title": "Build a level wider than the canvas",
       "instructions": "In setup(), create at least three static platforms ('static' as the 5th constructor argument) plus a ground. Spread them across an x-range wider than the canvas so the level requires scrolling.",
       "hints": [
-        "The Sprite constructor's 5th argument controls physics type. Open the shplay docs drawer and find the Sprite section."
+        "The Sprite constructor's 5th argument controls physics type. Open the moSHion docs drawer and find the Sprite section."
       ]
     },
     {
@@ -33,7 +33,7 @@
       "title": "Place a visible end goal",
       "instructions": "In setup(), add a goal sprite far to the right. Give it sprite.collider = 'none' so it doesn't physically push the player away.",
       "hints": [
-        "Open the shplay docs drawer and find the Visual / image section for the goal's appearance."
+        "Open the moSHion docs drawer and find the Visual / image section for the goal's appearance."
       ]
     },
     {
@@ -41,7 +41,7 @@
       "title": "Clear the background each frame",
       "instructions": "In draw(), call background(...) so old frames don't pile up.",
       "hints": [
-        "Search the shplay docs drawer for background()."
+        "Search the moSHion docs drawer for background()."
       ]
     },
     {
@@ -49,7 +49,7 @@
       "title": "WASD movement + state-driven visual swap",
       "instructions": "In draw(), read WASD with kb.pressing. Set the player's horizontal motion AND swap its visual based on motion — sprite.image to a 'run' emoji when moving, back to 'idle' when not. The grader looks for at least two animation states inside draw().",
       "hints": [
-        "Open the shplay docs drawer's Input / Keyboard section for kb.pressing."
+        "Open the moSHion docs drawer's Input / Keyboard section for kb.pressing."
       ]
     },
     {
@@ -57,7 +57,7 @@
       "title": "Ground-gated jump",
       "instructions": "In draw(), use kb.presses('w') (edge-triggered) AND player.colliding(allSprites) together to jump only when the player is touching the ground or a platform.",
       "hints": [
-        "Open the shplay docs drawer's Sprite section for colliding/overlaps. kb.presses fires once per press; kb.pressing fires every frame the key is held."
+        "Open the moSHion docs drawer's Sprite section for colliding/overlaps. kb.presses fires once per press; kb.pressing fires every frame the key is held."
       ]
     },
     {
@@ -73,7 +73,7 @@
       "title": "Goal overlap + win message",
       "instructions": "In draw(), check player.overlaps(goal). When it's truthy, call text('You win!', ...) so the win message is what the overlap triggers.",
       "hints": [
-        "Open the shplay docs drawer's Sprite section for overlaps. text() is the global drawing function for on-canvas text."
+        "Open the moSHion docs drawer's Sprite section for overlaps. text() is the global drawing function for on-canvas text."
       ]
     }
   ],

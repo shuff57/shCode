@@ -1,10 +1,10 @@
 {
   "id": "6-5-11-reading-store-structured",
-  "title": "6.5.11 Reading — shplay docs: Storing Structured Data",
+  "title": "6.5.11 Reading — moSHion docs: Storing Structured Data",
   "description": "The full pattern: build a save object, stringify it, store it. Then getItem, parse, and restore. Complete round-trip.",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "reading",
   "week": 16,

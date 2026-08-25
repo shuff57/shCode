@@ -7,7 +7,7 @@
 -- the link can fetch the image, with no auth check.
 --
 -- That is deliberate and it is the only thing that works. The sketch iframe
--- (components/ShPlayPreview.tsx) is sandboxed WITHOUT allow-same-origin, on
+-- (components/MoshionPreview.tsx) is sandboxed WITHOUT allow-same-origin, on
 -- purpose, so student code cannot reach /api/* carrying the session cookie.
 -- An opaque-origin document making a subresource request is cross-site for
 -- cookie purposes, and the session cookie is SameSite=Lax, so it is not sent

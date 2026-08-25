@@ -4,7 +4,7 @@
   "description": "Build three distinct screens — red, green, blue backgrounds with different text — all controlled by one state variable with switch.",
   "type": "lesson",
   "estimateMins": 15,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "example",
   "week": 17,

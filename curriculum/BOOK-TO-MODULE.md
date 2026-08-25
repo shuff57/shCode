@@ -76,7 +76,7 @@ lumpy (`2.2-2.7` is one row for all of chapter 6):
 |---|---|
 | 1, 2, 3 | 1.1 Foundations |
 | 4 | Q1-synth Print Shop |
-| 5 | 2.1 shPlay Foundations |
+| 5 | 2.1 moSHion Foundations |
 | 6 | 2.2–2.7 Game Mechanics |
 | 7 | Q2-synth Arcade Cabinet |
 | 8 | 3.1–3.2 JSCAD Foundations |
@@ -100,7 +100,7 @@ built alongside chapters 5–7 even though nothing wrote it down:
 |---|---|---|
 | 5.1 Hello Sprite and Movement | `2.1.1_hello-sprite-movement.md` | 2.1 |
 | 5.2 Physics Feel | `2.1.2_physics-feel.md` | 2.1 |
-| 5.3 Classes and Objects via shPlay | `2.2.1_classes-via-shplay.md` | 2.2 |
+| 5.3 Classes and Objects via moSHion | `2.2.1_classes-via-moshion.md` | 2.2 |
 | 6.1 Groups **+** 6.2 Overlaps and Collisions | `2.3.1_groups-overlaps.md` | 2.3 |
 | 6.3 Physics Applications | `2.3.2_physics-applications.md` | 2.3 |
 | 6.4 Animated Sprites and Camera | `2.4.1_animation-camera.md` | 2.4 |
@@ -216,12 +216,12 @@ on disk today. The actual result:
 | Unit 1.2 Control Flow | Unit 2, modules 2.1 / 2.2 / 2.3 | book Ch.2 §2.1 Conditionals, §2.2 Algorithms/Loops, §2.3 Switch |
 | Unit 1.3 Functions and Data | Unit 3, modules 3.1 / 3.2 | book Ch.3 §3.1 Functions, §3.2 Arrays |
 | Unit 1.4 Synthesis | Unit 4, module 4.1 | book Ch.4 §4.1 Print Shop |
-| Unit 2.1 shPlay Foundations, 2.2 OOP | Unit 5, modules 5.1 / 5.3 | book Ch.5 §5.1 Hello Sprite, §5.3 Classes/Objects (§5.2 Physics Feel not built) |
+| Unit 2.1 moSHion Foundations, 2.2 OOP | Unit 5, modules 5.1 / 5.3 | book Ch.5 §5.1 Hello Sprite, §5.3 Classes/Objects (§5.2 Physics Feel not built) |
 | Unit 2.3 Collections and Physics Applications | Unit 6, modules 6.1 / 6.3 | book Ch.6 §6.1+6.2 Groups/Overlaps combined, §6.3 Physics Applications |
 | Unit 2.4–2.7 | Unit 6, modules 6.4–6.7 | book Ch.6 §6.4–§6.8 (6.7 combines §6.7 Advanced Input + §6.8 Joints, per this doc's own combined-spec rule) |
 | Unit 2.8 (not built) | Unit 7, module 7.1 | book Ch.7 §7.1 Arcade Cabinet |
 
-176 shplay lesson folders and their D1 rows (`lesson_state`, `commits` — 35 real
+176 moSHion lesson folders and their D1 rows (`lesson_state`, `commits` — 35 real
 students, 3,858 rows) were renumbered and repointed in this pass; so were the smaller
 1.1–1.4 carry-overs. **This reverses the "Q2 is grandfathered" rule that used to be
 here** — that rule stood until 2026-08-12, when it was explicitly overridden because
@@ -332,9 +332,9 @@ per slot:
 | `video` | no | none — URL left empty, teacher curates |
 | `reading` | no | none |
 | `example` | no | fully working sketch (read-along) |
-| `shplay (lesson)` | yes | scaffold + `// STEP N:` description comments |
-| `shplay (assignment)` | yes | same scaffold shape, no solution code |
-| `shplay (challenge)` | yes | **empty file** — student structures it |
+| `moshion (lesson)` | yes | scaffold + `// STEP N:` description comments |
+| `moshion (assignment)` | yes | same scaffold shape, no solution code |
+| `moshion (challenge)` | yes | **empty file** — student structures it |
 | `assignment` + `aiGrader` | yes (AI) | none — written response |
 
 ---
@@ -447,10 +447,10 @@ rewriting a working lab unless the concept it grades actually moved.
   described a retired "5 sub-modules under one Unit 1.1" structure that no longer
   exists (see the renumber table above). Modules 1.2–1.5 need fresh section-level specs
   authored against the book directly, not a resync of the deleted files.
-- **Module statuses are stale across the shplay units (5–7).** Several module spec
+- **Module statuses are stale across the moSHion units (5–7).** Several module spec
   frontmatter `status:` fields don't match what's actually shipped on disk. Trust the
   disk, fix the frontmatter during resync.
-- **Slides moved off Slidev entirely (2026-08-12).** The old shplay-era Slidev decks
+- **Slides moved off Slidev entirely (2026-08-12).** The old moshion-era Slidev decks
   (`slides/2.1`–`2.5`, `public/slides/2.1`–`2.5`) collided with the new Unit 2 (Control
   Flow) module ids after the renumber and were removed rather than resynced — every
   `*-1-slides` lesson now carries a placeholder `slidesUrl` (its own module id, e.g.

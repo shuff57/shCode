@@ -4,9 +4,9 @@
   "description": "Write `Counter.tick()` — a method that takes no arguments and mutates `this.n`. First method you write from scratch.",
   "type": "lesson",
   "estimateMins": 8,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 12,
   "slos": [
     "SLO-2",
@@ -18,7 +18,7 @@
       "title": "Write the tick() method",
       "instructions": "Inside the `Counter` class body, after the constructor, write a `tick()` method that adds 1 to `this.n`. Press space in the sketch to call it and watch the number on screen increase.",
       "hints": [
-        "Open the shplay docs drawer on the right and review the class syntax section for method declaration format."
+        "Open the moSHion docs drawer on the right and review the class syntax section for method declaration format."
       ]
     }
   ],

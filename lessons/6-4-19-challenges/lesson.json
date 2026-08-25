@@ -4,9 +4,9 @@
   "description": "Pick one (or more) Animation & Camera stretches — parallax background, mirror the sprite when it walks left, or add vertical camera follow. Auto-graded.",
   "type": "challenge",
   "estimateMins": 30,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 15,
   "slos": [
     "SLO-3"
@@ -42,7 +42,7 @@
       "title": "Clear the background each frame",
       "instructions": "Call background(...) inside draw() so old frames don't pile up.",
       "hints": [
-        "Search the shplay docs drawer for background()."
+        "Search the moSHion docs drawer for background()."
       ]
     }
   ],

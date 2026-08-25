@@ -2,7 +2,7 @@
 
 ## CSCI 4 — Introduction to Programming Concepts and Methodologies
 
-_JavaScript + shPlay + JSCAD. **CS meets on odd days only** (single track). Book-native numbering: Unit N = book Chapter N, module N.S = Chapter N §N.S._
+_JavaScript + moSHion + JSCAD. **CS meets on odd days only** (single track). Book-native numbering: Unit N = book Chapter N, module N.S = Chapter N §N.S._
 
 > **GENERATED FILE — do not hand-edit.** Produced by `scripts/cs_schedule.py`; run `PYTHONUTF8=1 python scripts/cs_schedule.py` to regenerate. Any change to the section list, a day count or a pairing shifts every later date, so hand-patching rows corrupts the rest. The same data drives PART B of `curriculum-plan.md`.
 
@@ -73,7 +73,7 @@ _JavaScript + shPlay + JSCAD. **CS meets on odd days only** (single track). Book
 | | _Veterans Day — no school_ | | |
 | 32 | **§4.1 Print Shop -- Q1 Synthesis (day 3/3)** | 14 | Fri Nov 13, 2026 |
 
-### Chapter 5: shPlay Foundations
+### Chapter 5: moSHion Foundations
 
 | # | Meeting | Wk | Date |
 |---:|---|---:|---|

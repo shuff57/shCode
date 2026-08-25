@@ -4,15 +4,15 @@
   "description": "Why background(color) must be the first call inside draw() to clear the previous frame — and what motion trails look like without it. Read before 2.1.3f.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
   "preview": "reading",
   "week": 10,
   "slos": [
     "SLO-3"
   ],
-  "externalLink": "/docs/shplay",
-  "externalLinkLabel": "Open the in-app shplay docs",
+  "externalLink": "/docs/moshion",
+  "externalLinkLabel": "Open the in-app moSHion docs",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

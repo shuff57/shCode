@@ -87,7 +87,7 @@ export interface Lesson {
   assignmentCode?: string;
   category?: string;
   unit?: string;
-  preview?: 'html' | 'console' | 'jscad' | 'shplay' | 'reading' | 'video' | 'example' | 'challenge' | 'assignment' | 'slides' | 'diagram' | 'quiz';
+  preview?: 'html' | 'console' | 'jscad' | 'moshion' | 'reading' | 'video' | 'example' | 'challenge' | 'assignment' | 'slides' | 'diagram' | 'quiz';
   week?: number;
   slos?: string[];
   files: FileNode[];

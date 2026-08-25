@@ -4,7 +4,7 @@
   "description": "A win screen shows when the player reaches the goal. It's a distinct state with congratulations, final stats, and a 'Play Again?' option.",
   "type": "lesson",
   "estimateMins": 15,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "example",
   "week": 17,

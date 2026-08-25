@@ -1,7 +1,7 @@
 # Handoff — 2026-08-24 · shCAD shipped; no lesson uses it yet
 
 shCAD — a plain-words surface over `@jscad/modeling`, the JSCAD equivalent of what
-shPlay is to planck — was designed, built, gauntleted three times and committed on
+moSHion is to planck — was designed, built, gauntleted three times and committed on
 2026-08-24. The gate is green and a student can reach every part of it. **What does
 not exist is a single Q3 lesson that uses it.** The layer is done; the curriculum
 work it was built for has not started. That is the handoff.
@@ -638,8 +638,8 @@ This file is a point-in-time state report. When it goes stale, delete it.
 composition, OOP foundations) — where `cs-3d`'s Unit 3 is functions and arrays. Those
 lessons are **not** merged and were never deployed.
 
-The trap: both branches have a file at `public/shplay/shplay.js`, and they are
-unrelated libraries. On `cs-3d` shPlay is a 2D physics facade over planck.js. On
+The trap: both branches have a file at `public/moshion/moshion.js`, and they are
+unrelated libraries. On `cs-3d` moSHion is a 2D physics facade over planck.js. On
 `shallot-ge` it is a 3D facade over three.js. A diff between them is meaningless and
 a merge would be a rewrite. Treat the branch as an unfinished proposal, not as work in
 flight, and ask the operator before touching it.
@@ -649,7 +649,7 @@ Deploy is `npx wrangler pages deploy out --project-name shcode --branch cs-3d`, 
 throwaway `git worktree` at the sha you mean to ship. That is not paranoia — it is how
 the CRLF defect in §5 was found.
 
-Production right now serves the full 2026-08-22 state: `shplay.js` with the Web Audio
+Production right now serves the full 2026-08-22 state: `moshion.js` with the Web Audio
 `Sound` class, `/api/uploads` (401 unauthenticated, as designed), and the vendored
 JSCAD runtime at `/jscad/lib/`.
 
@@ -662,7 +662,7 @@ JSCAD runtime at `/jscad/lib/`.
   diagram ..............................  ALL PASS
   due dates, quiz (14/91), grader (17) .  ALL PASS
   runner timeout, capstone (19/11) .....  ALL PASS
-  shPlay  corpus 271/271   semantic 85/85  PASS
+  moSHion  corpus 271/271   semantic 85/85  PASS
   uploads ..............................  56 checks
   JSCAD gate ...........................  248/248
   JSCAD docs ...........................  208 examples, 94/94 exports, 1 warning
@@ -679,8 +679,8 @@ The gate prints that on every run rather than hiding it.
 Four sessions were in this tree at once. Their commit bodies are unusually detailed and
 are the real record — `git log --format='%B'` on any sha below repays the read.
 
-**shPlay game API** (`23aae49 78af477 d7c3b16 6524706 6afaaa3`)
-q5play parity 19% → 69%; the engine went 807 → 2,723 lines. Added: key-name
+**moSHion game API** (`23aae49 78af477 d7c3b16 6524706 6afaaa3`)
+the reference API parity 19% → 69%; the engine went 807 → 2,723 lines. Added: key-name
 normalisation, camera on/off + `sprite.screenSpace` HUDs, joints, text layout,
 `world.explodeAt`, group ops, and a Web Audio `Sound` class. 85 behavioural checks
 now exist where there were zero.
@@ -716,7 +716,7 @@ will not be there.
 
 | Missing | Consequence and fix |
 | --- | --- |
-| `_workspace/**` (ignored by `*`) | **The shPlay design record is lost.** `_workspace/gauntlet/DECISIONS.md`, 873 lines, D1–D32, is local to the machine it was written on. §6 distils it; the rest is gone unless copied over by hand. |
+| `_workspace/**` (ignored by `*`) | **The moSHion design record is lost.** `_workspace/gauntlet/DECISIONS.md`, 873 lines, D1–D32, is local to the machine it was written on. §6 distils it; the rest is gone unless copied over by hand. |
 | `.dev.vars` | Local `wrangler pages dev` has no auth. Recreate with `AUTH_SECRET`, `ADMIN_EMAILS`, `OLLAMA_API_KEY`, `OLLAMA_HOST`. |
 | `.wrangler/` | No local D1 or R2 state; every local test account is gone. `wrangler d1 migrations apply shcode-commits --local`, then sign up again. |
 | `functions/_shared/*.generated.ts` | Solutions and starters resolve to nothing. Any `npm run build` or `npm test` regenerates them via prebuild. |
@@ -742,7 +742,7 @@ rewrites LF on checkout. The JSCAD harness cut a shim out of `runner.html` by ma
 `<script>\n`, matched zero blocks against `\r\n`, and took 218 checks down with it —
 248/248 in one tree, 30/248 in a worktree beside it. Fixed by normalising on read, plus
 `.gitattributes`. **On a new machine, run `npm test` before believing anything.**
-(The shPlay gate was separately measured under CRLF and is unaffected — `164f3ef`
+(The moSHion gate was separately measured under CRLF and is unaffected — `164f3ef`
 retracts an earlier guess that it might have the same exposure.)
 
 **The preview runners refuse to run at top level, on purpose.** Navigating Playwright
@@ -771,19 +771,19 @@ paths. Blanket staging has swept another session's work into a commit twice.
 because migration files were hand-run with `d1 execute`, which does not write it. As of
 2026-08-22 the ledger is current through 0015 and matches the data.
 
-## 6. shPlay decisions worth keeping (distilled from the file that stays behind)
+## 6. moSHion decisions worth keeping (distilled from the file that stays behind)
 
-Deliberate divergences from q5play. The gate prints all of them as `DELTAS`, and none of
+Deliberate divergences from the reference API. The gate prints all of them as `DELTAS`, and none of
 them gate the build:
 
 - **`overlaps()` is level-triggered**, not edge-triggered — a curriculum choice. The
-  q5play-faithful edge semantics live on `collides()` / `overlapping()` / `overlapped()`.
-- **Named key properties return `pressing()`'s value**, not q5play's raw signed counter,
+  the reference API-faithful edge semantics live on `collides()` / `overlapping()` / `overlapped()`.
+- **Named key properties return `pressing()`'s value**, not the reference API's raw signed counter,
   so `if (kb.space)` cannot double-fire on key-up.
 - **Defaults differ**: density 1 (not 5), friction 0, bounciness 0, gravity (0, 9.8).
 - **The direction alias is reference-counted** — releasing `d` while ArrowRight is still
-  held keeps `'right'` alive. q5play has this bug; shPlay does not.
-- **`rotateTowards` always turns the short way.** q5play's number form does not.
+  held keeps `'right'` alive. the reference API has this bug; moSHion does not.
+- **`rotateTowards` always turns the short way.** the reference API's number form does not.
 
 And the method that actually found the defects, which is the part worth inheriting:
 

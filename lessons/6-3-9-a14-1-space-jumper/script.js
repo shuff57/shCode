@@ -1,5 +1,5 @@
 // 2.3.20 A14.1 Space Jumper
-// Open the Quest tab for the graded requirements; open the Docs tab for the shPlay API.
+// Open the Quest tab for the graded requirements; open the Docs tab for the moSHion API.
 
 let player, ground, goal;
 
@@ -23,7 +23,7 @@ function draw() {
   // STEP 3: Ground-gated jump — combine the edge-triggered space check with
   //         a ground contact test, so the player can only jump when landed.
   // Use a LITERAL space character as the key arg — the string 'space' is not
-  // recognized by shPlay. The contact test returns the frame count while in contact.
+  // recognized by moSHion. The contact test returns the frame count while in contact.
 
   // STEP 4: Win condition — when player overlaps the goal, trigger a clear
   // win state (change background, stop updating, show text, etc).

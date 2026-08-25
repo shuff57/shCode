@@ -20,7 +20,7 @@ function setup() {
   new Canvas(400, 200);
   ghost = new Sprite(200, 100, 80, 80);
   ghost.collider = 'none';
-  ghost.addAni('fly', '/shplay/assets/ghost_fly.avif', 4);
+  ghost.addAni('fly', '/moshion/assets/ghost_fly.avif', 4);
 }
 
 function draw() {

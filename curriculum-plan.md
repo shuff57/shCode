@@ -1,5 +1,5 @@
 # CSCI 4 — Introduction to Programming Concepts and Methodologies
-## Curriculum Plan: JavaScript + shplay + JSCAD 3D Modeling
+## Curriculum Plan: JavaScript + moSHion + JSCAD 3D Modeling
 ### Chico USD / Butte College Dual Enrollment | High School Juniors
 
 ---
@@ -9,7 +9,7 @@
 - **Language:** JavaScript (ES6+)
 - **Primary Environments:**
   - Browser DevTools console (Q1 JavaScript fundamentals)
-  - shplay in-app editor (Q2 applied game development) — no install required
+  - moSHion in-app editor (Q2 applied game development) — no install required
   - JSCAD browser app (https://jscad.app/) (Q3–Q4 3D modeling) — no install required
 - **Students:** High school juniors, little to no prior coding experience
 - **Contact Hours:** 3.5 hours/week × 36 weeks = 126 total contact hours
@@ -34,16 +34,16 @@ Each SLO must be covered by at least one graded assignment.
 | SLO 1 | Describe the software development life-cycle | §1.1 lecture + A1.1.1 written | §7.1 Arcade Cabinet capstone + §13.3 Mechanism capstone reflection |
 | SLO 2 | Describe principles of structured programming | §5.3–5.4 OOP + A5.4.2 written | §3.1–3.2 functions + §12.1 JSCAD modules |
 | SLO 3 | Describe, design, implement, and test structured programs | §7.1 Arcade Cabinet capstone + §13.1–13.3 Mechanism capstone | §4.1 Q1 synthesis (Print Shop) |
-| SLO 4 | Explain what an algorithm is and its importance | §2.2 algorithms + A2.2.1 written | §11.3 sort/search + shplay collision logic (§6.2) |
+| SLO 4 | Explain what an algorithm is and its importance | §2.2 algorithms + A2.2.1 written | §11.3 sort/search + moSHion collision logic (§6.2) |
 
 ### SLO Alignment Across Quarters
 
 A term-by-term view of how each SLO is introduced, reinforced, and assessed. **Bold** cells are the primary artifacts retained for dual-enrollment documentation.
 
-| SLO | Q1 Console Fundamentals (Ch.1–4) | Q2 shplay Game Dev (Ch.5–7) | Q3 JSCAD Foundations (Ch.8–10) | Q4 Advanced JSCAD + Capstone (Ch.11–13) |
+| SLO | Q1 Console Fundamentals (Ch.1–4) | Q2 moSHion Game Dev (Ch.5–7) | Q3 JSCAD Foundations (Ch.8–10) | Q4 Advanced JSCAD + Capstone (Ch.11–13) |
 |-----|-------------------------------|------------------------------|-------------------------------|----------------------------------------|
 | **SLO 1** — SDLC | §1.1 lecture + **A1.1.1 written** (intro) | §7.1 Arcade Cabinet design/build/test/reflect cycle (A7.1.1) | §10.1 Fits-My-Stuff lifecycle observation | §13.1–13.3 full capstone lifecycle + **A13.3.2 closing reflection** |
-| **SLO 2** — Structured programming | §1.3 coding conventions; §3.1–3.2 functions; §3.6 pass-by-value/reference (A3.6.2) | **§5.3–5.4 OOP via shplay + A5.4.2 written (primary artifact)**; §6.6 game-state machines | §8.1 libraries; §8.4 parameters as function args | §12.1 multi-file module design |
+| **SLO 2** — Structured programming | §1.3 coding conventions; §3.1–3.2 functions; §3.6 pass-by-value/reference (A3.6.2) | **§5.3–5.4 OOP via moSHion + A5.4.2 written (primary artifact)**; §6.6 game-state machines | §8.1 libraries; §8.4 parameters as function args | §12.1 multi-file module design |
 | **SLO 3** — Design / implement / test | §4.1 Print Shop with manual tests (A4.1.1) | **§7.1 Arcade Cabinet capstone (A7.1.1 — primary Sem 1 evidence)**: design doc + code + testing log + reflection | §9.3 error handling (A9.3.1); §9.4 testing principles (A9.4.1) | **§13.1–13.3 Mechanism capstone (A13.3.1 — primary Sem 2 evidence)**: spec → build → test → print → present |
 | **SLO 4** — Algorithms | §2.2 algorithm definition + **A2.2.1 written** (intro) | §6.2 collision detection as algorithm; §6.3 physics tuning | §8.5 loops generating geometry | **§11.3 Sort/Search on part data (A11.3.1 — primary applied evidence)** |
 
@@ -60,7 +60,7 @@ Each graded artifact that anchors an SLO appears at least twice (primary + backu
 | A3.6.2 | SLO 2, pass-by-ref | Written artifact |
 | A4.1.1 | SLO 3 | Q1 synthesis (Print Shop) |
 | A5.4.2 | SLO 2, OOP vs procedural | **Primary written artifact** |
-| A6.5.1 | SLO 3, File I/O | Persistent storage (shplay) |
+| A6.5.1 | SLO 3, File I/O | Persistent storage (moSHion) |
 | A7.1.1 | SLO 1, SLO 2, SLO 3 | **Primary Sem 1 capstone evidence** |
 | A9.3.1 | Topic: Error handling | Primary lab |
 | A9.4.1 | Topic: Testing principles | Primary lab |
@@ -77,15 +77,15 @@ Each graded artifact that anchors an SLO appears at least twice (primary + backu
 |-------|-------|----------------|
 | Software life-cycle | §1.1, §7.1, §13.1–13.3 | Written + discussion + capstone reflection |
 | Procedural vs OOP | §5.3–5.4 | Code + written comparison |
-| Program design tools & environments | §1.5, §5.1, §8.1 | Lab setup + reflection (console, shplay, JSCAD) |
+| Program design tools & environments | §1.5, §5.1, §8.1 | Lab setup + reflection (console, moSHion, JSCAD) |
 | Flowcharting / design-before-code | §1.5 (convention + starter 4: the book's 3 + `io`), §2.2 (loop hexagon), §3.1 (function call), §4.1 (connectors, notes) | **Gate on every graded build artifact — see Appendix D.** Auto-checked in-app; hand-drawn on Part D of every test |
 | Documentation | Throughout (formal: §1.3, §5.3–5.4, §8.1) | Inline comments + READMEs |
 | Coding conventions | §1.3 (formal), enforced throughout | Code review rubric |
 | Data types, variables, expressions, sequential processing | §1.2–1.3 | Exercises + quiz |
-| Arrays | §3.3 (intro), §6.1–6.2 (shplay Groups), §8.5 (JSCAD parametric) | Exercises + applied modeling |
-| Control structures (if/switch/for/while/do...while) | §2.1–2.5, applied §6.3–6.8 (shplay) | Exercises + shplay mechanics |
+| Arrays | §3.3 (intro), §6.1–6.2 (moSHion Groups), §8.5 (JSCAD parametric) | Exercises + applied modeling |
+| Control structures (if/switch/for/while/do...while) | §2.1–2.5, applied §6.3–6.8 (moSHion) | Exercises + moSHion mechanics |
 | Algorithms: sorting and searching | §11.3 | Applied to geometry data |
-| File I/O | §3.8 (JSON/localStorage — see Part A's re-opened gap note), §6.5 (shplay save/load), §12.1 (JSCAD multi-file + STL export) | Lab + multi-file project |
+| File I/O | §3.8 (JSON/localStorage — see Part A's re-opened gap note), §6.5 (moSHion save/load), §12.1 (JSCAD multi-file + STL export) | Lab + multi-file project |
 | Error handling | §2.5 (intro), §9.3 (deepened) | Debug exercise |
 | Parameters by value and reference | §3.6 | Functions deep dive |
 | Testing principles | §9.4 | Test case writing assignment |
@@ -98,9 +98,9 @@ These topics align with AP CSP Big Ideas 1, 2, 4, and 5 (which together account 
 |-----------------|-------|------|-------------------|
 | BI 2: Data (17–22%) | Binary number systems — how computers store data | §1.2 | Discussion + activity |
 | BI 2: Data | Data compression — lossy vs lossless | §3.3 | Discussion tied to arrays/data (moved off the retired FileReader lab) |
-| BI 2: Data | Digital image representation — pixels, sprites, RGB | §6.4 | Discussion tied to shplay sprites + animation |
+| BI 2: Data | Digital image representation — pixels, sprites, RGB | §6.4 | Discussion tied to moSHion sprites + animation |
 | BI 2: Data | Metadata — data about data | §6.5 | Discussion tied to game save/load JSON |
-| BI 4: CSN (11–15%) | How the Internet works — HTTP, DNS, client-server | §5.1 | Discussion: how does shplay reach your browser? |
+| BI 4: CSN (11–15%) | How the Internet works — HTTP, DNS, client-server | §5.1 | Discussion: how does moSHion reach your browser? |
 | BI 4: CSN | Protocols and fault tolerance — TCP/IP, routing, redundancy | §5.2 | Bell-ringer activity |
 | BI 4: CSN | Parallel and distributed computing | §11.3 | Discussion tied to algorithm efficiency + sort/search |
 | BI 5: IOC (21–26%) | Open source and licensing — Creative Commons, copyright | §1.3 | Discussion tied to documentation section |
@@ -320,7 +320,7 @@ lesson. Full lesson table in
 **In-Class Activities:**
 - Class discussion: show the same small task (e.g. "average a list of numbers") described in an imperative loop vs. a one-line functional call — ask what's the same, what's different
 - Card-sort activity: match a language name to its typical use case
-- Bridge forward: "shplay next quarter uses classes — that's the object-oriented paradigm. JSCAD later is mostly procedural, like this quarter."
+- Bridge forward: "moSHion next quarter uses classes — that's the object-oriented paradigm. JSCAD later is mostly procedural, like this quarter."
 
 **Assignments:**
 - **A1.4.1 (Written):** Pick two languages other than JavaScript. What is each typically used for, and why does that fit the paradigm(s) it supports?
@@ -348,7 +348,7 @@ table with book cross-references in `curriculum/modules/1.4_programming-paradigm
 
 **Teacher Notes:**
 - Keep this conceptual and light — no new syntax this week. It's a zoom-out, not a coding week.
-- Don't require students to write OOP or functional code yet; they've only seen procedural/imperative so far. Naming the paradigms now means later chapters (OOP in shplay, functional-flavored array methods in §3.7) land as "oh, that's the other paradigm from §1.4" rather than unexplained new vocabulary.
+- Don't require students to write OOP or functional code yet; they've only seen procedural/imperative so far. Naming the paradigms now means later chapters (OOP in moSHion, functional-flavored array methods in §3.7) land as "oh, that's the other paradigm from §1.4" rather than unexplained new vocabulary.
 
 ---
 
@@ -886,7 +886,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 - **A3.8.1 (Lab, File I/O coverage):** Take your A3.7.1 array-of-objects program. (1) Serialize the array with `JSON.stringify()` and save it under a key with `localStorage.setItem`. (2) Write a separate function that reads it back with `localStorage.getItem` + `JSON.parse()` and rebuilds the working array. (3) Prove round-trip correctness: log the array before saving and after loading and confirm they match. Comment explaining why the data had to be serialized first.
 
 **Teacher Notes:**
-- **This section replaces the old FileReader/Blob-based "Arrays and File I/O" week.** book_manifest.yaml retitled this section deliberately: chapters 4–13 use FileReader/Blob zero times, but use JSON.parse (11×), JSON.stringify (3×), and key-value storage (3×) throughout — most directly, shplay's own save/load system in §6.5 is this exact `storeItem`/`getItem` pattern one layer up. Teaching FileReader here taught a skill the rest of the book never calls on again.
+- **This section replaces the old FileReader/Blob-based "Arrays and File I/O" week.** book_manifest.yaml retitled this section deliberately: chapters 4–13 use FileReader/Blob zero times, but use JSON.parse (11×), JSON.stringify (3×), and key-value storage (3×) throughout — most directly, moSHion's own save/load system in §6.5 is this exact `storeItem`/`getItem` pattern one layer up. Teaching FileReader here taught a skill the rest of the book never calls on again.
 - **Butte outline flag:** the official outline names "File I/O including sequential access files" as a required topic, and the old A8.2/A8.3 FileReader labs were written specifically to cover that literal phrase. This section's JSON/localStorage approach is the better fit for what the course actually uses downstream, but it does not read a text file byte-by-byte the way "sequential access files" implies. See Part A's gap-analysis table (flagged for a follow-up pass) — if the sequential-file-reading phrasing needs to stay literally covered for articulation purposes, consider a short *supplementary* read-only FileReader demo (not a full graded lab) rather than reverting this section's main teaching.
 - `getItem` returns strings. Expect bugs from `getItem('x') + 1` concatenating — teach `Number()`/`JSON.parse()` explicitly, same trap as before, different API.
 
@@ -947,12 +947,12 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 
 ---
 
-# Q2: shplay — Applied Game Development
+# Q2: moSHion — Applied Game Development
 ### 23 meetings | ~40 contact hours | weeks 15–24 (Tue Nov 17, 2026 – Wed Feb 10, 2027)
 ### *Interrupted by the Semester 1 Close (Dec 9–17): Chapters 1–5 are examined before Ch 6 begins, so this quarter's Ch 6–7 work runs Jan 5 – Feb 11.*
 ### *Meeting counts and dates computed by `scripts/cs_schedule.py` against the real CUSD 2026-27 calendar. Sizing model: 1 meeting per book section (7 dense sections get 2) — see Part B.*
 ### Goal: Students extend Q1 fundamentals into a motivating visual/game context, learn OOP through hands-on use, practice save/load, and ship a complete game as their Semester 1 capstone.
-### Environment: shplay in-app editor (built on q5.js + Box2D physics) — no install required.
+### Environment: moSHion in-app editor (built on q5.js + Box2D physics) — no install required.
 ### Design-before-code (Appendix D): every in-app challenge in Ch 5–7 is preceded by its own flowchart
 ### lesson, which must be green before the challenge unlocks. Game logic is where charts earn their
 ### keep — a state machine, a collision consequence and a spawn loop are all far easier to argue about
@@ -977,7 +977,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 
 ---
 
-## Unit 5: shPlay Foundations (book Chapter 5)
+## Unit 5: moSHion Foundations (book Chapter 5)
 > **SLO focus:** Reinforces **SLO 3** (design/implement/test in a visual context); applies Q1 control structures (SLO backup) to interactive programs.
 
 ### 5.1 Hello Sprite and Movement (~1.75 hrs)
@@ -990,12 +990,12 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 **Learning Objectives:**
 - Create a canvas with `new Canvas(width, height)`
 - Create a sprite with `new Sprite(x, y, w, h)` and set its properties
-- Use `setup()` and `draw()` as the shplay program skeleton
+- Use `setup()` and `draw()` as the moSHion program skeleton
 - Drive sprite movement with the keyboard using `kb.pressing(...)` and `vel.x/y`
 - Explain the frame loop: `draw()` runs every frame
 
 **Topics:**
-- shplay program skeleton: `setup()`, `draw()`, optional `update()`
+- moSHion program skeleton: `setup()`, `draw()`, optional `update()`
 - `Canvas(width, height)` — sets up the drawing area
 - `Sprite(x, y, w, h)` — creating sprites
 - Sprite properties: `color`, `pos`, `vel`, `rotation`, `layer`
@@ -1007,16 +1007,16 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 - Teacher demo: type the minimum working sprite program live, line by line (in-app: `5-1-4-example-minimum-sprite`)
 - Students work through the module 5.1 reading/lab sequence (canvas + sprite basics, keyboard input, velocity)
 - Pair exercise: change the canvas size, make the sprite a different shape, swap control keys
-- **AP CSP Discussion (15 min):** How the Internet works. Tracing how shplay loaded in your browser: DNS → HTTP → server → renderer. "Every time you open this page, all of this happens in milliseconds."
+- **AP CSP Discussion (15 min):** How the Internet works. Tracing how moSHion loaded in your browser: DNS → HTTP → server → renderer. "Every time you open this page, all of this happens in milliseconds."
 
 **Assignments:**
 - **A5.1.1 (Lab, in-app `5-1-21-a10-1-sprite-playground`):** Build a "sprite playground": a canvas, one controllable sprite with WASD keys, a second sprite that moves automatically using `frameCount`, and an on-screen text label displaying a message. Must run without errors on Run.
 - **A5.1.2 (Lab, in-app `5-1-22-a10-2-frame-loop`):** Half page — in your own words, what is the difference between `setup()` and `draw()`, and what does "60 frames per second" actually mean for the values you pick?
 
 **Teacher Notes:**
-- `vel.x`/`vel.y` are pixels per frame. shplay targets ~60 fps — tell students this explicitly or they'll pick absurd values.
+- `vel.x`/`vel.y` are pixels per frame. moSHion targets ~60 fps — tell students this explicitly or they'll pick absurd values.
 - Omitting `vel.x = 0` in the else branch leaves the sprite drifting. Watch for this bug.
-- Some students will try `player.x =` — show that `player.pos.x` works too, but `vel` is the shplay idiom.
+- Some students will try `player.x =` — show that `player.pos.x` works too, but `vel` is the moSHion idiom.
 
 ---
 
@@ -1078,7 +1078,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 - Explain what a property is, and distinguish an explicitly-set value from one that falls back to the class's default
 
 **Topics:**
-- Every shplay primitive (`Canvas`, `Sprite`, `Group`) is an instance of a class — `Sprite` itself is the blueprint
+- Every moSHion primitive (`Canvas`, `Sprite`, `Group`) is an instance of a class — `Sprite` itself is the blueprint
 - Class vs. instance, using sprites already built in §5.1–5.2 as the running example
 - Properties as data belonging to one instance (`.color`, `.vel`) vs. the class's own defaults (`.bounciness`, `.friction`)
 
@@ -1124,10 +1124,10 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 
 **Assignments:**
 - **A5.4.1 (Lab, in-app `5-3-31-a12-1-collectible`):** Write a `Collectible` class — `constructor(x, y, value, color)` and a `collect()` method that returns the value and marks the item gone. Instantiate at least 5 in `setup()` and render them as sprites. Include at least one method call whose return value is used elsewhere.
-- **A5.4.2 (Written, graded, SLO 2 primary, in-app `5-3-32-a12-2-oop-writeup`):** 1 page comparing procedural and OOP. Must include: definitions in your own words; a specific Q1 example that was procedural; a specific shplay example that is OOP; and one scenario where OOP is clearly the better choice, with reasoning.
+- **A5.4.2 (Written, graded, SLO 2 primary, in-app `5-3-32-a12-2-oop-writeup`):** 1 page comparing procedural and OOP. Must include: definitions in your own words; a specific Q1 example that was procedural; a specific moSHion example that is OOP; and one scenario where OOP is clearly the better choice, with reasoning.
 
 **Teacher Notes:**
-- Don't go deep into inheritance or polymorphism — name them, don't require them; composition covers the same ground for shplay's own classes.
+- Don't go deep into inheritance or polymorphism — name them, don't require them; composition covers the same ground for moSHion's own classes.
 - A5.4.2 is the SLO 2 primary written artifact. Keep the essays.
 
 ---
@@ -1223,7 +1223,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 - The Pendulum example previews joints; tell students explicitly they'll return to it in §6.8.
 
 **Exam:**
-- **Semester 1 Midterm 3 (~1 hour, in class):** Covers §5.1–6.3 (shplay foundations, physics, classes/OOP, groups/overlaps, physics applications). Administer at the start or end of the week — teacher discretion.
+- **Semester 1 Midterm 3 (~1 hour, in class):** Covers §5.1–6.3 (moSHion foundations, physics, classes/OOP, groups/overlaps, physics applications). Administer at the start or end of the week — teacher discretion.
 
 ---
 
@@ -1264,19 +1264,19 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 
 ### 6.5 Save and Load (~1.75 hrs)
 **Contact hours:** 1.75
-**Sizing note:** 559 lines, 1 meeting. §3.8 already teaches `JSON.stringify`/`parse` and localStorage; new here are shplay's `storeItem`/`getItem` and choosing what state to persist.
+**Sizing note:** 559 lines, 1 meeting. §3.8 already teaches `JSON.stringify`/`parse` and localStorage; new here are moSHion's `storeItem`/`getItem` and choosing what state to persist.
 **Book section:** 6.5 Save and Load
 **SLOs covered:** SLO 3 (design/implement/test), Topic: File I/O
 **Reading:** Book §6.5 Save and Load
 **Build status:** ships as in-app module `6-5-*`, and already teaches `JSON.stringify`/`JSON.parse` (`6-5-9`, `6-5-10`) — consistent with Q1 §3.8's realignment to the same JSON/localStorage pattern.
 
 **Learning Objectives:**
-- Save data persistently with `storeItem(name, val)` (shplay's localStorage wrapper)
+- Save data persistently with `storeItem(name, val)` (moSHion's localStorage wrapper)
 - Retrieve saved data with `getItem(name)` and convert back to correct type
 - Serialize structured data (not just single values) with `JSON.stringify`/`JSON.parse`
 
 **Topics:**
-- shplay persistent storage: `storeItem`, `getItem`, `removeItem`, `clearStorage`
+- moSHion persistent storage: `storeItem`, `getItem`, `removeItem`, `clearStorage`
 - Serialization with JSON for saving structured player state, not just one value
 - Save slots and overwrite/delete handling
 
@@ -1378,7 +1378,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 - **A6.8.1 (Lab, Sumo challenge):** Complete a Two-Player Pong-Sumo scene using at least one joint or applyForce pattern from this week. Must include: separate input schemes for two players (e.g., WASD vs arrows); a win condition when one sprite is knocked out of bounds; a visible score or round counter.
 
 **Teacher Notes:**
-- Joints are the most complex shplay concept. Aim for "understand enough to use in capstone," not full mastery.
+- Joints are the most complex moSHion concept. Aim for "understand enough to use in capstone," not full mastery.
 - The slingshot pattern (drag + release + force) appears in many classic games — encourage students to riff on it.
 
 ---
@@ -1392,12 +1392,12 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 **Build status:** no in-app lessons exist yet (`lessons/6-9-*` is empty) — genuinely new content, drafted here for the first time.
 
 **Learning Objectives:**
-- Explain that `draw()` already runs synchronously ~60×/sec — shplay games do not need a hand-written frame loop
+- Explain that `draw()` already runs synchronously ~60×/sec — moSHion games do not need a hand-written frame loop
 - Distinguish `frameCount`-based timing (frame-rate dependent) from wall-clock timing (`setTimeout`/`setInterval`, frame-rate independent)
 - Use `setTimeout`/`setInterval` for a one-shot or repeating delayed action, and `clearInterval` to stop it
 
 **Topics:**
-- The `draw()` loop is shplay's own synchronous frame loop — students have been using timing via `frameCount % N === 0` since §6.1 without a hand-written loop
+- The `draw()` loop is moSHion's own synchronous frame loop — students have been using timing via `frameCount % N === 0` since §6.1 without a hand-written loop
 - `setTimeout(fn, ms)` — run something once, after a delay, independent of frame rate
 - `setInterval(fn, ms)` / `clearInterval(id)` — run something repeatedly, and how to stop it
 - Why `frameCount`-based timing drifts if the frame rate drops, and wall-clock timing doesn't
@@ -1483,7 +1483,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 # Q3: JSCAD Foundations — 2D to 3D + Quality
 ### 16 meetings | ~28 contact hours | weeks 25–31 (Tue Feb 16 – Thu Apr 8, 2027), including Ch 10 below
 ### *Meeting counts and dates computed by `scripts/cs_schedule.py` against the real CUSD 2026-27 calendar. Sizing model: 1 meeting per book section (7 dense sections get 2) — see Part B.*
-### Goal: Transition from shplay into JSCAD. Learn the library model, 2D primitives, parametric design, extrusion into 3D, 3D composition, error handling/testing discipline, and a personal parametric-design synthesis project.
+### Goal: Transition from moSHion into JSCAD. Learn the library model, 2D primitives, parametric design, extrusion into 3D, 3D composition, error handling/testing discipline, and a personal parametric-design synthesis project.
 ### Environment: JSCAD browser app (https://jscad.app/) — no install required.
 ### Design-before-code (Appendix D): unchanged, and the charts change character here. A JSCAD chart is
 ### a *build order* — measure, derive, profile, extrude, cut — not a control-flow chart, because the
@@ -1536,7 +1536,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 **Teacher Notes:**
 - The `require()` syntax will look unfamiliar. Explain it as "asking for a toolbox from a toolshed." Destructuring `const { primitives }` pulls out just the tools you need.
 - Students will want to immediately make complex things. Hold them to simple this week — the goal is understanding the structure, not the output.
-- Bridge back to shplay: "shplay was one big library — you imported classes by name. JSCAD is the same idea, different tool."
+- Bridge back to moSHion: "moSHion was one big library — you imported classes by name. JSCAD is the same idea, different tool."
 
 ---
 
@@ -1571,7 +1571,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 
 **Teacher Notes:**
 - A8.2.2 is a deliberate documentation-reading exercise. Reading API docs is a professional skill.
-- The coordinate system will confuse students who expect y to go down (screen coordinates in shplay). Address this explicitly — JSCAD uses math-standard orientation.
+- The coordinate system will confuse students who expect y to go down (screen coordinates in moSHion). Address this explicitly — JSCAD uses math-standard orientation.
 
 ---
 
@@ -2076,10 +2076,10 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 
 **Assignments:**
 - **A12.1.1 (Lab, File I/O coverage):** Refactor one Q3 project into a multi-file structure: one file for component/helper functions, one file for parameters, one file for main assembly. Initialize a git repo and make at least 2 commits showing your refactoring progress. Write a README explaining what each file does and why you split it this way.
-- **A12.1.2 (Written):** Explain what file I/O means in programming. How does JSCAD's multi-file system relate to the general concept of reading from and writing to files? Compare briefly with the shplay `storeItem`/`getItem` and JSON approach from Q2 §6.5.
+- **A12.1.2 (Written):** Explain what file I/O means in programming. How does JSCAD's multi-file system relate to the general concept of reading from and writing to files? Compare briefly with the moSHion `storeItem`/`getItem` and JSON approach from Q2 §6.5.
 
 **Teacher Notes:**
-- A12.1.2 comparing JSCAD multi-file to shplay save/load reinforces that file I/O takes many forms.
+- A12.1.2 comparing JSCAD multi-file to moSHion save/load reinforces that file I/O takes many forms.
 - Students should leave this week with a working git workflow they can use on the capstone.
 
 ---
@@ -2203,7 +2203,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 - **A13.3.2 — Course Reflection (Written, SLO 1 closing artifact):** 1 page. Reflect on the software development life-cycle as you experienced it across the year. Give a specific example of each phase (design, code, test, maintenance) drawn from either the Q2 Arcade Cabinet capstone, the Q4 Mechanism capstone, or both.
 
 **Exam:**
-- **Semester 2 Final (~1.5 hours, in class):** Cumulative exam covering all of Semester 2 (§8.1–13.3), with selected questions from Semester 1 fundamentals. Format: multiple-choice (JS fundamentals, shplay, JSCAD modeling, algorithms), code-tracing (mix of JS and JSCAD), short-answer (SLO-aligned: lifecycle reflection; OOP vs. procedural; algorithm analysis; testing principles), write-code problems (one JSCAD modeling task, one standalone JS algorithm). Schedule on a separate day from capstone presentations.
+- **Semester 2 Final (~1.5 hours, in class):** Cumulative exam covering all of Semester 2 (§8.1–13.3), with selected questions from Semester 1 fundamentals. Format: multiple-choice (JS fundamentals, moSHion, JSCAD modeling, algorithms), code-tracing (mix of JS and JSCAD), short-answer (SLO-aligned: lifecycle reflection; OOP vs. procedural; algorithm analysis; testing principles), write-code problems (one JSCAD modeling task, one standalone JS algorithm). Schedule on a separate day from capstone presentations.
 
 **Teacher Notes:**
 - Capstone presentations can be split across two class meetings if the cohort is large — presentations day 1, final exam day 2 (or reversed).
@@ -2383,16 +2383,16 @@ renumber and the Part B calendar rebuild (see that section's capacity finding).
 | 8 | Strings | §1.2 string methods | Adopt |
 | 9 | Lists | §3.3 Arrays (incl. multiple-subscripted) | Adopt |
 | 10 | Dictionaries | — | **Excluded** — not in the CSCI 4 outline or SLOs |
-| 11 | Classes | §5.3–5.4 OOP (shplay) | Borrow framing only — shplay-grounded OOP retained over abstract OOP |
+| 11 | Classes | §5.3–5.4 OOP (moSHion) | Borrow framing only — moshion-grounded OOP retained over abstract OOP |
 | 12 | Recursion | — (§11.3 optional enrichment) | Optional, not assessed |
 | 13 | Inheritance | §5.4 (named, not required) | Name only |
-| 14 | Files | §3.8 (JSON/localStorage, not FileReader — see Gap Analysis above), §6.5 shplay save, §12.1 JSCAD multi-file | Adopt concept — browser JSON/localStorage replaces Python `open()`; FileReader coverage is the re-opened gap above |
+| 14 | Files | §3.8 (JSON/localStorage, not FileReader — see Gap Analysis above), §6.5 moSHion save, §12.1 JSCAD multi-file | Adopt concept — browser JSON/localStorage replaces Python `open()`; FileReader coverage is the re-opened gap above |
 | 15 | Data Science | — | Excluded — out of CSCI 4 scope |
 
 #### Excluded Python content
 - **Ch 10 Dictionaries** — no outline/SLO requirement.
 - **Ch 15 Data Science** — belongs to *Principles of Data Science*, not CSCI 4.
-- **Ch 12 Recursion / Ch 13 Inheritance** — beyond scope; handled as optional enrichment / shplay context.
+- **Ch 12 Recursion / Ch 13 Inheritance** — beyond scope; handled as optional enrichment / moSHion context.
 
 #### Gap coverage the Python book helps close
 The outline's required topics that the book covers directly:
@@ -2653,12 +2653,12 @@ the per-section **Sizing notes** in the main body — they inform teaching empha
 | 30 | 4 | Synthesis — Print Shop | **§4.1 Print Shop — Q1 Synthesis (day 1/3)** | 13 | Fri Nov 06, 2026 |
 | 31 | 4 | Synthesis — Print Shop | **§4.1 Print Shop — Q1 Synthesis (day 2/3)** | 14 | Tue Nov 10, 2026 |
 | 32 | 4 | Synthesis — Print Shop | **§4.1 Print Shop — Q1 Synthesis (day 3/3)** | 14 | Fri Nov 13, 2026 |
-| 33 | 5 | shPlay Foundations | §5.1 Hello Sprite and Movement | 15 | Tue Nov 17, 2026 |
-| 34 | 5 | shPlay Foundations | §5.2 Physics Feel | 15 | Thu Nov 19, 2026 |
-| 35 | 5 | shPlay Foundations | §5.3 Classes and Instances + §5.4 Writing Your Own Classes (day 1/2) | 16 | Mon Nov 30, 2026 |
-| 36 | 5 | shPlay Foundations | §5.3 Classes and Instances + §5.4 Writing Your Own Classes (day 2/2) | 16 | Wed Dec 02, 2026 |
-| 37 | 5 | shPlay Foundations | **Ch 5 Group PA** | 16 | Fri Dec 04, 2026 |
-| 38 | 5 | shPlay Foundations | **Ch 5 Test** | 17 | Tue Dec 08, 2026 |
+| 33 | 5 | moSHion Foundations | §5.1 Hello Sprite and Movement | 15 | Tue Nov 17, 2026 |
+| 34 | 5 | moSHion Foundations | §5.2 Physics Feel | 15 | Thu Nov 19, 2026 |
+| 35 | 5 | moSHion Foundations | §5.3 Classes and Instances + §5.4 Writing Your Own Classes (day 1/2) | 16 | Mon Nov 30, 2026 |
+| 36 | 5 | moSHion Foundations | §5.3 Classes and Instances + §5.4 Writing Your Own Classes (day 2/2) | 16 | Wed Dec 02, 2026 |
+| 37 | 5 | moSHion Foundations | **Ch 5 Group PA** | 16 | Fri Dec 04, 2026 |
+| 38 | 5 | moSHion Foundations | **Ch 5 Test** | 17 | Tue Dec 08, 2026 |
 | — | — | — | ***← SEMESTER 1 CLOSE — Ch 1-5 complete. Review project Dec 10 & 14, final Dec 16 (inside the district's Dec 14-17 window).*** | — | — |
 | 39 | S1 | Semester 1 Close | **Semester 1 Review Project (covers Ch 1-5) (day 1/2)** | 17 | Thu Dec 10, 2026 |
 | 40 | S1 | Semester 1 Close | **Semester 1 Review Project (covers Ch 1-5) (day 2/2)** | 18 | Mon Dec 14, 2026 |
@@ -3158,7 +3158,7 @@ project *is* the assessment, and it is graded individually even when built in a 
 | 2 Control Flow | ✅ | ✅ |   |
 | 3 Functions and Data | ✅ | ✅ |   |
 | 4 Print Shop | — | — |  Synthesis; project is the assessment  |
-| 5 shPlay Foundations | ✅ | ✅ |   |
+| 5 moSHion Foundations | ✅ | ✅ |   |
 | 6 Game Mechanics | ✅ | ✅ |   |
 | 7 Arcade Cabinet | — | — |  Synthesis  |
 | 8 JSCAD Foundations | ✅ | ✅ |   |
@@ -3242,7 +3242,7 @@ directions against a `function` declaration; object literal access with both dot
 object**; `.map`/`.filter`/`.slice` on a supplied array; `JSON.stringify`/`parse` round-trip.
 **Assumes:** Ch 1–2. This is the heaviest test of Q1 and the last gate before the Print Shop project.
 
-**Ch 5 Test — shPlay Foundations** (§5.1–5.4) · *SLO 2, SLO 3*
+**Ch 5 Test — moSHion Foundations** (§5.1–5.4) · *SLO 2, SLO 3*
 `setup()` vs `draw()` and what belongs in each; creating a sprite and moving it by velocity vs by
 position; what `bounciness`, `friction` and `drag` each change (predict the behavior, don't recite the
 number); **class vs instance vs property vs method as vocabulary**, then writing a small class with a
@@ -3331,7 +3331,7 @@ it exercises the semester.
 | 7 | One function that *mutates* a passed object, with a comment explaining why it changes the original | Part B — the pass-by-reference trace |
 | 8 | Save and reload state with `JSON.stringify` / `parse` + localStorage | Part A |
 | 9 | A `try`/`catch` around something that can fail, with a friendly message | Part C |
-| 10 | A shPlay sprite that moves, and one class the student wrote with a constructor and a method | Part A, D |
+| 10 | A moSHion sprite that moves, and one class the student wrote with a constructor and a method | Part A, D |
 
 **Deliverables:** the program, **a flowchart of it drawn on day 1 before any code** (Appendix D — all
 eight checks green; this is also the last flowchart rehearsal before Part D of the final), a short
@@ -3357,7 +3357,7 @@ the chapter tests. Same four-part structure, so nothing about the format is new:
 | Part | Content | Weight |
 |---|---|---:|
 | **A — Vocabulary and concepts** | Lifecycle stages; data types; paradigms; class vs instance vs property vs method; what localStorage does | 25% |
-| **B — Trace the code** | ~5 snippets: a 3-branch conditional, a nested loop, an array method chain, **a pass-by-reference mutation**, a shPlay `draw()` loop | 25% |
+| **B — Trace the code** | ~5 snippets: a 3-branch conditional, a nested loop, an array method chain, **a pass-by-reference mutation**, a moSHion `draw()` loop | 25% |
 | **C — Find and fix** | 3 broken programs; name the error type (syntax / runtime / logic) and fix | 20% |
 | **D — Write it** | Two problems: one function with parameters and a return; one small class with a constructor and a method | 30% |
 
@@ -3445,7 +3445,7 @@ Exam weeks still include regular content. Plan for the exam to occupy the first 
 |------|------|-------------------|
 | S1 Midterm 1 | §1.1–2.2 | Exam first day, remaining content second day |
 | S1 Midterm 2 | §1.1–3.8 (cumulative) | Exam first day, synthesis project work fills remaining time |
-| S1 Midterm 3 | §5.1–6.3 (shplay foundations, physics, OOP, groups, physics applications) | — |
+| S1 Midterm 3 | §5.1–6.3 (moSHion foundations, physics, OOP, groups, physics applications) | — |
 | **S1 Final** | **Chapters 1–5 (cumulative)** — corrected 2026-08-14 | **SCHEDULED: Wed Dec 16, 2026** (meeting 41). Preceded by the 3-meeting Semester 1 Review Project, Dec 10–14. Full blueprint in **Semester Close** above |
 | S2 Midterm 1 | §8.1–8.4 (JSCAD libraries, 2D, booleans, parameters) | — |
 | S2 Midterm 2 | §8.5–9.4 (loops→geometry, extrusion, 3D primitives, error handling, testing) | — |
@@ -3459,14 +3459,14 @@ Exam weeks still include regular content. Plan for the exam to occupy the first 
 | SLO / Topic | Covered By | Assessment Artifact |
 |-------------|-----------|-------------------|
 | SLO 1: Software lifecycle | §1.1 lecture (A1.1.1), §7.1 Arcade Cabinet capstone, §13.3 closing reflection | A1.1.1 written (intro), A13.3.2 written (closing) |
-| SLO 2: Structured programming / OOP | §1.2–1.3, §5.3–5.4 (shplay OOP), A5.4.2, S1 Final, S2 Final | A5.4.2 written (primary), exam questions (backup) |
+| SLO 2: Structured programming / OOP | §1.2–1.3, §5.3–5.4 (moSHion OOP), A5.4.2, S1 Final, S2 Final | A5.4.2 written (primary), exam questions (backup) |
 | SLO 3: Design, implement, test programs | A4.1.1 (Print Shop synthesis), A7.1.1 (Arcade Cabinet capstone), A13.3.1 (Mechanism capstone) | All major projects |
 | SLO 4: Algorithms | §2.2, A2.2.1 (intro), A11.3.1 (applied) | A2.2.1 written (intro), A11.3.1 lab (applied) |
 | Data types / variables | §1.2, A1.2.1, A1.2.2 | Lab assignments |
-| Arrays | §3.3 (intro), §6.1–6.2 (shplay groups), §8.5 (JSCAD loops→geometry) | A3.3.1, A6.2.1, A8.5.1 |
-| Control structures | §2.1–2.5 (core, incl. switch and try/catch now dedicated sections), applied §6.3–6.8 (shplay mechanics) | Lab + quiz |
+| Arrays | §3.3 (intro), §6.1–6.2 (moSHion groups), §8.5 (JSCAD loops→geometry) | A3.3.1, A6.2.1, A8.5.1 |
+| Control structures | §2.1–2.5 (core, incl. switch and try/catch now dedicated sections), applied §6.3–6.8 (moSHion mechanics) | Lab + quiz |
 | Algorithms: sort/search | §11.3, A11.3.1 | A11.3.1 lab + A11.3.2 written |
-| File I/O | §3.8 (JSON/localStorage — **RE-OPENED gap on the literal "sequential access" phrase**, see Part A), §6.5 (shplay save/load), §12.1 (JSCAD multi-file) | A3.8.1 lab, A6.5.1 lab, A12.1.1 lab + A12.1.2 written |
+| File I/O | §3.8 (JSON/localStorage — **RE-OPENED gap on the literal "sequential access" phrase**, see Part A), §6.5 (moSHion save/load), §12.1 (JSCAD multi-file) | A3.8.1 lab, A6.5.1 lab, A12.1.1 lab + A12.1.2 written |
 | Error handling | §2.5 (intro), §9.3 (deepened), A9.3.1 | A9.3.1 lab |
 | Pass by value/reference | §3.6, A3.6.1, A3.6.2 | A3.6.2 written |
 | Testing principles | §9.4, A9.4.1 | A9.4.1 lab + A9.4.2 written |
@@ -3484,15 +3484,15 @@ as the single source of truth for the seven open references:
 - **JS1** → *The Modern JavaScript Tutorial* (javascript.info, Ilya Kantor, CC-BY-SA)
 - **JS2** → *Eloquent JavaScript* (Marijn Haverbeke, CC-BY-NC, code MIT)
 - **PY** → *Introduction to Python Programming* (OpenStax, CC BY-NC-SA) → structural model; Python syntax translated to JS
-- **shplay** → in-app docs at `/docs/shplay` (bundled `public/shplay/`, MIT facade + MIT planck.js, built from the public `shplay.d.ts` API) + in-repo docs at `public/shplay/docs/` + q5.js learn pages (LGPL-3.0) for graphics-layer concepts. The engine is an original MIT-licensed reimplementation of the q5play API design — no q5play license obligations
+- **moSHion Game Design** → in-app docs at `/docs/moshion` (bundled `public/moshion/`, MIT facade + MIT planck.js, built from the public `moshion.d.ts` API) + in-repo docs at `public/moshion/docs/`. An original MIT-licensed engine, inspired by q5play, containing no q5play code
 - **JSCAD** → in-app docs at `/docs/jscad` + in-repo docs at `public/jscad/docs/` + external API docs (openjscad.xyz, MIT) + GitHub monorepo `github.com/jscad/OpenJSCAD.org` → CDN-loaded, lessons need internet
 - **freeCodeCamp** → the Q1 content platform — week-by-week mapping in `curriculum-alignment-guide.md`, full activity list in `curriculum-data/master-activity-list.md`
 - **jscadui / jscad.app** → the Q3–Q4 JSCAD browser environment (`github.com/hrgdavor/jscadui`, MIT)
 
 To seed a chapter/section/subsection, pull the matching **JS1/JS2/PY → chapter/section** or
-**shplay → section → page** / **JSCAD → module → function** anchor from `js-references-toc.md`
+**moSHion → section → page** / **JSCAD → module → function** anchor from `js-references-toc.md`
 and drop it into that section reading/source row. Anchor notation: `JS1 → Fundamentals → Variables` ·
-`shplay → sprite → Your first sprite` · `JSCAD → extrusions → extrudeLinear`. Do **not** duplicate the TOC here.
+`moshion → sprite → Your first sprite` · `JSCAD → extrusions → extrudeLinear`. Do **not** duplicate the TOC here.
 
 **Updated 2026-08-14** to match the book-native renumber — chapter numbers below now match this
 document's own §-IDs directly (Chapter N = book Chapter N), so the old "(W1→3)"-style week-range
@@ -3503,9 +3503,9 @@ capacity decision.
 - **Chapter 2** Control Flow: JS1 Comparisons/Conditionals/Loops/switch/try-catch; JS2 Ch 2; OpenStax CS Ch 3
 - **Chapter 3** Functions and Data: JS1 Functions/Objects/Arrays/Array methods/JSON+LocalStorage (NOT File/FileReader — see §3.8's realignment note); JS2 Ch 3→4
 - **Chapter 4** Q1 Synthesis (Print Shop): openstax_cs Ch 9 (SDLC framing); reviews all of Ch 1-3
-- **Chapter 5** shPlay Foundations: shplay in-app docs; JS1 Functions, Classes; JS2 Ch 6
-- **Chapter 6** Game Mechanics: shplay docs; JS1 Arrays/JSON methods + LocalStorage, Timing (setTimeout/setInterval); JS2 Ch 4, Ch 18
-- **Chapter 7** Q2 Synthesis (Arcade Cabinet): shplay ch 8; JS2 Ch 16, Ch 8 (testing discipline); reviews all of Ch 5-6
+- **Chapter 5** moSHion Foundations: moSHion in-app docs; JS1 Functions, Classes; JS2 Ch 6
+- **Chapter 6** Game Mechanics: moSHion docs; JS1 Arrays/JSON methods + LocalStorage, Timing (setTimeout/setInterval); JS2 Ch 4, Ch 18
+- **Chapter 7** Q2 Synthesis (Arcade Cabinet): moSHion ch 8; JS2 Ch 16, Ch 8 (testing discipline); reviews all of Ch 5-6
 - **Chapter 8** JSCAD Foundations: JS1 Modules; JS2 Ch 10; JS1 Functions/Arrays, JS2 Ch 5 (map), (parametric)
 - **Chapter 9** 3D Modeling: JSCAD API docs; JS1 Error handling + Debugging + Mocha testing; JS2 Ch 8
 - **Chapter 10** Q3 Synthesis (Fits-My-Stuff): no reading — synthesis build; reviews Ch 8-9
@@ -3520,7 +3520,7 @@ When generating individual assignments from this plan, use the following convent
 - Each assignment file should be named: `A[week].[number]_[short_title].md`
 - Include: learning objectives, instructions, starter code (if applicable), rubric, estimated time, and which SLO(s) it covers
 - Starter code for **Q1 (console)** assignments should run in the browser DevTools console or a bare `<script>` tag
-- Starter code for **Q2 (shplay)** assignments should be a single `script.js` with `setup()`/`draw()`, runnable inside the in-app shplay editor
+- Starter code for **Q2 (moSHion)** assignments should be a single `script.js` with `setup()`/`draw()`, runnable inside the in-app moSHion editor
 - Starter code for **Q3/Q4 (JSCAD)** assignments should use the browser-app format (no npm required). JSCAD imports: `const { primitives, transforms, booleans, measurements, colors, text, extrusions, hulls } = require('@jscad/modeling')`
 - Written assignments should include a prompt, length guidance, and a simple rubric
 - Lab assignments should include: setup instructions, step-by-step task list, expected output description, rubric
@@ -3540,7 +3540,7 @@ When generating individual assignments from this plan, use the following convent
 
 ### Priority build order for assignments:
 1. **Q1 assignments first** (A1.1.1 through A4.1.1) — prerequisites for everything
-2. **Q2 shplay assignments** (A5.1.1 through A7.1.1) — needed for the Arcade Cabinet capstone
+2. **Q2 moSHion assignments** (A5.1.1 through A7.1.1) — needed for the Arcade Cabinet capstone
 3. **SLO coverage assignments** (A5.4.2 OOP written, A6.5.1 file I/O, A9.3.1 error handling, A9.4.1 testing, A11.3.1 sort/search) — required for dual-enrollment SLO documentation
 4. **Q3 JSCAD foundations** (A8.1.1 through A9.4.3, A10.1.1 Fits-My-Stuff)
 5. **Q4 advanced JSCAD + capstone** (A11.1.1 through A13.3.2)
@@ -3689,12 +3689,12 @@ If a student falls behind, prioritize catching up on these gateway topics — ev
 ```
 §1.2 Variables → §2.1 Conditionals → §2.2 Loops → §3.1-3.2 Functions → §3.3 Arrays
                                                                           ↓
-                                    §5.1 shPlay Intro → §5.3-5.4 OOP → §6.5 Save / §6.6 States → §7.1 Arcade Cabinet
+                                    §5.1 moSHion Intro → §5.3-5.4 OOP → §6.5 Save / §6.6 States → §7.1 Arcade Cabinet
                                                                           ↓
                      §8.1 JSCAD Intro → §8.3 Booleans → §9.1 Extrusion → §11.1+ Advanced → §13.1-13.3 Mechanism
 ```
 
-A student who doesn't understand functions (§3.1–3.2) cannot succeed in shplay OOP (§5.3–5.4) or JSCAD. Catch this before §3.6 (Pass by Value/Reference) at the latest.
+A student who doesn't understand functions (§3.1–3.2) cannot succeed in moSHion OOP (§5.3–5.4) or JSCAD. Catch this before §3.6 (Pass by Value/Reference) at the latest.
 A student who hasn't grasped classes by §5.4 will struggle through the rest of Q2 — flag them before §6.1 (Groups) and keep them in re-submission loops on A5.4.1.
 
 ---

@@ -32,8 +32,8 @@ const CHAPTER_SUBTITLES: Record<string, string> = {
   '2': 'Control Flow',
   '3': 'Functions and Data',
   '4': 'Q1 Synthesis',
-  '5': 'shplay — Game Development Foundations',
-  '6': 'shplay — Game Mechanics',
+  '5': 'moshion — Game Development Foundations',
+  '6': 'moshion — Game Mechanics',
   '7': 'Q2 Synthesis — Game Capstone',
 };
 

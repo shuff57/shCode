@@ -4,9 +4,9 @@
   "description": "Build a two-wheeled car using WheelJoints and drive it up a ramp with WASD. The harder of the two A14 options.",
   "type": "assignment",
   "estimateMins": 45,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.3 Physics Applications",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 14,
   "slos": [
     "SLO-3"

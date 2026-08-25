@@ -4,7 +4,7 @@
   "description": "Add a pause state to your game. When paused, stop movement and physics, show a PAUSED overlay. Press P to toggle pause on and off.",
   "type": "lesson",
   "estimateMins": 15,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "example",
   "week": 17,

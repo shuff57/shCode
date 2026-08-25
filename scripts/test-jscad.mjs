@@ -24,7 +24,7 @@
 //             other six groups all measure whether the runtime is CORRECT;
 //             none of them noticed that for the whole of the first build
 //             nothing rendered JscadPreview at all, and /docs/jscad fed JSCAD
-//             source to the shPlay runner. A gate that cannot fail on "nobody
+//             source to the moSHion runner. A gate that cannot fail on "nobody
 //             can load it" is measuring the wrong thing.
 //
 // Runtime builders MUST NOT edit this file or jscad-checks.mjs. A red check is
@@ -49,7 +49,7 @@ import {
   EXPECTED_MODULE_ORDER, DOCUMENTED_COLLISIONS, EXPECTED_BARE_NAME_COUNT,
   CORE_TAUGHT, taughtFromReference, REGL_ALIASES, MIN_REGL_SYMBOLS,
   ENTITY_GEOMETRY_KEYS, DOC_SYNC_EXCEPTIONS, MIN_DOC_EXAMPLES, FENCE_TAGS,
-  REACH_CHAIN, REACH_LESSON, REACH_SHPLAY,
+  REACH_CHAIN, REACH_LESSON, REACH_MOSHION,
 } from './jscad-checks.mjs';
 import {
   SIMPLE_PATH, SHCAD_NAMES, EXPECTED_SHCAD_NAME_COUNT, SHCAD_REPORT_GLOBALS,
@@ -668,7 +668,7 @@ check('every DocsSandbox and DocsClient call site names its runtime', () => {
   return offenders.length ? `no preview prop: ${offenders.join(', ')}` : true;
 });
 
-check('the shPlay docs still load the shPlay runner', () => assertHop(REACH_SHPLAY, REACH_SHPLAY.file));
+check('the moSHion docs still load the moSHion runner', () => assertHop(REACH_MOSHION, REACH_MOSHION.file));
 
 check('a lesson with preview:"jscad" would mount the JSCAD runner', () => assertHop(REACH_LESSON, REACH_LESSON.file));
 

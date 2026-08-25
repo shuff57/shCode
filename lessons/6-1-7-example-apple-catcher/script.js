@@ -32,7 +32,7 @@ function draw() {
 
   // Callback form: fires once per overlapping pair, with both sprites passed in.
   // Cleaner than a manual loop because delete() inside the callback can't trip
-  // the iterate-then-remove bug — shPlay has finished its own iteration first.
+  // the iterate-then-remove bug — moSHion has finished its own iteration first.
   // delete() destroys the sprite (body + every group it's in); group.remove(s)
   // would only unparent it, leaving it drawing via allSprites.
   basket.overlaps(apples, (b, apple) => {

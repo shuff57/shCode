@@ -4,7 +4,7 @@
   "description": "Game State Machines opening slides — title screen, gameplay, pause, game over. Every screen is a state. One variable controls which screen is active. Placeholder until the deck is rebuilt from bookSHelf.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "slides",
   "slos": [

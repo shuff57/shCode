@@ -173,7 +173,7 @@ test('gravity + bounce (pre-existing)', ({ sandbox: s, tick }) => {
   let ball;
   s.setup = () => {
     new s.Canvas(400, 300);
-    s.world.gravity.y = 10; // ~1g, raw m/s² (q5play semantics)
+    s.world.gravity.y = 10; // ~1g, raw m/s² (the reference API semantics)
     const ground = new s.Sprite(200, 280, 400, 20);
     ground.body = 'static';
     ball = new s.Sprite(200, 40, 24, 24);
@@ -350,7 +350,7 @@ test('gap: new groupName.Sprite(...) inherits group defaults (2.3.3)', ({ sandbo
   s.start();
 
   assert.equal(a.color, 'red', 'factory-spawned sprite should inherit the group default color');
-  assert.equal(a.w, 50, 'omitted size should fall back to the q5play default (50)');
+  assert.equal(a.w, 50, 'omitted size should fall back to the the reference API default (50)');
   assert.equal(a.h, 50);
   assert.ok(apples.includes(a), 'factory-spawned sprite should join the group');
 

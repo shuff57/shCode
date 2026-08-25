@@ -1,21 +1,2 @@
-# Chapter-only module URLs. Nothing in the app produces these any more --
-# ContentLessonView's breadcrumb was building /module/<chapter> from a
-# malformed lesson.unit -- but old bookmarks and shared links still hit them,
-# and a bare chapter number has no page of its own. Send them to the
-# chapter's first module.
-#
-# trailingSlash: true, so the canonical target carries the slash.
-/module/1     /module/1.1/    301
-/module/1/    /module/1.1/    301
-/module/2     /module/2.1/    301
-/module/2/    /module/2.1/    301
-/module/3     /module/3.1/    301
-/module/3/    /module/3.1/    301
-/module/4     /module/4.1/    301
-/module/4/    /module/4.1/    301
-/module/5     /module/5.1/    301
-/module/5/    /module/5.1/    301
-/module/6     /module/6.1/    301
-/module/6/    /module/6.1/    301
-/module/7     /module/7.1/    301
-/module/7/    /module/7.1/    301
+/docs/shplay/* /docs/moshion/:splat 301
+/docs/shplay   /docs/moshion/ 301

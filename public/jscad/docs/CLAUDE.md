@@ -11,7 +11,7 @@ loads from a CDN at runtime.
 - `public/jscad/lib/jscad-modeling.min.js` — `@jscad/modeling@2.13.0` (UMD).
 - `public/jscad/lib/jscad-regl-renderer.min.js` — `@jscad/regl-renderer@2.6.15` (UMD).
 - `public/jscad/runner.html` — the 3D preview iframe. Same shape as
-  `public/shplay/runner.html`: reads the student code from `?code=<base64url>`,
+  `public/moshion/runner.html`: reads the student code from `?code=<base64url>`,
   pipes console + errors to the parent over the `preview-console` /
   `preview-error` protocol, loads the two vendored bundles by relative path,
   installs the additive scope shim, runs `main()`, renders with
@@ -23,8 +23,8 @@ loads from a CDN at runtime.
 - `lib/jscad-docs.ts` — the in-app `/docs/jscad` content (sections, pages,
   runnable examples). Hand-authored against `@jscad/modeling@2.13.0`.
 - `components/JscadPreview.tsx` — iframe wrapper; takes `{ code, runKey }` and
-  builds `src=/jscad/runner.html?code=…&r=…`, mirroring `ShPlayPreview.tsx`.
-- `app/docs/jscad/` — the in-app docs route (reuses the shplay docs client
+  builds `src=/jscad/runner.html?code=…&r=…`, mirroring `MoshionPreview.tsx`.
+- `app/docs/jscad/` — the in-app docs route (reuses the moSHion docs client
   and sandbox components).
 - `lessons/jscad-*` — the JSCAD lessons (jscad-intro, jscad-2d-shapes,
   jscad-booleans).

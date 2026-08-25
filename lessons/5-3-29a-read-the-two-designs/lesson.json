@@ -4,7 +4,7 @@
   "description": "The same feature drawn twice, procedural and object-oriented. No drawing — read both and answer what happens when a fourth enemy arrives.",
   "type": "lesson",
   "estimateMins": 15,
-  "category": "Unit 2: shPlay Game Development",
+  "category": "Unit 2: moSHion Game Development",
   "unit": "5.4 Writing Your Own Classes",
   "preview": "reading",
   "slos": [

@@ -4,9 +4,9 @@
   "description": "Graded: build a game with at least 4 states (title, play, pause, gameover) with full save/load integration. Saves trigger on state transitions. Continue restores the right state.",
   "type": "assignment",
   "estimateMins": 60,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.6 Game State Machines",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 17,
   "slos": [
     "SLO-3"

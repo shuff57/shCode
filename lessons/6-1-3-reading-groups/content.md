@@ -8,7 +8,7 @@ By the end of this reading you should be able to answer:
 - How do you spawn a sprite that automatically inherits a group's defaults?
 - Why iterate `[...group]` instead of `group` when you might remove during the loop?
 
-A **Group** is shplay's collection for managing many sprites at once — enemies, projectiles, particles, stars. It looks like an array but knows about sprites.
+A **Group** is moSHion's collection for managing many sprites at once — enemies, projectiles, particles, stars. It looks like an array but knows about sprites.
 
 ---
 
@@ -65,13 +65,13 @@ Note the lowercase `s` vs capital `S`:
 - `new Sprite(...)` — bare. Does NOT use group defaults.
 - `new stars.Sprite(...)` — factory form. Inherits defaults from `stars`.
 
-The factory form is the shplay idiom for "spawn a member of this group."
+The factory form is the moSHion idiom for "spawn a member of this group."
 
 ---
 
 ## The timed-spawn idiom
 
-A common shplay pattern is "spawn one member every N frames, despawn members that fall off-screen." `frameCount % N === 0` is the timer, the factory creates the sprite, a copy-iteration despawns the off-screen ones:
+A common moSHion pattern is "spawn one member every N frames, despawn members that fall off-screen." `frameCount % N === 0` is the timer, the factory creates the sprite, a copy-iteration despawns the off-screen ones:
 
 ```js live
 let stars;
@@ -126,7 +126,7 @@ You'll see this same pattern in the next reading (`overlaps` + despawn).
 
 | Term | Meaning |
 |------|---------|
-| **Group** | A shplay collection that behaves like an array of sprites with shared defaults. |
+| **Group** | A moSHion collection that behaves like an array of sprites with shared defaults. |
 | **Factory pattern** | `new groupName.Sprite(...)` (capital S) — creates a sprite with the group's defaults applied. |
 | **Spawn** | Create a new sprite at runtime. Usually via the factory form. |
 | **Despawn** | Destroy a sprite at runtime via `sprite.delete()` (full destruction). `group.remove(sprite)` only unparents — useful for moving between groups, not cleanup. |

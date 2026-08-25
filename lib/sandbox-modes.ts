@@ -4,13 +4,13 @@
 
 import type { Lesson } from './types';
 
-export type SandboxModeId = 'js' | 'shplay' | 'jscad';
+export type SandboxModeId = 'js' | 'moshion' | 'jscad';
 
 export interface SandboxMode {
   id: SandboxModeId;
   label: string;
   blurb: string;
-  preview: 'console' | 'shplay' | 'jscad';
+  preview: 'console' | 'moshion' | 'jscad';
   docsHref: string | null;
   starter: string;
 }
@@ -24,7 +24,7 @@ for (const name of names) {
 }
 `;
 
-const SHPLAY_STARTER = `// shPlay sandbox — try it out!
+const MOSHION_STARTER = `// moSHion sandbox — try it out!
 
 function setup() {
   new Canvas(400, 400);
@@ -80,12 +80,12 @@ export const SANDBOX_MODES: SandboxMode[] = [
     starter: JS_STARTER,
   },
   {
-    id: 'shplay',
-    label: 'shPlay',
-    blurb: 'A blank shPlay canvas to try out ideas.',
-    preview: 'shplay',
-    docsHref: '/docs/shplay',
-    starter: SHPLAY_STARTER,
+    id: 'moshion',
+    label: 'moSHion',
+    blurb: 'A blank moSHion canvas to try out ideas.',
+    preview: 'moshion',
+    docsHref: '/docs/moshion',
+    starter: MOSHION_STARTER,
   },
   {
     id: 'jscad',

@@ -4,9 +4,9 @@
   "description": "Write a Collectible class, instantiate at least 5, and detect overlap with the player. SLO-2 lab — the class is the point. Auto-graded.",
   "type": "assignment",
   "estimateMins": 45,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 12,
   "slos": [
     "SLO-2",
@@ -26,7 +26,7 @@
       "title": "Add a collect() method",
       "instructions": "Add a `collect()` method on the class that despawns the sprite and returns `this.value`.",
       "hints": [
-        "Check the Sprite section of the shplay docs drawer for how to despawn a sprite."
+        "Check the Sprite section of the moSHion docs drawer for how to despawn a sprite."
       ]
     },
     {
@@ -42,7 +42,7 @@
       "title": "Detect overlaps and collect",
       "instructions": "In `draw()`, iterate the `collectibles` array. When the player overlaps a collectible's sprite, call its `collect()` method, add the returned value to `totalScore`, and remove that item from the array.",
       "hints": [
-        "Check the Sprite section of the shplay docs drawer for the overlap check.",
+        "Check the Sprite section of the moSHion docs drawer for the overlap check.",
         "Removing items while iterating forwards skips neighbours — search for 'iterate backwards to splice' if you hit that bug."
       ]
     }

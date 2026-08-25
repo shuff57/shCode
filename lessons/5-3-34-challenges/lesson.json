@@ -4,9 +4,9 @@
   "description": "Pick one (or more) OOP stretch challenges — extend your Enemy class, write a Player class, or try subclassing with `extends`. Auto-graded.",
   "type": "challenge",
   "estimateMins": 30,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 12,
   "slos": [
     "SLO-2",

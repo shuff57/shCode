@@ -4,7 +4,7 @@
   "description": "Read your saved high score on startup, coerce it with Number(), display it next to the current score, and update it when the player beats their record.",
   "type": "lesson",
   "estimateMins": 12,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "example",
   "week": 16,

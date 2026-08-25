@@ -103,7 +103,7 @@ def run(url, headed):
         # ---- selector -------------------------------------------------------
         tabs = page.query_selector_all(".sandbox-mode")
         labels = [t.inner_text().strip() for t in tabs]
-        check("SELECTOR_THREE_MODES", labels == ["JavaScript", "shPlay", "JSCAD"], str(labels))
+        check("SELECTOR_THREE_MODES", labels == ["JavaScript", "moSHion", "JSCAD"], str(labels))
 
         page.click(".sandbox-mode:has-text('JavaScript')")
         page.wait_for_timeout(300)

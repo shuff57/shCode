@@ -4,9 +4,9 @@
   "description": "Build a one-sprite platformer: WASD moves, space jumps — but only when touching the ground.",
   "type": "assignment",
   "estimateMins": 40,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.3 Physics Applications",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 14,
   "slos": [
     "SLO-3"

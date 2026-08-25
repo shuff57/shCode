@@ -4,7 +4,7 @@
   "description": "Animated Sprites and Camera slides — `addAni` / `changeAni`, camera follow, smoothing with `lerp`, and `layer` for render order. Placeholder until the deck is rebuilt from bookSHelf.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
   "preview": "slides",
   "slos": [

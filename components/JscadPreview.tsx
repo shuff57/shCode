@@ -1,7 +1,7 @@
 'use client';
 
 import { forwardRef } from 'react';
-import { encodeCode } from './ShPlayPreview';
+import { encodeCode } from './MoshionPreview';
 
 interface Props {
   code: string;

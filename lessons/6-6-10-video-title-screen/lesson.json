@@ -4,7 +4,7 @@
   "description": "A title screen is just a state. It shows the game name, maybe instructions, and waits for the player to press a key to start playing.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "video",
   "week": 17,

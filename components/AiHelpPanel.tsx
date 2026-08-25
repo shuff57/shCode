@@ -198,7 +198,7 @@ export default function AiHelpPanel({ lesson }: Props) {
         </div>
       ) : (
         <div style={{ color: '#6272a4', fontSize: 12.5, fontStyle: 'italic' }}>
-          No runtime errors yet. Ask anything below — the AI sees your current code and the shPlay docs.
+          No runtime errors yet. Ask anything below — the AI sees your current code and the moSHion docs.
         </div>
       )}
 
