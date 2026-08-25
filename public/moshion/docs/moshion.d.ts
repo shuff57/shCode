@@ -113,7 +113,7 @@ declare class Sprite {
   scaleBy(x: number, y?: number): void;
   moveTowards(x: number, y: number, tracking?: number): void;
   moveTowards(target: { x: number; y: number }, tracking?: number): void;
-  // The opposite of moveTowards. the reference API declares this but never implements
+  // The opposite of moveTowards. The reference API declares this but never implements
   // it; ours follows the documented meaning.
   moveAway(x: number, y: number, repel?: number): void;
   moveAway(target: { x: number; y: number }, repel?: number): void;
@@ -143,7 +143,7 @@ declare class Sprite {
   /** True freezes rotation. Unlike Box2D's own flag, this also blocks
    *  explicit angularVelocity writes — see DECISIONS D21. */
   rotationLock: boolean;
-  /** Live alias of angularVelocity, degrees per frame. the reference API's name for it. */
+  /** Live alias of angularVelocity, degrees per frame. The reference API's name for it. */
   rotationSpeed: number;
   /** Per-sprite multiplier on world gravity. 0 = weightless. */
   gravityScale: number;
@@ -408,7 +408,7 @@ interface Kb {
   pressed(key: string): boolean;
 
   // Named-key shorthands: same value kb.pressing(name) returns (0, or the
-  // held-frame count). the reference API exposes the raw signed counter here, which is
+  // held-frame count). The reference API exposes the raw signed counter here, which is
   // truthy on the release frame too — a deliberate divergence, DECISIONS D13.
   readonly space: number;
   readonly enter: number;

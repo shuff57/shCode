@@ -586,7 +586,7 @@ export const SEMANTIC_CHECKS = [
         if (ga[v] < 2) bad.push("Group." + v + " (arity " + ga[v] + ")");
       }
       if (bad.length) {
-        return bad.join(', ') + " declare no callback parameter. the reference API gives all six " +
+        return bad.join(', ') + " declare no callback parameter. The reference API gives all six " +
           "verbs a (target, callback) form on both Sprite and Group; passing one here is " +
           "silently ignored.";
       }
@@ -680,7 +680,7 @@ export const SEMANTIC_CHECKS = [
     name: 'releasing one of two keys feeding a direction keeps the direction held',
     area: 'input',
     // ArrowRight and 'd' both mean 'right'. Releasing 'd' while the arrow is
-    // still down must not stop the player. the reference API releases the shared alias
+    // still down must not stop the player. The reference API releases the shared alias
     // unconditionally and DOES break here; this is a deliberate divergence
     // (D16), so the check is a real gate, not informational.
     run({ createSandbox }) {
@@ -847,7 +847,7 @@ export const SEMANTIC_CHECKS = [
     name: 'kb.space exposes the raw signed counter, matching the reference API',
     area: 'input',
     informational: true,
-    // the reference API's named-key properties ARE the raw counter, so on the release
+    // The reference API's named-key properties ARE the raw counter, so on the release
     // frame kb.space is -1 or -2 — both truthy. `if (kb.space) jump()` there
     // fires a second time on key-UP. Ours returns kb.pressing()'s value
     // instead (0 or the held count), so the release frame reads 0.
@@ -1018,7 +1018,7 @@ export const SEMANTIC_CHECKS = [
       // the clamp: 0 must never reach the canvas transform
       if (b.zero.x === 0 || b.zero.y === 0)
         return 'scale = 0 left ' + JSON.stringify(b.zero) + '; ctx.scale(0,0) is a degenerate matrix and ' +
-          'a browser draws nothing after it. the reference API clamps to 0.01 (the reference implementation).';
+          'a browser draws nothing after it. The reference API clamps to 0.01 (the reference implementation).';
       if (b.byZero.x === 0 || b.byZero.y === 0)
         return 'scaleBy(0) left ' + JSON.stringify(b.byZero) + ' — it must route through the same clamp as the setter';
       // the array form the reference API's own typings advertise

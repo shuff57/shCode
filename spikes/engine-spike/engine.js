@@ -574,7 +574,7 @@
     }
   }
   class GlueJoint extends Joint {
-    // Ported from the the reference API GlueJoint (the reference implementation):
+    // Ported from the reference API GlueJoint (the reference implementation):
     // a WeldJoint rigidly fusing a and b at their CURRENT relative pose,
     // anchored at spriteA's position. No `opt` — the reference API's GlueJoint takes
     // only (spriteA, spriteB), unlike this file's other joints.

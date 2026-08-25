@@ -167,7 +167,7 @@
     releases: () => mouse.released(),
     // True once the browser has reported the cursor inside the canvas and
     // stays true until a mouseleave — tracked by the two listeners in
-    // start(). the reference API exposes the same name (mouse.isOnCanvas).
+    // start(). The reference API exposes the same name (mouse.isOnCanvas).
     get isOnCanvas() { return MOUSE._onCanvas; },
     // CSS cursor on the canvas element itself — the reference API's mouse.cursor
     // (the reference implementation) reads/writes $.canvas.style.cursor directly.
@@ -208,7 +208,7 @@
   // Named-key properties, so `kb.space` and `kb.arrowUp` work alongside
   // `kb.pressing('space')`.
   //
-  // the reference API exposes these as the RAW signed counter, which is truthy on the
+  // The reference API exposes these as the RAW signed counter, which is truthy on the
   // release frames (-1/-2) — `if (kb.space) jump()` there fires a second time
   // when the key comes back up. Ours returns what kb.pressing() returns: 0, or
   // the held-frame count. A deliberate divergence (DECISIONS.md D13); the
@@ -560,7 +560,7 @@
     // mid-update (`s.speed = 4; s.direction = 90;` — the speed write already
     // recomputed vel from the OLD direction, so the direction write's own
     // "preserve current speed" then reads a moving target). Not itself a
-    // the reference API member; direction is degrees, same convention as .direction.
+    // The reference API member; direction is degrees, same convention as .direction.
     setSpeedAndDirection(speed, dir) {
       this._direction = dir;
       const rad = (dir * Math.PI) / 180;
@@ -594,7 +594,7 @@
     rotationToFace(x, y, facing) {
       const t = this._target(x, y, facing);
       if (t.x === undefined) return 0;
-      // the reference API's own "too close to rotate toward" guard (the reference implementation).
+      // The reference API's own "too close to rotate toward" guard (the reference implementation).
       if (Math.abs(t.x - this.x) < 0.01 && Math.abs(t.y - this.y) < 0.01) return 0;
       return this.angleTo(t.x, t.y) + (t.opt || 0);
     }
@@ -620,7 +620,7 @@
     // frame in loop()'s post-draw sweep (see the comment there for why it
     // has to happen after this frame's physics/draw, not before) — reading
     // these mid-frame always answers "as of last frame", the same guarantee
-    // the reference API gives (the reference implementation, itself just get/set aliases over
+    // The reference API gives (the reference implementation, itself just get/set aliases over
     // prevPos/prevRotation — same relationship kept here).
     get prevPos() { return this._prevPos || { x: this.x, y: this.y }; }
     get previousPosition() { return this.prevPos; }
@@ -635,7 +635,7 @@
       if (x !== null && typeof x === 'object') {
         // The cursor sits at (0,0) until the browser reports a mousemove, so
         // `sprite.attractTo(mouse)` on a sketch nobody has touched yet hauls
-        // the sprite into the top-left corner. the reference API guards this with
+        // the sprite into the top-left corner. The reference API guards this with
         // mouse.isActive (the reference implementation); no target is better than a wrong one.
         if (x === mouse && !mouse.isActive) return { x: undefined };
         return { x: x.x, y: x.y, opt: y };
@@ -688,7 +688,7 @@
     // finite number, so it sails past the harness's NaN guard, but
     // ctx.scale(0, 0) is a degenerate (non-invertible) matrix and a real
     // browser draws nothing after it — the sprite vanishes with no error.
-    // the reference API clamps to 0.01 for this reason (the reference implementation). At 0.01 a 40px
+    // The reference API clamps to 0.01 for this reason (the reference implementation). At 0.01 a 40px
     // sprite is 0.4px, visually the same "gone" the student asked for, but
     // the transform stays valid and the next sprite still draws.
     get scale() { return this._scale; }
@@ -697,7 +697,7 @@
       if (typeof v === 'number') { this._scale.x = this._scale.y = v || 0.01; }
       else if (v) {
         // `[2, 3]` as well as `{x: 2, y: 3}` — the reference API's typings advertise the
-        // array form (the reference API.d.ts, `set scale(val: number | [] | {x,y})`) and
+        // array form (the reference typings, `set scale(val: number | [] | {x,y})`) and
         // its setter reads val[0]/val[1]. Without this branch the assignment
         // is a silent no-op: no error, no change, nothing to debug.
         this._scale.x = nz(v.x ?? v[0], this._scale.x);
@@ -716,7 +716,7 @@
       this.scale = { x: this._scale.x * x, y: this._scale.y * y };
     }
 
-    // The opposite of moveTowards. the reference API DECLARES this (docs/the reference API.d.ts:910)
+    // The opposite of moveTowards. The reference API DECLARES this (the reference typings (line 910))
     // but ships no implementation for it — verified by grepping the reference implementation,
     // which has attractTo/repelFrom/moveTowards and no moveAway at all. So
     // this is written to the documented meaning rather than ported.
@@ -765,7 +765,7 @@
     // rotateTowards(angle | target, tracking = 0.1): unlike rotateTo, this
     // does NOT snap or step the rotation directly — it sets a spin speed
     // proportional to how far there is left to turn, so the sprite eases
-    // round over several frames. the reference API sets .rotationSpeed (the reference implementation);
+    // round over several frames. The reference API sets .rotationSpeed (the reference implementation);
     // moSHion's equivalent unit is angularVelocity, also degrees per frame.
     rotateTowards(angle, tracking) {
       let target = angle, k = tracking;
@@ -777,7 +777,7 @@
       if (k === undefined) k = 0.1;
       // Shortest signed way round, ALWAYS — including the plain-number form.
       //
-      // the reference API normalises only its object/coordinate form (via angleToFace +
+      // The reference API normalises only its object/coordinate form (via angleToFace +
       // minAngleDist); the plain-number form takes the delta raw
       // (the reference implementation, `angle -= this.rotation`), so rotateTowards(350) from
       // rotation 0 spins 350 degrees the long way round instead of 10 the
@@ -912,7 +912,7 @@
       // rotationLock means "this sprite does not turn". Box2D's fixed-rotation
       // flag only stops TORQUE from spinning a body — an explicit angular
       // velocity write still turns it, so a locked sprite handed a spin would
-      // rotate anyway with nothing to explain why. the reference API has that hole too;
+      // rotate anyway with nothing to explain why. The reference API has that hole too;
       // honouring the lock here is a deliberate divergence (D21).
       if (this._body.isFixedRotation()) return;
       this._body.setAngularVelocity((degPerFrame * Math.PI / 180) * FPS);
@@ -1095,7 +1095,7 @@
     // life: frames remaining. Counts down once per frame in loop()'s sweep
     // (after this frame's update/draw, same spot prevPos snapshots) and
     // calls delete() at 0. Only stored, never initialized — matching
-    // the reference API's own Sprite (no default assignment anywhere in its
+    // The reference API's own Sprite (no default assignment anywhere in its
     // constructor; only its Group.Visuals subclass defaults to Infinity,
     // the reference implementation) — so `undefined - 1` is NaN, never <= 0, and an
     // untouched sprite is immortal for free. -1 is this file's own explicit
@@ -1401,7 +1401,7 @@
     // Cascading versions of the Sprite methods of the same name. A group
     // already cascades PROPERTIES (`coins.color = 'gold'`), so a student
     // reasonably expects `enemies.moveTowards(player)` to work too — and on
-    // the reference API (the reference implementation) it does.
+    // The reference API (the reference implementation) it does.
     applyForce(fx, fy) { for (const s of [...this]) s.applyForce(fx, fy); }
     applyTorque(t) { for (const s of [...this]) s.applyTorque(t); }
     applyForceScaled(fx, fy) { for (const s of [...this]) s.applyForceScaled(fx, fy); }
@@ -1591,7 +1591,7 @@
   // (the reference implementation), including its leading-object form so
   // `world.explodeAt(sprite, 120, 40)` works.
   //
-  // the reference API delegates to Box2D v3's b2World_Explode. planck is a Box2D 2.x
+  // The reference API delegates to Box2D v3's b2World_Explode. planck is a Box2D 2.x
   // port and has no such call, so the blast is hand-rolled: an impulse away
   // from the centre, attenuated toward the rim. The curve is OURS — a linear
   // ramp from full strength at the centre to `falloff` of it at the radius —
@@ -1739,7 +1739,7 @@
     }
   }
   class GlueJoint extends Joint {
-    // Ported from the the reference API GlueJoint (the reference implementation):
+    // Ported from the reference API GlueJoint (the reference implementation):
     // a WeldJoint rigidly fusing a and b at their CURRENT relative pose,
     // anchored at spriteA's position. No `opt` — the reference API's GlueJoint takes
     // only (spriteA, spriteB), unlike this file's other joints.
@@ -1856,7 +1856,7 @@
 
     // Two passes: the world, then anything pinned to the screen.
     //
-    // the reference API's answer to a HUD is camera.off() around drawing PRIMITIVES,
+    // The reference API's answer to a HUD is camera.off() around drawing PRIMITIVES,
     // which works here too — but moSHion renders sprites for you, so a HUD
     // built out of sprites had no way to stay put and scrolled off with the
     // level. `sprite.screenSpace = true` is ours, not the reference API's. Screen-space
@@ -2542,7 +2542,7 @@
       if (!dir) return;
       // Two keys feed each direction (ArrowRight and 'd' both mean 'right'),
       // so releasing one must NOT release the shared alias while the other is
-      // still down. the reference API releases it unconditionally (the reference implementation): hold
+      // still down. The reference API releases it unconditionally (the reference implementation): hold
       // both, let go of one, and the player stops moving with a key still
       // held. Deliberate divergence — see DECISIONS.md D16.
       const stillHeld = Object.keys(KEY_DIRS_).some(
@@ -2562,7 +2562,7 @@
       MOUSE._onCanvas = true;
       // drag tracking (mouse.drag/dragging/drags/dragged): mark "moved while
       // held" this frame for whichever buttons are currently down —
-      // the reference API's onpointermove (the reference implementation). Consumed and cleared
+      // The reference API's onpointermove (the reference implementation). Consumed and cleared
       // once per frame in loop()'s sweep below.
       if (MOUSE._bl > 0) MOUSE._mvl = true;
       if (MOUSE._bc > 0) MOUSE._mvc = true;
@@ -2763,7 +2763,7 @@
   global.masterVolume = masterVolume;
   global.Sound = Sound;
 
-  // Auto-boot: if the student sketch defines window.setup (the the reference API
+  // Auto-boot: if the student sketch defines window.setup (the reference API
   // convention — sketches never call start() themselves), start the engine.
   // The deferred check (setTimeout 0) fires after all synchronous <script>
   // tags in the page have executed, which is when the student sketch has

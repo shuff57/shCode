@@ -350,7 +350,7 @@ test('gap: new groupName.Sprite(...) inherits group defaults (2.3.3)', ({ sandbo
   s.start();
 
   assert.equal(a.color, 'red', 'factory-spawned sprite should inherit the group default color');
-  assert.equal(a.w, 50, 'omitted size should fall back to the the reference API default (50)');
+  assert.equal(a.w, 50, 'omitted size should fall back to the reference API default (50)');
   assert.equal(a.h, 50);
   assert.ok(apples.includes(a), 'factory-spawned sprite should join the group');
 

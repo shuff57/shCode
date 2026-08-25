@@ -1,3 +1,204 @@
+# Handoff — 2026-08-25 · shPlay is now moSHion; two engine outages fixed; q5play removed
+
+Started as "run the six new answer keys in a browser". Running them found two
+defects that had nothing to do with the keys, and pulling on those ended in an
+engine rename and the removal of a vendored library we should not have been
+hosting. Everything below is **shipped and verified on production**.
+
+| Commit | What |
+| --- | --- |
+| `b2b3303` | `feat(solutions): answer keys for the last six lessons` |
+| `1309460` | `feat(moshion): rename the engine, drop the vendored q5play` — 393 files, +2453/-27099 |
+
+Migration `0017_rename_q5play_lesson_ids.sql` is **applied to prod and local**.
+`npm test` green, `tsc --noEmit` clean, tree clean, `cs-3d` pushed.
+
+---
+
+## 1. The two engine defects — both were live, both pre-existing
+
+Neither was in the answer keys. Both had been shipping for as long as the
+features existed.
+
+**Unit 6.5 could not run at all.** The preview iframe is sandboxed *without*
+`allow-same-origin` (deliberately — student code must not reach `/api/*` with
+the viewer's cookie). That gives it an opaque origin, where merely *reading*
+`window.localStorage` throws `SecurityError`. So the first `storeItem()` killed
+the sketch: black canvas, red `Error: Script error.` bar. **42 lesson files call
+`storeItem`/`getItem`** — all of unit 6.5 (Save & Load), parts of 6.6 and 7.1,
+and 4.1.4. Confirmed by running the course's *own* 6.5.4 content, not mine.
+
+Fixed with a hydrate-from-parent bridge. The host page keeps the store on its
+real origin and hands the frame a populated copy *before* the sketch runs, so
+`getItem()` stays a synchronous read:
+
+```
+parent (app origin)          iframe (opaque origin)
+  localStorage  ---- init --->  window.__moshionStorage
+      ^                                  |
+      +---------- set/remove/clear ------+
+```
+
+`lib/moshion-storage.ts` (host), the boot block in `public/moshion/runner.html`
+(frame), `public/moshion/moshion.js` (the four storage functions). One shared
+namespace, `moshion.store.v1`, with a 64 KB per-value / 512 KB total cap so a
+runaway sketch cannot evict the student's lesson drafts from the same
+localStorage.
+
+**`camera.x = player.x` did not centre the player.** 6.4.12/13/16/17 all say it
+"re-centers the viewport", and 6.4.12's table said the camera defaults to
+`(canvas.w/2, canvas.h/2)`. The engine said `camera = {x: 0, y: 0}` and did
+`translate(-camera.x, -camera.y)` — a top-left offset. Running 6.4.16's own
+example and walking right:
+
+| | player.x | camera.x | rendered |
+| --- | --- | --- | --- |
+| as the course teaches it | 535 | 535 | half off the **left edge** |
+| with `- canvas.w/2` | 535 | 335 | dead centre |
+
+Fixed in the **engine**, not the docs, so every existing lesson became true as
+written and moSHion matches the API it is modelled on. All nine world/screen
+conversions now go through `_camLeft()` / `_camTop()`, so the centre-vs-corner
+question is answered in one place. No lesson had compensated for the old
+behaviour, so nothing regressed.
+
+---
+
+## 2. Names: shPlay → moSHion, q5play gone
+
+**The engine was always ours** — exactly one substantive line is shared with
+`q5play.js`, and it is `return this.vel.x != 0 || this.vel.y != 0`.
+
+**But `public/q5play/` held a real copy of upstream q5play v4.0 + q5.js v4.5**,
+1.3 MB, and because it sat under `public/` it was *served*: `/q5play/q5play.js`
+answered 200 with 194,498 bytes on shcode.pages.dev. q5play's licence is not
+open source, and clause 1d forbids use "for the purpose of teaching computer
+science… includes… use in schools". Nothing in the app loaded it — only a parity
+report read one typings file. Directory and report both deleted; `/q5play/*` now
+404s in production.
+
+**The example art was the harder half.** All six sprite sheets were
+byte-identical to q5play's (SHA-256), while our own `LICENSE.md` called them
+"original work written for this course" under an MIT notice. Four are
+load-bearing — 6.4.4, 6.4.5, 6.4.6 and 6.4.7 load them by URL to teach `addAni`
+and `sprite.image`. They are now redrawn from primitives by
+`scripts/make-moshion-assets.py` (deterministic; re-run to regenerate), same
+geometry and frame counts so no lesson content moved. `monster.webp` and
+`questKid.webp` had zero references and were deleted rather than redrawn.
+
+**One credit line survives, by decision:** `LICENSE.md` §3 says moSHion is
+*inspired by q5play* and contains none of its code. For an acknowledged
+reimplementation, removing attribution reads worse than keeping it. The only
+other occurrences are two pointers to that line and `_redirects` naming the old
+path.
+
+Slug is `moshion`, display name **moSHion Game Design**. `/docs/shplay/*` →
+`/docs/moshion/*` via `public/_redirects` (verified 301 on prod).
+
+---
+
+## 3. Migration 0017 — and the 65 rows it rescued
+
+Five lesson ids carried `q5play`. They now read `moshion`, and prod is migrated:
+
+```
+5-1-11-q5play-intro           -> 5-1-11-moshion-intro
+5-1-20-q5play-move-keys       -> 5-1-20-moshion-move-keys
+5-3-14-q5play-sprite-showcase -> 5-3-14-moshion-sprite-showcase
+q5play-bounce                 -> moshion-bounce
+q5play-gravity                -> moshion-gravity
+```
+
+**The rescue.** An earlier renumber moved these lessons onto the title numbering
+in `lesson_state` and `commits` but never touched `lesson_submissions`. Prod held
+65 submission rows under the pre-numbering ids (`q5play-intro` 29,
+`q5play-move-keys` 35, `q5play-sprite-showcase` 1) — a real submit history for
+lessons that could no longer find it, so
+`GET /api/lesson-submissions?lessonId=5-1-11-…` had been returning nothing for
+months. 0017 folds them onto the new ids. Zero students held both an old and a
+new id, so nothing merged two real histories.
+
+0017 also covers `lesson_modes` and `class_due_dates`, which `0013` predates.
+**`class_due_dates` keeps lesson ids in `scope_id`, not `lesson_id`** — a grep
+for the obvious column name walks straight past it. Both were empty; the
+statements are there for a database where they are not.
+
+Verified after applying: **201 rows moved, zero q5play left**, counts matching
+the pre-flight exactly (state 29/28/31, submissions 29/35/1, commits 22/26).
+
+**Still open, not touched:** production has **97** lesson ids with no matching
+lesson folder, mostly the old `2-x-y` numbering from the unit renumber. Three
+were ours and are fixed. The other 94 are a separate question nobody has asked
+yet.
+
+---
+
+## 4. Traps measured this session
+
+- **A repo-wide rename corrupts migrations.** The sweep rewrote 0017's SQL
+  string literals into `'the reference API-intro'` — valid SQL that matches zero
+  rows. It would have applied, printed ✅, and stranded all 201 rows. 169
+  literals were hit. **Exclude `migrations/` from any string sweep and re-read
+  the SQL.** `migrations apply` reporting ✅ means the statements ran, not that
+  they matched anything: always count rows on the new ids afterwards.
+- **"0 errors" is not "it worked".** After the storage change every sketch came
+  up black with a clean console and the run reported six greens. The bridge had
+  pushed injection past `_tryAutoBoot()`, so `window.setup` did not exist when
+  the engine looked and it never started — silently. Caught only because 7.1.1's
+  three startup `PASS` lines had vanished. The engine now exposes
+  `_moshionAutoBoot` and the runner calls it after injecting.
+- **Cloudflare edges disagree mid-rollout.** Polling for the deploy returned 200
+  for `/moshion/moshion.js` and then 404 for the same URL seconds later.
+  Applying the migration on that first 200 would have put D1 ahead of the site —
+  which is exactly how the 65 orphans were created. Require several consistent
+  samples with cache-busting before treating a deploy as live.
+- **`ImageDraw` replaces pixels, it does not composite.** Translucent shapes
+  punch holes through whatever they overlap: the star's highlight came out a
+  grey smudge and the burst's core ate the spokes behind it. Draw translucent
+  elements on their own layer and `alpha_composite` them.
+- **A `git mv` loop with `set -e` does not abort on failure inside a function.**
+  One untracked file silently failed to move and the loop carried on.
+
+---
+
+## 5. Verified green
+
+- `npm test` end to end: **moSHion gate PASS**, JSCAD 675/675, 144
+  grader-tolerance cases, 19 version-control assertions, no solution leaks, 510
+  lessons with no id collisions, `check-reachable` clean.
+- `npx tsc --noEmit` clean (clear `.next` first — stale route types for the old
+  `/docs/shplay` path fail the check).
+- All six reference sketches run headless with zero errors; 7.1.1 prints its
+  three `PASS` lines; 6.5.27's save survives a full page reload.
+- The storage bridge round-trips in the **real app**, not just the rig: parent
+  localStorage read `{"bridgeProbe":"1"}`, then `"2"` after a reload.
+- Nine numeric camera checks in a browser (HUD identity, world-origin-to-
+  top-left, pan direction, culling), plus 6.4.18 and 6.5.25 — the latter running
+  for the first time.
+- New sprite sheets load, slice and animate through the engine at the right
+  frame counts.
+- Production: `/moshion/moshion.js` 200, `/q5play/*` 404, `/docs/shplay/overview`
+  301 → `/docs/moshion/overview`, four new assets 200, two deleted assets 404.
+
+---
+
+## 6. What is NOT done
+
+- **Nobody has played the four animation lessons by hand.** The sheets are
+  verified to load, slice and animate — not to look good in motion.
+- **Three gate expectations were rewritten by the same person who changed the
+  behaviour** (`moshion-checks.mjs`, `moshion-checks-surface.mjs`). Each new
+  number is derived from the documented rule in a comment rather than copied
+  from the code's output, and an independent browser probe asserted the same
+  values first — but it is still builder-owns-gate and worth a second pair of
+  eyes.
+- **The 94 remaining orphaned lesson ids** in prod (see §3).
+- **`curriculum/modules/_build-spec-1.2-1.4.md`** and other archived specs were
+  swept along with everything else. They are historical documents; the rename is
+  correct but nobody re-read them for sense.
+
+---
+
 # Handoff — 2026-08-24 · shCAD shipped; no lesson uses it yet
 
 shCAD — a plain-words surface over `@jscad/modeling`, the JSCAD equivalent of what
@@ -680,7 +881,7 @@ Four sessions were in this tree at once. Their commit bodies are unusually detai
 are the real record — `git log --format='%B'` on any sha below repays the read.
 
 **moSHion game API** (`23aae49 78af477 d7c3b16 6524706 6afaaa3`)
-the reference API parity 19% → 69%; the engine went 807 → 2,723 lines. Added: key-name
+The reference API parity 19% → 69%; the engine went 807 → 2,723 lines. Added: key-name
 normalisation, camera on/off + `sprite.screenSpace` HUDs, joints, text layout,
 `world.explodeAt`, group ops, and a Web Audio `Sound` class. 85 behavioural checks
 now exist where there were zero.
@@ -777,12 +978,12 @@ Deliberate divergences from the reference API. The gate prints all of them as `D
 them gate the build:
 
 - **`overlaps()` is level-triggered**, not edge-triggered — a curriculum choice. The
-  the reference API-faithful edge semantics live on `collides()` / `overlapping()` / `overlapped()`.
+  The reference API-faithful edge semantics live on `collides()` / `overlapping()` / `overlapped()`.
 - **Named key properties return `pressing()`'s value**, not the reference API's raw signed counter,
   so `if (kb.space)` cannot double-fire on key-up.
 - **Defaults differ**: density 1 (not 5), friction 0, bounciness 0, gravity (0, 9.8).
 - **The direction alias is reference-counted** — releasing `d` while ArrowRight is still
-  held keeps `'right'` alive. the reference API has this bug; moSHion does not.
+  held keeps `'right'` alive. The reference API has this bug; moSHion does not.
 - **`rotateTowards` always turns the short way.** the reference API's number form does not.
 
 And the method that actually found the defects, which is the part worth inheriting:

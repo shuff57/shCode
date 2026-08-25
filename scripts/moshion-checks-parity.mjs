@@ -453,7 +453,7 @@ export const PARITY_CHECKS = [
       if (!r.ok) return `sketch threw: ${r.error?.message}`;
       const hits = r.box.sandbox.hits;
       if (hits === 1) return true;
-      return `overlaps() reported true on ${hits} frames of one pass-through; the reference API fires once. moSHion is level-triggered by curriculum design (D11) -- collides()/overlapping()/overlapped() carry the the reference API-faithful edge and count semantics`;
+      return `overlaps() reported true on ${hits} frames of one pass-through; the reference API fires once. moSHion is level-triggered by curriculum design (D11) -- collides()/overlapping()/overlapped() carry the reference API-faithful edge and count semantics`;
     },
   },
 ];
