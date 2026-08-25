@@ -73,7 +73,7 @@
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "function\\s+draw\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?background\\s*\\(",
+      "pattern": "background\\s*\\(",
       "flags": "",
       "points": 0
     },

@@ -370,6 +370,51 @@ for (const id of Object.values(L)) {
   ].join(nl) });
 }
 
+
+// -------------------------------------------- audit sweep, 2026-08-24
+// Found by scripts/audit-grader-tolerance.mjs across all 121 regex-graded
+// lessons. Pinned here because the auditor only reports -- this is what
+// stops them coming back.
+{
+  const anyQuote = [
+    '1-1-3-first-statement',
+    '1-1-7-classify-the-task',
+    '1-1-11-name-that-umbrella',
+    '1-2-10-lab-predict-the-number',
+    '2-5-9-lab-what-runs',
+    '2-5-20-lab-after-a-throw',
+    '2-5-25-lab-predict-try-catch-finally',
+  ];
+  for (const id of anyQuote) {
+    const S = solutionFiles(id);
+    accept(id, 'reference solution', S);
+    // 1.2.13 teaches template literals; these graders took only "double".
+    accept(id, 'strings written as template literals', {
+      ...S,
+      'script.js': S['script.js'].replace(/"([^"\\\n]*)"/g,
+        (m, inner) => (inner.includes('${') || inner.includes(BT) ? m : BT + inner + BT)),
+    });
+  }
+
+  // Automatic semicolon insertion makes a bare `break` / `continue` valid, so
+  // demanding the semicolon failed students writing correct JavaScript.
+  for (const id of ['2-4-12-lab-break-square', '2-4-19-lab-multiples-of-three',
+                    '6-6-24-a16-2-game-states']) {
+    const S = solutionFiles(id);
+    accept(id, 'reference solution', S);
+    accept(id, 'break/continue without a semicolon', {
+      ...S,
+      'script.js': S['script.js'].replace(/\b(break|continue)[ \t]*;/g, '$1'),
+    });
+  }
+
+  // r3 was type:"inFunction" AND re-matched `function draw() {` -- the header
+  // checkInFunction had already stripped. It could not pass for anybody; the
+  // reference solution calls background() in draw() and scored 4/5.
+  accept('5-1-23-challenges', 'reference solution now passes its own grader',
+    solutionFiles('5-1-23-challenges'));
+}
+
 // ---------------------------------------------------------------- run
 try {
   execFileSync(

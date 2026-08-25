@@ -41,7 +41,7 @@
       "description": "Code contains a break statement",
       "type": "regex",
       "file": "script.js",
-      "pattern": "break\\s*;",
+      "pattern": "\\bbreak\\b",
       "flags": "i",
       "points": 0
     },

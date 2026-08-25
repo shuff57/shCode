@@ -59,7 +59,7 @@
       "description": "Prints the result of multiplying text by a number",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*[\"']hello[\"']\\s*\\*\\s*5\\s*\\)",
+      "pattern": "console\\.log\\s*\\(\\s*[\"'`]hello[\"'`]\\s*\\*\\s*5\\s*\\)",
       "flags": "",
       "points": 0
     },

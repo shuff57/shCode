@@ -46,7 +46,7 @@
       "description": "try block throws new Error(\"boom\")",
       "type": "regex",
       "file": "script.js",
-      "pattern": "throw\\s+new\\s+Error\\(\\s*[\"']boom[\"']\\s*\\)",
+      "pattern": "throw\\s+new\\s+Error\\(\\s*[\"'`]boom[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -56,7 +56,7 @@
       "description": "\"D\" is logged after the finally block closes",
       "type": "regex",
       "file": "script.js",
-      "pattern": "finally[\\s\\S]*[\"']D[\"']",
+      "pattern": "finally[\\s\\S]*[\"'`]D[\"'`]",
       "flags": "i",
       "points": 0
     }

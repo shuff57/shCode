@@ -41,7 +41,7 @@
       "description": "Code contains a continue statement",
       "type": "regex",
       "file": "script.js",
-      "pattern": "continue\\s*;",
+      "pattern": "\\bcontinue\\b",
       "flags": "i",
       "points": 0
     },

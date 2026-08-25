@@ -91,7 +91,7 @@
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "\\bbreak\\s*;",
+      "pattern": "\\bbreak\\b",
       "flags": "",
       "points": 0
     },
