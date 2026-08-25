@@ -39,7 +39,7 @@
       "description": "Six or more variables declared with let or const, initialized on the declaration line or assigned later",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:[\\s\\S]*?(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*(?:=|;)){6}",
+      "pattern": "(?:[\\s\\S]*?(?:let|const|var)\\s+[a-z][A-Za-z0-9]*\\s*(?:=|;|\\n)){6}",
       "flags": "",
       "points": 0
     },
@@ -49,7 +49,7 @@
       "description": "Two or more variables hold plain numbers, assigned on the declaration line or later",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:[\\s\\S]*?(?:(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*-?[\\d.]+\\s*;|(?:let|const)\\s+([a-z][A-Za-z0-9]*)\\s*;[\\s\\S]*?\\1\\s*=\\s*-?[\\d.]+\\s*;)){2}",
+      "pattern": "(?:[\\s\\S]*?(?:(?:let|const|var)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*-?[\\d.]+\\s*;?|(?:let|const|var)\\s+([a-z][A-Za-z0-9]*)\\s*;?[\\s\\S]*?\\1\\s*=\\s*-?[\\d.]+\\s*;?)){2}",
       "flags": "",
       "points": 0
     },
@@ -59,7 +59,7 @@
       "description": "Two or more variables hold text, in quotes or backticks, assigned on the declaration line or later",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:[\\s\\S]*?(?:(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*(?:[\"'][^\"']*[\"']|`[^`]*`)\\s*;|(?:let|const)\\s+([a-z][A-Za-z0-9]*)\\s*;[\\s\\S]*?\\1\\s*=\\s*(?:[\"'][^\"']*[\"']|`[^`]*`)\\s*;)){2}",
+      "pattern": "(?:[\\s\\S]*?(?:(?:let|const|var)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|`[^`]*`)\\s*;?|(?:let|const|var)\\s+([a-z][A-Za-z0-9]*)\\s*;?[\\s\\S]*?\\1\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|`[^`]*`)\\s*;?)){2}",
       "flags": "",
       "points": 0
     },
@@ -69,17 +69,17 @@
       "description": "A variable holds true or false, either literally or from a comparison, assigned on the declaration line or later",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*(?:true|false|[^;\\n]*(?:===|!==|==|!=|<=|>=|<|>)[^;\\n]*)\\s*;|(?:let|const)\\s+([a-z][A-Za-z0-9]*)\\s*;[\\s\\S]*?\\1\\s*=\\s*(?:true|false|[^;\\n]*(?:===|!==|==|!=|<=|>=|<|>)[^;\\n]*)\\s*;",
+      "pattern": "(?:let|const|var)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*(?:!*(?:true|false)|Boolean\\s*\\(|[^;\\n]*(?:===|!==|==|!=|<=|>=|<|>)[^;\\n]*)\\s*;?|(?:let|const|var)\\s+([a-z][A-Za-z0-9]*)\\s*;?[\\s\\S]*?\\1\\s*=\\s*(?:!*(?:true|false)|Boolean\\s*\\(|[^;\\n]*(?:===|!==|==|!=|<=|>=|<|>)[^;\\n]*)\\s*;?",
       "flags": "",
       "points": 0
     },
     {
       "id": "r5",
       "title": "Two different string methods used",
-      "description": "Uses two distinct string operations such as .length, .toUpperCase(), .toLowerCase() or .includes()",
+      "description": "Uses two string operations -- .length, .toUpperCase(), .includes(), .trim(), .replace() and others all count",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.(length|toUpperCase|toLowerCase|includes|indexOf|slice)\\b[\\s\\S]*?\\.(length|toUpperCase|toLowerCase|includes|indexOf|slice)\\b",
+      "pattern": "\\.(length|toUpperCase|toLowerCase|includes|indexOf|slice|trim|charAt|at|replace|replaceAll|split|startsWith|endsWith|substring|concat|repeat|padStart|padEnd)\\b[\\s\\S]*?\\.(length|toUpperCase|toLowerCase|includes|indexOf|slice|trim|charAt|at|replace|replaceAll|split|startsWith|endsWith|substring|concat|repeat|padStart|padEnd)\\b",
       "flags": "",
       "points": 0
     },
@@ -89,17 +89,17 @@
       "description": "Prints a sentence using backticks with ${...} inside, either directly in console.log or via a variable printed later",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\([^;\\n]*?`[^`]*\\$\\{[^}]+\\}[^`]*`|(?:let|const|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*`[^`]*\\$\\{[^}]+\\}[^`]*`\\s*;[\\s\\S]*?console\\.log\\s*\\((?:[^()]*,)*\\s*\\1\\s*[,)]",
+      "pattern": "console\\.log\\s*\\([^;]*?`[^`]*\\$\\{[^}]+\\}[^`]*`|(?:let|const|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*`[^`]*\\$\\{[^}]+\\}[^`]*`\\s*;?[\\s\\S]*?console\\.log\\s*\\((?:[^()]*,)*\\s*\\1\\s*[,)]",
       "flags": "",
       "points": 0
     },
     {
       "id": "r7",
       "title": "typeof is used to check a type",
-      "description": "Logs the type of at least one variable",
+      "description": "Logs the type of at least one variable; the typeof may be labelled or stored in a variable first",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\s*\\(\\s*typeof\\s",
+      "pattern": "console\\.log\\s*\\([^;]*\\btypeof\\s|(?:let|const|var)\\s+[A-Za-z_$][\\w$]*\\s*=\\s*typeof\\s",
       "flags": "",
       "points": 0
     }

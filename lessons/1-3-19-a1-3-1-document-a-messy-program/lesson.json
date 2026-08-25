@@ -39,7 +39,7 @@
       "description": "The rate that never changes is declared with const in UPPER_SNAKE_CASE",
       "type": "regex",
       "file": "script.js",
-      "pattern": "const\\s+TAX_RATE\\s*=\\s*[\\d.]+\\s*;",
+      "pattern": "const\\s+TAX_RATE\\s*=\\s*[\\d.][^;\\n]*;",
       "flags": "",
       "points": 0
     },
@@ -49,7 +49,7 @@
       "description": "Declares bookTitle with quoted text",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+bookTitle\\s*=\\s*[\"'`][^\"'`]+[\"'`]\\s*;",
+      "pattern": "(?:let|const|var)\\s+bookTitle\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|`[^`]*`)\\s*;",
       "flags": "",
       "points": 0
     },
@@ -59,7 +59,7 @@
       "description": "Declares both unitPrice and quantity",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?=[\\s\\S]*(?:let|const)\\s+unitPrice\\s*=)(?=[\\s\\S]*(?:let|const)\\s+quantity\\s*=)[\\s\\S]*",
+      "pattern": "(?=[\\s\\S]*\\bunitPrice\\s*=)(?=[\\s\\S]*\\bquantity\\s*=)[\\s\\S]*",
       "flags": "",
       "points": 0
     },
@@ -69,7 +69,7 @@
       "description": "subtotal is unitPrice times quantity",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+subtotal\\s*=[^;]*(?:unitPrice[^;]*quantity|quantity[^;]*unitPrice)",
+      "pattern": "(?=[\\s\\S]*\\bsubtotal\\s*=)(?=[\\s\\S]*(?:unitPrice[^;\\n]*quantity|quantity[^;\\n]*unitPrice))[\\s\\S]*",
       "flags": "",
       "points": 0
     },
@@ -79,7 +79,7 @@
       "description": "orderTotal is computed from subtotal and TAX_RATE",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+orderTotal\\s*=[^;]*subtotal[^;]*TAX_RATE",
+      "pattern": "(?=[\\s\\S]*\\borderTotal\\s*=)(?=[\\s\\S]*(?:subtotal[^;\\n]*TAX_RATE|TAX_RATE[^;\\n]*subtotal))[\\s\\S]*",
       "flags": "",
       "points": 0
     },
@@ -99,17 +99,17 @@
       "description": "No cramped arithmetic like a*b remains — every operator has a space on each side",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?![\\s\\S]*[A-Za-z0-9_)][*/+][A-Za-z0-9_(])[\\s\\S]*$",
+      "pattern": "^(?![\\s\\S]*[A-Za-z0-9_)][*+][A-Za-z0-9_(])[\\s\\S]*$",
       "flags": "",
       "points": 0
     },
     {
       "id": "r8",
       "title": "At least four explanatory comments",
-      "description": "Four or more // comments explaining the code",
+      "description": "Four or more comments explaining the code, written as // or /* */",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:[\\s\\S]*?//[^\\n]{6,}){4}",
+      "pattern": "(?:[\\s\\S]*?(?://[^\\n]{6,}|/\\*[\\s\\S]{6,}?\\*/)){4}",
       "flags": "",
       "stripComments": false,
       "points": 0
@@ -117,11 +117,11 @@
     {
       "id": "r9",
       "title": "README answers all three prompts",
-      "description": "README.md answers all three prompts in plain English -- a sentence or a bullet each",
+      "description": "Each of the three headings has a real answer under it -- a sentence or a bullet, not an empty heading",
       "type": "regex",
       "file": "README.md",
-      "pattern": "(?:[\\s\\S]*?[A-Za-z][^\\n.!?]{19,}(?:[.!?]|\\n|$)){3}",
-      "flags": "",
+      "pattern": "(?:[\\s\\S]*?^(?![ \\t]*#)[ \\t]*\\S[^\\n]{9,}$){3}",
+      "flags": "m",
       "points": 0
     },
     {

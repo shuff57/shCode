@@ -34,7 +34,7 @@
       "description": "Declares subjectName holding the subject text",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+subjectName\\s*=\\s*[\"'`]",
+      "pattern": "\\bsubjectName\\s*=\\s*[\"'`]",
       "flags": "",
       "points": 0
     },
@@ -44,7 +44,7 @@
       "description": "Declares finalGrade holding the number",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+finalGrade\\s*=\\s*\\d+",
+      "pattern": "\\bfinalGrade\\s*=\\s*\\d",
       "flags": "",
       "points": 0
     },
@@ -54,7 +54,7 @@
       "description": "Declares gradeReport built from the other two",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+gradeReport\\s*=[^;]*(?:subjectName[^;]*finalGrade|finalGrade[^;]*subjectName)",
+      "pattern": "(?=[\\s\\S]*\\bgradeReport\\s*=)(?=[\\s\\S]*(?:subjectName[^;\\n]*finalGrade|finalGrade[^;\\n]*subjectName))[\\s\\S]*",
       "flags": "",
       "points": 0
     },
@@ -64,7 +64,7 @@
       "description": "Declares hoursWorked holding the number of hours",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+hoursWorked\\s*=\\s*[\\d.]+",
+      "pattern": "\\bhoursWorked\\s*=\\s*[\\d.]",
       "flags": "",
       "points": 0
     },
@@ -74,7 +74,7 @@
       "description": "Declares hourlyRate holding the rate",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+hourlyRate\\s*=\\s*[\\d.]+",
+      "pattern": "\\bhourlyRate\\s*=\\s*[\\d.]",
       "flags": "",
       "points": 0
     },
@@ -84,7 +84,7 @@
       "description": "Declares totalPay as hoursWorked times hourlyRate",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+totalPay\\s*=[^;]*(?:hoursWorked[^;]*hourlyRate|hourlyRate[^;]*hoursWorked)",
+      "pattern": "(?=[\\s\\S]*\\btotalPay\\s*=)(?=[\\s\\S]*(?:hoursWorked[^;\\n]*hourlyRate|hourlyRate[^;\\n]*hoursWorked))[\\s\\S]*",
       "flags": "",
       "points": 0
     },
@@ -94,7 +94,7 @@
       "description": "No declaration of a, b, c, n, d or p remains in the file",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?![\\s\\S]*(?:let|const)\\s+[abcndp]\\s*=)[\\s\\S]*$",
+      "pattern": "^(?![\\s\\S]*(?:let|const|var)\\s+[abcndp]\\s*=)[\\s\\S]*$",
       "flags": "",
       "points": 0
     }

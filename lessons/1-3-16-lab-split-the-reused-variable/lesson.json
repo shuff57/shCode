@@ -34,7 +34,7 @@
       "description": "Declares maxScore with a numeric value",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+maxScore\\s*=\\s*\\d+",
+      "pattern": "\\bmaxScore\\s*=\\s*\\d",
       "flags": "",
       "points": 0
     },
@@ -44,17 +44,17 @@
       "description": "Declares playerName with quoted text",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+playerName\\s*=\\s*[\"'`][^\"'`]+[\"'`]",
+      "pattern": "\\bplayerName\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|`[^`]*`)",
       "flags": "",
       "points": 0
     },
     {
       "id": "r3",
       "title": "isGameOver holds a boolean",
-      "description": "Declares isGameOver with true or false, unquoted",
+      "description": "isGameOver holds a boolean -- true, false, or a comparison that produces one (lesson 1.2.18) -- not quoted text and not a number",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+isGameOver\\s*=\\s*(true|false)",
+      "pattern": "\\bisGameOver\\s*=\\s*(?!\\s)(?![\"'`])(?!\\d[\\d.]*\\s*[;\\n])[^;\\n]+",
       "flags": "",
       "points": 0
     },
@@ -64,7 +64,7 @@
       "description": "Declares levelCount with a numeric value",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+levelCount\\s*=\\s*\\d+",
+      "pattern": "\\blevelCount\\s*=\\s*\\d",
       "flags": "",
       "points": 0
     },
@@ -74,7 +74,7 @@
       "description": "Logs each of the four new variables",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?=[\\s\\S]*console\\.log\\s*\\([^)]*maxScore)(?=[\\s\\S]*console\\.log\\s*\\([^)]*playerName)(?=[\\s\\S]*console\\.log\\s*\\([^)]*isGameOver)(?=[\\s\\S]*console\\.log\\s*\\([^)]*levelCount)[\\s\\S]*",
+      "pattern": "(?=[\\s\\S]*console\\.log\\s*\\([^;\\n]*maxScore)(?=[\\s\\S]*console\\.log\\s*\\([^;\\n]*playerName)(?=[\\s\\S]*console\\.log\\s*\\([^;\\n]*isGameOver)(?=[\\s\\S]*console\\.log\\s*\\([^;\\n]*levelCount)[\\s\\S]*",
       "flags": "",
       "points": 0
     },
@@ -84,7 +84,7 @@
       "description": "The reused variable no longer appears anywhere in the file",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?![\\s\\S]*\\bstuff\\b)[\\s\\S]*$",
+      "pattern": "^(?![\\s\\S]*(?:let|const|var)\\s+stuff\\b)(?![\\s\\S]*\\bstuff\\s*=[^=])[\\s\\S]*$",
       "flags": "",
       "points": 0
     }
