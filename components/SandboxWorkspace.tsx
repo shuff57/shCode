@@ -398,7 +398,17 @@ export default function SandboxWorkspace() {
   }, []);
 
   const run = useCallback(() => {
-    const script = fileContents['script.js'] || '';
+    // In Build the GENERATED program is the source of truth. fileContents
+    // ['script.js'] is still the untouched JSCAD starter until the one-way
+    // door out of Build writes the generated source into it, so reading it
+    // here silently replaced the student's model with the starter box --
+    // feature tree unchanged, Save STL sitting above the wrong solid, no
+    // console output (sketch gauntlet round 3, live lens). Read the doc, not
+    // the file. docRef, not doc, so this callback is not rebuilt on every
+    // dimension change.
+    const script = mode.preview === 'jscad' && build
+      ? toJscad(docRef.current)
+      : fileContents['script.js'] || '';
     if (mode.preview === 'console') {
       runJs(script);
       return;
@@ -414,7 +424,7 @@ export default function SandboxWorkspace() {
     setRunKey((k) => k + 1);
     setConsoleResetKey((k) => k + 1);
     setIsRunning(true);
-  }, [fileContents, mode.preview, runJs]);
+  }, [fileContents, mode.preview, build, runJs]);
 
   function stopRun() {
     workerRef.current?.terminate();

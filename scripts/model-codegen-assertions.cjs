@@ -1180,6 +1180,30 @@ module.exports = function run(dir) {
       return Math.hypot(p[0] - q[0], p[1] - q[1]) > 1e-9;
     }), JSON.stringify(afterCorner.points));
 
+  console.log('\n=== the generated program has to be what Run actually runs ===');
+
+  // Pressing Run in Build mode used to read fileContents['script.js'], which
+  // in Build is still the untouched JSCAD starter -- the generated source is
+  // only written into fileContents on the one-way door OUT of Build. So Run
+  // silently replaced the student's model with the starter box: feature tree
+  // unchanged, handles gone, Save STL sitting directly above the wrong solid,
+  // zero console output. Found live in sketch gauntlet round 3 while the lens
+  // was looking for something else.
+  //
+  // This is a source check because the defect is React wiring, not codegen --
+  // but it is the honest shape of it: the bug WAS that one call site read the
+  // wrong variable, and there is exactly one right answer.
+  const wsSrc = fs.readFileSync(
+    path.join(__dirname, '..', 'components', 'SandboxWorkspace.tsx'), 'utf8');
+  const runBody = wsSrc.slice(wsSrc.indexOf('const run = useCallback('));
+  check('Run in Build mode runs the generated program, not the starter file',
+    /toJscad\(docRef\.current\)/.test(runBody.slice(0, 900)),
+    "run() never regenerates from the doc, so in Build it runs whatever stale "
+      + "script.js holds -- the starter box");
+  check('...and it still runs the file in Code mode',
+    /fileContents\['script\.js'\]/.test(runBody.slice(0, 900)),
+    'run() no longer reads script.js at all, which breaks Code mode');
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };
