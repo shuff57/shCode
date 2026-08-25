@@ -1,0 +1,19 @@
+{
+  "_frozen": "Captured 2026-08-24, BEFORE the sketch-representation work. This is what a student's saved sandbox looks like today, as it sits in the lesson_drafts table. Do not regenerate it, do not migrate it in place, do not add fields to it. Its whole job is to be old.",
+  "version": 1,
+  "features": [
+    { "id": "sk1", "kind": "sketch", "plane": "xy", "offset": 0,
+      "points": [[0, 0], [40, 0], [40, 25], [0, 25]] },
+    { "id": "pull1", "kind": "extrude", "target": "sk1", "height": 12 },
+    { "id": "sk2", "kind": "sketch", "plane": "xz", "offset": 5,
+      "points": [[0, 0], [30, 0], [15, 20]],
+      "constraints": [
+        { "kind": "horizontal", "edge": 0 },
+        { "kind": "length", "edge": 0, "value": 30 },
+        { "kind": "equal", "edge": 1, "other": 2 },
+        { "kind": "lock", "corner": 0 }
+      ] },
+    { "id": "pull2", "kind": "extrude", "target": "sk2", "height": 6 },
+    { "id": "op1", "kind": "combine", "op": "union", "targets": ["pull1", "pull2"] }
+  ]
+}
