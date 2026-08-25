@@ -1,0 +1,208 @@
+{
+  "bar": {
+    "name": "Onshape Sketch toolbar",
+    "toolbarImage": "https://cad.onshape.com/help/Content/Resources/Images/sketch-tools/sketch-toolbar-01.png",
+    "page": "https://cad.onshape.com/help/Content/Sketch/sketch_tools.htm",
+    "toolCount": 52,
+    "note": "A separate bar from the feature toolbar. It appears only while a sketch is open."
+  },
+  "ships": [
+    {
+      "onshape": "Line",
+      "shcad": "the outline itself",
+      "where": "SketchFeature.points, a closed polyline"
+    },
+    {
+      "onshape": "Horizontal",
+      "shcad": "Across",
+      "where": "sketch-solve.ts constraint 'horizontal'"
+    },
+    {
+      "onshape": "Vertical",
+      "shcad": "Up",
+      "where": "sketch-solve.ts constraint 'vertical'"
+    },
+    {
+      "onshape": "Equal",
+      "shcad": "Same length",
+      "where": "sketch-solve.ts constraint 'equal'"
+    },
+    {
+      "onshape": "Fix",
+      "shcad": "Lock",
+      "where": "sketch-solve.ts constraint 'lock'"
+    },
+    {
+      "onshape": "Dimension",
+      "shcad": "Length",
+      "where": "sketch-solve.ts constraint 'length' -- distance only, no angle"
+    }
+  ],
+  "build": [
+    {
+      "id": "shape",
+      "name": "the representation",
+      "covers": [],
+      "why": "SketchFeature.points is Array<[number,number]> -- a closed polyline and nothing else. No arc, circle, rectangle or fillet can exist until that changes. Every other item below is blocked on it, so it is decided first, by a judged panel rather than by whoever builds first."
+    },
+    {
+      "id": "rect",
+      "name": "Rectangle",
+      "covers": [
+        "Corner Rectangle",
+        "Center Point Rectangle"
+      ],
+      "why": "the starter sketch is already a rectangle typed in by hand; drawing one is the first thing anybody tries"
+    },
+    {
+      "id": "circle",
+      "name": "Circle",
+      "covers": [
+        "Center Point Circle"
+      ],
+      "why": "needed by almost every part a student wants to make, and impossible in a polyline"
+    },
+    {
+      "id": "arc",
+      "name": "Arc",
+      "covers": [
+        "3 Point Arc",
+        "Tangent Arc"
+      ],
+      "why": "the other half of a real outline; tangent arc is what makes a slot or a rounded tab"
+    },
+    {
+      "id": "fillet",
+      "name": "Round a corner",
+      "covers": [
+        "Sketch Fillet",
+        "Sketch Chamfer"
+      ],
+      "why": "load-bearing: the app currently REFUSES to round a solid built from a sketch and tells the student to round the sketch's corners instead. That remedy does not exist. Building it is what makes our own refusal message true."
+    },
+    {
+      "id": "polygon",
+      "name": "Polygon",
+      "covers": [
+        "Inscribed Polygon",
+        "Circumscribed Polygon"
+      ],
+      "why": "a loop with n sides, which is a for-loop the student can see; cheap once the representation allows it"
+    },
+    {
+      "id": "construction",
+      "name": "Guide line",
+      "covers": [
+        "Construction"
+      ],
+      "why": "a line that positions other lines without becoming part of the outline -- the sketch equivalent of a variable"
+    },
+    {
+      "id": "trim",
+      "name": "Trim",
+      "covers": [
+        "Trim",
+        "Extend"
+      ],
+      "why": "the tool that makes drawing forgiving; without it a wrong line must be undone rather than fixed"
+    },
+    {
+      "id": "mirror2d",
+      "name": "Mirror",
+      "covers": [
+        "Sketch Mirror",
+        "Linear Sketch Pattern",
+        "Circular Sketch Pattern"
+      ],
+      "why": "symmetry and repetition inside the sketch, where they cost one line of code instead of a boolean"
+    },
+    {
+      "id": "constraints",
+      "name": "more rules",
+      "covers": [
+        "Coincident",
+        "Parallel",
+        "Perpendicular",
+        "Midpoint",
+        "Symmetric"
+      ],
+      "why": "we have five of Onshape's sixteen. These five are the ones a beginner reaches for and the solver in lib/sketch-solve.ts can already express"
+    },
+    {
+      "id": "chrome2d",
+      "name": "the bar itself",
+      "covers": [],
+      "why": "the sketch bar appears only while a sketch is open, groups by draw/modify/constrain, and carries its own search. Ours has no bar at all -- constraints live in a side panel."
+    }
+  ],
+  "outOfScope": [
+    {
+      "group": "Curve mathematics (7 tools)",
+      "tools": [
+        "Spline",
+        "Bezier",
+        "Spline Control Point",
+        "Conic",
+        "Ellipse",
+        "Elliptical Arc",
+        "Curvature"
+      ],
+      "why": "a spline's control points are a genuinely different mental model, and nothing in a first-year CS course needs a conic. The solver would also have to grow curvature continuity, which is a term no fourteen-year-old should meet in week three"
+    },
+    {
+      "group": "Reference into other geometry (4 tools)",
+      "tools": [
+        "Use",
+        "Intersection",
+        "Pierce",
+        "Normal"
+      ],
+      "why": "each projects existing 3D geometry into the sketch plane, which needs addressable faces and edges. Same B-rep wall the feature toolbar hit"
+    },
+    {
+      "group": "Import (3 tools)",
+      "tools": [
+        "Insert DXF or DWG",
+        "Insert Image",
+        "Text"
+      ],
+      "why": "file import into a sandboxed iframe, plus a font pipeline for Text. The bundle does carry vectorText, so Text is the one here worth revisiting if a lesson wants a name plate"
+    },
+    {
+      "group": "Advanced editing (4 tools)",
+      "tools": [
+        "Sketch Split",
+        "Offset",
+        "Slot",
+        "Transform Sketch"
+      ],
+      "why": "each is reachable once the representation lands, and none is needed before it. Queued behind the panel's decision rather than refused on principle -- revisit after the shape work"
+    },
+    {
+      "group": "Variants of tools we build (4 tools)",
+      "tools": [
+        "Midpoint Line",
+        "Aligned Rectangle",
+        "3 Point Circle",
+        "Center Point Arc"
+      ],
+      "why": "a second way to draw a thing the student can already draw. Onshape offers them because a professional wants the fewest clicks for their particular case; a beginner offered two ways to draw a circle learns that there are two ways to draw a circle"
+    },
+    {
+      "group": "Constraints the solver cannot express (3 tools)",
+      "tools": [
+        "Concentric",
+        "Tangent",
+        "Automatic Inferencing"
+      ],
+      "why": "concentric and tangent need arcs to exist first and then need the solver to handle curved-to-curved conditions, which lib/sketch-solve.ts does not do. Automatic inferencing is a whole guessing engine on top of that. Reconsider once arcs land"
+    },
+    {
+      "group": "Free point",
+      "tools": [
+        "Point"
+      ],
+      "why": "a point that is not a corner of the outline has nothing to reference it. In Onshape a sketch point is what a Hole feature snaps to; our Hole positions itself from its target's own centre instead, so a free point would be a dot the student can place and nothing can use. Revisit if Hole ever learns to snap."
+    }
+  ]
+}

@@ -279,6 +279,76 @@ module.exports = function run(dir) {
   check('captions follow the same names',
     gen.generatedParams(mixed).some((p) => p.caption === 'Cylinder 1 radius'));
 
+  console.log('\n=== display numbers are stable under reordering (root cause B, finding 4) ===');
+
+  // nameMap() used to count "position in doc.features" to number same-kind
+  // rows, so dragging a feature past its same-kind sibling renamed BOTH of
+  // them -- the box a student thinks of as "Box 1" reads as "Box 2" the
+  // moment something reorders it ahead of the other box. A value that would
+  // make a broken implementation pass: numbering by array index again, i.e.
+  // building nm2 by iterating the reordered array and counting occurrences
+  // in that order -- which would report b2 as "Box 1" below, the exact
+  // mislabel this closes.
+  const twoBoxes = doc(box('b1'), box('b2'));
+  const nmBefore = types.nameMap(twoBoxes);
+  check('b1 starts out Box 1', nmBefore.b1 === 'Box 1', nmBefore.b1);
+  check('b2 starts out Box 2', nmBefore.b2 === 'Box 2', nmBefore.b2);
+
+  const reorderedBoxes = doc(box('b2'), box('b1')); // same two features, swapped array order
+  const nmAfter = types.nameMap(reorderedBoxes);
+  check('b1 is still Box 1 after the list reorders it second',
+    nmAfter.b1 === 'Box 1', `${nmAfter.b1} (broken: position-based numbering would say Box 2)`);
+  check('b2 is still Box 2 after the list reorders it first',
+    nmAfter.b2 === 'Box 2', `${nmAfter.b2} (broken: position-based numbering would say Box 1)`);
+
+  // Same property for a kind whose label depends on a field, not the id
+  // prefix: three combines that share the 'op' id counter but split across
+  // three different labels (Join/Cut/Overlap) by f.op. Reordering must not
+  // shuffle their per-label numbers either.
+  const combos = doc(
+    { id: 'op1', kind: 'combine', op: 'union', targets: [] },
+    { id: 'op2', kind: 'combine', op: 'subtract', targets: [] },
+    { id: 'op3', kind: 'combine', op: 'union', targets: [] },
+  );
+  const comboNm = types.nameMap(combos);
+  check('the first Join is Join 1', comboNm.op1 === 'Join 1', comboNm.op1);
+  check('the only Cut is Cut 1', comboNm.op2 === 'Cut 1', comboNm.op2);
+  check('the second Join is Join 2, not Join 3 or Overlap 1', comboNm.op3 === 'Join 2', comboNm.op3);
+  const combosReordered = doc(combos.features[2], combos.features[0], combos.features[1]);
+  const comboNmAfter = types.nameMap(combosReordered);
+  check('reordering the combines does not renumber any of them',
+    comboNmAfter.op1 === comboNm.op1 && comboNmAfter.op2 === comboNm.op2 && comboNmAfter.op3 === comboNm.op3,
+    JSON.stringify(comboNmAfter));
+
+  console.log('\n=== the reorder guard asks each feature what it depends on (root cause B, finding 5) ===');
+
+  // dependsOn() is what ModelEditor's move() reorder guard calls instead of
+  // hardcoding `f.kind === 'combine'`. A value that would make a broken
+  // implementation pass: dependsOn() (or the guard built on it) only
+  // recognizing 'combine', i.e. returning [] for the other seven target-
+  // carrying kinds -- which is exactly the pre-fix bug (a Hole could be
+  // dragged above the box it drills with no warning).
+  const targetCarrying = [
+    ['hole', { id: 'h', kind: 'hole', target: 'b1', diameter: 4, depth: 10, center: [0, 0, 0], axis: 'z' }],
+    ['extrude', { id: 'e', kind: 'extrude', target: 's1', height: 10 }],
+    ['revolve', { id: 'r', kind: 'revolve', target: 's1', angle: 360 }],
+    ['mirror', { id: 'm', kind: 'mirror', target: 'b1', plane: 'xy' }],
+    ['pattern', { id: 'p', kind: 'pattern', target: 'b1', mode: 'linear', count: 2, step: [1, 0, 0] }],
+    ['shell', { id: 'sh', kind: 'shell', target: 'b1', thickness: 1 }],
+    ['move', { id: 'mv', kind: 'move', target: 'b1', offset: [1, 0, 0], copy: true }],
+  ];
+  for (const [label, f] of targetCarrying) {
+    check(`dependsOn() sees the target ${label} carries, not just combine`,
+      types.dependsOn(f).length === 1 && types.dependsOn(f)[0] === f.target,
+      JSON.stringify(types.dependsOn(f)));
+  }
+  check('dependsOn() on a combine returns every target, not just one',
+    JSON.stringify(types.dependsOn({ id: 'x', kind: 'combine', op: 'union', targets: ['a', 'b'] })) === '["a","b"]');
+  check('dependsOn() on a standalone shape is empty -- nothing to depend on',
+    types.dependsOn(box('b1')).length === 0);
+  check('dependsOn() on a sketch is empty too',
+    types.dependsOn({ id: 's', kind: 'sketch', plane: 'xy', offset: 0, points: [] }).length === 0);
+
   console.log('\n=== parameters ===');
 
   // Every shape kind, so a parameter that is declared but never read cannot
@@ -372,8 +442,50 @@ module.exports = function run(dir) {
 
   console.log('\n=== rounding rules ===');
 
-  check('a combine refuses to round',
-    /Round the box before/.test(types.whyCannotRound({ id: 'x', kind: 'combine', op: 'union', targets: [] })));
+  // ROOT CAUSE A / finding 2: whyCannotRound() used to say "Round the box
+  // before you cut the hole" for EVERY combine, regardless of f.op -- wrong
+  // for a Join or an Overlap, where nothing was cut. A value that would make
+  // a broken implementation pass: the union/intersect messages below still
+  // containing "cut" or "hole", which they would if the old unconditional
+  // string were still in place.
+  const cutMsg = types.whyCannotRound({ id: 'x', kind: 'combine', op: 'subtract', targets: [] });
+  const joinMsg = types.whyCannotRound({ id: 'x', kind: 'combine', op: 'union', targets: [] });
+  const overlapMsg = types.whyCannotRound({ id: 'x', kind: 'combine', op: 'intersect', targets: [] });
+  check('a Cut names cutting', /cut/i.test(cutMsg), cutMsg);
+  check('a Join does not blame a cut or a hole that never happened',
+    !/cut|hole/i.test(joinMsg), joinMsg);
+  check('a Join names joining', /join/i.test(joinMsg), joinMsg);
+  check('an Overlap does not blame a cut or a hole either', !/cut|hole/i.test(overlapMsg), overlapMsg);
+  check('an Overlap names overlapping', /overlap/i.test(overlapMsg), overlapMsg);
+
+  // ROOT CAUSE A / finding 1: the sketch/Pull/Spin message used to send a
+  // student to round "the corners of the sketch" -- a tool that does not
+  // exist anywhere in the sketch editor. A value that would make a broken
+  // implementation pass: either message below still containing the word
+  // "corners" paired with an instruction to use them, since that is the
+  // fabricated remedy being removed.
+  const sketchMsg = types.whyCannotRound({ id: 's', kind: 'sketch', plane: 'xy', offset: 0, points: [] });
+  const pullMsg = types.whyCannotRound({ id: 'e', kind: 'extrude', target: 's', height: 10 });
+  const spinMsg = types.whyCannotRound({ id: 'r', kind: 'revolve', target: 's', angle: 360 });
+  const fabricatedRemedy = /round the corners of the sketch/i;
+  for (const [label, msg] of [['sketch', sketchMsg], ['Pull result', pullMsg], ['Spin result', spinMsg]]) {
+    check(`a ${label} does not send the student to round a sketch's corners (no such tool exists)`,
+      !fabricatedRemedy.test(msg), msg);
+    check(`...and the ${label} message says outright there is no such tool`, /no way/i.test(msg), msg);
+  }
+
+  // ROOT CAUSE A / finding 3: the Move message used to always say "before
+  // you move it," even for a Copy -- contradicting the "(copy)" label the
+  // same row renders. A value that would make a broken implementation pass:
+  // the copy-made message below still reading "moved copy" instead of
+  // naming Copy, since that is the old unconditional text.
+  const movedMsg = types.whyCannotRound({ id: 'mv', kind: 'move', target: 'b1', offset: [1, 0, 0], copy: false });
+  const copiedMsg = types.whyCannotRound({ id: 'mv', kind: 'move', target: 'b1', offset: [1, 0, 0], copy: true });
+  check('a genuine Move names moving', /move/i.test(movedMsg), movedMsg);
+  check('a Move made with Copy names copying, not moving',
+    /copy/i.test(copiedMsg) && !/moved copy/i.test(copiedMsg), copiedMsg);
+  check('Move and Copy give different reasons', movedMsg !== copiedMsg);
+
   check('a sphere refuses to round',
     types.whyCannotRound({ id: 's', kind: 'sphere', radius: 5, center: [0, 0, 0] }) !== null);
   check('a box may round', types.whyCannotRound(box('b1')) === null);
@@ -382,6 +494,498 @@ module.exports = function run(dir) {
     String(types.maxRound(box('b1'))));
   check('maxRound on a cylinder uses the smaller of radius*2 and height',
     types.maxRound(cyl('c1')) < 10, String(types.maxRound(cyl('c1'))));
+
+  // A second silent-wrong-result bug found while fixing Repeat and Mirror:
+  // whyCannotRound() only ever named 5 of the 11 feature kinds; the other 6
+  // fell through to `return null` -- which reads as "rounding is fine here"
+  // -- while isRoundable() (the real gate, since only a box/cylinder even
+  // HAS a round field) silently no-opped the click one function away. A
+  // value that would make a broken implementation pass: whyCannotRound still
+  // falling through to null for these -- every check below would then read
+  // `null !== null` as false and fail.
+  const holeF = { id: 'h', kind: 'hole', target: 'b1', diameter: 6, depth: 10, center: [0, 0, 0], axis: 'z' };
+  const shellF = { id: 'sh', kind: 'shell', target: 'b1', thickness: 2 };
+  const mirrorF = { id: 'm', kind: 'mirror', target: 'b1', plane: 'xy' };
+  const patF = { id: 'pa', kind: 'pattern', target: 'b1', mode: 'linear', count: 3, step: [10, 0, 0] };
+  const moveF = { id: 'mv', kind: 'move', target: 'b1', offset: [10, 0, 0], copy: true };
+  const revF = { id: 'rv', kind: 'revolve', target: 's1', angle: 360 };
+  check('a hole refuses to round, and says why', types.whyCannotRound(holeF) !== null);
+  check('a hollowed shape refuses to round, and says why', types.whyCannotRound(shellF) !== null);
+  check('a mirrored copy refuses to round, and says why', types.whyCannotRound(mirrorF) !== null);
+  check('a repeated copy refuses to round, and says why', types.whyCannotRound(patF) !== null);
+  check('a moved copy refuses to round, and says why', types.whyCannotRound(moveF) !== null);
+  check('a revolve refuses to round, and says why', types.whyCannotRound(revF) !== null);
+  check('every one of those reasons is actually a sentence, not a blank refusal',
+    [holeF, shellF, mirrorF, patF, moveF, revF]
+      .every((f) => (types.whyCannotRound(f) || '').length > 10));
+
+  console.log('\n=== revolve (Spin) ===');
+
+  // Off-axis profile: x from 10 to 20, y from 0 to 30 -- a washer cross
+  // section, so a wrong axis or a dropped angle shows up in the volume.
+  const revProfile = (id) => ({
+    id, kind: 'sketch', plane: 'xy', offset: 0,
+    points: [[10, 0], [20, 0], [20, 30], [10, 30]],
+  });
+  const revolveF = (id, target, angle = 360) => ({ id, kind: 'revolve', target, angle });
+
+  const revSrc = gen.toJscad(doc(revProfile('s1'), revolveF('rev1', 's1')));
+  check('a revolve calls the real extrudeRotate, angle converted to radians',
+    revSrc.includes('extrusions.extrudeRotate({ angle: p.rev1_angle * Math.PI / 180 }, s1)'));
+  check('...and pulls extrusions in', /const \{[^}]*extrusions[^}]*\} = require/.test(revSrc));
+  check('the sketch it consumed is not also returned', !/return s1\b/.test(revSrc));
+  check('the revolve is what gets returned', /return rev1\b/.test(revSrc));
+
+  const rev360 = build(gen.toJscad(doc(revProfile('s1'), revolveF('rev1', 's1', 360))));
+  const rev180 = build(gen.toJscad(doc(revProfile('s1'), revolveF('rev1', 's1', 180))));
+  check('a full spin has real volume', rev360.volume > 20000, String(rev360.volume));
+  check('a half spin is about half the volume of a full one',
+    Math.abs(rev180.volume - rev360.volume / 2) < rev360.volume * 0.05,
+    `${rev180.volume.toFixed(0)} vs half of ${rev360.volume.toFixed(0)}`);
+
+  console.log('\n=== mirror (Mirror) ===');
+
+  const mirrorDoc = doc(box('b1', { center: [50, 0, 0] }), { id: 'm1', kind: 'mirror', target: 'b1', plane: 'yz' });
+  const mirrorSrc = gen.toJscad(mirrorDoc);
+  check('a mirror calls the face-relative helper, not bare transforms.mirror',
+    mirrorSrc.includes('mirrorThroughFace(b1, [1, 0, 0], 0)'));
+  check('...and the helper is actually defined',
+    mirrorSrc.includes('function mirrorThroughFace('));
+  check('mirror keeps the original standing: both b1 and m1 come back top-level',
+    types.topLevel(mirrorDoc).map((f) => f.id).sort().join() === 'b1,m1');
+  check('...so the model unions them both',
+    /return booleans\.union\(b1, m1\)/.test(mirrorSrc));
+
+  const mirrorBuilt = build(mirrorSrc);
+  // b1 spans x 30..70. The nearer-to-zero face is x=30, so the mirrored copy
+  // reflects off THAT face and lands at -10..30 -- touching b1, not
+  // reflected clean through the origin to -70..-30 (that stale expectation
+  // is exactly the pre-fix defect: see the "moved part" block below for the
+  // failing-value proof).
+  check('the mirrored copy reflects off the part\'s own near face',
+    mirrorBuilt.bbox[0][0] > -12 && mirrorBuilt.bbox[0][0] < -8
+    && mirrorBuilt.bbox[1][0] > 68 && mirrorBuilt.bbox[1][0] < 72,
+    JSON.stringify(mirrorBuilt.bbox));
+  check('...forming one snug 80-wide double, not two pieces with a gap between them',
+    Math.abs((mirrorBuilt.bbox[1][0] - mirrorBuilt.bbox[0][0]) - 80) < 2,
+    JSON.stringify(mirrorBuilt.bbox));
+
+  // The UI used to call newMirror with no plane, which meant the default
+  // baked into the function ('xz') was the ONLY plane a student could ever
+  // get -- picking a different one in a picker that did not exist was never
+  // possible. That defect lived at the call site, but the way it stays fixed
+  // is by proving every plane on the *doc* still produces genuinely
+  // different, correct geometry -- a regression that quietly special-cases
+  // or hardcodes one plane in featureExpr would fail right here even though
+  // the UI is untouched. A value that would make a broken implementation
+  // pass: featureExpr ignoring f.plane and always emitting the yz normal
+  // ([1, 0, 0]) -- the 'yz' case above would still pass, but 'xy' and 'xz'
+  // below would not, because b2/b3 would reflect on the wrong axis.
+  const mirrorOnXY = doc(box('b2', { center: [0, 0, 50] }), { id: 'm2', kind: 'mirror', target: 'b2', plane: 'xy' });
+  const xySrc = gen.toJscad(mirrorOnXY);
+  check('a mirror across xy uses the real xy normal, axis index 2',
+    xySrc.includes('mirrorThroughFace(b2, [0, 0, 1], 2)'));
+  const xyBuilt = build(xySrc);
+  // b2 spans z 40..60; the near face is z=40, so the copy lands at 20..40.
+  check('...and actually flips z, not x or y',
+    xyBuilt.bbox[0][2] > 18 && xyBuilt.bbox[0][2] < 22
+    && xyBuilt.bbox[1][2] > 58 && xyBuilt.bbox[1][2] < 62
+    && xyBuilt.bbox[0][0] < -18 && xyBuilt.bbox[1][0] > 18, // untouched box half-width still ~20
+    JSON.stringify(xyBuilt.bbox));
+
+  const mirrorOnXZ = doc(box('b3', { center: [0, 50, 0] }), { id: 'm3', kind: 'mirror', target: 'b3', plane: 'xz' });
+  const xzSrc = gen.toJscad(mirrorOnXZ);
+  check('a mirror across xz uses the real xz normal, axis index 1',
+    xzSrc.includes('mirrorThroughFace(b3, [0, 1, 0], 1)'));
+  const xzBuilt = build(xzSrc);
+  // b3 spans y 30..70; the near face is y=30, so the copy lands at -10..30.
+  check('...and actually flips y, not x or z',
+    xzBuilt.bbox[0][1] > -12 && xzBuilt.bbox[0][1] < -8
+    && xzBuilt.bbox[1][1] > 68 && xzBuilt.bbox[1][1] < 72,
+    JSON.stringify(xzBuilt.bbox));
+
+  check('the three planes are not secretly the same call',
+    new Set([mirrorSrc, xySrc, xzSrc]
+      .map((s) => s.match(/mirrorThroughFace\([a-zA-Z0-9_]+, (\[[^\]]+\])/)[1])).size === 3);
+
+  console.log('\n=== mirror follows a part the Move tool relocated ===');
+
+  // The exact defect this closes, verified live: an L-bracket sketched at
+  // the origin mirrors fine, because the sketch's own corner already sits
+  // at zero -- "happens to work" was always an accident of where the
+  // student started drawing. The moment the toolbar's OWN Move tool
+  // relocates that same part and it gets mirrored, the pre-fix code still
+  // reflected through world x=0 -- the plane where the part USED TO BE, not
+  // where Move put it -- so the "mirrored" copy came out nowhere near the
+  // moved part, floating in space with no warning that anything was wrong.
+  //
+  // A value that would make a broken implementation pass here: featureExpr
+  // still emitting the bare pre-fix call, `transforms.mirror({ normal }, target)`,
+  // with no origin at all. That still runs and still builds a solid -- mirror
+  // never throws just because the part has moved -- so this has to measure
+  // the geometry, not just check that codegen produced *something*. Against
+  // that old call the build below reflects the ALREADY-MOVED solid (x
+  // 200..240) straight through world zero to x -240..-200: a ~480-wide
+  // spread starting near -240, with a ~400-unit gap of empty space in the
+  // middle. The assertions below reject exactly that shape of result.
+  const movedL = doc(
+    sketch('s1'), pull('e1', 's1'),
+    { id: 'move1', kind: 'move', target: 'e1', offset: [200, 0, 0], copy: false },
+    { id: 'm1', kind: 'mirror', target: 'move1', plane: 'yz' },
+  );
+  const movedSrc = gen.toJscad(movedL);
+  check('mirror reads the MOVED part\'s own position, not e1\'s original one',
+    movedSrc.includes('mirrorThroughFace(move1, [1, 0, 0], 0)'));
+
+  const movedBuilt = build(movedSrc);
+  // e1 spans x 0..40; after Move by +200 it spans x 200..240. The near face
+  // is x=200, so the mirrored copy should land at 160..200, touching it.
+  check('the mirrored copy lands next to the MOVED part, not back near the origin',
+    movedBuilt.bbox[0][0] > 150,
+    `bbox starts at ${movedBuilt.bbox[0][0].toFixed(1)} -- the old bug would put this near -240`);
+  check('...forming one snug ~80-wide double, not a ~480-wide pair with a gap between',
+    Math.abs((movedBuilt.bbox[1][0] - movedBuilt.bbox[0][0]) - 80) < 4,
+    `span ${(movedBuilt.bbox[1][0] - movedBuilt.bbox[0][0]).toFixed(1)} -- the old bug would span ~480`);
+
+  console.log('\n=== pattern (Repeat) is a real for loop ===');
+
+  const linPattern = { id: 'pat1', kind: 'pattern', target: 'b1', mode: 'linear', count: 3, step: [30, 0, 0] };
+  const linDoc = doc(box('b1', { size: [10, 10, 10] }), linPattern);
+  const linSrc = gen.toJscad(linDoc);
+  check('a linear pattern emits an actual for loop, not a helper call',
+    linSrc.includes('for (let i = 0; i < p.pat1_count; i++) {'));
+  check('...translating by the step vector on each pass',
+    linSrc.includes('pat1_parts.push(transforms.translate([x, y, z], b1))'));
+  check('...then unions the copies together',
+    linSrc.includes('const pat1 = booleans.union(pat1_parts)'));
+  check('the pattern consumes its source: only the pattern comes back',
+    types.topLevel(linDoc).map((f) => f.id).join() === 'pat1');
+
+  const linBuilt = build(linSrc);
+  // 10-wide boxes at x = 0, 30, 60 -> outer span -5 to 65.
+  check('3 copies 30 apart span 70 across',
+    Math.abs((linBuilt.bbox[1][0] - linBuilt.bbox[0][0]) - 70) < 1.5, JSON.stringify(linBuilt.bbox));
+
+  const circPattern = { id: 'pat2', kind: 'pattern', target: 'c1', mode: 'circular', count: 4, axis: 'z', totalAngle: 360 };
+  const circDoc = doc(cyl('c1', { radius: 3, height: 10, center: [20, 0, 0] }), circPattern);
+  const circSrc = gen.toJscad(circDoc);
+  check('a circular pattern is a for loop too',
+    circSrc.includes('for (let i = 0; i < p.pat2_count; i++) {'));
+  check('...spacing by totalAngle / count so 360 does not double up the seam',
+    circSrc.includes('p.pat2_totalangle / p.pat2_count * i * Math.PI / 180'));
+  check('...rotating around the chosen world axis, with no per-target pivot',
+    circSrc.includes('transforms.rotate([0, 0, a], c1)')
+    && !circSrc.includes('centerOf(c1)'));
+
+  const circBuilt = build(circSrc);
+  const singleCyl = Math.PI * 3 * 3 * 10;
+  // c1 sits off-axis at [20, 0, 0], so 4 copies rotated about world Z land at
+  // four separate points on a circle of radius 20 and do not overlap: ~4x.
+  //
+  // Round 5 inverted this assertion to ~1x and left a comment claiming the
+  // ORIGINAL had encoded a bug. It had not -- the original was right, and the
+  // rewrite locked in a real regression (a shape spun about its own centre is
+  // a no-op for anything rotationally symmetric). Left as a marker: a test
+  // rewritten to match new behaviour has stopped being a test.
+  check('4 copies of an off-axis shape orbit the world axis -- ~4x, not ~1x',
+    circBuilt.volume > singleCyl * 3.6 && circBuilt.volume < singleCyl * 4.4,
+    `${circBuilt.volume.toFixed(0)} vs one instance ${singleCyl.toFixed(0)} `
+      + `(the in-place-spin regression collapses to ~${singleCyl.toFixed(0)})`);
+
+  console.log('\n=== Repeat Around orbits the world axis, and refuses when there is nothing to orbit ===');
+
+  // This section previously asserted the OPPOSITE, and locked a regression in.
+  //
+  // A round-4 critic reported that a cylinder at (50, 50) "scatters six copies
+  // into a huge ring instead of spinning where it stands", round 5 duly made
+  // the pattern pivot on centerOf(target), and this assertion was written to
+  // require ~1x. But scattering into a ring is what a circular pattern IS --
+  // it is how you draw a bolt circle -- and spinning a cylinder about its own
+  // axis produces six copies in one place whose union is one cylinder. The
+  // test could not fail, because it had been written from the bug.
+  //
+  // The value that would make a broken implementation pass: any volume near
+  // one instance. That is precisely what the in-place-spin code returns, and
+  // it is what this now rejects.
+  const scatterDoc = doc(cyl('c1', { radius: 5, height: 10, center: [50, 50, 0] }), {
+    id: 'pat3', kind: 'pattern', target: 'c1', mode: 'circular', count: 6, axis: 'z', totalAngle: 360,
+  });
+  const scatterBuilt = build(gen.toJscad(scatterDoc));
+  const oneOffAxisCyl = Math.PI * 5 * 5 * 10;
+  check('six copies of an off-axis cylinder orbit world zero -- ~6x one instance, not ~1x',
+    scatterBuilt.volume > oneOffAxisCyl * 5.4 && scatterBuilt.volume < oneOffAxisCyl * 6.6,
+    `${scatterBuilt.volume.toFixed(0)} vs one instance ${oneOffAxisCyl.toFixed(0)} `
+      + `(in-place-spin regression returns ~${oneOffAxisCyl.toFixed(0)})`);
+  check('...and the emitted call rotates about the axis, with no per-target pivot',
+    gen.toJscad(scatterDoc).includes('transforms.rotate([0, 0, a], c1)'));
+
+  // The real footgun the round-4 critic was half-seeing: a shape ON the axis
+  // has no radius to sweep, so every copy lands on the first. Refused up
+  // front rather than shipped as six rows that render one shape.
+  const onAxis = types.whyCannotOrbit(
+    { id: 'c2', kind: 'cylinder', radius: 5, height: 10, center: [0, 0, 0] }, 'z');
+  check('a shape sitting on the axis is refused, with a reason naming the fix',
+    typeof onAxis === 'string' && /move it away/i.test(onAxis), String(onAxis));
+  check('a shape away from the axis is allowed through',
+    types.whyCannotOrbit(
+      { id: 'c3', kind: 'cylinder', radius: 5, height: 10, center: [50, 0, 0] }, 'z') === null);
+
+  console.log('\n=== hole (Hole) is one row, not two ===');
+
+  const holeDoc = doc(box('b1', { size: [40, 40, 20] }), {
+    id: 'hole1', kind: 'hole', target: 'b1', diameter: 10, depth: 30, center: [0, 0, 0], axis: 'z',
+  });
+  const holeSrc = gen.toJscad(holeDoc);
+  check('a hole is a single subtract line, the cylinder built inline',
+    holeSrc.includes(
+      'booleans.subtract(b1, transforms.translate(centerOn(b1, [p.hole1_x, p.hole1_y, p.hole1_z]), ' +
+      'tube(p.hole1_diameter / 2, p.hole1_depth)))'
+    ));
+  check('...no separate cylinder feature row exists to be returned',
+    types.topLevel(holeDoc).map((f) => f.id).join() === 'hole1');
+
+  const holeBuilt = build(holeSrc);
+  check('a hole removes material without hollowing the whole block',
+    holeBuilt.volume < 40 * 40 * 20 && holeBuilt.volume > 40 * 40 * 20 - Math.PI * 5 * 5 * 20 * 1.3,
+    `${holeBuilt.volume.toFixed(0)} vs solid ${40 * 40 * 20}`);
+
+  console.log('\n=== hole position is real, not stuck at the origin ===');
+
+  // newHole() used to be the only way in, and it hardcodes center: [0, 0, 0]
+  // with nothing in the UI able to change it -- so this proves the position a
+  // *doc* carries is actually honoured by codegen end to end, independent of
+  // which tool put it there. A value that would make a broken implementation
+  // pass: featureExpr reading a literal [0, 0, 0] instead of f.center, same
+  // bug restated one level down -- the off-centre case below would then remove
+  // the same (larger) volume as the centred one instead of less, and fail.
+  const centredHole = build(gen.toJscad(doc(box('b1', { size: [40, 40, 20] }), {
+    id: 'hole1', kind: 'hole', target: 'b1', diameter: 10, depth: 30, center: [0, 0, 0], axis: 'z',
+  })));
+  // Box spans x -20..20. A radius-5 bore centred at x=19 pokes a third of its
+  // circle past the x=20 edge, so noticeably less of it stays inside the
+  // block than the centred case above, where the whole circle is inside.
+  const offCentreHole = build(gen.toJscad(doc(box('b1', { size: [40, 40, 20] }), {
+    id: 'hole1', kind: 'hole', target: 'b1', diameter: 10, depth: 30, center: [19, 0, 0], axis: 'z',
+  })));
+  check('moving a hole off-centre removes less material, not the same amount',
+    offCentreHole.volume > centredHole.volume + 300 && offCentreHole.volume < 40 * 40 * 20,
+    `off-centre ${offCentreHole.volume.toFixed(0)} vs centred ${centredHole.volume.toFixed(0)}`);
+
+  console.log('\n=== hole bores at the TARGET\'s position, not world zero ===');
+
+  // FINDING 1 from the round-5 gauntlet, reproduced live: drill a hole in a
+  // box that has been moved to x=100 and the pre-fix bore -- built at a
+  // literal [0, 0, 0] with no idea where the target actually is -- misses
+  // the block entirely. A value that would make a broken implementation
+  // pass: transforms.translate([p.hole1_x, p.hole1_y, p.hole1_z], ...) used
+  // as an ABSOLUTE world position instead of routing through centerOn(b1,
+  // ...). With the box moved to x=100 and the hole left at its default
+  // (offset [0, 0, 0]), that puts the bore at world zero -- nowhere near
+  // the block -- and booleans.subtract removes NOTHING: volume stays
+  // exactly 32000, unchanged from the solid block.
+  const movedBoxHoleDoc = doc(box('b1', { size: [40, 40, 20], center: [100, 0, 0] }), {
+    id: 'hole1', kind: 'hole', target: 'b1', diameter: 10, depth: 30, center: [0, 0, 0], axis: 'z',
+  });
+  const movedBoxHoleBuilt = build(gen.toJscad(movedBoxHoleDoc));
+  const movedBlockVolume = 40 * 40 * 20;
+  check('a hole left at its default offset still bores through a box moved off the origin',
+    movedBoxHoleBuilt.volume < movedBlockVolume - 300
+    && movedBoxHoleBuilt.volume > movedBlockVolume - Math.PI * 5 * 5 * 20 * 1.3,
+    `${movedBoxHoleBuilt.volume.toFixed(0)} vs untouched-block (broken pre-fix) ${movedBlockVolume}`);
+
+  check('applyParam moves a hole by name, same as any other centre',
+    gen.applyParam(holeDoc, 'hole1_x', 12).features[0].id === 'b1'
+    && gen.applyParam(holeDoc, 'hole1_x', 12).features[1].center[0] === 12
+    && gen.applyParam(holeDoc, 'hole1_x', 12).features[1].center[1] === 0);
+
+  console.log('\n=== hole, four corners: one feature, guaranteed symmetric ===');
+
+  // A plate big enough that four 6mm-diameter corner bores 40 apart in x and
+  // 30 apart in y (dx 20, dy 15) do not overlap each other or the edge.
+  const plate = box('b1', { size: [60, 40, 10] });
+  const cornersFeature = {
+    id: 'hole1', kind: 'hole', target: 'b1', diameter: 6, depth: 20,
+    center: [0, 0, 0], axis: 'z', corners: { dx: 20, dy: 15 },
+  };
+  const cornersDoc = doc(plate, cornersFeature);
+  const cornersSrc = gen.toJscad(cornersDoc);
+
+  check('four corners is still ONE subtract, not four Hole rows',
+    types.topLevel(cornersDoc).map((f) => f.id).join() === 'hole1');
+  check('...one subtract call, the four corners handed to the shared cornerBores helper',
+    cornersSrc.includes(
+      'booleans.subtract(b1, cornerBores(b1, [p.hole1_x, p.hole1_y, p.hole1_z], p.hole1_dx, p.hole1_dy, '
+    ));
+  check('...and the helper itself places all four corners, on top of the target\'s own centre',
+    cornersSrc.includes('function cornerBores(')
+    && cornersSrc.includes('transforms.translate([c[0] - dx, c[1] - dy, c[2]], bit)')
+    && cornersSrc.includes('transforms.translate([c[0] + dx, c[1] - dy, c[2]], bit)')
+    && cornersSrc.includes('transforms.translate([c[0] - dx, c[1] + dy, c[2]], bit)')
+    && cornersSrc.includes('transforms.translate([c[0] + dx, c[1] + dy, c[2]], bit)'));
+  check('...not booleans.union anywhere -- this is not Repeat duplicating the plate',
+    !cornersSrc.includes('booleans.union'));
+  check('dx and dy each feed the shared helper exactly once -- it fans them out to all four corners itself',
+    (cornersSrc.match(/p\.hole1_dx/g) || []).length === 1
+    && (cornersSrc.match(/p\.hole1_dy/g) || []).length === 1);
+
+  const cornersBuilt = build(cornersSrc);
+  const plateVolume = 60 * 40 * 10;
+  const oneBore = Math.PI * 3 * 3 * 10; // radius 3, clipped to the 10-thick plate
+  check('four non-overlapping corner bores remove ~4x one bore, not ~1x and not ~4x the plate',
+    cornersBuilt.volume > plateVolume - oneBore * 4 * 1.3
+    && cornersBuilt.volume < plateVolume - oneBore * 4 * 0.7,
+    `${cornersBuilt.volume.toFixed(0)} vs plate ${plateVolume} minus ~${(oneBore * 4).toFixed(0)}`);
+  // The failure mode Repeat has on a Hole target: duplicating the whole plate
+  // instead of just the cut would leave FAR more than the plate's own volume
+  // once the copies are unioned back together.
+  check('...and nowhere near what duplicating the whole plate four times would leave',
+    cornersBuilt.volume < plateVolume * 1.5, `${cornersBuilt.volume.toFixed(0)}`);
+
+  check('a plain Hole still declares no corner spacing at all',
+    !gen.generatedParams(holeDoc).some((p) => p.name.endsWith('_dx') || p.name.endsWith('_dy')));
+  check('a four-corners Hole declares both spacings, captioned across/up',
+    gen.generatedParams(cornersDoc).some((p) => p.name === 'hole1_dx' && p.caption === 'Hole 1 corner spacing across')
+    && gen.generatedParams(cornersDoc).some((p) => p.name === 'hole1_dy' && p.caption === 'Hole 1 corner spacing up'));
+
+  check('newHole() makes a plain single hole with no corners field',
+    types.newHole(doc(), 'b1').corners === undefined);
+  check('newHoleCorners() makes a four-corners hole out of the box',
+    types.newHoleCorners(doc(), 'b1').corners !== undefined
+    && types.newHoleCorners(doc(), 'b1').axis === 'z');
+
+  const widerCorners = gen.applyParam(gen.applyParam(cornersDoc, 'hole1_dx', 25), 'hole1_dy', 18);
+  check('applyParam widens the corner spacing without touching diameter, depth or centre',
+    widerCorners.features[1].corners.dx === 25
+    && widerCorners.features[1].corners.dy === 18
+    && widerCorners.features[1].diameter === 6
+    && widerCorners.features[1].center.join() === '0,0,0');
+
+  const holeXSrc = gen.toJscad(doc(box('b1'), {
+    id: 'hole2', kind: 'hole', target: 'b1', diameter: 10, depth: 60, center: [0, 0, 0], axis: 'x',
+  }));
+  check('boring along x tilts the bit with rotateY, not the default Z bore',
+    holeXSrc.includes('transforms.rotateY(Math.PI / 2, tube('));
+
+  console.log('\n=== Repeat on a Hole repeats the bore, not the block ===');
+
+  // The exact defect this closes, verified live: select a single 6mm bore in
+  // a 40x40x20 box and click Repeat, and the feature list reads "Hole 1 x 3"
+  // while the OLD engine (patternLines' generic branch) translated and
+  // unioned three copies of hole1's own value -- which per HoleFeature's doc
+  // comment is "the block with a hole in it," not "the hole." Each copy's
+  // solid material fills in its neighbour's hole, so the 3D view shows the
+  // box tripled into a solid bar with every hole gone.
+  //
+  // A value that would make a broken implementation pass: holePatternLines()
+  // never being called at all -- i.e. patternLines() still routing a
+  // hole-target pattern through booleans.union(translated copies of hole1)
+  // the way every other target does. That produces a ~56-wide solid slab
+  // (three overlapping 40-wide boxes spanning x -20..36) with volume close
+  // to the block's own 32000, not three real bores removed from ONE block.
+  const repeatHoleBox = box('b1', { size: [40, 40, 20] });
+  const repeatHole = {
+    id: 'hole1', kind: 'hole', target: 'b1', diameter: 6, depth: 25, center: [0, 0, 0], axis: 'z',
+  };
+  const repeatHolePattern = {
+    id: 'pat1', kind: 'pattern', target: 'hole1', mode: 'linear', count: 3, step: [8, 0, 0],
+  };
+  const repeatHoleDoc = doc(repeatHoleBox, repeatHole, repeatHolePattern);
+  const repeatHoleSrc = gen.toJscad(repeatHoleDoc);
+
+  check('the block stays ONE subtract from b1, not a union of shifted copies',
+    repeatHoleSrc.includes('booleans.subtract(b1, pat1_bores)') && !repeatHoleSrc.includes('booleans.union'),
+    repeatHoleSrc.slice(repeatHoleSrc.indexOf('function main')));
+  check('the pattern still consumes the hole: only the repeat comes back top-level',
+    types.topLevel(repeatHoleDoc).map((f) => f.id).join() === 'pat1');
+
+  const repeatHoleBuilt = build(repeatHoleSrc);
+  const blockVolume = 40 * 40 * 20;
+  const oneBoreVol = Math.PI * 3 * 3 * 20; // radius 3, bored clean through the 20-thick block
+  check('three non-overlapping bores remove ~3x one bore from ONE block',
+    repeatHoleBuilt.volume > blockVolume - oneBoreVol * 3 * 1.6
+    && repeatHoleBuilt.volume < blockVolume - oneBoreVol * 3 * 0.5,
+    `${repeatHoleBuilt.volume.toFixed(0)} vs block ${blockVolume} minus ~${(oneBoreVol * 3).toFixed(0)}`);
+  check('...nowhere near the solid tripled-block bar the old bug produced (~44800, no holes surviving)',
+    repeatHoleBuilt.volume < blockVolume * 1.15,
+    `${repeatHoleBuilt.volume.toFixed(0)} vs a broken ~44800`);
+
+  console.log('\n=== Repeat on a Four Corners hole repeats every bore ===');
+
+  // The same fix has to hold when the hole being repeated is itself a
+  // Four Corners hole -- four bores per pattern instance, not one.
+  const repeatCornersDoc = doc(box('b1', { size: [80, 40, 10] }), {
+    id: 'hole1', kind: 'hole', target: 'b1', diameter: 6, depth: 20,
+    center: [-15, 0, 0], axis: 'z', corners: { dx: 10, dy: 12 },
+  }, {
+    id: 'pat1', kind: 'pattern', target: 'hole1', mode: 'linear', count: 2, step: [30, 0, 0],
+  });
+  const repeatCornersSrc = gen.toJscad(repeatCornersDoc);
+  check('the pattern loop places all four corners itself, once per pass',
+    (repeatCornersSrc.match(/pat1_bores\.push\(transforms\.translate/g) || []).length === 4);
+  check('dx and dy each drive that loop -- once per corner, four times total',
+    (repeatCornersSrc.match(/p\.hole1_dx/g) || []).length === 5 // 1 for hole1's own cut + 4 in the loop
+    && (repeatCornersSrc.match(/p\.hole1_dy/g) || []).length === 5);
+
+  const repeatCornersBuilt = build(repeatCornersSrc);
+  const cornersPlateVolume = 80 * 40 * 10;
+  const oneCornerBoreVol = Math.PI * 3 * 3 * 10; // radius 3, clipped to the 10-thick plate
+  check('two pattern instances of a four-corners hole remove all 8 bores from ONE plate',
+    repeatCornersBuilt.volume > cornersPlateVolume - oneCornerBoreVol * 8 * 1.4
+    && repeatCornersBuilt.volume < cornersPlateVolume - oneCornerBoreVol * 8 * 0.6,
+    `${repeatCornersBuilt.volume.toFixed(0)} vs plate ${cornersPlateVolume} minus ~${(oneCornerBoreVol * 8).toFixed(0)}`);
+
+  console.log('\n=== shell (Hollow) ===');
+
+  const shellDoc = doc(box('b1', { size: [40, 40, 20] }), { id: 'shell1', kind: 'shell', target: 'b1', thickness: 4 });
+  const shellSrc = gen.toJscad(shellDoc);
+  check('a shell uses the honest scaled-subtract helper', shellSrc.includes('function shellOp('));
+  check('...which pulls measurements in for the bounding box',
+    /const \{[^}]*measurements[^}]*\} = require/.test(shellSrc));
+  check('the shell consumes its target, only the hollow shape returns',
+    types.topLevel(shellDoc).map((f) => f.id).join() === 'shell1');
+
+  const shellBuilt = build(shellSrc);
+  check('a shell is genuinely hollow: less than the solid, more than nothing',
+    shellBuilt.volume > 0 && shellBuilt.volume < 40 * 40 * 20 * 0.85,
+    `${shellBuilt.volume.toFixed(0)} vs solid ${40 * 40 * 20}`);
+
+  console.log('\n=== move (Move) ===');
+
+  const moveCopyDoc = doc(box('b1'), { id: 'move1', kind: 'move', target: 'b1', offset: [50, 0, 0], copy: true });
+  const moveCopySrc = gen.toJscad(moveCopyDoc);
+  check('a move translates the target with the real transforms.translate',
+    moveCopySrc.includes('transforms.translate([p.move1_x, p.move1_y, p.move1_z], b1)'));
+  check('copy:true keeps the original standing alongside the moved copy',
+    types.topLevel(moveCopyDoc).map((f) => f.id).sort().join() === 'b1,move1');
+
+  const moveReplaceDoc = doc(box('b1'), { id: 'move2', kind: 'move', target: 'b1', offset: [50, 0, 0], copy: false });
+  check('copy:false relocates: the original is consumed, only the moved feature shows',
+    types.topLevel(moveReplaceDoc).map((f) => f.id).join() === 'move2');
+
+  console.log('\n=== new feature names match the parity map ===');
+
+  const labelDoc = doc(
+    revProfile('s1'), revolveF('rev1', 's1'),
+    box('b1'),
+    { id: 'm1', kind: 'mirror', target: 'b1', plane: 'xy' },
+    { id: 'pat1', kind: 'pattern', target: 'b1', mode: 'linear', count: 2, step: [10, 0, 0] },
+    { id: 'hole1', kind: 'hole', target: 'b1', diameter: 4, depth: 10, center: [0, 0, 0], axis: 'z' },
+    { id: 'shell1', kind: 'shell', target: 'b1', thickness: 2 },
+    { id: 'move1', kind: 'move', target: 'b1', offset: [5, 0, 0], copy: true },
+  );
+  const labelNm = types.nameMap(labelDoc);
+  check('revolve is labelled Spin', labelNm.rev1 === 'Spin 1', labelNm.rev1);
+  check('mirror is labelled Mirror', labelNm.m1 === 'Mirror 1', labelNm.m1);
+  check('pattern is labelled Repeat', labelNm.pat1 === 'Repeat 1', labelNm.pat1);
+  check('hole is labelled Hole', labelNm.hole1 === 'Hole 1', labelNm.hole1);
+  check('shell is labelled Hollow', labelNm.shell1 === 'Hollow 1', labelNm.shell1);
+  check('move is labelled Move', labelNm.move1 === 'Move 1', labelNm.move1);
+
+  const newKindIds = ['rev1', 'm1', 'pat1', 'hole1', 'shell1', 'move1'];
+  check('isDerived recognizes every new feature as depending on an earlier one',
+    newKindIds.every((id) => types.isDerived(labelDoc.features.find((f) => f.id === id))));
+  check('isShape excludes every new feature -- none of them has a plain centre',
+    newKindIds.every((id) => !types.isShape(labelDoc.features.find((f) => f.id === id))));
 
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;

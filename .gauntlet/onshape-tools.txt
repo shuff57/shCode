@@ -1,0 +1,75 @@
+Extrude
+Revolve
+Sweep
+Loft
+Thicken
+Enclose
+Fillet
+Face Blend
+Chamfer
+Draft
+Body Draft
+Rib
+Shell
+Hole
+External Thread
+Linear Pattern
+Circular Pattern
+Curve Pattern
+Mirror
+Boolean
+Split
+Transform
+Wrap
+Decal
+Delete Part
+Modify Fillet
+Delete Face
+Move Face
+Replace Face
+Offset Surface
+Boundary Surface
+Fill
+Move Boundary
+Ruled Surface
+Mutual Trim
+Constrained Surface
+Plane
+Helix
+Projected Curve
+3D Fit Spline
+Bridging Curve
+Composite Curve
+Intersection Curve
+Trim Curve
+Isocline
+Offset Curve
+Isoparametric Curve
+Edit Curve
+Routing Curve
+Mate Connector
+Derived
+Variable
+Query Variable
+Composite Part
+Tag
+Frame
+Frame Trim
+Gusset
+End cap
+Cut List
+Sheet Metal Model
+Sheet Metal Flange
+Sheet Metal Hem
+Sheet Metal Tab
+Sheet Metal Bend
+Sheet Metal Form
+Sheet Metal Loft
+Sheet Metal Make Joint
+Sheet Metal Corner
+Sheet Metal Bend Relief
+Sheet Metal Modify Joint
+Sheet Metal Corner Break
+Sheet Metal Table and Flat View
+Finish Sheet Metal Model
+Add Custom Features

@@ -1,0 +1,228 @@
+{
+  "bar": {
+    "name": "Onshape Part Studio toolbar",
+    "toolbarImage": "https://cad.onshape.com/help/Content/Resources/Images/concepts/partstudioannotatedmodeling3.png",
+    "featureTools": "https://cad.onshape.com/help/Content/PartStudio/feature_tools.htm",
+    "sketchTools": "https://cad.onshape.com/help/Content/Sketch/sketch_tools.htm",
+    "toolCount": 88
+  },
+  "ships": [
+    {
+      "onshape": "Extrude",
+      "shcad": "Pull",
+      "where": "ModelEditor extrude"
+    },
+    {
+      "onshape": "Boolean",
+      "shcad": "Join / Cut / Overlap",
+      "where": "ModelEditor combine"
+    },
+    {
+      "onshape": "Fillet",
+      "shcad": "Round",
+      "where": "ModelEditor round, primitives only"
+    },
+    {
+      "onshape": "Chamfer",
+      "shcad": "Bevel",
+      "where": "ModelEditor roundStyle=chamfer"
+    },
+    {
+      "onshape": "Delete Part",
+      "shcad": "Delete",
+      "where": "ModelEditor remove"
+    },
+    {
+      "onshape": "Transform",
+      "shcad": "Turn + Move",
+      "where": "ModelEditor rotate + move"
+    },
+    {
+      "onshape": "Revolve",
+      "shcad": "Spin",
+      "where": "ModelEditor revolve",
+      "landed": "2026-08-24 gauntlet round 1"
+    },
+    {
+      "onshape": "Mirror",
+      "shcad": "Mirror",
+      "where": "ModelEditor mirror",
+      "landed": "2026-08-24 gauntlet round 1"
+    },
+    {
+      "onshape": "Linear Pattern",
+      "shcad": "Repeat",
+      "where": "ModelEditor pattern",
+      "landed": "2026-08-24 gauntlet round 1"
+    },
+    {
+      "onshape": "Circular Pattern",
+      "shcad": "Repeat",
+      "where": "ModelEditor pattern",
+      "landed": "2026-08-24 gauntlet round 1"
+    },
+    {
+      "onshape": "Hole",
+      "shcad": "Hole",
+      "where": "ModelEditor hole",
+      "landed": "2026-08-24 gauntlet round 1"
+    },
+    {
+      "onshape": "Shell",
+      "shcad": "Hollow",
+      "where": "ModelEditor shell",
+      "landed": "2026-08-24 gauntlet round 1"
+    }
+  ],
+  "build": [
+    {
+      "id": "loft",
+      "name": "Blend",
+      "jscad": "hullChain / extrudeFromSlices",
+      "why": "bundle has it; two sketches to a tapered solid",
+      "covers": [
+        "Loft"
+      ],
+      "label": "Loft"
+    },
+    {
+      "id": "plane",
+      "name": "Surface",
+      "jscad": "sketch plane + offset",
+      "why": "plane already in the model as xy/xz/yz+offset but no toolbar affordance",
+      "covers": [
+        "Plane"
+      ],
+      "label": "Plane"
+    },
+    {
+      "id": "sketch",
+      "name": "Draw",
+      "jscad": "sketch points + arcs",
+      "why": "our sketch is drag-the-corners polygon only; this is the widest single gap to the bar",
+      "covers": [],
+      "label": "Sketch Tools (line, rectangle, circle, arc, spline, point, construction, trim, offset, dimension)",
+      "coversNote": "the Sketch toolbar is a separate bar (Sketch/sketch_tools.htm), not the feature toolbar"
+    },
+    {
+      "id": "chrome",
+      "name": "-",
+      "jscad": "n/a",
+      "why": "the visual half of parity; the critic judges this blind against the real screenshot",
+      "covers": [],
+      "label": "toolbar grouping, flyout carets, icon set, disabled states, tooltips, Search tools (alt+c), rollback bar",
+      "coversNote": "toolbar presentation, not a tool"
+    }
+  ],
+  "outOfScope": [
+    {
+      "group": "Sheet metal (14 tools)",
+      "tools": [
+        "Sheet Metal Model",
+        "Sheet Metal Flange",
+        "Sheet Metal Hem",
+        "Sheet Metal Tab",
+        "Sheet Metal Bend",
+        "Sheet Metal Form",
+        "Sheet Metal Loft",
+        "Sheet Metal Make Joint",
+        "Sheet Metal Corner",
+        "Sheet Metal Bend Relief",
+        "Sheet Metal Modify Joint",
+        "Sheet Metal Corner Break",
+        "Sheet Metal Table and Flat View",
+        "Finish Sheet Metal Model"
+      ],
+      "why": "a manufacturing discipline with its own vocabulary; no JSCAD kernel support and nothing in a first-year CS course reaches for it"
+    },
+    {
+      "group": "Surface modelling (11 tools)",
+      "tools": [
+        "Face Blend",
+        "Offset Surface",
+        "Boundary Surface",
+        "Fill",
+        "Move Boundary",
+        "Ruled Surface",
+        "Mutual Trim",
+        "Constrained Surface",
+        "Delete Face",
+        "Move Face",
+        "Replace Face"
+      ],
+      "why": "all require a B-rep kernel with face topology. JSCAD solids are polygon soup with no addressable faces, so these cannot be built, not merely descoped"
+    },
+    {
+      "group": "Curve tools (12 tools)",
+      "tools": [
+        "Helix",
+        "Projected Curve",
+        "3D Fit Spline",
+        "Bridging Curve",
+        "Composite Curve",
+        "Intersection Curve",
+        "Trim Curve",
+        "Isocline",
+        "Offset Curve",
+        "Isoparametric Curve",
+        "Edit Curve",
+        "Routing Curve"
+      ],
+      "why": "curve-driven modelling presumes sweep/loft along a path; extrudeHelical exists in the bundle but a helix with no sweep to ride it is a toy"
+    },
+    {
+      "group": "Frames and weldments (6 tools)",
+      "tools": [
+        "Frame",
+        "Frame Trim",
+        "Gusset",
+        "End cap",
+        "Cut List",
+        "Composite Part"
+      ],
+      "why": "structural steel workflow; needs a profile library and a cut list, both outside a browser sandbox"
+    },
+    {
+      "group": "Document-scale features (8 tools)",
+      "tools": [
+        "Derived",
+        "Variable",
+        "Query Variable",
+        "Tag",
+        "Mate Connector",
+        "Add Custom Features",
+        "Wrap",
+        "Decal"
+      ],
+      "why": "these presume multiple documents, an assembly stage, or FeatureScript. The sandbox is one Part Studio with no document tree"
+    },
+    {
+      "group": "Kernel-dependent detail (6 tools)",
+      "tools": [
+        "Draft",
+        "Body Draft",
+        "Rib",
+        "External Thread",
+        "Split",
+        "Modify Fillet"
+      ],
+      "why": "each needs face or edge selection on a B-rep. Same wall as surface modelling: whyCannotRound() in lib/model-types.ts already documents this limit honestly for fillet, and it applies here too"
+    },
+    {
+      "group": "Not modelling (3 tools)",
+      "tools": [
+        "Thicken",
+        "Enclose",
+        "Curve Pattern"
+      ],
+      "why": "Thicken and Enclose act on surfaces we do not have; Curve Pattern needs a curve we do not have"
+    },
+    {
+      "group": "Sweep",
+      "tools": [
+        "Sweep"
+      ],
+      "why": "no extrudeAlongPath in the vendored bundle; extrudePath exists but is unexposed and untested. Reconsider if a lesson needs it"
+    }
+  ]
+}

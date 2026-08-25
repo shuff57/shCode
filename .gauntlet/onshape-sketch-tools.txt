@@ -1,0 +1,52 @@
+Line
+Midpoint Line
+Corner Rectangle
+Center Point Rectangle
+Aligned Rectangle
+Center Point Circle
+3 Point Circle
+Ellipse
+3 Point Arc
+Tangent Arc
+Center Point Arc
+Elliptical Arc
+Conic
+Inscribed Polygon
+Circumscribed Polygon
+Spline
+Bezier
+Spline Control Point
+Point
+Text
+Use
+Intersection
+Construction
+Sketch Chamfer
+Sketch Fillet
+Trim
+Extend
+Sketch Split
+Offset
+Slot
+Sketch Mirror
+Linear Sketch Pattern
+Circular Sketch Pattern
+Transform Sketch
+Insert DXF or DWG
+Insert Image
+Dimension
+Coincident
+Concentric
+Parallel
+Tangent
+Horizontal
+Vertical
+Perpendicular
+Equal
+Midpoint
+Normal
+Pierce
+Symmetric
+Fix
+Curvature
+Automatic Inferencing

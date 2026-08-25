@@ -96,7 +96,34 @@ export function generatedParams(doc: ModelDoc): GeneratedParam[] {
       push('offset', 'offset', f.offset, { min: -500, max: 500, step: 1 });
     } else if (f.kind === 'extrude') {
       push('height', 'height', f.height);
+    } else if (f.kind === 'revolve') {
+      push('angle', 'angle', f.angle, { min: 1, max: 360, step: 1 });
+    } else if (f.kind === 'pattern') {
+      push('count', 'count', f.count, { min: 1, max: 24, step: 1 });
+      if (f.mode === 'circular') {
+        push('totalangle', 'angle', f.totalAngle ?? 360, { min: 1, max: 360, step: 1 });
+      } else {
+        const step = f.step ?? [0, 0, 0];
+        push('stepx', 'step x', step[0], { min: -500, max: 500, step: 1 });
+        push('stepy', 'step y', step[1], { min: -500, max: 500, step: 1 });
+        push('stepz', 'step z', step[2], { min: -500, max: 500, step: 1 });
+      }
+    } else if (f.kind === 'hole') {
+      push('diameter', 'diameter', f.diameter);
+      push('depth', 'depth', f.depth);
+      pushCentre(out, f.id, label, f.center);
+      // Same across/up vocabulary the sketch corners use -- the two axes the
+      // drill does not point along, named the way this file already names them.
+      if (f.corners) {
+        push('dx', 'corner spacing across', f.corners.dx, { min: 0.5, max: 250, step: 0.5 });
+        push('dy', 'corner spacing up', f.corners.dy, { min: 0.5, max: 250, step: 0.5 });
+      }
+    } else if (f.kind === 'shell') {
+      push('thickness', 'wall', f.thickness, { min: 0.5, max: 40, step: 0.5 });
+    } else if (f.kind === 'move') {
+      pushCentre(out, f.id, label, f.offset);
     }
+    // mirror carries no numeric slot -- its only input is a plane choice.
   });
   return out;
 }
@@ -216,6 +243,49 @@ export function applyParam(doc: ModelDoc, name: string, value: number): ModelDoc
     if (f.kind === 'sphere' && slot === 'radius') {
       changed = true;
       return { ...f, radius: value };
+    }
+    if (f.kind === 'revolve' && slot === 'angle') {
+      changed = true;
+      return { ...f, angle: value };
+    }
+    if (f.kind === 'pattern') {
+      if (slot === 'count') { changed = true; return { ...f, count: Math.max(1, Math.round(value)) }; }
+      if (slot === 'totalangle') { changed = true; return { ...f, totalAngle: value }; }
+      const stepAx = slot === 'stepx' ? 0 : slot === 'stepy' ? 1 : slot === 'stepz' ? 2 : null;
+      if (stepAx !== null) {
+        const step: Vec3 = f.step ? [...f.step] : [0, 0, 0];
+        step[stepAx] = value;
+        changed = true;
+        return { ...f, step };
+      }
+    }
+    if (f.kind === 'hole') {
+      if (slot === 'diameter') { changed = true; return { ...f, diameter: value }; }
+      if (slot === 'depth') { changed = true; return { ...f, depth: value }; }
+      const holeAx = slot === 'x' ? 0 : slot === 'y' ? 1 : slot === 'z' ? 2 : null;
+      if (holeAx !== null) {
+        const center: Vec3 = [...f.center];
+        center[holeAx] = value;
+        changed = true;
+        return { ...f, center };
+      }
+      if (f.corners && (slot === 'dx' || slot === 'dy')) {
+        changed = true;
+        return { ...f, corners: { ...f.corners, [slot]: value } };
+      }
+    }
+    if (f.kind === 'shell' && slot === 'thickness') {
+      changed = true;
+      return { ...f, thickness: value };
+    }
+    if (f.kind === 'move') {
+      const moveAx = slot === 'x' ? 0 : slot === 'y' ? 1 : slot === 'z' ? 2 : null;
+      if (moveAx !== null) {
+        const offset: Vec3 = [...f.offset];
+        offset[moveAx] = value;
+        changed = true;
+        return { ...f, offset };
+      }
     }
     return f;
   });
@@ -382,8 +452,247 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
       + `'${plane}', p.${pname(f.target, 'offset')})`;
   }
 
+  if (f.kind === 'revolve') {
+    // revolve() (shCAD) refuses an `angle` option by name -- see REAL_EXTRAS
+    // in simple.js -- and hands the student the real call instead. Build mode
+    // exposes that exact angle as a dial, so it has to be the real call too:
+    // extrudeRotate sweeps the profile around the world Z axis, taking the
+    // profile's own x as the radius, same as revolve(profile) would for the
+    // full-circle case.
+    needs.add('extrusions');
+    return `extrusions.extrudeRotate({ angle: p.${pname(f.id, 'angle')} * Math.PI / 180 }, ${f.target})`;
+  }
+
+  if (f.kind === 'mirror') {
+    // Real transforms.mirror, not a shCAD name -- see the header banner:
+    // mirror is already short and reads as English, so shCAD ships it bare.
+    //
+    // The plane goes through the TARGET'S OWN bounding box, never bare world
+    // zero -- see mirrorThroughFace(). A shape built at the origin (a
+    // primitive centred there, or a sketch starting at its own corner, which
+    // is the common case) already has a face sitting at zero, so this picks
+    // that exact face and nothing changes. A shape the Move tool relocated no
+    // longer has any face near zero, so the plane moves with it instead of
+    // mirroring the part into empty space where it used to be.
+    needs.add('transforms');
+    needs.add('mirrorThroughFace');
+    const normal = f.plane === 'xy' ? '[0, 0, 1]' : f.plane === 'xz' ? '[0, 1, 0]' : '[1, 0, 0]';
+    const axis = f.plane === 'xy' ? 2 : f.plane === 'xz' ? 1 : 0;
+    return `mirrorThroughFace(${f.target}, ${normal}, ${axis})`;
+  }
+
+  if (f.kind === 'hole') {
+    // Sugar over tube (shCAD's cylinder) + subtract, folded into one line so
+    // the feature list shows one row rather than a tool body plus a cut.
+    needs.add('transforms');
+    const r = `p.${pname(f.id, 'diameter')} / 2`;
+    const depth = `p.${pname(f.id, 'depth')}`;
+    const bore = `tube(${r}, ${depth})`;
+    // tube() extrudes along Z; boring along x or y means tilting the bit 90
+    // degrees before it is moved into place.
+    const tilted = f.axis === 'x' ? `transforms.rotateY(Math.PI / 2, ${bore})`
+      : f.axis === 'y' ? `transforms.rotateX(Math.PI / 2, ${bore})`
+      : bore;
+    // center/corners are entered as an offset from the TARGET's own middle,
+    // never an absolute world position -- see centerOn() below, same
+    // reasoning mirrorThroughFace() already applies to a plane. newHole()'s
+    // default of [0, 0, 0] means "no offset," so an un-touched hole still
+    // lands dead center on whatever the target's own bounding box says,
+    // wherever Move has since put it -- not at world zero.
+    needs.add('centerOn');
+    needs.add('centerOf');
+    if (f.corners) {
+      // Four bores subtracted from the SAME target in one call -- real
+      // booleans.subtract takes every shape to remove at once. Patterning a
+      // hole the way Repeat patterns a shape would instead duplicate the
+      // whole target and union the copies, which is the wrong operation
+      // entirely: it multiplies the plate, not the bore. This keeps the
+      // plate singular and only repeats the cut, so the four corners are
+      // pulled from the same two numbers instead of four separate positions.
+      const cx = `p.${pname(f.id, 'x')}`;
+      const cy = `p.${pname(f.id, 'y')}`;
+      const cz = `p.${pname(f.id, 'z')}`;
+      const dx = `p.${pname(f.id, 'dx')}`;
+      const dy = `p.${pname(f.id, 'dy')}`;
+      needs.add('cornerBores');
+      return `booleans.subtract(${f.target}, `
+        + `cornerBores(${f.target}, [${cx}, ${cy}, ${cz}], ${dx}, ${dy}, ${tilted}))`;
+    }
+    return `booleans.subtract(${f.target}, `
+      + `transforms.translate(centerOn(${f.target}, ${centreExpr(f.id)}), ${tilted}))`;
+  }
+
+  if (f.kind === 'shell') {
+    needs.add('shellOp');
+    needs.add('transforms');
+    return `shellOp(${f.target}, p.${pname(f.id, 'thickness')})`;
+  }
+
+  if (f.kind === 'move') {
+    needs.add('transforms');
+    return `transforms.translate(${centreExpr(f.id)}, ${f.target})`;
+  }
+
+  if (f.kind === 'pattern') {
+    // toJscad() special-cases pattern features through patternLines() before
+    // ever calling featureExpr() -- a pattern's statement is a `for` loop,
+    // not a single expression. Reaching this means that guard was skipped.
+    throw new Error('pattern features are emitted by patternLines(), not featureExpr()');
+  }
+
   const args = f.targets.join(', ');
   return `booleans.${f.op}(${args})`;
+}
+
+/**
+ * A pattern is a for-loop -- literally, in the emitted source, not hidden
+ * behind a helper call. That is the highest-value teaching moment on the
+ * whole toolbar, so it is the one feature whose statement is not
+ * `const id = <expr>`: it is several lines, ending in that assignment.
+ *
+ * A pattern targeting a hole is a special case -- see holePatternLines()
+ * below -- because a HoleFeature's value is "the block with the hole cut
+ * into it," not "the hole." Feeding that through the engine here would
+ * translate-and-union COPIES OF THE WHOLE BLOCK.
+ */
+function patternLines(
+  f: Extract<Feature, { kind: 'pattern' }>,
+  needs: Set<string>,
+  byId: Map<string, Feature>
+): string[] {
+  needs.add('transforms');
+  const target = byId.get(f.target);
+  if (target && target.kind === 'hole') return holePatternLines(f, target, needs);
+
+  const parts = `${f.id}_parts`;
+  const count = `p.${pname(f.id, 'count')}`;
+  const lines: string[] = [];
+  lines.push(`  const ${parts} = []`);
+  if (f.mode === 'circular') {
+    // Repeat Around orbits the WORLD axis, not the target's own middle.
+    //
+    // This was briefly changed to pivot on centerOf(target), by analogy with
+    // mirrorThroughFace(). The analogy is wrong and the result was a silent
+    // no-op: a cylinder spun about its own centre produces N copies of itself
+    // in the same place, and the union of those is one cylinder. Scattering
+    // into a ring is not the bug -- it is what a circular pattern IS, and it
+    // is how a student draws a bolt circle. holePatternLines() below had it
+    // right all along: pivot on the plate, orbit the bore.
+    //
+    // The real footgun is the other one: a shape sitting ON the axis has
+    // nothing to orbit, so every copy lands on top of the original. That is
+    // refused up front in ModelEditor's repeat(), where the centre is known.
+  }
+  lines.push(`  for (let i = 0; i < ${count}; i++) {`);
+  if (f.mode === 'circular') {
+    const angle = `p.${pname(f.id, 'totalangle')} / ${count} * i * Math.PI / 180`;
+    const spin = f.axis === 'x' ? '[a, 0, 0]' : f.axis === 'y' ? '[0, a, 0]' : '[0, 0, a]';
+    lines.push(`    const a = ${angle}`);
+    lines.push(`    ${parts}.push(transforms.rotate(${spin}, ${f.target}))`);
+  } else {
+    lines.push(`    const x = p.${pname(f.id, 'stepx')} * i`);
+    lines.push(`    const y = p.${pname(f.id, 'stepy')} * i`);
+    lines.push(`    const z = p.${pname(f.id, 'stepz')} * i`);
+    lines.push(`    ${parts}.push(transforms.translate([x, y, z], ${f.target}))`);
+  }
+  lines.push('  }');
+  lines.push(`  const ${f.id} = booleans.union(${parts})`);
+  return lines;
+}
+
+/**
+ * Repeating a hole must repeat the BORE, not the block it was cut from.
+ * Verified live: select a single 6mm bore in a 40x40x20 box and click
+ * Repeat, and the feature list reads "Hole 1 x 3" while the old engine
+ * (above) translated and unioned three copies of hole1's own value -- which
+ * is the WHOLE block with one hole in it, per HoleFeature's doc comment. The
+ * copies overlap enough that each one's hole gets filled back in by its
+ * neighbour's solid material, so the 3D view shows the box tripled into a
+ * solid bar with no holes surviving at all.
+ *
+ * The fix builds every bore instance -- one per pattern step, times one per
+ * corner if this is a Four Corners hole -- and subtracts them ALL from the
+ * hole's own target in a single call. Same move the `corners` branch of
+ * featureExpr() already makes for four bores at once, generalized to N.
+ */
+function holePatternLines(
+  f: Extract<Feature, { kind: 'pattern' }>,
+  h: Extract<Feature, { kind: 'hole' }>,
+  needs: Set<string>
+): string[] {
+  const parts = `${f.id}_bores`;
+  const count = `p.${pname(f.id, 'count')}`;
+  const r = `p.${pname(h.id, 'diameter')} / 2`;
+  const depth = `p.${pname(h.id, 'depth')}`;
+  const bore = `tube(${r}, ${depth})`;
+  const tilted = h.axis === 'x' ? `transforms.rotateY(Math.PI / 2, ${bore})`
+    : h.axis === 'y' ? `transforms.rotateX(Math.PI / 2, ${bore})`
+    : bore;
+  const cx = `p.${pname(h.id, 'x')}`;
+  const cy = `p.${pname(h.id, 'y')}`;
+  const cz = `p.${pname(h.id, 'z')}`;
+
+  // The hole's stored x/y/z is an offset from the PLATE's own middle (see
+  // centerOn() below), not an absolute position -- computed once, since
+  // h.target does not move between copies.
+  needs.add('centerOn');
+  needs.add('centerOf');
+  const center = `${f.id}_center`;
+  const lines: string[] = [];
+  lines.push(`  const ${center} = centerOn(${h.target}, [${cx}, ${cy}, ${cz}])`);
+
+  // One base position per bore this hole already cuts -- one for a plain
+  // hole, four for a Four Corners hole (mirrors featureExpr's `corners`
+  // branch). Each gets offset or orbited by the pattern below in turn.
+  type Coord = { x: string; y: string; z: string };
+  const bases: Coord[] = h.corners
+    ? (() => {
+        const dx = `p.${pname(h.id, 'dx')}`;
+        const dy = `p.${pname(h.id, 'dy')}`;
+        const at = (sx: '-' | '+', sy: '-' | '+'): Coord =>
+          ({ x: `${center}[0] ${sx} ${dx}`, y: `${center}[1] ${sy} ${dy}`, z: `${center}[2]` });
+        return [at('-', '-'), at('+', '-'), at('-', '+'), at('+', '+')];
+      })()
+    : [{ x: `${center}[0]`, y: `${center}[1]`, z: `${center}[2]` }];
+
+  lines.push(`  const ${parts} = []`);
+  if (f.mode === 'circular') {
+    // Orbit around the PLATE's own middle (centerOf(h.target)), not around
+    // the hole's own (possibly off-centre) position -- computed once,
+    // outside the loop, since h.target does not move between copies.
+    // Ambiguous on paper -- "spin around the target" could mean either
+    // point -- but a bolt circle is drilled off-axis on purpose and spun
+    // around the part's own axis to ring the holes; pivoting on the hole's
+    // own point would just spin an off-axis dot around itself and go
+    // nowhere. This is the reading a student clicking "Repeat Around" on a
+    // single corner hole expects.
+    needs.add('rotateAbout');
+    lines.push(`  const ${f.id}_pivot = centerOf(${h.target})`);
+  }
+  lines.push(`  for (let i = 0; i < ${count}; i++) {`);
+  if (f.mode === 'circular') {
+    const angle = `p.${pname(f.id, 'totalangle')} / ${count} * i * Math.PI / 180`;
+    const spin = f.axis === 'x' ? '[a, 0, 0]' : f.axis === 'y' ? '[0, a, 0]' : '[0, 0, a]';
+    lines.push(`    const a = ${angle}`);
+    bases.forEach((base) => {
+      lines.push(
+        `    ${parts}.push(rotateAbout(${f.id}_pivot, ${spin}, `
+          + `transforms.translate([${base.x}, ${base.y}, ${base.z}], ${tilted})))`
+      );
+    });
+  } else {
+    lines.push(`    const x = p.${pname(f.id, 'stepx')} * i`);
+    lines.push(`    const y = p.${pname(f.id, 'stepy')} * i`);
+    lines.push(`    const z = p.${pname(f.id, 'stepz')} * i`);
+    bases.forEach((base) => {
+      lines.push(
+        `    ${parts}.push(transforms.translate([${base.x} + x, ${base.y} + y, ${base.z} + z], ${tilted}))`
+      );
+    });
+  }
+  lines.push('  }');
+  lines.push(`  const ${f.id} = booleans.subtract(${h.target}, ${parts})`);
+  return lines;
 }
 
 // JSCAD has roundedCuboid and roundedCylinder but no chamfer of any kind on a
@@ -439,6 +748,77 @@ function chamferCylinder(radius, height, center, c) {
     tube(radius - c, height, { center })
   )
 }`,
+  shellOp: `// A hollow copy of a solid, approximated: scale a copy of the body inward
+// around its own bounding-box centre, and subtract it. This is NOT a true
+// shell -- a true shell offsets every FACE inward by the same distance, so
+// the wall reads as exactly "thickness" everywhere. Scaling shrinks a
+// bounding box by the same FRACTION on every axis instead, so a long thin
+// part gets a thin wall on its long axis and a thick one on its short axis,
+// and a curved body (a ball, a tube) is not uniformly thin at all. The
+// vendored JSCAD bundle has no boolean offset, which is the only operation
+// that would do this honestly.
+function shellOp(shape, thickness) {
+  const box = measurements.measureBoundingBox(shape)
+  const size = [box[1][0] - box[0][0], box[1][1] - box[0][1], box[1][2] - box[0][2]]
+  const mid = [(box[0][0] + box[1][0]) / 2, (box[0][1] + box[1][1]) / 2, (box[0][2] + box[1][2]) / 2]
+  const factor = size.map((s) => Math.max(0, (s - 2 * thickness) / s))
+  const inner = transforms.translate(mid, transforms.scale(factor,
+    transforms.translate([-mid[0], -mid[1], -mid[2]], shape)))
+  return booleans.subtract(shape, inner)
+}`,
+  mirrorThroughFace: `// Mirror through a face of the part itself, not empty space at world
+// zero. JSCAD solids have no picker for "this face" -- the closest honest
+// stand-in is the part's own bounding box, so the plane passes through
+// whichever of its two faces on this axis sits nearer to zero. A shape
+// built at the origin -- a primitive centred there, or a sketch that starts
+// at its own corner, the common case -- already has a face AT zero, so this
+// picks that exact same face and nothing changes. A shape the Move tool
+// relocated no longer has a face anywhere near zero, so the plane moves
+// with it: the mirrored copy lands touching the part, not reflected through
+// a point the part has since left behind.
+function mirrorThroughFace(shape, normal, axis) {
+  const box = measurements.measureBoundingBox(shape)
+  const near = Math.abs(box[0][axis]) <= Math.abs(box[1][axis]) ? box[0][axis] : box[1][axis]
+  const origin = [0, 0, 0]
+  origin[axis] = near
+  return transforms.mirror({ normal, origin }, shape)
+}`,
+  centerOf: `// The middle of a shape's own bounding box -- the same "ask the target
+// where it is" move mirrorThroughFace() makes for a face, generalized to a
+// point. Every feature below that needs to know where its target sits
+// (a hole with no offset entered, a circular pattern's pivot) goes through
+// here rather than assuming world zero.
+function centerOf(shape) {
+  const box = measurements.measureBoundingBox(shape)
+  return [(box[0][0] + box[1][0]) / 2, (box[0][1] + box[1][1]) / 2, (box[0][2] + box[1][2]) / 2]
+}`,
+  centerOn: `// A hole with no offset entered should land on the TARGET's own middle,
+// not on world zero -- see centerOf(). The Dimensions panel's x/y/z is
+// added on top, so dragging it still works exactly as before; it is now a
+// nudge away from center instead of an absolute world position.
+function centerOn(shape, offset) {
+  const c = centerOf(shape)
+  return [c[0] + offset[0], c[1] + offset[1], c[2] + offset[2]]
+}`,
+  cornerBores: `// Four bores measured from ONE target-relative center -- see centerOn()
+// -- rather than four separate absolute positions.
+function cornerBores(shape, offset, dx, dy, bit) {
+  const c = centerOn(shape, offset)
+  return [
+    transforms.translate([c[0] - dx, c[1] - dy, c[2]], bit),
+    transforms.translate([c[0] + dx, c[1] - dy, c[2]], bit),
+    transforms.translate([c[0] - dx, c[1] + dy, c[2]], bit),
+    transforms.translate([c[0] + dx, c[1] + dy, c[2]], bit),
+  ]
+}`,
+  rotateAbout: `// Spin around a given pivot point rather than world zero -- the rotation
+// counterpart to mirrorThroughFace()'s plane. transforms.rotate always
+// turns around the origin, so this moves the pivot there first, rotates,
+// and moves it back.
+function rotateAbout(pivot, spin, shape) {
+  const back = [-pivot[0], -pivot[1], -pivot[2]]
+  return transforms.translate(pivot, transforms.rotate(spin, transforms.translate(back, shape)))
+}`,
 };
 
 export function toJscad(doc: ModelDoc): string {
@@ -448,6 +828,10 @@ export function toJscad(doc: ModelDoc): string {
   const byId = new Map(doc.features.map((f) => [f.id, f]));
   const lines: string[] = [];
   for (const f of doc.features) {
+    if (f.kind === 'pattern') {
+      lines.push(...patternLines(f, needs, byId));
+      continue;
+    }
     lines.push(`  const ${f.id} = ${featureExpr(f, needs, byId)}`);
   }
 
@@ -458,9 +842,16 @@ export function toJscad(doc: ModelDoc): string {
   const modules = ['primitives', 'booleans'];
   if (needs.has('chamferCylinder')) modules.push('hulls');
   if (needs.has('extrudeOnPlane')) modules.push('extrusions', 'transforms');
+  if (
+    (needs.has('shellOp') || needs.has('mirrorThroughFace') || needs.has('centerOf'))
+    && !modules.includes('measurements')
+  ) {
+    modules.push('measurements');
+  }
   if ((needs.has('chamferBox') || needs.has('transforms')) && !modules.includes('transforms')) {
     modules.push('transforms');
   }
+  if (needs.has('extrusions') && !modules.includes('extrusions')) modules.push('extrusions');
 
   const defs = params
     .map(
