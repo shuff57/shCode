@@ -120,7 +120,7 @@
       "description": "Each of the three headings has a real answer under it -- a sentence or a bullet, not an empty heading",
       "type": "regex",
       "file": "README.md",
-      "pattern": "(?:[\\s\\S]*?^(?![ \\t]*#)[ \\t]*\\S[^\\n]{9,}$){3}",
+      "pattern": "(?:[\\s\\S]*?^(?![ \\t]*[#*\\-]*[ \\t]*(?:What is it\\?|How to run\\?|Know first\\?|\\(name it\\))[ \\t]*$)[ \\t]*[#*\\-]*[ \\t]*\\S[^\\n]{2,}$){3}",
       "flags": "m",
       "points": 0
     },

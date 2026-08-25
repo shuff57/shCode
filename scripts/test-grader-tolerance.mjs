@@ -269,6 +269,19 @@ for (const id of Object.values(L)) {
     '## How to run?', '', '- Press Run to see it', '',
     '## Know first?', '', '- The tax rate', '',
   ].join(nl)));
+  // A real submission, 2026-08-25: this student answered all three prompts but
+  // wrote each ANSWER with a '##' prefix, matching the heading style around it.
+  // r9 skipped every line starting with '#' to stop a blank starter passing on
+  // its own prompts, so it skipped their answers too and cost them a
+  // requirement. Length cannot separate the three shapes -- '- The tax rate'
+  // (12 chars) sits between the starter's 'Know first?' (11) and everything
+  // else -- so r9 now excludes the four prompt texts by name instead.
+  accept(L.messy, 'README answers carry the same ## prefix as the prompts', readme([
+    '# (name it)', '',
+    '## What is it?', '  ## It is a price calculator',
+    '## How to run?', '  ## Input the book, the price per book, and how many you are buying, then press run',
+    '## Know first?', '  ## The program prints the title of the book, the subTotal, then the Total including tax', '',
+  ].join(nl)));
 
   reject(L.messy, 'operators still crammed together', 'r7',
     edit(S, 'const subtotal = unitPrice * quantity;', 'const subtotal = unitPrice*quantity;'));
