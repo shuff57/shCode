@@ -2,7 +2,7 @@
 
 **What you'll learn:**
 - When you are required to draw a flowchart, and why it comes first
-- The eight checks the editor runs, and what each one is complaining about
+- The nine checks the editor runs, and what each one is complaining about
 - What the checker cannot see, and how big a chart should get
 
 This is the companion to the style guide, and it works the same way: a short set of rules, handed out once, applied to everything after. Keep it somewhere you can find it.
@@ -26,7 +26,7 @@ Three reasons this is a rule and not a suggestion:
 
 You will want to skip it. The first few times, the chart will feel slower than just starting. That feeling goes away around the third project, usually the one where the chart catches something.
 
-### The eight checks
+### The nine checks
 
 Press **Check my diagram** and the editor runs these in your browser. They are free, instant, and you can run them as often as you like — there is no penalty for being red.
 
@@ -38,7 +38,8 @@ Press **Check my diagram** and the editor runs these in your browser. They are f
 | `no-orphans` | No shape floats with no arrows at all |
 | `decision-two-exits` | Every diamond has exactly two arrows leaving it |
 | `decision-labeled` | Every arrow out of a diamond carries a label — in this class, `yes` or `no` |
-| `connector-pairs` | Every connector letter appears exactly twice |
+| `min-decisions` | The chart uses at least one decision diamond |
+| `no-self-loop` | No arrow points back at its own shape |
 | `reaches-end` | Following the arrows from Start actually gets you to an End |
 
 An assignment may add a floor on top — "at least one diamond", "at least six shapes". Those are that assignment's requirements, not part of the convention.

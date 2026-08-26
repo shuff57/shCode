@@ -36,8 +36,11 @@ OUTPUT the sandwich
 | `IF … THEN` | A decision, with the consequence indented under it |
 | `ELSE` | The other branch |
 | `OUTPUT` | Hand a result back |
+| `WHILE … END WHILE` | Keep repeating the indented steps for as long as something stays true |
 
 The keywords are a convention, not a requirement. Nothing checks them. They exist because a capitalised `IF` is easier to find when you are scanning a page of plain English.
+
+`WHILE` is here because you will read one in 1.5.24 before the module is out. You are not expected to write repetition yet — Chapter 2 does loops properly. Read it the way it sounds: *while this is still true, keep doing the indented part.*
 
 ## Step 3 — Notice what `ELSE do nothing` is doing
 
