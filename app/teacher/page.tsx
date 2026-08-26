@@ -137,11 +137,17 @@ interface GradebookData {
   dueDates?: Record<string, number>;
 }
 
+// Mirrors CriterionResult in lib/grade-written-core.ts. The denominator field
+// is `max`, not `possible` -- this interface said `possible` and the drawer
+// rendered "0/" with nothing after the slash for every AI-graded criterion in
+// the course. `possible` IS the right name one level up, on the submission and
+// gradebook cell, which is how the two got confused.
 interface GradeCriterion {
   id: string;
   title: string;
   earned: number;
-  possible: number;
+  max: number;
+  verdict?: 'met' | 'partial' | 'missing';
   feedback?: string;
 }
 
@@ -149,6 +155,15 @@ interface GradeResponse {
   totalEarned: number;
   totalPossible: number;
   criteria?: GradeCriterion[];
+}
+
+// Nearly every rubric in the course awards points: 0 per criterion and grades
+// on the verdict, so totalPossible is 0 and any "x / y pts" rendering is "0 / 0
+// pts" -- true, and useless to a teacher answering "why did my kid lose points
+// on criterion 3". Show what the student was shown instead.
+function criterionScore(c: GradeCriterion, passFail: boolean): string {
+  if (passFail) return c.verdict ?? 'missing';
+  return `${c.earned}/${c.max}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -587,7 +602,14 @@ function StudentDrawer({
                           {gradeData && (
                             <div style={{ marginBottom: 8 }}>
                               <div style={{ fontSize: 12, fontWeight: 600, color: '#50fa7b', marginBottom: 6 }}>
-                                {gradeData.totalEarned} / {gradeData.totalPossible} pts
+                                {/* A pass/fail rubric has no point total, and a diagram
+                                    submission has neither -- both used to render a bare
+                                    " / pts" with the numbers missing. */}
+                                {typeof gradeData.totalPossible === 'number' && gradeData.totalPossible > 0
+                                  ? `${gradeData.totalEarned} / ${gradeData.totalPossible} pts`
+                                  : gradeData.criteria && gradeData.criteria.length > 0
+                                    ? `${gradeData.criteria.filter((c) => c.verdict === 'met' || c.verdict === 'partial').length} of ${gradeData.criteria.length} criteria met`
+                                    : 'graded'}
                               </div>
                               {gradeData.criteria && gradeData.criteria.length > 0 && (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -595,7 +617,9 @@ function StudentDrawer({
                                     <div key={c.id} style={{ fontSize: 12, background: '#1e1f29', borderRadius: 4, padding: '6px 10px' }}>
                                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: c.feedback ? 3 : 0 }}>
                                         <span style={{ color: '#f8f8f2' }}>{c.title}</span>
-                                        <span style={{ color: '#8be9fd', fontFamily: 'monospace' }}>{c.earned}/{c.possible}</span>
+                                        <span style={{ color: '#8be9fd', fontFamily: 'monospace' }}>
+                                          {criterionScore(c, !(typeof gradeData.totalPossible === 'number' && gradeData.totalPossible > 0))}
+                                        </span>
                                       </div>
                                       {c.feedback && (
                                         <div style={{ color: '#6272a4', fontSize: 11 }}>{c.feedback}</div>
