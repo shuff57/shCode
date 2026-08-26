@@ -36,7 +36,7 @@
       "description": "Code logs \"start\" before the throw statement",
       "type": "regex",
       "file": "script.js",
-      "pattern": "[\"']start[\"'][\\s\\S]*throw\\s+new\\s+Error\\(",
+      "pattern": "[\"'`]start[\"'`][\\s\\S]*throw\\s+new\\s+Error\\(",
       "flags": "i",
       "points": 0
     },
@@ -46,7 +46,7 @@
       "description": "Throws new Error with the message stop right here",
       "type": "regex",
       "file": "script.js",
-      "pattern": "throw\\s+new\\s+Error\\(\\s*[\"']stop right here[\"']\\s*\\)",
+      "pattern": "throw\\s+new\\s+Error\\(\\s*[\"'`]stop right here[\"'`]\\s*\\)",
       "flags": "i",
       "points": 0
     },
@@ -56,7 +56,7 @@
       "description": "Catch block logs caught: followed by err.message",
       "type": "regex",
       "file": "script.js",
-      "pattern": "catch\\s*\\([^)]*\\)\\s*\\{[^}]*[\"']caught:[\\s\\S]*err\\.message",
+      "pattern": "catch\\s*\\([^)]*\\)\\s*\\{[^}]*[\"'`]caught:[\\s\\S]*err\\.message",
       "flags": "i",
       "points": 0
     }

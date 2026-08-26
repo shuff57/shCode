@@ -139,7 +139,7 @@ Not checked, because nothing can: whether a distractor is genuinely wrong, and w
 ## 5. Known ceiling
 
 The answer key ships in the client bundle, so a student who opens devtools can read it.
-That is the same posture as every console and shplay lesson in this course (their
+That is the same posture as every console and moSHion lesson in this course (their
 solutions are generated into the bundle by `scripts/generate-solutions.mjs`), and moving
 quiz grading server-side would mean a new endpoint and a new table to defend a 0-point
 recall check. Deliberate; revisit if quizzes ever carry real weight.

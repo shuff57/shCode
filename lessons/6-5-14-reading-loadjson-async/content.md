@@ -79,4 +79,4 @@ These are things you design ahead of time as a developer. They're not player sav
 |------|---------|
 | **Async** | Short for "asynchronous." Code that starts now but finishes later — it doesn't block. |
 | **Callback** | A function you pass into another function, to be called when work is done. `loadJSON` uses this pattern. |
-| **`loadJSON(path, callback)`** | shplay function that fetches a JSON file and passes the parsed object to your callback. |
+| **`loadJSON(path, callback)`** | moSHion function that fetches a JSON file and passes the parsed object to your callback. |

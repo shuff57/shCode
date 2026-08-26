@@ -1,10 +1,10 @@
 {
   "id": "5-1-1-slides",
-  "title": "5.1.1 Slides — shplay Foundations",
+  "title": "5.1.1 Slides — moSHion Foundations",
   "description": "Hello Sprite and Movement slides — canvas, sprites, keyboard input, and the frame loop. Placeholder until the deck is rebuilt from bookSHelf.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
   "preview": "slides",
   "slos": [

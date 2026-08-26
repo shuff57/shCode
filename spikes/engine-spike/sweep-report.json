@@ -1354,63 +1354,63 @@
     "status": "NO-OP",
     "error": null,
     "state": null,
-    "note": "non-q5play lesson (console/HTML)"
+    "note": "non-moSHion lesson (console/HTML)"
   },
   {
     "file": "lessons\\algorithm-practice\\script.js",
     "status": "NO-OP",
     "error": null,
     "state": null,
-    "note": "non-q5play lesson (console/HTML)"
+    "note": "non-moSHion lesson (console/HTML)"
   },
   {
     "file": "lessons\\arrays\\script.js",
     "status": "NO-OP",
     "error": null,
     "state": null,
-    "note": "non-q5play lesson (console/HTML)"
+    "note": "non-moSHion lesson (console/HTML)"
   },
   {
     "file": "lessons\\basic-html\\script.js",
     "status": "NO-OP",
     "error": null,
     "state": null,
-    "note": "non-q5play lesson (console/HTML)"
+    "note": "non-moSHion lesson (console/HTML)"
   },
   {
     "file": "lessons\\conditionals\\script.js",
     "status": "NO-OP",
     "error": null,
     "state": null,
-    "note": "non-q5play lesson (console/HTML)"
+    "note": "non-moSHion lesson (console/HTML)"
   },
   {
     "file": "lessons\\debug-camper-bot\\script.js",
     "status": "NO-OP",
     "error": null,
     "state": null,
-    "note": "non-q5play lesson (console/HTML)"
+    "note": "non-moSHion lesson (console/HTML)"
   },
   {
     "file": "lessons\\functions\\script.js",
     "status": "NO-OP",
     "error": null,
     "state": null,
-    "note": "non-q5play lesson (console/HTML)"
+    "note": "non-moSHion lesson (console/HTML)"
   },
   {
     "file": "lessons\\html-intro\\script.js",
     "status": "NO-OP",
     "error": null,
     "state": null,
-    "note": "non-q5play lesson (console/HTML)"
+    "note": "non-moSHion lesson (console/HTML)"
   },
   {
     "file": "lessons\\intro-algorithms\\script.js",
     "status": "NO-OP",
     "error": null,
     "state": null,
-    "note": "non-q5play lesson (console/HTML)"
+    "note": "non-moSHion lesson (console/HTML)"
   },
   {
     "file": "lessons\\jscad-2d-shapes\\script.js",
@@ -1435,24 +1435,24 @@
     "status": "NO-OP",
     "error": null,
     "state": null,
-    "note": "non-q5play lesson (console/HTML)"
+    "note": "non-moSHion lesson (console/HTML)"
   },
   {
     "file": "lessons\\operators-expressions\\script.js",
     "status": "NO-OP",
     "error": null,
     "state": null,
-    "note": "non-q5play lesson (console/HTML)"
+    "note": "non-moSHion lesson (console/HTML)"
   },
   {
     "file": "lessons\\print-job-manager\\script.js",
     "status": "NO-OP",
     "error": null,
     "state": null,
-    "note": "non-q5play lesson (console/HTML)"
+    "note": "non-moSHion lesson (console/HTML)"
   },
   {
-    "file": "lessons\\q5play-bounce\\script.js",
+    "file": "lessons\\the reference API-bounce\\script.js",
     "status": "RUNS-CLEAN",
     "error": null,
     "state": {
@@ -1460,7 +1460,7 @@
     }
   },
   {
-    "file": "lessons\\q5play-gravity\\script.js",
+    "file": "lessons\\the reference API-gravity\\script.js",
     "status": "RUNS-CLEAN",
     "error": null,
     "state": {
@@ -1488,13 +1488,13 @@
     }
   },
   {
-    "file": "lessons\\q5play-intro\\script.js",
+    "file": "lessons\\the reference API-intro\\script.js",
     "status": "THROWS-SCAFFOLD",
     "error": "new Canvas(w, h) must be called in setup()",
     "state": null
   },
   {
-    "file": "lessons\\q5play-intro\\solution.js",
+    "file": "lessons\\the reference API-intro\\solution.js",
     "status": "RUNS-CLEAN",
     "error": null,
     "state": {
@@ -1513,13 +1513,13 @@
     }
   },
   {
-    "file": "lessons\\q5play-move-keys\\script.js",
+    "file": "lessons\\the reference API-move-keys\\script.js",
     "status": "THROWS-SCAFFOLD",
     "error": "new Canvas(w, h) must be called in setup()",
     "state": null
   },
   {
-    "file": "lessons\\q5play-move-keys\\solution.js",
+    "file": "lessons\\the reference API-move-keys\\solution.js",
     "status": "RUNS-CLEAN",
     "error": null,
     "state": {
@@ -1542,13 +1542,13 @@
     "status": "NO-OP",
     "error": null,
     "state": null,
-    "note": "non-q5play lesson (console/HTML)"
+    "note": "non-moSHion lesson (console/HTML)"
   },
   {
     "file": "lessons\\variables-and-types\\script.js",
     "status": "NO-OP",
     "error": null,
     "state": null,
-    "note": "non-q5play lesson (console/HTML)"
+    "note": "non-moSHion lesson (console/HTML)"
   }
 ]

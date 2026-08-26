@@ -4,9 +4,9 @@
   "description": "Write `Counter.bigStep()` which calls `this.addBy(5)` and returns `this.isHigh()` — one method dispatching another on the same instance.",
   "type": "lesson",
   "estimateMins": 8,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 12,
   "slos": [
     "SLO-2",
@@ -18,7 +18,7 @@
       "title": "Write the bigStep() method",
       "instructions": "Inside the `Counter` class body, write a `bigStep()` method that calls `this.addBy(5)` and then returns `this.isHigh()`. Press B in the sketch to call it. The counter jumps by 5 each press and turns red once it passes 10.",
       "hints": [
-        "Open the shplay docs drawer on the right — a method can call other methods on the same instance using `this.methodName()`."
+        "Open the moSHion docs drawer on the right — a method can call other methods on the same instance using `this.methodName()`."
       ]
     }
   ],

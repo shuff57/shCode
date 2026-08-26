@@ -1,10 +1,10 @@
 ## Cursor position every frame
 
-**Read before `6.7.4 Reading — shplay docs: mouse.pressing()`.** About 5 minutes.
+**Read before `6.7.4 Reading — moSHion docs: mouse.pressing()`.** About 5 minutes.
 
-`mouse.x` and `mouse.y` are numbers that shplay updates every frame. They hold the cursor's position in canvas coordinates — the same coordinate space your sprites live in. Top-left of the canvas is `(0, 0)`. Bottom-right is `(width, height)`.
+`mouse.x` and `mouse.y` are numbers that moSHion updates every frame. They hold the cursor's position in canvas coordinates — the same coordinate space your sprites live in. Top-left of the canvas is `(0, 0)`. Bottom-right is `(width, height)`.
 
-Because shplay updates them before each call to `draw()`, you can use them anywhere inside `draw()` without any extra setup.
+Because moSHion updates them before each call to `draw()`, you can use them anywhere inside `draw()` without any extra setup.
 
 **What you'll learn from it:**
 

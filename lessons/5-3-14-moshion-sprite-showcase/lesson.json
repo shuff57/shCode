@@ -1,0 +1,23 @@
+{
+  "id": "5-3-14-moshion-sprite-showcase",
+  "title": "5.3.14 Worked Example — Sprite Showcase",
+  "description": "A tour of the Sprite class re-read as OOP. Every `new Sprite(...)` is a constructor call; every `.color` / `.stroke` is a property on an instance.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion — Applied Game Development",
+  "unit": "5.3 Classes and Objects via moSHion",
+  "preview": "example",
+  "week": 12,
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

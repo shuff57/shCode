@@ -4,9 +4,9 @@
   "description": "Pick one or more of the stretch challenges and implement them in the editor. Auto-graded.",
   "type": "challenge",
   "estimateMins": 30,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 10,
   "slos": [
     "SLO-3"
@@ -17,7 +17,7 @@
       "title": "Create a canvas",
       "instructions": "Inside setup(), create a canvas of any size.",
       "hints": [
-        "Open the shplay docs drawer on the right and find the Canvas section."
+        "Open the moSHion docs drawer on the right and find the Canvas section."
       ]
     },
     {
@@ -25,7 +25,7 @@
       "title": "Create at least one sprite",
       "instructions": "In setup(), create a sprite and store it in the top-level `player` variable.",
       "hints": [
-        "Check the Sprite section of the shplay docs drawer for constructor arguments."
+        "Check the Sprite section of the moSHion docs drawer for constructor arguments."
       ]
     },
     {
@@ -33,7 +33,7 @@
       "title": "Clear the background each frame",
       "instructions": "Call background() as the first line of draw() so old frames don't stack up.",
       "hints": [
-        "Search the shplay docs drawer for background()."
+        "Search the moSHion docs drawer for background()."
       ]
     },
     {
@@ -73,7 +73,7 @@
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
-      "pattern": "function\\s+draw\\s*\\(\\s*\\)\\s*\\{[\\s\\S]*?background\\s*\\(",
+      "pattern": "background\\s*\\(",
       "flags": "",
       "points": 0
     },

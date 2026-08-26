@@ -8,7 +8,7 @@ By the end of this reading you should be able to answer:
 - When should you reach for the callback form?
 - What do the callback's two arguments mean — `(self, other) => { ... }`?
 
-shplay's overlap detection has two faces. They share a name (`overlaps`) but solve different problems.
+moSHion's overlap detection has two faces. They share a name (`overlaps`) but solve different problems.
 
 ---
 
@@ -78,7 +78,7 @@ basket.overlaps(apples, (b, apple) => {
 });
 ```
 
-The callback fires *during* `overlaps`, after shplay has finished its internal iteration. That makes it the safe place to call `apple.delete()` — you can't trip the iterate-then-delete bug because shplay isn't iterating anymore. (`sprite.delete()` destroys the sprite; `group.remove(sprite)` only unparents it. For cleanup, you almost always want `delete()`.)
+The callback fires *during* `overlaps`, after moSHion has finished its internal iteration. That makes it the safe place to call `apple.delete()` — you can't trip the iterate-then-delete bug because moSHion isn't iterating anymore. (`sprite.delete()` destroys the sprite; `group.remove(sprite)` only unparents it. For cleanup, you almost always want `delete()`.)
 
 ```js live
 let basket, apples, score = 0;

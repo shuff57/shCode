@@ -33,6 +33,18 @@ function toCommit(api: ApiCommit): Commit {
   };
 }
 
+// `Object.keys()` on a commit snapshot returns whatever order the JSON
+// happened to serialize in, not the order a student sees. lib/store.ts
+// defaults a lesson's own editor to script.js for JS-only preview modes
+// (console, jscad, moshion) for the same reason: it's the file that's
+// actually graded. Teacher-edit has no lesson.preview to check, but the
+// naming is a stable course-wide convention, so prefer it here too — a
+// teacher who starts typing "Push to student" should not be silently
+// editing index.html while script.js goes untouched.
+function defaultActiveFile(ids: string[]): string {
+  return ids.includes('script.js') ? 'script.js' : (ids[0] ?? '');
+}
+
 // ---------------------------------------------------------------------------
 // Styles — Dracula palette matching teacher/page.tsx
 // ---------------------------------------------------------------------------
@@ -297,7 +309,7 @@ function TeacherEditInner() {
     const ids = Object.keys(snapshot);
     setFiles(snapshot);
     setFileIds(ids);
-    setActiveFile(ids[0] ?? '');
+    setActiveFile(defaultActiveFile(ids));
     initializedRef.current = true;
   }, [commits, loadingCommits]);
 
@@ -344,7 +356,7 @@ function TeacherEditInner() {
     const ids = Object.keys(snapshot);
     setFiles(snapshot);
     setFileIds(ids);
-    setActiveFile(ids[0] ?? '');
+    setActiveFile(defaultActiveFile(ids));
     setTouchedFileIds(new Set());
     setCommitMsg('Teacher edit: ');
     setPushError('');

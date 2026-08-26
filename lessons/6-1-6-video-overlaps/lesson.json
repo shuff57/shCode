@@ -4,7 +4,7 @@
   "description": "The two flavors of `overlaps()` and why the callback form is cleaner for despawn-on-collide. Watch before `2.3.7 Apple Catcher`.",
   "type": "lesson",
   "estimateMins": 3,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.2 Overlaps and Collisions",
   "preview": "video",
   "week": 13,

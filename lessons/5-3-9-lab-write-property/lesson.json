@@ -4,9 +4,9 @@
   "description": "Mutate `b.color` on a space-bar press to practice assigning a new value to an instance property. First practice with dot-notation writes.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: shplay — Applied Game Development",
-  "unit": "5.3 Classes and Objects via shPlay",
-  "preview": "shplay",
+  "category": "Unit 2: moSHion — Applied Game Development",
+  "unit": "5.3 Classes and Objects via moSHion",
+  "preview": "moshion",
   "week": 12,
   "slos": [
     "SLO-2",
@@ -18,7 +18,7 @@
       "title": "Change b.color when space is pressed",
       "instructions": "Inside `draw()`, detect a space-bar press with `kb.presses('space')` and assign a new color to `b.color`. The box should change color on screen when you press space.",
       "hints": [
-        "Open the shplay docs drawer on the right and find the keyboard input section for detecting key presses."
+        "Open the moSHion docs drawer on the right and find the keyboard input section for detecting key presses."
       ]
     }
   ],

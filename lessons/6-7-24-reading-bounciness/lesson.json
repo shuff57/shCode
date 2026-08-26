@@ -1,18 +1,18 @@
 {
   "id": "6-7-24-reading-bounciness",
-  "title": "6.7.20 Reading — shplay docs: sprite.bounciness",
+  "title": "6.7.20 Reading — moSHion docs: sprite.bounciness",
   "description": "sprite.bounciness controls how much energy a sprite keeps after a collision — 0 is a dead thud, 1 is nearly lossless. Read this before 2.7.24a Worked Example — Bounciness Comparison.",
   "type": "lesson",
   "estimateMins": 7,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.7 Advanced Input",
   "preview": "reading",
   "week": 17,
   "slos": [
     "SLO-3"
   ],
-  "externalLink": "/docs/shplay",
-  "externalLinkLabel": "Open the in-app shplay docs",
+  "externalLink": "/docs/moshion",
+  "externalLinkLabel": "Open the in-app moSHion docs",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

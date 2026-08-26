@@ -14,4 +14,4 @@ public/jscad/lib/*.js -text
 # depends on this — keeping the working tree consistent as well is belt and
 # braces, and stops the whole file showing as changed on a Windows clone.
 public/jscad/runner.html   text eol=lf
-public/shplay/runner.html  text eol=lf
+public/moshion/runner.html  text eol=lf

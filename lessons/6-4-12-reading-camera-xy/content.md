@@ -39,4 +39,4 @@ Watch the row of dots scroll past as `camera.x` grows. No sprite moved — only 
 | **`camera.x` / `camera.y`** | The center of the visible viewport in world coordinates. |
 | **Viewport** | The rectangular window into the world that is rendered to the canvas. |
 | **World coordinates** | A sprite's absolute `pos.x` / `pos.y`, independent of camera position. |
-| **Default camera** | `camera.x = canvas.w / 2`, `camera.y = canvas.h / 2` — centered on the origin. |
+| **Default camera** | `camera.x = canvas.w / 2`, `camera.y = canvas.h / 2` — the view starts at the world origin, so a sprite at `(0, 0)` sits in the canvas's top-left corner. |

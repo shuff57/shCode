@@ -1,6 +1,6 @@
 # shCode — project notes for Claude
 
-A Next.js 15 (app router, `output: 'export'`) classroom app for a JavaScript + shplay
+A Next.js 15 (app router, `output: 'export'`) classroom app for a JavaScript + moSHion
 high-school CS course. Static site served from Cloudflare Pages; every `/api/*`
 route is a Pages Function in `functions/`, backed by a single D1 database
 (`shcode-commits`, binding `DB`).
@@ -101,7 +101,7 @@ Paths follow filenames under `functions/api/`.
 - `GET /api/lesson-submissions?lessonId=X` — append-only submit history for the caller
 - `POST /api/grade-written` — Ollama-backed essay grader. Text in, rubric out;
   diagram lessons send Mermaid plus a prose walk of the graph as the `response`.
-- `POST /api/ai-help` — streaming Socratic-tutor help; pulls keyword-matched shplay docs into the prompt. Per-student per-unit daily quota (`AI_HELP_DAILY_LIMIT`, default 10); teachers/admins exempt. Output is streamed `text/plain` with code blocks trimmed to ≤3 lines so a successful jailbreak still can't deliver a copy-pasteable solution. `X-RateLimit-Limit` / `X-RateLimit-Remaining` headers expose remaining quota.
+- `POST /api/ai-help` — streaming Socratic-tutor help; pulls keyword-matched moSHion docs into the prompt. Per-student per-unit daily quota (`AI_HELP_DAILY_LIMIT`, default 10); teachers/admins exempt. Output is streamed `text/plain` with code blocks trimmed to ≤3 lines so a successful jailbreak still can't deliver a copy-pasteable solution. `X-RateLimit-Limit` / `X-RateLimit-Remaining` headers expose remaining quota.
 
 ### Commits (student's own)
 - `GET  /api/commits?lessonId=X` — own history
@@ -142,7 +142,7 @@ Paths follow filenames under `functions/api/`.
   `WHERE`, and a missing id and someone else's id both 404 so ids can't be probed.
 - `GET /uploads/[id].[ext]` — **public, no auth**, deliberately outside `/api/`.
 
-  It has to be. The sketch iframe (`components/ShPlayPreview.tsx`) is
+  It has to be. The sketch iframe (`components/MoshionPreview.tsx`) is
   sandboxed *without* `allow-same-origin` so student code can't call the API
   as the student — which makes it an opaque origin, so the `SameSite=Lax`
   session cookie is never sent and an auth-gated image would 401 inside every

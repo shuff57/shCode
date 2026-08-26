@@ -4,9 +4,9 @@
   "description": "Combine Groups, overlap detection, and safe despawn into a playable asteroid scene. WASD steers the ship; an overlap with any asteroid ends the game.",
   "type": "assignment",
   "estimateMins": 60,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.2 Overlaps and Collisions",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 13,
   "slos": [
     "SLO-3",

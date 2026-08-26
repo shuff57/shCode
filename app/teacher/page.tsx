@@ -99,7 +99,7 @@ interface LessonMeta {
  * the matrix. Listing what IS code means the next preview type added defaults
  * to "not code" instead of silently joining that list.
  */
-const CODE_PREVIEWS = new Set(['console', 'example', 'shplay']);
+const CODE_PREVIEWS = new Set(['console', 'example', 'moshion']);
 
 // A student's lesson_state/commits rows can reference an id from before a
 // renumbering (ids recycle across years — see project memory). That id no
@@ -1428,7 +1428,7 @@ function DetailView({ classId }: { classId: string }) {
 
       {/* Shape tools vs code. Only JSCAD assignments can be gated — the setting
           decides which editor a JSCAD lesson opens in, and means nothing to a
-          shPlay or console one. */}
+          moSHion or console one. */}
       {activeView === 'roster' && (
         <LessonModeControl
           classId={classId}

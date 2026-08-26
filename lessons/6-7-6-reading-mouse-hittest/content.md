@@ -4,7 +4,7 @@
 
 A hit-test answers one question: is the cursor currently over this sprite? You need the answer before starting a drag — you only want the drag to begin when the player clicks directly on the sprite, not anywhere on the canvas.
 
-shplay gives you `world.getSpriteAt(x, y)`. Pass it the cursor coordinates and it returns the top-most sprite at that point — or `undefined` if there isn't one.
+moSHion gives you `world.getSpriteAt(x, y)`. Pass it the cursor coordinates and it returns the top-most sprite at that point — or `undefined` if there isn't one.
 
 ```js
 world.getSpriteAt(mouse.x, mouse.y)

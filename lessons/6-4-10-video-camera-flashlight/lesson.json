@@ -4,7 +4,7 @@
   "description": "Why the camera is a coordinate transform, not a 'real' object — the world stays put, only the viewport moves. Watch before `2.4.8 Worked Example — Camera Follow`.",
   "type": "lesson",
   "estimateMins": 4,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
   "preview": "video",
   "week": 15,

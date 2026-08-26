@@ -208,7 +208,7 @@ CHAPTERS = [
     ("4", "Synthesis -- Print Shop", [
         ("4.1 Print Shop -- Q1 Synthesis", 3, "synthesis"),
     ]),
-    ("5", "shPlay Foundations", [
+    ("5", "moSHion Foundations", [
         ("5.1 Hello Sprite and Movement", 1, "section"),                     # 184
         ("5.2 Physics Feel", 1, "section"),                                  # 453
         ("5.3 Classes and Instances + 5.4 Writing Your Own Classes", 2, "pair"),  # 165+504, one continuous book lesson
@@ -535,7 +535,7 @@ def write_course_schedule(assigned, wk, slack, last_item_date, n_available):
     a("")
     a("## CSCI 4 — Introduction to Programming Concepts and Methodologies")
     a("")
-    a("_JavaScript + shPlay + JSCAD. **CS meets on odd days only** (single track). Book-native "
+    a("_JavaScript + moSHion + JSCAD. **CS meets on odd days only** (single track). Book-native "
       "numbering: Unit N = book Chapter N, module N.S = Chapter N §N.S._")
     a("")
     a("> **GENERATED FILE — do not hand-edit.** Produced by `scripts/cs_schedule.py`; run "

@@ -4,9 +4,9 @@
   "description": "Three optional stretch prompts for Unit 2.7: build a SliderJoint piston sandbox, a trebuchet that uses a DistanceJoint + HingeJoint together, or a swinging rope chain with three or more HingeJoints.",
   "type": "challenge",
   "estimateMins": 30,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.7 Advanced Input",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 17,
   "slos": [
     "SLO-3"
@@ -18,7 +18,7 @@
       "title": "Create a canvas",
       "instructions": "Inside setup(), create a canvas of any size.",
       "hints": [
-        "Open the shplay docs drawer on the right and find the Canvas section."
+        "Open the moSHion docs drawer on the right and find the Canvas section."
       ]
     },
     {
@@ -26,7 +26,7 @@
       "title": "Create at least one sprite",
       "instructions": "In setup(), create at least one sprite.",
       "hints": [
-        "Check the Sprite section of the shplay docs drawer for constructor arguments."
+        "Check the Sprite section of the moSHion docs drawer for constructor arguments."
       ]
     },
     {
@@ -34,7 +34,7 @@
       "title": "Clear the background each frame",
       "instructions": "Call background() inside draw() so old frames don't stack up.",
       "hints": [
-        "Search the shplay docs drawer for background()."
+        "Search the moSHion docs drawer for background()."
       ]
     },
     {

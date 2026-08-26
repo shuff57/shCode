@@ -4,7 +4,7 @@
   "description": "Implement two auto-save triggers: when the player reaches a level-complete zone, and a timer-based save every 30 seconds.",
   "type": "lesson",
   "estimateMins": 20,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "example",
   "week": 16,

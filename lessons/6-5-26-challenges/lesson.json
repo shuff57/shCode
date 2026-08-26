@@ -4,9 +4,9 @@
   "description": "Extend your save system: save file previews (show slot contents before loading), save timestamps, multiple profiles, or a 'delete all saves' with double-confirmation.",
   "type": "challenge",
   "estimateMins": 30,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.5 Save and Load",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 16,
   "slos": [
     "SLO-3"

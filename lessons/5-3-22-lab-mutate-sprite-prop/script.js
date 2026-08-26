@@ -7,7 +7,7 @@ class Mover {
   }
 
   // STEP 1: Write moveRight(dx) that adds dx to this.sprite.x.
-  //   Reach through the composition: this.sprite is the shPlay Sprite;
+  //   Reach through the composition: this.sprite is the moSHion Sprite;
   //   this.sprite.x is that sprite's horizontal position.
   //   Adding dx to it moves the sprite to the right.
 }

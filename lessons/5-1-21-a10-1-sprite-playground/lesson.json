@@ -4,9 +4,9 @@
   "description": "Build a sprite playground combining canvas, WASD-controlled sprite, auto-motion, and on-screen text. Auto-graded.",
   "type": "assignment",
   "estimateMins": 45,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 10,
   "slos": [
     "SLO-3"

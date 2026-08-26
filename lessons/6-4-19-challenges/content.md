@@ -100,5 +100,5 @@ function draw() {
 ## If you finish all three
 
 - Combine: a tall, parallaxing level with a mirroring player and a smooth `lerp` follow on both axes — that's a real platformer camera.
-- Read the shplay `Camera` docs section. There may be a built-in `camera.follow(sprite)` that does much of this for you. How does yours compare?
+- Read the moSHion `Camera` docs section. There may be a built-in `camera.follow(sprite)` that does much of this for you. How does yours compare?
 - Show a classmate your favorite stretch and explain why you tuned the lerp factor the way you did.

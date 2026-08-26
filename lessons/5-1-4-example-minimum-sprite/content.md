@@ -1,4 +1,4 @@
-**Goal:** Prove that a canvas + sprite + background is the smallest possible shplay program.
+**Goal:** Prove that a canvas + sprite + background is the smallest possible moSHion program.
 
 ## Step 1 — Hit Run
 
@@ -56,5 +56,5 @@ function draw() {
 
 - `setup()` runs **once**. Create long-lived things here.
 - `draw()` runs **every frame**. Do per-frame things here (input, movement, scoring).
-- You don't call a render method on a sprite. shplay handles rendering.
+- You don't call a render method on a sprite. moSHion handles rendering.
 - `background(...)` is the first thing in `draw()`. Skip it and old frames stack up like a long-exposure photo.

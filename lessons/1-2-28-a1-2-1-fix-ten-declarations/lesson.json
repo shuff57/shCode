@@ -39,7 +39,7 @@
       "description": "studentAge is declared and holds a number, not text",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+studentAge\\s*=\\s*\\d+\\s*;",
+      "pattern": "(?:let|const|var)\\s+studentAge\\s*=\\s*[\\d.]",
       "flags": "",
       "points": 0
     },
@@ -49,17 +49,17 @@
       "description": "firstName is declared and holds properly quoted text",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+firstName\\s*=\\s*([\"'])[^\"']+\\1\\s*;",
+      "pattern": "(?:let|const|var)\\s+firstName\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|`[^`]*`)",
       "flags": "",
       "points": 0
     },
     {
       "id": "r3",
       "title": "isEnrolled is a real boolean",
-      "description": "isEnrolled holds true or false without quotes",
+      "description": "isEnrolled holds a real boolean -- true, false, or a comparison that produces one -- not quoted text",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+isEnrolled\\s*=\\s*(true|false)\\s*;",
+      "pattern": "(?:let|const|var)\\s+isEnrolled\\s*=\\s*(?!\\s)(?![\"'`])(?!\\d[\\d.]*\\s*[;\\n])[^;\\n]+",
       "flags": "",
       "points": 0
     },
@@ -69,7 +69,7 @@
       "description": "gradeLevel uses let or const rather than being assigned with no keyword",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+gradeLevel\\s*=",
+      "pattern": "(?:let|const|var)\\s+gradeLevel\\s*=",
       "flags": "",
       "points": 0
     },
@@ -79,7 +79,7 @@
       "description": "The value that never changes is declared with const",
       "type": "regex",
       "file": "script.js",
-      "pattern": "const\\s+MAX_STUDENTS\\s*=\\s*\\d+\\s*;",
+      "pattern": "const\\s+MAX_STUDENTS\\s*=\\s*[\\d.]",
       "flags": "",
       "points": 0
     },
@@ -89,7 +89,7 @@
       "description": "The mystery name p has been renamed to unitPrice",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+unitPrice\\s*=\\s*[\\d.]+\\s*;",
+      "pattern": "(?:let|const|var)\\s+unitPrice\\s*=\\s*[\\d.]",
       "flags": "",
       "points": 0
     },
@@ -99,7 +99,7 @@
       "description": "The mystery name q has been renamed to itemCount",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+itemCount\\s*=\\s*\\d+\\s*;",
+      "pattern": "(?:let|const|var)\\s+itemCount\\s*=\\s*\\d",
       "flags": "",
       "points": 0
     },
@@ -109,7 +109,7 @@
       "description": "The snake_case or all-lowercase name has become camelCase",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+favouriteColour\\s*=",
+      "pattern": "(?:let|const|var)\\s+favouriteColour\\s*=",
       "flags": "",
       "points": 0
     },
@@ -119,7 +119,7 @@
       "description": "The deliberately-empty value uses the null keyword without quotes",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+middleName\\s*=\\s*null\\s*;",
+      "pattern": "(?:let|const|var)\\s+middleName\\s*=\\s*null\\b",
       "flags": "",
       "points": 0
     },
@@ -129,8 +129,8 @@
       "description": "finalScore is declared with let and no value, so it holds undefined until set",
       "type": "regex",
       "file": "script.js",
-      "pattern": "let\\s+finalScore\\s*;",
-      "flags": "",
+      "pattern": "(?:let|var)\\s+finalScore\\s*(?:;|$)",
+      "flags": "m",
       "points": 0
     }
   ],

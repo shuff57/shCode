@@ -4,7 +4,7 @@
   "description": "Step-by-step: build a survival game, detect when the game ends, and use storeItem to save the player's high score so it survives a reload.",
   "type": "lesson",
   "estimateMins": 12,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "example",
   "week": 16,

@@ -4,7 +4,7 @@
   "description": "States and saves work together: when the player reaches 'gameover', auto-save their score. When they hit 'win', save their victory. States trigger saves.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "video",
   "week": 17,

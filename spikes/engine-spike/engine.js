@@ -1,4 +1,4 @@
-/* teaching-engine.js — q5play-style API spike, physics via planck.js (Box2D).
+/* teaching-engine.js — beginner-game-API API spike, physics via planck.js (Box2D).
  *
  * Goal: prove we can reimplement the exact API surface Q2 of the curriculum
  * already teaches, license-clean (our facade is MIT; planck.js is MIT, a
@@ -128,7 +128,7 @@
   // ---- sprite -----------------------------------------------------------
 
   // A live vector: reads/writes the underlying Box2D body on every axis access,
-  // so `player.vel.x = 3` and `player.pos.y += 5` work exactly like q5play.
+  // so `player.vel.x = 3` and `player.pos.y += 5` work exactly like the reference API.
   function liveVec(read, write) {
     return {
       get x() { return read().x; },
@@ -140,7 +140,7 @@
 
   class Sprite {
     constructor(x, y, w, h, bodyType) {
-      // Real q5play constructor-argument dispatch, matched to actual lesson
+      // The reference API constructor-argument dispatch, matched to actual lesson
       // call shapes (audited across all 86 real script.js/solution.js):
       //   new Sprite(x, y)             -> 50x50 square (group-factory shorthand)
       //   new Sprite(x, y, d)          -> circle, diameter d (2.2.6 lab)
@@ -232,7 +232,7 @@
 
     // still art — mutually exclusive with an active `ani` (2.4.3d).
     // A string with no '.' is treated as an emoji/text placeholder rather
-    // than an image URL (matches real q5play's `img` setter heuristic —
+    // than an image URL (matches the reference API's `img` setter heuristic —
     // exercised by real lesson code, e.g. `player.image = '🧍'`).
     get image() { return this._img || this._emoji; }
     set image(url) {
@@ -261,7 +261,7 @@
 
     changeAni(name) {
       const ani = this._anis && this._anis[name];
-      if (!ani) return; // unregistered name — silent no-op, matches q5play
+      if (!ani) return; // unregistered name — silent no-op, matches the reference API
       this.ani = ani;
     }
 
@@ -279,7 +279,7 @@
     set angularVelocity(degPerFrame) { this._body.setAngularVelocity((degPerFrame * Math.PI / 180) * FPS); }
 
     applyForce(fx, fy) {
-      // raw Box2D Newtons, like q5play's applyForce — the old px/frame²
+      // raw Box2D Newtons, like the reference API's applyForce — the old px/frame²
       // conversion (x120) made forces 120x too strong.
       this._body.applyForceToCenter(pl.Vec2(fx, fy), true);
     }
@@ -379,14 +379,14 @@
 
   // ---- animation (2.4.x) --------------------------------------------------
   // Minimal sprite-sheet animation: a named horizontal frame-strip, advanced
-  // on a fixed delay. Not q5play's full texture-atlas system (no multi-row
+  // on a fixed delay. Not the reference API's full texture-atlas system (no multi-row
   // atlases, no addAnis) — real lesson code only ever calls addAni/changeAni.
 
   class Ani {
     constructor(name, sheetUrl, frameCount) {
       this.name = name;
       this.frameCount = frameCount || 1;
-      this.frameDelay = 4; // game frames per animation frame (q5play default)
+      this.frameDelay = 4; // game frames per animation frame (the reference API default)
       this.frame = 0;
       this._tick = 0;
       this.spriteSheet = new Image();
@@ -574,9 +574,9 @@
     }
   }
   class GlueJoint extends Joint {
-    // Ported from the real q5play GlueJoint (public/q5play/q5play.js ~5552):
+    // Ported from the reference API GlueJoint (the reference implementation):
     // a WeldJoint rigidly fusing a and b at their CURRENT relative pose,
-    // anchored at spriteA's position. No `opt` — q5play's GlueJoint takes
+    // anchored at spriteA's position. No `opt` — the reference API's GlueJoint takes
     // only (spriteA, spriteB), unlike this file's other joints.
     constructor(a, b) {
       super();

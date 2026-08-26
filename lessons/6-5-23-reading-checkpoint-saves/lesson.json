@@ -4,7 +4,7 @@
   "description": "An auto-save fires when something important happens — reaching a checkpoint, finishing a level, hitting a score milestone.",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "reading",
   "week": 16,

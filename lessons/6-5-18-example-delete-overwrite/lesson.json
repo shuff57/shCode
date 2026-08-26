@@ -4,7 +4,7 @@
   "description": "Manage save slots: delete old saves with removeItem, confirm before overwriting, handle the empty-slot case.",
   "type": "lesson",
   "estimateMins": 20,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "example",
   "week": 16,

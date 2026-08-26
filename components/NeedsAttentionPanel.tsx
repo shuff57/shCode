@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 // ---------------------------------------------------------------------------
 
 export interface NeedsAttentionData {
-  inactive: Array<{ student_email: string; last_active: number; days_since_active: number }>;
+  inactive: Array<{ student_email: string; last_active: number | null; days_since_active: number }>;
   failed_submission: Array<{ student_email: string; lesson_id: string; score: number; possible: number; submitted_at: number }>;
   stuck: Array<{ student_email: string; lesson_id: string; started_at: number; days_since_started: number }>;
   /** Newest submission is an attempt the AI grader failed on — needs a human. */
@@ -232,7 +232,7 @@ export function NeedsAttentionPanel({ classId, onOpenStudent, onOpenTeacherEdit 
                 </span>
                 <span style={mutedStyle}>
                   {' '}&middot; {item.days_since_active} day{item.days_since_active === 1 ? '' : 's'} since last activity
-                  {' '}&middot; last active {formatTs(item.last_active)}
+                  {' '}&middot; {item.last_active !== null ? `last active ${formatTs(item.last_active)}` : 'never opened a lesson'}
                 </span>
               </div>
             ))}

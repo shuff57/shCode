@@ -4,7 +4,7 @@
 
 By the end of this reading you should be able to answer:
 
-- Where does `switch` go in a shplay sketch?
+- Where does `switch` go in a moSHion sketch?
 - How often does the switch run?
 - Why is this called a "dispatch" pattern?
 
@@ -62,5 +62,5 @@ Run it and press G, then M, then G again. Every frame, `draw()` checks `screen` 
 | Term | Meaning |
 |------|---------|
 | **Dispatch** | Using `switch` to route execution to the right code path based on a variable's value. |
-| **draw() loop** | shplay calls `draw()` 60 times per second. The switch runs on every call. |
+| **draw() loop** | moSHion calls `draw()` 60 times per second. The switch runs on every call. |
 | **Case ownership** | Each case is responsible for its own drawing AND its own input handling. |

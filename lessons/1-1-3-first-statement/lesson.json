@@ -39,7 +39,7 @@
       "description": "The first console.log statement is still present",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\(\\s*\"Welcome to the browser console!\"",
+      "pattern": "console\\.log\\(\\s*[\"'`]Welcome to the browser console![\"'`]",
       "flags": "i",
       "points": 0
     },
@@ -49,7 +49,7 @@
       "description": "The second console.log statement is still present",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\(\\s*\"My name is shCode\\.\"",
+      "pattern": "console\\.log\\(\\s*[\"'`]My name is shCode\\.[\"'`]",
       "flags": "i",
       "points": 0
     },
@@ -59,7 +59,7 @@
       "description": "The third console.log statement is still present",
       "type": "regex",
       "file": "script.js",
-      "pattern": "console\\.log\\(\\s*\"Today we start Unit 1\\.\"",
+      "pattern": "console\\.log\\(\\s*[\"'`]Today we start Unit 1\\.[\"'`]",
       "flags": "i",
       "points": 0
     },

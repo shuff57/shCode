@@ -2882,11 +2882,11 @@
     },
     {
       "id": "5-1-1-slides",
-      "title": "5.1.1 Slides — shplay Foundations",
+      "title": "5.1.1 Slides — moSHion Foundations",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": null
     },
     {
@@ -2895,16 +2895,16 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
-      "id": "5-1-11-q5play-intro",
+      "id": "5-1-11-moshion-intro",
       "title": "5.1.11 Hello Sprite",
       "unit": "5.1 Hello Sprite and Movement",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
@@ -2913,7 +2913,7 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
@@ -2922,7 +2922,7 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
@@ -2931,7 +2931,7 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
@@ -2940,7 +2940,7 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
@@ -2949,7 +2949,7 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
@@ -2958,16 +2958,16 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-18-lab-else-to-zero",
       "title": "5.1.18 Lab — Delete the else, watch drift",
       "unit": "5.1 Hello Sprite and Movement",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
@@ -2976,34 +2976,34 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-2-video-intro",
-      "title": "5.1.2 Video — Your first shplay sketch",
+      "title": "5.1.2 Video — Your first moSHion sketch",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
-      "id": "5-1-20-q5play-move-keys",
+      "id": "5-1-20-moshion-move-keys",
       "title": "5.1.20 Make it Move",
       "unit": "5.1 Hello Sprite and Movement",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-21-a10-1-sprite-playground",
       "title": "5.1.21 Sprite Playground",
       "unit": "5.1 Hello Sprite and Movement",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
@@ -3012,16 +3012,16 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "assignment",
       "type": "assignment",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-23-challenges",
       "title": "5.1.23 Challenges",
       "unit": "5.1 Hello Sprite and Movement",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "challenge",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
@@ -3030,7 +3030,7 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
@@ -3039,7 +3039,7 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
@@ -3048,7 +3048,7 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
@@ -3057,16 +3057,16 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-7-lab-one-sprite",
       "title": "5.1.7 Lab — Drop one sprite, change its color",
       "unit": "5.1 Hello Sprite and Movement",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
@@ -3075,7 +3075,7 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
@@ -3084,70 +3084,70 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     },
     {
       "id": "5-3-1-slides",
       "title": "5.3.1 Slides — Object-Oriented Programming",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "unit": "5.3 Classes and Objects via moSHion",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": null
     },
     {
       "id": "5-3-10-lab-two-instances",
       "title": "5.3.10 Lab — Two sprites, two property values",
-      "unit": "5.3 Classes and Objects via shPlay",
-      "preview": "shplay",
+      "unit": "5.3 Classes and Objects via moSHion",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-11-reading-this-noun",
       "title": "5.3.11 Reading — this is a noun",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "unit": "5.3 Classes and Objects via moSHion",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-12-example-this-pronoun",
       "title": "5.3.12 Worked Example — this is a pronoun",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "unit": "5.3 Classes and Objects via moSHion",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-13-lab-build-sprite",
       "title": "5.3.13 Your Turn — Build a Sprite",
-      "unit": "5.3 Classes and Objects via shPlay",
-      "preview": "shplay",
+      "unit": "5.3 Classes and Objects via moSHion",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
-      "id": "5-3-14-q5play-sprite-showcase",
+      "id": "5-3-14-moshion-sprite-showcase",
       "title": "5.3.14 Worked Example — Sprite Showcase",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "unit": "5.3 Classes and Objects via moSHion",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-15-video-this-keyword",
       "title": "5.3.15 Video — The this keyword",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "unit": "5.3 Classes and Objects via moSHion",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
@@ -3156,52 +3156,52 @@
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-17-lab-method-no-params",
       "title": "5.4.2 Lab — Method with no params",
       "unit": "5.4 Writing Your Own Classes",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-18-lab-method-with-params",
       "title": "5.4.3 Lab — Method with parameters",
       "unit": "5.4 Writing Your Own Classes",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-19-lab-method-returns",
       "title": "5.4.4 Lab — Method that returns a value",
       "unit": "5.4 Writing Your Own Classes",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-2-video-new-sprite",
       "title": "5.3.2 Video — What new Sprite() actually does",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "unit": "5.3 Classes and Objects via moSHion",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-20-lab-method-calls-method",
       "title": "5.4.5 Lab — A method calling this.otherMethod()",
       "unit": "5.4 Writing Your Own Classes",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
@@ -3210,7 +3210,7 @@
       "unit": "5.4 Writing Your Own Classes",
       "preview": "diagram",
       "type": "assignment",
-      "category": "Unit 2: shPlay Game Development",
+      "category": "Unit 2: moSHion Game Development",
       "week": null
     },
     {
@@ -3219,25 +3219,25 @@
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-22-lab-mutate-sprite-prop",
       "title": "5.4.8 Lab — Mutate this.sprite.x from a method",
       "unit": "5.4 Writing Your Own Classes",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-23-lab-cleanup",
       "title": "5.4.9 Lab — Cleanup with this.sprite.delete()",
       "unit": "5.4 Writing Your Own Classes",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
@@ -3246,34 +3246,34 @@
       "unit": "5.4 Writing Your Own Classes",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-25-lab-three-vars",
       "title": "5.4.11 Lab — Three Enemies in three variables",
       "unit": "5.4 Writing Your Own Classes",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-26-lab-array-of-instances",
       "title": "5.4.12 Lab — An array of Enemies",
       "unit": "5.4 Writing Your Own Classes",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-27-lab-loop-instances",
       "title": "5.4.13 Lab — Loop over an array of instances",
       "unit": "5.4 Writing Your Own Classes",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
@@ -3282,7 +3282,7 @@
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
@@ -3291,7 +3291,7 @@
       "unit": "5.4 Writing Your Own Classes",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
@@ -3300,16 +3300,16 @@
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shPlay Game Development",
+      "category": "Unit 2: moSHion Game Development",
       "week": null
     },
     {
       "id": "5-3-3-reading-classes",
       "title": "5.3.3 Reading — Class and instance",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "unit": "5.3 Classes and Objects via moSHion",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
@@ -3318,16 +3318,16 @@
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-31-a12-1-collectible",
       "title": "5.4.18 Collectible Class",
       "unit": "5.4 Writing Your Own Classes",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
@@ -3336,7 +3336,7 @@
       "unit": "5.4 Writing Your Own Classes",
       "preview": "assignment",
       "type": "assignment",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
@@ -3345,70 +3345,70 @@
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-34-challenges",
       "title": "5.4.21 Challenges",
       "unit": "5.4 Writing Your Own Classes",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "challenge",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-4-reading-new-operator",
       "title": "5.3.4 Reading — The new operator",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "unit": "5.3 Classes and Objects via moSHion",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-5-reading-constructor",
       "title": "5.3.5 Reading — constructor and its parameters",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "unit": "5.3 Classes and Objects via moSHion",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-6-example-devtools-reveal",
       "title": "5.3.6 Worked Example — You've been using classes",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "unit": "5.3 Classes and Objects via moSHion",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-7-reading-properties",
       "title": "5.3.7 Reading — Properties: data on this",
-      "unit": "5.3 Classes and Objects via shPlay",
+      "unit": "5.3 Classes and Objects via moSHion",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-8-lab-read-property",
       "title": "5.3.8 Lab — Read a property",
-      "unit": "5.3 Classes and Objects via shPlay",
-      "preview": "shplay",
+      "unit": "5.3 Classes and Objects via moSHion",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-9-lab-write-property",
       "title": "5.3.9 Lab — Write a property",
-      "unit": "5.3 Classes and Objects via shPlay",
-      "preview": "shplay",
+      "unit": "5.3 Classes and Objects via moSHion",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 12
     },
     {
@@ -3417,7 +3417,7 @@
       "unit": "6.1 Groups and Overlaps",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": null
     },
     {
@@ -3426,43 +3426,43 @@
       "unit": "6.2 Overlaps and Collisions",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-11-a13-1-asteroid-field",
       "title": "6.2.6 Asteroid Field",
       "unit": "6.2 Overlaps and Collisions",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-12-challenges",
       "title": "6.2.7 Challenges",
       "unit": "6.2 Overlaps and Collisions",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "challenge",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-2-video-groups-intro",
-      "title": "6.1.2 Video — Groups in shplay",
+      "title": "6.1.2 Video — Groups in moshion",
       "unit": "6.1 Groups and Overlaps",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-3-reading-groups",
-      "title": "6.1.3 Reading — shplay docs: Groups",
+      "title": "6.1.3 Reading — moSHion docs: Groups",
       "unit": "6.1 Groups and Overlaps",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 13
     },
     {
@@ -3471,16 +3471,16 @@
       "unit": "6.1 Groups and Overlaps",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-5-groups-sandbox",
       "title": "6.1.5 Groups Sandbox",
       "unit": "6.1 Groups and Overlaps",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 13
     },
     {
@@ -3489,7 +3489,7 @@
       "unit": "6.2 Overlaps and Collisions",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 13
     },
     {
@@ -3498,16 +3498,16 @@
       "unit": "6.2 Overlaps and Collisions",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-8-reading-collisions",
-      "title": "6.2.3 Reading — shplay docs: Collisions + Overlaps",
+      "title": "6.2.3 Reading — moSHion docs: Collisions + Overlaps",
       "unit": "6.2 Overlaps and Collisions",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 13
     },
     {
@@ -3516,7 +3516,7 @@
       "unit": "6.2 Overlaps and Collisions",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 13
     },
     {
@@ -3525,16 +3525,16 @@
       "unit": "6.3 Physics Applications",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": null
     },
     {
       "id": "6-3-10-a14-2-car-ramp",
       "title": "6.3.10 Car on a Ramp",
       "unit": "6.3 Physics Applications",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 14
     },
     {
@@ -3543,16 +3543,16 @@
       "unit": "6.3 Physics Applications",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 14
     },
     {
       "id": "6-3-3-reading-input-edges",
-      "title": "6.3.3 Reading — shplay docs: Input edges",
+      "title": "6.3.3 Reading — moSHion docs: Input edges",
       "unit": "6.3 Physics Applications",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 14
     },
     {
@@ -3561,7 +3561,7 @@
       "unit": "6.3 Physics Applications",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 14
     },
     {
@@ -3570,16 +3570,16 @@
       "unit": "6.3 Physics Applications",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 14
     },
     {
       "id": "6-3-6-reading-touching",
-      "title": "6.3.6 Reading — shplay docs: Colliding + Ground Detection",
+      "title": "6.3.6 Reading — moSHion docs: Colliding + Ground Detection",
       "unit": "6.3 Physics Applications",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 14
     },
     {
@@ -3588,7 +3588,7 @@
       "unit": "6.3 Physics Applications",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 14
     },
     {
@@ -3597,16 +3597,16 @@
       "unit": "6.3 Physics Applications",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 14
     },
     {
       "id": "6-3-9-a14-1-space-jumper",
       "title": "6.3.9 Space Jumper",
       "unit": "6.3 Physics Applications",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 14
     },
     {
@@ -3615,7 +3615,7 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": null
     },
     {
@@ -3624,16 +3624,16 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-11-reading-camera",
-      "title": "6.4.11 Reading — shplay docs: Camera",
+      "title": "6.4.11 Reading — moSHion docs: Camera",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
@@ -3642,7 +3642,7 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
@@ -3651,7 +3651,7 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
@@ -3660,7 +3660,7 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
@@ -3669,7 +3669,7 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
@@ -3678,7 +3678,7 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
@@ -3687,43 +3687,43 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-18-a15-1-platformer",
       "title": "6.4.18 Side-Scrolling Platformer",
       "unit": "6.4 Animated Sprites and Camera",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-19-challenges",
       "title": "6.4.19 Challenges",
       "unit": "6.4 Animated Sprites and Camera",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "challenge",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-2-video-animating-sprite",
-      "title": "6.4.2 Video — Animating a sprite in shplay",
+      "title": "6.4.2 Video — Animating a sprite in moshion",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-3-reading-animation",
-      "title": "6.4.3 Reading — shplay docs: Animation",
+      "title": "6.4.3 Reading — moSHion docs: Animation",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
@@ -3732,7 +3732,7 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
@@ -3741,7 +3741,7 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
@@ -3750,7 +3750,7 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
@@ -3759,7 +3759,7 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
@@ -3768,16 +3768,16 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-9-animated-sprites-sandbox",
       "title": "6.4.9 Animated Sprites Sandbox",
       "unit": "6.4 Animated Sprites and Camera",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 15
     },
     {
@@ -3786,25 +3786,25 @@
       "unit": "6.5 Save and Load",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": null
     },
     {
       "id": "6-5-10-reading-json-parse",
-      "title": "6.5.10 Reading — shplay docs: JSON.parse(str)",
+      "title": "6.5.10 Reading — moSHion docs: JSON.parse(str)",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-11-reading-store-structured",
-      "title": "6.5.11 Reading — shplay docs: Storing Structured Data",
+      "title": "6.5.11 Reading — moSHion docs: Storing Structured Data",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3813,7 +3813,7 @@
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3822,16 +3822,16 @@
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-14-reading-loadjson-async",
-      "title": "6.5.14 Reading — shplay docs: loadJSON is Async",
+      "title": "6.5.14 Reading — moSHion docs: loadJSON is Async",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3840,16 +3840,16 @@
       "unit": "6.5 Save and Load",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-16-reading-removeitem-clearstorage",
-      "title": "6.5.16 Reading — shplay docs: removeItem and clearStorage",
+      "title": "6.5.16 Reading — moSHion docs: removeItem and clearStorage",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3858,7 +3858,7 @@
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3867,7 +3867,7 @@
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3876,7 +3876,7 @@
       "unit": "6.5 Save and Load",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3885,7 +3885,7 @@
       "unit": "6.5 Save and Load",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3894,7 +3894,7 @@
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3903,7 +3903,7 @@
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shPlay Game Development",
+      "category": "Unit 2: moSHion Game Development",
       "week": null
     },
     {
@@ -3912,7 +3912,7 @@
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3921,7 +3921,7 @@
       "unit": "6.5 Save and Load",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3930,7 +3930,7 @@
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3939,25 +3939,25 @@
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-25-a16-1-save-system",
       "title": "6.5.26 Save System — Build Save/Load with Slots",
       "unit": "6.5 Save and Load",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-26-challenges",
       "title": "6.5.27 Challenges — Extended Save Features",
       "unit": "6.5 Save and Load",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "challenge",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3966,7 +3966,7 @@
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3975,7 +3975,7 @@
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3984,7 +3984,7 @@
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -3993,7 +3993,7 @@
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -4002,7 +4002,7 @@
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -4011,16 +4011,16 @@
       "unit": "6.5 Save and Load",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-9-reading-json-stringify",
-      "title": "6.5.9 Reading — shplay docs: JSON.stringify(obj)",
+      "title": "6.5.9 Reading — moSHion docs: JSON.stringify(obj)",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 16
     },
     {
@@ -4029,7 +4029,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": null
     },
     {
@@ -4038,7 +4038,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4047,7 +4047,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4056,7 +4056,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4065,7 +4065,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4074,16 +4074,16 @@
       "unit": "6.6 Game State Machines",
       "preview": "diagram",
       "type": "assignment",
-      "category": "Unit 2: shPlay Game Development",
+      "category": "Unit 2: moSHion Game Development",
       "week": null
     },
     {
       "id": "6-6-14-reading-transitions-input",
-      "title": "6.6.15 Reading — shplay docs: Input-Driven Transitions",
+      "title": "6.6.15 Reading — moSHion docs: Input-Driven Transitions",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4092,16 +4092,16 @@
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-16-reading-transitions-condition",
-      "title": "6.6.17 Reading — shplay docs: Condition-Driven Transitions",
+      "title": "6.6.17 Reading — moSHion docs: Condition-Driven Transitions",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4110,7 +4110,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4119,7 +4119,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4128,7 +4128,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4137,7 +4137,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "diagram",
       "type": "assignment",
-      "category": "Unit 2: shPlay Game Development",
+      "category": "Unit 2: moSHion Game Development",
       "week": null
     },
     {
@@ -4146,7 +4146,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4155,7 +4155,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4164,7 +4164,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4173,7 +4173,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4182,25 +4182,25 @@
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-24-a16-2-game-states",
       "title": "6.6.26 Game States — State Machine with Persistence",
       "unit": "6.6 Game State Machines",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-25-challenges",
       "title": "6.6.27 Challenges — Extended State Features",
       "unit": "6.6 Game State Machines",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "challenge",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4209,7 +4209,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4218,16 +4218,16 @@
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-4-reading-switch-dispatch",
-      "title": "6.6.4 Reading — shplay docs: switch in draw()",
+      "title": "6.6.4 Reading — moSHion docs: switch in draw()",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4236,7 +4236,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4245,16 +4245,16 @@
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-7-reading-state-variable",
-      "title": "6.6.7 Reading — shplay docs: The state Variable",
+      "title": "6.6.7 Reading — moSHion docs: The state Variable",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4263,7 +4263,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4272,7 +4272,7 @@
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4281,7 +4281,7 @@
       "unit": "6.7 Advanced Input and Joints",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": null
     },
     {
@@ -4290,7 +4290,7 @@
       "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4299,25 +4299,25 @@
       "unit": "6.7 Advanced Input and Joints",
       "preview": "diagram",
       "type": "assignment",
-      "category": "Unit 2: shPlay Game Development",
+      "category": "Unit 2: moSHion Game Development",
       "week": null
     },
     {
       "id": "6-7-11-video-joints-intro",
-      "title": "6.8.1 Video — Joints in shplay",
+      "title": "6.8.1 Video — Joints in moshion",
       "unit": "6.8 Joints",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-12-reading-distance-joint",
-      "title": "6.8.2 Reading — shplay docs: DistanceJoint",
+      "title": "6.8.2 Reading — moSHion docs: DistanceJoint",
       "unit": "6.8 Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4326,16 +4326,16 @@
       "unit": "6.8 Joints",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-14-reading-hinge-joint",
-      "title": "6.8.4 Reading — shplay docs: HingeJoint",
+      "title": "6.8.4 Reading — moSHion docs: HingeJoint",
       "unit": "6.8 Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4344,25 +4344,25 @@
       "unit": "6.8 Joints",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-16-reading-joint-delete",
-      "title": "6.8.6 Reading — shplay docs: joint.delete()",
+      "title": "6.8.6 Reading — moSHion docs: joint.delete()",
       "unit": "6.8 Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-17-reading-applyforce",
-      "title": "6.7.12 Reading — shplay docs: applyForce(fx, fy)",
+      "title": "6.7.12 Reading — moSHion docs: applyForce(fx, fy)",
       "unit": "6.7 Advanced Input",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4371,7 +4371,7 @@
       "unit": "6.7 Advanced Input",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4380,7 +4380,7 @@
       "unit": "6.7 Advanced Input",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4389,7 +4389,7 @@
       "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4398,7 +4398,7 @@
       "unit": "6.7 Advanced Input",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4407,7 +4407,7 @@
       "unit": "6.7 Advanced Input",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4416,7 +4416,7 @@
       "unit": "6.7 Advanced Input",
       "preview": "diagram",
       "type": "assignment",
-      "category": "Unit 2: shPlay Game Development",
+      "category": "Unit 2: moSHion Game Development",
       "week": null
     },
     {
@@ -4425,7 +4425,7 @@
       "unit": "6.7 Advanced Input",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4434,16 +4434,16 @@
       "unit": "6.7 Advanced Input",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-24-reading-bounciness",
-      "title": "6.7.20 Reading — shplay docs: sprite.bounciness",
+      "title": "6.7.20 Reading — moSHion docs: sprite.bounciness",
       "unit": "6.7 Advanced Input",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4452,7 +4452,7 @@
       "unit": "6.7 Advanced Input",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4461,25 +4461,25 @@
       "unit": "6.7 Advanced Input",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-27-a17-1-pong-sumo",
       "title": "6.7.23 Two-Player Pong-Sumo",
       "unit": "6.7 Advanced Input",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-28-challenges",
       "title": "6.7.24 Challenges — SliderJoint, Trebuchet, Swinging Rope",
       "unit": "6.7 Advanced Input",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "challenge",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4488,34 +4488,34 @@
       "unit": "6.7 Advanced Input",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-3-reading-mouse-pos",
-      "title": "6.7.3 Reading — shplay docs: mouse.x and mouse.y",
+      "title": "6.7.3 Reading — moSHion docs: mouse.x and mouse.y",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-4-reading-mouse-pressing",
-      "title": "6.7.4 Reading — shplay docs: mouse.pressing()",
+      "title": "6.7.4 Reading — moSHion docs: mouse.pressing()",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-5-reading-mouse-presses",
-      "title": "6.7.5 Reading — shplay docs: mouse.presses()",
+      "title": "6.7.5 Reading — moSHion docs: mouse.presses()",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4524,7 +4524,7 @@
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4533,7 +4533,7 @@
       "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4542,7 +4542,7 @@
       "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
@@ -4551,16 +4551,16 @@
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 17
     },
     {
       "id": "7-1-1-arcade-cabinet",
       "title": "7.1.1 Arcade Cabinet (Q2 Synthesis)",
       "unit": "7.1 Arcade Cabinet (Q2 Synthesis)",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "project",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 18
     },
     {
@@ -4569,25 +4569,25 @@
       "unit": "7.1 Arcade Cabinet (Q2 Synthesis)",
       "preview": "assignment",
       "type": "assignment",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 18
     },
     {
-      "id": "q5play-bounce",
+      "id": "moshion-bounce",
       "title": "5.2.1 Bouncy Ball",
       "unit": "5.2 Physics Feel",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 5: shplay — Game Physics",
+      "category": "Unit 5: moSHion — Game Physics",
       "week": 14
     },
     {
-      "id": "q5play-gravity",
+      "id": "moshion-gravity",
       "title": "5.1.24 Falling Block — Example",
       "unit": "5.1 Hello Sprite and Movement",
-      "preview": "shplay",
+      "preview": "moshion",
       "type": "example",
-      "category": "Unit 2: shplay — Applied Game Development",
+      "category": "Unit 2: moSHion — Applied Game Development",
       "week": 10
     }
   ]

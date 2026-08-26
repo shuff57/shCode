@@ -1,7 +1,7 @@
 // jscad-checks.mjs — what the JSCAD gate knows, as data.
 //
-// Split out from test-jscad.mjs for the same reason shplay-checks.mjs is split
-// out of test-shplay.mjs: the mechanics and the expectations are edited by
+// Split out from test-jscad.mjs for the same reason moshion-checks.mjs is split
+// out of test-moshion.mjs: the mechanics and the expectations are edited by
 // different people for different reasons. A number in here changes because the
 // library or the curriculum changed. A line in test-jscad.mjs changes because
 // the gate itself was wrong.
@@ -221,9 +221,9 @@ export const FENCE_TAGS = {
  * The wire from "a student clicks JSCAD in the header" to "public/jscad/runner.html
  * loads". Every other group in this gate asserts that the runtime is CORRECT.
  * None of them asserted that anything LOADS it, and for the whole of the first
- * build nothing did: DocsSandbox declared `preview = 'shplay'` as a default and
+ * build nothing did: DocsSandbox declared `preview = 'moshion'` as a default and
  * DocsClient never passed a value, so /docs/jscad piped JSCAD source into the
- * shPlay runner and all 24 examples died on `require is not defined`. 67 green
+ * moSHion runner and all 24 examples died on `require is not defined`. 67 green
  * checks, zero reachable users.
  *
  * The walk resolves each hop by reading the PREVIOUS hop's import of it, so
@@ -253,10 +253,10 @@ export const REACH_CHAIN = [
     next: 'DocsClient',
   },
   {
-    file: 'app/docs/shplay/[section]/DocsClient.tsx',
+    file: 'app/docs/moshion/[section]/DocsClient.tsx',
     role: 'the shared docs client forwards the runtime instead of dropping it',
     requires: [
-      { what: 'preview is a REQUIRED prop', pattern: /^\s*preview: 'shplay' \| 'jscad';/m },
+      { what: 'preview is a REQUIRED prop', pattern: /^\s*preview: 'moshion' \| 'jscad';/m },
       { what: 'preview is destructured from props', pattern: /^\s*preview,$/m },
       { what: 'preview is forwarded to DocsSandbox', pattern: /preview=\{preview\}/ },
     ],
@@ -264,16 +264,16 @@ export const REACH_CHAIN = [
     next: 'DocsSandbox',
   },
   {
-    file: 'app/docs/shplay/[section]/DocsSandbox.tsx',
+    file: 'app/docs/moshion/[section]/DocsSandbox.tsx',
     role: 'the sandbox picks the runner from the runtime it was told, with no default',
     requires: [
-      { what: 'preview is a REQUIRED prop', pattern: /^\s*preview: 'shplay' \| 'jscad';/m },
+      { what: 'preview is a REQUIRED prop', pattern: /^\s*preview: 'moshion' \| 'jscad';/m },
       { what: "a preview === 'jscad' branch rendering JscadPreview", pattern: /preview === 'jscad'[\s\S]{0,120}<JscadPreview/ },
     ],
     forbids: [
       // The exact regression. A default here silently swallows a missing prop
       // and sends JSCAD source to a runtime that cannot execute it.
-      { what: "a defaulted preview ('shplay' wins by silence)", pattern: /preview\s*=\s*'/ },
+      { what: "a defaulted preview ('moshion' wins by silence)", pattern: /preview\s*=\s*'/ },
       { what: 'an optional preview prop', pattern: /preview\?:/ },
     ],
     next: 'JscadPreview',
@@ -304,8 +304,8 @@ export const REACH_LESSON = {
   ],
 };
 
-/** shPlay must keep its own runtime — the fix must not cross the two wires. */
-export const REACH_SHPLAY = {
-  file: 'app/docs/shplay/[section]/page.tsx',
-  requires: [{ what: 'preview="shplay" handed to DocsClient', pattern: /preview="shplay"/ }],
+/** moSHion must keep its own runtime — the fix must not cross the two wires. */
+export const REACH_MOSHION = {
+  file: 'app/docs/moshion/[section]/page.tsx',
+  requires: [{ what: 'preview="moshion" handed to DocsClient', pattern: /preview="moshion"/ }],
 };

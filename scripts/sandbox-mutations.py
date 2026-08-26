@@ -5,7 +5,7 @@ A green gate means nothing until you have watched it go red for the right
 reason. This breaks one behaviour at a time, runs the gate, and asserts the
 specific check that guards that behaviour is the one that fails.
 
-The shPlay gate once reported 59/59 PASS when it should have said 79 -- a stray
+The moSHion gate once reported 59/59 PASS when it should have said 79 -- a stray
 backtick broke the checks file and a try/catch swallowed the load error. This
 script exists so that cannot happen quietly here.
 

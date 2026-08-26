@@ -4,15 +4,15 @@
   "description": "Why graded labs use 'a'/'d'/'w'/'s' instead of arrow keys, and how to swap them into the movement pattern. Read after 2.1.7d.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
   "preview": "reading",
   "week": 10,
   "slos": [
     "SLO-3"
   ],
-  "externalLink": "/docs/shplay",
-  "externalLinkLabel": "Open the in-app shplay docs",
+  "externalLink": "/docs/moshion",
+  "externalLinkLabel": "Open the in-app moSHion docs",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

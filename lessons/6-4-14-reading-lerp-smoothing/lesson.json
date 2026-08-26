@@ -4,15 +4,15 @@
   "description": "How lerp(current, target, t) replaces a hard-set camera follow with a smooth elastic trail. Read before 2.4.9 (Worked Example — Smooth Camera).",
   "type": "lesson",
   "estimateMins": 6,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
   "preview": "reading",
   "week": 15,
   "slos": [
     "SLO-3"
   ],
-  "externalLink": "/docs/shplay",
-  "externalLinkLabel": "Open the in-app shplay docs",
+  "externalLink": "/docs/moshion",
+  "externalLinkLabel": "Open the in-app moSHion docs",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

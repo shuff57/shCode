@@ -7,7 +7,7 @@ import LiveCodeBlock from './LiveCodeBlock';
 import DiagramBlock from './DiagramBlock';
 
 // Fence accepts an optional id for persistent storage, an optional `console`
-// flag that adds a DevTools-style REPL panel under the (shplay canvas)
+// flag that adds a DevTools-style REPL panel under the (moshion canvas)
 // preview, and an optional `plain` flag for console-track code that has no
 // canvas at all:
 //
@@ -18,10 +18,10 @@ import DiagramBlock from './DiagramBlock';
 //     ```js live plain id=hello-world
 //     ```
 //
-// `plain` swaps the shplay-iframe preview pane for a captured Output pane
+// `plain` swaps the moshion-iframe preview pane for a captured Output pane
 // side-by-side with the editor (same execution model as the in-app console
 // lesson workspace) — use it for Unit 1-4 console.log-only blocks. `console`
-// is unrelated and only applies to shplay/canvas blocks that want a REPL
+// is unrelated and only applies to moshion/canvas blocks that want a REPL
 // attached to the running sketch (e.g. 5-3-6-example-devtools-reveal).
 //
 // When id is omitted, we derive one by hashing the initial code so

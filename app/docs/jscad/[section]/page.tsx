@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { getAllSectionSlugs, getSection, sections } from '../../../../lib/jscad-docs';
-import DocsClient from '../../shplay/[section]/DocsClient';
+import DocsClient from '../../moshion/[section]/DocsClient';
 
 export function generateStaticParams() {
   return getAllSectionSlugs().map((section) => ({ section }));

@@ -4,9 +4,9 @@
   "description": "Pick one (or more) Groups stretch challenges — add a lives counter to Apple Catcher, vary apple sizes for varied points, or implement a `cull()` helper. Auto-graded.",
   "type": "challenge",
   "estimateMins": 30,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.2 Overlaps and Collisions",
-  "preview": "shplay",
+  "preview": "moshion",
   "week": 13,
   "slos": [
     "SLO-3",

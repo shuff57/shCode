@@ -4,7 +4,7 @@
   "description": "Why holding space launches a super-jump 60 frames in a row, and how the edge-triggered form fixes it. Watch before `2.3.15 Edge-triggered Input`.",
   "type": "lesson",
   "estimateMins": 2,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.3 Physics Applications",
   "preview": "video",
   "week": 14,

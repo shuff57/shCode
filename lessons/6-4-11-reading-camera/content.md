@@ -2,7 +2,7 @@
 
 **Read before attempting `2.4.7a Reading — camera.x / camera.y`.**
 
-The **camera** in shplay is a coordinate transform, not a "real" object. The canvas always shows a viewport into a coordinate space; sprites have absolute world coordinates. The camera holds the *center* of that viewport. When the player walks right, no sprite moves — the camera shifts, and the canvas redraws the new slice of the world. It's the flashlight analogy: the room (the world) is dark and full of stuff; your flashlight (the camera) points at one patch at a time.
+The **camera** in moSHion is a coordinate transform, not a "real" object. The canvas always shows a viewport into a coordinate space; sprites have absolute world coordinates. The camera holds the *center* of that viewport. When the player walks right, no sprite moves — the camera shifts, and the canvas redraws the new slice of the world. It's the flashlight analogy: the room (the world) is dark and full of stuff; your flashlight (the camera) points at one patch at a time.
 
 **What you'll learn from it:**
 

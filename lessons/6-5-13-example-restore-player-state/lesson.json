@@ -4,7 +4,7 @@
   "description": "Load a saved game: getItem, JSON.parse, coerce numbers, then apply to your game objects.",
   "type": "lesson",
   "estimateMins": 15,
-  "category": "Unit 2: shplay — Applied Game Development",
+  "category": "Unit 2: moSHion — Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "example",
   "week": 16,
