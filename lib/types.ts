@@ -99,6 +99,15 @@ export interface Lesson {
   diagram?: DiagramConfig;
   /** Multiple-choice module quiz. Graded in the browser — see components/QuizView.tsx. */
   quiz?: QuizConfig;
+  /**
+   * Part two of a split assignment: the lesson id of the part that holds the
+   * student's flowchart. Renders that chart read-only above the editor and
+   * seeds the starter with its pseudocode — see components/PlanChartPanel.tsx.
+   * Set on 1.5.31, whose plan lives in 1.5.30.
+   */
+  planFrom?: string;
+  /** Display label for `planFrom`, e.g. "1.5.30". */
+  planFromLabel?: string;
 }
 
 export interface QuizQuestion {

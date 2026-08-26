@@ -94,5 +94,7 @@
     "passingScore": 0,
     "allowLateSubmit": true
   },
-  "assignmentCode": "A1.5.1"
+  "assignmentCode": "A1.5.1",
+  "planFrom": "1-5-30-a1-5-1-flowchart-gate",
+  "planFromLabel": "1.5.30"
 }

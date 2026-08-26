@@ -2,9 +2,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { ChangeEvent } from 'react';
 import type { Lesson } from '../lib/types';
-import { useLessonStore } from '../lib/store';
+import { useLessonStore, flattenFiles } from '../lib/store';
 import { buildPreviewHtml } from '../lib/preview-builder';
-import { saveProgress } from '../lib/version-control';
+import { saveProgress, normalizeEol } from '../lib/version-control';
 import { recordSubmission } from '../lib/written-grader-store';
 import { recordLessonCompleted } from '../lib/progress';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
@@ -18,6 +18,7 @@ import LivePreview from './LivePreview';
 import JscadPreview from './JscadPreview';
 import MoshionPreview from './MoshionPreview';
 import RequirementsSection from './RequirementsSection';
+import PlanChartPanel from './PlanChartPanel';
 import LessonSteps from './LessonSteps';
 import Console from './Console';
 import CommitDialog from './CommitDialog';
@@ -221,6 +222,41 @@ export default function LessonWorkspace({
   }, [lesson]);
 
   const isConsoleMode = lesson.preview === 'console';
+
+  // Part two of a split assignment: drop the student's own chart into the
+  // starter as pseudocode comments.
+  //
+  // Two steps, deliberately. The panel's draft fetch resolves on its own
+  // schedule and can land BEFORE the store has populated fileContents, so
+  // seeding straight from the callback saw `undefined` and silently did
+  // nothing. The lines are parked in state instead, and the effect below
+  // applies them once the files are actually there.
+  const [planLines, setPlanLines] = useState<string[] | null>(null);
+  const planSeeded = useRef(false);
+
+  useEffect(() => {
+    if (!planLines || planSeeded.current) return;
+    const current = files['script.js'];
+    if (current === undefined) return;      // store not ready yet; try next render
+    planSeeded.current = true;              // decided once, either way
+    if (planLines.length === 0) return;
+
+    // Only while script.js is still byte-for-byte the starter. Seeding over a
+    // student who has begun would destroy their work to hand them a scaffold
+    // they no longer need, and this fires on load, when they are not watching
+    // for it.
+    const starter = flattenFiles(lesson.files).find((f) => f.path === 'script.js');
+    if (!starter || current !== normalizeEol(starter.content || '')) return;
+
+    const block = ['// --- your chart from ' + (lesson.planFromLabel ?? lesson.planFrom) + ' ---', ...planLines].join('\n');
+    // Anchored under STEP 1, which is where the lesson asks for the
+    // pseudocode. If that text ever moves, append rather than guess.
+    const ANCHOR = '//         Do this BEFORE you write any JavaScript.';
+    const next = current.includes(ANCHOR)
+      ? current.replace(ANCHOR, ANCHOR + '\n\n' + block)
+      : current + '\n\n' + block + '\n';
+    updateFile('script.js', next);
+  }, [planLines, files, lesson, updateFile]);
   const isJscadMode = lesson.preview === 'jscad';
   const isMoshionMode = lesson.preview === 'moshion';
 
@@ -673,6 +709,13 @@ export default function LessonWorkspace({
         <div id="titleRow">
           <h1>{lesson.title}</h1>
         </div>
+      )}
+      {lesson.planFrom && (
+        <PlanChartPanel
+          planFrom={lesson.planFrom}
+          planFromLabel={lesson.planFromLabel}
+          onScaffold={setPlanLines}
+        />
       )}
       <div className="editor-card">
         <div className="editor-body">

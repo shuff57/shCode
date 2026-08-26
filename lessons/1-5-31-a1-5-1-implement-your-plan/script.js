@@ -4,9 +4,10 @@
 // whole point is that this part should feel almost boring:
 // every decision was already made.
 
-// STEP 1: write your chart out as pseudocode, in comments, below
-//         this line. One instruction per line. Indent the steps
-//         that are inside the decision.
+// STEP 1: your chart from 1.5.30 is shown above, and its steps are
+//         written out as pseudocode below. Read them before you
+//         write any JavaScript. If a line does not say what you
+//         meant, fix the wording now - the comments are yours.
 //         Do this BEFORE you write any JavaScript.
 
 

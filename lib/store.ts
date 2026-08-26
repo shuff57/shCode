@@ -64,7 +64,7 @@ interface LessonState {
   idToPath: (id: string) => string | undefined;
 }
 
-function flattenFiles(nodes: FileNode[]): FileNode[] {
+export function flattenFiles(nodes: FileNode[]): FileNode[] {
   return nodes.flatMap((n) =>
     n.type === 'file' ? [n] : flattenFiles(n.children || [])
   );
