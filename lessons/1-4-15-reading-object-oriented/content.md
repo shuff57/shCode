@@ -2,7 +2,7 @@
 
 **Object-oriented programming** (OOP) organises a program around **objects** — values that bundle data together with the operations that work on that data.
 
-You already met the first half in §1.2.7, when you wrote an object literal. It holds data:
+You already met the first half in §1.2.22, when you wrote an object literal. It holds data:
 
 An object like `{ title: "JavaScript Guide", pages: 200 }` keeps two related facts in one value instead of two loose variables. The object-oriented idea is to put the *behaviour* in there too — so a bank account object would hold the balance **and** know how to deposit into it, rather than the balance sitting in one place and the depositing happening somewhere else.
 
@@ -20,7 +20,7 @@ Neither is better in the abstract. Procedural code is direct and easy to follow 
 
 **What you'll learn from it:**
 - An object bundles data (properties) with behaviour (methods).
-- You have already written the data half — an object literal, §1.2.7.
+- You have already written the data half — an object literal, §1.2.22.
 - Procedural keeps data and behaviour apart; object-oriented puts them together.
 - Neither wins in general: direct for small jobs, bundled as programs grow.
 
