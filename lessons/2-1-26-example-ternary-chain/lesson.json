@@ -1,6 +1,6 @@
 {
   "id": "2-1-26-example-ternary-chain",
-  "title": "2.1.23 Worked Example — Size Label with Chained ?",
+  "title": "2.1.23 Worked Example: Size Label with Chained ?",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.1.6 — 'Multiple ?', Example 2.6: Size Label",
+  "sourceRef": "book 2.1.6: 'Multiple ?', Example 2.6: Size Label",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

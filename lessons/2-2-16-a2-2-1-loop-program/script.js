@@ -1,4 +1,4 @@
-// 2.2.17 A2.2.1 (Part B) — For + While Loop Program
+// 2.2.17 A2.2.1 (Part B), For + While Loop Program
 
 // STEP 1: Write a for loop that counts or steps through a range of numbers.
 //         Log something on each pass.

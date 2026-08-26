@@ -1,6 +1,6 @@
 {
   "id": "2-3-6-example-menu-of-options",
-  "title": "2.3.4 Worked Example — A Menu of Options",
+  "title": "2.3.4 Worked Example: A Menu of Options",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.3.2 — Example 2.1: A menu of options",
+  "sourceRef": "book 2.3.2: Example 2.1: A menu of options",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

@@ -1,6 +1,6 @@
 {
   "id": "2-3-7-example-switch-on-expression",
-  "title": "2.3.5 Worked Example — The Switched Value Is an Expression",
+  "title": "2.3.5 Worked Example: The Switched Value Is an Expression",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.3.2 — Example 2.2: The value can be an expression",
+  "sourceRef": "book 2.3.2: Example 2.2: The value can be an expression",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

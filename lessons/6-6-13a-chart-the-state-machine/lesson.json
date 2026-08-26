@@ -1,6 +1,6 @@
 {
   "id": "6-6-13a-chart-the-state-machine",
-  "title": "6.6.14 Chart the Code — The Three-State Machine",
+  "title": "6.6.14 Chart the Code: The Three-State Machine",
   "description": "Draw the title / play / gameover machine. This is the chart that pays for itself: a state machine is far easier to argue about as a picture than as a switch.",
   "type": "assignment",
   "estimateMins": 25,

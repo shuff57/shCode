@@ -1,4 +1,4 @@
-Write your response in the box below. Short paragraphs or a numbered structure both work — whichever is clearest. Cite specific examples from your own work; generic statements don't count. Every criterion in the rubric below must be met for the lesson to count as complete.
+Write your response in the box below. Short paragraphs or a numbered structure both work: whichever is clearest. Cite specific examples from your own work; generic statements don't count. Every criterion in the rubric below must be met for the lesson to count as complete.
 
 ---
 

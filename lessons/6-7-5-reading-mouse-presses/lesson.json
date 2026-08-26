@@ -1,10 +1,10 @@
 {
   "id": "6-7-5-reading-mouse-presses",
-  "title": "6.7.5 Reading — moSHion docs: mouse.presses()",
-  "description": "mouse.presses() is true on exactly one frame — the moment the button first goes down. Read this after 2.7.4 to see how one-shot input differs from held input.",
+  "title": "6.7.5 Reading: moSHion docs: mouse.presses()",
+  "description": "mouse.presses() is true on exactly one frame: the moment the button first goes down. Read this after 2.7.4 to see how one-shot input differs from held input.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.7 Advanced Input and Joints",
   "preview": "reading",
   "week": 17,

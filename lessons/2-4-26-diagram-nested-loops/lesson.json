@@ -1,13 +1,13 @@
 {
   "id": "2-4-26-diagram-nested-loops",
-  "title": "2.4.26 Chart the Code — Nested Loops",
+  "title": "2.4.26 Chart the Code: Nested Loops",
   "description": "Draw the row/col nested loop with two loop-setup hexagons, one nested inside the other's body.",
   "type": "assignment",
   "estimateMins": 25,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "diagram",
-  "sourceRef": "designed — extends the single-hexagon pattern from module 2.2's 'Chart the for-loop' to two nested hexagons",
+  "sourceRef": "designed: extends the single-hexagon pattern from module 2.2's 'Chart the for-loop' to two nested hexagons",
   "week": 7,
   "slos": [
     "SLO-2",

@@ -1,4 +1,4 @@
-// 2.2.11 Collectible Class — reference solution.
+// 2.2.11 Collectible Class: reference solution.
 // Hidden from students; only loaded for admin/teacher via /api/lesson-solution.
 
 class Collectible {

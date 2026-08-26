@@ -1,8 +1,8 @@
 **Goal:** soften the hard camera follow with `lerp` so the camera eases toward the player instead of being glued to them.
 
-## Step 1 — Hit Run with the hard follow
+## Step 1: Hit Run with the hard follow
 
-The line is `camera.x = player.x` — same as `2.4.8`. The camera moves *exactly* as far as the player every frame, which feels rigid. Walk and run to feel it.
+The line is `camera.x = player.x`: same as `2.4.8`. The camera moves *exactly* as far as the player every frame, which feels rigid. Walk and run to feel it.
 
 ```js live
 let player;
@@ -39,9 +39,9 @@ function draw() {
 
 Glued. Every player pixel of motion = one pixel of camera motion. No "feel."
 
-## Step 2 — Replace with `lerp`
+## Step 2: Replace with `lerp`
 
-`lerp(camera.x, player.x, 0.1)` returns a value 10% of the way from the camera's current `x` toward the player's `x`. Each frame the camera *closes 10%* of the gap, never quite catching up — until the player stops, at which point it asymptotes in.
+`lerp(camera.x, player.x, 0.1)` returns a value 10% of the way from the camera's current `x` toward the player's `x`. Each frame the camera *closes 10%* of the gap, never quite catching up, until the player stops, at which point it asymptotes in.
 
 ```js live
 let player;
@@ -79,9 +79,9 @@ function draw() {
 
 Walk right. The player gets ahead of the camera; the camera "catches up" smoothly. That trailing motion is the whole point.
 
-## Step 3 — Tune the `t`
+## Step 3: Tune the `t`
 
-The third argument to `lerp` is how *much* of the gap to close per frame. Try `0.05` (laggier — the camera trails further), then `0.5` (snappier — closes most of the gap each frame). There's no right answer; pick what feels right for your game.
+The third argument to `lerp` is how *much* of the gap to close per frame. Try `0.05` (laggier: the camera trails further), then `0.5` (snappier: closes most of the gap each frame). There's no right answer; pick what feels right for your game.
 
 ```js live
 let player;
@@ -112,7 +112,7 @@ function draw() {
     player.vel.y = -8;
   }
 
-  // Try changing 0.5 to 0.05 or 0.1 — different feel each time.
+  // Try changing 0.5 to 0.05 or 0.1: different feel each time.
   camera.x = lerp(camera.x, player.x, 0.5);
 }
 ```
@@ -123,6 +123,6 @@ Most platformers land somewhere around `0.08–0.15`. Anything below `0.05` feel
 
 - `lerp(a, b, t)` returns a value `t` of the way from `a` to `b` (where `t` is 0..1).
 - `camera.x = lerp(camera.x, player.x, 0.1)` softens the follow by closing 10% of the gap per frame.
-- Smaller `t` lags more; larger `t` snaps faster — there's no math-correct value, only feel.
+- Smaller `t` lags more; larger `t` snaps faster: there's no math-correct value, only feel.
 - The same `lerp` pattern works for `camera.y` if the level is tall.
-- Tuning is part of game design — playtest the value, don't compute it.
+- Tuning is part of game design: playtest the value, don't compute it.

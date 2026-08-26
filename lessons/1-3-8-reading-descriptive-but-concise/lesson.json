@@ -1,7 +1,7 @@
 {
   "id": "1-3-8-reading-descriptive-but-concise",
-  "title": "1.3.8 Reading — Descriptive but Concise",
-  "description": "`data` and `value` are too vague to help anyone. Definition 1.3.1, third rule — and the other ditch.",
+  "title": "1.3.8 Reading: Descriptive but Concise",
+  "description": "`data` and `value` are too vague to help anyone. Definition 1.3.1, third rule, and the other ditch.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

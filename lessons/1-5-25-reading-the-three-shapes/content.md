@@ -1,16 +1,16 @@
 ## Three shapes carry nearly everything
 
-A **flowchart** shows the same kind of plan as a picture: boxes for steps, arrows for the order they happen in. Where pseudocode is easier to *write*, a flowchart is easier to *see* — especially when a program branches.
+A **flowchart** shows the same kind of plan as a picture: boxes for steps, arrows for the order they happen in. Where pseudocode is easier to *write*, a flowchart is easier to *see*, especially when a program branches.
 
-> **Definition 1.5.6 — Flowchart.** A diagram of a program's steps, using ovals for start and end, rectangles for actions, and diamonds for decisions, connected by arrows showing the order of execution.
+> **Definition 1.5.6: Flowchart.** A diagram of a program's steps, using ovals for start and end, rectangles for actions, and diamonds for decisions, connected by arrows showing the order of execution.
 
 | Shape | Meaning |
 |---|---|
 | **Oval** | Start or end |
-| **Rectangle** | A step — do this |
-| **Diamond** | A decision — a question with two exits, labelled yes and no |
+| **Rectangle** | A step: do this |
+| **Diamond** | A decision: a question with two exits, labelled yes and no |
 
-That is Table 1.5.2, and it is nearly all of it. Standard flowcharting has more symbols, and you will meet four extra ones in this course as they become useful — but three shapes will draw almost any plan you write this year.
+That is Table 1.5.2, and it is nearly all of it. Standard flowcharting has more symbols, and you will meet four extra ones in this course as they become useful, but three shapes will draw almost any plan you write this year.
 
 This course adds a fourth from the start, the **parallelogram** for input and output. That one is ours rather than the book's, and 1.5.29 explains why.
 
@@ -54,6 +54,6 @@ A chart whose paths never meet again has two endings, and that almost always mea
 |------|---------|
 | **flowchart** | A diagram of a program's steps, with shapes and arrows |
 | **oval** | Start or end |
-| **rectangle** | An action — one step |
-| **diamond** | A decision — one way in, two ways out |
+| **rectangle** | An action: one step |
+| **diamond** | A decision: one way in, two ways out |
 | **arrow** | The order of execution |

@@ -24,20 +24,20 @@
     },
     {
       "id": "s2",
-      "title": "estimateHours(order) — print time from volume"
+      "title": "estimateHours(order): print time from volume"
     },
     {
       "id": "s3",
-      "title": "priceOf(order) — grams x cost/gram + machine time",
+      "title": "priceOf(order): grams x cost/gram + machine time",
       "requiredCommit": true
     },
     {
       "id": "s4",
-      "title": "fitsInVolume(order, maxW, maxH, maxD) — three parameters"
+      "title": "fitsInVolume(order, maxW, maxH, maxD): three parameters"
     },
     {
       "id": "s5",
-      "title": "sortByPriority(list) — most urgent first"
+      "title": "sortByPriority(list): most urgent first"
     },
     {
       "id": "s6",
@@ -56,7 +56,7 @@
     {
       "id": "s9",
       "title": "README, comments, and style guide compliance",
-      "instructions": "Appendix A applies. The README says what the tool does and how to run it, and — per Appendix D — what changed from your A4.1.0 chart and why."
+      "instructions": "Appendix A applies. The README says what the tool does and how to run it, and, per Appendix D: what changed from your A4.1.0 chart and why."
     }
   ],
   "requirements": [
@@ -143,7 +143,7 @@
     {
       "id": "req9",
       "title": "Tests report PASS or FAIL",
-      "description": "A check that prints PASS when it matches the known answer and FAIL when it does not. The checker cannot count your tests — three is on you, and the teacher reads for it.",
+      "description": "A check that prints PASS when it matches the known answer and FAIL when it does not. The checker cannot count your tests: three is on you, and the teacher reads for it.",
       "type": "regex",
       "file": "script.js",
       "pattern": "PASS[\\s\\S]{0,200}FAIL|FAIL[\\s\\S]{0,200}PASS",

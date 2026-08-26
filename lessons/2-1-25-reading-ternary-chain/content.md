@@ -34,7 +34,7 @@ if (age < 3) {
 }
 ```
 
-Both versions do the same thing. The chained `?` is shorter and produces a value in one expression; the `if...else` version reads more clearly at a glance. Put the smallest cutoff first, same rule as an `else if` chain — the first true test wins.
+Both versions do the same thing. The chained `?` is shorter and produces a value in one expression; the `if...else` version reads more clearly at a glance. Put the smallest cutoff first, same rule as an `else if` chain: the first true test wins.
 
 **Try it:** Change `waist` and re-run to see `size` change.
 

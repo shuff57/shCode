@@ -13,5 +13,5 @@
 // STEP 3: in a comment, say what rule the two answers show.
 
 // STEP 4: log one more expression you were genuinely unsure
-//         about. A comparison, a string method, a typeof —
+//         about. A comparison, a string method, a typeof :
 //         anything. The habit is the lesson.

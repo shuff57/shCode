@@ -1,6 +1,6 @@
 {
   "id": "1-2-4-reading-dynamically-typed",
-  "title": "1.2.4 Reading — Dynamically Typed",
+  "title": "1.2.4 Reading: Dynamically Typed",
   "description": "A variable is not locked to one type. Convenient, and the reason a whole class of bug only shows up when you run the code.",
   "type": "lesson",
   "estimateMins": 10,

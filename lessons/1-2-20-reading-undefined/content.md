@@ -1,6 +1,6 @@
 ## The value JavaScript supplies when you don't
 
-> **Definition 1.2.6 — undefined.** A special value meaning "value is not assigned". When you declare a variable but do not give it a value, JavaScript automatically sets it to `undefined`.
+> **Definition 1.2.6: undefined.** A special value meaning "value is not assigned". When you declare a variable but do not give it a value, JavaScript automatically sets it to `undefined`.
 
 Note who does the setting. `null` is something *you* write. `undefined` is something *JavaScript* writes, because you did not.
 
@@ -18,14 +18,14 @@ Keeping them apart is what makes a variable holding `undefined` a useful signal 
 **What you'll learn from it:**
 - A declared-but-unassigned variable holds `undefined` automatically.
 - `undefined` is JavaScript's marker; `null` is yours.
-- You *can* assign `undefined` yourself — don't. Use `null`.
+- You *can* assign `undefined` yourself: don't. Use `null`.
 - Seeing `undefined` in output usually means a value never got set.
 
 **Try it:**
 
 ```js live plain
 let futureValue;
-console.log(futureValue);          // undefined — nobody assigned anything
+console.log(futureValue);          // undefined: nobody assigned anything
 console.log(typeof futureValue);   // "undefined"
 
 let age = 100;
@@ -36,7 +36,7 @@ let chosenColour = null;           // do this instead
 console.log(chosenColour);
 ```
 
-The first line declares a variable and stops. No value was given, so JavaScript supplied one. That is not an error state — the variable genuinely exists and genuinely holds `undefined`.
+The first line declares a variable and stops. No value was given, so JavaScript supplied one. That is not an error state: the variable genuinely exists and genuinely holds `undefined`.
 
 Unlike `null`, `typeof undefined` gives the honest answer: `"undefined"`.
 

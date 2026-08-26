@@ -1,6 +1,6 @@
 {
   "id": "2-2-9-example-while-vs-for",
-  "title": "2.2.14 Worked Example — while vs for + the infinite-loop trap",
+  "title": "2.2.14 Worked Example, while vs for + the infinite-loop trap",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed — while vs for comparison + infinite-loop trap, informed by book 2.2.4 Insight Note; do…while portion is shCode-added beyond book §2.2 (see report)",
+  "sourceRef": "designed, while vs for comparison + infinite-loop trap, informed by book 2.2.4 Insight Note; do…while portion is shCode-added beyond book §2.2 (see report)",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

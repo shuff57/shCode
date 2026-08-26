@@ -1,4 +1,4 @@
-// 2.3.7 Worked Example — Apple Catcher
+// 2.3.7 Worked Example: Apple Catcher
 // catch falling apples with a basket; demonstrates the overlaps(group, callback) idiom.
 
 let basket, apples, score = 0;
@@ -19,7 +19,7 @@ function setup() {
 function draw() {
   background('#113311');
 
-  // WASD-only — arrow keys scroll the editor iframe.
+  // WASD-only: arrow keys scroll the editor iframe.
   if (kb.pressing('a')) basket.vel.x = -4;
   else if (kb.pressing('d')) basket.vel.x = 4;
   else basket.vel.x = 0;
@@ -32,7 +32,7 @@ function draw() {
 
   // Callback form: fires once per overlapping pair, with both sprites passed in.
   // Cleaner than a manual loop because delete() inside the callback can't trip
-  // the iterate-then-remove bug — moSHion has finished its own iteration first.
+  // the iterate-then-remove bug: moSHion has finished its own iteration first.
   // delete() destroys the sprite (body + every group it's in); group.remove(s)
   // would only unparent it, leaving it drawing via allSprites.
   basket.overlaps(apples, (b, apple) => {
@@ -40,7 +40,7 @@ function draw() {
     apple.delete();
   });
 
-  // Off-screen cleanup still needs a manual loop — iterate a copy so deleting
+  // Off-screen cleanup still needs a manual loop: iterate a copy so deleting
   // doesn't shift the array under us.
   for (let a of [...apples]) {
     if (a.y > 450) a.delete();

@@ -1,12 +1,12 @@
 {
   "id": "2-4-28-example-break-both-loops",
-  "title": "2.4.28 Worked Example — Breaking Out of Both Loops",
+  "title": "2.4.28 Worked Example: Breaking Out of Both Loops",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "example",
-  "sourceRef": "book 2.4 — Example 2.7 part 2, the flag pattern with && !stop",
+  "sourceRef": "book 2.4: Example 2.7 part 2, the flag pattern with && !stop",
   "week": 7,
   "slos": [
     "SLO-3"

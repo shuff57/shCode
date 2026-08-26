@@ -5,7 +5,7 @@
 - Where the update has to live in a `while` loop for `continue` to be safe
 - How to spot this bug before you run it
 
-`continue` in a `for` loop is always safe. The update — `i++` — lives in the loop header, so `continue` still runs it on the way back around:
+`continue` in a `for` loop is always safe. The update: `i++`: lives in the loop header, so `continue` still runs it on the way back around:
 
 ```js live plain
 for (let i = 1; i <= 6; i++) {
@@ -16,10 +16,10 @@ for (let i = 1; i <= 6; i++) {
 }
 ```
 
-`continue` in a `while` loop is where this gets dangerous. The update is just a line inside the body — and `continue` jumps straight past any line written *after* it:
+`continue` in a `while` loop is where this gets dangerous. The update is just a line inside the body, and `continue` jumps straight past any line written *after* it:
 
 ```js
-// BROKEN — do not run this. It never stops.
+// BROKEN: do not run this. It never stops.
 let i = 0;
 while (i < 5) {
   if (i % 2 === 0) {
@@ -30,7 +30,7 @@ while (i < 5) {
 }
 ```
 
-When `i` is `0`, the condition is true, `continue` fires, and `i` is still `0`. Nothing changed, so the next round does exactly the same thing — forever.
+When `i` is `0`, the condition is true, `continue` fires, and `i` is still `0`. Nothing changed, so the next round does exactly the same thing: forever.
 
 **The fix is where you put the update, not whether you have one.** Move it *before* anything that could `continue` past it:
 

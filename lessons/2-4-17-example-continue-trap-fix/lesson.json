@@ -1,12 +1,12 @@
 {
   "id": "2-4-17-example-continue-trap-fix",
-  "title": "2.4.17 Worked Example — The continue Trap, and Its Fix",
+  "title": "2.4.17 Worked Example: The continue Trap, and Its Fix",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "example",
-  "sourceRef": "book 2.4 — Example 2.4 'The continue trap, and its fix'",
+  "sourceRef": "book 2.4: Example 2.4 'The continue trap, and its fix'",
   "week": 6,
   "slos": [
     "SLO-3"

@@ -29,7 +29,7 @@
         "options": [
           "Inside the account object, alongside the balance it changes",
           "In a separate variable next to the balance",
-          "Anywhere in the file — object-oriented style does not care",
+          "Anywhere in the file: object-oriented style does not care",
           "In a comment above the balance"
         ],
         "answer": 0,
@@ -46,7 +46,7 @@
           "Data and the behaviour that operates on it are bundled into one value"
         ],
         "answer": 3,
-        "explanation": "Bundling is the whole idea — properties and methods in one object, per Definition 1.4.4."
+        "explanation": "Bundling is the whole idea: properties and methods in one object, per Definition 1.4.4."
       },
       {
         "id": "q3-procedural-where",
@@ -55,7 +55,7 @@
         "options": [
           "Inside the balance variable itself",
           "Procedural style cannot change a balance at all",
-          "Separate from the balance — the balance sits in a variable, and the code reaches in from outside",
+          "Separate from the balance: the balance sits in a variable, and the code reaches in from outside",
           "In a second copy of the balance"
         ],
         "answer": 2,
@@ -72,7 +72,7 @@
           "It always runs faster than object-oriented code"
         ],
         "answer": 1,
-        "explanation": "Separation is the feature — and it is exactly what the next two paradigms change."
+        "explanation": "Separation is the feature, and it is exactly what the next two paradigms change."
       },
       {
         "id": "q5-when-which",

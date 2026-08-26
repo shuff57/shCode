@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.1.6 — 'Multiple ?', Try It Now 2.6",
+  "sourceRef": "book 2.1.6: 'Multiple ?', Try It Now 2.6",
   "steps": [
     {
       "id": "s1",
@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "at least two ternary operators chained",
-      "description": "Code contains two or more ? ... : ternary expressions",
+      "description": "Code contains two or more ? ...: ternary expressions",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\?[^:?]*:[\\s\\S]*\\?[^:?]*:",

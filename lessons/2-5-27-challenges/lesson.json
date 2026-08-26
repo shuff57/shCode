@@ -1,6 +1,6 @@
 {
   "id": "2-5-27-challenges",
-  "title": "2.5.27 Challenges — Optional Stretch",
+  "title": "2.5.27 Challenges: Optional Stretch",
   "description": "Optional stretch problems. Auto-graded.",
   "type": "assignment",
   "estimateMins": 10,
@@ -11,12 +11,12 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed — stretch bundle drawing on Problem Set 2.5.11, 2.5.13, 2.5.14 intent",
+  "sourceRef": "designed: stretch bundle drawing on Problem Set 2.5.11, 2.5.13, 2.5.14 intent",
   "steps": [
     {
       "id": "s1",
       "title": "Divide Safely",
-      "instructions": "JavaScript does NOT throw on division by zero — it returns Infinity. Write code that divides two hardcoded numbers where the divisor could be 0. Inside a try, throw your own error if the divisor is 0, before dividing. Catch it and log a friendly message."
+      "instructions": "JavaScript does NOT throw on division by zero: it returns Infinity. Write code that divides two hardcoded numbers where the divisor could be 0. Inside a try, throw your own error if the divisor is 0, before dividing. Catch it and log a friendly message."
     },
     {
       "id": "s2",
@@ -26,7 +26,7 @@
     {
       "id": "s3",
       "title": "Cleanup Counter",
-      "instructions": "Write a try/catch/finally where the finally block always logs \"Attempt finished.\" — regardless of whether the try succeeded or the catch fired. Test it once with input that succeeds and once with input that fails."
+      "instructions": "Write a try/catch/finally where the finally block always logs \"Attempt finished.\": regardless of whether the try succeeded or the catch fired. Test it once with input that succeeds and once with input that fails."
     }
   ],
   "requirements": [

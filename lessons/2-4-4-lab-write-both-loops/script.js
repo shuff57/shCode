@@ -7,5 +7,5 @@
 //         Write a while loop that doubles total each pass,
 //         stopping once total is greater than 100.
 //         Log total after the loop ends.
-//         You cannot say in advance how many doublings that takes —
+//         You cannot say in advance how many doublings that takes :
 //         that is why this one is a while loop.

@@ -1,10 +1,10 @@
 {
   "id": "5-3-34-challenges",
   "title": "5.4.21 Challenges",
-  "description": "Pick one (or more) OOP stretch challenges — extend your Enemy class, write a Player class, or try subclassing with `extends`. Auto-graded.",
+  "description": "Pick one (or more) OOP stretch challenges: extend your Enemy class, write a Player class, or try subclassing with `extends`. Auto-graded.",
   "type": "challenge",
   "estimateMins": 30,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
   "preview": "moshion",
   "week": 12,
@@ -26,7 +26,7 @@
       "title": "Instantiate the class",
       "instructions": "Build an instance with `new ClassName(...)` and store it in a variable.",
       "hints": [
-        "2.2.4 Worked Example shows `new Sprite(...)` — the same pattern applies to your own class."
+        "2.2.4 Worked Example shows `new Sprite(...)`: the same pattern applies to your own class."
       ]
     },
     {
@@ -42,7 +42,7 @@
       "title": "Use one OOP feature",
       "instructions": "Pick a challenge from content.md and implement it using at least one of: `this.<property>` access, `extends` another class, or a `super(...)` call.",
       "hints": [
-        "content.md lists three challenges with hints for each. Pick whichever interests you — the auto-grader accepts `this.`, `extends`, or `super(`."
+        "content.md lists three challenges with hints for each. Pick whichever interests you: the auto-grader accepts `this.`, `extends`, or `super(`."
       ]
     }
   ],
@@ -60,7 +60,7 @@
     {
       "id": "r2",
       "title": "Instantiates a class of your own",
-      "description": "Builds an object from a class the student defined — new Canvas() and new Sprite() are boilerplate and do not count",
+      "description": "Builds an object from a class the student defined: new Canvas() and new Sprite() are boilerplate and do not count",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+(?!Canvas\\b|Sprite\\b|Group\\b)[A-Z]\\w*\\s*\\(",

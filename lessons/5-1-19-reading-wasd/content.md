@@ -1,6 +1,6 @@
 ## WASD-not-arrows
 
-Read before `5.1.14 Worked Example — Keyboard Movement`. About 5 minutes.
+Read before `5.1.14 Worked Example: Keyboard Movement`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -13,9 +13,9 @@ The movement pattern you've been practicing works with any key names `kb.pressin
 **What you'll learn from it:**
 
 - In some browsers, the arrow keys also scroll the page or the editor's iframe while you're playing.
-- That makes the canvas jump around while you try to control your sprite — a bad experience during graded work.
+- That makes the canvas jump around while you try to control your sprite: a bad experience during graded work.
 - WASD (`'a'`, `'d'`, `'w'`, `'s'`) does not trigger browser scroll, so the canvas stays put.
-- The movement pattern is identical — only the key name strings change.
+- The movement pattern is identical, only the key name strings change.
 
 **Try it:**
 
@@ -53,4 +53,4 @@ function draw() {
 |------|---------|
 | **WASD** | The four letter keys used for movement in graded labs: `'a'` (left), `'d'` (right), `'w'` (up), `'s'` (down). |
 | **iframe scroll conflict** | Arrow keys scroll the browser page or embedded iframe in addition to triggering `kb.pressing`, disrupting canvas interaction. |
-| **Key name string** | The argument passed to `kb.pressing()` — e.g. `'a'`, `'space'`, `'left'`. Case-sensitive; use lowercase. |
+| **Key name string** | The argument passed to `kb.pressing()`: e.g. `'a'`, `'space'`, `'left'`. Case-sensitive; use lowercase. |

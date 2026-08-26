@@ -1,6 +1,6 @@
 {
   "id": "2-3-25-example-grade-chain",
-  "title": "2.3.25 Worked Example — When switch Doesn't Fit: the Grade Chain",
+  "title": "2.3.25 Worked Example: When switch Doesn't Fit: the Grade Chain",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.3.6 — the score-to-grade if...else chain",
+  "sourceRef": "book 2.3.6: the score-to-grade if...else chain",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

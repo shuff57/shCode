@@ -6,7 +6,7 @@
 - How to turn plain-English steps into code one at a time
 - What "pseudocode" means and how comments serve that role
 
-Professional programmers rarely open a blank file and start typing. Instead they sketch the plan first — often as `//` comments — then fill code in underneath each comment. This keeps them from getting lost and makes bugs easier to spot.
+Professional programmers rarely open a blank file and start typing. Instead they sketch the plan first, often as `//` comments, then fill code in underneath each comment. This keeps them from getting lost and makes bugs easier to spot.
 
 **Try it:** Read the comments first, predict what the code will print, then run it and check.
 
@@ -38,7 +38,7 @@ Notice how each comment names exactly one thing to do. If a step feels too big t
 | Term | Meaning |
 |------|---------|
 | **pseudocode** | Plain-English description of what code will do, written before the real code |
-| **comment (`//`)** | A line JavaScript ignores at runtime — used here as a planning step |
+| **comment (`//`)** | A line JavaScript ignores at runtime: used here as a planning step |
 | **decompose** | Break a big problem into smaller, independent pieces |
 | **step-by-step plan** | An ordered list of actions where each action is small enough to code in a few lines |
 | **top-down design** | Start with the big goal, then keep splitting into smaller sub-tasks until each is trivial |

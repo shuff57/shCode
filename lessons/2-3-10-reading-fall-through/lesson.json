@@ -1,7 +1,7 @@
 {
   "id": "2-3-10-reading-fall-through",
-  "title": "2.3.9 Reading — break and Fall-Through",
-  "description": "See what JavaScript actually does when a case has no break, and why the bug is easy to miss. Read before 2.3.10 Worked Example — switch vs if-else-if.",
+  "title": "2.3.9 Reading: break and Fall-Through",
+  "description": "See what JavaScript actually does when a case has no break, and why the bug is easy to miss. Read before 2.3.10 Worked Example: switch vs if-else-if.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.3.3 — 'break and Fall-Through', Definition 2.3.2, Concepts in Practice: Tracing fall-through Q2",
+  "sourceRef": "book 2.3.3: 'break and Fall-Through', Definition 2.3.2, Concepts in Practice: Tracing fall-through Q2",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

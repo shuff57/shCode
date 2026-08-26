@@ -1,7 +1,7 @@
-// 2.4.32 A2.4.2 — Print a Grid Pattern
+// 2.4.32 A2.4.2: Print a Grid Pattern
 
 // STEP 1: Declare rows and cols as variables, each set to at least 5.
-//         The loops below must read these variables — do not write
+//         The loops below must read these variables: do not write
 //         the numbers directly into the loop headers.
 
 // STEP 2: Write an outer for loop with counter row that runs while

@@ -11,12 +11,12 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.1.8 — 'Combining Conditions', Example 2.8: Both conditions must hold",
+  "sourceRef": "book 2.1.8: 'Combining Conditions', Example 2.8: Both conditions must hold",
   "steps": [
     {
       "id": "s1",
       "title": "Declare two variables",
-      "instructions": "Create two number variables — for example, age and score — and give each a value."
+      "instructions": "Create two number variables, for example, age and score, and give each a value."
     },
     {
       "id": "s2",

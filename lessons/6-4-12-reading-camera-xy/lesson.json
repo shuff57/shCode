@@ -1,10 +1,10 @@
 {
   "id": "6-4-12-reading-camera-xy",
-  "title": "6.4.12 Reading — camera.x / camera.y",
+  "title": "6.4.12 Reading: camera.x / camera.y",
   "description": "How assigning camera.x and camera.y shifts the viewport center each frame. Read before 2.4.7b (Camera-follow pattern).",
   "type": "lesson",
   "estimateMins": 6,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
   "preview": "reading",
   "week": 15,

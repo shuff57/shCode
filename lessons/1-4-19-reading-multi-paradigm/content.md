@@ -1,6 +1,6 @@
 ## One language, three styles
 
-Some languages commit to one paradigm. JavaScript does not: it is **multi-paradigm**, and supports all three of the styles you have just met. That is unusual, and it is a real advantage for a first language — you can meet each idea without changing languages to do it.
+Some languages commit to one paradigm. JavaScript does not: it is **multi-paradigm**, and supports all three of the styles you have just met. That is unusual, and it is a real advantage for a first language: you can meet each idea without changing languages to do it.
 
 Everything in this course is JavaScript, and you will write all three in it:
 
@@ -10,7 +10,7 @@ Everything in this course is JavaScript, and you will write all three in it:
 | **Functional** | Chapter 3, especially §3.7 | Functions that transform data without disturbing it |
 | **Object-oriented** | Chapter 5 onward | Objects with behaviour as the way the program is organised |
 
-The important thing is that these are **choices, not rules**. Real programs mix them, using whichever fits the piece of work in hand. A game might hold each character as an object, use a loop to update them, and transform a list of scores functionally — all in the same file, all in one language.
+The important thing is that these are **choices, not rules**. Real programs mix them, using whichever fits the piece of work in hand. A game might hold each character as an object, use a loop to update them, and transform a list of scores functionally: all in the same file, all in one language.
 
 So "what paradigm is this program?" is often the wrong question. "What paradigm is this *part* of the program?" usually has an answer.
 
@@ -41,7 +41,7 @@ console.log(player.name + " scored " + total + " on big plays");
 console.log("original scores still: " + player.scores);
 ```
 
-Nothing in JavaScript made you pick one. That freedom is the point — and the reason the paradigms are worth being able to name.
+Nothing in JavaScript made you pick one. That freedom is the point, and the reason the paradigms are worth being able to name.
 
 ---
 
@@ -50,5 +50,5 @@ Nothing in JavaScript made you pick one. That freedom is the point — and the r
 | Term | Meaning |
 |------|---------|
 | **multi-paradigm** | A language supporting more than one style of organising a program |
-| **JavaScript** | Multi-paradigm — procedural, functional and object-oriented are all valid in it |
-| **mixing paradigms** | Using different styles for different parts of one program — normal, not a mistake |
+| **JavaScript** | Multi-paradigm: procedural, functional and object-oriented are all valid in it |
+| **mixing paradigms** | Using different styles for different parts of one program: normal, not a mistake |

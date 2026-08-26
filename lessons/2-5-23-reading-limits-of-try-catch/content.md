@@ -2,9 +2,9 @@
 
 **What you'll learn:**
 - `try...catch` is not a universal safety net
-- A syntax error stops the whole file from loading — including the `try` meant to guard it
+- A syntax error stops the whole file from loading, including the `try` meant to guard it
 
-JavaScript reads your entire program before running any of it. If the text does not parse, nothing runs — not even the `try` block:
+JavaScript reads your entire program before running any of it. If the text does not parse, nothing runs, not even the `try` block:
 
 ```js
 // This does NOT protect anything. The file never starts.
@@ -15,7 +15,7 @@ try {
 }
 ```
 
-The `try` block here is not skipped over — the entire program fails to load. There is no running program in which `catch` could ever fire.
+The `try` block here is not skipped over: the entire program fails to load. There is no running program in which `catch` could ever fire.
 
 ## It Only Catches Code That Runs Now
 
@@ -33,7 +33,7 @@ try {
 console.log(outsideTheTry);
 ```
 
-`"Inside try."` prints, then an **uncaught** error appears — because the last line sits outside the block. A `try...catch` protects what is *inside* it, and nothing else. (Code that runs later, on a delay, has left the block behind by the time it runs — that's a case you'll meet again once you've learned how to schedule work.)
+`"Inside try."` prints, then an **uncaught** error appears, because the last line sits outside the block. A `try...catch` protects what is *inside* it, and nothing else. (Code that runs later, on a delay, has left the block behind by the time it runs: that's a case you'll meet again once you've learned how to schedule work.)
 
 ---
 
@@ -41,4 +41,4 @@ console.log(outsideTheTry);
 
 | Term | Meaning |
 |------|---------|
-| **uncaught error** | An error with no enclosing try...catch to run — it stops the program with no recovery |
+| **uncaught error** | An error with no enclosing try...catch to run: it stops the program with no recovery |

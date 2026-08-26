@@ -4,7 +4,7 @@
   "description": "Drive a sprite with the arrow keys by setting vel.x and vel.y based on what's pressed.",
   "type": "lesson",
   "estimateMins": 25,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
   "preview": "moshion",
   "week": 10,

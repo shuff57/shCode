@@ -4,7 +4,7 @@
   "description": "Pick one or more of the stretch challenges and implement them in the editor. Auto-graded.",
   "type": "challenge",
   "estimateMins": 30,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
   "preview": "moshion",
   "week": 10,
@@ -41,7 +41,7 @@
       "title": "Use one advanced feature",
       "instructions": "Pick a challenge from content.md and implement it using at least one technique beyond canvas + sprite + background: kb.presses, sin/cos, mouse.x/y, lerp, frameCount %, or text().",
       "hints": [
-        "content.md lists six challenges with hints for each. Pick whichever interests you — the auto-grader accepts any of the techniques above."
+        "content.md lists six challenges with hints for each. Pick whichever interests you: the auto-grader accepts any of the techniques above."
       ]
     }
   ],

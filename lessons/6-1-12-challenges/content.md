@@ -1,4 +1,4 @@
-## Challenge 1 — Lives counter (easy)
+## Challenge 1: Lives counter (easy)
 
 Extend the Apple Catcher pattern: track a `lives` variable and decrement it when a "rock" (a second Group) hits the basket. Show "Game Over" when `lives <= 0`.
 
@@ -36,13 +36,13 @@ function draw() {
 ```
 
 **Hints:**
-- Spawn rocks every 60 frames or so — slower than apples.
+- Spawn rocks every 60 frames or so: slower than apples.
 - The auto-grader accepts any line that assigns to `lives` (e.g. `lives = 3`).
 - For a smoother game, give rocks a slightly slower `vel.y` than apples.
 
 ---
 
-## Challenge 2 — Varied apples (medium)
+## Challenge 2: Varied apples (medium)
 
 Make every spawned apple a different size and worth a different score. Larger apples = more points.
 
@@ -67,12 +67,12 @@ function draw() {
 
 **Hints:**
 - Override `apple.diameter` AFTER spawn to break the Group default per-sprite.
-- You can attach any custom property (`apple.value`) to a sprite — it's just a JS object.
+- You can attach any custom property (`apple.value`) to a sprite: it's just a JS object.
 - The auto-grader accepts any expression that uses `Math.random()` or `random()` to set a sprite's `.diameter` / `.width` / `.height` / `.color`.
 
 ---
 
-## Challenge 3 — `cull()` helper (hard)
+## Challenge 3: `cull()` helper (hard)
 
 Write a reusable function `cull(group)` that deletes any sprite past the canvas edge. Use it in place of the manual backwards loop.
 
@@ -95,14 +95,14 @@ function draw() {
 ```
 
 **Hints:**
-- The auto-grader looks for a function declared with `function cull(...)`. Arrow functions assigned to `cull` won't match — use the function-statement form.
-- Compare to the manual backwards loop — `cull()` is reusable across every Group in your sketch.
-- Stretch: take a margin parameter — `cull(group, margin)` — so callers can decide how far past the edge counts as "off-screen."
+- The auto-grader looks for a function declared with `function cull(...)`. Arrow functions assigned to `cull` won't match: use the function-statement form.
+- Compare to the manual backwards loop: `cull()` is reusable across every Group in your sketch.
+- Stretch: take a margin parameter: `cull(group, margin)`, so callers can decide how far past the edge counts as "off-screen."
 
 ---
 
 ## If you finish all three
 
 - Combine: a game with apples (scored), rocks (cost a life), and a `cull()` helper handling off-screen cleanup for both.
-- Read the moSHion `Groups` docs section on `group.cull()` — the engine ships its own version. How does yours differ?
+- Read the moSHion `Groups` docs section on `group.cull()`: the engine ships its own version. How does yours differ?
 - Show a classmate your favorite challenge and explain why you picked the iteration pattern you did.

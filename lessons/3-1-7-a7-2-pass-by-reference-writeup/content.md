@@ -1,4 +1,4 @@
-Write your response in the box below. Answer all four questions in your own words — every criterion in the rubric below must be met for the lesson to count as complete.
+Write your response in the box below. Answer all four questions in your own words: every criterion in the rubric below must be met for the lesson to count as complete.
 
 ---
 

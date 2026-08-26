@@ -5,7 +5,7 @@
 - Why an algorithm must be precise and ordered
 - How an everyday algorithm maps to JavaScript `if` statements
 
-An **algorithm** is a precise, ordered set of steps to accomplish a task. Precise means every step is specific enough that someone (or a computer) can carry it out without guessing. Ordered means the steps happen in a defined sequence — change the order and you may get the wrong answer or no answer at all.
+An **algorithm** is a precise, ordered set of steps to accomplish a task. Precise means every step is specific enough that someone (or a computer) can carry it out without guessing. Ordered means the steps happen in a defined sequence: change the order and you may get the wrong answer or no answer at all.
 
 You already write algorithms whenever you write code. The trick is learning to think through the steps *before* you type any syntax.
 
@@ -18,7 +18,7 @@ You already write algorithms whenever you write code. The trick is learning to t
 
 Those same four steps can be drawn instead of written. A **flowchart** shows the plan as a picture: ovals for the start and the end, rectangles for the things the program does, diamonds for the questions it asks, and arrows for the order it all happens in.
 
-```flow readonly caption="Figure 2.2.1 — the largest-of-three algorithm as a flowchart. Each diamond is one comparison; the yes branch updates the current largest, the no branch skips it."
+```flow readonly caption="Figure 2.2.1: the largest-of-three algorithm as a flowchart. Each diamond is one comparison; the yes branch updates the current largest, the no branch skips it."
 flowchart TD
   A([Start]) --> B[set largest = a]
   B --> C{is b bigger than largest?}
@@ -31,7 +31,7 @@ flowchart TD
   G --> H([End])
 ```
 
-Drag the canvas to pan it, or scroll to zoom. Notice that every diamond has exactly two arrows leaving it, and both are labelled — that is what makes a flowchart readable by someone who has never seen your code.
+Drag the canvas to pan it, or scroll to zoom. Notice that every diamond has exactly two arrows leaving it, and both are labelled: that is what makes a flowchart readable by someone who has never seen your code.
 
 Those four plain-English steps map almost one-to-one to the code below.
 
@@ -55,7 +55,7 @@ if (c > largest) {
 console.log("The largest number is: " + largest);
 ```
 
-Notice that the code is almost a direct translation of the English steps. That is not a coincidence — good algorithms make the code almost write itself.
+Notice that the code is almost a direct translation of the English steps. That is not a coincidence: good algorithms make the code almost write itself.
 
 ---
 

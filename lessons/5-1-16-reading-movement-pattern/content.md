@@ -1,6 +1,6 @@
 ## Movement Pattern (if / else if / else)
 
-Read before `2.1.7c Reading — The else-to-zero rule`. About 5 minutes.
+Read before `2.1.7c Reading: The else-to-zero rule`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -12,7 +12,7 @@ You know how to set `vel.x` to move a sprite, and you know `kb.pressing(key)` re
 
 **What you'll learn from it:**
 
-- The pattern belongs in `draw()` because it runs once per frame — the only place you can react to live key input.
+- The pattern belongs in `draw()` because it runs once per frame: the only place you can react to live key input.
 - An `if / else if` chain means **at most one branch runs** per frame. Without the `else if`, pressing two opposite keys at the same time could set velocity twice, causing glitchy movement.
 - The `else` branch at the end of each chain sets velocity to `0` when no key matches. It is covered in detail in the next reading.
 - Velocity values of 2–6 give good feel; the pattern works identically regardless of the specific number.
@@ -41,9 +41,9 @@ function draw() {
 }
 ```
 
-**What you'll see:** a blue square in the center. Click the preview to focus it, then hold A, D, W, or S — the sprite moves. Two `if / else if / else` chains handle horizontal and vertical independently.
+**What you'll see:** a blue square in the center. Click the preview to focus it, then hold A, D, W, or S: the sprite moves. Two `if / else if / else` chains handle horizontal and vertical independently.
 
-**Try this:** change the `4`s to `2`. Notice the sprite is slower and easier to stop precisely. Change them to `8` — it gets harder to control. That range of 2–6 is the sweet spot for this kind of movement.
+**Try this:** change the `4`s to `2`. Notice the sprite is slower and easier to stop precisely. Change them to `8`: it gets harder to control. That range of 2–6 is the sweet spot for this kind of movement.
 
 ---
 

@@ -4,10 +4,10 @@
 
 **What you'll learn from it:**
 
-- `sprite.layer = N` controls draw order — higher numbers render on top of lower numbers.
+- `sprite.layer = N` controls draw order: higher numbers render on top of lower numbers.
 - The default layer is `0`; use `100` (or any high number) for HUD or overlay sprites.
 - Layer order is independent of the order sprites were created in `setup()`.
-- The camera transform still applies to all layers — a sprite at `layer = 100` scrolls with the world unless you compensate for camera position.
+- The camera transform still applies to all layers: a sprite at `layer = 100` scrolls with the world unless you compensate for camera position.
 
 **Try it:**
 
@@ -23,7 +23,7 @@ function setup() {
   player = new Sprite(100, 150, 30, 30);
   player.color = 'tomato';
 
-  // HUD sprite — high layer so it always draws on top.
+  // HUD sprite: high layer so it always draws on top.
   hud = new Sprite(340, 30, 40, 40, 'static');
   hud.color = 'gold';
   hud.layer = 100;
@@ -50,7 +50,7 @@ Walk right with **D**. The gold HUD square stays in the top-right of the view an
 
 | Term | Meaning |
 |------|---------|
-| **`sprite.layer`** | Draw order property — higher numbers render on top. Default is `0`. |
+| **`sprite.layer`** | Draw order property: higher numbers render on top. Default is `0`. |
 | **Layer** | A numeric z-index for sprites; controls which sprite appears in front. |
-| **HUD** | Heads-Up Display — UI elements that overlay the game world (health, score, etc.). |
+| **HUD** | Heads-Up Display: UI elements that overlay the game world (health, score, etc.). |
 | **Camera offset** | Adding `camera.x` to a sprite's position each frame to keep it fixed on screen. |

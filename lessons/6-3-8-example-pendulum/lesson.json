@@ -1,9 +1,9 @@
 {
   "id": "6-3-8-example-pendulum",
-  "title": "6.3.8 Worked Example — Swinging Pendulum",
+  "title": "6.3.8 Worked Example: Swinging Pendulum",
   "type": "lesson",
   "estimateMins": 15,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.3 Physics Applications",
   "preview": "example",
   "week": 14,

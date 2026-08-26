@@ -1,10 +1,10 @@
 {
   "id": "5-3-11-reading-this-noun",
-  "title": "5.3.11 Reading — this is a noun",
-  "description": "`this` always refers to one specific thing — the instance the method was called on. Read before the substitution rule example.",
+  "title": "5.3.11 Reading: this is a noun",
+  "description": "`this` always refers to one specific thing: the instance the method was called on. Read before the substitution rule example.",
   "type": "lesson",
   "estimateMins": 6,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.3 Classes and Objects via moSHion",
   "preview": "reading",
   "week": 12,

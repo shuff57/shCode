@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed — practice for 2.5.1 Concepts in Practice 'Telling them apart'",
+  "sourceRef": "designed: practice for 2.5.1 Concepts in Practice 'Telling them apart'",
   "steps": [
     {
       "id": "s1",
@@ -26,7 +26,7 @@
     {
       "id": "s3",
       "title": "Log a line after",
-      "instructions": "Add one more console.log line after that. Run your code and confirm this last line never prints — the error stopped everything below it."
+      "instructions": "Add one more console.log line after that. Run your code and confirm this last line never prints: the error stopped everything below it."
     }
   ],
   "requirements": [

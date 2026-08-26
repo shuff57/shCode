@@ -1,4 +1,4 @@
-## JSON.parse — unpacking strings back into objects
+## JSON.parse: unpacking strings back into objects
 
 **Read before the 2.5.10 round-trip lesson.** About 5 minutes.
 
@@ -8,7 +8,7 @@ By the end of this reading you should be able to answer:
 - How do you access individual fields after parsing?
 - Why does `JSON.parse` fail on a missing key?
 
-You now know `JSON.stringify` turns an object into a string. `JSON.parse` does the reverse — it takes a JSON string and builds a live JavaScript object from it.
+You now know `JSON.stringify` turns an object into a string. `JSON.parse` does the reverse: it takes a JSON string and builds a live JavaScript object from it.
 
 **What you'll learn from it:**
 
@@ -27,7 +27,7 @@ function setup() {
 
   let raw = getItem('save');
   if (raw === null) {
-    console.log('no save found — storing a default');
+    console.log('no save found: storing a default');
     storeItem('save', JSON.stringify({ score: 42, level: 3, playerX: 100, playerY: 200 }));
   } else {
     saved = JSON.parse(raw);
@@ -51,7 +51,7 @@ function draw() {
   } else {
     fill('#ff5555');
     textSize(16);
-    text('No save loaded — refresh the page.', 20, 90);
+    text('No save loaded: refresh the page.', 20, 90);
   }
 }
 ```
@@ -68,5 +68,5 @@ That's the pattern: `getItem` to pull the string out, `JSON.parse` to turn it ba
 
 | Term | Meaning |
 |------|---------|
-| **Deserialization** | The reverse of serialization — turning a flat string back into a living object. |
+| **Deserialization** | The reverse of serialization: turning a flat string back into a living object. |
 | **`JSON.parse(str)`** | The deserialization step. Takes a JSON string, returns a JS object. |

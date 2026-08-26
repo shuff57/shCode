@@ -16,7 +16,7 @@ for (let i = 1; i <= 6; i++) {
 }
 ```
 
-When `i` is even, `continue` skips the `console.log` and goes back to the top of the loop for the next value. The loop still runs all six rounds — it just does nothing useful in three of them.
+When `i` is even, `continue` skips the `console.log` and goes back to the top of the loop for the next value. The loop still runs all six rounds: it just does nothing useful in three of them.
 
 That's the whole difference from `break`: `break` stops the loop dead. `continue` says "not this one" and moves on to the next round like nothing happened.
 
@@ -26,6 +26,6 @@ That's the whole difference from `break`: `break` stops the loop dead. `continue
 
 | Term | Meaning |
 |------|---------|
-| **continue** | Ends the current round of a loop and jumps to the next one — the loop itself keeps running |
+| **continue** | Ends the current round of a loop and jumps to the next one: the loop itself keeps running |
 | **round** / **iteration** | One pass through a loop's body |
 | **break vs continue** | `break` leaves the loop entirely; `continue` skips only the current round |

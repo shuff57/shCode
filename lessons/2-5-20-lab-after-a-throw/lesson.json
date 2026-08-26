@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed — practice for 2.5.4 Concepts in Practice 'Throwing'",
+  "sourceRef": "designed: practice for 2.5.4 Concepts in Practice 'Throwing'",
   "steps": [
     {
       "id": "s1",
@@ -26,7 +26,7 @@
     {
       "id": "s3",
       "title": "Confirm and explain",
-      "instructions": "Run it. In a comment, explain why \"after the throw\" never prints — what does throw abandon, exactly like a runtime error?"
+      "instructions": "Run it. In a comment, explain why \"after the throw\" never prints: what does throw abandon, exactly like a runtime error?"
     }
   ],
   "requirements": [

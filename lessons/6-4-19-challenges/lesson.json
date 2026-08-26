@@ -1,10 +1,10 @@
 {
   "id": "6-4-19-challenges",
   "title": "6.4.19 Challenges",
-  "description": "Pick one (or more) Animation & Camera stretches — parallax background, mirror the sprite when it walks left, or add vertical camera follow. Auto-graded.",
+  "description": "Pick one (or more) Animation & Camera stretches: parallax background, mirror the sprite when it walks left, or add vertical camera follow. Auto-graded.",
   "type": "challenge",
   "estimateMins": 30,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
   "preview": "moshion",
   "week": 15,
@@ -26,7 +26,7 @@
       "title": "Make the camera follow",
       "instructions": "Inside draw(), assign camera.x from the player's x so the level can scroll.",
       "hints": [
-        "See 2.4.8 Worked Example — Camera Follow if you need a refresher."
+        "See 2.4.8 Worked Example: Camera Follow if you need a refresher."
       ]
     },
     {
@@ -34,7 +34,7 @@
       "title": "Pick a stretch from content.md",
       "instructions": "Implement at least one: a parallax background (a second sprite at a lower layer that moves slower), mirroring the sprite with mirrorX when walking left, or vertical camera follow.",
       "hints": [
-        "content.md describes three stretches with hints for each — pick whichever interests you."
+        "content.md describes three stretches with hints for each: pick whichever interests you."
       ]
     },
     {

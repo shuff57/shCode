@@ -1,10 +1,10 @@
 {
   "id": "6-5-19-video-continue",
-  "title": "6.5.19 Video — New Game or Continue?",
+  "title": "6.5.19 Video: New Game or Continue?",
   "description": "If a save exists, show 'Continue'. If not, only 'New Game'. The title screen pattern every game uses.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "video",
   "week": 16,

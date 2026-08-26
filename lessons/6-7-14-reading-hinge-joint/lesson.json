@@ -1,10 +1,10 @@
 {
   "id": "6-7-14-reading-hinge-joint",
-  "title": "6.8.4 Reading — moSHion docs: HingeJoint",
+  "title": "6.8.4 Reading: moSHion docs: HingeJoint",
   "description": "How HingeJoint pins two sprites to a shared pivot point so they rotate around it. Read this before the rotating-arm worked example.",
   "type": "lesson",
   "estimateMins": 8,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.8 Joints",
   "preview": "reading",
   "week": 17,

@@ -1,10 +1,10 @@
 {
   "id": "5-3-23-lab-cleanup",
-  "title": "5.4.9 Lab — Cleanup with this.sprite.delete()",
+  "title": "5.4.9 Lab: Cleanup with this.sprite.delete()",
   "description": "Write `Bubble.pop()` which calls `this.sprite.delete()` so the object removes its own sprite on click.",
   "type": "lesson",
   "estimateMins": 6,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
   "preview": "moshion",
   "week": 12,
@@ -16,9 +16,9 @@
     {
       "id": "s1",
       "title": "Write the pop() method",
-      "instructions": "Inside the `Bubble` class body, write a `pop()` method that calls `this.sprite.delete()`. Click anywhere on the canvas to pop the bubble — it should disappear.",
+      "instructions": "Inside the `Bubble` class body, write a `pop()` method that calls `this.sprite.delete()`. Click anywhere on the canvas to pop the bubble: it should disappear.",
       "hints": [
-        "Open the moSHion docs drawer on the right and find the Sprite methods section — look for how to destroy or remove a sprite from the canvas."
+        "Open the moSHion docs drawer on the right and find the Sprite methods section: look for how to destroy or remove a sprite from the canvas."
       ]
     }
   ],

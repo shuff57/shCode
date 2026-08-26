@@ -1,4 +1,4 @@
-# 2.5.12 Worked Example — Restore Full Player State from a Save
+# 2.5.12 Worked Example: Restore Full Player State from a Save
 
 Teacher-led walkthrough for loading and applying saved game state with `getItem` + `JSON.parse`.
 
@@ -6,7 +6,7 @@ Teacher-led walkthrough for loading and applying saved game state with `getItem`
 
 ---
 
-## Step 1 — Check if a save exists
+## Step 1: Check if a save exists
 
 `getItem` returns `null` when nothing is stored under that key. Always check before parsing.
 
@@ -39,11 +39,11 @@ function draw() {
 }
 ```
 
-No save yet — shows 0 and 1. That's fine. The important thing is that skipping the null check would crash with `JSON.parse`.
+No save yet: shows 0 and 1. That's fine. The important thing is that skipping the null check would crash with `JSON.parse`.
 
 ---
 
-## Step 2 — JSON.parse and coerce numbers
+## Step 2: JSON.parse and coerce numbers
 
 When a save exists, parse the JSON and coerce every numeric field with `Number()`.
 
@@ -64,7 +64,7 @@ function setup() {
     player.y = Number(state.playerY) || 200;
     console.log('Save restored!');
   } else {
-    console.log('No save yet — using defaults');
+    console.log('No save yet: using defaults');
     score = 0;
     level = 1;
   }
@@ -91,19 +91,19 @@ function draw() {
 
 If you saved in 2.5.11, you'll see your old score and player position snap back. If not, you get clean defaults.
 
-Notice `Number(state.something) || 1` — the `|| 1` is the fallback if the field is missing or NaN.
+Notice `Number(state.something) || 1`: the `|| 1` is the fallback if the field is missing or NaN.
 
 ---
 
-## Step 3 — Apply saved values to game objects
+## Step 3: Apply saved values to game objects
 
-After parse and coerce, apply: `player.x = state.playerX`, `score = state.score`. Direct assignment — the object just takes the value.
+After parse and coerce, apply: `player.x = state.playerX`, `score = state.score`. Direct assignment: the object just takes the value.
 
 The key insight: after you parse, the save is just values. You own how they're applied. Doesn't have to be one-to-one. You could add 100 to `playerX` to offset for a different starting area, or multiply score by a difficulty multiplier.
 
 ---
 
-## Step 4 — Full round-trip: save AND load
+## Step 4: Full round-trip: save AND load
 
 This is the complete pattern. Save on 'S', auto-load on startup. Persistent across refreshes.
 
@@ -185,5 +185,5 @@ Now the real test: move somewhere, score some points, press S. Then **refresh th
 
 - **Check for null.** `getItem` returns `null` when nothing's been saved. Parse `null` and you crash.
 - **Coerce after parse.** `JSON.parse` restores numbers correctly, but always `Number()` fields you depend on. It's one line and defends against bad data.
-- **Apply to game objects.** Parsing gives you values. You own what to do with them — put them into sprites, variables, whatever holds your game state.
+- **Apply to game objects.** Parsing gives you values. You own what to do with them: put them into sprites, variables, whatever holds your game state.
 - **The round-trip is reliable.** Once you wire both directions (save + restore), refresh becomes invisible to your players.

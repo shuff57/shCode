@@ -1,6 +1,6 @@
 {
   "id": "2-1-10-reading-logical-operators",
-  "title": "2.1.28 Reading — Logical Operators: && || !",
+  "title": "2.1.28 Reading: Logical Operators: && || !",
   "description": "Learn how to combine conditions with AND, OR, and NOT. Read before the conditionals practice lesson.",
   "type": "lesson",
   "estimateMins": 10,
@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.1.8 — 'Combining Conditions: &&, ||, !', Definition 2.1.2: Logical Operators",
+  "sourceRef": "book 2.1.8: 'Combining Conditions: &&, ||, !', Definition 2.1.2: Logical Operators",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

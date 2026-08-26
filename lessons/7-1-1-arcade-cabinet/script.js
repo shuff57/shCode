@@ -1,4 +1,4 @@
-// 7.1.1 Arcade Cabinet — Q2 Synthesis
+// 7.1.1 Arcade Cabinet: Q2 Synthesis
 //
 // This is the last thing you build this semester, and it is yours. There is no
 // starter game below and no steps to fill in, because the game is not a thing
@@ -8,14 +8,14 @@
 //
 // Write your pitch in README.md first. Then build.
 //
-//   1. A pitch in README.md — what it is, how you win, how you lose.
+//   1. A pitch in README.md: what it is, how you win, how you lose.
 //   2. A class you wrote yourself, used to make at least two objects.
 //   3. A Group that manages many sprites at once.
 //   4. An overlap or a collision that changes the game.
 //   5. Player input that controls something.
-//   6. Motion you tuned on purpose — gravity, friction, bounciness, velocity.
+//   6. Motion you tuned on purpose: gravity, friction, bounciness, velocity.
 //   7. Three game states, and a way to get between them.
-//   8. Something that survives closing the tab — storeItem and getItem.
+//   8. Something that survives closing the tab: storeItem and getItem.
 //   9. A function of your own that takes a parameter and returns a value.
 //  10. An array of game data that a loop reads.
 //  11. Any TWO of: an animated sprite, a camera that follows, a joint,

@@ -1,4 +1,4 @@
-// 2.2.7g Lab — Mutate this.sprite.x from a method.
+// 2.2.7g Lab: Mutate this.sprite.x from a method.
 
 class Mover {
   constructor(x, y) {

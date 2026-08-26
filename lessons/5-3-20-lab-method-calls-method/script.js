@@ -1,4 +1,4 @@
-// 2.2.7e Lab — A method calling this.otherMethod().
+// 2.2.7e Lab: A method calling this.otherMethod().
 
 class Counter {
   constructor() {
@@ -31,7 +31,7 @@ function setup() {
 
 function draw() {
   background('#222');
-  fill(c.isHigh() ? 'red' : 'white');
+  fill(c.isHigh() ? 'red': 'white');
   textSize(32);
   textAlign(CENTER);
   text(c.n, 130, 90);

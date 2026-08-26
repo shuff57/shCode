@@ -1,7 +1,7 @@
-// 2.4.23 A2.4.1 — Debug Five Loops
+// 2.4.23 A2.4.1: Debug Five Loops
 //
 // ---------------------------------------------------------------
-// PROGRAM 1 — infinite loop: missing update
+// PROGRAM 1: infinite loop: missing update
 //
 // let n = 1;
 // while (n <= 5) {
@@ -16,7 +16,7 @@ while (n <= 5) {
 }
 
 // ---------------------------------------------------------------
-// PROGRAM 2 — infinite loop: update moves the wrong way
+// PROGRAM 2: infinite loop: update moves the wrong way
 //
 // for (let count = 10; count > 0; count++) { ... }
 //
@@ -27,7 +27,7 @@ for (let count = 10; count > 0; count--) {
 }
 
 // ---------------------------------------------------------------
-// PROGRAM 3 — off by one: misses the last value
+// PROGRAM 3, off by one: misses the last value
 //
 // for (let i = 1; i < 5; i++) { ... }
 //
@@ -38,7 +38,7 @@ for (let i = 1; i <= 5; i++) {
 }
 
 // ---------------------------------------------------------------
-// PROGRAM 4 — off by one: one extra value
+// PROGRAM 4, off by one: one extra value
 //
 // for (let k = 0; k <= 5; k++) { ... }
 //
@@ -49,7 +49,7 @@ for (let k = 1; k <= 5; k++) {
 }
 
 // ---------------------------------------------------------------
-// PROGRAM 5 — do...while logic error
+// PROGRAM 5: do...while logic error
 //
 // let greeted = true;
 // while (!greeted) { ... }

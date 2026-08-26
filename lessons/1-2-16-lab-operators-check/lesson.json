@@ -25,7 +25,7 @@
     {
       "id": "s3",
       "title": "String concatenation",
-      "instructions": "Join two pieces of text together using the + operator (the same + you just used for addition — with text on either side it glues the words together instead), then print the joined result."
+      "instructions": "Join two pieces of text together using the + operator (the same + you just used for addition, with text on either side it glues the words together instead), then print the joined result."
     },
     {
       "id": "s4",

@@ -1,6 +1,6 @@
 **Goal:** Use the vector-from-A-to-B pattern (2.7.18) and `applyForce` (2.7.17) to launch a ball toward a static target when the player presses Space.
 
-## Step 1 — Hit Run and press Space
+## Step 1: Hit Run and press Space
 
 A ball sits near the bottom-left. A static target sits near the top-right. Press Space and the ball launches toward the target in a gravity-affected arc.
 
@@ -23,9 +23,9 @@ function draw() {
 }
 ```
 
-## Step 2 — Trace the vector math
+## Step 2: Trace the vector math
 
-`dx = target.pos.x - ball.pos.x` and `dy = target.pos.y - ball.pos.y` give the direction from the ball to the target — the same subtraction pattern from 2.7.18. Multiplying by `0.5` scales the push: larger makes a flatter arc, smaller makes gravity bend the path sooner. Press Space several times in a row — forces accumulate and the ball picks up speed.
+`dx = target.pos.x - ball.pos.x` and `dy = target.pos.y - ball.pos.y` give the direction from the ball to the target: the same subtraction pattern from 2.7.18. Multiplying by `0.5` scales the push: larger makes a flatter arc, smaller makes gravity bend the path sooner. Press Space several times in a row: forces accumulate and the ball picks up speed.
 
 ```js live
 let ball, target;
@@ -46,9 +46,9 @@ function draw() {
 }
 ```
 
-## Step 3 — Try a different scale
+## Step 3: Try a different scale
 
-Change `0.5` to `0.2` and press Space. The ball falls short — too little force to overcome gravity's pull. Then try `1.0` — the ball overshoots and gravity barely bends its path. The scale factor is the only knob between a weak lob and a line drive.
+Change `0.5` to `0.2` and press Space. The ball falls short: too little force to overcome gravity's pull. Then try `1.0`: the ball overshoots and gravity barely bends its path. The scale factor is the only knob between a weak lob and a line drive.
 
 ```js live
 let ball, target;
@@ -71,7 +71,7 @@ function draw() {
 
 ## Key takeaways
 
-- `applyForce(fx, fy)` takes two numbers — x and y components of the push.
+- `applyForce(fx, fy)` takes two numbers: x and y components of the push.
 - Subtracting ball coordinates from target coordinates gives the direction vector (2.7.18).
-- The scale factor determines force magnitude — it is the only thing to tune for arc shape.
+- The scale factor determines force magnitude: it is the only thing to tune for arc shape.
 - Forces accumulate across frames; each Space press adds to the ball's velocity.

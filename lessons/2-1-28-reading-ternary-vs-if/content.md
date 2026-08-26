@@ -9,10 +9,10 @@
 
 ```javascript
 (company == 'Netscape') ?
-  console.log('Right!') : console.log('Wrong.');
+  console.log('Right!'): console.log('Wrong.');
 ```
 
-This runs. It is not a syntax error. But it throws away the reason `?` exists — producing a value — and uses it purely for its side effect, like a compressed `if`. The equivalent `if` is clearer:
+This runs. It is not a syntax error. But it throws away the reason `?` exists: producing a value, and uses it purely for its side effect, like a compressed `if`. The equivalent `if` is clearer:
 
 ```javascript
 if (company == 'Netscape') {
@@ -31,7 +31,7 @@ Our eyes scan code vertically. A block that spans a few lines, with the two bran
 ```js live plain
 let loggedIn = false;
 
-(loggedIn) ? console.log("Welcome back!") : console.log("Please log in.");
+(loggedIn) ? console.log("Welcome back!"): console.log("Please log in.");
 
 if (loggedIn) {
   console.log("Welcome back!");

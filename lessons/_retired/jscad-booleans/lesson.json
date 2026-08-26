@@ -5,7 +5,7 @@
   "type": "assignment",
   "difficulty": "intermediate",
   "estimateMins": 40,
-  "category": "Unit 2: JSCAD — 2D to 3D",
+  "category": "Unit 2: JSCAD: 2D to 3D",
   "unit": "2.1 JSCAD Foundations",
   "preview": "jscad",
   "week": 12,
@@ -25,7 +25,7 @@
       "instructions": "Create two overlapping shapes and combine them with `booleans.union(shape1, shape2)`.",
       "hints": [
         "Union merges shapes into one. The result is the combined outline of both.",
-        "Make sure shapes overlap — union of non-overlapping shapes just groups them."
+        "Make sure shapes overlap: union of non-overlapping shapes just groups them."
       ]
     },
     {

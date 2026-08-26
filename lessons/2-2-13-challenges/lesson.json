@@ -1,6 +1,6 @@
 {
   "id": "2-2-13-challenges",
-  "title": "2.2.20 Challenges — Optional Stretch",
+  "title": "2.2.20 Challenges: Optional Stretch",
   "description": "Optional stretch problems. Auto-graded.",
   "type": "assignment",
   "estimateMins": 8,
@@ -12,7 +12,7 @@
     "SLO-3",
     "SLO-4"
   ],
-  "sourceRef": "designed — stretch problems informed by book Problem Set 2.2.1 (FizzBuzz-style) and Key Terms review",
+  "sourceRef": "designed: stretch problems informed by book Problem Set 2.2.1 (FizzBuzz-style) and Key Terms review",
   "steps": [
     {
       "id": "s1",
@@ -22,7 +22,7 @@
     {
       "id": "s2",
       "title": "Count vowels",
-      "instructions": "Given a string, count how many characters are vowels (a, e, i, o, u — upper or lower case). Log the total count."
+      "instructions": "Given a string, count how many characters are vowels (a, e, i, o, u: upper or lower case). Log the total count."
     },
     {
       "id": "s3",

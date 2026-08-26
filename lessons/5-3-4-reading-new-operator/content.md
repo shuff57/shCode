@@ -1,6 +1,6 @@
 ## The `new` operator
 
-**Read before `2.2.3b Reading — constructor and its parameters`.** About 4 minutes.
+**Read before `2.2.3b Reading: constructor and its parameters`.** About 4 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -13,7 +13,7 @@ Every time you've written `new Sprite(...)` or `new Canvas(...)`, the JavaScript
 
 - `new` creates a fresh, empty object and binds `this` to it.
 - `new` then runs the constructor function with whatever arguments you passed.
-- `new` returns the finished object automatically — no `return` needed in the constructor.
+- `new` returns the finished object automatically: no `return` needed in the constructor.
 - The variable on the left of `=` ends up holding that returned object.
 
 **Try it:**
@@ -42,7 +42,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** two lines — `t1.label = hello` and `t2.label = world`.
+**What you'll see:** two lines: `t1.label = hello` and `t2.label = world`.
 
 **Try this:** change `new Tag('hello')` to `new Tag('goodbye')` and re-run. Predict what the first line prints before you run it. Then change the second label too.
 
@@ -54,4 +54,4 @@ function draw() {
 |------|---------|
 | **`new`** | Operator that (1) allocates a fresh object, (2) calls the constructor with `this` bound to it, and (3) returns the object. |
 | **Constructor** | The method `new` calls. Responsible for storing arguments on `this`. |
-| **Instance** | The object `new` returns — one specific copy built from the class. |
+| **Instance** | The object `new` returns: one specific copy built from the class. |

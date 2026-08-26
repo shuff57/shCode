@@ -1,6 +1,6 @@
 # Groups
 
-Read this before `6.1.4 Worked Example — Iterating a Group`. About 5 minutes.
+Read this before `6.1.4 Worked Example: Iterating a Group`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -8,13 +8,13 @@ By the end of this reading you should be able to answer:
 - How do you spawn a sprite that automatically inherits a group's defaults?
 - Why iterate `[...group]` instead of `group` when you might remove during the loop?
 
-A **Group** is moSHion's collection for managing many sprites at once — enemies, projectiles, particles, stars. It looks like an array but knows about sprites.
+A **Group** is moSHion's collection for managing many sprites at once: enemies, projectiles, particles, stars. It looks like an array but knows about sprites.
 
 ---
 
 ## `new Group()` returns a Sprite-aware Array
 
-A Group behaves like an array — `length`, `push`, `for…of`, spread `[...group]` all work the same way they would on a normal array. The difference is that a Group also has *sprite-specific* features:
+A Group behaves like an array: `length`, `push`, `for…of`, spread `[...group]` all work the same way they would on a normal array. The difference is that a Group also has *sprite-specific* features:
 
 - Default properties (`group.color`, `group.diameter`) that apply to members.
 - A built-in factory `new groupName.Sprite(...)` that creates members with those defaults.
@@ -43,11 +43,11 @@ function draw() {
 
 **What you'll see:** five red squares oscillating left and right in unison. The `for (let e of enemies)` loop runs once per sprite each frame and updates that sprite's velocity.
 
-**Try this:** change the `5` in the spawn loop to `12`. The row gets wider but every other line stays the same — the loop body doesn't care how many sprites there are. That's the win.
+**Try this:** change the `5` in the spawn loop to `12`. The row gets wider but every other line stays the same: the loop body doesn't care how many sprites there are. That's the win.
 
 ---
 
-## Group defaults — set once, applies to every spawn
+## Group defaults: set once, applies to every spawn
 
 Setting a property on the group itself (`enemies.color = 'red'`) becomes the **default** for any sprite created via `new groupName.Sprite(...)`. You can still override per sprite afterwards.
 
@@ -62,8 +62,8 @@ new stars.Sprite(200, 100);   // same
 
 Note the lowercase `s` vs capital `S`:
 
-- `new Sprite(...)` — bare. Does NOT use group defaults.
-- `new stars.Sprite(...)` — factory form. Inherits defaults from `stars`.
+- `new Sprite(...)`: bare. Does NOT use group defaults.
+- `new stars.Sprite(...)`: factory form. Inherits defaults from `stars`.
 
 The factory form is the moSHion idiom for "spawn a member of this group."
 
@@ -100,7 +100,7 @@ function draw() {
 
 **What you'll see:** a starfield. Every 8 frames a new yellow dot appears at the top with a random horizontal position and falls toward the bottom. Once it's past `y > 380` it's destroyed.
 
-**Try this:** change `frameCount % 8` to `frameCount % 2` for a blizzard. Then change `stars.color = 'yellow'` to `'white'` and re-run — both existing and future stars are white because the default is read on each spawn.
+**Try this:** change `frameCount % 8` to `frameCount % 2` for a blizzard. Then change `stars.color = 'yellow'` to `'white'` and re-run: both existing and future stars are white because the default is read on each spawn.
 
 ---
 
@@ -116,7 +116,7 @@ for (let s of [...stars]) {
 
 The brackets `[...stars]` make a **copy** of the group as a plain array, then iterate the copy. Why?
 
-If you iterate the live `stars` group directly and delete an element mid-loop, `delete()` splices that sprite out of every group it belongs to — including `stars` — and the remaining members shift down by one index. The loop's pointer keeps moving forward, so it skips the next sprite. By iterating a snapshot, deletions don't affect what the loop sees next.
+If you iterate the live `stars` group directly and delete an element mid-loop, `delete()` splices that sprite out of every group it belongs to, including `stars`, and the remaining members shift down by one index. The loop's pointer keeps moving forward, so it skips the next sprite. By iterating a snapshot, deletions don't affect what the loop sees next.
 
 You'll see this same pattern in the next reading (`overlaps` + despawn).
 
@@ -127,12 +127,12 @@ You'll see this same pattern in the next reading (`overlaps` + despawn).
 | Term | Meaning |
 |------|---------|
 | **Group** | A moSHion collection that behaves like an array of sprites with shared defaults. |
-| **Factory pattern** | `new groupName.Sprite(...)` (capital S) — creates a sprite with the group's defaults applied. |
+| **Factory pattern** | `new groupName.Sprite(...)` (capital S): creates a sprite with the group's defaults applied. |
 | **Spawn** | Create a new sprite at runtime. Usually via the factory form. |
-| **Despawn** | Destroy a sprite at runtime via `sprite.delete()` (full destruction). `group.remove(sprite)` only unparents — useful for moving between groups, not cleanup. |
+| **Despawn** | Destroy a sprite at runtime via `sprite.delete()` (full destruction). `group.remove(sprite)` only unparents: useful for moving between groups, not cleanup. |
 | **`[...group]`** | Spread copy. Iterate the copy when you might delete during the loop. |
 | **`frameCount % N === 0`** | Timed-spawn idiom. Fires once every N frames. |
 
 ---
 
-Once you can explain the difference between bare `new Sprite(...)` and `new groupName.Sprite(...)`, open `6.1.4 Worked Example — Iterating a Group`.
+Once you can explain the difference between bare `new Sprite(...)` and `new groupName.Sprite(...)`, open `6.1.4 Worked Example: Iterating a Group`.

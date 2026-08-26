@@ -5,7 +5,7 @@
 - Why the function's body is *not* drawn hanging off it
 - How to count what a function actually bought you
 
-You have just written your first function. A new flowchart shape arrives with it — press **+ more shapes** in the toolbar to find it.
+You have just written your first function. A new flowchart shape arrives with it: press **+ more shapes** in the toolbar to find it.
 
 | Shape | Mermaid | Means |
 |---|---|---|
@@ -15,7 +15,7 @@ It is a rectangle with a stripe down each side. The stripes are the point: an or
 
 ### Flow goes in, and flow comes back
 
-```flow readonly caption="Figure 3.1.1 — the double rail is one step in this chart. drawScore() has a whole chart of its own somewhere else, and this one does not care what is in it."
+```flow readonly caption="Figure 3.1.1: the double rail is one step in this chart. drawScore() has a whole chart of its own somewhere else, and this one does not care what is in it."
 flowchart TD
   A([Start]) --> B[set score to 0]
   B --> C[[drawScore()]]
@@ -23,13 +23,13 @@ flowchart TD
   D --> E([End])
 ```
 
-Read it: *start, set the score, draw the score, print ready, end.* The double-rail behaves like any other single step — one arrow in, one arrow out, and the chart carries straight on afterwards.
+Read it: *start, set the score, draw the score, print ready, end.* The double-rail behaves like any other single step: one arrow in, one arrow out, and the chart carries straight on afterwards.
 
 That "comes back" part is the whole idea of a function call, and it is the thing beginners are most often unsure about. Calling a function is not a detour you might not return from. It is a step that finishes, like every other step.
 
 ### The mistake to avoid
 
-**Do not draw the function's body hanging off the double-rail.** The body is not part of this chart. It is either a separate chart of its own, or — most of the time — no chart at all, because it is short enough not to need one.
+**Do not draw the function's body hanging off the double-rail.** The body is not part of this chart. It is either a separate chart of its own, or: most of the time: no chart at all, because it is short enough not to need one.
 
 ```
    WRONG                          RIGHT
@@ -45,7 +45,7 @@ The version on the left has thrown away everything the function gained you. The 
 
 ### Count what it bought you
 
-Here is the exercise worth doing in your head. Take a chart you drew before this module — one with a block of steps that appeared twice. Now redraw it with each repeated block collapsed into one `[[ ]]` shape.
+Here is the exercise worth doing in your head. Take a chart you drew before this module: one with a block of steps that appeared twice. Now redraw it with each repeated block collapsed into one `[[ ]]` shape.
 
 **Count how many rectangles disappeared.** That number is the argument for functions, and it is more convincing than any explanation. Say it out loud.
 
@@ -59,4 +59,4 @@ This is also what makes a big chart manageable. The convention says stay under t
 |------|---------|
 | **function call (double rail)** | A flowchart shape standing for a sequence defined elsewhere |
 | **returns** | Flow comes back to the chart after the call finishes |
-| **decomposition** | Breaking a problem into pieces — the double-rail is what it looks like drawn |
+| **decomposition** | Breaking a problem into pieces: the double-rail is what it looks like drawn |

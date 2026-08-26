@@ -27,7 +27,7 @@
         "source": "1.5.20",
         "question": "Which of these is pseudocode?",
         "options": [
-          "set largest to a — plain English, laid out like code, no punctuation to get wrong",
+          "set largest to a: plain English, laid out like code, no punctuation to get wrong",
           "let largest = a;",
           "console.log(largest);",
           "if (a > b) { largest = a; }"
@@ -40,10 +40,10 @@
         "source": "1.5.21",
         "question": "Plan A above is meant to find the largest of three numbers. Does it work?",
         "options": [
-          "No — it never compares b against c",
-          "No — it should compare all three at once in a single decision",
+          "No: it never compares b against c",
+          "No: it should compare all three at once in a single decision",
           "Yes, but only when a is actually the largest",
-          "Yes — it starts by assuming a is largest, then replaces it whenever it finds something bigger"
+          "Yes: it starts by assuming a is largest, then replaces it whenever it finds something bigger"
         ],
         "answer": 3,
         "explanation": "Carrying \"the largest so far\" and replacing it is the standard shape. b and c each get their turn against the running answer."
@@ -56,7 +56,7 @@
           "Loops always stop on their own after enough passes",
           "The word \"until\" guarantees it",
           "The step inside the loop can change the answer being tested, so the condition can become false",
-          "Nothing does — a password loop can never be guaranteed to end"
+          "Nothing does: a password loop can never be guaranteed to end"
         ],
         "answer": 2,
         "explanation": "Something inside the loop has to be able to change what the condition looks at. That is the same rule the broken plan in 1.5.23 violated."
@@ -69,7 +69,7 @@
           "Add a comment explaining both",
           "Split it into two lines",
           "Indent it twice",
-          "Leave it — pseudocode has no rules"
+          "Leave it: pseudocode has no rules"
         ],
         "answer": 1,
         "explanation": "Two rules do almost all the work: one instruction per line, and indent what is inside something else."

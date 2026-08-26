@@ -1,5 +1,5 @@
-// 2.2.8b Lab — An array of Enemies (reference solution).
-// A for loop is a valid alternative — the grader accepts both forms.
+// 2.2.8b Lab: An array of Enemies (reference solution).
+// A for loop is a valid alternative: the grader accepts both forms.
 
 class Enemy {
   constructor(x, y, hp) {

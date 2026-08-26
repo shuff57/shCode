@@ -7,7 +7,7 @@
 // STEP 2: Create a variable called total and set it to 0.
 //         Write a for loop that visits every element in the array by index,
 //         starting at 0 and stopping when the index reaches the end of
-//         the array — the reading shows how to ask an array how long it is..
+//         the array: the reading shows how to ask an array how long it is..
 //         On each iteration, add the current element to total.
 
 // STEP 3: After the loop ends, use console.log to print the value of total.

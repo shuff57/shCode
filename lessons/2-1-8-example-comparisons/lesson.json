@@ -1,6 +1,6 @@
 {
   "id": "2-1-8-example-comparisons",
-  "title": "2.1.16 Worked Example — What each comparison returns",
+  "title": "2.1.16 Worked Example: What each comparison returns",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed — practice for comparison operators used throughout book 2.1",
+  "sourceRef": "designed: practice for comparison operators used throughout book 2.1",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

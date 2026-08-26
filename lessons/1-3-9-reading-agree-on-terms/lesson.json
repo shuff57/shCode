@@ -1,7 +1,7 @@
 {
   "id": "1-3-9-reading-agree-on-terms",
-  "title": "1.3.9 Reading — Agree on Terms",
-  "description": "If the team says \"user\", never write \"visitor\". Definition 1.3.1, fourth rule — the one that only bites in groups.",
+  "title": "1.3.9 Reading: Agree on Terms",
+  "description": "If the team says \"user\", never write \"visitor\". Definition 1.3.1, fourth rule: the one that only bites in groups.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

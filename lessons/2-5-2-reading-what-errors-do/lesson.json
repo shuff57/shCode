@@ -1,6 +1,6 @@
 {
   "id": "2-5-2-reading-what-errors-do",
-  "title": "2.5.2 Reading — What an Error Actually Does",
+  "title": "2.5.2 Reading: What an Error Actually Does",
   "description": "See what a runtime error does to a running program, and tell it apart from a syntax error. Read before 2.5.3 Runtime or Syntax?.",
   "type": "lesson",
   "estimateMins": 10,
@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.5.1 — 'What an Error Actually Does', Definition 2.5.1, both runnable examples",
+  "sourceRef": "book 2.5.1: 'What an Error Actually Does', Definition 2.5.1, both runnable examples",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

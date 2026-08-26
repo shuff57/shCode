@@ -1,4 +1,4 @@
-## The full round-trip — save, reload, restore
+## The full round-trip: save, reload, restore
 
 **Read before the 2.5.11 worked example.** About 5 minutes.
 
@@ -14,7 +14,7 @@ You've seen `stringify` + `storeItem` (save) and `getItem` + `parse` (load) sepa
 
 - Before anything else, check if a save exists in `setup()`.
 - Build your save object with every value your game needs to remember.
-- After `JSON.parse`, numeric fields come back as numbers — but always coerce them with `Number()` to be safe when combining with user input or new defaults.
+- After `JSON.parse`, numeric fields come back as numbers, but always coerce them with `Number()` to be safe when combining with user input or new defaults.
 
 **Try it:**
 
@@ -37,7 +37,7 @@ function setup() {
     level = 1;
     playerX = 200;
     playerY = 200;
-    console.log('no save — using defaults');
+    console.log('no save: using defaults');
   }
 }
 
@@ -73,7 +73,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** press Space a few times to build up a score, then press S to save. Refresh the page — your score is back.
+**What you'll see:** press Space a few times to build up a score, then press S to save. Refresh the page: your score is back.
 
 That is the full round-trip. Build an object, stringify, store. Later: getItem, parse, coerce, restore.
 
@@ -86,4 +86,4 @@ That is the full round-trip. Build an object, stringify, store. Later: getItem, 
 | Term | Meaning |
 |------|---------|
 | **Round-trip** | The full cycle: save an object, then later load and restore it. |
-| **Save object** | A plain JS object containing every piece of state you want to persist — scores, positions, levels, flags. |
+| **Save object** | A plain JS object containing every piece of state you want to persist: scores, positions, levels, flags. |

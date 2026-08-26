@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.3.3 — Try It Now 2.2",
+  "sourceRef": "book 2.3.3: Try It Now 2.2",
   "steps": [
     {
       "id": "s1",
@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "title": "Fix it",
-      "instructions": "Add the one missing break so the switch prints exactly one line. Do not change anything else — not the case values, not the messages."
+      "instructions": "Add the one missing break so the switch prints exactly one line. Do not change anything else, not the case values, not the messages."
     }
   ],
   "requirements": [

@@ -1,6 +1,6 @@
-**Goal:** Build a plain `switch` statement with three cases that each draw different text. Not a game yet — just getting comfortable with the syntax before adding state transitions.
+**Goal:** Build a plain `switch` statement with three cases that each draw different text. Not a game yet, just getting comfortable with the syntax before adding state transitions.
 
-## Step 1 — A switch with one case
+## Step 1: A switch with one case
 
 Start small. One variable, one case, one output. Run it and confirm the switch runs inside `draw()`.
 
@@ -24,9 +24,9 @@ function draw() {
 }
 ```
 
-## Step 2 — Add beta and gamma cases
+## Step 2: Add beta and gamma cases
 
-Two more cases. Same variable. Each case draws its own label in a different color. Only the matching case runs — the other two are skipped.
+Two more cases. Same variable. Each case draws its own label in a different color. Only the matching case runs: the other two are skipped.
 
 ```js live
 let state = 'alpha';
@@ -60,9 +60,9 @@ function draw() {
 }
 ```
 
-**Try this:** edit `let state = 'alpha'` to `'beta'` and hit Run. Then `'gamma'`. The same switch, the same structure — only the matching case runs.
+**Try this:** edit `let state = 'alpha'` to `'beta'` and hit Run. Then `'gamma'`. The same switch, the same structure, only the matching case runs.
 
-## Step 3 — Keyboard switches the state
+## Step 3: Keyboard switches the state
 
 Hard-coding the state variable is fine for testing, but games change screens from the keyboard. Add `kb.presses(...)` inside each case so pressing A/B/G jumps between screens.
 
@@ -112,9 +112,9 @@ function draw() {
 
 Run it. Press A, B, G. Each press changes the state variable. The next frame, `draw()` runs the switch again and dispatches to the new case.
 
-## Step 4 — Prove it works with a counter
+## Step 4: Prove it works with a counter
 
-Add a `frameCount` display. Even though the counter updates every frame, the switch still correctly picks one case per frame — proving the dispatch pattern works at 60 fps.
+Add a `frameCount` display. Even though the counter updates every frame, the switch still correctly picks one case per frame: proving the dispatch pattern works at 60 fps.
 
 ```js live
 let state = 'alpha';
@@ -167,6 +167,6 @@ function draw() {
 ## Key takeaways
 
 - `switch(state)` checks one variable and runs the matching `case`.
-- Only one case executes per frame — the variable can only hold one value.
+- Only one case executes per frame: the variable can only hold one value.
 - Adding a case is as easy as copying an existing one and changing the label and colors.
 - `kb.presses(...)` inside cases is how screens transition between each other.

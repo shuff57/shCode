@@ -1,6 +1,6 @@
 {
   "id": "1-5-32-reading-sequential-parallel-concurrent",
-  "title": "1.5.32 Reading — Sequential, Parallel, Concurrent",
+  "title": "1.5.32 Reading: Sequential, Parallel, Concurrent",
   "description": "Three ways the same instructions can be carried out, and why two of them finish sooner.",
   "type": "lesson",
   "estimateMins": 10,

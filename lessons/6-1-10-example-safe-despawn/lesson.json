@@ -1,9 +1,9 @@
 {
   "id": "6-1-10-example-safe-despawn",
-  "title": "6.2.5 Worked Example — Safe Despawn",
+  "title": "6.2.5 Worked Example: Safe Despawn",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.2 Overlaps and Collisions",
   "preview": "example",
   "week": 13,

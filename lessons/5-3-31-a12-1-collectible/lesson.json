@@ -1,10 +1,10 @@
 {
   "id": "5-3-31-a12-1-collectible",
   "title": "5.4.18 Collectible Class",
-  "description": "Write a Collectible class, instantiate at least 5, and detect overlap with the player. SLO-2 lab — the class is the point. Auto-graded.",
+  "description": "Write a Collectible class, instantiate at least 5, and detect overlap with the player. SLO-2 lab: the class is the point. Auto-graded.",
   "type": "assignment",
   "estimateMins": 45,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
   "preview": "moshion",
   "week": 12,
@@ -18,7 +18,7 @@
       "title": "Define the Collectible class",
       "instructions": "Write `class Collectible { }` with a `constructor(x, y, value, color)`. Store the data on `this` and create `this.sprite = new Sprite(...)`.",
       "hints": [
-        "Re-read 2.2.8 Worked Example — the `Enemy` constructor follows the same `this.x = x` / `this.sprite = new Sprite(...)` pattern."
+        "Re-read 2.2.8 Worked Example: the `Enemy` constructor follows the same `this.x = x` / `this.sprite = new Sprite(...)` pattern."
       ]
     },
     {
@@ -34,7 +34,7 @@
       "title": "Instantiate at least 5 Collectibles",
       "instructions": "In `setup()` (after the player is created), push at least 5 `new Collectible(...)` into the `collectibles` array at different positions, with different values and colors.",
       "hints": [
-        "A `for` loop with `collectibles.push(new Collectible(...))` is one option — a `const` per item works too."
+        "A `for` loop with `collectibles.push(new Collectible(...))` is one option: a `const` per item works too."
       ]
     },
     {
@@ -43,7 +43,7 @@
       "instructions": "In `draw()`, iterate the `collectibles` array. When the player overlaps a collectible's sprite, call its `collect()` method, add the returned value to `totalScore`, and remove that item from the array.",
       "hints": [
         "Check the Sprite section of the moSHion docs drawer for the overlap check.",
-        "Removing items while iterating forwards skips neighbours — search for 'iterate backwards to splice' if you hit that bug."
+        "Removing items while iterating forwards skips neighbours: search for 'iterate backwards to splice' if you hit that bug."
       ]
     }
   ],
@@ -51,7 +51,7 @@
     {
       "id": "r1",
       "title": "Constructor stores state on the object",
-      "description": "The constructor body assigns at least one argument onto this — the class shell is provided, so this checks the part the student writes",
+      "description": "The constructor body assigns at least one argument onto this: the class shell is provided, so this checks the part the student writes",
       "type": "regex",
       "file": "script.js",
       "pattern": "constructor\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?this\\.\\w+\\s*=",

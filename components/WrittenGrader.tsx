@@ -317,6 +317,18 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       <textarea
         value={response}
         onChange={(e) => setResponse(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key !== 'Tab') return;
+          e.preventDefault();
+          const el = e.currentTarget;
+          const start = el.selectionStart;
+          const end = el.selectionEnd;
+          const next = response.slice(0, start) + '  ' + response.slice(end);
+          setResponse(next);
+          requestAnimationFrame(() => {
+            el.selectionStart = el.selectionEnd = start + 2;
+          });
+        }}
         placeholder="Write your response here. Full sentences preferred."
         rows={10}
         style={{

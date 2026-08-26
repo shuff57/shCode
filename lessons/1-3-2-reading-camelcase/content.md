@@ -1,18 +1,18 @@
 ## camelCase names that say what they hold
 
-A variable name should tell a reader what the value means. The JavaScript habit is **camelCase**: start lowercase, and capitalize each new word — `firstName`, `totalPrice`, `isOnSale`. A good name like `unitPrice` is worth more than a comment explaining what `p` means.
+A variable name should tell a reader what the value means. The JavaScript habit is **camelCase**: start lowercase, and capitalize each new word: `firstName`, `totalPrice`, `isOnSale`. A good name like `unitPrice` is worth more than a comment explaining what `p` means.
 
 **What you'll learn from it:**
 - camelCase starts lowercase and capitalizes each later word.
 - Descriptive names (`unitPrice`) beat short mystery names (`p`).
-- The computer runs both versions the same — names are for humans.
+- The computer runs both versions the same: names are for humans.
 - A clear name often removes the need for a comment.
 - A value that never changes gets a different style: `UPPER_SNAKE_CASE`, like `TAX_RATE`.
 
 **Try it:**
 
 ```js live plain
-// Mystery names — what does this even calculate?
+// Mystery names: what does this even calculate?
 let p = 29.99;
 let q = 3;
 let t = p * q;
@@ -30,7 +30,7 @@ console.log("Subtotal: $" + subtotal);
 There is one other naming style in this course, and it exists to answer a question a reader
 always has: *is this value going to move?*
 
-When a value is set once and never changes again — a tax rate, the number of days in a week —
+When a value is set once and never changes again: a tax rate, the number of days in a week :
 write its name in **UPPER_SNAKE_CASE**: every letter capital, with an underscore between words.
 
 | Style | Looks like | Used for |

@@ -1,6 +1,6 @@
 {
   "id": "1-5-14-reading-layers-of-abstraction",
-  "title": "1.5.14 Reading — Layers of Abstraction",
+  "title": "1.5.14 Reading: Layers of Abstraction",
   "description": "Real systems stack abstractions so each layer minds its own job. You already trust dozens of them.",
   "type": "lesson",
   "estimateMins": 10,

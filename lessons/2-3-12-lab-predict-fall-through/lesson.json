@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.3.3 — Concepts in Practice: Tracing fall-through, Q1",
+  "sourceRef": "book 2.3.3: Concepts in Practice: Tracing fall-through, Q1",
   "steps": [
     {
       "id": "s1",

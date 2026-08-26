@@ -1,6 +1,6 @@
 {
   "id": "2-3-15-example-weekend-weekday",
-  "title": "2.3.15 Worked Example — Weekend or Weekday",
+  "title": "2.3.15 Worked Example: Weekend or Weekday",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.3.4 — the Saturday/Sunday grouped-case example and its || comparison",
+  "sourceRef": "book 2.3.4: the Saturday/Sunday grouped-case example and its || comparison",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

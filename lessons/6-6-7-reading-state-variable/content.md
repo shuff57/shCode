@@ -2,7 +2,7 @@
 
 What screen is the player on right now? The title screen? The game itself? A game over screen?
 
-The answer lives in one variable. That variable is the single source of truth — one place to check, zero confusion.
+The answer lives in one variable. That variable is the single source of truth: one place to check, zero confusion.
 
 Use a string: `'title'`, `'play'`, `'gameover'`. Strings are readable. When you see `case 'play':` you know exactly what screen that is.
 
@@ -69,6 +69,6 @@ What happens when `isTitleScreen` and `isPlaying` are both `true`? Nothing good.
 
 | Term | Meaning |
 |------|---------|
-| **State variable** | A `let` whose value says what the game is doing right now — `'title'`, `'play'`, `'gameover'`. |
+| **State variable** | A `let` whose value says what the game is doing right now: `'title'`, `'play'`, `'gameover'`. |
 | **Single source of truth** | One place in the code owns a piece of information. Nothing else can contradict it. |
 | **String state** | Using a readable string like `'play'` instead of a number like `1` for the state value. |

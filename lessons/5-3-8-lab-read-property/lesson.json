@@ -1,10 +1,10 @@
 {
   "id": "5-3-8-lab-read-property",
-  "title": "5.3.8 Lab — Read a property",
+  "title": "5.3.8 Lab: Read a property",
   "description": "Read `b.color` and `b.size` off a Box instance and print them to the on-canvas console using `console.log`. First practice with dot-notation reads.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.3 Classes and Objects via moSHion",
   "preview": "moshion",
   "week": 12,
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Print b.color and b.size to the console",
-      "instructions": "Inside `draw()`, call `console.log` twice — once with `b.color` and once with `b.size`. Both values should appear in the on-canvas console every frame.",
+      "instructions": "Inside `draw()`, call `console.log` twice, once with `b.color` and once with `b.size`. Both values should appear in the on-canvas console every frame.",
       "hints": [
         "Open the moSHion docs drawer on the right and look at how console.log works inside a sketch."
       ]

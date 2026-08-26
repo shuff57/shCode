@@ -1,6 +1,6 @@
-**Goal:** Wire up condition-driven transitions so the game itself decides when screens change — no button press needed.
+**Goal:** Wire up condition-driven transitions so the game itself decides when screens change: no button press needed.
 
-## Step 1 — Set up a play state with score and health
+## Step 1: Set up a play state with score and health
 
 Start with a play state that tracks two numbers: a score that climbs and a health bar that drains over time. Player moves with A/D, score increments each frame, health decrements slowly.
 
@@ -33,7 +33,7 @@ function draw() {
 }
 ```
 
-## Step 2 — Add the win condition
+## Step 2: Add the win condition
 
 When score passes 300, the game is won. In the play case, check `if (score >= 300)` and switch to a `'win'` state. The win screen shows the final score.
 
@@ -75,7 +75,7 @@ function draw() {
 }
 ```
 
-## Step 3 — Add the game over condition
+## Step 3: Add the game over condition
 
 Now check health: when it drops to 0 or below, switch to a `'gameover'` state. Both conditions run every frame inside the play case.
 
@@ -138,8 +138,8 @@ function draw() {
 
 ## Key takeaways
 
-- Condition-driven transitions happen **automatically** inside the play case — no key press needed.
+- Condition-driven transitions happen **automatically** inside the play case: no key press needed.
 - Check conditions **every frame** in `draw()`.
 - Multiple conditions can coexist: `score >= 300` triggers win, `health <= 0` triggers game over.
 - Restart resets all variables AND the state back to `'play'`.
-- Win and game over are **separate states** — they can share a restart key check but draw different text.
+- Win and game over are **separate states**: they can share a restart key check but draw different text.

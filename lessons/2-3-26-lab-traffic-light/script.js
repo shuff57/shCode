@@ -1,6 +1,6 @@
 // 2.3.26 Rewrite the Traffic Light as a Switch
 //
-// Here is the chain you are rewriting — do not delete this comment:
+// Here is the chain you are rewriting: do not delete this comment:
 //
 // let light = "yellow";
 // if (light === "green") {

@@ -19,7 +19,7 @@
     {
       "id": "s2",
       "title": "Use two string methods",
-      "instructions": "Apply at least two different string methods to your text — for example .length, .toUpperCase(), .toLowerCase(), or .includes()."
+      "instructions": "Apply at least two different string methods to your text, for example .length, .toUpperCase(), .toLowerCase(), or .includes()."
     },
     {
       "id": "s3",

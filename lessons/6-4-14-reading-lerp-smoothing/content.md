@@ -1,13 +1,13 @@
 ## Smooth Follow with lerp
 
-**Read before attempting `6.4.17 Worked Example — Smooth Camera with lerp`.**
+**Read before attempting `6.4.17 Worked Example: Smooth Camera with lerp`.**
 
 **What you'll learn from it:**
 
 - `lerp(current, target, t)` returns a value `t`-fraction of the way from `current` to `target`.
 - Replacing `camera.x = player.pos.x` with `camera.x = lerp(camera.x, player.pos.x, 0.1)` makes the camera trail the player like it's on a stretchy spring.
 - Small `t` (0.05–0.1) gives a smooth lag; large `t` (0.5+) snaps closely to the target.
-- `lerp` is also useful anywhere you want eased motion — UI transitions, value blending, color fades.
+- `lerp` is also useful anywhere you want eased motion: UI transitions, value blending, color fades.
 
 **Try it:**
 
@@ -44,7 +44,7 @@ Walk right with **D**, then stop. Notice the camera overshoots slightly and ease
 
 | Term | Meaning |
 |------|---------|
-| **`lerp(a, b, t)`** | Linear interpolation — returns `a + t * (b - a)`, a value `t`-fraction from `a` to `b`. |
-| **Easing** | Smooth blending of motion via interpolation — makes movement feel elastic or weighted. |
+| **`lerp(a, b, t)`** | Linear interpolation: returns `a + t * (b - a)`, a value `t`-fraction from `a` to `b`. |
+| **Easing** | Smooth blending of motion via interpolation: makes movement feel elastic or weighted. |
 | **`t` factor** | Controls lerp speed: `0.05` = slow/laggy, `0.1` = smooth spring, `0.5+` = snappy. |
 | **Follow camera** | A camera whose position tracks a sprite, updated each frame in `draw()`. |

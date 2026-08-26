@@ -1,10 +1,10 @@
 {
   "id": "5-3-9-lab-write-property",
-  "title": "5.3.9 Lab — Write a property",
+  "title": "5.3.9 Lab: Write a property",
   "description": "Mutate `b.color` on a space-bar press to practice assigning a new value to an instance property. First practice with dot-notation writes.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.3 Classes and Objects via moSHion",
   "preview": "moshion",
   "week": 12,

@@ -1,6 +1,6 @@
 **Goal:** Feel the difference between "data scattered across arrays" and "data bundled into instances" by running both versions yourself.
 
-## Step 1 — Procedural with parallel arrays
+## Step 1: Procedural with parallel arrays
 
 Each piece of enemy data lives in its own array, indexed in parallel. Functions take an index `i` and reach into all four arrays at once. Press **space** to damage enemy 0, or **d** to delete it.
 
@@ -49,9 +49,9 @@ function deleteEnemy(i) {
 }
 ```
 
-Look at `deleteEnemy`. Four arrays, four `splice`/`delete` calls — all aligned by index. Forget one and the arrays fall out of sync forever: `enemyX[0]` would refer to a different enemy than `enemyHP[0]`.
+Look at `deleteEnemy`. Four arrays, four `splice`/`delete` calls: all aligned by index. Forget one and the arrays fall out of sync forever: `enemyX[0]` would refer to a different enemy than `enemyHP[0]`.
 
-## Step 2 — OOP with an array of instances
+## Step 2: OOP with an array of instances
 
 All the data and behavior live inside the `Enemy` class. The outside world works with a single array of objects. Same controls: **space** to damage enemy 0, **d** to delete it.
 
@@ -95,11 +95,11 @@ function draw() {
 }
 ```
 
-Same behavior. One array instead of four. Each enemy carries its own data, so deletion is one local method — nothing outside the class can forget to update a "parallel" piece of state, because there isn't any.
+Same behavior. One array instead of four. Each enemy carries its own data, so deletion is one local method: nothing outside the class can forget to update a "parallel" piece of state, because there isn't any.
 
-## Step 3 — Which would you rather extend?
+## Step 3: Which would you rather extend?
 
-Think through these before your A12.2 written reflection — no answer key:
+Think through these before your A12.2 written reflection: no answer key:
 
 1. You want to add an `element` property to each enemy (fire, ice, lightning). In Step 1, how many arrays do you touch? In Step 2, how many lines inside the class do you touch?
 2. In Step 1, deleting enemy at index 3 means four aligned operations. What happens if you forget one? In Step 2, what is the equivalent operation?
@@ -108,5 +108,5 @@ Think through these before your A12.2 written reflection — no answer key:
 ## Key takeaways
 
 - **Procedural** keeps data in separate arrays indexed in parallel. Simple for tiny programs, fragile once you add more fields or start deleting mid-array.
-- **OOP** bundles data and the functions that act on it into one object. Adding a property or behavior is a local change — you don't hunt across four arrays.
+- **OOP** bundles data and the functions that act on it into one object. Adding a property or behavior is a local change: you don't hunt across four arrays.
 - Both approaches run the same simulation. OOP isn't "faster." It's a different way to organize the same code so it's easier to change later.

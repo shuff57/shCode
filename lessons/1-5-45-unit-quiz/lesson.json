@@ -33,7 +33,7 @@
           "Doing arithmetic quickly in your head"
         ],
         "answer": 2,
-        "explanation": "It is a way of approaching a problem, and it has nothing to do with thinking like a machine — people used it long before computers existed."
+        "explanation": "It is a way of approaching a problem, and it has nothing to do with thinking like a machine: people used it long before computers existed."
       },
       {
         "id": "q2-four-techniques",
@@ -46,7 +46,7 @@
           "Reading, writing, running and debugging"
         ],
         "answer": 0,
-        "explanation": "Those four. The second list is the software life-cycle, and the third is structured programming — different ideas that are easy to mix up."
+        "explanation": "Those four. The second list is the software life-cycle, and the third is structured programming: different ideas that are easy to mix up."
       },
       {
         "id": "q3-plan-first",
@@ -56,7 +56,7 @@
           "Typing slowly is bad for your hands",
           "You separate deciding what to do from getting it past the computer, so you only fight one problem at a time",
           "Planning is required before the browser will run your code",
-          "It is not faster — it just looks more professional"
+          "It is not faster: it just looks more professional"
         ],
         "answer": 1,
         "explanation": "Typing your way to an answer means solving the problem and satisfying the syntax at the same time. Planning first splits those apart, and a wrong plan is far cheaper to throw away than wrong code."
@@ -72,7 +72,7 @@
           "Oval = input, rectangle = output, diamond = a step"
         ],
         "answer": 1,
-        "explanation": "Table 1.5.2: oval for start and end, rectangle for a step, diamond for a decision. (This course adds a parallelogram for input and output — see 1.5.29.)"
+        "explanation": "Table 1.5.2: oval for start and end, rectangle for a step, diamond for a decision. (This course adds a parallelogram for input and output: see 1.5.29.)"
       },
       {
         "id": "q5-diamond",
@@ -85,7 +85,7 @@
           "All of them have two arrows leaving"
         ],
         "answer": 2,
-        "explanation": "The diamond is the only one that branches. Everything else has exactly one way out — which is what keeps a chart readable."
+        "explanation": "The diamond is the only one that branches. Everything else has exactly one way out: which is what keeps a chart readable."
       },
       {
         "id": "q6-pseudocode-vs-flowchart",
@@ -95,7 +95,7 @@
           "Pseudocode is faster to write and edit; a flowchart makes branching obvious at a glance",
           "A flowchart is faster to write; pseudocode is better for showing branches",
           "Pseudocode is better in every way, which is why flowcharts are no longer used",
-          "They are the same thing — one is just drawn instead of typed"
+          "They are the same thing: one is just drawn instead of typed"
         ],
         "answer": 0,
         "explanation": "They fail in opposite directions. Pseudocode stays a list and scales to long programs; a flowchart gets enormous, but you can see a branch instead of tracing it."
@@ -105,10 +105,10 @@
         "source": "1.5.33 and 1.5.34",
         "question": "What is a base case, and what happens without one?",
         "options": [
-          "The first line of any program — without one the program will not start",
-          "The stopping condition in a recursive function — without one it calls itself forever and crashes",
-          "The simplest test case you write — without one you cannot check your work",
-          "The default branch of an if statement — without one nothing happens"
+          "The first line of any program, without one the program will not start",
+          "The stopping condition in a recursive function, without one it calls itself forever and crashes",
+          "The simplest test case you write, without one you cannot check your work",
+          "The default branch of an if statement, without one nothing happens"
         ],
         "answer": 1,
         "explanation": "The base case is the case that does not recurse. Leave it out and the function keeps calling itself until the browser gives up with a stack overflow."
@@ -124,7 +124,7 @@
           "The line number, the column number and the character"
         ],
         "answer": 2,
-        "explanation": "In `Uncaught ReferenceError: totl is not defined at line 3` — the kind is ReferenceError, the detail names your typo exactly, and the place is line 3."
+        "explanation": "In `Uncaught ReferenceError: totl is not defined at line 3`: the kind is ReferenceError, the detail names your typo exactly, and the place is line 3."
       },
       {
         "id": "q9-console-label",

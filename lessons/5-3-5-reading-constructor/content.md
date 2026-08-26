@@ -1,20 +1,20 @@
 ## `constructor` and its parameters
 
-**Read before `5.3.6 Worked Example — You've been using classes`.** About 4 minutes.
+**Read before `5.3.6 Worked Example: You've been using classes`.** About 4 minutes.
 
 By the end of this reading you should be able to answer:
 
 - Where do the arguments you pass to `new Point(3, 4)` actually go?
 - What happens if the constructor never assigns `this.y`?
 
-The `constructor` is just a function — but it's the one function that `new` calls automatically. Its job is to receive arguments and park them on `this` so the rest of the class can use them later.
+The `constructor` is just a function, but it's the one function that `new` calls automatically. Its job is to receive arguments and park them on `this` so the rest of the class can use them later.
 
 **What you'll learn from it:**
 
 - `constructor(x, y)` receives the same arguments you pass to `new ClassName(x, y)`.
 - `this.x = x` stores the first argument on the new instance as a property named `x`.
 - If you forget to assign a parameter to `this`, that data is lost the moment the constructor returns.
-- A class with no `constructor` at all still works — JavaScript provides a silent empty one.
+- A class with no `constructor` at all still works: JavaScript provides a silent empty one.
 
 **Try it:**
 

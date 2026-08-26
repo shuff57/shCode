@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed — capstone quiz, assignment code A2.1.2 per curriculum-plan §2.1 Assignments; questions draw on book 2.1 Problem Set 2.1.7-2.1.10 intent (=== vs ==, operator precedence, trace prediction)",
+  "sourceRef": "designed: capstone quiz, assignment code A2.1.2 per curriculum-plan §2.1 Assignments; questions draw on book 2.1 Problem Set 2.1.7-2.1.10 intent (=== vs ==, operator precedence, trace prediction)",
   "points": 0,
   "contentFile": "content.md",
   "grading": {
@@ -45,11 +45,11 @@
         "options": [
           "|| runs first, because it appears later",
           "They run left to right, so it does not matter",
-          "&& runs first — it binds more tightly than ||",
+          "&& runs first: it binds more tightly than ||",
           "Whichever one you put parentheses around"
         ],
         "answer": 2,
-        "explanation": "&& binds tighter, so it groups as `(age >= 13 && age <= 19) || hasException`. Writing those parentheses in changes nothing about the result — it just stops the next reader having to remember the rule."
+        "explanation": "&& binds tighter, so it groups as `(age >= 13 && age <= 19) || hasException`. Writing those parentheses in changes nothing about the result: it just stops the next reader having to remember the rule."
       },
       {
         "id": "q3-trace-chain",
@@ -63,7 +63,7 @@
           "Cold and Warm, on two lines"
         ],
         "answer": 1,
-        "explanation": "45 is not below 32, but it is below 60, so the chain stops there and prints Cold. An if/else-if chain runs at most one branch — the first one that matches."
+        "explanation": "45 is not below 32, but it is below 60, so the chain stops there and prints Cold. An if/else-if chain runs at most one branch: the first one that matches."
       },
       {
         "id": "q4-trace-ternary",
@@ -77,7 +77,7 @@
           "D"
         ],
         "answer": 2,
-        "explanation": "72 fails the first two tests and passes `score >= 70`, so grade becomes \"C\". A chained ternary is read exactly like an if/else-if chain — top to bottom, first match wins."
+        "explanation": "72 fails the first two tests and passes `score >= 70`, so grade becomes \"C\". A chained ternary is read exactly like an if/else-if chain: top to bottom, first match wins."
       },
       {
         "id": "q5-or-trap",
@@ -91,7 +91,7 @@
           "Friday"
         ],
         "answer": 1,
-        "explanation": "The left side is false, so || hands back the right side — the string \"Sunday\", which is truthy. It never compares day to \"Sunday\" at all. You have to write the comparison twice: `day === \"Saturday\" || day === \"Sunday\"`."
+        "explanation": "The left side is false, so || hands back the right side: the string \"Sunday\", which is truthy. It never compares day to \"Sunday\" at all. You have to write the comparison twice: `day === \"Saturday\" || day === \"Sunday\"`."
       }
     ]
   }

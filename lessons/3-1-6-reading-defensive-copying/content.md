@@ -15,7 +15,7 @@ From the previous reading you know that arrays and objects are passed by referen
 let copy = [...original];
 ```
 
-The `...` (spread) inside `[...]` unpacks every element of `original` into a brand-new array. `copy` and `original` are separate — changing `copy` does not touch `original`.
+The `...` (spread) inside `[...]` unpacks every element of `original` into a brand-new array. `copy` and `original` are separate: changing `copy` does not touch `original`.
 
 ### Copying an object: `{...obj}`
 
@@ -25,7 +25,7 @@ let copy = {...original};
 
 Same idea for plain objects. The `...` inside `{...}` copies every key-value pair into a new object.
 
-> **One-level deep only.** Spread makes a *shallow* copy — nested arrays or objects inside are still shared. For now, all the arrays and objects in this course are flat, so spread is the right tool.
+> **One-level deep only.** Spread makes a *shallow* copy: nested arrays or objects inside are still shared. For now, all the arrays and objects in this course are flat, so spread is the right tool.
 
 **Try it:** Predict what each `console.log` will print, then run it.
 
@@ -36,7 +36,7 @@ var scores = [90, 85, 78];
 var scoresCopy = [...scores];
 scoresCopy.push(100);
 
-console.log("original:", scores);    // [90, 85, 78] — unchanged
+console.log("original:", scores);    // [90, 85, 78]: unchanged
 console.log("copy:", scoresCopy);    // [90, 85, 78, 100]
 
 // Object copy works the same way
@@ -44,7 +44,7 @@ var student = { name: "Alex", grade: "A" };
 var studentCopy = { ...student };
 studentCopy.grade = "B";
 
-console.log("original student:", student.grade);   // A — unchanged
+console.log("original student:", student.grade);   // A: unchanged
 console.log("copy student:", studentCopy.grade);   // B
 ```
 
@@ -56,5 +56,5 @@ console.log("copy student:", studentCopy.grade);   // B
 |------|---------|
 | **defensive copying** | Making a copy of data before changing it to protect the original |
 | **spread (`...`)** | Syntax that unpacks an array or object into a new one: `[...arr]`, `{...obj}` |
-| **shallow copy** | A one-level-deep copy — nested objects inside are still shared |
+| **shallow copy** | A one-level-deep copy: nested objects inside are still shared |
 | **mutation** | Changing data in place; defensive copying avoids unwanted mutations |

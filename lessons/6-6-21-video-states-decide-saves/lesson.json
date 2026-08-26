@@ -1,10 +1,10 @@
 {
   "id": "6-6-21-video-states-decide-saves",
-  "title": "6.6.23 Video — States Decide When to Save",
+  "title": "6.6.23 Video: States Decide When to Save",
   "description": "States and saves work together: when the player reaches 'gameover', auto-save their score. When they hit 'win', save their victory. States trigger saves.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "video",
   "week": 17,

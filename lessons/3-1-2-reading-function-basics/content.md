@@ -8,7 +8,7 @@
 
 A **function** is a named block of code you write once and run whenever you need it.
 
-**Defining** a function tells JavaScript what the function does — but nothing runs yet:
+**Defining** a function tells JavaScript what the function does, but nothing runs yet:
 
 ```
 function greet() {
@@ -44,7 +44,7 @@ Notice the function body runs each time you call it. Defining it once, calling i
 | Term | Meaning |
 |------|---------|
 | **function** | A named block of code you can run on demand |
-| **define** | Write out the function body with `function name() { ... }` — does not run it |
-| **call** | Execute the function by writing `name()` — this is what runs the code |
+| **define** | Write out the function body with `function name() { ... }`: does not run it |
+| **call** | Execute the function by writing `name()`: this is what runs the code |
 | **function body** | The code between `{` and `}` that runs when the function is called |
 | **`function` keyword** | The word that starts a function definition |

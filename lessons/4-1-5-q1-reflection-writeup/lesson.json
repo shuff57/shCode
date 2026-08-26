@@ -14,21 +14,21 @@
   "points": 0,
   "contentFile": "content.md",
   "aiGrader": {
-    "rubricTitle": "Q1 Reflection — AI-graded rubric",
+    "rubricTitle": "Q1 Reflection: AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "This one is about your own work, so most of it comes from you rather than from a reading. 4.1.2 (Plan Before You Code) and 4.1.4 (Manual Testing) will help with question 2, and 1.1.6 (The Four Phases) is where the life-cycle phases were introduced. A few sentences per answer is plenty, in your own everyday words.\n\n1. Name one concept from this quarter — variables, conditionals, loops, functions, arrays, anything — that you found hardest, and explain how you worked through it.\n\n2. Think about how you would build a small program now. Describe how you would plan it, build it, and test it, and connect that to the software-development life-cycle phases from Week 1. (4.1.2, 4.1.4 and 1.1.6)\n\n3. What is one thing you want to get better at next quarter?",
+    "prompt": "This one is about your own work, so most of it comes from you rather than from a reading. 4.1.2 (Plan Before You Code) and 4.1.4 (Manual Testing) will help with question 2, and 1.1.6 (The Four Phases) is where the life-cycle phases were introduced. A few sentences per answer is plenty, in your own everyday words.\n\n1. Name one concept from this quarter: variables, conditionals, loops, functions, arrays, anything: that you found hardest, and explain how you worked through it.\n\n2. Think about how you would build a small program now. Describe how you would plan it, build it, and test it, and connect that to the software-development life-cycle phases from Week 1. (4.1.2, 4.1.4 and 1.1.6)\n\n3. What is one thing you want to get better at next quarter?",
     "rubric": [
       {
         "id": "hardest-concept",
         "title": "Names a hard concept and describes how they worked through it",
-        "description": "Student names a specific Q1 concept they found hard (e.g., 'loops', 'functions', 'arrays') and describes, specifically, how they worked through it — not a generic 'I practiced'. A response like 'I found loops hard so I kept coding until it clicked' does not earn this criterion; a response that names an action ('I wrote the same loop five different ways') does.",
+        "description": "Student names a specific Q1 concept they found hard (e.g., 'loops', 'functions', 'arrays') and describes, specifically, how they worked through it, not a generic 'I practiced'. A response like 'I found loops hard so I kept coding until it clicked' does not earn this criterion; a response that names an action ('I wrote the same loop five different ways') does.",
         "points": 0
       },
       {
         "id": "plan-build-test",
         "title": "Describes a plan → build → test process for a small program",
-        "description": "Student describes how they would plan a small program, build it, and test it — in that order or a clearly recognizable sequence. All three stages (planning, building, testing) must be mentioned. A response that only describes coding without planning or testing does not earn this criterion.",
+        "description": "Student describes how they would plan a small program, build it, and test it, in that order or a clearly recognizable sequence. All three stages (planning, building, testing) must be mentioned. A response that only describes coding without planning or testing does not earn this criterion.",
         "points": 0
       },
       {

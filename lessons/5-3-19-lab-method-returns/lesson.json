@@ -1,10 +1,10 @@
 {
   "id": "5-3-19-lab-method-returns",
-  "title": "5.4.4 Lab — Method that returns a value",
+  "title": "5.4.4 Lab: Method that returns a value",
   "description": "Add `Counter.isHigh()` which returns `true` when `this.n > 10`. The driver uses the return value to color the display red.",
   "type": "lesson",
   "estimateMins": 8,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
   "preview": "moshion",
   "week": 12,
@@ -16,9 +16,9 @@
     {
       "id": "s1",
       "title": "Write the isHigh() method",
-      "instructions": "Inside the `Counter` class body, write an `isHigh()` method that returns `true` if `this.n` is greater than 10, and `false` otherwise. The driver already uses `c.isHigh()` to turn the number red — you supply the method.",
+      "instructions": "Inside the `Counter` class body, write an `isHigh()` method that returns `true` if `this.n` is greater than 10, and `false` otherwise. The driver already uses `c.isHigh()` to turn the number red: you supply the method.",
       "hints": [
-        "Open the moSHion docs drawer on the right — methods that return values use the `return` keyword just like regular functions."
+        "Open the moSHion docs drawer on the right: methods that return values use the `return` keyword just like regular functions."
       ]
     }
   ],

@@ -36,4 +36,4 @@ console.log("for a banking system, the product matters most: it must be reliable
 
 | Term | Definition |
 |---|---|
-| four Ps | Problem, project, people, product — the factors a framework is elaborated around. |
+| four Ps | Problem, project, people, product: the factors a framework is elaborated around. |

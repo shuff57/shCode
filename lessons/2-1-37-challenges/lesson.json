@@ -1,6 +1,6 @@
 {
   "id": "2-1-37-challenges",
-  "title": "2.1.38 Challenges — Optional Stretch",
+  "title": "2.1.38 Challenges: Optional Stretch",
   "description": "Optional stretch problems. Auto-graded.",
   "type": "assignment",
   "estimateMins": 15,
@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed — stretch practice drawing on every book 2.1 concept (if/else if/else, truthy/falsy, ternary, &&/||/!)",
+  "sourceRef": "designed: stretch practice drawing on every book 2.1 concept (if/else if/else, truthy/falsy, ternary, &&/||/!)",
   "steps": [
     {
       "id": "s1",
@@ -26,7 +26,7 @@
     {
       "id": "s3",
       "title": "Nested shipping rule",
-      "instructions": "Create isMember and orderTotal. Nest an if inside an if: if isMember, then check orderTotal — free shipping at $35 or more, otherwise a $5 fee. If not a member, free shipping only at $75 or more, otherwise a $10 fee."
+      "instructions": "Create isMember and orderTotal. Nest an if inside an if: if isMember, then check orderTotal: free shipping at $35 or more, otherwise a $5 fee. If not a member, free shipping only at $75 or more, otherwise a $10 fee."
     }
   ],
   "requirements": [

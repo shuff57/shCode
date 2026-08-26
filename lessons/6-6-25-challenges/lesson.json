@@ -1,10 +1,10 @@
 {
   "id": "6-6-25-challenges",
-  "title": "6.6.27 Challenges — Extended State Features",
+  "title": "6.6.27 Challenges: Extended State Features",
   "description": "Extend your state machine: animated transitions, a loading screen state, state history (undo last transition), or an options/settings state that modifies gameplay.",
   "type": "challenge",
   "estimateMins": 30,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "moshion",
   "week": 17,
@@ -18,7 +18,7 @@
       "title": "Choose a challenge",
       "instructions": "Pick one of the four challenge options from the content below. Each extends your A16.2 state machine with a real game-dev feature.",
       "hints": [
-        "Read all four before deciding. Pick the one that excites you most — you'll spend 30 minutes on it."
+        "Read all four before deciding. Pick the one that excites you most: you'll spend 30 minutes on it."
       ]
     },
     {

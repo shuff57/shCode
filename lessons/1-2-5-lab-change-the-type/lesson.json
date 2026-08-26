@@ -32,7 +32,7 @@
     {
       "id": "s3",
       "title": "Reassign it to a number",
-      "instructions": "Set `thing` to a number. Do NOT declare it again with let — just assign to it."
+      "instructions": "Set `thing` to a number. Do NOT declare it again with let, just assign to it."
     },
     {
       "id": "s4",

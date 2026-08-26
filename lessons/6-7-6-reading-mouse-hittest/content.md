@@ -1,10 +1,10 @@
 ## Is the cursor over a sprite?
 
-**Read before `6.7.7 Worked Example — Click to Spawn a Sprite`.** About 5 minutes.
+**Read before `6.7.7 Worked Example: Click to Spawn a Sprite`.** About 5 minutes.
 
-A hit-test answers one question: is the cursor currently over this sprite? You need the answer before starting a drag — you only want the drag to begin when the player clicks directly on the sprite, not anywhere on the canvas.
+A hit-test answers one question: is the cursor currently over this sprite? You need the answer before starting a drag: you only want the drag to begin when the player clicks directly on the sprite, not anywhere on the canvas.
 
-moSHion gives you `world.getSpriteAt(x, y)`. Pass it the cursor coordinates and it returns the top-most sprite at that point — or `undefined` if there isn't one.
+moSHion gives you `world.getSpriteAt(x, y)`. Pass it the cursor coordinates and it returns the top-most sprite at that point, or `undefined` if there isn't one.
 
 ```js
 world.getSpriteAt(mouse.x, mouse.y)
@@ -23,9 +23,9 @@ if (world.getSpriteAt(mouse.x, mouse.y) === box) {
 - `world.getSpriteAt(x, y)` returns the sprite under that point, or `undefined`.
 - Use `===` to compare against the sprite you care about.
 - The result is fresh every frame, so you can read it inside `draw()`.
-- This is the standard pattern for gating a drag — check the hit-test on `mouse.presses()` to start the drag only on a direct click.
+- This is the standard pattern for gating a drag: check the hit-test on `mouse.presses()` to start the drag only on a direct click.
 
-**Try it:** run the sketch and move your cursor onto the blue square. It turns green. Move off — it turns back to blue.
+**Try it:** run the sketch and move your cursor onto the blue square. It turns green. Move off: it turns back to blue.
 
 ```js live
 let box;

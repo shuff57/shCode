@@ -1,4 +1,4 @@
-// 2.4.33 Challenges — Optional Stretch
+// 2.4.33 Challenges: Optional Stretch
 
 // CHALLENGE 1: Hollow square
 //   Print a 6x6 hollow square using nested loops.

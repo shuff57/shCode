@@ -1,9 +1,9 @@
 {
   "id": "6-4-17-example-smooth-camera",
-  "title": "6.4.17 Worked Example — Smooth Camera with lerp",
+  "title": "6.4.17 Worked Example: Smooth Camera with lerp",
   "type": "lesson",
   "estimateMins": 8,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
   "preview": "example",
   "week": 15,

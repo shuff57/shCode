@@ -1,9 +1,9 @@
 {
   "id": "6-7-15-example-hinge-arm",
-  "title": "6.8.5 Worked Example — Rotating Arm with HingeJoint",
+  "title": "6.8.5 Worked Example: Rotating Arm with HingeJoint",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.8 Joints",
   "preview": "example",
   "week": 17,

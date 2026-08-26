@@ -1,6 +1,6 @@
 # Per-lesson-type conventions
 
-This directory collects the **reusable build conventions** for each lesson type used under `lessons/<slug>/`. Builder AI reads these whenever a module spec under `curriculum/modules/*.md` references a lesson type — the module spec stays short, these docs are the source of truth.
+This directory collects the **reusable build conventions** for each lesson type used under `lessons/<slug>/`. Builder AI reads these whenever a module spec under `curriculum/modules/*.md` references a lesson type: the module spec stays short, these docs are the source of truth.
 
 ## Type index
 
@@ -18,13 +18,13 @@ This directory collects the **reusable build conventions** for each lesson type 
 
 Authoritative badge list lives in `lib/lesson-badges.tsx` (`PREVIEW_BADGES`). Add a row there when introducing a new type.
 
-**Points policy — easy to get wrong when auditing a mixed-type module.** The course is mastery-based (no points visible to students), but the JSON-level shape *and* the pass threshold both differ by type:
+**Points policy: easy to get wrong when auditing a mixed-type module.** The course is mastery-based (no points visible to students), but the JSON-level shape *and* the pass threshold both differ by type:
 - `moshion` / `console` labs and challenges: `requirements[].points`, `grading.totalPoints`, `grading.passingScore` are **always `0`**, and `components/LessonWorkspace.tsx` gates Submit on **every requirement being green (100%)** (see `lab-assignment-conventions.md` §1/§7, `moshion-challenge-conventions.md`).
-- `aiGrader` written assignments: `aiGrader.rubric[].points` is **either `1` per criterion or `0` per criterion** (never mixed within a lesson) — see `written-assignment-conventions.md` §1/§4. Unlike labs, written work is gated by `components/WrittenGrader.tsx`, which **allows partial credit by design**: ≥70% of rubric points earned (`1`-per-item shape) or a bare majority of criteria met-or-partial (`0`-per-item shape). `lesson.json.grading.totalPoints`/`passingScore` are not read on this path at all — they're inert metadata, not a gate.
+- `aiGrader` written assignments: `aiGrader.rubric[].points` is **either `1` per criterion or `0` per criterion** (never mixed within a lesson): see `written-assignment-conventions.md` §1/§4. Unlike labs, written work is gated by `components/WrittenGrader.tsx`, which **allows partial credit by design**: ≥70% of rubric points earned (`1`-per-item shape) or a bare majority of criteria met-or-partial (`0`-per-item shape). `lesson.json.grading.totalPoints`/`passingScore` are not read on this path at all: they're inert metadata, not a gate.
 
-A lesson with non-zero points is only a bug if it's a lab/challenge — labs must gate at 100%. There is no equivalent "bug" shape for written assignments' rubric points; both `0`-per-item and `1`-per-item are legitimate and land on a different (still partial-credit) threshold. Don't expect editing `grading.passingScore` to change a written assignment's pass threshold — it won't.
+A lesson with non-zero points is only a bug if it's a lab/challenge: labs must gate at 100%. There is no equivalent "bug" shape for written assignments' rubric points; both `0`-per-item and `1`-per-item are legitimate and land on a different (still partial-credit) threshold. Don't expect editing `grading.passingScore` to change a written assignment's pass threshold: it won't.
 
-## Title numbering — the hard rule
+## Title numbering: the hard rule
 
 Every lesson's `title` field **MUST** start with a three-part dotted number `<unit>.<module>.<sequence>`. Wherever the per-type docs say `<numbering>` or `<unit-numbering>`, that's what they mean.
 
@@ -34,7 +34,7 @@ Every lesson's `title` field **MUST** start with a three-part dotted number `<un
 <sequence> N = 1, 2, 3, …  (lesson position within the module)
 ```
 
-`lib/curriculum.ts` → `parseNumberedIdFromTitle` greps for this pattern and uses it to place the lesson into its module. **Any lesson whose title doesn't start with three dotted numbers is silently dropped** from `/module/U.M` AND the home page — students never see it.
+`lib/curriculum.ts` → `parseNumberedIdFromTitle` greps for this pattern and uses it to place the lesson into its module. **Any lesson whose title doesn't start with three dotted numbers is silently dropped** from `/module/U.M` AND the home page: students never see it.
 
 ### Position conventions
 
@@ -43,16 +43,16 @@ Every lesson's `title` field **MUST** start with a three-part dotted number `<un
 
 ### Accepted / rejected examples
 
-✅ `"5.1.1 Slides — Hello Sprite Movement"`
-✅ `"5.1.3 Reading — moSHion docs: Canvas & Sprite"`
-✅ `"2.1.1 Slides — Conditionals"` (Unit 2 = Control Flow, not moSHion — see `BOOK-TO-MODULE.md`)
-❌ `"Unit 5.1 Slides — Hello Sprite Movement"` (no numbered prefix)
+✅ `"5.1.1 Slides: Hello Sprite Movement"`
+✅ `"5.1.3 Reading: moSHion docs: Canvas & Sprite"`
+✅ `"2.1.1 Slides: Conditionals"` (Unit 2 = Control Flow, not moSHion: see `BOOK-TO-MODULE.md`)
+❌ `"Unit 5.1 Slides: Hello Sprite Movement"` (no numbered prefix)
 ❌ `"5.1 Sprite Playground"` (needs three parts, not two)
 ❌ `"Reading: 5.1.3 Canvas & Sprite"` (number must be at the start)
 
-If you rename or renumber a lesson after students have started, their progress/commits stay with the folder ID (the `id` field in `lesson.json`), not the title. So renumbering a title doesn't lose data — it only changes where the lesson shows up in listings.
+If you rename or renumber a lesson after students have started, their progress/commits stay with the folder ID (the `id` field in `lesson.json`), not the title. So renumbering a title doesn't lose data: it only changes where the lesson shows up in listings.
 
-## Purpose — why per-type docs, not per-module
+## Purpose: why per-type docs, not per-module
 
 Module specs under `curriculum/modules/` used to repeat the same "Build Outputs" boilerplate (video manifest shape, written-assignment rubric shape, lab starter conventions, etc.) on every file. When a convention shifted, 13 module specs had to change in lockstep and drifted instead.
 
@@ -60,15 +60,15 @@ These per-type docs are the fix: each module spec now **links** instead of resta
 
 ## Adding a new lesson type (quizzes, tests, etc.)
 
-When a new type appears — for example a multiple-choice quiz, a timed test, a peer-review exercise — create a new convention doc next to these. The template is always the same:
+When a new type appears, for example a multiple-choice quiz, a timed test, a peer-review exercise: create a new convention doc next to these. The template is always the same:
 
-1. **Intro + Applies to** — the one-line rule that binds the doc to a `lesson.json` shape.
-2. **Required `lesson.json` shape** — full JSON skeleton with field-by-field notes.
-3. **File layout** — what sits in `lessons/<slug>/` besides `lesson.json`.
-4. **Content-file shape** — if there's a `content.md` or similar, describe its structure.
-5. **Don'ts** — the two or three anti-patterns that waste builder-AI tokens.
-6. **Title convention** — the pattern `lesson.json.title` must follow.
-7. **History** — where the pattern came from. Future-you will want this.
+1. **Intro + Applies to**: the one-line rule that binds the doc to a `lesson.json` shape.
+2. **Required `lesson.json` shape**: full JSON skeleton with field-by-field notes.
+3. **File layout**: what sits in `lessons/<slug>/` besides `lesson.json`.
+4. **Content-file shape**, if there's a `content.md` or similar, describe its structure.
+5. **Don'ts**: the two or three anti-patterns that waste builder-AI tokens.
+6. **Title convention**: the pattern `lesson.json.title` must follow.
+7. **History**: where the pattern came from. Future-you will want this.
 
 Then:
 
@@ -88,7 +88,7 @@ The per-sub-module specs that *consume* these per-type conventions have their ow
 
 ## Related
 
-- `curriculum/modules/*.md` — per-module build specs that consume these conventions.
-- `curriculum/README.md` — how the curriculum build system works overall.
-- `lib/lesson-badges.tsx` — authoritative list of recognized `preview` values.
-- `CLAUDE.md` — project-wide infrastructure (D1, auth, Ollama grader, env vars).
+- `curriculum/modules/*.md`, per-module build specs that consume these conventions.
+- `curriculum/README.md`: how the curriculum build system works overall.
+- `lib/lesson-badges.tsx`: authoritative list of recognized `preview` values.
+- `CLAUDE.md`: project-wide infrastructure (D1, auth, Ollama grader, env vars).

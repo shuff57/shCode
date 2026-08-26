@@ -1,10 +1,10 @@
 {
   "id": "6-4-7-reading-sprite-image",
-  "title": "6.4.7 Reading — sprite.image (single-frame art)",
+  "title": "6.4.7 Reading: sprite.image (single-frame art)",
   "description": "How sprite.image = url displays a still image without any animation cycle. Read before 2.4.5 (Animated Sprites Sandbox).",
   "type": "lesson",
   "estimateMins": 6,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
   "preview": "reading",
   "week": 15,

@@ -1,4 +1,4 @@
-// 2.2.7d Lab — Method that returns a value (reference solution).
+// 2.2.7d Lab: Method that returns a value (reference solution).
 
 class Counter {
   constructor() {
@@ -27,7 +27,7 @@ function setup() {
 
 function draw() {
   background('#222');
-  fill(c.isHigh() ? 'red' : 'white');
+  fill(c.isHigh() ? 'red': 'white');
   textSize(32);
   textAlign(CENTER);
   text(c.n, 120, 90);

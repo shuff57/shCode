@@ -1,6 +1,6 @@
 ## Single-line comments: `//`
 
-A single-line comment starts with `//`. Everything from `//` to the end of that line is ignored by JavaScript — the computer never sees it.
+A single-line comment starts with `//`. Everything from `//` to the end of that line is ignored by JavaScript: the computer never sees it.
 
 **What you'll learn from it:**
 - `//` turns the rest of a line into a note for human readers.
@@ -11,7 +11,7 @@ A single-line comment starts with `//`. Everything from `//` to the end of that 
 **Try it:**
 
 ```js live plain
-// This line is a comment — the computer ignores it entirely.
+// This line is a comment: the computer ignores it entirely.
 let age = 17; // age in years
 
 // Print a greeting
@@ -27,7 +27,7 @@ A block comment starts with `/*` and ends with `*/`. Everything in between is ig
 **What you'll learn from it:**
 - `/*` opens a block comment; `*/` closes it.
 - Block comments can stretch across as many lines as you need.
-- A common use is a header at the top of a file — author name, date, what the file does.
+- A common use is a header at the top of a file: author name, date, what the file does.
 - Like `//`, block comments have zero effect on how the program runs.
 
 **Try it:**

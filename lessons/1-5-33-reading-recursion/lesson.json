@@ -1,7 +1,7 @@
 {
   "id": "1-5-33-reading-recursion",
-  "title": "1.5.33 Reading — Recursion and the Base Case",
-  "description": "A process that calls itself on a smaller version of the same problem. Definition 1.5.7 — read it, don't write it yet.",
+  "title": "1.5.33 Reading: Recursion and the Base Case",
+  "description": "A process that calls itself on a smaller version of the same problem. Definition 1.5.7: read it, don't write it yet.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",

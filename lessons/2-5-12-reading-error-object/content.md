@@ -2,8 +2,8 @@
 
 **What you'll learn:**
 - `catch (err)` hands you a value, not just a signal that something failed
-- `err.name` — the *kind* of error, like `"ReferenceError"`
-- `err.message` — a sentence describing exactly what went wrong
+- `err.name`: the *kind* of error, like `"ReferenceError"`
+- `err.message`: a sentence describing exactly what went wrong
 
 ```js live plain
 try {
@@ -14,7 +14,7 @@ try {
 }
 ```
 
-`err.name` and `err.message` are read with the same dot notation you already know. `nothingHere is not defined` tells you the exact name JavaScript could not find — which is usually a typo, and usually a typo you would otherwise stare straight past in your own code.
+`err.name` and `err.message` are read with the same dot notation you already know. `nothingHere is not defined` tells you the exact name JavaScript could not find: which is usually a typo, and usually a typo you would otherwise stare straight past in your own code.
 
 ## ReferenceError vs TypeError
 
@@ -32,7 +32,7 @@ try {
 }
 ```
 
-`nothing` exists — it holds `null` — but `null` has no `.length` property to read. That's a different mistake from naming something that was never declared, and JavaScript gives it a different name so you can tell them apart at a glance. Together, `ReferenceError` and `TypeError` cover most of what a beginner runs into.
+`nothing` exists: it holds `null`, but `null` has no `.length` property to read. That's a different mistake from naming something that was never declared, and JavaScript gives it a different name so you can tell them apart at a glance. Together, `ReferenceError` and `TypeError` cover most of what a beginner runs into.
 
 ---
 

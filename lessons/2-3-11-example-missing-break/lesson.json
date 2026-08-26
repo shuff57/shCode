@@ -1,6 +1,6 @@
 {
   "id": "2-3-11-example-missing-break",
-  "title": "2.3.11 Worked Example — A Missing break in the Middle",
+  "title": "2.3.11 Worked Example: A Missing break in the Middle",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.3.3 — Example 2.3: A missing break in the middle",
+  "sourceRef": "book 2.3.3: Example 2.3: A missing break in the middle",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

@@ -1,4 +1,4 @@
-// 2.2.8a Lab — Three Enemies in three variables (reference solution).
+// 2.2.8a Lab: Three Enemies in three variables (reference solution).
 
 class Enemy {
   constructor(x, y, hp) {

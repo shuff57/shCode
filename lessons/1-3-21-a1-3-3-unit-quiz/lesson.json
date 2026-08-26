@@ -34,7 +34,7 @@
           "Variable names must be at least three characters"
         ],
         "answer": 1,
-        "explanation": "It is legal and it is fast — it is just silent. `let sideLength = 5;` tells the next reader what the 5 means without them having to reconstruct it."
+        "explanation": "It is legal and it is fast: it is just silent. `let sideLength = 5;` tells the next reader what the 5 means without them having to reconstruct it."
       },
       {
         "id": "q2-reuse",
@@ -44,7 +44,7 @@
           "JavaScript will refuse to run it",
           "It uses more memory than separate variables",
           "The name can only be true for one of them, so the code stops matching what it says",
-          "Nothing — it is good practice, because it keeps the program short"
+          "Nothing: it is good practice, because it keeps the program short"
         ],
         "answer": 2,
         "explanation": "A variable called `temp` that holds a temperature, then a name, then a total is lying two thirds of the time. Separate meanings want separate names."
@@ -54,10 +54,10 @@
         "source": "1.3.14",
         "question": "True or false: using extra variables slows your program down.",
         "options": [
-          "True — every variable costs measurable speed",
-          "False — the cost is far too small to matter, and clear names are worth much more",
-          "True — but only in the browser",
-          "False — extra variables actually make programs faster"
+          "True: every variable costs measurable speed",
+          "False: the cost is far too small to matter, and clear names are worth much more",
+          "True, but only in the browser",
+          "False: extra variables actually make programs faster"
         ],
         "answer": 1,
         "explanation": "False. Naming an intermediate value costs essentially nothing at runtime and buys a lot of readability. Do not trade clarity for a saving you cannot measure."
@@ -86,7 +86,7 @@
           "let priceWithCents"
         ],
         "answer": 2,
-        "explanation": "A boolean is true or false, so a yes/no name fits it — `isTaskFinished`. A name, a count and a price are a string and two numbers."
+        "explanation": "A boolean is true or false, so a yes/no name fits it: `isTaskFinished`. A name, a count and a price are a string and two numbers."
       },
       {
         "id": "q6-name-vs-comment",
@@ -99,7 +99,7 @@
           "A good name makes the program run faster than a comment does"
         ],
         "answer": 1,
-        "explanation": "You read the name at every use and the comment only once, at the declaration — and when the code changes, the comment is the part that quietly stops being true."
+        "explanation": "You read the name at every use and the comment only once, at the declaration, and when the code changes, the comment is the part that quietly stops being true."
       },
       {
         "id": "q7-single-letters",
@@ -109,10 +109,10 @@
           "`x` and `y`, because everyone knows they are coordinates",
           "A loop counter called `i`, because its scope is tiny and the convention is universal",
           "Any name inside a comment block",
-          "There is no exception — single letters are always wrong"
+          "There is no exception: single letters are always wrong"
         ],
         "answer": 1,
-        "explanation": "Tiny scope plus universal convention is what \"a very good reason\" looks like. It is not a licence for `d` — and half-abbreviations like `usrNm` or `calcTot` are the sneakier version of the same problem."
+        "explanation": "Tiny scope plus universal convention is what \"a very good reason\" looks like. It is not a licence for `d`, and half-abbreviations like `usrNm` or `calcTot` are the sneakier version of the same problem."
       },
       {
         "id": "q8-readme",
@@ -125,7 +125,7 @@
           "What it costs, who owns it, and where to report bugs"
         ],
         "answer": 1,
-        "explanation": "A README is written for the person standing outside your code deciding whether to go in. Good names and comments help someone already inside it — the README comes first."
+        "explanation": "A README is written for the person standing outside your code deciding whether to go in. Good names and comments help someone already inside it: the README comes first."
       },
       {
         "id": "q9-comment-the-reason",

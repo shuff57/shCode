@@ -1,4 +1,4 @@
-// 2.2.7h Lab — Cleanup with this.sprite.delete() (reference solution).
+// 2.2.7h Lab: Cleanup with this.sprite.delete() (reference solution).
 
 class Bubble {
   constructor(x, y) {

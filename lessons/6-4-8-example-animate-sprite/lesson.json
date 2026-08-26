@@ -1,9 +1,9 @@
 {
   "id": "6-4-8-example-animate-sprite",
-  "title": "6.4.8 Worked Example — Animating a Sprite",
+  "title": "6.4.8 Worked Example: Animating a Sprite",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
   "preview": "example",
   "week": 15,

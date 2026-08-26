@@ -1,6 +1,6 @@
 ## Properties: data on `this`
 
-**Read before `2.2.4b Lab — Read a property`.** About 4 minutes.
+**Read before `2.2.4b Lab: Read a property`.** About 4 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -11,10 +11,10 @@ A property is a named slot for data that belongs to one specific instance. When 
 
 **What you'll learn from it:**
 
-- Properties are created by assigning to `this.name` — usually inside the constructor.
+- Properties are created by assigning to `this.name`, usually inside the constructor.
 - Each instance gets its own independent copy of every property.
 - Outside the class, you read a property with `instance.propName` and write it with `instance.propName = newValue`.
-- You can have as many properties as you need — add one line per property in the constructor.
+- You can have as many properties as you need: add one line per property in the constructor.
 
 **Try it:**
 
@@ -47,7 +47,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** a blue square on the left and an orange square on the right. Each box holds its own `color` value — changing one won't touch the other.
+**What you'll see:** a blue square on the left and an orange square on the right. Each box holds its own `color` value: changing one won't touch the other.
 
 **Try this:** add a third property `this.size = 40` to the constructor. Then in `draw`, change `b2.size` to `80` after the canvas is created and observe that only the right square grows. One property, two instances, two independent values.
 

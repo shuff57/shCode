@@ -1,10 +1,10 @@
 {
   "id": "5-3-22-lab-mutate-sprite-prop",
-  "title": "5.4.8 Lab — Mutate this.sprite.x from a method",
+  "title": "5.4.8 Lab: Mutate this.sprite.x from a method",
   "description": "Write `Mover.moveRight(dx)` which adds `dx` to `this.sprite.x`, reaching through composition to move the wrapped sprite.",
   "type": "lesson",
   "estimateMins": 8,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
   "preview": "moshion",
   "week": 12,
@@ -18,7 +18,7 @@
       "title": "Write the moveRight(dx) method",
       "instructions": "Inside the `Mover` class body, write a `moveRight(dx)` method that adds `dx` to `this.sprite.x`. Hold the right arrow to see the sprite slide across the canvas.",
       "hints": [
-        "Open the moSHion docs drawer on the right and find the Sprite properties section — look for how to read and write a sprite's position."
+        "Open the moSHion docs drawer on the right and find the Sprite properties section: look for how to read and write a sprite's position."
       ]
     }
   ],

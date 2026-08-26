@@ -29,7 +29,7 @@
     {
       "id": "s4",
       "title": "Settle one more of your own",
-      "instructions": "Log any other expression you were unsure about — a comparison, a string method, a typeof. The point is the habit, not the answer."
+      "instructions": "Log any other expression you were unsure about: a comparison, a string method, a typeof. The point is the habit, not the answer."
     }
   ],
   "requirements": [

@@ -7,7 +7,7 @@ function setup() {
   new Canvas(400, 300);
   world.gravity.y = 10;
 
-  // STEP 1: Create the player sprite with an initial visual — either
+  // STEP 1: Create the player sprite with an initial visual: either
   // addAni('idle', ...) or sprite.image = '🧍'.
 
   // STEP 2: Build a level wider than the canvas. Add a ground sprite plus
@@ -28,7 +28,7 @@ function draw() {
   // STEP 6: Use kb.presses('w') AND player.colliding(allSprites) together
   // to jump only when the player is touching the ground or a platform.
 
-  // STEP 7: Make the camera follow — assign camera.x from player.x every
+  // STEP 7: Make the camera follow: assign camera.x from player.x every
   // frame. Hard follow is fine; lerp smoothing is a stretch.
 
   // STEP 8: Goal overlap -> win message. See the s8 step in the Quest tab

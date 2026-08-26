@@ -1,4 +1,4 @@
-// 1.2.29 A1.2.2 — Describe a Real Object
+// 1.2.29 A1.2.2: Describe a Real Object
 
 const itemName = "water bottle";
 const itemColor = "blue";

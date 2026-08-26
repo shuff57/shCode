@@ -1,6 +1,6 @@
-// 2.4.5 Animated Sprites Sandbox — swap a sprite's visual when its state changes.
+// 2.4.5 Animated Sprites Sandbox: swap a sprite's visual when its state changes.
 // (The canonical form is addAni('idle', ...) + changeAni('run') with art assets.
-//  Here we use sprite.image swapping with emoji placeholders — same pattern,
+//  Here we use sprite.image swapping with emoji placeholders: same pattern,
 //  no asset hosting required.)
 
 let player;
@@ -9,7 +9,7 @@ function setup() {
   new Canvas(400, 300);
 
   // STEP 1: Create the player sprite. Give it an idle visual by assigning
-  // sprite.image (or sprite.img) to an emoji string — e.g. '🧍'.
+  // sprite.image (or sprite.img) to an emoji string: e.g. '🧍'.
 
 }
 

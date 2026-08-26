@@ -1,4 +1,4 @@
-# CSCI 4 Class Style Guide — distributed Week 3, enforced all year
+# CSCI 4 Class Style Guide: distributed Week 3, enforced all year
 
 Every code assignment after Week 3 is graded against these rules. Keep this page.
 
@@ -7,7 +7,7 @@ Every code assignment after Week 3 is graded against these rules. Keep this page
 ## Indentation
 
 - **2 spaces** per indent level. No tabs.
-- Consistent nesting — every `{` increases indent by one level; every matching `}` decreases it.
+- Consistent nesting: every `{` increases indent by one level; every matching `}` decreases it.
 
 ```js
 if (condition) {
@@ -23,7 +23,7 @@ if (condition) {
 
 ```js
 let score = 0;       // correct
-let score = 0        // incorrect — missing semicolon
+let score = 0        // incorrect: missing semicolon
 ```
 
 ---
@@ -35,7 +35,7 @@ let score = 0        // incorrect — missing semicolon
 | Variables | `camelCase` | `userName`, `totalCost` |
 | Functions | `camelCase` | `calculateTax`, `printResult` |
 | Constants | `UPPER_SNAKE_CASE` | `TAX_RATE`, `MAX_ITEMS` |
-| Classes | `PascalCase` *(preview — Week 12)* | `ShoppingCart`, `GamePlayer` |
+| Classes | `PascalCase` *(preview: Week 12)* | `ShoppingCart`, `GamePlayer` |
 
 - Names must be **descriptive**. Single-letter names are only allowed for loop counters (`i`, `j`, `k`).
 - No abbreviations unless the meaning is completely obvious (`num`, `len` are fine; `tp` for `taxPercent` is not).
@@ -77,7 +77,7 @@ let subtotal = unitPrice * quantity;  // total before tax
 
 ## Braces
 
-- Opening brace on the **same line** as the statement — never on a new line.
+- Opening brace on the **same line** as the statement, never on a new line.
 - Always use braces for `if`/`else`/`for`/`while` bodies, even when the body is a single line.
 
 ```js
@@ -86,13 +86,13 @@ if (isStudent) {
   console.log("enrolled");
 }
 
-// incorrect — brace on new line
+// incorrect: brace on new line
 if (isStudent)
 {
   console.log("enrolled");
 }
 
-// incorrect — no braces
+// incorrect: no braces
 if (isStudent)
   console.log("enrolled");
 ```

@@ -1,6 +1,6 @@
 {
   "id": "2-2-6-example-trace-for",
-  "title": "2.2.10 Worked Example — Tracing a for-loop counter",
+  "title": "2.2.10 Worked Example: Tracing a for-loop counter",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.2.4 — for-loop mechanics; Example 2.4 (step size), Try It Now 2.4 (countdown); designed tracing practice",
+  "sourceRef": "book 2.2.4, for-loop mechanics; Example 2.4 (step size), Try It Now 2.4 (countdown); designed tracing practice",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

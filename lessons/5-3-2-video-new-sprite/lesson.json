@@ -1,10 +1,10 @@
 {
   "id": "5-3-2-video-new-sprite",
-  "title": "5.3.2 Video — What new Sprite() actually does",
+  "title": "5.3.2 Video: What new Sprite() actually does",
   "description": "4-min DevTools walkthrough. Opens a running moSHion sketch, inspects a Sprite instance, and names what a class is. Watch before the DevTools reveal example.",
   "type": "lesson",
   "estimateMins": 4,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.3 Classes and Objects via moSHion",
   "preview": "video",
   "week": 12,

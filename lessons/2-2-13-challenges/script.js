@@ -1,4 +1,4 @@
-// 2.2.20 Challenges — Optional Stretch
+// 2.2.20 Challenges: Optional Stretch
 
 // CHALLENGE 1: FizzBuzz
 //   Loop through every integer from 1 to 20.
@@ -12,7 +12,7 @@
 // CHALLENGE 2: Count vowels
 //   Start with any string of your choice.
 //   Write code that counts how many characters in the string are vowels
-//   (a, e, i, o, u — count upper and lower case).
+//   (a, e, i, o, u: count upper and lower case).
 //   Log the total vowel count.
 
 // CHALLENGE 3: Sum even numbers

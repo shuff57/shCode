@@ -8,11 +8,11 @@ All three examples are designed to be typed (not pasted) into the moSHion in-app
 
 ---
 
-## Worked Example 1 — Minimum sprite program
+## Worked Example 1: Minimum sprite program
 
 **Goal:** Prove that a canvas + sprite + background is the smallest possible moSHion program.
 
-### Step 1 — Type this exactly
+### Step 1: Type this exactly
 
 ```js
 function setup() {
@@ -27,13 +27,13 @@ function draw() {
 
 Click Run. You'll see a dark canvas with a square in the middle.
 
-### Step 2 — Notice the bug
+### Step 2: Notice the bug
 
-**Where is the sprite being created?** Inside `draw()`. That means a **new sprite is being made every frame** — 60 per second. If you run this for 5 seconds, 300 sprites exist. You just can't see them because they're all in the same spot.
+**Where is the sprite being created?** Inside `draw()`. That means a **new sprite is being made every frame**: 60 per second. If you run this for 5 seconds, 300 sprites exist. You just can't see them because they're all in the same spot.
 
 Open the in-app editor's performance tab (or the browser DevTools) to confirm. The frame rate will slowly drop.
 
-### Step 3 — Hoist the sprite
+### Step 3: Hoist the sprite
 
 Move the sprite creation OUT of `draw()` and INTO `setup()`. Store it in a variable so we can still reach it later.
 
@@ -51,9 +51,9 @@ function draw() {
 }
 ```
 
-Run. **One** sprite exists. It's rendered automatically every frame — you don't call any render function. The engine sees the sprite in its world and draws it for you.
+Run. **One** sprite exists. It's rendered automatically every frame: you don't call any render function. The engine sees the sprite in its world and draws it for you.
 
-**Try the combined final — tweak and Run:**
+**Try the combined final: tweak and Run:**
 
 ```js live
 let player;
@@ -78,13 +78,13 @@ function draw() {
 
 ---
 
-## Worked Example 2 — Keyboard movement
+## Worked Example 2: Keyboard movement
 
 **Goal:** Make the sprite respond to the keyboard.
 
 Start from Worked Example 1's final code.
 
-### Step 1 — Add horizontal movement
+### Step 1: Add horizontal movement
 
 ```js
 function draw() {
@@ -95,9 +95,9 @@ function draw() {
 }
 ```
 
-Run. Hold the left arrow key. Sprite moves left. Hold right. Sprite moves right. Release both. **Sprite stops** — because of the `else` branch.
+Run. Hold the left arrow key. Sprite moves left. Hold right. Sprite moves right. Release both. **Sprite stops**, because of the `else` branch.
 
-### Step 2 — Break it on purpose
+### Step 2: Break it on purpose
 
 Comment out the `else` branch:
 
@@ -107,13 +107,13 @@ Comment out the `else` branch:
   // else player.vel.x = 0;  ← commented out
 ```
 
-Run. Hold left, release. **Sprite drifts forever.** This is the **drifting sprite bug** — the #1 bug students hit this week.
+Run. Hold left, release. **Sprite drifts forever.** This is the **drifting sprite bug**: the #1 bug students hit this week.
 
 Why? `vel.x` keeps its last value (−4) until you assign something else. Without the `else`, you only ever assign on key presses.
 
 Put the `else` back.
 
-### Step 3 — Add vertical movement
+### Step 3: Add vertical movement
 
 ```js
 function draw() {
@@ -130,7 +130,7 @@ function draw() {
 
 Remember: **up is negative y** in screen coordinates. This is different from math class.
 
-**Try the combined final — hold arrow keys to move:**
+**Try the combined final: hold arrow keys to move:**
 
 ```js live
 let player;
@@ -156,13 +156,13 @@ function draw() {
 
 ### Key takeaways
 
-- `kb.pressing(key)` is **level-triggered** — true every frame while the key is held.
+- `kb.pressing(key)` is **level-triggered**: true every frame while the key is held.
 - **Always include the else branch** to reset velocity. This is 80% of the bugs this week.
 - Y-axis is flipped compared to math class. Up = negative, down = positive.
 
 ---
 
-## Worked Example 3 — Automatic motion with `frameCount`
+## Worked Example 3: Automatic motion with `frameCount`
 
 **Goal:** Make a sprite move on its own, no keyboard required. Useful for animated backgrounds, orbiting enemies, oscillating platforms.
 
@@ -181,7 +181,7 @@ function setup() {
 function draw() {
   background('#222');
 
-  // Player movement with WASD — see Worked Example 2
+  // Player movement with WASD: see Worked Example 2
   if (kb.pressing('a')) player.vel.x = -4;
   else if (kb.pressing('d')) player.vel.x = 4;
   else player.vel.x = 0;
@@ -197,10 +197,10 @@ function draw() {
 
 ### What the math does
 
-- `frameCount * 0.05` — scales down the counter so motion is slow enough to see.
-- `sin(...)` — produces a smooth wave between −1 and +1.
-- `* 80` — multiplies the wave to a range of ±80 pixels.
-- `400 + ...` — centers the motion around x = 400.
+- `frameCount * 0.05`: scales down the counter so motion is slow enough to see.
+- `sin(...)`: produces a smooth wave between −1 and +1.
+- `* 80`: multiplies the wave to a range of ±80 pixels.
+- `400 + ...`: centers the motion around x = 400.
 
 Result: the mover sprite slides smoothly left and right around x = 400, going 80 pixels each way.
 
@@ -217,7 +217,7 @@ Result: the mover sprite slides smoothly left and right around x = 400, going 80
   ```
 - **Faster / slower:** change `0.05` → smaller = slower, larger = faster. `0.1` moves twice as fast.
 
-**Try the combined final — WASD moves the player, the orange sprite moves on its own:**
+**Try the combined final: WASD moves the player, the orange sprite moves on its own:**
 
 ```js live
 let player, mover;
@@ -244,7 +244,7 @@ function draw() {
 
 ### Key takeaways
 
-- `frameCount` is a universal timing tool — whenever you need "do something periodically," reach for it.
+- `frameCount` is a universal timing tool, whenever you need "do something periodically," reach for it.
 - `sin` + scale + offset is the smooth-oscillation pattern. You'll use it a lot.
 - Setting `.pos.x` directly (without using `vel`) is fine when you don't want physics to affect motion. It's a "kinematic" style of motion.
 
@@ -269,7 +269,7 @@ function setup() {
   player.color = 'deepskyblue';
 }
 
-// Keyboard — else-to-zero is critical
+// Keyboard: else-to-zero is critical
 if (kb.pressing('a')) player.vel.x = -4;
 else if (kb.pressing('d')) player.vel.x = 4;
 else player.vel.x = 0;

@@ -2,7 +2,7 @@
 
 // STEP 1: In a comment, predict the output of the program you're about
 //         to build: "A", then a throw of "boom", "B: " + the message,
-//         "C", then "D" — in what order, and how many lines total?
+//         "C", then "D", in what order, and how many lines total?
 
 // STEP 2: Write a try block that logs "A", then throws
 //         new Error("boom"). In the catch block, log

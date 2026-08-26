@@ -1,12 +1,12 @@
 {
   "id": "2-4-14-example-filtering-while-loop",
-  "title": "2.4.14 Worked Example — Filtering While You Loop",
+  "title": "2.4.14 Worked Example: Filtering While You Loop",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "example",
-  "sourceRef": "book 2.4 — Example 2.3 'Filtering while you loop', adapted without arrays (arrays are book §3.3, not yet taught)",
+  "sourceRef": "book 2.4: Example 2.3 'Filtering while you loop', adapted without arrays (arrays are book §3.3, not yet taught)",
   "week": 6,
   "slos": [
     "SLO-3"

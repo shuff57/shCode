@@ -1,9 +1,9 @@
 {
   "id": "6-7-26-example-two-paddles",
-  "title": "6.7.22 Worked Example — Two Paddles, Two Schemes",
+  "title": "6.7.22 Worked Example: Two Paddles, Two Schemes",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.7 Advanced Input",
   "preview": "example",
   "week": 17,

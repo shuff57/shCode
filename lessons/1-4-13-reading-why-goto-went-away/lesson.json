@@ -1,6 +1,6 @@
 {
   "id": "1-4-13-reading-why-goto-went-away",
-  "title": "1.4.13 Reading — Why goto Went Away",
+  "title": "1.4.13 Reading: Why goto Went Away",
   "description": "The first example in this course of a restriction being a feature. No arbitrary jumps, and what that buys.",
   "type": "lesson",
   "estimateMins": 10,

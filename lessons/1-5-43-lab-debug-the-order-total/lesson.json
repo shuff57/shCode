@@ -19,7 +19,7 @@
     {
       "id": "s2",
       "title": "Add labelled prints",
-      "instructions": "Print each intermediate value with a label — subtotal, discount, taxed — so you can see where the numbers stop matching your expectation."
+      "instructions": "Print each intermediate value with a label: subtotal, discount, taxed, so you can see where the numbers stop matching your expectation."
     },
     {
       "id": "s3",

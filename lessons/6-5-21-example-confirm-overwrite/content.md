@@ -1,6 +1,6 @@
 **Goal:** When the player saves to a slot that already has data, show an "Are you sure?" prompt. Only write to storage if they confirm.
 
-## Step 1 — Start with a working save system
+## Step 1: Start with a working save system
 
 A player moves around. Press S to save to a single slot.
 
@@ -51,7 +51,7 @@ function draw() {
 
 The problem: press S again and the previous save is silently replaced. No warning, no undo.
 
-## Step 2 — Detect when a slot is already occupied
+## Step 2: Detect when a slot is already occupied
 
 Before saving, check if the slot has data. If it does, enter a "confirmation" state instead of saving immediately.
 
@@ -118,14 +118,14 @@ function drawConfirmation() {
 
   fill('white');
   textSize(14);
-  text('Y — Yes, save over it', 100, 160);
-  text('N — No, keep old save', 100, 180);
+  text('Y: Yes, save over it', 100, 160);
+  text('N: No, keep old save', 100, 180);
 }
 ```
 
-Press S once to save. Move somewhere else. Press S again — a confirmation dialog appears instead of instantly overwriting.
+Press S once to save. Move somewhere else. Press S again: a confirmation dialog appears instead of instantly overwriting.
 
-## Step 3 — Handle Y and N responses
+## Step 3: Handle Y and N responses
 
 Y confirms the overwrite and saves. N cancels. The player can't move while confirming.
 
@@ -205,12 +205,12 @@ function drawConfirmation() {
 
   fill('white');
   textSize(14);
-  text('Y — Yes, save over it', 100, 160);
-  text('N — No, keep old save', 100, 180);
+  text('Y: Yes, save over it', 100, 160);
+  text('N: No, keep old save', 100, 180);
 }
 ```
 
-## Step 4 — Add a visual timer and polish
+## Step 4: Add a visual timer and polish
 
 Show a shrinking bar that indicates how much time is left to decide. Freeze the player during confirmation.
 
@@ -304,8 +304,8 @@ function drawConfirmation() {
 
   fill('white');
   textSize(14);
-  text('Y — Yes, save over it', 100, 160);
-  text('N — No, keep old save', 100, 180);
+  text('Y: Yes, save over it', 100, 160);
+  text('N: No, keep old save', 100, 180);
 
   // Timer bar
   let elapsed = millis() - confirmTimer;
@@ -319,7 +319,7 @@ Save, move, save again. The confirmation dialog appears with a red timer bar cou
 
 ## Key takeaways
 
-- **Check before writing** — `getItem(key) !== null` before calling `storeItem` lets you detect occupied slots.
-- **Confirmation state** — a boolean variable (`confirming`) that freezes gameplay and shows a Yes/No prompt.
-- **Destructive actions need confirmation** — overwriting a save is destructive (the old data is gone). Always confirm first.
-- **Timeout as a safety net** — if the player doesn't respond, auto-cancel. Better to skip a save than to accidentally overwrite.
+- **Check before writing**: `getItem(key) !== null` before calling `storeItem` lets you detect occupied slots.
+- **Confirmation state**: a boolean variable (`confirming`) that freezes gameplay and shows a Yes/No prompt.
+- **Destructive actions need confirmation**: overwriting a save is destructive (the old data is gone). Always confirm first.
+- **Timeout as a safety net**, if the player doesn't respond, auto-cancel. Better to skip a save than to accidentally overwrite.

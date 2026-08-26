@@ -1,6 +1,6 @@
 {
   "id": "2-1-4-example-trace-if-else",
-  "title": "2.1.4 Worked Example — Tracing an if/else chain",
+  "title": "2.1.4 Worked Example: Tracing an if/else chain",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.1.4 — 'Several Conditions: else if', Example 2.4: Grade Letter",
+  "sourceRef": "book 2.1.4: 'Several Conditions: else if', Example 2.4: Grade Letter",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

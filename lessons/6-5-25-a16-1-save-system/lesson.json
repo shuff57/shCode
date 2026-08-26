@@ -1,10 +1,10 @@
 {
   "id": "6-5-25-a16-1-save-system",
-  "title": "6.5.26 Save System — Build Save/Load with Slots",
-  "description": "Graded: build a game with a complete save system — at least 3 save slots, load functionality, auto-save on level complete, and a Continue option on the title screen.",
+  "title": "6.5.26 Save System: Build Save/Load with Slots",
+  "description": "Graded: build a game with a complete save system, at least 3 save slots, load functionality, auto-save on level complete, and a Continue option on the title screen.",
   "type": "assignment",
   "estimateMins": 60,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "moshion",
   "week": 16,
@@ -41,7 +41,7 @@
     {
       "id": "s4",
       "title": "Add auto-save on level complete",
-      "instructions": "Add a goal zone or score threshold. When the player reaches it, auto-save to a dedicated slot (e.g. 'autoSave') in addition to incrementing the level. The auto-save should happen automatically — no button press required.",
+      "instructions": "Add a goal zone or score threshold. When the player reaches it, auto-save to a dedicated slot (e.g. 'autoSave') in addition to incrementing the level. The auto-save should happen automatically: no button press required.",
       "hints": [
         "See 2.5.23 Worked Example for the auto-save pattern.",
         "Check for overlap or score >= threshold to trigger the auto-save."

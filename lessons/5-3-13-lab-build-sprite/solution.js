@@ -1,4 +1,4 @@
-// 2.2.6 Your Turn — Build a Sprite (reference solution).
+// 2.2.6 Your Turn: Build a Sprite (reference solution).
 
 let rect, circ;
 

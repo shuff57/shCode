@@ -15,15 +15,15 @@
 - `undefined`
 - `NaN`
 
-A **falsy** value is one of those six. A **truthy** value is anything else — every other number, every non-empty string, every object.
+A **falsy** value is one of those six. A **truthy** value is anything else: every other number, every non-empty string, every object.
 
 ```javascript
 if (0) {
-  // never runs — 0 is falsy
+  // never runs: 0 is falsy
 }
 
 if (1) {
-  // always runs — 1 is truthy
+  // always runs: 1 is truthy
 }
 ```
 
@@ -37,7 +37,7 @@ if (cond) {
 }
 ```
 
-If a value is already a boolean, writing `if (x == true)` is redundant — `if (x)` does the same thing. Save the comparison for when you actually need to compare two different things.
+If a value is already a boolean, writing `if (x == true)` is redundant: `if (x)` does the same thing. Save the comparison for when you actually need to compare two different things.
 
 **Try it:** Change `cartCount` to `0`, then to `3`, and re-run each time.
 

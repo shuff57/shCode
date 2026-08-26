@@ -1,6 +1,6 @@
-## switch inside draw() — the game dispatch pattern
+## switch inside draw(): the game dispatch pattern
 
-**Read before `6.6.5 Worked Example — switch with Three Cases`.** About 5 minutes.
+**Read before `6.6.5 Worked Example: switch with Three Cases`.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -13,9 +13,9 @@ By the end of this reading you should be able to answer:
 **What you'll learn from it:**
 
 - `switch` goes inside `draw()`, right after `background()`.
-- Each `case` draws one complete screen — its background elements, its text, its sprites.
+- Each `case` draws one complete screen: its background elements, its text, its sprites.
 - Keyboard checks (`kb.presses(...)`) live inside cases because different screens listen for different keys.
-- This pattern is called **dispatch** — one switch distributes control to many code paths.
+- This pattern is called **dispatch**: one switch distributes control to many code paths.
 
 **Try it:**
 
@@ -51,7 +51,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** the menu screen first. Press G — the game screen. Press M — back to menu. Each case owns its own look and its own keyboard controls.
+**What you'll see:** the menu screen first. Press G: the game screen. Press M: back to menu. Each case owns its own look and its own keyboard controls.
 
 Run it and press G, then M, then G again. Every frame, `draw()` checks `screen` and dispatches to the right case. This is the core pattern behind every state machine in this module.
 

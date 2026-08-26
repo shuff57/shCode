@@ -7,7 +7,7 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "console",
-  "sourceRef": "designed — A2.4.2, curriculum-plan.md §2.4 Assignments",
+  "sourceRef": "designed: A2.4.2, curriculum-plan.md §2.4 Assignments",
   "week": 7,
   "slos": [
     "SLO-3"
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Declare the grid's dimensions as variables",
-      "instructions": "Declare a variable called rows and a variable called cols. Set each to a number of at least 5. Do not write the numbers directly into the loop headers — the loops must read them from these variables."
+      "instructions": "Declare a variable called rows and a variable called cols. Set each to a number of at least 5. Do not write the numbers directly into the loop headers: the loops must read them from these variables."
     },
     {
       "id": "s2",

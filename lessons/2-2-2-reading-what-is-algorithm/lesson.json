@@ -1,6 +1,6 @@
 {
   "id": "2-2-2-reading-what-is-algorithm",
-  "title": "2.2.2 Reading — What Is an Algorithm?",
+  "title": "2.2.2 Reading: What Is an Algorithm?",
   "description": "An algorithm is a precise, ordered set of steps to solve a problem. See how that idea turns directly into code.",
   "type": "lesson",
   "estimateMins": 10,
@@ -11,7 +11,7 @@
   "slos": [
     "SLO-4"
   ],
-  "sourceRef": "book 2.2.1 — 'What Is an Algorithm?', Definition 2.2.1: Algorithm, Insight Note (precision)",
+  "sourceRef": "book 2.2.1: 'What Is an Algorithm?', Definition 2.2.1: Algorithm, Insight Note (precision)",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

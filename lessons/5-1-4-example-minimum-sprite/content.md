@@ -1,6 +1,6 @@
 **Goal:** Prove that a canvas + sprite + background is the smallest possible moSHion program.
 
-## Step 1 — Hit Run
+## Step 1: Hit Run
 
 You'll see a dark canvas with a square in the middle.
 
@@ -15,9 +15,9 @@ function draw() {
 }
 ```
 
-## Step 2 — Notice the bug
+## Step 2: Notice the bug
 
-**Where is the sprite being created?** Inside `draw()`. That means a **new sprite is being made every frame** — 60 per second. If you run this for 5 seconds, 300 sprites exist. You just can't see them because they're all in the same spot.
+**Where is the sprite being created?** Inside `draw()`. That means a **new sprite is being made every frame**: 60 per second. If you run this for 5 seconds, 300 sprites exist. You just can't see them because they're all in the same spot.
 
 Let it run for a while. The frame rate slowly drops as sprites pile up.
 
@@ -32,11 +32,11 @@ function draw() {
 }
 ```
 
-## Step 3 — Hoist the sprite
+## Step 3: Hoist the sprite
 
 Move the sprite creation OUT of `draw()` and INTO `setup()`. Store it in a variable so we can still reach it later.
 
-Run. **One** sprite exists. It's rendered automatically every frame — you don't call any render function. The engine sees the sprite in its world and draws it for you.
+Run. **One** sprite exists. It's rendered automatically every frame: you don't call any render function. The engine sees the sprite in its world and draws it for you.
 
 ```js live
 let player;

@@ -27,7 +27,7 @@
           "The person who decides what gets built"
         ],
         "answer": 0,
-        "explanation": "A process model gives the project its shape — it says what happens when. Teams do not build in random order."
+        "explanation": "A process model gives the project its shape: it says what happens when. Teams do not build in random order."
       },
       {
         "id": "q2-four-phases",
@@ -40,20 +40,20 @@
           "Problem, project, people, product"
         ],
         "answer": 1,
-        "explanation": "Inception, elaboration, construction, deployment. Every process model uses these same four — what changes is how much work each one gets."
+        "explanation": "Inception, elaboration, construction, deployment. Every process model uses these same four: what changes is how much work each one gets."
       },
       {
         "id": "q3-which-phase-is-code",
         "source": "1.1.6 and 1.1.8",
         "question": "Which phase does the line `console.log(\"Hello, \" + name + \"!\")` belong to?",
         "options": [
-          "Inception — it is the goal of the app",
-          "Elaboration — it is the design",
-          "Construction — it is the actual code being written",
-          "Deployment — it is what the user sees"
+          "Inception: it is the goal of the app",
+          "Elaboration: it is the design",
+          "Construction: it is the actual code being written",
+          "Deployment: it is what the user sees"
         ],
         "answer": 2,
-        "explanation": "Construction is where the software is coded and built from the design. Worth noticing: that line is one phase out of four — teams tend to over-weight construction."
+        "explanation": "Construction is where the software is coded and built from the design. Worth noticing: that line is one phase out of four: teams tend to over-weight construction."
       },
       {
         "id": "q4-elaboration",
@@ -79,7 +79,7 @@
           "It is a phase that can be skipped on small projects"
         ],
         "answer": 0,
-        "explanation": "An umbrella activity never starts and ends — it runs the whole project. The kitchen analogy: the four phases are cooking the meal, umbrella activities are the cleanup that keeps the kitchen usable throughout."
+        "explanation": "An umbrella activity never starts and ends: it runs the whole project. The kitchen analogy: the four phases are cooking the meal, umbrella activities are the cleanup that keeps the kitchen usable throughout."
       },
       {
         "id": "q6-umbrella-example",
@@ -105,7 +105,7 @@
           "A meeting held at the start of a project"
         ],
         "answer": 2,
-        "explanation": "An action answers what job gets done inside a phase. It is not the whole phase and not a single keystroke — \"define the requirements\" lives inside inception."
+        "explanation": "An action answers what job gets done inside a phase. It is not the whole phase and not a single keystroke: \"define the requirements\" lives inside inception."
       },
       {
         "id": "q8-task-set",
@@ -144,7 +144,7 @@
           "It has no testing phase"
         ],
         "answer": 2,
-        "explanation": "Prescriptive means it hands you a prescribed order to follow. That is a strength when requirements are stable and a weakness when they are not — the strict-recipe problem."
+        "explanation": "Prescriptive means it hands you a prescribed order to follow. That is a strength when requirements are stable and a weakness when they are not: the strict-recipe problem."
       }
     ]
   },

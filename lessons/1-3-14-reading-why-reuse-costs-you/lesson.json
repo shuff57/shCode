@@ -1,6 +1,6 @@
 {
   "id": "1-3-14-reading-why-reuse-costs-you",
-  "title": "1.3.14 Reading — What Reuse Actually Costs",
+  "title": "1.3.14 Reading: What Reuse Actually Costs",
   "description": "It saves a little typing and buys you a debugging problem. Also: extra variables do not slow your program down.",
   "type": "lesson",
   "estimateMins": 10,

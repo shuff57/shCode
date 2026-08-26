@@ -1,6 +1,6 @@
 {
   "id": "1-5-42-example-finding-the-rectangle-bug",
-  "title": "1.5.42 Worked Example — Finding the Rectangle Bug",
+  "title": "1.5.42 Worked Example: Finding the Rectangle Bug",
   "description": "A program that prints 9 instead of 20, found by narrowing rather than by staring.",
   "type": "lesson",
   "estimateMins": 10,

@@ -32,7 +32,7 @@ if (day === "Saturday" || day === "Sunday") {
 
 Both are correct. Grouped cases are the `switch` spelling of `||`.
 
-**How do you tell "on purpose" from "forgot the break"?** Look at whether there's any code between the stacked labels. `case "Saturday":` immediately followed by `case "Sunday":` reads as intent — nothing was left out, there was never anything there. A case with several lines of code and no `break` reads as an oversight. If you ever *want* to fall through after running code (rarer, and not shown here), say so in a comment — the next person to read it will otherwise assume you forgot.
+**How do you tell "on purpose" from "forgot the break"?** Look at whether there's any code between the stacked labels. `case "Saturday":` immediately followed by `case "Sunday":` reads as intent: nothing was left out, there was never anything there. A case with several lines of code and no `break` reads as an oversight. If you ever *want* to fall through after running code (rarer, and not shown here), say so in a comment: the next person to read it will otherwise assume you forgot.
 
 **Try it:** Change `day` to `"Wednesday"` and confirm it hits `default`.
 
@@ -56,5 +56,5 @@ switch (day) {
 | Term | Meaning |
 |------|---------|
 | **Grouped cases** | Several `case` labels stacked with no code between them, so they all run the same block |
-| **Deliberate fall-through** | Grouping cases on purpose — visible because nothing sits between the stacked labels |
-| **Accidental fall-through** | A missing `break` after real code — a bug, not a technique |
+| **Deliberate fall-through** | Grouping cases on purpose: visible because nothing sits between the stacked labels |
+| **Accidental fall-through** | A missing `break` after real code: a bug, not a technique |

@@ -1,6 +1,6 @@
-// 2.1.7d Lab — Delete the else, watch drift.
+// 2.1.7d Lab: Delete the else, watch drift.
 
-// This lab ships with a BROKEN movement pattern — both `else` lines that reset
+// This lab ships with a BROKEN movement pattern: both `else` lines that reset
 // velocity to 0 are missing. The auto-grader checks that you put them back.
 
 let player;
@@ -14,7 +14,7 @@ function setup() {
 function draw() {
   background('#222');
 
-  // STEP 1: Click Run as-is. Tap a WASD key once and watch the sprite drift —
+  // STEP 1: Click Run as-is. Tap a WASD key once and watch the sprite drift :
   //         vel.x (or vel.y) was set by a keypress and is never cleared.
 
   // STEP 2: Add the missing `else player.vel.x = 0;` and

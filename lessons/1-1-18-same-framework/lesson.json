@@ -46,7 +46,7 @@
           "Requirements, architecture, release, support"
         ],
         "answer": 1,
-        "explanation": "Inception, elaboration, construction, deployment — the book's names. The five-phase list in the 1.1.5 video (design, development, testing, deployment, maintenance) is the same lifecycle under industry names."
+        "explanation": "Inception, elaboration, construction, deployment: the book's names. The five-phase list in the 1.1.5 video (design, development, testing, deployment, maintenance) is the same lifecycle under industry names."
       },
       {
         "id": "q3-why-teams-differ",
@@ -66,10 +66,10 @@
         "source": "1.1.17",
         "question": "A small team builds an app for one school. A large team builds a banking system for thousands of customers. Which project gets the heavier elaboration, and why?",
         "options": [
-          "The school app — schools have stricter rules about software",
-          "Neither — the framework fixes how much work each activity gets",
-          "The banking system — banking software is written in more programming languages",
-          "The banking system — the product has to be reliable for thousands of people, so the phases carry more weight"
+          "The school app: schools have stricter rules about software",
+          "Neither: the framework fixes how much work each activity gets",
+          "The banking system: banking software is written in more programming languages",
+          "The banking system: the product has to be reliable for thousands of people, so the phases carry more weight"
         ],
         "answer": 3,
         "explanation": "Same four activities, heavier elaboration. The product and the people it serves are what raise the stakes."

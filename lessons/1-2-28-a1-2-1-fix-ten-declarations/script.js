@@ -1,10 +1,10 @@
-// 1.2.28 A1.2.1 — Fix Ten Declarations
+// 1.2.28 A1.2.1: Fix Ten Declarations
 
 // Ten declarations below. Every one of them is wrong.
 // Some will not even run. Fix all ten, and above each fix write a
 // comment saying what was wrong with it.
 //
-// The names are correct except where the comment says otherwise —
+// The names are correct except where the comment says otherwise :
 // keep them, and give each variable the type its name implies.
 
 // 1. an age should be a number, not text
@@ -31,7 +31,7 @@ let q = 3;
 // 8. JavaScript names are camelCase
 let favourite_colour = "blue";
 
-// 9. this student has no middle name — deliberately nothing
+// 9. this student has no middle name: deliberately nothing
 let middleName = "null";
 
 // 10. the final score is not known yet; do not assign it at all

@@ -24,7 +24,7 @@
     {
       "id": "s3",
       "title": "Say which part solved it",
-      "instructions": "In a comment, say which of the three parts — the kind, the detail, or the place — actually told you what to change, and why."
+      "instructions": "In a comment, say which of the three parts: the kind, the detail, or the place: actually told you what to change, and why."
     },
     {
       "id": "s4",

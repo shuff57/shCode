@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed — practice for tracing a chain, book Problem Set 2.1.7 intent (predict the value of a chained conditional)",
+  "sourceRef": "designed: practice for tracing a chain, book Problem Set 2.1.7 intent (predict the value of a chained conditional)",
   "steps": [
     {
       "id": "s1",
@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "title": "Predict, then run the chained ternary",
-      "instructions": "Write a second chain — this time with ? operators instead of else if — using different cutoff values than the first chain. Predict the result in a comment first, then run it."
+      "instructions": "Write a second chain: this time with ? operators instead of else if: using different cutoff values than the first chain. Predict the result in a comment first, then run it."
     }
   ],
   "requirements": [

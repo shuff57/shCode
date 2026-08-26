@@ -1,6 +1,6 @@
 {
   "id": "2-2-2a-reading-flowchart-shapes",
-  "title": "2.2.4 Reading — Flowchart Shapes",
+  "title": "2.2.4 Reading: Flowchart Shapes",
   "description": "Four shapes carry nearly every flowchart. Learn what each one means and the two rules that make a flowchart readable, before you draw one.",
   "type": "lesson",
   "estimateMins": 12,
@@ -11,7 +11,7 @@
   "slos": [
     "SLO-4"
   ],
-  "sourceRef": "designed — flowchart shape vocabulary recap (Appendix D / book §1.5), ahead of 2.2.6 Chart the Code",
+  "sourceRef": "designed: flowchart shape vocabulary recap (Appendix D / book §1.5), ahead of 2.2.6 Chart the Code",
   "points": 0,
   "contentFile": "content.md",
   "steps": [],

@@ -41,18 +41,18 @@ console.log("Why: that line is the actual code being written, which is the const
 
 ---
 
-## Four phases here, five in the video — same idea, different labels
+## Four phases here, five in the video: same idea, different labels
 
 You will see the lifecycle cut two ways this unit, and they do not contradict each other.
 
-- **Four framework activities** — inception, elaboration, construction, deployment. This is the
+- **Four framework activities**: inception, elaboration, construction, deployment. This is the
   book's naming, and it is what the rest of this module uses.
-- **Five SDLC phases** — design, development, testing, deployment, maintenance. This is the
+- **Five SDLC phases**: design, development, testing, deployment, maintenance. This is the
   common industry naming, and it is what the `1.1.5` video uses.
 
 Line them up and the overlap is obvious: inception and elaboration are both **design** work,
 construction is **development**, deployment is **deployment** in both. The five-phase version
-just pulls two jobs out into names of their own — **testing**, which the four-phase version
+just pulls two jobs out into names of their own: **testing**, which the four-phase version
 treats as an umbrella activity running throughout (see `1.1.10`), and **maintenance**, the work
 that keeps going after release.
 

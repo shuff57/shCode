@@ -1,12 +1,12 @@
-// 2.4.23 A2.4.1 — Debug Five Loops
+// 2.4.23 A2.4.1: Debug Five Loops
 //
 // Each program below is shown BROKEN, as a comment. Do not uncomment
-// and run the broken versions — two of them never stop. Your job is
+// and run the broken versions: two of them never stop. Your job is
 // to write a FIXED, runnable version under each one, plus a comment
 // explaining what the bug was.
 
 // ---------------------------------------------------------------
-// PROGRAM 1 — infinite loop: missing update
+// PROGRAM 1: infinite loop: missing update
 //
 // let n = 1;
 // while (n <= 5) {
@@ -18,7 +18,7 @@
 
 
 // ---------------------------------------------------------------
-// PROGRAM 2 — infinite loop: update moves the wrong way
+// PROGRAM 2: infinite loop: update moves the wrong way
 //
 // for (let count = 10; count > 0; count++) {
 //   console.log(count);
@@ -29,18 +29,18 @@
 
 
 // ---------------------------------------------------------------
-// PROGRAM 3 — off by one: misses the last value
+// PROGRAM 3, off by one: misses the last value
 //
 // for (let i = 1; i < 5; i++) {
 //   console.log(i);
 // }
-// Expected: 1 2 3 4 5. Actual: 1 2 3 4 — it stops one value early.
+// Expected: 1 2 3 4 5. Actual: 1 2 3 4: it stops one value early.
 //
 // STEP 3: Write the fixed version here. Add a comment explaining the bug.
 
 
 // ---------------------------------------------------------------
-// PROGRAM 4 — off by one: one extra value
+// PROGRAM 4, off by one: one extra value
 //
 // for (let k = 0; k <= 5; k++) {
 //   console.log(k);
@@ -51,7 +51,7 @@
 
 
 // ---------------------------------------------------------------
-// PROGRAM 5 — do...while logic error
+// PROGRAM 5: do...while logic error
 //
 // let greeted = true;
 // while (!greeted) {

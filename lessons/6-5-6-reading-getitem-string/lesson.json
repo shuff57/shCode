@@ -1,10 +1,10 @@
 {
   "id": "6-5-6-reading-getitem-string",
-  "title": "6.5.6 Reading — getItem Returns a String",
-  "description": "getItem always gives you a string, even when you stored a number. String comparisons give wrong results — here's the Number() fix and the || 0 fallback.",
+  "title": "6.5.6 Reading: getItem Returns a String",
+  "description": "getItem always gives you a string, even when you stored a number. String comparisons give wrong results: here's the Number() fix and the || 0 fallback.",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "reading",
   "week": 16,

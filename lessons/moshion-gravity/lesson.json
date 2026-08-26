@@ -1,10 +1,10 @@
 {
   "id": "moshion-gravity",
-  "title": "5.1.24 Falling Block — Example",
+  "title": "5.1.24 Falling Block: Example",
   "description": "A dynamic block falls under gravity and lands on a static floor. Read the example, then experiment.",
   "type": "example",
   "estimateMins": 15,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
   "preview": "moshion",
   "week": 10,
@@ -31,7 +31,7 @@
     {
       "id": "s3",
       "title": "Make the floor dynamic",
-      "instructions": "Remove the `'static'` argument from the ground sprite. Both pieces fall now — that's why the floor is static.",
+      "instructions": "Remove the `'static'` argument from the ground sprite. Both pieces fall now: that's why the floor is static.",
       "hints": [
         "new Sprite(x, y, w, h) defaults to dynamic. Add 'static' to anchor it."
       ]

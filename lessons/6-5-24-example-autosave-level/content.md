@@ -1,6 +1,6 @@
-**Goal:** Implement two auto-save triggers — one that fires when the player reaches a level-complete zone, and one that fires on a timer every ~30 seconds.
+**Goal:** Implement two auto-save triggers: one that fires when the player reaches a level-complete zone, and one that fires on a timer every ~30 seconds.
 
-## Step 1 — A simple game with a goal zone
+## Step 1: A simple game with a goal zone
 
 You have a player you can move with the arrow keys, a score that ticks up, and a "level complete" zone (a green sprite) on the right side of the canvas. Reach the zone to trigger an auto-save.
 
@@ -47,9 +47,9 @@ function draw() {
 }
 ```
 
-## Step 2 — Auto-save when the player overlaps the goal zone
+## Step 2: Auto-save when the player overlaps the goal zone
 
-When the player sprite overlaps the goal zone, increment the level, build a save object with score and level, and write it to localStorage. The save fires automatically — no key press required.
+When the player sprite overlaps the goal zone, increment the level, build a save object with score and level, and write it to localStorage. The save fires automatically: no key press required.
 
 ```js live
 let player;
@@ -108,9 +108,9 @@ function draw() {
 }
 ```
 
-## Step 3 — Add a timer-based auto-save
+## Step 3: Add a timer-based auto-save
 
-In addition to the zone trigger, auto-save every ~30 seconds of gameplay (`frameCount % 1800 === 0`). Both triggers write to the same `'autoSave'` key — you don't need two save slots for two triggers.
+In addition to the zone trigger, auto-save every ~30 seconds of gameplay (`frameCount % 1800 === 0`). Both triggers write to the same `'autoSave'` key: you don't need two save slots for two triggers.
 
 ```js live
 let player;
@@ -174,9 +174,9 @@ function draw() {
 }
 ```
 
-## Step 4 — Show a subtle "Saving..." indicator
+## Step 4: Show a subtle "Saving..." indicator
 
-Auto-save should be invisible — but a brief visual cue helps debugging and gives the player confidence. Show "Saving..." text that fades after a second.
+Auto-save should be invisible, but a brief visual cue helps debugging and gives the player confidence. Show "Saving..." text that fades after a second.
 
 ```js live
 let player;
@@ -255,8 +255,8 @@ function draw() {
 
 ## Key takeaways
 
-- **Trigger-based auto-save** fires on a game event — overlapping a zone, hitting a score threshold, changing levels. It saves automatically; the player doesn't press anything.
-- **Timer-based auto-save** fires at regular intervals — `frameCount % N === 0`. Use a reasonable interval (15-60 seconds), not every frame.
-- **One key is enough.** Both triggers can write to the same `storeItem` key. The latest data overwrites the old — that's the point.
+- **Trigger-based auto-save** fires on a game event: overlapping a zone, hitting a score threshold, changing levels. It saves automatically; the player doesn't press anything.
+- **Timer-based auto-save** fires at regular intervals: `frameCount % N === 0`. Use a reasonable interval (15-60 seconds), not every frame.
+- **One key is enough.** Both triggers can write to the same `storeItem` key. The latest data overwrites the old: that's the point.
 - **Keep the indicator subtle.** A brief "Saving..." that fades in ~1 second builds confidence without being distracting. In a polished game, you might skip the indicator entirely.
 - **Guard against re-fires.** An overlap check fires every frame while the player stands on the zone. Either reset the player's position (like above) or use a boolean flag to save once per overlap.

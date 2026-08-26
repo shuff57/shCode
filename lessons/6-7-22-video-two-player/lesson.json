@@ -1,10 +1,10 @@
 {
   "id": "6-7-22-video-two-player",
-  "title": "6.7.18 Video — Two-Player Local Input",
-  "description": "One keyboard, two players — WASD on the left, arrow keys on the right, each with their own sprite and score. This video shows the pattern once so you can wire it up in A17.1 without guessing.",
+  "title": "6.7.18 Video: Two-Player Local Input",
+  "description": "One keyboard, two players: WASD on the left, arrow keys on the right, each with their own sprite and score. This video shows the pattern once so you can wire it up in A17.1 without guessing.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.7 Advanced Input",
   "preview": "video",
   "week": 17,

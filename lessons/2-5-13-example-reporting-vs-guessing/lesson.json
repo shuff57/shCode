@@ -1,6 +1,6 @@
 {
   "id": "2-5-13-example-reporting-vs-guessing",
-  "title": "2.5.13 Worked Example — Reporting Instead of Guessing",
+  "title": "2.5.13 Worked Example: Reporting Instead of Guessing",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.5.3 — Example 2.2 'Reporting instead of guessing'",
+  "sourceRef": "book 2.5.3: Example 2.2 'Reporting instead of guessing'",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

@@ -1,7 +1,7 @@
 {
   "id": "1-1-4-sdlc-overview",
   "title": "1.1.4 What a Program Is",
-  "description": "Learn what a program is, then write six lines of JavaScript with console.log() — text, math, joined strings and a true/false comparison — and watch them run in order.",
+  "description": "Learn what a program is, then write six lines of JavaScript with console.log(): text, math, joined strings and a true/false comparison, and watch them run in order.",
   "type": "assignment",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -25,7 +25,7 @@
     {
       "id": "s2",
       "title": "Print a number",
-      "instructions": "JavaScript can do math. Under the Step 2 comment, type:\n\n```js\nconsole.log(2 + 2);\n```\n\nNotice there are **no quotes** around `2 + 2`. That's because numbers aren't text — JavaScript calculates the answer and prints the result.\n\nTry changing the numbers or using other operators: `-`, `*`, `/`.",
+      "instructions": "JavaScript can do math. Under the Step 2 comment, type:\n\n```js\nconsole.log(2 + 2);\n```\n\nNotice there are **no quotes** around `2 + 2`. That's because numbers aren't text: JavaScript calculates the answer and prints the result.\n\nTry changing the numbers or using other operators: `-`, `*`, `/`.",
       "hints": [
         "Numbers don't need quotes. Text (strings) do.",
         "Try console.log(10 * 5); or console.log(100 / 4);"
@@ -34,7 +34,7 @@
     {
       "id": "s3",
       "title": "Join two strings",
-      "instructions": "Text values in JavaScript are called **strings**. You can join two strings together with `+`. Under the Step 3 comment, type:\n\n```js\nconsole.log(\"My name is \" + \"a programmer!\");\n```\n\nThis is called **concatenation**. Notice the space after \"is \" — without it the words smash together.",
+      "instructions": "Text values in JavaScript are called **strings**. You can join two strings together with `+`. Under the Step 3 comment, type:\n\n```js\nconsole.log(\"My name is \" + \"a programmer!\");\n```\n\nThis is called **concatenation**. Notice the space after \"is \", without it the words smash together.",
       "hints": [
         "Both sides of the + must be in quotes.",
         "If your output looks like 'My name isa programmer!' you forgot the space."
@@ -43,10 +43,10 @@
     {
       "id": "s4",
       "title": "True or false",
-      "instructions": "JavaScript can compare values and tell you if something is true or false. Under the Step 4 comment, type:\n\n```js\nconsole.log(100 > 50);\n```\n\nThe output is `true` — a **boolean** value. Booleans are either `true` or `false`. Try `console.log(10 < 5);` to see `false`.",
+      "instructions": "JavaScript can compare values and tell you if something is true or false. Under the Step 4 comment, type:\n\n```js\nconsole.log(100 > 50);\n```\n\nThe output is `true`: a **boolean** value. Booleans are either `true` or `false`. Try `console.log(10 < 5);` to see `false`.",
       "hints": [
         "Comparison operators: > (greater than), < (less than), === (equal to).",
-        "Booleans don't have quotes — they're not strings."
+        "Booleans don't have quotes: they're not strings."
       ]
     },
     {
@@ -54,14 +54,14 @@
       "title": "Print your name",
       "instructions": "Now make it personal. Under the Step 5 comment, print your own name:\n\n```js\nconsole.log(\"Your Name Here\");\n```\n\nReplace \"Your Name Here\" with your actual name.",
       "hints": [
-        "Keep the quotes around your name — it's a string.",
+        "Keep the quotes around your name: it's a string.",
         "Example: console.log(\"Maria Garcia\");"
       ]
     },
     {
       "id": "s6",
       "title": "Print your hobby",
-      "instructions": "Under the Step 6 comment, print your favorite hobby:\n\n```js\nconsole.log(\"I love building robots.\");\n```\n\nYour program now has **6 lines of code** — each one an instruction the computer follows **in order**, top to bottom. This is called **sequential execution**.\n\nYou just wrote your first JavaScript program!",
+      "instructions": "Under the Step 6 comment, print your favorite hobby:\n\n```js\nconsole.log(\"I love building robots.\");\n```\n\nYour program now has **6 lines of code**: each one an instruction the computer follows **in order**, top to bottom. This is called **sequential execution**.\n\nYou just wrote your first JavaScript program!",
       "hints": [
         "Each console.log() goes on its own line.",
         "Put your actual hobby inside the quotes."
@@ -122,7 +122,7 @@
     {
       "id": "req6",
       "title": "Your hobby",
-      "description": "Print your hobby — at least 6 console.log statements total",
+      "description": "Print your hobby, at least 6 console.log statements total",
       "type": "regex",
       "file": "script.js",
       "pattern": "(console\\.log\\(.*\\).*){6,}",

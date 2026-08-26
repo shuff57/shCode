@@ -1,10 +1,10 @@
 {
   "id": "5-1-18-lab-else-to-zero",
-  "title": "5.1.18 Lab — Delete the else, watch drift",
+  "title": "5.1.18 Lab: Delete the else, watch drift",
   "description": "Start from a working WASD movement pattern, delete the two else lines, observe drift, then restore them.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
   "preview": "moshion",
   "week": 10,
@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Run as-is and confirm movement stops",
-      "instructions": "Click Run (or the preview area). Hold a WASD key — the sprite moves. Release — it stops. Confirm the else-to-zero rule is working.",
+      "instructions": "Click Run (or the preview area). Hold a WASD key: the sprite moves. Release: it stops. Confirm the else-to-zero rule is working.",
       "hints": [
         "Open the moSHion docs drawer on the right and find the Sprite velocity section."
       ]
@@ -31,7 +31,7 @@
     {
       "id": "s3",
       "title": "Tap a key once and watch the sprite drift",
-      "instructions": "Click the preview to focus it. Tap one WASD key briefly and release. Watch what happens — the sprite keeps moving because vel was never reset.",
+      "instructions": "Click the preview to focus it. Tap one WASD key briefly and release. Watch what happens: the sprite keeps moving because vel was never reset.",
       "hints": [
         "The sprite drifts because velocity is not automatically reset between frames."
       ]

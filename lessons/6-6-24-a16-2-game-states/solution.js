@@ -64,7 +64,7 @@ function draw() {
       fill('white');
       textSize(20);
       textAlign(CENTER);
-      text('PAUSED — press P', 200, 200);
+      text('PAUSED: press P', 200, 200);
       if (kb.presses('p')) state = 'play';
       break;
 

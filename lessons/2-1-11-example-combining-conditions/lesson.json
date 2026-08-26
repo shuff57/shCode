@@ -1,6 +1,6 @@
 {
   "id": "2-1-11-example-combining-conditions",
-  "title": "2.1.29 Worked Example — Combining conditions",
+  "title": "2.1.29 Worked Example: Combining conditions",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.1.8 — 'Combining Conditions', Example 2.8/2.9/2.10 (&&, ||, !)",
+  "sourceRef": "book 2.1.8: 'Combining Conditions', Example 2.8/2.9/2.10 (&&, ||, !)",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

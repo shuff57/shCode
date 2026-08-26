@@ -11,12 +11,12 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.3.6 — Try It Now 2.5",
+  "sourceRef": "book 2.3.6: Try It Now 2.5",
   "steps": [
     {
       "id": "s1",
       "title": "Read the given if/else-if chain",
-      "instructions": "The comment at the top of script.js shows the chain you're rewriting. It's already there for reference — don't delete it."
+      "instructions": "The comment at the top of script.js shows the chain you're rewriting. It's already there for reference: don't delete it."
     },
     {
       "id": "s2",

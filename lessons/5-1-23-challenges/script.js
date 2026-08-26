@@ -1,5 +1,5 @@
 function setup() {
-  // STEP 1: Create a player sprite — position it and give it a size.
+  // STEP 1: Create a player sprite: position it and give it a size.
 
   // STEP 2: (Challenge 1) Create an array of colors to cycle through
 

@@ -1,6 +1,6 @@
 **Goal:** Use a nested loop to build a multiplication table, one row at a time.
 
-## Step 1 — Run it and read the shape
+## Step 1: Run it and read the shape
 
 ```js live plain
 for (let a = 1; a <= 4; a++) {
@@ -12,18 +12,18 @@ for (let a = 1; a <= 4; a++) {
 }
 ```
 
-`\t` is a tab character — it lines the columns up in the output.
+`\t` is a tab character: it lines the columns up in the output.
 
-## Step 2 — Trace what happens on one outer round
+## Step 2: Trace what happens on one outer round
 
 Pick `a = 3`. `line` starts as an empty string. The inner loop runs `b` from 1 to 4, appending `3*1`, `3*2`, `3*3`, `3*4` to `line` one at a time. Only after the inner loop finishes all four does `console.log(line)` run and print the whole row at once.
 
-## Step 3 — Move `let line = ""` and see it break
+## Step 3: Move `let line = ""` and see it break
 
 `line` has to be declared **inside** the outer loop, before the inner loop starts, so it resets to empty at the start of every row. Move it above the outer loop instead and run this:
 
 ```js live plain
-let line = "";   // moved outside — now it never resets
+let line = "";   // moved outside: now it never resets
 
 for (let a = 1; a <= 4; a++) {
   for (let b = 1; b <= 4; b++) {
@@ -33,7 +33,7 @@ for (let a = 1; a <= 4; a++) {
 }
 ```
 
-Every row now includes every number from every previous row too — `line` never went back to empty.
+Every row now includes every number from every previous row too: `line` never went back to empty.
 
 ## Key takeaways
 

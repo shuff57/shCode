@@ -20,7 +20,7 @@ Compare that to the older `+` concatenation style:
 console.log(name + " scored " + score + " points");
 ```
 
-Both produce the same output, but the template literal is easier to read. In this course we lead with template literals — use them whenever you build a sentence from variables.
+Both produce the same output, but the template literal is easier to read. In this course we lead with template literals: use them whenever you build a sentence from variables.
 
 ## String methods
 
@@ -62,6 +62,6 @@ console.log(material.includes("era"));
 | **interpolation** | Inserting a variable's value directly into a string |
 | **`${}`** | Placeholder inside a template literal; the expression inside is evaluated |
 | **method** | A built-in action on a value, called with `.methodName()` |
-| **`.length`** | Property (not a method) — returns the number of characters in a string |
+| **`.length`** | Property (not a method): returns the number of characters in a string |
 | **`.toUpperCase()`** | Returns the string in ALL CAPS |
 | **`.includes(x)`** | Returns `true` if the string contains the substring `x` |

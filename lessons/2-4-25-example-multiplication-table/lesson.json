@@ -1,12 +1,12 @@
 {
   "id": "2-4-25-example-multiplication-table",
-  "title": "2.4.25 Worked Example — A Multiplication Table",
+  "title": "2.4.25 Worked Example: A Multiplication Table",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "example",
-  "sourceRef": "book 2.4 — Example 2.6 'A multiplication table'",
+  "sourceRef": "book 2.4: Example 2.6 'A multiplication table'",
   "week": 7,
   "slos": [
     "SLO-3"

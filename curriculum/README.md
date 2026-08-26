@@ -1,7 +1,7 @@
 # Curriculum build system
 
 Source of truth: `../curriculum-plan.md` (SLOs + calendar) and the bookSHelf textbook
-(concepts — the book is upstream of shCode). See [BOOK-TO-MODULE.md](BOOK-TO-MODULE.md)
+(concepts: the book is upstream of shCode). See [BOOK-TO-MODULE.md](BOOK-TO-MODULE.md)
 for how a written book chapter becomes modules here, and how to resync a built unit
 when the book changes.
 
@@ -27,7 +27,7 @@ When the user says **"build 1.1.1"**:
 
 1. AI reads `curriculum/units/modules/1.1.1_software-lifecycle.md` (full spec).
 2. AI cross-checks the parent unit file `curriculum/units/1.1_foundations.md` for unit-level goals and inter-module bridges.
-3. AI generates the artifacts listed in the module's **Build Outputs** section — typically:
+3. AI generates the artifacts listed in the module's **Build Outputs** section: typically:
    - In-app lesson(s) at `lessons/<lesson-id>/` (lesson.json + script.js)
    - Assignment markdown at `assignments/A<week>.<n>_<slug>.md`
    - Teacher slide outline at `slides/<module-id>_<slug>.md` (optional)

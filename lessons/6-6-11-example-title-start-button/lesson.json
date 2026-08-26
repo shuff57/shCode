@@ -1,10 +1,10 @@
 {
   "id": "6-6-11-example-title-start-button",
-  "title": "6.6.11 Worked Example — Title Screen with Start Button",
+  "title": "6.6.11 Worked Example: Title Screen with Start Button",
   "description": "Build a title screen state that shows the game name and 'Press ENTER to start'. When they press Enter, change state to 'play'.",
   "type": "lesson",
   "estimateMins": 15,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "example",
   "week": 17,

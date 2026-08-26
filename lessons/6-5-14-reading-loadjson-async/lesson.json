@@ -1,10 +1,10 @@
 {
   "id": "6-5-14-reading-loadjson-async",
-  "title": "6.5.14 Reading — moSHion docs: loadJSON is Async",
-  "description": "loadJSON loads external JSON files (levels, dialogue, config) — different from save/load. It's async and needs a callback.",
+  "title": "6.5.14 Reading: moSHion docs: loadJSON is Async",
+  "description": "loadJSON loads external JSON files (levels, dialogue, config): different from save/load. It's async and needs a callback.",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "reading",
   "week": 16,

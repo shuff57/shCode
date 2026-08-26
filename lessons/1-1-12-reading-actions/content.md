@@ -1,6 +1,6 @@
 ## Software engineering action
 
-**Read before attempting `1.1.13 Reading — Task Sets`.**
+**Read before attempting `1.1.13 Reading: Task Sets`.**
 
 What you'll learn from it:
 
@@ -22,7 +22,7 @@ console.log("deployment: release to end users");
 What you'll learn from it:
 
 - An action answers *what job gets done* inside a phase, not how.
-- An action is a named, recognizable piece of work — not the whole phase and not a single keystroke.
+- An action is a named, recognizable piece of work, not the whole phase and not a single keystroke.
 
 **Try it:** Log one action you would expect inside construction.
 

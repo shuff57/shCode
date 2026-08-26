@@ -5,7 +5,7 @@
 - Which kinds of values JavaScript passes by value
 - Why changing a number inside a function does not change the original
 
-When you pass a **primitive** value — a number, string, or boolean — JavaScript hands the function a **copy**. Whatever the function does to that copy, the original variable outside stays the same.
+When you pass a **primitive** value: a number, string, or boolean: JavaScript hands the function a **copy**. Whatever the function does to that copy, the original variable outside stays the same.
 
 Primitives are: `number`, `string`, `boolean`, `undefined`, `null`.
 
@@ -16,7 +16,7 @@ Primitives are: `number`, `string`, `boolean`, `undefined`, `null`.
 - Which kinds of values JavaScript passes by reference
 - Why pushing to an array inside a function changes the original
 
-When you pass an **object** or an **array**, JavaScript hands the function a **reference** — a direct pointer to the same spot in memory. If the function modifies the object or array, the original is modified too.
+When you pass an **object** or an **array**, JavaScript hands the function a **reference**: a direct pointer to the same spot in memory. If the function modifies the object or array, the original is modified too.
 
 **Try it:** Read the code and predict what each `console.log` will print. Then run it and check.
 
@@ -50,7 +50,7 @@ The number `myNumber` is unchanged because the function only modified a copy. Th
 | Term | Meaning |
 |------|---------|
 | **primitive** | A simple value: number, string, boolean, undefined, null |
-| **pass by value** | The function gets a copy — changes inside don't affect the original |
-| **pass by reference** | The function gets a pointer to the original — changes inside do affect it |
+| **pass by value** | The function gets a copy: changes inside don't affect the original |
+| **pass by reference** | The function gets a pointer to the original: changes inside do affect it |
 | **object / array** | Non-primitive values; always passed by reference in JavaScript |
 | **mutation** | Changing an object or array in place (e.g., `.push()`, `arr[0] = ...`) |

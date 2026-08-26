@@ -1,10 +1,10 @@
 ## Game value → state change
 
-Read after `6.6.15 Reading — moSHion docs: Input-Driven Transitions`. About 8 minutes.
+Read after `6.6.15 Reading: moSHion docs: Input-Driven Transitions`. About 8 minutes.
 
 **What you'll learn from it:**
 
-- A **condition-driven transition** happens automatically — something in the game (score, health, timer, position) triggers it. The player doesn't press anything.
+- A **condition-driven transition** happens automatically: something in the game (score, health, timer, position) triggers it. The player doesn't press anything.
 - The pattern: inside the relevant `case` in `draw()`, check `if (score >= 100) state = 'win'`.
 - These transitions run every frame, so the condition is rechecked continuously. Once triggered, the new state takes over next frame.
 - Common condition-driven transitions: play → gameover (death), play → win (score/goal), play → levelComplete (position reached).
@@ -68,7 +68,7 @@ function draw() {
 }
 ```
 
-Press Enter. Two conditions run every frame: `score >= 120` triggers `'win'`, `health <= 0` triggers `'gameover'`. Whichever fires first wins. The player never presses a key to end the game — the game decides.
+Press Enter. Two conditions run every frame: `score >= 120` triggers `'win'`, `health <= 0` triggers `'gameover'`. Whichever fires first wins. The player never presses a key to end the game: the game decides.
 
 ---
 
@@ -96,4 +96,4 @@ Same switch, same draw loop. The difference is **who triggers the change**.
 | **Condition-driven transition** | A state change triggered by a game value (score, health, timer, position) rather than player input. |
 | **Game-over trigger** | A boolean expression (e.g. `health <= 0`) that moves the game to `'gameover'` when true. |
 | **Win condition** | A boolean expression (e.g. `score >= 100`) that moves the game to `'win'` when true. |
-| **Frame check** | A condition tested every frame inside a `case` — fires automatically when the condition is met. |
+| **Frame check** | A condition tested every frame inside a `case`: fires automatically when the condition is met. |

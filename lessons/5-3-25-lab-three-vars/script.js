@@ -1,4 +1,4 @@
-// 2.2.8a Lab — Three Enemies in three variables.
+// 2.2.8a Lab: Three Enemies in three variables.
 
 class Enemy {
   constructor(x, y, hp) {
@@ -17,7 +17,7 @@ let e1, e2, e3;
 function setup() {
   new Canvas(400, 200);
 
-  // STEP 1: Create e1, e2, and e3 — one Enemy at each of three different positions.
+  // STEP 1: Create e1, e2, and e3: one Enemy at each of three different positions.
   //   new Enemy(x, y, hp) takes an x position, y position, and hit point value.
   //   Each call produces a completely separate object with its own hp and sprite.
 }

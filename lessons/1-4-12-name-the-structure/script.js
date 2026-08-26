@@ -15,4 +15,4 @@
 
 // STEP 4: keep asking for a password until it is correct.
 //         This one needs TWO of the three. Log both in a single
-//         string, selection first — like "selection and repetition".
+//         string, selection first, like "selection and repetition".

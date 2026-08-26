@@ -4,7 +4,7 @@
   "description": "Combine Groups, overlap detection, and safe despawn into a playable asteroid scene. WASD steers the ship; an overlap with any asteroid ends the game.",
   "type": "assignment",
   "estimateMins": 60,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.2 Overlaps and Collisions",
   "preview": "moshion",
   "week": 13,
@@ -26,7 +26,7 @@
       "title": "WASD steering",
       "instructions": "In draw(), read kb.pressing('a' / 'd' / 'w' / 's') and set the ship's vel accordingly. Else-to-zero so the ship doesn't drift.",
       "hints": [
-        "Open the Input docs chapter for the kb API. Don't use arrow keys — they scroll the editor."
+        "Open the Input docs chapter for the kb API. Don't use arrow keys: they scroll the editor."
       ]
     },
     {
@@ -40,7 +40,7 @@
     {
       "id": "s4",
       "title": "Overlap-driven hit state",
-      "instructions": "Use ship.overlaps(asteroids, callback) or the boolean form to detect a hit. On hit, transition to a 'hit' state — change background, log a message, or stop updating.",
+      "instructions": "Use ship.overlaps(asteroids, callback) or the boolean form to detect a hit. On hit, transition to a 'hit' state: change background, log a message, or stop updating.",
       "hints": [
         "The Collisions docs chapter covers the boolean and callback forms of overlaps()."
       ]

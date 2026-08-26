@@ -32,7 +32,7 @@ function draw() {
     return;
   }
 
-  // Play state — WASD movement + score over time.
+  // Play state: WASD movement + score over time.
   if      (kb.pressing('a')) player.vel.x = -3;
   else if (kb.pressing('d')) player.vel.x =  3;
   else                       player.vel.x =  0;

@@ -1,10 +1,10 @@
 {
   "id": "5-1-17-reading-else-to-zero",
-  "title": "5.1.17 Reading — The else-to-zero rule",
+  "title": "5.1.17 Reading: The else-to-zero rule",
   "description": "Why velocity persists across frames and why the else branch is what stops the sprite. Read after 2.1.7b.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
   "preview": "reading",
   "week": 10,

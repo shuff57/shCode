@@ -1,4 +1,4 @@
-## A16.2 Game States — State Machine with Persistence
+## A16.2 Game States: State Machine with Persistence
 
 ### Assignment overview
 
@@ -18,7 +18,7 @@ Build a game with at least 4 states: `'title'`, `'play'`, `'pause'`, and `'gameo
 
 ### Starter code
 
-You'll start from the `script.js` file. It has a blank `setup()` and `draw()` with STEP comments — you write the code. Do not copy-paste a whole solution from an earlier lesson; build it step by step.
+You'll start from the `script.js` file. It has a blank `setup()` and `draw()` with STEP comments: you write the code. Do not copy-paste a whole solution from an earlier lesson; build it step by step.
 
 ### How to submit
 
@@ -26,11 +26,11 @@ Commit your work through the workspace. The auto-grader checks the patterns abov
 
 ### Tips
 
-- **2.5.16 (Slots)** — how `storeItem` and `getItem` read/write named save slots
-- **2.5.23 (Auto-save)** — saving automatically when something important happens
-- **2.6.13 (Three-state machine)** — the switch/case pattern for title, play, gameover
-- **2.6.19 (Pause state)** — toggling in and out of a freeze state with `kb.presses`
-- **2.6.22 (Save on transition)** — calling `saveGame()` right after `state = 'gameover'`
-- **2.6.23 (Continue loads right state)** — `saved.state` restores the correct case
+- **2.5.16 (Slots)**: how `storeItem` and `getItem` read/write named save slots
+- **2.5.23 (Auto-save)**: saving automatically when something important happens
+- **2.6.13 (Three-state machine)**: the switch/case pattern for title, play, gameover
+- **2.6.19 (Pause state)**: toggling in and out of a freeze state with `kb.presses`
+- **2.6.22 (Save on transition)**: calling `saveGame()` right after `state = 'gameover'`
+- **2.6.23 (Continue loads right state)**: `saved.state` restores the correct case
 
-Start small: title and play first. Get the switch working. Then add pause. Then gameover. Save for last — wire it in once the state machine is solid.
+Start small: title and play first. Get the switch working. Then add pause. Then gameover. Save for last: wire it in once the state machine is solid.

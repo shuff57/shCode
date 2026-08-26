@@ -1,6 +1,6 @@
 {
   "id": "3-2-2-reading-array-basics",
-  "title": "3.3.2 Reading — Array Basics: Index, push, pop",
+  "title": "3.3.2 Reading: Array Basics: Index, push, pop",
   "description": "Learn how arrays store ordered lists, how zero-based indexing works, and how push, pop, and length let you grow and shrink the list. Read before the array exercises.",
   "type": "lesson",
   "estimateMins": 10,

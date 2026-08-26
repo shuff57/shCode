@@ -1,10 +1,10 @@
 {
   "id": "6-6-9-reading-naming-states",
-  "title": "6.6.9 Reading — Naming States: Conventions",
+  "title": "6.6.9 Reading: Naming States: Conventions",
   "description": "Use lowercase strings for state names: 'title', 'play', 'pause', 'gameover'. Be consistent. Good names make the switch statement self-documenting.",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "reading",
   "week": 17,

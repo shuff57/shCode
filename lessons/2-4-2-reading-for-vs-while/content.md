@@ -5,7 +5,7 @@
 - The one question that tells you which to reach for
 - Why forcing the wrong loop onto a problem makes the code worse, not just different
 
-Section 2.2 taught you both `for` and `while`. They are genuinely interchangeable — here is the same count, twice:
+Section 2.2 taught you both `for` and `while`. They are genuinely interchangeable: here is the same count, twice:
 
 ```js live plain
 for (let i = 1; i <= 3; i++) {
@@ -19,9 +19,9 @@ while (j <= 3) {
 }
 ```
 
-Both print the same three lines. The difference is not what they can do — it's what they *say*. A `for` loop gathers the start, the condition, and the update onto one line, so a reader sees all three at once. That's exactly right when you know the count in advance: "do this five times," "count from 1 to 20."
+Both print the same three lines. The difference is not what they can do: it's what they *say*. A `for` loop gathers the start, the condition, and the update onto one line, so a reader sees all three at once. That's exactly right when you know the count in advance: "do this five times," "count from 1 to 20."
 
-A `while` loop puts nothing on that line but the condition. That's right when you do **not** know the count ahead of time — when the loop runs until something becomes true, and how long that takes depends on the work itself:
+A `while` loop puts nothing on that line but the condition. That's right when you do **not** know the count ahead of time: when the loop runs until something becomes true, and how long that takes depends on the work itself:
 
 ```js live plain
 let balance = 100;
@@ -35,9 +35,9 @@ while (balance < 200) {
 console.log("Doubled after " + years + " years.");
 ```
 
-Nobody writing that loop knew the answer was 8 years before running it. That's the point — the condition decides when to stop, not a counter someone picked in advance.
+Nobody writing that loop knew the answer was 8 years before running it. That's the point: the condition decides when to stop, not a counter someone picked in advance.
 
-**The test:** if you can say the number of repetitions out loud *before* running the program, reach for `for`. If the honest answer is "however many it takes," reach for `while`. Using `for` for the second case forces you to invent a counter you don't need. Using `while` for the first scatters the loop's three parts across three separate lines — which is exactly where a forgotten update comes from.
+**The test:** if you can say the number of repetitions out loud *before* running the program, reach for `for`. If the honest answer is "however many it takes," reach for `while`. Using `for` for the second case forces you to invent a counter you don't need. Using `while` for the first scatters the loop's three parts across three separate lines: which is exactly where a forgotten update comes from.
 
 ---
 
@@ -45,6 +45,6 @@ Nobody writing that loop knew the answer was 8 years before running it. That's t
 
 | Term | Meaning |
 |------|---------|
-| **known-count loop** | A loop where the number of repetitions is decided before it starts — reach for `for` |
-| **unknown-count loop** | A loop that runs until a condition becomes true, with no fixed repeat count — reach for `while` |
+| **known-count loop** | A loop where the number of repetitions is decided before it starts: reach for `for` |
+| **unknown-count loop** | A loop that runs until a condition becomes true, with no fixed repeat count: reach for `while` |
 | **interchangeable** | `for` and `while` can express the same repetition; they differ in readability, not power |

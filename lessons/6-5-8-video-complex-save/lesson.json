@@ -1,10 +1,10 @@
 {
   "id": "6-5-8-video-complex-save",
-  "title": "6.5.8 Video — More Than a Number: Saving Your Whole Game",
-  "description": "A high score is one number. But your game has position, level, inventory — many pieces. JSON bundles them together.",
+  "title": "6.5.8 Video: More Than a Number: Saving Your Whole Game",
+  "description": "A high score is one number. But your game has position, level, inventory: many pieces. JSON bundles them together.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "video",
   "week": 16,

@@ -46,5 +46,5 @@ Eight lines, eight types, one wrong answer. If you can look at that output and s
 |------|---------|
 | **primitive type** | Holds a single thing. Seven of the eight types |
 | **object** | The one non-primitive type; holds a collection |
-| **`2^53 - 1`** | `9007199254740991` — the exact-integer limit of `number` |
-| **standalone type** | A type with exactly one value in it — `null` and `undefined` |
+| **`2^53 - 1`** | `9007199254740991`: the exact-integer limit of `number` |
+| **standalone type** | A type with exactly one value in it: `null` and `undefined` |

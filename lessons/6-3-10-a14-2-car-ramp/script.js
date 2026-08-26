@@ -9,7 +9,7 @@ function setup() {
   // STEP 1: Enable gravity, create a flat static ground and a tilted static
   // ramp. Use .rotation in radians to tilt the ramp.
 
-  // STEP 2: Build the vehicle — a dynamic chassis rectangle and two dynamic
+  // STEP 2: Build the vehicle: a dynamic chassis rectangle and two dynamic
   // circular wheels (use .diameter to make them round).
 
   // STEP 3: Attach each wheel to the chassis with a WheelJoint.
@@ -19,7 +19,7 @@ function setup() {
 function draw() {
   background('#222');
 
-  // STEP 4: WASD-driven wheels — read kb.pressing and set each wheel's
+  // STEP 4: WASD-driven wheels: read kb.pressing and set each wheel's
   // angularVelocity. Drive both wheels for all-wheel drive.
 
 }

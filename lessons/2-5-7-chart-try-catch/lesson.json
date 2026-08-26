@@ -1,6 +1,6 @@
 {
   "id": "2-5-7-chart-try-catch",
-  "title": "2.5.7 Chart the Code — try/catch as a Flowchart",
+  "title": "2.5.7 Chart the Code: try/catch as a Flowchart",
   "description": "Draw try/catch as a flowchart: attempt a step, then branch on whether it failed.",
   "type": "assignment",
   "estimateMins": 20,
@@ -13,7 +13,7 @@
     "SLO-4"
   ],
   "points": 0,
-  "sourceRef": "designed — practice for Definition 2.5.2 (try...catch control flow)",
+  "sourceRef": "designed: practice for Definition 2.5.2 (try...catch control flow)",
   "contentFile": "content.md",
   "diagram": {
     "starter": "flowchart TD\n  A([Start])\n  Z([End])",

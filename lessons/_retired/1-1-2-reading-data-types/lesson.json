@@ -1,6 +1,6 @@
 {
   "id": "1-1-2-reading-data-types",
-  "title": "1.1.2d Reading — Data Types & typeof",
+  "title": "1.1.2d Reading: Data Types & typeof",
   "description": "Meet the five primary JS types and use typeof to reveal what a variable holds. Read before the variables-and-types lesson.",
   "type": "lesson",
   "difficulty": "beginner",

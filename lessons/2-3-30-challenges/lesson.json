@@ -1,6 +1,6 @@
 {
   "id": "2-3-30-challenges",
-  "title": "2.3.31 Challenges — Optional Stretch",
+  "title": "2.3.31 Challenges: Optional Stretch",
   "description": "Optional stretch problems. Auto-graded.",
   "type": "assignment",
   "estimateMins": 15,
@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed — stretch practice synthesizing switch, grouped cases, and fall-through debugging",
+  "sourceRef": "designed: stretch practice synthesizing switch, grouped cases, and fall-through debugging",
   "contentFile": "content.md",
   "steps": [
     {

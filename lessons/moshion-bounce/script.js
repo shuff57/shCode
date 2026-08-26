@@ -1,4 +1,4 @@
-// 5.2.1 Bouncy Ball — build a closed box and drop a ball in it.
+// 5.2.1 Bouncy Ball: build a closed box and drop a ball in it.
 
 let ball;
 
@@ -7,7 +7,7 @@ function setup() {
 
   // STEP 1: Turn gravity on, pulling downward.
 
-  // STEP 2: Build four static walls — top, bottom, left and right — so the
+  // STEP 2: Build four static walls: top, bottom, left and right, so the
   //         ball cannot escape. Each is a long thin static sprite; give
   //         them a colour so you can see them.
 
@@ -15,7 +15,7 @@ function setup() {
   //         of two makes it a circle. Store it in `ball` and colour it.
 
   // STEP 4: Make it bouncy. The property runs 0 (sticky) to 1 (perfectly
-  //         elastic) — pick something near the top of that range.
+  //         elastic): pick something near the top of that range.
 
   // STEP 5: Give it very low friction, so it does not drag to a stop.
 

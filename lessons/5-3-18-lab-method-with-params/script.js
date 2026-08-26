@@ -1,4 +1,4 @@
-// 2.2.7c Lab — Method with parameters.
+// 2.2.7c Lab: Method with parameters.
 
 class Counter {
   constructor() {
@@ -10,7 +10,7 @@ class Counter {
   }
 
   // STEP 1: Write an addBy(n) method that adds the argument n to this.n.
-  //   The method takes one parameter — the amount to add.
+  //   The method takes one parameter: the amount to add.
   //   Use that parameter inside the body to change this.n.
 }
 

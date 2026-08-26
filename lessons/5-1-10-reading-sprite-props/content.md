@@ -1,11 +1,11 @@
 ## Sprite property tour: pos, rotation, layer
 
-Read before `5.1.4 Worked Example — Minimum Sprite Program`. About 5 minutes.
+Read before `5.1.4 Worked Example: Minimum Sprite Program`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
 - How do you read a sprite's current x position?
-- What unit does `rotation` use — degrees or radians?
+- What unit does `rotation` use: degrees or radians?
 - When two sprites overlap, which property decides which one appears on top?
 
 Once you have a sprite stored in a variable, you can read or change its properties at any time using dot notation (`player.someProperty`).
@@ -15,7 +15,7 @@ Once you have a sprite stored in a variable, you can read or change its properti
 - `player.pos.x` and `player.pos.y` hold the sprite's current centre position; you can read or overwrite them.
 - `player.rotation` is the tilt in degrees (clockwise). `0` is upright; `90` points the top edge to the right.
 - `player.layer` controls draw order. A sprite with a higher layer number appears in front of sprites with lower numbers.
-- `player.color` (already familiar from 2.1.3b) is also a property — included here as a recap row.
+- `player.color` (already familiar from 2.1.3b) is also a property: included here as a recap row.
 
 **Try it:**
 
@@ -43,7 +43,7 @@ function draw() {
 
 **What you'll see:** a tilted blue square overlapping a red square, with the blue one on top because its `layer` is higher.
 
-**Try this:** swap the two `layer` values (`player.layer = 1`, `box.layer = 2`) and run again — the red square jumps in front. Then add `player.pos.x = 80;` at the bottom of `setup()` to reposition the blue sprite before the sketch starts.
+**Try this:** swap the two `layer` values (`player.layer = 1`, `box.layer = 2`) and run again: the red square jumps in front. Then add `player.pos.x = 80;` at the bottom of `setup()` to reposition the blue sprite before the sketch starts.
 
 ---
 
@@ -56,4 +56,4 @@ function draw() {
 | **`rotation`** | Clockwise tilt in degrees. `0` = upright; `90` = top edge points right. |
 | **`layer`** | Draw-order index. Higher value = drawn in front of lower-value sprites. |
 
-*"One more sprite property exists — `vel` — but it deserves its own reading. You'll meet it in 2.1.7a."*
+*"One more sprite property exists: `vel`, but it deserves its own reading. You'll meet it in 2.1.7a."*

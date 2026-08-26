@@ -12,12 +12,12 @@
     "SLO-3",
     "SLO-4"
   ],
-  "sourceRef": "designed — A2.2.1 Part B per curriculum-plan.md §2.2 ('a JS program using at least one for loop and one while loop...'); pairs with 2.2.8 A2.2.1 (Part A) and the 2.2.7 A2.2.0 gate chart",
+  "sourceRef": "designed: A2.2.1 Part B per curriculum-plan.md §2.2 ('a JS program using at least one for loop and one while loop...'); pairs with 2.2.8 A2.2.1 (Part A) and the 2.2.7 A2.2.0 gate chart",
   "steps": [
     {
       "id": "s1",
       "title": "Write a for-loop counting task",
-      "instructions": "Use a for loop to count or step through a range of numbers, logging something on each pass — for example, counting how many multiples of a number appear in a range."
+      "instructions": "Use a for loop to count or step through a range of numbers, logging something on each pass, for example, counting how many multiples of a number appear in a range."
     },
     {
       "id": "s2",
@@ -27,7 +27,7 @@
     {
       "id": "s3",
       "title": "Comment your steps",
-      "instructions": "Add a short comment above each loop explaining what it does. This should match the algorithm you charted in 2.2.7 — if your program ended up doing something different than your chart, add a comment saying what changed and why."
+      "instructions": "Add a short comment above each loop explaining what it does. This should match the algorithm you charted in 2.2.7, if your program ended up doing something different than your chart, add a comment saying what changed and why."
     }
   ],
   "requirements": [

@@ -1,6 +1,6 @@
 {
   "id": "2-5-10-reading-empty-catch-trap",
-  "title": "2.5.10 Reading — The Empty catch Trap",
+  "title": "2.5.10 Reading: The Empty catch Trap",
   "description": "See why a catch block that does nothing is worse than no try...catch at all. Read before 2.5.11 Fix the Silent Catch.",
   "type": "lesson",
   "estimateMins": 10,
@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.5.2 — Context Pause (the empty catch block)",
+  "sourceRef": "book 2.5.2: Context Pause (the empty catch block)",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

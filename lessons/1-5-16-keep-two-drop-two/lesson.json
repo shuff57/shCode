@@ -33,7 +33,7 @@
           "Describing something without using any examples"
         ],
         "answer": 1,
-        "explanation": "Definition 1.5.3. It is leaving something out on purpose — and you should be able to name what you left out."
+        "explanation": "Definition 1.5.3. It is leaving something out on purpose, and you should be able to name what you left out."
       },
       {
         "id": "q2-the-test",
@@ -66,10 +66,10 @@
         "source": "1.5.13",
         "question": "Can a detail be completely true and still be worth leaving out?",
         "options": [
-          "No — if it is true it belongs in the description",
+          "No, if it is true it belongs in the description",
           "Yes, but only if the description is running out of room",
-          "Yes — truth is not the standard, load-bearing is",
-          "No — leaving out true things is what makes a description wrong"
+          "Yes: truth is not the standard, load-bearing is",
+          "No: leaving out true things is what makes a description wrong"
         ],
         "answer": 2,
         "explanation": "The colour of the bus is a fact. It is also irrelevant to catching it."
@@ -79,8 +79,8 @@
         "source": "1.5.14",
         "question": "Now the person you are describing the route to is colour-blind and cannot read the route number from a distance. What does that do to your abstraction?",
         "options": [
-          "Nothing — the route is the same route",
-          "A detail you had dropped may become load-bearing — what you keep depends on the problem, not on the bus",
+          "Nothing: the route is the same route",
+          "A detail you had dropped may become load-bearing: what you keep depends on the problem, not on the bus",
           "It means you should include every detail from now on, to be safe",
           "It means abstraction does not work for describing directions"
         ],

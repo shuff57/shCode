@@ -1,10 +1,10 @@
 {
   "id": "5-1-7-lab-one-sprite",
-  "title": "5.1.7 Lab — Drop one sprite, change its color",
+  "title": "5.1.7 Lab: Drop one sprite, change its color",
   "description": "Practice from 2.1.3b: create a canvas, drop a single sprite at the centre, and set its color. Three steps, no movement yet.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
   "preview": "moshion",
   "week": 10,
@@ -31,7 +31,7 @@
     {
       "id": "s3",
       "title": "Set the sprite's color",
-      "instructions": "Store the sprite in a variable, then assign a CSS color string to its `.color` property — try `'tomato'`, `'deepskyblue'`, or any color you like.",
+      "instructions": "Store the sprite in a variable, then assign a CSS color string to its `.color` property: try `'tomato'`, `'deepskyblue'`, or any color you like.",
       "hints": [
         "Look up sprite properties in the moSHion docs drawer."
       ]

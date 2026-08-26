@@ -62,12 +62,12 @@ graders stay regex/AI as they are today.
                           /module/U.M renders, graders pass on the solution
 ```
 
-Steps 3–5 are already documented — `curriculum/README.md` and
+Steps 3–5 are already documented: `curriculum/README.md` and
 `curriculum/resources/*`. **Steps 1–2 are what this doc adds.**
 
 ---
 
-## 3. Step 1 — chapter → unit
+## 3. Step 1: chapter → unit
 
 `book_manifest.yaml` carries the coarse table. It is quarter-level and deliberately
 lumpy (`2.2-2.7` is one row for all of chapter 6):
@@ -90,9 +90,9 @@ Use it to find the neighbourhood, then go to step 2 for the actual join.
 
 ---
 
-## 4. Step 2 — section → sub-module (the real granularity)
+## 4. Step 2: section → sub-module (the real granularity)
 
-**One book section maps to one sub-module spec.** Not one lesson — one *spec*, which
+**One book section maps to one sub-module spec.** Not one lesson: one *spec*, which
 then fans out to 15–30 lessons. The mapping for Q2 is already 1:1, because unit 2 was
 built alongside chapters 5–7 even though nothing wrote it down:
 
@@ -107,14 +107,14 @@ built alongside chapters 5–7 even though nothing wrote it down:
 | 6.5 Save and Load | `2.5.1_game-saves.md` | 2.5 |
 | 6.6 Game State Machines | `2.6.1_game-states.md` | 2.6 |
 | 6.7 Advanced Input **+** 6.8 Joints | `2.7.1_joints-advanced-input.md` | 2.7 |
-| 6.9 Timing and Async | **— no home —** | *(gap, see §8)* |
+| 6.9 Timing and Async | **: no home :** | *(gap, see §8)* |
 | 7.1 Arcade Cabinet (Q2 Synthesis) | `2.8.1_capstone-game.md` | 2.8 |
 
 ### Q1 (chapters 1–4 → units 1.1–1.4)
 
 Derived 2026-08-10 from `curriculum-plan.md` (authoritative on calendar: ~35 contact
 hours, 10 weeks, 9 sub-modules) against the 19 remastered Q1 book sections. **Nothing is
-built yet** — unit 1 has zero lesson folders, and the three existing `1.1.x` specs
+built yet**: unit 1 has zero lesson folders, and the three existing `1.1.x` specs
 predate the book.
 
 **One book section = one sub-module. Never combined** (operator, 2026-08-10). The section
@@ -134,12 +134,12 @@ Q1 owns chapters 1–4 as units 1.1–1.4, so:
 | 1.3 Functions and Data | 3 (8 sections) | `1.3.1` … `1.3.8` |
 | 1.4 Synthesis | 4 (1 section) | `1.4.1` |
 
-Sub-modules are sized in **class days, 1–3**. Weeks are not a spec field — the calendar
+Sub-modules are sized in **class days, 1–3**. Weeks are not a spec field: the calendar
 groups sub-modules into weeks downstream and can be re-cut without touching a spec.
 
 | Sub-module | Book section | Lines | Days |
 |---|---|---|---|
-| `1.1.1` | 1.1 Software Lifecycle | 253 | **2** *(spec written — concept count, not estimate)* |
+| `1.1.1` | 1.1 Software Lifecycle | 253 | **2** *(spec written: concept count, not estimate)* |
 | `1.1.2` | 1.2 Variables and Data Types | 568 | 1 |
 | `1.1.3` | 1.3 Documentation and Coding Conventions | 229 | 1 |
 | `1.1.4` | 1.4 Programming Paradigms and Languages | 368 | 1 |
@@ -160,7 +160,7 @@ groups sub-modules into weeks downstream and can be re-cut without touching a sp
 | `1.4.1` | 4.1 Print Shop (Q1 Synthesis) | 151 | 3 |
 
 **The Days column is a provisional estimate**, derived from book line count at roughly 590
-lines per class day (`1.4.1` is a project — days come from the activity, not its 151 lines).
+lines per class day (`1.4.1` is a project: days come from the activity, not its 151 lines).
 It exists so the quarter can be sized before any spec is written. When each spec IS written,
 set `days:` from the atomic-concept count per `sub-module-spec-conventions.md` §2a and
 overwrite the estimate here.
@@ -187,15 +187,15 @@ the 1:1 rule. Older specs carrying the retired fields migrate per its §1.1.
 ### Quarter size
 
 The estimates above total **31 class days** for Q1. Against a 10-week quarter that is
-about 3 days per week — at the top of the range, with no slack. The earlier "~40% over"
+about 3 days per week, at the top of the range, with no slack. The earlier "~40% over"
 figure was mostly an artifact of forced section pairing; 1:1 mapping plus honest day-sizing
 absorbs most of it. Re-total once real `days:` values replace the estimates.
 
-### The Q.U scheme above is retired — full book-native renumber (operator, 2026-08-12)
+### The Q.U scheme above is retired: full book-native renumber (operator, 2026-08-12)
 
 The `Q.U` unit id used throughout this file (e.g. `1.1`, `1.2`, `2.4`) prefixes a
 quarter digit that doesn't exist in the book. It has been replaced everywhere,
-**including already-built content**, by the book's own chapter/section numbering —
+**including already-built content**, by the book's own chapter/section numbering :
 the same three-part shape the book already uses internally for definitions and
 examples (`### Definition 1.2.1`, see §5):
 
@@ -206,12 +206,12 @@ Submodule N.S.K     = book Chapter N, Section S, subsection/item K
 ```
 
 Every table above (§3, §4) describing `1.1`–`1.4` and `2.1`–`2.8` as *unit* ids is
-**historical** — it documents the mapping as planned before the renumber, not the ids
+**historical**: it documents the mapping as planned before the renumber, not the ids
 on disk today. The actual result:
 
 | Old id (this file's tables) | New id | What it is |
 |---|---|---|
-| Unit 1.1 Foundations, sub-module 1.1.1 | Module 1.1 | book Ch.1 §1.1 (ids happened to already match — no rename needed) |
+| Unit 1.1 Foundations, sub-module 1.1.1 | Module 1.1 | book Ch.1 §1.1 (ids happened to already match: no rename needed) |
 | Unit 1.1, sub-modules 1.1.2 / 1.1.3 (carry-over content) | Module 1.2 / 1.3 | book Ch.1 §1.2 Variables, §1.3 Documentation |
 | Unit 1.2 Control Flow | Unit 2, modules 2.1 / 2.2 / 2.3 | book Ch.2 §2.1 Conditionals, §2.2 Algorithms/Loops, §2.3 Switch |
 | Unit 1.3 Functions and Data | Unit 3, modules 3.1 / 3.2 | book Ch.3 §3.1 Functions, §3.2 Arrays |
@@ -221,22 +221,22 @@ on disk today. The actual result:
 | Unit 2.4–2.7 | Unit 6, modules 6.4–6.7 | book Ch.6 §6.4–§6.8 (6.7 combines §6.7 Advanced Input + §6.8 Joints, per this doc's own combined-spec rule) |
 | Unit 2.8 (not built) | Unit 7, module 7.1 | book Ch.7 §7.1 Arcade Cabinet |
 
-176 moSHion lesson folders and their D1 rows (`lesson_state`, `commits` — 35 real
+176 moSHion lesson folders and their D1 rows (`lesson_state`, `commits`: 35 real
 students, 3,858 rows) were renumbered and repointed in this pass; so were the smaller
 1.1–1.4 carry-overs. **This reverses the "Q2 is grandfathered" rule that used to be
-here** — that rule stood until 2026-08-12, when it was explicitly overridden because
+here**: that rule stood until 2026-08-12, when it was explicitly overridden because
 leaving two incompatible numbering schemes permanently in the same app was judged
 worse than a one-time repoint.
 
 One built-content wrinkle worth knowing: switch statements are taught directly after
 conditionals (module 2.1) in the actual lesson sequence, not after algorithms/loops
-(module 2.2) — module *numbers* follow the book's section order (2.1, 2.2, 2.3), but
+(module 2.2): module *numbers* follow the book's section order (2.1, 2.2, 2.3), but
 the taught *order* was kept as originally built rather than reshuffled to match.
 
 **Not yet done:** the `.md` sub-module spec files' prose (`curriculum/modules/*.md`)
 was updated enough to be accurate at the frontmatter/summary level (ids, titles,
 category) so every `/module/X.Y` route resolves, but was not rewritten section-by-
-section against the book for full pedagogical accuracy — several files carry a
+section against the book for full pedagogical accuracy: several files carry a
 "flagged for a follow-up pass" note. Treat that prose as provisional.
 
 **Note the coarse table in `book_manifest.yaml` is wrong for Q1.** It reads
@@ -252,9 +252,9 @@ Moving §2.3 out of `1.2.1` just overloads `1.2.2` instead. The real finding is 
 remastered book content is roughly 40% larger than the plan's calendar assumes. Three
 ways out, and it is the curriculum author's call, not the builder's:
 
-1. Compress — teach less of the heavy sections
-2. Extend — Q1 runs longer than 10 weeks
-3. Demote — some sections become reading-only with no graded slot
+1. Compress: teach less of the heavy sections
+2. Extend: Q1 runs longer than 10 weeks
+3. Demote: some sections become reading-only with no graded slot
 
 Line count is a crude proxy for concept load; re-check against atomic-concept counts
 before acting on it.
@@ -262,7 +262,7 @@ before acting on it.
 ### Q2 (chapters 5–7 → units 2.1–2.8)
 
 Two sections may share a spec when they are one week of class (6.1+6.2, 6.7+6.8). A
-section never splits across two specs — if it feels like it should, the book section
+section never splits across two specs, if it feels like it should, the book section
 is too big and that is a book-side conversation.
 
 For a chapter with no existing unit, derive the split from **contact hours, not section
@@ -271,7 +271,7 @@ row of the table above in the same commit.
 
 ---
 
-## 5. Step 3 — what the book supplies to the spec
+## 5. Step 3: what the book supplies to the spec
 
 The sub-module spec (`sub-module-spec-conventions.md`, 18 required sections) is the
 build target. Roughly half of it is now a *transcription* job from the book rather than
@@ -280,21 +280,21 @@ an authoring job:
 | Book element | Goes into the spec as | Then becomes |
 |---|---|---|
 | `## Learning Objectives` | §Learning Objectives (verbatim starting point) | slide deck outline |
-| `## N.M.K` sub-headings | §Topics Covered — **one bullet per atomic concept** | one lesson slot each |
-| Definitions — **two shapes, see below** | §Vocabulary table rows | reading glossary rows |
+| `## N.M.K` sub-headings | §Topics Covered: **one bullet per atomic concept** | one lesson slot each |
+| Definitions: **two shapes, see below** | §Vocabulary table rows | reading glossary rows |
 | `> **Insight Note:**` | §Teacher Notes, or a §Context `**Do NOT:**` bullet | reading prose |
 | `### Try It Now N.K` | §Readings → Reading content guidance → **Try it:** | a `js live` block in a reading lesson |
 | Worked examples in prose | §Worked Examples (teacher-led), full code | `preview: "example"` lesson |
-| `## Problem Set` | **read for intent, do not transcribe** | nothing — shCode writes its own labs |
+| `## Problem Set` | **read for intent, do not transcribe** | nothing: shCode writes its own labs |
 | `## Key Terms` | cross-check against §Vocabulary | glossary completeness |
 
-### Definitions have two different shapes — grep for both
+### Definitions have two different shapes: grep for both
 
 The book does not use one callout convention across chapters:
 
 ```
 ch1-3 (Q1)    ### Definition 1.2.1: Special Numeric Values      ← H3 heading
-ch5-7 (Q2)    > **Definition 6.1: Group** — A collection...     ← blockquote bold
+ch5-7 (Q2)    > **Definition 6.1: Group**: A collection...     ← blockquote bold
 ```
 
 A coverage check that greps only the Q2 shape returns **zero definitions** on every Q1
@@ -328,27 +328,27 @@ per slot:
 
 | Type | Graded | Starter `script.js` |
 |---|---|---|
-| `slides` | no | none — `U.M.1` is always the unit deck |
-| `video` | no | none — URL left empty, teacher curates |
+| `slides` | no | none: `U.M.1` is always the unit deck |
+| `video` | no | none: URL left empty, teacher curates |
 | `reading` | no | none |
 | `example` | no | fully working sketch (read-along) |
 | `moshion (lesson)` | yes | scaffold + `// STEP N:` description comments |
 | `moshion (assignment)` | yes | same scaffold shape, no solution code |
-| `moshion (challenge)` | yes | **empty file** — student structures it |
-| `assignment` + `aiGrader` | yes (AI) | none — written response |
+| `moshion (challenge)` | yes | **empty file**: student structures it |
+| `assignment` + `aiGrader` | yes (AI) | none: written response |
 
 ---
 
-## 6. Step 4 — build
+## 6. Step 4: build
 
 Unchanged, and already documented. Say **"build 2.3.1"**; the builder reads the spec,
 cross-checks the unit index at `curriculum/modules/<U.M>_*.md`, and emits
-`lessons/<U-M-L>-<descriptor>/`. The spec is self-contained by design — the builder
+`lessons/<U-M-L>-<descriptor>/`. The spec is self-contained by design: the builder
 should not need the book or `curriculum-plan.md` open.
 
 Hard rules it must not break (each has bitten before):
 
-- Every lesson `title` starts with `<U>.<M>.<L>` — a title without it is **silently
+- Every lesson `title` starts with `<U>.<M>.<L>`: a title without it is **silently
   dropped** from `/module/U.M` and the home page.
 - No invented video URLs.
 - No commented-out solution code in a scaffold.
@@ -357,7 +357,7 @@ Hard rules it must not break (each has bitten before):
 
 ---
 
-## 7. Resync — when the book changes under a built unit
+## 7. Resync: when the book changes under a built unit
 
 This is the common case now, not the exception. Unit 2 is built (175 lessons) against
 chapters 5–7 **as they were before the Q1/ch6 remaster**. Chapter 6 was restructured
@@ -390,13 +390,13 @@ rewriting a working lab unless the concept it grades actually moved.
 ## 8. Known gaps
 
 - **Book §1.1 has no JavaScript basics, but the course needs them on day one.**
-  §1.1 is purely the software lifecycle — zero occurrences of boolean, integer,
+  §1.1 is purely the software lifecycle: zero occurrences of boolean, integer,
   string or sequential execution, and `console.log` only inside two worked
   examples. shCode's `1-1-2-reading-console-log` and `1-1-4-sdlc-overview`
   therefore invent that teaching so week one has something runnable, which
   `curriculum-plan.md` §1.1 explicitly asks for ("Teacher demo: type
   `console.log("hello")`… Students open DevTools, run 3 provided statements").
-  The consequence is that the §1.1 **deck cannot cover what the labs demand** —
+  The consequence is that the §1.1 **deck cannot cover what the labs demand** :
   a teacher presenting from slides alone reaches a console lab having
   introduced no JavaScript at all. **Book-side request:** a short JS-basics
   opener in §1.1 (print a value, a string, a number, sequential execution)
@@ -405,12 +405,12 @@ rewriting a working lab unless the concept it grades actually moved.
   Raised 2026-08-16 from a module 1.1 review.
 
 - **Book §2.1 never defines the comparison operators it relies on.** `===`, `==`,
-  `<`, `>`, `<=`, `>=` are used pervasively from 2.1.1 onward — every worked
-  example depends on them — but the section gives them no definition, no table
+  `<`, `>`, `<=`, `>=` are used pervasively from 2.1.1 onward: every worked
+  example depends on them, but the section gives them no definition, no table
   and no subsection of their own. A student reading the book cold has to infer
   six operators from usage. shCode's `2.1.15`/`2.1.16`/`2.1.17`
   (reading / worked example / lab) are therefore load-bearing scaffolding with
-  no book anchor, tagged `sourceRef: designed` rather than `book 2.1 —`.
+  no book anchor, tagged `sourceRef: designed` rather than `book 2.1 :`.
   **A resync must not delete them for being absent from the book.**
   Same shape as the §1.1 JavaScript-basics gap above. **Book-side request:** a
   short operator table in §2.1, before Example 2.1. Raised 2026-08-16 from a
@@ -420,7 +420,7 @@ rewriting a working lab unless the concept it grades actually moved.
   module goal asks for it explicitly; the book section does not contain it
   anywhere. shCode teaches it at `2.2.11`/`2.2.12`, so those lessons are
   likewise load-bearing and must survive a resync. Note the book *does* reach
-  `do…while` later — §2.4 covers it as part of loop entry (Definition 2.4.1) —
+  `do…while` later: §2.4 covers it as part of loop entry (Definition 2.4.1) :
   so the gap is one of **placement**, not absence: the plan wants it a section
   earlier than the book delivers it. Decide whether the plan moves to match the
   book or §2.2 keeps its own treatment. Raised 2026-08-16 from a module 2.2 build.
@@ -431,7 +431,7 @@ rewriting a working lab unless the concept it grades actually moved.
   `2-4-14-example-filtering-while-loop` teaches the same continue-vs-keep idea
   over a numeric range instead. The book's §2.2 linear-search example (Example
   2.5) has the same problem and additionally uses `break`, which is itself §2.4
-  — `2.2.14a` adapts it to a `found`-flag search over a range. Both adaptations
+ : `2.2.14a` adapts it to a `found`-flag search over a range. Both adaptations
   are deliberate and should not be "corrected" back toward the book's text.
   **Book-side request:** either move these examples after §3.3, or rewrite them
   on ranges. Raised 2026-08-16 from the chapter 2 build.
@@ -443,7 +443,7 @@ rewriting a working lab unless the concept it grades actually moved.
 - **Only Q2 is mapped at section level.** Chapters 1–4 and 8–13 have the coarse
   chapter→unit row and nothing finer. The old `curriculum/modules/lessons/1.1.1`–`1.1.5`
   specs (pre-book, written against the old FCC/CodeHS activity lists) were removed
-  2026-08-12 rather than resynced — they predated the book-native scheme entirely and
+  2026-08-12 rather than resynced: they predated the book-native scheme entirely and
   described a retired "5 sub-modules under one Unit 1.1" structure that no longer
   exists (see the renumber table above). Modules 1.2–1.5 need fresh section-level specs
   authored against the book directly, not a resync of the deleted files.
@@ -452,11 +452,11 @@ rewriting a working lab unless the concept it grades actually moved.
   disk, fix the frontmatter during resync.
 - **Slides moved off Slidev entirely (2026-08-12).** The old moshion-era Slidev decks
   (`slides/2.1`–`2.5`, `public/slides/2.1`–`2.5`) collided with the new Unit 2 (Control
-  Flow) module ids after the renumber and were removed rather than resynced — every
+  Flow) module ids after the renumber and were removed rather than resynced: every
   `*-1-slides` lesson now carries a placeholder `slidesUrl` (its own module id, e.g.
   `/slides/5.1/`) pointing at nothing yet. `package.json`'s `slides:build-all` /
   `slides:U.M:*` scripts, the `@slidev/*` devDependencies, and
-  `scripts/strip-slide-externals.mjs` were all removed the same day — **slide decks are
+  `scripts/strip-slide-externals.mjs` were all removed the same day: **slide decks are
   now HTML sourced from bookSHelf's Introduction to Programming section slides, not
   Slidev-authored Markdown.** No build pipeline exists yet for the new source; authoring
   that pipeline (how a bookSHelf section's slides become a `public/slides/<U.M>/`
@@ -464,7 +464,7 @@ rewriting a working lab unless the concept it grades actually moved.
 - **Resolved 2026-08-16: there is no pipeline, by design.** `slidesUrl` holds the
   absolute bookSHelf deck URL and `ContentLessonView` iframes it directly, so a push to
   bookSHelf updates the deck with no shCode rebuild. Nothing is copied into
-  `public/slides/` — that directory is gone, along with the leftover `2.1`–`2.5` build
+  `public/slides/`: that directory is gone, along with the leftover `2.1`–`2.5` build
   output (archived to `.archive/`, gitignored) and the retired
   `curriculum/resources/slide-deck-conventions.md`. This works because bookSHelf serves
   decks with `Access-Control-Allow-Origin: *` (the HEAD readiness probe needs it), no
@@ -473,7 +473,7 @@ rewriting a working lab unless the concept it grades actually moved.
 - **Deck URLs end in a theme suffix.** `.paper` is the house theme and everything
   published so far uses it. Other themes exist (`bookshelf`, `grid`, `ledger`,
   `letter`, `notebook`, `course-module`) and §1.1 also has an older `.bookshelf`
-  build still live alongside its `.paper` one — prefer `.paper`. Guess wrong and
+  build still live alongside its `.paper` one: prefer `.paper`. Guess wrong and
   you do not get a 404, see below.
 - **A wrong deck URL returns HTTP 200, not 404.** `oerbookshelf.app` serves its site
   landing page ("Hand-curated math textbooks…") for any unrecognised deck path, so a
@@ -481,11 +481,11 @@ rewriting a working lab unless the concept it grades actually moved.
   shipped pointing at `1.1_software_lifecycle.paper`, which does not exist, and
   module 1.1 students were iframing the marketing landing page. Found and fixed
   2026-08-16. **To verify a deck URL, GET it and compare byte length against a
-  deliberately bogus path** — same length means the deck is not there. A real deck is
+  deliberately bogus path**: same length means the deck is not there. A real deck is
   150–250 KB and its `<title>` names the section.
 - **Deck inventory, checked 2026-08-16.** Six decks are published, and all six are
   linked. The other thirteen `*-1-slides` lessons correctly carry no `slidesUrl`
-  and render the "not published yet" placeholder — **do not invent URLs for them.**
+  and render the "not published yet" placeholder: **do not invent URLs for them.**
 
   | Published + linked | No deck in any theme |
   |---|---|
@@ -505,7 +505,7 @@ rewriting a working lab unless the concept it grades actually moved.
 
 ## 9. What this doc is not
 
-- Not a spec format reference — that is `curriculum/resources/sub-module-spec-conventions.md`.
-- Not a lesson-authoring guide — that is the per-type docs in `curriculum/resources/`.
-- Not the curriculum plan — that is `curriculum-plan.md`, which remains the SLO and
+- Not a spec format reference: that is `curriculum/resources/sub-module-spec-conventions.md`.
+- Not a lesson-authoring guide: that is the per-type docs in `curriculum/resources/`.
+- Not the curriculum plan: that is `curriculum-plan.md`, which remains the SLO and
   calendar authority. Where it and the book disagree on *concepts*, the book wins.

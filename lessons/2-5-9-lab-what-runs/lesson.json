@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed — practice for 2.5.2 Concepts in Practice 'What runs'",
+  "sourceRef": "designed: practice for 2.5.2 Concepts in Practice 'What runs'",
   "steps": [
     {
       "id": "s1",
@@ -26,7 +26,7 @@
     {
       "id": "s3",
       "title": "Run and compare",
-      "instructions": "Run the code. Check your prediction against what actually printed — was B really skipped?"
+      "instructions": "Run the code. Check your prediction against what actually printed: was B really skipped?"
     }
   ],
   "requirements": [

@@ -1,4 +1,4 @@
-// 2.5.25 Challenges — Extended save features
+// 2.5.25 Challenges: Extended save features
 
 function setup() {
   // STEP 1: Start from your A16.1 save system (copy the core setup)

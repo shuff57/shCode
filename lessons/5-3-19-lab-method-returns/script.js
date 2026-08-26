@@ -1,4 +1,4 @@
-// 2.2.7d Lab — Method that returns a value.
+// 2.2.7d Lab: Method that returns a value.
 
 class Counter {
   constructor() {
@@ -14,7 +14,7 @@ class Counter {
   }
 
   // STEP 1: Write isHigh() that returns true if this.n is greater than 10.
-  //   Use the return keyword — the driver reads the return value to change the color.
+  //   Use the return keyword: the driver reads the return value to change the color.
   //   Return false (or the comparison result directly) when this.n is 10 or below.
 }
 
@@ -27,7 +27,7 @@ function setup() {
 
 function draw() {
   background('#222');
-  fill(c.isHigh() ? 'red' : 'white');
+  fill(c.isHigh() ? 'red': 'white');
   textSize(32);
   textAlign(CENTER);
   text(c.n, 120, 90);

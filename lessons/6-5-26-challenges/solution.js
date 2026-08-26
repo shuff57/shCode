@@ -1,4 +1,4 @@
-// 6.5.27 Challenges — Extended Save Features (reference solution).
+// 6.5.27 Challenges: Extended Save Features (reference solution).
 //
 // The challenge this one takes: save a WHOLE PROFILE, not a single number.
 // storeItem already serialises for you, so the explicit JSON.stringify /

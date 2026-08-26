@@ -4,7 +4,7 @@
   "description": "Build a two-wheeled car using WheelJoints and drive it up a ramp with WASD. The harder of the two A14 options.",
   "type": "assignment",
   "estimateMins": 45,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.3 Physics Applications",
   "preview": "moshion",
   "week": 14,
@@ -35,7 +35,7 @@
       "title": "Join the wheels with WheelJoint",
       "instructions": "new WheelJoint(chassis, leftWheel) and again for the right wheel.",
       "hints": [
-        "The Joints docs chapter covers WheelJoint — including suspension travel options."
+        "The Joints docs chapter covers WheelJoint, including suspension travel options."
       ]
     },
     {
@@ -43,7 +43,7 @@
       "title": "Drive with WASD",
       "instructions": "In draw(), use kb.pressing('a') / kb.pressing('d') to set chassis.vel.x (positive = right, negative = left, 0 = stop).",
       "hints": [
-        "Open the Input docs chapter for kb.pressing. Don't use arrow keys — they scroll the editor.",
+        "Open the Input docs chapter for kb.pressing. Don't use arrow keys: they scroll the editor.",
         "vel.x sets horizontal velocity directly each frame; the wheels will roll from friction as the chassis moves."
       ]
     }
@@ -72,7 +72,7 @@
     {
       "id": "r3",
       "title": "Tilted ramp via rotation",
-      "description": "Assign to .rotation — tilting the ramp",
+      "description": "Assign to .rotation: tilting the ramp",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.rotation\\s*=",

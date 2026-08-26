@@ -4,7 +4,7 @@
   "description": "Combine animated sprites, a camera that follows the player, three or more platforms, working jump mechanics, and a visible end goal into a playable side-scroller. Auto-graded.",
   "type": "assignment",
   "estimateMins": 90,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
   "preview": "moshion",
   "week": 15,
@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Create the player with an initial visual",
-      "instructions": "In setup(), create the player sprite. Give it an initial visual — either addAni('idle', ...) or sprite.image = '🧍'.",
+      "instructions": "In setup(), create the player sprite. Give it an initial visual: either addAni('idle', ...) or sprite.image = '🧍'.",
       "hints": [
         "Open the moSHion docs drawer and find the Visual / image section. Single emoji strings work as zero-asset placeholders."
       ]
@@ -47,7 +47,7 @@
     {
       "id": "s5",
       "title": "WASD movement + state-driven visual swap",
-      "instructions": "In draw(), read WASD with kb.pressing. Set the player's horizontal motion AND swap its visual based on motion — sprite.image to a 'run' emoji when moving, back to 'idle' when not. The grader looks for at least two animation states inside draw().",
+      "instructions": "In draw(), read WASD with kb.pressing. Set the player's horizontal motion AND swap its visual based on motion: sprite.image to a 'run' emoji when moving, back to 'idle' when not. The grader looks for at least two animation states inside draw().",
       "hints": [
         "Open the moSHion docs drawer's Input / Keyboard section for kb.pressing."
       ]
@@ -102,7 +102,7 @@
     {
       "id": "r3",
       "title": "Three or more static platforms",
-      "description": "Create at least three static sprites — either three direct calls to new Sprite(..., 'static') OR a for-loop body that creates a 'static' sprite inside it.",
+      "description": "Create at least three static sprites: either three direct calls to new Sprite(..., 'static') OR a for-loop body that creates a 'static' sprite inside it.",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:['\"]static['\"][\\s\\S]*?){3}|for\\s*\\([\\s\\S]*?\\{[\\s\\S]*?['\"]static['\"][\\s\\S]*?\\}",

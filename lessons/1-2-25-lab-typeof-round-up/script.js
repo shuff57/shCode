@@ -1,6 +1,6 @@
 // 1.2.25 typeof Round-Up
 
-// Six values. Log the type of each one directly — put the value
+// Six values. Log the type of each one directly: put the value
 // itself inside typeof, not a variable holding it.
 // One of the six answers is a lie. Find it.
 

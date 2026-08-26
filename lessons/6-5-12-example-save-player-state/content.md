@@ -1,4 +1,4 @@
-# 2.5.11 Worked Example — Save Full Player State
+# 2.5.11 Worked Example: Save Full Player State
 
 Teacher-led walkthrough for saving a complete game state with `storeItem` + `JSON.stringify`.
 
@@ -6,7 +6,7 @@ Teacher-led walkthrough for saving a complete game state with `storeItem` + `JSO
 
 ---
 
-## Step 1 — Player + score + level
+## Step 1: Player + score + level
 
 Start with a player sprite and keyboard movement. Track score and level.
 
@@ -43,7 +43,7 @@ Run it. Move the player around with the arrow keys.
 
 ---
 
-## Step 2 — Build the save object
+## Step 2: Build the save object
 
 Add keyboard input for adjusting score and level (so we have something to save), then build a saveState object.
 
@@ -89,7 +89,7 @@ Try it: press Space to build points, L to level up. These are values we can save
 
 ---
 
-## Step 3 — Save on 'S' key
+## Step 3: Save on 'S' key
 
 Now add the actual save: build an object, stringify it, store it.
 
@@ -141,11 +141,11 @@ function draw() {
 }
 ```
 
-Move the player somewhere, press Space a few times, then press S. Check the console — "Game saved!" appears.
+Move the player somewhere, press Space a few times, then press S. Check the console: "Game saved!" appears.
 
 ---
 
-## Step 4 — Display confirmation text
+## Step 4: Display confirmation text
 
 Show "Game saved!" on screen briefly after saving, using `frameCount` for a timed message.
 
@@ -213,5 +213,5 @@ Press S. The green "Game saved!" appears for about 2 seconds (120 frames at 60 f
 
 - The save object is a plain JS object with keys for everything worth remembering.
 - `storeItem` wants a string. `JSON.stringify` turns the object into one.
-- Save on a deliberate trigger (key press), not every frame — that would hammer storage.
+- Save on a deliberate trigger (key press), not every frame: that would hammer storage.
 - A timed confirmation message gives the player feedback without cluttering the screen.

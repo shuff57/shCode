@@ -1,4 +1,4 @@
-## Chart the Code — A Method That Calls a Method
+## Chart the Code: A Method That Calls a Method
 
 **What you'll practise:**
 - Charting one method rather than a whole program
@@ -34,7 +34,7 @@ class Enemy {
 
 ### What to draw
 
-Chart `takeDamage` only. The two ovals are already placed and named — notice they are not "Start" and "End" but **`takeDamage(n) starts`** and **`back to the caller`**, because that is what the boundaries of a method actually are.
+Chart `takeDamage` only. The two ovals are already placed and named: notice they are not "Start" and "End" but **`takeDamage(n) starts`** and **`back to the caller`**, because that is what the boundaries of a method actually are.
 
 | Shape | Use it for |
 |---|---|
@@ -52,11 +52,11 @@ That is the entire reason methods are worth having, and this chart is where it b
 
 ### The line that catches people
 
-`this.flashRed()` is **after** the `if`, not inside it. So it runs whether the enemy died or not — which means on your chart, **both arrows out of the diamond reach it**.
+`this.flashRed()` is **after** the `if`, not inside it. So it runs whether the enemy died or not: which means on your chart, **both arrows out of the diamond reach it**.
 
 Now read what that says about the program: an enemy that just died still flashes red. Is that right? Arguably yes, it is a hit and it should look like one. But `die()` has already removed the sprite, so `flashRed()` is setting a colour on something that is no longer on screen.
 
-That is not a crash and not a bug the checker can see. It is a **question about design**, and the chart is what makes it askable — you can see the two boxes on the same path.
+That is not a crash and not a bug the checker can see. It is a **question about design**, and the chart is what makes it askable: you can see the two boxes on the same path.
 
 ### Before you submit
 
@@ -67,4 +67,4 @@ Press **Check my diagram**, then trace two calls by hand:
 
 Both should reach **back to the caller**. Exactly one of them should pass through `this.die()`. Both should pass through `this.flashRed()`.
 
-If your second trace stops at `die()` and never comes back, you have drawn a method call as an exit. It is not — it is a step, and steps return.
+If your second trace stops at `die()` and never comes back, you have drawn a method call as an exit. It is not: it is a step, and steps return.

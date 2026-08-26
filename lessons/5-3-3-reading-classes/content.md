@@ -1,6 +1,6 @@
 ## A class is a blueprint. `new` builds one instance from it.
 
-**Read before `2.2.3a Reading — The new operator`.** About 4 minutes.
+**Read before `2.2.3a Reading: The new operator`.** About 4 minutes.
 
 By the end of this reading you should be able to complete the sentences:
 
@@ -9,7 +9,7 @@ By the end of this reading you should be able to complete the sentences:
 
 ---
 
-`Point` is the **blueprint** — a description of what data a Point holds. It is not a Point itself. `new Point(3, 4)` is the **build instruction**: it produces one object — one *instance* — stamped out from the blueprint.
+`Point` is the **blueprint**: a description of what data a Point holds. It is not a Point itself. `new Point(3, 4)` is the **build instruction**: it produces one object: one *instance*: stamped out from the blueprint.
 
 **Each instance has its own copies.** `let a = new Point(3, 4)` and `let b = new Point(0, 0)` are two separate objects. Changing `a.x` does not touch `b.x`.
 
@@ -38,7 +38,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** `a.x = 3` and `b.x = 0` — two instances, two independent values.
+**What you'll see:** `a.x = 3` and `b.x = 0`: two instances, two independent values.
 
 **Try this:** change `new Point(0, 0)` to `new Point(99, 0)` and re-run. Only `b.x` changes; `a.x` stays 3. That's what "independent copies" means.
 

@@ -5,7 +5,7 @@
 - Why a decision diamond always has exactly two labelled exits
 - How to read a flowchart from Start to End without guessing
 
-You met these shapes back in 1.5, and you drew your first chart there. This is the recap before you start using them every week — and the toolbar tour, because in a flowchart **the shape is the meaning**. A reader who knows the shapes can follow your plan without you standing next to them explaining it.
+You met these shapes back in 1.5, and you drew your first chart there. This is the recap before you start using them every week, and the toolbar tour, because in a flowchart **the shape is the meaning**. A reader who knows the shapes can follow your plan without you standing next to them explaining it.
 
 If 1.5 is still fresh, skim the table and go straight to **the two rules that matter**.
 
@@ -26,20 +26,20 @@ These four cover almost everything you will draw this year. The toolbar hides fo
 |---|---|---|
 | **Loop setup** (hexagon) | **later in this module**, once you have met `for` and `while` | The counter, its start, and its limit, all in one shape |
 | **Function call** (double rail) | 3.1, when you write your first function | One shape standing for a whole sequence defined elsewhere |
-| **Connector** (circle) | 4.1, on the first chart too big for one page | A jump — two circles with the same letter are the same point |
+| **Connector** (circle) | 4.1, on the first chart too big for one page | A jump: two circles with the same letter are the same point |
 | **Note** (bracket) | 4.1 | A remark for the reader, sitting beside the chart rather than in it |
 
 Reach for one only once it has arrived. A hexagon used as decoration is worse than no hexagon, because a reader who knows the shapes will trust it and go looking for a loop that isn't there.
 
 ### The two rules that matter
 
-**One Start, one End.** A flowchart has exactly one shape with no arrow coming into it — that is where a reader begins. Every path eventually arrives at an End oval. If you can start in two places, nobody knows which is the real beginning.
+**One Start, one End.** A flowchart has exactly one shape with no arrow coming into it: that is where a reader begins. Every path eventually arrives at an End oval. If you can start in two places, nobody knows which is the real beginning.
 
-**Every diamond has two labelled exits.** A question has two answers, so exactly two arrows leave a diamond, and each one says which answer it follows: `yes` and `no`. An unlabelled branch is the single most common way a flowchart becomes unreadable — the shapes are all correct, but a reader cannot tell which way "true" goes.
+**Every diamond has two labelled exits.** A question has two answers, so exactly two arrows leave a diamond, and each one says which answer it follows: `yes` and `no`. An unlabelled branch is the single most common way a flowchart becomes unreadable: the shapes are all correct, but a reader cannot tell which way "true" goes.
 
 Here is the same voting example the book uses in §1.5, drawn with both rules applied:
 
-```flow readonly caption="Figure 2.2.2 — the voting check. One Start, one End, and both exits of the diamond say which answer they follow."
+```flow readonly caption="Figure 2.2.2: the voting check. One Start, one End, and both exits of the diamond say which answer they follow."
 flowchart TD
   A([Start]) --> B[/get the age/]
   B --> C{age >= 18}
@@ -49,11 +49,11 @@ flowchart TD
   E --> F
 ```
 
-Read it out loud, following the arrows: *start, get the age, is the age 18 or more? If yes, print "You may vote". If no, print "Too young". Either way, end.* That sentence is the algorithm — the picture just makes the branch visible at a glance.
+Read it out loud, following the arrows: *start, get the age, is the age 18 or more? If yes, print "You may vote". If no, print "Too young". Either way, end.* That sentence is the algorithm: the picture just makes the branch visible at a glance.
 
 ### Try it
 
-The canvas below is yours to play with. Nothing here is graded and nothing is saved to your teacher — drag the shapes around, add a few from the toolbar, draw an arrow between two of them, and double-click anything to type on it.
+The canvas below is yours to play with. Nothing here is graded and nothing is saved to your teacher: drag the shapes around, add a few from the toolbar, draw an arrow between two of them, and double-click anything to type on it.
 
 ```flow height=440
 flowchart TD
@@ -64,7 +64,7 @@ flowchart TD
 ```
 
 **Things worth trying:**
-- Drag a new **Task** from the toolbar and drop it *on an arrow* — it inserts itself into the path.
+- Drag a new **Task** from the toolbar and drop it *on an arrow*: it inserts itself into the path.
 - Click an arrow, then drag the pink dot on its end onto a different shape to re-point it.
 - Delete the `no` label and notice how much harder the chart is to read without it.
 

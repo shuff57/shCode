@@ -4,9 +4,9 @@
 
 - `console.log()` sends a value to the console output panel.
 - You can print text (called a **string**), a number, or the result of a calculation.
-- Putting text inside quotes — `"like this"` — tells JavaScript to treat it as text, not a command.
+- Putting text inside quotes: `"like this"`: tells JavaScript to treat it as text, not a command.
 - Printing a number (no quotes) lets JavaScript do math and print the result.
-- Printing a comparison like `5 > 3` prints `true` or `false` — these are called **booleans**.
+- Printing a comparison like `5 > 3` prints `true` or `false`: these are called **booleans**.
 
 **Try it:** Run the block below. Then change the text on line 1 to your own name and click Run again.
 
@@ -24,7 +24,7 @@ console.log(10 > 5);
 
 - JavaScript runs each line in order, starting from the top.
 - Line 1 finishes before line 2 starts; line 2 finishes before line 3 starts.
-- The order of your lines matters — swapping two lines can change the output.
+- The order of your lines matters: swapping two lines can change the output.
 - This is called **sequential execution** and is true of almost every program you will ever write.
 
 **Try it:** Read the three lines below and predict what order they will print. Then run the block and check.

@@ -1,6 +1,6 @@
 {
   "id": "1-2-6-reading-number",
-  "title": "1.2.6 Reading — The number Type",
+  "title": "1.2.6 Reading: The number Type",
   "description": "Whole numbers and decimals are the same type in JavaScript. One type, not two.",
   "type": "lesson",
   "estimateMins": 10,

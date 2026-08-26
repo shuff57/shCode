@@ -6,7 +6,7 @@ Joints are not permanent. You can delete a constraint at any point during the ga
 joint.delete();
 ```
 
-After that one call, the constraint is gone. On the very next frame, both sprites move independently — the physics engine no longer links them. They keep whatever velocity they had at the moment of removal.
+After that one call, the constraint is gone. On the very next frame, both sprites move independently: the physics engine no longer links them. They keep whatever velocity they had at the moment of removal.
 
 To use `joint.delete()`, you need a variable that holds the joint when you create it:
 
@@ -20,7 +20,7 @@ Then later, when you want to release it:
 joint.delete();
 ```
 
-**Try it:** a pendulum starts swinging. Press Space and the joint is deleted — the ball falls freely from wherever it was.
+**Try it:** a pendulum starts swinging. Press Space and the joint is deleted: the ball falls freely from wherever it was.
 
 ```js live
 let anchor;

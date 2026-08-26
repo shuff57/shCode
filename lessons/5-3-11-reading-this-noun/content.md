@@ -1,20 +1,20 @@
 ## `this` is a noun
 
-**Read before `2.2.5a Worked Example — this is a pronoun`.** About 4 minutes.
+**Read before `2.2.5a Worked Example: this is a pronoun`.** About 4 minutes.
 
 By the end of this reading you should be able to answer:
 
 - What does `this` refer to inside a method?
 - If you call `g1.greet()`, what is `this` during that call?
 
-`this` is a keyword that always names one concrete thing: the specific instance the method was called on. It is not a concept or a shorthand for the class — it is the actual object.
+`this` is a keyword that always names one concrete thing: the specific instance the method was called on. It is not a concept or a shorthand for the class: it is the actual object.
 
 **What you'll learn from it:**
 
 - Inside any method, `this` is set automatically to the instance on the left of the dot at the call site.
 - The same method definition can run on many different instances; `this` changes each time.
 - `this.name` reads or writes a property on whichever instance is currently running the method.
-- Two greeters, two different `this` values — same code, different data.
+- Two greeters, two different `this` values: same code, different data.
 
 **Try it:**
 
@@ -57,5 +57,5 @@ function draw() {
 | Term | Meaning |
 |------|---------|
 | **`this`** | Inside a method, the specific instance the method was called on. Set automatically at the call site. |
-| **Call site** | The line of code where a method is invoked — `g1.greet()` is the call site. |
+| **Call site** | The line of code where a method is invoked: `g1.greet()` is the call site. |
 | **Method** | A function defined inside a class body. Gets `this` bound automatically when called. |

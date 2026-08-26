@@ -11,7 +11,7 @@
   "slos": [
     "SLO-4"
   ],
-  "sourceRef": "designed — A2.2.0 flowchart gate per curriculum-plan.md §2.2 (0-pt structural gate; A2.2.1 stays locked until this is green); plan text describes charting the loop/hexagon counting problem for A2.2.1, but this lesson charts a decision instead — mismatch flagged in build report, kept as shipped 2026-08-15 pilot content",
+  "sourceRef": "designed: A2.2.0 flowchart gate per curriculum-plan.md §2.2 (0-pt structural gate; A2.2.1 stays locked until this is green); plan text describes charting the loop/hexagon counting problem for A2.2.1, but this lesson charts a decision instead: mismatch flagged in build report, kept as shipped 2026-08-15 pilot content",
   "points": 0,
   "contentFile": "content.md",
   "diagram": {
@@ -47,7 +47,7 @@
       }
     ],
     "aiGrader": {
-      "rubricTitle": "Ticket-price flowchart — AI-graded rubric",
+      "rubricTitle": "Ticket-price flowchart: AI-graded rubric",
       "model": "deepseek-v4-flash:0731-cloud",
       "contextDocs": [],
       "prompt": "Draw a flowchart for this algorithm:\n\n1. Start.\n2. Get the customer's age.\n3. If the age is under 13, the ticket costs $8. Otherwise the ticket costs $14.\n4. Print the ticket price.\n5. End.\n\nUse an oval for Start and for End, a rectangle for each task, and a diamond for the decision. Label both arrows leaving the diamond so a reader knows which answer goes which way.",
@@ -55,13 +55,13 @@
         {
           "id": "gets-age",
           "title": "Gets the age before deciding",
-          "description": "A task or input shape that obtains the customer's age appears on the path between Start and the decision diamond. Credit any reasonable wording — 'get age', 'ask for age', 'input age'. Deny if the diagram jumps straight from Start to the decision with no step that obtains the age.",
+          "description": "A task or input shape that obtains the customer's age appears on the path between Start and the decision diamond. Credit any reasonable wording: 'get age', 'ask for age', 'input age'. Deny if the diagram jumps straight from Start to the decision with no step that obtains the age.",
           "points": 0
         },
         {
           "id": "correct-condition",
           "title": "Diamond asks the right question",
-          "description": "The decision diamond tests the customer's age against 13 — for example 'age < 13', 'under 13?', 'age less than 13'. Accept an equivalent inverted test such as 'age >= 13' as long as the branches below it are consistent with the direction of the test. Deny if the condition tests a different number or a different quantity.",
+          "description": "The decision diamond tests the customer's age against 13, for example 'age < 13', 'under 13?', 'age less than 13'. Accept an equivalent inverted test such as 'age >= 13' as long as the branches below it are consistent with the direction of the test. Deny if the condition tests a different number or a different quantity.",
           "points": 0
         },
         {
@@ -73,7 +73,7 @@
         {
           "id": "rejoins-and-prints",
           "title": "Both branches lead onward to the End",
-          "description": "Neither branch is a dead end — following either answer out of the diamond eventually reaches the End oval, whether the two paths rejoin at a shared 'print the price' step or each prints separately before ending. Deny only if a branch stops with nothing after it.",
+          "description": "Neither branch is a dead end: following either answer out of the diamond eventually reaches the End oval, whether the two paths rejoin at a shared 'print the price' step or each prints separately before ending. Deny only if a branch stops with nothing after it.",
           "points": 0
         },
         {

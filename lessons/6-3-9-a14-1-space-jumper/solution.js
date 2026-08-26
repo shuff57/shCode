@@ -20,13 +20,13 @@ function setup() {
 }
 
 function draw() {
-  background(won ? '#040' : '#222');
+  background(won ? '#040': '#222');
 
   if      (kb.pressing('a')) player.vel.x = -4;
   else if (kb.pressing('d')) player.vel.x =  4;
   else                       player.vel.x =  0;
 
-  // Ground-gated jump — kb.presses(' ') is edge-triggered (one tap = one jump),
+  // Ground-gated jump: kb.presses(' ') is edge-triggered (one tap = one jump),
   // .colliding(ground) is truthy only while the player touches the ground.
   if (kb.presses(' ') && player.colliding(ground)) {
     player.vel.y = -7;

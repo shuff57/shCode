@@ -1,6 +1,6 @@
 {
   "id": "2-3-24-example-command-dispatch",
-  "title": "2.3.24 Worked Example — When switch Fits: Command Dispatch",
+  "title": "2.3.24 Worked Example: When switch Fits: Command Dispatch",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.3.6 — the command-dispatch switch example",
+  "sourceRef": "book 2.3.6: the command-dispatch switch example",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

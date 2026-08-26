@@ -23,7 +23,7 @@ function setup() {
 }
 
 function draw() {
-  background(hit ? '#400' : '#000');
+  background(hit ? '#400': '#000');
 
   if (!hit) {
     if      (kb.pressing('a')) ship.vel.x = -3;
@@ -39,7 +39,7 @@ function draw() {
     ship.vel.y = 0;
   }
 
-  // Safe despawn — wrap or remove asteroids that drift offscreen.
+  // Safe despawn: wrap or remove asteroids that drift offscreen.
   for (let a of [...asteroids]) {
     if (a.x < -30 || a.x > 430 || a.y < -30 || a.y > 430) a.delete();
   }

@@ -28,12 +28,12 @@
         "question": "SQL is a language built for asking questions of a database. Why could you not use it to build a web page?",
         "options": [
           "SQL is too old to run in a modern browser",
-          "SQL was designed for one job — asking a database questions — and has no way to build an interface",
+          "SQL was designed for one job: asking a database questions, and has no way to build an interface",
           "SQL runs too slowly to keep up with a web page",
           "SQL can only be used by professional programmers"
         ],
         "answer": 1,
-        "explanation": "Languages are purpose driven. SQL does its one job well and simply has no way to build the parts of a page you click on — it is not a matter of age or speed."
+        "explanation": "Languages are purpose driven. SQL does its one job well and simply has no way to build the parts of a page you click on: it is not a matter of age or speed."
       },
       {
         "id": "q2-low-level",
@@ -46,7 +46,7 @@
           "One that can only run on older computers"
         ],
         "answer": 2,
-        "explanation": "Low-level means close to the hardware — you handle details like where each value sits in memory. The first option describes a high-level language."
+        "explanation": "Low-level means close to the hardware: you handle details like where each value sits in memory. The first option describes a high-level language."
       },
       {
         "id": "q3-high-level-advantage",
@@ -72,7 +72,7 @@
           "An approach to organising and structuring code"
         ],
         "answer": 3,
-        "explanation": "Definition 1.4.2 — a paradigm is an approach to organising and structuring code: how a program is broken into pieces and how those pieces fit together. It is not a language, and it is not syntax."
+        "explanation": "Definition 1.4.2: a paradigm is an approach to organising and structuring code: how a program is broken into pieces and how those pieces fit together. It is not a language, and it is not syntax."
       },
       {
         "id": "q5-three-structures",
@@ -85,7 +85,7 @@
           "Design, development and testing"
         ],
         "answer": 1,
-        "explanation": "Sequence, selection and repetition — and nothing more exotic. There is no fourth structure waiting in a later chapter."
+        "explanation": "Sequence, selection and repetition, and nothing more exotic. There is no fourth structure waiting in a later chapter."
       },
       {
         "id": "q6-selection",
@@ -98,7 +98,7 @@
           "Giving a group of steps a name so you can reuse it"
         ],
         "answer": 2,
-        "explanation": "Selection is the choice — `if` and `switch`. Doing things in order is sequence; doing something more than once is repetition."
+        "explanation": "Selection is the choice: `if` and `switch`. Doing things in order is sequence; doing something more than once is repetition."
       },
       {
         "id": "q7-proc-vs-oo",
@@ -119,7 +119,7 @@
         "question": "A function written in the functional style always gives the same answer for the same input, and changes nothing outside itself. Why does that make it easier to test?",
         "options": [
           "Functional programs are shorter, so there is less to test",
-          "You can check it on its own — there is no setup first, and nothing else can affect the answer",
+          "You can check it on its own: there is no setup first, and nothing else can affect the answer",
           "Functional code cannot contain bugs",
           "The language tests functional code for you automatically"
         ],

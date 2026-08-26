@@ -30,7 +30,7 @@ Add a `'loading'` state that shows for 2 seconds before reaching `'title'`. This
 
 ### Challenge 3: State History (Undo)
 
-Keep an array of previous states. Press Backspace to undo the last transition — go back to the previous state.
+Keep an array of previous states. Press Backspace to undo the last transition: go back to the previous state.
 
 **How to approach it:**
 - Add `let stateHistory = []` at the top
@@ -43,7 +43,7 @@ Keep an array of previous states. Press Backspace to undo the last transition �
 
 ### Challenge 4: Settings State
 
-Add a `'settings'` state where the player can change game variables — speed, difficulty, or colors. These changes persist into gameplay.
+Add a `'settings'` state where the player can change game variables: speed, difficulty, or colors. These changes persist into gameplay.
 
 **How to approach it:**
 - Add `let playerSpeed = 4`, `let spawnRate = 60`, or similar tunable variables
@@ -57,7 +57,7 @@ Add a `'settings'` state where the player can change game variables — speed, d
 ### Instructions
 
 1. Pick one challenge
-2. Open `script.js` — it starts from the A16.2 scaffold
+2. Open `script.js`: it starts from the A16.2 scaffold
 3. Add your challenge's code
 4. Test that all base states still work
 5. Commit when you're happy

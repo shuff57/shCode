@@ -1,12 +1,12 @@
 ## Prescriptive process model
 
-**Read before attempting `1.1.20 Reading — Where Prescriptive Models Break`.**
+**Read before attempting `1.1.20 Reading: Where Prescriptive Models Break`.**
 
 What you'll learn from it:
 
 - A prescriptive process model advocates an orderly, prescribed sequence of activities.
 - Waterfall, prototyping, spiral, and RUP are named examples only.
-- "Prescriptive" means *it tells you what to do* — nothing fancier.
+- "Prescriptive" means *it tells you what to do*: nothing fancier.
 
 **Try it:** Run the block below to log the four objectives a prescriptive model helps a team hit.
 
@@ -22,7 +22,7 @@ console.log("objective 4: captured best practice");
 What you'll learn from it:
 
 - Prescriptive models hand the team a prescribed order to follow.
-- Waterfall, prototyping, spiral, and RUP are just examples of the idea — the idea is the orderly sequence.
+- Waterfall, prototyping, spiral, and RUP are just examples of the idea: the idea is the orderly sequence.
 
 **Try it:** Change the block to log which example (waterfall, prototyping, spiral, or RUP) sounds most orderly to you.
 

@@ -1,10 +1,10 @@
 {
   "id": "6-1-12-challenges",
   "title": "6.2.7 Challenges",
-  "description": "Pick one (or more) Groups stretch challenges — add a lives counter to Apple Catcher, vary apple sizes for varied points, or implement a `cull()` helper. Auto-graded.",
+  "description": "Pick one (or more) Groups stretch challenges: add a lives counter to Apple Catcher, vary apple sizes for varied points, or implement a `cull()` helper. Auto-graded.",
   "type": "challenge",
   "estimateMins": 30,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.2 Overlaps and Collisions",
   "preview": "moshion",
   "week": 13,
@@ -33,7 +33,7 @@
     {
       "id": "s3",
       "title": "Use overlaps() somewhere",
-      "instructions": "Detect a hit, catch, or collect using `.overlaps(...)` — boolean form OR the callback form, your call.",
+      "instructions": "Detect a hit, catch, or collect using `.overlaps(...)`: boolean form OR the callback form, your call.",
       "hints": [
         "2.3.8 Reading covers both forms; Apple Catcher (2.3.7) shows the callback form in action."
       ]

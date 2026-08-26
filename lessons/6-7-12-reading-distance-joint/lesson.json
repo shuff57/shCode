@@ -1,10 +1,10 @@
 {
   "id": "6-7-12-reading-distance-joint",
-  "title": "6.8.2 Reading — moSHion docs: DistanceJoint",
+  "title": "6.8.2 Reading: moSHion docs: DistanceJoint",
   "description": "How DistanceJoint constrains two sprites to stay at a fixed distance from each other. Read this before the pendulum worked example.",
   "type": "lesson",
   "estimateMins": 8,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.8 Joints",
   "preview": "reading",
   "week": 17,

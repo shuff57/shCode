@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.1.5 — 'Conditional Operator ?', Try It Now 2.5",
+  "sourceRef": "book 2.1.5: 'Conditional Operator ?', Try It Now 2.5",
   "steps": [
     {
       "id": "s1",
@@ -28,7 +28,7 @@
     {
       "id": "r1",
       "title": "ternary operator used",
-      "description": "Code contains a ? ... : ternary expression",
+      "description": "Code contains a ? ...: ternary expression",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\?[^:?]*:",

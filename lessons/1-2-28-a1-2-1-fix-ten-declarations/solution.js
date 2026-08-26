@@ -1,4 +1,4 @@
-// 1.2.28 A1.2.1 — Fix Ten Declarations
+// 1.2.28 A1.2.1: Fix Ten Declarations
 
 // 1. an age should be a number, not text
 let studentAge = 16;
@@ -24,7 +24,7 @@ let itemCount = 3;
 // 8. JavaScript names are camelCase
 let favouriteColour = "blue";
 
-// 9. this student has no middle name — deliberately nothing
+// 9. this student has no middle name: deliberately nothing
 const middleName = null;
 
 // 10. the final score is not known yet; do not assign it at all

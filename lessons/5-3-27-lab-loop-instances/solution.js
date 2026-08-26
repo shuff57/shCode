@@ -1,4 +1,4 @@
-// 2.2.8c Lab — Loop over an array of instances (reference solution).
+// 2.2.8c Lab: Loop over an array of instances (reference solution).
 
 class Enemy {
   constructor(x, y, hp) {

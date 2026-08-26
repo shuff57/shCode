@@ -1,4 +1,4 @@
-## JSON.stringify — packing objects into strings
+## JSON.stringify: packing objects into strings
 
 **Read before the 2.5.9 parsing lesson.** About 5 minutes.
 
@@ -41,13 +41,13 @@ function draw() {
   background('#222');
   fill('white');
   textSize(16);
-  text('Check the console — 3 lines printed.', 20, 90);
+  text('Check the console: 3 lines printed.', 20, 90);
 }
 ```
 
 **What you'll see:** the console prints the object, then the JSON string `{"score":42,"level":3,"playerX":100,"playerY":200}`, then confirms it was stored.
 
-Notice the JSON string has double quotes around every key name. That's how JSON always looks — keys and strings get double quotes, numbers don't.
+Notice the JSON string has double quotes around every key name. That's how JSON always looks: keys and strings get double quotes, numbers don't.
 
 **The golden rule:** `storeItem` wants a string. `JSON.stringify` gives you a string. They pair perfectly.
 
@@ -57,6 +57,6 @@ Notice the JSON string has double quotes around every key name. That's how JSON 
 
 | Term | Meaning |
 |------|---------|
-| **JSON** | JavaScript Object Notation — a text format for representing structured data. |
+| **JSON** | JavaScript Object Notation: a text format for representing structured data. |
 | **Serialization** | Converting a living object in memory into a flat string for storage or sending. |
 | **`JSON.stringify(obj)`** | The serialization step. Takes an object, returns a JSON string. |

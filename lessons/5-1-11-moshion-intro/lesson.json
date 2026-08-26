@@ -4,7 +4,7 @@
   "description": "Your first moSHion sketch: a canvas, a sprite, a background color.",
   "type": "lesson",
   "estimateMins": 20,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
   "preview": "moshion",
   "week": 10,

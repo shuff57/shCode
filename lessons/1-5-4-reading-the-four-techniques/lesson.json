@@ -1,7 +1,7 @@
 {
   "id": "1-5-4-reading-the-four-techniques",
-  "title": "1.5.4 Reading — The Four Cornerstones",
-  "description": "Decomposition, pattern recognition, abstraction, algorithms — and the table analogy that explains why you need all four.",
+  "title": "1.5.4 Reading: The Four Cornerstones",
+  "description": "Decomposition, pattern recognition, abstraction, algorithms, and the table analogy that explains why you need all four.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

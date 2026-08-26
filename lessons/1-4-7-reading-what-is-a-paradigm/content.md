@@ -2,9 +2,9 @@
 
 Two programs can solve the same problem and be organised in completely different ways. The name for that difference is a **paradigm**.
 
-> **Definition 1.4.2 — Programming paradigm.** An approach to organising and structuring code. It shapes how a program is broken into pieces and how those pieces fit together.
+> **Definition 1.4.2: Programming paradigm.** An approach to organising and structuring code. It shapes how a program is broken into pieces and how those pieces fit together.
 
-A paradigm is not a language, and it is not punctuation. It is a set of ideas about what a program is *made of* — steps? objects? functions? Different answers give different paradigms, and the same language can often support more than one.
+A paradigm is not a language, and it is not punctuation. It is a set of ideas about what a program is *made of*: steps? objects? functions? Different answers give different paradigms, and the same language can often support more than one.
 
 Three are worth knowing at this stage:
 
@@ -24,7 +24,7 @@ You will *write* all three later in this course. The goal here is only to recogn
 
 **Try it:**
 
-Both halves below hold the same two facts about the same book. The difference is not what they know — it is how they are organised.
+Both halves below hold the same two facts about the same book. The difference is not what they know: it is how they are organised.
 
 ```js live plain
 // Organised as separate values
@@ -37,7 +37,7 @@ let book = { title: "JavaScript Guide", pages: 200 };
 console.log(book.title + " has " + book.pages + " pages.");
 ```
 
-Same output, twice. That gap — where the data lives relative to the code using it — is the beginning of the difference between two paradigms. The next lessons give each one a name.
+Same output, twice. That gap: where the data lives relative to the code using it: is the beginning of the difference between two paradigms. The next lessons give each one a name.
 
 ---
 

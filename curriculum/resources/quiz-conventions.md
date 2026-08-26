@@ -1,6 +1,6 @@
 # Multiple-Choice Quiz Conventions
 
-Canonical rules for in-app **module quizzes** — multiple-choice recall checks graded
+Canonical rules for in-app **module quizzes**: multiple-choice recall checks graded
 in the browser, with no model call. When a `lessons/<slug>/lesson.json` has
 `preview === "quiz"` + a `quiz` block, these rules are binding.
 
@@ -55,7 +55,7 @@ stays with the grader.
         "question": "<the question, with any setup it depends on>",
         "options": ["<wrong>", "<right>", "<wrong>", "<wrong>"],
         "answer": 1,
-        "explanation": "<why, in a sentence or two — never just 'correct'>"
+        "explanation": "<why, in a sentence or two, never just 'correct'>"
       }
     ]
   }
@@ -64,32 +64,32 @@ stays with the grader.
 
 ### Field-by-field
 
-- `preview` — **`"quiz"`**. This is what routes the lesson to `QuizView` instead of
+- `preview`: **`"quiz"`**. This is what routes the lesson to `QuizView` instead of
   `WrittenGrader`. A `quiz` block with any other preview is a build failure.
-- `type` — stays **`"assignment"`**. A quiz is graded work, and the lists key their
+- `type`: stays **`"assignment"`**. A quiz is graded work, and the lists key their
   assignment styling off `type`. `badgeForLesson()` special-cases `preview: "quiz"`
   so the badge still reads **Quiz**.
-- `quiz.passPercent` — percent correct needed to advance. **Default 70**, applied by
+- `quiz.passPercent`: percent correct needed to advance. **Default 70**, applied by
   `passThreshold()` in `lib/quiz-grade.ts` with a *ceiling*: 70% of 8 questions is 6,
   never 5. Set it only when a quiz genuinely wants a different bar.
-- `quiz.questions[].id` — unique within the lesson. It is both the answer key and the
+- `quiz.questions[].id`: unique within the lesson. It is both the answer key and the
   radio-group `name`, so a duplicate makes two questions share one selection.
-- `quiz.questions[].answer` — **0-based** index into `options`.
-- `quiz.questions[].source` — displayed lesson number to reread, shown next to the
+- `quiz.questions[].answer`: **0-based** index into `options`.
+- `quiz.questions[].source`: displayed lesson number to reread, shown next to the
   explanation after grading. Same rule as written prompts: cite the number from
   `lesson.json.title`, never the folder slug.
-- `quiz.questions[].code` — optional snippet rendered monospace above the options,
+- `quiz.questions[].code`: optional snippet rendered monospace above the options,
   for trace-the-output questions. See `2-1-39-a2-1-2-quiz`.
-- `points` / `grading.*` — all `0`. `QuizView` never reads them; the gate is
+- `points` / `grading.*`: all `0`. `QuizView` never reads them; the gate is
   `passPercent`. Populate them anyway so the lesson.json stays self-describing.
-- No `aiGrader`. A lesson with both is a build failure — `QuizView` wins the render,
+- No `aiGrader`. A lesson with both is a build failure: `QuizView` wins the render,
   so the `aiGrader` would be dead config that still reads like the lesson is AI-graded.
 
 ## 2. content.md
 
 One line, naming where the answers come from. `QuizView` renders the heading, the
 "you need N of M" line and the retry rules itself, and `description` already appears
-above — three copies of the same instructions is what the first draft did.
+above: three copies of the same instructions is what the first draft did.
 
 ```md
 Everything in this quiz comes from this module's readings and videos. Each question names the lesson to reread if you get it wrong.
@@ -102,23 +102,23 @@ answer key.
 
 **Every question is answerable from one named lesson**, and `source` names it. If a
 question needs a fact the student was never given, hand them the fact and ask for the
-reasoning instead — *"SQL is a language built for asking questions of a database. Why
+reasoning instead: *"SQL is a language built for asking questions of a database. Why
 could you not use it to build a web page?"* tests the concept; *"Why can a program for
 a web page not simply be written in SQL?"* tests whether they remember what SQL is.
 
 **One short-answer question usually becomes two.** "Explain the difference between a
 low-level and a high-level language, and give one advantage of each" is two things;
 multiple choice can only ask one at a time. Splitting it is an improvement, not a
-compromise — 1.4.22's six prose questions became eight MC questions.
+compromise: 1.4.22's six prose questions became eight MC questions.
 
-**Four options, and the three wrong ones have to be actually wrong** — not merely
+**Four options, and the three wrong ones have to be actually wrong**, not merely
 worse. A distractor that a defensible reading makes correct is a bug the validator
 cannot catch. Good distractors are the near-misses students really make: the *other*
 level of abstraction, the life-cycle phases where the three structures belong, `"null"`
 where `"object"` is the answer.
 
 **The explanation teaches.** It is shown on a right answer and a wrong one, so it
-says *why*, never "correct". It is also the only feedback a failing student gets —
+says *why*, never "correct". It is also the only feedback a failing student gets :
 `QuizView` deliberately does **not** highlight the right option on a failed attempt,
 because that turns "try again" into "click the green one".
 
@@ -148,5 +148,5 @@ recall check. Deliberate; revisit if quizzes ever carry real weight.
 
 | When | What |
 |------|------|
-| Created (2026-08-17) | Six module quizzes converted from AI-graded prose to multiple choice: 1.1.23, 1.2.31, 1.3.21, 1.4.22, 1.5.45, 2.1.40 — 46 questions. New `preview: "quiz"` type, `components/QuizView.tsx`, `lib/quiz-grade.ts`, `scripts/test-quiz.mjs`. Writeups stayed with the AI grader. |
-| 1.1.23 placement (2026-08-17, open) | `1-1-23-a3-3-unit-quiz` is displayed as *1.1.23 Unit 1.1 Quiz* but every question is module **1.2/1.3** material — `typeof`, declarations, naming style — none of which module 1.1 teaches. Its `source` pointers cite 1.2.x/1.3.x accordingly. The lesson's position in the course is still unresolved. |
+| Created (2026-08-17) | Six module quizzes converted from AI-graded prose to multiple choice: 1.1.23, 1.2.31, 1.3.21, 1.4.22, 1.5.45, 2.1.40: 46 questions. New `preview: "quiz"` type, `components/QuizView.tsx`, `lib/quiz-grade.ts`, `scripts/test-quiz.mjs`. Writeups stayed with the AI grader. |
+| 1.1.23 placement (2026-08-17, open) | `1-1-23-a3-3-unit-quiz` is displayed as *1.1.23 Unit 1.1 Quiz* but every question is module **1.2/1.3** material: `typeof`, declarations, naming style: none of which module 1.1 teaches. Its `source` pointers cite 1.2.x/1.3.x accordingly. The lesson's position in the course is still unresolved. |

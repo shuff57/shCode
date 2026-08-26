@@ -4,13 +4,13 @@ You already know `storeItem` (write) and `getItem` (read). Now you need the othe
 
 **What you'll learn:**
 
-- `removeItem('keyName')` removes exactly one saved key — the rest of localStorage is untouched.
-- `clearStorage()` removes **every** key — nothing survives.
+- `removeItem('keyName')` removes exactly one saved key: the rest of localStorage is untouched.
+- `clearStorage()` removes **every** key: nothing survives.
 - Pick the right tool for the job: surgical delete vs. full reset.
 
 ---
 
-### removeItem — delete one key
+### removeItem: delete one key
 
 Run the block below. It stores three items, prints a before count, removes one, then prints the after count.
 
@@ -32,7 +32,7 @@ function setup() {
 
   removeItem('itemB');
 
-  // Count after — itemB is gone
+  // Count after: itemB is gone
   if (getItem('itemA') !== null) countAfter = countAfter + 1;
   if (getItem('itemB') !== null) countAfter = countAfter + 1;
   if (getItem('itemC') !== null) countAfter = countAfter + 1;
@@ -47,11 +47,11 @@ function draw() {
 }
 ```
 
-After `removeItem('itemB')`, `getItem('itemB')` returns `null` — it no longer exists. `itemA` and `itemC` are unaffected.
+After `removeItem('itemB')`, `getItem('itemB')` returns `null`: it no longer exists. `itemA` and `itemC` are unaffected.
 
 ---
 
-### clearStorage — wipe everything
+### clearStorage: wipe everything
 
 WARNING: `clearStorage()` removes every key your app has ever stored. There is no undo. Use it in a settings menu with a confirmation prompt, never as a default action.
 
@@ -94,7 +94,7 @@ function draw() {
 | Removes **one** key | Removes **every** key |
 | Other keys stay intact | Nothing survives |
 | Use for: deleting one save slot | Use for: factory-reset settings |
-| Safe — you control what goes | Dangerous — no undo, confirm first |
+| Safe: you control what goes | Dangerous: no undo, confirm first |
 
 ---
 
@@ -103,5 +103,5 @@ function draw() {
 | Term | Meaning |
 |---|---|
 | **removeItem(key)** | Deletes a single key-value pair from localStorage. After this, `getItem(key)` returns `null`. |
-| **clearStorage()** | Removes every key your domain has stored. Irreversible — confirm before calling. |
+| **clearStorage()** | Removes every key your domain has stored. Irreversible: confirm before calling. |
 | **null** | The value `getItem` returns when the key doesn't exist (or was deleted). |

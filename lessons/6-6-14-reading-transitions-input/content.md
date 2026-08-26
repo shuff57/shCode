@@ -1,13 +1,13 @@
 ## Player presses a key → state changes
 
-Read before `6.6.17 Reading — moSHion docs: Condition-Driven Transitions`. About 8 minutes.
+Read before `6.6.17 Reading: moSHion docs: Condition-Driven Transitions`. About 8 minutes.
 
 **What you'll learn from it:**
 
 - An **input-driven transition** happens when the player presses a key. The player is in control of when the state changes.
 - The pattern: inside the relevant `case` in `draw()`, check `if (kb.presses('key')) state = 'newState'`.
 - Use `kb.presses` (true on the first frame only) so the transition fires exactly once. `kb.pressing` would fire every frame the key is held, causing the state to flicker.
-- The transition belongs inside the `case` whose state owns the logic — title-to-play transition lives in `case 'title'`, not somewhere global.
+- The transition belongs inside the `case` whose state owns the logic: title-to-play transition lives in `case 'title'`, not somewhere global.
 - Common input-driven transitions: title → play (Enter), play → pause (P), any state → quit (Escape).
 
 **Try it:**
@@ -44,13 +44,13 @@ function draw() {
 }
 ```
 
-Press Enter to start playing. Press Escape to go back to the title. Try holding Enter — notice the state changes just once, not every frame, because `kb.presses` is one-shot.
+Press Enter to start playing. Press Escape to go back to the title. Try holding Enter: notice the state changes just once, not every frame, because `kb.presses` is one-shot.
 
 ---
 
 ## Input-driven vs. condition-driven
 
-Input-driven transitions are the ones the **player** triggers. Tomorrow you'll learn about **condition-driven** transitions, where the game itself decides — score thresholds, health reaching zero, timers expiring. The key difference:
+Input-driven transitions are the ones the **player** triggers. Tomorrow you'll learn about **condition-driven** transitions, where the game itself decides: score thresholds, health reaching zero, timers expiring. The key difference:
 
 | Transition type | Who decides | Example |
 |---|---|---|
@@ -65,7 +65,7 @@ Both follow the same rule: put the check inside the `case` that owns it.
 
 | Term | Meaning |
 |---|---|
-| **Input-driven transition** | A state change triggered by the player pressing a key — `kb.presses(key)` inside a `case`. |
-| **One-shot input** | `kb.presses(key)` — true only on the single frame the key is first pressed. Use for transitions. |
-| **Held input** | `kb.pressing(key)` — true every frame the key is down. Use for movement, not transitions. |
+| **Input-driven transition** | A state change triggered by the player pressing a key: `kb.presses(key)` inside a `case`. |
+| **One-shot input** | `kb.presses(key)`: true only on the single frame the key is first pressed. Use for transitions. |
+| **Held input** | `kb.pressing(key)`: true every frame the key is down. Use for movement, not transitions. |
 | **Key binding** | The specific key assigned to trigger a transition (e.g. P for pause, Escape for quit). |

@@ -1,6 +1,6 @@
 {
   "id": "1-2-2-reading-let-const",
-  "title": "1.2.2 Reading — Declaring Variables with let and const",
+  "title": "1.2.2 Reading: Declaring Variables with let and const",
   "description": "Declare variables with let and const, reassign a let, and choose between the two. Read before the variables-and-types lesson.",
   "type": "lesson",
   "estimateMins": 10,

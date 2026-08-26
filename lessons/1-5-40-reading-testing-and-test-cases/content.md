@@ -13,7 +13,7 @@ That is the whole mechanism. A program produces an answer; a test case supplies 
 
 In the jam sandwich algorithm, testing works by taking turns. One person plays the programmer who wrote the instructions; the other plays the robot. The programmer reads out each instruction and the robot follows it **exactly**.
 
-Each instruction is a test case, and the test succeeds if the robot can carry it out precisely and successfully. Otherwise you debug the instruction — find the source of the problem and correct it.
+Each instruction is a test case, and the test succeeds if the robot can carry it out precisely and successfully. Otherwise you debug the instruction: find the source of the problem and correct it.
 
 A record sheet helps, and the columns are worth knowing because they are the same ones a professional bug report has:
 
@@ -21,7 +21,7 @@ A record sheet helps, and the columns are worth knowing because they are the sam
 |---|---|---|---|---|
 | 1 | | | | |
 
-**Expected** before **observed**. In that order, always — writing the expectation after seeing the result is how you talk yourself into accepting a wrong answer.
+**Expected** before **observed**. In that order, always: writing the expectation after seeing the result is how you talk yourself into accepting a wrong answer.
 
 Everyone makes mistakes programming; they are part of learning. There is a good case that the deepest learning happens exactly when something goes wrong.
 
@@ -58,7 +58,7 @@ if (area === 9) {
 }
 ```
 
-Change `*` to `+` on the third line and run it again. Both tests fail, and each one tells you the expected value and the observed one — which is a far more useful report than a program that simply prints a number.
+Change `*` to `+` on the third line and run it again. Both tests fail, and each one tells you the expected value and the observed one: which is a far more useful report than a program that simply prints a number.
 
 ---
 
@@ -68,6 +68,6 @@ Change `*` to `+` on the third line and run it again. Both tests fail, and each 
 |------|---------|
 | **testing** | Checking whether a program meets its requirements |
 | **test case** | Specific input, plus the outcome you expect from it |
-| **expected outcome** | What should happen — written down before you run |
+| **expected outcome** | What should happen: written down before you run |
 | **observed outcome** | What actually happened |
 | **debugging** | Finding and fixing the cause of a failed test |

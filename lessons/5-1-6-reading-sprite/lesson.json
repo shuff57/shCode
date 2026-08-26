@@ -1,10 +1,10 @@
 {
   "id": "5-1-6-reading-sprite",
-  "title": "5.1.6 Reading — Sprite: new Sprite(x, y, w, h) + .color",
+  "title": "5.1.6 Reading: Sprite: new Sprite(x, y, w, h) + .color",
   "description": "How new Sprite(x, y, w, h) creates a rectangle the engine renders for you, and how .color sets its fill. Read before 2.1.3c (lab).",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
   "preview": "reading",
   "week": 10,

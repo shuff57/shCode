@@ -22,17 +22,17 @@ For example: `age >= 13 && age <= 17` is true only when age is between 13 and 17
 let age = 16;
 let hasTicket = true;
 
-// && — both must be true
+// &&: both must be true
 if (age >= 13 && age <= 17) {
   console.log("You are a teenager.");
 }
 
-// || — at least one must be true
+// ||, at least one must be true
 if (age < 13 || age > 17) {
   console.log("You are not a teenager.");
 }
 
-// ! — flip a boolean
+// !: flip a boolean
 if (!hasTicket) {
   console.log("You need a ticket to enter.");
 } else {

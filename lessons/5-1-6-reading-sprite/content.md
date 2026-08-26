@@ -1,6 +1,6 @@
 ## Sprite: new Sprite(x, y, w, h)
 
-Read before `2.1.3c Lab — Drop one sprite, change its color`. About 5 minutes.
+Read before `2.1.3c Lab: Drop one sprite, change its color`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -12,12 +12,12 @@ A **sprite** is a visible, physics-aware rectangle that moSHion draws for you ev
 
 **What you'll learn from it:**
 
-- The four arguments are: centre-x, centre-y, width, height — in that order.
+- The four arguments are: centre-x, centre-y, width, height, in that order.
 - `x` and `y` point to the sprite's **centre**, not its top-left corner.
 - You do **not** call any render method; moSHion draws the sprite for you each frame.
-- You can set `.color` on a sprite right after creating it — same statement, no extra setup.
+- You can set `.color` on a sprite right after creating it: same statement, no extra setup.
 
-**Try it — basic sprite:**
+**Try it: basic sprite:**
 
 ```js live
 function setup() {
@@ -30,11 +30,11 @@ function draw() {
 }
 ```
 
-**What you'll see:** a default-colored square centred in a dark-grey canvas. moSHion drew it for you — you never called any render function.
+**What you'll see:** a default-colored square centred in a dark-grey canvas. moSHion drew it for you: you never called any render function.
 
 **Try this:** change `180, 180` to `50, 50` inside `new Sprite(...)` and rerun. The square jumps to the upper-left area because `y = 50` is near the top (remember: `y` increases downward).
 
-**Try it — set the color:**
+**Try it: set the color:**
 
 ```js live
 function setup() {
@@ -53,7 +53,7 @@ The `.color = 'tomato'` chained onto `new Sprite(...)` reads left-to-right as: "
 
 **Try this:** swap `'tomato'` for `'deepskyblue'`, then for `'#88ff00'` (a hex color code). Each run shows a different fill.
 
-> *Heads-up:* the next reading (`2.1.3d`) shows a different way to write this — store the sprite in a `let` variable so you can change its color later, not just at creation. For now, the chained form is enough.
+> *Heads-up:* the next reading (`2.1.3d`) shows a different way to write this: store the sprite in a `let` variable so you can change its color later, not just at creation. For now, the chained form is enough.
 
 ---
 

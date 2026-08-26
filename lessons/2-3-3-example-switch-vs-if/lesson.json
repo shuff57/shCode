@@ -1,6 +1,6 @@
 {
   "id": "2-3-3-example-switch-vs-if",
-  "title": "2.3.10 Worked Example — switch vs if-else-if",
+  "title": "2.3.10 Worked Example: switch vs if-else-if",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.3.2 — the day-of-week if/else-if chain rewritten as switch; book 2.3.3 fall-through preview",
+  "sourceRef": "book 2.3.2: the day-of-week if/else-if chain rewritten as switch; book 2.3.3 fall-through preview",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

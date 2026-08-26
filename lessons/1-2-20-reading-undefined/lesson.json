@@ -1,6 +1,6 @@
 {
   "id": "1-2-20-reading-undefined",
-  "title": "1.2.20 Reading — The undefined Value",
+  "title": "1.2.20 Reading: The undefined Value",
   "description": "What JavaScript puts in a variable you declared but never filled. Definition 1.2.6, and why not to write it yourself.",
   "type": "lesson",
   "estimateMins": 10,

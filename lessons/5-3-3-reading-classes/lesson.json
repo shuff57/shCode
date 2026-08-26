@@ -1,10 +1,10 @@
 {
   "id": "5-3-3-reading-classes",
-  "title": "5.3.3 Reading — Class and instance",
-  "description": "The words class and instance and how they relate — a class is a blueprint; `new` builds one instance from it. Read before 2.2.3a.",
+  "title": "5.3.3 Reading: Class and instance",
+  "description": "The words class and instance and how they relate: a class is a blueprint; `new` builds one instance from it. Read before 2.2.3a.",
   "type": "lesson",
   "estimateMins": 12,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.3 Classes and Objects via moSHion",
   "preview": "reading",
   "week": 12,

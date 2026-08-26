@@ -33,7 +33,7 @@
           "Solving a problem the fastest way you can find"
         ],
         "answer": 2,
-        "explanation": "Definition 1.5.2 — one hard task redefined as a set of easy ones."
+        "explanation": "Definition 1.5.2: one hard task redefined as a set of easy ones."
       },
       {
         "id": "q2-self-contained",
@@ -53,7 +53,7 @@
         "source": "1.5.8",
         "question": "Which of these is a genuine decomposition of \"make a jam sandwich\"?",
         "options": [
-          "\"Open the jar\" — it can be understood and done on its own",
+          "\"Open the jar\": it can be understood and done on its own",
           "\"Start making it\", then \"finish making it\"",
           "\"Make the sandwich quickly\"",
           "\"Make half the sandwich\", then \"make the other half\""
@@ -66,10 +66,10 @@
         "source": "1.5.8",
         "question": "You decompose \"get to school on time\" and one of your tasks is \"get ready\". Is that task finished being decomposed?",
         "options": [
-          "Yes — everyone knows what getting ready means",
-          "Yes — a task only needs breaking down if it takes over an hour",
-          "No — but only because it does not mention school",
-          "No — \"get ready\" hides several separate tasks, so it is not yet self-contained"
+          "Yes: everyone knows what getting ready means",
+          "Yes: a task only needs breaking down if it takes over an hour",
+          "No, but only because it does not mention school",
+          "No: \"get ready\" hides several separate tasks, so it is not yet self-contained"
         ],
         "answer": 3,
         "explanation": "Wash, dress, pack the bag, eat. Each is separately doable; \"get ready\" is a label over the top of them."
@@ -81,7 +81,7 @@
         "options": [
           "It makes the list shorter",
           "It puts the tasks into the correct time order",
-          "It exposes gaps and lopsidedness — a category with one task in it usually means you forgot something",
+          "It exposes gaps and lopsidedness: a category with one task in it usually means you forgot something",
           "It proves every task is self-contained"
         ],
         "answer": 2,

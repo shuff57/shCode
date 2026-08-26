@@ -12,9 +12,9 @@ When a program reads a text file, the entire contents arrive as **one big string
 let lines = fileContents.split("\n");
 ```
 
-That one call turns the string into an **array** — one element per line. From there you already know what to do: loop over it with `for` or `for...of`.
+That one call turns the string into an **array**: one element per line. From there you already know what to do: loop over it with `for` or `for...of`.
 
-**A preview of File I/O:** In a later unit you will use `fs.readFileSync()` (Node.js) to load a real file. It returns a string, and the very first thing most programs do with it is `.split("\n")` — the same pattern you are about to practice below.
+**A preview of File I/O:** In a later unit you will use `fs.readFileSync()` (Node.js) to load a real file. It returns a string, and the very first thing most programs do with it is `.split("\n")`: the same pattern you are about to practice below.
 
 **Try it:** The block simulates a file by storing multiple lines in a template literal, then splits and numbers each line.
 
@@ -42,7 +42,7 @@ The template literal (backtick string) lets you type a real newline in your sour
 | Term | Meaning |
 |------|---------|
 | **`.split(sep)`** | String method that cuts the string at every `sep` and returns an array of pieces |
-| **`"\n"`** | The newline character — the invisible separator between lines in a text file |
+| **`"\n"`** | The newline character: the invisible separator between lines in a text file |
 | **template literal** | A string in backticks (`` ` ``) that can span multiple lines and embed real newlines |
 | **File I/O** | Reading from or writing to a file; `.split("\n")` is the standard first step after reading |
 | **line number** | Human-readable position of a line; `i + 1` when the index `i` starts at `0` |

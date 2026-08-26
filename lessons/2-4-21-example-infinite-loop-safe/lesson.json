@@ -1,12 +1,12 @@
 {
   "id": "2-4-21-example-infinite-loop-safe",
-  "title": "2.4.21 Worked Example — Making an Infinite Loop Safe",
+  "title": "2.4.21 Worked Example: Making an Infinite Loop Safe",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "example",
-  "sourceRef": "book 2.4 — Example 2.5 'Making an infinite loop safe'",
+  "sourceRef": "book 2.4: Example 2.5 'Making an infinite loop safe'",
   "week": 6,
   "slos": [
     "SLO-3"

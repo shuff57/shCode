@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed — practice for else if chains (book 2.1.4) and combining conditions (book 2.1.8); scenario named in curriculum-plan §2.1 In-Class Activities: 'print settings advisor'",
+  "sourceRef": "designed: practice for else if chains (book 2.1.4) and combining conditions (book 2.1.8); scenario named in curriculum-plan §2.1 In-Class Activities: 'print settings advisor'",
   "steps": [
     {
       "id": "s1",

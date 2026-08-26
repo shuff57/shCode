@@ -1,4 +1,4 @@
-// 7.1.1 Arcade Cabinet — Q2 Synthesis (reference solution).
+// 7.1.1 Arcade Cabinet: Q2 Synthesis (reference solution).
 //
 // SALVAGE RUN. Crates fall from a wrecked freighter; you fly the collector
 // underneath and catch them. Catch a crate, score it. Miss three and the run
@@ -70,7 +70,7 @@ function setup() {
 
   // Item 8: something that survives closing the tab.
   let saved = getItem(SAVE_KEY);
-  best = saved === null ? 0 : saved;
+  best = saved === null ? 0: saved;
 
   runTests();
 }
@@ -79,7 +79,7 @@ function setup() {
 // Kept separate from the sprite work so runTests() can check it without a
 // canvas, which is what makes it testable at all.
 function scoreFor(kind, comboCount) {
-  let bonus = comboCount >= 3 ? 2 : 1;
+  let bonus = comboCount >= 3 ? 2: 1;
   return kind.points * bonus;
 }
 
@@ -185,13 +185,13 @@ function draw() {
       break;
 
     case 'paused':
-      text('PAUSED — p to resume', 320, 300);
+      text('PAUSED: p to resume', 320, 300);
       if (kb.presses('p')) state = 'play';
       break;
 
     case 'gameover':
       textSize(24);
-      text('RUN OVER — ' + score, 320, 270);
+      text('RUN OVER: ' + score, 320, 270);
       textSize(16);
       text('best ' + best, 370, 305);
       text('enter returns to the title', 285, 345);
@@ -210,7 +210,7 @@ function draw() {
 // screen -- you would just feel that scoring was "off".
 function check(label, got, want) {
   let ok = got === want;
-  console.log((ok ? 'PASS' : 'FAIL') + ' — ' + label + ' (got ' + got + ', wanted ' + want + ')');
+  console.log((ok ? 'PASS': 'FAIL') + ': ' + label + ' (got ' + got + ', wanted ' + want + ')');
   return ok;
 }
 

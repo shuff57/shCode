@@ -1,4 +1,4 @@
-// 2.4.32 A2.4.2 — Print a Grid Pattern
+// 2.4.32 A2.4.2: Print a Grid Pattern
 //
 // Dimensions are variables, so the grid resizes without touching
 // the loops.

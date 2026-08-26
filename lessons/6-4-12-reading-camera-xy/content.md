@@ -1,6 +1,6 @@
 ## Moving the Viewport
 
-**Read before attempting `2.4.7b Reading — Camera-follow pattern`.**
+**Read before attempting `2.4.7b Reading: Camera-follow pattern`.**
 
 **What you'll learn from it:**
 
@@ -28,7 +28,7 @@ function draw() {
 }
 ```
 
-Watch the row of dots scroll past as `camera.x` grows. No sprite moved — only the viewport shifted.
+Watch the row of dots scroll past as `camera.x` grows. No sprite moved, only the viewport shifted.
 
 ---
 
@@ -39,4 +39,4 @@ Watch the row of dots scroll past as `camera.x` grows. No sprite moved — only 
 | **`camera.x` / `camera.y`** | The center of the visible viewport in world coordinates. |
 | **Viewport** | The rectangular window into the world that is rendered to the canvas. |
 | **World coordinates** | A sprite's absolute `pos.x` / `pos.y`, independent of camera position. |
-| **Default camera** | `camera.x = canvas.w / 2`, `camera.y = canvas.h / 2` — the view starts at the world origin, so a sprite at `(0, 0)` sits in the canvas's top-left corner. |
+| **Default camera** | `camera.x = canvas.w / 2`, `camera.y = canvas.h / 2`: the view starts at the world origin, so a sprite at `(0, 0)` sits in the canvas's top-left corner. |

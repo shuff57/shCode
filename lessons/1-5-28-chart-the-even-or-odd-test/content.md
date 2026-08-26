@@ -8,9 +8,9 @@ Five shapes will do it. Drag them onto the canvas and connect them.
 |---|---|---|
 | 1 | **Oval** | Start |
 | 2 | **Rectangle** | get the number |
-| 3 | **Diamond** | is the number even? — two exits, **yes** and **no** |
+| 3 | **Diamond** | is the number even?: two exits, **yes** and **no** |
 | 4 | **Rectangle**, twice | print "even" on the yes path, print "odd" on the no path |
-| 5 | **Oval** | End — with both branches joining back together before it |
+| 5 | **Oval** | End, with both branches joining back together before it |
 
 ### The detail worth checking
 
@@ -30,4 +30,4 @@ Put each one back afterwards. Meeting every failure message once, on a chart nob
 
 ### How this is checked
 
-The structural checks run in your browser and tell you what is wrong. Nothing is graded and there is no limit on redraws. The checks look at *shape* — one start, every arrow labelled, nothing floating, decisions with two labelled exits, everything reaching the end. They cannot tell whether your labels describe the right task; only you can.
+The structural checks run in your browser and tell you what is wrong. Nothing is graded and there is no limit on redraws. The checks look at *shape*: one start, every arrow labelled, nothing floating, decisions with two labelled exits, everything reaching the end. They cannot tell whether your labels describe the right task; only you can.

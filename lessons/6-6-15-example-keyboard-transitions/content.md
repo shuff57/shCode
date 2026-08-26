@@ -1,8 +1,8 @@
 **Goal:** Build a four-state machine where every transition is keyboard-driven. Four screens: title, play, pause, gameover. Every state change comes from the player pressing a key.
 
-## Step 1 — Set up four states
+## Step 1: Set up four states
 
-Four cases in the switch: `'title'`, `'play'`, `'pause'`, `'gameover'`. Each draws something different. No transitions yet — just verify all four screens exist.
+Four cases in the switch: `'title'`, `'play'`, `'pause'`, `'gameover'`. Each draws something different. No transitions yet, just verify all four screens exist.
 
 ```js live
 let state = 'title';
@@ -26,7 +26,7 @@ function draw() {
     case 'play':
       fill('#50fa7b');
       textSize(24);
-      text('Playing — dodge the asteroids!', 40, 140);
+      text('Playing: dodge the asteroids!', 40, 140);
       textSize(14);
       fill('#f8f8f2');
       text('Press P to pause | Press G for game over', 60, 250);
@@ -53,7 +53,7 @@ function draw() {
 }
 ```
 
-## Step 2 — Add input checks inside each state
+## Step 2: Add input checks inside each state
 
 Each transition check lives in the `case` whose state owns it. Title → play when Enter is pressed. Play → gameover when G is pressed. Gameover → title when R is pressed.
 
@@ -80,7 +80,7 @@ function draw() {
     case 'play':
       fill('#50fa7b');
       textSize(24);
-      text('Playing — dodge the asteroids!', 40, 140);
+      text('Playing: dodge the asteroids!', 40, 140);
       textSize(14);
       fill('#f8f8f2');
       text('Press P to pause | Press G for game over', 60, 250);
@@ -113,7 +113,7 @@ function draw() {
 
 Each key press moves the game to a new state. P toggles between play and pause. G triggers game over. R sends you back to the title. All keyboard-driven.
 
-## Step 3 — Add Escape to quit from any gameplay state
+## Step 3: Add Escape to quit from any gameplay state
 
 Escape should always take you back to the title. Add the same `if (kb.presses('Escape')) state = 'title'` to `case 'play'`, `case 'pause'`, and `case 'gameover'`.
 
@@ -140,7 +140,7 @@ function draw() {
     case 'play':
       fill('#50fa7b');
       textSize(24);
-      text('Playing — dodge the asteroids!', 40, 130);
+      text('Playing: dodge the asteroids!', 40, 130);
       textSize(14);
       fill('#f8f8f2');
       text('P to pause | G for game over | Esc to quit', 55, 250);
@@ -176,7 +176,7 @@ function draw() {
 
 Run it. Navigate: Enter → play, P → pause, P again → resume, Esc → quit from anywhere, G → gameover, R → restart. Every path is keyboard-controlled.
 
-## Step 4 — Why kb.presses matters
+## Step 4: Why kb.presses matters
 
 Switch one transition from `kb.presses` to `kb.pressing` and watch what happens. The state flickers because every frame (60 per second) while the key is held, the transition fires again. `kb.presses` is the frame-safe tool for state changes.
 
@@ -191,7 +191,7 @@ function draw() {
   background('#282a36');
 
   // Show a debug indicator when a key is held
-  let pressingIndicator = kb.pressing('Enter') ? ' [HOLD]' : '';
+  let pressingIndicator = kb.pressing('Enter') ? ' [HOLD]': '';
 
   switch (state) {
     case 'title':
@@ -230,12 +230,12 @@ function draw() {
 }
 ```
 
-Hold Enter on the title screen. The `[HOLD]` indicator appears because `kb.pressing` is true, but the state only changes once — because the transition uses `kb.presses`, not `kb.pressing`.
+Hold Enter on the title screen. The `[HOLD]` indicator appears because `kb.pressing` is true, but the state only changes once, because the transition uses `kb.presses`, not `kb.pressing`.
 
 ## Key takeaways
 
-- Input checks for transitions go inside the `case` that owns the transition — title-to-play logic lives in `case 'title'`.
+- Input checks for transitions go inside the `case` that owns the transition: title-to-play logic lives in `case 'title'`.
 - Use `kb.presses` for state transitions, not `kb.pressing`. Presses fires once; pressing fires every frame.
 - Escape-to-quit is just an input-driven transition applied in multiple cases.
 - P toggling between play and pause is the same pattern twice: `case 'play'` has `if (kb.presses('p')) state = 'pause'` and `case 'pause'` has the reverse.
-- Keyboard-driven transitions are the simplest kind — the player is explicitly in control.
+- Keyboard-driven transitions are the simplest kind: the player is explicitly in control.

@@ -4,7 +4,7 @@
   "description": "Groups let you treat many sprites as one. Create, configure, spawn into, and clean up a Group.",
   "type": "lesson",
   "estimateMins": 25,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.1 Groups and Overlaps",
   "preview": "moshion",
   "week": 13,
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Make a Group",
-      "instructions": "let stars = new Group(); — a Group is a sprite factory + a container.",
+      "instructions": "let stars = new Group();: a Group is a sprite factory + a container.",
       "hints": [
         "Open the moSHion docs Groups chapter on the right (or run /docs/moshion/groups) for the API."
       ]
@@ -24,7 +24,7 @@
     {
       "id": "s2",
       "title": "Set defaults on the Group",
-      "instructions": "stars.color = 'yellow'; stars.diameter = 10; — every sprite added to the group starts with these.",
+      "instructions": "stars.color = 'yellow'; stars.diameter = 10;: every sprite added to the group starts with these.",
       "hints": [
         "Set defaults once on the Group rather than per-sprite. Check the Groups docs section on defaults."
       ]
@@ -32,7 +32,7 @@
     {
       "id": "s3",
       "title": "Spawn sprites into the Group",
-      "instructions": "In draw(), every so often call new stars.Sprite(randomX, 0) — note capital-S Sprite on the group.",
+      "instructions": "In draw(), every so often call new stars.Sprite(randomX, 0): note capital-S Sprite on the group.",
       "hints": [
         "The moSHion docs has examples of timed spawning. Look for the frameCount % N === 0 idiom."
       ]
@@ -42,7 +42,7 @@
       "title": "Despawn sprites that leave the screen",
       "instructions": "Iterate the group and call .delete() on any sprite past the bottom of the canvas. Otherwise your sketch slows to a crawl.",
       "hints": [
-        "Iterating a Group while deleting trips a subtle bug. The Groups docs has a section on safe removal. Use sprite.delete() to destroy — group.remove(sprite) only unparents."
+        "Iterating a Group while deleting trips a subtle bug. The Groups docs has a section on safe removal. Use sprite.delete() to destroy: group.remove(sprite) only unparents."
       ]
     }
   ],

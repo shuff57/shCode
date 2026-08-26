@@ -1,11 +1,11 @@
-## Chart the Code — The Three-State Machine
+## Chart the Code: The Three-State Machine
 
 **What you'll practise:**
 - Drawing one frame of a state machine
 - Separating "what state am I in" from "should I change state"
 - Finding a transition nobody wrote
 
-Of every chart in this course, this is the one that pays for itself most. A state machine written as a `switch` is a list; a state machine drawn is a **shape**, and you can see immediately which screens can reach which — including the ones that cannot be reached at all.
+Of every chart in this course, this is the one that pays for itself most. A state machine written as a `switch` is a list; a state machine drawn is a **shape**, and you can see immediately which screens can reach which, including the ones that cannot be reached at all.
 
 ### The code
 
@@ -28,7 +28,7 @@ function draw() {
 
 ### What to draw
 
-Chart **one frame** — one run of `draw()`, from the top to the end of the frame. The Start and End ovals are already placed and named for you.
+Chart **one frame**: one run of `draw()`, from the top to the end of the frame. The Start and End ovals are already placed and named for you.
 
 | Shape | Use it for |
 |---|---|
@@ -44,12 +44,12 @@ There are **two different kinds of diamond** on this chart and mixing them up is
 
 | Kind | Asks | Example |
 |---|---|---|
-| **Which state am I in?** | routing — where does this frame go | `state === "play"` |
-| **Should I change state?** | a transition — does the next frame go somewhere else | `playerDead` |
+| **Which state am I in?** | routing: where does this frame go | `state === "play"` |
+| **Should I change state?** | a transition: does the next frame go somewhere else | `playerDead` |
 
 Every state does its drawing *first*, and only then asks whether to leave. That order matters: if you flip it, the frame where the player dies never draws.
 
-Notice too that changing `state` does **not** jump anywhere. It sets a variable and the frame ends. The change only takes effect next frame, when the routing diamonds run again. On your chart, every path — including one that just changed the state — arrives at **end of frame**.
+Notice too that changing `state` does **not** jump anywhere. It sets a variable and the frame ends. The change only takes effect next frame, when the routing diamonds run again. On your chart, every path, including one that just changed the state: arrives at **end of frame**.
 
 That is the thing beginners get wrong in code and can see instantly in a picture.
 

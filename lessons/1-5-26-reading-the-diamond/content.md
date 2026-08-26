@@ -4,19 +4,19 @@ Of the three shapes, the diamond is the one worth studying. It has **one way in 
 
 Ovals and rectangles have exactly one way onward. Only the diamond branches.
 
-That shape is not a drawing convention. It is **selection from §1.4.4, drawn** — the same structure you named as one of the three that every program is built from, in picture form. `if` and `else` are what it becomes in code.
+That shape is not a drawing convention. It is **selection from §1.4.4, drawn**: the same structure you named as one of the three that every program is built from, in picture form. `if` and `else` are what it becomes in code.
 
 Three rules follow from it, and all three are enforced later by the class convention:
 
 1. **Both exits must exist.** A diamond with one arrow leaving it is a question whose "no" answer was never decided.
-2. **Both exits must be labelled** — yes and no. An unlabelled arrow leaves a reader guessing which case they are following.
+2. **Both exits must be labelled**: yes and no. An unlabelled arrow leaves a reader guessing which case they are following.
 3. **The paths rejoin.** A chart whose branches never meet again has two endings, which almost always means a step was forgotten.
 
 Rule 3 is the one beginners break most, and it is why 1.5.22's `ELSE do nothing` was worth writing out. An empty branch still has to arrive somewhere.
 
 **What you'll learn from it:**
 - The diamond is the only shape with two ways out.
-- It is selection — the §1.4 control structure — drawn.
+- It is selection: the §1.4 control structure: drawn.
 - Both exits must exist and both must be labelled yes and no.
 - The branches rejoin; two endings usually means a missing step.
 
@@ -41,7 +41,7 @@ console.log("end");
 
 Change `91` to `60` and run it again. The middle line differs; `leave the house` and `end` print either way, because they are past the rejoin.
 
-If `leave the house` only happened on one branch, you would have written a chart where forgetting to bring water also means never leaving — which is exactly the class of bug the rejoin rule prevents.
+If `leave the house` only happened on one branch, you would have written a chart where forgetting to bring water also means never leaving: which is exactly the class of bug the rejoin rule prevents.
 
 ---
 
@@ -53,4 +53,4 @@ If `leave the house` only happened on one branch, you would have written a chart
 | **branch** | One of the two paths out of a decision |
 | **rejoin** | Where the two branches meet again |
 | **selection** | The §1.4 control structure a diamond draws |
-| **dangling branch** | A path that never rejoins — usually a forgotten step |
+| **dangling branch** | A path that never rejoins, usually a forgotten step |

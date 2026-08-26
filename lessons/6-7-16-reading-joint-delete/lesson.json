@@ -1,10 +1,10 @@
 {
   "id": "6-7-16-reading-joint-delete",
-  "title": "6.8.6 Reading — moSHion docs: joint.delete()",
+  "title": "6.8.6 Reading: moSHion docs: joint.delete()",
   "description": "How joint.delete() releases a constraint at runtime so previously-joined sprites become independent. This is the release step in the slingshot pattern.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.8 Joints",
   "preview": "reading",
   "week": 17,

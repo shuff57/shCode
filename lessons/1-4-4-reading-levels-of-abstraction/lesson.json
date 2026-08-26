@@ -1,7 +1,7 @@
 {
   "id": "1-4-4-reading-levels-of-abstraction",
-  "title": "1.4.4 Reading — Level of Abstraction",
-  "description": "How much machine detail a language makes you handle — and why hiding it is a choice, not a shortcut.",
+  "title": "1.4.4 Reading: Level of Abstraction",
+  "description": "How much machine detail a language makes you handle, and why hiding it is a choice, not a shortcut.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

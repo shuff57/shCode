@@ -1,7 +1,7 @@
 // 2.5.6 Wrap Only What Can Fail
 //
 // This try block wraps too much. If the risky line fails, the total is
-// thrown away along with it — even though the total had nothing to do
+// thrown away along with it, even though the total had nothing to do
 // with the failure.
 //
 // STEP 1: Move the for loop (and the let total = 0; line) so they run

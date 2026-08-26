@@ -1,8 +1,8 @@
 ## Eight types, and that is all of them
 
-Every value in JavaScript has a **type**. A type tells you what kind of thing the value is — a number, a piece of text, a yes/no answer, and so on.
+Every value in JavaScript has a **type**. A type tells you what kind of thing the value is: a number, a piece of text, a yes/no answer, and so on.
 
-There are exactly eight basic data types. Not "about eight", not "eight common ones" — eight. Everything you will ever put in a variable is one of these:
+There are exactly eight basic data types. Not "about eight", not "eight common ones": eight. Everything you will ever put in a variable is one of these:
 
 | Type | Holds | Example |
 |---|---|---|
@@ -20,7 +20,7 @@ The next lessons take one row at a time. This one is the map, so that when you m
 **What you'll learn from it:**
 - Every value in JavaScript has a type.
 - There are exactly eight basic data types.
-- Seven of them are *primitive* — they hold one single thing.
+- Seven of them are *primitive*: they hold one single thing.
 - The eighth, `object`, holds collections. It gets its own lesson (1.2.22).
 
 **Try it:**
@@ -41,7 +41,7 @@ console.log(chosen);
 console.log(notSetYet);
 ```
 
-Notice the last one. `notSetYet` was declared and never given a value, and it still printed something. That is a type too — and it has its own lesson at 1.2.20.
+Notice the last one. `notSetYet` was declared and never given a value, and it still printed something. That is a type too, and it has its own lesson at 1.2.20.
 
 ---
 
@@ -50,6 +50,6 @@ Notice the last one. `notSetYet` was declared and never given a value, and it st
 | Term | Meaning |
 |------|---------|
 | **data type** | A classification telling the language what kind of value it is holding |
-| **value** | The actual thing stored — `42`, `"hello"`, `true` |
+| **value** | The actual thing stored: `42`, `"hello"`, `true` |
 | **primitive type** | A type whose values hold only a single thing |
-| **object** | The one non-primitive type — holds a collection of values |
+| **object** | The one non-primitive type: holds a collection of values |

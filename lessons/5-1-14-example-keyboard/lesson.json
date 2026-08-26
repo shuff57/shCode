@@ -1,10 +1,10 @@
 {
   "id": "5-1-14-example-keyboard",
-  "title": "5.1.14 Worked Example — Keyboard Movement",
+  "title": "5.1.14 Worked Example: Keyboard Movement",
   "description": "Teacher-led walkthrough of the if/else-if/else pattern for keyboard movement and the drift-bug. Read before Make it Move.",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
   "preview": "example",
   "week": 10,

@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed — capstone lab, assignment code A2.1.1 per curriculum-plan §2.1 Assignments; draws on book 2.1.1 if, 2.1.3 else, 2.1.4 else if, and 2.1.8 combining conditions",
+  "sourceRef": "designed: capstone lab, assignment code A2.1.1 per curriculum-plan §2.1 Assignments; draws on book 2.1.1 if, 2.1.3 else, 2.1.4 else if, and 2.1.8 combining conditions",
   "steps": [
     {
       "id": "s1",
@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "title": "Chain a grade recommendation on score",
-      "instructions": "Write an else if chain (at least two else if branches) that picks a recommendation string based on score — for example 'Recommend: A', 'Recommend: B', and so on down to a lowest tier."
+      "instructions": "Write an else if chain (at least two else if branches) that picks a recommendation string based on score, for example 'Recommend: A', 'Recommend: B', and so on down to a lowest tier."
     },
     {
       "id": "s3",

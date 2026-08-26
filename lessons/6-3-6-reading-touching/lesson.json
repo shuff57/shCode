@@ -1,10 +1,10 @@
 {
   "id": "6-3-6-reading-touching",
-  "title": "6.3.6 Reading — moSHion docs: Colliding + Ground Detection",
+  "title": "6.3.6 Reading: moSHion docs: Colliding + Ground Detection",
   "description": "moshion docs on `sprite.colliding(other)` and the ground-gated jump idiom. Read before `2.3.18 Ground Detection`.",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.3 Physics Applications",
   "preview": "reading",
   "week": 14,

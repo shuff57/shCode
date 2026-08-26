@@ -1,4 +1,4 @@
-// 2.2.4c Lab — Write a property.
+// 2.2.4c Lab: Write a property.
 
 class Box {
   constructor() {

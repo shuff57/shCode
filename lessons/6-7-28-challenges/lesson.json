@@ -1,10 +1,10 @@
 {
   "id": "6-7-28-challenges",
-  "title": "6.7.24 Challenges — SliderJoint, Trebuchet, Swinging Rope",
+  "title": "6.7.24 Challenges: SliderJoint, Trebuchet, Swinging Rope",
   "description": "Three optional stretch prompts for Unit 2.7: build a SliderJoint piston sandbox, a trebuchet that uses a DistanceJoint + HingeJoint together, or a swinging rope chain with three or more HingeJoints.",
   "type": "challenge",
   "estimateMins": 30,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.7 Advanced Input",
   "preview": "moshion",
   "week": 17,
@@ -40,7 +40,7 @@
     {
       "id": "s4",
       "title": "Use one stretch joint feature",
-      "instructions": "Pick one challenge from content.md and implement it. Any of the three prompts — SliderJoint sandbox, trebuchet, or swinging rope — will satisfy this requirement.",
+      "instructions": "Pick one challenge from content.md and implement it. Any of the three prompts: SliderJoint sandbox, trebuchet, or swinging rope: will satisfy this requirement.",
       "hints": [
         "content.md describes all three challenges with API hints. Pick the one that interests you most."
       ]

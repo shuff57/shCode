@@ -1,10 +1,10 @@
 {
   "id": "6-6-6-reading-switch-break-default",
-  "title": "6.6.6 Reading — break and default in switch",
+  "title": "6.6.6 Reading: break and default in switch",
   "description": "break exits the switch; without it, execution falls through to the next case. default handles unexpected values.",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "reading",
   "week": 17,

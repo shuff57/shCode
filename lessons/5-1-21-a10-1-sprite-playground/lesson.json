@@ -4,7 +4,7 @@
   "description": "Build a sprite playground combining canvas, WASD-controlled sprite, auto-motion, and on-screen text. Auto-graded.",
   "type": "assignment",
   "estimateMins": 45,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
   "preview": "moshion",
   "week": 10,
@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Create a canvas and two sprites",
-      "instructions": "Make a canvas (any size between 300×300 and 800×600) and two sprites — one `player` (controllable) and one `mover` (moves on its own).",
+      "instructions": "Make a canvas (any size between 300×300 and 800×600) and two sprites: one `player` (controllable) and one `mover` (moves on its own).",
       "hints": []
     },
     {
@@ -23,7 +23,7 @@
       "title": "Wire WASD movement to the player",
       "instructions": "Use `kb.pressing('a')` / `'d'` / `'w'` / `'s'` to set the player's velocity. Include an else branch that resets velocity to 0 when no key is held.",
       "hints": [
-        "Don't use arrow keys in this lab — they also scroll the browser iframe."
+        "Don't use arrow keys in this lab: they also scroll the browser iframe."
       ]
     },
     {

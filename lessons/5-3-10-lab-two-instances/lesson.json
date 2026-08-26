@@ -1,10 +1,10 @@
 {
   "id": "5-3-10-lab-two-instances",
-  "title": "5.3.10 Lab — Two sprites, two property values",
+  "title": "5.3.10 Lab: Two sprites, two property values",
   "description": "Instantiate b1 and b2 from the same class with different colors, then mutate only b1 to confirm each instance's state is independent.",
   "type": "lesson",
   "estimateMins": 8,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.3 Classes and Objects via moSHion",
   "preview": "moshion",
   "week": 12,
@@ -24,7 +24,7 @@
     {
       "id": "s2",
       "title": "Mutate only b1 and confirm b2 is unaffected",
-      "instructions": "In `draw()`, press space to change `b1.color` to a new color. Watch the screen — `b2` should stay blue no matter what you do to `b1`.",
+      "instructions": "In `draw()`, press space to change `b1.color` to a new color. Watch the screen: `b2` should stay blue no matter what you do to `b1`.",
       "hints": [
         "Open the moSHion docs drawer on the right and find the keyboard input section."
       ]
@@ -34,7 +34,7 @@
     {
       "id": "r1",
       "title": "Two distinct new Box(...) calls",
-      "description": "Create `b1` and `b2` with separate `new Box(...)` calls — each gets its own color argument.",
+      "description": "Create `b1` and `b2` with separate `new Box(...)` calls: each gets its own color argument.",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Box\\s*\\([\\s\\S]*?new\\s+Box\\s*\\(",

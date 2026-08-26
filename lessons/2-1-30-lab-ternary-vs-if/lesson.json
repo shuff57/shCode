@@ -11,12 +11,12 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.1.7 — 'Non-traditional Use of ?', Try It Now 2.7",
+  "sourceRef": "book 2.1.7: 'Non-traditional Use of ?', Try It Now 2.7",
   "steps": [
     {
       "id": "s1",
       "title": "Read the misused ternary",
-      "instructions": "The comment below shows a ternary being used to run two different actions instead of picking a value: (loggedIn == \"yes\") ? console.log(\"Welcome back!\") : console.log(\"Please log in.\");"
+      "instructions": "The comment below shows a ternary being used to run two different actions instead of picking a value: (loggedIn == \"yes\") ? console.log(\"Welcome back!\"): console.log(\"Please log in.\");"
     },
     {
       "id": "s2",

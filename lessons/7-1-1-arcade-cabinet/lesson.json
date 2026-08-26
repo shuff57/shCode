@@ -1,10 +1,10 @@
 {
   "id": "7-1-1-arcade-cabinet",
   "title": "7.1.1 Arcade Cabinet (Q2 Synthesis)",
-  "description": "Q2 synthesis: ship a game you designed. The checklist is the spec — twelve things the game must contain. Everything else is your call.",
+  "description": "Q2 synthesis: ship a game you designed. The checklist is the spec: twelve things the game must contain. Everything else is your call.",
   "type": "project",
   "estimateMins": 300,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.1 Arcade Cabinet (Q2 Synthesis)",
   "preview": "moshion",
   "week": 18,
@@ -31,7 +31,7 @@
     {
       "id": "s4",
       "title": "An overlap or a collision that changes the game",
-      "instructions": "Changes something a player would notice — score, health, a sprite disappearing. Two sprites bumping and nothing happening does not count."
+      "instructions": "Changes something a player would notice: score, health, a sprite disappearing. Two sprites bumping and nothing happening does not count."
     },
     {
       "id": "s5",
@@ -40,7 +40,7 @@
     {
       "id": "s6",
       "title": "Motion you tuned on purpose",
-      "instructions": "Gravity, friction, bounciness, drag, velocity — pick what your game needs and set it to a value you chose, not the default."
+      "instructions": "Gravity, friction, bounciness, drag, velocity: pick what your game needs and set it to a value you chose, not the default."
     },
     {
       "id": "s7",
@@ -60,7 +60,7 @@
     {
       "id": "s10",
       "title": "An array of game data that a loop reads",
-      "instructions": "Levels, waves, spawn points, dialogue lines — whatever your game has more than one of."
+      "instructions": "Levels, waves, spawn points, dialogue lines: whatever your game has more than one of."
     },
     {
       "id": "s11",
@@ -83,7 +83,7 @@
     {
       "id": "req1",
       "title": "A class of your own",
-      "description": "A class you declared yourself — any name, any purpose, capitalised like every class you have written since 5.4. The checker cannot tell whether you made two of them; the teacher reads for that.",
+      "description": "A class you declared yourself: any name, any purpose, capitalised like every class you have written since 5.4. The checker cannot tell whether you made two of them; the teacher reads for that.",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bclass\\s+[A-Z][\\w$]*\\s*(?:extends\\s+[\\w$.]+\\s*)?\\{",
@@ -133,7 +133,7 @@
     {
       "id": "req6",
       "title": "Game states",
-      "description": "A state variable set to a named state — 'title', 'play', 'gameover', or whatever you called yours. The checker cannot count your states; the teacher reads for three.",
+      "description": "A state variable set to a named state: 'title', 'play', 'gameover', or whatever you called yours. The checker cannot count your states; the teacher reads for three.",
       "type": "regex",
       "file": "script.js",
       "pattern": "state\\w*\\s*=\\s*['\"`]\\w+['\"`]",
@@ -143,7 +143,7 @@
     {
       "id": "req7",
       "title": "Saves and loads",
-      "description": "storeItem writes it, getItem reads it back — both, or it does not survive the tab closing",
+      "description": "storeItem writes it, getItem reads it back: both, or it does not survive the tab closing",
       "type": "regex",
       "file": "script.js",
       "pattern": "storeItem\\s*\\([\\s\\S]*getItem\\s*\\(|getItem\\s*\\([\\s\\S]*storeItem\\s*\\(",
@@ -173,7 +173,7 @@
     {
       "id": "req10",
       "title": "A loop that reads it",
-      "description": "for, for...of, or forEach — an array nobody loops over is just storage",
+      "description": "for, for...of, or forEach: an array nobody loops over is just storage",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bfor\\s*\\(|\\.\\s*forEach\\s*\\(",
@@ -183,7 +183,7 @@
     {
       "id": "req11",
       "title": "Tests report PASS or FAIL",
-      "description": "A check that prints PASS when it matches the known answer and FAIL when it does not — the words in quotes, because they get printed. The checker cannot count your tests; three is on you, and the teacher reads for it.",
+      "description": "A check that prints PASS when it matches the known answer and FAIL when it does not: the words in quotes, because they get printed. The checker cannot count your tests; three is on you, and the teacher reads for it.",
       "type": "regex",
       "file": "script.js",
       "pattern": "(['\"`][^'\"`\\n]*PASS[\\s\\S]{0,300}FAIL)|(['\"`][^'\"`\\n]*FAIL[\\s\\S]{0,300}PASS)",

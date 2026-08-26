@@ -7,7 +7,7 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "console",
-  "sourceRef": "designed — practice writing both for and while for §2.4.1 'Choosing a Loop'",
+  "sourceRef": "designed: practice writing both for and while for §2.4.1 'Choosing a Loop'",
   "week": 6,
   "slos": [
     "SLO-3"
@@ -15,13 +15,13 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Known count — use for",
+      "title": "Known count: use for",
       "instructions": "Use a for loop to print the numbers 1 through 8, one per console.log call. The count (8) is known before the loop starts, so for is the right tool."
     },
     {
       "id": "s2",
-      "title": "Unknown count — use while",
-      "instructions": "Declare a variable called total set to 1. Use a while loop that doubles total on every pass, stopping once total is greater than 100. Log total after the loop. You cannot know in advance how many doublings that takes — that is why this one is a while loop, not a for loop."
+      "title": "Unknown count: use while",
+      "instructions": "Declare a variable called total set to 1. Use a while loop that doubles total on every pass, stopping once total is greater than 100. Log total after the loop. You cannot know in advance how many doublings that takes: that is why this one is a while loop, not a for loop."
     }
   ],
   "requirements": [

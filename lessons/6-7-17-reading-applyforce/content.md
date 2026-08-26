@@ -1,18 +1,18 @@
 ## applyForce(fx, fy)
 
-**Read before attempting `6.7.14 Worked Example — Launch a Sprite with applyForce`.**
+**Read before attempting `6.7.14 Worked Example: Launch a Sprite with applyForce`.**
 
-`sprite.applyForce(fx, fy)` gives a sprite a one-frame push. The physics engine takes that push and adds it to the sprite's motion — so if you press Space once, the sprite moves, and it keeps moving (subject to gravity and friction) even after you let go.
+`sprite.applyForce(fx, fy)` gives a sprite a one-frame push. The physics engine takes that push and adds it to the sprite's motion, so if you press Space once, the sprite moves, and it keeps moving (subject to gravity and friction) even after you let go.
 
 This is different from setting `sprite.vel.x` directly. Setting velocity *replaces* whatever motion the sprite already has. `applyForce` *adds* to it, which means the physics simulation stays in charge and the result feels natural.
 
 **What you'll learn from it:**
-- `applyForce(fx, fy)` adds a one-frame impulse — `fx` is the horizontal push, `fy` is the vertical push.
+- `applyForce(fx, fy)` adds a one-frame impulse: `fx` is the horizontal push, `fy` is the vertical push.
 - Negative `fy` pushes upward (canvas y grows downward, so negative = up).
 - The impulse is applied once; motion continues because the physics engine integrates it.
-- `applyForce` works with gravity — if gravity is on, the ball arcs realistically after the impulse.
+- `applyForce` works with gravity, if gravity is on, the ball arcs realistically after the impulse.
 
-**Try it:** press Space. The ball jumps. Press Space again mid-air and it gets another boost. Notice the ball stays in the air for a bit — gravity pulls it back down, not your code.
+**Try it:** press Space. The ball jumps. Press Space again mid-air and it gets another boost. Notice the ball stays in the air for a bit: gravity pulls it back down, not your code.
 
 ```js live
 let ball;

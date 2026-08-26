@@ -1,10 +1,10 @@
 {
   "id": "5-3-17-lab-method-no-params",
-  "title": "5.4.2 Lab — Method with no params",
-  "description": "Write `Counter.tick()` — a method that takes no arguments and mutates `this.n`. First method you write from scratch.",
+  "title": "5.4.2 Lab: Method with no params",
+  "description": "Write `Counter.tick()`: a method that takes no arguments and mutates `this.n`. First method you write from scratch.",
   "type": "lesson",
   "estimateMins": 8,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
   "preview": "moshion",
   "week": 12,

@@ -1,10 +1,10 @@
 {
   "id": "6-6-12-video-gameover-restart",
-  "title": "6.6.12 Video — Game Over and Restart",
+  "title": "6.6.12 Video: Game Over and Restart",
   "description": "The game over screen shows the final score and 'Press R to restart'. Restart means resetting variables + changing state back to 'play' (or 'title').",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "video",
   "week": 17,

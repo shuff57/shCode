@@ -1,4 +1,4 @@
-// 6.6.27 Challenges — Extended State Features (reference solution).
+// 6.6.27 Challenges: Extended State Features (reference solution).
 //
 // The challenge this one takes: add a PAUSE state that remembers where it
 // came from, so unpausing returns you to play rather than to the title. That
@@ -33,7 +33,7 @@ function draw() {
 
   switch (state) {
     case 'title':
-      text('ARCADE — press enter to start', 120, 200);
+      text('ARCADE: press enter to start', 120, 200);
       if (kb.presses('enter')) {
         score = 0;
         goTo('play');
@@ -50,7 +50,7 @@ function draw() {
       break;
 
     case 'paused':
-      text('PAUSED — p resumes, q quits to title', 100, 200);
+      text('PAUSED: p resumes, q quits to title', 100, 200);
       // Resume to whatever we paused FROM. Hard-coding 'play' here is the
       // bug this challenge exists to avoid.
       if (kb.presses('p')) goTo(previousState);
@@ -58,7 +58,7 @@ function draw() {
       break;
 
     case 'gameover':
-      text('GAME OVER — score ' + score, 150, 190);
+      text('GAME OVER: score ' + score, 150, 190);
       text('enter plays again', 170, 220);
       if (kb.presses('enter')) goTo('title');
       break;

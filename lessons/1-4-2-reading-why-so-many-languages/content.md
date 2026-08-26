@@ -4,13 +4,13 @@ There are thousands of programming languages and new ones appear every year. Tha
 
 | Language | Designed for |
 |---|---|
-| **JavaScript** | Making web pages interactive — and it is the only language every browser runs, which is why this course uses it |
+| **JavaScript** | Making web pages interactive, and it is the only language every browser runs, which is why this course uses it |
 | **Python** | Data analysis and teaching; prized for being quick to read |
-| **C** | Work that talks closely to the hardware — operating systems, device drivers |
+| **C** | Work that talks closely to the hardware: operating systems, device drivers |
 | **SQL** | One thing: asking questions of a database. You cannot write a game in it, and it was never meant for that |
 | **Swift** / **Kotlin** | Phone apps, on iOS and Android respectively |
 
-That is a list of *jobs*, not a ranking. Asking which language is best is like asking which tool in a toolbox is best — the honest answer is another question: **best for what?**
+That is a list of *jobs*, not a ranking. Asking which language is best is like asking which tool in a toolbox is best: the honest answer is another question: **best for what?**
 
 **What you'll learn from it:**
 - A language is designed for a kind of work, not to win a competition.
@@ -31,7 +31,7 @@ for (let i = 0; i < languages.length; i = i + 1) {
 }
 ```
 
-Languages come and go faster than the ideas do. Variables, conditions, loops, functions and data structures turn up in nearly all of them — which is why your second language takes dramatically less time to learn than your first. The second time, you are only learning new spellings for things you already understand.
+Languages come and go faster than the ideas do. Variables, conditions, loops, functions and data structures turn up in nearly all of them: which is why your second language takes dramatically less time to learn than your first. The second time, you are only learning new spellings for things you already understand.
 
 ---
 
@@ -39,7 +39,7 @@ Languages come and go faster than the ideas do. Variables, conditions, loops, fu
 
 | Term | Meaning |
 |------|---------|
-| **purpose driven** | A language is designed for a kind of work — the reason so many exist |
-| **domain-specific language** | A language built for one narrow job — SQL for databases |
-| **trade-off** | What you give up to get something else — the real basis for a language choice |
+| **purpose driven** | A language is designed for a kind of work: the reason so many exist |
+| **domain-specific language** | A language built for one narrow job: SQL for databases |
+| **trade-off** | What you give up to get something else: the real basis for a language choice |
 | **"best for what?"** | The question that replaces "which language is best?" |

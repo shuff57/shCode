@@ -1,7 +1,7 @@
 {
   "id": "2-2-5-reading-for-loop",
-  "title": "2.2.9 Reading — The for Loop",
-  "description": "Learn the three-part for loop: init, condition, increment. Count to five, then sum a range — the two moves you'll use everywhere.",
+  "title": "2.2.9 Reading: The for Loop",
+  "description": "Learn the three-part for loop: init, condition, increment. Count to five, then sum a range: the two moves you'll use everywhere.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.2.4 — 'Introduction to Loops', Definition 2.2.3: Loop, for-loop syntax, Insight Note (off-by-one condition)",
+  "sourceRef": "book 2.2.4: 'Introduction to Loops', Definition 2.2.3: Loop, for-loop syntax, Insight Note (off-by-one condition)",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

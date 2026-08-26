@@ -1,10 +1,10 @@
 {
   "id": "6-4-15-reading-sprite-layer",
-  "title": "6.4.15 Reading — sprite.layer (render order)",
+  "title": "6.4.15 Reading: sprite.layer (render order)",
   "description": "How sprite.layer = N controls draw order so HUD elements always render on top of world geometry. Read before 2.4.10 (A15.1 Platformer).",
   "type": "lesson",
   "estimateMins": 6,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
   "preview": "reading",
   "week": 15,

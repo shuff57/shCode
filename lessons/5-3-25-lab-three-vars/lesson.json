@@ -1,10 +1,10 @@
 {
   "id": "5-3-25-lab-three-vars",
-  "title": "5.4.11 Lab — Three Enemies in three variables",
-  "description": "Instantiate e1, e2, and e3 from the Enemy class at three different positions — three independent instances, each in its own named variable.",
+  "title": "5.4.11 Lab: Three Enemies in three variables",
+  "description": "Instantiate e1, e2, and e3 from the Enemy class at three different positions: three independent instances, each in its own named variable.",
   "type": "lesson",
   "estimateMins": 6,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
   "preview": "moshion",
   "week": 12,
@@ -16,9 +16,9 @@
     {
       "id": "s1",
       "title": "Create e1, e2, e3 at three different positions",
-      "instructions": "In `setup()`, create three Enemy instances — `e1`, `e2`, and `e3` — at three different x/y positions. Each call to `new Enemy(x, y, hp)` produces a separate object with its own state.",
+      "instructions": "In `setup()`, create three Enemy instances: `e1`, `e2`, and `e3`, at three different x/y positions. Each call to `new Enemy(x, y, hp)` produces a separate object with its own state.",
       "hints": [
-        "Open the moSHion docs drawer on the right and review how constructor arguments work — each Enemy takes an x, y, and hp value."
+        "Open the moSHion docs drawer on the right and review how constructor arguments work: each Enemy takes an x, y, and hp value."
       ]
     }
   ],
@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "Three separate new Enemy(...) calls",
-      "description": "Create three Enemy instances — `e1`, `e2`, and `e3` — in `setup()`. Each must be a distinct `new Enemy(...)` call.",
+      "description": "Create three Enemy instances: `e1`, `e2`, and `e3`, in `setup()`. Each must be a distinct `new Enemy(...)` call.",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:new\\s+Enemy\\s*\\([\\s\\S]*?){3}",

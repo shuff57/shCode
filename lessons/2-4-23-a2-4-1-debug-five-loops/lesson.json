@@ -7,7 +7,7 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "console",
-  "sourceRef": "designed — A2.4.1, curriculum-plan.md §2.4 Assignments",
+  "sourceRef": "designed: A2.4.1, curriculum-plan.md §2.4 Assignments",
   "week": 6,
   "slos": [
     "SLO-3"
@@ -15,34 +15,34 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Program 1 — infinite loop, missing update",
+      "title": "Program 1: infinite loop, missing update",
       "instructions": "The commented-out version of Program 1 never stops because n never changes. Write a fixed, runnable version below it that logs n from 1 to 5, then stops. Add a comment explaining what was wrong."
     },
     {
       "id": "s2",
-      "title": "Program 2 — infinite loop, wrong-direction update",
+      "title": "Program 2: infinite loop, wrong-direction update",
       "instructions": "Program 2's counter moves away from the stopping point instead of toward it. Write a fixed version that logs count from 10 down to 1. Add a comment explaining what was wrong."
     },
     {
       "id": "s3",
-      "title": "Program 3 — off by one, misses the last value",
+      "title": "Program 3, off by one, misses the last value",
       "instructions": "Program 3 is supposed to log 1 through 5 but its comparison stops one value too early. Write a fixed version. Add a comment explaining what was wrong."
     },
     {
       "id": "s4",
-      "title": "Program 4 — off by one, one extra value",
+      "title": "Program 4, off by one, one extra value",
       "instructions": "Program 4 is supposed to log 1 through 5 but starts one value too early, printing an extra line. Write a fixed version. Add a comment explaining what was wrong."
     },
     {
       "id": "s5",
-      "title": "Program 5 — do...while logic error",
+      "title": "Program 5: do...while logic error",
       "instructions": "Program 5 is supposed to guarantee the greeting prints at least once no matter what greeted starts as, but it's written as a plain while loop that can skip the body entirely. Rewrite it as a do...while loop. Add a comment explaining what was wrong."
     }
   ],
   "requirements": [
     {
       "id": "r1",
-      "title": "Program 1 fixed — update added",
+      "title": "Program 1 fixed: update added",
       "description": "The fixed version of Program 1 includes an increment on n",
       "type": "regex",
       "file": "script.js",
@@ -52,7 +52,7 @@
     },
     {
       "id": "r2",
-      "title": "Program 2 fixed — update moves the right way",
+      "title": "Program 2 fixed: update moves the right way",
       "description": "The fixed version of Program 2 decreases count instead of increasing it",
       "type": "regex",
       "file": "script.js",
@@ -62,7 +62,7 @@
     },
     {
       "id": "r3",
-      "title": "Program 3 fixed — inclusive comparison",
+      "title": "Program 3 fixed: inclusive comparison",
       "description": "The fixed version of Program 3 uses an inclusive comparison so it reaches 5",
       "type": "regex",
       "file": "script.js",
@@ -72,7 +72,7 @@
     },
     {
       "id": "r4",
-      "title": "Program 4 fixed — starts at 1",
+      "title": "Program 4 fixed: starts at 1",
       "description": "The fixed version of Program 4 starts its counter at 1, not 0",
       "type": "regex",
       "file": "script.js",
@@ -82,7 +82,7 @@
     },
     {
       "id": "r5",
-      "title": "Program 5 fixed — do...while used",
+      "title": "Program 5 fixed: do...while used",
       "description": "The fixed version of Program 5 is a do...while loop",
       "type": "regex",
       "file": "script.js",

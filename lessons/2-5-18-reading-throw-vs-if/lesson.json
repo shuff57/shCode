@@ -1,6 +1,6 @@
 {
   "id": "2-5-18-reading-throw-vs-if",
-  "title": "2.5.18 Reading — throw vs if: The Distance Rule",
+  "title": "2.5.18 Reading: throw vs if: The Distance Rule",
   "description": "Decide when a problem deserves a throw and when a plain if is simpler. Read before 2.5.19 Reject the Bad Input.",
   "type": "lesson",
   "estimateMins": 10,
@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.5.4 — Context Pause (throw vs if, the distance rule)",
+  "sourceRef": "book 2.5.4: Context Pause (throw vs if, the distance rule)",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

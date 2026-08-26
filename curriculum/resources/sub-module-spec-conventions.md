@@ -1,12 +1,12 @@
 # Sub-Module Spec Conventions
 
-Canonical rules for the per-sub-module Markdown specs at `curriculum/modules/<U.M>_<topic>.md`. A sub-module spec is the **teacher-facing planning doc for ONE pedagogical sub-module**. Its job is to drive lesson authoring downstream — when the user says "build 2.3.1," the spec is what Claude reads + acts on. The artifact-type conventions in this directory cover *how* to author each lesson; this doc covers *what a sub-module spec must contain to make that authoring possible.*
+Canonical rules for the per-sub-module Markdown specs at `curriculum/modules/<U.M>_<topic>.md`. A sub-module spec is the **teacher-facing planning doc for ONE pedagogical sub-module**. Its job is to drive lesson authoring downstream: when the user says "build 2.3.1," the spec is what Claude reads + acts on. The artifact-type conventions in this directory cover *how* to author each lesson; this doc covers *what a sub-module spec must contain to make that authoring possible.*
 
 **Applies to:** every file under `curriculum/modules/*.md` (e.g. `6.1_groups-overlaps.md`, `6.3_physics-applications.md`).
 
-**Canonical reference:** none currently — the pre-2026-08-12 example (`curriculum/modules/lessons/2.3.1_groups-overlaps.md`) was retired along with the old `Q.U.S` numbering scheme (see `BOOK-TO-MODULE.md`). The next module spec written to this convention under the book-native `<U.M>` scheme becomes the new canonical reference.
+**Canonical reference:** none currently: the pre-2026-08-12 example (`curriculum/modules/lessons/2.3.1_groups-overlaps.md`) was retired along with the old `Q.U.S` numbering scheme (see `BOOK-TO-MODULE.md`). The next module spec written to this convention under the book-native `<U.M>` scheme becomes the new canonical reference.
 
-**No longer distinct from a "unit-level index doc".** Before 2026-08-12, `curriculum/modules/<U.M>_*.md` was a short unit-level index and the full sub-module build spec lived in a separate `curriculum/modules/lessons/<U.M.Y>_*.md` file. Under the book-native scheme a sub-module now *is* one book section, which is exactly what `Module N.S` already means — so the two-tier split is gone. `curriculum/modules/<U.M>_*.md` is now the sub-module spec directly; there is no separate `lessons/` subdirectory.
+**No longer distinct from a "unit-level index doc".** Before 2026-08-12, `curriculum/modules/<U.M>_*.md` was a short unit-level index and the full sub-module build spec lived in a separate `curriculum/modules/lessons/<U.M.Y>_*.md` file. Under the book-native scheme a sub-module now *is* one book section, which is exactly what `Module N.S` already means, so the two-tier split is gone. `curriculum/modules/<U.M>_*.md` is now the sub-module spec directly; there is no separate `lessons/` subdirectory.
 
 ---
 
@@ -16,13 +16,13 @@ Canonical rules for the per-sub-module Markdown specs at `curriculum/modules/<U.
 section index carries straight through: book §3.7 becomes sub-module `1.3.7`. Two book
 sections are never merged into one spec, and one book section never splits across two.
 
-**Sub-modules are sized in DAYS of class, 1 to 3.** Three is the ceiling — that is a full
+**Sub-modules are sized in DAYS of class, 1 to 3.** Three is the ceiling: that is a full
 week. Most sub-modules are 1 or 2. Weeks are not a field on a spec at all; the calendar
 groups sub-modules into weeks downstream, and that grouping can change without touching
 any spec.
 
 This replaces the older "a sub-module is typically one week" rule. Specs written under
-that rule carry `week:`, `contactHours:` and `sessions:` — see §1.1 for how to migrate.
+that rule carry `week:`, `contactHours:` and `sessions:`: see §1.1 for how to migrate.
 
 ## 0.1 A sub-module id IS its lesson-slot prefix
 
@@ -39,7 +39,7 @@ sequence ends.
 
 **History (pre-2026-08-12):** under the retired `Q.U.S` scheme, several sub-modules could
 share one wider "unit," and lesson slots counted up flat across the whole unit instead of
-resetting per sub-module — so a sub-module's id and its lesson-slot range could diverge
+resetting per sub-module, so a sub-module's id and its lesson-slot range could diverge
 (e.g. sub-module `2.3.1` might start mid-range at lesson slot `2.3.14`). That divergence no
 longer exists: `Unit N = book Chapter N`, `Module N.S = book Chapter N §S`, and each module's
 lesson slots are always its own `N.S.1 … N.S.K`.
@@ -51,11 +51,11 @@ numbers. The `localeCompare(..., { numeric: true })` sort still orders slots cor
 Rejected alternative: four-part lesson numbering (`<U>.<M>.<Y>.<L>`). It reads better but
 changes the title contract that built lessons already satisfy, for no functional gain.
 
-## 1. YAML frontmatter — required shape
+## 1. YAML frontmatter: required shape
 
 ```yaml
 ---
-id: "<U.M.Y>"               # e.g. "2.3.1" — three-part dotted id matching the filename
+id: "<U.M.Y>"               # e.g. "2.3.1": three-part dotted id matching the filename
 title: <Sub-Module Title>   # e.g. "Groups and Overlaps"
 unit: "<U.M> <Unit Name>"   # e.g. "2.3 Collections and Physics Applications"
 quarter: <1-4>
@@ -76,39 +76,39 @@ status: draft|ready|shipped
 ---
 ```
 
-`id` MUST match the filename's `<U.M.Y>` prefix. `title` MUST NOT include numbering (the file id encodes that). `bookSection` MUST name exactly one section — if a spec needs two, it is two specs.
+`id` MUST match the filename's `<U.M.Y>` prefix. `title` MUST NOT include numbering (the file id encodes that). `bookSection` MUST name exactly one section, if a spec needs two, it is two specs.
 
 ### 1.1 Migrating a pre-2026-08-10 spec
 
 Older specs carry `week:`, `contactHours:` and `sessions:`. Replace all three with `days:`
 and add `bookSection:`. A day is roughly 1.75 contact hours, so the old `sessions: 2`
-(3.5 hours) is `days: 2`. Do not keep the old fields alongside the new one — two
+(3.5 hours) is `days: 2`. Do not keep the old fields alongside the new one: two
 scheduling fields is how a spec starts disagreeing with the calendar.
 
 ## 2. Required sections, in order
 
-1. **Header banner** — one or two block-quote lines stating the book section, day count, environment, and SLO focus. For intro-level units, include a third line stating the granularity bar ("each lesson ships exactly one new concept"). See §2a.
-2. **Context** — 1–3 paragraphs of *why this sub-module exists* + a `**Do NOT:**` bulleted list of pedagogical anti-patterns (the things teachers regret when they ignore them). For intro-level units, the Context block must also state the audience explicitly and reference the granularity bar (§2a).
-3. **Learning Objectives** — numbered list ("Students will be able to: 1. … 2. …"). 4–7 items for advanced units; 8–12 items typical for intro-level units (one objective per atomic concept the unit owns).
-4. **Topics Covered** — bulleted list of concepts and APIs introduced (no rubric content here — that's §Assignments). For intro-level units, **each bullet is a single atomic concept and corresponds 1:1 to a Numbered Lesson List slot** (§3.3). Group bullets under bold sub-headers when helpful (e.g. *Vocabulary*, *Methods, by shape*) but do not merge two concepts into one bullet.
-5. **Prerequisites** — bullet list of prior sub-modules + cross-unit prereqs (e.g. "Q1 W8 arrays comfortable").
-6. **Environment Setup** — anything beyond "standard moSHion setup" (projector tabs, handouts, supporting tools).
-7. **Videos** — table per §3.1.
-8. **Readings** — table per §3.2 + per-reading **Reading content guidance** subsection per §3.2.
-9. **In-App Lessons (carry-overs)** — list of pre-existing `lessons/<slug>/` to migrate, per §3.4. Skip the section entirely if nothing is being carried over.
-10. **Worked Examples (teacher-led)** — numbered `### Worked Example N — <topic> (<minutes>)` blocks with full code samples in fenced ```js blocks. These are the live-in-class demos *and* the spec for the matching `preview: "example"` lessons.
-11. **Challenges (optional stretch)** — bulleted list of stretch ideas. Becomes the `<U-M-L>-challenges` lesson's `content.md`.
-12. **Day Plan** — one table per class day, matching the `days:` count. Columns: `Time | Activity | Notes`.
-13. **Assignments** — for each `A<W>.<N>` artifact: type, est. time, due, task description, requirements, pass criteria. Lab assignments per `lab-assignment-conventions.md`; written per `written-assignment-conventions.md`. Do not author rubrics in points language — q5 lessons / labs / challenges are mastery-based (all-green Submit gate; see `moshion-lesson-conventions.md` §1 + §5). Written (AI-graded) assignments are *not* all-green-gated — they allow partial credit by design; see `written-assignment-conventions.md` §4 for the actual threshold.
-14. **Vocabulary** — 5–10 row table `Term | Definition`. Doubles as the source rows for the closing glossary in matching reading lessons.
-15. **Teacher Notes** — bullet list of pacing tips, common student bugs, retention rules (for SLO-evidence artifacts).
-16. **Numbered Lesson List** — per §3.3. **This is the build target** — Claude reads this section when the user says "build 2.X.Y."
-17. **Lab and Reading Specs (per-lesson detail)** — required for intro-level units that use the §2a one-concept-per-lesson rule. One block per net-new lesson in the Numbered Lesson List, giving the single concept isolated, the starter shape (for moSHion labs) or try-it shape (for readings), and the pass criterion. Lets each lesson be authored independently from this section without re-reading the rest of the spec. Optional for advanced units where each Numbered Lesson List row is self-explanatory.
-18. **Status** — one bullet matching the YAML `status` field.
+1. **Header banner**: one or two block-quote lines stating the book section, day count, environment, and SLO focus. For intro-level units, include a third line stating the granularity bar ("each lesson ships exactly one new concept"). See §2a.
+2. **Context**: 1–3 paragraphs of *why this sub-module exists* + a `**Do NOT:**` bulleted list of pedagogical anti-patterns (the things teachers regret when they ignore them). For intro-level units, the Context block must also state the audience explicitly and reference the granularity bar (§2a).
+3. **Learning Objectives**: numbered list ("Students will be able to: 1. … 2. …"). 4–7 items for advanced units; 8–12 items typical for intro-level units (one objective per atomic concept the unit owns).
+4. **Topics Covered**: bulleted list of concepts and APIs introduced (no rubric content here: that's §Assignments). For intro-level units, **each bullet is a single atomic concept and corresponds 1:1 to a Numbered Lesson List slot** (§3.3). Group bullets under bold sub-headers when helpful (e.g. *Vocabulary*, *Methods, by shape*) but do not merge two concepts into one bullet.
+5. **Prerequisites**: bullet list of prior sub-modules + cross-unit prereqs (e.g. "Q1 W8 arrays comfortable").
+6. **Environment Setup**: anything beyond "standard moSHion setup" (projector tabs, handouts, supporting tools).
+7. **Videos**: table per §3.1.
+8. **Readings**: table per §3.2 + per-reading **Reading content guidance** subsection per §3.2.
+9. **In-App Lessons (carry-overs)**: list of pre-existing `lessons/<slug>/` to migrate, per §3.4. Skip the section entirely if nothing is being carried over.
+10. **Worked Examples (teacher-led)**: numbered `### Worked Example N: <topic> (<minutes>)` blocks with full code samples in fenced ```js blocks. These are the live-in-class demos *and* the spec for the matching `preview: "example"` lessons.
+11. **Challenges (optional stretch)**: bulleted list of stretch ideas. Becomes the `<U-M-L>-challenges` lesson's `content.md`.
+12. **Day Plan**: one table per class day, matching the `days:` count. Columns: `Time | Activity | Notes`.
+13. **Assignments**, for each `A<W>.<N>` artifact: type, est. time, due, task description, requirements, pass criteria. Lab assignments per `lab-assignment-conventions.md`; written per `written-assignment-conventions.md`. Do not author rubrics in points language: q5 lessons / labs / challenges are mastery-based (all-green Submit gate; see `moshion-lesson-conventions.md` §1 + §5). Written (AI-graded) assignments are *not* all-green-gated: they allow partial credit by design; see `written-assignment-conventions.md` §4 for the actual threshold.
+14. **Vocabulary**: 5–10 row table `Term | Definition`. Doubles as the source rows for the closing glossary in matching reading lessons.
+15. **Teacher Notes**: bullet list of pacing tips, common student bugs, retention rules (for SLO-evidence artifacts).
+16. **Numbered Lesson List**, per §3.3. **This is the build target**: Claude reads this section when the user says "build 2.X.Y."
+17. **Lab and Reading Specs (per-lesson detail)**: required for intro-level units that use the §2a one-concept-per-lesson rule. One block per net-new lesson in the Numbered Lesson List, giving the single concept isolated, the starter shape (for moSHion labs) or try-it shape (for readings), and the pass criterion. Lets each lesson be authored independently from this section without re-reading the rest of the spec. Optional for advanced units where each Numbered Lesson List row is self-explanatory.
+18. **Status**: one bullet matching the YAML `status` field.
 
 ## 2a. Granularity bar (intro-level units)
 
-For introductory-level units — units where most students are seeing a category of concept (OOP, recursion, async, etc.) for the first time — the spec MUST follow the **one new concept per lesson** rule.
+For introductory-level units: units where most students are seeing a category of concept (OOP, recursion, async, etc.) for the first time: the spec MUST follow the **one new concept per lesson** rule.
 
 **Definition.** A "new concept" is anything a student would have to be *told* (vocabulary), *shown* (a syntactic form, a runtime behavior), or *practiced in isolation* (e.g. "method that returns a value" is a different concept from "method with no params" because each requires its own first-encounter practice). If a lesson would introduce ≥2 such concepts, **split it**.
 
@@ -117,17 +117,17 @@ For introductory-level units — units where most students are seeing a category
 1. List every atomic concept the sub-module owns. Do this *before* deciding lesson count.
 2. Allocate one Numbered Lesson List slot per concept. Most slots will be 5–10 minute readings or 1-step moSHion labs.
 3. Vocabulary lessons come *before* any "write code from scratch" lesson on the same concept. Reading and try-it labs may pair (one concept can occupy a `reading` slot followed by a `lab` slot that practices it), but each slot still owns one concept.
-4. Reserve at most one "integration" lesson per session — the lesson that composes prior atomic concepts (typically a `worked example` or a `moshion (assignment)`). The integration lesson is the *only* place compound demonstrations appear.
-5. Pacing impact: an intro-level sub-module typically runs 8–15 lessons per class day. Treat the `days:` count as a function of concept count, not the other way around — count the concepts first, then say how many days they take.
+4. Reserve at most one "integration" lesson per session: the lesson that composes prior atomic concepts (typically a `worked example` or a `moshion (assignment)`). The integration lesson is the *only* place compound demonstrations appear.
+5. Pacing impact: an intro-level sub-module typically runs 8–15 lessons per class day. Treat the `days:` count as a function of concept count, not the other way around: count the concepts first, then say how many days they take.
 
 **How to apply when reviewing a spec:**
 
 - For each Numbered Lesson List row: ask "what is the single new concept this lesson teaches?" If the answer requires "and" or "plus", the row should be split.
 - For each `reading` row: confirm the corresponding §17 Lab/Reading Spec block names *one* glossary term or syntactic form being introduced. Multi-concept readings get split into multiple rows even if they share a `content.md` source.
 
-**Why.** Bundling concepts is the most common shCode authoring mistake on intro-level material — readings that try to cover class + instance + `new` + constructor + `this` + properties + methods in one go ("JavaScript classes — comprehensive intro") leave students with vocabulary they can't use because they never practiced it in isolation. The granularity bar is a hard rule for intro material, not a guideline.
+**Why.** Bundling concepts is the most common shCode authoring mistake on intro-level material: readings that try to cover class + instance + `new` + constructor + `this` + properties + methods in one go ("JavaScript classes: comprehensive intro") leave students with vocabulary they can't use because they never practiced it in isolation. The granularity bar is a hard rule for intro material, not a guideline.
 
-**Where this rule does not apply.** Advanced units (assumed prior comfort with the concept category — e.g. a unit on "advanced React patterns" for students who already know React) may bundle. State the bundling explicitly in the spec's Context block when doing so.
+**Where this rule does not apply.** Advanced units (assumed prior comfort with the concept category: e.g. a unit on "advanced React patterns" for students who already know React) may bundle. State the bundling explicitly in the spec's Context block when doing so.
 
 ## 3. Per-section specifics
 
@@ -135,11 +135,11 @@ For introductory-level units — units where most students are seeing a category
 
 | Column | Required | Notes |
 |---|---|---|
-| `#` | yes | `V1`, `V2`, … — sequential |
+| `#` | yes | `V1`, `V2`, …: sequential |
 | `Source` | yes | `Teacher` or `Community` |
 | `Title` | yes | Bare title with a `(N min)` duration hint |
 | `Description hook` | **yes** | One-line student-facing hook ending with *when to watch* (e.g. "Watch before attempting `2.3.5 Groups Sandbox`."). Becomes the `description` field of the matching video lesson per `video-conventions.md` §1. |
-| `YouTube URL` | leave empty | Teacher curates per `video-conventions.md` §3 — never invent. |
+| `YouTube URL` | leave empty | Teacher curates per `video-conventions.md` §3, never invent. |
 
 ### 3.2 Readings table + per-reading guidance
 
@@ -158,12 +158,12 @@ Then a **Reading content guidance** subsection per reading. Each reading lesson 
 ```markdown
 ### Reading content guidance
 
-#### R1 — Groups (`2-3-3-reading-groups`)
+#### R1: Groups (`2-3-3-reading-groups`)
 
-- **Topic 1: Creating + iterating a Group** — read before `2.3.5 Groups Sandbox`.
+- **Topic 1: Creating + iterating a Group**: read before `2.3.5 Groups Sandbox`.
   - **What you'll learn from it** (3–5 bullets summarizing the chunk).
-  - **Try it:** demo idea — what the runnable js live block should show (e.g. "spawn 5 sprites into a Group, log group.length each frame").
-- **Topic 2: Group defaults + auto-association** — read before `2.3.5 Groups Sandbox`.
+  - **Try it:** demo idea: what the runnable js live block should show (e.g. "spawn 5 sprites into a Group, log group.length each frame").
+- **Topic 2: Group defaults + auto-association**: read before `2.3.5 Groups Sandbox`.
   - **What you'll learn from it** …
   - **Try it:** demo idea …
 - **Glossary rows from §Vocabulary:** `Group`, `Spawn`, `Despawn`, `Iterate backwards`.
@@ -171,7 +171,7 @@ Then a **Reading content guidance** subsection per reading. Each reading lesson 
 
 If a reading is one-topic (rare), state that explicitly with a one-line "single-topic" justification.
 
-### 3.3 Numbered Lesson List — the build target
+### 3.3 Numbered Lesson List: the build target
 
 Replaces the legacy "Build Outputs" section. Lists every in-app lesson the sub-module produces, in the order they appear on `/module/U.M`. The first lesson in the unit is always `<U>-<M>-1-slides` (per `slide-deck-conventions.md` §5); subsequent lessons start at `.2`.
 
@@ -179,23 +179,23 @@ Replaces the legacy "Build Outputs" section. Lists every in-app lesson the sub-m
 
 | Slot | Type | Title | Slug | Source / artifact | Notes |
 |---|---|---|---|---|---|
-| `<U.M.1>` | slides | `<U.M.1> Slides — <Unit Name>` | `<U-M-1-slides>` | Unit deck `slides/<U.M>/slides.md` | Shared with all sub-modules in the unit |
-| `<U.M.2>` | video | `<U.M.2> Video — <V1 title>` | `<U-M-2-video-…>` | V1 (above) | |
-| `<U.M.3>` | reading | `<U.M.3> Reading — <R1 title>` | `<U-M-3-reading-…>` | R1 (above) | |
-| `<U.M.4>` | example | `<U.M.4> Worked Example — <WE1 topic>` | `<U-M-4-example-…>` | WE1 (above) | |
+| `<U.M.1>` | slides | `<U.M.1> Slides: <Unit Name>` | `<U-M-1-slides>` | Unit deck `slides/<U.M>/slides.md` | Shared with all sub-modules in the unit |
+| `<U.M.2>` | video | `<U.M.2> Video: <V1 title>` | `<U-M-2-video-…>` | V1 (above) | |
+| `<U.M.3>` | reading | `<U.M.3> Reading: <R1 title>` | `<U-M-3-reading-…>` | R1 (above) | |
+| `<U.M.4>` | example | `<U.M.4> Worked Example: <WE1 topic>` | `<U-M-4-example-…>` | WE1 (above) | |
 | `<U.M.5>` | moSHion (lesson) | `<U.M.5> <Lab Name>` | `<U-M-5-…>` | carry-over: `moshion-groups` | Migration: title, week, unit, draw()-only |
 | … | … | … | … | … | … |
-| `<U.M.N>` | moSHion (challenge) | `<U.M.N> Challenges — Optional Stretch` | `<U-M-N>-challenges` | Challenges section (above) | |
+| `<U.M.N>` | moSHion (challenge) | `<U.M.N> Challenges: Optional Stretch` | `<U-M-N>-challenges` | Challenges section (above) | |
 
-A unit that spans multiple sub-modules numbers lessons **flat across the whole unit**, not per sub-module — so 2.3.1 (W13) might fill slots 2.3.1–2.3.12 and 2.3.2 (W14) continues at 2.3.13–2.3.21. The first sub-module owns the `<U.M.1>` slides slot; subsequent sub-modules in the same unit do **not** get their own slides row — they inherit the unit-level deck.
+A unit that spans multiple sub-modules numbers lessons **flat across the whole unit**, not per sub-module, so 2.3.1 (W13) might fill slots 2.3.1–2.3.12 and 2.3.2 (W14) continues at 2.3.13–2.3.21. The first sub-module owns the `<U.M.1>` slides slot; subsequent sub-modules in the same unit do **not** get their own slides row: they inherit the unit-level deck.
 
-**Starter-file shape per type** — the spec's slot table assigns a `type`, and that determines whether `script.js` ships with content:
+**Starter-file shape per type**: the spec's slot table assigns a `type`, and that determines whether `script.js` ships with content:
 
 | Slot type | `script.js` shape | Convention |
 |---|---|---|
 | `moshion (lesson)` (`type: "lesson"`) | scaffold: header + lets + `setup()` / `draw()` skeletons + `// STEP N:` comments **describing each task in plain English**, empty function bodies | `moshion-lesson-conventions.md` §3 |
-| `moshion (assignment)` (`type: "assignment"`) | scaffold: same shape as `lesson` — header + lets + skeletons + `// STEP N:` description-only comments. **No commented-out solution code.** | `lab-assignment-conventions.md` §2 + §3 |
-| `moshion (challenge)` (`type: "challenge"`) | **fully empty** — zero bytes (or single trailing newline). Challenges deliberately remove the scaffold so the student structures the program themselves. | `moshion-challenge-conventions.md` §4 |
+| `moshion (assignment)` (`type: "assignment"`) | scaffold: same shape as `lesson`: header + lets + skeletons + `// STEP N:` description-only comments. **No commented-out solution code.** | `lab-assignment-conventions.md` §2 + §3 |
+| `moshion (challenge)` (`type: "challenge"`) | **fully empty**: zero bytes (or single trailing newline). Challenges deliberately remove the scaffold so the student structures the program themselves. | `moshion-challenge-conventions.md` §4 |
 | `example` (`preview: "example"`) | fully working sketch (read-along) OR omitted entirely if `content.md` carries everything | `example-conventions.md` §4 |
 | `slides`, `video`, `reading` | no `script.js` at all | per-type convention |
 
@@ -205,10 +205,10 @@ The split between scaffolded (lesson + assignment, with description-only STEP co
 
 Pre-existing `lessons/<old-slug>/` directories that pre-date the post-2.2 conventions need migration. The spec's **In-App Lessons** section MUST list each one with:
 
-- **Old slug** — current folder name.
-- **New slug** — `<U-M-L>-<descriptor>` per the slug rule (§4).
-- **Title** — new `<U.M.L> <Lesson Name>`.
-- **Convention violations to fix** — bulleted list of what the existing `lesson.json` / `script.js` violates today (arrow keys vs WASD, `update()` separate from `draw()`, "BUILD THIS:" challenge starter, non-zero `points` / `totalPoints` / `passingScore`, stale unit/category, stale week, etc.).
+- **Old slug**: current folder name.
+- **New slug**: `<U-M-L>-<descriptor>` per the slug rule (§4).
+- **Title**: new `<U.M.L> <Lesson Name>`.
+- **Convention violations to fix**: bulleted list of what the existing `lesson.json` / `script.js` violates today (arrow keys vs WASD, `update()` separate from `draw()`, "BUILD THIS:" challenge starter, non-zero `points` / `totalPoints` / `passingScore`, stale unit/category, stale week, etc.).
 
 Example:
 
@@ -219,9 +219,9 @@ Example:
 - **Convention violations to fix:**
   - Title prefix `5.3.1 …` → `2.3.5 …`
   - `unit: "5.3 Groups & Overlaps"` → `"2.3 Collections and Physics Applications"`
-  - `category: "Unit 5: moSHion — Game Physics"` → `"Unit 2: moSHion — Applied Game Development"`
+  - `category: "Unit 5: moSHion: Game Physics"` → `"Unit 2: moSHion: Applied Game Development"`
   - `week: 15` → `13`
-  - `script.js` uses `update()` separate from `draw()` — consolidate to `draw()` only (per §Do NOT in this spec).
+  - `script.js` uses `update()` separate from `draw()`: consolidate to `draw()` only (per §Do NOT in this spec).
   - `passingScore: 20` → set to `0` (along with `totalPoints` and every `requirements[].points`) per `moshion-lesson-conventions.md` §1 (no-points; Submit is all-green-gated).
 - **Data continuity:** renaming the folder changes `lesson.json.id`, which breaks any existing student commits/progress under the old id. Acceptable in pre-launch state; flag if students are already enrolled.
 ```
@@ -245,17 +245,17 @@ Every `lessons/<slug>/` folder name (which is also `lesson.json.id`) MUST follow
 
 | Slug | Title | Type |
 |---|---|---|
-| `6-1-1-slides` | `6.1.1 Slides — Groups and Overlaps` | slides |
-| `6-1-3-reading-groups` | `6.1.3 Reading — moSHion docs: Groups` | reading |
+| `6-1-1-slides` | `6.1.1 Slides: Groups and Overlaps` | slides |
+| `6-1-3-reading-groups` | `6.1.3 Reading: moSHion docs: Groups` | reading |
 | `6-1-5-groups-sandbox` | `6.1.5 Groups Sandbox` | moSHion (lesson) |
 | `6-1-11-a13-1-asteroid-field` | `6.1.11 A13.1 Asteroid Field` | moSHion (assignment) |
-| `6-1-12-challenges` | `6.1.12 Challenges — Optional Stretch` | moSHion (challenge) |
+| `6-1-12-challenges` | `6.1.12 Challenges: Optional Stretch` | moSHion (challenge) |
 
 **For a graded artifact (`A<W>.<N>`)** include the artifact id in the descriptor (e.g. `a13-1-asteroid-field`, `a14-1-space-jumper`) so the slug self-documents its grading-system identity.
 
 **Slug rename ⇒ data loss.** Renaming the folder changes `lesson.json.id`, which breaks the foreign-key that `commits` / `lesson_state` / `lesson_drafts` / `lesson_submissions` tables hold against the old id. The §3.4 migration notes MUST flag this when the lesson has shipped.
 
-### 4.1 Letter-suffix slugs — retired (2026-08-12)
+### 4.1 Letter-suffix slugs: retired (2026-08-12)
 
 The optional `<letter>` suffix (e.g. `2.2.3a`, `1.1.1a`) used to exist for two purposes:
 retroactive granularity inserts under a shipped integer slot, and (in Unit 1.1's original
@@ -266,26 +266,26 @@ remaining `1.1.1a`/`1.1.1b`/`1.1.1c`/`1.1.3c` legacy inserts were renumbered int
 sequence (`a85cd42`, 2026-08-12).
 
 Net effect: **slugs are integer-only**, full stop. A future mid-module insertion needs a
-fresh renumbering decision — full sequential renumber (as done for Module 1.1) is now the
+fresh renumbering decision: full sequential renumber (as done for Module 1.1) is now the
 only sanctioned mechanism, not a letter-suffix escape hatch.
 
 **Code updated to match (2026-08-12).** `parseNumberedIdFromTitle` (`lib/curriculum.ts`)
 and every duplicate `parseNumberedId` helper (`functions/_shared/lessonAccess.ts`,
 `lib/lesson-neighbors.ts`, `components/HeaderLessonNav.tsx`,
 `components/LessonSearchFilter.tsx`) used to accept an optional trailing letter
-(`[a-zA-Z]?`) after the third dotted integer. That acceptance is now removed — the regex
-is strictly `\d+\.\d+\.\d+` — since no lesson on disk uses a letter suffix and none should
+(`[a-zA-Z]?`) after the third dotted integer. That acceptance is now removed: the regex
+is strictly `\d+\.\d+\.\d+`, since no lesson on disk uses a letter suffix and none should
 be authored going forward. A title with a letter suffix no longer parses as numbered at
 all and is silently dropped from `/module/U.M`, same as any other malformed title.
 
 ## 5. Don'ts
 
 - **Do not put per-lesson rendering details in the spec.** That's what the per-type conventions in this directory are for. The spec lists the lesson and links to the type convention; it doesn't restate the JSON shape.
-- **Do not include a "Build Outputs (what Builder AI generates)" section.** That was the pre-2.2 build pattern (produce one assignment markdown + one video manifest). The post-2.2 build is **the Numbered Lesson List in §3.3** — every in-app lesson, not a single artifact-list.
-- **Do not invent video URLs in the Videos table.** Same rule as `video-conventions.md` §3 — teacher curates `videoUrl`; the spec's `YouTube URL` cell stays empty.
+- **Do not include a "Build Outputs (what Builder AI generates)" section.** That was the pre-2.2 build pattern (produce one assignment markdown + one video manifest). The post-2.2 build is **the Numbered Lesson List in §3.3**: every in-app lesson, not a single artifact-list.
+- **Do not invent video URLs in the Videos table.** Same rule as `video-conventions.md` §3: teacher curates `videoUrl`; the spec's `YouTube URL` cell stays empty.
 - **Do not duplicate the unit-level (`<U.M>_*.md`) overview.** The unit-level file is for SLO mapping + inter-module bridges; the sub-module spec is for the build.
 - **Do not embed solutions to graded labs.** Worked examples ship runnable code; lab/challenge requirements stay declarative ("must include `kb.presses` somewhere in `draw()`").
-- **Do not skip the Numbered Lesson List.** A spec without §3.3 isn't buildable — lesson authors have to invent the slot mapping themselves and drift across sub-modules.
+- **Do not skip the Numbered Lesson List.** A spec without §3.3 isn't buildable: lesson authors have to invent the slot mapping themselves and drift across sub-modules.
 
 ## 6. Authoring workflow
 
@@ -294,7 +294,7 @@ When creating a new sub-module spec:
 1. Copy `2.3.1_groups-overlaps.md` as the template.
 2. Fill the YAML frontmatter (id, title, unit, week, slos, artifacts).
 3. Author §1–§15 (everything except the Numbered Lesson List + Status).
-4. Once the artifacts list is settled, populate §16 (Numbered Lesson List) — mapping each video / reading / worked example / lab / challenge to a `<U.M.L>` slot.
+4. Once the artifacts list is settled, populate §16 (Numbered Lesson List): mapping each video / reading / worked example / lab / challenge to a `<U.M.L>` slot.
 5. Set status to `draft`. Bump to `ready` when the spec passes a self-review (a stranger could author all the lessons from this spec without asking questions).
 6. After the lessons are built and shipped: bump to `shipped`. Optionally trim the spec down to a retrospective record.
 
@@ -307,4 +307,4 @@ When updating an existing spec for a build pass: §3.3 (Numbered Lesson List) is
 | Pre-2.2 | Each sub-module spec ended with a "Build Outputs (what Builder AI generates)" section listing 3-5 markdown deliverables (assignment doc + video manifest + lesson metadata updates). The actual 2.2 build produced 12 numbered in-app lessons; the spec section never matched what shipped. |
 | Post-2.2 / unit-2.3 prep | Spec convention codified (this doc). Required: §3.3 Numbered Lesson List replacing the legacy Build Outputs section, §3.2 Reading content guidance per reading, §3.1 Description-hook column on videos, §3.4 Carry-over migration notes per pre-existing slug. Slug naming rule §4 made explicit (`<U>-<M>-<L>-<descriptor>`) and tied to the DB / `parseNumberedIdFromTitle` constraints. |
 | No-points + green-to-advance | The course is now mastery-based. §1 frontmatter `artifacts[]` shape dropped the `points: <n>` field. §2 Required Sections #13 (Assignments) reframed: rubrics must use pass-criteria language, not point columns. §3.4 migration example updated to require `passingScore` AND `totalPoints` AND every `requirements[].points` to be `0`. The convention violation list at §3.4 now treats any non-zero point value as a violation. See `moshion-lesson-conventions.md` for the canonical wording and the green-to-advance lesson-nav lock. |
-| Granularity for intro-level units | §2a added: "one new concept per lesson" rule for intro-level material. §2 Required Sections gained #17 Lab/Reading Specs (per-lesson detail) for intro units. §4 slug rule now permits an optional lowercase `<letter>` suffix for retroactive granularity inserts under shipped integer slots (§4.1). The 2.2 OOP unit was the first to apply the granularity bar retroactively — its 13 shipped lessons were preserved by slug, with 13 new sub-letter inserts (2.2.3a, 2.2.3b, 2.2.4a–d, 2.2.5, 2.2.5a, 2.2.7a–h, 2.2.8a–c, 2.2.10a, 2.2.12a) splitting the dense readings and the Enemy-class worked example into atomic concept lessons. See `2.2.1_classes-via-moshion.md` for the canonical example. |
+| Granularity for intro-level units | §2a added: "one new concept per lesson" rule for intro-level material. §2 Required Sections gained #17 Lab/Reading Specs (per-lesson detail) for intro units. §4 slug rule now permits an optional lowercase `<letter>` suffix for retroactive granularity inserts under shipped integer slots (§4.1). The 2.2 OOP unit was the first to apply the granularity bar retroactively: its 13 shipped lessons were preserved by slug, with 13 new sub-letter inserts (2.2.3a, 2.2.3b, 2.2.4a–d, 2.2.5, 2.2.5a, 2.2.7a–h, 2.2.8a–c, 2.2.10a, 2.2.12a) splitting the dense readings and the Enemy-class worked example into atomic concept lessons. See `2.2.1_classes-via-moshion.md` for the canonical example. |

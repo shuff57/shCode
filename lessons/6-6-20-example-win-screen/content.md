@@ -1,6 +1,6 @@
-**Goal:** Build a win screen state that congratulates the player, shows final stats, and offers a replay option — distinct from both the play state and the game over screen.
+**Goal:** Build a win screen state that congratulates the player, shows final stats, and offers a replay option: distinct from both the play state and the game over screen.
 
-## Step 1 — Trigger the win state
+## Step 1: Trigger the win state
 
 Start with a play state where the player collects items to reach a goal. When they reach the target, switch to `'win'`. The win screen shows a congratulatory message and the final score.
 
@@ -46,7 +46,7 @@ function draw() {
 }
 ```
 
-## Step 2 — Show play stats on the win screen
+## Step 2: Show play stats on the win screen
 
 Capture stats when the win triggers: save the elapsed time so the win screen can show how long it took.
 
@@ -104,9 +104,9 @@ function draw() {
 }
 ```
 
-## Step 3 — Win screen vs Game Over screen
+## Step 3: Win screen vs Game Over screen
 
-Add a game over condition (a timer that runs out). Now you have two distinct end states: win and game over. They look different and give the player different messages — but both offer a restart.
+Add a game over condition (a timer that runs out). Now you have two distinct end states: win and game over. They look different and give the player different messages, but both offer a restart.
 
 ```js live
 let state, score, goal, startTime, timeLeft, finalTime, player, item;
@@ -179,8 +179,8 @@ function draw() {
 
 ## Key takeaways
 
-- Win is a **separate state** from game over — each draws different messages and meaning.
+- Win is a **separate state** from game over: each draws different messages and meaning.
 - Capture stats **at the moment of transition** (e.g. `finalTime = ...` before `state = 'win'`).
-- Both end states can share a restart check — check `kb.pressing('r')` once for both.
+- Both end states can share a restart check: check `kb.pressing('r')` once for both.
 - Reset **all relevant variables** on restart: score, timer, positions.
-- The win screen is the **reward** — make it feel different from the game over screen.
+- The win screen is the **reward**: make it feel different from the game over screen.

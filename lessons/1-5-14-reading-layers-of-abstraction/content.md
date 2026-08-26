@@ -12,7 +12,7 @@ Think about asking a generative AI tool for help:
 
 Each layer serves a separate role, and that separation is what makes the whole thing efficient for you *and* for the system. Nobody has to hold all three at once.
 
-You already trust abstraction constantly. You drive a car without knowing how the engine mixes fuel. You send a message without knowing how it is routed. Abstraction is not a programming trick — **it is the only reason any complicated system is usable at all.**
+You already trust abstraction constantly. You drive a car without knowing how the engine mixes fuel. You send a message without knowing how it is routed. Abstraction is not a programming trick: **it is the only reason any complicated system is usable at all.**
 
 The programming version of this is the whole reason §1.4.5 mattered: high-level languages hide the memory addresses, and you write `5 + 3` instead of moving bytes. You are standing on a layer somebody else built.
 
@@ -40,7 +40,7 @@ for (let i = 0; i < prices.length; i = i + 1) {
 console.log("Your basket comes to $" + total.toFixed(2));
 ```
 
-`.toFixed(2)` is a small abstraction all by itself. It turns `16.740000000000002` into `16.74`, and you do not need to know why that first number has a tail on it — only that money wants two decimal places.
+`.toFixed(2)` is a small abstraction all by itself. It turns `16.740000000000002` into `16.74`, and you do not need to know why that first number has a tail on it, only that money wants two decimal places.
 
 Which is exactly the deal: the layer below has a complication, and the layer above gives you a way not to care about it.
 

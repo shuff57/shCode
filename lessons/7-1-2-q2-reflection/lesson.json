@@ -4,7 +4,7 @@
   "description": "Reflect on the game you shipped and the process that got it there. AI-graded with hints.",
   "type": "assignment",
   "estimateMins": 20,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.1 Arcade Cabinet (Q2 Synthesis)",
   "preview": "assignment",
   "week": 18,
@@ -15,27 +15,27 @@
   "points": 0,
   "contentFile": "content.md",
   "aiGrader": {
-    "rubricTitle": "Q2 Reflection — AI-graded rubric",
+    "rubricTitle": "Q2 Reflection: AI-graded rubric",
     "model": "deepseek-v4-flash:0731-cloud",
     "contextDocs": [],
-    "prompt": "This one is entirely about the game you built, so there is no reading to look up — the answers come from your own project and your own memory of building it. A few sentences per answer is plenty, in your own everyday words. There is no wrong answer here as long as you are describing your actual project honestly.\n\n1. Your game changed between the pitch in your README and the version you handed in. Name one thing that changed, and explain what made you change it.\n\n2. Describe one bug that took you more than a few minutes to find. How did you track it down?\n\n3. The checklist gave you twelve requirements and no design. Which requirement was hardest to fit into YOUR game idea, and what did you do about it?",
+    "prompt": "This one is entirely about the game you built, so there is no reading to look up: the answers come from your own project and your own memory of building it. A few sentences per answer is plenty, in your own everyday words. There is no wrong answer here as long as you are describing your actual project honestly.\n\n1. Your game changed between the pitch in your README and the version you handed in. Name one thing that changed, and explain what made you change it.\n\n2. Describe one bug that took you more than a few minutes to find. How did you track it down?\n\n3. The checklist gave you twelve requirements and no design. Which requirement was hardest to fit into YOUR game idea, and what did you do about it?",
     "rubric": [
       {
         "id": "design-changed",
         "title": "Names a specific change from pitch to shipped, and what caused it",
-        "description": "Student names something concrete that differs between their README pitch and the game they handed in, and gives the reason — playtesting, scope, a mechanic that wasn't fun, something that didn't work. 'I changed some stuff' or 'I added more features' does not earn this criterion; 'the enemies chased the player and it was impossible, so I made them patrol instead' does.",
+        "description": "Student names something concrete that differs between their README pitch and the game they handed in, and gives the reason: playtesting, scope, a mechanic that wasn't fun, something that didn't work. 'I changed some stuff' or 'I added more features' does not earn this criterion; 'the enemies chased the player and it was impossible, so I made them patrol instead' does.",
         "points": 0
       },
       {
         "id": "debugging-account",
         "title": "Gives a real account of tracking down one bug",
-        "description": "Student describes a specific bug and the actual steps they took to locate it — printing values, commenting code out, reading an error, checking one thing at a time. A response that names a bug but not the hunt ('my sprite wouldn't move, then I fixed it') does not earn this criterion. The bug must be specific enough that a reader could picture it.",
+        "description": "Student describes a specific bug and the actual steps they took to locate it: printing values, commenting code out, reading an error, checking one thing at a time. A response that names a bug but not the hunt ('my sprite wouldn't move, then I fixed it') does not earn this criterion. The bug must be specific enough that a reader could picture it.",
         "points": 0
       },
       {
         "id": "requirement-tension",
         "title": "Explains fitting a required feature into their own design",
-        "description": "Student identifies which checklist requirement was hardest to justify inside their particular game and describes the decision they made — reworking the design to need it, or finding a use that fits. This criterion is about design judgment, not difficulty of coding; 'joints were hard to code' does not earn it, 'my game had nothing to save so I added a high score table' does.",
+        "description": "Student identifies which checklist requirement was hardest to justify inside their particular game and describes the decision they made: reworking the design to need it, or finding a use that fits. This criterion is about design judgment, not difficulty of coding; 'joints were hard to code' does not earn it, 'my game had nothing to save so I added a high score table' does.",
         "points": 0
       }
     ]

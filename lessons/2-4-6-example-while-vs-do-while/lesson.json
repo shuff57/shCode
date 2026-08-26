@@ -1,12 +1,12 @@
 {
   "id": "2-4-6-example-while-vs-do-while",
-  "title": "2.4.6 Worked Example — while vs do...while: The Difference in One Line",
+  "title": "2.4.6 Worked Example, while vs do...while: The Difference in One Line",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "example",
-  "sourceRef": "book 2.4 — Example 2.1 'The difference in one line' + Concepts in Practice 'Loop entry'",
+  "sourceRef": "book 2.4: Example 2.1 'The difference in one line' + Concepts in Practice 'Loop entry'",
   "week": 6,
   "slos": [
     "SLO-3"

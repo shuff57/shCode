@@ -1,6 +1,6 @@
 {
   "id": "2-3-16-example-days-in-month",
-  "title": "2.3.16 Worked Example — Days in a Month",
+  "title": "2.3.16 Worked Example: Days in a Month",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.3.4 — Example 2.4: Days in a month",
+  "sourceRef": "book 2.3.4: Example 2.4: Days in a month",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

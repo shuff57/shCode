@@ -19,7 +19,7 @@
 
 // --- Snippet C ---
 //   let hot = temps.filter(function (t) { return t > 70; });
-//   console.log(temps);   // still all six — untouched
+//   console.log(temps);   // still all six: untouched
 //
 // STEP 3: which paradigm is Snippet C?
 

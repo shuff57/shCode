@@ -4,7 +4,7 @@
   "description": "Learn how bounciness and friction change how sprites feel.",
   "type": "lesson",
   "estimateMins": 25,
-  "category": "Unit 5: moSHion — Game Physics",
+  "category": "Unit 5: moSHion: Game Physics",
   "unit": "5.2 Physics Feel",
   "preview": "moshion",
   "week": 14,
@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Build a box with four walls",
-      "instructions": "Four static sprites — top, bottom, left, right — make a containment box.",
+      "instructions": "Four static sprites: top, bottom, left, right: make a containment box.",
       "hints": [
         "Re-use the same size; just change positions and rotations."
       ]
@@ -23,9 +23,9 @@
     {
       "id": "s2",
       "title": "Add a ball",
-      "instructions": "Create a dynamic sprite with a `diameter` (e.g. 30) — that makes it a circle collider instead of a rectangle.",
+      "instructions": "Create a dynamic sprite with a `diameter` (e.g. 30): that makes it a circle collider instead of a rectangle.",
       "hints": [
-        "new Sprite(200, 100, 30) — one size argument = circle."
+        "new Sprite(200, 100, 30): one size argument = circle."
       ]
     },
     {

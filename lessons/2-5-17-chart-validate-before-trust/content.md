@@ -1,4 +1,4 @@
-## Chart the Code — Validate Before You Trust
+## Chart the Code: Validate Before You Trust
 
 **What you'll practise:**
 - Drawing two checks in a row, each one a diamond
@@ -26,10 +26,10 @@ console.log("Ordering " + quantity + " items.");
 |---|---|
 | **Start / End** (oval) | One of each. |
 | **Task** (rectangle) | Converting `typed` to `quantity`, each `throw`, and the final "Ordering..." print |
-| **Decision** (diamond) | "Is quantity NaN?" and, only on its `no` branch, "Is quantity <= 0?" — two diamonds |
+| **Decision** (diamond) | "Is quantity NaN?" and, only on its `no` branch, "Is quantity <= 0?": two diamonds |
 
-Each diamond's `yes` branch goes to that check's error message. Each diamond's `no` branch is the only way to reach the *next* step — the second check only happens if the first one passed, and the real order only happens if both did.
+Each diamond's `yes` branch goes to that check's error message. Each diamond's `no` branch is the only way to reach the *next* step: the second check only happens if the first one passed, and the real order only happens if both did.
 
 ### Before you submit
 
-Press **Check my diagram**. It needs at least two diamonds, each with two labelled exits, and every path — including both error paths — reaching the End.
+Press **Check my diagram**. It needs at least two diamonds, each with two labelled exits, and every path, including both error paths: reaching the End.

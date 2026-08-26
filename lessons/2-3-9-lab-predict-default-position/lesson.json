@@ -1,7 +1,7 @@
 {
   "id": "2-3-9-lab-predict-default-position",
   "title": "2.3.8 Predict Where default Runs",
-  "description": "Write two switch statements, predicting the output before you run each one — including one where default is written in the middle. Auto-graded.",
+  "description": "Write two switch statements, predicting the output before you run each one, including one where default is written in the middle. Auto-graded.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.3.2 — Concepts in Practice: Reading a switch, Q1 and Q2",
+  "sourceRef": "book 2.3.2: Concepts in Practice: Reading a switch, Q1 and Q2",
   "steps": [
     {
       "id": "s1",

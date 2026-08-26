@@ -96,7 +96,7 @@
     {
       "id": "r7",
       "title": "Operators are spaced",
-      "description": "No cramped arithmetic like a*b remains — every operator has a space on each side",
+      "description": "No cramped arithmetic like a*b remains: every operator has a space on each side",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?![\\s\\S]*[A-Za-z0-9_)][*+][A-Za-z0-9_(])[\\s\\S]*$",

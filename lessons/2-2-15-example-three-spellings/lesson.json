@@ -1,6 +1,6 @@
 {
   "id": "2-2-15-example-three-spellings",
-  "title": "2.2.15 Worked Example — Same Algorithm, Three Spellings",
+  "title": "2.2.15 Worked Example: Same Algorithm, Three Spellings",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -11,7 +11,7 @@
     "SLO-3",
     "SLO-4"
   ],
-  "sourceRef": "book 2.2.3 — 'Common Ideas Across Languages', Example 2.3, Try It Now 2.3, Context Pause",
+  "sourceRef": "book 2.2.3: 'Common Ideas Across Languages', Example 2.3, Try It Now 2.3, Context Pause",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

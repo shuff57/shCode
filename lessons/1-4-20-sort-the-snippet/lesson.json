@@ -13,17 +13,17 @@
   "steps": [
     {
       "id": "s1",
-      "title": "Snippet A — separate variables, steps in order",
+      "title": "Snippet A: separate variables, steps in order",
       "instructions": "Read the snippet in the comment. Log which paradigm it is, using console.log. Choose from: procedural, object-oriented, functional. Log one answer per step, in step order, one console.log each -- the first console.log is STEP 1."
     },
     {
       "id": "s2",
-      "title": "Snippet B — data bundled into one value",
+      "title": "Snippet B: data bundled into one value",
       "instructions": "Log which paradigm this snippet is."
     },
     {
       "id": "s3",
-      "title": "Snippet C — a new list, original untouched",
+      "title": "Snippet C: a new list, original untouched",
       "instructions": "Log which paradigm this snippet is."
     },
     {

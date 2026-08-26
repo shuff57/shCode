@@ -1,4 +1,4 @@
-// 2.1.3c Lab — Drop one sprite, change its color.
+// 2.1.3c Lab: Drop one sprite, change its color.
 
 function setup() {
   // STEP 1: Make a canvas (any reasonable size, e.g. 360x360).

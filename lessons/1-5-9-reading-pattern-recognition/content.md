@@ -12,7 +12,7 @@ For the jam sandwich, the things decomposition turned up sort naturally into thr
 | | | Pick up |
 | | | Unscrew |
 
-Once "pick up", "unscrew" and "spread" are all filed under *actions*, you stop tracking twelve unrelated facts and start tracking three groups. **That is the entire trick** — pattern recognition makes a big problem small enough to hold in your head.
+Once "pick up", "unscrew" and "spread" are all filed under *actions*, you stop tracking twelve unrelated facts and start tracking three groups. **That is the entire trick**: pattern recognition makes a big problem small enough to hold in your head.
 
 Applying decomposition and pattern recognition together also pushes you to think of *more* things, not fewer. Having an "equipment" column makes you notice you never mentioned a plate. The categories act as prompts.
 
@@ -20,7 +20,7 @@ The second half of pattern recognition is noticing where a structure **repeats**
 
 **What you'll learn from it:**
 - Pattern recognition groups the parts decomposition produced.
-- Grouping compresses many facts into few — that is why it helps.
+- Grouping compresses many facts into few: that is why it helps.
 - Categories act as prompts and make you notice what is missing.
 - Spotting a repeated structure is what later becomes a loop.
 
@@ -45,7 +45,7 @@ for (let i = 0; i < things.length; i = i + 1) {
 }
 ```
 
-Identical output. The second version has one instruction and a list, and adding a fifth object costs a word rather than a line. You are not expected to write the loop yet — §2.2 does that. Notice only that the loop became *possible* because a pattern was spotted first.
+Identical output. The second version has one instruction and a list, and adding a fifth object costs a word rather than a line. You are not expected to write the loop yet: §2.2 does that. Notice only that the loop became *possible* because a pattern was spotted first.
 
 ---
 
@@ -54,6 +54,6 @@ Identical output. The second version has one instruction and a list, and adding 
 | Term | Meaning |
 |------|---------|
 | **pattern recognition** | Grouping parts into categories and spotting recurring structures |
-| **category** | A group of parts that behave alike — ingredients, equipment, actions |
+| **category** | A group of parts that behave alike: ingredients, equipment, actions |
 | **compression** | Tracking three groups instead of twelve facts |
-| **repeated structure** | The same action applied to different things — a loop, later |
+| **repeated structure** | The same action applied to different things: a loop, later |

@@ -11,12 +11,12 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.1.8 — 'Combining Conditions', Example 2.9: Either condition is enough",
+  "sourceRef": "book 2.1.8: 'Combining Conditions', Example 2.9: Either condition is enough",
   "steps": [
     {
       "id": "s1",
       "title": "Declare two variables",
-      "instructions": "Create two variables — for example, isWeekend and isHoliday — and give each a value (true or false, or numbers you can compare)."
+      "instructions": "Create two variables, for example, isWeekend and isHoliday, and give each a value (true or false, or numbers you can compare)."
     },
     {
       "id": "s2",

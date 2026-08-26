@@ -1,6 +1,6 @@
 {
   "id": "1-5-41-reading-debugging-with-console-log",
-  "title": "1.5.41 Reading — Debugging with console.log",
+  "title": "1.5.41 Reading: Debugging with console.log",
   "description": "Most bugs never produce a message. Definition 1.5.9, and the two habits that make printing work.",
   "type": "lesson",
   "estimateMins": 10,

@@ -1,4 +1,4 @@
-# A10.1 — Sprite Playground
+# A10.1: Sprite Playground
 
 | | |
 |---|---|
@@ -7,16 +7,16 @@
 | **Type** | Lab (in-app moSHion editor) |
 | **Points** | 15 |
 | **Estimated time** | 45 min |
-| **SLO** | SLO 3 — design, implement, test |
+| **SLO** | SLO 3: design, implement, test |
 | **Due** | End of Week 10 |
 
 **Prerequisites:** complete both in-app lessons (`5.1.11 Hello Sprite` + `5.1.20 Make it Move`) before starting this lab.
 
 **Module resources:**
-- 📋 [Module overview](2.1.1_overview.md) — recommended learning order
-- 📖 [Readings](2.1.1_readings.md) — moSHion docs + FCC refs
-- 💡 [Worked examples](2.1.1_worked-examples.md) — reference code from class walkthroughs
-- ⭐ [Challenges](2.1.1_challenges.md) — stretch problems if you finish early
+- 📋 [Module overview](2.1.1_overview.md): recommended learning order
+- 📖 [Readings](2.1.1_readings.md): moSHion docs + FCC refs
+- 💡 [Worked examples](2.1.1_worked-examples.md): reference code from class walkthroughs
+- ⭐ [Challenges](2.1.1_challenges.md): stretch problems if you finish early
 
 ---
 
@@ -45,7 +45,7 @@ Create a new sketch in the in-app editor with the following features.
    - Orbit in a circle: use both `sin` and `cos`
    - Spin: `sprite.rotation = frameCount * 2;`
 4. **An on-screen text label at the top of the canvas** displaying a message of your choice. Use `text()` and `textSize()`.
-5. **`background(...)` is called at the start of every `draw()`** — otherwise old frames will stack up.
+5. **`background(...)` is called at the start of every `draw()`**: otherwise old frames will stack up.
 6. Code follows the class style guide (camelCase, 2-space indent, meaningful variable names, comments on non-obvious lines).
 
 ### Why WASD and not arrow keys?
@@ -59,7 +59,7 @@ Arrow keys also scroll the browser iframe. Your controllable sprite will be figh
 Paste this into `script.js` and fill in the TODOs:
 
 ```js
-// A10.1 — Sprite Playground
+// A10.1: Sprite Playground
 // Author: YOUR NAME
 // Module 2.1.1
 
@@ -81,7 +81,7 @@ function setup() {
 function draw() {
   background('#222');
 
-  // TODO: WASD input — remember the else-to-zero pattern
+  // TODO: WASD input: remember the else-to-zero pattern
   if (kb.pressing('a')) player.vel.x = -4;
   else if (kb.pressing('d')) player.vel.x = 4;
   else player.vel.x = 0;

@@ -1,8 +1,8 @@
 ## Why `getItem('highScore') > 100` can lie
 
-**Read before attempting `6.5.7 Worked Example — Load and Display a High Score`.**
+**Read before attempting `6.5.7 Worked Example: Load and Display a High Score`.**
 
-You stored a number — `storeItem('highScore', 250)`. You read it back with `getItem('highScore')` and get `"250"`. That is a string, not a number. This is the single most common save/load bug in student games.
+You stored a number: `storeItem('highScore', 250)`. You read it back with `getItem('highScore')` and get `"250"`. That is a string, not a number. This is the single most common save/load bug in student games.
 
 **Try it:** the sketch stores `5`, then shows what happens when you add `1` without coercion vs. with coercion. The first gives `"51"` (string concatenation). The second gives `6` (number addition).
 
@@ -32,7 +32,7 @@ Wrap every `getItem` call in `Number()` when you stored a number:
 let highScore = Number(getItem('highScore')) || 0;
 ```
 
-`Number("250")` gives you `250` — a real number. Now comparisons and arithmetic work correctly.
+`Number("250")` gives you `250`: a real number. Now comparisons and arithmetic work correctly.
 
 ---
 
@@ -73,7 +73,7 @@ Number(getItem('highScore')) > Number(getItem('oldScore'))  // 250 > 100 → tru
 
 | Term | Meaning |
 |------|---------|
-| **Type coercion** | Converting a value from one type to another — e.g. string `"250"` to number `250`. |
+| **Type coercion** | Converting a value from one type to another: e.g. string `"250"` to number `250`. |
 | **`Number(x)`** | Converts `x` to a JavaScript number. `Number("250")` is `250`, `Number(null)` is `0`. |
 | **`||` fallback** | The `||` operator picks the right-hand value when the left is falsy. `value || 0` means "use 0 if value is falsy." |
-| **String comparison** | JS compares strings character by character — `"9" > "100"` is `true` because `'9'` comes after `'1'`. |
+| **String comparison** | JS compares strings character by character: `"9" > "100"` is `true` because `'9'` comes after `'1'`. |

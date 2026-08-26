@@ -16,7 +16,7 @@ Use `let` when the value will change over time. Use `const` when the value shoul
 
 **Rule of thumb:** default to `const`. Switch to `let` only when you know you will need to change the value.
 
-**Try it:** Run the block below. Then change `score` to `const` and run again — notice the error.
+**Try it:** Run the block below. Then change `score` to `const` and run again: notice the error.
 
 ```js live plain
 let score = 0;

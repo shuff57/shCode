@@ -4,7 +4,7 @@
 
 Documentation means the comments inside the code, plus notes like a README that explain what the
 code does and how to use it. Code says *what the computer will do*. Documentation says *what the
-author was trying to do* — and those are not the same thing.
+author was trying to do*, and those are not the same thing.
 
 What you'll learn from it:
 
@@ -16,7 +16,7 @@ What you'll learn from it:
 
 Here is the case that convinces most people, because it happens to everyone eventually.
 
-You write a program. It works. Three lines in the middle look strange, but you had a good reason —
+You write a program. It works. Three lines in the middle look strange, but you had a good reason :
 you remember it clearly. You come back six months later. The code is unchanged. The reason is gone.
 You are now a stranger reading your own work, and you cannot tell whether those three lines are
 load-bearing or leftovers. Delete them and something breaks in a way you will not notice for a week.
@@ -42,7 +42,7 @@ whether the `- 2` is a deliberate discount or somebody's typo.
 ## What documentation is not
 
 It is not a retelling of the code. `let total = price * quantity;` does not need a comment saying
-"multiplies price by quantity" — the line already says that, and now there are two things to keep in
+"multiplies price by quantity": the line already says that, and now there are two things to keep in
 step instead of one. Comment the **reason**, the constraint, the thing a reader could not work out
 from the code alone.
 

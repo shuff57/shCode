@@ -1,4 +1,4 @@
-// 2.2.7c Lab — Method with parameters (reference solution).
+// 2.2.7c Lab: Method with parameters (reference solution).
 
 class Counter {
   constructor() {

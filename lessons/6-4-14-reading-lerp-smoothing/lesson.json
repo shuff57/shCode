@@ -1,10 +1,10 @@
 {
   "id": "6-4-14-reading-lerp-smoothing",
-  "title": "6.4.14 Reading — Smoothing with lerp",
-  "description": "How lerp(current, target, t) replaces a hard-set camera follow with a smooth elastic trail. Read before 2.4.9 (Worked Example — Smooth Camera).",
+  "title": "6.4.14 Reading: Smoothing with lerp",
+  "description": "How lerp(current, target, t) replaces a hard-set camera follow with a smooth elastic trail. Read before 2.4.9 (Worked Example: Smooth Camera).",
   "type": "lesson",
   "estimateMins": 6,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.4 Animated Sprites and Camera",
   "preview": "reading",
   "week": 15,

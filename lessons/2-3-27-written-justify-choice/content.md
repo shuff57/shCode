@@ -1,4 +1,4 @@
-Write your response in the box below. Short, clear answers are fine. The rubric below shows what the grader is looking for — every criterion must be met for the lesson to count as complete.
+Write your response in the box below. Short, clear answers are fine. The rubric below shows what the grader is looking for: every criterion must be met for the lesson to count as complete.
 
 ---
 

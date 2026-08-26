@@ -14,11 +14,11 @@ Almost every game shares these states:
 
 | State name | What it means |
 |------------|---------------|
-| `'title'` | The start screen — game name, instructions, "Press Enter" |
-| `'play'` | The game is running — player moves, score goes up, enemies spawn |
-| `'pause'` | Everything frozen — player can't move, score holds still |
-| `'gameover'` | The player lost — show final score, "Press R to restart" |
-| `'win'` | The player won — show congratulations, "Press R to play again" |
+| `'title'` | The start screen: game name, instructions, "Press Enter" |
+| `'play'` | The game is running: player moves, score goes up, enemies spawn |
+| `'pause'` | Everything frozen: player can't move, score holds still |
+| `'gameover'` | The player lost: show final score, "Press R to restart" |
+| `'win'` | The player won: show congratulations, "Press R to play again" |
 
 ## Bad names vs. good names
 
@@ -120,5 +120,5 @@ For this course, use **simple lowercase strings**: `'title'`, `'play'`, `'pause'
 
 | Term | Meaning |
 |------|---------|
-| **Naming convention** | An agreed-upon rule for how to name things — lowercase strings for state values. |
-| **Self-documenting code** | Code whose names are so clear you barely need comments — `case 'title'` explains itself. |
+| **Naming convention** | An agreed-upon rule for how to name things: lowercase strings for state values. |
+| **Self-documenting code** | Code whose names are so clear you barely need comments: `case 'title'` explains itself. |

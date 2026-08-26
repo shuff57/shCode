@@ -1,6 +1,6 @@
 {
   "id": "2-3-21-example-fix-number-convert",
-  "title": "2.3.21 Worked Example — Fix 2: Convert the Value with Number()",
+  "title": "2.3.21 Worked Example: Fix 2: Convert the Value with Number()",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.3.5 — 'Fix 2: convert the value to a number first'",
+  "sourceRef": "book 2.3.5: 'Fix 2: convert the value to a number first'",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

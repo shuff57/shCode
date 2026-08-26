@@ -1,6 +1,6 @@
 {
   "id": "3-1-2-reading-function-basics",
-  "title": "3.1.2 Reading — Defining & Calling a Function",
+  "title": "3.1.2 Reading: Defining & Calling a Function",
   "description": "Understand how to define a function with function name() {} and call it. Defining a function is not the same as running it.",
   "type": "lesson",
   "estimateMins": 10,

@@ -6,7 +6,7 @@
 - How to print "PASS" or "FAIL" so bugs are obvious at a glance
 - How to test more than one case for the same function
 
-When you write a function, how do you know it works? You test it. A **manual test** calls the function with a value you already know the answer for, then checks whether the output matches. If it does — PASS. If it doesn't — FAIL and you go fix the function.
+When you write a function, how do you know it works? You test it. A **manual test** calls the function with a value you already know the answer for, then checks whether the output matches. If it does: PASS. If it doesn't: FAIL and you go fix the function.
 
 **Try it:** Run the block as-is first, then try breaking `double` on purpose (e.g., change `n * 2` to `n + 2`) and re-run to see the FAIL messages.
 
@@ -22,7 +22,7 @@ var expected1 = 6;
 if (actual1 === expected1) {
   console.log("Test 1: PASS");
 } else {
-  console.log("Test 1: FAIL — got " + actual1 + ", expected " + expected1);
+  console.log("Test 1: FAIL: got " + actual1 + ", expected " + expected1);
 }
 
 // Test 2: double(0) should return 0
@@ -31,7 +31,7 @@ var expected2 = 0;
 if (actual2 === expected2) {
   console.log("Test 2: PASS");
 } else {
-  console.log("Test 2: FAIL — got " + actual2 + ", expected " + expected2);
+  console.log("Test 2: FAIL: got " + actual2 + ", expected " + expected2);
 }
 ```
 
@@ -46,6 +46,6 @@ Each test follows the same pattern: call the function, store the result in `actu
 | **manual test** | A check you write yourself: call a function and compare the result to what you know it should be |
 | **actual** | The value the function actually returned |
 | **expected** | The value you predicted the function should return |
-| **PASS** | Actual matches expected — the function is working for this input |
-| **FAIL** | Actual does not match expected — there is a bug to fix |
+| **PASS** | Actual matches expected: the function is working for this input |
+| **FAIL** | Actual does not match expected: there is a bug to fix |
 | **test case** | One specific input + expected output pair used to check a function |

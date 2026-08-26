@@ -1,6 +1,6 @@
 {
   "id": "2-5-16-example-validate-then-trust",
-  "title": "2.5.16 Worked Example — Validate, Then Trust",
+  "title": "2.5.16 Worked Example: Validate, Then Trust",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.5.4 — Example 2.3 'Validating before you trust'",
+  "sourceRef": "book 2.5.4: Example 2.3 'Validating before you trust'",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

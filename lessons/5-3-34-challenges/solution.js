@@ -1,4 +1,4 @@
-// 2.2.13 Challenges — reference solution.
+// 2.2.13 Challenges: reference solution.
 // Demonstrates all three OOP stretches: Challenge 1 (Enemy.isAlive),
 // Challenge 2 (Player class wrapping a sprite), Challenge 3 (PowerUp
 // extends Collectible). Any one of the three is enough to pass the grader.
@@ -91,7 +91,7 @@ function draw() {
 
   fill('white');
   textSize(14);
-  text('Enemy HP: ' + enemy.hp + (enemy.isAlive() ? '' : ' (dead)'), 12, 22);
+  text('Enemy HP: ' + enemy.hp + (enemy.isAlive() ? '': ' (dead)'), 12, 22);
   text('Score: ' + score, 12, 40);
   text('A/D move · SPACE jump · X attack', 12, 380);
 }

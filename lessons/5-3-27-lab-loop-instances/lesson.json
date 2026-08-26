@@ -1,10 +1,10 @@
 {
   "id": "5-3-27-lab-loop-instances",
-  "title": "5.4.13 Lab — Loop over an array of instances",
-  "description": "Write a `for...of` loop in `draw()` that calls `.render()` on each enemy — dispatching a method to every element in the array with one loop.",
+  "title": "5.4.13 Lab: Loop over an array of instances",
+  "description": "Write a `for...of` loop in `draw()` that calls `.render()` on each enemy: dispatching a method to every element in the array with one loop.",
   "type": "lesson",
   "estimateMins": 8,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
   "preview": "moshion",
   "week": 12,
@@ -18,7 +18,7 @@
       "title": "Loop over enemies and call .render() on each",
       "instructions": "In `draw()`, write a `for...of` loop over the `enemies` array. Inside the loop, call `.render()` on the loop variable. All five HP labels should appear on screen.",
       "hints": [
-        "Open the moSHion docs drawer on the right and review the array and loop sections — a for...of loop gives you each element one at a time."
+        "Open the moSHion docs drawer on the right and review the array and loop sections: a for...of loop gives you each element one at a time."
       ]
     }
   ],

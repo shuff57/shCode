@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed — A2.3.1, curriculum-plan.md §2.3 Assignments",
+  "sourceRef": "designed: A2.3.1, curriculum-plan.md §2.3 Assignments",
   "steps": [
     {
       "id": "s1",
@@ -21,12 +21,12 @@
     {
       "id": "s2",
       "title": "Write the switch",
-      "instructions": "Write a switch on filamentType with a case for 'PLA', 'ABS', 'PETG', and 'TPU'. Each case must print a recommended temperature and a recommended print speed for that filament — you choose reasonable numbers. Add a default that prints a message for a filament type you don't recognize. End every case with a break."
+      "instructions": "Write a switch on filamentType with a case for 'PLA', 'ABS', 'PETG', and 'TPU'. Each case must print a recommended temperature and a recommended print speed for that filament: you choose reasonable numbers. Add a default that prints a message for a filament type you don't recognize. End every case with a break."
     },
     {
       "id": "s3",
       "title": "Comment where fall-through would happen",
-      "instructions": "Above one of your case labels, write a comment explaining exactly what would print for that filament (and which cases below it) if its break were removed. Don't actually remove the break — the comment is the deliverable."
+      "instructions": "Above one of your case labels, write a comment explaining exactly what would print for that filament (and which cases below it) if its break were removed. Don't actually remove the break: the comment is the deliverable."
     }
   ],
   "requirements": [

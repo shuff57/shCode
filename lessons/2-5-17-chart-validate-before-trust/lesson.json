@@ -1,6 +1,6 @@
 {
   "id": "2-5-17-chart-validate-before-trust",
-  "title": "2.5.17 Chart the Code — Validate Before You Trust",
+  "title": "2.5.17 Chart the Code: Validate Before You Trust",
   "description": "Draw two validation checks in a row, each throwing on the branch that fails.",
   "type": "assignment",
   "estimateMins": 20,
@@ -13,7 +13,7 @@
     "SLO-4"
   ],
   "points": 0,
-  "sourceRef": "designed — practice for 2.5.4 Example 2.3 (two sequential validation checks)",
+  "sourceRef": "designed: practice for 2.5.4 Example 2.3 (two sequential validation checks)",
   "contentFile": "content.md",
   "diagram": {
     "starter": "flowchart TD\n  A([Start])\n  Z([End])",

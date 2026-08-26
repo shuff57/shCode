@@ -1,6 +1,6 @@
-**Goal:** Read `this` like a pronoun — replace it with whatever variable sits on the left of the dot at the call site.
+**Goal:** Read `this` like a pronoun: replace it with whatever variable sits on the left of the dot at the call site.
 
-## Step 1 — The class and two instances
+## Step 1: The class and two instances
 
 Here's the full class. Run it and confirm both counters start at 0.
 
@@ -34,7 +34,7 @@ function draw() {
 
 **What you'll see:** `c1.n = 0` and `c2.n = 0`. Two counters, each holding its own `n`.
 
-## Step 2 — Substitute `c1` for `this` when calling `c1.tick()`
+## Step 2: Substitute `c1` for `this` when calling `c1.tick()`
 
 Now add a space-bar call to `c1.tick()`. Each press increments only `c1`. Watch the substitution rule in action:
 
@@ -84,7 +84,7 @@ function draw() {
 
 **Try this:** change the call to `c2.tick()`. Now the substitution yields `c2.n += 1`, so `c2` grows and `c1` stays put. Same method body, different substitution.
 
-## Step 3 — Apply the rule to a second method
+## Step 3: Apply the rule to a second method
 
 The same substitution works for any method. Here `double()` uses `this.n *= 2`. Apply the rule yourself:
 
@@ -134,6 +134,6 @@ function draw() {
 
 ## Key takeaways
 
-- `this` is a pronoun — substitute the variable on the left of the dot at each call site.
+- `this` is a pronoun: substitute the variable on the left of the dot at each call site.
 - The same method body runs for every instance; only the substitution changes.
 - Two instances, two substitutions, completely independent state.

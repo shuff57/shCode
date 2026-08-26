@@ -1,6 +1,6 @@
-**Goal:** Predict which branch of an if/else chain fires before you run the code — then verify it.
+**Goal:** Predict which branch of an if/else chain fires before you run the code, then verify it.
 
-## Step 1 — Run the grade chain
+## Step 1: Run the grade chain
 
 `score` is 85. Before you hit Run, read each condition top to bottom and decide which one is true first. Then run and check your prediction.
 
@@ -20,7 +20,7 @@ if (score >= 90) {
 }
 ```
 
-## Step 2 — Change the value and re-predict
+## Step 2: Change the value and re-predict
 
 Change `score` to `55`. Which branch will fire now? Predict first, then run.
 
@@ -40,7 +40,7 @@ if (score >= 90) {
 }
 ```
 
-## Step 3 — Hit the else
+## Step 3: Hit the else
 
 Set `score` to `30`. No `if` or `else if` condition will be true, so the `else` at the bottom catches it.
 
@@ -63,6 +63,6 @@ if (score >= 90) {
 ## Key takeaways
 
 - JavaScript checks conditions **top to bottom** and stops at the first one that is true.
-- Only **one branch** ever runs per evaluation — the rest are skipped.
+- Only **one branch** ever runs per evaluation: the rest are skipped.
 - `else` is the fallback: it runs when every condition above it was false.
-- Predicting before running is the key habit — it turns reading code into understanding code.
+- Predicting before running is the key habit: it turns reading code into understanding code.

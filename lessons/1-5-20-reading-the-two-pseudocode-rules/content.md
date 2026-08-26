@@ -1,6 +1,6 @@
 ## Two rules, and no others
 
-> **Definition 1.5.5 — Pseudocode.** A description of a program's steps written in plain language and arranged like code, with indentation showing which steps belong inside which. It is not written in any programming language and cannot be run.
+> **Definition 1.5.5: Pseudocode.** A description of a program's steps written in plain language and arranged like code, with indentation showing which steps belong inside which. It is not written in any programming language and cannot be run.
 
 There is no compiler for pseudocode and no rules to look up. The only requirement is that a human can follow it without guessing. Two conventions do almost all the work:
 
@@ -17,7 +17,7 @@ while i is 5 or less
 print total
 ```
 
-The two indented lines are the ones that **repeat**. `print total` is not indented, so it happens once, at the end. Move `print total` in by four spaces and you have described a completely different program — one that prints five times. That is how much work indentation is doing.
+The two indented lines are the ones that **repeat**. `print total` is not indented, so it happens once, at the end. Move `print total` in by four spaces and you have described a completely different program: one that prints five times. That is how much work indentation is doing.
 
 Anyone who can read English can follow that, including someone who has never written a line of code. It is also close enough to a program that turning it into JavaScript later is nearly mechanical.
 
@@ -25,7 +25,7 @@ Anyone who can read English can follow that, including someone who has never wri
 
 **What you'll learn from it:**
 - One instruction per line; split any line doing two things.
-- Indentation shows what is inside what — it is not decoration.
+- Indentation shows what is inside what: it is not decoration.
 - Pseudocode cannot be run and is not any language.
 - Nothing checks it, which is why a human has to.
 
@@ -55,5 +55,5 @@ The braces `{ }` are doing in JavaScript exactly what the indentation did in the
 |------|---------|
 | **pseudocode** | A program's steps in plain language, laid out like code. Not runnable |
 | **indentation** | Leading spaces showing that a step is inside another |
-| **containment** | What indentation expresses — this step belongs to that one |
+| **containment** | What indentation expresses: this step belongs to that one |
 | **one instruction per line** | The other rule; split any line doing two things |

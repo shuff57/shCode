@@ -2,7 +2,7 @@
 
 // STEP 1: Write four console.log statements.
 //         Each one should print the result of a comparison expression.
-//         Use a mix of the comparison operators from the reading —
+//         Use a mix of the comparison operators from the reading :
 //         greater/less than, the two equality forms, and not-equal.
 //         At least one comparison MUST use the strict-equality form.
 

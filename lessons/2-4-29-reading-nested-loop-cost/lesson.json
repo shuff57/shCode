@@ -1,13 +1,13 @@
 {
   "id": "2-4-29-reading-nested-loop-cost",
-  "title": "2.4.29 Reading — Nested Loops Get Expensive",
+  "title": "2.4.29 Reading: Nested Loops Get Expensive",
   "description": "Two nested loops over 1,000 items each is a million rounds. Learn to count the cost before you look anywhere else for a slowdown. Read before Triangle of Stars.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "reading",
-  "sourceRef": "book 2.4 — Context Pause on nested-loop cost",
+  "sourceRef": "book 2.4: Context Pause on nested-loop cost",
   "week": 7,
   "slos": [
     "SLO-3"

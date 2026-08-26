@@ -33,7 +33,7 @@
           "JavaScript works out the answer before the program runs"
         ],
         "answer": 2,
-        "explanation": "You never write the type. `let x = 10;` then `x = \"ten\";` is perfectly legal — the value carries the type, not the variable."
+        "explanation": "You never write the type. `let x = 10;` then `x = \"ten\";` is perfectly legal: the value carries the type, not the variable."
       },
       {
         "id": "q2-primitives",
@@ -46,7 +46,7 @@
           "text, number, yes/no, empty, missing, big number, name"
         ],
         "answer": 0,
-        "explanation": "Those seven. Arrays, objects and functions are not primitives — they are objects, which is the other half of the primitive/object split."
+        "explanation": "Those seven. Arrays, objects and functions are not primitives: they are objects, which is the other half of the primitive/object split."
       },
       {
         "id": "q3-special-numbers",
@@ -72,7 +72,7 @@
           "\"error\""
         ],
         "answer": 1,
-        "explanation": "NaN stands for \"not a number\", but it is still of type number — it is the number type's way of saying \"this calculation had no numeric answer\"."
+        "explanation": "NaN stands for \"not a number\", but it is still of type number: it is the number type's way of saying \"this calculation had no numeric answer\"."
       },
       {
         "id": "q5-null-vs-undefined",
@@ -93,13 +93,13 @@
         "code": "let x = 10;\nx = \"ten\";\nconsole.log(x);",
         "question": "What does this code print?",
         "options": [
-          "An error — you cannot put a string in a number variable",
+          "An error: you cannot put a string in a number variable",
           "10",
           "ten",
           "undefined"
         ],
         "answer": 2,
-        "explanation": "It prints ten. JavaScript is dynamically typed, so reassigning x to a string is allowed — the variable never had a type to violate."
+        "explanation": "It prints ten. JavaScript is dynamically typed, so reassigning x to a string is allowed: the variable never had a type to violate."
       },
       {
         "id": "q7-backticks",
@@ -119,13 +119,13 @@
         "source": "1.2.23 and 1.2.24",
         "question": "What does `typeof null` give you, and what is odd about it?",
         "options": [
-          "\"null\" — nothing odd, that is the type name",
-          "\"undefined\" — odd, because null and undefined are different",
-          "\"object\" — odd, because null is not an object; it is a long-standing mistake in the language",
-          "\"empty\" — odd, because that type does not otherwise exist"
+          "\"null\": nothing odd, that is the type name",
+          "\"undefined\": odd, because null and undefined are different",
+          "\"object\": odd, because null is not an object; it is a long-standing mistake in the language",
+          "\"empty\": odd, because that type does not otherwise exist"
         ],
         "answer": 2,
-        "explanation": "It answers \"object\", which is wrong — null is a primitive. It is a bug from the very first version of JavaScript that was never fixed, because fixing it would break existing sites."
+        "explanation": "It answers \"object\", which is wrong: null is a primitive. It is a bug from the very first version of JavaScript that was never fixed, because fixing it would break existing sites."
       }
     ]
   }

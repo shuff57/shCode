@@ -4,13 +4,13 @@
 
 By the end of this reading you should be able to give a one-sentence definition of each term in your own words.
 
-OOP textbooks and college courses all invoke three vocabulary words. You will hear them again. This reading gives you a working definition for each so the word lands when it shows up — not so you practice them this week.
+OOP textbooks and college courses all invoke three vocabulary words. You will hear them again. This reading gives you a working definition for each so the word lands when it shows up, not so you practice them this week.
 
 **What you'll learn from it:**
 
-- **Encapsulation** — bundling data and behavior inside a single unit, and controlling what the outside world can see.
-- **Inheritance** — one class extends another class, receiving all its properties and methods automatically.
-- **Polymorphism** — different classes can respond to the same method name in different ways.
+- **Encapsulation**: bundling data and behavior inside a single unit, and controlling what the outside world can see.
+- **Inheritance**: one class extends another class, receiving all its properties and methods automatically.
+- **Polymorphism**: different classes can respond to the same method name in different ways.
 
 ---
 
@@ -41,10 +41,10 @@ Inheritance is powerful and can create hard-to-debug problems when the parent cl
 
 ### Polymorphism
 
-Imagine an array of game objects — some are `Enemy`, some are `Collectible`, some are `PowerUp`. Each class has its own `render()` method that draws itself differently. A single `for` loop can call `.render()` on every element, and each object runs *its own version*. Same method name, different behavior per class. That's **polymorphism**.
+Imagine an array of game objects: some are `Enemy`, some are `Collectible`, some are `PowerUp`. Each class has its own `render()` method that draws itself differently. A single `for` loop can call `.render()` on every element, and each object runs *its own version*. Same method name, different behavior per class. That's **polymorphism**.
 
 ```js
-// Each class has its own render() — loop doesn't care which:
+// Each class has its own render(): loop doesn't care which:
 for (let obj of allObjects) {
   obj.render();
 }
@@ -85,9 +85,9 @@ function draw() {
 }
 ```
 
-**What you'll see:** two blue squares and one orange circle — each drawn by its own `draw()` method. Same loop call, different rendering per class.
+**What you'll see:** two blue squares and one orange circle: each drawn by its own `draw()` method. Same loop call, different rendering per class.
 
-**Try this:** add a `Triangle` class with its own `draw()` that draws a triangle and push one into `shapes`. The loop doesn't change — it just works.
+**Try this:** add a `Triangle` class with its own `draw()` that draws a triangle and push one into `shapes`. The loop doesn't change: it just works.
 
 ---
 

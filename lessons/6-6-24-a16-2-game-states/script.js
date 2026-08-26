@@ -1,4 +1,4 @@
-// 2.6.24 A16.2 Game States — State machine with persistence
+// 2.6.24 A16.2 Game States: State machine with persistence
 
 let state;
 

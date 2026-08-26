@@ -11,12 +11,12 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.3.5 — Try It Now 2.4",
+  "sourceRef": "book 2.3.5: Try It Now 2.4",
   "steps": [
     {
       "id": "s1",
       "title": "Explain why it fails",
-      "instructions": "Run the code and confirm it prints No medal. place is the string '2', and the cases are the numbers 1 and 2 — strict equality means neither case can match."
+      "instructions": "Run the code and confirm it prints No medal. place is the string '2', and the cases are the numbers 1 and 2: strict equality means neither case can match."
     },
     {
       "id": "s2",

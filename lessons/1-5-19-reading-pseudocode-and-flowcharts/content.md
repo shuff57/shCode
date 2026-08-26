@@ -5,13 +5,13 @@
 - The three flowchart shapes and what each one means
 - Why the diamond is the shape worth studying
 
-An **algorithm** is a precise sequence of steps. You have one in your head the moment you understand a problem — the difficulty is getting it out of your head accurately enough that somebody else, or a computer, can follow it.
+An **algorithm** is a precise sequence of steps. You have one in your head the moment you understand a problem: the difficulty is getting it out of your head accurately enough that somebody else, or a computer, can follow it.
 
 There are two standard ways to write one down, and neither is code. Both come before code.
 
 ### Pseudocode
 
-**Pseudocode** is the algorithm written as ordinary language, arranged in the shape a program has. It borrows a few keywords — `START`, `INPUT`, `OUTPUT`, `IF`, `THEN`, `ELSE`, `END` — and uses indenting to show what belongs inside what. Nothing else about it is fussy. It does not run, no compiler checks it, and there is no punctuation to get wrong.
+**Pseudocode** is the algorithm written as ordinary language, arranged in the shape a program has. It borrows a few keywords: `START`, `INPUT`, `OUTPUT`, `IF`, `THEN`, `ELSE`, `END`, and uses indenting to show what belongs inside what. Nothing else about it is fussy. It does not run, no compiler checks it, and there is no punctuation to get wrong.
 
 Here is a rule about voting age, written as pseudocode:
 
@@ -30,21 +30,21 @@ Read it aloud and it is just English with the shape showing. That shape is the p
 
 ### Flowcharts
 
-A **flowchart** is the same plan drawn as a picture — boxes for steps, arrows for the order they happen in. Where pseudocode is quicker to write, a flowchart is easier to *see*, which matters as soon as a program starts making choices.
+A **flowchart** is the same plan drawn as a picture: boxes for steps, arrows for the order they happen in. Where pseudocode is quicker to write, a flowchart is easier to *see*, which matters as soon as a program starts making choices.
 
 **Three shapes carry nearly every flowchart:**
 
 | Shape | Name | Means |
 |---|---|---|
 | Oval | **Terminal** | Start or end |
-| Rectangle | **Process** | A step — do this |
+| Rectangle | **Process** | A step: do this |
 | Diamond | **Decision** | A question with two exits, labelled `yes` and `no` |
 
-That is the whole vocabulary for now. Your toolbar shows a fourth — a parallelogram for input and output — and hides four more behind **+ more shapes**. They arrive in later sections, and nothing you are assessed on this chapter needs them.
+That is the whole vocabulary for now. Your toolbar shows a fourth: a parallelogram for input and output, and hides four more behind **+ more shapes**. They arrive in later sections, and nothing you are assessed on this chapter needs them.
 
 Here is the voting pseudocode above, drawn:
 
-```flow readonly caption="Figure 1.5.1 — the voting rule as a flowchart. Same algorithm as the pseudocode, same order, drawn instead of written."
+```flow readonly caption="Figure 1.5.1: the voting rule as a flowchart. Same algorithm as the pseudocode, same order, drawn instead of written."
 flowchart TD
   A([Start]) --> B[get the age]
   B --> C{age >= 18}
@@ -60,7 +60,7 @@ It has **one way in and two ways out**, and the two paths **join up again afterw
 
 Two rules follow from it, and almost every broken flowchart breaks one of them:
 
-**Both exits must be labelled.** A question has two answers, so say which arrow is which. An unlabelled branch is the fastest way to make a chart unreadable — every shape is correct and a reader still cannot tell which way `true` goes.
+**Both exits must be labelled.** A question has two answers, so say which arrow is which. An unlabelled branch is the fastest way to make a chart unreadable: every shape is correct and a reader still cannot tell which way `true` goes.
 
 **Both branches must come back together.** A flowchart whose paths never meet again has two endings, and two endings almost always means a step was forgotten. In the figure above, both prints lead to the same End oval.
 
@@ -83,7 +83,7 @@ flowchart TD
   B --> C{is it above 30}
 ```
 
-**Worth trying:** the chart above is unfinished — the diamond has one exit and no labels. Give it both answers and an End, and notice how much of the work is deciding what happens on the `no` path.
+**Worth trying:** the chart above is unfinished: the diamond has one exit and no labels. Give it both answers and an End, and notice how much of the work is deciding what happens on the `no` path.
 
 ---
 

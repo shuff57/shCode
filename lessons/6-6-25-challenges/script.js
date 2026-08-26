@@ -1,4 +1,4 @@
-// 2.6.25 Challenges — Extended state features
+// 2.6.25 Challenges: Extended state features
 
 let state;
 
@@ -10,6 +10,6 @@ function setup() {
 function draw() {
   background('#222');
 
-  // STEP 2: switch(state) — add your challenge's new state or transition logic here
+  // STEP 2: switch(state): add your challenge's new state or transition logic here
 
 }

@@ -1,10 +1,10 @@
 {
   "id": "6-5-26-challenges",
-  "title": "6.5.27 Challenges — Extended Save Features",
+  "title": "6.5.27 Challenges: Extended Save Features",
   "description": "Extend your save system: save file previews (show slot contents before loading), save timestamps, multiple profiles, or a 'delete all saves' with double-confirmation.",
   "type": "challenge",
   "estimateMins": 30,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "moshion",
   "week": 16,
@@ -24,7 +24,7 @@
     {
       "id": "s2",
       "title": "Implement the feature",
-      "instructions": "Starting from your A16.1 save system, add the challenge feature. Make sure the core save/load functionality still works — your extension should add capability, not break existing saves.",
+      "instructions": "Starting from your A16.1 save system, add the challenge feature. Make sure the core save/load functionality still works: your extension should add capability, not break existing saves.",
       "hints": [
         "Test your existing save/load before adding the new feature so you know it still works.",
         "Save a backup copy of your A16.1 script.js before modifying it."

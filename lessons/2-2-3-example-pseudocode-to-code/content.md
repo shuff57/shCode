@@ -1,6 +1,6 @@
 **Goal:** Turn a plain-English algorithm into working JavaScript by writing the pseudocode as comments first, then filling in the code underneath.
 
-## Step 1 — Read the pseudocode
+## Step 1: Read the pseudocode
 
 Here is the algorithm in plain English, written as comments. Read through it before touching any code. Notice how each step maps naturally to a JavaScript statement.
 
@@ -16,7 +16,7 @@ let b = 27;
 let c = 9;
 ```
 
-## Step 2 — Fill in the code under each comment
+## Step 2: Fill in the code under each comment
 
 Each comment becomes one or two lines of JavaScript. Run it and check that it prints `27`.
 
@@ -42,7 +42,7 @@ if (c > largest) {
 console.log("Largest:", largest);
 ```
 
-## Step 3 — Try different values
+## Step 3: Try different values
 
 Change `a`, `b`, `c` to `5`, `5`, `5` (a tie) and then to `99`, `1`, `2`. The algorithm handles both cases without any changes.
 
@@ -67,6 +67,6 @@ console.log("Largest:", largest);
 ## Key takeaways
 
 - Write the algorithm in plain English as comments **before** writing any code.
-- Translate one comment at a time — each step is usually one or two lines.
+- Translate one comment at a time: each step is usually one or two lines.
 - Separate `if` statements (not `else if`) let every condition get checked independently, which is right here because each check might update `largest`.
 - Testing edge cases (tie, first is largest, last is largest) confirms the algorithm is correct.

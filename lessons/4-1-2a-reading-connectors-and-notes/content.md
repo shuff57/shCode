@@ -5,11 +5,11 @@
 - The note: a remark for the reader that takes no arrows
 - Why both of these only show up on charts this size
 
-These are the last two shapes. They arrive now because the Print Shop is the first chart you will draw that is too big to be tidy without them — which is exactly the right reason for a tool to arrive.
+These are the last two shapes. They arrive now because the Print Shop is the first chart you will draw that is too big to be tidy without them: which is exactly the right reason for a tool to arrive.
 
 ### The connector
 
-```flow readonly caption="Figure 4.1.1 — the two A circles are one point. Flow leaves the first and continues at the second; the long arrow across the page is what they replace."
+```flow readonly caption="Figure 4.1.1: the two A circles are one point. Flow leaves the first and continues at the second; the long arrow across the page is what they replace."
 flowchart TD
   S([Start]) --> B[work out the price]
   B --> C{is it over budget}
@@ -24,13 +24,13 @@ A **connector** is a small circle with a letter in it. Two connectors sharing th
 
 That is all it is: a way of saying "continues over there" without dragging an arrow across four inches of diagram and through three other shapes. On paper it is what lets a chart span two pages.
 
-**Every letter must appear exactly twice** — once where flow leaves, once where it arrives. A lone connector is a jump to nowhere, and `connector-pairs` will tell you so. If you need a third landing point, that is a sign the chart wants a function instead.
+**Every letter must appear exactly twice**, once where flow leaves, once where it arrives. A lone connector is a jump to nowhere, and `connector-pairs` will tell you so. If you need a third landing point, that is a sign the chart wants a function instead.
 
 Use them sparingly. A chart with eight connectors in it is harder to read than the long arrows were.
 
 ### The note
 
-A **note** is a bracket-shaped box holding a remark for whoever reads the chart. It is not a step. It sits beside the diagram and **takes no arrows at all** — it is the one shape that is allowed to float, and the `no-orphans` check knows to ignore it.
+A **note** is a bracket-shaped box holding a remark for whoever reads the chart. It is not a step. It sits beside the diagram and **takes no arrows at all**: it is the one shape that is allowed to float, and the `no-orphans` check knows to ignore it.
 
 Use it for the thing a reader would otherwise stop and question:
 
@@ -49,7 +49,7 @@ Good notes explain a decision that is not obvious from the shapes: why a thresho
 | **Circle** | **now** | a jump |
 | **Bracket** | **now** | a note |
 
-That is the whole vocabulary for the rest of the course. There is no ninth shape coming — from here it is all in how you use these.
+That is the whole vocabulary for the rest of the course. There is no ninth shape coming, from here it is all in how you use these.
 
 ---
 

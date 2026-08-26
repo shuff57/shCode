@@ -1,6 +1,6 @@
 {
   "id": "2-2-3-example-pseudocode-to-code",
-  "title": "2.2.5 Worked Example — Pseudocode → code",
+  "title": "2.2.5 Worked Example: Pseudocode → code",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -11,7 +11,7 @@
     "SLO-4",
     "SLO-5"
   ],
-  "sourceRef": "designed — pseudocode-to-code translation practice, informed by book 2.2.1/2.2.2 worked examples (Example 2.1, Example 2.2)",
+  "sourceRef": "designed: pseudocode-to-code translation practice, informed by book 2.2.1/2.2.2 worked examples (Example 2.1, Example 2.2)",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

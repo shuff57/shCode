@@ -1,13 +1,13 @@
 ## throw vs if: The Distance Rule
 
 **What you'll learn:**
-- `throw` is not always the right tool for a bad value — sometimes a plain `if` is simpler
+- `throw` is not always the right tool for a bad value, sometimes a plain `if` is simpler
 - The rule: ask *who* notices the problem and *who* knows what to do about it
 
 Both of these reject a negative age. Only one of them uses `throw`.
 
 ```js live plain
-// Plain if — the code that notices is also the code that decides
+// Plain if: the code that notices is also the code that decides
 const age = -5;
 
 if (age < 0) {
@@ -18,7 +18,7 @@ if (age < 0) {
 ```
 
 ```js live plain
-// throw — because something further out should decide what the user sees
+// throw, because something further out should decide what the user sees
 const age = -5;
 
 try {
@@ -31,7 +31,7 @@ try {
 }
 ```
 
-Both programs print the same thing here. The difference shows up in *where the decision gets made*. Use the **distance rule**: if the code that notices the problem is also the code that knows what to do about it, a plain `if` is simpler and clearer. `throw` earns its place when the code that notices *cannot* decide — a validation check buried deep inside a calculation has no business deciding what message the user sees, so it throws, and code further out decides what happens next.
+Both programs print the same thing here. The difference shows up in *where the decision gets made*. Use the **distance rule**: if the code that notices the problem is also the code that knows what to do about it, a plain `if` is simpler and clearer. `throw` earns its place when the code that notices *cannot* decide: a validation check buried deep inside a calculation has no business deciding what message the user sees, so it throws, and code further out decides what happens next.
 
 ---
 

@@ -1,4 +1,4 @@
-// 2.3.12 Challenges — reference solution.
+// 2.3.12 Challenges: reference solution.
 // Combines all three Groups stretches: Challenge 1 (lives counter via a
 // rocks Group), Challenge 2 (varied-size/value apples driven by Math.random),
 // Challenge 3 (`cull()` helper replacing the manual backwards loop).
@@ -33,7 +33,7 @@ function draw() {
   // Basket follows the mouse along x.
   basket.x = mouseX;
 
-  // Challenge 2 — spawn apples with varied size, varied score.
+  // Challenge 2: spawn apples with varied size, varied score.
   if (frameCount % 30 === 0) {
     let a = new apples.Sprite(20 + Math.random() * 360, -20);
     a.diameter = 12 + Math.random() * 24;
@@ -41,7 +41,7 @@ function draw() {
     a.vel.y = 3;
   }
 
-  // Challenge 1 — rocks spawn slower and cost a life on contact.
+  // Challenge 1: rocks spawn slower and cost a life on contact.
   if (frameCount % 90 === 0) {
     let r = new rocks.Sprite(20 + Math.random() * 360, -20);
     r.vel.y = 2;
@@ -59,7 +59,7 @@ function draw() {
     rock.delete();
   });
 
-  // Challenge 3 — single helper handles off-screen cleanup for every Group.
+  // Challenge 3: single helper handles off-screen cleanup for every Group.
   cull(apples);
   cull(rocks);
 

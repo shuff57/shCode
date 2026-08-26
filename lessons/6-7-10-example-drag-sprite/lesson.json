@@ -1,9 +1,9 @@
 {
   "id": "6-7-10-example-drag-sprite",
-  "title": "6.7.10 Worked Example — Drag a Sprite Around",
+  "title": "6.7.10 Worked Example: Drag a Sprite Around",
   "type": "lesson",
   "estimateMins": 12,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.7 Advanced Input and Joints",
   "preview": "example",
   "week": 17,

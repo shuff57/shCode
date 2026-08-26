@@ -1,6 +1,6 @@
-**Goal:** Compose hit-testing (2.7.6), drag (2.7.9), `DistanceJoint` (2.7.12), `joint.delete()` (2.7.16), `applyForce` (2.7.17), and vector math (2.7.18) into a working slingshot — the unit's integration moment.
+**Goal:** Compose hit-testing (2.7.6), drag (2.7.9), `DistanceJoint` (2.7.12), `joint.delete()` (2.7.16), `applyForce` (2.7.17), and vector math (2.7.18) into a working slingshot: the unit's integration moment.
 
-## Step 1 — Hit Run and try the slingshot
+## Step 1: Hit Run and try the slingshot
 
 Click the ball near the center-left, drag it away from the anchor, and release. The ball snaps back toward the anchor and launches past it under gravity.
 
@@ -32,9 +32,9 @@ function draw() {
 }
 ```
 
-## Step 2 — Setup: anchor + ball + zero-length joint
+## Step 2: Setup: anchor + ball + zero-length joint
 
-`anchor` is static — it never moves. `ball` starts at the same position. `new DistanceJoint(anchor, ball)` creates the tether; `joint.length = 0` sets the natural resting length to zero (so the ball sits right on the anchor when nothing pulls it). Without `joint.length = 0` the natural length would be the starting distance — also zero here, but setting it explicitly makes the intent clear.
+`anchor` is static: it never moves. `ball` starts at the same position. `new DistanceJoint(anchor, ball)` creates the tether; `joint.length = 0` sets the natural resting length to zero (so the ball sits right on the anchor when nothing pulls it). Without `joint.length = 0` the natural length would be the starting distance: also zero here, but setting it explicitly makes the intent clear.
 
 ```js live
 let ball, anchor, joint, dragging = false;
@@ -50,11 +50,11 @@ function setup() {
 function draw() { background('#222'); }
 ```
 
-## Step 3 — Drag: snap position, zero velocity
+## Step 3: Drag: snap position, zero velocity
 
-While dragging, the ball's position is forced to the cursor every frame and its velocity is zeroed. Without the velocity zero, the physics engine's own velocity would fight the position override and the ball would shake. The `world.getSpriteAt` hit-test ensures dragging only starts when the cursor is actually on the ball — clicking the anchor or empty canvas does nothing.
+While dragging, the ball's position is forced to the cursor every frame and its velocity is zeroed. Without the velocity zero, the physics engine's own velocity would fight the position override and the ball would shake. The `world.getSpriteAt` hit-test ensures dragging only starts when the cursor is actually on the ball: clicking the anchor or empty canvas does nothing.
 
-> **Why `mouse.pressing()` here, not `mouse.presses()`?** 2.7.10 used `mouse.presses()` (one-shot, fires only on the first frame the button goes down) to start its drag. This slingshot uses `mouse.pressing()` (held, fires every frame the button is down) so the drag re-engages on any frame the cursor is over the ball while the button is held — more forgiving when the ball is small and the cursor slips off the first try. Either form works; the difference is how strict the start is.
+> **Why `mouse.pressing()` here, not `mouse.presses()`?** 2.7.10 used `mouse.presses()` (one-shot, fires only on the first frame the button goes down) to start its drag. This slingshot uses `mouse.pressing()` (held, fires every frame the button is down) so the drag re-engages on any frame the cursor is over the ball while the button is held: more forgiving when the ball is small and the cursor slips off the first try. Either form works; the difference is how strict the start is.
 
 ```js live
 let ball, anchor, joint, dragging = false;
@@ -79,9 +79,9 @@ function draw() {
 }
 ```
 
-## Step 4 — Release: delete joint, apply force
+## Step 4: Release: delete joint, apply force
 
-When the mouse button comes up while dragging, `dx = anchor.pos.x - ball.pos.x` and `dy = anchor.pos.y - ball.pos.y` compute the vector from the ball's pulled-back position back to the anchor — the bowstring direction. `joint.delete()` removes the constraint; `ball.applyForce(dx * 5, dy * 5)` fires the ball along that vector. The scale `5` is large enough to overcome gravity for a visible arc.
+When the mouse button comes up while dragging, `dx = anchor.pos.x - ball.pos.x` and `dy = anchor.pos.y - ball.pos.y` compute the vector from the ball's pulled-back position back to the anchor: the bowstring direction. `joint.delete()` removes the constraint; `ball.applyForce(dx * 5, dy * 5)` fires the ball along that vector. The scale `5` is large enough to overcome gravity for a visible arc.
 
 ```js live
 let ball, anchor, joint, dragging = false;
@@ -113,8 +113,8 @@ function draw() {
 
 ## Key takeaways
 
-- `joint.length = 0` after construction sets the natural resting length (the third-arg object form is not supported — always use the property).
-- `world.getSpriteAt(x, y) === ball` is the only correct cursor hit-test — do not use `overlaps`.
+- `joint.length = 0` after construction sets the natural resting length (the third-arg object form is not supported, always use the property).
+- `world.getSpriteAt(x, y) === ball` is the only correct cursor hit-test: do not use `overlaps`.
 - Zero the ball's velocity every drag frame or the physics engine fights the position override.
-- `joint.delete()` releases the constraint — `joint.remove()` does not exist.
-- The force vector points from the pulled-back ball back toward the anchor — that is the bowstring snap direction.
+- `joint.delete()` releases the constraint: `joint.remove()` does not exist.
+- The force vector points from the pulled-back ball back toward the anchor: that is the bowstring snap direction.

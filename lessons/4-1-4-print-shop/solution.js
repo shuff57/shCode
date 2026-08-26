@@ -1,4 +1,4 @@
-// Print Shop — Q1 Synthesis Project
+// Print Shop: Q1 Synthesis Project
 
 // Filament cost per gram, kept in one place so it's easy to change.
 const FILAMENT_COST_PER_GRAM = {
@@ -57,10 +57,10 @@ function saveQueue() {
 
 function loadQueue() {
   const raw = localStorage.getItem("printQueue");
-  return raw ? JSON.parse(raw) : [];
+  return raw ? JSON.parse(raw): [];
 }
 
-// STEP 7: main program — everything above is definitions, this is what runs.
+// STEP 7: main program: everything above is definitions, this is what runs.
 saveQueue();
 const loadedOrders = loadQueue();
 const sortedQueue = sortByPriority(loadedOrders);
@@ -77,14 +77,14 @@ console.log("You made $" + totalMade.toFixed(2) + "; queue is " + totalHours.toF
 // STEP 8: three manual tests, one of them an edge case.
 const testCube = { name: "Test cube", width: 10, height: 10, depth: 10, filament: "PLA", priority: 1 };
 const expectedHours = (10 * 10 * 10) * HOURS_PER_CUBIC_MM;
-console.log(estimateHours(testCube) === expectedHours ? "PASS" : "FAIL");
+console.log(estimateHours(testCube) === expectedHours ? "PASS": "FAIL");
 
 const sortedSample = sortByPriority([
   { name: "Low urgency", priority: 5 },
   { name: "High urgency", priority: 1 },
 ]);
-console.log(sortedSample[0].priority === 1 ? "PASS" : "FAIL");
+console.log(sortedSample[0].priority === 1 ? "PASS": "FAIL");
 
 // Edge case: an order too big for the printer's build volume should not fit.
 const oversizedOrder = { name: "Oversized", width: 500, height: 500, depth: 500, filament: "PLA", priority: 1 };
-console.log(fitsInVolume(oversizedOrder, 200, 200, 200) === false ? "PASS" : "FAIL");
+console.log(fitsInVolume(oversizedOrder, 200, 200, 200) === false ? "PASS": "FAIL");

@@ -1,4 +1,4 @@
-## loadJSON — loading external game data
+## loadJSON: loading external game data
 
 **Read before the next video.** About 5 minutes.
 
@@ -20,7 +20,7 @@ You have two patterns now. They look similar but serve different purposes:
 **What you'll learn from it:**
 
 - `loadJSON(path, callback)` fetches a JSON file and passes the result to a callback function.
-- It runs **asynchronously** — it starts the fetch, keeps going, and calls your function later when the data arrives.
+- It runs **asynchronously**: it starts the fetch, keeps going, and calls your function later when the data arrives.
 - You use `loadJSON` for things you want to hard-code ahead of time: level layouts, NPC dialogue trees, item catalogs, quiz questions.
 
 **Try it:**
@@ -60,7 +60,7 @@ function draw() {
 
 **What you'll see:** "Loading level data..." flashes on screen briefly, then (once the fetch completes) the level name and stats appear. The `console.log` after `loadJSON` proves the callback fires later.
 
-**The callback rule:** you cannot write `let data = loadJSON('file.json')` and use the return value. `loadJSON` doesn't return the data — it passes it to your callback. This is the async pattern.
+**The callback rule:** you cannot write `let data = loadJSON('file.json')` and use the return value. `loadJSON` doesn't return the data: it passes it to your callback. This is the async pattern.
 
 **What `loadJSON` is good for in your games:**
 - Level layouts (tile maps, platform positions)
@@ -69,7 +69,7 @@ function draw() {
 - Item catalogs (names, stats, descriptions)
 - Quiz question banks (questions, answers, distractors)
 
-These are things you design ahead of time as a developer. They're not player saves — they're the blueprint your game runs from.
+These are things you design ahead of time as a developer. They're not player saves: they're the blueprint your game runs from.
 
 ---
 
@@ -77,6 +77,6 @@ These are things you design ahead of time as a developer. They're not player sav
 
 | Term | Meaning |
 |------|---------|
-| **Async** | Short for "asynchronous." Code that starts now but finishes later — it doesn't block. |
+| **Async** | Short for "asynchronous." Code that starts now but finishes later: it doesn't block. |
 | **Callback** | A function you pass into another function, to be called when work is done. `loadJSON` uses this pattern. |
 | **`loadJSON(path, callback)`** | moSHion function that fetches a JSON file and passes the parsed object to your callback. |

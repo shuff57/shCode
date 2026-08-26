@@ -19,7 +19,7 @@
     {
       "id": "s2",
       "title": "Fix the wrong types",
-      "instructions": "Some values are the wrong type for what the name says — a number written as text, a boolean written as text. Give each the type its name implies."
+      "instructions": "Some values are the wrong type for what the name says: a number written as text, a boolean written as text. Give each the type its name implies."
     },
     {
       "id": "s3",

@@ -18,7 +18,7 @@ if (condition) {
 }
 ```
 
-JavaScript checks each condition from top to bottom and stops at the **first** one that is true. Only that block runs — the rest are skipped.
+JavaScript checks each condition from top to bottom and stops at the **first** one that is true. Only that block runs: the rest are skipped.
 
 **Try it:** Change `score` to different values (95, 70, 55, 40) and re-run to see which branch fires each time.
 

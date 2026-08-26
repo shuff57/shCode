@@ -1,12 +1,12 @@
 ## SDLC methodology
 
-**Read before attempting `1.1.17 Reading — The Four Ps`.**
+**Read before attempting `1.1.17 Reading: The Four Ps`.**
 
 What you'll learn from it:
 
 - An SDLC methodology is a software process model that follows the generic framework of activities.
 - Teams use one for efficiency, lower risk, predictability, and captured best practice.
-- Every methodology is built from the same four phases — what changes is how much work each one gets.
+- Every methodology is built from the same four phases: what changes is how much work each one gets.
 
 **Try it:** Run the block below to log the four objectives a team gets from following a methodology.
 

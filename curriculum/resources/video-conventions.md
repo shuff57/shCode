@@ -17,7 +17,7 @@ these rules are binding.
 ```json
 {
   "id": "<slug>",
-  "title": "<numbering> Video — <topic>",
+  "title": "<numbering> Video: <topic>",
   "description": "<one-line hook ending with when-to-watch>",
   "type": "lesson",
   "estimateMins": 5,
@@ -36,19 +36,19 @@ these rules are binding.
 
 ### Field-by-field
 
-- `videoUrl` — **leave empty** at build time. The UI accepts any YouTube URL form (`youtu.be/…`, `/watch?v=…`, `/embed/…`, `/shorts/…`) and auto-extracts the 11-char video ID into an `/embed/` iframe (see `components/ContentLessonView.tsx` `toEmbedUrl`). Teacher fills this in during course prep.
-- `videoFallback` — the dashed-border message shown when `videoUrl` is empty. Make it actionable ("Ask your teacher for the link", "Open the slide deck for the live demo"). Never invent URLs here either.
-- `steps` / `requirements` — must be empty arrays. Videos are not auto-graded.
-- `grading.totalPoints` — must be `0`. The completion toggle is rendered by `CompletionPanel`, not the auto-grader.
+- `videoUrl`: **leave empty** at build time. The UI accepts any YouTube URL form (`youtu.be/…`, `/watch?v=…`, `/embed/…`, `/shorts/…`) and auto-extracts the 11-char video ID into an `/embed/` iframe (see `components/ContentLessonView.tsx` `toEmbedUrl`). Teacher fills this in during course prep.
+- `videoFallback`: the dashed-border message shown when `videoUrl` is empty. Make it actionable ("Ask your teacher for the link", "Open the slide deck for the live demo"). Never invent URLs here either.
+- `steps` / `requirements`: must be empty arrays. Videos are not auto-graded.
+- `grading.totalPoints`: must be `0`. The completion toggle is rendered by `CompletionPanel`, not the auto-grader.
 
 ## 2. File layout
 
 ```
 lessons/<slug>/
-└── lesson.json        # metadata only — no script.js, style.css, content.md
+└── lesson.json        # metadata only: no script.js, style.css, content.md
 ```
 
-A `content.md` is allowed but rare — only when the video needs a short comprehension-check paragraph below the embed. Do not use it to duplicate the video transcript.
+A `content.md` is allowed but rare, only when the video needs a short comprehension-check paragraph below the embed. Do not use it to duplicate the video transcript.
 
 ## 3. Don'ts
 
@@ -61,9 +61,9 @@ A `content.md` is allowed but rare — only when the video needs a short compreh
 
 > **`<unit-numbering>` = three dotted numbers `U.M.N`** (e.g. `2.1.2`). Titles MUST start with that prefix or the lesson vanishes from `/module/U.M` and the home page. See [README §Title numbering](README.md#title-numbering--the-hard-rule).
 
-`"<unit-numbering> Video — <topic>"` — the word "Video" appears in the title so the type is legible in the sidebar even if the badge is stripped.
+`"<unit-numbering> Video: <topic>"`: the word "Video" appears in the title so the type is legible in the sidebar even if the badge is stripped.
 
-Example: `"2.1.2 Video — Your first moSHion sketch"`.
+Example: `"2.1.2 Video: Your first moSHion sketch"`.
 
 ## History
 

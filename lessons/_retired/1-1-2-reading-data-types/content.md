@@ -17,7 +17,7 @@ Every value in JavaScript belongs to a **type**. JavaScript has several types; t
 
 The `typeof` operator returns the type of any value as a string. Write `typeof` in front of a value or variable name.
 
-**Try it:** Run the block and read each output. Notice that `typeof null` returns `"object"` — that is a famous old JavaScript bug. Every other language would call it `"null"`.
+**Try it:** Run the block and read each output. Notice that `typeof null` returns `"object"`: that is a famous old JavaScript bug. Every other language would call it `"null"`.
 
 ```js live plain
 let age = 17;
@@ -43,6 +43,6 @@ console.log(typeof notSet);
 | **number** | Any numeric value: integers and decimals |
 | **string** | Text surrounded by quotes (single, double, or backtick) |
 | **boolean** | Exactly `true` or `false` |
-| **`null`** | Intentional empty value — you set it on purpose |
+| **`null`** | Intentional empty value: you set it on purpose |
 | **`undefined`** | A variable that exists but has not been assigned a value |
 | **`typeof`** | Operator that returns a type name as a string |

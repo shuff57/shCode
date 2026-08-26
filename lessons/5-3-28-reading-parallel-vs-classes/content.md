@@ -1,6 +1,6 @@
 # Parallel arrays vs classes
 
-Read this before `5.4.15 Worked Example — Procedural vs OOP side-by-side`. About 6 minutes.
+Read this before `5.4.15 Worked Example: Procedural vs OOP side-by-side`. About 6 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -8,11 +8,11 @@ By the end of this reading you should be able to answer:
 - Why does deletion get harder as you add more arrays?
 - How does packing data + behavior into a class change the same problem?
 
-Both versions below build the *same* thing — a list of enemies, each with HP. The first does it the old procedural way (separate arrays for each property). The second uses a class. Read them side by side.
+Both versions below build the *same* thing: a list of enemies, each with HP. The first does it the old procedural way (separate arrays for each property). The second uses a class. Read them side by side.
 
 ---
 
-## Procedural — three arrays sharing an index
+## Procedural: three arrays sharing an index
 
 In the procedural version, "enemy 0" doesn't exist as a single object. It's *implied* by the agreement that index `0` of every array refers to the same enemy:
 
@@ -65,13 +65,13 @@ function draw() {
 
 **What you'll see:** three red circles in a row, each labelled with HP. Click anywhere to spawn another. Tap space to deal one damage to enemy `0`.
 
-**Try this:** delete one of the three `splice` calls inside `damageEnemy` — say, the `enemyX.splice(...)` line. Then keep tapping space until enemy 0 should die. The circle still shows up but at a different position than its label, because the arrays fell out of sync.
+**Try this:** delete one of the three `splice` calls inside `damageEnemy`: say, the `enemyX.splice(...)` line. Then keep tapping space until enemy 0 should die. The circle still shows up but at a different position than its label, because the arrays fell out of sync.
 
-**Now imagine adding a property** — say, a `color` per enemy. You'd need a new `enemyColor` array, plus updates in `spawnEnemy`, `damageEnemy`, and anywhere else that touches enemy data. One conceptual change, four code changes.
+**Now imagine adding a property**: say, a `color` per enemy. You'd need a new `enemyColor` array, plus updates in `spawnEnemy`, `damageEnemy`, and anywhere else that touches enemy data. One conceptual change, four code changes.
 
 ---
 
-## Object-oriented — one array of `Enemy` instances
+## Object-oriented: one array of `Enemy` instances
 
 The OOP version makes "enemy 0" a real object. It owns its own position, HP, and behavior:
 
@@ -117,9 +117,9 @@ function draw() {
 }
 ```
 
-**What you'll see:** the same gameplay — three red sprites, click to spawn, space to damage enemy 0. The behavior is identical; the *code shape* is what's different.
+**What you'll see:** the same gameplay: three red sprites, click to spawn, space to damage enemy 0. The behavior is identical; the *code shape* is what's different.
 
-**Try this:** add a property. Inside the `Enemy` constructor, add `this.maxHp = hp;` (so each enemy remembers its starting HP). Then change the label to read `'HP ' + e.hp + '/' + e.maxHp`. Notice you only edited two places — the constructor and the draw call — instead of needing to update a parallel `enemyMaxHp` array everywhere.
+**Try this:** add a property. Inside the `Enemy` constructor, add `this.maxHp = hp;` (so each enemy remembers its starting HP). Then change the label to read `'HP ' + e.hp + '/' + e.maxHp`. Notice you only edited two places: the constructor and the draw call: instead of needing to update a parallel `enemyMaxHp` array everywhere.
 
 ---
 
@@ -148,4 +148,4 @@ function draw() {
 
 ---
 
-Once you can describe what goes wrong if one of the three `splice` calls is forgotten, open `5.4.15 Worked Example — Procedural vs OOP side-by-side`.
+Once you can describe what goes wrong if one of the three `splice` calls is forgotten, open `5.4.15 Worked Example: Procedural vs OOP side-by-side`.

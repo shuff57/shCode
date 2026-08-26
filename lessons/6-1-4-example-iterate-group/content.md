@@ -1,6 +1,6 @@
 **Goal:** create a Group, populate it with sprites, and iterate the Group every frame to drive per-sprite motion.
 
-## Step 1 — Hit Run
+## Step 1: Hit Run
 
 Five red enemies in a row, each wobbling left and right. The wobble is computed in `draw()` for every sprite in the Group on every frame.
 
@@ -27,9 +27,9 @@ function draw() {
 
 Notice what's happening: `enemies` is created once in `setup()`. The `for (let e of enemies)` loop in `draw()` runs over every sprite, every frame. The sprite's `pos.y` (set at spawn) seeds the sine wave so each enemy gets a slightly different phase.
 
-## Step 2 — Change the wobble formula
+## Step 2: Change the wobble formula
 
-Replace the `vel.x` line with `vel.y` (or both). Notice the loop still works — you're driving whatever property you want on whichever axis.
+Replace the `vel.x` line with `vel.y` (or both). Notice the loop still works: you're driving whatever property you want on whichever axis.
 
 ```js live
 let enemies;
@@ -54,9 +54,9 @@ function draw() {
 
 The pattern is: per-frame loop → look up some unique seed on each sprite (`e.pos.x`, `e.pos.y`, or even an index you stored on `e`) → drive a property.
 
-## Step 3 — Scale up
+## Step 3: Scale up
 
-Spawn 30 enemies instead of 5. The same loop handles all of them — that's the point of a Group.
+Spawn 30 enemies instead of 5. The same loop handles all of them: that's the point of a Group.
 
 ```js live
 let enemies;
@@ -79,12 +79,12 @@ function draw() {
 }
 ```
 
-No `draw()` change. The loop body is the **interface** — the Group is the **collection**. As long as every sprite in the Group shares an interface (here: has `pos.y`, has `vel.x`), one loop drives all of them.
+No `draw()` change. The loop body is the **interface**: the Group is the **collection**. As long as every sprite in the Group shares an interface (here: has `pos.y`, has `vel.x`), one loop drives all of them.
 
 ## Key takeaways
 
 - A `Group` is iterated with `for (let s of group)` exactly like an array.
 - Per-sprite uniqueness comes from each sprite's own state (position, index, custom property), not from the loop.
-- Group size is invisible to the loop — 5 sprites or 500 sprites use the same code.
+- Group size is invisible to the loop: 5 sprites or 500 sprites use the same code.
 - Group iteration in `draw()` runs every frame. Keep the per-sprite work cheap.
-- For the safe iteration pattern when you also need to *remove* during the loop, see `6.2.5 Worked Example — Safe Despawn`.
+- For the safe iteration pattern when you also need to *remove* during the loop, see `6.2.5 Worked Example: Safe Despawn`.

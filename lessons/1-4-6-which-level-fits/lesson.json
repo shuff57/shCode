@@ -28,7 +28,7 @@
         "question": "A small team has eight weeks to ship a working web app. One member wants a low-level language because the program will run faster. Which level should they choose?",
         "options": [
           "Low-level",
-          "Neither — the level makes no difference to how long it takes to write",
+          "Neither: the level makes no difference to how long it takes to write",
           "Whichever one runs fastest, always",
           "High-level"
         ],
@@ -59,7 +59,7 @@
           "How recently the language was invented"
         ],
         "answer": 1,
-        "explanation": "How far the language sits from the hardware. The detail still happens — you are just not the one describing it."
+        "explanation": "How far the language sits from the hardware. The detail still happens: you are just not the one describing it."
       },
       {
         "id": "q4-the-cost",
@@ -67,7 +67,7 @@
         "question": "What is the team trading away by choosing a high-level language?",
         "options": [
           "Some run speed, and direct control over the hardware",
-          "Nothing — high-level languages are better in every way",
+          "Nothing: high-level languages are better in every way",
           "The ability to build a web app at all",
           "The ability to use variables"
         ],

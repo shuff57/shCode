@@ -8,13 +8,13 @@ Two other models are worth knowing about, because they change what the same set 
 
 **Parallel** execution runs parts of an algorithm at the same instant, on separate processors.
 
-You and a friend are buying cinema tickets and there are three separate queues. Splitting up — you in one, your friend in another — is a parallel model, and you are guaranteed to get the tickets sooner as long as one queue moves faster than the other, which it usually does.
+You and a friend are buying cinema tickets and there are three separate queues. Splitting up: you in one, your friend in another: is a parallel model, and you are guaranteed to get the tickets sooner as long as one queue moves faster than the other, which it usually does.
 
 ### Concurrent
 
 Running the same algorithm truly simultaneously may not be possible if the machine has only one **central processing unit (CPU)**. In that case you can *simulate* parallelism: the operating system runs the two tasks **concurrently**, as separate tasks sharing one processor.
 
-That is less efficient than true parallelism, because **nothing is actually happening at the same instant** — the processor is switching between tasks very quickly. One person, alternating between two queues, moving a step in each.
+That is less efficient than true parallelism, because **nothing is actually happening at the same instant**: the processor is switching between tasks very quickly. One person, alternating between two queues, moving a step in each.
 
 | Model | How many at once | Needs |
 |---|---|---|
@@ -25,7 +25,7 @@ That is less efficient than true parallelism, because **nothing is actually happ
 **What you'll learn from it:**
 - Sequential is the default: one step, then the next.
 - Parallel runs parts at the same instant, on separate processors.
-- Concurrent interleaves tasks on one processor — fast switching, not simultaneous.
+- Concurrent interleaves tasks on one processor: fast switching, not simultaneous.
 - Concurrency is less efficient than true parallelism, and often good enough.
 
 **Try it:**
@@ -42,7 +42,7 @@ console.log("A:1 and B:1 at the same instant");
 console.log("A:2 and B:2 at the same instant");
 ```
 
-The first three lines are the model you have. The last two describe a model you do not have here — and could not observe from inside a single sequence anyway.
+The first three lines are the model you have. The last two describe a model you do not have here, and could not observe from inside a single sequence anyway.
 
 Chapter 4 goes into the difference properly. For now: **assume sequential**, and know that the other two exist and why someone would want them.
 
@@ -52,7 +52,7 @@ Chapter 4 goes into the difference properly. For now: **assume sequential**, and
 
 | Term | Meaning |
 |------|---------|
-| **sequential execution** | One step after another, in written order — the default |
+| **sequential execution** | One step after another, in written order: the default |
 | **parallel execution** | Parts running at the same instant on separate processors |
 | **concurrent execution** | Tasks interleaved on one processor, progressing together |
-| **CPU** | Central processing unit — the part that carries out instructions |
+| **CPU** | Central processing unit: the part that carries out instructions |

@@ -17,9 +17,9 @@ A comparison operator compares two values and gives back `true` or `false`.
 | `<=` | less than or equal | `5 <= 5` | `true` |
 | `>=` | greater than or equal | `4 >= 7` | `false` |
 
-### `===` vs `==` — always use `===`
+### `===` vs `==`, always use `===`
 
-`===` checks that the value **and** the type match. `==` (two equals signs) is the "loose" version — it quietly converts types before comparing, which leads to surprises. Use `===` everywhere; only bring in `==` if you have a specific reason.
+`===` checks that the value **and** the type match. `==` (two equals signs) is the "loose" version: it quietly converts types before comparing, which leads to surprises. Use `===` everywhere; only bring in `==` if you have a specific reason.
 
 **Try it:** Read each line, predict `true` or `false`, then run it and check.
 
@@ -43,6 +43,6 @@ console.log(5 !== 6);
 | **comparison operator** | A symbol that compares two values and returns `true` or `false` |
 | **`===` (strict equality)** | Both value AND type must match |
 | **`!==` (strict inequality)** | True when the values or types do not match |
-| **`==` (loose equality)** | Converts types before comparing — use `===` instead |
+| **`==` (loose equality)** | Converts types before comparing: use `===` instead |
 | **`<` / `>`** | Less than / greater than |
 | **`<=` / `>=`** | Less than or equal / greater than or equal |

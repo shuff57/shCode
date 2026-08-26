@@ -1,10 +1,10 @@
 {
   "id": "6-3-2-video-presses-vs-pressing",
-  "title": "6.3.2 Video — kb.presses vs kb.pressing",
+  "title": "6.3.2 Video: kb.presses vs kb.pressing",
   "description": "Why holding space launches a super-jump 60 frames in a row, and how the edge-triggered form fixes it. Watch before `2.3.15 Edge-triggered Input`.",
   "type": "lesson",
   "estimateMins": 2,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.3 Physics Applications",
   "preview": "video",
   "week": 14,

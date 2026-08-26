@@ -1,10 +1,10 @@
 {
   "id": "6-6-26-video-whats-next",
-  "title": "6.6.28 Video — What's Next: Looking Ahead to Unit 3",
-  "description": "You've built save systems and state machines — real game infrastructure. Unit 3 preview: what comes after the fundamentals.",
+  "title": "6.6.28 Video: What's Next: Looking Ahead to Unit 3",
+  "description": "You've built save systems and state machines: real game infrastructure. Unit 3 preview: what comes after the fundamentals.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "video",
   "week": 17,

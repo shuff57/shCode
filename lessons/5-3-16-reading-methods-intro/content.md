@@ -1,6 +1,6 @@
 ## Methods: functions that live on a class
 
-**Read before `2.2.7b Lab — Method with no params`.** About 4 minutes.
+**Read before `2.2.7b Lab: Method with no params`.** About 4 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -11,9 +11,9 @@ A method is a function that lives inside a class body and has access to `this`. 
 
 **What you'll learn from it:**
 
-- Inside a class body, write `methodName(params) { ... }` — no `function` keyword.
+- Inside a class body, write `methodName(params) { ... }`: no `function` keyword.
 - Adding `function` before the method name is a syntax error; the engine won't run the file.
-- A method is available on every instance of the class — you don't create it separately.
+- A method is available on every instance of the class: you don't create it separately.
 - Calling a method on an instance: `instance.methodName(args)`.
 
 **Try it:**
@@ -58,6 +58,6 @@ function draw() {
 
 | Term | Meaning |
 |------|---------|
-| **Method** | A function defined inside a class body — no `function` keyword, just `name(params) { }`. |
+| **Method** | A function defined inside a class body: no `function` keyword, just `name(params) { }`. |
 | **Method call** | Invoking a method on an instance: `instance.method(args)`. |
 | **`this`** | Inside a method, the instance the method was called on. |

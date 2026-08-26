@@ -11,7 +11,7 @@ function setup() {
   new Canvas(600, 400);
   world.gravity.y = 10;
 
-  // STEP 1 — the foreground: ground, then platforms stacked upward so there
+  // STEP 1: the foreground: ground, then platforms stacked upward so there
   // is something to climb and a reason for the camera to move on y.
   let ground = new Sprite(300, 560, 2000, 40, 'static');
   ground.color = '#353';
@@ -31,7 +31,7 @@ function setup() {
   player.color = 'gold';
   player.rotationLock = true;
 
-  // STEP 2 — Challenge 1. Each cloud remembers the spot it was BORN at. Its
+  // STEP 2: Challenge 1. Each cloud remembers the spot it was BORN at. Its
   // drawn position is that base plus a fraction of the camera, which is what
   // makes it drift slower than the ground and read as further away.
   //
@@ -43,7 +43,7 @@ function setup() {
     let cloud = new Sprite(i * 160 - 200, 200 + (i % 3) * 50, 90, 30);
     cloud.color = '#8898b8';
     cloud.collider = 'none';   // scenery: nothing should bump into it
-    cloud.layer = 0;           // STEP 7 feature — draw it behind the action
+    cloud.layer = 0;           // STEP 7 feature: draw it behind the action
     cloud.baseX = cloud.x;
     cloud.baseY = cloud.y;
     clouds.push(cloud);
@@ -53,27 +53,27 @@ function setup() {
 function draw() {
   background('#224');
 
-  // STEP 4 — input.
+  // STEP 4: input.
   if (kb.pressing('a')) player.vel.x = -4;
   else if (kb.pressing('d')) player.vel.x = 4;
   else player.vel.x = 0;
 
   if (kb.presses('space') || kb.presses('w')) player.vel.y = -9;
 
-  // STEP 5 and STEP 8 — ease the camera toward the player on BOTH axes.
+  // STEP 5 and STEP 8: ease the camera toward the player on BOTH axes.
   // lerp moves a fraction of the remaining distance each frame, so the
   // camera trails instead of snapping, and a jump does not jerk the view.
   camera.x = lerp(camera.x, player.x, 0.1);
   camera.y = lerp(camera.y, player.y, 0.05);
 
-  // STEP 6 — Challenge 1. The cloud tracks 30% of the camera, so on screen it
-  // slides at only 70% of the ground's speed — and slower means further away.
+  // STEP 6: Challenge 1. The cloud tracks 30% of the camera, so on screen it
+  // slides at only 70% of the ground's speed, and slower means further away.
   for (let cloud of clouds) {
     cloud.x = cloud.baseX + camera.x * 0.3;
     cloud.y = cloud.baseY + camera.y * 0.3;
   }
 
-  // STEP 7 — Challenge 2. -1 mirrors the sprite horizontally, so it faces
+  // STEP 7: Challenge 2. -1 mirrors the sprite horizontally, so it faces
   // the way it is walking. Left alone when standing still, so it keeps
   // facing wherever it last went.
   if (player.vel.x < 0) player.scale.x = -1;

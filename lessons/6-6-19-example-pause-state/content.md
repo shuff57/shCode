@@ -1,6 +1,6 @@
-**Goal:** Add a pause state that freezes gameplay without resetting anything. Press P to toggle — the game is still there when you unpause.
+**Goal:** Add a pause state that freezes gameplay without resetting anything. Press P to toggle: the game is still there when you unpause.
 
-## Step 1 — Add a pause case to the switch
+## Step 1: Add a pause case to the switch
 
 Start from a working play state with player movement. Add `'pause'` as a new case in the switch. For now, the pause case just draws the frozen game underneath and overlays "PAUSED" text.
 
@@ -37,9 +37,9 @@ function draw() {
 }
 ```
 
-## Step 2 — Toggle between play and pause
+## Step 2: Toggle between play and pause
 
-Add the P-key check inside both states. In `'play'`, pressing P switches to `'pause'`. In `'pause'`, pressing P switches back. Notice: score **stops** incrementing while paused — that's the point.
+Add the P-key check inside both states. In `'play'`, pressing P switches to `'pause'`. In `'pause'`, pressing P switches back. Notice: score **stops** incrementing while paused: that's the point.
 
 ```js live
 let state, score, player;
@@ -79,7 +79,7 @@ function draw() {
 }
 ```
 
-## Step 3 — Show the game behind the pause overlay
+## Step 3: Show the game behind the pause overlay
 
 Draw the game elements AGAIN in the pause case (score text, player position) so the frozen game is visible behind the pause message. Then draw the PAUSED overlay on top.
 
@@ -127,8 +127,8 @@ function draw() {
 
 ## Key takeaways
 
-- Pause **stops updating** game variables — score freezes, movement stops.
-- Game data (score, position) is **preserved** — just not changed while paused.
+- Pause **stops updating** game variables: score freezes, movement stops.
+- Game data (score, position) is **preserved**, just not changed while paused.
 - The toggle pattern: pressing the same key in opposite states toggles between them.
 - Draw the game behind the overlay so the player sees what's frozen.
 - A semi-transparent rectangle (`fill(0,0,0,120)`) dims the background to make the overlay pop.

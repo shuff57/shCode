@@ -1,7 +1,7 @@
 {
   "id": "2-1-22-reading-ternary",
-  "title": "2.1.19 Reading — The Conditional Operator ?",
-  "description": "Learn the ternary operator: condition ? value1 : value2. Read before the ternary practice lesson.",
+  "title": "2.1.19 Reading: The Conditional Operator ?",
+  "description": "Learn the ternary operator: condition ? value1: value2. Read before the ternary practice lesson.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.1.5 — 'Conditional Operator ?'",
+  "sourceRef": "book 2.1.5: 'Conditional Operator ?'",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

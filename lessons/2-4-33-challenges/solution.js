@@ -1,6 +1,6 @@
-// 2.4.33 Challenges — Optional Stretch
+// 2.4.33 Challenges: Optional Stretch
 //
-// CHALLENGE 1: Hollow square — border rows/cols get "#", inside is space.
+// CHALLENGE 1: Hollow square: border rows/cols get "#", inside is space.
 for (let row = 1; row <= 6; row++) {
   let line = "";
   for (let col = 1; col <= 6; col++) {

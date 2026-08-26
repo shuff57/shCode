@@ -1,4 +1,4 @@
-// 2.1.5 Hello Sprite — your first moSHion sketch.
+// 2.1.5 Hello Sprite: your first moSHion sketch.
 
 let player;
 
@@ -7,7 +7,7 @@ function setup() {
 
   // STEP 2: Create a sprite at the center (200, 200), 40 wide, 40 tall
 
-  // STEP 3: Give it a color — try 'deepskyblue' or any CSS color
+  // STEP 3: Give it a color: try 'deepskyblue' or any CSS color
 }
 
 function draw() {

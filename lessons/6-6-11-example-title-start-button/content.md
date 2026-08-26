@@ -1,8 +1,8 @@
 **Goal:** Build a title screen that waits for the player, then transitions to gameplay. The most common pattern in games: title → play.
 
-## Step 1 — Title screen with game name
+## Step 1: Title screen with game name
 
-`state` starts as `'title'`. The switch draws the game name and instructions. Nothing moves — it's just waiting.
+`state` starts as `'title'`. The switch draws the game name and instructions. Nothing moves: it's just waiting.
 
 ```js live
 let state = 'title';
@@ -26,7 +26,7 @@ function draw() {
 }
 ```
 
-## Step 2 — Enter key transitions to play
+## Step 2: Enter key transitions to play
 
 Add the transition: when `kb.presses('Enter')` is true, `state` changes to `'play'`. Add the play state with a simple game.
 
@@ -64,7 +64,7 @@ function draw() {
 }
 ```
 
-## Step 3 — Add player movement in the play state
+## Step 3: Add player movement in the play state
 
 Now the play state has real gameplay: a player sprite that moves with arrow keys. Score keeps incrementing.
 
@@ -123,7 +123,7 @@ function draw() {
 }
 ```
 
-## Step 4 — Restart from game over
+## Step 4: Restart from game over
 
 Add a restart transition: press R on the game over screen → destroy old player, make new one, reset score, go back to play.
 
@@ -200,8 +200,8 @@ function draw() {
 
 ## Key takeaways
 
-- A title screen is just a state — nothing special, no special variable.
+- A title screen is just a state: nothing special, no special variable.
 - Title screen waits for input, then transitions to play.
-- The play state owns the game logic — movement, scoring, collision.
-- Game over displays results and offers restart or title — both require resetting variables + changing state.
+- The play state owns the game logic: movement, scoring, collision.
+- Game over displays results and offers restart or title: both require resetting variables + changing state.
 - Each state (title, play, gameover) has a clean, single job.

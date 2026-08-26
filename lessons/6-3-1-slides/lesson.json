@@ -1,10 +1,10 @@
 {
   "id": "6-3-1-slides",
-  "title": "6.3.1 Slides — Physics Applications",
+  "title": "6.3.1 Slides: Physics Applications",
   "description": "Physics Applications slides. Placeholder until the deck is built from the book.",
   "type": "lesson",
   "estimateMins": 5,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.3 Physics Applications",
   "preview": "slides",
   "slos": [

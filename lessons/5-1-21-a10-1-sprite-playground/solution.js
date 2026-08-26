@@ -14,7 +14,7 @@ function setup() {
 function draw() {
   background('#222');
 
-  // Player — WASD with else-to-zero so it stops cleanly.
+  // Player: WASD with else-to-zero so it stops cleanly.
   if      (kb.pressing('a')) player.vel.x = -4;
   else if (kb.pressing('d')) player.vel.x =  4;
   else                       player.vel.x =  0;
@@ -22,7 +22,7 @@ function draw() {
   else if (kb.pressing('s')) player.vel.y =  4;
   else                       player.vel.y =  0;
 
-  // Mover — frameCount drives a small horizontal oscillation.
+  // Mover: frameCount drives a small horizontal oscillation.
   mover.x = 80 + Math.sin(frameCount * 0.05) * 60;
 
   // Label.

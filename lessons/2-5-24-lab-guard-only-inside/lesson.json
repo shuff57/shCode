@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed — practice for 2.5.6 (only catches code that runs inside it) + Concepts in Practice 'The limits'",
+  "sourceRef": "designed: practice for 2.5.6 (only catches code that runs inside it) + Concepts in Practice 'The limits'",
   "steps": [
     {
       "id": "s1",
@@ -21,7 +21,7 @@
     {
       "id": "s2",
       "title": "Leave a second one unguarded",
-      "instructions": "After the whole try...catch, log a second variable called secondMissing (also never declared) — with no try around it."
+      "instructions": "After the whole try...catch, log a second variable called secondMissing (also never declared), with no try around it."
     },
     {
       "id": "s3",

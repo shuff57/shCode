@@ -7,7 +7,7 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "console",
-  "sourceRef": "book 2.4 — Try It Now 2.5",
+  "sourceRef": "book 2.4: Try It Now 2.5",
   "week": 7,
   "slos": [
     "SLO-3"
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Run it first",
-      "instructions": "Run the loop as it's given. Notice it prints 1-1, 1-2, 1-3, 2-1, 2-2, 2-3, 3-1, 3-2, 3-3 — every pair twice, plus pairs of a number with itself."
+      "instructions": "Run the loop as it's given. Notice it prints 1-1, 1-2, 1-3, 2-1, 2-2, 2-3, 3-1, 3-2, 3-3: every pair twice, plus pairs of a number with itself."
     },
     {
       "id": "s2",

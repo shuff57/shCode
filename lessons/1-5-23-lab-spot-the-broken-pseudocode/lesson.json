@@ -54,7 +54,7 @@
         "question": "What is indentation doing in pseudocode?",
         "options": [
           "Making the plan look tidy for the reader",
-          "Showing which steps are inside which — it is containment, not decoration",
+          "Showing which steps are inside which: it is containment, not decoration",
           "Marking which lines are the most important",
           "Standing in for the semicolons that pseudocode does not use"
         ],
@@ -64,7 +64,7 @@
       {
         "id": "q4-no-compiler",
         "source": "1.5.20",
-        "question": "Nothing checks pseudocode — there is no compiler for it. Why is that an advantage rather than a problem?",
+        "question": "Nothing checks pseudocode: there is no compiler for it. Why is that an advantage rather than a problem?",
         "options": [
           "A syntax error tells you nothing about whether the plan makes sense, so a human reading it is the check that matters",
           "It means you can write the plan as carelessly as you like",

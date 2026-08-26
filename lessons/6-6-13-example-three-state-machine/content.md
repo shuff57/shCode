@@ -1,8 +1,8 @@
 **Goal:** Build the complete arcade loop: title screen → gameplay → game over → restart. Every game you've played has this flow. Now you build it.
 
-## Step 1 — State variable and switch skeleton
+## Step 1: State variable and switch skeleton
 
-Three states: `'title'`, `'play'`, `'gameover'`. Each case draws something different. `state` starts as `'title'` — the first thing the player sees.
+Three states: `'title'`, `'play'`, `'gameover'`. Each case draws something different. `state` starts as `'title'`: the first thing the player sees.
 
 ```js live
 let state = 'title';
@@ -40,9 +40,9 @@ function draw() {
 }
 ```
 
-Three screens. One variable. Run it. Nothing happens yet — we need transitions.
+Three screens. One variable. Run it. Nothing happens yet: we need transitions.
 
-## Step 2 — Title transitions to play
+## Step 2: Title transitions to play
 
 Press Enter on the title screen → `state = 'play'`. That's the first transition.
 
@@ -85,9 +85,9 @@ function draw() {
 }
 ```
 
-## Step 3 — Gameplay: player movement, score, and losing condition
+## Step 3: Gameplay: player movement, score, and losing condition
 
-The play state now has real mechanics. A player sprite moves with WASD. A score counter ticks up. An asteroid moves across — if it hits the player, they lose a life. When health reaches 0, game over.
+The play state now has real mechanics. A player sprite moves with WASD. A score counter ticks up. An asteroid moves across, if it hits the player, they lose a life. When health reaches 0, game over.
 
 ```js live
 let state = 'title';
@@ -160,7 +160,7 @@ function draw() {
 }
 ```
 
-## Step 4 — Game over restarts the loop
+## Step 4: Game over restarts the loop
 
 Press R on the game over screen → remove old player and asteroid, create new ones, reset score and health, go back to `'play'`. The complete arcade loop is now closed.
 
@@ -249,7 +249,7 @@ function draw() {
 ## Key takeaways
 
 - The arcade loop is always the same: **title → play → gameover → title/play**.
-- Each state does exactly one job — title shows the name, play runs the game, gameover shows results.
+- Each state does exactly one job: title shows the name, play runs the game, gameover shows results.
 - Transitions are explicit: press Enter to start, condition triggers game over, press R to restart.
 - Restart means: clean up old objects, create new ones, reset variables, change state.
 - One `state` variable is the single source of truth for the entire game flow.

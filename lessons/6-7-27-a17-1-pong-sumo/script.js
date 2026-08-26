@@ -1,4 +1,4 @@
-// 2.7.26 A17.1 Two-Player Pong-Sumo — two players, one ball, first to 5.
+// 2.7.26 A17.1 Two-Player Pong-Sumo: two players, one ball, first to 5.
 
 let gameState;
 let p1, p2, ball;
@@ -15,7 +15,7 @@ function setup() {
   // STEP 4: Create ball in the center with an initial horizontal velocity
   //         Set a bounciness value on the ball too
 
-  // STEP 5: Add at least one joint somewhere in the arena — a fixed-length joint
+  // STEP 5: Add at least one joint somewhere in the arena: a fixed-length joint
   //         between two sprites, or a pivot joint on an obstacle.
   //         Tip: set the joint's length after you create it, not inside the constructor.
 
@@ -26,7 +26,7 @@ function setup() {
 function draw() {
   // STEP 7: switch(gameState) with cases for 'title', 'play', and 'win'
   //   case 'title':  Show the game name and a prompt; listen for a keypress to start
-  //   case 'play':   Move paddles with kb.pressing — different keys for each player
+  //   case 'play':   Move paddles with kb.pressing: different keys for each player
   //                  Check if the ball crossed the left or right edge to score
   //                  Reset the ball to the center after each score
   //                  Render both scores on screen with text()

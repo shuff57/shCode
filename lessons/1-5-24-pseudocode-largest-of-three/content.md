@@ -1,6 +1,6 @@
 Two plans, written as pseudocode. Read them before you answer.
 
-**Plan A — largest of three**
+**Plan A: largest of three**
 
 ```
 INPUT a, b, c
@@ -14,7 +14,7 @@ END IF
 OUTPUT largest
 ```
 
-**Plan B — keep asking for the password**
+**Plan B: keep asking for the password**
 
 ```
 INPUT password

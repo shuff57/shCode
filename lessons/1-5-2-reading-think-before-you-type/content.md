@@ -7,7 +7,7 @@ The reason is that a program has **two separate difficulties**:
 1. **Working out what the steps are.** This is thinking. The language you use is irrelevant to it.
 2. **Writing those steps in JavaScript.** This is syntax, and it is much easier once step 1 is settled.
 
-Do both at once and every time you get confused you cannot tell which difficulty you are stuck on — the plan or the punctuation. You will spend twenty minutes hunting a missing bracket in a program whose logic was never going to work.
+Do both at once and every time you get confused you cannot tell which difficulty you are stuck on: the plan or the punctuation. You will spend twenty minutes hunting a missing bracket in a program whose logic was never going to work.
 
 Separating them is what this whole module is about. Most of the tools in it are for step 1, and **none of those are JavaScript.**
 
@@ -34,7 +34,7 @@ let average = a + b + c / 3;
 console.log("average is " + average);
 ```
 
-`16` — not `6`. Nothing errored, nothing was flagged, and the answer is wrong because the plan (and the precedence) was never checked. No amount of care with semicolons would have caught it.
+`16`, not `6`. Nothing errored, nothing was flagged, and the answer is wrong because the plan (and the precedence) was never checked. No amount of care with semicolons would have caught it.
 
 A syntax problem announces itself. A plan problem does not, and that asymmetry is the whole argument for planning first.
 
@@ -44,7 +44,7 @@ A syntax problem announces itself. A plan problem does not, and that asymmetry i
 
 | Term | Meaning |
 |------|---------|
-| **plan** | What the steps are and what order they go in — settled before any code |
+| **plan** | What the steps are and what order they go in: settled before any code |
 | **syntax** | The punctuation and spelling rules of a particular language |
 | **computational thinking** | The name for the thinking half; see 1.5.3 |
 | **silent failure** | A program that runs happily and produces the wrong answer |

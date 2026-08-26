@@ -1,8 +1,8 @@
 ## Auto-save: saving without asking
 
-**Read before attempting `6.5.25 Worked Example — Auto-Save on Level Complete or Timer`.**
+**Read before attempting `6.5.25 Worked Example: Auto-Save on Level Complete or Timer`.**
 
-Until now, every save in your games has been player-initiated: press a key, pick a slot, confirm. That works, but it puts the burden on the player to remember to save — and nobody remembers every time.
+Until now, every save in your games has been player-initiated: press a key, pick a slot, confirm. That works, but it puts the burden on the player to remember to save, and nobody remembers every time.
 
 **Auto-save** is a save that fires automatically when something important happens. The player doesn't press a button. They might not even notice it happened. But next time they load the game, their progress is right where they left off.
 
@@ -18,7 +18,7 @@ Until now, every save in your games has been player-initiated: press a key, pick
 
 ### Score milestone auto-save example
 
-The sketch below auto-saves every 100 points. The save is invisible — no prompt, no confirmation. Watch the console to see it fire.
+The sketch below auto-saves every 100 points. The save is invisible: no prompt, no confirmation. Watch the console to see it fire.
 
 ```js live
 let score = 0;
@@ -50,7 +50,7 @@ Notice: the `lastSavedAt` guard prevents re-saving on every frame after the mile
 
 ### Don't save every frame
 
-Auto-save is cheap — a `storeItem` call is near-instant — but doing it every frame is still wasteful. localStorage writes are synchronous and block the main thread. A few saves per minute is fine. Sixty saves per second is not.
+Auto-save is cheap: a `storeItem` call is near-instant, but doing it every frame is still wasteful. localStorage writes are synchronous and block the main thread. A few saves per minute is fine. Sixty saves per second is not.
 
 Guard your auto-saves with a condition:
 - `score % 100 === 0 && score > 0` fires once per milestone
@@ -59,7 +59,7 @@ Guard your auto-saves with a condition:
 
 ### The player doesn't need to know
 
-Auto-save should be subtle. At most, show a small "Saving..." indicator that fades after a second. The player should feel like their progress is magically preserved — not like the game is nagging them.
+Auto-save should be subtle. At most, show a small "Saving..." indicator that fades after a second. The player should feel like their progress is magically preserved, not like the game is nagging them.
 
 ---
 
@@ -68,6 +68,6 @@ Auto-save should be subtle. At most, show a small "Saving..." indicator that fad
 | Term | Meaning |
 |------|---------|
 | **Auto-save** | A save that fires automatically on a trigger (milestone, timer, transition) rather than waiting for the player to press a button. |
-| **Checkpoint** | A designated point in a level where auto-save fires — reaching it records progress so the player restarts from there, not the beginning. |
+| **Checkpoint** | A designated point in a level where auto-save fires: reaching it records progress so the player restarts from there, not the beginning. |
 | **Milestone trigger** | A condition like "score hits 100" or "level changes" that causes an auto-save. Fires once per milestone, not continuously. |
 | **Guard condition** | Extra logic (like `lastSavedAt` or a boolean flag) that prevents an auto-save from firing repeatedly when the trigger condition stays true across multiple frames. |

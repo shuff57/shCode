@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "designed — curriculum-plan.md A2.5.1 (loop + try/catch on bad input), informed by Problem Set 2.5.13",
+  "sourceRef": "designed: curriculum-plan.md A2.5.1 (loop + try/catch on bad input), informed by Problem Set 2.5.13",
   "steps": [
     {
       "id": "s1",
@@ -26,7 +26,7 @@
     {
       "id": "s3",
       "title": "Report instead of crashing",
-      "instructions": "In the catch block, log a friendly message using err.message that names which reading was skipped — do not just log a generic \"Error!\"."
+      "instructions": "In the catch block, log a friendly message using err.message that names which reading was skipped: do not just log a generic \"Error!\"."
     }
   ],
   "requirements": [

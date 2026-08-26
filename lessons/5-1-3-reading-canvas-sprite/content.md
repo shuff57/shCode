@@ -1,6 +1,6 @@
-## Frame loop — `setup()` and `draw()`
+## Frame loop: `setup()` and `draw()`
 
-**Read before `2.1.3a Reading — Canvas`.** About 3 minutes.
+**Read before `2.1.3a Reading: Canvas`.** About 3 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -12,7 +12,7 @@ You don't call `setup()` or `draw()` yourself. You **define** them, and moSHion 
 **What you'll learn from it:**
 
 - `setup()` is called once, the moment the sketch starts.
-- `draw()` is called every frame — about 60 times per second, forever.
+- `draw()` is called every frame, about 60 times per second, forever.
 - Code that should run once (open a canvas, build sprites) goes in `setup()`; code that should run every frame (clear the screen, check input) goes in `draw()`.
 
 **Try it:**

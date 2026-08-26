@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.1.8 — 'Combining Conditions', Example 2.10: Flipping a condition with !",
+  "sourceRef": "book 2.1.8: 'Combining Conditions', Example 2.10: Flipping a condition with !",
   "steps": [
     {
       "id": "s1",

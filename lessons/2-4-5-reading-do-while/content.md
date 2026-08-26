@@ -5,7 +5,7 @@
 - How `do...while` guarantees the body runs at least once
 - The one punctuation detail `do...while` needs that no other loop does
 
-Both loops you've met so far — `for` and `while` — test their condition **before** running the body. If the condition is false at the start, the body never runs at all:
+Both loops you've met so far: `for` and `while`: test their condition **before** running the body. If the condition is false at the start, the body never runs at all:
 
 ```js live plain
 let count = 10;
@@ -29,11 +29,11 @@ do {
 } while (attempts < 3);
 ```
 
-Because the check comes last, the body always runs **at least once** — even if the condition would have been false from the very start.
+Because the check comes last, the body always runs **at least once**, even if the condition would have been false from the very start.
 
 Note the semicolon after the closing `while (...)`. A `do...while` is the one loop that ends with one; leaving it off is a common slip.
 
-**When to reach for it:** `do...while` is the least-used of the three loops, and that's fine — most of the time you genuinely want the test first. Reach for it when the thing you're testing doesn't exist yet until the body has run once: a value the user hasn't typed, a die that hasn't been rolled, a menu choice that hasn't been made.
+**When to reach for it:** `do...while` is the least-used of the three loops, and that's fine: most of the time you genuinely want the test first. Reach for it when the thing you're testing doesn't exist yet until the body has run once: a value the user hasn't typed, a die that hasn't been rolled, a menu choice that hasn't been made.
 
 ---
 
@@ -41,6 +41,6 @@ Note the semicolon after the closing `while (...)`. A `do...while` is the one lo
 
 | Term | Meaning |
 |------|---------|
-| **do...while loop** | Runs its body first, then tests the condition — body always runs at least once |
+| **do...while loop** | Runs its body first, then tests the condition: body always runs at least once |
 | **body-first / test-first** | Whether a loop checks its condition before or after running its body once |
-| **guaranteed first run** | The property that makes `do...while` different — no other loop promises this |
+| **guaranteed first run** | The property that makes `do...while` different: no other loop promises this |

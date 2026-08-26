@@ -1,4 +1,4 @@
-// 2.2.7b Lab — Method with no params.
+// 2.2.7b Lab: Method with no params.
 
 class Counter {
   constructor() {
@@ -6,7 +6,7 @@ class Counter {
   }
 
   // STEP 1: Write a tick() method that adds 1 to this.n.
-  //   A method takes no arguments here — just the name, empty parens, and a body.
+  //   A method takes no arguments here, just the name, empty parens, and a body.
   //   Use this.n inside the body to refer to the instance's count.
 }
 

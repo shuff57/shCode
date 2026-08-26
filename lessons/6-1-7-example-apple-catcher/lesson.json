@@ -1,9 +1,9 @@
 {
   "id": "6-1-7-example-apple-catcher",
-  "title": "6.2.2 Worked Example — Apple Catcher",
+  "title": "6.2.2 Worked Example: Apple Catcher",
   "type": "lesson",
   "estimateMins": 15,
-  "category": "Unit 2: moSHion — Applied Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.2 Overlaps and Collisions",
   "preview": "example",
   "week": 13,

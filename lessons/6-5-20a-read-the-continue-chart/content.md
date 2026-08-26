@@ -1,17 +1,17 @@
-## Read the Chart — Does Continue Show Up?
+## Read the Chart: Does Continue Show Up?
 
 **What you'll practise:**
 - Reading a chart somebody else drew
 - Tracing two different players through the same diagram
 - Spotting the case a chart handles badly
 
-Nothing to draw here. Read this one and answer the questions — reading charts is the half of the skill you will use most, because most charts you meet will not be yours.
+Nothing to draw here. Read this one and answer the questions: reading charts is the half of the skill you will use most, because most charts you meet will not be yours.
 
 ### The chart
 
 This is the title screen deciding whether to offer **Continue**.
 
-```flow readonly caption="Figure 6.5.1 — the title screen's save check. Two players, two different paths through the same shapes."
+```flow readonly caption="Figure 6.5.1: the title screen's save check. Two players, two different paths through the same shapes."
 flowchart TD
   A([Title screen loads]) --> B[read "save" from storage]
   B --> C{did we get anything back}
@@ -36,12 +36,12 @@ Answer these before you look at any code. Put a finger on **Title screen loads**
 
 ### The one it handles badly
 
-Question 3 is the interesting one. The first diamond asks *did we get anything back* — that catches the brand-new player, where storage returns nothing at all.
+Question 3 is the interesting one. The first diamond asks *did we get anything back*: that catches the brand-new player, where storage returns nothing at all.
 
-The second asks *is the level number valid*, and that catches a stranger case: a save that exists but is **damaged**. Storage returned a string, `JSON.parse` turned it into an object, and the object is nonsense — a level of `0`, or `undefined`, or a number from a version of the game that no longer exists.
+The second asks *is the level number valid*, and that catches a stranger case: a save that exists but is **damaged**. Storage returned a string, `JSON.parse` turned it into an object, and the object is nonsense: a level of `0`, or `undefined`, or a number from a version of the game that no longer exists.
 
 Without the second diamond, that player gets a Continue button that loads them into nowhere. With it, they get treated like a new player, which is not perfect but is at least a game they can play.
 
-**Here is what the chart does not tell you.** Look again at the `JSON.parse` rectangle. What happens if the saved text is not valid JSON at all — if it is half-written, or something else overwrote it? `JSON.parse` throws, and there is no arrow on this chart for that. The chart is drawn as though parsing always succeeds.
+**Here is what the chart does not tell you.** Look again at the `JSON.parse` rectangle. What happens if the saved text is not valid JSON at all, if it is half-written, or something else overwrote it? `JSON.parse` throws, and there is no arrow on this chart for that. The chart is drawn as though parsing always succeeds.
 
 That is a real gap, and you found it by reading a picture rather than by running code. When you build your own save system, that missing arrow is a `try`/`catch`.

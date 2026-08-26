@@ -1,6 +1,6 @@
 **Goal:** Build three save slots. Each slot is a differently-named key. Press 1/2/3 to save, hold Shift+1/2/3 to load.
 
-## Step 1 — Player with movement and a score
+## Step 1: Player with movement and a score
 
 A simple player that moves with arrow keys and collects coins for points.
 
@@ -40,7 +40,7 @@ function draw() {
 }
 ```
 
-## Step 2 — Save to three slots
+## Step 2: Save to three slots
 
 When you press 1, 2, or 3, build a save object with position and score, then `storeItem` to a slot key.
 
@@ -98,7 +98,7 @@ function draw() {
 }
 ```
 
-## Step 3 — Show which slots have saves
+## Step 3: Show which slots have saves
 
 Before drawing the HUD, check each slot with `getItem`. If it returns something (not null), that slot is occupied.
 
@@ -149,9 +149,9 @@ function draw() {
 
   // Show slot status
   textSize(12);
-  let s1 = getItem('saveSlot1') !== null ? 'SAVED' : 'empty';
-  let s2 = getItem('saveSlot2') !== null ? 'SAVED' : 'empty';
-  let s3 = getItem('saveSlot3') !== null ? 'SAVED' : 'empty';
+  let s1 = getItem('saveSlot1') !== null ? 'SAVED': 'empty';
+  let s2 = getItem('saveSlot2') !== null ? 'SAVED': 'empty';
+  let s3 = getItem('saveSlot3') !== null ? 'SAVED': 'empty';
   fill('#ffb86c');
   text('Slot 1 [1]: ' + s1, 10, 65);
   text('Slot 2 [2]: ' + s2, 10, 80);
@@ -164,7 +164,7 @@ function draw() {
 
 Try it: press 1 to save. The slot label changes from "empty" to "SAVED".
 
-## Step 4 — Load from a slot
+## Step 4: Load from a slot
 
 Hold Shift and press 1, 2, or 3 to load. Parse the JSON and restore position and score.
 
@@ -222,9 +222,9 @@ function draw() {
 
   // Show slot status
   textSize(12);
-  let s1 = getItem('saveSlot1') !== null ? 'SAVED' : 'empty';
-  let s2 = getItem('saveSlot2') !== null ? 'SAVED' : 'empty';
-  let s3 = getItem('saveSlot3') !== null ? 'SAVED' : 'empty';
+  let s1 = getItem('saveSlot1') !== null ? 'SAVED': 'empty';
+  let s2 = getItem('saveSlot2') !== null ? 'SAVED': 'empty';
+  let s3 = getItem('saveSlot3') !== null ? 'SAVED': 'empty';
   fill('#ffb86c');
   text('Slot 1 [1]: ' + s1, 10, 65);
   text('Slot 2 [2]: ' + s2, 10, 80);
@@ -249,7 +249,7 @@ Save in slot 1, move somewhere else, then hold Shift+1 to restore your saved pos
 
 ## Key takeaways
 
-- A **save slot** is just a different key name — `'saveSlot1'`, `'saveSlot2'`, `'saveSlot3'` are three separate entries in localStorage.
+- A **save slot** is just a different key name: `'saveSlot1'`, `'saveSlot2'`, `'saveSlot3'` are three separate entries in localStorage.
 - **Save** = build an object with the data you care about, `JSON.stringify` it, call `storeItem`.
 - **Load** = call `getItem(key)`, check it isn't null, `JSON.parse` it, apply the values.
-- **Check before loading** — `getItem` returns `null` for empty slots. Always guard with `if (raw !== null)`.
+- **Check before loading**: `getItem` returns `null` for empty slots. Always guard with `if (raw !== null)`.
