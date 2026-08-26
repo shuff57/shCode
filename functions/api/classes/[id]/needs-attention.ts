@@ -3,6 +3,7 @@
 // Only the class owner, co-teachers, or an admin may call this endpoint.
 
 import { canManageClass } from '../../../_shared/classAuth';
+import { isPassingSubmission } from '../../../../lib/grade-pass';
 
 interface Env {
   DB: D1Database;
@@ -21,6 +22,7 @@ interface FailedSubRow {
   lesson_id: string;
   score: number;
   possible: number;
+  grade_json: string | null;
   submitted_at: number;
 }
 
@@ -101,8 +103,16 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
       ),
     }));
 
-  // 2. Failed submissions: latest SCORED submission per student per lesson
-  //    where score < possible * 0.6 (below 60%).
+  // 2. Failed submissions: the latest SCORED submission per student per lesson
+  //    that did not pass.
+  //
+  //    Pass/fail is decided by isPassingSubmission, NOT by comparing the
+  //    totals here. Nearly every rubric in the course awards `points: 0` per
+  //    criterion and grades on the model's verdicts, so `possible` is 0 and
+  //    the old `score < possible * 0.6` predicate was `0 < 0` — permanently
+  //    false. A whole class could be failing A1.4.1 and this list came back
+  //    empty. Rows the helper cannot judge (unparseable grade_json) return
+  //    null and are left to rule 4 rather than guessed at.
   //
   //    Only scored rows are ranked. An attempt the grader failed on has a NULL
   //    score, and `NULL < NULL * 0.6` is NULL rather than true, so it could
@@ -111,10 +121,10 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
   //    struggling student from this list. An outage must not make anyone look
   //    fine. Those rows are reported by rule 4 instead.
   const failedResult = await env.DB.prepare(
-    `SELECT student_email, lesson_id, score, possible, submitted_at
+    `SELECT student_email, lesson_id, score, possible, grade_json, submitted_at
        FROM (
          SELECT
-           student_email, lesson_id, score, possible, submitted_at,
+           student_email, lesson_id, score, possible, grade_json, submitted_at,
            ROW_NUMBER() OVER (
              PARTITION BY student_email, lesson_id
              ORDER BY submitted_at DESC
@@ -126,19 +136,28 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
               WHERE class_id = ?1 AND expires_at > ?2
            )
        )
-      WHERE rn = 1 AND score < possible * 0.6`,
+      WHERE rn = 1`,
   )
     .bind(classId, now)
     .all<FailedSubRow>();
 
-  const failed_submission = (failedResult.results ?? []).map((row) => ({
-    student_email: row.student_email,
-    lesson_id: row.lesson_id,
-    lesson_title: row.lesson_id,
-    score: row.score,
-    possible: row.possible,
-    submitted_at: row.submitted_at,
-  }));
+  const failed_submission = (failedResult.results ?? [])
+    .filter((row) => {
+      // Point-scored rubrics keep the historical "below 60%" band — a
+      // deliberately narrower "really struggling" signal than the 70% pass
+      // bar, and untouched by this fix.
+      if (row.possible > 0) return row.score < row.possible * 0.6;
+      // Pass/fail rubrics have no points to compare. Ask the verdicts.
+      return isPassingSubmission(row.score, row.possible, row.grade_json) === false;
+    })
+    .map((row) => ({
+      student_email: row.student_email,
+      lesson_id: row.lesson_id,
+      lesson_title: row.lesson_id,
+      score: row.score,
+      possible: row.possible,
+      submitted_at: row.submitted_at,
+    }));
 
   // 3. Stuck: lesson_state rows where state = 'started' and started_at is
   //    more than 3 days ago.

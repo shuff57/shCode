@@ -223,6 +223,13 @@ function buildGradebookCsv(
       if (c.score !== null) return String(c.score) + suffix;
       if (c.state === 'completed') return 'C' + suffix;
       if (c.state === 'started') return 'S' + suffix;
+      // Submitted, graded, and did NOT pass. WrittenGrader only writes a
+      // lesson_state row when the grade passes, so a failing submission has
+      // no state at all — and every branch above missed it, exporting the
+      // same empty cell as a student who never opened the lesson. The matrix
+      // on screen already had this branch; the CSV, which is the file a
+      // teacher actually pastes into a grade system, did not.
+      if (c.submitted_score !== null) return 's' + c.submitted_score + suffix;
       return suffix || '';
     })];
     return cols.map(escape).join(',');
@@ -388,7 +395,18 @@ function StudentDrawer({
     const unitOrder: string[] = [];
     const byUnit: Record<string, LessonMeta[]> = {};
 
-    for (const id of Object.keys(detail.lessonState)) {
+    // Union, not just lessonState. A free-response answer that was graded and
+    // failed writes a lesson_submissions row and NO lesson_state row, so
+    // keying off lessonState alone dropped the lesson out of this drawer
+    // entirely — no row, no badge, no way in to the submission — for exactly
+    // the students a teacher opens the drawer to find. The grade itself was
+    // already sitting in detail.latestSubmissions, unread.
+    const lessonIds = new Set([
+      ...Object.keys(detail.lessonState),
+      ...Object.keys(detail.latestSubmissions),
+    ]);
+
+    for (const id of lessonIds) {
       const meta = lessonMap.get(id) ?? { id, title: id, unit: null, preview: null };
       const u = meta.unit ?? inferUnit(id, lessonMap);
       if (!byUnit[u]) {
@@ -432,7 +450,18 @@ function StudentDrawer({
     zIndex: 999,
   };
 
-  function stateBadge(state: 'started' | 'completed' | undefined) {
+  // `submitted` covers the case with no lesson_state row at all but a graded
+  // submission on file — a free-response answer that did not pass. Without
+  // this it fell through to "Not started", which is the opposite of true and
+  // worse than the missing row it replaced.
+  function stateBadge(state: 'started' | 'completed' | undefined, submitted = false) {
+    if (!state && submitted) {
+      return (
+        <span style={{ background: '#ffb86c', color: '#282a36', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
+          Submitted
+        </span>
+      );
+    }
     if (state === 'completed') {
       return (
         <span style={{ background: '#50fa7b', color: '#282a36', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
@@ -512,7 +541,7 @@ function StudentDrawer({
                         <span style={{ flex: 1, fontSize: 13, color: '#f8f8f2', minWidth: 0 }}>
                           {lesson.title}
                         </span>
-                        {stateBadge(ls?.state)}
+                        {stateBadge(ls?.state, !!sub)}
                         {ls?.state === 'completed' && ls.score !== null && (
                           <span style={{ fontSize: 12, color: '#8be9fd', fontFamily: 'monospace', flexShrink: 0 }}>
                             {ls.score} pts

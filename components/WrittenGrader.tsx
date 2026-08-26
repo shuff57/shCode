@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { CircleCheck, CircleX, Circle, Loader2, Lightbulb, Sparkles, Save } from 'lucide-react';
 import { recordLessonCompleted, useLessonState } from '../lib/progress';
+import { isPassingGrade } from '../lib/grade-pass';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import {
   fetchDraft,
@@ -87,14 +88,13 @@ function saveState(lessonId: string, state: StoredState) {
 // totalPossible === 0 ⇒ pass/fail rubric (all rubric points are 0). Pass when
 // a majority of criteria are met-or-partial — loose threshold for very new
 // students. Otherwise fall back to the points-based 70% threshold.
-function isPassing(r: GradeResult): boolean {
-  if (r.totalPossible === 0) {
-    if (r.criteria.length === 0) return false;
-    const ok = r.criteria.filter((c) => c.verdict === 'met' || c.verdict === 'partial').length;
-    return ok >= Math.ceil(r.criteria.length / 2);
-  }
-  return r.totalEarned / r.totalPossible >= 0.7;
-}
+//
+// Lives in lib/grade-pass so the teacher side asks the same question the
+// student was answered with. It used to be local to this file, and the
+// consequence was that a failing submission wrote no lesson_state row while
+// every teacher-side "who is struggling" check compared points that these
+// rubrics never award — so nobody's failure was visible to anyone.
+const isPassing = isPassingGrade;
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
