@@ -29,7 +29,10 @@ failures = []
 
 
 def check(name, ok, detail=""):
-    print(("  PASS " if ok else "  FAIL ") + name + ((" -- " + detail) if detail else ""))
+    # Detail prints on FAIL only. Printing it next to a PASS reads as evidence
+    # for the pass when it is just a static label, which is exactly how a
+    # false pass slipped through here once.
+    print(("  PASS " if ok else "  FAIL ") + name + (("" if ok else (" -- " + detail)) if detail else ""))
     if not ok:
         failures.append(name)
 

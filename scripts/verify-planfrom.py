@@ -30,12 +30,16 @@ EMAIL = "plan.verify@shcode.local"
 PASSWORD = "PlanVerify123!"
 LESSON = "1-5-31-a1-5-1-implement-your-plan"
 MARKER = "--- your chart from 1.5.30 ---"
+RELABEL = "RELABELLED FOR THE STALE CHECK"
 
 failures = []
 
 
 def check(name, ok, detail=""):
-    print(("  PASS " if ok else "  FAIL ") + name + ((" -- " + detail) if detail else ""))
+    # Detail prints on FAIL only. Printing it next to a PASS reads as evidence
+    # for the pass when it is just a static label, which is exactly how a
+    # false pass slipped through here once.
+    print(("  PASS " if ok else "  FAIL ") + name + (("" if ok else (" -- " + detail)) if detail else ""))
     if not ok:
         failures.append(name)
 
@@ -48,6 +52,27 @@ with sync_playwright() as p:
     if not r.ok:
         print("login failed: %s %s" % (r.status, r.text()[:200]))
         sys.exit(1)
+
+    # Start from a known state, and put it back afterwards. Without this the
+    # run is not repeatable: the stale case below relabels the 1.5.30 chart, so
+    # a second run seeds FROM the relabelled chart and the stale check can
+    # never fire. A check that only works the first time is not a check.
+    import json
+    snap = ctx.request.get("/api/lesson-drafts/1-5-30-a1-5-1-flowchart-gate")
+    original_chart = snap.json().get("response") if snap.ok else None
+    if not original_chart:
+        print("no 1.5.30 draft for %s -- nothing to carry into part two" % EMAIL)
+        sys.exit(1)
+    # Refuse to run against a chart a previous run already relabelled. That
+    # exact contamination made this file report two failures against working
+    # code: every run seeded FROM the relabelled chart, so the "comments were
+    # not rewritten" check was comparing the residue of the last run to itself.
+    # A dirty fixture cannot fail honestly, so stop rather than measure it.
+    if RELABEL in original_chart:
+        print("FIXTURE DIRTY: %s's 1.5.30 chart still contains %r from an earlier"
+              " run. Restore it from a clean chart before re-running." % (EMAIL, RELABEL))
+        sys.exit(1)
+    ctx.request.delete("/api/lesson-drafts/%s" % LESSON)
 
     page = ctx.new_page()
     page.goto("%s/lesson/%s/" % (BASE, LESSON), wait_until="domcontentloaded")
@@ -91,6 +116,41 @@ with sync_playwright() as p:
     check("the scaffold is not duplicated on reload", after.count(MARKER) == 1,
           "count=%d" % after.count(MARKER))
 
+    # Revise the chart AFTER part two has already seeded. The comments are the
+    # student's now -- they may have built code around them -- so they are left
+    # alone, and the page has to say the two no longer agree. Without the
+    # notice the chart and the comments silently contradict each other, under a
+    # Step 4 that tells the student to compare them.
+    d = json.loads(original_chart)
+    if True:
+        renamed = False
+        for node in d["nodes"]:
+            if node["shape"] == "process":
+                node["label"] = RELABEL
+                renamed = True
+                break
+        check("found a task shape to relabel", renamed)
+        ctx.request.post("/api/lesson-drafts/1-5-30-a1-5-1-flowchart-gate",
+                         data={"response": json.dumps(d)})
+
+        page.reload(wait_until="domcontentloaded")
+        page.wait_for_selector(".cm-content", timeout=30000)
+        page.wait_for_timeout(5000)
+        body2 = page.inner_text("body")
+        editor2 = page.locator(".cm-content").first.inner_text()
+
+        check("the chart shown is the revised one",
+              RELABEL in body2)
+        check("the student's existing comments are NOT rewritten",
+              RELABEL not in editor2)
+        check("the page says the chart and the comments disagree",
+              "changed this chart after starting Part 2" in body2,
+              "stale notice missing")
+
+    # Put the chart back so the next run starts clean.
+    ctx.request.post("/api/lesson-drafts/1-5-30-a1-5-1-flowchart-gate",
+                     data={"response": original_chart})
+    ctx.request.delete("/api/lesson-drafts/%s" % LESSON)
     browser.close()
 
 if failures:

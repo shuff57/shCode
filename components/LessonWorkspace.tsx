@@ -232,6 +232,7 @@ export default function LessonWorkspace({
   // nothing. The lines are parked in state instead, and the effect below
   // applies them once the files are actually there.
   const [planLines, setPlanLines] = useState<string[] | null>(null);
+  const [planStale, setPlanStale] = useState(false);
   const planSeeded = useRef(false);
 
   useEffect(() => {
@@ -241,14 +242,24 @@ export default function LessonWorkspace({
     planSeeded.current = true;              // decided once, either way
     if (planLines.length === 0) return;
 
+    const marker = '// --- your chart from ' + (lesson.planFromLabel ?? lesson.planFrom) + ' ---';
+    const block = [marker, ...planLines].join('\n');
+
     // Only while script.js is still byte-for-byte the starter. Seeding over a
     // student who has begun would destroy their work to hand them a scaffold
     // they no longer need, and this fires on load, when they are not watching
     // for it.
     const starter = flattenFiles(lesson.files).find((f) => f.path === 'script.js');
-    if (!starter || current !== normalizeEol(starter.content || '')) return;
+    if (!starter || current !== normalizeEol(starter.content || '')) {
+      // Not seeding. If a PREVIOUS visit seeded, and the chart has since been
+      // redrawn, the comments below the chart now describe an older plan than
+      // the chart above them -- and the lesson's own last step tells the
+      // student to read the two side by side. Their code is theirs to keep, so
+      // say the plan is stale rather than rewriting it under them.
+      if (current.includes(marker) && !current.includes(block)) setPlanStale(true);
+      return;
+    }
 
-    const block = ['// --- your chart from ' + (lesson.planFromLabel ?? lesson.planFrom) + ' ---', ...planLines].join('\n');
     // Anchored under STEP 1, which is where the lesson asks for the
     // pseudocode. If that text ever moves, append rather than guess.
     const ANCHOR = '//         Do this BEFORE you write any JavaScript.';
@@ -715,6 +726,7 @@ export default function LessonWorkspace({
           planFrom={lesson.planFrom}
           planFromLabel={lesson.planFromLabel}
           onScaffold={setPlanLines}
+          stale={planStale}
         />
       )}
       <div className="editor-card">

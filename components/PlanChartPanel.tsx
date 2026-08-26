@@ -27,6 +27,12 @@ interface Props {
   planFromLabel?: string;
   /** Called once, with the student's chart as pseudocode comment lines. */
   onScaffold?: (lines: string[]) => void;
+  /**
+   * The chart was redrawn after the comments below it were written, so the two
+   * no longer agree. The comments are not rewritten -- the student may have
+   * built code around them -- so the mismatch is named instead of hidden.
+   */
+  stale?: boolean;
 }
 
 function parseDoc(raw: string): DiagramDoc | null {
@@ -39,7 +45,7 @@ function parseDoc(raw: string): DiagramDoc | null {
   }
 }
 
-export default function PlanChartPanel({ planFrom, planFromLabel, onScaffold }: Props) {
+export default function PlanChartPanel({ planFrom, planFromLabel, onScaffold, stale }: Props) {
   const [doc, setDoc] = useState<DiagramDoc | null>(null);
   const [state, setState] = useState<'loading' | 'ready' | 'missing'>('loading');
   // onScaffold seeds an editor, so it must fire once and never on a re-render.
@@ -87,6 +93,13 @@ export default function PlanChartPanel({ planFrom, planFromLabel, onScaffold }: 
 
   return (
     <div style={{ marginBottom: 12 }}>
+      {stale && (
+        <div style={{ background: '#3a2f1a', border: '1px solid #ffb86c', borderRadius: 6, padding: '8px 12px', marginBottom: 8, color: '#ffb86c', fontSize: 13 }}>
+          You changed this chart after starting Part 2. The chart here is your
+          latest one; the pseudocode comments in the editor still describe the
+          earlier version. Update the comments to match before you compare them.
+        </div>
+      )}
       <DiagramBlock
         source={toMermaid(doc)}
         blockId={`plan-from-${planFrom}`}
