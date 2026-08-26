@@ -300,7 +300,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   let raw: ReadableStream<Uint8Array>;
   try {
     raw = await chatStream({
-      model: 'qwen3-coder-next:cloud',
+      model: 'deepseek-v4-flash:0731-cloud',
       host: env.OLLAMA_HOST,
       apiKey: env.OLLAMA_API_KEY,
       temperature: 0.3,

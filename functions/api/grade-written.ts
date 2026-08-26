@@ -57,7 +57,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   }
 
   const host = env.OLLAMA_HOST || 'https://ollama.com';
-  const model = body.model || 'qwen3-coder-next:cloud';
+  const model = body.model || 'deepseek-v4-flash:0731-cloud';
   const { system, user } = buildPrompt(body);
 
   // 180s timeout — the cloud can be slow on a cold model. Cloudflare Pages
