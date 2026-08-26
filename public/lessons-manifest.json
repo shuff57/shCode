@@ -2,7 +2,7 @@
   "lessons": [
     {
       "id": "1-1-1-slides",
-      "title": "1.1.1 Slides : Foundations",
+      "title": "1.1.1 Slides: Foundations",
       "unit": "1.1 Software Lifecycle",
       "preview": "slides",
       "type": "lesson",
@@ -11,7 +11,7 @@
     },
     {
       "id": "1-1-10-reading-umbrella",
-      "title": "1.1.10 Reading : Umbrella Activities",
+      "title": "1.1.10 Reading: Umbrella Activities",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
       "type": "lesson",
@@ -29,7 +29,7 @@
     },
     {
       "id": "1-1-12-reading-actions",
-      "title": "1.1.12 Reading : Software Engineering Actions",
+      "title": "1.1.12 Reading: Software Engineering Actions",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
       "type": "lesson",
@@ -38,7 +38,7 @@
     },
     {
       "id": "1-1-13-reading-task-sets",
-      "title": "1.1.13 Reading : Task Sets",
+      "title": "1.1.13 Reading: Task Sets",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
       "type": "lesson",
@@ -47,7 +47,7 @@
     },
     {
       "id": "1-1-14-example-task-set-loop",
-      "title": "1.1.14 Worked Example : Task Set for a Loop Bug",
+      "title": "1.1.14 Worked Example: Task Set for a Loop Bug",
       "unit": "1.1 Software Lifecycle",
       "preview": "example",
       "type": "lesson",
@@ -65,7 +65,7 @@
     },
     {
       "id": "1-1-16-reading-sdlc",
-      "title": "1.1.16 Reading : SDLC Methodologies",
+      "title": "1.1.16 Reading: SDLC Methodologies",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
       "type": "lesson",
@@ -74,7 +74,7 @@
     },
     {
       "id": "1-1-17-reading-four-ps",
-      "title": "1.1.17 Reading : The Four Ps",
+      "title": "1.1.17 Reading: The Four Ps",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
       "type": "lesson",
@@ -92,7 +92,7 @@
     },
     {
       "id": "1-1-19-reading-prescriptive",
-      "title": "1.1.19 Reading : Prescriptive Process Models",
+      "title": "1.1.19 Reading: Prescriptive Process Models",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
       "type": "lesson",
@@ -101,7 +101,7 @@
     },
     {
       "id": "1-1-2-reading-console-log",
-      "title": "1.1.2 Reading : Console: console.log & sequential execution",
+      "title": "1.1.2 Reading: Console: console.log & sequential execution",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
       "type": "lesson",
@@ -110,7 +110,7 @@
     },
     {
       "id": "1-1-20-reading-prescriptive-limits",
-      "title": "1.1.20 Reading : Where Prescriptive Models Break",
+      "title": "1.1.20 Reading: Where Prescriptive Models Break",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
       "type": "lesson",
@@ -164,7 +164,7 @@
     },
     {
       "id": "1-1-5-video-sdlc",
-      "title": "1.1.5 Video : What is the SDLC?",
+      "title": "1.1.5 Video: What is the SDLC?",
       "unit": "1.1 Software Lifecycle",
       "preview": "video",
       "type": "lesson",
@@ -173,7 +173,7 @@
     },
     {
       "id": "1-1-6-reading-four-phases",
-      "title": "1.1.6 Reading : The Four Phases",
+      "title": "1.1.6 Reading: The Four Phases",
       "unit": "1.1 Software Lifecycle",
       "preview": "reading",
       "type": "lesson",
@@ -191,7 +191,7 @@
     },
     {
       "id": "1-1-8-example-greeting-phases",
-      "title": "1.1.8 Worked Example : Greeting App Through Four Phases",
+      "title": "1.1.8 Worked Example: Greeting App Through Four Phases",
       "unit": "1.1 Software Lifecycle",
       "preview": "example",
       "type": "lesson",
@@ -200,7 +200,7 @@
     },
     {
       "id": "1-2-1-slides",
-      "title": "1.2.1 Slides : Variables and Data Types",
+      "title": "1.2.1 Slides: Variables and Data Types",
       "unit": "1.2 Variables and Data Types",
       "preview": "slides",
       "type": "lesson",
@@ -218,7 +218,7 @@
     },
     {
       "id": "1-2-11-reading-bigint",
-      "title": "1.2.11 Reading : BigInt",
+      "title": "1.2.11 Reading: BigInt",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -227,7 +227,7 @@
     },
     {
       "id": "1-2-12-reading-strings-and-quotes",
-      "title": "1.2.12 Reading : Strings and the Three Quotes",
+      "title": "1.2.12 Reading: Strings and the Three Quotes",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -236,7 +236,7 @@
     },
     {
       "id": "1-2-13-reading-template-literals",
-      "title": "1.2.13 Reading : Embedding Values with ${...}",
+      "title": "1.2.13 Reading: Embedding Values with ${...}",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -245,7 +245,7 @@
     },
     {
       "id": "1-2-14-reading-string-methods",
-      "title": "1.2.14 Reading : String Methods in Practice",
+      "title": "1.2.14 Reading: String Methods in Practice",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -272,7 +272,7 @@
     },
     {
       "id": "1-2-17-reading-boolean",
-      "title": "1.2.17 Reading : The boolean Type",
+      "title": "1.2.17 Reading: The boolean Type",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -281,7 +281,7 @@
     },
     {
       "id": "1-2-18-example-comparisons-make-booleans",
-      "title": "1.2.18 Worked Example : Comparisons Produce Booleans",
+      "title": "1.2.18 Worked Example: Comparisons Produce Booleans",
       "unit": "1.2 Variables and Data Types",
       "preview": "example",
       "type": "lesson",
@@ -290,7 +290,7 @@
     },
     {
       "id": "1-2-19-reading-null",
-      "title": "1.2.19 Reading : The null Value",
+      "title": "1.2.19 Reading: The null Value",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -299,7 +299,7 @@
     },
     {
       "id": "1-2-2-reading-let-const",
-      "title": "1.2.2 Reading : Declaring Variables with let and const",
+      "title": "1.2.2 Reading: Declaring Variables with let and const",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -308,7 +308,7 @@
     },
     {
       "id": "1-2-20-reading-undefined",
-      "title": "1.2.20 Reading : The undefined Value",
+      "title": "1.2.20 Reading: The undefined Value",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -326,7 +326,7 @@
     },
     {
       "id": "1-2-22-reading-primitive-vs-object",
-      "title": "1.2.22 Reading : Primitive vs Object",
+      "title": "1.2.22 Reading: Primitive vs Object",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -335,7 +335,7 @@
     },
     {
       "id": "1-2-23-reading-typeof",
-      "title": "1.2.23 Reading : The typeof Operator",
+      "title": "1.2.23 Reading: The typeof Operator",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -344,7 +344,7 @@
     },
     {
       "id": "1-2-24-example-typeof-surprises",
-      "title": "1.2.24 Worked Example : The typeof Surprises",
+      "title": "1.2.24 Worked Example: The typeof Surprises",
       "unit": "1.2 Variables and Data Types",
       "preview": "example",
       "type": "lesson",
@@ -371,7 +371,7 @@
     },
     {
       "id": "1-2-27-reading-the-seven-primitives",
-      "title": "1.2.27 Reading : The Seven Primitives, Recapped",
+      "title": "1.2.27 Reading: The Seven Primitives, Recapped",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -398,7 +398,7 @@
     },
     {
       "id": "1-2-3-reading-every-value-has-a-type",
-      "title": "1.2.3 Reading : Every Value Has a Type",
+      "title": "1.2.3 Reading: Every Value Has a Type",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -407,7 +407,7 @@
     },
     {
       "id": "1-2-30-video-every-value-has-a-type",
-      "title": "1.2.30 Video : Every Value Has a Type",
+      "title": "1.2.30 Video: Every Value Has a Type",
       "unit": "1.2 Variables and Data Types",
       "preview": "video",
       "type": "lesson",
@@ -425,7 +425,7 @@
     },
     {
       "id": "1-2-4-reading-dynamically-typed",
-      "title": "1.2.4 Reading : Dynamically Typed",
+      "title": "1.2.4 Reading: Dynamically Typed",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -443,7 +443,7 @@
     },
     {
       "id": "1-2-6-reading-number",
-      "title": "1.2.6 Reading : The number Type",
+      "title": "1.2.6 Reading: The number Type",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -452,7 +452,7 @@
     },
     {
       "id": "1-2-7-reading-operators-coercion",
-      "title": "1.2.7 Reading : Arithmetic Operators and Type Coercion",
+      "title": "1.2.7 Reading: Arithmetic Operators and Type Coercion",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -461,7 +461,7 @@
     },
     {
       "id": "1-2-8-reading-special-numeric-values",
-      "title": "1.2.8 Reading : Infinity, -Infinity and NaN",
+      "title": "1.2.8 Reading: Infinity, -Infinity and NaN",
       "unit": "1.2 Variables and Data Types",
       "preview": "reading",
       "type": "lesson",
@@ -470,7 +470,7 @@
     },
     {
       "id": "1-2-9-example-nan-is-sticky",
-      "title": "1.2.9 Worked Example : NaN Is Sticky",
+      "title": "1.2.9 Worked Example: NaN Is Sticky",
       "unit": "1.2 Variables and Data Types",
       "preview": "example",
       "type": "lesson",
@@ -479,7 +479,7 @@
     },
     {
       "id": "1-3-1-slides",
-      "title": "1.3.1 Slides : Documentation and Coding Conventions",
+      "title": "1.3.1 Slides: Documentation and Coding Conventions",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "slides",
       "type": "lesson",
@@ -488,7 +488,7 @@
     },
     {
       "id": "1-3-10-example-good-vs-bad-names",
-      "title": "1.3.10 Worked Example : Good vs Bad Names",
+      "title": "1.3.10 Worked Example: Good vs Bad Names",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "example",
       "type": "lesson",
@@ -515,7 +515,7 @@
     },
     {
       "id": "1-3-13-reading-reuse-or-create",
-      "title": "1.3.13 Reading : Reuse or Create?",
+      "title": "1.3.13 Reading: Reuse or Create?",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
       "type": "lesson",
@@ -524,7 +524,7 @@
     },
     {
       "id": "1-3-14-reading-why-reuse-costs-you",
-      "title": "1.3.14 Reading : What Reuse Actually Costs",
+      "title": "1.3.14 Reading: What Reuse Actually Costs",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
       "type": "lesson",
@@ -533,7 +533,7 @@
     },
     {
       "id": "1-3-15-example-one-variable-three-meanings",
-      "title": "1.3.15 Worked Example : One Variable, Three Meanings",
+      "title": "1.3.15 Worked Example: One Variable, Three Meanings",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "example",
       "type": "lesson",
@@ -560,7 +560,7 @@
     },
     {
       "id": "1-3-18-reading-what-a-readme-is",
-      "title": "1.3.18 Reading : What a README Is For",
+      "title": "1.3.18 Reading: What a README Is For",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
       "type": "lesson",
@@ -578,7 +578,7 @@
     },
     {
       "id": "1-3-2-reading-camelcase",
-      "title": "1.3.2 Reading : camelCase and UPPER_SNAKE_CASE",
+      "title": "1.3.2 Reading: camelCase and UPPER_SNAKE_CASE",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
       "type": "lesson",
@@ -587,7 +587,7 @@
     },
     {
       "id": "1-3-20-video-names-are-for-readers",
-      "title": "1.3.20 Video : Names Are for Readers",
+      "title": "1.3.20 Video: Names Are for Readers",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "video",
       "type": "lesson",
@@ -605,7 +605,7 @@
     },
     {
       "id": "1-3-3-reading-code-layout",
-      "title": "1.3.3 Reading : Code Layout",
+      "title": "1.3.3 Reading: Code Layout",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
       "type": "lesson",
@@ -614,7 +614,7 @@
     },
     {
       "id": "1-3-4-reading-comments",
-      "title": "1.3.4 Reading : Comments: // and /* */",
+      "title": "1.3.4 Reading: Comments: // and /* */",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
       "type": "lesson",
@@ -623,7 +623,7 @@
     },
     {
       "id": "1-3-5-why-documentation",
-      "title": "1.3.5 Reading : Why Documentation Matters",
+      "title": "1.3.5 Reading: Why Documentation Matters",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
       "type": "lesson",
@@ -632,7 +632,7 @@
     },
     {
       "id": "1-3-6-reading-human-readable-names",
-      "title": "1.3.6 Reading : Human-Readable Names",
+      "title": "1.3.6 Reading: Human-Readable Names",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
       "type": "lesson",
@@ -641,7 +641,7 @@
     },
     {
       "id": "1-3-7-reading-avoid-abbreviations",
-      "title": "1.3.7 Reading : Avoid Single Letters and Abbreviations",
+      "title": "1.3.7 Reading: Avoid Single Letters and Abbreviations",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
       "type": "lesson",
@@ -650,7 +650,7 @@
     },
     {
       "id": "1-3-8-reading-descriptive-but-concise",
-      "title": "1.3.8 Reading : Descriptive but Concise",
+      "title": "1.3.8 Reading: Descriptive but Concise",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
       "type": "lesson",
@@ -659,7 +659,7 @@
     },
     {
       "id": "1-3-9-reading-agree-on-terms",
-      "title": "1.3.9 Reading : Agree on Terms",
+      "title": "1.3.9 Reading: Agree on Terms",
       "unit": "1.3 Documentation and Coding Conventions",
       "preview": "reading",
       "type": "lesson",
@@ -668,7 +668,7 @@
     },
     {
       "id": "1-4-1-slides",
-      "title": "1.4.1 Slides : Programming Paradigms and Languages",
+      "title": "1.4.1 Slides: Programming Paradigms and Languages",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "slides",
       "type": "lesson",
@@ -677,7 +677,7 @@
     },
     {
       "id": "1-4-10-reading-three-structures",
-      "title": "1.4.10 Reading : Sequence, Selection, Repetition",
+      "title": "1.4.10 Reading: Sequence, Selection, Repetition",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
       "type": "lesson",
@@ -686,7 +686,7 @@
     },
     {
       "id": "1-4-11-example-which-structures",
-      "title": "1.4.11 Worked Example : Which Structures Does This Use?",
+      "title": "1.4.11 Worked Example: Which Structures Does This Use?",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "example",
       "type": "lesson",
@@ -704,7 +704,7 @@
     },
     {
       "id": "1-4-13-reading-why-goto-went-away",
-      "title": "1.4.13 Reading : Why goto Went Away",
+      "title": "1.4.13 Reading: Why goto Went Away",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
       "type": "lesson",
@@ -722,7 +722,7 @@
     },
     {
       "id": "1-4-15-reading-object-oriented",
-      "title": "1.4.15 Reading : Object-Oriented Programming",
+      "title": "1.4.15 Reading: Object-Oriented Programming",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
       "type": "lesson",
@@ -731,7 +731,7 @@
     },
     {
       "id": "1-4-16-example-procedural-vs-oo",
-      "title": "1.4.16 Worked Example : Procedural vs Object-Oriented",
+      "title": "1.4.16 Worked Example: Procedural vs Object-Oriented",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "example",
       "type": "lesson",
@@ -749,7 +749,7 @@
     },
     {
       "id": "1-4-18-reading-functional-programming",
-      "title": "1.4.18 Reading : Functional Programming",
+      "title": "1.4.18 Reading: Functional Programming",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
       "type": "lesson",
@@ -758,7 +758,7 @@
     },
     {
       "id": "1-4-19-reading-multi-paradigm",
-      "title": "1.4.19 Reading : JavaScript Is Multi-Paradigm",
+      "title": "1.4.19 Reading: JavaScript Is Multi-Paradigm",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
       "type": "lesson",
@@ -767,7 +767,7 @@
     },
     {
       "id": "1-4-2-reading-why-so-many-languages",
-      "title": "1.4.2 Reading : Why There Are So Many Languages",
+      "title": "1.4.2 Reading: Why There Are So Many Languages",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
       "type": "lesson",
@@ -785,7 +785,7 @@
     },
     {
       "id": "1-4-21-video-why-so-many-languages",
-      "title": "1.4.21 Video : Why Are There So Many Programming Languages?",
+      "title": "1.4.21 Video: Why Are There So Many Programming Languages?",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "video",
       "type": "lesson",
@@ -821,7 +821,7 @@
     },
     {
       "id": "1-4-4-reading-levels-of-abstraction",
-      "title": "1.4.4 Reading : Level of Abstraction",
+      "title": "1.4.4 Reading: Level of Abstraction",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
       "type": "lesson",
@@ -830,7 +830,7 @@
     },
     {
       "id": "1-4-5-reading-high-and-low-level",
-      "title": "1.4.5 Reading : High-Level and Low-Level Languages",
+      "title": "1.4.5 Reading: High-Level and Low-Level Languages",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
       "type": "lesson",
@@ -848,7 +848,7 @@
     },
     {
       "id": "1-4-7-reading-what-is-a-paradigm",
-      "title": "1.4.7 Reading : What a Paradigm Is",
+      "title": "1.4.7 Reading: What a Paradigm Is",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
       "type": "lesson",
@@ -857,7 +857,7 @@
     },
     {
       "id": "1-4-8-reading-procedural-programming",
-      "title": "1.4.8 Reading : Procedural Programming",
+      "title": "1.4.8 Reading: Procedural Programming",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
       "type": "lesson",
@@ -866,7 +866,7 @@
     },
     {
       "id": "1-4-9-reading-structured-programming",
-      "title": "1.4.9 Reading : Structured Programming",
+      "title": "1.4.9 Reading: Structured Programming",
       "unit": "1.4 Programming Paradigms and Languages",
       "preview": "reading",
       "type": "lesson",
@@ -875,7 +875,7 @@
     },
     {
       "id": "1-5-1-slides",
-      "title": "1.5.1 Slides : Program Design Tools and Environments",
+      "title": "1.5.1 Slides: Program Design Tools and Environments",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "slides",
       "type": "lesson",
@@ -884,7 +884,7 @@
     },
     {
       "id": "1-5-10-reading-inductive-and-deductive",
-      "title": "1.5.10 Reading : Inductive and Deductive Reasoning",
+      "title": "1.5.10 Reading: Inductive and Deductive Reasoning",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -893,7 +893,7 @@
     },
     {
       "id": "1-5-11-example-decomposing-the-sandwich",
-      "title": "1.5.11 Worked Example : Decomposing the Sandwich",
+      "title": "1.5.11 Worked Example: Decomposing the Sandwich",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "example",
       "type": "lesson",
@@ -911,7 +911,7 @@
     },
     {
       "id": "1-5-13-reading-abstraction",
-      "title": "1.5.13 Reading : Abstraction",
+      "title": "1.5.13 Reading: Abstraction",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -920,7 +920,7 @@
     },
     {
       "id": "1-5-14-reading-layers-of-abstraction",
-      "title": "1.5.14 Reading : Layers of Abstraction",
+      "title": "1.5.14 Reading: Layers of Abstraction",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -929,7 +929,7 @@
     },
     {
       "id": "1-5-15-example-computational-thinking-in-chess",
-      "title": "1.5.15 Worked Example : Computational Thinking in Chess",
+      "title": "1.5.15 Worked Example: Computational Thinking in Chess",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "example",
       "type": "lesson",
@@ -956,7 +956,7 @@
     },
     {
       "id": "1-5-18-reading-what-an-algorithm-is",
-      "title": "1.5.18 Reading : What an Algorithm Is",
+      "title": "1.5.18 Reading: What an Algorithm Is",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -965,7 +965,7 @@
     },
     {
       "id": "1-5-19-reading-pseudocode-and-flowcharts",
-      "title": "1.5.19 Reading : Pseudocode and Flowcharts",
+      "title": "1.5.19 Reading: Pseudocode and Flowcharts",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -974,7 +974,7 @@
     },
     {
       "id": "1-5-2-reading-think-before-you-type",
-      "title": "1.5.2 Reading : Think Before You Type",
+      "title": "1.5.2 Reading: Think Before You Type",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -983,7 +983,7 @@
     },
     {
       "id": "1-5-20-reading-the-two-pseudocode-rules",
-      "title": "1.5.20 Reading : The Two Pseudocode Rules",
+      "title": "1.5.20 Reading: The Two Pseudocode Rules",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -992,7 +992,7 @@
     },
     {
       "id": "1-5-21-example-pseudocode-for-a-decision",
-      "title": "1.5.21 Worked Example : Pseudocode for a Decision",
+      "title": "1.5.21 Worked Example: Pseudocode for a Decision",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "example",
       "type": "lesson",
@@ -1001,7 +1001,7 @@
     },
     {
       "id": "1-5-22-example-butter-or-no-butter",
-      "title": "1.5.22 Worked Example : Butter or No Butter",
+      "title": "1.5.22 Worked Example: Butter or No Butter",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "example",
       "type": "lesson",
@@ -1028,7 +1028,7 @@
     },
     {
       "id": "1-5-25-reading-the-three-shapes",
-      "title": "1.5.25 Reading : The Three Flowchart Shapes",
+      "title": "1.5.25 Reading: The Three Flowchart Shapes",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1037,7 +1037,7 @@
     },
     {
       "id": "1-5-26-reading-the-diamond",
-      "title": "1.5.26 Reading : The Diamond",
+      "title": "1.5.26 Reading: The Diamond",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1046,7 +1046,7 @@
     },
     {
       "id": "1-5-27-reading-when-to-use-which",
-      "title": "1.5.27 Reading : Pseudocode or Flowchart?",
+      "title": "1.5.27 Reading: Pseudocode or Flowchart?",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1064,7 +1064,7 @@
     },
     {
       "id": "1-5-29-reading-the-flowchart-convention",
-      "title": "1.5.29 Reading : The Class Flowchart Convention",
+      "title": "1.5.29 Reading: The Class Flowchart Convention",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1073,7 +1073,7 @@
     },
     {
       "id": "1-5-3-reading-computational-thinking",
-      "title": "1.5.3 Reading : What Computational Thinking Is",
+      "title": "1.5.3 Reading: What Computational Thinking Is",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1100,7 +1100,7 @@
     },
     {
       "id": "1-5-32-reading-sequential-parallel-concurrent",
-      "title": "1.5.32 Reading : Sequential, Parallel, Concurrent",
+      "title": "1.5.32 Reading: Sequential, Parallel, Concurrent",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1109,7 +1109,7 @@
     },
     {
       "id": "1-5-33-reading-recursion",
-      "title": "1.5.33 Reading : Recursion and the Base Case",
+      "title": "1.5.33 Reading: Recursion and the Base Case",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1118,7 +1118,7 @@
     },
     {
       "id": "1-5-34-example-stack-overflow-on-purpose",
-      "title": "1.5.34 Worked Example : Stack Overflow on Purpose",
+      "title": "1.5.34 Worked Example: Stack Overflow on Purpose",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "example",
       "type": "lesson",
@@ -1127,7 +1127,7 @@
     },
     {
       "id": "1-5-35-reading-the-browser-console",
-      "title": "1.5.35 Reading : The Browser Console",
+      "title": "1.5.35 Reading: The Browser Console",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1136,7 +1136,7 @@
     },
     {
       "id": "1-5-36-reading-a-code-editor",
-      "title": "1.5.36 Reading : A Code Editor",
+      "title": "1.5.36 Reading: A Code Editor",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1154,7 +1154,7 @@
     },
     {
       "id": "1-5-38-reading-reading-an-error-message",
-      "title": "1.5.38 Reading : Reading an Error Message",
+      "title": "1.5.38 Reading: Reading an Error Message",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1172,7 +1172,7 @@
     },
     {
       "id": "1-5-4-reading-the-four-techniques",
-      "title": "1.5.4 Reading : The Four Cornerstones",
+      "title": "1.5.4 Reading: The Four Cornerstones",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1181,7 +1181,7 @@
     },
     {
       "id": "1-5-40-reading-testing-and-test-cases",
-      "title": "1.5.40 Reading : Testing and Test Cases",
+      "title": "1.5.40 Reading: Testing and Test Cases",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1190,7 +1190,7 @@
     },
     {
       "id": "1-5-41-reading-debugging-with-console-log",
-      "title": "1.5.41 Reading : Debugging with console.log",
+      "title": "1.5.41 Reading: Debugging with console.log",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1199,7 +1199,7 @@
     },
     {
       "id": "1-5-42-example-finding-the-rectangle-bug",
-      "title": "1.5.42 Worked Example : Finding the Rectangle Bug",
+      "title": "1.5.42 Worked Example: Finding the Rectangle Bug",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "example",
       "type": "lesson",
@@ -1217,7 +1217,7 @@
     },
     {
       "id": "1-5-44-video-think-before-you-type",
-      "title": "1.5.44 Video : Think Before You Type",
+      "title": "1.5.44 Video: Think Before You Type",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "video",
       "type": "lesson",
@@ -1235,7 +1235,7 @@
     },
     {
       "id": "1-5-5-reading-the-three-as",
-      "title": "1.5.5 Reading : The Three As",
+      "title": "1.5.5 Reading: The Three As",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1244,7 +1244,7 @@
     },
     {
       "id": "1-5-6-example-the-jam-sandwich-robot",
-      "title": "1.5.6 Worked Example : The Jam Sandwich Robot",
+      "title": "1.5.6 Worked Example: The Jam Sandwich Robot",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "example",
       "type": "lesson",
@@ -1262,7 +1262,7 @@
     },
     {
       "id": "1-5-8-reading-decomposition",
-      "title": "1.5.8 Reading : Decomposition",
+      "title": "1.5.8 Reading: Decomposition",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1271,7 +1271,7 @@
     },
     {
       "id": "1-5-9-reading-pattern-recognition",
-      "title": "1.5.9 Reading : Pattern Recognition",
+      "title": "1.5.9 Reading: Pattern Recognition",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "reading",
       "type": "lesson",
@@ -1280,7 +1280,7 @@
     },
     {
       "id": "2-1-1-slides",
-      "title": "2.1.1 Slides : Conditionals",
+      "title": "2.1.1 Slides: Conditionals",
       "unit": "2.1 Conditionals",
       "preview": "slides",
       "type": "lesson",
@@ -1289,7 +1289,7 @@
     },
     {
       "id": "2-1-10-reading-logical-operators",
-      "title": "2.1.28 Reading : Logical Operators: && || !",
+      "title": "2.1.28 Reading: Logical Operators: && || !",
       "unit": "2.1 Conditionals",
       "preview": "reading",
       "type": "lesson",
@@ -1298,7 +1298,7 @@
     },
     {
       "id": "2-1-11-example-combining-conditions",
-      "title": "2.1.29 Worked Example : Combining conditions",
+      "title": "2.1.29 Worked Example: Combining conditions",
       "unit": "2.1 Conditionals",
       "preview": "example",
       "type": "lesson",
@@ -1334,7 +1334,7 @@
     },
     {
       "id": "2-1-15-reading-nested-conditionals",
-      "title": "2.1.9 Reading : Nested Conditionals",
+      "title": "2.1.9 Reading: Nested Conditionals",
       "unit": "2.1 Conditionals",
       "preview": "reading",
       "type": "lesson",
@@ -1343,7 +1343,7 @@
     },
     {
       "id": "2-1-16-example-nested-conditionals",
-      "title": "2.1.10 Worked Example : Nested if Inside if",
+      "title": "2.1.10 Worked Example: Nested if Inside if",
       "unit": "2.1 Conditionals",
       "preview": "example",
       "type": "lesson",
@@ -1361,7 +1361,7 @@
     },
     {
       "id": "2-1-18-reading-truthy-falsy",
-      "title": "2.1.12 Reading : Truthy and Falsy Values",
+      "title": "2.1.12 Reading: Truthy and Falsy Values",
       "unit": "2.1 Conditionals",
       "preview": "reading",
       "type": "lesson",
@@ -1370,7 +1370,7 @@
     },
     {
       "id": "2-1-19-example-falsy-values",
-      "title": "2.1.13 Worked Example : Falsy Value Surprises",
+      "title": "2.1.13 Worked Example: Falsy Value Surprises",
       "unit": "2.1 Conditionals",
       "preview": "example",
       "type": "lesson",
@@ -1379,7 +1379,7 @@
     },
     {
       "id": "2-1-2-video-decisions",
-      "title": "2.1.2 Video : Making Decisions in Code",
+      "title": "2.1.2 Video: Making Decisions in Code",
       "unit": "2.1 Conditionals",
       "preview": "video",
       "type": "lesson",
@@ -1397,7 +1397,7 @@
     },
     {
       "id": "2-1-21-reading-precedence",
-      "title": "2.1.18 Reading : Parentheses and Operator Precedence",
+      "title": "2.1.18 Reading: Parentheses and Operator Precedence",
       "unit": "2.1 Conditionals",
       "preview": "reading",
       "type": "lesson",
@@ -1406,7 +1406,7 @@
     },
     {
       "id": "2-1-22-reading-ternary",
-      "title": "2.1.19 Reading : The Conditional Operator ?",
+      "title": "2.1.19 Reading: The Conditional Operator ?",
       "unit": "2.1 Conditionals",
       "preview": "reading",
       "type": "lesson",
@@ -1415,7 +1415,7 @@
     },
     {
       "id": "2-1-23-example-ternary",
-      "title": "2.1.20 Worked Example : Ticket Price with ?",
+      "title": "2.1.20 Worked Example: Ticket Price with ?",
       "unit": "2.1 Conditionals",
       "preview": "example",
       "type": "lesson",
@@ -1433,7 +1433,7 @@
     },
     {
       "id": "2-1-25-reading-ternary-chain",
-      "title": "2.1.22 Reading : Chaining Multiple ? Operators",
+      "title": "2.1.22 Reading: Chaining Multiple ? Operators",
       "unit": "2.1 Conditionals",
       "preview": "reading",
       "type": "lesson",
@@ -1442,7 +1442,7 @@
     },
     {
       "id": "2-1-26-example-ternary-chain",
-      "title": "2.1.23 Worked Example : Size Label with Chained ?",
+      "title": "2.1.23 Worked Example: Size Label with Chained ?",
       "unit": "2.1 Conditionals",
       "preview": "example",
       "type": "lesson",
@@ -1460,7 +1460,7 @@
     },
     {
       "id": "2-1-28-reading-ternary-vs-if",
-      "title": "2.1.25 Reading : When to Use ? vs if",
+      "title": "2.1.25 Reading: When to Use ? vs if",
       "unit": "2.1 Conditionals",
       "preview": "reading",
       "type": "lesson",
@@ -1469,7 +1469,7 @@
     },
     {
       "id": "2-1-29-example-ternary-vs-if",
-      "title": "2.1.26 Worked Example : Rewriting a Misused Ternary",
+      "title": "2.1.26 Worked Example: Rewriting a Misused Ternary",
       "unit": "2.1 Conditionals",
       "preview": "example",
       "type": "lesson",
@@ -1478,7 +1478,7 @@
     },
     {
       "id": "2-1-3-reading-if-else",
-      "title": "2.1.3 Reading : If / Else if / Else",
+      "title": "2.1.3 Reading, If / Else if / Else",
       "unit": "2.1 Conditionals",
       "preview": "reading",
       "type": "lesson",
@@ -1505,7 +1505,7 @@
     },
     {
       "id": "2-1-32-example-or-trap",
-      "title": "2.1.33 Worked Example : The OR String-Literal Trap",
+      "title": "2.1.33 Worked Example: The OR String-Literal Trap",
       "unit": "2.1 Conditionals",
       "preview": "example",
       "type": "lesson",
@@ -1550,7 +1550,7 @@
     },
     {
       "id": "2-1-37-challenges",
-      "title": "2.1.38 Challenges : Optional Stretch",
+      "title": "2.1.38 Challenges: Optional Stretch",
       "unit": "2.1 Conditionals",
       "preview": "console",
       "type": "assignment",
@@ -1577,7 +1577,7 @@
     },
     {
       "id": "2-1-4-example-trace-if-else",
-      "title": "2.1.4 Worked Example : Tracing an if/else chain",
+      "title": "2.1.4 Worked Example: Tracing an if/else chain",
       "unit": "2.1 Conditionals",
       "preview": "example",
       "type": "lesson",
@@ -1586,7 +1586,7 @@
     },
     {
       "id": "2-1-4a-chart-the-if-else",
-      "title": "2.1.5 Chart the Code : if / else",
+      "title": "2.1.5 Chart the Code, if / else",
       "unit": "2.1 Conditionals",
       "preview": "diagram",
       "type": "assignment",
@@ -1613,7 +1613,7 @@
     },
     {
       "id": "2-1-7-reading-comparison-operators",
-      "title": "2.1.15 Reading : Comparison Operators & === vs ==",
+      "title": "2.1.15 Reading: Comparison Operators & === vs ==",
       "unit": "2.1 Conditionals",
       "preview": "reading",
       "type": "lesson",
@@ -1622,7 +1622,7 @@
     },
     {
       "id": "2-1-8-example-comparisons",
-      "title": "2.1.16 Worked Example : What each comparison returns",
+      "title": "2.1.16 Worked Example: What each comparison returns",
       "unit": "2.1 Conditionals",
       "preview": "example",
       "type": "lesson",
@@ -1640,7 +1640,7 @@
     },
     {
       "id": "2-2-1-slides",
-      "title": "2.2.1 Slides : Algorithms and Loops",
+      "title": "2.2.1 Slides: Algorithms and Loops",
       "unit": "2.2 Algorithms and Loops",
       "preview": "slides",
       "type": "lesson",
@@ -1676,7 +1676,7 @@
     },
     {
       "id": "2-2-13-challenges",
-      "title": "2.2.20 Challenges : Optional Stretch",
+      "title": "2.2.20 Challenges: Optional Stretch",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
       "type": "assignment",
@@ -1685,7 +1685,7 @@
     },
     {
       "id": "2-2-14-reading-programs-implement-algorithms",
-      "title": "2.2.3 Reading : Programs Implement Algorithms",
+      "title": "2.2.3 Reading: Programs Implement Algorithms",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
       "type": "lesson",
@@ -1694,7 +1694,7 @@
     },
     {
       "id": "2-2-15-example-three-spellings",
-      "title": "2.2.15 Worked Example : Same Algorithm, Three Spellings",
+      "title": "2.2.15 Worked Example: Same Algorithm, Three Spellings",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
       "type": "lesson",
@@ -1712,7 +1712,7 @@
     },
     {
       "id": "2-2-17-reading-canonical-algorithms",
-      "title": "2.2.19 Reading : Canonical Algorithms & Linear Search",
+      "title": "2.2.19 Reading: Canonical Algorithms & Linear Search",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
       "type": "lesson",
@@ -1721,7 +1721,7 @@
     },
     {
       "id": "2-2-2-reading-what-is-algorithm",
-      "title": "2.2.2 Reading : What Is an Algorithm?",
+      "title": "2.2.2 Reading: What Is an Algorithm?",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
       "type": "lesson",
@@ -1730,7 +1730,7 @@
     },
     {
       "id": "2-2-2a-reading-flowchart-shapes",
-      "title": "2.2.4 Reading : Flowchart Shapes",
+      "title": "2.2.4 Reading: Flowchart Shapes",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
       "type": "lesson",
@@ -1739,7 +1739,7 @@
     },
     {
       "id": "2-2-3-example-pseudocode-to-code",
-      "title": "2.2.5 Worked Example : Pseudocode → code",
+      "title": "2.2.5 Worked Example: Pseudocode → code",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
       "type": "lesson",
@@ -1748,7 +1748,7 @@
     },
     {
       "id": "2-2-3a-chart-the-algorithm",
-      "title": "2.2.6 Chart the Code : Largest of Three",
+      "title": "2.2.6 Chart the Code: Largest of Three",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
       "type": "assignment",
@@ -1766,7 +1766,7 @@
     },
     {
       "id": "2-2-5-reading-for-loop",
-      "title": "2.2.9 Reading : The for Loop",
+      "title": "2.2.9 Reading: The for Loop",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
       "type": "lesson",
@@ -1775,7 +1775,7 @@
     },
     {
       "id": "2-2-6-example-trace-for",
-      "title": "2.2.10 Worked Example : Tracing a for-loop counter",
+      "title": "2.2.10 Worked Example: Tracing a for-loop counter",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
       "type": "lesson",
@@ -1784,7 +1784,7 @@
     },
     {
       "id": "2-2-6a-chart-the-for-loop",
-      "title": "2.2.11 Chart the Code : A for-loop That Accumulates",
+      "title": "2.2.11 Chart the Code: A for-loop That Accumulates",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
       "type": "assignment",
@@ -1802,7 +1802,7 @@
     },
     {
       "id": "2-2-8-reading-while-loop",
-      "title": "2.2.13 Reading : while & do…while",
+      "title": "2.2.13 Reading, while & do…while",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
       "type": "lesson",
@@ -1811,7 +1811,7 @@
     },
     {
       "id": "2-2-9-example-while-vs-for",
-      "title": "2.2.14 Worked Example : while vs for + the infinite-loop trap",
+      "title": "2.2.14 Worked Example, while vs for + the infinite-loop trap",
       "unit": "2.2 Algorithms and Loops",
       "preview": "example",
       "type": "lesson",
@@ -1820,7 +1820,7 @@
     },
     {
       "id": "2-3-1-slides",
-      "title": "2.3.1 Slides : The Switch Statement",
+      "title": "2.3.1 Slides: The Switch Statement",
       "unit": "2.3 The switch Statement",
       "preview": "slides",
       "type": "lesson",
@@ -1829,7 +1829,7 @@
     },
     {
       "id": "2-3-10-reading-fall-through",
-      "title": "2.3.9 Reading : break and Fall-Through",
+      "title": "2.3.9 Reading: break and Fall-Through",
       "unit": "2.3 The switch Statement",
       "preview": "reading",
       "type": "lesson",
@@ -1838,7 +1838,7 @@
     },
     {
       "id": "2-3-11-example-missing-break",
-      "title": "2.3.11 Worked Example : A Missing break in the Middle",
+      "title": "2.3.11 Worked Example: A Missing break in the Middle",
       "unit": "2.3 The switch Statement",
       "preview": "example",
       "type": "lesson",
@@ -1865,7 +1865,7 @@
     },
     {
       "id": "2-3-14-reading-grouping-cases",
-      "title": "2.3.14 Reading : Grouping Cases",
+      "title": "2.3.14 Reading: Grouping Cases",
       "unit": "2.3 The switch Statement",
       "preview": "reading",
       "type": "lesson",
@@ -1874,7 +1874,7 @@
     },
     {
       "id": "2-3-15-example-weekend-weekday",
-      "title": "2.3.15 Worked Example : Weekend or Weekday",
+      "title": "2.3.15 Worked Example: Weekend or Weekday",
       "unit": "2.3 The switch Statement",
       "preview": "example",
       "type": "lesson",
@@ -1883,7 +1883,7 @@
     },
     {
       "id": "2-3-16-example-days-in-month",
-      "title": "2.3.16 Worked Example : Days in a Month",
+      "title": "2.3.16 Worked Example: Days in a Month",
       "unit": "2.3 The switch Statement",
       "preview": "example",
       "type": "lesson",
@@ -1901,7 +1901,7 @@
     },
     {
       "id": "2-3-18-reading-strict-equality",
-      "title": "2.3.18 Reading : switch Compares Strictly",
+      "title": "2.3.18 Reading: switch Compares Strictly",
       "unit": "2.3 The switch Statement",
       "preview": "reading",
       "type": "lesson",
@@ -1919,7 +1919,7 @@
     },
     {
       "id": "2-3-2-reading-switch",
-      "title": "2.3.3 Reading : switch Statements",
+      "title": "2.3.3 Reading: switch Statements",
       "unit": "2.3 The switch Statement",
       "preview": "reading",
       "type": "lesson",
@@ -1928,7 +1928,7 @@
     },
     {
       "id": "2-3-20-example-fix-case-type",
-      "title": "2.3.20 Worked Example : Fix 1: Match the Case Type to the Value",
+      "title": "2.3.20 Worked Example: Fix 1: Match the Case Type to the Value",
       "unit": "2.3 The switch Statement",
       "preview": "example",
       "type": "lesson",
@@ -1937,7 +1937,7 @@
     },
     {
       "id": "2-3-21-example-fix-number-convert",
-      "title": "2.3.21 Worked Example : Fix 2: Convert the Value with Number()",
+      "title": "2.3.21 Worked Example: Fix 2: Convert the Value with Number()",
       "unit": "2.3 The switch Statement",
       "preview": "example",
       "type": "lesson",
@@ -1955,7 +1955,7 @@
     },
     {
       "id": "2-3-23-reading-choosing",
-      "title": "2.3.23 Reading : Choosing Between if...else and switch",
+      "title": "2.3.23 Reading: Choosing Between if...else and switch",
       "unit": "2.3 The switch Statement",
       "preview": "reading",
       "type": "lesson",
@@ -1964,7 +1964,7 @@
     },
     {
       "id": "2-3-24-example-command-dispatch",
-      "title": "2.3.24 Worked Example : When switch Fits: Command Dispatch",
+      "title": "2.3.24 Worked Example: When switch Fits: Command Dispatch",
       "unit": "2.3 The switch Statement",
       "preview": "example",
       "type": "lesson",
@@ -1973,7 +1973,7 @@
     },
     {
       "id": "2-3-25-example-grade-chain",
-      "title": "2.3.25 Worked Example : When switch Doesn't Fit: the Grade Chain",
+      "title": "2.3.25 Worked Example: When switch Doesn't Fit: the Grade Chain",
       "unit": "2.3 The switch Statement",
       "preview": "example",
       "type": "lesson",
@@ -2018,7 +2018,7 @@
     },
     {
       "id": "2-3-3-example-switch-vs-if",
-      "title": "2.3.10 Worked Example : switch vs if-else-if",
+      "title": "2.3.10 Worked Example: switch vs if-else-if",
       "unit": "2.3 The switch Statement",
       "preview": "example",
       "type": "lesson",
@@ -2027,7 +2027,7 @@
     },
     {
       "id": "2-3-30-challenges",
-      "title": "2.3.31 Challenges : Optional Stretch",
+      "title": "2.3.31 Challenges: Optional Stretch",
       "unit": "2.3 The switch Statement",
       "preview": "console",
       "type": "assignment",
@@ -2036,7 +2036,7 @@
     },
     {
       "id": "2-3-3a-chart-the-switch",
-      "title": "2.3.6 Chart the Code : a switch is a chain of diamonds",
+      "title": "2.3.6 Chart the Code: a switch is a chain of diamonds",
       "unit": "2.3 The switch Statement",
       "preview": "diagram",
       "type": "assignment",
@@ -2054,7 +2054,7 @@
     },
     {
       "id": "2-3-5-reading-one-value-many-answers",
-      "title": "2.3.2 Reading : One Value, Many Answers",
+      "title": "2.3.2 Reading: One Value, Many Answers",
       "unit": "2.3 The switch Statement",
       "preview": "reading",
       "type": "lesson",
@@ -2063,7 +2063,7 @@
     },
     {
       "id": "2-3-6-example-menu-of-options",
-      "title": "2.3.4 Worked Example : A Menu of Options",
+      "title": "2.3.4 Worked Example: A Menu of Options",
       "unit": "2.3 The switch Statement",
       "preview": "example",
       "type": "lesson",
@@ -2072,7 +2072,7 @@
     },
     {
       "id": "2-3-7-example-switch-on-expression",
-      "title": "2.3.5 Worked Example : The Switched Value Is an Expression",
+      "title": "2.3.5 Worked Example: The Switched Value Is an Expression",
       "unit": "2.3 The switch Statement",
       "preview": "example",
       "type": "lesson",
@@ -2099,7 +2099,7 @@
     },
     {
       "id": "2-4-1-slides",
-      "title": "2.4.1 Slides : Loop Control and Nested Loops",
+      "title": "2.4.1 Slides: Loop Control and Nested Loops",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "slides",
       "type": "lesson",
@@ -2108,7 +2108,7 @@
     },
     {
       "id": "2-4-10-example-search-until-found",
-      "title": "2.4.10 Worked Example : Searching Without a Known End",
+      "title": "2.4.10 Worked Example: Searching Without a Known End",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
       "type": "lesson",
@@ -2117,7 +2117,7 @@
     },
     {
       "id": "2-4-11-diagram-search-until-found",
-      "title": "2.4.11 Chart the Code : Search Until Found",
+      "title": "2.4.11 Chart the Code: Search Until Found",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "diagram",
       "type": "assignment",
@@ -2135,7 +2135,7 @@
     },
     {
       "id": "2-4-13-reading-continue",
-      "title": "2.4.13 Reading : Skipping a Round with continue",
+      "title": "2.4.13 Reading: Skipping a Round with continue",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
       "type": "lesson",
@@ -2144,7 +2144,7 @@
     },
     {
       "id": "2-4-14-example-filtering-while-loop",
-      "title": "2.4.14 Worked Example : Filtering While You Loop",
+      "title": "2.4.14 Worked Example: Filtering While You Loop",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
       "type": "lesson",
@@ -2153,7 +2153,7 @@
     },
     {
       "id": "2-4-15-diagram-continue",
-      "title": "2.4.15 Chart the Code : continue Skips, Doesn't Leave",
+      "title": "2.4.15 Chart the Code: continue Skips, Doesn't Leave",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "diagram",
       "type": "assignment",
@@ -2162,7 +2162,7 @@
     },
     {
       "id": "2-4-16-reading-continue-while-trap",
-      "title": "2.4.16 Reading : The continue Trap in a while Loop",
+      "title": "2.4.16 Reading: The continue Trap in a while Loop",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
       "type": "lesson",
@@ -2171,7 +2171,7 @@
     },
     {
       "id": "2-4-17-example-continue-trap-fix",
-      "title": "2.4.17 Worked Example : The continue Trap, and Its Fix",
+      "title": "2.4.17 Worked Example: The continue Trap, and Its Fix",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
       "type": "lesson",
@@ -2180,7 +2180,7 @@
     },
     {
       "id": "2-4-18-example-predict-break-vs-continue",
-      "title": "2.4.18 Worked Example : Predict: break vs continue",
+      "title": "2.4.18 Worked Example: Predict: break vs continue",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
       "type": "lesson",
@@ -2198,7 +2198,7 @@
     },
     {
       "id": "2-4-2-reading-for-vs-while",
-      "title": "2.4.2 Reading : for vs while: Choosing a Loop",
+      "title": "2.4.2 Reading, for vs while: Choosing a Loop",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
       "type": "lesson",
@@ -2207,7 +2207,7 @@
     },
     {
       "id": "2-4-20-reading-infinite-loops",
-      "title": "2.4.20 Reading : Infinite Loops: Three Causes",
+      "title": "2.4.20 Reading: Infinite Loops: Three Causes",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
       "type": "lesson",
@@ -2216,7 +2216,7 @@
     },
     {
       "id": "2-4-21-example-infinite-loop-safe",
-      "title": "2.4.21 Worked Example : Making an Infinite Loop Safe",
+      "title": "2.4.21 Worked Example: Making an Infinite Loop Safe",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
       "type": "lesson",
@@ -2243,7 +2243,7 @@
     },
     {
       "id": "2-4-24-reading-nested-loops",
-      "title": "2.4.24 Reading : Nested Loops",
+      "title": "2.4.24 Reading: Nested Loops",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
       "type": "lesson",
@@ -2252,7 +2252,7 @@
     },
     {
       "id": "2-4-25-example-multiplication-table",
-      "title": "2.4.25 Worked Example : A Multiplication Table",
+      "title": "2.4.25 Worked Example: A Multiplication Table",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
       "type": "lesson",
@@ -2261,7 +2261,7 @@
     },
     {
       "id": "2-4-26-diagram-nested-loops",
-      "title": "2.4.26 Chart the Code : Nested Loops",
+      "title": "2.4.26 Chart the Code: Nested Loops",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "diagram",
       "type": "assignment",
@@ -2270,7 +2270,7 @@
     },
     {
       "id": "2-4-27-example-break-inner-loop",
-      "title": "2.4.27 Worked Example : break Leaves Only the Inner Loop",
+      "title": "2.4.27 Worked Example: break Leaves Only the Inner Loop",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
       "type": "lesson",
@@ -2279,7 +2279,7 @@
     },
     {
       "id": "2-4-28-example-break-both-loops",
-      "title": "2.4.28 Worked Example : Breaking Out of Both Loops",
+      "title": "2.4.28 Worked Example: Breaking Out of Both Loops",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
       "type": "lesson",
@@ -2288,7 +2288,7 @@
     },
     {
       "id": "2-4-29-reading-nested-loop-cost",
-      "title": "2.4.29 Reading : Nested Loops Get Expensive",
+      "title": "2.4.29 Reading: Nested Loops Get Expensive",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
       "type": "lesson",
@@ -2297,7 +2297,7 @@
     },
     {
       "id": "2-4-3-example-predict-which-loop",
-      "title": "2.4.3 Worked Example : Predict: Which Loop Fits?",
+      "title": "2.4.3 Worked Example: Predict: Which Loop Fits?",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
       "type": "lesson",
@@ -2333,7 +2333,7 @@
     },
     {
       "id": "2-4-33-challenges",
-      "title": "2.4.33 Challenges : Optional Stretch",
+      "title": "2.4.33 Challenges: Optional Stretch",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
       "type": "assignment",
@@ -2351,7 +2351,7 @@
     },
     {
       "id": "2-4-5-reading-do-while",
-      "title": "2.4.5 Reading : The do...while Loop",
+      "title": "2.4.5 Reading: The do...while Loop",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
       "type": "lesson",
@@ -2360,7 +2360,7 @@
     },
     {
       "id": "2-4-6-example-while-vs-do-while",
-      "title": "2.4.6 Worked Example : while vs do...while: The Difference in One Line",
+      "title": "2.4.6 Worked Example, while vs do...while: The Difference in One Line",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "example",
       "type": "lesson",
@@ -2369,7 +2369,7 @@
     },
     {
       "id": "2-4-7-diagram-do-while",
-      "title": "2.4.7 Chart the Code : do...while",
+      "title": "2.4.7 Chart the Code: do...while",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "diagram",
       "type": "assignment",
@@ -2387,7 +2387,7 @@
     },
     {
       "id": "2-4-9-reading-break",
-      "title": "2.4.9 Reading : Leaving Early with break",
+      "title": "2.4.9 Reading: Leaving Early with break",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "reading",
       "type": "lesson",
@@ -2396,7 +2396,7 @@
     },
     {
       "id": "2-5-1-slides",
-      "title": "2.5.1 Slides : Handling Errors with try/catch",
+      "title": "2.5.1 Slides: Handling Errors with try/catch",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "slides",
       "type": "lesson",
@@ -2405,7 +2405,7 @@
     },
     {
       "id": "2-5-10-reading-empty-catch-trap",
-      "title": "2.5.10 Reading : The Empty catch Trap",
+      "title": "2.5.10 Reading: The Empty catch Trap",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
       "type": "lesson",
@@ -2423,7 +2423,7 @@
     },
     {
       "id": "2-5-12-reading-error-object",
-      "title": "2.5.12 Reading : Reading the Error Object",
+      "title": "2.5.12 Reading: Reading the Error Object",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
       "type": "lesson",
@@ -2432,7 +2432,7 @@
     },
     {
       "id": "2-5-13-example-reporting-vs-guessing",
-      "title": "2.5.13 Worked Example : Reporting Instead of Guessing",
+      "title": "2.5.13 Worked Example: Reporting Instead of Guessing",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "example",
       "type": "lesson",
@@ -2450,7 +2450,7 @@
     },
     {
       "id": "2-5-15-reading-throwing-errors",
-      "title": "2.5.15 Reading : Throwing Your Own Errors",
+      "title": "2.5.15 Reading: Throwing Your Own Errors",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
       "type": "lesson",
@@ -2459,7 +2459,7 @@
     },
     {
       "id": "2-5-16-example-validate-then-trust",
-      "title": "2.5.16 Worked Example : Validate, Then Trust",
+      "title": "2.5.16 Worked Example: Validate, Then Trust",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "example",
       "type": "lesson",
@@ -2468,7 +2468,7 @@
     },
     {
       "id": "2-5-17-chart-validate-before-trust",
-      "title": "2.5.17 Chart the Code : Validate Before You Trust",
+      "title": "2.5.17 Chart the Code: Validate Before You Trust",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "diagram",
       "type": "assignment",
@@ -2477,7 +2477,7 @@
     },
     {
       "id": "2-5-18-reading-throw-vs-if",
-      "title": "2.5.18 Reading : throw vs if: The Distance Rule",
+      "title": "2.5.18 Reading: throw vs if: The Distance Rule",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
       "type": "lesson",
@@ -2495,7 +2495,7 @@
     },
     {
       "id": "2-5-2-reading-what-errors-do",
-      "title": "2.5.2 Reading : What an Error Actually Does",
+      "title": "2.5.2 Reading: What an Error Actually Does",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
       "type": "lesson",
@@ -2513,7 +2513,7 @@
     },
     {
       "id": "2-5-21-reading-finally",
-      "title": "2.5.21 Reading : Cleaning Up with finally",
+      "title": "2.5.21 Reading: Cleaning Up with finally",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
       "type": "lesson",
@@ -2531,7 +2531,7 @@
     },
     {
       "id": "2-5-23-reading-limits-of-try-catch",
-      "title": "2.5.23 Reading : What try...catch Cannot Do",
+      "title": "2.5.23 Reading: What try...catch Cannot Do",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
       "type": "lesson",
@@ -2567,7 +2567,7 @@
     },
     {
       "id": "2-5-27-challenges",
-      "title": "2.5.27 Challenges : Optional Stretch",
+      "title": "2.5.27 Challenges: Optional Stretch",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
       "type": "assignment",
@@ -2585,7 +2585,7 @@
     },
     {
       "id": "2-5-4-reading-try-catch",
-      "title": "2.5.4 Reading : try...catch: Attempt and Recover",
+      "title": "2.5.4 Reading: try...catch: Attempt and Recover",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "reading",
       "type": "lesson",
@@ -2594,7 +2594,7 @@
     },
     {
       "id": "2-5-5-example-wrap-what-can-fail",
-      "title": "2.5.5 Worked Example : Only Wrap What Can Fail",
+      "title": "2.5.5 Worked Example, Only Wrap What Can Fail",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "example",
       "type": "lesson",
@@ -2612,7 +2612,7 @@
     },
     {
       "id": "2-5-7-chart-try-catch",
-      "title": "2.5.7 Chart the Code : try/catch as a Flowchart",
+      "title": "2.5.7 Chart the Code: try/catch as a Flowchart",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "diagram",
       "type": "assignment",
@@ -2639,7 +2639,7 @@
     },
     {
       "id": "3-1-1-slides",
-      "title": "3.1.1 Slides : Functions",
+      "title": "3.1.1 Slides: Functions",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "slides",
       "type": "lesson",
@@ -2657,7 +2657,7 @@
     },
     {
       "id": "3-1-2-reading-function-basics",
-      "title": "3.1.2 Reading : Defining & Calling a Function",
+      "title": "3.1.2 Reading: Defining & Calling a Function",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "reading",
       "type": "lesson",
@@ -2666,7 +2666,7 @@
     },
     {
       "id": "3-1-2a-reading-the-function-call-shape",
-      "title": "3.1.3 Reading : The Function-Call Shape",
+      "title": "3.1.3 Reading: The Function-Call Shape",
       "unit": "3.1 Functions: Definition and Calls",
       "preview": "reading",
       "type": "lesson",
@@ -2675,7 +2675,7 @@
     },
     {
       "id": "3-1-3-reading-parameters-return",
-      "title": "3.2.1 Reading : Parameters & Return Values",
+      "title": "3.2.1 Reading: Parameters & Return Values",
       "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
       "type": "lesson",
@@ -2684,7 +2684,7 @@
     },
     {
       "id": "3-1-4-reading-scope",
-      "title": "3.2.2 Reading : Scope: Local vs Global",
+      "title": "3.2.2 Reading: Scope: Local vs Global",
       "unit": "3.2 Parameters and Return Values",
       "preview": "reading",
       "type": "lesson",
@@ -2693,7 +2693,7 @@
     },
     {
       "id": "3-1-5-reading-pass-by-value-reference",
-      "title": "3.6.1 Reading : Pass by Value vs Reference",
+      "title": "3.6.1 Reading: Pass by Value vs Reference",
       "unit": "3.6 Functions: Pass by Value/Reference",
       "preview": "reading",
       "type": "lesson",
@@ -2702,7 +2702,7 @@
     },
     {
       "id": "3-1-6-reading-defensive-copying",
-      "title": "3.6.2 Reading : Defensive Copying: [...] and {...}",
+      "title": "3.6.2 Reading: Defensive Copying: [...] and {...}",
       "unit": "3.6 Functions: Pass by Value/Reference",
       "preview": "reading",
       "type": "lesson",
@@ -2747,7 +2747,7 @@
     },
     {
       "id": "3-2-1-slides",
-      "title": "3.3.1 Slides : Arrays",
+      "title": "3.3.1 Slides: Arrays",
       "unit": "3.3 Arrays",
       "preview": "slides",
       "type": "lesson",
@@ -2756,7 +2756,7 @@
     },
     {
       "id": "3-2-2-reading-array-basics",
-      "title": "3.3.2 Reading : Array Basics: Index, push, pop",
+      "title": "3.3.2 Reading: Array Basics: Index, push, pop",
       "unit": "3.3 Arrays",
       "preview": "reading",
       "type": "lesson",
@@ -2765,7 +2765,7 @@
     },
     {
       "id": "3-2-3-reading-array-iteration",
-      "title": "3.3.3 Reading : Looping Over Arrays (for / for…of)",
+      "title": "3.3.3 Reading: Looping Over Arrays (for / for…of)",
       "unit": "3.3 Arrays",
       "preview": "reading",
       "type": "lesson",
@@ -2774,7 +2774,7 @@
     },
     {
       "id": "3-2-4-reading-split-lines",
-      "title": "3.3.4 Reading : Splitting Text into Lines (.split)",
+      "title": "3.3.4 Reading: Splitting Text into Lines (.split)",
       "unit": "3.3 Arrays",
       "preview": "reading",
       "type": "lesson",
@@ -2792,7 +2792,7 @@
     },
     {
       "id": "3-2-6-example-menu-loop",
-      "title": "3.3.6 Worked Example : A tiny menu loop",
+      "title": "3.3.6 Worked Example: A tiny menu loop",
       "unit": "3.3 Arrays",
       "preview": "example",
       "type": "lesson",
@@ -2801,7 +2801,7 @@
     },
     {
       "id": "3-2-6a-chart-the-array-loop",
-      "title": "3.3.7 Chart the Code : Looping Over an Array",
+      "title": "3.3.7 Chart the Code: Looping Over an Array",
       "unit": "3.3 Arrays",
       "preview": "diagram",
       "type": "assignment",
@@ -2819,7 +2819,7 @@
     },
     {
       "id": "4-1-1-slides",
-      "title": "4.1.1 Slides : Print Shop (Q1 Synthesis)",
+      "title": "4.1.1 Slides: Print Shop (Q1 Synthesis)",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "slides",
       "type": "lesson",
@@ -2828,7 +2828,7 @@
     },
     {
       "id": "4-1-2-reading-plan-before-code",
-      "title": "4.1.2 Reading : Plan Before You Code",
+      "title": "4.1.2 Reading: Plan Before You Code",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "reading",
       "type": "lesson",
@@ -2837,7 +2837,7 @@
     },
     {
       "id": "4-1-2a-reading-connectors-and-notes",
-      "title": "4.1.3 Reading : Connectors and Notes",
+      "title": "4.1.3 Reading: Connectors and Notes",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "reading",
       "type": "lesson",
@@ -2846,7 +2846,7 @@
     },
     {
       "id": "4-1-3-reading-manual-testing",
-      "title": "4.1.4 Reading : Manual Testing: PASS / FAIL Checks",
+      "title": "4.1.4 Reading: Manual Testing: PASS / FAIL Checks",
       "unit": "4.1 Print Shop (Q1 Synthesis)",
       "preview": "reading",
       "type": "lesson",
@@ -2882,20 +2882,20 @@
     },
     {
       "id": "5-1-1-slides",
-      "title": "5.1.1 Slides : moSHion Foundations",
+      "title": "5.1.1 Slides: moSHion Foundations",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": null
     },
     {
       "id": "5-1-10-reading-sprite-props",
-      "title": "5.1.10 Reading : Sprite property tour: pos, rotation, layer",
+      "title": "5.1.10 Reading: Sprite property tour: pos, rotation, layer",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
@@ -2904,88 +2904,88 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-12-video-frame-loop",
-      "title": "5.1.12 Video : The Frame Loop Explained",
+      "title": "5.1.12 Video: The Frame Loop Explained",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-13-reading-input",
-      "title": "5.1.13 Reading : kb.pressing(key)",
+      "title": "5.1.13 Reading: kb.pressing(key)",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-14-example-keyboard",
-      "title": "5.1.14 Worked Example : Keyboard Movement",
+      "title": "5.1.14 Worked Example: Keyboard Movement",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-15-reading-velocity",
-      "title": "5.1.15 Reading : Velocity: vel.x and vel.y",
+      "title": "5.1.15 Reading: Velocity: vel.x and vel.y",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-16-reading-movement-pattern",
-      "title": "5.1.16 Reading : Movement pattern (if / else if / else)",
+      "title": "5.1.16 Reading: Movement pattern (if / else if / else)",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-17-reading-else-to-zero",
-      "title": "5.1.17 Reading : The else-to-zero rule",
+      "title": "5.1.17 Reading: The else-to-zero rule",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-18-lab-else-to-zero",
-      "title": "5.1.18 Lab : Delete the else, watch drift",
+      "title": "5.1.18 Lab: Delete the else, watch drift",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-19-reading-wasd",
-      "title": "5.1.19 Reading : WASD-not-arrows",
+      "title": "5.1.19 Reading: WASD-not-arrows",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-2-video-intro",
-      "title": "5.1.2 Video : Your first moSHion sketch",
+      "title": "5.1.2 Video: Your first moSHion sketch",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
@@ -2994,7 +2994,7 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
@@ -3003,7 +3003,7 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
@@ -3012,7 +3012,7 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "assignment",
       "type": "assignment",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
@@ -3021,192 +3021,192 @@
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "moshion",
       "type": "challenge",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-3-reading-canvas-sprite",
-      "title": "5.1.3 Reading : Frame loop: setup() and draw()",
+      "title": "5.1.3 Reading: Frame loop: setup() and draw()",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-4-example-minimum-sprite",
-      "title": "5.1.4 Worked Example : Minimum Sprite Program",
+      "title": "5.1.4 Worked Example: Minimum Sprite Program",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-5-reading-canvas",
-      "title": "5.1.5 Reading : Canvas: new Canvas(w, h)",
+      "title": "5.1.5 Reading: Canvas: new Canvas(w, h)",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-6-reading-sprite",
-      "title": "5.1.6 Reading : Sprite: new Sprite(x, y, w, h) + .color",
+      "title": "5.1.6 Reading: Sprite: new Sprite(x, y, w, h) + .color",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-7-lab-one-sprite",
-      "title": "5.1.7 Lab : Drop one sprite, change its color",
+      "title": "5.1.7 Lab: Drop one sprite, change its color",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-8-reading-sprite-variable",
-      "title": "5.1.8 Reading : Storing the sprite in a let variable",
+      "title": "5.1.8 Reading: Storing the sprite in a let variable",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-1-9-reading-background",
-      "title": "5.1.9 Reading : background(color) wipe rule",
+      "title": "5.1.9 Reading: background(color) wipe rule",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     },
     {
       "id": "5-3-1-slides",
-      "title": "5.3.1 Slides : Object-Oriented Programming",
+      "title": "5.3.1 Slides: Object-Oriented Programming",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": null
     },
     {
       "id": "5-3-10-lab-two-instances",
-      "title": "5.3.10 Lab : Two sprites, two property values",
+      "title": "5.3.10 Lab: Two sprites, two property values",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-11-reading-this-noun",
-      "title": "5.3.11 Reading : this is a noun",
+      "title": "5.3.11 Reading: this is a noun",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-12-example-this-pronoun",
-      "title": "5.3.12 Worked Example : this is a pronoun",
+      "title": "5.3.12 Worked Example: this is a pronoun",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-13-lab-build-sprite",
-      "title": "5.3.13 Your Turn : Build a Sprite",
+      "title": "5.3.13 Your Turn: Build a Sprite",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-14-moshion-sprite-showcase",
-      "title": "5.3.14 Worked Example : Sprite Showcase",
+      "title": "5.3.14 Worked Example: Sprite Showcase",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-15-video-this-keyword",
-      "title": "5.3.15 Video : The this keyword",
+      "title": "5.3.15 Video: The this keyword",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-16-reading-methods-intro",
-      "title": "5.4.1 Reading : Methods: functions that live on a class",
+      "title": "5.4.1 Reading: Methods: functions that live on a class",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-17-lab-method-no-params",
-      "title": "5.4.2 Lab : Method with no params",
+      "title": "5.4.2 Lab: Method with no params",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-18-lab-method-with-params",
-      "title": "5.4.3 Lab : Method with parameters",
+      "title": "5.4.3 Lab: Method with parameters",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-19-lab-method-returns",
-      "title": "5.4.4 Lab : Method that returns a value",
+      "title": "5.4.4 Lab: Method that returns a value",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-2-video-new-sprite",
-      "title": "5.3.2 Video : What new Sprite() actually does",
+      "title": "5.3.2 Video: What new Sprite() actually does",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-20-lab-method-calls-method",
-      "title": "5.4.5 Lab : A method calling this.otherMethod()",
+      "title": "5.4.5 Lab: A method calling this.otherMethod()",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-20a-chart-the-method-chain",
-      "title": "5.4.6 Chart the Code : A Method That Calls a Method",
+      "title": "5.4.6 Chart the Code: A Method That Calls a Method",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "diagram",
       "type": "assignment",
@@ -3215,88 +3215,88 @@
     },
     {
       "id": "5-3-21-reading-composition",
-      "title": "5.4.7 Reading : Why this.sprite, not extends Sprite",
+      "title": "5.4.7 Reading: Why this.sprite, not extends Sprite",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-22-lab-mutate-sprite-prop",
-      "title": "5.4.8 Lab : Mutate this.sprite.x from a method",
+      "title": "5.4.8 Lab: Mutate this.sprite.x from a method",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-23-lab-cleanup",
-      "title": "5.4.9 Lab : Cleanup with this.sprite.delete()",
+      "title": "5.4.9 Lab: Cleanup with this.sprite.delete()",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-24-example-enemy-class",
-      "title": "5.4.10 Worked Example : Write an Enemy class (integration)",
+      "title": "5.4.10 Worked Example: Write an Enemy class (integration)",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-25-lab-three-vars",
-      "title": "5.4.11 Lab : Three Enemies in three variables",
+      "title": "5.4.11 Lab: Three Enemies in three variables",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-26-lab-array-of-instances",
-      "title": "5.4.12 Lab : An array of Enemies",
+      "title": "5.4.12 Lab: An array of Enemies",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-27-lab-loop-instances",
-      "title": "5.4.13 Lab : Loop over an array of instances",
+      "title": "5.4.13 Lab: Loop over an array of instances",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-28-reading-parallel-vs-classes",
-      "title": "5.4.14 Reading : Parallel Arrays vs Classes",
+      "title": "5.4.14 Reading: Parallel Arrays vs Classes",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-29-example-proc-vs-oop",
-      "title": "5.4.15 Worked Example : Procedural vs OOP side-by-side",
+      "title": "5.4.15 Worked Example: Procedural vs OOP side-by-side",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-29a-read-the-two-designs",
-      "title": "5.4.16 Read the Charts : Three Variables or Three Objects",
+      "title": "5.4.16 Read the Charts: Three Variables or Three Objects",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
@@ -3305,20 +3305,20 @@
     },
     {
       "id": "5-3-3-reading-classes",
-      "title": "5.3.3 Reading : Class and instance",
+      "title": "5.3.3 Reading: Class and instance",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-30-reading-when-oop",
-      "title": "5.4.17 Reading : When to reach for OOP (3-question checklist)",
+      "title": "5.4.17 Reading: When to reach for OOP (3-question checklist)",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
@@ -3327,7 +3327,7 @@
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
@@ -3336,16 +3336,16 @@
       "unit": "5.4 Writing Your Own Classes",
       "preview": "assignment",
       "type": "assignment",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-33-reading-oop-vocab",
-      "title": "5.4.20 Reading : Encapsulation, inheritance, polymorphism (vocabulary only)",
+      "title": "5.4.20 Reading: Encapsulation, inheritance, polymorphism (vocabulary only)",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
@@ -3354,79 +3354,79 @@
       "unit": "5.4 Writing Your Own Classes",
       "preview": "moshion",
       "type": "challenge",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-4-reading-new-operator",
-      "title": "5.3.4 Reading : The new operator",
+      "title": "5.3.4 Reading: The new operator",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-5-reading-constructor",
-      "title": "5.3.5 Reading : constructor and its parameters",
+      "title": "5.3.5 Reading: constructor and its parameters",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-6-example-devtools-reveal",
-      "title": "5.3.6 Worked Example : You've been using classes",
+      "title": "5.3.6 Worked Example: You've been using classes",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-7-reading-properties",
-      "title": "5.3.7 Reading : Properties: data on this",
+      "title": "5.3.7 Reading: Properties: data on this",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-8-lab-read-property",
-      "title": "5.3.8 Lab : Read a property",
+      "title": "5.3.8 Lab: Read a property",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "5-3-9-lab-write-property",
-      "title": "5.3.9 Lab : Write a property",
+      "title": "5.3.9 Lab: Write a property",
       "unit": "5.3 Classes and Objects via moSHion",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 12
     },
     {
       "id": "6-1-1-slides",
-      "title": "6.1.1 Slides : Groups and Overlaps",
+      "title": "6.1.1 Slides: Groups and Overlaps",
       "unit": "6.1 Groups and Overlaps",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": null
     },
     {
       "id": "6-1-10-example-safe-despawn",
-      "title": "6.2.5 Worked Example : Safe Despawn",
+      "title": "6.2.5 Worked Example: Safe Despawn",
       "unit": "6.2 Overlaps and Collisions",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 13
     },
     {
@@ -3435,7 +3435,7 @@
       "unit": "6.2 Overlaps and Collisions",
       "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 13
     },
     {
@@ -3444,34 +3444,34 @@
       "unit": "6.2 Overlaps and Collisions",
       "preview": "moshion",
       "type": "challenge",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-2-video-groups-intro",
-      "title": "6.1.2 Video : Groups in moshion",
+      "title": "6.1.2 Video: Groups in moshion",
       "unit": "6.1 Groups and Overlaps",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-3-reading-groups",
-      "title": "6.1.3 Reading : moSHion docs: Groups",
+      "title": "6.1.3 Reading: moSHion docs: Groups",
       "unit": "6.1 Groups and Overlaps",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-4-example-iterate-group",
-      "title": "6.1.4 Worked Example : Iterating a Group",
+      "title": "6.1.4 Worked Example: Iterating a Group",
       "unit": "6.1 Groups and Overlaps",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 13
     },
     {
@@ -3480,52 +3480,52 @@
       "unit": "6.1 Groups and Overlaps",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-6-video-overlaps",
-      "title": "6.2.1 Video : overlaps() boolean vs callback",
+      "title": "6.2.1 Video: overlaps() boolean vs callback",
       "unit": "6.2 Overlaps and Collisions",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-7-example-apple-catcher",
-      "title": "6.2.2 Worked Example : Apple Catcher",
+      "title": "6.2.2 Worked Example: Apple Catcher",
       "unit": "6.2 Overlaps and Collisions",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-8-reading-collisions",
-      "title": "6.2.3 Reading : moSHion docs: Collisions + Overlaps",
+      "title": "6.2.3 Reading: moSHion docs: Collisions + Overlaps",
       "unit": "6.2 Overlaps and Collisions",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 13
     },
     {
       "id": "6-1-9-video-remove-bug",
-      "title": "6.2.4 Video : The remove-during-iteration bug",
+      "title": "6.2.4 Video: The remove-during-iteration bug",
       "unit": "6.2 Overlaps and Collisions",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 13
     },
     {
       "id": "6-3-1-slides",
-      "title": "6.3.1 Slides : Physics Applications",
+      "title": "6.3.1 Slides: Physics Applications",
       "unit": "6.3 Physics Applications",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": null
     },
     {
@@ -3534,70 +3534,70 @@
       "unit": "6.3 Physics Applications",
       "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 14
     },
     {
       "id": "6-3-2-video-presses-vs-pressing",
-      "title": "6.3.2 Video : kb.presses vs kb.pressing",
+      "title": "6.3.2 Video: kb.presses vs kb.pressing",
       "unit": "6.3 Physics Applications",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 14
     },
     {
       "id": "6-3-3-reading-input-edges",
-      "title": "6.3.3 Reading : moSHion docs: Input edges",
+      "title": "6.3.3 Reading: moSHion docs: Input edges",
       "unit": "6.3 Physics Applications",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 14
     },
     {
       "id": "6-3-4-example-presses-vs-pressing",
-      "title": "6.3.4 Worked Example : Edge-triggered Input",
+      "title": "6.3.4 Worked Example: Edge-triggered Input",
       "unit": "6.3 Physics Applications",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 14
     },
     {
       "id": "6-3-5-video-jump-ground",
-      "title": "6.3.5 Video : Why your jump feels wrong",
+      "title": "6.3.5 Video: Why your jump feels wrong",
       "unit": "6.3 Physics Applications",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 14
     },
     {
       "id": "6-3-6-reading-touching",
-      "title": "6.3.6 Reading : moSHion docs: Colliding + Ground Detection",
+      "title": "6.3.6 Reading: moSHion docs: Colliding + Ground Detection",
       "unit": "6.3 Physics Applications",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 14
     },
     {
       "id": "6-3-7-example-ground-detection",
-      "title": "6.3.7 Worked Example : Ground Detection",
+      "title": "6.3.7 Worked Example: Ground Detection",
       "unit": "6.3 Physics Applications",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 14
     },
     {
       "id": "6-3-8-example-pendulum",
-      "title": "6.3.8 Worked Example : Swinging Pendulum",
+      "title": "6.3.8 Worked Example: Swinging Pendulum",
       "unit": "6.3 Physics Applications",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 14
     },
     {
@@ -3606,88 +3606,88 @@
       "unit": "6.3 Physics Applications",
       "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 14
     },
     {
       "id": "6-4-1-slides",
-      "title": "6.4.1 Slides : Animation & Camera",
+      "title": "6.4.1 Slides: Animation & Camera",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": null
     },
     {
       "id": "6-4-10-video-camera-flashlight",
-      "title": "6.4.10 Video : Camera follow explained with a flashlight",
+      "title": "6.4.10 Video: Camera follow explained with a flashlight",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-11-reading-camera",
-      "title": "6.4.11 Reading : moSHion docs: Camera",
+      "title": "6.4.11 Reading: moSHion docs: Camera",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-12-reading-camera-xy",
-      "title": "6.4.12 Reading : camera.x / camera.y",
+      "title": "6.4.12 Reading: camera.x / camera.y",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-13-reading-camera-follow",
-      "title": "6.4.13 Reading : Camera-follow pattern",
+      "title": "6.4.13 Reading: Camera-follow pattern",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-14-reading-lerp-smoothing",
-      "title": "6.4.14 Reading : Smoothing with lerp",
+      "title": "6.4.14 Reading: Smoothing with lerp",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-15-reading-sprite-layer",
-      "title": "6.4.15 Reading : sprite.layer (render order)",
+      "title": "6.4.15 Reading: sprite.layer (render order)",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-16-example-camera-follow",
-      "title": "6.4.16 Worked Example : Camera Follow",
+      "title": "6.4.16 Worked Example: Camera Follow",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-17-example-smooth-camera",
-      "title": "6.4.17 Worked Example : Smooth Camera with lerp",
+      "title": "6.4.17 Worked Example: Smooth Camera with lerp",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
@@ -3696,7 +3696,7 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
@@ -3705,70 +3705,70 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "moshion",
       "type": "challenge",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-2-video-animating-sprite",
-      "title": "6.4.2 Video : Animating a sprite in moshion",
+      "title": "6.4.2 Video: Animating a sprite in moshion",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-3-reading-animation",
-      "title": "6.4.3 Reading : moSHion docs: Animation",
+      "title": "6.4.3 Reading: moSHion docs: Animation",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-4-reading-add-ani",
-      "title": "6.4.4 Reading : addAni(name, frames)",
+      "title": "6.4.4 Reading: addAni(name, frames)",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-5-reading-change-ani",
-      "title": "6.4.5 Reading : changeAni(name)",
+      "title": "6.4.5 Reading: changeAni(name)",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-6-reading-frame-delay",
-      "title": "6.4.6 Reading : frameDelay (cycle speed)",
+      "title": "6.4.6 Reading: frameDelay (cycle speed)",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-7-reading-sprite-image",
-      "title": "6.4.7 Reading : sprite.image (single-frame art)",
+      "title": "6.4.7 Reading: sprite.image (single-frame art)",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
       "id": "6-4-8-example-animate-sprite",
-      "title": "6.4.8 Worked Example : Animating a Sprite",
+      "title": "6.4.8 Worked Example: Animating a Sprite",
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
@@ -3777,129 +3777,129 @@
       "unit": "6.4 Animated Sprites and Camera",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15
     },
     {
       "id": "6-5-1-slides",
-      "title": "6.5.1 Slides : Your Game Forgets: The Problem",
+      "title": "6.5.1 Slides: Your Game Forgets: The Problem",
       "unit": "6.5 Save and Load",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": null
     },
     {
       "id": "6-5-10-reading-json-parse",
-      "title": "6.5.10 Reading : moSHion docs: JSON.parse(str)",
+      "title": "6.5.10 Reading: moSHion docs: JSON.parse(str)",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-11-reading-store-structured",
-      "title": "6.5.11 Reading : moSHion docs: Storing Structured Data",
+      "title": "6.5.11 Reading: moSHion docs: Storing Structured Data",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-12-example-save-player-state",
-      "title": "6.5.12 Worked Example : Save Full Player State",
+      "title": "6.5.12 Worked Example: Save Full Player State",
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-13-example-restore-player-state",
-      "title": "6.5.13 Worked Example : Restore Full Player State from a Save",
+      "title": "6.5.13 Worked Example: Restore Full Player State from a Save",
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-14-reading-loadjson-async",
-      "title": "6.5.14 Reading : moSHion docs: loadJSON is Async",
+      "title": "6.5.14 Reading: moSHion docs: loadJSON is Async",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-15-video-save-slots",
-      "title": "6.5.15 Video : Save Slots: Multiple Save Files",
+      "title": "6.5.15 Video: Save Slots: Multiple Save Files",
       "unit": "6.5 Save and Load",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-16-reading-removeitem-clearstorage",
-      "title": "6.5.16 Reading : moSHion docs: removeItem and clearStorage",
+      "title": "6.5.16 Reading: moSHion docs: removeItem and clearStorage",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-17-example-three-slots",
-      "title": "6.5.17 Worked Example : Three Save Slots",
+      "title": "6.5.17 Worked Example: Three Save Slots",
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-18-example-delete-overwrite",
-      "title": "6.5.18 Worked Example : Delete and Overwrite a Save Slot",
+      "title": "6.5.18 Worked Example: Delete and Overwrite a Save Slot",
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-19-video-continue",
-      "title": "6.5.19 Video : New Game or Continue?",
+      "title": "6.5.19 Video: New Game or Continue?",
       "unit": "6.5 Save and Load",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-2-video-memory",
-      "title": "6.5.2 Video : Memory: What Stays, What Disappears",
+      "title": "6.5.2 Video: Memory: What Stays, What Disappears",
       "unit": "6.5 Save and Load",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-20-example-title-detect-save",
-      "title": "6.5.20 Worked Example : Title Screen Detects Existing Saves",
+      "title": "6.5.20 Worked Example: Title Screen Detects Existing Saves",
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-20a-read-the-continue-chart",
-      "title": "6.5.21 Read the Chart : Does Continue Show Up?",
+      "title": "6.5.21 Read the Chart: Does Continue Show Up?",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
@@ -3908,169 +3908,169 @@
     },
     {
       "id": "6-5-21-example-confirm-overwrite",
-      "title": "6.5.22 Worked Example : Confirm Before Overwriting a Save",
+      "title": "6.5.22 Worked Example: Confirm Before Overwriting a Save",
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-22-video-autosave",
-      "title": "6.5.23 Video : Your Game, Automatically Saved",
+      "title": "6.5.23 Video: Your Game, Automatically Saved",
       "unit": "6.5 Save and Load",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-23-reading-checkpoint-saves",
-      "title": "6.5.24 Reading : Checkpoint Saves: Save on Milestones",
+      "title": "6.5.24 Reading: Checkpoint Saves: Save on Milestones",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-24-example-autosave-level",
-      "title": "6.5.25 Worked Example : Auto-Save on Level Complete or Timer",
+      "title": "6.5.25 Worked Example: Auto-Save on Level Complete or Timer",
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-25-a16-1-save-system",
-      "title": "6.5.26 Save System : Build Save/Load with Slots",
+      "title": "6.5.26 Save System: Build Save/Load with Slots",
       "unit": "6.5 Save and Load",
       "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-26-challenges",
-      "title": "6.5.27 Challenges : Extended Save Features",
+      "title": "6.5.27 Challenges: Extended Save Features",
       "unit": "6.5 Save and Load",
       "preview": "moshion",
       "type": "challenge",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-3-reading-storeitem",
-      "title": "6.5.3 Reading : storeItem: Save Game Data",
+      "title": "6.5.3 Reading: storeItem: Save Game Data",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-4-example-save-highscore",
-      "title": "6.5.4 Worked Example : Save a High Score on Game Over",
+      "title": "6.5.4 Worked Example: Save a High Score on Game Over",
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-5-reading-getitem",
-      "title": "6.5.5 Reading : getItem: Load Saved Data",
+      "title": "6.5.5 Reading: getItem: Load Saved Data",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-6-reading-getitem-string",
-      "title": "6.5.6 Reading : getItem Returns a String",
+      "title": "6.5.6 Reading: getItem Returns a String",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-7-example-load-highscore",
-      "title": "6.5.7 Worked Example : Load and Display a High Score",
+      "title": "6.5.7 Worked Example: Load and Display a High Score",
       "unit": "6.5 Save and Load",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-8-video-complex-save",
-      "title": "6.5.8 Video : More Than a Number: Saving Your Whole Game",
+      "title": "6.5.8 Video: More Than a Number: Saving Your Whole Game",
       "unit": "6.5 Save and Load",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-5-9-reading-json-stringify",
-      "title": "6.5.9 Reading : moSHion docs: JSON.stringify(obj)",
+      "title": "6.5.9 Reading: moSHion docs: JSON.stringify(obj)",
       "unit": "6.5 Save and Load",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 16
     },
     {
       "id": "6-6-1-slides",
-      "title": "6.6.1 Slides : One Game, Many Screens",
+      "title": "6.6.1 Slides: One Game, Many Screens",
       "unit": "6.6 Game State Machines",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": null
     },
     {
       "id": "6-6-10-video-title-screen",
-      "title": "6.6.10 Video : Building a Title Screen",
+      "title": "6.6.10 Video: Building a Title Screen",
       "unit": "6.6 Game State Machines",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-11-example-title-start-button",
-      "title": "6.6.11 Worked Example : Title Screen with Start Button",
+      "title": "6.6.11 Worked Example: Title Screen with Start Button",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-12-video-gameover-restart",
-      "title": "6.6.12 Video : Game Over and Restart",
+      "title": "6.6.12 Video: Game Over and Restart",
       "unit": "6.6 Game State Machines",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-13-example-three-state-machine",
-      "title": "6.6.13 Worked Example : Three-State Machine: Title, Play, Game Over",
+      "title": "6.6.13 Worked Example: Three-State Machine: Title, Play, Game Over",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-13a-chart-the-state-machine",
-      "title": "6.6.14 Chart the Code : The Three-State Machine",
+      "title": "6.6.14 Chart the Code: The Three-State Machine",
       "unit": "6.6 Game State Machines",
       "preview": "diagram",
       "type": "assignment",
@@ -4079,61 +4079,61 @@
     },
     {
       "id": "6-6-14-reading-transitions-input",
-      "title": "6.6.15 Reading : moSHion docs: Input-Driven Transitions",
+      "title": "6.6.15 Reading: moSHion docs: Input-Driven Transitions",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-15-example-keyboard-transitions",
-      "title": "6.6.16 Worked Example : Keyboard-Driven State Changes",
+      "title": "6.6.16 Worked Example: Keyboard-Driven State Changes",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-16-reading-transitions-condition",
-      "title": "6.6.17 Reading : moSHion docs: Condition-Driven Transitions",
+      "title": "6.6.17 Reading: moSHion docs: Condition-Driven Transitions",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-17-example-score-threshold",
-      "title": "6.6.18 Worked Example : Score Threshold Triggers Game Over",
+      "title": "6.6.18 Worked Example: Score Threshold Triggers Game Over",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-18-video-extended-states",
-      "title": "6.6.19 Video : More States: Pause, Inventory, Settings",
+      "title": "6.6.19 Video: More States: Pause, Inventory, Settings",
       "unit": "6.6 Game State Machines",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-19-example-pause-state",
-      "title": "6.6.20 Worked Example : Adding a Pause State",
+      "title": "6.6.20 Worked Example: Adding a Pause State",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-19a-fix-the-pause-chart",
-      "title": "6.6.21 Fix the Broken Chart : the Pause State",
+      "title": "6.6.21 Fix the Broken Chart: the Pause State",
       "unit": "6.6 Game State Machines",
       "preview": "diagram",
       "type": "assignment",
@@ -4142,160 +4142,160 @@
     },
     {
       "id": "6-6-2-video-state-machines",
-      "title": "6.6.2 Video : State Machines in Games",
+      "title": "6.6.2 Video: State Machines in Games",
       "unit": "6.6 Game State Machines",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-20-example-win-screen",
-      "title": "6.6.22 Worked Example : Win Screen State",
+      "title": "6.6.22 Worked Example: Win Screen State",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-21-video-states-decide-saves",
-      "title": "6.6.23 Video : States Decide When to Save",
+      "title": "6.6.23 Video: States Decide When to Save",
       "unit": "6.6 Game State Machines",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-22-example-save-on-transition",
-      "title": "6.6.24 Worked Example : Save on State Transition",
+      "title": "6.6.24 Worked Example: Save on State Transition",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-23-example-continue-right-state",
-      "title": "6.6.25 Worked Example : Continue Loads the Correct State",
+      "title": "6.6.25 Worked Example: Continue Loads the Correct State",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-24-a16-2-game-states",
-      "title": "6.6.26 Game States : State Machine with Persistence",
+      "title": "6.6.26 Game States: State Machine with Persistence",
       "unit": "6.6 Game State Machines",
       "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-25-challenges",
-      "title": "6.6.27 Challenges : Extended State Features",
+      "title": "6.6.27 Challenges: Extended State Features",
       "unit": "6.6 Game State Machines",
       "preview": "moshion",
       "type": "challenge",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-26-video-whats-next",
-      "title": "6.6.28 Video : What's Next: Looking Ahead to Unit 3",
+      "title": "6.6.28 Video: What's Next: Looking Ahead to Unit 3",
       "unit": "6.6 Game State Machines",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-3-reading-switch-syntax",
-      "title": "6.6.3 Reading : MDN: The switch Statement",
+      "title": "6.6.3 Reading: MDN: The switch Statement",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-4-reading-switch-dispatch",
-      "title": "6.6.4 Reading : moSHion docs: switch in draw()",
+      "title": "6.6.4 Reading: moSHion docs: switch in draw()",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-5-example-switch-three-cases",
-      "title": "6.6.5 Worked Example : switch with Three Cases",
+      "title": "6.6.5 Worked Example: switch with Three Cases",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-6-reading-switch-break-default",
-      "title": "6.6.6 Reading : break and default in switch",
+      "title": "6.6.6 Reading: break and default in switch",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-7-reading-state-variable",
-      "title": "6.6.7 Reading : moSHion docs: The state Variable",
+      "title": "6.6.7 Reading: moSHion docs: The state Variable",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-8-example-one-variable-many-screens",
-      "title": "6.6.8 Worked Example : One Variable, Many Screens",
+      "title": "6.6.8 Worked Example: One Variable, Many Screens",
       "unit": "6.6 Game State Machines",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-6-9-reading-naming-states",
-      "title": "6.6.9 Reading : Naming States: Conventions",
+      "title": "6.6.9 Reading: Naming States: Conventions",
       "unit": "6.6 Game State Machines",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-1-slides",
-      "title": "6.7.1 Slides : Advanced Mechanics: One Last Toolkit",
+      "title": "6.7.1 Slides: Advanced Mechanics: One Last Toolkit",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "slides",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": null
     },
     {
       "id": "6-7-10-example-drag-sprite",
-      "title": "6.7.10 Worked Example : Drag a Sprite Around",
+      "title": "6.7.10 Worked Example: Drag a Sprite Around",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-10a-fix-the-drag-chart",
-      "title": "6.7.11 Fix the Broken Chart : Dragging a Sprite",
+      "title": "6.7.11 Fix the Broken Chart: Dragging a Sprite",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "diagram",
       "type": "assignment",
@@ -4304,115 +4304,115 @@
     },
     {
       "id": "6-7-11-video-joints-intro",
-      "title": "6.8.1 Video : Joints in moshion",
+      "title": "6.8.1 Video: Joints in moshion",
       "unit": "6.8 Joints",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-12-reading-distance-joint",
-      "title": "6.8.2 Reading : moSHion docs: DistanceJoint",
+      "title": "6.8.2 Reading: moSHion docs: DistanceJoint",
       "unit": "6.8 Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-13-example-distance-pendulum",
-      "title": "6.8.3 Worked Example : Pendulum with DistanceJoint",
+      "title": "6.8.3 Worked Example: Pendulum with DistanceJoint",
       "unit": "6.8 Joints",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-14-reading-hinge-joint",
-      "title": "6.8.4 Reading : moSHion docs: HingeJoint",
+      "title": "6.8.4 Reading: moSHion docs: HingeJoint",
       "unit": "6.8 Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-15-example-hinge-arm",
-      "title": "6.8.5 Worked Example : Rotating Arm with HingeJoint",
+      "title": "6.8.5 Worked Example: Rotating Arm with HingeJoint",
       "unit": "6.8 Joints",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-16-reading-joint-delete",
-      "title": "6.8.6 Reading : moSHion docs: joint.delete()",
+      "title": "6.8.6 Reading: moSHion docs: joint.delete()",
       "unit": "6.8 Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-17-reading-applyforce",
-      "title": "6.7.12 Reading : moSHion docs: applyForce(fx, fy)",
+      "title": "6.7.12 Reading: moSHion docs: applyForce(fx, fy)",
       "unit": "6.7 Advanced Input",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-18-reading-vector-ab",
-      "title": "6.7.13 Reading : Vector from A to B",
+      "title": "6.7.13 Reading: Vector from A to B",
       "unit": "6.7 Advanced Input",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-19-example-launch-force",
-      "title": "6.7.14 Worked Example : Launch a Sprite with applyForce",
+      "title": "6.7.14 Worked Example: Launch a Sprite with applyForce",
       "unit": "6.7 Advanced Input",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-2-video-intro",
-      "title": "6.7.2 Video : Why Mechanics Matter for the Capstone",
+      "title": "6.7.2 Video: Why Mechanics Matter for the Capstone",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-20-video-slingshot",
-      "title": "6.7.15 Video : The Slingshot Pattern",
+      "title": "6.7.15 Video: The Slingshot Pattern",
       "unit": "6.7 Advanced Input",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-21-example-slingshot",
-      "title": "6.7.16 Worked Example : Slingshot End-to-End",
+      "title": "6.7.16 Worked Example: Slingshot End-to-End",
       "unit": "6.7 Advanced Input",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-21a-chart-the-slingshot",
-      "title": "6.7.17 Chart the Code : The Slingshot",
+      "title": "6.7.17 Chart the Code: The Slingshot",
       "unit": "6.7 Advanced Input",
       "preview": "diagram",
       "type": "assignment",
@@ -4421,47 +4421,47 @@
     },
     {
       "id": "6-7-22-video-two-player",
-      "title": "6.7.18 Video : Two-Player Local Input",
+      "title": "6.7.18 Video: Two-Player Local Input",
       "unit": "6.7 Advanced Input",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-23-reading-two-schemes",
-      "title": "6.7.19 Reading : Two Key Schemes, Independent State",
+      "title": "6.7.19 Reading: Two Key Schemes, Independent State",
       "unit": "6.7 Advanced Input",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-24-reading-bounciness",
-      "title": "6.7.20 Reading : moSHion docs: sprite.bounciness",
+      "title": "6.7.20 Reading: moSHion docs: sprite.bounciness",
       "unit": "6.7 Advanced Input",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-25-example-bounciness-compare",
-      "title": "6.7.21 Worked Example : Bounciness Comparison",
+      "title": "6.7.21 Worked Example: Bounciness Comparison",
       "unit": "6.7 Advanced Input",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-26-example-two-paddles",
-      "title": "6.7.22 Worked Example : Two Paddles, Two Schemes",
+      "title": "6.7.22 Worked Example: Two Paddles, Two Schemes",
       "unit": "6.7 Advanced Input",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
@@ -4470,88 +4470,88 @@
       "unit": "6.7 Advanced Input",
       "preview": "moshion",
       "type": "assignment",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-28-challenges",
-      "title": "6.7.24 Challenges : SliderJoint, Trebuchet, Swinging Rope",
+      "title": "6.7.24 Challenges: SliderJoint, Trebuchet, Swinging Rope",
       "unit": "6.7 Advanced Input",
       "preview": "moshion",
       "type": "challenge",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-29-video-wrap",
-      "title": "6.7.25 Video : Wrap and Capstone Preview",
+      "title": "6.7.25 Video: Wrap and Capstone Preview",
       "unit": "6.7 Advanced Input",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-3-reading-mouse-pos",
-      "title": "6.7.3 Reading : moSHion docs: mouse.x and mouse.y",
+      "title": "6.7.3 Reading: moSHion docs: mouse.x and mouse.y",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-4-reading-mouse-pressing",
-      "title": "6.7.4 Reading : moSHion docs: mouse.pressing()",
+      "title": "6.7.4 Reading: moSHion docs: mouse.pressing()",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-5-reading-mouse-presses",
-      "title": "6.7.5 Reading : moSHion docs: mouse.presses()",
+      "title": "6.7.5 Reading: moSHion docs: mouse.presses()",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-6-reading-mouse-hittest",
-      "title": "6.7.6 Reading : Hit-Testing a Sprite with the Mouse",
+      "title": "6.7.6 Reading: Hit-Testing a Sprite with the Mouse",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-7-example-click-spawn",
-      "title": "6.7.7 Worked Example : Click to Spawn a Sprite",
+      "title": "6.7.7 Worked Example: Click to Spawn a Sprite",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "example",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-8-video-drag-release",
-      "title": "6.7.8 Video : Drag and Release",
+      "title": "6.7.8 Video: Drag and Release",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "video",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
       "id": "6-7-9-reading-snap-zero-vel",
-      "title": "6.7.9 Reading : Snap a Sprite to the Cursor",
+      "title": "6.7.9 Reading: Snap a Sprite to the Cursor",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "reading",
       "type": "lesson",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17
     },
     {
@@ -4560,7 +4560,7 @@
       "unit": "7.1 Arcade Cabinet (Q2 Synthesis)",
       "preview": "moshion",
       "type": "project",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 18
     },
     {
@@ -4569,7 +4569,7 @@
       "unit": "7.1 Arcade Cabinet (Q2 Synthesis)",
       "preview": "assignment",
       "type": "assignment",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 18
     },
     {
@@ -4578,16 +4578,16 @@
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "lesson",
-      "category": "Unit 5: moSHion : Game Physics",
+      "category": "Unit 5: moSHion: Game Physics",
       "week": 14
     },
     {
       "id": "moshion-gravity",
-      "title": "5.1.24 Falling Block : Example",
+      "title": "5.1.24 Falling Block: Example",
       "unit": "5.1 Hello Sprite and Movement",
       "preview": "moshion",
       "type": "example",
-      "category": "Unit 2: moSHion : Applied Game Development",
+      "category": "Unit 2: moSHion: Applied Game Development",
       "week": 10
     }
   ]

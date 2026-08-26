@@ -431,7 +431,7 @@ rewriting a working lab unless the concept it grades actually moved.
   `2-4-14-example-filtering-while-loop` teaches the same continue-vs-keep idea
   over a numeric range instead. The book's §2.2 linear-search example (Example
   2.5) has the same problem and additionally uses `break`, which is itself §2.4
- : `2.2.14a` adapts it to a `found`-flag search over a range. Both adaptations
+; `2.2.14a` adapts it to a `found`-flag search over a range. Both adaptations
   are deliberate and should not be "corrected" back toward the book's text.
   **Book-side request:** either move these examples after §3.3, or rewrite them
   on ranges. Raised 2026-08-16 from the chapter 2 build.
