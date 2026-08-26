@@ -301,11 +301,17 @@ for (const id of Object.values(L)) {
 
 
 // ---------------------------------------------------------------- unit 1.4
-// Three one-word-answer labs. Each requirement is pinned to an ordinal
-// console.log -- r3 means "the THIRD console.log", not "the word appears
-// somewhere". Before that, every pattern searched the whole file, so a student
-// who mapped every job to the wrong language still scored full marks. The
-// swap cases below are what hold that shut; they passed before the fix.
+// Three one-word-answer labs. Each requirement is pinned to an ordinal --
+// r3 means "the THIRD answer", not "the word appears somewhere". Before that,
+// every pattern searched the whole file, so a student who mapped every job to
+// the wrong language still scored full marks. The swap cases below are what
+// hold that shut; they passed before the fix.
+//
+// The ordinal counts ANSWER-CARRYING console.log calls, not every call, so a
+// header, a label or a leftover debug print does not shift the answers under
+// it. Both halves are load-bearing and both are measured here: relax the
+// counting to "appears somewhere" and the swap cases go green; count every
+// call again and the label cases go red.
 {
   const labs = [
     { id: L.match, answers: ['SQL', 'Swift', 'C', 'JavaScript', 'Python'] },
@@ -342,12 +348,22 @@ for (const id of Object.values(L)) {
 
     reject(id, 'answers reversed', 'r1', inOrder(answers.slice().reverse()));
 
-    // The right answers, in the right order, but with a chatty log in front:
-    // ordinal binding cannot tell that apart from a wrong first answer. Pinned
-    // here so the cost of the binding stays visible rather than being
-    // rediscovered by a student.
-    reject(id, '[cost of binding] a header log before the answers', 'r1',
+    // This used to be a reject, pinned as "[cost of binding]": the ordinal
+    // counted EVERY console.log, so a chatty header shifted all the answers by
+    // one and failed all of them at once. The comment predicted a student
+    // would rediscover it, and one did.
+    //
+    // The ordinal now counts only ANSWER-CARRYING logs, so the binding above
+    // still holds — swapped, rotated and reversed answers are all still
+    // rejected at r1 — while output that answers nothing is ignored. That
+    // matters most for the labelled style 1.4.18 teaches two lessons before
+    // 1.4.20: console.log("hot days: ", hot).
+    accept(id, 'a header log before the answers',
       { 'script.js': [`console.log("My answers:");`, ...answers.map((a) => log('"', a))].join(nl) });
+    accept(id, 'a label log before each answer',
+      { 'script.js': answers.flatMap((a, i) => [`console.log("STEP ${i + 1}:");`, log('"', a)]).join(nl) });
+    accept(id, 'answers logged with a label argument (the 1.4.18 style)',
+      { 'script.js': answers.map((a, i) => `console.log("STEP ${i + 1}: ", "${a}");`).join(nl) });
 
     // Corrupt one answer at a time: the requirement that fails must be the one
     // for THAT position. A swap case only proves "something failed", so an
