@@ -27,6 +27,7 @@ interface SubmissionRow {
   score: number | null;
   possible: number | null;
   grade_json: string | null;
+  response: string | null;
 }
 
 export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = async (
@@ -73,10 +74,10 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
   // Fetch latest submission per lesson using ROW_NUMBER window function.
   // rn = 1 means the most recent submission for that lesson.
   const submissionRows = await env.DB.prepare(
-    `SELECT id, lesson_id, submitted_at, score, possible, grade_json
+    `SELECT id, lesson_id, submitted_at, score, possible, grade_json, response
        FROM (
          SELECT
-           id, lesson_id, submitted_at, score, possible, grade_json,
+           id, lesson_id, submitted_at, score, possible, grade_json, response,
            ROW_NUMBER() OVER (PARTITION BY lesson_id ORDER BY submitted_at DESC) AS rn
          FROM lesson_submissions
          WHERE student_email = ?
@@ -108,6 +109,7 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
       score: number | null;
       possible: number | null;
       grade_json: string | null;
+      response: string | null;
     }
   > = {};
   for (const row of submissionRows.results ?? []) {
@@ -117,6 +119,11 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
       score: row.score,
       possible: row.possible,
       grade_json: row.grade_json,
+      // The student's actual answer. A diagram assignment stores its
+      // DiagramDoc here, so without it the teacher can see that a chart was
+      // submitted and scored but never what was drawn. Bounded: rn = 1 means
+      // one row per lesson, not every attempt.
+      response: row.response,
     };
   }
 

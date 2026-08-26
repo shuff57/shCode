@@ -11,6 +11,7 @@ import DueDatesPanel from '../../components/DueDatesPanel';
 import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 import { lessonHref } from '../../lib/lesson-href';
+import { toMermaid } from '../../lib/diagram-mermaid';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -69,6 +70,8 @@ interface SubmissionEntry {
   score: number | null;
   possible: number | null;
   grade_json: string | null;
+  /** The student's own answer. A diagram assignment stores its DiagramDoc here. */
+  response: string | null;
 }
 
 interface StudentDetail {
@@ -151,16 +154,45 @@ interface GradeCriterion {
   feedback?: string;
 }
 
+// One structural check from lib/diagram-check.ts. Diagram assignments store
+// these under `structural` instead of `criteria` -- 23 lessons across the
+// course, one of them (2.2.7 / A5.2) AI-graded on top.
+interface StructuralCheck {
+  id: string;
+  title: string;
+  passed: boolean;
+  detail: string;
+}
+
 interface GradeResponse {
   totalEarned: number;
   totalPossible: number;
   criteria?: GradeCriterion[];
+  /** Diagram assignments: the browser-side structural checks. */
+  structural?: StructuralCheck[];
+  /** Diagram assignments that also run the essay grader. */
+  ai?: GradeResponse;
 }
 
 // Nearly every rubric in the course awards points: 0 per criterion and grades
 // on the verdict, so totalPossible is 0 and any "x / y pts" rendering is "0 / 0
 // pts" -- true, and useless to a teacher answering "why did my kid lose points
 // on criterion 3". Show what the student was shown instead.
+// A diagram assignment stores its DiagramDoc as the submission response.
+// Returns the Mermaid projection when the response is one, null otherwise --
+// which is also how the caller decides whether to label it a chart or prose.
+// Raw DiagramDoc JSON is not something to show a teacher.
+function asDiagramMermaid(response: string): string | null {
+  if (!response.trimStart().startsWith('{')) return null;
+  try {
+    const doc = JSON.parse(response);
+    if (!Array.isArray(doc?.nodes) || !Array.isArray(doc?.edges)) return null;
+    return toMermaid(doc);
+  } catch {
+    return null;
+  }
+}
+
 function criterionScore(c: GradeCriterion, passFail: boolean): string {
   if (passFail) return c.verdict ?? 'missing';
   return `${c.earned}/${c.max}`;
@@ -609,8 +641,30 @@ function StudentDrawer({
                                   ? `${gradeData.totalEarned} / ${gradeData.totalPossible} pts`
                                   : gradeData.criteria && gradeData.criteria.length > 0
                                     ? `${gradeData.criteria.filter((c) => c.verdict === 'met' || c.verdict === 'partial').length} of ${gradeData.criteria.length} criteria met`
-                                    : 'graded'}
+                                    : gradeData.structural && gradeData.structural.length > 0
+                                      ? `${gradeData.structural.filter((s) => s.passed).length} of ${gradeData.structural.length} checks passed`
+                                      : 'graded'}
                               </div>
+
+                              {/* Diagram assignments store their browser-side checks here.
+                                  Without this the drawer showed a date and a score and
+                                  nothing else -- a teacher could not see which check a
+                                  student failed, let alone what they drew. */}
+                              {gradeData.structural && gradeData.structural.length > 0 && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
+                                  {gradeData.structural.map((s) => (
+                                    <div key={s.id} style={{ fontSize: 12, background: '#1e1f29', borderRadius: 4, padding: '6px 10px' }}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: s.detail ? 3 : 0 }}>
+                                        <span style={{ color: '#f8f8f2' }}>{s.title}</span>
+                                        <span style={{ color: s.passed ? '#50fa7b' : '#ff5555', fontFamily: 'monospace' }}>
+                                          {s.passed ? 'pass' : 'fail'}
+                                        </span>
+                                      </div>
+                                      {s.detail && <div style={{ color: '#6272a4', fontSize: 11 }}>{s.detail}</div>}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                               {gradeData.criteria && gradeData.criteria.length > 0 && (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                   {gradeData.criteria.map((c) => (
@@ -628,6 +682,20 @@ function StudentDrawer({
                                   ))}
                                 </div>
                               )}
+                            </div>
+                          )}
+
+                          {/* The answer itself. Diagram submissions store a
+                              DiagramDoc, so render the Mermaid projection of it
+                              rather than raw JSON; everything else is prose. */}
+                          {sub.response && (
+                            <div>
+                              <div style={{ fontSize: 11, color: '#6272a4', marginBottom: 4 }}>
+                                {asDiagramMermaid(sub.response) ? 'Their chart' : 'Their answer'}
+                              </div>
+                              <pre style={{ margin: 0, maxHeight: 260, overflow: 'auto', background: '#1e1f29', borderRadius: 4, padding: '8px 10px', fontSize: 11, color: '#f8f8f2', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                                {asDiagramMermaid(sub.response) ?? sub.response}
+                              </pre>
                             </div>
                           )}
                         </div>
