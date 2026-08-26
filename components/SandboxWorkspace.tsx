@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { RotateCcw } from 'lucide-react';
+import { Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw } from 'lucide-react';
 import { useLessonStore } from '../lib/store';
 import CodeEditor from './CodeEditor';
 import MoshionPreview from './MoshionPreview';
@@ -41,6 +41,20 @@ import {
 
 const MODE_KEY = 'shCode:sandbox-mode';
 const BUILD_KEY = 'shCode:sandbox-jscad-build';
+
+// The plain outlined chip the Reset and Full screen buttons both wear.
+const chipStyle: React.CSSProperties = {
+  padding: '6px 14px',
+  borderRadius: 4,
+  background: 'transparent',
+  color: '#6272a4',
+  border: '1px solid #44475a',
+  cursor: 'pointer',
+  fontSize: 13,
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 5,
+};
 
 interface LogLine {
   type: string;
@@ -83,6 +97,12 @@ export default function SandboxWorkspace() {
   const past = useRef<ModelDoc[]>([]);
   const future = useRef<ModelDoc[]>([]);
   const [depth, setDepth] = useState({ back: 0, forward: 0 });
+
+  // Full screen puts the preview edge to edge and floats the editor over it,
+  // so a shape can be built and then looked at without the editor in the way.
+  const shellRef = useRef<HTMLDivElement>(null);
+  const [full, setFull] = useState(false);
+  const [editorHidden, setEditorHidden] = useState(false);
   const [anchors, setAnchors] = useState<AnchorPoint[]>([]);
   // The frame reloads on every structural edit, so specs posted at the moment
   // runKey changes arrive before the runner has a listener and are simply lost.
@@ -480,6 +500,34 @@ export default function SandboxWorkspace() {
     return () => window.removeEventListener('keydown', handler);
   }, [run, undo, redo, mode.preview, build]);
 
+  // Same shape as DiagramEditor's fullscreen: the browser owns the state, we
+  // only mirror it, so Esc and the F11-style exits stay correct for free.
+  useEffect(() => {
+    const onFs = () => {
+      const active = document.fullscreenElement === shellRef.current;
+      setFull(active);
+      // Leaving full screen should not leave the editor hidden in the
+      // windowed layout, where there is no way to bring it back.
+      if (!active) setEditorHidden(false);
+      // Both panes just changed size by a lot; CodeMirror and the preview
+      // iframe only relayout on a resize event.
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
+    };
+    document.addEventListener('fullscreenchange', onFs);
+    return () => document.removeEventListener('fullscreenchange', onFs);
+  }, []);
+
+  const toggleFull = useCallback(() => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen?.();
+    } else {
+      shellRef.current?.requestFullscreen?.().catch(() => {
+        // Rejected outside a user gesture or in a sandboxed frame; staying
+        // windowed is the correct fallback.
+      });
+    }
+  }, []);
+
   // Pane resize — same drag-handle plumbing as LessonWorkspace.
   useEffect(() => {
     const split = document.getElementById('split') as HTMLElement | null;
@@ -627,7 +675,14 @@ export default function SandboxWorkspace() {
   return (
     <>
       <TabbedRightDrawer storageKey="shCode:sandbox-drawer" tabs={drawerTabs} />
-      <div className="sandbox-shell">
+      <div
+        className={
+          'sandbox-shell'
+          + (full ? ' is-full' : '')
+          + (full && editorHidden ? ' is-editor-hidden' : '')
+        }
+        ref={shellRef}
+      >
         <div className="sandbox-header">
           <h1 className="sandbox-title">Sandbox</h1>
           <span className="sandbox-subtitle">{mode.blurb}</span>
@@ -686,23 +741,17 @@ export default function SandboxWorkspace() {
               ■ Stop
             </button>
           )}
-          <button
-            style={{
-              padding: '6px 14px',
-              borderRadius: 4,
-              background: 'transparent',
-              color: '#6272a4',
-              border: '1px solid #44475a',
-              cursor: 'pointer',
-              fontSize: 13,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 5,
-            }}
-            onClick={reset}
-          >
+          <button style={chipStyle} onClick={reset}>
             <RotateCcw size={12} />
             Reset
+          </button>
+          <button
+            style={chipStyle}
+            onClick={toggleFull}
+            title={full ? 'Leave full screen (Esc)' : 'Fill the screen with the editor and preview'}
+          >
+            {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
+            {full ? 'Exit full screen' : 'Full screen'}
           </button>
           <span className="run-hint">Ctrl+Enter</span>
         </div>
@@ -780,6 +829,17 @@ export default function SandboxWorkspace() {
               <MoshionPreview code={code} runKey={runKey} />
             )}
           </div>
+          {full && (
+            <button
+              type="button"
+              className="sandbox-editor-toggle"
+              onClick={() => setEditorHidden((h) => !h)}
+              title={editorHidden ? 'Show the editor again' : 'Hide the editor and keep the shape'}
+            >
+              {editorHidden ? <PanelLeftOpen size={13} /> : <PanelLeftClose size={13} />}
+              {editorHidden ? 'Editor' : 'Hide editor'}
+            </button>
+          )}
           <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
         </div>
 
@@ -864,6 +924,64 @@ export default function SandboxWorkspace() {
           min-height: 0;
           resize: none;
         }
+
+        /* ---- full screen ----
+           The preview takes the whole screen and the editor floats over its
+           left edge, so "build the shape, then get the editor out of the way"
+           is one click and does not throw the shape away. The title and the
+           console are the two things worth the space they were taking. */
+        .sandbox-shell.is-full {
+          height: 100vh;
+          min-height: 0;
+          margin: 0;
+          padding: 8px;
+          gap: 8px;
+          background: var(--bg);
+        }
+        .sandbox-shell.is-full .sandbox-header,
+        .sandbox-shell.is-full .sandbox-console-wrap,
+        .sandbox-shell.is-full .divider { display: none; }
+        .sandbox-shell.is-full .sandbox-split { min-height: 0; }
+        /* !important beats the inline flex the divider drag leaves behind --
+           without it the pane keeps whatever split it was dragged to. */
+        .sandbox-shell.is-full #previewPane { flex: 1 1 100% !important; }
+        .sandbox-shell.is-full #editorPane {
+          position: absolute;
+          left: 12px;
+          top: 12px;
+          bottom: 12px;
+          /* .pane sets height:100%, which would win over the top/bottom pair
+             and hang the panel 24px past the bottom of the frame. */
+          height: auto;
+          width: min(420px, 45%);
+          flex: 0 0 auto !important;
+          min-width: 0;
+          z-index: 40;
+          background: var(--card);
+          border: 1px solid #565a70;
+          border-radius: 6px;
+          box-shadow: 0 12px 36px rgba(0,0,0,0.6);
+          overflow: hidden;
+        }
+        .sandbox-shell.is-editor-hidden #editorPane { display: none; }
+        .sandbox-editor-toggle {
+          position: absolute;
+          top: 12px;
+          left: calc(min(420px, 45%) + 22px);
+          z-index: 50;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          padding: 5px 10px;
+          font-size: 12px;
+          color: #d3d5e3;
+          background: rgba(40, 42, 54, 0.92);
+          border: 1px solid #565a70;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        .sandbox-editor-toggle:hover { background: #44475a; }
+        .sandbox-shell.is-editor-hidden .sandbox-editor-toggle { left: 12px; }
       `}</style>
     </>
   );

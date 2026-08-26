@@ -225,15 +225,36 @@ function FlyoutButton({
   /** Whether the search box currently has text in it. */
   searchActive: boolean;
 }) {
+  const wrapRef = useRef<HTMLSpanElement>(null);
+  const [at, setAt] = useState<{ left: number; top: number } | null>(null);
   const shown = variants.filter((v) => matches(v.label) || matches(v.id));
   const faceMatches = matches(label);
-  if (!faceMatches && shown.length === 0) return null;
+  const filteredOut = !faceMatches && shown.length === 0;
   // A match hiding inside a closed flyout is invisible to the student who
   // typed for it -- if the face itself doesn't match but a variant does,
   // pop the flyout open so the match is on screen, not just in the data.
-  const revealed = open || (searchActive && !faceMatches && shown.length > 0);
+  const revealed = !filteredOut && (open || (searchActive && !faceMatches && shown.length > 0));
+  // The bar can scroll sideways, and a box that scrolls on one axis clips the
+  // other -- an absolutely positioned menu would be sliced off inside a 38px
+  // strip. So the menu is measured off the button and positioned against the
+  // viewport instead, out of the bar's clip entirely.
+  // ponytail: measured on open only. Scrolling the bar with a menu already
+  // open leaves it where it was; clicking anywhere closes it, which is the
+  // next thing a student does.
+  //
+  // This hook runs BEFORE the filtered-out return on purpose. Typing in the
+  // search box unmounts most of the bar, and a hook below that return means
+  // this component renders a different number of hooks on that keystroke than
+  // it did on the last one -- which React treats as a crash, taking the whole
+  // toolbar with it.
+  useEffect(() => {
+    if (!revealed) { setAt(null); return; }
+    const r = wrapRef.current?.getBoundingClientRect();
+    if (r) setAt({ left: r.left, top: r.bottom + 3 });
+  }, [revealed]);
+  if (filteredOut) return null;
   return (
-    <span className="model-flyout">
+    <span className="model-flyout" ref={wrapRef}>
       <button onClick={onMain} disabled={disabled} title={title}>
         {icon} {label}
       </button>
@@ -244,10 +265,10 @@ function FlyoutButton({
         aria-label={`More ${label.toLowerCase()} tools`}
         title={`More ${label.toLowerCase()} tools`}
       >
-        <ChevronDown size={11} />
+        <ChevronDown size={9} />
       </button>
-      {revealed && shown.length > 0 && (
-        <div className="model-flyout-menu">
+      {revealed && at && shown.length > 0 && (
+        <div className="model-flyout-menu" style={{ left: at.left, top: at.top }}>
           {shown.map((v) => (
             <button key={v.id} onClick={v.onClick} disabled={v.disabled} title={v.title}>
               {v.icon} {v.label}
@@ -279,6 +300,10 @@ export default function ModelEditor({
 
   const toolsRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  // Onshape's Search tools is a magnifier that opens a field, not a field
+  // parked on the bar. Same thing here, and it is also what keeps the last
+  // chip from being sliced in half when the bar runs out of room.
+  const [searchOpen, setSearchOpen] = useState(false);
 
   // Alt+C (Onshape's own shortcut) focuses Search tools; Escape closes
   // whichever flyout is open, wherever focus happens to be.
@@ -286,14 +311,20 @@ export default function ModelEditor({
     function onKey(e: KeyboardEvent) {
       if (e.altKey && e.code === 'KeyC') {
         e.preventDefault();
-        searchRef.current?.focus();
+        setSearchOpen(true);
       } else if (e.key === 'Escape') {
         setMenu(null);
+        setSearchOpen(false);
       }
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
+
+  // The field only exists once it is open, so focus has to wait for it.
+  useEffect(() => {
+    if (searchOpen) searchRef.current?.focus();
+  }, [searchOpen]);
 
   // A flyout menu closes on any click outside the toolbar, same as a native
   // dropdown -- otherwise it just sits open over the canvas.
@@ -975,17 +1006,30 @@ export default function ModelEditor({
           </button>
         </div>
 
-        <div className="model-tool-search">
-          <Search size={13} />
-          <input
-            ref={searchRef}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search tools..."
-            aria-label="Search tools"
-          />
-          <kbd>Alt+C</kbd>
-        </div>
+        {searchOpen || searchActive ? (
+          <div className="model-tool-search" title="Search tools (Alt+C)">
+            <Search size={13} />
+            <input
+              ref={searchRef}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              // Collapsing while it still has text would hide the reason half
+              // the bar is missing, so an empty box is the only one that closes.
+              onBlur={() => { if (!search.trim()) setSearchOpen(false); }}
+              placeholder="Search tools..."
+              aria-label="Search tools (Alt+C)"
+            />
+          </div>
+        ) : (
+          <button
+            className="model-tool-searchbtn"
+            onClick={() => setSearchOpen(true)}
+            title="Search tools (Alt+C)"
+            aria-label="Search tools (Alt+C)"
+          >
+            <Search size={14} />
+          </button>
+        )}
       </div>
 
       {note && <p className="model-note">{note}</p>}
@@ -1093,50 +1137,85 @@ export default function ModelEditor({
 
       <style>{`
         .model-editor { display: flex; flex-direction: column; height: 100%; min-height: 0; overflow: hidden; }
+        /* Onshape's Part Studio bar, measured against a screenshot of it: ONE
+           row that never wraps, square icon-only buttons with no chrome of
+           their own until you point at them, hairline dividers between
+           groups, and -- where a family flies out -- a small caret in the
+           button's own bottom-right corner rather than a second button
+           beside it. Overflow scrolls; it does not stack into a second row,
+           because a bar whose tools move when the window narrows is a bar
+           you cannot build muscle memory on. */
         .model-tools {
-          display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px;
+          display: flex; flex-wrap: nowrap; align-items: center; gap: 2px;
+          height: 38px; padding: 0 6px; box-sizing: border-box;
           border-bottom: 1px solid var(--border); flex-shrink: 0; position: relative;
+          overflow-x: auto; overflow-y: visible; scrollbar-width: thin;
         }
-        .model-tool-group { display: inline-flex; gap: 4px; align-items: center; }
-        .model-tool-divider { align-self: stretch; width: 1px; background: #44475a; margin: 2px 0; }
-        .model-tool-end { margin-left: auto; }
+        .model-tools::-webkit-scrollbar { height: 4px; }
+        .model-tools::-webkit-scrollbar-thumb { background: #44475a; border-radius: 2px; }
+        .model-tool-group { display: inline-flex; gap: 2px; align-items: center; flex: 0 0 auto; }
+        .model-tool-divider {
+          align-self: center; flex: 0 0 1px; width: 1px; height: 20px;
+          background: #44475a; margin: 0 4px;
+        }
+        .model-tool-end { margin-left: auto; padding-left: 6px; flex: 0 0 auto; }
+        /* ponytail: font-size:0 blanks the bare text node sitting beside each
+           icon, which is what makes the bar icon-only without wrapping twenty
+           labels in spans. The words stay in the DOM for screen readers and
+           are what the tooltip and the flyout menu show. Anything nested that
+           SHOULD read as text sets its own size back (menu, search box) --
+           add that line too if you nest something new in here. */
         .model-tools button {
-          display: inline-flex; align-items: center; gap: 5px;
-          padding: 5px 10px; font-size: 12px;
-          background: transparent; color: var(--text);
-          border: 1px solid #44475a; border-radius: 4px; cursor: pointer;
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 28px; height: 28px; padding: 0; gap: 0; font-size: 0;
+          background: transparent; color: #d3d5e3;
+          border: 1px solid transparent; border-radius: 3px; cursor: pointer;
+          flex: 0 0 auto;
         }
-        .model-tools button:hover:not(:disabled) { background: #44475a; }
-        .model-tools button:disabled { opacity: 0.4; cursor: not-allowed; }
-        .model-flyout { position: relative; display: inline-flex; }
-        .model-flyout > button:first-child { border-radius: 4px 0 0 4px; border-right: none; }
+        .model-tools button:hover:not(:disabled) {
+          background: #3d4051; border-color: #565a70; color: #f8f8f2;
+        }
+        .model-tools button:active:not(:disabled) { background: #44475a; }
+        .model-tools button:disabled { opacity: 0.35; cursor: not-allowed; }
+        .model-tools button:focus-visible { outline: 1px solid #8be9fd; outline-offset: 1px; }
+        .model-flyout { position: relative; display: inline-flex; flex: 0 0 auto; }
+        /* Sits ON the main button's corner, Onshape-style: the corner opens
+           the family, the rest of the face runs the tool on its face. */
         .model-flyout-caret {
-          border-radius: 0 4px 4px 0 !important; padding: 5px 4px !important;
+          position: absolute; right: 0; bottom: 0; z-index: 1;
+          width: 13px !important; height: 13px !important;
+          border-color: transparent !important; border-radius: 0 3px 0 4px !important;
+          background: transparent !important; color: #8a8fa8;
         }
+        .model-flyout-caret:hover:not(:disabled) { color: #f8f8f2; }
+        .model-flyout:hover .model-flyout-caret { color: #f8f8f2; }
         .model-flyout-menu {
-          position: absolute; top: calc(100% + 4px); left: 0; z-index: 20;
-          display: flex; flex-direction: column; gap: 2px;
-          background: #282a36; border: 1px solid #44475a; border-radius: 4px;
-          padding: 4px; min-width: 150px; box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+          position: fixed; z-index: 60;
+          display: flex; flex-direction: column; gap: 1px;
+          background: #282a36; border: 1px solid #44475a; border-radius: 3px;
+          padding: 3px; min-width: 168px; box-shadow: 0 6px 18px rgba(0,0,0,0.5);
         }
         .model-flyout-menu button {
-          justify-content: flex-start; border: none; width: 100%;
+          justify-content: flex-start; border: none; border-radius: 2px;
+          width: 100%; height: 26px; padding: 0 8px; gap: 8px; font-size: 12px;
         }
+        .model-tool-searchbtn { margin-left: 4px; }
         .model-tool-search {
           display: inline-flex; align-items: center; gap: 6px;
+          flex: 0 1 auto; min-width: 30px; overflow: hidden;
           margin-left: 6px; padding: 4px 8px; font-size: 12px;
-          background: #1e1f29; border: 1px solid #44475a; border-radius: 4px;
+          background: #1e1f29; border: 1px solid #44475a; border-radius: 3px;
           color: #6272a4;
         }
         .model-tool-search input {
           background: transparent; border: none; outline: none;
-          color: var(--text); font-size: 12px; width: 108px;
+          color: var(--text); font-size: 12px;
+          flex: 1 1 108px; width: 108px; min-width: 0;
         }
         .model-tool-search input::placeholder { color: #6272a4; }
-        .model-tool-search kbd {
-          font-size: 10px; color: #6272a4; border: 1px solid #44475a;
-          border-radius: 3px; padding: 1px 4px; font-family: inherit;
-        }
+        /* The magnifier is the last thing to go, so a squeezed search still
+           reads as a search rather than as an empty chip. */
+        .model-tool-search > svg { flex: 0 0 auto; }
         .model-note {
           margin: 0; padding: 7px 10px; font-size: 12px; line-height: 1.45;
           color: #ffb86c; background-color: #3a2f22;
