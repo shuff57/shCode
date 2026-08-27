@@ -298,6 +298,10 @@
 	}
 	function isFlat(v) { return geometries.geom2.isA(v); }
 	function isSolid(v) { return geometries.geom3.isA(v); }
+	// A path2 is the third geometry the library ships. It is not a geom2 -- it
+	// has points rather than sides -- but extrudeLinear takes one, which is how
+	// the book turns vectorText into a solid letter.
+	function isPath(v) { return geometries.path2.isA(v); }
 
 	// A student's trailing { } — as opposed to a shape, an array, or a number.
 	function isOptionsObject(v) {
@@ -315,6 +319,13 @@
 		if (typeof v === 'boolean') return String(v);
 		if (typeof v === 'number') return String(v);
 		if (Array.isArray(v)) return 'a list of ' + v.length;
+		// Say WHICH kind. isGeometry is true for all three, so answering "a
+		// shape" produced the self-refuting "that is not a shape, it is a
+		// shape." for a path2 — measured against §8.1's vectorText glyph, where
+		// the message a student got told them nothing at all.
+		if (isSolid(v)) return 'a solid';
+		if (isFlat(v)) return 'a flat shape';
+		if (isPath(v)) return 'an open or closed path';
 		if (isGeometry(v)) return 'a shape';
 		if (typeof v === 'function') return 'a function';
 		return 'a { } object';
@@ -730,9 +741,13 @@
 					REAL_EXTRAS.extrude.twistAngle + '.'
 				);
 			}
-			if (!isFlat(flat[j])) {
+			// A path2 is allowed through: extrudeLinear takes one, and refusing it
+			// here would put the two out of step for no reason a student could
+			// see. It is what §8.1 extrudes a vectorText glyph from.
+			if (!isFlat(flat[j]) && !isPath(flat[j])) {
 				throw new Error(
-					'extrude(10, shape) — that is not a shape, it is ' + describe(flat[j]) + '.'
+					'extrude(10, shape) — that is not a flat shape, it is ' + describe(flat[j]) + '. ' +
+					'Build the outline first with rect, disc or poly, then extrude that.'
 				);
 			}
 		}

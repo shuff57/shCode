@@ -782,6 +782,42 @@ check('each measure wrapper returns exactly what the library returns', () => {
   return true;
 });
 
+// extrude takes a path2, because extrudeLinear does. §8.1 turns a vectorText
+// glyph into a solid letter that way, and a layer that refused it would put the
+// two out of step for no reason a student could see.
+check('extrude takes a path2, exactly as extrudeLinear does', () => {
+  const { window: w, jscad } = createSimpleContext();
+  const pts = w.vectorText({ height: 8, inputText: 'J' })[0].reverse();
+  const path = jscad.geometries.path2.fromPoints({ closed: true }, pts);
+  let mine;
+  try { mine = w.extrude(3, path); } catch (e) { return `extrude refused a path2: ${e.message}`; }
+  if (!jscad.geometries.geom3.isA(mine)) return 'extrude(3, path2) built nothing solid';
+  return sameGeometry(mine, w.extrudeLinear({ height: 3 }, path));
+});
+
+// The refusal that used to refute itself. describe() answered 'a shape' for all
+// three geometry kinds, so handing extrude a path2 produced 'that is not a
+// shape, it is a shape.' -- in the layer whose whole claim is better messages.
+check('a refusal never contradicts itself about what it was given', () => {
+  const { window: w, jscad } = createSimpleContext();
+  const cases = [
+    ['a number', 42],
+    ['a solid', jscad.primitives.sphere({ radius: 2 })],
+    ['text', 'hello'],
+  ];
+  for (const [what, value] of cases) {
+    try {
+      w.extrude(3, value);
+      return `extrude accepted ${what}`;
+    } catch (e) {
+      if (/is not a (flat shape|shape), it is a? ?shape\./.test(e.message)) {
+        return `given ${what}, extrude says: "${e.message}" -- which refutes itself`;
+      }
+    }
+  }
+  return true;
+});
+
 // And the reason the wrappers exist at all, asserted the way the defect fails:
 // measure, change a parameter, measure again, and the second answer must be the
 // new shape's. Without the unwrap this returns the FIRST answer forever.

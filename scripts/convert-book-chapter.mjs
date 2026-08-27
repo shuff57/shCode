@@ -177,6 +177,37 @@ function shadowed(code) {
   return RESHAPE_NAMES.filter((n) => declared.includes(n) && new RegExp(`\\b${n}\\s*\\(`).test(code));
 }
 
+/**
+ * Variables the book named after the SHAPE, back when the function was named
+ * after the primitive: `let ball = sphere(...)`, `let ring = torus(...)`.
+ * reSHape gives those English words to the functions, so the two collide and
+ * the fence dies in its own initialiser.
+ *
+ * The fix is the operator's: the primitive names are free now, so the variable
+ * takes the name of the primitive it used to call. `let sphere = ball(5)`.
+ * Nothing is lost — a student still meets `sphere`, `torus` and `cylinder` as
+ * words on the page, which is the "name JSCAD, then switch" split working
+ * exactly as intended.
+ *
+ * #32 is the one that is not a straight swap: its variable holds the extruded
+ * circle, and a 2-thick 6-radius solid IS a cylinder, so it takes that name on
+ * the same principle rather than an invented one.
+ */
+const RENAME = { ball: 'sphere', ring: 'torus', disc: 'cylinder' };
+
+function renameCollisions(code) {
+  let out = code;
+  const applied = [];
+  for (const [from, to] of Object.entries(RENAME)) {
+    const declares = new RegExp(`(^|\\n)(\\s*)(let|const|var)\\s+${from}\\b`);
+    if (!declares.test(out)) continue;
+    if (!new RegExp(`\\b${from}\\s*\\(`).test(out)) continue;   // no collision here
+    out = out.replace(new RegExp(`(?<![.\\w$])${from}\\b(?!\\s*\\()`, 'g'), to);
+    applied.push(`${from} -> ${to}`);
+  }
+  return { code: out, applied };
+}
+
 function convert(code) {
   let out = code;
   const used = [];
@@ -185,7 +216,10 @@ function convert(code) {
     out = out.replace(r.rx, (...a) => r.to(a[0], ...a.slice(1, -2)));
     if (out !== before) used.push(r);
   }
-  return { code: out, used };
+  // After the rewrites, because the collision only exists once the function
+  // has taken the variable's name.
+  const r = renameCollisions(out);
+  return { code: r.code, used, renamed: r.applied };
 }
 
 // ---------------------------------------------------------------------------
@@ -238,14 +272,16 @@ const G = '\x1b[32m', Y = '\x1b[33m', R = '\x1b[31m', D = '\x1b[2m', B = '\x1b[1
 let n = 0, touched = 0, proved = 0;
 const failures = [];
 const decisions = new Map();
+const renames = new Set();
 
 const next = html.replace(RX, (whole, open, body, close) => {
   n++;
   const original = decodeEntities(body);
-  const { code, used } = convert(original);
+  const { code, used, renamed } = convert(original);
   if (code === original) return whole;
   touched++;
   for (const r of used) if (r.decide) decisions.set(r.name, r.why);
+  for (const r of renamed) renames.add(r);
 
   // Refuse a rewrite that shadows the function it now calls, before running it:
   // the failure is a ReferenceError, and "x is not defined" would read as a
@@ -277,6 +313,12 @@ const next = html.replace(RX, (whole, open, body, close) => {
 console.log(`\n${B}${CHAPTER} — ${file}${X}`);
 console.log(`  ${n} editors, ${touched} rewritten, ${G}${proved} proved identical${X}`
   + (failures.length ? `, ${R}${failures.length} FAILED${X}` : ''));
+
+if (renames.size) {
+  console.log(`
+${Y}${B}Variables renamed${X}  ${D}the book named these after the shape while the function was named after the primitive; reSHape gives the function that word, so the variable takes the primitive's${X}`);
+  for (const r of renames) console.log(`  ${r}`);
+}
 
 if (decisions.size) {
   console.log(`\n${Y}${B}Judgement calls applied${X}`);
