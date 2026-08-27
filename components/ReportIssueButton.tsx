@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { createIssueReport, IssueKind } from '../lib/issue-reports-api';
+import { uploadImage, UploadError } from '../lib/uploads';
 import { useLessonStore } from '../lib/store';
 import { getCurrentUser } from '../lib/auth';
 
@@ -26,6 +27,11 @@ const KIND_COLOR: Record<IssueKind, string> = {
   enhancement: '#22c55e',
 };
 
+// Single attachment, same limits as student image uploads (MAX_UPLOAD_BYTES
+// in functions/_shared/uploads.ts); the server re-checks everything and is
+// authoritative — these numbers only keep the obvious rejects client-side.
+const MAX_SCREENSHOT_MB = 2;
+
 export default function ReportIssueButton() {
   const [open, setOpen] = useState(false);
   const [kind, setKind] = useState<IssueKind>('bug');
@@ -33,8 +39,17 @@ export default function ReportIssueButton() {
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Screenshot attachment: picked via file input or pasted from the
+  // clipboard. Upload fires as soon as one is chosen — the POST
+  // /api/issue-reports call then sends only the returned id, so a large
+  // image never has to ride along with the JSON report and a slow upload
+  // doesn't block the send button on two round-trips at once.
+  const [screenshotId, setScreenshotId] = useState<string | null>(null);
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
+  const [screenshotBusy, setScreenshotBusy] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const pathname = usePathname();
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
 
@@ -53,12 +68,68 @@ export default function ReportIssueButton() {
     }
   }, [open]);
 
+  // object URLs are process-global; drop the last one before making a new one
+  // and on unmount, or every attached screenshot leaks until reload.
+  useEffect(() => {
+    return () => {
+      if (screenshotPreview) URL.revokeObjectURL(screenshotPreview);
+    };
+  }, [screenshotPreview]);
+
+  function clearScreenshot() {
+    if (screenshotPreview) URL.revokeObjectURL(screenshotPreview);
+    setScreenshotPreview(null);
+    setScreenshotId(null);
+  }
+
+  async function acceptScreenshot(file: File) {
+    setError(null);
+    if (!file.type.startsWith('image/')) {
+      setError('Screenshots must be images (PNG, JPEG, GIF, or WebP).');
+      return;
+    }
+    if (file.size > MAX_SCREENSHOT_MB * 1024 * 1024) {
+      setError(`That image is over ${MAX_SCREENSHOT_MB} MB. Try a smaller screenshot.`);
+      return;
+    }
+    setScreenshotBusy(true);
+    const preview = URL.createObjectURL(file);
+    if (screenshotPreview) URL.revokeObjectURL(screenshotPreview);
+    setScreenshotPreview(preview);
+    try {
+      const item = await uploadImage(file);
+      setScreenshotId(item.id);
+    } catch (err) {
+      // Preview off, error up: the report can still be sent without it.
+      URL.revokeObjectURL(preview);
+      setScreenshotPreview(null);
+      setScreenshotId(null);
+      setError(
+        err instanceof UploadError && err.message
+          ? `Screenshot not attached: ${err.message}`
+          : 'Screenshot could not be attached. You can still send the report.',
+      );
+    } finally {
+      setScreenshotBusy(false);
+    }
+  }
+
+  function onPaste(e: React.ClipboardEvent) {
+    const item = Array.from(e.clipboardData.items).find((i) => i.type.startsWith('image/'));
+    const file = item?.getAsFile();
+    if (file) {
+      e.preventDefault();
+      void acceptScreenshot(file);
+    }
+  }
+
   function close() {
     setOpen(false);
     setDone(false);
     setError(null);
     setKind('bug');
     setMessage('');
+    clearScreenshot();
   }
 
   /**
@@ -98,11 +169,11 @@ export default function ReportIssueButton() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (sending) return;
+    if (sending || screenshotBusy) return;
     setSending(true);
     setError(null);
     try {
-      await createIssueReport(kind, message.trim(), captureContext());
+      await createIssueReport(kind, message.trim(), captureContext(), screenshotId);
       setDone(true);
       setTimeout(() => close(), 1600);
     } catch (err) {
@@ -144,6 +215,7 @@ export default function ReportIssueButton() {
         ref={dialogRef}
         className="issue-dialog"
         onClose={close}
+        onPaste={onPaste}
         onClick={(e) => {
           if (e.target === dialogRef.current) close();
         }}
@@ -157,7 +229,8 @@ export default function ReportIssueButton() {
             <h3 style={{ marginTop: 0 }}>Report an issue</h3>
             <p style={{ color: 'var(--text)', opacity: 0.7, fontSize: 13, marginTop: 0 }}>
               Your page, lesson, and current code are attached automatically —
-              just tell us what happened.
+              just tell us what happened. A screenshot helps: paste one
+              (Ctrl+V) or attach a file.
             </p>
 
             <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
@@ -212,6 +285,89 @@ export default function ReportIssueButton() {
               }}
             />
 
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                marginBottom: 12,
+              }}
+            >
+              {screenshotPreview ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+                  <img
+                    src={screenshotPreview}
+                    alt="Screenshot attachment preview"
+                    style={{
+                      height: 44,
+                      maxWidth: 90,
+                      objectFit: 'cover',
+                      border: '1px solid var(--border)',
+                      borderRadius: 4,
+                      display: 'block',
+                    }}
+                  />
+                  <span style={{ fontSize: 12, flex: 1, opacity: 0.7 }}>
+                    {screenshotId
+                      ? 'Screenshot attached'
+                      : screenshotBusy
+                        ? 'Attaching…'
+                        : 'Not attached'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={clearScreenshot}
+                    disabled={screenshotBusy}
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid var(--border)',
+                      color: 'var(--text)',
+                      padding: '3px 10px',
+                      borderRadius: 4,
+                      fontSize: 12,
+                      cursor: screenshotBusy ? 'wait' : 'pointer',
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={screenshotBusy}
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid var(--border)',
+                      color: 'var(--text)',
+                      padding: '6px 12px',
+                      borderRadius: 4,
+                      fontSize: 13,
+                      cursor: screenshotBusy ? 'wait' : 'pointer',
+                    }}
+                  >
+                    {screenshotBusy ? 'Attaching…' : 'Attach screenshot'}
+                  </button>
+                  <span style={{ fontSize: 12, opacity: 0.6 }}>
+                    optional · paste works too · max {MAX_SCREENSHOT_MB} MB
+                  </span>
+                </>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/gif,image/webp"
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) void acceptScreenshot(file);
+                  // Reset so picking the same file again still fires change.
+                  e.target.value = '';
+                }}
+              />
+            </div>
+
             {error && (
               <div
                 style={{
@@ -246,7 +402,7 @@ export default function ReportIssueButton() {
               </button>
               <button
                 type="submit"
-                disabled={sending || message.trim().length < 3}
+                disabled={sending || screenshotBusy || message.trim().length < 3}
                 style={{
                   background: KIND_COLOR[kind],
                   color: '#1a1a1a',

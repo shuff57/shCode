@@ -14,6 +14,14 @@ export interface IssueReport {
   triaged_at: number | null;
   created_at: number;
   context: Record<string, unknown> | null;
+  /** Upload id (32 hex) of the attached screenshot, when there is one. The
+   *  public URL is /uploads/<id>.<ext> — build it with screenshotUrl. */
+  screenshot_id: string | null;
+}
+
+/** The serve route is public and id-keyed; the extension is cosmetic. */
+export function screenshotUrl(id: string): string {
+  return `/uploads/${id}.png`;
 }
 
 async function readError(res: Response): Promise<string> {
@@ -29,12 +37,13 @@ export async function createIssueReport(
   kind: IssueKind,
   message: string,
   context?: Record<string, unknown>,
+  screenshotId?: string | null,
 ): Promise<number> {
   const res = await fetch('/api/issue-reports', {
     method: 'POST',
     credentials: 'same-origin',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ kind, message, context }),
+    body: JSON.stringify({ kind, message, context, screenshotId: screenshotId ?? null }),
   });
   if (!res.ok) throw new Error(await readError(res));
   const data = (await res.json()) as { id: number };

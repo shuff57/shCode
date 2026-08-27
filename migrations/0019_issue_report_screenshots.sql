@@ -1,0 +1,13 @@
+-- Issue-report screenshots. The bytes live in the same R2 bucket as student
+-- image uploads (binding `UPLOADS`), written by the existing POST /api/uploads
+-- BEFORE the report is filed; this column stores only that upload's id.
+--
+-- The id is the same 128-bit CSPRNG capability the uploads table issues, and
+-- the image is served by the same unauthenticated /uploads/:id route, so no
+-- new serve path and no new access-control decision. See 0015_uploads.sql for
+-- why the serve route must stay public and why that is safe.
+--
+-- Nullable: a report without a screenshot is the normal case. The DELETE on
+-- /api/uploads/:id is how a reporter's attachment disappears when a report is
+-- no longer needed — same lifecycle as any other upload, no separate rule.
+ALTER TABLE issue_reports ADD COLUMN screenshot_id TEXT;

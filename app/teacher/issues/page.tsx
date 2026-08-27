@@ -8,6 +8,7 @@ import {
   IssueStatus,
   listIssueReports,
   setIssueReportStatus,
+  screenshotUrl,
 } from '../../../lib/issue-reports-api';
 
 // ---------------------------------------------------------------------------
@@ -249,7 +250,7 @@ function IssuesPageInner() {
                 ))}
               </select>
 
-              {(r.message.includes('\n') || context) && (
+              {(r.message.includes('\n') || context || r.screenshot_id) && (
                 <button
                   type="button"
                   onClick={() => toggleExpand(r.id)}
@@ -314,6 +315,28 @@ function IssuesPageInner() {
                     {context.currentFileContent}
                     {context.currentFileContentTruncated ? '\n… (truncated)' : ''}
                   </pre>
+                )}
+
+                {r.screenshot_id && (
+                  <a
+                    href={screenshotUrl(r.screenshot_id)}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ display: 'inline-block', marginTop: 10 }}
+                  >
+                    <img
+                      src={screenshotUrl(r.screenshot_id)}
+                      alt={`Screenshot attached to report ${r.id}`}
+                      style={{
+                        maxWidth: 420,
+                        maxHeight: 280,
+                        border: '1px solid var(--border)',
+                        borderRadius: 4,
+                        display: 'block',
+                        cursor: 'zoom-in',
+                      }}
+                    />
+                  </a>
                 )}
 
                 {r.triaged_by && (

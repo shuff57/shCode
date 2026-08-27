@@ -9,6 +9,8 @@
 // to stop a stuck loop from flooding the queue without punishing legitimate
 // use.
 
+import { isUploadId } from '../_shared/uploads';
+
 interface Env {
   DB: D1Database;
 }
@@ -29,6 +31,7 @@ interface ReportRow {
   triaged_by: string | null;
   triaged_at: number | null;
   context_json: string | null;
+  screenshot_id: string | null;
   created_at: number;
 }
 
@@ -38,7 +41,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async (cont
   if (data.role === 'student') return json({ error: 'Staff only' }, 403);
 
   const result = await env.DB.prepare(
-    `SELECT id, reporter_email, kind, message, status, triaged_by, triaged_at, context_json, created_at
+    `SELECT id, reporter_email, kind, message, status, triaged_by, triaged_at, context_json, screenshot_id, created_at
        FROM issue_reports
       ORDER BY created_at DESC`,
   ).all<ReportRow>();
@@ -62,7 +65,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async (cont
 export const onRequestPost: PagesFunction<Env, string, SessionData> = async (context: Ctx) => {
   const { env, data, request } = context;
 
-  let body: { kind?: unknown; message?: unknown; context?: unknown };
+  let body: { kind?: unknown; message?: unknown; context?: unknown; screenshotId?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -95,6 +98,28 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     }
   }
 
+  // The screenshot, when one is attached, must be an upload the REPORTER
+  // already stored via POST /api/uploads — the client uploads the file first
+  // and sends its id here. Checking shape, then ownership (the id alone would
+  // let a reporter staple someone else's image to their report), then storing
+  // only the id: the bytes never move through this route, so a report can
+  // never become a backdoor way to write into R2.
+  let screenshotId: string | null = null;
+  if (body.screenshotId !== undefined && body.screenshotId !== null) {
+    if (typeof body.screenshotId !== 'string' || !isUploadId(body.screenshotId)) {
+      return json({ error: 'screenshotId does not look like an upload id.' }, 400);
+    }
+    const owned = await env.DB.prepare(
+      `SELECT id FROM uploads WHERE id = ? AND owner_email = ?`,
+    )
+      .bind(body.screenshotId, data.email)
+      .first<{ id: string }>();
+    if (!owned) {
+      return json({ error: 'That screenshot upload does not exist or belongs to another account.' }, 400);
+    }
+    screenshotId = body.screenshotId;
+  }
+
   // Flood guard: count the reporter's open/in-progress reports. Resolved ones
   // don't count, so a student who reports one thing per lesson is never near
   // the cap.
@@ -113,10 +138,10 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   }
 
   const result = await env.DB.prepare(
-    `INSERT INTO issue_reports (reporter_email, kind, message, status, context_json, created_at)
-     VALUES (?, ?, ?, 'open', ?, ?)`,
+    `INSERT INTO issue_reports (reporter_email, kind, message, status, context_json, screenshot_id, created_at)
+     VALUES (?, ?, ?, 'open', ?, ?, ?)`,
   )
-    .bind(data.email, kind, message, contextJson, Date.now())
+    .bind(data.email, kind, message, contextJson, screenshotId, Date.now())
     .run();
 
   return json({ id: result.meta.last_row_id, ok: true }, 201);
@@ -178,6 +203,15 @@ export function renderMarkdown(reports: ReportRow[]): string {
       );
     }
     lines.push('', '### Report', '', r.message);
+
+    if (r.screenshot_id) {
+      // The public serve route needs the content-type extension to be honest;
+      // the id alone is the key, and the extension in the URL is cosmetic
+      // (functions/uploads/[name].ts). Link, don't inline: a markdown
+      // handoff file gets read as text, and a wall of base64 it can't render
+      // is worse than a path to open.
+      lines.push('', `### Screenshot`, '', `/uploads/${r.screenshot_id}.png`);
+    }
 
     const ctx = parseContext(r.context_json);
     if (ctx) {
