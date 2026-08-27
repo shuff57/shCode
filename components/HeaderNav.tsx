@@ -43,12 +43,12 @@ export default function HeaderNav() {
       <Link href="/sandbox" className="text-white">Sandbox</Link>
       <Link href="/docs/moshion" className="text-white">Docs</Link>
       <Link href="/docs/reshape" className="text-white">reSHape</Link>
-      {loaded && user?.role === 'teacher' && (
-        <Link href="/teacher" className="text-white">Classes</Link>
-      )}
-      {loaded && user?.role === 'admin' && (
-        <Link href="/teacher" className="text-white">Classes</Link>
-      )}
+      {(loaded && user?.role === 'teacher') || user?.role === 'admin' ? (
+        <>
+          <Link href="/teacher" className="text-white">Classes</Link>
+          <Link href="/teacher/issues" className="text-white">Issues</Link>
+        </>
+      ) : null}
       {loaded && user?.role === 'admin' && (
         <Link href="/admin/users" className="text-white">Users</Link>
       )}

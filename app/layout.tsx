@@ -1,6 +1,7 @@
 import './globals.css';
 import Header from '../components/Header';
 import { AnnouncementBanner } from '../components/AnnouncementBanner';
+import ReportIssueButton from '../components/ReportIssueButton';
 import { ReactNode } from 'react';
 
 export const metadata = {
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <AnnouncementBanner />
         <Header />
         {children}
+        <ReportIssueButton />
       </body>
     </html>
   );
