@@ -2,7 +2,7 @@
 // A `var x = <value>` sitting BELOW that call runs at its own position — after
 // render() has already assigned x — and silently wipes live state.
 //
-// It has cost two real bugs in public/jscad/runner.html:
+// It has cost two real bugs in public/reshape/runner.html:
 //   swapGeometry   — a parameter change rebuilt geometry that never reached the
 //                    screen, because the hook render() installed was set back
 //                    to null a few lines later.
@@ -25,7 +25,7 @@ import { fileURLToPath } from 'url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const FILES = [
-  { file: 'public/jscad/runner.html', runMarker: /^\tstatusEl\.textContent = 'Running your code/m },
+  { file: 'public/reshape/runner.html', runMarker: /^\tstatusEl\.textContent = 'Running your code/m },
 ];
 
 let failed = 0;

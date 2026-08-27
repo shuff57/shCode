@@ -23,7 +23,7 @@ module.exports = function run(dir) {
 
   const fs = require('fs');
   const vm = require('vm');
-  const bundlePath = path.join(__dirname, '..', 'public', 'jscad', 'lib', 'jscad-modeling.min.js');
+  const bundlePath = path.join(__dirname, '..', 'public', 'reshape', 'lib', 'jscad-modeling.min.js');
   const sandbox = {};
   sandbox.window = sandbox;
   sandbox.self = sandbox;
@@ -33,26 +33,26 @@ module.exports = function run(dir) {
   const M = sandbox.jscadModeling;
 
   // The generator emits shCAD names (box, tube, ball, extrude, turn), which are
-  // globals installed by simple.js — so the geometry checks below cannot run
+  // globals installed by reshape.js — so the geometry checks below cannot run
   // without it. That is a real dependency, not a test convenience: the code we
-  // generate genuinely does not work without simple.js loaded, which is also
+  // generate genuinely does not work without reshape.js loaded, which is also
   // why it no longer runs unmodified on jscad.app.
-  const simplePath = path.join(__dirname, '..', 'public', 'jscad', 'simple.js');
+  const simplePath = path.join(__dirname, '..', 'public', 'reshape', 'reshape.js');
   if (!fs.existsSync(simplePath)) {
-    console.log('  FAIL  public/jscad/simple.js is missing — the generated code needs it');
+    console.log('  FAIL  public/reshape/reshape.js is missing — the generated code needs it');
     return false;
   }
   vm.runInContext(fs.readFileSync(simplePath, 'utf8'), sandbox);
   for (const n of ['box', 'tube', 'ball', 'extrude', 'turn', 'cone', 'ring', 'poly']) {
     if (typeof sandbox[n] !== 'function') {
-      console.log(`  FAIL  simple.js did not expose ${n}()`);
+      console.log(`  FAIL  reshape.js did not expose ${n}()`);
       return false;
     }
   }
 
   function build(src) {
     const mod = { exports: {} };
-    // Run inside the same context simple.js populated, so the shCAD globals the
+    // Run inside the same context reshape.js populated, so the shCAD globals the
     // generated code calls are actually in scope.
     const run = vm.runInContext(
       '(function (require, module) {' + src + String.fromCharCode(10) + '})',

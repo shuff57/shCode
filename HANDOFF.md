@@ -224,7 +224,7 @@ and both are current.
 Twelve names, additive only, in their own file: `box rect disc ball tube extrude
 revolve turn sit cone ring poly`. Positional arguments for what a shape cannot exist
 without, everything else in a trailing options object keyed with the textbook's own
-words. `simple.js` loads beside the bare-name shim and skips any name already taken,
+words. `reshape.js` loads beside the bare-name shim and skips any name already taken,
 reporting into `window.__shcadNamesSkipped` the way the shim reports into
 `__jscadBareNamesSkipped`.
 
@@ -235,13 +235,13 @@ and a student's program can be converted to portable form and pasted into jscad.
 
 | Path | What it is |
 | --- | --- |
-| `public/jscad/simple.js` | the layer itself, ~934 lines, IIFE, banner carries the REFUSALS list |
-| `public/jscad/svg.js` | geom2 to SVG, hand-rolled, ~139 lines |
+| `public/reshape/reshape.js` | the layer itself, ~934 lines, IIFE, banner carries the REFUSALS list |
+| `public/reshape/svg.js` | geom2 to SVG, hand-rolled, ~139 lines |
 | `lib/jscad-portable.mjs` | source-text in, portable source-text out, ~1016 lines |
 | `app/portable/page.tsx` | the `/portable` converter page |
-| `scripts/jscad-simple-checks.mjs` | expectations as data — the builder must not own the gate |
-| `scripts/test-jscad.mjs` | SIMPLE + PORTABLE groups appended; nothing existing weakened |
-| `public/jscad/docs/reference.md` | the shCAD section, the graduation table, the reading table |
+| `scripts/reshape-simple-checks.mjs` | expectations as data — the builder must not own the gate |
+| `scripts/test-reshape.mjs` | SIMPLE + PORTABLE groups appended; nothing existing weakened |
+| `public/reshape/docs/reference.md` | the shCAD section, the graduation table, the reading table |
 
 ### `turn` is the one that is not a rename
 
@@ -259,7 +259,7 @@ The save bar shipped `stl`, `3mf` and `obj` — all three serialize polygons, an
 `geom2` has none. So every 2D design in §8.2 and §8.3 could be built, rendered and
 graded in shCode and **never leave it**, while A8.2.1 asks in so many words for an
 SVG file. `svg.js` closes that. It is hand-written rather than vendored because
-`public/jscad/lib/jscad-io.min.js` contains no SVG serializer and is already the one
+`public/reshape/lib/jscad-io.min.js` contains no SVG serializer and is already the one
 entry in `EXPECTED_BUNDLES` with `verified: false` — a second unverified binary to
 solve a fifty-line problem is the wrong trade.
 
@@ -274,8 +274,8 @@ but the gate failure will not explain why.
 - **`taughtFromReference()` derives the taught set from the module tables in
   `reference.md`.** Restructuring those tables silently redefines what the API group
   tests. Add sections around them; do not reformat them.
-- **`scripts/jscad-checks.mjs` is not editable to make a red check go green.** Its
-  header says so. The same rule applies to `jscad-simple-checks.mjs`: the builder
+- **`scripts/reshape-checks.mjs` is not editable to make a red check go green.** Its
+  header says so. The same rule applies to `reshape-simple-checks.mjs`: the builder
   does not own the gate.
 - **The API group asserts every taught function is the SAME REFERENCE bare as
   namespaced.** A facade is legal only as additive new names — never as a wrapper
@@ -313,7 +313,7 @@ is not decoration.
    matches the button the student will actually see.
 3. **`model-codegen` was retargeted to shCAD** at the operator's confirmation; the
    sandbox generator now emits shCAD. Two of its assertions are borrowed by the JSCAD
-   gate (`BORROWED_ASSERTIONS` in `jscad-simple-checks.mjs`) so a change in one place
+   gate (`BORROWED_ASSERTIONS` in `reshape-simple-checks.mjs`) so a change in one place
    fails in both. Worth knowing before editing either file.
 4. **Nothing is pushed.** Both commits are local on `cs-3d`.
 
@@ -334,7 +334,7 @@ instances are worth keeping:
   subpaths *within* one `<path>` and does nothing across elements. Found only by
   rendering the file and looking at it. The real check (paths = shapes, subpaths =
   loops) exists because of the looking.
-- **A test-harness bug that blamed the product.** `test-jscad.mjs` interpolated a
+- **A test-harness bug that blamed the product.** `test-reshape.mjs` interpolated a
   degrees value into source text raw, so an array angle became four positional
   arguments and `turn` correctly refused — which read as a `turn` defect.
   `JSON.stringify` fixed it. *Coverage of a feature is not coverage of its forms*: a
@@ -852,7 +852,7 @@ the CRLF defect in §5 was found.
 
 Production right now serves the full 2026-08-22 state: `moshion.js` with the Web Audio
 `Sound` class, `/api/uploads` (401 unauthenticated, as designed), and the vendored
-JSCAD runtime at `/jscad/lib/`.
+JSCAD runtime at `/reshape/lib/`.
 
 ## 2. What is green
 

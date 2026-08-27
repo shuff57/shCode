@@ -149,7 +149,7 @@
 // Read student code from ?code=<base64url>, inject as a <script> so declarations become globals
 (function() {
 	// Never execute ?code= as a top-level document. See the matching guard in
-	// public/jscad/runner.html for the full reasoning: embedded, this frame is
+	// public/reshape/runner.html for the full reasoning: embedded, this frame is
 	// sandboxed into an opaque origin; opened directly by a link, the injected
 	// script would run on the app's origin with the viewer's SameSite=Lax
 	// session cookie available to any same-origin fetch.

@@ -103,7 +103,7 @@ try {
     //   1800    the plain sketch dropped
     //  12000    the constrained sketch dropped -- the interesting one, since
     //           it is the one carrying all four legacy constraint kinds
-    const { build } = require('./jscad-build-harness.cjs');
+    const { build } = require('./reshape-build-harness.cjs');
     let built = null;
     try {
       built = build(src);

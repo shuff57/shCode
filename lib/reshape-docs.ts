@@ -3,7 +3,7 @@
 // booleans, extrusions, hulls, measurements, colors, text, parameters,
 // patterns, export). Every code example runs in the docs sandbox, which
 // loads the vendored @jscad/modeling + @jscad/regl-renderer bundles from
-// public/jscad/lib/ (see public/jscad/runner.html). Nothing loads from a CDN.
+// public/reshape/lib/ (see public/reshape/runner.html). Nothing loads from a CDN.
 //
 // The runner also pre-destructures every module into scope, so cube(...)
 // works with no require() line. The examples here deliberately keep the
@@ -17,7 +17,7 @@
 // conversions and the utils helpers — documented as what they are: past the
 // course, needed by no lesson, and there so that a student who goes looking
 // finds something. Together those cover every function the fifteen modules
-// export directly, which is what scripts/test-jscad-docs.mjs measures.
+// export directly, which is what scripts/test-reshape-docs.mjs measures.
 //
 // What is still undocumented is one level deeper: the sub-namespaces
 // (curves.bezier, geometries.geom3, maths.vec3, extrusions.slice,

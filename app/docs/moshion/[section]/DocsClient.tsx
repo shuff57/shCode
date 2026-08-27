@@ -17,7 +17,7 @@ interface Props {
   docsTitle: string;
   searchPlaceholder: string;
   /** Which runner the live sandbox on each page loads. JSCAD source needs
-   *  /jscad/runner.html; moSHion source needs /moshion/runner.html. Neither
+   *  /reshape/runner.html; moSHion source needs /moshion/runner.html. Neither
    *  runtime can execute the other's examples, so this is required, not a
    *  convenience — a wrong value throws on every Run. */
   preview: 'moshion' | 'jscad';

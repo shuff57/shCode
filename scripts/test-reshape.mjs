@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// test-jscad.mjs — the JSCAD acceptance gate.
+// test-reshape.mjs — the JSCAD acceptance gate.
 //
 // Six groups, each one closing a claim the stack currently makes only in prose:
 //
 //   BUNDLE    the two vendored files really are the libraries they claim to be,
-//             and nothing in public/jscad/ reaches for a CDN.
+//             and nothing in public/reshape/ reaches for a CDN.
 //   SHIM      the scope shim cut live out of runner.html behaves the way its
 //             own banner says — including the two-name collision list, which
 //             until now was observable only by a human opening the preview
@@ -15,25 +15,25 @@
 //   RENDERER  every regl symbol runner.html reaches resolves, and the camera /
 //             orbit / entity wiring runs. 160 lines of renderer code that no
 //             test touches is 160 lines that are correct by assertion only.
-//   DOCS      every example in lib/jscad-docs.ts and public/jscad/docs/
+//   DOCS      every example in lib/reshape-docs.ts and public/reshape/docs/
 //             reference.md runs in a require-only context — the jscad.app
 //             environment, with the shim subtracted back out.
 //   SYNC      the in-app docs and reference.md document the same API surface.
-//             public/jscad/docs/CLAUDE.md states this rule; this enforces it.
+//             public/reshape/docs/CLAUDE.md states this rule; this enforces it.
 //   REACH     something a student can actually click loads this runtime. The
 //             other six groups all measure whether the runtime is CORRECT;
 //             none of them noticed that for the whole of the first build
-//             nothing rendered JscadPreview at all, and /docs/jscad fed JSCAD
+//             nothing rendered ReshapePreview at all, and /docs/reshape fed JSCAD
 //             source to the moSHion runner. A gate that cannot fail on "nobody
 //             can load it" is measuring the wrong thing.
 //
-// Runtime builders MUST NOT edit this file or jscad-checks.mjs. A red check is
-// closed by fixing public/jscad/runner.html, the vendored bundles, or the docs
+// Runtime builders MUST NOT edit this file or reshape-checks.mjs. A red check is
+// closed by fixing public/reshape/runner.html, the vendored bundles, or the docs
 // — never by loosening a check here.
 //
-//   node scripts/test-jscad.mjs                # everything
-//   node scripts/test-jscad.mjs --only=docs    # one group
-//   node scripts/test-jscad.mjs --json         # machine-readable, for critics
+//   node scripts/test-reshape.mjs                # everything
+//   node scripts/test-reshape.mjs --only=docs    # one group
+//   node scripts/test-reshape.mjs --json         # machine-readable, for critics
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -43,14 +43,14 @@ import {
   REPO, PATHS, extractShim, runnerSource, loadModeling, loadRenderer,
   createShimContext, createRequireOnlyContext, runProgram, isGeometry,
   docExamples, apiNames, documentedNames, docText, captureConsole,
-} from './jscad-harness.mjs';
+} from './reshape-harness.mjs';
 import {
   EXPECTED_BUNDLES,
   EXPECTED_MODULE_ORDER, DOCUMENTED_COLLISIONS, EXPECTED_BARE_NAME_COUNT,
   CORE_TAUGHT, taughtFromReference, REGL_ALIASES, MIN_REGL_SYMBOLS,
   ENTITY_GEOMETRY_KEYS, DOC_SYNC_EXCEPTIONS, MIN_DOC_EXAMPLES, FENCE_TAGS,
   REACH_CHAIN, REACH_LESSON, REACH_MOSHION,
-} from './jscad-checks.mjs';
+} from './reshape-checks.mjs';
 import {
   SIMPLE_PATH, SHCAD_NAMES, EXPECTED_SHCAD_NAME_COUNT, SHCAD_REPORT_GLOBALS,
   SHCAD_OPTION_KEYS, EQUIVALENTS, TURN_IN_PLACE, POSITIONAL_CONTRACT, GUARDS,
@@ -63,7 +63,7 @@ import {
   SIT_VS_BOOK_ALIGN, BOOK_IDENTIFIERS, REFUSAL_CALLS, evaluateInShcad, BOOK_OPTION_KEYS,
   OBJECT_DEPTH, PARAM_DEFAULTS, shcadSection, liveObjectLiterals, PARAM_TYPES,
   readFirstColumn, paramProgram, BOOK_OPTION_WORDS,
-} from './jscad-simple-checks.mjs';
+} from './reshape-simple-checks.mjs';
 
 const argv = process.argv.slice(2);
 const WANT_JSON = argv.includes('--json');
@@ -100,14 +100,14 @@ at('bundle');
 check('vendored bundles match their recorded hashes', () => {
   const bad = [];
   for (const b of EXPECTED_BUNDLES) {
-    const p = join(REPO, 'public/jscad/lib', b.file);
+    const p = join(REPO, 'public/reshape/lib', b.file);
     if (!existsSync(p)) { bad.push(`${b.file}: missing`); continue; }
     const buf = readFileSync(p);
     if (buf.length !== b.bytes) bad.push(`${b.file}: ${buf.length} bytes, expected ${b.bytes}`);
     const got = createHash('sha256').update(buf).digest('hex');
     if (got !== b.sha256) {
       const who = b.version ? `${b.pkg}@${b.version}` : b.pkg;
-      bad.push(`${b.file}: sha256 ${got.slice(0, 16)}… but ${who} is recorded as ${b.sha256.slice(0, 16)}… — if this is a deliberate upgrade, update version AND sha256 in jscad-checks.mjs together, never the hash alone`);
+      bad.push(`${b.file}: sha256 ${got.slice(0, 16)}… but ${who} is recorded as ${b.sha256.slice(0, 16)}… — if this is a deliberate upgrade, update version AND sha256 in reshape-checks.mjs together, never the hash alone`);
     }
   }
   return bad.length ? bad.join(' | ') : true;
@@ -143,7 +143,7 @@ check('regl-renderer bundle is vendored and full-size', () => {
 
 // The whole point of vendoring. A CDN reference that creeps back in works fine
 // on a fast connection at a desk and fails in a classroom behind a filter.
-check('nothing under public/jscad or its wiring loads from a CDN', () => {
+check('nothing under public/reshape or its wiring loads from a CDN', () => {
   const CDN = /unpkg\.com|jsdelivr|cdnjs|cdn\.skypack|esm\.sh|\/\/cdn\./i;
   const skip = new Set([PATHS.modeling, PATHS.regl]);
   const offenders = [];
@@ -156,8 +156,8 @@ check('nothing under public/jscad or its wiring loads from a CDN', () => {
       if (CDN.test(readFileSync(p, 'utf8'))) offenders.push(relative(REPO, p));
     }
   };
-  walk(join(REPO, 'public/jscad'));
-  for (const p of [join(REPO, 'lib/preview-builder.ts'), join(REPO, 'components/JscadPreview.tsx')]) {
+  walk(join(REPO, 'public/reshape'));
+  for (const p of [join(REPO, 'lib/preview-builder.ts'), join(REPO, 'components/ReshapePreview.tsx')]) {
     if (existsSync(p) && CDN.test(readFileSync(p, 'utf8'))) offenders.push(relative(REPO, p));
   }
   return offenders.length ? `CDN reference in ${offenders.join(', ')}` : true;
@@ -208,7 +208,7 @@ check('__jscadBareNamesSkipped is exactly the two documented collisions', () => 
   const want = DOCUMENTED_COLLISIONS.map((c) => c.name);
   return same(skipped, want)
     ? true
-    : `expected ${JSON.stringify(want)}, got ${JSON.stringify(skipped)} — a library upgrade changed the collision set; update the shim banner, then jscad-checks.mjs`;
+    : `expected ${JSON.stringify(want)}, got ${JSON.stringify(skipped)} — a library upgrade changed the collision set; update the shim banner, then reshape-checks.mjs`;
 });
 
 // A node vm global is a far smaller surface than a browser `window`, so the
@@ -540,7 +540,7 @@ for (const e of examples) {
 }
 
 // ===========================================================================
-// SYNC  (public/jscad/docs/CLAUDE.md's unenforced rule)
+// SYNC  (public/reshape/docs/CLAUDE.md's unenforced rule)
 // ===========================================================================
 
 at('sync');
@@ -556,7 +556,7 @@ check('the in-app docs and reference.md document the same API', () => {
   const onlyRef = [...ref].filter((n) => !inApp.has(n) && allow.get(n) !== 'reference').sort();
   if (!onlyInApp.length && !onlyRef.length) return true;
   const parts = [];
-  if (onlyInApp.length) parts.push(`only in lib/jscad-docs.ts: ${onlyInApp.join(', ')}`);
+  if (onlyInApp.length) parts.push(`only in lib/reshape-docs.ts: ${onlyInApp.join(', ')}`);
   if (onlyRef.length) parts.push(`only in reference.md: ${onlyRef.join(', ')}`);
   return `${parts.join(' | ')} — document it in both, or add a reviewed entry to DOC_SYNC_EXCEPTIONS`;
 });
@@ -617,7 +617,7 @@ function assertHop(hop, file) {
       return assertHop(hop, here);
     });
     if (hop.nextRoute) {
-      // Next.js filesystem routing: /docs/jscad -> app/docs/jscad/…
+      // Next.js filesystem routing: /docs/reshape -> app/docs/reshape/…
       const src = readFileSync(join(REPO, here), 'utf8');
       const m = hop.nextRoute.hrefPattern.exec(src);
       const derived = m ? `app${m[1]}/${hop.nextRoute.page}` : null;
@@ -662,17 +662,17 @@ check('the moSHion docs still load the moSHion runner', () => assertHop(REACH_MO
 check('a lesson with preview:"jscad" would mount the JSCAD runner', () => assertHop(REACH_LESSON, REACH_LESSON.file));
 
 // ===========================================================================
-// SIMPLE  (shCAD — public/jscad/simple.js, the layer Q3 actually teaches)
+// SIMPLE  (shCAD — public/reshape/reshape.js, the layer Q3 actually teaches)
 // ===========================================================================
 //
 // The six groups above all measure the REAL API. shCAD is a second, simplified
 // vocabulary sitting on top of it, and the whole reason it is safe is three
 // claims that were previously only prose:
 //
-//   ADDITIVE  none of its nine names exists before simple.js runs, and no real
+//   ADDITIVE  none of its nine names exists before reshape.js runs, and no real
 //             JSCAD name is a different value afterwards. The API group's
 //             "same reference bare as namespaced" check is re-run downstream
-//             of simple.js here, so a shCAD name that shadowed a real one
+//             of reshape.js here, so a shCAD name that shadowed a real one
 //             would fail loudly instead of quietly.
 //   REAL      every call returns byte-identical geometry to the real API call
 //             it stands for — compared the same way the API group compares
@@ -688,27 +688,27 @@ check('a lesson with preview:"jscad" would mount the JSCAD runner', () => assert
 // the opposite expectation instead — including a counter-case that fails if it
 // ever silently becomes a pure rename of transforms.rotate.
 //
-// Expectations live in scripts/jscad-simple-checks.mjs. A red check here is
-// closed by fixing public/jscad/simple.js, never by loosening one of them.
+// Expectations live in scripts/reshape-simple-checks.mjs. A red check here is
+// closed by fixing public/reshape/reshape.js, never by loosening one of them.
 
 at('simple');
 
-check('simple.js is vendored in public/jscad and loaded by the runner', () => {
+check('reshape.js is vendored in public/reshape and loaded by the runner', () => {
   if (!existsSync(SIMPLE_PATH)) return `missing ${relative(REPO, SIMPLE_PATH)}`;
   const html = runnerSource();
-  const tag = html.indexOf('src="./simple.js"');
-  if (tag === -1) return 'runner.html does not load ./simple.js';
+  const tag = html.indexOf('src="./reshape.js"');
+  if (tag === -1) return 'runner.html does not load ./reshape.js';
   // Order is the whole contract: after the shim, so shCAD can see every real
   // name and refuse to overwrite one; before the ?code= injection, so a
   // student's own declaration still wins over a shCAD name.
   const shimEnds = html.indexOf('window.__jscadBareNamesLost = lost;');
   const codeInjection = html.indexOf("params.get('code')");
-  if (!(shimEnds < tag)) return 'simple.js is loaded before the shim has finished installing';
-  if (!(tag < codeInjection)) return 'simple.js is loaded after the student code is injected';
+  if (!(shimEnds < tag)) return 'reshape.js is loaded before the shim has finished installing';
+  if (!(tag < codeInjection)) return 'reshape.js is loaded after the student code is injected';
   return true;
 });
 
-check('none of the shCAD names exists before simple.js loads', () => {
+check('none of the shCAD names exists before reshape.js loads', () => {
   const { before } = createSimpleContext();
   const already = SHCAD_NAMES.filter((n) => before.includes(n.name)).map((n) => n.name);
   return already.length
@@ -716,7 +716,7 @@ check('none of the shCAD names exists before simple.js loads', () => {
     : true;
 });
 
-check('simple.js adds exactly the shCAD names and nothing else', () => {
+check('reshape.js adds exactly the shCAD names and nothing else', () => {
   const { added } = createSimpleContext();
   const want = [...SHCAD_NAMES.map((n) => n.name), ...SHCAD_REPORT_GLOBALS].sort();
   const got = [...added].sort();
@@ -733,7 +733,7 @@ check('the shCAD surface is the expected size', () => {
   return eq(installed.length, EXPECTED_SHCAD_NAME_COUNT, 'shCAD names');
 });
 
-// The decisive additive-ness check, run on the far side of simple.js. The API
+// The decisive additive-ness check, run on the far side of reshape.js. The API
 // group asserts bare === namespaced with only the shim loaded; this asserts
 // that loading shCAD on top changed none of those answers.
 check('no real JSCAD name was overwritten by shCAD', () => {
@@ -775,7 +775,7 @@ check('shCAD does not move the shim tripwires', () => {
     for (const k of Object.keys(jscad[m] || {})) if (w[k] !== undefined) n++;
   }
   n -= DOCUMENTED_COLLISIONS.length;
-  return eq(n, EXPECTED_BARE_NAME_COUNT, 'bare names after simple.js');
+  return eq(n, EXPECTED_BARE_NAME_COUNT, 'bare names after reshape.js');
 });
 
 check('a shCAD name that cannot be installed is reported, not swallowed', () => {
@@ -785,7 +785,7 @@ check('a shCAD name that cannot be installed is reported, not swallowed', () => 
     consoleImpl: cap.console,
   });
   const report = w.__shcadNamesSkipped;
-  if (!Array.isArray(report)) return 'simple.js publishes no __shcadNamesSkipped';
+  if (!Array.isArray(report)) return 'reshape.js publishes no __shcadNamesSkipped';
   if (!report.includes(SEEDED_COLLISION.name)) {
     return `expected '${SEEDED_COLLISION.name}' in the skipped list, got ${JSON.stringify(report)}`;
   }
@@ -875,7 +875,7 @@ for (const t of TURN_COMPOSITION) {
     const movedThenTurned = w.turn(t.degrees, w.translate(t.move, t.build(w)));
     if (!sameModel(jscad, turnedThenMoved, movedThenTurned)) {
       return 'turn no longer commutes with translate — it has stopped rotating in place, '
-        + 'and the banner in simple.js plus the reference.md section on it are now wrong';
+        + 'and the banner in reshape.js plus the reference.md section on it are now wrong';
     }
 
     const spunThenMoved = w.translate(t.move, w.rotate(t.radians, t.build(w)));
@@ -960,7 +960,7 @@ check('svg: the viewBox is the design plus a margin', () => {
 });
 
 check('svg: the runner offers the button and loads the file', () => {
-  const html = readFileSync(join(REPO, 'public/jscad/runner.html'), 'utf8');
+  const html = readFileSync(join(REPO, 'public/reshape/runner.html'), 'utf8');
   if (!/<script src="\.\/svg\.js">/.test(html)) return 'runner.html does not load svg.js';
   if (!/data-format="svg"/.test(html)) return 'there is no Save SVG button';
   return /svg:\s*\{\s*name: 'design\.svg'/.test(html) ? true : 'svg is not in FORMATS';
@@ -1206,7 +1206,7 @@ for (const m of RING_ARITHMETIC.ownMisread) {
       out = m.run(w);
     } catch (e) {
       return `it throws now (${e.message}). That would be good news, but reference.md and `
-        + "simple.js's banner both publish this as a SILENT wrong answer — re-measure and "
+        + "reshape.js's banner both publish this as a SILENT wrong answer — re-measure and "
         + 'rewrite all three together rather than deleting the row';
     }
     const dims = w.measureDimensions(out);
@@ -1269,12 +1269,12 @@ for (const d of SILENTLY_DROPPED) {
   });
 }
 
-// Two refusals in simple.js's banner were overturned this round. A refusal
+// Two refusals in reshape.js's banner were overturned this round. A refusal
 // overturned QUIETLY leaves nobody able to audit the decision later, and the
 // poly one has a live cost — it takes a target out of A8.2.2. So the banner has
 // to keep saying it, and these are the sentences it must keep.
 for (const s of REFUSALS_OVERTURNED.says) {
-  check(`simple.js's banner records ${s.what}`, () => {
+  check(`reshape.js's banner records ${s.what}`, () => {
     const src = readFileSync(REFUSALS_OVERTURNED.path, 'utf8').replace(/\r\n/g, '\n');
     return s.rx.test(src)
       ? true
@@ -1286,7 +1286,7 @@ for (const s of REFUSALS_OVERTURNED.says) {
 check('the names that were overturned are not still listed as refused', () => {
   const src = readFileSync(REFUSALS_OVERTURNED.path, 'utf8').replace(/\r\n/g, '\n');
   const m = REFUSALS_OVERTURNED.refusalLine.exec(src);
-  if (!m) return 'simple.js no longer has a "Deliberately NOT here" list at all';
+  if (!m) return 'reshape.js no longer has a "Deliberately NOT here" list at all';
   const still = REFUSALS_OVERTURNED.notRefusedAnyMore.filter((n) => new RegExp(`\\b${n}\\b`).test(m[1]));
   return still.length
     ? `still on the not-here list after being added: ${still.join(', ')}`
@@ -1298,7 +1298,7 @@ check('the names that were overturned are not still listed as refused', () => {
 //
 // It asserted that ellipse and star were the surviving pool and that poly had
 // taken the assignment's best target. Both are false, and both are false for
-// one reason: simple.js's banner quoted the assignment as "NOT covered in
+// one reason: reshape.js's banner quoted the assignment as "NOT covered in
 // class" when curriculum-plan.md says "NOT covered in class THIS WEEK", and
 // §8.2 — the assignment's own section — teaches ellipse, polygon and star with
 // worked solutions. BOOK_CENSUS.calls is a flat per-name total with no chapter
@@ -1318,7 +1318,7 @@ check(`${ASSIGNMENT_POOL.assignment} is quoted from the plan, word for word`, ()
   const plan = readFileSync(ASSIGNMENT_POOL.planPath, 'utf8').replace(/\r\n/g, '\n');
   if (!plan.includes(ASSIGNMENT_POOL.wording)) {
     return `the plan no longer says "${ASSIGNMENT_POOL.wording}". Re-read A8.2.2 and redo the `
-      + 'eligibility accounting in ASSIGNMENT_POOL and in simple.js — every number below '
+      + 'eligibility accounting in ASSIGNMENT_POOL and in reshape.js — every number below '
       + 'depends on which week counts as "covered in class"';
   }
   if (!plan.includes(ASSIGNMENT_POOL.objectiveLine)) {
@@ -1338,7 +1338,7 @@ check(`${ASSIGNMENT_POOL.assignment} is quoted from the plan, word for word`, ()
     .replace(/\s+/g, ' ');
   return banner.includes(ASSIGNMENT_POOL.wording)
     ? true
-    : 'simple.js quotes A8.2.2 in words that are not the plan\'s words. That is exactly how '
+    : 'reshape.js quotes A8.2.2 in words that are not the plan\'s words. That is exactly how '
       + 'this went wrong the first time: "NOT covered in class" and "NOT covered in class this '
       + 'week" are different assignments, and only one of them is the one being set';
 });
@@ -1351,8 +1351,8 @@ check(`${ASSIGNMENT_POOL.assignment}'s largest softener is still written down`, 
   if (!ASSIGNMENT_POOL.spoiledByOurOwnDocs) {
     return 'ASSIGNMENT_POOL.spoiledByOurOwnDocs is false. If shCode genuinely stopped '
       + 'publishing the option signatures of A8.2.2\'s eligible primitives, delete this check '
-      + 'with it — but verify that first, because reference.md and lib/jscad-docs.ts both '
-      + 'carried them and /docs/jscad served them in-app.';
+      + 'with it — but verify that first, because reference.md and lib/reshape-docs.ts both '
+      + 'carried them and /docs/reshape served them in-app.';
   }
   const banner = readFileSync(SIMPLE_PATH, 'utf8')
     .replace(/\r\n/g, '\n')
@@ -1360,7 +1360,7 @@ check(`${ASSIGNMENT_POOL.assignment}'s largest softener is still written down`, 
     .replace(/\s+/g, ' ');
   return /satisfied by scrolling one bundled page/.test(banner)
     ? true
-    : 'simple.js no longer records that shCode\'s own docs are what soften A8.2.2 most — '
+    : 'reshape.js no longer records that shCode\'s own docs are what soften A8.2.2 most — '
       + 'that "using only the JSCAD documentation" is satisfiable without leaving the app. '
       + 'It is the biggest cost to that assignment and none of the three new names caused it. '
       + 'Do not delete this check to go green: either restore the sentence, or set '
@@ -1377,7 +1377,7 @@ check(`${ASSIGNMENT_POOL.assignment} still has primitives left that its own week
   const eligible = prims.filter((p) => !claimed.has(p) && !taught.has(p)).sort();
   if (!same(eligible, [...ASSIGNMENT_POOL.eligible].sort())) {
     return `the eligible pool is now ${JSON.stringify(eligible)}, the record says `
-      + `${JSON.stringify(ASSIGNMENT_POOL.eligible)} — re-measure ASSIGNMENT_POOL and simple.js's `
+      + `${JSON.stringify(ASSIGNMENT_POOL.eligible)} — re-measure ASSIGNMENT_POOL and reshape.js's `
       + 'banner together, they are the same accounting';
   }
   const twoD = ASSIGNMENT_POOL.eligible2d.filter((p) => eligible.includes(p));
@@ -1422,7 +1422,7 @@ check('polygon answers the bare list poly trains with a silently empty shape', (
     bare = POLY_BARE_ARRAY.bare(jscad);
   } catch (e) {
     return `polygon([[…]]) throws now (${e.message}) — that would be GOOD NEWS, and it means `
-      + "reference.md's poly crossover table and simple.js's banner are both saying something "
+      + "reference.md's poly crossover table and reshape.js's banner are both saying something "
       + 'false. Rewrite them rather than deleting this check';
   }
   if (!isGeometry(bare)) return 'the bare call no longer returns geometry at all';
@@ -1472,7 +1472,7 @@ for (const i of INTEROP) {
 // ---------------------------------------------------------------------------
 // The graduation table in reference.md, executed rather than read.
 //
-// EQUIVALENTS above proves simple.js matches the real API. It proves nothing
+// EQUIVALENTS above proves reshape.js matches the real API. It proves nothing
 // about what the DOCS say the real API is — and that table is the only place a
 // student is handed the real call to copy. The two drifted once already: the
 // `sit` row was missing `grouped`, which is right for one shape and silently
@@ -2143,7 +2143,7 @@ check('the in-app docs count the numeric types and get the list right', () => {
 check('both doc surfaces name every numeric parameter type', () => {
   const surfaces = [
     ['reference.md', readFileSync(PARAM_TYPES.path, 'utf8')],
-    ['lib/jscad-docs.ts', readFileSync(PARAM_TYPES.inApp, 'utf8')],
+    ['lib/reshape-docs.ts', readFileSync(PARAM_TYPES.inApp, 'utf8')],
   ];
   const bad = [];
   for (const [where, text] of surfaces) {

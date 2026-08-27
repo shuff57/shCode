@@ -336,32 +336,32 @@ The drawing layer is the engine's own 2D-canvas renderer (no q5.js). For graphic
 ---
 
 ## Source 4 — JSCAD (GitHub monorepo + hosted API docs)
-**GitHub:** https://github.com/jscad/OpenJSCAD.org  ·  **API docs:** https://openjscad.xyz/docs/  ·  **Package:** `@jscad/modeling@2.13.0` (+ `@jscad/regl-renderer@2.6.15` for the viewport) via unpkg  ·  **License:** MIT
+**GitHub:** https://github.com/reshape/OpenJSCAD.org  ·  **API docs:** https://openjscad.xyz/docs/  ·  **Package:** `@jscad/modeling@2.13.0` (+ `@jscad/regl-renderer@2.6.15` for the viewport) via unpkg  ·  **License:** MIT
 
 Not vendored — loaded at runtime from unpkg, so JSCAD lessons need internet (unlike moSHion). Anchor notation: `JSCAD → <module> → <fn>`, with a per-function fragment link of the form `<module docs page>#.<fn>` (verified against the generated jsdoc). E.g. `JSCAD → primitives → cube` → `https://openjscad.xyz/docs/module-modeling_primitives.html#.cube`.
 
-### In-repo docs (`public/jscad/docs/`)
+### In-repo docs (`public/reshape/docs/`)
 
 | File | Covers |
 |---|---|
-| `public/jscad/docs/reference.md` | Hand-authored API reference — the exact function subset the course teaches, with signatures + examples |
-| `public/jscad/docs/challenges.md` | 15-challenge ladder for the JSCAD units |
-| `public/jscad/docs/CLAUDE.md` | App integration notes (unpkg versions, CJS shim, preview builder) — dev reference |
-| `public/jscad/docs/LICENSE.md` | MIT notes for @jscad/modeling + @jscad/regl-renderer |
-| `public/jscad/docs/index.html` | Docs index page (open `docs/` in a browser) |
+| `public/reshape/docs/reference.md` | Hand-authored API reference — the exact function subset the course teaches, with signatures + examples |
+| `public/reshape/docs/challenges.md` | 15-challenge ladder for the JSCAD units |
+| `public/reshape/docs/CLAUDE.md` | App integration notes (unpkg versions, CJS shim, preview builder) — dev reference |
+| `public/reshape/docs/LICENSE.md` | MIT notes for @jscad/modeling + @jscad/regl-renderer |
+| `public/reshape/docs/index.html` | Docs index page (open `docs/` in a browser) |
 
-The app also renders a student-facing JSCAD reference at `/docs/jscad` (built from `lib/jscad-docs.ts`, with live runnable examples in the same sandbox style as `/docs/moshion`). Anchor notation for reading rows: `JSCAD → <Section> → <Page title>`.
+The app also renders a student-facing JSCAD reference at `/docs/reshape` (built from `lib/reshape-docs.ts`, with live runnable examples in the same sandbox style as `/docs/moshion`). Anchor notation for reading rows: `JSCAD → <Section> → <Page title>`.
 
 ### GitHub repo (canonical) — the source behind every anchor
 
-**Repo:** https://github.com/jscad/OpenJSCAD.org · Lerna-Lite monorepo, branch `master`. The hosted API docs are **generated from this source** (`jsdoc.json` → `source.include: packages/modeling/src/**` + array-utils + select IO → docdash → `openjscad.xyz/docs/`). Every function anchor resolves to a real file:
+**Repo:** https://github.com/reshape/OpenJSCAD.org · Lerna-Lite monorepo, branch `master`. The hosted API docs are **generated from this source** (`jsdoc.json` → `source.include: packages/modeling/src/**` + array-utils + select IO → docdash → `openjscad.xyz/docs/`). Every function anchor resolves to a real file:
 
 - `packages/modeling/src/` — `@jscad/modeling` source. `src/primitives/cuboid.js` → docs `#.cuboid` (via `@alias module:modeling/primitives.cuboid`). Students can read the implementation behind any API page. Subfolders mirror the doc modules: `primitives/`, `operations/{transforms,booleans,extrusions,hulls}`, `measurements/`, `colors/`, `text/`.
 - `packages/utils/regl-renderer/` — `@jscad/regl-renderer` (viewport/display, W19 UI).
 - `packages/io/` — serializers/deserializers (STL, 3MF, AMF, OBJ, JSON, DXF, SVG, X3D). **STL/OBJ/JSON/DXF are source-only** — not in the JSDoc build; export-format lessons should cite the User Guide (`en:user_guide_formats`) for those.
 - `jsdoc/tutorials/` — the 5 hosted tutorials as markdown: Getting Started · Modeling Basics · **Using Parameters** · Multi-File Projects · Importing Files (→ `tutorial-0X_*.html` on openjscad.xyz).
 - `packages/web/` — browser app (editor + viewport); `README.md` + `demo.html` show self-host UI usage.
-- Wiki: https://github.com/jscad/OpenJSCAD.org/wiki — Reporting Issues + release notes; **not** a citation target for lessons.
+- Wiki: https://github.com/reshape/OpenJSCAD.org/wiki — Reporting Issues + release notes; **not** a citation target for lessons.
 
 ### Hosted doc surfaces (openjscad.xyz)
 

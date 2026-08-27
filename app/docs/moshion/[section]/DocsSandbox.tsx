@@ -9,7 +9,7 @@ import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting } fr
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { tags as t } from '@lezer/highlight';
 import MoshionPreview from '../../../../components/MoshionPreview';
-import JscadPreview from '../../../../components/JscadPreview';
+import ReshapePreview from '../../../../components/ReshapePreview';
 
 // Dracula palette (mirrors CodeEditor.tsx — kept local to avoid coupling)
 const dracula = {
@@ -136,7 +136,7 @@ export default function DocsSandbox({
         <div className="docs-sandbox-preview-header">Preview</div>
         <div className="docs-sandbox-preview-body">
           {preview === 'jscad' ? (
-            <JscadPreview code={code} runKey={runKey} />
+            <ReshapePreview code={code} runKey={runKey} />
           ) : (
             <MoshionPreview code={code} runKey={runKey} />
           )}

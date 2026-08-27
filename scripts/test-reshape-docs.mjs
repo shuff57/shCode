@@ -1,26 +1,26 @@
 #!/usr/bin/env node
-// test-jscad-docs.mjs — the verification gate for the JSCAD docs stack.
+// test-reshape-docs.mjs — the verification gate for the JSCAD docs stack.
 //
 // Six groups. Each one closes a claim the stack currently makes only in prose:
 //
-//   NETWORK    nothing under public/jscad/ or on the preview path pulls a
+//   NETWORK    nothing under public/reshape/ or on the preview path pulls a
 //              resource off the network. A CDN reference works fine at a desk
 //              and dies in a classroom behind a filter.
 //   BUNDLE     the two vendored libraries are present and full-size.
-//   EXAMPLES   every `code` field on every page of lib/jscad-docs.ts is
+//   EXAMPLES   every `code` field on every page of lib/reshape-docs.ts is
 //              executed against the VENDORED bundle inside the SAME shim scope
-//              public/jscad/runner.html gives a student, and must hand back
+//              public/reshape/runner.html gives a student, and must hand back
 //              real geometry. Reported per page, by section slug + page title.
 //   STYLES     bare `cube(...)` and qualified `primitives.cube(...)` both work
 //              and are the same reference — the check that stops a future shim
 //              from wrapping geometry and breaking paste-into-jscad.app.
-//   DRIFT      lib/jscad-docs.ts and public/jscad/docs/reference.md document
+//   DRIFT      lib/reshape-docs.ts and public/reshape/docs/reference.md document
 //              the same API surface. Reported as a WARNING with a count so the
 //              two references cannot silently diverge.
 //   COVERAGE   documented X / Y exports (Z%). Printed every run. This is the
 //              measurable half of the bar.
 //
-// lib/jscad-docs.ts is TypeScript that imports without a file extension, which
+// lib/reshape-docs.ts is TypeScript that imports without a file extension, which
 // neither Node's ESM resolver nor its type stripping will load. So compile it
 // to CommonJS in a temp dir first and require the real `sections` array out of
 // it — the docs are read as DATA, never re-parsed with a regex. Same trick
@@ -28,13 +28,13 @@
 //
 // The runtime itself is never reimplemented here: the bundle is the vendored
 // file evaluated as-is, and the scope shim is cut out of runner.html at run
-// time by scripts/jscad-harness.mjs. Edit the shim and this gate tests the edit.
+// time by scripts/reshape-harness.mjs. Edit the shim and this gate tests the edit.
 //
 // A red check is closed by fixing runner.html, the vendored bundles, or the
-// docs — never by loosening an assertion here. Do not edit lib/jscad-docs.ts
+// docs — never by loosening an assertion here. Do not edit lib/reshape-docs.ts
 // to make an example pass; a failing example is a finding.
 //
-//   node scripts/test-jscad-docs.mjs
+//   node scripts/test-reshape-docs.mjs
 
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
@@ -48,7 +48,7 @@ import { fileURLToPath } from 'node:url';
 import {
   PATHS, createShimContext, runProgram, isGeometry, captureConsole,
   loadModeling, apiNames, documentedNames, docText,
-} from './jscad-harness.mjs';
+} from './reshape-harness.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -100,10 +100,10 @@ const REMOTE_LOAD = [
 ];
 
 // The preview path: the component that mounts the iframe, and the builder that
-// assembles preview HTML. Both are outside public/jscad but are what actually
+// assembles preview HTML. Both are outside public/reshape but are what actually
 // reaches a student.
 const PREVIEW_PATH = [
-  path.join(root, 'components/JscadPreview.tsx'),
+  path.join(root, 'components/ReshapePreview.tsx'),
   path.join(root, 'components/MoshionPreview.tsx'),
   path.join(root, 'lib/preview-builder.ts'),
 ];
@@ -122,13 +122,13 @@ function scanTargets() {
       files.push(p);
     }
   };
-  walk(path.join(root, 'public/jscad'));
+  walk(path.join(root, 'public/reshape'));
   for (const p of PREVIEW_PATH) if (existsSync(p)) files.push(p);
   return files;
 }
 
 const scanned = scanTargets();
-note(`scanned ${scanned.length} files under public/jscad/ + the preview path`);
+note(`scanned ${scanned.length} files under public/reshape/ + the preview path`);
 
 {
   const hits = [];
@@ -201,22 +201,22 @@ for (const [label, p, globalName] of [
 }
 
 {
-  const dir = path.join(root, 'public/jscad/lib');
+  const dir = path.join(root, 'public/reshape/lib');
   const mins = existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith('.min.js')) : [];
-  ok('public/jscad/lib/*.min.js is non-empty', mins.length >= 2, `found ${JSON.stringify(mins)}`);
+  ok('public/reshape/lib/*.min.js is non-empty', mins.length >= 2, `found ${JSON.stringify(mins)}`);
 }
 
 // ---------------------------------------------------------------------------
 // EVERY DOCUMENTED EXAMPLE RUNS
 // ---------------------------------------------------------------------------
 //
-// Compile lib/jscad-docs.ts to CommonJS in a temp dir and require the real
+// Compile lib/reshape-docs.ts to CommonJS in a temp dir and require the real
 // `sections` array. Reading the docs as data is what gives every result a
 // section slug and a page title instead of a line number.
 
 section('documented examples');
 
-const outDir = mkdtempSync(path.join(tmpdir(), 'shcode-jscad-docs-'));
+const outDir = mkdtempSync(path.join(tmpdir(), 'shcode-reshape-docs-'));
 let sections = null;
 
 try {
@@ -226,7 +226,7 @@ try {
       [
         path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
         'lib/docs-core.ts',
-        'lib/jscad-docs.ts',
+        'lib/reshape-docs.ts',
         '--outDir', outDir,
         '--module', 'commonjs',
         '--target', 'es2022',
@@ -238,13 +238,13 @@ try {
     // package.json with "type": "module" can't reinterpret them as ESM.
     writeFileSync(path.join(outDir, 'package.json'), '{"type":"commonjs"}');
     const require = createRequire(path.join(outDir, 'noop.cjs'));
-    sections = require(path.join(outDir, 'jscad-docs.js')).sections;
+    sections = require(path.join(outDir, 'reshape-docs.js')).sections;
   } catch (e) {
-    ok('lib/jscad-docs.ts compiles and exports `sections`', false, e.message);
+    ok('lib/reshape-docs.ts compiles and exports `sections`', false, e.message);
   }
 
   if (sections) {
-    ok('lib/jscad-docs.ts compiles and exports `sections`', Array.isArray(sections) && sections.length > 0,
+    ok('lib/reshape-docs.ts compiles and exports `sections`', Array.isArray(sections) && sections.length > 0,
       `got ${JSON.stringify(sections)?.slice(0, 80)}`);
 
     const pages = [];
@@ -267,7 +267,7 @@ try {
       let r;
       try {
         const { ctx } = createShimContext({ consoleImpl: cap.console });
-        r = runProgram(ctx, p.code, `lib/jscad-docs.ts<${label}>`);
+        r = runProgram(ctx, p.code, `lib/reshape-docs.ts<${label}>`);
       } catch (e) {
         ok(label, false, `context build threw: ${e.message}`);
         continue;
@@ -335,7 +335,7 @@ section('both call styles');
 }
 
 // ---------------------------------------------------------------------------
-// DRIFT between lib/jscad-docs.ts and public/jscad/docs/reference.md
+// DRIFT between lib/reshape-docs.ts and public/reshape/docs/reference.md
 // ---------------------------------------------------------------------------
 //
 // Warnings, not failures: the two references are allowed to differ on purpose
@@ -354,11 +354,11 @@ const refDocumented = documentedNames(docText.reference(), exportNames);
 const onlyInApp = exportNames.filter((n) => inAppDocumented.has(n) && !refDocumented.has(n));
 const onlyRef = exportNames.filter((n) => refDocumented.has(n) && !inAppDocumented.has(n));
 
-if (onlyInApp.length === 0) ok('nothing in lib/jscad-docs.ts is missing from reference.md', true);
-else warn(`${onlyInApp.length} function(s) in lib/jscad-docs.ts but not in reference.md`, onlyInApp.join(', '));
+if (onlyInApp.length === 0) ok('nothing in lib/reshape-docs.ts is missing from reference.md', true);
+else warn(`${onlyInApp.length} function(s) in lib/reshape-docs.ts but not in reference.md`, onlyInApp.join(', '));
 
-if (onlyRef.length === 0) ok('nothing in reference.md is missing from lib/jscad-docs.ts', true);
-else warn(`${onlyRef.length} function(s) in reference.md but not in lib/jscad-docs.ts`, onlyRef.join(', '));
+if (onlyRef.length === 0) ok('nothing in reference.md is missing from lib/reshape-docs.ts', true);
+else warn(`${onlyRef.length} function(s) in reference.md but not in lib/reshape-docs.ts`, onlyRef.join(', '));
 
 note(`drift total: ${onlyInApp.length + onlyRef.length} name(s)`);
 
@@ -374,7 +374,7 @@ section('coverage');
   const x = documented.size;
   const z = y === 0 ? 0 : Math.round((x / y) * 1000) / 10;
   console.log(`  ----  documented ${x} / ${y} exports (${z}%)`);
-  console.log(`  ----    lib/jscad-docs.ts: ${inAppDocumented.size}   reference.md: ${refDocumented.size}`);
+  console.log(`  ----    lib/reshape-docs.ts: ${inAppDocumented.size}   reference.md: ${refDocumented.size}`);
   // 94 uniquely-named exported functions across the 15 modules as of
   // @jscad/modeling@2.13.0. The floor only has to catch a bundle that failed to
   // load and reported 0/0 as "100%".

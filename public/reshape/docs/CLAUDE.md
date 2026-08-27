@@ -5,43 +5,43 @@ JSCAD integration in this repository.
 
 ## Repository layout
 
-JSCAD **is vendored**. Both bundles live in `public/jscad/lib/` and nothing
+JSCAD **is vendored**. Both bundles live in `public/reshape/lib/` and nothing
 loads from a CDN at runtime.
 
-- `public/jscad/lib/jscad-modeling.min.js` — `@jscad/modeling@2.13.0` (UMD).
-- `public/jscad/lib/jscad-regl-renderer.min.js` — `@jscad/regl-renderer@2.6.15` (UMD).
-- `public/jscad/runner.html` — the 3D preview iframe. Same shape as
+- `public/reshape/lib/jscad-modeling.min.js` — `@jscad/modeling@2.13.0` (UMD).
+- `public/reshape/lib/jscad-regl-renderer.min.js` — `@jscad/regl-renderer@2.6.15` (UMD).
+- `public/reshape/runner.html` — the 3D preview iframe. Same shape as
   `public/moshion/runner.html`: reads the student code from `?code=<base64url>`,
   pipes console + errors to the parent over the `preview-console` /
   `preview-error` protocol, loads the two vendored bundles by relative path,
   installs the additive scope shim, runs `main()`, renders with
   `@jscad/regl-renderer`.
-- `public/jscad/simple.js` — **shCAD**, the simplified nine-name layer the
+- `public/reshape/reshape.js` — **shCAD**, the simplified nine-name layer the
   course teaches for the whole of Q3. Additive, in its own file, loaded by
   `runner.html` after the shim and before student code. See the amended
   invariant below.
-- `lib/jscad-docs.ts` — the in-app `/docs/jscad` content (sections, pages,
+- `lib/reshape-docs.ts` — the in-app `/docs/reshape` content (sections, pages,
   runnable examples). Hand-authored against `@jscad/modeling@2.13.0`.
-- `components/JscadPreview.tsx` — iframe wrapper; takes `{ code, runKey }` and
-  builds `src=/jscad/runner.html?code=…&r=…`, mirroring `MoshionPreview.tsx`.
-- `app/docs/jscad/` — the in-app docs route (reuses the moSHion docs client
+- `components/ReshapePreview.tsx` — iframe wrapper; takes `{ code, runKey }` and
+  builds `src=/reshape/runner.html?code=…&r=…`, mirroring `MoshionPreview.tsx`.
+- `app/docs/reshape/` — the in-app docs route (reuses the moSHion docs client
   and sandbox components).
 - `lessons/jscad-*` — the JSCAD lessons (jscad-intro, jscad-2d-shapes,
   jscad-booleans).
 
 ## Versions (keep in sync)
 
-- `@jscad/modeling@2.13.0` — vendored at `public/jscad/lib/jscad-modeling.min.js`.
-- `@jscad/regl-renderer@2.6.15` — vendored at `public/jscad/lib/jscad-regl-renderer.min.js`.
+- `@jscad/modeling@2.13.0` — vendored at `public/reshape/lib/jscad-modeling.min.js`.
+- `@jscad/regl-renderer@2.6.15` — vendored at `public/reshape/lib/jscad-regl-renderer.min.js`.
 
-If either version bumps, re-download the bundle into `public/jscad/lib/`, then
-re-check the collision list in the shim banner in `public/jscad/runner.html`
+If either version bumps, re-download the bundle into `public/reshape/lib/`, then
+re-check the collision list in the shim banner in `public/reshape/runner.html`
 (`window.__jscadBareNamesSkipped` in the preview console is the live answer)
 and update the version notes here and in `docs/README.md`.
 
 ## Runtime architecture
 
-The preview iframe (`public/jscad/runner.html`):
+The preview iframe (`public/reshape/runner.html`):
 
 1. Installs the console/error reporter, then loads the two vendored bundles by
    relative path. They are UMD and must load *before* the shim declares
@@ -71,7 +71,7 @@ The preview iframe (`public/jscad/runner.html`):
   **This invariant used to end "and no new function name is invented", and
   shCAD deliberately amends that half of it.** The SHIM still invents nothing —
   it copies real names onto `window` and does not add a tenth thing. shCAD is a
-  separate additive layer in its own file, `public/jscad/simple.js`, loaded
+  separate additive layer in its own file, `public/reshape/reshape.js`, loaded
   after the shim and before student code, which adds nine NEW names (`box`,
   `rect`, `disc`, `ball`, `tube`, `extrude`, `revolve`, `turn`, `sit`) and
   never renames, wraps or overwrites a real one — every name is a new word, not
@@ -85,7 +85,7 @@ The preview iframe (`public/jscad/runner.html`):
   something — which is the objects lesson the book has no chapter for yet.
   Every shCAD call returns the same real geometry the call it stands for
   returns, so the two vocabularies mix in one file and graduation is a rename.
-  Its own banner carries the design; `scripts/jscad-simple-checks.mjs` carries
+  Its own banner carries the design; `scripts/reshape-simple-checks.mjs` carries
   the expectations.
 
   **`turn` is the one exception, and it diverges twice.** The pivot is the
@@ -124,7 +124,7 @@ The preview iframe (`public/jscad/runner.html`):
   `getParameterDefinitions`, `main({})`. Parameter examples must still work
   from defaults alone. The live parameter panel is a jscad.app feature.
 - **The docs examples are verified.** Every `code` block in
-  `lib/jscad-docs.ts` and every ` ```js ` block in `docs/reference.md` is run
+  `lib/reshape-docs.ts` and every ` ```js ` block in `docs/reference.md` is run
   by `npm test` against the vendored bundle, in a require-only context — the
   jscad.app environment, with the shim subtracted back out. An example that
   needs a bare shim name fails the build.
@@ -132,14 +132,14 @@ The preview iframe (`public/jscad/runner.html`):
   the same API subset; a new page in one belongs in the other. `npm test`
   enforces this: the two files must document the same set of
   `@jscad/modeling` function names, with any deliberate asymmetry recorded in
-  `DOC_SYNC_EXCEPTIONS` in `scripts/jscad-checks.mjs`.
+  `DOC_SYNC_EXCEPTIONS` in `scripts/reshape-checks.mjs`.
 
 ## The gate
 
-`npm test` (or `npm run test:jscad`) runs `scripts/test-jscad.mjs` — 449 checks
+`npm test` (or `npm run test:jscad`) runs `scripts/test-reshape.mjs` — 449 checks
 in eight groups: BUNDLE, SHIM, API, RENDERER, DOCS, SYNC, REACH, SIMPLE. It
 evaluates the real vendored bundles, the scope shim **cut live out of
-`runner.html`**, and `public/jscad/simple.js` read off disk, in a `node:vm`
+`runner.html`**, and `public/reshape/reshape.js` read off disk, in a `node:vm`
 context — so editing any of the three tests the edit; nothing is reimplemented
 in the test.
 
@@ -161,7 +161,7 @@ makes them un-abusable — a `skeleton` that returns geometry, or a
 - ` ```js shcode-only ` — the example depends on the shim and is NOT portable.
 
 The SIMPLE group adds twelve more, the first three about shCAD staying additive: none of its
-nine names exists before `simple.js` runs, no real JSCAD name resolves to
+nine names exists before `reshape.js` runs, no real JSCAD name resolves to
 anything different afterwards, and every shCAD call builds geometry **identical**
 to the real call it stands for — serialised and compared, not just counted, so
 a helpful default drifting in would fail. `turn` is exempt from that last one on
@@ -171,7 +171,7 @@ that fails if it ever becomes a plain `transforms.rotate`.
 The fourth is the one to know about. **The graduation table in `reference.md`
 is executed, both halves of every row, and the two results compared as whole
 geometry.** That table is the only place a student is handed the real call to
-copy at the moment they leave shCAD, and proving `simple.js` matches the real
+copy at the moment they leave shCAD, and proving `reshape.js` matches the real
 API proves nothing about what the docs *say* the real API is. The two drifted
 once already: the `sit` row was missing `grouped`, which is correct for a single
 shape and silently collapses an assembly onto `z = 0` — every part dropped
@@ -291,9 +291,9 @@ theirs first. `extrude` hides that (its required value *becomes* the leading
 The swap is a table row, a paragraph in `reference.md`, and a named error rather
 than an inherited surprise.
 
-Runtime builders must not edit `scripts/test-jscad.mjs`,
-`scripts/jscad-checks.mjs` or `scripts/jscad-simple-checks.mjs`. A red check is
-closed by fixing the runner, `simple.js`, the bundles, or the docs.
+Runtime builders must not edit `scripts/test-reshape.mjs`,
+`scripts/reshape-checks.mjs` or `scripts/reshape-simple-checks.mjs`. A red check is
+closed by fixing the runner, `reshape.js`, the bundles, or the docs.
 
 ## Consuming JSCAD (context for user-facing questions)
 

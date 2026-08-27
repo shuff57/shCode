@@ -8,7 +8,7 @@
 // adding, deleting or reordering a feature regenerates the file.
 //
 // It emits shCAD spellings -- box, tube, ball, extrude, turn -- which are
-// globals installed by public/jscad/simple.js, so a student reads the same names
+// globals installed by public/reshape/reshape.js, so a student reads the same names
 // the lessons teach rather than a second dialect alongside them.
 //
 // THE COST, stated because it used to be a selling point: the generated file no
@@ -556,7 +556,7 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
 
   if (f.kind === 'revolve') {
     // revolve() (shCAD) refuses an `angle` option by name -- see REAL_EXTRAS
-    // in simple.js -- and hands the student the real call instead. Build mode
+    // in reshape.js -- and hands the student the real call instead. Build mode
     // exposes that exact angle as a dial, so it has to be the real call too:
     // extrudeRotate sweeps the profile around the world Z axis, taking the
     // profile's own x as the radius, same as revolve(profile) would for the

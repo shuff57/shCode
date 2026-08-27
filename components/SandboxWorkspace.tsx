@@ -5,8 +5,8 @@ import { Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw } from '
 import { useLessonStore } from '../lib/store';
 import CodeEditor from './CodeEditor';
 import MoshionPreview from './MoshionPreview';
-import JscadPreview from './JscadPreview';
-import JscadParamsPanel, { type ParamDef, type ParamValues } from './JscadParamsPanel';
+import ReshapePreview from './ReshapePreview';
+import ReshapeParamsPanel, { type ParamDef, type ParamValues } from './ReshapeParamsPanel';
 import Console from './Console';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
@@ -800,7 +800,7 @@ export default function SandboxWorkspace() {
             ) : isJscad ? (
               <div className="jscad-pane">
                 <div className="jscad-pane-view">
-                  <JscadPreview ref={frameRef} code={code} runKey={runKey} />
+                  <ReshapePreview ref={frameRef} code={code} runKey={runKey} />
                   {build && (
                     <HandleOverlay
                       points={anchors}
@@ -814,7 +814,7 @@ export default function SandboxWorkspace() {
                 </div>
                 {runKey > 0 && (
                   <aside className="jscad-pane-params">
-                    <JscadParamsPanel
+                    <ReshapeParamsPanel
                       defs={paramDefs}
                       values={paramValues}
                       onChange={sendParams}

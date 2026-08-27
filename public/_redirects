@@ -1,2 +1,4 @@
 /docs/shplay/* /docs/moshion/:splat 301
 /docs/shplay   /docs/moshion/ 301
+/docs/jscad/* /docs/reshape/:splat 301
+/docs/jscad   /docs/reshape/ 301

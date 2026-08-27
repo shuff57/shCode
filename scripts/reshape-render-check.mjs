@@ -1,17 +1,17 @@
 #!/usr/bin/env node
-// jscad-render-check.mjs — the half of the JSCAD gate that needs a real GPU.
+// reshape-render-check.mjs — the half of the JSCAD gate that needs a real GPU.
 //
-// scripts/test-jscad.mjs covers everything a node vm can reach. It cannot
-// reach render(): ~160 lines in public/jscad/runner.html that call
+// scripts/test-reshape.mjs covers everything a node vm can reach. It cannot
+// reach render(): ~160 lines in public/reshape/runner.html that call
 // regl.prepareRender, which needs a live WebGL context. Those lines were
 // correct-by-assertion until this script existed.
 //
 // It is NOT part of `npm test`, because it needs a browser binary that is not
 // a repo dependency. Run it by hand when runner.html's rendering changes:
 //
-//     node scripts/jscad-render-check.mjs                     # chromium
-//     node scripts/jscad-render-check.mjs --browser=firefox
-//     node scripts/jscad-render-check.mjs --browser=webkit
+//     node scripts/reshape-render-check.mjs                     # chromium
+//     node scripts/reshape-render-check.mjs --browser=firefox
+//     node scripts/reshape-render-check.mjs --browser=webkit
 //
 // Playwright is resolved from the repo first, then from a global install. If
 // neither is present the script says so and exits 2 (skipped), never 0 —
@@ -27,9 +27,9 @@
 //     student's own file, line, column and source line
 //
 // PHASE 2 runs only when out/ exists (i.e. after `npm run build`) and is the
-// reachability proof: it opens the BUILT /docs/jscad pages, clicks Run, and
+// reachability proof: it opens the BUILT /docs/reshape pages, clicks Run, and
 // reads which runner the sandbox actually mounted. The REACH group in
-// test-jscad.mjs asserts that wire from source; this one watches it happen.
+// test-reshape.mjs asserts that wire from source; this one watches it happen.
 // It checks /docs/moshion in the same pass, because the failure that shipped
 // last time was two wires crossed, not one wire missing.
 //
@@ -43,7 +43,7 @@
 //     other two gave "script.js:2:3" — because webkit ignores the
 //     //# sourceURL pragma and labels an injected script with the DOCUMENT
 //     url, so runner.html's stack regex found no *.js it recognised. Fixed by
-//     engineFrame() in public/jscad/runner.html. All three engines now blame
+//     engineFrame() in public/reshape/runner.html. All three engines now blame
 //     the same LINE; only the column differs (JSC points at the identifier,
 //     V8 at the start of the call), which nothing depends on.
 //
@@ -199,7 +199,7 @@ for (const c of CASES) {
   // local origin — and any request that leaves that origin shows up in
   // `external`, which is how the no-CDN claim gets measured rather than read.
   //
-  // The sandbox attribute below must MIRROR components/JscadPreview.tsx. Drop
+  // The sandbox attribute below must MIRROR components/ReshapePreview.tsx. Drop
   // it and this check quietly starts proving a configuration that never ships:
   // the runner would run same-origin here and opaque-origin in the app, so a
   // regression that only breaks under the sandbox would pass.
@@ -212,13 +212,13 @@ for (const c of CASES) {
     </script>
     <iframe id="f" style="width:640px;height:480px;border:0"
       sandbox="allow-scripts allow-downloads"
-      src="${base}/jscad/runner.html?code=${b64url(c.code)}&r=1"></iframe>
+      src="${base}/reshape/runner.html?code=${b64url(c.code)}&r=1"></iframe>
   </body>`, { waitUntil: 'load' });
 
   // Give the render loop a few frames.
   await page.waitForTimeout(WAIT);
 
-  const frame = page.frames().find((f) => f.url().includes('/jscad/runner.html'));
+  const frame = page.frames().find((f) => f.url().includes('/reshape/runner.html'));
   const probe = frame
     ? await frame.evaluate(() => {
         const canvas = document.querySelector('#__jscadViewer canvas');
@@ -293,8 +293,8 @@ for (const c of CASES) {
 const OUT = join(REPO, 'out');
 let reachTotal = 0, reachBad = 0;
 
-if (!existsSync(join(OUT, 'docs/jscad'))) {
-  console.log('\nphase 2 skipped - no out/docs/jscad. Run `npm run build` first to check reachability.');
+if (!existsSync(join(OUT, 'docs/reshape'))) {
+  console.log('\nphase 2 skipped - no out/docs/reshape. Run `npm run build` first to check reachability.');
 } else {
   const outServer = http.createServer((req, res) => {
     let file = join(OUT, decodeURIComponent(req.url.split('?')[0]));
@@ -308,8 +308,8 @@ if (!existsSync(join(OUT, 'docs/jscad'))) {
   const outBase = `http://127.0.0.1:${outServer.address().port}`;
 
   const TARGETS = [
-    { url: '/docs/jscad/overview/', expect: '/jscad/runner.html', label: 'JSCAD docs - overview' },
-    { url: '/docs/jscad/booleans/', expect: '/jscad/runner.html', label: 'JSCAD docs - booleans' },
+    { url: '/docs/reshape/overview/', expect: '/reshape/runner.html', label: 'JSCAD docs - overview' },
+    { url: '/docs/reshape/booleans/', expect: '/reshape/runner.html', label: 'JSCAD docs - booleans' },
     { url: '/docs/moshion/overview/', expect: '/moshion/runner.html', label: 'moSHion docs - wires not crossed' },
   ];
   reachTotal = TARGETS.length;

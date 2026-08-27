@@ -15,7 +15,7 @@ import { RUNNER_SOURCE, RUN_MAX_LOGS, RUN_TIMEOUT_MS } from '../lib/js-runner-so
 import FileExplorer from './FileExplorer';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
-import JscadPreview from './JscadPreview';
+import ReshapePreview from './ReshapePreview';
 import MoshionPreview from './MoshionPreview';
 import RequirementsSection from './RequirementsSection';
 import PlanChartPanel from './PlanChartPanel';
@@ -397,7 +397,7 @@ export default function LessonWorkspace({
   }
 
   // For JSCAD lessons: snapshot the current code and bump runKey to reload the
-  // iframe. Same shape as runQ5 — the runner lives at /jscad/runner.html and
+  // iframe. Same shape as runQ5 — the runner lives at /reshape/runner.html and
   // reads the code from its ?code= param.
   function runJscad() {
     setRuntimeError(null);
@@ -889,7 +889,7 @@ export default function LessonWorkspace({
                   </pre>
                 </>
               ) : isJscadMode ? (
-                <JscadPreview code={jscadCode} runKey={runKey} />
+                <ReshapePreview code={jscadCode} runKey={runKey} />
               ) : isMoshionMode ? (
                 <MoshionPreview code={q5Code} runKey={runKey} />
               ) : (

@@ -2,7 +2,7 @@
 
 Reference material for the JSCAD 3D-modeling unit (Q3–Q4 of the course).
 JSCAD **is vendored** — `@jscad/modeling` and `@jscad/regl-renderer` live in
-`public/jscad/lib/` and are loaded by `public/jscad/runner.html` over relative
+`public/reshape/lib/` and are loaded by `public/reshape/runner.html` over relative
 paths. Nothing loads from a CDN at runtime.
 
 ## What's in this folder
@@ -17,7 +17,7 @@ paths. Nothing loads from a CDN at runtime.
 
 ## Where the docs live in the app
 
-- **In-app:** `/docs/jscad` — built from `lib/jscad-docs.ts`, with live
+- **In-app:** `/docs/reshape` — built from `lib/reshape-docs.ts`, with live
   runnable examples in the same sandbox style as `/docs/moshion`.
 - **External (canonical):** https://openjscad.xyz/docs/ — the generated JSDoc
   for the full `@jscad/modeling` surface. The in-app docs cover only what the
@@ -25,9 +25,9 @@ paths. Nothing loads from a CDN at runtime.
 
 ## Versions
 
-- `@jscad/modeling@2.13.0` — vendored at `public/jscad/lib/jscad-modeling.min.js`.
+- `@jscad/modeling@2.13.0` — vendored at `public/reshape/lib/jscad-modeling.min.js`.
 - `@jscad/regl-renderer@2.6.15` — the 3D viewport renderer, vendored at
-  `public/jscad/lib/jscad-regl-renderer.min.js`.
+  `public/reshape/lib/jscad-regl-renderer.min.js`.
 
 ## Licensing
 

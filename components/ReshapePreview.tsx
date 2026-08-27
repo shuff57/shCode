@@ -8,7 +8,7 @@ interface Props {
   runKey: number;
 }
 
-const JscadPreview = forwardRef<HTMLIFrameElement, Props>(function JscadPreview(
+const ReshapePreview = forwardRef<HTMLIFrameElement, Props>(function ReshapePreview(
   { code, runKey },
   ref
 ) {
@@ -19,7 +19,7 @@ const JscadPreview = forwardRef<HTMLIFrameElement, Props>(function JscadPreview(
       </div>
     );
   }
-  const src = `/jscad/runner.html?code=${encodeCode(code)}&r=${runKey}`;
+  const src = `/reshape/runner.html?code=${encodeCode(code)}&r=${runKey}`;
   return (
     <iframe
       ref={ref}
@@ -41,4 +41,4 @@ const JscadPreview = forwardRef<HTMLIFrameElement, Props>(function JscadPreview(
   );
 });
 
-export default JscadPreview;
+export default ReshapePreview;

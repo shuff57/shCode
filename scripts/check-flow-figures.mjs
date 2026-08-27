@@ -84,7 +84,7 @@ try {
   // pages. Whichever of them exist get walked — a missing one is not an error,
   // but a new one must not silently go unchecked, so this is a directory list
   // rather than a hardcoded pair.
-  const roots = ['lessons', 'docs', 'public/jscad/docs', 'public/moshion/docs']
+  const roots = ['lessons', 'docs', 'public/reshape/docs', 'public/moshion/docs']
     .map((d) => path.join(root, d))
     .filter(existsSync);
   for (const file of roots.flatMap((d) => markdown(d))) {

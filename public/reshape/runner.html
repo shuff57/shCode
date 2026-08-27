@@ -260,7 +260,7 @@
 	var jscad = window.jscadModeling;
 	var statusEl = document.getElementById('__jscadStatus');
 	if (!jscad) {
-		statusEl.textContent = 'Failed to load @jscad/modeling from /jscad/lib/ — try refreshing.';
+		statusEl.textContent = 'Failed to load @jscad/modeling from /reshape/lib/ — try refreshing.';
 		return;
 	}
 
@@ -345,8 +345,8 @@
      Additive, in its own file, loaded AFTER the shim above so it can see every
      real name and refuse to overwrite one, and BEFORE the ?code= injection
      below so a student's own declarations still win. Its banner explains the
-     design; scripts/jscad-simple-checks.mjs holds its expectations. -->
-<script src="./simple.js"></script>
+     design; scripts/reshape-simple-checks.mjs holds its expectations. -->
+<script src="./reshape.js"></script>
 <script src="./svg.js"></script>
 <script>
 // Read student code from ?code=<base64url> (written by encodeCode() in
@@ -355,7 +355,7 @@
 (function() {
 	// Never execute ?code= as a top-level document.
 	//
-	// Embedded by JscadPreview this frame carries sandbox="allow-scripts"
+	// Embedded by ReshapePreview this frame carries sandbox="allow-scripts"
 	// WITHOUT allow-same-origin, so student code runs in an opaque origin and
 	// cannot touch the app. Opened directly — a link someone was sent — there
 	// is no iframe and no sandbox, and the injected script would run on the
@@ -494,7 +494,7 @@
 	}
 
 	if (!jscad || !regl) {
-		fail('Failed to load the JSCAD libraries from /jscad/lib/. Try refreshing the page.');
+		fail('Failed to load the JSCAD libraries from /reshape/lib/. Try refreshing the page.');
 		return;
 	}
 	if (!window.__previewSources) { statusEl.textContent = ''; return; }  // nothing submitted

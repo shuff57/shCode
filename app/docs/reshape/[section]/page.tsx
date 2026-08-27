@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { getAllSectionSlugs, getSection, sections } from '../../../../lib/jscad-docs';
+import { getAllSectionSlugs, getSection, sections } from '../../../../lib/reshape-docs';
 import DocsClient from '../../moshion/[section]/DocsClient';
 
 export function generateStaticParams() {
@@ -20,7 +20,7 @@ export default async function JscadDocsSectionPage({
       <DocsClient
         section={section}
         allSections={sections}
-        basePath="/docs/jscad"
+        basePath="/docs/reshape"
         docsTitle="JSCAD reference"
         searchPlaceholder="Search the JSCAD docs…"
         preview="jscad"

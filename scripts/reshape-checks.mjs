@@ -1,13 +1,13 @@
-// jscad-checks.mjs — what the JSCAD gate knows, as data.
+// reshape-checks.mjs — what the JSCAD gate knows, as data.
 //
-// Split out from test-jscad.mjs for the same reason moshion-checks.mjs is split
+// Split out from test-reshape.mjs for the same reason moshion-checks.mjs is split
 // out of test-moshion.mjs: the mechanics and the expectations are edited by
 // different people for different reasons. A number in here changes because the
-// library or the curriculum changed. A line in test-jscad.mjs changes because
+// library or the curriculum changed. A line in test-reshape.mjs changes because
 // the gate itself was wrong.
 //
 // Runtime builders MUST NOT edit this file to make a red check go green.
-// A red check is closed by fixing public/jscad/runner.html, the vendored
+// A red check is closed by fixing public/reshape/runner.html, the vendored
 // bundles, or the docs — never by loosening an expectation here.
 
 // ---------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * would leave every check green while the docs described a different library
  * than jscad.app runs. The version was a prose comment and nothing more.
  *
- * `sha256` is the measured hash of the file in public/jscad/lib/. For the two
+ * `sha256` is the measured hash of the file in public/reshape/lib/. For the two
  * marked verified:true it is a BYTE-EXACT match against the published artifact
  * at `source`, fetched and compared 2026-08-22 — so the version is a
  * measurement, not a claim.
@@ -101,7 +101,7 @@ export const EXPECTED_BARE_NAME_COUNT = 124;
  * friendlier object and quietly breaking paste-into-jscad.app.
  *
  * This list is the floor. jscad-harness/test-jscad additionally derives the
- * full taught set from the tables in public/jscad/docs/reference.md, so a name
+ * full taught set from the tables in public/reshape/docs/reference.md, so a name
  * added to the docs is covered without anyone remembering to add it here; the
  * floor exists so deleting a docs table cannot silently shrink the gate.
  */
@@ -191,7 +191,7 @@ export const ENTITY_GEOMETRY_KEYS = ['type', 'positions', 'normals', 'indices', 
 // ---------------------------------------------------------------------------
 
 /**
- * public/jscad/docs/CLAUDE.md: "The in-app docs and docs/reference.md must
+ * public/reshape/docs/CLAUDE.md: "The in-app docs and docs/reference.md must
  * stay in sync." Empty means the rule holds with no exceptions today. An entry
  * is a deliberate, reviewed asymmetry — name it and say why, or fix the docs.
  */
@@ -218,11 +218,11 @@ export const FENCE_TAGS = {
 // ---------------------------------------------------------------------------
 
 /**
- * The wire from "a student clicks JSCAD in the header" to "public/jscad/runner.html
+ * The wire from "a student clicks JSCAD in the header" to "public/reshape/runner.html
  * loads". Every other group in this gate asserts that the runtime is CORRECT.
  * None of them asserted that anything LOADS it, and for the whole of the first
  * build nothing did: DocsSandbox declared `preview = 'moshion'` as a default and
- * DocsClient never passed a value, so /docs/jscad piped JSCAD source into the
+ * DocsClient never passed a value, so /docs/reshape piped JSCAD source into the
  * moSHion runner and all 24 examples died on `require is not defined`. 67 green
  * checks, zero reachable users.
  *
@@ -241,13 +241,13 @@ export const REACH_CHAIN = [
   {
     file: 'components/HeaderNav.tsx',
     role: 'a student can reach the JSCAD docs from the site nav',
-    requires: [{ what: 'a nav link to /docs/jscad', pattern: /href="\/docs\/jscad"/ }],
+    requires: [{ what: 'a nav link to /docs/reshape', pattern: /href="\/docs\/reshape"/ }],
     // Not an import — the hop from a nav href to a page is Next.js filesystem
     // routing, so the next file is DERIVED from the href this link carries.
-    nextRoute: { hrefPattern: /href="(\/docs\/jscad)"/, page: '[section]/page.tsx' },
+    nextRoute: { hrefPattern: /href="(\/docs\/reshape)"/, page: '[section]/page.tsx' },
   },
   {
-    file: 'app/docs/jscad/[section]/page.tsx',
+    file: 'app/docs/reshape/[section]/page.tsx',
     role: 'the JSCAD docs route tells the client which runtime its code is for',
     requires: [{ what: 'preview="jscad" handed to DocsClient', pattern: /preview="jscad"/ }],
     next: 'DocsClient',
@@ -268,7 +268,7 @@ export const REACH_CHAIN = [
     role: 'the sandbox picks the runner from the runtime it was told, with no default',
     requires: [
       { what: 'preview is a REQUIRED prop', pattern: /^\s*preview: 'moshion' \| 'jscad';/m },
-      { what: "a preview === 'jscad' branch rendering JscadPreview", pattern: /preview === 'jscad'[\s\S]{0,120}<JscadPreview/ },
+      { what: "a preview === 'jscad' branch rendering ReshapePreview", pattern: /preview === 'jscad'[\s\S]{0,120}<ReshapePreview/ },
     ],
     forbids: [
       // The exact regression. A default here silently swallows a missing prop
@@ -276,16 +276,16 @@ export const REACH_CHAIN = [
       { what: "a defaulted preview ('moshion' wins by silence)", pattern: /preview\s*=\s*'/ },
       { what: 'an optional preview prop', pattern: /preview\?:/ },
     ],
-    next: 'JscadPreview',
+    next: 'ReshapePreview',
   },
   {
-    file: 'components/JscadPreview.tsx',
+    file: 'components/ReshapePreview.tsx',
     role: 'the preview component points an iframe at the vendored JSCAD runner',
     requires: [
-      { what: 'src built from /jscad/runner.html', pattern: /\/jscad\/runner\.html\?code=/ },
+      { what: 'src built from /reshape/runner.html', pattern: /\/reshape\/runner\.html\?code=/ },
       { what: 'the shared base64 encoder', pattern: /encodeCode\(code\)/ },
     ],
-    asset: 'public/jscad/runner.html',
+    asset: 'public/reshape/runner.html',
   },
 ];
 
@@ -299,8 +299,8 @@ export const REACH_LESSON = {
   file: 'components/LessonWorkspace.tsx',
   requires: [
     { what: "isJscadMode derived from lesson.preview", pattern: /isJscadMode\s*=\s*lesson\.preview === 'jscad'/ },
-    { what: 'a render branch mounting JscadPreview', pattern: /isJscadMode \?[\s\S]{0,80}<JscadPreview/ },
-    { what: 'JscadPreview receives code and runKey', pattern: /<JscadPreview code=\{jscadCode\} runKey=\{runKey\} \/>/ },
+    { what: 'a render branch mounting ReshapePreview', pattern: /isJscadMode \?[\s\S]{0,80}<ReshapePreview/ },
+    { what: 'ReshapePreview receives code and runKey', pattern: /<ReshapePreview code=\{jscadCode\} runKey=\{runKey\} \/>/ },
   ],
 };
 

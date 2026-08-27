@@ -3,7 +3,7 @@
 // Extracted so a compatibility gate can build geometry without importing
 // scripts/model-codegen-assertions.cjs, whose build() is private to its run()
 // and whose file is deliberately hands-off during a gauntlet. Same sandbox
-// recipe: the modeling bundle, then simple.js on top, because the generated
+// recipe: the modeling bundle, then reshape.js on top, because the generated
 // code calls shCAD's bare names and genuinely does not work without them.
 
 const fs = require('fs');
@@ -12,8 +12,8 @@ const vm = require('vm');
 
 /** A context with the vendored bundle and the shCAD globals already in it. */
 function makeSandbox() {
-  const bundlePath = path.join(__dirname, '..', 'public', 'jscad', 'lib', 'jscad-modeling.min.js');
-  const simplePath = path.join(__dirname, '..', 'public', 'jscad', 'simple.js');
+  const bundlePath = path.join(__dirname, '..', 'public', 'reshape', 'lib', 'jscad-modeling.min.js');
+  const simplePath = path.join(__dirname, '..', 'public', 'reshape', 'reshape.js');
   for (const p of [bundlePath, simplePath]) {
     if (!fs.existsSync(p)) throw new Error(`missing ${path.relative(process.cwd(), p)}`);
   }

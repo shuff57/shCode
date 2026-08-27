@@ -1,4 +1,4 @@
-// jscad-harness.mjs — the machinery the JSCAD gate runs on.
+// reshape-harness.mjs — the machinery the JSCAD gate runs on.
 //
 // Nothing in here decides pass or fail; it only builds the two contexts the
 // checks need and pulls the real artifacts out of the repo. The rule that
@@ -6,7 +6,7 @@
 //
 //   * the modeling bundle is the vendored file, evaluated as-is
 //   * the regl bundle is the vendored file, evaluated as-is
-//   * the scope shim is CUT OUT OF public/jscad/runner.html at run time,
+//   * the scope shim is CUT OUT OF public/reshape/runner.html at run time,
 //     not copied here. Edit the shim and this file tests the edit.
 //
 // Two contexts come out the other side:
@@ -22,7 +22,7 @@
 // Caveat worth knowing before reading a result: a node vm global object is a
 // much smaller surface than a browser `window`, so the shim's rule-2 skip
 // ("already on window") fires less often here than it would in the browser.
-// That is why the collision tripwire in jscad-checks.mjs is asserted twice —
+// That is why the collision tripwire in reshape-checks.mjs is asserted twice —
 // once against this context, and once host-independently straight off the
 // library.
 
@@ -34,11 +34,11 @@ import vm from 'node:vm';
 export const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 export const PATHS = {
-  modeling: join(REPO, 'public/jscad/lib/jscad-modeling.min.js'),
-  regl: join(REPO, 'public/jscad/lib/jscad-regl-renderer.min.js'),
-  runner: join(REPO, 'public/jscad/runner.html'),
-  inAppDocs: join(REPO, 'lib/jscad-docs.ts'),
-  reference: join(REPO, 'public/jscad/docs/reference.md'),
+  modeling: join(REPO, 'public/reshape/lib/jscad-modeling.min.js'),
+  regl: join(REPO, 'public/reshape/lib/jscad-regl-renderer.min.js'),
+  runner: join(REPO, 'public/reshape/runner.html'),
+  inAppDocs: join(REPO, 'lib/reshape-docs.ts'),
+  reference: join(REPO, 'public/reshape/docs/reference.md'),
 };
 
 // ---- artifacts ------------------------------------------------------------
@@ -300,9 +300,9 @@ export function inAppExamples() {
   const rx = /^\s*code: `([\s\S]*?)`,?$/gm;
   let m;
   while ((m = rx.exec(src)) !== null) {
-    if (/\$\{/.test(m[1])) throw new Error('lib/jscad-docs.ts example contains ${} — extractor needs updating');
+    if (/\$\{/.test(m[1])) throw new Error('lib/reshape-docs.ts example contains ${} — extractor needs updating');
     out.push({
-      source: 'lib/jscad-docs.ts',
+      source: 'lib/reshape-docs.ts',
       line: src.slice(0, m.index).split('\n').length + 1,
       code: m[1],
       tags: [],
@@ -313,7 +313,7 @@ export function inAppExamples() {
 
 /**
  * reference.md's ```js fences. An info string beyond `js` is carried through as
- * a tag; `shcode-only` is the one tag the gate understands (see test-jscad.mjs).
+ * a tag; `shcode-only` is the one tag the gate understands (see test-reshape.mjs).
  */
 export function referenceExamples() {
   const src = read(PATHS.reference);
@@ -322,7 +322,7 @@ export function referenceExamples() {
   let m;
   while ((m = rx.exec(src)) !== null) {
     out.push({
-      source: 'public/jscad/docs/reference.md',
+      source: 'public/reshape/docs/reference.md',
       line: src.slice(0, m.index).split('\n').length + 1,
       code: m[2],
       tags: (m[1] || '').trim().split(/\s+/).filter(Boolean),
@@ -369,7 +369,7 @@ export function documentedNames(text, candidates) {
 }
 
 /**
- * lib/jscad-docs.ts opens with a scope-out comment naming a dozen functions the
+ * lib/reshape-docs.ts opens with a scope-out comment naming a dozen functions the
  * course deliberately does NOT document. Reading it as content would report
  * every one of them as drift, so the file's docs start at its first import.
  */

@@ -92,7 +92,7 @@ export const SANDBOX_MODES: SandboxMode[] = [
     label: 'JSCAD',
     blurb: 'Solid modelling. Drag a dimension and the model rebuilds.',
     preview: 'jscad',
-    docsHref: '/docs/jscad',
+    docsHref: '/docs/reshape',
     starter: JSCAD_STARTER,
   },
 ];

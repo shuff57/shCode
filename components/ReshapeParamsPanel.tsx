@@ -63,7 +63,7 @@ function settle(n: number, d: ParamDef) {
   return v;
 }
 
-export default function JscadParamsPanel({
+export default function ReshapeParamsPanel({
   defs, values, onChange, onCommit, lastMs, stale,
 }: Props) {
   // What is in the text box, deliberately NOT the same as the model value:

@@ -235,14 +235,14 @@
 //
 //   The larger cost to A8.2.2 is one neither count looked at, and these three
 //   names did not cause it: reference.md's own primitives catalogue publishes
-//   the option signature of every surviving target, lib/jscad-docs.ts mirrors
-//   it, and /docs/jscad serves it in the app — so "using only the JSCAD
+//   the option signature of every surviving target, lib/reshape-docs.ts mirrors
+//   it, and /docs/reshape serves it in the app — so "using only the JSCAD
 //   documentation" can be satisfied by scrolling one bundled page. That is
 //   deliberate (a missing row reads as "nothing to worry about", which is the
 //   opposite of true) and it predates this round, but it is the thing that
 //   softens the assignment most, and leaving it unsaid would be the same
 //   mistake again. Read all of this before proposing a thirteenth name:
-//   ASSIGNMENT_POOL in scripts/jscad-simple-checks.mjs reads both plan
+//   ASSIGNMENT_POOL in scripts/reshape-simple-checks.mjs reads both plan
 //   sentences out of curriculum-plan.md and matches them against this comment,
 //   so a paraphrase that drops words again is a red check.
 //
@@ -273,8 +273,8 @@
 // wrapped around a list the student already has, which is a smaller win than
 // box(40, 20, 10) and is worth saying so.
 //
-// New expectations for this file go in scripts/jscad-simple-checks.mjs and the
-// SIMPLE group of scripts/test-jscad.mjs — never by loosening a check that is
+// New expectations for this file go in scripts/reshape-simple-checks.mjs and the
+// SIMPLE group of scripts/test-reshape.mjs — never by loosening a check that is
 // already there.
 // ---------------------------------------------------------------------------
 (function () {
@@ -635,7 +635,7 @@
 		// This test HAS to run before any geometry test. An object with a
 		// `points` array is exactly what a path2 looks like, so isGeometry()
 		// claims { points: [...] } and the refusal would never say the word
-		// polygon — the same trap jscad-simple-checks.mjs flags on rect/normal.
+		// polygon — the same trap reshape-simple-checks.mjs flags on rect/normal.
 		if (points && typeof points === 'object' && !Array.isArray(points)) {
 			throw new Error(
 				'poly takes a plain list of corners: poly([[0, 0], [20, 0], [10, 15]]). ' +
@@ -926,7 +926,7 @@
 	//
 	//   Fixing THAT means overriding the eight measure names on window so they
 	//   unwrap first, and those are real JSCAD names. Doing it breaks two
-	//   contracts the gate states outright: 'simple.js adds exactly the shCAD
+	//   contracts the gate states outright: 'reshape.js adds exactly the shCAD
 	//   names and nothing else' and 'no real JSCAD name was overwritten by
 	//   shCAD'. This layer is additive or it is not trustworthy.
 	//

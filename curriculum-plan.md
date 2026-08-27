@@ -3485,7 +3485,7 @@ as the single source of truth for the seven open references:
 - **JS2** → *Eloquent JavaScript* (Marijn Haverbeke, CC-BY-NC, code MIT)
 - **PY** → *Introduction to Python Programming* (OpenStax, CC BY-NC-SA) → structural model; Python syntax translated to JS
 - **moSHion Game Design** → in-app docs at `/docs/moshion` (bundled `public/moshion/`, MIT facade + MIT planck.js, built from the public `moshion.d.ts` API) + in-repo docs at `public/moshion/docs/`. An original MIT-licensed engine, inspired by q5play, containing no q5play code
-- **JSCAD** → in-app docs at `/docs/jscad` + in-repo docs at `public/jscad/docs/` + external API docs (openjscad.xyz, MIT) + GitHub monorepo `github.com/jscad/OpenJSCAD.org` → CDN-loaded, lessons need internet
+- **JSCAD** → in-app docs at `/docs/reshape` + in-repo docs at `public/reshape/docs/` + external API docs (openjscad.xyz, MIT) + GitHub monorepo `github.com/reshape/OpenJSCAD.org` → CDN-loaded, lessons need internet
 - **freeCodeCamp** → the Q1 content platform — week-by-week mapping in `curriculum-alignment-guide.md`, full activity list in `curriculum-data/master-activity-list.md`
 - **jscadui / jscad.app** → the Q3–Q4 JSCAD browser environment (`github.com/hrgdavor/jscadui`, MIT)
 

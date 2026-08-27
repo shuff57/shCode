@@ -41,7 +41,7 @@ const MoshionPreview = forwardRef<HTMLIFrameElement, Props>(function MoshionPrev
       key={runKey}
       id="preview"
       className="jscad-frame"
-      // See JscadPreview for the reasoning: allow-same-origin is deliberately
+      // See ReshapePreview for the reasoning: allow-same-origin is deliberately
       // absent so student code cannot reach /api/* with the session cookie.
       // Saves therefore go through the parent -- see lib/moshion-storage.ts.
       sandbox="allow-scripts allow-downloads"

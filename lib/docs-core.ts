@@ -1,6 +1,6 @@
 // Shared types + search helpers for the in-app docs surfaces
-// (/docs/moshion, /docs/jscad). Each docs set (lib/moshion-docs.ts,
-// lib/jscad-docs.ts) provides its own `sections` array and thin wrappers
+// (/docs/moshion, /docs/reshape). Each docs set (lib/moshion-docs.ts,
+// lib/reshape-docs.ts) provides its own `sections` array and thin wrappers
 // over these functions.
 
 export interface DocPage {

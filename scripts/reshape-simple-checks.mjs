@@ -1,23 +1,23 @@
-// jscad-simple-checks.mjs — what the shCAD gate knows, as data.
+// reshape-simple-checks.mjs — what the shCAD gate knows, as data.
 //
-// Same split, and the same rule, as jscad-checks.mjs: the mechanics live in
-// scripts/test-jscad.mjs and the expectations live here, because they are
+// Same split, and the same rule, as reshape-checks.mjs: the mechanics live in
+// scripts/test-reshape.mjs and the expectations live here, because they are
 // edited by different people for different reasons. A number in this file
 // changes because the shCAD surface or the library changed. A line in
-// test-jscad.mjs changes because the gate itself was wrong.
+// test-reshape.mjs changes because the gate itself was wrong.
 //
-// Runtime builders MUST NOT edit this file — or jscad-checks.mjs, or
-// test-jscad.mjs — to make a red check go green. A red check is closed by
-// fixing public/jscad/simple.js, public/jscad/runner.html, the vendored
+// Runtime builders MUST NOT edit this file — or reshape-checks.mjs, or
+// test-reshape.mjs — to make a red check go green. A red check is closed by
+// fixing public/reshape/reshape.js, public/reshape/runner.html, the vendored
 // bundles, or the docs.
 //
 // shCAD is the simplified layer the course teaches for the whole of Q3. It
-// lives in public/jscad/simple.js, loads after the modeling bundle and after
+// lives in public/reshape/reshape.js, loads after the modeling bundle and after
 // the bare-name shim, and adds twelve NEW names on top of the real API without
 // renaming, wrapping or overwriting any of it. The three claims that make it
 // safe, and that everything below exists to measure:
 //
-//   1. ADDITIVE   — none of the twelve names exists before simple.js runs, and
+//   1. ADDITIVE   — none of the twelve names exists before reshape.js runs, and
 //                   no real JSCAD name is a different value afterwards.
 //   2. REAL       — every call returns the SAME geometry the real API call it
 //                   stands for returns, so the result goes straight back into
@@ -45,9 +45,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import vm from 'node:vm';
 
-import { REPO, createShimContext } from './jscad-harness.mjs';
+import { REPO, createShimContext } from './reshape-harness.mjs';
 
-export const SIMPLE_PATH = join(REPO, 'public/jscad/simple.js');
+export const SIMPLE_PATH = join(REPO, 'public/reshape/reshape.js');
 
 /** The twelve names, what each needs positionally, and what it really calls. */
 export const SHCAD_NAMES = [
@@ -188,7 +188,7 @@ export const SILENTLY_DROPPED = [
 ];
 
 /**
- * The only globals simple.js is allowed to add beyond the nine names.
+ * The only globals reshape.js is allowed to add beyond the nine names.
  * `__shcadNamesSkipped` is the browser-only collision report: a node vm global
  * is a far smaller surface than a browser `window`, so a real collision can
  * exist there and not here. Publishing it is how it stays observable.
@@ -348,7 +348,7 @@ export const TURN_IN_PLACE = [
  *
  * So "the order you apply transforms in changes the answer" — §9.2's
  * composition topic — is NOT observable through turn. That is a thing turn
- * takes away, it is stated in simple.js's banner and in reference.md, and both
+ * takes away, it is stated in reshape.js's banner and in reference.md, and both
  * halves are asserted here so neither claim can rot: `commutes` failing would
  * mean turn had stopped rotating in place, and `rotateCommutes` becoming true
  * would mean the library's rotate had changed under the whole argument.
@@ -495,7 +495,7 @@ export const REFUSALS_NAME_THE_REAL_CALL = [
  * name shCAD stands in for has a row, pointing at the shCAD word for it.
  */
 export const REVERSE_LOOKUP = {
-  path: join(REPO, 'public/jscad/docs/reference.md'),
+  path: join(REPO, 'public/reshape/docs/reference.md'),
   heading: '#### Reading the book',
   /** real name in the left cell -> the shCAD name its right cell must name. */
   expect: {
@@ -514,7 +514,7 @@ export const REVERSE_LOOKUP = {
     // The three added when /sandbox's generator turned out to be emitting half
     // an shCAD call and half a raw namespaced one in the same expression. torus
     // and polygon moved OFF the "no shCAD word" table to get here, which is the
-    // A8.2.2 cost the banner in simple.js records.
+    // A8.2.2 cost the banner in reshape.js records.
     cylinderElliptic: 'cone',
     torus: 'ring',
     polygon: 'poly',
@@ -857,7 +857,7 @@ export const WRAPS_BOX = [
 /**
  * THE REFUSALS THIS RUN OVERTURNED, AND WHAT THEY COST, AS A CHECK.
  *
- * simple.js's banner refused `donut` and `poly` in writing, with arguments.
+ * reshape.js's banner refused `donut` and `poly` in writing, with arguments.
  * Both were overturned. A refusal that is overturned QUIETLY — by deleting the
  * paragraph — leaves nobody able to audit the decision later, and the poly one
  * has a live cost: assignment A8.2.2 asks a student to find a primitive not
@@ -1066,7 +1066,7 @@ export const INTEROP = [
  *
  * reference.md's "#### The nine names" table is the one document a student
  * reads at the moment they leave shCAD, and it is the only place the real call
- * is written out for them to copy. EQUIVALENTS above proves simple.js matches
+ * is written out for them to copy. EQUIVALENTS above proves reshape.js matches
  * the real API; it proves nothing about what that table SAYS, so the two could
  * — and did — drift apart with the gate fully green.
  *
@@ -1083,7 +1083,7 @@ export const INTEROP = [
  * The table cannot be wrong again without the gate going red.
  */
 export const GRADUATION = {
-  path: join(REPO, 'public/jscad/docs/reference.md'),
+  path: join(REPO, 'public/reshape/docs/reference.md'),
   heading: '#### The twelve names',
 
   /**
@@ -1196,8 +1196,8 @@ export const SEEDED_COLLISION = { name: 'box', value: 'a student already owns th
 // ---- the context ----------------------------------------------------------
 
 /**
- * The shim context with simple.js run into it — bundle, shim, then shCAD, in
- * the order runner.html loads them. simple.js is read off disk and evaluated
+ * The shim context with reshape.js run into it — bundle, shim, then shCAD, in
+ * the order runner.html loads them. reshape.js is read off disk and evaluated
  * as-is, never reimplemented here, for the same reason the shim is cut live
  * out of runner.html: edit the file and this tests the edit.
  *
@@ -1212,7 +1212,7 @@ export function createSimpleContext(opts = {}) {
   vm.runInContext('__beforeSimple = Object.getOwnPropertyNames(globalThis);', shim.ctx);
   const before = vm.runInContext('__beforeSimple.slice()', shim.ctx);
   vm.runInContext(readFileSync(SIMPLE_PATH, 'utf8').replace(/\r\n/g, '\n'), shim.ctx, {
-    filename: 'public/jscad/simple.js',
+    filename: 'public/reshape/reshape.js',
   });
   const added = vm.runInContext(
     'Object.getOwnPropertyNames(globalThis).filter(function (n) { return __beforeSimple.indexOf(n) < 0; })',
@@ -1350,7 +1350,7 @@ export const BOOK_CENSUS = {
     'Occurrences of a bare `name(` inside the 209 <textarea class="cs-input"> runnable '
     + 'editors across the seven chapters, with /* */ and // comments and string literals '
     + 'stripped first, matched against the export lists of the fifteen modules read out of '
-    + 'the vendored public/jscad/lib/jscad-modeling.min.js. EXCLUDED: inline <code> in prose '
+    + 'the vendored public/reshape/lib/jscad-modeling.min.js. EXCLUDED: inline <code> in prose '
     + 'and option tables (every <code> in all seven files was verified single-line, so no '
     + 'code example lives outside the textareas); <pre class="cs-out"> program output; JS '
     + 'builtins and array methods; require() and main() module plumbing. Dotted member calls '
@@ -1440,7 +1440,7 @@ export const BOOK_CENSUS = {
  * per-name total with no chapter attribution, so it cannot express "taught in
  * the assignment's own week" and the old check could never have asked. Rather
  * than pin a second census, the two sentences that decide everything are READ
- * OUT OF curriculum-plan.md at gate time and matched against simple.js's
+ * OUT OF curriculum-plan.md at gate time and matched against reshape.js's
  * quotation of them — which is what makes dropping two words from a quote a
  * red check instead of a plausible paragraph.
  */
@@ -1448,7 +1448,7 @@ export const ASSIGNMENT_POOL = {
   assignment: 'A8.2.2',
   planPath: join(REPO, 'curriculum-plan.md'),
 
-  /** the assignment, verbatim. The check finds this in the plan, and in simple.js. */
+  /** the assignment, verbatim. The check finds this in the plan, and in reshape.js. */
   wording: 'find and use one primitive type NOT covered in class this week',
   /** §8.2's own learning objective, likewise read out of the plan */
   objectiveLine: 'Create 2D primitives: rectangle, circle, ellipse, polygon, star',
@@ -1486,8 +1486,8 @@ export const ASSIGNMENT_POOL = {
   /**
    * The softener nobody had measured, recorded because it is larger than
    * anything the three new names did: reference.md's own primitives catalogue
-   * publishes the option signature of every surviving target, lib/jscad-docs.ts
-   * mirrors it under the SYNC gate, and /docs/jscad serves it in-app. "Using
+   * publishes the option signature of every surviving target, lib/reshape-docs.ts
+   * mirrors it under the SYNC gate, and /docs/reshape serves it in-app. "Using
    * only the JSCAD documentation" is therefore satisfiable without leaving
    * shCode. That predates this round and is deliberate — a missing row reads as
    * "nothing to worry about" — but it is the real cost to A8.2.2, and pretending
@@ -1504,7 +1504,7 @@ export const ASSIGNMENT_POOL = {
  * per name shCAD has NO word for, saying so, because silence reads as safety.
  */
 export const BRIDGE = {
-  path: join(REPO, 'public/jscad/docs/reference.md'),
+  path: join(REPO, 'public/reshape/docs/reference.md'),
   shcadWordHeading: REVERSE_LOOKUP.heading,
   noWordHeading: "#### The book's other names — type what the book typed",
   tauHeading: '#### `TAU` is a value, not a name in scope',
@@ -1793,7 +1793,7 @@ export const BOOK_OPTION_KEYS = [
  * layer ships each appear in a worked example rather than only in a table.
  */
 export const OBJECT_DEPTH = {
-  path: join(REPO, 'public/jscad/docs/reference.md'),
+  path: join(REPO, 'public/reshape/docs/reference.md'),
   heading: '## shCAD — the simplified names',
   endsBefore: '## Modules',
 
@@ -1836,7 +1836,7 @@ export const OBJECT_DEPTH = {
  * about runner.html, read out of runner.html rather than restated.
  */
 export const PARAM_DEFAULTS = {
-  runner: 'public/jscad/runner.html',
+  runner: 'public/reshape/runner.html',
   reads: ['initial', 'default'],
   ignores: 'checked',
   saysInReference: /checkbox[\s\S]{0,400}?`checked`[\s\S]{0,400}?undefined/,
@@ -1922,8 +1922,8 @@ export function evaluateInShcad(bindings, expr) {
 // has been correctly trained not to guess.
 
 export const PARAM_TYPES = {
-  path: join(REPO, 'public/jscad/docs/reference.md'),
-  inApp: join(REPO, 'lib/jscad-docs.ts'),
+  path: join(REPO, 'public/reshape/docs/reference.md'),
+  inApp: join(REPO, 'lib/reshape-docs.ts'),
 
   /** The book -> shCode table, in the shCAD section. */
   heading: '#### The parameter panel — the words that are not calls',
@@ -2067,7 +2067,7 @@ function main(params) { globalThis.__seen = params; return box(10, 10, 10) }`;
  * belong to a student's own object rather than to the library.
  */
 export const BOOK_OPTION_WORDS = {
-  path: join(REPO, 'public/jscad/docs/reference.md'),
+  path: join(REPO, 'public/reshape/docs/reference.md'),
 
   /** key -> the call that takes it, for the failure message. */
   keys: {
@@ -2124,13 +2124,13 @@ export const BOOK_OPTION_WORDS = {
 // SVG — the only way 2D work leaves the app
 // ---------------------------------------------------------------------------
 
-/** public/jscad/svg.js, evaluated into a shim context the way simple.js is. */
-export const SVG_PATH = join(REPO, 'public/jscad/svg.js');
+/** public/reshape/svg.js, evaluated into a shim context the way reshape.js is. */
+export const SVG_PATH = join(REPO, 'public/reshape/svg.js');
 
 export function createSvgContext(opts = {}) {
   const sc = createSimpleContext(opts);
   vm.runInContext(readFileSync(SVG_PATH, 'utf8').replace(/\r\n/g, '\n'), sc.ctx, {
-    filename: 'public/jscad/svg.js',
+    filename: 'public/reshape/svg.js',
   });
   return { ...sc, svg: sc.ctx.shcadSvg ?? sc.window.shcadSvg };
 }

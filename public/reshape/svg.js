@@ -8,7 +8,7 @@
 // that file ("Export as SVG") and shCode could not produce one.
 //
 // This is hand-written rather than vendored on purpose. @jscad/io publishes an
-// SVG serializer, but the bundle in public/jscad/lib/ does not contain one, and
+// SVG serializer, but the bundle in public/reshape/lib/ does not contain one, and
 // that bundle is already the one entry in EXPECTED_BUNDLES with
 // `verified: false` — its upstream identity is not established. Adding a second
 // unverified binary to fix a fifty-line problem is the wrong trade. Everything

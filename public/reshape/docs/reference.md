@@ -1,7 +1,7 @@
 # JSCAD API Reference
 
 Hand-authored reference for the `@jscad/modeling` surface the course teaches
-(Q3–Q4). Every example below runs in the in-app docs sandbox (`/docs/jscad`)
+(Q3–Q4). Every example below runs in the in-app docs sandbox (`/docs/reshape`)
 and was verified against `@jscad/modeling@2.13.0`.
 
 The seventeen exports the course does **not** teach are at the bottom, under
@@ -32,7 +32,7 @@ module.exports = { main }
 
 ### The shortcut, and why the long form is still worth writing
 
-The in-app runner (`public/jscad/runner.html`) pre-loads every JSCAD module
+The in-app runner (`public/reshape/runner.html`) pre-loads every JSCAD module
 into scope, so inside shCode both of these do the same thing:
 
 ```js shcode-only
@@ -151,7 +151,7 @@ project, and nothing here converts a project layout.
 
 Everything else in this file is the real `@jscad/modeling` API, and it is what
 you take to jscad.app, to a job, and to Q4. **shCAD** is twelve extra names that
-sit on top of it, loaded from `public/jscad/simple.js` after the shim. They
+sit on top of it, loaded from `public/reshape/reshape.js` after the shim. They
 exist for one reason: to put the object literal where a beginner can see why it
 is worth having, instead of on line one where it is just punctuation.
 
@@ -1295,7 +1295,7 @@ a bag of flat faces, `geometries.geom3.toPolygons(solid)` hands you that bag
 (six items for a cuboid), each face may carry its own `color` array, and
 `geometries.geom3.create(faces)` puts them back together. The rebuilt solid
 measures identically and has no top-level colour of its own. The in-app docs
-(`/docs/jscad`, Colors) work this through.
+(`/docs/reshape`, Colors) work this through.
 
 ```js
 const { primitives, colors } = require('@jscad/modeling')
@@ -1462,7 +1462,7 @@ module.exports = { main }
 The viewport has a **Save STL**, a **Save 3MF** and a **Save OBJ** button in its
 top right corner, live once `main()` has returned something drawable. They run
 the real `@jscad/{stl,3mf,obj}-serializer` (vendored in
-`public/jscad/lib/jscad-io.min.js`), so the bytes are the same bytes jscad.app
+`public/reshape/lib/jscad-io.min.js`), so the bytes are the same bytes jscad.app
 writes.
 
 | Format | Carries | Use it for |
@@ -1522,7 +1522,7 @@ modules in Q1 — one job per file — and each file gets its own git history.
 ## Recipes
 
 Short answers to the things people ask first. Every one of these is worked
-through at more length in the in-app docs (`/docs/jscad`).
+through at more length in the in-app docs (`/docs/reshape`).
 
 ### Make a hole
 
@@ -1655,7 +1655,7 @@ gives you a wall of polygon data; print `measureDimensions(shape)` instead.
 
 Seventeen exports the course does not teach and no assignment needs. They are
 documented because they are real and exported, not because they are worth a
-lesson. The in-app docs (`/docs/jscad`, Beyond the course) work each one
+lesson. The in-app docs (`/docs/reshape`, Beyond the course) work each one
 through with a runnable example.
 
 Between this section and the ones above, every function the fifteen modules
