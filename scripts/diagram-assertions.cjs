@@ -376,6 +376,52 @@ flowchart TD
      !only(fromMermaid('flowchart TD\n A([S]) --> Z([E])\n S[[orphan()]]'), 'no-orphans').passed);
 }
 
+section('checkDiagram — reaches-end catches a branch that never finishes');
+{
+  // The defect this closes: reaches-end used to ask only "can Start get to
+  // every shape, and is SOME End oval reached". Both are true here, and the
+  // "no" branch still stops dead on a process box. It is the exact mistake
+  // 1.5.30's own text warns about, and the rule passed it.
+  const deadBranch = fromMermaid(`
+flowchart TD
+  A([Start]) --> B{age >= 18}
+  B -- yes --> C[/print "You may vote"/]
+  C --> Z([End])
+  B -- no --> D[print Too young]
+`);
+  const r = only(deadBranch, 'reaches-end');
+  ok('a branch that stops on a task box fails', !r.passed, JSON.stringify(r));
+  ok('the dead end is named', /Too young/.test(r.detail), r.detail);
+  ok('the dead end is highlightable', r.offenders.length === 1, JSON.stringify(r.offenders));
+  // The half that already worked must keep working.
+  ok('every shape still reachable is not enough on its own',
+     only(deadBranch, 'no-orphans').passed);
+
+  // A loop with no exit reaches no End either — 2-4-22's whole subject.
+  const noExit = fromMermaid(`
+flowchart TD
+  A([Start]) --> B[count = 0]
+  B --> C[count = count + 1]
+  C --> B
+  A --> Z([End])
+`);
+  ok('a loop with no way out fails', !only(noExit, 'reaches-end').passed);
+
+  // And a correct chart with BOTH branches finishing still passes.
+  const good = fromMermaid(`
+flowchart TD
+  A([Start]) --> B{age >= 18}
+  B -- yes --> C[/print "You may vote"/]
+  B -- no --> D[print Too young]
+  C --> Z([End])
+  D --> Z
+`);
+  ok('both branches reaching End passes', only(good, 'reaches-end').passed,
+     JSON.stringify(only(good, 'reaches-end')));
+  ok('the whole correct chart is still valid', allPassed(checkDiagram(good, DEFAULT_RULES)),
+     checkDiagram(good, DEFAULT_RULES).filter(x => !x.passed).map(x => x.id + ': ' + x.detail).join('; '));
+}
+
 section('describeDiagram');
 {
   const text = describeDiagram(good);

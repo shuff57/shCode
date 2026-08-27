@@ -117,12 +117,18 @@ function endNodes(g: Graph): FlowNode[] {
   return g.flowNodes.filter((n) => (g.outgoing.get(n.id) ?? []).length === 0);
 }
 
-function reachableFrom(seeds: string[], g: Graph): Set<string> {
+/**
+ * Walk the graph from `seeds`. `dir` picks which way: 'outgoing' answers "what
+ * can Start get to", 'incoming' answers "what can get to an End". Both
+ * questions have to be asked — a shape can sit on a path out of Start and
+ * still never finish, which is exactly what a dead-ending branch is.
+ */
+function reachableFrom(seeds: string[], g: Graph, dir: 'outgoing' | 'incoming' = 'outgoing'): Set<string> {
   const seen = new Set<string>(seeds);
   const queue = [...seeds];
   while (queue.length > 0) {
     const id = queue.shift()!;
-    for (const next of g.outgoing.get(id) ?? []) {
+    for (const next of g[dir].get(id) ?? []) {
       if (!seen.has(next)) {
         seen.add(next);
         queue.push(next);
@@ -338,13 +344,28 @@ function evaluate(rule: DiagramRule, doc: DiagramDoc, g: Graph): Omit<CheckResul
       const endsHit = g.flowNodes.filter(
         (n) => seen.has(n.id) && n.shape === 'terminal' && (g.outgoing.get(n.id) ?? []).length === 0,
       );
-      return endsHit.length > 0
+      if (endsHit.length === 0) {
+        return {
+          id,
+          passed: false,
+          detail: 'Following the arrows from Start never reaches an End oval.',
+          offenders: [],
+        };
+      }
+      // Reaching every shape is only half of it. Walk BACKWARDS from the End
+      // ovals too: a shape that Start can get to but that cannot itself get to
+      // an End is a dead end — the "no" branch that stops on a process box, or
+      // a loop with no way out. Both read as finished charts and are not, and
+      // the second one is the mistake 2-4-22 asks the student to find.
+      const finishing = reachableFrom(endsHit.map((n) => n.id), g, 'incoming');
+      const dead = g.flowNodes.filter((n) => !finishing.has(n.id));
+      return dead.length === 0
         ? { id, passed: true, detail: 'Following the arrows from Start reaches every shape and finishes at an End oval.', offenders: [] }
         : {
             id,
             passed: false,
-            detail: 'Following the arrows from Start never reaches an End oval.',
-            offenders: [],
+            detail: `${nameList(dead.map((n) => n.id), g)} ${plural(dead.length, 'is a dead end', 'are dead ends')} — you can get there from Start, but no arrows lead on from there to an End oval.`,
+            offenders: expand(dead.map((n) => n.id), g),
           };
     }
 
