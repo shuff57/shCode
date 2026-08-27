@@ -904,112 +904,6 @@
 		);
 	}
 
-	// ---- live shapes: the moSHion model -------------------------------------
-	//
-	// moSHion sprites are configured two ways -- `new Sprite(x, y, 50, 50)` and
-	// `s.color = 'red'` -- and this brings the same to reSHape:
-	//
-	//     let ball = ball(5)      ball.radius = 9      ball.color = 'red'
-	//
-	// A reSHape name returns a LIVE HANDLE: a plain object that remembers the
-	// arguments it was built from and REBUILDS its geometry whenever one is
-	// assigned. Everything below is additive; the twelve implementations are
-	// untouched and still return plain geometry when called directly.
-	//
-	// WHY A HANDLE AND NOT AN IN-PLACE MUTATION. The obvious design -- return the
-	// real geom3 and swap its `polygons` on write -- is WRONG, and measurably so:
-	// @jscad/modeling caches measurements in a `new WeakMap()` keyed on the
-	// geometry object (measureVolume, measureArea, measureBoundingBox,
-	// measureBoundingSphere, measureCenterOfMass). Mutate in place and every
-	// measurement taken before the change keeps its old answer forever, with no
-	// way to clear the cache from outside. Measured: a sphere measured at r=5,
-	// changed to r=9, measured again still reported 515.24 against a true 3004.90.
-	// That is the silent-wrong-number failure, in the chapter about measuring
-	// things for printing.
-	//
-	// A handle sidesteps it because each rebuild produces a FRESH inner geometry,
-	// so the library's cache is keyed on an object that genuinely is that shape.
-	//
-	// WHY IT STILL MIXES FREELY. geom2.isA/geom3.isA are duck-typed --
-	// `'polygons' in object && 'transforms' in object` -- so a handle exposing
-	// those as getters IS a geometry as far as subtract, union, hull, colorize
-	// and the extrusions are concerned. Verified against the real library.
-	var HANDLE = new WeakMap();
-
-	// Unwrap a handle to the geometry it currently stands for. Anything else
-	// passes through untouched, so this is safe to apply to every argument.
-	function current(v) {
-		var s = HANDLE.get(v);
-		return s ? s.geom : v;
-	}
-	function currentAll(args) {
-		var out = [];
-		for (var i = 0; i < args.length; i++) out.push(current(args[i]));
-		return out;
-	}
-
-	function isPlainObject(v) {
-		return v && typeof v === 'object' && !Array.isArray(v) && !('polygons' in v) && !('sides' in v);
-	}
-
-	// Build a live handle. `names` are the positional parameters of the reSHape
-	// call; a trailing options object contributes its keys as settable names too,
-	// so `ball(5, { segments: 8 })` gives both `.radius` and `.segments`.
-	function live(build, names, args) {
-		var params = {};
-		var extras = null;
-		for (var i = 0; i < names.length; i++) params[names[i]] = args[i];
-		if (args.length > names.length && isPlainObject(args[names.length])) {
-			extras = args[names.length];
-			for (var k in extras) if (Object.prototype.hasOwnProperty.call(extras, k)) params[k] = extras[k];
-		}
-
-		var state = { params: params, geom: null };
-		function rebuild() {
-			var positional = [];
-			for (var i = 0; i < names.length; i++) positional.push(current(state.params[names[i]]));
-			if (extras) {
-				var opts = {};
-				for (var k in extras) if (Object.prototype.hasOwnProperty.call(extras, k)) opts[k] = state.params[k];
-				positional.push(opts);
-			}
-			state.geom = build.apply(null, positional);
-		}
-		rebuild();
-
-		var h = {};
-		Object.keys(params).forEach(function (key) {
-			Object.defineProperty(h, key, {
-				enumerable: true, configurable: true,
-				get: function () { return state.params[key]; },
-				set: function (v) { state.params[key] = v; rebuild(); }
-			});
-		});
-
-		// Geometry passthrough. Whichever of sides/polygons this shape has is
-		// read from the CURRENT inner geometry every time, so a consumer that
-		// holds the handle across an assignment sees the new shape.
-		['sides', 'polygons', 'transforms'].forEach(function (key) {
-			Object.defineProperty(h, key, {
-				enumerable: true, configurable: true,
-				get: function () { return state.geom[key]; }
-			});
-		});
-
-		// `.color` is not a build parameter -- the library applies it with
-		// colorize, which returns a new geometry rather than taking an option --
-		// so it re-colorizes the current geometry instead of triggering a rebuild.
-		// Reading it back gives the library's own RGBA array.
-		Object.defineProperty(h, 'color', {
-			enumerable: true, configurable: true,
-			get: function () { return state.geom.color; },
-			set: function (v) { state.geom = jscad.colors.colorize(jscad.colors.colorNameToRgb(v) || v, state.geom); }
-		});
-
-		HANDLE.set(h, state);
-		return h;
-	}
-
 	// ---- install ------------------------------------------------------------
 	//
 	// Same discipline as the shim's own install(): anything already on window
@@ -1017,61 +911,39 @@
 	// filed away in a global nobody reads. Nothing here is a documented
 	// collision, so every skip is a real name a student expected and did not
 	// get — which is why the console warning has no exception list.
-	// The positional parameters of each name, in order -- this is what becomes
-	// settable on the returned handle. Taken from the signatures above, not
-	// guessed; a wrong list here would silently make a property unassignable.
-	var PARAMS = {
-		box: ['width', 'depth', 'height'], rect: ['width', 'height'],
-		disc: ['radius'], ball: ['radius'],
-		tube: ['radius', 'height'], cone: ['radius', 'height'],
-		ring: ['ringRadius', 'tubeRadius'], poly: ['points'],
-		extrude: ['height', 'shape'], revolve: ['shape'],
-		turn: ['degrees', 'shape'], sit: ['shape']
-	};
-
-	// Wrap each name so it returns a live handle instead of bare geometry. The
-	// twelve implementations are untouched -- `build` is the original function,
-	// called again on every property assignment.
-	function liveify (name, fn) {
-		var names = PARAMS[name];
-		return function () {
-			return live(fn, names, Array.prototype.slice.call(arguments));
-		};
-	}
-
-	// Measurements are the ONE place a handle is not transparent: each of these
-	// caches its answer in a WeakMap keyed on the object it was handed, so a
-	// handle measured before a property change would keep reporting the old
-	// number. Unwrapping to the current inner geometry -- a fresh object after
-	// every rebuild -- gives the cache a key that is honestly that shape.
 	//
-	// This deliberately OVERRIDES names the shim already installed, which is the
-	// one exception to this file's "anything already on window wins" rule. The
-	// exception is written down rather than left to be discovered, because a
-	// silently stale measurement is exactly the defect it exists to prevent.
-	var CACHED_MEASURES = ['measureArea', 'measureVolume', 'measureBoundingBox',
-		'measureBoundingSphere', 'measureCenterOfMass', 'measureDimensions',
-		'measureCenter', 'measureEpsilon'];
-	CACHED_MEASURES.forEach(function (m) {
-		if (typeof measurements[m] !== 'function') return;
-		var orig = measurements[m];
-		window[m] = function () { return orig.apply(null, currentAll(arguments)); };
-	});
-
-	// Hosts (a runner, an exporter) need a way to turn whatever main() returned
-	// into real geometry. Arrays are walked, so `return [a, b]` works.
-	window.__reshapeCurrent = function unwrap (v) {
-		if (Array.isArray(v)) return v.map(unwrap);
-		return current(v);
-	};
-
+	// EVERY NAME RETURNS PLAIN GEOMETRY, AND THAT IS THE DECISION. The obvious
+	// next feature is a moSHion-style live handle — `let b = ball(5)` then
+	// `b.radius = 9` rebuilds, the way a Sprite is configured. It was built and
+	// reverted (ad98aa3), so the measurements are on the record rather than
+	// waiting to be taken a second time:
+	//
+	//   A handle CAN be made indistinguishable from geometry. A Proxy
+	//   forwarding ownKeys/getOwnPropertyDescriptor to a swappable inner
+	//   geometry serialises byte-identically, so geom2.isA/geom3.isA and the
+	//   whole identity bar accept it. That half is not the problem.
+	//
+	//   The measurement cache is. measureVolume/measureArea/measureBoundingBox
+	//   /measureBoundingSphere/measureCenterOfMass each memoise in a WeakMap
+	//   keyed on the object they were handed, and a handle's identity is stable
+	//   across a rebuild by definition. Measured: a ball measured at radius 5,
+	//   changed to 9, still reports 515.24 against a true 3004.90 — a silent
+	//   wrong number, in the chapter about measuring things before printing.
+	//
+	//   Fixing THAT means overriding the eight measure names on window so they
+	//   unwrap first, and those are real JSCAD names. Doing it breaks two
+	//   contracts the gate states outright: 'simple.js adds exactly the shCAD
+	//   names and nothing else' and 'no real JSCAD name was overwritten by
+	//   shCAD'. This layer is additive or it is not trustworthy.
+	//
+	// So the price of the feature is either a stale measurement or a weaker
+	// gate, and no lesson asks for it. Revisit only if one does — and if you
+	// do, the shape to beat is a name of its own (with a converter rule and a
+	// corpus row), not a change to what these twelve return.
 	var NAMES = [
-		['box', liveify('box', box)], ['rect', liveify('rect', rect)],
-		['disc', liveify('disc', disc)], ['ball', liveify('ball', ball)],
-		['tube', liveify('tube', tube)], ['cone', liveify('cone', cone)],
-		['ring', liveify('ring', ring)], ['poly', liveify('poly', poly)],
-		['extrude', liveify('extrude', extrude)], ['revolve', liveify('revolve', revolve)],
-		['turn', liveify('turn', turn)], ['sit', liveify('sit', sit)]
+		['box', box], ['rect', rect], ['disc', disc], ['ball', ball], ['tube', tube],
+		['cone', cone], ['ring', ring], ['poly', poly],
+		['extrude', extrude], ['revolve', revolve], ['turn', turn], ['sit', sit]
 	];
 
 	var skipped = [];
