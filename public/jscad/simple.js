@@ -65,12 +65,6 @@
 // poly's slide has to carry a warning the other ten do not, because forgetting
 // ITS bracket is the one that does not throw. See poly's paragraph below.
 //
-// And it need not be done by hand. lib/jscad-portable.mjs converts a whole
-// shCAD program into its real-API form — every name here, plus the runner's
-// bare names put back behind their modules, plus the require() header — and
-// its rules are proved against the same EQUIVALENTS table the identity bar
-// runs on, so the converter cannot drift away from what this file does.
-//
 // turn() IS THE ONE EXCEPTION, AND IT DIVERGES FROM rotate TWICE.
 //
 // FIRST DIVERGENCE — THE PIVOT.

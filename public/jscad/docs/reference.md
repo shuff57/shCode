@@ -66,14 +66,8 @@ fails the build if one of them needs the shim.
 
 ### Converting a whole file to the portable form
 
-Doing that by hand, one name at a time, is the slow way. **[/portable](/portable/)**
-does it for a whole program — paste the shCAD file in on the left, copy the
-portable form out on the right. The conversion itself is
-`lib/jscad-portable.mjs`, and `convert(source)` hands back
-`{ code, notes, refusals }` if you want to call it yourself.
-
-It undoes **two** shortcuts, and a file that only had the first one undone still
-does not run. The obvious one is the shCAD names — `box(40, 20, 10)` becomes
+Converting a file undoes **two** shortcuts, and a file that only had the first
+one undone still does not run. The obvious one is the shCAD names — `box(40, 20, 10)` becomes
 `primitives.cuboid({ size: [40, 20, 10] })`. The one that is easy to forget is
 the shim above: `translate` and `subtract` and `measureVolume` are bare in
 shCode and do not exist on jscad.app at all. Both halves show up in one line
@@ -217,13 +211,12 @@ results are compared as whole geometry — so it is an answer key, not a
 description. `turn` is the one row that is prose, because it is the one name
 that has no plain equivalent.
 
-You do not have to walk that table by hand to leave. **[/portable](/portable/)**
-converts a whole shCAD program into the form that runs on https://jscad.app/ —
-these twelve names, plus the shim's bare names put back behind their modules,
-plus the `require` header. Its rules are proved against the same table this one
-is, so the two cannot drift apart. See
+Walking that table is how you leave: swap each shCAD name for the plain
+equivalent beside it, then put the shim's bare names back behind their modules
+and add the `require` header. See
 [Converting a whole file to the portable form](#converting-a-whole-file-to-the-portable-form)
-above for what the output looks like.
+above for both halves, because a file with only the names undone still does not
+run.
 
 Every option is passed through untouched: `segments`, `center` and
 `roundRadius` mean exactly what they mean in the real call, with the same
@@ -643,12 +636,13 @@ replaced with `turn`.
 shCAD's twelve names live in this runner and nowhere else, so a shCAD program
 pasted into <https://jscad.app/> does not run — `box is not defined`. The course
 names that editor as the Q3 environment, and your file should outlive this app,
-so there is a converter: **[/portable](/portable)**.
+so the graduation table above is the answer key.
 
-Paste a shCAD program in and it hands back the same program written in the real
-`@jscad/modeling` API — the form that runs there, and the form the book prints.
-Nothing is approximated: every name it rewrites is one the gate already proves
-builds identical geometry both ways.
+Swap each shCAD name for the plain equivalent printed beside it, put the shim's
+bare names back behind their modules, and add the `require` header — and you
+have the same program written in the real `@jscad/modeling` API, the form that
+runs there and the form the book prints. Nothing is approximated: every name in
+that table is one the gate already proves builds identical geometry both ways.
 
 Two things it will tell you rather than guess:
 
