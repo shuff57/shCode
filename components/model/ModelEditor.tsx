@@ -22,6 +22,7 @@
 // no reach-distance problem here worth optimizing away from that.
 
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { ReactNode } from 'react';
 import {
   Box as BoxIcon,
@@ -324,6 +325,18 @@ export default function ModelEditor({
   // parked on the bar. Same thing here, and it is also what keeps the last
   // chip from being sliced in half when the bar runs out of room.
   const [searchOpen, setSearchOpen] = useState(false);
+
+  // Build mode renders the tools bar into the ribbon at the top of the
+  // canvas, Onshape-style, instead of inside the feature card. The bar is
+  // rendered here and moved in a layout effect, so there is no flash of it
+  // in the card and no portal-target race on first paint. React keeps
+  // managing the node wherever it sits, so re-renders update it in place.
+  useEffect(() => {
+    if (!collapsible || collapsed) return;
+    const ribbon = document.getElementById('reshapeRibbon');
+    const bar = toolsRef.current;
+    if (ribbon && bar && bar.parentElement !== ribbon) ribbon.appendChild(bar);
+  }, [collapsible, collapsed]);
 
   // Alt+C (Onshape's own shortcut) focuses Search tools; Escape closes
   // whichever flyout is open, wherever focus happens to be.

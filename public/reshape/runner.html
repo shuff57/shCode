@@ -665,6 +665,13 @@
 			if (projectAnchors) projectAnchors();
 			return;
 		}
+		if (d && d.source === 'reshape-set-savebar') {
+			// Build mode floats the app toolbar over the top of this frame, so
+			// the Save bar would sit under it. Drop it below the ribbon.
+			var bar = document.getElementById('__jscadSave');
+			if (bar) bar.style.top = (d.offset || 0) + 'px';
+			return;
+		}
 		if (!d || d.source !== 'reshape-set-params' || !d.params) return;
 		// ponytail: every message is applied in order. The sender coalesces to one
 		// per frame and rebuilds run ~20ms, so nothing queues today. If a heavy

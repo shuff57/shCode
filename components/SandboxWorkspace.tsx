@@ -191,6 +191,10 @@ export default function SandboxWorkspace() {
           { source: 'reshape-set-anchors', anchors: specsRef.current },
           '*'
         );
+        frameRef.current?.contentWindow?.postMessage(
+          { source: 'reshape-set-savebar', offset: build ? 48 : 0 },
+          '*'
+        );
         setParamDefs(Array.isArray(d.defs) ? d.defs : []);
         setParamValues(d.values ?? {});
         setRebuildMs(null);
@@ -209,7 +213,7 @@ export default function SandboxWorkspace() {
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, [mode.preview]);
+  }, [mode.preview, build]);
 
   // Read inside callbacks that must not rebuild on every doc change, and to
   // keep history bookkeeping out of a state updater -- React may call one twice.
@@ -733,6 +737,11 @@ export default function SandboxWorkspace() {
                 </button>
               </div>
               {lockNote && <span className="sandbox-lock">{lockNote}</span>}
+              {/* The shape tools move here in Build mode: ModelEditor renders
+                  its bar and a layout effect relocates it into this host, so
+                  the ribbon carries the modelling tools the way Onshape's
+                  does. Empty in Code mode. */}
+              <span id="reshapeRibbon" className="sandbox-ribbon" aria-hidden={!build} />
             </>
           )}
 
@@ -873,6 +882,7 @@ export default function SandboxWorkspace() {
       <style>{`
         .sandbox-shell {
           display: flex;
+          position: relative;
           flex-direction: column;
           gap: 10px;
           height: calc(100vh - 180px);
@@ -944,14 +954,75 @@ export default function SandboxWorkspace() {
         }
 
         /* ---- Build mode ----
-           The whole window belongs to the rendered shapes: the toolbar sits
-           on top of the preview, the editor and console are gone, and the
+           The whole window belongs to the rendered shapes: the toolbar and the
+           preview are ONE space, the editor and console are gone, and the
            shape tools ride the left edge as a hideable sidebar. */
+        .sandbox-shell.is-build .sandbox-header { display: none; }
+        .sandbox-shell.is-build .sandbox-toolbar {
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          /* Above the editor card (40): the flyout menus are fixed-position
+             children of this bar, and a stacking context lower than the card
+             would bury them under the feature list. */
+          z-index: 50;
+          margin-bottom: 0;
+          padding: 4px 10px;
+          /* Transparent: the bar floats over the split, so the runner's
+             canvas shows through behind the buttons and the tools sit
+             directly on the 3D viewport -- the Onshape ribbon, not a header
+             above a box. */
+          background: transparent;
+          border: 0;
+          border-radius: 0;
+          box-shadow: none;
+        }
+        /* The ribbon host takes the rest of the row; the shape tools bar
+           (moved here by ModelEditor) fills it. */
+        .sandbox-shell.is-build .sandbox-ribbon {
+          flex: 1 1 auto;
+          min-width: 0;
+          display: flex;
+          align-items: center;
+        }
+        .sandbox-shell.is-build .sandbox-ribbon .model-tools {
+          flex: 1 1 auto;
+          height: 34px;
+          border-bottom: 0;
+          background: transparent;
+        }
+        /* In Build the model is live -- every structural change reloads the
+           frame and every dimension change rebuilds it by message -- so Run
+           and Stop have nothing to do, and a green Run button is the one
+           thing that reads "web app" instead of "CAD ribbon". */
+        .sandbox-shell.is-build .btn-run,
+        .sandbox-shell.is-build .run-hint { display: none; }
+        /* Stop is the same story: in Build isRunning is true from the first
+           structural change on, so the red button would sit there forever
+           with nothing to stop. */
+        .sandbox-shell.is-build .sandbox-toolbar .btn-secondary { display: none; }
+        /* The program-type tabs (JavaScript / moSHion / reSHape) are the
+           strongest "tab bar" cue there is; Onshape has no mode tabs. In
+           Build they hide -- the Code/Build toggle stays, and switching
+           program type happens from Code mode. */
+        .sandbox-shell.is-build .sandbox-toolbar > .sandbox-modes:first-child { display: none; }
+        /* The mode pills drop their chrome to read as flat ribbon buttons. */
+        .sandbox-shell.is-build .sandbox-modes { border: 0; background: transparent; }
+        .sandbox-shell.is-build .sandbox-mode { border-right: 0; color: #d3d5e3; }
+        .sandbox-shell.is-build .sandbox-mode.is-active { background: #44475a; color: #f8f8f2; }
+        .sandbox-shell.is-build .sandbox-mode:hover { color: #f8f8f2; }
+        .sandbox-shell.is-build .sandbox-lock { margin-right: 10px; }
+        /* Reset and Full screen lose their chip borders, Onshape-ribbon style. */
+        .sandbox-shell.is-build .sandbox-toolbar button[style] {
+          border: 0 !important;
+          color: #d3d5e3;
+        }
         .sandbox-shell.is-build .sandbox-split { height: auto; flex: 1 1 auto; min-height: 0; }
         .sandbox-shell.is-build #editorPane {
           position: absolute;
           left: 12px;
-          top: 12px;
+          top: 48px;
           bottom: 12px;
           /* .pane sets height:100%, which would win over the top/bottom pair
              and hang the panel 24px past the bottom of the frame. */
@@ -978,6 +1049,28 @@ export default function SandboxWorkspace() {
         .sandbox-shell.is-build #previewPane { flex: 1 1 100% !important; }
         .sandbox-shell.is-build .divider { display: none; }
         .sandbox-shell.is-build .reshape-pane-params { flex: 0 0 208px; }
+        /* The toolbar floats over the preview, so the preview owns the whole
+           window and the two read as one space. */
+        .sandbox-shell.is-build .sandbox-split { border: 0; box-shadow: none; }
+        /* Onshape's panels sit on the same surface as the canvas; the card
+           and the Dimensions panel wear the canvas colour too, so the whole
+           window is one surface with floating panels on it. */
+        .sandbox-shell.is-build #editorPane {
+          background: #36333a;
+          border: 0;
+          border-radius: 0;
+          box-shadow: none;
+        }
+        .sandbox-shell.is-build .reshape-pane-params {
+          background: #36333a;
+          border-left: 1px solid #44475a;
+        }
+        /* The tools bar has moved into the ribbon, so the card is just the
+           feature list now. */
+        .sandbox-shell.is-build #editorPane .model-tools { display: none; }
+        /* Full screen's own #editorPane rule (top:12px) would otherwise win
+           on equal specificity and slide the card under the floating bar. */
+        .sandbox-shell.is-full.is-build #editorPane { top: 48px; }
 
         /* ---- full screen ----
            The preview takes the whole screen and the editor floats over its
