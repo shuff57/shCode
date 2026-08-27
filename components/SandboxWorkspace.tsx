@@ -192,7 +192,7 @@ export default function SandboxWorkspace() {
           '*'
         );
         frameRef.current?.contentWindow?.postMessage(
-          { source: 'reshape-set-savebar', offset: build ? 48 : 0 },
+          { source: 'reshape-set-savebar', offset: build ? 48 : 0, bottom: build },
           '*'
         );
         setParamDefs(Array.isArray(d.defs) ? d.defs : []);
@@ -1065,9 +1065,10 @@ export default function SandboxWorkspace() {
           background: #36333a;
           border-left: 1px solid #44475a;
         }
-        /* The tools bar has moved into the ribbon, so the card is just the
+        /* The tools bar is portaled into the ribbon, so the card is just the
            feature list now. */
         .sandbox-shell.is-build #editorPane .model-tools { display: none; }
+        .sandbox-shell.is-build.is-tools-hidden .sandbox-ribbon .model-tools { display: none; }
         /* Full screen's own #editorPane rule (top:12px) would otherwise win
            on equal specificity and slide the card under the floating bar. */
         .sandbox-shell.is-full.is-build #editorPane { top: 48px; }

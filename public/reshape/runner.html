@@ -667,9 +667,29 @@
 		}
 		if (d && d.source === 'reshape-set-savebar') {
 			// Build mode floats the app toolbar over the top of this frame, so
-			// the Save bar would sit under it. Drop it below the ribbon.
+			// the Save bar would sit under it. Drop it below the ribbon -- or,
+			// when the parent asks, park it in the bottom-right corner where
+			// nothing else lives.
 			var bar = document.getElementById('__jscadSave');
-			if (bar) bar.style.top = (d.offset || 0) + 'px';
+			var note = document.getElementById('__jscadSaveNote');
+			if (bar) {
+				if (d.bottom) {
+					bar.style.top = 'auto';
+					bar.style.bottom = '8px';
+				} else {
+					bar.style.top = (d.offset || 0) + 'px';
+					bar.style.bottom = 'auto';
+				}
+			}
+			if (note) {
+				if (d.bottom) {
+					note.style.top = 'auto';
+					note.style.bottom = '40px';
+				} else {
+					note.style.top = (d.offset || 0) + 32 + 'px';
+					note.style.bottom = 'auto';
+				}
+			}
 			return;
 		}
 		if (!d || d.source !== 'reshape-set-params' || !d.params) return;

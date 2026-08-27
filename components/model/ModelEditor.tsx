@@ -327,16 +327,16 @@ export default function ModelEditor({
   const [searchOpen, setSearchOpen] = useState(false);
 
   // Build mode renders the tools bar into the ribbon at the top of the
-  // canvas, Onshape-style, instead of inside the feature card. The bar is
-  // rendered here and moved in a layout effect, so there is no flash of it
-  // in the card and no portal-target race on first paint. React keeps
-  // managing the node wherever it sits, so re-renders update it in place.
-  useEffect(() => {
-    if (!collapsible || collapsed) return;
-    const ribbon = document.getElementById('reshapeRibbon');
-    const bar = toolsRef.current;
-    if (ribbon && bar && bar.parentElement !== ribbon) ribbon.appendChild(bar);
-  }, [collapsible, collapsed]);
+  // canvas, Onshape-style, instead of inside the feature card. A portal keeps
+  // React in charge of the node wherever it sits -- a manual appendChild
+  // crashed the tree on collapse, because React then tried to removeChild the
+  // bar from a parent it no longer had. The host is a sibling of the card in
+  // the toolbar, so it exists before this component mounts and there is no
+  // portal-target race.
+  const ribbonHost =
+    typeof document !== 'undefined' && collapsible && !collapsed
+      ? document.getElementById('reshapeRibbon')
+      : null;
 
   // Alt+C (Onshape's own shortcut) focuses Search tools; Escape closes
   // whichever flyout is open, wherever focus happens to be.
@@ -809,8 +809,8 @@ export default function ModelEditor({
           </button>
         </div>
       )}
-      {!(collapsible && collapsed) && (
-      <div className="model-tools" ref={toolsRef}>
+      {ribbonHost ? createPortal(
+        <div className="model-tools" ref={toolsRef}>
         {sketchVisible && (
           <>
             <div className="model-tool-group">
@@ -1090,10 +1090,9 @@ export default function ModelEditor({
             <Search size={14} />
           </button>
         )}
-      </div>
-      )}
-      {!(collapsible && collapsed) && (
-      <>
+      </div>,
+        ribbonHost
+      ) : null}
       {note && <p className="model-note">{note}</p>}
       <ol className="model-list">
         {doc.features.length === 0 && (
@@ -1194,8 +1193,6 @@ export default function ModelEditor({
           onChange={(next) => setConstraints(activeSketch, next)}
           onRound={(corner, radius) => roundSketchCorner(activeSketch, corner, radius)}
         />
-      )}
-      </>
       )}
 
       <style>{`
