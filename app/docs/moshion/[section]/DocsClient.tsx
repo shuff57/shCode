@@ -20,7 +20,7 @@ interface Props {
    *  /reshape/runner.html; moSHion source needs /moshion/runner.html. Neither
    *  runtime can execute the other's examples, so this is required, not a
    *  convenience — a wrong value throws on every Run. */
-  preview: 'moshion' | 'jscad';
+  preview: 'moshion' | 'reshape';
 }
 
 function pageHref(basePath: string, slug: string, pageIndex: number) {

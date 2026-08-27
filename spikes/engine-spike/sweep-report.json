@@ -1413,19 +1413,19 @@
     "note": "non-moSHion lesson (console/HTML)"
   },
   {
-    "file": "lessons\\jscad-2d-shapes\\script.js",
+    "file": "lessons\\reshape-2d-shapes\\script.js",
     "status": "EXCLUDED-JSCAD",
     "error": null,
     "state": null
   },
   {
-    "file": "lessons\\jscad-booleans\\script.js",
+    "file": "lessons\\reshape-booleans\\script.js",
     "status": "EXCLUDED-JSCAD",
     "error": null,
     "state": null
   },
   {
-    "file": "lessons\\jscad-intro\\script.js",
+    "file": "lessons\\reshape-intro\\script.js",
     "status": "EXCLUDED-JSCAD",
     "error": null,
     "state": null

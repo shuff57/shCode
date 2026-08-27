@@ -341,7 +341,7 @@
 	}
 })();
 </script>
-<!-- shCAD: the simplified names the course teaches in Q3 (box, ball, tube, …).
+<!-- reSHape: the simplified names the course teaches in Q3 (box, ball, tube, …).
      Additive, in its own file, loaded AFTER the shim above so it can see every
      real name and refuse to overwrite one, and BEFORE the ?code= injection
      below so a student's own declarations still win. Its banner explains the
@@ -430,7 +430,7 @@
 		// and a geom2 has none. §8.2 and §8.3 are entirely 2D.
 		svg: { name: 'design.svg', mime: 'image/svg+xml',
 		       run: function(s) {
-		           var out = shcadSvg.serialize(jscadModeling, s);
+		           var out = reshapeSvg.serialize(jscadModeling, s);
 		           if (out === null) {
 		               throw new Error('this design has no flat shapes in it. SVG is for 2D ' +
 		                   'outlines — save STL for a solid, or extrude a 2D shape first.');
@@ -571,7 +571,7 @@
 	var liveParams = defaultParams();
 	try {
 		window.parent.postMessage({
-			source: 'jscad-params',
+			source: 'reshape-params',
 			defs: JSON.parse(JSON.stringify(paramDefs(), function(k, v) {
 				return typeof v === 'function' ? undefined : v;
 			})),
@@ -630,7 +630,7 @@
 	function rebuildFailed(e) {
 		window.dispatchEvent(new ErrorEvent('error', { error: e, message: e && e.message, filename: 'script.js' }));
 		try {
-			window.parent.postMessage({ source: 'jscad-rebuilt', ms: 0, failed: true }, '*');
+			window.parent.postMessage({ source: 'reshape-rebuilt', ms: 0, failed: true }, '*');
 		} catch (_) { /* parent gone */ }
 	}
 
@@ -640,7 +640,7 @@
 		// shape the numbers no longer describe.
 		if (!geometry || isEmptyGeometry(geometry)) {
 			try {
-				window.parent.postMessage({ source: 'jscad-rebuilt', ms: 0, empty: true }, '*');
+				window.parent.postMessage({ source: 'reshape-rebuilt', ms: 0, empty: true }, '*');
 			} catch (_) { /* parent gone */ }
 			return;
 		}
@@ -653,19 +653,19 @@
 		}
 		var t1 = (window.performance && performance.now) ? performance.now() : 0;
 		try {
-			window.parent.postMessage({ source: 'jscad-rebuilt', ms: t1 - t0 }, '*');
+			window.parent.postMessage({ source: 'reshape-rebuilt', ms: t1 - t0 }, '*');
 		} catch (_) { /* parent gone */ }
 	}
 
 	window.addEventListener('message', function(e) {
 		var d = e.data;
-		if (d && d.source === 'jscad-set-anchors') {
+		if (d && d.source === 'reshape-set-anchors') {
 			anchors = Array.isArray(d.anchors) ? d.anchors : [];
 			anchorsDirty = true;
 			if (projectAnchors) projectAnchors();
 			return;
 		}
-		if (!d || d.source !== 'jscad-set-params' || !d.params) return;
+		if (!d || d.source !== 'reshape-set-params' || !d.params) return;
 		// ponytail: every message is applied in order. The sender coalesces to one
 		// per frame and rebuilds run ~20ms, so nothing queues today. If a heavy
 		// model ever pushes a rebuild past a frame, drop to latest-wins here.
@@ -924,7 +924,7 @@
 		var aHere = [0, 0], aThere = [0, 0];
 		projectAnchors = function() {
 			if (!anchors.length) {
-				try { window.parent.postMessage({ source: 'jscad-anchors', points: [] }, '*'); } catch (_) {}
+				try { window.parent.postMessage({ source: 'reshape-anchors', points: [] }, '*'); } catch (_) {}
 				return;
 			}
 			fitAnchors();
@@ -958,7 +958,7 @@
 				}
 				points.push(pt);
 			}
-			try { window.parent.postMessage({ source: 'jscad-anchors', points: points }, '*'); } catch (_) {}
+			try { window.parent.postMessage({ source: 'reshape-anchors', points: points }, '*'); } catch (_) {}
 		};
 
 		function updateAndRender() {

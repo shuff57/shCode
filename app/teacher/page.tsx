@@ -1554,7 +1554,7 @@ function DetailView({ classId }: { classId: string }) {
         <LessonModeControl
           classId={classId}
           lessons={[...lessonMap.values()]
-            .filter((l) => l.preview === 'jscad')
+            .filter((l) => l.preview === 'reshape')
             .map((l) => ({ id: l.id, title: l.title }))}
         />
       )}

@@ -1,9 +1,9 @@
-// reshape-simple-checks.mjs — what the shCAD gate knows, as data.
+// reshape-simple-checks.mjs — what the reSHape gate knows, as data.
 //
 // Same split, and the same rule, as reshape-checks.mjs: the mechanics live in
 // scripts/test-reshape.mjs and the expectations live here, because they are
 // edited by different people for different reasons. A number in this file
-// changes because the shCAD surface or the library changed. A line in
+// changes because the reSHape surface or the library changed. A line in
 // test-reshape.mjs changes because the gate itself was wrong.
 //
 // Runtime builders MUST NOT edit this file — or reshape-checks.mjs, or
@@ -11,7 +11,7 @@
 // fixing public/reshape/reshape.js, public/reshape/runner.html, the vendored
 // bundles, or the docs.
 //
-// shCAD is the simplified layer the course teaches for the whole of Q3. It
+// reSHape is the simplified layer the course teaches for the whole of Q3. It
 // lives in public/reshape/reshape.js, loads after the modeling bundle and after
 // the bare-name shim, and adds twelve NEW names on top of the real API without
 // renaming, wrapping or overwriting any of it. The three claims that make it
@@ -50,7 +50,7 @@ import { REPO, createShimContext } from './reshape-harness.mjs';
 export const SIMPLE_PATH = join(REPO, 'public/reshape/reshape.js');
 
 /** The twelve names, what each needs positionally, and what it really calls. */
-export const SHCAD_NAMES = [
+export const RESHAPE_NAMES = [
   {
     name: 'box', arity: 3,
     positional: ['width', 'depth', 'height'],
@@ -138,13 +138,13 @@ export const SHCAD_NAMES = [
 ];
 
 /** A jump means the taught surface moved. Twelve names, and twelve is a decision. */
-export const EXPECTED_SHCAD_NAME_COUNT = 12;
+export const EXPECTED_RESHAPE_NAME_COUNT = 12;
 
 /**
  * THE TWO NAMES THAT SHIP NO { } BECAUSE THE LIBRARY DROPS IT, MEASURED.
  *
  * Every other name without a trailing { } — extrude, turn, sit — has one for a
- * design reason: the keys exist on the real call and shCAD declines to offer
+ * design reason: the keys exist on the real call and reSHape declines to offer
  * them. ring and poly are different, and the difference is worth an assertion
  * rather than a sentence: torus ACCEPTS `center` and `segments` and silently
  * ignores both, so a ring that took them would be the exact defect this layer
@@ -154,7 +154,7 @@ export const EXPECTED_SHCAD_NAME_COUNT = 12;
  *
  * poly's two are the other kind: `paths` and `orientation` are real polygon
  * keys that do work, and they are refused because they are outside both
- * SHCAD_OPTION_KEYS and the book's own vocabulary. That is recorded here too so
+ * RESHAPE_OPTION_KEYS and the book's own vocabulary. That is recorded here too so
  * the two reasons are not confused for each other.
  */
 export const SILENTLY_DROPPED = [
@@ -175,7 +175,7 @@ export const SILENTLY_DROPPED = [
     name: 'cone', key: 'roundRadius', real: 'cylinderElliptic', drops: true,
     a: (w) => w.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20 }),
     b: (w) => w.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20, roundRadius: 2 }),
-    why: 'roundRadius is in shCAD\'s option vocabulary and is NOT a cylinderElliptic key — '
+    why: 'roundRadius is in reSHape\'s option vocabulary and is NOT a cylinderElliptic key — '
       + 'accepting it would round nothing and say nothing',
   },
   {
@@ -189,22 +189,22 @@ export const SILENTLY_DROPPED = [
 
 /**
  * The only globals reshape.js is allowed to add beyond the nine names.
- * `__shcadNamesSkipped` is the browser-only collision report: a node vm global
+ * `__reshapeNamesSkipped` is the browser-only collision report: a node vm global
  * is a far smaller surface than a browser `window`, so a real collision can
  * exist there and not here. Publishing it is how it stays observable.
  */
-export const SHCAD_REPORT_GLOBALS = ['__shcadNamesSkipped'];
+export const RESHAPE_REPORT_GLOBALS = ['__reshapeNamesSkipped'];
 
 /**
- * The three option keys shCAD ships, and the rule they obey. Every one is BOTH
+ * The three option keys reSHape ships, and the rule they obey. Every one is BOTH
  * a real key of the backing library call AND measured vocabulary from the seven
  * written Q3 book chapters. Nothing here is invented, renamed or defaulted
  * differently from the library.
  */
-export const SHCAD_OPTION_KEYS = ['center', 'roundRadius', 'segments'];
+export const RESHAPE_OPTION_KEYS = ['center', 'roundRadius', 'segments'];
 
 /**
- * The identity bar. Each case builds the same model twice — once in shCAD,
+ * The identity bar. Each case builds the same model twice — once in reSHape,
  * once in the real API — and the two must be indistinguishable. This is the
  * check that catches a future "helpful" default drifting into a wrapper: a
  * changed segment count or a synthesised center would pass "it returns
@@ -212,84 +212,84 @@ export const SHCAD_OPTION_KEYS = ['center', 'roundRadius', 'segments'];
  */
 export const EQUIVALENTS = [
   { name: 'box', label: 'box(40, 20, 10)',
-    shcad: (w) => w.box(40, 20, 10),
+    reshape: (w) => w.box(40, 20, 10),
     real: (j) => j.primitives.cuboid({ size: [40, 20, 10] }) },
   { name: 'box', label: 'box(40, 20, 10, { center: [0, 0, 10] })',
-    shcad: (w) => w.box(40, 20, 10, { center: [0, 0, 10] }),
+    reshape: (w) => w.box(40, 20, 10, { center: [0, 0, 10] }),
     real: (j) => j.primitives.cuboid({ size: [40, 20, 10], center: [0, 0, 10] }) },
   { name: 'box', label: 'box(20, 20, 20, { roundRadius: 3, segments: 16 })',
-    shcad: (w) => w.box(20, 20, 20, { roundRadius: 3, segments: 16 }),
+    reshape: (w) => w.box(20, 20, 20, { roundRadius: 3, segments: 16 }),
     real: (j) => j.primitives.roundedCuboid({ size: [20, 20, 20], roundRadius: 3, segments: 16 }) },
   { name: 'rect', label: 'rect(40, 20)',
-    shcad: (w) => w.rect(40, 20),
+    reshape: (w) => w.rect(40, 20),
     real: (j) => j.primitives.rectangle({ size: [40, 20] }) },
   { name: 'rect', label: 'rect(40, 20, { roundRadius: 3 })',
-    shcad: (w) => w.rect(40, 20, { roundRadius: 3 }),
+    reshape: (w) => w.rect(40, 20, { roundRadius: 3 }),
     real: (j) => j.primitives.roundedRectangle({ size: [40, 20], roundRadius: 3 }) },
   { name: 'disc', label: 'disc(6)',
-    shcad: (w) => w.disc(6),
+    reshape: (w) => w.disc(6),
     real: (j) => j.primitives.circle({ radius: 6 }) },
   { name: 'disc', label: 'disc(6, { center: [10, 0], segments: 48 })',
-    shcad: (w) => w.disc(6, { center: [10, 0], segments: 48 }),
+    reshape: (w) => w.disc(6, { center: [10, 0], segments: 48 }),
     real: (j) => j.primitives.circle({ radius: 6, center: [10, 0], segments: 48 }) },
   { name: 'ball', label: 'ball(20)',
-    shcad: (w) => w.ball(20),
+    reshape: (w) => w.ball(20),
     real: (j) => j.primitives.sphere({ radius: 20 }) },
   { name: 'ball', label: 'ball(20, { segments: 64 })',
-    shcad: (w) => w.ball(20, { segments: 64 }),
+    reshape: (w) => w.ball(20, { segments: 64 }),
     real: (j) => j.primitives.sphere({ radius: 20, segments: 64 }) },
   { name: 'tube', label: 'tube(5, 20)',
-    shcad: (w) => w.tube(5, 20),
+    reshape: (w) => w.tube(5, 20),
     real: (j) => j.primitives.cylinder({ radius: 5, height: 20 }) },
   { name: 'tube', label: 'tube(5, 20, { roundRadius: 1 })',
-    shcad: (w) => w.tube(5, 20, { roundRadius: 1 }),
+    reshape: (w) => w.tube(5, 20, { roundRadius: 1 }),
     real: (j) => j.primitives.roundedCylinder({ radius: 5, height: 20, roundRadius: 1 }) },
   { name: 'cone', label: 'cone(10, 20)',
-    shcad: (w) => w.cone(10, 20),
+    reshape: (w) => w.cone(10, 20),
     real: (j) => j.primitives.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20 }) },
   { name: 'cone', label: 'cone(10, 20, { center: [0, 0, 10] })',
-    shcad: (w) => w.cone(10, 20, { center: [0, 0, 10] }),
+    reshape: (w) => w.cone(10, 20, { center: [0, 0, 10] }),
     real: (j) => j.primitives.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20, center: [0, 0, 10] }) },
   { name: 'cone', label: 'cone(10, 20, { segments: 64 })',
-    shcad: (w) => w.cone(10, 20, { segments: 64 }),
+    reshape: (w) => w.cone(10, 20, { segments: 64 }),
     real: (j) => j.primitives.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20, segments: 64 }) },
   { name: 'ring', label: 'ring(14, 4)',
-    shcad: (w) => w.ring(14, 4),
+    reshape: (w) => w.ring(14, 4),
     real: (j) => j.primitives.torus({ outerRadius: 14, innerRadius: 4 }) },
   { name: 'ring', label: 'ring(10, 2)',
-    shcad: (w) => w.ring(10, 2),
+    reshape: (w) => w.ring(10, 2),
     real: (j) => j.primitives.torus({ outerRadius: 10, innerRadius: 2 }) },
   { name: 'poly', label: 'poly([[0, 0], [20, 0], [10, 15]])',
-    shcad: (w) => w.poly([[0, 0], [20, 0], [10, 15]]),
+    reshape: (w) => w.poly([[0, 0], [20, 0], [10, 15]]),
     real: (j) => j.primitives.polygon({ points: [[0, 0], [20, 0], [10, 15]] }) },
   { name: 'extrude', label: 'extrude(10, rect(40, 20))',
-    shcad: (w) => w.extrude(10, w.rect(40, 20)),
+    reshape: (w) => w.extrude(10, w.rect(40, 20)),
     real: (j) => j.extrusions.extrudeLinear({ height: 10 }, j.primitives.rectangle({ size: [40, 20] })) },
   { name: 'extrude', label: 'extrude(4, rect(10, 10), disc(3)) — variadic',
-    shcad: (w) => w.extrude(4, w.rect(10, 10), w.disc(3)),
+    reshape: (w) => w.extrude(4, w.rect(10, 10), w.disc(3)),
     real: (j) => j.extrusions.extrudeLinear(
       { height: 4 },
       j.primitives.rectangle({ size: [10, 10] }),
       j.primitives.circle({ radius: 3 })
     ) },
   { name: 'revolve', label: 'revolve(profile)',
-    shcad: (w) => w.revolve(w.translate([10, 0, 0], w.rect(4, 10))),
+    reshape: (w) => w.revolve(w.translate([10, 0, 0], w.rect(4, 10))),
     real: (j) => j.extrusions.extrudeRotate(
       {}, j.transforms.translate([10, 0, 0], j.primitives.rectangle({ size: [4, 10] }))
     ) },
   { name: 'revolve', label: 'revolve(profile, { segments: 16 })',
-    shcad: (w) => w.revolve(w.translate([10, 0, 0], w.rect(4, 10)), { segments: 16 }),
+    reshape: (w) => w.revolve(w.translate([10, 0, 0], w.rect(4, 10)), { segments: 16 }),
     real: (j) => j.extrusions.extrudeRotate(
       { segments: 16 }, j.transforms.translate([10, 0, 0], j.primitives.rectangle({ size: [4, 10] }))
     ) },
   { name: 'sit', label: 'sit(ball(10))',
-    shcad: (w) => w.sit(w.ball(10)),
+    reshape: (w) => w.sit(w.ball(10)),
     real: (j) => j.transforms.align(
       { modes: ['none', 'none', 'min'], relativeTo: [0, 0, 0], grouped: false },
       j.primitives.sphere({ radius: 10 })
     ) },
   { name: 'sit', label: 'sit([ball(10), box(10, 10, 10)]) — an assembly, grouped',
-    shcad: (w) => w.sit([w.ball(10), w.translate([30, 0, 40], w.box(10, 10, 10))]),
+    reshape: (w) => w.sit([w.ball(10), w.translate([30, 0, 40], w.box(10, 10, 10))]),
     real: (j) => j.transforms.align(
       { modes: ['none', 'none', 'min'], relativeTo: [0, 0, 0], grouped: true },
       [j.primitives.sphere({ radius: 10 }),
@@ -314,21 +314,21 @@ export const EQUIVALENTS = [
 export const TURN_IN_PLACE = [
   {
     label: 'a 40 x 20 x 20 box moved to x = 50, turned 90°',
-    shcad: (w) => w.turn(90, w.translate([50, 0, 0], w.box(40, 20, 20))),
+    reshape: (w) => w.turn(90, w.translate([50, 0, 0], w.box(40, 20, 20))),
     orbit: (w) => w.rotate([0, 0, Math.PI / 2], w.translate([50, 0, 0], w.box(40, 20, 20))),
     expect: [[40, -20, -10], [60, 20, 10]],
     orbits: [[-10, 30, -10], [10, 70, 10]],
   },
   {
     label: 'a flat rect moved to x = 30, turned 90° in the page',
-    shcad: (w) => w.turn(90, w.translate([30, 0, 0], w.rect(40, 20))),
+    reshape: (w) => w.turn(90, w.translate([30, 0, 0], w.rect(40, 20))),
     orbit: (w) => w.rotate([0, 0, Math.PI / 2], w.translate([30, 0, 0], w.rect(40, 20))),
     expect: [[20, -20, 0], [40, 20, 0]],
     orbits: [[-10, 10, 0], [10, 50, 0]],
   },
   {
     label: 'an assembly turned as one group',
-    shcad: (w) => w.turn(90, [w.translate([50, 0, 0], w.box(40, 20, 20)), w.translate([50, 0, 30], w.ball(5))]),
+    reshape: (w) => w.turn(90, [w.translate([50, 0, 0], w.box(40, 20, 20)), w.translate([50, 0, 30], w.ball(5))]),
     orbit: (w) => w.rotate([0, 0, Math.PI / 2], [w.translate([50, 0, 0], w.box(40, 20, 20)), w.translate([50, 0, 30], w.ball(5))]),
     expect: [[40, -20, -10], [60, 20, 35]],
     orbits: [[-10, 30, -10], [10, 70, 35]],
@@ -430,7 +430,7 @@ export const REFUSALS_NAME_THE_REAL_CALL = [
     what: 'cone refuses roundRadius, which the library would have dropped',
     run: (w) => w.cone(10, 20, { roundRadius: 2 }),
     names: 'cylinderElliptic',
-    why: 'roundRadius IS in shCAD\'s option vocabulary, and cylinderElliptic ignores it '
+    why: 'roundRadius IS in reSHape\'s option vocabulary, and cylinderElliptic ignores it '
       + 'silently — same bounding box, same 64 polygons',
   },
   {
@@ -488,16 +488,16 @@ export const REFUSALS_NAME_THE_REAL_CALL = [
  * written Q3 chapters pose the opposite question — they are in the real API,
  * so a student READS `cuboid` and has to write `box`. Measured on the chapter
  * sources: roughly half the calls in the assigned reading are in a spelling
- * shCAD replaces, and three of the mappings (extrudeRotate -> revolve,
+ * reSHape replaces, and three of the mappings (extrudeRotate -> revolve,
  * align -> sit, rotate -> turn) cannot be guessed backwards at all.
  *
  * So reference.md carries both directions and this pins the second one: every
- * name shCAD stands in for has a row, pointing at the shCAD word for it.
+ * name reSHape stands in for has a row, pointing at the reSHape word for it.
  */
 export const REVERSE_LOOKUP = {
   path: join(REPO, 'public/reshape/docs/reference.md'),
   heading: '#### Reading the book',
-  /** real name in the left cell -> the shCAD name its right cell must name. */
+  /** real name in the left cell -> the reSHape name its right cell must name. */
   expect: {
     cuboid: 'box',
     // 12 calls across four chapters, and the opening runnable block of the
@@ -512,8 +512,8 @@ export const REVERSE_LOOKUP = {
     cylinder: 'tube',
     roundedCylinder: 'tube',
     // The three added when /sandbox's generator turned out to be emitting half
-    // an shCAD call and half a raw namespaced one in the same expression. torus
-    // and polygon moved OFF the "no shCAD word" table to get here, which is the
+    // an reSHape call and half a raw namespaced one in the same expression. torus
+    // and polygon moved OFF the "no reSHape word" table to get here, which is the
     // A8.2.2 cost the banner in reshape.js records.
     cylinderElliptic: 'cone',
     torus: 'ring',
@@ -526,7 +526,7 @@ export const REVERSE_LOOKUP = {
 };
 
 /**
- * Read a two-column table of ``real`` -> ``shcad`` out of reference.md, the
+ * Read a two-column table of ``real`` -> ``reshape`` out of reference.md, the
  * same way readGraduationTable reads the forward one.
  */
 export function readReverseTable(text = readFileSync(REVERSE_LOOKUP.path, 'utf8')) {
@@ -561,7 +561,7 @@ export function readReverseTable(text = readFileSync(REVERSE_LOOKUP.path, 'utf8'
  *   bare        the day-one call, no brace anywhere
  *   withOptions the day-two call, one key, and it must actually change the model
  *   objectFirst the graduation stumble: box({ size: [...] }) must NOT work.
- *               An alias would delete the contrast that shCAD exists to teach,
+ *               An alias would delete the contrast that reSHape exists to teach,
  *               and would make the arity guard unwriteable — you cannot tell a
  *               mistyped positional call from an intended object call. What it
  *               gets instead is the name of the real function to reach for.
@@ -704,7 +704,7 @@ export const NO_OPTIONS_CONTRACT = [
  * a copy-pasted name is a silent way to tell a student to fix the wrong thing —
  * `ring needs two numbers: ring(radius, height)` would be a perfectly
  * plausible-looking wrong answer. Each of these calls a name short and asserts
- * that EVERY parameter that name declares in SHCAD_NAMES appears in the
+ * that EVERY parameter that name declares in RESHAPE_NAMES appears in the
  * message, so the two cannot drift.
  */
 export const ARITY_GUARDS = [
@@ -786,14 +786,14 @@ export const RING_ARITHMETIC = {
   swapped: (w) => w.torus({ outerRadius: 4, innerRadius: 14 }),
   swappedSays: /inner circle is too large to rotate about the outer circle/,
   /** the same swap through ring, rethrown with the student's own numbers */
-  shcadSwapped: (w) => w.ring(4, 14),
-  shcadSwappedSays: /a tube 14 thick will not fit round a ring of radius 4.*ring\(14, 4\) is the one you meant/s,
+  reshapeSwapped: (w) => w.ring(4, 14),
+  reshapeSwappedSays: /a tube 14 thick will not fit round a ring of radius 4.*ring\(14, 4\) is the one you meant/s,
 };
 
 /**
  * WHAT poly TRAINS, AND WHAT THAT HABIT DOES ON GRADUATION DAY.
  *
- * poly is the one shCAD name whose single positional argument is a LIST, so it
+ * poly is the one reSHape name whose single positional argument is a LIST, so it
  * is also the one that teaches "hand the array over bare". Every other name in
  * the layer teaches numbers-then-optional-brace, and graduating any of those is
  * a rename plus a bracket that FAILS LOUDLY if you forget the bracket.
@@ -826,30 +826,30 @@ export const POLY_BARE_ARRAY = {
  * EQUIVALENTS already compares the whole serialised geometry, which is
  * strictly stronger — so why this? Because a serialised compare reports
  * "shape 1 differs" and nothing else. These three names were added to stop a
- * generator emitting half an shCAD call, and the thing a reader of a failure
+ * generator emitting half an reSHape call, and the thing a reader of a failure
  * needs is the SIZE: a ring that comes out 8 across instead of 36 is the exact
  * defect the argument order was chosen to prevent, and this is the check that
  * says so in numbers.
  */
 export const WRAPS_BOX = [
   { label: 'cone(10, 20)',
-    shcad: (w) => w.cone(10, 20),
+    reshape: (w) => w.cone(10, 20),
     real: (j) => j.primitives.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20 }),
     box: [[-10, -10, -10], [10, 10, 10]] },
   { label: 'cone(10, 20, { center: [0, 0, 10] })',
-    shcad: (w) => w.cone(10, 20, { center: [0, 0, 10] }),
+    reshape: (w) => w.cone(10, 20, { center: [0, 0, 10] }),
     real: (j) => j.primitives.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20, center: [0, 0, 10] }),
     box: [[-10, -10, 0], [10, 10, 20]] },
   { label: 'ring(14, 4)',
-    shcad: (w) => w.ring(14, 4),
+    reshape: (w) => w.ring(14, 4),
     real: (j) => j.primitives.torus({ outerRadius: 14, innerRadius: 4 }),
     box: [[-18, -18, -4], [18, 18, 4]] },
   { label: 'ring(10, 2)',
-    shcad: (w) => w.ring(10, 2),
+    reshape: (w) => w.ring(10, 2),
     real: (j) => j.primitives.torus({ outerRadius: 10, innerRadius: 2 }),
     box: [[-12, -12, -2], [12, 12, 2]] },
   { label: 'poly([[0, 0], [20, 0], [10, 15]])',
-    shcad: (w) => w.poly([[0, 0], [20, 0], [10, 15]]),
+    reshape: (w) => w.poly([[0, 0], [20, 0], [10, 15]]),
     real: (j) => j.primitives.polygon({ points: [[0, 0], [20, 0], [10, 15]] }),
     box: [[0, 0, 0], [20, 15, 0]] },
 ];
@@ -993,7 +993,7 @@ export const GUARDS = [
     says: /extrude needs a shape to push upwards/,
     why: 'extrudeLinear({height}) with no profile throws from inside the library',
   },
-  // The operand-order family. shCAD's grammar has ONE rule — required values
+  // The operand-order family. reSHape's grammar has ONE rule — required values
   // positional, every extra in a TRAILING { } — and the real API breaks it for
   // the two extrusions, which take their { } first. A student who copies the
   // library's order out of the docs (or out of the graduation table two lines
@@ -1026,7 +1026,7 @@ export const GUARDS = [
 ];
 
 /**
- * A shCAD result must be a first-class citizen of the real API — that is what
+ * A reSHape result must be a first-class citizen of the real API — that is what
  * "returns real geometry" has to mean in practice, not just isGeometry().
  */
 export const INTEROP = [
@@ -1034,24 +1034,24 @@ export const INTEROP = [
     run: (w) => w.subtract(w.rect(40, 20), w.disc(6)) },
   { label: 'subtract(tube, tube) — the A9.2.2 bushing',
     run: (w) => w.subtract(w.tube(10, 20), w.tube(4, 22)) },
-  { label: 'union of a shCAD shape and a real one',
+  { label: 'union of a reSHape shape and a real one',
     run: (w) => w.union(w.ball(10), w.cuboid({ size: [10, 10, 10] })) },
-  { label: 'hull of two shCAD shapes',
+  { label: 'hull of two reSHape shapes',
     run: (w) => w.hull(w.disc(5), w.translate([20, 0, 0], w.disc(2))) },
-  { label: 'extrudeLinear (the real one) on a shCAD profile',
+  { label: 'extrudeLinear (the real one) on a reSHape profile',
     run: (w) => w.extrudeLinear({ height: 5 }, w.rect(20, 10)) },
-  { label: 'colorize a shCAD solid',
+  { label: 'colorize a reSHape solid',
     run: (w) => w.colorize([1, 0, 0], w.ball(5)) },
-  { label: 'measureBoundingBox reads a shCAD shape',
+  { label: 'measureBoundingBox reads a reSHape shape',
     run: (w) => w.box(10, 10, 10) },
-  { label: 'a shCAD shape passed through the real align',
+  { label: 'a reSHape shape passed through the real align',
     run: (w) => w.align({ modes: ['center', 'center', 'min'], relativeTo: [0, 0, 0] }, w.ball(8)) },
   // The three new names, in the shapes /sandbox actually generates.
   { label: 'extrude(6, poly(corners)) — the /sandbox Sketch kind, in one vocabulary',
     run: (w) => w.extrude(6, w.poly([[0, 0], [20, 0], [10, 15]])) },
   { label: 'subtract(box, ring) — a groove cut with a donut',
     run: (w) => w.subtract(w.box(40, 40, 40), w.ring(14, 4)) },
-  { label: 'hull(cone, ball) — a shCAD cone in an organic form',
+  { label: 'hull(cone, ball) — a reSHape cone in an organic form',
     run: (w) => w.hull(w.cone(10, 20), w.translate([0, 0, 30], w.ball(4))) },
   { label: 'sit(cone) and sit(ring) — both are built centred on the origin',
     run: (w) => w.sit([w.cone(10, 20), w.translate([40, 0, 0], w.ring(14, 4))]) },
@@ -1065,7 +1065,7 @@ export const INTEROP = [
  * THE GRADUATION TABLE, AS AN ANSWER KEY RATHER THAN A DESCRIPTION.
  *
  * reference.md's "#### The nine names" table is the one document a student
- * reads at the moment they leave shCAD, and it is the only place the real call
+ * reads at the moment they leave reSHape, and it is the only place the real call
  * is written out for them to copy. EQUIVALENTS above proves reshape.js matches
  * the real API; it proves nothing about what that table SAYS, so the two could
  * — and did — drift apart with the gate fully green.
@@ -1105,7 +1105,7 @@ export const GRADUATION = {
 
   /**
    * Rows whose right-hand cell is prose because there IS no plain equivalent.
-   * Keyed by the shCAD call so a stale exemption fails on the missing row
+   * Keyed by the reSHape call so a stale exemption fails on the missing row
    * instead of quietly excusing a new one.
    */
   prose: {
@@ -1114,8 +1114,8 @@ export const GRADUATION = {
       'and TURN_IN_PLACE pins it to the opposite expectation instead',
   },
 
-  /** Every shCAD name has to appear somewhere in the left column. */
-  namesInTable: SHCAD_NAMES.map((n) => n.name),
+  /** Every reSHape name has to appear somewhere in the left column. */
+  namesInTable: RESHAPE_NAMES.map((n) => n.name),
 };
 
 /**
@@ -1141,9 +1141,9 @@ export function readGraduationTable(text = readFileSync(GRADUATION.path, 'utf8')
     const cells = line.slice(1, -1).split('|').map((c) => c.trim());
     if (cells.length !== 2) continue;
     const code = (cell) => (cell.match(/`([^`]+)`/) || [])[1];
-    const shcad = code(cells[0]);
-    if (!shcad || shcad === 'shCAD') continue;              // the header row
-    rows.push({ line: i + 1, shcad, real: code(cells[1]), rawReal: cells[1] });
+    const reshape = code(cells[0]);
+    if (!reshape || reshape === 'reSHape') continue;              // the header row
+    rows.push({ line: i + 1, reshape, real: code(cells[1]), rawReal: cells[1] });
   }
   return { rows };
 }
@@ -1179,7 +1179,7 @@ export const GRADUATION_TRIPWIRES = [
     row: 'revolve(profile, { segments: 16 })',
     without: 'extrudeRotate(profile, { segments: 16 })',
     throws: true,
-    why: 'extrudeRotate takes its { } FIRST — keeping shCAD\'s trailing order after '
+    why: 'extrudeRotate takes its { } FIRST — keeping reSHape\'s trailing order after '
       + 'graduating is the swap the row exists to show, and the library dies inside '
       + 'itself rather than saying so',
   },
@@ -1187,7 +1187,7 @@ export const GRADUATION_TRIPWIRES = [
 
 /**
  * A student's own declaration beats everything, and everything on the page
- * beats shCAD. Seeded the way the shim's own collision check is seeded,
+ * beats reSHape. Seeded the way the shim's own collision check is seeded,
  * because a node vm global is too small a surface to produce a real collision
  * on its own.
  */
@@ -1196,7 +1196,7 @@ export const SEEDED_COLLISION = { name: 'box', value: 'a student already owns th
 // ---- the context ----------------------------------------------------------
 
 /**
- * The shim context with reshape.js run into it — bundle, shim, then shCAD, in
+ * The shim context with reshape.js run into it — bundle, shim, then reSHape, in
  * the order runner.html loads them. reshape.js is read off disk and evaluated
  * as-is, never reimplemented here, for the same reason the shim is cut live
  * out of runner.html: edit the file and this tests the edit.
@@ -1328,7 +1328,7 @@ export const BORROWED_ASSERTION = BORROWED_ASSERTIONS[0];
 // reference.md that answers it.
 // ===========================================================================
 //
-// REVERSE_LOOKUP above asks a narrow question: does every name shCAD stands in
+// REVERSE_LOOKUP above asks a narrow question: does every name reSHape stands in
 // for have a row? It cannot ask the wide one, which is the one that matters to
 // a student — is there a row for every name the BOOK PRINTS? Measured before
 // this existed: eight names the chapters type had no row anywhere and were not
@@ -1380,12 +1380,12 @@ export const BOOK_CENSUS = {
   totalCalls: 273,
 
   /**
-   * How many of those calls are in a spelling shCAD replaces. Derived from
-   * `calls` and the shCAD-word table at check time, and pinned here so a row
+   * How many of those calls are in a spelling reSHape replaces. Derived from
+   * `calls` and the reSHape-word table at check time, and pinned here so a row
    * quietly moving between the two tables cannot go unnoticed.
    *
    * Was 177 before `ring` and `poly` existed. torus (4 calls) and polygon (10)
-   * moved off the "type what the book typed" table and onto the shCAD-word one:
+   * moved off the "type what the book typed" table and onto the reSHape-word one:
    * the two tables are a partition, so a name gained here is a name lost there.
    *
    * This number is NOT the A8.2.2 cost, and an earlier version of this comment
@@ -1456,7 +1456,7 @@ export const ASSIGNMENT_POOL = {
   taughtThisWeek: ['circle', 'ellipse', 'polygon', 'rectangle', 'star'],
 
   /**
-   * ELIGIBLE = a primitive of the bundle that shCAD has no word for AND §8.2
+   * ELIGIBLE = a primitive of the bundle that reSHape has no word for AND §8.2
    * does not teach. Derived at check time from those two facts, never listed by
    * hand; this is the expected answer, and disagreeing with it is the failure.
    */
@@ -1480,7 +1480,7 @@ export const ASSIGNMENT_POOL = {
 
   /** taken from the eligible pool this round — and NOT polygon */
   taken: ['cylinderElliptic', 'torus'],
-  /** claimed by shCAD, but never eligible, so its loss cost the assignment nothing */
+  /** claimed by reSHape, but never eligible, so its loss cost the assignment nothing */
   neverEligible: ['polygon'],
 
   /**
@@ -1501,11 +1501,11 @@ export const ASSIGNMENT_POOL = {
  *
  * Two tables, deliberately separate. The first is the reverse lookup
  * REVERSE_LOOKUP already reads. The second is the one that did not exist: a row
- * per name shCAD has NO word for, saying so, because silence reads as safety.
+ * per name reSHape has NO word for, saying so, because silence reads as safety.
  */
 export const BRIDGE = {
   path: join(REPO, 'public/reshape/docs/reference.md'),
-  shcadWordHeading: REVERSE_LOOKUP.heading,
+  reshapeWordHeading: REVERSE_LOOKUP.heading,
   noWordHeading: "#### The book's other names — type what the book typed",
   tauHeading: '#### `TAU` is a value, not a name in scope',
 };
@@ -1537,8 +1537,8 @@ export function readBridgeTable(heading, text = readFileSync(BRIDGE.path, 'utf8'
 }
 
 /**
- * Three rows of the shCAD-word table are not renames. The real call and the
- * shCAD word beside it do DIFFERENT THINGS, and each difference is silent —
+ * Three rows of the reSHape-word table are not renames. The real call and the
+ * reSHape word beside it do DIFFERENT THINGS, and each difference is silent —
  * the model comes out wrong and nothing throws. A row that does not say so is
  * worse than a missing row, because the table reads as authoritative.
  */
@@ -1623,11 +1623,11 @@ export const SIT_VS_BOOK_ALIGN = {
  * and `constants` both land in scope and TAU — which lives at
  * maths.constants.TAU, one level below that — does not. Paste §9.1's own worked
  * example into shCode and it dies on `TAU is not defined`, in the one chapter
- * shCAD's `revolve` exists to serve.
+ * reSHape's `revolve` exists to serve.
  *
  * This is not fixed by adding a name. runner.html installs the scope and this
  * layer adds no tenth word, so the fix is that reference.md says what to type
- * and shCAD's own refusals spell a call that runs. Both are checked.
+ * and reSHape's own refusals spell a call that runs. Both are checked.
  *
  * `inScope: false` is asserted, not assumed. The day the runner does install a
  * bare TAU, this goes red and the documentation it guards should be deleted
@@ -1652,7 +1652,7 @@ export const BOOK_IDENTIFIERS = [
  * REFUSALS_NAME_THE_REAL_CALL asserts the message hands over a real function
  * name, and for two of them that the message spells the whole call. Neither
  * check asks whether the spelled call WORKS — and measured, neither did: both
- * were written with the book's bare `TAU`, which throws here. shCAD's one
+ * were written with the book's bare `TAU`, which throws here. reSHape's one
  * promise is that a dead end is always one function name from an answer, and
  * an answer that throws is not an answer.
  *
@@ -1780,7 +1780,7 @@ export const BOOK_OPTION_KEYS = [
 /**
  * THE OBJECT LITERAL, WHICH IS THE LAYER'S ENTIRE JUSTIFICATION.
  *
- * shCAD's defence is that it does not hide objects, it postpones them until
+ * reSHape's defence is that it does not hide objects, it postpones them until
  * they are worth having. Measured before this existed, the section making that
  * argument contained exactly ONE live object literal —
  * box(40, 20, 10, { center: [0, 0, 10] }) — because every other brace on the
@@ -1794,7 +1794,7 @@ export const BOOK_OPTION_KEYS = [
  */
 export const OBJECT_DEPTH = {
   path: join(REPO, 'public/reshape/docs/reference.md'),
-  heading: '## shCAD — the simplified names',
+  heading: '## reSHape — the simplified names',
   endsBefore: '## Modules',
 
   /** live = not inside a comment, so it really is executed by the gate */
@@ -1805,13 +1805,13 @@ export const OBJECT_DEPTH = {
   /** and the shape a student is being taught to write first */
   minSingleKey: 4,
 
-  /** every option key shCAD ships, worked rather than merely listed */
-  keys: SHCAD_OPTION_KEYS,
+  /** every option key reSHape ships, worked rather than merely listed */
+  keys: RESHAPE_OPTION_KEYS,
 
   /**
    * getParameterDefinitions is the richest object writing in the quarter and
    * §8.4 is entirely about it, so it is the one place the section has to show
-   * an array OF objects rather than one object. It stays real JSCAD: no shCAD
+   * an array OF objects rather than one object. It stays real JSCAD: no reSHape
    * name is involved in the parameter panel itself.
    */
   parameters: {
@@ -1873,8 +1873,8 @@ export function liveObjectLiterals(code) {
   return out;
 }
 
-/** The slice of reference.md the shCAD layer owns. */
-export function shcadSection(text = readFileSync(OBJECT_DEPTH.path, 'utf8')) {
+/** The slice of reference.md the reSHape layer owns. */
+export function reshapeSection(text = readFileSync(OBJECT_DEPTH.path, 'utf8')) {
   const src = text.replace(/\r\n/g, '\n');
   const start = src.indexOf(OBJECT_DEPTH.heading);
   if (start === -1) return { error: `reference.md has no "${OBJECT_DEPTH.heading}" heading` };
@@ -1885,7 +1885,7 @@ export function shcadSection(text = readFileSync(OBJECT_DEPTH.path, 'utf8')) {
   return { body, line };
 }
 
-/** Evaluate an expression in a shCAD context with extra bindings in place. */
+/** Evaluate an expression in a reSHape context with extra bindings in place. */
 export function evaluateInShcad(bindings, expr) {
   const ctx = createSimpleContext();
   if (bindings) vm.runInContext(bindings, ctx.ctx, { filename: 'bindings' });
@@ -1903,7 +1903,7 @@ export function evaluateInShcad(bindings, expr) {
 // counted them and no table covered them, so the coverage claim was true and
 // still left a hole a student falls into.
 //
-// Measured: a shCAD-only reader translated every one of §8.5's 28 calls and
+// Measured: a reSHape-only reader translated every one of §8.5's 28 calls and
 // then stopped dead on line two of its first parameter block —
 // `{ name: 'ringRadius', type: 'float', ... }`. `float` appeared nowhere in
 // anything shCode shipped: not in reference.md's four-row type table, not on
@@ -1912,7 +1912,7 @@ export function evaluateInShcad(bindings, expr) {
 // and gets the wrong answer, so the docs actively denied it existed. One line
 // earlier, `type: 'int'` had the same problem for anyone reading reference.md
 // alone: the in-app docs teach `int` and `slider`, reference.md listed
-// neither, and reference.md is the file the shCAD section tells a student to
+// neither, and reference.md is the file the reSHape section tells a student to
 // keep open while reading.
 //
 // The answer is one sentence, and it is what the checks below pin rather than
@@ -1925,7 +1925,7 @@ export const PARAM_TYPES = {
   path: join(REPO, 'public/reshape/docs/reference.md'),
   inApp: join(REPO, 'lib/reshape-docs.ts'),
 
-  /** The book -> shCode table, in the shCAD section. */
+  /** The book -> shCode table, in the reSHape section. */
   heading: '#### The parameter panel — the words that are not calls',
   /** The plain reference table, in the API half of the file. */
   referenceHeading: '## Parameters',
@@ -1981,7 +1981,7 @@ export const PARAM_TYPES = {
     { type: 'text', initial: 'HI' },
     { type: 'choice', initial: 'round' },
     { type: 'color', initial: '#ff5555' },
-    { type: 'nonsense-that-is-not-a-jscad-type', initial: 41.5 },
+    { type: 'nonsense-that-is-not-a-reshape-type', initial: 41.5 },
   ],
 
   /**
@@ -1997,7 +1997,7 @@ export const PARAM_TYPES = {
   ],
 
   /**
-   * The runnable example in the shCAD section. Its whole job is to show the
+   * The runnable example in the reSHape section. Its whole job is to show the
    * four numeric spellings declared together and arriving as one kind of
    * thing, so it is found by the type the docs used to deny.
    */
@@ -2056,7 +2056,7 @@ function main(params) { globalThis.__seen = params; return box(10, 10, 10) }`;
  *            NOWHERE in reference.md, while the in-app docs taught both.
  *
  * Both times the defect was the same one: two doc surfaces disagreeing, with
- * reference.md — the file the shCAD section tells a student to keep open while
+ * reference.md — the file the reSHape section tells a student to keep open while
  * reading — the poorer of the two. So the list below is swept rather than
  * spot-checked. A key here must be WRITTEN in reference.md, inside backticks,
  * not merely implied by the function that takes it.
@@ -2093,14 +2093,14 @@ export const BOOK_OPTION_WORDS = {
   },
 
   /**
-   * Not from the book, but from shCAD's own graduation table — the two keys a
+   * Not from the book, but from reSHape's own graduation table — the two keys a
    * student is handed at the moment they leave the layer. `grouped` is the one
    * that silently collapses an assembly if it goes missing.
    */
   alsoFromGraduation: { grouped: 'align', relativeTo: 'align' },
 
   /**
-   * And the keys shCAD's own refusals SPELL OUT. Three of the twelve names hand
+   * And the keys reSHape's own refusals SPELL OUT. Three of the twelve names hand
    * a student a real call carrying a key the layer does not offer — cone's
    * frustum and pie slice, ring's segmented torus. REFUSAL_CALLS proves those
    * calls run; this proves reference.md writes the words, so a student who met
@@ -2132,7 +2132,7 @@ export function createSvgContext(opts = {}) {
   vm.runInContext(readFileSync(SVG_PATH, 'utf8').replace(/\r\n/g, '\n'), sc.ctx, {
     filename: 'public/reshape/svg.js',
   });
-  return { ...sc, svg: sc.ctx.shcadSvg ?? sc.window.shcadSvg };
+  return { ...sc, svg: sc.ctx.reshapeSvg ?? sc.window.reshapeSvg };
 }
 
 /**

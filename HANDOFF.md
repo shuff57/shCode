@@ -199,9 +199,9 @@ yet.
 
 ---
 
-# Handoff — 2026-08-24 · shCAD shipped; no lesson uses it yet
+# Handoff — 2026-08-24 · reSHape shipped; no lesson uses it yet
 
-shCAD — a plain-words surface over `@jscad/modeling`, the JSCAD equivalent of what
+reSHape — a plain-words surface over `@jscad/modeling`, the JSCAD equivalent of what
 moSHion is to planck — was designed, built, gauntleted three times and committed on
 2026-08-24. The gate is green and a student can reach every part of it. **What does
 not exist is a single Q3 lesson that uses it.** The layer is done; the curriculum
@@ -211,7 +211,7 @@ Two commits, both on `cs-3d`, neither pushed:
 
 | Commit | What |
 | --- | --- |
-| `e5056e5` | `feat(jscad): shCAD, a plain-words surface over @jscad/modeling` — 10 files, +8133/-30 |
+| `e5056e5` | `feat(jscad): reSHape, a plain-words surface over @jscad/modeling` — 10 files, +8133/-30 |
 | `2892e67` | `fix(jscad): give /portable a way in` — 4 files, +61/-1 |
 
 This section sits above the module-1.3 review of the same date; the two are unrelated
@@ -219,33 +219,33 @@ and both are current.
 
 ---
 
-## 1. What shCAD is
+## 1. What reSHape is
 
 Twelve names, additive only, in their own file: `box rect disc ball tube extrude
 revolve turn sit cone ring poly`. Positional arguments for what a shape cannot exist
 without, everything else in a trailing options object keyed with the textbook's own
 words. `reshape.js` loads beside the bare-name shim and skips any name already taken,
-reporting into `window.__shcadNamesSkipped` the way the shim reports into
+reporting into `window.__reshapeNamesSkipped` the way the shim reports into
 `__jscadBareNamesSkipped`.
 
-The design decision the operator made, and it drives everything else: **shCAD
-everywhere in Q3, with the real API as the "why"** — not shCAD-as-fallback. So the
-real names stay fully reachable, every shCAD call has a proven real-API equivalent,
+The design decision the operator made, and it drives everything else: **reSHape
+everywhere in Q3, with the real API as the "why"** — not reSHape-as-fallback. So the
+real names stay fully reachable, every reSHape call has a proven real-API equivalent,
 and a student's program can be converted to portable form and pasted into jscad.app.
 
 | Path | What it is |
 | --- | --- |
 | `public/reshape/reshape.js` | the layer itself, ~934 lines, IIFE, banner carries the REFUSALS list |
 | `public/reshape/svg.js` | geom2 to SVG, hand-rolled, ~139 lines |
-| `lib/jscad-portable.mjs` | source-text in, portable source-text out, ~1016 lines |
+| `lib/reshape-portable.mjs` | source-text in, portable source-text out, ~1016 lines |
 | `app/portable/page.tsx` | the `/portable` converter page |
 | `scripts/reshape-simple-checks.mjs` | expectations as data — the builder must not own the gate |
 | `scripts/test-reshape.mjs` | SIMPLE + PORTABLE groups appended; nothing existing weakened |
-| `public/reshape/docs/reference.md` | the shCAD section, the graduation table, the reading table |
+| `public/reshape/docs/reference.md` | the reSHape section, the graduation table, the reading table |
 
 ### `turn` is the one that is not a rename
 
-Every other shCAD name maps onto one real call. `turn` does not: it rotates a shape
+Every other reSHape name maps onto one real call. `turn` does not: it rotates a shape
 **in place** (bbox centre to origin, rotate, back) and takes **degrees**, where
 `transforms.rotate` orbits the world origin in radians. The slogan in the docs is
 **"turn for shapes, rotate for frames"**, and it is load-bearing — a student who
@@ -268,8 +268,8 @@ solve a fifty-line problem is the wrong trade.
 These are the things a future change will step on. Each one is enforced by the gate,
 but the gate failure will not explain why.
 
-- **`EXPECTED_BARE_NAME_COUNT = 124` counts the shim, not shCAD.** shCAD lives in its
-  own file precisely so it does not move that number. If a shCAD name ever needs to
+- **`EXPECTED_BARE_NAME_COUNT = 124` counts the shim, not reSHape.** reSHape lives in its
+  own file precisely so it does not move that number. If a reSHape name ever needs to
   come from the shim, the count and the reasoning both change.
 - **`taughtFromReference()` derives the taught set from the module tables in
   `reference.md`.** Restructuring those tables silently redefines what the API group
@@ -285,7 +285,7 @@ but the gate failure will not explain why.
   link and no docs link, while its own header comment described three ways a student
   arrives. Do not delete either link and leave the page.
 - **`check-runner-hoisting.mjs`** anchors on the "Running your code…" status line in
-  `runner.html`. The three shCAD edits there (script tag, `FORMATS` entry, Save SVG
+  `runner.html`. The three reSHape edits there (script tag, `FORMATS` entry, Save SVG
   button) were made above it deliberately.
 
 ## 3. Verified green
@@ -305,14 +305,14 @@ is not decoration.
 
 ## 4. What is NOT done
 
-1. **No Q3 lesson uses shCAD.** The layer, the docs, the converter and the export all
+1. **No Q3 lesson uses reSHape.** The layer, the docs, the converter and the export all
    exist; §8.2 and §8.3 still teach the raw API. This is the whole remaining job and
    it is curriculum work, not build work.
 2. **A8.2.1's assignment text has not been re-read against what shipped.** It says
    "Export as SVG". That now works. Nobody has checked that the rest of the wording
    matches the button the student will actually see.
-3. **`model-codegen` was retargeted to shCAD** at the operator's confirmation; the
-   sandbox generator now emits shCAD. Two of its assertions are borrowed by the JSCAD
+3. **`model-codegen` was retargeted to reSHape** at the operator's confirmation; the
+   sandbox generator now emits reSHape. Two of its assertions are borrowed by the JSCAD
    gate (`BORROWED_ASSERTIONS` in `reshape-simple-checks.mjs`) so a change in one place
    fails in both. Worth knowing before editing either file.
 4. **Nothing is pushed.** Both commits are local on `cs-3d`.
@@ -344,7 +344,7 @@ instances are worth keeping:
 
 - **`msg.mjs release --as <name> --all` is per-identity and the identity is
   unauthenticated free text.** A peer probing the guard under the identity
-  `claude-shcad` released all six of this session's claims as collateral. Claims are
+  `claude-reshape` released all six of this session's claims as collateral. Claims are
   a coordination convention, not a lock.
 - **The ownership guard path in `settings.json` was wrong** (`shuff57` where the home
   directory is `shuff`), so it had never blocked anything while looking configured.
@@ -608,7 +608,7 @@ auto-advances, retry works, no lockout. The AI grader is live and grading loosel
 intended. Teacher class management, gradebook, CSV export (real 14.7 KB download),
 push author stamping, and lesson-mode persistence through the real route all pass.
 
-Per-lesson teacher gates only render for `preview === 'jscad'` lessons
+Per-lesson teacher gates only render for `preview === 'reshape'` lessons
 (`app/teacher/page.tsx:1433`) and no 1.3 lesson is jscad — so that gate cannot touch
 this module. Not a defect; noted so "no gate row on 1.3.11" is not read as one.
 

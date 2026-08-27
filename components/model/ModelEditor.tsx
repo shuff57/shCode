@@ -16,7 +16,7 @@
 // variant. Search tools (Onshape: alt+c) is the same idea here.
 //
 // Deliberately NOT copied: Onshape puts Undo/Redo at the far left and buries
-// Delete mid-bar next to Transform. shCAD keeps Undo/Redo/Delete clustered at
+// Delete mid-bar next to Transform. reSHape keeps Undo/Redo/Delete clustered at
 // the end, as it already did before this pass — for a first CS course "the
 // row at the end for fixing mistakes" is one easy-to-teach unit, and there is
 // no reach-distance problem here worth optimizing away from that.
@@ -132,7 +132,7 @@ const BOOL_OPS: BoolOp[] = ['union', 'subtract', 'intersect'];
 
 // "Chamfer" is the one CAD word left in the bar. The button keeps saying it
 // in plain English -- the real term shows up in the tooltip instead, same as
-// every other real-API-as-the-why relationship in shCAD.
+// every other real-API-as-the-why relationship in reSHape.
 function roundLabel(style: RoundStyle) {
   return style === 'fillet' ? 'Round' : 'Angled Corner';
 }

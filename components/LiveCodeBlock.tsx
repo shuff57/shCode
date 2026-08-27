@@ -330,8 +330,8 @@ export default function LiveCodeBlock({
           background: #000;
           position: relative;
         }
-        .livecodeblock-preview .jscad-frame,
-        .livecodeblock-preview .jscad-empty {
+        .livecodeblock-preview .reshape-frame,
+        .livecodeblock-preview .reshape-empty {
           width: 100%;
           height: 100%;
           display: block;

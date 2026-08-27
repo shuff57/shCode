@@ -7,15 +7,15 @@
 // source stays byte-identical while any number moves, so nothing reloads. Only
 // adding, deleting or reordering a feature regenerates the file.
 //
-// It emits shCAD spellings -- box, tube, ball, extrude, turn -- which are
+// It emits reSHape spellings -- box, tube, ball, extrude, turn -- which are
 // globals installed by public/reshape/reshape.js, so a student reads the same names
 // the lessons teach rather than a second dialect alongside them.
 //
 // THE COST, stated because it used to be a selling point: the generated file no
 // longer runs unmodified on jscad.app. Those names exist only in our runner.
-// Every shape it emits now has a shCAD spelling. Booleans and translate stay
+// Every shape it emits now has a reSHape spelling. Booleans and translate stay
 // JSCAD deliberately -- they are already short and array-first and have no
-// shCAD twin by design -- and `ring` takes no options, so a positioned ring is
+// reSHape twin by design -- and `ring` takes no options, so a positioned ring is
 // a translate around one rather than an argument to it.
 
 import { solveSketch, type Point } from './sketch-solve';
@@ -421,7 +421,7 @@ function centreExpr(id: string): string {
 
 /** The expression that builds one feature, and which helpers it needs. */
 function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>): string {
-  // shCAD's turn() measures the shape's own middle, brings it to the origin,
+  // reSHape's turn() measures the shape's own middle, brings it to the origin,
   // rotates, and puts it back -- so it commutes with translate and the shape is
   // simply built where it belongs. Measured on a 40x20x10 box moved to x=50 and
   // turned 90: turn lands on [[40,-20,-5],[60,20,5]], identical to the
@@ -442,7 +442,7 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
 
   if (f.kind === 'box') {
     const size = `[p.${pname(f.id, 'width')}, p.${pname(f.id, 'depth')}, p.${pname(f.id, 'height')}]`;
-    // shCAD takes plain numbers; the { size: [...] } spelling belongs to cuboid
+    // reSHape takes plain numbers; the { size: [...] } spelling belongs to cuboid
     // and box() throws on it deliberately, so there is one way to write each.
     const dims = `p.${pname(f.id, 'width')}, p.${pname(f.id, 'depth')}, p.${pname(f.id, 'height')}`;
     if (!f.round) return place(`box(${dims}, { center: ${c} })`);
@@ -555,7 +555,7 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
   }
 
   if (f.kind === 'revolve') {
-    // revolve() (shCAD) refuses an `angle` option by name -- see REAL_EXTRAS
+    // revolve() (reSHape) refuses an `angle` option by name -- see REAL_EXTRAS
     // in reshape.js -- and hands the student the real call instead. Build mode
     // exposes that exact angle as a dial, so it has to be the real call too:
     // extrudeRotate sweeps the profile around the world Z axis, taking the
@@ -566,8 +566,8 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
   }
 
   if (f.kind === 'mirror') {
-    // Real transforms.mirror, not a shCAD name -- see the header banner:
-    // mirror is already short and reads as English, so shCAD ships it bare.
+    // Real transforms.mirror, not a reSHape name -- see the header banner:
+    // mirror is already short and reads as English, so reSHape ships it bare.
     //
     // The plane goes through the TARGET'S OWN bounding box, never bare world
     // zero -- see mirrorThroughFace(). A shape built at the origin (a
@@ -584,7 +584,7 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
   }
 
   if (f.kind === 'hole') {
-    // Sugar over tube (shCAD's cylinder) + subtract, folded into one line so
+    // Sugar over tube (reSHape's cylinder) + subtract, folded into one line so
     // the feature list shows one row rather than a tool body plus a cut.
     needs.add('transforms');
     const r = `p.${pname(f.id, 'diameter')} / 2`;
@@ -636,7 +636,7 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
   }
 
   if (f.kind === 'pattern') {
-    // toJscad() special-cases pattern features through patternLines() before
+    // toReshape() special-cases pattern features through patternLines() before
     // ever calling featureExpr() -- a pattern's statement is a `for` loop,
     // not a single expression. Reaching this means that guard was skipped.
     throw new Error('pattern features are emitted by patternLines(), not featureExpr()');
@@ -1033,7 +1033,7 @@ function roundPoly(corners, rounds, bulges) {
 }`,
 };
 
-export function toJscad(doc: ModelDoc): string {
+export function toReshape(doc: ModelDoc): string {
   const params = generatedParams(doc);
   const needs = new Set<string>();
 
@@ -1065,7 +1065,7 @@ export function toJscad(doc: ModelDoc): string {
   }
   if (needs.has('extrusions') && !modules.includes('extrusions')) modules.push('extrusions');
   // polyArc closes its sampled points into a geom2 by hand -- discAcross needs
-  // no raw jscad import at all, it only calls the shCAD global disc().
+  // no raw jscad import at all, it only calls the reSHape global disc().
   if (needs.has('polyArc') && !modules.includes('geometries')) modules.push('geometries');
 
   const defs = params

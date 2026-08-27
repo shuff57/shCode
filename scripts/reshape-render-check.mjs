@@ -328,7 +328,7 @@ if (!existsSync(join(OUT, 'docs/reshape'))) {
     await runBtn.click();
     await page.waitForTimeout(WAIT + 1500);
 
-    const src = await page.locator('iframe.jscad-frame').first().getAttribute('src').catch(() => null);
+    const src = await page.locator('iframe.reshape-frame').first().getAttribute('src').catch(() => null);
     const rframe = page.frames().find((f) => /runner\.html/.test(f.url()));
     const inner = rframe
       ? await rframe.evaluate(() => ({

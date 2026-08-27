@@ -21,7 +21,7 @@ import {
   paramValues as docParams,
   solveDoc,
   solveSketchDrag,
-  toJscad,
+  toReshape,
 } from '../lib/model-codegen';
 import { RUNNER_SOURCE, RUN_TIMEOUT_MS } from '../lib/js-runner-source';
 import {
@@ -40,7 +40,7 @@ import {
 } from '../lib/sandbox-modes';
 
 const MODE_KEY = 'shCode:sandbox-mode';
-const BUILD_KEY = 'shCode:sandbox-jscad-build';
+const BUILD_KEY = 'shCode:sandbox-reshape-build';
 
 // The plain outlined chip the Reset and Full screen buttons both wear.
 const chipStyle: React.CSSProperties = {
@@ -117,7 +117,7 @@ export default function SandboxWorkspace() {
   // A gate arriving after the page has rendered must not leave a student on a
   // side they are no longer allowed on.
   useEffect(() => {
-    if (mode.preview !== 'jscad') return;
+    if (mode.preview !== 'reshape') return;
     const g = resolveMode('sandbox', teacherModes);
     if (build && !canUseBuild(g)) setBuild(false);
     if (!build && !canUseCode(g)) setBuild(true);
@@ -171,7 +171,7 @@ export default function SandboxWorkspace() {
   // ---- JSCAD: dimensions in, rebuild timings out ----------------------------
 
   useEffect(() => {
-    if (mode.preview !== 'jscad') return;
+    if (mode.preview !== 'reshape') return;
     const onMessage = (e: MessageEvent) => {
       // Filter by source, not origin: the runner frame is sandboxed without
       // allow-same-origin, so its origin is opaque ("null") by design.
@@ -180,22 +180,22 @@ export default function SandboxWorkspace() {
         source?: string; defs?: ParamDef[]; values?: ParamValues;
         ms?: number; empty?: boolean; failed?: boolean; points?: AnchorPoint[];
       };
-      if (d?.source === 'jscad-params') {
+      if (d?.source === 'reshape-params') {
         frameRef.current?.contentWindow?.postMessage(
-          { source: 'jscad-set-anchors', anchors: specsRef.current },
+          { source: 'reshape-set-anchors', anchors: specsRef.current },
           '*'
         );
         setParamDefs(Array.isArray(d.defs) ? d.defs : []);
         setParamValues(d.values ?? {});
         setRebuildMs(null);
         setStale(null);
-      } else if (d?.source === 'jscad-rebuilt' && typeof d.ms === 'number') {
+      } else if (d?.source === 'reshape-rebuilt' && typeof d.ms === 'number') {
         setStale(d.failed ? 'error' : d.empty ? 'empty' : null);
         if (!d.empty && !d.failed) setRebuildMs(d.ms);
-      } else if (d?.source === 'jscad-anchors') {
+      } else if (d?.source === 'reshape-anchors') {
         setAnchors(Array.isArray(d.points) ? d.points : []);
       } else if (d?.source === 'preview-error') {
-        // A script that throws on load never reaches jscad-rebuilt, so without
+        // A script that throws on load never reaches reshape-rebuilt, so without
         // this the failure is visible only inside the frame — and the panel
         // goes on showing numbers for a model that was never built.
         setStale('error');
@@ -224,7 +224,7 @@ export default function SandboxWorkspace() {
     setParamValues(() => docParams(next));
     setRebuildMs(null);
     setStale(null);
-    setCode(toJscad(next));
+    setCode(toReshape(next));
     setRunKey((k) => k + 1);
     setIsRunning(true);
   }, []);
@@ -277,7 +277,7 @@ export default function SandboxWorkspace() {
     setParamValues((prev) => ({ ...prev, ...solved }));
     uncommitted.current = { ...uncommitted.current, ...solved };
     frameRef.current?.contentWindow?.postMessage(
-      { source: 'jscad-set-params', params: solved },
+      { source: 'reshape-set-params', params: solved },
       '*'
     );
   }, []);
@@ -352,7 +352,7 @@ export default function SandboxWorkspace() {
   useEffect(() => {
     specsRef.current = specs;
     frameRef.current?.contentWindow?.postMessage(
-      { source: 'jscad-set-anchors', anchors: specs },
+      { source: 'reshape-set-anchors', anchors: specs },
       '*'
     );
     if (specs.length === 0) setAnchors([]);
@@ -365,7 +365,7 @@ export default function SandboxWorkspace() {
         + 'after this, but the shape tools will no longer be driving it.'
       );
       if (!ok) return;
-      updateFile('script.js', toJscad(doc));
+      updateFile('script.js', toReshape(doc));
       setDoc(EMPTY_DOC);
       setSelected([]);
       past.current = [];
@@ -441,8 +441,8 @@ export default function SandboxWorkspace() {
     // console output (sketch gauntlet round 3, live lens). Read the doc, not
     // the file. docRef, not doc, so this callback is not rebuilt on every
     // dimension change.
-    const script = mode.preview === 'jscad' && build
-      ? toJscad(docRef.current)
+    const script = mode.preview === 'reshape' && build
+      ? toReshape(docRef.current)
       : fileContents['script.js'] || '';
     if (mode.preview === 'console') {
       runJs(script);
@@ -491,7 +491,7 @@ export default function SandboxWorkspace() {
       }
       // Only in Build. In Code the editor owns undo, and stealing it there
       // would rewind the model out from under someone editing text.
-      if (!(mode.preview === 'jscad' && build) || !(e.ctrlKey || e.metaKey)) return;
+      if (!(mode.preview === 'reshape' && build) || !(e.ctrlKey || e.metaKey)) return;
       const k = e.key.toLowerCase();
       if (k === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
       else if ((k === 'z' && e.shiftKey) || k === 'y') { e.preventDefault(); redo(); }
@@ -663,7 +663,7 @@ export default function SandboxWorkspace() {
   ];
 
   const isConsole = mode.preview === 'console';
-  const isJscad = mode.preview === 'jscad';
+  const isReshape = mode.preview === 'reshape';
 
   // The sandbox has no assignment, so only the class-wide gate can reach it.
   // Per-assignment overrides apply in lessons, where a lesson id exists.
@@ -703,7 +703,7 @@ export default function SandboxWorkspace() {
             ))}
           </div>
 
-          {isJscad && (
+          {isReshape && (
             <>
               <div className="sandbox-modes" role="group" aria-label="Editing mode">
                 <button
@@ -758,7 +758,7 @@ export default function SandboxWorkspace() {
 
         <div className="editor-preview-container sandbox-split" id="split">
           <div className="pane" id="editorPane">
-            {isJscad && build ? (
+            {isReshape && build ? (
               <ModelEditor
                 doc={doc}
                 onChange={applyDoc}
@@ -797,9 +797,9 @@ export default function SandboxWorkspace() {
                   )}
                 </pre>
               </>
-            ) : isJscad ? (
-              <div className="jscad-pane">
-                <div className="jscad-pane-view">
+            ) : isReshape ? (
+              <div className="reshape-pane">
+                <div className="reshape-pane-view">
                   <ReshapePreview ref={frameRef} code={code} runKey={runKey} />
                   {build && (
                     <HandleOverlay
@@ -813,7 +813,7 @@ export default function SandboxWorkspace() {
                   )}
                 </div>
                 {runKey > 0 && (
-                  <aside className="jscad-pane-params">
+                  <aside className="reshape-pane-params">
                     <ReshapeParamsPanel
                       defs={paramDefs}
                       values={paramValues}
@@ -891,10 +891,10 @@ export default function SandboxWorkspace() {
           flex: 1 1 auto;
           min-height: 280px;
         }
-        .jscad-pane { display: flex; height: 100%; min-height: 0; }
-        .jscad-pane-view { flex: 1 1 auto; min-width: 0; display: flex; position: relative; }
-        .jscad-pane-view .jscad-frame, .jscad-pane-view .jscad-empty { flex: 1; }
-        .jscad-pane-params {
+        .reshape-pane { display: flex; height: 100%; min-height: 0; }
+        .reshape-pane-view { flex: 1 1 auto; min-width: 0; display: flex; position: relative; }
+        .reshape-pane-view .reshape-frame, .reshape-pane-view .reshape-empty { flex: 1; }
+        .reshape-pane-params {
           flex: 0 0 208px;
           min-width: 0;
           border-left: 1px solid var(--border);

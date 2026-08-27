@@ -135,5 +135,5 @@
 		return out + '  </g>\n</svg>\n';
 	}
 
-	root.shcadSvg = { serialize: serialize };
+	root.reshapeSvg = { serialize: serialize };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

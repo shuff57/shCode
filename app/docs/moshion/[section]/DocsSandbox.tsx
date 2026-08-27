@@ -50,7 +50,7 @@ export default function DocsSandbox({
    *  here is what silently piped the JSCAD docs into the moSHion runner, where
    *  every example died on `require is not defined`. Leave it required so the
    *  compiler catches the next caller that forgets. */
-  preview: 'moshion' | 'jscad';
+  preview: 'moshion' | 'reshape';
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -135,7 +135,7 @@ export default function DocsSandbox({
       <div className="docs-sandbox-pane docs-sandbox-preview-pane">
         <div className="docs-sandbox-preview-header">Preview</div>
         <div className="docs-sandbox-preview-body">
-          {preview === 'jscad' ? (
+          {preview === 'reshape' ? (
             <ReshapePreview code={code} runKey={runKey} />
           ) : (
             <MoshionPreview code={code} runKey={runKey} />

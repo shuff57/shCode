@@ -7,7 +7,7 @@ export function generateStaticParams() {
   return getAllSectionSlugs().map((section) => ({ section }));
 }
 
-export default async function JscadDocsSectionPage({
+export default async function ReshapeDocsSectionPage({
   params,
 }: {
   params: Promise<{ section: string }>;
@@ -23,7 +23,7 @@ export default async function JscadDocsSectionPage({
         basePath="/docs/reshape"
         docsTitle="JSCAD reference"
         searchPlaceholder="Search the JSCAD docs…"
-        preview="jscad"
+        preview="reshape"
       />
     </Suspense>
   );

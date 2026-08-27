@@ -16,7 +16,7 @@ loads from a CDN at runtime.
   `preview-error` protocol, loads the two vendored bundles by relative path,
   installs the additive scope shim, runs `main()`, renders with
   `@jscad/regl-renderer`.
-- `public/reshape/reshape.js` — **shCAD**, the simplified nine-name layer the
+- `public/reshape/reshape.js` — **reSHape**, the simplified nine-name layer the
   course teaches for the whole of Q3. Additive, in its own file, loaded by
   `runner.html` after the shim and before student code. See the amended
   invariant below.
@@ -26,8 +26,8 @@ loads from a CDN at runtime.
   builds `src=/reshape/runner.html?code=…&r=…`, mirroring `MoshionPreview.tsx`.
 - `app/docs/reshape/` — the in-app docs route (reuses the moSHion docs client
   and sandbox components).
-- `lessons/jscad-*` — the JSCAD lessons (jscad-intro, jscad-2d-shapes,
-  jscad-booleans).
+- `lessons/reshape-*` — the JSCAD lessons (reshape-intro, reshape-2d-shapes,
+  reshape-booleans).
 
 ## Versions (keep in sync)
 
@@ -69,21 +69,21 @@ The preview iframe (`public/reshape/runner.html`):
   paste into jscad.app and run.
 
   **This invariant used to end "and no new function name is invented", and
-  shCAD deliberately amends that half of it.** The SHIM still invents nothing —
-  it copies real names onto `window` and does not add a tenth thing. shCAD is a
+  reSHape deliberately amends that half of it.** The SHIM still invents nothing —
+  it copies real names onto `window` and does not add a tenth thing. reSHape is a
   separate additive layer in its own file, `public/reshape/reshape.js`, loaded
   after the shim and before student code, which adds nine NEW names (`box`,
   `rect`, `disc`, `ball`, `tube`, `extrude`, `revolve`, `turn`, `sit`) and
   never renames, wraps or overwrites a real one — every name is a new word, not
   an abbreviation of the function it stands for, and any name already on
-  `window` is skipped and reported in `window.__shcadNamesSkipped`. It exists
+  `window` is skipped and reported in `window.__reshapeNamesSkipped`. It exists
   because the real API forces an object literal *and* an array literal into a
   fourteen-year-old's first 3D line, which puts the brace where it is only
-  punctuation. shCAD makes required values positional and every named extra an
+  punctuation. reSHape makes required values positional and every named extra an
   optional trailing `{ }`, so `box(40, 20, 10)` is day one and
   `box(40, 20, 10, { center: [0, 0, 10] })` is the day the model needed
   something — which is the objects lesson the book has no chapter for yet.
-  Every shCAD call returns the same real geometry the call it stands for
+  Every reSHape call returns the same real geometry the call it stands for
   returns, so the two vocabularies mix in one file and graduation is a rename.
   Its own banner carries the design; `scripts/reshape-simple-checks.mjs` carries
   the expectations.
@@ -99,10 +99,10 @@ The preview iframe (`public/reshape/runner.html`):
   origin and translate last" — with `turn` that advice makes no difference.
   Both facts are stated in the banner and in `reference.md`, and both halves
   are asserted by `TURN_COMPOSITION` (turn must commute; `transforms.rotate`
-  must still not). The order lesson stays teachable because shCAD renames
+  must still not). The order lesson stays teachable because reSHape renames
   nothing: `rotate` and `translate` are bare, real, and what the book prints.
 
-  **A refusal always names the real function.** A key shCAD does not have, a
+  **A refusal always names the real function.** A key reSHape does not have, a
   `{ }` written where the real API wants one, a third argument to `turn` — each
   is refused with the JSCAD name that does take it, and where the refused key
   is a real key of that call (`revolve` + `angle`, `extrude` + `twistAngle`)
@@ -160,9 +160,9 @@ makes them un-abusable — a `skeleton` that returns geometry, or a
 - ` ```js skeleton ` — `main()` is a stub and returns nothing.
 - ` ```js shcode-only ` — the example depends on the shim and is NOT portable.
 
-The SIMPLE group adds twelve more, the first three about shCAD staying additive: none of its
+The SIMPLE group adds twelve more, the first three about reSHape staying additive: none of its
 nine names exists before `reshape.js` runs, no real JSCAD name resolves to
-anything different afterwards, and every shCAD call builds geometry **identical**
+anything different afterwards, and every reSHape call builds geometry **identical**
 to the real call it stands for — serialised and compared, not just counted, so
 a helpful default drifting in would fail. `turn` is exempt from that last one on
 purpose and is pinned to the in-place expectation instead, with a counter-case
@@ -171,7 +171,7 @@ that fails if it ever becomes a plain `transforms.rotate`.
 The fourth is the one to know about. **The graduation table in `reference.md`
 is executed, both halves of every row, and the two results compared as whole
 geometry.** That table is the only place a student is handed the real call to
-copy at the moment they leave shCAD, and proving `reshape.js` matches the real
+copy at the moment they leave reSHape, and proving `reshape.js` matches the real
 API proves nothing about what the docs *say* the real API is. The two drifted
 once already: the `sit` row was missing `grouped`, which is correct for a single
 shape and silently collapses an assembly onto `z = 0` — every part dropped
@@ -183,15 +183,15 @@ quietly excusing a new row. `GRADUATION_TRIPWIRES` holds the counter-cases that
 stop a row becoming decoration.
 
 The fifth and sixth close the two holes that table left. **`reference.md` also
-carries the table the other way round** — real name on the left, shCAD word on
+carries the table the other way round** — real name on the left, reSHape word on
 the right, under `#### Reading the book` — because the seven written Q3 chapters
 are in the real API, so a student *reads* `cuboid` and has to write `box`.
 Measured on the chapter sources: 177 of the 273 calls in the assigned reading
-— 65% — are in a spelling shCAD replaces, and three mappings (`extrudeRotate`
+— 65% — are in a spelling reSHape replaces, and three mappings (`extrudeRotate`
 → `revolve`, `align` → `sit`, `rotate` → `turn`) cannot be guessed backwards
-at all. `REVERSE_LOOKUP` asserts every name shCAD stands in for has a row pointing
-at the right shCAD word. And **every `shcode-only` example in `reference.md` is
-now executed** in the shCAD context. They were previously asserted only to
+at all. `REVERSE_LOOKUP` asserts every name reSHape stands in for has a row pointing
+at the right reSHape word. And **every `shcode-only` example in `reference.md` is
+now executed** in the reSHape context. They were previously asserted only to
 *fail* portably — which is what the tag means — so nothing ever checked that
 they work, and the `turn` examples, the ones a student is likeliest to copy out
 of the hardest section, had never been run at all.
@@ -199,7 +199,7 @@ of the hardest section, had never been run at all.
 The seventh, eighth and ninth were added after the reverse table was measured
 against the chapter sources rather than eyeballed.
 
-**The bridge.** `REVERSE_LOOKUP` asks whether every name *shCAD replaces* has a
+**The bridge.** `REVERSE_LOOKUP` asks whether every name *reSHape replaces* has a
 row. A student reading the book asks whether every name they can *type* has one,
 and eight did not — `cube` among them, at 12 calls across four chapters and in
 the opening runnable block of the whole unit, with `box(10, 10, 10)` being
@@ -217,7 +217,7 @@ old row got a part on the bed but still off to one side, with no error.
 **`TAU`, which is not a name.** §9.1 types a bare `TAU` in five runnable blocks
 and the option tables print it a dozen more times. The shim installs module
 members one level deep and `TAU` lives one level below that, at
-`maths.constants.TAU` — so it is genuinely not in scope here, and shCAD's own
+`maths.constants.TAU` — so it is genuinely not in scope here, and reSHape's own
 refusal messages used to hand a student a call containing it. `BOOK_IDENTIFIERS`
 asserts it is still out of scope (the day it is not, delete the docs it guards),
 that `constants.TAU`, `maths.constants.TAU` and `Math.PI * 2` all evaluate to
@@ -232,7 +232,7 @@ objects rather than hiding them, and the section making that argument held
 exactly ONE live object literal, because every other brace on the page was
 inside a `//` comment showing the real API. `OBJECT_DEPTH` counts the option
 objects a student can actually run in that section, how many carry more than one
-key, and whether each of the three keys shCAD ships is *worked* rather than
+key, and whether each of the three keys reSHape ships is *worked* rather than
 merely tabled — plus `getParameterDefinitions`, which stays real JSCAD, is
 executed and checked to be an array of genuinely different object shapes whose
 declared defaults reach `main()`. `PARAM_DEFAULTS` pins the trap that goes with
@@ -255,9 +255,9 @@ the defect is still there rather than tolerating it.
 literal was covered by nothing, and the coverage claim stayed true while a
 student stalled. It happened twice, and both times the underlying defect was
 the same: two doc surfaces disagreeing, with `reference.md` — the file the
-shCAD section tells a student to keep open — the poorer of the two.
+reSHape section tells a student to keep open — the poorer of the two.
 
-First, `type: 'float'`. A shCAD-only reader translated all 28 of §8.5's calls
+First, `type: 'float'`. A reSHape-only reader translated all 28 of §8.5's calls
 and stopped on line two of its first parameter block. `reference.md`'s
 parameter table had four rows (`number`, `text`, `checkbox`, `choice`); the
 seven chapters print seven types, and the in-app docs taught `int`, `slider`,
@@ -282,8 +282,8 @@ asserting `reference.md` writes it. That is the wall that should have caught
 both, and the reason a third one of this shape is a build failure rather than a
 critic's finding.
 
-One consequence worth writing down: **`revolve` is the one shCAD name whose
-`{ }` changes ends on graduation.** shCAD's grammar has no exceptions — every
+One consequence worth writing down: **`revolve` is the one reSHape name whose
+`{ }` changes ends on graduation.** reSHape's grammar has no exceptions — every
 extra rides in a trailing `{ }` — but `extrudeRotate` and `extrudeLinear` take
 theirs first. `extrude` hides that (its required value *becomes* the leading
 `{ height: … }`); `revolve` cannot, because its required value is the shape. So

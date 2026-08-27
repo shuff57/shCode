@@ -29,7 +29,7 @@ const MoshionPreview = forwardRef<HTMLIFrameElement, Props>(function MoshionPrev
 
   if (runKey === 0 || !code.trim()) {
     return (
-      <div className="jscad-empty">
+      <div className="reshape-empty">
         <p>Click <strong>Run</strong> to execute your moSHion sketch.</p>
       </div>
     );
@@ -40,7 +40,7 @@ const MoshionPreview = forwardRef<HTMLIFrameElement, Props>(function MoshionPrev
       ref={innerRef}
       key={runKey}
       id="preview"
-      className="jscad-frame"
+      className="reshape-frame"
       // See ReshapePreview for the reasoning: allow-same-origin is deliberately
       // absent so student code cannot reach /api/* with the session cookie.
       // Saves therefore go through the parent -- see lib/moshion-storage.ts.

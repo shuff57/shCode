@@ -33,7 +33,7 @@ const claim = (tool, where) => {
   claims.set(t, [...(claims.get(t) ?? []), where]);
 };
 
-for (const s of map.ships) claim(s.onshape, `ships:${s.shcad}`);
+for (const s of map.ships) claim(s.onshape, `ships:${s.reshape}`);
 for (const b of map.build) for (const t of b.covers) claim(t, `build:${b.id}`);
 for (const g of map.outOfScope) for (const t of g.tools) claim(t, `scope:${g.group}`);
 

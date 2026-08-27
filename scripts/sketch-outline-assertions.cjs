@@ -273,7 +273,7 @@ module.exports = function run(dir) {
   // ------------------------------------------------------------------ C5 --
   console.log('\n=== C5 the generated source drags live ===');
 
-  const src = gen.toJscad({
+  const src = gen.toReshape({
     version: 1,
     features: [
       sk({ rounds: { 1: 8 } }),
@@ -307,7 +307,7 @@ module.exports = function run(dir) {
   // it has to be, it runs inside the sandboxed frame with no imports. So it is
   // measured against the first one rather than trusted. This is the only thing
   // that catches the two drifting apart.
-  // Both helpers by name, in dependency order -- toJscad emits them in
+  // Both helpers by name, in dependency order -- toReshape emits them in
   // whatever order the needs set happened to fill, so slicing a range from
   // one of them silently drops the other.
   const fnSrc = (name) => {
@@ -358,7 +358,7 @@ module.exports = function run(dir) {
   }
 
   // Unchanged: a doc with bulges and no rounds is somebody else's outline.
-  const legacySrc = gen.toJscad(doc(sk({
+  const legacySrc = gen.toReshape(doc(sk({
     points: [[0, 0], [25, 0], [28, 9], [0, 30]],
     bulges: { 1: 0.720748 },
   })));

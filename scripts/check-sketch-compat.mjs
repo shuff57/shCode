@@ -66,7 +66,7 @@ try {
 
   let src = null;
   try {
-    src = gen.toJscad(doc);
+    src = gen.toReshape(doc);
     check('an old doc still generates source', typeof src === 'string' && src.length > 0);
   } catch (e) {
     check('an old doc still generates source', false, String(e && e.message));

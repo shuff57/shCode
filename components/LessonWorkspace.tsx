@@ -84,7 +84,7 @@ export default function LessonWorkspace({
   const [srcDoc, setSrcDoc] = useState('');
   const [runKey, setRunKey] = useState(0);
   const [q5Code, setQ5Code] = useState('');
-  const [jscadCode, setJscadCode] = useState('');
+  const [reshapeCode, setReshapeCode] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [resetMsg, setResetMsg] = useState<string | null>(null);
   const [consoleOutput, setConsoleOutput] = useState<Array<{type: string; message: string; timestamp: string}>>([]);
@@ -268,26 +268,26 @@ export default function LessonWorkspace({
       : current + '\n\n' + block + '\n';
     updateFile('script.js', next);
   }, [planLines, files, lesson, updateFile]);
-  const isJscadMode = lesson.preview === 'jscad';
+  const isReshapeMode = lesson.preview === 'reshape';
   const isMoshionMode = lesson.preview === 'moshion';
 
   // For JSCAD lessons: auto-run on first load
   useEffect(() => {
-    if (!isJscadMode) return;
+    if (!isReshapeMode) return;
     const scriptContent = files['script.js'] || '';
     if (!scriptContent.trim()) return;
     const to = setTimeout(() => {
-      setJscadCode(scriptContent);
+      setReshapeCode(scriptContent);
       setRunKey((k) => k + 1);
       setIsRunning(true);
       setTimeout(() => runTests(), 600);
     }, 300);
     return () => clearTimeout(to);
-  }, [isJscadMode]); // only on mount, not on every keystroke
+  }, [isReshapeMode]); // only on mount, not on every keystroke
 
   // For HTML lessons: auto-build preview on every change (debounced)
   useEffect(() => {
-    if (isConsoleMode || isJscadMode || isMoshionMode) return;
+    if (isConsoleMode || isReshapeMode || isMoshionMode) return;
     const to = setTimeout(() => {
       const doc = buildPreviewHtml(lesson.files, files);
       setSrcDoc(doc);
@@ -299,7 +299,7 @@ export default function LessonWorkspace({
       return () => clearTimeout(to2);
     }, 600);
     return () => clearTimeout(to);
-  }, [files, isConsoleMode, isJscadMode]);
+  }, [files, isConsoleMode, isReshapeMode]);
 
   // For console lessons: run JS in a Worker and capture output.
   // This is intentional — students write code in the editor and we execute it,
@@ -399,9 +399,9 @@ export default function LessonWorkspace({
   // For JSCAD lessons: snapshot the current code and bump runKey to reload the
   // iframe. Same shape as runQ5 — the runner lives at /reshape/runner.html and
   // reads the code from its ?code= param.
-  function runJscad() {
+  function runReshape() {
     setRuntimeError(null);
-    setJscadCode(files['script.js'] || '');
+    setReshapeCode(files['script.js'] || '');
     setRunKey((k) => k + 1);
     setConsoleResetKey((k) => k + 1);
     setConsoleOpen(true);
@@ -424,7 +424,7 @@ export default function LessonWorkspace({
   // Stop unloads the iframe back to its empty state without touching the editor.
   function stopRun() {
     setQ5Code('');
-    setJscadCode('');
+    setReshapeCode('');
     setSrcDoc('');
     setRunKey(0);
     setConsoleResetKey((k) => k + 1);
@@ -475,8 +475,8 @@ export default function LessonWorkspace({
         e.preventDefault();
         if (isConsoleMode) {
           runCode();
-        } else if (isJscadMode) {
-          runJscad();
+        } else if (isReshapeMode) {
+          runReshape();
         } else if (isMoshionMode) {
           runQ5();
         } else {
@@ -732,9 +732,9 @@ export default function LessonWorkspace({
       <div className="editor-card">
         <div className="editor-body">
           <div className="run-toolbar">
-            {(isConsoleMode || isJscadMode || isMoshionMode) && (
+            {(isConsoleMode || isReshapeMode || isMoshionMode) && (
               <>
-                {isRunning && (isJscadMode || isMoshionMode) ? (
+                {isRunning && (isReshapeMode || isMoshionMode) ? (
                   <button
                     className="btn-run"
                     style={{ background: '#ff5555', borderColor: '#ff5555' }}
@@ -745,7 +745,7 @@ export default function LessonWorkspace({
                 ) : (
                   <button
                     className="btn-run"
-                    onClick={isJscadMode ? runJscad : isMoshionMode ? runQ5 : runCode}
+                    onClick={isReshapeMode ? runReshape : isMoshionMode ? runQ5 : runCode}
                   >
                     ▶ Run
                   </button>
@@ -888,8 +888,8 @@ export default function LessonWorkspace({
                     )}
                   </pre>
                 </>
-              ) : isJscadMode ? (
-                <ReshapePreview code={jscadCode} runKey={runKey} />
+              ) : isReshapeMode ? (
+                <ReshapePreview code={reshapeCode} runKey={runKey} />
               ) : isMoshionMode ? (
                 <MoshionPreview code={q5Code} runKey={runKey} />
               ) : (

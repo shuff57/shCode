@@ -4,13 +4,13 @@
 // scripts/model-codegen-assertions.cjs, whose build() is private to its run()
 // and whose file is deliberately hands-off during a gauntlet. Same sandbox
 // recipe: the modeling bundle, then reshape.js on top, because the generated
-// code calls shCAD's bare names and genuinely does not work without them.
+// code calls reSHape's bare names and genuinely does not work without them.
 
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-/** A context with the vendored bundle and the shCAD globals already in it. */
+/** A context with the vendored bundle and the reSHape globals already in it. */
 function makeSandbox() {
   const bundlePath = path.join(__dirname, '..', 'public', 'reshape', 'lib', 'jscad-modeling.min.js');
   const simplePath = path.join(__dirname, '..', 'public', 'reshape', 'reshape.js');

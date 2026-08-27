@@ -82,7 +82,7 @@ def press_run(page):
 
 
 def canvas_png(page):
-    el = page.query_selector(".jscad-frame")
+    el = page.query_selector(".reshape-frame")
     return el.screenshot() if el else b""
 
 
@@ -123,10 +123,10 @@ def run(url, headed):
 
         # ---- run + panel ----------------------------------------------------
         press_run(page)
-        page.wait_for_selector(".jscad-params", timeout=30_000)
+        page.wait_for_selector(".reshape-params", timeout=30_000)
         page.wait_for_timeout(2500)
 
-        names = [l.inner_text().strip() for l in page.query_selector_all(".jscad-param-row > label")]
+        names = [l.inner_text().strip() for l in page.query_selector_all(".reshape-param-row > label")]
         check(
             "PANEL_LISTS_DECLARED_DIMENSIONS",
             names == ["Width", "Depth", "Height", "Corner round", "Hole radius"],
@@ -161,7 +161,7 @@ def run(url, headed):
         after = canvas_png(page)
         check("MODEL_REDRAWN", before != after and len(after) > 0)
 
-        badge = page.query_selector(".jscad-params-ms")
+        badge = page.query_selector(".reshape-params-ms")
         ms_text = badge.inner_text().strip() if badge else ""
         check("REBUILD_TIME_REPORTED", ms_text.endswith("ms") and ms_text != "", ms_text)
 
@@ -185,7 +185,7 @@ def run(url, headed):
         check(
             "EMPTY_FIELD_KEEPS_MODEL",
             canvas_png(page) == steady
-            and page.query_selector(".jscad-params-empty-warn") is None,
+            and page.query_selector(".reshape-params-empty-warn") is None,
         )
 
 
@@ -208,7 +208,7 @@ def run(url, headed):
         box.type("60", delay=30)
         box.press("Enter")
         page.wait_for_timeout(900)
-        check("EMPTY_MODEL_FLAGGED", page.query_selector(".jscad-params-empty-warn") is None)
+        check("EMPTY_MODEL_FLAGGED", page.query_selector(".reshape-params-empty-warn") is None)
 
         pre = canvas_png(page)
         slider = page.query_selector('input[aria-label="Height slider"]')
@@ -265,7 +265,7 @@ def run(url, headed):
         page.wait_for_timeout(900)
         check(
             "EMPTY_RESULT_IS_FLAGGED",
-            page.query_selector(".jscad-params-empty-warn") is not None,
+            page.query_selector(".reshape-params-empty-warn") is not None,
         )
 
         # ---- code that throws is labelled, not just left stale ---------------
@@ -277,7 +277,7 @@ def run(url, headed):
         set_field("#p-depth", "5")
         set_field("#p-round", "20")
         page.wait_for_timeout(1200)
-        warn = page.query_selector(".jscad-params-empty-warn")
+        warn = page.query_selector(".reshape-params-empty-warn")
         check(
             "THROWN_REBUILD_IS_LABELLED",
             warn is not None and "stopped the code" in warn.inner_text(),
@@ -308,7 +308,7 @@ def run(url, headed):
         page.click(".model-tools button:has-text('Ring')")
         page.wait_for_timeout(3500)
         check("RING_BUILDS", canvas_png(page) != before_ring
-              and page.query_selector(".jscad-params-empty-warn") is None)
+              and page.query_selector(".reshape-params-empty-warn") is None)
         page.click('.model-tools button[aria-label="Undo"]')
         page.wait_for_timeout(2500)
         rows = page.query_selector_all(".model-row")
@@ -364,7 +364,7 @@ def run(url, headed):
         check("FILLET_CHANGES_THE_MODEL", canvas_png(page) != cut_shot)
         check("FILLET_ADDS_A_DIMENSION",
               any("corner" in (l.inner_text() or "")
-                  for l in page.query_selector_all(".jscad-param-row > label")))
+                  for l in page.query_selector_all(".reshape-param-row > label")))
 
         fillet_shot = canvas_png(page)
         page.click(".model-tools button:has-text('Chamfer')")
@@ -374,8 +374,8 @@ def run(url, headed):
         # healthy model as well as a changed one.
         check("CHAMFER_DIFFERS_FROM_FILLET",
               canvas_png(page) != fillet_shot
-              and page.query_selector(".jscad-params-empty-warn") is None,
-              "stale" if page.query_selector(".jscad-params-empty-warn") else "")
+              and page.query_selector(".reshape-params-empty-warn") is None,
+              "stale" if page.query_selector(".reshape-params-empty-warn") else "")
 
         # ---- drag handles ----------------------------------------------------
         # box1 is selected and chamfered by this point.
@@ -456,9 +456,9 @@ def run(url, headed):
               f"{len(page.query_selector_all('.handle.is-turn'))} rings")
         check("TURN_ADDS_ANGLE_DIMENSIONS",
               any("turn" in (l.inner_text() or "").lower()
-                  for l in page.query_selector_all(".jscad-param-row > label")))
+                  for l in page.query_selector_all(".reshape-param-row > label")))
         check("TURN_ALONE_CHANGES_NOTHING_YET",
-              page.query_selector(".jscad-params-empty-warn") is None)
+              page.query_selector(".reshape-params-empty-warn") is None)
 
         rz_before = float(page.input_value("#p-box1_rz"))
         ring_h = handle("Drag turn z")
@@ -475,7 +475,7 @@ def run(url, headed):
               f"rz {rz_before} -> {page.input_value('#p-box1_rz')}")
         check("TURNING_REDRAWS_THE_MODEL", canvas_png(page) != before_turn)
         check("TURN_DID_NOT_BREAK_THE_BUILD",
-              page.query_selector(".jscad-params-empty-warn") is None)
+              page.query_selector(".reshape-params-empty-warn") is None)
 
         # A combination has no shape of its own to grab.
         page.query_selector_all(".model-row")[2].click()
@@ -495,7 +495,7 @@ def run(url, headed):
         # inserted above it, each time testing the test rather than the feature.
         def dims():
             out = {}
-            for inp in page.query_selector_all('.jscad-param-row input[type="text"]'):
+            for inp in page.query_selector_all('.reshape-param-row input[type="text"]'):
                 i = inp.get_attribute("id")
                 if i:
                     out[i] = inp.input_value()
@@ -665,12 +665,12 @@ def run(url, headed):
         page.wait_for_timeout(4000)
         check("PULL_MAKES_A_SOLID",
               canvas_png(page) != before_pull
-              and page.query_selector(".jscad-params-empty-warn") is None)
+              and page.query_selector(".reshape-params-empty-warn") is None)
         rows = [r.inner_text().replace(chr(10), " ") for r in page.query_selector_all(".model-row")]
         check("PULL_NAMES_ITS_SKETCH", any("Pull" in r and "Sketch" in r for r in rows), str(rows[-1:]))
         check("PULL_ADDS_A_HEIGHT",
               any("height" in (l.inner_text() or "").lower()
-                  for l in page.query_selector_all(".jscad-param-row > label")))
+                  for l in page.query_selector_all(".reshape-param-row > label")))
 
         # Pulling the same outline twice would make a second solid from it,
         # which is never what the click meant.
@@ -752,7 +752,7 @@ def run(url, headed):
         page.keyboard.insert_text(SLOW_SKETCH)
         page.wait_for_timeout(400)
         press_run(page)
-        page.wait_for_selector(".jscad-params", timeout=60_000)
+        page.wait_for_selector(".reshape-params", timeout=60_000)
         early = page.query_selector("#p-n")
         early.click()
         early.press("Control+a")
@@ -763,10 +763,10 @@ def run(url, headed):
         # A dropped edit means no rebuild ever ran, and the timing badge is
         # cleared on every fresh load -- so its absence is the tell.
         check("EARLY_EDIT_REACHED_THE_MODEL",
-              page.query_selector(".jscad-params-ms") is not None
-              and page.query_selector(".jscad-params-empty-warn") is None,
-              page.query_selector(".jscad-params-ms").inner_text()
-              if page.query_selector(".jscad-params-ms") else "no rebuild ran")
+              page.query_selector(".reshape-params-ms") is not None
+              and page.query_selector(".reshape-params-empty-warn") is None,
+              page.query_selector(".reshape-params-ms").inner_text()
+              if page.query_selector(".reshape-params-ms") else "no rebuild ran")
         check("EARLY_EDIT_PANEL_AGREES", page.input_value("#p-n") == "3",
               page.input_value("#p-n"))
 

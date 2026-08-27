@@ -468,12 +468,12 @@ built on `@jscad/modeling` + `@jscad/regl-renderer` (Source 4). It is an improve
 of `openjscad.xyz` (runs npm imports, ES modules, TypeScript, and preserves the worker between parameter changes).
 
 - **Live app:** https://jscad.app/ — the environment students open for every JSCAD lesson.
-- **Repo:** https://github.com/hrgdavor/jscadui — `apps/jscad-web/` is the app source; `docs/` holds project notes.
+- **Repo:** https://github.com/hrgdavor/jscadui — `apps/reshape-web/` is the app source; `docs/` holds project notes.
 - **Relationship:** `jscad.app` and `openjscad.xyz` are *two UIs over the same `@jscad/modeling` library*. The API
   anchors in Source 4 (`JSCAD → <module> → <fn>`) apply to code running in **either** app.
 
 > **URL reconciliation:** `curriculum-plan.md` cited `https://openjscad.xyz/` as the Q3–Q4 environment; the
-> activity files (`curriculum-data/jscad-freecad-activities.md`, `final-activity-list.md`) and the live practice
+> activity files (`curriculum-data/reshape-freecad-activities.md`, `final-activity-list.md`) and the live practice
 > use **jscad.app**. The canonical student environment is `jscad.app`; `openjscad.xyz/docs/` remains the API/docs site.
 
 ---

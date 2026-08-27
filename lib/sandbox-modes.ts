@@ -4,13 +4,13 @@
 
 import type { Lesson } from './types';
 
-export type SandboxModeId = 'js' | 'moshion' | 'jscad';
+export type SandboxModeId = 'js' | 'moshion' | 'reshape';
 
 export interface SandboxMode {
   id: SandboxModeId;
   label: string;
   blurb: string;
-  preview: 'console' | 'moshion' | 'jscad';
+  preview: 'console' | 'moshion' | 'reshape';
   docsHref: string | null;
   starter: string;
 }
@@ -41,7 +41,7 @@ function draw() {
 // Every dimension is declared in getParameterDefinitions() rather than written
 // as a literal in main(). That is what lets the Dimensions panel drive the model
 // without touching a character of the source.
-const JSCAD_STARTER = `// JSCAD sandbox — solid modelling.
+const RESHAPE_STARTER = `// JSCAD sandbox — solid modelling.
 // Numbers declared here show up in the Dimensions panel.
 
 const { primitives, booleans, transforms } = require('@jscad/modeling')
@@ -88,12 +88,12 @@ export const SANDBOX_MODES: SandboxMode[] = [
     starter: MOSHION_STARTER,
   },
   {
-    id: 'jscad',
-    label: 'JSCAD',
+    id: 'reshape',
+    label: 'reSHape',
     blurb: 'Solid modelling. Drag a dimension and the model rebuilds.',
-    preview: 'jscad',
+    preview: 'reshape',
     docsHref: '/docs/reshape',
-    starter: JSCAD_STARTER,
+    starter: RESHAPE_STARTER,
   },
 ];
 

@@ -28,7 +28,7 @@ MUTATIONS = [
         "reload the frame instead of messaging it",
         "components/SandboxWorkspace.tsx",
         "    frameRef.current?.contentWindow?.postMessage(\n"
-        "      { source: 'jscad-set-params', params: next },\n"
+        "      { source: 'reshape-set-params', params: next },\n"
         "      '*'\n"
         "    );",
         "    setRunKey((k) => k + 1);",
@@ -37,7 +37,7 @@ MUTATIONS = [
     (
         "ignore inbound parameter messages",
         "public/jscad/runner.html",
-        "\t\tif (!d || d.source !== 'jscad-set-params' || !d.params) return;",
+        "\t\tif (!d || d.source !== 'reshape-set-params' || !d.params) return;",
         "\t\tif (true) return;",
         {"MODEL_REDRAWN", "REBUILD_TIME_REPORTED", "SLIDER_DRAG_REBUILDS"},
     ),
@@ -79,7 +79,7 @@ MUTATIONS = [
     (
         "let a thrown rebuild pass unlabelled",
         "public/jscad/runner.html",
-        "			window.parent.postMessage({ source: 'jscad-rebuilt', ms: 0, failed: true }, '*');",
+        "			window.parent.postMessage({ source: 'reshape-rebuilt', ms: 0, failed: true }, '*');",
         "			void 0;",
         {"THROWN_REBUILD_IS_LABELLED"},
     ),
@@ -128,7 +128,7 @@ MUTATIONS = [
     (
         "never re-send anchors once the runner is listening",
         "components/SandboxWorkspace.tsx",
-        "          { source: 'jscad-set-anchors', anchors: specsRef.current },",
+        "          { source: 'reshape-set-anchors', anchors: specsRef.current },",
         "          { source: 'never-mind', anchors: specsRef.current },",
         {"HANDLES_FOR_A_SELECTED_BOX"},
     ),

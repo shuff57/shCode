@@ -9,42 +9,42 @@
   "ships": [
     {
       "onshape": "Line",
-      "shcad": "the outline itself",
+      "reshape": "the outline itself",
       "where": "SketchFeature.points, a closed polyline"
     },
     {
       "onshape": "Horizontal",
-      "shcad": "Across",
+      "reshape": "Across",
       "where": "sketch-solve.ts constraint 'horizontal'"
     },
     {
       "onshape": "Vertical",
-      "shcad": "Up",
+      "reshape": "Up",
       "where": "sketch-solve.ts constraint 'vertical'"
     },
     {
       "onshape": "Equal",
-      "shcad": "Same length",
+      "reshape": "Same length",
       "where": "sketch-solve.ts constraint 'equal'"
     },
     {
       "onshape": "Fix",
-      "shcad": "Lock",
+      "reshape": "Lock",
       "where": "sketch-solve.ts constraint 'lock'"
     },
     {
       "onshape": "Dimension",
-      "shcad": "Length",
+      "reshape": "Length",
       "where": "sketch-solve.ts constraint 'length' -- distance only, no angle"
     },
     {
       "onshape": "Center Point Circle",
-      "shcad": "Circle",
+      "reshape": "Circle",
       "where": "SketchFeature.shape 'circle' -- two points read as a diameter (lib/sketch-arc.ts circleOf()) -- plus the toolbar's Circle button (ModelEditor.tsx startCircleSketch()). Not a centre-plus-drag click: that needs the click-to-draw surface chrome2d names below, which still does not exist"
     },
     {
       "onshape": "Sketch Fillet",
-      "shcad": "Round a corner",
+      "reshape": "Round a corner",
       "where": "lib/sketch-arc.ts filletCorner() -- trims both adjacent edges and inserts an arc via a bulge (tan(includedAngle/4)) -- wired to a per-corner radius field in the Rules panel (SketchConstraints.tsx).",
       "partial": "corner-bearing sketches only, and reachable only from the Rules panel -- there is no click-a-corner-on-the-canvas surface, because there is no 2D canvas. A circle sketch renders no Rules panel and has no corners, so Round is unreachable for it by design. The refusal message that explains this has been wrong three times in a row, each generation naming a remedy the student could not reach; it now names none and just states what is true. This entry is an artefact under test like any other -- it overclaimed twice before saying this much."
     }

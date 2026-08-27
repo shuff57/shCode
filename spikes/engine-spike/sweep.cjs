@@ -18,7 +18,7 @@ const planckSrc = fs.readFileSync(PLANCK_PATH, 'utf8');
 const engineSrc = fs.readFileSync(ENGINE_PATH, 'utf8');
 
 // ---- JSCAD folders (excluded — different runtime) -----------------------
-const JSCAD_FOLDERS = new Set(['jscad-intro', 'jscad-2d-shapes', 'jscad-booleans']);
+const JSCAD_FOLDERS = new Set(['reshape-intro', 'reshape-2d-shapes', 'reshape-booleans']);
 
 // ---- sandbox factory ----------------------------------------------------
 

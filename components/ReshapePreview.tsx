@@ -14,7 +14,7 @@ const ReshapePreview = forwardRef<HTMLIFrameElement, Props>(function ReshapePrev
 ) {
   if (runKey === 0 || !code.trim()) {
     return (
-      <div className="jscad-empty">
+      <div className="reshape-empty">
         <p>Write JSCAD code and click <strong>Run</strong> to see your 3D model.</p>
       </div>
     );
@@ -25,7 +25,7 @@ const ReshapePreview = forwardRef<HTMLIFrameElement, Props>(function ReshapePrev
       ref={ref}
       key={runKey}
       id="preview"
-      className="jscad-frame"
+      className="reshape-frame"
       // allow-same-origin is deliberately ABSENT. The runner executes student
       // code with document.createElement('script'), so without this the frame
       // shares the app's origin and that code can call /api/* with the user's

@@ -112,30 +112,30 @@ export default function ReshapeParamsPanel({
 
   if (defs.length === 0) {
     return (
-      <div className="jscad-params-empty">
+      <div className="reshape-params-empty">
         No dimensions declared. Add a <code>getParameterDefinitions()</code> function
         returning a list of names and this panel fills in.
         <style>{`
-          .jscad-params-empty { padding: 10px 12px; color: #6272a4; font-size: 12px; line-height: 1.5; }
-          .jscad-params-empty code { color: #8be9fd; }
+          .reshape-params-empty { padding: 10px 12px; color: #6272a4; font-size: 12px; line-height: 1.5; }
+          .reshape-params-empty code { color: #8be9fd; }
         `}</style>
       </div>
     );
   }
 
   return (
-    <div className="jscad-params">
-      <div className="jscad-params-head">
+    <div className="reshape-params">
+      <div className="reshape-params-head">
         <span>Dimensions</span>
         {lastMs !== null && (
-          <span className="jscad-params-ms" title="Time for the last rebuild">
+          <span className="reshape-params-ms" title="Time for the last rebuild">
             {lastMs < 1 ? '<1' : Math.round(lastMs)} ms
           </span>
         )}
       </div>
 
       {stale && (
-        <p className="jscad-params-empty-warn">
+        <p className="reshape-params-empty-warn">
           {stale === 'empty'
             ? 'These numbers leave nothing behind — the cut is bigger than the part it is cutting. '
             : 'These numbers stopped the code before it produced a shape. '}
@@ -149,7 +149,7 @@ export default function ReshapeParamsPanel({
 
         if (String(d.type).toLowerCase() === 'checkbox') {
           return (
-            <label key={d.name} className="jscad-param-row jscad-param-check">
+            <label key={d.name} className="reshape-param-row reshape-param-check">
               <input
                 type="checkbox"
                 checked={Boolean(raw)}
@@ -162,7 +162,7 @@ export default function ReshapeParamsPanel({
 
         if (Array.isArray(d.values)) {
           return (
-            <div key={d.name} className="jscad-param-row">
+            <div key={d.name} className="reshape-param-row">
               <label htmlFor={`p-${d.name}`}>{label}</label>
               <select
                 id={`p-${d.name}`}
@@ -184,7 +184,7 @@ export default function ReshapeParamsPanel({
 
         if (!isNumeric(d)) {
           return (
-            <div key={d.name} className="jscad-param-row">
+            <div key={d.name} className="reshape-param-row">
               <label htmlFor={`p-${d.name}`}>{label}</label>
               <input
                 id={`p-${d.name}`}
@@ -203,9 +203,9 @@ export default function ReshapeParamsPanel({
         const hasRange = typeof d.min === 'number' && typeof d.max === 'number';
 
         return (
-          <div key={d.name} className="jscad-param-row">
+          <div key={d.name} className="reshape-param-row">
             <label htmlFor={`p-${d.name}`}>{label}</label>
-            <div className="jscad-param-controls">
+            <div className="reshape-param-controls">
               {hasRange && (
                 <input
                   type="range"
@@ -274,18 +274,18 @@ export default function ReshapeParamsPanel({
       })}
 
       <style>{`
-        .jscad-params { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; overflow-y: auto; }
-        .jscad-params-head {
+        .reshape-params { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; overflow-y: auto; }
+        .reshape-params-head {
           display: flex; align-items: baseline; justify-content: space-between;
           font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
           color: #6272a4; padding-bottom: 6px; margin-bottom: 4px;
           border-bottom: 1px solid var(--border);
         }
-        .jscad-params-ms {
+        .reshape-params-ms {
           font-variant-numeric: tabular-nums; color: #50fa7b;
           text-transform: none; letter-spacing: 0;
         }
-        .jscad-params-empty-warn {
+        .reshape-params-empty-warn {
           /* Sticky: the panel scrolls, and a student who has scrolled down to a
              field is exactly the person who needs to know why the shape went
              away. Pinned to the top it stays with them. */
@@ -295,24 +295,24 @@ export default function ReshapeParamsPanel({
           border-left: 2px solid #ffb86c;
           color: #ffb86c; font-size: 11px; line-height: 1.45;
         }
-        .jscad-param-row { display: flex; flex-direction: column; gap: 3px; padding: 5px 0; }
-        .jscad-param-row > label { font-size: 12px; color: var(--text); }
+        .reshape-param-row { display: flex; flex-direction: column; gap: 3px; padding: 5px 0; }
+        .reshape-param-row > label { font-size: 12px; color: var(--text); }
         /* Slider on its own line. Sharing a row with the number box inside a
            208px panel collapsed it to a ~14px dot — still draggable by a test
            driving its bounding box, useless to a hand. */
-        .jscad-param-controls { display: flex; flex-direction: column; gap: 5px; }
-        .jscad-param-controls input[type="range"] {
+        .reshape-param-controls { display: flex; flex-direction: column; gap: 5px; }
+        .reshape-param-controls input[type="range"] {
           width: 100%; min-width: 0; margin: 0; accent-color: #bd93f9;
         }
-        .jscad-param-controls input[type="text"] { width: 100%; }
-        .jscad-param-row input[type="text"], .jscad-param-row select {
+        .reshape-param-controls input[type="text"] { width: 100%; }
+        .reshape-param-row input[type="text"], .reshape-param-row select {
           background: var(--bg); color: var(--text);
           border: 1px solid var(--border); border-radius: 3px;
           padding: 3px 6px; font-size: 12px; font-variant-numeric: tabular-nums;
         }
-        .jscad-param-row input.is-bad { border-color: #ff5555; color: #ff5555; }
-        .jscad-param-check { flex-direction: row; align-items: center; gap: 7px; }
-        .jscad-param-check span { font-size: 12px; color: var(--text); }
+        .reshape-param-row input.is-bad { border-color: #ff5555; color: #ff5555; }
+        .reshape-param-check { flex-direction: row; align-items: center; gap: 7px; }
+        .reshape-param-check span { font-size: 12px; color: var(--text); }
       `}</style>
     </div>
   );

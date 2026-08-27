@@ -100,7 +100,7 @@ export const EXPECTED_BARE_NAME_COUNT = 124;
  * check that stops a future shim from "helpfully" wrapping geometry in a
  * friendlier object and quietly breaking paste-into-jscad.app.
  *
- * This list is the floor. jscad-harness/test-jscad additionally derives the
+ * This list is the floor. reshape-harness/test-jscad additionally derives the
  * full taught set from the tables in public/reshape/docs/reference.md, so a name
  * added to the docs is covered without anyone remembering to add it here; the
  * floor exists so deleting a docs table cannot silently shrink the gate.
@@ -249,14 +249,14 @@ export const REACH_CHAIN = [
   {
     file: 'app/docs/reshape/[section]/page.tsx',
     role: 'the JSCAD docs route tells the client which runtime its code is for',
-    requires: [{ what: 'preview="jscad" handed to DocsClient', pattern: /preview="jscad"/ }],
+    requires: [{ what: 'preview="reshape" handed to DocsClient', pattern: /preview="reshape"/ }],
     next: 'DocsClient',
   },
   {
     file: 'app/docs/moshion/[section]/DocsClient.tsx',
     role: 'the shared docs client forwards the runtime instead of dropping it',
     requires: [
-      { what: 'preview is a REQUIRED prop', pattern: /^\s*preview: 'moshion' \| 'jscad';/m },
+      { what: 'preview is a REQUIRED prop', pattern: /^\s*preview: 'moshion' \| 'reshape';/m },
       { what: 'preview is destructured from props', pattern: /^\s*preview,$/m },
       { what: 'preview is forwarded to DocsSandbox', pattern: /preview=\{preview\}/ },
     ],
@@ -267,8 +267,8 @@ export const REACH_CHAIN = [
     file: 'app/docs/moshion/[section]/DocsSandbox.tsx',
     role: 'the sandbox picks the runner from the runtime it was told, with no default',
     requires: [
-      { what: 'preview is a REQUIRED prop', pattern: /^\s*preview: 'moshion' \| 'jscad';/m },
-      { what: "a preview === 'jscad' branch rendering ReshapePreview", pattern: /preview === 'jscad'[\s\S]{0,120}<ReshapePreview/ },
+      { what: 'preview is a REQUIRED prop', pattern: /^\s*preview: 'moshion' \| 'reshape';/m },
+      { what: "a preview === 'reshape' branch rendering ReshapePreview", pattern: /preview === 'reshape'[\s\S]{0,120}<ReshapePreview/ },
     ],
     forbids: [
       // The exact regression. A default here silently swallows a missing prop
@@ -290,7 +290,7 @@ export const REACH_CHAIN = [
 ];
 
 /**
- * The other live consumer. No shipping lesson sets `preview: "jscad"` today
+ * The other live consumer. No shipping lesson sets `preview: "reshape"` today
  * (all three JSCAD lessons sit in lessons/_retired/), so this hop is not on the
  * student path right now — but it is the wire an un-retired lesson would travel,
  * and it cost nothing to keep honest.
@@ -298,9 +298,9 @@ export const REACH_CHAIN = [
 export const REACH_LESSON = {
   file: 'components/LessonWorkspace.tsx',
   requires: [
-    { what: "isJscadMode derived from lesson.preview", pattern: /isJscadMode\s*=\s*lesson\.preview === 'jscad'/ },
-    { what: 'a render branch mounting ReshapePreview', pattern: /isJscadMode \?[\s\S]{0,80}<ReshapePreview/ },
-    { what: 'ReshapePreview receives code and runKey', pattern: /<ReshapePreview code=\{jscadCode\} runKey=\{runKey\} \/>/ },
+    { what: "isReshapeMode derived from lesson.preview", pattern: /isReshapeMode\s*=\s*lesson\.preview === 'reshape'/ },
+    { what: 'a render branch mounting ReshapePreview', pattern: /isReshapeMode \?[\s\S]{0,80}<ReshapePreview/ },
+    { what: 'ReshapePreview receives code and runKey', pattern: /<ReshapePreview code=\{reshapeCode\} runKey=\{runKey\} \/>/ },
   ],
 };
 

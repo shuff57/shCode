@@ -32,7 +32,7 @@ module.exports = function run(dir) {
   vm.runInContext(fs.readFileSync(bundlePath, 'utf8'), sandbox);
   const M = sandbox.jscadModeling;
 
-  // The generator emits shCAD names (box, tube, ball, extrude, turn), which are
+  // The generator emits reSHape names (box, tube, ball, extrude, turn), which are
   // globals installed by reshape.js — so the geometry checks below cannot run
   // without it. That is a real dependency, not a test convenience: the code we
   // generate genuinely does not work without reshape.js loaded, which is also
@@ -52,7 +52,7 @@ module.exports = function run(dir) {
 
   function build(src) {
     const mod = { exports: {} };
-    // Run inside the same context reshape.js populated, so the shCAD globals the
+    // Run inside the same context reshape.js populated, so the reSHape globals the
     // generated code calls are actually in scope.
     const run = vm.runInContext(
       '(function (require, module) {' + src + String.fromCharCode(10) + '})',
@@ -76,43 +76,43 @@ module.exports = function run(dir) {
 
   console.log('\n=== codegen shape ===');
 
-  const plain = gen.toJscad(doc(box('b1')));
-  check('a plain box is a shCAD box', plain.includes('box(p.b1_width, p.b1_depth, p.b1_height'));
+  const plain = gen.toReshape(doc(box('b1')));
+  check('a plain box is a reSHape box', plain.includes('box(p.b1_width, p.b1_depth, p.b1_height'));
   check('...positional, never the object form box() refuses', !plain.includes('box({'));
   check('no hulls import when nothing needs it', !plain.includes('hulls'));
 
-  const filleted = gen.toJscad(doc(box('b1', { round: 4, roundStyle: 'fillet' })));
+  const filleted = gen.toReshape(doc(box('b1', { round: 4, roundStyle: 'fillet' })));
   check('a filleted box passes roundRadius to box', filleted.includes('roundRadius: p.b1_round'));
 
-  const chamfered = gen.toJscad(doc(box('b1', { round: 4, roundStyle: 'chamfer' })));
+  const chamfered = gen.toReshape(doc(box('b1', { round: 4, roundStyle: 'chamfer' })));
   check('a chamfered box uses the hull helper', chamfered.includes('function chamferBox('));
   check('...and pulls transforms in', /const \{[^}]*transforms[^}]*\} = require/.test(chamfered));
   check('...and only that helper', !chamfered.includes('function chamferCylinder('));
 
-  const chamCyl = gen.toJscad(doc(cyl('c1', { round: 2, roundStyle: 'chamfer' })));
+  const chamCyl = gen.toReshape(doc(cyl('c1', { round: 2, roundStyle: 'chamfer' })));
   check('a chamfered cylinder uses its own helper', chamCyl.includes('function chamferCylinder('));
 
-  const filCyl = gen.toJscad(doc(cyl('c1', { round: 2, roundStyle: 'fillet' })));
+  const filCyl = gen.toReshape(doc(cyl('c1', { round: 2, roundStyle: 'fillet' })));
   check('a filleted cylinder passes roundRadius to tube',
     filCyl.includes('tube(') && filCyl.includes('roundRadius: p.c1_round'));
 
   console.log('\n=== order is the lesson ===');
 
-  const cut = gen.toJscad(doc(box('b1'), cyl('c1'), {
+  const cut = gen.toReshape(doc(box('b1'), cyl('c1'), {
     id: 'x1', kind: 'combine', op: 'subtract', targets: ['b1', 'c1'],
   }));
   check('subtract keeps body first', cut.includes('booleans.subtract(b1, c1)'));
   check('a consumed feature is not returned', /return x1\b/.test(cut));
 
-  const flipped = gen.toJscad(doc(box('b1'), cyl('c1'), {
+  const flipped = gen.toReshape(doc(box('b1'), cyl('c1'), {
     id: 'x1', kind: 'combine', op: 'subtract', targets: ['c1', 'b1'],
   }));
   check('swapping targets swaps the call', flipped.includes('booleans.subtract(c1, b1)'));
 
-  const loose = gen.toJscad(doc(box('b1'), cyl('c1')));
+  const loose = gen.toReshape(doc(box('b1'), cyl('c1')));
   check('two loose shapes are unioned', loose.includes('booleans.union(b1, c1)'));
 
-  const empty = gen.toJscad(doc());
+  const empty = gen.toReshape(doc());
   check('an empty doc still returns something', empty.includes('return box(1, 1, 1)'));
 
   console.log('\n=== cone and ring ===');
@@ -120,10 +120,10 @@ module.exports = function run(dir) {
   const cone = (id) => ({ id, kind: 'cone', radius: 12, height: 30, center: [0, 0, 0] });
   const ring = (id) => ({ id, kind: 'torus', ringRadius: 14, tubeRadius: 4, center: [0, 0, 0] });
 
-  const coneSrc = gen.toJscad(doc(cone('k1')));
-  const ringSrc = gen.toJscad(doc(ring('r1')));
-  check('a cone is a shCAD cone', coneSrc.includes('cone(p.k1_radius, p.k1_height'));
-  check('a ring is a shCAD ring', ringSrc.includes('ring(p.r1_ring, p.r1_tube)'));
+  const coneSrc = gen.toReshape(doc(cone('k1')));
+  const ringSrc = gen.toReshape(doc(ring('r1')));
+  check('a cone is a reSHape cone', coneSrc.includes('cone(p.k1_radius, p.k1_height'));
+  check('a ring is a reSHape ring', ringSrc.includes('ring(p.r1_ring, p.r1_tube)'));
   // ring() refuses an options object because torus accepts `center` and drops
   // it silently. A positioned ring must therefore be a translate around one.
   check('a ring is positioned by translate, not by an argument',
@@ -158,14 +158,14 @@ module.exports = function run(dir) {
   });
   const pull = (id, target, height = 12) => ({ id, kind: 'extrude', target, height });
 
-  const flatOnly = gen.toJscad(doc(sketch('s1')));
-  check('a sketch is a shCAD poly', flatOnly.includes('poly([[p.s1_p0u'));
+  const flatOnly = gen.toReshape(doc(sketch('s1')));
+  check('a sketch is a reSHape poly', flatOnly.includes('poly([[p.s1_p0u'));
   check('...taking the list positionally, never an options object',
     !flatOnly.includes('poly({'));
   check('a bare sketch is not returned as the model',
     !/return s1\b/.test(flatOnly), flatOnly.slice(flatOnly.indexOf('return')).split('\n')[0]);
 
-  const pulled = gen.toJscad(doc(sketch('s1'), pull('e1', 's1')));
+  const pulled = gen.toReshape(doc(sketch('s1'), pull('e1', 's1')));
   check('an extrude uses the plane helper', pulled.includes('function extrudeOnPlane('));
   check('...and pulls extrusions in', /const \{[^}]*extrusions[^}]*\} = require/.test(pulled));
   check('the sketch it consumed is not also returned', /return e1\b/.test(pulled));
@@ -183,21 +183,21 @@ module.exports = function run(dir) {
     Math.abs(pulledSolid.bbox[1][2] - pulledSolid.bbox[0][2] - 12) < 0.5, JSON.stringify(pulledSolid.bbox));
 
   // The plane is the whole point of choosing one, so measure that it moved.
-  const onXZ = build(gen.toJscad(doc(sketch('s1', 'xz'), pull('e1', 's1'))));
+  const onXZ = build(gen.toReshape(doc(sketch('s1', 'xz'), pull('e1', 's1'))));
   check('an xz sketch stands up in z, not y',
     Math.abs(onXZ.bbox[1][2] - onXZ.bbox[0][2] - 25) < 0.5
     && Math.abs(onXZ.bbox[1][1] - onXZ.bbox[0][1] - 12) < 0.5,
     JSON.stringify(onXZ.bbox));
-  const onYZ = build(gen.toJscad(doc(sketch('s1', 'yz'), pull('e1', 's1'))));
+  const onYZ = build(gen.toReshape(doc(sketch('s1', 'yz'), pull('e1', 's1'))));
   check('a yz sketch is thin in x',
     Math.abs(onYZ.bbox[1][0] - onYZ.bbox[0][0] - 12) < 0.5, JSON.stringify(onYZ.bbox));
 
-  const raised = build(gen.toJscad(doc(sketch('s1', 'xy', 30), pull('e1', 's1'))));
+  const raised = build(gen.toReshape(doc(sketch('s1', 'xy', 30), pull('e1', 's1'))));
   check('offset lifts the sketch off the origin',
     Math.abs(raised.bbox[0][2] - 30) < 0.5, JSON.stringify(raised.bbox));
 
   // An extruded sketch is a solid like any other, so it must cut and be cut.
-  const cutBySketch = build(gen.toJscad(doc(
+  const cutBySketch = build(gen.toReshape(doc(
     box('b1'), sketch('s1'), pull('e1', 's1'),
     { id: 'x1', kind: 'combine', op: 'subtract', targets: ['b1', 'e1'] },
   )));
@@ -207,11 +207,11 @@ module.exports = function run(dir) {
 
   console.log('\n=== turning a shape ===');
 
-  const flat = gen.toJscad(doc(box('b1')));
-  const turnedSrc = gen.toJscad(doc(box('b1', { rotate: [0, 0, 45] })));
+  const flat = gen.toReshape(doc(box('b1')));
+  const turnedSrc = gen.toReshape(doc(box('b1', { rotate: [0, 0, 45] })));
   check('an unrotated shape carries no turn call', !flat.includes('turn('));
   check('a turned shape is turned', turnedSrc.includes('turn([p.b1_rx, p.b1_ry, p.b1_rz]'));
-  // shCAD's turn takes degrees. The conversion this used to emit is gone, and
+  // reSHape's turn takes degrees. The conversion this used to emit is gone, and
   // its absence is worth asserting: a stray Math.PI/180 would silently divide
   // every angle by 57 and still produce a plausible-looking model.
   check('...in degrees, with no conversion left behind',
@@ -226,7 +226,7 @@ module.exports = function run(dir) {
   check('a turned one does',
     gen.generatedParams(doc(box('b1', { rotate: [0, 0, 45] }))).some((p) => p.name === 'b1_rz'));
 
-  const offCentre = build(gen.toJscad(doc(box('b1', {
+  const offCentre = build(gen.toReshape(doc(box('b1', {
     center: [50, 0, 0], rotate: [0, 0, 90],
   }))));
   // A 40x40x20 box turned 90 degrees about its own centre is still centred on
@@ -238,14 +238,14 @@ module.exports = function run(dir) {
     Math.abs((offCentre.bbox[1][1] - offCentre.bbox[0][1]) - 40) < 1.5,
     `depth ${(offCentre.bbox[1][1] - offCentre.bbox[0][1]).toFixed(1)}`);
 
-  const turnedRing = build(gen.toJscad(doc(ring('r1'))));
+  const turnedRing = build(gen.toReshape(doc(ring('r1'))));
   check('a ring still builds with the rotation path in place', turnedRing.volume > 100);
 
   console.log('\n=== one dialect, everywhere ===');
 
   // The property, not the spellings. These keep holding if a name moves; a
   // check that greps for `box(` would go red on a rename and teach nothing.
-  const everything = gen.toJscad(doc(
+  const everything = gen.toReshape(doc(
     box('b1'), cyl('c1'), cone('k1'), ring('r1'),
     { id: 'sp1', kind: 'sphere', radius: 9, center: [0, 0, 0] },
     sketch('s1'), pull('e1', 's1')));
@@ -258,7 +258,7 @@ module.exports = function run(dir) {
   // in a student's own file, so a second spelling there is the same second
   // dialect — and a main()-only check cannot see it. Coverage of a property is
   // not coverage of every place the property has to hold.
-  const withHelpers = gen.toJscad(doc(
+  const withHelpers = gen.toReshape(doc(
     box('b2', { round: 4, roundStyle: 'chamfer' }),
     cyl('c2', { round: 2, roundStyle: 'chamfer' }),
     sketch('s2'), pull('e2', 's2')));
@@ -267,7 +267,7 @@ module.exports = function run(dir) {
     (withHelpers.match(/primitives\.[a-zA-Z]+/g) || []).join(','));
 
   check('not even the empty-doc placeholder is raw',
-    !gen.toJscad(doc()).includes('primitives.'));
+    !gen.toReshape(doc()).includes('primitives.'));
 
   console.log('\n=== names count per kind, not per row ===');
 
@@ -370,7 +370,7 @@ module.exports = function run(dir) {
   check('reordering renames nothing',
     reordered.map((p) => p.name).sort().join() === names.slice().sort().join());
 
-  const code = gen.toJscad(d);
+  const code = gen.toReshape(d);
   const declared = [...code.matchAll(/name: '([^']+)'/g)].map((m) => m[1]);
   check('every declared param is used in main()',
     declared.every((n) => code.includes('p.' + n)),
@@ -403,7 +403,7 @@ module.exports = function run(dir) {
   for (const [label, src] of [
     ['plain', plain], ['filleted', filleted], ['chamferedBox', chamfered],
     ['chamferedCyl', chamCyl], ['filletedCyl', filCyl], ['cut', cut],
-    ['loose', loose], ['empty', empty], ['plainCyl', gen.toJscad(doc(cyl('c1')))],
+    ['loose', loose], ['empty', empty], ['plainCyl', gen.toReshape(doc(cyl('c1')))],
   ]) {
     let r = null, why = '';
     try { r = build(src); } catch (e) { why = e.message; }
@@ -473,7 +473,7 @@ module.exports = function run(dir) {
       !fabricatedRemedy.test(msg), msg);
   }
 
-  // shCAD sketch build 1 (lib/sketch-arc.ts, the Rules panel's Round a corner
+  // reSHape sketch build 1 (lib/sketch-arc.ts, the Rules panel's Round a corner
   // field): a real remedy now exists, so "there is no such tool" stopped
   // being true and the message must say so. A value that would make a
   // broken implementation pass: any of the three messages below still
@@ -549,15 +549,15 @@ module.exports = function run(dir) {
   });
   const revolveF = (id, target, angle = 360) => ({ id, kind: 'revolve', target, angle });
 
-  const revSrc = gen.toJscad(doc(revProfile('s1'), revolveF('rev1', 's1')));
+  const revSrc = gen.toReshape(doc(revProfile('s1'), revolveF('rev1', 's1')));
   check('a revolve calls the real extrudeRotate, angle converted to radians',
     revSrc.includes('extrusions.extrudeRotate({ angle: p.rev1_angle * Math.PI / 180 }, s1)'));
   check('...and pulls extrusions in', /const \{[^}]*extrusions[^}]*\} = require/.test(revSrc));
   check('the sketch it consumed is not also returned', !/return s1\b/.test(revSrc));
   check('the revolve is what gets returned', /return rev1\b/.test(revSrc));
 
-  const rev360 = build(gen.toJscad(doc(revProfile('s1'), revolveF('rev1', 's1', 360))));
-  const rev180 = build(gen.toJscad(doc(revProfile('s1'), revolveF('rev1', 's1', 180))));
+  const rev360 = build(gen.toReshape(doc(revProfile('s1'), revolveF('rev1', 's1', 360))));
+  const rev180 = build(gen.toReshape(doc(revProfile('s1'), revolveF('rev1', 's1', 180))));
   check('a full spin has real volume', rev360.volume > 20000, String(rev360.volume));
   check('a half spin is about half the volume of a full one',
     Math.abs(rev180.volume - rev360.volume / 2) < rev360.volume * 0.05,
@@ -566,7 +566,7 @@ module.exports = function run(dir) {
   console.log('\n=== mirror (Mirror) ===');
 
   const mirrorDoc = doc(box('b1', { center: [50, 0, 0] }), { id: 'm1', kind: 'mirror', target: 'b1', plane: 'yz' });
-  const mirrorSrc = gen.toJscad(mirrorDoc);
+  const mirrorSrc = gen.toReshape(mirrorDoc);
   check('a mirror calls the face-relative helper, not bare transforms.mirror',
     mirrorSrc.includes('mirrorThroughFace(b1, [1, 0, 0], 0)'));
   check('...and the helper is actually defined',
@@ -602,7 +602,7 @@ module.exports = function run(dir) {
   // ([1, 0, 0]) -- the 'yz' case above would still pass, but 'xy' and 'xz'
   // below would not, because b2/b3 would reflect on the wrong axis.
   const mirrorOnXY = doc(box('b2', { center: [0, 0, 50] }), { id: 'm2', kind: 'mirror', target: 'b2', plane: 'xy' });
-  const xySrc = gen.toJscad(mirrorOnXY);
+  const xySrc = gen.toReshape(mirrorOnXY);
   check('a mirror across xy uses the real xy normal, axis index 2',
     xySrc.includes('mirrorThroughFace(b2, [0, 0, 1], 2)'));
   const xyBuilt = build(xySrc);
@@ -614,7 +614,7 @@ module.exports = function run(dir) {
     JSON.stringify(xyBuilt.bbox));
 
   const mirrorOnXZ = doc(box('b3', { center: [0, 50, 0] }), { id: 'm3', kind: 'mirror', target: 'b3', plane: 'xz' });
-  const xzSrc = gen.toJscad(mirrorOnXZ);
+  const xzSrc = gen.toReshape(mirrorOnXZ);
   check('a mirror across xz uses the real xz normal, axis index 1',
     xzSrc.includes('mirrorThroughFace(b3, [0, 1, 0], 1)'));
   const xzBuilt = build(xzSrc);
@@ -653,7 +653,7 @@ module.exports = function run(dir) {
     { id: 'move1', kind: 'move', target: 'e1', offset: [200, 0, 0], copy: false },
     { id: 'm1', kind: 'mirror', target: 'move1', plane: 'yz' },
   );
-  const movedSrc = gen.toJscad(movedL);
+  const movedSrc = gen.toReshape(movedL);
   check('mirror reads the MOVED part\'s own position, not e1\'s original one',
     movedSrc.includes('mirrorThroughFace(move1, [1, 0, 0], 0)'));
 
@@ -671,7 +671,7 @@ module.exports = function run(dir) {
 
   const linPattern = { id: 'pat1', kind: 'pattern', target: 'b1', mode: 'linear', count: 3, step: [30, 0, 0] };
   const linDoc = doc(box('b1', { size: [10, 10, 10] }), linPattern);
-  const linSrc = gen.toJscad(linDoc);
+  const linSrc = gen.toReshape(linDoc);
   check('a linear pattern emits an actual for loop, not a helper call',
     linSrc.includes('for (let i = 0; i < p.pat1_count; i++) {'));
   check('...translating by the step vector on each pass',
@@ -688,7 +688,7 @@ module.exports = function run(dir) {
 
   const circPattern = { id: 'pat2', kind: 'pattern', target: 'c1', mode: 'circular', count: 4, axis: 'z', totalAngle: 360 };
   const circDoc = doc(cyl('c1', { radius: 3, height: 10, center: [20, 0, 0] }), circPattern);
-  const circSrc = gen.toJscad(circDoc);
+  const circSrc = gen.toReshape(circDoc);
   check('a circular pattern is a for loop too',
     circSrc.includes('for (let i = 0; i < p.pat2_count; i++) {'));
   check('...spacing by totalAngle / count so 360 does not double up the seam',
@@ -730,14 +730,14 @@ module.exports = function run(dir) {
   const scatterDoc = doc(cyl('c1', { radius: 5, height: 10, center: [50, 50, 0] }), {
     id: 'pat3', kind: 'pattern', target: 'c1', mode: 'circular', count: 6, axis: 'z', totalAngle: 360,
   });
-  const scatterBuilt = build(gen.toJscad(scatterDoc));
+  const scatterBuilt = build(gen.toReshape(scatterDoc));
   const oneOffAxisCyl = Math.PI * 5 * 5 * 10;
   check('six copies of an off-axis cylinder orbit world zero -- ~6x one instance, not ~1x',
     scatterBuilt.volume > oneOffAxisCyl * 5.4 && scatterBuilt.volume < oneOffAxisCyl * 6.6,
     `${scatterBuilt.volume.toFixed(0)} vs one instance ${oneOffAxisCyl.toFixed(0)} `
       + `(in-place-spin regression returns ~${oneOffAxisCyl.toFixed(0)})`);
   check('...and the emitted call rotates about the axis, with no per-target pivot',
-    gen.toJscad(scatterDoc).includes('transforms.rotate([0, 0, a], c1)'));
+    gen.toReshape(scatterDoc).includes('transforms.rotate([0, 0, a], c1)'));
 
   // The real footgun the round-4 critic was half-seeing: a shape ON the axis
   // has no radius to sweep, so every copy lands on the first. Refused up
@@ -755,7 +755,7 @@ module.exports = function run(dir) {
   const holeDoc = doc(box('b1', { size: [40, 40, 20] }), {
     id: 'hole1', kind: 'hole', target: 'b1', diameter: 10, depth: 30, center: [0, 0, 0], axis: 'z',
   });
-  const holeSrc = gen.toJscad(holeDoc);
+  const holeSrc = gen.toReshape(holeDoc);
   check('a hole is a single subtract line, the cylinder built inline',
     holeSrc.includes(
       'booleans.subtract(b1, transforms.translate(centerOn(b1, [p.hole1_x, p.hole1_y, p.hole1_z]), ' +
@@ -778,13 +778,13 @@ module.exports = function run(dir) {
   // pass: featureExpr reading a literal [0, 0, 0] instead of f.center, same
   // bug restated one level down -- the off-centre case below would then remove
   // the same (larger) volume as the centred one instead of less, and fail.
-  const centredHole = build(gen.toJscad(doc(box('b1', { size: [40, 40, 20] }), {
+  const centredHole = build(gen.toReshape(doc(box('b1', { size: [40, 40, 20] }), {
     id: 'hole1', kind: 'hole', target: 'b1', diameter: 10, depth: 30, center: [0, 0, 0], axis: 'z',
   })));
   // Box spans x -20..20. A radius-5 bore centred at x=19 pokes a third of its
   // circle past the x=20 edge, so noticeably less of it stays inside the
   // block than the centred case above, where the whole circle is inside.
-  const offCentreHole = build(gen.toJscad(doc(box('b1', { size: [40, 40, 20] }), {
+  const offCentreHole = build(gen.toReshape(doc(box('b1', { size: [40, 40, 20] }), {
     id: 'hole1', kind: 'hole', target: 'b1', diameter: 10, depth: 30, center: [19, 0, 0], axis: 'z',
   })));
   check('moving a hole off-centre removes less material, not the same amount',
@@ -806,7 +806,7 @@ module.exports = function run(dir) {
   const movedBoxHoleDoc = doc(box('b1', { size: [40, 40, 20], center: [100, 0, 0] }), {
     id: 'hole1', kind: 'hole', target: 'b1', diameter: 10, depth: 30, center: [0, 0, 0], axis: 'z',
   });
-  const movedBoxHoleBuilt = build(gen.toJscad(movedBoxHoleDoc));
+  const movedBoxHoleBuilt = build(gen.toReshape(movedBoxHoleDoc));
   const movedBlockVolume = 40 * 40 * 20;
   check('a hole left at its default offset still bores through a box moved off the origin',
     movedBoxHoleBuilt.volume < movedBlockVolume - 300
@@ -828,7 +828,7 @@ module.exports = function run(dir) {
     center: [0, 0, 0], axis: 'z', corners: { dx: 20, dy: 15 },
   };
   const cornersDoc = doc(plate, cornersFeature);
-  const cornersSrc = gen.toJscad(cornersDoc);
+  const cornersSrc = gen.toReshape(cornersDoc);
 
   check('four corners is still ONE subtract, not four Hole rows',
     types.topLevel(cornersDoc).map((f) => f.id).join() === 'hole1');
@@ -880,7 +880,7 @@ module.exports = function run(dir) {
     && widerCorners.features[1].diameter === 6
     && widerCorners.features[1].center.join() === '0,0,0');
 
-  const holeXSrc = gen.toJscad(doc(box('b1'), {
+  const holeXSrc = gen.toReshape(doc(box('b1'), {
     id: 'hole2', kind: 'hole', target: 'b1', diameter: 10, depth: 60, center: [0, 0, 0], axis: 'x',
   }));
   check('boring along x tilts the bit with rotateY, not the default Z bore',
@@ -910,7 +910,7 @@ module.exports = function run(dir) {
     id: 'pat1', kind: 'pattern', target: 'hole1', mode: 'linear', count: 3, step: [8, 0, 0],
   };
   const repeatHoleDoc = doc(repeatHoleBox, repeatHole, repeatHolePattern);
-  const repeatHoleSrc = gen.toJscad(repeatHoleDoc);
+  const repeatHoleSrc = gen.toReshape(repeatHoleDoc);
 
   check('the block stays ONE subtract from b1, not a union of shifted copies',
     repeatHoleSrc.includes('booleans.subtract(b1, pat1_bores)') && !repeatHoleSrc.includes('booleans.union'),
@@ -939,7 +939,7 @@ module.exports = function run(dir) {
   }, {
     id: 'pat1', kind: 'pattern', target: 'hole1', mode: 'linear', count: 2, step: [30, 0, 0],
   });
-  const repeatCornersSrc = gen.toJscad(repeatCornersDoc);
+  const repeatCornersSrc = gen.toReshape(repeatCornersDoc);
   check('the pattern loop places all four corners itself, once per pass',
     (repeatCornersSrc.match(/pat1_bores\.push\(transforms\.translate/g) || []).length === 4);
   check('dx and dy each drive that loop -- once per corner, four times total',
@@ -957,7 +957,7 @@ module.exports = function run(dir) {
   console.log('\n=== shell (Hollow) ===');
 
   const shellDoc = doc(box('b1', { size: [40, 40, 20] }), { id: 'shell1', kind: 'shell', target: 'b1', thickness: 4 });
-  const shellSrc = gen.toJscad(shellDoc);
+  const shellSrc = gen.toReshape(shellDoc);
   check('a shell uses the honest scaled-subtract helper', shellSrc.includes('function shellOp('));
   check('...which pulls measurements in for the bounding box',
     /const \{[^}]*measurements[^}]*\} = require/.test(shellSrc));
@@ -972,7 +972,7 @@ module.exports = function run(dir) {
   console.log('\n=== move (Move) ===');
 
   const moveCopyDoc = doc(box('b1'), { id: 'move1', kind: 'move', target: 'b1', offset: [50, 0, 0], copy: true });
-  const moveCopySrc = gen.toJscad(moveCopyDoc);
+  const moveCopySrc = gen.toReshape(moveCopyDoc);
   check('a move translates the target with the real transforms.translate',
     moveCopySrc.includes('transforms.translate([p.move1_x, p.move1_y, p.move1_z], b1)'));
   check('copy:true keeps the original standing alongside the moved copy',
@@ -1011,7 +1011,7 @@ module.exports = function run(dir) {
 
   const circleSketch = { id: 'sk2', kind: 'sketch', plane: 'xy', offset: 0, shape: 'circle', points: [[15, 12.5], [25, 12.5]] };
   const circleDoc = doc(circleSketch, pull('e2', 'sk2'));
-  const circleSrc = gen.toJscad(circleDoc);
+  const circleSrc = gen.toReshape(circleDoc);
   check('#7 a tagged circle emits discAcross, not poly',
     circleSrc.includes('discAcross([p.sk2_p0u, p.sk2_p0v], [p.sk2_p1u, p.sk2_p1v])')
     && !/\bpoly\(\[\[?p\.sk2/.test(circleSrc));
@@ -1071,7 +1071,7 @@ module.exports = function run(dir) {
     points: [[0, 0], [25, 0], [28, 9], [0, 30]],
     bulges: { 1: Math.tan((143.1301 * Math.PI / 180) / 4) },
   }, pull('e3', 'sk3'));
-  const filletedSrc = gen.toJscad(filletedDoc);
+  const filletedSrc = gen.toReshape(filletedDoc);
   check('a bulged sketch emits polyArc, not poly', filletedSrc.includes('polyArc([') && filletedSrc.includes('function polyArc('));
   check('...literal bulge values, keyed by edge, not routed through a param',
     /polyArc\(\[.*\], \{1: 0\.72/.test(filletedSrc), filletedSrc.slice(filletedSrc.indexOf('polyArc(')));
@@ -1088,7 +1088,7 @@ module.exports = function run(dir) {
 
   console.log('\n=== sketch build 1: old docs are untouched ===');
 
-  const plainSketchSrc = gen.toJscad(doc(sketch('s1')));
+  const plainSketchSrc = gen.toReshape(doc(sketch('s1')));
   check('#9 no shape, no bulges: still poly([, byte-identical to before this build',
     plainSketchSrc.includes(`poly([${sketch('s1').points.map((_, n) => `[p.s1_p${n}u, p.s1_p${n}v]`).join(', ')}])`));
   check('...and neither new helper is pulled in for a doc that never uses them',
@@ -1197,7 +1197,7 @@ module.exports = function run(dir) {
     path.join(__dirname, '..', 'components', 'SandboxWorkspace.tsx'), 'utf8');
   const runBody = wsSrc.slice(wsSrc.indexOf('const run = useCallback('));
   check('Run in Build mode runs the generated program, not the starter file',
-    /toJscad\(docRef\.current\)/.test(runBody.slice(0, 900)),
+    /toReshape\(docRef\.current\)/.test(runBody.slice(0, 900)),
     "run() never regenerates from the doc, so in Build it runs whatever stale "
       + "script.js holds -- the starter box");
   check('...and it still runs the file in Code mode',

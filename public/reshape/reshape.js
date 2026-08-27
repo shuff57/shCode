@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// shCAD — the simplified JSCAD layer the course teaches in Q3.
+// reSHape — the simplified JSCAD layer the course teaches in Q3.
 //
 // WHAT THIS IS
 // Twelve extra names — box, rect, disc, ball, tube, cone, ring, poly, extrude,
@@ -8,7 +8,7 @@
 // radian in the same line:
 //
 //     primitives.cuboid({ size: [40, 20, 10] })      the real library
-//     box(40, 20, 10)                                shCAD
+//     box(40, 20, 10)                                reSHape
 //
 // The whole design turns on the SECOND line a student writes, not the first:
 //
@@ -41,10 +41,10 @@
 //     recorded further down, not the spelling.
 //   * It never overwrites anything. The install loop at the bottom refuses any
 //     name that is already on window, exactly the way the shim's own install()
-//     does, and reports what it had to skip in window.__shcadNamesSkipped plus
+//     does, and reports what it had to skip in window.__reshapeNamesSkipped plus
 //     a console warning on the first run.
 //   * It never wraps geometry. Every function here hands back the SAME kind of
-//     object the real library hands back — a geom2 or a geom3 — so a shCAD
+//     object the real library hands back — a geom2 or a geom3 — so a reSHape
 //     result goes straight into subtract(), hull(), colorize(), extrudeLinear()
 //     or anything else in @jscad/modeling, and a student's file can mix the two
 //     vocabularies in one line with nothing to convert.
@@ -100,7 +100,7 @@
 //
 // That also corrects what turn's graduation lesson can honestly be. It is NOT
 // "this is why you build at the origin and translate last": with turn that
-// advice makes no difference at all, so a Q3 spent in shCAD would quietly
+// advice makes no difference at all, so a Q3 spent in reSHape would quietly
 // contradict it. The honest lesson runs the other way round —
 //
 //   "turn spins your shape around its own middle, which is why it never
@@ -109,7 +109,7 @@
 //    and that is why every JSCAD example you are about to read builds at the
 //    origin and translates last."
 //
-// The composition lesson is still fully teachable in Q3, because shCAD renames
+// The composition lesson is still fully teachable in Q3, because reSHape renames
 // nothing: rotate and translate are both bare, both real, and both what the
 // textbook prints. reference.md shows the two orders side by side in rotate,
 // and the gate pins both halves of this — TURN_COMPOSITION asserts that turn
@@ -122,8 +122,8 @@
 // wrong answer.
 //
 // The in-place answer stops at turn, on purpose. transforms.scale is
-// origin-based in the same way, and shCAD ships no scale name at all: scale
-// stays real, so there is no inconsistency INSIDE shCAD's vocabulary — it has
+// origin-based in the same way, and reSHape ships no scale name at all: scale
+// stays real, so there is no inconsistency INSIDE reSHape's vocabulary — it has
 // exactly one transform name and it does exactly what its name says. revolve's
 // sweep about the world Z axis is not a pivot bug either, it IS the operation:
 // the profile is supposed to sit off-axis.
@@ -146,7 +146,7 @@
 //   which is neither short nor English, and the seven written Q3 chapters call
 //   it exactly zero times, so no student meets it in the reading either.
 //   Meanwhile the /sandbox visual modeller emits that call verbatim for its
-//   Cone kind, which put half an shCAD line and half a raw namespaced line in
+//   Cone kind, which put half an reSHape line and half a raw namespaced line in
 //   the same generated expression. It was listed under a rationale it does not
 //   fit; that needs no counter-argument, only the observation.
 //
@@ -219,7 +219,7 @@
 //     primitive the week did not cover, that is the qualifying property, not a
 //     discount.
 //
-//     Eligible primitives — no shCAD word, not taught in §8.2 — went from nine
+//     Eligible primitives — no reSHape word, not taught in §8.2 — went from nine
 //     to seven. torus was the only one of the nine the seven chapters call at
 //     all, so the book-anchored part of the pool went from one to zero, and
 //     ring is what emptied it. That floor turns out to be the wrong thing to
@@ -229,7 +229,7 @@
 //
 //   And what survives, which is more than either count suggested: both losses
 //   are 3D primitives, in a 2D week. The 2D remainder is square, triangle, arc
-//   and line, none of which shCAD claims and none of which the seven chapters
+//   and line, none of which reSHape claims and none of which the seven chapters
 //   call even once, and that is the pool a 2D lab actually draws on. A8.2.2 is
 //   not in trouble. The accounting was.
 //
@@ -362,17 +362,17 @@
 	}
 
 	/**
-	 * Keys the REAL backing call has and shCAD deliberately does not offer.
+	 * Keys the REAL backing call has and reSHape deliberately does not offer.
 	 *
 	 * A refusal has to leave a student somewhere. "revolve has no option called
 	 * angle" is true and is a dead end; the same sentence with the real call
 	 * spelled out beside it is the escape hatch this whole layer promises —
-	 * every shCAD name is one function away from the full API, and this is the
+	 * every reSHape name is one function away from the full API, and this is the
 	 * moment a student most needs to be told which function.
 	 *
 	 * `angle` is the sharp one: section 9.1's own worked example is
 	 * extrudeRotate({ segments: 8, angle: constants.TAU / 2 }, profile), so a student
-	 * reading the chapter revolve exists for WILL type it. shCAD does not grow
+	 * reading the chapter revolve exists for WILL type it. reSHape does not grow
 	 * an angle key for it — angle is outside the option vocabulary this layer
 	 * ships — it hands over the real call instead, spelled out and ready to
 	 * copy.
@@ -608,7 +608,7 @@
 	/**
 	 * poly([[0, 0], [20, 0], [10, 15]]) -> primitives.polygon({ points: [...] })
 	 *
-	 * The one shCAD name whose positional argument is a list rather than a
+	 * The one reSHape name whose positional argument is a list rather than a
 	 * number, which is a cost the banner records rather than hides.
 	 *
 	 * Three guards, each closing a measured silent failure:
@@ -676,7 +676,7 @@
 	 * Same operand order as the real call — number first, shapes last — so this
 	 * one graduates by deleting the word "Linear" and adding a brace. No options
 	 * object: extrudeLinear's only other keys are twistAngle and twistSteps,
-	 * which are outside the textbook's vocabulary, and shCAD offers no key
+	 * which are outside the textbook's vocabulary, and reSHape offers no key
 	 * rather than inventing a name for one. A student who wants a twist reaches
 	 * for extrudeLinear, which is bare and still there.
 	 *
@@ -759,7 +759,7 @@
 	function revolve(shape, extras) {
 		// revolve is the one name whose options object trades places with the
 		// real call's: revolve(profile, { segments: 16 }) is
-		// extrudeRotate({ segments: 16 }, profile). shCAD's grammar has no
+		// extrudeRotate({ segments: 16 }, profile). reSHape's grammar has no
 		// exceptions — every extra rides in a TRAILING { } — so the swap is
 		// real, it is documented in the graduation table, and a student who
 		// writes the library's order is told so rather than left with a message
@@ -787,7 +787,7 @@
 
 	// turn(45, shape) — degrees about Z, or turn([0, 90, 0], shape) to pick the
 	// axis. Read the banner at the top of this file before changing anything
-	// here: the in-place pivot is the one place shCAD is not a pure rename, and
+	// here: the in-place pivot is the one place reSHape is not a pure rename, and
 	// it is not an accident.
 	function turnAngles(degrees) {
 		if (isNumber(degrees)) return [0, 0, degrees];
@@ -926,9 +926,9 @@
 	//
 	//   Fixing THAT means overriding the eight measure names on window so they
 	//   unwrap first, and those are real JSCAD names. Doing it breaks two
-	//   contracts the gate states outright: 'reshape.js adds exactly the shCAD
+	//   contracts the gate states outright: 'reshape.js adds exactly the reSHape
 	//   names and nothing else' and 'no real JSCAD name was overwritten by
-	//   shCAD'. This layer is additive or it is not trustworthy.
+	//   reSHape'. This layer is additive or it is not trustworthy.
 	//
 	// So the price of the feature is either a stale measurement or a weaker
 	// gate, and no lesson asks for it. Revisit only if one does — and if you
@@ -946,10 +946,10 @@
 		if (name in window) { skipped.push(name); continue; }
 		window[name] = NAMES[n][1];
 	}
-	window.__shcadNamesSkipped = skipped;
+	window.__reshapeNamesSkipped = skipped;
 	if (skipped.length) {
 		console.warn(
-			'shCAD: ' + skipped.length + ' name(s) could not be added to scope because ' +
+			'reSHape: ' + skipped.length + ' name(s) could not be added to scope because ' +
 			'something already owns them here: ' + skipped.join(', ') + '. The JSCAD ' +
 			'function each one stands in for is still available under its real name.'
 		);

@@ -178,9 +178,27 @@ function loadAllProgress(): Record<string, any> {
   }
   if (legacy !== null) localStorage.removeItem(LEGACY_STORAGE_KEY);
 
+  let all: Record<string, any>;
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    all = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
   } catch {
     return {};
   }
+
+  // The sandbox names its draft after the mode it belongs to, so renaming the
+  // jscad mode to reshape would strand whatever a student had open in it.
+  // Rewrite the key instead. Idempotent, and it never overwrites a newer draft
+  // already sitting under the new name.
+  let moved = false;
+  for (const key of Object.keys(all)) {
+    if (!key.startsWith('sandbox-jscad')) continue;
+    const renamed = `sandbox-reshape${key.slice('sandbox-jscad'.length)}`;
+    if (all[renamed] === undefined) all[renamed] = all[key];
+    delete all[key];
+    moved = true;
+  }
+  if (moved) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch { /* quota, private mode */ }
+  }
+  return all;
 }

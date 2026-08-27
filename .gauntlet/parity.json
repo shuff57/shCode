@@ -9,67 +9,67 @@
   "ships": [
     {
       "onshape": "Extrude",
-      "shcad": "Pull",
+      "reshape": "Pull",
       "where": "ModelEditor extrude"
     },
     {
       "onshape": "Boolean",
-      "shcad": "Join / Cut / Overlap",
+      "reshape": "Join / Cut / Overlap",
       "where": "ModelEditor combine"
     },
     {
       "onshape": "Fillet",
-      "shcad": "Round",
+      "reshape": "Round",
       "where": "ModelEditor round, primitives only"
     },
     {
       "onshape": "Chamfer",
-      "shcad": "Bevel",
+      "reshape": "Bevel",
       "where": "ModelEditor roundStyle=chamfer"
     },
     {
       "onshape": "Delete Part",
-      "shcad": "Delete",
+      "reshape": "Delete",
       "where": "ModelEditor remove"
     },
     {
       "onshape": "Transform",
-      "shcad": "Turn + Move",
+      "reshape": "Turn + Move",
       "where": "ModelEditor rotate + move"
     },
     {
       "onshape": "Revolve",
-      "shcad": "Spin",
+      "reshape": "Spin",
       "where": "ModelEditor revolve",
       "landed": "2026-08-24 gauntlet round 1"
     },
     {
       "onshape": "Mirror",
-      "shcad": "Mirror",
+      "reshape": "Mirror",
       "where": "ModelEditor mirror",
       "landed": "2026-08-24 gauntlet round 1"
     },
     {
       "onshape": "Linear Pattern",
-      "shcad": "Repeat",
+      "reshape": "Repeat",
       "where": "ModelEditor pattern",
       "landed": "2026-08-24 gauntlet round 1"
     },
     {
       "onshape": "Circular Pattern",
-      "shcad": "Repeat",
+      "reshape": "Repeat",
       "where": "ModelEditor pattern",
       "landed": "2026-08-24 gauntlet round 1"
     },
     {
       "onshape": "Hole",
-      "shcad": "Hole",
+      "reshape": "Hole",
       "where": "ModelEditor hole",
       "landed": "2026-08-24 gauntlet round 1"
     },
     {
       "onshape": "Shell",
-      "shcad": "Hollow",
+      "reshape": "Hollow",
       "where": "ModelEditor shell",
       "landed": "2026-08-24 gauntlet round 1"
     }
@@ -78,7 +78,7 @@
     {
       "id": "loft",
       "name": "Blend",
-      "jscad": "hullChain / extrudeFromSlices",
+      "reshape": "hullChain / extrudeFromSlices",
       "why": "bundle has it; two sketches to a tapered solid",
       "covers": [
         "Loft"
@@ -88,7 +88,7 @@
     {
       "id": "plane",
       "name": "Surface",
-      "jscad": "sketch plane + offset",
+      "reshape": "sketch plane + offset",
       "why": "plane already in the model as xy/xz/yz+offset but no toolbar affordance",
       "covers": [
         "Plane"
@@ -98,7 +98,7 @@
     {
       "id": "sketch",
       "name": "Draw",
-      "jscad": "sketch points + arcs",
+      "reshape": "sketch points + arcs",
       "why": "our sketch is drag-the-corners polygon only; this is the widest single gap to the bar",
       "covers": [],
       "label": "Sketch Tools (line, rectangle, circle, arc, spline, point, construction, trim, offset, dimension)",
@@ -107,7 +107,7 @@
     {
       "id": "chrome",
       "name": "-",
-      "jscad": "n/a",
+      "reshape": "n/a",
       "why": "the visual half of parity; the critic judges this blind against the real screenshot",
       "covers": [],
       "label": "toolbar grouping, flyout carets, icon set, disabled states, tooltips, Search tools (alt+c), rollback bar",

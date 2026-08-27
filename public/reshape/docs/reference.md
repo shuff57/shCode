@@ -59,7 +59,7 @@ https://jscad.app/ — that editor has no such shortcut. Two names inside
 `minkowski` are the top-level modules of those names; `maths.utils` and
 `booleans.minkowski` stay reachable through their modules.
 
-That first block, and the shCAD section below, are the only examples in this
+That first block, and the reSHape section below, are the only examples in this
 file that depend on shCode, and their fences are tagged `shcode-only` for a
 reason: `npm test` runs every other example here in a require-only sandbox and
 fails the build if one of them needs the shim.
@@ -67,14 +67,14 @@ fails the build if one of them needs the shim.
 ### Converting a whole file to the portable form
 
 Converting a file undoes **two** shortcuts, and a file that only had the first
-one undone still does not run. The obvious one is the shCAD names — `box(40, 20, 10)` becomes
+one undone still does not run. The obvious one is the reSHape names — `box(40, 20, 10)` becomes
 `primitives.cuboid({ size: [40, 20, 10] })`. The one that is easy to forget is
 the shim above: `translate` and `subtract` and `measureVolume` are bare in
 shCode and do not exist on jscad.app at all. Both halves show up in one line
-more often than not — `revolve(translate([10, 0, 0], rect(4, 10)))` is an shCAD
+more often than not — `revolve(translate([10, 0, 0], rect(4, 10)))` is an reSHape
 name wrapped around a bare real one.
 
-Here is a program in shCAD:
+Here is a program in reSHape:
 
 ```js shcode-only
 function main() {
@@ -91,7 +91,7 @@ from what was actually emitted, nothing added that is not used:
 ```js
 const { measurements, primitives, utils, transforms } = require('@jscad/modeling')
 
-// shCAD's turn(), written out in the real API. It rotates a shape about its
+// reSHape's turn(), written out in the real API. It rotates a shape about its
 // OWN middle; transforms.rotate rotates about the world origin.
 function turnInPlace(degrees, shape) {
   const spin = Array.isArray(degrees) ? degrees : [0, 0, degrees]
@@ -127,7 +127,7 @@ measure the shape, bring it to the origin, rotate, put it back — so there is n
 one call to swap it for. Writing it inline would evaluate your shape three
 times, which is wrong the moment the argument is `turn(45, subtract(a, b))`. So
 the converter writes an ordinary local function into your file. `turnInPlace` is
-not a shim and not shCAD in disguise: it is the real API, it travels with the
+not a shim and not reSHape in disguise: it is the real API, it travels with the
 file, and it is the honest answer to "what was `turn` actually doing". Swapping
 it for a plain `transforms.rotate` is **not** the same thing — that pivots on
 the world origin.
@@ -147,10 +147,10 @@ Two more things it tells you rather than hides:
 It converts one file. jscad.app also takes a whole folder for a multi-file
 project, and nothing here converts a project layout.
 
-## shCAD — the simplified names
+## reSHape — the simplified names
 
 Everything else in this file is the real `@jscad/modeling` API, and it is what
-you take to jscad.app, to a job, and to Q4. **shCAD** is twelve extra names that
+you take to jscad.app, to a job, and to Q4. **reSHape** is twelve extra names that
 sit on top of it, loaded from `public/reshape/reshape.js` after the shim. They
 exist for one reason: to put the object literal where a beginner can see why it
 is worth having, instead of on line one where it is just punctuation.
@@ -159,7 +159,7 @@ Compare the first line a student writes:
 
 ```js shcode-only
 function main() {
-  return box(40, 20, 10)                      // shCAD — no braces, no arrays
+  return box(40, 20, 10)                      // reSHape — no braces, no arrays
   // return cuboid({ size: [40, 20, 10] })    // the real API — both required
 }
 ```
@@ -180,13 +180,13 @@ without are positional; every named extra rides in an optional trailing `{ }`.**
 The option keys are the library's own: `center`, `roundRadius`, `segments`.
 
 Nothing is renamed and nothing is wrapped. Every call below returns exactly
-what the real call beside it returns — a `geom2` or a `geom3` — so a shCAD
+what the real call beside it returns — a `geom2` or a `geom3` — so a reSHape
 shape goes straight into `subtract`, `hull`, `colorize` or `extrudeLinear`, and
 the two vocabularies mix freely in one file.
 
 #### The twelve names
 
-| shCAD | The real call it stands for |
+| reSHape | The real call it stands for |
 | --- | --- |
 | `box(40, 20, 10)` | `cuboid({ size: [40, 20, 10] })` |
 | `box(20, 20, 20, { roundRadius: 3 })` | `roundedCuboid({ size: [20, 20, 20], roundRadius: 3 })` |
@@ -211,7 +211,7 @@ results are compared as whole geometry — so it is an answer key, not a
 description. `turn` is the one row that is prose, because it is the one name
 that has no plain equivalent.
 
-Walking that table is how you leave: swap each shCAD name for the plain
+Walking that table is how you leave: swap each reSHape name for the plain
 equivalent beside it, then put the shim's bare names back behind their modules
 and add the `require` header. See
 [Converting a whole file to the portable form](#converting-a-whole-file-to-the-portable-form)
@@ -222,7 +222,7 @@ Every option is passed through untouched: `segments`, `center` and
 `roundRadius` mean exactly what they mean in the real call, with the same
 defaults. A key a name does not have is refused by name rather than ignored,
 **and the refusal tells you the real function that does have it** — so a dead
-end in shCAD is always one function name from an answer. A `roundRadius` that
+end in reSHape is always one function name from an answer. A `roundRadius` that
 is too big is reported with your own numbers in it instead of the library's
 "must be smaller than the radius of all dimensions".
 
@@ -235,14 +235,14 @@ really does throw it away.
 
 Four rows need reading twice.
 
-**`sit` on a list needs `grouped: true`.** shCAD does this for you: handed one
+**`sit` on a list needs `grouped: true`.** reSHape does this for you: handed one
 shape it aligns that shape, handed a list it moves the whole assembly as one.
 The real `align` defaults to `grouped: false`, which drops *every part
 separately* onto `z = 0` — the model collapses into itself, and nothing throws.
 That is the single most likely way to graduate a working assembly into a broken
 one, so copy the `grouped: true` row, not the plain one.
 
-**`revolve` is the one name whose `{ }` changes ends.** In shCAD every extra
+**`revolve` is the one name whose `{ }` changes ends.** In reSHape every extra
 rides in a *trailing* `{ }`, with no exceptions — that is the whole grammar.
 The real `extrudeRotate` and `extrudeLinear` take theirs *first*. `extrude`
 hides that, because its one required value becomes the leading `{ height: … }`;
@@ -253,14 +253,14 @@ order. Writing `revolve({ segments: 16 }, profile)` is refused by name rather
 than half-working.
 
 **`revolve` makes a full turn, and only a full turn.** `angle` is not one of
-shCAD's option keys and it is not going to become one — a part turn is
+reSHape's option keys and it is not going to become one — a part turn is
 `extrudeRotate`'s job, and §9.1's own worked example is written that way:
 `extrudeRotate({ segments: 8, angle: constants.TAU / 2 }, profile)` sweeps half
 way round. (The book writes that angle `TAU / 2`; bare `TAU` is not a name this
 runner installs — see [`TAU` is a value, not a name in scope](#tau-is-a-value-not-a-name-in-scope).)
 Typing `revolve(profile, { angle: … })` does not half-work either; it is refused
 with that real call spelled out in the message. That is the shape of every
-refusal here — a name shCAD does not have is answered with the name that does.
+refusal here — a name reSHape does not have is answered with the name that does.
 
 **`ring` inverts `torus`'s two radiuses, on purpose, because `torus`'s names are
 not true.** JSCAD's `outerRadius` is the radius of the circle the tube travels
@@ -305,7 +305,7 @@ wrong place with no error. `torus` spells its own segment counts
 
 ```js shcode-only
 function main() {
-  const donut = ring(14, 4)                                   // shCAD
+  const donut = ring(14, 4)                                   // reSHape
   // torus({ outerRadius: 14, innerRadius: 4 })
 
   const chunky = torus({ outerRadius: 14, innerRadius: 4, outerSegments: 8 })
@@ -334,7 +334,7 @@ refusal you get for asking:
 | half of it, like a pie slice | `cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20, startAngle: 0, endAngle: constants.TAU / 2 })` |
 
 `roundRadius` is refused too, and for a reason worth knowing: it is a real
-shCAD option key on three other names, and `cylinderElliptic` **ignores it
+reSHape option key on three other names, and `cylinderElliptic` **ignores it
 silently** — same bounding box, same polygon count, no error. A key that does
 nothing is the same class of bug as a missing height.
 
@@ -354,7 +354,7 @@ Only the two-corner case throws, and it says *"list of points 0 must contain
 three or more points"* — naming a list index `poly` has not got.
 
 **The one thing `poly` teaches you that graduation day punishes: `polygon` does
-not take a bare list, and it does not say so.** Every other shCAD name
+not take a bare list, and it does not say so.** Every other reSHape name
 graduates by a rename plus a bracket, and forgetting the bracket throws. This
 one does not. Measured on the vendored bundle:
 
@@ -373,7 +373,7 @@ own heading is telling you.
 function main() {
   const corners = [[0, 0], [20, 0], [10, 15]]
 
-  const flat = poly(corners)                     // shCAD
+  const flat = poly(corners)                     // reSHape
   // polygon({ points: corners })
 
   const wedge = extrude(6, flat)
@@ -388,13 +388,13 @@ function main() {
 
 ```js shcode-only
 function main() {
-  const plate = subtract(rect(40, 20), disc(6))       // shCAD
+  const plate = subtract(rect(40, 20), disc(6))       // reSHape
   // subtract(rectangle({ size: [40, 20] }), circle({ radius: 6 }))
 
-  const part = extrude(10, plate)                     // shCAD
+  const part = extrude(10, plate)                     // reSHape
   // extrudeLinear({ height: 10 }, plate)
 
-  const bushing = subtract(tube(10, 20), tube(4, 22)) // shCAD
+  const bushing = subtract(tube(10, 20), tube(4, 22)) // reSHape
   // subtract(cylinder({ radius: 10, height: 20 }),
   //          cylinder({ radius: 4,  height: 22 }))
 
@@ -416,7 +416,7 @@ is a separate row).
 
 The layer's whole justification is that it still teaches objects — so here is
 the object literal five times, in the order a student meets it. Every key below
-is the library's own; nothing on this page is a name shCAD made up.
+is the library's own; nothing on this page is a name reSHape made up.
 
 **One key, because the model needed one.** A `tube` is built centred on the
 origin, so half of it starts under the print bed. Nothing is wrong with the
@@ -481,7 +481,7 @@ function main() {
 ```
 
 **And the richest object writing in the quarter — `getParameterDefinitions`.**
-This one is not shCAD's; it is the real JSCAD parameter panel, and §8.4 is
+This one is not reSHape's; it is the real JSCAD parameter panel, and §8.4 is
 entirely about it. It hands back an **array of objects**, one per control, and
 each kind of control is a different set of keys: a `number` carries
 `min` / `max` / `step`, a `choice` carries `values` and `captions`. Read it as
@@ -525,7 +525,7 @@ to `x = 50` occupies `[[30,-10,-10],[70,10,10]]`; rotate it 90° about Z and it
 becomes `[[-10,30,-10],[10,70,10]]` — it orbited to `y = 50` instead of turning
 where it stood, and nothing threw.
 
-This is not only shCAD's finding. The `/sandbox` visual modeller hit it first
+This is not only reSHape's finding. The `/sandbox` visual modeller hit it first
 and builds every rotated shape at the origin before moving it into place for
 exactly this reason; the rule is pinned there by an assertion named
 **"a turned shape spins about itself, not the scene"** in
@@ -575,7 +575,7 @@ No angle and no distance will make it appear.
 
 That fixes what `turn`'s graduation lesson honestly is. It is *not* "this is why
 you build at the origin and translate last" — with `turn` that advice makes no
-difference, so a whole quarter of shCAD would quietly contradict it. It runs the
+difference, so a whole quarter of reSHape would quietly contradict it. It runs the
 other way round:
 
 > `turn` spins your shape around its own middle, which is why it never mattered
@@ -584,7 +584,7 @@ other way round:
 > why every JSCAD example you are about to read builds at the origin and
 > translates last.
 
-The order lesson itself is still fully teachable in Q3, because shCAD renames
+The order lesson itself is still fully teachable in Q3, because reSHape renames
 nothing: `rotate` and `translate` are both bare, both real, and both what the
 textbook prints. Show it in `rotate` — that is the only place it exists:
 
@@ -633,12 +633,12 @@ replaced with `turn`.
 
 #### Taking your work to jscad.app
 
-shCAD's twelve names live in this runner and nowhere else, so a shCAD program
+reSHape's twelve names live in this runner and nowhere else, so a reSHape program
 pasted into <https://jscad.app/> does not run — `box is not defined`. The course
 names that editor as the Q3 environment, and your file should outlive this app,
 so the graduation table above is the answer key.
 
-Swap each shCAD name for the plain equivalent printed beside it, put the shim's
+Swap each reSHape name for the plain equivalent printed beside it, put the shim's
 bare names back behind their modules, and add the `require` header — and you
 have the same program written in the real `@jscad/modeling` API, the form that
 runs there and the form the book prints. Nothing is approximated: every name in
@@ -659,10 +659,10 @@ call you want, rather than emitting something that half-works.
 
 The seven Q3 chapters are written in the real API, so a student reads `cuboid`
 and writes `box`. That table goes the other way — real name on the left, the
-shCAD word for it on the right — and it is the one to keep open while reading.
+reSHape word for it on the right — and it is the one to keep open while reading.
 Three of these are not guessable backwards, which is exactly why they are here.
 
-| what the book prints | the shCAD word |
+| what the book prints | the reSHape word |
 | --- | --- |
 | `cuboid` | `box` |
 | `cube` | `box(10, 10, 10)` — one number in the book, three here. It is the first 3D shape §8.1 prints and the opening runnable block of the whole unit |
@@ -675,7 +675,7 @@ Three of these are not guessable backwards, which is exactly why they are here.
 | `roundedCylinder` | `tube(r, h, { roundRadius: n })` |
 | `cylinderElliptic` | `cone(radius, height)` — **when, and only when, it is a cone.** `cone` sets `endRadius` to `[0, 0]` for you. A frustum, an oval tube or a pie slice is still `cylinderElliptic`; type the book's own call |
 | `torus` | `ring(ringRadius, tubeRadius)` — **the pair is inverted, and neither of `torus`'s names is true.** `outerRadius` is the radius of the circle the tube travels along, not the outer edge; `innerRadius` is the tube, not the hole. `ring(14, 4)` is 36 across and 8 thick. Read the warning above before swapping one for the other |
-| `polygon` | `poly(corners)` — a straight rename, minus the `{ points: … }` wrapper. `polygon`'s other two keys, `paths` and `orientation`, have no shCAD spelling; type the book's own call for those |
+| `polygon` | `poly(corners)` — a straight rename, minus the `{ points: … }` wrapper. `polygon`'s other two keys, `paths` and `orientation`, have no reSHape spelling; type the book's own call for those |
 | `extrudeLinear` | `extrude` — **a straight extrusion only.** Three of §9.1's five `extrudeLinear` calls also pass `twistAngle` / `twistSteps`, and `extrude` has no such key; type the book's own call, below |
 | `extrudeRotate` | `revolve` — **a full turn only.** §9.1 spins one profile half way round, and `revolve` cannot do it; type the book's own call, below |
 | `align` | `sit`, but **only when the modes are `['none','none','min']`** — with any other modes `sit` is the wrong answer, and not one of the four `align` calls the seven chapters print is written that way. Read the warning below before you swap one for the other |
@@ -691,7 +691,7 @@ Every one of them swings an off-centre shape around the middle of the scene
 with no error.
 
 Four rows above carry a warning rather than a rename. They are the places
-where the real call and its shCAD twin do **different things**, quietly.
+where the real call and its reSHape twin do **different things**, quietly.
 
 **`rotate` → `turn` changes the pivot.** That is the warning above, worked
 through two sections up: `rotate` spins about the world origin and `turn` spins
@@ -713,7 +713,7 @@ is bare and real in here — it needs no translation at all.
 **`extrudeRotate` → `revolve` drops the part turn.** `revolve(profile)` is a
 full turn, which is already `extrudeRotate`'s default angle, and five of the six
 `extrudeRotate` calls in the chapters are exactly that. The sixth, §9.1's first
-worked example, is a half turn, and `angle` is not one of shCAD's option keys.
+worked example, is a half turn, and `angle` is not one of reSHape's option keys.
 Type the real call for it — it is bare and in scope here:
 
 ```js shcode-only
@@ -733,7 +733,7 @@ up, which is what `extrudeLinear` does when you give it nothing but a height —
 and six of the book's nine `extrudeLinear` calls are exactly that. The other
 three are §9.1's twisted block and twisted disc, which add `twistAngle` and
 `twistSteps`, turning the profile a little at each of `twistSteps` layers on
-the way up. Neither is a shCAD option key, and neither is going to become one:
+the way up. Neither is a reSHape option key, and neither is going to become one:
 a twist is `extrudeLinear`'s job, so `extrude(10, profile, { twistAngle: … })`
 is refused by name with the real call spelled out rather than quietly building
 a straight block. Type the book's own call:
@@ -742,7 +742,7 @@ a straight block. Type the book's own call:
 function main() {
   const profile = rect(10, 20)
 
-  const straight = extrude(10, profile)                                  // shCAD
+  const straight = extrude(10, profile)                                  // reSHape
   const twisted = extrudeLinear(
     { height: 10, twistAngle: constants.TAU / 4, twistSteps: 20 }, profile
   )
@@ -784,7 +784,7 @@ function main() {
 
 #### The book's other names — type what the book typed
 
-shCAD has no word for these, and that is deliberate: they already read as
+reSHape has no word for these, and that is deliberate: they already read as
 English, or they belong to a corner of the library the layer does not model.
 Every one of them is bare and real inside shCode, so the answer is always the
 same — type what the book typed. They get rows anyway, because a name missing
@@ -793,7 +793,7 @@ to translate here" is worth saying out loud once per name.
 
 | what the book prints | what to type in shCode |
 | --- | --- |
-| `translate` | `translate` — the same call. shCAD ships no `move`; this one is short already |
+| `translate` | `translate` — the same call. reSHape ships no `move`; this one is short already |
 | `subtract` | `subtract` — unchanged, and order still matters |
 | `union` | `union` — unchanged |
 | `mirror` | `mirror({ normal: [...] }, s)` — unchanged |
@@ -801,13 +801,13 @@ to translate here" is worth saying out loud once per name.
 | `scale` | `scale` — unchanged, and it scales about the **world origin**, the same trap `rotate` has. `turn` has no counterpart here |
 | `center` | `center({ axes: [...] }, s)` — unchanged. Handed several shapes it stacks them all on the origin; `sit` and `align` are the ones for an assembly |
 | `star` | `star({ vertices: n, outerRadius: a, innerRadius: b })` — unchanged |
-| `ellipse` | `ellipse({ radius: [rx, ry] })` — unchanged. A `disc` has one radius; an ellipse has two, and shCAD does not model it |
+| `ellipse` | `ellipse({ radius: [rx, ry] })` — unchanged. A `disc` has one radius; an ellipse has two, and reSHape does not model it |
 | `measureVolume` | `measureVolume(shape)` — unchanged |
 | `measureDimensions` | `measureDimensions(shape)` — unchanged |
 | `hullChain` | `hullChain(a, b, c)` — unchanged. `hull` wraps everything in one skin, `hullChain` joins neighbours pair by pair; they are not synonyms |
 | `vectorText` | `vectorText({ height: 8, input: 'J' })` — unchanged, **but the book prints `inputText`, and there is no such option.** Measured on the vendored bundle: `vectorText({ height: 8, inputText: 'J' })` and the same call with `'H'` come back byte-identical, so §8.1's "swap 'J' for 'H' and run again" changes nothing and reports nothing. The real key is `input`. Letters come out as pen strokes, not shapes |
 | `extrudeRectangular` | `extrudeRectangular({ size: w, height: h }, shape)` — unchanged. §9.1 uses it to turn a flat outline into a wall `size` thick and `height` tall. Handed a list of paths instead — `vectorText`'s strokes — it returns one solid per path rather than one lump, so measure the group with `measureAggregateBoundingBox`. `extrude` is the wrong tool for a path and fails silently |
-| `path2.fromPoints` | `path2.fromPoints({ closed: true }, points)` — unchanged; bare `path2` is in scope here, and `geometries.path2.fromPoints` is the portable spelling. Its `{ }` comes **first**, unlike every shCAD call |
+| `path2.fromPoints` | `path2.fromPoints({ closed: true }, points)` — unchanged; bare `path2` is in scope here, and `geometries.path2.fromPoints` is the portable spelling. Its `{ }` comes **first**, unlike every reSHape call |
 
 #### The parameter panel — the words that are not calls
 
@@ -843,7 +843,7 @@ type is a differently-shaped knob, never a value that fails to arrive. The
 seventh, `checkbox`, is the exception precisely because it breaks that rule: it
 is the one type that spells its default something other than `initial`.
 
-Run it. This is §8.5's circular arrangement in shCAD words — its `count` and
+Run it. This is §8.5's circular arrangement in reSHape words — its `count` and
 `ringRadius` copied out of the chapter character for character, `int` and
 `float` and all — with two more knobs added so that all four numeric spellings
 sit in one block and can be compared. The chapter's version is flat; this one
@@ -881,7 +881,7 @@ function main(params) {
 
 Measured on the chapter sources, so that the size of the bridge is a number
 rather than an impression: the seven chapters make **273 library calls** in
-their runnable editors, **191 of them — 70% — in a spelling shCAD replaces**,
+their runnable editors, **191 of them — 70% — in a spelling reSHape replaces**,
 and 82 in a name it has none for. Every name a student can type in
 those chapters is on one of the three tables above, and every `type:` the
 parameter panel takes is on the fourth. That is the cost of the layer, and

@@ -156,7 +156,7 @@ export interface CombineFeature {
   targets: string[];
 }
 
-/** A solid of revolution. shCAD already exposes revolve() in code mode; this
+/** A solid of revolution. reSHape already exposes revolve() in code mode; this
  *  is the Build-mode equivalent, spinning a sketch around the world Z axis. */
 export interface RevolveFeature {
   id: string;

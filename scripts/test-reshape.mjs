@@ -52,8 +52,8 @@ import {
   REACH_CHAIN, REACH_LESSON, REACH_MOSHION,
 } from './reshape-checks.mjs';
 import {
-  SIMPLE_PATH, SHCAD_NAMES, EXPECTED_SHCAD_NAME_COUNT, SHCAD_REPORT_GLOBALS,
-  SHCAD_OPTION_KEYS, EQUIVALENTS, TURN_IN_PLACE, POSITIONAL_CONTRACT, GUARDS,
+  SIMPLE_PATH, RESHAPE_NAMES, EXPECTED_RESHAPE_NAME_COUNT, RESHAPE_REPORT_GLOBALS,
+  RESHAPE_OPTION_KEYS, EQUIVALENTS, TURN_IN_PLACE, POSITIONAL_CONTRACT, GUARDS,
   NO_OPTIONS_CONTRACT, ARITY_GUARDS, RING_ARITHMETIC, POLY_BARE_ARRAY, WRAPS_BOX,
   SILENTLY_DROPPED, REFUSALS_OVERTURNED, ASSIGNMENT_POOL, INTEROP, SEEDED_COLLISION,
   GRADUATION, GRADUATION_TRIPWIRES, TURN_COMPOSITION, REFUSALS_NAME_THE_REAL_CALL,
@@ -61,7 +61,7 @@ import {
   SVG_MARGIN, readGraduationTable, createGraduationContext, createSimpleContext,
   sameGeometry, sameModel, BOOK_CENSUS, BRIDGE, readBridgeTable, BRIDGE_WARNINGS,
   SIT_VS_BOOK_ALIGN, BOOK_IDENTIFIERS, REFUSAL_CALLS, evaluateInShcad, BOOK_OPTION_KEYS,
-  OBJECT_DEPTH, PARAM_DEFAULTS, shcadSection, liveObjectLiterals, PARAM_TYPES,
+  OBJECT_DEPTH, PARAM_DEFAULTS, reshapeSection, liveObjectLiterals, PARAM_TYPES,
   readFirstColumn, paramProgram, BOOK_OPTION_WORDS,
 } from './reshape-simple-checks.mjs';
 
@@ -511,10 +511,10 @@ for (const e of examples) {
     const cap = captureConsole();
     const ctx = createRequireOnlyContext(cap.console);
     const r = runProgram(ctx, e.code, label, { lineOffset: e.line - 1 });
-    const shcadeOnly = e.tags.includes('shcode-only');
+    const shcodeOnly = e.tags.includes('shcode-only');
     const skeleton = e.tags.includes('skeleton');
 
-    if (shcadeOnly) {
+    if (shcodeOnly) {
       // Tagged as depending on the shim, so it MUST fail portably. A tag on a
       // portable example would be hiding a working example behind an excuse.
       return r.ok
@@ -659,20 +659,20 @@ check('every DocsSandbox and DocsClient call site names its runtime', () => {
 
 check('the moSHion docs still load the moSHion runner', () => assertHop(REACH_MOSHION, REACH_MOSHION.file));
 
-check('a lesson with preview:"jscad" would mount the JSCAD runner', () => assertHop(REACH_LESSON, REACH_LESSON.file));
+check('a lesson with preview:"reshape" would mount the JSCAD runner', () => assertHop(REACH_LESSON, REACH_LESSON.file));
 
 // ===========================================================================
-// SIMPLE  (shCAD — public/reshape/reshape.js, the layer Q3 actually teaches)
+// SIMPLE  (reSHape — public/reshape/reshape.js, the layer Q3 actually teaches)
 // ===========================================================================
 //
-// The six groups above all measure the REAL API. shCAD is a second, simplified
+// The six groups above all measure the REAL API. reSHape is a second, simplified
 // vocabulary sitting on top of it, and the whole reason it is safe is three
 // claims that were previously only prose:
 //
 //   ADDITIVE  none of its nine names exists before reshape.js runs, and no real
 //             JSCAD name is a different value afterwards. The API group's
 //             "same reference bare as namespaced" check is re-run downstream
-//             of reshape.js here, so a shCAD name that shadowed a real one
+//             of reshape.js here, so a reSHape name that shadowed a real one
 //             would fail loudly instead of quietly.
 //   REAL      every call returns byte-identical geometry to the real API call
 //             it stands for — compared the same way the API group compares
@@ -698,9 +698,9 @@ check('reshape.js is vendored in public/reshape and loaded by the runner', () =>
   const html = runnerSource();
   const tag = html.indexOf('src="./reshape.js"');
   if (tag === -1) return 'runner.html does not load ./reshape.js';
-  // Order is the whole contract: after the shim, so shCAD can see every real
+  // Order is the whole contract: after the shim, so reSHape can see every real
   // name and refuse to overwrite one; before the ?code= injection, so a
-  // student's own declaration still wins over a shCAD name.
+  // student's own declaration still wins over a reSHape name.
   const shimEnds = html.indexOf('window.__jscadBareNamesLost = lost;');
   const codeInjection = html.indexOf("params.get('code')");
   if (!(shimEnds < tag)) return 'reshape.js is loaded before the shim has finished installing';
@@ -708,35 +708,35 @@ check('reshape.js is vendored in public/reshape and loaded by the runner', () =>
   return true;
 });
 
-check('none of the shCAD names exists before reshape.js loads', () => {
+check('none of the reSHape names exists before reshape.js loads', () => {
   const { before } = createSimpleContext();
-  const already = SHCAD_NAMES.filter((n) => before.includes(n.name)).map((n) => n.name);
+  const already = RESHAPE_NAMES.filter((n) => before.includes(n.name)).map((n) => n.name);
   return already.length
-    ? `${already.join(', ')} already existed — shCAD must only ever add NEW names`
+    ? `${already.join(', ')} already existed — reSHape must only ever add NEW names`
     : true;
 });
 
-check('reshape.js adds exactly the shCAD names and nothing else', () => {
+check('reshape.js adds exactly the reSHape names and nothing else', () => {
   const { added } = createSimpleContext();
-  const want = [...SHCAD_NAMES.map((n) => n.name), ...SHCAD_REPORT_GLOBALS].sort();
+  const want = [...RESHAPE_NAMES.map((n) => n.name), ...RESHAPE_REPORT_GLOBALS].sort();
   const got = [...added].sort();
   return same(got, want) ? true : `globals added: ${JSON.stringify(got)}, expected ${JSON.stringify(want)}`;
 });
 
-check('the shCAD surface is the expected size', () => {
+check('the reSHape surface is the expected size', () => {
   const { window: w } = createSimpleContext();
-  const installed = SHCAD_NAMES.filter((n) => typeof w[n.name] === 'function');
-  if (installed.length !== SHCAD_NAMES.length) {
-    const missing = SHCAD_NAMES.filter((n) => typeof w[n.name] !== 'function').map((n) => n.name);
+  const installed = RESHAPE_NAMES.filter((n) => typeof w[n.name] === 'function');
+  if (installed.length !== RESHAPE_NAMES.length) {
+    const missing = RESHAPE_NAMES.filter((n) => typeof w[n.name] !== 'function').map((n) => n.name);
     return `not installed as functions: ${missing.join(', ')}`;
   }
-  return eq(installed.length, EXPECTED_SHCAD_NAME_COUNT, 'shCAD names');
+  return eq(installed.length, EXPECTED_RESHAPE_NAME_COUNT, 'reSHape names');
 });
 
 // The decisive additive-ness check, run on the far side of reshape.js. The API
 // group asserts bare === namespaced with only the shim loaded; this asserts
-// that loading shCAD on top changed none of those answers.
-check('no real JSCAD name was overwritten by shCAD', () => {
+// that loading reSHape on top changed none of those answers.
+check('no real JSCAD name was overwritten by reSHape', () => {
   const { window: w, jscad } = createSimpleContext();
   const collisions = new Set(DOCUMENTED_COLLISIONS.map((c) => c.name));
   const bad = [];
@@ -747,24 +747,24 @@ check('no real JSCAD name was overwritten by shCAD', () => {
       if (w[k] !== undefined && w[k] !== jscad[mod][k]) bad.push(`${mod}.${k}`);
     }
   }
-  return bad.length ? `shCAD changed what these names resolve to: ${bad.join(', ')}` : true;
+  return bad.length ? `reSHape changed what these names resolve to: ${bad.join(', ')}` : true;
 });
 
-check('none of the shCAD names is a real JSCAD name in disguise', () => {
+check('none of the reSHape names is a real JSCAD name in disguise', () => {
   const { jscad } = loadModeling();
   const clashes = [];
-  for (const n of SHCAD_NAMES) {
+  for (const n of RESHAPE_NAMES) {
     if (jscad[n.name] !== undefined) clashes.push(`<module> ${n.name}`);
     for (const mod of EXPECTED_MODULE_ORDER) {
       if ((jscad[mod] || {})[n.name] !== undefined) clashes.push(`${mod}.${n.name}`);
     }
   }
   return clashes.length
-    ? `shCAD name shadows the library: ${clashes.join(', ')} — every shCAD name must be a NEW word`
+    ? `reSHape name shadows the library: ${clashes.join(', ')} — every reSHape name must be a NEW word`
     : true;
 });
 
-check('shCAD does not move the shim tripwires', () => {
+check('reSHape does not move the shim tripwires', () => {
   const { window: w, jscad, skipped } = createSimpleContext();
   if (!same(skipped, DOCUMENTED_COLLISIONS.map((c) => c.name))) {
     return `__jscadBareNamesSkipped changed to ${JSON.stringify(skipped)}`;
@@ -778,43 +778,43 @@ check('shCAD does not move the shim tripwires', () => {
   return eq(n, EXPECTED_BARE_NAME_COUNT, 'bare names after reshape.js');
 });
 
-check('a shCAD name that cannot be installed is reported, not swallowed', () => {
+check('a reSHape name that cannot be installed is reported, not swallowed', () => {
   const cap = captureConsole();
   const { window: w } = createSimpleContext({
     preSeed: { [SEEDED_COLLISION.name]: SEEDED_COLLISION.value },
     consoleImpl: cap.console,
   });
-  const report = w.__shcadNamesSkipped;
-  if (!Array.isArray(report)) return 'reshape.js publishes no __shcadNamesSkipped';
+  const report = w.__reshapeNamesSkipped;
+  if (!Array.isArray(report)) return 'reshape.js publishes no __reshapeNamesSkipped';
   if (!report.includes(SEEDED_COLLISION.name)) {
     return `expected '${SEEDED_COLLISION.name}' in the skipped list, got ${JSON.stringify(report)}`;
   }
   if (w[SEEDED_COLLISION.name] !== SEEDED_COLLISION.value) {
-    return 'shCAD overwrote a name something else already owned';
+    return 'reSHape overwrote a name something else already owned';
   }
-  const warned = cap.lines.filter((l) => l.type === 'warn' && /shCAD/.test(l.text));
+  const warned = cap.lines.filter((l) => l.type === 'warn' && /reSHape/.test(l.text));
   return warned.length ? true : 'nothing was written to the console about the skipped name';
 });
 
 check('nothing is skipped in a clean context', () => {
   const { window: w } = createSimpleContext();
-  return same(w.__shcadNamesSkipped, []) ? true : `skipped ${JSON.stringify(w.__shcadNamesSkipped)}`;
+  return same(w.__reshapeNamesSkipped, []) ? true : `skipped ${JSON.stringify(w.__reshapeNamesSkipped)}`;
 });
 
-check('shCAD invents no option key of its own', () => {
+check('reSHape invents no option key of its own', () => {
   const invented = [];
-  for (const n of SHCAD_NAMES) {
-    for (const k of n.options) if (!SHCAD_OPTION_KEYS.includes(k)) invented.push(`${n.name}.${k}`);
+  for (const n of RESHAPE_NAMES) {
+    for (const k of n.options) if (!RESHAPE_OPTION_KEYS.includes(k)) invented.push(`${n.name}.${k}`);
   }
   if (invented.length) return `option keys outside the sanctioned set: ${invented.join(', ')}`;
   // And the keys are really the ones the file offers, not just the ones this
-  // gate hoped for: a key shCAD refuses is named in its own error message.
+  // gate hoped for: a key reSHape refuses is named in its own error message.
   const { window: w } = createSimpleContext();
   try {
     w.box(10, 10, 10, { thickness: 2 });
     return 'box accepted an option it does not have';
   } catch (e) {
-    return SHCAD_OPTION_KEYS.every((k) => e.message.includes(k))
+    return RESHAPE_OPTION_KEYS.every((k) => e.message.includes(k))
       ? true
       : `box's refusal does not list its real keys: ${e.message}`;
   }
@@ -826,8 +826,8 @@ check('shCAD invents no option key of its own', () => {
 for (const e of EQUIVALENTS) {
   check(`${e.label} builds exactly what the real API builds`, () => {
     const { window: w, jscad } = createSimpleContext();
-    const mine = e.shcad(w);
-    if (!isGeometry(mine)) return 'shCAD returned nothing the renderer could draw';
+    const mine = e.reshape(w);
+    if (!isGeometry(mine)) return 'reSHape returned nothing the renderer could draw';
     const theirs = e.real(jscad);
     return sameGeometry(mine, theirs);
   });
@@ -840,7 +840,7 @@ for (const e of EQUIVALENTS) {
 for (const t of TURN_IN_PLACE) {
   check(`turn rotates in place — ${t.label}`, () => {
     const { window: w } = createSimpleContext();
-    const turned = t.shcad(w);
+    const turned = t.reshape(w);
     if (!isGeometry(turned)) return 'turn returned nothing the renderer could draw';
     const box = Array.isArray(turned)
       ? w.measureAggregateBoundingBox(turned)
@@ -1038,11 +1038,11 @@ for (const c of POSITIONAL_CONTRACT) {
     }
 
     // No alias. An object-shaped first argument must NOT work: allowing it
-    // would delete the day-one/day-two contrast shCAD exists to teach, and
+    // would delete the day-one/day-two contrast reSHape exists to teach, and
     // would make the arity guard unwriteable.
     try {
       c.objectFirst(w);
-      return `${c.name}({ … }) worked — shCAD must not accept the real API's object form`;
+      return `${c.name}({ … }) worked — reSHape must not accept the real API's object form`;
     } catch (e) {
       if (!c.objectFirstSays.test(e.message)) return `unhelpful object-first message: ${e.message}`;
     }
@@ -1088,7 +1088,7 @@ for (const c of NO_OPTIONS_CONTRACT) {
 
     try {
       c.objectFirst(w);
-      return `${c.name}({ … }) worked — shCAD must not accept the real API's object form`;
+      return `${c.name}({ … }) worked — reSHape must not accept the real API's object form`;
     } catch (e) {
       if (!c.objectFirstSays.test(e.message)) return `unhelpful object-first message: ${e.message}`;
     }
@@ -1106,11 +1106,11 @@ for (const c of NO_OPTIONS_CONTRACT) {
 // A guard that names somebody else's parameters is not a guard. requireNumbers
 // builds its message out of the list it is handed, so `ring needs two numbers:
 // ring(radius, height)` is a perfectly plausible-looking wrong answer. Every
-// parameter the name declares in SHCAD_NAMES has to appear in its own message.
+// parameter the name declares in RESHAPE_NAMES has to appear in its own message.
 for (const g of ARITY_GUARDS) {
   check(`the arity guard for ${g.name} names its own parameters`, () => {
-    const spec = SHCAD_NAMES.find((n) => n.name === g.name);
-    if (!spec) return `${g.name} is not in SHCAD_NAMES`;
+    const spec = RESHAPE_NAMES.find((n) => n.name === g.name);
+    if (!spec) return `${g.name} is not in RESHAPE_NAMES`;
     const { window: w } = createSimpleContext();
     let message;
     try {
@@ -1122,7 +1122,7 @@ for (const g of ARITY_GUARDS) {
     const want = spec.positional.filter((p) => !p.startsWith('...'));
     const absent = want.filter((p) => !message.includes(p));
     if (absent.length) {
-      return `the message never names ${absent.join(', ')} — SHCAD_NAMES says ${g.name} takes `
+      return `the message never names ${absent.join(', ')} — RESHAPE_NAMES says ${g.name} takes `
         + `${want.join(', ')}, and a guard that names the wrong parameters sends a student `
         + `to fix the wrong thing: ${message}`;
     }
@@ -1132,7 +1132,7 @@ for (const g of ARITY_GUARDS) {
   });
 }
 
-// The three names added because /sandbox was generating half an shCAD call and
+// The three names added because /sandbox was generating half an reSHape call and
 // half a raw namespaced one in the same expression. EQUIVALENTS above compares
 // the whole serialised geometry, which is stricter — but it reports "shape 1
 // differs" and nothing else, and the thing a reader of a failure needs here is
@@ -1141,8 +1141,8 @@ for (const g of ARITY_GUARDS) {
 for (const wb of WRAPS_BOX) {
   check(`${wb.label} measures what the real call measures`, () => {
     const { window: w, jscad } = createSimpleContext();
-    const mine = wb.shcad(w);
-    if (!isGeometry(mine)) return 'shCAD returned nothing the renderer could draw';
+    const mine = wb.reshape(w);
+    if (!isGeometry(mine)) return 'reSHape returned nothing the renderer could draw';
     const box = w.measureBoundingBox(mine);
     if (!same(box, wb.box)) {
       return `measured ${JSON.stringify(box)}, expected ${JSON.stringify(wb.box)}`;
@@ -1237,10 +1237,10 @@ check('only the full swap throws, and it names circles nobody typed', () => {
     }
   }
   try {
-    RING_ARITHMETIC.shcadSwapped(w);
+    RING_ARITHMETIC.reshapeSwapped(w);
     return 'ring(4, 14) builds — the backwards call has stopped being caught';
   } catch (e) {
-    return RING_ARITHMETIC.shcadSwappedSays.test(e.message)
+    return RING_ARITHMETIC.reshapeSwappedSays.test(e.message)
       ? true
       : `ring does not rethrow it with the student's own numbers: ${e.message}`;
   }
@@ -1373,7 +1373,7 @@ check(`${ASSIGNMENT_POOL.assignment} still has primitives left that its own week
   const taught = new Set(ASSIGNMENT_POOL.taughtThisWeek);
   const prims = Object.keys(jscad.primitives).filter((k) => typeof jscad.primitives[k] === 'function');
   // ELIGIBLE is both conditions at once, which is the correction: a primitive
-  // shCAD has no word for is useless as a target if §8.2 taught it anyway.
+  // reSHape has no word for is useless as a target if §8.2 taught it anyway.
   const eligible = prims.filter((p) => !claimed.has(p) && !taught.has(p)).sort();
   if (!same(eligible, [...ASSIGNMENT_POOL.eligible].sort())) {
     return `the eligible pool is now ${JSON.stringify(eligible)}, the record says `
@@ -1402,12 +1402,12 @@ check(`${ASSIGNMENT_POOL.assignment} still has primitives left that its own week
   const notTaken = ASSIGNMENT_POOL.taken.filter((p) => !claimed.has(p) || taught.has(p));
   return notTaken.length
     ? `${notTaken.join(', ')} is recorded as taken from the eligible pool, but it is not a name `
-      + 'shCAD claims, or its own week teaches it — either way the cost is misstated'
+      + 'reSHape claims, or its own week teaches it — either way the cost is misstated'
     : true;
 });
 
 // The graduation-day cost of poly, which is the one it does not pay in shCode.
-// It is the only shCAD name whose positional argument is a list, so it is the
+// It is the only reSHape name whose positional argument is a list, so it is the
 // only one that teaches "hand the array over bare" — and polygon answers a bare
 // array with a valid, EMPTY shape and no error at all.
 check('polygon answers the bare list poly trains with a silently empty shape', () => {
@@ -1460,9 +1460,9 @@ for (const g of GUARDS) {
 }
 
 // "Returns real geometry" has to mean this in practice, not just isGeometry():
-// a shCAD result is a first-class citizen of the real API.
+// a reSHape result is a first-class citizen of the real API.
 for (const i of INTEROP) {
-  check(`the real API accepts a shCAD shape — ${i.label}`, () => {
+  check(`the real API accepts a reSHape shape — ${i.label}`, () => {
     const { window: w } = createSimpleContext();
     const out = i.run(w);
     return isGeometry(out) ? true : 'the real call did not hand back drawable geometry';
@@ -1484,24 +1484,24 @@ for (const i of INTEROP) {
 
 const graduation = readGraduationTable();
 
-check('the graduation table in reference.md parses, and covers every shCAD name', () => {
+check('the graduation table in reference.md parses, and covers every reSHape name', () => {
   if (graduation.error) return graduation.error;
   const { rows } = graduation;
   if (!rows.length) return `no rows found under "${GRADUATION.heading}"`;
   const missing = GRADUATION.namesInTable.filter(
-    (n) => !rows.some((r) => new RegExp(`^${n}\\s*\\(`).test(r.shcad))
+    (n) => !rows.some((r) => new RegExp(`^${n}\\s*\\(`).test(r.reshape))
   );
   if (missing.length) return `not in the graduation table: ${missing.join(', ')}`;
-  const noReal = rows.filter((r) => !r.real && !(r.shcad in GRADUATION.prose));
+  const noReal = rows.filter((r) => !r.real && !(r.reshape in GRADUATION.prose));
   return noReal.length
-    ? `no real call given for: ${noReal.map((r) => r.shcad).join(', ')} — a row with no right-hand call must be listed in GRADUATION.prose with a reason`
+    ? `no real call given for: ${noReal.map((r) => r.reshape).join(', ')} — a row with no right-hand call must be listed in GRADUATION.prose with a reason`
     : true;
 });
 
 check('every prose exemption names a row that is really in the table', () => {
   if (graduation.error) return graduation.error;
   const stale = Object.keys(GRADUATION.prose).filter(
-    (k) => !graduation.rows.some((r) => r.shcad === k)
+    (k) => !graduation.rows.some((r) => r.reshape === k)
   );
   return stale.length
     ? `GRADUATION.prose excuses rows that no longer exist: ${stale.join(', ')} — a stale exemption would quietly excuse a new row`
@@ -1509,22 +1509,22 @@ check('every prose exemption names a row that is really in the table', () => {
 });
 
 for (const row of graduation.rows || []) {
-  if (row.shcad in GRADUATION.prose) continue;
-  check(`graduation: ${row.shcad}  ->  ${row.real}`, () => {
+  if (row.reshape in GRADUATION.prose) continue;
+  check(`graduation: ${row.reshape}  ->  ${row.real}`, () => {
     const g = createGraduationContext();
     let mine;
     let theirs;
     try {
-      mine = g.evaluate(row.shcad);
+      mine = g.evaluate(row.reshape);
     } catch (e) {
-      return `reference.md:${row.line} — the shCAD half does not run: ${e.message}`;
+      return `reference.md:${row.line} — the reSHape half does not run: ${e.message}`;
     }
     try {
       theirs = g.evaluate(row.real);
     } catch (e) {
       return `reference.md:${row.line} — the real call a student would copy does not run: ${e.message}`;
     }
-    if (!isGeometry(mine)) return `reference.md:${row.line} — the shCAD half built nothing drawable`;
+    if (!isGeometry(mine)) return `reference.md:${row.line} — the reSHape half built nothing drawable`;
     if (!isGeometry(theirs)) return `reference.md:${row.line} — the real half built nothing drawable`;
     const verdict = sameGeometry(mine, theirs);
     return verdict === true
@@ -1536,10 +1536,10 @@ for (const row of graduation.rows || []) {
 for (const t of GRADUATION_TRIPWIRES) {
   check(`graduation tripwire: ${t.what}`, () => {
     if (graduation.error) return graduation.error;
-    const row = (graduation.rows || []).find((r) => r.shcad === t.row);
+    const row = (graduation.rows || []).find((r) => r.reshape === t.row);
     if (!row) return `the row this guards is gone: ${t.row}`;
     const g = createGraduationContext();
-    const mine = g.evaluate(row.shcad);
+    const mine = g.evaluate(row.reshape);
     let other;
     try {
       other = g.evaluate(t.without);
@@ -1561,47 +1561,47 @@ for (const t of GRADUATION_TRIPWIRES) {
 // The graduation table answers "I wrote box — what is that really?". The seven
 // written Q3 chapters ask the opposite: they are in the real API, so a student
 // READS cuboid and has to write box. Measured on the chapter sources, roughly
-// half the calls in the assigned reading are in a spelling shCAD replaces, and
+// half the calls in the assigned reading are in a spelling reSHape replaces, and
 // three of the mappings — extrudeRotate -> revolve, align -> sit, rotate ->
 // turn — cannot be guessed backwards at all. reference.md carries both
 // directions; this is the check that it keeps carrying the second one.
 
 const reverse = readReverseTable();
 
-check('reference.md maps every real name shCAD replaces back to its shCAD word', () => {
+check('reference.md maps every real name reSHape replaces back to its reSHape word', () => {
   if (reverse.error) return reverse.error;
   const rows = new Map(reverse.rows.map((r) => [r.real, r]));
   const problems = [];
-  for (const [real, shcad] of Object.entries(REVERSE_LOOKUP.expect)) {
+  for (const [real, reshape] of Object.entries(REVERSE_LOOKUP.expect)) {
     const row = rows.get(real);
     if (!row) {
-      problems.push(`${real} has no row — a student reading the book cannot get from it to ${shcad}`);
+      problems.push(`${real} has no row — a student reading the book cannot get from it to ${reshape}`);
       continue;
     }
-    if (!new RegExp(`\\b${shcad}\\b`).test(row.says)) {
-      problems.push(`reference.md:${row.line} — ${real} does not point at ${shcad}: ${row.says}`);
+    if (!new RegExp(`\\b${reshape}\\b`).test(row.says)) {
+      problems.push(`reference.md:${row.line} — ${real} does not point at ${reshape}: ${row.says}`);
     }
   }
   return problems.length ? problems.join('; ') : true;
 });
 
-check('the reverse table points only at names shCAD really has', () => {
+check('the reverse table points only at names reSHape really has', () => {
   if (reverse.error) return reverse.error;
-  const known = new Set(SHCAD_NAMES.map((n) => n.name));
+  const known = new Set(RESHAPE_NAMES.map((n) => n.name));
   const bad = reverse.rows.filter((r) => {
     const named = (r.says.match(/`([A-Za-z_$][\w$]*)/g) || []).map((m) => m.slice(1));
     return named.length > 0 && !named.some((n) => known.has(n));
   });
   return bad.length
-    ? `rows naming no shCAD word: ${bad.map((r) => `reference.md:${r.line} ${r.real}`).join(', ')}`
+    ? `rows naming no reSHape word: ${bad.map((r) => `reference.md:${r.line} ${r.real}`).join(', ')}`
     : true;
 });
 
-check('every real name in the reverse table is one shCAD actually stands in for', () => {
-  const want = new Set(SHCAD_NAMES.map((n) => n.real));
+check('every real name in the reverse table is one reSHape actually stands in for', () => {
+  const want = new Set(RESHAPE_NAMES.map((n) => n.real));
   const missing = [...want].filter((r) => !(r in REVERSE_LOOKUP.expect));
   return missing.length
-    ? `shCAD stands in for ${missing.join(', ')} but the reverse table is not asked about them`
+    ? `reSHape stands in for ${missing.join(', ')} but the reverse table is not asked about them`
     : true;
 });
 
@@ -1610,7 +1610,7 @@ check('every real name in the reverse table is one shCAD actually stands in for'
 // out of the hardest section, was never executed at all. Run them where they
 // are meant to run.
 for (const e of examples.filter((x) => x.source.endsWith('reference.md') && x.tags.includes('shcode-only'))) {
-  check(`the shCAD example at ${e.source}:${e.line} actually runs`, () => {
+  check(`the reSHape example at ${e.source}:${e.line} actually runs`, () => {
     const cap = captureConsole();
     const { ctx } = createSimpleContext({ consoleImpl: cap.console });
     const r = runProgram(ctx, e.code, `${e.source}:${e.line}`, { lineOffset: e.line - 1 });
@@ -1624,14 +1624,14 @@ for (const e of examples.filter((x) => x.source.endsWith('reference.md') && x.ta
   });
 }
 
-check('reference.md documents every shCAD name in a shcode-only fence', () => {
+check('reference.md documents every reSHape name in a shcode-only fence', () => {
   const fenced = examples
     .filter((e) => e.source.endsWith('reference.md') && e.tags.includes('shcode-only'))
     .map((e) => e.code)
     .join('\n');
-  const missing = SHCAD_NAMES.filter((n) => !new RegExp(`\\b${n.name}\\s*\\(`).test(fenced));
+  const missing = RESHAPE_NAMES.filter((n) => !new RegExp(`\\b${n.name}\\s*\\(`).test(fenced));
   return missing.length
-    ? `not shown in reference.md: ${missing.map((n) => n.name).join(', ')} — every shCAD example needs the shcode-only tag or the portability check fails it`
+    ? `not shown in reference.md: ${missing.map((n) => n.name).join(', ')} — every reSHape example needs the shcode-only tag or the portability check fails it`
     : true;
 });
 
@@ -1639,7 +1639,7 @@ check('reference.md documents every shCAD name in a shcode-only fence', () => {
 // ---------------------------------------------------------------------------
 // THE BRIDGE — is every call in the assigned reading answerable from shCode?
 //
-// REVERSE_LOOKUP above asks the narrow question: does every name shCAD stands
+// REVERSE_LOOKUP above asks the narrow question: does every name reSHape stands
 // in for have a row? A student reading the book asks the wide one: does every
 // name I can TYPE have a row? Measured before these checks existed, eight did
 // not — `cube` at 12 calls among them, in the opening runnable block of the
@@ -1673,13 +1673,13 @@ check('the book census adds up to the total it reports', () => {
   return eq(bare + dotted, BOOK_CENSUS.totalCalls, 'total calls in the seven chapters');
 });
 
-const bridgeWord = readBridgeTable(BRIDGE.shcadWordHeading);
+const bridgeWord = readBridgeTable(BRIDGE.reshapeWordHeading);
 const bridgeNoWord = readBridgeTable(BRIDGE.noWordHeading);
 
 check('reference.md carries both halves of the bridge', () => {
   if (bridgeWord.error) return bridgeWord.error;
   if (bridgeNoWord.error) return bridgeNoWord.error;
-  if (!bridgeWord.rows.length) return `no rows under "${BRIDGE.shcadWordHeading}"`;
+  if (!bridgeWord.rows.length) return `no rows under "${BRIDGE.reshapeWordHeading}"`;
   if (!bridgeNoWord.rows.length) return `no rows under "${BRIDGE.noWordHeading}"`;
   return true;
 });
@@ -1705,7 +1705,7 @@ check('no name is answered twice, in two different directions', () => {
     : true;
 });
 
-check('the "no shCAD word" table names only real library functions', () => {
+check('the "no reSHape word" table names only real library functions', () => {
   if (bridgeNoWord.error) return bridgeNoWord.error;
   const { jscad } = loadModeling();
   const names = apiNames(jscad);
@@ -1720,11 +1720,11 @@ check('the "no shCAD word" table names only real library functions', () => {
   return bad.length ? `rows for things the library does not export: ${bad.join(', ')}` : true;
 });
 
-check('nothing on the "no shCAD word" table actually has one', () => {
+check('nothing on the "no reSHape word" table actually has one', () => {
   if (bridgeNoWord.error) return bridgeNoWord.error;
   const has = bridgeNoWord.rows.filter((r) => r.left in REVERSE_LOOKUP.expect);
   return has.length
-    ? `told to "type what the book typed" for names shCAD does replace: ${has.map((r) => r.left).join(', ')}`
+    ? `told to "type what the book typed" for names reSHape does replace: ${has.map((r) => r.left).join(', ')}`
     : true;
 });
 
@@ -1735,7 +1735,7 @@ check('the size of the bridge in reference.md is the measured size', () => {
     .filter(([n]) => word.has(n))
     .reduce((a, [, c]) => a + c, 0);
   if (replaced !== BOOK_CENSUS.replacedCalls) {
-    return `the shCAD-word table now covers ${replaced} of the book's calls, but the census `
+    return `the reSHape-word table now covers ${replaced} of the book's calls, but the census `
       + `records ${BOOK_CENSUS.replacedCalls} — move the row back, or re-measure and update both`;
   }
   const md = readFileSync(BRIDGE.path, 'utf8');
@@ -1744,15 +1744,15 @@ check('the size of the bridge in reference.md is the measured size', () => {
   }
   return new RegExp(`\\*\\*${replaced} of them`).test(md)
     ? true
-    : `reference.md does not print the measured ${replaced} calls shCAD replaces`;
+    : `reference.md does not print the measured ${replaced} calls reSHape replaces`;
 });
 
-// The rows that are not renames. Each of these is a real call and a shCAD word
+// The rows that are not renames. Each of these is a real call and a reSHape word
 // that do DIFFERENT things, silently — the model comes out wrong and nothing
 // throws. A row that does not say so is worse than a missing row, because the
 // table reads as authoritative.
 for (const wrn of BRIDGE_WARNINGS) {
-  check(`the ${wrn.real} row warns that its shCAD word is not a rename`, () => {
+  check(`the ${wrn.real} row warns that its reSHape word is not a rename`, () => {
     if (bridgeWord.error) return bridgeWord.error;
     const row = bridgeWord.rows.find((r) => r.left === wrn.real);
     if (!row) return `${wrn.real} has no row at all`;
@@ -1790,7 +1790,7 @@ check('sit is not the align the seven chapters print', () => {
 
 // TAU: a value the book types eleven times and never defines, which is not a
 // name this runner installs. The fix is documentation plus a refusal that
-// spells something runnable, because runner.html owns the scope and shCAD adds
+// spells something runnable, because runner.html owns the scope and reSHape adds
 // no tenth name.
 for (const id of BOOK_IDENTIFIERS) {
   check(`${id.name} is not in scope here, and reference.md says what to type instead`, () => {
@@ -1882,33 +1882,33 @@ for (const k of BOOK_OPTION_KEYS) {
 // ---------------------------------------------------------------------------
 // OBJECT DEPTH — the layer's justification, measured rather than asserted.
 //
-// shCAD's defence is that it postpones the object literal rather than hiding
+// reSHape's defence is that it postpones the object literal rather than hiding
 // it. Measured before this existed, the section making that argument held
 // exactly ONE live object literal, because every other brace on the page was
 // inside a // comment showing the real API — while 197 of the book's own calls
 // lead with one.
 
-const shcad = shcadSection();
-const shcadFences = shcad.error
+const reshape = reshapeSection();
+const reshapeFences = reshape.error
   ? []
-  : [...shcad.body.matchAll(/^```js([^\n]*)\n([\s\S]*?)^```/gm)].map((m) => ({
+  : [...reshape.body.matchAll(/^```js([^\n]*)\n([\s\S]*?)^```/gm)].map((m) => ({
     tags: (m[1] || '').trim().split(/\s+/).filter(Boolean),
     code: m[2],
   }));
 
-check('every example in the shCAD section is tagged shcode-only', () => {
-  if (shcad.error) return shcad.error;
-  if (!shcadFences.length) return 'no examples in the shCAD section at all';
-  const untagged = shcadFences.filter((f) => !f.tags.includes('shcode-only'));
+check('every example in the reSHape section is tagged shcode-only', () => {
+  if (reshape.error) return reshape.error;
+  if (!reshapeFences.length) return 'no examples in the reSHape section at all';
+  const untagged = reshapeFences.filter((f) => !f.tags.includes('shcode-only'));
   return untagged.length
-    ? `${untagged.length} example(s) in the shCAD section are not tagged shcode-only — they are `
-      + 'run in the require-only sandbox, where every shCAD name is undefined'
+    ? `${untagged.length} example(s) in the reSHape section are not tagged shcode-only — they are `
+      + 'run in the require-only sandbox, where every reSHape name is undefined'
     : true;
 });
 
-check('the shCAD section writes option objects rather than describing them', () => {
-  if (shcad.error) return shcad.error;
-  const objects = shcadFences.flatMap((f) => liveObjectLiterals(f.code));
+check('the reSHape section writes option objects rather than describing them', () => {
+  if (reshape.error) return reshape.error;
+  const objects = reshapeFences.flatMap((f) => liveObjectLiterals(f.code));
   if (objects.length < OBJECT_DEPTH.minLiveObjects) {
     return `only ${objects.length} live option object(s) in the whole section, expected at least `
       + `${OBJECT_DEPTH.minLiveObjects} — a brace inside a // comment is not an example of `
@@ -1929,19 +1929,19 @@ check('the shCAD section writes option objects rather than describing them', () 
     : `the widest object in the section has ${widest} key(s), expected ${OBJECT_DEPTH.minKeysInOneObject}`;
 });
 
-check('every shCAD option key is worked in a runnable example, not just tabled', () => {
-  if (shcad.error) return shcad.error;
-  const keys = new Set(shcadFences.flatMap((f) => liveObjectLiterals(f.code)).flat());
+check('every reSHape option key is worked in a runnable example, not just tabled', () => {
+  if (reshape.error) return reshape.error;
+  const keys = new Set(reshapeFences.flatMap((f) => liveObjectLiterals(f.code)).flat());
   const missing = OBJECT_DEPTH.keys.filter((k) => !keys.has(k));
   return missing.length
-    ? `shCAD ships these keys and no runnable example writes them: ${missing.join(', ')}`
+    ? `reSHape ships these keys and no runnable example writes them: ${missing.join(', ')}`
     : true;
 });
 
 check('the parameter panel example is a real array of objects, and its defaults reach main()', () => {
   const { marker, minDefinitions, everyDefinition, someDefinition, modelBox } = OBJECT_DEPTH.parameters;
-  const fence = shcadFences.find((f) => new RegExp(`function\\s+${marker}`).test(f.code));
-  if (!fence) return `no runnable ${marker} example in the shCAD section`;
+  const fence = reshapeFences.find((f) => new RegExp(`function\\s+${marker}`).test(f.code));
+  if (!fence) return `no runnable ${marker} example in the reSHape section`;
 
   const cap = captureConsole();
   const ctx = createSimpleContext({ consoleImpl: cap.console });
@@ -2002,7 +2002,7 @@ check('the parameter trap reference.md names is really in runner.html', () => {
 // Every bridge check above answers a NAME. BOOK_CENSUS counts CALLS. §8.4 and
 // §8.5 also print words that are neither: the `type:` values inside
 // getParameterDefinitions, which are strings in an object literal. So the
-// coverage claim was true and a student still stalled — a shCAD-only reader
+// coverage claim was true and a student still stalled — a reSHape-only reader
 // translated all 28 of §8.5's calls and then stopped on `type: 'float'`, which
 // appeared nowhere shCode ships, while the in-app docs said "THREE of the types
 // hand you a number" and thereby denied it existed.
@@ -2025,7 +2025,7 @@ check('the parameter-type census adds up', () => {
 // One per spelling, because a missing row is the failure being closed here and
 // a single aggregate check reports it as one number rather than as the word.
 for (const [type, m] of Object.entries(PARAM_TYPES.spellings)) {
-  check(`the book's type: '${type}' has a row in the shCAD section`, () => {
+  check(`the book's type: '${type}' has a row in the reSHape section`, () => {
     if (paramBookTable.error) return paramBookTable.error;
     const want = `type: '${type}'`;
     const row = paramBookTable.rows.find((r) => r.left === want);
@@ -2071,7 +2071,7 @@ check("reference.md's own type table lists every type either surface teaches", (
   const missing = PARAM_TYPES.documented.filter((t) => !have.has(t));
   return missing.length
     ? `§Parameters has no row for: ${missing.join(', ')} — the in-app docs teach these and `
-      + 'reference.md is the file the shCAD section tells a student to keep open. Two doc '
+      + 'reference.md is the file the reSHape section tells a student to keep open. Two doc '
       + 'surfaces disagreeing about the list is how int and float went missing'
     : true;
 });
@@ -2157,11 +2157,11 @@ check('both doc surfaces name every numeric parameter type', () => {
     : true;
 });
 
-check('the shCAD section works the four numeric types in one runnable example', () => {
-  if (shcad.error) return shcad.error;
+check('the reSHape section works the four numeric types in one runnable example', () => {
+  if (reshape.error) return reshape.error;
   const { findBy, declares, everyValueIsA } = PARAM_TYPES.example;
-  const fence = shcadFences.find((f) => findBy.test(f.code));
-  if (!fence) return `no runnable example in the shCAD section declares ${findBy} — the table `
+  const fence = reshapeFences.find((f) => findBy.test(f.code));
+  if (!fence) return `no runnable example in the reSHape section declares ${findBy} — the table `
     + 'says these are safe to type and nothing on the page types one';
   if (!fence.tags.includes('shcode-only')) return 'that example is not tagged shcode-only';
   const missing = declares.filter((t) => !new RegExp(`type:\\s*'${t}'`).test(fence.code));
@@ -2199,7 +2199,7 @@ for (const [key, takenBy] of Object.entries({
     return new RegExp('`[^`\\n]*\\b' + key + '\\b[^`\\n]*`').test(md)
       ? true
       : `${key} is never written in reference.md, and the seven chapters type it (${takenBy}). `
-        + 'The in-app docs are not a substitute: reference.md is the file the shCAD section '
+        + 'The in-app docs are not a substitute: reference.md is the file the reSHape section '
         + 'tells a student to keep open while reading, so a word only the other surface '
         + 'carries is a word that student cannot reach';
   });
@@ -2232,7 +2232,7 @@ const TITLES = {
   docs: 'DOCS     — every example runs on jscad.app',
   sync: 'SYNC     — in-app docs vs docs/reference.md',
   reach: 'REACH    — a student can actually load this runtime',
-  simple: 'SIMPLE   — shCAD adds names, and only names',
+  simple: 'SIMPLE   — reSHape adds names, and only names',
 };
 
 for (const g of GROUPS) {
@@ -2248,5 +2248,5 @@ for (const g of GROUPS) {
   if (fails.length) console.log(`  ${rows.length - fails.length}/${rows.length} passing`);
 }
 
-console.log(`\n${ok ? C.g + 'JSCAD gate: PASS' : C.r + 'JSCAD gate: FAIL'}${C.x} — ${pass}/${results.length}\n`);
+console.log(`\n${ok ? C.g + 'reSHape gate: PASS' : C.r + 'reSHape gate: FAIL'}${C.x} — ${pass}/${results.length}\n`);
 process.exit(ok ? 0 : 1);
