@@ -28,7 +28,7 @@ import SubmitDialog from './SubmitDialog';
 import GradeReportView from './GradeReport';
 import TeacherPushBanner from './TeacherPushBanner';
 import CrossDeviceSyncBanner from './CrossDeviceSyncBanner';
-import MoshionDocsContent from './MoshionDocsContent';
+import DocsDrawer from './DocsDrawer';
 import AiHelpPanel from './AiHelpPanel';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import SolutionPanel from './SolutionPanel';
@@ -626,7 +626,7 @@ export default function LessonWorkspace({
                   key: 'docs',
                   label: 'Docs',
                   color: '#bd93f9',
-                  content: <MoshionDocsContent />,
+                  content: <DocsDrawer defaultSetId="moshion" storageKey="shCode:lesson-docs" />,
                   headerExtra: (
                     <a
                       href="/docs/moshion"
@@ -637,6 +637,23 @@ export default function LessonWorkspace({
                       Docs ↗
                     </a>
                   ),
+                },
+              ] as DrawerTab[])
+            : []),
+          // Console lessons get the Docs drawer, defaulting to the
+          // plain-JavaScript reference — the Q1–Q2 taught surface (values,
+          // variables, conditionals, loops, functions, arrays, objects,
+          // JSON) distilled from the bookSHelf book. The teaching for a
+          // console lesson lives in lesson.json's `steps`; this is the
+          // lookup surface for the constructs those steps name. The drawer
+          // also carries the moSHion and reSHape references, one click away.
+          ...(isConsoleMode
+            ? ([
+                {
+                  key: 'docs',
+                  label: 'Docs',
+                  color: '#bd93f9',
+                  content: <DocsDrawer defaultSetId="js" storageKey="shCode:lesson-docs" />,
                 },
               ] as DrawerTab[])
             : []),

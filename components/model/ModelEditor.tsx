@@ -34,6 +34,7 @@ import {
   SquareDashedBottom,
   PenLine,
   MoveUp,
+  PanelLeftClose,
   Plus,
   RotateCw,
   Trash2,
@@ -98,6 +99,16 @@ interface Props {
   onRedo: () => void;
   canUndo: boolean;
   canRedo: boolean;
+  /** When set, the panel breaks down to a thin preview bar and back. Used by
+   *  the sandbox's Build mode, where the canvas owns the window and the tools
+   *  are a sidebar the student can hide to look at the shape. The state lives
+   *  here — inside the editor — rather than in the sandbox, so the shape
+   *  toolbar's own strip is the only control that moves it. */
+  collapsible?: boolean;
+  /** Mirrors the collapsed state up, so the sandbox can dress its shell
+   *  (the floating panel must turn transparent when the strip is all that
+   *  is left of it, or a 420px card sits over the canvas). */
+  onCollapsed?: (collapsed: boolean) => void;
 }
 
 type BoolOp = 'union' | 'subtract' | 'intersect';
@@ -281,11 +292,20 @@ function FlyoutButton({
 }
 
 export default function ModelEditor({
-  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo,
+  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed,
 }: Props) {
   const [note, setNote] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [menu, setMenu] = useState<MenuId>(null);
+  // A collapsible editor starts out expanded: the tools are the point of
+  // Build mode, so the panel's first face is the full toolbar and list over
+  // the canvas. The rail is what collapsing buys -- shapes-only, with the
+  // essential tools still one click away.
+  const [collapsed, setCollapsed] = useState(false);
+  const collapse = (next: boolean) => {
+    setCollapsed(next);
+    onCollapsed?.(next);
+  };
   const [lastShape, setLastShape] = useState<ShapeKind>('box');
   const [lastBoolOp, setLastBoolOp] = useState<BoolOp>('union');
   const [lastRound, setLastRound] = useState<RoundStyle>('fillet');
@@ -759,6 +779,24 @@ export default function ModelEditor({
 
   return (
     <div className="model-editor">
+      {collapsible && collapsed && (
+        <div className="model-collapsed" role="group" aria-label="Shape tools">
+          <button
+            onClick={() => collapse(false)}
+            title="Show the shape tools"
+            aria-label="Show the shape tools"
+          >
+            <PenLine size={14} />
+          </button>
+          <button onClick={onUndo} disabled={!canUndo} title="Undo (Ctrl+Z)" aria-label="Undo">
+            <Undo2 size={14} />
+          </button>
+          <button onClick={onRedo} disabled={!canRedo} title="Redo (Ctrl+Shift+Z)" aria-label="Redo">
+            <Redo2 size={14} />
+          </button>
+        </div>
+      )}
+      {!(collapsible && collapsed) && (
       <div className="model-tools" ref={toolsRef}>
         {sketchVisible && (
           <>
@@ -995,6 +1033,15 @@ export default function ModelEditor({
         )}
 
         <div className="model-tool-group model-tool-end">
+          {collapsible && (
+            <button
+              onClick={() => collapse(true)}
+              title="Collapse the tools to a rail, so the shape fills the window"
+              aria-label="Collapse the tools"
+            >
+              <PanelLeftClose size={14} />
+            </button>
+          )}
           <button onClick={onUndo} disabled={!canUndo} title="Undo (Ctrl+Z)" aria-label="Undo">
             <Undo2 size={14} />
           </button>
@@ -1031,9 +1078,10 @@ export default function ModelEditor({
           </button>
         )}
       </div>
-
+      )}
+      {!(collapsible && collapsed) && (
+      <>
       {note && <p className="model-note">{note}</p>}
-
       <ol className="model-list">
         {doc.features.length === 0 && (
           <li className="model-empty">
@@ -1133,6 +1181,8 @@ export default function ModelEditor({
           onChange={(next) => setConstraints(activeSketch, next)}
           onRound={(corner, radius) => roundSketchCorner(activeSketch, corner, radius)}
         />
+      )}
+      </>
       )}
 
       <style>{`
@@ -1245,6 +1295,24 @@ export default function ModelEditor({
         }
         .model-move button:hover:not(:disabled) { color: var(--text); background: #6272a4; }
         .model-move button:disabled { opacity: 0.25; cursor: default; }
+        /* The collapsed strip: a thin rail of the essential tools on the
+           canvas's left edge, dressed like the full toolbar. */
+        .model-collapsed {
+          display: flex; flex-direction: column; align-items: center; gap: 4px;
+          padding: 6px 0; height: 100%; box-sizing: border-box;
+          background: var(--card); border-right: 1px solid var(--border);
+        }
+        .model-collapsed button {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 28px; height: 28px; padding: 0; gap: 0; font-size: 0;
+          background: transparent; color: #d3d5e3;
+          border: 1px solid transparent; border-radius: 3px; cursor: pointer;
+        }
+        .model-collapsed button:hover:not(:disabled) {
+          background: #3d4051; border-color: #565a70; color: #f8f8f2;
+        }
+        .model-collapsed button:disabled { opacity: 0.35; cursor: not-allowed; }
+        .model-collapsed button:focus-visible { outline: 1px solid #8be9fd; outline-offset: 1px; }
       `}</style>
     </div>
   );

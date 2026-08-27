@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw } from 'lucide-react';
+import { ChevronDown, ChevronUp, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw } from 'lucide-react';
 import { useLessonStore } from '../lib/store';
 import CodeEditor from './CodeEditor';
 import MoshionPreview from './MoshionPreview';
@@ -10,7 +10,7 @@ import ReshapeParamsPanel, { type ParamDef, type ParamValues } from './ReshapePa
 import Console from './Console';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
-import MoshionDocsContent from './MoshionDocsContent';
+import DocsDrawer from './DocsDrawer';
 import ModelEditor from './model/ModelEditor';
 import HandleOverlay, { type AnchorPoint, type SketchOutline } from './model/HandleOverlay';
 import { outlineOf } from '../lib/sketch-arc';
@@ -103,6 +103,10 @@ export default function SandboxWorkspace() {
   const shellRef = useRef<HTMLDivElement>(null);
   const [full, setFull] = useState(false);
   const [editorHidden, setEditorHidden] = useState(false);
+  const [consoleHidden, setConsoleHidden] = useState(false);
+  // Build's shape tools collapsing to the rail. Lives in ModelEditor; mirrored
+  // here so the shell can shrink the floating card to rail width.
+  const [toolsHidden, setToolsHidden] = useState(false);
   const [anchors, setAnchors] = useState<AnchorPoint[]>([]);
   // The frame reloads on every structural edit, so specs posted at the moment
   // runKey changes arrive before the runner has a listener and are simply lost.
@@ -165,6 +169,8 @@ export default function SandboxWorkspace() {
     workerRef.current?.terminate();
     workerRef.current = null;
     try { window.localStorage.setItem(MODE_KEY, next); } catch { /* private mode */ }
+    setEditorHidden(false);
+    setConsoleHidden(false);
     setModeId(next);
   }
 
@@ -374,6 +380,8 @@ export default function SandboxWorkspace() {
     }
     try { window.localStorage.setItem(BUILD_KEY, on ? '1' : '0'); } catch { /* private mode */ }
     setBuild(on);
+    // The tools stay exactly where the student left them: Build remembers its
+    // own collapsed state, and it is not reset by coming back from Code.
   }
 
   // Adding, deleting or reordering changes the shape of the file, so this is
@@ -506,9 +514,12 @@ export default function SandboxWorkspace() {
     const onFs = () => {
       const active = document.fullscreenElement === shellRef.current;
       setFull(active);
-      // Leaving full screen should not leave the editor hidden in the
-      // windowed layout, where there is no way to bring it back.
-      if (!active) setEditorHidden(false);
+      // Leaving full screen should not leave the editor or the console hidden
+      // in the windowed layout, where there is no way to bring them back.
+      if (!active) {
+        setEditorHidden(false);
+        setConsoleHidden(false);
+      }
       // Both panes just changed size by a lot; CodeMirror and the preview
       // iframe only relayout on a resize event.
       setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
@@ -639,16 +650,7 @@ export default function SandboxWorkspace() {
       key: 'docs',
       label: 'Docs',
       color: '#bd93f9',
-      content:
-        mode.id === 'moshion' ? (
-          <MoshionDocsContent />
-        ) : (
-          <div style={{ padding: '12px 14px', color: '#6272a4', fontSize: 13, lineHeight: 1.6 }}>
-            {mode.docsHref
-              ? 'Open the full reference in a new tab.'
-              : 'This mode is plain JavaScript — no library reference needed.'}
-          </div>
-        ),
+      content: <DocsDrawer defaultSetId={mode.id} storageKey="shCode:sandbox-docs" />,
       headerExtra: mode.docsHref ? (
         <a
           href={mode.docsHref}
@@ -679,7 +681,10 @@ export default function SandboxWorkspace() {
         className={
           'sandbox-shell'
           + (full ? ' is-full' : '')
-          + (full && editorHidden ? ' is-editor-hidden' : '')
+          + (full && editorHidden && !(isReshape && build) ? ' is-editor-hidden' : '')
+          + (full && consoleHidden ? ' is-console-hidden' : '')
+          + (isReshape && build ? ' is-build' : '')
+          + (isReshape && build && toolsHidden ? ' is-tools-hidden' : '')
         }
         ref={shellRef}
       >
@@ -748,7 +753,7 @@ export default function SandboxWorkspace() {
           <button
             style={chipStyle}
             onClick={toggleFull}
-            title={full ? 'Leave full screen (Esc)' : 'Fill the screen with the editor and preview'}
+            title={full ? 'Leave full screen (Esc)' : 'Fill the screen with the preview'}
           >
             {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
             {full ? 'Exit full screen' : 'Full screen'}
@@ -768,6 +773,8 @@ export default function SandboxWorkspace() {
                 onRedo={redo}
                 canUndo={depth.back > 0}
                 canRedo={depth.forward > 0}
+                collapsible
+                onCollapsed={setToolsHidden}
               />
             ) : (
               <CodeEditor />
@@ -829,7 +836,7 @@ export default function SandboxWorkspace() {
               <MoshionPreview code={code} runKey={runKey} />
             )}
           </div>
-          {full && (
+          {full && !(isReshape && build) && (
             <button
               type="button"
               className="sandbox-editor-toggle"
@@ -843,13 +850,24 @@ export default function SandboxWorkspace() {
           <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
         </div>
 
-        {!isConsole && (
+        {!isConsole && !(isReshape && build) && (
           <div className="sandbox-console-wrap">
             <div className="output-header">Console</div>
             <div className="sandbox-console-body">
               <Console resetKey={String(consoleResetKey)} />
             </div>
           </div>
+        )}
+        {full && !isConsole && !(isReshape && build) && (
+          <button
+            type="button"
+            className="sandbox-console-toggle"
+            onClick={() => setConsoleHidden((h) => !h)}
+            title={consoleHidden ? 'Show the console again' : 'Hide the console and keep the shape'}
+          >
+            {consoleHidden ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+            {consoleHidden ? 'Console' : 'Hide console'}
+          </button>
         )}
       </div>
       <style>{`
@@ -925,6 +943,42 @@ export default function SandboxWorkspace() {
           resize: none;
         }
 
+        /* ---- Build mode ----
+           The whole window belongs to the rendered shapes: the toolbar sits
+           on top of the preview, the editor and console are gone, and the
+           shape tools ride the left edge as a hideable sidebar. */
+        .sandbox-shell.is-build .sandbox-split { height: auto; flex: 1 1 auto; min-height: 0; }
+        .sandbox-shell.is-build #editorPane {
+          position: absolute;
+          left: 12px;
+          top: 12px;
+          bottom: 12px;
+          /* .pane sets height:100%, which would win over the top/bottom pair
+             and hang the panel 24px past the bottom of the frame. */
+          height: auto;
+          width: min(420px, 45%);
+          flex: 0 0 auto !important;
+          min-width: 0;
+          z-index: 40;
+          background: var(--card);
+          border: 1px solid #565a70;
+          border-radius: 6px;
+          box-shadow: 0 12px 36px rgba(0,0,0,0.6);
+          overflow: hidden;
+        }
+        /* The rail is all that is left: shrink the card to it so the canvas
+           owns the rest of the screen. */
+        .sandbox-shell.is-build.is-tools-hidden #editorPane {
+          width: 46px;
+          box-shadow: none;
+          background: rgba(40, 42, 54, 0.72);
+        }
+        /* The empty preview frame never shows in Build; the header, the
+           divider and the empty-screen copy all sit on top of it anyway. */
+        .sandbox-shell.is-build #previewPane { flex: 1 1 100% !important; }
+        .sandbox-shell.is-build .divider { display: none; }
+        .sandbox-shell.is-build .reshape-pane-params { flex: 0 0 208px; }
+
         /* ---- full screen ----
            The preview takes the whole screen and the editor floats over its
            left edge, so "build the shape, then get the editor out of the way"
@@ -939,7 +993,6 @@ export default function SandboxWorkspace() {
           background: var(--bg);
         }
         .sandbox-shell.is-full .sandbox-header,
-        .sandbox-shell.is-full .sandbox-console-wrap,
         .sandbox-shell.is-full .divider { display: none; }
         .sandbox-shell.is-full .sandbox-split { min-height: 0; }
         /* !important beats the inline flex the divider drag leaves behind --
@@ -982,6 +1035,39 @@ export default function SandboxWorkspace() {
         }
         .sandbox-editor-toggle:hover { background: #44475a; }
         .sandbox-shell.is-editor-hidden .sandbox-editor-toggle { left: 12px; }
+        .sandbox-console-toggle {
+          position: absolute;
+          right: 12px;
+          top: 12px;
+          z-index: 50;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          padding: 5px 10px;
+          font-size: 12px;
+          color: #d3d5e3;
+          background: rgba(40, 42, 54, 0.92);
+          border: 1px solid #565a70;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        .sandbox-console-toggle:hover { background: #44475a; }
+        /* The console sits at the bottom edge and the toggle sits above its
+           right corner, so it never covers a line of output. */
+        .sandbox-shell.is-full .sandbox-console-wrap {
+          position: absolute;
+          left: 8px;
+          right: 8px;
+          bottom: 8px;
+          height: 42%;
+          max-height: 42%;
+          min-height: 0;
+          resize: none;
+          border: 1px solid #565a70;
+          box-shadow: 0 -8px 32px rgba(0,0,0,0.45);
+        }
+        .sandbox-shell.is-console-hidden .sandbox-console-wrap { display: none; }
+        .sandbox-shell.is-console-hidden .sandbox-console-toggle { bottom: 12px; top: auto; }
       `}</style>
     </>
   );
