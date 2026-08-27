@@ -1,14 +1,14 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { getAllSectionSlugs, getSection, sections } from '../../../../lib/moshion-docs';
-import DocsClient from './DocsClient';
+import { getAllSectionSlugs, getSection, sections } from '../../../../lib/js-docs';
+import JsDocsClient from './JsDocsClient';
 import DocsFamilyBar from '../../../../components/DocsFamilyBar';
 
 export function generateStaticParams() {
   return getAllSectionSlugs().map((section) => ({ section }));
 }
 
-export default async function DocsSectionPage({
+export default async function JsDocsSectionPage({
   params,
 }: {
   params: Promise<{ section: string }>;
@@ -18,15 +18,14 @@ export default async function DocsSectionPage({
   if (!section) return notFound();
   return (
     <>
-      <DocsFamilyBar currentId="moshion" />
+      <DocsFamilyBar currentId="js" />
       <Suspense fallback={<div className="docs-main">Loading…</div>}>
-        <DocsClient
+        <JsDocsClient
           section={section}
           allSections={sections}
-          basePath="/docs/moshion"
-          docsTitle="moSHion reference"
-          searchPlaceholder="Search the moSHion docs…"
-          preview="moshion"
+          basePath="/docs/js"
+          docsTitle="JavaScript reference"
+          searchPlaceholder="Search the JavaScript docs…"
         />
       </Suspense>
     </>

@@ -41,8 +41,10 @@ export default function HeaderNav() {
     <>
       <Link href="/" className="text-white">Lessons</Link>
       <Link href="/sandbox" className="text-white">Sandbox</Link>
-      <Link href="/docs/moshion" className="text-white">Docs</Link>
-      <Link href="/docs/reshape" className="text-white">reSHape</Link>
+      {/* One Docs tab for the whole family — JavaScript, moSHion and reSHape
+          each have a set inside, switched from the hub at /docs and from the
+          family switcher on every docs page. */}
+      <Link href="/docs" className="text-white">Docs</Link>
       {(loaded && user?.role === 'teacher') || user?.role === 'admin' ? (
         <>
           <Link href="/teacher" className="text-white">Classes</Link>

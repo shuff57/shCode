@@ -620,43 +620,34 @@ export default function LessonWorkspace({
             color: '#ffb86c',
             content: <AiHelpPanel lesson={lesson} />,
           },
-          ...(isMoshionMode
-            ? ([
-                {
-                  key: 'docs',
-                  label: 'Docs',
-                  color: '#bd93f9',
-                  content: <DocsDrawer defaultSetId="moshion" storageKey="shCode:lesson-docs" />,
-                  headerExtra: (
-                    <a
-                      href="/docs/moshion"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-secondary btn-sm"
-                    >
-                      Docs ↗
-                    </a>
-                  ),
-                },
-              ] as DrawerTab[])
-            : []),
-          // Console lessons get the Docs drawer, defaulting to the
-          // plain-JavaScript reference — the Q1–Q2 taught surface (values,
-          // variables, conditionals, loops, functions, arrays, objects,
-          // JSON) distilled from the bookSHelf book. The teaching for a
-          // console lesson lives in lesson.json's `steps`; this is the
-          // lookup surface for the constructs those steps name. The drawer
-          // also carries the moSHion and reSHape references, one click away.
-          ...(isConsoleMode
-            ? ([
-                {
-                  key: 'docs',
-                  label: 'Docs',
-                  color: '#bd93f9',
-                  content: <DocsDrawer defaultSetId="js" storageKey="shCode:lesson-docs" />,
-                },
-              ] as DrawerTab[])
-            : []),
+          // The Docs drawer is on every lesson. It defaults to the set the
+          // lesson teaches — moSHion for moSHion lessons, the plain-JavaScript
+          // reference for console lessons, JavaScript for everything else
+          // (readings, slides, examples, quizzes) — and all three sets
+          // (JavaScript, moSHion, reSHape) are one click away, because a
+          // student reading about `for` loops in a moSHion lesson may want
+          // the plain-JS page on the same construct.
+          {
+            key: 'docs',
+            label: 'Docs',
+            color: '#bd93f9',
+            content: (
+              <DocsDrawer
+                defaultSetId={isMoshionMode ? 'moshion' : 'js'}
+                storageKey="shCode:lesson-docs"
+              />
+            ),
+            headerExtra: isMoshionMode ? (
+              <a
+                href="/docs/moshion"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary btn-sm"
+              >
+                Docs ↗
+              </a>
+            ) : undefined,
+          },
           // The teaching for a console lesson lives in lesson.json's `steps` —
           // what console.log does, why numbers take no quotes, what a boolean
           // is. Nothing mounted LessonSteps, so all of it was invisible and the

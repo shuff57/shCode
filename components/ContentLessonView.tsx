@@ -11,6 +11,8 @@ import QuizView from './QuizView';
 import MarkdownWithLiveBlocks from './MarkdownWithLiveBlocks';
 import HeaderLessonNav from './HeaderLessonNav';
 import { withInlineCode } from './InlineCode';
+import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
+import DocsDrawer from './DocsDrawer';
 
 interface Props {
   lesson: Lesson;
@@ -66,7 +68,19 @@ export default function ContentLessonView({ lesson }: Props) {
   }, [slidesUrl]);
 
   return (
-    <main style={{ maxWidth: 960, margin: '0 auto', padding: '24px 20px 80px', color: '#f8f8f2' }}>
+    <>
+      <TabbedRightDrawer
+        storageKey="shCode:content-drawer"
+        tabs={[
+          {
+            key: 'docs',
+            label: 'Docs',
+            color: '#bd93f9',
+            content: <DocsDrawer defaultSetId="js" storageKey="shCode:lesson-docs" />,
+          },
+        ]}
+      />
+      <main style={{ maxWidth: 960, margin: '0 auto', padding: '24px 20px 80px', color: '#f8f8f2' }}>
       <nav style={{ marginBottom: 12, fontSize: 13, color: '#888' }}>
         <Link href="/" style={{ color: '#8be9fd' }}>Home</Link>
         {lesson.unit ? (
@@ -238,6 +252,7 @@ export default function ContentLessonView({ lesson }: Props) {
         .content-prose ul, .content-prose ol { padding-left: 24px; }
       `}</style>
     </main>
+    </>
   );
 }
 

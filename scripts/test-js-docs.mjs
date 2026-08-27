@@ -172,13 +172,26 @@ const localStorage = {
 
   const sandboxSrc = readFileSafe(path.join(root, 'components/SandboxWorkspace.tsx'));
   const lessonSrc = readFileSafe(path.join(root, 'components/LessonWorkspace.tsx'));
+  const contentSrc = readFileSafe(path.join(root, 'components/ContentLessonView.tsx'));
 
   ok('the sandbox mounts the JS docs for its JavaScript mode',
     sandboxSrc.includes('DocsDrawer') && sandboxSrc.includes('defaultSetId={mode.id}'),
     'SandboxWorkspace.tsx must render DocsDrawer with the current mode as the default set');
-  ok('console lessons mount the JS docs',
-    lessonSrc.includes('DocsDrawer') && lessonSrc.includes('defaultSetId="js"'),
-    'LessonWorkspace.tsx must render DocsDrawer defaulting to the js set for console lessons');
+  ok('lessons mount the JS docs',
+    lessonSrc.includes('DocsDrawer') && lessonSrc.includes("'moshion' : 'js'"),
+    'LessonWorkspace.tsx must render DocsDrawer on every lesson, defaulting to js except moSHion lessons');
+  ok('content lessons mount the JS docs',
+    contentSrc.includes('DocsDrawer') && contentSrc.includes('defaultSetId="js"'),
+    'ContentLessonView.tsx must render DocsDrawer for readings/slides/examples/videos/quizzes');
+
+  const hubSrc = readFileSafe(path.join(root, 'app/docs/page.tsx'));
+  const jsSectionPage = readFileSafe(path.join(root, 'app/docs/js/[section]/page.tsx'));
+  ok('the docs hub links to the JS route',
+    hubSrc.includes('href="/docs/js/values"'),
+    'app/docs/page.tsx must carry a JavaScript card linking /docs/js/values');
+  ok('the /docs/js route exists and renders the family bar',
+    jsSectionPage.includes('DocsFamilyBar') && jsSectionPage.includes('JsDocsClient'),
+    'app/docs/js/[section]/page.tsx must mount the family bar and the JS docs client');
 
   // -------------------------------------------------------------------------
   // SCOPE — plain JavaScript only. The runner has no moSHion or reSHape
