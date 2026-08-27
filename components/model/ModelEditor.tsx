@@ -43,6 +43,8 @@ import {
   Redo2,
   ChevronUp,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Search,
   Disc3,
   FlipHorizontal2,
@@ -110,6 +112,10 @@ interface Props {
    *  (the floating panel must turn transparent when the strip is all that
    *  is left of it, or a 420px card sits over the canvas). */
   onCollapsed?: (collapsed: boolean) => void;
+  /** Mirrors whether the card holds anything (a note or the sketch rules).
+   *  The feature list lives in the bottom timeline now, so an empty card is
+   *  hidden entirely rather than sitting over the canvas as a click-eater. */
+  onContentChange?: (hasContent: boolean) => void;
 }
 
 type BoolOp = 'union' | 'subtract' | 'intersect';
@@ -293,7 +299,7 @@ function FlyoutButton({
 }
 
 export default function ModelEditor({
-  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed,
+  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange,
 }: Props) {
   const [note, setNote] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -336,6 +342,14 @@ export default function ModelEditor({
   const ribbonHost =
     typeof document !== 'undefined' && collapsible && !collapsed
       ? document.getElementById('reshapeRibbon')
+      : null;
+  // The feature list is the parametric timeline: a horizontal strip across
+  // the bottom of the canvas, Fusion 360 style, instead of a vertical list
+  // in the left card. Same portal pattern as the ribbon -- the host is a
+  // sibling rendered by the sandbox, so it exists before this mounts.
+  const timelineHost =
+    typeof document !== 'undefined' && collapsible && !collapsed
+      ? document.getElementById('reshapeTimeline')
       : null;
 
   // Alt+C (Onshape's own shortcut) focuses Search tools; Escape closes
@@ -763,6 +777,15 @@ export default function ModelEditor({
   const activeSketch =
     chosen.length === 1 && chosen[0].kind === 'sketch' ? chosen[0] : null;
 
+  // The feature list lives in the bottom timeline (Fusion 360 style), so the
+  // card only holds the note and the sketch rules. When both are gone the
+  // card is empty and collapses to the rail on its own -- an empty card over
+  // the canvas is a click-eater with nothing to say.
+  const cardHasContent = Boolean(note) || Boolean(activeSketch);
+  useEffect(() => {
+    onContentChange?.(cardHasContent);
+  }, [cardHasContent, onContentChange]);
+
   const canCombine = chosen.length >= 2;
   // Same unconditional-reason rule as whyCannotSolidOp: a gated button never
   // goes silent, even at the most common early state (nothing picked yet).
@@ -1094,95 +1117,188 @@ export default function ModelEditor({
         ribbonHost
       ) : null}
       {note && <p className="model-note">{note}</p>}
-      <ol className="model-list">
-        {doc.features.length === 0 && (
-          <li className="model-empty">
-            Nothing here yet. Add a box, then a cylinder, select both and press{' '}
-            <strong>Cut</strong> to drill a hole through it.
-          </li>
-        )}
-        {doc.features.map((f, i) => {
-          const on = selected.includes(f.id);
-          return (
-            <li
-              key={f.id}
-              className={
-                'model-row' + (on ? ' is-on' : '') + (shownIds.has(f.id) ? '' : ' is-consumed')
-              }
-              onClick={(e) => pick(f.id, e.ctrlKey || e.metaKey || e.shiftKey)}
-            >
-              <span className="model-step">{i + 1}</span>
-              <span className="model-name">
-                {names[f.id]}
-                {f.kind === 'sketch' && (
-                  <em className="model-detail">
-                    {' '}{f.points.length} corners, {f.plane}
-                    {f.constraints?.length ? `, ${f.constraints.length} rules` : ''}
-                  </em>
-                )}
-                {f.kind === 'extrude' && (
-                  <em className="model-detail"> {names[f.target] ?? f.target}</em>
-                )}
-                {f.kind === 'revolve' && (
-                  <em className="model-detail"> {names[f.target] ?? f.target}, {f.angle}°</em>
-                )}
-                {f.kind === 'mirror' && (
-                  <em className="model-detail">
-                    {' '}{names[f.target] ?? f.target}, {mirrorPlaneLabel(f.plane)}
-                  </em>
-                )}
-                {f.kind === 'pattern' && (
-                  <em className="model-detail">
-                    {' '}{names[f.target] ?? f.target} × {f.count}
-                    {f.mode === 'circular' ? ' around' : ''}
-                  </em>
-                )}
-                {f.kind === 'hole' && (
-                  <em className="model-detail">
-                    {' '}⌀{f.diameter}{f.corners ? ' × 4 corners' : ''} in {names[f.target] ?? f.target}
-                  </em>
-                )}
-                {f.kind === 'shell' && (
-                  <em className="model-detail"> {names[f.target] ?? f.target}, wall {f.thickness}</em>
-                )}
-                {f.kind === 'move' && (
-                  <em className="model-detail">
-                    {' '}{names[f.target] ?? f.target}{f.copy ? ' (copy)' : ''}
-                  </em>
-                )}
-                {f.kind === 'combine' && (
-                  <em className="model-detail">
-                    {' '}
-                    {f.targets.map((t) => names[t] ?? t).join(f.op === 'subtract' ? ' − ' : f.op === 'union' ? ' + ' : ' ∩ ')}
-                  </em>
-                )}
-                {canRotate(f) && f.rotate && f.rotate.some((v) => v !== 0) ? (
-                  <em className="model-detail"> turned</em>
-                ) : null}
-                {'round' in f && f.round ? (
-                  <em className="model-detail"> {f.roundStyle === 'chamfer' ? 'chamfered' : 'filleted'}</em>
-                ) : null}
-              </span>
-              <span className="model-move">
-                <button
-                  onClick={(e) => { e.stopPropagation(); move(f.id, -1); }}
-                  disabled={i === 0}
-                  aria-label={`Move ${names[f.id]} earlier`}
-                >
-                  <ChevronUp size={12} />
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); move(f.id, 1); }}
-                  disabled={i === doc.features.length - 1}
-                  aria-label={`Move ${names[f.id]} later`}
-                >
-                  <ChevronDown size={12} />
-                </button>
-              </span>
+      {timelineHost ? createPortal(
+        <ol className="model-list model-timeline">
+          {doc.features.length === 0 && (
+            <li className="model-empty">
+              Nothing here yet. Add a box, then a cylinder, select both and press{' '}
+              <strong>Cut</strong> to drill a hole through it.
             </li>
-          );
-        })}
-      </ol>
+          )}
+          {doc.features.map((f, i) => {
+            const on = selected.includes(f.id);
+            return (
+              <li
+                key={f.id}
+                className={
+                  'model-row' + (on ? ' is-on' : '') + (shownIds.has(f.id) ? '' : ' is-consumed')
+                }
+                onClick={(e) => pick(f.id, e.ctrlKey || e.metaKey || e.shiftKey)}
+              >
+                <span className="model-step">{i + 1}</span>
+                <span className="model-name">
+                  {names[f.id]}
+                  {f.kind === 'sketch' && (
+                    <em className="model-detail">
+                      {' '}{f.points.length} corners, {f.plane}
+                      {f.constraints?.length ? `, ${f.constraints.length} rules` : ''}
+                    </em>
+                  )}
+                  {f.kind === 'extrude' && (
+                    <em className="model-detail"> {names[f.target] ?? f.target}</em>
+                  )}
+                  {f.kind === 'revolve' && (
+                    <em className="model-detail"> {names[f.target] ?? f.target}, {f.angle}°</em>
+                  )}
+                  {f.kind === 'mirror' && (
+                    <em className="model-detail">
+                      {' '}{names[f.target] ?? f.target}, {mirrorPlaneLabel(f.plane)}
+                    </em>
+                  )}
+                  {f.kind === 'pattern' && (
+                    <em className="model-detail">
+                      {' '}{names[f.target] ?? f.target} × {f.count}
+                      {f.mode === 'circular' ? ' around' : ''}
+                    </em>
+                  )}
+                  {f.kind === 'hole' && (
+                    <em className="model-detail">
+                      {' '}⌀{f.diameter}{f.corners ? ' × 4 corners' : ''} in {names[f.target] ?? f.target}
+                    </em>
+                  )}
+                  {f.kind === 'shell' && (
+                    <em className="model-detail"> {names[f.target] ?? f.target}, wall {f.thickness}</em>
+                  )}
+                  {f.kind === 'move' && (
+                    <em className="model-detail">
+                      {' '}{names[f.target] ?? f.target}{f.copy ? ' (copy)' : ''}
+                    </em>
+                  )}
+                  {f.kind === 'combine' && (
+                    <em className="model-detail">
+                      {' '}
+                      {f.targets.map((t) => names[t] ?? t).join(f.op === 'subtract' ? ' − ' : f.op === 'union' ? ' + ' : ' ∩ ')}
+                    </em>
+                  )}
+                  {canRotate(f) && f.rotate && f.rotate.some((v) => v !== 0) ? (
+                    <em className="model-detail"> turned</em>
+                  ) : null}
+                  {'round' in f && f.round ? (
+                    <em className="model-detail"> {f.roundStyle === 'chamfer' ? 'chamfered' : 'filleted'}</em>
+                  ) : null}
+                </span>
+                <span className="model-move">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); move(f.id, -1); }}
+                    disabled={i === 0}
+                    aria-label={`Move ${names[f.id]} earlier`}
+                  >
+                    <ChevronLeft size={12} />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); move(f.id, 1); }}
+                    disabled={i === doc.features.length - 1}
+                    aria-label={`Move ${names[f.id]} later`}
+                  >
+                    <ChevronRight size={12} />
+                  </button>
+                </span>
+              </li>
+            );
+          })}
+        </ol>,
+        timelineHost
+      ) : (
+        <ol className="model-list">
+          {doc.features.length === 0 && (
+            <li className="model-empty">
+              Nothing here yet. Add a box, then a cylinder, select both and press{' '}
+              <strong>Cut</strong> to drill a hole through it.
+            </li>
+          )}
+          {doc.features.map((f, i) => {
+            const on = selected.includes(f.id);
+            return (
+              <li
+                key={f.id}
+                className={
+                  'model-row' + (on ? ' is-on' : '') + (shownIds.has(f.id) ? '' : ' is-consumed')
+                }
+                onClick={(e) => pick(f.id, e.ctrlKey || e.metaKey || e.shiftKey)}
+              >
+                <span className="model-step">{i + 1}</span>
+                <span className="model-name">
+                  {names[f.id]}
+                  {f.kind === 'sketch' && (
+                    <em className="model-detail">
+                      {' '}{f.points.length} corners, {f.plane}
+                      {f.constraints?.length ? `, ${f.constraints.length} rules` : ''}
+                    </em>
+                  )}
+                  {f.kind === 'extrude' && (
+                    <em className="model-detail"> {names[f.target] ?? f.target}</em>
+                  )}
+                  {f.kind === 'revolve' && (
+                    <em className="model-detail"> {names[f.target] ?? f.target}, {f.angle}°</em>
+                  )}
+                  {f.kind === 'mirror' && (
+                    <em className="model-detail">
+                      {' '}{names[f.target] ?? f.target}, {mirrorPlaneLabel(f.plane)}
+                    </em>
+                  )}
+                  {f.kind === 'pattern' && (
+                    <em className="model-detail">
+                      {' '}{names[f.target] ?? f.target} × {f.count}
+                      {f.mode === 'circular' ? ' around' : ''}
+                    </em>
+                  )}
+                  {f.kind === 'hole' && (
+                    <em className="model-detail">
+                      {' '}⌀{f.diameter}{f.corners ? ' × 4 corners' : ''} in {names[f.target] ?? f.target}
+                    </em>
+                  )}
+                  {f.kind === 'shell' && (
+                    <em className="model-detail"> {names[f.target] ?? f.target}, wall {f.thickness}</em>
+                  )}
+                  {f.kind === 'move' && (
+                    <em className="model-detail">
+                      {' '}{names[f.target] ?? f.target}{f.copy ? ' (copy)' : ''}
+                    </em>
+                  )}
+                  {f.kind === 'combine' && (
+                    <em className="model-detail">
+                      {' '}
+                      {f.targets.map((t) => names[t] ?? t).join(f.op === 'subtract' ? ' − ' : f.op === 'union' ? ' + ' : ' ∩ ')}
+                    </em>
+                  )}
+                  {canRotate(f) && f.rotate && f.rotate.some((v) => v !== 0) ? (
+                    <em className="model-detail"> turned</em>
+                  ) : null}
+                  {'round' in f && f.round ? (
+                    <em className="model-detail"> {f.roundStyle === 'chamfer' ? 'chamfered' : 'filleted'}</em>
+                  ) : null}
+                </span>
+                <span className="model-move">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); move(f.id, -1); }}
+                    disabled={i === 0}
+                    aria-label={`Move ${names[f.id]} earlier`}
+                  >
+                    <ChevronUp size={12} />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); move(f.id, 1); }}
+                    disabled={i === doc.features.length - 1}
+                    aria-label={`Move ${names[f.id]} later`}
+                  >
+                    <ChevronDown size={12} />
+                  </button>
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+      )}
 
       {activeSketch && activeSketch.shape !== 'circle' && (
         <SketchConstraints
@@ -1282,6 +1398,82 @@ export default function ModelEditor({
           border-left: 2px solid #ffb86c; flex-shrink: 0;
         }
         .model-list { margin: 0; padding: 6px; list-style: none; overflow-y: auto; flex: 1 1 auto; }
+        /* The parametric timeline: the same feature list, laid out as a
+           horizontal strip of chips across the bottom of the canvas, Fusion
+           360 style. The list is portaled into the sandbox's timeline host,
+           so this class only applies there. */
+        .model-timeline {
+          display: flex;
+          flex-direction: row;
+          align-items: stretch;
+          gap: 4px;
+          padding: 6px 8px;
+          overflow-x: auto;
+          overflow-y: hidden;
+          flex: 1 1 auto;
+          min-height: 0;
+        }
+        .model-timeline .model-row {
+          flex: 0 0 auto;
+          position: relative;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 2px;
+          min-width: 96px;
+          max-width: 180px;
+          padding: 5px 8px;
+          border: 1px solid #44475a;
+          border-radius: 4px;
+          background: rgba(40, 42, 54, 0.6);
+        }
+        .model-timeline .model-row:hover { background: #343746; }
+        .model-timeline .model-row.is-on {
+          background: #44475a;
+          border-color: #6272a4;
+        }
+        .model-timeline .model-row.is-consumed { opacity: 0.55; }
+        .model-timeline .model-step {
+          flex: 0 0 auto;
+          text-align: left;
+          font-size: 10px;
+        }
+        .model-timeline .model-name {
+          flex: 1 1 auto;
+          min-width: 0;
+          font-size: 12px;
+          line-height: 1.3;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .model-timeline .model-detail { display: none; }
+        .model-timeline .model-move {
+          position: absolute;
+          right: 2px;
+          top: 2px;
+          display: inline-flex;
+          gap: 1px;
+          opacity: 0;
+        }
+        .model-timeline .model-row:hover .model-move { opacity: 1; }
+        .model-timeline .model-move button {
+          padding: 1px;
+          background: transparent;
+          border: 0;
+          color: #6272a4;
+          cursor: pointer;
+          border-radius: 2px;
+        }
+        .model-timeline .model-move button:hover:not(:disabled) { color: var(--text); background: #6272a4; }
+        .model-timeline .model-move button:disabled { opacity: 0.25; cursor: default; }
+        .model-timeline .model-empty {
+          flex: 0 0 auto;
+          align-self: center;
+          padding: 0 10px;
+          color: #6272a4;
+          font-size: 12px;
+          line-height: 1.5;
+        }
         .model-empty { padding: 14px 10px; color: #6272a4; font-size: 12px; line-height: 1.6; }
         .model-row {
           display: flex; align-items: center; gap: 8px;

@@ -107,6 +107,10 @@ export default function SandboxWorkspace() {
   // Build's shape tools collapsing to the rail. Lives in ModelEditor; mirrored
   // here so the shell can shrink the floating card to rail width.
   const [toolsHidden, setToolsHidden] = useState(false);
+  // The feature list lives in the bottom timeline now, so the card only holds
+  // the note and the sketch rules. When both are gone the card collapses to
+  // the rail on its own -- an empty card over the canvas is a click-eater.
+  const [cardHasContent, setCardHasContent] = useState(true);
   const [anchors, setAnchors] = useState<AnchorPoint[]>([]);
   // The frame reloads on every structural edit, so specs posted at the moment
   // runKey changes arrive before the runner has a listener and are simply lost.
@@ -689,6 +693,7 @@ export default function SandboxWorkspace() {
           + (full && consoleHidden ? ' is-console-hidden' : '')
           + (isReshape && build ? ' is-build' : '')
           + (isReshape && build && toolsHidden ? ' is-tools-hidden' : '')
+          + (isReshape && build && !cardHasContent ? ' is-card-empty' : '')
         }
         ref={shellRef}
       >
@@ -744,7 +749,6 @@ export default function SandboxWorkspace() {
               <span id="reshapeRibbon" className="sandbox-ribbon" aria-hidden={!build} />
             </>
           )}
-
           <button className="btn-run" onClick={run}>▶ Run</button>
           {isRunning && (
             <button
@@ -784,6 +788,7 @@ export default function SandboxWorkspace() {
                 canRedo={depth.forward > 0}
                 collapsible
                 onCollapsed={setToolsHidden}
+                onContentChange={setCardHasContent}
               />
             ) : (
               <CodeEditor />
@@ -856,6 +861,10 @@ export default function SandboxWorkspace() {
               {editorHidden ? 'Editor' : 'Hide editor'}
             </button>
           )}
+          {/* The parametric timeline: ModelEditor portals its feature list
+              here, so the history reads as a horizontal strip across the
+              bottom of the canvas, Fusion 360 style. */}
+          <div id="reshapeTimeline" className="sandbox-timeline" aria-hidden={!build} />
           <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
         </div>
 
@@ -992,6 +1001,29 @@ export default function SandboxWorkspace() {
           border-bottom: 0;
           background: transparent;
         }
+        /* The parametric timeline: the feature history as a horizontal strip
+           across the bottom of the canvas, Fusion 360 style. ModelEditor
+           portals its list here. It spans the canvas between the floating
+           card (left) and the Dimensions panel (right) -- chips under either
+           would be hidden and unclickable. */
+        .sandbox-timeline { display: none; }
+        .sandbox-shell.is-build .sandbox-timeline {
+          position: absolute;
+          left: calc(min(420px, 45%) + 24px);
+          right: 220px;
+          bottom: 0;
+          height: 58px;
+          z-index: 25;
+          display: flex;
+          align-items: stretch;
+          background: rgba(40, 42, 54, 0.88);
+          border-top: 1px solid #44475a;
+        }
+        .sandbox-shell.is-build.is-card-empty .sandbox-timeline { left: 66px; }
+        .sandbox-shell.is-build .sandbox-timeline .model-timeline {
+          flex: 1 1 auto;
+          min-width: 0;
+        }
         /* In Build the model is live -- every structural change reloads the
            frame and every dimension change rebuilds it by message -- so Run
            and Stop have nothing to do, and a green Run button is the one
@@ -1040,6 +1072,14 @@ export default function SandboxWorkspace() {
         /* The rail is all that is left: shrink the card to it so the canvas
            owns the rest of the screen. */
         .sandbox-shell.is-build.is-tools-hidden #editorPane {
+          width: 46px;
+          box-shadow: none;
+          background: rgba(40, 42, 54, 0.72);
+        }
+        /* The feature list lives in the bottom timeline, so a card with no
+           note and no sketch rules is empty -- collapse it to the rail on
+           its own rather than leaving a click-eater over the canvas. */
+        .sandbox-shell.is-build.is-card-empty #editorPane {
           width: 46px;
           box-shadow: none;
           background: rgba(40, 42, 54, 0.72);
