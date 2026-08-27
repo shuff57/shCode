@@ -49,6 +49,7 @@ import {
   PATHS, createShimContext, runProgram, isGeometry, captureConsole,
   loadModeling, apiNames, documentedNames, docText,
 } from './reshape-harness.mjs';
+import { createSimpleContext } from './reshape-simple-checks.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -257,8 +258,11 @@ try {
     note(`${sections.length} sections, ${pages.length} pages, ${withCode.length} carrying a code example`);
     ok('the docs still carry examples', withCode.length > 0, 'no page has a `code` field');
 
-    // Every example runs in the SAME shim scope the runner gives a student:
-    // the vendored bundle plus the additive shim cut live out of runner.html.
+    // Every example runs in the SAME scope the runner gives a student: the
+    // vendored bundle, the additive shim cut live out of runner.html, AND
+    // reshape.js. That last one is not optional any more -- these examples are
+    // written in reSHape words, so a shim-only context reports every one of
+    // them as "box is not defined" while the page they came from renders fine.
     // One fresh context per example — module.exports persists otherwise, and a
     // page with no main() would inherit the previous page's.
     for (const p of withCode) {
@@ -266,7 +270,7 @@ try {
       const cap = captureConsole();
       let r;
       try {
-        const { ctx } = createShimContext({ consoleImpl: cap.console });
+        const { ctx } = createSimpleContext({ consoleImpl: cap.console });
         r = runProgram(ctx, p.code, `lib/reshape-docs.ts<${label}>`);
       } catch (e) {
         ok(label, false, `context build threw: ${e.message}`);

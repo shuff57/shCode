@@ -502,11 +502,34 @@ check('every fence tag in reference.md is one the gate understands', () => {
   return bad.length ? `unknown fence tag: ${bad.join(', ')}` : true;
 });
 
-// Each example runs in the jscad.app-equivalent context: the shim subtracted
-// back out, require() and module.exports the only things left. A bare `cube()`
-// throws here, which is the whole point.
+// TWO CONTRACTS, BECAUSE THE TWO DOCUMENTS DO DIFFERENT JOBS.
+//
+// lib/reshape-docs.ts is what a student reads at /docs/reshape, and it is now
+// written in reSHape words -- bare names, no require(), box rather than
+// primitives.cuboid. Those examples CANNOT run on jscad.app by construction, so
+// holding them to that bar would fail the docs for being what the course
+// teaches. They are held to the bar that applies: they must run HERE, in the
+// runner a student actually has.
+//
+// reference.md keeps the old contract. It is the bridge document -- it carries
+// the graduation tables and has to show the real API working -- so every fence
+// there stays portable unless it is tagged shcode-only, and a tag on a fence
+// that would run portably is still a failure.
 for (const e of examples) {
   const label = `${e.source}:${e.line}`;
+  const inApp = e.source.endsWith('reshape-docs.ts');
+
+  if (inApp) {
+    check(`runs in the reSHape runner — ${label}`, () => {
+      const cap = captureConsole();
+      const { ctx } = createSimpleContext({ consoleImpl: cap.console });
+      const r = runProgram(ctx, e.code, label, { lineOffset: e.line - 1 });
+      if (!r.ok) return `${r.phase}: ${r.error.message}`;
+      return true;
+    });
+    continue;
+  }
+
   check(`runs on jscad.app — ${label}`, () => {
     const cap = captureConsole();
     const ctx = createRequireOnlyContext(cap.console);

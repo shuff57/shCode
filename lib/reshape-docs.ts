@@ -63,21 +63,17 @@ One line at the top brings the library in and parks it in a variable — called 
 Everything the library can do hangs off that variable, sorted into groups called modules. jscad.primitives holds the basic shapes, jscad.transforms moves them, jscad.booleans glues them together and cuts holes in them. There are fifteen modules; this course uses about eight.
 
 So the call below reads left to right: the library, the drawer of basic shapes, the box maker. The three lines wrapped around main() are the same in every JSCAD file ever written, and the next page takes them apart.`,
-        code: `const jscad = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   // Change this one number and every part below follows it.
   const size = 20
 
-  const plate = jscad.primitives.cuboid({ size: [size, size, size / 4] })
-  const post = jscad.primitives.cylinder({ radius: size / 8, height: size })
+  const plate = box(size, size, size / 4)
+  const post = tube(size / 8, size)
 
   // Both parts are built centred on the middle of the grid, which is why the
   // post pokes out underneath as well. "Where a shape sits" explains that.
   return [plate, post]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'The three lines around main()',
@@ -92,21 +88,17 @@ The require line has a shorter spelling. Putting names inside curly braces on th
 main must return one shape, or an array of shapes. Returning is the only thing that draws: build a shape and never hand it back, and nothing appears.
 
 The export line carries a shorthand too. { main } is short for { main: main } — when the label and the variable already share a name, JavaScript lets you write it once. Forget the line and this app hunts for main anyway; jscad.app does not, so write it every time.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
-  const plate = primitives.cuboid({ size: [30, 30, 3] })
+        code: `function main() {
+  const plate = box(30, 30, 3)
 
   // The plate is 3 tall and sits astride the floor, so its top face is at 1.5.
-  // Add the ball's radius of 6 and the ball rests on the plate.
-  const ball = transforms.translate([0, 0, 7.5],
-    primitives.sphere({ radius: 6 })
+  // Add the sphere's radius of 6 and the sphere rests on the plate.
+  const sphere = translate([0, 0, 7.5],
+    ball(6)
   )
 
-  return [plate, ball]
-}
-
-module.exports = { main }`,
+  return [plate, sphere]
+}`,
       },
       {
         title: 'What the browser does with your file',
@@ -122,20 +114,16 @@ Drag to orbit, hold Shift and drag to slide the view sideways, scroll to zoom. c
 Step 1 does one extra thing: before your file runs, this app copies every module, and every function inside every module, into your program. That is why a bare cube({ size: 20 }) works here with no require line — same function, shorter name, nothing renamed.
 
 It only works here. Paste the bare version into jscad.app and line one is an error: the file that worked in class stops working at home. Treat a bare name as a typo the app forgave. Two arrive differently — bare utils and minkowski are the top-level modules of those names, and maths.utils and booleans.minkowski still reach the functions they hide.`,
-        code: `const { primitives } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   console.log('main() is running')
 
-  // Inside this app, a bare cube({ size: 20 }) would build the same shape.
+  // Inside this app, a bare box(20, 20, 20) would build the same shape.
   // It is spelled out in full here so the file also runs on jscad.app.
-  const part = primitives.cube({ size: 20 })
+  const part = box(20, 20, 20)
 
   console.log('built it - now handing it back to be drawn')
   return part
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Where a shape sits: the origin',
@@ -146,22 +134,18 @@ Centred means centred in all three directions, up and down included. A cube of s
 transforms.translate([x, y, z], shape) hands back a copy moved by that much. To sit something on the floor, lift it by half its height: a cube of size 10 needs translate([0, 0, 5], ...), and a plate 3 mm thick needs 1.5. That habit is what makes a model printable, because a printer builds upwards from a flat bed and has nothing to build the buried half onto.
 
 X runs left and right, Y runs away from you and back, Z runs up and down. Numbers are millimetres, so a cube of size 10 is about a fingernail wide. The floor is ruled every 10 mm with finer lines every 1 mm. Sizes are written [x, y, z], and so are positions.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   // Built where it lands: half of this one is under the floor.
-  const buried = primitives.cube({ size: 10 })
+  const buried = box(10, 10, 10)
 
   // The same cube, lifted by half its height so it sits on the floor,
   // and slid 20 to the right so you can see both at once.
-  const sitting = transforms.translate([20, 0, 5],
-    primitives.cube({ size: 10 })
+  const sitting = translate([20, 0, 5],
+    box(10, 10, 10)
   )
 
   return [buried, sitting]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Shapes are values',
@@ -172,23 +156,19 @@ You can put a shape in a variable, hand it to a function, or keep several in an 
 That is also why translate is a function that takes a shape and gives one back. It does not move the shape you handed it; it hands you a moved copy, and the original is untouched and ready to use again. Below, one brick is built once and placed three times, and brick still holds the original when the last line runs.
 
 So a JSCAD program is really just this: make some values, combine them, return the result.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   // One brick, built once and stored in a variable.
-  const brick = primitives.cuboid({ size: [20, 10, 5] })
+  const brick = box(20, 10, 5)
 
   // translate hands back a NEW brick each time, so the original is untouched
   // and the same variable can be used three times over. Each lift is 5 more
   // than the last, because the brick is 5 tall.
-  const bottom = transforms.translate([0, 0, 2.5], brick)
-  const middle = transforms.translate([0, 0, 7.5], brick)
-  const top = transforms.translate([0, 0, 12.5], brick)
+  const bottom = translate([0, 0, 2.5], brick)
+  const middle = translate([0, 0, 7.5], brick)
+  const top = translate([0, 0, 12.5], brick)
 
   return [bottom, middle, top]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: "When your first run doesn't work",
@@ -203,14 +183,12 @@ Red bar, cuboid is not defined. A name you used is not in scope. Check the requi
 Half the model is under the floor. Not an error, so no bar appears. Shapes are built centred on the origin; lift it with translate.
 
 Then two habits. Print before you change anything, and change one thing at a time — changing three and running once tells you nothing about which one it was. When the trouble is the geometry rather than the skeleton around it, the Debugging section goes further.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
-  const plate = transforms.translate([0, 0, 2],
-    primitives.cuboid({ size: [20, 20, 4] })
+        code: `function main() {
+  const plate = translate([0, 0, 2],
+    box(20, 20, 4)
   )
-  const knob = transforms.translate([0, 0, 7],
-    primitives.cube({ size: 6 })
+  const knob = translate([0, 0, 7],
+    box(6, 6, 6)
   )
 
   const parts = []
@@ -221,9 +199,7 @@ function main() {
   console.log('returning', parts.length, 'shapes')
 
   return parts
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Taking your file to jscad.app',
@@ -236,23 +212,19 @@ Two things you get there that this app does not have: an Export button, which wr
 It works in the other direction too. An example from the JSCAD website, or a file from a classmate, pastes in here and runs — which makes this a good place to read somebody else's model a line at a time.
 
 The tag below is a file worth taking over. booleans.subtract cuts the second shape out of the first, which is how the keyring hole gets made; the Booleans section covers it properly. The hole is deliberately taller than the plate so the cut goes all the way through, and the tag already sits on the floor, ready to print as it stands.`,
-        code: `const { primitives, transforms, booleans } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const thickness = 4
 
-  const plate = transforms.translate([0, 0, thickness / 2],
-    primitives.cuboid({ size: [60, 20, thickness] })
+  const plate = translate([0, 0, thickness / 2],
+    box(60, 20, thickness)
   )
 
-  const hole = transforms.translate([-22, 0, thickness / 2],
-    primitives.cylinder({ radius: 3, height: thickness * 3 })
+  const hole = translate([-22, 0, thickness / 2],
+    tube(3, thickness * 3)
   )
 
-  return booleans.subtract(plate, hole)
-}
-
-module.exports = { main }`,
+  return subtract(plate, hole)
+}`,
       },
     ],
   },
@@ -270,12 +242,10 @@ Two lines wrap every JSCAD file. The require line pulls the names you list out o
         code: `const { cuboid } = require('@jscad/modeling').primitives
 
 function main() {
-  const slab = cuboid({ size: [30, 20, 10] })          // -15..15, -10..10, -5..5
-  const post = cuboid({ size: [6, 6, 30], center: [0, 0, 20] })
+  const slab = box(30, 20, 10)          // -15..15, -10..10, -5..5
+  const post = box(6, 6, 30, { center: [0, 0, 20] })
   return [slab, post]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'cube, when all three sides match',
@@ -287,12 +257,10 @@ One case gets no complaint at all: cuboid({ size: [10, 0, 10] }) is legal, build
         code: `const { cube, cuboid } = require('@jscad/modeling').primitives
 
 function main() {
-  const c = cube({ size: 20 })
-  const same = cuboid({ size: [20, 20, 20], center: [30, 0, 0] })
+  const c = box(20, 20, 20)
+  const same = box(20, 20, 20, { center: [30, 0, 0] })
   return [c, same]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'sphere, and what segments cost',
@@ -304,13 +272,11 @@ The price rises fast, as the comments below show. All three balls are exactly 20
         code: `const { sphere } = require('@jscad/modeling').primitives
 
 function main() {
-  const rough = sphere({ radius: 10, segments: 8, center: [-25, 0, 0] })   // 32 faces
-  const plain = sphere({ radius: 10 })                                    // 512 faces
-  const smooth = sphere({ radius: 10, segments: 64, center: [25, 0, 0] }) // 2048 faces
+  const rough = ball(10, { segments: 8, center: [-25, 0, 0] })   // 32 faces
+  const plain = ball(10)                                    // 512 faces
+  const smooth = ball(10, { segments: 64, center: [25, 0, 0] }) // 2048 faces
   return [rough, plain, smooth]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'geodesicSphere, a ball built from triangles',
@@ -343,9 +309,7 @@ function main() {
   const egg = ellipsoid({ radius: [20, 10, 10] })
   const pebble = ellipsoid({ radius: [8, 8, 3], center: [0, 0, 20] })
   return [egg, pebble]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'cylinder, for posts and discs',
@@ -357,12 +321,10 @@ A short, wide cylinder is a disc. A tall, thin one is a post or a peg. Most of t
         code: `const { cylinder } = require('@jscad/modeling').primitives
 
 function main() {
-  const post = cylinder({ radius: 4, height: 40 })   // 8 across, z -20..20, 96 faces
-  const base = cylinder({ radius: 20, height: 3, center: [0, 0, -21] })
+  const post = tube(4, 40)   // 8 across, z -20..20, 96 faces
+  const base = tube(20, 3, { center: [0, 0, -21] })
   return [post, base]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'cylinderElliptic, for cones and oval tubes',
@@ -386,9 +348,7 @@ function main() {
     center: [45, 0, 0]
   })
   return [cone, oval]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'torus, the donut',
@@ -401,7 +361,7 @@ torus() ignores segments. It has two of its own — innerSegments around the tub
 const { translate } = require('@jscad/modeling').transforms
 
 function main() {
-  const smooth = torus({ innerRadius: 4, outerRadius: 10 })   // 2048 faces
+  const smooth = ring(10, 4)   // 2048 faces
   const chunky = torus({                                      // 128 faces
     innerRadius: 4,
     outerRadius: 10,
@@ -409,9 +369,7 @@ function main() {
     outerSegments: 8
   })
   return [translate([-16, 0, 0], smooth), translate([16, 0, 0], chunky)]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Rounding the edges off a solid',
@@ -455,9 +413,7 @@ function main() {
       [0, 1, 4], [1, 2, 4], [2, 3, 4], [3, 0, 4]
     ]
   })
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Flat shapes: rectangle, square, roundedRectangle',
@@ -469,13 +425,11 @@ rectangle() takes size as [width, depth]. square() is its all-sides-equal partne
         code: `const { rectangle, square, roundedRectangle } = require('@jscad/modeling').primitives
 
 function main() {
-  const wide = rectangle({ size: [30, 20] })                    // 4 corners
+  const wide = rect(30, 20)                    // 4 corners
   const box = square({ size: 20, center: [40, 0] })
-  const soft = roundedRectangle({ size: [30, 20], roundRadius: 5, center: [-40, 0] })  // 36
+  const soft = rect(30, 20, { roundRadius: 5, center: [-40, 0] })  // 36
   return [wide, box, soft]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'circle and ellipse',
@@ -508,9 +462,7 @@ function main() {
   return polygon({
     points: [[0, 0], [30, 0], [30, 12], [18, 12], [18, 25], [0, 25]]
   })
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'triangle, by sides or by angles',
@@ -526,9 +478,7 @@ function main() {
   const sides = triangle({ type: 'SSS', values: [30, 40, 50] })
   const angles = triangle({ type: 'ASA', values: [Math.PI / 3, 30, Math.PI / 3] })
   return [sides, translate([50, 0], angles)]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'star',
@@ -544,9 +494,7 @@ function main() {
   const spiky = star({ vertices: 5, outerRadius: 15 })   // no innerRadius: density 2
   const gear = star({ vertices: 12, outerRadius: 15, innerRadius: 12, center: [40, 0] })
   return [sheriff, spiky, gear]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'arc and line are paths, not shapes',
@@ -563,9 +511,7 @@ function main() {
   const zigzag = line([[-45, 0], [-35, 15], [-25, 0], [-15, 15]])   // a bare array
   const solid = polygon({ points: [[10, -12], [34, -12], [34, 12], [10, 12]] })
   return [curve, zigzag, solid]
-}
-
-module.exports = { main }`,
+}`,
       },
     ],
   },
@@ -582,19 +528,15 @@ That one sentence is the whole mental model. transforms.translate([0, 0, 8], bri
 So a shape is worth keeping in a variable. Build a part once, then make as many placed copies of it as you like — every copy costs you one line and the original never gets used up.
 
 If you ever write transforms.translate([0, 0, 8], brick) on a line of its own and wonder why nothing moved: nothing was meant to. The copy was made and then thrown away, because you did not keep it.`,
-      code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
-  const brick = primitives.cuboid({ size: [24, 10, 4] })
+      code: `function main() {
+  const brick = box(24, 10, 4)
 
   // Each of these is a NEW brick. The original is untouched.
-  const middle = transforms.translate([0, 0, 8], brick)
-  const top = transforms.translate([0, 0, 16], brick)
+  const middle = translate([0, 0, 8], brick)
+  const top = translate([0, 0, 16], brick)
 
   return [brick, middle, top]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'translate: sliding a shape',
@@ -605,25 +547,21 @@ Notice the order of the two arguments: the settings come first and the shape com
 A 2D shape takes two numbers instead of three — translate([10, 5], disc) — because a flat shape has no Z to move along.
 
 This is how a design with several parts gets assembled: build each part at the origin, where the numbers are easy to think about, then translate it into its place in the finished object.`,
-      code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
-  const leg = primitives.cuboid({ size: [6, 6, 30], center: [0, 0, 15] })
+      code: `function main() {
+  const leg = box(6, 6, 30, { center: [0, 0, 15] })
 
   const parts = []
   for (const x of [-20, 20]) {
     for (const y of [-20, 20]) {
-      parts.push(transforms.translate([x, y, 0], leg))
+      parts.push(translate([x, y, 0], leg))
     }
   }
 
-  parts.push(transforms.translate([0, 0, 32],
-    primitives.cuboid({ size: [56, 56, 4] })
+  parts.push(translate([0, 0, 32],
+    box(56, 56, 4)
   ))
   return parts
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Moving along one axis',
@@ -636,22 +574,18 @@ module.exports = { main }`,
 They are not new powers, just shorter spellings of one you already have. A stack of plates reads better as translateZ(12, plate) than as translate([0, 0, 12], plate), because the one number on the screen is the one number that matters.
 
 Where the long form wins is a diagonal move, or placing a part with all three coordinates at once. One translate([x, y, z], part) beats three calls chained together.`,
-      code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
-  const plate = primitives.cuboid({ size: [40, 40, 3] })
+      code: `function main() {
+  const plate = box(40, 40, 3)
 
   const stack = [plate]
   for (const height of [10, 20, 30]) {
-    stack.push(transforms.translateZ(height, plate))
+    stack.push(translateZ(height, plate))
   }
 
   // The long form is the one to reach for when more than one axis moves.
-  stack.push(transforms.translate([60, 0, 15], plate))
+  stack.push(translate([60, 0, 15], plate))
   return stack
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'rotate: turning a shape',
@@ -660,19 +594,15 @@ module.exports = { main }`,
 Picture each one as a skewer through the shape. rotateZ spins it like a record on a turntable. rotateX tips it forward, the way a book tips off a shelf. rotateY rolls it sideways.
 
 Angles are in radians, not degrees. A full turn is 2 * Math.PI, a half turn is Math.PI, and a quarter turn is Math.PI / 2. Those three cover most of what you need; the next page deals with the awkward angles in between.`,
-      code: `const { primitives, transforms } = require('@jscad/modeling')
+      code: `function main() {
+  const bar = box(40, 6, 2)
 
-function main() {
-  const bar = primitives.cuboid({ size: [40, 6, 2] })
-
-  const flat = transforms.translateY(-20, bar)
-  const tipped = transforms.rotateX(Math.PI / 2, bar)
-  const turned = transforms.translateY(20, transforms.rotateZ(Math.PI / 2, bar))
+  const flat = translateY(-20, bar)
+  const tipped = rotateX(Math.PI / 2, bar)
+  const turned = translateY(20, rotateZ(Math.PI / 2, bar))
 
   return [flat, tipped, turned]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Turning by degrees',
@@ -683,22 +613,18 @@ utils.degToRad(degrees) does the conversion, so you can write the angle you actu
 Careful with one name. Written on its own inside this app, utils is the top-level utils module, and that is the one that owns degToRad. The maths module has a utils of its own that does not; reach that one as maths.utils.
 
 In the example the hand is built running out from the middle, so turning it sweeps a clock face rather than spinning on the spot.`,
-      code: `const { primitives, transforms, utils } = require('@jscad/modeling')
-
-function main() {
+      code: `function main() {
   // Built from the middle outwards, so a turn sweeps it like a clock hand.
-  const hand = primitives.cuboid({ size: [30, 3, 3], center: [15, 0, 0] })
+  const hand = box(30, 3, 3, { center: [15, 0, 0] })
 
-  console.log('90 degrees is', utils.degToRad(90), 'radians')
+  console.log('90 degrees is', degToRad(90), 'radians')
 
   const clock = []
   for (const deg of [0, 30, 60, 90, 120, 150]) {
-    clock.push(transforms.rotateZ(utils.degToRad(deg), hand))
+    clock.push(rotateZ(degToRad(deg), hand))
   }
   return clock
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Rotation swings around the origin',
@@ -712,21 +638,17 @@ So these two lines do completely different things:
 - translate([50, 0, 0], rotateZ(a, arm)) — spin it where it stands, then move it out.
 
 Neither is wrong. Swinging is how you arrange parts in a ring; spinning in place is how you tilt one part of an assembly. Just decide which one you meant, and read the line from the inside out to check.`,
-      code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
-  const arm = primitives.cuboid({ size: [30, 6, 6] })
+      code: `function main() {
+  const arm = box(30, 6, 6)
 
   // Moved out first, so the turn swings it around the origin.
-  const swung = transforms.rotateZ(Math.PI / 4, transforms.translate([50, 0, 0], arm))
+  const swung = rotateZ(Math.PI / 4, translate([50, 0, 0], arm))
 
   // Turned first, so it spins on the spot and then moves out.
-  const spun = transforms.translate([-50, 0, 0], transforms.rotateZ(Math.PI / 4, arm))
+  const spun = translate([-50, 0, 0], rotateZ(Math.PI / 4, arm))
 
   return [arm, swung, spun]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'scale: bigger, smaller, squashed',
@@ -739,18 +661,14 @@ module.exports = { main }`,
 A multiplier of 1 means leave that axis alone, so two of the three numbers are usually 1. The single-axis shortcuts say the same thing more briefly: scaleX(f, shape), scaleY(f, shape), scaleZ(f, shape).
 
 Scaling a solid scales everything about it, including wall thickness and hole diameters. A case scaled up by 2 has holes twice as wide, which is rarely what anyone wanted — resize a part by changing the numbers you built it from, and keep scale for squashing and stretching.`,
-      code: `const { primitives, transforms } = require('@jscad/modeling')
+      code: `function main() {
+  const block = box(16, 16, 16)
 
-function main() {
-  const block = primitives.cube({ size: 16 })
-
-  const wide = transforms.translateX(-45, transforms.scale([2, 1, 1], block))
-  const tall = transforms.translateX(45, transforms.scaleZ(2, block))
+  const wide = translateX(-45, scale([2, 1, 1], block))
+  const tall = translateX(45, scaleZ(2, block))
 
   return [block, wide, tall]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Scaling moves a shape as well',
@@ -761,19 +679,15 @@ Measure it and the surprise goes away. The ball below is built 30 mm out along X
 That is not a bug, it is what multiplying by 2 means. It does explain the classic mess, where scaling one part of an assembly sends it flying off to somewhere it was never meant to be.
 
 The habit that avoids it: scale a shape while it is still at the origin, and translate it into place afterwards. Same rule as rotation, and the same reason.`,
-      code: `const { primitives, transforms, measurements } = require('@jscad/modeling')
+      code: `function main() {
+  const sphere = ball(10, { segments: 24, center: [30, 0, 0] })
+  const doubled = scale([2, 2, 2], sphere)
 
-function main() {
-  const ball = primitives.sphere({ radius: 10, segments: 24, center: [30, 0, 0] })
-  const doubled = transforms.scale([2, 2, 2], ball)
+  console.log('before:', measureBoundingBox(sphere))
+  console.log('after :', measureBoundingBox(doubled))
 
-  console.log('before:', measurements.measureBoundingBox(ball))
-  console.log('after :', measurements.measureBoundingBox(doubled))
-
-  return [ball, doubled]
-}
-
-module.exports = { main }`,
+  return [sphere, doubled]
+}`,
     },
     {
       title: 'mirror: building the other half',
@@ -784,20 +698,16 @@ mirrorX(shape) hands you the shape flipped left-to-right, across the plane that 
 The trick is where you build the first half. Build it entirely on one side of the origin, so the mirror line falls exactly where the two halves are meant to meet. A half that straddles the origin comes back overlapping itself.
 
 Mirroring is not the same as turning. A mirrored part is a reflection, like your left hand against your right, and no amount of rotating will make one sit on top of the other.`,
-      code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
+      code: `function main() {
   // Both pieces are built entirely to the left of x = 0.
-  const wall = primitives.cuboid({ size: [8, 40, 20], center: [-16, 0, 10] })
-  const foot = primitives.cuboid({ size: [24, 40, 4], center: [-12, 0, 2] })
+  const wall = box(8, 40, 20, { center: [-16, 0, 10] })
+  const foot = box(24, 40, 4, { center: [-12, 0, 2] })
 
-  const rightWall = transforms.mirrorX(wall)
-  const rightFoot = transforms.mirrorX(foot)
+  const rightWall = mirrorX(wall)
+  const rightFoot = mirrorX(foot)
 
   return [wall, foot, rightWall, rightFoot]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Mirroring across any plane',
@@ -806,19 +716,15 @@ module.exports = { main }`,
 normal is the direction the mirror faces, not a line drawn on it — [0, 1, 0] is a mirror facing along Y, so the shape gets flipped front-to-back. origin is any point the mirror passes through, and it defaults to [0, 0, 0]. In the example the mirror faces Y and stands at [0, 10, 0], right where the wall is, and it sends a tab that ran from y = 20 to y = 30 across to y = 0 to y = -10: the same 10 mm clear of the wall, on the other side.
 
 One trap, because it does not announce itself. The options object belongs to the long form only. Hand one to a shortcut — mirrorX({ normal: [1, 0, 0] }, half) — and the shortcut takes that object for a second shape to mirror. Nothing throws. Back comes an array holding your options object and one correctly mirrored shape, and the viewport ignores the object and draws the shape, so at a glance it looks fine. The damage lands at the next step: union that array and you get an empty solid, measuring [[0,0,0],[0,0,0]]. A symmetric part that measures as nothing is the symptom to look for.`,
-      code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
-  const wall = primitives.cuboid({ size: [40, 2, 12], center: [0, 10, 6] })
-  const tab = primitives.cuboid({ size: [30, 10, 4], center: [0, 25, 2] })
+      code: `function main() {
+  const wall = box(40, 2, 12, { center: [0, 10, 6] })
+  const tab = box(30, 10, 4, { center: [0, 25, 2] })
 
   // A mirror facing Y, standing at y = 10 — the plane the wall sits on.
-  const flipped = transforms.mirror({ normal: [0, 1, 0], origin: [0, 10, 0] }, tab)
+  const flipped = mirror({ normal: [0, 1, 0], origin: [0, 10, 0] }, tab)
 
   return [wall, tab, flipped]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'center: putting a shape back in the middle',
@@ -829,21 +735,17 @@ That is worth having because rotation and scaling both work from the origin. A s
 You can centre one axis at a time, either with options — center({ axes: [true, false, false] }, shape) leaves Y and Z where they are — or with the shortcuts centerX(shape), centerY(shape), centerZ(shape).
 
 Hand center several shapes at once and it centres each one separately, so they all end up stacked on the origin instead of keeping their spacing. That is almost never what an assembly wants. align, on the next page, is the tool for lining several parts up.`,
-      code: `const { primitives, transforms, measurements } = require('@jscad/modeling')
+      code: `function main() {
+  const off = box(20, 10, 6, { center: [30, 12, 9] })
 
-function main() {
-  const off = primitives.cuboid({ size: [20, 10, 6], center: [30, 12, 9] })
+  const middled = center({}, off)
+  const dropped = centerZ(off)
 
-  const middled = transforms.center({}, off)
-  const dropped = transforms.centerZ(off)
-
-  console.log('before:', measurements.measureBoundingBox(off))
-  console.log('after :', measurements.measureBoundingBox(middled))
+  console.log('before:', measureBoundingBox(off))
+  console.log('after :', measureBoundingBox(middled))
 
   return [off, middled, dropped]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'align: lining parts up',
@@ -859,20 +761,16 @@ The line is the origin unless you say otherwise. So modes ['none', 'none', 'min'
 Write the modes out even when the defaults would do. Called with no modes at all it uses ['center', 'center', 'min'], which is a sensible default and an invisible one.
 
 The measurements section does this same job by hand — measure the bounding box, then translate up by -box[0][2]. Keep both. Measuring hands you the number, and a number can be used in arithmetic; align is the shorter road when all you want is the part on the floor.`,
-      code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
-  const shortOne = primitives.cuboid({ size: [16, 16, 10], center: [-30, 0, 25] })
-  const middleOne = primitives.cuboid({ size: [16, 16, 24], center: [0, 0, 40] })
-  const tallOne = primitives.cuboid({ size: [16, 16, 40], center: [30, 0, 5] })
+      code: `function main() {
+  const shortOne = box(16, 16, 10, { center: [-30, 0, 25] })
+  const middleOne = box(16, 16, 24, { center: [0, 0, 40] })
+  const tallOne = box(16, 16, 40, { center: [30, 0, 5] })
 
   // Leave X and Y alone; drop each one until it rests on the grid.
-  return transforms.align(
+  return align(
     { modes: ['none', 'none', 'min'] }, shortOne, middleOne, tallOne
   )
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Aligning against a point',
@@ -881,21 +779,17 @@ module.exports = { main }`,
 Any axis you are not interested in gets null, and null means leave that coordinate of the line alone. relativeTo: [null, null, 42] with modes ['none', 'none', 'min'] reads as one sentence — put the bottom of this part at z = 42 and do not touch X or Y. That is how a boss lands exactly on top of a shelf.
 
 There is one more option worth knowing about before you need it. By default each shape is aligned on its own, which is what let the previous page drop three separate towers onto the grid. Add grouped: true and the shapes move together as one set, keeping the gaps between them — which is what you want when the thing being aligned is a finished assembly rather than a pile of parts.`,
-      code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
-  const shelf = primitives.cuboid({ size: [60, 30, 4], center: [0, 0, 40] })
-  const boss = primitives.cuboid({ size: [10, 10, 14], center: [20, 8, 0] })
+      code: `function main() {
+  const shelf = box(60, 30, 4, { center: [0, 0, 40] })
+  const boss = box(10, 10, 14, { center: [20, 8, 0] })
 
   // The top of the shelf is at z = 42. Put the bottom of the boss there.
-  const seated = transforms.align(
+  const seated = align(
     { modes: ['none', 'none', 'min'], relativeTo: [null, null, 42] }, boss
   )
 
   return [shelf, seated]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'transform: a move you can keep',
@@ -906,23 +800,19 @@ mat4.create() makes an empty matrix, which means do nothing. The builders fill i
 The odd part of the spelling is that the first argument is where the answer gets written. The builder fills that matrix in and then hands it back, which is why mat4.create() sits inside the call.
 
 Doing it this way buys you one thing: the move becomes a value. You can name it, keep it in an array, pass it to a function, and apply the identical move to twenty different parts knowing every one of them got exactly the same treatment.`,
-      code: `const { primitives, transforms, maths } = require('@jscad/modeling')
-
-function main() {
+      code: `function main() {
   // One move, stored: up 12 mm. Now it has a name.
-  const lift = maths.mat4.fromTranslation(maths.mat4.create(), [0, 0, 12])
+  const lift = mat4.fromTranslation(mat4.create(), [0, 0, 12])
 
-  const box = primitives.cuboid({ size: [12, 12, 4] })
-  const ball = primitives.sphere({ radius: 5, segments: 24 })
+  const cuboid = box(12, 12, 4)
+  const sphere = ball(5, { segments: 24 })
 
   return [
-    box,
-    transforms.transform(lift, box),
-    transforms.translateX(30, transforms.transform(lift, ball)),
+    cuboid,
+    transform(lift, cuboid),
+    translateX(30, transform(lift, sphere)),
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Two matrices in one',
@@ -933,29 +823,25 @@ The rule to remember is that the rightmost matrix happens first. multiply(out, m
 Swap the two and you get a different object, not a different spelling of the same one. The example prints both bounding boxes: turn-then-move leaves the bar out at x = 50 pointing along Y, while move-then-turn swings the whole thing round so it sits out at y = 50 instead. That is the arc-versus-spin page again, in matrix form.
 
 You do not need any of this to build things — the named transforms do everything a lesson asks for. It starts being worth the trouble when the same combined move is applied over and over, because a joined matrix is one step where nested calls are two.`,
-      code: `const { primitives, transforms, maths, measurements } = require('@jscad/modeling')
+      code: `function main() {
+  const bar = box(30, 6, 6, { center: [15, 0, 0] })
 
-function main() {
-  const bar = primitives.cuboid({ size: [30, 6, 6], center: [15, 0, 0] })
-
-  const turn = maths.mat4.fromZRotation(maths.mat4.create(), Math.PI / 2)
-  const move = maths.mat4.fromTranslation(maths.mat4.create(), [50, 0, 0])
+  const turn = mat4.fromZRotation(mat4.create(), Math.PI / 2)
+  const move = mat4.fromTranslation(mat4.create(), [50, 0, 0])
 
   // Rightmost first: turn, then move.
-  const turnThenMove = maths.mat4.multiply(maths.mat4.create(), move, turn)
+  const turnThenMove = mat4.multiply(mat4.create(), move, turn)
   // The other way round: move, then turn.
-  const moveThenTurn = maths.mat4.multiply(maths.mat4.create(), turn, move)
+  const moveThenTurn = mat4.multiply(mat4.create(), turn, move)
 
-  const a = transforms.transform(turnThenMove, bar)
-  const b = transforms.transform(moveThenTurn, bar)
+  const a = transform(turnThenMove, bar)
+  const b = transform(moveThenTurn, bar)
 
-  console.log('turn then move:', measurements.measureBoundingBox(a))
-  console.log('move then turn:', measurements.measureBoundingBox(b))
+  console.log('turn then move:', measureBoundingBox(a))
+  console.log('move then turn:', measureBoundingBox(b))
 
   return [bar, a, b]
-}
-
-module.exports = { main }`,
+}`,
     },
   ],
 },
@@ -972,24 +858,20 @@ The console shows what that costs. Measure the bar and the post on their own and
 Change the 30 in translateZ to 80 so the two never touch. union still returns one solid, and now the two numbers match.
 
 union takes as many shapes as you like: union(a, b, c).`,
-      code: `const { primitives, transforms, booleans, measurements } = require('@jscad/modeling')
-
-function main() {
-  const bar = primitives.cuboid({ size: [120, 30, 30] })
-  const post = transforms.translateZ(30,
-    primitives.cuboid({ size: [30, 30, 90] })
+      code: `function main() {
+  const bar = box(120, 30, 30)
+  const post = translateZ(30,
+    box(30, 30, 90)
   )
 
-  const merged = booleans.union(bar, post)
+  const merged = union(bar, post)
 
-  const apart = measurements.measureVolume(bar) + measurements.measureVolume(post)
+  const apart = measureVolume(bar) + measureVolume(post)
   console.log('measured separately:', Math.round(apart))
-  console.log('after union:', Math.round(measurements.measureVolume(merged)))
+  console.log('after union:', Math.round(measureVolume(merged)))
 
   return merged
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'subtract',
@@ -1000,18 +882,14 @@ The cutter is not part of the finished object. It is a shape you build only to d
 Nothing says a cutter has to be round, either. A cuboid cuts a slot, a star cuts a star.
 
 Change radius from 20 to 35 and the hole grows with it.`,
-      code: `const { primitives, booleans } = require('@jscad/modeling')
-
-function main() {
-  const plate = primitives.cuboid({ size: [120, 80, 12] })
+      code: `function main() {
+  const plate = box(120, 80, 12)
 
   // Taller than the plate on purpose. Two pages on is about why.
-  const drill = primitives.cylinder({ radius: 20, height: 40, segments: 48 })
+  const drill = tube(20, 40, { segments: 48 })
 
-  return booleans.subtract(plate, drill)
-}
-
-module.exports = { main }`,
+  return subtract(plate, drill)
+}`,
     },
     {
       title: 'Order matters',
@@ -1022,22 +900,18 @@ subtract(plate, drill) is a plate with a hole in it. subtract(drill, plate) is t
 union and intersect do not care. union(a, b) and union(b, a) are the same solid.
 
 Swap the two names in the return line to look at the other one.`,
-      code: `const { primitives, booleans, measurements } = require('@jscad/modeling')
+      code: `function main() {
+  const plate = box(120, 80, 12)
+  const drill = tube(20, 40, { segments: 48 })
 
-function main() {
-  const plate = primitives.cuboid({ size: [120, 80, 12] })
-  const drill = primitives.cylinder({ radius: 20, height: 40, segments: 48 })
+  const plateWithHole = subtract(plate, drill)
+  const drillWithBite = subtract(drill, plate)
 
-  const plateWithHole = booleans.subtract(plate, drill)
-  const drillWithBite = booleans.subtract(drill, plate)
-
-  console.log('subtract(plate, drill):', Math.round(measurements.measureVolume(plateWithHole)))
-  console.log('subtract(drill, plate):', Math.round(measurements.measureVolume(drillWithBite)))
+  console.log('subtract(plate, drill):', Math.round(measureVolume(plateWithHole)))
+  console.log('subtract(drill, plate):', Math.round(measureVolume(drillWithBite)))
 
   return plateWithHole
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Make the cutter longer than the material',
@@ -1048,26 +922,22 @@ One exactly as tall as the plate does cut — but it leaves you no room. Move ei
 The console counts the damage: 102669 against 100163 is 2506 cubic mm that should have been drilled away and was not.
 
 The extra length costs nothing — it is thrown away with the rest of the cut. Change short to through in the return line and the hole opens.`,
-      code: `const { primitives, transforms, booleans, measurements } = require('@jscad/modeling')
-
-function main() {
-  const plate = primitives.cuboid({ size: [120, 80, 12] })
+      code: `function main() {
+  const plate = box(120, 80, 12)
 
   // Same height as the plate, and 2 mm out of line.
-  const short = transforms.translateZ(-2,
-    primitives.cylinder({ radius: 20, height: 12, segments: 48 })
+  const short = translateZ(-2,
+    tube(20, 12, { segments: 48 })
   )
 
   // Longer at both ends. Nothing to line up, so nothing to get wrong.
-  const through = primitives.cylinder({ radius: 20, height: 40, segments: 48 })
+  const through = tube(20, 40, { segments: 48 })
 
-  console.log('cutter the same height:', Math.round(measurements.measureVolume(booleans.subtract(plate, short))))
-  console.log('cutter made longer:', Math.round(measurements.measureVolume(booleans.subtract(plate, through))))
+  console.log('cutter the same height:', Math.round(measureVolume(subtract(plate, short))))
+  console.log('cutter made longer:', Math.round(measureVolume(subtract(plate, through))))
 
-  return booleans.subtract(plate, short)
-}
-
-module.exports = { main }`,
+  return subtract(plate, short)
+}`,
     },
     {
       title: 'intersect',
@@ -1078,21 +948,17 @@ That makes it the tool for trimming. Here a 200 mm rod stands up through a 40 mm
 The console prints the rod's volume and the puck's, so you can see how much of it went.
 
 Change the slab's 40 to 160 and the puck grows into most of the rod.`,
-      code: `const { primitives, booleans, measurements } = require('@jscad/modeling')
+      code: `function main() {
+  const rod = tube(45, 200, { segments: 48 })
+  const slab = box(140, 140, 40)
 
-function main() {
-  const rod = primitives.cylinder({ radius: 45, height: 200, segments: 48 })
-  const slab = primitives.cuboid({ size: [140, 140, 40] })
+  const puck = intersect(rod, slab)
 
-  const puck = booleans.intersect(rod, slab)
-
-  console.log('the whole rod:', Math.round(measurements.measureVolume(rod)))
-  console.log('the shared part:', Math.round(measurements.measureVolume(puck)))
+  console.log('the whole rod:', Math.round(measureVolume(rod)))
+  console.log('the shared part:', Math.round(measureVolume(puck)))
 
   return puck
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'When a boolean gives back nothing',
@@ -1103,21 +969,17 @@ The two blocks here are stacked 120 mm apart, so they share no volume at all, an
 subtract does the same thing whenever the cutter covers the whole of the base.
 
 Return shared on its own instead of the array, and the viewport goes completely empty.`,
-      code: `const { primitives, transforms, booleans, measurements } = require('@jscad/modeling')
-
-function main() {
-  const lower = primitives.cuboid({ size: [80, 80, 40] })
-  const upper = transforms.translateZ(120,
-    primitives.cuboid({ size: [80, 80, 40] })
+      code: `function main() {
+  const lower = box(80, 80, 40)
+  const upper = translateZ(120,
+    box(80, 80, 40)
   )
 
-  const shared = booleans.intersect(lower, upper)
-  console.log('volume of the shared part:', measurements.measureVolume(shared))
+  const shared = intersect(lower, upper)
+  console.log('volume of the shared part:', measureVolume(shared))
 
   return [lower, upper]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'scission: taking a solid apart',
@@ -1128,24 +990,20 @@ Cut a bar in half and JSCAD does not hand you two objects. The viewport shows tw
 scission finds the separate lumps and hands them back in an array. Each one measures 65 mm, and main() can return that array exactly as it comes.
 
 Give scission a solid that is already in one piece and you get an array of one.`,
-      code: `const { primitives, booleans, measurements } = require('@jscad/modeling')
-
-function main() {
-  const bar = primitives.cuboid({ size: [140, 40, 20] })
-  const saw = primitives.cuboid({ size: [10, 60, 40] })
+      code: `function main() {
+  const bar = box(140, 40, 20)
+  const saw = box(10, 60, 40)
 
   // One solid, even though it now holds two lumps that never touch.
-  const cut = booleans.subtract(bar, saw)
-  console.log('the cut bar measures:', measurements.measureDimensions(cut))
+  const cut = subtract(bar, saw)
+  console.log('the cut bar measures:', measureDimensions(cut))
 
-  const pieces = booleans.scission(cut)
+  const pieces = scission(cut)
   console.log('pieces found:', pieces.length)
-  console.log('one piece measures:', measurements.measureDimensions(pieces[0]))
+  console.log('one piece measures:', measureDimensions(pieces[0]))
 
   return pieces
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Build, cut, then paint',
@@ -1156,25 +1014,21 @@ colorize gives a shape a colour, and that colour survives every transform — mo
 So the order is: build the parts, do the booleans, colorize what comes out. Paint first and you get an orange part and no explanation.
 
 The console prints undefined for the plate that was painted too early, and the four numbers of tomato for the one painted last.`,
-      code: `const { primitives, booleans, colors } = require('@jscad/modeling')
-
-function main() {
-  const plate = primitives.cuboid({ size: [120, 80, 12] })
-  const drill = primitives.cylinder({ radius: 20, height: 40, segments: 48 })
+      code: `function main() {
+  const plate = box(120, 80, 12)
+  const drill = tube(20, 40, { segments: 48 })
 
   // colorize wants an array of numbers, so turn the name into one first.
-  const tomato = colors.colorNameToRgb('tomato')
+  const tomato = colorNameToRgb('tomato')
 
-  const paintedTooEarly = booleans.subtract(colors.colorize(tomato, plate), drill)
+  const paintedTooEarly = subtract(colorize(tomato, plate), drill)
   console.log('painted, then cut:', paintedTooEarly.color)
 
-  const paintedLast = colors.colorize(tomato, booleans.subtract(plate, drill))
+  const paintedLast = colorize(tomato, subtract(plate, drill))
   console.log('cut, then painted:', paintedLast.color)
 
   return paintedLast
-}
-
-module.exports = { main }`,
+}`,
     },
   ],
 },
@@ -1189,19 +1043,15 @@ module.exports = { main }`,
 Every extrusion function is called the same way: an options object saying how to push, then the profile to push. There are four of them in this section, and they differ only in the direction of the push.
 
 Below are two shapes: the profile on its own, still flat, and the solid that extrudeLinear made out of it. The outline did not change at all. It only gained a third dimension.`,
-      code: `const { primitives, extrusions, transforms } = require('@jscad/modeling')
-
-function main() {
-  const outline = primitives.rectangle({ size: [40, 20] })
-  const solid = extrusions.extrudeLinear({ height: 8 }, outline)
+      code: `function main() {
+  const outline = rect(40, 20)
+  const solid = extrude(8, outline)
 
   return [
-    transforms.translateX(-40, outline),
-    transforms.translateX(40, solid)
+    translateX(-40, outline),
+    translateX(40, solid)
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'extrudeLinear',
@@ -1210,18 +1060,14 @@ module.exports = { main }`,
 height is the only option you need to get started. Change that one number and the same outline is a thin badge or a tall post, with nothing else in the file touched — which is most of the reason for designing in code rather than by dragging.
 
 Below, one circle is extruded twice at two different heights. The circle itself is written once.`,
-      code: `const { primitives, extrusions, transforms } = require('@jscad/modeling')
-
-function main() {
-  const badge = primitives.circle({ radius: 12, segments: 48 })
+      code: `function main() {
+  const badge = disc(12, { segments: 48 })
 
   return [
-    transforms.translateX(-20, extrusions.extrudeLinear({ height: 3 }, badge)),
-    transforms.translateX(20, extrusions.extrudeLinear({ height: 45 }, badge))
+    translateX(-20, extrude(3, badge)),
+    translateX(20, extrude(45, badge))
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'An extrusion sits on the grid',
@@ -1230,20 +1076,16 @@ module.exports = { main }`,
 Neither behaviour is wrong, but mixing the two without noticing is how parts end up half sunk into one another.
 
 To centre an extrusion the way a primitive is centred, move it down by half its height with transforms.translateZ. All three shapes below are 20 tall.`,
-      code: `const { primitives, extrusions, transforms } = require('@jscad/modeling')
-
-function main() {
-  const disc = primitives.circle({ radius: 10, segments: 48 })
-  const post = extrusions.extrudeLinear({ height: 20 }, disc)
+      code: `function main() {
+  const circle = disc(10, { segments: 48 })
+  const post = extrude(20, circle)
 
   return [
-    transforms.translateX(-25, post),
-    primitives.cylinder({ radius: 10, height: 20, segments: 48 }),
-    transforms.translateX(25, transforms.translateZ(-10, post))
+    translateX(-25, post),
+    tube(10, 20, { segments: 48 }),
+    translateX(25, translateZ(-10, post))
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Cut the detail while it is still flat',
@@ -1252,18 +1094,14 @@ module.exports = { main }`,
 A hole cut into a flat outline is a subtract over a handful of edges. The very same hole cut through a finished solid is a subtract over every triangle in the model — slower to compute, and much easier to get subtly wrong along the way.
 
 So learn the whole thing as one move: draw the outline, subtract the details, extrude once at the end. The plate below is one rectangle, one circle taken out of it, and one extrude. Reordering those three lines would cost you nothing but time.`,
-      code: `const { primitives, booleans, extrusions } = require('@jscad/modeling')
+      code: `function main() {
+  const plate = rect(50, 30)
+  const hole = disc(6, { segments: 32 })
 
-function main() {
-  const plate = primitives.rectangle({ size: [50, 30] })
-  const hole = primitives.circle({ radius: 6, segments: 32 })
+  const outline = subtract(plate, hole)
 
-  const outline = booleans.subtract(plate, hole)
-
-  return extrusions.extrudeLinear({ height: 6 }, outline)
-}
-
-module.exports = { main }`,
+  return extrude(6, outline)
+}`,
     },
     {
       title: 'It has to be a flat shape',
@@ -1293,25 +1131,21 @@ module.exports = { main }`,
 Angles in JSCAD are measured in radians, not degrees. Rather than memorise what a half turn is in radians, write utils.degToRad(180) and let the library do the conversion. Every angle in this section works that way, so the number you read in the code is always the number you meant.
 
 A twist also widens the shape, because the corners of the profile swing outward as they turn.`,
-      code: `const { primitives, extrusions, transforms, utils } = require('@jscad/modeling')
+      code: `function main() {
+  const bar = rect(20, 20)
 
-function main() {
-  const bar = primitives.rectangle({ size: [20, 20] })
-
-  const straight = extrusions.extrudeLinear({ height: 60 }, bar)
-  const twisted = extrusions.extrudeLinear({
+  const straight = extrude(60, bar)
+  const twisted = extrudeLinear({
     height: 60,
-    twistAngle: utils.degToRad(180),
+    twistAngle: degToRad(180),
     twistSteps: 24
   }, bar)
 
   return [
-    transforms.translateX(-20, straight),
-    transforms.translateX(20, twisted)
+    translateX(-20, straight),
+    translateX(20, twisted)
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'extrudeRotate',
@@ -1403,15 +1237,11 @@ module.exports = { main }`,
 extrudeRectangular walks along a path and leaves a rectangular bar behind it. size is how wide that bar is, height is how tall. A line you could only ever look at turns into something you could actually print.
 
 geometries.path2.fromPoints({}, points) is how you build the path. This is the tool for lettering, wire frames, rails, and anything else that is a stroke rather than a shape.`,
-      code: `const { geometries, extrusions } = require('@jscad/modeling')
+      code: `function main() {
+  const line = path2.fromPoints({}, [[-25, -10], [0, 15], [25, -10]])
 
-function main() {
-  const line = geometries.path2.fromPoints({}, [[-25, -10], [0, 15], [25, -10]])
-
-  return extrusions.extrudeRectangular({ size: 3, height: 8 }, line)
-}
-
-module.exports = { main }`,
+  return extrudeRectangular({ size: 3, height: 8 }, line)
+}`,
     },
     {
       title: 'A closed outline gives walls, not a block',
@@ -1420,18 +1250,14 @@ module.exports = { main }`,
 Below, the same circle goes into extrudeRectangular and into extrudeLinear. One comes back a tube, the other a solid disc. Both are legitimate, and which one you get depends entirely on which function you called.
 
 Hollow is often exactly what you wanted — a cup, a fence, a planter, a box with an open top. It is a problem only when you were expecting a block.`,
-      code: `const { primitives, extrusions, transforms } = require('@jscad/modeling')
-
-function main() {
-  const ring = primitives.circle({ radius: 15, segments: 48 })
+      code: `function main() {
+  const ring = disc(15, { segments: 48 })
 
   return [
-    transforms.translateX(-20, extrusions.extrudeRectangular({ size: 2, height: 10 }, ring)),
-    transforms.translateX(20, extrusions.extrudeLinear({ height: 10 }, ring))
+    translateX(-20, extrudeRectangular({ size: 2, height: 10 }, ring)),
+    translateX(20, extrude(10, ring))
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'extrudeFromSlices',
@@ -1440,13 +1266,12 @@ module.exports = { main }`,
 numberOfSlices is how many cross-sections to make. callback is a function JSCAD runs once per slice to get each one: it is handed progress — 0 at the bottom slice, 1 at the top — and it returns a slice, which you build from a list of [x, y, z] points with slice.fromPoints.
 
 Pass the starting shape as the second argument as well, even when the callback ignores it completely, as this one does. Leave that argument out and the call fails.`,
-      code: `const { primitives, extrusions } = require('@jscad/modeling')
-const { slice } = extrusions
+      code: `const { slice } = extrusions
 
 function main() {
-  const base = primitives.rectangle({ size: [30, 30] })
+  const base = rect(30, 30)
 
-  return extrusions.extrudeFromSlices({
+  return extrudeFromSlices({
     numberOfSlices: 2,
     callback: function (progress) {
       const half = 15 - 10 * progress
@@ -1456,9 +1281,7 @@ function main() {
       ])
     }
   }, base)
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Letting progress shape the slice',
@@ -1467,32 +1290,29 @@ module.exports = { main }`,
 Here a helper builds a ring of points at whatever radius and height you ask it for, and the callback feeds that helper a radius that rises and falls as progress climbs. Six lines of arithmetic, and the result is a vase with a wavy side that no other extrusion in this section could have made.
 
 Raise numberOfSlices for a smoother surface and lower it to see the steps. Two is the minimum, and JSCAD refuses anything smaller than that.`,
-      code: `const { primitives, extrusions, utils } = require('@jscad/modeling')
-const { slice } = extrusions
+      code: `const { slice } = extrusions
 
 const SIDES = 48
 
 function ring(radius, z) {
   const points = []
   for (let i = 0; i < SIDES; i++) {
-    const angle = utils.degToRad(i * 360 / SIDES)
+    const angle = degToRad(i * 360 / SIDES)
     points.push([radius * Math.cos(angle), radius * Math.sin(angle), z])
   }
   return slice.fromPoints(points)
 }
 
 function main() {
-  const base = primitives.circle({ radius: 14, segments: SIDES })
+  const base = disc(14, { segments: SIDES })
 
-  return extrusions.extrudeFromSlices({
+  return extrudeFromSlices({
     numberOfSlices: 40,
     callback: function (progress) {
       return ring(10 + 4 * Math.sin(progress * 6), progress * 60)
     }
   }, base)
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'project',
@@ -1501,23 +1321,19 @@ module.exports = { main }`,
 Use it when you want a base plate that matches a part exactly, or an outline to cut on a laser cutter, or a footprint to check that two parts do not overlap on the bed of a printer.
 
 What comes back is 2D, so it needs an extrude of its own before it is solid again. And a hole that does not go all the way through leaves no mark in the shadow.`,
-      code: `const { primitives, booleans, extrusions, transforms } = require('@jscad/modeling')
-
-function main() {
-  const part = booleans.subtract(
-    primitives.cuboid({ size: [40, 25, 10] }),
-    primitives.cylinder({ radius: 6, height: 20, segments: 32 })
+      code: `function main() {
+  const part = subtract(
+    box(40, 25, 10),
+    tube(6, 20, { segments: 32 })
   )
 
-  const shadow = extrusions.project({}, part)
+  const shadow = project({}, part)
 
   return [
-    transforms.translateX(-25, part),
-    transforms.translateX(25, extrusions.extrudeLinear({ height: 1 }, shadow))
+    translateX(-25, part),
+    translateX(25, extrude(1, shadow))
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Springs and threads with extrudeHelical',
@@ -1528,13 +1344,11 @@ Four numbers control it. radius is how far the profile sits from the centre pole
 Two traps, both worth knowing before you lose an afternoon. If you pass height as well as pitch, height wins and your pitch is thrown away. And there is no endAngle and no segmentPoints: pass either one and JSCAD ignores it silently — no error, no warning, and a shape that is not the one you asked for. The turning is set by angle, and nothing else.
 
 The profile is the wire itself, seen end-on. A circle gives round wire like a pen spring; a rectangle gives flat wire like a watch spring.`,
-      code: `const { primitives, extrusions, transforms } = require('@jscad/modeling')
-
-function main() {
+      code: `function main() {
   // The profile is the wire, seen end-on.
-  const wire = primitives.circle({ radius: 1.5, segments: 16 })
+  const wire = disc(1.5, { segments: 16 })
 
-  const spring = extrusions.extrudeHelical({
+  const spring = extrudeHelical({
     radius: 10,                 // how wide the coil is
     pitch: 6,                   // how far it climbs per turn
     angle: Math.PI * 2 * 5,     // five full turns
@@ -1542,10 +1356,8 @@ function main() {
   }, wire)
 
   // Helices build upward from z = 0, so drop it to sit centred.
-  return transforms.translate([0, 0, -15], spring)
-}
-
-module.exports = { main }`,
+  return translate([0, 0, -15], spring)
+}`,
     },
     {
       title: 'Which extrusion do I want?',
@@ -1554,18 +1366,14 @@ module.exports = { main }`,
 Reach for extrudeRotate when the object is round about one axis. Reach for extrudeRectangular when you are working from a line rather than from an area. Reach for extrudeFromSlices only when the cross-section genuinely changes as it climbs — it is the most code in this section, for the least common shape.
 
 When none of them fits, draw the outline flat and extrude it anyway. It is nearly always enough.`,
-      code: `const { primitives, booleans, extrusions } = require('@jscad/modeling')
-
-function main() {
-  const outline = booleans.subtract(
-    primitives.rectangle({ size: [50, 50] }),
-    primitives.circle({ radius: 10, segments: 48 })
+      code: `function main() {
+  const outline = subtract(
+    rect(50, 50),
+    disc(10, { segments: 48 })
   )
 
-  return extrusions.extrudeLinear({ height: 8 }, outline)
-}
-
-module.exports = { main }`,
+  return extrude(8, outline)
+}`,
     },
   ],
 },
@@ -1580,19 +1388,15 @@ module.exports = { main }`,
 The example hulls two circles of radius 8 — one moved 15 to the left by transforms.translate, one moved 15 to the right. What comes back is a single shape, a capsule 46 units across and 16 tall.
 
 Change either 15 to a 25 and the capsule stretches to 66 across, still 16 tall. The circles decide where the ends are; hull fills in everything between them.`,
-        code: `const { primitives, transforms, hulls } = require('@jscad/modeling')
-
-function main() {
-  const left = transforms.translate([-15, 0, 0],
-    primitives.circle({ radius: 8, segments: 32 })
+        code: `function main() {
+  const left = translate([-15, 0, 0],
+    disc(8, { segments: 32 })
   )
-  const right = transforms.translate([15, 0, 0],
-    primitives.circle({ radius: 8, segments: 32 })
+  const right = translate([15, 0, 0],
+    disc(8, { segments: 32 })
   )
-  return hulls.hull(left, right)
-}
-
-module.exports = { main }`,
+  return hull(left, right)
+}`,
       },
       {
         title: 'A hull has no dents',
@@ -1601,22 +1405,18 @@ module.exports = { main }`,
 The example builds an L out of two rectangles joined with booleans.union, then puts the plain L on the left and hulls.hull of the same L on the right. The notch is gone. The L has six corners and covers 600 square units; its hull has five and covers 900. The extra 300 is exactly the triangle that filled in the notch.
 
 Both fit the same bounding box, to the last decimal place. A hull never shrinks a shape and never reaches past it — it only fills in.`,
-        code: `const { primitives, transforms, booleans, hulls } = require('@jscad/modeling')
-
-function main() {
-  const tall = primitives.rectangle({ size: [10, 40] })
-  const foot = transforms.translate([15, -15, 0],
-    primitives.rectangle({ size: [20, 10] })
+        code: `function main() {
+  const tall = rect(10, 40)
+  const foot = translate([15, -15, 0],
+    rect(20, 10)
   )
-  const ell = booleans.union(tall, foot)
+  const ell = union(tall, foot)
 
   return [
-    transforms.translate([-30, 0, 0], ell),
-    transforms.translate([30, 0, 0], hulls.hull(ell))
+    translate([-30, 0, 0], ell),
+    translate([30, 0, 0], hull(ell))
   ]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'One kind of shape at a time',
@@ -1625,17 +1425,13 @@ module.exports = { main }`,
 Hulling two solids that are nothing alike is where hull earns its keep. The example hulls a 30 by 30 plate 4 thick, made with primitives.cuboid, against a primitives.sphere of radius 6 sitting high above it. The result is a tapered stalk: square at the bottom, round at the top, smoothly blended the whole way.
 
 Watch the coordinates. The plate is centred on the origin, so it runs from z = -2 up to z = 2, and the ball reaches z = 34. The stalk is 36 tall.`,
-        code: `const { primitives, transforms, hulls } = require('@jscad/modeling')
-
-function main() {
-  const foot = primitives.cuboid({ size: [30, 30, 4] })
-  const ball = transforms.translate([0, 0, 28],
-    primitives.sphere({ radius: 6, segments: 32 })
+        code: `function main() {
+  const foot = box(30, 30, 4)
+  const sphere = translate([0, 0, 28],
+    ball(6, { segments: 32 })
   )
-  return hulls.hull(foot, ball)
-}
-
-module.exports = { main }`,
+  return hull(foot, sphere)
+}`,
       },
       {
         title: 'Rounding a box with hull',
@@ -1646,24 +1442,20 @@ The spheres sit at the corners, so the part ends up one radius bigger in every d
 hulls.hull(...corners) uses the spread operator: three dots in front of an array unpack it into separate arguments, because hull wants shapes one after another, not one array holding them.
 
 Leave segments at 16. Each sphere is then 128 flat pieces and the hull returns 182; at 48 it is 1152 each and the hull returns 1302 — seven times the detail on a corner nobody inspects. primitives.roundedCuboid does this in one line; hull is the version that is not limited to boxes.`,
-        code: `const { primitives, transforms, hulls } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const r = 4
   const half = [20 - r, 12 - r, 6 - r]
-  const bead = primitives.sphere({ radius: r, segments: 16 })
+  const bead = ball(r, { segments: 16 })
 
   const corners = []
   for (let i = 0; i < 8; i++) {
     const x = (i % 2 === 0) ? -half[0] : half[0]
     const y = (Math.floor(i / 2) % 2 === 0) ? -half[1] : half[1]
     const z = (i < 4) ? -half[2] : half[2]
-    corners.push(transforms.translate([x, y, z], bead))
+    corners.push(translate([x, y, z], bead))
   }
-  return hulls.hull(...corners)
-}
-
-module.exports = { main }`,
+  return hull(...corners)
+}`,
       },
       {
         title: 'hullChain',
@@ -1672,20 +1464,16 @@ module.exports = { main }`,
 What comes back is still one shape, not seven. The name is the clue: a chain, not a bag. And because only neighbours get hulled, the finished shape is free to bend. A plain hull can never bend, because a hull is always convex.
 
 The example lays seven circles of radius 5 along a zig-zag, 14 apart, alternating 8 above and 8 below the centre line. The snake fills a 94 by 26 box and follows every turn.`,
-        code: `const { primitives, transforms, hulls } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const beads = []
   for (let i = 0; i < 7; i++) {
     const y = (i % 2 === 0) ? -8 : 8
-    beads.push(transforms.translate([i * 14, y, 0],
-      primitives.circle({ radius: 5, segments: 24 })
+    beads.push(translate([i * 14, y, 0],
+      disc(5, { segments: 24 })
     ))
   }
-  return hulls.hullChain(...beads)
-}
-
-module.exports = { main }`,
+  return hullChain(...beads)
+}`,
       },
       {
         title: 'hull or hullChain?',
@@ -1696,27 +1484,23 @@ They fill the same 66 by 26 box, and that is where the resemblance ends. The blo
 Order is the other difference. Shuffle the five circles and hull returns the identical blob — it only cares which shapes it was given, not what order they came in. Shuffle them for hullChain and you get a different snake, because you changed who counts as a neighbour.
 
 Use hull when you want one rounded lump. Use hullChain when the shape has to follow a path.`,
-        code: `const { primitives, transforms, hulls } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const beads = []
   for (let i = 0; i < 5; i++) {
     const y = (i % 2 === 0) ? -8 : 8
-    beads.push(transforms.translate([i * 14, y, 0],
-      primitives.circle({ radius: 5, segments: 24 })
+    beads.push(translate([i * 14, y, 0],
+      disc(5, { segments: 24 })
     ))
   }
 
-  const blob = hulls.hull(...beads)
-  const snake = hulls.hullChain(...beads)
+  const blob = hull(...beads)
+  const snake = hullChain(...beads)
 
   return [
-    transforms.translate([0, 25, 0], blob),
-    transforms.translate([0, -25, 0], snake)
+    translate([0, 25, 0], blob),
+    translate([0, -25, 0], snake)
   ]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Points instead of shapes',
@@ -1727,19 +1511,15 @@ That is also the trap. What comes back is an array of [x, y] pairs, not a 2D sha
 The example feeds in seven points and keeps five. [0, 14] and [18, 10] are dropped, because each sits inside the outline the other five make.
 
 hulls.hullPoints3 is the 3D twin: points in, faces out, and geometries.geom3.create builds the solid from those faces.`,
-        code: `const { geometries, extrusions, hulls } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const dots = [[0, 0], [20, 0], [20, 14], [0, 14], [10, 26], [-8, 8], [18, 10]]
 
-  const edge = hulls.hullPoints2(dots)
+  const edge = hullPoints2(dots)
   console.log('kept ' + edge.length + ' of ' + dots.length + ' points')
 
-  const outline = geometries.geom2.fromPoints(edge)
-  return extrusions.extrudeLinear({ height: 4 }, outline)
-}
-
-module.exports = { main }`,
+  const outline = geom2.fromPoints(edge)
+  return extrude(4, outline)
+}`,
       },
     ],
   },
@@ -1756,28 +1536,23 @@ The only names in the whole library with round in them are roundedCuboid, rounde
 The expansions module is the general answer, and it holds two functions. Both push the outside of a shape outward by a set distance, laying a curve wherever that outside used to turn a corner. Which one you call depends on what you already have: offset takes a flat outline, expand takes a solid.
 
 The example softens a cross — a shape no primitive gives you.`,
-        code: `const { primitives, booleans, expansions, extrusions, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   // A cross: two flat rectangles, unioned. No primitive makes this shape.
-  const cross = booleans.union(
-    primitives.rectangle({ size: [60, 20] }),
-    primitives.rectangle({ size: [20, 60] })
+  const cross = union(
+    rect(60, 20),
+    rect(20, 60)
   )
 
-  const sharp = extrusions.extrudeLinear({ height: 8 }, cross)
+  const sharp = extrude(8, cross)
 
-  const softened = extrusions.extrudeLinear({ height: 8 },
-    expansions.offset({ delta: 6, corners: 'round', segments: 16 }, cross)
+  const softened = extrude(8, offset({ delta: 6, corners: 'round', segments: 16 }, cross)
   )
 
   return [
-    transforms.translate([-45, 0, 0], sharp),
-    transforms.translate([45, 0, 0], softened),
+    translate([-45, 0, 0], sharp),
+    translate([45, 0, 0], softened),
   ]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'offset: reshaping a flat outline',
@@ -1792,30 +1567,25 @@ corners decides what happens where the outline turns.
 - 'round' lays a curve; segments is how many short straight pieces it is built from. 16 is smooth enough for anything you will print.
 
 offset only speaks flat. Hand it a solid and you get the very same solid back, unchanged and without a word of complaint.`,
-        code: `const { primitives, expansions, extrusions, transforms } = require('@jscad/modeling')
-
-function main() {
-  const start = primitives.rectangle({ size: [60, 60] })
+        code: `function main() {
+  const start = rect(60, 60)
 
   // The same delta three times over. Only the corner treatment changes.
   const styles = ['edge', 'chamfer', 'round']
   const grown = styles.map((style, i) =>
-    transforms.translate([i * 95 - 95, 0, 0],
-      extrusions.extrudeLinear({ height: 6 },
-        expansions.offset({ delta: 10, corners: style, segments: 16 }, start)
+    translate([i * 95 - 95, 0, 0],
+      extrude(6, offset({ delta: 10, corners: style, segments: 16 }, start)
       )
     )
   )
 
   // The outline all three started from, parked behind them for scale.
-  const original = transforms.translate([0, 95, 0],
-    extrusions.extrudeLinear({ height: 6 }, start)
+  const original = translate([0, 95, 0],
+    extrude(6, start)
   )
 
   return [original, ...grown]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'expand: a rounded skin on a solid',
@@ -1826,33 +1596,29 @@ On a solid, round is the only corner style there is. Ask for corners: 'edge' or 
 It grows by more than people expect, because delta goes on at the left and again at the right — a 40 mm cube expanded by 4 measures 48. To finish at the size you actually wanted, build it at size - 2 * delta and let the skin make up the difference. The example does it both ways, beside a plain 40 mm cube.
 
 segments costs real money here: that cube is 62 faces at 8 segments and 614 at 32.`,
-        code: `const { primitives, expansions, measurements, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const delta = 4
-  const reference = primitives.cube({ size: 40 })
+  const reference = box(40, 40, 40)
 
   // Built at 40 and expanded: it ends up 48, wider than the reference.
-  const tooBig = expansions.expand({ delta: delta, segments: 8 },
-    primitives.cube({ size: 40 })
+  const tooBig = expand({ delta: delta, segments: 8 },
+    box(40, 40, 40)
   )
 
   // Built at 40 - 2 * delta, so the skin brings it back to exactly 40.
-  const justRight = expansions.expand({ delta: delta, segments: 8 },
-    primitives.cube({ size: 40 - 2 * delta })
+  const justRight = expand({ delta: delta, segments: 8 },
+    box(40 - 2 * delta, 40 - 2 * delta, 40 - 2 * delta)
   )
 
-  console.log('too big:   ', measurements.measureDimensions(tooBig))
-  console.log('just right:', measurements.measureDimensions(justRight))
+  console.log('too big:   ', measureDimensions(tooBig))
+  console.log('just right:', measureDimensions(justRight))
 
   return [
-    transforms.translate([-70, 0, 0], reference),
+    translate([-70, 0, 0], reference),
     tooBig,
-    transforms.translate([70, 0, 0], justRight),
+    translate([70, 0, 0], justRight),
   ]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Round the outline, then extrude',
@@ -1863,35 +1629,28 @@ It rounds the four upright edges and leaves the top and bottom faces flat and sh
 The arithmetic from the previous page does the real work: the sketch is drawn at 60 - 2 * 6 by 40 - 2 * 6, so once it is offset by 6 the outline measures exactly the 60 by 40 it was meant to. The plain plate beside it in the viewport is there so your eyes can check.
 
 Anything you want cut into the plate — bolt holes, a slot, lettering — goes in between the offset and the extrude, while it is still flat and cheap to cut.`,
-        code: `const { primitives, expansions, extrusions, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const width = 60
   const depth = 40
   const radius = 6
 
   // One radius smaller on every side, so the offset lands it on 60 by 40.
-  const sketch = primitives.rectangle({
-    size: [width - 2 * radius, depth - 2 * radius],
-  })
-  const rounded = expansions.offset(
+  const sketch = rect(width - 2 * radius, depth - 2 * radius)
+  const rounded = offset(
     { delta: radius, corners: 'round', segments: 16 }, sketch
   )
 
-  const plate = extrusions.extrudeLinear({ height: 5 }, rounded)
+  const plate = extrude(5, rounded)
 
   // A plain 60 by 40 plate, to check the size came out right.
-  const sharp = extrusions.extrudeLinear({ height: 5 },
-    primitives.rectangle({ size: [width, depth] })
+  const sharp = extrude(5, rect(width, depth)
   )
 
   return [
-    transforms.translate([0, 25, 0], plate),
-    transforms.translate([0, -25, 0], sharp),
+    translate([0, 25, 0], plate),
+    translate([0, -25, 0], sharp),
   ]
-}
-
-module.exports = { main }`,
+}`,
       },
     ],
   },
@@ -1912,21 +1671,17 @@ geometries.path2.fromPoints({}, points) builds one. points is a list of [x, y] p
 Return a path from main() and you can see it: a thin line on the grid, no thickness, nothing filled in. Ask JSCAD to measure it and it agrees. measureArea and measureVolume both come back 0, because there is nothing there to measure.
 
 So why bother? Two reasons, both later in this section. A path is the easiest way to describe an outline that has a curve in it, and a path that loops back to its own start turns into a solid in a single call.`,
-      code: `const { geometries } = require('@jscad/modeling')
-
-function main() {
+      code: `function main() {
   // Four corners, in the order you would draw them with a pencil.
-  const line = geometries.path2.fromPoints({}, [
+  const line = path2.fromPoints({}, [
     [-30, -10], [-10, 20], [10, -20], [30, 10],
   ])
 
-  console.log('points:', geometries.path2.toPoints(line).length)
+  console.log('points:', path2.toPoints(line).length)
   console.log('is it a loop?', line.isClosed)
 
   return line
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Open paths and closed paths',
@@ -2252,24 +2007,20 @@ A path is a run of points joined end to end, like a pen line. It does not have t
 You can tell which is which by looking. The viewport shades a solid, so it catches the light and you can see its faces. A flat shape and a path have no faces to shade, so they are drawn as plain lines instead. That is not a bug and it does not mean the shape is broken — it is what a shape with no volume looks like.
 
 Below, left to right: a shaded box, the outline of a square lying on the grid, and an open zigzag.`,
-      code: `const { primitives, geometries, transforms } = require('@jscad/modeling')
-
-function main() {
-  const solid = primitives.cuboid({ size: [20, 20, 20] })
-  const flat = primitives.rectangle({ size: [20, 20] })
+      code: `function main() {
+  const solid = box(20, 20, 20)
+  const flat = rect(20, 20)
 
   // fromPoints takes an options object first. There is nothing worth
   // setting here, so {} is the whole of it.
-  const line = geometries.path2.fromPoints({}, [[0, 0], [10, 14], [20, 0], [30, 14]])
+  const line = path2.fromPoints({}, [[0, 0], [10, 14], [20, 0], [30, 14]])
 
   return [
-    transforms.translate([-45, 0, 10], solid),
+    translate([-45, 0, 10], solid),
     flat,
-    transforms.translate([30, -7, 0], line),
+    translate([30, -7, 0], line),
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Asking a shape what it is',
@@ -2284,30 +2035,26 @@ All three are safe to call on anything. Hand one a number, or a value that is no
 This is the fastest way to settle an argument with the library. When a function complains about types and you cannot see why, print the kind of each thing you passed it. Nine times out of ten one of them is not what you assumed it was — usually because a line further up already extruded it.
 
 The helper below is worth keeping in your file while you are debugging.`,
-      code: `const { primitives, geometries, extrusions, transforms } = require('@jscad/modeling')
-
-function whatIsIt(shape) {
-  if (geometries.geom3.isA(shape)) return 'geom3 — a solid'
-  if (geometries.geom2.isA(shape)) return 'geom2 — flat'
-  if (geometries.path2.isA(shape)) return 'path2 — a line'
+      code: `function whatIsIt(shape) {
+  if (geom3.isA(shape)) return 'geom3 — a solid'
+  if (geom2.isA(shape)) return 'geom2 — flat'
+  if (path2.isA(shape)) return 'path2 — a line'
   return 'not a shape at all'
 }
 
 function main() {
-  const sketch = primitives.circle({ radius: 12, segments: 48 })
-  const solid = extrusions.extrudeLinear({ height: 8 }, sketch)
+  const sketch = disc(12, { segments: 48 })
+  const solid = extrude(8, sketch)
 
   console.log('sketch:', whatIsIt(sketch))
   console.log('solid:', whatIsIt(solid))
   console.log('the number 7:', whatIsIt(7))
 
   return [
-    transforms.translate([-20, 0, 0], sketch),
-    transforms.translate([20, 0, 0], solid),
+    translate([-20, 0, 0], sketch),
+    translate([20, 0, 0], solid),
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Which maker gives you which kind',
@@ -2322,25 +2069,21 @@ These make a path: line, for a run of straight segments, and arc, for part of a 
 The pattern is easier to remember than the list. A name that describes something you could cut out of paper is flat; a name that describes something you could hold is solid.
 
 One place the pattern misleads people: text.vectorText does not make paths. It hands back plain arrays of numbers, one array per pen stroke, and you turn each of those into a path yourself with fromPoints. The Text section works that through.`,
-      code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
-  const flat = primitives.star({ vertices: 5, outerRadius: 14, innerRadius: 6 })
-  const solid = primitives.torus({ innerRadius: 3, outerRadius: 12 })
+      code: `function main() {
+  const flat = star({ vertices: 5, outerRadius: 14, innerRadius: 6 })
+  const solid = ring(12, 3)
 
   // Angles are radians, so Math.PI is half a turn — this is a semicircle.
-  const line = primitives.arc({
+  const line = arc({
     radius: 12, startAngle: 0, endAngle: Math.PI, segments: 32,
   })
 
   return [
-    transforms.translate([-40, 0, 0], flat),
+    translate([-40, 0, 0], flat),
     solid,
-    transforms.translate([40, 0, 0], line),
+    translate([40, 0, 0], line),
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Extruding turns flat into solid',
@@ -2353,19 +2096,15 @@ That is why the usual way to build a part is: draw the outline flat, cut any 2D 
 Below, the same circle appears twice — on the left as itself, an outline lying on the grid, and on the right after extrudeLinear, a shaded solid with sides you can see. One call, two kinds.
 
 Note what did not happen: the circle on the left is untouched. Extruding does not convert the shape you handed it. Like every other JSCAD function, it builds a new shape and gives that back.`,
-      code: `const { primitives, extrusions, transforms } = require('@jscad/modeling')
-
-function main() {
-  const sketch = primitives.circle({ radius: 12, segments: 48 })
-  const solid = extrusions.extrudeLinear({ height: 18 }, sketch)
+      code: `function main() {
+  const sketch = disc(12, { segments: 48 })
+  const solid = extrude(18, sketch)
 
   return [
-    transforms.translate([-20, 0, 0], sketch),
-    transforms.translate([20, 0, 0], solid),
+    translate([-20, 0, 0], sketch),
+    translate([20, 0, 0], solid),
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'A path is a line, not an area',
@@ -2378,23 +2117,19 @@ extruded path must be closed
 There are two ways forward. If the line was always meant to be a loop, close it — geometries.path2.close(path) joins the last point back to the first, and the result extrudes like any flat shape. If it was always meant to stay a line, use extrudeRectangular instead: it sweeps a small rectangle along the path, so the line becomes a thin wall you can print. That is how the Text section turns letter strokes into raised lettering.
 
 Below is the same zigzag both ways — the bare path on the left, and on the right the wall extrudeRectangular makes from it.`,
-      code: `const { geometries, extrusions, transforms } = require('@jscad/modeling')
+      code: `function main() {
+  const zigzag = path2.fromPoints({}, [[0, 0], [10, 14], [20, 0], [30, 14]])
 
-function main() {
-  const zigzag = geometries.path2.fromPoints({}, [[0, 0], [10, 14], [20, 0], [30, 14]])
-
-  // extrusions.extrudeLinear({ height: 6 }, zigzag) would stop here with
+  // extrude(6, zigzag) would stop here with
   //   extruded path must be closed
   // because an open line has no inside to give thickness to.
-  const wall = extrusions.extrudeRectangular({ size: 2, height: 8 }, zigzag)
+  const wall = extrudeRectangular({ size: 2, height: 8 }, zigzag)
 
   return [
-    transforms.translate([-45, -7, 0], zigzag),
-    transforms.translate([10, -7, 0], wall),
+    translate([-45, -7, 0], zigzag),
+    translate([10, -7, 0], wall),
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'project goes the other way',
@@ -2407,22 +2142,18 @@ This is genuinely useful. The shadow of a part is the footprint it needs on the 
 project is the exception worth remembering, because the shape of the library otherwise says flat goes to solid and stays there. Its first argument is the usual options object; leaving it as {} projects straight down, which is what you want almost every time.
 
 Below, a donut and the ring its shadow makes — hole and all. The two printed numbers are not the same measurement: a solid's area is its whole outer skin, a flat shape's is the ground it covers.`,
-      code: `const { primitives, extrusions, transforms, measurements } = require('@jscad/modeling')
+      code: `function main() {
+  const donut = ring(14, 4)
+  const shadow = project({}, donut)
 
-function main() {
-  const donut = primitives.torus({ innerRadius: 4, outerRadius: 14 })
-  const shadow = extrusions.project({}, donut)
-
-  console.log('donut is a solid; area of its skin:', measurements.measureArea(donut))
-  console.log('shadow is flat; area it covers:', measurements.measureArea(shadow))
+  console.log('donut is a solid; area of its skin:', measureArea(donut))
+  console.log('shadow is flat; area it covers:', measureArea(shadow))
 
   return [
-    transforms.translate([-22, 0, 0], donut),
-    transforms.translate([22, 0, 0], shadow),
+    translate([-22, 0, 0], donut),
+    translate([22, 0, 0], shadow),
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Both sides have to match',
@@ -2435,25 +2166,21 @@ The other three complain in almost the same words: only unions of the same type 
 Inside one kind you are free, and the result keeps that kind. Two flat circles hull into a flat stadium outline. Two spheres hull into a solid capsule. Subtracting one flat shape from another gives you a flat shape with a hole in it.
 
 The fix is always to make both sides agree, and usually that means extruding the flat one first.`,
-      code: `const { primitives, hulls, transforms } = require('@jscad/modeling')
+      code: `function main() {
+  const circle = disc(8, { segments: 48 })
+  const flatHull = hull(circle, translate([30, 0, 0], circle))
 
-function main() {
-  const circle = primitives.circle({ radius: 8, segments: 48 })
-  const flatHull = hulls.hull(circle, transforms.translate([30, 0, 0], circle))
+  const sphere = ball(8, { segments: 32 })
+  const solidHull = hull(sphere, translate([30, 0, 0], sphere))
 
-  const ball = primitives.sphere({ radius: 8, segments: 32 })
-  const solidHull = hulls.hull(ball, transforms.translate([30, 0, 0], ball))
-
-  // hulls.hull(circle, ball) never gets this far. It stops with:
+  // hull(circle, sphere) never gets this far. It stops with:
   //   only hulls of the same type are supported
 
   return [
-    transforms.translate([-15, 25, 0], flatHull),
-    transforms.translate([-15, -25, 0], solidHull),
+    translate([-15, 25, 0], flatHull),
+    translate([-15, -25, 0], solidHull),
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Extruding a solid does nothing',
@@ -2492,28 +2219,24 @@ A flat shape has no thickness, so turning it out of the XY plane does not stand 
 The viewport will not show you this, which is exactly why it is worth a page. The renderer draws the outline the square had before the turn, so a squashed sketch looks like a perfectly good square standing on its edge. Your eyes are no help here. Measure it instead — that is what the two printed lines below are for: 400 before the turn, 0 after.
 
 The order that works is the other one. Extrude the sketch while it is still flat, then rotate the solid. That is the version on screen: the flat sketch on the left, and on the right the same sketch given 5 mm of thickness and stood up into a wall.`,
-      code: `const { primitives, extrusions, transforms, measurements } = require('@jscad/modeling')
-
-function main() {
-  const sketch = primitives.rectangle({ size: [20, 20] })
+      code: `function main() {
+  const sketch = rect(20, 20)
 
   // The wrong order. Deliberately not returned: the viewport cannot show you
   // what is wrong with it, and the measurement can.
-  const squashed = transforms.rotateX(Math.PI / 2, sketch)   // a quarter turn
-  console.log('area of the flat sketch:', measurements.measureArea(sketch))
-  console.log('area after rotating it:', measurements.measureArea(squashed))
+  const squashed = rotateX(Math.PI / 2, sketch)   // a quarter turn
+  console.log('area of the flat sketch:', measureArea(sketch))
+  console.log('area after rotating it:', measureArea(squashed))
 
   // The right order: thickness first, then stand the solid up.
-  const wall = transforms.rotateX(Math.PI / 2,
-    extrusions.extrudeLinear({ height: 5 }, sketch))
+  const wall = rotateX(Math.PI / 2,
+    extrude(5, sketch))
 
   return [
-    transforms.translate([-25, 0, 0], sketch),
-    transforms.translate([25, 0, 10], wall),
+    translate([-25, 0, 0], sketch),
+    translate([25, 0, 10], wall),
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
   ],
 },
@@ -2530,20 +2253,16 @@ measureDimensions(shape) hands back [width, depth, height] in millimetres. measu
 Neither one changes the shape. They read it and hand back numbers, so you can call them whenever you like.
 
 console.log prints an answer where you can read it — the console panel beside your code in a lesson, or your browser's own console anywhere else. The tray below is hollowed out, so nobody can work out its volume by reading the code. The program can.`,
-      code: `const { primitives, transforms, booleans, measurements } = require('@jscad/modeling')
+      code: `function main() {
+  const body = box(120, 80, 20)
+  const scoop = translate([0, 0, 4], box(110, 70, 20))
+  const tray = subtract(body, scoop)
 
-function main() {
-  const body = primitives.cuboid({ size: [120, 80, 20] })
-  const scoop = transforms.translate([0, 0, 4], primitives.cuboid({ size: [110, 70, 20] }))
-  const tray = booleans.subtract(body, scoop)
-
-  console.log('size mm:', measurements.measureDimensions(tray))
-  console.log('plastic used, cubic mm:', Math.round(measurements.measureVolume(tray)))
+  console.log('size mm:', measureDimensions(tray))
+  console.log('plastic used, cubic mm:', Math.round(measureVolume(tray)))
 
   return tray
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'measureBoundingBox — the two corners',
@@ -2552,24 +2271,20 @@ module.exports = { main }`,
 It is a pair of arrays, not an object with .min and .max on it. Writing box.min gives you undefined and no warning, so read it by number instead: box[0] is the low corner, box[1] is the high one, and box[1][0] - box[0][0] is the width.
 
 The blob below came out of hull(), so its size is written nowhere in the code. The two small cubes sit on the corners the measurement found.`,
-      code: `const { primitives, transforms, hulls, measurements } = require('@jscad/modeling')
-
-function main() {
-  const blob = hulls.hull(
-    primitives.sphere({ radius: 10, segments: 24 }),
-    transforms.translate([40, 20, 15], primitives.sphere({ radius: 5, segments: 24 }))
+      code: `function main() {
+  const blob = hull(
+    ball(10, { segments: 24 }),
+    translate([40, 20, 15], ball(5, { segments: 24 }))
   )
 
-  const box = measurements.measureBoundingBox(blob)
-  console.log('low corner: ', box[0])
-  console.log('high corner:', box[1])
-  console.log('width:', box[1][0] - box[0][0])
+  const cuboid = measureBoundingBox(blob)
+  console.log('low corner: ', cuboid[0])
+  console.log('high corner:', cuboid[1])
+  console.log('width:', cuboid[1][0] - cuboid[0][0])
 
-  const dot = primitives.cube({ size: 5 })
-  return [blob, transforms.translate(box[0], dot), transforms.translate(box[1], dot)]
-}
-
-module.exports = { main }`,
+  const dot = box(5, 5, 5)
+  return [blob, translate(cuboid[0], dot), translate(cuboid[1], dot)]
+}`,
     },
     {
       title: 'Sitting a shape on the grid',
@@ -2582,24 +2297,20 @@ Measuring and then moving keeps working when the design changes. Hard-coding tra
 When all you want is a shape centred on the origin, transforms.center({ axes: [true, true, true] }, shape) does that in one call.
 
 Below is the same pin twice. Only the right-hand one was measured first.`,
-      code: `const { primitives, transforms, hulls, measurements } = require('@jscad/modeling')
-
-function main() {
-  const pin = hulls.hull(
-    primitives.sphere({ radius: 8, segments: 24 }),
-    transforms.translate([0, 0, 22], primitives.sphere({ radius: 4, segments: 24 }))
+      code: `function main() {
+  const pin = hull(
+    ball(8, { segments: 24 }),
+    translate([0, 0, 22], ball(4, { segments: 24 }))
   )
 
-  const box = measurements.measureBoundingBox(pin)
+  const box = measureBoundingBox(pin)
   const lift = -box[0][2]
   console.log('lowest point sits at z =', box[0][2])
   console.log('so lift it by', lift)
 
-  const sitting = transforms.translate([0, 0, lift], pin)
-  return [transforms.translate([-20, 0, 0], pin), transforms.translate([20, 0, 0], sitting)]
-}
-
-module.exports = { main }`,
+  const sitting = translate([0, 0, lift], pin)
+  return [translate([-20, 0, 0], pin), translate([20, 0, 0], sitting)]
+}`,
     },
     {
       title: 'measureCenter — the middle',
@@ -2608,21 +2319,17 @@ module.exports = { main }`,
 That is not the balance point — the spot where the shape would sit still on the end of a pencil. There is a separate function for that one, measureCenterOfMass(shape), and on the L-shaped bracket below the two answers are about 8 mm apart.
 
 The middle of the box is not even guaranteed to be inside the shape. Move this bracket by minus its own centre and the three coloured axis lines cross in the empty notch — in mid-air, exactly where the measurement said the middle was.`,
-      code: `const { primitives, transforms, booleans, measurements } = require('@jscad/modeling')
+      code: `function main() {
+  const arm = box(60, 12, 12, { center: [30, 6, 6] })
+  const post = box(12, 12, 40, { center: [6, 6, 20] })
+  const bracket = union(arm, post)
 
-function main() {
-  const arm = primitives.cuboid({ size: [60, 12, 12], center: [30, 6, 6] })
-  const post = primitives.cuboid({ size: [12, 12, 40], center: [6, 6, 20] })
-  const bracket = booleans.union(arm, post)
-
-  const middle = measurements.measureCenter(bracket)
+  const middle = measureCenter(bracket)
   console.log('middle of the box:', middle)
-  console.log('balance point:    ', measurements.measureCenterOfMass(bracket))
+  console.log('balance point:    ', measureCenterOfMass(bracket))
 
-  return transforms.translate([-middle[0], -middle[1], -middle[2]], bracket)
-}
-
-module.exports = { main }`,
+  return translate([-middle[0], -middle[1], -middle[2]], bracket)
+}`,
     },
     {
       title: 'Surface area, and what a hole costs',
@@ -2631,22 +2338,18 @@ module.exports = { main }`,
 Area and volume do not move together. Drilling a hole through the block below takes plastic away, and at the same time it carves a new wall for the paint to cover: the volume drops from 27000 to 17602 while the area climbs from 5400 to 6657.
 
 Flat shapes are worth a warning. A 2D rectangle has an area, but its volume is 0 and its height is 0. Nothing has gone wrong — there is just nothing there to fill.`,
-      code: `const { primitives, transforms, booleans, measurements } = require('@jscad/modeling')
+      code: `function main() {
+  const block = box(30, 30, 30)
+  const drill = tube(10, 40, { segments: 48 })
+  const drilled = subtract(block, drill)
 
-function main() {
-  const block = primitives.cuboid({ size: [30, 30, 30] })
-  const drill = primitives.cylinder({ radius: 10, height: 40, segments: 48 })
-  const drilled = booleans.subtract(block, drill)
+  console.log('solid:   paint', Math.round(measureArea(block)),
+    'plastic', Math.round(measureVolume(block)))
+  console.log('drilled: paint', Math.round(measureArea(drilled)),
+    'plastic', Math.round(measureVolume(drilled)))
 
-  console.log('solid:   paint', Math.round(measurements.measureArea(block)),
-    'plastic', Math.round(measurements.measureVolume(block)))
-  console.log('drilled: paint', Math.round(measurements.measureArea(drilled)),
-    'plastic', Math.round(measurements.measureVolume(drilled)))
-
-  return [transforms.translate([-20, 0, 0], block), transforms.translate([20, 0, 0], drilled)]
-}
-
-module.exports = { main }`,
+  return [translate([-20, 0, 0], block), translate([20, 0, 0], drilled)]
+}`,
     },
     {
       title: 'measureEpsilon — when 30 is not 30',
@@ -2655,26 +2358,22 @@ module.exports = { main }`,
 measureEpsilon(shape) hands you a sensible margin for that particular shape: about 0.0002 mm for this brick, and a bigger margin for a bigger shape, because bigger numbers carry bigger rounding.
 
 So never compare two measured numbers with ===. Ask whether the gap between them is smaller than the epsilon instead.`,
-      code: `const { primitives, transforms, measurements } = require('@jscad/modeling')
-
-function main() {
-  const brick = primitives.cuboid({ size: [30, 20, 10] })
+      code: `function main() {
+  const brick = box(30, 20, 10)
 
   let spun = brick
   for (let i = 0; i < 12; i++) {
-    spun = transforms.rotateZ(Math.PI / 6, spun)
+    spun = rotateZ(Math.PI / 6, spun)
   }
 
-  const width = measurements.measureDimensions(spun)[0]
-  const eps = measurements.measureEpsilon(spun)
+  const width = measureDimensions(spun)[0]
+  const eps = measureEpsilon(spun)
   console.log('width after 12 turns:', width)
   console.log('is it exactly 30?', width === 30)
   console.log('is it within', eps, '?', Math.abs(width - 30) < eps)
 
-  return [transforms.translate([-25, 0, 0], brick), transforms.translate([25, 0, 0], spun)]
-}
-
-module.exports = { main }`,
+  return [translate([-25, 0, 0], brick), translate([25, 0, 0], spun)]
+}`,
     },
     {
       title: 'Measuring a whole group at once',
@@ -2683,26 +2382,22 @@ module.exports = { main }`,
 For the group there is a second family of functions with Aggregate in the name: measureAggregateBoundingBox(shapes) for the box around everything, and measureAggregateVolume(shapes) for the total material. Anything built by extrudeRectangular out of a list of paths counts as a group too.
 
 The staircase below is five separate blocks. Measured one by one you get five boxes; measured as a group it runs from [-52, -8, 0] to [52, 8, 22] and uses 17920 cubic millimetres of plastic.`,
-      code: `const { primitives, transforms, measurements } = require('@jscad/modeling')
-
-function main() {
+      code: `function main() {
   const steps = []
   for (let i = 0; i < 5; i++) {
     const h = 6 + i * 4
-    const step = primitives.cuboid({ size: [16, 16, h] })
-    steps.push(transforms.translate([i * 22 - 44, 0, h / 2], step))
+    const step = box(16, 16, h)
+    steps.push(translate([i * 22 - 44, 0, h / 2], step))
   }
 
-  console.log('boxes handed back:', measurements.measureBoundingBox(steps).length)
+  console.log('boxes handed back:', measureBoundingBox(steps).length)
 
-  const whole = measurements.measureAggregateBoundingBox(steps)
+  const whole = measureAggregateBoundingBox(steps)
   console.log('the group runs from', whole[0], 'to', whole[1])
-  console.log('plastic for all 5:', Math.round(measurements.measureAggregateVolume(steps)))
+  console.log('plastic for all 5:', Math.round(measureAggregateVolume(steps)))
 
   return steps
-}
-
-module.exports = { main }`,
+}`,
     },
   ],
 },
@@ -2717,19 +2412,15 @@ module.exports = { main }`,
 The colour is an array of numbers: [red, green, blue]. Each one runs from 0, none of it, to 1, all of it. So [1, 0.2, 0.2] is a strong red and [0.2, 0.4, 1] is a strong blue.
 
 Colour is not part of the shape. It changes nothing about the size or the geometry — only what you see. That is worth doing while you work: three parts in three colours are three parts you can tell apart.`,
-        code: `const { primitives, transforms, colors } = require('@jscad/modeling')
+        code: `function main() {
+  const block = box(15, 15, 15)
 
-function main() {
-  const block = primitives.cuboid({ size: [15, 15, 15] })
-
-  const red = colors.colorize([1, 0.2, 0.2, 1], transforms.translate([-20, 0, 0], block))
-  const green = colors.colorize([0.3, 0.9, 0.4, 1], block)
-  const blue = colors.colorize([0.2, 0.4, 1, 1], transforms.translate([20, 0, 0], block))
+  const red = colorize([1, 0.2, 0.2, 1], translate([-20, 0, 0], block))
+  const green = colorize([0.3, 0.9, 0.4, 1], block)
+  const blue = colorize([0.2, 0.4, 1, 1], translate([20, 0, 0], block))
 
   return [red, green, blue]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Zero to one, not zero to 255',
@@ -2738,18 +2429,14 @@ module.exports = { main }`,
 Get it wrong and nothing complains. colorize stores [214, 92, 39, 1] exactly as you typed it, and the viewer pulls every number above 1 back down to 1 — so 214, 92 and 39 all become 1, and 1, 1, 1 is white.
 
 That is the left-hand block: no brick colour, no shading either, just flat white. The right-hand block is the same three numbers divided by 255.`,
-        code: `const { primitives, transforms, colors } = require('@jscad/modeling')
+        code: `function main() {
+  const block = box(18, 18, 18)
 
-function main() {
-  const block = primitives.cuboid({ size: [18, 18, 18] })
-
-  const wrong = colors.colorize([214, 92, 39, 1], transforms.translate([-12, 0, 0], block))
-  const right = colors.colorize([214 / 255, 92 / 255, 39 / 255, 1], transforms.translate([12, 0, 0], block))
+  const wrong = colorize([214, 92, 39, 1], translate([-12, 0, 0], block))
+  const right = colorize([214 / 255, 92 / 255, 39 / 255, 1], translate([12, 0, 0], block))
 
   return [wrong, right]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'The fourth number is see-through',
@@ -2758,22 +2445,18 @@ module.exports = { main }`,
 The gold wall in the example never changes. The four blue panes in front of it run 1, 0.6, 0.3 and 0.1. The first hides the wall completely. By the last one the wall is almost as clear as if the pane were not there at all.
 
 Leave the fourth number out and you get 1. colorize fills it in, so [1, 0, 0] and [1, 0, 0, 1] are the same solid red.`,
-        code: `const { primitives, colors } = require('@jscad/modeling')
-
-function main() {
-  const wall = primitives.cuboid({ size: [90, 6, 30], center: [0, 14, 15] })
-  const parts = [colors.colorize([1, 0.85, 0.2, 1], wall)]
+        code: `function main() {
+  const wall = box(90, 6, 30, { center: [0, 14, 15] })
+  const parts = [colorize([1, 0.85, 0.2, 1], wall)]
 
   const alphas = [1, 0.6, 0.3, 0.1]
   for (let i = 0; i < alphas.length; i++) {
-    const pane = primitives.cuboid({ size: [18, 6, 30], center: [i * 22 - 33, 0, 15] })
-    parts.push(colors.colorize([0.3, 0.8, 1, alphas[i]], pane))
+    const pane = box(18, 6, 30, { center: [i * 22 - 33, 0, 15] })
+    parts.push(colorize([0.3, 0.8, 1, alphas[i]], pane))
   }
 
   return parts
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'A colour name is not a colour',
@@ -2782,16 +2465,12 @@ module.exports = { main }`,
 Convert the name into an array first, then colorize. The next three pages are three ways to get that array.
 
 Uncomment the line in the example and run it — the red banner across the top of the viewer is that error, word for word. Worth seeing once, because it is also what a misspelled colour name gets you, for a reason the next page explains.`,
-        code: `const { primitives, colors } = require('@jscad/modeling')
+        code: `function main() {
+  const block = box(20, 20, 20)
 
-function main() {
-  const block = primitives.cuboid({ size: [20, 20, 20] })
-
-  // colors.colorize('red', block)   <- "color must be an array"
-  return colors.colorize(colors.colorNameToRgb('red'), block)
-}
-
-module.exports = { main }`,
+  // colorize('red', block)   <- "color must be an array"
+  return colorize(colorNameToRgb('red'), block)
+}`,
       },
       {
         title: 'colorNameToRgb',
@@ -2800,21 +2479,17 @@ module.exports = { main }`,
 A name it does not know is where this turns sharp. colorNameToRgb('tomatoe') does not complain. It quietly returns undefined, and colorize then throws color must be an array, which points at the wrong line.
 
 So if you see that error and you are sure you passed an array, check the spelling of the colour name first.`,
-        code: `const { primitives, transforms, colors } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const names = ['tomato', 'gold', 'mediumseagreen', 'deepskyblue', 'orchid']
   const blocks = []
 
   for (let i = 0; i < names.length; i++) {
-    const block = primitives.cuboid({ size: [14, 14, 14] })
-    blocks.push(colors.colorize(colors.colorNameToRgb(names[i]), transforms.translate([i * 18 - 36, 0, 0], block)))
+    const block = box(14, 14, 14)
+    blocks.push(colorize(colorNameToRgb(names[i]), translate([i * 18 - 36, 0, 0], block)))
   }
 
   return blocks
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'hexToRgb',
@@ -2825,21 +2500,17 @@ Eight digits instead of six carry alpha as well. '#ff555580' is that same red, a
 The three-digit shorthand you may have met in CSS is not accepted here: hexToRgb('#f0f') throws the given notation must contain 3 or more hex values. Write the code out in full — '#ff00ff'.
 
 The colors module also carries the converters that run the other way, rgb back to hex and rgb to hsl. Nothing in this course needs them.`,
-        code: `const { primitives, transforms, colors } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const codes = ['#ff5555', '#f1fa8c', '#50fa7b', '#bd93f9']
   const blocks = []
 
   for (let i = 0; i < codes.length; i++) {
-    const block = primitives.cuboid({ size: [16, 16, 16] })
-    blocks.push(colors.colorize(colors.hexToRgb(codes[i]), transforms.translate([i * 20 - 30, 0, 0], block)))
+    const block = box(16, 16, 16)
+    blocks.push(colorize(hexToRgb(codes[i]), translate([i * 20 - 30, 0, 0], block)))
   }
 
   return blocks
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'hslToRgb',
@@ -2848,27 +2519,23 @@ module.exports = { main }`,
 Hue is the one that catches everybody. It is a position round the colour wheel measured as a fraction of one whole turn, not in degrees: 0 is red, a third of the way round is green, two thirds is blue, and 1 is back to red. The twelve spokes step round it.
 
 Both bars in front ask for green. Passing 120 asks for 120 whole turns, and what comes back is black. Passing 120 / 360 is green.`,
-        code: `const { primitives, transforms, colors } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const parts = []
 
   for (let i = 0; i < 12; i++) {
-    const spoke = primitives.cuboid({ size: [18, 6, 6], center: [26, 0, 0] })
-    parts.push(colors.colorize(colors.hslToRgb(i / 12, 1, 0.5),
-      transforms.rotateZ(i / 12 * 2 * Math.PI, spoke)))
+    const spoke = box(18, 6, 6, { center: [26, 0, 0] })
+    parts.push(colorize(hslToRgb(i / 12, 1, 0.5),
+      rotateZ(i / 12 * 2 * Math.PI, spoke)))
   }
 
   // Both bars ask for green. Only the one that divides by 360 gets it.
-  parts.push(colors.colorize(colors.hslToRgb(120, 1, 0.5),
-    primitives.cuboid({ size: [16, 8, 6], center: [-10, -46, 0] })))
-  parts.push(colors.colorize(colors.hslToRgb(120 / 360, 1, 0.5),
-    primitives.cuboid({ size: [16, 8, 6], center: [10, -46, 0] })))
+  parts.push(colorize(hslToRgb(120, 1, 0.5),
+    box(16, 8, 6, { center: [-10, -46, 0] })))
+  parts.push(colorize(hslToRgb(120 / 360, 1, 0.5),
+    box(16, 8, 6, { center: [10, -46, 0] })))
 
   return parts
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Paint last',
@@ -2877,20 +2544,16 @@ module.exports = { main }`,
 Colour does not survive a boolean. union, subtract and intersect each build a brand new solid out of the surfaces where the old ones met, and hand it back with no colour at all — silently, no error.
 
 Both blocks in the example are the same plate with the same hole. The left one was painted blue and then drilled, and it is back to the default orange. The right one was drilled first and painted last. Build, cut, then paint.`,
-        code: `const { primitives, transforms, booleans, colors } = require('@jscad/modeling')
-
-function main() {
-  const plate = primitives.cuboid({ size: [30, 30, 8] })
-  const drill = primitives.cylinder({ radius: 6, height: 20, segments: 32 })
+        code: `function main() {
+  const plate = box(30, 30, 8)
+  const drill = tube(6, 20, { segments: 32 })
   const blue = [0.2, 0.5, 1, 1]
 
-  const lost = booleans.subtract(colors.colorize(blue, plate), drill)
-  const kept = colors.colorize(blue, booleans.subtract(plate, drill))
+  const lost = subtract(colorize(blue, plate), drill)
+  const kept = colorize(blue, subtract(plate, drill))
 
-  return [transforms.translate([-20, 0, 0], lost), transforms.translate([20, 0, 0], kept)]
-}
-
-module.exports = { main }`,
+  return [translate([-20, 0, 0], lost), translate([20, 0, 0], kept)]
+}`,
       },
       {
         title: 'One palette for the whole design',
@@ -2899,28 +2562,24 @@ module.exports = { main }`,
 Keep the colours in one object at the top of the file. Changing the scheme is then one edit instead of nine, and names like base, post and top say what each colour is for rather than what it looks like.
 
 Nothing here is unioned. Each part is still its own solid; main() returns the array.`,
-        code: `const { primitives, colors } = require('@jscad/modeling')
-
-const PALETTE = {
-  base: colors.colorNameToRgb('slategray'),
-  post: colors.colorNameToRgb('goldenrod'),
-  top: colors.hexToRgb('#ff5555'),
+        code: `const PALETTE = {
+  base: colorNameToRgb('slategray'),
+  post: colorNameToRgb('goldenrod'),
+  top: hexToRgb('#ff5555'),
 }
 
 function main() {
-  const base = colors.colorize(PALETTE.base,
-    primitives.cuboid({ size: [50, 50, 6], center: [0, 0, 3] }))
+  const base = colorize(PALETTE.base,
+    box(50, 50, 6, { center: [0, 0, 3] }))
 
-  const post = colors.colorize(PALETTE.post,
-    primitives.cylinder({ radius: 4, height: 40, segments: 32, center: [0, 0, 26] }))
+  const post = colorize(PALETTE.post,
+    tube(4, 40, { segments: 32, center: [0, 0, 26] }))
 
-  const top = colors.colorize(PALETTE.top,
-    primitives.roundedCuboid({ size: [20, 20, 8], roundRadius: 2, center: [0, 0, 50] }))
+  const top = colorize(PALETTE.top,
+    box(20, 20, 8, { roundRadius: 2, center: [0, 0, 50] }))
 
   return [base, post, top]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'A different colour on every face',
@@ -2929,20 +2588,16 @@ module.exports = { main }`,
 A solid is a bag of flat faces. geometries.geom3.toPolygons(solid) hands you the bag — six of them for a cuboid — every face can carry a colour array of its own, and geometries.geom3.create(faces) puts the bag back together into a solid.
 
 The rebuilt cube is a real solid: same size, same volume, and you can still subtract from it. What you cannot have is both. Run a boolean on it and every face colour goes — the same rule as Paint last, two pages back.`,
-        code: `const { primitives, geometries, colors } = require('@jscad/modeling')
-
-function main() {
-  const cube = primitives.cuboid({ size: [30, 30, 30] })
-  const faces = geometries.geom3.toPolygons(cube)
+        code: `function main() {
+  const cube = box(30, 30, 30)
+  const faces = geom3.toPolygons(cube)
 
   for (let i = 0; i < faces.length; i++) {
-    faces[i].color = colors.hslToRgb(i / faces.length, 0.8, 0.55)
+    faces[i].color = hslToRgb(i / faces.length, 0.8, 0.55)
   }
 
-  return geometries.geom3.create(faces)
-}
-
-module.exports = { main }`,
+  return geom3.create(faces)
+}`,
       },
     ],
   },
@@ -2963,20 +2618,16 @@ Three steps turn strokes into something you could hold, and the example is all t
 Two bits of JavaScript may be new. The curly braces on line 1 pull three modules out of the library and give them names. And "for (const stroke of strokes)" runs the lines inside it once per stroke.
 
 Read this program once. Every page after it changes one piece and leaves the rest alone. Start by changing HI to your own name.`,
-        code: `const { text, geometries, extrusions } = require('@jscad/modeling')
-
-function main() {
-  const strokes = text.vectorText({ height: 10, input: 'HI' })
+        code: `function main() {
+  const strokes = vectorText({ height: 10, input: 'HI' })
 
   const paths = []
   for (const stroke of strokes) {
-    paths.push(geometries.path2.fromPoints({}, stroke))
+    paths.push(path2.fromPoints({}, stroke))
   }
 
-  return extrusions.extrudeRectangular({ size: 1, height: 2 }, paths)
-}
-
-module.exports = { main }`,
+  return extrudeRectangular({ size: 1, height: 2 }, paths)
+}`,
       },
       {
         title: 'How tall, how fat',
@@ -2987,20 +2638,16 @@ height inside vectorText is not the height of a capital. It is the height of a l
 size inside extrudeRectangular is half the pen width: size 1 draws a 2 mm stroke, size 0.5 a 1 mm one. Leave it out and you get 1 — a 2 mm pen, a third of the height of a 6 mm letter. Hence 0.5 here.
 
 height inside extrudeRectangular is the odd one out. It is how far the letters stand up off the ground, and has nothing to do with letter size. Read which braces each one sits in.`,
-        code: `const { text, geometries, extrusions } = require('@jscad/modeling')
-
-function main() {
-  const strokes = text.vectorText({ height: 6, input: 'shCode' })
+        code: `function main() {
+  const strokes = vectorText({ height: 6, input: 'shCode' })
 
   const paths = []
   for (const stroke of strokes) {
-    paths.push(geometries.path2.fromPoints({}, stroke))
+    paths.push(path2.fromPoints({}, stroke))
   }
 
-  return extrusions.extrudeRectangular({ size: 0.5, height: 2 }, paths)
-}
-
-module.exports = { main }`,
+  return extrudeRectangular({ size: 0.5, height: 2 }, paths)
+}`,
       },
       {
         title: 'Why not extrudeLinear',
@@ -3014,19 +2661,15 @@ Use it anyway and what happens depends on what you hand it. Neither answer is fr
 O is the exception, and this page uses it. O arrives as one stroke of 21 points whose last point is the first point again, so fromPoints marks that path closed and extrudeLinear fills it happily. Two Os appear: the left one solid through and through, the right one an outline. Same letter, two functions, volume 419 against 257.
 
 extrudeRectangular never asks whether a path closes. That is why this section uses it everywhere else.`,
-        code: `const { text, geometries, extrusions, transforms } = require('@jscad/modeling')
+        code: `function main() {
+  const strokes = vectorText({ height: 10, input: 'O' })
+  const ring = path2.fromPoints({}, strokes[0])
 
-function main() {
-  const strokes = text.vectorText({ height: 10, input: 'O' })
-  const ring = geometries.path2.fromPoints({}, strokes[0])
+  const filled = extrude(3, ring)
+  const outline = extrudeRectangular({ size: 1, height: 3 }, [ring])
 
-  const filled = extrusions.extrudeLinear({ height: 3 }, ring)
-  const outline = extrusions.extrudeRectangular({ size: 1, height: 3 }, [ring])
-
-  return [filled, transforms.translate([20, 0, 0], outline)]
-}
-
-module.exports = { main }`,
+  return [filled, translate([20, 0, 0], outline)]
+}`,
       },
       {
         title: 'Finding the middle of a word',
@@ -3037,24 +2680,20 @@ measureAggregateBoundingBox gives the smallest box the whole group fits inside. 
 Half that width is not quite the answer, because the word does not begin at exactly zero. Subtract the left edge first, then half the width.
 
 The trap is the other measure function. Twelve paths make twelve separate solids, and measureBoundingBox on a list of twelve gives twelve boxes — so box[0][0] is a corner, [1.14, -1, 0], not a number. Subtracting one array from another in JavaScript is NaN, and nothing objects: translate takes NaN without a word, every x in the model becomes NaN, and no error appears anywhere. NaN is not a place anything can be drawn. On a group, use the Aggregate one.`,
-        code: `const { text, geometries, extrusions, transforms, measurements } = require('@jscad/modeling')
-
-function main() {
-  const strokes = text.vectorText({ height: 10, input: 'SHCODE' })
+        code: `function main() {
+  const strokes = vectorText({ height: 10, input: 'SHCODE' })
 
   const paths = []
   for (const stroke of strokes) {
-    paths.push(geometries.path2.fromPoints({}, stroke))
+    paths.push(path2.fromPoints({}, stroke))
   }
-  const letters = extrusions.extrudeRectangular({ size: 1, height: 2 }, paths)
+  const letters = extrudeRectangular({ size: 1, height: 2 }, paths)
 
-  const box = measurements.measureAggregateBoundingBox(letters)
+  const box = measureAggregateBoundingBox(letters)
   const width = box[1][0] - box[0][0]
 
-  return transforms.translate([-box[0][0] - width / 2, 0, 0], letters)
-}
-
-module.exports = { main }`,
+  return translate([-box[0][0] - width / 2, 0, 0], letters)
+}`,
       },
       {
         title: 'A name tag',
@@ -3067,36 +2706,28 @@ Engraved letters are cut in, and booleans.subtract takes the letter shapes out o
 That 1 mm is the number to remember. Letters standing 1 mm proud read clearly and print reliably; 5 mm looks like a mistake and snaps off in a pocket. Engraved, 1 mm deep is the same story.
 
 The plate sizes itself from the measured width, so a longer name still fits: width + 14 leaves 7 mm past each end. The two tags come back 30 mm apart.`,
-        code: `const {
-  text, geometries, extrusions, transforms, measurements, primitives, booleans,
-} = require('@jscad/modeling')
-
-function main() {
-  const strokes = text.vectorText({ height: 8, input: 'ADA' })
+        code: `function main() {
+  const strokes = vectorText({ height: 8, input: 'ADA' })
 
   const paths = []
   for (const stroke of strokes) {
-    paths.push(geometries.path2.fromPoints({}, stroke))
+    paths.push(path2.fromPoints({}, stroke))
   }
 
-  const raised = extrusions.extrudeRectangular({ size: 0.9, height: 1 }, paths)
-  const cutter = extrusions.extrudeRectangular({ size: 0.9, height: 2 }, paths)
+  const raised = extrudeRectangular({ size: 0.9, height: 1 }, paths)
+  const cutter = extrudeRectangular({ size: 0.9, height: 2 }, paths)
 
-  const box = measurements.measureAggregateBoundingBox(raised)
-  const width = box[1][0] - box[0][0]
-  const shift = -box[0][0] - width / 2
+  const cuboid = measureAggregateBoundingBox(raised)
+  const width = cuboid[1][0] - cuboid[0][0]
+  const shift = -cuboid[0][0] - width / 2
 
-  const plate = primitives.roundedCuboid({
-    size: [width + 14, 24, 3], roundRadius: 1.4, center: [0, 0, 1.5],
-  })
+  const plate = box(width + 14, 24, 3, { roundRadius: 1.4, center: [0, 0, 1.5] })
 
-  const tag = booleans.union(plate, transforms.translate([shift, -6, 3], raised))
-  const dug = booleans.subtract(plate, transforms.translate([shift, -6, 2], cutter))
+  const tag = union(plate, translate([shift, -6, 3], raised))
+  const dug = subtract(plate, translate([shift, -6, 2], cutter))
 
-  return [tag, transforms.translate([0, 30, 0], dug)]
-}
-
-module.exports = { main }`,
+  return [tag, translate([0, 30, 0], dug)]
+}`,
       },
       {
         title: 'One letter at a time',
@@ -3109,25 +2740,21 @@ So the loop keeps a variable x meaning "where the next letter goes", moves each 
 Two things to notice. "for (const character of 'ADA LAB')" walks a string one character at a time. And a space is a real character: width 11.4 mm, zero segments — so the inner loop never runs while x moves along anyway, which is exactly what a space is for.
 
 Guard that zero. extrudeRectangular refuses an empty list, with the unhelpful message "wrong number of arguments". Collecting every path into one list and extruding once at the end means a space can never hand it an empty one.`,
-        code: `const { text, geometries, extrusions, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const paths = []
   let x = 0
 
   for (const character of 'ADA LAB') {
-    const letter = text.vectorChar({ height: 10, input: character })
+    const letter = vectorChar({ height: 10, input: character })
     for (const stroke of letter.segments) {
-      const path = geometries.path2.fromPoints({}, stroke)
-      paths.push(transforms.translate([x, 0], path))
+      const path = path2.fromPoints({}, stroke)
+      paths.push(translate([x, 0], path))
     }
     x = x + letter.width + 4
   }
 
-  return extrusions.extrudeRectangular({ size: 1, height: 2 }, paths)
-}
-
-module.exports = { main }`,
+  return extrudeRectangular({ size: 1, height: 2 }, paths)
+}`,
       },
     ],
   },
@@ -3144,25 +2771,22 @@ A vec3 is a plain JavaScript array and nothing more. No new kind of object, no c
 So why bother? Because a position that has a name can be worked on. Once corner is a variable, the functions on the next pages can measure from it, add to it and halve it — and every shape built from it moves together when you edit the one line that made it.
 
 Two spellings reach the module: maths.vec3, or const { vec3 } = maths once you have pulled maths out of require. There is a vec3.create() as well, which hands back [0, 0, 0] — a blank one, which turns out to matter on the next page.`,
-      code: `const { primitives, transforms, maths } = require('@jscad/modeling')
-const { vec3 } = maths
+      code: `const { vec3 } = maths
 
 function main() {
-  const box = primitives.cuboid({ size: [48, 28, 12] })
+  const cuboid = box(48, 28, 12)
 
   // A vec3 IS the array. fromValues just builds [24, 14, 6] and hands it back.
   const corner = vec3.fromValues(24, 14, 6)
   console.log('corner is', corner)
 
   // So it goes straight into translate, which wanted an [x, y, z] all along.
-  const marker = transforms.translate(corner,
-    primitives.sphere({ radius: 3, segments: 24 })
+  const marker = translate(corner,
+    ball(3, { segments: 24 })
   )
 
-  return [box, marker]
-}
-
-module.exports = { main }`,
+  return [cuboid, marker]
+}`,
     },
     {
       title: 'Adding and halving positions',
@@ -3177,8 +2801,7 @@ The blank vec3.create() is the destination. The function fills it in and hands i
 Pass a new vec3.create() and you never have to think about it again. Pass one of your own vectors instead and it gets overwritten — vec3.add(hub, hub, reach) changes hub, and the position it used to hold is gone. That is the same pass-by-reference behaviour every JavaScript array has; it is just easier to walk into here, because overwriting is what the argument is for.
 
 Not everything wants a destination. The ones that build a vector out of nothing — create and fromValues — have nothing to write over, and the ones that hand back a plain number have nowhere to put it.`,
-      code: `const { primitives, transforms, maths } = require('@jscad/modeling')
-const { vec3 } = maths
+      code: `const { vec3 } = maths
 
 function main() {
   const hub = vec3.fromValues(0, 0, 6)
@@ -3190,18 +2813,16 @@ function main() {
   const halfway = vec3.add(vec3.create(), hub, vec3.scale(vec3.create(), reach, 0.5))
   console.log('left', left, 'right', right)
 
-  const ball = primitives.sphere({ radius: 5, segments: 24 })
-  const pin = primitives.sphere({ radius: 3, segments: 24 })
+  const sphere = ball(5, { segments: 24 })
+  const pin = ball(3, { segments: 24 })
 
   // Edit reach, and all three of these move.
   return [
-    transforms.translate(left, ball),
-    transforms.translate(right, ball),
-    transforms.translate(halfway, pin),
+    translate(left, sphere),
+    translate(right, sphere),
+    translate(halfway, pin),
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'How far apart two points are',
@@ -3214,8 +2835,7 @@ That is worth the extra line, because the alternative is reading the gap off the
 So test it. Change either peg to anything you like, including numbers with a Z in them, and the ring still lands on both. It has to: the radius and the centre are both worked out from wherever the two pegs ended up.
 
 Measuring a shape you already built, rather than two points you chose, is a different module — see Measurements, under Centering something you did not build.`,
-      code: `const { primitives, transforms, booleans, maths } = require('@jscad/modeling')
-const { vec3 } = maths
+      code: `const { vec3 } = maths
 
 function main() {
   // Move either peg. The ring still lands on both.
@@ -3229,21 +2849,19 @@ function main() {
   const mid = vec3.scale(vec3.create(), vec3.add(vec3.create(), a, b), 0.5)
   console.log('halfway is', mid)
 
-  const ring = booleans.subtract(
-    primitives.cylinder({ radius: gap / 2 + 2, height: 4, segments: 64 }),
-    primitives.cylinder({ radius: gap / 2 - 2, height: 6, segments: 64 })
+  const ring = subtract(
+    tube(gap / 2 + 2, 4, { segments: 64 }),
+    tube(gap / 2 - 2, 6, { segments: 64 })
   )
 
-  const peg = primitives.cylinder({ radius: 3, height: 16, segments: 24 })
+  const peg = tube(3, 16, { segments: 24 })
 
   return [
-    transforms.translate(mid, ring),
-    transforms.translate(a, peg),
-    transforms.translate(b, peg),
+    translate(mid, ring),
+    translate(a, peg),
+    translate(b, peg),
   ]
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'A direction with no length',
@@ -3256,8 +2874,7 @@ That is the trick below. Normalize the trip from peg to peg, scale the result to
 vec3.length(v) is how you check. It hands back how long a vector is, and for a normalized one it says 1. Print it and see.
 
 One thing to know before it bites: normalizing [0, 0, 0] gives [0, 0, 0] back with no error at all, because a vector of no length has no direction to keep. If a row of copies piles up in a single spot instead of spreading out, that is the symptom — the two points you subtracted are the same point.`,
-      code: `const { primitives, transforms, maths } = require('@jscad/modeling')
-const { vec3 } = maths
+      code: `const { vec3 } = maths
 
 function main() {
   const a = vec3.fromValues(-20, -10, 0)
@@ -3270,19 +2887,17 @@ function main() {
   console.log('step is', step[0].toFixed(2), step[1].toFixed(2), step[2].toFixed(2),
     'and', vec3.length(step).toFixed(3), 'mm long')
 
-  const bead = primitives.sphere({ radius: 3, segments: 24 })
-  const peg = primitives.cylinder({ radius: 2, height: 14, segments: 24 })
+  const bead = ball(3, { segments: 24 })
+  const peg = tube(2, 14, { segments: 24 })
 
-  const parts = [transforms.translate(a, peg), transforms.translate(b, peg)]
+  const parts = [translate(a, peg), translate(b, peg)]
   const hops = Math.floor(vec3.length(along) / 10)
   for (let i = 0; i <= hops; i++) {
     const out = vec3.scale(vec3.create(), step, i)
-    parts.push(transforms.translate(vec3.add(vec3.create(), a, out), bead))
+    parts.push(translate(vec3.add(vec3.create(), a, out), bead))
   }
   return parts
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'Radians are a distance',
@@ -3297,29 +2912,25 @@ Write the whole path, not a bare TAU. Books and forum answers write angle: TAU b
 The fourth arm is the mistake this page exists to prevent. rotateZ(90) is perfectly legal and means 90 radians, which is fourteen whole turns and a bit, finishing at 116.6 degrees. Nothing warns you. You just get an arm pointing somewhere odd.
 
 degToRad and radToDeg live in the top-level utils module, covered in Transforms, under Turning by degrees. Watch the name: written bare, utils is that top-level module, and the maths module has a different utils of its own that you reach as maths.utils.`,
-      code: `const { primitives, transforms, utils, maths } = require('@jscad/modeling')
-
-function main() {
-  const arm = primitives.cuboid({ size: [40, 3, 3], center: [20, 0, 0] })
+      code: `function main() {
+  const arm = box(40, 3, 3, { center: [20, 0, 0] })
 
   // The same quarter turn, spelled three ways.
-  const quarterTurn = [Math.PI / 2, utils.degToRad(90), maths.constants.TAU / 4]
+  const quarterTurn = [Math.PI / 2, degToRad(90), constants.TAU / 4]
   console.log('three spellings of a quarter turn:', quarterTurn.join(' '))
 
   const parts = [arm]
   for (let i = 0; i < quarterTurn.length; i++) {
-    parts.push(transforms.rotateZ(quarterTurn[i], arm))
+    parts.push(rotateZ(quarterTurn[i], arm))
   }
 
   // The mistake: this is 90 RADIANS, not 90 degrees. Lifted so you can see it.
-  const wrong = transforms.rotateZ(90, transforms.translateZ(8, arm))
-  console.log('90 radians lands at', utils.radToDeg(90 % maths.constants.TAU).toFixed(1), 'degrees')
+  const wrong = rotateZ(90, translateZ(8, arm))
+  console.log('90 radians lands at', radToDeg(90 % constants.TAU).toFixed(1), 'degrees')
   parts.push(wrong)
 
   return parts
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'A point on a circle, from the angle',
@@ -3332,25 +2943,22 @@ vec2.fromAngleRadians is the same function for an angle already in radians, whic
 The catch is that translate wants three numbers and a vec2 has two, so the height goes in by hand: [at[0], at[1], 0].
 
 This is the same ring as Patterns, under A ring with sin and cos, and the same numbers come out of it. Use whichever one says more clearly what you meant. There is no vec3 twin of these two, because a direction in 3D takes two angles to pin down, not one.`,
-      code: `const { primitives, transforms, maths } = require('@jscad/modeling')
-const { vec2 } = maths
+      code: `const { vec2 } = maths
 
 function main() {
   const radius = 40
-  const parts = [primitives.cylinder({ radius: 12, height: 6, segments: 48 })]
-  const post = primitives.cylinder({ radius: 4, height: 12, segments: 24 })
+  const parts = [tube(12, 6, { segments: 48 })]
+  const post = tube(4, 12, { segments: 24 })
 
   for (let i = 0; i < 12; i++) {
     // The point on a circle of radius 1, straight from the angle.
     const dir = vec2.fromAngleDegrees(vec2.create(), i * 30)
     const at = vec2.scale(vec2.create(), dir, radius)
     // A vec2 is two numbers; translate wants three.
-    parts.push(transforms.translate([at[0], at[1], 0], post))
+    parts.push(translate([at[0], at[1], 0], post))
   }
   return parts
-}
-
-module.exports = { main }`,
+}`,
     },
     {
       title: 'A placement you can keep',
@@ -3363,16 +2971,15 @@ Three functions build it. mat4.fromTranslation(mat4.create(), [50, 0, 0]) is a m
 transforms.transform(placement, shape) applies it, and like every transform it hands back a new shape and leaves the original alone. Run it and there are two cranes: the base swings a quarter turn and slides 50 mm out, and the mast, boom and head come with it, still bolted together the same way. Change the 50 and the whole crane moves — one number, four parts.
 
 For a single shape, translate and rotate are shorter and you should keep using them. The matrix earns its place the moment a placement needs a name.`,
-      code: `const { primitives, transforms, maths } = require('@jscad/modeling')
-const { mat4 } = maths
+      code: `const { mat4 } = maths
 
 // Four parts, each built where it belongs on the crane.
 function crane() {
   return [
-    primitives.cuboid({ size: [20, 20, 4], center: [0, 0, 2] }),
-    primitives.cuboid({ size: [4, 4, 24], center: [0, 0, 16] }),
-    primitives.cuboid({ size: [20, 4, 4], center: [10, 0, 26] }),
-    primitives.sphere({ radius: 4, segments: 24, center: [20, 0, 26] }),
+    box(20, 20, 4, { center: [0, 0, 2] }),
+    box(4, 4, 24, { center: [0, 0, 16] }),
+    box(20, 4, 4, { center: [10, 0, 26] }),
+    ball(4, { segments: 24, center: [20, 0, 26] }),
   ]
 }
 
@@ -3386,12 +2993,10 @@ function main() {
   const parts = crane()
   const copy = []
   for (let i = 0; i < parts.length; i++) {
-    copy.push(transforms.transform(place, parts[i]))
+    copy.push(transform(place, parts[i]))
   }
   return parts.concat(copy)
-}
-
-module.exports = { main }`,
+}`,
     },
   ],
 },
@@ -3642,18 +3247,14 @@ module.exports = { main, getParameterDefinitions }`,
 The viewport draws everything in the array. Nothing merges: three shapes in an array are three separate solids that happen to be sitting near each other. If you need them fused into one object, that is what booleans.union is for, and there is a page on doing that to a whole array further down.
 
 This one fact is what makes the rest of this section possible. A loop's job is to build an array, and main() is happy to be handed one.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
-  const left = transforms.translate([-22, 0, 0], primitives.cube({ size: 12 }))
-  const middle = primitives.sphere({ radius: 7, segments: 32 })
-  const right = transforms.translate([22, 0, 0],
-    primitives.cylinder({ radius: 6, height: 12, segments: 32 })
+        code: `function main() {
+  const left = translate([-22, 0, 0], box(12, 12, 12))
+  const middle = ball(7, { segments: 32 })
+  const right = translate([22, 0, 0],
+    tube(6, 12, { segments: 32 })
   )
   return [left, middle, right]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Your first loop',
@@ -3664,18 +3265,14 @@ A for loop repeats a block of code, counting as it goes. for (let i = 0; i < 5; 
 The recipe is always the same three moves. Make an empty array. Inside the loop, build one shape and push it onto the end of the array. After the loop, return the array.
 
 The only line that does anything interesting is the position, and it is the counter times a spacing. i * 14 puts each post 14 mm further along X than the one before.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const posts = []
   for (let i = 0; i < 5; i++) {
-    const post = primitives.cuboid({ size: [8, 8, 30] })
-    posts.push(transforms.translate([i * 14, 0, 15], post))
+    const post = box(8, 8, 30)
+    posts.push(translate([i * 14, 0, 15], post))
   }
   return posts
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Give the numbers names',
@@ -3686,23 +3283,19 @@ Lift them to the top of main() as variables with names. Now count and spacing sa
 The row also runs off to the right, because the first post sits at x = 0 and the rest march away from it. To centre it on the origin, work out how wide the whole row is — the gaps between the posts, which is (count - 1) * spacing — and slide everything back by half of that.
 
 Nine posts, 14 mm apart, is a row 112 mm wide. Subtracting 56 puts the middle post at x = 0 and the ends at -56 and +56.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const count = 9
   const spacing = 14
   const width = (count - 1) * spacing
 
   const posts = []
   for (let i = 0; i < count; i++) {
-    posts.push(transforms.translate([i * spacing - width / 2, 0, 15],
-      primitives.cuboid({ size: [8, 8, 30] })
+    posts.push(translate([i * spacing - width / 2, 0, 15],
+      box(8, 8, 30)
     ))
   }
   return posts
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'map(): one shape per value',
@@ -3713,21 +3306,17 @@ Every array has a .map() method. It walks the array, hands each value to a funct
 The function is written in the short arrow form: (h, i) => ... means "given h and i, produce this". The first parameter is the value out of the array, the second is its position in the array, counting from 0 — the same counter the for loop was giving you.
 
 Nothing here is magic and nothing is faster. The same row could be written with a for loop. map is worth knowing because when the data comes first, it reads in the order you thought of it: here are the heights, turn each one into a bar.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const heights = [10, 24, 18, 32, 12]
   const spacing = 12
   const width = (heights.length - 1) * spacing
 
   return heights.map((h, i) =>
-    transforms.translate([i * spacing - width / 2, 0, h / 2],
-      primitives.cuboid({ size: [9, 9, h] })
+    translate([i * spacing - width / 2, 0, h / 2],
+      box(9, 9, h)
     )
   )
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Array.from(): when there is no list yet',
@@ -3738,21 +3327,17 @@ Array.from({ length: count }, (_, i) => ...) does both steps at once: it makes a
 The underscore in (_, i) is a real parameter, holding the value in the slot — which is nothing, because the slots start out empty. Naming it _ is the usual way of saying "this one is here so I can reach the one after it, and I am not going to use it".
 
 Use whichever of the three forms you can read back in a month. A for loop when the body has several steps in it, map when you already have the data, Array.from when you only have a count. They all produce the same array of shapes.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const count = 7
   const spacing = 13
   const width = (count - 1) * spacing
 
   return Array.from({ length: count }, (_, i) =>
-    transforms.translate([i * spacing - width / 2, 0, 0],
-      primitives.cylinder({ radius: 5, height: 6, segments: 32 })
+    translate([i * spacing - width / 2, 0, 0],
+      tube(5, 6, { segments: 32 })
     )
   )
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'A grid: two loops',
@@ -3763,9 +3348,7 @@ Both counters need names you can tell apart. Call them col and row rather than i
 Centring works the way it did for the row, just twice — half the width off X, half the depth off Y.
 
 The plate is pushed into the array before the loop runs. An array of shapes does not care where its contents came from, so a loop's output and a single hand-placed part can sit in the same list.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const cols = 6
   const rows = 4
   const pitch = 12
@@ -3773,20 +3356,18 @@ function main() {
   const yShift = (rows - 1) * pitch / 2
 
   const parts = [
-    primitives.cuboid({ size: [cols * pitch, rows * pitch, 4], center: [0, 0, -2] })
+    box(cols * pitch, rows * pitch, 4, { center: [0, 0, -2] })
   ]
   for (let col = 0; col < cols; col++) {
     for (let row = 0; row < rows; row++) {
-      parts.push(transforms.translate(
+      parts.push(translate(
         [col * pitch - xShift, row * pitch - yShift, 3],
-        primitives.cylinder({ radius: 4, height: 6, segments: 24 })
+        tube(4, 6, { segments: 24 })
       ))
     }
   }
   return parts
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Copies that change as they go',
@@ -3797,9 +3378,7 @@ Here the height is 5 + i * 4. Step 0 is 5 mm tall, step 1 is 9, and by step 9 it
 Watch the Z position when a size changes. cuboid builds its box centred on the point you put it at, so a 41 mm step placed at z = 0 would sink halfway through the floor. Moving it up by half its own height — height / 2 — lands every step flat on the grid no matter how tall it is. That is the same trick every time: half of whatever the size is.
 
 This is where a loop stops being a way to save typing and starts being a design. A curve, a wedge, a spiral, a set of shelves that get deeper towards the bottom — all of them are one arithmetic expression away from the row you already have.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const count = 10
   const spacing = 11
   const width = (count - 1) * spacing
@@ -3807,14 +3386,12 @@ function main() {
   const steps = []
   for (let i = 0; i < count; i++) {
     const height = 5 + i * 4
-    steps.push(transforms.translate([i * spacing - width / 2, 0, height / 2],
-      primitives.cuboid({ size: [9, 24, height] })
+    steps.push(translate([i * spacing - width / 2, 0, height / 2],
+      box(9, 24, height)
     ))
   }
   return steps
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Skipping and alternating',
@@ -3825,9 +3402,7 @@ continue means "stop this trip and go straight to the next one". Nothing gets pu
 For every-other-one behaviour, use the remainder operator, written %. It gives you what is left over after a division, so i % 2 is 0 for even counters and 1 for odd ones. Testing i % 2 === 0 splits the loop into two alternating cases; i % 3 === 0 would mark every third one instead.
 
 Both tests read the counter, so both survive a change to count. Twelve teeth or forty, the gap stays in the middle and the tall ones stay alternating.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const count = 12
   const spacing = 10
   const width = (count - 1) * spacing
@@ -3836,14 +3411,12 @@ function main() {
   for (let i = 0; i < count; i++) {
     if (i === 5 || i === 6) continue
     const height = i % 2 === 0 ? 26 : 14
-    teeth.push(transforms.translate([i * spacing - width / 2, 0, height / 2],
-      primitives.cuboid({ size: [6, 6, height] })
+    teeth.push(translate([i * spacing - width / 2, 0, height / 2],
+      box(6, 6, height)
     ))
   }
   return teeth
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'A ring with sin and cos',
@@ -3856,27 +3429,23 @@ The angle comes from the counter, by sharing one full turn among the copies: ang
 If each copy should face outward, rotate it before you move it. rotateZ turns a shape about the origin, so a shape still sitting at the origin spins on the spot; one that has already been translated 40 mm out would swing around the centre instead. Turn first, then translate.
 
 There is a second way to get a ring, and it is not this one: extrusions.extrudeRotate sweeps a single 2D shape into one continuous solid. Loop when you want separate copies with gaps between them. Sweep when you want an unbroken ring.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const count = 12
   const radius = 40
 
   const spokes = [
-    primitives.cylinder({ radius: 34, height: 5, segments: 64, center: [0, 0, 2.5] })
+    tube(34, 5, { segments: 64, center: [0, 0, 2.5] })
   ]
   for (let i = 0; i < count; i++) {
     const angle = i / count * 2 * Math.PI
-    const spoke = primitives.cuboid({ size: [16, 5, 5] })
-    spokes.push(transforms.translate(
+    const spoke = box(16, 5, 5)
+    spokes.push(translate(
       [radius * Math.cos(angle), radius * Math.sin(angle), 2.5],
-      transforms.rotateZ(angle, spoke)
+      rotateZ(angle, spoke)
     ))
   }
   return spokes
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'From a list of shapes to one solid',
@@ -3887,22 +3456,18 @@ Three dots fix it. Written in front of an array in a call, ... is the spread ope
 The same move does holes, which is the more useful half. Build the solid, loop to build an array of the shapes you want gone, then subtract them all in one call: booleans.subtract(plate, ...holes). Six holes or sixty, the line does not change.
 
 Make each hole longer than the material it passes through. The cylinders here are 10 mm tall in a 6 mm plate, so they poke out both faces. A hole exactly as deep as the plate leaves the two surfaces touching at the top and bottom, and a boolean between two surfaces in the same place is the classic way to get a hole that does not quite go through.`,
-        code: `const { primitives, transforms, booleans } = require('@jscad/modeling')
-
-function main() {
-  const plate = primitives.cuboid({ size: [90, 30, 6] })
+        code: `function main() {
+  const plate = box(90, 30, 6)
 
   const holes = []
   for (let i = 0; i < 6; i++) {
-    holes.push(transforms.translate([i * 14 - 35, 0, 0],
-      primitives.cylinder({ radius: 3.5, height: 10, segments: 32 })
+    holes.push(translate([i * 14 - 35, 0, 0],
+      tube(3.5, 10, { segments: 32 })
     ))
   }
 
-  return booleans.subtract(plate, ...holes)
-}
-
-module.exports = { main }`,
+  return subtract(plate, ...holes)
+}`,
       },
       {
         title: 'Wrapping a pattern in a function',
@@ -3913,29 +3478,25 @@ A function's parameters are the parts you want to vary. Here they are the count,
 It returns an array, so spreading it — the same three dots from the last page — pours both rings into one list for main() to return.
 
 Naming the pattern is most of the benefit. A month from now, ring(18, 40, tooth) still says what it builds; the loop it replaced would need reading line by line before you could be sure.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-// One job: hand back count copies of a shape, spaced around a circle.
+        code: `// One job: hand back count copies of a shape, spaced around a circle.
 function ring(count, radius, shape) {
   return Array.from({ length: count }, (_, i) => {
     const angle = i / count * 2 * Math.PI
-    return transforms.translate(
+    return translate(
       [radius * Math.cos(angle), radius * Math.sin(angle), 0],
-      transforms.rotateZ(angle, shape)
+      rotateZ(angle, shape)
     )
   })
 }
 
 function main() {
-  const peg = primitives.cylinder({ radius: 3, height: 12, segments: 24 })
-  const tooth = primitives.cuboid({ size: [9, 4, 12] })
+  const peg = tube(3, 12, { segments: 24 })
+  const tooth = box(9, 4, 12)
   return [
     ...ring(6, 16, peg),
     ...ring(18, 40, tooth)
   ]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Counting the cost',
@@ -3946,24 +3507,20 @@ Every curved primitive is really a lot of flat faces, and segments is how many. 
 Multiply that by your loop. The twenty spheres below are 20 x 128 = 2560 faces, which is nothing. The same twenty at segments: 64 would be 40,960, for a difference nobody can see at this size. A 60 x 60 grid is 3600 copies before you have chosen a shape at all — that is the number to be suspicious of, not the segments.
 
 So: pick the smallest segments that still looks round at the size the part will actually be, and sanity-check the count with a console.log before you scale a working pattern up. If the viewport goes quiet after an edit, the shape count is the first thing to check.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const count = 20
   const spacing = 9
   const width = (count - 1) * spacing
 
   const balls = []
   for (let i = 0; i < count; i++) {
-    balls.push(transforms.translate([i * spacing - width / 2, 0, 0],
-      primitives.sphere({ radius: 4, segments: 16 })
+    balls.push(translate([i * spacing - width / 2, 0, 0],
+      ball(4, { segments: 16 })
     ))
   }
   console.log('shapes returned:', balls.length)
   return balls
-}
-
-module.exports = { main }`,
+}`,
       },
     ],
   },
@@ -3978,15 +3535,11 @@ module.exports = { main }`,
 STL holds exactly one thing: a list of triangles. Every curve in your model has already been chopped into flat triangles by the time it is written — this washer becomes 696 of them, which is why the file is 34 KB for a shape you described in four lines.
 
 The program that turns an STL into instructions for a printer is called a slicer. Cura, PrusaSlicer and Bambu Studio are all slicers. Open model.stl in any of them and the same washer is sitting there, ready to print.`,
-        code: `const { primitives, booleans } = require('@jscad/modeling')
-
-function main() {
-  const disc = primitives.cylinder({ radius: 20, height: 4, segments: 64, center: [0, 0, 2] })
-  const hole = primitives.cylinder({ radius: 6, height: 10, segments: 64, center: [0, 0, 2] })
-  return booleans.subtract(disc, hole)
-}
-
-module.exports = { main }`,
+        code: `function main() {
+  const disc = tube(20, 4, { segments: 64, center: [0, 0, 2] })
+  const hole = tube(6, 10, { segments: 64, center: [0, 0, 2] })
+  return subtract(disc, hole)
+}`,
       },
       {
         title: 'STL forgets colour, 3MF remembers',
@@ -3997,19 +3550,15 @@ The STL is 10 KB of nothing but triangles. There is nowhere in the format to put
 3MF is newer, and underneath it is a zip file. Rename model.3mf to model.zip, open it, and read 3D/3dmodel.model inside. It is plain text, and it says displaycolor="#FFD633FF" — the exact gold you asked for — beside displaycolor="#9999A5FF" for the body. It is also the smaller of the two files, because zipping text is cheap.
 
 Printing in one colour: STL. Printing in two, or on a printer that can swap filament: 3MF.`,
-        code: `const { primitives, colors } = require('@jscad/modeling')
-
-function main() {
-  const body = colors.colorize([0.6, 0.6, 0.65],
-    primitives.cuboid({ size: [20, 20, 20], center: [0, 0, 10] })
+        code: `function main() {
+  const body = colorize([0.6, 0.6, 0.65],
+    box(20, 20, 20, { center: [0, 0, 10] })
   )
-  const cap = colors.colorize([1, 0.84, 0],
-    primitives.cylinder({ radius: 6, height: 6, segments: 48, center: [0, 0, 23] })
+  const cap = colorize([1, 0.84, 0],
+    tube(6, 6, { segments: 48, center: [0, 0, 23] })
   )
   return [body, cap]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'OBJ, and choosing between the three',
@@ -4022,13 +3571,9 @@ Which format:
 - STL — printing. Every slicer reads it.
 - 3MF — printing in colour, or when the file needs to be small.
 - OBJ — handing the model to graphics software like Blender. Not for printing.`,
-        code: `const { primitives } = require('@jscad/modeling')
-
-function main() {
-  return primitives.cuboid({ size: [10, 10, 10], center: [0, 0, 5] })
-}
-
-module.exports = { main }`,
+        code: `function main() {
+  return box(10, 10, 10, { center: [0, 0, 5] })
+}`,
       },
       {
         title: 'Every number is a millimetre',
@@ -4037,15 +3582,11 @@ module.exports = { main }`,
 The grid under your model is the ruler. Each large square is 10 mm across and each small one is 1 mm, so you can count this box off the floor: five big squares one way, three the other, one deep. The console line agrees: 50, 30, 10.
 
 Check the size before you print, not after. A common school printer can make something about 220 mm wide, 220 mm deep and 250 mm tall, and no bigger. Anything larger has to be cut into pieces and glued, which is much better to find out now than six hours in.`,
-        code: `const { primitives, measurements } = require('@jscad/modeling')
-
-function main() {
-  const part = primitives.cuboid({ size: [50, 30, 10], center: [0, 0, 5] })
-  console.log('size in mm:', measurements.measureDimensions(part))
+        code: `function main() {
+  const part = box(50, 30, 10, { center: [0, 0, 5] })
+  console.log('size in mm:', measureDimensions(part))
   return part
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Put it on the plate',
@@ -4054,21 +3595,17 @@ module.exports = { main }`,
 The grid is the build plate. A slicer has nowhere to put a buried half: some quietly drop the whole model onto the plate for you, some refuse to open it, and neither is what you meant.
 
 So build the part where it is going to be printed. Give the shape a center as you make it — center: [0, 0, 10] for a 20 mm cube — or translate it up afterwards. The two do the same job, so pick whichever reads better in the line you are writing.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
-  const shape = primitives.cuboid({ size: [20, 20, 20] })
+        code: `function main() {
+  const shape = box(20, 20, 20)
 
   // Left: built at the origin, so half of it is under the grid.
-  const sunk = transforms.translate([-18, 0, 0], shape)
+  const sunk = translate([-18, 0, 0], shape)
 
   // Right: lifted by half its height, so it rests on the plate.
-  const standing = transforms.translate([18, 0, 10], shape)
+  const standing = translate([18, 0, 10], shape)
 
   return [sunk, standing]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'The printer only prints what is joined',
@@ -4077,23 +3614,16 @@ module.exports = { main }`,
 The console line is the giveaway. With the gap, the volume is 7983 cubic mm — the plate's 7200 plus the knob's 783, two separate things added together. Change lift to -1 so the knob sinks 1 mm into the plate and the number drops to 7905, because the millimetre they now share is counted once instead of twice. That drop is what one solid looks like as a number.
 
 Parts that must come out as one piece have to overlap. Exactly touching is not enough.`,
-        code: `const { primitives, booleans, measurements } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const lift = 2   // the gap, in mm — change it to -1 and watch the number drop
 
-  const plate = primitives.cuboid({ size: [30, 30, 8], center: [0, 0, 4] })
-  const knob = primitives.cylinder({
-    radius: 5, height: 10, segments: 48,
-    center: [0, 0, 8 + lift + 5],
-  })
+  const plate = box(30, 30, 8, { center: [0, 0, 4] })
+  const knob = tube(5, 10, { segments: 48, center: [0, 0, 8 + lift + 5] })
 
-  const part = booleans.union(plate, knob)
-  console.log('volume in cubic mm:', Math.round(measurements.measureVolume(part)))
+  const part = union(plate, knob)
+  console.log('volume in cubic mm:', Math.round(measureVolume(part)))
   return part
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'A wall thinner than the nozzle disappears',
@@ -4102,23 +3632,19 @@ module.exports = { main }`,
 A printer squeezes melted plastic out through a small hole called the nozzle, and on almost every school machine that hole is 0.4 mm across. One line of plastic is therefore 0.4 mm wide, and that is the thinnest thing the machine can make. The slicer looks at the 0.2 mm wall, finds it cannot fit a single line inside, and skips it — so the part comes out with a gap where the wall was.
 
 0.4 mm is the floor. Three lines, 1.2 mm, is the thinnest wall worth printing on anything that will be picked up and handled.`,
-        code: `const { primitives, transforms } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const walls = []
   const thicknesses = [0.2, 0.4, 1.2, 2.4]
 
   for (let i = 0; i < thicknesses.length; i++) {
     const t = thicknesses[i]
-    walls.push(transforms.translate([i * 12 - 18, 0, 10],
-      primitives.cuboid({ size: [t, 20, 20] })
+    walls.push(translate([i * 12 - 18, 0, 10],
+      box(t, 20, 20)
     ))
   }
 
   return walls
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'One file, many parts',
@@ -4129,31 +3655,24 @@ Here peg() knows what a peg is, plate() knows what a plate is, and main() only s
 When a project outgrows one file, jscad.app takes a whole folder instead: peg.js ends with module.exports = { peg }, and index.js starts with const { peg } = require('./peg.js'). Nothing else about the code changes — the same functions, in different files.
 
 This viewport runs a single file, so keep the parts as functions here. The split is worth knowing about for the day the file reaches 400 lines.`,
-        code: `const { primitives, transforms, booleans } = require('@jscad/modeling')
-
-// What a peg is.
+        code: `// What a peg is.
 function peg(radius, height) {
-  return primitives.cylinder({ radius: radius, height: height, segments: 32 })
+  return tube(radius, height, { segments: 32 })
 }
 
 // What a plate is.
 function plate(width, depth, thickness) {
-  return primitives.roundedCuboid({
-    size: [width, depth, thickness], roundRadius: 2,
-    center: [0, 0, thickness / 2],
-  })
+  return box(width, depth, thickness, { roundRadius: 2, center: [0, 0, thickness / 2] })
 }
 
 // How they go together.
 function main() {
   const parts = [plate(60, 40, 6)]
   for (const x of [-20, 0, 20]) {
-    parts.push(transforms.translate([x, 0, 9], peg(4, 12)))
+    parts.push(translate([x, 0, 9], peg(4, 12)))
   }
-  return booleans.union(...parts)
-}
-
-module.exports = { main }`,
+  return union(...parts)
+}`,
       },
     ],
   },
@@ -4176,16 +3695,11 @@ Read the middle part backwards. In is not a function, the thing named just befor
 Ten messages come up more often than all the rest put together, and each of them gets a page here, in roughly the order you will meet them, with the words you will see and the thing to change. After those comes a list of the leftovers, and then three pages for when there is no message at all, which is the harder half.
 
 One rule underneath all of it: change one thing, then run again. Change three things and run once and you have learned nothing about which of the three it was.`,
-        code: `const jscad = require('@jscad/modeling')
-const primitives = jscad.primitives
-
-function main() {
+        code: `function main() {
   // The smallest program that works. When you are lost, come back to
   // something this size, check that it runs, then add one piece at a time.
-  return primitives.cube({ size: 10 })
-}
-
-module.exports = { main }`,
+  return box(10, 10, 10)
+}`,
       },
       {
         title: 'Why the examples have two extra lines',
@@ -4204,8 +3718,8 @@ So: type it either way. Read it either way. Nothing on the following pages depen
 const primitives = jscad.primitives        // 2. name the part you want
 
 function main() {
-  // Inside shCode you could write cube({ size: 10 }) with no lines above.
-  return primitives.cube({ size: 10 })
+  // Inside shCode you could write box(10, 10, 10) with no lines above.
+  return box(10, 10, 10)
 }
 
 module.exports = { main }                  // 3. hand main() over`,
@@ -4225,17 +3739,11 @@ SyntaxError: Unexpected number — two values with no comma between them, as in 
 None of those messages name your mistake. They name the spot where the sentence stopped making sense, which is usually a little after it.
 
 The fix is mechanical, not clever. Brackets close in the reverse of the order they open: the last one opened is the first one closed. Put the cursor next to a bracket and the editor highlights its partner — an opening bracket with no partner is your answer.`,
-        code: `const jscad = require('@jscad/modeling')
-const primitives = jscad.primitives
-const transforms = jscad.transforms
-
-function main() {
+        code: `function main() {
   // Count outward from the middle. cube( opens one, { opens two,
   // then } closes two and ) closes one, in that order.
-  return transforms.translate([0, 0, 5], primitives.cube({ size: 10 }))
-}
-
-module.exports = { main }`,
+  return translate([0, 0, 5], box(10, 10, 10))
+}`,
       },
       {
         title: 'Error: No main() function found.',
@@ -4256,20 +3764,15 @@ So there are only three ways to see this. Either there is no function called mai
 The message also mentions module.exports. Do not let that distract you here. In shCode that line is optional, and adding it will not fix a name that is wrong. Fix the spelling first.
 
 Helper functions can be called anything you like, and having several is a good sign. Just make sure the one at the top of the chain is main.`,
-        code: `const jscad = require('@jscad/modeling')
-const primitives = jscad.primitives
-
-// Helpers can be called anything. Only the one the runner starts from
+        code: `// Helpers can be called anything. Only the one the runner starts from
 // has to be spelled main, in lower case.
 function buildLid(width) {
-  return primitives.cuboid({ size: [width, width, 3] })
+  return box(width, width, 3)
 }
 
 function main() {
   return buildLid(30)
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Error: main() returned nothing.',
@@ -4292,19 +3795,13 @@ Shapes were pushed into an array and the array was never returned. This is the c
 The array came back empty. A loop that never ran, or a filter that matched nothing, returns [] — and the runner counts an empty array as nothing, because there is genuinely nothing to draw.
 
 Returning several shapes at once is fine and often faster than joining them: return an array and every shape in it is drawn.`,
-        code: `const jscad = require('@jscad/modeling')
-const primitives = jscad.primitives
-const transforms = jscad.transforms
-
-function main() {
+        code: `function main() {
   const parts = []
   for (let i = 0; i < 4; i++) {
-    parts.push(transforms.translateX(i * 14, primitives.cube({ size: 10 })))
+    parts.push(translateX(i * 14, box(10, 10, 10)))
   }
   return parts        // <- the one that is easy to forget
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'ReferenceError: count is not defined',
@@ -4321,21 +3818,15 @@ The name was made inside something and used outside it. A const declared between
 You used it above the point where you made it. Reading order matters — a const is not ready until the reading gets to it.
 
 Worth knowing: inside shCode, cube is not defined never means you forgot to import anything, because nothing needs importing here. If a JSCAD name comes back not defined, you misspelled it — cubee, or Cube with a capital.`,
-        code: `const jscad = require('@jscad/modeling')
-const primitives = jscad.primitives
-const transforms = jscad.transforms
-
-const count = 5       // out here, so every function below can see it
+        code: `const count = 5       // out here, so every function below can see it
 
 function main() {
   const parts = []
   for (let i = 0; i < count; i++) {
-    parts.push(transforms.translateX(i * 12, primitives.cube({ size: 8 })))
+    parts.push(translateX(i * 12, box(8, 8, 8)))
   }
   return parts
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: "TypeError: Cannot read properties of undefined (reading 'cube')",
@@ -4350,17 +3841,11 @@ undefined is JavaScript's word for a value that was never set. It is not zero an
 So the mistake is never on the word in quotes. It is on whatever came before the dot, and usually on an earlier line entirely. Write const primitives = jscad.primtives with the letters swapped and nothing complains, because jscad.primtives is simply undefined. The complaint arrives later, at the first primitives.cube, pointing at a line that is perfectly correct.
 
 That is the habit worth building from this page: when a message names a spot, ask where the value at that spot came from, and go and look there. Two other shapes of the same message, both meaning the same thing: reading a member of an array slot that is empty, and reading a member of null, which is the value you get when something deliberately handed back an empty answer.`,
-        code: `const jscad = require('@jscad/modeling')
-
-// A typo up here is why a call down there fails. Misspell this as
+        code: `// A typo up here is why a call down there fails. Misspell this as
 // jscad.primtives and primitives becomes undefined, quietly.
-const primitives = jscad.primitives
-
 function main() {
-  return primitives.cube({ size: 10 })
-}
-
-module.exports = { main }`,
+  return box(10, 10, 10)
+}`,
       },
       {
         title: 'TypeError: primitives.cub is not a function',
@@ -4375,16 +3860,11 @@ The message quotes the whole path, so you can see at a glance which half is wron
 The shape group holds cube, cuboid, cylinder, sphere, circle, rectangle, torus, star, polygon, roundedCuboid and roundedCylinder, and nothing else. If the name you want is not on that list, it is somewhere else — translate is a mover, union is a combiner, colorize is a painter — and calling it off the wrong group produces exactly this message.
 
 The same words turn up for a plain variable too. part is not a function means you put brackets after something that is a shape, not a function. part.push is not a function means you used an array trick on something that is not an array.`,
-        code: `const jscad = require('@jscad/modeling')
-const primitives = jscad.primitives
-
-function main() {
+        code: `function main() {
   // cube, cuboid, cylinder, sphere, circle, rectangle, torus, star,
   // polygon, roundedCuboid, roundedCylinder. Nothing else is in here.
-  return primitives.cuboid({ size: [30, 20, 10] })
-}
-
-module.exports = { main }`,
+  return box(30, 20, 10)
+}`,
       },
       {
         title: 'Error: size must be an array of width, depth and height values',
@@ -4399,17 +3879,11 @@ Make the mistake the other way — cube({ size: [10, 10, 10] }) — and you get 
 The flat shapes say it their own way. rectangle({ size: 10 }) gives Error: size must be an array of X and Y values, because flat shapes have two sides, not three.
 
 The habit: when a message talks about the shape of a value rather than a name, count. How many numbers does this one want, and are they in square brackets?`,
-        code: `const jscad = require('@jscad/modeling')
-const primitives = jscad.primitives
-const transforms = jscad.transforms
-
-function main() {
-  const evenSided = primitives.cube({ size: 10 })              // one number
-  const boxy = primitives.cuboid({ size: [30, 20, 10] })       // three numbers
-  return [transforms.translateX(-25, evenSided), transforms.translateX(15, boxy)]
-}
-
-module.exports = { main }`,
+        code: `function main() {
+  const evenSided = box(10, 10, 10)              // one number
+  const boxy = box(30, 20, 10)       // three numbers
+  return [translateX(-25, evenSided), translateX(15, boxy)]
+}`,
       },
       {
         title: 'Error: offset must be an array',
@@ -4424,18 +3898,12 @@ rotate(90, part) gives Error: angles must be an array. It wants rotate([0, 0, 1.
 scale(2, part) gives Error: factors must be an array. It wants scale([2, 2, 2], part) — one stretch factor per direction.
 
 Now the reason this trips people twice. The single-direction shortcuts do take a bare number, on purpose: translateZ(20, part) lifts something 20 straight up, rotateZ(1.57, part) spins it flat, scaleZ(2, part) makes it twice as tall. So both forms are correct JSCAD, and which one is right depends on the name you typed. Square brackets for the plain name, a bare number for the one ending in X, Y or Z.`,
-        code: `const jscad = require('@jscad/modeling')
-const primitives = jscad.primitives
-const transforms = jscad.transforms
-
-function main() {
-  const part = primitives.sphere({ radius: 6, segments: 32 })
-  const moved = transforms.translate([20, 0, 0], part)   // three numbers
-  const lifted = transforms.translateZ(20, part)         // one number
+        code: `function main() {
+  const part = ball(6, { segments: 32 })
+  const moved = translate([20, 0, 0], part)   // three numbers
+  const lifted = translateZ(20, part)         // one number
   return [part, moved, lifted]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Error: color must be an array',
@@ -4453,24 +3921,17 @@ hexToRgb('#3366ff') does the same for a hex code, the six-character form you mee
 So the fix for colorize('gold', part) is colorize(colorNameToRgb('gold'), part) — the name still does the work, it just gets translated on the way in.
 
 One thing that will save you a puzzled minute later: colour is decoration only. It never changes the geometry, it makes no difference to cutting or joining shapes, and a printer with one reel of plastic ignores it entirely. It is there so you can tell your own parts apart.`,
-        code: `const jscad = require('@jscad/modeling')
-const primitives = jscad.primitives
-const transforms = jscad.transforms
-const colors = jscad.colors
-
-function main() {
-  const part = primitives.cube({ size: 10 })
-  const red = colors.colorize([1, 0.2, 0.2, 1], part)
-  const named = colors.colorize(colors.colorNameToRgb('gold'), part)
-  const hex = colors.colorize(colors.hexToRgb('#3366ff'), part)
+        code: `function main() {
+  const part = box(10, 10, 10)
+  const red = colorize([1, 0.2, 0.2, 1], part)
+  const named = colorize(colorNameToRgb('gold'), part)
+  const hex = colorize(hexToRgb('#3366ff'), part)
   return [
-    transforms.translateX(-15, red),
+    translateX(-15, red),
     named,
-    transforms.translateX(15, hex),
+    translateX(15, hex),
   ]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Error: only unions of the same type are supported',
@@ -4489,19 +3950,12 @@ Its three siblings say the same thing in slightly different words, and the gramm
 The fix is to bring both to the same kind before combining, and in practice that means giving the flat one thickness. extrudeLinear({ height: 4 }, disc) takes a flat shape and pushes it straight up into a solid one, and after that the union is fine — which is what the example does.
 
 The same message turns up if a shape is missing rather than flat: joining anything with a variable that holds undefined produces it too, because nothing is not the same kind as a cube either.`,
-        code: `const jscad = require('@jscad/modeling')
-const primitives = jscad.primitives
-const booleans = jscad.booleans
-const extrusions = jscad.extrusions
-
-function main() {
-  const disc = primitives.circle({ radius: 8, segments: 32 })  // flat, 2D
-  const post = extrusions.extrudeLinear({ height: 4 }, disc)   // now 3D
-  const slab = primitives.cuboid({ size: [30, 30, 4] })
-  return booleans.union(slab, post)
-}
-
-module.exports = { main }`,
+        code: `function main() {
+  const circle = disc(8, { segments: 32 })  // flat, 2D
+  const post = extrude(4, circle)   // now 3D
+  const slab = box(30, 30, 4)
+  return union(slab, post)
+}`,
       },
       {
         title: 'The rest of the messages, at a glance',
@@ -4521,20 +3975,14 @@ Two from JavaScript rather than JSCAD:
 
   Assignment to constant variable. — you changed something declared with const. Declare it with let if it needs to change.
   Maximum call stack size exceeded — a function called itself with no way out. Look for a function whose name appears inside its own body.`,
-        code: `const jscad = require('@jscad/modeling')
-const primitives = jscad.primitives
-const transforms = jscad.transforms
-
-function main() {
+        code: `function main() {
   // Every number here is inside a limit the library checks:
   // sizes above zero, segments of 3 or more (4 for anything round in 3D),
   // and a roundRadius well under half the smallest side.
-  const lid = primitives.roundedCuboid({ size: [40, 30, 6], roundRadius: 2 })
-  const peg = primitives.cylinder({ radius: 4, height: 20, segments: 24 })
-  return [lid, transforms.translateZ(13, peg)]
-}
-
-module.exports = { main }`,
+  const lid = box(40, 30, 6, { roundRadius: 2 })
+  const peg = tube(4, 20, { segments: 24 })
+  return [lid, translateZ(13, peg)]
+}`,
       },
       {
         title: 'When there is no message at all',
@@ -4553,23 +4001,16 @@ and then to use moved from there on. The give-away is a program where a change t
 The same rule catches a second, sneakier one. Hand a mover something that is not a shape and it hands the same thing straight back with no complaint: translate([0, 0, 10], 5) is 5. So a variable holding a number rather than a shape can travel a long way down a program before anything goes wrong, and when it does the message will be about somewhere else.
 
 The example prints the middle of both shapes so you can watch the original stay put.`,
-        code: `const jscad = require('@jscad/modeling')
-const primitives = jscad.primitives
-const transforms = jscad.transforms
-const measurements = jscad.measurements
+        code: `function main() {
+  const part = box(10, 10, 10)
 
-function main() {
-  const part = primitives.cube({ size: 10 })
+  translateZ(50, part)                  // thrown away
+  const moved = translateZ(50, part)    // kept
 
-  transforms.translateZ(50, part)                  // thrown away
-  const moved = transforms.translateZ(50, part)    // kept
-
-  console.log('part is still at', measurements.measureCenter(part))
-  console.log('moved is at', measurements.measureCenter(moved))
+  console.log('part is still at', measureCenter(part))
+  console.log('moved is at', measureCenter(moved))
   return moved
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Nothing is showing up',
@@ -4584,24 +4025,17 @@ It is flat and you are looking at its edge. A circle or a rectangle has no thick
 A size is zero. This one is nasty, because JSCAD allows it without a word: cube({ size: 0 }) and cuboid({ size: [10, 0, 5] }) both build a perfectly valid shape with no surfaces, and a shape with no surfaces draws as nothing. A number below zero would have been refused with a message; exactly zero slips through. If a size comes from arithmetic, print it.
 
 A combiner ate it. subtract cuts its later shapes out of its first one, so the wrong order can remove everything.`,
-        code: `const jscad = require('@jscad/modeling')
-const primitives = jscad.primitives
-const transforms = jscad.transforms
-const measurements = jscad.measurements
+        code: `function main() {
+  const part = translateZ(400, box(20, 20, 20))
+  const cuboid = measureBoundingBox(part)
 
-function main() {
-  const part = transforms.translateZ(400, primitives.cube({ size: 20 }))
-  const box = measurements.measureBoundingBox(part)
-
-  console.log('lowest corner', box[0])
-  console.log('highest corner', box[1])
-  console.log('size', measurements.measureDimensions(part))
+  console.log('lowest corner', cuboid[0])
+  console.log('highest corner', cuboid[1])
+  console.log('size', measureDimensions(part))
 
   // 400 units up is off screen. Drop it back onto the grid.
-  return transforms.translateZ(-box[0][2], part)
-}
-
-module.exports = { main }`,
+  return translateZ(-cuboid[0][2], part)
+}`,
       },
       {
         title: 'Print what you cannot see',
@@ -4618,24 +4052,17 @@ Markers. A print before and after a slow step shows you which part of a long pro
 What not to print: the shape itself. A shape is a list of every flat face it is made of, so printing one fills the console with hundreds of lines of coordinates and tells you nothing. Print its measurements instead.
 
 Take the noisy ones out when you are done. A print on every turn of a two-thousand-turn loop is slower than the shapes it is describing.`,
-        code: `const jscad = require('@jscad/modeling')
-const primitives = jscad.primitives
-const transforms = jscad.transforms
-const measurements = jscad.measurements
-
-function main() {
+        code: `function main() {
   const parts = []
   for (let i = 0; i < 5; i++) {
     const size = 6 + i * 3
     const x = i * 20 - 40
     console.log('step', i, 'size', size, 'at x', x)
-    parts.push(transforms.translate([x, 0, size / 2], primitives.cube({ size: size })))
+    parts.push(translate([x, 0, size / 2], box(size, size, size)))
   }
-  console.log('the lot fits in', measurements.measureAggregateBoundingBox(parts))
+  console.log('the lot fits in', measureAggregateBoundingBox(parts))
   return parts
-}
-
-module.exports = { main }`,
+}`,
       },
     ],
   },
@@ -4656,40 +4083,30 @@ Then the letters, built the way the name tag page built them, measured and slid 
 Finally one boolean each way: subtract the hole, union the letters. That order matters — cut the hole from the plate before the letters go on, or the subtraction has to chew through the lettering as well.
 
 Change the label and everything else follows, because the plate is sized from the measured text rather than from a number somebody typed.`,
-        code: `const { primitives, transforms, booleans, text, geometries, extrusions, measurements, colors } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const label = 'CS'
   const thickness = 3
 
-  const strokes = text.vectorText({ height: 12, input: label })
-  const paths = strokes.map((points) => geometries.path2.fromPoints({}, points))
-  const letters = extrusions.extrudeRectangular({ size: 1.4, height: 1.5 }, paths)
+  const strokes = vectorText({ height: 12, input: label })
+  const paths = strokes.map((points) => path2.fromPoints({}, points))
+  const letters = extrudeRectangular({ size: 1.4, height: 1.5 }, paths)
 
-  const box = measurements.measureAggregateBoundingBox(letters)
-  const textWidth = box[1][0] - box[0][0]
+  const cuboid = measureAggregateBoundingBox(letters)
+  const textWidth = cuboid[1][0] - cuboid[0][0]
   const plateWidth = textWidth + 26
 
-  const plate = primitives.roundedCuboid({
-    size: [plateWidth, 20, thickness], roundRadius: 1.4,
-    center: [0, 0, thickness / 2],
-  })
+  const plate = box(plateWidth, 20, thickness, { roundRadius: 1.4, center: [0, 0, thickness / 2] })
 
-  const ring = primitives.cylinder({
-    radius: 2.5, height: 20, segments: 32,
-    center: [-plateWidth / 2 + 6, 0, 0],
-  })
+  const ring = tube(2.5, 20, { segments: 32, center: [-plateWidth / 2 + 6, 0, 0] })
 
-  const raised = transforms.translate(
+  const raised = translate(
     [-textWidth / 2 + 5, -6, thickness], letters
   )
 
-  return colors.colorize(colors.colorNameToRgb('goldenrod'),
-    booleans.union(booleans.subtract(plate, ring), raised)
+  return colorize(colorNameToRgb('goldenrod'),
+    union(subtract(plate, ring), raised)
   )
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'Project: a phone stand',
@@ -4702,38 +4119,30 @@ Then two cuts. A slot across the front holds the phone; make it a millimetre or 
 The angle is set by where you put the top corner of the triangle. Move that one point and the whole stand leans differently, which is the parametric idea in its simplest possible form.
 
 Print it on its side and the sloping face comes out smooth with no supports.`,
-        code: `const { primitives, transforms, booleans, extrusions } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const width = 70
   const depth = 60
   const height = 55
   const slot = 12
 
   // A wedge is a triangle, extruded sideways.
-  const profile = primitives.polygon({
+  const profile = polygon({
     points: [[0, 0], [depth, 0], [0, height]],
   })
-  const wedge = transforms.rotateX(Math.PI / 2,
-    extrusions.extrudeLinear({ height: width }, profile)
+  const wedge = rotateX(Math.PI / 2,
+    extrude(width, profile)
   )
 
   // The lip the phone leans back against.
-  const lip = primitives.cuboid({
-    size: [slot, width + 4, 26], center: [14, width / 2, 8],
-  })
+  const lip = box(slot, width + 4, 26, { center: [14, width / 2, 8] })
 
   // A way out for the charging cable.
-  const cable = primitives.cuboid({
-    size: [30, 16, 20], center: [12, width / 2, -2],
-  })
+  const cable = box(30, 16, 20, { center: [12, width / 2, -2] })
 
-  return transforms.translate([-depth / 2, -width / 2, 0],
-    booleans.subtract(wedge, lip, cable)
+  return translate([-depth / 2, -width / 2, 0],
+    subtract(wedge, lip, cable)
   )
-}
-
-module.exports = { main }`,
+}`,
       },
     ],
   },
@@ -4802,35 +4211,31 @@ generalize does whatever its options ask for, and nothing at all if they ask for
 retessellate re-cuts the faces so that faces lying flat against one another merge into fewer, larger ones. It short-circuits: a solid the library built already carries a flag saying this has been done, and retessellate hands such a solid straight back untouched.
 
 The example builds a solid the library has never seen — two cubes' faces poured into one bag by hand — so that there is something left to fix. Twelve faces go in and eight come out, with the volume and the overall size unchanged.`,
-        code: `const { primitives, geometries, modifiers } = require('@jscad/modeling')
-
-function main() {
-  const lower = primitives.cuboid({ size: [10, 10, 10] })
-  const upper = primitives.cuboid({ size: [10, 10, 10], center: [0, 0, 10] })
+        code: `function main() {
+  const lower = box(10, 10, 10)
+  const upper = box(10, 10, 10, { center: [0, 0, 10] })
 
   // Both boxes' faces tipped into one bag: a solid nothing has tidied yet.
-  const raw = geometries.geom3.create([
-    ...geometries.geom3.toPolygons(lower),
-    ...geometries.geom3.toPolygons(upper),
+  const raw = geom3.create([
+    ...geom3.toPolygons(lower),
+    ...geom3.toPolygons(upper),
   ])
 
   // snap: geometries only, no options object, one or several.
-  const snapped = modifiers.snap(raw)
+  const snapped = snap(raw)
 
   // generalize: options FIRST, and the object is not optional.
-  const merged = modifiers.generalize({ simplify: true }, snapped)
+  const merged = generalize({ simplify: true }, snapped)
 
   // retessellate: exactly one solid, and nothing else.
-  const tidy = modifiers.retessellate(raw)
+  const tidy = retessellate(raw)
 
   console.log('as built:    ', raw.polygons.length)
   console.log('generalize:  ', merged.polygons.length)
   console.log('retessellate:', tidy.polygons.length)
 
   return tidy
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'What the wrong call shape gets you',
@@ -4847,39 +4252,35 @@ snap({}, shape) throws nothing. snap takes any number of geometries, so an optio
 retessellate(a, b) throws nothing either, and this one is quieter still. It takes exactly one solid, so the second is not merged, not returned, and not complained about — it is simply dropped, and what comes back is a tidied a. Measured: a union measuring 15 by 10 by 10 handed a radius-8 sphere as a second argument comes back 15 by 10 by 10, with the sphere gone. Wrap the pair in an array instead and it does throw — retessellate([a, b]) gives Cannot read properties of undefined (reading '0') — so the array form fails loudly and the comma form fails silently, which is the opposite of what you would guess.
 
 The example runs all four calls and prints what each one actually said.`,
-        code: `const { primitives, modifiers } = require('@jscad/modeling')
-
-function main() {
-  const block = primitives.cuboid({ size: [20, 20, 20] })
-  const flat = primitives.rectangle({ size: [10, 10] })
+        code: `function main() {
+  const block = box(20, 20, 20)
+  const flat = rect(10, 10)
 
   try {
-    modifiers.generalize(block)
+    generalize(block)
   } catch (e) {
     console.log('generalize(block)      ->', e.message)
   }
 
   try {
-    modifiers.retessellate({}, block)
+    retessellate({}, block)
   } catch (e) {
     console.log('retessellate({}, block) ->', e.message)
   }
 
   try {
-    modifiers.retessellate(flat)
+    retessellate(flat)
   } catch (e) {
     console.log('retessellate(flat)      ->', e.message)
   }
 
   // snap does not complain. It hands the options object straight back.
-  const wrong = modifiers.snap({}, block)
+  const wrong = snap({}, block)
   console.log('snap({}, block) gave back', wrong.length, 'things')
   console.log('the first one is a shape?', Array.isArray(wrong[0].polygons))
 
-  return modifiers.snap(block)
-}
-
-module.exports = { main }`,
+  return snap(block)
+}`,
       },
       {
         title: 'generalize and its three switches',
@@ -4896,31 +4297,27 @@ simplify and retessellate land on the same eight faces here, because on a solid 
 triangulate is the switch with a use outside this drawer. An STL file stores nothing but triangles, so saving one triangulates the model anyway; doing it yourself first lets you count the triangles before you save.
 
 A flat shape is left alone entirely. Hand generalize a 2D shape or a path with all three switches on and you get back the very same object, not a copy — the library has no generalizing to do on something flat and does not pretend otherwise.`,
-        code: `const { primitives, geometries, modifiers } = require('@jscad/modeling')
-
-function main() {
-  const lower = primitives.cuboid({ size: [10, 10, 10] })
-  const upper = primitives.cuboid({ size: [10, 10, 10], center: [0, 0, 10] })
-  const raw = geometries.geom3.create([
-    ...geometries.geom3.toPolygons(lower),
-    ...geometries.geom3.toPolygons(upper),
+        code: `function main() {
+  const lower = box(10, 10, 10)
+  const upper = box(10, 10, 10, { center: [0, 0, 10] })
+  const raw = geom3.create([
+    ...geom3.toPolygons(lower),
+    ...geom3.toPolygons(upper),
   ])
 
   console.log('as built:   ', raw.polygons.length)
-  console.log('no switches:', modifiers.generalize({}, raw).polygons.length)
-  console.log('snap:       ', modifiers.generalize({ snap: true }, raw).polygons.length)
-  console.log('simplify:   ', modifiers.generalize({ simplify: true }, raw).polygons.length)
-  console.log('triangulate:', modifiers.generalize({ triangulate: true }, raw).polygons.length)
+  console.log('no switches:', generalize({}, raw).polygons.length)
+  console.log('snap:       ', generalize({ snap: true }, raw).polygons.length)
+  console.log('simplify:   ', generalize({ simplify: true }, raw).polygons.length)
+  console.log('triangulate:', generalize({ triangulate: true }, raw).polygons.length)
 
   // A flat shape comes back exactly as it went in, whatever you ask for.
-  const flat = primitives.rectangle({ size: [10, 10] })
-  const asked = modifiers.generalize({ snap: true, simplify: true, triangulate: true }, flat)
+  const flat = rect(10, 10)
+  const asked = generalize({ snap: true, simplify: true, triangulate: true }, flat)
   console.log('the same 2D shape back?', asked === flat)
 
-  return modifiers.generalize({ simplify: true, triangulate: true }, raw)
-}
-
-module.exports = { main }`,
+  return generalize({ simplify: true, triangulate: true }, raw)
+}`,
       },
       {
         title: 'minkowskiSum: growing a solid',
@@ -4931,33 +4328,29 @@ Exactly two solids, and both have to be solids. A flat shape throws minkowskiSum
 The use worth knowing is clearance. A 10 mm peg will not go into a 10 mm hole — a printer lays plastic a little wide, and the part comes out a little large — so the hole has to be bigger than the peg in every direction, including around whatever shape the peg happens to be. Sweeping a small ball over the peg is exactly that: minkowskiSum(peg, sphere({ radius: 0.4 })) is the peg grown by 0.4 mm everywhere, so a 10 x 10 x 20 peg becomes a 10.8 x 10.8 x 20.8 hole. Cut that out of the block instead of the peg itself and the two parts fit.
 
 The cost is faces, and it is not a product. The 96-face peg below comes out at 202 faces swept with an 8-segment ball (32 faces of its own) and 546 swept with a 32-segment one (512 faces), for exactly the same finished size — sixteen times the ball for under three times the result. Double the peg instead, to a 64-segment 192-face cylinder, sweep it with that same 8-segment ball, and the answer is 362. Both shapes cost, roughly in step with the two face counts added rather than multiplied, and per face added it is the peg's own faces that cost more: the ball's extra 480 faces bought 344, the peg's extra 96 bought 160. Keeping the growing shape coarse is still right, though — nobody can see it, because the shape you see is the peg's.`,
-        code: `const { primitives, transforms, booleans, minkowski, measurements } = require('@jscad/modeling')
-
-function main() {
-  const peg = primitives.cylinder({ radius: 5, height: 20, segments: 32 })
+        code: `function main() {
+  const peg = tube(5, 20, { segments: 32 })
 
   // Grow a copy of the peg by 0.4 mm all round, then cut THAT out of the block.
-  const clearance = minkowski.minkowskiSum(peg, primitives.sphere({ radius: 0.4, segments: 8 }))
-  console.log('peg: ', measurements.measureDimensions(peg))
-  console.log('hole:', measurements.measureDimensions(clearance))
+  const clearance = minkowski.minkowskiSum(peg, ball(0.4, { segments: 8 }))
+  console.log('peg: ', measureDimensions(peg))
+  console.log('hole:', measureDimensions(clearance))
 
   // What the faces actually do. Count them yourself rather than taking my word.
-  const finerBall = minkowski.minkowskiSum(peg, primitives.sphere({ radius: 0.4, segments: 32 }))
+  const finerBall = minkowski.minkowskiSum(peg, ball(0.4, { segments: 32 }))
   const finerPeg = minkowski.minkowskiSum(
-    primitives.cylinder({ radius: 5, height: 20, segments: 64 }),
-    primitives.sphere({ radius: 0.4, segments: 8 })
+    tube(5, 20, { segments: 64 }),
+    ball(0.4, { segments: 8 })
   )
   console.log('peg faces:      ', peg.polygons.length)
   console.log('with a coarse ball:', clearance.polygons.length)
   console.log('with a fine ball:  ', finerBall.polygons.length)
   console.log('finer peg, coarse ball:', finerPeg.polygons.length)
 
-  const socket = booleans.subtract(primitives.cuboid({ size: [30, 30, 20] }), clearance)
+  const socket = subtract(box(30, 30, 20), clearance)
 
-  return [transforms.translate([-25, 0, 0], peg), socket]
-}
-
-module.exports = { main }`,
+  return [translate([-25, 0, 0], peg), socket]
+}`,
       },
       {
         title: 'measureBoundingSphere',
@@ -4999,21 +4392,17 @@ measureAggregateArea(a, b, ...) is the area of several shapes at once, and it ad
 measureAggregateEpsilon(a, b, ...) is the same idea for the comparison margin. measureEpsilon sizes a margin for one shape; the aggregate version sizes one margin from everything together, so the biggest shape in the group decides it. A 10 mm cube on its own gets 0.0001 and a 200 mm cube gets 0.002, and the two of them together get 0.002.
 
 That is what it is for: when you are comparing measured numbers across a whole assembly, one margin for the lot is more honest than a different margin per part.`,
-        code: `const { primitives, transforms, measurements } = require('@jscad/modeling')
+        code: `function main() {
+  const plate = rect(4, 4)
+  const circle = disc(3, { segments: 32 })
 
-function main() {
-  const plate = primitives.rectangle({ size: [4, 4] })
-  const disc = primitives.circle({ radius: 3, segments: 32 })
+  console.log('one at a time:', measureArea(plate), measureArea(circle))
+  console.log('added up:     ', measureAggregateArea(plate, circle))
+  console.log('epsilon each: ', measureEpsilon(plate), measureEpsilon(circle))
+  console.log('epsilon group:', measureAggregateEpsilon(plate, circle))
 
-  console.log('one at a time:', measurements.measureArea(plate), measurements.measureArea(disc))
-  console.log('added up:     ', measurements.measureAggregateArea(plate, disc))
-  console.log('epsilon each: ', measurements.measureEpsilon(plate), measurements.measureEpsilon(disc))
-  console.log('epsilon group:', measurements.measureAggregateEpsilon(plate, disc))
-
-  return [transforms.translate([-5, 0, 0], plate), transforms.translate([5, 0, 0], disc)]
-}
-
-module.exports = { main }`,
+  return [translate([-5, 0, 0], plate), translate([5, 0, 0], circle)]
+}`,
       },
       {
         title: 'Colour, the other way round',
@@ -5028,27 +4417,23 @@ rgbToHsv([r, g, b]) gives [hue, saturation, value].
 Hue is a fraction of a turn in both — 0 to 1, not 0 to 360 — and a fourth number you passed in comes back on the end untouched.
 
 Going out to hsl and back is how you shift a colour rather than pick a new one. Add half a turn to the hue and leave saturation and lightness alone, and you have the colour opposite it on the wheel: a second colour that goes with the first without anybody guessing at numbers. Tomato is [1, 0.388, 0.278]; the opposite comes back as [0.278, 0.890, 1], which is the same colour read backwards.`,
-        code: `const { primitives, colors } = require('@jscad/modeling')
-
-function main() {
-  const base = colors.colorNameToRgb('tomato')
+        code: `function main() {
+  const base = colorNameToRgb('tomato')
   console.log('as rgb:', base)
-  console.log('as hex:', colors.rgbToHex(base))
-  console.log('as hsl:', colors.rgbToHsl(base))
-  console.log('as hsv:', colors.rgbToHsv(base))
+  console.log('as hex:', rgbToHex(base))
+  console.log('as hsl:', rgbToHsl(base))
+  console.log('as hsv:', rgbToHsv(base))
 
   // Same saturation, same lightness, half a turn round the wheel.
-  const hsl = colors.rgbToHsl(base)
-  const opposite = colors.hslToRgb([(hsl[0] + 0.5) % 1, hsl[1], hsl[2]])
+  const hsl = rgbToHsl(base)
+  const opposite = hslToRgb([(hsl[0] + 0.5) % 1, hsl[1], hsl[2]])
   console.log('the opposite:', opposite)
 
   return [
-    colors.colorize(base, primitives.cube({ size: 10, center: [-8, 0, 5] })),
-    colors.colorize(opposite, primitives.cube({ size: 10, center: [8, 0, 5] })),
+    colorize(base, box(10, 10, 10, { center: [-8, 0, 5] })),
+    colorize(opposite, box(10, 10, 10, { center: [8, 0, 5] })),
   ]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'rgbToHex is exact for some colours only',
@@ -5065,31 +4450,27 @@ The fix is one line. Round each number onto the 255 grid first, and the result i
   const stepped = paint.map(function (c) { return Math.round(c * 255) / 255 })
 
 The fourth number has the same fault and shows it more plainly: rgbToHex([1, 0, 0, 0.5]) hands back #ff00007f.8, with a decimal point in the middle of a colour code.`,
-        code: `const { primitives, colors } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const grey = [0.5, 0.5, 0.5]
 
   // Middle grey, twice. One of these two hex codes is a bright cyan.
-  console.log('straight in:  ', colors.rgbToHex(grey))
+  console.log('straight in:  ', rgbToHex(grey))
   const stepped = grey.map(function (c) { return Math.round(c * 255) / 255 })
-  console.log('rounded first:', colors.rgbToHex(stepped))
+  console.log('rounded first:', rgbToHex(stepped))
 
   // A colour that came from colorNameToRgb or hexToRgb is already on the grid.
-  console.log('a named colour:', colors.rgbToHex(colors.colorNameToRgb('tomato')))
+  console.log('a named colour:', rgbToHex(colorNameToRgb('tomato')))
 
   // The fourth number has the same problem, and can grow a decimal point.
-  console.log('half see-through:', colors.rgbToHex([1, 0, 0, 0.5]))
+  console.log('half see-through:', rgbToHex([1, 0, 0, 0.5]))
 
   return [
-    colors.colorize(colors.hexToRgb(colors.rgbToHex(grey)),
-      primitives.cube({ size: 14, center: [-10, 0, 7] })),
-    colors.colorize(colors.hexToRgb(colors.rgbToHex(stepped)),
-      primitives.cube({ size: 14, center: [10, 0, 7] })),
+    colorize(hexToRgb(rgbToHex(grey)),
+      box(14, 14, 14, { center: [-10, 0, 7] })),
+    colorize(hexToRgb(rgbToHex(stepped)),
+      box(14, 14, 14, { center: [10, 0, 7] })),
   ]
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'hsvToRgb: a set of shades from one hue',
@@ -5100,21 +4481,15 @@ Lightness, in hsl, runs from black at 0, through the colour at 0.5, to white at 
 Either call shape works: hsvToRgb([0, 1, 1]) and hsvToRgb(0, 1, 1) both give [1, 0, 0]. A fourth number is carried through as alpha.
 
 One hue and four values is a palette. The four bars below are the same blue at a quarter, a half, three quarters and full value.`,
-        code: `const { primitives, colors } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const hue = 0.58
 
   return [0.25, 0.5, 0.75, 1].map(function (value, i) {
-    const paint = colors.hsvToRgb([hue, 0.7, value])
+    const paint = hsvToRgb([hue, 0.7, value])
     console.log('value', value, 'gives', paint)
-    return colors.colorize(paint, primitives.cuboid({
-      size: [8, 8, 24], center: [i * 10 - 15, 0, 12],
-    }))
+    return colorize(paint, box(8, 8, 24, { center: [i * 10 - 15, 0, 12] }))
   })
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'hueToColorComponent, which is not for you',
@@ -5125,9 +4500,7 @@ It takes three numbers and returns one colour component. hslToRgb works the firs
 The example rebuilds hslToRgb by hand out of it and prints both answers so you can see they match. That is the only thing it is good for — understanding what hslToRgb is doing. If what you want is a colour, call hslToRgb.
 
 It is in this section for the same reason as the rest: it is exported, so somebody was going to find it, and finding it with no explanation is worse than finding it with one.`,
-        code: `const { primitives, colors } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const h = 0.6
   const s = 0.8
   const l = 0.5
@@ -5136,18 +4509,16 @@ function main() {
   const q = l < 0.5 ? l * (1 + s) : l + s - l * s
   const p = 2 * l - q
   const byHand = [
-    colors.hueToColorComponent(p, q, h + 1 / 3),
-    colors.hueToColorComponent(p, q, h),
-    colors.hueToColorComponent(p, q, h - 1 / 3),
+    hueToColorComponent(p, q, h + 1 / 3),
+    hueToColorComponent(p, q, h),
+    hueToColorComponent(p, q, h - 1 / 3),
   ]
 
   console.log('by hand: ', byHand)
-  console.log('hslToRgb:', colors.hslToRgb([h, s, l]))
+  console.log('hslToRgb:', hslToRgb([h, s, l]))
 
-  return colors.colorize(byHand, primitives.roundedCuboid({ size: [24, 24, 24], roundRadius: 3 }))
-}
-
-module.exports = { main }`,
+  return colorize(byHand, box(24, 24, 24, { roundRadius: 3 }))
+}`,
       },
       {
         title: 'The helper drawer',
@@ -5162,29 +4533,25 @@ fnNumberSort(a, b) is a comparison function, not a sort. It returns a minus b, a
 areAllShapesTheSameType(list) is true when every shape in the list is the same kind — all solids, or all flat shapes, or all paths — and false when they are mixed. It answers the same question the booleans ask before refusing a mixed list with only unions of the same type are supported. An empty list is true.
 
 The remaining two get a page each, because both of them behave in a way that is worth being warned about.`,
-        code: `const { primitives, booleans, utils } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   // A list of lists, the shape a loop inside a loop leaves behind.
   const nested = [0, 1, 2].map(function (row) {
     return [0, 1, 2].map(function (col) {
-      return primitives.cube({ size: 6, center: [col * 10 - 10, row * 10 - 10, 3] })
+      return box(6, 6, 6, { center: [col * 10 - 10, row * 10 - 10, 3] })
     })
   })
 
-  const flat = utils.flatten(nested)
+  const flat = flatten(nested)
   console.log('rows:', nested.length, ' shapes:', flat.length)
-  console.log('all one kind?', utils.areAllShapesTheSameType(flat))
-  console.log('mixed?', utils.areAllShapesTheSameType([flat[0], primitives.circle({ radius: 2 })]))
+  console.log('all one kind?', areAllShapesTheSameType(flat))
+  console.log('mixed?', areAllShapesTheSameType([flat[0], disc(2)]))
 
   const heights = [12, 3, 30, 7]
   console.log('sorted the default way:', heights.slice().sort())
-  console.log('sorted as numbers:     ', heights.slice().sort(utils.fnNumberSort))
+  console.log('sorted as numbers:     ', heights.slice().sort(fnNumberSort))
 
-  return booleans.union(flat)
-}
-
-module.exports = { main }`,
+  return union(flat)
+}`,
       },
       {
         title: 'insertSorted returns nothing',
@@ -5199,22 +4566,18 @@ leaves sorted holding undefined while heights quietly became the answer you were
 The compare argument is not optional. Leave it off and it throws, because it has nothing to compare the item with.
 
 Plain JavaScript does the same job in two steps that are harder to misread: list.push(item) and then list.sort(fnNumberSort).`,
-        code: `const { primitives, utils } = require('@jscad/modeling')
-
-function main() {
+        code: `function main() {
   const heights = [4, 12, 24]
 
   // insertSorted hands back nothing at all. The array is what changed.
-  const answer = utils.insertSorted(heights, 8, utils.fnNumberSort)
+  const answer = insertSorted(heights, 8, fnNumberSort)
   console.log('what it returned:', answer)
   console.log('what the array is now:', heights)
 
   return heights.map(function (h, i) {
-    return primitives.cuboid({ size: [6, 6, h], center: [i * 10 - 15, 0, h / 2] })
+    return box(6, 6, h, { center: [i * 10 - 15, 0, h / 2] })
   })
-}
-
-module.exports = { main }`,
+}`,
       },
       {
         title: 'radiusToSegments',
