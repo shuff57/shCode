@@ -9,7 +9,7 @@
 // to stop a stuck loop from flooding the queue without punishing legitimate
 // use.
 
-import { isUploadId } from '../_shared/uploads';
+import { isUploadId } from '../../_shared/uploads';
 
 interface Env {
   DB: D1Database;
