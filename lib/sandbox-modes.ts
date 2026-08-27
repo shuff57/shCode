@@ -41,10 +41,8 @@ function draw() {
 // Every dimension is declared in getParameterDefinitions() rather than written
 // as a literal in main(). That is what lets the Dimensions panel drive the model
 // without touching a character of the source.
-const RESHAPE_STARTER = `// JSCAD sandbox — solid modelling.
+const RESHAPE_STARTER = `// reSHape sandbox — solid modelling.
 // Numbers declared here show up in the Dimensions panel.
-
-const { primitives, booleans, transforms } = require('@jscad/modeling')
 
 function getParameterDefinitions() {
   return [
@@ -58,16 +56,14 @@ function getParameterDefinitions() {
 
 function main(p) {
   const body = p.round > 0
-    ? primitives.roundedCuboid({ size: [p.width, p.depth, p.height], roundRadius: p.round })
-    : primitives.cuboid({ size: [p.width, p.depth, p.height] })
+    ? box(p.width, p.depth, p.height, { roundRadius: p.round })
+    : box(p.width, p.depth, p.height)
 
   if (p.hole <= 0) return body
 
-  const drill = primitives.cylinder({ radius: p.hole, height: p.height * 2 })
-  return booleans.subtract(body, drill)
+  const drill = tube(p.hole, p.height * 2)
+  return subtract(body, drill)
 }
-
-module.exports = { main, getParameterDefinitions }
 `;
 
 export const SANDBOX_MODES: SandboxMode[] = [

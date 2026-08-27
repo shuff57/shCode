@@ -137,6 +137,38 @@ function collectCorpus() {
       }
     }
   }
+
+  // The in-app docs at /docs/moshion. These were run by NOTHING: the corpus
+  // walked lessons/ and stopped, so every lesson sketch in the course was held
+  // to the 60-frames-and-draws bar while the 50-odd examples a student reads
+  // first were held to none of it. An example that stopped working there would
+  // have gone out silently, which is the same shape as the lesson-content bug
+  // this gate exists to catch.
+  //
+  // Held to exactly the lesson bar, with no docs-only escape hatch: an example
+  // that does not touch the engine is skipped by MOSHION_MARKER the way a
+  // plain-JS lesson is, and every one that does touch it currently opens its
+  // own `new Canvas`, so all 53 are full sketches. If a bare fragment is ever
+  // added it will fail here for not drawing — loudly, which is the right way
+  // round. Do not add a lenient branch for it without a real one to point at.
+  const docsPath = join(REPO, 'lib', 'moshion-docs.ts');
+  if (existsSync(docsPath)) {
+    const src = readFileSync(docsPath, 'utf8');
+    let n = 0;
+    for (const m of src.matchAll(/\bcode: `([\s\S]*?)`/g)) {
+      n++;
+      const code = m[1].replace(/\\`/g, '`').replace(/\\\$/g, '$');
+      if (!MOSHION_MARKER.test(code)) continue;
+      items.push({
+        kind: 'docs',
+        lesson: 'docs/moshion',
+        path: `lib/moshion-docs.ts#example${n}`,
+        code,
+        expectDraw: true,
+      });
+    }
+  }
+
   return items;
 }
 

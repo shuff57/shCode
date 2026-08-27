@@ -782,6 +782,37 @@ check('each measure wrapper returns exactly what the library returns', () => {
   return true;
 });
 
+// The /sandbox mode labelled reSHape must actually BE reSHape. It was not:
+// the starter shipped `require('@jscad/modeling')` plus primitives.cuboid and
+// booleans.subtract, so a student clicking the reSHape tab met not one reSHape
+// name. Nothing gated it, which is how it drifted -- so this asserts both
+// halves: the vocabulary, and that the thing still builds.
+check('the sandbox reSHape starter is written in reSHape', () => {
+  const src = readFileSync(join(REPO, 'lib/sandbox-modes.ts'), 'utf8');
+  const m = src.match(/const RESHAPE_STARTER = `([\s\S]*?)`;/);
+  if (!m) return 'RESHAPE_STARTER is gone from lib/sandbox-modes.ts';
+  const code = m[1];
+  const leaked = ['require(', 'primitives.', 'booleans.', 'transforms.', 'extrusions.']
+    .filter((t) => code.includes(t));
+  if (leaked.length) return `the starter still reaches for the real API: ${leaked.join(', ')}`;
+  const names = ['box', 'rect', 'disc', 'ball', 'tube', 'cone', 'ring', 'poly',
+    'extrude', 'revolve', 'turn', 'sit'].filter((n) => code.includes(`${n}(`));
+  if (!names.length) return 'the starter calls no reSHape name at all';
+
+  // And it builds -- on every branch its own parameters can take.
+  const { ctx, jscad } = createSimpleContext();
+  vm.runInContext(`${code}
+;globalThis.__d = getParameterDefinitions(); globalThis.__m = main;`, ctx);
+  const defs = Object.fromEntries(ctx.__d.map((d) => [d.name, d.initial]));
+  for (const tweak of [{}, { round: 0 }, { hole: 0 }]) {
+    const out = ctx.__m({ ...defs, ...tweak });
+    if (!jscad.geometries.geom3.isA(out)) {
+      return `the starter builds nothing solid with ${JSON.stringify(tweak)}`;
+    }
+  }
+  return true;
+});
+
 // extrude takes a path2, because extrudeLinear does. §8.1 turns a vectorText
 // glyph into a solid letter that way, and a layer that refused it would put the
 // two out of step for no reason a student could see.
