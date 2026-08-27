@@ -196,6 +196,43 @@ export const SILENTLY_DROPPED = [
 export const RESHAPE_REPORT_GLOBALS = ['__reshapeNamesSkipped'];
 
 /**
+ * The one global that is neither a reSHape name nor a report: the hook a HOST
+ * uses to turn whatever main() returned into real geometry. A live handle is
+ * indistinguishable from geometry to every consumer inside the page, but an
+ * exporter or a renderer holding one across a rebuild wants the current inner
+ * object, and this is how it asks. bookSHelf's fence runner maps every result
+ * through it before painting.
+ */
+export const RESHAPE_HOST_GLOBALS = ['__reshapeCurrent'];
+
+/**
+ * THE ONE PLACE reSHape OVERWRITES REAL JSCAD NAMES, AND WHY THE RULE BENDS
+ * HERE AND NOWHERE ELSE.
+ *
+ * Every other name in this layer is additive — that is the whole basis for
+ * trusting it, and 'no real JSCAD name was overwritten' is the check that says
+ * so. These eight are the exception, and they are ENUMERATED rather than
+ * waived, so adding a ninth is a red check and not a shrug.
+ *
+ * The reason is a silent wrong number. Each of these memoises its answer in a
+ * WeakMap keyed on the object it was handed. A live handle keeps one identity
+ * across a rebuild by definition, so a shape measured at one size, changed, and
+ * measured again would report the FIRST answer forever — measured on this
+ * bundle: a ball at radius 5 changed to 9 still returns 515.24 against a true
+ * 3004.90. That lands in the chapter about measuring a thing before printing
+ * it.
+ *
+ * The wrappers unwrap to the current inner geometry and then call the library's
+ * own function, so for anything that is NOT a handle they must be exactly
+ * equivalent to what they replaced. That equivalence is asserted separately —
+ * a wrapper is allowed to exist, it is not allowed to change an answer.
+ */
+export const MEASURE_WRAPPERS = [
+  'measureArea', 'measureVolume', 'measureBoundingBox', 'measureBoundingSphere',
+  'measureCenterOfMass', 'measureDimensions', 'measureCenter', 'measureEpsilon',
+];
+
+/**
  * The three option keys reSHape ships, and the rule they obey. Every one is BOTH
  * a real key of the backing library call AND measured vocabulary from the seven
  * written Q3 book chapters. Nothing here is invented, renamed or defaulted

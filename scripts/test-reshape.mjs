@@ -53,7 +53,7 @@ import {
 } from './reshape-checks.mjs';
 import {
   SIMPLE_PATH, RESHAPE_NAMES, EXPECTED_RESHAPE_NAME_COUNT, RESHAPE_REPORT_GLOBALS,
-  RESHAPE_OPTION_KEYS, EQUIVALENTS, TURN_IN_PLACE, POSITIONAL_CONTRACT, GUARDS,
+  RESHAPE_OPTION_KEYS, RESHAPE_HOST_GLOBALS, MEASURE_WRAPPERS, EQUIVALENTS, TURN_IN_PLACE, POSITIONAL_CONTRACT, GUARDS,
   NO_OPTIONS_CONTRACT, ARITY_GUARDS, RING_ARITHMETIC, POLY_BARE_ARRAY, WRAPS_BOX,
   SILENTLY_DROPPED, REFUSALS_OVERTURNED, ASSIGNMENT_POOL, INTEROP, SEEDED_COLLISION,
   GRADUATION, GRADUATION_TRIPWIRES, TURN_COMPOSITION, REFUSALS_NAME_THE_REAL_CALL,
@@ -716,9 +716,10 @@ check('none of the reSHape names exists before reshape.js loads', () => {
     : true;
 });
 
-check('reshape.js adds exactly the reSHape names and nothing else', () => {
+check('reshape.js adds exactly the reSHape names, its report global, and the host hook', () => {
   const { added } = createSimpleContext();
-  const want = [...RESHAPE_NAMES.map((n) => n.name), ...RESHAPE_REPORT_GLOBALS].sort();
+  const want = [...RESHAPE_NAMES.map((n) => n.name), ...RESHAPE_REPORT_GLOBALS,
+    ...RESHAPE_HOST_GLOBALS].sort();
   const got = [...added].sort();
   return same(got, want) ? true : `globals added: ${JSON.stringify(got)}, expected ${JSON.stringify(want)}`;
 });
@@ -736,18 +737,68 @@ check('the reSHape surface is the expected size', () => {
 // The decisive additive-ness check, run on the far side of reshape.js. The API
 // group asserts bare === namespaced with only the shim loaded; this asserts
 // that loading reSHape on top changed none of those answers.
-check('no real JSCAD name was overwritten by reSHape', () => {
+check('no real JSCAD name was overwritten by reSHape, except the eight named', () => {
   const { window: w, jscad } = createSimpleContext();
   const collisions = new Set(DOCUMENTED_COLLISIONS.map((c) => c.name));
+  const allowed = new Set(MEASURE_WRAPPERS);
   const bad = [];
+  const wrapped = [];
   for (const mod of EXPECTED_MODULE_ORDER) {
     if (jscad[mod] !== undefined && w[mod] !== jscad[mod]) bad.push(mod);
     for (const k of Object.keys(jscad[mod] || {})) {
       if (collisions.has(k)) continue;
-      if (w[k] !== undefined && w[k] !== jscad[mod][k]) bad.push(`${mod}.${k}`);
+      if (w[k] === undefined || w[k] === jscad[mod][k]) continue;
+      if (allowed.has(k)) { wrapped.push(k); continue; }
+      bad.push(`${mod}.${k}`);
     }
   }
-  return bad.length ? `reSHape changed what these names resolve to: ${bad.join(', ')}` : true;
+  if (bad.length) return `reSHape changed what these names resolve to: ${bad.join(', ')}`;
+  // The exception list is a CEILING, not a target: a name that stopped being
+  // wrapped is as much a defect as one that started, because the staleness it
+  // exists to close would be back with nothing to say so.
+  return same(wrapped.sort(), [...MEASURE_WRAPPERS].sort())
+    ? true
+    : `the measure wrappers installed are ${JSON.stringify(wrapped.sort())}, `
+      + `MEASURE_WRAPPERS says ${JSON.stringify([...MEASURE_WRAPPERS].sort())}`;
+});
+
+// A wrapper may exist. It may not change an answer. For anything that is not a
+// live handle these must be indistinguishable from the functions they replaced,
+// or the exception above has quietly become a behaviour change.
+check('each measure wrapper returns exactly what the library returns', () => {
+  const { window: w, jscad } = createSimpleContext();
+  const solid = jscad.primitives.cuboid({ size: [40, 20, 10] });
+  const flat = jscad.primitives.rectangle({ size: [40, 20] });
+  for (const m of MEASURE_WRAPPERS) {
+    const orig = jscad.measurements[m];
+    if (typeof orig !== 'function') continue;
+    for (const [what, g] of [['a solid', solid], ['a flat shape', flat]]) {
+      let mine; let theirs;
+      try { mine = JSON.stringify(w[m](g)); } catch (e) { mine = `threw ${e.message}`; }
+      try { theirs = JSON.stringify(orig(g)); } catch (e) { theirs = `threw ${e.message}`; }
+      if (mine !== theirs) return `${m} on ${what}: wrapper gave ${mine}, the library gives ${theirs}`;
+    }
+  }
+  return true;
+});
+
+// And the reason the wrappers exist at all, asserted the way the defect fails:
+// measure, change a parameter, measure again, and the second answer must be the
+// new shape's. Without the unwrap this returns the FIRST answer forever.
+check('a measurement follows a live shape when it is changed', () => {
+  const { window: w, jscad } = createSimpleContext();
+  const b = w.ball(5);
+  const before = w.measureVolume(b);
+  b.radius = 9;
+  const after = w.measureVolume(b);
+  const truth = jscad.measurements.measureVolume(jscad.primitives.sphere({ radius: 9 }));
+  if (Math.abs(before - after) < 1e-9) {
+    return `measureVolume still reports ${before.toFixed(2)} after radius went 5 -> 9. `
+      + 'The WeakMap cache is keyed on the handle again — see MEASURE_WRAPPERS.';
+  }
+  return Math.abs(after - truth) < 1e-6
+    ? true
+    : `after the change measureVolume says ${after.toFixed(2)}, a real ball(9) is ${truth.toFixed(2)}`;
 });
 
 check('none of the reSHape names is a real JSCAD name in disguise', () => {
