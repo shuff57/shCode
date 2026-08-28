@@ -240,11 +240,20 @@ export const FENCE_TAGS = {
 export const REACH_CHAIN = [
   {
     file: 'components/HeaderNav.tsx',
-    role: 'a student can reach the JSCAD docs from the site nav',
-    requires: [{ what: 'a nav link to /docs/reshape', pattern: /href="\/docs\/reshape"/ }],
+    role: 'a student can reach the docs hub from the site nav',
+    // The header stopped linking each docs set directly when the hub landed —
+    // one Docs link, three sets behind it. The walk grew a hop rather than
+    // loosening, because "reachable" still has to mean reachable by clicking.
+    requires: [{ what: 'a nav link to /docs', pattern: /href="\/docs"/ }],
     // Not an import — the hop from a nav href to a page is Next.js filesystem
     // routing, so the next file is DERIVED from the href this link carries.
-    nextRoute: { hrefPattern: /href="(\/docs\/reshape)"/, page: '[section]/page.tsx' },
+    nextRoute: { hrefPattern: /href="(\/docs)"/, page: 'page.tsx' },
+  },
+  {
+    file: 'app/docs/page.tsx',
+    role: 'the docs hub offers the reSHape set',
+    requires: [{ what: 'a card linking to /docs/reshape', pattern: /href="\/docs\/reshape\/overview"/ }],
+    nextRoute: { hrefPattern: /href="(\/docs\/reshape)\/overview"/, page: '[section]/page.tsx' },
   },
   {
     file: 'app/docs/reshape/[section]/page.tsx',
