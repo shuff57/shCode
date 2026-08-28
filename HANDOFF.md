@@ -1,3 +1,24 @@
+# Handoff — 2026-08-28 · moSHion and reSHape extracted to public repos
+
+**shuff57/moshion** and **shuff57/reshape-3d** now exist as standalone public
+repos (fresh history, MIT), extracted byte-identically from
+`public/moshion/` and `public/reshape/`. Each has a root `LICENSE`, `README`,
+and `index.html` demo page deployed to GitHub Pages:
+
+- https://shuff57.github.io/moshion/
+- https://shuff57.github.io/reshape-3d/   (name taken: `shuff57/reshape` is the STL→STEP converter)
+
+The runners' "This preview only runs inside shCode" top-level guard and the
+postMessage storage bridge were kept as-is — the demo page implements the
+host side (storage-init responder, console pipe), so no engine edits were
+needed. shCode keeps its vendored copies; these are extracts, not moves.
+If either engine changes here, re-copy `public/<name>/` into the public repo
+(and leave `svg.js`'s shCode-specific header comment — it shipped unchanged).
+`demo.html`→`index.html` rename was needed because GitHub Pages serves the
+site root from `index.html`.
+
+---
+
 # Handoff — 2026-08-25 · shPlay is now moSHion; two engine outages fixed; q5play removed
 
 Started as "run the six new answer keys in a browser". Running them found two
