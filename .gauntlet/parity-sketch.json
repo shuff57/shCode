@@ -63,7 +63,9 @@
         "Corner Rectangle",
         "Center Point Rectangle"
       ],
-      "why": "CORRECTED: never representation-blocked. newSketch() already emits a rectangle (four points, typed in by hand), and a straight-edged polyline was always exactly the right shape for one -- the representation panel added nothing this needed. Blocked on chrome2d: there is no click-to-draw surface, only a 3D-projected drag overlay (HandleOverlay.tsx) over the preview iframe, and two clicks on empty sketch-plane space is not something that overlay can place yet"
+      "why": "CORRECTED: never representation-blocked. newSketch() already emits a rectangle (four points, typed in by hand), and a straight-edged polyline was always exactly the right shape for one -- the representation panel added nothing this needed. Blocked on chrome2d: there is no click-to-draw surface, only a 3D-projected drag overlay (HandleOverlay.tsx) over the preview iframe, and two clicks on empty sketch-plane space is not something that overlay can place yet",
+      "landed": "2026-08-28 gauntlet round 3 (chrome2d piece 2), Corner Rectangle only -- click two diagonal corners on an empty sketch plane to place a real rectangle sketch. Built on chrome2d piece 1's planeAnchor() (a screen-projectable anchor at the plane origin, even with zero corners), reusing HandleOverlay's existing drag inverse-projection math for a click instead of a drag. Verified live via Playwright: real corner handles, correct RULES panel (opposite edges equal length), degenerate click (same point twice) correctly retries instead of creating a sliver, Escape cancels a half-placed rectangle. A real cross-piece bug (planeAnchor() set axisV but not paramV, so the runner never computed vx/vy and every click silently no-opped) was caught by this live check, not by code review or unit tests -- fixed and reverified.",
+      "note": "Center Point Rectangle (centre + corner) still not built -- a second gesture for the same resulting shape, kept in `covers` here rather than moved to outOfScope so the checker keeps tracking it as real remaining work. By the reasoning already applied in outOfScope's 'Variants of tools we build' group, it's a candidate to reclassify as out of scope instead of building, but that's a policy call for review, not decided here."
     },
     {
       "id": "arc",
@@ -81,7 +83,9 @@
         "Inscribed Polygon",
         "Circumscribed Polygon"
       ],
-      "why": "CORRECTED: never representation-blocked -- N points is exactly what a closed polyline already is, and generating them is a for-loop the student can see. Blocked on chrome2d, same as Rectangle: there is nowhere to click to place the shape before the loop can size it"
+      "why": "CORRECTED: never representation-blocked -- N points is exactly what a closed polyline already is, and generating them is a for-loop the student can see. Blocked on chrome2d, same as Rectangle: there is nowhere to click to place the shape before the loop can size it",
+      "landed": "2026-08-28 gauntlet round 3 (chrome2d piece 3), Inscribed Polygon only, fixed at 6 sides -- click a center then a vertex; the clicked point becomes an actual corner (radius = click distance, angle = atan2 of the click), the rest of the hexagon generated from that. Reused piece 2's click-catcher and inverse-projection unchanged -- HandleOverlay.tsx needed zero edits. Verified live via Playwright: degenerate click (same point) stays in draw mode, a real placement produces a genuine regular hexagon (6 corner handles, 6 equal-length edges confirmed in the RULES panel).",
+      "note": "Circumscribed Polygon (edges tangent to the circle, rather than vertices on it) is a second gesture for a related shape, not built here -- same reasoning as Rectangle's Center Point variant. No side-count picker either; fixed at 6. Both are candidates for outOfScope's 'Variants of tools we build' reasoning, left as a policy question for review rather than decided here."
     },
     {
       "id": "chamfer2d",
@@ -89,7 +93,9 @@
       "covers": [
         "Sketch Chamfer"
       ],
-      "why": "split out of the old 'fillet' item: Sketch Fillet shipped (Round a corner, via filletCorner() in lib/sketch-arc.ts -- rounds with an arc). A sketch-level CHAMFER slices the corner off flat instead: a straight replacement edge between two trim points, no bulge, no arc math. Same shape of work as the solid Angled Corner tool already does for a box or cylinder, not yet built for a sketch outline"
+      "why": "split out of the old 'fillet' item: Sketch Fillet shipped (Round a corner, via filletCorner() in lib/sketch-arc.ts -- rounds with an arc). A sketch-level CHAMFER slices the corner off flat instead: a straight replacement edge between two trim points, no bulge, no arc math. Same shape of work as the solid Angled Corner tool already does for a box or cylinder, not yet built for a sketch outline",
+      "landed": "2026-08-29, geometry (chamferCorner/maxChamferDistance/whyCannotChamferCorner in lib/sketch-arc.ts, chamfers?: Record<number,number> on SketchFeature, outlineOf() merges rounds+chamfers with round-wins on conflict) plus Rules-panel UI (a 'Chamfer a corner:' row mirroring 'Round a corner:' in SketchConstraints.tsx, wired via chamferSketchCorner() in ModelEditor.tsx). Verified live via Playwright: an ordinary chamfer sets and persists, an oversized request clamps to a measured ceiling instead of crashing, un-chamfering at 0 clears it, and the neighbour-interaction message correctly names the corner whose round ate the shared edge first ('That corner can only take a chamfer of 20.8 once corner 4 has taken its share of the edge between them').",
+      "note": "outlineOf() processes rounds/chamfers descending by design corner index, so a corner's ceiling only reflects a HIGHER-indexed neighbour's trim, never a lower-indexed one (that neighbour is processed AFTER it, too late to matter within the same pass) -- this is pre-existing, documented behaviour inherited unchanged from Round, not something chamfer2d introduced, but it cost real debugging time to rediscover live and is worth knowing before testing this area again. Separately, a request landing almost exactly on a corner's own un-reduced design ceiling can report the 'own limit' wording even when a neighbour is the tighter real constraint (the reported number is still correct, just the suggested remedy can be the less-relevant one) -- an existing quirk shared with Round, not a chamfer2d regression, left as-is."
     },
     {
       "id": "construction",

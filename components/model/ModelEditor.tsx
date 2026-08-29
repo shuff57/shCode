@@ -62,7 +62,13 @@ import {
 } from 'lucide-react';
 import SketchConstraints from './SketchConstraints';
 import { solveSketch, type Constraint, type Point } from '../../lib/sketch-solve';
-import { maxFilletRadius, outlineOf, whyCannotRoundCorner } from '../../lib/sketch-arc';
+import {
+  maxChamferDistance,
+  maxFilletRadius,
+  outlineOf,
+  whyCannotChamferCorner,
+  whyCannotRoundCorner,
+} from '../../lib/sketch-arc';
 import {
   type Feature,
   type ModelDoc,
@@ -601,8 +607,13 @@ export default function ModelEditor({
     // name a radius the student cannot actually have.
     const note = outlineOf(next).notes.find((x) => x.corner === corner);
     const n = f.points.length;
+    // A neighbouring corner can be eating the shared edge via EITHER a round
+    // or a chamfer (round-wins-if-both is handled inside outlineOf()). This
+    // lookup names the actual neighbour in the clamp message, so it has to
+    // check both maps -- a neighbour that used a chamfer would otherwise be
+    // missed and the message would blame the design ceiling instead.
     const neighbour = [(corner - 1 + n) % n, (corner + 1) % n]
-      .find((c) => (f.rounds?.[c] ?? 0) > 0);
+      .find((c) => (f.rounds?.[c] ?? 0) > 0 || (f.chamfers?.[c] ?? 0) > 0);
 
     let clamped: string | null = null;
     if (note && (ownLimit || neighbour === undefined)) {
@@ -620,6 +631,77 @@ export default function ModelEditor({
     } else if (note && neighbour !== undefined) {
       clamped = `There is no room left to round that corner -- corner ${neighbour + 1}'s `
         + `round has taken the whole edge between them. Put a smaller round on corner `
+        + `${neighbour + 1} first.`;
+    }
+    say(clamped);
+  }
+
+  function chamferSketchCorner(f: Extract<Feature, { kind: 'sketch' }>, corner: number, distance: number) {
+    // f.bulges, not just the points: a corner whose neighbour is already an
+    // imported arc cannot be chamfered (the chamfer construction reads both
+    // adjacent edges as straight chords), and without the bulges this asks
+    // about a different sketch than the one on screen and gets told yes.
+    // Un-chamfering comes first and is never refused: a corner that HAS a
+    // chamfer may since have been dragged somewhere unchamferable, and
+    // refusing to take the chamfer off it would strand the student with a
+    // shape they cannot undo.
+    if (!(distance > 0)) {
+      if ((f.chamfers?.[corner] ?? 0) <= 0) { say(null); return; }
+      const chamfers = { ...(f.chamfers ?? {}) };
+      delete chamfers[corner];
+      onChange({
+        ...doc,
+        features: doc.features.map((x) => (x.id === f.id ? { ...x, chamfers } : x)),
+      });
+      say(null);
+      return;
+    }
+
+    const why = whyCannotChamferCorner(f.points, corner, f.bulges);
+    if (why) { say(why); return; }
+
+    // Record the REQUEST, not the geometry -- same division of labour as
+    // roundSketchCorner: outlineOf() derives the trim points every time they
+    // are needed, so nothing here writes into f.points.
+    const next = { ...f, chamfers: { ...(f.chamfers ?? {}), [corner]: distance } };
+    onChange({
+      ...doc,
+      features: doc.features.map((x) => (x.id === f.id ? next : x)),
+    });
+
+    // What this corner could take ON ITS OWN, from the design polygon.
+    const ceiling = maxChamferDistance(f.points, corner, f.bulges);
+    const ownLimit = distance > ceiling;
+    // What it could take once every OTHER chamfer had its share of the shared
+    // edges -- the number outlineOf() actually used, which is smaller when a
+    // neighbour got there first. Reporting the design-only ceiling here would
+    // name a distance the student cannot actually have.
+    const note = outlineOf(next).notes.find((x) => x.corner === corner);
+    const n = f.points.length;
+    // A neighbouring corner can be eating the shared edge via EITHER a round
+    // or a chamfer (round-wins-if-both is handled inside outlineOf()). This
+    // lookup names the actual neighbour in the clamp message, so it has to
+    // check both maps -- a neighbour that used a round would otherwise be
+    // missed and the message would blame the design ceiling instead.
+    const neighbour = [(corner - 1 + n) % n, (corner + 1) % n]
+      .find((c) => (f.rounds?.[c] ?? 0) > 0 || (f.chamfers?.[c] ?? 0) > 0);
+
+    let clamped: string | null = null;
+    if (note && (ownLimit || neighbour === undefined)) {
+      // Its own two edges are the limit. Both remedies are reachable from
+      // here: this panel has a Length box per edge, and every design corner
+      // carries a drag handle on the canvas.
+      clamped = `That corner can only take a chamfer of ${note.got.toFixed(1)}, so that is `
+        + 'what I used. Make its two edges longer if you want a bigger one.';
+    } else if (note && neighbour !== undefined && note.got > 0) {
+      // The remedy names the Chamfer box on the neighbouring corner, which is
+      // in this same panel and takes a new number at any time.
+      clamped = `That corner can only take a chamfer of ${note.got.toFixed(1)} once corner `
+        + `${neighbour + 1} has taken its share of the edge between them. Put a smaller `
+        + `chamfer on corner ${neighbour + 1} if you want a bigger one here.`;
+    } else if (note && neighbour !== undefined) {
+      clamped = `There is no room left to chamfer that corner -- corner ${neighbour + 1}'s `
+        + `chamfer has taken the whole edge between them. Put a smaller chamfer on corner `
         + `${neighbour + 1} first.`;
     }
     say(clamped);
@@ -1305,9 +1387,11 @@ export default function ModelEditor({
           points={activeSketch.points}
           bulges={activeSketch.bulges}
           rounds={activeSketch.rounds}
+          chamfers={activeSketch.chamfers}
           constraints={activeSketch.constraints ?? []}
           onChange={(next) => setConstraints(activeSketch, next)}
           onRound={(corner, radius) => roundSketchCorner(activeSketch, corner, radius)}
+          onChamfer={(corner, distance) => chamferSketchCorner(activeSketch, corner, distance)}
         />
       )}
 

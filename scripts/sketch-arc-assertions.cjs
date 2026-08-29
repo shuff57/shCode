@@ -365,6 +365,120 @@ module.exports = function run(dir) {
     && !/straighten|un-?round|remove the curve|make it straight/i.test(curvedWhy),
     `"${curvedWhy}" names a remedy; there is no action anywhere in the app that removes a bulge`);
 
+  // ------------------------------------------------------------------ CH --
+  // Chamfer is the mirror of fillet, with ONE deliberate difference: the
+  // request IS the trim distance (no radius, no tan(), no arc). The rectangle
+  // is the right fixture here precisely because it is degenerate for chamfer
+  // the same way it is degenerate for trim -- there is no radius-to-trim law
+  // that a degenerate angle could mask, so a correct answer and a
+  // wrong-by-construction answer are trivially separable.
+  console.log('\n=== chamferCorner: the trim distance is the request, no arc ===');
+
+  const chamferedTri = A.chamferCorner({ points: triangle }, 1, 5);
+  check('#CH the sharp corner is replaced by two trim points, exactly `distance` in',
+    chamferedTri.points.length === 4
+      && near(chamferedTri.points[1][0], 35) && near(chamferedTri.points[1][1], 0)
+      && near(chamferedTri.points[2][0], 36) && near(chamferedTri.points[2][1], 3),
+    `got ${JSON.stringify(chamferedTri.points)} -- trim must be the request (5), not a `
+      + `r/tan(interior/2) fillet trim (15) that would land at [25,0]/[28,9]`);
+  check('#CH ...and it writes NO bulge: the new edge is straight, not an arc',
+    !chamferedTri.bulges || Object.keys(chamferedTri.bulges).length === 0,
+    JSON.stringify(chamferedTri.bulges));
+  check('...the untouched corners are still exactly where they were',
+    chamferedTri.points[0][0] === 0 && chamferedTri.points[0][1] === 0
+      && chamferedTri.points[3][0] === 0 && chamferedTri.points[3][1] === 30);
+
+  check('...a chamfer on a rectangle corner trims both edges by the distance',
+    (() => {
+      const r = A.chamferCorner({ points: rect() }, 0, 5);
+      return r.points.length === 5
+        && near(r.points[0][0], 0) && near(r.points[0][1], 5)
+        && near(r.points[1][0], 5) && near(r.points[1][1], 0);
+    })(),
+    'corner [0,0] at distance 5 must become [0,5] and [5,0]');
+
+  console.log('\n=== maxChamferDistance: the ceiling IS the shorter edge, no tan() ===');
+
+  check('#CH a 3-4-5 triangle corner clamps to the shorter adjacent edge (40, not a fillet)',
+    near(A.maxChamferDistance(triangle, 1), 40),
+    `got ${A.maxChamferDistance(triangle, 1)} -- the shorter edge here is the 40-unit leg; a `
+      + `fillet formula (min/2 * tan(interior/2)) would say ~5.55, not 40`);
+  check('...a rectangle corner clamps to half its shorter side (25) -- the whole edge',
+    near(A.maxChamferDistance(rect(), 0), 25));
+
+  console.log('\n=== chamferCorner: the same three refusals as fillet, and only those ===');
+
+  check('#CH a STRAIGHT corner refuses, returning the sketch unchanged',
+    (() => {
+      const c = A.chamferCorner({ points: collinear }, 1, 5);
+      return c.points.length === collinear.length
+        && c.points.every((p, i) => p[0] === collinear[i][0] && p[1] === collinear[i][1]);
+    })(),
+    'a collinear corner has no angle to slice; chamfer must not splice two coincident points');
+  check('#CH a zero-length-adjacent-edge corner refuses too',
+    (() => {
+      const zeroLen = [[0, 0], [40, 0], [40, 0], [0, 25]];
+      const c = A.chamferCorner({ points: zeroLen }, 1, 5);
+      return c.points.length === 4
+        && c.points.every((p, i) => p[0] === zeroLen[i][0] && p[1] === zeroLen[i][1]);
+    })(),
+    'a corner with no edge on one side cannot be chamfered');
+  check('#CH a corner next to an already-curved edge refuses (same reason round does)',
+    A.maxChamferDistance(filleted.points, 2, filleted.bulges) === 0
+      && A.chamferCorner(filleted, 2, 5).points.length === filleted.points.length,
+    'chamfering reads both edges as straight chords; next to an arc it would slice that arc');
+
+  console.log('\n=== whyCannotChamferCorner: words for the refusals ===');
+
+  check('#CH an ordinary corner has no refusal at all',
+    A.whyCannotChamferCorner(rect(), 0) === null);
+  check('#CH a straight corner is named straight, not "too sharp"',
+    (() => {
+      const w = A.whyCannotChamferCorner(collinear, 1);
+      return typeof w === 'string' && /straight/i.test(w) && !/too sharp/i.test(w);
+    })(),
+    String(A.whyCannotChamferCorner(collinear, 1)));
+  check('#CH a zero-length edge is named as coincidence, not a sharp angle',
+    (() => {
+      const zeroLen = [[0, 0], [40, 0], [40, 0], [0, 25]];
+      const w = A.whyCannotChamferCorner(zeroLen, 1);
+      return typeof w === 'string' && /on top of each other/i.test(w) && !/wider angle/i.test(w);
+    })(),
+    String(A.whyCannotChamferCorner([[0, 0], [40, 0], [40, 0], [0, 25]], 1)));
+  check('#CH a curved neighbour is named as a curve, with no remedy the app cannot provide',
+    (() => {
+      const w = A.whyCannotChamferCorner(filleted.points, 2, filleted.bulges);
+      return typeof w === 'string' && /curve/i.test(w)
+        && !/straighten|un-?round|remove the curve|make it straight/i.test(w);
+    })(),
+    String(A.whyCannotChamferCorner(filleted.points, 2, filleted.bulges)));
+
+  console.log('\n=== chamferCorner: reindexing constraints and chamfers ===');
+
+  const cFilleted2 = A.chamferCorner({
+    points: rect(),
+    constraints: [
+      { kind: 'horizontal', edge: 0 },
+      { kind: 'vertical', edge: 1 },
+      { kind: 'lock', corner: 2 },
+    ],
+    chamfers: { 1: 5 },
+  }, 1, 5);
+  check('#CH constraints reindex past the seam exactly as a fillet does',
+    cFilleted2.constraints.some((c) => c.kind === 'horizontal' && c.edge === 0)
+      && cFilleted2.constraints.some((c) => c.kind === 'vertical' && c.edge === 2)
+      && cFilleted2.constraints.some((c) => c.kind === 'lock' && c.corner === 3),
+    JSON.stringify(cFilleted2.constraints));
+  check('#CH a lock on the chamfered-away corner is dropped, not reassigned',
+    !A.chamferCorner({ points: rect(), constraints: [{ kind: 'lock', corner: 1 }] }, 1, 5)
+      .constraints.some((c) => c.kind === 'lock'),
+    'the corner being chamfered is deleted; its pin must not silently move to pointOut');
+  check('#CH reindex shifts the chamfers map with its corner, not its index',
+    A.reindex({ points: rect(), chamfers: { 1: 8 } }, 0).chamfers[2] === 8
+      && A.reindex({ points: rect(), chamfers: { 1: 8 } }, 0).chamfers[1] === undefined
+      && A.reindex({ points: rect(), chamfers: { 1: 8 } }, 3).chamfers[1] === 8,
+    'chamfers is keyed by CORNER like rounds; splitting edge 0 must slide corner 1 to corner 2');
+
   console.log('\n=== splitEdge, curved branch: the reindex nobody was covering ===');
 
   // splitEdge()'s curved branch calls reindex() to shift everything past the

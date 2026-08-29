@@ -134,6 +134,22 @@ export interface SketchFeature {
    * generates exactly the polyArc() it always did.
    */
   rounds?: Record<number, number>;
+  /**
+   * Chamfer trim distance the student asked for on design corner n. Absent or
+   * empty means nothing is chamfered on that corner.
+   *
+   * Unlike `rounds`, this is a DISTANCE, not a radius -- a chamfer has no arc
+   * to convert through tan(), it slices a straight edge between two trim
+   * points at exactly this distance along each adjacent edge. Same
+   * request-not-geometry contract as `rounds`: outlineOf() derives the actual
+   * trim points every time, clamped to what the corner can currently take.
+   *
+   * A corner should never carry both a `rounds` entry and a `chamfers` entry
+   * -- the UI is expected to enforce that as a per-corner choice. If it
+   * happens anyway, outlineOf() resolves it deterministically: round wins,
+   * the chamfer request is ignored for that corner (see outlineOf()).
+   */
+  chamfers?: Record<number, number>;
   /** Rules the corners must obey. Absent means free-hand. */
   constraints?: SketchConstraint[];
 }

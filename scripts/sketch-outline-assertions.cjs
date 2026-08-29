@@ -270,6 +270,78 @@ module.exports = function run(dir) {
     })(),
     JSON.stringify(arc.outlineOf(split).bulges));
 
+  // ------------------------------------------------------------ CHAMFER --
+  console.log('\n=== C6 chamfer: a straight slice, request-not-geometry, like round ===');
+
+  // A plain chamfer: corner 0 of a rectangle at distance 5. Unlike a round it
+  // writes NO arc -- the two trim points are joined by a straight edge, so the
+  // outline is 5 corners and no bulge.
+  const chamf = arc.outlineOf(sk({ chamfers: { 0: 5 } }));
+  check('#C6 a chamfered corner produces two trim points and no arc',
+    chamf.points.length === 5
+      && Math.abs(chamf.points[0][0] - 0) < 1e-9 && Math.abs(chamf.points[0][1] - 5) < 1e-9
+      && Math.abs(chamf.points[1][0] - 5) < 1e-9 && Math.abs(chamf.points[1][1] - 0) < 1e-9
+      && (chamf.bulges === undefined || Object.keys(chamf.bulges).length === 0),
+    `points ${JSON.stringify(chamf.points)}, bulges ${JSON.stringify(chamf.bulges)} -- a chamfer `
+      + 'must be a straight edge (no bulge), unlike a round');
+  check('...every outline point is attributed to a design corner',
+    chamf.basis.length === 5 && JSON.stringify(chamf.basis) === JSON.stringify([0, 0, 1, 2, 3]),
+    JSON.stringify(chamf.basis));
+
+  // The clamp. Chamfer's input IS the trim distance, so the ceiling is the
+  // shorter adjacent edge (25 for a 40x25 corner) and a request past it has to
+  // be clamped AND reported.
+  const clampedChamf = arc.outlineOf(sk({ chamfers: { 0: 500 } }));
+  check('#C6 a chamfer clamped by the ceiling is reported at the used number',
+    clampedChamf.points.length === 5
+      && clampedChamf.notes.length === 1 && clampedChamf.notes[0].corner === 0
+      && Math.abs(clampedChamf.notes[0].want - 500) < 1e-9
+      && Math.abs(clampedChamf.notes[0].got - 25) < 1e-6,
+    `${JSON.stringify(clampedChamf.notes)} -- a chamfer request of 500 on a 25-unit edge must `
+      + 'clamp to 25 and say so');
+
+  // A chamfer next to a curved edge is refused, like a round: chamfer reads
+  // both edges as straight chords and would slice the arc. Refusing leaves the
+  // outline exactly as the arc already described it, and reports got: 0.
+  const filletedTri = arc.filletCorner({ points: [[0, 0], [40, 0], [0, 30]] }, 1, 5);
+  const curvedChamf = arc.outlineOf({
+    points: filletedTri.points, bulges: filletedTri.bulges, chamfers: { 2: 5 },
+  });
+  check('#C6 a chamfer next to a curved edge is refused, not silently wrong',
+    curvedChamf.points.length === filletedTri.points.length
+      && Math.abs(curvedChamf.bulges[1] - filletedTri.bulges[1]) < 1e-12
+      && curvedChamf.notes.length === 1 && curvedChamf.notes[0].corner === 2
+      && Math.abs(curvedChamf.notes[0].got) < 1e-9,
+    `points ${JSON.stringify(curvedChamf.points)}, bulges ${JSON.stringify(curvedChamf.bulges)}`
+      + `, notes ${JSON.stringify(curvedChamf.notes)} -- the arc must survive untouched`);
+
+  // The conflict rule: a corner in BOTH rounds and chamfers is rounded, the
+  // chamfer dropped. Corner 1 here has round 8 and chamfer 10; the corner must
+  // come out ARCED (a bulge, two trim points), not sliced.
+  const both = arc.outlineOf(sk({ rounds: { 1: 8 }, chamfers: { 1: 10 } }));
+  const bothKeys = Object.keys(both.bulges || {}).map(Number);
+  check('#C6 when a corner carries BOTH a round and a chamfer, round wins',
+    bothKeys.length === 1 && bothKeys[0] === 1
+      && Math.abs(both.bulges[1] - 0.41421356237309503) < 1e-9
+      && both.points.length === 5
+      && Math.abs(both.points[1][0] - 32) < 1e-9 && Math.abs(both.points[2][1] - 8) < 1e-9,
+    `points ${JSON.stringify(both.points)}, bulges ${JSON.stringify(both.bulges)} -- the corner `
+      + 'must come out ARCED (round wins) not sliced (chamfer would win)');
+  check('...and the chamfer ask for that corner is not reported (it was ignored, not clamped)',
+    both.notes.length === 0, JSON.stringify(both.notes));
+
+  // The legacy-passthrough gate. A doc with `chamfers` and no `rounds` is NOT
+  // a legacy bulges-only outline -- it has to be processed. If it wrongly took
+  // the passthrough branch it would come back with the raw 4 design corners
+  // and no trim.
+  const chamfOnly = arc.outlineOf(sk({ chamfers: { 1: 8 } }));
+  check('#C6 a chamfers-only doc is processed, not passed through as legacy',
+    chamfOnly.points.length === 5
+      && Math.abs(chamfOnly.points[2][0] - 40) < 1e-9 && Math.abs(chamfOnly.points[2][1] - 8) < 1e-9
+      && chamfOnly.points[1][0] === 32 && chamfOnly.points[1][1] === 0,
+    `points ${JSON.stringify(chamfOnly.points)} -- 4 points means the doc took the legacy `
+      + 'bulges-only passthrough and the chamfer was ignored');
+
   // ------------------------------------------------------------------ C5 --
   console.log('\n=== C5 the generated source drags live ===');
 

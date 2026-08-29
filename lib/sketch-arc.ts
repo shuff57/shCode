@@ -26,6 +26,9 @@ export interface SketchLike {
   bulges?: Record<number, number>;
   /** Radius the student asked for on DESIGN corner n. See outlineOf(). */
   rounds?: Record<number, number>;
+  /** Chamfer trim distance the student asked for on DESIGN corner n. See
+   *  outlineOf(). */
+  chamfers?: Record<number, number>;
   constraints?: Constraint[];
 }
 
@@ -214,6 +217,78 @@ export function whyCannotRoundCorner(
 }
 
 /**
+ * The real ceiling on this corner's chamfer trim distance: the distance at
+ * which trimming both edges reaches exactly the far end of the shorter
+ * adjacent edge. A chamfer's input IS the trim distance -- there is no
+ * radius-to-trim conversion, no tan() -- so the ceiling is simply
+ * `Math.min(lenIn, lenOut)`, unlike maxFilletRadius()'s
+ * `(Math.min/2) * tan(interior/2)`.
+ *
+ * The two whole-corner refusals are the same three as maxFilletRadius() and
+ * in the same spirit (a caller treats 0 as "this corner cannot be
+ * chamfered"): a curved neighbour via `bulges`, a zero-length adjacent edge,
+ * and a corner already straight within STRAIGHT_TOL. A chamfer next to an
+ * arc reads that arc as a straight chord and slices it, which either breaks
+ * tangency or rescales the arc -- so refusing is the honest answer, same as
+ * rounding would. `bulges` is optional so a caller with only a point list
+ * still gets the straight/sharp answers; pass it whenever you have it.
+ */
+export function maxChamferDistance(
+  points: Point[], corner: number, bulges?: Record<number, number>
+): number {
+  const n = points.length;
+  if (bulges && (bulges[(corner - 1 + n) % n] || bulges[corner])) return 0;
+  const prev = points[(corner - 1 + n) % n];
+  const c = points[corner];
+  const next = points[(corner + 1) % n];
+  const lenIn = Math.hypot(c[0] - prev[0], c[1] - prev[1]);
+  const lenOut = Math.hypot(next[0] - c[0], next[1] - c[1]);
+  if (lenIn === 0 || lenOut === 0) return 0;
+  const vIn: Point = [prev[0] - c[0], prev[1] - c[1]];
+  const vOut: Point = [next[0] - c[0], next[1] - c[1]];
+  const cosInterior = (vIn[0] * vOut[0] + vIn[1] * vOut[1]) / (lenIn * lenOut);
+  const interior = Math.acos(Math.max(-1, Math.min(1, cosInterior)));
+  if (Math.PI - interior < STRAIGHT_TOL) return 0;
+  return Math.min(lenIn, lenOut);
+}
+
+/**
+ * Plain words for why THIS corner cannot take a chamfer at all, or null when
+ * some positive distance would work. The mirror of whyCannotRoundCorner():
+ * the same three refusals, the same message strings, "chamfer" where the
+ * round one says "round"/"rounded". On remedies, the same rule applies: the
+ * two ANGLE answers name the corner-drag handle (a real handle, emitted by
+ * sketchHandles() in lib/model-handles.ts); the CURVED-neighbour answer names
+ * none, because there is no un-round action in the app to point a student at.
+ */
+export function whyCannotChamferCorner(
+  points: Point[], corner: number, bulges?: Record<number, number>
+): string | null {
+  if (maxChamferDistance(points, corner, bulges) > 0) return null;
+  const n = points.length;
+  if (bulges && (bulges[(corner - 1 + n) % n] || bulges[corner])) {
+    return "One of the two edges at this corner is already a curve, and shCode can only chamfer a corner where both of its edges are straight.";
+  }
+  const prev = points[(corner - 1 + n) % n];
+  const c = points[corner];
+  const next = points[(corner + 1) % n];
+  const lenIn = Math.hypot(c[0] - prev[0], c[1] - prev[1]);
+  const lenOut = Math.hypot(next[0] - c[0], next[1] - c[1]);
+  if (lenIn === 0 || lenOut === 0) {
+    return "Two corners of this sketch are sitting on top of each other, so one of the edges here has no length at all. Drag them apart first.";
+  }
+  if (lenIn > 0 && lenOut > 0) {
+    const cosInterior = ((prev[0] - c[0]) * (next[0] - c[0]) + (prev[1] - c[1]) * (next[1] - c[1]))
+      / (lenIn * lenOut);
+    const interior = Math.acos(Math.max(-1, Math.min(1, cosInterior)));
+    if (Math.PI - interior < STRAIGHT_TOL) {
+      return "This corner is straight -- both of its edges run in one line, so there is no corner sticking out to chamfer off. Drag the corner away from that line first.";
+    }
+  }
+  return "This corner is too sharp to chamfer -- its two edges nearly double back on each other. Drag it into a wider angle first.";
+}
+
+/**
  * Shift every constraint and bulge index past `insertedAt` by one.
  *
  * "Past a seam" is the one operation both callers need, because both add
@@ -271,11 +346,22 @@ export function reindex<T extends SketchLike>(f: T, insertedAt: number): T {
       )
     : f.rounds;
 
+  // `chamfers` is keyed by CORNER exactly like `rounds`, so it shifts on the
+  // same corner rule for the same reason: the trim distance belongs to a
+  // design corner, not to an edge, and sliding it onto a neighbour would
+  // chamfer the wrong corner the first time addCorner() ran.
+  const chamfers = f.chamfers
+    ? Object.fromEntries(
+        Object.entries(f.chamfers).map(([k, v]) => [shiftCorner(Number(k)), v])
+      )
+    : f.chamfers;
+
   return {
     ...f,
     ...(constraints ? { constraints } : {}),
     ...(bulges ? { bulges } : {}),
     ...(rounds ? { rounds } : {}),
+    ...(chamfers ? { chamfers } : {}),
   };
 }
 
@@ -342,6 +428,79 @@ export function splitEdge<T extends SketchLike>(f: T, index: number): T {
 }
 
 /**
+ * The shared middle of a corner-trimming operation: cut both adjacent edges
+ * back by `trim` from the corner, splice the two trim points into `points` in
+ * place of the corner, strip any `lock` constraint that pointed at the deleted
+ * corner, and `reindex()` everything past the seam.
+ *
+ * This is the part filletCorner() and chamferCorner() have in common -- the
+ * only difference between the two is what they do after the corner is gone:
+ * one writes a bulge for the new edge, the other leaves it straight. Both
+ * refusal conditions live here because both operations share them:
+ *
+ *   - A zero-length adjacent edge is not a corner at all, there is no angle to
+ *     trim into -- return null.
+ *   - The epsilon guard. This is the one invariant the splice must never
+ *     break: the two points about to be spliced in are pointIn and pointOut,
+ *     both `trim` away from C along different rays. A trim of zero (or NaN)
+ *     makes them the same point, which is a duplicate point and a zero-length
+ *     edge in the outline -- and a zero-length edge is what makes lenIn === 0
+ *     for the neighbours, so every later trim of them silently no-ops
+ *     forever. Relative to the edges so it means the same thing at any scale.
+ *
+ * Returns null on either refusal; the caller returns f unchanged. Otherwise
+ * `reindexed` is `f` with constraints and bulges shifted past the seam (the
+ * caller's own field to write, e.g. the new arc's bulge, is left to it) and
+ * `points` is the spliced list the caller should ship.
+ */
+function trimCorner<T extends SketchLike>(
+  f: T, corner: number, trim: number
+): { points: Point[]; reindexed: T; pointIn: Point; pointOut: Point } | null {
+  const n = f.points.length;
+  const prevI = (corner - 1 + n) % n;
+  const nextI = (corner + 1) % n;
+  const C = f.points[corner];
+  const P = f.points[prevI];
+  const N = f.points[nextI];
+
+  const vIn: Point = [P[0] - C[0], P[1] - C[1]];
+  const vOut: Point = [N[0] - C[0], N[1] - C[1]];
+  const lenIn = Math.hypot(vIn[0], vIn[1]);
+  const lenOut = Math.hypot(vOut[0], vOut[1]);
+  if (lenIn === 0 || lenOut === 0) return null; // a zero-length adjacent edge: no corner here to trim
+
+  if (!(trim > 1e-9 * Math.min(lenIn, lenOut))) return null;
+
+  const pointIn: Point = [C[0] + (vIn[0] / lenIn) * trim, C[1] + (vIn[1] / lenIn) * trim];
+  const pointOut: Point = [C[0] + (vOut[0] / lenOut) * trim, C[1] + (vOut[1] / lenOut) * trim];
+
+  const points = [...f.points];
+  points.splice(corner, 1, pointIn, pointOut);
+
+  // The seam is right before the corner being trimmed -- see reindex()'s own
+  // comment for why this exact insertedAt makes ONE shared function correct
+  // for both callers (addCorner() and the corner-trimmers alike).
+  const insertedAt = corner - 1;
+
+  // A 'lock' on the corner being trimmed away has no surviving point to
+  // point at -- the corner itself is deleted, replaced by two new trim
+  // points. reindex()'s generic "shift anything past insertedAt" rule
+  // cannot tell that deletion apart from addCorner()'s plain insertion
+  // shift, so left to it a lock here is silently reassigned to pointOut, a
+  // point the student never selected (Finding 2, sketch gauntlet round 2).
+  // Strip it before reindexing the rest -- every OTHER constraint still
+  // needs the ordinary shift, which is why this filters rather than
+  // replacing reindex() itself. The caller decides whether and how to tell
+  // the student their pin is gone.
+  const constraintsMinusTrimmedPin = f.constraints?.filter(
+    (c) => !(c.kind === 'lock' && c.corner === corner)
+  );
+  const reindexed = reindex({ ...f, constraints: constraintsMinusTrimmedPin }, insertedAt);
+
+  return { points, reindexed, pointIn, pointOut };
+}
+
+/**
  * Round one sharp corner into an arc: trim both adjacent edges back by the
  * tangent distance, drop the sharp corner, and insert the two trim points
  * plus a bulge for the arc between them.
@@ -350,6 +509,11 @@ export function splitEdge<T extends SketchLike>(f: T, index: number): T {
  * construction, verified against a non-90-degree corner on purpose (a
  * rectangle's 90-degree corners cannot tell trim-by-r apart from the correct
  * trim-by-r/tan(45deg)=r, since they are numerically identical there).
+ *
+ * The whole corner-removal (trim, splice, lock-strip, reindex) lives in
+ * trimCorner(), shared with chamferCorner(); this wrapper only decides the
+ * trim distance from the radius and then, on top of the trimmed outline,
+ * writes the arc's bulge.
  */
 export function filletCorner<T extends SketchLike>(f: T, corner: number, radius: number): T {
   const n = f.points.length;
@@ -384,17 +548,9 @@ export function filletCorner<T extends SketchLike>(f: T, corner: number, radius:
   const clampedRadius = Math.min(Math.max(0, radius), safeRadius);
   if (clampedRadius <= 0) return f;
   const trim = clampedRadius / Math.tan(interior / 2);
-  // Belt under the belt, and the one invariant this function must never
-  // break: the two points about to be spliced in are pointIn and pointOut,
-  // both `trim` away from C along different rays. A trim of zero (or NaN)
-  // makes them the same point, which is a duplicate point and a zero-length
-  // edge in the outline -- and a zero-length edge is what makes lenIn === 0
-  // for the neighbours, so every later round of them silently no-ops
-  // forever. Relative to the edges so it means the same thing at any scale.
-  if (!(trim > 1e-9 * Math.min(lenIn, lenOut))) return f;
 
-  const pointIn: Point = [C[0] + (vIn[0] / lenIn) * trim, C[1] + (vIn[1] / lenIn) * trim];
-  const pointOut: Point = [C[0] + (vOut[0] / lenOut) * trim, C[1] + (vOut[1] / lenOut) * trim];
+  const trimmed = trimCorner(f, corner, trim);
+  if (!trimmed) return f;
 
   // Sign of the turn at C: positive (CCW) for a convex corner on a
   // CCW-wound outline. The arc's sweep is the corner's exterior angle
@@ -405,32 +561,31 @@ export function filletCorner<T extends SketchLike>(f: T, corner: number, radius:
   const sweep = Math.PI - interior;
   const bulge = (cross >= 0 ? 1 : -1) * Math.tan(sweep / 4);
 
-  const points = [...f.points];
-  points.splice(corner, 1, pointIn, pointOut);
-
-  // The seam is right before the corner being rounded -- see reindex()'s own
-  // comment for why this exact insertedAt makes ONE shared function correct
-  // for both callers.
-  const insertedAt = corner - 1;
-
-  // A 'lock' on the corner being rounded away has no surviving point to
-  // point at -- the corner itself is deleted, replaced by two new trim
-  // points. reindex()'s generic "shift anything past insertedAt" rule
-  // cannot tell that deletion apart from addCorner()'s plain insertion
-  // shift, so left to it a lock here is silently reassigned to pointOut, a
-  // point the student never selected (Finding 2, sketch gauntlet round 2).
-  // Strip it before reindexing the rest -- every OTHER constraint still
-  // needs the ordinary shift, which is why this filters rather than
-  // replacing reindex() itself. The caller decides whether and how to tell
-  // the student their pin is gone.
-  const constraintsMinusRoundedPin = f.constraints?.filter(
-    (c) => !(c.kind === 'lock' && c.corner === corner)
-  );
-  const reindexed = reindex({ ...f, constraints: constraintsMinusRoundedPin }, insertedAt);
-  const bulges = { ...(reindexed.bulges ?? {}) };
+  const bulges = { ...(trimmed.reindexed.bulges ?? {}) };
   bulges[corner] = bulge;
 
-  return { ...reindexed, points, bulges };
+  return { ...trimmed.reindexed, points: trimmed.points, bulges };
+}
+
+/**
+ * Slice one sharp corner off flat: trim both adjacent edges back by `distance`
+ * and drop the corner, leaving a straight edge between the two trim points.
+ *
+ * Same overall shape as filletCorner() -- clamp the request to what the corner
+ * can actually take, then trimCorner() -- but no bulge math afterwards: the new
+ * edge between pointIn and pointOut is straight, which is already what "0 or
+ * absent" means in `bulges` per this file's top-of-file convention. So the
+ * reindexed result with the trimmed `points` is the whole answer.
+ */
+export function chamferCorner<T extends SketchLike>(f: T, corner: number, distance: number): T {
+  const safeDistance = maxChamferDistance(f.points, corner, f.bulges);
+  const clampedDistance = Math.min(Math.max(0, distance), safeDistance);
+  if (clampedDistance <= 0) return f;
+
+  const trimmed = trimCorner(f, corner, clampedDistance);
+  if (!trimmed) return f;
+
+  return { ...trimmed.reindexed, points: trimmed.points };
 }
 
 /**
@@ -566,21 +721,30 @@ export function outlineOf(f: SketchLike): Outline {
 
   const collapsed = collapsedEdge(f.points);
 
-  const asked = f.rounds ?? {};
-  // Descending, and that is load-bearing: filletCorner() splices one extra
-  // point in at `corner`, so every index ABOVE it shifts. Working downwards
-  // means the corner about to be rounded still sits at its own design index
-  // when its turn comes, and no bookkeeping is needed to find it.
-  const corners = Object.keys(asked)
-    .map(Number)
-    .filter((k) => Number.isInteger(k) && k >= 0 && k < f.points.length && asked[k] > 0)
-    .sort((a, b) => b - a);
+  type Ask = { corner: number; kind: 'round' | 'chamfer'; want: number };
+  const validCorner = (k: number) =>
+    Number.isInteger(k) && k >= 0 && k < f.points.length;
 
-  if (corners.length === 0) {
-    // Legacy / imported: a doc carrying `bulges` and no `rounds` is an outline
-    // somebody else already built, and it passes through untouched. This is
-    // what keeps a pre-rounds saved sandbox generating exactly the polyArc it
-    // always did.
+  const roundAsks: Ask[] = Object.entries(f.rounds ?? {})
+    .map(([k, v]) => ({ corner: Number(k), kind: 'round' as const, want: v }))
+    .filter((a) => validCorner(a.corner) && a.want > 0);
+
+  // If a corner appears in BOTH rounds and chamfers, round wins -- see the
+  // doc comment on SketchFeature.chamfers. Drop any chamfer ask whose corner
+  // already has a round ask, rather than trusting the UI to have prevented
+  // this.
+  const roundCorners = new Set(roundAsks.map((a) => a.corner));
+  const chamferAsks: Ask[] = Object.entries(f.chamfers ?? {})
+    .map(([k, v]) => ({ corner: Number(k), kind: 'chamfer' as const, want: v }))
+    .filter((a) => validCorner(a.corner) && a.want > 0 && !roundCorners.has(a.corner));
+
+  const asks = [...roundAsks, ...chamferAsks].sort((a, b) => b.corner - a.corner);
+
+  if (asks.length === 0) {
+    // Legacy / imported: a doc carrying `bulges` and no `rounds` (or
+    // `chamfers`) is an outline somebody else already built, and it passes
+    // through untouched. This is what keeps a pre-rounds saved sandbox
+    // generating exactly the polyArc it always did.
     return collapsed
       ? { ok: false, points: f.points, bulges: f.bulges, basis: identity, notes: [], why: collapsed }
       : { ok: true, points: f.points, bulges: f.bulges, basis: identity, notes: [] };
@@ -591,21 +755,26 @@ export function outlineOf(f: SketchLike): Outline {
   let basis = identity.slice();
   const notes: Outline['notes'] = [];
 
-  for (const k of corners) {
-    const want = asked[k];
-    // Asked of the WORKING points, not the design: a neighbour rounded a
-    // moment ago has already eaten part of the shared edge, so the honest
-    // ceiling here is smaller than the design alone would suggest. This is
-    // the number the caller reports, precisely because it is the one that
-    // took the other rounds into account.
-    const ceiling = maxFilletRadius(points, k, bulges);
+  for (const ask of asks) {
+    const k = ask.corner;
+    const want = ask.want;
+    // Asked of the WORKING points, not the design: a neighbour rounded or
+    // chamfered a moment ago has already eaten part of the shared edge, so the
+    // honest ceiling here is smaller than the design alone would suggest. This
+    // is the number the caller reports, precisely because it is the one that
+    // took the other corners into account.
+    const ceiling = ask.kind === 'round'
+      ? maxFilletRadius(points, k, bulges)
+      : maxChamferDistance(points, k, bulges);
     const got = Math.min(want, Math.max(0, ceiling));
     if (got < want - 1e-9) notes.push({ corner: k, want, got });
     if (!(got > 0)) continue;
 
     const before = points.length;
-    const next = filletCorner({ points, bulges }, k, got);
-    if (next.points.length === before) continue; // filletCorner refused
+    const next = ask.kind === 'round'
+      ? filletCorner({ points, bulges }, k, got)
+      : chamferCorner({ points, bulges }, k, got);
+    if (next.points.length === before) continue; // the corner op refused
     points = next.points;
     bulges = next.bulges ?? {};
     // The one sharp corner became two trim points; both belong to it.

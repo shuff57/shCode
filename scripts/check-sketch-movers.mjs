@@ -33,6 +33,7 @@ const SANCTIONED = {
   'lib/sketch-arc.ts': {
     splitEdge: 'owns the split, including dividing an arc into two arcs that retrace it',
     filletCorner: 'builds the trim points and the arc; the one place they are constructed',
+    chamferCorner: 'builds the trim points and the straight edge; the slice counterpart of filletCorner',
     reindex: 'shifts keys past a seam and never touches a value or a coordinate',
     outlineOf: 'derives the outline from the design; the only producer of an arc endpoint',
   },

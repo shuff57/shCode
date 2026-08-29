@@ -12,7 +12,12 @@ import {
   edgeLength,
   residualOf,
 } from '../../lib/sketch-solve';
-import { maxFilletRadius, whyCannotRoundCorner } from '../../lib/sketch-arc';
+import {
+  maxChamferDistance,
+  maxFilletRadius,
+  whyCannotChamferCorner,
+  whyCannotRoundCorner,
+} from '../../lib/sketch-arc';
 
 interface Props {
   /** The DESIGN corners -- one row per edge between them, one Round box per
@@ -27,19 +32,26 @@ interface Props {
   /** Radius asked for on each rounded design corner, so the Round boxes can
    *  show what is currently set instead of always reading empty. */
   rounds?: Record<number, number>;
+  /** Distance asked for on each chamfered design corner, so the Chamfer boxes
+   *  can show what is currently set instead of always reading empty. */
+  chamfers?: Record<number, number>;
   constraints: Constraint[];
   onChange: (next: Constraint[]) => void;
   /** Round corner `corner` to `radius`, or un-round it at 0 -- the caller
    *  owns writing it into the feature, same division of labour onChange
    *  already has for constraints. Nothing here computes geometry. */
   onRound: (corner: number, radius: number) => void;
+  /** Chamfer corner `corner` to `distance`, or un-chamfer it at 0 -- same
+   *  division of labour as onRound: the caller owns writing it into the
+   *  feature, nothing here computes geometry. */
+  onChamfer: (corner: number, distance: number) => void;
 }
 
 function has(cs: Constraint[], kind: Constraint['kind'], edge: number) {
   return cs.some((c) => 'edge' in c && c.edge === edge && c.kind === kind);
 }
 
-export default function SketchConstraints({ points, bulges, rounds, constraints, onChange, onRound }: Props) {
+export default function SketchConstraints({ points, bulges, rounds, chamfers, constraints, onChange, onRound, onChamfer }: Props) {
   const count = points.length;
   const residual = residualOf(points, constraints);
   const fighting = residual > 1e-3;
@@ -239,6 +251,44 @@ export default function SketchConstraints({ points, bulges, rounds, constraints,
         })}
       </div>
 
+      <div className="sk-chamfers">
+        <span>Chamfer a corner:</span>
+        {points.map((_, i) => {
+          // `bulges` is passed through on purpose, same reason as the Round
+          // boxes above: without it this asks about a corner whose adjacent
+          // edges it is pretending are all straight, and gets back a ceiling
+          // for a corner that does not exist. A corner beside an arc can no
+          // more be chamfered than it can be rounded, and without `bulges`
+          // this would wrongly say yes.
+          const ceiling = maxChamferDistance(points, i, bulges);
+          const why = whyCannotChamferCorner(points, i, bulges);
+          const set = chamfers?.[i];
+          return (
+            <input
+              key={`${i}:${set ?? ''}`}
+              type="number"
+              inputMode="decimal"
+              aria-label={`Chamfer corner ${i + 1}`}
+              title={why ?? `Chamfer corner ${i + 1} -- up to ${ceiling.toFixed(1)}, or 0 to undo it`}
+              min={0}
+              max={ceiling}
+              step="0.5"
+              placeholder="0"
+              defaultValue={set !== undefined ? String(set) : ''}
+              onBlur={(ev) => {
+                const v = Number(ev.target.value);
+                if (!Number.isFinite(v)) { ev.target.value = set !== undefined ? String(set) : ''; return; }
+                if (v <= 0 && set === undefined) { ev.target.value = ''; return; }
+                onChamfer(i, Math.max(0, v));
+              }}
+              onKeyDown={(ev) => {
+                if (ev.key === 'Enter') (ev.target as HTMLInputElement).blur();
+              }}
+            />
+          );
+        })}
+      </div>
+
       <style>{`
         .sk-rules { border-top: 1px solid var(--border); padding: 8px 10px; font-size: 12px; }
         .sk-rules-head {
@@ -273,8 +323,8 @@ export default function SketchConstraints({ points, bulges, rounds, constraints,
         }
         .sk-table button:disabled { opacity: 0.35; cursor: not-allowed; }
         .sk-table input:disabled { opacity: 0.35; cursor: not-allowed; }
-        .sk-pins, .sk-rounds { display: flex; align-items: center; gap: 4px; margin-top: 8px; color: #6272a4; }
-        .sk-rounds input {
+        .sk-pins, .sk-rounds, .sk-chamfers { display: flex; align-items: center; gap: 4px; margin-top: 8px; color: #6272a4; }
+        .sk-rounds input, .sk-chamfers input {
           width: 42px; background: var(--bg); color: var(--text);
           border: 1px solid #44475a; border-radius: 3px;
           padding: 2px 5px; font-size: 12px; font-variant-numeric: tabular-nums;
