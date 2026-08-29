@@ -68,6 +68,11 @@ interface Props {
   outlines?: SketchOutline[];
   /** Called once when the drag ends, to fold the result back into the doc. */
   onCommit: () => void;
+  /** When true, a click-to-draw tool is active: a transparent catcher fills
+   *  the layer and reports each click's plane coordinates via `onPlace`. */
+  drawing?: boolean;
+  /** Plane (u, v) of a click while `drawing` is true. */
+  onPlace?: (u: number, v: number) => void;
 }
 
 /**
@@ -149,9 +154,14 @@ function projectOutline(o: SketchOutline, at: Map<string, AnchorPoint>): { x: nu
 }
 
 export default function HandleOverlay({
-  points, values, scales, onDrag, onCommit, outlines,
+  points, values, scales, onDrag, onCommit, outlines, drawing, onPlace,
 }: Props) {
   const [dragging, setDragging] = useState<string | null>(null);
+  // The layer's own DOM node, so a click's viewport position can be converted
+  // to the same container-relative space the anchor x/y already use. Handles
+  // only ever need DELTAS from their own pointerdown, so nothing needed this
+  // before -- the click-catcher is the first consumer of an absolute position.
+  const layerRef = useRef<HTMLDivElement>(null);
   // Pixels the pointer has travelled along the handle's axis. The dragged
   // handle is drawn from this rather than from the runner's next reply, so its
   // position owes nothing to the rebuild round-trip.
@@ -206,8 +216,29 @@ export default function HandleOverlay({
 
   const at = new Map(points.map((p) => [p.param, p]));
 
+  // A click (not a drag) measured against the plane anchor's own screen
+  // position. The anchor sits at plane-coordinate (0,0), so this is the
+  // click's absolute (u, v), not a delta -- the same inverse projection the
+  // two-axis drag uses, with dx,dy being the click's offset from the anchor.
+  function handleCanvasClick(e: React.MouseEvent) {
+    if (!drawing || !onPlace || !layerRef.current) return;
+    const rect = layerRef.current.getBoundingClientRect();
+    const localX = e.clientX - rect.left;
+    const localY = e.clientY - rect.top;
+    const origin = points.find((p) => p.param === '__planeOrigin');
+    if (!origin || origin.ux === undefined || origin.uy === undefined
+        || origin.vx === undefined || origin.vy === undefined) return;
+    const dx = localX - origin.x;
+    const dy = localY - origin.y;
+    const det = origin.ux * origin.vy - origin.uy * origin.vx;
+    if (Math.abs(det) < 1e-6) return;
+    const u = (dx * origin.vy - dy * origin.vx) / det;
+    const v = (origin.ux * dy - origin.uy * dx) / det;
+    onPlace(u, v);
+  }
+
   return (
-    <div className="handle-layer">
+    <div className="handle-layer" ref={layerRef}>
       {/* The outline is drawn, not built. A sketch is a flat profile, not a
           solid, so the renderer has nothing to show for it until something
           extrudes it -- but a student needs to see what they are drawing. */}
@@ -306,9 +337,24 @@ export default function HandleOverlay({
           />
         );
       })}
+      {drawing && (
+        <div
+          className="draw-catcher"
+          onClick={handleCanvasClick}
+          aria-label="Click to place a point on the sketch plane"
+        />
+      )}
       <style>{`
         /* The layer must not eat orbit drags — only the handles themselves do. */
         .handle-layer { position: absolute; inset: 0; pointer-events: none; }
+        /* The click-to-draw catcher: transparent, fills the layer, and is the
+           only thing that eats pointer events while a draw tool is active. It
+           renders AFTER the handles in the DOM, so it paints on top and the
+           plane-origin dot is not independently draggable mid-draw. */
+        .draw-catcher {
+          position: absolute; inset: 0;
+          pointer-events: auto; cursor: crosshair;
+        }
         .sketch-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
         .sketch-lines polygon {
           fill: rgba(139, 233, 253, 0.12);

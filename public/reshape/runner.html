@@ -880,17 +880,23 @@
 			var dy = ev.pageY - lastY;
 			lastX = ev.pageX;
 			lastY = ev.pageY;
-			if (ev.shiftKey || ev.buttons === 4) {
-				panDelta[0] += dx;
-				panDelta[1] += dy;
-			} else {
+			// Fusion 360 default navigation: right-drag orbits, middle-drag pans,
+			// left-drag is a no-op (reserved for future selection). buttons is a
+			// bitmask: 1 = left, 2 = right, 4 = middle.
+			if (ev.buttons === 2) {
 				rotateDelta[0] -= dx;
 				rotateDelta[1] -= dy;
+			} else if (ev.buttons === 4) {
+				panDelta[0] += dx;
+				panDelta[1] += dy;
 			}
 		};
 		container.onwheel = function(ev) {
 			ev.preventDefault();
 			zoomDelta += ev.deltaY;
+		};
+		container.oncontextmenu = function(ev) {
+			ev.preventDefault();
 		};
 
 		// ---- Render loop ----

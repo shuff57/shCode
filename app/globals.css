@@ -38,6 +38,16 @@ body:has(.lesson-progress-footer) {
   padding-bottom: 60px;
 }
 
+/* The "Report an issue" pill is position:fixed, so the body padding above does
+   nothing for it. At its default bottom:20px it overlapped the top ~16px of
+   the footer bar and covered the right end of the lesson-dot rail. The footer
+   measures ~36px (8px padding + 14px dots + 1px border), so 52px clears it
+   with a 16px gap. The pill transitions `bottom`, so this slides rather than
+   jumps when navigating onto a lesson page. */
+body:has(.lesson-progress-footer) .issue-fab {
+  bottom: 52px;
+}
+
 code {
   background-color: #2d2d2d;
   color: #d65093;

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { createIssueReport, IssueKind } from '../lib/issue-reports-api';
-import { uploadImage, UploadError } from '../lib/uploads';
+import { uploadImage, deleteUpload, UploadError } from '../lib/uploads';
 import { useLessonStore } from '../lib/store';
 import { getCurrentUser } from '../lib/auth';
 
@@ -13,12 +13,29 @@ import { getCurrentUser } from '../lib/auth';
 // auto-captured context: where the student is, what lesson, their browser,
 // and their current code for the open file — so a bug report can be
 // reproduced without asking the student anything.
+//
+// Kind, title, description, send. That is the whole form on purpose: every
+// control here is one a student has to read before they can report anything,
+// and a student annoyed enough to file a bug will abandon a long form. The
+// auto-captured context gets one line of mention and is never shown — curating
+// it is not their job.
+//
+// Layout lives in the <style> block rather than in style={{}} props. This file
+// used to be ~440 lines, most of it inline style objects on elements that
+// exist once; the CSS is shorter and it is what lets globals.css reposition
+// the pill on pages that have a fixed footer.
 // ---------------------------------------------------------------------------
 
+// The hint under each label is doing real work: "quirk" and "enhancement" are
+// our words, not a 14-year-old's, and without the gloss everything lands in
+// Bug. Kept from the original form for exactly that reason.
 const KINDS: { value: IssueKind; label: string; hint: string }[] = [
   { value: 'bug', label: 'Bug', hint: "doesn't work" },
-  { value: 'quirk', label: 'Quirky', hint: 'works, but picky' },
-  { value: 'enhancement', label: 'Enhance', hint: 'wish it had' },
+  { value: 'quirk', label: 'Quirk', hint: 'works, but picky' },
+  // The stored value stays 'enhancement': it is inside a CHECK constraint on
+  // issue_reports (migration 0018), and renaming it would cost a migration to
+  // buy a synonym. Only the label a student reads says "Improve".
+  { value: 'enhancement', label: 'Improve', hint: 'wish it had' },
 ];
 
 const KIND_COLOR: Record<IssueKind, string> = {
@@ -27,31 +44,55 @@ const KIND_COLOR: Record<IssueKind, string> = {
   enhancement: '#22c55e',
 };
 
-// Single attachment, same limits as student image uploads (MAX_UPLOAD_BYTES
-// in functions/_shared/uploads.ts); the server re-checks everything and is
-// authoritative — these numbers only keep the obvious rejects client-side.
+const PLACEHOLDER: Record<IssueKind, { title: string; body: string }> = {
+  bug: {
+    title: 'Run button does nothing on 2.4',
+    body: 'What did you try, and what happened instead?',
+  },
+  quirk: {
+    title: 'Grader wants exactly two spaces',
+    body: 'What feels off or picky about how this works?',
+  },
+  enhancement: {
+    title: 'Let me rename my files',
+    body: 'What would you like to be able to do?',
+  },
+};
+
+const MAX_TITLE = 120;
+// Same limit as student image uploads (MAX_UPLOAD_BYTES in
+// functions/_shared/uploads.ts); the server re-checks and is authoritative.
 const MAX_SCREENSHOT_MB = 2;
+/** Code snapshot cap. The server DROPS a context over 16 KB rather than
+ *  truncating it, so staying well under keeps the rest of the report. */
+const MAX_SNAPSHOT_CHARS = 8000;
 
 export default function ReportIssueButton() {
   const [open, setOpen] = useState(false);
   const [kind, setKind] = useState<IssueKind>('bug');
+  const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Screenshot attachment: picked via file input or pasted from the
-  // clipboard. Upload fires as soon as one is chosen — the POST
-  // /api/issue-reports call then sends only the returned id, so a large
-  // image never has to ride along with the JSON report and a slow upload
-  // doesn't block the send button on two round-trips at once.
-  const [screenshotId, setScreenshotId] = useState<string | null>(null);
-  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
-  const [screenshotBusy, setScreenshotBusy] = useState(false);
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const pathname = usePathname();
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
+
+  // Screenshot: picked or pasted. The upload fires as soon as one is chosen,
+  // so the report POST carries only the returned id and never the bytes.
+  const [shotId, setShotId] = useState<string | null>(null);
+  const [shotPreview, setShotPreview] = useState<string | null>(null);
+  const [shotBusy, setShotBusy] = useState(false);
+
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  // An uploaded-but-unsent screenshot is a real file inside the student's
+  // 20 MB / 40 file quota. These two refs are what let us hand it back on
+  // cancel: state reads stale inside an unmount cleanup, and `committed` is
+  // how we know the report now owns the image and must NOT delete it.
+  const shotIdRef = useRef<string | null>(null);
+  const committedRef = useRef(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     getCurrentUser().then((u) => setSignedIn(!!u));
@@ -62,27 +103,37 @@ export default function ReportIssueButton() {
     if (!dialog) return;
     if (open) {
       dialog.showModal();
-      setTimeout(() => textareaRef.current?.focus(), 0);
+      setTimeout(() => titleRef.current?.focus(), 0);
     } else {
       dialog.close();
     }
   }, [open]);
 
-  // object URLs are process-global; drop the last one before making a new one
-  // and on unmount, or every attached screenshot leaks until reload.
+  // Unmount: hand back an attachment nobody is going to use. Navigating away
+  // mid-report is the common case, and without this every abandoned screenshot
+  // sits in the student's quota forever with nothing in any UI pointing at it.
   useEffect(() => {
     return () => {
-      if (screenshotPreview) URL.revokeObjectURL(screenshotPreview);
+      const id = shotIdRef.current;
+      if (id && !committedRef.current) void deleteUpload(id).catch(() => {});
     };
-  }, [screenshotPreview]);
+  }, []);
 
-  function clearScreenshot() {
-    if (screenshotPreview) URL.revokeObjectURL(screenshotPreview);
-    setScreenshotPreview(null);
-    setScreenshotId(null);
+  function setShot(id: string | null, preview: string | null) {
+    shotIdRef.current = id;
+    setShotId(id);
+    setShotPreview(preview);
   }
 
-  async function acceptScreenshot(file: File) {
+  /** Drop the attachment locally AND server-side, unless a report claimed it. */
+  function discardShot() {
+    const id = shotIdRef.current;
+    if (shotPreview) URL.revokeObjectURL(shotPreview);
+    if (id && !committedRef.current) void deleteUpload(id).catch(() => {});
+    setShot(null, null);
+  }
+
+  async function acceptShot(file: File) {
     setError(null);
     if (!file.type.startsWith('image/')) {
       setError('Screenshots must be images (PNG, JPEG, GIF, or WebP).');
@@ -92,25 +143,25 @@ export default function ReportIssueButton() {
       setError(`That image is over ${MAX_SCREENSHOT_MB} MB. Try a smaller screenshot.`);
       return;
     }
-    setScreenshotBusy(true);
+    // Replacing one? The old upload is already stored — give it back first.
+    discardShot();
+    setShotBusy(true);
     const preview = URL.createObjectURL(file);
-    if (screenshotPreview) URL.revokeObjectURL(screenshotPreview);
-    setScreenshotPreview(preview);
+    setShot(null, preview);
     try {
       const item = await uploadImage(file);
-      setScreenshotId(item.id);
+      setShot(item.id, preview);
     } catch (err) {
       // Preview off, error up: the report can still be sent without it.
       URL.revokeObjectURL(preview);
-      setScreenshotPreview(null);
-      setScreenshotId(null);
+      setShot(null, null);
       setError(
         err instanceof UploadError && err.message
           ? `Screenshot not attached: ${err.message}`
           : 'Screenshot could not be attached. You can still send the report.',
       );
     } finally {
-      setScreenshotBusy(false);
+      setShotBusy(false);
     }
   }
 
@@ -119,17 +170,19 @@ export default function ReportIssueButton() {
     const file = item?.getAsFile();
     if (file) {
       e.preventDefault();
-      void acceptScreenshot(file);
+      void acceptShot(file);
     }
   }
 
   function close() {
+    discardShot();
+    committedRef.current = false;
     setOpen(false);
     setDone(false);
     setError(null);
     setKind('bug');
+    setTitle('');
     setMessage('');
-    clearScreenshot();
   }
 
   /**
@@ -148,20 +201,18 @@ export default function ReportIssueButton() {
         : undefined,
     };
 
-    const lesson = useLessonStore.getState().lesson;
+    const store = useLessonStore.getState();
+    const lesson = store.lesson;
     if (lesson) {
       ctx.lessonId = lesson.id;
       ctx.lessonTitle = lesson.title;
-      const currentFile = useLessonStore.getState().currentFile;
+      const currentFile = store.currentFile;
       if (currentFile) {
         ctx.currentFile = currentFile;
-        const content = useLessonStore.getState().fileContents[currentFile];
-        // Cap the snapshot — a runaway generator shouldn't blow the
-        // 16 KB context cap server-side and silently drop the rest.
-        ctx.currentFileContent =
-          typeof content === 'string' && content.length <= 8000 ? content : undefined;
-        ctx.currentFileContentTruncated =
-          typeof content === 'string' && content.length > 8000;
+        const content = store.fileContents[currentFile];
+        const short = typeof content === 'string' && content.length <= MAX_SNAPSHOT_CHARS;
+        ctx.currentFileContent = short ? content : undefined;
+        ctx.currentFileContentTruncated = typeof content === 'string' && !short;
       }
     }
     return ctx;
@@ -169,13 +220,16 @@ export default function ReportIssueButton() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (sending || screenshotBusy) return;
+    if (sending || shotBusy) return;
     setSending(true);
     setError(null);
     try {
-      await createIssueReport(kind, message.trim(), captureContext(), screenshotId);
+      await createIssueReport(kind, title.trim(), message.trim(), captureContext(), shotId);
+      // The report owns the screenshot now. This must be set BEFORE the
+      // auto-close below, or close() deletes the image out from under it.
+      committedRef.current = true;
       setDone(true);
-      setTimeout(() => close(), 1600);
+      setTimeout(() => close(), 1400);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -185,28 +239,15 @@ export default function ReportIssueButton() {
 
   if (signedIn === false) return null;
 
+  const ready = title.trim().length >= 3 && message.trim().length >= 3;
+
   return (
     <>
       <button
         type="button"
+        className="issue-fab"
         onClick={() => setOpen(true)}
         title="Report a bug, quirk, or idea"
-        style={{
-          position: 'fixed',
-          bottom: 20,
-          right: 20,
-          zIndex: 1000,
-          background: 'var(--card)',
-          color: 'var(--text)',
-          border: '1px solid var(--border)',
-          borderRadius: 20,
-          padding: '8px 16px',
-          fontSize: 13,
-          fontWeight: 600,
-          cursor: 'pointer',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.4)',
-          transition: 'border-color 120ms, color 120ms',
-        }}
       >
         Report an issue
       </button>
@@ -221,217 +262,234 @@ export default function ReportIssueButton() {
         }}
       >
         {done ? (
-          <div style={{ padding: 20, textAlign: 'center' }}>
-            <p style={{ color: '#22c55e', fontWeight: 700, margin: 0 }}>Reported — thank you!</p>
-          </div>
+          <p className="issue-done">Reported — thank you!</p>
         ) : (
           <form onSubmit={submit} className="issue-form">
-            <h3 style={{ marginTop: 0 }}>Report an issue</h3>
-            <p style={{ color: 'var(--text)', opacity: 0.7, fontSize: 13, marginTop: 0 }}>
-              Your page, lesson, and current code are attached automatically —
-              just tell us what happened. A screenshot helps: paste one
-              (Ctrl+V) or attach a file.
-            </p>
+            <h3>Report an issue</h3>
 
-            <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+            <div className="issue-kinds">
               {KINDS.map((k) => (
                 <button
                   key={k.value}
                   type="button"
                   onClick={() => setKind(k.value)}
-                  style={{
-                    flex: 1,
-                    padding: '8px 4px',
-                    borderRadius: 6,
-                    border: `2px solid ${kind === k.value ? KIND_COLOR[k.value] : 'var(--border)'}`,
-                    background: kind === k.value ? 'rgba(91, 170, 253, 0.08)' : 'transparent',
-                    color: kind === k.value ? KIND_COLOR[k.value] : 'var(--text)',
-                    cursor: 'pointer',
-                    textAlign: 'center',
-                  }}
+                  aria-pressed={kind === k.value}
+                  className="issue-kind"
+                  style={
+                    kind === k.value
+                      ? { borderColor: KIND_COLOR[k.value], color: KIND_COLOR[k.value] }
+                      : undefined
+                  }
                 >
-                  <div style={{ fontWeight: 700, fontSize: 14 }}>{k.label}</div>
-                  <div style={{ fontSize: 11 }}>{k.hint}</div>
+                  <span className="issue-kind-label">{k.label}</span>
+                  <span className="issue-kind-hint">{k.hint}</span>
                 </button>
               ))}
             </div>
 
+            <label className="issue-label" htmlFor="issue-title">
+              Title
+            </label>
+            <input
+              id="issue-title"
+              ref={titleRef}
+              className="issue-input"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={PLACEHOLDER[kind].title}
+              required
+              minLength={3}
+              maxLength={MAX_TITLE}
+            />
+
+            <label className="issue-label" htmlFor="issue-body">
+              Description
+            </label>
             <textarea
-              ref={textareaRef}
+              id="issue-body"
+              className="issue-input"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder={
-                kind === 'bug'
-                  ? 'What did you try to do, and what went wrong?'
-                  : kind === 'quirk'
-                    ? 'What feels off or picky about how this works?'
-                    : 'What would you like to be able to do?'
-              }
+              placeholder={PLACEHOLDER[kind].body}
               required
               minLength={3}
               maxLength={4000}
-              rows={5}
-              style={{
-                width: '100%',
-                padding: 8,
-                marginBottom: 12,
-                background: 'var(--bg)',
-                color: 'var(--text)',
-                border: '1px solid var(--border)',
-                borderRadius: 4,
-                fontSize: 14,
-                resize: 'vertical',
-                fontFamily: 'inherit',
-              }}
+              rows={4}
             />
 
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                marginBottom: 12,
-              }}
-            >
-              {screenshotPreview ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
-                  <img
-                    src={screenshotPreview}
-                    alt="Screenshot attachment preview"
-                    style={{
-                      height: 44,
-                      maxWidth: 90,
-                      objectFit: 'cover',
-                      border: '1px solid var(--border)',
-                      borderRadius: 4,
-                      display: 'block',
-                    }}
-                  />
-                  <span style={{ fontSize: 12, flex: 1, opacity: 0.7 }}>
-                    {screenshotId
-                      ? 'Screenshot attached'
-                      : screenshotBusy
-                        ? 'Attaching…'
-                        : 'Not attached'}
+            <div className="issue-shot">
+              {shotPreview ? (
+                <>
+                  <img src={shotPreview} alt="Screenshot attachment preview" />
+                  <span>
+                    {shotId ? 'Screenshot attached' : shotBusy ? 'Attaching...' : 'Not attached'}
                   </span>
-                  <button
-                    type="button"
-                    onClick={clearScreenshot}
-                    disabled={screenshotBusy}
-                    style={{
-                      background: 'transparent',
-                      border: '1px solid var(--border)',
-                      color: 'var(--text)',
-                      padding: '3px 10px',
-                      borderRadius: 4,
-                      fontSize: 12,
-                      cursor: screenshotBusy ? 'wait' : 'pointer',
-                    }}
-                  >
+                  <button type="button" onClick={discardShot} disabled={shotBusy}>
                     Remove
                   </button>
-                </div>
+                </>
               ) : (
                 <>
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={screenshotBusy}
-                    style={{
-                      background: 'transparent',
-                      border: '1px solid var(--border)',
-                      color: 'var(--text)',
-                      padding: '6px 12px',
-                      borderRadius: 4,
-                      fontSize: 13,
-                      cursor: screenshotBusy ? 'wait' : 'pointer',
-                    }}
-                  >
-                    {screenshotBusy ? 'Attaching…' : 'Attach screenshot'}
+                  <button type="button" onClick={() => fileRef.current?.click()} disabled={shotBusy}>
+                    {shotBusy ? 'Attaching...' : 'Attach screenshot'}
                   </button>
-                  <span style={{ fontSize: 12, opacity: 0.6 }}>
-                    optional · paste works too · max {MAX_SCREENSHOT_MB} MB
-                  </span>
+                  <span>or paste one — optional, max {MAX_SCREENSHOT_MB} MB</span>
                 </>
               )}
               <input
-                ref={fileInputRef}
+                ref={fileRef}
                 type="file"
                 accept="image/png,image/jpeg,image/gif,image/webp"
-                style={{ display: 'none' }}
+                hidden
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  if (file) void acceptScreenshot(file);
+                  if (file) void acceptShot(file);
                   // Reset so picking the same file again still fires change.
                   e.target.value = '';
                 }}
               />
             </div>
 
-            {error && (
-              <div
-                style={{
-                  padding: 8,
-                  marginBottom: 12,
-                  background: 'rgba(220, 38, 38, 0.12)',
-                  color: '#f87171',
-                  border: '1px solid #dc2626',
-                  borderRadius: 4,
-                  fontSize: 13,
-                }}
-              >
-                {error}
-              </div>
-            )}
+            {error && <div className="issue-error">{error}</div>}
 
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-              <button
-                type="button"
-                onClick={close}
-                style={{
-                  background: 'transparent',
-                  border: '1px solid var(--border)',
-                  color: 'var(--text)',
-                  padding: '6px 14px',
-                  borderRadius: 4,
-                  cursor: 'pointer',
-                  fontSize: 13,
-                }}
-              >
+            <p className="issue-note">
+              Your page, lesson, and current code are attached automatically.
+            </p>
+
+            <div className="issue-actions">
+              <button type="button" onClick={close}>
                 Cancel
               </button>
               <button
                 type="submit"
-                disabled={sending || screenshotBusy || message.trim().length < 3}
-                style={{
-                  background: KIND_COLOR[kind],
-                  color: '#1a1a1a',
-                  border: 'none',
-                  padding: '6px 14px',
-                  borderRadius: 4,
-                  fontWeight: 600,
-                  fontSize: 13,
-                  cursor: sending ? 'wait' : 'pointer',
-                  opacity: sending ? 0.7 : 1,
-                }}
+                disabled={sending || shotBusy || !ready}
+                className="issue-send"
+                style={{ background: KIND_COLOR[kind] }}
               >
-                {sending ? 'Sending…' : 'Send report'}
+                {sending ? 'Sending...' : 'Send report'}
               </button>
             </div>
           </form>
         )}
       </dialog>
+
       <style>{`
+        .issue-fab {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          /* Below TabbedRightDrawer (900) on purpose: a floating pill sitting
+             on top of an open drawer covers the drawer's own content. Above
+             everything else, which is why clearing the fixed lesson footer is
+             a globals.css rule rather than a bigger z-index here. */
+          z-index: 899;
+          background: var(--card);
+          color: var(--text);
+          border: 1px solid var(--border);
+          border-radius: 20px;
+          padding: 8px 16px;
+          font-size: 13px;
+          font-weight: 600;
+          font-family: inherit;
+          cursor: pointer;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+          transition: border-color 120ms, color 120ms, bottom 220ms ease;
+        }
+        .issue-fab:hover { border-color: var(--brand); color: var(--brand); }
+
         .issue-dialog {
           padding: 0;
           border: 1px solid var(--border);
           border-radius: 8px;
           background: var(--card);
           color: var(--text);
-          width: min(440px, 92vw);
+          width: min(420px, 92vw);
         }
         .issue-dialog::backdrop { background: rgba(0,0,0,0.5); }
-        .issue-form { padding: 20px; }
+        .issue-form { padding: 18px; }
+        .issue-form h3 { margin: 0 0 12px; font-size: 16px; }
+        .issue-done {
+          padding: 24px; margin: 0; text-align: center;
+          font-weight: 700; color: #22c55e;
+        }
+
+        .issue-kinds { display: flex; gap: 6px; margin-bottom: 14px; }
+        .issue-kind {
+          flex: 1;
+          padding: 6px 4px;
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          background: transparent;
+          color: var(--text);
+          font-family: inherit;
+          cursor: pointer;
+          /* Border grows to 2px on select; the padding shrinks by the same
+             1px so the row does not jog when you change your mind. */
+        }
+        .issue-kind[aria-pressed="true"] { border-width: 2px; padding: 5px 3px; }
+        .issue-kind-label { display: block; font-size: 14px; font-weight: 700; }
+        .issue-kind-hint { display: block; font-size: 11px; opacity: 0.75; }
+
+        .issue-label {
+          display: block;
+          font-size: 12px;
+          font-weight: 600;
+          opacity: 0.7;
+          margin-bottom: 4px;
+        }
+        .issue-input {
+          width: 100%;
+          box-sizing: border-box;
+          padding: 7px 8px;
+          margin-bottom: 12px;
+          background: var(--bg);
+          color: var(--text);
+          border: 1px solid var(--border);
+          border-radius: 4px;
+          font-size: 14px;
+          font-family: inherit;
+          resize: vertical;
+        }
+
+        .issue-shot { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .issue-shot img {
+          height: 40px; max-width: 80px; object-fit: cover;
+          border: 1px solid var(--border); border-radius: 4px; display: block;
+        }
+        .issue-shot span { flex: 1; min-width: 0; font-size: 12px; opacity: 0.6; }
+        .issue-shot button {
+          background: transparent;
+          border: 1px solid var(--border);
+          color: var(--text);
+          padding: 5px 10px;
+          border-radius: 4px;
+          font-size: 12px;
+          font-family: inherit;
+          cursor: pointer;
+        }
+        .issue-shot button:disabled { cursor: wait; }
+
+        .issue-error {
+          padding: 8px; margin-bottom: 10px; font-size: 13px;
+          background: rgba(220,38,38,0.12); color: #f87171;
+          border: 1px solid #dc2626; border-radius: 4px;
+        }
+        .issue-note { margin: 0 0 14px; font-size: 11px; opacity: 0.5; }
+
+        .issue-actions { display: flex; gap: 8px; justify-content: flex-end; }
+        .issue-actions button {
+          padding: 7px 14px;
+          border-radius: 4px;
+          font-size: 13px;
+          font-weight: 600;
+          font-family: inherit;
+          cursor: pointer;
+          background: transparent;
+          border: 1px solid var(--border);
+          color: var(--text);
+        }
+        .issue-send { border: none; color: #1a1a1a; }
+        .issue-send:disabled { opacity: 0.45; cursor: not-allowed; }
       `}</style>
     </>
   );

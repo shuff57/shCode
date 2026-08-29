@@ -1,3 +1,96 @@
+# Handoff — 2026-08-29 · reSHape sketch-tool parity gauntlet, parked mid-machine-switch
+
+**Read this before anything else if you're picking this up cold.** The
+day-by-day design/exec log for this whole effort lives at
+`~/.claude/plans/reshape-fusion-parity.md` — but that file is LOCAL to
+`DESKTOP-F82ORAK` (under the user's home `.claude/` directory, not this
+repo), so it will NOT be present on a different machine. This section is
+the condensed version. If you need the full blow-by-blow (exact test
+output, live-browser Playwright traces, the git-stash recovery story),
+ask the user for that file specifically — it was not lost, just never
+git-tracked.
+
+## Where things stand
+
+- **`chamfer2d` (sketch-level chamfer) — SHIPPED, committed, PUSHED.**
+  Commit `b85d2ca` on `cs-3d`, already on `origin`. Geometry
+  (`lib/sketch-arc.ts`: `chamferCorner`/`maxChamferDistance`/
+  `whyCannotChamferCorner`), data model (`chamfers?: Record<number,
+  number>` on `SketchFeature`), and Rules-panel UI (a "Chamfer a corner"
+  row mirroring "Round a corner") are all done and verified live via
+  Playwright against a local `wrangler pages dev` server. Not yet marked
+  `landed` differently from geometry+UI — actually it IS marked landed in
+  `.gauntlet/parity-sketch.json`, check there for the exact note.
+
+- **`constraints` ("more rules") solver half — DONE, verified, NOT YET
+  COMMITTED** (that's the thing this park interrupted). Touches
+  `lib/sketch-solve.ts` (new `parallel`/`perpendicular` Constraint kinds,
+  a pinned-aware `rotateEdgeBy` rotation primitive, a residual-units fix)
+  and `scripts/sketch-solve-assertions.cjs` (34 assertions, all passing).
+  Independently re-verified: isolated `tsc --noEmit` clean, full `npm
+  test` clean. One real finding worth knowing: an intentionally-impossible
+  3-way perpendicular constraint on a triangle does NOT converge (burns
+  all 300 solver iterations) but never crashes/NaNs and correctly reports
+  `overConstrained: true` — accepted as a documented, bounded limitation,
+  not a bug to fix.
+
+  **Design decision that came out of this pass:** of Onshape's five
+  constraints this item claims to cover (Coincident, Parallel,
+  Perpendicular, Midpoint, Symmetric), only Parallel and Perpendicular
+  actually fit this app's model (always one closed polygon, no free
+  points, no independent second sketch entity). Recommend reclassifying
+  Coincident/Midpoint/Symmetric to `outOfScope` in
+  `.gauntlet/parity-sketch.json` at implementation time — not done yet,
+  this is a design note, not a completed edit.
+
+  **NEXT ACTION, exact:** dispatch the Rules-panel UI half (a new
+  N-choose-2 toggle-button grid in `components/model/SketchConstraints.tsx`
+  cycling none → equal → parallel → perpendicular per edge pair — this
+  ALSO closes a pre-existing gap where `equal` has zero UI despite being
+  marked shipped). The full spec was written but lives only in this
+  session's local scratchpad (also machine-local, gone). Rewrite it
+  following the exact pattern of the two specs already used successfully
+  in this effort (see any of the `SPEC-chamfer2d*.md` — pattern: read the
+  target file in full first, give exact code snippets, name what's out of
+  scope, require a hand-trace + `tsc`/`npm test` in the reply), then:
+  ```
+  node ~/.claude/bin/msg.mjs claim --as opencode components/model/SketchConstraints.tsx components/model/ModelEditor.tsx
+  node ~/.claude/bin/handoff.mjs --spec /abs/path/to/SPEC.md --allow-claims
+  ```
+
+- **Two items never reached a design pass yet:** Arc ("3 Point Arc") and
+  `construction` (Guide line / Sketch Chamfer's sibling). Both hit the
+  same wall identified early on: this app's sketches are always ONE
+  closed polygon, and both of these are inherently open/non-solid
+  concepts. Whoever picks this up next should read the "Design questions"
+  section of the (local, machine-specific) plan file for the reasoning,
+  or re-derive it — the wall itself is simple: `lib/model-types.ts`'s
+  `SketchFeature.points` is always treated as closed.
+
+## What to run to get back up to speed
+
+```bash
+cd shCode && git status --short     # constraints-solver files should show modified, uncommitted
+node ~/.claude/bin/msg.mjs log --n 20
+node ~/.claude/bin/msg.mjs owners   # should be empty -- claims were released before this park
+npx tsc --noEmit && npm test        # both should be clean as of the park
+```
+
+## The one thing to watch
+
+The working tree also carries OTHER uncommitted, unrelated in-progress
+work that is NOT part of this gauntlet effort and was deliberately left
+alone throughout (per this repo's "never `git add -A`" convention) —
+an issue-reports feature, a timeline rollback bar, and chrome2d's
+Rectangle/Polygon toolbar wiring. **This park's `git add -A` commit WILL
+include all of that too**, bundled as one `wip:` commit — that's
+intentional for a machine-switch park (nothing should be stranded
+un-synced), but it means the resulting commit is NOT a clean, reviewable
+unit the way `b85d2ca` was. Don't mistake "it's committed" for "it's
+reviewed" when picking this back up.
+
+---
+
 # Handoff — 2026-08-28 · moSHion and reSHape extracted to public repos
 
 **shuff57/moshion** and **shuff57/reshape-3d** now exist as standalone public

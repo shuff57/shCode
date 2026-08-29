@@ -8,6 +8,8 @@ import {
   IssueStatus,
   listIssueReports,
   setIssueReportStatus,
+  deleteIssueReport,
+  reportHeadline,
   screenshotUrl,
 } from '../../../lib/issue-reports-api';
 
@@ -56,6 +58,15 @@ const S = {
     fontSize: 13,
     cursor: 'pointer',
   } as React.CSSProperties,
+
+  danger: {
+    background: 'none',
+    border: 'none',
+    color: '#f87171',
+    fontSize: 13,
+    cursor: 'pointer',
+    padding: 0,
+  } as React.CSSProperties,
 };
 
 const KIND_COLOR: Record<string, string> = {
@@ -82,6 +93,60 @@ function fmtDate(ms: number): string {
   });
 }
 
+/** A markdown code fence, spelled out so the string below stays readable. */
+const FENCE = '```';
+
+/**
+ * A paste-ready work order for Claude Code or opencode.
+ *
+ * Same substance as the ?format=md export minus the summary table: an agent
+ * does not need counts, it needs the reproduction context for each item and an
+ * instruction about scope. The scope line is the important half — without it a
+ * coding agent treats a one-line bug report as licence to reorganise the file.
+ *
+ * Deliberately built with concatenation rather than template literals: the
+ * body embeds code fences, and nesting backticks inside backticks is how this
+ * kind of function quietly starts emitting broken markdown.
+ */
+function buildAgentPrompt(reports: IssueReport[]): string {
+  const out: string[] = [
+    'These are issue reports filed by students in the shCode app.',
+    '',
+    'For each one: reproduce it if you can, fix the root cause, and state which',
+    'report number your change addresses. If a report is not actionable, say so',
+    'and why rather than guessing. Do not change anything the report does not',
+    'touch.',
+    '',
+  ];
+
+  for (const r of reports) {
+    const c = (r.context ?? {}) as Record<string, unknown>;
+    out.push('## #' + r.id + ' [' + r.kind + '] ' + reportHeadline(r), '', r.message, '');
+    if (c.path) out.push('- page: ' + String(c.path));
+    if (c.lessonId) {
+      out.push(
+        '- lesson: ' +
+          String(c.lessonId) +
+          (c.lessonTitle ? ' (' + String(c.lessonTitle) + ')' : ''),
+      );
+    }
+    if (c.currentFile) out.push('- file open: ' + String(c.currentFile));
+    if (c.userAgent) out.push('- browser: ' + String(c.userAgent));
+    if (r.screenshot_id) {
+      // Absolute, because the agent is not running in the browser and a bare
+      // /uploads/... path is unfetchable from a terminal.
+      out.push('- screenshot: ' + window.location.origin + screenshotUrl(r.screenshot_id));
+    }
+    if (typeof c.currentFileContent === 'string' && c.currentFileContent) {
+      out.push('', 'Their code at the time:', FENCE, c.currentFileContent, FENCE);
+      if (c.currentFileContentTruncated) out.push('(snapshot was truncated)');
+    }
+    out.push('', '---', '');
+  }
+
+  return out.join('\n');
+}
+
 type Filter = 'open' | 'all';
 
 function IssuesPageInner() {
@@ -92,6 +157,7 @@ function IssuesPageInner() {
   const [loadError, setLoadError] = useState('');
   const [filter, setFilter] = useState<Filter>('open');
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
+  const [copied, setCopied] = useState('');
 
   useEffect(() => {
     getCurrentUser().then((u) => {
@@ -125,6 +191,38 @@ function IssuesPageInner() {
     } catch {
       load();
     }
+  }
+
+  // Delete is for reports that were never real: a duplicate, a misfire, or
+  // one of your own filed while testing the button. A real report that is
+  // finished gets status 'fixed' instead — collapsing "done" and "was noise"
+  // into one state is what makes an export useless as a handoff document.
+  async function handleDelete(id: number, label: string) {
+    const ok = window.confirm(
+      `Delete report #${id} permanently?\n\n"${label}"\n\n` +
+        'This also deletes its screenshot. To close a real report instead, ' +
+        "set its status to 'fixed'.",
+    );
+    if (!ok) return;
+    const before = reports;
+    setReports((prev) => prev.filter((r) => r.id !== id));
+    try {
+      await deleteIssueReport(id);
+    } catch (e) {
+      setReports(before);
+      setLoadError(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  async function copyForAgent() {
+    const text = buildAgentPrompt(visible);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(`Copied ${visible.length} report(s)`);
+    } catch {
+      setCopied('Clipboard blocked — use Download report.md');
+    }
+    setTimeout(() => setCopied(''), 2500);
   }
 
   function toggleExpand(id: number) {
@@ -177,11 +275,23 @@ function IssuesPageInner() {
         <button type="button" style={S.button} onClick={download}>
           Download report.md
         </button>
+        <button
+          type="button"
+          style={S.button}
+          onClick={() => void copyForAgent()}
+          disabled={visible.length === 0}
+          title="Copy the reports shown below as a work order for Claude Code or opencode"
+        >
+          Copy for agent
+        </button>
         <button type="button" style={S.button} onClick={load}>
           Refresh
         </button>
 
         <span style={{ fontSize: 13, color: 'var(--text)', opacity: 0.55 }}>{counts}</span>
+        {copied && (
+          <span style={{ fontSize: 13, color: '#22c55e' }}>{copied}</span>
+        )}
       </div>
 
       {loading && <div style={{ color: 'var(--text)', opacity: 0.55 }}>Loading reports…</div>}
@@ -225,8 +335,8 @@ function IssuesPageInner() {
                 {r.kind}
               </span>
 
-              <span style={{ fontSize: 14, flex: 1, minWidth: 200 }}>
-                {r.message.split('\n')[0].slice(0, 120)}
+              <span style={{ fontSize: 14, fontWeight: 600, flex: 1, minWidth: 200 }}>
+                {reportHeadline(r)}
               </span>
 
               <span style={{ fontSize: 12, color: 'var(--text)', opacity: 0.6 }}>
@@ -250,39 +360,44 @@ function IssuesPageInner() {
                 ))}
               </select>
 
-              {(r.message.includes('\n') || context || r.screenshot_id) && (
-                <button
-                  type="button"
-                  onClick={() => toggleExpand(r.id)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--brand)',
-                    cursor: 'pointer',
-                    fontSize: 13,
-                    padding: 0,
-                  }}
-                >
-                  {isExpanded ? 'Less' : 'More'}
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => toggleExpand(r.id)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--brand)',
+                  cursor: 'pointer',
+                  fontSize: 13,
+                  padding: 0,
+                }}
+              >
+                {isExpanded ? 'Less' : 'More'}
+              </button>
+
+              <button
+                type="button"
+                style={S.danger}
+                onClick={() => void handleDelete(r.id, reportHeadline(r))}
+                title="Delete this report permanently (for duplicates, misfires and test reports)"
+              >
+                Delete
+              </button>
             </div>
 
             {isExpanded && (
               <div style={{ marginTop: 12, borderTop: '1px solid var(--border)', paddingTop: 12 }}>
-                {r.message.includes('\n') && (
-                  <pre
-                    style={{
-                      whiteSpace: 'pre-wrap',
-                      fontSize: 13,
-                      color: 'var(--text)',
-                      margin: '0 0 12px',
-                      fontFamily: 'inherit',
-                    }}
-                  >
-                    {r.message}
-                  </pre>
-                )}
+                <pre
+                  style={{
+                    whiteSpace: 'pre-wrap',
+                    fontSize: 13,
+                    color: 'var(--text)',
+                    margin: '0 0 12px',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  {r.message}
+                </pre>
 
                 {context && (
                   <div style={{ fontSize: 12, color: 'var(--text)', opacity: 0.7, display: 'grid', gap: 4 }}>

@@ -191,6 +191,115 @@ app.prepare().then(() => {
     }
   });
 
+  // ---- Dev-only issue-report + upload stubs ------------------------------
+  // functions/api/issue-reports/** and functions/api/uploads/** are Pages
+  // Functions with D1 and R2 bindings, so like the auth stubs above they do
+  // not run here. Held in memory: restarting the server empties the queue,
+  // which is what you want when reviewing the form rather than the data.
+  //
+  // These mirror the real routes' SHAPES, not their security. The real ones
+  // sniff magic bytes, enforce quotas, check upload ownership, and gate on
+  // session role; none of that is repeated here, because there is no session
+  // and no other user to protect anything from. Do not read this as a second
+  // implementation to keep in sync -- it exists so the Report an issue button
+  // and /teacher/issues can be clicked through without wrangler.
+  const devIssues = [];
+  const devUploads = new Map();
+  let devIssueSeq = 0;
+  let devUploadSeq = 0;
+
+  server.post('/api/uploads', express.raw({ type: '*/*', limit: '4mb' }), (req, res) => {
+    if (!req.body || !req.body.length) return res.status(400).json({ error: 'That file is empty.' });
+    devUploadSeq++;
+    // Shaped like the real 32-hex CSPRNG id so isUploadId() would accept it.
+    const id = devUploadSeq.toString(16).padStart(32, 'a');
+    const type = req.headers['content-type'] || 'image/png';
+    devUploads.set(id, { buf: req.body, type });
+    res.status(201).json({ id, url: '/uploads/' + id + '.png', filename: 'dev', contentType: type, bytes: req.body.length });
+  });
+
+  server.delete('/api/uploads/:id', (req, res) => {
+    const had = devUploads.delete(req.params.id);
+    console.log('  [dev] upload delete ' + req.params.id + (had ? ' -> gone' : ' -> was not there'));
+    if (!had) return res.status(404).json({ error: 'Not found' });
+    res.json({ deleted: req.params.id });
+  });
+
+  server.get('/uploads/:name', (req, res) => {
+    const item = devUploads.get(String(req.params.name).split('.')[0]);
+    if (!item) return res.status(404).send('Not found');
+    res.set('Content-Type', item.type).set('X-Content-Type-Options', 'nosniff').send(item.buf);
+  });
+
+  server.get('/api/issue-reports', (req, res) => {
+    const sorted = [...devIssues].sort((a, b) => b.created_at - a.created_at);
+    if (req.query.format === 'md') {
+      const lines = ['# Issue reports (dev server)', ''];
+      for (const r of sorted) {
+        lines.push('## #' + r.id + ' [' + r.kind.toUpperCase() + '] ' + (r.title || ''), '', r.message, '');
+      }
+      return res
+        .set('Content-Type', 'text/markdown; charset=utf-8')
+        .set('Content-Disposition', 'attachment; filename="issue-reports-dev.md"')
+        .send(lines.join('\n'));
+    }
+    res.json({ reports: sorted });
+  });
+
+  server.post('/api/issue-reports', express.json({ limit: '1mb' }), (req, res) => {
+    const { kind, title, message, context, screenshotId } = req.body || {};
+    if (!['bug', 'quirk', 'enhancement'].includes(kind)) {
+      return res.status(400).json({ error: 'kind must be one of: bug, quirk, enhancement' });
+    }
+    // Same two guards the real route applies, because they are the two the
+    // form can actually trip and you want to see the error rendering.
+    if (typeof title !== 'string' || title.trim().length < 3) {
+      return res.status(400).json({ error: 'Please give this a short title (at least 3 characters).' });
+    }
+    if (typeof message !== 'string' || message.trim().length < 3) {
+      return res.status(400).json({ error: 'Please describe the issue (at least 3 characters).' });
+    }
+    devIssueSeq++;
+    devIssues.push({
+      id: devIssueSeq,
+      reporter_email: 'dev@local',
+      kind,
+      title: title.trim(),
+      message: message.trim(),
+      status: 'open',
+      triaged_by: null,
+      triaged_at: null,
+      context: context ?? null,
+      screenshot_id: screenshotId ?? null,
+      created_at: Date.now(),
+    });
+    console.log('  [dev] issue #' + devIssueSeq + ' [' + kind + '] ' + title.trim());
+    res.status(201).json({ id: devIssueSeq, ok: true });
+  });
+
+  server.post('/api/issue-reports/:id/status', express.json(), (req, res) => {
+    const r = devIssues.find((x) => x.id === Number(req.params.id));
+    if (!r) return res.status(404).json({ error: 'Report not found' });
+    const { status } = req.body || {};
+    if (!['open', 'in-progress', 'fixed', 'deferred'].includes(status)) {
+      return res.status(400).json({ error: 'status must be one of: open, in-progress, fixed, deferred' });
+    }
+    r.status = status;
+    r.triaged_by = 'dev@local';
+    r.triaged_at = Date.now();
+    res.json({ ok: true, id: r.id, status });
+  });
+
+  server.delete('/api/issue-reports/:id', (req, res) => {
+    const i = devIssues.findIndex((x) => x.id === Number(req.params.id));
+    if (i === -1) return res.status(404).json({ error: 'Report not found' });
+    const [gone] = devIssues.splice(i, 1);
+    let screenshotDeleted = false;
+    if (gone.screenshot_id) screenshotDeleted = devUploads.delete(gone.screenshot_id);
+    console.log('  [dev] issue #' + gone.id + ' deleted' + (screenshotDeleted ? ' (+ screenshot)' : ''));
+    res.json({ deleted: gone.id, screenshotDeleted });
+  });
+
   server.all('*', (req, res) => {
     return handle(req, res);
   });

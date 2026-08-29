@@ -14,8 +14,8 @@ import DocsDrawer from './DocsDrawer';
 import ModelEditor from './model/ModelEditor';
 import HandleOverlay, { type AnchorPoint, type SketchOutline } from './model/HandleOverlay';
 import { outlineOf } from '../lib/sketch-arc';
-import { handlesFor } from '../lib/model-handles';
-import { EMPTY_DOC, type Feature, type ModelDoc } from '../lib/model-types';
+import { handlesFor, planeAnchor } from '../lib/model-handles';
+import { EMPTY_DOC, type Feature, type ModelDoc, newPolygonSketch, newRectangleSketch } from '../lib/model-types';
 import {
   applyParam,
   paramValues as docParams,
@@ -88,6 +88,14 @@ export default function SandboxWorkspace() {
   const [build, setBuild] = useState(false);
   const [doc, setDoc] = useState<ModelDoc>(EMPTY_DOC);
   const [selected, setSelected] = useState<string[]>([]);
+  // Rollback bar: the boundary index (0..features.length) past which features
+  // are suppressed from the rebuilt model. null means "show everything". This
+  // is a view change, not a structural edit -- see the effect below.
+  const [rollbackIndex, setRollbackIndex] = useState<number | null>(null);
+  // Click-to-draw state: which tool is active (null = none), and the first
+  // clicked plane point awaiting a second click to complete the shape.
+  const [drawTool, setDrawTool] = useState<'rect' | 'polygon' | null>(null);
+  const [drawFirst, setDrawFirst] = useState<[number, number] | null>(null);
   // What the student's teachers have set. A failed or missing fetch resolves to
   // 'both', so a gate that cannot be read never locks anyone out of their work.
   const [teacherModes, setTeacherModes] = useState<TeacherModes>(NO_TEACHER_MODES);
@@ -224,6 +232,25 @@ export default function SandboxWorkspace() {
   const docRef = useRef(doc);
   useEffect(() => { docRef.current = doc; }, [doc]);
 
+  // The doc as the rollback bar sees it: everything up to (not including)
+  // rollbackIndex. null means the full doc. Slicing here keeps the underlying
+  // doc untouched, so toggling rollback never mutates the student's model.
+  const effectiveDoc = useMemo(
+    () => (rollbackIndex == null ? doc : { ...doc, features: doc.features.slice(0, rollbackIndex) }),
+    [doc, rollbackIndex]
+  );
+
+  // Regenerate the live runner ONLY when the rollback toggle changes. Doc
+  // edits already regenerate through loadDoc, so effectiveDoc is deliberately
+  // left out of the dependency array -- this effect exists to react to the
+  // rollback boundary itself, not to structural edits.
+  useEffect(() => {
+    if (!build) return;
+    setCode(toReshape(effectiveDoc));
+    setRunKey((k) => k + 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rollbackIndex]);
+
   // Regenerate and reload. The slow path, and the only one structure takes.
   const loadDoc = useCallback((raw: ModelDoc) => {
     // Solve here, not at the call site. Every path into the doc goes through
@@ -238,6 +265,7 @@ export default function SandboxWorkspace() {
     setParamValues(() => docParams(next));
     setRebuildMs(null);
     setStale(null);
+    setRollbackIndex(null);
     setCode(toReshape(next));
     setRunKey((k) => k + 1);
     setIsRunning(true);
@@ -328,10 +356,12 @@ export default function SandboxWorkspace() {
   // is a permanent non-goal.
   // Only the selected shape gets handles: every shape at once is a screenful
   // of dots with no way to tell which belongs to what.
-  const specs = useMemo(
-    () => (build ? doc.features.filter((f) => selected.includes(f.id)).flatMap(handlesFor) : []),
-    [build, doc, selected]
-  );
+  const specs = useMemo(() => {
+    if (!build) return [];
+    if (drawTool) return [planeAnchor('xy', 0)];
+    if (doc.features.length === 0) return [planeAnchor('xy', 0)];
+    return doc.features.filter((f) => selected.includes(f.id)).flatMap(handlesFor);
+  }, [build, doc, selected, drawTool]);
   const scales = useMemo(
     () => Object.fromEntries(specs.map((h) => [h.param, h.scale])),
     [specs]
@@ -371,6 +401,42 @@ export default function SandboxWorkspace() {
     );
     if (specs.length === 0) setAnchors([]);
   }, [specs]);
+
+  // Escape cancels an in-progress draw. ModelEditor's own keydown listener
+  // closes flyouts but lives in a different component and does not own this
+  // state, so the draw tool needs its own.
+  useEffect(() => {
+    if (!drawTool) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') { setDrawTool(null); setDrawFirst(null); }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [drawTool]);
+
+  // A click on the plane while a draw tool is active. First click records the
+  // start; a second click completes the shape and exits draw mode. A
+  // degenerate second click (either side under 1 unit) is not an error -- it
+  // just stays in draw mode so the student can click again.
+  function handlePlace(u: number, v: number) {
+    if (drawTool === 'rect') {
+      if (!drawFirst) { setDrawFirst([u, v]); return; }
+      const f = newRectangleSketch(doc, 'xy', drawFirst, [u, v]);
+      if (!f) return;  // degenerate second click -- stay in draw mode, let them click again
+      applyDoc({ ...doc, features: [...doc.features, f] });
+      setSelected([f.id]);
+      setDrawTool(null);
+      setDrawFirst(null);
+    } else if (drawTool === 'polygon') {
+      if (!drawFirst) { setDrawFirst([u, v]); return; }
+      const f = newPolygonSketch(doc, 'xy', drawFirst, [u, v]);
+      if (!f) return;
+      applyDoc({ ...doc, features: [...doc.features, f] });
+      setSelected([f.id]);
+      setDrawTool(null);
+      setDrawFirst(null);
+    }
+  }
 
   function chooseBuild(on: boolean) {
     if (!on && doc.features.length > 0) {
@@ -782,6 +848,9 @@ export default function SandboxWorkspace() {
                 onChange={applyDoc}
                 selected={selected}
                 onSelect={setSelected}
+                rollbackIndex={rollbackIndex}
+                onRollback={setRollbackIndex}
+                onStartDraw={setDrawTool}
                 onUndo={undo}
                 onRedo={redo}
                 canUndo={depth.back > 0}
@@ -830,6 +899,8 @@ export default function SandboxWorkspace() {
                       onDrag={(param, value) => sendParams({ [param]: value })}
                       onCommit={commitParams}
                       outlines={outlines}
+                      drawing={drawTool != null}
+                      onPlace={handlePlace}
                     />
                   )}
                 </div>
@@ -1088,7 +1159,13 @@ export default function SandboxWorkspace() {
            divider and the empty-screen copy all sit on top of it anyway. */
         .sandbox-shell.is-build #previewPane { flex: 1 1 100% !important; }
         .sandbox-shell.is-build .divider { display: none; }
-        .sandbox-shell.is-build .reshape-pane-params { flex: 0 0 208px; }
+        .sandbox-shell.is-build .reshape-pane-params {
+          flex: 0 0 208px;
+          /* The toolbar floats at top:0 (48px), over the canvas. The panel
+             must clear that same band -- the identical offset #editorPane
+             uses. align-items: stretch shrinks the panel from the top. */
+          margin-top: 48px;
+        }
         /* The toolbar floats over the preview, so the preview owns the whole
            window and the two read as one space. */
         .sandbox-shell.is-build .sandbox-split { border: 0; box-shadow: none; }

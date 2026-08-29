@@ -149,6 +149,102 @@ module.exports = function run(dir) {
   const tiny = S.solveSketch([[0, 0]], [{ kind: 'horizontal', edge: 0 }]);
   check('a single point is not a polygon and is left alone', tiny.points.length === 1);
 
+  console.log('\n=== parallel and perpendicular ===');
+
+  // Angles are measured from the returned points with plain trig, mod PI --
+  // a line has no direction, so angle and angle+PI are the same edge.
+  const edgeAngle = (pts, n) => {
+    const [a, b] = S.edgeCorners(n, pts.length);
+    const dx = pts[b][0] - pts[a][0];
+    const dy = pts[b][1] - pts[a][1];
+    if (Math.hypot(dx, dy) < 1e-9) return null;
+    return Math.atan2(dy, dx);
+  };
+  // Smallest signed difference between two angles, mod PI, in (-PI/2, PI/2].
+  const angleDiff = (a, b) => {
+    let d = (b - a) % Math.PI;
+    if (d > Math.PI / 2) d -= Math.PI;
+    if (d <= -Math.PI / 2) d += Math.PI;
+    return d;
+  };
+
+  // Two edges at clearly different angles (edge 0 leans, edge 2 is flat).
+  const lean2 = [[0, 0], [40, 6], [40, 25], [0, 25]];
+  const par = S.solveSketch(lean2, [{ kind: 'parallel', edge: 0, other: 2 }]);
+  check('parallel brings two edges to the same angle',
+    near(angleDiff(edgeAngle(par.points, 0), edgeAngle(par.points, 2)), 0, 1e-3),
+    `${edgeAngle(par.points, 0).toFixed(4)} vs ${edgeAngle(par.points, 2).toFixed(4)}`);
+
+  const perp = S.solveSketch(lean2, [{ kind: 'perpendicular', edge: 0, other: 2 }]);
+  check('perpendicular brings two edges to a right angle',
+    near(Math.abs(angleDiff(edgeAngle(perp.points, 0), edgeAngle(perp.points, 2))), Math.PI / 2, 1e-3),
+    `${edgeAngle(perp.points, 0).toFixed(4)} vs ${edgeAngle(perp.points, 2).toFixed(4)}`);
+
+  // Length preservation is the whole point of rotating around the right pivot.
+  const lenBefore = [S.edgeLength(lean2, 0), S.edgeLength(lean2, 2)];
+  const parLen = S.solveSketch(lean2, [{ kind: 'parallel', edge: 0, other: 2 }]);
+  check('parallel preserves both edge lengths (no corner pinned)',
+    near(S.edgeLength(parLen.points, 0), lenBefore[0], 1e-3)
+    && near(S.edgeLength(parLen.points, 2), lenBefore[1], 1e-3),
+    `${S.edgeLength(parLen.points, 0).toFixed(3)}/${lenBefore[0].toFixed(3)} and ${S.edgeLength(parLen.points, 2).toFixed(3)}/${lenBefore[1].toFixed(3)}`);
+
+  // Pin one endpoint of edge 0; the pivot must move to the other endpoint so
+  // the edge still rotates without changing length, and the pin never moves.
+  const parPin = S.solveSketch(lean2, [
+    { kind: 'parallel', edge: 0, other: 2 },
+    { kind: 'lock', corner: 0 },
+  ]);
+  check('...and still preserves length with one corner pinned',
+    near(S.edgeLength(parPin.points, 0), lenBefore[0], 1e-3),
+    `${S.edgeLength(parPin.points, 0).toFixed(3)} vs ${lenBefore[0].toFixed(3)}`);
+  check('...and the pinned corner does not move at all',
+    parPin.points[0][0] === 0 && parPin.points[0][1] === 0,
+    JSON.stringify(parPin.points[0]));
+
+  // A zero-length edge has no angle to match; it must be skipped, not NaN'd.
+  const zeroPar = S.solveSketch([[10, 10], [10, 10], [40, 25]], [
+    { kind: 'parallel', edge: 0, other: 1 },
+  ]);
+  check('a zero-length edge is refused, not NaN\'d',
+    zeroPar.points.every((p) => Number.isFinite(p[0]) && Number.isFinite(p[1])),
+    JSON.stringify(zeroPar.points));
+  check('...and its corners stay exactly where they were',
+    zeroPar.points[0][0] === 10 && zeroPar.points[0][1] === 10
+    && zeroPar.points[1][0] === 10 && zeroPar.points[1][1] === 10,
+    JSON.stringify([zeroPar.points[0], zeroPar.points[1]]));
+
+  // Three sides of a triangle cannot all be mutually perpendicular. The solver
+  // must settle on a compromise and report the disagreement, not pinball until
+  // the iteration cap or corrupt the geometry. NOTE: whether it actually
+  // settles (iterations well under 300) is the one open question from the
+  // design pass -- it is surfaced as a measurement below, not a hard PASS/FAIL,
+  // because a non-converging relaxation is a real algorithmic finding for a
+  // human to read, not a test to paper over.
+  const tri = [[0, 0], [40, 0], [20, 30]];
+  const triPerp = S.solveSketch(tri, [
+    { kind: 'perpendicular', edge: 0, other: 1 },
+    { kind: 'perpendicular', edge: 1, other: 2 },
+    { kind: 'perpendicular', edge: 2, other: 0 },
+  ]);
+  console.log(`  MEASURE  impossible perpendiculars: ${triPerp.iterations} iterations (cap ${300})`);
+  check('impossible perpendiculars are reported as over-constrained, not silently picked',
+    triPerp.overConstrained, `residual ${triPerp.residual.toFixed(3)}`);
+  check('...with finite points throughout',
+    triPerp.points.every((p) => Number.isFinite(p[0]) && Number.isFinite(p[1])),
+    JSON.stringify(triPerp.points));
+
+  // All three relation kinds at once on one small polygon: they must not
+  // crash or fight into NaN, even if the result is over-constrained.
+  const mixed = S.solveSketch(rect(), [
+    { kind: 'equal', edge: 0, other: 1 },
+    { kind: 'parallel', edge: 0, other: 2 },
+    { kind: 'perpendicular', edge: 1, other: 3 },
+  ]);
+  check('equal + parallel + perpendicular coexist without NaN',
+    Number.isFinite(mixed.residual)
+    && mixed.points.every((p) => Number.isFinite(p[0]) && Number.isFinite(p[1])),
+    `residual ${mixed.residual}`);
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };

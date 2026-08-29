@@ -111,7 +111,8 @@
       "why": "the visual half of parity; the critic judges this blind against the real screenshot",
       "covers": [],
       "label": "toolbar grouping, flyout carets, icon set, disabled states, tooltips, Search tools (alt+c), rollback bar",
-      "coversNote": "toolbar presentation, not a tool"
+      "coversNote": "toolbar presentation, not a tool",
+      "landed": "2026-08-28 gauntlet round 2 -- fixed a real Dimensions-panel/toolbar overlap bug (missing 48px top offset on .reshape-pane-params); toolbar grouping/dividers, Search tools alt+c hint, and disabled states were already correct on inspection; built the rollback bar from scratch (click-to-set vertical handles in the timeline, a deliberate adaptation of Onshape's draggable horizontal bar to reSHape's horizontal chip strip). All verified live in a browser, not just by code review."
     }
   ],
   "outOfScope": [

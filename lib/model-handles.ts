@@ -9,7 +9,7 @@
 // box grows both ways at once, so its face only keeps up with the pointer if
 // the width changes by twice the drag.
 
-import { isShape, type Feature } from './model-types';
+import { isShape, type Feature, type SketchPlane } from './model-types';
 import { maxFilletRadius } from './sketch-arc';
 
 export type HandleKind = 'size' | 'move' | 'turn' | 'point' | 'radius';
@@ -83,6 +83,35 @@ const PLANE_AXES: Record<string, { u: [number, number, number]; v: [number, numb
 
 export function planeAxes(plane: string) {
   return PLANE_AXES[plane] ?? PLANE_AXES.xy;
+}
+
+// The normal of a sketch plane, as a unit vector. Matches the `n` computation
+// in sketchHandles; kept as one place so planeAnchor and the corner world()
+// helper cannot drift apart.
+function planeNormal(plane: SketchPlane): [number, number, number] {
+  return plane === 'xy' ? [0, 0, 1] : plane === 'xz' ? [0, 1, 0] : [1, 0, 0];
+}
+
+/**
+ * A single anchor at a sketch plane's own origin -- what a click-to-draw
+ * surface needs to exist BEFORE any corner does, so a screen click can be
+ * measured relative to something. Same u/v axis convention as a sketch
+ * corner's own handle (see sketchHandles), just with no existing point to
+ * anchor from.
+ */
+export function planeAnchor(plane: SketchPlane, offset: number): HandleSpec {
+  const { u, v } = planeAxes(plane);
+  const n = planeNormal(plane);
+  return {
+    kind: 'point',
+    param: '__planeOrigin',
+    origin: [n[0] * offset, n[1] * offset, n[2] * offset],
+    axis: u,
+    axisV: v,
+    paramV: '__planeOriginV',
+    scale: 1,
+    label: 'sketch plane origin',
+  };
 }
 
 // The band a radius handle is worth offering in. Outside it the handle is

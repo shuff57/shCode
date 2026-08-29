@@ -522,6 +522,52 @@ export function newCircleSketch(doc: ModelDoc, plane: SketchPlane = 'xy'): Sketc
   };
 }
 
+/**
+ * A rectangle from two clicked corners, in plane coordinates. Returns null
+ * for a degenerate click pair (either side under 1 unit) rather than
+ * creating a sliver -- the caller should treat null as "not a valid second
+ * point yet", not as an error to surface.
+ */
+export function newRectangleSketch(
+  doc: ModelDoc, plane: SketchPlane, p1: [number, number], p2: [number, number]
+): SketchFeature | null {
+  const w = Math.abs(p2[0] - p1[0]);
+  const h = Math.abs(p2[1] - p1[1]);
+  if (w < 1 || h < 1) return null;
+  const loU = Math.min(p1[0], p2[0]), hiU = Math.max(p1[0], p2[0]);
+  const loV = Math.min(p1[1], p2[1]), hiV = Math.max(p1[1], p2[1]);
+  return {
+    id: nextId(doc, 'sk'),
+    kind: 'sketch',
+    plane,
+    offset: 0,
+    points: [[loU, loV], [hiU, loV], [hiU, hiV], [loU, hiV]],
+  };
+}
+
+/**
+ * A regular polygon from a clicked center and one clicked vertex, in plane
+ * coordinates. The vertex point becomes an actual corner (angle = atan2 of
+ * the click relative to center), not just a radius reference. Returns null
+ * for a degenerate click (center and vertex under 1 unit apart).
+ */
+export function newPolygonSketch(
+  doc: ModelDoc, plane: SketchPlane, center: [number, number],
+  vertex: [number, number], sides = 6
+): SketchFeature | null {
+  const dx = vertex[0] - center[0];
+  const dy = vertex[1] - center[1];
+  const radius = Math.hypot(dx, dy);
+  if (radius < 1) return null;
+  const startAngle = Math.atan2(dy, dx);
+  const points: [number, number][] = [];
+  for (let i = 0; i < sides; i++) {
+    const a = startAngle + (i / sides) * Math.PI * 2;
+    points.push([center[0] + radius * Math.cos(a), center[1] + radius * Math.sin(a)]);
+  }
+  return { id: nextId(doc, 'sk'), kind: 'sketch', plane, offset: 0, points };
+}
+
 export function newExtrude(doc: ModelDoc, target: string): ExtrudeFeature {
   return { id: nextId(doc, 'pull'), kind: 'extrude', target, height: 12 };
 }

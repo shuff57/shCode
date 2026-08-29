@@ -21,7 +21,7 @@
 // row at the end for fixing mistakes" is one easy-to-teach unit, and there is
 // no reach-distance problem here worth optimizing away from that.
 
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { ReactNode } from 'react';
 import {
@@ -58,7 +58,9 @@ import {
   Move as MoveIcon,
   Copy as CopyIcon,
   SquareRoundCorner,
+  Square,
   Octagon,
+  Hexagon,
 } from 'lucide-react';
 import SketchConstraints from './SketchConstraints';
 import { solveSketch, type Constraint, type Point } from '../../lib/sketch-solve';
@@ -122,6 +124,17 @@ interface Props {
    *  The feature list lives in the bottom timeline now, so an empty card is
    *  hidden entirely rather than sitting over the canvas as a click-eater. */
   onContentChange?: (hasContent: boolean) => void;
+  /** Rollback bar boundary (0..features.length): features at or past this
+   *  index are suppressed from the rebuilt model. null means "show everything".
+   *  A view change, not a structural edit -- the sandbox regenerates the live
+   *  runner when this changes, without touching the doc or its history. */
+  rollbackIndex?: number | null;
+  /** Set the rollback boundary, or null to clear it (show the full model). */
+  onRollback?: (i: number | null) => void;
+  /** Start a click-to-draw tool. The sandbox owns the draw state machine and
+   *  this just flips it on; the tool stays active until two clicks place a
+   *  shape or Escape cancels it. */
+  onStartDraw?: (tool: 'rect' | 'polygon') => void;
 }
 
 type BoolOp = 'union' | 'subtract' | 'intersect';
@@ -305,7 +318,7 @@ function FlyoutButton({
 }
 
 export default function ModelEditor({
-  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange,
+  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, onStartDraw,
 }: Props) {
   const [note, setNote] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -929,6 +942,16 @@ export default function ModelEditor({
                   <Circle size={14} /> Circle
                 </button>
               )}
+              {matches('Rectangle') && (
+                <button onClick={() => onStartDraw?.('rect')} title="Click two corners to draw a rectangle">
+                  <Square size={14} /> Rectangle
+                </button>
+              )}
+              {matches('Polygon') && (
+                <button onClick={() => onStartDraw?.('polygon')} title="Click a center, then a corner, to draw a hexagon">
+                  <Hexagon size={14} /> Polygon
+                </button>
+              )}
               {matches('Corner') && (
                 <button
                   onClick={corner}
@@ -1209,14 +1232,35 @@ export default function ModelEditor({
           )}
           {doc.features.map((f, i) => {
             const on = selected.includes(f.id);
+            const rolledBack = rollbackIndex != null && i >= rollbackIndex;
             return (
-              <li
-                key={f.id}
-                className={
-                  'model-row' + (on ? ' is-on' : '') + (shownIds.has(f.id) ? '' : ' is-consumed')
-                }
-                onClick={(e) => pick(f.id, e.ctrlKey || e.metaKey || e.shiftKey)}
-              >
+              <Fragment key={f.id}>
+                <button
+                  type="button"
+                  className={
+                    'model-rollback-handle'
+                    + (rollbackIndex === i ? ' is-active' : '')
+                  }
+                  onClick={() => onRollback?.(rollbackIndex === i ? null : i)}
+                  title={
+                    rollbackIndex === i
+                      ? 'Show the full model'
+                      : `Roll back to before "${names[f.id]}"`
+                  }
+                  aria-label={
+                    rollbackIndex === i
+                      ? 'Show the full model'
+                      : `Roll back to before "${names[f.id]}"`
+                  }
+                >
+                  <span className="model-rollback-line" aria-hidden="true" />
+                </button>
+                <li
+                  className={
+                    'model-row' + (on ? ' is-on' : '') + (shownIds.has(f.id) ? '' : ' is-consumed') + (rolledBack ? ' is-rolled-back' : '')
+                  }
+                  onClick={(e) => pick(f.id, e.ctrlKey || e.metaKey || e.shiftKey)}
+                >
                 <span className="model-step">{i + 1}</span>
                 <span className="model-name">
                   {names[f.id]}
@@ -1286,8 +1330,21 @@ export default function ModelEditor({
                   </button>
                 </span>
               </li>
+              </Fragment>
             );
           })}
+          <button
+            type="button"
+            className={
+              'model-rollback-handle'
+              + (rollbackIndex === doc.features.length ? ' is-active' : '')
+            }
+            onClick={() => onRollback?.(rollbackIndex === doc.features.length ? null : doc.features.length)}
+            title="Show the full model"
+            aria-label="Show the full model"
+          >
+            <span className="model-rollback-line" aria-hidden="true" />
+          </button>
         </ol>,
         timelineHost
       ) : (
@@ -1516,6 +1573,36 @@ export default function ModelEditor({
           border-color: #6272a4;
         }
         .model-timeline .model-row.is-consumed { opacity: 0.55; }
+        /* Suppressed by the rollback bar: features at or past the boundary are
+           hidden from the rebuilt model. More suppressed than is-consumed so
+           the two read as distinct states (a feature can be both). */
+        .model-timeline .model-row.is-rolled-back { opacity: 0.35; filter: grayscale(0.6); }
+        /* The rollback bar handle: a thin vertical divider between chips.
+           Click-to-set, not drag -- a deliberate adaptation of Onshape's
+           draggable bar to reSHape's horizontal timeline. */
+        .model-timeline .model-rollback-handle {
+          flex: 0 0 auto;
+          align-self: stretch;
+          width: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
+          background: transparent;
+          border: 0;
+          cursor: pointer;
+          border-radius: 2px;
+        }
+        .model-timeline .model-rollback-handle:hover { background: #343746; }
+        .model-timeline .model-rollback-line {
+          width: 2px;
+          height: 100%;
+          background: #6272a4;
+          border-radius: 1px;
+        }
+        .model-timeline .model-rollback-handle.is-active .model-rollback-line {
+          background: #8be9fd;
+        }
         .model-timeline .model-step {
           flex: 0 0 auto;
           text-align: left;

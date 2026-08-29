@@ -2,7 +2,9 @@
 //
 // GET   — staff (teacher/admin) only: the full report queue, newest first.
 //         `?format=md` streams a markdown handoff file instead of JSON.
-// POST  — any signed-in user: file a new report. Body {kind, message, context}.
+// POST  — any signed-in user: file a new report.
+//         Body {kind, title, message, context, screenshotId}.
+// DELETE — see [id]/index.ts. Staff only; removes the report and its screenshot.
 //
 // Reports are site-wide notes, not class-scoped: any staff member can triage
 // all of them. Rate limiting is a simple per-reporter open-report cap, enough
@@ -18,6 +20,7 @@ type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 type Ctx = EventContext<Env, string, SessionData>;
 
 const KINDS = new Set(['bug', 'quirk', 'enhancement']);
+const MAX_TITLE = 120;
 const MAX_MESSAGE = 4000;
 const MAX_CONTEXT = 16000;
 const MAX_OPEN_PER_REPORTER = 20;
@@ -26,6 +29,8 @@ interface ReportRow {
   id: number;
   reporter_email: string;
   kind: 'bug' | 'quirk' | 'enhancement';
+  /** NULL only for reports filed before migration 0020 added the column. */
+  title: string | null;
   message: string;
   status: 'open' | 'in-progress' | 'fixed' | 'deferred';
   triaged_by: string | null;
@@ -41,7 +46,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async (cont
   if (data.role === 'student') return json({ error: 'Staff only' }, 403);
 
   const result = await env.DB.prepare(
-    `SELECT id, reporter_email, kind, message, status, triaged_by, triaged_at, context_json, screenshot_id, created_at
+    `SELECT id, reporter_email, kind, title, message, status, triaged_by, triaged_at, context_json, screenshot_id, created_at
        FROM issue_reports
       ORDER BY created_at DESC`,
   ).all<ReportRow>();
@@ -65,7 +70,13 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async (cont
 export const onRequestPost: PagesFunction<Env, string, SessionData> = async (context: Ctx) => {
   const { env, data, request } = context;
 
-  let body: { kind?: unknown; message?: unknown; context?: unknown; screenshotId?: unknown };
+  let body: {
+    kind?: unknown;
+    title?: unknown;
+    message?: unknown;
+    context?: unknown;
+    screenshotId?: unknown;
+  };
   try {
     body = await request.json();
   } catch {
@@ -75,6 +86,16 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   const kind = typeof body.kind === 'string' ? body.kind : '';
   if (!KINDS.has(kind)) {
     return json({ error: 'kind must be one of: bug, quirk, enhancement' }, 400);
+  }
+
+  // Title is required on new reports. Old rows can be NULL (migration 0020),
+  // but nothing should be able to create another one.
+  const title = typeof body.title === 'string' ? body.title.trim() : '';
+  if (title.length < 3) {
+    return json({ error: 'Please give this a short title (at least 3 characters).' }, 400);
+  }
+  if (title.length > MAX_TITLE) {
+    return json({ error: `That title is too long. The limit is ${MAX_TITLE} characters.` }, 413);
   }
 
   const message = typeof body.message === 'string' ? body.message.trim() : '';
@@ -138,10 +159,10 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   }
 
   const result = await env.DB.prepare(
-    `INSERT INTO issue_reports (reporter_email, kind, message, status, context_json, screenshot_id, created_at)
-     VALUES (?, ?, ?, 'open', ?, ?, ?)`,
+    `INSERT INTO issue_reports (reporter_email, kind, title, message, status, context_json, screenshot_id, created_at)
+     VALUES (?, ?, ?, ?, 'open', ?, ?, ?)`,
   )
-    .bind(data.email, kind, message, contextJson, screenshotId, Date.now())
+    .bind(data.email, kind, title, message, contextJson, screenshotId, Date.now())
     .run();
 
   return json({ id: result.meta.last_row_id, ok: true }, 201);
@@ -176,13 +197,13 @@ export function renderMarkdown(reports: ReportRow[]): string {
     '',
     `Exported from shCode. ${open} open, ${inProgress} in progress, ${fixed} fixed, ${deferred} deferred (${reports.length} total).`,
     '',
-    '| # | Kind | Status | Reporter | When |',
-    '| --- | --- | --- | --- | --- |',
+    '| # | Title | Kind | Status | Reporter | When |',
+    '| --- | --- | --- | --- | --- | --- |',
   ];
 
   for (const r of reports) {
     lines.push(
-      `| ${r.id} | ${KIND_ICON[r.kind] ?? r.kind} ${r.kind} | ${STATUS_LABEL[r.status] ?? r.status} | ${r.reporter_email} | ${new Date(r.created_at).toISOString()} |`,
+      `| ${r.id} | ${cell(headline(r))} | ${KIND_ICON[r.kind] ?? r.kind} ${r.kind} | ${STATUS_LABEL[r.status] ?? r.status} | ${r.reporter_email} | ${new Date(r.created_at).toISOString()} |`,
     );
   }
 
@@ -190,7 +211,7 @@ export function renderMarkdown(reports: ReportRow[]): string {
 
   for (const r of reports) {
     lines.push(
-      `## #${r.id} — [${r.kind.toUpperCase()}] ${firstLine(r.message)}`,
+      `## #${r.id} — [${r.kind.toUpperCase()}] ${headline(r)}`,
       '',
       `- **Kind:** ${r.kind}`,
       `- **Status:** ${r.status}`,
@@ -221,6 +242,21 @@ export function renderMarkdown(reports: ReportRow[]): string {
   }
 
   return lines.join('\n');
+}
+
+/**
+ * The report's headline. `title` is required on anything filed after
+ * migration 0020; older rows fall back to the first line of the body, which
+ * is exactly what the UI used to derive on every render.
+ */
+function headline(r: ReportRow): string {
+  const t = (r.title || '').trim();
+  return t || firstLine(r.message);
+}
+
+/** Table-cell safe: a pipe would silently add a column and shift the row. */
+function cell(text: string): string {
+  return text.split('|').join('\u2758');
 }
 
 function firstLine(message: string): string {
