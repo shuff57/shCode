@@ -1,93 +1,72 @@
-# Handoff — 2026-08-29 · reSHape sketch-tool parity gauntlet, parked mid-machine-switch
+# Handoff — 2026-08-29 (evening) · reSHape constraints DONE; two lesson fixes shipped
 
-**Read this before anything else if you're picking this up cold.** The
-day-by-day design/exec log for this whole effort lives at
-`~/.claude/plans/reshape-fusion-parity.md` — but that file is LOCAL to
-`DESKTOP-F82ORAK` (under the user's home `.claude/` directory, not this
-repo), so it will NOT be present on a different machine. This section is
-the condensed version. If you need the full blow-by-blow (exact test
-output, live-browser Playwright traces, the git-stash recovery story),
-ask the user for that file specifically — it was not lost, just never
-git-tracked.
+Supersedes the morning park section, whose open items are all now closed.
+Tree is clean, `npm test` and `tsc --noEmit` both green, nothing uncommitted.
 
-## Where things stand
+## Shipped today
 
-- **`chamfer2d` (sketch-level chamfer) — SHIPPED, committed, PUSHED.**
-  Commit `b85d2ca` on `cs-3d`, already on `origin`. Geometry
-  (`lib/sketch-arc.ts`: `chamferCorner`/`maxChamferDistance`/
-  `whyCannotChamferCorner`), data model (`chamfers?: Record<number,
-  number>` on `SketchFeature`), and Rules-panel UI (a "Chamfer a corner"
-  row mirroring "Round a corner") are all done and verified live via
-  Playwright against a local `wrangler pages dev` server. Not yet marked
-  `landed` differently from geometry+UI — actually it IS marked landed in
-  `.gauntlet/parity-sketch.json`, check there for the exact note.
+| Commit | What |
+| --- | --- |
+| `d7f2bce` | `fix(grader)` — 1.2.25 r1–r6 and 1.5.37 r3 were rejecting correct work over untaught surface details (semicolons, one exact rule phrasing). Grader tolerance suite 151 → 167 cases. |
+| `a049a31` | `fix(a11y)` — footer progress dots were below the 3:1 WCAG non-text minimum (locked 1.72:1 plus 0.4 opacity); `?` shortcut was eating question marks typed into CodeMirror, which is a contenteditable div the old INPUT/TEXTAREA guard did not catch. |
+| `226507d` | `docs` — dropped the CLAUDE.md migration and endpoint tables; both were a second copy of what the tree already states. |
+| `dc771b6` | `feat(reshape)` — the Rules-panel pair grid. **This closes the constraints item.** |
 
-- **`constraints` ("more rules") solver half — DONE, verified, NOT YET
-  COMMITTED** (that's the thing this park interrupted). Touches
-  `lib/sketch-solve.ts` (new `parallel`/`perpendicular` Constraint kinds,
-  a pinned-aware `rotateEdgeBy` rotation primitive, a residual-units fix)
-  and `scripts/sketch-solve-assertions.cjs` (34 assertions, all passing).
-  Independently re-verified: isolated `tsc --noEmit` clean, full `npm
-  test` clean. One real finding worth knowing: an intentionally-impossible
-  3-way perpendicular constraint on a triangle does NOT converge (burns
-  all 300 solver iterations) but never crashes/NaNs and correctly reports
-  `overConstrained: true` — accepted as a documented, bounded limitation,
-  not a bug to fix.
+## The constraints item is finished
 
-  **Design decision that came out of this pass:** of Onshape's five
-  constraints this item claims to cover (Coincident, Parallel,
-  Perpendicular, Midpoint, Symmetric), only Parallel and Perpendicular
-  actually fit this app's model (always one closed polygon, no free
-  points, no independent second sketch entity). Recommend reclassifying
-  Coincident/Midpoint/Symmetric to `outOfScope` in
-  `.gauntlet/parity-sketch.json` at implementation time — not done yet,
-  this is a design note, not a completed edit.
+Solver half landed in the morning park commit (`f2d2214`); the UI half is
+`dc771b6`. A lower-triangular grid in `SketchConstraints.tsx` gives each
+unordered edge pair one cell cycling none → equal → parallel → perpendicular.
 
-  **NEXT ACTION, exact:** dispatch the Rules-panel UI half (a new
-  N-choose-2 toggle-button grid in `components/model/SketchConstraints.tsx`
-  cycling none → equal → parallel → perpendicular per edge pair — this
-  ALSO closes a pre-existing gap where `equal` has zero UI despite being
-  marked shipped). The full spec was written but lives only in this
-  session's local scratchpad (also machine-local, gone). Rewrite it
-  following the exact pattern of the two specs already used successfully
-  in this effort (see any of the `SPEC-chamfer2d*.md` — pattern: read the
-  target file in full first, give exact code snippets, name what's out of
-  scope, require a hand-trace + `tsc`/`npm test` in the reply), then:
-  ```
-  node ~/.claude/bin/msg.mjs claim --as opencode components/model/SketchConstraints.tsx components/model/ModelEditor.tsx
-  node ~/.claude/bin/handoff.mjs --spec /abs/path/to/SPEC.md --allow-claims
-  ```
+`.gauntlet/parity-sketch.json` is updated to match: `constraints` now covers
+only Parallel and Perpendicular and carries a `landed` field, and
+Coincident/Midpoint/Symmetric moved to a new outOfScope group. That was the
+design note the morning section left open — it is done, not pending.
+Sketch bar now reads 8 shipped / 10 queued / 29 refused, all 52 accounted for.
 
-- **Two items never reached a design pass yet:** Arc ("3 Point Arc") and
-  `construction` (Guide line / Sketch Chamfer's sibling). Both hit the
-  same wall identified early on: this app's sketches are always ONE
-  closed polygon, and both of these are inherently open/non-solid
-  concepts. Whoever picks this up next should read the "Design questions"
-  section of the (local, machine-specific) plan file for the reasoning,
-  or re-derive it — the wall itself is simple: `lib/model-types.ts`'s
-  `SketchFeature.points` is always treated as closed.
+**`ModelEditor.tsx` needed no change** — `setConstraints` (line 867) already
+replaces the constraint array generically. The morning section told you to
+claim it; that was precautionary and turned out unnecessary.
 
-## What to run to get back up to speed
+### The one new guard, and why it exists
+
+`scripts/check-constraint-ui.mjs` (in `npm test`) reads the `Constraint` union
+out of `lib/sketch-solve.ts` and fails if any kind has no control in the Rules
+panel. It exists because `equal` sat in `ships` for months while being
+completely unreachable — declared, solved, scored, described, and impossible
+for a student to create, see or remove. Nothing failed, because the solver half
+and the UI half were each complete on their own terms.
+
+It **strips comments before looking**, deliberately: a kind named only in prose
+is the exact false pass it is guarding against. Do not "fix" a red run by
+mentioning the kind in a comment.
+
+## Still open — neither has had a design pass
+
+**Arc ("3 Point Arc")** and **`construction`** (guide lines). Both hit the same
+wall: `SketchFeature.points` in `lib/model-types.ts` is always treated as a
+closed polygon, and both tools are inherently open, non-solid concepts. Nothing
+has been decided about either; they need a design pass before any spec.
+
+## Traps worth knowing
+
+- **A finished opencode run can leave its file claim held while its reply says
+  it released it.** That happened today — the reply asserted the release, and
+  `msg.mjs owners` showed the claim still live. The PreToolUse guard is what
+  caught it, on an edit I expected to just work. Check `owners`, not the reply.
+- **`git show HEAD:<file>` returns LF where the working tree is CRLF**, so a
+  naive `diff` against a checked-out file reports every line as changed. Pipe
+  both through `tr -d '\r'` before concluding a backup differs from git.
+- A `;\n`-anchored regex over a repo source file will silently match nothing on
+  a CRLF checkout. `check-constraint-ui.mjs` hit this on its first run and only
+  surfaced it as a FAIL because it has a "did the parse find implausibly few
+  results" self-check. Worth copying that pattern into any new checker.
+
+## What to run
 
 ```bash
-cd shCode && git status --short     # constraints-solver files should show modified, uncommitted
-node ~/.claude/bin/msg.mjs log --n 20
-node ~/.claude/bin/msg.mjs owners   # should be empty -- claims were released before this park
-npx tsc --noEmit && npm test        # both should be clean as of the park
+cd shCode && npx tsc --noEmit && npm test && node ~/.claude/bin/msg.mjs owners
 ```
-
-## The one thing to watch
-
-The working tree also carries OTHER uncommitted, unrelated in-progress
-work that is NOT part of this gauntlet effort and was deliberately left
-alone throughout (per this repo's "never `git add -A`" convention) —
-an issue-reports feature, a timeline rollback bar, and chrome2d's
-Rectangle/Polygon toolbar wiring. **This park's `git add -A` commit WILL
-include all of that too**, bundled as one `wip:` commit — that's
-intentional for a machine-switch park (nothing should be stranded
-un-synced), but it means the resulting commit is NOT a clean, reviewable
-unit the way `b85d2ca` was. Don't mistake "it's committed" for "it's
-reviewed" when picking this back up.
 
 ---
 

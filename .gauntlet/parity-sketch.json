@@ -128,13 +128,12 @@
       "id": "constraints",
       "name": "more rules",
       "covers": [
-        "Coincident",
         "Parallel",
-        "Perpendicular",
-        "Midpoint",
-        "Symmetric"
+        "Perpendicular"
       ],
-      "why": "we have five of Onshape's sixteen. These five are the ones a beginner reaches for and the solver in lib/sketch-solve.ts can already express"
+      "why": "two of Onshape's sixteen. Started as five; Coincident, Midpoint and Symmetric turned out to have nothing to attach to in this app's model and moved to outOfScope during the design pass",
+      "landed": "2026-08-29, solver (parallel/perpendicular Constraint kinds, a pinned-aware rotateEdgeBy primitive and a residual-units fix in lib/sketch-solve.ts, 34 assertions in scripts/sketch-solve-assertions.cjs) plus Rules-panel UI (a lower-triangular pair grid in SketchConstraints.tsx cycling none -> equal -> parallel -> perpendicular per unordered edge pair, pairs stored canonically as edge=lo/other=hi). The UI half also closed a pre-existing hole: Equal was listed in ships with no control anywhere in the panel, so it could not be created, seen or removed. scripts/check-constraint-ui.mjs now reads the Constraint union out of the solver and fails if any kind has no control, comments stripped first so prose cannot satisfy it.",
+      "note": "an intentionally-impossible 3-way perpendicular on a triangle does not converge -- it burns all 300 solver iterations -- but never crashes or produces NaN, and correctly reports overConstrained so the existing 'these rules disagree' line fires. Accepted as a documented, bounded limitation: a student has to deliberately construct it, and 300 iterations at this sketch size is not a performance concern."
     },
     {
       "id": "chrome2d",
@@ -204,6 +203,15 @@
         "Automatic Inferencing"
       ],
       "why": "concentric and tangent need arcs to exist first and then need the solver to handle curved-to-curved conditions, which lib/sketch-solve.ts does not do. Automatic inferencing is a whole guessing engine on top of that. Reconsider once arcs land"
+    },
+    {
+      "group": "Constraints with nothing to attach to (3 tools)",
+      "tools": [
+        "Coincident",
+        "Midpoint",
+        "Symmetric"
+      ],
+      "why": "not a solver limitation -- a model-shape one. A sketch here is always ONE closed polygon, so there are no free points to make coincident, no second entity to be symmetric about, and every corner is already exactly the join of its two edges, which is the whole of what Coincident would assert. Midpoint needs a point that is not a corner, and this model has no such thing. All three were in the constraints item until the design pass found they had no referent; revisit if free points or a second sketch entity ever land"
     },
     {
       "group": "Free point",
