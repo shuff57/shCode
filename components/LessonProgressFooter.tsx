@@ -78,49 +78,61 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
       >
         Module {moduleId}
       </Link>
-      <span style={{ color: '#6272a4', minWidth: 96 }}>
+      {/* Dropped below 720px (see globals.css): at phone width this and the
+          segments were competing for the same ~70px, and the tally on the
+          right already says how many lessons the module has. */}
+      <span className="lesson-progress-count" style={{ color: '#6272a4', minWidth: 96 }}>
         {idx >= 0 ? `Lesson ${idx + 1} of ${lessons.length}` : `${lessons.length} lessons`}
       </span>
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          gap: 4,
-          alignItems: 'center',
-          overflowX: 'auto',
-        }}
-      >
+      {/* Segments, not dots. A dot is a fixed 14px, so 31 of them plus the
+          surrounding text stopped fitting somewhere around 700px wide and the
+          row silently became a scroller with no scrollbar — the lessons you
+          had already finished slid off the left edge. Segments divide whatever
+          width they are handed, so the rail cannot overflow at any viewport;
+          it only gets thinner. */}
+      <div className="lesson-progress-segs">
         {lessons.map((l, i) => {
           const isCurrent = l.id === currentLessonId;
           const state = snap.states[l.id];
           const isDone = state === 'completed';
           const isStarted = state === 'started';
           const isLocked = i > firstUnlocked && !isCurrent && !lockBypass;
-          // Dot colours are contrast-driven: on this #21222c footer, a dot
-          // border needs 3.0:1 (WCAG 2.1 non-text) to be visible. Every state
-          // clears it, including locked — a student reported the locked run as
-          // unreadable, and #44475a measured 1.72:1. Locked is now #6272a4 at
-          // 3.31:1 and available-not-started #7b88b8 at 4.54:1, so the two stay
-          // a full step apart in lightness. Do not dim either back down.
-          const borderColor = isDone
+          // Segment colours are contrast-driven: on this #21222c footer a
+          // segment needs 3.0:1 (WCAG 2.1 non-text) to be visible at all.
+          // Every state clears it, including locked — a student reported the
+          // locked run as unreadable and #44475a measured 1.72:1. Locked is
+          // #6272a4 at 3.36:1 and available-not-started #7b88b8 at 4.55:1, so
+          // the two stay a full step apart in lightness. Do not dim either
+          // back down. scripts/check-dot-contrast.mjs reads this chain.
+          const stateColor = isCurrent
+            ? '#ff79c6'
+            : isDone
             ? '#50fa7b'
             : isStarted
             ? '#f1fa8c'
             : isLocked
             ? '#6272a4'
             : '#7b88b8';
-          const background = isCurrent
-            ? '#ff79c6'
-            : isDone
-            ? '#50fa7b'
-            : 'transparent';
-          const dotStyle: React.CSSProperties = {
-            width: 14,
-            height: 14,
-            borderRadius: '50%',
-            background,
-            border: `2px solid ${borderColor}`,
-            flexShrink: 0,
+          // The current lesson is the only one that changes height. Colour
+          // alone would not survive a colour-blind reader scanning for "where
+          // am I", and height is the one channel nothing else here uses.
+          // Every segment is a 16px-tall target that only PAINTS its bottom
+          // 6px. `background-clip: content-box` confines the colour to the
+          // content box, so the padding above it is invisible but still
+          // clickable — at 380px a segment is only ~3.7px wide, and the
+          // vertical room costs nothing. Height still marks the current
+          // lesson, because that one paints its full 16px.
+          const segStyle: React.CSSProperties = {
+            flex: '1 1 0',
+            minWidth: 0,
+            height: 16,
+            paddingTop: isCurrent ? 0 : 10,
+            // backgroundColor, NOT the `background` shorthand: the shorthand
+            // resets background-clip to border-box, so the colour filled the
+            // padding too and every segment rendered as a 16px block.
+            backgroundClip: 'content-box',
+            borderRadius: 1,
+            backgroundColor: stateColor,
             cursor: isLocked ? 'not-allowed' : undefined,
           };
           const titleText = `${l.numberedId} ${l.displayTitle}${isDone ? ' (complete)' : isStarted ? ' (in progress)' : ''}${isCurrent ? ' (current)' : ''}${isLocked ? ' (locked — get a green to unlock)' : ''}`;
@@ -130,7 +142,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
               title={titleText}
               aria-label={`${l.numberedId} ${l.displayTitle} (locked)`}
               aria-disabled="true"
-              style={dotStyle}
+              style={segStyle}
             />
           ) : (
             <Link
@@ -138,7 +150,8 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
               href={lessonHref(l)}
               title={titleText}
               aria-label={`${l.numberedId} ${l.displayTitle}`}
-              style={dotStyle}
+              aria-current={isCurrent ? 'page' : undefined}
+              style={segStyle}
             />
           );
         })}

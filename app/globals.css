@@ -38,6 +38,42 @@ body:has(.lesson-progress-footer) {
   padding-bottom: 60px;
 }
 
+/* The progress rail's segments. Laid out here rather than inline because a
+   hover affordance and a width breakpoint are both things inline styles
+   cannot express, and a 6px-tall target needs to say it is clickable. */
+.lesson-progress-segs {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 16px;
+}
+
+.lesson-progress-segs > a:hover {
+  padding-top: 5px;
+}
+
+.lesson-progress-segs > a {
+  transition: padding-top 0.12s ease;
+}
+
+.lesson-progress-segs > a:focus-visible {
+  outline: 2px solid #8be9fd;
+  outline-offset: 2px;
+}
+
+/* Below this the module label, the lesson counter and 31 segments are all
+   fighting for one line. The counter goes: the tally on the right already
+   carries the same two numbers. */
+@media (max-width: 720px) {
+  .lesson-progress-count { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lesson-progress-segs > a { transition: none; }
+}
+
 /* The "Report an issue" pill is position:fixed, so the body padding above does
    nothing for it. At its default bottom:20px it overlapped the top ~16px of
    the footer bar and covered the right end of the lesson-dot rail. The footer
