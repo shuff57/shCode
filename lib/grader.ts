@@ -136,7 +136,12 @@ export function grade(
       id: req.id,
       title: req.title,
       status: passed ? ('passed' as const) : ('failed' as const),
-      messages: [],
+      // A failing requirement used to render a red bar, its title, and
+      // nothing else -- the student could see WHICH check failed but never
+      // why, so a correct-looking answer that missed by one token read as
+      // the grader being arbitrary (issue report #9). Both renderers
+      // already handled `messages`; nothing ever filled it.
+      messages: !passed && req.hint ? [req.hint] : [],
       pointsEarned: passed ? points : 0,
       pointsPossible: points,
     };

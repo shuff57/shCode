@@ -567,14 +567,43 @@ try {
     }
   }
 
+  // ------------------------------------------------- hints on failure
+  // Report #9: a student's object answer missed by one token, the check went
+  // red with no text next to it, and the grader read as arbitrary. Both
+  // renderers already displayed `messages`; grade() hardcoded it empty. This
+  // fails if that regresses, or if a 1.2.25 hint is dropped from the lesson.
+  let hintFailures = 0;
+  {
+    const id = '1-2-25-lab-typeof-round-up';
+    const reqs = lesson(id).requirements;
+    const report = grade(reqs, starterFiles(id), 0);
+    // The starter must lose everything, or the loop below checks nothing.
+    if (!report.results.some((r) => r.status === 'failed')) {
+      hintFailures++;
+      console.log('  FAIL  1-2-25  starter passed -- nothing exercised the hint path');
+    }
+    for (const r of report.results) {
+      const authored = reqs.find((q) => q.id === r.id).hint;
+      const shown = r.messages.join('');
+      if (r.status === 'failed' && shown !== authored) {
+        hintFailures++;
+        console.log(`  FAIL  1-2-25  ${r.id} failed showing ${JSON.stringify(shown)}, not its hint`);
+      }
+      if (r.status === 'passed' && shown !== '') {
+        hintFailures++;
+        console.log(`  FAIL  1-2-25  ${r.id} passed but still showed a hint`);
+      }
+    }
+  }
+
   const accepts = cases.filter((c) => c.expect === 'pass').length;
-  if (failures === 0) {
+  if (failures === 0 && hintFailures === 0) {
     console.log(
       `grader tolerance: ${cases.length} cases OK ` +
-      `(${accepts} accepted, ${cases.length - accepts} rejected)`,
+      `(${accepts} accepted, ${cases.length - accepts} rejected), hints OK`,
     );
   } else {
-    console.log(`grader tolerance: ${failures} of ${cases.length} cases wrong`);
+    console.log(`grader tolerance: ${failures} of ${cases.length} cases wrong, ${hintFailures} hint problems`);
     process.exit(1);
   }
 } finally {

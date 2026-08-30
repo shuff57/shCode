@@ -62,6 +62,12 @@ export interface Requirement {
   function?: string | string[];
   expected?: string;
   testFn?: string;
+  /** Shown to the student ONLY when this requirement fails — grade() copies
+   *  it into `messages`, which RequirementCard and GradeReport already
+   *  render. Say what to look at, not what to type: a hint that hands over
+   *  the answer turns the checklist into the assignment. Optional; a
+   *  requirement without one fails silently, the way all of them used to. */
+  hint?: string;
   points?: number;
   /** Set false to test the raw source instead of the comment-stripped
    *  version — needed for requirements that check for comments themselves
