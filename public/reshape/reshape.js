@@ -974,20 +974,38 @@
 	// `names` are the positional parameters of the call; a trailing options
 	// object contributes its keys as settable names too, so ball(5, {segments:8})
 	// gives both `.radius` and `.segments`.
-	function live(build, names, args) {
+	function live(build, names, optionKeys, args) {
 		var params = {};
 		var extras = null;
 		for (var i = 0; i < names.length; i++) params[names[i]] = args[i];
+
+		// EVERY argument a name accepts is a settable parameter from the start —
+		// the options included, whether or not the student supplied one. Seeding
+		// the unsupplied ones as undefined is the whole reason ball(10).segments = 8
+		// rebuilds instead of writing a dead property onto the geometry: the set
+		// trap below tests hasOwnProperty(params, key), and a key that was never
+		// passed used to fail that test and fall through to state.geom[key].
+		// rebuild() sends only the ones actually set, so unsupplied stays unsupplied
+		// and no library default is disturbed.
+		for (var o = 0; o < optionKeys.length; o++) {
+			if (!Object.prototype.hasOwnProperty.call(params, optionKeys[o])) params[optionKeys[o]] = undefined;
+		}
 
 		// Whatever follows the named parameters. extrude is variadic —
 		// extrude(4, rect(10, 10), disc(3)) pushes BOTH shapes — so the tail is
 		// carried through the rebuild rather than dropped. It is positional only;
 		// there is no name to assign it by, which is why it is not in `params`.
 		var tail = Array.prototype.slice.call(args, names.length);
+		var optNames = optionKeys.slice();
 		if (tail.length && isOptions(tail[tail.length - 1])) {
 			extras = tail.pop();
 			for (var k in extras) {
-				if (Object.prototype.hasOwnProperty.call(extras, k)) params[k] = extras[k];
+				if (!Object.prototype.hasOwnProperty.call(extras, k)) continue;
+				params[k] = extras[k];
+				// A key the name does NOT accept is carried anyway, so the rebuild
+				// still hands it to readOptions and the student still gets
+				// 'box has no option called "widht"' rather than silence.
+				if (optNames.indexOf(k) === -1) optNames.push(k);
 			}
 		}
 		var rest = tail;
@@ -1003,11 +1021,16 @@
 			// property later fills the hole and the argument comes back.
 			while (positional.length && positional[positional.length - 1] === undefined) positional.pop();
 			for (var j = 0; j < rest.length; j++) positional.push(current(rest[j]));
-			if (extras) {
-				var opts = {};
-				for (var k in extras) {
-					if (Object.prototype.hasOwnProperty.call(extras, k)) opts[k] = state.params[k];
-				}
+			var opts = null;
+			for (var o = 0; o < optNames.length; o++) {
+				var v = state.params[optNames[o]];
+				// Unset stays unsupplied — pushing an explicit undefined would
+				// override the library's own default for that key.
+				if (v === undefined) continue;
+				if (!opts) opts = {};
+				opts[optNames[o]] = current(v);
+			}
+			if (opts) {
 				positional.push(opts);
 			}
 			state.geom = build.apply(null, positional);
@@ -1066,10 +1089,22 @@
 		turn: ['degrees', 'shape'], sit: ['shape']
 	};
 
+	/**
+	 * The option keys each name accepts — the SAME arrays readOptions validates
+	 * against, so the two can never disagree about what is settable. A name
+	 * absent here takes no options at all (ring, poly, extrude, turn, sit), and
+	 * an object passed to one of those still reaches its own refusal message.
+	 */
+	var OPTIONS = {
+		box: BOX_KEYS, rect: RECT_KEYS, disc: DISC_KEYS, ball: BALL_KEYS,
+		tube: TUBE_KEYS, cone: CONE_KEYS, revolve: REVOLVE_KEYS
+	};
+
 	function liveify(name, fn) {
 		var names = PARAMS[name];
+		var opts = OPTIONS[name] || [];
 		return function () {
-			var out = live(fn, names, Array.prototype.slice.call(arguments));
+			var out = live(fn, names, opts, Array.prototype.slice.call(arguments));
 			// sit() and turn() hand back an ARRAY for an assembly. An array is not
 			// one shape and must not be wrapped as one, or the renderer is handed a
 			// single object where it expected a list.
