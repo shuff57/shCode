@@ -59,7 +59,7 @@
       "description": "A comment naming precedence, order of operations, or that multiplication happens first",
       "type": "regex",
       "file": "script.js",
-      "pattern": "//[^\\n]*(precedence|order of operations|multipl\\w*\\s+(happens|comes|goes|is done)|brackets? (first|change)|parenthes\\w* (first|change))",
+      "pattern": "//[^\\n]*(?:precedence|order of operations|pemdas|bodmas|bidmas|(?:multipl\\w*|times)[^\\n]*(?:first|before)|(?:brackets?|parenthes\\w*)[^\\n]*(?:first|change|before))",
       "flags": "i",
       "stripComments": false,
       "points": 0

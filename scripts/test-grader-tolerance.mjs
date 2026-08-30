@@ -79,6 +79,8 @@ const L = {
   rename: '1-3-11-lab-rename-the-mystery-variables',
   split: '1-3-16-lab-split-the-reused-variable',
   messy: '1-3-19-a1-3-1-document-a-messy-program',
+  roundup: '1-2-25-lab-typeof-round-up',
+  settle:  '1-5-37-lab-settle-it-in-the-console',
 };
 
 const cases = [];
@@ -171,6 +173,75 @@ for (const id of Object.values(L)) {
   reject(L.object, 'no string method used', 'r5',
     edit(S, `console.log(itemColor.toUpperCase());${nl}console.log(itemName.includes("water"));`,
       'console.log(itemColor);'));
+}
+
+// ---------------------------------------------------------------- 1.2.25
+// Report #9: a completely correct answer that omitted semicolons failed FIVE
+// of the six requirements. Every variable-route pattern demanded a trailing
+// `;` and refused `var`, but semicolons are optional in JavaScript and `var`
+// is still legal. The accept cases below are the reproduction; the reject
+// cases keep the real objective shut -- `typeof <theObjectVariable>`, and an
+// undefined check a student who never mentions undefined cannot satisfy.
+{
+  const lines = [
+    'let s = "hi"',
+    'console.log(typeof s)',
+    'let n = 5',
+    'console.log(typeof n)',
+    'let b = true',
+    'console.log(typeof b)',
+    'let u',
+    'console.log(typeof u)',
+    'let z = null',
+    'console.log(typeof z)',
+    'let o = { name: "Sarah" }',
+    'console.log(typeof o)',
+  ];
+  const base = { 'script.js': lines.join(nl) };
+  const dropLine = (gone) => lines.filter((l) => l !== gone);
+
+  accept(L.roundup, 'variable route with no semicolons', base);
+  accept(L.roundup, 'var throughout',
+    { 'script.js': lines.map((l) => l.replace(/\blet\b/g, 'var')).join(nl) });
+  accept(L.roundup, 'variable route with semicolons',
+    { 'script.js': lines.map((l) => (l.startsWith('let ') ? l + ';' : l)).join(nl) });
+  accept(L.roundup, 'multi-line object literal', { 'script.js': [
+    ...dropLine('let o = { name: "Sarah" }').slice(0, -1),
+    'let o = {',
+    '  tall: 6',
+    '}',
+    'console.log(typeof o)',
+  ].join(nl) });
+
+  reject(L.roundup, 'typeof of a property name, not the object', 'r6',
+    { 'script.js': base['script.js'].replace('console.log(typeof o)', 'console.log(typeof tall)') });
+  reject(L.roundup, 'undefined never checked', 'r4',
+    { 'script.js': dropLine('let u').filter((l) => l !== 'console.log(typeof u)').join(nl) });
+}
+
+// ---------------------------------------------------------------- 1.5.37
+// Report #12: the "state the rule" comment check only accepted a handful of
+// phrasings, so correct comments like "times comes before plus" failed. Each
+// rule below is a correct restatement and must pass r3. r4 also needs three
+// logs; the third expression of the student's own is a typeof here.
+{
+  const logs = [
+    'console.log(2 + 2 * 3)',
+    'console.log((2 + 2) * 3)',
+    'console.log(typeof "x")',
+  ].join(nl);
+  const rules = [
+    'you do multiplication before addition',
+    'the brackets make the addition happen first',
+    'times comes before plus',
+    'multiply first, then add',
+    'PEMDAS',
+  ];
+  for (const rule of rules) {
+    accept(L.settle, `rule phrased as: ${rule}`, { 'script.js': `// ${rule}${nl}${logs}` });
+  }
+  reject(L.settle, 'three logs but no rule stated', 'r3',
+    { 'script.js': `// here are my answers${nl}${logs}` });
 }
 
 // ---------------------------------------------------------------- 1.3.11
