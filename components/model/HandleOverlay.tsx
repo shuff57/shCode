@@ -12,6 +12,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { arcFromBulge, type Point } from '../../lib/sketch-arc';
+import { type Constraint, residualsOf } from '../../lib/sketch-solve';
 
 /**
  * One selected sketch's outline, in plane coordinates -- what the overlay
@@ -37,6 +38,9 @@ export interface SketchOutline {
   basis: number[];
   shape?: 'circle';
   bulges?: Record<number, number>;
+  /** The sketch's constraints, so the overlay can mark which edges carry one.
+   *  Plain data like everything else here -- the overlay never writes them. */
+  constraints?: Constraint[];
 }
 
 export interface AnchorPoint {
@@ -93,6 +97,72 @@ function projectFrom(basis: AnchorPoint, basisPlane: Point, q: Point): { x: numb
     x: basis.x + du * (basis.ux ?? 0) + dv * (basis.vx ?? 0),
     y: basis.y + du * (basis.uy ?? 0) + dv * (basis.vy ?? 0),
   };
+}
+
+/**
+ * Where a constraint glyph goes, as `{x, y}` screen pixels, or null: the
+ * anchor lookups and the perpendicular-offset arithmetic can both decline.
+ *
+ * Design edge `e` runs between design corners e and (e+1); each corner's
+ * projected anchor lives in `at` keyed by its param name. The glyph sits at
+ * the midpoint of those two anchors, pushed ~10px along the edge's screen
+ * normal so it does not sit on the line itself.
+ */
+function glyphAt(
+  at: Map<string, AnchorPoint>,
+  params: string[],
+  e: number,
+): { x: number; y: number } | null {
+  const a = at.get(params[e]);
+  const b = at.get(params[(e + 1) % params.length]);
+  if (!a || !b) return null;
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2;
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const len = Math.hypot(dx, dy);
+  if (len < 1e-6) return null;
+  return {
+    x: mx + (-dy / len) * 10,
+    y: my + (dx / len) * 10,
+  };
+}
+
+const GLYPH_TEXT: Record<Exclude<Constraint['kind'], 'lock'>, string> = {
+  horizontal: '—',
+  vertical: '|',
+  length: '↔',
+  equal: '=',
+  parallel: '∥',
+  perpendicular: '⊥',
+};
+
+/**
+ * One entry per (constraint × edge it names), in draw order. Locks are
+ * corners and carry no edge, so they are dropped here: the panel is where a
+ * pin reads, and a glyph floating at a corner would crowd the corner handle
+ * it sat under for no information the panel does not already give.
+ *
+ * `losing` is the constraint's own residual crossing tolerance -- the same
+ * test the Rules panel marks a control with, so the canvas and the panel
+ * cannot disagree about which rule is in trouble. Onshape reddens exactly the
+ * offending glyphs and leaves the innocent ones be; this is that.
+ */
+function edgeGlyphs(
+  design: Point[],
+  constraints: Constraint[],
+): { edge: number; text: string; losing: boolean }[] {
+  const residuals = residualsOf(design, constraints);
+  const out: { edge: number; text: string; losing: boolean }[] = [];
+  constraints.forEach((c, i) => {
+    if (c.kind === 'lock') return;
+    const losing = residuals[i] > 1e-3;
+    out.push({ edge: c.edge, text: GLYPH_TEXT[c.kind], losing });
+    if (c.kind === 'equal' || c.kind === 'parallel' || c.kind === 'perpendicular') {
+      out.push({ edge: c.other, text: GLYPH_TEXT[c.kind], losing });
+    }
+  });
+  return out;
 }
 
 /** The outline's screen points, or null when a corner anchor is not on
@@ -247,11 +317,69 @@ export default function HandleOverlay({
           {outlines.map((o, n) => {
             const pts = projectOutline(o, at);
             if (!pts || pts.length < 2) return null;
+            // A chip groups the glyphs on one edge and gives them a backdrop,
+            // so they stay readable sitting over the outline.
+            //
+            // Colour is PER GLYPH, not per chip. Reddening the whole chip is
+            // one line shorter and wrong: an edge can carry a satisfied length
+            // rule and a losing equal rule at once, and painting both red says
+            // the length is a culprit when it is not. Naming the guilty rule
+            // exactly is the entire point of this feature -- Onshape reddens
+            // the offending glyph and leaves the innocent one alone, and a
+            // first pass here got that backwards.
+            const chips = new Map<number, { text: string; losing: boolean }[]>();
+            for (const g of edgeGlyphs(o.design, o.constraints ?? [])) {
+              if (!glyphAt(at, o.corners, g.edge)) continue;
+              chips.set(g.edge, [...(chips.get(g.edge) ?? []), { text: g.text, losing: g.losing }]);
+            }
             return (
-              <polygon
-                key={n}
-                points={pts.map((p) => `${p.x},${p.y}`).join(' ')}
-              />
+              <g key={n}>
+                <polygon
+                  points={pts.map((p) => `${p.x},${p.y}`).join(' ')}
+                />
+                {[...chips].map(([edge, glyphs]) => {
+                  const spot = glyphAt(at, o.corners, edge)!;
+                  // #bd93f9 is the same purple the panel paints a set control
+                  // with, so "this rule is on" looks the same in both places.
+                  // The first pass used #6272a4 and measured unreadable at 4x
+                  // against the sketch outline -- a marker nobody notices is
+                  // the one failure this whole feature exists to avoid.
+                  const STEP = 13;
+                  const w = glyphs.length * STEP + 8;
+                  // The chip's own outline follows the worst rule on the edge:
+                  // it is the "look over here" cue, and it has to fire even
+                  // when only one of several glyphs inside it is red.
+                  const anyLosing = glyphs.some((g) => g.losing);
+                  return (
+                    <g key={edge} transform={`translate(${spot.x}, ${spot.y})`}>
+                      <rect
+                        x={-w / 2}
+                        y={-9}
+                        width={w}
+                        height={18}
+                        rx={3}
+                        fill="#282a36"
+                        stroke={anyLosing ? '#ff5555' : '#44475a'}
+                        strokeWidth={1}
+                        opacity={0.95}
+                      />
+                      {glyphs.map((g, gi) => (
+                        <text
+                          key={gi}
+                          x={-w / 2 + 4 + STEP * gi + STEP / 2}
+                          fill={g.losing ? '#ff5555' : '#bd93f9'}
+                          fontSize={12}
+                          fontWeight={600}
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                        >
+                          {g.text}
+                        </text>
+                      ))}
+                    </g>
+                  );
+                })}
+              </g>
             );
           })}
         </svg>

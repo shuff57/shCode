@@ -8,9 +8,11 @@
 import {
   type Constraint,
   type Point,
+  describe,
   edgeCorners,
   edgeLength,
   residualOf,
+  residualsOf,
 } from '../../lib/sketch-solve';
 import {
   maxChamferDistance,
@@ -96,6 +98,26 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
   const count = points.length;
   const residual = residualOf(points, constraints);
   const fighting = residual > 1e-3;
+  // One residual per constraint, same order, so a rule is in conflict when its
+  // OWN entry crosses the tolerance. This is what lets the panel point at the
+  // rules that disagree instead of printing a number and asking the student to
+  // guess which of six cells to undo. A lock always reports 0, which is why the
+  // pin buttons below are never marked.
+  const residuals = residualsOf(points, constraints);
+  const conflicted = (c: Constraint) => {
+    const i = constraints.indexOf(c);
+    return i >= 0 && residuals[i] > 1e-3;
+  };
+  /** Is there a conflicting constraint of this kind on this edge? */
+  const edgeConflict = (kind: Constraint['kind'], edge: number) =>
+    constraints.some(
+      (c) => c.kind === kind && 'edge' in c && c.edge === edge && conflicted(c)
+    );
+  const pairConflict = (lo: number, hi: number) =>
+    constraints.some(
+      (c) => 'other' in c && c.edge === lo && c.other === hi && conflicted(c)
+    );
+  const namedConflict = constraints.filter(conflicted).map(describe);
 
   function toggle(kind: 'horizontal' | 'vertical', edge: number) {
     if (has(constraints, kind, edge)) {
@@ -135,16 +157,35 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
       <div className="sk-rules-head">
         <span>Rules</span>
         {fighting && (
-          <span className="sk-rules-warn" title="These rules cannot all be true at once">
-            off by {residual.toFixed(1)}
+          // The residual moves to a tooltip. It is a distance in sketch units,
+          // which tells a teacher how badly the rules miss and tells a student
+          // nothing -- "off by 3.2" was the whole message and named no culprit.
+          <span
+            className="sk-rules-warn"
+            title={`These rules cannot all be true at once. Largest miss: ${residual.toFixed(2)}`}
+          >
+            these rules disagree
           </span>
         )}
       </div>
 
       {fighting && (
         <p className="sk-rules-note">
-          These rules disagree — the shape is as close as it can get to all of them.
-          Remove one to settle it.
+          {namedConflict.length > 0 ? (
+            <>
+              These rules cannot all be true: <strong>{namedConflict.join('; ')}</strong>.
+              The shape is as close as it can get to all of them — remove one to settle it.
+            </>
+          ) : (
+            // Over tolerance with nothing named: possible in principle, since
+            // the header's threshold and the per-rule one are the same number
+            // and floating point does not promise the max lands on any single
+            // entry. Say the honest general thing rather than an empty list.
+            <>
+              These rules disagree — the shape is as close as it can get to all of them.
+              Remove one to settle it.
+            </>
+          )}
         </p>
       )}
 
@@ -177,7 +218,8 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
                   <button
                     aria-label={`Edge ${e + 1} across`}
                     aria-pressed={has(constraints, 'horizontal', e)}
-                    className={has(constraints, 'horizontal', e) ? 'on' : undefined}
+                    className={[has(constraints, 'horizontal', e) ? 'on' : '', edgeConflict('horizontal', e) ? 'fighting' : '']
+                      .filter(Boolean).join(' ') || undefined}
                     onClick={() => toggle('horizontal', e)}
                     disabled={curved}
                     title={curvedTitle}
@@ -189,7 +231,8 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
                   <button
                     aria-label={`Edge ${e + 1} up`}
                     aria-pressed={has(constraints, 'vertical', e)}
-                    className={has(constraints, 'vertical', e) ? 'on' : undefined}
+                    className={[has(constraints, 'vertical', e) ? 'on' : '', edgeConflict('vertical', e) ? 'fighting' : '']
+                      .filter(Boolean).join(' ') || undefined}
                     onClick={() => toggle('vertical', e)}
                     disabled={curved}
                     title={curvedTitle}
@@ -202,6 +245,7 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
                     type="text"
                     inputMode="decimal"
                     aria-label={`Edge ${e + 1} length`}
+                    className={edgeConflict('length', e) ? 'fighting' : undefined}
                     placeholder={edgeLength(points, e).toFixed(1)}
                     defaultValue={fixed && fixed.kind === 'length' ? String(fixed.value) : ''}
                     onBlur={(ev) => setLength(e, ev.target.value)}
@@ -261,7 +305,8 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
                       <td key={j}>
                         <button
                           aria-label={`Edges ${lo + 1} and ${hi + 1}: ${cur === null ? 'no rule' : cur}`}
-                          className={cur === null ? undefined : 'on'}
+                          className={[cur === null ? '' : 'on', pairConflict(lo, hi) ? 'fighting' : '']
+                            .filter(Boolean).join(' ') || undefined}
                           onClick={() => onChange(cyclePair(constraints, lo, hi))}
                           disabled={disabled}
                           title={cur === null ? (curvedTitle ?? `Edges ${lo + 1} and ${hi + 1}: click to cycle equal, parallel, perpendicular`) : `Edges ${lo + 1} and ${hi + 1}: ${cur}`}
@@ -417,6 +462,27 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
           border: 1px solid var(--border); border-radius: 3px;
           padding: 2px 5px; font-size: 12px; font-variant-numeric: tabular-nums;
         }
+        /* A rule that is losing the argument. Onshape red-boxes exactly the
+           conflicting constraint glyphs and leaves the innocent ones alone,
+           which is what makes "remove one" actionable; this is that, in the
+           panel. Deliberately a BORDER and not a fill: .on already owns the
+           fill, so "this rule is set" and "this rule is losing" stay two
+           separate readings of the same control rather than one overwriting
+           the other.
+           NB: no backticks in here -- this block is a template literal, and a
+           backtick in a CSS comment closes it. That is a syntax error 40 lines
+           later with a message about a property that does not exist. */
+        .sk-table button.fighting,
+        .sk-table input.fighting,
+        .sk-pairs-grid td button.fighting {
+          border-color: #ff5555;
+          box-shadow: 0 0 0 1px #ff5555;
+        }
+        /* Unset controls also take the red text; a set one keeps the dark text
+           its purple fill needs for contrast. */
+        .sk-table button.fighting:not(.on),
+        .sk-table input.fighting,
+        .sk-pairs-grid td button.fighting:not(.on) { color: #ff5555; }
         .sk-table button:disabled { opacity: 0.35; cursor: not-allowed; }
         .sk-table input:disabled { opacity: 0.35; cursor: not-allowed; }
         .sk-pins, .sk-rounds, .sk-chamfers { display: flex; align-items: center; gap: 4px; margin-top: 8px; color: #6272a4; }

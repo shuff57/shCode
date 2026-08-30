@@ -388,6 +388,7 @@ export default function SandboxWorkspace() {
             basis: o.basis,
             shape: f.shape,
             bulges: o.bulges,
+            constraints: f.constraints ?? [],
           };
         }),
     [doc, selected]
