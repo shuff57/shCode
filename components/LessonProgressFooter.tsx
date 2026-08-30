@@ -96,13 +96,17 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
           const isDone = state === 'completed';
           const isStarted = state === 'started';
           const isLocked = i > firstUnlocked && !isCurrent && !lockBypass;
+          // Dot colours are contrast-driven: on this #21222c footer, a dot
+          // border needs 3.0:1 (WCAG 2.1 non-text) to be visible.
+          // #6272a4 measures 3.35:1 (available, not started) and #44475a
+          // measures 1.72:1 (locked) — do not dim them back down.
           const borderColor = isDone
             ? '#50fa7b'
             : isStarted
             ? '#f1fa8c'
             : isLocked
-            ? '#2a2d3a'
-            : '#44475a';
+            ? '#44475a'
+            : '#6272a4';
           const background = isCurrent
             ? '#ff79c6'
             : isDone
@@ -115,7 +119,6 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
             background,
             border: `2px solid ${borderColor}`,
             flexShrink: 0,
-            opacity: isLocked ? 0.4 : 1,
             cursor: isLocked ? 'not-allowed' : undefined,
           };
           const titleText = `${l.numberedId} ${l.displayTitle}${isDone ? ' (complete)' : isStarted ? ' (in progress)' : ''}${isCurrent ? ' (current)' : ''}${isLocked ? ' (locked — get a green to unlock)' : ''}`;

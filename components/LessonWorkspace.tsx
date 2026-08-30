@@ -492,8 +492,17 @@ export default function LessonWorkspace({
         runTests();
       }
       if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
-        const tag = (e.target as HTMLElement)?.tagName;
-        if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+        // CodeMirror is a contenteditable <div>, not a <textarea>: without these
+        // two extra tests the guard passes and preventDefault() eats a question
+        // mark the student was trying to type into their own code.
+        const el = e.target as HTMLElement | null;
+        const typing =
+          !!el &&
+          (el.tagName === 'INPUT' ||
+            el.tagName === 'TEXTAREA' ||
+            el.isContentEditable ||
+            !!el.closest?.('.cm-editor'));
+        if (!typing) {
           e.preventDefault();
           setShortcutModalOpen(true);
         }
