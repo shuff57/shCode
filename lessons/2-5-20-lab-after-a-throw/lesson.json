@@ -2,7 +2,7 @@
   "id": "2-5-20-lab-after-a-throw",
   "title": "2.5.20 What Happens After a throw?",
   "description": "Build a try block where a throw sits between two other lines, and confirm exactly which lines run. Auto-graded.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

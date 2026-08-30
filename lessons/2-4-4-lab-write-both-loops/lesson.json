@@ -2,7 +2,7 @@
   "id": "2-4-4-lab-write-both-loops",
   "title": "2.4.4 Write Both: Known Count, Unknown Count",
   "description": "Write a for loop for a known-count task and a while loop for an unknown-count task. Auto-graded.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

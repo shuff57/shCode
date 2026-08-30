@@ -17,6 +17,9 @@ export interface HrefableLesson {
 }
 
 export function lessonHref(lesson: HrefableLesson): string {
-  const isAssignment = lesson.type === 'assignment' || lesson.type === 'project';
+  // `challenge` rides the assignment side too: it is a terminal, scored stop
+  // at the end of a unit, so it wants the score header, not the lesson chrome.
+  const isAssignment =
+    lesson.type === 'assignment' || lesson.type === 'project' || lesson.type === 'challenge';
   return `${isAssignment ? '/assignment' : '/lesson'}/${lesson.id}`;
 }

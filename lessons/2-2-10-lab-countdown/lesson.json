@@ -2,7 +2,7 @@
   "id": "2-2-10-lab-countdown",
   "title": "2.2.16 Countdown with while",
   "description": "Write a while loop that counts down from 10 to 1, logging each value. Auto-graded.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

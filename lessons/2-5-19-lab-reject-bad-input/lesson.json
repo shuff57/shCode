@@ -2,7 +2,7 @@
   "id": "2-5-19-lab-reject-bad-input",
   "title": "2.5.19 Reject the Bad Input",
   "description": "Throw an error when a password is too short, and catch it with a clear message. Auto-graded.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

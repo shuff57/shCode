@@ -2,7 +2,7 @@
   "id": "2-5-9-lab-what-runs",
   "title": "2.5.9 What Runs, What Doesn't",
   "description": "Build a try...catch and predict exactly which of four lines print. Auto-graded.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

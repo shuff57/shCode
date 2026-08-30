@@ -2,7 +2,7 @@
   "id": "6-7-10a-fix-the-drag-chart",
   "title": "6.7.11 Fix the Broken Chart: Dragging a Sprite",
   "description": "Someone charted the grab half of drag-and-drop and never charted the letting go. Find what the red checks are pointing at.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 2: moSHion Game Development",
   "unit": "6.7 Advanced Input and Joints",

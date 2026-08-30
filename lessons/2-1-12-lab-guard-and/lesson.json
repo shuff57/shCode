@@ -2,7 +2,7 @@
   "id": "2-1-12-lab-guard-and",
   "title": "2.1.30 Guard with &&",
   "description": "Write an if statement whose condition combines two checks with &&. Auto-graded.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

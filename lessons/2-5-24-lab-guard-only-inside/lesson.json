@@ -2,7 +2,7 @@
   "id": "2-5-24-lab-guard-only-inside",
   "title": "2.5.24 Guard Only What's Inside",
   "description": "Write two risky lines: one guarded by try...catch, one left outside it, and see which one crashes. Auto-graded.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

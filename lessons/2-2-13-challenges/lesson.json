@@ -2,7 +2,7 @@
   "id": "2-2-13-challenges",
   "title": "2.2.20 Challenges: Optional Stretch",
   "description": "Optional stretch problems. Auto-graded.",
-  "type": "assignment",
+  "type": "challenge",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

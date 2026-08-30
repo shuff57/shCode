@@ -2,7 +2,7 @@
   "id": "2-5-14-lab-report-the-error",
   "title": "2.5.14 Report the Error",
   "description": "Cause a TypeError on purpose and print both err.name and err.message. Auto-graded.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

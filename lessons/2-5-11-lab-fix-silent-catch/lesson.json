@@ -2,7 +2,7 @@
   "id": "2-5-11-lab-fix-silent-catch",
   "title": "2.5.11 Fix the Silent Catch",
   "description": "An empty catch block is hiding a failure. Add a report so the next person can see it. Auto-graded.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

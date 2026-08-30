@@ -2,7 +2,7 @@
   "id": "2-5-8-lab-catch-first-error",
   "title": "2.5.8 Catch Your First Error",
   "description": "Write a try...catch that falls back gracefully when a variable doesn't exist, and confirm the program still finishes. Auto-graded.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

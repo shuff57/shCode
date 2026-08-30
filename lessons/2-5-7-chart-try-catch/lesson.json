@@ -2,7 +2,7 @@
   "id": "2-5-7-chart-try-catch",
   "title": "2.5.7 Chart the Code: try/catch as a Flowchart",
   "description": "Draw try/catch as a flowchart: attempt a step, then branch on whether it failed.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

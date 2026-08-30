@@ -2,7 +2,7 @@
   "id": "2-4-19-lab-multiples-of-three",
   "title": "2.4.19 Multiples of 3 with continue",
   "description": "Loop over 1 to 20 and print only the multiples of 3, using continue to skip the rest. Auto-graded.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

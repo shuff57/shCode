@@ -2,7 +2,7 @@
   "id": "2-5-27-challenges",
   "title": "2.5.27 Challenges: Optional Stretch",
   "description": "Optional stretch problems. Auto-graded.",
-  "type": "assignment",
+  "type": "challenge",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

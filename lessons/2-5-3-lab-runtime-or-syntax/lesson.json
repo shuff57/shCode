@@ -2,7 +2,7 @@
   "id": "2-5-3-lab-runtime-or-syntax",
   "title": "2.5.3 Runtime or Syntax?",
   "description": "Write code that fails at runtime, not at parse time, and confirm which lines still run. Auto-graded.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

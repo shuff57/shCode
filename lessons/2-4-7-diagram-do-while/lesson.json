@@ -2,7 +2,7 @@
   "id": "2-4-7-diagram-do-while",
   "title": "2.4.7 Chart the Code: do...while",
   "description": "Draw a do...while loop as a flowchart and see why the diamond sits at the bottom instead of the top.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

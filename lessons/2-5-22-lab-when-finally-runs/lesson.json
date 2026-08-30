@@ -2,7 +2,7 @@
   "id": "2-5-22-lab-when-finally-runs",
   "title": "2.5.22 When Does finally Run?",
   "description": "Build a try/catch/finally and confirm finally runs in both the success and the failure case. Auto-graded.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

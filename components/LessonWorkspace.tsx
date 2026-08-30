@@ -610,7 +610,9 @@ export default function LessonWorkspace({
     (isMoshionMode || isNoPoints
       ? allRequirementsPassed
       : totalScore >= (lesson.grading?.passingScore ?? 0));
-  const showAssignmentHeader = isAssignment || isMoshionMode;
+  // Any lesson with graded criteria keeps the score header, not just the
+  // assignment routes — ch2's labs are `type: "lesson"` but still scored.
+  const showAssignmentHeader = isAssignment || isMoshionMode || totalCriteria > 0;
   // q5 grading is binary/completion-based — show criteria counts, not points.
   const headerScore = isMoshionMode ? passedCriteria : totalScore;
   const headerTotal = isMoshionMode ? totalCriteria : totalPossible;

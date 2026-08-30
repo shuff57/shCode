@@ -2,7 +2,7 @@
   "id": "2-1-37-challenges",
   "title": "2.1.38 Challenges: Optional Stretch",
   "description": "Optional stretch problems. Auto-graded.",
-  "type": "assignment",
+  "type": "challenge",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

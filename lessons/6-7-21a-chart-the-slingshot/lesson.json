@@ -2,7 +2,7 @@
   "id": "6-7-21a-chart-the-slingshot",
   "title": "6.7.17 Chart the Code: The Slingshot",
   "description": "Chart the three-stage slingshot: aim, stretch, release. The stage nobody draws is the one where nothing is happening yet.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 25,
   "category": "Unit 2: moSHion Game Development",
   "unit": "6.7 Advanced Input",

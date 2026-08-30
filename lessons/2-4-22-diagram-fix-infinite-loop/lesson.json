@@ -2,7 +2,7 @@
   "id": "2-4-22-diagram-fix-infinite-loop",
   "title": "2.4.22 Fix the Infinite Loop",
   "description": "A chart arrives whose diamond only has one exit: the loop can never leave. Add the missing branch so a reader can see where it stops.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

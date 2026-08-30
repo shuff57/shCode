@@ -2,7 +2,7 @@
   "id": "2-4-11-diagram-search-until-found",
   "title": "2.4.11 Chart the Code: Search Until Found",
   "description": "Draw a while (true) + break search as a flowchart. The loop has no condition of its own: the diamond inside the body is the only way out.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

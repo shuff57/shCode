@@ -2,7 +2,7 @@
   "id": "2-3-12-lab-predict-fall-through",
   "title": "2.3.12 Predict the Fall-Through",
   "description": "Write a three-case switch where the first case deliberately has no break, predict the output, then run it and check. Auto-graded.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The switch Statement",

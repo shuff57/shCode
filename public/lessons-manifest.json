@@ -1058,7 +1058,7 @@
       "title": "1.5.28 Chart the Even-or-Odd Test",
       "unit": "1.5 Program Design Tools and Environments",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -1310,7 +1310,7 @@
       "title": "2.1.30 Guard with &&",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1319,7 +1319,7 @@
       "title": "2.1.31 Branch with ||",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1328,7 +1328,7 @@
       "title": "2.1.8 Chain Three Branches",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1355,7 +1355,7 @@
       "title": "2.1.11 Nest a Check",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1391,7 +1391,7 @@
       "title": "2.1.14 Guard with a Truthy Check",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1427,7 +1427,7 @@
       "title": "2.1.21 Write Your First Ternary",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1454,7 +1454,7 @@
       "title": "2.1.24 Chain Your Ternaries",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1490,7 +1490,7 @@
       "title": "2.1.27 Rewrite It as if/else",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1499,7 +1499,7 @@
       "title": "2.1.32 Flip It with !",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1517,7 +1517,7 @@
       "title": "2.1.34 Debug the Door",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1526,7 +1526,7 @@
       "title": "2.1.35 Combine &&, ||, and !",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1535,7 +1535,7 @@
       "title": "2.1.36 Predict the Chain",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1544,7 +1544,7 @@
       "title": "2.1.37 Print Settings Advisor",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1553,7 +1553,7 @@
       "title": "2.1.38 Challenges: Optional Stretch",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "challenge",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1589,7 +1589,7 @@
       "title": "2.1.5 Chart the Code, if / else",
       "unit": "2.1 Conditionals",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1598,7 +1598,7 @@
       "title": "2.1.6 Write Your First if",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1607,7 +1607,7 @@
       "title": "2.1.7 Add an else",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1634,7 +1634,7 @@
       "title": "2.1.17 Predict, Then Run",
       "unit": "2.1 Conditionals",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 5
     },
@@ -1652,7 +1652,7 @@
       "title": "2.2.16 Countdown with while",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1661,7 +1661,7 @@
       "title": "2.2.18 Fix the Broken Chart",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1679,7 +1679,7 @@
       "title": "2.2.20 Challenges: Optional Stretch",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
-      "type": "assignment",
+      "type": "challenge",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1751,7 +1751,7 @@
       "title": "2.2.6 Chart the Code: Largest of Three",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1787,7 +1787,7 @@
       "title": "2.2.11 Chart the Code: A for-loop That Accumulates",
       "unit": "2.2 Algorithms and Loops",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1796,7 +1796,7 @@
       "title": "2.2.12 Count 1 to 10",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1850,7 +1850,7 @@
       "title": "2.3.12 Predict the Fall-Through",
       "unit": "2.3 The switch Statement",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1859,7 +1859,7 @@
       "title": "2.3.13 Fix the Fall-Through Bug",
       "unit": "2.3 The switch Statement",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1895,7 +1895,7 @@
       "title": "2.3.17 Group Cases: Vowel or Consonant",
       "unit": "2.3 The switch Statement",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1913,7 +1913,7 @@
       "title": "2.3.19 case false vs case 0: Predict, Then Run",
       "unit": "2.3 The switch Statement",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1949,7 +1949,7 @@
       "title": "2.3.22 Fix the Type Mismatch",
       "unit": "2.3 The switch Statement",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -1985,7 +1985,7 @@
       "title": "2.3.26 Rewrite the Traffic Light as a Switch",
       "unit": "2.3 The switch Statement",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2003,7 +2003,7 @@
       "title": "2.3.28 Build a Four-Case Switch: Drink Sizes",
       "unit": "2.3 The switch Statement",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2030,7 +2030,7 @@
       "title": "2.3.31 Challenges: Optional Stretch",
       "unit": "2.3 The switch Statement",
       "preview": "console",
-      "type": "assignment",
+      "type": "challenge",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2039,7 +2039,7 @@
       "title": "2.3.6 Chart the Code: a switch is a chain of diamonds",
       "unit": "2.3 The switch Statement",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2048,7 +2048,7 @@
       "title": "2.3.29 Convert an if-chain to switch",
       "unit": "2.3 The switch Statement",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2084,7 +2084,7 @@
       "title": "2.3.7 Build a Switch: Animal Sounds",
       "unit": "2.3 The switch Statement",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2093,7 +2093,7 @@
       "title": "2.3.8 Predict Where default Runs",
       "unit": "2.3 The switch Statement",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2120,7 +2120,7 @@
       "title": "2.4.11 Chart the Code: Search Until Found",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2129,7 +2129,7 @@
       "title": "2.4.12 Break When the Square Passes 50",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2156,7 +2156,7 @@
       "title": "2.4.15 Chart the Code: continue Skips, Doesn't Leave",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2192,7 +2192,7 @@
       "title": "2.4.19 Multiples of 3 with continue",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2228,7 +2228,7 @@
       "title": "2.4.22 Fix the Infinite Loop",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2264,7 +2264,7 @@
       "title": "2.4.26 Chart the Code: Nested Loops",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2309,7 +2309,7 @@
       "title": "2.4.30 Triangle of Stars",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2318,7 +2318,7 @@
       "title": "2.4.31 Fix the Duplicate Pairs",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2336,7 +2336,7 @@
       "title": "2.4.33 Challenges: Optional Stretch",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
-      "type": "assignment",
+      "type": "challenge",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2345,7 +2345,7 @@
       "title": "2.4.4 Write Both: Known Count, Unknown Count",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2372,7 +2372,7 @@
       "title": "2.4.7 Chart the Code: do...while",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2381,7 +2381,7 @@
       "title": "2.4.8 do...while: Count 1 to 5",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6
     },
@@ -2417,7 +2417,7 @@
       "title": "2.5.11 Fix the Silent Catch",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2444,7 +2444,7 @@
       "title": "2.5.14 Report the Error",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2471,7 +2471,7 @@
       "title": "2.5.17 Chart the Code: Validate Before You Trust",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2489,7 +2489,7 @@
       "title": "2.5.19 Reject the Bad Input",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2507,7 +2507,7 @@
       "title": "2.5.20 What Happens After a throw?",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2525,7 +2525,7 @@
       "title": "2.5.22 When Does finally Run?",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2543,7 +2543,7 @@
       "title": "2.5.24 Guard Only What's Inside",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2552,7 +2552,7 @@
       "title": "2.5.25 Predict, Then Run: try/catch/finally Together",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2570,7 +2570,7 @@
       "title": "2.5.27 Challenges: Optional Stretch",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
-      "type": "assignment",
+      "type": "challenge",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2579,7 +2579,7 @@
       "title": "2.5.3 Runtime or Syntax?",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2606,7 +2606,7 @@
       "title": "2.5.6 Wrap Only What Can Fail",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2615,7 +2615,7 @@
       "title": "2.5.7 Chart the Code: try/catch as a Flowchart",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2624,7 +2624,7 @@
       "title": "2.5.8 Catch Your First Error",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2633,7 +2633,7 @@
       "title": "2.5.9 What Runs, What Doesn't",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 7
     },
@@ -2804,7 +2804,7 @@
       "title": "3.3.7 Chart the Code: Looping Over an Array",
       "unit": "3.3 Arrays",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": null
     },
@@ -3209,7 +3209,7 @@
       "title": "5.4.6 Chart the Code: A Method That Calls a Method",
       "unit": "5.4 Writing Your Own Classes",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 2: moSHion Game Development",
       "week": null
     },
@@ -4073,7 +4073,7 @@
       "title": "6.6.14 Chart the Code: The Three-State Machine",
       "unit": "6.6 Game State Machines",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 2: moSHion Game Development",
       "week": null
     },
@@ -4136,7 +4136,7 @@
       "title": "6.6.21 Fix the Broken Chart: the Pause State",
       "unit": "6.6 Game State Machines",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 2: moSHion Game Development",
       "week": null
     },
@@ -4298,7 +4298,7 @@
       "title": "6.7.11 Fix the Broken Chart: Dragging a Sprite",
       "unit": "6.7 Advanced Input and Joints",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 2: moSHion Game Development",
       "week": null
     },
@@ -4415,7 +4415,7 @@
       "title": "6.7.17 Chart the Code: The Slingshot",
       "unit": "6.7 Advanced Input",
       "preview": "diagram",
-      "type": "assignment",
+      "type": "lesson",
       "category": "Unit 2: moSHion Game Development",
       "week": null
     },

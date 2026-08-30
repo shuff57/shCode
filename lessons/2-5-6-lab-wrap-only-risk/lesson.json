@@ -2,7 +2,7 @@
   "id": "2-5-6-lab-wrap-only-risk",
   "title": "2.5.6 Wrap Only What Can Fail",
   "description": "Rewrite a try that wraps too much so the total still prints even when the risky line fails. Auto-graded.",
-  "type": "assignment",
+  "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",
