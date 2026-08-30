@@ -51,6 +51,38 @@ function has(cs: Constraint[], kind: Constraint['kind'], edge: number) {
   return cs.some((c) => 'edge' in c && c.edge === edge && c.kind === kind);
 }
 
+// A pair constraint names TWO edges but the array order is arbitrary, so the
+// kind only matches if the pair is stored the same way every lookup normalises
+// to: lower design index in `edge`, higher in `other`. has() above only
+// inspects c.edge, so it cannot ask about pair kinds -- pairKind() is the
+// pairedges-specific lookup, and cyclePair() below is the only producer of
+// pair kinds in the panel (nothing else in the app writes one, so the
+// canonical order holds everywhere a constraint can be born).
+type PairKind = 'equal' | 'parallel' | 'perpendicular';
+
+const PAIR_CYCLES: PairKind[] = ['equal', 'parallel', 'perpendicular'];
+
+function pairKind(cs: Constraint[], lo: number, hi: number): PairKind | null {
+  return (
+    PAIR_CYCLES.find(
+      (k) => cs.some((c) => c.kind === k && c.edge === lo && 'other' in c && c.other === hi)
+    ) ?? null
+  );
+}
+
+// The three pair rules are alternatives on one pair, not a stack -- same
+// contradiction rule as horizontal/vertical one edge up in toggle(). Every
+// write normalises lo/hi so a pair stored as {edge:3, other:1} can never be
+// read as a different pair by pairKind().
+function cyclePair(cs: Constraint[], a: number, b: number): Constraint[] {
+  const lo = Math.min(a, b);
+  const hi = Math.max(a, b);
+  const current = pairKind(cs, lo, hi);
+  const next = current === null ? 'equal' : PAIR_CYCLES[PAIR_CYCLES.indexOf(current) + 1];
+  const rest = cs.filter((c) => !(current !== null && c.kind === current && c.edge === lo && 'other' in c && c.other === hi));
+  return next === undefined ? rest : [...rest, { kind: next, edge: lo, other: hi }];
+}
+
 export default function SketchConstraints({ points, bulges, rounds, chamfers, constraints, onChange, onRound, onChamfer }: Props) {
   const count = points.length;
   const residual = residualOf(points, constraints);
@@ -181,6 +213,61 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
           })}
         </tbody>
       </table>
+
+      <div className="sk-pairs">
+        <div className="sk-pairs-head">Rules between two edges:</div>
+        <table className="sk-pairs-grid">
+          <thead>
+            <tr>
+              <th aria-hidden="true" />
+              {/* One column short of the edge count on purpose. The body is a
+                  LOWER triangle -- the highest column any row fills is i-1, so
+                  a header for the last edge would sit over an empty column. */}
+              {points.slice(0, -1).map((_, j) => (
+                <th key={j}>{j + 1}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {points.map((_, i) =>
+              i === 0 ? null : (
+                <tr key={i}>
+                  <th scope="row">{i + 1}</th>
+                  {Array.from({ length: i }, (_, j) => {
+                    const lo = j;
+                    const hi = i;
+                    const cur = pairKind(constraints, lo, hi);
+                    // An arc has no direction (parallel/perpendicular are
+                    // meaningless) and equal would scale a rounded corner's
+                    // radius. A rule already ON the pair must stay clickable
+                    // so it can be cycled off -- same reasoning as the Length
+                    // box above, which notes "remove one to settle it" has to
+                    // name a control the student can still use.
+                    const curved = Boolean(bulges?.[lo]) || Boolean(bulges?.[hi]);
+                    const disabled = curved && cur === null;
+                    const curvedTitle = curved
+                      ? "This pair includes a rounded corner's arc. Equal, parallel and perpendicular only make sense between two straight edges."
+                      : undefined;
+                    return (
+                      <td key={j}>
+                        <button
+                          aria-label={`Edges ${lo + 1} and ${hi + 1}: ${cur === null ? 'no rule' : cur}`}
+                          className={cur === null ? undefined : 'on'}
+                          onClick={() => onChange(cyclePair(constraints, lo, hi))}
+                          disabled={disabled}
+                          title={cur === null ? (curvedTitle ?? `Edges ${lo + 1} and ${hi + 1}: click to cycle equal, parallel, perpendicular`) : `Edges ${lo + 1} and ${hi + 1}: ${cur}`}
+                        >
+                          {cur === null ? '' : cur === 'equal' ? '=' : cur === 'parallel' ? '∥' : '⊥'}
+                        </button>
+                      </td>
+                    );
+                  })}
+                </tr>
+              )
+            )}
+          </tbody>
+        </table>
+      </div>
 
       <div className="sk-pins">
         <span>Pin a corner:</span>
@@ -329,6 +416,23 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
           border: 1px solid #44475a; border-radius: 3px;
           padding: 2px 5px; font-size: 12px; font-variant-numeric: tabular-nums;
         }
+        .sk-pairs { margin-top: 8px; }
+        .sk-pairs-head { font-size: 11px; color: #6272a4; margin-bottom: 3px; }
+        .sk-pairs-grid { border-collapse: collapse; }
+        .sk-pairs-grid th {
+          font-weight: normal; color: #6272a4; font-size: 11px;
+          min-width: 24px; padding: 1px 3px; text-align: center;
+        }
+        .sk-pairs-grid td button {
+          width: 24px; height: 20px; min-width: 24px; padding: 0;
+          font-size: 12px; line-height: 1;
+          background: transparent; color: #6272a4;
+          border: 1px solid #44475a; border-radius: 3px; cursor: pointer;
+        }
+        .sk-pairs-grid td button.on {
+          background: #bd93f9; color: #282a36; border-color: #bd93f9;
+        }
+        .sk-pairs-grid td button:disabled { opacity: 0.35; cursor: not-allowed; }
       `}</style>
     </div>
   );
