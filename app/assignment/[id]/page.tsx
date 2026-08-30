@@ -1,5 +1,6 @@
 import LessonWorkspace from '../../../components/LessonWorkspace';
 import ContentLessonView from '../../../components/ContentLessonView';
+import LessonProgressFooter from '../../../components/LessonProgressFooter';
 import LessonAccessGate from '../../../components/LessonAccessGate';
 import { getLesson, loadLessons } from '../../../lib/lessons';
 import { getModule } from '../../../lib/curriculum';
@@ -29,13 +30,36 @@ export default async function AssignmentPage({
     ? <ContentLessonView lesson={lesson} />
     : <LessonWorkspace lesson={lesson} mode="assignment" />;
 
-  return (
-    <LessonAccessGate
+  // Same progress strip as /lesson/. It used to be lesson-only, and
+  // lib/lesson-href.ts still warns that the footer "lands on top of the
+  // console workspace's run/output row" -- that was true when the note was
+  // written, and `body:has(.lesson-progress-footer) { padding-bottom: 60px }`
+  // in globals.css is what fixed it. Without the strip here a student lost
+  // every way of moving through the module the moment they opened an
+  // assignment, which is most of the unit.
+  const footer = mod ? (
+    <LessonProgressFooter
+      moduleId={mod.summary.id}
       currentLessonId={lesson.id}
-      siblings={siblingIds}
-      moduleId={moduleId}
-    >
-      {body}
-    </LessonAccessGate>
+      lessons={mod.lessons.map((l) => ({
+        id: l.id,
+        numberedId: l.numberedId,
+        displayTitle: l.displayTitle,
+        type: l.type,
+      }))}
+    />
+  ) : null;
+
+  return (
+    <>
+      <LessonAccessGate
+        currentLessonId={lesson.id}
+        siblings={siblingIds}
+        moduleId={moduleId}
+      >
+        {body}
+      </LessonAccessGate>
+      {footer}
+    </>
   );
 }
