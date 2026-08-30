@@ -27,7 +27,16 @@ interface Props {
    *  is rounded. */
   points: Point[];
   /** Bulge of the edge leaving corner n -- present and nonzero means curved.
-   *  Absent entirely for a sketch that has never had a corner rounded. */
+   *
+   *  LEGACY DOCS ONLY. Rounding a corner today writes `rounds`, not this:
+   *  roundSketchCorner() records the request and outlineOf() derives the arc,
+   *  so a corner rounded through the UI leaves every DESIGN edge straight and
+   *  this stays undefined. Only a sketch saved before that refactor, with an
+   *  arc baked into its edges, carries bulges. So every `curved` branch below
+   *  -- the disabled Across/Up buttons, the Length box, the pair grid -- is
+   *  unreachable through the current UI and guards those old docs alone.
+   *  (This comment used to say bulges appeared once a corner was rounded. It
+   *  does not, and believing it costs you a test that cannot pass.) */
   bulges?: Record<number, number>;
   /** Radius asked for on each rounded design corner, so the Round boxes can
    *  show what is currently set instead of always reading empty. */
