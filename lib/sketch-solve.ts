@@ -206,34 +206,64 @@ export function solveSketch(
   };
 }
 
-export function residualOf(pts: Point[], constraints: Constraint[]): number {
+/** How far each constraint is from being satisfied, parallel to `constraints`.
+ *
+ *  Every entry is a DISTANCE, so the numbers are comparable across kinds and
+ *  one tolerance means the same thing for all of them. A `lock` reports 0: it
+ *  pins a corner rather than asserting anything that can be off.
+ *
+ *  This is what lets the panel say WHICH rules disagree instead of only that
+ *  some do. Once relaxation has settled, a constraint still carrying error is
+ *  one the others outvoted -- that is the culprit set, and naming it is the
+ *  difference between "remove one to settle it" and pointing at the two that
+ *  are actually fighting.
+ *
+ *  Collateral is possible: a third rule can be dragged off true by a conflict
+ *  it is not part of, and it will appear in the set. Over-reporting is the
+ *  safe direction -- every rule genuinely in the conflict is always present. */
+export function residualsOf(pts: Point[], constraints: Constraint[]): number[] {
   const n = pts.length;
-  let worst = 0;
-  for (const c of constraints) {
-    if (c.kind === 'lock') continue;
+  return constraints.map((c) => {
+    if (c.kind === 'lock') return 0;
     if (c.kind === 'horizontal' || c.kind === 'vertical') {
       const axis = c.kind === 'horizontal' ? 1 : 0;
       const [a, b] = edgeCorners(c.edge, n);
-      worst = Math.max(worst, Math.abs(pts[b][axis] - pts[a][axis]));
-    } else if (c.kind === 'length') {
-      worst = Math.max(worst, Math.abs(edgeLength(pts, c.edge) - c.value));
-    } else if (c.kind === 'parallel' || c.kind === 'perpendicular') {
-      const angleA = edgeAngle(pts, c.edge, n);
-      const angleB = edgeAngle(pts, c.other, n);
-      if (angleA === null || angleB === null) continue;
-      const target = c.kind === 'perpendicular' ? Math.PI / 2 : 0;
-      let diff = (angleB - angleA - target) % Math.PI;
-      if (diff > Math.PI / 2) diff -= Math.PI;
-      if (diff <= -Math.PI / 2) diff += Math.PI;
-      // Converted to an approximate ARC LENGTH, not left as raw radians --
-      // every other constraint kind's contribution to `worst` is a distance,
-      // and mixing units here would make the fighting/overConstrained
-      // thresholds (both calibrated at 1e-3 in distance units) meaningless.
-      worst = Math.max(worst, Math.abs(diff) * Math.max(edgeLength(pts, c.edge), edgeLength(pts, c.other)));
-    } else {
-      worst = Math.max(worst, Math.abs(edgeLength(pts, c.edge) - edgeLength(pts, c.other)));
+      return Math.abs(pts[b][axis] - pts[a][axis]);
     }
+    if (c.kind === 'length') return Math.abs(edgeLength(pts, c.edge) - c.value);
+    return residualOfPair(pts, c, n);
+  });
+}
+
+/** equal / parallel / perpendicular -- the kinds that name two edges. */
+function residualOfPair(
+  pts: Point[],
+  c: Extract<Constraint, { other: number }>,
+  n: number,
+): number {
+  if (c.kind === 'equal') {
+    return Math.abs(edgeLength(pts, c.edge) - edgeLength(pts, c.other));
   }
+  const angleA = edgeAngle(pts, c.edge, n);
+  const angleB = edgeAngle(pts, c.other, n);
+  // A zero-length edge has no direction, so there is nothing to be off by.
+  if (angleA === null || angleB === null) return 0;
+  const target = c.kind === 'perpendicular' ? Math.PI / 2 : 0;
+  let diff = (angleB - angleA - target) % Math.PI;
+  if (diff > Math.PI / 2) diff -= Math.PI;
+  if (diff <= -Math.PI / 2) diff += Math.PI;
+  // Converted to an approximate ARC LENGTH, not left as raw radians -- every
+  // other kind's residual is a distance, and mixing units here would make the
+  // fighting/overConstrained thresholds (both calibrated at 1e-3 in distance
+  // units) meaningless.
+  return Math.abs(diff) * Math.max(edgeLength(pts, c.edge), edgeLength(pts, c.other));
+}
+
+export function residualOf(pts: Point[], constraints: Constraint[]): number {
+  // Max of the per-constraint residuals, so the arithmetic lives in exactly one
+  // place: a fix to one kind's residual cannot land here and miss residualsOf.
+  let worst = 0;
+  for (const r of residualsOf(pts, constraints)) worst = Math.max(worst, r);
   return worst;
 }
 

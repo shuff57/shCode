@@ -245,6 +245,69 @@ module.exports = function run(dir) {
     && mixed.points.every((p) => Number.isFinite(p[0]) && Number.isFinite(p[1])),
     `residual ${mixed.residual}`);
 
+  // ------------------------------------------------------------------
+  // residualsOf -- WHICH rules disagree, not just that some do.
+  //
+  // The panel turns a cell red off these numbers, so the thing worth testing
+  // is discrimination: the culprits must come back above tolerance AND an
+  // innocent rule in the same sketch must come back below it. A function that
+  // flagged everything would satisfy "the culprits are flagged" and be useless.
+  console.log('\n=== which rules disagree (residualsOf) ===');
+
+  const TOL = 1e-3;
+
+  // A sketch where every rule is satisfiable: nothing should be flagged.
+  const happy = [
+    { kind: 'horizontal', edge: 0 },
+    { kind: 'length', edge: 0, value: 40 },
+    { kind: 'lock', corner: 0 },
+  ];
+  const happySolved = S.solveSketch(rect(), happy);
+  const happyR = S.residualsOf(happySolved.points, happy);
+  check('one residual per constraint, in order', happyR.length === happy.length,
+    `got ${happyR.length} for ${happy.length}`);
+  check('a satisfiable sketch flags nothing', happyR.every((r) => r < TOL),
+    JSON.stringify(happyR));
+  check('a lock reports no residual', happyR[2] === 0, String(happyR[2]));
+
+  // NOT horizontal+vertical on one edge, which looks like the obvious
+  // contradiction and is not one: the solver satisfies BOTH by collapsing the
+  // edge to zero length, and every residual comes back ~1e-8. Measured here
+  // 2026-08-29 when this test was written expecting a conflict and got none.
+  // Two different lengths on one edge is a real contradiction -- no geometry
+  // satisfies both.
+  const fight = [
+    { kind: 'length', edge: 0, value: 40 },
+    { kind: 'length', edge: 0, value: 10 },
+    { kind: 'length', edge: 1, value: 25 },   // innocent bystander, already true
+  ];
+  const fightSolved = S.solveSketch(rect(), fight);
+  const fightR = S.residualsOf(fightSolved.points, fight);
+  const flagged = fightR.map((r) => r > TOL);
+  check('a contradiction flags at least one of the two rules in it',
+    flagged[0] || flagged[1], JSON.stringify(fightR));
+  check('...and does NOT flag the satisfied bystander', !flagged[2],
+    `bystander residual ${fightR[2]}`);
+  check('so the flags discriminate rather than lighting everything up',
+    flagged.some(Boolean) && !flagged.every(Boolean), JSON.stringify(flagged));
+
+  // residualOf must stay the max of residualsOf -- they are one calculation,
+  // and a drift between them is how the header and the cells start disagreeing.
+  for (const [label, pts, cs] of [
+    ['satisfiable', happySolved.points, happy],
+    ['contradictory', fightSolved.points, fight],
+    ['impossible triangle', triPerp.points, [
+      { kind: 'perpendicular', edge: 0, other: 1 },
+      { kind: 'perpendicular', edge: 1, other: 2 },
+      { kind: 'perpendicular', edge: 2, other: 0 },
+    ]],
+  ]) {
+    check(`residualOf === max(residualsOf) -- ${label}`,
+      near(S.residualOf(pts, cs), Math.max(0, ...S.residualsOf(pts, cs)), 1e-9));
+  }
+
+  check('no constraints means no residuals', S.residualsOf(rect(), []).length === 0);
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };
