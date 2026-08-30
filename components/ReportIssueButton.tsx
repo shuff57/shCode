@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { Flag } from 'lucide-react';
 import { createIssueReport, IssueKind } from '../lib/issue-reports-api';
 import { uploadImage, deleteUpload, UploadError } from '../lib/uploads';
 import { useLessonStore } from '../lib/store';
@@ -247,9 +248,10 @@ export default function ReportIssueButton() {
         type="button"
         className="issue-fab"
         onClick={() => setOpen(true)}
-        title="Report a bug, quirk, or idea"
+        title="Report an issue: a bug, quirk, or idea"
+        aria-label="Report an issue"
       >
-        Report an issue
+        <Flag size={16} aria-hidden="true" />
       </button>
 
       <dialog
@@ -386,11 +388,16 @@ export default function ReportIssueButton() {
           background: var(--card);
           color: var(--text);
           border: 1px solid var(--border);
-          border-radius: 20px;
-          padding: 8px 16px;
-          font-size: 13px;
-          font-weight: 600;
-          font-family: inherit;
+          /* An icon, not a labelled pill. The pill was ~140px wide and sat
+             permanently over whatever lived in that corner -- reported twice
+             (#8, #11) with screenshots. The label lives in title/aria-label
+             instead, which costs a hover but frees the corner. */
+          border-radius: 50%;
+          width: 34px;
+          height: 34px;
+          display: grid;
+          place-items: center;
+          padding: 0;
           cursor: pointer;
           box-shadow: 0 2px 10px rgba(0,0,0,0.4);
           transition: border-color 120ms, color 120ms, bottom 220ms ease;
