@@ -2,6 +2,16 @@ import express from 'express';
 import next from 'next';
 import fs from 'fs/promises';
 import path from 'path';
+// The REAL anonymiser, not a dev copy of it. If /issues is going to be
+// reviewed locally, it has to be reviewed through the same function that
+// decides what a student may see in production.
+import { publicReport, rankReports, visibleToStudent } from './functions/_shared/issue-reports.ts';
+
+// Who the dev auth stub pretends to be. `DEV_ROLE=student npm run dev` is the
+// only way to see the student half of anything here — the real session comes
+// from a JWT this server does not issue.
+const DEV_EMAIL = 'dev@local';
+const DEV_ROLE = process.env.DEV_ROLE === 'student' ? 'student' : process.env.DEV_ROLE === 'admin' ? 'admin' : 'teacher';
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
@@ -76,10 +86,10 @@ app.prepare().then(() => {
   // renders "Lesson locked" because the client sees role=null. Production
   // (Cloudflare Pages) ignores this file entirely — dev convenience only.
   server.get('/api/me', (_req, res) => {
-    res.json({ email: 'dev@local', role: 'teacher' });
+    res.json({ email: DEV_EMAIL, role: DEV_ROLE });
   });
   server.post('/api/auth/login', (_req, res) => {
-    res.json({ email: 'dev@local', role: 'teacher' });
+    res.json({ email: DEV_EMAIL, role: DEV_ROLE });
   });
   server.post('/api/auth/logout', (_req, res) => {
     res.json({ ok: true });
@@ -104,7 +114,7 @@ app.prepare().then(() => {
   });
 
   server.get('/api/lesson-state', (_req, res) => {
-    res.json({ states: {}, scores: {}, role: 'teacher' });
+    res.json({ states: {}, scores: {}, role: DEV_ROLE });
   });
   server.post('/api/lesson-state/:lessonId', (_req, res) => {
     res.json({ ok: true });
@@ -207,6 +217,24 @@ app.prepare().then(() => {
   const devUploads = new Map();
   let devIssueSeq = 0;
   let devUploadSeq = 0;
+  // key `${reportId}|${email}` -> 1 | -1. The real store is
+  // migrations/0021_issue_report_votes.sql, keyed the same way so one person
+  // can hold at most one vote per report.
+  const devVotes = new Map();
+
+  function devTally(reportId) {
+    let up = 0;
+    let down = 0;
+    let myVote = 0;
+    for (const [key, vote] of devVotes) {
+      const [id, email] = key.split('|');
+      if (Number(id) !== reportId) continue;
+      if (vote === 1) up++;
+      else down++;
+      if (email === DEV_EMAIL) myVote = vote;
+    }
+    return { up, down, myVote };
+  }
 
   server.post('/api/uploads', express.raw({ type: '*/*', limit: '4mb' }), (req, res) => {
     if (!req.body || !req.body.length) return res.status(400).json({ error: 'That file is empty.' });
@@ -233,6 +261,9 @@ app.prepare().then(() => {
 
   server.get('/api/issue-reports', (req, res) => {
     const sorted = [...devIssues].sort((a, b) => b.created_at - a.created_at);
+    if (req.query.format === 'md' && DEV_ROLE === 'student') {
+      return res.status(403).json({ error: 'Staff only' });
+    }
     if (req.query.format === 'md') {
       const lines = ['# Issue reports (dev server)', ''];
       for (const r of sorted) {
@@ -243,7 +274,30 @@ app.prepare().then(() => {
         .set('Content-Disposition', 'attachment; filename="issue-reports-dev.md"')
         .send(lines.join('\n'));
     }
-    res.json({ reports: sorted });
+    if (DEV_ROLE === 'student') {
+      // context_json is a string in D1; the dev store already holds it parsed,
+      // so re-serialise before handing it to the real publicReport().
+      const rows = sorted.map((r) => ({ ...r, context_json: r.context ? JSON.stringify(r.context) : null }));
+      const visible = rows.filter((r) => visibleToStudent(r, DEV_EMAIL));
+      return res.json({ reports: rankReports(visible.map((r) => publicReport(r, devTally(r.id), DEV_EMAIL))) });
+    }
+
+    res.json({ reports: sorted.map((r) => { const t = devTally(r.id); return { ...r, ...t, score: t.up - t.down }; }) });
+  });
+
+  server.post('/api/issue-reports/:id/vote', express.json(), (req, res) => {
+    const id = Number(req.params.id);
+    const report = devIssues.find((x) => x.id === id);
+    if (!report) return res.status(404).json({ error: 'Report not found' });
+    const { vote } = req.body || {};
+    if (vote !== 1 && vote !== -1 && vote !== 0) {
+      return res.status(400).json({ error: 'vote must be one of: 1, -1, 0' });
+    }
+    const key = id + '|' + DEV_EMAIL;
+    if (vote === 0) devVotes.delete(key);
+    else devVotes.set(key, vote);
+    const t = devTally(id);
+    res.json({ ok: true, id, up: t.up, down: t.down, score: t.up - t.down, myVote: vote });
   });
 
   server.post('/api/issue-reports', express.json({ limit: '1mb' }), (req, res) => {
@@ -271,6 +325,8 @@ app.prepare().then(() => {
       triaged_at: null,
       context: context ?? null,
       screenshot_id: screenshotId ?? null,
+      screenshot_shared: 0,
+      withdrawn_at: null,
       created_at: Date.now(),
     });
     console.log('  [dev] issue #' + devIssueSeq + ' [' + kind + '] ' + title.trim());
@@ -288,6 +344,32 @@ app.prepare().then(() => {
     r.triaged_by = 'dev@local';
     r.triaged_at = Date.now();
     res.json({ ok: true, id: r.id, status });
+  });
+
+  server.post('/api/issue-reports/:id/withdraw', express.json(), (req, res) => {
+    const r = devIssues.find((x) => x.id === Number(req.params.id));
+    if (!r) return res.status(404).json({ error: 'Report not found' });
+    const { withdrawn } = req.body || {};
+    if (typeof withdrawn !== 'boolean') {
+      return res.status(400).json({ error: 'withdrawn must be a boolean' });
+    }
+    // Dev stub has one identity (DEV_EMAIL) and no other reporter to be
+    // blocked from withdrawing someone else's report, unlike the real route.
+    r.withdrawn_at = withdrawn ? Date.now() : null;
+    res.json({ ok: true, id: r.id, withdrawn });
+  });
+
+  server.post('/api/issue-reports/:id/share-screenshot', express.json(), (req, res) => {
+    if (DEV_ROLE === 'student') return res.status(403).json({ error: 'Staff only' });
+    const r = devIssues.find((x) => x.id === Number(req.params.id));
+    if (!r) return res.status(404).json({ error: 'Report not found' });
+    const { shared } = req.body || {};
+    if (typeof shared !== 'boolean') {
+      return res.status(400).json({ error: 'shared must be a boolean' });
+    }
+    if (!r.screenshot_id) return res.status(400).json({ error: 'This report has no screenshot to share.' });
+    r.screenshot_shared = shared ? 1 : 0;
+    res.json({ ok: true, id: r.id, shared });
   });
 
   server.delete('/api/issue-reports/:id', (req, res) => {

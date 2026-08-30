@@ -46,6 +46,11 @@ export const onRequestDelete: PagesFunction<Env, 'id', SessionData> = async (con
   const result = await env.DB.prepare(`DELETE FROM issue_reports WHERE id = ?`).bind(id).run();
   if (result.meta.changes === 0) return json({ error: 'Report not found' }, 404);
 
+  // No FK from issue_report_votes to issue_reports (D1 doesn't enforce them),
+  // so an orphaned vote row would otherwise resurface against a future
+  // report that reuses this id.
+  await env.DB.prepare(`DELETE FROM issue_report_votes WHERE report_id = ?`).bind(id).run();
+
   // The report is gone either way; a failure to clean up the image must not
   // turn into a 500 that makes the caller retry a delete that already
   // happened. Worst case is an orphaned object, which is invisible and costs

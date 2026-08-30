@@ -1,10 +1,17 @@
 // /api/issue-reports
 //
-// GET   — staff (teacher/admin) only: the full report queue, newest first.
-//         `?format=md` streams a markdown handoff file instead of JSON.
+// GET   — any signed-in user. Staff get the full report queue, newest first,
+//         same as before, plus each report's up/down/score/myVote. Students
+//         get the same reports run through publicReport() (reporter identity
+//         and raw context stripped, screenshot withheld unless staff opted
+//         it in), worst-first by vote score, minus any report withdrawn by
+//         someone other than the viewer -- see visibleToStudent().
+//         `?format=md` streams a markdown handoff file instead of JSON —
+//         staff only, regardless of who is asking.
 // POST  — any signed-in user: file a new report.
 //         Body {kind, title, message, context, screenshotId}.
-// DELETE — see [id]/index.ts. Staff only; removes the report and its screenshot.
+// DELETE — see [id]/index.ts. Staff only; removes the report, its votes, and
+//          its screenshot.
 //
 // Reports are site-wide notes, not class-scoped: any staff member can triage
 // all of them. Rate limiting is a simple per-reporter open-report cap, enough
@@ -12,6 +19,13 @@
 // use.
 
 import { isUploadId } from '../../_shared/uploads';
+import {
+  publicReport,
+  rankReports,
+  tallyVotes,
+  visibleToStudent,
+  type ReportRow,
+} from '../../_shared/issue-reports';
 
 interface Env {
   DB: D1Database;
@@ -25,35 +39,21 @@ const MAX_MESSAGE = 4000;
 const MAX_CONTEXT = 16000;
 const MAX_OPEN_PER_REPORTER = 20;
 
-interface ReportRow {
-  id: number;
-  reporter_email: string;
-  kind: 'bug' | 'quirk' | 'enhancement';
-  /** NULL only for reports filed before migration 0020 added the column. */
-  title: string | null;
-  message: string;
-  status: 'open' | 'in-progress' | 'fixed' | 'deferred';
-  triaged_by: string | null;
-  triaged_at: number | null;
-  context_json: string | null;
-  screenshot_id: string | null;
-  created_at: number;
-}
-
 export const onRequestGet: PagesFunction<Env, string, SessionData> = async (context: Ctx) => {
   const { env, data, request } = context;
 
-  if (data.role === 'student') return json({ error: 'Staff only' }, 403);
+  const format = new URL(request.url).searchParams.get('format');
+  if (format === 'md' && data.role === 'student') return json({ error: 'Staff only' }, 403);
 
   const result = await env.DB.prepare(
-    `SELECT id, reporter_email, kind, title, message, status, triaged_by, triaged_at, context_json, screenshot_id, created_at
+    `SELECT id, reporter_email, kind, title, message, status, triaged_by, triaged_at, context_json,
+            screenshot_id, screenshot_shared, withdrawn_at, created_at
        FROM issue_reports
       ORDER BY created_at DESC`,
   ).all<ReportRow>();
 
   const reports = result.results ?? [];
 
-  const format = new URL(request.url).searchParams.get('format');
   if (format === 'md') {
     const md = renderMarkdown(reports);
     return new Response(md, {
@@ -64,7 +64,36 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async (cont
     });
   }
 
-  return json({ reports: reports.map((r) => ({ ...r, context: parseContext(r.context_json) })) });
+  // One query for every report's tally, not one per report.
+  const voteResult = await env.DB.prepare(
+    `SELECT report_id, voter_email, vote FROM issue_report_votes`,
+  ).all<{ report_id: number; voter_email: string; vote: number }>();
+
+  const tallies = tallyVotes(voteResult.results ?? [], data.email);
+  const zeroTally = { up: 0, down: 0, myVote: 0 as const };
+
+  if (data.role === 'student') {
+    const publicReports = rankReports(
+      reports
+        .filter((r) => visibleToStudent(r, data.email))
+        .map((r) => publicReport(r, tallies.get(r.id) ?? zeroTally, data.email)),
+    );
+    return json({ reports: publicReports });
+  }
+
+  const staffReports = reports.map((r) => {
+    const t = tallies.get(r.id) ?? zeroTally;
+    return {
+      ...r,
+      context: parseContext(r.context_json),
+      up: t.up,
+      down: t.down,
+      score: t.up - t.down,
+      myVote: t.myVote,
+    };
+  });
+
+  return json({ reports: staffReports });
 };
 
 export const onRequestPost: PagesFunction<Env, string, SessionData> = async (context: Ctx) => {

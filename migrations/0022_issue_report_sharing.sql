@@ -1,0 +1,22 @@
+-- Two independent opt-outs for a report, both defaulting to the closed
+-- state: nothing new becomes visible to a student until someone chooses it.
+--
+-- screenshot_shared: a report's screenshot is served by the deliberately
+-- unauthenticated functions/uploads/[name].ts (see migrations/0015_uploads.sql)
+-- -- the id itself is the whole access control. Handing screenshot_id to a
+-- student therefore publishes the image to the entire internet, permanently,
+-- with no way to recall it. Defaulting to 0 means an attachment stays private
+-- until a staff member deliberately ticks it on, the same way the report
+-- itself starts staff-only until this migration's sibling change makes the
+-- queue student-visible at all.
+--
+-- withdrawn_at: existing reports were filed back when the queue was
+-- staff-only, and all of them stay visible now that students can see the
+-- queue -- their authors need a way out that isn't DELETE, which
+-- /api/issue-reports/[id] already refuses for students on purpose (flood
+-- guard). A column rather than a delete: staff still need to see the report
+-- and its triage status even after the reporter withdraws it from the public
+-- view. NULL (not withdrawn) is the default; a timestamp records when it was
+-- pulled, the same shape triaged_at already uses.
+ALTER TABLE issue_reports ADD COLUMN screenshot_shared INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE issue_reports ADD COLUMN withdrawn_at INTEGER;

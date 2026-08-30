@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { Flag } from 'lucide-react';
 import { createIssueReport, IssueKind } from '../lib/issue-reports-api';
 import { uploadImage, deleteUpload, UploadError } from '../lib/uploads';
@@ -264,7 +265,12 @@ export default function ReportIssueButton() {
         }}
       >
         {done ? (
-          <p className="issue-done">Reported — thank you!</p>
+          <div className="issue-done">
+            <p>Reported — thank you!</p>
+            <Link href="/issues" className="issue-done-link">
+              See what everyone else has reported
+            </Link>
+          </div>
         ) : (
           <form onSubmit={submit} className="issue-form">
             <h3>Report an issue</h3>
@@ -416,9 +422,10 @@ export default function ReportIssueButton() {
         .issue-form { padding: 18px; }
         .issue-form h3 { margin: 0 0 12px; font-size: 16px; }
         .issue-done {
-          padding: 24px; margin: 0; text-align: center;
-          font-weight: 700; color: #22c55e;
+          padding: 24px; text-align: center;
         }
+        .issue-done p { margin: 0 0 10px; font-weight: 700; color: #22c55e; }
+        .issue-done-link { font-size: 13px; color: var(--brand); }
 
         .issue-kinds { display: flex; gap: 6px; margin-bottom: 14px; }
         .issue-kind {

@@ -51,6 +51,12 @@ export default function HeaderNav() {
           <Link href="/teacher/issues" className="text-white">Issues</Link>
         </>
       ) : null}
+      {/* Students get the anonymised queue at /issues, staff get the triage
+          page above. Without this link the only way in is the one-off link
+          shown after filing a report, which is not visibility. */}
+      {loaded && user?.role === 'student' && (
+        <Link href="/issues" className="text-white">Issues</Link>
+      )}
       {loaded && user?.role === 'admin' && (
         <Link href="/admin/users" className="text-white">Users</Link>
       )}

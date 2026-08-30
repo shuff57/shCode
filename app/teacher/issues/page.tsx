@@ -11,7 +11,9 @@ import {
   deleteIssueReport,
   reportHeadline,
   screenshotUrl,
+  setScreenshotShared,
 } from '../../../lib/issue-reports-api';
+import IssueVoteControl, { type VoteState } from '../../../components/IssueVoteControl';
 
 // ---------------------------------------------------------------------------
 // Staff triage queue for student issue reports. Read from D1, export the
@@ -155,6 +157,7 @@ function IssuesPageInner() {
   const [reports, setReports] = useState<IssueReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const [voteError, setVoteError] = useState('');
   const [filter, setFilter] = useState<Filter>('open');
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [copied, setCopied] = useState('');
@@ -190,6 +193,29 @@ function IssuesPageInner() {
       await setIssueReportStatus(id, status);
     } catch {
       load();
+    }
+  }
+
+  function applyVote(id: number, next: VoteState) {
+    setVoteError('');
+    setReports((prev) =>
+      prev.map((r) =>
+        r.id === id ? { ...r, up: next.up, down: next.down, score: next.up - next.down, myVote: next.myVote } : r,
+      ),
+    );
+  }
+
+  // Off is the safe default (migration 0022) -- ticking this on publishes
+  // the screenshot to the whole internet via the unauthenticated /uploads/
+  // route, permanently. Reload on failure rather than assume the toggle
+  // took, same reasoning as handleStatus above.
+  async function handleShareScreenshot(id: number, shared: boolean) {
+    setReports((prev) => prev.map((r) => (r.id === id ? { ...r, screenshot_shared: shared ? 1 : 0 } : r)));
+    try {
+      await setScreenshotShared(id, shared);
+    } catch (e) {
+      load();
+      setLoadError(e instanceof Error ? e.message : String(e));
     }
   }
 
@@ -296,6 +322,7 @@ function IssuesPageInner() {
 
       {loading && <div style={{ color: 'var(--text)', opacity: 0.55 }}>Loading reports…</div>}
       {loadError && <div style={{ color: '#dc2626', fontSize: 14 }}>{loadError}</div>}
+      {voteError && <div style={{ color: '#dc2626', fontSize: 14, marginBottom: 12 }}>{voteError}</div>}
 
       {!loading && !loadError && visible.length === 0 && (
         <p style={{ color: 'var(--text)', opacity: 0.55, fontSize: 14 }}>
@@ -342,6 +369,13 @@ function IssuesPageInner() {
               <span style={{ fontSize: 12, color: 'var(--text)', opacity: 0.6 }}>
                 {r.reporter_email} · {fmtDate(r.created_at)}
               </span>
+
+              <IssueVoteControl
+                reportId={r.id}
+                vote={{ up: r.up, down: r.down, myVote: r.myVote }}
+                onChange={(next) => applyVote(r.id, next)}
+                onError={setVoteError}
+              />
 
               <select
                 style={{
@@ -452,6 +486,28 @@ function IssuesPageInner() {
                       }}
                     />
                   </a>
+                )}
+
+                {r.screenshot_id && (
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      marginTop: 8,
+                      fontSize: 12,
+                      color: 'var(--text)',
+                      opacity: 0.85,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={r.screenshot_shared === 1}
+                      onChange={(e) => void handleShareScreenshot(r.id, e.target.checked)}
+                    />
+                    Show screenshot to students
+                  </label>
                 )}
 
                 {r.triaged_by && (
