@@ -1,3 +1,23 @@
+# Handoff — 2026-08-31 · stale gitignored generated bundles after a lesson pull
+
+A `git pull` that touched 14 lessons' `solution.js` files left `npm test` failing
+`check-solution-leak.mjs` with 14 "not in solutions.generated.ts — teachers
+cannot see it" errors. Not a real leak: `functions/_shared/solutions.generated.ts`
+and `lesson-starters.generated.ts` are gitignored build artifacts, and
+`check-solution-leak.mjs` only regenerates them when **missing**, not when
+**stale** — so a pull that edits lesson content without touching those files'
+mtimes leaves a mismatch behind. Fixed by hand-running the two generators:
+
+```bash
+node scripts/generate-solutions.mjs && node scripts/generate-lesson-starters.mjs
+```
+
+`npm test` was clean after. Worth remembering after any pull that touches
+`lessons/`: if `check-solution-leak` goes red, regenerate before assuming a
+real leak.
+
+---
+
 # Handoff — 2026-08-29 (evening) · reSHape constraints DONE; two lesson fixes shipped
 
 Supersedes the morning park section, whose open items are all now closed.
