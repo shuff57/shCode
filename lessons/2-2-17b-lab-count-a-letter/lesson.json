@@ -50,11 +50,11 @@
     },
     {
       "id": "r3",
-      "title": "the counter is increased",
-      "description": "count goes up inside the if",
+      "title": "the counter goes up inside the if",
+      "description": "count is increased inside the if body, not somewhere else in the file",
       "type": "regex",
       "file": "script.js",
-      "pattern": "count\\s*(\\+\\+|\\+=\\s*1|=\\s*count\\s*\\+\\s*1)",
+      "pattern": "if\\s*\\(\\s*word\\s*\\[\\s*i\\s*\\]\\s*===?\\s*[\\\"'][^\\\"']*[\\\"']\\s*\\)\\s*\\{?[^}]*?count\\s*(\\+\\+|\\+=\\s*1|=\\s*count\\s*\\+\\s*1)",
       "points": 0
     },
     {
