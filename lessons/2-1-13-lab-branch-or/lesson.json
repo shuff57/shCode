@@ -38,10 +38,10 @@
     {
       "id": "r2",
       "title": "two variables declared",
-      "description": "Two variables are declared and given values before the if",
+      "description": "Two variables are declared and given values before the if, in any shape",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:const|let|var)\\s+[A-Za-z_$][\\w$]*\\s*=[\\s\\S]*?(?:const|let|var)\\s+[A-Za-z_$][\\w$]*\\s*=",
+      "pattern": "(?:const|let|var)\\s[\\s\\S]*?\\b[A-Za-z_$][\\w$]*\\s*=(?!=)[\\s\\S]*?\\b[A-Za-z_$][\\w$]*\\s*=(?!=)",
       "points": 0
     },
     {

@@ -1,7 +1,7 @@
 {
   "id": "2-1-21-reading-precedence",
   "title": "2.1.36 Reading: Parentheses and Operator Precedence",
-  "description": "Learn why parentheses make a condition's intent clear even when they aren't strictly required. Read before the ternary operator lessons.",
+  "description": "Learn why parentheses make a condition's intent clear even when they aren't strictly required. Read before 2.1.37 Combine &&, ||, and !.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",

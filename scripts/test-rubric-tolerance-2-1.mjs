@@ -81,6 +81,16 @@ check(LAB.guardAnd, 'student picked their own variable names',
   'const temperature = 30;\nconst humidity = 80;\nif (temperature > 20 && humidity > 50) { console.log("muggy"); }', 'ALL');
 check(LAB.branchOr, 'bare booleans, no comparison operators',
   'const isWeekend = true;\nconst isHoliday = false;\nif (isWeekend || isHoliday) { console.log("off"); }', 'ALL');
+// Both shapes are in cs-student-tester.md's tolerance table and both are
+// modelled by the course at 1.3.11. The first tightening of r2 refused them.
+check(LAB.guardAnd, 'declare then assign on a later line',
+  ['let temperature;', 'let humidity = 80;', 'temperature = 30;',
+   'if (temperature > 20 && humidity > 50) { console.log("muggy"); }'].join('\n'), 'ALL');
+check(LAB.guardAnd, 'several names on one let',
+  ['let a = 1, b = 2;', 'if (a > 0 && b > 0) { console.log("yes"); }'].join('\n'), 'ALL');
+check(LAB.branchOr, 'declare then assign on a later line',
+  ['let isWeekend;', 'let isHoliday = false;', 'isWeekend = true;',
+   'if (isWeekend || isHoliday) { console.log("off"); }'].join('\n'), 'ALL');
 check(LAB.branchOr, 'let instead of const, no semicolons',
   'let a = 1\nlet b = 2\nif (a > 0 || b > 0) { console.log("yes") }', 'ALL');
 check(LAB.advisor, 'reference shape with two separate ifs',
