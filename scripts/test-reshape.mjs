@@ -56,6 +56,7 @@ import {
   RESHAPE_OPTION_KEYS, RESHAPE_HOST_GLOBALS, MEASURE_WRAPPERS, EQUIVALENTS, TURN_IN_PLACE, POSITIONAL_CONTRACT, GUARDS,
   NO_OPTIONS_CONTRACT, ARITY_GUARDS, RING_ARITHMETIC, POLY_BARE_ARRAY, WRAPS_BOX,
   SILENTLY_DROPPED, REFUSALS_OVERTURNED, ASSIGNMENT_POOL, INTEROP, SEEDED_COLLISION,
+  OWNED_NAMES, OWNED_FORMS,
   GRADUATION, GRADUATION_TRIPWIRES, TURN_COMPOSITION, REFUSALS_NAME_THE_REAL_CALL,
   REVERSE_LOOKUP, readReverseTable, BORROWED_ASSERTIONS, createSvgContext, SVG_CASES,
   SVG_MARGIN, readGraduationTable, createGraduationContext, createSimpleContext,
@@ -731,18 +732,60 @@ check('reshape.js is vendored in public/reshape and loaded by the runner', () =>
   return true;
 });
 
-check('none of the reSHape names exists before reshape.js loads', () => {
+// reSHape used to require that every one of its names was a NEW word. Ten of
+// them are now the library's own words on purpose, so the rule splits: an owned
+// name MUST already be there (it is the thing being replaced, and if it is
+// absent the replacement is standing on nothing), and every other name must
+// still be new.
+// A DOC EXAMPLE MAY NOT NAME A VARIABLE AFTER A SHAPE FUNCTION.
+//
+// This became a real defect the moment reSHape took the library's own words.
+// The docs were full of `const sphere = ball(10)` -- a perfectly good name for
+// a ball -- and renaming the call to sphere() turned every one of them into
+// `const sphere = sphere(10)`, which is a TDZ error, or worse a later
+// `sphere is not a function` several lines from the declaration that caused it.
+//
+// The examples do get run, so a shadow that breaks is already caught. This
+// exists for the message: "cuboid is not a function" on line 40 of an example
+// does not point at the `const cuboid` on line 12, and the first pass at this
+// rename lost real time to exactly that. It also catches a shadow that happens
+// NOT to break yet, which is the one that breaks later.
+check('no doc example names a variable after a shape function', () => {
+  const owned = new Set([...OWNED_NAMES, ...RESHAPE_NAMES.map((n) => n.name)]);
+  const bad = [];
+  for (const ex of docExamples()) {
+    // Fresh regex per example: one shared /g regex carries lastIndex between
+    // examples and can scan a later one from the wrong offset.
+    const rx = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)/g;
+    let m;
+    while ((m = rx.exec(ex.code)) !== null) {
+      if (owned.has(m[1])) bad.push(`${ex.source}:${ex.line} declares \`${m[1]}\`, shadowing the function of that name`);
+    }
+  }
+  return bad.length ? bad.join('; ') : true;
+}, 'docs');
+
+check('reSHape replaces names that exist and adds names that do not', () => {
   const { before } = createSimpleContext();
-  const already = RESHAPE_NAMES.filter((n) => before.includes(n.name)).map((n) => n.name);
+  const owned = new Set(OWNED_NAMES);
+  const missing = OWNED_NAMES.filter((n) => !before.includes(n));
+  if (missing.length) {
+    return `${missing.join(', ')} is claimed as a replaced library name but was not there to replace`;
+  }
+  const already = RESHAPE_NAMES
+    .filter((n) => !owned.has(n.name) && before.includes(n.name)).map((n) => n.name);
   return already.length
-    ? `${already.join(', ')} already existed — reSHape must only ever add NEW names`
+    ? `${already.join(', ')} already existed — a name reSHape does not own must be a NEW word`
     : true;
 });
 
 check('reshape.js adds exactly the reSHape names, its report global, and the host hook', () => {
   const { added } = createSimpleContext();
-  const want = [...RESHAPE_NAMES.map((n) => n.name), ...RESHAPE_REPORT_GLOBALS,
-    ...RESHAPE_HOST_GLOBALS].sort();
+  // An owned name is a replacement, not an addition, so it is absent here by
+  // definition — what this measures is that nothing ELSE crept in.
+  const owned = new Set(OWNED_NAMES);
+  const want = [...RESHAPE_NAMES.map((n) => n.name).filter((n) => !owned.has(n)),
+    ...RESHAPE_REPORT_GLOBALS, ...RESHAPE_HOST_GLOBALS].sort();
   const got = [...added].sort();
   return same(got, want) ? true : `globals added: ${JSON.stringify(got)}, expected ${JSON.stringify(want)}`;
 });
@@ -760,10 +803,14 @@ check('the reSHape surface is the expected size', () => {
 // The decisive additive-ness check, run on the far side of reshape.js. The API
 // group asserts bare === namespaced with only the shim loaded; this asserts
 // that loading reSHape on top changed none of those answers.
-check('no real JSCAD name was overwritten by reSHape, except the eight named', () => {
+check('no real JSCAD name was overwritten by reSHape, except the ones named', () => {
   const { window: w, jscad } = createSimpleContext();
   const collisions = new Set(DOCUMENTED_COLLISIONS.map((c) => c.name));
-  const allowed = new Set(MEASURE_WRAPPERS);
+  // The eight measure wrappers, plus the ten names reSHape now owns. This list
+  // is a CEILING and it is not self-certifying: every owned name is separately
+  // required to still reach the library through its { } form, by the check
+  // below. Widen this set without that one passing and the guarantee is gone.
+  const allowed = new Set([...MEASURE_WRAPPERS, ...OWNED_NAMES]);
   const bad = [];
   const wrapped = [];
   for (const mod of EXPECTED_MODULE_ORDER) {
@@ -779,10 +826,11 @@ check('no real JSCAD name was overwritten by reSHape, except the eight named', (
   // The exception list is a CEILING, not a target: a name that stopped being
   // wrapped is as much a defect as one that started, because the staleness it
   // exists to close would be back with nothing to say so.
-  return same(wrapped.sort(), [...MEASURE_WRAPPERS].sort())
+  const expected = [...MEASURE_WRAPPERS, ...OWNED_NAMES].sort();
+  return same(wrapped.sort(), expected)
     ? true
-    : `the measure wrappers installed are ${JSON.stringify(wrapped.sort())}, `
-      + `MEASURE_WRAPPERS says ${JSON.stringify([...MEASURE_WRAPPERS].sort())}`;
+    : `the names replaced are ${JSON.stringify(wrapped.sort())}, `
+      + `MEASURE_WRAPPERS + OWNED_NAMES says ${JSON.stringify(expected)}`;
 });
 
 // A wrapper may exist. It may not change an answer. For anything that is not a
@@ -818,8 +866,8 @@ check('the sandbox reSHape starter is written in reSHape', () => {
   const leaked = ['require(', 'primitives.', 'booleans.', 'transforms.', 'extrusions.']
     .filter((t) => code.includes(t));
   if (leaked.length) return `the starter still reaches for the real API: ${leaked.join(', ')}`;
-  const names = ['box', 'rect', 'disc', 'ball', 'tube', 'cone', 'ring', 'poly',
-    'extrude', 'revolve', 'turn', 'sit'].filter((n) => code.includes(`${n}(`));
+  const names = ['cuboid', 'rectangle', 'circle', 'sphere', 'cylinder', 'cylinderElliptic', 'torus', 'polygon',
+    'extrudeLinear', 'extrudeRotate', 'turn', 'sit'].filter((n) => code.includes(`${n}(`));
   if (!names.length) return 'the starter calls no reSHape name at all';
 
   // And it builds -- on every branch its own parameters can take.
@@ -844,7 +892,7 @@ check('extrude takes a path2, exactly as extrudeLinear does', () => {
   const pts = w.vectorText({ height: 8, inputText: 'J' })[0].reverse();
   const path = jscad.geometries.path2.fromPoints({ closed: true }, pts);
   let mine;
-  try { mine = w.extrude(3, path); } catch (e) { return `extrude refused a path2: ${e.message}`; }
+  try { mine = w.extrudeLinear(3, path); } catch (e) { return `extrude refused a path2: ${e.message}`; }
   if (!jscad.geometries.geom3.isA(mine)) return 'extrude(3, path2) built nothing solid';
   return sameGeometry(mine, w.extrudeLinear({ height: 3 }, path));
 });
@@ -861,7 +909,7 @@ check('a refusal never contradicts itself about what it was given', () => {
   ];
   for (const [what, value] of cases) {
     try {
-      w.extrude(3, value);
+      w.extrudeLinear(3, value);
       return `extrude accepted ${what}`;
     } catch (e) {
       if (/is not a (flat shape|shape), it is a? ?shape\./.test(e.message)) {
@@ -877,7 +925,7 @@ check('a refusal never contradicts itself about what it was given', () => {
 // new shape's. Without the unwrap this returns the FIRST answer forever.
 check('a measurement follows a live shape when it is changed', () => {
   const { window: w, jscad } = createSimpleContext();
-  const b = w.ball(5);
+  const b = w.sphere(5);
   const before = w.measureVolume(b);
   b.radius = 9;
   const after = w.measureVolume(b);
@@ -891,18 +939,47 @@ check('a measurement follows a live shape when it is changed', () => {
     : `after the change measureVolume says ${after.toFixed(2)}, a real ball(9) is ${truth.toFixed(2)}`;
 });
 
-check('none of the reSHape names is a real JSCAD name in disguise', () => {
+// A name reSHape does NOT own still may not collide with the library — that is
+// the original rule, still live for turn, sit and anything added later.
+check('a name reSHape does not own is not a real JSCAD name in disguise', () => {
   const { jscad } = loadModeling();
+  const owned = new Set(OWNED_NAMES);
   const clashes = [];
   for (const n of RESHAPE_NAMES) {
+    if (owned.has(n.name)) continue;
     if (jscad[n.name] !== undefined) clashes.push(`<module> ${n.name}`);
     for (const mod of EXPECTED_MODULE_ORDER) {
       if ((jscad[mod] || {})[n.name] !== undefined) clashes.push(`${mod}.${n.name}`);
     }
   }
   return clashes.length
-    ? `reSHape name shadows the library: ${clashes.join(', ')} — every reSHape name must be a NEW word`
+    ? `reSHape name shadows the library: ${clashes.join(', ')} — a name reSHape does not own must be a NEW word`
     : true;
+});
+
+// THE CHECK THAT MAKES REPLACING A LIBRARY NAME SAFE, and the reason the two
+// ceilings above are not blank cheques. reSHape owns ten of @jscad/modeling's
+// own words. That is only a widening -- rather than a shadowing that silently
+// breaks pasted code -- for exactly as long as the library's own calling
+// convention still reaches the library and hands back the same geometry it
+// always did. Measured against the untouched module, not against reSHape's
+// idea of itself.
+check('every name reSHape owns still reaches the library through its { } form', () => {
+  const { window: w } = createSimpleContext();
+  const { jscad } = loadModeling();
+  const wrong = [];
+  for (const { name, args } of OWNED_FORMS) {
+    const real = args(jscad);
+    const mine = w[name];
+    if (typeof mine !== 'function') { wrong.push(`${name}: not installed`); continue; }
+    const realFn = (jscad.primitives || {})[name] || (jscad.extrusions || {})[name];
+    if (typeof realFn !== 'function') { wrong.push(`${name}: no library function to compare`); continue; }
+    let ours; let theirs;
+    try { ours = mine(...real); } catch (e) { wrong.push(`${name}: object form refused — ${e.message}`); continue; }
+    try { theirs = realFn(...real); } catch (e) { wrong.push(`${name}: library itself refused — ${e.message}`); continue; }
+    if (JSON.stringify(ours) !== JSON.stringify(theirs)) wrong.push(`${name}: object form returns different geometry`);
+  }
+  return wrong.length ? wrong.join('; ') : true;
 });
 
 check('reSHape does not move the shim tripwires', () => {
@@ -952,7 +1029,7 @@ check('reSHape invents no option key of its own', () => {
   // gate hoped for: a key reSHape refuses is named in its own error message.
   const { window: w } = createSimpleContext();
   try {
-    w.box(10, 10, 10, { thickness: 2 });
+    w.cuboid(10, 10, 10, { thickness: 2 });
     return 'box accepted an option it does not have';
   } catch (e) {
     return RESHAPE_OPTION_KEYS.every((k) => e.message.includes(k))
@@ -1072,8 +1149,8 @@ check('svg: up is up — the y axis is flipped for SVG', () => {
     const ys = [...svg.serialize(jscad, g).matchAll(/[ML] [-\d.]+ ([-\d.]+)/g)].map((m) => +m[1]);
     return ys.reduce((a, b) => a + b, 0) / ys.length;
   };
-  const up = meanY(w.translate([0, 20], w.disc(3)));
-  const down = meanY(w.translate([0, -20], w.disc(3)));
+  const up = meanY(w.translate([0, 20], w.circle(3)));
+  const down = meanY(w.translate([0, -20], w.circle(3)));
   // SVG y grows DOWN, so the disc JSCAD put at y=+20 must have the SMALLER y.
   // Without the flip these swap and the design is mirrored — which still looks
   // like a design, and is wrong in the way nobody notices until it is cut out.
@@ -1083,14 +1160,14 @@ check('svg: up is up — the y axis is flipped for SVG', () => {
 
 check('svg: a solid is refused rather than written empty', () => {
   const { svg, window: w, jscad } = createSvgContext();
-  if (svg.serialize(jscad, w.ball(5)) !== null) return 'a geom3 produced an SVG';
-  const mixed = svg.serialize(jscad, [w.rect(10, 10), w.ball(5)]);
+  if (svg.serialize(jscad, w.sphere(5)) !== null) return 'a geom3 produced an SVG';
+  const mixed = svg.serialize(jscad, [w.rectangle(10, 10), w.sphere(5)]);
   return /<path /.test(mixed) ? true : 'a mixed 2D/3D return dropped the 2D half';
 });
 
 check('svg: the viewBox is the design plus a margin', () => {
   const { svg, window: w, jscad } = createSvgContext();
-  const g = w.rect(40, 20);
+  const g = w.rectangle(40, 20);
   const vb = /viewBox="([^"]+)"/.exec(svg.serialize(jscad, g))[1].split(/\s+/).map(Number);
   const bb = jscad.measurements.measureBoundingBox(g);
   const wantW = (bb[1][0] - bb[0][0]) + SVG_MARGIN * 2;
@@ -1178,15 +1255,20 @@ for (const c of POSITIONAL_CONTRACT) {
       return 'the trailing { } changed nothing — the option is being ignored';
     }
 
-    // No alias. An object-shaped first argument must NOT work: allowing it
-    // would delete the day-one/day-two contrast reSHape exists to teach, and
-    // would make the arity guard unwriteable.
+    // THE OBJECT FORM IS THE LIBRARY'S AND MUST REACH IT. This used to assert the
+    // opposite -- that an object-shaped first argument was refused, to teach a
+    // day-one/day-two contrast between the friendly name and the real one. There
+    // is no second day now: reSHape owns this word, so the { } spelling a student
+    // pastes off jscad.app has to go straight through. That it hands back exactly
+    // what the real primitive hands back is proved once, for all ten names, by
+    // 'every name reSHape owns still reaches the library through its { } form'.
+    let viaObject;
     try {
-      c.objectFirst(w);
-      return `${c.name}({ … }) worked — reSHape must not accept the real API's object form`;
+      viaObject = c.objectFirst(w);
     } catch (e) {
-      if (!c.objectFirstSays.test(e.message)) return `unhelpful object-first message: ${e.message}`;
+      return `${c.name}({ … }) was refused — the library's own spelling must still work: ${e.message}`;
     }
+    if (!isGeometry(viaObject)) return `${c.name}({ … }) returned nothing drawable`;
 
     try {
       c.short(w);
@@ -1227,12 +1309,13 @@ for (const c of NO_OPTIONS_CONTRACT) {
       if (!c.trailingSays.test(e.message)) return `unhelpful refusal for the trailing { }: ${e.message}`;
     }
 
+    let viaObject2;
     try {
-      c.objectFirst(w);
-      return `${c.name}({ … }) worked — reSHape must not accept the real API's object form`;
+      viaObject2 = c.objectFirst(w);
     } catch (e) {
-      if (!c.objectFirstSays.test(e.message)) return `unhelpful object-first message: ${e.message}`;
+      return `${c.name}({ … }) was refused — the library's own spelling must still work: ${e.message}`;
     }
+    if (!isGeometry(viaObject2)) return `${c.name}({ … }) returned nothing drawable`;
 
     try {
       c.short(w);

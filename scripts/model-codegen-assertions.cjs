@@ -43,7 +43,7 @@ module.exports = function run(dir) {
     return false;
   }
   vm.runInContext(fs.readFileSync(simplePath, 'utf8'), sandbox);
-  for (const n of ['box', 'tube', 'ball', 'extrude', 'turn', 'cone', 'ring', 'poly']) {
+  for (const n of ['cuboid', 'cylinder', 'sphere', 'extrudeLinear', 'turn', 'cylinderElliptic', 'torus', 'polygon']) {
     if (typeof sandbox[n] !== 'function') {
       console.log(`  FAIL  reshape.js did not expose ${n}()`);
       return false;
@@ -77,7 +77,7 @@ module.exports = function run(dir) {
   console.log('\n=== codegen shape ===');
 
   const plain = gen.toReshape(doc(box('b1')));
-  check('a plain box is a reSHape box', plain.includes('box(p.b1_width, p.b1_depth, p.b1_height'));
+  check('a plain box is a reSHape box', plain.includes('cuboid(p.b1_width, p.b1_depth, p.b1_height'));
   check('...positional, never the object form box() refuses', !plain.includes('box({'));
   check('no hulls import when nothing needs it', !plain.includes('hulls'));
 
@@ -94,7 +94,7 @@ module.exports = function run(dir) {
 
   const filCyl = gen.toReshape(doc(cyl('c1', { round: 2, roundStyle: 'fillet' })));
   check('a filleted cylinder passes roundRadius to tube',
-    filCyl.includes('tube(') && filCyl.includes('roundRadius: p.c1_round'));
+    filCyl.includes('cylinder(') && filCyl.includes('roundRadius: p.c1_round'));
 
   console.log('\n=== order is the lesson ===');
 
@@ -113,7 +113,7 @@ module.exports = function run(dir) {
   check('two loose shapes are unioned', loose.includes('booleans.union(b1, c1)'));
 
   const empty = gen.toReshape(doc());
-  check('an empty doc still returns something', empty.includes('return box(1, 1, 1)'));
+  check('an empty doc still returns something', empty.includes('return cuboid(1, 1, 1)'));
 
   console.log('\n=== cone and ring ===');
 
@@ -122,12 +122,12 @@ module.exports = function run(dir) {
 
   const coneSrc = gen.toReshape(doc(cone('k1')));
   const ringSrc = gen.toReshape(doc(ring('r1')));
-  check('a cone is a reSHape cone', coneSrc.includes('cone(p.k1_radius, p.k1_height'));
-  check('a ring is a reSHape ring', ringSrc.includes('ring(p.r1_ring, p.r1_tube)'));
+  check('a cone is a reSHape cone', coneSrc.includes('cylinderElliptic(p.k1_radius, p.k1_height'));
+  check('a ring is a reSHape ring', ringSrc.includes('torus(p.r1_ring, p.r1_tube)'));
   // ring() refuses an options object because torus accepts `center` and drops
   // it silently. A positioned ring must therefore be a translate around one.
   check('a ring is positioned by translate, not by an argument',
-    ringSrc.includes('transforms.translate([p.r1_x') && !ringSrc.includes('ring(p.r1_ring, p.r1_tube, {'));
+    ringSrc.includes('transforms.translate([p.r1_x') && !ringSrc.includes('torus(p.r1_ring, p.r1_tube, {'));
 
   // The doc talks in ring-centre and tube thickness because that is what a
   // student can picture; JSCAD wants inner/outer. Getting that mapping backwards
@@ -159,7 +159,7 @@ module.exports = function run(dir) {
   const pull = (id, target, height = 12) => ({ id, kind: 'extrude', target, height });
 
   const flatOnly = gen.toReshape(doc(sketch('s1')));
-  check('a sketch is a reSHape poly', flatOnly.includes('poly([[p.s1_p0u'));
+  check('a sketch is a reSHape poly', flatOnly.includes('polygon([[p.s1_p0u'));
   check('...taking the list positionally, never an options object',
     !flatOnly.includes('poly({'));
   check('a bare sketch is not returned as the model',
@@ -759,7 +759,7 @@ module.exports = function run(dir) {
   check('a hole is a single subtract line, the cylinder built inline',
     holeSrc.includes(
       'booleans.subtract(b1, transforms.translate(centerOn(b1, [p.hole1_x, p.hole1_y, p.hole1_z]), ' +
-      'tube(p.hole1_diameter / 2, p.hole1_depth)))'
+      'cylinder(p.hole1_diameter / 2, p.hole1_depth)))'
     ));
   check('...no separate cylinder feature row exists to be returned',
     types.topLevel(holeDoc).map((f) => f.id).join() === 'hole1');
@@ -884,7 +884,7 @@ module.exports = function run(dir) {
     id: 'hole2', kind: 'hole', target: 'b1', diameter: 10, depth: 60, center: [0, 0, 0], axis: 'x',
   }));
   check('boring along x tilts the bit with rotateY, not the default Z bore',
-    holeXSrc.includes('transforms.rotateY(Math.PI / 2, tube('));
+    holeXSrc.includes('transforms.rotateY(Math.PI / 2, cylinder('));
 
   console.log('\n=== Repeat on a Hole repeats the bore, not the block ===');
 
@@ -1089,8 +1089,8 @@ module.exports = function run(dir) {
   console.log('\n=== sketch build 1: old docs are untouched ===');
 
   const plainSketchSrc = gen.toReshape(doc(sketch('s1')));
-  check('#9 no shape, no bulges: still poly([, byte-identical to before this build',
-    plainSketchSrc.includes(`poly([${sketch('s1').points.map((_, n) => `[p.s1_p${n}u, p.s1_p${n}v]`).join(', ')}])`));
+  check('#9 no shape, no bulges: still polygon([, byte-identical to before this build',
+    plainSketchSrc.includes(`polygon([${sketch('s1').points.map((_, n) => `[p.s1_p${n}u, p.s1_p${n}v]`).join(', ')}])`));
   check('...and neither new helper is pulled in for a doc that never uses them',
     !plainSketchSrc.includes('function discAcross(') && !plainSketchSrc.includes('function polyArc('));
 

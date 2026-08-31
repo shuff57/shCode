@@ -443,30 +443,30 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
   if (f.kind === 'box') {
     const size = `[p.${pname(f.id, 'width')}, p.${pname(f.id, 'depth')}, p.${pname(f.id, 'height')}]`;
     // reSHape takes plain numbers; the { size: [...] } spelling belongs to cuboid
-    // and box() throws on it deliberately, so there is one way to write each.
+    // and cuboid() throws on it deliberately, so there is one way to write each.
     const dims = `p.${pname(f.id, 'width')}, p.${pname(f.id, 'depth')}, p.${pname(f.id, 'height')}`;
-    if (!f.round) return place(`box(${dims}, { center: ${c} })`);
+    if (!f.round) return place(`cuboid(${dims}, { center: ${c} })`);
     if (f.roundStyle === 'chamfer') {
       needs.add('chamferBox');
       return place(`chamferBox(${size}, ${c}, p.${pname(f.id, 'round')})`);
     }
-    return place(`box(${dims}, { center: ${c}, roundRadius: p.${pname(f.id, 'round')} })`);
+    return place(`cuboid(${dims}, { center: ${c}, roundRadius: p.${pname(f.id, 'round')} })`);
   }
 
   if (f.kind === 'cylinder') {
     const r = `p.${pname(f.id, 'radius')}`;
     const h = `p.${pname(f.id, 'height')}`;
-    if (!f.round) return place(`tube(${r}, ${h}, { center: ${c} })`);
+    if (!f.round) return place(`cylinder(${r}, ${h}, { center: ${c} })`);
     if (f.roundStyle === 'chamfer') {
       needs.add('chamferCylinder');
       return place(`chamferCylinder(${r}, ${h}, ${c}, p.${pname(f.id, 'round')})`);
     }
-    return place(`tube(${r}, ${h}, { center: ${c}, roundRadius: p.${pname(f.id, 'round')} })`);
+    return place(`cylinder(${r}, ${h}, { center: ${c}, roundRadius: p.${pname(f.id, 'round')} })`);
   }
 
   if (f.kind === 'cone') {
-    // JSCAD has no cone(): a cylinder whose far end has zero radius is one.
-    return place(`cone(p.${pname(f.id, 'radius')}, p.${pname(f.id, 'height')}, { center: ${c} })`);
+    // JSCAD has no cylinderElliptic(): a cylinder whose far end has zero radius is one.
+    return place(`cylinderElliptic(p.${pname(f.id, 'radius')}, p.${pname(f.id, 'height')}, { center: ${c} })`);
   }
 
   if (f.kind === 'torus') {
@@ -475,23 +475,23 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
     // center, so it has to be moved afterwards or its position parameters would
     // be declared and never read, and the move handles would do nothing.
     needs.add('transforms');
-    // ring() refuses an options object, and rightly: torus accepts `center` and
+    // torus() refuses an options object, and rightly: torus accepts `center` and
     // silently drops it. So the position has to be a translate around the ring,
     // not an argument to it.
-    const donut = `ring(p.${pname(f.id, 'ring')}, p.${pname(f.id, 'tube')})`;
+    const donut = `torus(p.${pname(f.id, 'ring')}, p.${pname(f.id, 'tube')})`;
     return turned ? place(`transforms.translate(${c}, ${donut})`)
                   : `transforms.translate(${c}, ${donut})`;
   }
 
   if (f.kind === 'sphere') {
-    return place(`ball(p.${pname(f.id, 'radius')}, { center: ${c} })`);
+    return place(`sphere(p.${pname(f.id, 'radius')}, { center: ${c} })`);
   }
 
   if (f.kind === 'sketch') {
     // A circle is TAGGED, not inferred -- circleOf() in sketch-arc.ts is the
     // only other place that reads f.shape, and this is where the tag turns
     // into geometry. Two points is a diameter here, never "the outline";
-    // poly() on two points would draw a degenerate line, not a circle.
+    // polygon() on two points would draw a degenerate line, not a circle.
     if (f.shape === 'circle' && f.points.length === 2) {
       needs.add('discAcross');
       const a = `[p.${pname(f.id, 'p0u')}, p.${pname(f.id, 'p0v')}]`;
@@ -539,7 +539,7 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
     }
     // Byte-identical to every doc saved before shape/bulges existed -- see
     // check-sketch-compat.mjs, which pins exactly this.
-    return `poly([${pts}])`;
+    return `polygon([${pts}])`;
   }
 
   if (f.kind === 'extrude') {
@@ -555,11 +555,11 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
   }
 
   if (f.kind === 'revolve') {
-    // revolve() (reSHape) refuses an `angle` option by name -- see REAL_EXTRAS
+    // extrudeRotate() (reSHape) refuses an `angle` option by name -- see REAL_EXTRAS
     // in reshape.js -- and hands the student the real call instead. Build mode
     // exposes that exact angle as a dial, so it has to be the real call too:
     // extrudeRotate sweeps the profile around the world Z axis, taking the
-    // profile's own x as the radius, same as revolve(profile) would for the
+    // profile's own x as the radius, same as extrudeRotate(profile) would for the
     // full-circle case.
     needs.add('extrusions');
     return `extrusions.extrudeRotate({ angle: p.${pname(f.id, 'angle')} * Math.PI / 180 }, ${f.target})`;
@@ -589,8 +589,8 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
     needs.add('transforms');
     const r = `p.${pname(f.id, 'diameter')} / 2`;
     const depth = `p.${pname(f.id, 'depth')}`;
-    const bore = `tube(${r}, ${depth})`;
-    // tube() extrudes along Z; boring along x or y means tilting the bit 90
+    const bore = `cylinder(${r}, ${depth})`;
+    // cylinder() extrudes along Z; boring along x or y means tilting the bit 90
     // degrees before it is moved into place.
     const tilted = f.axis === 'x' ? `transforms.rotateY(Math.PI / 2, ${bore})`
       : f.axis === 'y' ? `transforms.rotateX(Math.PI / 2, ${bore})`
@@ -726,7 +726,7 @@ function holePatternLines(
   const count = `p.${pname(f.id, 'count')}`;
   const r = `p.${pname(h.id, 'diameter')} / 2`;
   const depth = `p.${pname(h.id, 'depth')}`;
-  const bore = `tube(${r}, ${depth})`;
+  const bore = `cylinder(${r}, ${depth})`;
   const tilted = h.axis === 'x' ? `transforms.rotateY(Math.PI / 2, ${bore})`
     : h.axis === 'y' ? `transforms.rotateX(Math.PI / 2, ${bore})`
     : bore;
@@ -822,13 +822,13 @@ function chamferBox(size, center, c) {
   const kx = y / 2 + z / 2 - c
   const ky = x / 2 + z / 2 - c
   const kz = x / 2 + y / 2 - c
-  let s = box(x, y, z, { center })
+  let s = cuboid(x, y, z, { center })
   s = booleans.intersect(s, transforms.translate(center,
-    transforms.rotateX(Math.PI / 4, box(long, kx * d, kx * d))))
+    transforms.rotateX(Math.PI / 4, cuboid(long, kx * d, kx * d))))
   s = booleans.intersect(s, transforms.translate(center,
-    transforms.rotateY(Math.PI / 4, box(ky * d, long, ky * d))))
+    transforms.rotateY(Math.PI / 4, cuboid(ky * d, long, ky * d))))
   s = booleans.intersect(s, transforms.translate(center,
-    transforms.rotateZ(Math.PI / 4, box(kz * d, kz * d, long))))
+    transforms.rotateZ(Math.PI / 4, cuboid(kz * d, kz * d, long))))
   return s
 }`,
   extrudeOnPlane: `// Pull a flat outline into a solid, on one of the three planes.
@@ -837,7 +837,7 @@ function chamferBox(size, center, c) {
 // plane is extruded flat first and the SOLID turned afterwards. Turning the
 // outline first is not possible -- a geom2 has no third axis to turn into.
 function extrudeOnPlane(sketch, height, plane, offset) {
-  const solid = extrude(height, sketch)
+  const solid = extrudeLinear(height, sketch)
   if (plane === 'xz') return transforms.translate([0, offset, 0], transforms.rotateX(Math.PI / 2, solid))
   if (plane === 'yz') return transforms.translate([offset, 0, 0], transforms.rotateY(-Math.PI / 2, solid))
   return transforms.translate([0, 0, offset], solid)
@@ -846,8 +846,8 @@ function extrudeOnPlane(sketch, height, plane, offset) {
 // and a tall narrow one.
 function chamferCylinder(radius, height, center, c) {
   return hulls.hull(
-    tube(radius, height - 2 * c, { center }),
-    tube(radius - c, height, { center })
+    cylinder(radius, height - 2 * c, { center }),
+    cylinder(radius - c, height, { center })
   )
 }`,
   shellOp: `// A hollow copy of a solid, approximated: scale a copy of the body inward
@@ -925,12 +925,12 @@ function rotateAbout(pivot, spin, shape) {
 // -- see SketchFeature.shape. The tag is the only source of truth for "is
 // this a circle," so this never has to guess from the point count.
 function discAcross(a, b) {
-  return disc(Math.hypot(b[0] - a[0], b[1] - a[1]) / 2,
+  return circle(Math.hypot(b[0] - a[0], b[1] - a[1]) / 2,
               { center: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2] })
 }`,
   polyArc: `// A closed outline whose edges can bend. bulges[i], if present and
 // nonzero, curves the edge LEAVING corner i into an arc instead of a
-// straight line -- 0 or a missing key is a straight edge, same as poly().
+// straight line -- 0 or a missing key is a straight edge, same as polygon().
 // bulge is tan(includedAngle / 4), the same convention lib/sketch-arc.ts
 // uses to build the corner's trim points in the first place.
 function polyArc(corners, bulges) {
@@ -1065,7 +1065,7 @@ export function toReshape(doc: ModelDoc): string {
   }
   if (needs.has('extrusions') && !modules.includes('extrusions')) modules.push('extrusions');
   // polyArc closes its sampled points into a geom2 by hand -- discAcross needs
-  // no raw jscad import at all, it only calls the reSHape global disc().
+  // no raw jscad import at all, it only calls the reSHape global circle().
   if (needs.has('polyArc') && !modules.includes('geometries')) modules.push('geometries');
 
   const defs = params
@@ -1094,7 +1094,7 @@ export function toReshape(doc: ModelDoc): string {
     helpers ? '' : null,
     'function main(p) {',
     lines.join('\n') || '  // Nothing here yet — add a shape.',
-    result ? `  return ${result}` : '  return box(1, 1, 1)',
+    result ? `  return ${result}` : '  return cuboid(1, 1, 1)',
     '}',
     '',
     'module.exports = { main, getParameterDefinitions }',

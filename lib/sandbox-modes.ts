@@ -56,12 +56,12 @@ function getParameterDefinitions() {
 
 function main(p) {
   const body = p.round > 0
-    ? box(p.width, p.depth, p.height, { roundRadius: p.round })
-    : box(p.width, p.depth, p.height)
+    ? cuboid(p.width, p.depth, p.height, { roundRadius: p.round })
+    : cuboid(p.width, p.depth, p.height)
 
   if (p.hole <= 0) return body
 
-  const drill = tube(p.hole, p.height * 2)
+  const drill = cylinder(p.hole, p.height * 2)
   return subtract(body, drill)
 }
 `;

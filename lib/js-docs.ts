@@ -749,7 +749,7 @@ console.log(player.score);    // 600`,
 
 The order of the keys does not matter — the names carry the meaning. And a setting can be left out entirely: the function checks for it, or the object simply does not have the key, which reads as undefined.
 
-This is the pattern the reSHape layer uses for its options: box(40, 20, 10, { roundRadius: 3 }) — the values a shape cannot exist without are positional, and everything named rides in the trailing object.`,
+This is the pattern the reSHape layer uses for its options: cuboid(40, 20, 10, { roundRadius: 3 }) — the values a shape cannot exist without are positional, and everything named rides in the trailing object.`,
         code: `function describePlayer(player) {
   console.log(
     player.name + " is level " + player.level +

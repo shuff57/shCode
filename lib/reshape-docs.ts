@@ -62,13 +62,13 @@ Underneath it is JSCAD, a JavaScript library that does the same job with longer 
 
 There is nothing to bring in. All twelve names are in scope the moment your file runs, and so is the rest of the library behind them: translate and rotate move a shape, union and subtract glue shapes together and cut holes in them.
 
-So the call below reads as plainly as it sounds. box(size, size, size / 4) is a box that wide, that deep, and a quarter as tall; tube(size / 8, size) is a rod of that radius and that height. Every reSHape program is one function called main that builds something and hands it back, and the next page takes that apart.`,
+So the call below reads as plainly as it sounds. cuboid(size, size, size / 4) is a box that wide, that deep, and a quarter as tall; cylinder(size / 8, size) is a rod of that radius and that height. Every reSHape program is one function called main that builds something and hands it back, and the next page takes that apart.`,
         code: `function main() {
   // Change this one number and every part below follows it.
   const size = 20
 
-  const plate = box(size, size, size / 4)
-  const post = tube(size / 8, size)
+  const plate = cuboid(size, size, size / 4)
+  const post = cylinder(size / 8, size)
 
   // Both parts are built centred on the middle of the grid, which is why the
   // post pokes out underneath as well. "Where a shape sits" explains that.
@@ -85,15 +85,15 @@ There is no line at the top bringing the library in, because the names are alrea
 
 Two habits worth starting now. Give each part its own variable, named for what it is. And when there is more than one part, return them in an array: [plate, sphere] draws both. Below, the plate is 3 tall and straddles the floor, so its top face is at 1.5; add the ball's radius of 6 and 7.5 is where the ball has to sit to rest on it. Working that out is the next page's subject.`,
         code: `function main() {
-  const plate = box(30, 30, 3)
+  const plate = cuboid(30, 30, 3)
 
   // The plate is 3 tall and sits astride the floor, so its top face is at 1.5.
-  // Add the sphere's radius of 6 and the sphere rests on the plate.
-  const sphere = translate([0, 0, 7.5],
-    ball(6)
+  // Add the mySphere's radius of 6 and the mySphere rests on the plate.
+  const mySphere = translate([0, 0, 7.5],
+    sphere(6)
   )
 
-  return [plate, sphere]
+  return [plate, mySphere]
 }`,
       },
       {
@@ -107,13 +107,13 @@ Two habits worth starting now. Give each part its own variable, named for what i
 
 Drag to orbit, hold Shift and drag to slide the view sideways, scroll to zoom. console.log output lands in the lesson editor's console panel, or your browser's own console (F12) where there is no panel. An error puts a red bar across the top of the viewport naming the problem and a line in script.js — the name this app gives your file.
 
-Step 1 does one extra thing worth knowing about. Before your file runs it puts the twelve reSHape names in scope, and every name the library underneath has as well. So box(20, 20, 20) works, and so does the longer spelling that box was written to replace, and the two build exactly the same shape. This course writes the short one. The last page of this section is where the long one starts to matter.`,
+Step 1 does one extra thing worth knowing about. Before your file runs it puts the twelve reSHape names in scope, and every name the library underneath has as well. So cuboid(20, 20, 20) works, and so does the longer spelling that box was written to replace, and the two build exactly the same shape. This course writes the short one. The last page of this section is where the long one starts to matter.`,
         code: `function main() {
   console.log('main() is running')
 
   // The library underneath spells this one cuboid({ size: [20, 20, 20] }),
   // and that works here too. Same shape, more punctuation.
-  const part = box(20, 20, 20)
+  const part = cuboid(20, 20, 20)
 
   console.log('built it - now handing it back to be drawn')
   return part
@@ -132,12 +132,12 @@ Do that arithmetic by hand while it is still new. reSHape has sit(shape) for it 
 X runs left and right, Y runs away from you and back, Z runs up and down. Numbers are millimetres, so a cube of size 10 is about a fingernail wide. The floor is ruled every 10 mm with finer lines every 1 mm. Sizes are written [x, y, z], and so are positions.`,
         code: `function main() {
   // Built where it lands: half of this one is under the floor.
-  const buried = box(10, 10, 10)
+  const buried = cuboid(10, 10, 10)
 
   // The same cube, lifted by half its height so it sits on the floor,
   // and slid 20 to the right so you can see both at once.
   const sitting = translate([20, 0, 5],
-    box(10, 10, 10)
+    cuboid(10, 10, 10)
   )
 
   return [buried, sitting]
@@ -154,7 +154,7 @@ That is also why translate is a function that takes a shape and gives one back. 
 So a reSHape program is really just this: make some values, combine them, return the result.`,
         code: `function main() {
   // One brick, built once and stored in a variable.
-  const brick = box(20, 10, 5)
+  const brick = cuboid(20, 10, 5)
 
   // translate hands back a NEW brick each time, so the original is untouched
   // and the same variable can be used three times over. Each lift is 5 more
@@ -181,10 +181,10 @@ Half the model is under the floor. Not an error, so no bar appears. Shapes are b
 Then two habits. Print before you change anything, and change one thing at a time — changing three and running once tells you nothing about which one it was. When the trouble is the geometry rather than the skeleton around it, the Debugging section goes further.`,
         code: `function main() {
   const plate = translate([0, 0, 2],
-    box(20, 20, 4)
+    cuboid(20, 20, 4)
   )
   const knob = translate([0, 0, 7],
-    box(6, 6, 6)
+    cuboid(6, 6, 6)
   )
 
   const parts = []
@@ -212,11 +212,11 @@ The tag below is a file worth taking over. subtract cuts the second shape out of
   const thickness = 4
 
   const plate = translate([0, 0, thickness / 2],
-    box(60, 20, thickness)
+    cuboid(60, 20, thickness)
   )
 
   const hole = translate([-22, 0, thickness / 2],
-    tube(3, thickness * 3)
+    cylinder(3, thickness * 3)
   )
 
   return subtract(plate, hole)
@@ -232,36 +232,36 @@ The tag below is a file worth taking over. subtract cuts the second shape out of
         title: 'Your first solid',
         body: `A primitive is a ready-made shape. You call it by name, hand it the measurements, and get geometry back.
 
-box() makes a box. Three numbers: width along X, depth along Y, height along Z. It is built around the origin, so box(30, 20, 10) runs from -15 to 15 across. Each big square on the viewer's grid is 10 units wide, so you can count it.
+cuboid() makes a box. Three numbers: width along X, depth along Y, height along Z. It is built around the origin, so cuboid(30, 20, 10) runs from -15 to 15 across. Each big square on the viewer's grid is 10 units wide, so you can count it.
 
-Anything beyond the measurements rides in an options object — settings inside curly braces, written after the numbers. center is the one you will reach for first: box(6, 6, 30, { center: [0, 0, 20] }) is the same post built somewhere else. The braces turn up only when the shape needs something it cannot exist without, which is why the first line you ever write has none.
+Anything beyond the measurements rides in an options object — settings inside curly braces, written after the numbers. center is the one you will reach for first: cuboid(6, 6, 30, { center: [0, 0, 20] }) is the same post built somewhere else. The braces turn up only when the shape needs something it cannot exist without, which is why the first line you ever write has none.
 
 main() must return a shape, or an array of shapes. The library underneath spells this one primitives.cuboid({ size: [30, 20, 10] }); every page in this section names its long form the same way, so that taking a model to jscad.app later is a lookup rather than a translation.`,
         code: `function main() {
-  const slab = box(30, 20, 10)          // -15..15, -10..10, -5..5
-  const post = box(6, 6, 30, { center: [0, 0, 20] })
+  const slab = cuboid(30, 20, 10)          // -15..15, -10..10, -5..5
+  const post = cuboid(6, 6, 30, { center: [0, 0, 20] })
   return [slab, post]
 }`,
       },
       {
-        title: 'A cube is a box with three equal numbers',
-        body: `There is no separate cube. box(20, 20, 20) is one, and typing the number three times is the whole trick — no size array, no second function to remember.
+        title: 'A cube is a cuboid with three equal numbers',
+        body: `There is no separate cube. cuboid(20, 20, 20) is one, and typing the number three times is the whole trick — no size array, no second function to remember.
 
 That is worth dwelling on, because the library underneath does have two of them and they are where a first mistake usually happens. cube({ size: 20 }) takes a plain number; cuboid({ size: [20, 20, 20] }) takes an array; swap them and you get size must be an array of width, depth and height values. box has no array to get wrong.
 
-It does count. box(10) stops with box needs three numbers: box(width, depth, height). The depth is missing. And box({ size: 20 }) — the object form, copied out of the real docs — is answered by name: box takes plain numbers: box(width, depth, height). The JSCAD version that takes a { } object is called cuboid.
+It does count. cuboid(10) stops with box needs three numbers: cuboid(width, depth, height). The depth is missing. And cuboid({ size: 20 }) — the object form, copied out of the real docs — is answered by name: box takes plain numbers: cuboid(width, depth, height). The JSCAD version that takes a { } object is called cuboid.
 
-One mistake gets no complaint from either. A zero is legal: box(20, 0, 20) builds a box with no faces at all and renders as nothing. If a shape vanishes, look for a zero.`,
+One mistake gets no complaint from either. A zero is legal: cuboid(20, 0, 20) builds a box with no faces at all and renders as nothing. If a shape vanishes, look for a zero.`,
         code: `function main() {
   // Three equal numbers is a cube. Change one and it is not.
-  const solid = box(20, 20, 20)
-  const slab = box(20, 20, 4, { center: [30, 0, 0] })
+  const solid = cuboid(20, 20, 20)
+  const slab = cuboid(20, 20, 4, { center: [30, 0, 0] })
   return [solid, slab]
 }`,
       },
       {
-        title: 'ball, and what segments cost',
-        body: `ball() takes a radius. A radius of 10 gives a ball 20 units across.
+        title: 'sphere, and what segments cost',
+        body: `sphere() takes a radius. A radius of 10 gives a ball 20 units across.
 
 A computer cannot store a real curve, so it is faked with flat faces. segments is how many slices it cuts going around, and it is the option you will meet on nearly every round shape. The default is 32.
 
@@ -269,14 +269,14 @@ The price rises fast, as the comments below show. All three balls are exactly 20
 
 Underneath, ball is primitives.sphere({ radius: 10 }).`,
         code: `function main() {
-  const rough = ball(10, { segments: 8, center: [-25, 0, 0] })   // 32 faces
-  const plain = ball(10)                                    // 512 faces
-  const smooth = ball(10, { segments: 64, center: [25, 0, 0] }) // 2048 faces
+  const rough = sphere(10, { segments: 8, center: [-25, 0, 0] })   // 32 faces
+  const plain = sphere(10)                                    // 512 faces
+  const smooth = sphere(10, { segments: 64, center: [25, 0, 0] }) // 2048 faces
   return [rough, plain, smooth]
 }`,
       },
       {
-        title: 'geodesicSphere, a ball built from triangles',
+        title: 'geodesicSphere, a sphere built from triangles',
         body: `geodesicSphere() is the other ball, and it is the first shape on these pages with no short name of its own. reSHape covers twelve; everything else in the library you call by the name it already has, exactly the way you call translate. Nothing is missing, the word is just longer.
 
 Every one of its faces is a triangle of nearly the same size — a football, or a climbing wall — instead of a ball's stack of rings.
@@ -286,15 +286,15 @@ It ignores segments. Its detail knob is frequency, which must be six or more and
 It ignores center too, so the example below moves it with translate() instead. One more surprise: at frequency 6 a radius-10 ball measures 17.01 across, not 20, because 20 flat triangles cut the corners off.`,
         code: `function main() {
   const geo = geodesicSphere({ radius: 10, frequency: 12 })
-  const round = ball(10, { segments: 16 })
+  const round = sphere(10, { segments: 16 })
   return [translate([-13, 0, 0], geo), translate([13, 0, 0], round)]
 }`,
       },
       {
-        title: 'ellipsoid, a ball stretched by axis',
+        title: 'ellipsoid, a sphere stretched by axis',
         body: `ellipsoid() is a ball with a separate radius for each direction, and another of the library's own names. Its radius option is an array of three numbers — X, Y, Z — so radius [20, 10, 10] gives an egg 40 long, 20 wide and 20 tall.
 
-Unlike ball() it will not take a plain number: ellipsoid({ radius: 5 }) stops with radius must be an array of X, Y and Z values.
+Unlike sphere() it will not take a plain number: ellipsoid({ radius: 5 }) stops with radius must be an array of X, Y and Z values.
 
 Give it three equal radii and you get a ball — same 512 faces, same shape. So reach for it whenever a design might need squashing later: change one number in the array instead of swapping the shape out.`,
         code: `function main() {
@@ -304,8 +304,8 @@ Give it three equal radii and you get a ball — same 512 faces, same shape. So 
 }`,
       },
       {
-        title: 'tube, for posts and discs',
-        body: `tube() needs a radius and a height. It stands up the Z axis and is centred on the origin, so tube(4, 40) reaches from -20 to 20 and measures 8 across.
+        title: 'cylinder, for posts and discs',
+        body: `cylinder() needs a radius and a height. It stands up the Z axis and is centred on the origin, so cylinder(4, 40) reaches from -20 to 20 and measures 8 across.
 
 segments works the same way it did on the ball, but the cost is far gentler: a tube spends three faces per segment — one panel of the side wall and a wedge of each end cap. So 8 segments is 24 faces where a ball at 8 already costs 32.
 
@@ -313,20 +313,20 @@ A short, wide tube is a disc. A tall, thin one is a post or a peg. Most of the h
 
 Underneath, tube is primitives.cylinder({ radius: 4, height: 40 }).`,
         code: `function main() {
-  const post = tube(4, 40)   // 8 across, z -20..20, 96 faces
-  const base = tube(20, 3, { center: [0, 0, -21] })
+  const post = cylinder(4, 40)   // 8 across, z -20..20, 96 faces
+  const base = cylinder(20, 3, { center: [0, 0, -21] })
   return [post, base]
 }`,
       },
       {
-        title: 'cone, and oval tubes',
-        body: `A tube has one radius all the way up. cone() has a radius at the bottom and a point at the top: cone(12, 30) is 24 across, 30 tall, and takes the same center and segments options everything else round does.
+        title: 'cylinderElliptic, for cones and oval tubes',
+        body: `A tube has one radius all the way up. cylinderElliptic() has a radius at the bottom and a point at the top: cylinderElliptic(12, 30) is 24 across, 30 tall, and takes the same center and segments options everything else round does.
 
 There is no tapering option on a tube, and no half-measure between the two. Worth saying plainly, because you will read otherwise: the library's cylinder({ radius: [12, 0] }) does not make a cone. It stops with radius must be positive.
 
 Underneath, cone is cylinderElliptic — a shape with a pair of radii at each end, an X radius and a Y radius, which is more than cone's two numbers carry. That pair is what makes an oval tube: startRadius and endRadius of [15, 5] gives a tube 30 wide and 10 deep, as below. Ask cone for a startRadius and it hands you that call back, spelled out. Zeroing both ends of cylinderElliptic() fails too — at least one radius must be positive.`,
         code: `function main() {
-  const point = cone(12, 30)
+  const point = cylinderElliptic(12, 30)
   const oval = cylinderElliptic({
     height: 30,
     startRadius: [15, 5],
@@ -337,16 +337,16 @@ Underneath, cone is cylinderElliptic — a shape with a pair of radii at each en
 }`,
       },
       {
-        title: 'ring, the donut',
-        body: `ring(ringRadius, tubeRadius) is a donut. The first number is the radius of the circle the tube travels along; the second is how thick the tube is.
+        title: 'torus, the donut',
+        body: `torus(ringRadius, tubeRadius) is a donut. The first number is the radius of the circle the tube travels along; the second is how thick the tube is.
 
-So ring(10, 4) is 28 across overall, and the hole through the middle is exactly 12 across: a post of radius 6 slides through untouched, one of radius 6.2 does not.
+So torus(10, 4) is 28 across overall, and the hole through the middle is exactly 12 across: a post of radius 6 slides through untouched, one of radius 6.2 does not.
 
-Fix that order in your head, because the library underneath has it the other way about and names both radii misleadingly. torus({ outerRadius: 10, innerRadius: 4 }) is the same donut — its outerRadius is the travel circle, not the outside edge, and its innerRadius is the tube. ring exists to say those two things in the order you think them, and it catches the swap by name: ring(4, 10) stops with a tube 10 thick will not fit round a ring of radius 4 — ring(10, 4) is the one you meant.
+Fix that order in your head, because the library underneath has it the other way about and names both radii misleadingly. torus({ outerRadius: 10, innerRadius: 4 }) is the same donut — its outerRadius is the travel circle, not the outside edge, and its innerRadius is the tube. ring exists to say those two things in the order you think them, and it catches the swap by name: torus(4, 10) stops with a tube 10 thick will not fit round a ring of radius 4 — torus(10, 4) is the one you meant.
 
 ring takes no options at all, because the library's torus has none worth passing on: it has no center and no segments and drops both silently. So translate a ring to move it, and call torus itself when you want innerSegments and outerSegments.`,
         code: `function main() {
-  const smooth = ring(10, 4)   // 2048 faces
+  const smooth = torus(10, 4)   // 2048 faces
   const chunky = torus({                                      // 128 faces
     outerRadius: 10,
     innerRadius: 4,
@@ -360,14 +360,14 @@ ring takes no options at all, because the library's torus has none worth passing
         title: 'Rounding the edges off a solid',
         body: `Real objects rarely have knife-sharp edges. box, rect and tube all take roundRadius — how big that curve is — and filing the edges down is the only thing it changes.
 
-The outside size does not move. box(30, 20, 10, { roundRadius: 3 }) still measures 30 by 20 by 10. The face count does, because a curve has to be built from flat faces like every other curve: 614 instead of 6. Lower segments if that gets slow — 8 brings the same box down to 62.
+The outside size does not move. cuboid(30, 20, 10, { roundRadius: 3 }) still measures 30 by 20 by 10. The face count does, because a curve has to be built from flat faces like every other curve: 614 instead of 6. Lower segments if that gets slow — 8 brings the same box down to 62.
 
 The roundRadius has to fit, and the refusal comes back in your numbers rather than the library's. Too big on a box gives roundRadius 12 is too big for a 30 x 20 x 10 box — it must be less than 5. A tube has two ways to fail and answers each separately: too big for its radius, or too big for a tube 8 tall.
 
 Underneath, roundRadius is what picks the second function. box becomes primitives.roundedCuboid, tube becomes primitives.roundedCylinder, rect becomes primitives.roundedRectangle; without one you get plain cuboid, cylinder and rectangle.`,
         code: `function main() {
-  const pad = box(30, 20, 10, { roundRadius: 3 })                  // 614 faces, not 6
-  const pill = tube(6, 30, { roundRadius: 3, center: [40, 0, 0] }) // 544 faces, not 96
+  const pad = cuboid(30, 20, 10, { roundRadius: 3 })                  // 614 faces, not 6
+  const pill = cylinder(6, 30, { roundRadius: 3, center: [40, 0, 0] }) // 544 faces, not 96
   return [pad, pill]
 }`,
       },
@@ -392,40 +392,40 @@ List each face's corners counter-clockwise as seen from outside. Nothing will wa
 }`,
       },
       {
-        title: 'rect, the flat box',
+        title: 'rectangle, the flat box',
         body: `The rest of the primitives are flat. They live in the XY plane with no thickness at all, and the Extrusions section is where they turn into solids.
 
 Expect them to look wrong at first. A rect has a real width and height but a thickness of exactly 0, so from most camera angles it is a hairline. Spin the view until you are looking down on it.
 
-rect(width, height) is the flat box: two numbers where box takes three, and the same options after them. center takes two numbers here rather than three, and roundRadius rounds the corners the same way it files the edges off a box. There is no separate square either — rect(20, 20) is one.
+rectangle(width, height) is the flat box: two numbers where box takes three, and the same options after them. center takes two numbers here rather than three, and roundRadius rounds the corners the same way it files the edges off a box. There is no separate square either — rectangle(20, 20) is one.
 
 Underneath, rect is primitives.rectangle({ size: [30, 20] }), or roundedRectangle when it has a roundRadius. The library's square({ size: 20 }) takes a plain number rather than an array, which is the flat twin of the cube/cuboid confusion box does away with.`,
         code: `function main() {
-  const wide = rect(30, 20)                                        // 4 corners
-  const even = rect(20, 20, { center: [40, 0] })
-  const soft = rect(30, 20, { roundRadius: 5, center: [-40, 0] })  // 36 corners
+  const wide = rectangle(30, 20)                                        // 4 corners
+  const even = rectangle(20, 20, { center: [40, 0] })
+  const soft = rectangle(30, 20, { roundRadius: 5, center: [-40, 0] })  // 36 corners
   return [wide, even, soft]
 }`,
       },
       {
-        title: 'disc, and ellipse',
-        body: `disc(radius) is the flat version of the ball, and takes the same two options: center, and segments for how many corners it is really made of. The default is 32.
+        title: 'circle, and ellipse',
+        body: `circle(radius) is the flat version of the ball, and takes the same two options: center, and segments for how many corners it is really made of. The default is 32.
 
-Here you can measure the lie. A true circle of radius 12 covers 452.4 square units; disc(12) covers 449.5 at the default 32 segments, 451.7 at 64, and only 374.1 at 6 — where you have plainly asked for a hexagon.
+Here you can measure the lie. A true circle of radius 12 covers 452.4 square units; circle(12) covers 449.5 at the default 32 segments, 451.7 at 64, and only 374.1 at 6 — where you have plainly asked for a hexagon.
 
 ellipse() is to disc what ellipsoid is to ball: its radius is an array, [across, up]. It is the library's own name, with no short form here. Everything you extrude, and every hole you cut, starts as one of these two.
 
 Underneath, disc is primitives.circle({ radius: 12 }).`,
         code: `function main() {
-  const hexagon = disc(12, { segments: 6, center: [-30, 0] })
-  const round = disc(12)
+  const hexagon = circle(12, { segments: 6, center: [-30, 0] })
+  const round = circle(12)
   const squashed = ellipse({ radius: [20, 8], center: [40, 0] })  // 40 wide, 16 tall
   return [hexagon, round, squashed]
 }`,
       },
       {
-        title: 'poly, any outline you can list',
-        body: `poly(points) draws whatever outline you can describe as a list of corners: an array of [x, y] pairs, walked in order, with the last joined back to the first for you.
+        title: 'polygon, any outline you can list',
+        body: `polygon(points) draws whatever outline you can describe as a list of corners: an array of [x, y] pairs, walked in order, with the last joined back to the first for you.
 
 The L below is six corners, 30 by 25, covering 594 square units.
 
@@ -433,7 +433,7 @@ Walk the corners counter-clockwise. Go round the other way and it still builds, 
 
 Two corners is not an outline, and poly says so in those words: poly needs at least three corners to enclose anything. You gave it two. Underneath is primitives.polygon({ points: [...] }), which answers the same mistake with list of points 0 must contain three or more points — naming a list index you never wrote, which is the reason poly checks first. polygon is the one to call when you want several outlines at once, or control over their orientation.`,
         code: `function main() {
-  return poly([[0, 0], [30, 0], [30, 12], [18, 12], [18, 25], [0, 25]])
+  return polygon([[0, 0], [30, 0], [30, 12], [18, 12], [18, 25], [0, 25]])
 }`,
       },
       {
@@ -469,12 +469,12 @@ Leave innerRadius out and one is worked out from density — how many points to 
 
 arc() takes radius, startAngle and endAngle in radians, plus segments. line() takes a bare array of points and no options object at all — line({ points: [...] }) stops with points must be an array.
 
-A path has no area, so an open one cannot be extruded: extrude() on one gives extruded path must be closed. Called with no options arc() draws a whole circle, and that one is closed. When what you want is a filled outline rather than a stroke, use poly().`,
+A path has no area, so an open one cannot be extruded: extrudeLinear() on one gives extruded path must be closed. Called with no options arc() draws a whole circle, and that one is closed. When what you want is a filled outline rather than a stroke, use polygon().`,
         code: `function main() {
   // a quarter turn: 7 points, running from [20, 0] round to [0, 20]
   const curve = arc({ radius: 20, startAngle: 0, endAngle: Math.PI / 2, segments: 24 })
   const zigzag = line([[-45, 0], [-35, 15], [-25, 0], [-15, 15]])   // a bare array
-  const solid = poly([[10, -12], [34, -12], [34, 12], [10, 12]])
+  const solid = polygon([[10, -12], [34, -12], [34, 12], [10, 12]])
   return [curve, zigzag, solid]
 }`,
       },
@@ -494,7 +494,7 @@ So a shape is worth keeping in a variable. Build a part once, then make as many 
 
 If you ever write translate([0, 0, 8], brick) on a line of its own and wonder why nothing moved: nothing was meant to. The copy was made and then thrown away, because you did not keep it.`,
       code: `function main() {
-  const brick = box(24, 10, 4)
+  const brick = cuboid(24, 10, 4)
 
   // Each of these is a NEW brick. The original is untouched.
   const middle = translate([0, 0, 8], brick)
@@ -513,7 +513,7 @@ A 2D shape takes two numbers instead of three — translate([10, 5], disc) — b
 
 This is how a design with several parts gets assembled: build each part at the origin, where the numbers are easy to think about, then translate it into its place in the finished object.`,
       code: `function main() {
-  const leg = box(6, 6, 30, { center: [0, 0, 15] })
+  const leg = cuboid(6, 6, 30, { center: [0, 0, 15] })
 
   const parts = []
   for (const x of [-20, 20]) {
@@ -523,7 +523,7 @@ This is how a design with several parts gets assembled: build each part at the o
   }
 
   parts.push(translate([0, 0, 32],
-    box(56, 56, 4)
+    cuboid(56, 56, 4)
   ))
   return parts
 }`,
@@ -540,7 +540,7 @@ They are not new powers, just shorter spellings of one you already have. A stack
 
 Where the long form wins is a diagonal move, or placing a part with all three coordinates at once. One translate([x, y, z], part) beats three calls chained together.`,
       code: `function main() {
-  const plate = box(40, 40, 3)
+  const plate = cuboid(40, 40, 3)
 
   const stack = [plate]
   for (const height of [10, 20, 30]) {
@@ -560,7 +560,7 @@ Picture each one as a skewer through the shape. rotateZ spins it like a record o
 
 Angles are in radians, not degrees. A full turn is 2 * Math.PI, a half turn is Math.PI, and a quarter turn is Math.PI / 2. Those three cover most of what you need; the next page deals with the awkward angles in between.`,
       code: `function main() {
-  const bar = box(40, 6, 2)
+  const bar = cuboid(40, 6, 2)
 
   const flat = translateY(-20, bar)
   const tipped = rotateX(Math.PI / 2, bar)
@@ -580,7 +580,7 @@ Careful with one name. Written on its own inside this app, utils is the top-leve
 In the example the hand is built running out from the middle, so turning it sweeps a clock face rather than spinning on the spot.`,
       code: `function main() {
   // Built from the middle outwards, so a turn sweeps it like a clock hand.
-  const hand = box(30, 3, 3, { center: [15, 0, 0] })
+  const hand = cuboid(30, 3, 3, { center: [15, 0, 0] })
 
   console.log('90 degrees is', degToRad(90), 'radians')
 
@@ -604,7 +604,7 @@ So these two lines do completely different things:
 
 Neither is wrong. Swinging is how you arrange parts in a ring; spinning in place is how you tilt one part of an assembly. Just decide which one you meant, and read the line from the inside out to check.`,
       code: `function main() {
-  const arm = box(30, 6, 6)
+  const arm = cuboid(30, 6, 6)
 
   // Moved out first, so the turn swings it around the origin.
   const swung = rotateZ(Math.PI / 4, translate([50, 0, 0], arm))
@@ -627,7 +627,7 @@ A multiplier of 1 means leave that axis alone, so two of the three numbers are u
 
 Scaling a solid scales everything about it, including wall thickness and hole diameters. A case scaled up by 2 has holes twice as wide, which is rarely what anyone wanted — resize a part by changing the numbers you built it from, and keep scale for squashing and stretching.`,
       code: `function main() {
-  const block = box(16, 16, 16)
+  const block = cuboid(16, 16, 16)
 
   const wide = translateX(-45, scale([2, 1, 1], block))
   const tall = translateX(45, scaleZ(2, block))
@@ -645,13 +645,13 @@ That is not a bug, it is what multiplying by 2 means. It does explain the classi
 
 The habit that avoids it: scale a shape while it is still at the origin, and translate it into place afterwards. Same rule as rotation, and the same reason.`,
       code: `function main() {
-  const sphere = ball(10, { segments: 24, center: [30, 0, 0] })
-  const doubled = scale([2, 2, 2], sphere)
+  const mySphere = sphere(10, { segments: 24, center: [30, 0, 0] })
+  const doubled = scale([2, 2, 2], mySphere)
 
-  console.log('before:', measureBoundingBox(sphere))
+  console.log('before:', measureBoundingBox(mySphere))
   console.log('after :', measureBoundingBox(doubled))
 
-  return [sphere, doubled]
+  return [mySphere, doubled]
 }`,
     },
     {
@@ -665,8 +665,8 @@ The trick is where you build the first half. Build it entirely on one side of th
 Mirroring is not the same as turning. A mirrored part is a reflection, like your left hand against your right, and no amount of rotating will make one sit on top of the other.`,
       code: `function main() {
   // Both pieces are built entirely to the left of x = 0.
-  const wall = box(8, 40, 20, { center: [-16, 0, 10] })
-  const foot = box(24, 40, 4, { center: [-12, 0, 2] })
+  const wall = cuboid(8, 40, 20, { center: [-16, 0, 10] })
+  const foot = cuboid(24, 40, 4, { center: [-12, 0, 2] })
 
   const rightWall = mirrorX(wall)
   const rightFoot = mirrorX(foot)
@@ -682,8 +682,8 @@ normal is the direction the mirror faces, not a line drawn on it — [0, 1, 0] i
 
 One trap, because it does not announce itself. The options object belongs to the long form only. Hand one to a shortcut — mirrorX({ normal: [1, 0, 0] }, half) — and the shortcut takes that object for a second shape to mirror. Nothing throws. Back comes an array holding your options object and one correctly mirrored shape, and the viewport ignores the object and draws the shape, so at a glance it looks fine. The damage lands at the next step: union that array and you get an empty solid, measuring [[0,0,0],[0,0,0]]. A symmetric part that measures as nothing is the symptom to look for.`,
       code: `function main() {
-  const wall = box(40, 2, 12, { center: [0, 10, 6] })
-  const tab = box(30, 10, 4, { center: [0, 25, 2] })
+  const wall = cuboid(40, 2, 12, { center: [0, 10, 6] })
+  const tab = cuboid(30, 10, 4, { center: [0, 25, 2] })
 
   // A mirror facing Y, standing at y = 10 — the plane the wall sits on.
   const flipped = mirror({ normal: [0, 1, 0], origin: [0, 10, 0] }, tab)
@@ -701,7 +701,7 @@ You can centre one axis at a time, either with options — center({ axes: [true,
 
 Hand center several shapes at once and it centres each one separately, so they all end up stacked on the origin instead of keeping their spacing. That is almost never what an assembly wants. align, on the next page, is the tool for lining several parts up.`,
       code: `function main() {
-  const off = box(20, 10, 6, { center: [30, 12, 9] })
+  const off = cuboid(20, 10, 6, { center: [30, 12, 9] })
 
   const middled = center({}, off)
   const dropped = centerZ(off)
@@ -727,9 +727,9 @@ Write the modes out even when the defaults would do. Called with no modes at all
 
 The measurements section does this same job by hand — measure the bounding box, then translate up by -box[0][2]. Keep both. Measuring hands you the number, and a number can be used in arithmetic; align is the shorter road when all you want is the part on the floor.`,
       code: `function main() {
-  const shortOne = box(16, 16, 10, { center: [-30, 0, 25] })
-  const middleOne = box(16, 16, 24, { center: [0, 0, 40] })
-  const tallOne = box(16, 16, 40, { center: [30, 0, 5] })
+  const shortOne = cuboid(16, 16, 10, { center: [-30, 0, 25] })
+  const middleOne = cuboid(16, 16, 24, { center: [0, 0, 40] })
+  const tallOne = cuboid(16, 16, 40, { center: [30, 0, 5] })
 
   // Leave X and Y alone; drop each one until it rests on the grid.
   return align(
@@ -745,8 +745,8 @@ Any axis you are not interested in gets null, and null means leave that coordina
 
 There is one more option worth knowing about before you need it. By default each shape is aligned on its own, which is what let the previous page drop three separate towers onto the grid. Add grouped: true and the shapes move together as one set, keeping the gaps between them — which is what you want when the thing being aligned is a finished assembly rather than a pile of parts.`,
       code: `function main() {
-  const shelf = box(60, 30, 4, { center: [0, 0, 40] })
-  const boss = box(10, 10, 14, { center: [20, 8, 0] })
+  const shelf = cuboid(60, 30, 4, { center: [0, 0, 40] })
+  const boss = cuboid(10, 10, 14, { center: [20, 8, 0] })
 
   // The top of the shelf is at z = 42. Put the bottom of the boss there.
   const seated = align(
@@ -769,13 +769,13 @@ Doing it this way buys you one thing: the move becomes a value. You can name it,
   // One move, stored: up 12 mm. Now it has a name.
   const lift = mat4.fromTranslation(mat4.create(), [0, 0, 12])
 
-  const cuboid = box(12, 12, 4)
-  const sphere = ball(5, { segments: 24 })
+  const myCuboid = cuboid(12, 12, 4)
+  const mySphere = sphere(5, { segments: 24 })
 
   return [
-    cuboid,
-    transform(lift, cuboid),
-    translateX(30, transform(lift, sphere)),
+    myCuboid,
+    transform(lift, myCuboid),
+    translateX(30, transform(lift, mySphere)),
   ]
 }`,
     },
@@ -789,7 +789,7 @@ Swap the two and you get a different object, not a different spelling of the sam
 
 You do not need any of this to build things — the named transforms do everything a lesson asks for. It starts being worth the trouble when the same combined move is applied over and over, because a joined matrix is one step where nested calls are two.`,
       code: `function main() {
-  const bar = box(30, 6, 6, { center: [15, 0, 0] })
+  const bar = cuboid(30, 6, 6, { center: [15, 0, 0] })
 
   const spin = mat4.fromZRotation(mat4.create(), Math.PI / 2)
   const move = mat4.fromTranslation(mat4.create(), [50, 0, 0])
@@ -824,9 +824,9 @@ Change the 30 in translateZ to 80 so the two never touch. union still returns on
 
 union takes as many shapes as you like: union(a, b, c).`,
       code: `function main() {
-  const bar = box(120, 30, 30)
+  const bar = cuboid(120, 30, 30)
   const post = translateZ(30,
-    box(30, 30, 90)
+    cuboid(30, 30, 90)
   )
 
   const merged = union(bar, post)
@@ -848,10 +848,10 @@ Nothing says a cutter has to be round, either. A box cuts a slot, a star cuts a 
 
 Change radius from 20 to 35 and the hole grows with it.`,
       code: `function main() {
-  const plate = box(120, 80, 12)
+  const plate = cuboid(120, 80, 12)
 
   // Taller than the plate on purpose. Two pages on is about why.
-  const drill = tube(20, 40, { segments: 48 })
+  const drill = cylinder(20, 40, { segments: 48 })
 
   return subtract(plate, drill)
 }`,
@@ -866,8 +866,8 @@ union and intersect do not care. union(a, b) and union(b, a) are the same solid.
 
 Swap the two names in the return line to look at the other one.`,
       code: `function main() {
-  const plate = box(120, 80, 12)
-  const drill = tube(20, 40, { segments: 48 })
+  const plate = cuboid(120, 80, 12)
+  const drill = cylinder(20, 40, { segments: 48 })
 
   const plateWithHole = subtract(plate, drill)
   const drillWithBite = subtract(drill, plate)
@@ -888,15 +888,15 @@ The console counts the damage: 102669 against 100163 is 2506 cubic mm that shoul
 
 The extra length costs nothing — it is thrown away with the rest of the cut. Change short to through in the return line and the hole opens.`,
       code: `function main() {
-  const plate = box(120, 80, 12)
+  const plate = cuboid(120, 80, 12)
 
   // Same height as the plate, and 2 mm out of line.
   const short = translateZ(-2,
-    tube(20, 12, { segments: 48 })
+    cylinder(20, 12, { segments: 48 })
   )
 
   // Longer at both ends. Nothing to line up, so nothing to get wrong.
-  const through = tube(20, 40, { segments: 48 })
+  const through = cylinder(20, 40, { segments: 48 })
 
   console.log('cutter the same height:', Math.round(measureVolume(subtract(plate, short))))
   console.log('cutter made longer:', Math.round(measureVolume(subtract(plate, through))))
@@ -914,8 +914,8 @@ The console prints the rod's volume and the puck's, so you can see how much of i
 
 Change the slab's 40 to 160 and the puck grows into most of the rod.`,
       code: `function main() {
-  const rod = tube(45, 200, { segments: 48 })
-  const slab = box(140, 140, 40)
+  const rod = cylinder(45, 200, { segments: 48 })
+  const slab = cuboid(140, 140, 40)
 
   const puck = intersect(rod, slab)
 
@@ -935,9 +935,9 @@ subtract does the same thing whenever the cutter covers the whole of the base.
 
 Return shared on its own instead of the array, and the viewport goes completely empty.`,
       code: `function main() {
-  const lower = box(80, 80, 40)
+  const lower = cuboid(80, 80, 40)
   const upper = translateZ(120,
-    box(80, 80, 40)
+    cuboid(80, 80, 40)
   )
 
   const shared = intersect(lower, upper)
@@ -956,8 +956,8 @@ scission finds the separate lumps and hands them back in an array. Each one meas
 
 Give scission a solid that is already in one piece and you get an array of one.`,
       code: `function main() {
-  const bar = box(140, 40, 20)
-  const saw = box(10, 60, 40)
+  const bar = cuboid(140, 40, 20)
+  const saw = cuboid(10, 60, 40)
 
   // One solid, even though it now holds two lumps that never touch.
   const cut = subtract(bar, saw)
@@ -980,8 +980,8 @@ So the order is: build the parts, do the booleans, colorize what comes out. Pain
 
 The console prints undefined for the plate that was painted too early, and the four numbers of tomato for the one painted last.`,
       code: `function main() {
-  const plate = box(120, 80, 12)
-  const drill = tube(20, 40, { segments: 48 })
+  const plate = cuboid(120, 80, 12)
+  const drill = cylinder(20, 40, { segments: 48 })
 
   // colorize wants an array of numbers, so turn the name into one first.
   const tomato = colorNameToRgb('tomato')
@@ -1009,8 +1009,8 @@ There are two reSHape names for it. extrude pushes a profile straight up; revolv
 
 Below are two shapes: the profile on its own, still flat, and the solid that extrude made out of it. The outline did not change at all. It only gained a third dimension.`,
       code: `function main() {
-  const outline = rect(40, 20)
-  const solid = extrude(8, outline)
+  const outline = rectangle(40, 20)
+  const solid = extrudeLinear(8, outline)
 
   return [
     translateX(-40, outline),
@@ -1019,37 +1019,37 @@ Below are two shapes: the profile on its own, still flat, and the solid that ext
 }`,
     },
     {
-      title: 'extrude',
-      body: `extrude(height, profile) pushes a profile straight up and hands back a solid. The profile becomes the bottom face, a copy of it becomes the top face, and flat sides join the two.
+      title: 'extrudeLinear',
+      body: `extrudeLinear(height, profile) pushes a profile straight up and hands back a solid. The profile becomes the bottom face, a copy of it becomes the top face, and flat sides join the two.
 
 The height comes first and comes plain — no braces anywhere in the call. Change that one number and the same outline is a thin badge or a tall post, with nothing else in the file touched, which is most of the reason for designing in code rather than by dragging.
 
 Below, one disc is extruded twice at two different heights. The disc itself is written once.
 
-Underneath, extrude is extrusions.extrudeLinear({ height: 3 }, profile). That call takes its object first, so a student who writes extrude({ height: 3 }, profile) is told which function that spelling belongs to rather than left with a message about the height.`,
+Underneath, extrude is extrusions.extrudeLinear({ height: 3 }, profile). That call takes its object first, so a student who writes extrudeLinear({ height: 3 }, profile) is told which function that spelling belongs to rather than left with a message about the height.`,
       code: `function main() {
-  const badge = disc(12, { segments: 48 })
+  const badge = circle(12, { segments: 48 })
 
   return [
-    translateX(-20, extrude(3, badge)),
-    translateX(20, extrude(45, badge))
+    translateX(-20, extrudeLinear(3, badge)),
+    translateX(20, extrudeLinear(45, badge))
   ]
 }`,
     },
     {
       title: 'An extrusion sits on the grid',
-      body: `Primitives are built around the origin: tube(10, 20) reaches from z = -10 up to z = +10, half of it below the grid. An extrusion does not do that. It starts at z = 0 and grows upward, so the same 20 of height lands entirely above the grid.
+      body: `Primitives are built around the origin: cylinder(10, 20) reaches from z = -10 up to z = +10, half of it below the grid. An extrusion does not do that. It starts at z = 0 and grows upward, so the same 20 of height lands entirely above the grid.
 
 Neither behaviour is wrong, but mixing the two without noticing is how parts end up half sunk into one another.
 
 To centre an extrusion the way a primitive is centred, move it down by half its height with translateZ. All three shapes below are 20 tall. The other way round — putting a primitive on the floor rather than an extrusion in the middle — is what sit is for.`,
       code: `function main() {
-  const outline = disc(10, { segments: 48 })
-  const post = extrude(20, outline)
+  const outline = circle(10, { segments: 48 })
+  const post = extrudeLinear(20, outline)
 
   return [
     translateX(-25, post),
-    tube(10, 20, { segments: 48 }),
+    cylinder(10, 20, { segments: 48 }),
     translateX(25, translateZ(-10, post))
   ]
 }`,
@@ -1062,12 +1062,12 @@ A hole cut into a flat outline is a subtract over a handful of edges. The very s
 
 So learn the whole thing as one move: draw the outline, subtract the details, extrude once at the end. The plate below is one rect, one disc taken out of it, and one extrude. Reordering those three lines would cost you nothing but time.`,
       code: `function main() {
-  const plate = rect(50, 30)
-  const hole = disc(6, { segments: 32 })
+  const plate = rectangle(50, 30)
+  const hole = circle(6, { segments: 32 })
 
   const outline = subtract(plate, hole)
 
-  return extrude(6, outline)
+  return extrudeLinear(6, outline)
 }`,
     },
     {
@@ -1078,12 +1078,12 @@ That refusal exists because the library underneath does not complain. extrudeLin
 
 Below, the flat square grows into a tall post. The box, put through the library's extrudeLinear on the very next line, comes back a box.`,
       code: `function main() {
-  const flat = rect(20, 20)
-  const solid = box(20, 20, 20)
+  const flat = rectangle(20, 20)
+  const solid = cuboid(20, 20, 20)
 
-  // extrude(40, solid) would stop here instead, and say why.
+  // extrudeLinear(40, solid) would stop here instead, and say why.
   return [
-    translateX(-20, extrude(40, flat)),
+    translateX(-20, extrudeLinear(40, flat)),
     translateX(20, extrudeLinear({ height: 40 }, solid))
   ]
 }`,
@@ -1098,9 +1098,9 @@ Angles in the library are measured in radians, not degrees. Rather than memorise
 
 A twist also widens the shape, because the corners of the profile swing outward as they turn.`,
       code: `function main() {
-  const bar = rect(20, 20)
+  const bar = rectangle(20, 20)
 
-  const straight = extrude(60, bar)
+  const straight = extrudeLinear(60, bar)
   const twisted = extrudeLinear({
     height: 60,
     twistAngle: degToRad(180),
@@ -1114,20 +1114,20 @@ A twist also widens the shape, because the corners of the profile swing outward 
 }`,
     },
     {
-      title: 'revolve',
-      body: `revolve(profile) spins a profile all the way round to make a solid that is round about one axis — a vase, a bowl, a knob, a wheel.
+      title: 'extrudeRotate',
+      body: `extrudeRotate(profile) spins a profile all the way round to make a solid that is round about one axis — a vase, a bowl, a knob, a wheel.
 
 Picture the profile as one slice cut through the finished object and then laid out flat on the page. How far it sits from the vertical line x = 0 becomes its radius in the solid, and how tall it stands on the page becomes how tall the solid is.
 
 The profile below is the wall and the floor of a vase, drawn as if you had sliced the vase in half and were looking at the cut. Spin it and you get the whole vessel — hollow inside, closed underneath — with no subtract anywhere.
 
-revolve is the one name whose options object trades places with the library's. revolve(profile, { segments: 48 }) is extrusions.extrudeRotate({ segments: 48 }, profile), because everything in reSHape puts its extras last. Write the library's order by mistake and you are told which function that spelling belongs to.`,
+revolve is the one name whose options object trades places with the library's. extrudeRotate(profile, { segments: 48 }) is extrusions.extrudeRotate({ segments: 48 }, profile), because everything in reSHape puts its extras last. Write the library's order by mistake and you are told which function that spelling belongs to.`,
       code: `function main() {
-  const profile = poly([
+  const profile = polygon([
     [0, 0], [14, 0], [14, 4], [11, 6], [11, 26], [14, 28], [10, 28], [10, 3], [0, 3]
   ])
 
-  return revolve(profile, { segments: 48 })
+  return extrudeRotate(profile, { segments: 48 })
 }`,
     },
     {
@@ -1138,12 +1138,12 @@ Below, both profiles are the same 10 by 10 square. The one drawn clear of the li
 
 A profile drawn entirely on the wrong side produces nothing at all.`,
       code: `function main() {
-  const clear = rect(10, 10, { center: [10, 5] })
-  const straddling = rect(10, 10, { center: [0, 5] })
+  const clear = rectangle(10, 10, { center: [10, 5] })
+  const straddling = rectangle(10, 10, { center: [0, 5] })
 
   return [
-    translateX(-25, revolve(clear, { segments: 48 })),
-    translateX(25, revolve(straddling, { segments: 48 }))
+    translateX(-25, extrudeRotate(clear, { segments: 48 })),
+    translateX(25, extrudeRotate(straddling, { segments: 48 }))
   ]
 }`,
     },
@@ -1155,11 +1155,11 @@ What a high number costs you is model size. Every extra segment is more triangle
 
 Fewer than three segments is not a circle at all, and it is refused.`,
       code: `function main() {
-  const profile = translateX(18, disc(6, { segments: 32 }))
+  const profile = translateX(18, circle(6, { segments: 32 }))
 
   return [
-    translateX(-35, revolve(profile, { segments: 6 })),
-    translateX(35, revolve(profile, { segments: 64 }))
+    translateX(-35, extrudeRotate(profile, { segments: 6 })),
+    translateX(35, extrudeRotate(profile, { segments: 64 }))
   ]
 }`,
     },
@@ -1171,9 +1171,9 @@ Less than a full turn leaves one flat face where the sweep began and another whe
 
 Write the angle with degToRad, the same helper the twist page used.`,
       code: `function main() {
-  const profile = translateX(20, disc(5, { segments: 24 }))
+  const profile = translateX(20, circle(5, { segments: 24 }))
 
-  const full = revolve(profile, { segments: 48 })
+  const full = extrudeRotate(profile, { segments: 48 })
   const part = extrudeRotate({ segments: 48, angle: degToRad(120) }, profile)
 
   return [
@@ -1203,11 +1203,11 @@ Below, the same disc goes into extrudeRectangular and into extrude. One comes ba
 
 Hollow is often exactly what you wanted — a cup, a fence, a planter, a box with an open top. It is a problem only when you were expecting a block.`,
       code: `function main() {
-  const outline = disc(15, { segments: 48 })
+  const outline = circle(15, { segments: 48 })
 
   return [
     translateX(-20, extrudeRectangular({ size: 2, height: 10 }, outline)),
-    translateX(20, extrude(10, outline))
+    translateX(20, extrudeLinear(10, outline))
   ]
 }`,
     },
@@ -1223,7 +1223,7 @@ Pass the starting shape as the second argument as well, even when the callback i
       code: `const { slice } = extrusions
 
 function main() {
-  const base = rect(30, 30)
+  const base = rectangle(30, 30)
 
   return extrudeFromSlices({
     numberOfSlices: 2,
@@ -1258,7 +1258,7 @@ function loop(radius, z) {
 }
 
 function main() {
-  const base = disc(14, { segments: SIDES })
+  const base = circle(14, { segments: SIDES })
 
   return extrudeFromSlices({
     numberOfSlices: 40,
@@ -1277,15 +1277,15 @@ Use it when you want a base plate that matches a part exactly, or an outline to 
 What comes back is 2D, so it needs an extrude of its own before it is solid again. And a hole that does not go all the way through leaves no mark in the shadow.`,
       code: `function main() {
   const part = subtract(
-    box(40, 25, 10),
-    tube(6, 20, { segments: 32 })
+    cuboid(40, 25, 10),
+    cylinder(6, 20, { segments: 32 })
   )
 
   const shadow = project({}, part)
 
   return [
     translateX(-25, part),
-    translateX(25, extrude(1, shadow))
+    translateX(25, extrudeLinear(1, shadow))
   ]
 }`,
     },
@@ -1300,7 +1300,7 @@ Two traps, both worth knowing before you lose an afternoon. If you pass height a
 The profile is the wire itself, seen end-on. A disc gives round wire like a pen spring; a rect gives flat wire like a watch spring.`,
       code: `function main() {
   // The profile is the wire, seen end-on.
-  const wire = disc(1.5, { segments: 16 })
+  const wire = circle(1.5, { segments: 16 })
 
   const spring = extrudeHelical({
     radius: 10,                 // how wide the coil is
@@ -1322,11 +1322,11 @@ Reach for revolve when the object is round about one axis. Reach for extrudeRect
 When none of them fits, draw the outline flat and extrude it anyway. It is nearly always enough.`,
       code: `function main() {
   const outline = subtract(
-    rect(50, 50),
-    disc(10, { segments: 48 })
+    rectangle(50, 50),
+    circle(10, { segments: 48 })
   )
 
-  return extrude(8, outline)
+  return extrudeLinear(8, outline)
 }`,
     },
   ],
@@ -1344,10 +1344,10 @@ The example hulls two circles of radius 8 — one moved 15 to the left by transl
 Change either 15 to a 25 and the capsule stretches to 66 across, still 16 tall. The circles decide where the ends are; hull fills in everything between them.`,
         code: `function main() {
   const left = translate([-15, 0, 0],
-    disc(8, { segments: 32 })
+    circle(8, { segments: 32 })
   )
   const right = translate([15, 0, 0],
-    disc(8, { segments: 32 })
+    circle(8, { segments: 32 })
   )
   return hull(left, right)
 }`,
@@ -1360,9 +1360,9 @@ The example builds an L out of two rects joined with union, then puts the plain 
 
 Both fit the same bounding box, to the last decimal place. A hull never shrinks a shape and never reaches past it — it only fills in.`,
         code: `function main() {
-  const tall = rect(10, 40)
+  const tall = rectangle(10, 40)
   const foot = translate([15, -15, 0],
-    rect(20, 10)
+    rectangle(20, 10)
   )
   const ell = union(tall, foot)
 
@@ -1380,15 +1380,15 @@ Hulling two solids that are nothing alike is where hull earns its keep. The exam
 
 Watch the coordinates. The plate is centred on the origin, so it runs from z = -2 up to z = 2, and the ball reaches z = 34. The stalk is 36 tall.`,
         code: `function main() {
-  const foot = box(30, 30, 4)
-  const sphere = translate([0, 0, 28],
-    ball(6, { segments: 32 })
+  const foot = cuboid(30, 30, 4)
+  const mySphere = translate([0, 0, 28],
+    sphere(6, { segments: 32 })
   )
-  return hull(foot, sphere)
+  return hull(foot, mySphere)
 }`,
       },
       {
-        title: 'Rounding a box with hull',
+        title: 'Rounding a cuboid with hull',
         body: `Here is the trick that makes hull worth learning. Put a small sphere wherever a corner of a box should be, hull all eight, and the skin wraps them into a box with perfectly rounded corners. The sphere's radius is the corner radius.
 
 The spheres sit at the corners, so the part ends up one radius bigger in every direction than the box through their centres. Subtract the radius from each half-size first — that is what 20 - r is doing — and it measures exactly 40 by 24 by 12.
@@ -1399,7 +1399,7 @@ Leave segments at 16. Each ball is then 128 flat pieces and the hull returns 182
         code: `function main() {
   const r = 4
   const half = [20 - r, 12 - r, 6 - r]
-  const bead = ball(r, { segments: 16 })
+  const bead = sphere(r, { segments: 16 })
 
   const corners = []
   for (let i = 0; i < 8; i++) {
@@ -1423,7 +1423,7 @@ The example lays seven circles of radius 5 along a zig-zag, 14 apart, alternatin
   for (let i = 0; i < 7; i++) {
     const y = (i % 2 === 0) ? -8 : 8
     beads.push(translate([i * 14, y, 0],
-      disc(5, { segments: 24 })
+      circle(5, { segments: 24 })
     ))
   }
   return hullChain(...beads)
@@ -1443,7 +1443,7 @@ Use hull when you want one rounded lump. Use hullChain when the shape has to fol
   for (let i = 0; i < 5; i++) {
     const y = (i % 2 === 0) ? -8 : 8
     beads.push(translate([i * 14, y, 0],
-      disc(5, { segments: 24 })
+      circle(5, { segments: 24 })
     ))
   }
 
@@ -1472,7 +1472,7 @@ hullPoints3(points) is the 3D twin: points in, faces out, and geometries.geom3.c
   console.log('kept ' + edge.length + ' of ' + dots.length + ' points')
 
   const outline = geom2.fromPoints(edge)
-  return extrude(4, outline)
+  return extrudeLinear(4, outline)
 }`,
       },
     ],
@@ -1493,13 +1493,13 @@ The example softens a cross — a shape no primitive gives you.`,
         code: `function main() {
   // A cross: two flat rects, unioned. No primitive makes this shape.
   const cross = union(
-    rect(60, 20),
-    rect(20, 60)
+    rectangle(60, 20),
+    rectangle(20, 60)
   )
 
-  const sharp = extrude(8, cross)
+  const sharp = extrudeLinear(8, cross)
 
-  const softened = extrude(8, offset({ delta: 6, corners: 'round', segments: 16 }, cross)
+  const softened = extrudeLinear(8, offset({ delta: 6, corners: 'round', segments: 16 }, cross)
   )
 
   return [
@@ -1522,20 +1522,20 @@ corners decides what happens where the outline turns.
 
 offset only speaks flat. Hand it a solid and you get the very same solid back, unchanged and without a word of complaint.`,
         code: `function main() {
-  const start = rect(60, 60)
+  const start = rectangle(60, 60)
 
   // The same delta three times over. Only the corner treatment changes.
   const styles = ['edge', 'chamfer', 'round']
   const grown = styles.map((style, i) =>
     translate([i * 95 - 95, 0, 0],
-      extrude(6, offset({ delta: 10, corners: style, segments: 16 }, start)
+      extrudeLinear(6, offset({ delta: 10, corners: style, segments: 16 }, start)
       )
     )
   )
 
   // The outline all three started from, parked behind them for scale.
   const original = translate([0, 95, 0],
-    extrude(6, start)
+    extrudeLinear(6, start)
   )
 
   return [original, ...grown]
@@ -1552,16 +1552,16 @@ It grows by more than people expect, because delta goes on at the left and again
 segments costs real money here: that cube is 62 faces at 8 segments and 614 at 32.`,
         code: `function main() {
   const delta = 4
-  const reference = box(40, 40, 40)
+  const reference = cuboid(40, 40, 40)
 
   // Built at 40 and expanded: it ends up 48, wider than the reference.
   const tooBig = expand({ delta: delta, segments: 8 },
-    box(40, 40, 40)
+    cuboid(40, 40, 40)
   )
 
   // Built at 40 - 2 * delta, so the skin brings it back to exactly 40.
   const justRight = expand({ delta: delta, segments: 8 },
-    box(40 - 2 * delta, 40 - 2 * delta, 40 - 2 * delta)
+    cuboid(40 - 2 * delta, 40 - 2 * delta, 40 - 2 * delta)
   )
 
   console.log('too big:   ', measureDimensions(tooBig))
@@ -1575,7 +1575,7 @@ segments costs real money here: that cube is 62 faces at 8 segments and 614 at 3
 }`,
       },
       {
-        title: 'Round the outline, then extrude',
+        title: 'Round the outline, then extrudeLinear',
         body: `The recipe worth memorising, and the closest thing to a fillet you get: sketch the part flat, offset the sketch with corners: 'round', then extrude it.
 
 It rounds the four upright edges and leaves the top and bottom faces flat and sharp, which is what a plate that has to sit on a table or a print bed wants. expand would round those two faces as well, so the plate rocks — and it would add twice delta to the thickness besides.
@@ -1589,15 +1589,15 @@ Anything you want cut into the plate — bolt holes, a slot, lettering — goes 
   const radius = 6
 
   // One radius smaller on every side, so the offset lands it on 60 by 40.
-  const sketch = rect(width - 2 * radius, depth - 2 * radius)
+  const sketch = rectangle(width - 2 * radius, depth - 2 * radius)
   const rounded = offset(
     { delta: radius, corners: 'round', segments: 16 }, sketch
   )
 
-  const plate = extrude(5, rounded)
+  const plate = extrudeLinear(5, rounded)
 
   // A plain 60 by 40 plate, to check the size came out right.
-  const sharp = extrude(5, rect(width, depth)
+  const sharp = extrudeLinear(5, rectangle(width, depth)
   )
 
   return [
@@ -1793,13 +1793,13 @@ The payoff is the next page: a closed path is the one thing in this section that
       title: 'From a closed path to a solid',
       body: `This is what the whole section has been walking toward, and it is one line.
 
-extrude(height, closedPath) takes a closed path and pushes it straight up into a solid, exactly the way it does with a disc or a rect. The loop becomes the top and bottom faces, and height is how far apart they are. Like any extrusion it grows upward from z = 0, so the part is already sitting on the grid rather than sunk half into it.
+extrudeLinear(height, closedPath) takes a closed path and pushes it straight up into a solid, exactly the way it does with a disc or a rect. The loop becomes the top and bottom faces, and height is how far apart they are. Like any extrusion it grows upward from z = 0, so the part is already sitting on the grid rather than sunk half into it.
 
 Hand the same call an open path and it stops with a message that says precisely what is wrong: "extruded path must be closed". If you see that, you forgot the close.
 
 So the full pipeline for a shape no primitive could have given you is four steps: start the path, append the straight bits and the curved bits, close it, extrude it. The example does all four, and prints the volume so you can see that something solid really came out the other end.
 
-It is worth the effort only when the outline has something a primitive cannot do. A plain four-cornered outline is still rect(w, h). Reach for a path when the shape has a fillet in it, a swooping side, or a run of corners that a loop generated.`,
+It is worth the effort only when the outline has something a primitive cannot do. A plain four-cornered outline is still rectangle(w, h). Reach for a path when the shape has a fillet in it, a swooping side, or a run of corners that a loop generated.`,
       code: `function main() {
   const path2 = geometries.path2
 
@@ -1926,8 +1926,8 @@ You can tell which is which by looking. The viewport shades a solid, so it catch
 
 Below, left to right: a shaded box, the outline of a square lying on the grid, and an open zigzag.`,
       code: `function main() {
-  const solid = box(20, 20, 20)
-  const flat = rect(20, 20)
+  const solid = cuboid(20, 20, 20)
+  const flat = rectangle(20, 20)
 
   // fromPoints takes an options object first. There is nothing worth
   // setting here, so {} is the whole of it.
@@ -1961,8 +1961,8 @@ The helper below is worth keeping in your file while you are debugging.`,
 }
 
 function main() {
-  const sketch = disc(12, { segments: 48 })
-  const solid = extrude(8, sketch)
+  const sketch = circle(12, { segments: 48 })
+  const solid = extrudeLinear(8, sketch)
 
   console.log('sketch:', whatIsIt(sketch))
   console.log('solid:', whatIsIt(solid))
@@ -1991,7 +1991,7 @@ The pattern is easier to remember than the list. A name that describes something
 One place the pattern misleads people: vectorText does not make paths. It hands back plain arrays of numbers, one array per pen stroke, and you turn each of those into a path yourself with fromPoints. The Text section works that through.`,
       code: `function main() {
   const flat = star({ vertices: 5, outerRadius: 14, innerRadius: 6 })
-  const solid = ring(12, 3)
+  const solid = torus(12, 3)
 
   // Angles are radians, so Math.PI is half a turn — this is a semicircle.
   const line = arc({
@@ -2017,8 +2017,8 @@ Below, the same disc appears twice — on the left as itself, an outline lying o
 
 Note what did not happen: the circle on the left is untouched. Extruding does not convert the shape you handed it. Like every other JSCAD function, it builds a new shape and gives that back.`,
       code: `function main() {
-  const sketch = disc(12, { segments: 48 })
-  const solid = extrude(18, sketch)
+  const sketch = circle(12, { segments: 48 })
+  const solid = extrudeLinear(18, sketch)
 
   return [
     translate([-20, 0, 0], sketch),
@@ -2040,7 +2040,7 @@ Below is the same zigzag both ways — the bare path on the left, and on the rig
       code: `function main() {
   const zigzag = path2.fromPoints({}, [[0, 0], [10, 14], [20, 0], [30, 14]])
 
-  // extrude(6, zigzag) would stop here with
+  // extrudeLinear(6, zigzag) would stop here with
   //   extruded path must be closed
   // because an open line has no inside to give thickness to.
   const wall = extrudeRectangular({ size: 2, height: 8 }, zigzag)
@@ -2063,7 +2063,7 @@ project is the exception worth remembering, because the shape of the library oth
 
 Below, a donut and the ring its shadow makes — hole and all. The two printed numbers are not the same measurement: a solid's area is its whole outer skin, a flat shape's is the ground it covers.`,
       code: `function main() {
-  const donut = ring(14, 4)
+  const donut = torus(14, 4)
   const shadow = project({}, donut)
 
   console.log('donut is a solid; area of its skin:', measureArea(donut))
@@ -2087,13 +2087,13 @@ Inside one kind you are free, and the result keeps that kind. Two flat circles h
 
 The fix is always to make both sides agree, and usually that means extruding the flat one first.`,
       code: `function main() {
-  const circle = disc(8, { segments: 48 })
-  const flatHull = hull(circle, translate([30, 0, 0], circle))
+  const myCircle = circle(8, { segments: 48 })
+  const flatHull = hull(myCircle, translate([30, 0, 0], myCircle))
 
-  const sphere = ball(8, { segments: 32 })
-  const solidHull = hull(sphere, translate([30, 0, 0], sphere))
+  const mySphere = sphere(8, { segments: 32 })
+  const solidHull = hull(mySphere, translate([30, 0, 0], mySphere))
 
-  // hull(circle, sphere) never gets this far. It stops with:
+  // hull(myCircle, mySphere) never gets this far. It stops with:
   //   only hulls of the same type are supported
 
   return [
@@ -2112,10 +2112,10 @@ Both boxes below are 20 x 20 x 5 mm. The one on the right was asked for a height
 
 So when a part comes out flatter than you meant it to be, and nothing is red, this is the first thing to check. Was the shape you extruded still flat, or had an earlier line already turned it into a solid? The isA test from earlier in this section answers that in one line.`,
       code: `function main() {
-  const solid = box(20, 20, 5)
+  const solid = cuboid(20, 20, 5)
 
   // Asking the library for 40 mm of height on something already solid.
-  // reSHape's extrude(40, solid) would refuse instead of doing this.
+  // reSHape's extrudeLinear(40, solid) would refuse instead of doing this.
   const noTaller = extrudeLinear({ height: 40 }, solid)
 
   console.log('solid:', measureDimensions(solid))
@@ -2128,7 +2128,7 @@ So when a part comes out flatter than you meant it to be, and nothing is red, th
 }`,
     },
     {
-      title: 'Sketch flat, extrude, then turn',
+      title: 'Sketch flat, extrudeLinear, then turn',
       body: `The last rule of the section is about order, and it is the one that costs people an afternoon.
 
 A flat shape has no thickness, so turning it out of the XY plane does not stand it up. It squashes it. Rotate a 20 x 20 square a quarter turn and what is left has zero area — no shape inside it any more. Extruding that afterwards will not rescue it; extrude stops with slices must have 3 or more edges to calculate a plane.
@@ -2137,7 +2137,7 @@ The viewport will not show you this, which is exactly why it is worth a page. Th
 
 The order that works is the other one. Extrude the sketch while it is still flat, then rotate the solid. That is the version on screen: the flat sketch on the left, and on the right the same sketch given 5 mm of thickness and stood up into a wall.`,
       code: `function main() {
-  const sketch = rect(20, 20)
+  const sketch = rectangle(20, 20)
 
   // The wrong order. Deliberately not returned: the viewport cannot show you
   // what is wrong with it, and the measurement can.
@@ -2147,7 +2147,7 @@ The order that works is the other one. Extrude the sketch while it is still flat
 
   // The right order: thickness first, then stand the solid up.
   const wall = rotateX(Math.PI / 2,
-    extrude(5, sketch))
+    extrudeLinear(5, sketch))
 
   return [
     translate([-25, 0, 0], sketch),
@@ -2171,8 +2171,8 @@ Neither one changes the shape. They read it and hand back numbers, so you can ca
 
 console.log prints an answer where you can read it — the console panel beside your code in a lesson, or your browser's own console anywhere else. The tray below is hollowed out, so nobody can work out its volume by reading the code. The program can.`,
       code: `function main() {
-  const body = box(120, 80, 20)
-  const scoop = translate([0, 0, 4], box(110, 70, 20))
+  const body = cuboid(120, 80, 20)
+  const scoop = translate([0, 0, 4], cuboid(110, 70, 20))
   const tray = subtract(body, scoop)
 
   console.log('size mm:', measureDimensions(tray))
@@ -2190,8 +2190,8 @@ It is a pair of arrays, not an object with .min and .max on it. Writing box.min 
 The blob below came out of hull(), so its size is written nowhere in the code. The two small cubes sit on the corners the measurement found.`,
       code: `function main() {
   const blob = hull(
-    ball(10, { segments: 24 }),
-    translate([40, 20, 15], ball(5, { segments: 24 }))
+    sphere(10, { segments: 24 }),
+    translate([40, 20, 15], sphere(5, { segments: 24 }))
   )
 
   const bounds = measureBoundingBox(blob)
@@ -2199,7 +2199,7 @@ The blob below came out of hull(), so its size is written nowhere in the code. T
   console.log('high corner:', bounds[1])
   console.log('width:', bounds[1][0] - bounds[0][0])
 
-  const dot = box(5, 5, 5)
+  const dot = cuboid(5, 5, 5)
   return [blob, translate(bounds[0], dot), translate(bounds[1], dot)]
 }`,
     },
@@ -2216,8 +2216,8 @@ When all you want is a shape centred on the origin, center({ axes: [true, true, 
 Below is the same pin twice. Only the right-hand one was measured first.`,
       code: `function main() {
   const pin = hull(
-    ball(8, { segments: 24 }),
-    translate([0, 0, 22], ball(4, { segments: 24 }))
+    sphere(8, { segments: 24 }),
+    translate([0, 0, 22], sphere(4, { segments: 24 }))
   )
 
   const bounds = measureBoundingBox(pin)
@@ -2237,8 +2237,8 @@ That is not the balance point — the spot where the shape would sit still on th
 
 The middle of the box is not even guaranteed to be inside the shape. Move this bracket by minus its own centre and the three coloured axis lines cross in the empty notch — in mid-air, exactly where the measurement said the middle was.`,
       code: `function main() {
-  const arm = box(60, 12, 12, { center: [30, 6, 6] })
-  const post = box(12, 12, 40, { center: [6, 6, 20] })
+  const arm = cuboid(60, 12, 12, { center: [30, 6, 6] })
+  const post = cuboid(12, 12, 40, { center: [6, 6, 20] })
   const bracket = union(arm, post)
 
   const middle = measureCenter(bracket)
@@ -2256,8 +2256,8 @@ Area and volume do not move together. Drilling a hole through the block below ta
 
 Flat shapes are worth a warning. A rect has an area, but its volume is 0 and its height is 0. Nothing has gone wrong — there is just nothing there to fill.`,
       code: `function main() {
-  const block = box(30, 30, 30)
-  const drill = tube(10, 40, { segments: 48 })
+  const block = cuboid(30, 30, 30)
+  const drill = cylinder(10, 40, { segments: 48 })
   const drilled = subtract(block, drill)
 
   console.log('solid:   paint', Math.round(measureArea(block)),
@@ -2276,7 +2276,7 @@ measureEpsilon(shape) hands you a sensible margin for that particular shape: abo
 
 So never compare two measured numbers with ===. Ask whether the gap between them is smaller than the epsilon instead.`,
       code: `function main() {
-  const brick = box(30, 20, 10)
+  const brick = cuboid(30, 20, 10)
 
   let spun = brick
   for (let i = 0; i < 12; i++) {
@@ -2303,7 +2303,7 @@ The staircase below is five separate blocks. Measured one by one you get five bo
   const steps = []
   for (let i = 0; i < 5; i++) {
     const h = 6 + i * 4
-    const step = box(16, 16, h)
+    const step = cuboid(16, 16, h)
     steps.push(translate([i * 22 - 44, 0, h / 2], step))
   }
 
@@ -2330,7 +2330,7 @@ The colour is an array of numbers: [red, green, blue]. Each one runs from 0, non
 
 Colour is not part of the shape. It changes nothing about the size or the geometry — only what you see. That is worth doing while you work: three parts in three colours are three parts you can tell apart.`,
         code: `function main() {
-  const block = box(15, 15, 15)
+  const block = cuboid(15, 15, 15)
 
   const red = colorize([1, 0.2, 0.2, 1], translate([-20, 0, 0], block))
   const green = colorize([0.3, 0.9, 0.4, 1], block)
@@ -2347,7 +2347,7 @@ Get it wrong and nothing complains. colorize stores [214, 92, 39, 1] exactly as 
 
 That is the left-hand block: no brick colour, no shading either, just flat white. The right-hand block is the same three numbers divided by 255.`,
         code: `function main() {
-  const block = box(18, 18, 18)
+  const block = cuboid(18, 18, 18)
 
   const wrong = colorize([214, 92, 39, 1], translate([-12, 0, 0], block))
   const right = colorize([214 / 255, 92 / 255, 39 / 255, 1], translate([12, 0, 0], block))
@@ -2363,12 +2363,12 @@ The gold wall in the example never changes. The four blue panes in front of it r
 
 Leave the fourth number out and you get 1. colorize fills it in, so [1, 0, 0] and [1, 0, 0, 1] are the same solid red.`,
         code: `function main() {
-  const wall = box(90, 6, 30, { center: [0, 14, 15] })
+  const wall = cuboid(90, 6, 30, { center: [0, 14, 15] })
   const parts = [colorize([1, 0.85, 0.2, 1], wall)]
 
   const alphas = [1, 0.6, 0.3, 0.1]
   for (let i = 0; i < alphas.length; i++) {
-    const pane = box(18, 6, 30, { center: [i * 22 - 33, 0, 15] })
+    const pane = cuboid(18, 6, 30, { center: [i * 22 - 33, 0, 15] })
     parts.push(colorize([0.3, 0.8, 1, alphas[i]], pane))
   }
 
@@ -2383,7 +2383,7 @@ Convert the name into an array first, then colorize. The next three pages are th
 
 Uncomment the line in the example and run it — the red banner across the top of the viewer is that error, word for word. Worth seeing once, because it is also what a misspelled colour name gets you, for a reason the next page explains.`,
         code: `function main() {
-  const block = box(20, 20, 20)
+  const block = cuboid(20, 20, 20)
 
   // colorize('red', block)   <- "color must be an array"
   return colorize(colorNameToRgb('red'), block)
@@ -2401,7 +2401,7 @@ So if you see that error and you are sure you passed an array, check the spellin
   const blocks = []
 
   for (let i = 0; i < names.length; i++) {
-    const block = box(14, 14, 14)
+    const block = cuboid(14, 14, 14)
     blocks.push(colorize(colorNameToRgb(names[i]), translate([i * 18 - 36, 0, 0], block)))
   }
 
@@ -2422,7 +2422,7 @@ The colors module also carries the converters that run the other way, rgb back t
   const blocks = []
 
   for (let i = 0; i < codes.length; i++) {
-    const block = box(16, 16, 16)
+    const block = cuboid(16, 16, 16)
     blocks.push(colorize(hexToRgb(codes[i]), translate([i * 20 - 30, 0, 0], block)))
   }
 
@@ -2440,16 +2440,16 @@ Both bars in front ask for green. Passing 120 asks for 120 whole turns, and what
   const parts = []
 
   for (let i = 0; i < 12; i++) {
-    const spoke = box(18, 6, 6, { center: [26, 0, 0] })
+    const spoke = cuboid(18, 6, 6, { center: [26, 0, 0] })
     parts.push(colorize(hslToRgb(i / 12, 1, 0.5),
       rotateZ(i / 12 * 2 * Math.PI, spoke)))
   }
 
   // Both bars ask for green. Only the one that divides by 360 gets it.
   parts.push(colorize(hslToRgb(120, 1, 0.5),
-    box(16, 8, 6, { center: [-10, -46, 0] })))
+    cuboid(16, 8, 6, { center: [-10, -46, 0] })))
   parts.push(colorize(hslToRgb(120 / 360, 1, 0.5),
-    box(16, 8, 6, { center: [10, -46, 0] })))
+    cuboid(16, 8, 6, { center: [10, -46, 0] })))
 
   return parts
 }`,
@@ -2462,8 +2462,8 @@ Colour does not survive a boolean. union, subtract and intersect each build a br
 
 Both blocks in the example are the same plate with the same hole. The left one was painted blue and then drilled, and it is back to the default orange. The right one was drilled first and painted last. Build, cut, then paint.`,
         code: `function main() {
-  const plate = box(30, 30, 8)
-  const drill = tube(6, 20, { segments: 32 })
+  const plate = cuboid(30, 30, 8)
+  const drill = cylinder(6, 20, { segments: 32 })
   const blue = [0.2, 0.5, 1, 1]
 
   const lost = subtract(colorize(blue, plate), drill)
@@ -2487,13 +2487,13 @@ Nothing here is unioned. Each part is still its own solid; main() returns the ar
 
 function main() {
   const base = colorize(PALETTE.base,
-    box(50, 50, 6, { center: [0, 0, 3] }))
+    cuboid(50, 50, 6, { center: [0, 0, 3] }))
 
   const post = colorize(PALETTE.post,
-    tube(4, 40, { segments: 32, center: [0, 0, 26] }))
+    cylinder(4, 40, { segments: 32, center: [0, 0, 26] }))
 
   const top = colorize(PALETTE.top,
-    box(20, 20, 8, { roundRadius: 2, center: [0, 0, 50] }))
+    cuboid(20, 20, 8, { roundRadius: 2, center: [0, 0, 50] }))
 
   return [base, post, top]
 }`,
@@ -2506,7 +2506,7 @@ A solid is a bag of flat faces. geometries.geom3.toPolygons(solid) hands you the
 
 The rebuilt cube is a real solid: same size, same volume, and you can still subtract from it. What you cannot have is both. Run a boolean on it and every face colour goes — the same rule as Paint last, two pages back.`,
         code: `function main() {
-  const cube = box(30, 30, 30)
+  const cube = cuboid(30, 30, 30)
   const faces = geom3.toPolygons(cube)
 
   for (let i = 0; i < faces.length; i++) {
@@ -2567,7 +2567,7 @@ height inside extrudeRectangular is the odd one out. It is how far the letters s
 }`,
       },
       {
-        title: 'Why not extrude',
+        title: 'Why not extrudeLinear',
         body: `extrude is the usual way to push a flat shape upward, so it is the obvious thing to reach for — and it is the wrong tool. It needs a closed outline: a line that finishes where it started, so there is an inside to fill. Letter strokes are open.
 
 Use it anyway and what happens depends on what you hand it. Neither answer is friendly:
@@ -2582,7 +2582,7 @@ extrudeRectangular never asks whether a path closes. That is why this section us
   const strokes = vectorText({ height: 10, input: 'O' })
   const loop = path2.fromPoints({}, strokes[0])
 
-  const filled = extrude(3, loop)
+  const filled = extrudeLinear(3, loop)
   const outline = extrudeRectangular({ size: 1, height: 3 }, [loop])
 
   return [filled, translate([20, 0, 0], outline)]
@@ -2634,11 +2634,11 @@ The plate sizes itself from the measured width, so a longer name still fits: wid
   const raised = extrudeRectangular({ size: 0.9, height: 1 }, paths)
   const cutter = extrudeRectangular({ size: 0.9, height: 2 }, paths)
 
-  const cuboid = measureAggregateBoundingBox(raised)
-  const width = cuboid[1][0] - cuboid[0][0]
-  const shift = -cuboid[0][0] - width / 2
+  const myCuboid = measureAggregateBoundingBox(raised)
+  const width = myCuboid[1][0] - myCuboid[0][0]
+  const shift = -myCuboid[0][0] - width / 2
 
-  const plate = box(width + 14, 24, 3, { roundRadius: 1.4, center: [0, 0, 1.5] })
+  const plate = cuboid(width + 14, 24, 3, { roundRadius: 1.4, center: [0, 0, 1.5] })
 
   const tag = union(plate, translate([shift, -6, 3], raised))
   const dug = subtract(plate, translate([shift, -6, 2], cutter))
@@ -2691,7 +2691,7 @@ Two spellings reach the module: vec3, or const { vec3 } = maths once you have pu
       code: `const { vec3 } = maths
 
 function main() {
-  const cuboid = box(48, 28, 12)
+  const myCuboid = cuboid(48, 28, 12)
 
   // A vec3 IS the array. fromValues just builds [24, 14, 6] and hands it back.
   const corner = vec3.fromValues(24, 14, 6)
@@ -2699,10 +2699,10 @@ function main() {
 
   // So it goes straight into translate, which wanted an [x, y, z] all along.
   const marker = translate(corner,
-    ball(3, { segments: 24 })
+    sphere(3, { segments: 24 })
   )
 
-  return [cuboid, marker]
+  return [myCuboid, marker]
 }`,
     },
     {
@@ -2730,13 +2730,13 @@ function main() {
   const halfway = vec3.add(vec3.create(), hub, vec3.scale(vec3.create(), reach, 0.5))
   console.log('left', left, 'right', right)
 
-  const sphere = ball(5, { segments: 24 })
-  const pin = ball(3, { segments: 24 })
+  const mySphere = sphere(5, { segments: 24 })
+  const pin = sphere(3, { segments: 24 })
 
   // Edit reach, and all three of these move.
   return [
-    translate(left, sphere),
-    translate(right, sphere),
+    translate(left, mySphere),
+    translate(right, mySphere),
     translate(halfway, pin),
   ]
 }`,
@@ -2767,11 +2767,11 @@ function main() {
   console.log('halfway is', mid)
 
   const band = subtract(
-    tube(gap / 2 + 2, 4, { segments: 64 }),
-    tube(gap / 2 - 2, 6, { segments: 64 })
+    cylinder(gap / 2 + 2, 4, { segments: 64 }),
+    cylinder(gap / 2 - 2, 6, { segments: 64 })
   )
 
-  const peg = tube(3, 16, { segments: 24 })
+  const peg = cylinder(3, 16, { segments: 24 })
 
   return [
     translate(mid, band),
@@ -2804,8 +2804,8 @@ function main() {
   console.log('step is', step[0].toFixed(2), step[1].toFixed(2), step[2].toFixed(2),
     'and', vec3.length(step).toFixed(3), 'mm long')
 
-  const bead = ball(3, { segments: 24 })
-  const peg = tube(2, 14, { segments: 24 })
+  const bead = sphere(3, { segments: 24 })
+  const peg = cylinder(2, 14, { segments: 24 })
 
   const parts = [translate(a, peg), translate(b, peg)]
   const hops = Math.floor(vec3.length(along) / 10)
@@ -2830,7 +2830,7 @@ The fourth arm is the mistake this page exists to prevent. rotateZ(90) is perfec
 
 degToRad and radToDeg live in the top-level utils module, covered in Transforms, under Turning by degrees. Watch the name: written bare, utils is that top-level module, and the maths module has a different utils of its own that you reach as `,
       code: `function main() {
-  const arm = box(40, 3, 3, { center: [20, 0, 0] })
+  const arm = cuboid(40, 3, 3, { center: [20, 0, 0] })
 
   // The same quarter turn, spelled three ways.
   const quarterTurn = [Math.PI / 2, degToRad(90), constants.TAU / 4]
@@ -2864,8 +2864,8 @@ This is the same ring as Patterns, under A ring with sin and cos, and the same n
 
 function main() {
   const radius = 40
-  const parts = [tube(12, 6, { segments: 48 })]
-  const post = tube(4, 12, { segments: 24 })
+  const parts = [cylinder(12, 6, { segments: 48 })]
+  const post = cylinder(4, 12, { segments: 24 })
 
   for (let i = 0; i < 12; i++) {
     // The point on a circle of radius 1, straight from the angle.
@@ -2893,10 +2893,10 @@ For a single shape, translate and rotate are shorter and you should keep using t
 // Four parts, each built where it belongs on the crane.
 function crane() {
   return [
-    box(20, 20, 4, { center: [0, 0, 2] }),
-    box(4, 4, 24, { center: [0, 0, 16] }),
-    box(20, 4, 4, { center: [10, 0, 26] }),
-    ball(4, { segments: 24, center: [20, 0, 26] }),
+    cuboid(20, 20, 4, { center: [0, 0, 2] }),
+    cuboid(4, 4, 24, { center: [0, 0, 16] }),
+    cuboid(20, 4, 4, { center: [10, 0, 26] }),
+    sphere(4, { segments: 24, center: [20, 0, 26] }),
   ]
 }
 
@@ -2923,7 +2923,7 @@ function main() {
     pages: [
       {
         title: 'A number with a name',
-        body: `Every shape so far has had its numbers typed straight in: box(40, 30, 4). That works until someone asks for the same plate, only wider — and then you go hunting through the file for the 40.
+        body: `Every shape so far has had its numbers typed straight in: cuboid(40, 30, 4). That works until someone asks for the same plate, only wider — and then you go hunting through the file for the 40.
 
 A parameter is a value your design asks for by name instead of spelling out. You list the ones you want in a function called getParameterDefinitions, which hands back an array of small objects. JSCAD collects the values and passes them to main as one object, so the width arrives as params.width.
 
@@ -3133,10 +3133,10 @@ The viewport draws everything in the array. Nothing merges: three shapes in an a
 
 This one fact is what makes the rest of this section possible. A loop's job is to build an array, and main() is happy to be handed one.`,
         code: `function main() {
-  const left = translate([-22, 0, 0], box(12, 12, 12))
-  const middle = ball(7, { segments: 32 })
+  const left = translate([-22, 0, 0], cuboid(12, 12, 12))
+  const middle = sphere(7, { segments: 32 })
   const right = translate([22, 0, 0],
-    tube(6, 12, { segments: 32 })
+    cylinder(6, 12, { segments: 32 })
   )
   return [left, middle, right]
 }`,
@@ -3153,7 +3153,7 @@ The only line that does anything interesting is the position, and it is the coun
         code: `function main() {
   const posts = []
   for (let i = 0; i < 5; i++) {
-    const post = box(8, 8, 30)
+    const post = cuboid(8, 8, 30)
     posts.push(translate([i * 14, 0, 15], post))
   }
   return posts
@@ -3176,7 +3176,7 @@ Nine posts, 14 mm apart, is a row 112 mm wide. Subtracting 56 puts the middle po
   const posts = []
   for (let i = 0; i < count; i++) {
     posts.push(translate([i * spacing - width / 2, 0, 15],
-      box(8, 8, 30)
+      cuboid(8, 8, 30)
     ))
   }
   return posts
@@ -3198,7 +3198,7 @@ Nothing here is magic and nothing is faster. The same row could be written with 
 
   return heights.map((h, i) =>
     translate([i * spacing - width / 2, 0, h / 2],
-      box(9, 9, h)
+      cuboid(9, 9, h)
     )
   )
 }`,
@@ -3219,7 +3219,7 @@ Use whichever of the three forms you can read back in a month. A for loop when t
 
   return Array.from({ length: count }, (_, i) =>
     translate([i * spacing - width / 2, 0, 0],
-      tube(5, 6, { segments: 32 })
+      cylinder(5, 6, { segments: 32 })
     )
   )
 }`,
@@ -3241,13 +3241,13 @@ The plate is pushed into the array before the loop runs. An array of shapes does
   const yShift = (rows - 1) * pitch / 2
 
   const parts = [
-    box(cols * pitch, rows * pitch, 4, { center: [0, 0, -2] })
+    cuboid(cols * pitch, rows * pitch, 4, { center: [0, 0, -2] })
   ]
   for (let col = 0; col < cols; col++) {
     for (let row = 0; row < rows; row++) {
       parts.push(translate(
         [col * pitch - xShift, row * pitch - yShift, 3],
-        tube(4, 6, { segments: 24 })
+        cylinder(4, 6, { segments: 24 })
       ))
     }
   }
@@ -3272,7 +3272,7 @@ This is where a loop stops being a way to save typing and starts being a design.
   for (let i = 0; i < count; i++) {
     const height = 5 + i * 4
     steps.push(translate([i * spacing - width / 2, 0, height / 2],
-      box(9, 24, height)
+      cuboid(9, 24, height)
     ))
   }
   return steps
@@ -3297,7 +3297,7 @@ Both tests read the counter, so both survive a change to count. Twelve teeth or 
     if (i === 5 || i === 6) continue
     const height = i % 2 === 0 ? 26 : 14
     teeth.push(translate([i * spacing - width / 2, 0, height / 2],
-      box(6, 6, height)
+      cuboid(6, 6, height)
     ))
   }
   return teeth
@@ -3319,11 +3319,11 @@ There is a second way to get a ring, and it is not this one: revolve sweeps a si
   const radius = 40
 
   const spokes = [
-    tube(34, 5, { segments: 64, center: [0, 0, 2.5] })
+    cylinder(34, 5, { segments: 64, center: [0, 0, 2.5] })
   ]
   for (let i = 0; i < count; i++) {
     const angle = i / count * 2 * Math.PI
-    const spoke = box(16, 5, 5)
+    const spoke = cuboid(16, 5, 5)
     spokes.push(translate(
       [radius * Math.cos(angle), radius * Math.sin(angle), 2.5],
       rotateZ(angle, spoke)
@@ -3342,12 +3342,12 @@ The same move does holes, which is the more useful half. Build the solid, loop t
 
 Make each hole longer than the material it passes through. The cylinders here are 10 mm tall in a 6 mm plate, so they poke out both faces. A hole exactly as deep as the plate leaves the two surfaces touching at the top and bottom, and a boolean between two surfaces in the same place is the classic way to get a hole that does not quite go through.`,
         code: `function main() {
-  const plate = box(90, 30, 6)
+  const plate = cuboid(90, 30, 6)
 
   const holes = []
   for (let i = 0; i < 6; i++) {
     holes.push(translate([i * 14 - 35, 0, 0],
-      tube(3.5, 10, { segments: 32 })
+      cylinder(3.5, 10, { segments: 32 })
     ))
   }
 
@@ -3376,8 +3376,8 @@ function around(count, radius, shape) {
 }
 
 function main() {
-  const peg = tube(3, 12, { segments: 24 })
-  const tooth = box(9, 4, 12)
+  const peg = cylinder(3, 12, { segments: 24 })
+  const tooth = cuboid(9, 4, 12)
   return [
     ...around(6, 16, peg),
     ...around(18, 40, tooth)
@@ -3401,7 +3401,7 @@ So: pick the smallest segments that still looks round at the size the part will 
   const balls = []
   for (let i = 0; i < count; i++) {
     balls.push(translate([i * spacing - width / 2, 0, 0],
-      ball(4, { segments: 16 })
+      sphere(4, { segments: 16 })
     ))
   }
   console.log('shapes returned:', balls.length)
@@ -3422,8 +3422,8 @@ STL holds exactly one thing: a list of triangles. Every curve in your model has 
 
 The program that turns an STL into instructions for a printer is called a slicer. Cura, PrusaSlicer and Bambu Studio are all slicers. Open model.stl in any of them and the same washer is sitting there, ready to print.`,
         code: `function main() {
-  const plate = tube(20, 4, { segments: 64, center: [0, 0, 2] })
-  const hole = tube(6, 10, { segments: 64, center: [0, 0, 2] })
+  const plate = cylinder(20, 4, { segments: 64, center: [0, 0, 2] })
+  const hole = cylinder(6, 10, { segments: 64, center: [0, 0, 2] })
   return subtract(plate, hole)
 }`,
       },
@@ -3438,10 +3438,10 @@ The STL is 10 KB of nothing but triangles. There is nowhere in the format to put
 Printing in one colour: STL. Printing in two, or on a printer that can swap filament: 3MF.`,
         code: `function main() {
   const body = colorize([0.6, 0.6, 0.65],
-    box(20, 20, 20, { center: [0, 0, 10] })
+    cuboid(20, 20, 20, { center: [0, 0, 10] })
   )
   const cap = colorize([1, 0.84, 0],
-    tube(6, 6, { segments: 48, center: [0, 0, 23] })
+    cylinder(6, 6, { segments: 48, center: [0, 0, 23] })
   )
   return [body, cap]
 }`,
@@ -3458,7 +3458,7 @@ Which format:
 - 3MF — printing in colour, or when the file needs to be small.
 - OBJ — handing the model to graphics software like Blender. Not for printing.`,
         code: `function main() {
-  return box(10, 10, 10, { center: [0, 0, 5] })
+  return cuboid(10, 10, 10, { center: [0, 0, 5] })
 }`,
       },
       {
@@ -3469,7 +3469,7 @@ The grid under your model is the ruler. Each large square is 10 mm across and ea
 
 Check the size before you print, not after. A common school printer can make something about 220 mm wide, 220 mm deep and 250 mm tall, and no bigger. Anything larger has to be cut into pieces and glued, which is much better to find out now than six hours in.`,
         code: `function main() {
-  const part = box(50, 30, 10, { center: [0, 0, 5] })
+  const part = cuboid(50, 30, 10, { center: [0, 0, 5] })
   console.log('size in mm:', measureDimensions(part))
   return part
 }`,
@@ -3482,7 +3482,7 @@ The grid is the build plate. A slicer has nowhere to put a buried half: some qui
 
 So build the part where it is going to be printed. Give the shape a center as you make it — center: [0, 0, 10] for a 20 mm cube — or translate it up afterwards. The two do the same job, so pick whichever reads better in the line you are writing.`,
         code: `function main() {
-  const shape = box(20, 20, 20)
+  const shape = cuboid(20, 20, 20)
 
   // Left: built at the origin, so half of it is under the grid.
   const sunk = translate([-18, 0, 0], shape)
@@ -3503,8 +3503,8 @@ Parts that must come out as one piece have to overlap. Exactly touching is not e
         code: `function main() {
   const lift = 2   // the gap, in mm — change it to -1 and watch the number drop
 
-  const plate = box(30, 30, 8, { center: [0, 0, 4] })
-  const knob = tube(5, 10, { segments: 48, center: [0, 0, 8 + lift + 5] })
+  const plate = cuboid(30, 30, 8, { center: [0, 0, 4] })
+  const knob = cylinder(5, 10, { segments: 48, center: [0, 0, 8 + lift + 5] })
 
   const part = union(plate, knob)
   console.log('volume in cubic mm:', Math.round(measureVolume(part)))
@@ -3525,7 +3525,7 @@ A printer squeezes melted plastic out through a small hole called the nozzle, an
   for (let i = 0; i < thicknesses.length; i++) {
     const t = thicknesses[i]
     walls.push(translate([i * 12 - 18, 0, 10],
-      box(t, 20, 20)
+      cuboid(t, 20, 20)
     ))
   }
 
@@ -3543,12 +3543,12 @@ When a project outgrows one file, jscad.app takes a whole folder instead: peg.js
 This viewport runs a single file, so keep the parts as functions here. The split is worth knowing about for the day the file reaches 400 lines.`,
         code: `// What a peg is.
 function peg(radius, height) {
-  return tube(radius, height, { segments: 32 })
+  return cylinder(radius, height, { segments: 32 })
 }
 
 // What a plate is.
 function plate(width, depth, thickness) {
-  return box(width, depth, thickness, { roundRadius: 2, center: [0, 0, thickness / 2] })
+  return cuboid(width, depth, thickness, { roundRadius: 2, center: [0, 0, thickness / 2] })
 }
 
 // How they go together.
@@ -3584,12 +3584,12 @@ One rule underneath all of it: change one thing, then run again. Change three th
         code: `function main() {
   // The smallest program that works. When you are lost, come back to
   // something this size, check that it runs, then add one piece at a time.
-  return box(10, 10, 10)
+  return cuboid(10, 10, 10)
 }`,
       },
       {
         title: 'Why the examples have no extra lines',
-        body: `An empty file in this app really is empty. Type box(10, 10, 10) on the first line and it works. All twelve reSHape names are already sitting there waiting for you — box, rect, disc, ball, tube, cone, ring, poly, extrude, revolve, turn, sit — and so is every name in the library underneath them, translate and subtract and hull among them. Nothing to import, nothing to set up.
+        body: `An empty file in this app really is empty. Type cuboid(10, 10, 10) on the first line and it works. All twelve reSHape names are already sitting there waiting for you — box, rect, disc, ball, tube, cone, ring, poly, extrude, revolve, turn, sit — and so is every name in the library underneath them, translate and subtract and hull among them. Nothing to import, nothing to set up.
 
 That is worth saying out loud, because most of the JSCAD you will find elsewhere does not look like this. A file written for https://jscad.app/ opens with a require line that fetches the library into a variable, and closes with module.exports = { main } to say which function to start from. That editor has no head start, so it needs both.
 
@@ -3599,7 +3599,7 @@ Where they come back is "Taking your model to jscad.app", in the Overview sectio
         code: `function main() {
   // Nothing above this line, and nothing below the closing brace.
   // box is already here.
-  return box(10, 10, 10)
+  return cuboid(10, 10, 10)
 }`,
       },
       {
@@ -3620,7 +3620,7 @@ The fix is mechanical, not clever. Brackets close in the reverse of the order th
         code: `function main() {
   // Count outward from the middle. cube( opens one, { opens two,
   // then } closes two and ) closes one, in that order.
-  return translate([0, 0, 5], box(10, 10, 10))
+  return translate([0, 0, 5], cuboid(10, 10, 10))
 }`,
       },
       {
@@ -3645,7 +3645,7 @@ Helper functions can be called anything you like, and having several is a good s
         code: `// Helpers can be called anything. Only the one the runner starts from
 // has to be spelled main, in lower case.
 function buildLid(width) {
-  return box(width, width, 3)
+  return cuboid(width, width, 3)
 }
 
 function main() {
@@ -3676,7 +3676,7 @@ Returning several shapes at once is fine and often faster than joining them: ret
         code: `function main() {
   const parts = []
   for (let i = 0; i < 4; i++) {
-    parts.push(translateX(i * 14, box(10, 10, 10)))
+    parts.push(translateX(i * 14, cuboid(10, 10, 10)))
   }
   return parts        // <- the one that is easy to forget
 }`,
@@ -3701,7 +3701,7 @@ Worth knowing: inside shCode, cube is not defined never means you forgot to impo
 function main() {
   const parts = []
   for (let i = 0; i < count; i++) {
-    parts.push(translateX(i * 12, box(8, 8, 8)))
+    parts.push(translateX(i * 12, cuboid(8, 8, 8)))
   }
   return parts
 }`,
@@ -3723,7 +3723,7 @@ That is the habit worth building from this page: when a message names a spot, as
   // parts[5] on a list of four is undefined, and asking undefined for its
   // .length is the error above. The complaint lands on the line that READ
   // it, not the line that made it.
-  const parts = [box(10, 10, 10)]
+  const parts = [cuboid(10, 10, 10)]
   console.log('parts has', parts.length, 'in it')
   return parts
 }`,
@@ -3744,7 +3744,7 @@ The same words turn up for a plain variable too. part is not a function means yo
         code: `function main() {
   // box, rect, disc, ball, tube, cone, ring, poly, extrude, revolve,
   // turn, sit. Twelve names, all short, all case-sensitive.
-  return box(30, 20, 10)
+  return cuboid(30, 20, 10)
 }`,
       },
       {
@@ -3753,16 +3753,16 @@ The same words turn up for a plain variable too. part is not a function means yo
 
 The first message in this section that comes from JSCAD itself rather than from JavaScript. It means the value was the wrong shape — not the wrong spelling, not missing, just not laid out the way that function wants.
 
-You will not get this one from box, and that is the point of the page: it is what a shape maker says when its size is laid out the wrong way, and the library underneath is full of them. cube({ size: 10 }) wants one number; cuboid({ size: [30, 20, 10] }) wants three in square brackets; hand cuboid a single number and you get the message above. box(30, 20, 10) has no brackets to get wrong.
+You will not get this one from box, and that is the point of the page: it is what a shape maker says when its size is laid out the wrong way, and the library underneath is full of them. cube({ size: 10 }) wants one number; cuboid({ size: [30, 20, 10] }) wants three in square brackets; hand cuboid a single number and you get the message above. cuboid(30, 20, 10) has no brackets to get wrong.
 
 Make the mistake the other way — cube({ size: [10, 10, 10] }) — and you get Error: size must be positive instead, which is confusing until you know why: cube looked for one number, found a list, could not compare a list against zero, and gave up there.
 
 So the habit this page is really teaching is for the moment you step down into the library, or paste in somebody else's file: when a message talks about the shape of a value rather than a name, count. How many numbers does this one want, and are they in square brackets?
 
-reSHape's own version of the same complaint counts for you: box needs three numbers: box(width, depth, height). The depth is missing.`,
+reSHape's own version of the same complaint counts for you: box needs three numbers: cuboid(width, depth, height). The depth is missing.`,
         code: `function main() {
-  const evenSided = box(10, 10, 10)              // one number
-  const boxy = box(30, 20, 10)       // three numbers
+  const evenSided = cuboid(10, 10, 10)              // one number
+  const boxy = cuboid(30, 20, 10)       // three numbers
   return [translateX(-25, evenSided), translateX(15, boxy)]
 }`,
       },
@@ -3780,7 +3780,7 @@ scale(2, part) gives Error: factors must be an array. It wants scale([2, 2, 2], 
 
 Now the reason this trips people twice. The single-direction shortcuts do take a bare number, on purpose: translateZ(20, part) lifts something 20 straight up, rotateZ(1.57, part) spins it flat, scaleZ(2, part) makes it twice as tall. So both forms are correct JSCAD, and which one is right depends on the name you typed. Square brackets for the plain name, a bare number for the one ending in X, Y or Z.`,
         code: `function main() {
-  const part = ball(6, { segments: 32 })
+  const part = sphere(6, { segments: 32 })
   const moved = translate([20, 0, 0], part)   // three numbers
   const lifted = translateZ(20, part)         // one number
   return [part, moved, lifted]
@@ -3803,7 +3803,7 @@ So the fix for colorize('gold', part) is colorize(colorNameToRgb('gold'), part) 
 
 One thing that will save you a puzzled minute later: colour is decoration only. It never changes the geometry, it makes no difference to cutting or joining shapes, and a printer with one reel of plastic ignores it entirely. It is there so you can tell your own parts apart.`,
         code: `function main() {
-  const part = box(10, 10, 10)
+  const part = cuboid(10, 10, 10)
   const red = colorize([1, 0.2, 0.2, 1], part)
   const named = colorize(colorNameToRgb('gold'), part)
   const hex = colorize(hexToRgb('#3366ff'), part)
@@ -3828,13 +3828,13 @@ Its three siblings say the same thing in slightly different words, and the gramm
   Error: only intersect of the types are supported
   Error: only hulls of the same type are supported
 
-The fix is to bring both to the same kind before combining, and in practice that means giving the flat one thickness. extrude(4, outline) takes a flat shape and pushes it straight up into a solid one, and after that the union is fine — which is what the example does.
+The fix is to bring both to the same kind before combining, and in practice that means giving the flat one thickness. extrudeLinear(4, outline) takes a flat shape and pushes it straight up into a solid one, and after that the union is fine — which is what the example does.
 
 The same message turns up if a shape is missing rather than flat: joining anything with a variable that holds undefined produces it too, because nothing is not the same kind as a cube either.`,
         code: `function main() {
-  const circle = disc(8, { segments: 32 })  // flat, 2D
-  const post = extrude(4, circle)   // now 3D
-  const slab = box(30, 30, 4)
+  const myCircle = circle(8, { segments: 32 })  // flat, 2D
+  const post = extrudeLinear(4, myCircle)   // now 3D
+  const slab = cuboid(30, 30, 4)
   return union(slab, post)
 }`,
       },
@@ -3860,8 +3860,8 @@ Two from JavaScript rather than JSCAD:
   // Every number here is inside a limit the library checks:
   // sizes above zero, segments of 3 or more (4 for anything round in 3D),
   // and a roundRadius well under half the smallest side.
-  const lid = box(40, 30, 6, { roundRadius: 2 })
-  const peg = tube(4, 20, { segments: 24 })
+  const lid = cuboid(40, 30, 6, { roundRadius: 2 })
+  const peg = cylinder(4, 20, { segments: 24 })
   return [lid, translateZ(13, peg)]
 }`,
       },
@@ -3883,7 +3883,7 @@ The same rule catches a second, sneakier one. Hand a mover something that is not
 
 The example prints the middle of both shapes so you can watch the original stay put.`,
         code: `function main() {
-  const part = box(10, 10, 10)
+  const part = cuboid(10, 10, 10)
 
   translateZ(50, part)                  // thrown away
   const moved = translateZ(50, part)    // kept
@@ -3903,11 +3903,11 @@ It is off screen. One extra zero in a translate puts a part 400 units away, past
 
 It is flat and you are looking at its edge. A disc or a rect has no thickness at all, so from straight above it can be a hairline or nothing. Drag to orbit the camera, or give it thickness with extrude.
 
-A size is zero. This one is nasty, because a zero is allowed without a word: box(10, 0, 5) builds a perfectly valid shape with no surfaces, and a shape with no surfaces draws as nothing. A number below zero would have been refused with a message; exactly zero slips through. If a size comes from arithmetic, print it.
+A size is zero. This one is nasty, because a zero is allowed without a word: cuboid(10, 0, 5) builds a perfectly valid shape with no surfaces, and a shape with no surfaces draws as nothing. A number below zero would have been refused with a message; exactly zero slips through. If a size comes from arithmetic, print it.
 
 A combiner ate it. subtract cuts its later shapes out of its first one, so the wrong order can remove everything.`,
         code: `function main() {
-  const part = translateZ(400, box(20, 20, 20))
+  const part = translateZ(400, cuboid(20, 20, 20))
   const bounds = measureBoundingBox(part)
 
   console.log('lowest corner', bounds[0])
@@ -3939,7 +3939,7 @@ Take the noisy ones out when you are done. A print on every turn of a two-thousa
     const size = 6 + i * 3
     const x = i * 20 - 40
     console.log('step', i, 'size', size, 'at x', x)
-    parts.push(translate([x, 0, size / 2], box(size, size, size)))
+    parts.push(translate([x, 0, size / 2], cuboid(size, size, size)))
   }
   console.log('the lot fits in', measureAggregateBoundingBox(parts))
   return parts
@@ -3976,9 +3976,9 @@ Change the label and everything else follows, because the plate is sized from th
   const textWidth = bounds[1][0] - bounds[0][0]
   const plateWidth = textWidth + 26
 
-  const plate = box(plateWidth, 20, thickness, { roundRadius: 1.4, center: [0, 0, thickness / 2] })
+  const plate = cuboid(plateWidth, 20, thickness, { roundRadius: 1.4, center: [0, 0, thickness / 2] })
 
-  const keyHole = tube(2.5, 20, { segments: 32, center: [-plateWidth / 2 + 6, 0, 0] })
+  const keyHole = cylinder(2.5, 20, { segments: 32, center: [-plateWidth / 2 + 6, 0, 0] })
 
   const raised = translate(
     [-textWidth / 2 + 5, -6, thickness], letters
@@ -4011,14 +4011,14 @@ Print it on its side and the sloping face comes out smooth with no supports.`,
     points: [[0, 0], [depth, 0], [0, height]],
   })
   const wedge = rotateX(Math.PI / 2,
-    extrude(width, profile)
+    extrudeLinear(width, profile)
   )
 
   // The lip the phone leans back against.
-  const lip = box(slot, width + 4, 26, { center: [14, width / 2, 8] })
+  const lip = cuboid(slot, width + 4, 26, { center: [14, width / 2, 8] })
 
   // A way out for the charging cable.
-  const cable = box(30, 16, 20, { center: [12, width / 2, -2] })
+  const cable = cuboid(30, 16, 20, { center: [12, width / 2, -2] })
 
   return translate([-depth / 2, -width / 2, 0],
     subtract(wedge, lip, cable)
@@ -4089,8 +4089,8 @@ retessellate re-cuts the faces so that faces lying flat against one another merg
 
 The example builds a solid the library has never seen — two cubes' faces poured into one bag by hand — so that there is something left to fix. Twelve faces go in and eight come out, with the volume and the overall size unchanged.`,
         code: `function main() {
-  const lower = box(10, 10, 10)
-  const upper = box(10, 10, 10, { center: [0, 0, 10] })
+  const lower = cuboid(10, 10, 10)
+  const upper = cuboid(10, 10, 10, { center: [0, 0, 10] })
 
   // Both boxes' faces tipped into one bag: a solid nothing has tidied yet.
   const raw = geom3.create([
@@ -4130,8 +4130,8 @@ retessellate(a, b) throws nothing either, and this one is quieter still. It take
 
 The example runs all four calls and prints what each one actually said.`,
         code: `function main() {
-  const block = box(20, 20, 20)
-  const flat = rect(10, 10)
+  const block = cuboid(20, 20, 20)
+  const flat = rectangle(10, 10)
 
   try {
     generalize(block)
@@ -4175,8 +4175,8 @@ triangulate is the switch with a use outside this drawer. An STL file stores not
 
 A flat shape is left alone entirely. Hand generalize a 2D shape or a path with all three switches on and you get back the very same object, not a copy — the library has no generalizing to do on something flat and does not pretend otherwise.`,
         code: `function main() {
-  const lower = box(10, 10, 10)
-  const upper = box(10, 10, 10, { center: [0, 0, 10] })
+  const lower = cuboid(10, 10, 10)
+  const upper = cuboid(10, 10, 10, { center: [0, 0, 10] })
   const raw = geom3.create([
     ...geom3.toPolygons(lower),
     ...geom3.toPolygons(upper),
@@ -4189,7 +4189,7 @@ A flat shape is left alone entirely. Hand generalize a 2D shape or a path with a
   console.log('triangulate:', generalize({ triangulate: true }, raw).polygons.length)
 
   // A flat shape comes back exactly as it went in, whatever you ask for.
-  const flat = rect(10, 10)
+  const flat = rectangle(10, 10)
   const asked = generalize({ snap: true, simplify: true, triangulate: true }, flat)
   console.log('the same 2D shape back?', asked === flat)
 
@@ -4206,25 +4206,25 @@ The use worth knowing is clearance. A 10 mm peg will not go into a 10 mm hole �
 
 The cost is faces, and it is not a product. The 96-face peg below comes out at 202 faces swept with an 8-segment ball (32 faces of its own) and 546 swept with a 32-segment one (512 faces), for exactly the same finished size — sixteen times the ball for under three times the result. Double the peg instead, to a 64-segment 192-face cylinder, sweep it with that same 8-segment ball, and the answer is 362. Both shapes cost, roughly in step with the two face counts added rather than multiplied, and per face added it is the peg's own faces that cost more: the ball's extra 480 faces bought 344, the peg's extra 96 bought 160. Keeping the growing shape coarse is still right, though — nobody can see it, because the shape you see is the peg's.`,
         code: `function main() {
-  const peg = tube(5, 20, { segments: 32 })
+  const peg = cylinder(5, 20, { segments: 32 })
 
   // Grow a copy of the peg by 0.4 mm all round, then cut THAT out of the block.
-  const clearance = minkowski.minkowskiSum(peg, ball(0.4, { segments: 8 }))
+  const clearance = minkowski.minkowskiSum(peg, sphere(0.4, { segments: 8 }))
   console.log('peg: ', measureDimensions(peg))
   console.log('hole:', measureDimensions(clearance))
 
   // What the faces actually do. Count them yourself rather than taking my word.
-  const finerBall = minkowski.minkowskiSum(peg, ball(0.4, { segments: 32 }))
+  const finerBall = minkowski.minkowskiSum(peg, sphere(0.4, { segments: 32 }))
   const finerPeg = minkowski.minkowskiSum(
-    tube(5, 20, { segments: 64 }),
-    ball(0.4, { segments: 8 })
+    cylinder(5, 20, { segments: 64 }),
+    sphere(0.4, { segments: 8 })
   )
   console.log('peg faces:      ', peg.polygons.length)
   console.log('with a coarse ball:', clearance.polygons.length)
   console.log('with a fine ball:  ', finerBall.polygons.length)
   console.log('finer peg, coarse ball:', finerPeg.polygons.length)
 
-  const socket = subtract(box(30, 30, 20), clearance)
+  const socket = subtract(cuboid(30, 30, 20), clearance)
 
   return [translate([-25, 0, 0], peg), socket]
 }`,
@@ -4266,15 +4266,15 @@ measureAggregateEpsilon(a, b, ...) is the same idea for the comparison margin. m
 
 That is what it is for: when you are comparing measured numbers across a whole assembly, one margin for the lot is more honest than a different margin per part.`,
         code: `function main() {
-  const plate = rect(4, 4)
-  const circle = disc(3, { segments: 32 })
+  const plate = rectangle(4, 4)
+  const myCircle = circle(3, { segments: 32 })
 
-  console.log('one at a time:', measureArea(plate), measureArea(circle))
-  console.log('added up:     ', measureAggregateArea(plate, circle))
-  console.log('epsilon each: ', measureEpsilon(plate), measureEpsilon(circle))
-  console.log('epsilon group:', measureAggregateEpsilon(plate, circle))
+  console.log('one at a time:', measureArea(plate), measureArea(myCircle))
+  console.log('added up:     ', measureAggregateArea(plate, myCircle))
+  console.log('epsilon each: ', measureEpsilon(plate), measureEpsilon(myCircle))
+  console.log('epsilon group:', measureAggregateEpsilon(plate, myCircle))
 
-  return [translate([-5, 0, 0], plate), translate([5, 0, 0], circle)]
+  return [translate([-5, 0, 0], plate), translate([5, 0, 0], myCircle)]
 }`,
       },
       {
@@ -4303,8 +4303,8 @@ Going out to hsl and back is how you shift a colour rather than pick a new one. 
   console.log('the opposite:', opposite)
 
   return [
-    colorize(base, box(10, 10, 10, { center: [-8, 0, 5] })),
-    colorize(opposite, box(10, 10, 10, { center: [8, 0, 5] })),
+    colorize(base, cuboid(10, 10, 10, { center: [-8, 0, 5] })),
+    colorize(opposite, cuboid(10, 10, 10, { center: [8, 0, 5] })),
   ]
 }`,
       },
@@ -4339,9 +4339,9 @@ The fourth number has the same fault and shows it more plainly: rgbToHex([1, 0, 
 
   return [
     colorize(hexToRgb(rgbToHex(grey)),
-      box(14, 14, 14, { center: [-10, 0, 7] })),
+      cuboid(14, 14, 14, { center: [-10, 0, 7] })),
     colorize(hexToRgb(rgbToHex(stepped)),
-      box(14, 14, 14, { center: [10, 0, 7] })),
+      cuboid(14, 14, 14, { center: [10, 0, 7] })),
   ]
 }`,
       },
@@ -4360,7 +4360,7 @@ One hue and four values is a palette. The four bars below are the same blue at a
   return [0.25, 0.5, 0.75, 1].map(function (value, i) {
     const paint = hsvToRgb([hue, 0.7, value])
     console.log('value', value, 'gives', paint)
-    return colorize(paint, box(8, 8, 24, { center: [i * 10 - 15, 0, 12] }))
+    return colorize(paint, cuboid(8, 8, 24, { center: [i * 10 - 15, 0, 12] }))
   })
 }`,
       },
@@ -4390,7 +4390,7 @@ It is in this section for the same reason as the rest: it is exported, so somebo
   console.log('by hand: ', byHand)
   console.log('hslToRgb:', hslToRgb([h, s, l]))
 
-  return colorize(byHand, box(24, 24, 24, { roundRadius: 3 }))
+  return colorize(byHand, cuboid(24, 24, 24, { roundRadius: 3 }))
 }`,
       },
       {
@@ -4410,14 +4410,14 @@ The remaining two get a page each, because both of them behave in a way that is 
   // A list of lists, the shape a loop inside a loop leaves behind.
   const nested = [0, 1, 2].map(function (row) {
     return [0, 1, 2].map(function (col) {
-      return box(6, 6, 6, { center: [col * 10 - 10, row * 10 - 10, 3] })
+      return cuboid(6, 6, 6, { center: [col * 10 - 10, row * 10 - 10, 3] })
     })
   })
 
   const flat = flatten(nested)
   console.log('rows:', nested.length, ' shapes:', flat.length)
   console.log('all one kind?', areAllShapesTheSameType(flat))
-  console.log('mixed?', areAllShapesTheSameType([flat[0], disc(2)]))
+  console.log('mixed?', areAllShapesTheSameType([flat[0], circle(2)]))
 
   const heights = [12, 3, 30, 7]
   console.log('sorted the default way:', heights.slice().sort())
@@ -4448,7 +4448,7 @@ Plain JavaScript does the same job in two steps that are harder to misread: list
   console.log('what the array is now:', heights)
 
   return heights.map(function (h, i) {
-    return box(6, 6, h, { center: [i * 10 - 15, 0, h / 2] })
+    return cuboid(6, 6, h, { center: [i * 10 - 15, 0, h / 2] })
   })
 }`,
       },

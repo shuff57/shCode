@@ -67,19 +67,19 @@ fails the build if one of them needs the shim.
 ### Converting a whole file to the portable form
 
 Converting a file undoes **two** shortcuts, and a file that only had the first
-one undone still does not run. The obvious one is the reSHape names — `box(40, 20, 10)` becomes
+one undone still does not run. The obvious one is the reSHape names — `cuboid(40, 20, 10)` becomes
 `primitives.cuboid({ size: [40, 20, 10] })`. The one that is easy to forget is
 the shim above: `translate` and `subtract` and `measureVolume` are bare in
 shCode and do not exist on jscad.app at all. Both halves show up in one line
-more often than not — `revolve(translate([10, 0, 0], rect(4, 10)))` is an reSHape
+more often than not — `extrudeRotate(translate([10, 0, 0], rectangle(4, 10)))` is an reSHape
 name wrapped around a bare real one.
 
 Here is a program in reSHape:
 
 ```js shcode-only
 function main() {
-  const arm = translate([50, 0, 0], box(40, 20, 20))
-  const cap = sit(ring(14, 4))
+  const arm = translate([50, 0, 0], cuboid(40, 20, 20))
+  const cap = sit(torus(14, 4))
 
   return [turn(90, arm), cap]
 }
@@ -159,7 +159,7 @@ Compare the first line a student writes:
 
 ```js shcode-only
 function main() {
-  return box(40, 20, 10)                      // reSHape — no braces, no arrays
+  return cuboid(40, 20, 10)                      // reSHape — no braces, no arrays
   // return cuboid({ size: [40, 20, 10] })    // the real API — both required
 }
 ```
@@ -168,7 +168,7 @@ function main() {
 
 ```js shcode-only
 function main() {
-  return box(40, 20, 10, { center: [0, 0, 10] })
+  return cuboid(40, 20, 10, { center: [0, 0, 10] })
   // return cuboid({ size: [40, 20, 10], center: [0, 0, 10] })
 }
 ```
@@ -188,20 +188,20 @@ the two vocabularies mix freely in one file.
 
 | reSHape | The real call it stands for |
 | --- | --- |
-| `box(40, 20, 10)` | `cuboid({ size: [40, 20, 10] })` |
-| `box(20, 20, 20, { roundRadius: 3 })` | `roundedCuboid({ size: [20, 20, 20], roundRadius: 3 })` |
-| `rect(40, 20)` | `rectangle({ size: [40, 20] })` |
-| `rect(40, 20, { roundRadius: 3 })` | `roundedRectangle({ size: [40, 20], roundRadius: 3 })` |
-| `disc(6)` | `circle({ radius: 6 })` |
-| `ball(20)` | `sphere({ radius: 20 })` |
-| `tube(5, 20)` | `cylinder({ radius: 5, height: 20 })` |
-| `tube(5, 20, { roundRadius: 1 })` | `roundedCylinder({ radius: 5, height: 20, roundRadius: 1 })` |
-| `cone(10, 20)` | `cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20 })` |
-| `ring(14, 4)` | `torus({ outerRadius: 14, innerRadius: 4 })` — read the warning below; the pair is inverted |
-| `poly(corners)` | `polygon({ points: corners })` |
-| `extrude(10, profile)` | `extrudeLinear({ height: 10 }, profile)` |
-| `revolve(profile)` | `extrudeRotate({}, profile)` — a full turn is already the default |
-| `revolve(profile, { segments: 16 })` | `extrudeRotate({ segments: 16 }, profile)` — the `{ }` swaps ends |
+| `cuboid(40, 20, 10)` | `cuboid({ size: [40, 20, 10] })` |
+| `cuboid(20, 20, 20, { roundRadius: 3 })` | `roundedCuboid({ size: [20, 20, 20], roundRadius: 3 })` |
+| `rectangle(40, 20)` | `rectangle({ size: [40, 20] })` |
+| `rectangle(40, 20, { roundRadius: 3 })` | `roundedRectangle({ size: [40, 20], roundRadius: 3 })` |
+| `circle(6)` | `circle({ radius: 6 })` |
+| `sphere(20)` | `sphere({ radius: 20 })` |
+| `cylinder(5, 20)` | `cylinder({ radius: 5, height: 20 })` |
+| `cylinder(5, 20, { roundRadius: 1 })` | `roundedCylinder({ radius: 5, height: 20, roundRadius: 1 })` |
+| `cylinderElliptic(10, 20)` | `cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20 })` |
+| `torus(14, 4)` | `torus({ outerRadius: 14, innerRadius: 4 })` — read the warning below; the pair is inverted |
+| `polygon(corners)` | `polygon({ points: corners })` |
+| `extrudeLinear(10, profile)` | `extrudeLinear({ height: 10 }, profile)` |
+| `extrudeRotate(profile)` | `extrudeRotate({}, profile)` — a full turn is already the default |
+| `extrudeRotate(profile, { segments: 16 })` | `extrudeRotate({ segments: 16 }, profile)` — the `{ }` swaps ends |
 | `sit(shape)` | `align({ modes: ['none','none','min'], relativeTo: [0,0,0] }, shape)` |
 | `sit(parts)` — a list of shapes | `align({ modes: ['none','none','min'], relativeTo: [0,0,0], grouped: true }, parts)` |
 | `turn(45, shape)` | **not** a plain `rotate` — see below |
@@ -228,7 +228,7 @@ is too big is reported with your own numbers in it instead of the library's
 
 Nothing here is accepted and quietly dropped. `turn`, `sit`, `ring` and `poly`
 have no `{ }` at all, so `turn(45, shape, 30)`, `sit(shape, { modes: [...] })`
-and `ring(14, 4, { segments: 64 })` are errors, not no-ops — the second one
+and `torus(14, 4, { segments: 64 })` are errors, not no-ops — the second one
 especially, because `modes` is `align`'s own key and looks like it ought to
 work, and the third because `torus` really does accept a `segments` key and
 really does throw it away.
@@ -247,9 +247,9 @@ rides in a *trailing* `{ }`, with no exceptions — that is the whole grammar.
 The real `extrudeRotate` and `extrudeLinear` take theirs *first*. `extrude`
 hides that, because its one required value becomes the leading `{ height: … }`;
 `revolve` cannot, because its required value is the shape. So
-`revolve(profile, { segments: 16 })` graduates to
+`extrudeRotate(profile, { segments: 16 })` graduates to
 `extrudeRotate({ segments: 16 }, profile)` — the same two things, in the other
-order. Writing `revolve({ segments: 16 }, profile)` is refused by name rather
+order. Writing `extrudeRotate({ segments: 16 }, profile)` is refused by name rather
 than half-working.
 
 **`revolve` makes a full turn, and only a full turn.** `angle` is not one of
@@ -258,7 +258,7 @@ reSHape's option keys and it is not going to become one — a part turn is
 `extrudeRotate({ segments: 8, angle: constants.TAU / 2 }, profile)` sweeps half
 way round. (The book writes that angle `TAU / 2`; bare `TAU` is not a name this
 runner installs — see [`TAU` is a value, not a name in scope](#tau-is-a-value-not-a-name-in-scope).)
-Typing `revolve(profile, { angle: … })` does not half-work either; it is refused
+Typing `extrudeRotate(profile, { angle: … })` does not half-work either; it is refused
 with that real call spelled out in the message. That is the shape of every
 refusal here — a name reSHape does not have is answered with the name that does.
 
@@ -266,7 +266,7 @@ refusal here — a name reSHape does not have is answered with the name that doe
 not true.** JSCAD's `outerRadius` is the radius of the circle the tube travels
 *along* — it is not the outside edge of the finished donut, and it is not
 anything you can put a caliper on. Its `innerRadius` is the radius of the tube
-itself, not the hole. So `ring(ringRadius, tubeRadius)` maps the ring radius to
+itself, not the hole. So `torus(ringRadius, tubeRadius)` maps the ring radius to
 `outerRadius` and the tube radius to `innerRadius`.
 
 **`tubeRadius` is a true word where `innerRadius` is a false one — and that is
@@ -282,12 +282,12 @@ complaining. Measured on the vendored bundle, for a donut **36 across with an
 
 | what you write | what you get |
 | --- | --- |
-| `ring(14, 4)` — or `torus({ outerRadius: 14, innerRadius: 4 })` | 36 × 36 × 8 — right |
-| `ring(18, 4)` — `ringRadius` read as the outer edge | 44 × 44 × 8, silently |
-| `ring(14, 8)` — `tubeRadius` read as the tube's *thickness* | 44 × 44 × 16, silently |
-| `torus({ outerRadius: 18, innerRadius: 4 })` — `outerRadius` read as the outer edge | 44 × 44 × 8, silently — the same wrong model as `ring(18, 4)` |
+| `torus(14, 4)` — or `torus({ outerRadius: 14, innerRadius: 4 })` | 36 × 36 × 8 — right |
+| `torus(18, 4)` — `ringRadius` read as the outer edge | 44 × 44 × 8, silently |
+| `torus(14, 8)` — `tubeRadius` read as the tube's *thickness* | 44 × 44 × 16, silently |
+| `torus({ outerRadius: 18, innerRadius: 4 })` — `outerRadius` read as the outer edge | 44 × 44 × 8, silently — the same wrong model as `torus(18, 4)` |
 | `torus({ outerRadius: 18, innerRadius: 10 })` — and `innerRadius` read as the hole | 56 × 56 × 20, silently |
-| `ring(4, 14)` — the full swap | throws, and it says *"a tube 14 thick will not fit round a ring of radius 4 — in `ring(ringRadius, tubeRadius)` the ring radius comes first. `ring(14, 4)` is the one you meant"* |
+| `torus(4, 14)` — the full swap | throws, and it says *"a tube 14 thick will not fit round a ring of radius 4 — in `torus(ringRadius, tubeRadius)` the ring radius comes first. `torus(14, 4)` is the one you meant"* |
 | `torus({ outerRadius: 4, innerRadius: 14 })` — the same swap | throws too, and it says *"inner circle is too large to rotate about the outer circle"* — two circles you never typed |
 
 Read the two throwing rows together: **`ring` does not catch a swap `torus`
@@ -305,7 +305,7 @@ wrong place with no error. `torus` spells its own segment counts
 
 ```js shcode-only
 function main() {
-  const donut = ring(14, 4)                                   // reSHape
+  const donut = torus(14, 4)                                   // reSHape
   // torus({ outerRadius: 14, innerRadius: 4 })
 
   const chunky = torus({ outerRadius: 14, innerRadius: 4, outerSegments: 8 })
@@ -321,14 +321,14 @@ function main() {
 **`cone` is the one whose real call is worth seeing before you need it.** A cone
 is `cylinderElliptic` with its top radius set to zero, and there is no shorter
 way to write it in the real API: `cylinder({ radius: [12, 0] })` is not a cone,
-it is an error. `cone(10, 20)` takes `center` and `segments` and nothing else.
+it is an error. `cylinderElliptic(10, 20)` takes `center` and `segments` and nothing else.
 Anything else a cone-shaped thing might be — a cut-off point, an oval base, a
 pie slice — is `cylinderElliptic`'s job, and each one is spelled out in the
 refusal you get for asking:
 
 | what you want | the real call |
 | --- | --- |
-| a cone | `cone(10, 20)`, or `cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20 })` |
+| a cone | `cylinderElliptic(10, 20)`, or `cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20 })` |
 | the point cut off (a frustum) | `cylinderElliptic({ startRadius: [10, 10], endRadius: [4, 4], height: 20 })` |
 | an oval base | `cylinderElliptic({ startRadius: [10, 6], endRadius: [0, 0], height: 20 })` |
 | half of it, like a pie slice | `cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20, startAngle: 0, endAngle: constants.TAU / 2 })` |
@@ -339,10 +339,10 @@ silently** — same bounding box, same polygon count, no error. A key that does
 nothing is the same class of bug as a missing height.
 
 **`poly` is the one whose positional argument is a list, and that is a smaller
-win than the others.** `box(40, 20, 10)` has no punctuation in it at all;
-`poly([[0, 0], [20, 0], [10, 15]])` plainly does. What it removes is the object
+win than the others.** `cuboid(40, 20, 10)` has no punctuation in it at all;
+`polygon([[0, 0], [20, 0], [10, 15]])` plainly does. What it removes is the object
 literal wrapped around a list you already have — `polygon({ points: corners })`
-becomes `poly(corners)` — which is worth having and is not the same thing as
+becomes `polygon(corners)` — which is worth having and is not the same thing as
 "no punctuation". It has no `{ }`, so `polygon`'s other two keys, `paths` and
 `orientation`, are on the far side of it; the refusal names `polygon`.
 
@@ -361,7 +361,7 @@ one does not. Measured on the vendored bundle:
 | what you write, after graduating | what you get |
 | --- | --- |
 | `polygon({ points: corners })` | the shape — this is the right call |
-| `polygon(corners)` — the habit `poly(corners)` builds | a real, **valid, empty** shape: 0 sides, bounding box `[[0,0,0],[0,0,0]]`, no error, nothing on screen |
+| `polygon(corners)` — the habit `polygon(corners)` builds | a real, **valid, empty** shape: 0 sides, bounding box `[[0,0,0],[0,0,0]]`, no error, nothing on screen |
 
 And "always wrap the list" is not the rule either, because `line`, two rows away
 from `polygon` in the **primitives** catalogue below, really does take its
@@ -373,12 +373,12 @@ own heading is telling you.
 function main() {
   const corners = [[0, 0], [20, 0], [10, 15]]
 
-  const flat = poly(corners)                     // reSHape
+  const flat = polygon(corners)                     // reSHape
   // polygon({ points: corners })
 
-  const wedge = extrude(6, flat)
-  const spun = revolve(translate([30, 0, 0], poly(corners)))
-  const spike = cone(10, 20)
+  const wedge = extrudeLinear(6, flat)
+  const spun = extrudeRotate(translate([30, 0, 0], polygon(corners)))
+  const spike = cylinderElliptic(10, 20)
 
   return sit([wedge, translate([70, 0, 0], spun), translate([-30, 0, 0], spike)])
 }
@@ -388,20 +388,20 @@ function main() {
 
 ```js shcode-only
 function main() {
-  const plate = subtract(rect(40, 20), disc(6))       // reSHape
+  const plate = subtract(rectangle(40, 20), circle(6))       // reSHape
   // subtract(rectangle({ size: [40, 20] }), circle({ radius: 6 }))
 
-  const part = extrude(10, plate)                     // reSHape
+  const part = extrudeLinear(10, plate)                     // reSHape
   // extrudeLinear({ height: 10 }, plate)
 
-  const bushing = subtract(tube(10, 20), tube(4, 22)) // reSHape
+  const bushing = subtract(cylinder(10, 20), cylinder(4, 22)) // reSHape
   // subtract(cylinder({ radius: 10, height: 20 }),
   //          cylinder({ radius: 4,  height: 22 }))
 
-  const bowl = revolve(translate([10, 0, 0], rect(4, 10)))
+  const bowl = extrudeRotate(translate([10, 0, 0], rectangle(4, 10)))
   // extrudeRotate({}, translate([10, 0, 0], rectangle({ size: [4, 10] })))
 
-  return [sit(part), sit(bushing), sit(bowl), sit(ball(10))]
+  return [sit(part), sit(bushing), sit(bowl), sit(sphere(10))]
   // align({ modes: ['none', 'none', 'min'], relativeTo: [0, 0, 0] }, …)
 }
 ```
@@ -424,8 +424,8 @@ call — the model is wrong, and `center` is what fixes it.
 
 ```js shcode-only
 function main() {
-  const sunk = tube(6, 30)                        // no brace anywhere
-  const seated = tube(6, 30, { center: [0, 0, 15] })   // one key, one reason
+  const sunk = cylinder(6, 30)                        // no brace anywhere
+  const seated = cylinder(6, 30, { center: [0, 0, 15] })   // one key, one reason
 
   // Half of `sunk` is below z = 0. Read it rather than trusting the picture.
   console.log('sunk  ', measureBoundingBox(sunk)[0][2])
@@ -442,9 +442,9 @@ not a second positional number.
 
 ```js shcode-only
 function main() {
-  const sharp = box(30, 20, 10)
-  const soft = box(30, 20, 10, { roundRadius: 3 })
-  const smooth = box(30, 20, 10, { roundRadius: 3, segments: 24 })
+  const sharp = cuboid(30, 20, 10)
+  const soft = cuboid(30, 20, 10, { roundRadius: 3 })
+  const smooth = cuboid(30, 20, 10, { roundRadius: 3, segments: 24 })
 
   // Rounding removes material, so the volume falls; segments only changes how
   // finely the curve is drawn, so it barely moves the number at all.
@@ -461,8 +461,8 @@ segments is not a rough circle, it is a hexagon — which is how a nut gets made
 
 ```js shcode-only
 function main() {
-  const nut = extrude(6, disc(10, { segments: 6 }))
-  const bolt = extrude(24, disc(4, { segments: 48 }))
+  const nut = extrudeLinear(6, circle(10, { segments: 6 }))
+  const bolt = extrudeLinear(24, circle(4, { segments: 48 }))
 
   console.log('nut across the corners:', measureDimensions(nut))
 
@@ -476,7 +476,7 @@ wants.
 
 ```js shcode-only
 function main() {
-  return tube(8, 24, { center: [0, 0, 12], roundRadius: 2, segments: 48 })
+  return cylinder(8, 24, { center: [0, 0, 12], roundRadius: 2, segments: 48 })
 }
 ```
 
@@ -504,7 +504,7 @@ function main(params) {
   const extras = {}
   if (params.finish === 'round' && params.corner > 0) extras.roundRadius = params.corner
 
-  return sit(box(params.width, 20, 10, extras))
+  return sit(cuboid(params.width, 20, 10, extras))
 }
 ```
 
@@ -536,7 +536,7 @@ renamed out from under this citation.
 
 ```js shcode-only
 function main() {
-  const arm = translate([50, 0, 0], box(40, 20, 20))
+  const arm = translate([50, 0, 0], cuboid(40, 20, 20))
 
   return turn(90, arm)                     // turns where it stands
   // rotate([0, 0, Math.PI / 2], arm)      // orbits to y = 50 instead
@@ -590,7 +590,7 @@ textbook prints. Show it in `rotate` — that is the only place it exists:
 
 ```js shcode-only
 function main() {
-  const s = box(40, 20, 10)
+  const s = cuboid(40, 20, 10)
 
   // The same two transforms, in the two orders. With rotate these are two
   // different models: the first stands at x = 50, the second has swung round
@@ -657,27 +657,29 @@ call you want, rather than emitting something that half-works.
 
 #### Reading the book
 
-The seven Q3 chapters are written in the real API, so a student reads `cuboid`
-and writes `box`. That table goes the other way — real name on the left, the
-reSHape word for it on the right — and it is the one to keep open while reading.
-Three of these are not guessable backwards, which is exactly why they are here.
+The seven Q3 chapters are written in the real API, and so is this layer — a
+student reads `cuboid` and types `cuboid`. What still differs is the CALL: here
+the common shapes take plain numbers, and the library's own `{ }` spelling keeps
+working beside it. This table is what to keep open while reading, for the rows
+where the two are not the same shape of call. Three of them are not guessable at
+all — `torus` inverts its pair, and `align` and `rotate` have no equivalent.
 
-| what the book prints | the reSHape word |
+| what the book prints | how you call it here |
 | --- | --- |
-| `cuboid` | `box` |
-| `cube` | `box(10, 10, 10)` — one number in the book, three here. It is the first 3D shape §8.1 prints and the opening runnable block of the whole unit |
-| `roundedCuboid` | `box(w, d, h, { roundRadius: n })` |
-| `rectangle` | `rect` |
-| `roundedRectangle` | `rect(w, h, { roundRadius: n })` |
-| `circle` | `disc` |
-| `sphere` | `ball` |
-| `cylinder` | `tube` |
-| `roundedCylinder` | `tube(r, h, { roundRadius: n })` |
-| `cylinderElliptic` | `cone(radius, height)` — **when, and only when, it is a cone.** `cone` sets `endRadius` to `[0, 0]` for you. A frustum, an oval tube or a pie slice is still `cylinderElliptic`; type the book's own call |
-| `torus` | `ring(ringRadius, tubeRadius)` — **the pair is inverted, and neither of `torus`'s names is true.** `outerRadius` is the radius of the circle the tube travels along, not the outer edge; `innerRadius` is the tube, not the hole. `ring(14, 4)` is 36 across and 8 thick. Read the warning above before swapping one for the other |
-| `polygon` | `poly(corners)` — a straight rename, minus the `{ points: … }` wrapper. `polygon`'s other two keys, `paths` and `orientation`, have no reSHape spelling; type the book's own call for those |
-| `extrudeLinear` | `extrude` — **a straight extrusion only.** Three of §9.1's five `extrudeLinear` calls also pass `twistAngle` / `twistSteps`, and `extrude` has no such key; type the book's own call, below |
-| `extrudeRotate` | `revolve` — **a full turn only.** §9.1 spins one profile half way round, and `revolve` cannot do it; type the book's own call, below |
+| `cuboid` | `cuboid(width, depth, height)` — the same word, positional instead of `{ size: [...] }`. The `{ }` form still works |
+| `cube` | `cuboid(10, 10, 10)` — one number in the book, three here. It is the first 3D shape §8.1 prints and the opening runnable block of the whole unit |
+| `roundedCuboid` | `cuboid(w, d, h, { roundRadius: n })` |
+| `rectangle` | `rectangle(width, height)` — positional; the `{ }` form still works |
+| `roundedRectangle` | `rectangle(w, h, { roundRadius: n })` |
+| `circle` | `circle(radius)` — positional; the `{ }` form still works |
+| `sphere` | `sphere(radius)` — positional; the `{ }` form still works |
+| `cylinder` | `cylinder(radius, height)` — positional; the `{ }` form still works |
+| `roundedCylinder` | `cylinder(r, h, { roundRadius: n })` |
+| `cylinderElliptic` | `cylinderElliptic(radius, height)` — **when, and only when, it is a cone.** `cone` sets `endRadius` to `[0, 0]` for you. A frustum, an oval tube or a pie slice is still `cylinderElliptic`; type the book's own call |
+| `torus` | `torus(ringRadius, tubeRadius)` — **the pair is inverted, and neither of `torus`'s names is true.** `outerRadius` is the radius of the circle the tube travels along, not the outer edge; `innerRadius` is the tube, not the hole. `torus(14, 4)` is 36 across and 8 thick. Read the warning above before swapping one for the other |
+| `polygon` | `polygon(corners)` — a straight rename, minus the `{ points: … }` wrapper. `polygon`'s other two keys, `paths` and `orientation`, have no reSHape spelling; type the book's own call for those |
+| `extrudeLinear` | `extrudeLinear(height, shape)` — **a straight extrusion only.** Three of §9.1's five `extrudeLinear` calls also pass `twistAngle` / `twistSteps`, and `extrude` has no such key; type the book's own call, below |
+| `extrudeRotate` | `extrudeRotate(shape)` — **a full turn only.** §9.1 spins one profile half way round, and `revolve` cannot do it; type the book's own call, below |
 | `align` | `sit`, but **only when the modes are `['none','none','min']`** — with any other modes `sit` is the wrong answer, and not one of the four `align` calls the seven chapters print is written that way. Read the warning below before you swap one for the other |
 | `rotate` | `turn` — **degrees, and about the shape's own middle**, see above |
 | `rotateZ` / `rotateX` / `rotateY` | `turn` — same warning. These are single-axis shortcuts for `rotate` and they orbit the world origin exactly the way it does. `rotateZ(a, s)` is `turn(degrees, s)`; `rotateX` / `rotateY` are `turn([d, 0, 0], s)` / `turn([0, d, 0], s)` |
@@ -710,7 +712,7 @@ the picture looks plausible. So: `sit` when you want a shape brought down and
 left alone horizontally, and the book's own `align` for anything else. `align`
 is bare and real in here — it needs no translation at all.
 
-**`extrudeRotate` → `revolve` drops the part turn.** `revolve(profile)` is a
+**`extrudeRotate` → `revolve` drops the part turn.** `extrudeRotate(profile)` is a
 full turn, which is already `extrudeRotate`'s default angle, and five of the six
 `extrudeRotate` calls in the chapters are exactly that. The sixth, §9.1's first
 worked example, is a half turn, and `angle` is not one of reSHape's option keys.
@@ -718,31 +720,31 @@ Type the real call for it — it is bare and in scope here:
 
 ```js shcode-only
 function main() {
-  const profile = disc(3, { center: [4, 0] })
+  const profile = circle(3, { center: [4, 0] })
 
   const half = extrudeRotate({ segments: 8, angle: constants.TAU / 2 }, profile)
-  const full = revolve(profile, { segments: 16 })
+  const full = extrudeRotate(profile, { segments: 16 })
 
   return [translate([0, -12, 0], half), translate([0, 12, 0], full)]
 }
 ```
 
 **`extrudeLinear` → `extrude` drops the twist, and it is the same shape of
-warning one section later.** `extrude(10, profile)` raises a profile straight
+warning one section later.** `extrudeLinear(10, profile)` raises a profile straight
 up, which is what `extrudeLinear` does when you give it nothing but a height —
 and six of the book's nine `extrudeLinear` calls are exactly that. The other
 three are §9.1's twisted block and twisted disc, which add `twistAngle` and
 `twistSteps`, turning the profile a little at each of `twistSteps` layers on
 the way up. Neither is a reSHape option key, and neither is going to become one:
-a twist is `extrudeLinear`'s job, so `extrude(10, profile, { twistAngle: … })`
+a twist is `extrudeLinear`'s job, so `extrudeLinear(10, profile, { twistAngle: … })`
 is refused by name with the real call spelled out rather than quietly building
 a straight block. Type the book's own call:
 
 ```js shcode-only
 function main() {
-  const profile = rect(10, 20)
+  const profile = rectangle(10, 20)
 
-  const straight = extrude(10, profile)                                  // reSHape
+  const straight = extrudeLinear(10, profile)                                  // reSHape
   const twisted = extrudeLinear(
     { height: 10, twistAngle: constants.TAU / 4, twistSteps: 20 }, profile
   )
@@ -778,7 +780,7 @@ same number and travels anywhere.
 ```js shcode-only
 function main() {
   console.log(constants.TAU, Math.PI * 2, maths.constants.TAU)
-  return revolve(disc(3, { center: [8, 0] }), { segments: 24 })
+  return extrudeRotate(circle(3, { center: [8, 0] }), { segments: 24 })
 }
 ```
 
@@ -873,7 +875,7 @@ function main(params) {
     const x = params.ringRadius * Math.cos(angle)
     const y = params.ringRadius * Math.sin(angle)
     // The book's line here is translate([x, y], circle({ radius: 5 })).
-    shapes.push(translate([x, y, 0], extrude(params.thick, disc(params.size))))
+    shapes.push(translate([x, y, 0], extrudeLinear(params.thick, circle(params.size))))
   }
   return shapes
 }

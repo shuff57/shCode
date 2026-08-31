@@ -24,7 +24,7 @@
 //                   subtract / union / hull / extrudeLinear / colorize.
 //   3. OBJECTS    — required values are positional; every named extra rides in
 //                   an optional trailing { } whose keys are the textbook's own
-//                   words. box(40,20,10) on day one, box(40,20,10,{center:…})
+//                   words. cuboid(40,20,10) on day one, cuboid(40,20,10,{center:…})
 //                   the first time a student moves something.
 //
 // turn() is the ONE deliberate exception to "the same geometry the real call
@@ -52,70 +52,70 @@ export const SIMPLE_PATH = join(REPO, 'public/reshape/reshape.js');
 /** The twelve names, what each needs positionally, and what it really calls. */
 export const RESHAPE_NAMES = [
   {
-    name: 'box', arity: 3,
+    name: 'cuboid', arity: 3,
     positional: ['width', 'depth', 'height'],
     options: ['center', 'roundRadius', 'segments'],
     wraps: 'primitives.cuboid({ size: [width, depth, height] }); roundedCuboid when roundRadius is given',
     real: 'cuboid',
   },
   {
-    name: 'rect', arity: 2,
+    name: 'rectangle', arity: 2,
     positional: ['width', 'height'],
     options: ['center', 'roundRadius', 'segments'],
     wraps: 'primitives.rectangle({ size: [width, height] }); roundedRectangle when roundRadius is given',
     real: 'rectangle',
   },
   {
-    name: 'disc', arity: 1,
+    name: 'circle', arity: 1,
     positional: ['radius'],
     options: ['center', 'segments'],
     wraps: 'primitives.circle({ radius })',
     real: 'circle',
   },
   {
-    name: 'ball', arity: 1,
+    name: 'sphere', arity: 1,
     positional: ['radius'],
     options: ['center', 'segments'],
     wraps: 'primitives.sphere({ radius })',
     real: 'sphere',
   },
   {
-    name: 'tube', arity: 2,
+    name: 'cylinder', arity: 2,
     positional: ['radius', 'height'],
     options: ['center', 'roundRadius', 'segments'],
     wraps: 'primitives.cylinder({ radius, height }); roundedCylinder when roundRadius is given',
     real: 'cylinder',
   },
   {
-    name: 'cone', arity: 2,
+    name: 'cylinderElliptic', arity: 2,
     positional: ['radius', 'height'],
     options: ['center', 'segments'],
     wraps: 'primitives.cylinderElliptic({ startRadius: [radius, radius], endRadius: [0, 0], height })',
     real: 'cylinderElliptic',
   },
   {
-    name: 'ring', arity: 2,
+    name: 'torus', arity: 2,
     positional: ['ringRadius', 'tubeRadius'],
     options: [],
     wraps: 'primitives.torus({ outerRadius: ringRadius, innerRadius: tubeRadius }) — the mapping is inverted, and that is the point',
     real: 'torus',
   },
   {
-    name: 'poly', arity: 1,
+    name: 'polygon', arity: 1,
     positional: ['points'],
     options: [],
     wraps: 'primitives.polygon({ points })',
     real: 'polygon',
   },
   {
-    name: 'extrude', arity: 2,
+    name: 'extrudeLinear', arity: 2,
     positional: ['height', 'shape', '...moreShapes'],
     options: [],
     wraps: 'extrusions.extrudeLinear({ height }, ...shapes)',
     real: 'extrudeLinear',
   },
   {
-    name: 'revolve', arity: 1,
+    name: 'extrudeRotate', arity: 1,
     positional: ['shape'],
     options: ['segments'],
     wraps: 'extrusions.extrudeRotate({}, shape) — a full turn is already the default angle',
@@ -159,27 +159,27 @@ export const EXPECTED_RESHAPE_NAME_COUNT = 12;
  */
 export const SILENTLY_DROPPED = [
   {
-    name: 'ring', key: 'center', real: 'torus', drops: true,
+    name: 'torus', key: 'center', real: 'torus', drops: true,
     a: (w) => w.torus({ outerRadius: 14, innerRadius: 4 }),
     b: (w) => w.torus({ outerRadius: 14, innerRadius: 4, center: [0, 0, 10] }),
     why: 'a torus has no center; the bounding box does not move and nothing is reported',
   },
   {
-    name: 'ring', key: 'segments', real: 'torus', drops: true,
+    name: 'torus', key: 'segments', real: 'torus', drops: true,
     a: (w) => w.torus({ outerRadius: 14, innerRadius: 4 }),
     b: (w) => w.torus({ outerRadius: 14, innerRadius: 4, segments: 8 }),
     why: 'torus spells them innerSegments and outerSegments; plain segments is dropped, '
       + 'and the model comes back at the same 2048 polygons',
   },
   {
-    name: 'cone', key: 'roundRadius', real: 'cylinderElliptic', drops: true,
+    name: 'cylinderElliptic', key: 'roundRadius', real: 'cylinderElliptic', drops: true,
     a: (w) => w.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20 }),
     b: (w) => w.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20, roundRadius: 2 }),
     why: 'roundRadius is in reSHape\'s option vocabulary and is NOT a cylinderElliptic key — '
       + 'accepting it would round nothing and say nothing',
   },
   {
-    name: 'poly', key: 'orientation', real: 'polygon', drops: false,
+    name: 'polygon', key: 'orientation', real: 'polygon', drops: false,
     a: (w) => w.polygon({ points: [[0, 0], [20, 0], [10, 15]] }),
     b: (w) => w.polygon({ points: [[0, 0], [20, 0], [10, 15]], orientation: 'clockwise' }),
     why: 'this one really works — poly refuses it because it is outside the option '
@@ -248,85 +248,85 @@ export const RESHAPE_OPTION_KEYS = ['center', 'roundRadius', 'segments'];
  * geometry" and fail here.
  */
 export const EQUIVALENTS = [
-  { name: 'box', label: 'box(40, 20, 10)',
-    reshape: (w) => w.box(40, 20, 10),
+  { name: 'cuboid', label: 'cuboid(40, 20, 10)',
+    reshape: (w) => w.cuboid(40, 20, 10),
     real: (j) => j.primitives.cuboid({ size: [40, 20, 10] }) },
-  { name: 'box', label: 'box(40, 20, 10, { center: [0, 0, 10] })',
-    reshape: (w) => w.box(40, 20, 10, { center: [0, 0, 10] }),
+  { name: 'cuboid', label: 'cuboid(40, 20, 10, { center: [0, 0, 10] })',
+    reshape: (w) => w.cuboid(40, 20, 10, { center: [0, 0, 10] }),
     real: (j) => j.primitives.cuboid({ size: [40, 20, 10], center: [0, 0, 10] }) },
-  { name: 'box', label: 'box(20, 20, 20, { roundRadius: 3, segments: 16 })',
-    reshape: (w) => w.box(20, 20, 20, { roundRadius: 3, segments: 16 }),
+  { name: 'cuboid', label: 'cuboid(20, 20, 20, { roundRadius: 3, segments: 16 })',
+    reshape: (w) => w.cuboid(20, 20, 20, { roundRadius: 3, segments: 16 }),
     real: (j) => j.primitives.roundedCuboid({ size: [20, 20, 20], roundRadius: 3, segments: 16 }) },
-  { name: 'rect', label: 'rect(40, 20)',
-    reshape: (w) => w.rect(40, 20),
+  { name: 'rectangle', label: 'rectangle(40, 20)',
+    reshape: (w) => w.rectangle(40, 20),
     real: (j) => j.primitives.rectangle({ size: [40, 20] }) },
-  { name: 'rect', label: 'rect(40, 20, { roundRadius: 3 })',
-    reshape: (w) => w.rect(40, 20, { roundRadius: 3 }),
+  { name: 'rectangle', label: 'rectangle(40, 20, { roundRadius: 3 })',
+    reshape: (w) => w.rectangle(40, 20, { roundRadius: 3 }),
     real: (j) => j.primitives.roundedRectangle({ size: [40, 20], roundRadius: 3 }) },
-  { name: 'disc', label: 'disc(6)',
-    reshape: (w) => w.disc(6),
+  { name: 'circle', label: 'circle(6)',
+    reshape: (w) => w.circle(6),
     real: (j) => j.primitives.circle({ radius: 6 }) },
-  { name: 'disc', label: 'disc(6, { center: [10, 0], segments: 48 })',
-    reshape: (w) => w.disc(6, { center: [10, 0], segments: 48 }),
+  { name: 'circle', label: 'circle(6, { center: [10, 0], segments: 48 })',
+    reshape: (w) => w.circle(6, { center: [10, 0], segments: 48 }),
     real: (j) => j.primitives.circle({ radius: 6, center: [10, 0], segments: 48 }) },
-  { name: 'ball', label: 'ball(20)',
-    reshape: (w) => w.ball(20),
+  { name: 'sphere', label: 'sphere(20)',
+    reshape: (w) => w.sphere(20),
     real: (j) => j.primitives.sphere({ radius: 20 }) },
-  { name: 'ball', label: 'ball(20, { segments: 64 })',
-    reshape: (w) => w.ball(20, { segments: 64 }),
+  { name: 'sphere', label: 'sphere(20, { segments: 64 })',
+    reshape: (w) => w.sphere(20, { segments: 64 }),
     real: (j) => j.primitives.sphere({ radius: 20, segments: 64 }) },
-  { name: 'tube', label: 'tube(5, 20)',
-    reshape: (w) => w.tube(5, 20),
+  { name: 'cylinder', label: 'cylinder(5, 20)',
+    reshape: (w) => w.cylinder(5, 20),
     real: (j) => j.primitives.cylinder({ radius: 5, height: 20 }) },
-  { name: 'tube', label: 'tube(5, 20, { roundRadius: 1 })',
-    reshape: (w) => w.tube(5, 20, { roundRadius: 1 }),
+  { name: 'cylinder', label: 'cylinder(5, 20, { roundRadius: 1 })',
+    reshape: (w) => w.cylinder(5, 20, { roundRadius: 1 }),
     real: (j) => j.primitives.roundedCylinder({ radius: 5, height: 20, roundRadius: 1 }) },
-  { name: 'cone', label: 'cone(10, 20)',
-    reshape: (w) => w.cone(10, 20),
+  { name: 'cylinderElliptic', label: 'cylinderElliptic(10, 20)',
+    reshape: (w) => w.cylinderElliptic(10, 20),
     real: (j) => j.primitives.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20 }) },
-  { name: 'cone', label: 'cone(10, 20, { center: [0, 0, 10] })',
-    reshape: (w) => w.cone(10, 20, { center: [0, 0, 10] }),
+  { name: 'cylinderElliptic', label: 'cylinderElliptic(10, 20, { center: [0, 0, 10] })',
+    reshape: (w) => w.cylinderElliptic(10, 20, { center: [0, 0, 10] }),
     real: (j) => j.primitives.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20, center: [0, 0, 10] }) },
-  { name: 'cone', label: 'cone(10, 20, { segments: 64 })',
-    reshape: (w) => w.cone(10, 20, { segments: 64 }),
+  { name: 'cylinderElliptic', label: 'cylinderElliptic(10, 20, { segments: 64 })',
+    reshape: (w) => w.cylinderElliptic(10, 20, { segments: 64 }),
     real: (j) => j.primitives.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20, segments: 64 }) },
-  { name: 'ring', label: 'ring(14, 4)',
-    reshape: (w) => w.ring(14, 4),
+  { name: 'torus', label: 'torus(14, 4)',
+    reshape: (w) => w.torus(14, 4),
     real: (j) => j.primitives.torus({ outerRadius: 14, innerRadius: 4 }) },
-  { name: 'ring', label: 'ring(10, 2)',
-    reshape: (w) => w.ring(10, 2),
+  { name: 'torus', label: 'torus(10, 2)',
+    reshape: (w) => w.torus(10, 2),
     real: (j) => j.primitives.torus({ outerRadius: 10, innerRadius: 2 }) },
-  { name: 'poly', label: 'poly([[0, 0], [20, 0], [10, 15]])',
-    reshape: (w) => w.poly([[0, 0], [20, 0], [10, 15]]),
+  { name: 'polygon', label: 'polygon([[0, 0], [20, 0], [10, 15]])',
+    reshape: (w) => w.polygon([[0, 0], [20, 0], [10, 15]]),
     real: (j) => j.primitives.polygon({ points: [[0, 0], [20, 0], [10, 15]] }) },
-  { name: 'extrude', label: 'extrude(10, rect(40, 20))',
-    reshape: (w) => w.extrude(10, w.rect(40, 20)),
+  { name: 'extrudeLinear', label: 'extrudeLinear(10, rectangle(40, 20))',
+    reshape: (w) => w.extrudeLinear(10, w.rectangle(40, 20)),
     real: (j) => j.extrusions.extrudeLinear({ height: 10 }, j.primitives.rectangle({ size: [40, 20] })) },
-  { name: 'extrude', label: 'extrude(4, rect(10, 10), disc(3)) — variadic',
-    reshape: (w) => w.extrude(4, w.rect(10, 10), w.disc(3)),
+  { name: 'extrudeLinear', label: 'extrudeLinear(4, rectangle(10, 10), circle(3)) — variadic',
+    reshape: (w) => w.extrudeLinear(4, w.rectangle(10, 10), w.circle(3)),
     real: (j) => j.extrusions.extrudeLinear(
       { height: 4 },
       j.primitives.rectangle({ size: [10, 10] }),
       j.primitives.circle({ radius: 3 })
     ) },
-  { name: 'revolve', label: 'revolve(profile)',
-    reshape: (w) => w.revolve(w.translate([10, 0, 0], w.rect(4, 10))),
+  { name: 'extrudeRotate', label: 'extrudeRotate(profile)',
+    reshape: (w) => w.extrudeRotate(w.translate([10, 0, 0], w.rectangle(4, 10))),
     real: (j) => j.extrusions.extrudeRotate(
       {}, j.transforms.translate([10, 0, 0], j.primitives.rectangle({ size: [4, 10] }))
     ) },
-  { name: 'revolve', label: 'revolve(profile, { segments: 16 })',
-    reshape: (w) => w.revolve(w.translate([10, 0, 0], w.rect(4, 10)), { segments: 16 }),
+  { name: 'extrudeRotate', label: 'extrudeRotate(profile, { segments: 16 })',
+    reshape: (w) => w.extrudeRotate(w.translate([10, 0, 0], w.rectangle(4, 10)), { segments: 16 }),
     real: (j) => j.extrusions.extrudeRotate(
       { segments: 16 }, j.transforms.translate([10, 0, 0], j.primitives.rectangle({ size: [4, 10] }))
     ) },
-  { name: 'sit', label: 'sit(ball(10))',
-    reshape: (w) => w.sit(w.ball(10)),
+  { name: 'sit', label: 'sit(sphere(10))',
+    reshape: (w) => w.sit(w.sphere(10)),
     real: (j) => j.transforms.align(
       { modes: ['none', 'none', 'min'], relativeTo: [0, 0, 0], grouped: false },
       j.primitives.sphere({ radius: 10 })
     ) },
-  { name: 'sit', label: 'sit([ball(10), box(10, 10, 10)]) — an assembly, grouped',
-    reshape: (w) => w.sit([w.ball(10), w.translate([30, 0, 40], w.box(10, 10, 10))]),
+  { name: 'sit', label: 'sit([sphere(10), cuboid(10, 10, 10)]) — an assembly, grouped',
+    reshape: (w) => w.sit([w.sphere(10), w.translate([30, 0, 40], w.cuboid(10, 10, 10))]),
     real: (j) => j.transforms.align(
       { modes: ['none', 'none', 'min'], relativeTo: [0, 0, 0], grouped: true },
       [j.primitives.sphere({ radius: 10 }),
@@ -351,22 +351,22 @@ export const EQUIVALENTS = [
 export const TURN_IN_PLACE = [
   {
     label: 'a 40 x 20 x 20 box moved to x = 50, turned 90°',
-    reshape: (w) => w.turn(90, w.translate([50, 0, 0], w.box(40, 20, 20))),
-    orbit: (w) => w.rotate([0, 0, Math.PI / 2], w.translate([50, 0, 0], w.box(40, 20, 20))),
+    reshape: (w) => w.turn(90, w.translate([50, 0, 0], w.cuboid(40, 20, 20))),
+    orbit: (w) => w.rotate([0, 0, Math.PI / 2], w.translate([50, 0, 0], w.cuboid(40, 20, 20))),
     expect: [[40, -20, -10], [60, 20, 10]],
     orbits: [[-10, 30, -10], [10, 70, 10]],
   },
   {
     label: 'a flat rect moved to x = 30, turned 90° in the page',
-    reshape: (w) => w.turn(90, w.translate([30, 0, 0], w.rect(40, 20))),
-    orbit: (w) => w.rotate([0, 0, Math.PI / 2], w.translate([30, 0, 0], w.rect(40, 20))),
+    reshape: (w) => w.turn(90, w.translate([30, 0, 0], w.rectangle(40, 20))),
+    orbit: (w) => w.rotate([0, 0, Math.PI / 2], w.translate([30, 0, 0], w.rectangle(40, 20))),
     expect: [[20, -20, 0], [40, 20, 0]],
     orbits: [[-10, 10, 0], [10, 50, 0]],
   },
   {
     label: 'an assembly turned as one group',
-    reshape: (w) => w.turn(90, [w.translate([50, 0, 0], w.box(40, 20, 20)), w.translate([50, 0, 30], w.ball(5))]),
-    orbit: (w) => w.rotate([0, 0, Math.PI / 2], [w.translate([50, 0, 0], w.box(40, 20, 20)), w.translate([50, 0, 30], w.ball(5))]),
+    reshape: (w) => w.turn(90, [w.translate([50, 0, 0], w.cuboid(40, 20, 20)), w.translate([50, 0, 30], w.sphere(5))]),
+    orbit: (w) => w.rotate([0, 0, Math.PI / 2], [w.translate([50, 0, 0], w.cuboid(40, 20, 20)), w.translate([50, 0, 30], w.sphere(5))]),
     expect: [[40, -20, -10], [60, 20, 35]],
     orbits: [[-10, 30, -10], [10, 70, 35]],
   },
@@ -393,27 +393,27 @@ export const TURN_IN_PLACE = [
 export const TURN_COMPOSITION = [
   {
     label: 'a solid moved 50 along x and turned 90° about Z',
-    build: (w) => w.box(40, 20, 10),
+    build: (w) => w.cuboid(40, 20, 10),
     move: [50, 0, 0],
     degrees: 90,
     radians: [0, 0, Math.PI / 2],
   },
   {
     label: 'a flat shape moved 30 along x and turned 90° in the page',
-    build: (w) => w.rect(40, 20),
+    build: (w) => w.rectangle(40, 20),
     move: [30, 0, 0],
     degrees: 90,
     radians: [0, 0, Math.PI / 2],
   },
   {
     label: 'an assembly moved 50 along x and turned 90° about Z',
-    build: (w) => [w.box(40, 20, 10), w.translate([0, 0, 30], w.ball(5))],
+    build: (w) => [w.cuboid(40, 20, 10), w.translate([0, 0, 30], w.sphere(5))],
     move: [50, 0, 0],
     degrees: 90,
     radians: [0, 0, Math.PI / 2],
   },
   {
-    // The /sandbox generator emits turn(translate(ring(...))) for a ring that
+    // The /sandbox generator emits turn(translate(torus(...))) for a ring that
     // is both positioned and rotated, and CANNOT exercise it — its Ring UI has
     // no rotation control, so that path ships unrun and was filed Not-tested in
     // 3d1bca9. It is covered here instead, because turn is this side's code and
@@ -427,7 +427,7 @@ export const TURN_COMPOSITION = [
     // rotation axis cannot orbit, so the `rotate` counter-case commuted too and
     // proved nothing.
     label: 'a ring moved 50 along x and tilted 90° about Y',
-    build: (w) => w.ring(14, 4),
+    build: (w) => w.torus(14, 4),
     move: [50, 0, 0],
     degrees: [0, 90, 0],
     radians: [0, Math.PI / 2, 0],
@@ -438,7 +438,7 @@ export const TURN_COMPOSITION = [
  * Every refusal has to leave a student somewhere.
  *
  * Measured before this existed: the object-first errors named the real function
- * ("…is called cuboid") and NOTHING else did. `revolve(profile, { angle: … })`
+ * ("…is called cuboid") and NOTHING else did. `extrudeRotate(profile, { angle: … })`
  * — which a student reading §9.1 will type, because the chapter's own worked
  * example is extrudeRotate({ segments: 8, angle: TAU / 2 }, profile) — answered
  * only "revolve has no option called angle. It takes segments." True, and a
@@ -449,70 +449,70 @@ export const TURN_COMPOSITION = [
  * message owes the student the actual call rather than just a name.
  */
 export const REFUSALS_NAME_THE_REAL_CALL = [
-  { what: 'box refuses size', run: (w) => w.box(10, 10, 10, { size: 3 }), names: 'cuboid' },
+  { what: 'box refuses size', run: (w) => w.cuboid(10, 10, 10, { size: 3 }), names: 'cuboid' },
   // NOT { points: … } here: an object with a `points` array is what a path2
   // looks like, so the geometry test claims it before the option test can.
-  { what: 'rect refuses normal', run: (w) => w.rect(10, 10, { normal: [0, 0, 1] }), names: 'rectangle' },
-  { what: 'disc refuses radius', run: (w) => w.disc(6, { radius: 3 }), names: 'circle' },
-  { what: 'ball refuses outerRadius', run: (w) => w.ball(10, { outerRadius: 3 }), names: 'sphere' },
-  { what: 'tube refuses innerRadius', run: (w) => w.tube(5, 20, { innerRadius: 2 }), names: 'cylinder' },
+  { what: 'rect refuses normal', run: (w) => w.rectangle(10, 10, { normal: [0, 0, 1] }), names: 'rectangle' },
+  { what: 'disc refuses radius', run: (w) => w.circle(6, { radius: 3 }), names: 'circle' },
+  { what: 'ball refuses outerRadius', run: (w) => w.sphere(10, { outerRadius: 3 }), names: 'sphere' },
+  { what: 'tube refuses innerRadius', run: (w) => w.cylinder(5, 20, { innerRadius: 2 }), names: 'cylinder' },
   {
     what: 'cone refuses endRadius and spells out the cut-off-point call',
-    run: (w) => w.cone(10, 20, { endRadius: [4, 4] }),
+    run: (w) => w.cylinderElliptic(10, 20, { endRadius: [4, 4] }),
     names: 'cylinderElliptic',
     spells: /cylinderElliptic\(\{ startRadius: \[10, 10\], endRadius: \[4, 4\], height: 20 \}\)/,
     why: 'a frustum is a real thing to want and cone deliberately does not model it',
   },
   {
     what: 'cone refuses roundRadius, which the library would have dropped',
-    run: (w) => w.cone(10, 20, { roundRadius: 2 }),
+    run: (w) => w.cylinderElliptic(10, 20, { roundRadius: 2 }),
     names: 'cylinderElliptic',
     why: 'roundRadius IS in reSHape\'s option vocabulary, and cylinderElliptic ignores it '
       + 'silently — same bounding box, same 64 polygons',
   },
   {
     what: 'ring refuses a { } and spells out the torus call that takes segments',
-    run: (w) => w.ring(14, 4, { segments: 64 }),
+    run: (w) => w.torus(14, 4, { segments: 64 }),
     names: 'torus',
     spells: /torus\(\{ outerRadius: 14, innerRadius: 4, outerSegments: 64 \}\)/,
     why: 'measured: torus accepts plain `segments` and silently drops it',
   },
-  {
-    what: 'poly refuses the { points: … } spelling by name',
-    run: (w) => w.poly({ points: [[0, 0], [20, 0], [10, 15]] }),
-    names: 'polygon',
-    why: 'an object with a `points` array is what a path2 looks like, so the geometry test '
-      + 'would claim it and the refusal would never say the word polygon',
-  },
+  // RETIRED BY THE RENAME. These asserted that reSHape REFUSED the library's own
+  // { } spelling and named the real function to graduate to. Both halves are gone:
+  // reSHape owns these words now, so the { } form goes straight to the library
+  // (proved by 'every name reSHape owns still reaches the library through its { }
+  // form'), and there is no second name to be sent to. Kept as a note rather than
+  // deleted, because a refusal that simply disappears is a decision nobody can
+  // audit afterwards.
   {
     what: 'poly refuses a trailing { } instead of ignoring it',
-    run: (w) => w.poly([[0, 0], [20, 0], [10, 15]], { orientation: 'clockwise' }),
+    run: (w) => w.polygon([[0, 0], [20, 0], [10, 15]], { orientation: 'clockwise' }),
     names: 'polygon',
     why: 'orientation is a real polygon key that really works — refusing it has to hand it over',
   },
   {
     what: 'revolve refuses angle and spells out the part-turn call',
-    run: (w) => w.revolve(w.translate([10, 0, 0], w.rect(4, 10)), { angle: Math.PI }),
+    run: (w) => w.extrudeRotate(w.translate([10, 0, 0], w.rectangle(4, 10)), { angle: Math.PI }),
     names: 'extrudeRotate',
     spells: /extrudeRotate\(\{ segments: 16, angle: constants\.TAU \/ 2 \}, profile\)/,
     why: "§9.1's own worked example is a part turn, and revolve does not do part turns",
   },
   {
     what: 'extrude refuses a { } and spells out the twist call',
-    run: (w) => w.extrude(10, w.rect(10, 10), { twistAngle: 1 }),
+    run: (w) => w.extrudeLinear(10, w.rectangle(10, 10), { twistAngle: 1 }),
     names: 'extrudeLinear',
     spells: /twistAngle: constants\.TAU \/ 4/,
     why: 'extrude has no options object at all, so a { } here would be read as a profile',
   },
   {
     what: 'turn refuses a third argument instead of ignoring it',
-    run: (w) => w.turn(45, w.box(10, 10, 10), 30),
+    run: (w) => w.turn(45, w.cuboid(10, 10, 10), 30),
     names: 'rotate',
     why: 'measured: turn(45, s, "extra") used to be accepted silently',
   },
   {
     what: 'sit refuses a { } instead of ignoring it',
-    run: (w) => w.sit(w.box(10, 10, 10), { modes: ['center', 'center', 'min'] }),
+    run: (w) => w.sit(w.cuboid(10, 10, 10), { modes: ['center', 'center', 'min'] }),
     names: 'align',
     why: "measured: sit(s, { modes: … }) used to be accepted and dropped, and `modes` is align's own key",
   },
@@ -535,28 +535,38 @@ export const REVERSE_LOOKUP = {
   path: join(REPO, 'public/reshape/docs/reference.md'),
   heading: '#### Reading the book',
   /** real name in the left cell -> the reSHape name its right cell must name. */
+  // Ten rows are GONE, not lost: cuboid -> cuboid is not a lookup. Since reSHape
+  // took the library's own words, the book prints the name a student types, and
+  // the only rows left are the ones that are still genuinely NOT a rename --
+  // shape variants folded into an option, and the two names with no library
+  // equivalent at all.
   expect: {
-    cuboid: 'box',
+    // Fourteen of these rows are now an IDENTITY -- the book prints cuboid and a
+    // student types cuboid. They stay anyway: this table is also the authoritative
+    // map of what reSHape stands in for, read by 'every real name in the reverse
+    // table is one reSHape actually stands in for' and by the A8.2.2 census.
+    // Dropping them silently widened the untaught-primitive pool.
+    cuboid: 'cuboid',
+    rectangle: 'rectangle',
+    circle: 'circle',
+    sphere: 'sphere',
+    cylinder: 'cylinder',
+    cylinderElliptic: 'cylinderElliptic',
+    torus: 'torus',
+    polygon: 'polygon',
+    extrudeLinear: 'extrudeLinear',
+    extrudeRotate: 'extrudeRotate',
     // 12 calls across four chapters, and the opening runnable block of the
-    // whole unit is cube({ size: 10 }). box(10, 10, 10) is exactly it, and
+    // whole unit is cube({ size: 10 }). cuboid(10, 10, 10) is exactly it, and
     // until this row existed nothing shCode shipped said so.
-    cube: 'box',
-    roundedCuboid: 'box',
-    rectangle: 'rect',
-    roundedRectangle: 'rect',
-    circle: 'disc',
-    sphere: 'ball',
-    cylinder: 'tube',
-    roundedCylinder: 'tube',
+    cube: 'cuboid',
+    roundedCuboid: 'cuboid',
+    roundedRectangle: 'rectangle',
+    roundedCylinder: 'cylinder',
     // The three added when /sandbox's generator turned out to be emitting half
     // an reSHape call and half a raw namespaced one in the same expression. torus
     // and polygon moved OFF the "no reSHape word" table to get here, which is the
     // A8.2.2 cost the banner in reshape.js records.
-    cylinderElliptic: 'cone',
-    torus: 'ring',
-    polygon: 'poly',
-    extrudeLinear: 'extrude',
-    extrudeRotate: 'revolve',
     align: 'sit',
     rotate: 'turn',
   },
@@ -597,7 +607,7 @@ export function readReverseTable(text = readFileSync(REVERSE_LOOKUP.path, 'utf8'
  *
  *   bare        the day-one call, no brace anywhere
  *   withOptions the day-two call, one key, and it must actually change the model
- *   objectFirst the graduation stumble: box({ size: [...] }) must NOT work.
+ *   objectFirst the graduation stumble: cuboid({ size: [...] }) must NOT work.
  *               An alias would delete the contrast that reSHape exists to teach,
  *               and would make the arity guard unwriteable — you cannot tell a
  *               mistyped positional call from an intended object call. What it
@@ -609,85 +619,85 @@ export function readReverseTable(text = readFileSync(REVERSE_LOOKUP.path, 'utf8'
  */
 export const POSITIONAL_CONTRACT = [
   {
-    name: 'box',
-    bare: (w) => w.box(40, 20, 10),
+    name: 'cuboid',
+    bare: (w) => w.cuboid(40, 20, 10),
     bareBox: [[-20, -10, -5], [20, 10, 5]],
-    withOptions: (w) => w.box(40, 20, 10, { center: [0, 0, 10] }),
+    withOptions: (w) => w.cuboid(40, 20, 10, { center: [0, 0, 10] }),
     optionBox: [[-20, -10, 5], [20, 10, 15]],
-    objectFirst: (w) => w.box({ size: [40, 20, 10] }),
+    objectFirst: (w) => w.cuboid({ size: [40, 20, 10] }),
     objectFirstSays: /takes plain numbers.*called cuboid/s,
-    short: (w) => w.box(40, 20),
-    shortSays: /box needs three numbers.*height is missing/s,
-    badKey: (w) => w.box(40, 20, 10, { colour: 'red' }),
+    short: (w) => w.cuboid(40, 20),
+    shortSays: /cuboid needs three numbers.*height is missing/s,
+    badKey: (w) => w.cuboid(40, 20, 10, { colour: 'red' }),
     badKeySays: /no option called "colour".*center, roundRadius and segments/s,
   },
   {
-    name: 'rect',
-    bare: (w) => w.rect(40, 20),
+    name: 'rectangle',
+    bare: (w) => w.rectangle(40, 20),
     bareBox: [[-20, -10, 0], [20, 10, 0]],
-    withOptions: (w) => w.rect(40, 20, { center: [10, 0] }),
+    withOptions: (w) => w.rectangle(40, 20, { center: [10, 0] }),
     optionBox: [[-10, -10, 0], [30, 10, 0]],
-    objectFirst: (w) => w.rect({ size: [40, 20] }),
+    objectFirst: (w) => w.rectangle({ size: [40, 20] }),
     objectFirstSays: /takes plain numbers.*called rectangle/s,
-    short: (w) => w.rect(40),
-    shortSays: /rect needs two numbers.*height is missing/s,
-    badKey: (w) => w.rect(40, 20, { radius: 3 }),
+    short: (w) => w.rectangle(40),
+    shortSays: /rectangle needs two numbers.*height is missing/s,
+    badKey: (w) => w.rectangle(40, 20, { radius: 3 }),
     badKeySays: /no option called "radius"/s,
   },
   {
-    name: 'tube',
-    bare: (w) => w.tube(5, 20),
+    name: 'cylinder',
+    bare: (w) => w.cylinder(5, 20),
     bareBox: [[-5, -5, -10], [5, 5, 10]],
-    withOptions: (w) => w.tube(5, 20, { center: [0, 0, 10] }),
+    withOptions: (w) => w.cylinder(5, 20, { center: [0, 0, 10] }),
     optionBox: [[-5, -5, 0], [5, 5, 20]],
-    objectFirst: (w) => w.tube({ radius: 5, height: 20 }),
+    objectFirst: (w) => w.cylinder({ radius: 5, height: 20 }),
     objectFirstSays: /takes plain numbers.*called cylinder/s,
     // The measured defect this name exists for: the real call would have
     // returned a height-2 disc here, with no complaint at all.
-    short: (w) => w.tube(5),
-    shortSays: /tube needs two numbers.*height is missing/s,
-    badKey: (w) => w.tube(5, 20, { innerRadius: 2 }),
+    short: (w) => w.cylinder(5),
+    shortSays: /cylinder needs two numbers.*height is missing/s,
+    badKey: (w) => w.cylinder(5, 20, { innerRadius: 2 }),
     badKeySays: /no option called "innerRadius"/s,
   },
   {
-    name: 'cone',
-    bare: (w) => w.cone(10, 20),
+    name: 'cylinderElliptic',
+    bare: (w) => w.cylinderElliptic(10, 20),
     bareBox: [[-10, -10, -10], [10, 10, 10]],
-    withOptions: (w) => w.cone(10, 20, { center: [0, 0, 10] }),
+    withOptions: (w) => w.cylinderElliptic(10, 20, { center: [0, 0, 10] }),
     optionBox: [[-10, -10, 0], [10, 10, 20]],
-    objectFirst: (w) => w.cone({ startRadius: [10, 10], endRadius: [0, 0], height: 20 }),
+    objectFirst: (w) => w.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20 }),
     objectFirstSays: /takes plain numbers.*called cylinderElliptic/s,
     // tube's defect, one shape along: measured, the real call with no height
     // builds a 20 x 20 x 2 pancake and says nothing at all.
-    short: (w) => w.cone(10),
-    shortSays: /cone needs two numbers.*height is missing/s,
-    badKey: (w) => w.cone(10, 20, { roundRadius: 2 }),
+    short: (w) => w.cylinderElliptic(10),
+    shortSays: /cylinderElliptic needs two numbers.*height is missing/s,
+    badKey: (w) => w.cylinderElliptic(10, 20, { roundRadius: 2 }),
     badKeySays: /no option called "roundRadius".*center and segments/s,
   },
   {
-    name: 'ball',
-    bare: (w) => w.ball(20),
+    name: 'sphere',
+    bare: (w) => w.sphere(20),
     bareBox: [[-20, -20, -20], [20, 20, 20]],
-    withOptions: (w) => w.ball(20, { center: [0, 0, 20] }),
+    withOptions: (w) => w.sphere(20, { center: [0, 0, 20] }),
     optionBox: [[-20, -20, 0], [20, 20, 40]],
-    objectFirst: (w) => w.ball({ radius: 20 }),
+    objectFirst: (w) => w.sphere({ radius: 20 }),
     objectFirstSays: /takes plain numbers.*called sphere/s,
-    short: (w) => w.ball(),
-    shortSays: /ball needs one number.*radius is missing/s,
-    badKey: (w) => w.ball(20, { size: 3 }),
+    short: (w) => w.sphere(),
+    shortSays: /sphere needs one number.*radius is missing/s,
+    badKey: (w) => w.sphere(20, { size: 3 }),
     badKeySays: /no option called "size"/s,
   },
   {
-    name: 'disc',
-    bare: (w) => w.disc(6),
+    name: 'circle',
+    bare: (w) => w.circle(6),
     bareBox: [[-6, -6, 0], [6, 6, 0]],
-    withOptions: (w) => w.disc(6, { center: [10, 0] }),
+    withOptions: (w) => w.circle(6, { center: [10, 0] }),
     optionBox: [[4, -6, 0], [16, 6, 0]],
-    objectFirst: (w) => w.disc({ radius: 6 }),
+    objectFirst: (w) => w.circle({ radius: 6 }),
     objectFirstSays: /takes plain numbers.*called circle/s,
-    short: (w) => w.disc(),
-    shortSays: /disc needs one number.*radius is missing/s,
-    badKey: (w) => w.disc(6, { roundRadius: 1 }),
+    short: (w) => w.circle(),
+    shortSays: /circle needs one number.*radius is missing/s,
+    badKey: (w) => w.circle(6, { roundRadius: 1 }),
     badKeySays: /no option called "roundRadius".*center and segments/s,
   },
 ];
@@ -704,32 +714,32 @@ export const POSITIONAL_CONTRACT = [
  *
  *   bare        the day-one call, which is the only call
  *   trailing    a trailing { } must be REFUSED, by name, not dropped
- *   objectFirst the graduation stumble: poly({ points: … }) must not work
+ *   objectFirst the graduation stumble: polygon({ points: … }) must not work
  *   short       the missing-argument case, which must name the argument
  */
 export const NO_OPTIONS_CONTRACT = [
   {
-    name: 'ring',
-    bare: (w) => w.ring(14, 4),
+    name: 'torus',
+    bare: (w) => w.torus(14, 4),
     bareBox: [[-18, -18, -4], [18, 18, 4]],
-    trailing: (w) => w.ring(14, 4, { segments: 64 }),
-    trailingSays: /ring takes just the two radiuses.*no \{ \} options.*called torus/s,
-    objectFirst: (w) => w.ring({ outerRadius: 14, innerRadius: 4 }),
+    trailing: (w) => w.torus(14, 4, { segments: 64 }),
+    trailingSays: /torus takes just the two radiuses.*no \{ \} options.*called torus/s,
+    objectFirst: (w) => w.torus({ outerRadius: 14, innerRadius: 4 }),
     objectFirstSays: /takes plain numbers.*called torus/s,
-    short: (w) => w.ring(14),
-    shortSays: /ring needs two numbers.*tubeRadius is missing/s,
+    short: (w) => w.torus(14),
+    shortSays: /torus needs two numbers.*tubeRadius is missing/s,
     why: 'torus accepts center and segments and silently drops both',
   },
   {
-    name: 'poly',
-    bare: (w) => w.poly([[0, 0], [20, 0], [10, 15]]),
+    name: 'polygon',
+    bare: (w) => w.polygon([[0, 0], [20, 0], [10, 15]]),
     bareBox: [[0, 0, 0], [20, 15, 0]],
-    trailing: (w) => w.poly([[0, 0], [20, 0], [10, 15]], { orientation: 'clockwise' }),
-    trailingSays: /poly takes just the list of corners.*no \{ \} options.*called polygon/s,
-    objectFirst: (w) => w.poly({ points: [[0, 0], [20, 0], [10, 15]] }),
+    trailing: (w) => w.polygon([[0, 0], [20, 0], [10, 15]], { orientation: 'clockwise' }),
+    trailingSays: /polygon takes just the list of corners.*no \{ \} options.*called polygon/s,
+    objectFirst: (w) => w.polygon({ points: [[0, 0], [20, 0], [10, 15]] }),
     objectFirstSays: /plain list of corners.*called polygon/s,
-    short: (w) => w.poly(),
-    shortSays: /poly needs a list of corners: poly\(points\)/s,
+    short: (w) => w.polygon(),
+    shortSays: /polygon needs a list of corners: polygon\(points\)/s,
     why: 'paths and orientation are real polygon keys outside this layer\'s vocabulary',
   },
 ];
@@ -739,18 +749,18 @@ export const NO_OPTIONS_CONTRACT = [
  *
  * requireNumbers builds its message out of the parameter list it is handed, so
  * a copy-pasted name is a silent way to tell a student to fix the wrong thing —
- * `ring needs two numbers: ring(radius, height)` would be a perfectly
+ * `ring needs two numbers: torus(radius, height)` would be a perfectly
  * plausible-looking wrong answer. Each of these calls a name short and asserts
  * that EVERY parameter that name declares in RESHAPE_NAMES appears in the
  * message, so the two cannot drift.
  */
 export const ARITY_GUARDS = [
-  { name: 'cone', run: (w) => w.cone(10) },
-  { name: 'ring', run: (w) => w.ring(14) },
-  { name: 'poly', run: (w) => w.poly() },
-  { name: 'box', run: (w) => w.box(40, 20) },
-  { name: 'rect', run: (w) => w.rect(40) },
-  { name: 'tube', run: (w) => w.tube(5) },
+  { name: 'cylinderElliptic', run: (w) => w.cylinderElliptic(10) },
+  { name: 'torus', run: (w) => w.torus(14) },
+  { name: 'polygon', run: (w) => w.polygon() },
+  { name: 'cuboid', run: (w) => w.cuboid(40, 20) },
+  { name: 'rectangle', run: (w) => w.rectangle(40) },
+  { name: 'cylinder', run: (w) => w.cylinder(5) },
 ];
 
 /**
@@ -771,10 +781,10 @@ export const ARITY_GUARDS = [
  * which made the case for ring look stronger than it is. Measured on this
  * bundle: `ringRadius` read as "the radius of the ring I am making", i.e. its
  * outside edge, is exactly as available a misreading as `outerRadius` read the
- * same way, and it builds the byte-identical wrong model — ring(18, 4) and
+ * same way, and it builds the byte-identical wrong model — torus(18, 4) and
  * torus({ outerRadius: 18, innerRadius: 4 }) are both 44 x 44 x 8, silently.
  * `tubeRadius` has a second, smaller version of it: read as the tube's
- * THICKNESS rather than its radius, ring(14, 8) comes out 44 x 44 x 16.
+ * THICKNESS rather than its radius, torus(14, 8) comes out 44 x 44 x 16.
  *
  * So the honest claim — the one reference.md and the banner now make, and the
  * one that is still enough to justify the name — is narrower than "both of
@@ -790,7 +800,7 @@ export const ARITY_GUARDS = [
  * the catch.
  */
 export const RING_ARITHMETIC = {
-  build: (w) => w.ring(14, 4),
+  build: (w) => w.torus(14, 4),
   dimensions: [36, 36, 8],
   across: 36,
   thick: 8,
@@ -810,21 +820,21 @@ export const RING_ARITHMETIC = {
    */
   ownMisread: [
     { what: 'ringRadius read as the outside edge of the donut',
-      run: (w) => w.ring(18, 4),
+      run: (w) => w.torus(18, 4),
       dimensions: [44, 44, 8],
       sameAs: (w) => w.torus({ outerRadius: 18, innerRadius: 4 }) },
     // No `sameAs` on this one: there is no torus misreading it mirrors. It is
     // ring's own, and 8 THICK asked for is 16 thick delivered.
     { what: "and tubeRadius read as the tube's thickness",
-      run: (w) => w.ring(14, 8),
+      run: (w) => w.torus(14, 8),
       dimensions: [44, 44, 16] },
   ],
   /** the only spelling that does not build, and the message it gives */
   swapped: (w) => w.torus({ outerRadius: 4, innerRadius: 14 }),
   swappedSays: /inner circle is too large to rotate about the outer circle/,
   /** the same swap through ring, rethrown with the student's own numbers */
-  reshapeSwapped: (w) => w.ring(4, 14),
-  reshapeSwappedSays: /a tube 14 thick will not fit round a ring of radius 4.*ring\(14, 4\) is the one you meant/s,
+  reshapeSwapped: (w) => w.torus(4, 14),
+  reshapeSwappedSays: /a tube 14 thick will not fit round a ring of radius 4.*torus\(14, 4\) is the one you meant/s,
 };
 
 /**
@@ -869,24 +879,24 @@ export const POLY_BARE_ARRAY = {
  * says so in numbers.
  */
 export const WRAPS_BOX = [
-  { label: 'cone(10, 20)',
-    reshape: (w) => w.cone(10, 20),
+  { label: 'cylinderElliptic(10, 20)',
+    reshape: (w) => w.cylinderElliptic(10, 20),
     real: (j) => j.primitives.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20 }),
     box: [[-10, -10, -10], [10, 10, 10]] },
-  { label: 'cone(10, 20, { center: [0, 0, 10] })',
-    reshape: (w) => w.cone(10, 20, { center: [0, 0, 10] }),
+  { label: 'cylinderElliptic(10, 20, { center: [0, 0, 10] })',
+    reshape: (w) => w.cylinderElliptic(10, 20, { center: [0, 0, 10] }),
     real: (j) => j.primitives.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20, center: [0, 0, 10] }),
     box: [[-10, -10, 0], [10, 10, 20]] },
-  { label: 'ring(14, 4)',
-    reshape: (w) => w.ring(14, 4),
+  { label: 'torus(14, 4)',
+    reshape: (w) => w.torus(14, 4),
     real: (j) => j.primitives.torus({ outerRadius: 14, innerRadius: 4 }),
     box: [[-18, -18, -4], [18, 18, 4]] },
-  { label: 'ring(10, 2)',
-    reshape: (w) => w.ring(10, 2),
+  { label: 'torus(10, 2)',
+    reshape: (w) => w.torus(10, 2),
     real: (j) => j.primitives.torus({ outerRadius: 10, innerRadius: 2 }),
     box: [[-12, -12, -2], [12, 12, 2]] },
-  { label: 'poly([[0, 0], [20, 0], [10, 15]])',
-    reshape: (w) => w.poly([[0, 0], [20, 0], [10, 15]]),
+  { label: 'polygon([[0, 0], [20, 0], [10, 15]])',
+    reshape: (w) => w.polygon([[0, 0], [20, 0], [10, 15]]),
     real: (j) => j.primitives.polygon({ points: [[0, 0], [20, 0], [10, 15]] }),
     box: [[0, 0, 0], [20, 15, 0]] },
 ];
@@ -935,10 +945,10 @@ export const REFUSALS_OVERTURNED = {
     { what: 'and the bare-array habit it trains is measured at the crossover',
       rx: /SILENTLY EMPTY|silently empty/ },
     { what: "ring's own misreadings are recorded, not just torus's",
-      rx: /ring\(18, 4\)/ },
+      rx: /torus\(18, 4\)/ },
   ],
   /** the names that must NOT still be sitting in the "deliberately NOT here" list */
-  notRefusedAnyMore: ['cone', 'donut'],
+  notRefusedAnyMore: ['cylinderElliptic', 'donut'],
   refusalLine: /Deliberately NOT here:([^\n]*)/,
 };
 
@@ -950,84 +960,84 @@ export const REFUSALS_OVERTURNED = {
 export const GUARDS = [
   {
     what: 'roundRadius too big for a box is rethrown with the real numbers',
-    run: (w) => w.box(10, 4, 10, { roundRadius: 5 }),
-    says: /roundRadius 5 is too big for a 10 x 4 x 10 box — it must be less than 2\./,
+    run: (w) => w.cuboid(10, 4, 10, { roundRadius: 5 }),
+    says: /roundRadius 5 is too big for a 10 x 4 x 10 cuboid — it must be less than 2\./,
     why: "the library says only 'roundRadius must be smaller than the radius of all dimensions'",
   },
   {
     what: 'roundRadius too big for a rect is rethrown with the real numbers',
-    run: (w) => w.rect(10, 4, { roundRadius: 5 }),
-    says: /roundRadius 5 is too big for a 10 x 4 rect — it must be less than 2\./,
+    run: (w) => w.rectangle(10, 4, { roundRadius: 5 }),
+    says: /roundRadius 5 is too big for a 10 x 4 rectangle — it must be less than 2\./,
     why: 'same library message, same uselessness to a beginner',
   },
   {
     what: 'a tube too short for its roundRadius names the height',
-    run: (w) => w.tube(5, 4, { roundRadius: 3 }),
-    says: /roundRadius 3 is too big for a tube 4 tall — it must be less than 2\./,
+    run: (w) => w.cylinder(5, 4, { roundRadius: 3 }),
+    says: /roundRadius 3 is too big for a cylinder 4 tall — it must be less than 2\./,
     why: "the library says 'height must be larger than twice roundRadius'",
   },
   {
     what: 'a tube too thin for its roundRadius names the radius',
-    run: (w) => w.tube(5, 40, { roundRadius: 6 }),
-    says: /roundRadius 6 is too big for a tube of radius 5 — it must be 5 or less\./,
+    run: (w) => w.cylinder(5, 40, { roundRadius: 6 }),
+    says: /roundRadius 6 is too big for a cylinder of radius 5 — it must be 5 or less\./,
     why: "roundedCylinder's second, different complaint",
   },
   {
     what: 'a ring whose tube will not fit is rethrown with the two numbers typed',
-    run: (w) => w.ring(4, 14),
-    says: /a tube 14 thick will not fit round a ring of radius 4 — in ring\(ringRadius, tubeRadius\) the ring radius comes first\. ring\(14, 4\) is the one you meant\./,
+    run: (w) => w.torus(4, 14),
+    says: /a tube 14 thick will not fit round a ring of radius 4 — in torus\(ringRadius, tubeRadius\) the ring radius comes first\. torus\(14, 4\) is the one you meant\./,
     why: "the library says 'inner circle is too large to rotate about the outer circle', "
       + 'which names two circles a student never typed',
   },
   {
     what: 'poly refuses an empty list instead of building an invisible nothing',
-    run: (w) => w.poly([]),
-    says: /poly needs at least three corners to enclose anything.*You gave it zero\./s,
+    run: (w) => w.polygon([]),
+    says: /polygon needs at least three corners to enclose anything.*You gave it zero\./s,
     why: 'measured: polygon({ points: [] }) returns a VALID geom2 with no sides and an '
       + 'all-zero bounding box, and nothing throws',
   },
   {
     what: 'poly names the corner that is not a pair of numbers',
-    run: (w) => w.poly([[0, 0], [20, 0], [10, 'x']]),
-    says: /every corner poly takes is an x and a y.*Corner 3 is/s,
+    run: (w) => w.polygon([[0, 0], [20, 0], [10, 'x']]),
+    says: /every corner polygon takes is an x and a y.*Corner 3 is/s,
     why: 'measured: that call builds real geometry whose bounding box reads '
       + '[[0,null,0],[20,null,0]], with no error anywhere',
   },
   {
     what: 'poly counts the corners itself rather than letting the library name a list index',
-    run: (w) => w.poly([[0, 0], [20, 0]]),
-    says: /poly needs at least three corners to enclose anything.*You gave it two\./s,
+    run: (w) => w.polygon([[0, 0], [20, 0]]),
+    says: /polygon needs at least three corners to enclose anything.*You gave it two\./s,
     why: 'the library throws "list of points 0 must contain three or more points", naming a '
       + "list index poly's spelling has not got",
   },
   {
     what: 'revolve refuses a solid instead of dying inside the library',
-    run: (w) => w.revolve(w.box(4, 4, 4)),
-    says: /revolve needs a flat 2D shape — you gave it a solid\./,
+    run: (w) => w.extrudeRotate(w.cuboid(4, 4, 4)),
+    says: /extrudeRotate needs a flat 2D shape — you gave it a solid\./,
     why: "measured: extrudeRotate on a geom3 throws \"Cannot read properties of undefined (reading 'length')\"",
   },
   {
     what: 'extrude refuses a solid instead of returning it unchanged',
-    run: (w) => w.extrude(10, w.box(4, 4, 4)),
-    says: /extrude needs a flat 2D shape — you gave it a solid\./,
+    run: (w) => w.extrudeLinear(10, w.cuboid(4, 4, 4)),
+    says: /extrudeLinear needs a flat 2D shape — you gave it a solid\./,
     why: 'measured: extrudeLinear on a geom3 does not throw, it hands the solid straight back',
   },
   {
     what: 'turn refuses to tip a flat shape out of its plane',
-    run: (w) => w.turn([90, 0, 0], w.rect(40, 20)),
+    run: (w) => w.turn([90, 0, 0], w.rectangle(40, 20)),
     says: /turn tips a flat shape out of its plane and it disappears/,
     why: 'measured: rotate([PI/2,0,0], rect) returns a degenerate line, no error',
   },
   {
     what: 'turn refuses an angle it cannot read',
-    run: (w) => w.turn('45', w.box(10, 10, 10)),
+    run: (w) => w.turn('45', w.cuboid(10, 10, 10)),
     says: /turn needs an angle in degrees first/,
     why: 'a quoted number is the commonest beginner slip and silently means nothing here',
   },
   {
     what: 'extrude refuses to run without a shape',
-    run: (w) => w.extrude(10),
-    says: /extrude needs a shape to push upwards/,
+    run: (w) => w.extrudeLinear(10),
+    says: /extrudeLinear needs a shape to push upwards/,
     why: 'extrudeLinear({height}) with no profile throws from inside the library',
   },
   // The operand-order family. reSHape's grammar has ONE rule — required values
@@ -1036,21 +1046,16 @@ export const GUARDS = [
   // library's order out of the docs (or out of the graduation table two lines
   // below the one they wanted) must be told which function that spelling
   // belongs to, not handed a message about flat shapes.
-  {
-    what: 'revolve names extrudeRotate when the { } is written first',
-    run: (w) => w.revolve({ segments: 16 }, w.translate([10, 0, 0], w.rect(4, 10))),
-    says: /revolve takes the shape first and its extras last.*called extrudeRotate/s,
-    why: 'the bare type guard said only "you gave it a { } object", which names nothing',
-  },
-  {
-    what: 'extrude names extrudeLinear when the { } is written first',
-    run: (w) => w.extrude({ height: 10 }, w.rect(40, 20)),
-    says: /extrude takes the height first and plain.*called extrudeLinear/s,
-    why: 'same stumble, same fix — the real call really does take { height } first',
-  },
+  // RETIRED BY THE RENAME. These asserted that reSHape REFUSED the library's own
+  // { } spelling and named the real function to graduate to. Both halves are gone:
+  // reSHape owns these words now, so the { } form goes straight to the library
+  // (proved by 'every name reSHape owns still reaches the library through its { }
+  // form'), and there is no second name to be sent to. Kept as a note rather than
+  // deleted, because a refusal that simply disappears is a decision nobody can
+  // audit afterwards.
   {
     what: 'turn says which way round its two arguments go',
-    run: (w) => w.turn(w.box(10, 10, 10), 45),
+    run: (w) => w.turn(w.cuboid(10, 10, 10), 45),
     says: /turn takes the angle first and the shape last: turn\(45, shape\)\./,
     why: 'a message about degrees does not help someone who wrote the shape first',
   },
@@ -1068,34 +1073,34 @@ export const GUARDS = [
  */
 export const INTEROP = [
   { label: 'subtract(rect, disc) — §8.3 in one readable line',
-    run: (w) => w.subtract(w.rect(40, 20), w.disc(6)) },
+    run: (w) => w.subtract(w.rectangle(40, 20), w.circle(6)) },
   { label: 'subtract(tube, tube) — the A9.2.2 bushing',
-    run: (w) => w.subtract(w.tube(10, 20), w.tube(4, 22)) },
+    run: (w) => w.subtract(w.cylinder(10, 20), w.cylinder(4, 22)) },
   { label: 'union of a reSHape shape and a real one',
-    run: (w) => w.union(w.ball(10), w.cuboid({ size: [10, 10, 10] })) },
+    run: (w) => w.union(w.sphere(10), w.cuboid({ size: [10, 10, 10] })) },
   { label: 'hull of two reSHape shapes',
-    run: (w) => w.hull(w.disc(5), w.translate([20, 0, 0], w.disc(2))) },
+    run: (w) => w.hull(w.circle(5), w.translate([20, 0, 0], w.circle(2))) },
   { label: 'extrudeLinear (the real one) on a reSHape profile',
-    run: (w) => w.extrudeLinear({ height: 5 }, w.rect(20, 10)) },
+    run: (w) => w.extrudeLinear({ height: 5 }, w.rectangle(20, 10)) },
   { label: 'colorize a reSHape solid',
-    run: (w) => w.colorize([1, 0, 0], w.ball(5)) },
+    run: (w) => w.colorize([1, 0, 0], w.sphere(5)) },
   { label: 'measureBoundingBox reads a reSHape shape',
-    run: (w) => w.box(10, 10, 10) },
+    run: (w) => w.cuboid(10, 10, 10) },
   { label: 'a reSHape shape passed through the real align',
-    run: (w) => w.align({ modes: ['center', 'center', 'min'], relativeTo: [0, 0, 0] }, w.ball(8)) },
+    run: (w) => w.align({ modes: ['center', 'center', 'min'], relativeTo: [0, 0, 0] }, w.sphere(8)) },
   // The three new names, in the shapes /sandbox actually generates.
-  { label: 'extrude(6, poly(corners)) — the /sandbox Sketch kind, in one vocabulary',
-    run: (w) => w.extrude(6, w.poly([[0, 0], [20, 0], [10, 15]])) },
+  { label: 'extrudeLinear(6, polygon(corners)) — the /sandbox Sketch kind, in one vocabulary',
+    run: (w) => w.extrudeLinear(6, w.polygon([[0, 0], [20, 0], [10, 15]])) },
   { label: 'subtract(box, ring) — a groove cut with a donut',
-    run: (w) => w.subtract(w.box(40, 40, 40), w.ring(14, 4)) },
+    run: (w) => w.subtract(w.cuboid(40, 40, 40), w.torus(14, 4)) },
   { label: 'hull(cone, ball) — a reSHape cone in an organic form',
-    run: (w) => w.hull(w.cone(10, 20), w.translate([0, 0, 30], w.ball(4))) },
+    run: (w) => w.hull(w.cylinderElliptic(10, 20), w.translate([0, 0, 30], w.sphere(4))) },
   { label: 'sit(cone) and sit(ring) — both are built centred on the origin',
-    run: (w) => w.sit([w.cone(10, 20), w.translate([40, 0, 0], w.ring(14, 4))]) },
-  { label: 'revolve(translate(poly)) — a point list swept into a solid',
-    run: (w) => w.revolve(w.translate([30, 0, 0], w.poly([[0, 0], [20, 0], [10, 15]]))) },
+    run: (w) => w.sit([w.cylinderElliptic(10, 20), w.translate([40, 0, 0], w.torus(14, 4))]) },
+  { label: 'extrudeRotate(translate(poly)) — a point list swept into a solid',
+    run: (w) => w.extrudeRotate(w.translate([30, 0, 0], w.polygon([[0, 0], [20, 0], [10, 15]]))) },
   { label: 'turn(90, ring) — turning a torus in place',
-    run: (w) => w.turn(90, w.ring(14, 4)) },
+    run: (w) => w.turn(90, w.torus(14, 4)) },
 ];
 
 /**
@@ -1211,15 +1216,9 @@ export const GRADUATION_TRIPWIRES = [
     why: 'align defaults to grouped:false, which drops every part of an assembly '
       + 'separately onto z = 0 — the model collapses into itself and nothing throws',
   },
-  {
-    what: "the revolve row's operand order is load-bearing",
-    row: 'revolve(profile, { segments: 16 })',
-    without: 'extrudeRotate(profile, { segments: 16 })',
-    throws: true,
-    why: 'extrudeRotate takes its { } FIRST — keeping reSHape\'s trailing order after '
-      + 'graduating is the swap the row exists to show, and the library dies inside '
-      + 'itself rather than saying so',
-  },
+  // RETIRED BY THE RENAME: the row it guarded taught swapping reSHape's
+  // trailing { } for extrudeRotate's leading one. Both spellings now work,
+  // so there is no swap left to get wrong.
 ];
 
 /**
@@ -1228,7 +1227,51 @@ export const GRADUATION_TRIPWIRES = [
  * because a node vm global is too small a surface to produce a real collision
  * on its own.
  */
-export const SEEDED_COLLISION = { name: 'box', value: 'a student already owns this word' };
+/**
+ * The ten names reSHape now OWNS: each replaces the @jscad/modeling global of
+ * the same word, deliberately, because the friendly positional form IS the
+ * taught call. This is a widening rather than a shadowing, and
+ * 'a replaced name still reaches the library through its { } form' is the check
+ * that keeps it one. turn and sit are absent: neither replaces a library name.
+ */
+export const OWNED_NAMES = [
+  'cuboid', 'rectangle', 'circle', 'sphere', 'cylinder',
+  'cylinderElliptic', 'torus', 'polygon', 'extrudeLinear', 'extrudeRotate',
+];
+
+/**
+ * One call per owned name, written in the LIBRARY's own { } convention -- the
+ * form a student pastes off jscad.app, and the form every example in the
+ * vendored docs uses. Each is run twice, once through reSHape's global and once
+ * through the untouched module, and the two results must serialise identically.
+ *
+ * Given the module rather than hardcoded, because extrudeLinear and
+ * extrudeRotate need a real geom2 to act on and it has to come from the same
+ * module instance both answers are built from.
+ */
+export const OWNED_FORMS = [
+  { name: 'cuboid', args: () => [{ size: [40, 20, 10] }] },
+  { name: 'rectangle', args: () => [{ size: [40, 20] }] },
+  { name: 'circle', args: () => [{ radius: 6 }] },
+  { name: 'sphere', args: () => [{ radius: 10, segments: 32 }] },
+  { name: 'cylinder', args: () => [{ radius: 5, height: 20 }] },
+  { name: 'cylinderElliptic',
+    args: () => [{ startRadius: [10, 10], endRadius: [0, 0], height: 20 }] },
+  { name: 'torus', args: () => [{ outerRadius: 14, innerRadius: 4 }] },
+  { name: 'polygon', args: () => [{ points: [[0, 0], [20, 0], [10, 15]] }] },
+  { name: 'extrudeLinear',
+    args: (j) => [{ height: 5 }, j.primitives.rectangle({ size: [10, 10] })] },
+  // Offset off the axis: extrudeRotate refuses a profile that crosses it.
+  { name: 'extrudeRotate',
+    args: (j) => [{ segments: 16 }, j.primitives.rectangle({ size: [2, 10], center: [5, 0] })] },
+];
+
+/**
+ * Seeded on a name reSHape does NOT own, because an owned name is overwritten
+ * by design and could never be reported as skipped. turn is the tripwire now:
+ * it is still a NEW word, so the original rule still governs it.
+ */
+export const SEEDED_COLLISION = { name: 'turn', value: 'a student already owns this word' };
 
 // ---- the context ----------------------------------------------------------
 
@@ -1599,7 +1642,7 @@ export const BRIDGE_WARNINGS = [
   },
   {
     real: 'torus',
-    says: [/ring\(ringRadius, tubeRadius\)/, /outerRadius/],
+    says: [/torus\(ringRadius, tubeRadius\)/, /outerRadius/],
     why: "JSCAD's outerRadius is the radius of the circle the tube travels along, not the "
       + 'outside edge of the donut, and its innerRadius is the tube — so ring inverts the '
       + 'pair on purpose. A row that only said "torus -> ring" would send a student '
@@ -1647,7 +1690,7 @@ export const SIT_VS_BOOK_ALIGN = {
   ],
   sitModes: ['none', 'none', 'min'],
   /** deliberately off-centre in X and Y, which is the whole difference */
-  build: (w) => w.translate([40, 25, 12], w.box(20, 10, 8)),
+  build: (w) => w.translate([40, 25, 12], w.cuboid(20, 10, 8)),
   sitBox: [[30, 20, 0], [50, 30, 8]],
   bookBox: [[-10, -5, 0], [10, 5, 8]],
 };
@@ -1698,14 +1741,14 @@ export const BOOK_IDENTIFIERS = [
 export const REFUSAL_CALLS = [
   {
     what: 'the part-turn call revolve hands over',
-    trigger: (w) => w.revolve(w.translate([10, 0, 0], w.rect(4, 10)), { angle: Math.PI }),
+    trigger: (w) => w.extrudeRotate(w.translate([10, 0, 0], w.rectangle(4, 10)), { angle: Math.PI }),
     call: 'extrudeRotate({ segments: 16, angle: constants.TAU / 2 }, profile)',
     bindings: 'var profile = translate([10, 0, 0], rectangle({ size: [4, 10] }));',
     why: "§9.1's own worked example is a part turn and revolve does not do part turns",
   },
   {
     what: 'the twist call extrude hands over',
-    trigger: (w) => w.extrude(10, w.rect(10, 10), { twistAngle: 1 }),
+    trigger: (w) => w.extrudeLinear(10, w.rectangle(10, 10), { twistAngle: 1 }),
     call: 'extrudeLinear({ height: 10, twistAngle: constants.TAU / 4, twistSteps: 20 }, profile)',
     bindings: 'var profile = rectangle({ size: [10, 10] });',
     why: 'extrude has no options object at all, so the whole twist is on the other side of '
@@ -1713,21 +1756,21 @@ export const REFUSAL_CALLS = [
   },
   {
     what: 'the cut-off-point call cone hands over',
-    trigger: (w) => w.cone(10, 20, { endRadius: [4, 4] }),
+    trigger: (w) => w.cylinderElliptic(10, 20, { endRadius: [4, 4] }),
     call: 'cylinderElliptic({ startRadius: [10, 10], endRadius: [4, 4], height: 20 })',
     bindings: '',
     why: 'a frustum is a real thing to want and cone models a point only',
   },
   {
     what: 'the pie-slice call cone hands over',
-    trigger: (w) => w.cone(10, 20, { endAngle: 3 }),
+    trigger: (w) => w.cylinderElliptic(10, 20, { endAngle: 3 }),
     call: 'cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20, startAngle: 0, endAngle: constants.TAU / 2 })',
     bindings: '',
     why: 'it spells constants.TAU rather than the book\'s bare TAU, which throws in this runner',
   },
   {
     what: 'the segmented-torus call ring hands over',
-    trigger: (w) => w.ring(14, 4, { segments: 64 }),
+    trigger: (w) => w.torus(14, 4, { segments: 64 }),
     call: 'torus({ outerRadius: 14, innerRadius: 4, outerSegments: 64 })',
     bindings: '',
     why: 'ring has no { } at all, and plain `segments` is the key torus silently drops',
@@ -1763,20 +1806,20 @@ export const BOOK_OPTION_KEYS = [
     a: (w) => w.path2.fromPoints({ closed: true }, [[0, 0], [10, 0], [10, 10]]),
     b: (w) => w.path2.fromPoints({ closed: false }, [[0, 0], [10, 0], [10, 10]]) },
   { what: 'mirror normal', changes: true,
-    a: (w) => w.mirror({ normal: [1, 0, 0] }, w.translate([10, 0, 0], w.box(4, 4, 4))),
-    b: (w) => w.mirror({ normal: [0, 1, 0] }, w.translate([10, 0, 0], w.box(4, 4, 4))) },
+    a: (w) => w.mirror({ normal: [1, 0, 0] }, w.translate([10, 0, 0], w.cuboid(4, 4, 4))),
+    b: (w) => w.mirror({ normal: [0, 1, 0] }, w.translate([10, 0, 0], w.cuboid(4, 4, 4))) },
   { what: 'center axes', changes: true,
-    a: (w) => w.center({ axes: [true, false, false] }, w.translate([10, 10, 10], w.box(4, 4, 4))),
-    b: (w) => w.center({ axes: [true, true, true] }, w.translate([10, 10, 10], w.box(4, 4, 4))) },
+    a: (w) => w.center({ axes: [true, false, false] }, w.translate([10, 10, 10], w.cuboid(4, 4, 4))),
+    b: (w) => w.center({ axes: [true, true, true] }, w.translate([10, 10, 10], w.cuboid(4, 4, 4))) },
   { what: 'align modes', changes: true,
-    a: (w) => w.align({ modes: ['center', 'center', 'min'] }, w.translate([10, 10, 10], w.box(4, 4, 4))),
-    b: (w) => w.align({ modes: ['none', 'none', 'min'] }, w.translate([10, 10, 10], w.box(4, 4, 4))) },
+    a: (w) => w.align({ modes: ['center', 'center', 'min'] }, w.translate([10, 10, 10], w.cuboid(4, 4, 4))),
+    b: (w) => w.align({ modes: ['none', 'none', 'min'] }, w.translate([10, 10, 10], w.cuboid(4, 4, 4))) },
   { what: 'extrudeRotate angle', changes: true,
-    a: (w) => w.extrudeRotate({ segments: 16, angle: Math.PI }, w.disc(2, { center: [6, 0] })),
-    b: (w) => w.extrudeRotate({ segments: 16, angle: Math.PI * 2 }, w.disc(2, { center: [6, 0] })) },
+    a: (w) => w.extrudeRotate({ segments: 16, angle: Math.PI }, w.circle(2, { center: [6, 0] })),
+    b: (w) => w.extrudeRotate({ segments: 16, angle: Math.PI * 2 }, w.circle(2, { center: [6, 0] })) },
   { what: 'extrudeLinear twistAngle', changes: true,
-    a: (w) => w.extrudeLinear({ height: 10, twistAngle: Math.PI / 2, twistSteps: 20 }, w.rect(10, 4)),
-    b: (w) => w.extrudeLinear({ height: 10 }, w.rect(10, 4)) },
+    a: (w) => w.extrudeLinear({ height: 10, twistAngle: Math.PI / 2, twistSteps: 20 }, w.rectangle(10, 4)),
+    b: (w) => w.extrudeLinear({ height: 10 }, w.rectangle(10, 4)) },
   { what: 'torus innerRadius', changes: true,
     a: (w) => w.torus({ innerRadius: 2, outerRadius: 8 }),
     b: (w) => w.torus({ innerRadius: 3, outerRadius: 8 }) },
@@ -1793,8 +1836,8 @@ export const BOOK_OPTION_KEYS = [
     a: (w) => w.ellipse({ radius: [5, 10] }),
     b: (w) => w.ellipse({ radius: [10, 5] }) },
   { what: 'extrudeRectangular size', changes: true,
-    a: (w) => w.extrudeRectangular({ size: 2, height: 10 }, w.rect(10, 20)),
-    b: (w) => w.extrudeRectangular({ size: 4, height: 10 }, w.rect(10, 20)) },
+    a: (w) => w.extrudeRectangular({ size: 2, height: 10 }, w.rectangle(10, 20)),
+    b: (w) => w.extrudeRectangular({ size: 4, height: 10 }, w.rectangle(10, 20)) },
   { what: 'cube size', changes: true,
     a: (w) => w.cube({ size: 10 }), b: (w) => w.cube({ size: 20 }) },
   { what: 'polygon points', changes: true,
@@ -1820,7 +1863,7 @@ export const BOOK_OPTION_KEYS = [
  * reSHape's defence is that it does not hide objects, it postpones them until
  * they are worth having. Measured before this existed, the section making that
  * argument contained exactly ONE live object literal —
- * box(40, 20, 10, { center: [0, 0, 10] }) — because every other brace on the
+ * cuboid(40, 20, 10, { center: [0, 0, 10] }) — because every other brace on the
  * page was inside a // comment showing the real API. One brace does not carry
  * an argument about braces, and meanwhile 197 of the book's own calls lead with
  * one.
@@ -2073,7 +2116,7 @@ export function readFirstColumn(heading, text = readFileSync(PARAM_TYPES.path, '
 /** A one-parameter program, built from a definition literal, for the gate to run. */
 export function paramProgram(defLiteral) {
   return `function getParameterDefinitions() { return [${defLiteral}] }
-function main(params) { globalThis.__seen = params; return box(10, 10, 10) }`;
+function main(params) { globalThis.__seen = params; return cuboid(10, 10, 10) }`;
 }
 
 
@@ -2188,14 +2231,14 @@ export function createSvgContext(opts = {}) {
  * the case where they differ. Assert both, or this comes back.
  */
 export const SVG_CASES = [
-  { label: 'a plain rectangle', build: (w) => w.rect(40, 20), paths: 1, subpaths: 1 },
+  { label: 'a plain rectangle', build: (w) => w.rectangle(40, 20), paths: 1, subpaths: 1 },
   { label: 'a rectangle with a hole in it',
-    build: (w) => w.subtract(w.rect(40, 20), w.disc(5)), paths: 1, subpaths: 2 },
+    build: (w) => w.subtract(w.rectangle(40, 20), w.circle(5)), paths: 1, subpaths: 2 },
   { label: 'a plate with two holes',
-    build: (w) => w.subtract(w.rect(60, 20), w.translate([-15, 0], w.disc(4)),
-                             w.translate([15, 0], w.disc(4))), paths: 1, subpaths: 3 },
+    build: (w) => w.subtract(w.rectangle(60, 20), w.translate([-15, 0], w.circle(4)),
+                             w.translate([15, 0], w.circle(4))), paths: 1, subpaths: 3 },
   { label: 'two separate shapes',
-    build: (w) => [w.rect(10, 10), w.translate([40, 0], w.disc(5))], paths: 2, subpaths: 2 },
+    build: (w) => [w.rectangle(10, 10), w.translate([40, 0], w.circle(5))], paths: 2, subpaths: 2 },
 ];
 
 /** Margin the serializer adds around the bounding box, in mm. */

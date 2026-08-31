@@ -11,14 +11,29 @@ const text = readFileSync(SRC, 'utf8');
 // teach. Everything else in the app IS JSCAD's own vocabulary used bare —
 // translate, union, subtract, hull, align, colorize — so a page saying
 // "translate hands back a moved copy" is correct, not drift.
-const REPLACED = [
-  'cuboid', 'roundedCuboid', 'rectangle', 'roundedRectangle',
-  'roundedCylinder', 'cylinderElliptic',
-  'torus', 'polygon', 'extrudeLinear', 'extrudeRotate',
-];
+// INVERTED BY THE RENAME. This used to forbid prose from teaching the real
+// @jscad/modeling vocabulary, because the code beside it was reSHape's own
+// words. reSHape now IS those words, so naming cuboid in prose is correct and
+// the drift runs the other way: prose still teaching box, ball or tube names a
+// function that no longer exists. Same gate, opposite list.
+// INVERTED BY THE RENAME. This used to forbid prose from teaching the real
+// @jscad/modeling vocabulary, because the code beside it was reSHape's own
+// words. reSHape now IS those words, so naming cuboid in prose is correct and
+// the drift runs the other way: prose still teaching box, ball or tube names a
+// function that no longer exists.
+//
+// EVERY entry is soft -- a call, not a mention. That is not laziness, it is the
+// only line that holds after the rename: "a bounding box", "a ring of radius 4"
+// and "the tube travels along" are ordinary English about the shape and are
+// correct prose, while box( names something a student cannot call any more.
+// Hard-listing the words flagged 105 pages, nearly all of them for writing
+// English.
+const REPLACED = [];
 
-// Also English words. Only a call counts.
-const REPLACED_SOFT = ['sphere', 'cylinder', 'circle', 'square'];
+const REPLACED_SOFT = [
+  'box', 'rect', 'disc', 'ball', 'tube', 'cone', 'ring', 'poly',
+  'extrude', 'revolve',
+];
 
 // The boilerplate reSHape does away with. A file in this app has no require
 // line, no module.exports, and reaches nothing through a module object.

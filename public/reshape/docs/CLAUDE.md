@@ -80,8 +80,8 @@ The preview iframe (`public/reshape/runner.html`):
   because the real API forces an object literal *and* an array literal into a
   fourteen-year-old's first 3D line, which puts the brace where it is only
   punctuation. reSHape makes required values positional and every named extra an
-  optional trailing `{ }`, so `box(40, 20, 10)` is day one and
-  `box(40, 20, 10, { center: [0, 0, 10] })` is the day the model needed
+  optional trailing `{ }`, so `cuboid(40, 20, 10)` is day one and
+  `cuboid(40, 20, 10, { center: [0, 0, 10] })` is the day the model needed
   something — which is the objects lesson the book has no chapter for yet.
   Every reSHape call returns the same real geometry the call it stands for
   returns, so the two vocabularies mix in one file and graduation is a rename.
@@ -202,7 +202,7 @@ against the chapter sources rather than eyeballed.
 **The bridge.** `REVERSE_LOOKUP` asks whether every name *reSHape replaces* has a
 row. A student reading the book asks whether every name they can *type* has one,
 and eight did not — `cube` among them, at 12 calls across four chapters and in
-the opening runnable block of the whole unit, with `box(10, 10, 10)` being
+the opening runnable block of the whole unit, with `cuboid(10, 10, 10)` being
 exactly it and nothing shCode shipped saying so. `BOOK_CENSUS` records the
 measurement as data (the chapters live in another repository, so `npm test` must
 not need it checked out) and the gate asserts that **every one of the 273 calls
@@ -287,7 +287,7 @@ One consequence worth writing down: **`revolve` is the one reSHape name whose
 extra rides in a trailing `{ }` — but `extrudeRotate` and `extrudeLinear` take
 theirs first. `extrude` hides that (its required value *becomes* the leading
 `{ height: … }`); `revolve` cannot, because its required value is the shape. So
-`revolve(profile, { segments: 16 })` is `extrudeRotate({ segments: 16 }, profile)`.
+`extrudeRotate(profile, { segments: 16 })` is `extrudeRotate({ segments: 16 }, profile)`.
 The swap is a table row, a paragraph in `reference.md`, and a named error rather
 than an inherited surprise.
 

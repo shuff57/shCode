@@ -8,11 +8,11 @@
 // radian in the same line:
 //
 //     primitives.cuboid({ size: [40, 20, 10] })      the real library
-//     box(40, 20, 10)                                reSHape
+//     cuboid(40, 20, 10)                                reSHape
 //
 // The whole design turns on the SECOND line a student writes, not the first:
 //
-//     box(40, 20, 10, { center: [0, 0, 10] })
+//     cuboid(40, 20, 10, { center: [0, 0, 10] })
 //
 // The brace appears the moment the model needs something the shape cannot
 // exist without — which is exactly when an object literal is worth meeting.
@@ -59,7 +59,7 @@
 // cylinder, rectangle, circle, extrudeLinear, extrudeRotate, translate,
 // rotate, scale, union, subtract, intersect, hull, align — bare, namespaced,
 // or through require('@jscad/modeling'). Eleven of the twelve names below are
-// a pure rename plus a bracket: swap box(40, 20, 10) for
+// a pure rename plus a bracket: swap cuboid(40, 20, 10) for
 // cuboid({ size: [40, 20, 10] }) and the program is portable to jscad.app with
 // no other edit. The graduation lesson is one slide per name — except that
 // poly's slide has to carry a warning the other ten do not, because forgetting
@@ -86,7 +86,7 @@
 // about the world origin does not. That is not a quirk of this implementation,
 // it is arithmetic — turn(a, translate(t, s)) and translate(t, turn(a, s)) are
 // the same model for every a, t and s. Measured on this bundle with
-// box(40, 20, 10):
+// cuboid(40, 20, 10):
 //
 //   translate([50,0,0], rotate([0,0,PI/2], s))  ->  [[40,-20,-5],[60,20,5]]
 //   rotate([0,0,PI/2], translate([50,0,0], s))  ->  [[-10,30,-5],[10,70,5]]
@@ -157,7 +157,7 @@
 //   the labels are TRUE. They are not. JSCAD's outerRadius is the radius of the
 //   circle the tube travels along — it is neither the outside edge of the
 //   finished donut nor any feature you can put a caliper on. Measured on this
-//   bundle, for a student building a donut 36 across with an 8-thick tube: the
+//   bundle, for a student building a donut 36 across with an 8-thick cylinder: the
 //   correct call is torus({ outerRadius: 14, innerRadius: 4 }); reading
 //   outerRadius as the outside edge gives torus({ outerRadius: 18,
 //   innerRadius: 4 }) -> 44 x 44 x 8, and additionally reading innerRadius as
@@ -171,13 +171,13 @@
 //   BUT THE WIN IS NARROWER THAN THE FIRST VERSION OF THIS PARAGRAPH CLAIMED,
 //   AND THE MISSING MEASUREMENT WAS ring's OWN. It said "both its names are
 //   honest about what they set". Only one of them is. Measured on this bundle:
-//   ring(18, 4) — ringRadius read as "the radius of the ring I am making", its
+//   torus(18, 4) — ringRadius read as "the radius of the ring I am making", its
 //   outside edge — builds 44 x 44 x 8, SILENTLY, the byte-identical wrong model
 //   torus({ outerRadius: 18, innerRadius: 4 }) builds. `ringRadius` carries the
-//   same ambiguity `outerRadius` does. ring(14, 8), tubeRadius read as the
+//   same ambiguity `outerRadius` does. torus(14, 8), tubeRadius read as the
 //   tube's THICKNESS rather than its radius, builds 44 x 44 x 16, also
 //   silently. Nor does ring win on catching the swap: torus throws on the full
-//   swap too, so what ring wins there is the MESSAGE — ring(4, 14) is rethrown
+//   swap too, so what ring wins there is the MESSAGE — torus(4, 14) is rethrown
 //   with the student's own two numbers and the call they meant — not the catch.
 //
 //   What is left is still enough, and it is the whole of it: tubeRadius is TRUE
@@ -268,10 +268,10 @@
 // to close, so ring and poly follow extrude, turn and sit: a trailing argument
 // is refused by name, and the refusal spells out the real call that does take
 // those keys. poly also carries the one cost the positional rule cannot pay
-// off — its single positional argument is a LIST, so poly([[0, 0], [20, 0],
+// off — its single positional argument is a LIST, so polygon([[0, 0], [20, 0],
 // [10, 15]]) is not punctuation-free. What it removes is the object literal
 // wrapped around a list the student already has, which is a smaller win than
-// box(40, 20, 10) and is worth saying so.
+// cuboid(40, 20, 10) and is worth saying so.
 //
 // New expectations for this file go in scripts/reshape-simple-checks.mjs and the
 // SIMPLE group of scripts/test-reshape.mjs — never by loosening a check that is
@@ -345,7 +345,7 @@
 	// ---- the two guards every shape shares ----------------------------------
 
 	/**
-	 * The positional arity guard, and the reason tube() exists at all: the real
+	 * The positional arity guard, and the reason cylinder() exists at all: the real
 	 * cylinder({ radius: 5 }) does NOT complain about the missing height. It
 	 * quietly defaults it to 2 and hands back a squat disc, which is worse than
 	 * an error because there is nothing to read.
@@ -396,16 +396,16 @@
 	 * and REFUSAL_CALLS in the gate executes every call spelled out here.
 	 */
 	var REAL_EXTRAS = {
-		cone: {
+		cylinderElliptic: {
 			startRadius: 'cylinderElliptic({ startRadius: [10, 6], endRadius: [0, 0], height: 20 }) gives it an oval base',
 			endRadius: 'cylinderElliptic({ startRadius: [10, 10], endRadius: [4, 4], height: 20 }) cuts the point off',
 			startAngle: 'cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20, startAngle: 0, endAngle: constants.TAU / 2 }) leaves half of it, like a pie slice',
 			endAngle: 'cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20, startAngle: 0, endAngle: constants.TAU / 2 }) leaves half of it, like a pie slice'
 		},
-		revolve: {
+		extrudeRotate: {
 			angle: 'extrudeRotate({ segments: 16, angle: constants.TAU / 2 }, profile) turns it part of the way round'
 		},
-		extrude: {
+		extrudeLinear: {
 			twistAngle: 'extrudeLinear({ height: 10, twistAngle: constants.TAU / 4, twistSteps: 20 }, profile) twists it',
 			twistSteps: 'extrudeLinear({ height: 10, twistAngle: constants.TAU / 4, twistSteps: 20 }, profile) twists it'
 		}
@@ -478,10 +478,10 @@
 	var CONE_KEYS = ['center', 'segments'];
 	var REVOLVE_KEYS = ['segments'];
 
-	/** box(40, 20, 10) -> primitives.cuboid({ size: [40, 20, 10] }) */
-	function box(width, depth, height, extras) {
-		requireNumbers('box', ['width', 'depth', 'height'], arguments, 'cuboid');
-		var opts = readOptions('box', BOX_KEYS, extras, 'box(40, 20, 10, { center: [0, 0, 10] })', 'cuboid');
+	/** cuboid(40, 20, 10) -> primitives.cuboid({ size: [40, 20, 10] }) */
+	function cuboid(width, depth, height, extras) {
+		requireNumbers('cuboid', ['width', 'depth', 'height'], arguments, 'cuboid');
+		var opts = readOptions('cuboid', BOX_KEYS, extras, 'cuboid(40, 20, 10, { center: [0, 0, 10] })', 'cuboid');
 		var size = [width, depth, height];
 		if (!('roundRadius' in opts)) return primitives.cuboid(callWith({ size: size }, opts));
 		try {
@@ -490,16 +490,16 @@
 			if (!saidRoundRadius(e)) throw e;
 			throw new Error(
 				'roundRadius ' + opts.roundRadius + ' is too big for a ' + width + ' x ' + depth +
-				' x ' + height + ' box — it must be less than ' +
+				' x ' + height + ' cuboid — it must be less than ' +
 				tidy(Math.min(width, depth, height) / 2) + '.'
 			);
 		}
 	}
 
-	/** rect(40, 20) -> primitives.rectangle({ size: [40, 20] }) */
-	function rect(width, height, extras) {
-		requireNumbers('rect', ['width', 'height'], arguments, 'rectangle');
-		var opts = readOptions('rect', RECT_KEYS, extras, 'rect(40, 20, { center: [10, 0] })', 'rectangle');
+	/** rectangle(40, 20) -> primitives.rectangle({ size: [40, 20] }) */
+	function rectangle(width, height, extras) {
+		requireNumbers('rectangle', ['width', 'height'], arguments, 'rectangle');
+		var opts = readOptions('rectangle', RECT_KEYS, extras, 'rectangle(40, 20, { center: [10, 0] })', 'rectangle');
 		var size = [width, height];
 		if (!('roundRadius' in opts)) return primitives.rectangle(callWith({ size: size }, opts));
 		try {
@@ -508,29 +508,29 @@
 			if (!saidRoundRadius(e)) throw e;
 			throw new Error(
 				'roundRadius ' + opts.roundRadius + ' is too big for a ' + width + ' x ' + height +
-				' rect — it must be less than ' + tidy(Math.min(width, height) / 2) + '.'
+				' rectangle — it must be less than ' + tidy(Math.min(width, height) / 2) + '.'
 			);
 		}
 	}
 
-	/** disc(6) -> primitives.circle({ radius: 6 }) */
-	function disc(radius, extras) {
-		requireNumbers('disc', ['radius'], arguments, 'circle');
-		var opts = readOptions('disc', DISC_KEYS, extras, 'disc(6, { center: [10, 0] })', 'circle');
+	/** circle(6) -> primitives.circle({ radius: 6 }) */
+	function circle(radius, extras) {
+		requireNumbers('circle', ['radius'], arguments, 'circle');
+		var opts = readOptions('circle', DISC_KEYS, extras, 'circle(6, { center: [10, 0] })', 'circle');
 		return primitives.circle(callWith({ radius: radius }, opts));
 	}
 
-	/** ball(20) -> primitives.sphere({ radius: 20 }) */
-	function ball(radius, extras) {
-		requireNumbers('ball', ['radius'], arguments, 'sphere');
-		var opts = readOptions('ball', BALL_KEYS, extras, 'ball(20, { segments: 64 })', 'sphere');
+	/** sphere(20) -> primitives.sphere({ radius: 20 }) */
+	function sphere(radius, extras) {
+		requireNumbers('sphere', ['radius'], arguments, 'sphere');
+		var opts = readOptions('sphere', BALL_KEYS, extras, 'sphere(20, { segments: 64 })', 'sphere');
 		return primitives.sphere(callWith({ radius: radius }, opts));
 	}
 
-	/** tube(5, 20) -> primitives.cylinder({ radius: 5, height: 20 }) */
-	function tube(radius, height, extras) {
-		requireNumbers('tube', ['radius', 'height'], arguments, 'cylinder');
-		var opts = readOptions('tube', TUBE_KEYS, extras, 'tube(5, 20, { center: [0, 0, 10] })', 'cylinder');
+	/** cylinder(5, 20) -> primitives.cylinder({ radius: 5, height: 20 }) */
+	function cylinder(radius, height, extras) {
+		requireNumbers('cylinder', ['radius', 'height'], arguments, 'cylinder');
+		var opts = readOptions('cylinder', TUBE_KEYS, extras, 'cylinder(5, 20, { center: [0, 0, 10] })', 'cylinder');
 		var required = { radius: radius, height: height };
 		if (!('roundRadius' in opts)) return primitives.cylinder(callWith(required, opts));
 		try {
@@ -541,66 +541,66 @@
 			// separate answers: one is about the height, one about the radius.
 			if (/height must be larger than twice roundRadius/.test(msg)) {
 				throw new Error(
-					'roundRadius ' + opts.roundRadius + ' is too big for a tube ' + height +
+					'roundRadius ' + opts.roundRadius + ' is too big for a cylinder ' + height +
 					' tall — it must be less than ' + tidy(height / 2) + '.'
 				);
 			}
 			if (!saidRoundRadius(e)) throw e;
 			throw new Error(
-				'roundRadius ' + opts.roundRadius + ' is too big for a tube of radius ' + radius +
+				'roundRadius ' + opts.roundRadius + ' is too big for a cylinder of radius ' + radius +
 				' — it must be ' + tidy(radius) + ' or less.'
 			);
 		}
 	}
 
 	/**
-	 * cone(10, 20) ->
+	 * cylinderElliptic(10, 20) ->
 	 *   primitives.cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0], height: 20 })
 	 *
-	 * The same silent wrong answer tube() exists for, one shape along. Measured:
+	 * The same silent wrong answer cylinder() exists for, one shape along. Measured:
 	 * cylinderElliptic({ startRadius: [10, 10], endRadius: [0, 0] }) with no
 	 * height does not complain — height defaults to 2, so it hands back a
 	 * 20 x 20 x 2 pancake and says nothing. requireNumbers closes it.
 	 *
 	 * center and segments are the only keys, and both were already in this
 	 * layer's three-word option vocabulary, so nothing is invented and the
-	 * day-one call cone(10, 20) still has no punctuation in it. roundRadius is
+	 * day-one call cylinderElliptic(10, 20) still has no punctuation in it. roundRadius is
 	 * refused rather than accepted for the usual reason: measured,
 	 * cylinderElliptic ignores it silently — same bounding box, same 64
 	 * polygons. A cut-off point, an oval base and a pie slice are all real
 	 * things to want, and cone deliberately models none of them; REAL_EXTRAS
 	 * above hands over the whole cylinderElliptic call for each one.
 	 */
-	function cone(radius, height, extras) {
-		requireNumbers('cone', ['radius', 'height'], arguments, 'cylinderElliptic');
-		var opts = readOptions('cone', CONE_KEYS, extras, 'cone(10, 20, { center: [0, 0, 10] })', 'cylinderElliptic');
+	function cylinderElliptic(radius, height, extras) {
+		requireNumbers('cylinderElliptic', ['radius', 'height'], arguments, 'cylinderElliptic');
+		var opts = readOptions('cylinderElliptic', CONE_KEYS, extras, 'cylinderElliptic(10, 20, { center: [0, 0, 10] })', 'cylinderElliptic');
 		return primitives.cylinderElliptic(callWith({
 			startRadius: [radius, radius], endRadius: [0, 0], height: height
 		}, opts));
 	}
 
 	/**
-	 * ring(14, 4) -> primitives.torus({ outerRadius: 14, innerRadius: 4 })
+	 * torus(14, 4) -> primitives.torus({ outerRadius: 14, innerRadius: 4 })
 	 *
 	 * The mapping is inverted on purpose, and the inversion is the whole reason
 	 * this name exists: JSCAD's outerRadius is the radius of the circle the TUBE
 	 * TRAVELS ALONG, and its innerRadius is the radius of the tube itself.
-	 * Neither is the thing its name suggests. Measured: ring(14, 4) comes out
+	 * Neither is the thing its name suggests. Measured: torus(14, 4) comes out
 	 * 36 across and 8 thick.
 	 *
 	 * No options object at all — see the banner. torus has no center and no
 	 * segments, and drops both silently.
 	 */
-	function ring(ringRadius, tubeRadius) {
+	function torus(ringRadius, tubeRadius) {
 		if (arguments.length > 2) {
 			throw new Error(
-				'ring takes just the two radiuses: ring(14, 4). It has no { } options — ' +
+				'torus takes just the two radiuses: torus(14, 4). It has no { } options — ' +
 				'a torus has no center and no segments, so translate it to move it. The ' +
 				'JSCAD version, which does take innerSegments and outerSegments, is called ' +
 				'torus: torus({ outerRadius: 14, innerRadius: 4, outerSegments: 64 }).'
 			);
 		}
-		requireNumbers('ring', ['ringRadius', 'tubeRadius'], arguments, 'torus');
+		requireNumbers('torus', ['ringRadius', 'tubeRadius'], arguments, 'torus');
 		try {
 			return primitives.torus({ outerRadius: ringRadius, innerRadius: tubeRadius });
 		} catch (e) {
@@ -610,14 +610,14 @@
 			if (!/inner circle is too large/.test((e && e.message) || '')) throw e;
 			throw new Error(
 				'a tube ' + tubeRadius + ' thick will not fit round a ring of radius ' +
-				ringRadius + ' — in ring(ringRadius, tubeRadius) the ring radius comes ' +
-				'first. ring(' + tubeRadius + ', ' + ringRadius + ') is the one you meant.'
+				ringRadius + ' — in torus(ringRadius, tubeRadius) the ring radius comes ' +
+				'first. torus(' + tubeRadius + ', ' + ringRadius + ') is the one you meant.'
 			);
 		}
 	}
 
 	/**
-	 * poly([[0, 0], [20, 0], [10, 15]]) -> primitives.polygon({ points: [...] })
+	 * polygon([[0, 0], [20, 0], [10, 15]]) -> primitives.polygon({ points: [...] })
 	 *
 	 * The one reSHape name whose positional argument is a list rather than a
 	 * number, which is a cost the banner records rather than hides.
@@ -635,10 +635,10 @@
 	 *                                                 list index poly has not
 	 *                                                 got
 	 */
-	function poly(points) {
+	function polygon(points) {
 		if (arguments.length > 1) {
 			throw new Error(
-				'poly takes just the list of corners: poly([[0, 0], [20, 0], [10, 15]]). ' +
+				'polygon takes just the list of corners: polygon([[0, 0], [20, 0], [10, 15]]). ' +
 				'It has no { } options. The JSCAD version, which also takes paths and ' +
 				'orientation, is called polygon.'
 			);
@@ -649,21 +649,21 @@
 		// polygon — the same trap reshape-simple-checks.mjs flags on rect/normal.
 		if (points && typeof points === 'object' && !Array.isArray(points)) {
 			throw new Error(
-				'poly takes a plain list of corners: poly([[0, 0], [20, 0], [10, 15]]). ' +
+				'polygon takes a plain list of corners: polygon([[0, 0], [20, 0], [10, 15]]). ' +
 				'The JSCAD version that takes { points: [...] } as a { } object is ' +
 				'called polygon.'
 			);
 		}
 		if (!Array.isArray(points)) {
 			throw new Error(
-				'poly needs a list of corners: poly(points), like ' +
-				'poly([[0, 0], [20, 0], [10, 15]]). You gave it ' + describe(points) + '.'
+				'polygon needs a list of corners: polygon(points), like ' +
+				'polygon([[0, 0], [20, 0], [10, 15]]). You gave it ' + describe(points) + '.'
 			);
 		}
 		if (points.length < 3) {
 			throw new Error(
-				'poly needs at least three corners to enclose anything: poly(points), ' +
-				'like poly([[0, 0], [20, 0], [10, 15]]). You gave it ' +
+				'polygon needs at least three corners to enclose anything: polygon(points), ' +
+				'like polygon([[0, 0], [20, 0], [10, 15]]). You gave it ' +
 				count(points.length) + '.'
 			);
 		}
@@ -672,8 +672,8 @@
 			if (!Array.isArray(corner) || corner.length < 2 ||
 				!isNumber(corner[0]) || !isNumber(corner[1])) {
 				throw new Error(
-					'every corner poly takes is an x and a y: ' +
-					'poly([[0, 0], [20, 0], [10, 15]]). Corner ' + (i + 1) + ' is ' +
+					'every corner polygon takes is an x and a y: ' +
+					'polygon([[0, 0], [20, 0], [10, 15]]). Corner ' + (i + 1) + ' is ' +
 					describe(corner) + '.'
 				);
 			}
@@ -682,7 +682,7 @@
 	}
 
 	/**
-	 * extrude(10, profile) -> extrusions.extrudeLinear({ height: 10 }, profile)
+	 * extrudeLinear(10, profile) -> extrusions.extrudeLinear({ height: 10 }, profile)
 	 *
 	 * Same operand order as the real call — number first, shapes last — so this
 	 * one graduates by deleting the word "Linear" and adding a brace. No options
@@ -694,25 +694,25 @@
 	 * The 2D guard is not decoration. Measured on this bundle: extrudeLinear on
 	 * a solid does not throw — it hands the solid straight back, unchanged.
 	 */
-	function extrude(height, shape) {
+	function extrudeLinear(height, shape) {
 		// The real extrudeLinear takes its { } FIRST. A student who copies that
 		// order out of the docs gets told which function that spelling belongs
 		// to, by name, instead of a message about the height.
 		if (isOptionsObject(height)) {
 			throw new Error(
-				'extrude takes the height first and plain: extrude(10, shape). ' +
+				'extrudeLinear takes the height first and plain: extrudeLinear(10, shape). ' +
 				'The JSCAD version that takes { height: 10 } as a { } object first ' +
 				'is called extrudeLinear.'
 			);
 		}
 		if (!isNumber(height)) {
 			throw new Error(
-				'extrude needs the height first: extrude(10, shape). You gave it ' +
+				'extrudeLinear needs the height first: extrudeLinear(10, shape). You gave it ' +
 				describe(height) + '.'
 			);
 		}
 		var shapes = Array.prototype.slice.call(arguments, 1);
-		if (!shapes.length) throw new Error('extrude needs a shape to push upwards: extrude(10, shape).');
+		if (!shapes.length) throw new Error('extrudeLinear needs a shape to push upwards: extrudeLinear(10, shape).');
 		// The real extrudeLinear flattens an array of profiles, so a student may
 		// hand it one. Validate the flattened view; forward the original.
 		var flat = [];
@@ -723,8 +723,8 @@
 		for (var j = 0; j < flat.length; j++) {
 			if (isSolid(flat[j])) {
 				throw new Error(
-					'extrude needs a flat 2D shape — you gave it a solid. Build the flat ' +
-					'outline first (rect, disc, or a boolean of them), then extrude that.'
+					'extrudeLinear needs a flat 2D shape — you gave it a solid. Build the flat ' +
+					'outline first (rectangle, circle, or a boolean of them), then extrudeLinear that.'
 				);
 			}
 			if (isOptionsObject(flat[j])) {
@@ -736,9 +736,9 @@
 				// table's extrude entries were unreachable and this message stopped
 				// at a function name. A name is a search; a call is a paste.
 				throw new Error(
-					'extrude has no { } options: extrude(10, shape). The JSCAD version ' +
+					'extrudeLinear has no { } options: extrudeLinear(10, shape). The JSCAD version ' +
 					'that takes twistAngle and twistSteps is called extrudeLinear: ' +
-					REAL_EXTRAS.extrude.twistAngle + '.'
+					REAL_EXTRAS.extrudeLinear.twistAngle + '.'
 				);
 			}
 			// A path2 is allowed through: extrudeLinear takes one, and refusing it
@@ -746,8 +746,8 @@
 			// see. It is what §8.1 extrudes a vectorText glyph from.
 			if (!isFlat(flat[j]) && !isPath(flat[j])) {
 				throw new Error(
-					'extrude(10, shape) — that is not a flat shape, it is ' + describe(flat[j]) + '. ' +
-					'Build the outline first with rect, disc or poly, then extrude that.'
+					'extrudeLinear(10, shape) — that is not a flat shape, it is ' + describe(flat[j]) + '. ' +
+					'Build the outline first with rectangle, circle or polygon, then extrudeLinear that.'
 				);
 			}
 		}
@@ -755,7 +755,7 @@
 	}
 
 	/**
-	 * revolve(profile) -> extrusions.extrudeRotate({}, profile)
+	 * extrudeRotate(profile) -> extrusions.extrudeRotate({}, profile)
 	 *
 	 * A full turn, which is already the library's default angle — so leaving it
 	 * out changes nothing about the model, it only removes TAU and the baffling
@@ -771,9 +771,9 @@
 	 * "Cannot read properties of undefined (reading 'length')" from inside the
 	 * library, which points a student at nothing at all.
 	 */
-	function revolve(shape, extras) {
+	function extrudeRotate(shape, extras) {
 		// revolve is the one name whose options object trades places with the
-		// real call's: revolve(profile, { segments: 16 }) is
+		// real call's: extrudeRotate(profile, { segments: 16 }) is
 		// extrudeRotate({ segments: 16 }, profile). reSHape's grammar has no
 		// exceptions — every extra rides in a TRAILING { } — so the swap is
 		// real, it is documented in the graduation table, and a student who
@@ -781,22 +781,22 @@
 		// about flat shapes.
 		if (isOptionsObject(shape)) {
 			throw new Error(
-				'revolve takes the shape first and its extras last: ' +
-				'revolve(profile, { segments: 16 }). The JSCAD version that takes ' +
+				'extrudeRotate takes the shape first and its extras last: ' +
+				'extrudeRotate(profile, { segments: 16 }). The JSCAD version that takes ' +
 				'the { } object first is called extrudeRotate.'
 			);
 		}
 		if (Array.isArray(shape)) {
-			throw new Error('revolve spins one flat shape at a time: revolve(profile).');
+			throw new Error('extrudeRotate spins one flat shape at a time: extrudeRotate(profile).');
 		}
 		if (isSolid(shape)) {
-			throw new Error('revolve needs a flat 2D shape — you gave it a solid.');
+			throw new Error('extrudeRotate needs a flat 2D shape — you gave it a solid.');
 		}
 		if (!isFlat(shape)) {
-			throw new Error('revolve needs a flat 2D shape: revolve(profile). You gave it ' +
+			throw new Error('extrudeRotate needs a flat 2D shape: extrudeRotate(profile). You gave it ' +
 				describe(shape) + '.');
 		}
-		var opts = readOptions('revolve', REVOLVE_KEYS, extras, 'revolve(profile, { segments: 16 })', 'extrudeRotate');
+		var opts = readOptions('extrudeRotate', REVOLVE_KEYS, extras, 'extrudeRotate(profile, { segments: 16 })', 'extrudeRotate');
 		return extrusions.extrudeRotate(opts, shape);
 	}
 
@@ -897,14 +897,14 @@
 		// a student certain they had changed something.
 		if (arguments.length > 1) {
 			throw new Error(
-				'sit takes just the shape: sit(ball(10)). It has no { } options. The ' +
+				'sit takes just the shape: sit(sphere(10)). It has no { } options. The ' +
 				'JSCAD version, which lines shapes up any way you like, is called align.'
 			);
 		}
 		var many = Array.isArray(shape);
 		var list = many ? shape : [shape];
 		if (!everyGeometry(list)) {
-			throw new Error('sit needs a shape, or a list of shapes: sit(ball(10)). You gave it ' +
+			throw new Error('sit needs a shape, or a list of shapes: sit(sphere(10)). You gave it ' +
 				describe(shape) + '.');
 		}
 		return transforms.align(
@@ -926,7 +926,7 @@
 	// A moSHion Sprite is configured two ways — `new Sprite(x, y, 50, 50)` and
 	// `s.color = 'red'` — and a reSHape name works the same:
 	//
-	//     let b = ball(5)      b.radius = 9      b.color = 'red'
+	//     let b = sphere(5)      b.radius = 9      b.color = 'red'
 	//
 	// Every name returns a LIVE HANDLE: it remembers the arguments it was built
 	// from and REBUILDS its geometry when one is assigned. The twelve
@@ -972,7 +972,7 @@
 	}
 
 	// `names` are the positional parameters of the call; a trailing options
-	// object contributes its keys as settable names too, so ball(5, {segments:8})
+	// object contributes its keys as settable names too, so sphere(5, {segments:8})
 	// gives both `.radius` and `.segments`.
 	function live(build, names, optionKeys, args) {
 		var params = {};
@@ -981,7 +981,7 @@
 
 		// EVERY argument a name accepts is a settable parameter from the start —
 		// the options included, whether or not the student supplied one. Seeding
-		// the unsupplied ones as undefined is the whole reason ball(10).segments = 8
+		// the unsupplied ones as undefined is the whole reason sphere(10).segments = 8
 		// rebuilds instead of writing a dead property onto the geometry: the set
 		// trap below tests hasOwnProperty(params, key), and a key that was never
 		// passed used to fail that test and fall through to state.geom[key].
@@ -992,7 +992,7 @@
 		}
 
 		// Whatever follows the named parameters. extrude is variadic —
-		// extrude(4, rect(10, 10), disc(3)) pushes BOTH shapes — so the tail is
+		// extrudeLinear(4, rectangle(10, 10), circle(3)) pushes BOTH shapes — so the tail is
 		// carried through the rebuild rather than dropped. It is positional only;
 		// there is no name to assign it by, which is why it is not in `params`.
 		var tail = Array.prototype.slice.call(args, names.length);
@@ -1004,7 +1004,7 @@
 				params[k] = extras[k];
 				// A key the name does NOT accept is carried anyway, so the rebuild
 				// still hands it to readOptions and the student still gets
-				// 'box has no option called "widht"' rather than silence.
+				// 'cuboid has no option called "widht"' rather than silence.
 				if (optNames.indexOf(k) === -1) optNames.push(k);
 			}
 		}
@@ -1081,11 +1081,11 @@
 
 	/** The positional parameters of each name, in order. */
 	var PARAMS = {
-		box: ['width', 'depth', 'height'], rect: ['width', 'height'],
-		disc: ['radius'], ball: ['radius'],
-		tube: ['radius', 'height'], cone: ['radius', 'height'],
-		ring: ['ringRadius', 'tubeRadius'], poly: ['points'],
-		extrude: ['height', 'shape'], revolve: ['shape'],
+		cuboid: ['width', 'depth', 'height'], rectangle: ['width', 'height'],
+		circle: ['radius'], sphere: ['radius'],
+		cylinder: ['radius', 'height'], cylinderElliptic: ['radius', 'height'],
+		torus: ['ringRadius', 'tubeRadius'], polygon: ['points'],
+		extrudeLinear: ['height', 'shape'], extrudeRotate: ['shape'],
 		turn: ['degrees', 'shape'], sit: ['shape']
 	};
 
@@ -1096,14 +1096,55 @@
 	 * an object passed to one of those still reaches its own refusal message.
 	 */
 	var OPTIONS = {
-		box: BOX_KEYS, rect: RECT_KEYS, disc: DISC_KEYS, ball: BALL_KEYS,
-		tube: TUBE_KEYS, cone: CONE_KEYS, revolve: REVOLVE_KEYS
+		cuboid: BOX_KEYS, rectangle: RECT_KEYS, circle: DISC_KEYS, sphere: BALL_KEYS,
+		cylinder: TUBE_KEYS, cylinderElliptic: CONE_KEYS, extrudeRotate: REVOLVE_KEYS
+	};
+
+	/**
+	 * The library function each owned name stands on. A call in the library's own
+	 * { } convention is handed straight to it -- NOT to the reSHape wrapper above,
+	 * which would only refuse the object it was given. turn and sit are absent on
+	 * purpose: neither replaces a library name, so neither has a real form.
+	 */
+	/**
+	 * Is this first argument the LIBRARY's own { } form rather than a shape?
+	 *
+	 * isOptionsObject alone is not enough, and polygon is why: { points: [...] }
+	 * is exactly what a path2 looks like, so isGeometry() duck-types it as
+	 * geometry, isOptionsObject says false, and polygon({ points: [...] }) would
+	 * be sent down the friendly path to be refused -- the same trap the poly
+	 * wrapper below already had to guard against for its own message.
+	 *
+	 * Real geometry out of @jscad/modeling always carries `transforms`. A hand
+	 * written options object never does, so that is the thing worth testing.
+	 */
+	function isLibraryForm(v) {
+		if (!v || typeof v !== 'object' || Array.isArray(v)) return false;
+		if (!isGeometry(v)) return true;
+		return !Object.prototype.hasOwnProperty.call(v, 'transforms');
+	}
+
+	var REAL = {
+		cuboid: primitives.cuboid, rectangle: primitives.rectangle,
+		circle: primitives.circle, sphere: primitives.sphere,
+		cylinder: primitives.cylinder, cylinderElliptic: primitives.cylinderElliptic,
+		torus: primitives.torus, polygon: primitives.polygon,
+		extrudeLinear: extrusions.extrudeLinear, extrudeRotate: extrusions.extrudeRotate
 	};
 
 	function liveify(name, fn) {
 		var names = PARAMS[name];
 		var opts = OPTIONS[name] || [];
+		var real = REAL[name];
 		return function () {
+			// THE OBJECT FORM IS THE LIBRARY'S, AND STAYS THE LIBRARY'S. Each name
+			// below now owns the word @jscad/modeling installed, so a student
+			// pasting cuboid({ size: [40, 20, 10] }) off jscad.app -- and every
+			// example in the vendored docs -- must still reach the real primitive
+			// and get back exactly what it returns. No handle is put round it: the
+			// real API has no assignable parameters, and wrapping one would break
+			// this file's rule that it never changes the kind of object handed back.
+			if (real && isLibraryForm(arguments[0])) return real.apply(null, arguments);
 			var out = live(fn, names, opts, Array.prototype.slice.call(arguments));
 			// sit() and turn() hand back an ARRAY for an assembly. An array is not
 			// one shape and must not be wrapped as one, or the renderer is handed a
@@ -1140,18 +1181,31 @@
 	};
 
 	var NAMES = [
-		['box', liveify('box', box)], ['rect', liveify('rect', rect)],
-		['disc', liveify('disc', disc)], ['ball', liveify('ball', ball)],
-		['tube', liveify('tube', tube)], ['cone', liveify('cone', cone)],
-		['ring', liveify('ring', ring)], ['poly', liveify('poly', poly)],
-		['extrude', liveify('extrude', extrude)], ['revolve', liveify('revolve', revolve)],
+		['cuboid', liveify('cuboid', cuboid)], ['rectangle', liveify('rectangle', rectangle)],
+		['circle', liveify('circle', circle)], ['sphere', liveify('sphere', sphere)],
+		['cylinder', liveify('cylinder', cylinder)], ['cylinderElliptic', liveify('cylinderElliptic', cylinderElliptic)],
+		['torus', liveify('torus', torus)], ['polygon', liveify('polygon', polygon)],
+		['extrudeLinear', liveify('extrudeLinear', extrudeLinear)], ['extrudeRotate', liveify('extrudeRotate', extrudeRotate)],
 		['turn', liveify('turn', turn)], ['sit', liveify('sit', sit)]
 	];
 
+	// THE TEN NAMES reSHape NOW OWNS. Every one of these is already on window,
+	// installed by the shim straight off @jscad/modeling, so the rule that a name
+	// already taken wins would skip all ten and install nothing. Replacing them is
+	// the point of this file now, and it is a WIDENING rather than a shadowing:
+	// the object form goes through to the real primitive untouched (see liveify),
+	// so every call that worked before this file loaded still works after it.
+	// turn and sit are NOT here -- they have no real-name equivalent to replace
+	// (turn pivots at the shape's centre and takes degrees; sit is align with a
+	// fixed preset), so they keep the original rule and are skipped if taken.
+	var OWNED = {
+		cuboid: 1, rectangle: 1, circle: 1, sphere: 1, cylinder: 1,
+		cylinderElliptic: 1, torus: 1, polygon: 1, extrudeLinear: 1, extrudeRotate: 1
+	};
 	var skipped = [];
 	for (var n = 0; n < NAMES.length; n++) {
 		var name = NAMES[n][0];
-		if (name in window) { skipped.push(name); continue; }
+		if (!OWNED[name] && name in window) { skipped.push(name); continue; }
 		window[name] = NAMES[n][1];
 	}
 	window.__reshapeNamesSkipped = skipped;
