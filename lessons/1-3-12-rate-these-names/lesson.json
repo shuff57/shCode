@@ -33,7 +33,7 @@
       {
         "id": "borderline-identified",
         "title": "Q7: identifies temp as the borderline one, with an argument",
-        "description": "Student names temp and explains the tension: it is a widely-used short form for temperature (and also for 'temporary', which is the ambiguity), so it is readable to many programmers but still less clear than bodyTemperature. Credit any answer that names temp AND gives a real reason it is arguable rather than simply bad.",
+        "description": "Student names temp and gives some reason it is arguable rather than simply bad - that it is a common short form, that it could be read more than one way, that experienced programmers would recognise it. Any real reason counts, however informally put. Credit naming temp with a reason; do not require them to weigh it against bodyTemperature.",
         "points": 0
       },
       {

@@ -45,7 +45,7 @@
       {
         "id": "abstraction-shows-omission",
         "title": "The abstraction example names something deliberately ignored",
-        "description": "Abstraction is the part beginners most often get wrong by describing simplification in general. Credit requires the student to name at least one specific detail they left out and why it did not matter for this problem - for example 'it does not matter what brand of bread it is'. Deny if the abstraction example does not identify something omitted.",
+        "description": "Abstraction is the part beginners most often get wrong by describing simplification in general. Looking for: one specific detail they left out and why it did not matter - for example 'it does not matter what brand of bread it is'. Be generous about how it is worded; any gesture at something deliberately ignored counts. But do NOT credit an answer that describes choosing what to work on rather than what to leave out - 'I ignored the parts of the code that weren't broken' is focus, not abstraction, and calling it abstraction teaches the wrong idea. Say plainly that it is a different thing and point at the reading.",
         "points": 0
       }
     ]
