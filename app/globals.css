@@ -50,15 +50,30 @@ body:has(.lesson-progress-footer) {
   height: 16px;
 }
 
-.lesson-progress-segs > a:hover {
-  padding-top: 5px;
-}
-
-.lesson-progress-segs > a {
+/* A segment is 16px tall and paints only its bottom 6px (background-clip:
+   content-box in the component), so padding-top is both the bar's height and
+   the hover lift. It MUST live here rather than inline: an inline style
+   outranks a stylesheet rule, so setting it on the element silently disables
+   :hover with no error anywhere. */
+.lesson-progress-seg {
+  padding-top: 10px;
   transition: padding-top 0.12s ease;
 }
 
-.lesson-progress-segs > a:focus-visible {
+/* The current lesson already paints its full height, so it has nowhere to
+   lift to -- and shrinking it on hover would read as a different state. */
+.lesson-progress-seg.is-current,
+a.lesson-progress-seg.is-current:hover {
+  padding-top: 0;
+}
+
+/* Only anchors lift. A locked lesson renders as a <span>, so the rail says
+   what is clickable by which segments respond. */
+a.lesson-progress-seg:hover {
+  padding-top: 5px;
+}
+
+a.lesson-progress-seg:focus-visible {
   outline: 2px solid #8be9fd;
   outline-offset: 2px;
 }
@@ -71,7 +86,7 @@ body:has(.lesson-progress-footer) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lesson-progress-segs > a { transition: none; }
+  .lesson-progress-seg { transition: none; }
 }
 
 /* The "Report an issue" pill is position:fixed, so the body padding above does

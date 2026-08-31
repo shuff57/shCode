@@ -122,11 +122,15 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
           // clickable — at 380px a segment is only ~3.7px wide, and the
           // vertical room costs nothing. Height still marks the current
           // lesson, because that one paints its full 16px.
+          //
+          // padding-top lives in globals.css, NOT here: it is what the hover
+          // lift animates, and an inline style outranks a stylesheet rule, so
+          // setting it here silently killed :hover. Only the colour, which
+          // varies per lesson, stays inline.
           const segStyle: React.CSSProperties = {
             flex: '1 1 0',
             minWidth: 0,
             height: 16,
-            paddingTop: isCurrent ? 0 : 10,
             // backgroundColor, NOT the `background` shorthand: the shorthand
             // resets background-clip to border-box, so the colour filled the
             // padding too and every segment rendered as a 16px block.
@@ -135,10 +139,12 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
             backgroundColor: stateColor,
             cursor: isLocked ? 'not-allowed' : undefined,
           };
+          const segClass = `lesson-progress-seg${isCurrent ? ' is-current' : ''}`;
           const titleText = `${l.numberedId} ${l.displayTitle}${isDone ? ' (complete)' : isStarted ? ' (in progress)' : ''}${isCurrent ? ' (current)' : ''}${isLocked ? ' (locked — get a green to unlock)' : ''}`;
           return isLocked ? (
             <span
               key={l.id}
+              className={segClass}
               title={titleText}
               aria-label={`${l.numberedId} ${l.displayTitle} (locked)`}
               aria-disabled="true"
@@ -148,6 +154,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
             <Link
               key={l.id}
               href={lessonHref(l)}
+              className={segClass}
               title={titleText}
               aria-label={`${l.numberedId} ${l.displayTitle}`}
               aria-current={isCurrent ? 'page' : undefined}
