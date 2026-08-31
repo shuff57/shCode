@@ -43,6 +43,12 @@ if (process.argv.includes('--write-baseline')) {
 }
 
 const fail = [];
+// Structural drift is a different class of problem from a missing hint: it
+// means something OTHER than hints moved, which is the tamper signal this
+// file exists for. Kept in its own list and never truncated -- when it lived
+// in `fail`, a large hint backlog buried it past the 40-line print cap and
+// the check silently looked clean.
+const drift = [];
 const baseline = fs.existsSync(BASELINE) ? JSON.parse(fs.readFileSync(BASELINE, 'utf8')) : null;
 if (!baseline) {
   console.error('no baseline: run `node scripts/check-step-hints.mjs --write-baseline` first');
@@ -57,7 +63,7 @@ for (const d of dirs) {
 
   // (3) everything but hints must be untouched
   const h = hash(stripHints(lesson));
-  if (baseline[d] && baseline[d] !== h) fail.push(`${d}: lesson.json changed outside of step hints`);
+  if (baseline[d] && baseline[d] !== h) drift.push(`${d}: lesson.json changed outside of step hints`);
 
   // the solution, for the "don't hand over the answer" check
   const solPath = path.join(root, 'lessons', d, 'solution.js');
@@ -94,10 +100,18 @@ if (process.argv.includes('--write-baseline')) {
   process.exit(0);
 }
 
+// Drift first, and in full: it is the finding you must not miss.
+if (drift.length) {
+  console.error(`\n[check-step-hints] ${drift.length} lesson(s) changed outside of step hints:`);
+  for (const f of drift) console.error('  ' + f);
+  console.error('  (if that change was intended, re-run with --write-baseline)');
+}
+
 if (fail.length) {
-  console.error(`\n[check-step-hints] ${fail.length} problem(s):`);
+  console.error(`\n[check-step-hints] ${fail.length} hint problem(s):`);
   for (const f of fail.slice(0, 40)) console.error('  ' + f);
   if (fail.length > 40) console.error(`  ...and ${fail.length - 40} more`);
-  process.exit(1);
 }
+
+if (drift.length || fail.length) process.exit(1);
 console.log(`[check-step-hints] ${hinted}/${steps} chapter-2 steps hinted, nothing else changed`);

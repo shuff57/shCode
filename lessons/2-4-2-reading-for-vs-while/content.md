@@ -37,6 +37,8 @@ console.log("Doubled after " + years + " years.");
 
 Nobody writing that loop knew the answer was 8 years before running it. That's the point: the condition decides when to stop, not a counter someone picked in advance.
 
+These two kinds of loop have names. A loop whose repeat count is settled before it runs is **definite**; one that runs until a condition says stop is **indefinite**. The words are worth knowing because they describe the problem, not the keyword: the same task is definite or indefinite before you have chosen `for` or `while` at all.
+
 **The test:** if you can say the number of repetitions out loud *before* running the program, reach for `for`. If the honest answer is "however many it takes," reach for `while`. Using `for` for the second case forces you to invent a counter you don't need. Using `while` for the first scatters the loop's three parts across three separate lines: which is exactly where a forgotten update comes from.
 
 ---
@@ -45,6 +47,6 @@ Nobody writing that loop knew the answer was 8 years before running it. That's t
 
 | Term | Meaning |
 |------|---------|
-| **known-count loop** | A loop where the number of repetitions is decided before it starts: reach for `for` |
-| **unknown-count loop** | A loop that runs until a condition becomes true, with no fixed repeat count: reach for `while` |
+| **definite loop** (known-count) | A loop whose number of repetitions is settled before it starts: reach for `for` |
+| **indefinite loop** (unknown-count) | A loop that runs until a condition becomes true, with no fixed repeat count: reach for `while` |
 | **interchangeable** | `for` and `while` can express the same repetition; they differ in readability, not power |

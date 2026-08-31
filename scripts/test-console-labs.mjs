@@ -125,16 +125,17 @@ try {
     if (failures === 0) console.log(`  ok — ${reqs.length} requirements`);
   }
 
-  // Fix-the-bug labs hand the student working-but-wrong code instead of a
-  // list of answers, so the checks above do not apply. The one thing that
-  // must hold is that the grader can tell the two apart: a starter that
-  // already passes means the lab grades nothing.
-  const FIX_LABS = [
+  // Labs whose starter is code to fix or complete rather than a list of
+  // answers, so the answer-order checks above do not apply. The one thing
+  // that must hold is that the grader can tell starter from solution: a
+  // starter that already passes means the lab grades nothing.
+  const BUILD_LABS = [
     '2-1-9b-lab-count-the-equals',
     '2-1-33-lab-debug-door',
+    '2-2-17b-lab-count-a-letter',
   ];
 
-  for (const dir of FIX_LABS) {
+  for (const dir of BUILD_LABS) {
     console.log(`\n${dir}`);
     const lesson = JSON.parse(readFileSync(path.join(root, 'lessons', dir, 'lesson.json'), 'utf8'));
     const reqs = lesson.requirements;

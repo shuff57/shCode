@@ -1703,7 +1703,7 @@
     },
     {
       "id": "2-2-13-challenges",
-      "title": "2.2.20 Challenges: Optional Stretch",
+      "title": "2.2.22 Challenges: Optional Stretch",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
       "type": "challenge",
@@ -1739,9 +1739,27 @@
     },
     {
       "id": "2-2-17-reading-canonical-algorithms",
-      "title": "2.2.19 Reading: Canonical Algorithms & Linear Search",
+      "title": "2.2.21 Reading: Canonical Algorithms & Linear Search",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-2-17a-example-walk-a-word",
+      "title": "2.2.19 Worked Example: Walking Through a Word",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "example",
+      "type": "lesson",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": 6
+    },
+    {
+      "id": "2-2-17b-lab-count-a-letter",
+      "title": "2.2.20 Count a Letter in a Word",
+      "unit": "2.2 Algorithms and Loops",
+      "preview": "console",
       "type": "lesson",
       "category": "Unit 1: JavaScript Fundamentals",
       "week": 6

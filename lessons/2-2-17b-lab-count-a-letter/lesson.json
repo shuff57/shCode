@@ -1,0 +1,75 @@
+{
+  "id": "2-2-17b-lab-count-a-letter",
+  "title": "2.2.20 Count a Letter in a Word",
+  "description": "Loop through a string and count how many times one letter appears. Auto-graded.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.2 Algorithms and Loops",
+  "preview": "console",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.2.4: 'Introduction to Loops', Example 2.6 (the letter-counting half)",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Loop over every position",
+      "instructions": "Write a for loop whose counter i runs from 0 while i is less than word.length. Use < and not <=, or the last round reaches a position that does not exist."
+    },
+    {
+      "id": "s2",
+      "title": "Test each character",
+      "instructions": "Inside the loop, use an if to check whether word[i] is the letter you are counting."
+    },
+    {
+      "id": "s3",
+      "title": "Keep a running total",
+      "instructions": "When the if matches, add 1 to count. After the loop finishes, log count."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "loop runs to word.length with <",
+      "description": "A for loop counts i from 0 while i < word.length",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(\\s*let\\s+i\\s*=\\s*0\\s*;\\s*i\\s*<\\s*word\\.length\\s*;",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "a character is tested by position",
+      "description": "The if compares word[i] against a letter",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\(\\s*word\\s*\\[\\s*i\\s*\\]\\s*===?\\s*[\\\"']",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "the counter is increased",
+      "description": "count goes up inside the if",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "count\\s*(\\+\\+|\\+=\\s*1|=\\s*count\\s*\\+\\s*1)",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "the total is printed",
+      "description": "count is logged after the loop",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\([^)]*\\bcount\\b",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

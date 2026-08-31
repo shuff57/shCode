@@ -1,0 +1,22 @@
+{
+  "id": "2-2-17a-example-walk-a-word",
+  "title": "2.2.19 Worked Example: Walking Through a Word",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.2 Algorithms and Loops",
+  "preview": "example",
+  "week": 6,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.2.4: 'Introduction to Loops', Example 2.6: Walking Through a Word",
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

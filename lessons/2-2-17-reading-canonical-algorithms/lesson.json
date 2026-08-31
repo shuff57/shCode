@@ -1,6 +1,6 @@
 {
   "id": "2-2-17-reading-canonical-algorithms",
-  "title": "2.2.19 Reading: Canonical Algorithms & Linear Search",
+  "title": "2.2.21 Reading: Canonical Algorithms & Linear Search",
   "description": "A canonical algorithm is a well-known pattern worth knowing by name. Meet linear search: check one item at a time until you find what you're looking for.",
   "type": "lesson",
   "estimateMins": 10,
