@@ -1,4 +1,4 @@
-// 2.1.34 Debug the Door
+// 2.1.36 Debug the Door
 
 const isAlive = true;
 const hasKey = false;

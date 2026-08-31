@@ -1,4 +1,4 @@
-// 2.1.34 Debug the Door
+// 2.1.36 Debug the Door
 //
 // This is meant to open the door only when the player is alive
 // AND has a key. Find the bug and fix it.

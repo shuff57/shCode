@@ -1,4 +1,4 @@
-// 2.1.37 Print Settings Advisor
+// 2.1.40 Print Settings Advisor
 
 // STEP 1: Create filamentType ("PLA", "PETG", or "ABS")
 //         and layerHeight (a number of millimeters, e.g. 0.2).

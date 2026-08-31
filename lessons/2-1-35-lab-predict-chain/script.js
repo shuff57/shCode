@@ -1,4 +1,4 @@
-// 2.1.36 Predict the Chain
+// 2.1.39 Predict the Chain
 
 // STEP 1: Write an else if chain of your own (at least 3 branches,
 //         using a variable and comparisons of your choice).

@@ -1,4 +1,4 @@
-// 2.1.24 Chain Your Ternaries
+// 2.1.26 Chain Your Ternaries
 
 const score = 85;
 const rating = score >= 90 ? "Excellent" : score >= 70 ? "Good" : "Needs work";

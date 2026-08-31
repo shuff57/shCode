@@ -1,17 +1,16 @@
 {
-  "id": "2-1-22-reading-ternary",
-  "title": "2.1.21 Reading: The Conditional Operator ?",
-  "description": "Learn the ternary operator: condition ? value1: value2. Read before the ternary practice lesson.",
+  "id": "2-1-34a-example-always-true-comparison",
+  "title": "2.1.38 Worked Example: A Condition That Is Always True",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",
-  "preview": "reading",
+  "preview": "example",
   "week": 5,
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.1.5: 'Conditional Operator ?'",
+  "sourceRef": "book 2.1.8: 'Combining Conditions', Example 2.12: A Condition That Is Always True",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

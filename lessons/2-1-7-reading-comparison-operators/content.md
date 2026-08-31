@@ -34,6 +34,17 @@ console.log(4 >= 5);
 console.log(5 !== 6);
 ```
 
+### "Exact" includes the capital letters
+
+`===` compares two strings character by character and stops at the first pair that differ. `Y` and `y` differ, so `"Yes" === "yes"` is `false`, and so is `"Saturday" === "saturday"`.
+
+```js live plain
+console.log("Yes" === "yes");
+console.log("Yes".toLowerCase() === "yes");
+```
+
+Whenever a condition on text refuses to be true and you cannot see why, check the capitals before you check anything else, especially when the text came from somewhere you did not type yourself. `.toLowerCase()` from `1.2.14 Reading: String Methods in Practice` is the usual fix: compare `answer.toLowerCase() === "yes"` and the capitals stop mattering.
+
 ---
 
 ## Short glossary (quick reference)

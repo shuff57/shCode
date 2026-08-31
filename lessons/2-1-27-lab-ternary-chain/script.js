@@ -1,4 +1,4 @@
-// 2.1.24 Chain Your Ternaries
+// 2.1.26 Chain Your Ternaries
 
 // STEP 1: Create score and set it to a number from 0 to 100.
 

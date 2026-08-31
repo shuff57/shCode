@@ -1,4 +1,4 @@
-// 2.1.27 Rewrite It as if/else
+// 2.1.29 Rewrite It as if/else
 //
 // This ternary uses ? to run two different actions instead of picking
 // a value: that's the misuse from the reading:

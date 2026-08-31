@@ -1,4 +1,4 @@
-// 2.1.37 Print Settings Advisor
+// 2.1.40 Print Settings Advisor
 
 const filamentType = "PLA";
 const layerHeight = 0.2;

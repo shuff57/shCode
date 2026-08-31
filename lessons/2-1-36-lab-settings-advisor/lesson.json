@@ -1,6 +1,6 @@
 {
   "id": "2-1-36-lab-settings-advisor",
-  "title": "2.1.37 Print Settings Advisor",
+  "title": "2.1.40 Print Settings Advisor",
   "description": "Given filament type and layer height, print a recommended print temperature using else if and logical operators. Auto-graded.",
   "type": "lesson",
   "estimateMins": 15,

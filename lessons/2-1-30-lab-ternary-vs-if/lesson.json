@@ -1,6 +1,6 @@
 {
   "id": "2-1-30-lab-ternary-vs-if",
-  "title": "2.1.27 Rewrite It as if/else",
+  "title": "2.1.29 Rewrite It as if/else",
   "description": "Take a ternary used for its side effect and rewrite it as an if/else statement. Auto-graded.",
   "type": "lesson",
   "estimateMins": 8,

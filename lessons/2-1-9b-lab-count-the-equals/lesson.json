@@ -1,0 +1,57 @@
+{
+  "id": "2-1-9b-lab-count-the-equals",
+  "title": "2.1.19 Count the Equals Signs",
+  "description": "Fix an if condition that uses a single = where it should compare with ===. Auto-graded.",
+  "type": "lesson",
+  "estimateMins": 8,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "2.1 Conditionals",
+  "preview": "console",
+  "week": 5,
+  "slos": [
+    "SLO-3"
+  ],
+  "sourceRef": "book 2.1.1: 'The if Statement', Example 2.1 and its Context Pause",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it and watch it lie",
+      "instructions": "The starter says the alarm should only sound when temperature is 100. Run it. The alarm sounds even though temperature is 20."
+    },
+    {
+      "id": "s2",
+      "title": "Fix the condition",
+      "instructions": "Change the single = in the if condition to === so it asks a question instead of storing a value."
+    },
+    {
+      "id": "s3",
+      "title": "Check the variable survived",
+      "instructions": "Run it again. The last line should now print 20, not 100 - the broken version was overwriting the variable on its way past."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "=== used in the condition",
+      "description": "The if condition compares temperature to 100 with ===",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\(\\s*temperature\\s*===\\s*100\\s*\\)",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "no assignment left inside any if condition",
+      "description": "No single = remains inside an if condition anywhere in the file",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*if\\s*\\(\\s*\\w+\\s*=[^=])[\\s\\S]*$",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

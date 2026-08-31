@@ -1,4 +1,4 @@
-// 2.1.30 Guard with &&
+// 2.1.32 Guard with &&
 
 const age = 17;
 const score = 80;

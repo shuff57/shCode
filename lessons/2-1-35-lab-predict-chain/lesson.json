@@ -1,6 +1,6 @@
 {
   "id": "2-1-35-lab-predict-chain",
-  "title": "2.1.36 Predict the Chain",
+  "title": "2.1.39 Predict the Chain",
   "description": "Predict the output of an else if chain and a chained ternary before running them. Auto-graded.",
   "type": "lesson",
   "estimateMins": 10,

@@ -124,6 +124,36 @@ try {
 
     if (failures === 0) console.log(`  ok — ${reqs.length} requirements`);
   }
+
+  // Fix-the-bug labs hand the student working-but-wrong code instead of a
+  // list of answers, so the checks above do not apply. The one thing that
+  // must hold is that the grader can tell the two apart: a starter that
+  // already passes means the lab grades nothing.
+  const FIX_LABS = [
+    '2-1-9b-lab-count-the-equals',
+    '2-1-33-lab-debug-door',
+  ];
+
+  for (const dir of FIX_LABS) {
+    console.log(`\n${dir}`);
+    const lesson = JSON.parse(readFileSync(path.join(root, 'lessons', dir, 'lesson.json'), 'utf8'));
+    const reqs = lesson.requirements;
+    const passCount = (src) =>
+      grade(reqs, { 'script.js': src }).results.filter((r) => r.status === 'passed').length;
+
+    const starter = readFileSync(path.join(root, 'lessons', dir, 'script.js'), 'utf8');
+    const solution = readFileSync(path.join(root, 'lessons', dir, 'solution.js'), 'utf8');
+
+    check(`${dir}: reference solution passes all`, passCount(solution), reqs.length);
+
+    const starterPass = passCount(starter);
+    if (starterPass >= reqs.length) {
+      failures++;
+      console.error(`  FAIL ${dir}: the broken starter already passes all ${reqs.length} — nothing is graded`);
+    } else {
+      console.log(`  ok — starter ${starterPass}/${reqs.length}, solution ${reqs.length}/${reqs.length}`);
+    }
+  }
 } finally {
   rmSync(out, { recursive: true, force: true });
 }

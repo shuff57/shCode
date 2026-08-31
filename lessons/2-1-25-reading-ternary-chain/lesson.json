@@ -1,6 +1,6 @@
 {
   "id": "2-1-25-reading-ternary-chain",
-  "title": "2.1.22 Reading: Chaining Multiple ? Operators",
+  "title": "2.1.24 Reading: Chaining Multiple ? Operators",
   "description": "Learn how to chain conditional operators to pick from more than two values. Read before the chained-ternary practice lesson.",
   "type": "lesson",
   "estimateMins": 10,

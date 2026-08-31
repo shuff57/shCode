@@ -1,4 +1,4 @@
-// 2.1.30 Guard with &&
+// 2.1.32 Guard with &&
 
 // STEP 1: Create two number variables.
 //         For example, you could use age and score, or temperature and humidity.

@@ -1,6 +1,6 @@
 {
   "id": "2-1-28-reading-ternary-vs-if",
-  "title": "2.1.25 Reading: When to Use ? vs if",
+  "title": "2.1.27 Reading: When to Use ? vs if",
   "description": "Learn the rule of thumb: use ? to pick a value, use if to run different code. Read before the rewrite practice lesson.",
   "type": "lesson",
   "estimateMins": 8,
