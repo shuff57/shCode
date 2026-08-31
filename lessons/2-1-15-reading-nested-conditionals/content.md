@@ -15,7 +15,7 @@ if (outerCondition) {
 }
 ```
 
-The inner `if` only runs at all when the outer condition is true. This is different from `age >= 13 && age <= 17`: that checks both conditions at once and picks one path. Nesting checks the first condition, and only *then* decides whether to ask the second question.
+The inner `if` only runs at all when the outer condition is true. Nesting asks the first question, and only *then* decides whether to ask the second one at all. (There is also a way to write a single condition that checks two things at once, which is what `2.1.29 Reading: Logical Operators: && || !` is about. It solves a different problem: it asks both questions every time.)
 
 **Try it:** Change `isMember` to `false` and re-run. Notice the inner check never even runs: the outer `if` skipped its whole block.
 
