@@ -2,10 +2,12 @@
 
 **What you'll learn:**
 - What "operator precedence" means: which operator JavaScript evaluates first
-- Why comparisons (`>`, `===`, `&&`) run before JavaScript decides an `if`/`?` branch
+- Why the whole condition is worked out before `if` or `?` chooses a branch
 - Why adding parentheses around a condition is good practice even when not required
 
-**Operator precedence** is the order JavaScript evaluates operators in an expression when there's more than one. Comparison operators (`>`, `<`, `===`, `&&`, `||`) are evaluated *before* `if` or `?` look at the result: the condition is always fully computed down to a single `true`/`false` first.
+**Operator precedence** is the order JavaScript evaluates operators in an expression when there's more than one. Comparison operators (`>`, `<`, `===`) are evaluated *before* `if` or `?` look at the result: the condition is always fully computed down to a single `true`/`false` first.
+
+> **Two operators you have not met yet.** This reading needs `&&` and `||` to show you why precedence matters, and they arrive properly in `2.1.30 Reading: Logical Operators: && || !`. For now, all you need is this: `a && b` is true only when **both** sides are true, and `a || b` is true when **at least one** side is true. They are *logical* operators, not comparison operators — they combine whole conditions rather than comparing two values. If the examples below feel like a lot at once, read 2.1.30 first and come back; nothing here is graded.
 
 ```javascript
 if (age > 18) {

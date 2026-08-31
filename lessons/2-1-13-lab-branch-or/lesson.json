@@ -31,8 +31,26 @@
       "description": "if statement condition uses ||",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^)]*\\|\\|",
+      "pattern": "if\\s*\\([^{]*\\|\\|[^{]*\\)",
       "flags": "i",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "two variables declared",
+      "description": "Two variables are declared and given values before the if",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:const|let|var)\\s+[A-Za-z_$][\\w$]*\\s*=[\\s\\S]*?(?:const|let|var)\\s+[A-Za-z_$][\\w$]*\\s*=",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "a message is printed inside the if block",
+      "description": "console.log runs inside the if block, as step 2 asks",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "if\\s*\\([^{]*\\{[^}]*console\\.log",
       "points": 0
     }
   ],

@@ -38,30 +38,30 @@
     {
       "id": "r1",
       "title": "if statement present",
-      "description": "Code contains an if statement",
+      "description": "An if statement tests score",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(",
+      "pattern": "if\\s*\\([^{]*\\bscore\\b[^{]*\\)",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r2",
       "title": "else if chain present",
-      "description": "Code contains at least two else if branches",
+      "description": "An else if chain with at least two branches, each testing score",
       "type": "regex",
       "file": "script.js",
-      "pattern": "else\\s+if\\s*\\([\\s\\S]*else\\s+if\\s*\\(",
+      "pattern": "else\\s+if\\s*\\([^{]*\\bscore\\b[\\s\\S]*else\\s+if\\s*\\([^{]*\\bscore\\b",
       "flags": "i",
       "points": 0
     },
     {
       "id": "r3",
       "title": "&& or || used to combine attendance and lateAssignments",
-      "description": "Code contains a condition combining two checks with && or ||",
+      "description": "An if condition combines attendance and lateAssignments with && or ||",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^)]*(&&|\\|\\|)",
+      "pattern": "if\\s*\\([^{]*\\b(attendance|lateAssignments)\\b[^{]*(&&|\\|\\|)[^{]*\\)",
       "flags": "i",
       "points": 0
     },

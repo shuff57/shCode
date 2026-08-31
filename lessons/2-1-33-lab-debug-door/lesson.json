@@ -28,10 +28,10 @@
     {
       "id": "r1",
       "title": "&& used to guard the door",
-      "description": "if statement condition combines isAlive and hasKey with &&",
+      "description": "if statement condition combines isAlive and hasKey with && (either order)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*isAlive\\s*&&\\s*hasKey\\s*\\)",
+      "pattern": "if\\s*\\(\\s*(isAlive\\s*&&\\s*hasKey|hasKey\\s*&&\\s*isAlive)\\s*\\)",
       "flags": "i",
       "points": 0
     }
