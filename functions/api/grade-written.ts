@@ -24,8 +24,17 @@ interface Env {
   OLLAMA_API_KEY: string;
   // Optional override — defaults to https://ollama.com when unset.
   OLLAMA_HOST?: string;
+  // Optional per-student daily submission cap. Default 30. Teachers exempt.
+  GRADE_WRITTEN_DAILY_LIMIT?: string;
   ASSETS?: Fetcher;
 }
+
+// Counter bucket inside the shared ai_help_usage table. That table is really a
+// generic (student, bucket, UTC day) counter, so grading reuses it under its own
+// bucket key rather than adding a migration — a table this endpoint needs but
+// that a deploy forgot to migrate would 500 every submission.
+const RATE_BUCKET = 'grade-written';
+const DEFAULT_DAILY_LIMIT = 30;
 
 type Ctx = EventContext<Env, string, SessionData>;
 
@@ -69,6 +78,47 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
       { ok: false, error: 'No AI grader is configured for this lesson.', offline: true },
       503,
     );
+  }
+
+  // ----- Rate limit (students only) -----
+  //
+  // The course is mastery-based with unlimited retries, so this is a runaway-cost
+  // stop, NOT a pedagogical cap: the default is far above what revising an essay
+  // to mastery takes. If a student ever legitimately hits it, raise the limit —
+  // don't tell them to stop trying.
+  const dailyLimit = Math.max(
+    1,
+    parseInt(env.GRADE_WRITTEN_DAILY_LIMIT || '', 10) || DEFAULT_DAILY_LIMIT,
+  );
+  if (data.role === 'student') {
+    const day = new Date().toISOString().slice(0, 10); // UTC YYYY-MM-DD
+    const row = await env.DB.prepare(
+      'SELECT count FROM ai_help_usage WHERE student_email = ? AND unit = ? AND day = ?',
+    )
+      .bind(data.email, RATE_BUCKET, day)
+      .first<{ count: number }>();
+
+    if ((row?.count ?? 0) >= dailyLimit) {
+      return json(
+        {
+          error:
+            `You've submitted ${dailyLimit} written responses for grading today, which is the daily maximum. `
+            + `The counter resets at midnight UTC — ask your teacher if you need more today.`,
+          rateLimited: true,
+          limit: dailyLimit,
+          remaining: 0,
+        },
+        429,
+        { 'X-RateLimit-Limit': String(dailyLimit), 'X-RateLimit-Remaining': '0' },
+      );
+    }
+
+    await env.DB.prepare(
+      `INSERT INTO ai_help_usage (student_email, unit, day, count) VALUES (?, ?, ?, 1)
+       ON CONFLICT(student_email, unit, day) DO UPDATE SET count = count + 1`,
+    )
+      .bind(data.email, RATE_BUCKET, day)
+      .run();
   }
 
   const host = env.OLLAMA_HOST || 'https://ollama.com';

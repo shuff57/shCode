@@ -22,19 +22,19 @@
       {
         "id": "hardest-concept",
         "title": "Names a hard concept and describes how they worked through it",
-        "description": "Student names a specific Q1 concept they found hard (e.g., 'loops', 'functions', 'arrays') and describes, specifically, how they worked through it, not a generic 'I practiced'. A response like 'I found loops hard so I kept coding until it clicked' does not earn this criterion; a response that names an action ('I wrote the same loop five different ways') does.",
+        "description": "Student names a specific Q1 concept they found hard (e.g., 'loops', 'functions', 'arrays') and names something they actually did about it, however briefly described - re-doing a problem a different way, asking someone, looking something up, working through an example by hand. Credit any real action, even a single sentence and even informally worded; 'I wrote the same loop five different ways' counts, and so does something similarly small. Deny only a fully generic 'I practiced' / 'I kept coding until it clicked' with no actual action behind it.",
         "points": 0
       },
       {
         "id": "plan-build-test",
         "title": "Describes a plan → build → test process for a small program",
-        "description": "Student describes how they would plan a small program, build it, and test it, in that order or a clearly recognizable sequence. All three stages (planning, building, testing) must be mentioned. A response that only describes coding without planning or testing does not earn this criterion.",
+        "description": "Student touches on planning, building, and testing a small program, in that order or a clearly recognizable sequence, however briefly each is mentioned - a single phrase for a stage is enough. Deny only if a whole stage is missing entirely, e.g. jumping straight to describing code with no mention of planning first or checking it works after.",
         "points": 0
       },
       {
         "id": "connects-sdlc",
         "title": "Connects reflection to SDLC phases or lived experience this quarter",
-        "description": "Student explicitly connects their plan/build/test description (Q2) to the SDLC phases from Week 1, or reflects on a specific moment from this quarter that illustrates one of those phases. A generic 'I know SDLC' mention without any specifics does not earn this criterion.",
+        "description": "Student connects their plan/build/test description (Q2) to the SDLC phases from Week 1, or points to a specific moment from this quarter that illustrates one of those phases - even a loose or informally-worded connection counts, it doesn't need to name the phase precisely. Deny only a generic 'I know SDLC' or similar with no specific connection attached at all.",
         "points": 0
       }
     ]

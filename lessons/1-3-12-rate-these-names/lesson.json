@@ -21,13 +21,13 @@
       {
         "id": "all-six-judged",
         "title": "All six names are judged",
-        "description": "Student gives a verdict on each of the six names. The verdicts should broadly match: x bad, numberOfStudents good, d bad, currentDay good, temp borderline-or-weak, bodyTemperature good. Credit requires all six addressed; a wrong call on temp alone does not lose this criterion since it is the deliberately arguable one.",
+        "description": "Student gives a verdict on each of the six names, and the verdicts broadly land in the expected place: x bad, numberOfStudents good, d bad, currentDay good, temp borderline-or-weak, bodyTemperature good. Credit any answer that addresses all six, even if a call or two beyond temp is debatable rather than a clean match - the point is that they engaged with each name and reasoned through most of them, not that every verdict landed exactly right.",
         "points": 0
       },
       {
         "id": "reasons-cite-rules",
         "title": "Reasons name the rule, not just the verdict",
-        "description": "For the bad names the student says WHAT is wrong in the vocabulary of the module - a single letter carries no information, the name is too vague, you cannot tell what it holds. Deny if the answers are bare verdicts ('bad', 'good') or only 'it is confusing' with no rule attached.",
+        "description": "For the bad names the student gives some reason grounded in the module's vocabulary - a single letter carries no information, the name is too vague, you can't tell what it holds, or something in that spirit even loosely phrased. Deny only bare verdicts ('bad', 'good') with literally no reason given, or 'it is confusing' repeated with nothing else attached.",
         "points": 0
       },
       {
@@ -39,7 +39,7 @@
       {
         "id": "matching-correct",
         "title": "Q8: the four problems are matched correctly",
-        "description": "Expected matching: temp = too generic; x = abbreviation with no context; a1 = numbered name that says nothing; myVariable = meaningless but harmless-sounding. Credit three or four correct. Deny two or fewer.",
+        "description": "Expected matching: temp = too generic; x = abbreviation with no context; a1 = numbered name that says nothing; myVariable = meaningless but harmless-sounding. Accept any phrasing that captures the same idea, even loosely worded. Credit three or four correct; two or fewer is a genuine miss on the matching itself, not just phrasing.",
         "points": 0
       }
     ]

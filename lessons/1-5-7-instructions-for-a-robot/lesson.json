@@ -21,31 +21,31 @@
       {
         "id": "task-and-five-steps",
         "title": "A task is named and at least five numbered instructions are given",
-        "description": "Student names one specific everyday task and writes five or more instructions as a numbered or clearly ordered list. Deny if fewer than five instructions, or if the task is not named.",
+        "description": "Student names one specific everyday task and writes five or more instructions as a numbered or clearly ordered list. Be generous about what counts as a task name and an instruction - informal phrasing is fine. If there are four solid instructions instead of five, credit as partial rather than missing; only fully withhold if the task isn't named at all or the list is clearly too short (two or three items).",
         "points": 0
       },
       {
         "id": "break-identified",
         "title": "Identifies a specific instruction that breaks",
-        "description": "Student points at ONE of their own instructions and says it fails. It must be a specific instruction from their own list, not a general observation that 'the robot might get confused'. Deny if no particular instruction is singled out.",
+        "description": "Student points at one of their own instructions and says it fails when read literally. Be generous about how specifically it's pointed at - referencing it by number, quoting it, or clearly describing which step it is all count. Only withhold credit if the answer stays at the level of a general observation ('the robot might get confused') with no particular instruction identifiable.",
         "points": 0
       },
       {
         "id": "unstated-knowledge-named",
         "title": "Names the unstated knowledge the robot lacks",
-        "description": "Student says what the instruction assumed the reader already knew - where an object is, which hand to use, that a lid must be removed first, which side is up. Credit any concrete missing assumption. Deny vague answers such as 'it is not clear enough' or 'the robot would be confused'.",
+        "description": "Student says what the instruction assumed the reader already knew - where an object is, which hand to use, that a lid must be removed first, which side is up. Credit any concrete missing assumption, worded however roughly. Only withhold credit for answers that stay fully vague, like 'it is not clear enough' or 'the robot would be confused', with no actual assumption named.",
         "points": 0
       },
       {
         "id": "rewrite-fixes-it",
         "title": "The rewritten instruction actually closes the gap",
-        "description": "The rewrite supplies the missing knowledge, and would survive being read literally. Credit a rewrite that expands into several steps - that is the expected outcome. Deny if the rewrite repeats the same assumption in different words.",
+        "description": "The rewrite supplies the missing knowledge, and would survive being read literally. Be generous about how completely it closes the gap - it doesn't need to anticipate every possible literal reading, just the specific one identified in the prior step. Credit a rewrite that expands into several steps; that's the expected outcome. Only withhold credit if the rewrite doesn't actually add the missing information and just repeats the same assumption in different words - crediting that would tell the student they closed a gap that's still open.",
         "points": 0
       },
       {
         "id": "why-not-noticed",
         "title": "Q4: explains why the gap was invisible at first",
-        "description": "Student recognises that they were reading their own list with their own knowledge filled in - they knew what they meant, so the instruction looked complete. Credit any answer expressing that the assumption was invisible because the writer already held it. Deny 'I was careless' or 'I rushed' with nothing about assumed knowledge.",
+        "description": "Student recognises that they were reading their own list with their own knowledge filled in - they knew what they meant, so the instruction looked complete. Be generous about how this is expressed; it doesn't need the course vocabulary, just the idea that their own familiarity hid the gap. Only withhold credit for answers like 'I was careless' or 'I rushed' that don't gesture at assumed knowledge at all.",
         "points": 0
       }
     ]

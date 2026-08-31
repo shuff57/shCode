@@ -21,31 +21,31 @@
       {
         "id": "four-phases-named",
         "title": "All four phases named and described",
-        "description": "Student names and describes all four framework activities: inception, elaboration, construction, deployment. Full credit if each of the four is named and given at least a short description in their own words. Deny if any of the four is missing or only listed with no description.",
+        "description": "Student names and describes all four framework activities: inception, elaboration, construction, deployment. Credit is generous per phase - a brief, even one-phrase description is enough, it doesn't need to be precise or complete. Full credit for all four named with some description, however short. If one of the four is missing entirely or named with no description at all, treat it as partial rather than denying the whole criterion.",
         "points": 0
       },
       {
         "id": "real-product-named",
         "title": "One named real product",
-        "description": "Student names one real software product they use (e.g. a specific app, game, or service). Full credit for a named product. Deny if no product is named, or the product is generic ('an app') with no actual name.",
+        "description": "Student names one real software product they use (e.g. a specific app, game, or service). Any recognizable name counts, spelled however the student spells it. Credit generously; withhold credit only if no actual name appears anywhere (just 'an app' or 'a website' with nothing more specific).",
         "points": 0
       },
       {
         "id": "sentence-per-phase",
         "title": "One concrete sentence per phase for that product",
-        "description": "Student gives at least one concrete sentence per phase for the named product, saying what probably happened in that phase for it. Full credit for four concrete sentences (one per phase) tied to the product. Deny if any phase lacks a concrete sentence, or the sentences are generic and not about the product.",
+        "description": "Student gives at least one concrete sentence per phase for the named product, saying what probably happened in that phase for it. Credit a sentence as concrete even if it's a rough guess or thin - the point is that it's actually about the named product, not phase-content accuracy. Full credit for all four phases covered. If one phase is thin or missing while the other three are solid, treat it as partial rather than denying the whole criterion.",
         "points": 0
       },
       {
         "id": "umbrella-mentioned",
         "title": "At least one umbrella activity mentioned by name",
-        "description": "Student mentions at least one umbrella activity by name (e.g. quality management, security management, risk management, configuration management, architecture management, training/communication). Full credit for naming at least one. Deny if no umbrella activity is named.",
+        "description": "Student mentions at least one umbrella activity, even paraphrased rather than the exact course term (e.g. quality management, security management, risk management, configuration management, architecture management, training/communication). A close variant like 'security' or 'making sure it works well throughout' counts if it clearly points at one of these. Credit generously; withhold only if nothing resembling an umbrella activity appears anywhere.",
         "points": 0
       },
       {
         "id": "own-words",
         "title": "Own words",
-        "description": "The response is written in the student's own words, not copied from a source. Deny this criterion only for significant issues: text that reads as copied/dictionary-style, or writing too disorganized to follow. Do not deny for length: a short response that clearly covers the four phases and a product walkthrough is fine. This is not a prose-quality score.",
+        "description": "The response is written in the student's own words, not copied from a source. Withhold credit only for significant issues: text that reads as copied/dictionary-style, or writing too disorganized to follow. Do not withhold for length: a short response that clearly covers the four phases and a product walkthrough is fine. This is not a prose-quality score.",
         "points": 0
       },
       {

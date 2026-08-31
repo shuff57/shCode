@@ -23,19 +23,19 @@
       {
         "id": "design-changed",
         "title": "Names a specific change from pitch to shipped, and what caused it",
-        "description": "Student names something concrete that differs between their README pitch and the game they handed in, and gives the reason: playtesting, scope, a mechanic that wasn't fun, something that didn't work. 'I changed some stuff' or 'I added more features' does not earn this criterion; 'the enemies chased the player and it was impossible, so I made them patrol instead' does.",
+        "description": "Student names something concrete that differs between their README pitch and the game they handed in, with some reason behind it, however brief - playtesting, scope, something that wasn't fun or didn't work. A short, real, named change with a one-phrase reason counts; 'the enemies chased the player and it was impossible, so I made them patrol instead' is the clean case, but a thinner version of the same shape still counts. Deny only fully generic non-answers like 'I changed some stuff' or 'I added more features' that don't name anything real.",
         "points": 0
       },
       {
         "id": "debugging-account",
         "title": "Gives a real account of tracking down one bug",
-        "description": "Student describes a specific bug and the actual steps they took to locate it: printing values, commenting code out, reading an error, checking one thing at a time. A response that names a bug but not the hunt ('my sprite wouldn't move, then I fixed it') does not earn this criterion. The bug must be specific enough that a reader could picture it.",
+        "description": "Student describes a specific bug and something about how they tracked it down, however briefly - printing values, commenting code out, reading an error, checking one thing at a time. A short, real account counts even if thin; deny only a response that names a bug but skips the hunt entirely ('my sprite wouldn't move, then I fixed it'), or a bug so vague a reader couldn't picture it at all.",
         "points": 0
       },
       {
         "id": "requirement-tension",
         "title": "Explains fitting a required feature into their own design",
-        "description": "Student identifies which checklist requirement was hardest to justify inside their particular game and describes the decision they made: reworking the design to need it, or finding a use that fits. This criterion is about design judgment, not difficulty of coding; 'joints were hard to code' does not earn it, 'my game had nothing to save so I added a high score table' does.",
+        "description": "Student identifies which checklist requirement was hardest to justify inside their particular game and says something about the decision they made - reworking the design to need it, or finding a use that fits - however briefly. This is about design judgment, not difficulty of coding, so 'joints were hard to code' still doesn't earn it, but a thinner version of 'my game had nothing to save so I added a high score table' does.",
         "points": 0
       }
     ]

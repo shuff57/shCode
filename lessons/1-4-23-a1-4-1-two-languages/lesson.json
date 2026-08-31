@@ -21,31 +21,31 @@
       {
         "id": "two-languages-named",
         "title": "Two specific non-JavaScript languages are named",
-        "description": "Student names two distinct, real programming languages, neither of which is JavaScript. HTML and CSS do not count as programming languages and do not earn this criterion on their own; SQL does count. Deny if only one language is discussed, or if a language is referred to vaguely ('a systems language').",
+        "description": "Student names two distinct, real programming languages, neither of which is JavaScript. HTML and CSS do not count as programming languages and don't earn this criterion on their own; SQL does count. Credit any real language named clearly enough to identify - a common nickname or informal name is fine. Only withhold credit if just one language is actually discussed, or if a 'language' named is so vague it can't be identified as any real one ('a systems language').",
         "points": 0
       },
       {
         "id": "typical-use-specific",
         "title": "Each language's typical use is specific",
-        "description": "For BOTH languages the student names a concrete kind of software or task - 'analysing data sets', 'iPhone apps', 'operating systems', 'querying a database'. Deny if either one is generic filler such as 'making programs', 'websites and stuff', or 'lots of things'.",
+        "description": "For both languages the student names a concrete-ish kind of software or task - 'analysing data sets', 'iPhone apps', 'operating systems', 'querying a database'. Be generous about what counts as concrete: a plausible, recognizable use case in the student's own words is enough, even if broad ('building websites' counts). Credit both when covered; if one language's use is specific and the other is generic filler ('making programs', 'websites and stuff'), credit it as partial rather than missing.",
         "points": 0
       },
       {
         "id": "paradigm-named",
         "title": "A paradigm is named for each language",
-        "description": "For BOTH languages the student names at least one paradigm from the course vocabulary - procedural, object-oriented, or functional - and the pairing is defensible. Credit a reasonable pairing even if incomplete (e.g. calling Python object-oriented without also saying it is multi-paradigm). Deny if a paradigm is missing for one language, or if the pairing is plainly wrong (e.g. 'SQL is object-oriented').",
+        "description": "For both languages the student names at least one paradigm from the course vocabulary - procedural, object-oriented, or functional - and the pairing is defensible. Credit a reasonable pairing generously, even if incomplete or imprecisely worded (e.g. calling Python object-oriented without also saying it is multi-paradigm). If a paradigm is missing for one language but present and reasonable for the other, credit as partial rather than missing. Only withhold full credit where a pairing is plainly wrong (e.g. 'SQL is object-oriented').",
         "points": 0
       },
       {
         "id": "fit-explained",
         "title": "The fit between paradigm and purpose is explained, not just asserted",
-        "description": "This is the core of the assignment. For at least one language, the student gives a real reason WHY the paradigm suits the work - for example that a database question is declarative because you want rows back and do not care how they are found, or that game and app code suits objects because there are many similar things each keeping their own state. Deny if the answer only states the pairing ('Python is object-oriented and that fits data science') without any reasoning connecting the two.",
+        "description": "This is the core of the assignment. For at least one language, the student gives a reason connecting the paradigm to the kind of work - for example that a database question is declarative because you want rows back and don't care how they're found, or that game and app code suits objects because there are many similar things each keeping their own state. Be generous about how the reasoning is worded - a rough, intuitive version of the connection counts, it doesn't need textbook precision. Only withhold credit if the answer purely asserts the pairing with nothing at all connecting it to the kind of work ('Python is object-oriented and that fits data science').",
         "points": 0
       },
       {
         "id": "own-words",
         "title": "Written in the student's own words",
-        "description": "The writing reads as a beginner's own understanding, with personal phrasing and natural variation. Deny if it reads as copied marketing copy or encyclopedia text - polished, uniform, and using terminology well beyond anything else in the submission.",
+        "description": "The writing reads as a beginner's own understanding, with personal phrasing and natural variation. Be generous - uneven or clunky phrasing is expected and fine. Only withhold credit if it clearly reads as copied marketing copy or encyclopedia text: polished, uniform, and using terminology well beyond anything else in the submission.",
         "points": 0
       }
     ]

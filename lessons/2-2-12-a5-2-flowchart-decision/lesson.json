@@ -55,31 +55,31 @@
         {
           "id": "gets-age",
           "title": "Gets the age before deciding",
-          "description": "A task or input shape that obtains the customer's age appears on the path between Start and the decision diamond. Credit any reasonable wording: 'get age', 'ask for age', 'input age'. Deny if the diagram jumps straight from Start to the decision with no step that obtains the age.",
+          "description": "A task or input shape that obtains the customer's age appears on the path between Start and the decision diamond. Credit any reasonable wording: 'get age', 'ask for age', 'input age', or even just 'age' labeled on an input step. If the diagram jumps straight from Start to the decision with no step that obtains the age, that is a real structural gap - the diamond has nothing to test - so do not credit it, but be generous about how the step itself is worded or drawn.",
           "points": 0
         },
         {
           "id": "correct-condition",
           "title": "Diamond asks the right question",
-          "description": "The decision diamond tests the customer's age against 13, for example 'age < 13', 'under 13?', 'age less than 13'. Accept an equivalent inverted test such as 'age >= 13' as long as the branches below it are consistent with the direction of the test. Deny if the condition tests a different number or a different quantity.",
+          "description": "The decision diamond tests the customer's age against 13, for example 'age < 13', 'under 13?', 'age less than 13'. Accept an equivalent inverted test such as 'age >= 13' as long as the branches below it are consistent with the direction of the test. Be generous about exact phrasing or how the number is presented. If the condition tests a different number entirely or a different quantity than age, that is testing the wrong thing rather than just being imprecise about the right thing, so do not credit it.",
           "points": 0
         },
         {
           "id": "both-prices",
           "title": "Both prices appear on the correct branches",
-          "description": "One branch out of the diamond leads to $8 and the other to $14, and the branch labels match the condition. If the diamond asks 'age < 13', the yes branch must reach $8 and the no branch $14; if it asks 'age >= 13', the mapping is reversed. Deny if a price is missing, both branches carry the same price, or the prices are swapped relative to the condition.",
+          "description": "One branch out of the diamond leads to $8 and the other to $14, and the branch labels match the condition. If the diamond asks 'age < 13', the yes branch must reach $8 and the no branch $14; if it asks 'age >= 13', the mapping is reversed. Be generous about how the branches are labeled - 'yes'/'no', 'true'/'false', or the literal condition text all count. But a missing price, both branches carrying the same price, or prices swapped relative to the condition mean the algorithm itself is wrong rather than just messily drawn, so do not credit those.",
           "points": 0
         },
         {
           "id": "rejoins-and-prints",
           "title": "Both branches lead onward to the End",
-          "description": "Neither branch is a dead end: following either answer out of the diamond eventually reaches the End oval, whether the two paths rejoin at a shared 'print the price' step or each prints separately before ending. Deny only if a branch stops with nothing after it.",
+          "description": "Neither branch is a dead end: following either answer out of the diamond eventually reaches the End oval, whether the two paths rejoin at a shared 'print the price' step or each prints separately before ending. Any structure that gets both branches to the End counts - only withhold credit if a branch genuinely stops with nothing after it.",
           "points": 0
         },
         {
           "id": "shape-meaning",
           "title": "Shapes are used for what they mean",
-          "description": "Ovals are used only for Start and End, the diamond is used only for the question, and rectangles (or input/output parallelograms) carry the actions. Deny if, for example, the question is drawn in a rectangle or an action is drawn in a diamond.",
+          "description": "Ovals are used only for Start and End, the diamond is used only for the question, and rectangles (or input/output parallelograms) carry the actions. Small variation in exactly which action lands in which action-shaped box is fine. But if the question ends up drawn as a rectangle instead of a diamond, or an action is drawn as a diamond, the shapes are no longer carrying their meaning - which is the whole point of shape vocabulary - so do not credit that.",
           "points": 0
         }
       ]

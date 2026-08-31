@@ -25,25 +25,25 @@
       {
         "id": "q1-definitions",
         "title": "Q1: Both terms defined in own words",
-        "description": "Student defines procedural programming (code as a sequence of instructions, top-to-bottom or function-based flow) AND OOP (organizing code into classes/objects that bundle data and behavior) clearly and in their own words. Full credit requires both definitions to be accurate and personal. Half credit if one is clear and one is vague. Zero if definitions are missing or appear copied.",
+        "description": "Student defines procedural programming (code as a sequence of instructions, top-to-bottom or function-based flow) AND OOP (organizing code into classes/objects that bundle data and behavior), in their own words even if informal or imprecise. Credit any answer that gestures at both ideas in the right direction, even loosely worded - it doesn't need textbook precision. Deny only if a definition is missing entirely or is copied rather than in the student's own words.",
         "points": 0
       },
       {
         "id": "q2-proc-example",
         "title": "Q2: Specific Q1 procedural example named",
-        "description": "Student names a specific Q1 assignment (by name or description) and provides a 1–2 sentence description of how it used a procedural approach. Full credit requires a specific reference, not a generic statement like 'I used procedural code in Q1.' Half credit for a vague but plausible reference. Zero for no example.",
+        "description": "Student names a specific Q1 assignment (by name or description) and says something, however brief, about how it used a procedural approach. Any real named assignment with even a loose description counts - it doesn't need to be precise or detailed. Deny only a fully generic statement like 'I used procedural code in Q1' with nothing pinning it to an actual assignment, or no example at all.",
         "points": 0
       },
       {
         "id": "q3-oop-example",
         "title": "Q3: Specific moSHion OOP example named",
-        "description": "Student names a specific class from their moSHion code (e.g., Collectible, Player, Enemy) and describes how that class organized their code: what properties and methods it contained, or how it reduced repetition. Full credit requires naming the class and explaining the organizational benefit. Half credit for a generic reference to using a class. Zero for no specific example.",
+        "description": "Student names a specific class from their moSHion code (e.g., Collectible, Player, Enemy) and says something, however brief, about how it organized their code - what it held, or how it cut down repetition. Any real named class with even a loose explanation counts. Deny only a generic reference to 'using a class' with nothing specific named, or no example at all.",
         "points": 0
       },
       {
         "id": "q4-oop-wins",
         "title": "Q4: OOP-wins scenario with reasoning",
-        "description": "Student describes a specific scenario (real or hypothetical) where OOP is clearly the better approach and explains WHY using at least one of: readability (code is easier to understand), extensibility (easy to add more objects/types), or separation of data and behavior (object owns its own state). Full credit for a specific scenario plus 2–3 clear reasons. Partial credit for a specific scenario with only one reason or vague reasoning. Below expectations for a generic or missing response.",
+        "description": "Student describes a scenario (real or hypothetical) where OOP is the better approach and gives some reason why - readability (easier to understand), extensibility (easy to add more objects/types), or separation of data and behaviour (the object owns its own state). One reason is enough, and it counts however loosely it is worded; a student who says 'it would be easier to add more enemies later' has given the extensibility reason. Credit a scenario with any real reason attached. A scenario with no reason at all is partial. Reserve missing for a response with no scenario.",
         "points": 0
       },
       {

@@ -21,25 +21,25 @@
       {
         "id": "q1-matches-team",
         "title": "Q1: picks currentMember and ties it to the team's word",
-        "description": "Student chooses currentMember and explains that it matches the term the team already uses, keeping the vocabulary consistent. Deny if currentPerson is chosen, or if currentMember is chosen with no reason connected to team terminology.",
+        "description": "Student chooses currentMember and explains that it matches the term the team already uses, keeping the vocabulary consistent. The reasoning can be brief or informally worded - 'because that's what the team calls it' is enough. If currentPerson is picked instead, or currentMember is picked with no reasoning at all, that misses the actual idea being tested - consistency with the team's vocabulary - so do not credit it.",
         "points": 0
       },
       {
         "id": "q2-problem-named",
         "title": "Q2: names the reader's problem",
-        "description": "Student identifies that a reader cannot tell whether cartItems and basketItems are two different things or the same thing under two names, or otherwise names the confusion/searchability cost of mixed vocabulary. Deny if the answer only says it is 'messy' or 'inconsistent' without saying what that costs a reader.",
+        "description": "Student identifies that a reader cannot tell whether cartItems and basketItems are two different things or the same thing under two names, or otherwise names the confusion/searchability cost of mixed vocabulary. Credit any answer that gestures at this cost, even briefly or in different words - 'someone reading it might think there are two carts' is enough. An answer that only says it is 'messy' or 'inconsistent' with no sense of what that actually costs a reader has not quite shown the idea yet, so treat that as partial rather than full credit.",
         "points": 0
       },
       {
         "id": "q2-action",
         "title": "Q2: says what to do",
-        "description": "Student proposes an actual action - rename to match the existing code, or agree one term with the team and change everything to it. Credit either direction as long as the outcome is ONE word used everywhere. Deny 'leave it, it's fine' or an answer with no action.",
+        "description": "Student proposes an actual action - rename to match the existing code, or agree one term with the team and change everything to it. Credit either direction as long as the outcome is one word used everywhere, and be generous about how the action is described. An answer that says to leave it as-is, or that names no action at all, has not actually answered what the question asked, so that one does not earn credit.",
         "points": 0
       },
       {
         "id": "q3-consistency-over-preference",
         "title": "Q3: consistency beats personal preference",
-        "description": "Student says they would use the team's word despite preferring their own, and gives a reason grounded in the codebase - one word per idea is easier to read and search, and mixed vocabulary costs everyone. Deny if the student says they would keep using their preferred word, or gives no reason beyond 'to be polite' or 'to follow rules'.",
+        "description": "Student says they would use the team's word despite preferring their own, and gives a reason grounded in the codebase - one word per idea is easier to read and search, and mixed vocabulary costs everyone. Be generous about how that reasoning is phrased; it does not need to be polished. If the student says they would keep using their own preferred word anyway, that answers a different question than the one being asked, so do not credit it. A reason that is purely social ('to be polite', 'to follow the rules') with no sense of why consistency actually helps the code is thinner - treat that as partial rather than full credit rather than a hard miss.",
         "points": 0
       }
     ]

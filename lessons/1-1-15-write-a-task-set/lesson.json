@@ -21,13 +21,13 @@
       {
         "id": "two-concrete-tasks",
         "title": "At least two concrete tasks listed",
-        "description": "Student lists at least two tasks for the 'requirements definition' action. Each task must be a concrete step (e.g. interviewing users, writing a requirements document, reviewing requirements) rather than a restatement of the action itself. Full credit for two or more concrete tasks. Deny if there are fewer than two tasks, or if a 'task' just restates the action ('define the requirements') with no concrete step behind it.",
+        "description": "Student lists at least two tasks for the 'requirements definition' action. Each task should be a concrete-ish step (e.g. interviewing users, writing a requirements document, reviewing requirements) rather than just restating the action itself. Be generous about what counts as concrete - a short, plausible step in the student's own words is enough, it doesn't need much detail. Full credit for two or more such tasks. If only one is concrete and the other just restates the action, credit as partial rather than missing; only fully withhold if fewer than two tasks are listed at all, or none rises above restating the action.",
         "points": 0
       },
       {
         "id": "plausible-for-requirements",
         "title": "Tasks plausibly belong to requirements definition",
-        "description": "Each listed task is plausibly something 'requirements definition' would need: interviewing stakeholders, documenting needs, reviewing requirements, and similar. The rubric must NOT require an exact match to any specific examples; the book explicitly allows 'other reasonable tasks.' Full credit if the tasks are all plausible. Deny only if a task is clearly unrelated to figuring out what the software should do.",
+        "description": "Each listed task is plausibly something 'requirements definition' would need: interviewing stakeholders, documenting needs, reviewing requirements, and similar. Be generous - the rubric must NOT require an exact match to any specific examples, and the book explicitly allows 'other reasonable tasks.' Full credit if the tasks are all at least plausibly in the neighborhood. Only withhold credit if a task is clearly unrelated to figuring out what the software should do.",
         "points": 0
       }
     ]

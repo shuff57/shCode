@@ -21,25 +21,25 @@
       {
         "id": "undefined-defined",
         "title": "Q1: undefined means no value assigned, and JavaScript supplies it",
-        "description": "Student says undefined means the variable was declared but never given a value, AND that JavaScript sets it automatically. Credit requires both halves - the meaning and the fact that the language, not the programmer, put it there.",
+        "description": "Student says undefined means the variable was declared but never given a value, and that JavaScript sets it automatically rather than the programmer. Credit a loose or brief gesture at both ideas - 'JS puts that there automatically when nothing's assigned' covers both halves even said in passing. If only one half is clearly present, credit it as partial rather than treating the answer as missing.",
         "points": 0
       },
       {
         "id": "null-defined",
         "title": "Q2: null means deliberately empty, and the programmer writes it",
-        "description": "Student says null means nothing / empty / value unknown, AND that the programmer assigns it on purpose. Credit requires both halves. Deny if null is described only as 'empty' with no sense that it is a deliberate choice.",
+        "description": "Student says null means nothing / empty / value unknown, and that the programmer assigns it on purpose. Credit a loose or brief gesture at both ideas - describing null as something you set on purpose, even without the word 'deliberate', is enough. Give partial credit if only one half is clearly present. But do not credit an answer that describes null as only 'empty' with no sense that anyone chose it - that erases the one distinction between null and undefined this pair of questions is actually testing.",
         "points": 0
       },
       {
         "id": "null-situation",
         "title": "Q3: a concrete situation for writing null",
-        "description": "Student describes a specific variable and moment - a chosen colour before the user picks one, a middle name that does not exist, a score before the game starts - and says why null fits. Deny generic answers such as 'when you want it to be empty' with no situation attached.",
+        "description": "Student describes a specific variable and moment - a chosen colour before the user picks one, a middle name that does not exist, a score before the game starts - and says why null fits. It does not need to be polished or original; any concrete, named situation counts, even a simple or slightly awkward one. A fully generic non-answer like 'when you want it to be empty' with no actual situation named does not give the grader anything to check, so that is the one thing to hold the line on.",
         "points": 0
       },
       {
         "id": "debugging-inference",
         "title": "Q4: infers that a value was never assigned",
-        "description": "Student concludes that seeing undefined means the variable never got a value - the assignment did not happen, ran too late, or the wrong name was used - so the bug is upstream of the line that printed it. Deny if the answer only says 'there is a bug' without saying what undefined specifically implies.",
+        "description": "Student concludes that seeing undefined means the variable never got a value - the assignment did not happen, ran too late, or the wrong name was used - so the bug is upstream of the line that printed it. Credit any answer that connects undefined to 'the value was never set' in some form, even loosely phrased. An answer that only says 'there's a bug' with nothing about what undefined itself tells you has not shown the inference this question is checking for, so that one stays a miss.",
         "points": 0
       }
     ]

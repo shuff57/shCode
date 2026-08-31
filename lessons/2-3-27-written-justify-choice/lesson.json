@@ -23,19 +23,19 @@
       {
         "id": "q1-priority-switch",
         "title": "Q1: Picks switch and explains why",
-        "description": "Answer picks switch and explains that priority is a single value compared against a fixed, finite list of exact strings ('low', 'medium', 'high') with no ranges involved. Deny if the answer picks if...else, or picks switch without explaining the finite-list reasoning.",
+        "description": "Answer picks switch and gives some real reason grounded in the finite-list idea - that priority is compared against a small set of exact values ('low', 'medium', 'high'), that there's no range or comparison involved, or something in that spirit even loosely worded. Deny if the answer picks if...else, or picks switch with no reasoning at all (a bare 'switch is better' with nothing behind it).",
         "points": 0
       },
       {
         "id": "q2-grade-chain-explanation",
         "title": "Q2: Explains why the grade chain can't become a switch",
-        "description": "Answer explains that score >= 80 (and similar) is a range covering many values, not one exact value, so there is no finite list of case values that could represent it. Accept any phrasing that identifies the range/boundary nature of the condition as the blocker. Deny an answer that only says 'switch doesn't support >=' without explaining why that matters (the finite-list requirement).",
+        "description": "Answer explains that score >= 80 (and similar) is a range covering many values rather than one exact value, so it can't be written as a finite list of case values. Accept any phrasing that gestures at the range/boundary nature of the condition, even loosely - 'it's a range, not a specific number' is enough. Only deny a bare 'switch doesn't support >=' with nothing at all behind it.",
         "points": 0
       },
       {
         "id": "q3-own-example",
         "title": "Q3: Gives an own-choice example with a justified pick",
-        "description": "Describes a concrete program scenario (not the priority or grade example already used), states which statement it would use, and justifies the pick by asking whether the test can be written as a finite list of exact values. Deny if no reasoning is given for the choice, or if the example is just restated from Q1/Q2.",
+        "description": "Describes a concrete program scenario (not the priority or grade example already used), states which statement it would use, and gives some real reasoning behind the pick tied to the finite-list idea, however briefly. Deny if no reasoning at all is given, or if the example is just Q1/Q2 restated rather than something new.",
         "points": 0
       }
     ]

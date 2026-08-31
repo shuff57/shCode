@@ -21,25 +21,25 @@
       {
         "id": "three-named",
         "title": "All three structures are named",
-        "description": "Student names sequence, selection and repetition. Accept close synonyms - 'choice' or 'branching' for selection, 'loop' or 'iteration' for repetition. Credit requires all three. Naming two does not earn this criterion.",
+        "description": "Student names sequence, selection and repetition. Accept close synonyms freely - 'choice', 'branching', or 'if/else' for selection; 'loop', 'iteration', or 'repeat' for repetition; even 'in order' or 'one after another' for sequence. Full credit needs all three named, even loosely. Naming two of the three is partial credit rather than a miss; naming only one or none is where this criterion is genuinely not met.",
         "points": 0
       },
       {
         "id": "examples-everyday",
         "title": "Each example comes from ordinary life",
-        "description": "All three examples are drawn from everyday activity rather than code. Deny if the student illustrates a structure with an if statement or a for loop instead of a real-world situation, or if fewer than three examples are given.",
+        "description": "All three examples are drawn from everyday activity rather than code. Be generous about how everyday or how simply stated the examples are - plain, ordinary examples are exactly what is being asked for. If the student illustrates a structure with actual code (an if statement, a for loop) instead of a real-world situation, that answers a different question than the one asked, so do not credit that example. Three solid everyday examples is full credit; two out of three is partial rather than missing - the count itself is part of what this question checks, since the assignment explicitly asks for three.",
         "points": 0
       },
       {
         "id": "examples-match",
         "title": "Each example actually matches its structure",
-        "description": "The sequence example is genuinely steps in order; the selection example genuinely involves choosing between paths based on a condition; the repetition example genuinely involves doing something more than once. Deny if any example is mismatched - for instance, a plain list of steps offered as the repetition example.",
+        "description": "The sequence example is genuinely steps in order; the selection example genuinely involves choosing between paths based on a condition; the repetition example genuinely involves doing something more than once. Be generous about how directly the example demonstrates this - it does not need to be a textbook case, just recognizably the right shape. If an example is actually mismatched, though - a plain list of steps offered as the repetition example, say - that shows the difference between the structures has not landed yet, which is the actual point of this question, so that one example does not earn credit even if the others do.",
         "points": 0
       },
       {
         "id": "jumps-explained",
         "title": "Explains why forbidding arbitrary jumps was worth it",
-        "description": "Student says something about being able to follow or reason about the program - that you can tell how execution reached a line, that code becomes readable, that it prevents tangled flow. Deny if the answer only asserts it is 'better' or 'cleaner' without saying what it makes possible.",
+        "description": "Student says something about being able to follow or reason about the program - that you can tell how execution reached a line, that code becomes readable, that it prevents tangled flow. Credit any answer that connects the restriction to something it actually enables, even loosely or briefly phrased - 'so you can follow what's happening' is enough. An answer that only asserts it is 'better' or 'cleaner' with nothing about what that betterness consists of has not quite gotten there, so treat that as partial rather than full credit.",
         "points": 0
       }
     ]

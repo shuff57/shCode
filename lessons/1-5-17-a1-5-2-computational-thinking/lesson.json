@@ -21,7 +21,7 @@
       {
         "id": "all-four-defined",
         "title": "All four parts explained",
-        "description": "Student addresses all four of decomposition, pattern recognition, abstraction and algorithmic thinking in Part 1, each by name (or an unmistakable synonym) and each with at least one sentence of explanation. Credit requires all four. Covering three does not earn this criterion.",
+        "description": "Student addresses all four of decomposition, pattern recognition, abstraction and algorithmic thinking in Part 1, each by name (or an unmistakable synonym) and each with some explanation, however brief or informally worded. Credit any answer that touches all four, even lightly - the point is that they engaged with each term, not that each explanation is polished or lengthy.",
         "points": 0
       },
       {
@@ -33,13 +33,13 @@
       {
         "id": "one-task-named",
         "title": "A specific task is named in Part 2",
-        "description": "Student names one concrete thing they actually did - preferably a specific program or lab they wrote this quarter ('the ten broken declarations lab', 'my object description'), or failing that a specific everyday activity. Generic references such as 'a problem', 'some code' or 'an assignment' do not count.",
+        "description": "Student names one concrete thing they actually did, however briefly - a specific program or lab from this quarter ('the ten broken declarations lab', 'my object description') or a specific everyday activity. Any real named thing counts, even mentioned in passing. Generic references such as 'a problem', 'some code' or 'an assignment' with nothing pinning them to something real don't count.",
         "points": 0
       },
       {
         "id": "four-examples-grounded",
         "title": "All four parts are illustrated with that task",
-        "description": "Student gives an example of each of the four parts, and the examples are drawn from the task they named rather than being restatements of the definitions. Deny if an example just repeats the definition in different words, or if fewer than four are illustrated.",
+        "description": "Student gives an example for each of the four parts, drawn from the task they named rather than restating the definitions. Be generous about how thin or informally worded an example is - a short phrase pointing at something real counts, even if imperfectly explained. Deny only if an example is just the definition repeated in different words with nothing concrete added, or if most of the four have no real example attached at all.",
         "points": 0
       },
       {
