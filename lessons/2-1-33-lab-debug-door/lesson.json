@@ -1,6 +1,6 @@
 {
   "id": "2-1-33-lab-debug-door",
-  "title": "2.1.36 Debug the Door",
+  "title": "2.1.35 Debug the Door",
   "description": "Fix a door-unlock condition that uses || where it should use &&. Auto-graded.",
   "type": "lesson",
   "estimateMins": 8,

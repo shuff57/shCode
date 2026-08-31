@@ -1,4 +1,4 @@
-// 2.1.23 Write Your First Ternary
+// 2.1.22 Write Your First Ternary
 
 // STEP 1: Create isMember and set it to true.
 

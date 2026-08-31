@@ -7,7 +7,7 @@
 
 **Operator precedence** is the order JavaScript evaluates operators in an expression when there's more than one. Comparison operators (`>`, `<`, `===`) are evaluated *before* `if` or `?` look at the result: the condition is always fully computed down to a single `true`/`false` first.
 
-> **Two operators you have not met yet.** This reading needs `&&` and `||` to show you why precedence matters, and they arrive properly in `2.1.30 Reading: Logical Operators: && || !`. For now, all you need is this: `a && b` is true only when **both** sides are true, and `a || b` is true when **at least one** side is true. They are *logical* operators, not comparison operators — they combine whole conditions rather than comparing two values. If the examples below feel like a lot at once, read 2.1.30 first and come back; nothing here is graded.
+> **A reminder, not new material.** `a && b` is true only when **both** sides are true; `a || b` is true when **at least one** is. You met both in `2.1.29 Reading: Logical Operators: && || !` and combined them in `2.1.30 Worked Example: Combining conditions`. This reading is about what happens when you put them in the *same* condition.
 
 ```javascript
 if (age > 18) {

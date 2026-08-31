@@ -40,7 +40,7 @@
       },
       {
         "id": "q2-precedence",
-        "source": "2.1.30 and 2.1.20",
+        "source": "2.1.29 and 2.1.36",
         "question": "In `age >= 13 && age <= 19 || hasException`, which runs first?",
         "options": [
           "|| runs first, because it appears later",
@@ -67,7 +67,7 @@
       },
       {
         "id": "q4-trace-ternary",
-        "source": "2.1.24 and 2.1.25",
+        "source": "2.1.23 and 2.1.24",
         "code": "let score = 72;\nlet grade = (score >= 90) ? \"A\" :\n  (score >= 80) ? \"B\" :\n  (score >= 70) ? \"C\" :\n  \"D\";\nconsole.log(grade);",
         "question": "What does this print?",
         "options": [
@@ -81,7 +81,7 @@
       },
       {
         "id": "q5-or-trap",
-        "source": "2.1.30 and 2.1.35",
+        "source": "2.1.29 and 2.1.34",
         "code": "let day = \"Friday\";\nconsole.log(day === \"Saturday\" || \"Sunday\");",
         "question": "What does this print?",
         "options": [

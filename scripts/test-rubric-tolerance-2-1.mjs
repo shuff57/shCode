@@ -32,13 +32,25 @@ execFileSync(process.execPath, [
 writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
 const { grade } = createRequire(import.meta.url)(path.join(out, 'grader.js'));
 
+// Keyed by FOLDER ID, never by display number. Display numbers move every
+// time a lesson is inserted or reordered; folder ids do not. Keying on the
+// number is what broke this file the first time the unit was resequenced.
+const LAB = {
+  equals:   '2-1-9b-lab-count-the-equals',
+  guardAnd: '2-1-12-lab-guard-and',
+  branchOr: '2-1-13-lab-branch-or',
+  door:     '2-1-33-lab-debug-door',
+  combine:  '2-1-34-lab-combine-logical',
+  advisor:  '2-1-38-a2-1-1-grade-advisor',
+};
 const byNum = {};
-for (const d of readdirSync('lessons')) {
-  const f = path.join('lessons', d, 'lesson.json');
-  if (!existsSync(f)) continue;
-  const j = JSON.parse(readFileSync(f, 'utf8'));
-  byNum[j.title.split(' ')[0]] = { dir: d, j };
+for (const [, dir] of Object.entries(LAB)) {
+  const f = path.join('lessons', dir, 'lesson.json');
+  if (!existsSync(f)) { console.error(`missing lesson folder: ${dir}`); process.exit(1); }
+  byNum[dir] = { dir, j: JSON.parse(readFileSync(f, 'utf8')) };
 }
+// display number is shown in output for readability only
+const lessonLabel = (dir) => `${byNum[dir].j.title.split(' ')[0]} ${dir.replace(/^2-1-[0-9a-z]+-/, '')}`;
 
 let failures = 0;
 const check = (num, label, src, want) => {
@@ -48,43 +60,43 @@ const check = (num, label, src, want) => {
   const got = passed === reqs.length ? 'ALL' : (passed === 0 ? 'NONE' : `${passed}/${reqs.length}`);
   const ok = want === 'ALL' ? got === 'ALL' : (want === 'NOT_ALL' ? got !== 'ALL' : got === want);
   if (!ok) failures++;
-  console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${num.padEnd(8)} ${label.padEnd(42)} ${got.padEnd(5)} (want ${want})`);
+  console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${lessonLabel(num).padEnd(26)} ${label.padEnd(42)} ${got.padEnd(5)} (want ${want})`);
 };
 
 // every lesson's reference solution must still score full marks
 console.log('MUST PASS — reference solutions');
-for (const num of ['2.1.19', '2.1.32', '2.1.33', '2.1.36', '2.1.37', '2.1.42']) {
+for (const num of [LAB.equals, LAB.guardAnd, LAB.branchOr, LAB.door, LAB.combine, LAB.advisor]) {
   const e = byNum[num];
   check(num, 'solution.js', readFileSync(path.join('lessons', e.dir, 'solution.js'), 'utf8'), 'ALL');
 }
 
 console.log('\nMUST PASS — correct answers in a different shape');
-check('2.1.36', 'reversed operands: hasKey && isAlive',
+check(LAB.door, 'reversed operands: hasKey && isAlive',
   'const isAlive = true;\nconst hasKey = false;\nif (hasKey && isAlive) { console.log("open"); }', 'ALL');
-check('2.1.19', 'constant-first: 100 === temperature',
+check(LAB.equals, 'constant-first: 100 === temperature',
   'let temperature = 20;\nif (100 === temperature) { console.log("x"); }\nconsole.log(temperature);', 'ALL');
-check('2.1.37', "lesson's own suggested nested-paren shape",
+check(LAB.combine, "lesson's own suggested nested-paren shape",
   'const hasTicket=true, age=10, isBlocked=false;\nif ((hasTicket && (age < 5 || age >= 65)) && !isBlocked) { console.log("in"); }', 'ALL');
-check('2.1.32', 'student picked their own variable names',
+check(LAB.guardAnd, 'student picked their own variable names',
   'const temperature = 30;\nconst humidity = 80;\nif (temperature > 20 && humidity > 50) { console.log("muggy"); }', 'ALL');
-check('2.1.33', 'bare booleans, no comparison operators',
+check(LAB.branchOr, 'bare booleans, no comparison operators',
   'const isWeekend = true;\nconst isHoliday = false;\nif (isWeekend || isHoliday) { console.log("off"); }', 'ALL');
-check('2.1.33', 'let instead of const, no semicolons',
+check(LAB.branchOr, 'let instead of const, no semicolons',
   'let a = 1\nlet b = 2\nif (a > 0 || b > 0) { console.log("yes") }', 'ALL');
-check('2.1.42', 'reference shape with two separate ifs',
-  readFileSync(path.join('lessons', byNum['2.1.42'].dir, 'solution.js'), 'utf8'), 'ALL');
+check(LAB.advisor, 'reference shape with two separate ifs',
+  readFileSync(path.join('lessons', byNum[LAB.advisor].dir, 'solution.js'), 'utf8'), 'ALL');
 
 console.log('\nMUST FAIL — the gaming answers');
-check('2.1.32', 'if(true&&true){}', 'if(true&&true){}', 'NOT_ALL');
-check('2.1.33', 'if(1||0){}', 'if(1||0){}', 'NOT_ALL');
-check('2.1.37', 'three unrelated ifs', 'if(a&&b){}\nif(c||d){}\nif(!e){}', 'NOT_ALL');
-check('2.1.42', 'placeholder conditions, no real variables',
+check(LAB.guardAnd, 'if(true&&true){}', 'if(true&&true){}', 'NOT_ALL');
+check(LAB.branchOr, 'if(1||0){}', 'if(1||0){}', 'NOT_ALL');
+check(LAB.combine, 'three unrelated ifs', 'if(a&&b){}\nif(c||d){}\nif(!e){}', 'NOT_ALL');
+check(LAB.advisor, 'placeholder conditions, no real variables',
   'if(1){}else if(1){}else if(1){}\nif(1||1){}\nconsole.log(1);', 'NOT_ALL');
-check('2.1.36', 'the untouched || bug',
+check(LAB.door, 'the untouched || bug',
   'const isAlive = true;\nconst hasKey = false;\nif (isAlive || hasKey) { console.log("open"); }', 'NOT_ALL');
 
 console.log('\nMUST SCORE ZERO — untouched starters');
-for (const num of ['2.1.19', '2.1.32', '2.1.33', '2.1.36', '2.1.37', '2.1.42']) {
+for (const num of [LAB.equals, LAB.guardAnd, LAB.branchOr, LAB.door, LAB.combine, LAB.advisor]) {
   const e = byNum[num];
   check(num, 'script.js as shipped', readFileSync(path.join('lessons', e.dir, 'script.js'), 'utf8'), 'NONE');
 }

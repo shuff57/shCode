@@ -1,6 +1,6 @@
 {
   "id": "2-1-21-reading-precedence",
-  "title": "2.1.20 Reading: Parentheses and Operator Precedence",
+  "title": "2.1.36 Reading: Parentheses and Operator Precedence",
   "description": "Learn why parentheses make a condition's intent clear even when they aren't strictly required. Read before the ternary operator lessons.",
   "type": "lesson",
   "estimateMins": 8,

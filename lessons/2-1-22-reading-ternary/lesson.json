@@ -1,6 +1,6 @@
 {
   "id": "2-1-22-reading-ternary",
-  "title": "2.1.21 Reading: The Conditional Operator ?",
+  "title": "2.1.20 Reading: The Conditional Operator ?",
   "description": "Learn the ternary operator: condition ? value1: value2. Read before the ternary practice lesson.",
   "type": "lesson",
   "estimateMins": 10,
