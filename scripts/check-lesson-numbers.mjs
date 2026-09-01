@@ -207,6 +207,25 @@ if (attached === 0) {
     + 'directory is empty of module packets or the id shape has drifted again');
 }
 
+// The packets cross-link each other by bare filename, so renaming one to fix
+// its module attachment breaks every link pointing at it. Renaming the nine
+// broke thirty such links in one go.
+const assignFiles = new Set(await fs.readdir(assignDir).catch(() => []));
+let linkChecked = 0;
+for (const f of assignFiles) {
+  if (!f.endsWith('.md')) continue;
+  const src = await fs.readFile(path.join(assignDir, f), 'utf8');
+  for (const m of src.matchAll(/\]\(([^)#\s]+\.(?:md|js))\)/g)) {
+    linkChecked++;
+    if (assignFiles.has(m[1])) continue;
+    errors.push(`assignments/${f} links ${m[1]}, which is not in assignments/`);
+  }
+}
+if (linkChecked === 0) {
+  errors.push('no sibling links found in assignments/ — the link check above '
+    + 'proved nothing; confirm the packets still cross-link before trusting it');
+}
+
 // 6. a lesson page breadcrumb links to /module/<first token of the unit field>
 // (ContentLessonView). A static export has no page for an id no module declares,
 // so that link 404s. All 23 lessons of module 1.1 shipped filed under the unit
