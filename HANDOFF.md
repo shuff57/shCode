@@ -1,3 +1,81 @@
+# Handoff — 2026-09-01 · the reSHape/Onshape parity gauntlet is CLOSED
+
+Every build item on both toolbars is `landed`. `npm test` prints the census:
+
+```
+feature toolbar: 75 tools -- 12 shipped, 4 pieces queued, 61 refused with a reason
+sketch  toolbar: 52 tools -- 8 shipped, 8 pieces queued, 35 refused with a reason
+both toolbars: every tool accounted for exactly once
+```
+
+All 127 tools are shipped, built, or refused with a written model reason.
+The full record is `~/.claude/plans/reshape-fusion-parity.md` (see its final
+`CLOSED` section) and `.gauntlet/parity.json` / `parity-sketch.json`.
+
+## Shipped in rounds 6–10 (2026-09-01)
+
+| Commit | What |
+| --- | --- |
+| `8a036de` | conflict display — losing edges turn red, dismissible banner over the canvas |
+| `887f73e` | **Bow an edge** — an arc is a bulge on an existing edge, not a standalone curve |
+| `f32593e` | **Remove a corner** — `addCorner`'s missing inverse |
+| `6348b65` | `trim` reclassified; Onshape's Trim/Extend refused |
+| `af804a8` | **Sits on: Ground/Front/Side** — a sketch can leave the xy plane; sketch bar closed |
+| `73bc48d` | **Blend** — two sketches skinned into a tapered solid |
+
+## The one thing worth carrying forward
+
+Three of five rounds found the same shape: **a finished pipeline with nothing
+at the top of it.** `bulges` (arc), `SketchFeature.plane`, and earlier `equal`
+were each recorded in `.gauntlet/` as blocked on a model problem. None was.
+Each was a declared, plumbed, tested capability with no writer.
+
+Before believing a queue item is blocked: read the type, then grep for who
+writes it. `scripts/check-constraint-ui.mjs` is the guard shape for this —
+parse the declaration out of the source and fail if nothing reaches it.
+
+## Traps this stretch cost a cycle on
+
+- **This checkout is CRLF.** A multi-line anchor joined with bare `\n` matches
+  nothing and fails silently. Detect with `s.includes('\r\n')` before any
+  multi-line string replace. Cost two cycles; already in this file's history
+  once, which did not stop it.
+- **`cat -A` piped through `sed 's/\$$//'` hides the `^M`** — that is how the
+  CRLF was missed the second time. Check `s.includes('\r')` in node instead.
+- **A quoted heredoc keeps `\n` literal, which is right for JS source but wrong
+  for a JS *string* you intend as a real newline.** Both appear in the same
+  script; know which you are writing.
+- **Two `npm run dev` on one `.next` corrupts it.** Every chunk 500s while the
+  page still serves 200 HTML, so it looks like a hydration bug. Kill both, `rm
+  -rf .next`, start one.
+- **`labelOf()` used to end in a bare `: 'Sphere'`.** Any new Feature kind
+  inherited it. Now exhaustive against `never` — a new kind will not compile
+  until it is named.
+
+## Still open, deliberately
+
+- **Construction (guide lines)** is the only genuine model wall left: an edge
+  excluded from the outline breaks the one-closed-polygon invariant that
+  `outlineOf`, `tessellate`, the solver and the codegen all assume. Refused,
+  not forgotten.
+- **No canvas drag handle for a bow.** It fits the existing one-axis
+  `HandleSpec` exactly (origin at the edge midpoint, axis the chord normal,
+  scale 1), but the bulge would have to become an emitted parameter rather than
+  a literal first.
+- **The `+` tool still always splits edge 1** while its new inverse is
+  per-corner. Asymmetric.
+
+## What to run
+
+```bash
+cd shCode && npx tsc --noEmit && npm test
+# and, with a dev server up, the five browser drivers:
+npm run dev &
+for f in scripts/drive-*.py; do python "$f"; done
+```
+
+---
+
 # Handoff — 2026-08-31 · stale gitignored generated bundles after a lesson pull
 
 A `git pull` that touched 14 lessons' `solution.js` files left `npm test` failing
