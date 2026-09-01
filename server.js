@@ -17,6 +17,28 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
+// Every lesson id is a directory name under lessons/, and all 519 of them are
+// [A-Za-z0-9_-]. No dots, so `..` cannot pass this at all -- which is the whole
+// traversal class, since a lesson id is the only thing these routes ever join
+// onto a path. The realpath comparison after it is defence in depth for the day
+// someone authors an id with a dot in it and widens the charset to match.
+//
+// Two routes join a client-supplied id onto a filesystem path (/api/grade and
+// /api/lesson-solution), and neither had any validation. Both go through here.
+const LESSON_ID = /^[A-Za-z0-9_-]+$/;
+
+async function resolveLessonDir(id) {
+  if (typeof id !== 'string' || !LESSON_ID.test(id)) return null;
+  const root = await fs.realpath(path.join(process.cwd(), 'lessons'));
+  let dir;
+  try {
+    dir = await fs.realpath(path.join(root, id));
+  } catch {
+    return null; // no such lesson
+  }
+  return dir === root || dir.startsWith(root + path.sep) ? dir : null;
+}
+
 // Extract the body of a named function by balancing braces. Returns just
 // the code between the opening { and matching closing }, or null if the
 // function isn't found. Used so requirements can scope a pattern match to
@@ -131,17 +153,26 @@ app.prepare().then(() => {
   // lesson stores its reference chart, so "no solution" in the browser meant
   // "not implemented in dev" rather than anything about the lesson.
   server.get('/api/lesson-solution/:id', async (req, res) => {
-    const id = decodeURIComponent(req.params.id);
-    const lessonDir = path.join(process.cwd(), 'lessons', id);
+    // NOT decodeURIComponent(req.params.id) -- Express has already decoded the
+    // param, so decoding again turns %252e%252e%252f into ../ and hands this
+    // route a traversal it cannot see. The Pages Functions convention in
+    // CLAUDE.md says always decode, and that is right THERE, because Pages
+    // does not decode for you. Express does.
+    const lessonDir = await resolveLessonDir(req.params.id);
+    if (!lessonDir) return res.status(404).json({ error: 'No solution for this lesson' });
 
     // Recurse so solution/ mirrors the generator, which keys every file by its
     // path relative to solution/ rather than by basename.
     const readDirForm = async (dir, prefix = '') => {
       const out = {};
       for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
+        // A symlink inside solution/ would read whatever it points at, which
+        // is the containment check in resolveLessonDir defeated from inside.
+        // No lesson uses one, so skip rather than resolve-and-compare.
+        if (entry.isSymbolicLink()) continue;
         const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
         if (entry.isDirectory()) Object.assign(out, await readDirForm(path.join(dir, entry.name), rel));
-        else out[rel] = await fs.readFile(path.join(dir, entry.name), 'utf8');
+        else if (entry.isFile()) out[rel] = await fs.readFile(path.join(dir, entry.name), 'utf8');
       }
       return out;
     };
@@ -174,7 +205,11 @@ app.prepare().then(() => {
   server.post('/api/grade', express.json(), async (req, res) => {
     const { lessonId, files } = req.body;
     try {
-      const lessonDir = path.join(process.cwd(), 'lessons', lessonId);
+      // Same traversal guard as /api/lesson-solution. lessonId arrives in a
+      // JSON body here rather than the path, which makes it MORE attacker-
+      // shaped, not less -- nothing upstream normalises it at all.
+      const lessonDir = await resolveLessonDir(lessonId);
+      if (!lessonDir) return res.status(404).json({ error: 'No such lesson' });
       const meta = JSON.parse(
         await fs.readFile(path.join(lessonDir, 'lesson.json'), 'utf8')
       );
