@@ -37,8 +37,9 @@ They are in the panel with the response box. Short answers throughout — a sent
 or two each, except the test cases, which are a table.
 
 Nothing in them is new. Part 2 is test cases from 1.5.40. Part 3 is `console.log`
-debugging from 1.5.41. Part 4 is the four framework activities from 1.1.6. Part 5 is
-the paradigm vocabulary from 1.4.8 plus the types from 1.2.18 and 1.2.23. Part 6 is
+debugging from 1.5.41. Part 4 is the four framework activities from 1.1.6. Part 5 lists
+the four paradigms from 1.4.8, 1.4.9, 1.4.15 and 1.4.18 and asks you to pick the one
+your program is, plus the types from 1.2.18, 1.2.23 and 1.2.27. Part 6 is
 the two comment lines already sitting in your `script.js`.
 
 The one section nothing below asks about is **1.3, documentation and conventions** — not
