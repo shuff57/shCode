@@ -28,6 +28,7 @@ import {
 
 import EditorPlaceholder from './diagram/EditorPlaceholder';
 import SolutionPanel from './SolutionPanel';
+import DiagramHintPanel from './DiagramHintPanel';
 
 // React Flow is a large chunk of the client bundle. Loading it lazily keeps it
 // out of the 270-odd lesson pages that have no diagram on them at all.
@@ -67,6 +68,8 @@ interface Props {
   config: DiagramConfig;
   /** Falls back to this when config.prompt is unset. */
   fallbackPrompt?: string;
+  /** Buckets the AI-hint quota, the same way the code tutor is bucketed. */
+  unit?: string | null;
 }
 
 function parseDoc(raw: string | null): DiagramDoc | null {
@@ -97,6 +100,7 @@ export default function DiagramAssignmentView({
   lessonTitle,
   config,
   fallbackPrompt,
+  unit,
 }: Props) {
   const starter = useMemo(
     () => (config.starter ? fromMermaid(config.starter) : emptyDiagram()),
@@ -376,6 +380,20 @@ export default function DiagramAssignmentView({
         <span style={{ color: '#666', fontSize: 12 }}>
           {doc.nodes.length} shapes · {doc.edges.length} arrows
         </span>
+      </div>
+
+      {/* Between the checker and the grader: the checker names a broken rule
+          but not the shape that fixes it, and the grader only speaks after
+          submit. This is the one place a student stuck mid-chart can ask. */}
+      <div style={{ marginTop: 12 }}>
+        <DiagramHintPanel
+          lessonTitle={lessonTitle}
+          unit={unit}
+          task={promptText}
+          doc={doc}
+          checks={checks}
+          authed={progress.authed}
+        />
       </div>
 
       {checks && (

@@ -220,6 +220,7 @@ export default function ContentLessonView({ lesson }: Props) {
           lessonTitle={lesson.title}
           config={meta.diagram}
           fallbackPrompt={contentMd.slice(0, 2000)}
+          unit={lesson.unit}
         />
       ) : meta.aiGrader ? (
         <WrittenGrader
