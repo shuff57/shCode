@@ -54,7 +54,9 @@
       "id": "shape",
       "name": "the representation",
       "covers": [],
-      "why": "DECIDED (build 1, panel-reviewed): SketchFeature gained two optional fields, additive to the existing points: Array<[number,number]> -- shape?: 'circle' (a tag, not an inference, read by circleOf()) and bulges?: Record<edge, number> (tan(includedAngle/4) on the edge leaving a corner, read by arcFromBulge()/tessellate() in lib/sketch-arc.ts). A sketch saved before this field existed has neither key and still loads, builds and renders exactly as before -- see scripts/check-sketch-compat.mjs. lib/sketch-solve.ts (the constraint relaxation solver) is UNCHANGED; both write-back paths already spread {...f, points}, so shape/bulges survive a solve untouched. Circle and Round a corner (fillet) ship on this. Arc, Rectangle and Polygon are unblocked by it but wait on chrome2d below, which is a different blocker"
+      "why": "DECIDED (build 1, panel-reviewed): SketchFeature gained two optional fields, additive to the existing points: Array<[number,number]> -- shape?: 'circle' (a tag, not an inference, read by circleOf()) and bulges?: Record<edge, number> (tan(includedAngle/4) on the edge leaving a corner, read by arcFromBulge()/tessellate() in lib/sketch-arc.ts). A sketch saved before this field existed has neither key and still loads, builds and renders exactly as before -- see scripts/check-sketch-compat.mjs. lib/sketch-solve.ts (the constraint relaxation solver) is UNCHANGED; both write-back paths already spread {...f, points}, so shape/bulges survive a solve untouched. Circle and Round a corner (fillet) ship on this. Arc, Rectangle and Polygon are unblocked by it but wait on chrome2d below, which is a different blocker",
+      "landed": "2026-09-01, retroactively. The decision itself is recorded in `why` and shipped with the circle/bulge fields: SketchFeature gained `shape?: 'circle'` (a tag, read by circleOf()) and `bulges?: Record<edge, number>` (read by arcFromBulge()/tessellate()), both optional, both invisible to a doc saved before them -- pinned by scripts/check-sketch-compat.mjs. It sat unmarked while every tool it unblocked shipped on top of it, which is the same bookkeeping gap that let Equal sit in `ships` with no control: the map, not the code, was behind.",
+      "note": "Round 7 found the consequence of leaving this unmarked: the queue believed Arc was blocked on a representation that had in fact been finished and shipping for months."
     },
     {
       "id": "rect",
@@ -100,30 +102,12 @@
       "note": "outlineOf() processes rounds/chamfers descending by design corner index, so a corner's ceiling only reflects a HIGHER-indexed neighbour's trim, never a lower-indexed one (that neighbour is processed AFTER it, too late to matter within the same pass) -- this is pre-existing, documented behaviour inherited unchanged from Round, not something chamfer2d introduced, but it cost real debugging time to rediscover live and is worth knowing before testing this area again. Separately, a request landing almost exactly on a corner's own un-reduced design ceiling can report the 'own limit' wording even when a neighbour is the tighter real constraint (the reported number is still correct, just the suggested remedy can be the less-relevant one) -- an existing quirk shared with Round, not a chamfer2d regression, left as-is."
     },
     {
-      "id": "construction",
-      "name": "Guide line",
-      "covers": [
-        "Construction"
-      ],
-      "why": "a line that positions other lines without becoming part of the outline -- the sketch equivalent of a variable"
-    },
-    {
       "id": "trim",
       "name": "Remove a corner",
       "covers": [],
       "why": "RECLASSIFIED 2026-09-01. Onshape's Trim removes the excess line past an intersection, and a closed polygon has no excess -- every edge ends exactly where the next begins, so that job does not exist here. Trim and Extend moved to outOfScope with that reason. What the re-examination DID turn up in the same place a student reaches is a real gap of a different shape: addCorner() has split an edge since the first sketch build and there has never been a way to take a corner back off. A + with no -.",
       "landed": "2026-09-01 gauntlet round 8. removeCorner/whyCannotRemoveCorner/whyRemovingCornerCosts in lib/sketch-arc.ts, and a 'Remove a corner:' row in SketchConstraints.tsx mirroring the Pin row, wired through dropSketchCorner() in ModelEditor.tsx. Removing corner k merges the two edges beside it, which is the part insertion never has to think about, so every key alongside is decided explicitly: rounds/chamfers ride their corner, bulges on BOTH merging edges are dropped (one edge cannot retrace two arcs), and any rule naming k or either merging edge is dropped rather than remapped onto an edge it was not written about. The cost is counted and shown in the button's tooltip BEFORE the click, and said out loud after. Floor of three corners, refused with a sentence. The round-trip is measured on the outline, not on the indices: splitEdge then removeCorner restores the tessellated area exactly, on three different edges including the wrap-around. Verified live: panel, edge table, pair grid, Dimensions list and canvas all drop to three together, and every Remove button then disables itself and says why.",
       "note": "No canvas affordance -- removal is a panel verb, like Pin. The '+' tool on the toolbar still always splits edge 1, which is the asymmetry that remains: the inverse is per-corner and the forward direction is not."
-    },
-    {
-      "id": "mirror2d",
-      "name": "Mirror",
-      "covers": [
-        "Sketch Mirror",
-        "Linear Sketch Pattern",
-        "Circular Sketch Pattern"
-      ],
-      "why": "symmetry and repetition inside the sketch, where they cost one line of code instead of a boolean"
     },
     {
       "id": "constraints",
@@ -140,7 +124,8 @@
       "id": "chrome2d",
       "name": "the bar itself",
       "covers": [],
-      "why": "CORRECTED: the bar already exists -- ModelEditor.tsx's .model-tools has grouped buttons, a FlyoutButton that collapses variants under a caret (the same drop-down pattern Onshape's own tools.htm describes), and a search box with matches() filtering, same as the feature toolbar. The Sketch group is the first group on it and now has three buttons (Sketch, Circle, Corner). What is genuinely missing: a click-to-draw SURFACE. The sketch editing surface is a 3D-projected drag overlay (HandleOverlay.tsx) over the preview iframe -- corners are dragged, not placed by clicking empty sketch-plane space -- so Rectangle, Arc and Polygon above are blocked here, on interaction, not on the representation panel this item used to gate them on"
+      "why": "CORRECTED: the bar already exists -- ModelEditor.tsx's .model-tools has grouped buttons, a FlyoutButton that collapses variants under a caret (the same drop-down pattern Onshape's own tools.htm describes), and a search box with matches() filtering, same as the feature toolbar. The Sketch group is the first group on it and now has three buttons (Sketch, Circle, Corner). What is genuinely missing: a click-to-draw SURFACE. The sketch editing surface is a 3D-projected drag overlay (HandleOverlay.tsx) over the preview iframe -- corners are dragged, not placed by clicking empty sketch-plane space -- so Rectangle, Arc and Polygon above are blocked here, on interaction, not on the representation panel this item used to gate them on",
+      "landed": "2026-09-01. The bar itself was never missing (see `why`); what was, was a click-to-draw SURFACE, and it shipped in three pieces on 2026-08-28: planeAnchor() giving the plane a screen-projectable origin even with zero corners, then Corner Rectangle, then Inscribed Polygon, both placed by clicking empty sketch-plane space through HandleOverlay's click-catcher. Marked now rather than then because Arc was still listed as blocked on it. Round 7 established that it never was: an arc's endpoints are corners that already exist, so it needs no placement surface at all."
     }
   ],
   "outOfScope": [
@@ -228,6 +213,22 @@
         "Extend"
       ],
       "why": "the closed-polygon model, not a solver limit. Trim cuts a line back to where it crosses another and Extend runs it forward to meet one; both need loose ends, and a SketchFeature has none -- every edge already ends exactly on the next corner. The forgiving-drawing job they do in Onshape is done here by moving a corner, or by removing one (the 'Remove a corner' build item, which is what this queue entry became)."
+    },
+    {
+      "group": "construction",
+      "tools": [
+        "Construction"
+      ],
+      "why": "the one-closed-polygon invariant, and unlike Arc nothing in the tree half-implements it. A guide line is an edge deliberately EXCLUDED from the outline, and outlineOf(), tessellate(), the solver and the codegen every one of them assume the point list IS the outline -- a non-solid edge would need each to learn a second kind of edge. Design pass 2026-09-01 re-examined this against the evidence that freed Arc and found none of it applies: there is no dormant representation waiting for a writer here. Revisit only if a lesson actually needs a guide line, and then as a model change, not a tool."
+    },
+    {
+      "group": "mirror2d",
+      "tools": [
+        "Sketch Mirror",
+        "Linear Sketch Pattern",
+        "Circular Sketch Pattern"
+      ],
+      "why": "Onshape's Sketch Mirror reflects selected entities about a CONSTRUCTION line, so it inherits that item's wall directly. Mirroring the whole outline about the plane's own axis is expressible on the design points, but the feature toolbar's Mirror already ships and does exactly that job one step later, on the solid -- and this course's own rule is that a second way to do a thing the student can already do teaches that there are two things. Linear and Circular Sketch Pattern are the same argument against the shipped Pattern feature."
     }
   ]
 }

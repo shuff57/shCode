@@ -93,7 +93,9 @@
       "covers": [
         "Plane"
       ],
-      "label": "Plane"
+      "label": "Plane",
+      "landed": "2026-09-01 gauntlet round 9. The third instance of the same shape as Arc and the bulge writer: newSketch(doc, plane) has always taken a plane, SketchFeature has always carried one, extrudeOnPlane() has always built on all three, and model-codegen-assertions.cjs has pinned xz and yz since the first sketch build -- and the single caller passed nothing, so every sketch in the app was born on xy and could never leave. What landed is a 'Sits on:' row at the top of the Rules panel (Ground / Front / Side, with the real xy/xz/yz name in each tooltip, the same bargain the Mirror flyout already strikes) wired through setSketchPlane() in ModelEditor.tsx. Moving a sketch does not touch its own coordinates, so the outline, rules, rounds, chamfers and bows all come with it. Verified live including that the shape really reorients in space rather than only in the panel.",
+      "note": "It also closed a hole found while building it: SketchConstraints was mounted only for non-circle sketches, so a circle got no panel and therefore no way to leave the ground. A circle now reaches the panel and gets the plane row ALONE -- it has no edges to rule and no corners to pin. Onshape's Plane feature creates a free datum plane at an arbitrary angle; that is not this. Ours is the three principal planes plus the offset slider the Dimensions panel already had, which is what a sketch here can actually sit on."
     },
     {
       "id": "sketch",
@@ -102,7 +104,8 @@
       "why": "our sketch is drag-the-corners polygon only; this is the widest single gap to the bar",
       "covers": [],
       "label": "Sketch Tools (line, rectangle, circle, arc, spline, point, construction, trim, offset, dimension)",
-      "coversNote": "the Sketch toolbar is a separate bar (Sketch/sketch_tools.htm), not the feature toolbar"
+      "coversNote": "the Sketch toolbar is a separate bar (Sketch/sketch_tools.htm), not the feature toolbar",
+      "landed": "2026-09-01 gauntlet round 9, by the sketch toolbar closing. This entry was the umbrella for the whole separate Sketch bar (see .gauntlet/parity-sketch.json), which now reads 8 shipped, 8 build items all landed, 35 refused with a reason, every one of its 52 tools accounted for exactly once. Line, Rectangle, Circle, Polygon, Arc (as a bow on an edge), Trim (reclassified to Remove a corner), Construction and Mirror are each either built or refused with the model reason."
     },
     {
       "id": "chrome",

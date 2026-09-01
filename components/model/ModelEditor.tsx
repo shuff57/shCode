@@ -654,6 +654,25 @@ export default function ModelEditor({
     say(clamped);
   }
 
+  function setSketchPlane(f: Extract<Feature, { kind: 'sketch' }>, plane: SketchPlane) {
+    if (f.plane === plane) return;
+    // A plain field write. The plane has always been part of the feature and
+    // the codegen has always honoured it -- extrudeOnPlane() builds on all
+    // three and the codegen tests pin xz and yz -- but newSketch()'s plane
+    // argument had exactly one caller passing nothing, so every sketch in the
+    // app was born on xy and could never leave. Same shape of gap as the
+    // bulge writer: a finished pipeline with nothing at the top of it.
+    //
+    // The sketch's own coordinates do not change, so the outline, the rules,
+    // the rounds and the corners all come with it -- the shape stands up on
+    // a different wall rather than being redrawn.
+    onChange({
+      ...doc,
+      features: doc.features.map((x) => (x.id === f.id ? { ...x, plane } : x)),
+    });
+    say(null);
+  }
+
   function dropSketchCorner(f: Extract<Feature, { kind: 'sketch' }>, corner: number) {
     const why = whyCannotRemoveCorner(f, corner);
     if (why) { say(why); return; }
@@ -1481,7 +1500,11 @@ export default function ModelEditor({
         </ol>
       )}
 
-      {activeSketch && activeSketch.shape !== 'circle' && (
+      {/* A circle reaches the panel too now. It gets the plane row alone --
+          it has no edges to rule and no corners to pin -- but before this the
+          whole panel was skipped for it, so a circle was born on the ground
+          and could never stand up. */}
+      {activeSketch && (
         <SketchConstraints
           points={activeSketch.points}
           bulges={activeSketch.bulges}
@@ -1493,6 +1516,9 @@ export default function ModelEditor({
           onChamfer={(corner, distance) => chamferSketchCorner(activeSketch, corner, distance)}
           onBow={(edge, bow) => bowSketchEdge(activeSketch, edge, bow)}
           onRemoveCorner={(corner) => dropSketchCorner(activeSketch, corner)}
+          plane={activeSketch.plane}
+          shape={activeSketch.shape}
+          onPlane={(plane) => setSketchPlane(activeSketch, plane)}
         />
       )}
 

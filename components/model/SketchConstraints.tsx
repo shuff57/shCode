@@ -73,6 +73,18 @@ interface Props {
   /** Remove design corner `corner`, joining the two edges beside it. The
    *  caller owns the write and the refusal, same as every other row here. */
   onRemoveCorner: (corner: number) => void;
+  /** Which of the three planes this sketch sits on. 'xy' is the ground.
+   *  Passed through only so the row below can show which one is current --
+   *  nothing here reads it as geometry. */
+  plane: 'xy' | 'xz' | 'yz';
+  /** 'circle' when this sketch is a circle. The panel then shows ONLY the
+   *  plane row: a circle has no edges to rule, no corners to pin and no
+   *  corners to remove, but it sits on a plane like any other sketch and
+   *  used to have no way to leave the ground because the whole panel was
+   *  skipped for it. */
+  shape?: 'circle';
+  /** Move the whole sketch onto another plane. The caller owns the write. */
+  onPlane: (plane: 'xy' | 'xz' | 'yz') => void;
 }
 
 function has(cs: Constraint[], kind: Constraint['kind'], edge: number) {
@@ -111,7 +123,95 @@ function cyclePair(cs: Constraint[], a: number, b: number): Constraint[] {
   return next === undefined ? rest : [...rest, { kind: next, edge: lo, other: hi }];
 }
 
-export default function SketchConstraints({ points, bulges, rounds, chamfers, constraints, onChange, onRound, onChamfer, onBow, onRemoveCorner }: Props) {
+const PANEL_CSS = `
+        .sk-rules { border-top: 1px solid var(--border); padding: 8px 10px; font-size: 12px; }
+        .sk-rules-head {
+          display: flex; justify-content: space-between; align-items: baseline;
+          font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+          color: #6272a4; margin-bottom: 6px;
+        }
+        .sk-rules-warn { color: #ffb86c; text-transform: none; letter-spacing: 0; }
+        .sk-rules-note {
+          margin: 0 0 8px; padding: 6px 8px; font-size: 11px; line-height: 1.45;
+          color: #ffb86c; background-color: #3a2f22; border-left: 2px solid #ffb86c;
+        }
+        .sk-table { width: 100%; border-collapse: collapse; }
+        .sk-table th {
+          text-align: left; font-weight: normal; color: #6272a4;
+          font-size: 11px; padding: 2px 4px;
+        }
+        .sk-table td { padding: 2px 4px; color: var(--text); }
+        .sk-shape { color: #6272a4; font-size: 11px; }
+        .sk-table button, .sk-pins button, .sk-drops button, .sk-planes button {
+          min-width: 24px; padding: 2px 6px; font-size: 12px;
+          background: transparent; color: #6272a4;
+          border: 1px solid #44475a; border-radius: 3px; cursor: pointer;
+        }
+        /* A removal that costs something is marked, not blocked -- amber is
+           already this app's "read the tooltip" colour on the radius handle. */
+        .sk-drops button.costly { border-color: #ffb86c; color: #ffb86c; }
+        .sk-drops button:disabled { opacity: 0.4; cursor: not-allowed; }
+        /* Wider than the numbered buttons beside it -- these carry words. */
+        .sk-planes button { width: auto; padding: 0 8px; }
+        .sk-planes button.on { background: #44475a; color: #f8f8f2; border-color: #bd93f9; }
+        .sk-planes { margin-top: 0; margin-bottom: 8px; }
+        .sk-table button.on, .sk-pins button.on {
+          background: #bd93f9; color: #282a36; border-color: #bd93f9;
+        }
+        .sk-table input {
+          width: 62px; background: var(--bg); color: var(--text);
+          border: 1px solid var(--border); border-radius: 3px;
+          padding: 2px 5px; font-size: 12px; font-variant-numeric: tabular-nums;
+        }
+        /* A rule that is losing the argument. Onshape red-boxes exactly the
+           conflicting constraint glyphs and leaves the innocent ones alone,
+           which is what makes "remove one" actionable; this is that, in the
+           panel. Deliberately a BORDER and not a fill: .on already owns the
+           fill, so "this rule is set" and "this rule is losing" stay two
+           separate readings of the same control rather than one overwriting
+           the other.
+           NB: no backticks in here -- this block is a template literal, and a
+           backtick in a CSS comment closes it. That is a syntax error 40 lines
+           later with a message about a property that does not exist. */
+        .sk-table button.fighting,
+        .sk-table input.fighting,
+        .sk-pairs-grid td button.fighting {
+          border-color: #ff5555;
+          box-shadow: 0 0 0 1px #ff5555;
+        }
+        /* Unset controls also take the red text; a set one keeps the dark text
+           its purple fill needs for contrast. */
+        .sk-table button.fighting:not(.on),
+        .sk-table input.fighting,
+        .sk-pairs-grid td button.fighting:not(.on) { color: #ff5555; }
+        .sk-table button:disabled { opacity: 0.35; cursor: not-allowed; }
+        .sk-table input:disabled { opacity: 0.35; cursor: not-allowed; }
+        .sk-pins, .sk-rounds, .sk-chamfers, .sk-bows, .sk-drops, .sk-planes { display: flex; align-items: center; gap: 4px; margin-top: 8px; color: #6272a4; }
+        .sk-rounds input, .sk-chamfers input, .sk-bows input {
+          width: 42px; background: var(--bg); color: var(--text);
+          border: 1px solid #44475a; border-radius: 3px;
+          padding: 2px 5px; font-size: 12px; font-variant-numeric: tabular-nums;
+        }
+        .sk-pairs { margin-top: 8px; }
+        .sk-pairs-head { font-size: 11px; color: #6272a4; margin-bottom: 3px; }
+        .sk-pairs-grid { border-collapse: collapse; }
+        .sk-pairs-grid th {
+          font-weight: normal; color: #6272a4; font-size: 11px;
+          min-width: 24px; padding: 1px 3px; text-align: center;
+        }
+        .sk-pairs-grid td button {
+          width: 24px; height: 20px; min-width: 24px; padding: 0;
+          font-size: 12px; line-height: 1;
+          background: transparent; color: #6272a4;
+          border: 1px solid #44475a; border-radius: 3px; cursor: pointer;
+        }
+        .sk-pairs-grid td button.on {
+          background: #bd93f9; color: #282a36; border-color: #bd93f9;
+        }
+        .sk-pairs-grid td button:disabled { opacity: 0.35; cursor: not-allowed; }
+      `;
+
+export default function SketchConstraints({ points, bulges, rounds, chamfers, constraints, onChange, onRound, onChamfer, onBow, onRemoveCorner, plane, onPlane, shape }: Props) {
   const count = points.length;
   const residual = residualOf(points, constraints);
   const fighting = residual > 1e-3;
@@ -169,6 +269,46 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
     );
   }
 
+  // Named for where the sketch SITS, not for its axis letters, with the real
+  // name in the tooltip -- the same bargain the Mirror flyout in ModelEditor
+  // already strikes ("Mirror left to right (the real name: the yz plane)").
+  // A student who never needs "xz" never has to learn it, and one reading a
+  // reSHape example can still map the two.
+  const planeRow = (
+    <div className="sk-planes">
+      <span>Sits on:</span>
+      {([
+        ['xy', 'Ground', 'Flat on the ground, seen from above (the real name: the xy plane)'],
+        ['xz', 'Front', 'Standing up facing you (the real name: the xz plane)'],
+        ['yz', 'Side', 'Standing up facing sideways (the real name: the yz plane)'],
+      ] as const).map(([id, label, why]) => (
+        <button
+          key={id}
+          aria-label={`Sit the sketch on the ${label} plane`}
+          aria-pressed={plane === id}
+          className={plane === id ? 'on' : undefined}
+          title={why}
+          onClick={() => onPlane(id)}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+
+  // A circle gets the plane row and nothing else. Everything below it is
+  // about edges and corners, and a circle has neither -- its two points are
+  // the ends of a diameter.
+  if (shape === 'circle') {
+    return (
+      <div className="sk-rules">
+        <div className="sk-rules-head"><span>Rules</span></div>
+        {planeRow}
+        <style>{PANEL_CSS}</style>
+      </div>
+    );
+  }
+
   return (
     <div className="sk-rules">
       <div className="sk-rules-head">
@@ -205,6 +345,8 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
           )}
         </p>
       )}
+
+      {planeRow}
 
       <table className="sk-table">
         <thead>
@@ -531,89 +673,7 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
         })}
       </div>
 
-      <style>{`
-        .sk-rules { border-top: 1px solid var(--border); padding: 8px 10px; font-size: 12px; }
-        .sk-rules-head {
-          display: flex; justify-content: space-between; align-items: baseline;
-          font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
-          color: #6272a4; margin-bottom: 6px;
-        }
-        .sk-rules-warn { color: #ffb86c; text-transform: none; letter-spacing: 0; }
-        .sk-rules-note {
-          margin: 0 0 8px; padding: 6px 8px; font-size: 11px; line-height: 1.45;
-          color: #ffb86c; background-color: #3a2f22; border-left: 2px solid #ffb86c;
-        }
-        .sk-table { width: 100%; border-collapse: collapse; }
-        .sk-table th {
-          text-align: left; font-weight: normal; color: #6272a4;
-          font-size: 11px; padding: 2px 4px;
-        }
-        .sk-table td { padding: 2px 4px; color: var(--text); }
-        .sk-shape { color: #6272a4; font-size: 11px; }
-        .sk-table button, .sk-pins button, .sk-drops button {
-          min-width: 24px; padding: 2px 6px; font-size: 12px;
-          background: transparent; color: #6272a4;
-          border: 1px solid #44475a; border-radius: 3px; cursor: pointer;
-        }
-        /* A removal that costs something is marked, not blocked -- amber is
-           already this app's "read the tooltip" colour on the radius handle. */
-        .sk-drops button.costly { border-color: #ffb86c; color: #ffb86c; }
-        .sk-drops button:disabled { opacity: 0.4; cursor: not-allowed; }
-        .sk-table button.on, .sk-pins button.on {
-          background: #bd93f9; color: #282a36; border-color: #bd93f9;
-        }
-        .sk-table input {
-          width: 62px; background: var(--bg); color: var(--text);
-          border: 1px solid var(--border); border-radius: 3px;
-          padding: 2px 5px; font-size: 12px; font-variant-numeric: tabular-nums;
-        }
-        /* A rule that is losing the argument. Onshape red-boxes exactly the
-           conflicting constraint glyphs and leaves the innocent ones alone,
-           which is what makes "remove one" actionable; this is that, in the
-           panel. Deliberately a BORDER and not a fill: .on already owns the
-           fill, so "this rule is set" and "this rule is losing" stay two
-           separate readings of the same control rather than one overwriting
-           the other.
-           NB: no backticks in here -- this block is a template literal, and a
-           backtick in a CSS comment closes it. That is a syntax error 40 lines
-           later with a message about a property that does not exist. */
-        .sk-table button.fighting,
-        .sk-table input.fighting,
-        .sk-pairs-grid td button.fighting {
-          border-color: #ff5555;
-          box-shadow: 0 0 0 1px #ff5555;
-        }
-        /* Unset controls also take the red text; a set one keeps the dark text
-           its purple fill needs for contrast. */
-        .sk-table button.fighting:not(.on),
-        .sk-table input.fighting,
-        .sk-pairs-grid td button.fighting:not(.on) { color: #ff5555; }
-        .sk-table button:disabled { opacity: 0.35; cursor: not-allowed; }
-        .sk-table input:disabled { opacity: 0.35; cursor: not-allowed; }
-        .sk-pins, .sk-rounds, .sk-chamfers, .sk-bows, .sk-drops { display: flex; align-items: center; gap: 4px; margin-top: 8px; color: #6272a4; }
-        .sk-rounds input, .sk-chamfers input, .sk-bows input {
-          width: 42px; background: var(--bg); color: var(--text);
-          border: 1px solid #44475a; border-radius: 3px;
-          padding: 2px 5px; font-size: 12px; font-variant-numeric: tabular-nums;
-        }
-        .sk-pairs { margin-top: 8px; }
-        .sk-pairs-head { font-size: 11px; color: #6272a4; margin-bottom: 3px; }
-        .sk-pairs-grid { border-collapse: collapse; }
-        .sk-pairs-grid th {
-          font-weight: normal; color: #6272a4; font-size: 11px;
-          min-width: 24px; padding: 1px 3px; text-align: center;
-        }
-        .sk-pairs-grid td button {
-          width: 24px; height: 20px; min-width: 24px; padding: 0;
-          font-size: 12px; line-height: 1;
-          background: transparent; color: #6272a4;
-          border: 1px solid #44475a; border-radius: 3px; cursor: pointer;
-        }
-        .sk-pairs-grid td button.on {
-          background: #bd93f9; color: #282a36; border-color: #bd93f9;
-        }
-        .sk-pairs-grid td button:disabled { opacity: 0.35; cursor: not-allowed; }
-      `}</style>
+      <style>{PANEL_CSS}</style>
     </div>
   );
 }
