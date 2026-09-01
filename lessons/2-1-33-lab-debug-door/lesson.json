@@ -31,7 +31,7 @@
       "description": "if statement condition combines isAlive and hasKey with && (either order)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*(isAlive\\s*&&\\s*hasKey|hasKey\\s*&&\\s*isAlive)\\s*\\)",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*(isAlive\\s*&&\\s*hasKey|hasKey\\s*&&\\s*isAlive)\\s*\\)?\\s*\\)",
       "flags": "i",
       "points": 0
     }

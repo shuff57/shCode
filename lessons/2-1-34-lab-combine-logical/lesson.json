@@ -51,7 +51,7 @@
       "description": "if condition uses !",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^{]*!\\s*\\w",
+      "pattern": "if\\s*\\([^{]*!\\s*\\(?\\s*\\w",
       "flags": "i",
       "points": 0
     },
@@ -61,7 +61,7 @@
       "description": "A single if condition uses &&, || and ! together, not three separate ifs",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\((?=[^{]*&&)(?=[^{]*\\|\\|)(?=[^{]*!\\s*\\w)[^{]*\\{",
+      "pattern": "if\\s*\\((?=[^{]*&&)(?=[^{]*\\|\\|)(?=[^{]*!\\s*\\(?\\s*\\w)[^{]*\\{",
       "points": 0
     }
   ],

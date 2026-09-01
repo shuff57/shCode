@@ -31,7 +31,7 @@
       "description": "if statement condition uses the ! operator",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*!\\s*\\w",
+      "pattern": "if\\s*\\(\\s*!\\s*\\(?\\s*\\w",
       "flags": "i",
       "points": 0
     },

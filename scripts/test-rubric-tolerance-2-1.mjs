@@ -40,6 +40,7 @@ const LAB = {
   guardAnd: '2-1-12-lab-guard-and',
   branchOr: '2-1-13-lab-branch-or',
   door:     '2-1-33-lab-debug-door',
+  flipNot:  '2-1-31-lab-flip-not',
   combine:  '2-1-34-lab-combine-logical',
   advisor:  '2-1-38-a2-1-1-grade-advisor',
 };
@@ -95,6 +96,19 @@ check(LAB.branchOr, 'let instead of const, no semicolons',
   'let a = 1\nlet b = 2\nif (a > 0 || b > 0) { console.log("yes") }', 'ALL');
 check(LAB.advisor, 'reference shape with two separate ifs',
   readFileSync(path.join('lessons', byNum[LAB.advisor].dir, 'solution.js'), 'utf8'), 'ALL');
+
+// Clarifying parentheses. 2.1.36's reading names these in its own glossary and
+// tells the student "Keep the parentheses anyway" -- and three graders in this
+// unit then refused them, requiring `!` and the operands to be followed
+// directly by a word character.
+check(LAB.flipNot, 'clarifying parens: !(isRaining)',
+  ['const isRaining = false;', 'if (!(isRaining)) { console.log("walk"); }'].join('\n'), 'ALL');
+check(LAB.door, 'whole condition wrapped: ((hasKey && isAlive))',
+  ['const isAlive = true;', 'const hasKey = false;',
+   'if ((hasKey && isAlive)) { console.log("open"); }'].join('\n'), 'ALL');
+check(LAB.combine, 'parens around the negated operand',
+  ['const a = 1, b = 2, isBlocked = false;',
+   'if (a > 0 && !(isBlocked) && (b < 5 || b > 9)) { console.log("in"); }'].join('\n'), 'ALL');
 
 console.log('\nMUST FAIL — the gaming answers');
 check(LAB.guardAnd, 'if(true&&true){}', 'if(true&&true){}', 'NOT_ALL');
