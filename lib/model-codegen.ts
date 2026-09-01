@@ -642,6 +642,22 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
     throw new Error('pattern features are emitted by patternLines(), not featureExpr()');
   }
 
+  if (f.kind === 'blend') {
+    needs.add('blendOnPlane');
+    // The two sketches are looked up rather than referenced by variable: a
+    // blend needs their CORNER LISTS, not the geom2s they build into, and it
+    // needs them as parameters so dragging a corner still reshapes the solid.
+    // Same reason roundPoly() takes corners rather than a built outline.
+    const [lo, hi] = f.targets.map((id) => byId.get(id));
+    if (!lo || lo.kind !== 'sketch' || !hi || hi.kind !== 'sketch') {
+      throw new Error(`blend ${f.id} does not name two sketches`);
+    }
+    const list = (sk: Extract<Feature, { kind: 'sketch' }>) => '[' + sk.points
+      .map((_: unknown, n: number) => `[p.${pname(sk.id, `p${n}u`)}, p.${pname(sk.id, `p${n}v`)}]`)
+      .join(', ') + ']';
+    return `blendOnPlane(${list(lo)}, ${list(hi)}, p.${pname(hi.id, 'offset')} - p.${pname(lo.id, 'offset')}, '${lo.plane}', p.${pname(lo.id, 'offset')})`;
+  }
+
   const args = f.targets.join(', ');
   return `booleans.${f.op}(${args})`;
 }
@@ -838,6 +854,69 @@ function chamferBox(size, center, c) {
 // outline first is not possible -- a geom2 has no third axis to turn into.
 function extrudeOnPlane(sketch, height, plane, offset) {
   const solid = extrudeLinear(height, sketch)
+  if (plane === 'xz') return transforms.translate([0, offset, 0], transforms.rotateX(Math.PI / 2, solid))
+  if (plane === 'yz') return transforms.translate([offset, 0, 0], transforms.rotateY(-Math.PI / 2, solid))
+  return transforms.translate([0, 0, offset], solid)
+}`,
+  blendOnPlane: `// Skin two flat outlines into one tapered solid -- a loft.
+//
+// extrudeFromSlices stacks cross-sections and skins between them, and two
+// slices is the smallest real one. The catch is that the two outlines rarely
+// have the same number of corners -- blending a rectangle to a hexagon is 4
+// against 6 -- and a skin needs to know which point on the bottom joins which
+// point on the top. So both are RESAMPLED to the same count first, at equal
+// fractions of their own perimeter.
+//
+// Winding is normalised too. Two outlines drawn in opposite directions skin
+// into a bow tie: every joining line crosses the one before it. Signed area
+// says which way each one runs, and a negative one is reversed.
+//
+// Both outlines start their walk at their own first corner, so a shape
+// rotated relative to the other blends with a twist. That is predictable
+// rather than clever, which is the right trade here -- untwisting means
+// searching for the best alignment, and a student cannot see why it chose.
+//
+// Built flat on XY and turned afterwards, exactly as extrudeOnPlane does and
+// for the same reason: the plane maths is worth keeping in one shape.
+function blendOnPlane(bottom, top, gap, plane, offset) {
+  const count = Math.max(bottom.length, top.length)
+  const ring = function (pts) {
+    const n = pts.length
+    let area = 0
+    const seg = []
+    let total = 0
+    for (let i = 0; i < n; i++) {
+      const a = pts[i]
+      const b = pts[(i + 1) % n]
+      area += a[0] * b[1] - b[0] * a[1]
+      const d = Math.hypot(b[0] - a[0], b[1] - a[1])
+      seg.push(d)
+      total += d
+    }
+    const walk = area < 0 ? pts.slice().reverse() : pts
+    const lens = area < 0 ? seg.slice().reverse() : seg
+    const out = []
+    for (let k = 0; k < count; k++) {
+      let want = (k / count) * total
+      let i = 0
+      while (i < n - 1 && want > lens[i]) { want -= lens[i]; i++ }
+      const a = walk[i]
+      const b = walk[(i + 1) % n]
+      const t = lens[i] > 0 ? want / lens[i] : 0
+      out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t])
+    }
+    return out
+  }
+  const A = ring(bottom)
+  const B = ring(top)
+  const solid = extrusions.extrudeFromSlices({
+    numberOfSlices: 2,
+    callback: function (progress) {
+      const src = progress < 0.5 ? A : B
+      const z = progress * gap
+      return extrusions.slice.fromPoints(src.map(function (q) { return [q[0], q[1], z] }))
+    }
+  }, polygon(A))
   if (plane === 'xz') return transforms.translate([0, offset, 0], transforms.rotateX(Math.PI / 2, solid))
   if (plane === 'yz') return transforms.translate([offset, 0, 0], transforms.rotateY(-Math.PI / 2, solid))
   return transforms.translate([0, 0, offset], solid)
@@ -1054,6 +1133,13 @@ export function toReshape(doc: ModelDoc): string {
   const modules = ['primitives', 'booleans'];
   if (needs.has('chamferCylinder')) modules.push('hulls');
   if (needs.has('extrudeOnPlane')) modules.push('extrusions', 'transforms');
+  // blendOnPlane reuses extrudeOnPlane's plane maths but is reached on its
+  // own, so it has to ask for the same two modules rather than rely on an
+  // extrude happening to be in the same document.
+  if (needs.has('blendOnPlane')) {
+    if (!modules.includes('extrusions')) modules.push('extrusions');
+    if (!modules.includes('transforms')) modules.push('transforms');
+  }
   if (
     (needs.has('shellOp') || needs.has('mirrorThroughFace') || needs.has('centerOf'))
     && !modules.includes('measurements')

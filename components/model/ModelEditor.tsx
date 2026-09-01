@@ -47,6 +47,7 @@ import {
   ChevronRight,
   Search,
   Disc3,
+  Layers,
   FlipHorizontal2,
   FlipHorizontal,
   FlipVertical2,
@@ -91,12 +92,14 @@ import {
   newExtrude,
   newHole,
   newHoleCorners,
+  newBlend,
   newMirror,
   newPattern,
   newRevolve,
   newShape,
   newShell,
   newSketch,
+  whyCannotBlend,
   newMove,
   nextId,
   type ShapeKind,
@@ -432,6 +435,24 @@ export default function ModelEditor({
     setLastShape(kind);
     setMenu(null);
     say(null);
+  }
+
+  function blend() {
+    if (chosen.length !== 2) {
+      say('Blend joins exactly two sketches. Click one, then hold Shift (or Ctrl, or Cmd) and click the other.');
+      return;
+    }
+    const [a, b] = chosen;
+    // Every refusal names what to do about it. A blend that quietly did
+    // nothing, or picked one of two disagreeing planes, is worse than one
+    // that says why it will not -- the two sketches look identical on the
+    // canvas whether or not they can be blended.
+    const why = whyCannotBlend(a, b);
+    if (why) { say(why); return; }
+    const f = newBlend(doc, a as Extract<Feature, { kind: 'sketch' }>, b as Extract<Feature, { kind: 'sketch' }>);
+    onChange({ ...doc, features: [...doc.features, f] });
+    setSelected([f.id]);
+    say('The two outlines are skinned together. Slide either sketch along its plane to change the taper.');
   }
 
   function combine(op: BoolOp) {
@@ -1066,6 +1087,15 @@ export default function ModelEditor({
                   title="Spin the selected sketch around to make a solid"
                 >
                   <Disc3 size={14} /> Spin
+                </button>
+              )}
+              {matches('Blend') && (
+                <button
+                  onClick={blend}
+                  disabled={chosen.length !== 2 || chosen.some((c) => c.kind !== 'sketch')}
+                  title="Skin two sketches together into one tapered solid"
+                >
+                  <Layers size={14} /> Blend
                 </button>
               )}
             </div>

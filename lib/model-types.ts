@@ -163,6 +163,29 @@ export interface ExtrudeFeature {
   height: number;
 }
 
+/**
+ * Two flat outlines skinned into one tapered solid -- Onshape calls it Loft.
+ *
+ * It takes no numbers of its own, deliberately. The two sketches already say
+ * everything a blend needs: which plane they sit on and how far along it they
+ * are, so the gap between them IS the difference in their offsets and the
+ * solid starts at the lower one. A `height` field here would be a third
+ * number that could disagree with the two that were already true, and the
+ * student would have no way to tell which one the shape obeyed.
+ *
+ * Both sketches must sit on the SAME plane at DIFFERENT offsets. Anything
+ * else is refused with a sentence rather than guessed at -- see
+ * whyCannotBlend().
+ */
+export interface BlendFeature {
+  id: string;
+  kind: 'blend';
+  name?: string;
+  /** Exactly two sketch ids, bottom first. Plural so dependsOn() picks it up
+   *  without being taught the kind -- see the note on that function. */
+  targets: string[];
+}
+
 export interface CombineFeature {
   id: string;
   kind: 'combine';
@@ -299,6 +322,7 @@ export type Feature =
   | BoxFeature | CylinderFeature | SphereFeature
   | ConeFeature | TorusFeature
   | SketchFeature | ExtrudeFeature | CombineFeature
+  | BlendFeature
   | RevolveFeature | MirrorFeature | PatternFeature
   | HoleFeature | ShellFeature | MoveFeature;
 
@@ -580,6 +604,35 @@ export function newRevolve(doc: ModelDoc, target: string): RevolveFeature {
 // refuses to complete the feature without one, precisely because there is no
 // plane that is silently "probably right." A caller that has not asked the
 // student which way to flip has no business creating this feature yet.
+/**
+ * Why these two features cannot be blended, in a sentence, or null when they
+ * can. Every refusal names what to do about it -- a blend that silently did
+ * nothing, or quietly picked one of two disagreeing planes, is worse than one
+ * that says why it will not.
+ */
+export function whyCannotBlend(a: Feature, b: Feature): string | null {
+  if (a.kind !== 'sketch' || b.kind !== 'sketch') {
+    return "Blend joins two flat outlines. Pick two sketches -- a solid has no outline to skin from.";
+  }
+  if (a.plane !== b.plane) {
+    return "Those two sketches sit on different planes, so there is no single direction to blend along. Put both on the same one first.";
+  }
+  if (a.offset === b.offset) {
+    return "Both sketches sit at the same offset, so there is no gap to fill. Slide one of them along its plane first.";
+  }
+  if (a.points.length < 3 || b.points.length < 3) {
+    return "A blend needs two real outlines, and one of these has fewer than three corners.";
+  }
+  return null;
+}
+
+/** Bottom-first: the sketch with the smaller offset leads, so the generated
+ *  gap is always positive and the solid always starts at the lower one. */
+export function newBlend(doc: ModelDoc, a: SketchFeature, b: SketchFeature): BlendFeature {
+  const [lo, hi] = a.offset <= b.offset ? [a, b] : [b, a];
+  return { id: nextId(doc, 'bl'), kind: 'blend', targets: [lo.id, hi.id] };
+}
+
 export function newMirror(
   doc: ModelDoc, target: string, plane: SketchPlane
 ): MirrorFeature {
@@ -678,7 +731,23 @@ function labelOf(f: Feature): string {
     : f.kind === 'cylinder' ? 'Cylinder'
     : f.kind === 'cone' ? 'Cone'
     : f.kind === 'torus' ? 'Ring'
-    : 'Sphere';
+    : f.kind === 'blend' ? 'Blend'
+    : f.kind === 'sphere' ? 'Sphere'
+    : nameless(f);
+}
+
+/**
+ * Every Feature kind must be named above. This takes `never`, so adding a
+ * kind and forgetting its label is a COMPILE error.
+ *
+ * It exists because the chain used to end in a bare `: 'Sphere'`, which is a
+ * fallback that looks like an answer. The first blend built correctly, showed
+ * up in the timeline, and called itself "Sphere 1" -- caught in a screenshot,
+ * by eye, because nothing anywhere could have failed. Returning the raw kind
+ * at runtime is the honest version of not knowing.
+ */
+function nameless(f: never): string {
+  return (f as Feature).kind;
 }
 
 /** The numeric suffix nextId() stamped into an id at creation time (`box1` ->

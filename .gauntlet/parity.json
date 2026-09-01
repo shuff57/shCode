@@ -83,7 +83,9 @@
       "covers": [
         "Loft"
       ],
-      "label": "Loft"
+      "label": "Loft",
+      "landed": "2026-09-01 gauntlet round 10. A BlendFeature taking exactly two sketches, emitted as a generated blendOnPlane() helper built on extrudeFromSlices with two slices -- the smallest real loft. It takes no numbers of its own on purpose: the two sketches already say which plane they sit on and how far along it they are, so the gap IS the difference in their offsets and the solid starts at the lower one. A height field would be a third number that could disagree with two that were already true. Both corner lists are emitted as PARAMETERS, so dragging a corner still reshapes the solid. Refuses, with a sentence naming the fix, when the two sketches sit on different planes, at the same offset, or when either is not a sketch. Measured in the gate against the frustum formula (40x40 to 10x10 over 30 = 21000 cubic units, within 2%), plus the two cases the helper exists for: a 4-corner outline blended to a 6-corner one, and one outline drawn the opposite way round building the SAME solid rather than a bow tie.",
+      "note": "Two deliberate simplifications, both visible rather than hidden. Both outlines are walked from their OWN first corner, so a shape rotated relative to the other blends with a twist -- predictable beats clever, since untwisting means searching for an alignment a student cannot see the reason for. And two slices means the sides are straight; Onshape's Loft can take guide curves and more than two profiles, which this does not. Building it also closed a latent trap in labelOf(): the chain ended in a bare `: 'Sphere'`, so the first blend built correctly and called itself 'Sphere 1'. The tail is now exhaustive against `never`, so the next new feature kind fails to compile rather than quietly inheriting a name."
     },
     {
       "id": "plane",

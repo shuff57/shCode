@@ -1237,6 +1237,93 @@ module.exports = function run(dir) {
     /fileContents\['script\.js'\]/.test(runBody.slice(0, 900)),
     'run() no longer reads script.js at all, which breaks Code mode');
 
+  {
+    console.log('\n=== blend: two outlines skinned into one solid ===');
+
+    const sq = (id, offset, half) => ({
+      id, kind: 'sketch', plane: 'xy', offset,
+      points: [[-half, -half], [half, -half], [half, half], [-half, half]],
+    });
+    const big = sq('sa', 0, 20);
+    const small = sq('sb', 30, 5);
+    const blended = { version: 1, features: [big, small, { id: 'bl1', kind: 'blend', targets: ['sa', 'sb'] }] };
+    const src = gen.toReshape(blended);
+
+    check('a blend emits blendOnPlane and pulls the helper in',
+      src.includes('blendOnPlane(') && src.includes('function blendOnPlane('));
+    check('...with both corner lists as PARAMETERS, so dragging still reshapes it',
+      src.includes('[p.sa_p0u, p.sa_p0v]') && src.includes('[p.sb_p0u, p.sb_p0v]'),
+      src.split(/\r?\n/).filter((l) => l.includes('blendOnPlane(')).slice(0, 1).join(''));
+    check('...and the gap read off the two offsets rather than a third number',
+      /p\.sb_offset - p\.sa_offset/.test(src),
+      src.split(/\r?\n/).filter((l) => l.includes('blendOnPlane(')).slice(0, 1).join(''));
+
+    const built = build(src);
+    // A truncated pyramid, 40x40 at the bottom and 10x10 at the top, 30 tall.
+    // Volume of a frustum = h/3 * (A1 + A2 + sqrt(A1*A2)) = 30/3 * (1600 + 100 + 400).
+    check('it builds a real tapered solid, measured against the frustum formula',
+      Math.abs(built.volume - 21000) < 21000 * 0.02,
+      `${built.volume.toFixed(0)} vs 21000`);
+    check('...standing the full gap tall',
+      Math.abs((built.bbox[1][2] - built.bbox[0][2]) - 30) < 0.5,
+      JSON.stringify(built.bbox));
+    check('...and as wide as its WIDEST outline, not its narrowest',
+      Math.abs((built.bbox[1][0] - built.bbox[0][0]) - 40) < 0.5,
+      JSON.stringify(built.bbox));
+
+    // Different corner counts is the case the resampling exists for: without
+    // it a skin has nothing to join corner n of one to corner n of the other.
+    const hexPts = [];
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2;
+      hexPts.push([12 * Math.cos(a), 12 * Math.sin(a)]);
+    }
+    const mixed = { version: 1, features: [
+      big,
+      { id: 'sb', kind: 'sketch', plane: 'xy', offset: 30, points: hexPts },
+      { id: 'bl1', kind: 'blend', targets: ['sa', 'sb'] },
+    ] };
+    const mixedBuilt = build(gen.toReshape(mixed));
+    check('a 4-corner outline blends to a 6-corner one at all',
+      mixedBuilt.volume > 0 && mixedBuilt.polys > 0,
+      `volume ${mixedBuilt.volume.toFixed(0)}, ${mixedBuilt.polys} polys`);
+    check('...and lands between the two areas, so the skin did not collapse or explode',
+      mixedBuilt.volume > 30 * 300 * 0.4 && mixedBuilt.volume < 30 * 1600,
+      `${mixedBuilt.volume.toFixed(0)}`);
+
+    // Opposite winding is the bow-tie case. Reversing one outline must not
+    // change the solid: a blend that self-intersects loses volume, badly.
+    const reversed = { version: 1, features: [
+      big,
+      { ...sq('sb', 30, 5), points: sq('sb', 30, 5).points.slice().reverse() },
+      { id: 'bl1', kind: 'blend', targets: ['sa', 'sb'] },
+    ] };
+    const revBuilt = build(gen.toReshape(reversed));
+    check('drawing the top outline the other way round builds the SAME solid',
+      Math.abs(revBuilt.volume - built.volume) < built.volume * 0.02,
+      `${revBuilt.volume.toFixed(0)} vs ${built.volume.toFixed(0)} -- a bow tie would be far smaller`);
+
+    check('a blend on the front plane builds too',
+      build(gen.toReshape({ version: 1, features: [
+        { ...big, plane: 'xz' }, { ...small, plane: 'xz' },
+        { id: 'bl1', kind: 'blend', targets: ['sa', 'sb'] },
+      ] })).volume > 0);
+
+    console.log('\n=== blend: what it refuses ===');
+
+    check('two sketches on different planes are refused, naming the fix',
+      /same one first/.test(types.whyCannotBlend(big, { ...small, plane: 'yz' }) || ''),
+      String(types.whyCannotBlend(big, { ...small, plane: 'yz' })));
+    check('the same offset twice is refused -- there is no gap to fill',
+      /no gap to fill/.test(types.whyCannotBlend(big, { ...small, offset: 0 }) || ''));
+    check('a solid is refused -- it has no outline to skin from',
+      /Pick two sketches/.test(types.whyCannotBlend(big, { id: 'b1', kind: 'box', size: [1, 1, 1], center: [0, 0, 0] }) || ''));
+    check('two good sketches are not refused', types.whyCannotBlend(big, small) === null);
+    check('newBlend orders them bottom-first whichever way they are handed over',
+      JSON.stringify(types.newBlend({ version: 1, features: [] }, small, big).targets) === JSON.stringify(['sa', 'sb']),
+      JSON.stringify(types.newBlend({ version: 1, features: [] }, small, big).targets));
+  }
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };
