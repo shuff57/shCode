@@ -5,6 +5,7 @@ import type { Lesson } from '../lib/types';
 import { useLessonStore, flattenFiles } from '../lib/store';
 import { buildPreviewHtml } from '../lib/preview-builder';
 import { saveProgress, normalizeEol } from '../lib/version-control';
+import { seedPlan } from '../lib/plan-seed';
 import { recordSubmission } from '../lib/written-grader-store';
 import { recordLessonCompleted } from '../lib/progress';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
@@ -260,13 +261,10 @@ export default function LessonWorkspace({
       return;
     }
 
-    // Anchored under STEP 1, which is where the lesson asks for the
-    // pseudocode. If that text ever moves, append rather than guess.
-    const ANCHOR = '//         Do this BEFORE you write any JavaScript.';
-    const next = current.includes(ANCHOR)
-      ? current.replace(ANCHOR, ANCHOR + '\n\n' + block)
-      : current + '\n\n' + block + '\n';
-    updateFile('script.js', next);
+    // Under the lesson's STEP 1 comment block, which is where every planFrom
+    // lesson asks for the pseudocode. See lib/plan-seed.ts for why this is a
+    // block match and not the single sentence it used to be.
+    updateFile('script.js', seedPlan(current, block));
   }, [planLines, files, lesson, updateFile]);
   const isReshapeMode = lesson.preview === 'reshape';
   const isMoshionMode = lesson.preview === 'moshion';
