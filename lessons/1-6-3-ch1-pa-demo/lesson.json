@@ -1,7 +1,7 @@
 {
   "id": "1-6-3-ch1-pa-demo",
   "title": "1.6.3 Group PA Part 3: Demo It",
-  "description": "The writeup that goes with the live demo: who did what, three test cases, and where each of Chapter 1's five sections shows up in your program. AI-graded with hints.",
+  "description": "The writeup that goes with the live demo: who did what, three test cases, and where four of Chapter 1's five sections show up in your program. AI-graded with hints.",
   "type": "assignment",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",

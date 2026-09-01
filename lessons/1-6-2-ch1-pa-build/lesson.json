@@ -122,7 +122,7 @@
       "description": "A variable is assigned from arithmetic on other variables, not typed in by hand",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[A-Za-z_$][A-Za-z0-9_$]*\\s*[-+*/]",
+      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[^;\\n\"'`]*[A-Za-z_$][A-Za-z0-9_$.]*\\s*[-+*/]",
       "flags": "",
       "points": 0,
       "hint": "const costPerSlice = pizzaPrice / sliceCount; -- the answer has to be worked out, not written down."
@@ -133,7 +133,7 @@
       "description": "A comparison is assigned to a variable, which is what the chart's diamond becomes",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[^;\\n]*(?:<=|>=|===|!==|<|>)[^;\\n]*;",
+      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[^;\\n\"'`]*(?:<=|>=|===|!==|<|>)",
       "flags": "",
       "points": 0,
       "hint": "const meetsTheLimit = costPerSlice <= GOOD_DEAL_LIMIT; -- a comparison produces true or false (1.2.18)."
@@ -141,13 +141,13 @@
     {
       "id": "r8",
       "title": "Both branches written as pseudocode",
-      "description": "An IF comment line and an ELSE comment line say what happens on each side of the diamond",
+      "description": "An IF comment line and an ELSE comment line, sitting below the stored comparison, say what happens on each side of the diamond",
       "type": "regex",
       "file": "script.js",
-      "pattern": "//[^\\n]*\\bIF\\b[\\s\\S]*//[^\\n]*\\bELSE\\b",
+      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[^;\\n\"'`]*(?:<=|>=|===|!==|<|>)[\\s\\S]*?//[^\\n]*\\bIF\\b[\\s\\S]*?//[^\\n]*\\bELSE\\b",
       "flags": "",
       "points": 0,
-      "hint": "Two comment lines, capitals: // IF meetsTheLimit THEN report it is a good deal   and   // ELSE report it is not.",
+      "hint": "Two comment lines, capitals, BELOW the line that stores the comparison: // IF meetsTheLimit THEN report it is a good deal   and   // ELSE report it is not. The pseudocode you copied in at the top does not count on its own.",
       "stripComments": false
     },
     {
