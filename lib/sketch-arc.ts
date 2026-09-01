@@ -785,3 +785,102 @@ export function outlineOf(f: SketchLike): Outline {
     ? { ok: false, points, bulges, basis, notes, why: collapsed }
     : { ok: true, points, bulges, basis, notes };
 }
+
+// ---- Bowing a straight edge into an arc -------------------------------------
+//
+// The other half of arcFromBulge: given a bow, produce the bulge. Together
+// they are what makes "Arc" a write rather than a new representation -- see
+// the 2026-09-01 design pass in ~/.claude/plans/reshape-fusion-parity.md.
+//
+// The stored number is the BOW (the sagitta): how far the middle of the arc
+// stands off the straight chord, in sketch units. The panel and the canvas
+// handle both work in it, because every other number a student types in the
+// Rules panel is a distance and tan(includedAngle / 4) is not something to put
+// in front of a fourteen-year-old. The identity is in this file's header:
+// sagitta = halfChord * bulge, so bulge = 2 * bow / chord and back again.
+//
+// Sign is meaningful and kept: positive bows one way, negative the other, and
+// zero is straight. It matches the bulge's own sign convention (positive is
+// CCW, centre on the LEFT of a->b), so a bow handle dragged across the chord
+// passes through straight rather than jumping.
+
+/** Chord length of design edge `e`, wrapping. 0 for a collapsed edge. */
+function chordOf(pts: Point[], e: number): number {
+  const n = pts.length;
+  if (n < 2) return 0;
+  const a = pts[((e % n) + n) % n];
+  const b = pts[((e + 1) % n + n) % n];
+  return Math.hypot(b[0] - a[0], b[1] - a[1]);
+}
+
+/**
+ * The largest bow design edge `e` can take: half its chord, which is a
+ * half-circle (|bulge| = 1).
+ *
+ * Not an arbitrary limit. Past |bulge| = 1 the arc's centre crosses to the
+ * other side of the chord and the edge starts swallowing its neighbours; a
+ * beginner who asks for more has made a mistake rather than asked for a major
+ * arc. arcFromBulge() handles |bulge| > 1 correctly either way, so this is a
+ * UI ceiling, not a math one -- a legacy doc carrying a bigger bulge still
+ * loads, draws and builds.
+ */
+export function maxBow(pts: Point[], e: number): number {
+  return chordOf(pts, e) / 2;
+}
+
+/** The bow currently on design edge `e`, in sketch units. 0 when straight. */
+export function bowOf(pts: Point[], e: number, bulges?: Record<number, number>): number {
+  const g = bulges?.[e];
+  if (!g) return 0;
+  return (chordOf(pts, e) / 2) * g;
+}
+
+/** The bulge that puts design edge `e` at bow `want`, clamped to maxBow.
+ *  0 for a straight edge or a collapsed one -- a chord of zero length has no
+ *  middle to stand off, and dividing by it is how a NaN reaches the outline. */
+export function bulgeFromBow(pts: Point[], e: number, want: number): number {
+  const chord = chordOf(pts, e);
+  if (!(chord > 0) || !Number.isFinite(want) || want === 0) return 0;
+  const ceiling = chord / 2;
+  const bow = Math.max(-ceiling, Math.min(ceiling, want));
+  return (2 * bow) / chord;
+}
+
+/**
+ * Why edge `e` cannot take the bow it was asked for, in a sentence a student
+ * can act on -- or null when it can. Same shape and the same job as
+ * whyCannotRoundCorner()/whyCannotChamferCorner(): the panel shows this
+ * instead of silently clamping, because a box that accepts 40 and stores 12
+ * teaches that the tool is broken.
+ */
+export function whyCannotBowEdge(pts: Point[], e: number, want: number): string | null {
+  if (!Number.isFinite(want)) return 'That is not a number.';
+  const chord = chordOf(pts, e);
+  if (!(chord > 0)) {
+    return `Edge ${e + 1} has no length, so there is nothing to bow. Move one of its corners first.`;
+  }
+  const ceiling = chord / 2;
+  if (Math.abs(want) > ceiling) {
+    return `Edge ${e + 1} can bow at most ${ceiling.toFixed(1)} either way -- that is a half circle, and past it the arc turns back on itself.`;
+  }
+  return null;
+}
+
+/** Set (or clear, at 0) the bow on design edge `e`, returning a new sketch.
+ *
+ *  Writes `bulges` DIRECTLY rather than a request map beside `rounds` and
+ *  `chamfers`, and that is deliberate. Those two store a request because their
+ *  geometry is derived and clamped against the NEIGHBOURING edges, so a stored
+ *  result is one a later mover can invalidate. A bulge is derived from
+ *  nothing: it is the parameter itself, and it is the right thing to preserve
+ *  when a corner moves -- the included angle stays put and the bow scales with
+ *  the chord, which is what a curve is supposed to do under a drag. */
+export function bowEdge<T extends SketchLike>(f: T, e: number, bow: number): T {
+  if (f.shape === 'circle') return f;
+  if (!Number.isInteger(e) || e < 0 || e >= f.points.length) return f;
+  const bulges = { ...(f.bulges ?? {}) };
+  const g = bulgeFromBow(f.points, e, bow);
+  if (g) bulges[e] = g;
+  else delete bulges[e];
+  return Object.keys(bulges).length ? { ...f, bulges } : { ...f, bulges: undefined };
+}

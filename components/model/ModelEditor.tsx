@@ -65,9 +65,11 @@ import {
 import SketchConstraints from './SketchConstraints';
 import { solveSketch, type Constraint, type Point } from '../../lib/sketch-solve';
 import {
+  bowEdge,
   maxChamferDistance,
   maxFilletRadius,
   outlineOf,
+  whyCannotBowEdge,
   whyCannotChamferCorner,
   whyCannotRoundCorner,
 } from '../../lib/sketch-arc';
@@ -647,6 +649,30 @@ export default function ModelEditor({
         + `${neighbour + 1} first.`;
     }
     say(clamped);
+  }
+
+  function bowSketchEdge(f: Extract<Feature, { kind: 'sketch' }>, edge: number, bow: number) {
+    // Straightening comes first and is never refused, same reason un-rounding
+    // and un-chamfering are not: an edge that HAS a bow may since have had a
+    // corner dragged onto its neighbour, and refusing to take the curve off it
+    // would strand the student with a shape they cannot undo.
+    if (bow === 0) {
+      onChange({
+        ...doc,
+        features: doc.features.map((x) => (x.id === f.id ? bowEdge(x as typeof f, edge, 0) : x)),
+      });
+      say(null);
+      return;
+    }
+
+    const why = whyCannotBowEdge(f.points, edge, bow);
+    if (why) { say(why); return; }
+
+    onChange({
+      ...doc,
+      features: doc.features.map((x) => (x.id === f.id ? bowEdge(x as typeof f, edge, bow) : x)),
+    });
+    say(`Edge ${edge + 1} now curves. Across, Up and Length only apply to straight edges, so they are off for it.`);
   }
 
   function chamferSketchCorner(f: Extract<Feature, { kind: 'sketch' }>, corner: number, distance: number) {
@@ -1449,6 +1475,7 @@ export default function ModelEditor({
           onChange={(next) => setConstraints(activeSketch, next)}
           onRound={(corner, radius) => roundSketchCorner(activeSketch, corner, radius)}
           onChamfer={(corner, distance) => chamferSketchCorner(activeSketch, corner, distance)}
+          onBow={(edge, bow) => bowSketchEdge(activeSketch, edge, bow)}
         />
       )}
 

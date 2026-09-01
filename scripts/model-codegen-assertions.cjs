@@ -1093,6 +1093,39 @@ module.exports = function run(dir) {
     plainSketchSrc.includes(`polygon([${sketch('s1').points.map((_, n) => `[p.s1_p${n}u, p.s1_p${n}v]`).join(', ')}])`));
   check('...and neither new helper is pulled in for a doc that never uses them',
     !plainSketchSrc.includes('function discAcross(') && !plainSketchSrc.includes('function polyArc('));
+  {
+    // A BOWED edge is not a legacy import any more -- the Bow row writes
+    // bulges, so this path is now reachable from the UI and has to be checked
+    // as a live one rather than as a compatibility shim. What matters is that
+    // the corners stay PARAMETERS (so dragging one still moves the shape) while
+    // the bulge rides along as a literal.
+    const arcLib = require(path.join(dir, 'sketch-arc.js'));
+    const bowed = arcLib.bowEdge(sketch('s1'), 0, 8);
+    const bowedSrc = gen.toReshape(doc(bowed));
+    check('a bowed sketch emits polyArc, not polygon',
+      bowedSrc.includes('polyArc([') && !/=\s*polygon\(\[/.test(bowedSrc),
+      bowedSrc.split(/\r?\n/).filter((l) => /poly(gon|Arc)\(/.test(l)).slice(0, 2).join(' | '));
+    check('...and pulls the helper in with it',
+      bowedSrc.includes('function polyArc('));
+    check('...with the corners still PARAMETERS, so a drag still moves them',
+      bowedSrc.includes('polyArc([[p.s1_p0u, p.s1_p0v]'),
+      bowedSrc.split(/\r?\n/).filter((l) => l.includes('polyArc([')).slice(0, 1).join(''));
+    check('...and the bow it was given carried through as a bulge',
+      /polyArc\(\[.*\],\s*\{0:\s*0\.4\b/.test(bowedSrc),
+      bowedSrc.split(/\r?\n/).filter((l) => l.includes('polyArc([')).slice(0, 1).join(''));
+
+    // Built, not just generated -- and measured against the straight version
+    // of the same sketch rather than against a number typed here. Bowing an
+    // edge OUTWARD adds area, so the extruded solid has to get bigger; a
+    // curve that draws on the canvas but flattens on the way to the geometry
+    // is the exact half-wired failure this file exists to catch.
+    const straightVol = build(gen.toReshape(doc(sketch('s1'), pull('e1', 's1')))).volume;
+    const bowedVol = build(gen.toReshape(doc(bowed, pull('e1', 's1')))).volume;
+    check('a bowed sketch still BUILDS, and the bow reaches the solid',
+      bowedVol > straightVol * 1.02,
+      `straight ${straightVol.toFixed(0)} -> bowed ${bowedVol.toFixed(0)}`);
+  }
+
 
   console.log('\n=== sketch build 1: addCorner reindexes past the seam ===');
 

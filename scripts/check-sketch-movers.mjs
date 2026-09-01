@@ -36,6 +36,15 @@ const SANCTIONED = {
     chamferCorner: 'builds the trim points and the straight edge; the slice counterpart of filletCorner',
     reindex: 'shifts keys past a seam and never touches a value or a coordinate',
     outlineOf: 'derives the outline from the design; the only producer of an arc endpoint',
+    // The answer this file demands, written down. bowEdge writes ONE bulge key
+    // and never a point, so no arc endpoint moves: the endpoints of a bowed
+    // edge are the two design corners that were already there, and they stay
+    // exactly where they were. `rounds` and `chamfers` are untouched, and the
+    // ceiling (half the chord, |bulge| = 1) is applied in bulgeFromBow before
+    // the write. The interaction the other four faces had -- a mover shifting
+    // a point out from under a key that describes it -- cannot arise here,
+    // because bowEdge moves nothing.
+    bowEdge: 'sets one edge bulge from a bow distance; writes no point, so no arc endpoint moves',
   },
   'lib/model-codegen.ts': {
     applyParam: 'writes a DESIGN corner from a drag handle or a typed dimension',

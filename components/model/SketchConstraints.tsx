@@ -17,6 +17,9 @@ import {
 import {
   maxChamferDistance,
   maxFilletRadius,
+  bowOf,
+  maxBow,
+  whyCannotBowEdge,
   whyCannotChamferCorner,
   whyCannotRoundCorner,
 } from '../../lib/sketch-arc';
@@ -41,7 +44,12 @@ interface Props {
    *  does not, and believing it costs you a test that cannot pass.) */
   bulges?: Record<number, number>;
   /** Radius asked for on each rounded design corner, so the Round boxes can
-   *  show what is currently set instead of always reading empty. */
+   *  show what is currently set instead of always reading empty.
+   *
+   *  NOTE (2026-09-01): the LEGACY DOCS ONLY note above is now half true. The
+   *  Bow row below writes `bulges` directly and is the one live writer, so a
+   *  curved edge is reachable through the UI again -- but rounding still does
+   *  not produce one, which is the part of that note that matters. */
   rounds?: Record<number, number>;
   /** Distance asked for on each chamfered design corner, so the Chamfer boxes
    *  can show what is currently set instead of always reading empty. */
@@ -56,6 +64,10 @@ interface Props {
    *  division of labour as onRound: the caller owns writing it into the
    *  feature, nothing here computes geometry. */
   onChamfer: (corner: number, distance: number) => void;
+  /** Bow design edge `edge` out by `bow` sketch units, or straighten it at 0.
+   *  Signed: positive bows one way, negative the other. Same division of
+   *  labour as onRound/onChamfer -- the caller owns the write. */
+  onBow: (edge: number, bow: number) => void;
 }
 
 function has(cs: Constraint[], kind: Constraint['kind'], edge: number) {
@@ -94,7 +106,7 @@ function cyclePair(cs: Constraint[], a: number, b: number): Constraint[] {
   return next === undefined ? rest : [...rest, { kind: next, edge: lo, other: hi }];
 }
 
-export default function SketchConstraints({ points, bulges, rounds, chamfers, constraints, onChange, onRound, onChamfer }: Props) {
+export default function SketchConstraints({ points, bulges, rounds, chamfers, constraints, onChange, onRound, onChamfer, onBow }: Props) {
   const count = points.length;
   const residual = residualOf(points, constraints);
   const fighting = residual > 1e-3;
@@ -430,6 +442,62 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
         })}
       </div>
 
+      {/* One box per EDGE, not per corner -- a bow belongs to the edge between
+          two corners, the way a round belongs to the corner between two edges.
+          Signed, unlike Round and Chamfer: negative bows the other way, which
+          is the only way to reach the inward arc at all, and a second control
+          for "which side" would be a second thing to explain. */}
+      <div className="sk-bows">
+        <span>Bow an edge:</span>
+        {points.map((_, e) => {
+          const ceiling = maxBow(points, e);
+          const set = bowOf(points, e, bulges);
+          const why = whyCannotBowEdge(points, e, set || 1);
+          return (
+            <input
+              // Keyed on the READ-BACK bow, not on a stored request: unlike
+              // rounds/chamfers there is no request map, so what the box shows
+              // is derived from the bulge every render. Moving a corner
+              // therefore updates this number on its own, which is correct --
+              // the angle is kept and the bow scales with the chord.
+              key={`${e}:${set.toFixed(3)}`}
+              type="number"
+              inputMode="decimal"
+              aria-label={`Bow edge ${e + 1}`}
+              title={why ?? `Bow edge ${e + 1} -- up to ${ceiling.toFixed(1)} either way, or 0 to straighten it`}
+              min={-ceiling}
+              max={ceiling}
+              step="0.5"
+              placeholder="0"
+              defaultValue={set ? String(Math.round(set * 100) / 100) : ''}
+              onBlur={(ev) => {
+                const v = Number(ev.target.value);
+                if (!Number.isFinite(v)) { ev.target.value = set ? String(set) : ''; return; }
+                if (v === 0 && !set) { ev.target.value = ''; return; }
+                // What was TYPED, not a clamped value -- same reason as the
+                // Round box above: clamping here makes 400 and 12 arrive
+                // identically and nothing downstream can report the ceiling.
+                onBow(e, v);
+                // Then put the box back to what the SHAPE says. On an accepted
+                // bow this is overwritten a moment later by the remount (the
+                // key carries the read-back value); on a refused one it is the
+                // whole point -- measured live, a rejected 999 otherwise sat in
+                // the box beside an edge still bowed 8, which is a control
+                // stating something untrue about the model.
+                //
+                // FOUND, NOT FIXED: the Round and Chamfer boxes above have the
+                // same behaviour and keep their refused number. Left alone
+                // rather than swept into this change.
+                ev.target.value = set ? String(Math.round(set * 100) / 100) : '';
+              }}
+              onKeyDown={(ev) => {
+                if (ev.key === 'Enter') (ev.target as HTMLInputElement).blur();
+              }}
+            />
+          );
+        })}
+      </div>
+
       <style>{`
         .sk-rules { border-top: 1px solid var(--border); padding: 8px 10px; font-size: 12px; }
         .sk-rules-head {
@@ -485,8 +553,8 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
         .sk-pairs-grid td button.fighting:not(.on) { color: #ff5555; }
         .sk-table button:disabled { opacity: 0.35; cursor: not-allowed; }
         .sk-table input:disabled { opacity: 0.35; cursor: not-allowed; }
-        .sk-pins, .sk-rounds, .sk-chamfers { display: flex; align-items: center; gap: 4px; margin-top: 8px; color: #6272a4; }
-        .sk-rounds input, .sk-chamfers input {
+        .sk-pins, .sk-rounds, .sk-chamfers, .sk-bows { display: flex; align-items: center; gap: 4px; margin-top: 8px; color: #6272a4; }
+        .sk-rounds input, .sk-chamfers input, .sk-bows input {
           width: 42px; background: var(--bg); color: var(--text);
           border: 1px solid #44475a; border-radius: 3px;
           padding: 2px 5px; font-size: 12px; font-variant-numeric: tabular-nums;

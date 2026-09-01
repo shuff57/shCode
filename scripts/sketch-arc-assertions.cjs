@@ -578,6 +578,84 @@ module.exports = function run(dir) {
       && /radius\s*>\s*ceiling/.test(editorSrc),
     'ModelEditor.tsx never asks for the ceiling, so an over-radius round is still silent');
 
+
+  {
+    console.log('\n=== bowing a straight edge into an arc ===');
+
+    // A 40x25 rectangle. Edge 0 is the 40-long bottom, edge 1 the 25-long right.
+    const bowRect = { points: [[0, 0], [40, 0], [40, 25], [0, 25]] };
+
+    check('a straight edge reports no bow', A.bowOf(bowRect.points, 0) === 0);
+    check('the ceiling is half the chord -- a half circle',
+      A.maxBow(bowRect.points, 0) === 20 && A.maxBow(bowRect.points, 1) === 12.5,
+      `${A.maxBow(bowRect.points, 0)} / ${A.maxBow(bowRect.points, 1)}`);
+
+    // Round trip: a bow in, the same bow back out. This is the whole contract
+    // between the panel (which speaks distances) and the outline (which speaks
+    // bulges), and a factor-of-two slip here is invisible in both directions
+    // separately.
+    for (const [edge, want] of [[0, 5], [0, -5], [1, 12.5], [2, 0.25], [3, -3]]) {
+      const bowed = A.bowEdge(bowRect, edge, want);
+      check(`bow ${want} on edge ${edge + 1} round-trips`,
+        near(A.bowOf(bowed.points, edge, bowed.bulges), want),
+        `asked ${want}, read back ${A.bowOf(bowed.points, edge, bowed.bulges)}`);
+    }
+
+    // The geometry it actually produces, measured rather than asserted from the
+    // formula it was built with: a bow of exactly half the chord is a half
+    // circle, so the radius must be half the chord and the arc's midpoint must
+    // sit exactly `bow` off the chord.
+    const half = A.bowEdge(bowRect, 0, 20);
+    check('a half-chord bow is bulge 1', near(half.bulges[0], 1), String(half.bulges[0]));
+    const arc = A.arcFromBulge(bowRect.points[0], bowRect.points[1], half.bulges[0]);
+    check('...and that is a half circle: radius = half the chord',
+      near(arc.radius, 20), String(arc.radius));
+    check('...centred on the chord itself',
+      near(arc.center[0], 20) && near(arc.center[1], 0), JSON.stringify(arc.center));
+
+    // A quarter-ish bow, checked by sampling the drawn outline rather than by
+    // re-running the same arithmetic: tessellate() is what the student sees.
+    const bowed5 = A.bowEdge(bowRect, 0, 5);
+    const drawn = A.tessellate(bowed5);
+    const far = drawn.reduce((m, p) => (Math.abs(p[1]) > Math.abs(m) && p[0] > 1 && p[0] < 39 ? p[1] : m), 0);
+    check('the drawn outline really stands off the chord by the bow',
+      near(Math.abs(far), 5, 0.05), `furthest sample is ${far} from the chord, asked 5`);
+
+    check('0 clears the bow rather than storing a straight arc',
+      A.bowEdge(bowed5, 0, 0).bulges === undefined,
+      JSON.stringify(A.bowEdge(bowed5, 0, 0).bulges));
+
+    // Clamping and refusal. The panel is supposed to REPORT the ceiling rather
+    // than silently clamp -- same contract the round/chamfer rows already have,
+    // and the reason whyCannotBowEdge exists at all.
+    check('over the ceiling is refused with a sentence naming the ceiling',
+      /at most 20\.0/.test(A.whyCannotBowEdge(bowRect.points, 0, 40) || ''),
+      String(A.whyCannotBowEdge(bowRect.points, 0, 40)));
+    check('...and refused in the negative direction too',
+      A.whyCannotBowEdge(bowRect.points, 0, -40) !== null);
+    check('...but an in-range bow is not refused',
+      A.whyCannotBowEdge(bowRect.points, 0, 19.9) === null);
+    check('a bow still clamps rather than producing a bulge past 1, if one gets through',
+      Math.abs(A.bulgeFromBow(bowRect.points, 0, 400)) <= 1,
+      String(A.bulgeFromBow(bowRect.points, 0, 400)));
+
+    const collapsed = { points: [[0, 0], [0, 0], [40, 25], [0, 25]] };
+    check('a zero-length edge cannot be bowed, and says why rather than NaN-ing',
+      A.bulgeFromBow(collapsed.points, 0, 5) === 0
+        && /no length/.test(A.whyCannotBowEdge(collapsed.points, 0, 5) || ''),
+      String(A.whyCannotBowEdge(collapsed.points, 0, 5)));
+
+    check('a circle refuses to be bowed -- its two points are a diameter, not an edge',
+      A.bowEdge({ points: [[0, 0], [20, 0]], shape: 'circle' }, 0, 5).bulges === undefined);
+
+    // The bulge survives a corner move, which is the whole reason it is stored
+    // rather than the bow: the included angle is what a curve should keep.
+    const moved = { ...bowed5, points: [[0, 0], [80, 0], [40, 25], [0, 25]] };
+    check('moving a corner keeps the ANGLE and scales the bow with the chord',
+      near(moved.bulges[0], bowed5.bulges[0]) && near(A.bowOf(moved.points, 0, moved.bulges), 10),
+      `bulge ${moved.bulges[0]}, bow now ${A.bowOf(moved.points, 0, moved.bulges)}`);
+  }
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };
