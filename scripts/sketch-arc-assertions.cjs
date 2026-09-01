@@ -656,6 +656,145 @@ module.exports = function run(dir) {
       `bulge ${moved.bulges[0]}, bow now ${A.bowOf(moved.points, 0, moved.bulges)}`);
   }
 
+  {
+    console.log('\n=== removing a corner: splitEdge run backwards ===');
+
+    const pent = {
+      points: [[0, 0], [40, 0], [50, 20], [20, 35], [-10, 20]],
+      constraints: [
+        { kind: 'lock', corner: 0 },
+        { kind: 'lock', corner: 3 },
+        { kind: 'length', edge: 0, value: 40 },
+        { kind: 'length', edge: 3, value: 25 },
+        { kind: 'equal', edge: 1, other: 4 },
+      ],
+      bulges: { 3: 0.2 },
+      rounds: { 2: 4 },
+      chamfers: { 4: 3 },
+    };
+
+    const gone = A.removeCorner(pent, 2);
+    check('the corner is gone and the rest stay put',
+      gone.points.length === 4 && JSON.stringify(gone.points[2]) === JSON.stringify([20, 35]),
+      JSON.stringify(gone.points));
+
+    // Corner keys: 3 and 4 slide down to 2 and 3, corner 2's own round goes.
+    check('a lock above the removed corner slides down',
+      gone.constraints.some((c) => c.kind === 'lock' && c.corner === 2),
+      JSON.stringify(gone.constraints));
+    check('...and one below it does not move',
+      gone.constraints.some((c) => c.kind === 'lock' && c.corner === 0));
+    check('the round ON the removed corner goes with it',
+      gone.rounds === undefined, JSON.stringify(gone.rounds));
+    check('a chamfer above it slides down, keeping its value',
+      gone.chamfers && gone.chamfers[3] === 3, JSON.stringify(gone.chamfers));
+
+    // Edge keys: edges 1 and 2 merged, so anything naming either is dropped.
+    check('a length rule on an edge that did not merge slides down',
+      gone.constraints.some((c) => c.kind === 'length' && c.edge === 2 && c.value === 25),
+      JSON.stringify(gone.constraints));
+    check('...and one below the seam stays where it is',
+      gone.constraints.some((c) => c.kind === 'length' && c.edge === 0 && c.value === 40));
+    check('a pair rule touching a merged edge is DROPPED, not remapped',
+      !gone.constraints.some((c) => c.kind === 'equal'),
+      'edge 1 merged, so "edge 1 = edge 5" is a rule about an edge that no longer exists');
+    check('the curve on a merged edge is dropped rather than guessed at',
+      !gone.bulges || gone.bulges[3] === undefined, JSON.stringify(gone.bulges));
+
+    // A curve NOT on a merging edge has to survive, or the drop above is just
+    // a bug that happens to look like a policy.
+    const curvedFar = A.removeCorner({ ...pent, bulges: { 0: 0.3 } }, 3);
+    check('a curve on an untouched edge survives the removal',
+      curvedFar.bulges && Math.abs(curvedFar.bulges[0] - 0.3) < 1e-9,
+      JSON.stringify(curvedFar.bulges));
+
+    // Removing corner 0 is the wrap-around case: edges 4 and 0 merge, and the
+    // merged edge lands LAST rather than first. Off-by-one here mis-keys every
+    // rule on the shape.
+    const first = A.removeCorner({ ...pent, bulges: undefined, rounds: undefined, chamfers: undefined }, 0);
+    check('removing corner 1 wraps: the merged edge lands last, not first',
+      first.points.length === 4
+        && first.constraints.some((c) => c.kind === 'length' && c.edge === 2 && c.value === 25)
+        && !first.constraints.some((c) => c.kind === 'length' && c.value === 40),
+      JSON.stringify(first.constraints));
+
+    // The real contract, measured on the OUTLINE rather than on index
+    // arithmetic: put a corner in and take it back out, and the shape has to
+    // come back. Numbers that look plausible are exactly how the four earlier
+    // faces of the arc-endpoint bug shipped.
+    const area = (pts) => {
+      let a = 0;
+      for (let i = 0; i < pts.length; i++) {
+        const [x1, y1] = pts[i];
+        const [x2, y2] = pts[(i + 1) % pts.length];
+        a += x1 * y2 - x2 * y1;
+      }
+      return Math.abs(a) / 2;
+    };
+    for (const edge of [0, 2, 4]) {
+      const base = { points: pent.points };
+      const split = A.splitEdge(base, edge);
+      const back = A.removeCorner(split, edge + 1);
+      check(`split edge ${edge + 1} then remove the new corner restores the shape`,
+        back.points.length === base.points.length
+          && near(area(A.tessellate(back)), area(A.tessellate(base)), 1e-6),
+        `${back.points.length} corners, area ${area(A.tessellate(back))} vs ${area(A.tessellate(base))}`);
+    }
+
+    console.log('\n=== removing a corner: what it refuses ===');
+
+    const tri = { points: [[0, 0], [40, 0], [20, 30]] };
+    check('a triangle refuses -- three corners is the floor',
+      /at least three corners/.test(A.whyCannotRemoveCorner(tri, 1) || ''),
+      String(A.whyCannotRemoveCorner(tri, 1)));
+    check('...and really does not change it',
+      A.removeCorner(tri, 1).points.length === 3);
+    check('a circle refuses, and says why in circle words',
+      /diameter/.test(A.whyCannotRemoveCorner({ points: [[0, 0], [20, 0]], shape: 'circle' }, 0) || ''));
+    check('an out-of-range corner refuses rather than splicing nothing',
+      A.whyCannotRemoveCorner(pent, 9) !== null);
+    check('a four-corner shape is still allowed to lose one',
+      A.whyCannotRemoveCorner({ points: pent.points.slice(0, 4) }, 1) === null);
+
+    console.log('\n=== removing a corner: saying what it costs, first ===');
+
+    const cost = A.whyRemovingCornerCosts(pent, 2);
+    // ONE rule, not three: of pent's five, only the equal pair names a
+    // merging edge. Written as 3 first, which is what the fixture LOOKS like
+    // at a glance -- the counter was right and the expectation was wrong.
+    check('the warning counts the rules that will go',
+      /so 1 rule and/.test(cost || ''), String(cost));
+    check('...and pluralises once there is more than one',
+      /3 rules/.test(A.whyRemovingCornerCosts({
+        points: pent.points,
+        constraints: [
+          { kind: 'lock', corner: 2 },
+          { kind: 'length', edge: 1, value: 10 },
+          { kind: 'horizontal', edge: 2 },
+          { kind: 'vertical', edge: 4 },
+        ],
+      }, 2) || ''),
+      String(A.whyRemovingCornerCosts({
+        points: pent.points,
+        constraints: [
+          { kind: 'lock', corner: 2 },
+          { kind: 'length', edge: 1, value: 10 },
+          { kind: 'horizontal', edge: 2 },
+          { kind: 'vertical', edge: 4 },
+        ],
+      }, 2)));
+    check('...names the round on that corner',
+      /its round/.test(cost || ''), String(cost));
+    check('...and says WHY, in edges rather than in indices',
+      /joins the two edges beside it into one/.test(cost || ''), String(cost));
+    check('a corner that costs nothing warns about nothing',
+      A.whyRemovingCornerCosts({ points: pent.points }, 2) === null,
+      String(A.whyRemovingCornerCosts({ points: pent.points }, 2)));
+    check('the warning counts a curve on a merging edge too',
+      /a curve/.test(A.whyRemovingCornerCosts({ points: pent.points, bulges: { 1: 0.4 } }, 2) || ''),
+      String(A.whyRemovingCornerCosts({ points: pent.points, bulges: { 1: 0.4 } }, 2)));
+  }
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };

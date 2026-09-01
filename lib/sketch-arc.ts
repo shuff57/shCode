@@ -884,3 +884,132 @@ export function bowEdge<T extends SketchLike>(f: T, e: number, bow: number): T {
   else delete bulges[e];
   return Object.keys(bulges).length ? { ...f, bulges } : { ...f, bulges: undefined };
 }
+
+// ---- Removing a corner ------------------------------------------------------
+//
+// splitEdge()'s inverse, and the missing half of a pair: addCorner() has
+// existed since the first sketch build and there has never been a way to take
+// one back off. A "+" with no "-".
+//
+// Removing corner k does something insertion never does: the two edges either
+// side of k MERGE into one. Every key in this file is indexed off one of those
+// two lists, so the whole job is deciding what each key means afterwards.
+//
+//        before                      after removing corner 2
+//   1───────2───────3            1───────────────3
+//       e1     e2                       e1'
+//
+// - `points`   -- k spliced out.
+// - corners    -- above k shift down one. `rounds` and `chamfers` are keyed by
+//                 corner, so they shift the same way; k's own entry goes with
+//                 the corner it described.
+// - edges      -- above k shift down one, and the two that merged become one.
+// - `bulges` on either merging edge are DROPPED, not merged. One edge cannot
+//   retrace two different arcs, and picking one of the two would silently
+//   change the drawn shape somewhere the student was not looking.
+// - constraints naming the removed corner, or either merging edge, are dropped
+//   for the same reason: a length rule that survived onto the merged edge
+//   would apply to a longer edge than the one it was written about and yank
+//   the sketch on the next solve.
+//
+// All of that is reported rather than done quietly -- whyRemovingCornerCosts()
+// says it in advance, so the panel can warn before anything is lost.
+
+/** Can corner `k` come off at all? A sentence if not, null if it can. */
+export function whyCannotRemoveCorner(f: SketchLike, k: number): string | null {
+  if (f.shape === 'circle') {
+    return 'A circle has no corners to remove -- its two points are the ends of a diameter.';
+  }
+  if (!Number.isInteger(k) || k < 0 || k >= f.points.length) return 'There is no such corner.';
+  if (f.points.length <= 3) {
+    return 'A shape needs at least three corners. Removing this one would leave a line, not an outline.';
+  }
+  return null;
+}
+
+/** What removing corner `k` would cost, as a sentence, or null when it costs
+ *  nothing. Written for a student, in the vocabulary the panel already uses:
+ *  rules, curves, rounds and chamfers -- never "constraint" or "bulge". */
+export function whyRemovingCornerCosts(f: SketchLike, k: number): string | null {
+  const n = f.points.length;
+  if (!Number.isInteger(k) || k < 0 || k >= n) return null;
+  const merging = [(k - 1 + n) % n, k];
+  const lost: string[] = [];
+
+  const rules = (f.constraints ?? []).filter((c) => {
+    if (c.kind === 'lock') return c.corner === k;
+    if ('other' in c) return merging.includes(c.edge) || merging.includes(c.other);
+    return merging.includes(c.edge);
+  }).length;
+  if (rules > 0) lost.push(rules === 1 ? '1 rule' : `${rules} rules`);
+
+  const curves = merging.filter((e) => f.bulges?.[e]).length;
+  if (curves > 0) lost.push(curves === 1 ? 'a curve' : 'two curves');
+  if (f.rounds?.[k]) lost.push('its round');
+  if (f.chamfers?.[k]) lost.push('its chamfer');
+
+  if (lost.length === 0) return null;
+  const list = lost.length === 1
+    ? lost[0]
+    : lost.slice(0, -1).join(', ') + ' and ' + lost[lost.length - 1];
+  return `Removing corner ${k + 1} joins the two edges beside it into one, so ${list} go with it.`;
+}
+
+/**
+ * Remove design corner `k`, merging the two edges beside it.
+ *
+ * Returns the sketch unchanged when whyCannotRemoveCorner() has something to
+ * say -- a refusal is the caller's to report, exactly as it is for rounding
+ * and chamfering, so nothing here says anything out loud.
+ */
+export function removeCorner<T extends SketchLike>(f: T, k: number): T {
+  if (whyCannotRemoveCorner(f, k)) return f;
+  const n = f.points.length;
+  const prev = (k - 1 + n) % n;
+  const merging = new Set([prev, k]);
+
+  // A corner above k slides down one; k itself is gone. The same rule gives
+  // the surviving edge indices, because an edge is named by its first corner.
+  const shift = (i: number) => (i > k ? i - 1 : i);
+
+  const points = f.points.filter((_, i) => i !== k);
+
+  const remap = <V,>(
+    src: Record<number, V> | undefined,
+    drop: (key: number) => boolean,
+  ): Record<number, V> | undefined => {
+    if (!src) return undefined;
+    const out: Record<number, V> = {};
+    for (const [key, v] of Object.entries(src)) {
+      const i = Number(key);
+      if (!Number.isInteger(i) || drop(i)) continue;
+      out[shift(i)] = v;
+    }
+    return Object.keys(out).length ? out : undefined;
+  };
+
+  const bulges = remap(f.bulges, (e) => merging.has(e));
+  const rounds = remap(f.rounds, (c) => c === k);
+  const chamfers = remap(f.chamfers, (c) => c === k);
+
+  const constraints = f.constraints
+    ?.filter((c) => {
+      if (c.kind === 'lock') return c.corner !== k;
+      if ('other' in c) return !merging.has(c.edge) && !merging.has(c.other);
+      return !merging.has(c.edge);
+    })
+    .map((c): Constraint => {
+      if (c.kind === 'lock') return { ...c, corner: shift(c.corner) };
+      if ('other' in c) return { ...c, edge: shift(c.edge), other: shift(c.other) };
+      return { ...c, edge: shift(c.edge) };
+    });
+
+  return {
+    ...f,
+    points,
+    bulges,
+    rounds,
+    chamfers,
+    ...(constraints ? { constraints } : {}),
+  };
+}

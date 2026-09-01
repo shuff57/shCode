@@ -66,10 +66,13 @@ import SketchConstraints from './SketchConstraints';
 import { solveSketch, type Constraint, type Point } from '../../lib/sketch-solve';
 import {
   bowEdge,
+  removeCorner,
   maxChamferDistance,
   maxFilletRadius,
   outlineOf,
   whyCannotBowEdge,
+  whyCannotRemoveCorner,
+  whyRemovingCornerCosts,
   whyCannotChamferCorner,
   whyCannotRoundCorner,
 } from '../../lib/sketch-arc';
@@ -649,6 +652,19 @@ export default function ModelEditor({
         + `${neighbour + 1} first.`;
     }
     say(clamped);
+  }
+
+  function dropSketchCorner(f: Extract<Feature, { kind: 'sketch' }>, corner: number) {
+    const why = whyCannotRemoveCorner(f, corner);
+    if (why) { say(why); return; }
+    // The cost is read BEFORE the removal, off the sketch that still has the
+    // corner in it -- afterwards there is nothing left to count.
+    const cost = whyRemovingCornerCosts(f, corner);
+    onChange({
+      ...doc,
+      features: doc.features.map((x) => (x.id === f.id ? removeCorner(x as typeof f, corner) : x)),
+    });
+    say(cost ?? null);
   }
 
   function bowSketchEdge(f: Extract<Feature, { kind: 'sketch' }>, edge: number, bow: number) {
@@ -1476,6 +1492,7 @@ export default function ModelEditor({
           onRound={(corner, radius) => roundSketchCorner(activeSketch, corner, radius)}
           onChamfer={(corner, distance) => chamferSketchCorner(activeSketch, corner, distance)}
           onBow={(edge, bow) => bowSketchEdge(activeSketch, edge, bow)}
+          onRemoveCorner={(corner) => dropSketchCorner(activeSketch, corner)}
         />
       )}
 

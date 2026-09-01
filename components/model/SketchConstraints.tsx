@@ -18,6 +18,8 @@ import {
   maxChamferDistance,
   maxFilletRadius,
   bowOf,
+  whyCannotRemoveCorner,
+  whyRemovingCornerCosts,
   maxBow,
   whyCannotBowEdge,
   whyCannotChamferCorner,
@@ -68,6 +70,9 @@ interface Props {
    *  Signed: positive bows one way, negative the other. Same division of
    *  labour as onRound/onChamfer -- the caller owns the write. */
   onBow: (edge: number, bow: number) => void;
+  /** Remove design corner `corner`, joining the two edges beside it. The
+   *  caller owns the write and the refusal, same as every other row here. */
+  onRemoveCorner: (corner: number) => void;
 }
 
 function has(cs: Constraint[], kind: Constraint['kind'], edge: number) {
@@ -106,7 +111,7 @@ function cyclePair(cs: Constraint[], a: number, b: number): Constraint[] {
   return next === undefined ? rest : [...rest, { kind: next, edge: lo, other: hi }];
 }
 
-export default function SketchConstraints({ points, bulges, rounds, chamfers, constraints, onChange, onRound, onChamfer, onBow }: Props) {
+export default function SketchConstraints({ points, bulges, rounds, chamfers, constraints, onChange, onRound, onChamfer, onBow, onRemoveCorner }: Props) {
   const count = points.length;
   const residual = residualOf(points, constraints);
   const fighting = residual > 1e-3;
@@ -350,6 +355,34 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
         ))}
       </div>
 
+      {/* addCorner() has existed since the first sketch build with no way to
+          take one back off. This is that inverse. Buttons rather than boxes,
+          because there is nothing to type -- it mirrors the Pin row directly
+          above, which is the other per-corner control that is a verb. */}
+      <div className="sk-drops">
+        <span>Remove a corner:</span>
+        {points.map((_, i) => {
+          const why = whyCannotRemoveCorner({ points, bulges, rounds, chamfers, constraints }, i);
+          const cost = whyRemovingCornerCosts({ points, bulges, rounds, chamfers, constraints }, i);
+          return (
+            <button
+              key={i}
+              aria-label={`Remove corner ${i + 1}`}
+              // Disabled ONLY when it is impossible, never merely expensive:
+              // a corner that costs rules to remove is still the student's
+              // to remove, and the cost is in the tooltip and said out loud
+              // by the editor afterwards.
+              disabled={Boolean(why)}
+              title={why ?? cost ?? `Remove corner ${i + 1}`}
+              className={cost ? 'costly' : undefined}
+              onClick={() => onRemoveCorner(i)}
+            >
+              {i + 1}
+            </button>
+          );
+        })}
+      </div>
+
       <div className="sk-rounds">
         <span>Round a corner:</span>
         {points.map((_, i) => {
@@ -517,11 +550,15 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
         }
         .sk-table td { padding: 2px 4px; color: var(--text); }
         .sk-shape { color: #6272a4; font-size: 11px; }
-        .sk-table button, .sk-pins button {
+        .sk-table button, .sk-pins button, .sk-drops button {
           min-width: 24px; padding: 2px 6px; font-size: 12px;
           background: transparent; color: #6272a4;
           border: 1px solid #44475a; border-radius: 3px; cursor: pointer;
         }
+        /* A removal that costs something is marked, not blocked -- amber is
+           already this app's "read the tooltip" colour on the radius handle. */
+        .sk-drops button.costly { border-color: #ffb86c; color: #ffb86c; }
+        .sk-drops button:disabled { opacity: 0.4; cursor: not-allowed; }
         .sk-table button.on, .sk-pins button.on {
           background: #bd93f9; color: #282a36; border-color: #bd93f9;
         }
@@ -553,7 +590,7 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
         .sk-pairs-grid td button.fighting:not(.on) { color: #ff5555; }
         .sk-table button:disabled { opacity: 0.35; cursor: not-allowed; }
         .sk-table input:disabled { opacity: 0.35; cursor: not-allowed; }
-        .sk-pins, .sk-rounds, .sk-chamfers, .sk-bows { display: flex; align-items: center; gap: 4px; margin-top: 8px; color: #6272a4; }
+        .sk-pins, .sk-rounds, .sk-chamfers, .sk-bows, .sk-drops { display: flex; align-items: center; gap: 4px; margin-top: 8px; color: #6272a4; }
         .sk-rounds input, .sk-chamfers input, .sk-bows input {
           width: 42px; background: var(--bg); color: var(--text);
           border: 1px solid #44475a; border-radius: 3px;

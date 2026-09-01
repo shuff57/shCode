@@ -45,6 +45,22 @@ const SANCTIONED = {
     // a point out from under a key that describes it -- cannot arise here,
     // because bowEdge moves nothing.
     bowEdge: 'sets one edge bulge from a bow distance; writes no point, so no arc endpoint moves',
+    // The answer for the one that really does splice `points`. Removing corner
+    // k merges the two edges beside it, so every key alongside is decided
+    // explicitly rather than left to shift and hope:
+    //   - rounds/chamfers are keyed by CORNER: k's own entry goes with the
+    //     corner it described, everything above slides down one.
+    //   - bulges are keyed by EDGE, and the two merging edges are DROPPED
+    //     rather than merged -- one edge cannot retrace two different arcs,
+    //     and keeping either would silently redraw the shape. An arc on any
+    //     other edge slides down and is otherwise untouched.
+    //   - constraints naming k, or either merging edge, are dropped; a length
+    //     rule that survived onto the merged edge would be about a longer edge
+    //     than the one it was written for and would yank the sketch on the
+    //     next solve.
+    // The round-trip is measured, not asserted: splitEdge then removeCorner
+    // restores the tessellated area exactly (sketch-arc-assertions.cjs).
+    removeCorner: 'splices one design corner out and merges the two edges beside it, deciding every corner- and edge-keyed field explicitly',
   },
   'lib/model-codegen.ts': {
     applyParam: 'writes a DESIGN corner from a drag handle or a typed dimension',
