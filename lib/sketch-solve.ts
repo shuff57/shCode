@@ -276,3 +276,32 @@ export function describe(c: Constraint): string {
   if (c.kind === 'perpendicular') return `edge ${c.edge + 1} ⊥ edge ${c.other + 1}`;
   return `corner ${c.corner + 1} pinned`;
 }
+
+/** Which DESIGN EDGES are named by a constraint that is still violated after a
+ *  solve -- the geometry a student should be looking at, as opposed to
+ *  `residualsOf`, which names the rules.
+ *
+ *  Onshape's loudest conflict signal is the geometry itself turning red, and
+ *  this is the set that earns it. Both edges of a pair rule are included: an
+ *  `equal` that cannot be met is an argument between two edges and pointing at
+ *  one of them would be picking a side arbitrarily.
+ *
+ *  A `lock` names a corner rather than an edge and never appears here. It also
+ *  never has a residual to begin with, so this is a type guard rather than a
+ *  behavioural one.
+ *
+ *  The 1e-3 tolerance is the same one the Rules panel marks a control with, so
+ *  a red edge and a red control are always the same claim. */
+export function losingEdges(pts: Point[], constraints: Constraint[]): number[] {
+  const n = pts.length;
+  const wrap = (e: number) => ((e % n) + n) % n;
+  const residuals = residualsOf(pts, constraints);
+  const out = new Set<number>();
+  constraints.forEach((c, i) => {
+    if (residuals[i] <= 1e-3) return;
+    if (c.kind === 'lock') return;
+    out.add(wrap(c.edge));
+    if ('other' in c) out.add(wrap(c.other));
+  });
+  return [...out].sort((a, b) => a - b);
+}

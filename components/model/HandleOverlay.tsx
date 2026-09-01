@@ -12,7 +12,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { arcFromBulge, type Point } from '../../lib/sketch-arc';
-import { type Constraint, residualsOf } from '../../lib/sketch-solve';
+import { type Constraint, losingEdges, residualsOf } from '../../lib/sketch-solve';
 
 /**
  * One selected sketch's outline, in plane coordinates -- what the overlay
@@ -167,8 +167,17 @@ function edgeGlyphs(
 
 /** The outline's screen points, or null when a corner anchor is not on
  *  screen (edge-on plane, same fallback the old flat rendering already had
- *  via its `pts.length < 2` skip). */
-function projectOutline(o: SketchOutline, at: Map<string, AnchorPoint>): { x: number; y: number }[] | null {
+ *  via its `pts.length < 2` skip).
+ *
+ *  `basis` is parallel to `pts` and says which DESIGN corner each screen point
+ *  rides -- the same mapping `SketchOutline.basis` carries, extended to cover
+ *  the arc samples generated here. It is what lets one design edge be picked
+ *  back out of a tessellated outline. A circle returns `basis: null`: its ring
+ *  is sampled off two anchors and has no edges to index. */
+function projectOutline(
+  o: SketchOutline,
+  at: Map<string, AnchorPoint>,
+): { pts: { x: number; y: number }[]; basis: number[] | null } | null {
   const anchors = o.corners.map((c) => at.get(c));
   if (anchors.some((a) => !a || a.ux === undefined || a.uy === undefined)) return null;
   const A = anchors as AnchorPoint[];
@@ -188,10 +197,11 @@ function projectOutline(o: SketchOutline, at: Map<string, AnchorPoint>): { x: nu
       const half = i < samples / 2 ? 0 : 1;
       out.push(projectFrom(A[half], o.design[half], q));
     }
-    return out;
+    return { pts: out, basis: null };
   }
 
   const out: { x: number; y: number }[] = [];
+  const basisOut: number[] = [];
   const count = o.points.length;
   // Every point is projected through its BASIS corner's anchor, not through
   // an anchor of its own: an outline point derived from a fillet has no
@@ -203,6 +213,7 @@ function projectOutline(o: SketchOutline, at: Map<string, AnchorPoint>): { x: nu
   for (let i = 0; i < count; i++) {
     const bi = basisOf(i);
     out.push(projectFrom(A[bi], o.design[bi], o.points[i]));
+    basisOut.push(bi);
     const bulge = o.bulges?.[i];
     if (!bulge) continue;
     const a = o.points[i];
@@ -218,9 +229,43 @@ function projectOutline(o: SketchOutline, at: Map<string, AnchorPoint>): { x: nu
       // The edge's own start point rides its basis corner, and so does every
       // sample along it -- which for a fillet arc is the corner it rounded.
       out.push(projectFrom(A[bi], o.design[bi], q));
+      basisOut.push(bi);
     }
   }
-  return out;
+  return { pts: out, basis: basisOut };
+}
+
+/**
+ * The screen polyline for one DESIGN edge, or null when it cannot be picked
+ * out of the tessellated outline.
+ *
+ * Design edge `e` runs from the LAST screen point riding corner `e` to the
+ * FIRST one riding corner `e + 1`. On a plain corner those are adjacent; on a
+ * rounded or bulged one, everything between them is the arc that belongs to
+ * this edge, and it is drawn with it. Taking the FIRST point riding `e`
+ * instead would reach back across the round at the far end of the previous
+ * edge and paint that red too, blaming an edge no rule named.
+ */
+function edgePolyline(
+  pts: { x: number; y: number }[],
+  basis: number[],
+  e: number,
+  corners: number,
+): { x: number; y: number }[] | null {
+  const from = basis.lastIndexOf(e);
+  const to = basis.indexOf((e + 1) % corners);
+  if (from < 0 || to < 0) return null;
+  const out: { x: number; y: number }[] = [];
+  let i = from;
+  // Bounded rather than while(true): a basis array that never reaches `to`
+  // means the outline and its index disagree, and drawing nothing is the
+  // honest answer to that -- not spinning.
+  for (let guard = 0; guard <= pts.length; guard++) {
+    out.push(pts[i]);
+    if (i === to) return out.length >= 2 ? out : null;
+    i = (i + 1) % pts.length;
+  }
+  return null;
 }
 
 export default function HandleOverlay({
@@ -244,6 +289,22 @@ export default function HandleOverlay({
   useEffect(() => () => {
     if (raf.current !== null) cancelAnimationFrame(raf.current);
   }, []);
+
+  // How many rules are losing right now, across every sketch on screen. The
+  // banner is driven from this rather than from the Rules panel, because the
+  // panel can be scrolled away or narrowed to nothing and a conflict that only
+  // shows there is a conflict a student never sees. Same 1e-3 the panel marks
+  // a control with and losingEdges reddens an edge with -- one claim, three
+  // places to notice it.
+  const conflicts = (outlines ?? []).reduce(
+    (n, o) => n + residualsOf(o.design, o.constraints ?? []).filter((r) => r > 1e-3).length,
+    0,
+  );
+  const [dismissed, setDismissed] = useState(false);
+  // Dismissal lasts for one conflict, not forever: settle the sketch and break
+  // it again and the banner is back. An × that silences the warning for the
+  // rest of the session would be worse than no × at all.
+  useEffect(() => { if (conflicts === 0) setDismissed(false); }, [conflicts]);
 
   // One update per frame. A pointer can fire far faster than a rebuild
   // finishes, and every extra send is geometry that is stale before it lands.
@@ -315,8 +376,9 @@ export default function HandleOverlay({
       {outlines && outlines.length > 0 && (
         <svg className="sketch-lines" aria-hidden="true">
           {outlines.map((o, n) => {
-            const pts = projectOutline(o, at);
-            if (!pts || pts.length < 2) return null;
+            const projected = projectOutline(o, at);
+            if (!projected || projected.pts.length < 2) return null;
+            const { pts, basis } = projected;
             // A chip groups the glyphs on one edge and gives them a backdrop,
             // so they stay readable sitting over the outline.
             //
@@ -337,6 +399,24 @@ export default function HandleOverlay({
                 <polygon
                   points={pts.map((p) => `${p.x},${p.y}`).join(' ')}
                 />
+                {/* The edges a losing rule names, repainted red OVER the
+                    outline rather than instead of it -- the shape reads the
+                    same, only its colour changes. Onshape's loudest conflict
+                    signal is the geometry itself going red, and this is that,
+                    narrowed to the edges actually in the argument. Innocent
+                    edges keep the ordinary cyan, for the same reason the chips
+                    above colour per glyph. */}
+                {basis && losingEdges(o.design, o.constraints ?? []).map((e) => {
+                  const run = edgePolyline(pts, basis, e, o.corners.length);
+                  if (!run) return null;
+                  return (
+                    <polyline
+                      key={`losing-${e}`}
+                      className="is-losing"
+                      points={run.map((p) => `${p.x},${p.y}`).join(' ')}
+                    />
+                  );
+                })}
                 {[...chips].map(([edge, glyphs]) => {
                   const spot = glyphAt(at, o.corners, edge)!;
                   // #bd93f9 is the same purple the panel paints a set control
@@ -472,6 +552,22 @@ export default function HandleOverlay({
           aria-label="Click to place a point on the sketch plane"
         />
       )}
+      {/* Rendered after the draw-catcher so its × is clickable mid-draw, and
+          after the svg, which is aria-hidden -- this is the only thing that
+          announces a conflict to a screen reader. */}
+      {conflicts > 0 && !dismissed && (
+        <div className="sketch-alarm" role="status">
+          <span className="warn" aria-hidden="true">⚠</span>
+          <span>These rules cannot all be true — {conflicts} marked in red.</span>
+          <button
+            type="button"
+            aria-label="Hide this warning"
+            onClick={() => setDismissed(true)}
+          >
+            ×
+          </button>
+        </div>
+      )}
       <style>{`
         /* The layer must not eat orbit drags — only the handles themselves do. */
         .handle-layer { position: absolute; inset: 0; pointer-events: none; }
@@ -488,6 +584,39 @@ export default function HandleOverlay({
           fill: rgba(139, 233, 253, 0.12);
           stroke: #8be9fd; stroke-width: 1.5; stroke-dasharray: 5 3;
         }
+        /* Still dashed, so it still reads as a sketch line rather than a new
+           kind of geometry. Wider than the outline underneath it so the red
+           wins cleanly where the two overlap. */
+        .sketch-lines .is-losing {
+          fill: none;
+          stroke: #ff5555; stroke-width: 2.5; stroke-dasharray: 5 3;
+        }
+        /* The Rules panel names which rules disagree and this does not repeat
+           that -- it exists to be impossible to miss and to point at the red. */
+        /* Top RIGHT, not Onshape's top centre, and 60px down rather than 12px.
+           Both are forced by what else floats over this same layer, measured
+           live rather than guessed: the tools bar is a 48px ribbon across the
+           top (a banner at 12px sat on the buttons and ate their clicks), and
+           the Rules panel overlays the left ~450px -- and grows taller exactly
+           when a conflict exists, which is exactly when this banner shows, so
+           a centred banner is clipped precisely when it is needed. The top
+           right corner is the one part of the canvas nothing else claims. */
+        .sketch-alarm {
+          position: absolute; top: 60px; right: 16px;
+          display: flex; align-items: center; gap: 9px;
+          max-width: calc(100% - 24px);
+          padding: 7px 8px 7px 12px;
+          background: #282a36; border: 1px solid #ff5555; border-radius: 6px;
+          color: #f8f8f2; font-size: 13px; line-height: 1.35;
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+          pointer-events: auto;
+        }
+        .sketch-alarm .warn { color: #ffb86c; font-size: 15px; }
+        .sketch-alarm button {
+          background: none; border: 0; color: #6272a4; cursor: pointer;
+          font-size: 17px; line-height: 1; padding: 1px 4px;
+        }
+        .sketch-alarm button:hover { color: #f8f8f2; }
         .handle.is-point {
           background: #8be9fd; border-radius: 2px;
           width: 10px; height: 10px; margin: -5px 0 0 -5px;

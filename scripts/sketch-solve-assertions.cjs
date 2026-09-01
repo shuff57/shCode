@@ -308,6 +308,51 @@ module.exports = function run(dir) {
 
   check('no constraints means no residuals', S.residualsOf(rect(), []).length === 0);
 
+  console.log('\n=== which EDGES lose, not which rules ===');
+
+  // losingEdges is what turns geometry red. Its failure mode is the one the
+  // canvas chips already shipped once and had to be corrected: reddening an
+  // innocent neighbour, which says "this is a culprit" about something that is
+  // not. Every check here is about discrimination, not about detection.
+  const litEdges = S.losingEdges(fightSolved.points, fight);
+  check('a contradiction reddens the edge it is about', litEdges.includes(0),
+    JSON.stringify(litEdges));
+  check('...and leaves the satisfied edge alone', !litEdges.includes(1),
+    JSON.stringify(litEdges));
+
+  check('a satisfiable sketch reddens nothing',
+    S.losingEdges(happySolved.points, happy).length === 0,
+    JSON.stringify(S.losingEdges(happySolved.points, happy)));
+
+  // Measured on raw points rather than a solve: this is the pure mapping from
+  // rule to edges, and a solver that happened to settle it would hide it.
+  const unmetPair = S.losingEdges(rect(), [{ kind: 'equal', edge: 0, other: 1 }]);
+  check('an unmet pair rule reddens BOTH its edges, not an arbitrary one',
+    JSON.stringify(unmetPair) === '[0,1]', JSON.stringify(unmetPair));
+
+  check('a lock never reddens an edge -- it names a corner',
+    S.losingEdges(rect(), [{ kind: 'lock', corner: 0 }]).length === 0);
+
+  const dup = S.losingEdges(rect(), [
+    { kind: 'equal', edge: 1, other: 0 },
+    { kind: 'length', edge: 0, value: 999 },
+  ]);
+  check('an edge named by two losing rules appears once, and the list is sorted',
+    JSON.stringify(dup) === '[0,1]', JSON.stringify(dup));
+
+  // The panel and the canvas must agree about who is in trouble: every edge
+  // reddened has to be named by a rule the panel would mark, and vice versa.
+  const panelEdges = new Set();
+  fight.forEach((c, i) => {
+    if (S.residualsOf(fightSolved.points, fight)[i] <= 1e-3) return;
+    panelEdges.add(c.edge);
+    if ('other' in c) panelEdges.add(c.other);
+  });
+  check('the red edges are exactly the edges the panel marks rules on',
+    JSON.stringify([...panelEdges].sort((a, b) => a - b)) === JSON.stringify(litEdges),
+    JSON.stringify([...panelEdges]) + ' vs ' + JSON.stringify(litEdges));
+
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };

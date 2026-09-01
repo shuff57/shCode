@@ -59,17 +59,32 @@ constraint sitting next to a losing one must not be painted as failing.
 | **per-glyph** colouring, satisfied stays neutral | yes | yes — `HandleOverlay.tsx:370` |
 | plain-language sentence, no solver jargon | "Sketch could not be solved." | names the rules: "These rules cannot all be true: edge 1 = edge 3." |
 | marks only the offending rules in the panel | n/a (no panel) | 1 of 18 controls in the measured case |
+| the geometry itself turns red | yes | yes, as of 2026-09-01 -- and only the edges a losing rule NAMES, where Onshape reddens both whole lines |
+| a dismissible banner over the canvas | yes | yes, as of 2026-09-01 -- top right rather than top centre, see below |
 
 Ours says *which* rules disagree; Onshape only says that some do. That is a
 deliberate divergence in our favour for a beginner audience — keep it.
 
 ## Where ours differs, and whether that is a defect
 
-1. **Geometry does not turn red.** Onshape's loudest conflict signal. A
-   student looking at the shape rather than the panel currently sees only two
-   small chips. *Gap. Cheap to close.*
-2. **No banner over the canvas.** Our message lives in the side panel only. If
-   the panel is scrolled or narrow the conflict is silent. *Gap.*
+1. ~~**Geometry does not turn red.**~~ **CLOSED 2026-09-01.** `losingEdges()`
+   in `lib/sketch-solve.ts` names the design edges a violated rule points at,
+   and `HandleOverlay` repaints exactly those over the outline in `#ff5555`.
+   Narrower than Onshape on purpose: Onshape reddens both whole entities, we
+   redden only the edges actually in the argument -- the same discrimination
+   the per-glyph chip colouring already commits to.
+2. ~~**No banner over the canvas.**~~ **CLOSED 2026-09-01.** `.sketch-alarm`,
+   dismissible, and the dismissal lasts one conflict rather than the session.
+   It sits **top right, 60px down**, not top centre. Both positions were
+   measured live and both are taken: the tools bar floats as a 48px ribbon
+   across the top, and the Rules panel overlays the left ~450px and *grows
+   taller exactly when a conflict exists*, so a centred banner is clipped
+   precisely when it fires. `scripts/drive-sketch-conflict.py` keeps that
+   measurement as a check rather than as a comment.
+
+   The banner deliberately does NOT name the rules -- the panel does, and one
+   sentence maintained in two places drifts. It carries a count and points at
+   the red: *These rules cannot all be true -- 3 marked in red.*
 3. **The `Sketch 1` chip is not marked.** Onshape reddens the tree entry.
    *Minor; our tree is one chip, not a tree.*
 4. **Interaction model is different by design.** Onshape is select-then-verb
