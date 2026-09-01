@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getCurrentUser, type CurrentUser } from '../../lib/auth';
 import { useLessonState } from '../../lib/progress';
+import StudentGradebook from '../../components/StudentGradebook';
 
 interface ManifestLesson {
   id: string;
@@ -127,6 +128,10 @@ export default function ProgressPage() {
           </p>
         )}
       </div>
+
+      {/* Per-assignment gradebook — the student's own row of the same matrix
+          the teacher reads from /api/classes/[id]/gradebook. */}
+      <StudentGradebook lessons={manifest.lessons} />
 
       <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
         {/* Recently completed */}
