@@ -109,12 +109,11 @@
     },
     {
       "id": "trim",
-      "name": "Trim",
-      "covers": [
-        "Trim",
-        "Extend"
-      ],
-      "why": "the tool that makes drawing forgiving; without it a wrong line must be undone rather than fixed"
+      "name": "Remove a corner",
+      "covers": [],
+      "why": "RECLASSIFIED 2026-09-01. Onshape's Trim removes the excess line past an intersection, and a closed polygon has no excess -- every edge ends exactly where the next begins, so that job does not exist here. Trim and Extend moved to outOfScope with that reason. What the re-examination DID turn up in the same place a student reaches is a real gap of a different shape: addCorner() has split an edge since the first sketch build and there has never been a way to take a corner back off. A + with no -.",
+      "landed": "2026-09-01 gauntlet round 8. removeCorner/whyCannotRemoveCorner/whyRemovingCornerCosts in lib/sketch-arc.ts, and a 'Remove a corner:' row in SketchConstraints.tsx mirroring the Pin row, wired through dropSketchCorner() in ModelEditor.tsx. Removing corner k merges the two edges beside it, which is the part insertion never has to think about, so every key alongside is decided explicitly: rounds/chamfers ride their corner, bulges on BOTH merging edges are dropped (one edge cannot retrace two arcs), and any rule naming k or either merging edge is dropped rather than remapped onto an edge it was not written about. The cost is counted and shown in the button's tooltip BEFORE the click, and said out loud after. Floor of three corners, refused with a sentence. The round-trip is measured on the outline, not on the indices: splitEdge then removeCorner restores the tessellated area exactly, on three different edges including the wrap-around. Verified live: panel, edge table, pair grid, Dimensions list and canvas all drop to three together, and every Remove button then disables itself and says why.",
+      "note": "No canvas affordance -- removal is a panel verb, like Pin. The '+' tool on the toolbar still always splits edge 1, which is the asymmetry that remains: the inverse is per-corner and the forward direction is not."
     },
     {
       "id": "mirror2d",
@@ -221,6 +220,14 @@
         "Point"
       ],
       "why": "a point that is not a corner of the outline has nothing to reference it. In Onshape a sketch point is what a Hole feature snaps to; our Hole positions itself from its target's own centre instead, so a free point would be a dot the student can place and nothing can use. Revisit if Hole ever learns to snap."
+    },
+    {
+      "group": "trim",
+      "tools": [
+        "Trim",
+        "Extend"
+      ],
+      "why": "the closed-polygon model, not a solver limit. Trim cuts a line back to where it crosses another and Extend runs it forward to meet one; both need loose ends, and a SketchFeature has none -- every edge already ends exactly on the next corner. The forgiving-drawing job they do in Onshape is done here by moving a corner, or by removing one (the 'Remove a corner' build item, which is what this queue entry became)."
     }
   ]
 }
