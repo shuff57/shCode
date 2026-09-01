@@ -1092,6 +1092,22 @@ export default function SandboxWorkspace() {
           border-top: 1px solid #44475a;
         }
         .sandbox-shell.is-build.is-card-empty .sandbox-timeline { left: 66px; }
+        /* The timeline floats at bottom:0 over the whole pane, and the runner
+           puts its own Save STL/3MF/OBJ/SVG buttons at the bottom of ITS
+           viewport -- so in Build the strip lay directly on top of them and
+           every export was unclickable. Measured, not guessed: the STL button
+           sits at y 835-863, the strip at y 814-871, and
+           document.elementFromPoint() at the button centre returned the
+           timeline <ol>.
+
+           Fixed by ending the VIEW above the strip rather than by moving the
+           runner's bar. The runner is shared with the docs pages and the
+           lessons, where there is no timeline to dodge, so its layout is not
+           this host's to bend. Padding the shared container also keeps the
+           handle overlay in step: it is inset:0 on this same box, so the
+           frame and the handles shrink together and a corner handle stays on
+           the corner it belongs to. */
+        .sandbox-shell.is-build .reshape-pane-view { padding-bottom: 58px; }
         .sandbox-shell.is-build .sandbox-timeline .model-timeline {
           flex: 1 1 auto;
           min-width: 0;

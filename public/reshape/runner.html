@@ -439,6 +439,15 @@
 		       } }
 	};
 
+	// A save problem, shown where the student is looking and logged, but NOT
+	// reported to the host as a preview error. Same overlay reportError uses,
+	// so it reads identically; the difference is entirely in who is told.
+	function saveFailed(msg) {
+		console.log(msg);
+		var el = document.getElementById("__jscadError");
+		if (el) { el.style.display = "block"; el.textContent = "Error: " + msg; }
+	}
+
 	function kb(bytes) { return bytes < 1024 ? bytes + ' bytes' : (bytes / 1024).toFixed(1) + ' KB'; }
 
 	function save(key) {
@@ -448,7 +457,14 @@
 		try {
 			blob = new Blob(fmt.run(solids), { type: fmt.mime });
 		} catch (e) {
-			window.__previewFail('Could not write the ' + key.toUpperCase() + ' file: ' + (e.message || e));
+			// NOT __previewFail. A save that declines is not a build that failed:
+			// the model on screen is fine, and routing this through reportError
+			// posted a preview-error to the host, which made shCode's Build mode
+			// tell the student 'These numbers stopped the code before it produced
+			// a shape' about a shape that had just been built and exported to STL
+			// and OBJ seconds earlier. Measured 2026-09-01 pressing Save SVG on a
+			// solid, which declines on purpose.
+			saveFailed('Could not write the ' + key.toUpperCase() + ' file: ' + (e.message || e));
 			return;
 		}
 		var url = URL.createObjectURL(blob);
