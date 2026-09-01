@@ -33,7 +33,10 @@
           "Describing something without using any examples"
         ],
         "answer": 1,
-        "explanation": "Definition 1.5.3. It is leaving something out on purpose, and you should be able to name what you left out."
+        "explanation": "Definition 1.5.3. It is leaving something out on purpose, and you should be able to name what you left out.",
+        "sourceIds": [
+          "1-5-13-reading-abstraction"
+        ]
       },
       {
         "id": "q2-the-test",
@@ -46,7 +49,10 @@
           "Would leaving it out make the description shorter?"
         ],
         "answer": 0,
-        "explanation": "One question settles every case. Being true is not the standard; being load-bearing is."
+        "explanation": "One question settles every case. Being true is not the standard; being load-bearing is.",
+        "sourceIds": [
+          "1-5-13-reading-abstraction"
+        ]
       },
       {
         "id": "q3-bus-route",
@@ -59,7 +65,10 @@
           "The stop where they get off"
         ],
         "answer": 3,
-        "explanation": "Without the stop the description is useless. The other three are all true and none of them change what the person does."
+        "explanation": "Without the stop the description is useless. The other three are all true and none of them change what the person does.",
+        "sourceIds": [
+          "1-5-13-reading-abstraction"
+        ]
       },
       {
         "id": "q4-true-but-droppable",
@@ -72,7 +81,10 @@
           "No: leaving out true things is what makes a description wrong"
         ],
         "answer": 2,
-        "explanation": "The colour of the bus is a fact. It is also irrelevant to catching it."
+        "explanation": "The colour of the bus is a fact. It is also irrelevant to catching it.",
+        "sourceIds": [
+          "1-5-13-reading-abstraction"
+        ]
       },
       {
         "id": "q5-abstraction-is-relative",
@@ -85,7 +97,10 @@
           "It means abstraction does not work for describing directions"
         ],
         "answer": 1,
-        "explanation": "Change the problem and the same fact changes category. Abstraction is relative to the job in front of you."
+        "explanation": "Change the problem and the same fact changes category. Abstraction is relative to the job in front of you.",
+        "sourceIds": [
+          "1-5-14-reading-layers-of-abstraction"
+        ]
       }
     ]
   }

@@ -33,7 +33,10 @@
           "In a comment above the balance"
         ],
         "answer": 0,
-        "explanation": "The behaviour goes where the data is. The account holds the balance and knows how to deposit into it."
+        "explanation": "The behaviour goes where the data is. The account holds the balance and knows how to deposit into it.",
+        "sourceIds": [
+          "1-4-15-reading-object-oriented"
+        ]
       },
       {
         "id": "q2-what-makes-it-oo",
@@ -46,7 +49,10 @@
           "Data and the behaviour that operates on it are bundled into one value"
         ],
         "answer": 3,
-        "explanation": "Bundling is the whole idea: properties and methods in one object, per Definition 1.4.4."
+        "explanation": "Bundling is the whole idea: properties and methods in one object, per Definition 1.4.4.",
+        "sourceIds": [
+          "1-4-15-reading-object-oriented"
+        ]
       },
       {
         "id": "q3-procedural-where",
@@ -59,7 +65,10 @@
           "In a second copy of the balance"
         ],
         "answer": 2,
-        "explanation": "Procedural keeps them apart: variables hold values, statements do work, nothing owns anything."
+        "explanation": "Procedural keeps them apart: variables hold values, statements do work, nothing owns anything.",
+        "sourceIds": [
+          "1-4-8-reading-procedural-programming"
+        ]
       },
       {
         "id": "q4-procedural-defining",
@@ -72,7 +81,10 @@
           "It always runs faster than object-oriented code"
         ],
         "answer": 1,
-        "explanation": "Separation is the feature, and it is exactly what the next two paradigms change."
+        "explanation": "Separation is the feature, and it is exactly what the next two paradigms change.",
+        "sourceIds": [
+          "1-4-8-reading-procedural-programming"
+        ]
       },
       {
         "id": "q5-when-which",
@@ -85,7 +97,10 @@
           "Whichever one you learned first is the right one to keep using"
         ],
         "answer": 0,
-        "explanation": "Neither wins in the abstract. Bundling starts paying once the program is big enough to be annoying without it."
+        "explanation": "Neither wins in the abstract. Bundling starts paying once the program is big enough to be annoying without it.",
+        "sourceIds": [
+          "1-4-15-reading-object-oriented"
+        ]
       }
     ]
   }

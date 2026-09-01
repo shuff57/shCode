@@ -27,7 +27,10 @@
           "The person who decides what gets built"
         ],
         "answer": 0,
-        "explanation": "A process model gives the project its shape: it says what happens when. Teams do not build in random order."
+        "explanation": "A process model gives the project its shape: it says what happens when. Teams do not build in random order.",
+        "sourceIds": [
+          "1-1-6-reading-four-phases"
+        ]
       },
       {
         "id": "q2-four-phases",
@@ -40,7 +43,10 @@
           "Problem, project, people, product"
         ],
         "answer": 1,
-        "explanation": "Inception, elaboration, construction, deployment. Every process model uses these same four: what changes is how much work each one gets."
+        "explanation": "Inception, elaboration, construction, deployment. Every process model uses these same four: what changes is how much work each one gets.",
+        "sourceIds": [
+          "1-1-6-reading-four-phases"
+        ]
       },
       {
         "id": "q3-which-phase-is-code",
@@ -53,7 +59,11 @@
           "Deployment: it is what the user sees"
         ],
         "answer": 2,
-        "explanation": "Construction is where the software is coded and built from the design. Worth noticing: that line is one phase out of four: teams tend to over-weight construction."
+        "explanation": "Construction is where the software is coded and built from the design. Worth noticing: that line is one phase out of four: teams tend to over-weight construction.",
+        "sourceIds": [
+          "1-1-6-reading-four-phases",
+          "1-1-8-example-greeting-phases"
+        ]
       },
       {
         "id": "q4-elaboration",
@@ -66,7 +76,10 @@
           "Deployment"
         ],
         "answer": 1,
-        "explanation": "Elaboration. Inception sets the goals and scope; elaboration turns them into requirements and a design."
+        "explanation": "Elaboration. Inception sets the goals and scope; elaboration turns them into requirements and a design.",
+        "sourceIds": [
+          "1-1-6-reading-four-phases"
+        ]
       },
       {
         "id": "q5-umbrella-definition",
@@ -79,7 +92,10 @@
           "It is a phase that can be skipped on small projects"
         ],
         "answer": 0,
-        "explanation": "An umbrella activity never starts and ends: it runs the whole project. The kitchen analogy: the four phases are cooking the meal, umbrella activities are the cleanup that keeps the kitchen usable throughout."
+        "explanation": "An umbrella activity never starts and ends: it runs the whole project. The kitchen analogy: the four phases are cooking the meal, umbrella activities are the cleanup that keeps the kitchen usable throughout.",
+        "sourceIds": [
+          "1-1-10-reading-umbrella"
+        ]
       },
       {
         "id": "q6-umbrella-example",
@@ -92,7 +108,10 @@
           "Writing the greeting function"
         ],
         "answer": 1,
-        "explanation": "Risk management is one of the six: training/communication, risk management, configuration management, quality management, architecture management, security management."
+        "explanation": "Risk management is one of the six: training/communication, risk management, configuration management, quality management, architecture management, security management.",
+        "sourceIds": [
+          "1-1-10-reading-umbrella"
+        ]
       },
       {
         "id": "q7-action-definition",
@@ -105,7 +124,10 @@
           "A meeting held at the start of a project"
         ],
         "answer": 2,
-        "explanation": "An action answers what job gets done inside a phase. It is not the whole phase and not a single keystroke: \"define the requirements\" lives inside inception."
+        "explanation": "An action answers what job gets done inside a phase. It is not the whole phase and not a single keystroke: \"define the requirements\" lives inside inception.",
+        "sourceIds": [
+          "1-1-12-reading-actions"
+        ]
       },
       {
         "id": "q8-task-set",
@@ -118,7 +140,10 @@
           "A single task that finishes a whole phase"
         ],
         "answer": 0,
-        "explanation": "One action = one task set. Each task in the set produces a real work product, and that work product is checked before moving on."
+        "explanation": "One action = one task set. Each task in the set produces a real work product, and that work product is checked before moving on.",
+        "sourceIds": [
+          "1-1-13-reading-task-sets"
+        ]
       },
       {
         "id": "q9-four-ps",
@@ -131,7 +156,10 @@
           "Purpose, priority, progress, proof"
         ],
         "answer": 1,
-        "explanation": "Problem, project, people, product. They are the reason two teams following the same four phases still work very differently."
+        "explanation": "Problem, project, people, product. They are the reason two teams following the same four phases still work very differently.",
+        "sourceIds": [
+          "1-1-17-reading-four-ps"
+        ]
       },
       {
         "id": "q10-prescriptive-limits",
@@ -144,7 +172,11 @@
           "It has no testing phase"
         ],
         "answer": 2,
-        "explanation": "Prescriptive means it hands you a prescribed order to follow. That is a strength when requirements are stable and a weakness when they are not: the strict-recipe problem."
+        "explanation": "Prescriptive means it hands you a prescribed order to follow. That is a strength when requirements are stable and a weakness when they are not: the strict-recipe problem.",
+        "sourceIds": [
+          "1-1-19-reading-prescriptive",
+          "1-1-20-reading-prescriptive-limits"
+        ]
       }
     ]
   },

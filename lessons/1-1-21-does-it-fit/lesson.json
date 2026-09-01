@@ -33,7 +33,10 @@
           "Skipping documentation to release sooner"
         ],
         "answer": 1,
-        "explanation": "\"Prescriptive\" means it tells you what to do: an orderly, prescribed sequence. Nothing fancier."
+        "explanation": "\"Prescriptive\" means it tells you what to do: an orderly, prescribed sequence. Nothing fancier.",
+        "sourceIds": [
+          "1-1-19-reading-prescriptive"
+        ]
       },
       {
         "id": "q2-named-examples",
@@ -46,7 +49,10 @@
           "Problem, project, people, product"
         ],
         "answer": 0,
-        "explanation": "Waterfall, prototyping, spiral and RUP are named examples. The idea they share is the orderly sequence."
+        "explanation": "Waterfall, prototyping, spiral and RUP are named examples. The idea they share is the orderly sequence.",
+        "sourceIds": [
+          "1-1-19-reading-prescriptive"
+        ]
       },
       {
         "id": "q3-zara-fit",
@@ -59,7 +65,10 @@
           "No: prescriptive models are rigid, and hers is exactly the case they handle worst: requirements that keep changing"
         ],
         "answer": 3,
-        "explanation": "Rigidity is the problem. A plan made once cannot bend to requirements that move every week."
+        "explanation": "Rigidity is the problem. A plan made once cannot bend to requirements that move every week.",
+        "sourceIds": [
+          "1-1-20-reading-prescriptive-limits"
+        ]
       },
       {
         "id": "q4-recipe-analogy",
@@ -72,7 +81,10 @@
           "Recipes list ingredients first, and so should software plans"
         ],
         "answer": 2,
-        "explanation": "Follow the recipe and it works, until something changes and the recipe has no room to bend. That is the failure mode."
+        "explanation": "Follow the recipe and it works, until something changes and the recipe has no room to bend. That is the failure mode.",
+        "sourceIds": [
+          "1-1-20-reading-prescriptive-limits"
+        ]
       }
     ]
   }

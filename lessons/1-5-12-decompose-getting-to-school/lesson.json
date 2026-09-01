@@ -33,7 +33,10 @@
           "Solving a problem the fastest way you can find"
         ],
         "answer": 2,
-        "explanation": "Definition 1.5.2: one hard task redefined as a set of easy ones."
+        "explanation": "Definition 1.5.2: one hard task redefined as a set of easy ones.",
+        "sourceIds": [
+          "1-5-8-reading-decomposition"
+        ]
       },
       {
         "id": "q2-self-contained",
@@ -46,7 +49,10 @@
           "The parts are listed in the order they happen"
         ],
         "answer": 1,
-        "explanation": "A part you can only understand while holding three others in your head has been chopped, not decomposed."
+        "explanation": "A part you can only understand while holding three others in your head has been chopped, not decomposed.",
+        "sourceIds": [
+          "1-5-8-reading-decomposition"
+        ]
       },
       {
         "id": "q3-chopped-not-decomposed",
@@ -59,7 +65,10 @@
           "\"Make half the sandwich\", then \"make the other half\""
         ],
         "answer": 0,
-        "explanation": "Start and finish are not solvable on their own. Opening the jar is."
+        "explanation": "Start and finish are not solvable on their own. Opening the jar is.",
+        "sourceIds": [
+          "1-5-8-reading-decomposition"
+        ]
       },
       {
         "id": "q4-still-too-big",
@@ -72,7 +81,10 @@
           "No: \"get ready\" hides several separate tasks, so it is not yet self-contained"
         ],
         "answer": 3,
-        "explanation": "Wash, dress, pack the bag, eat. Each is separately doable; \"get ready\" is a label over the top of them."
+        "explanation": "Wash, dress, pack the bag, eat. Each is separately doable; \"get ready\" is a label over the top of them.",
+        "sourceIds": [
+          "1-5-8-reading-decomposition"
+        ]
       },
       {
         "id": "q5-why-group",
@@ -85,7 +97,10 @@
           "It proves every task is self-contained"
         ],
         "answer": 2,
-        "explanation": "The shape of the groups is information. A nearly empty category is the flat list telling you it is incomplete."
+        "explanation": "The shape of the groups is information. A nearly empty category is the flat list telling you it is incomplete.",
+        "sourceIds": [
+          "1-5-11-example-decomposing-the-sandwich"
+        ]
       }
     ]
   }

@@ -65,6 +65,7 @@ for (const e of entries) {
     title: String(meta.title ?? ''),
     unit: meta.unit ?? null,
     graders: [meta.aiGrader, meta.diagram?.aiGrader].filter(Boolean),
+    quiz: meta.quiz ?? null,
   });
 }
 
@@ -187,6 +188,56 @@ for (const l of lessons) {
       }
     }
   }
+}
+
+// --- every quiz `source` must still point at the lesson it was pinned to
+//
+// QuizView resolves `source` LIVE by lesson number, and it is a plain prose
+// string ("2.1.28 and 2.1.18") -- not backtick-quoted, so a sweep for cited
+// lesson TITLES never sees it. Unit 2.1 was renumbered, three questions kept
+// their old numbers, and a student who missed one and clicked "review" landed
+// on an unrelated lesson.
+//
+// Checking only that the number EXISTS is useless here, and this check
+// originally did exactly that: every stale number still named a real lesson,
+// just the wrong one. Replaying the real defect against it passed clean.
+//
+// So each question also carries `sourceIds`, the FOLDER IDS those numbers
+// resolved to when pinned. Ids never move; numbers move on every insert or
+// reorder. If they stop agreeing, the citation drifted.
+//
+// What this proves: the number and the pinned lesson still agree. What it does
+// NOT prove: that the pinned lesson was the right one to cite. Pinning froze
+// whatever was true at the time.
+const numberOf = new Map();
+for (const l of lessons) {
+  const m = /^(\d+\.\d+\.\d+)\s/.exec(l.title);
+  if (m) numberOf.set(l.folder, m[1]);
+}
+for (const l of lessons) {
+  const questions = l.quiz?.questions;
+  if (!Array.isArray(questions)) continue;
+  questions.forEach((q, i) => {
+    if (!q.source) return;
+    const cited = String(q.source).match(/\d+\.\d+\.\d+/g) ?? [];
+    const ids = q.sourceIds;
+    if (!Array.isArray(ids) || ids.length !== cited.length) {
+      errors.push(`${l.folder} quiz question ${i + 1} has ${cited.length} number(s) `
+        + `in \`source\` but ${Array.isArray(ids) ? ids.length : 'no'} \`sourceIds\`. `
+        + `Run scripts/pin-quiz-sources.mjs to re-pin.`);
+      return;
+    }
+    cited.forEach((n, k) => {
+      const now = numberOf.get(ids[k]);
+      if (now === undefined) {
+        errors.push(`${l.folder} quiz question ${i + 1} pins ${ids[k]}, which no longer exists.`);
+      } else if (now !== n) {
+        errors.push(`${l.folder} quiz question ${i + 1} cites ${n}, but ${ids[k]} `
+          + `is now ${now}. The review link points at the wrong lesson -- renumbering `
+          + `must rewrite \`source\`, and nothing else does.`);
+      }
+    });
+  });
 }
 
 for (const w of warnings) console.warn(`[check-lesson-numbers] WARN  ${w}`);

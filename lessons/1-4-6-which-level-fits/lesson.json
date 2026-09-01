@@ -33,7 +33,10 @@
           "High-level"
         ],
         "answer": 3,
-        "explanation": "High-level. The deadline is the binding constraint, and high-level languages are faster to write."
+        "explanation": "High-level. The deadline is the binding constraint, and high-level languages are faster to write.",
+        "sourceIds": [
+          "1-4-5-reading-high-and-low-level"
+        ]
       },
       {
         "id": "q2-scarce-resource",
@@ -46,7 +49,10 @@
           "Disk space"
         ],
         "answer": 2,
-        "explanation": "Eight weeks is what they are short of. The right level is the one that spends the scarce resource most carefully."
+        "explanation": "Eight weeks is what they are short of. The right level is the one that spends the scarce resource most carefully.",
+        "sourceIds": [
+          "1-4-5-reading-high-and-low-level"
+        ]
       },
       {
         "id": "q3-abstraction-means",
@@ -59,7 +65,10 @@
           "How recently the language was invented"
         ],
         "answer": 1,
-        "explanation": "How far the language sits from the hardware. The detail still happens: you are just not the one describing it."
+        "explanation": "How far the language sits from the hardware. The detail still happens: you are just not the one describing it.",
+        "sourceIds": [
+          "1-4-4-reading-levels-of-abstraction"
+        ]
       },
       {
         "id": "q4-the-cost",
@@ -72,7 +81,10 @@
           "The ability to use variables"
         ],
         "answer": 0,
-        "explanation": "Every choice on this scale has a cost. Here it is a little run speed and the fine-grained control."
+        "explanation": "Every choice on this scale has a cost. Here it is a little run speed and the fine-grained control.",
+        "sourceIds": [
+          "1-4-5-reading-high-and-low-level"
+        ]
       },
       {
         "id": "q5-when-low-level",
@@ -85,7 +97,10 @@
           "Writing the code that drives a hard disk, where control over the hardware is the point"
         ],
         "answer": 3,
-        "explanation": "When hardware control IS the job, low-level earns its cost. Neither end of the scale wins in general."
+        "explanation": "When hardware control IS the job, low-level earns its cost. Neither end of the scale wins in general.",
+        "sourceIds": [
+          "1-4-5-reading-high-and-low-level"
+        ]
       }
     ]
   }

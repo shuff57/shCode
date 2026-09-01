@@ -33,7 +33,10 @@
           "SQL can only be used by professional programmers"
         ],
         "answer": 1,
-        "explanation": "Languages are purpose driven. SQL does its one job well and simply has no way to build the parts of a page you click on: it is not a matter of age or speed."
+        "explanation": "Languages are purpose driven. SQL does its one job well and simply has no way to build the parts of a page you click on: it is not a matter of age or speed.",
+        "sourceIds": [
+          "1-4-2-reading-why-so-many-languages"
+        ]
       },
       {
         "id": "q2-low-level",
@@ -46,7 +49,10 @@
           "One that can only run on older computers"
         ],
         "answer": 2,
-        "explanation": "Low-level means close to the hardware: you handle details like where each value sits in memory. The first option describes a high-level language."
+        "explanation": "Low-level means close to the hardware: you handle details like where each value sits in memory. The first option describes a high-level language.",
+        "sourceIds": [
+          "1-4-5-reading-high-and-low-level"
+        ]
       },
       {
         "id": "q3-high-level-advantage",
@@ -59,7 +65,10 @@
           "It is the only kind of language a browser can run"
         ],
         "answer": 0,
-        "explanation": "High-level buys writing speed and fewer mistakes; low-level buys run speed and control. Which one wins depends on which resource is scarce for that project."
+        "explanation": "High-level buys writing speed and fewer mistakes; low-level buys run speed and control. Which one wins depends on which resource is scarce for that project.",
+        "sourceIds": [
+          "1-4-5-reading-high-and-low-level"
+        ]
       },
       {
         "id": "q4-paradigm",
@@ -72,7 +81,10 @@
           "An approach to organising and structuring code"
         ],
         "answer": 3,
-        "explanation": "Definition 1.4.2: a paradigm is an approach to organising and structuring code: how a program is broken into pieces and how those pieces fit together. It is not a language, and it is not syntax."
+        "explanation": "Definition 1.4.2: a paradigm is an approach to organising and structuring code: how a program is broken into pieces and how those pieces fit together. It is not a language, and it is not syntax.",
+        "sourceIds": [
+          "1-4-7-reading-what-is-a-paradigm"
+        ]
       },
       {
         "id": "q5-three-structures",
@@ -85,7 +97,11 @@
           "Design, development and testing"
         ],
         "answer": 1,
-        "explanation": "Sequence, selection and repetition, and nothing more exotic. There is no fourth structure waiting in a later chapter."
+        "explanation": "Sequence, selection and repetition, and nothing more exotic. There is no fourth structure waiting in a later chapter.",
+        "sourceIds": [
+          "1-4-9-reading-structured-programming",
+          "1-4-10-reading-three-structures"
+        ]
       },
       {
         "id": "q6-selection",
@@ -98,7 +114,10 @@
           "Giving a group of steps a name so you can reuse it"
         ],
         "answer": 2,
-        "explanation": "Selection is the choice: `if` and `switch`. Doing things in order is sequence; doing something more than once is repetition."
+        "explanation": "Selection is the choice: `if` and `switch`. Doing things in order is sequence; doing something more than once is repetition.",
+        "sourceIds": [
+          "1-4-10-reading-three-structures"
+        ]
       },
       {
         "id": "q7-proc-vs-oo",
@@ -111,7 +130,11 @@
           "Object-oriented programs do not need to store any data"
         ],
         "answer": 2,
-        "explanation": "That separation is the whole contrast. Procedural is a sequence of steps acting on data held elsewhere; object-oriented is objects that hold their own data and the behaviour that works on it. Neither is better in general."
+        "explanation": "That separation is the whole contrast. Procedural is a sequence of steps acting on data held elsewhere; object-oriented is objects that hold their own data and the behaviour that works on it. Neither is better in general.",
+        "sourceIds": [
+          "1-4-8-reading-procedural-programming",
+          "1-4-15-reading-object-oriented"
+        ]
       },
       {
         "id": "q8-functional-testing",
@@ -124,7 +147,10 @@
           "The language tests functional code for you automatically"
         ],
         "answer": 1,
-        "explanation": "Because it depends on nothing but its inputs, you never have to ask what else happened first. That is exactly what makes it checkable on its own."
+        "explanation": "Because it depends on nothing but its inputs, you never have to ask what else happened first. That is exactly what makes it checkable on its own.",
+        "sourceIds": [
+          "1-4-18-reading-functional-programming"
+        ]
       }
     ]
   }

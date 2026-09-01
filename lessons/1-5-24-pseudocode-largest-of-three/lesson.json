@@ -33,7 +33,10 @@
           "if (a > b) { largest = a; }"
         ],
         "answer": 0,
-        "explanation": "No semicolons, no braces, no console.log. Pseudocode is not written in any language and cannot be run."
+        "explanation": "No semicolons, no braces, no console.log. Pseudocode is not written in any language and cannot be run.",
+        "sourceIds": [
+          "1-5-20-reading-the-two-pseudocode-rules"
+        ]
       },
       {
         "id": "q2-largest-of-three",
@@ -46,7 +49,10 @@
           "Yes: it starts by assuming a is largest, then replaces it whenever it finds something bigger"
         ],
         "answer": 3,
-        "explanation": "Carrying \"the largest so far\" and replacing it is the standard shape. b and c each get their turn against the running answer."
+        "explanation": "Carrying \"the largest so far\" and replacing it is the standard shape. b and c each get their turn against the running answer.",
+        "sourceIds": [
+          "1-5-21-example-pseudocode-for-a-decision"
+        ]
       },
       {
         "id": "q3-what-makes-it-finite",
@@ -59,7 +65,10 @@
           "Nothing does: a password loop can never be guaranteed to end"
         ],
         "answer": 2,
-        "explanation": "Something inside the loop has to be able to change what the condition looks at. That is the same rule the broken plan in 1.5.23 violated."
+        "explanation": "Something inside the loop has to be able to change what the condition looks at. That is the same rule the broken plan in 1.5.23 violated.",
+        "sourceIds": [
+          "1-5-20-reading-the-two-pseudocode-rules"
+        ]
       },
       {
         "id": "q4-one-instruction",
@@ -72,7 +81,10 @@
           "Leave it: pseudocode has no rules"
         ],
         "answer": 1,
-        "explanation": "Two rules do almost all the work: one instruction per line, and indent what is inside something else."
+        "explanation": "Two rules do almost all the work: one instruction per line, and indent what is inside something else.",
+        "sourceIds": [
+          "1-5-20-reading-the-two-pseudocode-rules"
+        ]
       },
       {
         "id": "q5-why-unrunnable-helps",
@@ -85,7 +97,10 @@
           "It stops other people from stealing the algorithm"
         ],
         "answer": 0,
-        "explanation": "Both plans come before code on purpose. A running program proves it compiles, not that the plan was sound."
+        "explanation": "Both plans come before code on purpose. A running program proves it compiles, not that the plan was sound.",
+        "sourceIds": [
+          "1-5-19-reading-pseudocode-and-flowcharts"
+        ]
       }
     ]
   }

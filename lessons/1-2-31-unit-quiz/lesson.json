@@ -33,7 +33,10 @@
           "JavaScript works out the answer before the program runs"
         ],
         "answer": 2,
-        "explanation": "You never write the type. `let x = 10;` then `x = \"ten\";` is perfectly legal: the value carries the type, not the variable."
+        "explanation": "You never write the type. `let x = 10;` then `x = \"ten\";` is perfectly legal: the value carries the type, not the variable.",
+        "sourceIds": [
+          "1-2-4-reading-dynamically-typed"
+        ]
       },
       {
         "id": "q2-primitives",
@@ -46,7 +49,10 @@
           "text, number, yes/no, empty, missing, big number, name"
         ],
         "answer": 0,
-        "explanation": "Those seven. Arrays, objects and functions are not primitives: they are objects, which is the other half of the primitive/object split."
+        "explanation": "Those seven. Arrays, objects and functions are not primitives: they are objects, which is the other half of the primitive/object split.",
+        "sourceIds": [
+          "1-2-27-reading-the-seven-primitives"
+        ]
       },
       {
         "id": "q3-special-numbers",
@@ -59,7 +65,10 @@
           "Infinity, BigInt and NaN"
         ],
         "answer": 2,
-        "explanation": "Infinity and -Infinity come from going past what a number can hold (or dividing by zero); NaN comes from arithmetic that has no numeric answer. `null` and `undefined` are not numbers at all."
+        "explanation": "Infinity and -Infinity come from going past what a number can hold (or dividing by zero); NaN comes from arithmetic that has no numeric answer. `null` and `undefined` are not numbers at all.",
+        "sourceIds": [
+          "1-2-8-reading-special-numeric-values"
+        ]
       },
       {
         "id": "q4-nan-type",
@@ -72,7 +81,10 @@
           "\"error\""
         ],
         "answer": 1,
-        "explanation": "NaN stands for \"not a number\", but it is still of type number: it is the number type's way of saying \"this calculation had no numeric answer\"."
+        "explanation": "NaN stands for \"not a number\", but it is still of type number: it is the number type's way of saying \"this calculation had no numeric answer\".",
+        "sourceIds": [
+          "1-2-8-reading-special-numeric-values"
+        ]
       },
       {
         "id": "q5-null-vs-undefined",
@@ -85,7 +97,11 @@
           "undefined is for numbers and null is for strings"
         ],
         "answer": 1,
-        "explanation": "Who put it there is the difference. Seeing undefined usually means a value never arrived; seeing null means somebody deliberately said \"nothing here right now\"."
+        "explanation": "Who put it there is the difference. Seeing undefined usually means a value never arrived; seeing null means somebody deliberately said \"nothing here right now\".",
+        "sourceIds": [
+          "1-2-19-reading-null",
+          "1-2-20-reading-undefined"
+        ]
       },
       {
         "id": "q6-trace",
@@ -99,7 +115,11 @@
           "undefined"
         ],
         "answer": 2,
-        "explanation": "It prints ten. JavaScript is dynamically typed, so reassigning x to a string is allowed: the variable never had a type to violate."
+        "explanation": "It prints ten. JavaScript is dynamically typed, so reassigning x to a string is allowed: the variable never had a type to violate.",
+        "sourceIds": [
+          "1-2-4-reading-dynamically-typed",
+          "1-2-5-lab-change-the-type"
+        ]
       },
       {
         "id": "q7-backticks",
@@ -112,7 +132,11 @@
           "Contain the letter n"
         ],
         "answer": 2,
-        "explanation": "Backticks give you template literals: `${name}` puts the value of name right into the text. In double quotes, ${name} is just those characters."
+        "explanation": "Backticks give you template literals: `${name}` puts the value of name right into the text. In double quotes, ${name} is just those characters.",
+        "sourceIds": [
+          "1-2-12-reading-strings-and-quotes",
+          "1-2-13-reading-template-literals"
+        ]
       },
       {
         "id": "q8-typeof-null",
@@ -125,7 +149,11 @@
           "\"empty\": odd, because that type does not otherwise exist"
         ],
         "answer": 2,
-        "explanation": "It answers \"object\", which is wrong: null is a primitive. It is a bug from the very first version of JavaScript that was never fixed, because fixing it would break existing sites."
+        "explanation": "It answers \"object\", which is wrong: null is a primitive. It is a bug from the very first version of JavaScript that was never fixed, because fixing it would break existing sites.",
+        "sourceIds": [
+          "1-2-23-reading-typeof",
+          "1-2-24-example-typeof-surprises"
+        ]
       }
     ]
   }

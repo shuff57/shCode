@@ -33,7 +33,10 @@
           "Problem, plan, program, product"
         ],
         "answer": 2,
-        "explanation": "Problem, project, people, product. They are the four factors a framework gets elaborated around."
+        "explanation": "Problem, project, people, product. They are the four factors a framework gets elaborated around.",
+        "sourceIds": [
+          "1-1-17-reading-four-ps"
+        ]
       },
       {
         "id": "q2-four-activities",
@@ -46,7 +49,10 @@
           "Requirements, architecture, release, support"
         ],
         "answer": 1,
-        "explanation": "Inception, elaboration, construction, deployment: the book's names. The five-phase list in the 1.1.5 video (design, development, testing, deployment, maintenance) is the same lifecycle under industry names."
+        "explanation": "Inception, elaboration, construction, deployment: the book's names. The five-phase list in the 1.1.5 video (design, development, testing, deployment, maintenance) is the same lifecycle under industry names.",
+        "sourceIds": [
+          "1-1-6-reading-four-phases"
+        ]
       },
       {
         "id": "q3-why-teams-differ",
@@ -59,7 +65,10 @@
           "They are writing in different programming languages"
         ],
         "answer": 0,
-        "explanation": "Both teams keep all four activities. The four Ps decide how much weight each one carries."
+        "explanation": "Both teams keep all four activities. The four Ps decide how much weight each one carries.",
+        "sourceIds": [
+          "1-1-17-reading-four-ps"
+        ]
       },
       {
         "id": "q4-heavier-elaboration",
@@ -72,7 +81,10 @@
           "The banking system: the product has to be reliable for thousands of people, so the phases carry more weight"
         ],
         "answer": 3,
-        "explanation": "Same four activities, heavier elaboration. The product and the people it serves are what raise the stakes."
+        "explanation": "Same four activities, heavier elaboration. The product and the people it serves are what raise the stakes.",
+        "sourceIds": [
+          "1-1-17-reading-four-ps"
+        ]
       },
       {
         "id": "q5-which-p",
@@ -85,7 +97,10 @@
           "Product"
         ],
         "answer": 2,
-        "explanation": "People. Problem is how hard the work is, project is how it is managed, product is what gets built."
+        "explanation": "People. Problem is how hard the work is, project is how it is managed, product is what gets built.",
+        "sourceIds": [
+          "1-1-17-reading-four-ps"
+        ]
       }
     ]
   }

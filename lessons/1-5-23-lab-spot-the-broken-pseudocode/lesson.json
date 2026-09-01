@@ -33,7 +33,10 @@
           "Nothing ever changes count, so \"count is less than 10\" stays true forever"
         ],
         "answer": 3,
-        "explanation": "The condition tests count, and no line touches count. It is true on the first pass and true on every pass after."
+        "explanation": "The condition tests count, and no line touches count. It is true on the first pass and true on every pass after.",
+        "sourceIds": [
+          "1-5-20-reading-the-two-pseudocode-rules"
+        ]
       },
       {
         "id": "q2-the-fix",
@@ -46,7 +49,10 @@
           "Move \"set count to 1\" inside the loop"
         ],
         "answer": 2,
-        "explanation": "It has to be inside the loop, or it runs once after the loop is already stuck. Indentation is what puts it inside."
+        "explanation": "It has to be inside the loop, or it runs once after the loop is already stuck. Indentation is what puts it inside.",
+        "sourceIds": [
+          "1-5-20-reading-the-two-pseudocode-rules"
+        ]
       },
       {
         "id": "q3-indentation",
@@ -59,7 +65,10 @@
           "Standing in for the semicolons that pseudocode does not use"
         ],
         "answer": 1,
-        "explanation": "Move one line in or out by four spaces and you have described a different program. That is how much work it is doing."
+        "explanation": "Move one line in or out by four spaces and you have described a different program. That is how much work it is doing.",
+        "sourceIds": [
+          "1-5-20-reading-the-two-pseudocode-rules"
+        ]
       },
       {
         "id": "q4-no-compiler",
@@ -72,7 +81,10 @@
           "It means mistakes in pseudocode cannot happen"
         ],
         "answer": 0,
-        "explanation": "The bug here is a planning bug. No compiler would have caught it; reading it aloud catches it in seconds."
+        "explanation": "The bug here is a planning bug. No compiler would have caught it; reading it aloud catches it in seconds.",
+        "sourceIds": [
+          "1-5-20-reading-the-two-pseudocode-rules"
+        ]
       },
       {
         "id": "q5-why-reading-beat-running",
@@ -85,7 +97,10 @@
           "It would print forever without ever pointing at the line responsible"
         ],
         "answer": 3,
-        "explanation": "An endless stream of numbers tells you something is wrong and nothing about what. The plan tells you exactly what."
+        "explanation": "An endless stream of numbers tells you something is wrong and nothing about what. The plan tells you exactly what.",
+        "sourceIds": [
+          "1-5-2-reading-think-before-you-type"
+        ]
       }
     ]
   }
