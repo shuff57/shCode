@@ -44,7 +44,7 @@
       "description": "A descriptive variable holds how many pages were asked for",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+pagesRequested\\s*=\\s*\\d+",
+      "pattern": "(?:let|var|const)\\s+pagesRequested\\s*(?:=\\s*\\d+|;[\\s\\S]*?\\bpagesRequested\\s*=\\s*\\d+)",
       "flags": "",
       "points": 0
     },
@@ -54,7 +54,7 @@
       "description": "A descriptive variable holds the credit left",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:let|const)\\s+creditRemaining\\s*=\\s*\\d+",
+      "pattern": "(?:let|var|const)\\s+creditRemaining\\s*(?:=\\s*\\d+|;[\\s\\S]*?\\bcreditRemaining\\s*=\\s*\\d+)",
       "flags": "",
       "points": 0
     },

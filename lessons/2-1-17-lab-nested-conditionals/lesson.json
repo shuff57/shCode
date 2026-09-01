@@ -41,7 +41,7 @@
       "description": "Code contains a second if that opens after the first if's opening brace and before its closing brace",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^)]*\\)\\s*\\{[^{}]*if\\s*\\(",
+      "pattern": "if\\s*\\((?:[^()]|\\([^()]*\\))*\\)\\s*\\{[^{}]*if\\s*\\(",
       "flags": "i",
       "points": 0
     }

@@ -56,7 +56,7 @@
       "description": "Code contains an if statement nested inside another if's block",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\([^)]*\\)\\s*\\{[^{}]*if\\s*\\(",
+      "pattern": "if\\s*\\((?:[^()]|\\([^()]*\\))*\\)\\s*\\{[^{}]*if\\s*\\(",
       "flags": "i",
       "points": 0
     }

@@ -36,7 +36,7 @@
       "description": "The if condition compares temperature to 100 with === (either order)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*(temperature\\s*===\\s*100|100\\s*===\\s*temperature)\\s*\\)",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*(temperature\\s*===\\s*100|100\\s*===\\s*temperature)\\s*\\)?\\s*\\)",
       "points": 0
     },
     {

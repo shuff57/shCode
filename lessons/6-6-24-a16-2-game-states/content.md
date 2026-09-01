@@ -28,9 +28,9 @@ Commit your work through the workspace. The auto-grader checks the patterns abov
 
 - **2.5.16 (Slots)**: how `storeItem` and `getItem` read/write named save slots
 - **2.5.23 (Auto-save)**: saving automatically when something important happens
-- **2.6.13 (Three-state machine)**: the switch/case pattern for title, play, gameover
-- **2.6.19 (Pause state)**: toggling in and out of a freeze state with `kb.presses`
-- **2.6.22 (Save on transition)**: calling `saveGame()` right after `state = 'gameover'`
-- **2.6.23 (Continue loads right state)**: `saved.state` restores the correct case
+- **6.6.13 (Three-state machine)**: the switch/case pattern for title, play, gameover
+- **6.6.20 (Pause state)**: toggling in and out of a freeze state with `kb.presses`
+- **6.6.24 (Save on transition)**: calling `saveGame()` right after `state = 'gameover'`
+- **6.6.25 (Continue loads right state)**: `saved.state` restores the correct case
 
 Start small: title and play first. Get the switch working. Then add pause. Then gameover. Save for last: wire it in once the state machine is solid.

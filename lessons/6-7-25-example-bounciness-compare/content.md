@@ -1,4 +1,4 @@
-**Goal:** See `bounciness` values of 0.2, 0.6, and 1.0 side by side so the difference between a dead thud and a nearly lossless rebound is immediately visible. Composes the `bounciness` reading from 2.7.24.
+**Goal:** See `bounciness` values of 0.2, 0.6, and 1.0 side by side so the difference between a dead thud and a nearly lossless rebound is immediately visible. Composes the `bounciness` reading from 6.7.20.
 
 ## Step 1: Hit Run and watch the three balls
 

@@ -31,7 +31,7 @@
       "description": "if statement condition is a bare variable with no comparison operator",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*searchTerm\\s*\\)",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*searchTerm\\s*\\)?\\s*\\)",
       "flags": "i",
       "points": 0
     },

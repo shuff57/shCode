@@ -76,7 +76,7 @@
       "description": "The fixed version of Program 4 starts its counter at 1, not 0",
       "type": "regex",
       "file": "script.js",
-      "pattern": "let\\s+k\\s*=\\s*1\\b",
+      "pattern": "(?:let|var)\\s+k\\s*=\\s*1\\b",
       "flags": "i",
       "points": 0
     },

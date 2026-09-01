@@ -31,7 +31,7 @@
       "description": "Code contains a while (true) loop",
       "type": "regex",
       "file": "script.js",
-      "pattern": "while\\s*\\(\\s*true\\s*\\)",
+      "pattern": "while\\s*\\(\\s*\\(?\\s*true\\s*\\)?\\s*\\)",
       "flags": "i",
       "points": 0
     },

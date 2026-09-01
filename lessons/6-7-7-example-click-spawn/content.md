@@ -1,4 +1,4 @@
-**Goal:** Combine mouse position (2.7.3) and one-shot click detection (2.7.5) to spawn exactly one sprite per click.
+**Goal:** Combine mouse position (6.7.3) and one-shot click detection (6.7.5) to spawn exactly one sprite per click.
 
 ## Step 1: Hit Run and click
 

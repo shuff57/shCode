@@ -18,11 +18,16 @@
 // first, not permission to skip them. Every hit needs a human to check it
 // against what the lesson is actually teaching.
 //
-// This is deliberately NOT part of `npm test`. It reports; it does not gate.
-// Cases that must hold forever belong in test-grader-tolerance.mjs instead.
+// The full sweep is deliberately NOT part of `npm test`: it reports, and a
+// human decides. `--gate` is the exception. It runs only the axes that rewrite
+// pure layout -- extra parentheses, extra spaces, a brace on its own line --
+// where there is no lesson anywhere in the course for which refusing the
+// rewrite would be correct. A hit there is unambiguously a bug, so it can fail
+// the build without a judgement call.
 //
-//   node scripts/audit-grader-tolerance.mjs              # whole course
+//   node scripts/audit-grader-tolerance.mjs              # whole course, reports
 //   node scripts/audit-grader-tolerance.mjs 2-1 2-3      # only these units
+//   node scripts/audit-grader-tolerance.mjs --gate       # layout axes, exits 1 on a hit
 
 import { execFileSync } from 'child_process';
 import { mkdtempSync, rmSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'fs';
@@ -39,7 +44,15 @@ const BT = String.fromCharCode(96);
 const AP = String.fromCharCode(39);
 const nl = '\n';
 
-const unitFilter = process.argv.slice(2);
+const argv = process.argv.slice(2);
+// --gate runs ONLY the axes marked `gate: true` and exits non-zero on any hit.
+// Those three axes rewrite nothing but layout -- extra parentheses, extra
+// spaces, a brace on its own line -- so a requirement that notices is wrong,
+// full stop, with no judgement call to make. That is what makes them safe to
+// gate when the rest of the audit can only ever be a triage list.
+const GATE = argv.includes('--gate');
+const unitFilter = argv.filter((a) => !a.startsWith('--'));
+let gateFailed = false;
 
 // ---------------------------------------------------------------- loading
 
@@ -71,6 +84,34 @@ function referenceFiles(id) {
 // Each returns new source, or null when it does not apply. Every one of these
 // is an axis that produced a REAL defect in units 1.2-1.4; none of them change
 // whether the answer is right.
+
+// Rewrites the inside of every `if (...)` / `while (...)` condition. A regex
+// cannot do this -- conditions nest -- so scan for the matching close paren.
+//
+// A quote containing the literal text `if (` would be rewritten too. Mutated
+// source is only ever fed to the regex grader, never executed, so the cost of
+// that is a false positive on the triage list, not a corrupted test.
+function mapConditions(src, fn) {
+  let out = '';
+  let i = 0;
+  for (;;) {
+    const m = /\b(if|while)\b/.exec(src.slice(i));
+    if (!m) return out + src.slice(i);
+    const at = i + m.index;
+    let j = at + m[1].length;
+    while (j < src.length && /\s/.test(src[j])) j++;
+    if (src[j] !== '(') { out += src.slice(i, j); i = j; continue; }
+    let depth = 0;
+    let k = j;
+    for (; k < src.length; k++) {
+      if (src[k] === '(') depth++;
+      else if (src[k] === ')' && --depth === 0) break;
+    }
+    if (k >= src.length) return out + src.slice(i);
+    out += src.slice(i, j + 1) + fn(src.slice(j + 1, k)) + ')';
+    i = k + 1;
+  }
+}
 
 const MUTATIONS = [
   {
@@ -138,6 +179,61 @@ const MUTATIONS = [
     teaches: /format|layout|blank|spacing|style/i,
     fn: (s) => (s.includes(nl) ? s.replace(/\n(?=[a-zA-Z])/g, nl + nl) : null),
   },
+  // Everything above this line rewrites a DECLARATION, a STRING or the
+  // whitespace between statements. Unit 2.1's review found three graders
+  // refusing clarifying parentheses -- inside a CONDITION -- in a unit whose
+  // own reading tells the student, in bold, to keep them. No mutation above
+  // could have reached that, so the audit ran clean over the defect twice.
+  // The five below are the condition-and-operator axes.
+  {
+    name: 'clarifying parentheses',
+    gate: true,
+    teaches: /parenthes|precedence|order of operation|grouping/i,
+    fn: (s) => {
+      const wrapped = mapConditions(s, (c) => `(${c})`);
+      const out = wrapped.replace(
+        /!\s*([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)/g, '!($1)');
+      return out === s ? null : out;
+    },
+  },
+  {
+    name: 'condition spaced out',
+    gate: true,
+    teaches: /space|whitespace|format|style/i,
+    fn: (s) => {
+      const out = mapConditions(s, (c) => (/["'`]/.test(c) ? c
+        : ' ' + c.replace(/\s*(===|!==|==|!=|<=|>=|&&|\|\||[<>])\s*/g, ' $1 ').trim() + ' '));
+      return out === s ? null : out;
+    },
+  },
+  {
+    name: 'opening brace on its own line',
+    gate: true,
+    teaches: /brace|format|style|layout|indent/i,
+    fn: (s) => (/\)[ \t]*\{/.test(s) ? s.replace(/\)[ \t]*\{/g, ')' + nl + '{') : null),
+  },
+  // Both directions, because the defect is symmetric: a rubric written against
+  // `count = count + 1` refuses `count++`, and one written against `count++`
+  // refuses the longhand the course teaches first.
+  {
+    name: 'increment written as x = x + 1',
+    teaches: /increment|shorthand|compound|\+\+/i,
+    fn: (s) => {
+      const out = s.replace(/\b([A-Za-z_$][\w$]*)\s*(?:\+\+|\+=\s*1\b)/g,
+        (m, n) => `${n} = ${n} + 1`);
+      return out === s ? null : out;
+    },
+  },
+  {
+    name: 'increment written as x++',
+    teaches: /increment|shorthand|compound|\+\+/i,
+    fn: (s) => {
+      const out = s
+        .replace(/\b([A-Za-z_$][\w$]*)\s*=\s*\1\s*\+\s*1\b/g, '$1++')
+        .replace(/\b([A-Za-z_$][\w$]*)\s*\+=\s*1\b/g, '$1++');
+      return out === s ? null : out;
+    },
+  },
 ];
 
 // ---------------------------------------------------------------- run
@@ -161,6 +257,11 @@ try {
     grade(reqs, files, 0).results.filter((r) => r.status === 'failed').map((r) => r.id);
 
   const audited = [];
+  // How many lessons each mutation actually rewrote. A mutation whose regex
+  // stops matching -- or that was wrong from the day it was written -- returns
+  // null everywhere and contributes no findings, which is indistinguishable
+  // from "this axis is clean" unless the reach is printed.
+  const reach = new Map();
   const noReference = [];
   const brokenReference = [];
   const findings = [];
@@ -198,6 +299,7 @@ try {
     ].filter(Boolean).join(' ');
 
     for (const mut of MUTATIONS) {
+      if (GATE && !mut.gate) continue;
       const mutated = {};
       let applied = false;
       for (const [name, text] of Object.entries(ref)) {
@@ -208,6 +310,7 @@ try {
         applied = true;
       }
       if (!applied) continue;
+      reach.set(mut.name, (reach.get(mut.name) ?? 0) + 1);
 
       const broke = failedIds(reqs, mutated);
       if (!broke.length) continue;
@@ -265,9 +368,28 @@ try {
   const real = findings.filter((f) => !f.maybeIntentional).length;
   say(`${findings.length} hit(s); ${real} not tagged maybe-intentional`);
 
-  const reportPath = path.join(root, 'grader-tolerance-audit.txt');
-  writeFileSync(reportPath, lines.join(nl) + nl);
-  console.log(`\nwritten to ${path.relative(root, reportPath)}`);
+  say('');
+  say('mutation reach — lessons each axis actually rewrote:');
+  for (const mut of MUTATIONS) {
+    if (GATE && !mut.gate) continue;
+    const n = reach.get(mut.name) ?? 0;
+    say(`  ${String(n).padStart(3)}  ${mut.name}${n === 0 ? '   <-- DEAD: rewrote nothing' : ''}`);
+  }
+
+  if (GATE) {
+    gateFailed = findings.length > 0;
+    console.log(gateFailed
+      ? `\n[audit --gate] ${findings.length} grader(s) refuse a purely cosmetic`
+        + ' rewrite of their own reference answer — listed above'
+      : '\n[audit --gate] no grader refuses extra parentheses, extra spaces,'
+        + ' or a brace on its own line');
+  } else {
+    const reportPath = path.join(root, 'grader-tolerance-audit.txt');
+    writeFileSync(reportPath, lines.join(nl) + nl);
+    console.log(`\nwritten to ${path.relative(root, reportPath)}`);
+  }
 } finally {
   rmSync(out, { recursive: true, force: true });
 }
+
+if (gateFailed) process.exit(1);

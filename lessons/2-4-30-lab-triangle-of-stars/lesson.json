@@ -36,7 +36,7 @@
       "description": "Code contains an outer for loop using row",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(\\s*let\\s+row\\s*=\\s*1",
+      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+row\\s*=\\s*1",
       "flags": "i",
       "points": 0
     },

@@ -36,7 +36,7 @@
       "description": "A for loop counts i from 0 while i < word.length",
       "type": "regex",
       "file": "script.js",
-      "pattern": "for\\s*\\(\\s*let\\s+i\\s*=\\s*0\\s*;\\s*i\\s*<\\s*word\\.length\\s*;",
+      "pattern": "for\\s*\\(\\s*(?:let|var)\\s+i\\s*=\\s*0\\s*;\\s*i\\s*<\\s*word\\.length\\s*;",
       "points": 0
     },
     {
@@ -45,7 +45,7 @@
       "description": "The if compares word[i] against a letter",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*word\\s*\\[\\s*i\\s*\\]\\s*===?\\s*[\\\"']",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*word\\s*\\[\\s*i\\s*\\]\\s*===?\\s*[\"'`]",
       "points": 0
     },
     {
@@ -54,7 +54,7 @@
       "description": "count is increased inside the if body, not somewhere else in the file",
       "type": "regex",
       "file": "script.js",
-      "pattern": "if\\s*\\(\\s*word\\s*\\[\\s*i\\s*\\]\\s*===?\\s*[\\\"'][^\\\"']*[\\\"']\\s*\\)\\s*\\{?[^}]*?count\\s*(\\+\\+|\\+=\\s*1|=\\s*count\\s*\\+\\s*1)",
+      "pattern": "if\\s*\\(\\s*\\(?\\s*word\\s*\\[\\s*i\\s*\\]\\s*===?\\s*[\"'`][^\"'`]*[\"'`]\\s*\\)?\\s*\\)\\s*\\{?[^}]*?count\\s*(\\+\\+|\\+=\\s*1|=\\s*count\\s*\\+\\s*1)",
       "points": 0
     },
     {

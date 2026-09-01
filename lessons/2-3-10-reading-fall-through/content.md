@@ -7,7 +7,7 @@
 
 The `break` statement is not decoration. Without it, JavaScript does something surprising: once a `case` matches, execution keeps going *through* the cases below it, running their code too, without checking any of their values. That's **fall-through**: execution continuing from a matched case into the following cases because no `break` stopped it.
 
-Here's the vending machine from the last reading with every `break` removed:
+Here's the vending machine from the menu worked example, with every `break` removed:
 
 ```js live plain
 let selection = "A";

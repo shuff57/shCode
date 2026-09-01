@@ -31,7 +31,7 @@
       "description": "The inner loop's counter starts at a + 1, not a fixed value",
       "type": "regex",
       "file": "script.js",
-      "pattern": "let\\s+b\\s*=\\s*a\\s*\\+\\s*1",
+      "pattern": "(?:let|var)\\s+b\\s*=\\s*a\\s*\\+\\s*1",
       "flags": "i",
       "points": 0
     }

@@ -81,6 +81,7 @@ const L = {
   messy: '1-3-19-a1-3-1-document-a-messy-program',
   roundup: '1-2-25-lab-typeof-round-up',
   settle:  '1-5-37-lab-settle-it-in-the-console',
+  countLetter: '2-2-17b-lab-count-a-letter',
 };
 
 const cases = [];
@@ -92,6 +93,50 @@ const reject = (id, name, req, files) => cases.push({ id, name, files, expect: '
 for (const id of Object.values(L)) {
   accept(id, 'reference solution', solutionFiles(id));
   reject(id, 'untouched starter', null, starterFiles(id));
+}
+
+// ---------------------------------------------------------------- 2.2.20
+//
+// This lab has been widened twice and tightened once, which is exactly the
+// shape that loses a fix. The advanced-student lens found it scoring 4/4 with
+// the loop body EMPTY -- r3 matched `count = count + 1` anywhere in the file,
+// so an increment after the loop satisfied "the counter goes up inside the if"
+// and the program printed 1 for a word with three r's. r3 was tightened to
+// require the increment inside the if body.
+//
+// Then r2 and r3 were widened again, to accept clarifying parentheses and
+// backticks. A widening is precisely how the earlier tightening gets undone by
+// accident, so the gaming answer is pinned here alongside the shapes that must
+// keep passing. If a future relaxation lets it back in, this fails.
+{
+  const C = L.countLetter;
+  const loopHead = `for (let i = 0; i < word.length; i++) {${nl}`;
+  const head = `let word = "strawberry";${nl}let count = 0;${nl}`;
+  const tail = `${nl}console.log(count);${nl}`;
+
+  accept(C, 'clarifying parentheses around the test', {
+    'script.js': head + loopHead
+      + `  if ((word[i] === "r")) {${nl}    count = count + 1;${nl}  }${nl}}` + tail,
+  });
+  accept(C, 'count++ rather than the longhand', {
+    'script.js': head + loopHead
+      + `  if (word[i] === "r") {${nl}    count++;${nl}  }${nl}}` + tail,
+  });
+  accept(C, 'var throughout, single-quoted letter, += 1', {
+    'script.js': `var word = ${AP}strawberry${AP};${nl}var count = 0;${nl}`
+      + `for (var i = 0; i < word.length; i++) {${nl}`
+      + `  if (word[i] === ${AP}r${AP}) {${nl}    count += 1;${nl}  }${nl}}` + tail,
+  });
+  accept(C, 'brace on its own line', {
+    'script.js': head + `for (let i = 0; i < word.length; i++)${nl}{${nl}`
+      + `  if (word[i] === "r")${nl}  {${nl}    count = count + 1;${nl}  }${nl}}` + tail,
+  });
+
+  // Prints 1 for a word with three r's. Must lose r3, not score 4/4.
+  reject(C, 'empty if body, increment after the loop', 'r3', {
+    'script.js': head + loopHead + `  if (word[i] === "r") {}${nl}}${nl}`
+      + 'count = count + 1;' + tail,
+  });
 }
 
 // ---------------------------------------------------------------- 1.2.28

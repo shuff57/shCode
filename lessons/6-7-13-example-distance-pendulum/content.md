@@ -1,4 +1,4 @@
-**Goal:** See how a static anchor + a dynamic ball + a `DistanceJoint` produces a pendulum. This example composes the `DistanceJoint` reading from 2.7.12.
+**Goal:** See how a static anchor + a dynamic ball + a `DistanceJoint` produces a pendulum. This example composes the `DistanceJoint` reading from 6.8.2.
 
 ## Step 1: Hit Run
 

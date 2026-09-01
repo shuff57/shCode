@@ -36,7 +36,7 @@
       "description": "A variable named rows is declared",
       "type": "regex",
       "file": "script.js",
-      "pattern": "let\\s+rows\\s*=",
+      "pattern": "(?:let|var|const)\\s+rows\\s*(?:=|;[\\s\\S]*?\\brows\\s*=)",
       "flags": "i",
       "points": 0
     },
@@ -46,7 +46,7 @@
       "description": "A variable named cols is declared",
       "type": "regex",
       "file": "script.js",
-      "pattern": "let\\s+cols\\s*=",
+      "pattern": "(?:let|var|const)\\s+cols\\s*(?:=|;[\\s\\S]*?\\bcols\\s*=)",
       "flags": "i",
       "points": 0
     },

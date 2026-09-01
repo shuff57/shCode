@@ -88,7 +88,7 @@
       },
       {
         "id": "q5-why-unrunnable-helps",
-        "source": "1.5.19",
+        "source": "1.5.20",
         "question": "Why is it useful that nothing can actually run either of these plans?",
         "options": [
           "You are forced to check whether the thinking is right, instead of letting the machine find only the typing mistakes",
@@ -99,7 +99,7 @@
         "answer": 0,
         "explanation": "Both plans come before code on purpose. A running program proves it compiles, not that the plan was sound.",
         "sourceIds": [
-          "1-5-19-reading-pseudocode-and-flowcharts"
+          "1-5-20-reading-the-two-pseudocode-rules"
         ]
       }
     ]

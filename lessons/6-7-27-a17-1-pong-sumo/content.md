@@ -2,7 +2,7 @@
 
 ### Assignment overview
 
-This is the capstone lab for Unit 2.7. You've built paddles (2.7.25), learned joints (2.7.12–2.7.16), and practiced two-player input (2.7.23). Now you put it all together into a real two-player game.
+This is the capstone lab for Unit 6.7. You've built paddles (6.7.22), learned joints (6.8.2–6.8.6), and practiced two-player input (6.7.19). Now you put it all together into a real two-player game.
 
 Build a top-down Pong-Sumo game: two paddles, one ball, push the ball past the other player's side to score. First to 5 wins.
 
@@ -15,7 +15,7 @@ Ship a complete two-player local game with:
 - A win condition
 - At least one joint somewhere in the game
 
-Your game should follow the state-machine pattern from Unit 2.6: **title → play → win → reset**. A teacher will confirm this during share-out.
+Your game should follow the state-machine pattern from Unit 6.6: **title → play → win → reset**. A teacher will confirm this during share-out.
 
 ### Requirements (all must be green to Submit)
 
@@ -29,7 +29,7 @@ Your game should follow the state-machine pattern from Unit 2.6: **title → pla
 | 6 | Win condition | A comparison against a number (e.g. `>= 5`) triggers the win state |
 | 7 | At least one joint | A `new DistanceJoint(...)` or `new HingeJoint(...)` is created somewhere |
 
-**Teacher-checked (not auto-graded):** your game uses a state machine: title screen, play state, win screen, and a way to reset. This is the 2.6.1 pattern applied to a two-player game.
+**Teacher-checked (not auto-graded):** your game uses a state machine: title screen, play state, win screen, and a way to reset. This is the 6.6.13 pattern applied to a two-player game.
 
 ### Suggested approach
 

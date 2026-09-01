@@ -16,7 +16,7 @@ function draw() {
 }
 ```
 
-Nothing new: you wrote this exact code in 2.1. But notice the panel below the preview: it's a console attached to this running sketch. Every `console.log()` call in your sketch prints there, and you can type expressions into the `>` prompt to poke at the running program, just like Chrome DevTools, but embedded in the page.
+Nothing new: you have been running this exact code since 5.1. But notice the panel below the preview: it's a console attached to this running sketch. Every `console.log()` call in your sketch prints there, and you can type expressions into the `>` prompt to poke at the running program, just like Chrome DevTools, but embedded in the page.
 
 Click **Run**, then keep the sketch running while you work through the next steps.
 

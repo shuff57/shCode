@@ -32,7 +32,7 @@ for (let i = 1; i <= 5; i--) {
 
 Each of these is a live loop with no output you can read. The only fix is to inspect the three parts: start, condition, update, and ask whether the update actually moves the loop toward making the condition false.
 
-**Not every infinite loop is a bug.** `while (true)` with a `break` is one on purpose: you wrote it that way in lesson 2.4.10. The bug isn't "this loop runs forever," it's "this loop runs forever *and I didn't mean it to.*"
+**Not every infinite loop is a bug.** `while (true)` with a `break` is one on purpose: you wrote it that way in lesson 2.4.12. The bug isn't "this loop runs forever," it's "this loop runs forever *and I didn't mean it to.*"
 
 ---
 
