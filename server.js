@@ -6,6 +6,10 @@ import path from 'path';
 // reviewed locally, it has to be reviewed through the same function that
 // decides what a student may see in production.
 import { publicReport, rankReports, visibleToStudent } from './functions/_shared/issue-reports.ts';
+// Both lesson-id routes below resolve paths through this. It lives in lib/ so
+// scripts/test-lesson-solution-parity.mjs can compare the real dev behaviour
+// against the Pages Function rather than a reimplementation of it.
+import { resolveLessonDir as resolveLessonDirIn, readLessonSolution } from './lib/lesson-solution-fs.mjs';
 
 // Who the dev auth stub pretends to be. `DEV_ROLE=student npm run dev` is the
 // only way to see the student half of anything here — the real session comes
@@ -17,27 +21,13 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-// Every lesson id is a directory name under lessons/, and all 519 of them are
-// [A-Za-z0-9_-]. No dots, so `..` cannot pass this at all -- which is the whole
-// traversal class, since a lesson id is the only thing these routes ever join
-// onto a path. The realpath comparison after it is defence in depth for the day
-// someone authors an id with a dot in it and widens the charset to match.
-//
 // Two routes join a client-supplied id onto a filesystem path (/api/grade and
-// /api/lesson-solution), and neither had any validation. Both go through here.
-const LESSON_ID = /^[A-Za-z0-9_-]+$/;
-
-async function resolveLessonDir(id) {
-  if (typeof id !== 'string' || !LESSON_ID.test(id)) return null;
-  const root = await fs.realpath(path.join(process.cwd(), 'lessons'));
-  let dir;
-  try {
-    dir = await fs.realpath(path.join(root, id));
-  } catch {
-    return null; // no such lesson
-  }
-  return dir === root || dir.startsWith(root + path.sep) ? dir : null;
-}
+// /api/lesson-solution) and neither had any validation, which made both
+// traversable. The charset check and the realpath containment behind it now
+// live in lib/lesson-solution-fs.mjs, so the test can exercise the same guard
+// the server runs.
+const LESSONS_ROOT = () => path.join(process.cwd(), 'lessons');
+const resolveLessonDir = (id) => resolveLessonDirIn(id, LESSONS_ROOT());
 
 // Extract the body of a named function by balancing braces. Returns just
 // the code between the opening { and matching closing }, or null if the
@@ -153,50 +143,13 @@ app.prepare().then(() => {
   // lesson stores its reference chart, so "no solution" in the browser meant
   // "not implemented in dev" rather than anything about the lesson.
   server.get('/api/lesson-solution/:id', async (req, res) => {
-    // NOT decodeURIComponent(req.params.id) -- Express has already decoded the
-    // param, so decoding again turns %252e%252e%252f into ../ and hands this
-    // route a traversal it cannot see. The Pages Functions convention in
-    // CLAUDE.md says always decode, and that is right THERE, because Pages
-    // does not decode for you. Express does.
-    const lessonDir = await resolveLessonDir(req.params.id);
-    if (!lessonDir) return res.status(404).json({ error: 'No solution for this lesson' });
-
-    // Recurse so solution/ mirrors the generator, which keys every file by its
-    // path relative to solution/ rather than by basename.
-    const readDirForm = async (dir, prefix = '') => {
-      const out = {};
-      for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
-        // A symlink inside solution/ would read whatever it points at, which
-        // is the containment check in resolveLessonDir defeated from inside.
-        // No lesson uses one, so skip rather than resolve-and-compare.
-        if (entry.isSymbolicLink()) continue;
-        const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
-        if (entry.isDirectory()) Object.assign(out, await readDirForm(path.join(dir, entry.name), rel));
-        else if (entry.isFile()) out[rel] = await fs.readFile(path.join(dir, entry.name), 'utf8');
-      }
-      return out;
-    };
-
-    let files = null;
-    try {
-      files = await readDirForm(path.join(lessonDir, 'solution'));
-      if (Object.keys(files).length === 0) files = null;
-    } catch {
-      /* no solution/ directory — fall through to the single-file form */
-    }
-
-    if (!files) {
-      try {
-        files = { 'script.js': await fs.readFile(path.join(lessonDir, 'solution.js'), 'utf8') };
-      } catch {
-        return res.status(404).json({ error: 'No solution for this lesson' });
-      }
-    }
-
-    // Same fallback as the Pages Function: a solution whose code file is not
-    // script.js still populates the legacy single-string field.
-    const solution = files['script.js'] ?? files[Object.keys(files).sort()[0]];
-    res.json({ files, solution });
+    // NOT decodeURIComponent(req.params.id) -- Express has ALREADY decoded the
+    // param, so decoding again turns %252e%252e into .. after the router has
+    // stopped looking. CLAUDE.md's always-decode rule is about Pages Functions,
+    // which do not decode for you. Express does.
+    const found = await readLessonSolution(req.params.id, LESSONS_ROOT());
+    if (!found) return res.status(404).json({ error: 'No solution for this lesson' });
+    res.json(found);
   });
 
   // Scope express.json() to the Express-owned route only. Applying it globally
