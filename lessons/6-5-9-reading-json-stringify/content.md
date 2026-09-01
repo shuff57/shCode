@@ -1,6 +1,6 @@
 ## JSON.stringify: packing objects into strings
 
-**Read before the 2.5.9 parsing lesson.** About 5 minutes.
+**Read before the 6.5.10 parsing lesson.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

@@ -1,6 +1,6 @@
 ## `this` is a noun
 
-**Read before `2.2.5a Worked Example: this is a pronoun`.** About 4 minutes.
+**Read before `5.3.12 Worked Example: this is a pronoun`.** About 4 minutes.
 
 By the end of this reading you should be able to answer:
 

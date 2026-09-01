@@ -1,7 +1,7 @@
 {
   "id": "6-4-6-reading-frame-delay",
   "title": "6.4.6 Reading: frameDelay (cycle speed)",
-  "description": "How sprite.animation.frameDelay = N slows or speeds an animation cycle. Read before 2.4.5 (Animated Sprites Sandbox).",
+  "description": "How sprite.animation.frameDelay = N slows or speeds an animation cycle. Read before 6.4.9 (Animated Sprites Sandbox).",
   "type": "lesson",
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",

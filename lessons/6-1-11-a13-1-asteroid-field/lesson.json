@@ -34,7 +34,7 @@
       "title": "Spawn at least 10 asteroids with varied velocity",
       "instructions": "Either spawn a batch in setup() with a for loop, or drip-spawn in draw() using frameCount % N === 0. Each asteroid gets its own vel.x / vel.y.",
       "hints": [
-        "Math.random() * range gives you variety. The Apple Catcher example (2.3.7) shows the timed-spawn idiom."
+        "Math.random() * range gives you variety. The Apple Catcher example (6.2.2) shows the timed-spawn idiom."
       ]
     },
     {
@@ -50,7 +50,7 @@
       "title": "Safe despawn for off-screen asteroids",
       "instructions": "If asteroids leave the canvas, remove them. Iterate backwards or iterate a copy ([...asteroids]) to avoid the iterate-then-remove bug.",
       "hints": [
-        "The Safe Despawn worked example (2.3.10) demonstrates both safe patterns."
+        "The Safe Despawn worked example (6.2.5) demonstrates both safe patterns."
       ]
     }
   ],

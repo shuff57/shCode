@@ -2,7 +2,7 @@
 
 ### Assignment overview
 
-This is the capstone for Unit 2. You've learned two major systems: **save/load** (Module 2.5) and **state machines** (Module 2.6). Now you integrate them.
+This is the capstone for Modules 6.5 and 6.6. You've learned two major systems: **save/load** (Module 6.5) and **state machines** (Module 6.6). Now you integrate them.
 
 Build a game with at least 4 states: `'title'`, `'play'`, `'pause'`, and `'gameover'`. The state machine controls which screen you see. The save system captures your progress. When you press Continue, it loads the save AND restores the correct state.
 
@@ -26,8 +26,8 @@ Commit your work through the workspace. The auto-grader checks the patterns abov
 
 ### Tips
 
-- **2.5.16 (Slots)**: how `storeItem` and `getItem` read/write named save slots
-- **2.5.23 (Auto-save)**: saving automatically when something important happens
+- **6.5.17 (Slots)**: how `storeItem` and `getItem` read/write named save slots
+- **6.5.25 (Auto-save)**: saving automatically when something important happens
 - **6.6.13 (Three-state machine)**: the switch/case pattern for title, play, gameover
 - **6.6.20 (Pause state)**: toggling in and out of a freeze state with `kb.presses`
 - **6.6.24 (Save on transition)**: calling `saveGame()` right after `state = 'gameover'`

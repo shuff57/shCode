@@ -1,7 +1,7 @@
 {
   "id": "5-1-15-reading-velocity",
   "title": "5.1.15 Reading: Velocity: vel.x and vel.y",
-  "description": "How `sprite.vel.x` and `vel.y` work as pixels-per-frame values the engine integrates into position. Read after 2.1.7.",
+  "description": "How `sprite.vel.x` and `vel.y` work as pixels-per-frame values the engine integrates into position. Read after 5.1.14.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",

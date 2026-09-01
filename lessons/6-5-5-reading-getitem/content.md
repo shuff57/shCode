@@ -31,7 +31,7 @@ function draw() {
 - A **string** if the key exists, even if you originally stored a number.
 - `null` if the key has never been saved.
 
-This has a catch: comparing strings and numbers can give surprising results. `"42" > "100"` is `true` in JavaScript because strings compare character by character. The fix: wrapping `getItem` in `Number()`: is covered in the next reading (2.5.5a).
+This has a catch: comparing strings and numbers can give surprising results. `"42" > "100"` is `true` in JavaScript because strings compare character by character. The fix: wrapping `getItem` in `Number()`: is covered in the next reading (6.5.6).
 
 ---
 

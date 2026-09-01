@@ -1,7 +1,7 @@
 {
   "id": "6-1-8-reading-collisions",
   "title": "6.2.3 Reading: moSHion docs: Collisions + Overlaps",
-  "description": "moshion docs chapter on collisions and overlap detection. Read before `2.3.10 Safe Despawn`.",
+  "description": "moshion docs chapter on collisions and overlap detection. Read before `6.2.5 Safe Despawn`.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",

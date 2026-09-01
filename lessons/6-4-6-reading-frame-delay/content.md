@@ -46,7 +46,7 @@ Hit Run: the ghost flaps at a normal pace. Hold Space: the wings move ~6× slowe
 1. **`frameDelay` is a property on the active animation, not the sprite.** That's why we write `ghost.ani.frameDelay`, not `ghost.frameDelay`. `ghost.ani` is a shortcut for "whichever animation is currently active."
 2. **Higher number = slower cycle.** A `frameDelay` of `4` means "hold each frame for 4 game frames before advancing"; `24` means hold each frame for 24 game frames. Inverse intuition: think of it as "how long to wait before the next frame," not "frames per second."
 
-**Per-state pacing.** If you've registered `'idle'` and `'run'` (as in 2.4.3b), you can give each its own pace by calling `changeAni` first, then setting `frameDelay`:
+**Per-state pacing.** If you've registered `'idle'` and `'run'` (as in 6.4.5), you can give each its own pace by calling `changeAni` first, then setting `frameDelay`:
 
 ```js
 ghost.changeAni('idle');

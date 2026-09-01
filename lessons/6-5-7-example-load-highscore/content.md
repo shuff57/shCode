@@ -76,6 +76,6 @@ That is persistence: the variable `score` was destroyed on reload, but the save 
 ## Key takeaways
 
 - **Read once in `setup()`**: storage reads are slower than variable reads, so load the value at startup and keep it in a variable.
-- **Always coerce with `Number()`**: `getItem` returns a string, and uncoerced string comparisons produce wrong results (see 2.5.5a).
+- **Always coerce with `Number()`**: `getItem` returns a string, and uncoerced string comparisons produce wrong results (see 6.5.6).
 - **`|| 0` is the first-run fallback**: when no save data exists yet, `Number(null)` is `0`, and `|| 0` gives you a clean start.
 - **Write only when the value changes**: `storeItem` belongs inside the `if`, not in `draw()` unconditionally. Writes to storage are expensive.

@@ -2,7 +2,7 @@
 
 ## Step 1: Start from the three-slot system
 
-Same player + coin setup from 2.5.16. Save/load with 1/2/3 and Shift+1/2/3.
+Same player + coin setup from 6.5.17. Save/load with 1/2/3 and Shift+1/2/3.
 
 ```js live
 let player;

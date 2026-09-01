@@ -18,7 +18,7 @@
       "title": "Define a class",
       "instructions": "Declare at least one class using the `class` keyword.",
       "hints": [
-        "Re-read 2.2.3 Reading for the `class Name { ... }` shape."
+        "Re-read 5.3.3 Reading for the `class Name { ... }` shape."
       ]
     },
     {
@@ -26,7 +26,7 @@
       "title": "Instantiate the class",
       "instructions": "Build an instance with `new ClassName(...)` and store it in a variable.",
       "hints": [
-        "2.2.4 Worked Example shows `new Sprite(...)`: the same pattern applies to your own class."
+        "5.3.6 Worked Example shows `new Sprite(...)`: the same pattern applies to your own class."
       ]
     },
     {
@@ -34,7 +34,7 @@
       "title": "Write a constructor",
       "instructions": "Give the class a `constructor(...)` that stores its arguments on `this`.",
       "hints": [
-        "2.2.3 Reading walks through the three parts of a class: constructor, `this`, and methods."
+        "5.3.3 Reading walks through the three parts of a class: constructor, `this`, and methods."
       ]
     },
     {

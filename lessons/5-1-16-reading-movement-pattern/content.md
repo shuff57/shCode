@@ -1,6 +1,6 @@
 ## Movement Pattern (if / else if / else)
 
-Read before `2.1.7c Reading: The else-to-zero rule`. About 5 minutes.
+Read before `5.1.17 Reading: The else-to-zero rule`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

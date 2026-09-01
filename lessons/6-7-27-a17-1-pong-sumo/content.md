@@ -29,7 +29,7 @@ Your game should follow the state-machine pattern from Unit 6.6: **title → pla
 | 6 | Win condition | A comparison against a number (e.g. `>= 5`) triggers the win state |
 | 7 | At least one joint | A `new DistanceJoint(...)` or `new HingeJoint(...)` is created somewhere |
 
-**Teacher-checked (not auto-graded):** your game uses a state machine: title screen, play state, win screen, and a way to reset. This is the 6.6.13 pattern applied to a two-player game.
+**Teacher-checked (not auto-graded):** your game uses a state machine: title screen, play state, win screen, and a way to reset. This is the Unit 6.6 pattern applied to a two-player game.
 
 ### Suggested approach
 

@@ -1,6 +1,6 @@
 ## The full round-trip: save, reload, restore
 
-**Read before the 2.5.11 worked example.** About 5 minutes.
+**Read before the 6.5.12 worked example.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

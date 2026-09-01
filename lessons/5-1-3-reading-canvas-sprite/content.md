@@ -1,6 +1,6 @@
 ## Frame loop: `setup()` and `draw()`
 
-**Read before `2.1.3a Reading: Canvas`.** About 3 minutes.
+**Read before `5.1.5 Reading: Canvas`.** About 3 minutes.
 
 By the end of this reading you should be able to answer:
 

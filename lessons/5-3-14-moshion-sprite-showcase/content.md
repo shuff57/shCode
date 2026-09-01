@@ -1,6 +1,6 @@
-# 2.2.5 Worked Example: Sprite Showcase
+# 5.3.14 Worked Example: Sprite Showcase
 
-In 2.2.4 you proved that `Sprite` is a class and `player` is one instance of it. In this example you're going to walk through a bunch of sprites and read every line as **OOP code**: `new Sprite(...)` is a constructor call, `sprite.color = ...` is a property assignment on one specific instance. Six sprites, three shapes, lots of color: the same code you've been writing since 2.1, now with a name for what's happening.
+In 5.3.6 you proved that `Sprite` is a class and `player` is one instance of it. In this example you're going to walk through a bunch of sprites and read every line as **OOP code**: `new Sprite(...)` is a constructor call, `sprite.color = ...` is a property assignment on one specific instance. Six sprites, three shapes, lots of color: the same code you've been writing since 2.1, now with a name for what's happening.
 
 ---
 

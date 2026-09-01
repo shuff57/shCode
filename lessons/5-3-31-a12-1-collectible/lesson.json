@@ -18,7 +18,7 @@
       "title": "Define the Collectible class",
       "instructions": "Write `class Collectible { }` with a `constructor(x, y, value, color)`. Store the data on `this` and create `this.sprite = new Sprite(...)`.",
       "hints": [
-        "Re-read 2.2.8 Worked Example: the `Enemy` constructor follows the same `this.x = x` / `this.sprite = new Sprite(...)` pattern."
+        "Re-read 5.4.10 Worked Example: the `Enemy` constructor follows the same `this.x = x` / `this.sprite = new Sprite(...)` pattern."
       ]
     },
     {

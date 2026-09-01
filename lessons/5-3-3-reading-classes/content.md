@@ -1,6 +1,6 @@
 ## A class is a blueprint. `new` builds one instance from it.
 
-**Read before `2.2.3a Reading: The new operator`.** About 4 minutes.
+**Read before `5.3.4 Reading: The new operator`.** About 4 minutes.
 
 By the end of this reading you should be able to complete the sentences:
 

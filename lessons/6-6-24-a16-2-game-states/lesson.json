@@ -17,7 +17,7 @@
       "title": "Set up 4+ states with switch in draw()",
       "instructions": "In draw(), write a switch(state) with at least four cases: 'title', 'play', 'pause', 'gameover'. Each case must end with break. Set state = 'title' in setup().",
       "hints": [
-        "Review 2.6.5 (switch with three cases) and 2.6.13 (three-state machine) for the switch pattern."
+        "Review 6.6.5 (switch with three cases) and 6.6.13 (three-state machine) for the switch pattern."
       ]
     },
     {
@@ -25,7 +25,7 @@
       "title": "Build the play state with player movement and score",
       "instructions": "In the 'play' case, use kb.pressing for WASD or arrow-key movement. Increment score over time (frameCount % 60 === 0 is a simple timer). Display score with text().",
       "hints": [
-        "2.6.15 (keyboard-driven transitions) and 2.6.17 (score threshold) show movement + scoring patterns."
+        "6.6.16 (keyboard-driven transitions) and 6.6.18 (score threshold) show movement + scoring patterns."
       ]
     },
     {
@@ -33,7 +33,7 @@
       "title": "Implement title screen with New Game / Continue",
       "instructions": "In the 'title' case, display the game name and instructions. Show 'Press N for New Game'. If a save exists (check getItem), also show 'Press C to Continue'.",
       "hints": [
-        "2.6.11 (title screen) shows text layout for a start screen. Check localStorage with getItem()."
+        "6.6.11 (title screen) shows text layout for a start screen. Check localStorage with getItem()."
       ]
     },
     {
@@ -41,7 +41,7 @@
       "title": "Implement pause state (press P, game freezes)",
       "instructions": "In the 'play' case, listen for kb.presses('p') to switch state to 'pause'. In the 'pause' case, stop all movement and draw a paused overlay. Press P again to return to 'play'.",
       "hints": [
-        "2.6.19 (pause state) shows the toggle pattern. Use kb.presses (edge-triggered) so P doesn't flicker."
+        "6.6.20 (pause state) shows the toggle pattern. Use kb.presses (edge-triggered) so P doesn't flicker."
       ]
     },
     {
@@ -49,7 +49,7 @@
       "title": "Implement game over state (condition-driven) with auto-save",
       "instructions": "In the 'play' case, check a lose condition (e.g. score reaches a threshold, or player falls off screen). When it triggers, set state = 'gameover' AND call a save function. In the 'gameover' case, show final score and restart option.",
       "hints": [
-        "2.6.17 (score threshold) for condition-driven transition. 2.6.22 (save on transition) for wiring saveGame() to state changes."
+        "6.6.18 (score threshold) for condition-driven transition. 6.6.24 (save on transition) for wiring saveGame() to state changes."
       ]
     },
     {
@@ -57,7 +57,7 @@
       "title": "Add save/load integration so Continue restores the correct state and data",
       "instructions": "Write a saveGame() function that uses storeItem + JSON.stringify to save { state, score, playerX, playerY, ... }. Write a loadGame() function that uses getItem + JSON.parse to restore. Call saveGame() on gameover and on win. Wire Continue to loadGame().",
       "hints": [
-        "2.5.16 (slots), 2.5.23 (auto-save), 2.6.22 (save on transition), 2.6.23 (continue loads correct state) cover the full save/load cycle."
+        "6.5.17 (slots), 6.5.25 (auto-save), 6.6.24 (save on transition), 6.6.25 (continue loads correct state) cover the full save/load cycle."
       ]
     }
   ],

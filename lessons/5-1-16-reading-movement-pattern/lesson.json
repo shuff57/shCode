@@ -1,7 +1,7 @@
 {
   "id": "5-1-16-reading-movement-pattern",
   "title": "5.1.16 Reading: Movement pattern (if / else if / else)",
-  "description": "The canonical if/else-if/else pattern that maps key presses to velocity changes inside `draw()`. Read after 2.1.7a.",
+  "description": "The canonical if/else-if/else pattern that maps key presses to velocity changes inside `draw()`. Read after 5.1.15.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",

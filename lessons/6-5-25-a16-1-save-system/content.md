@@ -36,9 +36,9 @@ Your `script.js` starts as a scaffold with STEP breadcrumbs inside `setup()` and
 
 ## Tips
 
-- **Reference 2.5.16** for the save-slot pattern with multiple `storeItem` keys
-- **Reference 2.5.19** for building a title screen with state-based transitions
-- **Reference 2.5.23** for the auto-save pattern: overlap check or score threshold
+- **Reference 6.5.17** for the save-slot pattern with multiple `storeItem` keys
+- **Reference 6.5.20** for building a title screen with state-based transitions
+- **Reference 6.5.25** for the auto-save pattern: overlap check or score threshold
 - **Test with reloads.** Save your game, reload the page, and verify the save loaded correctly. If something is `undefined`, check your `JSON.parse` fallback.
 - **Handle empty slots.** A slot that hasn't been saved to yet returns `null` from `getItem`. Use `||` to provide a fallback value.
 - **Keep it simple.** The grader checks for the five patterns: it doesn't care how big your game is. A simple player that moves and earns points is enough.

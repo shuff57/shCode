@@ -1,7 +1,7 @@
 {
   "id": "6-4-3-reading-animation",
   "title": "6.4.3 Reading: moSHion docs: Animation",
-  "description": "moshion docs chapter on Animation. Read before `2.4.5 Animated Sprites Sandbox`.",
+  "description": "moshion docs chapter on Animation. Read before `6.4.9 Animated Sprites Sandbox`.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",

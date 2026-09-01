@@ -1,7 +1,7 @@
 {
   "id": "6-3-3-reading-input-edges",
   "title": "6.3.3 Reading: moSHion docs: Input edges",
-  "description": "moshion docs chapter on input: `kb.pressing` (level-triggered) vs `kb.presses` (edge-triggered). Read before `2.3.15 Edge-triggered Input`.",
+  "description": "moshion docs chapter on input: `kb.pressing` (level-triggered) vs `kb.presses` (edge-triggered). Read before `6.3.4 Edge-triggered Input`.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",

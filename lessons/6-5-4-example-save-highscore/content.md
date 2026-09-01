@@ -48,7 +48,7 @@ function draw() {
 
 ## Step 2: Save the high score on game over
 
-When the enemy catches the player, compare the current score to the saved high score. If it beats the record, save it with `storeItem`. The `Number()` wrapper and `|| 0` fallback handle the case where nothing has been saved yet (more on this in 2.5.5a).
+When the enemy catches the player, compare the current score to the saved high score. If it beats the record, save it with `storeItem`. The `Number()` wrapper and `|| 0` fallback handle the case where nothing has been saved yet (more on this in 6.5.6).
 
 ```js live
 let player, enemy;

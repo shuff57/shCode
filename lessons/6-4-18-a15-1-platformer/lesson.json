@@ -65,7 +65,7 @@
       "title": "Camera follows the player",
       "instructions": "In draw(), assign camera.x from player.x every frame so the canvas tracks the player. The hard follow line is fine; lerp smoothing is a stretch.",
       "hints": [
-        "See the camera examples 2.4.8 and 2.4.9 if you're stuck."
+        "See the camera examples 6.4.16 and 6.4.17 if you're stuck."
       ]
     },
     {

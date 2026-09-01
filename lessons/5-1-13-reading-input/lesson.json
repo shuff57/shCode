@@ -1,7 +1,7 @@
 {
   "id": "5-1-13-reading-input",
   "title": "5.1.13 Reading: kb.pressing(key)",
-  "description": "How `kb.pressing(key)` checks whether a key is held this frame. Read before 2.1.7a (Velocity).",
+  "description": "How `kb.pressing(key)` checks whether a key is held this frame. Read before 5.1.15 (Velocity).",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",

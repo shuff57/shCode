@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Module** | 2.1.1 Hello Sprite and Movement |
+| **Module** | 5.1 Hello Sprite and Movement |
 | **Week** | 10 |
 | **Type** | Lab (in-app moSHion editor) |
 | **Points** | 15 |
@@ -24,7 +24,7 @@
 
 Build a "sprite playground" in the moSHion in-app editor. You will combine everything from the two in-app lessons this week (`Hello Sprite` + `Make it Move`) and add two new things: a second sprite that moves on its own, and an on-screen text label.
 
-By the end of this lab, you'll have a single running sketch that demonstrates every concept from Module 2.1.1.
+By the end of this lab, you'll have a single running sketch that demonstrates every concept from Module 5.1.
 
 ---
 
@@ -61,7 +61,7 @@ Paste this into `script.js` and fill in the TODOs:
 ```js
 // A10.1: Sprite Playground
 // Author: YOUR NAME
-// Module 2.1.1
+// Module 5.1
 
 let player;
 let mover;

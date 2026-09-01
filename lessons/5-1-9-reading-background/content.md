@@ -1,6 +1,6 @@
 ## background(color) wipe rule
 
-Read before `2.1.3f Reading: Sprite property tour`. About 5 minutes.
+Read before `5.1.10 Reading: Sprite property tour`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -19,7 +19,7 @@ By the end of this reading you should be able to answer:
 
 **Try it:**
 
-This sketch shifts the sprite right by one pixel each frame so the trail effect is visible. The motion line (`player.pos.x = player.pos.x + 1`) uses a sprite property you'll meet properly in **2.1.3f**, for now, just observe what happens with and without `background()`.
+This sketch shifts the sprite right by one pixel each frame so the trail effect is visible. The motion line (`player.pos.x = player.pos.x + 1`) uses a sprite property you'll meet properly in **5.1.10**, for now, just observe what happens with and without `background()`.
 
 ```js live
 let player;

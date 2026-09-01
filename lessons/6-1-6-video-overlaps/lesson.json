@@ -1,7 +1,7 @@
 {
   "id": "6-1-6-video-overlaps",
   "title": "6.2.1 Video: overlaps() boolean vs callback",
-  "description": "The two flavors of `overlaps()` and why the callback form is cleaner for despawn-on-collide. Watch before `2.3.7 Apple Catcher`.",
+  "description": "The two flavors of `overlaps()` and why the callback form is cleaner for despawn-on-collide. Watch before `6.2.2 Apple Catcher`.",
   "type": "lesson",
   "estimateMins": 3,
   "category": "Unit 2: moSHion: Applied Game Development",

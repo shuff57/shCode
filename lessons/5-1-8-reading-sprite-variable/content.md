@@ -1,6 +1,6 @@
 ## Storing the sprite in a let variable
 
-Read before `2.1.3e Reading: background(color) wipe rule`. About 5 minutes.
+Read before `5.1.9 Reading: background(color) wipe rule`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

@@ -1,10 +1,10 @@
-# 2.1.1 Worked Examples
+# 5.1.14 Worked Examples
 
-Teacher-led walkthroughs for Module 2.1.1. Students can reference these after class when building [A10.1](A10.1_sprite-playground.md).
+Teacher-led walkthroughs for Module 5.1. Students can reference these after class when building [A10.1](A10.1_sprite-playground.md).
 
 All three examples are designed to be typed (not pasted) into the moSHion in-app editor so the code sinks in line-by-line.
 
-**Other 2.1.1 resources:** [overview](2.1.1_overview.md) · [readings](2.1.1_readings.md) · [challenges](2.1.1_challenges.md) · [A10.2 writeup](A10.2_frame-loop-writeup.md)
+**Other Module 5.1 resources:** [overview](2.1.1_overview.md) · [readings](2.1.1_readings.md) · [challenges](2.1.1_challenges.md) · [A10.2 writeup](A10.2_frame-loop-writeup.md)
 
 ---
 

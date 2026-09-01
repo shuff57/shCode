@@ -1,7 +1,7 @@
 {
   "id": "6-4-4-reading-add-ani",
   "title": "6.4.4 Reading: addAni(name, frames)",
-  "description": "How sprite.addAni(name, frame1, ...) registers a named animation and makes it the active default. Read before 2.4.3b (changeAni).",
+  "description": "How sprite.addAni(name, frame1, ...) registers a named animation and makes it the active default. Read before 6.4.5 (changeAni).",
   "type": "lesson",
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",

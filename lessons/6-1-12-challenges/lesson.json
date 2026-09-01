@@ -19,7 +19,7 @@
       "title": "Create a Group",
       "instructions": "Declare at least one `new Group()` for whatever the chosen challenge needs (apples, rocks, enemies, pickups).",
       "hints": [
-        "Re-read 2.3.3 Reading for the Group constructor + defaults pattern."
+        "Re-read 6.1.3 Reading for the Group constructor + defaults pattern."
       ]
     },
     {
@@ -27,7 +27,7 @@
       "title": "Spawn into the Group",
       "instructions": "Use the factory form `new groupName.Sprite(...)` so spawned sprites inherit the group's defaults.",
       "hints": [
-        "2.3.3 Reading Topic 2 covers the factory pattern."
+        "6.1.3 Reading Topic 2 covers the factory pattern."
       ]
     },
     {
@@ -35,7 +35,7 @@
       "title": "Use overlaps() somewhere",
       "instructions": "Detect a hit, catch, or collect using `.overlaps(...)`: boolean form OR the callback form, your call.",
       "hints": [
-        "2.3.8 Reading covers both forms; Apple Catcher (2.3.7) shows the callback form in action."
+        "6.2.3 Reading covers both forms; Apple Catcher (6.2.2) shows the callback form in action."
       ]
     },
     {

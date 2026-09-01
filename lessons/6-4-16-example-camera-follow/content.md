@@ -128,4 +128,4 @@ This is the platformer convention: the player sits a third or so of the way from
 - The world doesn't move; the camera does. Sprite positions stay constant.
 - Adding a constant (`+ 100`) biases the view ahead of the player: useful for platformers.
 - Without the camera line, the player can walk off the canvas: the world is still there, just outside the viewport.
-- The next worked example (`2.4.9`) softens this by interpolating with `lerp`.
+- The next worked example (`6.4.17`) softens this by interpolating with `lerp`.

@@ -1,6 +1,6 @@
 ## A sprite can have multiple animations; one is active at a time
 
-**Read before attempting `2.4.3a Reading: addAni(name, frames)`.**
+**Read before attempting `6.4.4 Reading: addAni(name, frames)`.**
 
 moSHion's animation system is **state-driven**: a sprite carries a library of named animations, only one of which renders per frame. Games swap between named animations to express what the player is doing: `idle`, `run`, `jump`. The frame loop never decides what the sprite should look like; your input/state code does.
 
@@ -38,7 +38,7 @@ function draw() {
 }
 ```
 
-Click the preview, then hold `D`. The visual flips on press, back on release. That's the same pattern moSHion's animation system uses, just with named animations instead of color strings. The next four readings introduce the real API: `2.4.3a` registers a named animation with `addAni`, `2.4.3b` switches between them with `changeAni`, `2.4.3c` controls cycle speed via `frameDelay`, and `2.4.3d` covers single-frame still art with `sprite.image`.
+Click the preview, then hold `D`. The visual flips on press, back on release. That's the same pattern moSHion's animation system uses, just with named animations instead of color strings. The next four readings introduce the real API: `6.4.4` registers a named animation with `addAni`, `6.4.5` switches between them with `changeAni`, `6.4.6` controls cycle speed via `frameDelay`, and `6.4.7` covers single-frame still art with `sprite.image`.
 
 ---
 

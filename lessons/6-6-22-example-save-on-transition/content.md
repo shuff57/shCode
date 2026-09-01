@@ -285,4 +285,4 @@ Hit ENTER to start, let the score run. After a save triggers, open DevTools → 
 - Include the current state name in the save data: `saveData.state = state`
 - A single `saveGame()` function works for all states; the save object captures whichever state just activated
 - Save at transitions that matter: game over, win, checkpoint, new level
-- The save object is the bridge between state machines (Module 2.6) and persistence (Module 2.5)
+- The save object is the bridge between state machines (Module 6.6) and persistence (Module 6.5)

@@ -18,7 +18,7 @@
       "title": "Set up a player and at least one platform",
       "instructions": "You need somewhere to start: a canvas, a player sprite, and at least one static platform. Anything beyond that is up to the challenge you pick.",
       "hints": [
-        "Re-read 2.4.7 Reading for the camera follow pattern."
+        "Re-read 6.4.11 Reading for the camera follow pattern."
       ]
     },
     {
@@ -26,7 +26,7 @@
       "title": "Make the camera follow",
       "instructions": "Inside draw(), assign camera.x from the player's x so the level can scroll.",
       "hints": [
-        "See 2.4.8 Worked Example: Camera Follow if you need a refresher."
+        "See 6.4.16 Worked Example: Camera Follow if you need a refresher."
       ]
     },
     {

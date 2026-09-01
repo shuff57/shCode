@@ -1,7 +1,7 @@
 {
   "id": "5-1-10-reading-sprite-props",
   "title": "5.1.10 Reading: Sprite property tour: pos, rotation, layer",
-  "description": "How to read and write the core sprite properties pos, rotation, and layer after the sprite is created. Read before 2.1.4 (worked example).",
+  "description": "How to read and write the core sprite properties pos, rotation, and layer after the sprite is created. Read before 5.1.4 (worked example).",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",

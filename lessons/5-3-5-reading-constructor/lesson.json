@@ -1,7 +1,7 @@
 {
   "id": "5-3-5-reading-constructor",
   "title": "5.3.5 Reading: constructor and its parameters",
-  "description": "How the constructor receives arguments from `new` and stores them on `this`. Read right after 2.2.3a.",
+  "description": "How the constructor receives arguments from `new` and stores them on `this`. Read right after 5.3.4.",
   "type": "lesson",
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",

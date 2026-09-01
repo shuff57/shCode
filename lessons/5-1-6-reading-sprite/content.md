@@ -1,6 +1,6 @@
 ## Sprite: new Sprite(x, y, w, h)
 
-Read before `2.1.3c Lab: Drop one sprite, change its color`. About 5 minutes.
+Read before `5.1.7 Lab: Drop one sprite, change its color`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -53,7 +53,7 @@ The `.color = 'tomato'` chained onto `new Sprite(...)` reads left-to-right as: "
 
 **Try this:** swap `'tomato'` for `'deepskyblue'`, then for `'#88ff00'` (a hex color code). Each run shows a different fill.
 
-> *Heads-up:* the next reading (`2.1.3d`) shows a different way to write this: store the sprite in a `let` variable so you can change its color later, not just at creation. For now, the chained form is enough.
+> *Heads-up:* the next reading (`5.1.8`) shows a different way to write this: store the sprite in a `let` variable so you can change its color later, not just at creation. For now, the chained form is enough.
 
 ---
 

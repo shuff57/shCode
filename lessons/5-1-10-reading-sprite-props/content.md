@@ -15,7 +15,7 @@ Once you have a sprite stored in a variable, you can read or change its properti
 - `player.pos.x` and `player.pos.y` hold the sprite's current centre position; you can read or overwrite them.
 - `player.rotation` is the tilt in degrees (clockwise). `0` is upright; `90` points the top edge to the right.
 - `player.layer` controls draw order. A sprite with a higher layer number appears in front of sprites with lower numbers.
-- `player.color` (already familiar from 2.1.3b) is also a property: included here as a recap row.
+- `player.color` (already familiar from 5.1.6) is also a property: included here as a recap row.
 
 **Try it:**
 
@@ -56,4 +56,4 @@ function draw() {
 | **`rotation`** | Clockwise tilt in degrees. `0` = upright; `90` = top edge points right. |
 | **`layer`** | Draw-order index. Higher value = drawn in front of lower-value sprites. |
 
-*"One more sprite property exists: `vel`, but it deserves its own reading. You'll meet it in 2.1.7a."*
+*"One more sprite property exists: `vel`, but it deserves its own reading. You'll meet it in 5.1.15."*

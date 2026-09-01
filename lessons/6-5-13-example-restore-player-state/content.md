@@ -1,4 +1,4 @@
-# 2.5.12 Worked Example: Restore Full Player State from a Save
+# 6.5.13 Worked Example: Restore Full Player State from a Save
 
 Teacher-led walkthrough for loading and applying saved game state with `getItem` + `JSON.parse`.
 
@@ -89,7 +89,7 @@ function draw() {
 }
 ```
 
-If you saved in 2.5.11, you'll see your old score and player position snap back. If not, you get clean defaults.
+If you saved in 6.5.12, you'll see your old score and player position snap back. If not, you get clean defaults.
 
 Notice `Number(state.something) || 1`: the `|| 1` is the fallback if the field is missing or NaN.
 

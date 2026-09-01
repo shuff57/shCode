@@ -1,6 +1,6 @@
 ## Canvas: new Canvas(w, h)
 
-Read before `2.1.3b Reading: Sprite`. About 5 minutes.
+Read before `5.1.6 Reading: Sprite`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -29,7 +29,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** a 360×360 dark-grey rectangle in the preview. Nothing else has been drawn yet: that comes in 2.1.3b.
+**What you'll see:** a 360×360 dark-grey rectangle in the preview. Nothing else has been drawn yet: that comes in 5.1.6.
 
 **Try this:** change `360, 360` to `800, 200` and run it. Notice the canvas becomes wide and short. Then change it back. The two numbers are always `width, height`: horizontal first, then vertical.
 

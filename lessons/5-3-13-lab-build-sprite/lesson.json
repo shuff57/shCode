@@ -1,7 +1,7 @@
 {
   "id": "5-3-13-lab-build-sprite",
   "title": "5.3.13 Your Turn: Build a Sprite",
-  "description": "Low-stakes autograded practice. Instantiate the Sprite class twice (rectangle form and circle form), set properties on each instance, and give one sprite a stroke. Bridges the 2.2.4 / 2.2.5 worked examples and the 2.2.8 Enemy class lab.",
+  "description": "Low-stakes autograded practice. Instantiate the Sprite class twice (rectangle form and circle form), set properties on each instance, and give one sprite a stroke. Bridges the 5.3.6 / 5.3.12 worked examples and the 5.4.10 Enemy class lab.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Create the canvas",
-      "instructions": "In `setup()`, create a canvas. `Canvas` is a class, and `new Canvas(...)` stamps out an instance: the same constructor-call pattern you saw in 2.2.4.",
+      "instructions": "In `setup()`, create a canvas. `Canvas` is a class, and `new Canvas(...)` stamps out an instance: the same constructor-call pattern you saw in 5.3.6.",
       "hints": [
         "Open the moSHion docs drawer on the right and find the Canvas section."
       ]

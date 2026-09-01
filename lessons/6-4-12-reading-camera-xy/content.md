@@ -1,6 +1,6 @@
 ## Moving the Viewport
 
-**Read before attempting `2.4.7b Reading: Camera-follow pattern`.**
+**Read before attempting `6.4.13 Reading: Camera-follow pattern`.**
 
 **What you'll learn from it:**
 

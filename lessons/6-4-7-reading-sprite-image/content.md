@@ -37,7 +37,7 @@ Hit Run: the star just sits there. That's the entire API.
 if (collected) star.image = '/art/star_collected.png';
 ```
 
-But note: this **replaces** the image, it doesn't transition or animate between them. For a smooth multi-frame effect (e.g., a blinking power-up), reach for `addAni` from `2.4.3a`.
+But note: this **replaces** the image, it doesn't transition or animate between them. For a smooth multi-frame effect (e.g., a blinking power-up), reach for `addAni` from `6.4.4`.
 
 **`sprite.image` vs `addAni`: when to use which:**
 

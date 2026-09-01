@@ -1,6 +1,6 @@
 ## The `new` operator
 
-**Read before `2.2.3b Reading: constructor and its parameters`.** About 4 minutes.
+**Read before `5.3.5 Reading: constructor and its parameters`.** About 4 minutes.
 
 By the end of this reading you should be able to answer:
 

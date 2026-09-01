@@ -1,6 +1,6 @@
 ## Registering a Named Animation
 
-**Read before attempting `2.4.3b Reading: changeAni(name)`.**
+**Read before attempting `6.4.5 Reading: changeAni(name)`.**
 
 **What you'll learn from it:**
 

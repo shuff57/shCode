@@ -25,7 +25,7 @@
       "title": "Implement save slots",
       "instructions": "Create at least three save slots using storeItem with different keys (e.g. 'saveSlot1', 'saveSlot2', 'saveSlot3'). Build a save object that contains the player's position, score, and level. Use JSON.stringify before calling storeItem.",
       "hints": [
-        "See 2.5.16 Reading on save slot patterns.",
+        "See 6.5.17 (Three Save Slots) for save slot patterns.",
         "The save object should look like { x: player.x, y: player.y, score: score, level: level }."
       ]
     },
@@ -34,7 +34,7 @@
       "title": "Implement load functionality",
       "instructions": "Add a way to load from each slot. Call getItem with a slot key, parse the result with JSON.parse, and apply the loaded values back to the player position, score, and level. Provide a fallback (|| {}) in case a slot is empty.",
       "hints": [
-        "See 2.5.16 Reading on loading from save slots.",
+        "See 6.5.17 (Three Save Slots) for loading from save slots.",
         "Use JSON.parse(getItem('saveSlot1')) || null to handle empty slots."
       ]
     },
@@ -43,7 +43,7 @@
       "title": "Add auto-save on level complete",
       "instructions": "Add a goal zone or score threshold. When the player reaches it, auto-save to a dedicated slot (e.g. 'autoSave') in addition to incrementing the level. The auto-save should happen automatically: no button press required.",
       "hints": [
-        "See 2.5.23 Worked Example for the auto-save pattern.",
+        "See 6.5.25 Worked Example for the auto-save pattern.",
         "Check for overlap or score >= threshold to trigger the auto-save."
       ]
     },
@@ -52,7 +52,7 @@
       "title": "Add a title screen with Continue option",
       "instructions": "Build a simple title screen state at the top of draw(). Show the game title and a prompt like 'Press C to Continue'. When the player presses C, load the most recent auto-save. Provide a way to start a new game as well.",
       "hints": [
-        "See 2.5.19 Reading on title screen patterns.",
+        "See 6.5.20 (Title Screen Detects Existing Saves) for title screen patterns.",
         "The Continue option should check if an autoSave exists before offering to load it."
       ]
     }

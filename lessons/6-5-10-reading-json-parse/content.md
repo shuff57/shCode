@@ -1,6 +1,6 @@
 ## JSON.parse: unpacking strings back into objects
 
-**Read before the 2.5.10 round-trip lesson.** About 5 minutes.
+**Read before the 6.5.11 round-trip lesson.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

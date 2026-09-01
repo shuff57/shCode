@@ -1,7 +1,7 @@
 {
   "id": "5-1-19-reading-wasd",
   "title": "5.1.19 Reading: WASD-not-arrows",
-  "description": "Why graded labs use 'a'/'d'/'w'/'s' instead of arrow keys, and how to swap them into the movement pattern. Read after 2.1.7d.",
+  "description": "Why graded labs use 'a'/'d'/'w'/'s' instead of arrow keys, and how to swap them into the movement pattern. Read after 5.1.18.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",

@@ -1,7 +1,7 @@
 {
   "id": "6-4-11-reading-camera",
   "title": "6.4.11 Reading: moSHion docs: Camera",
-  "description": "moshion docs chapter on Camera. Read before `2.4.8 Worked Example: Camera Follow`.",
+  "description": "moshion docs chapter on Camera. Read before `6.4.16 Worked Example: Camera Follow`.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",

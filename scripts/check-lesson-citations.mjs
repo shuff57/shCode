@@ -41,6 +41,10 @@ const LABELLED = /(?:definition|figure|fig\.?|table|example|section|appendix|ver
 // ALREADY covered something they have not reached yet.
 const BACKWARD = /\b(?:from|in lesson|back in|earlier in|you (?:wrote|saw|built|made|used|learned|met)|composes?|composing|learned|practi[cs]ed|covered|met|introduced in|shown in)\b[^.]{0,60}$/i;
 
+// ...unless the sentence says outright that it is pointing ahead. "is covered
+// in the next reading (6.5.6)" contains "covered" and is not a back-reference.
+const FORWARD_WORDS = /\b(?:next|upcoming|later|coming up|you'll|you will)\b/i;
+
 const lessons = [];
 for (const d of fs.readdirSync(lessonsDir).sort()) {
   const p = path.join(lessonsDir, d, 'lesson.json');
@@ -76,8 +80,9 @@ for (const l of lessons) {
         console.error(`            ${line.trim().slice(0, 110)}`);
         continue;
       }
+      const lead = line.slice(0, m.index);
       if (rankOf.get(cited) > rankOf.get(l.num)
-          && BACKWARD.test(line.slice(0, m.index))) {
+          && BACKWARD.test(lead) && !FORWARD_WORDS.test(lead.slice(-70))) {
         forward++;
         console.error(`FORWARD     ${l.dir}:${i + 1} (${l.num}) claims ${cited} as prior`
           + ` material, but it comes later: ${byNum.get(cited).title}`);
@@ -124,14 +129,12 @@ for (const l of lessons) {
 // the student is sent to `2.4.5 Reading: The do...while Loop`. A citation that
 // resolves and lies passes every mechanical check there is.
 //
-// Neither is gated per-item: fixing one needs a human to name the lesson it
-// meant, and a wrong guess produces exactly the resolves-and-lies failure. What
-// IS gated is the total, against the count measured the day this was written.
-// It can go down. It cannot go up.
-// 140 as measured 2026-09-01: 10 dead three-part numbers in description/steps,
-// 59 letter-suffixed numbers the old regex could not see, 71 that resolve to the
-// wrong lesson. Lower this every time a batch is resolved; never raise it.
-const STALE_BASELINE = Number(process.env.STALE_BASELINE ?? 140);
+// There were 140 of them: 10 dead three-part numbers in description or steps,
+// 59 letter-suffixed numbers the old regex could not see, and 71 that resolved
+// to the wrong lesson. All 140 were resolved against the folder-rename map
+// recorded in the renumber commit itself (d2e9950) rather than by guessing at
+// topics, so the baseline is 0 and this is an ordinary gate. It may never rise.
+const STALE_BASELINE = Number(process.env.STALE_BASELINE ?? 0);
 const stale = [];
 const CITE = /\b(\d+\.\d+\.\d+)([a-z])?\b/g;
 for (const l of lessons) {

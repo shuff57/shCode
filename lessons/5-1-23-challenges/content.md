@@ -87,7 +87,7 @@ Make a third sprite that always follows the **mouse cursor**, but smoothly, not 
   ```
 - Smaller `t` = laggier follow. Larger `t` = snappier.
 
-This is the same math you'll use in Module 2.4.1 for smooth camera follow.
+This is the same math you'll use in Module 6.4 for smooth camera follow.
 
 ---
 

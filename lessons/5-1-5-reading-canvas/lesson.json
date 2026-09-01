@@ -1,7 +1,7 @@
 {
   "id": "5-1-5-reading-canvas",
   "title": "5.1.5 Reading: Canvas: new Canvas(w, h)",
-  "description": "How new Canvas(w, h) opens the drawing area and why (0, 0) is top-left with y increasing downward. Read before 2.1.3b (Sprite).",
+  "description": "How new Canvas(w, h) opens the drawing area and why (0, 0) is top-left with y increasing downward. Read before 5.1.6 (Sprite).",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",

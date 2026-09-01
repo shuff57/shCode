@@ -1,7 +1,7 @@
 {
   "id": "6-1-2-video-groups-intro",
   "title": "6.1.2 Video: Groups in moshion",
-  "description": "Why a `Group` is a class with shared defaults, and how a single line creates fifty enemies. Watch before `2.3.5 Groups Sandbox`.",
+  "description": "Why a `Group` is a class with shared defaults, and how a single line creates fifty enemies. Watch before `6.1.5 Groups Sandbox`.",
   "type": "lesson",
   "estimateMins": 4,
   "category": "Unit 2: moSHion: Applied Game Development",

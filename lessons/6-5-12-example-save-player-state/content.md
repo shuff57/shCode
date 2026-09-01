@@ -1,4 +1,4 @@
-# 2.5.11 Worked Example: Save Full Player State
+# 6.5.12 Worked Example: Save Full Player State
 
 Teacher-led walkthrough for saving a complete game state with `storeItem` + `JSON.stringify`.
 

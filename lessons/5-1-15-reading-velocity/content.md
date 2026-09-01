@@ -1,6 +1,6 @@
 ## Velocity: vel.x and vel.y
 
-Read before `2.1.7b Reading: Movement pattern`. About 5 minutes.
+Read before `5.1.16 Reading: Movement pattern`. About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

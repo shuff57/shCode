@@ -2,7 +2,7 @@
 
 ## Step 1: Hit Run with the hard follow
 
-The line is `camera.x = player.x`: same as `2.4.8`. The camera moves *exactly* as far as the player every frame, which feels rigid. Walk and run to feel it.
+The line is `camera.x = player.x`: same as `6.4.16`. The camera moves *exactly* as far as the player every frame, which feels rigid. Walk and run to feel it.
 
 ```js live
 let player;

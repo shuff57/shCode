@@ -68,7 +68,7 @@
       "title": "State-machine draw(): title, play, win",
       "instructions": "Wrap your draw() logic in a switch(gameState) with cases for 'title', 'play', and 'win'. In 'play': move paddles with kb.pressing, check ball edge zones to score, render scores with text(), check the win threshold. In 'win': show the winner and wire a key to reset.",
       "hints": [
-        "See 6.6.13 (state machine pattern) for switch(state) with cases and break."
+        "See Unit 6.6 (state machine pattern) for switch(state) with cases and break."
       ]
     }
   ],

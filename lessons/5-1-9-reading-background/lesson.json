@@ -1,7 +1,7 @@
 {
   "id": "5-1-9-reading-background",
   "title": "5.1.9 Reading: background(color) wipe rule",
-  "description": "Why background(color) must be the first call inside draw() to clear the previous frame, and what motion trails look like without it. Read before 2.1.3f.",
+  "description": "Why background(color) must be the first call inside draw() to clear the previous frame, and what motion trails look like without it. Read before 5.1.10.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",

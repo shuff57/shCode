@@ -1,7 +1,7 @@
 {
   "id": "5-1-17-reading-else-to-zero",
   "title": "5.1.17 Reading: The else-to-zero rule",
-  "description": "Why velocity persists across frames and why the else branch is what stops the sprite. Read after 2.1.7b.",
+  "description": "Why velocity persists across frames and why the else branch is what stops the sprite. Read after 5.1.16.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
