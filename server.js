@@ -131,6 +131,46 @@ app.prepare().then(() => {
   server.post('/api/lesson-state/:lessonId', (_req, res) => {
     res.json({ ok: true });
   });
+  // The student gradebook on /progress. The real route is
+  // functions/api/my-gradebook.ts, reading lesson_state + lesson_submissions
+  // out of D1, which this server does not have. Without a stub the page shows
+  // its "could not load" card in dev and the table is unreviewable locally,
+  // so this serves a fixture that hits every status the component renders --
+  // including `pending` (grader outage) and a teacher override with feedback,
+  // the two states that are hardest to produce on purpose against real data.
+  server.get('/api/my-gradebook', async (_req, res) => {
+    const day = 86400000;
+    const now = Date.now();
+    let ids = [];
+    try {
+      const raw = await fs.readFile(path.join(process.cwd(), 'public', 'lessons-manifest.json'), 'utf8');
+      ids = JSON.parse(raw).lessons.filter((l) => l.type === 'assignment').slice(0, 5).map((l) => l.id);
+    } catch {
+      ids = [];
+    }
+    const base = {
+      state: null, score: null, submittedScore: null, possible: null,
+      late: false, pending: false, completedAt: null, submittedAt: null,
+      teacherFeedback: null, teacherReviewedAt: null,
+    };
+    const fixtures = [
+      { ...base, state: 'completed', score: 100, completedAt: now - 6 * day, due: now - 7 * day + day },
+      { ...base, state: 'completed', score: 90, submittedScore: 18, possible: 20, completedAt: now - day, late: true, due: now - 3 * day },
+      { ...base, state: 'completed', score: 75, submittedScore: 15, possible: 20, completedAt: now - 2 * day,
+        teacherFeedback: 'Nice work on the nested loop. Next time give the counter a clearer name than i, and add a comment above draw() saying what it animates.',
+        teacherReviewedAt: now - day, due: now - 2 * day },
+      { ...base, pending: true, submittedAt: now - 3600000, due: now + 2 * day },
+      { ...base, late: true, due: now - day },
+    ];
+    const cells = {};
+    const dueDates = {};
+    ids.forEach((id, i) => {
+      const { due, ...cell } = fixtures[i];
+      cells[id] = cell;
+      if (due) dueDates[id] = due;
+    });
+    res.json({ cells, dueDates });
+  });
   // Reference solutions (admin/teacher "View solution" button). Dev reads the
   // lesson straight from disk; the Pages Function serves the generated map.
   // Both must answer with the same shape, so this mirrors
