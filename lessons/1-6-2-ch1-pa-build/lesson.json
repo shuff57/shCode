@@ -1,0 +1,184 @@
+{
+  "id": "1-6-2-ch1-pa-build",
+  "title": "1.6.2 Group PA Part 2: Build It",
+  "description": "Turn the chart you just passed into a documented, straight-line program. Ten checks, all of them things Chapter 1 taught. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 40,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.6 Chapter 1 Group Performance Assessment",
+  "preview": "console",
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Fill in the header",
+      "instructions": "The top of script.js has three comment lines waiting: Problem, Partners, Date. Fill all three in. Both partners' names, on the Partners line, before anything else happens."
+    },
+    {
+      "id": "s2",
+      "title": "Copy your pseudocode in as comments",
+      "instructions": "Your chart from 1.6.1, written out one instruction per line as // comments, indented to show what sits inside the decision. Do this before you write a single line of JavaScript. If a line does not say what you meant on the chart, fix the wording now."
+    },
+    {
+      "id": "s3",
+      "title": "Declare the inputs",
+      "instructions": "One variable per number your problem takes in, plus one string for the name or label. Descriptive camelCase names -- pricePerPizza, not p. The limit you are comparing against never changes, so it is a const in UPPER_SNAKE_CASE.",
+      "hints": [
+        "The limit is the fixed number in your problem statement: 2.00, 15.00, 70, or the trip distance",
+        "UPPER_SNAKE_CASE means GOOD_DEAL_LIMIT, not goodDealLimit",
+        "A name someone else can read is worth more marks here than a short one"
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Work out the value",
+      "instructions": "One line of arithmetic that turns your inputs into the one number your problem is about: the cost per slice, the cost per person, the weighted average, the range of a tank. Name it for what it is."
+    },
+    {
+      "id": "s5",
+      "title": "Answer the diamond without an if",
+      "instructions": "Your chart's diamond is a comparison, and a comparison produces a boolean (1.2.18). Store it: const meetsTheLimit = yourValue <= YOUR_LIMIT; That variable IS the diamond. Underneath it, write the two branches as pseudocode comments -- what the program would say on the yes side, and on the no side. Chapter 2 turns those comments into an if statement; today they stay comments.",
+      "hints": [
+        "Which way round the comparison goes depends on your problem -- read your chart, not the example",
+        "The two branch comments are graded. IF and ELSE, in capitals, one comment line each"
+      ]
+    },
+    {
+      "id": "s6",
+      "title": "Report it",
+      "instructions": "At least three console.log calls, and at least one of them a template literal with a ${} in it so the numbers are inside the sentence rather than bolted onto the end. Also print typeof for one of your values -- an assessment of Chapter 1 that never asks what type anything is has skipped 1.2."
+    },
+    {
+      "id": "s7",
+      "title": "Read it back to each other",
+      "instructions": "Swap the keyboard. The partner who did not type reads the program out loud line by line while the other checks it against the chart. Every shape on the chart should appear once, in order. Fix what does not match, then run three sets of numbers through it -- you will need them for the demo writeup."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Both partners named in the header",
+      "description": "The Partners line at the top of script.js has names on it",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "//[^\\S\\n]*Partners:[^\\S\\n]*\\S+",
+      "flags": "i",
+      "points": 0,
+      "hint": "Line 3 of script.js: // Partners: -- put both names after the colon.",
+      "stripComments": false
+    },
+    {
+      "id": "r2",
+      "title": "The problem is named in the header",
+      "description": "The Problem line says which of the four menu problems this is",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "//[^\\S\\n]*Problem:[^\\S\\n]*\\S+",
+      "flags": "i",
+      "points": 0,
+      "hint": "Line 2 of script.js: // Problem: -- Slice Economics, Split the Check, Grade Forecast or Fuel Stop.",
+      "stripComments": false
+    },
+    {
+      "id": "r3",
+      "title": "The limit is an UPPER_SNAKE_CASE const",
+      "description": "The number that never changes is declared with const in UPPER_SNAKE_CASE",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "const\\s+[A-Z][A-Z0-9_]{2,}\\s*=",
+      "flags": "",
+      "points": 0,
+      "hint": "const GOOD_DEAL_LIMIT = 2.00; -- capitals and underscores, and const rather than let, because it never changes."
+    },
+    {
+      "id": "r4",
+      "title": "A string variable is declared",
+      "description": "One variable holds text -- the name or label your problem talks about",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*(?:\"[^\"]*\"|'[^']*'|`[^`$]*`)",
+      "flags": "",
+      "points": 0,
+      "hint": "Something like const pizzeriaName = \"Tony's\"; -- quotes make it a string."
+    },
+    {
+      "id": "r5",
+      "title": "A number variable is declared",
+      "description": "At least one variable holds a number typed straight in",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*-?\\d",
+      "flags": "",
+      "points": 0,
+      "hint": "let sliceCount = 8; -- no quotes around a number, or it is a string."
+    },
+    {
+      "id": "r6",
+      "title": "The value is computed from the inputs",
+      "description": "A variable is assigned from arithmetic on other variables, not typed in by hand",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[A-Za-z_$][A-Za-z0-9_$]*\\s*[-+*/]",
+      "flags": "",
+      "points": 0,
+      "hint": "const costPerSlice = pizzaPrice / sliceCount; -- the answer has to be worked out, not written down."
+    },
+    {
+      "id": "r7",
+      "title": "The diamond is stored as a boolean",
+      "description": "A comparison is assigned to a variable, which is what the chart's diamond becomes",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:let|const)\\s+[a-z][A-Za-z0-9]*\\s*=\\s*[^;\\n]*(?:<=|>=|===|!==|<|>)[^;\\n]*;",
+      "flags": "",
+      "points": 0,
+      "hint": "const meetsTheLimit = costPerSlice <= GOOD_DEAL_LIMIT; -- a comparison produces true or false (1.2.18)."
+    },
+    {
+      "id": "r8",
+      "title": "Both branches written as pseudocode",
+      "description": "An IF comment line and an ELSE comment line say what happens on each side of the diamond",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "//[^\\n]*\\bIF\\b[\\s\\S]*//[^\\n]*\\bELSE\\b",
+      "flags": "",
+      "points": 0,
+      "hint": "Two comment lines, capitals: // IF meetsTheLimit THEN report it is a good deal   and   // ELSE report it is not.",
+      "stripComments": false
+    },
+    {
+      "id": "r9",
+      "title": "A template literal reports the result",
+      "description": "At least one console.log uses backticks with ${} inside",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "console\\.log\\s*\\(\\s*`[^`]*\\$\\{",
+      "flags": "",
+      "points": 0,
+      "hint": "console.log(`A slice costs $${costPerSlice}.`); -- backticks, not quotes, and ${} around the variable."
+    },
+    {
+      "id": "r10",
+      "title": "typeof is reported for one value",
+      "description": "The program prints the type of at least one of its values",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "typeof\\s+[A-Za-z_$]",
+      "flags": "",
+      "points": 0,
+      "hint": "console.log(typeof costPerSlice); -- 1.2.23. Say what type your computed value actually is."
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "assignmentCode": "A1.6.2",
+  "planFrom": "1-6-1-ch1-pa-design-chart",
+  "planFromLabel": "1.6.1"
+}

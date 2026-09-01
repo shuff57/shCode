@@ -1,0 +1,69 @@
+{
+  "id": "1-6-3-ch1-pa-demo",
+  "title": "1.6.3 Group PA Part 3: Demo It",
+  "description": "The writeup that goes with the live demo: who did what, three test cases, and where each of Chapter 1's five sections shows up in your program. AI-graded with hints.",
+  "type": "assignment",
+  "estimateMins": 20,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.6 Chapter 1 Group Performance Assessment",
+  "preview": "assignment",
+  "slos": [
+    "SLO-1",
+    "SLO-2",
+    "SLO-4"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "aiGrader": {
+    "rubricTitle": "Chapter 1 Group PA, demo third: AI-graded rubric",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "Both partners write this together and both submit the same answer. Everything asked for is something you did in the last hour or read earlier in Chapter 1; go back and reread if you get stuck. Your own everyday words throughout.\n\nPart 1 -- Who did what. Name both partners. Then say who drove the keyboard for the chart (1.6.1), who drove it for the code (1.6.2), and one thing the partner who was not typing caught that the one typing had missed.\n\nPart 2 -- Three test cases. A table or three rows, each with the numbers you put in, what you expected to come out, and what actually came out. At least one of your three has to land on the other side of the comparison from the other two -- a test set that only ever proves one answer has not tested the decision (1.5.40).\n\nPart 3 -- One thing you logged. Name one console.log you added while building that was there to check your work rather than to report the answer: what you printed, what it showed you, and what you changed because of it (1.5.41). If nothing was wrong, say what the print confirmed and how you would have known if it had been.\n\nPart 4 -- Lifecycle. Chapter 1 opened with the four framework activities (1.1.6). Name which activity each third of this period was -- the chart, the code, this writeup -- and say in one sentence why the chart came before the code rather than after.\n\nPart 5 -- Paradigm and types. Name the paradigm your program is written in and say in one sentence how you can tell (1.4.8). Then name the type your computed value turned out to be and the type your comparison turned out to be, and say why they are different (1.2.18, 1.2.23).\n\nPart 6 -- The branch you did not write. Copy in the two pseudocode comment lines from your code, and say in one sentence what would have to be true before those comments could become real JavaScript.",
+    "rubric": [
+      {
+        "id": "partners-and-roles",
+        "title": "Both partners named, with who drove which third",
+        "description": "Two names appear, and the response says who had the keyboard for the chart and who had it for the code. Credit generously -- any clear division counts, including 'we swapped every ten minutes' as long as both names are there and both thirds are accounted for. The catch-something-missed detail is a bonus; do not withhold the criterion for a thin one. Withhold only if fewer than two names appear, or if the division of work is not stated at all.",
+        "points": 0
+      },
+      {
+        "id": "three-test-cases",
+        "title": "Three test cases, with one landing on the other side of the comparison",
+        "description": "Three sets of inputs are given, each with an expected result and an actual result. Credit rough tables, bullet lists or prose equally -- format is not being assessed. The one thing that matters: at least one case has to come out on the opposite side of the comparison from the others, so that both answers of the decision are exercised. Credit that if the response makes it visible in any way, including just saying 'this one was not a good deal'. If all three land on the same side, credit the criterion as partial and say why in the feedback.",
+        "points": 0
+      },
+      {
+        "id": "debugging-log",
+        "title": "One console.log used to check work, with what it showed",
+        "description": "The response names one specific thing they printed while building, what it showed, and what they did next. Credit a print that confirmed something was already right just as fully as one that found a bug -- the response is allowed to say nothing was wrong, as long as it says what the print told them. Withhold only if no specific printed value is named at all, or the answer is generic advice about debugging rather than something that happened.",
+        "points": 0
+      },
+      {
+        "id": "lifecycle-mapping",
+        "title": "Each third mapped onto a framework activity, and design-before-code justified",
+        "description": "The response assigns a lifecycle activity to each of the three thirds. Placements are allowed to be arguable -- the chart as elaboration or as inception, the writeup as deployment or as construction, are all defensible, and this criterion is about the mapping being attempted and reasoned, not about matching an answer key. Credit any three placements with any reasoning. The design-before-code sentence has to say something about catching problems early or about agreeing before typing; credit any version of that idea.",
+        "points": 0
+      },
+      {
+        "id": "paradigm-and-types",
+        "title": "Paradigm named, and the two types distinguished",
+        "description": "The response names a paradigm -- procedural, imperative or structured all count for a straight-line script -- with any short justification (a list of steps, runs top to bottom, no objects or classes). Then it says the computed value is a number and the comparison is a boolean, with some statement of why they differ. Credit 'one is a calculation, one is a yes or no' as a full answer to the why. If the paradigm is named but the type answer is missing, or vice versa, treat as partial.",
+        "points": 0
+      },
+      {
+        "id": "pseudocode-branches",
+        "title": "The two pseudocode branches, and what would make them code",
+        "description": "The two IF/ELSE comment lines from their program appear, quoted or paraphrased. Then one sentence about what is still missing -- the expected answer is the if statement, which is Chapter 2. Credit any answer that points at conditionals, if/else, or 'we have not learned that syntax yet'. Withhold only if the branches do not appear at all.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A1.6.3"
+}

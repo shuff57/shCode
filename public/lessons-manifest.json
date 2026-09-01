@@ -1279,6 +1279,33 @@
       "week": null
     },
     {
+      "id": "1-6-1-ch1-pa-design-chart",
+      "title": "1.6.1 Group PA Part 1: Design the Chart",
+      "unit": "1.6 Chapter 1 Group Performance Assessment",
+      "preview": "diagram",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-6-2-ch1-pa-build",
+      "title": "1.6.2 Group PA Part 2: Build It",
+      "unit": "1.6 Chapter 1 Group Performance Assessment",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-6-3-ch1-pa-demo",
+      "title": "1.6.3 Group PA Part 3: Demo It",
+      "unit": "1.6 Chapter 1 Group Performance Assessment",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "2-1-1-slides",
       "title": "2.1.1 Slides: Conditionals",
       "unit": "2.1 Conditionals",
