@@ -1,4 +1,4 @@
-**Goal:** Use the vector-from-A-to-B pattern (6.7.13) and `applyForce` (6.7.12) to launch a ball toward a static target when the player presses Space.
+**Goal:** Use the vector-from-A-to-B pattern (6.8.8) and `applyForce` (6.8.7) to launch a ball toward a static target when the player presses Space.
 
 ## Step 1: Hit Run and press Space
 
@@ -25,7 +25,7 @@ function draw() {
 
 ## Step 2: Trace the vector math
 
-`dx = target.pos.x - ball.pos.x` and `dy = target.pos.y - ball.pos.y` give the direction from the ball to the target: the same subtraction pattern from 6.7.13. Multiplying by `0.5` scales the push: larger makes a flatter arc, smaller makes gravity bend the path sooner. Press Space several times in a row: forces accumulate and the ball picks up speed.
+`dx = target.pos.x - ball.pos.x` and `dy = target.pos.y - ball.pos.y` give the direction from the ball to the target: the same subtraction pattern from 6.8.8. Multiplying by `0.5` scales the push: larger makes a flatter arc, smaller makes gravity bend the path sooner. Press Space several times in a row: forces accumulate and the ball picks up speed.
 
 ```js live
 let ball, target;
@@ -72,6 +72,6 @@ function draw() {
 ## Key takeaways
 
 - `applyForce(fx, fy)` takes two numbers: x and y components of the push.
-- Subtracting ball coordinates from target coordinates gives the direction vector (6.7.13).
+- Subtracting ball coordinates from target coordinates gives the direction vector (6.8.8).
 - The scale factor determines force magnitude: it is the only thing to tune for arc shape.
 - Forces accumulate across frames; each Space press adds to the ball's velocity.

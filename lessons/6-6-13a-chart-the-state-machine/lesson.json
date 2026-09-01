@@ -4,7 +4,7 @@
   "description": "Draw the title / play / gameover machine. This is the chart that pays for itself: a state machine is far easier to argue about as a picture than as a switch.",
   "type": "lesson",
   "estimateMins": 25,
-  "category": "Unit 2: moSHion Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.6 Game State Machines",
   "preview": "diagram",
   "slos": [

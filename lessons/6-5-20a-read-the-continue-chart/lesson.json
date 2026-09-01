@@ -4,7 +4,7 @@
   "description": "No drawing. Read the title-screen save check and answer five questions about what a first-time player sees.",
   "type": "lesson",
   "estimateMins": 10,
-  "category": "Unit 2: moSHion Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.5 Save and Load",
   "preview": "reading",
   "slos": [

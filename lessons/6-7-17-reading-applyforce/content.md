@@ -1,6 +1,6 @@
 ## applyForce(fx, fy)
 
-**Read before attempting `6.7.14 Worked Example: Launch a Sprite with applyForce`.**
+**Read before attempting `6.8.9 Worked Example: Launch a Sprite with applyForce`.**
 
 `sprite.applyForce(fx, fy)` gives a sprite a one-frame push. The physics engine takes that push and adds it to the sprite's motion, so if you press Space once, the sprite moves, and it keeps moving (subject to gravity and friction) even after you let go.
 

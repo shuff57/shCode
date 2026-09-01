@@ -12,7 +12,7 @@ Create a static anchor and a dynamic sprite. Connect them with `new SliderJoint(
 
 **API hint:** The constructor takes two sprite arguments: `new SliderJoint(spriteA, spriteB)`: exactly like `DistanceJoint` and `HingeJoint`. Set `spriteA.collider = 'static'` for the anchor. The piston slides along the axis defined by the two sprites' initial positions.
 
-**Where to look:** 6.8.2 (DistanceJoint reading) and 6.7.12 (applyForce reading) cover the sibling APIs. The pattern is the same; only the constraint type changes.
+**Where to look:** 6.8.2 (DistanceJoint reading) and 6.8.7 (applyForce reading) cover the sibling APIs. The pattern is the same; only the constraint type changes.
 
 ---
 
@@ -22,7 +22,7 @@ A trebuchet is a sling machine: a long arm pivots on a hinge, one end heavy (cou
 
 Build a simplified version: a pivot sprite (`collider = 'static'`), an arm sprite connected by a `HingeJoint`, and a projectile connected to the arm's far end by a `DistanceJoint`. Set gravity, give the counterweight end more mass (make it bigger), and watch what happens. Can you release the projectile at the right moment using `joint.delete()` and `applyForce`?
 
-**API hints:** See 6.8.4 (HingeJoint), 6.8.2 (DistanceJoint), 6.8.6 (joint.delete()), and 6.7.12 (applyForce). You'll use all four in the same sketch: that's the point.
+**API hints:** See 6.8.4 (HingeJoint), 6.8.2 (DistanceJoint), 6.8.6 (joint.delete()), and 6.8.7 (applyForce). You'll use all four in the same sketch: that's the point.
 
 **Stretch it further:** Add a target sprite somewhere on screen and try to aim.
 

@@ -1,6 +1,6 @@
 ## sprite.bounciness
 
-**Read before attempting `6.7.21 Worked Example: Bounciness Comparison`.**
+**Read before attempting `6.7.15 Worked Example: Bounciness Comparison`.**
 
 `sprite.bounciness` controls how much energy a sprite keeps after it collides with something. It is a number from 0 to 1:
 

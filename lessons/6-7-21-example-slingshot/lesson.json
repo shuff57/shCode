@@ -1,10 +1,10 @@
 {
   "id": "6-7-21-example-slingshot",
-  "title": "6.7.16 Worked Example: Slingshot End-to-End",
+  "title": "6.8.11 Worked Example: Slingshot End-to-End",
   "type": "lesson",
   "estimateMins": 18,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.7 Advanced Input",
+  "unit": "6.8 Joints",
   "preview": "example",
   "week": 17,
   "slos": [

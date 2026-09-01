@@ -50,7 +50,7 @@ for (const d of fs.readdirSync(lessonsDir).sort()) {
   const m = /^(\d+)\.(\d+)\.(\d+)\s+(.*)/.exec(j.title ?? '');
   if (!m) continue;
   lessons.push({ dir: d, num: `${+m[1]}.${+m[2]}.${+m[3]}`, title: j.title, quiz: j.quiz,
-    key: [+m[1], +m[2], +m[3]] });
+    key: [+m[1], +m[2], +m[3]], meta: j });
 }
 lessons.sort((a, b) => a.key[0] - b.key[0] || a.key[1] - b.key[1] || a.key[2] - b.key[2]);
 
@@ -104,6 +104,78 @@ for (const l of lessons) {
       }
     }
   }
+}
+
+// ------------------------------------------------------- renumber-rot report
+//
+// Everything above reads THREE-PART numbers in content.md prose and in quiz
+// sourceIds. That surface was chosen when the check was written and it has two
+// holes, both of which were hiding real defects on 2026-09-01:
+//
+//   * `description`, `steps` and `requirements` are prose too, and shipped to
+//     the student, and NOTHING has ever read them. 38 dead citations there.
+//   * the `\b`-anchored number regex cannot match a letter-suffixed number:
+//     in `2.4.3b` there is no word boundary between `3` and `b`, so the whole
+//     citation is invisible. The old moSHion numbering used letters heavily.
+//
+// The second population below is nastier than a dead link. When chapter 2 was
+// the moSHion chapter, 2.4 was Animated Sprites; today it is Loop Control. So
+// unit 6.4's animation readings still cite "2.4.5", that number RESOLVES, and
+// the student is sent to `2.4.5 Reading: The do...while Loop`. A citation that
+// resolves and lies passes every mechanical check there is.
+//
+// Neither is gated per-item: fixing one needs a human to name the lesson it
+// meant, and a wrong guess produces exactly the resolves-and-lies failure. What
+// IS gated is the total, against the count measured the day this was written.
+// It can go down. It cannot go up.
+// 140 as measured 2026-09-01: 10 dead three-part numbers in description/steps,
+// 59 letter-suffixed numbers the old regex could not see, 71 that resolve to the
+// wrong lesson. Lower this every time a batch is resolved; never raise it.
+const STALE_BASELINE = Number(process.env.STALE_BASELINE ?? 140);
+const stale = [];
+const CITE = /\b(\d+\.\d+\.\d+)([a-z])?\b/g;
+for (const l of lessons) {
+  const md = path.join(lessonsDir, l.dir, 'content.md');
+  const surfaces = [
+    ['description', l.meta.description ?? ''],
+    ['steps', JSON.stringify(l.meta.steps ?? '')],
+    ['requirements', JSON.stringify(l.meta.requirements ?? '')],
+    ['content.md', fs.existsSync(md) ? fs.readFileSync(md, 'utf8') : ''],
+  ];
+  for (const [where, text] of surfaces) {
+    for (const m of String(text).matchAll(CITE)) {
+      const at = m.index;
+      if (LABELLED.test(String(text).slice(Math.max(0, at - 14), at))) continue;
+      const cited = m[0];
+      // A letter-suffixed number never names a lesson today: no title carries
+      // one. Anything else is judged on whether it resolves.
+      if (m[2]) {
+        stale.push(`${l.dir} [${where}] ${cited} — no lesson has a lettered number`);
+      } else if (!byNum.has(cited)) {
+        // content.md three-part misses are already reported as UNRESOLVED.
+        if (where !== 'content.md') {
+          stale.push(`${l.dir} [${where}] ${cited} — names no lesson`);
+        }
+      } else if (l.key[0] >= 5 && Number(cited.split('.')[0]) <= 2) {
+        // The moSHion units were chapter 2 before the renumber. A chapter-5+
+        // lesson pointing into chapter 1-2 is that rot until a human says
+        // otherwise -- and it resolves, so nothing else will ever flag it.
+        stale.push(`${l.dir} (${l.num}) [${where}] ${cited} RESOLVES TO`
+          + ` "${byNum.get(cited).title.slice(0, 52)}"`);
+      }
+    }
+  }
+}
+if (stale.length) {
+  console.log(`\n[check-lesson-citations] ${stale.length} stale-numbering finding(s)`
+    + ` (baseline ${STALE_BASELINE}):`);
+  for (const s of stale) console.log(`  STALE  ${s}`);
+}
+if (stale.length > STALE_BASELINE) {
+  console.error(`\n[check-lesson-citations] stale citations rose from`
+    + ` ${STALE_BASELINE} to ${stale.length}. Resolve the new one by topic against`
+    + ' the current titles — an offset lands on a real but unrelated lesson.');
+  process.exit(1);
 }
 
 // Only UNRESOLVED fails the build. Whether a number resolves is a fact; whether

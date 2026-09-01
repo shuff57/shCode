@@ -4,8 +4,8 @@
   "description": "Someone charted the grab half of drag-and-drop and never charted the letting go. Find what the red checks are pointing at.",
   "type": "lesson",
   "estimateMins": 20,
-  "category": "Unit 2: moSHion Game Development",
-  "unit": "6.7 Advanced Input and Joints",
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.7 Advanced Input",
   "preview": "diagram",
   "slos": [
     "SLO-3",

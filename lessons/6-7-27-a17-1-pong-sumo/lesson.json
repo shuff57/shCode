@@ -1,11 +1,11 @@
 {
   "id": "6-7-27-a17-1-pong-sumo",
-  "title": "6.7.23 Two-Player Pong-Sumo",
+  "title": "6.8.14 Two-Player Pong-Sumo",
   "description": "Graded: build a two-player Pong-Sumo game: two paddles, one ball, push the ball past the opponent to score. Incorporates two-player input, push-collision physics, a win condition, and at least one joint. Auto-graded.",
   "type": "assignment",
   "estimateMins": 75,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.7 Advanced Input",
+  "unit": "6.8 Joints",
   "preview": "moshion",
   "week": 17,
   "slos": [
@@ -20,7 +20,7 @@
       "title": "Arena setup: canvas and gravity",
       "instructions": "Create a canvas (e.g. 600×400). Set world.gravity.y = 0 so paddles and ball glide instead of falling.",
       "hints": [
-        "Check the Canvas section of the moSHion docs drawer. For no-gravity setup see 2.7.25."
+        "Check the Canvas section of the moSHion docs drawer. For no-gravity setup see 6.7.16."
       ]
     },
     {
@@ -36,7 +36,7 @@
       "title": "Two paddles: Player 1 (WASD) and Player 2 (arrow keys)",
       "instructions": "Create two paddle sprites (one on the left, one on the right). In draw(), read kb.pressing for W/S (Player 1) and up/down (Player 2) and set each paddle's velocity accordingly.",
       "hints": [
-        "See 2.7.25 for the two-paddle pattern. Check kb.pressing in the moSHion docs drawer."
+        "See 6.7.16 for the two-paddle pattern. Check kb.pressing in the moSHion docs drawer."
       ]
     },
     {
@@ -44,7 +44,7 @@
       "title": "Ball: bouncy, dynamic, initial velocity",
       "instructions": "Create a ball sprite in the center. Set a positive bounciness so it bounces off paddles and walls. Give it an initial vel.x so the game starts moving.",
       "hints": [
-        "See 2.7.24 (bounciness) and 2.7.25 (two paddles) for the arena setup pattern."
+        "See 6.7.14 (bounciness) and 6.7.16 (two paddles) for the arena setup pattern."
       ]
     },
     {
@@ -52,7 +52,7 @@
       "title": "Add at least one joint",
       "instructions": "Use a DistanceJoint or HingeJoint somewhere in your game: a boundary chain, a moving obstacle, or an attachment between two sprites. Use new DistanceJoint(a, b) and set joint.length = N after construction if you want a specific length.",
       "hints": [
-        "See 2.7.12 (DistanceJoint) or 2.7.14 (HingeJoint). Remember: joint.delete() releases the constraint. Set length with joint.length = N after new DistanceJoint(a, b)."
+        "See 6.8.2 (DistanceJoint) or 6.8.4 (HingeJoint). Remember: joint.delete() releases the constraint. Set length with joint.length = N after new DistanceJoint(a, b)."
       ]
     },
     {
@@ -68,7 +68,7 @@
       "title": "State-machine draw(): title, play, win",
       "instructions": "Wrap your draw() logic in a switch(gameState) with cases for 'title', 'play', and 'win'. In 'play': move paddles with kb.pressing, check ball edge zones to score, render scores with text(), check the win threshold. In 'win': show the winner and wire a key to reset.",
       "hints": [
-        "See 2.6.1 (state machine pattern) for switch(state) with cases and break."
+        "See 6.6.13 (state machine pattern) for switch(state) with cases and break."
       ]
     }
   ],

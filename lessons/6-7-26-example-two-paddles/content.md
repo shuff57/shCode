@@ -1,4 +1,4 @@
-**Goal:** Put two independent key schemes into one running sketch: WASD for Player 1, arrow keys for Player 2, so you can feel how they work together before writing your own. Composes the two-scheme reading from 6.7.19.
+**Goal:** Put two independent key schemes into one running sketch: WASD for Player 1, arrow keys for Player 2, so you can feel how they work together before writing your own. Composes the two-scheme reading from 6.7.13.
 
 ## Step 1: Hit Run and move both paddles
 

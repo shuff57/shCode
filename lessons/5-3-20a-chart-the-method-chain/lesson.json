@@ -4,7 +4,7 @@
   "description": "Draw a method calling another method. Two double-rails, and flow that comes back from both.",
   "type": "lesson",
   "estimateMins": 20,
-  "category": "Unit 2: moSHion Game Development",
+  "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.4 Writing Your Own Classes",
   "preview": "diagram",
   "slos": [

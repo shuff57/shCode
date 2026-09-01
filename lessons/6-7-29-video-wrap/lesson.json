@@ -1,11 +1,11 @@
 {
   "id": "6-7-29-video-wrap",
-  "title": "6.7.25 Video: Wrap and Capstone Preview",
-  "description": "You've built every piece: mouse input, joints, forces, two-player games, state machines, saves. This short video closes Unit 2.7 and previews what Unit 2.8 asks you to do: design and pitch your own game from scratch.",
+  "title": "6.8.15 Video: Wrap and Capstone Preview",
+  "description": "You've built every piece: mouse input, joints, forces, two-player games, state machines, saves. This short video closes Units 6.7 and 6.8 and previews what Unit 7.1 asks you to do: design and pitch your own game from scratch.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.7 Advanced Input",
+  "unit": "6.8 Joints",
   "preview": "video",
   "week": 17,
   "slos": [

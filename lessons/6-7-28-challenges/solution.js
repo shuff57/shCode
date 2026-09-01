@@ -1,4 +1,4 @@
-// 6.7.24 Challenges: SliderJoint, Trebuchet, Swinging Rope
+// 6.8.13 Challenges: SliderJoint, Trebuchet, Swinging Rope
 // (reference solution).
 //
 // Takes the SliderJoint challenge: a lift platform locked to a vertical

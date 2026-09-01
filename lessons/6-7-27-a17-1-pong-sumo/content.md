@@ -2,7 +2,7 @@
 
 ### Assignment overview
 
-This is the capstone lab for Unit 6.7. You've built paddles (6.7.22), learned joints (6.8.2–6.8.6), and practiced two-player input (6.7.19). Now you put it all together into a real two-player game.
+This is the capstone lab for Units 6.7 and 6.8. You've built paddles (6.7.16), learned joints (6.8.2–6.8.6), and practiced two-player input (6.7.13). Now you put it all together into a real two-player game.
 
 Build a top-down Pong-Sumo game: two paddles, one ball, push the ball past the other player's side to score. First to 5 wins.
 

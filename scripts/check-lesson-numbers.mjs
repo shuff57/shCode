@@ -64,6 +64,7 @@ for (const e of entries) {
     folder: e.name,
     title: String(meta.title ?? ''),
     unit: meta.unit ?? null,
+    category: meta.category ?? null,
     graders: [meta.aiGrader, meta.diagram?.aiGrader].filter(Boolean),
     quiz: meta.quiz ?? null,
   });
@@ -108,6 +109,40 @@ for (const l of lessons) {
   if (u && u[1] !== m[1]) {
     warnings.push(`${l.folder}: numbered ${m[1]}.${m[2]} but filed under unit `
       + `${JSON.stringify(l.unit)}`);
+  }
+}
+
+// --- 3b. one category per chapter.
+//
+// `category` is not decoration: HeaderLessonNav builds prev/next out of
+// `lessons.filter(l => l.category === current.category)`. A lesson whose
+// category string drifts gets its neighbours from the drifted set instead of
+// its own chapter. Seven "Chart the Code" lessons carried "Unit 2: moSHion Game
+// Development" against everyone else's "Unit 2: moSHion: Applied Game
+// Development", so their Next button jumped between units -- 6.6.21 to 6.7.11
+// to 6.8.12 -- and moshion-bounce, alone under "Unit 5: moSHion: Game Physics",
+// had no prev or next at all. Nothing rendered an error; the arrows just went
+// somewhere else.
+const catsByChapter = new Map();
+for (const l of lessons) {
+  const m = l.title && l.title.match(NUMBERED);
+  if (!m || !l.category) continue;
+  const ch = m[1].split('.')[0];
+  if (!catsByChapter.has(ch)) catsByChapter.set(ch, new Map());
+  const seen = catsByChapter.get(ch);
+  if (!seen.has(l.category)) seen.set(l.category, []);
+  seen.get(l.category).push(l.folder);
+}
+for (const [ch, seen] of [...catsByChapter].sort()) {
+  if (seen.size < 2) continue;
+  const ranked = [...seen].sort((a, b) => b[1].length - a[1].length);
+  const [main] = ranked;
+  for (const [cat, folders] of ranked.slice(1)) {
+    errors.push(`chapter ${ch} has ${seen.size} category strings — `
+      + `${folders.length} lesson(s) use ${JSON.stringify(cat)} while `
+      + `${main[1].length} use ${JSON.stringify(main[0])}, so prev/next skips `
+      + `between them: ${folders.slice(0, 4).join(', ')}`
+      + (folders.length > 4 ? ` (+${folders.length - 4} more)` : ''));
   }
 }
 

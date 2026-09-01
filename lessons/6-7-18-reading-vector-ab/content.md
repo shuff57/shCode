@@ -1,6 +1,6 @@
 ## Direction from A to B
 
-**Read before attempting `6.7.14 Worked Example: Launch a Sprite with applyForce`.**
+**Read before attempting `6.8.9 Worked Example: Launch a Sprite with applyForce`.**
 
 When you want to push sprite A toward sprite B, you need to know which direction "toward B" is. Two numbers tell you: `dx` and `dy`.
 

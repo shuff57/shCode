@@ -1,4 +1,4 @@
-**Goal:** Compose hit-testing (6.7.6), drag (6.7.9), `DistanceJoint` (6.8.2), `joint.delete()` (6.8.6), `applyForce` (6.7.12), and vector math (6.7.13) into a working slingshot: the unit's integration moment.
+**Goal:** Compose hit-testing (6.7.6), drag (6.7.9), `DistanceJoint` (6.8.2), `joint.delete()` (6.8.6), `applyForce` (6.8.7), and vector math (6.8.8) into a working slingshot: the unit's integration moment.
 
 ## Step 1: Hit Run and try the slingshot
 

@@ -106,7 +106,8 @@ built alongside chapters 5–7 even though nothing wrote it down:
 | 6.4 Animated Sprites and Camera | `2.4.1_animation-camera.md` | 2.4 |
 | 6.5 Save and Load | `2.5.1_game-saves.md` | 2.5 |
 | 6.6 Game State Machines | `2.6.1_game-states.md` | 2.6 |
-| 6.7 Advanced Input **+** 6.8 Joints | `2.7.1_joints-advanced-input.md` | 2.7 |
+| 6.7 Advanced Input | `6.7_advanced-input.md` | 6.7 |
+| 6.8 Joints | `6.8_joints.md` | 6.8 |
 | 6.9 Timing and Async | **: no home :** | *(gap, see §8)* |
 | 7.1 Arcade Cabinet (Q2 Synthesis) | `2.8.1_capstone-game.md` | 2.8 |
 
@@ -218,7 +219,7 @@ on disk today. The actual result:
 | Unit 1.4 Synthesis | Unit 4, module 4.1 | book Ch.4 §4.1 Print Shop |
 | Unit 2.1 moSHion Foundations, 2.2 OOP | Unit 5, modules 5.1 / 5.3 | book Ch.5 §5.1 Hello Sprite, §5.3 Classes/Objects (§5.2 Physics Feel not built) |
 | Unit 2.3 Collections and Physics Applications | Unit 6, modules 6.1 / 6.3 | book Ch.6 §6.1+6.2 Groups/Overlaps combined, §6.3 Physics Applications |
-| Unit 2.4–2.7 | Unit 6, modules 6.4–6.7 | book Ch.6 §6.4–§6.8 (6.7 combines §6.7 Advanced Input + §6.8 Joints, per this doc's own combined-spec rule) |
+| Unit 2.4–2.7 | Unit 6, modules 6.4–6.8 | book Ch.6 §6.4–§6.8 (6.7 and 6.8 were one combined spec until 2026-09-01; split because §6.8's own slingshot arc was numbered into 6.7 and so sorted ahead of the joint readings it depends on) |
 | Unit 2.8 (not built) | Unit 7, module 7.1 | book Ch.7 §7.1 Arcade Cabinet |
 
 176 moSHion lesson folders and their D1 rows (`lesson_state`, `commits`: 35 real
@@ -261,7 +262,7 @@ before acting on it.
 
 ### Q2 (chapters 5–7 → units 2.1–2.8)
 
-Two sections may share a spec when they are one week of class (6.1+6.2, 6.7+6.8). A
+Two sections may share a spec when they are one week of class (6.1+6.2). A
 section never splits across two specs, if it feels like it should, the book section
 is too big and that is a book-side conversation.
 
@@ -436,10 +437,11 @@ rewriting a working lab unless the concept it grades actually moved.
   **Book-side request:** either move these examples after §3.3, or rewrite them
   on ranges. Raised 2026-08-16 from the chapter 2 build.
 
-- **§6.9 Timing and Async has no shCode home.** It is not in Module 6.7 (which covers
-  joints and advanced input, zero async content) and Module 7.1 is the capstone. Either
-  it becomes a new Module 6.8/6.9 spec or it is book-only teaching with no graded work.
-  Decide before chapter 6 is rebuilt.
+- **§6.9 Timing and Async has no shCode home.** Modules 6.7 (advanced input) and 6.8
+  (joints) have zero async content, and Module 7.1 is the capstone. Either it becomes a
+  new Module 6.9 spec or it is book-only teaching with no graded work. Decide before
+  chapter 6 is rebuilt. (6.8 is no longer available for it — as of 2026-09-01 that id
+  is the Joints module.)
 - **Only Q2 is mapped at section level.** Chapters 1–4 and 8–13 have the coarse
   chapter→unit row and nothing finer. The old `curriculum/modules/lessons/1.1.1`–`1.1.5`
   specs (pre-book, written against the old FCC/CodeHS activity lists) were removed
