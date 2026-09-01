@@ -179,6 +179,34 @@ for (const [mod, n] of [...homeless].sort()) {
     + `lesson(s) appear on no module page`);
 }
 
+// --- 3c. assignments/<moduleId>_*.md must name a module that exists.
+//
+// getModule() surfaces these to teachers as "Legacy module-level markdown
+// files" by matching `${moduleId}_`. Module ids went from three-part to
+// two-part at the renumber and these filenames did not, so the prefix matched
+// zero files -- for as long as both had existed. Nothing errored: the <details>
+// block is hidden when the list is empty, so a silent zero looks identical to
+// "this module has no packets".
+//
+// A-prefixed handouts (A10.1_sprite-playground.md) are a different scheme and
+// were never collected by this path; they are ignored here rather than flagged.
+const assignDir = path.join(root, 'assignments');
+let attached = 0;
+for (const f of await fs.readdir(assignDir).catch(() => [])) {
+  if (!f.endsWith('.md')) continue;
+  const m = /^([\d.]+)_/.exec(f);
+  if (!m) continue;                          // A*, or anything not module-numbered
+  if (modulesById.has(m[1])) { attached++; continue; }
+  errors.push(`assignments/${f} is named for module ${m[1]}, which no module `
+    + 'declares, so it is attached to nothing and renders nowhere');
+}
+// ...and if NONE attach, the check above is vacuous: every file could be
+// misnamed in the same way and each one would look like an ignorable A-file.
+if (attached === 0) {
+  errors.push('no file in assignments/ attaches to any module — either the '
+    + 'directory is empty of module packets or the id shape has drifted again');
+}
+
 // 6. a lesson page breadcrumb links to /module/<first token of the unit field>
 // (ContentLessonView). A static export has no page for an id no module declares,
 // so that link 404s. All 23 lessons of module 1.1 shipped filed under the unit
