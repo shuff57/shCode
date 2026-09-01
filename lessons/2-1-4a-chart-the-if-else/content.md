@@ -5,7 +5,7 @@
 - Noticing where the two branches come back together
 - Reading code and recovering the plan behind it
 
-You traced this code by hand in the last lesson. Now draw it.
+This is the smallest shape an `if`/`else` makes: one question, two answers, and a line at the end that runs either way. Read it, then draw it.
 
 ### The code
 
