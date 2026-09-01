@@ -1,3 +1,40 @@
+# Handoff — 2026-09-01 (later) · Phase B run; two defects found and fixed
+
+The gauntlet closed earlier today on the toolbars. Its OTHER exit criterion --
+a full click-through of the sandbox, create -> timeline -> orbit/pan/zoom ->
+save -- had never been run in ten rounds. It has now: `scripts/drive-phase-b.py`,
+23 checks, **all passing** after two fixes in `4189ddf`.
+
+## What it found that nothing else could
+
+- **The Save buttons were unreachable in Build mode.** The timeline strip is
+  `absolute; bottom: 0` over the pane; the runner puts Save STL/3MF/OBJ/SVG at
+  the bottom of its own viewport. `elementFromPoint()` at the STL button centre
+  returned the timeline `<ol>`. **A student could build a model and never export
+  it.** Fixed by ending the view above the strip, not by moving the runner's bar
+  -- the runner is shared with the docs and the lessons.
+- **A save that declined was reported as a build that failed.** Save SVG on a
+  solid refuses on purpose, but went through `__previewFail`, so Build mode told
+  the student "These numbers stopped the code before it produced a shape" about a
+  model that had exported to STL seconds earlier.
+
+## Open, and it is a judgement call
+
+The runner's error banner is `position: fixed; top: 0` inside the frame, and
+Build floats a 48px ribbon over that band -- so the first line of any runner
+error is unreadable in Build mode. Fixing it means bending the shared runner
+(wrong for the docs pages and lessons, which have no ribbon) or undoing the
+floating ribbon from `ae1f21e`. Left for a person to choose.
+
+## Also worth knowing
+
+Two of the driver's original assertions were wrong about the APP, not the other
+way round, and both came from reasoning out of Onshape's habits:
+an illegal reorder is refused with a sentence rather than a disabled arrow, and
+Save SVG on a solid declines by design. Check what this app does before
+asserting what it should.
+
+---
 # Handoff — 2026-09-01 · the reSHape/Onshape parity gauntlet is CLOSED
 
 Every build item on both toolbars is `landed`. `npm test` prints the census:
