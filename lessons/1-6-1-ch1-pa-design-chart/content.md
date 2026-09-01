@@ -37,9 +37,13 @@ A course grade is three categories with different weights: homework is 30%, labs
 
 **4. Fuel Stop**
 
-You are checking whether a road trip needs a gas stop. You know the trip distance in
-miles, the car's miles per gallon, and how many gallons the tank holds. Work out **how
-far one full tank goes**, and compare it against the trip distance.
+You are checking whether a road trip needs a gas stop. You know the car's miles per
+gallon and how many gallons the tank holds. Work out **how far one full tank goes**,
+and compare it against the trip you have already committed to: **275 miles**.
+
+Whichever you pick, your program also needs one piece of **text** — the name of the
+pizzeria, the restaurant, the student, or the car. Pick one and write it down now;
+Part 2 asks for it.
 
 ---
 
@@ -77,8 +81,10 @@ One screen, one keyboard, both of you looking at it. Three shapes only (1.5.25):
 | **Task** (rectangle) | Getting the numbers, working out the value, reporting the result. At least three. |
 | **Decision** (diamond) | The comparison against the limit. Label both exits. |
 
-The toolbar also offers a parallelogram for input and output. You may use it, and
-nothing requires it: Chapter 1 is assessed on the three shapes above.
+The toolbar also offers a parallelogram for input and output. Chapter 1 is assessed on
+the three shapes above, and the checker counts **rectangles** — a parallelogram is not
+one. Use it as an extra if you like the look of it, never in place of a rectangle, or
+"Uses at least three task rectangles" goes red on a chart that looks finished.
 
 ### What "green in four minutes" means
 

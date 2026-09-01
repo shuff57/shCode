@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 
 import EditorPlaceholder from './diagram/EditorPlaceholder';
+import SolutionPanel from './SolutionPanel';
 
 // React Flow is a large chunk of the client bundle. Loading it lazily keeps it
 // out of the 270-odd lesson pages that have no diagram on them at all.
@@ -301,6 +302,25 @@ export default function DiagramAssignmentView({
           <ListChecks size={16} />
           Check my diagram
         </button>
+
+        {/* Teacher-only, and it renders nothing at all for a student — the
+            panel checks the role itself and the endpoint behind it is gated
+            server-side, so this is not a client-side secret. A diagram lesson
+            stores its reference as Mermaid under solution/, which the existing
+            generate-solutions pipeline already picks up unchanged: solution/
+            is keyed by filename and never assumed to be JavaScript. */}
+        <SolutionPanel
+          lessonId={lessonId}
+          onInsert={(files) => {
+            const key =
+              Object.keys(files).find((k) => k.endsWith('.mmd')) ??
+              Object.keys(files).sort()[0];
+            if (!key) return;
+            if (!confirm('Replace the diagram on the canvas with the reference chart?')) return;
+            setDoc(fromMermaid(files[key]));
+            setChecks(null);
+          }}
+        />
 
         <button
           onClick={submit}
