@@ -111,6 +111,40 @@ for (const l of lessons) {
   }
 }
 
+// --------------------------------------------------------------- dead links
+//
+// A markdown link in lesson prose has to resolve to something the static export
+// actually serves. Two lessons linked module packets by bare filename --
+// `[overview](2.1.1_overview.md)` -- and those files are real, in `assignments/`,
+// which is not a route. getModule() does try to surface that directory as
+// "module artifacts", but it matches on `${moduleId}_` and module ids have been
+// two-part since the renumber while every file there is named for a three-part
+// one, so it has found zero files for as long as both have existed. The links
+// rendered as ordinary blue text that goes nowhere.
+//
+// Lesson prose cites lessons by number, not by link, so the rule is simply:
+// off-site links are fine, absolute paths must exist under public/, and a bare
+// relative path is a defect.
+let deadLinks = 0;
+for (const l of lessons) {
+  const md = path.join(lessonsDir, l.dir, 'content.md');
+  if (!fs.existsSync(md)) continue;
+  const text = fs.readFileSync(md, 'utf8');
+  for (const m of text.matchAll(/!?\[[^\]]*\]\(([^)\s]+)/g)) {
+    const href = m[1];
+    if (/^(?:https?:|mailto:|#)/i.test(href)) continue;
+    if (href.startsWith('/')) {
+      if (fs.existsSync(path.join(root, 'public', href.replace(/^\//, '').split(/[?#]/)[0]))) continue;
+      deadLinks++;
+      console.error(`DEADLINK    ${l.dir} links ${href}, which is not in public/`);
+      continue;
+    }
+    deadLinks++;
+    console.error(`DEADLINK    ${l.dir} links ${href} by relative path —`
+      + ' nothing serves that. Cite the lesson by number instead.');
+  }
+}
+
 // ------------------------------------------------------- renumber-rot report
 //
 // Everything above reads THREE-PART numbers in content.md prose and in quiz
@@ -191,8 +225,9 @@ if (forward) {
   console.log(`\n[check-lesson-citations] ${forward} citation(s) above read as`
     + ' back-references to later material. Not a build failure — read them.');
 }
-if (unresolved) {
-  console.error(`\n[check-lesson-citations] ${unresolved} citation(s) name no lesson`);
+if (unresolved || deadLinks) {
+  if (unresolved) console.error(`\n[check-lesson-citations] ${unresolved} citation(s) name no lesson`);
+  if (deadLinks) console.error(`[check-lesson-citations] ${deadLinks} link(s) resolve to nothing`);
   process.exit(1);
 }
 console.log(`[check-lesson-citations] ${lessons.length} lessons — every cited lesson`

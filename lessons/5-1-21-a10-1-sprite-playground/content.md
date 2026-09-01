@@ -13,10 +13,8 @@
 **Prerequisites:** complete both in-app lessons (`5.1.11 Hello Sprite` + `5.1.20 Make it Move`) before starting this lab.
 
 **Module resources:**
-- 📋 [Module overview](2.1.1_overview.md): recommended learning order
-- 📖 [Readings](2.1.1_readings.md): moSHion docs + FCC refs
-- 💡 [Worked examples](2.1.1_worked-examples.md): reference code from class walkthroughs
-- ⭐ [Challenges](2.1.1_challenges.md): stretch problems if you finish early
+- 💡 5.1.14 Worked Examples: reference code from the class walkthroughs
+- ⭐ 5.1.23 Challenges: stretch problems if you finish early
 
 ---
 

@@ -127,7 +127,12 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
           </span>
         )}
       </div>
-      <p className="text-med text-text/70">{withInlineCode(lesson.description)}</p>
+      {/* Worked examples ship without a description by convention (all 66 of
+          them), and an unconditional <p> gave every one of those cards an empty
+          paragraph's worth of height. */}
+      {lesson.description?.trim() && (
+        <p className="text-med text-text/70">{withInlineCode(lesson.description)}</p>
+      )}
     </>
   );
 
