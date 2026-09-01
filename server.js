@@ -119,20 +119,53 @@ app.prepare().then(() => {
   server.post('/api/lesson-state/:lessonId', (_req, res) => {
     res.json({ ok: true });
   });
-  // Reference solutions (admin/teacher "View solution" button). Serves the
-  // same map the Pages Function reads, so the sandbox's solution panel works
-  // locally.
   // Reference solutions (admin/teacher "View solution" button). Dev reads the
-  // lesson's solution.js straight from disk; the Pages Function serves the
-  // generated map instead.
+  // lesson straight from disk; the Pages Function serves the generated map.
+  // Both must answer with the same shape, so this mirrors
+  // functions/api/lesson-solution/[id].ts.
+  //
+  // It used to read solution.js and nothing else, so every lesson using the
+  // solution/ DIRECTORY form 404'd locally while working in production --
+  // 1.3.19, 7.1.1 and 1.6.1. That is the form CLAUDE.md documents for an
+  // assignment grading more than one file, and it is also how a diagram
+  // lesson stores its reference chart, so "no solution" in the browser meant
+  // "not implemented in dev" rather than anything about the lesson.
   server.get('/api/lesson-solution/:id', async (req, res) => {
     const id = decodeURIComponent(req.params.id);
+    const lessonDir = path.join(process.cwd(), 'lessons', id);
+
+    // Recurse so solution/ mirrors the generator, which keys every file by its
+    // path relative to solution/ rather than by basename.
+    const readDirForm = async (dir, prefix = '') => {
+      const out = {};
+      for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
+        const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+        if (entry.isDirectory()) Object.assign(out, await readDirForm(path.join(dir, entry.name), rel));
+        else out[rel] = await fs.readFile(path.join(dir, entry.name), 'utf8');
+      }
+      return out;
+    };
+
+    let files = null;
     try {
-      const solution = await fs.readFile(path.join(process.cwd(), 'lessons', id, 'solution.js'), 'utf8');
-      res.json({ solution });
+      files = await readDirForm(path.join(lessonDir, 'solution'));
+      if (Object.keys(files).length === 0) files = null;
     } catch {
-      res.status(404).json({ error: 'No solution for this lesson' });
+      /* no solution/ directory — fall through to the single-file form */
     }
+
+    if (!files) {
+      try {
+        files = { 'script.js': await fs.readFile(path.join(lessonDir, 'solution.js'), 'utf8') };
+      } catch {
+        return res.status(404).json({ error: 'No solution for this lesson' });
+      }
+    }
+
+    // Same fallback as the Pages Function: a solution whose code file is not
+    // script.js still populates the legacy single-string field.
+    const solution = files['script.js'] ?? files[Object.keys(files).sort()[0]];
+    res.json({ files, solution });
   });
 
   // Scope express.json() to the Express-owned route only. Applying it globally
