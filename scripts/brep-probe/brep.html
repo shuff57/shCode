@@ -47,8 +47,8 @@
 
 <!-- Classic scripts, fetched no-cors, so these need no header. Only the ES
      module and its wasm below are CORS-mode fetches. -->
-<script src="./lib/jscad-modeling.min.js"></script>
-<script src="./lib/jscad-regl-renderer.min.js"></script>
+<script src="../lib/jscad-modeling.min.js"></script>
+<script src="../lib/jscad-regl-renderer.min.js"></script>
 
 <script type="module">
 const rows = document.getElementById('rows');
@@ -86,7 +86,7 @@ try {
   // wasm it pulls are CORS-mode fetches carrying `Origin: null`.
   step('1 — kernel');
   const t0 = performance.now();
-  const initModule = (await import('./kernel/replicad_single.js')).default;
+  const initModule = (await import('./replicad_single.js')).default;
   const oc = await initModule();
   const initMs = Math.round(performance.now() - t0);
   report.initMs = initMs;
@@ -133,7 +133,7 @@ try {
   // this whole bundle rests on nothing.
   let controlLoaded = false;
   try {
-    await import('./kernel-cors-control.js');
+    await import('../kernel-cors-control.js');
     controlLoaded = true;
   } catch (e) { /* expected: blocked by CORS */ }
   report.corsControlBlocked = !controlLoaded;
@@ -142,8 +142,8 @@ try {
 
   // ---- 2. a ModelDoc through the real adapter ---------------------------
   step('2 — build');
-  const { buildDoc, measureShape } = await import('./kernel/occt-build.js');
-  const { tessellate, signedVolume, triangleCount } = await import('./kernel/occt-mesh.js');
+  const { buildDoc, measureShape } = await import('./occt-build.js');
+  const { tessellate, signedVolume, triangleCount } = await import('./occt-mesh.js');
 
   // A drilled, rounded plate: a primitive, a boolean, and a fillet on ONE named
   // edge -- which is the whole point of the swap, since JSCAD cannot round one

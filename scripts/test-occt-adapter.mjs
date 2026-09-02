@@ -30,10 +30,27 @@ import { fileURLToPath } from 'url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
 
-const dir = process.env.OCCT_DIR;
+const LEDGER = path.join(root, '.gauntlet', 'occt-checks.json');
+
+const flag = process.argv.indexOf('--occt');
+const dir = flag > -1 ? process.argv[flag + 1] : process.env.OCCT_DIR;
 if (!dir || !existsSync(path.join(dir, 'replicad_single.js'))) {
-  console.log('SKIPPED — set OCCT_DIR to a directory containing replicad_single.js');
-  console.log('          (this is a skip, not a pass: nothing was measured)');
+  // A SKIP THAT SAYS HOW MUCH IT IS SKIPPING.
+  //
+  // This suite is in `npm test` so the gap is visible on every run, but a bare
+  // "SKIPPED" is nearly as invisible as not being there at all -- it scrolls
+  // past and nobody knows whether it stands for two checks or two hundred. So a
+  // successful run records its own count, and the skip reads it back. The number
+  // cannot go stale, because the only thing that writes it is a real run.
+  let was = null;
+  try { was = JSON.parse(readFileSync(LEDGER, 'utf8')); } catch (e) { /* never run here */ }
+  console.log('SKIPPED — no OpenCascade build, so the B-rep kernel was NOT measured.');
+  if (was) {
+    console.log(`          ${was.checks} checks are not running. Last measured ${was.when}`
+      + (was.sha ? ` at ${was.sha}` : '') + '.');
+  }
+  console.log('          npm run test:occt -- --occt <dir with replicad_single.js>');
+  console.log('          (a skip, not a pass: nothing here was measured)');
   process.exit(0);
 }
 
@@ -890,6 +907,256 @@ console.log('');
     mesh.tessellate(occ, null) === null);
 }
 
+
+// ---------------------------------------------------------------------------
+// THE RECIPES, BUILT RATHER THAN CLAIMED
+// ---------------------------------------------------------------------------
+//
+// lib/script-surface.ts calls seventeen names `recipe`: no single OpenCascade
+// call, but buildable from ones it has. Every one of those was a CLAIM -- a
+// sentence saying what it would be built from, with nothing built. The
+// presence/absence probe above does not touch them: it checks that the cited
+// exports exist, which is a long way from checking that they compose into the
+// shape the name promises.
+//
+// So each construction is performed here and measured against arithmetic. Not a
+// recorded number -- a hexagon's area, a frustum's volume, an offset polygon's
+// area are all things a formula knows, and a recipe that builds the wrong thing
+// moves a number the formula does not.
+//
+// `proved` is collected as it goes and checked against SURFACE at the end, so a
+// `proof:` field naming a check that does not exist fails rather than reads
+// nicely. That control is the point: without it the field is decoration.
+
+const proved = new Set();
+
+{
+  const occ = globalThis.__oc;
+  const gp = (s, kind) => {
+    const g = new occ.GProp_GProps();
+    if (kind === 'v') occ.BRepGProp.VolumeProperties(s, g, true, false, false);
+    else occ.BRepGProp.SurfaceProperties(s, g, false, false);
+    return g.Mass();
+  };
+  const P = (x, y, z) => new occ.gp_Pnt(x, y, z);
+  const wireOf = (pts) => {
+    const w = new occ.BRepBuilderAPI_MakeWire();
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[i];
+      const b = pts[(i + 1) % pts.length];
+      w.Add(new occ.BRepBuilderAPI_MakeEdge(P(a[0], a[1], a[2]), P(b[0], b[1], b[2])).Edge());
+    }
+    return w.Wire();
+  };
+  const faceOf = (w) => new occ.BRepBuilderAPI_MakeFace(w, false).Face();
+  const prism = (f, h) => new occ.BRepPrimAPI_MakePrism(f, new occ.gp_Vec(0, 0, h), false, true).Shape();
+  const close = (a, b, tol) => Math.abs(a - b) < (tol === undefined ? 1e-6 : tol);
+
+  // ---- polygon: edges into a wire into a face -----------------------------
+  //
+  // BRepBuilderAPI_MakePolygon is NOT bound in this build, which is why this is
+  // a recipe rather than exact. A regular hexagon of circumradius R has area
+  // (3*sqrt(3)/2) R^2, so extruding it is a number arithmetic already knows.
+  {
+    const hex = [];
+    for (let i = 0; i < 6; i++) {
+      hex.push([10 * Math.cos((i * Math.PI) / 3), 10 * Math.sin((i * Math.PI) / 3), 0]);
+    }
+    const v = gp(prism(faceOf(wireOf(hex)), 5), 'v');
+    check('recipe polygon: a hexagon wire extrudes to its analytic volume',
+      close(v, (3 * Math.sqrt(3) / 2) * 100 * 5, 1e-4),
+      v + ' vs ' + ((3 * Math.sqrt(3) / 2) * 100 * 5));
+    // CONTROL: the same recipe with a different corner count must land on a
+    // DIFFERENT analytic answer, or the check would pass on a hard-coded shape.
+    const sq = gp(prism(faceOf(wireOf([[-10, -10, 0], [10, -10, 0], [10, 10, 0], [-10, 10, 0]])), 5), 'v');
+    check('...and a square through the same path gives the square answer',
+      close(sq, 400 * 5, 1e-4), String(sq));
+    proved.add('polygon-wire');
+  }
+
+  // ---- polyhedron: planar faces sewn into a shell, then a solid -----------
+  {
+    const T = [[0, 0, 0], [6, 0, 0], [0, 9, 0], [0, 0, 4]];
+    const tris = [[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3]];
+    const sew = new occ.BRepBuilderAPI_Sewing(1e-6, true, true, true, false);
+    for (const t of tris) sew.Add(faceOf(wireOf(t.map((i) => T[i]))));
+    sew.Perform(new occ.Message_ProgressRange());
+    const sol = new occ.BRepBuilderAPI_MakeSolid();
+    sol.Add(occ.TopoDS.Shell(sew.SewedShape()));
+    const v = gp(sol.Solid(), 'v');
+    check('recipe polyhedron: four triangles sew into a solid of |det|/6',
+      close(v, 36, 1e-6), String(v));
+    proved.add('sewn-solid');
+  }
+
+  // ---- cylinderElliptic: a loft between two ellipses ----------------------
+  //
+  // MakeCone is circular only. An elliptic prism is a ThruSections between two
+  // ellipse wires, and its volume is pi*a*b*h exactly -- a real ellipse, not a
+  // polygon approximating one, which is the whole gain over the mesh engine.
+  {
+    const ell = (z) => {
+      const ax = new occ.gp_Ax2(P(0, 0, z), new occ.gp_Dir(0, 0, 1));
+      const w = new occ.BRepBuilderAPI_MakeWire();
+      w.Add(new occ.BRepBuilderAPI_MakeEdge(new occ.gp_Elips(ax, 12, 6)).Edge());
+      return w.Wire();
+    };
+    const mk = new occ.BRepOffsetAPI_ThruSections(true, false, 1e-6);
+    mk.AddWire(ell(0));
+    mk.AddWire(ell(20));
+    mk.Build(new occ.Message_ProgressRange());
+    const v = gp(mk.Shape(), 'v');
+    check('recipe cylinderElliptic: a loft of two ellipses measures pi*a*b*h',
+      close(v, Math.PI * 12 * 6 * 20, 1e-4),
+      v + ' vs ' + (Math.PI * 12 * 6 * 20));
+    proved.add('loft-ellipses');
+  }
+
+  // ---- extrudeFromSlices: the same loft, between unequal sections ---------
+  //
+  // A frustum, whose volume is h/3 (A1 + A2 + sqrt(A1 A2)). Narrower than the
+  // JSCAD original, honestly: that one takes a callback that can emit a twisted
+  // run ThruSections refuses rather than quietly triangulating.
+  {
+    const mk = new occ.BRepOffsetAPI_ThruSections(true, true, 1e-6);
+    mk.AddWire(wireOf([[-10, -10, 0], [10, -10, 0], [10, 10, 0], [-10, 10, 0]]));
+    mk.AddWire(wireOf([[-5, -5, 30], [5, -5, 30], [5, 5, 30], [-5, 5, 30]]));
+    mk.Build(new occ.Message_ProgressRange());
+    const v = gp(mk.Shape(), 'v');
+    check('recipe extrudeFromSlices: a square frustum measures h/3(A1+A2+sqrt(A1A2))',
+      close(v, (30 / 3) * (400 + 100 + Math.sqrt(400 * 100)), 1e-4), String(v));
+    proved.add('loft-frustum');
+  }
+
+  // ---- extrudeRectangular: offset the outline, then extrude ---------------
+  //
+  // Offsetting a convex outline outward by t adds P*t + pi*t^2 to its area: the
+  // straight strips along each side, plus the corner arcs, which together make
+  // exactly one full circle however many corners there are. That last part is
+  // what makes this a real check rather than a tautology -- a join style that
+  // mitred the corners instead of rounding them would land on a different
+  // number.
+  {
+    const sq = wireOf([[-10, -10, 0], [10, -10, 0], [10, 10, 0], [-10, 10, 0]]);
+    const mk = new occ.BRepOffsetAPI_MakeOffset(faceOf(sq), occ.GeomAbs_JoinType.GeomAbs_Arc, false);
+    mk.Perform(3, 0);
+    const a = gp(faceOf(occ.TopoDS.Wire(mk.Shape())), 's');
+    check('recipe extrudeRectangular: an offset outline grows by P*t + pi*t^2',
+      close(a, 400 + 80 * 3 + Math.PI * 9, 1e-4),
+      a + ' vs ' + (400 + 80 * 3 + Math.PI * 9));
+    proved.add('offset-wire');
+  }
+
+  // ---- scission: walk the solids of a compound ----------------------------
+  //
+  // A B-rep knows what is connected to what without being asked, so splitting a
+  // shape into its disjoint pieces is an explorer rather than an algorithm.
+  {
+    const a = new occ.BRepPrimAPI_MakeBox(10, 10, 10).Shape();
+    const t = new occ.gp_Trsf();
+    t.SetTranslation(new occ.gp_Vec(50, 0, 0));
+    const b = new occ.BRepBuilderAPI_Transform(
+      new occ.BRepPrimAPI_MakeBox(10, 10, 10).Shape(), t, false).Shape();
+    const fuse = new occ.BRepAlgoAPI_Fuse(a, b, new occ.Message_ProgressRange());
+    fuse.Build(new occ.Message_ProgressRange());
+    const exp = new occ.TopExp_Explorer(fuse.Shape(),
+      occ.TopAbs_ShapeEnum.TopAbs_SOLID, occ.TopAbs_ShapeEnum.TopAbs_SHAPE);
+    const vols = [];
+    while (exp.More()) { vols.push(gp(exp.Current(), 'v')); exp.Next(); }
+    check('recipe scission: fusing two separated boxes leaves TWO solids',
+      vols.length === 2 && vols.every((v) => close(v, 1000, 1e-6)),
+      vols.length + ' solids: ' + vols.join(', '));
+    // CONTROL: overlapping boxes must come back as ONE, or the explorer is
+    // simply counting inputs rather than measuring connectivity.
+    const t2 = new occ.gp_Trsf();
+    t2.SetTranslation(new occ.gp_Vec(5, 0, 0));
+    const c = new occ.BRepBuilderAPI_Transform(
+      new occ.BRepPrimAPI_MakeBox(10, 10, 10).Shape(), t2, false).Shape();
+    const f2 = new occ.BRepAlgoAPI_Fuse(a, c, new occ.Message_ProgressRange());
+    f2.Build(new occ.Message_ProgressRange());
+    const e2 = new occ.TopExp_Explorer(f2.Shape(),
+      occ.TopAbs_ShapeEnum.TopAbs_SOLID, occ.TopAbs_ShapeEnum.TopAbs_SHAPE);
+    let n2 = 0;
+    while (e2.More()) { n2++; e2.Next(); }
+    check('...while two OVERLAPPING boxes leave one', n2 === 1, String(n2));
+    proved.add('explode-solids');
+  }
+
+  // ---- bbox arithmetic: center, align, measureDimensions ------------------
+  //
+  // AND A REAL TRAP IN IT. BRepBndLib.Add returns a box with a GAP added --
+  // measured here at 1e-7 per side, so a 10 x 20 x 30 solid reports
+  // 10.0000002 wide. Harmless in a preview and wrong in a measurement a student
+  // is asked to read out loud, which is exactly what measureDimensions is for.
+  // SetGap(0) clears it, and the two are asserted separately so the gap cannot
+  // come back unnoticed.
+  {
+    const s = new occ.BRepPrimAPI_MakeBox(10, 20, 30).Shape();
+    const bb = new occ.Bnd_Box();
+    occ.BRepBndLib.Add(s, bb, true);
+    const padded = bb.CornerMax().X() - bb.CornerMin().X();
+    check('the kernel bounding box arrives PADDED, not exact',
+      padded > 10 && padded < 10.001, String(padded));
+    bb.SetGap(0);
+    const lo = bb.CornerMin();
+    const hi = bb.CornerMax();
+    check('recipe measureDimensions: SetGap(0) makes it exact',
+      close(hi.X() - lo.X(), 10, 1e-9)
+        && close(hi.Y() - lo.Y(), 20, 1e-9)
+        && close(hi.Z() - lo.Z(), 30, 1e-9),
+      [hi.X() - lo.X(), hi.Y() - lo.Y(), hi.Z() - lo.Z()].join(', '));
+    check('recipe center/align: the box corner is where the arithmetic says',
+      close(lo.X(), 0, 1e-9) && close(hi.Z(), 30, 1e-9),
+      lo.X() + ' .. ' + hi.Z());
+    proved.add('bbox-arithmetic');
+  }
+
+  // ---- aggregate measurements: summed, per shape --------------------------
+  {
+    const a = new occ.BRepPrimAPI_MakeBox(10, 10, 10).Shape();
+    const b = new occ.BRepPrimAPI_MakeBox(20, 10, 10).Shape();
+    check('recipe measureAggregateVolume: per-shape BRepGProp, summed',
+      close(gp(a, 'v') + gp(b, 'v'), 3000, 1e-6),
+      String(gp(a, 'v') + gp(b, 'v')));
+    check('recipe measureAggregateArea: the same, on surface area',
+      close(gp(a, 's') + gp(b, 's'), 600 + 1000, 1e-6),
+      String(gp(a, 's') + gp(b, 's')));
+    proved.add('gprop-sum');
+  }
+}
+
+// ---- every recipe verdict now points at a proof that really ran ------------
+{
+  const surface = globalThis.__surface;
+  const recipes = surface.SURFACE.filter((e) => e.serves === 'recipe');
+  const unproven = recipes.filter((e) => !e.proof);
+  check('every recipe verdict names the check that builds it',
+    unproven.length === 0,
+    unproven.map((e) => e.name).join(', ') + ' -- add a proof, or say honestly '
+      + 'in the note that it is unbuilt');
+  const dangling = [...new Set(recipes.map((e) => e.proof).filter(Boolean))]
+    .filter((p) => !proved.has(p));
+  check('...and every proof named is a check that actually ran',
+    dangling.length === 0,
+    dangling.join(', ') + ' -- named but never performed, which is the failure '
+      + 'this control exists for');
+  check('...with no proof left over, unclaimed by any name',
+    [...proved].every((p) => recipes.some((e) => e.proof === p)),
+    [...proved].filter((p) => !recipes.some((e) => e.proof === p)).join(', '));
+}
+
+
+if (fails.length === 0) {
+  // Written only when everything passed, so the ledger can never advertise a
+  // count that included failures.
+  let sha = '';
+  try {
+    sha = execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: root })
+      .toString().trim();
+  } catch (e) { /* not a checkout */ }
+  writeFileSync(LEDGER, JSON.stringify(
+    { checks: pass, when: new Date().toISOString().slice(0, 10), sha }, null, 2) + '\n');
+}
 
 console.log((fails.length ? 'FAIL' : 'ALL PASS') + '  (' + pass + ' checks'
   + (fails.length ? ', ' + fails.length + ' failed' : '') + ')');

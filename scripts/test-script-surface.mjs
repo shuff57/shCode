@@ -34,7 +34,7 @@
 
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -193,6 +193,46 @@ try {
     blocked.length > 0,
     'no page reads as blocked — either hull and non-uniform scale now have paths, '
     + 'or namesIn() stopped seeing names');
+
+  // -------------------------------------------------------------------------
+  // NOTHING DEV-ONLY IS SITTING WHERE IT WOULD SHIP
+  // -------------------------------------------------------------------------
+  //
+  // next.config.js sets output: 'export', which copies public/ wholesale into
+  // the deployed site. The B-rep probe pages lived there for one commit, which
+  // would have published two diagnostic pages that 404 on a gitignored kernel
+  // and render an error panel -- harmless, and not a page anyone should find on
+  // a school site.
+  //
+  // They are generated into public/reshape/kernel/ now, which is one ignored
+  // directory, and their source is scripts/brep-probe/, which Next never copies.
+  // Asserted rather than remembered: the failure mode is somebody adding a
+  // second probe page next to the first, and a note in a build script does not
+  // stop that.
+
+  console.log('\n=== nothing dev-only ships ===');
+
+  const shipped = readdirSync(path.join(root, 'public', 'reshape'))
+    .filter((f) => f.endsWith('.html'));
+  check('the only page public/reshape ships is the student runner',
+    shipped.length === 1 && shipped[0] === 'runner.html',
+    shipped.join(', ') + ' — a probe or diagnostic page here WILL be deployed; '
+    + 'generate it into public/reshape/kernel/ instead');
+
+  const ignore = readFileSync(path.join(root, '.gitignore'), 'utf8');
+  check('...and the directory the generated bundle goes into is gitignored',
+    ignore.includes('public/reshape/kernel/'),
+    'without this the 22 MB wasm and the probe pages become committable');
+  check('...as is the CORS control file, which sits outside it by design',
+    ignore.includes('public/reshape/kernel-cors-control.js'));
+
+  // CONTROL: the probe source must actually exist, or the check above passes
+  // for the wrong reason -- an empty scripts/brep-probe/ would also leave
+  // public/reshape clean.
+  check('CONTROL: the probe still exists, in the source location',
+    existsSync(path.join(root, 'scripts', 'brep-probe', 'brep.html'))
+      && existsSync(path.join(root, 'scripts', 'brep-probe', 'brep-check.html')),
+    'public/reshape being clean means nothing if the probe was simply deleted');
 } finally {
   rmSync(out, { recursive: true, force: true });
 }

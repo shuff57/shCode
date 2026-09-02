@@ -130,4 +130,23 @@ for (const f of ['replicad_single.js', 'replicad_single.wasm']) {
   copyFileSync(from, path.join(dest, f));
   console.log(`  ${f}  ${(statSync(from).size / 1024 / 1024).toFixed(2)} MB`);
 }
+
+// THE PROBE PAGES, copied in rather than living in public/.
+//
+// next.config.js sets output: 'export', which copies public/ wholesale into the
+// deployed site. A probe page sitting there would therefore SHIP -- publicly
+// reachable, 404ing on the gitignored kernel, showing an error panel, with the
+// school's name on it. Not a security problem and not a page anyone should find.
+//
+// The fix is structural rather than a note asking someone to remember. The
+// source of truth is scripts/brep-probe/, which Next never copies, and the
+// build drops a working copy INSIDE the one gitignored directory. So the probe
+// exists exactly when the kernel does, and neither can reach production without
+// somebody deliberately un-ignoring a path.
+for (const f of ['brep.html', 'brep-check.html']) {
+  copyFileSync(path.join(here, 'brep-probe', f), path.join(dest, f));
+}
+console.log('  brep.html, brep-check.html  (probe, dev only)');
+
 console.log(`\nkernel bundle ready at public/reshape/kernel/`);
+console.log('  probe:  npm run dev  ->  http://localhost:3002/reshape/kernel/brep-check.html');

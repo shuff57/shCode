@@ -104,6 +104,19 @@ export interface SurfaceName {
    */
   kernel?: string[];
   /**
+   * For a `recipe`: the check in scripts/test-occt-adapter.mjs that actually
+   * BUILDS it and measures the result against arithmetic.
+   *
+   * Every recipe here was once a sentence saying what it would be built from,
+   * with nothing built -- and the presence probe does not close that, since
+   * "the cited exports exist" is a long way from "they compose into the shape
+   * the name promises". The suite collects the proofs it performs and checks
+   * them against this field both ways: a proof named here that never ran fails,
+   * and a proof that ran without any name claiming it fails too. Without that
+   * the field would be decoration.
+   */
+  proof?: string;
+  /**
    * OpenCascade exports whose ABSENCE is what refuses this name.
    *
    * Asserted absent, and that is the assertion that earns its keep: an absence
@@ -134,7 +147,7 @@ export const SURFACE: SurfaceName[] = [
     kernel: ['BRepPrimAPI_MakeSphere'] },
   { name: 'torus', module: 'primitives', serves: 'exact',
     note: 'BRepPrimAPI_MakeTorus.', kernel: ['BRepPrimAPI_MakeTorus'] },
-  { name: 'cylinderElliptic', module: 'primitives', serves: 'recipe',
+  { name: 'cylinderElliptic', module: 'primitives', proof: 'loft-ellipses', serves: 'recipe',
     note: 'MakeCone is circular only, so an elliptic one is a loft between two ellipses.',
     needs: 'BRepOffsetAPI_ThruSections between two gp_Elips sections',
     kernel: ['BRepOffsetAPI_ThruSections'] },
@@ -144,12 +157,12 @@ export const SURFACE: SurfaceName[] = [
       + 'revolve and works today.',
     needs: 'BRepBuilderAPI_GTransform, or a NURBS build of the general ellipsoid',
     absent: ['BRepBuilderAPI_GTransform'] },
-  { name: 'geodesicSphere', module: 'primitives', serves: 'recipe',
+  { name: 'geodesicSphere', module: 'primitives', proof: 'sewn-solid', serves: 'recipe',
     note: 'A deliberately faceted sphere: its facets ARE its geometry, so it is a '
       + 'polyhedron rather than an approximation of anything.',
     needs: 'the polyhedron path -- planar faces sewn into a shell',
     kernel: ['BRepBuilderAPI_Sewing', 'BRepBuilderAPI_MakeSolid'] },
-  { name: 'polyhedron', module: 'primitives', serves: 'recipe',
+  { name: 'polyhedron', module: 'primitives', proof: 'sewn-solid', serves: 'recipe',
     note: 'Explicit points and faces sewn into a closed shell, then a solid.',
     needs: 'BRepBuilderAPI_MakeFace per face, then Sewing',
     kernel: ['BRepBuilderAPI_Sewing', 'BRepBuilderAPI_MakeSolid', 'BRepBuilderAPI_MakeFace'] },
@@ -163,15 +176,15 @@ export const SURFACE: SurfaceName[] = [
     note: 'gp_Elips. A 2D ellipse is a curve, not a stretched shape, so it does not '
       + 'meet the non-uniform scale wall that ellipsoid does.',
     kernel: ['gp_Elips'] },
-  { name: 'polygon', module: 'primitives', serves: 'recipe',
+  { name: 'polygon', module: 'primitives', proof: 'polygon-wire', serves: 'recipe',
     note: 'BRepBuilderAPI_MakePolygon is not bound in this build, so the wire is '
       + 'assembled edge by edge -- which occt-build.ts already does for sketches.',
     needs: 'MakeEdge per side, then MakeWire',
     kernel: ['BRepBuilderAPI_MakeEdge', 'BRepBuilderAPI_MakeWire'] },
-  { name: 'star', module: 'primitives', serves: 'recipe',
+  { name: 'star', module: 'primitives', proof: 'polygon-wire', serves: 'recipe',
     note: 'Its points are trigonometry; what comes out is a polygon.',
     needs: 'the polygon path' },
-  { name: 'triangle', module: 'primitives', serves: 'recipe',
+  { name: 'triangle', module: 'primitives', proof: 'polygon-wire', serves: 'recipe',
     note: 'A polygon of three.', needs: 'the polygon path' },
   { name: 'arc', module: 'primitives', serves: 'exact',
     note: 'A trimmed gp_Circ. Open paths are ordinary edges on a B-rep.',
@@ -214,13 +227,13 @@ export const SURFACE: SurfaceName[] = [
       + 'matrix carrying shear or unequal scale is the general case of the same wall.',
     needs: 'BRepBuilderAPI_GTransform for the general matrix',
     absent: ['BRepBuilderAPI_GTransform'] },
-  { name: 'center', module: 'transforms', serves: 'recipe',
+  { name: 'center', module: 'transforms', proof: 'bbox-arithmetic', serves: 'recipe',
     note: 'Measure the bounding box, translate by half of it. Arithmetic over a '
       + 'measurement the kernel already gives exactly.',
     needs: 'Bnd_Box + BRepBndLib, then a translate', kernel: ['Bnd_Box'] },
-  { name: 'centerZ', module: 'transforms', serves: 'recipe',
+  { name: 'centerZ', module: 'transforms', proof: 'bbox-arithmetic', serves: 'recipe',
     note: 'center on one axis.', needs: 'the center path', kernel: ['Bnd_Box'] },
-  { name: 'align', module: 'transforms', serves: 'recipe',
+  { name: 'align', module: 'transforms', proof: 'bbox-arithmetic', serves: 'recipe',
     note: 'Bounding-box arithmetic and a translate -- the same recipe center uses, with '
       + 'the corner chosen per axis. This is what sit() is built on.',
     needs: 'Bnd_Box + BRepBndLib, then a translate', kernel: ['Bnd_Box'] },
@@ -233,7 +246,7 @@ export const SURFACE: SurfaceName[] = [
     note: 'BRepAlgoAPI_Cut.', kernel: ['BRepAlgoAPI_Cut'] },
   { name: 'intersect', module: 'booleans', serves: 'exact',
     note: 'BRepAlgoAPI_Common.', kernel: ['BRepAlgoAPI_Common'] },
-  { name: 'scission', module: 'booleans', serves: 'recipe',
+  { name: 'scission', module: 'booleans', proof: 'explode-solids', serves: 'recipe',
     note: 'Splitting one shape into its disconnected pieces is walking the solids of a '
       + 'compound -- a B-rep knows what is connected to what without being asked.',
     needs: 'TopExp_Explorer over TopAbs_SOLID',
@@ -247,11 +260,11 @@ export const SURFACE: SurfaceName[] = [
   { name: 'extrudeRotate', module: 'extrusions', serves: 'exact',
     note: 'BRepPrimAPI_MakeRevol, and the round result is exact rather than segmented.',
     kernel: ['BRepPrimAPI_MakeRevol'] },
-  { name: 'extrudeRectangular', module: 'extrusions', serves: 'recipe',
+  { name: 'extrudeRectangular', module: 'extrusions', proof: 'offset-wire', serves: 'recipe',
     note: 'Offset the outline, then extrude the ring between the two.',
     needs: 'BRepOffsetAPI_MakeOffset, then MakePrism',
     kernel: ['BRepOffsetAPI_MakeOffset', 'BRepPrimAPI_MakePrism'] },
-  { name: 'extrudeFromSlices', module: 'extrusions', serves: 'recipe',
+  { name: 'extrudeFromSlices', module: 'extrusions', proof: 'loft-frustum', serves: 'recipe',
     note: 'A loft. NARROWER than JSCAD’s, honestly: ThruSections wants real section '
       + 'wires, while the JSCAD form takes a callback that can emit a twisted or '
       + 'self-crossing run the kernel will refuse rather than quietly triangulate.',
@@ -315,21 +328,21 @@ export const SURFACE: SurfaceName[] = [
     note: 'GProp_GProps.CentreOfMass.', kernel: ['GProp_GProps'] },
   { name: 'measureBoundingBox', module: 'measurements', serves: 'exact',
     note: 'Bnd_Box via BRepBndLib.', kernel: ['Bnd_Box', 'BRepBndLib'] },
-  { name: 'measureDimensions', module: 'measurements', serves: 'recipe',
+  { name: 'measureDimensions', module: 'measurements', proof: 'bbox-arithmetic', serves: 'recipe',
     note: 'The bounding box, subtracted.', needs: 'Bnd_Box', kernel: ['Bnd_Box'] },
-  { name: 'measureCenter', module: 'measurements', serves: 'recipe',
+  { name: 'measureCenter', module: 'measurements', proof: 'bbox-arithmetic', serves: 'recipe',
     note: 'The bounding box, halved. Not the centre of mass -- a distinction the docs '
       + 'already draw and the kernel keeps.', needs: 'Bnd_Box', kernel: ['Bnd_Box'] },
   { name: 'measureEpsilon', module: 'measurements', serves: 'ours',
     note: 'A comparison tolerance scaled to the shape’s own size. Arithmetic over the '
       + 'bounding box, and not the same idea as BRep_Tool::Tolerance, which is how far '
       + 'the kernel allows two surfaces to disagree.' },
-  { name: 'measureAggregateBoundingBox', module: 'measurements', serves: 'recipe',
+  { name: 'measureAggregateBoundingBox', module: 'measurements', proof: 'bbox-arithmetic', serves: 'recipe',
     note: 'One Bnd_Box fed every shape in turn.', needs: 'Bnd_Box', kernel: ['Bnd_Box'] },
-  { name: 'measureAggregateVolume', module: 'measurements', serves: 'recipe',
+  { name: 'measureAggregateVolume', module: 'measurements', proof: 'gprop-sum', serves: 'recipe',
     note: 'Summed. Overlapping solids double-count in both engines alike.',
     needs: 'BRepGProp per shape', kernel: ['BRepGProp'] },
-  { name: 'measureAggregateArea', module: 'measurements', serves: 'recipe',
+  { name: 'measureAggregateArea', module: 'measurements', proof: 'gprop-sum', serves: 'recipe',
     note: 'Summed.', needs: 'BRepGProp per shape', kernel: ['BRepGProp'] },
   { name: 'measureAggregateEpsilon', module: 'measurements', serves: 'ours',
     note: 'Arithmetic over the aggregate bounding box.' },
