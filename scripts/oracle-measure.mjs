@@ -285,6 +285,13 @@ try {
     torus: 2 * Math.PI * Math.PI * 14 * 4 * 4,
     'sketch-extrude': 40 * 25 * 12,
     'circle-extrude': Math.PI * 15 * 15 * 20,
+    // A ring: outer 20, inner 10, 30 tall. pi*(R*R - r*r)*h. Spin tessellates
+    // more coarsely than the primitives do -- JSCAD comes in 4.5% under this,
+    // against 0.64% for a cylinder -- so these need the analytic target or an
+    // exact kernel fails them for being right.
+    'sketch-revolve': Math.PI * (20 * 20 - 10 * 10) * 30,
+    'revolve-on-xy': Math.PI * (20 * 20 - 10 * 10) * 30,
+    'revolve-on-yz': Math.PI * (20 * 20 - 10 * 10) * 30,
   };
   const CURVED = new Set([
     'box-rounded', 'cylinder', 'cone', 'sphere', 'torus', 'sketch-revolve',

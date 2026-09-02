@@ -550,8 +550,24 @@ module.exports = function run(dir) {
   const revolveF = (id, target, angle = 360) => ({ id, kind: 'revolve', target, angle });
 
   const revSrc = gen.toReshape(doc(revProfile('s1'), revolveF('rev1', 's1')));
-  check('a revolve calls the real extrudeRotate, angle converted to radians',
-    revSrc.includes('extrusions.extrudeRotate({ angle: p.rev1_angle * Math.PI / 180 }, s1)'));
+  // The real call is still there and still takes radians -- it moved into the
+  // revolveOnPlane helper, exactly as extrudeLinear lives inside
+  // extrudeOnPlane. That indirection is what lets Spin honour the sketch
+  // plane: before it, revolve emitted extrudeRotate on the raw profile and
+  // swept around world Z whatever plane the sketch sat on, so all three
+  // planes produced the same solid and the Sits-on control did nothing.
+  //
+  // What matters pedagogically is unchanged and is what these check: the
+  // student can still see the genuine JSCAD call, and the angle is still
+  // converted at the point where a dial feeds it.
+  check('the real extrudeRotate is still in the generated source',
+    revSrc.includes('extrusions.extrudeRotate({ angle: angle }, profile)'),
+    'the helper body should still contain the genuine JSCAD call');
+  check('...and the angle still arrives in radians from the dial',
+    revSrc.includes('p.rev1_angle * Math.PI / 180'));
+  check('...through the plane-aware helper, so Spin honours Sits-on',
+    revSrc.includes("revolveOnPlane(s1, p.rev1_angle * Math.PI / 180, 'xy'"),
+    revSrc.split(/\r?\n/).filter((l) => l.includes('revolveOnPlane(')).slice(0, 1).join(''));
   check('...and pulls extrusions in', /const \{[^}]*extrusions[^}]*\} = require/.test(revSrc));
   check('the sketch it consumed is not also returned', !/return s1\b/.test(revSrc));
   check('the revolve is what gets returned', /return rev1\b/.test(revSrc));

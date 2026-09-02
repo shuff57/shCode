@@ -204,6 +204,39 @@ function sketchWire(oc: Occt, arc: any, f: any): any {
   return w.Wire();
 }
 
+/**
+ * The profile for a REVOLVE, which is not the same thing as the sketch lying
+ * on its plane.
+ *
+ * Spin reads a sketch as (radius, height): the outline's across is how far
+ * out from the axis, and its up is how far along it. The axis is the plane's
+ * normal. So the profile is laid in the plane spanned by the sketch's U
+ * direction and that normal -- a plane CONTAINING the axis -- rather than on
+ * the sketch plane itself, which is perpendicular to it.
+ *
+ * On the ground plane this is exactly what extrudeRotate does unaided, which
+ * is why xy is the one of the three that does not move when Spin learns about
+ * planes at all.
+ */
+function revolveProfileFace(oc: Occt, arc: any, f: any): any {
+  const a = PLANE_AXES[f.plane ?? 'xy'] ?? PLANE_AXES.xy;
+  const outline = arc.outlineOf(f);
+  if (!outline.ok) return null;
+  const pts: number[][] = outline.points;
+  const n = pts.length;
+  if (n < 3) return null;
+  const at = (p: number[]) => new oc.gp_Pnt(
+    a.u[0] * p[0] + a.n[0] * p[1],
+    a.u[1] * p[0] + a.n[1] * p[1],
+    a.u[2] * p[0] + a.n[2] * p[1],
+  );
+  const w = new oc.BRepBuilderAPI_MakeWire();
+  for (let i = 0; i < n; i++) {
+    w.Add(new oc.BRepBuilderAPI_MakeEdge(at(pts[i]), at(pts[(i + 1) % n])).Edge());
+  }
+  return new oc.BRepBuilderAPI_MakeFace(w.Wire(), false).Face();
+}
+
 /** The sketch as a flat face, ready to be pulled or spun. */
 function sketchFace(oc: Occt, arc: any, f: any): any {
   const wire = sketchWire(oc, arc, f);
@@ -281,17 +314,21 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): Map<string, any> {
         shape = new oc.BRepPrimAPI_MakePrism(face, v, false, true).Shape();
       }
     } else if (f.kind === 'revolve') {
-      const face = built.get(f.target);
       const src = doc.features.find((x) => x.id === f.target);
-      if (face && src && src.kind === 'sketch') {
+      if (arc && src && src.kind === 'sketch') {
         const a = PLANE_AXES[src.plane ?? 'xy'] ?? PLANE_AXES.xy;
-        // Spun about the plane's own U axis through the origin, matching what
-        // extrudeRotate does on the JSCAD side.
-        const axis = new oc.gp_Ax1(
-          new oc.gp_Pnt(0, 0, 0),
-          new oc.gp_Dir(a.u[0], a.u[1], a.u[2]),
-        );
-        shape = new oc.BRepPrimAPI_MakeRevol(face, axis, (f.angle * Math.PI) / 180, true).Shape();
+        const face = revolveProfileFace(oc, arc, src);
+        if (face) {
+          // About the plane NORMAL, which is the axis the profile was laid
+          // against -- see revolveProfileFace.
+          const axis = new oc.gp_Ax1(
+            new oc.gp_Pnt(0, 0, 0),
+            new oc.gp_Dir(a.n[0], a.n[1], a.n[2]),
+          );
+          const spun = new oc.BRepPrimAPI_MakeRevol(face, axis, (f.angle * Math.PI) / 180, true).Shape();
+          const off = src.offset ?? 0;
+          shape = moved(oc, spun, [a.n[0] * off, a.n[1] * off, a.n[2] * off]);
+        }
       }
     } else if (f.kind === 'blend') {
       // A REAL loft. On the JSCAD side this is extrudeFromSlices with two

@@ -119,6 +119,21 @@ try {
       { id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0, points: [[0,0],[40,0],[40,25],[0,25]], bulges: { 0: 0.4 } },
       { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
     ],
+    // Spin, on all three planes. These must DIFFER: the axis is the plane
+    // normal, so each stands along a different world axis. Before Spin
+    // honoured the plane at all, the three were identical.
+    'revolve-on-xy': [
+      { id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0, points: [[10,0],[20,0],[20,30],[10,30]] },
+      { id: 'r1', kind: 'revolve', target: 'sk1', angle: 360 },
+    ],
+    'sketch-revolve': [
+      { id: 'sk1', kind: 'sketch', plane: 'xz', offset: 0, points: [[10,0],[20,0],[20,30],[10,30]] },
+      { id: 'r1', kind: 'revolve', target: 'sk1', angle: 360 },
+    ],
+    'revolve-on-yz': [
+      { id: 'sk1', kind: 'sketch', plane: 'yz', offset: 0, points: [[10,0],[20,0],[20,30],[10,30]] },
+      { id: 'r1', kind: 'revolve', target: 'sk1', angle: 360 },
+    ],
     blend: [
       { id: 'sa', kind: 'sketch', plane: 'xy', offset: 0, points: [[-20,-20],[20,-20],[20,20],[-20,20]] },
       { id: 'sb', kind: 'sketch', plane: 'xy', offset: 30, points: [[-5,-5],[5,-5],[5,5],[-5,5]] },

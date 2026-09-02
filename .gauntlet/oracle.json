@@ -1,5 +1,5 @@
 {
-  "sha": "d37b6942bb481fa424680ba107562f0fb2032049",
+  "sha": "0ca0a8e65c7abd512c910836a44c4e5b073138a6",
   "takenAt": "2026-09-02",
   "models": {
     "box": {
@@ -162,18 +162,18 @@
       "bbox": [
         [
           -20,
-          -20,
-          0
+          0,
+          -20
         ],
         [
           20,
-          20,
-          30
+          30,
+          20
         ]
       ],
       "polys": 96,
       "curved": true,
-      "note": "KNOWN DEFECT, recorded on purpose 2026-09-01. sketch-revolve, revolve-on-xy and revolve-on-yz are the SAME profile on three different planes and produce identical geometry, because revolve does not go through extrudeOnPlane at all -- featureExpr emits extrudeRotate on the raw 2D profile, which sweeps around world Z whatever plane the sketch sits on. So the \"Sits on: Ground / Front / Side\" control shipped in af804a8 is inert for Spin: a student picks Side, presses Spin, and gets the Ground result with nothing to tell them. These three entries are a MEASUREMENT of the defect, not a contract. When it is fixed, two of the three must move and one must not -- that is the check. Do not treat them matching as a passing state to preserve."
+      "exact": 28274.3339
     },
     "revolve-on-xy": {
       "volume": 27000,
@@ -191,25 +191,25 @@
       ],
       "polys": 96,
       "curved": true,
-      "note": "KNOWN DEFECT, recorded on purpose 2026-09-01. sketch-revolve, revolve-on-xy and revolve-on-yz are the SAME profile on three different planes and produce identical geometry, because revolve does not go through extrudeOnPlane at all -- featureExpr emits extrudeRotate on the raw 2D profile, which sweeps around world Z whatever plane the sketch sits on. So the \"Sits on: Ground / Front / Side\" control shipped in af804a8 is inert for Spin: a student picks Side, presses Spin, and gets the Ground result with nothing to tell them. These three entries are a MEASUREMENT of the defect, not a contract. When it is fixed, two of the three must move and one must not -- that is the check. Do not treat them matching as a passing state to preserve."
+      "exact": 28274.3339
     },
     "revolve-on-yz": {
       "volume": 27000,
       "bbox": [
         [
+          0,
           -20,
-          -20,
-          0
+          -20
         ],
         [
+          30,
           20,
-          20,
-          30
+          20
         ]
       ],
       "polys": 96,
       "curved": true,
-      "note": "KNOWN DEFECT, recorded on purpose 2026-09-01. sketch-revolve, revolve-on-xy and revolve-on-yz are the SAME profile on three different planes and produce identical geometry, because revolve does not go through extrudeOnPlane at all -- featureExpr emits extrudeRotate on the raw 2D profile, which sweeps around world Z whatever plane the sketch sits on. So the \"Sits on: Ground / Front / Side\" control shipped in af804a8 is inert for Spin: a student picks Side, presses Spin, and gets the Ground result with nothing to tell them. These three entries are a MEASUREMENT of the defect, not a contract. When it is fixed, two of the three must move and one must not -- that is the check. Do not treat them matching as a passing state to preserve."
+      "exact": 28274.3339
     },
     "circle-extrude": {
       "volume": 14046.5032,

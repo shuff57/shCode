@@ -580,7 +580,12 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
     // profile's own x as the radius, same as extrudeRotate(profile) would for the
     // full-circle case.
     needs.add('extrusions');
-    return `extrusions.extrudeRotate({ angle: p.${pname(f.id, 'angle')} * Math.PI / 180 }, ${f.target})`;
+    needs.add('revolveOnPlane');
+    needs.add('transforms');
+    const sk = byId.get(f.target);
+    const plane = sk && sk.kind === 'sketch' ? sk.plane : 'xy';
+    return `revolveOnPlane(${f.target}, p.${pname(f.id, 'angle')} * Math.PI / 180, `
+      + `'${plane}', p.${pname(f.target, 'offset')})`;
   }
 
   if (f.kind === 'mirror') {
@@ -950,6 +955,26 @@ function blendOnPlane(bottom, top, gap, plane, offset) {
   if (plane === 'yz') return transforms.translate([offset, 0, 0], transforms.rotateY(-Math.PI / 2, solid))
   return transforms.translate([0, 0, offset], solid)
 }`,
+  revolveOnPlane: `// Spin a flat outline into a solid, on one of the three planes.
+//
+// The rule: the axis of revolution is the sketch plane's NORMAL, the outline's
+// across is the radius, and its up is the height along that axis. On the
+// ground plane that is already what extrudeRotate does on its own, which is
+// why xy comes out of here unchanged.
+//
+// It did not used to be a rule at all. revolve emitted extrudeRotate on the
+// raw profile and swept around world Z whatever plane the sketch sat on, so
+// all three planes produced identical geometry and the Sits-on control was
+// inert for Spin -- pick Side, press Spin, get the Ground result, with
+// nothing to say so. Measured 2026-09-01: xy, xz and yz all returned volume
+// 27000 in the same bounding box.
+function revolveOnPlane(profile, angle, plane, offset) {
+  const solid = extrusions.extrudeRotate({ angle: angle }, profile)
+  // Z is where extrudeRotate stands the solid up; turn that onto the normal.
+  if (plane === 'xz') return transforms.translate([0, offset, 0], transforms.rotateX(-Math.PI / 2, solid))
+  if (plane === 'yz') return transforms.translate([offset, 0, 0], transforms.rotateY(Math.PI / 2, solid))
+  return transforms.translate([0, 0, offset], solid)
+}`,
   chamferCylinder: `// A cylinder with both rims sliced off: the hull of a short full-width one
 // and a tall narrow one.
 function chamferCylinder(radius, height, center, c) {
@@ -1193,6 +1218,10 @@ export function toReshape(doc: ModelDoc): string {
   // blendOnPlane reuses extrudeOnPlane's plane maths but is reached on its
   // own, so it has to ask for the same two modules rather than rely on an
   // extrude happening to be in the same document.
+  if (needs.has('revolveOnPlane')) {
+    if (!modules.includes('extrusions')) modules.push('extrusions');
+    if (!modules.includes('transforms')) modules.push('transforms');
+  }
   if (needs.has('blendOnPlane')) {
     if (!modules.includes('extrusions')) modules.push('extrusions');
     if (!modules.includes('transforms')) modules.push('transforms');
