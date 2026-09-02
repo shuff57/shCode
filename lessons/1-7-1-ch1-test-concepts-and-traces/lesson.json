@@ -1,0 +1,357 @@
+{
+  "id": "1-7-1-ch1-test-concepts-and-traces",
+  "title": "1.7.1 Chapter 1 Test, Part 1: Concepts and Traces",
+  "description": "Eight questions: three on the ideas of Chapter 1, five where you read a short program and say what it prints. One submission, nothing marked on screen.",
+  "type": "assignment",
+  "estimateMins": 16,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.7 Chapter 1 Individual Test",
+  "preview": "quiz",
+  "slos": [
+    "SLO-1",
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A1.7.1",
+  "quiz": {
+    "summative": true,
+    "shuffle": true,
+    "variants": [
+      "a",
+      "b",
+      "c"
+    ],
+    "questions": [
+      {
+        "id": "c1-lifecycle-order",
+        "source": "1.1.6",
+        "question": "Chapter 1 described the software life cycle as four framework activities. Which sequence puts them in the order they happen?",
+        "options": [
+          "inception, elaboration, construction, deployment",
+          "elaboration, inception, deployment, construction",
+          "construction, inception, elaboration, deployment",
+          "deployment, construction, elaboration, inception"
+        ],
+        "answer": 0,
+        "explanation": "Deciding the goals and scope (inception) has to happen before working out requirements and designing the thing (elaboration), which has to happen before writing it (construction), which has to happen before releasing it to the people who will use it (deployment). Building something nobody has scoped is how a project ships the wrong program.",
+        "sourceIds": [
+          "1-1-6-reading-four-phases"
+        ]
+      },
+      {
+        "id": "c2-paradigm-oo",
+        "source": "1.4.15",
+        "question": "Which paradigm bundles data together with the code that works on that data?",
+        "options": [
+          "Structured programming",
+          "Object-oriented programming",
+          "Procedural programming",
+          "Functional programming"
+        ],
+        "answer": 1,
+        "explanation": "Object-oriented programming puts values and the operations on those values into one object. Procedural code keeps its data in variables that separate statements reach into from outside; functional programming builds a program out of functions that take values in and hand values back; structured programming is about being built only from sequence, selection and repetition.",
+        "sourceIds": [
+          "1-4-15-reading-object-oriented"
+        ]
+      },
+      {
+        "id": "c3-chart-or-pseudocode",
+        "source": "1.5.27",
+        "question": "You are untangling some logic that branches in several places, and you want to see the shape of the branching at a glance. Which design tool fits best?",
+        "options": [
+          "A README",
+          "A test-case table",
+          "A flowchart",
+          "Pseudocode"
+        ],
+        "answer": 2,
+        "explanation": "A flowchart draws branching as shapes and arrows, so where the paths split and rejoin is visible without reading. Pseudocode suits a long straight run of steps, a README explains a finished program to whoever has to use it, and a test-case table records what you tried and what came out.",
+        "sourceIds": [
+          "1-5-27-reading-when-to-use-which"
+        ]
+      },
+      {
+        "id": "a-t1-const",
+        "variant": "a",
+        "source": "1.2.2",
+        "question": "What does this program print?",
+        "code": "const TAX_RATE = 0.08;\nTAX_RATE = 0.09;\nconsole.log(TAX_RATE);",
+        "options": [
+          "0.09",
+          "0.08",
+          "undefined",
+          "Nothing — the program stops with a TypeError"
+        ],
+        "answer": 3,
+        "explanation": "A name declared with const cannot be pointed at a new value. The reassignment throws a TypeError and the program stops there, so console.log never runs. Use let for a value that is meant to change.",
+        "sourceIds": [
+          "1-2-2-reading-let-const"
+        ]
+      },
+      {
+        "id": "a-t2-coercion",
+        "variant": "a",
+        "source": "1.2.7",
+        "question": "What does this program print?",
+        "code": "let a = \"5\" + 2;\nlet b = \"5\" - 2;\nconsole.log(a, b);",
+        "options": [
+          "52 3",
+          "7 3",
+          "52 52",
+          "7 -3"
+        ],
+        "answer": 0,
+        "explanation": "With text on one side, + joins rather than adds, so \"5\" + 2 builds the text 52. The - operator has no meaning for text, so JavaScript converts \"5\" into the number 5 and subtracts, giving 3. Same two values, two different answers, depending on the operator.",
+        "sourceIds": [
+          "1-2-7-reading-operators-coercion"
+        ]
+      },
+      {
+        "id": "a-t3-typeof",
+        "variant": "a",
+        "source": "1.2.23 and 1.2.24",
+        "question": "What does this program print?",
+        "code": "console.log(typeof null, typeof NaN);",
+        "options": [
+          "null NaN",
+          "object number",
+          "null number",
+          "object NaN"
+        ],
+        "answer": 1,
+        "explanation": "typeof null reports object. That is a bug baked into JavaScript in 1995 and never repaired, because too much code now depends on it. NaN stands for Not a Number and is itself of type number — that is the point of it: the number type's way of saying an arithmetic answer does not exist.",
+        "sourceIds": [
+          "1-2-23-reading-typeof",
+          "1-2-24-example-typeof-surprises"
+        ]
+      },
+      {
+        "id": "a-t4-nan",
+        "variant": "a",
+        "source": "1.2.9",
+        "question": "What does this program print?",
+        "code": "let scoops = Number(\"three\");\nlet total = scoops * 2;\nconsole.log(total + 10);",
+        "options": [
+          "10",
+          "0",
+          "NaN",
+          "16"
+        ],
+        "answer": 2,
+        "explanation": "Number(\"three\") cannot build a number out of that text, so it produces NaN. Every piece of arithmetic that touches NaN produces NaN, so it travels through the multiplication and the addition and comes out of the print unchanged.",
+        "sourceIds": [
+          "1-2-9-example-nan-is-sticky"
+        ]
+      },
+      {
+        "id": "a-t5-template",
+        "variant": "a",
+        "source": "1.2.13",
+        "question": "What does this program print?",
+        "code": "const name = \"Ada\";\nconst boxes = 4;\nconsole.log(`${name} packed ${boxes * 3} mugs`);",
+        "options": [
+          "${name} packed ${boxes * 3} mugs",
+          "Ada packed 4 * 3 mugs",
+          "Ada packed 43 mugs",
+          "Ada packed 12 mugs"
+        ],
+        "answer": 3,
+        "explanation": "Backticks make a template literal, and ${...} runs the expression inside the braces and drops the result into the text. boxes * 3 is arithmetic, so 12 lands in the sentence.",
+        "sourceIds": [
+          "1-2-13-reading-template-literals"
+        ]
+      },
+      {
+        "id": "b-t1-const",
+        "variant": "b",
+        "source": "1.2.2",
+        "question": "What does this program print?",
+        "code": "const SPEED_LIMIT = 55;\nSPEED_LIMIT = 65;\nconsole.log(SPEED_LIMIT);",
+        "options": [
+          "Nothing — the program stops with a TypeError",
+          "65",
+          "55",
+          "undefined"
+        ],
+        "answer": 0,
+        "explanation": "A name declared with const cannot be pointed at a new value. The reassignment throws a TypeError and the program stops there, so console.log never runs. Use let for a value that is meant to change.",
+        "sourceIds": [
+          "1-2-2-reading-let-const"
+        ]
+      },
+      {
+        "id": "b-t2-coercion",
+        "variant": "b",
+        "source": "1.2.7",
+        "question": "What does this program print?",
+        "code": "let a = \"20\" + 5;\nlet b = \"20\" - 5;\nconsole.log(a, b);",
+        "options": [
+          "25 -15",
+          "205 15",
+          "25 15",
+          "205 205"
+        ],
+        "answer": 1,
+        "explanation": "With text on one side, + joins rather than adds, so \"20\" + 5 builds the text 205. The - operator has no meaning for text, so JavaScript converts \"20\" into the number 20 and subtracts, giving 15. Same two values, two different answers, depending on the operator.",
+        "sourceIds": [
+          "1-2-7-reading-operators-coercion"
+        ]
+      },
+      {
+        "id": "b-t3-typeof",
+        "variant": "b",
+        "source": "1.2.19 and 1.2.23",
+        "question": "What does this program print?",
+        "code": "let chosen = null;\nconsole.log(typeof chosen);",
+        "options": [
+          "undefined",
+          "empty",
+          "object",
+          "null"
+        ],
+        "answer": 2,
+        "explanation": "typeof null reports object. That is a bug baked into JavaScript in 1995 and never repaired, because too much code now depends on it. null is a value you assign on purpose to mean \"deliberately nothing\", and typeof is not able to tell you so.",
+        "sourceIds": [
+          "1-2-19-reading-null",
+          "1-2-23-reading-typeof"
+        ]
+      },
+      {
+        "id": "b-t4-nan",
+        "variant": "b",
+        "source": "1.2.9",
+        "question": "What does this program print?",
+        "code": "let cost = Number(\"ten dollars\");\nlet doubled = cost + cost;\nconsole.log(doubled - 4);",
+        "options": [
+          "16",
+          "-4",
+          "0",
+          "NaN"
+        ],
+        "answer": 3,
+        "explanation": "Number(\"ten dollars\") cannot build a number out of that text, so it produces NaN. Every piece of arithmetic that touches NaN produces NaN, so it travels through the addition and the subtraction and comes out of the print unchanged.",
+        "sourceIds": [
+          "1-2-9-example-nan-is-sticky"
+        ]
+      },
+      {
+        "id": "b-t5-template",
+        "variant": "b",
+        "source": "1.2.13",
+        "question": "What does this program print?",
+        "code": "const pet = \"Rex\";\nconst pairs = 2;\nconsole.log(`${pet} has ${pairs * 2} legs`);",
+        "options": [
+          "Rex has 4 legs",
+          "${pet} has ${pairs * 2} legs",
+          "Rex has 2 * 2 legs",
+          "Rex has 22 legs"
+        ],
+        "answer": 0,
+        "explanation": "Backticks make a template literal, and ${...} runs the expression inside the braces and drops the result into the text. pairs * 2 is arithmetic, so 4 lands in the sentence.",
+        "sourceIds": [
+          "1-2-13-reading-template-literals"
+        ]
+      },
+      {
+        "id": "c-t1-const",
+        "variant": "c",
+        "source": "1.2.2",
+        "question": "What does this program print?",
+        "code": "const CLASS_SIZE = 24;\nCLASS_SIZE = CLASS_SIZE + 1;\nconsole.log(CLASS_SIZE);",
+        "options": [
+          "undefined",
+          "Nothing — the program stops with a TypeError",
+          "25",
+          "24"
+        ],
+        "answer": 1,
+        "explanation": "A name declared with const cannot be pointed at a new value, and adding one to it is still pointing it at a new value. The reassignment throws a TypeError and the program stops there, so console.log never runs.",
+        "sourceIds": [
+          "1-2-2-reading-let-const"
+        ]
+      },
+      {
+        "id": "c-t2-coercion",
+        "variant": "c",
+        "source": "1.2.7",
+        "question": "What does this program print?",
+        "code": "let a = \"7\" + 3;\nlet b = \"7\" * 3;\nconsole.log(a, b);",
+        "options": [
+          "73 73",
+          "10 10",
+          "73 21",
+          "10 21"
+        ],
+        "answer": 2,
+        "explanation": "With text on one side, + joins rather than adds, so \"7\" + 3 builds the text 73. The * operator has no meaning for text, so JavaScript converts \"7\" into the number 7 and multiplies, giving 21. Only + is ambiguous; every other arithmetic operator converts.",
+        "sourceIds": [
+          "1-2-7-reading-operators-coercion"
+        ]
+      },
+      {
+        "id": "c-t3-typeof",
+        "variant": "c",
+        "source": "1.2.8 and 1.2.23",
+        "question": "What does this program print?",
+        "code": "let result = 10 / \"cats\";\nconsole.log(typeof result);",
+        "options": [
+          "NaN",
+          "string",
+          "undefined",
+          "number"
+        ],
+        "answer": 3,
+        "explanation": "Dividing by text that is not a number produces NaN, and NaN is of type number — Not a Number is the number type's way of saying an arithmetic answer does not exist. typeof reports the type, not the value, so it says number rather than NaN.",
+        "sourceIds": [
+          "1-2-8-reading-special-numeric-values",
+          "1-2-23-reading-typeof"
+        ]
+      },
+      {
+        "id": "c-t4-nan",
+        "variant": "c",
+        "source": "1.2.9",
+        "question": "What does this program print?",
+        "code": "let width = Number(\"wide\");\nlet area = width * 6;\nconsole.log(area + 100);",
+        "options": [
+          "NaN",
+          "106",
+          "100",
+          "0"
+        ],
+        "answer": 0,
+        "explanation": "Number(\"wide\") cannot build a number out of that text, so it produces NaN. Every piece of arithmetic that touches NaN produces NaN, so it travels through the multiplication and the addition and comes out of the print unchanged.",
+        "sourceIds": [
+          "1-2-9-example-nan-is-sticky"
+        ]
+      },
+      {
+        "id": "c-t5-template",
+        "variant": "c",
+        "source": "1.2.13",
+        "question": "What does this program print?",
+        "code": "const city = \"Chico\";\nconst days = 5;\nconsole.log(`${city} in ${days + 2} days`);",
+        "options": [
+          "Chico in 52 days",
+          "Chico in 7 days",
+          "${city} in ${days + 2} days",
+          "Chico in 5 + 2 days"
+        ],
+        "answer": 1,
+        "explanation": "Backticks make a template literal, and ${...} runs the expression inside the braces and drops the result into the text. days + 2 is arithmetic on two numbers, so 7 lands in the sentence.",
+        "sourceIds": [
+          "1-2-13-reading-template-literals"
+        ]
+      }
+    ]
+  }
+}

@@ -129,15 +129,54 @@ export interface QuizQuestion {
   explanation: string;
   /** Displayed lesson number to reread, e.g. "1.4.5". */
   source?: string;
+  /**
+   * Which form of the test this question belongs to. Only meaningful when the
+   * quiz declares `variants`: a student assigned form "b" is shown the
+   * untagged questions plus the ones tagged "b", and never sees "a" or "c".
+   * Absent means "every form asks this one".
+   */
+  variant?: string;
 }
 
 export interface QuizConfig {
   /** Percent correct needed to advance. Default 70. */
   passPercent?: number;
+  /**
+   * Re-order questions and options per student. **Off by default, and that
+   * default is load-bearing:** module quizzes routinely explain themselves
+   * positionally ("the second list is the lifecycle"), and shuffling turns
+   * those notes into lies. Opt in only when every explanation is written
+   * without reference to where an option sits -- scripts/test-quiz.mjs
+   * refuses a shuffled quiz whose prose says "the third".
+   */
+  shuffle?: boolean;
+  /**
+   * Form labels, e.g. `["a", "b", "c"]`. Each student is assigned one
+   * deterministically from their email, so a proctored room gets neighbours
+   * on different forms with no cards to hand out and nothing for a teacher
+   * to track. Every form must end up the same length -- the checker enforces
+   * it.
+   */
+  variants?: string[];
+  /**
+   * Test mode. A module quiz is formative -- it marks each answer, explains
+   * itself and invites another go. A chapter test is not: submitting is final,
+   * the paper locks, no answer is marked, no explanation is shown, and the
+   * lesson completes on submission rather than on a score, because the course
+   * is green-to-advance and a summative score is the teacher's to hand back.
+   */
+  summative?: boolean;
   questions: QuizQuestion[];
 }
 
 export interface AiGraderConfig {
+  /**
+   * Test mode, the written-response twin of QuizConfig.summative. One
+   * submission, no rubric feedback returned to the student, and the lesson
+   * completes on submission. Rubric feedback on a graded test is the answer
+   * key: it names the criterion that was missed, and the student resubmits.
+   */
+  summative?: boolean;
   rubricTitle?: string;
   model?: string;
   contextDocs?: string[];

@@ -1,0 +1,106 @@
+{
+  "id": "1-7-3-ch1-test-find-and-fix",
+  "title": "1.7.3 Chapter 1 Test, Part 3: Find and Fix",
+  "description": "A book-order receipt with four bugs in it. Repair all four and name what kind each one was. Auto-checked.",
+  "type": "assignment",
+  "estimateMins": 11,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.7 Chapter 1 Individual Test",
+  "preview": "console",
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "points": 0,
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Read the error before you change anything",
+      "instructions": "Run it. The console tells you where it gave up and what it did not understand. Start there: one of the four bugs stops the file from running at all, so until that one is gone you cannot see what the others do."
+    },
+    {
+      "id": "s2",
+      "title": "Fix all four",
+      "instructions": "Two of the four never produce an error message. The receipt prints, the numbers look like numbers, and two of the lines are wrong anyway. Work out by hand what the receipt SHOULD say for 6 notebooks at 4.25 with 5 for shipping and 8% tax, then find the lines that disagree with you."
+    },
+    {
+      "id": "s3",
+      "title": "Name each one",
+      "instructions": "Above each fix, add a comment naming the kind of bug it was: syntax, runtime or logic. A syntax bug means the file is not valid JavaScript. A runtime bug means it is valid, starts running, and then stops. A logic bug means it runs all the way through and tells you something untrue.",
+      "hints": [
+        "The kind is about WHEN it goes wrong, not about how hard it was to find",
+        "Two of these four are the same kind as each other"
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "One variable, one meaning",
+      "instructions": "One of the logic bugs is a variable being used for two different things. Do not fix it by moving lines around -- give the second meaning its own variable, named wrappedCount."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The item name is a complete piece of text",
+      "description": "itemName is assigned a properly quoted string",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "let\\s+itemName\\s*=\\s*\"[^\"\\n]*\"\\s*;",
+      "flags": "",
+      "stripComments": false,
+      "hint": "Look at what the console said it did not understand, and count the quote marks on that line.",
+      "points": 0
+    },
+    {
+      "id": "r2",
+      "title": "The total adds up a name that exists",
+      "description": "beforTax is gone and total is built from beforeTax plus tax",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*\\bbeforTax\\b)(?=[\\s\\S]*\\btotal\\s*=\\s*beforeTax\\s*\\+\\s*tax)[\\s\\S]*$",
+      "flags": "",
+      "hint": "A ReferenceError names the thing it could not find. Read the name it gives you very carefully against the name you declared.",
+      "points": 0
+    },
+    {
+      "id": "r3",
+      "title": "Shipping is a number, not text",
+      "description": "shipping is assigned 5 rather than \"5\"",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "let\\s+shipping\\s*=\\s*5\\s*;",
+      "flags": "",
+      "hint": "Adding a number to a piece of text does not add. Check what Before tax actually printed.",
+      "points": 0
+    },
+    {
+      "id": "r4",
+      "title": "The gift-wrap count has its own variable",
+      "description": "wrappedCount is declared, and count is no longer reassigned to 2",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?![\\s\\S]*\\bcount\\s*=\\s*2\\b)(?=[\\s\\S]*\\b(?:let|const)\\s+wrappedCount\\s*=)[\\s\\S]*$",
+      "flags": "",
+      "hint": "The receipt says how many were ordered. Compare that line's number against the number the order actually was.",
+      "points": 0
+    },
+    {
+      "id": "r5",
+      "title": "Every bug is named",
+      "description": "Comments name a syntax bug, a runtime bug and two logic bugs",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*//[^\\n]*syntax)(?=[\\s\\S]*//[^\\n]*runtime)(?=[\\s\\S]*//[^\\n]*logic[\\s\\S]*//[^\\n]*logic)[\\s\\S]*$",
+      "flags": "i",
+      "stripComments": false,
+      "hint": "Four fixes, four comments. Two of them name the same kind.",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "assignmentCode": "A1.7.3"
+}

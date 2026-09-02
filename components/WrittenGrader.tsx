@@ -19,6 +19,8 @@ export interface AiRubricItem {
 }
 
 export interface AiGraderConfig {
+  /** Test mode -- one submission, no rubric feedback. See lib/types.ts. */
+  summative?: boolean;
   rubricTitle?: string;
   model?: string;
   contextDocs?: string[];
@@ -109,6 +111,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
 
   const progress = useLessonState();
   const totalPossible = config.rubric.reduce((s, r) => s + r.points, 0);
+  // A test, not a practice assignment: see AiGraderConfig.summative.
+  const summative = !!config.summative;
+  const locked = summative && !!result;
 
   useEffect(() => {
     // Local cache is the always-available fallback; server draft is canonical
@@ -233,7 +238,10 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       lastFailedRef.current = null;
       setResult(data as GradeResult);
       const passed = isPassing(data as GradeResult);
-      if (passed) {
+      // On a test, sitting it is what unlocks the next part. Gating on the
+      // grade would lock a student out of the rest of their own exam over an
+      // answer the teacher has not even seen yet.
+      if (summative || passed) {
         await recordLessonCompleted(lessonId, data.totalEarned);
       }
       if (progress.authed) {
@@ -348,7 +356,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10, flexWrap: 'wrap' }}>
         <button
           onClick={submit}
-          disabled={loading || response.trim().length < 20}
+          disabled={loading || locked || response.trim().length < 20}
           style={{
             padding: '8px 16px',
             borderRadius: 6,
@@ -363,7 +371,17 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
           }}
         >
           {loading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
-          {loading ? 'Grading…' : result ? 'Re-submit for feedback' : 'Submit for feedback'}
+          {loading
+            ? summative
+              ? 'Submitting…'
+              : 'Grading…'
+            : summative
+              ? locked
+                ? 'Submitted'
+                : 'Submit my answer'
+              : result
+                ? 'Re-submit for feedback'
+                : 'Submit for feedback'}
         </button>
         <button
           onClick={saveNow}
@@ -416,7 +434,26 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         </div>
       )}
 
-      {result && (() => {
+      {result && summative ? (
+        <div
+          style={{
+            marginTop: 16,
+            padding: '12px 14px',
+            background: '#282a36',
+            border: '1px solid #50fa7b',
+            borderRadius: 6,
+            color: '#f8f8f2',
+            fontSize: 13,
+            lineHeight: 1.6,
+          }}
+        >
+          <strong style={{ color: '#50fa7b' }}>Submitted.</strong> Your answer is with your
+          teacher. Nothing is marked here and this one does not reopen — that is what makes
+          it a test rather than a practice run.
+        </div>
+      ) : null}
+
+      {result && !summative && (() => {
         const passFail = result.totalPossible === 0;
         const passed = isPassing(result);
         const okCount = result.criteria.filter(

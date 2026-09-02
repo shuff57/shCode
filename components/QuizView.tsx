@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CircleCheck, CircleX, Circle, ListChecks } from 'lucide-react';
 import type { QuizConfig } from '../lib/types';
 import { recordLessonCompleted, useLessonState } from '../lib/progress';
@@ -9,6 +9,8 @@ import { fetchDraft, saveDraft, recordSubmission } from '../lib/written-grader-s
 import { countCorrect, passThreshold } from '../lib/quiz-grade';
 import { withInlineCode } from './InlineCode';
 import { sourceHintNumbers, sourceHintParts } from '../lib/source-hint';
+import { buildQuizView } from '../lib/quiz-variant';
+import { getCurrentUser } from '../lib/auth';
 
 interface Props {
   lessonId: string;
@@ -45,9 +47,19 @@ export default function QuizView({ lessonId, config }: Props) {
   const [graded, setGraded] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [sourceHrefs, setSourceHrefs] = useState<Record<string, string>>({});
+  const [identity, setIdentity] = useState('guest');
   const progress = useLessonState();
 
-  const questions = config.questions ?? [];
+  // Which paper this student sits. Identical to the authored order unless the
+  // lesson opts into `shuffle` or `variants`; see lib/quiz-variant.ts.
+  const view = useMemo(
+    () => buildQuizView(config, lessonId, identity),
+    [config, lessonId, identity],
+  );
+  const questions = view.questions.map((v) => v.question);
+  // A test, not a module quiz: see QuizConfig.summative.
+  const summative = !!config.summative;
+  const locked = summative && graded;
   const answeredCount = questions.filter((q) => answers[q.id] !== undefined).length;
   const allAnswered = answeredCount === questions.length && questions.length > 0;
   const correctCount = countCorrect(questions, answers);
@@ -74,8 +86,15 @@ export default function QuizView({ lessonId, config }: Props) {
     let cancelled = false;
     const local = loadState(lessonId);
     (async () => {
-      const serverDraft = progress.authed ? await fetchDraft(lessonId) : null;
+      // The email seeds the form assignment, so it has to land before the
+      // first paint -- a quiz drawn as 'guest' and then re-drawn as the
+      // student would visibly re-order itself under them.
+      const [user, serverDraft] = await Promise.all([
+        getCurrentUser(),
+        progress.authed ? fetchDraft(lessonId) : Promise.resolve(null),
+      ]);
       if (cancelled) return;
+      if (user?.email) setIdentity(user.email);
       let next: StoredState = local;
       if (serverDraft?.response) {
         try {
@@ -100,7 +119,12 @@ export default function QuizView({ lessonId, config }: Props) {
     saveState(lessonId, { answers, graded });
   }, [answers, graded, lessonId, loaded]);
 
+  // `index` is the option's index in the AUTHORED options array, never where
+  // it was drawn. That is what lets a shuffled quiz share its storage, its
+  // grading and its submission record with an unshuffled one.
   function pick(questionId: string, index: number) {
+    // A submitted test is final -- the paper does not reopen.
+    if (locked) return;
     // Stale marks mislead more than no marks, so changing anything clears them.
     setGraded(false);
     setAnswers((prev) => ({ ...prev, [questionId]: index }));
@@ -111,7 +135,10 @@ export default function QuizView({ lessonId, config }: Props) {
     setGraded(true);
     const payload = JSON.stringify({ answers, graded: true });
 
-    if (correctCount >= needed) {
+    // Green-to-advance on a test means "you sat it", never "you passed it".
+    // Gating the next part behind a score would strand a student halfway
+    // through their own exam.
+    if (summative || correctCount >= needed) {
       await recordLessonCompleted(lessonId, correctCount);
       setTimeout(() => navigateToNextLesson(lessonId), 1800);
     }
@@ -120,6 +147,7 @@ export default function QuizView({ lessonId, config }: Props) {
         lessonId,
         response: payload,
         gradeJson: {
+          variant: view.variant,
           quiz: questions.map((q) => ({
             id: q.id,
             picked: answers[q.id],
@@ -152,14 +180,17 @@ export default function QuizView({ lessonId, config }: Props) {
         Check your understanding
       </h2>
       <p style={{ color: '#888', fontSize: 13, margin: '0 0 20px' }}>
-        Pick the answer that fits best for each question. You need {needed} of {questions.length}{' '}
-        right to move on, and you can change your answers and try again as many times as you like.
+        {summative
+          ? `Answer all ${questions.length}. You can change an answer as often as you like before you submit, but submitting is final and nothing is marked here — your teacher hands the score back.`
+          : `Pick the answer that fits best for each question. You need ${needed} of ${questions.length} right to move on, and you can change your answers and try again as many times as you like.`}
       </p>
 
-      {questions.map((q, qi) => {
+      {view.questions.map(({ question: q, order }, qi) => {
         const picked = answers[q.id];
-        const isCorrect = graded && picked === q.answer;
-        const isWrong = graded && picked !== undefined && picked !== q.answer;
+        // Under summative marking nothing is revealed, so the card never
+        // turns green or red and no explanation is drawn.
+        const isCorrect = !summative && graded && picked === q.answer;
+        const isWrong = !summative && graded && picked !== undefined && picked !== q.answer;
         return (
           <div
             key={q.id}
@@ -206,13 +237,14 @@ export default function QuizView({ lessonId, config }: Props) {
             ) : null}
 
             <div style={{ marginLeft: 30 }}>
-              {q.options.map((opt, oi) => {
+              {order.map((oi) => {
+                const opt = q.options[oi];
                 const selected = picked === oi;
                 // Green the right option only once it's been earned — either the
                 // student picked it, or they've passed. Marking it on a failed
                 // attempt turns "try again" into "click the green one".
-                const markAsAnswer = graded && oi === q.answer && (isCorrect || passed);
-                const markAsMistake = graded && selected && oi !== q.answer;
+                const markAsAnswer = !summative && graded && oi === q.answer && (isCorrect || passed);
+                const markAsMistake = !summative && graded && selected && oi !== q.answer;
                 return (
                   <label
                     key={oi}
@@ -240,6 +272,7 @@ export default function QuizView({ lessonId, config }: Props) {
                       type="radio"
                       name={q.id}
                       checked={selected}
+                      disabled={locked}
                       onChange={() => pick(q.id, oi)}
                       style={{ marginTop: 3, accentColor: '#bd93f9' }}
                     />
@@ -249,7 +282,7 @@ export default function QuizView({ lessonId, config }: Props) {
               })}
             </div>
 
-            {graded ? (
+            {graded && !summative ? (
               <div
                 style={{
                   marginLeft: 30,
@@ -304,7 +337,7 @@ export default function QuizView({ lessonId, config }: Props) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 18, flexWrap: 'wrap' }}>
         <button
           onClick={submit}
-          disabled={!allAnswered}
+          disabled={!allAnswered || locked}
           style={{
             background: allAnswered ? '#bd93f9' : '#44475a',
             color: allAnswered ? '#282a36' : '#888',
@@ -316,7 +349,13 @@ export default function QuizView({ lessonId, config }: Props) {
             cursor: allAnswered ? 'pointer' : 'not-allowed',
           }}
         >
-          {graded ? 'Check again' : 'Check my answers'}
+          {summative
+            ? locked
+              ? 'Submitted'
+              : 'Submit my answers'
+            : graded
+              ? 'Check again'
+              : 'Check my answers'}
         </button>
 
         {!allAnswered ? (
@@ -326,7 +365,16 @@ export default function QuizView({ lessonId, config }: Props) {
           </span>
         ) : null}
 
-        {graded ? (
+        {graded && summative ? (
+          <span
+            style={{ color: '#50fa7b', fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            <CircleCheck size={16} />
+            Submitted — all {questions.length} answers are with your teacher.
+          </span>
+        ) : null}
+
+        {graded && !summative ? (
           <span
             style={{
               color: passed ? '#50fa7b' : '#ffb86c',

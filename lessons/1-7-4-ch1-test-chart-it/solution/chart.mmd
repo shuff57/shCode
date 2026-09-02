@@ -1,0 +1,19 @@
+flowchart TD
+  A([Start])
+  B[Get the number of textbooks and what one textbook weighs]
+  C[Get the student's own weight]
+  D[Work out the backpack weight: books times the weight of one]
+  E[Work out the guideline: one tenth of the student's weight]
+  F{Is the backpack weight at or under the guideline?}
+  G[Report that the backpack is a safe weight]
+  H[Report that the backpack is over the guideline]
+  Z([End])
+  A --> B
+  B --> C
+  C --> D
+  D --> E
+  E --> F
+  F -->|yes| G
+  F -->|no| H
+  G --> Z
+  H --> Z

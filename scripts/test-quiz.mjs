@@ -59,9 +59,21 @@ for (const dir of fs.readdirSync(LESSONS)) {
   // still reads like the lesson is AI-graded.
   if (lesson.aiGrader) fail(dir, 'has both `quiz` and `aiGrader` — the aiGrader is dead config');
 
-  const { passPercent, questions } = lesson.quiz;
+  const { passPercent, questions, shuffle, variants } = lesson.quiz;
   if (passPercent !== undefined && (!Number.isFinite(passPercent) || passPercent <= 0 || passPercent > 100)) {
     fail(dir, `passPercent ${passPercent} is not a percentage between 1 and 100`);
+  }
+  if (shuffle !== undefined && typeof shuffle !== 'boolean') {
+    fail(dir, `shuffle must be true or false, not ${JSON.stringify(shuffle)}`);
+  }
+  if (variants !== undefined) {
+    if (!Array.isArray(variants) || variants.length < 2) {
+      fail(dir, 'variants must list at least two form labels, e.g. ["a", "b", "c"]');
+    } else if (variants.some((v) => typeof v !== 'string' || !v.trim())) {
+      fail(dir, 'a variant label is empty or not a string');
+    } else if (new Set(variants).size !== variants.length) {
+      fail(dir, `duplicate variant label in ${JSON.stringify(variants)}`);
+    }
   }
   if (!Array.isArray(questions) || questions.length === 0) {
     fail(dir, 'quiz.questions is missing or empty');
@@ -95,12 +107,54 @@ for (const dir of fs.readdirSync(LESSONS)) {
     if (!Number.isInteger(q.answer) || q.answer < 0 || q.answer >= q.options.length) {
       fail(at, `answer ${q.answer} is not a valid index into ${q.options.length} options`);
     }
+
+    if (q.variant !== undefined) {
+      if (!Array.isArray(variants) || !variants.includes(q.variant)) {
+        fail(at, `variant "${q.variant}" is not one of the quiz's ${JSON.stringify(variants ?? null)}`);
+      }
+    }
+
+    // Under shuffling an option has no fixed position, so prose that points at
+    // one becomes a lie. This is strict on purpose: shuffle is opt-in, so the
+    // cost of a false positive is one rewritten sentence in a lesson the
+    // author is already writing, and the cost of a miss is a graded test
+    // telling a student to look at an option that moved.
+    if (shuffle) {
+      const prose = [q.question, q.explanation, ...(q.options ?? [])].join(' ');
+      const ordinal = prose.match(/\b(first|second|third|fourth|fifth|last)\b/i);
+      if (ordinal) {
+        fail(at, `shuffled quiz, but the wording says "${ordinal[0]}" -- positions move per student`);
+      }
+      if (/\boption\s*\d/i.test(prose)) {
+        fail(at, 'shuffled quiz, but the wording numbers an option -- positions move per student');
+      }
+    }
   });
+
+  // Every form has to be the same test. A student on form "b" answering four
+  // questions while form "a" answers six is not a retake, it is a different
+  // exam, and passThreshold would quietly move under them too.
+  if (Array.isArray(variants) && variants.length >= 2) {
+    const common = questions.filter((q) => q.variant === undefined).length;
+    const sizes = variants.map((v) => ({
+      variant: v,
+      size: common + questions.filter((q) => q.variant === v).length,
+    }));
+    const distinct = new Set(sizes.map((s) => s.size));
+    if (distinct.size !== 1) {
+      fail(dir, `forms are different lengths: ${sizes.map((s) => `${s.variant}=${s.size}`).join(', ')}`);
+    }
+    const orphan = questions.find((q) => q.variant !== undefined && !variants.includes(q.variant));
+    if (orphan) fail(dir, `question "${orphan.id}" is tagged for a form that does not exist`);
+  } else if (questions.some((q) => q.variant !== undefined)) {
+    fail(dir, 'questions are tagged with a variant but the quiz declares no `variants` -- every student would see all of them');
+  }
 
   // A quiz whose correct answers are all in the same slot is guessable without
   // reading a word of it.
+  // Shuffling already scatters them, so the check only applies to a fixed quiz.
   const slots = questions.map((q) => q.answer);
-  if (questions.length >= 4 && new Set(slots).size === 1) {
+  if (!shuffle && questions.length >= 4 && new Set(slots).size === 1) {
     fail(dir, `every correct answer is option ${slots[0] + 1} — shuffle them`);
   }
 }
