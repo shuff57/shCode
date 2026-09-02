@@ -873,7 +873,18 @@ function chamferBox(size, center, c) {
 function extrudeOnPlane(sketch, height, plane, offset) {
   const solid = extrudeLinear(height, sketch)
   if (plane === 'xz') return transforms.translate([0, offset, 0], transforms.rotateX(Math.PI / 2, solid))
-  if (plane === 'yz') return transforms.translate([offset, 0, 0], transforms.rotateY(-Math.PI / 2, solid))
+  // TWO turns, not one, and the reason is that a single rotateY(-90) puts the
+  // sketch's ACROSS on world Z and its UP on world Y -- transposed from what
+  // the Rules panel and the drag handles mean by those words. Measured
+  // 2026-09-01 in a browser: a sketch sat on Side and pulled produced a solid
+  // standing upright while its own outline lay flat on the ground, in a
+  // different plane entirely.
+  //
+  // rotateX(90) then rotateZ(90) sends across->+Y, up->+Z and the pull->+X,
+  // which is what "Side" means to a person: across is depth, up is height.
+  // lib/model-handles.ts has always used that convention for the handles; this
+  // is the geometry catching up to it rather than the other way round.
+  if (plane === 'yz') return transforms.translate([offset, 0, 0], transforms.rotateZ(Math.PI / 2, transforms.rotateX(Math.PI / 2, solid)))
   return transforms.translate([0, 0, offset], solid)
 }`,
   blendOnPlane: `// Skin two flat outlines into one tapered solid -- a loft.

@@ -133,7 +133,7 @@ function coneOf(oc: Occt, radius: number, height: number): any {
 const PLANE_AXES: Record<string, { u: Vec3; v: Vec3; n: Vec3; dir: number }> = {
   xy: { u: [1, 0, 0], v: [0, 1, 0], n: [0, 0, 1], dir: 1 },
   xz: { u: [1, 0, 0], v: [0, 0, 1], n: [0, 1, 0], dir: -1 },
-  yz: { u: [0, 0, 1], v: [0, 1, 0], n: [1, 0, 0], dir: -1 },
+  yz: { u: [0, 1, 0], v: [0, 0, 1], n: [1, 0, 0], dir: 1 },
 };
 
 /** A sketch point in plane coordinates, placed in the world. Mirrors the
