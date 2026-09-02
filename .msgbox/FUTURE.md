@@ -19,17 +19,48 @@ These are PER STUDENT and a classroom shares one pipe: twenty-five first
 visits at once move 172 MB, so the bottom row is a floor rather than a worst
 case. A repeat visit is the top row, because the browser caches it.
 
-**Nothing is decided here.** Three shapes the answer could take, and the
-numbers do not pick between them on their own:
+**JSCAD IS NOT STAYING** (operator, 2026-09-02). The first version of this
+entry offered "keep JSCAD for the taught path and serve B-rep per lesson" as
+one of three options. It is not an option, and removing it changes what the
+42 s means: there is no fallback engine, so every student pays that cost on
+their first modelling lesson and the load has to be SOLVED rather than routed
+around.
 
-- Switch the preview and show a real loading state. Honest, and 42 s is a long
-  time to hold a class.
-- Keep JSCAD for the taught path and offer the B-rep engine per lesson --
-  `lesson.preview` already selects a runner, so the machinery exists.
-- Warm the cache deliberately: fetch the kernel on the module index page so it
-  is already there by the time a student opens the first modelling lesson.
+What is left:
 
-The third is worth pricing before choosing between the first two.
+- Warm the cache deliberately -- fetch the kernel from the module index so the
+  download happens while a student is reading, not while they are waiting on a
+  model. Cheapest thing available and it may dissolve the problem.
+- A loading state, regardless. 42 s of blank canvas is not acceptable even if
+  it is rare.
+- Trim the wasm. We call 50 of the 498 bound classes; the payload carries the
+  other 90% and whatever OCCT they drag in.
+
+### The binding rebuild is now the critical path, and it fixes two things
+
+A custom OpenCascade build was already the way to shrink the download. It is
+ALSO the only way to get `BRepBuilderAPI_GTransform`, and with JSCAD gone that
+stops being a queued nicety: non-uniform scale is taught -- the docs page is
+titled "scale: bigger, smaller, squashed" and its worked line is
+`scale([3, 1, 1], shape)`, "how a circle becomes an oval" -- and there is no
+longer an engine that can do it. Same for `ellipsoid`, `scaleZ` and a general
+`transform` matrix, which all hit the same missing binding.
+
+So one piece of work -- rebuilding `replicad-opencascadejs` with our own
+binding list -- both cuts the payload and unblocks four taught names. It
+should be priced before anything else.
+
+### And every documented page now has to run
+
+With no fallback, the 19 pages blocked on an unported name and the 27 that
+refuse are no longer curiosities; they are either work or doc edits. Largest
+first: `vectorText` and its font table (7 pages), `project` via HLR (2),
+`roundRadius`, `twistAngle`, `innerSegments`, `geodesicSphere`, `minkowski`,
+`path2`'s curve builders, `expand`, `arc`, `measureEpsilon`.
+
+Some of those should be doc edits rather than code: a page whose whole subject
+is `segments` is teaching a mesh idea that the new kernel does not have, and
+rewriting it is more honest than emulating a facet count.
 
 ## The 17 doc pages the kernel swap does not carry (2026-09-02)
 
