@@ -24,13 +24,49 @@
 # by hand, or the build and the code drift apart silently -- the build would
 # still succeed and a name would simply be missing at runtime.
 #
-# WHAT THIS DOES NOT PROMISE. An identifier count is not a byte count, and the
-# shipped wasm has its name section stripped so bytes cannot be attributed to
-# packages without building. The linker decides the real saving: these 46
-# classes still drag in booleans, filleting, offsets, meshing and the whole
-# geometry and topology base, which is most of the modelling half of OpenCascade.
-# What is genuinely removable is the data exchange. Visualisation and IGES are
-# already absent from the current build, so they are not available as savings.
+# BUILT AND MEASURED, 2026-09-02. Two iterations, about nine minutes each, on
+# donalffons/opencascade.js:latest.
+#
+#                    uncompressed   gzip -9    exports
+#   stock replicad      21.91 MB    6.87 MB      498
+#   this list           11.35 MB    3.82 MB      370
+#                          -48%       -44%
+#
+# Verified working against the same arithmetic the OCCT suite uses:
+#
+#   box 10x20x30                 6000.0000   exact
+#   cylinder r12 h30            13571.6803   the analytic value, exact
+#   boolean cut                  5410.9514   builds
+#   non-uniform scale x3 in x   18000.0000   EXACT -- the thing the stock
+#                                            build cannot do at all
+#
+# The STEP stack is gone: StepBasic, AUTOMOTIVE_DESIGN and IFSelect all match
+# zero times in the new binary, against 299 for StepBasic alone in the stock one.
+#
+# TWO INCOMPATIBILITIES ANY SWITCH MUST HANDLE. Neither is a defect; both are
+# differences between two builds of the same library, and both fail loudly at
+# the first call rather than silently.
+#
+#   1. OVERLOADS ARE SUFFIXED HERE. `new oc.GProp_GProps()` throws "has no
+#      accessible constructor"; `GProp_GProps_1` works. The stock build resolves
+#      overloads itself and takes the unsuffixed name -- which is what all of
+#      lib/occt-*.ts is written against, and it is the exact trap this session
+#      already hit once in the other direction ("mk.Add_2 is not a function").
+#      BRepBuilderAPI_GTransform_2 is the shape-taking overload; _1 takes only
+#      the transform.
+#
+#   2. THE SHAPE LIST IS RENAMED, from NCollection_List_TopoDS_Shape to
+#      TopTools_ListOfShape. lib/topo-history.ts constructs one to copy a
+#      boolean's Modified() output, which is the load-bearing part of face
+#      naming.
+#
+# AND THE FAILURE MODE OF A LEAF-ONLY LIST, because it cost an iteration. The
+# first attempt listed only the classes lib/ calls. It BUILT, the module LOADED,
+# the exports were all present in Object.keys -- and every constructor threw
+# "Cannot construct BRepPrimAPI_MakeBox due to unbound types:
+# BRepBuilderAPI_MakeShape". embind cannot construct a class whose base is not
+# also bound. A list derived by grepping call sites finds only leaves, so the
+# bases below were added by reading the hierarchy.
 
 mainBuild:
   name: reshape.js
@@ -99,7 +135,81 @@ mainBuild:
 
     # ---- plumbing --------------------------------------------------------
     - symbol: Message_ProgressRange
-    - symbol: NCollection_List<TopoDS_Shape>
+    # NOT NCollection_List<TopoDS_Shape>, and not the
+    # NCollection_List_TopoDS_Shape the current build exposes. Verified against
+    # the image's own binding tree: the shape list is bound under its OCCT
+    # typedef, TopTools_ListOfShape.
+    #
+    # This is a REAL INCOMPATIBILITY, not a spelling. lib/topo-history.ts calls
+    # `new oc.NCollection_List_TopoDS_Shape()` to copy a boolean's Modified()
+    # list, and that name will not exist on a custom build. Any switch has to
+    # change it, and the 120-check suite is what will catch it.
+    - symbol: TopTools_ListOfShape
+
+    # ---- BASE CLASSES, which embind needs and a leaf-only list omits -------
+    #
+    # MEASURED, first build attempt 2026-09-02. The build SUCCEEDED and the
+    # module loaded with 284 exports, and then every constructor threw
+    # "Cannot construct BRepPrimAPI_MakeBox due to unbound types:
+    # 24BRepBuilderAPI_MakeShape". embind will not construct a class whose base
+    # is not itself bound -- it cannot, because it has no way to represent the
+    # inherited half.
+    #
+    # This is the failure mode a leaf-only list produces, and it is worth
+    # naming: the build does not warn, the module loads, the export appears in
+    # Object.keys, and the error arrives at the first `new`. A list derived by
+    # grepping call sites can only ever find leaves, so the bases have to be
+    # added by reading the class hierarchy.
+    - symbol: Standard_Transient
+    - symbol: BRepBuilderAPI_Command
+    - symbol: BRepBuilderAPI_MakeShape
+    - symbol: BRepBuilderAPI_ModifyShape
+    - symbol: BRepPrimAPI_MakeOneAxis
+    - symbol: BRepPrimAPI_MakeSweep
+    - symbol: BRepBuilderAPI_MakeVertex
+    - symbol: BRepFilletAPI_LocalOperation
+    - symbol: BRepAlgoAPI_Algo
+    - symbol: BRepAlgoAPI_BuilderAlgo
+    - symbol: BRepAlgoAPI_BooleanOperation
+    - symbol: BRepOffsetAPI_MakeFilling
+
+    # ---- the shape types themselves ---------------------------------------
+    #
+    # Every builder above returns one of these, and TopoDS's downcasts take and
+    # return them. Omitting them is the same unbound-type failure one level out.
+    - symbol: TopoDS_Shape
+    - symbol: TopoDS_Vertex
+    - symbol: TopoDS_Edge
+    - symbol: TopoDS_Wire
+    - symbol: TopoDS_Face
+    - symbol: TopoDS_Shell
+    - symbol: TopoDS_Solid
+    - symbol: TopoDS_Compound
+    - symbol: TopoDS_CompSolid
+    - symbol: TopAbs_ShapeEnum
+    - symbol: TopAbs_Orientation
+
+    # ---- value types the signatures mention -------------------------------
+    - symbol: gp_XYZ
+    - symbol: gp_Mat
+    - symbol: gp_Ax3
+    - symbol: gp_Pnt2d
+    - symbol: gp_Dir2d
+    - symbol: gp_Vec2d
+    - symbol: gp_Trsf2d
+    - symbol: Geom_Surface
+    - symbol: Geom_Curve
+    - symbol: Geom_Plane
+    - symbol: Geom_CylindricalSurface
+    - symbol: Geom2d_Curve
+    - symbol: Poly_Triangulation
+    - symbol: Poly_Triangle
+    - symbol: GeomAbs_JoinType
+    - symbol: GeomAbs_Shape
+    - symbol: ChFi3d_FilletShape
+    - symbol: Message_ProgressScope
+    - symbol: Bnd_Box2d
+
 
 # Deliberately NOT bound, and each for a stated reason rather than by omission:
 #

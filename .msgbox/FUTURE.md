@@ -3,6 +3,56 @@
 Ideas parked for later. Not scheduled, not specced. Newest first.
 Lives beside `log.jsonl` so it ships with the repo and travels between machines.
 
+## A custom kernel build cuts the download 44% (2026-09-02)
+
+Built and measured, not estimated. `scripts/occt-bindings.yml` is the class
+list; two iterations on `donalffons/opencascade.js:latest`, about nine minutes
+each.
+
+|  | uncompressed | gzip -9 | exports |
+| --- | --- | --- | --- |
+| stock replicad-opencascadejs | 21.91 MB | 6.87 MB | 498 |
+| our list | 11.35 MB | **3.82 MB** | 370 |
+
+Verified working against the same arithmetic the OCCT suite uses: a box
+measures exactly 6000, a cylinder exactly 13571.6803, booleans build, and
+**non-uniform scale comes out exactly 18000 for a 3x stretch** -- the operation
+the stock build cannot perform at all, which is what `scale([3, 1, 1], shape)`
+needs and what four taught names are blocked on.
+
+The saving is the ISO 10303 STEP stack. `StepBasic`, `AUTOMOTIVE_DESIGN` and
+`IFSelect` match zero times in the new binary against 299 for `StepBasic` alone
+in the stock one. A CAD application imports STEP files; reSHape does not.
+
+### What this does to the 42 seconds
+
+On the measured 1.5 Mbps shared-wifi profile, 6.87 MB took 42 s. 3.82 MB is
+roughly 24 s. Better, and still not good. **This is a necessary piece and not a
+sufficient one** -- cache warming is still the thing that decides whether a
+student waits at all, and it is now the cheaper of the two remaining levers.
+
+### Before it can be adopted
+
+Two renames, both of which fail loudly at the first call:
+
+- Overloads are **suffixed** in a custom build. `new oc.GProp_GProps()` throws;
+  `GProp_GProps_1` works. All of `lib/occt-*.ts` uses unsuffixed names, because
+  the stock build resolves overloads itself. `BRepBuilderAPI_GTransform_2` is
+  the shape-taking overload.
+- `NCollection_List_TopoDS_Shape` becomes `TopTools_ListOfShape`, which
+  `lib/topo-history.ts` constructs to copy a boolean's `Modified()` list.
+
+The 120-check OCCT suite is what proves a switch, and it is the reason the
+switch is safe to attempt at all.
+
+### One trap worth carrying forward
+
+The first build listed only the classes `lib/` calls. It built, the module
+loaded, every export was present in `Object.keys` -- and every constructor threw
+`Cannot construct BRepPrimAPI_MakeBox due to unbound types:
+BRepBuilderAPI_MakeShape`. embind will not construct a class whose base is not
+also bound, and a list derived by grepping call sites can only ever find leaves.
+
 ## The new vocabulary: keep the names, fix what misleads (2026-09-02)
 
 Operator decision, taken once it was settled that the book and lessons are
