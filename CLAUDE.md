@@ -120,7 +120,8 @@ Cloudflare dashboard env vars pane (plain vars):
 ## D1 schema
 
 Applied in migration order. Every ALTER/CREATE uses `IF NOT EXISTS` so re-applies
-are safe. Apply with `npx wrangler d1 migrations apply shcode-commits --remote`.
+are safe. Apply with `npm run d1:migrate` (see Build + deploy — that wrapper
+retries Cloudflare's transient failures; bare `wrangler` does not).
 
 ### Table highlights
 
@@ -221,9 +222,19 @@ npm run dev            # port 3002
 npm run build                                                   # static export to ./out
 npx wrangler pages deploy out --project-name shcode --branch cs-3d
 
-# D1 migrations
-npx wrangler d1 migrations apply shcode-commits --remote        # prod
-npx wrangler d1 migrations apply shcode-commits --local         # local dev DB
+# D1 migrations. Go through scripts/d1.mjs, not bare wrangler -- it retries the
+# transient Cloudflare failures and, when retries run out, tells you whether the
+# problem is Cloudflare or your credentials.
+npm run d1:status                                               # what's applied in prod
+npm run d1:migrate                                              # prod
+npm run d1 -- migrations apply shcode-commits --local           # local dev DB
+
+# A `--remote` d1 command can fail with "The given account is not valid or is not
+# authorized to access this service [code: 7403]" and mean nothing at all --
+# observed 2026-09-02, transient, gone on the next attempt with no re-auth.
+# It is NOT a login problem: `wrangler d1 list` kept working on the same token
+# throughout. The wrapper above absorbs this. If you ran bare wrangler and hit
+# it, retry once before touching `wrangler login`, token scopes, or database_id.
 
 # R2 bucket for image uploads — ONE TIME, before uploads will work at all.
 # Without it POST /api/uploads returns 500 "Uploads are not configured".

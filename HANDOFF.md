@@ -1217,9 +1217,17 @@ request). Restart the dev server after editing a lesson before trusting a browse
 not mean abandoned; it means someone else is mid-task. Check mtimes and stage explicit
 paths. Blanket staging has swept another session's work into a commit twice.
 
-**Run `wrangler d1 migrations list --remote` before applying.** The ledger drifted once
-because migration files were hand-run with `d1 execute`, which does not write it. As of
-2026-08-22 the ledger is current through 0015 and matches the data.
+**Run `npm run d1:status` before applying.** The ledger drifted once because migration
+files were hand-run with `d1 execute`, which does not write it. As of 2026-09-02 the
+ledger is current through 0023 and matches the data.
+
+**Use `npm run d1:status` / `npm run d1:migrate`, not bare wrangler.** Both go through
+`scripts/d1.mjs`, which retries the transient Cloudflare failures. The one that costs a
+debugging cycle is `[code: 7403] The given account is not valid or is not authorized`:
+it reads like an expired login and is not one. Seen 2026-09-02 mid-deploy, gone on the
+next attempt with no re-auth, while `wrangler d1 list` — same account, same token —
+worked the whole time. When the wrapper does give up it runs that probe for you and says
+which of the three it is: Cloudflare flaking, network down, or credentials actually wrong.
 
 ## 6. moSHion decisions worth keeping (distilled from the file that stays behind)
 
