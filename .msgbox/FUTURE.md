@@ -3,6 +3,34 @@
 Ideas parked for later. Not scheduled, not specced. Newest first.
 Lives beside `log.jsonl` so it ships with the repo and travels between machines.
 
+## What the B-rep preview would cost a student (2026-09-02)
+
+Measured, cold cache, per profile. `scripts/measure-brep-load.py` re-runs it.
+
+| connection | kernel init | kernel to pixels | wall clock |
+| --- | --- | --- | --- |
+| localhost (or a repeat visit) | 1.3 s | 1.6 s | 1.8 s |
+| fast 4G, 20 Mbps | 3.4 s | 3.9 s | 4.1 s |
+| slow 4G, 4 Mbps | 15.3 s | 16.1 s | 16.6 s |
+| shared wifi, 1.5 Mbps | 39.9 s | 41.1 s | **42.1 s** |
+
+The wasm is 6.87 MB gzipped and must arrive before the first frame draws.
+These are PER STUDENT and a classroom shares one pipe: twenty-five first
+visits at once move 172 MB, so the bottom row is a floor rather than a worst
+case. A repeat visit is the top row, because the browser caches it.
+
+**Nothing is decided here.** Three shapes the answer could take, and the
+numbers do not pick between them on their own:
+
+- Switch the preview and show a real loading state. Honest, and 42 s is a long
+  time to hold a class.
+- Keep JSCAD for the taught path and offer the B-rep engine per lesson --
+  `lesson.preview` already selects a runner, so the machinery exists.
+- Warm the cache deliberately: fetch the kernel on the module index page so it
+  is already there by the time a student opens the first modelling lesson.
+
+The third is worth pricing before choosing between the first two.
+
 ## The 17 doc pages the kernel swap does not carry (2026-09-02)
 
 `lib/script-surface.ts` classifies all 75 API names the 183 documented examples
