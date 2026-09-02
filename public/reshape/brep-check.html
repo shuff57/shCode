@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>reSHape B-rep sandbox check</title>
+<!--
+  Opens brep.html in an iframe with the EXACT sandbox attributes
+  components/ReshapePreview.tsx uses, so what is measured is what a student's
+  preview would actually be.
+
+  The attributes are the whole point, and copying them is not a convenience:
+  `allow-same-origin` is deliberately absent from the real preview so that
+  student code cannot call /api/* with the session cookie attached, and that
+  absence is exactly what puts the frame in an opaque origin and makes every ES
+  module and wasm fetch a CORS request. Test it in a permissive frame and it
+  passes for a reason that will not be there in production.
+
+  Serve it from the app so the /reshape/kernel/ headers apply:
+
+      npm run dev   ->   http://localhost:3002/reshape/brep-check.html
+-->
+<style>
+  html, body { margin: 0; height: 100%; background: #191a21; color: #f8f8f2;
+    font: 13px/1.6 ui-monospace, Menlo, Consolas, monospace; display: flex;
+    flex-direction: column; }
+  header { padding: 8px 14px; border-bottom: 1px solid #44475a; color: #6272a4; }
+  #verdict { font-weight: 700; }
+  iframe { flex: 1 1 auto; width: 100%; border: 0; }
+</style>
+</head>
+<body>
+<header>
+  sandbox="allow-scripts allow-downloads" — the real preview's attributes, no allow-same-origin &nbsp;·&nbsp;
+  <span id="verdict">running…</span>
+</header>
+<iframe
+  id="probe"
+  sandbox="allow-scripts allow-downloads"
+  allow="fullscreen"
+  src="./brep.html"></iframe>
+<script>
+  // The frame is opaque, so its contentDocument is unreachable by design. The
+  // report has to arrive by message, and it is filtered by event.source rather
+  // than by origin -- an opaque frame's origin is "null", which is not a thing
+  // worth comparing against. Same rule the real preview parent follows.
+  var frame = document.getElementById('probe');
+  var verdict = document.getElementById('verdict');
+  window.addEventListener('message', function (e) {
+    if (e.source !== frame.contentWindow) return;
+    if (!e.data || e.data.type !== 'brep-probe') return;
+    var r = e.data.report;
+    verdict.textContent = r.ok ? 'PASS' : 'FAIL — ' + (r.error || 'see the panel');
+    verdict.style.color = r.ok ? '#50fa7b' : '#ff5555';
+    document.title = r.ok ? 'BREP OK' : 'BREP FAILED';
+    window.__brepReport = r;
+  });
+  setTimeout(function () {
+    if (verdict.textContent === 'running…') {
+      verdict.textContent = 'FAIL — no report after 60s';
+      verdict.style.color = '#ff5555';
+      document.title = 'BREP FAILED';
+    }
+  }, 60000);
+</script>
+</body>
+</html>

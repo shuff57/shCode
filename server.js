@@ -91,6 +91,29 @@ function stripJsComments(src) {
 app.prepare().then(() => {
   const server = express();
 
+  // ---- public/_headers, for the one prefix that cannot work without it ----
+  //
+  // Cloudflare Pages reads public/_headers; this Express server does not, so
+  // without this the local preview and production differ on exactly the thing
+  // that makes the B-rep kernel loadable at all.
+  //
+  // The preview iframe is sandboxed WITHOUT allow-same-origin, which puts it in
+  // an OPAQUE origin, so its fetches carry `Origin: null`. A classic
+  // <script src> is no-cors and loads fine -- which is why JSCAD never needed
+  // this -- but an ES module is always fetched in CORS mode, and so is the wasm
+  // an emscripten module pulls in. Missing header, and the kernel is blocked
+  // before its wasm is even requested.
+  //
+  // Failing only in dev would be bad enough; the reverse is worse. Whichever way
+  // round it went, the difference would be found by a person, in a classroom.
+  // Kept deliberately narrow to the same prefix public/_headers grants, and
+  // NOT applied to /api/*, which stays same-origin and cookie-gated.
+  server.use('/reshape/kernel', (_req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    next();
+  });
+
   // ---- Dev-only auth + lesson-state stubs --------------------------------
   // The real /api/auth/* and /api/lesson-state* are Cloudflare Pages
   // Functions (functions/api/**), which this local Express server does NOT

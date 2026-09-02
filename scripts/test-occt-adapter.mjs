@@ -53,7 +53,7 @@ try {
       path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
       'lib/occt-build.ts', 'lib/model-types.ts', 'lib/sketch-arc.ts', 'lib/topo-resolve.ts',
       'lib/topo-history.ts', 'lib/topo-name.ts',
-      'lib/script-surface.ts', 'lib/hull.ts',
+      'lib/script-surface.ts', 'lib/hull.ts', 'lib/occt-mesh.ts',
       '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',
     ],
     { cwd: root, stdio: 'inherit' },
@@ -82,6 +82,7 @@ try {
   globalThis.__name = naming;
   globalThis.__surface = require(path.join(out, 'script-surface.js'));
   globalThis.__hull = require(path.join(out, 'hull.js'));
+  globalThis.__mesh = require(path.join(out, 'occt-mesh.js'));
 
   // The fixtures this slice claims: primitives, booleans, move, mirror.
   const DOCS = {
@@ -742,6 +743,151 @@ console.log('');
   check('...and the two independent volumes agree to ten digits',
     Math.abs(vol3(hullSolid) - hull.hullVolume(CUBE, h)) < 1e-9 * 1000,
     'kernel ' + vol3(hullSolid) + ' vs ours ' + hull.hullVolume(CUBE, h));
+}
+
+
+// ---------------------------------------------------------------------------
+// TESSELLATION: THE STEP THAT MAKES ANY OF THIS VISIBLE
+// ---------------------------------------------------------------------------
+//
+// Every slice before this one ended at a volume number. A B-rep holds surfaces
+// and trimming curves; a GPU draws triangles and nothing else, so until there
+// was a bridge the whole conversion could be measured and not seen.
+//
+// The two traps are silent, so both are measured rather than reasoned about: a
+// face's TopLoc_Location (ignore it and every moved copy stacks at the origin)
+// and its orientation (a REVERSED face's triangles are wound for the surface,
+// not the solid). Neither throws. The SIGNED volume catches the second, which is
+// why signedVolume exists at all -- an unsigned one cannot tell a correct mesh
+// from a wholly inverted one.
+
+{
+  const occ = globalThis.__oc;
+  const mesh = globalThis.__mesh;
+  const exactCyl = Math.PI * 144 * 30;
+
+  // ---- flat shapes are exact, and cost nothing extra ----------------------
+  const box = new occ.BRepPrimAPI_MakeBox(10, 10, 10).Shape();
+  const bg = mesh.tessellate(occ, box, { deflection: 0.05 });
+  check('a box tessellates to exactly twelve triangles',
+    mesh.triangleCount(bg) === 12, String(mesh.triangleCount(bg)));
+  check('...enclosing exactly its own volume',
+    Math.abs(mesh.signedVolume(bg) - 1000) < 1e-9, String(mesh.signedVolume(bg)));
+
+  // THE ORIENTATION CONTROL. Positive is not incidental: a box's six faces come
+  // back three FORWARD and three REVERSED, so a build that ignored orientation
+  // would put half of them inside-out and land nowhere near +1000. Asserting the
+  // SIGN separately from the magnitude is what makes that a real check.
+  check('...with a POSITIVE sign, so the winding is outward not inward',
+    mesh.signedVolume(bg) > 0, String(mesh.signedVolume(bg)));
+
+  // Flat faces need no more triangles when the dial is turned up, which is the
+  // control proving deflection only spends detail on curvature.
+  const coarse = mesh.tessellate(occ, new occ.BRepPrimAPI_MakeBox(10, 10, 10).Shape(),
+    { deflection: 1 });
+  check('CONTROL: a loose deflection does not coarsen a flat shape',
+    mesh.triangleCount(coarse) === 12
+      && Math.abs(mesh.signedVolume(coarse) - 1000) < 1e-9,
+    mesh.triangleCount(coarse) + ' tris, ' + mesh.signedVolume(coarse));
+
+  // ---- curved shapes approach the truth as the dial tightens --------------
+  const at = (d) => {
+    const g = mesh.tessellate(occ, new occ.BRepPrimAPI_MakeCylinder(12, 30).Shape(),
+      { deflection: d });
+    return { tris: mesh.triangleCount(g), vol: mesh.signedVolume(g) };
+  };
+  const loose = at(0.05);
+  const tight = at(0.005);
+  check('a cylinder meshes under its exact volume, as an inscribed solid must',
+    loose.vol < exactCyl && tight.vol < exactCyl,
+    loose.vol + ' / ' + tight.vol + ' against ' + exactCyl);
+  check('...and a tighter deflection gets closer to it',
+    Math.abs(tight.vol - exactCyl) < Math.abs(loose.vol - exactCyl),
+    'loose ' + loose.vol.toFixed(4) + ', tight ' + tight.vol.toFixed(4));
+  check('...by spending triangles to do it',
+    tight.tris > loose.tris * 2, loose.tris + ' -> ' + tight.tris);
+
+  // The default already beats what ships. JSCAD's 32-segment cylinder measures
+  // 13484.6431, which is 0.64% low.
+  check('the default deflection beats the JSCAD mesh it replaces',
+    Math.abs(loose.vol - exactCyl) < Math.abs(13484.6431 - exactCyl),
+    'ours ' + loose.vol.toFixed(4) + ' vs JSCAD 13484.6431, exact ' + exactCyl.toFixed(4));
+
+  // THE ANGULAR FINDING. Three linear deflections give byte-identical meshes,
+  // because below ~0.1 on a shape this size the 0.3 rad angular tolerance is
+  // already the tighter constraint. Recorded as an assertion rather than a
+  // comment: someone tuning quality with the obvious parameter needs to know it
+  // stops responding, and if a future kernel changes that, this says so.
+  check('below a point, linear deflection stops being the binding constraint',
+    at(1).tris === at(0.1).tris && at(1).tris === at(0.5).tris,
+    'd=1 ' + at(1).tris + ', d=0.5 ' + at(0.5).tris + ', d=0.1 ' + at(0.1).tris);
+  check('...while the ANGULAR dial still moves it',
+    mesh.triangleCount(mesh.tessellate(occ,
+      new occ.BRepPrimAPI_MakeCylinder(12, 30).Shape(), { deflection: 1, angular: 0.1 }))
+      > at(1).tris,
+    'tightening angular at the same deflection must add triangles');
+
+  // ---- the location trap --------------------------------------------------
+  //
+  // Invisible on a primitive at the origin and wrong the moment anything moves,
+  // which is the worst order to find a bug in. Measured by where the triangles
+  // actually are, not by whether the call succeeded.
+  const bounds = (g) => {
+    const lo = [Infinity, Infinity, Infinity];
+    const hi = [-Infinity, -Infinity, -Infinity];
+    for (const p of g.polygons) for (const v of p.vertices) {
+      for (let i = 0; i < 3; i++) {
+        if (v[i] < lo[i]) lo[i] = v[i];
+        if (v[i] > hi[i]) hi[i] = v[i];
+      }
+    }
+    return [lo, hi];
+  };
+  const moved = globalThis.__adapter.buildDoc(occ, { version: 1, features: [
+    { id: 'b1', kind: 'box', size: [10, 10, 10], center: [50, 0, 0] },
+  ] }).shapes.get('b1');
+  const mg = mesh.tessellate(occ, moved, { deflection: 0.05 });
+  const [mlo, mhi] = bounds(mg);
+  check('a moved solid meshes where it actually sits, not at the origin',
+    Math.abs(mlo[0] - 45) < 1e-6 && Math.abs(mhi[0] - 55) < 1e-6,
+    'x spans ' + mlo[0] + ' to ' + mhi[0] + ', expected 45 to 55');
+  check('...still enclosing the same volume it did before it moved',
+    Math.abs(mesh.signedVolume(mg) - 1000) < 1e-9, String(mesh.signedVolume(mg)));
+
+  // ---- a real document, not just primitives -------------------------------
+  //
+  // The end of the chain the whole conversion is for: a ModelDoc through
+  // occt-build, through a boolean, out as triangles. The kernel's own volume and
+  // the triangles' volume are computed from different things and must agree.
+  const cut = globalThis.__adapter.buildDoc(occ, { version: 1, features: [
+    { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+    { id: 'c1', kind: 'cylinder', radius: 8, height: 40, center: [0, 0, 0] },
+    { id: 'op1', kind: 'combine', op: 'subtract', targets: ['b1', 'c1'] },
+  ] }).shapes.get('op1');
+  const cg = mesh.tessellate(occ, cut, { deflection: 0.02 });
+  const kernelVol = globalThis.__adapter.measureShape(occ, cut).volume;
+  check('a drilled plate from a real ModelDoc tessellates',
+    cg !== null && mesh.triangleCount(cg) > 50, String(mesh.triangleCount(cg)));
+  check('...and the triangles agree with the kernel to within the deflection',
+    Math.abs(mesh.signedVolume(cg) - kernelVol) / kernelVol < 0.002,
+    'mesh ' + mesh.signedVolume(cg).toFixed(4) + ' vs kernel ' + kernelVol.toFixed(4));
+  check('...with the hole really removed, not merely subtracted on paper',
+    mesh.signedVolume(cg) < 40 * 40 * 20 * 0.95,
+    String(mesh.signedVolume(cg)));
+
+  // ---- the shape handed back is the renderer's own -------------------------
+  //
+  // Not a new format: a plain JSCAD geom3, so the existing regl renderer draws
+  // an OpenCascade solid with no change to the renderer, the runner, or the
+  // preview component. A wrapper here would have made the swap all-or-nothing.
+  check('the result is a geom3 the existing renderer already understands',
+    Array.isArray(cg.polygons) && Array.isArray(cg.transforms)
+      && cg.transforms.length === 16
+      && cg.polygons.every((p) => Array.isArray(p.vertices) && p.vertices.length === 3
+        && p.vertices.every((v) => v.length === 3 && v.every(Number.isFinite))),
+    'a malformed polygon list renders as nothing, silently');
+  check('an empty or null shape gives null rather than a blank canvas',
+    mesh.tessellate(occ, null) === null);
 }
 
 

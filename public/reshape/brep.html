@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>reSHape B-rep end-to-end probe</title>
+<!--
+  THE END-TO-END PROOF, and nothing more than that.
+
+  Five slices measured the B-rep conversion in Node, against a wasm build in a
+  temp directory, and not one line of it had ever reached a browser. This page
+  runs the whole chain in the place it actually has to work:
+
+      OpenCascade wasm  ->  occt-build (ModelDoc -> solid)
+                        ->  occt-mesh  (solid -> triangles)
+                        ->  the SAME regl renderer runner.html uses
+
+  It is a probe, not a product. It does not replace runner.html, it takes no
+  student code, and nothing links to it -- it exists so the three things that had
+  never been tested can be: whether the kernel loads inside the real sandbox,
+  what it costs to load, and whether what comes out the far end draws.
+
+  Every number it reports is measured here rather than passed in, and it posts
+  them to whoever opened it so a headless run can read them without scraping the
+  DOM.
+-->
+<style>
+  html, body { margin: 0; height: 100%; background: #282a36; color: #f8f8f2;
+    font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace; }
+  #wrap { display: flex; height: 100%; }
+  #view { flex: 1 1 auto; position: relative; min-width: 0; }
+  #view canvas { display: block; }
+  #log { flex: 0 0 340px; padding: 12px 14px; overflow: auto;
+    border-left: 1px solid #44475a; background: #21222c; }
+  h1 { font-size: 13px; margin: 0 0 10px; color: #bd93f9; letter-spacing: .04em; }
+  .row { display: flex; justify-content: space-between; gap: 10px; padding: 2px 0; }
+  .row span:last-child { color: #50fa7b; }
+  .bad span:last-child { color: #ff5555; }
+  .step { color: #6272a4; margin: 10px 0 3px; }
+  pre { white-space: pre-wrap; color: #ff5555; margin: 8px 0 0; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="view"></div>
+  <div id="log"><h1>B-REP END-TO-END</h1><div id="rows"></div><pre id="err"></pre></div>
+</div>
+
+<!-- Classic scripts, fetched no-cors, so these need no header. Only the ES
+     module and its wasm below are CORS-mode fetches. -->
+<script src="./lib/jscad-modeling.min.js"></script>
+<script src="./lib/jscad-regl-renderer.min.js"></script>
+
+<script type="module">
+const rows = document.getElementById('rows');
+const errBox = document.getElementById('err');
+const report = {};
+
+function say(label, value, bad) {
+  const d = document.createElement('div');
+  d.className = 'row' + (bad ? ' bad' : '');
+  d.innerHTML = '<span></span><span></span>';
+  d.children[0].textContent = label;
+  d.children[1].textContent = value;
+  rows.appendChild(d);
+}
+function step(t) {
+  const d = document.createElement('div');
+  d.className = 'step';
+  d.textContent = t;
+  rows.appendChild(d);
+}
+function done(ok) {
+  report.ok = ok;
+  document.title = ok ? 'BREP OK' : 'BREP FAILED';
+  // Read by the parent page and by the headless driver. Posted rather than left
+  // in the DOM so a run cannot mistake a half-rendered page for a result.
+  try { parent.postMessage({ type: 'brep-probe', report }, '*'); } catch (e) { /* opaque parent */ }
+  window.__brepReport = report;
+}
+
+try {
+  // ---- 1. does the kernel load in an opaque origin at all? ---------------
+  //
+  // This is the question the whole conversion rested on and that only a browser
+  // can answer. The iframe has no allow-same-origin, so this module and the
+  // wasm it pulls are CORS-mode fetches carrying `Origin: null`.
+  step('1 — kernel');
+  const t0 = performance.now();
+  const initModule = (await import('./kernel/replicad_single.js')).default;
+  const oc = await initModule();
+  const initMs = Math.round(performance.now() - t0);
+  report.initMs = initMs;
+  report.exports = Object.keys(oc).length;
+  // WHETHER THE FRAME IS REALLY OPAQUE, tested rather than assumed. The first
+  // version of this line read `location.origin === 'null'` and reported
+  // "http://localhost:3002" -- location.origin keeps the URL's origin in a
+  // sandboxed frame, so that check would have called an opaque frame
+  // same-origin and quietly turned this whole probe into a test of nothing.
+  // Storage access is the real boundary: an opaque origin throws SecurityError
+  // on localStorage, and a same-origin frame does not.
+  let opaque;
+  try { void window.localStorage; opaque = false; } catch (e) { opaque = true; }
+  report.opaque = opaque;
+  say('opaque origin', opaque ? 'yes — storage refused' : 'NO — not sandboxed', !opaque);
+  say('kernel init', initMs + ' ms');
+  say('exports live', String(report.exports), report.exports < 400);
+
+  // What it cost to fetch. Reported carefully, because the obvious reading is
+  // wrong: transferSize comes back 0 here and that does NOT mean a cache hit.
+  // Resource timing is masked for cross-origin responses unless they carry
+  // Timing-Allow-Origin, and from this opaque frame every kernel fetch is
+  // cross-origin -- so 0 means "not allowed to tell you", and an earlier
+  // version of this line printed "from cache", which was simply false.
+  //
+  // The real size is not in doubt anyway: 22.97 MB on disk, 6.87 MB gzipped,
+  // measured with gzip -9 rather than guessed.
+  const wasmEntry = performance.getEntriesByType('resource')
+    .find((e) => e.name.endsWith('.wasm'));
+  if (wasmEntry) {
+    report.wasmTransfer = wasmEntry.transferSize;
+    report.wasmDecoded = wasmEntry.decodedBodySize;
+    report.wasmTimingVisible = wasmEntry.decodedBodySize > 0;
+    say('wasm size', wasmEntry.decodedBodySize > 0
+      ? (wasmEntry.decodedBodySize / 1048576).toFixed(2) + ' MB'
+      : 'masked (cross-origin timing)');
+  }
+
+  // THE CONTROL FOR ALL OF THAT. The kernel loading proves the header is
+  // SUFFICIENT and says nothing about whether it was needed -- and "we added a
+  // header and it started working" is the shape of a fix nobody has tested. So
+  // an identical module sitting one directory up, outside the covered prefix,
+  // must be REFUSED. If it loads, this frame is not opaque and the layout of
+  // this whole bundle rests on nothing.
+  let controlLoaded = false;
+  try {
+    await import('./kernel-cors-control.js');
+    controlLoaded = true;
+  } catch (e) { /* expected: blocked by CORS */ }
+  report.corsControlBlocked = !controlLoaded;
+  say('same file, no header', controlLoaded ? 'LOADED — header proves nothing' : 'blocked, as it must be',
+    controlLoaded);
+
+  // ---- 2. a ModelDoc through the real adapter ---------------------------
+  step('2 — build');
+  const { buildDoc, measureShape } = await import('./kernel/occt-build.js');
+  const { tessellate, signedVolume, triangleCount } = await import('./kernel/occt-mesh.js');
+
+  // A drilled, rounded plate: a primitive, a boolean, and a fillet on ONE named
+  // edge -- which is the whole point of the swap, since JSCAD cannot round one
+  // edge of anything.
+  const face = (part) => ({ cause: 'primitive', feature: 'b1', kind: 'face', part });
+  const doc = { version: 1, features: [
+    { id: 'b1', kind: 'box', size: [60, 40, 16], center: [0, 0, 0] },
+    { id: 'c1', kind: 'cylinder', radius: 9, height: 40, center: [0, 0, 0] },
+    { id: 'cut1', kind: 'combine', op: 'subtract', targets: ['b1', 'c1'] },
+    { id: 'r1', kind: 'fillet', target: 'cut1', size: 5, style: 'fillet',
+      edge: { cause: 'between', feature: 'b1', kind: 'edge',
+              of: [face('+z'), face('+x')] } },
+  ] };
+
+  const t1 = performance.now();
+  const built = buildDoc(oc, doc);
+  const buildMs = Math.round(performance.now() - t1);
+  const solid = built.shapes.get('r1');
+  report.buildMs = buildMs;
+  say('build', buildMs + ' ms');
+  if (!solid) throw new Error('buildDoc produced no solid for r1');
+
+  const kernelVol = measureShape(oc, solid).volume;
+  report.kernelVolume = kernelVol;
+  say('kernel volume', kernelVol.toFixed(2));
+
+  // ---- 3. triangles ------------------------------------------------------
+  step('3 — mesh');
+  const t2 = performance.now();
+  const geom = tessellate(oc, solid, { deflection: 0.05 });
+  const meshMs = Math.round(performance.now() - t2);
+  if (!geom) throw new Error('tessellate returned null');
+  report.meshMs = meshMs;
+  report.triangles = triangleCount(geom);
+  report.meshVolume = signedVolume(geom);
+  say('tessellate', meshMs + ' ms');
+  say('triangles', String(report.triangles));
+  say('mesh volume', report.meshVolume.toFixed(2));
+
+  // The two numbers come from different things -- BRepGProp off the surfaces,
+  // and the divergence theorem over the triangle soup -- so agreement is a real
+  // check that the mesh is the solid, and a POSITIVE sign is what says the
+  // winding survived.
+  const drift = Math.abs(report.meshVolume - kernelVol) / kernelVol;
+  report.drift = drift;
+  say('mesh vs kernel', (drift * 100).toFixed(3) + '%', drift > 0.005);
+  say('winding', report.meshVolume > 0 ? 'outward' : 'INVERTED', report.meshVolume <= 0);
+
+  // ---- 4. draw it, with the renderer that already ships ------------------
+  //
+  // No new renderer: tessellate hands back a plain JSCAD geom3, so this is the
+  // same entitiesFromSolids path runner.html feeds. If a wrapper had been put
+  // round the geometry, this is the line that would not work.
+  step('4 — draw');
+  const t3 = performance.now();
+  const container = document.getElementById('view');
+  const { prepareRender, drawCommands, cameras, controls, entitiesFromSolids } = jscadReglRenderer;
+  const camera = Object.assign({}, cameras.perspective.defaults);
+  camera.position = [140, 160, 130];
+  camera.target = [0, 0, 0];
+  camera.up = [0, 0, 1];
+  cameras.perspective.setProjection(camera, camera,
+    { width: container.clientWidth, height: container.clientHeight });
+  cameras.perspective.update(camera, camera);
+
+  const renderer = prepareRender({
+    glOptions: { container },
+    rendering: {
+      background: [0.157, 0.164, 0.212, 1],
+      meshColor: [1, 0.4, 0, 1],
+      lightDirection: [0.2, 0.2, 1],
+      lightPosition: [100, 200, 100],
+      ambientLightAmount: 0.3,
+      diffuseLightAmount: 0.89,
+      specularLightAmount: 0.16,
+      materialShininess: 8.0,
+    },
+  });
+  const entities = entitiesFromSolids({ color: [1, 0.4, 0, 1] }, [geom]);
+  renderer({
+    camera,
+    drawCommands: {
+      drawAxis: drawCommands.drawAxis,
+      drawGrid: drawCommands.drawGrid,
+      drawLines: drawCommands.drawLines,
+      drawMesh: drawCommands.drawMesh,
+    },
+    entities: [
+      { visuals: { drawCmd: 'drawGrid', show: true, transparent: true },
+        size: [100, 100], ticks: [10, 2],
+        color: [1, 1, 1, 0.4], subColor: [0, 1, 1, 0.18] },
+      { visuals: { drawCmd: 'drawAxis', show: true }, size: 50, alwaysVisible: true },
+      ...entities,
+    ],
+  });
+  const drawMs = Math.round(performance.now() - t3);
+  report.drawMs = drawMs;
+  report.entities = entities.length;
+  say('first frame', drawMs + ' ms');
+  say('entities', String(entities.length), entities.length === 0);
+
+  // A canvas the renderer never touched still has a canvas element, so the
+  // presence of one proves nothing. Its size does.
+  const canvas = container.querySelector('canvas');
+  report.canvas = canvas ? canvas.width + 'x' + canvas.height : 'none';
+  say('canvas', report.canvas, !canvas || canvas.width === 0);
+
+  report.totalMs = Math.round(performance.now() - t0);
+  step('total');
+  say('kernel to pixels', report.totalMs + ' ms');
+  done(entities.length > 0 && report.meshVolume > 0 && drift < 0.005 && !!canvas
+    && report.opaque && report.corsControlBlocked);
+} catch (e) {
+  report.error = String(e && e.message ? e.message : e);
+  errBox.textContent = report.error + '\n\n' + (e && e.stack ? e.stack : '');
+  say('FAILED', 'see below', true);
+  done(false);
+}
+</script>
+</body>
+</html>
