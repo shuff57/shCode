@@ -1,0 +1,121 @@
+# The OpenCascade classes reSHape actually calls, for a custom wasm build.
+#
+# WHY THIS FILE EXISTS. The kernel we ship today is replicad-opencascadejs: a
+# good general-purpose build made for a CAD application, 21.91 MB uncompressed
+# and 6.87 MB gzipped. Measured 2026-09-02 (scripts/inspect-occt-wasm.mjs), it
+# carries the entire ISO 10303 STEP data-exchange stack -- 1253 distinct schema
+# entity names, the full AP203/AP214/AP242 set plus its read and write drivers
+# -- because a CAD application imports STEP files. reSHape does not. Its exports
+# are STL/3MF/OBJ and go through the renderer's own writers.
+#
+# It is ALSO the only way to get BRepBuilderAPI_GTransform, which is bound
+# nowhere in the current build and is the sole path to non-uniform scale. With
+# JSCAD being removed there is no fallback engine, and `scale([3, 1, 1], shape)`
+# is taught -- the docs page is titled "scale: bigger, smaller, squashed". So
+# this build is not only an optimisation.
+#
+# THE LIST IS DERIVED, NOT WRITTEN. Every entry below except the additions
+# section came out of:
+#
+#   grep -ohE "(oc|occ)\.[A-Za-z_][A-Za-z0-9_]*" lib/occt-*.ts lib/topo-*.ts \
+#     scripts/test-occt-adapter.mjs | sed 's/^oc\.//; s/^occ\.//' | sort -u
+#
+# 46 classes. Re-derive it after touching any of those files rather than adding
+# by hand, or the build and the code drift apart silently -- the build would
+# still succeed and a name would simply be missing at runtime.
+#
+# WHAT THIS DOES NOT PROMISE. An identifier count is not a byte count, and the
+# shipped wasm has its name section stripped so bytes cannot be attributed to
+# packages without building. The linker decides the real saving: these 46
+# classes still drag in booleans, filleting, offsets, meshing and the whole
+# geometry and topology base, which is most of the modelling half of OpenCascade.
+# What is genuinely removable is the data exchange. Visualisation and IGES are
+# already absent from the current build, so they are not available as savings.
+
+mainBuild:
+  name: reshape.js
+  bindings:
+    # ---- transforms and primitives -------------------------------------
+    - symbol: gp_Pnt
+    - symbol: gp_Vec
+    - symbol: gp_Dir
+    - symbol: gp_Ax1
+    - symbol: gp_Ax2
+    - symbol: gp_Pln
+    - symbol: gp_Circ
+    - symbol: gp_Elips
+    - symbol: gp_Trsf
+    - symbol: gp_GTrsf
+
+    - symbol: BRepPrimAPI_MakeBox
+    - symbol: BRepPrimAPI_MakeCylinder
+    - symbol: BRepPrimAPI_MakeSphere
+    - symbol: BRepPrimAPI_MakeTorus
+    - symbol: BRepPrimAPI_MakePrism
+    - symbol: BRepPrimAPI_MakeRevol
+
+    # ---- topology construction -----------------------------------------
+    - symbol: BRepBuilderAPI_MakeEdge
+    - symbol: BRepBuilderAPI_MakeWire
+    - symbol: BRepBuilderAPI_MakeFace
+    - symbol: BRepBuilderAPI_MakeSolid
+    - symbol: BRepBuilderAPI_MakeVertex
+    - symbol: BRepBuilderAPI_Sewing
+    - symbol: BRepBuilderAPI_Transform
+    # THE ADDITION THIS BUILD EXISTS FOR. Applies a gp_GTrsf -- an unequal
+    # stretch -- to a shape. Real OpenCascade has it; the current build simply
+    # did not list it, which is why scale, scaleZ, ellipsoid and a general
+    # transform matrix are all refused today.
+    - symbol: BRepBuilderAPI_GTransform
+
+    # ---- booleans, and the history they carry --------------------------
+    - symbol: BRepAlgoAPI_Fuse
+    - symbol: BRepAlgoAPI_Cut
+    - symbol: BRepAlgoAPI_Common
+
+    # ---- detail features ------------------------------------------------
+    - symbol: BRepFilletAPI_MakeFillet
+    - symbol: BRepFilletAPI_MakeChamfer
+    - symbol: BRepOffsetAPI_DraftAngle
+    - symbol: BRepOffsetAPI_MakeOffset
+    - symbol: BRepOffsetAPI_ThruSections
+
+    # ---- traversal, naming, measurement ---------------------------------
+    - symbol: TopoDS
+    - symbol: TopExp_Explorer
+    - symbol: TopLoc_Location
+    - symbol: BRep_Tool
+    - symbol: BRepAdaptor_Surface
+    - symbol: BRepExtrema_DistShapeShape
+    - symbol: GeomAPI_ProjectPointOnSurf
+    - symbol: GC_MakeArcOfCircle
+    - symbol: BRepGProp
+    - symbol: GProp_GProps
+    - symbol: BRepBndLib
+    - symbol: Bnd_Box
+
+    # ---- meshing, which is how anything reaches a screen ----------------
+    - symbol: BRepMesh_IncrementalMesh
+
+    # ---- plumbing --------------------------------------------------------
+    - symbol: Message_ProgressRange
+    - symbol: NCollection_List<TopoDS_Shape>
+
+# Deliberately NOT bound, and each for a stated reason rather than by omission:
+#
+#   STEPControl_*, StepBasic_*, IFSelect_*, Transfer_*, XSControl_*
+#     the ISO 10303 data exchange stack. ~29% of the identifiers in the current
+#     wasm and not one call site anywhere in lib/.
+#
+#   XCAFDoc_*, TDocStd_*, TDF_*
+#     the OCAF document and assembly model. reSHape's document is ModelDoc, in
+#     lib/model-types.ts, and it is first-party on purpose.
+#
+#   Graphic3d_*, OpenGl_*, AIS_*, V3d_*
+#     already absent from the current build. Rendering is regl's job and the
+#     kernel never sees a pixel -- lib/occt-mesh.ts hands over triangles.
+#
+#   Geom_Helix
+#     does not exist in OpenCascade at all, in any build. This is why
+#     extrudeHelical and External Thread are refused, and no binding list can
+#     change that.

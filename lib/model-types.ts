@@ -9,6 +9,8 @@
 
 import type { Constraint as SketchConstraint } from './sketch-solve';
 import { splitEdge } from './sketch-arc';
+import { featureChain } from './topo-name';
+import type { TopoName } from './topo-name';
 
 /** Re-exported so a caller needs one import to work with a sketch. */
 export type { Constraint as SketchConstraint } from './sketch-solve';
@@ -16,9 +18,6 @@ export type { Constraint as SketchConstraint } from './sketch-solve';
 export type Vec3 = [number, number, number];
 
 /** How a shape's edges are killed. JSCAD has no fillet(); see model-codegen. */
-import { featureChain } from './topo-name';
-import type { TopoName } from './topo-name';
-
 export type RoundStyle = 'fillet' | 'chamfer';
 
 /** A single world axis, spelled out rather than as a Vec3 direction — a
