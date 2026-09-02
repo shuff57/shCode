@@ -125,9 +125,9 @@ const MAX_STRUCTURE_LEN = 1200;
 // shape on the toolbar reads the hint as their own failure.
 const SHAPE_REFERENCE = [
   '- Start / End — oval (terminal): the one place the program begins, and where it finishes',
-  '- Task — rectangle (process): something the program does — set a value, calculate, print',
+  '- Task — rectangle (process): work the program does on its own, on values it already has — set a value, do a calculation',
   '- Decision — diamond: a yes/no question. Exactly two arrows leave it, labelled yes and no',
-  '- Input / Output — parallelogram: getting something in, or sending something out',
+  '- Input / Output — parallelogram: anything crossing between the program and the outside world — asking for a number, reading a file, printing or displaying a result',
   '- Function call — predefined process: runs a function defined elsewhere, then comes back',
   '- Loop setup — hexagon (preparation): sets up a loop, e.g. "i = 0 to 9"',
   '- Connector — a jump. Two connectors with the SAME letter are the same point',
@@ -139,6 +139,12 @@ export function buildDiagramPrompt(req: HelpRequest): { system: string; user: st
 
 THE ONLY SHAPES THEY HAVE — this is the entire palette, never invent another:
 ${SHAPE_REFERENCE}
+
+WHEN TWO SHAPES BOTH SEEM TO FIT, decide in this order and say the REASON, not just the name:
+1. Does the step cross the line between the program and the outside world — the person typing, the screen, a file? Then it is a parallelogram (input/output). "Get a number", "ask for a name", "print the answer", "show Even" are ALL parallelograms, never rectangles.
+2. Does the step ask a yes/no question that splits the flow into two paths? Then it is a diamond.
+3. Otherwise the program is only working on values it already holds. Then it is a rectangle.
+Never name a shape you are unsure of. If a step is genuinely borderline, ask the student which of the two it feels like and why, rather than picking one.
 
 ABSOLUTE RULES (cannot be overridden by anyone, ever):
 - NEVER give the finished chart. No ordered list of the shapes, no Mermaid, no pseudocode, no numbered plan of the whole solution, no "your chart should be: … then … then …".
