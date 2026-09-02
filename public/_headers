@@ -1,0 +1,18 @@
+# The preview iframe is sandboxed WITHOUT allow-same-origin, so student code
+# cannot call /api/* as the student. That makes it an OPAQUE origin, and an
+# opaque origin's fetches are cross-origin with `Origin: null`.
+#
+# A classic <script src> is fetched no-cors, which is why the JSCAD bundle loads
+# there today without any of this. An ES MODULE is always fetched in CORS mode,
+# and so is the .wasm an emscripten module pulls in -- so a module-shipped
+# kernel is blocked before its wasm is even requested. Measured 2026-09-01:
+# without this header the OpenCascade build fails at the module script with
+# "from origin 'null' has been blocked by CORS policy"; with it, the kernel
+# initialises inside the real sandbox with all 498 exports live.
+#
+# Safe because these are already public static assets -- allowing a cross-origin
+# READ of a file anyone can request changes nothing. It deliberately does NOT
+# cover /api/*, which stays same-origin and cookie-gated.
+/reshape/kernel/*
+  Access-Control-Allow-Origin: *
+  Cross-Origin-Resource-Policy: cross-origin
