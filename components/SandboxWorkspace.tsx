@@ -10,6 +10,7 @@ import ReshapeParamsPanel, { type ParamDef, type ParamValues } from './ReshapePa
 import Console from './Console';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
+import TextureEditor from './TextureEditor';
 import DocsDrawer from './DocsDrawer';
 import ModelEditor from './model/ModelEditor';
 import HandleOverlay, { type AnchorPoint, type SketchOutline } from './model/HandleOverlay';
@@ -715,6 +716,21 @@ export default function SandboxWorkspace() {
   }, []);
 
   const drawerTabs: DrawerTab[] = [
+    // moSHion only. reSHape has no sprites and the JS console has no canvas,
+    // so a texture editor there is a tab that can never be acted on.
+    ...(mode.preview === 'moshion'
+      ? [{
+          key: 'textures',
+          label: 'Textures',
+          color: '#8be9fd',
+          content: <TextureEditor />,
+          headerExtra: (
+            <a href="/textures" target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
+              Full page ↗
+            </a>
+          ),
+        } as DrawerTab]
+      : []),
     {
       key: 'help',
       label: 'Help',

@@ -41,6 +41,10 @@ export default function HeaderNav() {
     <>
       <Link href="/" className="text-white">Lessons</Link>
       <Link href="/sandbox" className="text-white">Sandbox</Link>
+      {/* The pixel editor behind `sprite.texture`. Linked here rather than
+          only from the docs: a page nothing navigates to is the failure
+          check-reachable.mjs exists to catch. */}
+      <Link href="/textures" className="text-white">Textures</Link>
       {/* One Docs tab for the whole family — JavaScript, moSHion and reSHape
           each have a set inside, switched from the hub at /docs and from the
           family switcher on every docs page. */}

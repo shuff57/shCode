@@ -561,6 +561,64 @@ function draw() {
   background('#222');
 }`,
       },
+      {
+        title: 'Textures: named pixel art',
+        body: `sprite.texture = 'coin' picks art by NAME instead of by URL. moSHion ships a catalog of 40 pixel-art textures, so you can give a sprite a picture without finding, hosting, or spelling a file path.
+
+The names, by group —
+
+characters: player, playerBeige, playerBlue, playerPink, playerYellow
+
+pickups: coin, coinBronze, coinSilver, gem, gemGreen, gemOrange, gemYellow, heart, heartHalf, key, keyBlue, keyGreen, keyOrange, star
+
+blocks: block, bomb, cactus, crate, crateX, door, exitSign, mushroom, mushroomBrown, torch
+
+creatures: bat, bee, bird, fish, fishPink, ghost, ladybug, slime, slimeBlue, snail, worm
+
+Call textureNames() to print the list from inside a sketch, and hasTexture('coin') to check one name. A name that does not exist warns in the console and suggests near matches rather than failing silently, so a typo tells you what it was.
+
+Reading sprite.texture gives back the name you set, which makes if (s.texture === 'coin') work. Setting .texture clears .image and .ani, exactly the way those two already clear each other.
+
+Textures draw with smoothing turned off, so a 21x21 tile stretched across a 50x50 sprite stays blocky instead of blurring. A plain .image still smooths.
+
+Draw your own in the texture editor — the Textures tab in the sandbox, or the Textures link in the header. Open a built-in, change it, save it under any name. Save more than one frame and the texture ANIMATES: sprite.texture = 'myWalk' plays it, with no addAni call, because a saved animation is stored as the same horizontal frame strip addAni already slices.
+
+In code, saveTexture('myGuy', dataUrl) stores a data: URL under a name, and from then on sprite.texture = 'myGuy' finds it — including in a later sketch, because it lives in the same store as storeItem(). A saved name beats a built-in one, so saving 'coin' replaces the built-in coin everywhere. deleteTexture('myGuy') forgets it. Keep saved art small: the store holds 64 KB per value and 512 KB in total, which is generous for pixel art and far too small for a photograph.
+
+The built-in art is Kenney's "Platformer Art: Pixel Redux" pack, released under CC0 — public domain, free for classroom and commercial use alike.`,
+        code: `let player, coins;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  player = new Sprite(200, 300, 48, 48);
+  player.collider = 'none';
+  player.texture = 'player';
+
+  coins = new Group();
+  for (let i = 0; i < 5; i++) {
+    const c = new coins.Sprite(60 + i * 70, 120, 32, 32);
+    c.collider = 'none';
+    c.texture = 'coin';
+  }
+
+  console.log('textures available:', textureNames().length);
+}
+
+function update() {
+  if (kb.pressing('left'))       player.x -= 3;
+  else if (kb.pressing('right')) player.x += 3;
+
+  for (let i = coins.length - 1; i >= 0; i--) {
+    if (player.overlaps(coins[i])) coins[i].remove();
+  }
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
     ],
   },
   {

@@ -7,7 +7,7 @@
 // This file is the GATE. Engine builders do not edit it — if a check here is
 // wrong, fix the check deliberately, not to make a build pass.
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { createContext, runInContext } from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -15,6 +15,14 @@ import { dirname, join } from 'node:path';
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PLANCK = join(REPO, 'public', 'moshion', 'planck.min.js');
 const MOSHION = join(REPO, 'public', 'moshion', 'moshion.js');
+// The generated texture catalog. runner.html loads this BEFORE moshion.js, so
+// the harness must too -- otherwise headless runs exercise an engine with an
+// empty catalog and every `sprite.texture = 'coin'` warns instead of drawing,
+// which is a different engine from the one that ships. Absent = the catalog
+// has not been generated; that is a real state (a fresh clone before
+// make-moshion-textures.py has run) and the engine already falls back to
+// saved-textures-only, so it is not fatal here.
+const TEXTURES = join(REPO, 'public', 'moshion', 'textures', 'textures.js');
 
 const FRAME_MS = 1000 / 60;
 
@@ -28,6 +36,11 @@ function makeCtx(ops) {
     fillStyle: '#000', strokeStyle: '#000', lineWidth: 1,
     font: '10px sans-serif', textAlign: 'start', textBaseline: 'alphabetic',
     globalAlpha: 1,
+    // Real canvas state. Missing, a write to it went unrecorded and the
+    // engine's crisp-pixel path for `sprite.texture` was invisible here --
+    // the same shape as the naturalWidth gap above: the stub deciding what
+    // the engine is allowed to be tested on.
+    imageSmoothingEnabled: true,
   };
   const methods = [
     'save', 'restore', 'translate', 'rotate', 'scale', 'beginPath', 'closePath',
@@ -294,6 +307,12 @@ export function createSandbox({ width = 800, height = 600 } = {}) {
       setItem: (k, v) => store.set(k, String(v)),
       removeItem: (k) => store.delete(k),
       clear: () => store.clear(),
+      // Real localStorage enumerates through .length and .key(i). Without
+      // them the engine cannot list what it has saved, so textureNames()
+      // reported only the built-ins and a student's own saved art looked
+      // like it had never been written.
+      get length() { return store.size; },
+      key: (i) => (i >= 0 && i < store.size ? [...store.keys()][i] : null),
     },
     addEventListener: addListenerFactory('window'),
     removeEventListener: () => {},
@@ -313,6 +332,9 @@ export function createSandbox({ width = 800, height = 600 } = {}) {
 
   // ---- load the engine ----------------------------------------------------
   runInContext(readFileSync(PLANCK, 'utf8'), sandbox, { filename: 'planck.min.js' });
+  if (existsSync(TEXTURES)) {
+    runInContext(readFileSync(TEXTURES, 'utf8'), sandbox, { filename: 'textures.js' });
+  }
   runInContext(readFileSync(MOSHION, 'utf8'), sandbox, { filename: 'moshion.js' });
 
   function drainTimers() {

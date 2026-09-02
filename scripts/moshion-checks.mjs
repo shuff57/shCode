@@ -1156,4 +1156,251 @@ export const SEMANTIC_CHECKS = [
       return true;
     },
   },
+
+  // ---- textures -----------------------------------------------------------
+  {
+    name: 'sprite.texture resolves a built-in name to a real file and draws it',
+    area: 'texture',
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(200,200);
+          a = new Sprite(50, 50, 50, 50); a.texture = 'coin';
+          names = textureNames(); had = hasTexture('coin'); nope = hasTexture('definitelyNot'); }
+        function draw(){ background('#222'); }
+      `, { frames: 2 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      const b = r.box.sandbox;
+      if (b.a.texture !== 'coin') return 'sprite.texture read back as ' + JSON.stringify(b.a.texture) + ', expected "coin"';
+      if (!b.had) return "hasTexture('coin') was false — the built-in catalog did not load";
+      if (b.nope) return 'hasTexture() returned true for a name that does not exist';
+      if (!b.names || b.names.length < 10) return 'textureNames() returned ' + (b.names ? b.names.length : 'nothing') + ' names';
+      const drew = r.ops.filter((o) => o.op === 'drawImage' && String(o.args[0]).includes('/moshion/textures/coin.png'));
+      // The whole point: a texture that resolves but never reaches drawImage
+      // is the "pipeline with nothing at the top" this repo keeps shipping.
+      return drew.length ? true : 'sprite.texture = "coin" drew no image; drawImage ops were ' +
+        JSON.stringify(r.ops.filter((o) => o.op === 'drawImage').map((o) => o.args[0]));
+    },
+  },
+  {
+    name: 'an unknown texture name warns instead of failing silently',
+    area: 'texture',
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(200,200);
+          s = new Sprite(100, 100, 50, 50); s.texture = 'Coin'; }
+        function draw(){ background('#222'); }
+      `, { frames: 2 });
+      if (!r.ok) return 'a bad texture name threw instead of warning: ' + r.error?.message;
+      const warns = r.console.filter((c) => c.type === 'warn').map((c) => c.text).join(' ');
+      if (!/No texture named/.test(warns)) return 'no warning for an unknown texture name; console was ' + JSON.stringify(warns);
+      // Near-matches are the difference between a warning and a useful one:
+      // wrong case is the single most likely student typo.
+      if (!/coin/.test(warns)) return 'the warning for "Coin" suggested no near match: ' + warns;
+      return r.box.sandbox.s.texture === null ? true :
+        'a rejected name still set sprite.texture to ' + JSON.stringify(r.box.sandbox.s.texture);
+    },
+  },
+  {
+    name: 'textures draw with smoothing off, and restore it for ordinary images',
+    area: 'texture',
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(200,200);
+          a = new Sprite(50, 50, 50, 50); a.texture = 'crate';
+          b = new Sprite(150, 50, 50, 50); b.image = '/moshion/assets/star.webp'; }
+        function draw(){ background('#222'); }
+      `, { frames: 1 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      // Pixel art scaled up with smoothing ON arrives as a blur. There is no
+      // error and no missing draw -- it just looks wrong, which is why this
+      // is asserted on the op sequence rather than left to the eye.
+      const seq = r.ops.filter((o) => o.op === 'set:imageSmoothingEnabled' || o.op === 'drawImage');
+      const i = seq.findIndex((o) => o.op === 'drawImage' && String(o.args[0]).includes('/textures/crate.png'));
+      if (i === -1) return 'the crate texture never reached drawImage';
+      const beforeTex = seq[i - 1];
+      if (!beforeTex || beforeTex.op !== 'set:imageSmoothingEnabled' || beforeTex.args[0] !== false) {
+        return 'texture drawn without turning imageSmoothingEnabled off first; preceding op was ' + JSON.stringify(beforeTex);
+      }
+      const j = seq.findIndex((o) => o.op === 'drawImage' && String(o.args[0]).includes('star.webp'));
+      if (j === -1) return 'the .image sprite never reached drawImage';
+      const beforeImg = seq[j - 1];
+      if (beforeImg && beforeImg.op === 'set:imageSmoothingEnabled' && beforeImg.args[0] === false) {
+        return 'a plain .image was drawn with smoothing still off — the texture path leaked its state';
+      }
+      return true;
+    },
+  },
+  {
+    name: 'saveTexture round-trips, is listed, and shadows a built-in of the same name',
+    area: 'texture',
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(200,200);
+          saveTexture('mine', 'data:image/png;base64,iVBORw0KGgo=');
+          a = new Sprite(50, 50, 50, 50); a.texture = 'mine';
+          listed = textureNames().indexOf('mine') !== -1;
+          saveTexture('coin', 'data:image/png;base64,SHADOWED=');
+          b = new Sprite(150, 50, 50, 50); b.texture = 'coin';
+          try { saveTexture('bad', 'not-a-data-url'); threw = false; } catch (e) { threw = true; }
+        }
+        function draw(){ background('#222'); }
+      `, { frames: 2 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      const b = r.box.sandbox;
+      if (b.a.texture !== 'mine') return 'a saved texture did not set sprite.texture; got ' + JSON.stringify(b.a.texture);
+      if (!b.listed) return 'a saved texture was not in textureNames() — the editor could save art nothing can find';
+      if (!b.threw) return 'saveTexture accepted a value that is not a data: URL';
+      const srcs = r.ops.filter((o) => o.op === 'drawImage').map((o) => String(o.args[0]));
+      if (!srcs.some((sx) => sx.includes('iVBORw0KGgo='))) return 'the saved texture never reached drawImage; sources were ' + JSON.stringify(srcs);
+      if (!srcs.some((sx) => sx.includes('SHADOWED='))) {
+        return 'a saved texture named "coin" did not shadow the built-in; sources were ' + JSON.stringify(srcs);
+      }
+      return true;
+    },
+  },
+  {
+    name: 'texture, image and ani stay mutually exclusive',
+    area: 'texture',
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(200,200);
+          a = new Sprite(50, 50, 50, 50); a.texture = 'crate'; a.image = '/moshion/assets/star.webp';
+          afterImage = a.texture;
+          b = new Sprite(100, 50, 50, 50); b.texture = 'gem'; b.addAni('x', '/moshion/assets/ghost_fly.avif', 4);
+          afterAni = b.texture;
+          c = new Sprite(150, 50, 50, 50); c.texture = 'coin'; c.texture = null;
+          afterNull = c.texture; }
+        function draw(){ background('#222'); }
+      `, { frames: 2 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      const b = r.box.sandbox;
+      if (b.afterImage !== null) return 'setting .image left .texture at ' + JSON.stringify(b.afterImage);
+      if (b.afterAni !== null) return 'addAni() left .texture at ' + JSON.stringify(b.afterAni);
+      if (b.afterNull !== null) return 'texture = null left .texture at ' + JSON.stringify(b.afterNull);
+      return true;
+    },
+  },
+
+  {
+    name: 'a saved multi-frame texture animates, and a still saved over it stops animating',
+    area: 'texture',
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(300,200);
+          saveTexture('walk', 'data:image/png;base64,STRIP4=', { frames: 4, frameDelay: 2 });
+          a = new Sprite(80, 100, 50, 50); a.collider='none'; a.texture = 'walk';
+          isAni = !!a.ani; count = a.ani ? a.ani.frameCount : 0;
+          delay = a.ani ? a.ani.frameDelay : 0; stillImg = a._img;
+
+          saveTexture('walk', 'data:image/png;base64,STILL=');
+          b = new Sprite(200, 100, 50, 50); b.collider='none'; b.texture = 'walk';
+          bIsAni = !!b.ani;
+
+          leaked = textureNames().filter(function(n){ return n.indexOf('texmeta') === 0; });
+        }
+        function draw(){ background('#222'); if (frameCount === 8) advanced = a.ani.frame; }
+      `, { frames: 10 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      const b = r.box.sandbox;
+      if (!b.isAni) return 'a texture saved with frames:4 did not become an animation';
+      if (b.count !== 4) return 'frameCount was ' + b.count + ', expected 4';
+      if (b.delay !== 2) return 'frameDelay was ' + b.delay + ', expected 2';
+      if (b.stillImg !== null) return 'the animated path left a still _img set; both would draw';
+      // Without this, a "4-frame" texture that never advances looks like a
+      // still and nothing fails.
+      if (!(b.advanced > 0)) return 'the animation never advanced a frame (frame=' + b.advanced + ')';
+      // Saving a still over an animation must drop the frame count, or the
+      // still is sliced into 4 and only a sliver ever draws.
+      if (b.bIsAni) return 'saving a still over an animation left the old frame count in place';
+      if (b.leaked && b.leaked.length) return 'texmeta keys leaked into textureNames(): ' + JSON.stringify(b.leaked);
+      // The slice geometry: source x must be frame * (width / frameCount).
+      const sliced = r.ops.filter((o) => o.op === 'drawImage' && o.args.length === 9 && String(o.args[0]).includes('STRIP4'));
+      if (!sliced.length) return 'the animated texture never drew a sliced frame';
+      const widths = new Set(sliced.map((o) => o.args[3]));
+      if (widths.size !== 1) return 'frame width varied between draws: ' + JSON.stringify([...widths]);
+      return true;
+    },
+  },
+  {
+    name: 'an animated texture draws with smoothing off, like a still one',
+    area: 'texture',
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(300,200);
+          saveTexture('walk', 'data:image/png;base64,STRIP2=', { frames: 2, frameDelay: 2 });
+          a = new Sprite(80, 100, 50, 50); a.collider='none'; a.texture = 'walk';
+          b = new Sprite(200, 100, 50, 50); b.collider='none';
+          b.addAni('plain', '/moshion/assets/ghost_fly.avif', 4);
+        }
+        function draw(){ background('#222'); }
+      `, { frames: 1 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      const seq = r.ops.filter((o) => o.op === 'set:imageSmoothingEnabled' || o.op === 'drawImage');
+      const i = seq.findIndex((o) => o.op === 'drawImage' && String(o.args[0]).includes('STRIP2'));
+      if (i === -1) return 'the animated texture never reached drawImage';
+      const before = seq[i - 1];
+      if (!before || before.op !== 'set:imageSmoothingEnabled' || before.args[0] !== false) {
+        return 'animated texture drawn without smoothing off; preceding op was ' + JSON.stringify(before);
+      }
+      // addAni() art is NOT a texture and must keep smoothing -- the opt-in is
+      // "came from .texture", not "is animated".
+      const j = seq.findIndex((o) => o.op === 'drawImage' && String(o.args[0]).includes('ghost_fly'));
+      if (j !== -1) {
+        const bj = seq[j - 1];
+        if (bj && bj.op === 'set:imageSmoothingEnabled' && bj.args[0] === false) {
+          return 'a plain addAni() sheet was drawn with smoothing off -- the texture path leaked';
+        }
+      }
+      return true;
+    },
+  },
+
+  {
+    name: 'per-frame durations hold the right frames, and a bad array is ignored',
+    area: 'texture',
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(200,200);
+          saveTexture('hold', 'data:image/png;base64,S3=', { frames: 3, frameDelay: 4, delays: [1, 12, 1] });
+          a = new Sprite(60, 100, 40, 40); a.collider='none'; a.texture = 'hold';
+          holds = [a.ani.holdOf(0), a.ani.holdOf(1), a.ani.holdOf(2)];
+
+          saveTexture('uni', 'data:image/png;base64,U3=', { frames: 3, frameDelay: 4 });
+          u = new Sprite(120, 100, 40, 40); u.collider='none'; u.texture = 'uni';
+          uniformDelays = u.ani.frameDelays;
+
+          saveTexture('bad', 'data:image/png;base64,B3=', { frames: 3, frameDelay: 4, delays: [1, 2] });
+          x = new Sprite(170, 100, 40, 40); x.collider='none'; x.texture = 'bad';
+          badDelays = x.ani.frameDelays; badHold = x.ani.holdOf(0);
+
+          seen = []; useen = [];
+        }
+        function draw(){ background('#222'); seen.push(a.ani.frame); useen.push(u.ani.frame); }
+      `, { frames: 30 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      const b = r.box.sandbox;
+      if (JSON.stringify(b.holds) !== '[1,12,1]') return 'holdOf() returned ' + JSON.stringify(b.holds) + ', expected [1,12,1]';
+
+      // The point of a per-frame hold is that the long frame is ACTUALLY on
+      // screen longer. Asserting only on holdOf() would pass with _advance()
+      // still using the uniform delay.
+      const count = (arr, f) => arr.filter((x) => x === f).length;
+      const long = count(b.seen, 1);
+      if (!(long > count(b.seen, 0) + count(b.seen, 2))) {
+        return 'the frame with a 12-frame hold was shown ' + long + ' of 30 draws; it should dominate';
+      }
+
+      // addAni() and uniform textures must be untouched by any of this.
+      if (b.uniformDelays !== null) return 'a uniform animation was given a frameDelays array';
+      const spread = [0, 1, 2].map((f) => count(b.useen, f));
+      if (Math.max(...spread) - Math.min(...spread) > 4) {
+        return 'a uniform animation became uneven: visits were ' + JSON.stringify(spread);
+      }
+
+      // A half-written save must not hold the wrong frames.
+      if (b.badDelays !== null) return 'a delays array shorter than the frame count was accepted';
+      if (b.badHold !== 4) return 'a rejected delays array left holdOf() at ' + b.badHold + ', expected the uniform 4';
+      return true;
+    },
+  },
 ];

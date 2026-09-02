@@ -76,6 +76,17 @@ declare class Sprite {
   debug: boolean;
   ani: Ani | null;
   image: string | HTMLImageElement | null;
+  /**
+   * Named art from the texture catalog, e.g. `sprite.texture = 'coin'`.
+   *
+   * Reads back as the NAME that was set, not the image. Setting it clears
+   * `.image` and `.ani`, and setting either of those clears this. An
+   * unknown name warns and leaves the sprite as it was.
+   *
+   * Names come from `textureNames()`: the built-in catalog plus anything
+   * `saveTexture()` has stored. A saved name wins over a built-in one.
+   */
+  texture: string | null;
 
   addAni(name: string, sheetUrl: string, frameCount: number): Ani;
   changeAni(name: string): void;
@@ -522,6 +533,27 @@ declare const CENTER: 'center';
 declare const LEFT: 'left';
 declare const RIGHT: 'right';
 
+/** Every texture name usable right now — built-ins plus saved art, sorted. */
+declare function textureNames(): string[];
+/** True if `sprite.texture = name` would resolve. */
+declare function hasTexture(name: string): boolean;
+/**
+ * Save art under a name so `sprite.texture = name` finds it.
+ *
+ * `dataUrl` must be a `data:` URL; small pixel art only (the store caps a
+ * value at 64 KB and the whole store at 512 KB).
+ *
+ * Pass `{ frames: n }` and `dataUrl` is read as a horizontal strip of n
+ * equal frames — `sprite.texture = name` then animates it, no addAni needed.
+ * `frameDelay` is game frames per animation frame (default 4).
+ */
+declare function saveTexture(
+  name: string,
+  dataUrl: string,
+  anim?: { frames: number; frameDelay?: number }
+): void;
+/** Forget a saved texture. Built-ins cannot be deleted. */
+declare function deleteTexture(name: string): void;
 declare function storeItem(name: string, val: any): void;
 declare function getItem(name: string): any;
 declare function removeItem(name: string): void;

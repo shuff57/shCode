@@ -6,6 +6,9 @@ It contains no q5play source code. The sections below cover each file in
 
 ## 1. moshion.js, moshion.d.ts, runner.html, assets/ — MIT
 
+> `textures/` is **not** covered by this section — it is third-party CC0 art.
+> See section 5.
+
 The moSHion engine facade, its type declarations, the sandbox host and the
 example sprite sheets are original work written for this course and released
 under the MIT license:
@@ -88,3 +91,48 @@ count: `asterisk_explode.avif` 11 frames, `ghost_idle.avif` 7,
 lesson, doc or example referenced either one.
 
 Re-run the script to regenerate the sheets; it is deterministic.
+
+## 5. `textures/` — CC0 (Kenney)
+
+`public/moshion/textures/` is the catalog behind `sprite.texture = 'coin'`.
+It is **not** original work for this course, and section 1 does not cover it.
+
+| | |
+| --- | --- |
+| Pack | Kenney, *Platformer Art: Pixel Redux*, created 2020-04-22 |
+| Author | Kenney (kenney.nl) |
+| License | **CC0 1.0 Universal** — public domain dedication |
+| Source | `github.com/ETdoFresh/kenney.nl`, `platformerart_pixelredux_2` |
+| Sheet | `Tilemap/tilemap_packed.png`, sha256 `883071fc…99bdc78`, 630×630 |
+
+The pack's own `License.txt` reads: *"This content is free to use in
+personal, educational and commercial projects."* CC0 requires no attribution;
+crediting Kenney is optional and encouraged. That license file is vendored
+twice on purpose — beside the source sheet in
+`scripts/assets/kenney-pixel-redux/`, and beside the sliced output in
+`public/moshion/textures/LICENSE.txt` — so the provenance travels with the
+bytes in either direction.
+
+Each of the 40 PNGs is an **exact 21×21 crop** of that sheet. Nothing is
+redrawn, recoloured or modified. `scripts/make-moshion-textures.py` holds the
+name → tile-index table and is deterministic: re-running it reproduces every
+file. Adding a texture means adding a row to that table and re-running, never
+dropping a PNG into the directory by hand —
+`scripts/check-moshion-textures.mjs` fails on a file the manifest does not
+name.
+
+### Why this section reads the way section 4 does
+
+Section 4 exists because `assets/` once held art byte-identical to q5play's
+while section 1 called it original work. This section is written to make that
+mistake harder to repeat: the pack, the author, the license, the upstream repo
+and the hash of the exact file are all recorded here, and the slicing script
+reads a vendored copy of that file rather than downloading one. If a future
+texture comes from somewhere else, it needs its own row and its own section —
+not a quiet addition to this one.
+
+### Student-saved textures
+
+`saveTexture(name, dataUrl)` stores art a student drew, in that student's own
+browser storage. It never touches this directory, is never committed, and
+carries no license claim by this project.
