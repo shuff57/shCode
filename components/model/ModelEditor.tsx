@@ -65,6 +65,7 @@ import {
 } from 'lucide-react';
 import SketchConstraints from './SketchConstraints';
 import { solveSketch, type Constraint, type Point } from '../../lib/sketch-solve';
+import { whyDeletingCosts, withoutFeatures } from '../../lib/model-deps';
 import {
   bowEdge,
   removeCorner,
@@ -876,14 +877,23 @@ export default function ModelEditor({
 
   function remove() {
     if (!chosen.length) return;
-    const gone = new Set(selected);
-    const features = doc.features
-      .filter((f) => !gone.has(f.id))
-      // A combine that lost an input is not a combine any more.
-      .filter((f) => f.kind !== 'combine' || f.targets.every((t) => !gone.has(t)));
-    onChange({ ...doc, features });
+    // Everything built from what is going has to go too, however far down the
+    // chain. Filtering only combines -- which is what this did -- left a Pull
+    // pointing at a deleted sketch, and the generated source then referred to a
+    // variable it never declared: the preview died with "ReferenceError: sk1 is
+    // not defined" for the ordinary act of deleting a sketch. dependsOn() knew
+    // about every one of those kinds the whole time; the reorder path beneath
+    // this one was already using it.
+    // `chosen`, not `selected`: the selection can outlive a feature (a rollback,
+    // an undo), and a stale id would put a raw `pull1` into the sentence.
+    const asked = chosen.map((f) => f.id);
+    const cost = whyDeletingCosts(doc, asked, (id) => names[id] ?? id);
+    onChange(withoutFeatures(doc, asked));
     setSelected([]);
-    say(null);
+    // Said after the fact, not as a confirmation. Delete is undoable here and
+    // an "are you sure" on a reversible action trains people to click through
+    // it -- but vanishing three rows with no explanation is worse still.
+    say(cost);
   }
 
   function move(id: string, by: -1 | 1) {
