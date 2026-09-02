@@ -56,11 +56,16 @@ export type TopoKind = 'face' | 'edge' | 'vertex';
  * A point that is known to lie on the thing being named, used only to tell
  * apart pieces that share a cause -- see the header.
  *
- * `u`/`v` are in the PARENT surface's parameter space, not in world
- * coordinates, so that stretching the model moves the discriminator with the
- * face it belongs to instead of leaving it behind. Rounded on purpose: two
- * rebuilds of the same model should produce the same name text, and raw
- * floats do not.
+ * `u`/`v` are a FRACTION of the parent surface's parameter range -- 0 to 1
+ * across the face -- not world coordinates and not raw parameters. Fractions
+ * because stretching the model then moves the discriminator with the face it
+ * belongs to, and because a raw parameter is a distance from whichever corner
+ * the kernel chose to count from, which is not a thing anyone means. That
+ * choice was measured, not argued: see the note above fractionOnFace() in
+ * lib/topo-history.ts for the case where the raw form loses a selection.
+ *
+ * Rounded on purpose: two rebuilds of the same model should produce the same
+ * name text, and raw floats do not.
  */
 export interface OnPoint {
   u: number;

@@ -13,16 +13,26 @@
 // widen the part. If it does not, parametric modelling does not work, and no
 // amount of kernel makes up for it.
 //
-// WHAT IS HERE AND WHAT IS NOT. This slice resolves `primitive` names -- the
-// faces of a box, cylinder, sphere, cone or torus -- which are the ones whose
-// identity is knowable from the shape alone, with no operation history needed.
-// `carried` and `split` names, the ones that ride through a boolean, need
-// OpenCascade's Modified/Generated maps and the operations kept alive to query;
-// that is the next slice. The maps are present in this build and were checked
-// before any of this was written.
+// WHAT IS HERE AND WHAT IS NOT. `primitive` names -- the faces of a box,
+// cylinder, sphere, cone or torus -- resolve from the shape alone, with no
+// operation history needed. `carried` and `split` names, the ones that ride
+// through a boolean, resolve through the operation history that buildDoc now
+// keeps alive; lib/topo-history.ts is the layer that asks the kernel and this
+// file is the bookkeeping on top of it.
+//
+// `swept`, `cap` and `made` still return null. A swept face needs the prism or
+// revolve to record which sketch edge produced which wall, which is sweep
+// bookkeeping rather than boolean history and is its own piece of work. `made`
+// is the odder case and is worth a note: the faces a cut appears to invent --
+// the floor and walls of a groove -- are not invented at all, they are the
+// TOOL'S faces carried through. So they are nameable with the machinery already
+// here, off the tool feature's id, and `made` may turn out to be needed only
+// for the seams a fuse genuinely creates. That is a design question, not a
+// missing capability, and it is left open rather than guessed at.
 
-import type { Occt } from './occt-build';
+import type { BuildResult, Occt, OpRecord } from './occt-build';
 import type { TopoName } from './topo-name';
+import { faceFate, fractionOnFace, pieceContaining, pointAtFraction, pointOnFace } from './topo-history';
 
 /** Every face of a shape, in the kernel's own order -- which is exactly the
  *  order nothing here is allowed to depend on. */
@@ -114,6 +124,61 @@ export function resolvePrimitiveFace(oc: Occt, shape: any, part: string): any | 
 }
 
 /**
+ * The operations at a feature that a given ancestor's face has to pass through.
+ *
+ * A combine over three targets is two pairwise booleans. A face of the first
+ * target sees both; a face of the third only sees the second. Starting at the
+ * wrong one asks an operation about a face it has never seen, which answers
+ * "deleted" and loses a selection that was never actually lost.
+ *
+ * An ancestor the chain does not mention -- a name rooted several features back
+ * -- falls back to the whole chain, which is the conservative reading: it went
+ * in at the beginning.
+ */
+function chainFor(build: BuildResult, feature: string, ancestor: string): OpRecord[] {
+  const list = build.ops.get(feature) ?? [];
+  const at = list.findIndex((r) => r.inputs.includes(ancestor));
+  return at < 0 ? list : list.slice(at);
+}
+
+/**
+ * Push a face forward through a chain of booleans.
+ *
+ * `discriminator` is consulted only where an operation SPLITS the face, and it
+ * is evaluated on the face as it enters that operation -- which is the face
+ * whose pieces they are. For the single-boolean case, which is what the app
+ * actually produces today, that is exactly the parent face the name was written
+ * against. Naming uses the same rule (see nameSplitPiece), so the two halves
+ * agree by construction rather than by coincidence.
+ *
+ * A split met by a name that carries no discriminator returns null. That is not
+ * a gap: it means an edit turned one face into several and the name predates
+ * the split, so there is genuinely no answer to which piece was meant.
+ */
+function pushThrough(
+  oc: Occt,
+  chain: OpRecord[],
+  face: any,
+  discriminator: { u: number; v: number } | null,
+): any | null {
+  let cur = face;
+  for (const rec of chain) {
+    const fate = faceFate(oc, rec.op, cur);
+    if (fate.kind === 'deleted') return null;
+    if (fate.kind === 'kept' || fate.kind === 'replaced') {
+      cur = fate.face;
+      continue;
+    }
+    if (!discriminator) return null;
+    const p = pointAtFraction(oc, cur, discriminator.u, discriminator.v);
+    const hit = pieceContaining(oc, fate.pieces, p);
+    if (!hit) return null;
+    cur = hit;
+  }
+  return cur;
+}
+
+/**
  * Find the face a name refers to on a built shape, or null.
  *
  * Null is a real answer and the caller must treat it as one: it means the
@@ -121,12 +186,94 @@ export function resolvePrimitiveFace(oc: Occt, shape: any, part: string): any | 
  * words a student can act on. Silently returning some other face would be the
  * behaviour that makes people distrust parametric CAD.
  */
-export function resolveName(oc: Occt, name: TopoName, built: Map<string, any>): any | null {
-  const shape = built.get(name.feature);
-  if (!shape) return null;
-  if (name.cause === 'primitive') return resolvePrimitiveFace(oc, shape, name.part);
-  // carried / split / swept / cap / made need operation history or sweep
-  // bookkeeping, which is the next slice. Returning null rather than guessing
-  // is the point.
+export function resolveName(oc: Occt, name: TopoName, build: BuildResult): any | null {
+  if (name.cause === 'primitive') {
+    const shape = build.shapes.get(name.feature);
+    return shape ? resolvePrimitiveFace(oc, shape, name.part) : null;
+  }
+  if (name.cause === 'carried' || name.cause === 'split') {
+    // The ancestor is resolved on ITS OWN feature's shape -- the state of the
+    // model before this operation ran -- and then pushed forward. Resolving it
+    // against the result would be asking for the answer this function exists to
+    // compute.
+    const parent = resolveName(oc, name.of, build);
+    if (!parent) return null;
+    const chain = chainFor(build, name.feature, name.of.feature);
+    if (!chain.length) return null;
+    return pushThrough(oc, chain, parent, name.cause === 'split' ? name.at : null);
+  }
+  // swept / cap / made -- see the header. Returning null rather than guessing is
+  // the point.
+  return null;
+}
+
+// ---- writing a name down ----------------------------------------------------
+//
+// The inverse direction, and it has to exist here rather than in
+// lib/topo-name.ts: deciding whether a face was carried or split, and where its
+// discriminator goes, is a question about real geometry.
+
+/**
+ * The name for a face that came through an operation without splitting.
+ *
+ * Returns null when the face was split instead, because `carried` would then be
+ * a lie -- there are several faces with that history and the name would not say
+ * which. The caller wants nameSplitPiece in that case, and the null is how it
+ * finds out.
+ */
+export function nameCarried(
+  oc: Occt,
+  build: BuildResult,
+  feature: string,
+  of: TopoName,
+): TopoName | null {
+  const parent = resolveName(oc, of, build);
+  if (!parent) return null;
+  const chain = chainFor(build, feature, of.feature);
+  if (!chain.length) return null;
+  for (const rec of chain) {
+    const fate = faceFate(oc, rec.op, parent);
+    if (fate.kind === 'deleted' || fate.kind === 'split') return null;
+  }
+  return { cause: 'carried', feature, kind: of.kind, of };
+}
+
+/**
+ * The name for one piece of a face an operation split.
+ *
+ * The discriminator is computed the same way it will later be read: a point
+ * known to lie on the chosen piece, expressed in the parameter space of the
+ * face as it entered the splitting operation. Both halves going through
+ * pointOnFace and uvOnFace is what keeps them honest -- a name is only written
+ * if the point that identifies it can actually be found and located.
+ *
+ * Null means the piece could not be identified, and no name is better than a
+ * name that will not resolve.
+ */
+export function nameSplitPiece(
+  oc: Occt,
+  build: BuildResult,
+  feature: string,
+  of: TopoName,
+  piece: any,
+): TopoName | null {
+  const parent = resolveName(oc, of, build);
+  if (!parent) return null;
+  let cur = parent;
+  for (const rec of chainFor(build, feature, of.feature)) {
+    const fate = faceFate(oc, rec.op, cur);
+    if (fate.kind === 'deleted') return null;
+    if (fate.kind === 'kept' || fate.kind === 'replaced') {
+      cur = fate.face;
+      continue;
+    }
+    const on = pointOnFace(oc, piece);
+    if (!on) return null;
+    // Belt and braces: the point has to identify the piece uniquely among its
+    // siblings, or the name would resolve to null the moment it was read back.
+    if (!pieceContaining(oc, fate.pieces, on)) return null;
+    const uv = fractionOnFace(oc, cur, on);
+    return uv ? { cause: 'split', feature, kind: of.kind, of, at: uv } : null;
+  }
   return null;
 }

@@ -35,6 +35,33 @@ export interface Built {
   shape: any;
 }
 
+/**
+ * One boolean, kept alive after it has produced its shape.
+ *
+ * This is the reason buildDoc returns a record instead of a bare Map. A
+ * `BRepAlgoAPI_*` object is not merely a function that returns a shape -- it
+ * holds the history that says which input face became which output face, and
+ * that history dies with the object. Discarding it, which this file did until
+ * the naming work needed it, throws away the only thing that can carry a
+ * student's selection across a rebuild.
+ *
+ * `inputs` is the feature ids that had gone in by the time this step ran. A
+ * combine over three targets is two pairwise booleans, and a face of the third
+ * target is only visible to the second of them, so the resolver needs to know
+ * where in the chain to start asking.
+ */
+export interface OpRecord {
+  op: any;
+  inputs: string[];
+}
+
+/** Everything a build produced: the shapes, and the operation history behind
+ *  them, keyed by the feature that ran them. */
+export interface BuildResult {
+  shapes: Map<string, any>;
+  ops: Map<string, OpRecord[]>;
+}
+
 const DEG = Math.PI / 180;
 
 /** Move a shape by a vector. Every primitive OCCT builds sits at the origin or
@@ -281,8 +308,21 @@ function primitiveOf(oc: Occt, f: Feature): any {
  *  can be compiled and measured on its own. It is the outline authority --
  *  rounds, chamfers and bows are all already derived there, correctly, by
  *  code that predates the kernel and does not know about it. */
-export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): Map<string, any> {
+export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
   const built = new Map<string, any>();
+  const ops = new Map<string, OpRecord[]>();
+  /** Run one boolean and keep it. Build() is called explicitly rather than
+   *  relying on the two-argument constructor to do it, because the history maps
+   *  are what this is for and an explicitly built operation is the shape that
+   *  was measured to fill them. */
+  const boolean = (kind: string, a: any, b: any, feature: string, inputs: string[]) => {
+    const op = new oc[kind](a, b);
+    op.Build(new oc.Message_ProgressRange());
+    const list = ops.get(feature) ?? [];
+    list.push({ op, inputs });
+    ops.set(feature, list);
+    return op.Shape();
+  };
   for (const f of doc.features) {
     let shape: any = null;
     if (f.kind === 'box' || f.kind === 'cylinder' || f.kind === 'cone'
@@ -290,13 +330,16 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): Map<string, any> {
       shape = primitiveOf(oc, f);
       if (shape) shape = moved(oc, shape, f.center);
     } else if (f.kind === 'combine') {
-      const parts = f.targets.map((id) => built.get(id)).filter(Boolean);
-      if (parts.length >= 2) {
-        shape = parts.reduce((a, b) => {
-          const op = f.op === 'union' ? 'BRepAlgoAPI_Fuse'
-            : f.op === 'subtract' ? 'BRepAlgoAPI_Cut' : 'BRepAlgoAPI_Common';
-          return new oc[op](a, b).Shape();
-        });
+      const live = f.targets.filter((id) => built.get(id));
+      if (live.length >= 2) {
+        const kind = f.op === 'union' ? 'BRepAlgoAPI_Fuse'
+          : f.op === 'subtract' ? 'BRepAlgoAPI_Cut' : 'BRepAlgoAPI_Common';
+        // Written as a loop rather than a reduce so each pairwise step can
+        // record which ids had gone in by the time it ran -- see OpRecord.
+        shape = built.get(live[0]);
+        for (let i = 1; i < live.length; i++) {
+          shape = boolean(kind, shape, built.get(live[i]), f.id, live.slice(0, i + 1));
+        }
       }
     } else if (f.kind === 'sketch') {
       // A sketch is kept as a FACE, not a solid. Nothing renders it on its
@@ -374,13 +417,15 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): Map<string, any> {
         ));
         const flipped = new oc.BRepBuilderAPI_Transform(src, t, false).Shape();
         // reSHape's Mirror keeps the original and adds its reflection, which is
-        // what makes it useful for symmetry rather than a flip.
-        shape = new oc.BRepAlgoAPI_Fuse(src, flipped).Shape();
+        // what makes it useful for symmetry rather than a flip. It is a real
+        // boolean, so its history is recorded like any other -- a face of the
+        // mirrored part has to be nameable too.
+        shape = boolean('BRepAlgoAPI_Fuse', src, flipped, f.id, [f.target]);
       }
     }
     if (shape) built.set(f.id, shape);
   }
-  return built;
+  return { shapes: built, ops };
 }
 
 /** Volume and bounding box, straight from the kernel. Exact for curved

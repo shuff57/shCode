@@ -52,6 +52,7 @@ try {
     [
       path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
       'lib/occt-build.ts', 'lib/model-types.ts', 'lib/sketch-arc.ts', 'lib/topo-resolve.ts',
+      'lib/topo-history.ts', 'lib/topo-name.ts',
       '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',
     ],
     { cwd: root, stdio: 'inherit' },
@@ -61,6 +62,8 @@ try {
   const adapter = require(path.join(out, 'occt-build.js'));
   const arc = require(path.join(out, 'sketch-arc.js'));
   const topo = require(path.join(out, 'topo-resolve.js'));
+  const hist = require(path.join(out, 'topo-history.js'));
+  const naming = require(path.join(out, 'topo-name.js'));
 
   const oc = await (await import(pathToFileURL(path.join(dir, 'replicad_single.js')).href)).default();
   console.log('OpenCascade up, ' + Object.keys(oc).length + ' exports\n');
@@ -71,6 +74,8 @@ try {
   globalThis.__oc = oc;
   globalThis.__adapter = adapter;
   globalThis.__topo = topo;
+  globalThis.__hist = hist;
+  globalThis.__name = naming;
 
   // The fixtures this slice claims: primitives, booleans, move, mirror.
   const DOCS = {
@@ -159,7 +164,7 @@ try {
     let got;
     try {
       const built = adapter.buildDoc(oc, { version: 1, features }, arc);
-      const last = built.get(features[features.length - 1].id);
+      const last = built.shapes.get(features[features.length - 1].id);
       if (!last) { check(name, false, 'the adapter built nothing for it'); continue; }
       got = adapter.measureShape(oc, last);
     } catch (e) {
@@ -211,14 +216,14 @@ function centreOf(oc, shape, part) {
   const build = (w, d, h) => globalThis.__adapter.buildDoc(occ,
     { version: 1, features: [{ id: 'b1', kind: 'box', size: [w, d, h], center: [0, 0, 0] }] });
 
-  const before = build(40, 30, 20).get('b1');
+  const before = build(40, 30, 20).shapes.get('b1');
   const topBefore = centreOf(occ, before, '+z');
   check('a primitive face name resolves at all',
     topBefore !== null && Math.abs(topBefore[2] - 10) < 1e-6, JSON.stringify(topBefore));
 
   // The rebuild. Every dimension changes, so every face moves and the
   // kernel's own face order is free to change with them.
-  const after = build(70, 12, 46).get('b1');
+  const after = build(70, 12, 46).shapes.get('b1');
   const topAfter = centreOf(occ, after, '+z');
   check('...and after a rebuild it still finds the TOP face, at its new height',
     topAfter !== null && Math.abs(topAfter[2] - 23) < 1e-6, JSON.stringify(topAfter));
@@ -241,7 +246,7 @@ function centreOf(oc, shape, part) {
 
   // A cylinder, where +z and -z are caps and the wall is neither.
   const cyl = globalThis.__adapter.buildDoc(occ, { version: 1, features: [
-    { id: 'c1', kind: 'cylinder', radius: 12, height: 30, center: [0, 0, 0] }] }).get('c1');
+    { id: 'c1', kind: 'cylinder', radius: 12, height: 30, center: [0, 0, 0] }] }).shapes.get('c1');
   const side = topo.resolvePrimitiveFace(occ, cyl, 'side');
   const cap = topo.resolvePrimitiveFace(occ, cyl, '+z');
   check('a cylinder tells its wall from its caps',
@@ -253,8 +258,106 @@ function centreOf(oc, shape, part) {
   // A name that cannot be resolved returns null rather than a wrong face.
   check('an unresolvable name returns null instead of guessing',
     topo.resolveName(occ, { cause: 'swept', feature: 'b1', kind: 'face', from: 'sk9', edge: 0 },
-      new Map([['b1', after]])) === null,
+      { shapes: new Map([['b1', after]]), ops: new Map() }) === null,
     'swept names need sweep bookkeeping, which this slice does not have');
+}
+
+
+// ---- the boolean half of the same claim ---------------------------------
+//
+// The block above proves a name survives a REBUILD. This one proves it
+// survives an OPERATION, which is the half the whole design was argued over.
+// A groove cut across the top of a bar SPLITS that top face in two, and the
+// history alone cannot say which piece the student meant -- both came from the
+// same parent. "The left one" has to keep meaning the left one when the bar
+// changes width.
+
+{
+  const occ = globalThis.__oc;
+  const topo = globalThis.__topo;
+  const hist = globalThis.__hist;
+  const naming = globalThis.__name;
+
+  // A bar with a slot cut across its top. The slot stays where it is; only the
+  // bar's width changes, so the two top pieces grow and shrink asymmetrically
+  // -- which is what makes this a real test rather than a uniform scale.
+  const grooved = (w) => globalThis.__adapter.buildDoc(occ, { version: 1, features: [
+    { id: 'bar', kind: 'box', size: [w, 40, 20], center: [0, 0, 0] },
+    { id: 'slot', kind: 'box', size: [10, 60, 10], center: [0, 0, 10] },
+    { id: 'cut', kind: 'combine', op: 'subtract', targets: ['bar', 'slot'] },
+  ] });
+  const TOP = { cause: 'primitive', feature: 'bar', kind: 'face', part: '+z' };
+  const SIDE = { cause: 'primitive', feature: 'bar', kind: 'face', part: '+y' };
+  const cx = (f) => (f ? topo.faceCentre(occ, f)[0] : NaN);
+
+  const a = grooved(40);
+  check('buildDoc keeps the boolean, not just its Shape()',
+    (a.ops.get('cut') || []).length === 1,
+    'the BRepAlgoAPI object holds the history and dies with it');
+
+  const op = a.ops.get('cut')[0].op;
+  const topA = topo.resolveName(occ, TOP, a);
+  const fate = hist.faceFate(occ, op, topA);
+  check('the cut SPLITS the top face rather than merely changing it',
+    fate.kind === 'split' && fate.pieces.length === 2,
+    'got ' + fate.kind + (fate.pieces ? ' x' + fate.pieces.length : ''));
+  check('...while a side face is carried through, changed but still one face',
+    hist.faceFate(occ, op, topo.resolveName(occ, SIDE, a)).kind === 'replaced');
+
+  // Naming refuses to write a name it cannot honour.
+  check('a carried name is refused for a face that split',
+    topo.nameCarried(occ, a, 'cut', TOP) === null,
+    'carried would claim there is one such face when there are two');
+  const sideName = topo.nameCarried(occ, a, 'cut', SIDE);
+  check('...and granted for the face that did not', sideName !== null
+    && naming.formatName(sideName) === 'cut.same[bar.face[+y]]',
+    sideName ? naming.formatName(sideName) : 'null');
+
+  // The name under test: the LEFT piece of the split top face.
+  const left = fate.pieces.reduce((p, q) => (cx(q) < cx(p) ? q : p));
+  check('the two pieces sit either side of the slot',
+    Math.abs(cx(left) + 12.5) < 1e-6, 'left piece should centre at x=-12.5, got ' + cx(left));
+  const leftName = topo.nameSplitPiece(occ, a, 'cut', TOP, left);
+  check('a split piece can be named at all', leftName !== null
+    && leftName.cause === 'split' && leftName.at !== undefined,
+    leftName ? naming.formatName(leftName) : 'null');
+  check('...and the name is written as a discriminator, never an ordinal',
+    leftName !== null && naming.formatName(leftName).indexOf('near(') > 0,
+    leftName ? naming.formatName(leftName) : 'null');
+
+  check('it resolves on the build it was written against',
+    Math.abs(cx(topo.resolveName(occ, leftName, a)) + 12.5) < 1e-6);
+
+  // THE CLAIM. Same name, a bar of a different width, still the left piece.
+  // The pieces are not merely scaled: at w=70 the left piece runs -35..-5 and
+  // at w=26 it runs -13..-5, so a name that tracked world coordinates or piece
+  // order would land on the wrong one or on nothing.
+  for (const [w, want] of [[70, -20], [26, -9]]) {
+    const b = grooved(w);
+    const got = topo.resolveName(occ, leftName, b);
+    check('the same name still finds the LEFT piece on a ' + w + '-wide bar',
+      got !== null && Math.abs(cx(got) - want) < 1e-6,
+      got === null ? 'resolved to null' : 'centred at x=' + cx(got).toFixed(2) + ', wanted ' + want);
+  }
+
+  // ...and it is not doing it by picking the leftmost thing it can find.
+  const rightName = topo.nameSplitPiece(occ, a, 'cut', TOP,
+    fate.pieces.reduce((p, q) => (cx(q) > cx(p) ? q : p)));
+  const rightOn70 = topo.resolveName(occ, rightName, grooved(70));
+  check('the RIGHT piece resolves to the right piece, so it is not a fixed guess',
+    rightOn70 !== null && Math.abs(cx(rightOn70) - 20) < 1e-6,
+    rightOn70 === null ? 'null' : 'x=' + cx(rightOn70).toFixed(2));
+
+  // A discriminator that lands nowhere is lost, and says so by being null.
+  const nowhere = { cause: 'split', feature: 'cut', kind: 'face', of: TOP, at: { u: 500, v: 500 } };
+  check('a discriminator that lands on no piece resolves to null, not a neighbour',
+    topo.resolveName(occ, nowhere, a) === null);
+
+  // Deleting the feature the name hangs off is caught without a kernel at all.
+  check('and a name rooted in a deleted feature is reported as lost, in words',
+    naming.whyNameLost(leftName, (id) => id !== 'bar', () => null, (id) => 'the bar')
+      === 'That face was made by the bar, which is no longer in the model.',
+    String(naming.whyNameLost(leftName, (id) => id !== 'bar', () => null, (id) => 'the bar')));
 }
 
 console.log('');
