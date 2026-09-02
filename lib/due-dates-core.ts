@@ -23,6 +23,17 @@ export interface DueIndex {
   unit: Map<string, number>;
 }
 
+// "Available after" rows, from class_open_dates (migrations/0023). Identical
+// shape and identical inheritance to a due date, so everything below that
+// takes a DueIndex works on an open index unchanged — buildOpenIndex,
+// resolveDueAt and moduleDueSummary are all reused verbatim rather than
+// written twice against the same three maps.
+export interface OpenDateRow {
+  scope: DueScope;
+  scopeId: string;
+  openAt: number; // epoch ms
+}
+
 // ---------------------------------------------------------------------------
 // Timezone
 // ---------------------------------------------------------------------------
@@ -52,18 +63,57 @@ function tzOffsetMs(utcMs: number, tz: string): number {
   return asIfUtc - Math.floor(utcMs / 1000) * 1000;
 }
 
-// Epoch ms for the last instant of `dateStr` (YYYY-MM-DD) in SCHOOL_TZ.
-// Two-pass so a date that straddles a DST transition still lands on the real
-// end of that local day — a hardcoded -8/-7 offset is wrong twice a year.
-export function endOfSchoolDay(dateStr: string, tz: string = SCHOOL_TZ): number {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
-  if (!m) throw new Error(`endOfSchoolDay: expected YYYY-MM-DD, got ${JSON.stringify(dateStr)}`);
-  const [, y, mo, d] = m;
-  const wall = Date.UTC(Number(y), Number(mo) - 1, Number(d), 23, 59, 59, 999);
-
+// A SCHOOL_TZ wall-clock reading (already packed into a UTC-shaped number) ->
+// the real instant it names. Two-pass so a time that straddles a DST
+// transition still lands on the real local moment — a hardcoded -8/-7 offset
+// is wrong twice a year.
+function wallClockToInstant(wall: number, tz: string): number {
   const firstGuess = wall - tzOffsetMs(wall, tz);
   const offset = tzOffsetMs(firstGuess, tz);
   return wall - offset;
+}
+
+const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/;
+// <input type="time"> emits HH:MM, and HH:MM:SS when a step is set. We only
+// ever store minutes, so seconds are parsed and ignored rather than rejected.
+const TIME_ONLY = /^(\d{2}):(\d{2})(?::\d{2})?$/;
+
+// The end-of-day time an <input type="time"> shows for a legacy due date.
+// Round-tripping "23:59" back through schoolInstant would drop the stored
+// 59.999s, so the write path special-cases it — see EOD_TIME's use in the
+// due-dates route.
+export const EOD_TIME = '23:59';
+
+// Epoch ms for the last instant of `dateStr` (YYYY-MM-DD) in SCHOOL_TZ.
+export function endOfSchoolDay(dateStr: string, tz: string = SCHOOL_TZ): number {
+  const m = DATE_ONLY.exec(dateStr);
+  if (!m) throw new Error(`endOfSchoolDay: expected YYYY-MM-DD, got ${JSON.stringify(dateStr)}`);
+  const [, y, mo, d] = m;
+  return wallClockToInstant(Date.UTC(Number(y), Number(mo) - 1, Number(d), 23, 59, 59, 999), tz);
+}
+
+// Epoch ms for `dateStr` at `timeStr` (HH:MM) in SCHOOL_TZ. This is what an
+// "opens Monday at 8:00 AM" row stores, and what a due date with an explicit
+// time stores. Seconds are always :00 — the course has never needed finer,
+// and a whole-minute boundary is what the teacher typed.
+export function schoolInstant(dateStr: string, timeStr: string, tz: string = SCHOOL_TZ): number {
+  const d = DATE_ONLY.exec(dateStr);
+  if (!d) throw new Error(`schoolInstant: expected YYYY-MM-DD, got ${JSON.stringify(dateStr)}`);
+  const t = TIME_ONLY.exec(timeStr);
+  if (!t) throw new Error(`schoolInstant: expected HH:MM, got ${JSON.stringify(timeStr)}`);
+  const hour = Number(t[1]);
+  const minute = Number(t[2]);
+  if (hour > 23 || minute > 59) throw new Error(`schoolInstant: out-of-range time ${JSON.stringify(timeStr)}`);
+  return wallClockToInstant(
+    Date.UTC(Number(d[1]), Number(d[2]) - 1, Number(d[3]), hour, minute, 0, 0),
+    tz,
+  );
+}
+
+// Epoch ms for midnight at the START of `dateStr` in SCHOOL_TZ. The default
+// an "available after" row gets when the teacher sets a date but no time.
+export function startOfSchoolDay(dateStr: string, tz: string = SCHOOL_TZ): number {
+  return schoolInstant(dateStr, '00:00', tz);
 }
 
 // The YYYY-MM-DD that an instant falls on in SCHOOL_TZ. Round-trips with
@@ -80,6 +130,23 @@ export function schoolDateString(ms: number, tz: string = SCHOOL_TZ): string {
   return `${get('year')}-${get('month')}-${get('day')}`;
 }
 
+// The HH:MM that an instant falls on in SCHOOL_TZ. Round-trips with
+// schoolInstant, which is what lets the teacher editor put a stored open_at
+// or due_at straight back into an <input type="time">.
+export function schoolTimeString(ms: number, tz: string = SCHOOL_TZ): string {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz,
+    hour12: false,
+    hour: '2-digit',
+    minute: '2-digit',
+  }).formatToParts(new Date(ms));
+  const get = (type: string) => Number(parts.find((x) => x.type === type)?.value ?? 0);
+  // Intl renders midnight as hour 24 in some ICU versions — same guard as
+  // tzOffsetMs above, and the reason this isn't a plain string slice.
+  const hour = get('hour') % 24;
+  return `${String(hour).padStart(2, '0')}:${String(get('minute')).padStart(2, '0')}`;
+}
+
 // "Fri Sep 12" — short enough to sit inline in a lesson row.
 export function formatDue(ms: number, tz: string = SCHOOL_TZ): string {
   return new Intl.DateTimeFormat('en-US', {
@@ -88,6 +155,25 @@ export function formatDue(ms: number, tz: string = SCHOOL_TZ): string {
     month: 'short',
     day: 'numeric',
   }).format(new Date(ms));
+}
+
+// "8:00 AM". Students read a clock, not a 24-hour string, so the storage
+// format and the display format deliberately differ.
+export function formatTime(ms: number, tz: string = SCHOOL_TZ): string {
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: tz,
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(new Date(ms));
+}
+
+// "Mon Sep 8 · 8:00 AM" — the full form a lock message needs, because
+// "opens Monday" with no time is the question a student immediately asks.
+// An end-of-day instant drops the time: "due Fri Sep 12 · 11:59 PM" is noise
+// on the 200-odd rows that were written before times existed.
+export function formatDueTime(ms: number, tz: string = SCHOOL_TZ): string {
+  const date = formatDue(ms, tz);
+  return schoolTimeString(ms, tz) === EOD_TIME ? date : `${date} · ${formatTime(ms, tz)}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -111,6 +197,18 @@ export function buildDueIndex(rows: readonly DueDateRow[]): DueIndex {
   for (const row of rows) {
     const bucket = index[row.scope];
     if (bucket) bucket.set(row.scopeId, row.dueAt);
+  }
+  return index;
+}
+
+// Same three maps, filled from class_open_dates. Kept as a separate function
+// only because the row field is named openAt; every consumer downstream
+// (resolveDueAt, moduleDueSummary) is shared with due dates.
+export function buildOpenIndex(rows: readonly OpenDateRow[]): DueIndex {
+  const index: DueIndex = { lesson: new Map(), module: new Map(), unit: new Map() };
+  for (const row of rows) {
+    const bucket = index[row.scope];
+    if (bucket) bucket.set(row.scopeId, row.openAt);
   }
   return index;
 }
@@ -209,6 +307,21 @@ export function dueStatus(
   if (completedAt != null) return completedAt > dueAt ? 'done-late' : 'done';
   if (now > dueAt) return 'late';
   return schoolDateString(now, tz) === schoolDateString(dueAt, tz) ? 'today' : 'upcoming';
+}
+
+// ---------------------------------------------------------------------------
+// Availability ("available after")
+// ---------------------------------------------------------------------------
+
+// The one rule the lock is built on, written once so the card, the module
+// row, the footer dot and the workspace gate cannot disagree about it.
+//
+// No row anywhere in the chain -> null -> available. That default is
+// load-bearing: 512 lessons have no open date and must stay openable, and a
+// failed fetch resolves to null too, so a network blip opens lessons rather
+// than sealing the course shut.
+export function isAvailable(openAt: number | null, now: number): boolean {
+  return openAt === null || now >= openAt;
 }
 
 // Read-time late test for the teacher dashboard. Most lessons never write a

@@ -10,15 +10,23 @@ if (!LIB) {
 
 const {
   SCHOOL_TZ,
+  EOD_TIME,
   endOfSchoolDay,
+  startOfSchoolDay,
+  schoolInstant,
   schoolDateString,
+  schoolTimeString,
   formatDue,
+  formatTime,
+  formatDueTime,
   moduleIdFromTitle,
   buildDueIndex,
+  buildOpenIndex,
   resolveDueAt,
   moduleDueSummary,
   dueStatus,
   isPastDue,
+  isAvailable,
 } = require(LIB + '/due-dates-core.js');
 
 let fails = 0;
@@ -218,6 +226,118 @@ ok('late completion counts', isPastDue(SEP12, NOON_SEP15, NOON_SEP15));
 ok('on-time completion does not count', !isPastDue(SEP12, NOON_SEP10, NOON_SEP15));
 ok('not-yet-due does not count', !isPastDue(SEP12, null, NOON_SEP10));
 ok('no due date never counts', !isPastDue(null, null, NOON_SEP15));
+
+// ---------------------------------------------------------------------------
+section('schoolInstant — a wall clock in school time');
+
+// Sep 8 2026 is inside daylight time (UTC-7): 8:00 AM local is 15:00Z.
+eq(
+  'PDT morning lands on the right instant',
+  new Date(schoolInstant('2026-09-08', '08:00')).toISOString(),
+  '2026-09-08T15:00:00.000Z',
+);
+// Jan 15 2026 is standard time (UTC-8): the SAME wall clock is an hour later
+// in UTC. A hardcoded offset would put first period in the wrong hour for
+// half the school year.
+eq(
+  'PST morning lands on the right instant',
+  new Date(schoolInstant('2026-01-15', '08:00')).toISOString(),
+  '2026-01-15T16:00:00.000Z',
+);
+eq(
+  'startOfSchoolDay is local midnight',
+  new Date(startOfSchoolDay('2026-09-08')).toISOString(),
+  '2026-09-08T07:00:00.000Z',
+);
+eq('seconds are accepted and ignored', schoolInstant('2026-09-08', '08:00:45'), schoolInstant('2026-09-08', '08:00'));
+
+// DST transition day: US daylight time starts 2026-03-08 at 02:00 local.
+eq(
+  'the hour before spring-forward is PST',
+  new Date(schoolInstant('2026-03-08', '01:00')).toISOString(),
+  '2026-03-08T09:00:00.000Z',
+);
+eq(
+  'the hour after spring-forward is PDT',
+  new Date(schoolInstant('2026-03-08', '03:00')).toISOString(),
+  '2026-03-08T10:00:00.000Z',
+);
+
+ok('a bad time is rejected', (() => {
+  try { schoolInstant('2026-09-08', '99:99'); return false; } catch { return true; }
+})());
+ok('a bad date is rejected', (() => {
+  try { schoolInstant('Sept 8', '08:00'); return false; } catch { return true; }
+})());
+
+// ---------------------------------------------------------------------------
+section('schoolTimeString — round trip into <input type="time">');
+
+eq('morning round-trips', schoolTimeString(schoolInstant('2026-09-08', '08:00')), '08:00');
+eq('afternoon round-trips', schoolTimeString(schoolInstant('2026-09-08', '15:35')), '15:35');
+// Midnight is the case an ICU that renders hour 24 gets wrong, and it is also
+// the default an "opens on this date" row is written at.
+eq('midnight round-trips as 00:00', schoolTimeString(startOfSchoolDay('2026-09-08')), '00:00');
+eq('a legacy due row reads back as the end-of-day time', schoolTimeString(endOfSchoolDay('2026-09-12')), EOD_TIME);
+eq('the round trip survives DST', schoolTimeString(schoolInstant('2026-01-15', '08:00')), '08:00');
+
+// This is the guard the due-dates route relies on: re-saving a legacy row
+// must not move it. Round-tripping "23:59" back through schoolInstant would
+// land 59.999s earlier, so the route special-cases EOD_TIME instead.
+ok(
+  'raw round trip of an end-of-day row would lose the last second',
+  schoolInstant('2026-09-12', EOD_TIME) < endOfSchoolDay('2026-09-12'),
+);
+
+// ---------------------------------------------------------------------------
+section('formatDueTime');
+
+const SEP8_8AM = schoolInstant('2026-09-08', '08:00');
+eq('a timed instant shows the clock', formatDueTime(SEP8_8AM), `${formatDue(SEP8_8AM)} · ${formatTime(SEP8_8AM)}`);
+eq('8:00 AM formats as a clock reads', formatTime(SEP8_8AM), '8:00 AM');
+// An end-of-day due date drops the time — "· 11:59 PM" on every one of the
+// rows written before times existed is noise, not information.
+eq(
+  'an end-of-day instant shows date only',
+  formatDueTime(endOfSchoolDay('2026-09-12')),
+  formatDue(endOfSchoolDay('2026-09-12')),
+);
+
+// ---------------------------------------------------------------------------
+section('isAvailable — the "available after" gate');
+
+ok('no open date means available', isAvailable(null, SEP8_8AM));
+ok('before the open instant is locked', !isAvailable(SEP8_8AM, SEP8_8AM - 1));
+ok('exactly at the open instant is available', isAvailable(SEP8_8AM, SEP8_8AM));
+ok('after the open instant is available', isAvailable(SEP8_8AM, SEP8_8AM + 1));
+
+// ---------------------------------------------------------------------------
+section('buildOpenIndex — same inheritance as a due date');
+
+const openIndex = buildOpenIndex([
+  { scope: 'unit', scopeId: 'Unit 1: JavaScript Fundamentals', openAt: 100 },
+  { scope: 'module', scopeId: '1.1', openAt: 200 },
+  { scope: 'lesson', scopeId: '1-1-4-sdlc-overview', openAt: 300 },
+]);
+const ids = (lessonId) => ({ lessonId, moduleId: '1.1', unitId: 'Unit 1: JavaScript Fundamentals' });
+
+eq('lesson override wins', resolveDueAt(openIndex, ids('1-1-4-sdlc-overview')), 300);
+eq('module beats unit', resolveDueAt(openIndex, ids('1-1-9-something')), 200);
+eq(
+  'unit is the last resort',
+  resolveDueAt(openIndex, { lessonId: 'x', moduleId: '9.9', unitId: 'Unit 1: JavaScript Fundamentals' }),
+  100,
+);
+eq('nothing in the chain resolves to null', resolveDueAt(openIndex, { lessonId: 'x', moduleId: '9.9', unitId: 'Unit 9' }), null);
+// The default that keeps 512 undated lessons openable, stated as a test.
+ok('an empty open index leaves every lesson available', isAvailable(resolveDueAt(buildOpenIndex([]), ids('anything')), 0));
+
+// moduleDueSummary is index-shaped, not due-specific — the panel reuses it
+// for the Opens column, so it has to behave on an open index too.
+const openSummary = moduleDueSummary(openIndex, '1.1', ['1-1-4-sdlc-overview', '1-1-9-something'], 'Unit 1: JavaScript Fundamentals');
+eq('a module with one overridden child is mixed', openSummary.kind, 'mixed');
+eq('and it counts the override', openSummary.overrides, 1);
+eq('and it reports the module row it would apply', openSummary.ownDueAt, 200);
 
 // ---------------------------------------------------------------------------
 console.log('');

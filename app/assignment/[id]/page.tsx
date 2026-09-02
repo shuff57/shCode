@@ -56,6 +56,7 @@ export default async function AssignmentPage({
         currentLessonId={lesson.id}
         siblings={siblingIds}
         moduleId={moduleId}
+        unitId={lesson.category ?? null}
       >
         {body}
       </LessonAccessGate>

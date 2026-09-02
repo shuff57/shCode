@@ -8,8 +8,8 @@
 // has nothing left to act on. Late-ness after the fact is the teacher's view,
 // not the student's — see the needs-attention endpoint.
 
-import { CalendarClock } from 'lucide-react';
-import { dueStatus, formatDue, type DueStatus } from '../lib/due-dates';
+import { CalendarClock, LockKeyhole } from 'lucide-react';
+import { dueStatus, formatDue, formatDueTime, type DueStatus } from '../lib/due-dates';
 
 const STYLES: Record<Exclude<DueStatus, 'none' | 'done' | 'done-late'>, { color: string; prefix: string }> = {
   upcoming: { color: '#6272a4', prefix: 'Due ' },
@@ -58,6 +58,56 @@ export default function DueBadge({
     >
       <CalendarClock size={fontSize} strokeWidth={2} />
       {label}
+      {ambiguous && className ? <span style={{ opacity: 0.7 }}>· {className}</span> : null}
+    </span>
+  );
+}
+
+// "Opens Mon Sep 8 · 8:00 AM" — the counterpart of DueBadge for a lesson the
+// "available after" gate is still holding shut.
+//
+// This one carries the time, where DueBadge does not: a due date is a whole
+// school day and a student plans around the day, but an open time is the
+// exact moment a locked card becomes clickable, and "opens Monday" with no
+// hour is the question a student asks the second they read it.
+//
+// Renders nothing once the lesson is open. There is no lingering "opened
+// Tuesday" state — a lesson you can work on has nothing left to say.
+export function OpensBadge({
+  openAt,
+  available,
+  className,
+  ambiguous = false,
+  size = 'sm',
+}: {
+  openAt: number | null;
+  available: boolean;
+  className?: string;
+  ambiguous?: boolean;
+  size?: 'sm' | 'md';
+}) {
+  if (openAt === null || available) return null;
+  const fontSize = size === 'md' ? 13 : 12;
+
+  return (
+    <span
+      title={
+        ambiguous && className
+          ? `Earliest open date across your classes (${className})`
+          : 'Your teacher set this lesson to open later.'
+      }
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        color: '#bd93f9',
+        fontSize,
+        whiteSpace: 'nowrap',
+        fontWeight: 600,
+      }}
+    >
+      <LockKeyhole size={fontSize} strokeWidth={2} />
+      Opens {formatDueTime(openAt)}
       {ambiguous && className ? <span style={{ opacity: 0.7 }}>· {className}</span> : null}
     </span>
   );

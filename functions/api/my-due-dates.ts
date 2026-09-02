@@ -1,7 +1,15 @@
 // GET /api/my-due-dates
 //
-// The caller's due-date rows, grouped by the class they came from:
-//   { classes: [{ classId, className, rows: [{ scope, scopeId, dueAt }] }] }
+// The caller's due-date AND "available after" rows, grouped by the class they
+// came from:
+//   { classes: [{ classId, className,
+//                 rows:     [{ scope, scopeId, dueAt }],
+//                 openRows: [{ scope, scopeId, openAt }] }] }
+//
+// Both live on this one endpoint rather than a second /api/my-open-dates: the
+// two are read together by every list that renders a lesson, the rows are a
+// few hundred bytes, and a lesson's lock state must not flicker because one
+// of two fetches landed first.
 //
 // Raw rows, not resolved dates. Two reasons:
 //   1. There are 512 lessons and only a handful of rows — sending the rows is
@@ -26,8 +34,10 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async (cont
   const { env, data } = context;
   const classes = await loadStudentDueRows(env.DB, data.email);
   // Drop classes that have no dates at all — the client only uses the class
-  // name to label a date, so an empty class is pure payload.
-  return json({ classes: classes.filter((c) => c.rows.length > 0) });
+  // name to label a date, so an empty class is pure payload. A class with an
+  // open date but no due date is NOT empty: dropping it would silently unlock
+  // every lesson that class gates.
+  return json({ classes: classes.filter((c) => c.rows.length > 0 || c.openRows.length > 0) });
 };
 
 function json(body: unknown, status = 200): Response {

@@ -134,6 +134,19 @@ are safe. Apply with `npx wrangler d1 migrations apply shcode-commits --remote`.
   buys ~10× on student code.
 - `commits.authored_by_email`: teacher email on teacher pushes; NULL or
   `student_email` for own commits.
+- `class_open_dates` (0023) is the "available after" gate and the mirror of
+  `class_due_dates`: same `(class_id, scope, scope_id)` key, same
+  lesson-over-module-over-unit inheritance, same school timezone. The
+  difference is what they mean — a due date is advisory, an open date
+  **locks**. Two tables rather than one nullable column because
+  `class_due_dates.due_at` is NOT NULL and SQLite cannot relax that in place.
+  **A lesson-id rename migration must UPDATE BOTH tables** where
+  `scope = 'lesson'`; an orphaned due row only loses a badge, but an orphaned
+  open row leaves a lesson locked with no findable date holding it shut.
+- Both `due_at` and `open_at` now carry a real time of day. Every row written
+  before 0023 sits at 23:59:59.999, and the due-dates route special-cases the
+  `23:59` an `<input type="time">` reads back so re-saving one does not
+  silently move it 59.999s earlier.
 
 ## API surface
 
@@ -144,6 +157,18 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
 
 - There is no `PUT /api/lesson-state` and no per-lesson GET — read state from
   the bulk `GET /api/lesson-state`.
+- `GET|PUT /api/classes/[id]/open-dates` is the "available after" editor, the
+  deliberate sibling of `due-dates` (same auth, same entries array, same
+  batching). Both entry shapes take an optional `time: 'HH:MM'`.
+- `GET /api/my-due-dates` carries BOTH kinds — `rows` (due) and `openRows`
+  (open) — per class. One endpoint, because a lesson's lock state must not
+  flicker because one of two fetches landed first.
+- **The open-date lock is enforced client-side only**, in
+  `components/LessonAccessGate.tsx` and the two list components. That matches
+  the existing green-to-advance gate, which is also client-side. A determined
+  student can still reach a not-yet-open lesson's data through the API.
+  `functions/_shared/dueDates.ts` exports `isLessonAvailableForStudent` ready
+  for a route that wants to enforce it server-side; nothing calls it yet.
 - `lesson-drafts` doubles as diagram storage (the serialized `DiagramDoc`);
   there is no diagram-specific table.
 - Teacher pushes to a student's pool stamp `authored_by_email = session.email`

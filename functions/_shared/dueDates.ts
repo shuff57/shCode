@@ -6,13 +6,16 @@
 
 import {
   buildDueIndex,
+  buildOpenIndex,
+  isAvailable,
   moduleIdFromTitle,
   resolveDueAt,
   type DueDateRow,
   type DueScope,
+  type OpenDateRow,
 } from '../../lib/due-dates-core';
 
-export type { DueDateRow, DueScope } from '../../lib/due-dates-core';
+export type { DueDateRow, DueScope, OpenDateRow } from '../../lib/due-dates-core';
 
 interface ManifestLesson {
   id: string;
@@ -94,11 +97,31 @@ export async function loadClassDueRows(db: D1Database, classId: string): Promise
   }));
 }
 
+interface OpenRow {
+  scope: string;
+  scope_id: string;
+  open_at: number;
+}
+
+export async function loadClassOpenRows(db: D1Database, classId: string): Promise<OpenDateRow[]> {
+  const result = await db
+    .prepare('SELECT scope, scope_id, open_at FROM class_open_dates WHERE class_id = ?')
+    .bind(classId)
+    .all<OpenRow>();
+  return (result.results ?? []).map((r) => ({
+    scope: r.scope as DueScope,
+    scopeId: r.scope_id,
+    openAt: r.open_at,
+  }));
+}
+
 // Every class the student is currently enrolled in, with that class's rows.
 export interface ClassDueRows {
   classId: string;
   className: string;
   rows: DueDateRow[];
+  /** class_open_dates rows for the same class. Usually empty. */
+  openRows: OpenDateRow[];
 }
 
 interface EnrollmentDueRow {
@@ -109,30 +132,63 @@ interface EnrollmentDueRow {
   due_at: number | null;
 }
 
+interface EnrollmentOpenRow {
+  class_id: string;
+  scope: string | null;
+  scope_id: string | null;
+  open_at: number | null;
+}
+
 export async function loadStudentDueRows(db: D1Database, email: string): Promise<ClassDueRows[]> {
+  const now = Date.now();
+
+  // Two queries, not one. A second LEFT JOIN onto class_open_dates would
+  // cross-product with the due rows — a class with 8 due rows and 3 open rows
+  // would come back as 24, and every due date would be reported three times.
+  //
   // LEFT JOIN so a class with no due dates still comes back — the client uses
-  // the class list to label which class a date belongs to.
-  const result = await db
-    .prepare(
-      `SELECT c.id AS class_id, c.name AS class_name, d.scope AS scope, d.scope_id AS scope_id, d.due_at AS due_at
-         FROM enrollments e
-         JOIN classes c ON c.id = e.class_id
-         LEFT JOIN class_due_dates d ON d.class_id = c.id
-        WHERE e.student_email = ? AND e.expires_at > ? AND c.archived_at IS NULL`,
-    )
-    .bind(email, Date.now())
-    .all<EnrollmentDueRow>();
+  // the class list to label which date belongs to which class.
+  const [dueResult, openResult] = await Promise.all([
+    db
+      .prepare(
+        `SELECT c.id AS class_id, c.name AS class_name, d.scope AS scope, d.scope_id AS scope_id, d.due_at AS due_at
+           FROM enrollments e
+           JOIN classes c ON c.id = e.class_id
+           LEFT JOIN class_due_dates d ON d.class_id = c.id
+          WHERE e.student_email = ? AND e.expires_at > ? AND c.archived_at IS NULL`,
+      )
+      .bind(email, now)
+      .all<EnrollmentDueRow>(),
+    db
+      .prepare(
+        `SELECT c.id AS class_id, o.scope AS scope, o.scope_id AS scope_id, o.open_at AS open_at
+           FROM enrollments e
+           JOIN classes c ON c.id = e.class_id
+           JOIN class_open_dates o ON o.class_id = c.id
+          WHERE e.student_email = ? AND e.expires_at > ? AND c.archived_at IS NULL`,
+      )
+      .bind(email, now)
+      .all<EnrollmentOpenRow>(),
+  ]);
 
   const byClass = new Map<string, ClassDueRows>();
-  for (const row of result.results ?? []) {
+  for (const row of dueResult.results ?? []) {
     let entry = byClass.get(row.class_id);
     if (!entry) {
-      entry = { classId: row.class_id, className: row.class_name, rows: [] };
+      entry = { classId: row.class_id, className: row.class_name, rows: [], openRows: [] };
       byClass.set(row.class_id, entry);
     }
     if (row.scope && row.scope_id && row.due_at !== null) {
       entry.rows.push({ scope: row.scope as DueScope, scopeId: row.scope_id, dueAt: row.due_at });
     }
+  }
+  for (const row of openResult.results ?? []) {
+    // The due query is a LEFT JOIN over the same enrollments, so every class
+    // here already has an entry. Guard anyway rather than drop a row that
+    // gates access.
+    const entry = byClass.get(row.class_id);
+    if (!entry || !row.scope || !row.scope_id || row.open_at === null) continue;
+    entry.openRows.push({ scope: row.scope as DueScope, scopeId: row.scope_id, openAt: row.open_at });
   }
   return [...byClass.values()];
 }
@@ -163,4 +219,48 @@ export async function resolveDueForStudent(
     if (resolved !== null && (earliest === null || resolved < earliest)) earliest = resolved;
   }
   return earliest;
+}
+
+// The "available after" instant in force for one student on one lesson.
+// Resolved per class and then EARLIEST wins, exactly like the due date —
+// which for a gate means the least restrictive class that actually sets a
+// date. Classes with no open row at all are skipped rather than treated as
+// "open now": most students sit in two classes (the Legacy class plus their
+// real one), and letting an ungated class veto a gated one would mean this
+// feature never locked anything for anybody.
+export async function resolveOpenForStudent(
+  env: DueEnv,
+  request: Request,
+  email: string,
+  lessonId: string,
+): Promise<number | null> {
+  const scopeMap = await loadLessonScopeMap(env, request);
+  if (!scopeMap) return null;
+  const scope = scopeMap.get(lessonId) ?? { title: lessonId, moduleId: null, unitId: null };
+
+  const classes = await loadStudentDueRows(env.DB, email);
+  let earliest: number | null = null;
+  for (const cls of classes) {
+    if (cls.openRows.length === 0) continue;
+    const resolved = resolveDueAt(buildOpenIndex(cls.openRows), {
+      lessonId,
+      moduleId: scope.moduleId,
+      unitId: scope.unitId,
+    });
+    if (resolved !== null && (earliest === null || resolved < earliest)) earliest = resolved;
+  }
+  return earliest;
+}
+
+// True when the student may open this lesson right now, as far as the
+// "available after" gate is concerned. The sequential green-to-advance rule
+// is a separate, independent gate — both must pass.
+export async function isLessonAvailableForStudent(
+  env: DueEnv,
+  request: Request,
+  email: string,
+  lessonId: string,
+  now: number = Date.now(),
+): Promise<boolean> {
+  return isAvailable(await resolveOpenForStudent(env, request, email, lessonId), now);
 }

@@ -49,6 +49,7 @@ export default async function LessonPage({
         currentLessonId={lesson.id}
         siblings={siblingIds}
         moduleId={moduleId}
+        unitId={lesson.category ?? null}
       >
         {body}
       </LessonAccessGate>

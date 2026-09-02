@@ -1,26 +1,29 @@
-// GET /api/classes/[id]/due-dates
-//   -> { dueDates: [{ scope, scopeId, dueAt, date, time, setBy, setAt }] }
-// PUT /api/classes/[id]/due-dates
+// GET /api/classes/[id]/open-dates
+//   -> { openDates: [{ scope, scopeId, openAt, date, time, setBy, setAt }] }
+// PUT /api/classes/[id]/open-dates
 //   body { entries: [{ scope, scopeId, date: 'YYYY-MM-DD' | null, time?: 'HH:MM' | null }] }
 //   `date: null` DELETES that row, which is how a lesson override is cleared
-//   and the lesson goes back to inheriting its module.
-//   `time` is optional and defaults to the end of the school day, which is
-//   what every row written before times existed already stores.
+//   and the lesson goes back to inheriting its module's open date.
+//   `time` is optional and defaults to midnight — the start of that school day.
 //
-// Both are teacher-only (owner, co-teacher, or admin) via canManageClass.
+// The deliberate sibling of ../due-dates/index.ts. Same auth, same batching,
+// same entry shape, same MAX_ENTRIES. It is a separate route rather than a
+// mode flag on that one because the two write different tables and a partly
+// applied cross-table batch would be a worse failure than two round-trips.
 //
-// The client sends a calendar date and a wall-clock time, never a timestamp —
-// the server owns the conversion to an instant so every class shares one
-// school timezone and a student's device clock can never move a deadline.
-// See lib/due-dates-core.ts.
+// UNLIKE a due date, this one LOCKS. A lesson whose resolved open instant is
+// in the future is not openable by a student, so a bad write here is the one
+// thing in this file with real blast radius: getting the timezone wrong shuts
+// a class out of its work. The instant is computed server-side from a wall
+// clock in SCHOOL_TZ for exactly that reason — a student's device clock can
+// never move it, in either direction.
 
 import { canManageClass } from '../../../../_shared/classAuth';
 import {
-  EOD_TIME,
-  endOfSchoolDay,
   schoolDateString,
   schoolInstant,
   schoolTimeString,
+  startOfSchoolDay,
 } from '../../../../../lib/due-dates-core';
 
 interface Env {
@@ -32,23 +35,21 @@ type Ctx = EventContext<Env, 'id', SessionData>;
 const SCOPES = new Set(['unit', 'module', 'lesson']);
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_RE = /^\d{2}:\d{2}(:\d{2})?$/;
-// One PUT covers at most a whole module's worth of lessons plus the module
-// row. The largest module in the course is ~25 lessons; 600 is far above any
-// legitimate write and still bounds a hostile one.
+// Matches the due-dates route: one PUT covers at most a module's worth of
+// lessons plus the module row.
 const MAX_ENTRIES = 600;
 
 interface Entry {
   scope: string;
   scopeId: string;
   date: string | null;
-  /** Optional HH:MM in the school timezone. Omitted = end of the school day. */
   time?: string | null;
 }
 
 interface Row {
   scope: string;
   scope_id: string;
-  due_at: number;
+  open_at: number;
   set_by: string;
   set_at: number;
 }
@@ -64,21 +65,18 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
 
   const result = await env.DB
     .prepare(
-      'SELECT scope, scope_id, due_at, set_by, set_at FROM class_due_dates WHERE class_id = ? ORDER BY scope, scope_id',
+      'SELECT scope, scope_id, open_at, set_by, set_at FROM class_open_dates WHERE class_id = ? ORDER BY scope, scope_id',
     )
     .bind(classId)
     .all<Row>();
 
   return json({
-    dueDates: (result.results ?? []).map((r) => ({
+    openDates: (result.results ?? []).map((r) => ({
       scope: r.scope,
       scopeId: r.scope_id,
-      dueAt: r.due_at,
-      // Echo the calendar date and wall-clock time back so the editor can put
-      // them straight into <input type="date"> / <input type="time"> without
-      // redoing the timezone math client-side.
-      date: schoolDateString(r.due_at),
-      time: schoolTimeString(r.due_at),
+      openAt: r.open_at,
+      date: schoolDateString(r.open_at),
+      time: schoolTimeString(r.open_at),
       setBy: r.set_by,
       setAt: r.set_at,
     })),
@@ -121,7 +119,7 @@ export const onRequestPut: PagesFunction<Env, 'id', SessionData> = async (contex
     if (entry.date === null) {
       statements.push(
         env.DB
-          .prepare('DELETE FROM class_due_dates WHERE class_id = ? AND scope = ? AND scope_id = ?')
+          .prepare('DELETE FROM class_open_dates WHERE class_id = ? AND scope = ? AND scope_id = ?')
           .bind(classId, entry.scope, entry.scopeId),
       );
       cleared++;
@@ -135,37 +133,32 @@ export const onRequestPut: PagesFunction<Env, 'id', SessionData> = async (contex
       return json({ error: `time must be HH:MM or null, got ${JSON.stringify(entry.time)}` }, 400);
     }
 
-    let dueAt: number;
+    let openAt: number;
     try {
-      // No time, or the end-of-day time the editor shows for a legacy row:
-      // keep the 23:59:59.999 semantics. Sending "23:59" back through
-      // schoolInstant would silently move the deadline 59.999s earlier on
-      // every re-save of a date the teacher never meant to change.
-      dueAt =
-        entry.time == null || entry.time.slice(0, 5) === EOD_TIME
-          ? endOfSchoolDay(entry.date)
-          : schoolInstant(entry.date, entry.time);
+      // A date with no time opens at midnight. That is the least surprising
+      // default: "available after Sep 8" reads as all of Sep 8, not from
+      // whatever hour the teacher happened to be editing.
+      openAt = entry.time == null ? startOfSchoolDay(entry.date) : schoolInstant(entry.date, entry.time);
     } catch {
       return json({ error: `Invalid date ${JSON.stringify(entry.date)}` }, 400);
     }
-    if (!Number.isFinite(dueAt)) return json({ error: `Invalid date ${JSON.stringify(entry.date)}` }, 400);
+    if (!Number.isFinite(openAt)) return json({ error: `Invalid date ${JSON.stringify(entry.date)}` }, 400);
 
     statements.push(
       env.DB
         .prepare(
-          `INSERT INTO class_due_dates (class_id, scope, scope_id, due_at, set_by, set_at)
+          `INSERT INTO class_open_dates (class_id, scope, scope_id, open_at, set_by, set_at)
              VALUES (?, ?, ?, ?, ?, ?)
            ON CONFLICT (class_id, scope, scope_id)
-             DO UPDATE SET due_at = excluded.due_at, set_by = excluded.set_by, set_at = excluded.set_at`,
+             DO UPDATE SET open_at = excluded.open_at, set_by = excluded.set_by, set_at = excluded.set_at`,
         )
-        .bind(classId, entry.scope, entry.scopeId, dueAt, data.email, now),
+        .bind(classId, entry.scope, entry.scopeId, openAt, data.email, now),
     );
     written++;
   }
 
-  // One batch so "set the module date and clear its 3 overrides" either all
-  // lands or none of it does — a half-applied write would leave the module
-  // header reading Mixed for no visible reason.
+  // One batch, same reason as the due-dates route: "set the module date and
+  // clear its overrides" either all lands or none of it does.
   await env.DB.batch(statements);
 
   return json({ ok: true, written, cleared });
