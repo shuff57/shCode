@@ -38,6 +38,22 @@ const record = process.argv.includes('--record');
 // units because it is a position, and a position that is off by a millimetre is
 // off wherever it sits.
 const VOL_TOL = 0.005;
+// Curved shapes get a looser one, and the reason is not sloppiness.
+//
+// JSCAD tessellates: a cylinder is a 32-sided prism, and a prism inscribed in
+// a cylinder holds LESS than the cylinder. So the recorded volume for anything
+// round is an artifact of one implementation's mesh density, not the truth.
+// Measured 2026-09-01 against OpenCascade, which computes from the exact
+// surface: cylinder r12 h30 is 13571.6803 by both OCCT and pi*r*r*h, and
+// 13484.6431 by JSCAD -- 0.64% low. A sphere is 1.60% low.
+//
+// Holding an exact kernel to the tessellated number would fail the MORE
+// correct answer for not being the old one, which is the same mistake the
+// solver bar made about relaxation's exact length preservation. So a fixture
+// that is round says so, and the `exact` field below records the analytic
+// volume where arithmetic knows it -- that is the real target, and the
+// tessellated value is what the current core happens to produce on the way.
+const CURVED_VOL_TOL = 0.02;
 const BOX_TOL = 0.01;
 
 /** The fixtures. One per thing the core has to keep doing, kept deliberately
@@ -244,9 +260,30 @@ try {
   const sandbox = makeSandbox();
   const M = sandbox.jscadModeling;
   results = {};
+  // Analytic volumes, worked by hand. A fixture listed here is round, is
+  // compared on the looser tolerance, and carries the number an exact kernel
+  // should hit.
+  const EXACT = {
+    box: 40 * 30 * 20,
+    cylinder: Math.PI * 12 * 12 * 30,
+    cone: (Math.PI * 12 * 12 * 30) / 3,
+    sphere: (4 / 3) * Math.PI * 15 * 15 * 15,
+    torus: 2 * Math.PI * Math.PI * 14 * 4 * 4,
+    'sketch-extrude': 40 * 25 * 12,
+    'circle-extrude': Math.PI * 15 * 15 * 20,
+  };
+  const CURVED = new Set([
+    'box-rounded', 'cylinder', 'cone', 'sphere', 'torus', 'sketch-revolve',
+    'circle-extrude', 'rounded-corner', 'bowed-edge', 'boolean-cut',
+    'boolean-union', 'boolean-intersect',
+  ]);
   for (const [name, doc] of Object.entries(fixtures(types))) {
     try {
       results[name] = measure(sandbox, M, gen.toReshape(doc));
+      if (CURVED.has(name)) results[name].curved = true;
+      if (EXACT[name] !== undefined) {
+        results[name].exact = Math.round(EXACT[name] * 1e4) / 1e4;
+      }
     } catch (e) {
       results[name] = { error: String((e && e.message) || e) };
     }
@@ -286,14 +323,17 @@ for (const [name, want] of Object.entries(base.models)) {
     continue;
   }
   const dv = Math.abs(got.volume - want.volume) / Math.max(1e-9, Math.abs(want.volume));
+  const tol = want.curved ? CURVED_VOL_TOL : VOL_TOL;
   const db = Math.max(...want.bbox.flatMap((row, i) => row.map((v, j) => Math.abs(got.bbox[i][j] - v))));
-  if (dv <= VOL_TOL && db <= BOX_TOL) {
+  if (dv <= tol && db <= BOX_TOL) {
     pass++;
     console.log('  PASS  ' + name + '  vol ' + got.volume + '  polys ' + want.polys + ' -> ' + got.polys);
   } else {
     fails.push(name);
     console.log('  FAIL  ' + name + ' -- volume ' + want.volume + ' -> ' + got.volume
-      + ' (' + (dv * 100).toFixed(2) + '%), worst bbox corner off by ' + db.toFixed(4));
+      + ' (' + (dv * 100).toFixed(2) + '%, limit ' + (tol * 100) + '%), worst bbox corner off by '
+      + db.toFixed(4)
+      + (want.exact !== undefined ? ' | exact would be ' + want.exact : ''));
   }
 }
 console.log('');

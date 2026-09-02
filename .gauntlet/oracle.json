@@ -1,5 +1,5 @@
 {
-  "sha": "0b3514b3e0c66f57ba245dbc65ed89eeee3e471d",
+  "sha": "42cf7d070848c15df67b4b14bf06e683ebc69bd1",
   "takenAt": "2026-09-02",
   "models": {
     "box": {
@@ -16,7 +16,8 @@
           10
         ]
       ],
-      "polys": 6
+      "polys": 6,
+      "exact": 24000
     },
     "box-rounded": {
       "volume": 22822.1949,
@@ -32,7 +33,8 @@
           10
         ]
       ],
-      "polys": 614
+      "polys": 614,
+      "curved": true
     },
     "cylinder": {
       "volume": 13484.6431,
@@ -48,7 +50,9 @@
           15
         ]
       ],
-      "polys": 96
+      "polys": 96,
+      "curved": true,
+      "exact": 13571.6803
     },
     "cone": {
       "volume": 4494.881,
@@ -64,7 +68,9 @@
           15
         ]
       ],
-      "polys": 64
+      "polys": 64,
+      "curved": true,
+      "exact": 4523.8934
     },
     "sphere": {
       "volume": 13911.5534,
@@ -80,7 +86,9 @@
           15
         ]
       ],
-      "polys": 512
+      "polys": 512,
+      "curved": true,
+      "exact": 14137.1669
     },
     "torus": {
       "volume": 4365.0521,
@@ -96,7 +104,9 @@
           4
         ]
       ],
-      "polys": 2048
+      "polys": 2048,
+      "curved": true,
+      "exact": 4421.5828
     },
     "sketch-extrude": {
       "volume": 12000,
@@ -112,7 +122,8 @@
           12
         ]
       ],
-      "polys": 12
+      "polys": 12,
+      "exact": 12000
     },
     "sketch-on-xz": {
       "volume": 12000,
@@ -160,7 +171,8 @@
           30
         ]
       ],
-      "polys": 96
+      "polys": 96,
+      "curved": true
     },
     "circle-extrude": {
       "volume": 14046.5032,
@@ -176,7 +188,9 @@
           20
         ]
       ],
-      "polys": 124
+      "polys": 124,
+      "curved": true,
+      "exact": 14137.1669
     },
     "rounded-corner": {
       "volume": 11906.3239,
@@ -192,7 +206,8 @@
           12
         ]
       ],
-      "polys": 60
+      "polys": 60,
+      "curved": true
     },
     "chamfered-corner": {
       "volume": 11784,
@@ -224,7 +239,8 @@
           12
         ]
       ],
-      "polys": 56
+      "polys": 56,
+      "curved": true
     },
     "blend": {
       "volume": 21000,
@@ -272,7 +288,8 @@
           10
         ]
       ],
-      "polys": 104
+      "polys": 104,
+      "curved": true
     },
     "boolean-union": {
       "volume": 35995.4498,
@@ -288,7 +305,8 @@
           20
         ]
       ],
-      "polys": 138
+      "polys": 138,
+      "curved": true
     },
     "boolean-intersect": {
       "volume": 14046.5032,
@@ -304,7 +322,8 @@
           10
         ]
       ],
-      "polys": 34
+      "polys": 34,
+      "curved": true
     },
     "mirror": {
       "volume": 16000,
@@ -476,16 +495,16 @@
       "closed": true,
       "_points": [
         [
-          3.6583,
-          -0.3369
+          3.7462,
+          -0.0683
         ],
         [
-          35.8027,
-          -3.2971
+          36.2525,
+          -3.744
         ],
         [
-          40.539,
-          28.634
+          40.0683,
+          28.7461
         ],
         [
           0,
@@ -532,16 +551,16 @@
       "closed": true,
       "_points": [
         [
-          -0.0772,
-          1.3001
+          -0.0749,
+          1.3115
         ],
         [
-          40.8429,
-          4.8194
+          40.8361,
+          4.8011
         ],
         [
-          39.1206,
-          24.8451
+          39.1261,
+          24.8487
         ],
         [
           0,
@@ -595,20 +614,20 @@
       "closed": true,
       "_points": [
         [
-          3.75,
-          -3.75
+          3.7581,
+          -3.7413
         ],
         [
-          36.25,
-          -3.75
+          36.2576,
+          -3.7413
         ],
         [
-          36.25,
-          28.75
+          36.2576,
+          28.7582
         ],
         [
-          3.75,
-          28.75
+          3.7581,
+          28.7582
         ]
       ],
       "_residual": 0
@@ -625,24 +644,23 @@
       "closed": true,
       "_points": [
         [
-          7.5906,
-          0.1116
+          7.2478,
+          -2.5128
         ],
         [
-          32.5879,
-          0.4789
+          32.0701,
+          0.463
         ],
         [
-          39.8215,
-          24.4095
+          39.0094,
+          24.4806
         ],
         [
           0,
           25
         ]
       ],
-      "_residual": 15,
-      "note": "BASELINE CHANGED 2026-09-01 when the solver became least squares, and the new answer is the better one. Edge 0 is asked to be both 40 and 10. Relaxation settled it at 10 -- satisfying one of two contradictory rules and marking only the other, which tells a student the 40 is the problem when the two are equally at fault. Least squares settles at 25, the compromise, and marks BOTH. The innocent third rule (edge 1 = 25) is still not marked, which is what makes this discrimination rather than lighting everything up."
+      "_residual": 15
     },
     "impossible-triangle": {
       "satisfied": [
@@ -656,20 +674,19 @@
       "closed": true,
       "_points": [
         [
-          1.3402,
-          -0.9785
+          1.3482,
+          -0.7643
         ],
         [
-          38.6629,
-          -0.9766
+          38.648,
+          -0.6219
         ],
         [
-          19.9999,
-          31.3449
+          19.8747,
+          31.6095
         ]
       ],
-      "_residual": 25.8521,
-      "note": "Held through the solver swap, but only after the loophole was closed. Least squares aims at whatever makes the residuals small, and an angle residual scaled by the sketch size RECOMPUTED from the points being solved gave it a way to make an impossible rule look met by shrinking: it collapsed all three corners onto one point, twice, and reported every rule satisfied. Freezing the scale at the input removed the incentive. Reporting a full-size miss for a zero-length edge was also tried and reverted -- it made the solver chase degenerate edges apart, moving corners nobody asked it to move. The triangle now keeps 37.30-unit sides and says the rules disagree."
+      "_residual": 25.8604
     }
   }
 }
