@@ -51,7 +51,7 @@ try {
     process.execPath,
     [
       path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-      'lib/occt-build.ts', 'lib/model-types.ts', 'lib/sketch-arc.ts',
+      'lib/occt-build.ts', 'lib/model-types.ts', 'lib/sketch-arc.ts', 'lib/topo-resolve.ts',
       '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',
     ],
     { cwd: root, stdio: 'inherit' },
@@ -60,9 +60,17 @@ try {
   const require = createRequire(import.meta.url);
   const adapter = require(path.join(out, 'occt-build.js'));
   const arc = require(path.join(out, 'sketch-arc.js'));
+  const topo = require(path.join(out, 'topo-resolve.js'));
 
   const oc = await (await import(pathToFileURL(path.join(dir, 'replicad_single.js')).href)).default();
   console.log('OpenCascade up, ' + Object.keys(oc).length + ' exports\n');
+
+  // The rebuild-identity block at the bottom runs after this try/finally has
+  // closed, so it cannot see these bindings. Handing them over explicitly is
+  // uglier than nesting and keeps the two concerns readable apart.
+  globalThis.__oc = oc;
+  globalThis.__adapter = adapter;
+  globalThis.__topo = topo;
 
   // The fixtures this slice claims: primitives, booleans, move, mirror.
   const DOCS = {
@@ -182,6 +190,71 @@ try {
   }
 } finally {
   rmSync(out, { recursive: true, force: true });
+}
+
+// ---- the claim the whole naming design rests on -------------------------
+//
+// Build, name a face, change an upstream number, rebuild, and ask the name
+// again. It has to come back to the SAME face. If it does not, a student
+// cannot fillet an edge and keep the fillet when they widen the part, and
+// parametric modelling does not work whatever the kernel is.
+
+function centreOf(oc, shape, part) {
+  const topo = globalThis.__topo;
+  const face = topo.resolvePrimitiveFace(oc, shape, part);
+  return face ? topo.faceCentre(oc, face) : null;
+}
+
+{
+  const occ = globalThis.__oc;
+  const topo = globalThis.__topo;
+  const build = (w, d, h) => globalThis.__adapter.buildDoc(occ,
+    { version: 1, features: [{ id: 'b1', kind: 'box', size: [w, d, h], center: [0, 0, 0] }] });
+
+  const before = build(40, 30, 20).get('b1');
+  const topBefore = centreOf(occ, before, '+z');
+  check('a primitive face name resolves at all',
+    topBefore !== null && Math.abs(topBefore[2] - 10) < 1e-6, JSON.stringify(topBefore));
+
+  // The rebuild. Every dimension changes, so every face moves and the
+  // kernel's own face order is free to change with them.
+  const after = build(70, 12, 46).get('b1');
+  const topAfter = centreOf(occ, after, '+z');
+  check('...and after a rebuild it still finds the TOP face, at its new height',
+    topAfter !== null && Math.abs(topAfter[2] - 23) < 1e-6, JSON.stringify(topAfter));
+  check('...not merely some face that happens to sit high',
+    topAfter !== null && Math.abs(topAfter[0]) < 1e-6 && Math.abs(topAfter[1]) < 1e-6,
+    'the top face of a centred box centres on the z axis');
+
+  // Every direction, so a lucky guess on one cannot pass for the design
+  // working.
+  const dirs = [['+x', 35], ['-x', -35], ['+y', 6], ['-y', -6], ['-z', -23]];
+  let allRight = true;
+  const seen = [];
+  for (const [part, want] of dirs) {
+    const c = centreOf(occ, after, part);
+    const axis = part.includes('x') ? 0 : part.includes('y') ? 1 : 2;
+    seen.push(part + (c ? c[axis].toFixed(1) : 'null'));
+    if (!c || Math.abs(c[axis] - want) > 1e-6) allRight = false;
+  }
+  check('every face of the rebuilt box is found where it belongs', allRight, seen.join(' '));
+
+  // A cylinder, where +z and -z are caps and the wall is neither.
+  const cyl = globalThis.__adapter.buildDoc(occ, { version: 1, features: [
+    { id: 'c1', kind: 'cylinder', radius: 12, height: 30, center: [0, 0, 0] }] }).get('c1');
+  const side = topo.resolvePrimitiveFace(occ, cyl, 'side');
+  const cap = topo.resolvePrimitiveFace(occ, cyl, '+z');
+  check('a cylinder tells its wall from its caps',
+    side !== null && cap !== null
+      && Math.abs(topo.faceCentre(occ, cap)[2] - 15) < 1e-6
+      && Math.abs(topo.faceCentre(occ, side)[2]) < 1e-6,
+    'cap should centre at z=15, the wall at z=0');
+
+  // A name that cannot be resolved returns null rather than a wrong face.
+  check('an unresolvable name returns null instead of guessing',
+    topo.resolveName(occ, { cause: 'swept', feature: 'b1', kind: 'face', from: 'sk9', edge: 0 },
+      new Map([['b1', after]])) === null,
+    'swept names need sweep bookkeeping, which this slice does not have');
 }
 
 console.log('');
