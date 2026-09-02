@@ -14,17 +14,46 @@
 // screenshot: the same source, two engines, two numbers that have to agree.
 // scripts/test-occt-api.mjs is that harness and it prints the count every run.
 //
-// JSCAD'S SEMANTICS, NOT A BETTER IDEA. Every signature here copies
-// @jscad/modeling exactly, including the parts that are awkward:
+// JSCAD'S SEMANTICS, EXCEPT WHERE THEY MISLEAD. Every signature here copies
+// @jscad/modeling, including the parts that are merely awkward:
 //
 //   * `size` is the FULL extent, not a half-extent, and shapes are centred at
 //     the origin unless `center` says otherwise.
-//   * `torus` takes innerRadius as the TUBE and outerRadius as the ring the tube
-//     travels along -- labels that mislead, documented at length in
-//     public/reshape/reshape.js, and copied here rather than fixed. Fixing them
-//     would silently change what a student's existing file builds.
 //   * `rotate` spins about the WORLD origin. reSHape's `turn` is the one that
 //     pivots in place, and the difference is a taught topic.
+//
+// THIS RULE WAS TIGHTER WHEN THIS FILE WAS WRITTEN, and the change is worth
+// recording rather than quietly editing. It read "JSCAD's semantics, NOT a
+// better idea" -- copy even the harmful parts, because an existing student file
+// must build what it built before. Two things removed that force (operator,
+// 2026-09-02): the book and lessons are being rewritten around this engine, so
+// there is no corpus of files to preserve; and reSHape's stated reason for
+// mirroring JSCAD was GRADUATION -- "nothing to undo, the real names are still
+// in scope, paste it into jscad.app" -- and that destination goes away with
+// JSCAD itself. Carrying a design error for compatibility with something being
+// deleted buys nothing.
+//
+// So the rule now: keep the names and call shapes, and fix what is MEASURED as
+// harmful. The case on record is `torus`. JSCAD's `outerRadius` is the circle
+// the tube travels along and its `innerRadius` is the tube itself; neither is
+// what its name suggests, and public/reshape/reshape.js measured what that
+// costs -- reading them the obvious way builds 44 x 44 x 8, or 56 x 56 x 20,
+// SILENTLY, with only the full swap throwing. Those become ringRadius and
+// tubeRadius.
+//
+// And mesh-only options are REFUSED BY NAME, never emulated and never ignored.
+// `sphere(15, { segments: 24 })` answers "a B-rep sphere is exact; there are no
+// segments to choose". Those refusal sentences are the only place a student
+// meets the difference between the two engines, so they matter more than the
+// refusal does.
+//
+// NOT YET DONE, and deliberately: no name has actually been renamed here. The
+// decision is recorded and the rule is stated; the renames land with the lesson
+// rewrites that need them, so the two cannot drift apart. scripts/
+// test-occt-api.mjs still compares against JSCAD as its bar, which makes it a
+// TRANSITIONAL regression check rather than a permanent one -- every deliberate
+// divergence has to be listed there, the way the bounding-sphere one already
+// is.
 //
 // Anywhere the two engines cannot agree, the divergence is named in the
 // function's own comment rather than smoothed over.
@@ -570,9 +599,11 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
       : given;
     delete o.ringRadius; delete o.tubeRadius;
     refuseUnknown('torus', o);
-    // JSCAD's names, kept exactly: innerRadius is the TUBE, outerRadius is the
-    // circle the tube travels along. Both mislead, and both are what every
-    // existing student file was written against.
+    // The library's names, still accepted: innerRadius is the TUBE and
+    // outerRadius is the circle it travels along. Both mislead -- see the
+    // banner -- and both are DUE to be renamed to tubeRadius and ringRadius
+    // with the lesson rewrite. The positional form above already uses the true
+    // names; this is the object form, kept until the docs move.
     const c = centre(o);
     const raw = new oc.BRepPrimAPI_MakeTorus(o.outerRadius ?? 1, o.innerRadius ?? 0.5).Shape();
     return moved(raw, c);
