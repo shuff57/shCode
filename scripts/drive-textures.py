@@ -40,7 +40,18 @@ with sync_playwright() as p:
     # Next's dev server holds an HMR websocket open, so "networkidle" never
     # settles here. Wait for the thing we actually need instead.
     pg.goto(f"{BASE}/textures/", wait_until="domcontentloaded")
-    pg.wait_for_selector('button[title="coin"]', timeout=20000)
+    # The built-in catalog sits behind LOAD, matching pixelartcss.com's modal.
+    #
+    # Clicked in a retry loop, not once: "text=LOAD" matches the SSR markup
+    # before React has hydrated, so a single click lands on dead HTML, opens
+    # nothing, and the wait below then times out on a page that is fine.
+    pg.wait_for_selector("text=LOAD", timeout=25000)
+    for _ in range(20):
+        pg.click("text=LOAD")
+        pg.wait_for_timeout(500)
+        if pg.locator('button[title="coin"]').count():
+            break
+    pg.wait_for_selector('button[title="coin"]', timeout=15000)
 
     builtins = pg.locator("button[title] img[alt]")
     check("the built-in catalog rendered", builtins.count() >= 30, f"{builtins.count()} thumbnails")
@@ -49,7 +60,7 @@ with sync_playwright() as p:
     check("a named built-in is offered by name", coin.count() == 1, f"{coin.count()} matches")
 
     if coin.count() == 1:
-        coin.first.click()
+        coin.first.click()   # picking one also closes the library
         pg.wait_for_timeout(500)
         # Reading the PNG back off a canvas is the same-origin question. A
         # tainted canvas would surface here as the error message, not a crash.
@@ -81,7 +92,7 @@ with sync_playwright() as p:
         pg.wait_for_timeout(120)
 
     pg.fill('input[placeholder="myGuy"]', "driveTest")
-    pg.click("text=Save texture")
+    pg.click("text=SAVE")
     pg.wait_for_timeout(400)
 
     saved_ok = pg.locator("p").filter(has_text="driveTest").count() >= 1
@@ -97,14 +108,38 @@ with sync_playwright() as p:
     check("it landed in the moSHion store in storeItem's own format",
           isinstance(stored, str) and stored.startswith("data:image/png"), stored)
 
+    pg.click("text=LOAD")
+    pg.wait_for_timeout(300)
     listed = pg.locator('button[title="Edit driveTest"]').count()
+    pg.click("text=Close")
+    pg.wait_for_timeout(200)
     check("it appears in the student's own library", listed == 1, f"{listed} matches")
+
+    # Layout parity with pixelartcss.com: frames strip across the top, then
+    # tool rail / canvas / settings left to right. Colours are deliberately NOT
+    # copied, so this asserts geometry only.
+    order = pg.evaluate("""() => {
+        const strip = document.querySelector('button[aria-label="add frame"]');
+        const grid = document.querySelector('[data-texture-grid]');
+        const rail = [...document.querySelectorAll('button')].find((b) => b.textContent.trim() === 'NEW');
+        const settings = document.querySelector('input[aria-label="pixel size"]');
+        if (!strip || !grid || !rail || !settings) return null;
+        const r = (e) => e.getBoundingClientRect();
+        return {
+            stripAboveGrid: r(strip).bottom <= r(grid).top,
+            railLeftOfGrid: r(rail).right <= r(grid).left,
+            settingsRightOfGrid: r(settings).left >= r(grid).right,
+        };
+    }""")
+    check("frames strip sits above the canvas", bool(order) and order["stripAboveGrid"], order)
+    check("tool rail sits left of the canvas", bool(order) and order["railLeftOfGrid"], order)
+    check("settings sit right of the canvas", bool(order) and order["settingsRightOfGrid"], order)
 
     pg.screenshot(path=os.path.join(SHOTS, "editor.png"), full_page=True)
 
 
     # ---- parity features (pixelartcss.com / pixel-art-react) -------------
-    pg.click("text=Pencil")
+    pg.click("text=Draw")
     cells = pg.locator('div[style*="width: 21px"], div[style*="width: 22px"], div[style*="width: 20px"]')
     # Cell size is adaptive, so the selector above may miss; fall back to the
     # grid's own children rather than asserting a pixel size.
@@ -112,13 +147,14 @@ with sync_playwright() as p:
 
     # redo: undo one stroke, then put it back
     before = pg.evaluate("() => document.querySelectorAll('button').length")
-    pg.click("text=↶ Undo")
+    undo_btn = pg.locator('button[title="Ctrl+Z"]')
+    redo_btn = pg.locator('button[title="Ctrl+Y"]')
+    undo_btn.click()
     pg.wait_for_timeout(150)
-    redo_btn = pg.locator("button", has_text="Redo").first
     check("redo becomes available after an undo", redo_btn.is_enabled())
     redo_btn.click()
     pg.wait_for_timeout(150)
-    check("redo is consumed after use", "Redo" in pg.inner_text("body"))
+    check("redo is consumed after use", redo_btn.count() == 1)
 
     # frames: add two, confirm the animation controls appear
     pg.click('button[title="Duplicate this frame"]')
@@ -128,8 +164,9 @@ with sync_playwright() as p:
     check("frame thumbnails appear for each frame",
           pg.locator('button[title^="Frame "]').count() == 3,
           pg.locator('button[title^="Frame "]').count())
-    check("play + onion skin appear only once there is more than one frame",
-          pg.locator("text=▶ Play").count() == 1 and pg.locator("text=onion skin").count() == 1)
+    check("play and onion-skin controls are present",
+          pg.locator('button[title="Play / pause  (Space)"]').count() == 1
+          and pg.locator('button[title="Onion skin"]').count() == 1)
 
     # a visibly different last frame, so the strip is not 3 identical cells
     pg.click("text=Fill")
@@ -139,7 +176,7 @@ with sync_playwright() as p:
         pg.wait_for_timeout(150)
 
     pg.fill('input[placeholder="myGuy"]', "driveAnim")
-    pg.click("text=Save texture")
+    pg.click("text=SAVE")
     pg.wait_for_timeout(400)
     check("saving several frames reports an animation",
           "animates" in pg.inner_text("body"))
@@ -186,7 +223,7 @@ with sync_playwright() as p:
     pg.fill('input[aria-label="Frame 2 duration"]', "20")
     pg.wait_for_timeout(200)
     pg.fill('input[placeholder="myGuy"]', "driveHold")
-    pg.click("text=Save texture")
+    pg.click("text=SAVE")
     pg.wait_for_timeout(400)
     held = pg.evaluate("""() => {
         try {
@@ -203,8 +240,8 @@ with sync_playwright() as p:
         const g = document.querySelector('[data-texture-grid]');
         return g ? Math.round(g.children[0].getBoundingClientRect().width) : -1;
     }""")
-    pg.click('button[aria-label="zoom in"]')
-    pg.click('button[aria-label="zoom in"]')
+    pg.click('button[aria-label="pixel size up"]')
+    pg.click('button[aria-label="pixel size up"]')
     pg.wait_for_timeout(200)
     zoom_after = pg.evaluate("""() => {
         const g = document.querySelector('[data-texture-grid]');
@@ -212,7 +249,7 @@ with sync_playwright() as p:
     }""")
     check("Pixel size zooms the grid", zoom_after > zoom_before,
           f"{zoom_before}px -> {zoom_after}px")
-    pg.click("text=Fit")
+    pg.click('button[title="Fit the grid to this panel"]')
     pg.wait_for_timeout(200)
     check("Fit returns to the auto-fitted size",
           pg.evaluate("""() => {
@@ -225,19 +262,19 @@ with sync_playwright() as p:
     body = pg.inner_text("body")
     # A shortcut nothing documents may as well not exist -- and a panel that
     # lists a key the handler does not implement is worse. Both directions.
-    listed = [k for k in ("Ctrl+Z", "Ctrl+Y", "B", "E", "G", "I", "V", "Space") if k in body]
+    listed = [k for k in ("Ctrl+Z", "Ctrl+Y", "B", "E", "G", "I", "V", "Space") if k in body]  # noqa: E501
     check("the shortcuts panel lists the keys", len(listed) >= 6, listed)
 
     pg.keyboard.press("e")
     pg.wait_for_timeout(150)
     eraser_active = pg.evaluate("""() => {
-        const b = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Eraser');
+        const b = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Erase');
         return b ? getComputedStyle(b).fontWeight : null;
     }""")
     pg.keyboard.press("b")
     pg.wait_for_timeout(150)
     pencil_active = pg.evaluate("""() => {
-        const b = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Pencil');
+        const b = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Draw');
         return b ? getComputedStyle(b).fontWeight : null;
     }""")
     check("the documented tool shortcuts actually switch tools",

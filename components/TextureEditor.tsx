@@ -104,6 +104,10 @@ export default function TextureEditor() {
   // makes the same component work in a 240px drawer and on a full page.
   const [zoom, setZoom] = useState<number | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  // Their LOAD opens a modal gallery. Inline panel here instead: it holds the
+  // 40-texture built-in catalog as well as saved art, and burying that behind
+  // a modal would hide the thing most students start from.
+  const [showLibrary, setShowLibrary] = useState(false);
 
   const painting = useRef(false);
   const strokeStart = useRef<Snapshot | null>(null);
@@ -526,6 +530,18 @@ export default function TextureEditor() {
     a.click();
   }
 
+  // Their NEW. Undoable rather than a confirm dialog -- an accidental NEW is
+  // one Ctrl+Z away, which is friendlier than a prompt on every deliberate one.
+  function handleNew() {
+    commit(snapshot());
+    setFrames([blank(w, h)]);
+    setIndex(0);
+    setHolds(null);
+    setName('');
+    setPlaying(false);
+    setMessage({ text: 'New texture. Ctrl+Z brings the old one back.', bad: false });
+  }
+
   function handleDelete(n: string) {
     deleteSavedTexture(n);
     refreshSaved();
@@ -562,7 +578,6 @@ export default function TextureEditor() {
     backgroundColor: '#202020',
   };
 
-  const swatches = [...recent, ...PALETTE.filter((c) => !recent.includes(c))];
 
   function MiniFrame({ cells, size }: { cells: Frame; size: number }) {
     return (
@@ -576,62 +591,254 @@ export default function TextureEditor() {
     );
   }
 
+  // ---- layout ------------------------------------------------------------
+  //
+  // Arranged like pixelartcss.com, because that is the shape asked for:
+  //
+  //   [ frames strip, full width ]
+  //   [ tool rail | canvas | settings ]
+  //   [ library, when LOAD is open ]
+  //
+  // Their colours are not copied -- this stays on shCode's Dracula tokens, so
+  // it matches the rest of the app rather than a second site.
+  //
+  // The one departure is forced: three columns cannot fit the sandbox drawer
+  // (240-600px), so below `narrow` the same three regions stack. The order is
+  // preserved, which is what makes it recognisably the same layout.
+  const railBtn = (active = false, disabled = false): React.CSSProperties => ({
+    ...btn(active, disabled),
+    width: '100%', textAlign: 'center', padding: '6px 4px',
+  });
+  const stepBox: React.CSSProperties = {
+    display: 'flex', alignItems: 'stretch',
+    border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden',
+  };
+  const stepVal: React.CSSProperties = {
+    width: 44, textAlign: 'center', background: 'var(--muted)', color: 'var(--text)',
+    border: 'none', fontSize: 13, padding: '5px 2px', MozAppearance: 'textfield',
+  };
+  const stepBtn: React.CSSProperties = {
+    background: 'var(--card)', color: 'var(--text)', border: 'none',
+    borderLeft: '1px solid var(--border)', cursor: 'pointer',
+    fontSize: 11, lineHeight: 1, padding: '0 7px',
+  };
+
+  function Stepper({
+    value, onChange, min, max, ariaLabel,
+  }: { value: number; onChange: (n: number) => void; min: number; max: number; ariaLabel: string }) {
+    return (
+      <div style={stepBox}>
+        <input
+          type="number" value={value} min={min} max={max} aria-label={ariaLabel}
+          onChange={(e) => onChange(Math.max(min, Math.min(max, Number(e.target.value) || min)))}
+          style={stepVal}
+        />
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <button style={{ ...stepBtn, borderBottom: '1px solid var(--border)' }}
+            onClick={() => onChange(Math.min(max, value + 1))} aria-label={ariaLabel + ' up'}>+</button>
+          <button style={stepBtn}
+            onClick={() => onChange(Math.max(min, value - 1))} aria-label={ariaLabel + ' down'}>−</button>
+        </div>
+      </div>
+    );
+  }
+
+  const uniformHold = Math.max(1, Math.round(60 / fps));
+
   return (
     <div
       ref={wrapRef}
       style={{
-        padding: narrow ? 12 : 20, color: 'var(--text)', maxWidth: 1240, margin: '0 auto',
+        padding: narrow ? 10 : 18, color: 'var(--text)', maxWidth: 1320, margin: '0 auto',
         // width + minWidth:0 so this can never be sized by its own content --
-        // the other half of the feedback loop above.
+        // measuring a content-sized box is a feedback loop, and it once made a
+        // 319px drawer report room for a 462px grid.
         width: '100%', minWidth: 0, boxSizing: 'border-box',
-        // A belt to the cell-size braces above: if any row still measures wider
-        // than the drawer, it scrolls inside the panel rather than vanishing
-        // off the edge with no way to reach it.
         overflowX: 'hidden',
       }}
     >
-      <h1 style={{ fontSize: narrow ? 16 : 22, margin: '0 0 4px' }}>Texture editor</h1>
-      <p style={{ fontSize: 12, opacity: 0.72, margin: '0 0 14px', lineHeight: 1.5 }}>
-        Draw a texture, or open a built-in one and change it. Saving puts it under a name{' '}
-        <code style={{ color: 'var(--brand)' }}>sprite.texture</code> can use. More than one frame
-        saves as an animation — the sprite moves on its own. Saved art lives in this browser only.
-      </p>
+      {/* ---- frames strip, across the top ---- */}
+      <div style={{ ...card, padding: 8, marginBottom: 10, overflowX: 'auto' }}>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+          <button
+            style={{ ...btn(), alignSelf: 'stretch', padding: '0 12px', fontSize: 18 }}
+            onClick={() => addFrame(false)}
+            title="Add an empty frame"
+            aria-label="add frame"
+          >
+            +
+          </button>
+          {frames.map((f, i) => (
+            <div key={i} style={{ textAlign: 'center', flexShrink: 0 }}>
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => { setPlaying(false); setIndex(i); }}
+                  title={`Frame ${i + 1}`}
+                  style={{
+                    padding: 2, cursor: 'pointer', borderRadius: 5, background: '#202020',
+                    border: i === index ? '2px solid var(--brand)' : '1px solid var(--border)',
+                    display: 'block',
+                  }}
+                >
+                  <MiniFrame cells={f} size={38} />
+                </button>
+                {i === index && (
+                  <div style={{ position: 'absolute', top: 1, right: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <button
+                      onClick={removeFrame}
+                      title="Delete this frame"
+                      aria-label="delete frame"
+                      style={{
+                        background: 'rgba(0,0,0,0.72)', border: 'none', color: '#e8607a',
+                        cursor: 'pointer', fontSize: 9, lineHeight: 1, padding: '2px 3px', borderRadius: 3,
+                      }}
+                    >
+                      ✕
+                    </button>
+                    <button
+                      onClick={() => addFrame(true)}
+                      title="Duplicate this frame"
+                      aria-label="duplicate frame"
+                      style={{
+                        background: 'rgba(0,0,0,0.72)', border: 'none', color: 'var(--text)',
+                        cursor: 'pointer', fontSize: 9, lineHeight: 1, padding: '2px 3px', borderRadius: 3,
+                      }}
+                    >
+                      ⧉
+                    </button>
+                  </div>
+                )}
+              </div>
+              {frames.length > 1 && (
+                <input
+                  type="number" min={1} max={60}
+                  aria-label={`Frame ${i + 1} duration`}
+                  value={holds ? holds[i] : uniformHold}
+                  onChange={(e) => {
+                    const v = Math.max(1, Math.min(60, Number(e.target.value) || 1));
+                    setHolds((hs) => {
+                      const base = hs ?? frames.map(() => uniformHold);
+                      const next = base.slice();
+                      next[i] = v;
+                      return next;
+                    });
+                  }}
+                  style={{
+                    width: 42, marginTop: 2, textAlign: 'center',
+                    background: 'var(--muted)', color: 'var(--text)',
+                    border: '1px solid var(--border)', borderRadius: 4,
+                    fontSize: 10, padding: '1px 2px',
+                  }}
+                />
+              )}
+            </div>
+          ))}
+          {frames.length > 1 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 3, alignSelf: 'center' }}>
+              <button style={{ ...btn(false, index === 0), padding: '2px 7px' }}
+                onClick={() => moveFrame(-1)} title="Move this frame earlier">‹</button>
+              <button style={{ ...btn(false, index === frames.length - 1), padding: '2px 7px' }}
+                onClick={() => moveFrame(1)} title="Move this frame later">›</button>
+            </div>
+          )}
+        </div>
+      </div>
 
-      <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-        {/* ---- canvas + frames ---- */}
-        <div style={{ ...card, maxWidth: '100%', boxSizing: 'border-box', overflowX: 'auto' }}>
-          <div style={{ display: 'flex', gap: 5, marginBottom: 8, flexWrap: 'wrap' }}>
-            {([['pencil', 'Pencil'], ['eraser', 'Eraser'], ['fill', 'Fill'], ['pick', 'Pick'], ['move', 'Move']] as [Tool, string][])
-              .map(([t, lab]) => (
-                <button key={t} style={btn(tool === t)} onClick={() => setTool(t)}>{lab}</button>
-              ))}
-            <button style={btn(false, !undoStack.length)} onClick={undo} disabled={!undoStack.length} title="Ctrl+Z">
-              ↶ Undo{undoStack.length ? ` ${undoStack.length}` : ''}
-            </button>
-            <button style={btn(false, !redoStack.length)} onClick={redo} disabled={!redoStack.length} title="Ctrl+Y">
-              ↷ Redo{redoStack.length ? ` ${redoStack.length}` : ''}
-            </button>
-            <button
-              style={btn()}
-              onClick={() => {
-                commit(snapshot());
-                setFrames((fs) => fs.map((f, i) => (i === index ? blank(w, h) : f)));
-              }}
-            >
-              Clear
-            </button>
+      {/* ---- three columns ---- */}
+      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: narrow ? 'wrap' : 'nowrap' }}>
+
+        {/* LEFT RAIL — file, history, tools, palette, export */}
+        <div style={{ ...card, width: narrow ? '100%' : 150, flexShrink: 0, boxSizing: 'border-box' }}>
+          <button style={{ ...railBtn(), marginBottom: 6 }} onClick={handleNew}>NEW</button>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+            <button style={railBtn(showLibrary)} onClick={() => setShowLibrary((v) => !v)}>LOAD</button>
+            <button style={railBtn(true)} onClick={handleSave}>SAVE</button>
+          </div>
+
+          <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+            <button style={railBtn(false, !undoStack.length)} onClick={undo} disabled={!undoStack.length} title="Ctrl+Z">↶</button>
+            <button style={railBtn(false, !redoStack.length)} onClick={redo} disabled={!redoStack.length} title="Ctrl+Y">↷</button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 5, marginBottom: 10 }}>
+            {([
+              ['fill', 'Fill', 'G'], ['pick', 'Pick', 'I'], ['pencil', 'Draw', 'B'],
+              ['eraser', 'Erase', 'E'], ['move', 'Move', 'V'],
+            ] as [Tool, string, string][]).map(([t, lab, key]) => (
+              <button key={t} style={{ ...btn(tool === t), padding: '5px 2px', fontSize: 11 }}
+                onClick={() => setTool(t)} title={`${lab}  (${key})`}>
+                {lab}
+              </button>
+            ))}
           </div>
 
           {tool === 'move' && (
-            <div style={{ display: 'flex', gap: 5, marginBottom: 8, alignItems: 'center' }}>
-              <span style={{ fontSize: 11, opacity: 0.6 }}>Shift this frame</span>
-              <button style={btn()} onClick={() => shift(-1, 0)}>←</button>
-              <button style={btn()} onClick={() => shift(1, 0)}>→</button>
-              <button style={btn()} onClick={() => shift(0, -1)}>↑</button>
-              <button style={btn()} onClick={() => shift(0, 1)}>↓</button>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4, marginBottom: 10 }}>
+              <button style={{ ...btn(), padding: '4px 0' }} onClick={() => shift(-1, 0)} aria-label="shift left">←</button>
+              <button style={{ ...btn(), padding: '4px 0' }} onClick={() => shift(1, 0)} aria-label="shift right">→</button>
+              <button style={{ ...btn(), padding: '4px 0' }} onClick={() => shift(0, -1)} aria-label="shift up">↑</button>
+              <button style={{ ...btn(), padding: '4px 0' }} onClick={() => shift(0, 1)} aria-label="shift down">↓</button>
             </div>
           )}
 
+          {recent.length > 0 && (
+            <>
+              <div style={{ ...label, marginBottom: 3, fontSize: 9 }}>Recent</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 3, marginBottom: 7 }}>
+                {recent.slice(0, 6).map((c) => (
+                  <button
+                    key={'r' + c}
+                    onClick={() => { setColor(c); if (tool === 'eraser' || tool === 'move') setTool('pencil'); }}
+                    title={c}
+                    style={{
+                      height: 18, background: c, cursor: 'pointer', borderRadius: 3,
+                      border: color === c ? '2px solid var(--brand)' : '1px solid var(--border)',
+                    }}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+          {/* The palette itself stays in a FIXED order. Sorting it by recency
+              re-shuffles every swatch after each stroke, so the colour you
+              just used is never twice in the same place -- recent colours get
+              their own row above instead. */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 3, marginBottom: 8 }}>
+            {PALETTE.map((c) => (
+              <button
+                key={c}
+                onClick={() => { setColor(c); noteColor(c); if (tool === 'eraser' || tool === 'move') setTool('pencil'); }}
+                title={c}
+                style={{
+                  height: 18, background: c, cursor: 'pointer', borderRadius: 3,
+                  border: color === c ? '2px solid var(--brand)' : '1px solid var(--border)',
+                }}
+              />
+            ))}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+            <input
+              type="color" value={color} aria-label="custom colour"
+              onChange={(e) => { setColor(e.target.value); noteColor(e.target.value); }}
+              style={{ width: 34, height: 24, background: 'none', border: '1px solid var(--border)', borderRadius: 4, cursor: 'pointer' }}
+            />
+            <code style={{ fontSize: 10, opacity: 0.75 }}>{color}</code>
+          </div>
+
+          <button style={{ ...railBtn(), marginBottom: 6 }} onClick={download} title="Download the PNG (a strip, if animated)">
+            ↓ PNG
+          </button>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button style={railBtn(showHelp)} onClick={() => setShowHelp((v) => !v)} aria-label="keyboard shortcuts">?</button>
+            <button style={railBtn()} onClick={() => setTool('pick')} title="Pick a colour off the canvas  (I)">💧</button>
+          </div>
+        </div>
+
+        {/* CENTRE — the canvas */}
+        <div style={{
+          ...card, flex: '1 1 auto', minWidth: 0, boxSizing: 'border-box',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', overflowX: 'auto',
+        }}>
           <div
             style={{
               display: 'grid',
@@ -643,10 +850,9 @@ export default function TextureEditor() {
               width: w * cell,
               cursor: tool === 'pick' ? 'crosshair' : tool === 'move' ? 'default' : 'pointer',
               userSelect: 'none',
-              position: 'relative',
             }}
             // A stable hook for scripts/drive-textures.py. Cell size is
-            // adaptive, so a driver matching on "width: 18px" silently counts
+            // adaptive, so a driver matching on a pixel width silently counts
             // zero cells and reports a feature broken that is not.
             data-texture-grid={`${w}x${h}`}
             onDragStart={(e) => e.preventDefault()}
@@ -674,120 +880,18 @@ export default function TextureEditor() {
             })}
           </div>
 
-          {/* frames strip */}
-          <div style={{ marginTop: 10 }}>
-            <div style={{ ...label, display: 'flex', justifyContent: 'space-between' }}>
-              <span>Frames ({frames.length})</span>
-              {frames.length > 1 && <span>{fps} fps</span>}
-            </div>
-            <div style={{ display: 'flex', gap: 5, alignItems: 'center', flexWrap: 'wrap' }}>
-              {frames.map((f, i) => (
-                <div key={i} style={{ textAlign: 'center' }}>
-                  <button
-                    onClick={() => { setPlaying(false); setIndex(i); }}
-                    title={`Frame ${i + 1}`}
-                    style={{
-                      padding: 2, cursor: 'pointer', borderRadius: 5,
-                      background: '#202020',
-                      border: i === index ? '2px solid var(--brand)' : '1px solid var(--border)',
-                    }}
-                  >
-                    <MiniFrame cells={f} size={34} />
-                  </button>
-                  {frames.length > 1 && (
-                    <input
-                      type="number" min={1} max={60}
-                      aria-label={`Frame ${i + 1} duration`}
-                      value={holds ? holds[i] : Math.max(1, Math.round(60 / fps))}
-                      onChange={(e) => {
-                        const v = Math.max(1, Math.min(60, Number(e.target.value) || 1));
-                        const uniform = Math.max(1, Math.round(60 / fps));
-                        setHolds((hs) => {
-                          const base = hs ?? frames.map(() => uniform);
-                          const next = base.slice();
-                          next[i] = v;
-                          return next;
-                        });
-                      }}
-                      style={{
-                        width: 38, marginTop: 2, textAlign: 'center',
-                        background: 'var(--muted)', color: 'var(--text)',
-                        border: '1px solid var(--border)', borderRadius: 4,
-                        fontSize: 10, padding: '1px 2px',
-                      }}
-                    />
-                  )}
-                </div>
-              ))}
-              <button style={btn()} onClick={() => addFrame(false)} title="Add an empty frame">+</button>
-              <button style={btn()} onClick={() => addFrame(true)} title="Duplicate this frame">⧉</button>
-              <button style={btn(false, frames.length < 2)} onClick={removeFrame} title="Delete this frame">🗑</button>
-              <button style={btn(false, index === 0)} onClick={() => moveFrame(-1)} title="Move earlier">‹</button>
-              <button style={btn(false, index === frames.length - 1)} onClick={() => moveFrame(1)} title="Move later">›</button>
-            </div>
-            {frames.length > 1 && (
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8, flexWrap: 'wrap' }}>
-                <button style={btn(playing)} onClick={() => setPlaying((p) => !p)}>
-                  {playing ? '⏸ Pause' : '▶ Play'}
-                </button>
-                <input
-                  type="range" min={1} max={30} value={fps}
-                  onChange={(e) => setFps(Number(e.target.value))}
-                  style={{ width: 110 }}
-                />
-                <label style={{ fontSize: 11, opacity: 0.7, display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <input type="checkbox" checked={onion} onChange={(e) => setOnion(e.target.checked)} />
-                  onion skin
-                </label>
-              </div>
-            )}
-          </div>
-
-          {/* size */}
-          <div style={{ display: 'flex', gap: 5, marginTop: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 11, opacity: 0.6 }}>Size</span>
-            {PRESETS.map((n) => (
-              <button key={n} style={btn(w === n && h === n)} onClick={() => resize(n, n)}>{n}²</button>
-            ))}
-            <input
-              type="number" min={1} max={MAX_DIM} value={w} aria-label="width"
-              onChange={(e) => resize(Number(e.target.value) || 1, h)}
-              style={{ width: 48, background: 'var(--muted)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 4, padding: '3px 5px', fontSize: 12 }}
-            />
-            <span style={{ fontSize: 11, opacity: 0.5 }}>×</span>
-            <input
-              type="number" min={1} max={MAX_DIM} value={h} aria-label="height"
-              onChange={(e) => resize(w, Number(e.target.value) || 1)}
-              style={{ width: 48, background: 'var(--muted)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 4, padding: '3px 5px', fontSize: 12 }}
-            />
-            <span style={{ fontSize: 10, opacity: 0.45 }}>21² matches the built-ins · resizing keeps your art</span>
-          </div>
-
-          <div style={{ display: 'flex', gap: 5, marginTop: 7, alignItems: 'center', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 11, opacity: 0.6 }}>Pixel size</span>
-            <button style={btn(false, cell <= 3)} onClick={() => setZoom(Math.max(3, cell - 2))} aria-label="zoom out">−</button>
-            <span style={{ fontSize: 11, width: 22, textAlign: 'center' }}>{cell}</span>
-            <button style={btn(false, cell >= 40)} onClick={() => setZoom(Math.min(40, cell + 2))} aria-label="zoom in">+</button>
-            <button style={btn(zoom === null)} onClick={() => setZoom(null)} title="Shrink to fit the panel">
-              Fit
-            </button>
-            {holds && (
-              <button
-                style={btn()}
-                onClick={() => setHolds(null)}
-                title="Drop per-frame durations and use one speed for every frame"
-              >
-                Even out timing
-              </button>
-            )}
-            <button style={btn(showHelp)} onClick={() => setShowHelp((v) => !v)} aria-label="keyboard shortcuts">
-              ? Keys
-            </button>
-          </div>
+          {message && (
+            <p style={{
+              fontSize: 12, lineHeight: 1.45, marginTop: 10, marginBottom: 0, maxWidth: 460,
+              textAlign: 'center', color: message.bad ? '#e8607a' : '#7ec850',
+            }}>
+              {message.text}
+            </p>
+          )}
 
           {showHelp && (
             <div style={{
-              marginTop: 8, padding: 10, borderRadius: 6,
+              marginTop: 10, padding: 10, borderRadius: 6, alignSelf: 'stretch',
               background: 'var(--muted)', border: '1px solid var(--border)',
               fontSize: 11, lineHeight: 1.7,
             }}>
@@ -795,108 +899,127 @@ export default function TextureEditor() {
               {[
                 ['Ctrl+Z', 'undo'],
                 ['Ctrl+Y  /  Ctrl+Shift+Z', 'redo'],
-                ['B', 'pencil'],
-                ['E', 'eraser'],
-                ['G', 'fill'],
-                ['I', 'pick colour'],
-                ['V', 'move'],
+                ['B', 'draw'], ['E', 'erase'], ['G', 'fill'],
+                ['I', 'pick colour'], ['V', 'move'],
                 ['[  ]', 'zoom out / in'],
                 ['Space', 'play / pause'],
               ].map(([k, what]) => (
                 <div key={k} style={{ display: 'flex', gap: 8 }}>
-                  <code style={{ color: 'var(--brand)', minWidth: 128, display: 'inline-block' }}>{k}</code>
+                  <code style={{ color: 'var(--brand)', minWidth: 132, display: 'inline-block' }}>{k}</code>
                   <span style={{ opacity: 0.8 }}>{what}</span>
                 </div>
               ))}
               <div style={{ ...label, margin: '8px 0 4px' }}>Durations</div>
               <div style={{ opacity: 0.8 }}>
                 The number under each frame is how long it is held, in game frames (60 = one
-                second). Leave them alone and every frame uses the one speed slider.
+                second). Leave them alone and every frame uses the one Duration below.
+              </div>
+              <div style={{ ...label, margin: '8px 0 4px' }}>No CSS output</div>
+              <div style={{ opacity: 0.8 }}>
+                pixelartcss.com exists to emit box-shadow, which a sprite engine cannot use.
+                Its animated GIF is a frame strip here instead — that is what moSHion slices.
               </div>
             </div>
           )}
         </div>
 
-        {/* ---- palette + save ---- */}
-        <div style={{ ...card, width: narrow ? '100%' : 288, boxSizing: 'border-box' }}>
-          <div style={label}>Colour {recent.length > 0 && <span style={{ textTransform: 'none' }}>· recent first</span>}</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 4 }}>
-            {swatches.slice(0, 32).map((c) => (
-              <button
-                key={c}
-                onClick={() => { setColor(c); noteColor(c); if (tool === 'eraser' || tool === 'move') setTool('pencil'); }}
-                title={c}
-                style={{
-                  height: 24, background: c, cursor: 'pointer', borderRadius: 4,
-                  border: color === c ? '2px solid var(--brand)' : '1px solid var(--border)',
-                }}
-              />
-            ))}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
-            <input
-              type="color" value={color} aria-label="custom colour"
-              onChange={(e) => { setColor(e.target.value); noteColor(e.target.value); }}
-              style={{ width: 38, height: 26, background: 'none', border: '1px solid var(--border)', borderRadius: 4, cursor: 'pointer' }}
-            />
-            <code style={{ fontSize: 11, opacity: 0.8 }}>{color}</code>
+        {/* RIGHT — playback, preview, geometry */}
+        <div style={{ ...card, width: narrow ? '100%' : 178, flexShrink: 0, boxSizing: 'border-box' }}>
+          <div style={{ display: 'flex', gap: 5, marginBottom: 8 }}>
+            <button style={{ ...btn(playing), flex: 1 }} onClick={() => setPlaying((p) => !p)}
+              disabled={frames.length < 2} title="Play / pause  (Space)">
+              {playing ? '⏸' : '▶'}
+            </button>
+            <button style={btn(onion)} onClick={() => setOnion((v) => !v)} title="Onion skin">◍</button>
+            <button style={btn(zoom === null)} onClick={() => setZoom(null)} title="Fit the grid to this panel">⛶</button>
           </div>
 
-          <div style={{ height: 1, background: 'var(--border)', margin: '12px 0' }} />
-
-          <div style={label}>Preview at sprite size</div>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
-            {[24, 50, 88].map((px) => (
+          <div style={{
+            ...checker, border: '1px solid var(--border)', borderRadius: 4,
+            height: 108, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            marginBottom: 8,
+          }}>
+            <div style={{ width: 88, height: 88 }}><MiniFrame cells={grid} size={88} /></div>
+          </div>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 10 }}>
+            {[24, 50].map((px) => (
               <div key={px} style={{ textAlign: 'center' }}>
                 <div style={{ width: px, height: px, border: '1px solid var(--border)' }}>
                   <MiniFrame cells={grid} size={px} />
                 </div>
-                <div style={{ fontSize: 10, opacity: 0.5, marginTop: 3 }}>{px}px</div>
+                <div style={{ fontSize: 9, opacity: 0.5 }}>{px}px</div>
               </div>
             ))}
           </div>
 
-          <div style={{ height: 1, background: 'var(--border)', margin: '12px 0' }} />
+          <button style={{ ...railBtn(), marginBottom: 10 }}
+            onClick={() => { commit(snapshot()); setFrames((fs) => fs.map((f, i) => (i === index ? blank(w, h) : f))); }}>
+            RESET
+          </button>
 
-          <div style={label}>Save as</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            <span style={{ fontSize: 13, opacity: 0.6, width: 16 }}>↔</span>
+            <Stepper value={w} min={1} max={MAX_DIM} ariaLabel="width" onChange={(n) => resize(n, h)} />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+            <span style={{ fontSize: 13, opacity: 0.6, width: 16 }}>↕</span>
+            <Stepper value={h} min={1} max={MAX_DIM} ariaLabel="height" onChange={(n) => resize(w, n)} />
+          </div>
+          <div style={{ display: 'flex', gap: 4, marginBottom: 10, flexWrap: 'wrap' }}>
+            {PRESETS.map((n) => (
+              <button key={n} style={{ ...btn(w === n && h === n), padding: '3px 6px', fontSize: 10 }}
+                onClick={() => resize(n, n)}>{n}²</button>
+            ))}
+          </div>
+
+          <div style={{ ...label, marginBottom: 3 }}>Pixel size</div>
+          <div style={{ marginBottom: 8 }}>
+            <Stepper value={cell} min={3} max={40} ariaLabel="pixel size" onChange={(n) => setZoom(n)} />
+          </div>
+
+          <div style={{ ...label, marginBottom: 3 }}>Duration</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Stepper value={fps} min={1} max={30} ariaLabel="duration" onChange={setFps} />
+            <span style={{ fontSize: 10, opacity: 0.5 }}>fps</span>
+          </div>
+          {holds && (
+            <button style={{ ...railBtn(), marginTop: 6, fontSize: 10 }} onClick={() => setHolds(null)}
+              title="Drop per-frame durations and use one speed for every frame">
+              Even out timing
+            </button>
+          )}
+
+          <div style={{ height: 1, background: 'var(--border)', margin: '10px 0' }} />
+          <div style={{ ...label, marginBottom: 3 }}>Save as</div>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="myGuy"
             style={{
-              width: '100%', boxSizing: 'border-box', padding: '6px 8px',
+              width: '100%', boxSizing: 'border-box', padding: '5px 7px',
               background: 'var(--muted)', color: 'var(--text)',
-              border: '1px solid var(--border)', borderRadius: 6, fontSize: 13,
+              border: '1px solid var(--border)', borderRadius: 6, fontSize: 12,
             }}
           />
-          <div style={{ display: 'flex', gap: 6, marginTop: 7 }}>
-            <button style={{ ...btn(true), flex: 1, padding: '7px 0' }} onClick={handleSave}>Save texture</button>
-            <button style={btn()} onClick={download} title="Download the PNG (a strip, if animated)">↓ PNG</button>
+          <div style={{ fontSize: 10, opacity: 0.45, marginTop: 5, lineHeight: 1.4 }}>
+            then <code style={{ color: 'var(--brand)' }}>sprite.texture</code> = that name
           </div>
-          {message && (
-            <p style={{
-              fontSize: 12, lineHeight: 1.45, marginTop: 9, marginBottom: 0,
-              color: message.bad ? '#e8607a' : '#7ec850',
-            }}>
-              {message.text}
-            </p>
-          )}
-          <p style={{ fontSize: 10, opacity: 0.4, lineHeight: 1.4, marginTop: 9, marginBottom: 0 }}>
-            No CSS output: pixelartcss.com exists to emit <code>box-shadow</code>, which a sprite
-            engine cannot use. Its animated GIF is a frame strip here instead — that is what
-            moSHion already slices.
-          </p>
         </div>
+      </div>
 
-        {/* ---- library ---- */}
-        <div style={{ ...card, flex: '1 1 280px', minWidth: narrow ? '100%' : 280, boxSizing: 'border-box' }}>
-          <div style={label}>
-            Your textures {saved.length ? `(${saved.length})` : ''}
-            {saved.length > 0 && (
-              <span style={{ textTransform: 'none', marginLeft: 6 }}>
-                · {totalBytes < 1024 ? `${totalBytes} bytes` : `${Math.round(totalBytes / 1024)} KB`}
-              </span>
-            )}
+      {/* ---- LOAD: the library, their modal as an inline panel ---- */}
+      {showLibrary && (
+        <div style={{ ...card, marginTop: 10 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <div style={label}>
+              Your textures {saved.length ? `(${saved.length})` : ''}
+              {saved.length > 0 && (
+                <span style={{ textTransform: 'none', marginLeft: 6 }}>
+                  · {totalBytes < 1024 ? `${totalBytes} bytes` : `${Math.round(totalBytes / 1024)} KB`}
+                </span>
+              )}
+            </div>
+            <button style={btn()} onClick={() => setShowLibrary(false)}>Close</button>
           </div>
           {saved.length === 0 && <div style={{ fontSize: 11, opacity: 0.5, marginBottom: 12 }}>Nothing saved yet.</div>}
           {saved.length > 0 && (
@@ -904,7 +1027,7 @@ export default function TextureEditor() {
               {saved.map((t) => (
                 <div key={t.name} style={{ textAlign: 'center', width: 62 }}>
                   <button
-                    onClick={() => loadImage(t.dataUrl, t.name, t.frames, t.frameDelay, t.delays)}
+                    onClick={() => { loadImage(t.dataUrl, t.name, t.frames, t.frameDelay, t.delays); setShowLibrary(false); }}
                     title={`Edit ${t.name}${t.frames > 1 ? ` (${t.frames} frames)` : ''}`}
                     style={{
                       width: 54, height: 54, padding: 2, cursor: 'pointer',
@@ -919,7 +1042,7 @@ export default function TextureEditor() {
                         height: 48, imageRendering: 'pixelated',
                         // A strip is N frames wide; show the first one only.
                         width: 48 * t.frames, objectFit: 'none', objectPosition: 'left',
-                        maxWidth: 'none', marginLeft: 0,
+                        maxWidth: 'none',
                       }}
                     />
                     {t.frames > 1 && (
@@ -954,7 +1077,7 @@ export default function TextureEditor() {
                 {names.map((n) => (
                   <button
                     key={n}
-                    onClick={() => loadImage(catalog.base + catalog.textures[n].file, n)}
+                    onClick={() => { loadImage(catalog.base + catalog.textures[n].file, n); setShowLibrary(false); }}
                     title={n}
                     style={{
                       width: 36, height: 36, padding: 2, cursor: 'pointer',
@@ -973,7 +1096,7 @@ export default function TextureEditor() {
             </div>
           ))}
         </div>
-      </div>
+      )}
     </div>
   );
 }
