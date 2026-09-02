@@ -91,7 +91,7 @@ with sync_playwright() as p:
             cells.nth(i).click()
         pg.wait_for_timeout(120)
 
-    pg.fill('input[placeholder="myGuy"]', "driveTest")
+    pg.fill('input[aria-label="texture name"]', "driveTest")
     pg.click("button:text-is('SAVE')")
     pg.wait_for_timeout(400)
 
@@ -141,7 +141,7 @@ with sync_playwright() as p:
         const play = document.querySelector('button[title="Play / pause  (Space)"]');
         const onionB = document.querySelector('button[title="Onion skin"]');
         const fit = document.querySelector('button[title="Fit the grid to this panel"]');
-        const nameI = document.querySelector('input[placeholder="myGuy"]');
+        const nameI = document.querySelector('input[aria-label="texture name"]');
         const save = [...document.querySelectorAll('button')].find((b) => b.textContent.trim() === 'SAVE');
         if (!grid || !play || !onionB || !fit || !nameI || !save) return null;
         const r = (e) => e.getBoundingClientRect();
@@ -156,6 +156,23 @@ with sync_playwright() as p:
           bool(under) and under["play"] and under["onion"] and under["fit"], under)
     check("the name field and SAVE sit under the canvas",
           bool(under) and under["name"] and under["save"], under)
+    # Inline: playback and naming share ONE row, not two stacked ones. Measured
+    # by vertical overlap rather than exact tops, since the input is a couple of
+    # pixels taller than the buttons.
+    inline = pg.evaluate("""() => {
+        const play = document.querySelector('button[title="Play / pause  (Space)"]');
+        const nameI = document.querySelector('input[aria-label="texture name"]');
+        const save = [...document.querySelectorAll('button')].find((b) => b.textContent.trim() === 'SAVE');
+        if (!play || !nameI || !save) return null;
+        const r = (e) => e.getBoundingClientRect();
+        const mid = (e) => (r(e).top + r(e).bottom) / 2;
+        return {
+            playToName: Math.abs(mid(play) - mid(nameI)),
+            nameToSave: Math.abs(mid(nameI) - mid(save)),
+        };
+    }""")
+    check("playback and naming share one inline row",
+          bool(inline) and inline["playToName"] < 6 and inline["nameToSave"] < 6, inline)
     check("there is exactly one SAVE button", bool(under) and under["saveCount"] == 1, under)
     check("tool rail sits left of the canvas", bool(order) and order["railLeftOfGrid"], order)
     check("settings sit right of the canvas", bool(order) and order["settingsRightOfGrid"], order)
@@ -200,7 +217,7 @@ with sync_playwright() as p:
         body_cells.nth(5).click()
         pg.wait_for_timeout(150)
 
-    pg.fill('input[placeholder="myGuy"]', "driveAnim")
+    pg.fill('input[aria-label="texture name"]', "driveAnim")
     pg.click("button:text-is('SAVE')")
     pg.wait_for_timeout(400)
     check("saving several frames reports an animation",
@@ -247,7 +264,7 @@ with sync_playwright() as p:
 
     pg.fill('input[aria-label="Frame 2 duration"]', "20")
     pg.wait_for_timeout(200)
-    pg.fill('input[placeholder="myGuy"]', "driveHold")
+    pg.fill('input[aria-label="texture name"]', "driveHold")
     pg.click("button:text-is('SAVE')")
     pg.wait_for_timeout(400)
     held = pg.evaluate("""() => {

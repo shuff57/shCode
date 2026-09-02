@@ -885,9 +885,21 @@ export default function TextureEditor() {
               settings column: both are things you reach for while looking at
               the drawing, and the eye should not have to leave it. The right
               column keeps what you set once and forget -- size, zoom, speed. */}
-          <div style={{ display: 'flex', gap: 6, marginTop: 10, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+          {/* One inline row, hard against the bottom of the grid: playback and
+              naming are both reached while looking at the drawing, so they sit
+              on the same line rather than stacking away from it. The right
+              column keeps only what you set once and forget. */}
+          <div
+            style={{
+              display: 'flex', gap: 8, marginTop: 8, alignItems: 'center',
+              // Wraps only when it genuinely cannot fit -- in the sandbox
+              // drawer this becomes two or three lines instead of overflowing.
+              flexWrap: 'wrap', justifyContent: 'center',
+              width: w * cell, maxWidth: '100%',
+            }}
+          >
             <button
-              style={{ ...btn(playing, frames.length < 2), minWidth: 74 }}
+              style={{ ...btn(playing, frames.length < 2), minWidth: 72 }}
               onClick={() => setPlaying((p) => !p)}
               disabled={frames.length < 2}
               title="Play / pause  (Space)"
@@ -900,25 +912,22 @@ export default function TextureEditor() {
             <button style={btn(zoom === null)} onClick={() => setZoom(null)} title="Fit the grid to this panel">
               ⛶ Fit
             </button>
-          </div>
 
-          <div style={{ display: 'flex', gap: 6, marginTop: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <span style={{ ...label, marginBottom: 0 }}>Save as</span>
+            <span style={{ width: 1, height: 22, background: 'var(--border)', margin: '0 2px' }} />
+
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="myGuy"
+              placeholder="name it…"
+              aria-label="texture name"
               onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); }}
               style={{
-                width: 150, boxSizing: 'border-box', padding: '6px 8px',
+                width: 132, boxSizing: 'border-box', padding: '6px 8px',
                 background: 'var(--muted)', color: 'var(--text)',
                 border: '1px solid var(--border)', borderRadius: 6, fontSize: 13,
               }}
             />
             <button style={{ ...btn(true), padding: '6px 14px' }} onClick={handleSave}>SAVE</button>
-          </div>
-          <div style={{ fontSize: 10, opacity: 0.45, marginTop: 5, textAlign: 'center' }}>
-            then <code style={{ color: 'var(--brand)' }}>sprite.texture</code> = that name
           </div>
 
           {message && (
