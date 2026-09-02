@@ -13,6 +13,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { ChevronDown, ChevronRight, MessageSquare } from 'lucide-react';
 import { formatDue } from '../lib/due-dates-core';
+import { sortLessons } from '../lib/lesson-order';
 // Status derivation is shared with the endpoint that builds these cells, so
 // the page and the teacher's gradebook can never disagree about whether a
 // student is behind. See lib/gradebook-cell.ts.
@@ -115,9 +116,11 @@ export default function StudentGradebook({ lessons }: Props) {
     );
   }
 
-  // Walk the manifest rather than the response: manifest order is course
-  // order, and D1 hands rows back in whatever order it likes.
-  const rows = lessons
+  // Walk the manifest rather than the response: D1 hands rows back in
+  // whatever order it likes. Sort here rather than trusting the caller —
+  // the manifest arrives in folder-id order, which reads 1.1.19, 1.1.2,
+  // 1.1.20 down the Assignment column. See lib/lesson-order.ts.
+  const rows = sortLessons(lessons)
     .filter((l) => cells[l.id])
     .map((l) => {
       const cell = cells[l.id];

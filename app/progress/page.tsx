@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getCurrentUser, type CurrentUser } from '../../lib/auth';
 import { useLessonState } from '../../lib/progress';
+import { sortLessons } from '../../lib/lesson-order';
 import StudentGradebook from '../../components/StudentGradebook';
 
 interface ManifestLesson {
@@ -73,14 +74,20 @@ export default function ProgressPage() {
     ? Math.round(scoredIds.reduce((sum, id) => sum + (progress.scores[id] ?? 0), 0) / scoredIds.length)
     : null;
 
-  // Recently completed: last 5 completed lessons in manifest order
-  const recentlyCompleted = manifest.lessons
+  // Both lists below slice a SEQUENCE, so they need course order, not the
+  // manifest's folder-id order — which reads 1.1.19, 1.1.2, 1.1.20 and made
+  // "Up Next" name lessons the Next button would not go to. See
+  // lib/lesson-order.ts.
+  const orderedLessons = sortLessons(manifest.lessons);
+
+  // Recently completed: last 5 completed lessons in course order
+  const recentlyCompleted = orderedLessons
     .filter((l) => progress.states[l.id] === 'completed')
     .slice(-5)
     .reverse();
 
   // Next locked: first 5 incomplete lessons the student hasn't started
-  const nextLocked = manifest.lessons
+  const nextLocked = orderedLessons
     .filter((l) => !progress.states[l.id])
     .slice(0, 5);
 
