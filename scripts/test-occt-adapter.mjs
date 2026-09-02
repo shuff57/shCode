@@ -53,6 +53,7 @@ try {
       path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
       'lib/occt-build.ts', 'lib/model-types.ts', 'lib/sketch-arc.ts', 'lib/topo-resolve.ts',
       'lib/topo-history.ts', 'lib/topo-name.ts',
+      'lib/script-surface.ts', 'lib/hull.ts',
       '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',
     ],
     { cwd: root, stdio: 'inherit' },
@@ -79,6 +80,8 @@ try {
   globalThis.__types = types;
   globalThis.__hist = hist;
   globalThis.__name = naming;
+  globalThis.__surface = require(path.join(out, 'script-surface.js'));
+  globalThis.__hull = require(path.join(out, 'hull.js'));
 
   // The fixtures this slice claims: primitives, booleans, move, mirror.
   const DOCS = {
@@ -614,6 +617,133 @@ console.log('');
       .shapes.get('d1')).bbox[1][2] - 10) < 1e-6,
     'the top should still be a flat face at z=10');
 }
+
+// ---------------------------------------------------------------------------
+// THE SCRIPTING SURFACE'S VERDICTS, AGAINST THE ACTUAL BUILD
+// ---------------------------------------------------------------------------
+//
+// lib/script-surface.ts classifies all 75 names the documented examples call,
+// and every verdict rests on an OpenCascade export being there or not being
+// there. Prose cannot hold that: the moment a different build is dropped in,
+// half of it silently stops being true.
+//
+// So both directions are asserted, and the SECOND one is the one that matters.
+// Checking that MakeBox exists is a formality. Checking that GTransform still
+// does NOT exist is what stops `scale` staying refused out of habit after
+// somebody rebuilds the bindings -- an absence nobody would notice becoming
+// false is not a measurement, it is a note.
+
+{
+  const occ = globalThis.__oc;
+  const surface = globalThis.__surface;
+  const hull = globalThis.__hull;
+  const has = (n) => n in occ;
+
+  const present = [...new Set(surface.SURFACE.flatMap((e) => e.kernel || []))];
+  const claimedMissing = [...new Set(surface.SURFACE.flatMap((e) => e.absent || []))];
+
+  const notThere = present.filter((n) => !has(n));
+  check('every export a served name relies on is in this build',
+    notThere.length === 0, notThere.join(', '));
+  check('...and there are enough of them for that to mean something',
+    present.length >= 20, present.length + ' cited');
+
+  const there = claimedMissing.filter((n) => has(n));
+  check('every export a REFUSED name blames is genuinely absent',
+    there.length === 0,
+    there.join(', ') + ' -- this build now has it, so re-judge those names in '
+      + 'lib/script-surface.ts rather than leaving them refused');
+  check('...and the refusals actually name something to look for',
+    claimedMissing.length >= 2, claimedMissing.join(', '));
+
+  // The hull verdict, measured rather than asserted from a name list: no export
+  // in the whole build mentions one.
+  check('nothing in the build offers a convex hull, under any spelling',
+    Object.keys(occ).filter((k) => /hull/i.test(k)).length === 0,
+    Object.keys(occ).filter((k) => /hull/i.test(k)).join(', '));
+  check('...nor a helix, which is the same wall External Thread hits',
+    Object.keys(occ).filter((k) => /helix/i.test(k)).length === 0,
+    Object.keys(occ).filter((k) => /helix/i.test(k)).join(', '));
+
+  // ---- the scale finding, demonstrated on a real solid --------------------
+  //
+  // The claim is narrow and easy to get wrong in either direction, so it is
+  // built rather than argued: UNIFORM scaling works and lands on the exact
+  // volume arithmetic predicts, and the unequal case has nothing to apply.
+  const box = new occ.BRepPrimAPI_MakeBox(10, 10, 10).Shape();
+  const vol3 = (s) => globalThis.__adapter.measureShape(occ, s).volume;
+  check('a 10-cube measures 1000 before anything is done to it',
+    Math.abs(vol3(box) - 1000) < 1e-6, String(vol3(box)));
+
+  const t = new occ.gp_Trsf();
+  t.SetScale(new occ.gp_Pnt(0, 0, 0), 2);
+  const bigger = new occ.BRepBuilderAPI_Transform(box, t, true).Shape();
+  check('uniform scale x2 gives exactly 8x the volume, so scale([2,2,2]) is fine',
+    Math.abs(vol3(bigger) - 8000) < 1e-6, String(vol3(bigger)));
+
+  // gp_GTrsf is bound and can be BUILT -- it is only the applying that is
+  // missing, which is why the refusal is "unbound" and not "absent".
+  const g = new occ.gp_GTrsf();
+  g.SetValue(1, 1, 3);
+  check('gp_GTrsf exists and takes an unequal stretch',
+    Math.abs(g.Value(1, 1) - 3) < 1e-12, String(g.Value(1, 1)));
+  check('...but nothing in this build applies one to a shape',
+    !has('BRepBuilderAPI_GTransform'),
+    'BRepBuilderAPI_GTransform is here now -- scale, scaleZ, transform and '
+      + 'ellipsoid can be lifted from unbound to exact');
+  check('...and BRepBuilderAPI_Transform will not take it in its place',
+    (() => { try { new occ.BRepBuilderAPI_Transform(box, g, true); return false; }
+      catch (e) { return true; } })(),
+    'a GTrsf passed to the Trsf constructor was accepted, which would mean the '
+      + 'unbound verdict is wrong');
+
+  // ---- the hull we own, sewn into a real solid ----------------------------
+  //
+  // lib/hull.ts is checked against arithmetic in its own suite with no kernel
+  // at all. What is checked HERE is the other half: that its triangles sew into
+  // a closed solid OpenCascade agrees is a solid, and that the kernel's own
+  // volume -- computed from the sewn faces, not from our arithmetic -- lands on
+  // the same number. Two independent measurements of the same shape.
+  const CUBE = [
+    [0, 0, 0], [10, 0, 0], [10, 10, 0], [0, 10, 0],
+    [0, 0, 10], [10, 0, 10], [10, 10, 10], [0, 10, 10],
+    [5, 5, 5],
+  ];
+  const h = hull.convexHull(CUBE);
+  const sew = new occ.BRepBuilderAPI_Sewing(1e-6, true, true, true, false);
+  for (const tri of h.triangles) {
+    const poly = [];
+    for (const i of tri) poly.push(new occ.gp_Pnt(CUBE[i][0], CUBE[i][1], CUBE[i][2]));
+    const w = new occ.BRepBuilderAPI_MakeWire();
+    for (let k = 0; k < 3; k++) {
+      w.Add(new occ.BRepBuilderAPI_MakeEdge(poly[k], poly[(k + 1) % 3]).Edge());
+    }
+    sew.Add(new occ.BRepBuilderAPI_MakeFace(w.Wire(), true).Face());
+  }
+  sew.Perform(new occ.Message_ProgressRange());
+  const shell = sew.SewedShape();
+  const solid = new occ.BRepBuilderAPI_MakeSolid();
+  solid.Add(occ.TopoDS.Shell(shell));
+  const hullSolid = solid.Solid();
+  check('our hull triangles sew into a shape the kernel calls a solid',
+    !hullSolid.IsNull());
+  check('...and the KERNEL measures it at the volume arithmetic predicted',
+    Math.abs(vol3(hullSolid) - 1000) < 1e-6,
+    'kernel ' + vol3(hullSolid) + ' vs ours ' + hull.hullVolume(CUBE, h));
+  check('...having swallowed the interior point on the way',
+    h.used.length === 8, JSON.stringify(h.used));
+
+  // The stronger claim, and the one that survives changing the fixture: our
+  // volume and the kernel's are computed from different things -- ours from the
+  // triangle list by the divergence theorem, the kernel's from the sewn faces by
+  // BRepGProp -- and they have to agree. Found by sabotage: lifting one corner
+  // 2 mm moved BOTH to 1066.6666666666665 and 1066.6667, which is the pair
+  // agreeing rather than one echoing the other.
+  check('...and the two independent volumes agree to ten digits',
+    Math.abs(vol3(hullSolid) - hull.hullVolume(CUBE, h)) < 1e-9 * 1000,
+    'kernel ' + vol3(hullSolid) + ' vs ours ' + hull.hullVolume(CUBE, h));
+}
+
 
 console.log((fails.length ? 'FAIL' : 'ALL PASS') + '  (' + pass + ' checks'
   + (fails.length ? ', ' + fails.length + ' failed' : '') + ')');

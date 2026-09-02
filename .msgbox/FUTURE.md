@@ -3,6 +3,37 @@
 Ideas parked for later. Not scheduled, not specced. Newest first.
 Lives beside `log.jsonl` so it ships with the repo and travels between machines.
 
+## The 17 doc pages the kernel swap does not carry (2026-09-02)
+
+`lib/script-surface.ts` classifies all 75 API names the 183 documented examples
+call. 166 pages (90.7%) survive the swap untouched. The other 17 split into two
+piles that need completely different work, and the split is the point -- one is
+geometry we owe, the other is a line in a build config.
+
+**Owed to us: the hull recipe.** `lib/hull.ts` exists and is measured -- its
+triangles sew into a solid OpenCascade agrees is a solid, and the two volumes
+agree to ten digits. What is NOT done is wiring it behind the `hull`,
+`hullChain` and `hullPoints2` names, which needs a decision first: hulling a
+CURVED solid means sampling its surface, and how densely is a real choice
+nobody has made. 11 pages wait on this.
+
+**Owed by the build: `BRepBuilderAPI_GTransform`.** Non-uniform scale --
+`scale([3, 1, 1], s)`, `scaleZ`, a general `transform` matrix, `ellipsoid` --
+has no path in this wasm build. `gp_GTrsf` is bound and takes the stretch;
+nothing applies it to a shape. This is real OpenCascade that
+`replicad-opencascadejs` does not expose, so the fix is rebuilding the binding
+list, not writing geometry. 6 pages wait on this. The OCCT suite asserts the
+ABSENCE, so the day a build binds it the suite goes red and the four names get
+re-judged rather than staying refused out of habit.
+
+**Refused outright: `extrudeHelical`.** No helix in the build, and nothing for
+`MakePipeShell` to ride. Same wall External Thread hits in `.gauntlet/parity.json`.
+1 page.
+
+Also settled here, and not parked: `generalize`, `snap` and `retessellate` are
+MOOT rather than refused. They exist to repair a triangle mesh and a B-rep has
+none, so nothing is lost and nothing is owed.
+
 ## KiCad unit (2026-08-31)
 
 Add a course unit on **KiCad** — open-source schematic capture + PCB design.
