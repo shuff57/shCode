@@ -118,6 +118,35 @@
       "label": "toolbar grouping, flyout carets, icon set, disabled states, tooltips, Search tools (alt+c), rollback bar",
       "coversNote": "toolbar presentation, not a tool",
       "landed": "2026-08-28 gauntlet round 2 -- fixed a real Dimensions-panel/toolbar overlap bug (missing 48px top offset on .reshape-pane-params); toolbar grouping/dividers, Search tools alt+c hint, and disabled states were already correct on inspection; built the rollback bar from scratch (click-to-set vertical handles in the timeline, a deliberate adaptation of Onshape's draggable horizontal bar to reSHape's horizontal chip strip). All verified live in a browser, not just by code review."
+    },
+    {
+      "id": "fillet-edge",
+      "covers": [
+        "Modify Fillet"
+      ],
+      "why": "BUILT AND MEASURED in lib/occt-build.ts, 2026-09-01, not yet reachable from the toolbar. One NAMED edge is rounded or bevelled -- the edge is named as the meeting of two named faces (the `between` cause in lib/topo-name.ts), so it survives a rebuild. Checked against arithmetic rather than a golden number: a fillet of radius r along an edge of length L removes exactly (1 - pi/4) * r^2 * L, on a 40x30x20 box and again on a 70x12x46 one, where the same name finds the same edge and the loss follows the new length. What ships today is JSCAD roundRadius, which rounds every edge of a box at once and cannot be pointed at one. REMAINING: the preview still runs JSCAD, so the feature passes its target through unchanged there -- see whyNotOnJscad() in lib/model-types.ts -- and no toolbar button creates one yet."
+    },
+    {
+      "id": "draft",
+      "covers": [
+        "Draft",
+        "Body Draft"
+      ],
+      "why": "BUILT AND MEASURED in lib/occt-build.ts, 2026-09-01, not yet reachable from the toolbar. BRepOffsetAPI_DraftAngle on a named face, with the pull direction and neutral plane stored on the feature because neither has a defensible default. Body Draft is every face except the two the pull points at -- exact for the axis-aligned primitives, rougher than Onshape on a shape whose sides are not parallel to the pull, which is stated on DraftFeature rather than discovered. REMAINING: same as fillet-edge -- preview engine and a toolbar affordance."
+    },
+    {
+      "id": "split",
+      "covers": [
+        "Split"
+      ],
+      "why": "NOT kernel-blocked, which the old refusal got wrong. BRepAlgoAPI_Section is bound and returns the section edges; a cut-by-halfspace twice gives both halves. The real blocker is ModelDoc: a Split produces TWO bodies from one, and every feature kind here maps one id to one shape. BOPAlgo_Splitter, which would do it in one call, is absent from this build. Queued behind deciding how a document names a second body, which is a document design question and not a geometry one."
+    },
+    {
+      "id": "rib",
+      "covers": [
+        "Rib"
+      ],
+      "why": "NOT kernel-blocked either, and never was. A rib is a recipe, not an API: pull a sketch line into a thin wall, keep only the part inside the body, fuse it on. Every step of that already exists here -- extrude, intersect, union. Queued on the UI question of drawing a rib line against an existing solid, which the sketch surface has no affordance for yet."
     }
   ],
   "outOfScope": [
@@ -203,18 +232,6 @@
       "why": "these presume multiple documents, an assembly stage, or FeatureScript. The sandbox is one Part Studio with no document tree"
     },
     {
-      "group": "Kernel-dependent detail (6 tools)",
-      "tools": [
-        "Draft",
-        "Body Draft",
-        "Rib",
-        "External Thread",
-        "Split",
-        "Modify Fillet"
-      ],
-      "why": "each needs face or edge selection on a B-rep. Same wall as surface modelling: whyCannotRound() in lib/model-types.ts already documents this limit honestly for fillet, and it applies here too MEASURED COST OF LIFTING THIS (2026-09-01): the only browser B-rep kernel is OpenCascade compiled to wasm (replicad-opencascadejs), which is 21.9 MB and LGPL-2.1-only. reSHape ships on JSCAD today at 0.41 MB total for modeling, renderer and io, all MIT -- so this is 53x the payload for every student on every preview load, plus an LGPL kernel inside an otherwise-MIT app that has already been extracted as MIT public repos. Across all four kernel-blocked groups it buys 34 tools, of which 28 are sheet metal and surfacing this file already refuses on pedagogy. REFUSED on cost, not on ignorance. Revisit only if the course needs Draft or Thread specifically, or if a custom OCCT build trimmed to the modules reSHape uses lands under a couple of MB. REVERSED 2026-09-01, same day: the refusal above weighed B-rep only by which toolbar entries it unlocks, which is the wrong measure. The stated goal is a true PARAMETRIC modeller with persistent face and edge references, and that is not a feature list -- it is a representation. A mesh has no face to refer to, which is why Bevel on a cylinder is a hull of two cylinders rather than a chamfer. Two numbers were also overstated: 21.9 MB is the uncompressed wasm, it is 6.9 MB gzipped and cached after first load, and the runner is already conditional on lesson.preview === \"reshape\" rather than loading everywhere. LGPL for a wasm module loaded at runtime is the case LGPL was written for and does not reach our own code. These tools are QUEUED behind the parametric core, not refused."
-    },
-    {
       "group": "Not modelling (3 tools)",
       "tools": [
         "Thicken",
@@ -229,6 +246,13 @@
         "Sweep"
       ],
       "why": "no extrudeAlongPath in the vendored bundle; extrudePath exists but is unexposed and untested. Reconsider if a lesson needs it"
+    },
+    {
+      "group": "No helical geometry (1 tool)",
+      "why": "External Thread needs a helix to sweep a profile along. Measured in the OpenCascade build reSHape now targets (2026-09-01): no Helix, no extrudeHelical, and BRepOffsetAPI_MakePipeShell has no path to ride -- the whole Curve tools group is refused for the same missing piece. This is a narrower refusal than the one it replaces: the old reason was \"needs face or edge selection on a B-rep\", which is no longer true of anything here. Onshape's own External Thread is largely an annotation rather than cut geometry, so a cosmetic version is reachable without a helix and is a deliberate non-goal for a first-year course, not a gap.",
+      "tools": [
+        "External Thread"
+      ]
     }
   ]
 }

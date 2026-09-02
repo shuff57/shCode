@@ -177,6 +177,44 @@ module.exports = function run(dir) {
     deps.withoutFeatures(outOfOrder, ['sk1']).features.length === 0,
     ids(deps.withoutFeatures(outOfOrder, ['sk1'])));
 
+
+  console.log('\n=== a selection can be a NAME, and dangle just the same ===');
+
+  // Round and Draft hold a TopoName, not just a target id. The edge a Round
+  // works on is the meeting of two faces, and those faces can belong to a
+  // feature other than the one being rounded -- a dependency no `target` field
+  // shows. dependsOn() folds it in, so everything above works on it unchanged.
+  const face = (feature, part) => ({ cause: 'primitive', feature, kind: 'face', part });
+  const NAMED = { version: 1, features: [
+    { id: 'b1', kind: 'box', size: [40, 30, 20], center: [0, 0, 0] },
+    { id: 'b2', kind: 'box', size: [10, 10, 40], center: [30, 0, 0] },
+    { id: 'cut1', kind: 'combine', op: 'subtract', targets: ['b1', 'b2'] },
+    { id: 'r1', kind: 'fillet', target: 'cut1', size: 4, style: 'fillet',
+      edge: { cause: 'between', feature: 'cut1', kind: 'edge',
+              of: [face('b1', '+z'), face('b1', '+x')] } },
+  ] };
+  const nlabel = (id) => ({ b1: 'Box 1', b2: 'Box 2', cut1: 'Cut 1', r1: 'Round 1' }[id] || id);
+
+  check('CONTROL: a document whose Round names a live face is clean',
+    deps.danglingRefs(NAMED).length === 0, JSON.stringify(deps.danglingRefs(NAMED)));
+  check('a Round depends on the feature its EDGE names, not only on its target',
+    deps.orphanedBy(NAMED, ['b1']).has('r1'),
+    'r1 targets cut1, but its edge is named off b1');
+  check('...so deleting that feature takes the Round with it, and says so',
+    deps.whyDeletingCosts(NAMED, ['b1'], nlabel)
+      === 'Cut 1 and Round 1 are built from Box 1, so they go too.',
+    String(deps.whyDeletingCosts(NAMED, ['b1'], nlabel)));
+  check('...and a Round left naming a feature that is gone is reported dangling',
+    deps.danglingRefs({ version: 1, features: [NAMED.features[3]] })
+      .some((d) => d.missing === 'b1'),
+    JSON.stringify(deps.danglingRefs({ version: 1, features: [NAMED.features[3]] })));
+  check('a Draft with no named face depends only on its target',
+    deps.orphanedBy({ version: 1, features: [
+      NAMED.features[0],
+      { id: 'd1', kind: 'draft', target: 'b1', whole: true, angle: 8, pull: 'z', neutral: -10 },
+    ] }, ['b1']).has('d1'),
+    'Body Draft names no face, so its only tie is the target');
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };

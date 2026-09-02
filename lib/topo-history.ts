@@ -309,6 +309,134 @@ export function capOf(oc: Occt, op: any, end: 'top' | 'bottom', closed: boolean)
 }
 
 /**
+ * Run a kernel operation that is allowed to refuse.
+ *
+ * MEASURED, not defensive: OCCT reports a refusal two different ways and only
+ * one of them is a return value. A fillet radius too big for its edge sets
+ * IsDone() false; a draft on a face that cannot take one throws a
+ * `WebAssembly.Exception` with no message, no stack into our code, and no type
+ * beyond `Exception {}`. Body Draft hit the second on the first run and took
+ * the whole build down with it -- one face that cannot lean should cost that
+ * face, not the model.
+ *
+ * So both are funnelled to null, which is the answer the rest of this design
+ * already knows how to handle: the feature does not build, and the caller says
+ * why rather than shipping a shape the student did not ask for.
+ */
+function refusable(run: () => any | null): any | null {
+  try {
+    return run();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The one edge two faces share, or null.
+ *
+ * This is all an edge name needs. A box has twelve edges, they are
+ * indistinguishable to look at, and the kernel's order over them is exactly
+ * what a name may not depend on -- but each one is the meeting of two faces,
+ * and faces are already nameable. So the pair IS the name and this is the
+ * whole of its resolution.
+ *
+ * IsSame rather than a geometric comparison: two faces of one solid share the
+ * literal same edge, so identity is available and is stronger than proximity.
+ * Null when they share none (opposite faces of a box) or several (which a
+ * curved pair can genuinely do) -- both mean the name does not pick out one
+ * edge, and refusing is the rule.
+ */
+export function sharedEdge(oc: Occt, a: any, b: any): any | null {
+  if (!a || !b) return null;
+  const ea = edgesOf(oc, a);
+  const eb = edgesOf(oc, b);
+  const hits: any[] = [];
+  for (const x of ea) {
+    for (const y of eb) {
+      if (x.IsSame(y)) hits.push(x);
+    }
+  }
+  return hits.length === 1 ? hits[0] : null;
+}
+
+/**
+ * Round one edge of a solid.
+ *
+ * The payoff of every naming slice before this one, and the reason the
+ * refusal in .gauntlet/parity.json said "each needs face or edge selection on
+ * a B-rep": rounding ONE edge is not a thing a mesh can express. What ships in
+ * the app today is JSCAD's roundRadius, which rounds every edge of a box at
+ * once and cannot be pointed at one.
+ *
+ * Measured against the analytic answer rather than a golden number: a fillet of
+ * radius r along a straight edge of length L removes exactly
+ * (1 - pi/4) * r^2 * L. On a 40x30x20 box, r=4 along the 30 edge: 103.009 in,
+ * 103.009 out.
+ *
+ * ChFi3d_Rational is the surface family OCCT builds the blend from; it is the
+ * ordinary choice and the only one of the three that is exact for a constant
+ * radius on a straight edge.
+ */
+export function filleted(oc: Occt, shape: any, edge: any, radius: number): any | null {
+  if (!shape || !edge || !(radius > 0)) return null;
+  return refusable(() => {
+    const mk = new oc.BRepFilletAPI_MakeFillet(shape, oc.ChFi3d_FilletShape.ChFi3d_Rational);
+    mk.Add(radius, oc.TopoDS.Edge(edge));
+    mk.Build(new oc.Message_ProgressRange());
+    // A radius the edge cannot take -- bigger than the faces beside it --
+    // leaves IsDone false. Returning the unfilleted shape would silently
+    // ignore the student; null is the caller's cue to say so.
+    return mk.IsDone && !mk.IsDone() ? null : mk.Shape();
+  });
+}
+
+/** Cut one edge off flat, at `distance` from it. The chamfer to filleted()'s
+ *  round, and the same story: one named edge, not all of them. */
+export function chamfered(oc: Occt, shape: any, edge: any, distance: number): any | null {
+  if (!shape || !edge || !(distance > 0)) return null;
+  return refusable(() => {
+    const mk = new oc.BRepFilletAPI_MakeChamfer(shape);
+    mk.Add(distance, oc.TopoDS.Edge(edge));
+    mk.Build(new oc.Message_ProgressRange());
+    return mk.IsDone && !mk.IsDone() ? null : mk.Shape();
+  });
+}
+
+/**
+ * Tilt one face of a solid, so the part can leave a mould.
+ *
+ * `pull` is the direction the mould opens and `neutral` the plane that does not
+ * move -- everything above it leans out, everything below leans in. Both are
+ * required by the kernel and neither has a sensible default, so the caller
+ * supplies them from the feature rather than this guessing.
+ */
+export function drafted(
+  oc: Occt,
+  shape: any,
+  face: any,
+  pull: [number, number, number],
+  angleRad: number,
+  neutralZ: number,
+): any | null {
+  if (!shape || !face) return null;
+  return refusable(() => {
+    const dr = new oc.BRepOffsetAPI_DraftAngle(shape);
+    const plane = new oc.gp_Pln(
+      new oc.gp_Pnt(0, 0, neutralZ),
+      new oc.gp_Dir(pull[0], pull[1], pull[2]),
+    );
+    dr.Add(
+      oc.TopoDS.Face(face),
+      new oc.gp_Dir(pull[0], pull[1], pull[2]),
+      angleRad,
+      plane,
+    );
+    dr.Build(new oc.Message_ProgressRange());
+    return dr.IsDone && !dr.IsDone() ? null : dr.Shape();
+  });
+}
+
+/**
  * Put a face where its solid actually ended up.
  *
  * A sweep's output is sometimes moved afterwards -- a revolve on an offset

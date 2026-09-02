@@ -37,7 +37,7 @@ import type { BuildResult, Occt, OpRecord } from './occt-build';
 import type { TopoName } from './topo-name';
 import {
   capOf, faceFate, fractionOnFace, generatedFrom, pieceContaining,
-  placed, pointAtFraction, pointOnFace,
+  placed, pointAtFraction, pointOnFace, sharedEdge,
 } from './topo-history';
 
 /** Every face of a shape, in the kernel's own order -- which is exactly the
@@ -219,6 +219,15 @@ export function resolveName(oc: Occt, name: TopoName, build: BuildResult): any |
     const seg = rec.segments.find((s) => s.role === want && s.index === at);
     if (!seg) return null;
     return placed(oc, generatedFrom(oc, rec.op, seg.edge), rec.after);
+  }
+  if (name.cause === 'between') {
+    // Both faces are resolved on the SAME built shape, and the edge is the one
+    // they share. Nothing here knows or cares which edge index that is, which
+    // is the entire point -- the same pair of face names finds the same edge on
+    // a box of any size.
+    const a = resolveName(oc, name.of[0], build);
+    const b = resolveName(oc, name.of[1], build);
+    return a && b ? sharedEdge(oc, a, b) : null;
   }
   if (name.cause === 'cap') {
     const rec = build.sweeps.get(name.feature);

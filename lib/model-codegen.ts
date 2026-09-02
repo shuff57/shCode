@@ -681,6 +681,22 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
     return `blendOnPlane(${list(lo)}, ${list(hi)}, p.${pname(hi.id, 'offset')} - p.${pname(lo.id, 'offset')}, '${lo.plane}', p.${pname(lo.id, 'offset')})`;
   }
 
+  if (f.kind === 'fillet' || f.kind === 'draft') {
+    // The preview runs JSCAD, which has no addressable edge or face, so there
+    // is nothing honest to emit here. The target passes through unchanged and
+    // whyNotOnJscad() in lib/model-types.ts is the sentence that goes with it.
+    //
+    // The comment is emitted deliberately. Silence in generated source that a
+    // student can open and read would be the same tool-that-does-nothing this
+    // is trying not to be -- and reSHape's whole teaching claim is that the
+    // code shown is the code that runs.
+    const what = f.kind === 'fillet'
+      ? (f.style === 'chamfer' ? 'Bevel' : 'Round')
+      : 'Draft';
+    return `${f.target} /* ${what} needs edge and face selection, `
+      + `which this preview engine does not have */`;
+  }
+
   const args = f.targets.join(', ');
   return `booleans.${f.op}(${args})`;
 }

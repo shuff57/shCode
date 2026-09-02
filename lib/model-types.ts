@@ -16,6 +16,9 @@ export type { Constraint as SketchConstraint } from './sketch-solve';
 export type Vec3 = [number, number, number];
 
 /** How a shape's edges are killed. JSCAD has no fillet(); see model-codegen. */
+import { featureChain } from './topo-name';
+import type { TopoName } from './topo-name';
+
 export type RoundStyle = 'fillet' | 'chamfer';
 
 /** A single world axis, spelled out rather than as a Vec3 direction — a
@@ -302,6 +305,85 @@ export interface ShellFeature {
 }
 
 /**
+ * Round or cut off ONE named edge of a solid -- Onshape's Modify Fillet.
+ *
+ * The difference from the `round` property a Box already carries is the whole
+ * reason this exists. `round` is JSCAD's roundRadius: it rounds EVERY edge of
+ * the box at once, and there is no way to point at one, because a mesh has no
+ * edge to point at. This names an edge -- as the meeting of two named faces,
+ * see the `between` cause in lib/topo-name.ts -- and rounds that one.
+ *
+ * WHICH ENGINE BUILDS IT. lib/occt-build.ts does, exactly. The JSCAD path
+ * cannot and does not pretend to: see whyNotOnJscad() below, and featureExpr()
+ * in lib/model-codegen.ts, which passes the target through unchanged rather
+ * than emitting something that looks like a round and is not one.
+ */
+export interface FilletFeature {
+  id: string;
+  kind: 'fillet';
+  name?: string;
+  /** The solid whose edge is being worked. */
+  target: string;
+  /** Which edge. A `between` name -- the edge where two named faces meet. */
+  edge: TopoName;
+  /** Radius for a round, or the distance cut back for a chamfer. */
+  size: number;
+  /** The same two words the rest of the app uses; the UI says Round and Bevel. */
+  style: RoundStyle;
+}
+
+/**
+ * Tilt one face, or every side face, so a moulded part can leave its mould --
+ * Onshape's Draft and Body Draft.
+ *
+ * `pull` is the direction the mould opens; `neutral` is the height along that
+ * direction which does not move, so the part pivots about it. Both are the
+ * student's to choose and neither has a defensible default, which is why they
+ * are stored rather than inferred.
+ *
+ * `whole` is Body Draft: every face except the two the pull direction points
+ * at. Exact for the axis-aligned primitives, and stated here rather than
+ * discovered -- on a shape whose sides are not parallel to the pull, "except
+ * the two caps" is a rougher description than Onshape's own.
+ */
+export interface DraftFeature {
+  id: string;
+  kind: 'draft';
+  name?: string;
+  target: string;
+  /** The face to tilt. Ignored when `whole` is set. */
+  face?: TopoName;
+  /** Body Draft: tilt every side face rather than one named one. */
+  whole?: boolean;
+  /** Degrees. Positive leans outward from the neutral plane. */
+  angle: number;
+  pull: Axis3;
+  /** Where along `pull` the part does not move. */
+  neutral: number;
+}
+
+/**
+ * Why a fillet or a draft shows nothing in the preview today.
+ *
+ * The preview runs JSCAD, which has no addressable edges or faces, so neither
+ * feature can be built there. Saying so is the contract: a tool that silently
+ * does nothing is worse than one that is honestly unavailable, and this repo
+ * has the sentence-with-a-reason pattern everywhere already
+ * (whyCannotRoundCorner, whyRemovingCornerCosts, whyNameLost).
+ *
+ * Returns null once the preview is running the B-rep adapter, which is the
+ * single place this needs changing when that lands.
+ */
+export function whyNotOnJscad(f: Feature): string | null {
+  if (f.kind !== 'fillet' && f.kind !== 'draft') return null;
+  const what = f.kind === 'fillet'
+    ? (f.style === 'chamfer' ? 'Cutting one edge off flat' : 'Rounding one edge')
+    : 'Draft';
+  return `${what} needs the shape to know its own edges and faces, and the `
+    + 'preview does not yet. The feature is kept and will build when it does.';
+}
+
+/**
  * Move or copy an earlier feature by a vector — the move/copy half of
  * Onshape's Transform tool; the rotate half already ships as Turn.
  *
@@ -324,7 +406,9 @@ export type Feature =
   | SketchFeature | ExtrudeFeature | CombineFeature
   | BlendFeature
   | RevolveFeature | MirrorFeature | PatternFeature
-  | HoleFeature | ShellFeature | MoveFeature;
+  | HoleFeature | ShellFeature | MoveFeature
+  | FilletFeature
+  | DraftFeature;
 
 /**
  * Ids of earlier features this one is built from directly.
@@ -337,9 +421,31 @@ export type Feature =
  * does -- rather than needing a human to remember to add it to a list.
  */
 export function dependsOn(f: Feature): string[] {
-  if ('targets' in f) return f.targets;
-  if ('target' in f) return [f.target];
-  return [];
+  const named = topoRefs(f);
+  if ('targets' in f) return [...new Set([...f.targets, ...named])];
+  if ('target' in f) return [...new Set([f.target, ...named])];
+  return named;
+}
+
+/**
+ * Feature ids a feature reaches through a TopoName rather than through a
+ * target field.
+ *
+ * A Round names the edge it works on, and that edge is the meeting of two faces
+ * which may belong to a feature other than the one being rounded. That is a
+ * real dependency -- delete the feature the face came from and the round has
+ * nothing to hold on to -- and it is invisible to a `target` field, which is
+ * why dependsOn() above folds this in rather than leaving it to each caller to
+ * remember.
+ *
+ * featureChain() is the authority on which ids a name passes through; this only
+ * knows which fields hold names.
+ */
+export function topoRefs(f: Feature): string[] {
+  const names: TopoName[] = [];
+  if (f.kind === 'fillet') names.push(f.edge);
+  if (f.kind === 'draft' && f.face) names.push(f.face);
+  return [...new Set(names.flatMap(featureChain))];
 }
 
 /** Anything that consumes an earlier feature rather than standing alone. */
@@ -733,6 +839,8 @@ function labelOf(f: Feature): string {
     : f.kind === 'torus' ? 'Ring'
     : f.kind === 'blend' ? 'Blend'
     : f.kind === 'sphere' ? 'Sphere'
+    : f.kind === 'fillet' ? (f.style === 'chamfer' ? 'Bevel' : 'Round')
+    : f.kind === 'draft' ? (f.whole ? 'Body draft' : 'Draft')
     : nameless(f);
 }
 
@@ -804,6 +912,11 @@ export function topLevel(doc: ModelDoc): Feature[] {
     if (f.kind === 'hole') consumed.add(f.target);
     if (f.kind === 'shell') consumed.add(f.target);
     if (f.kind === 'move' && !f.copy) consumed.add(f.target);
+    // A rounded body REPLACES the one it was made from. Leaving both top level
+    // would draw the sharp-edged original inside the rounded one, which reads
+    // as the round having done nothing.
+    if (f.kind === 'fillet') consumed.add(f.target);
+    if (f.kind === 'draft') consumed.add(f.target);
     // A mirror's target is deliberately never consumed here — see
     // MirrorFeature's doc comment. The source stays visible and the mirrored
     // copy is a second, independent top-level shape.

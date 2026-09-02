@@ -64,6 +64,7 @@ try {
   const topo = require(path.join(out, 'topo-resolve.js'));
   const hist = require(path.join(out, 'topo-history.js'));
   const naming = require(path.join(out, 'topo-name.js'));
+  const types = require(path.join(out, 'model-types.js'));
 
   const oc = await (await import(pathToFileURL(path.join(dir, 'replicad_single.js')).href)).default();
   console.log('OpenCascade up, ' + Object.keys(oc).length + ' exports\n');
@@ -75,6 +76,7 @@ try {
   globalThis.__adapter = adapter;
   globalThis.__topo = topo;
   globalThis.__arc = arc;
+  globalThis.__types = types;
   globalThis.__hist = hist;
   globalThis.__name = naming;
 
@@ -499,6 +501,118 @@ console.log('');
     cap === null || flatCap === null ? 'null'
       : 'offset-0 cap at z=' + ctr(flatCap)[2].toFixed(2)
         + ', offset-30 cap at z=' + ctr(cap)[2].toFixed(2));
+}
+
+
+// ---- the tools the parity list refused ----------------------------------
+//
+// .gauntlet/parity.json put Draft, Body Draft, Rib, External Thread, Split and
+// Modify Fillet in "Kernel-dependent detail", refused because "each needs face
+// or edge selection on a B-rep". That was true of the mesh engine and is the
+// exact wall the naming slices were built to remove.
+//
+// Rounding ONE edge is the whole difference. What the app ships today is
+// JSCAD's roundRadius, which rounds every edge of a box at once because a mesh
+// has no edge to point at. Here the edge is named -- as the meeting of two
+// named faces -- and the answer is checked against arithmetic, not a golden
+// number: a fillet of radius r along a straight edge of length L removes
+// exactly (1 - pi/4) * r^2 * L.
+
+{
+  const occ = globalThis.__oc;
+  const topo = globalThis.__topo;
+  const naming = globalThis.__name;
+  const arc = globalThis.__arc;
+  const build = (features) => globalThis.__adapter.buildDoc(occ, { version: 1, features }, arc);
+  const vol = (s) => (s ? globalThis.__adapter.measureShape(occ, s).volume : NaN);
+
+  const FACE = (part) => ({ cause: 'primitive', feature: 'b1', kind: 'face', part });
+  const TOP_RIGHT = {
+    cause: 'between', feature: 'b1', kind: 'edge', of: [FACE('+z'), FACE('+x')],
+  };
+  const bar = (w, d, h, extra) => build([
+    { id: 'b1', kind: 'box', size: [w, d, h], center: [0, 0, 0] },
+    ...(extra ? [extra] : []),
+  ]);
+
+  check('an edge is named by the two faces that meet at it, in a stable order',
+    naming.formatName(TOP_RIGHT) === 'b1.edge[b1.face[+x] ^ b1.face[+z]]'
+      && naming.formatName({ ...TOP_RIGHT, of: [FACE('+x'), FACE('+z')] })
+         === naming.formatName(TOP_RIGHT),
+    naming.formatName(TOP_RIGHT));
+
+  const plain = bar(40, 30, 20);
+  const edge = topo.resolveName(occ, TOP_RIGHT, plain);
+  check('...and it resolves to a real edge on the solid', edge !== null);
+  check('...while two faces that never meet resolve to nothing',
+    topo.resolveName(occ, { ...TOP_RIGHT, of: [FACE('+z'), FACE('-z')] }, plain) === null,
+    'the top and the bottom of a box share no edge');
+
+  // ROUND one edge. Radius 4 along the 30-long edge.
+  const loss = (r, L) => (1 - Math.PI / 4) * r * r * L;
+  const R = (size, style) => ({
+    id: 'r1', kind: 'fillet', target: 'b1', edge: TOP_RIGHT, size, style,
+  });
+  const rounded = bar(40, 30, 20, R(4, 'fillet'));
+  check('Modify Fillet: one named edge is rounded, and only that one',
+    Math.abs(vol(rounded.shapes.get('r1')) - (24000 - loss(4, 30))) < 0.01,
+    'got ' + vol(rounded.shapes.get('r1')) + ', analytic ' + (24000 - loss(4, 30)).toFixed(4));
+  check('...the rounded body replaces the sharp one rather than sitting inside it',
+    globalThis.__types.topLevel({ version: 1, features: [
+      { id: 'b1', kind: 'box', size: [40, 30, 20], center: [0, 0, 0] }, R(4, 'fillet')] })
+      .map((f) => f.id).join(',') === 'r1');
+
+  // THE CLAIM. Same name, different box, still the same edge -- and the loss
+  // follows the NEW edge length, which is how we know it is that edge and not
+  // a coincidence.
+  const wide = bar(70, 12, 46, R(4, 'fillet'));
+  check('the same edge name finds the same edge after a rebuild',
+    Math.abs(vol(wide.shapes.get('r1')) - (70 * 12 * 46 - loss(4, 12))) < 0.01,
+    'got ' + vol(wide.shapes.get('r1')) + ', analytic ' + (70 * 12 * 46 - loss(4, 12)).toFixed(4));
+  check('...and it is not a fixed edge: a different pair rounds a different one',
+    Math.abs(vol(bar(70, 12, 46, { ...R(4, 'fillet'),
+      edge: { ...TOP_RIGHT, of: [FACE('+z'), FACE('+y')] } }).shapes.get('r1'))
+      - (70 * 12 * 46 - loss(4, 70))) < 0.01,
+    'the top-front edge runs the 70 way, so it should cost 70/12 as much');
+
+  // BEVEL: the same edge, cut flat. A chamfer of distance d removes half of
+  // what the square d x d corner would, so d^2 * L / 2.
+  const bevelled = bar(40, 30, 20, R(4, 'chamfer'));
+  check('...and the same edge can be cut off flat instead',
+    Math.abs(vol(bevelled.shapes.get('r1')) - (24000 - (16 * 30) / 2)) < 0.01,
+    'got ' + vol(bevelled.shapes.get('r1')) + ', analytic ' + (24000 - 240));
+
+  // An edge that cannot take the radius is refused, not silently ignored.
+  check('a radius the edge cannot take produces nothing, rather than a sharp body',
+    bar(40, 30, 20, R(400, 'fillet')).shapes.get('r1') === undefined,
+    'an over-large round must not quietly return the unrounded solid');
+  check('...and neither does an edge name that does not resolve',
+    bar(40, 30, 20, { ...R(4, 'fillet'),
+      edge: { ...TOP_RIGHT, of: [FACE('+z'), FACE('-z')] } }).shapes.get('r1') === undefined);
+
+  // DRAFT: tilt one face away from a neutral plane at the base.
+  const D = (extra) => ({
+    id: 'd1', kind: 'draft', target: 'b1', angle: 8, pull: 'z', neutral: -10, ...extra,
+  });
+  const one = bar(40, 30, 20, D({ face: FACE('+x') }));
+  const oneVol = vol(one.shapes.get('d1'));
+  check('Draft: one named face leans, and the part loses material',
+    Number.isFinite(oneVol) && oneVol < 24000 && oneVol > 22000,
+    'got ' + oneVol);
+  check('...and a bigger angle takes more off',
+    vol(bar(40, 30, 20, D({ face: FACE('+x'), angle: 16 })).shapes.get('d1')) < oneVol);
+  check('...while a zero angle changes nothing',
+    Math.abs(vol(bar(40, 30, 20, D({ face: FACE('+x'), angle: 0 })).shapes.get('d1')) - 24000) < 0.01);
+
+  // BODY DRAFT: every side face, so strictly more than one of them.
+  const whole = vol(bar(40, 30, 20, D({ whole: true })).shapes.get('d1'));
+  check('Body Draft: all four sides lean, so it takes more off than one face does',
+    Number.isFinite(whole) && whole < oneVol,
+    'one face ' + oneVol + ' vs whole body ' + whole);
+  check('...and the two faces the pull points at are left alone',
+    Math.abs(globalThis.__adapter.measureShape(occ, bar(40, 30, 20, D({ whole: true }))
+      .shapes.get('d1')).bbox[1][2] - 10) < 1e-6,
+    'the top should still be a flat face at z=10');
 }
 
 console.log((fails.length ? 'FAIL' : 'ALL PASS') + '  (' + pass + ' checks'

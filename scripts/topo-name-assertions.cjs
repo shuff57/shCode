@@ -137,6 +137,42 @@ module.exports = function run(dir) {
     N.formatName({ cause: 'carried', feature: 'op1', kind: 'face', of: roundFace })
       === 'op1.same[e1.face[sk1.corner2]]');
 
+
+  // ---- an edge is the meeting of two faces ------------------------------
+  //
+  // Fillet works on edges, and an edge is the part of a solid with the least to
+  // hold on to: a box has twelve, they look alike, and the kernel's order over
+  // them is exactly what these names may not use. But every edge is where two
+  // faces meet, and faces are already nameable -- so the pair IS the name, and
+  // no new mechanism is needed.
+
+  const topFace = { cause: 'primitive', feature: 'c1', kind: 'face', part: '+z' };
+  const rightFace = { cause: 'primitive', feature: 'c1', kind: 'face', part: '+x' };
+  const edge = { cause: 'between', feature: 'c1', kind: 'edge', of: [topFace, rightFace] };
+
+  check('an edge names the two faces that meet at it',
+    N.formatName(edge) === 'c1.edge[c1.face[+x] ^ c1.face[+z]]', N.formatName(edge));
+  check('...and the pair is unordered, so either way round reads the same',
+    N.formatName({ ...edge, of: [rightFace, topFace] }) === N.formatName(edge),
+    'an unordered pair with an ordered spelling would be two names for one edge');
+  check('...it depends on both faces, so featureChain names them once each',
+    N.featureChain(edge).join(',') === 'c1');
+  check('...and on two different features when the faces come from two',
+    N.featureChain({ ...edge, of: [topFace, { ...rightFace, feature: 'e1' }] })
+      .sort().join(',') === 'c1,e1');
+  check('losing either face loses the edge, and says which',
+    N.whyNameLost({ ...edge, of: [topFace, { ...rightFace, feature: 'gone' }] },
+      (id) => id !== 'gone', edges, (id) => 'Box 9')
+      === 'That face was made by Box 9, which is no longer in the model.',
+    String(N.whyNameLost({ ...edge, of: [topFace, { ...rightFace, feature: 'gone' }] },
+      (id) => id !== 'gone', edges, (id) => 'Box 9')));
+  check('...and an edge whose faces both survive is not reported lost',
+    N.whyNameLost(edge, exists, edges, label) === null
+      && N.nameIsStructurallyValid(edge, exists, edges));
+  check('a boolean can carry an edge name through like any other',
+    N.formatName({ cause: 'carried', feature: 'op1', kind: 'edge', of: edge })
+      === 'op1.same[c1.edge[c1.face[+x] ^ c1.face[+z]]]');
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };

@@ -21,7 +21,8 @@
 // generated declarations for thirty functions.
 
 import type { Feature, ModelDoc, Vec3 } from './model-types';
-import { edgeThrough } from './topo-history';
+import { chamfered, drafted, edgeThrough, filleted } from './topo-history';
+import { facesOf, resolveName, resolvePrimitiveFace } from './topo-resolve';
 
 /** The handful of OpenCascade entry points this adapter uses. Loose on
  *  purpose -- see the note above. */
@@ -496,6 +497,50 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
         through.AddWire(sketchWire(oc, arc, hi));
         through.Build(new oc.Message_ProgressRange());
         shape = through.Shape();
+      }
+    } else if (f.kind === 'fillet') {
+      // The payoff of the naming work, and the tool .gauntlet/parity.json
+      // refused as needing "face or edge selection on a B-rep". The edge is
+      // resolved from its NAME -- the pair of faces it lies between -- against
+      // the shape as built so far, so widening the part finds the same edge
+      // rather than the same index.
+      const src = built.get(f.target);
+      const partial: BuildResult = { shapes: built, ops, sweeps };
+      const edge = src ? resolveName(oc, f.edge, partial) : null;
+      if (src && edge) {
+        shape = f.style === 'chamfer'
+          ? chamfered(oc, src, edge, f.size)
+          : filleted(oc, src, edge, f.size);
+      }
+      // A null edge, or a size the edge cannot take, leaves `shape` null and
+      // the feature absent from the build. That is the same refusal every
+      // other unresolvable name gets, and it is the caller's to report --
+      // whyNameLost() in lib/topo-name.ts says which face went.
+    } else if (f.kind === 'draft') {
+      const src = built.get(f.target);
+      const axis: Vec3 = f.pull === 'x' ? [1, 0, 0] : f.pull === 'y' ? [0, 1, 0] : [0, 0, 1];
+      const rad = (f.angle * Math.PI) / 180;
+      if (src && f.whole) {
+        // Body Draft: every face except the two the pull points at. Exact for
+        // the axis-aligned primitives; see DraftFeature's note on the limit.
+        // Applied one at a time rather than in a single DraftAngle so that a
+        // face which refuses -- a curved wall, a face already at the angle --
+        // costs that face and not the whole feature.
+        let cur = src;
+        const caps = [
+          resolvePrimitiveFace(oc, src, f.pull === 'x' ? '+x' : f.pull === 'y' ? '+y' : '+z'),
+          resolvePrimitiveFace(oc, src, f.pull === 'x' ? '-x' : f.pull === 'y' ? '-y' : '-z'),
+        ];
+        for (const face of facesOf(oc, src)) {
+          if (caps.some((c) => c && c.IsSame(face))) continue;
+          const next = drafted(oc, cur, face, axis, rad, f.neutral);
+          if (next) cur = next;
+        }
+        shape = cur;
+      } else if (src && f.face) {
+        const partial: BuildResult = { shapes: built, ops, sweeps };
+        const face = resolveName(oc, f.face, partial);
+        if (face) shape = drafted(oc, src, face, axis, rad, f.neutral);
       }
     } else if (f.kind === 'move') {
       const src = built.get(f.target);

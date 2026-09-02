@@ -115,11 +115,12 @@ export interface DanglingRef {
  * function so the delete path, a load, and the test gate can all ask the same
  * question the same way.
  *
- * Face-level selections belong here too the moment a feature holds one --
- * nameIsStructurallyValid() in lib/topo-name.ts answers the same question for a
- * TopoName. No feature kind carries one yet, so wiring that in now would be a
- * check with nothing to check; it is named here so the next person adding such
- * a field knows where it goes.
+ * Face-level selections are covered too, now that Round and Draft carry one.
+ * dependsOn() folds in every feature id a TopoName passes through (see
+ * topoRefs in lib/model-types.ts), so a Round whose edge names a deleted box is
+ * reported here exactly like a Pull whose sketch is gone -- and cascaded by
+ * orphanedBy() for the same reason, without either function knowing what a
+ * TopoName is.
  */
 export function danglingRefs(doc: ModelDoc): DanglingRef[] {
   const have = new Set(doc.features.map((f) => f.id));

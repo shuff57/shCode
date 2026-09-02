@@ -105,7 +105,25 @@ export type TopoName =
   /** A part that did not exist before this operation -- the wall a subtraction
    *  cuts, the seam a union makes. It has no ancestor to name, so it is named
    *  by its maker and located by a discriminator. */
-  | { cause: 'made'; feature: string; kind: TopoKind; at: OnPoint };
+  | { cause: 'made'; feature: string; kind: TopoKind; at: OnPoint }
+  /**
+   * An EDGE, named by the two faces that meet along it.
+   *
+   * Edges are what a fillet is applied to, and they are the part of a solid
+   * with the least to hold on to: a box has twelve of them, they are
+   * interchangeable to look at, and the kernel's own order over them is exactly
+   * the thing this file refuses to depend on. But every edge is the meeting of
+   * two faces, and faces are already nameable -- so an edge needs no new
+   * mechanism, only the pair.
+   *
+   *   b1.edge[b1.face[+x] ^ b1.face[+z]]   the top-right edge of a box
+   *
+   * The pair is unordered: the edge where the top meets the right is the same
+   * edge as where the right meets the top. formatName sorts the two so that a
+   * name written either way round produces the same text, which is what makes
+   * two rebuilds of the same model comparable as strings.
+   */
+  | { cause: 'between'; feature: string; kind: 'edge'; of: [TopoName, TopoName] };
 
 const r4 = (n: number) => Math.round(n * 1e4) / 1e4;
 
@@ -122,6 +140,13 @@ export function formatName(n: TopoName): string {
     case 'carried': return `${n.feature}.same[${formatName(n.of)}]`;
     case 'split': return `${n.feature}.split[${formatName(n.of)}, ${at(n.at)}]`;
     case 'made': return `${n.feature}.made[${n.kind}, ${at(n.at)}]`;
+    case 'between': {
+      // Sorted, not written in the order the caller happened to pick the two
+      // faces. An unordered pair with an ordered spelling is two names for one
+      // edge, and the whole point of a name is that it compares.
+      const pair = [formatName(n.of[0]), formatName(n.of[1])].sort();
+      return `${n.feature}.edge[${pair[0]} ^ ${pair[1]}]`;
+    }
   }
 }
 
@@ -130,7 +155,14 @@ export function formatName(n: TopoName): string {
  *  name rooted in it is gone, which is a thing to say out loud rather than
  *  discover at rebuild time. */
 export function rootFeature(n: TopoName): string {
-  return n.cause === 'carried' || n.cause === 'split' ? rootFeature(n.of) : n.feature;
+  if (n.cause === 'carried' || n.cause === 'split') return rootFeature(n.of);
+  // An edge between two faces can in principle root in two different features.
+  // The first is reported, and featureChain() below is the honest answer when
+  // the caller needs all of them -- a single root is a convenience, not a
+  // complete description, and callers deciding what an edit disturbs should be
+  // asking for the chain.
+  if (n.cause === 'between') return rootFeature(n.of[0]);
+  return n.feature;
 }
 
 /** Every feature id a name passes through, nearest cause first. Used to decide
@@ -139,7 +171,8 @@ export function rootFeature(n: TopoName): string {
 export function featureChain(n: TopoName): string[] {
   const out = [n.feature];
   if (n.cause === 'carried' || n.cause === 'split') out.push(...featureChain(n.of));
-  return out;
+  if (n.cause === 'between') out.push(...featureChain(n.of[0]), ...featureChain(n.of[1]));
+  return [...new Set(out)];
 }
 
 /**
@@ -165,6 +198,9 @@ export function nameIsStructurallyValid(
   }
   if (n.cause === 'carried' || n.cause === 'split') {
     return nameIsStructurallyValid(n.of, featureExists, sketchEdgeCount);
+  }
+  if (n.cause === 'between') {
+    return n.of.every((f) => nameIsStructurallyValid(f, featureExists, sketchEdgeCount));
   }
   return true;
 }
@@ -206,6 +242,15 @@ export function whyNameLost(
   }
   if (n.cause === 'carried' || n.cause === 'split') {
     return whyNameLost(n.of, featureExists, sketchEdgeCount, label);
+  }
+  if (n.cause === 'between') {
+    // Either face going takes the edge with it, and the first reason found is
+    // the one reported -- two reasons for one lost edge is more than a student
+    // needs to act.
+    for (const f of n.of) {
+      const why = whyNameLost(f, featureExists, sketchEdgeCount, label);
+      if (why) return why;
+    }
   }
   return null;
 }
