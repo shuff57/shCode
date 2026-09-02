@@ -673,6 +673,48 @@ export interface Outline {
   why?: string;
 }
 
+/** What one segment of a finished outline means back in the design. */
+export interface SegmentRole {
+  /** `edge` -- the run of design edge `index`, between design corners `index`
+   *  and `index + 1`. `corner` -- the arc or flat that replaced design corner
+   *  `index` when it was rounded or chamfered. */
+  role: 'edge' | 'corner';
+  index: number;
+}
+
+/**
+ * Read an outline's segments back as design edges and treated corners.
+ *
+ * This is what lets a face of a pulled solid be named after the thing the
+ * student drew rather than after its position in the result. `basis` already
+ * says which design corner each outline point projects from, and rounding a
+ * corner is exactly what duplicates an entry there -- one sharp corner becomes
+ * two trim points, both carrying the same basis. So a segment whose two ends
+ * share a basis IS the corner treatment, and every other segment is the design
+ * edge its first end came from.
+ *
+ * Worked through, a square rounded at corner 2 gives basis [0,1,2,2,3]:
+ *
+ *   segment 0  basis 0 -> 1   design edge 0
+ *   segment 1  basis 1 -> 2   design edge 1
+ *   segment 2  basis 2 -> 2   THE ROUND at corner 2
+ *   segment 3  basis 2 -> 3   design edge 2
+ *   segment 4  basis 3 -> 0   design edge 3   (the wrap)
+ *
+ * Design edges keep their numbers whatever is rounded, which is the property
+ * the naming scheme needs and the reason it can refer to `edge 2` at all.
+ */
+export function segmentRoles(basis: number[]): SegmentRole[] {
+  const n = basis.length;
+  const out: SegmentRole[] = [];
+  for (let i = 0; i < n; i++) {
+    const a = basis[i];
+    const b = basis[(i + 1) % n];
+    out.push(a === b ? { role: 'corner', index: a } : { role: 'edge', index: a });
+  }
+  return out;
+}
+
 /**
  * A design edge with no length at all.
  *

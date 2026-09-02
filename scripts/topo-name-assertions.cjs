@@ -104,6 +104,39 @@ module.exports = function run(dir) {
       && typeof N.whyNameLost(bad, exists, edges, label) === 'string',
     'an invalid name with no explanation would force a silent drop');
 
+
+  // ---- a rounded corner is not an edge ----------------------------------
+  //
+  // Rounding a corner does not give the sketch a fifth edge. The design still
+  // has four corners and four edges; what changes is the OUTLINE, which gains
+  // a segment between the two trim points the round leaves behind. So the face
+  // that segment sweeps into has to be named after the CORNER, and naming it
+  // after an outline position would move it every time a different corner was
+  // rounded -- the exact failure this file exists to prevent.
+
+  const roundFace = { cause: 'rounded', feature: 'e1', kind: 'face', from: 'sk1', corner: 2 };
+
+  check('a rounded corner names the corner, not an edge',
+    N.formatName(roundFace) === 'e1.face[sk1.corner2]', N.formatName(roundFace));
+  check('...and it reads differently from the edge with the same number',
+    N.formatName(roundFace) !== N.formatName({ ...sideFace, edge: 2 }));
+  check('...it still hangs off the feature that swept it',
+    N.rootFeature(roundFace) === 'e1' && N.featureChain(roundFace).join(',') === 'e1');
+  check('...a corner beyond the sketch is structurally invalid, same as an edge',
+    N.nameIsStructurallyValid(roundFace, exists, edges)
+      && !N.nameIsStructurallyValid({ ...roundFace, corner: 9 }, exists, edges));
+  check('...and losing it is explained in corners, not edges',
+    N.whyNameLost({ ...roundFace, corner: 9 }, exists, edges, label)
+      === 'That face was pulled from corner 10 of Sketch 1, which now has only 4 corners.',
+    String(N.whyNameLost({ ...roundFace, corner: 9 }, exists, edges, label)));
+  check('...while a swept name still explains itself in edges',
+    N.whyNameLost({ ...sideFace, edge: 9 }, exists, edges, label)
+      === 'That face was pulled from edge 10 of Sketch 1, which now has only 4 edges.',
+    String(N.whyNameLost({ ...sideFace, edge: 9 }, exists, edges, label)));
+  check('a boolean can carry a rounded face through like any other',
+    N.formatName({ cause: 'carried', feature: 'op1', kind: 'face', of: roundFace })
+      === 'op1.same[e1.face[sk1.corner2]]');
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };

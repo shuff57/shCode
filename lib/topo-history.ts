@@ -1,4 +1,4 @@
-// Asking a boolean what became of a face.
+// Asking an operation what became of a face.
 //
 // lib/topo-name.ts is the algebra of names and lib/topo-resolve.ts turns a name
 // back into a face. This file is the one underneath both: the small set of
@@ -26,9 +26,17 @@
 //   side y=0, y=40           replaced (each gained a notch)
 //   TOP                      split into two, at x=-12.5 and x=+12.5
 //
-// FOUR BINDING TRAPS, all of them found the hard way and none of them obvious
+// WHAT A SWEEP DOES INSTEAD. A prism or a revolve does not modify faces, it
+// GENERATES them: one profile edge in, one wall out, plus a cap at each end.
+// That history is exact rather than discriminated, which is why a `swept` or
+// `cap` name needs no near() point. The second half of this file covers it.
+//
+// SIX BINDING TRAPS, all of them found the hard way and none of them obvious
 // from the error text. They are noted at each call site as well, because that
-// is where the next person will be standing.
+// is where the next person will be standing. Two of them -- the wire builder
+// copying the edges you hand it, and a full revolve still offering caps it does
+// not have -- return a plausible wrong answer rather than an error, which is
+// the kind worth reading twice.
 
 /** The slice of OpenCascade this file calls. Same deliberate looseness as
  *  lib/occt-build.ts -- see the note there. */
@@ -216,9 +224,106 @@ export function pointAtFraction(oc: Occt, face: any, u: number, v: number): any 
  * 15Extrema_ExtFlag" -- an error that names neither argument you passed. The
  * two-argument form is bound and works.
  */
-export function distanceToFace(oc: Occt, pnt: any, face: any): number {
+export function distanceTo(oc: Occt, pnt: any, shape: any): number {
   const v = new oc.BRepBuilderAPI_MakeVertex(pnt).Vertex();
-  return new oc.BRepExtrema_DistShapeShape(v, face).Value();
+  return new oc.BRepExtrema_DistShapeShape(v, shape).Value();
+}
+
+/** Every edge of a shape. Used to find the profile edge a sketch segment
+ *  became -- see the note on generatedFrom. */
+export function edgesOf(oc: Occt, shape: any): any[] {
+  const out: any[] = [];
+  const exp = new oc.TopExp_Explorer(
+    shape,
+    oc.TopAbs_ShapeEnum.TopAbs_EDGE,
+    oc.TopAbs_ShapeEnum.TopAbs_SHAPE,
+  );
+  while (exp.More()) {
+    out.push(exp.Current().clone());
+    exp.Next();
+  }
+  return out;
+}
+
+/** The one edge of `shape` that passes through a point, or null if none does
+ *  or several do. Ambiguity is a refusal, for the same reason a split piece
+ *  that two discriminators claim is a refusal. */
+export function edgeThrough(oc: Occt, shape: any, pnt: any): any | null {
+  const hits = edgesOf(oc, shape).filter((e) => distanceTo(oc, pnt, e) <= ON_TOL);
+  return hits.length === 1 ? hits[0] : null;
+}
+
+// ---- sweeps -----------------------------------------------------------------
+//
+// A prism or a revolve does not modify faces the way a boolean does; it
+// GENERATES them. One edge of the profile goes in and one wall of the solid
+// comes out, and the two ends of the sweep are its caps. That is a cleaner
+// history than a boolean's and it is why `swept` and `cap` names can be exact
+// rather than discriminated.
+
+/**
+ * The single face a sweep generated from one profile edge, or null.
+ *
+ * TRAP, and it is the one that decides how the profile has to be built: the
+ * edges you hand to BRepBuilderAPI_MakeWire are NOT the edges that end up in
+ * the wire. The builder copies and reorients them to make the wire connected,
+ * so asking Generated() about an edge you kept a reference to answers with an
+ * empty list -- for every edge except, confusingly, the first, which is added
+ * as-is. Measured: a four-sided profile answered 1, 0, 0, 0.
+ *
+ * The fix is not to keep the edges at all. Build the face, walk the edges back
+ * OFF it, and match each one to its outline segment by a point known to lie on
+ * it. That is order-independent as well as correct, which matters because
+ * explorer order is exactly the thing this whole design refuses to depend on.
+ */
+export function generatedFrom(oc: Occt, op: any, edge: any): any | null {
+  if (!op || !edge) return null;
+  let made: any[] = [];
+  try {
+    made = listShapes(oc, op.Generated(edge));
+  } catch {
+    return null;
+  }
+  return made.length === 1 ? made[0] : null;
+}
+
+/**
+ * The face capping one end of a sweep, or null.
+ *
+ * `closed` is not a convenience flag. A revolve that goes all the way round has
+ * no caps -- the profile meets itself -- but FirstShape() and LastShape() still
+ * return a face, and they return the PROFILE, which is not part of the solid at
+ * all. Measured: a 90-degree revolve gives 6 faces with First and Last at
+ * different places; the same profile at 360 gives 4 faces with First and Last
+ * both at the profile's own centre. Handing that back would be a face the
+ * student can never see, on a solid it is not part of.
+ */
+export function capOf(oc: Occt, op: any, end: 'top' | 'bottom', closed: boolean): any | null {
+  if (!op || closed) return null;
+  try {
+    const s = end === 'top' ? op.LastShape() : op.FirstShape();
+    return s && (!s.IsNull || !s.IsNull()) ? s : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Put a face where its solid actually ended up.
+ *
+ * A sweep's output is sometimes moved afterwards -- a revolve on an offset
+ * sketch plane is built at the origin and then translated. The transform shares
+ * the underlying geometry rather than copying it, so the face the sweep
+ * generated is NOT a face of the moved solid: measured, IsSame() against every
+ * face of the moved solid is false, and the face sits where the solid used to
+ * be. Applying the same transform to the face lands it exactly on the right
+ * one. Skipping this would hand back a face floating in space, which is worse
+ * than null because it looks like an answer.
+ */
+export function placed(oc: Occt, shape: any, trsf: any | null): any | null {
+  if (!shape) return null;
+  if (!trsf) return shape;
+  return new oc.BRepBuilderAPI_Transform(shape, trsf, false).Shape();
 }
 
 /** Where a face's area is centred. Duplicated from lib/topo-resolve.ts rather
@@ -246,7 +351,7 @@ function centreOf(oc: Occt, face: any): any {
  */
 export function pointOnFace(oc: Occt, face: any): any | null {
   const c = centreOf(oc, face);
-  if (distanceToFace(oc, c, face) <= ON_TOL) return c;
+  if (distanceTo(oc, c, face) <= ON_TOL) return c;
   const ad = new oc.BRepAdaptor_Surface(oc.TopoDS.Face(face), true);
   const u0 = ad.FirstUParameter();
   const u1 = ad.LastUParameter();
@@ -256,7 +361,7 @@ export function pointOnFace(oc: Occt, face: any): any | null {
   for (let i = 1; i <= N; i++) {
     for (let j = 1; j <= N; j++) {
       const p = ad.Value(u0 + ((u1 - u0) * i) / (N + 1), v0 + ((v1 - v0) * j) / (N + 1));
-      if (distanceToFace(oc, p, face) <= ON_TOL) return p;
+      if (distanceTo(oc, p, face) <= ON_TOL) return p;
     }
   }
   return null;
@@ -273,6 +378,6 @@ export function pointOnFace(oc: Occt, face: any): any | null {
  * never quietly moved to a neighbour.
  */
 export function pieceContaining(oc: Occt, pieces: any[], pnt: any): any | null {
-  const hits = pieces.filter((f) => distanceToFace(oc, pnt, f) <= ON_TOL);
+  const hits = pieces.filter((f) => distanceTo(oc, pnt, f) <= ON_TOL);
   return hits.length === 1 ? hits[0] : null;
 }

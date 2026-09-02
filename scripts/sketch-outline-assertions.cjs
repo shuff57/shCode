@@ -573,6 +573,70 @@ module.exports = function run(dir) {
     /disabled=\{curved && !fixed\}/.test(panelSrc),
     'the note says "remove one to settle it" while the box that removes it is disabled');
 
+
+  // ---- reading an outline back as design edges and treated corners --------
+  //
+  // A face of a pulled solid has to be nameable after the thing the student
+  // drew. That means telling apart, in a finished outline, which segments are
+  // design edges and which are the arc or flat a rounded corner left behind.
+  // The information is already in `basis` -- rounding a corner is exactly what
+  // duplicates an entry there -- so this is a read, not a new derivation.
+  //
+  // The control below matters as much as the check: if rounding a corner ever
+  // stops changing the outline's length, every assertion here passes for a
+  // reason that has nothing to do with segmentRoles.
+
+  const square = { points: [[0, 0], [40, 0], [40, 20], [0, 20]] };
+
+  const plainRoles = arc.segmentRoles(arc.outlineOf(square).basis);
+  check('an untouched outline is design edges all the way round',
+    plainRoles.length === 4
+      && plainRoles.every((r, i) => r.role === 'edge' && r.index === i),
+    JSON.stringify(plainRoles));
+
+  const rounded = arc.outlineOf({ ...square, rounds: { 2: 5 } });
+  check('CONTROL: rounding corner 2 really does lengthen the outline',
+    rounded.points.length === 5,
+    'the round was refused, so nothing below is measuring anything');
+
+  const roles2 = arc.segmentRoles(rounded.basis);
+  check('...and exactly one segment is reported as that corner',
+    roles2.filter((r) => r.role === 'corner').length === 1
+      && roles2.find((r) => r.role === 'corner').index === 2,
+    JSON.stringify(roles2));
+  check('...while the four design edges keep the numbers they always had',
+    JSON.stringify(roles2.filter((r) => r.role === 'edge').map((r) => r.index))
+      === JSON.stringify([0, 1, 2, 3]),
+    JSON.stringify(roles2));
+
+  // The property the whole naming scheme leans on: rounding one corner must
+  // not renumber the edges, or every name written before the round moves to a
+  // different face.
+  const rounded0 = arc.segmentRoles(arc.outlineOf({ ...square, rounds: { 0: 5 } }).basis);
+  check('rounding a DIFFERENT corner still leaves design edge 3 called edge 3',
+    rounded0.filter((r) => r.role === 'edge').map((r) => r.index).join(',') === '0,1,2,3'
+      && rounded0.find((r) => r.role === 'corner').index === 0,
+    JSON.stringify(rounded0));
+
+  // Every corner treated at once -- the case where an ordinal into the outline
+  // would be furthest from the design number it is meant to mean.
+  const allRound = arc.outlineOf({ ...square, rounds: { 0: 4, 1: 4, 2: 4, 3: 4 } });
+  const rolesAll = arc.segmentRoles(allRound.basis);
+  check('CONTROL: four rounds really do double the outline', allRound.points.length === 8,
+    'got ' + allRound.points.length + ' points');
+  check('...and it reads back as four corners and four edges, correctly numbered',
+    rolesAll.filter((r) => r.role === 'corner').map((r) => r.index).join(',') === '0,1,2,3'
+      && rolesAll.filter((r) => r.role === 'edge').map((r) => r.index).join(',') === '0,1,2,3',
+    JSON.stringify(rolesAll));
+
+  // A chamfer is the same shape of edit, so it must read the same way.
+  const cham = arc.segmentRoles(arc.outlineOf({ ...square, chamfers: { 1: 5 } }).basis);
+  check('a chamfered corner reads as that corner too, not as a new edge',
+    cham.filter((r) => r.role === 'corner').length === 1
+      && cham.find((r) => r.role === 'corner').index === 1
+      && cham.filter((r) => r.role === 'edge').map((r) => r.index).join(',') === '0,1,2,3',
+    JSON.stringify(cham));
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };

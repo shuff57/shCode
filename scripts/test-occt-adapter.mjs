@@ -74,6 +74,7 @@ try {
   globalThis.__oc = oc;
   globalThis.__adapter = adapter;
   globalThis.__topo = topo;
+  globalThis.__arc = arc;
   globalThis.__hist = hist;
   globalThis.__name = naming;
 
@@ -258,8 +259,8 @@ function centreOf(oc, shape, part) {
   // A name that cannot be resolved returns null rather than a wrong face.
   check('an unresolvable name returns null instead of guessing',
     topo.resolveName(occ, { cause: 'swept', feature: 'b1', kind: 'face', from: 'sk9', edge: 0 },
-      { shapes: new Map([['b1', after]]), ops: new Map() }) === null,
-    'swept names need sweep bookkeeping, which this slice does not have');
+      { shapes: new Map([['b1', after]]), ops: new Map(), sweeps: new Map() }) === null,
+    'b1 is a box, so no sweep produced it and there is no edge to have been pulled from');
 }
 
 
@@ -361,6 +362,145 @@ function centreOf(oc, shape, part) {
 }
 
 console.log('');
+
+// ---- swept and cap: naming what the student actually drew ---------------
+//
+// A boolean MODIFIES faces; a sweep GENERATES them. One profile edge in, one
+// wall out, plus a cap at each end. So a swept name needs no discriminator --
+// it is exact -- and the whole difficulty moves to a different place: making
+// sure "edge 2" keeps meaning the same design edge when the student rounds a
+// corner somewhere else, and that the face handed back belongs to the solid
+// they can actually see.
+
+{
+  const occ = globalThis.__oc;
+  const topo = globalThis.__topo;
+  const hist = globalThis.__hist;
+  const naming = globalThis.__name;
+  const arc = globalThis.__arc;
+  const ctr = (f) => (f ? topo.faceCentre(occ, f) : null);
+  const near = (f, want) => f !== null && want.every((n, i) => Math.abs(ctr(f)[i] - n) < 1e-6);
+
+  const bar = (w, extra) => globalThis.__adapter.buildDoc(occ, { version: 1, features: [
+    { id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0,
+      points: [[0, 0], [w, 0], [w, 25], [0, 25]], ...extra },
+    { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
+  ] }, arc);
+
+  const E = (i) => ({ cause: 'swept', feature: 'e1', kind: 'face', from: 'sk1', edge: i });
+  const CAP = (end) => ({ cause: 'cap', feature: 'e1', kind: 'face', end });
+
+  const a = bar(40);
+  check('buildDoc keeps the sweep, not just its Shape()',
+    a.sweeps.get('e1') !== undefined && a.sweeps.get('e1').segments.length === 4,
+    'segments: ' + JSON.stringify((a.sweeps.get('e1') || {}).segments || []));
+
+  // Each design edge gets its own wall, and each wall is where that edge was.
+  // The profile runs (0,0) (40,0) (40,25) (0,25), pulled 12 up.
+  const walls = [[20, 0, 6], [40, 12.5, 6], [20, 25, 6], [0, 12.5, 6]];
+  let allWalls = true;
+  const seen = [];
+  for (let i = 0; i < 4; i++) {
+    const f = topo.resolveName(occ, E(i), a);
+    seen.push(i + ':' + (f ? ctr(f).map((n) => n.toFixed(1)).join(',') : 'null'));
+    if (!near(f, walls[i])) allWalls = false;
+  }
+  check('every design edge resolves to the wall it was pulled into', allWalls, seen.join('  '));
+
+  check('a pull caps both ends, and they are the two flat faces',
+    near(topo.resolveName(occ, CAP('bottom'), a), [20, 12.5, 0])
+      && near(topo.resolveName(occ, CAP('top'), a), [20, 12.5, 12]),
+    JSON.stringify([ctr(topo.resolveName(occ, CAP('bottom'), a)),
+      ctr(topo.resolveName(occ, CAP('top'), a))]));
+
+  // THE CLAIM, the sweep half. Change the sketch and the name still lands on
+  // the same design edge's wall -- at its new position, which is the point.
+  const wide = bar(70);
+  check('a swept name survives a rebuild that moves the edge it names',
+    near(topo.resolveName(occ, E(1), wide), [70, 12.5, 6]),
+    'edge 1 is the right-hand wall; at w=70 it belongs at x=70, got '
+      + JSON.stringify(ctr(topo.resolveName(occ, E(1), wide))));
+
+  // ...and it is not just picking the same ordinal. Rounding a corner inserts
+  // a segment into the OUTLINE, so an outline-ordinal name would shift here.
+  const withRound = bar(40, { rounds: { 1: 6 } });
+  check('CONTROL: rounding corner 1 really does add a face',
+    topo.facesOf(occ, withRound.shapes.get('e1')).length === 7,
+    'got ' + topo.facesOf(occ, withRound.shapes.get('e1')).length + ' faces, expected 6 + 1');
+  check('...and design edge 2 is STILL design edge 2 after that round',
+    near(topo.resolveName(occ, E(2), withRound), [20, 25, 6]),
+    'the far wall moved to ' + JSON.stringify(ctr(topo.resolveName(occ, E(2), withRound))));
+  check('...while edges 0 and 1 are shortened by the round rather than lost',
+    topo.resolveName(occ, E(0), withRound) !== null
+      && topo.resolveName(occ, E(1), withRound) !== null);
+
+  // The round's own face is nameable, and as a CORNER -- not as an edge.
+  const R1 = { cause: 'rounded', feature: 'e1', kind: 'face', from: 'sk1', corner: 1 };
+  const rf = topo.resolveName(occ, R1, withRound);
+  check('the face a rounded corner made is nameable, after the corner',
+    rf !== null && naming.formatName(R1) === 'e1.face[sk1.corner1]',
+    rf === null ? 'resolved to null' : naming.formatName(R1));
+  check('...and it is the curved one, sitting off the corner it replaced',
+    rf !== null && Math.abs(ctr(rf)[2] - 6) < 1e-6
+      && ctr(rf)[0] > 34 && ctr(rf)[0] < 40 && ctr(rf)[1] > 0 && ctr(rf)[1] < 6,
+    rf === null ? 'null' : JSON.stringify(ctr(rf).map((n) => Number(n.toFixed(2)))));
+  check('a corner that was never rounded has no such face',
+    topo.resolveName(occ, { ...R1, corner: 3 }, withRound) === null
+      && topo.resolveName(occ, R1, a) === null,
+    'a rounded name should only resolve where a round exists');
+
+  // A chamfer is the same shape of edit and reads the same way.
+  const withCham = bar(40, { chamfers: { 1: 6 } });
+  check('a chamfered corner is nameable the same way, and is flat',
+    topo.resolveName(occ, R1, withCham) !== null
+      && Math.abs(ctr(topo.resolveName(occ, R1, withCham))[2] - 6) < 1e-6);
+
+  // Retargeting the pull at a different sketch must not silently rebind.
+  check('a swept name whose sketch it no longer comes from resolves to null',
+    topo.resolveName(occ, { ...E(0), from: 'sk9' }, a) === null);
+
+  // ---- spin -------------------------------------------------------------
+  const spin = (angle, offset) => globalThis.__adapter.buildDoc(occ, { version: 1, features: [
+    { id: 'sk1', kind: 'sketch', plane: 'xy', offset,
+      points: [[10, 0], [20, 0], [20, 8], [10, 8]] },
+    { id: 'r1', kind: 'revolve', target: 'sk1', angle },
+  ] }, arc);
+  const rCap = (end) => ({ cause: 'cap', feature: 'r1', kind: 'face', end });
+
+  const quarter = spin(90, 0);
+  check('a partial spin has caps, and they resolve',
+    topo.resolveName(occ, rCap('bottom'), quarter) !== null
+      && topo.resolveName(occ, rCap('top'), quarter) !== null);
+  check('a FULL spin has none, and says so instead of handing back the profile',
+    topo.resolveName(occ, rCap('bottom'), spin(360, 0)) === null
+      && topo.resolveName(occ, rCap('top'), spin(360, 0)) === null,
+    'FirstShape/LastShape still return the profile face at 360 -- a face that is '
+      + 'not part of the solid at all');
+
+  // The transform trap: a spin on an offset plane is built at the origin and
+  // then moved. A face handed back unmoved would float where the part used to
+  // be -- which looks like an answer and is not.
+  const lifted = spin(90, 30);
+  const cap = topo.resolveName(occ, rCap('bottom'), lifted);
+  const solid = lifted.shapes.get('r1');
+  check('a face of a spin that was moved afterwards lands ON the moved solid',
+    cap !== null && hist.distanceTo(occ, occ.gp_Pnt.prototype ? new occ.gp_Pnt(...ctr(cap)) : null, solid) < 1e-6,
+    cap === null ? 'null' : 'cap centres at ' + JSON.stringify(ctr(cap).map((n) => Number(n.toFixed(2))))
+      + ' while the solid sits at z=30');
+  // ...and it moved by exactly the offset. Measured against the same spin at
+  // offset 0 rather than against a number typed here: the profile spans 8 up
+  // from its plane, so the cap centres 4 above it either way, and asserting a
+  // bare 30 would have been asserting the wrong thing. The DIFFERENCE is the
+  // transform, and it is the whole claim.
+  const flatCap = topo.resolveName(occ, rCap('bottom'), spin(90, 0));
+  check('...having moved by exactly the sketch offset, not by nothing',
+    cap !== null && flatCap !== null
+      && Math.abs((ctr(cap)[2] - ctr(flatCap)[2]) - 30) < 1e-6,
+    cap === null || flatCap === null ? 'null'
+      : 'offset-0 cap at z=' + ctr(flatCap)[2].toFixed(2)
+        + ', offset-30 cap at z=' + ctr(cap)[2].toFixed(2));
+}
+
 console.log((fails.length ? 'FAIL' : 'ALL PASS') + '  (' + pass + ' checks'
   + (fails.length ? ', ' + fails.length + ' failed' : '') + ')');
 process.exit(fails.length ? 1 : 0);

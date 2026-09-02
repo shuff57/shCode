@@ -21,6 +21,7 @@
 // generated declarations for thirty functions.
 
 import type { Feature, ModelDoc, Vec3 } from './model-types';
+import { edgeThrough } from './topo-history';
 
 /** The handful of OpenCascade entry points this adapter uses. Loose on
  *  purpose -- see the note above. */
@@ -55,11 +56,70 @@ export interface OpRecord {
   inputs: string[];
 }
 
+/** One outline segment of a sketch, paired with the edge it became in the
+ *  profile face. `role`/`index` come straight from segmentRoles() in
+ *  lib/sketch-arc.ts, so a face can be named after the design edge or the
+ *  rounded corner the student actually drew. */
+export interface Segment {
+  role: 'edge' | 'corner';
+  index: number;
+  edge: any;
+}
+
+/**
+ * One sweep -- a pull or a spin -- kept alive after it has produced its shape,
+ * for the same reason as OpRecord: the history lives in the operation object.
+ *
+ * `after` is the transform applied to the sweep's output afterwards, and it has
+ * to be recorded because the faces the sweep generated are NOT faces of the
+ * moved solid. `closed` marks a revolve that went all the way round and so has
+ * no caps, which the kernel will not tell you -- see capOf().
+ */
+export interface SweepRecord {
+  op: any;
+  from: string;
+  segments: Segment[];
+  after: any | null;
+  closed: boolean;
+}
+
 /** Everything a build produced: the shapes, and the operation history behind
  *  them, keyed by the feature that ran them. */
 export interface BuildResult {
   shapes: Map<string, any>;
   ops: Map<string, OpRecord[]>;
+  sweeps: Map<string, SweepRecord>;
+}
+
+/** One outline segment and a point known to lie on it, in world coordinates.
+ *  The point is how the segment is matched back to a profile edge -- see
+ *  matchSegments. */
+interface Mark {
+  role: 'edge' | 'corner';
+  index: number;
+  at: any;
+}
+
+/**
+ * Pair each outline segment with the edge it became in the built profile face.
+ *
+ * Matching by a point rather than by keeping the edges is not caution, it is
+ * the only thing that works: BRepBuilderAPI_MakeWire copies and reorients the
+ * edges it is given, so a reference kept from before the wire was built answers
+ * Generated() with nothing. Measured on a four-sided profile: edges 1, 2 and 3
+ * all came back empty while edge 0, which the builder took as-is, worked --
+ * which is exactly the shape of bug that looks like a one-off.
+ *
+ * A segment that matches no edge, or more than one, is dropped. Its name then
+ * fails to resolve, which is the honest outcome.
+ */
+function matchSegments(oc: Occt, face: any, marks: Mark[]): Segment[] {
+  const out: Segment[] = [];
+  for (const m of marks) {
+    const edge = edgeThrough(oc, face, m.at);
+    if (edge) out.push({ role: m.role, index: m.index, edge });
+  }
+  return out;
 }
 
 const DEG = Math.PI / 180;
@@ -187,7 +247,7 @@ function onPlane(oc: Occt, plane: string, offset: number, pu: number, pv: number
  * one arc constructor bound in this build and is stable when the sweep is
  * nearly flat.
  */
-function sketchWire(oc: Occt, arc: any, f: any): any {
+function sketchWire(oc: Occt, arc: any, f: any, marks?: Mark[]): any {
   const plane = f.plane ?? 'xy';
   const offset = f.offset ?? 0;
   const at = (p: number[]) => onPlane(oc, plane, offset, p[0], p[1]);
@@ -200,6 +260,9 @@ function sketchWire(oc: Occt, arc: any, f: any): any {
     const edge = new oc.BRepBuilderAPI_MakeEdge(new oc.gp_Circ(axis, circle.radius)).Edge();
     const w = new oc.BRepBuilderAPI_MakeWire();
     w.Add(edge);
+    // A circle is one closed edge, so it is design edge 0 and there is nothing
+    // else it could be. Any point on the rim identifies it.
+    marks?.push({ role: 'edge', index: 0, at: at([circle.center[0] + circle.radius, circle.center[1]]) });
     return w.Wire();
   }
 
@@ -209,6 +272,7 @@ function sketchWire(oc: Occt, arc: any, f: any): any {
   const bulges: Record<number, number> = outline.bulges ?? {};
   const n = pts.length;
   if (n < 3) return null;
+  const roles = arc.segmentRoles(outline.basis);
 
   const w = new oc.BRepBuilderAPI_MakeWire();
   for (let i = 0; i < n; i++) {
@@ -217,6 +281,7 @@ function sketchWire(oc: Occt, arc: any, f: any): any {
     const g = bulges[i];
     if (!g) {
       w.Add(new oc.BRepBuilderAPI_MakeEdge(at(a2), at(b2)).Edge());
+      marks?.push({ ...roles[i], at: at([(a2[0] + b2[0]) / 2, (a2[1] + b2[1]) / 2]) });
       continue;
     }
     const { center, radius, startAngle, endAngle } = arc.arcFromBulge(a2, b2, g);
@@ -227,6 +292,9 @@ function sketchWire(oc: Occt, arc: any, f: any): any {
     const through = [center[0] + radius * Math.cos(mid), center[1] + radius * Math.sin(mid)];
     const made = new oc.GC_MakeArcOfCircle(at(a2), at(through), at(b2));
     w.Add(new oc.BRepBuilderAPI_MakeEdge(made.Value()).Edge());
+    // The arc's own midpoint, not the chord's -- a bowed edge's chord midpoint
+    // is not on the edge at all.
+    marks?.push({ ...roles[i], at: at(through) });
   }
   return w.Wire();
 }
@@ -245,13 +313,14 @@ function sketchWire(oc: Occt, arc: any, f: any): any {
  * is why xy is the one of the three that does not move when Spin learns about
  * planes at all.
  */
-function revolveProfileFace(oc: Occt, arc: any, f: any): any {
+function revolveProfileFace(oc: Occt, arc: any, f: any, marks?: Mark[]): any {
   const a = PLANE_AXES[f.plane ?? 'xy'] ?? PLANE_AXES.xy;
   const outline = arc.outlineOf(f);
   if (!outline.ok) return null;
   const pts: number[][] = outline.points;
   const n = pts.length;
   if (n < 3) return null;
+  const roles = arc.segmentRoles(outline.basis);
   const at = (p: number[]) => new oc.gp_Pnt(
     a.u[0] * p[0] + a.n[0] * p[1],
     a.u[1] * p[0] + a.n[1] * p[1],
@@ -259,14 +328,20 @@ function revolveProfileFace(oc: Occt, arc: any, f: any): any {
   );
   const w = new oc.BRepBuilderAPI_MakeWire();
   for (let i = 0; i < n; i++) {
-    w.Add(new oc.BRepBuilderAPI_MakeEdge(at(pts[i]), at(pts[(i + 1) % n])).Edge());
+    const b = pts[(i + 1) % n];
+    w.Add(new oc.BRepBuilderAPI_MakeEdge(at(pts[i]), at(b)).Edge());
+    marks?.push({ ...roles[i], at: at([(pts[i][0] + b[0]) / 2, (pts[i][1] + b[1]) / 2]) });
   }
+  // Straight segments only: this profile ignores `bulges`, so a bowed sketch
+  // spins as a polygon. That is a pre-existing gap in Spin rather than one the
+  // naming work introduces, and it is why the marks here are chord midpoints
+  // where sketchWire uses arc midpoints.
   return new oc.BRepBuilderAPI_MakeFace(w.Wire(), false).Face();
 }
 
 /** The sketch as a flat face, ready to be pulled or spun. */
-function sketchFace(oc: Occt, arc: any, f: any): any {
-  const wire = sketchWire(oc, arc, f);
+function sketchFace(oc: Occt, arc: any, f: any, marks?: Mark[]): any {
+  const wire = sketchWire(oc, arc, f, marks);
   if (!wire) return null;
   // (wire, onlyPlane) -- the single-argument overload binds to gp_Torus in this
   // build. See the note on coneOf().
@@ -311,6 +386,11 @@ function primitiveOf(oc: Occt, f: Feature): any {
 export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
   const built = new Map<string, any>();
   const ops = new Map<string, OpRecord[]>();
+  const sweeps = new Map<string, SweepRecord>();
+  /** Filled by the sketch branch, read by the extrude branch. The profile face
+   *  is built once and only once -- rebuilding it to get the marks would be two
+   *  copies of the same derivation, free to drift apart. */
+  const sketchMarks = new Map<string, Mark[]>();
   /** Run one boolean and keep it. Build() is called explicitly rather than
    *  relying on the two-argument constructor to do it, because the history maps
    *  are what this is for and an explicitly built operation is the shape that
@@ -346,7 +426,11 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
       // own -- an extrude or a revolve consumes it -- which is the same rule
       // the JSCAD path follows and why a bare sketch is not returned as the
       // model.
-      if (arc) shape = sketchFace(oc, arc, f);
+      if (arc) {
+        const marks: Mark[] = [];
+        shape = sketchFace(oc, arc, f, marks);
+        if (shape) sketchMarks.set(f.id, marks);
+      }
     } else if (f.kind === 'extrude') {
       const face = built.get(f.target);
       const src = doc.features.find((x) => x.id === f.target);
@@ -354,13 +438,22 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
         const a = PLANE_AXES[src.plane ?? 'xy'] ?? PLANE_AXES.xy;
         const h = f.height * a.dir;
         const v = new oc.gp_Vec(a.n[0] * h, a.n[1] * h, a.n[2] * h);
-        shape = new oc.BRepPrimAPI_MakePrism(face, v, false, true).Shape();
+        const op = new oc.BRepPrimAPI_MakePrism(face, v, false, true);
+        shape = op.Shape();
+        sweeps.set(f.id, {
+          op,
+          from: src.id,
+          segments: matchSegments(oc, face, sketchMarks.get(src.id) ?? []),
+          after: null,
+          closed: false,
+        });
       }
     } else if (f.kind === 'revolve') {
       const src = doc.features.find((x) => x.id === f.target);
       if (arc && src && src.kind === 'sketch') {
         const a = PLANE_AXES[src.plane ?? 'xy'] ?? PLANE_AXES.xy;
-        const face = revolveProfileFace(oc, arc, src);
+        const marks: Mark[] = [];
+        const face = revolveProfileFace(oc, arc, src, marks);
         if (face) {
           // About the plane NORMAL, which is the axis the profile was laid
           // against -- see revolveProfileFace.
@@ -368,9 +461,26 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
             new oc.gp_Pnt(0, 0, 0),
             new oc.gp_Dir(a.n[0], a.n[1], a.n[2]),
           );
-          const spun = new oc.BRepPrimAPI_MakeRevol(face, axis, (f.angle * Math.PI) / 180, true).Shape();
+          const op = new oc.BRepPrimAPI_MakeRevol(face, axis, (f.angle * Math.PI) / 180, true);
+          const spun = op.Shape();
           const off = src.offset ?? 0;
-          shape = moved(oc, spun, [a.n[0] * off, a.n[1] * off, a.n[2] * off]);
+          // The offset translation is recorded, not just applied: the faces
+          // this revolve generated belong to the UNMOVED solid, and handing one
+          // back without moving it too gives a face floating where the part
+          // used to be. See placed() in lib/topo-history.ts.
+          let after: any = null;
+          if (off !== 0) {
+            after = new oc.gp_Trsf();
+            after.SetTranslation(new oc.gp_Vec(a.n[0] * off, a.n[1] * off, a.n[2] * off));
+          }
+          shape = after ? new oc.BRepBuilderAPI_Transform(spun, after, false).Shape() : spun;
+          sweeps.set(f.id, {
+            op,
+            from: src.id,
+            segments: matchSegments(oc, face, marks),
+            after,
+            closed: Math.abs(f.angle) >= 360 - 1e-9,
+          });
         }
       }
     } else if (f.kind === 'blend') {
@@ -425,7 +535,7 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
     }
     if (shape) built.set(f.id, shape);
   }
-  return { shapes: built, ops };
+  return { shapes: built, ops, sweeps };
 }
 
 /** Volume and bounding box, straight from the kernel. Exact for curved

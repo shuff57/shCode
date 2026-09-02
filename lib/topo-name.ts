@@ -83,6 +83,17 @@ export type TopoName =
    *  reindex() in lib/sketch-arc.ts keeps it so across corner insertion and
    *  removal, which is why this is a sound thing to name from. */
   | { cause: 'swept'; feature: string; kind: TopoKind; from: string; edge: number }
+  /** The face a sweep made from a ROUNDED OR CHAMFERED CORNER of its sketch.
+   *  `e1.face[sk1.corner2]`.
+   *
+   *  This is not a fussy distinction from `swept`. Rounding a corner does not
+   *  add a design edge -- the design still has four corners and four edges --
+   *  it inserts a segment into the OUTLINE, between the two trim points the
+   *  round leaves behind. Naming that face after an outline index would move it
+   *  every time another corner was rounded, which is the whole failure this
+   *  file exists to avoid. segmentRoles() in lib/sketch-arc.ts reads the two
+   *  apart from the `basis` the outline already carries. */
+  | { cause: 'rounded'; feature: string; kind: TopoKind; from: string; corner: number }
   /** The cap a sweep puts on its own end. `e1.cap[top]`. */
   | { cause: 'cap'; feature: string; kind: TopoKind; end: 'top' | 'bottom' }
   /** A part that came through an operation unchanged, keeping its identity.
@@ -106,6 +117,7 @@ export function formatName(n: TopoName): string {
   switch (n.cause) {
     case 'primitive': return `${n.feature}.${n.kind}[${n.part}]`;
     case 'swept': return `${n.feature}.${n.kind}[${n.from}.edge${n.edge}]`;
+    case 'rounded': return `${n.feature}.${n.kind}[${n.from}.corner${n.corner}]`;
     case 'cap': return `${n.feature}.cap[${n.end}]`;
     case 'carried': return `${n.feature}.same[${formatName(n.of)}]`;
     case 'split': return `${n.feature}.split[${formatName(n.of)}, ${at(n.at)}]`;
@@ -144,9 +156,12 @@ export function nameIsStructurallyValid(
   sketchEdgeCount: (id: string) => number | null,
 ): boolean {
   if (!featureExists(n.feature)) return false;
-  if (n.cause === 'swept') {
+  if (n.cause === 'swept' || n.cause === 'rounded') {
+    // A closed outline has as many design edges as design corners, so one
+    // count answers for both.
     const count = sketchEdgeCount(n.from);
-    if (count === null || n.edge < 0 || n.edge >= count) return false;
+    const at = n.cause === 'swept' ? n.edge : n.corner;
+    if (count === null || at < 0 || at >= count) return false;
   }
   if (n.cause === 'carried' || n.cause === 'split') {
     return nameIsStructurallyValid(n.of, featureExists, sketchEdgeCount);
@@ -177,14 +192,16 @@ export function whyNameLost(
   if (!featureExists(n.feature)) {
     return `That ${n.kind} was made by ${label(n.feature)}, which is no longer in the model.`;
   }
-  if (n.cause === 'swept') {
+  if (n.cause === 'swept' || n.cause === 'rounded') {
     const count = sketchEdgeCount(n.from);
     if (count === null) {
       return `That ${n.kind} was pulled from ${label(n.from)}, which is no longer in the model.`;
     }
-    if (n.edge < 0 || n.edge >= count) {
-      return `That ${n.kind} was pulled from edge ${n.edge + 1} of ${label(n.from)}, `
-        + `which now has only ${count} edge${count === 1 ? '' : 's'}.`;
+    const part = n.cause === 'swept' ? 'edge' : 'corner';
+    const at = n.cause === 'swept' ? n.edge : n.corner;
+    if (at < 0 || at >= count) {
+      return `That ${n.kind} was pulled from ${part} ${at + 1} of ${label(n.from)}, `
+        + `which now has only ${count} ${part}${count === 1 ? '' : 's'}.`;
     }
   }
   if (n.cause === 'carried' || n.cause === 'split') {

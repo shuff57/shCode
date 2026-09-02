@@ -20,19 +20,25 @@
 // keeps alive; lib/topo-history.ts is the layer that asks the kernel and this
 // file is the bookkeeping on top of it.
 //
-// `swept`, `cap` and `made` still return null. A swept face needs the prism or
-// revolve to record which sketch edge produced which wall, which is sweep
-// bookkeeping rather than boolean history and is its own piece of work. `made`
-// is the odder case and is worth a note: the faces a cut appears to invent --
-// the floor and walls of a groove -- are not invented at all, they are the
-// TOOL'S faces carried through. So they are nameable with the machinery already
-// here, off the tool feature's id, and `made` may turn out to be needed only
-// for the seams a fuse genuinely creates. That is a design question, not a
-// missing capability, and it is left open rather than guessed at.
+// `swept`, `rounded` and `cap` resolve through the sweep history buildDoc keeps
+// alongside the boolean history -- a prism or revolve GENERATES one wall per
+// profile edge and a cap at each end, which is an exact answer rather than a
+// discriminated one.
+//
+// `made` still returns null, and it is worth saying why rather than listing it
+// as missing: the faces a cut appears to invent -- the floor and walls of a
+// groove -- are not invented at all, they are the TOOL'S faces carried through.
+// So they are already nameable with the machinery here, off the tool feature's
+// id, and `made` may turn out to be needed only for the seams a fuse genuinely
+// creates. That is a design question, not a gap, and it is left open rather
+// than guessed at.
 
 import type { BuildResult, Occt, OpRecord } from './occt-build';
 import type { TopoName } from './topo-name';
-import { faceFate, fractionOnFace, pieceContaining, pointAtFraction, pointOnFace } from './topo-history';
+import {
+  capOf, faceFate, fractionOnFace, generatedFrom, pieceContaining,
+  placed, pointAtFraction, pointOnFace,
+} from './topo-history';
 
 /** Every face of a shape, in the kernel's own order -- which is exactly the
  *  order nothing here is allowed to depend on. */
@@ -202,8 +208,24 @@ export function resolveName(oc: Occt, name: TopoName, build: BuildResult): any |
     if (!chain.length) return null;
     return pushThrough(oc, chain, parent, name.cause === 'split' ? name.at : null);
   }
-  // swept / cap / made -- see the header. Returning null rather than guessing is
-  // the point.
+  if (name.cause === 'swept' || name.cause === 'rounded') {
+    const rec = build.sweeps.get(name.feature);
+    // `from` is checked rather than trusted: a name written against one sketch
+    // and read back after the pull was retargeted at another refers to an edge
+    // that exists but is not the one meant.
+    if (!rec || rec.from !== name.from) return null;
+    const want = name.cause === 'swept' ? 'edge' : 'corner';
+    const at = name.cause === 'swept' ? name.edge : name.corner;
+    const seg = rec.segments.find((s) => s.role === want && s.index === at);
+    if (!seg) return null;
+    return placed(oc, generatedFrom(oc, rec.op, seg.edge), rec.after);
+  }
+  if (name.cause === 'cap') {
+    const rec = build.sweeps.get(name.feature);
+    if (!rec) return null;
+    return placed(oc, capOf(oc, rec.op, name.end, rec.closed), rec.after);
+  }
+  // made -- see the header. Returning null rather than guessing is the point.
   return null;
 }
 
