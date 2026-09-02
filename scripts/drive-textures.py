@@ -92,7 +92,7 @@ with sync_playwright() as p:
         pg.wait_for_timeout(120)
 
     pg.fill('input[placeholder="myGuy"]', "driveTest")
-    pg.click("text=SAVE")
+    pg.click("button:text-is('SAVE')")
     pg.wait_for_timeout(400)
 
     saved_ok = pg.locator("p").filter(has_text="driveTest").count() >= 1
@@ -132,6 +132,31 @@ with sync_playwright() as p:
         };
     }""")
     check("frames strip sits above the canvas", bool(order) and order["stripAboveGrid"], order)
+
+    # Play/onion/fit and the name+SAVE row were moved UNDER the canvas: both
+    # are reached while looking at the drawing. Asserted by geometry so a
+    # future tidy-up cannot quietly move them back into the settings column.
+    under = pg.evaluate("""() => {
+        const grid = document.querySelector('[data-texture-grid]');
+        const play = document.querySelector('button[title="Play / pause  (Space)"]');
+        const onionB = document.querySelector('button[title="Onion skin"]');
+        const fit = document.querySelector('button[title="Fit the grid to this panel"]');
+        const nameI = document.querySelector('input[placeholder="myGuy"]');
+        const save = [...document.querySelectorAll('button')].find((b) => b.textContent.trim() === 'SAVE');
+        if (!grid || !play || !onionB || !fit || !nameI || !save) return null;
+        const r = (e) => e.getBoundingClientRect();
+        const gb = r(grid).bottom;
+        return {
+            play: r(play).top >= gb, onion: r(onionB).top >= gb, fit: r(fit).top >= gb,
+            name: r(nameI).top >= gb, save: r(save).top >= gb,
+            saveCount: [...document.querySelectorAll('button')].filter((b) => b.textContent.trim() === 'SAVE').length,
+        };
+    }""")
+    check("play, onion and fit sit under the canvas",
+          bool(under) and under["play"] and under["onion"] and under["fit"], under)
+    check("the name field and SAVE sit under the canvas",
+          bool(under) and under["name"] and under["save"], under)
+    check("there is exactly one SAVE button", bool(under) and under["saveCount"] == 1, under)
     check("tool rail sits left of the canvas", bool(order) and order["railLeftOfGrid"], order)
     check("settings sit right of the canvas", bool(order) and order["settingsRightOfGrid"], order)
 
@@ -176,7 +201,7 @@ with sync_playwright() as p:
         pg.wait_for_timeout(150)
 
     pg.fill('input[placeholder="myGuy"]', "driveAnim")
-    pg.click("text=SAVE")
+    pg.click("button:text-is('SAVE')")
     pg.wait_for_timeout(400)
     check("saving several frames reports an animation",
           "animates" in pg.inner_text("body"))
@@ -223,7 +248,7 @@ with sync_playwright() as p:
     pg.fill('input[aria-label="Frame 2 duration"]', "20")
     pg.wait_for_timeout(200)
     pg.fill('input[placeholder="myGuy"]', "driveHold")
-    pg.click("text=SAVE")
+    pg.click("button:text-is('SAVE')")
     pg.wait_for_timeout(400)
     held = pg.evaluate("""() => {
         try {

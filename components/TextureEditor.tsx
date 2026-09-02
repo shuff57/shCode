@@ -749,10 +749,11 @@ export default function TextureEditor() {
 
         {/* LEFT RAIL — file, history, tools, palette, export */}
         <div style={{ ...card, width: narrow ? '100%' : 150, flexShrink: 0, boxSizing: 'border-box' }}>
-          <button style={{ ...railBtn(), marginBottom: 6 }} onClick={handleNew}>NEW</button>
+          {/* SAVE lives under the canvas beside the name field, not here --
+              one save button, next to the thing it names. */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+            <button style={railBtn()} onClick={handleNew}>NEW</button>
             <button style={railBtn(showLibrary)} onClick={() => setShowLibrary((v) => !v)}>LOAD</button>
-            <button style={railBtn(true)} onClick={handleSave}>SAVE</button>
           </div>
 
           <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
@@ -880,6 +881,46 @@ export default function TextureEditor() {
             })}
           </div>
 
+          {/* Playback and naming sit UNDER the canvas rather than off in the
+              settings column: both are things you reach for while looking at
+              the drawing, and the eye should not have to leave it. The right
+              column keeps what you set once and forget -- size, zoom, speed. */}
+          <div style={{ display: 'flex', gap: 6, marginTop: 10, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <button
+              style={{ ...btn(playing, frames.length < 2), minWidth: 74 }}
+              onClick={() => setPlaying((p) => !p)}
+              disabled={frames.length < 2}
+              title="Play / pause  (Space)"
+            >
+              {playing ? '⏸ Pause' : '▶ Play'}
+            </button>
+            <button style={btn(onion)} onClick={() => setOnion((v) => !v)} title="Onion skin">
+              ◍ Onion
+            </button>
+            <button style={btn(zoom === null)} onClick={() => setZoom(null)} title="Fit the grid to this panel">
+              ⛶ Fit
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', gap: 6, marginTop: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <span style={{ ...label, marginBottom: 0 }}>Save as</span>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="myGuy"
+              onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); }}
+              style={{
+                width: 150, boxSizing: 'border-box', padding: '6px 8px',
+                background: 'var(--muted)', color: 'var(--text)',
+                border: '1px solid var(--border)', borderRadius: 6, fontSize: 13,
+              }}
+            />
+            <button style={{ ...btn(true), padding: '6px 14px' }} onClick={handleSave}>SAVE</button>
+          </div>
+          <div style={{ fontSize: 10, opacity: 0.45, marginTop: 5, textAlign: 'center' }}>
+            then <code style={{ color: 'var(--brand)' }}>sprite.texture</code> = that name
+          </div>
+
           {message && (
             <p style={{
               fontSize: 12, lineHeight: 1.45, marginTop: 10, marginBottom: 0, maxWidth: 460,
@@ -925,15 +966,6 @@ export default function TextureEditor() {
 
         {/* RIGHT — playback, preview, geometry */}
         <div style={{ ...card, width: narrow ? '100%' : 178, flexShrink: 0, boxSizing: 'border-box' }}>
-          <div style={{ display: 'flex', gap: 5, marginBottom: 8 }}>
-            <button style={{ ...btn(playing), flex: 1 }} onClick={() => setPlaying((p) => !p)}
-              disabled={frames.length < 2} title="Play / pause  (Space)">
-              {playing ? '⏸' : '▶'}
-            </button>
-            <button style={btn(onion)} onClick={() => setOnion((v) => !v)} title="Onion skin">◍</button>
-            <button style={btn(zoom === null)} onClick={() => setZoom(null)} title="Fit the grid to this panel">⛶</button>
-          </div>
-
           <div style={{
             ...checker, border: '1px solid var(--border)', borderRadius: 4,
             height: 108, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -989,21 +1021,6 @@ export default function TextureEditor() {
             </button>
           )}
 
-          <div style={{ height: 1, background: 'var(--border)', margin: '10px 0' }} />
-          <div style={{ ...label, marginBottom: 3 }}>Save as</div>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="myGuy"
-            style={{
-              width: '100%', boxSizing: 'border-box', padding: '5px 7px',
-              background: 'var(--muted)', color: 'var(--text)',
-              border: '1px solid var(--border)', borderRadius: 6, fontSize: 12,
-            }}
-          />
-          <div style={{ fontSize: 10, opacity: 0.45, marginTop: 5, lineHeight: 1.4 }}>
-            then <code style={{ color: 'var(--brand)' }}>sprite.texture</code> = that name
-          </div>
         </div>
       </div>
 
