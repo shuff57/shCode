@@ -126,7 +126,7 @@ const SHAPE_REFERENCE = [
   '- Note — an annotation beside the chart. Not part of the flow, so it takes no arrows',
 ].join('\n');
 
-function buildDiagramPrompt(req: HelpRequest): { system: string; user: string } {
+export function buildDiagramPrompt(req: HelpRequest): { system: string; user: string } {
   const system = `You are a Socratic CS tutor for a high-school student who is DRAWING A FLOWCHART in a beginner programming course. Your sole job is to help them work out for themselves which shape to reach for next. You do NOT draw the chart.
 
 THE ONLY SHAPES THEY HAVE — this is the entire palette, never invent another:
@@ -252,7 +252,7 @@ YOUR JOB:
 // successful prompt-injection still can't deliver a copy-pasteable solution.
 // Operates line-by-line — full lines get forwarded promptly while a partial
 // trailing line stays buffered until its newline arrives.
-function trimLongCodeBlocks(input: ReadableStream<Uint8Array>, maxLines: number): ReadableStream<Uint8Array> {
+export function trimLongCodeBlocks(input: ReadableStream<Uint8Array>, maxLines: number): ReadableStream<Uint8Array> {
   const reader = input.getReader();
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
