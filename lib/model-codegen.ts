@@ -513,20 +513,38 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
     // ignores, and the shape would freeze mid-drag and only catch up when the
     // doc was regenerated on release. Same reason every other dimension in
     // this file is a parameter rather than a number.
-    const roundEntries = Object.entries(f.rounds ?? {}).filter(
-      ([k, v]) => v > 0 && Number.isInteger(Number(k))
-        && Number(k) >= 0 && Number(k) < f.points.length
-    );
-    if (roundEntries.length > 0) {
+    const validAsk = ([k, v]: [string, number]) =>
+      v > 0 && Number.isInteger(Number(k))
+        && Number(k) >= 0 && Number(k) < f.points.length;
+    const roundEntries = Object.entries(f.rounds ?? {}).filter(validAsk);
+    // Chamfers reach the emitted code the same way rounds do. They did not
+    // for the whole of their first life: this branch read `rounds` only, so a
+    // chamfered sketch emitted a plain polygon() of its raw corners. The
+    // canvas drew the cut (HandleOverlay reads outlineOf, which applies it)
+    // and the SOLID never had it -- a shape that looked chamfered, extruded
+    // square, and exported square. Found 2026-09-01 by the geometry oracle on
+    // its first run: a chamfered 40x25x12 measured exactly 12000, which is
+    // the volume of the same block with no chamfer at all.
+    const chamferEntries = Object.entries(f.chamfers ?? {}).filter(validAsk);
+    if (roundEntries.length > 0 || chamferEntries.length > 0) {
       needs.add('roundPoly');
       needs.add('polyArc');
       const rounds = '{'
         + roundEntries.map(([k]) => `${k}: p.${pname(f.id, `r${k}`)}`).join(', ')
         + '}';
+      // Chamfers go out as LITERALS, not parameters. A round has a slider
+      // because docParams emits r<k> from `rounds`; nothing emits a chamfer
+      // parameter, and inventing one here would reference a name the frame is
+      // never handed -- the exact dead-parameter trap the comment above warns
+      // about, one field over. A chamfer therefore rebuilds on doc change
+      // rather than on a live drag, which is what it already did in the panel.
+      const chamferLit = '{'
+        + chamferEntries.map(([k, v]) => `${k}: ${num(v)}`).join(', ')
+        + '}';
       // The third argument carries any LEGACY arc the doc already had, keyed
       // by design edge. Dropping it would silently flatten an imported curve
       // the moment a student rounded some unrelated corner of the same sketch.
-      return `roundPoly([${pts}], ${rounds}, ${legacyLiteral})`;
+      return `roundPoly([${pts}], ${rounds}, ${chamferLit}, ${legacyLiteral})`;
     }
 
     // Bulges with no rounds are a legacy or imported outline: somebody else
@@ -1062,14 +1080,22 @@ function polyArc(corners, bulges) {
 // The third argument carries any arc the doc already had (an imported
 // outline), keyed by design edge. A corner next to one is left sharp,
 // because this construction reads both adjacent edges as straight chords.
-function roundPoly(corners, rounds, bulges) {
+//
+// chamfers[k] is a TRIM DISTANCE on corner k -- the same cut, without the
+// arc. Round wins when a corner carries both, matching outlineOf().
+function roundPoly(corners, rounds, chamfers, bulges) {
   let pts = corners.map(function (p) { return [p[0], p[1]] })
   let curves = Object.assign({}, bulges || {})
   // Descending, and that is load-bearing: rounding corner k splices one extra
   // point in at k, so every index above it shifts. Working downwards means
   // each corner is still at its own index when its turn comes.
-  const asked = Object.keys(rounds).map(Number)
+  const isRound = {}
+  const roundKeys = Object.keys(rounds || {}).map(Number)
     .filter(function (k) { return rounds[k] > 0 })
+  roundKeys.forEach(function (k) { isRound[k] = true })
+  const chamferKeys = Object.keys(chamfers || {}).map(Number)
+    .filter(function (k) { return chamfers[k] > 0 && !isRound[k] })
+  const asked = roundKeys.concat(chamferKeys)
     .sort(function (a, b) { return b - a })
   for (let i = 0; i < asked.length; i++) {
     const k = asked[i]
@@ -1085,6 +1111,26 @@ function roundPoly(corners, rounds, bulges) {
     const cosI = (vIn[0] * vOut[0] + vIn[1] * vOut[1]) / (lenIn * lenOut)
     const interior = Math.acos(Math.max(-1, Math.min(1, cosI)))
     if (Math.PI - interior < 1e-6) continue
+    // A chamfer is the same cut with no arc: its stored number IS the trim,
+    // capped by the shorter adjacent edge, exactly as maxChamferDistance()
+    // caps it. A round stores a RADIUS, which is why it needs the tangent
+    // below to become one.
+    if (!isRound[k]) {
+      const cut = Math.min(chamfers[k], Math.min(lenIn, lenOut))
+      if (!(cut > 1e-9 * Math.min(lenIn, lenOut))) continue
+      const bumped = {}
+      const ck = Object.keys(curves)
+      for (let j = 0; j < ck.length; j++) {
+        const e = Number(ck[j])
+        bumped[e > k - 1 ? e + 1 : e] = curves[ck[j]]
+      }
+      curves = bumped
+      pts = pts.slice(0, k).concat([
+        [C[0] + (vIn[0] / lenIn) * cut, C[1] + (vIn[1] / lenIn) * cut],
+        [C[0] + (vOut[0] / lenOut) * cut, C[1] + (vOut[1] / lenOut) * cut],
+      ], pts.slice(k + 1))
+      continue
+    }
     const half = Math.tan(interior / 2)
     // Clamped to what the corner can actually take -- trim grows much faster
     // than radius as a corner sharpens, and an unclamped trim runs past the

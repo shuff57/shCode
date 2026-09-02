@@ -1324,6 +1324,57 @@ module.exports = function run(dir) {
       JSON.stringify(types.newBlend({ version: 1, features: [] }, small, big).targets));
   }
 
+  {
+    console.log('\n=== a chamfer has to reach the SOLID, not just the canvas ===');
+
+    // Regression, and the number is derived by hand rather than snapshotted: a
+    // 6mm chamfer on a right-angle corner removes a triangle with legs 6 and 6,
+    // area 18, times 12 tall = 216. So 40*25*12 - 216 = 11784.
+    //
+    // Chamfer shipped without this. featureExpr's sketch branch read `rounds`
+    // only, so a chamfered sketch emitted a plain polygon() of its raw corners:
+    // HandleOverlay drew the cut, because it reads outlineOf, and the built
+    // solid never had it. It looked chamfered, extruded square, exported
+    // square, and no test could fail. Found by scripts/oracle-measure.mjs on
+    // its first run -- a chamfered block measuring EXACTLY the volume of an
+    // unchamfered one.
+    const chSketch = { id: 'sk9', kind: 'sketch', plane: 'xy', offset: 0,
+      points: [[0, 0], [40, 0], [40, 25], [0, 25]], chamfers: { 1: 6 } };
+    const chDoc = { version: 1, features: [chSketch, { id: 'e9', kind: 'extrude', target: 'sk9', height: 12 }] };
+    const chSrc = gen.toReshape(chDoc);
+    check('a chamfered sketch does NOT emit a bare polygon of its raw corners',
+      !/=\s*polygon\(\[/.test(chSrc),
+      chSrc.split(/\r?\n/).filter((l) => /polygon\(|roundPoly\(/.test(l)).slice(0, 1).join(''));
+    check('...it emits roundPoly, which is where the cut is derived',
+      chSrc.includes('roundPoly(['));
+    const chBuilt = build(chSrc);
+    check('...and the cut really reaches the solid: 12000 - 216 = 11784',
+      Math.abs(chBuilt.volume - 11784) < 1,
+      `${chBuilt.volume.toFixed(2)} -- 12000 would mean the chamfer never arrived`);
+
+    // Round still wins when a corner carries both, the same way outlineOf
+    // resolves it -- so the two paths cannot disagree about one corner.
+    const bothDoc = { version: 1, features: [
+      { ...chSketch, rounds: { 1: 6 }, chamfers: { 1: 6 } },
+      { id: 'e9', kind: 'extrude', target: 'sk9', height: 12 },
+    ] };
+    const bothVol = build(gen.toReshape(bothDoc)).volume;
+    const roundOnly = build(gen.toReshape({ version: 1, features: [
+      { ...chSketch, chamfers: undefined, rounds: { 1: 6 } },
+      { id: 'e9', kind: 'extrude', target: 'sk9', height: 12 },
+    ] })).volume;
+    check('a corner asked for BOTH is rounded, not chamfered -- round wins',
+      Math.abs(bothVol - roundOnly) < 1,
+      `both ${bothVol.toFixed(2)} vs round-only ${roundOnly.toFixed(2)} (chamfer-only is 11784)`);
+
+    check('a chamfer on one corner leaves the others sharp',
+      Math.abs(build(gen.toReshape({ version: 1, features: [
+        { ...chSketch, chamfers: { 1: 6, 2: 6 } },
+        { id: 'e9', kind: 'extrude', target: 'sk9', height: 12 },
+      ] })).volume - (12000 - 432)) < 1,
+      'two chamfers should remove exactly twice one chamfer');
+  }
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };
