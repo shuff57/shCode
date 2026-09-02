@@ -1,3 +1,24 @@
+# Handoff — 2026-09-01 (latest) · JSCAD is retired as a direction
+
+reSHape (which is the thing referred to as jSketcher) runs on JSCAD, and JSCAD
+is now retired: it is what gets replaced, not what gets built on. The full note,
+including where the line already falls, is at the top of `CLAUDE.md`.
+
+The short version, measured across the 55 files this session touched: the
+solver, the sketch geometry, the constraint rules, the whole Rules-panel and
+canvas UI, and all 501 assertions have **zero** JSCAD coupling.
+`lib/model-codegen.ts` is the single translation layer, with 11 real call
+sites. `ModelDoc` is the seam and it is already the right one -- keep new work
+above it.
+
+What does NOT survive a core swap: the 227 doc examples and `reference.md`,
+which teach JSCAD's API by name, and the vendored bundle itself.
+
+A B-rep kernel was measured and refused the same day -- 21.9 MB and LGPL
+against 0.41 MB and MIT, for six tools worth having. Retiring JSCAD does not
+make OpenCascade the answer.
+
+---
 # Handoff — 2026-09-01 (later) · Phase B run; two defects found and fixed
 
 The gauntlet closed earlier today on the toolbars. Its OTHER exit criterion --

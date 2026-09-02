@@ -11,6 +11,56 @@ route is a Pages Function in `functions/`, backed by a single D1 database
 > cycle. The top section is the most recent. When a section is stale or its decisions
 > are made, delete that section; when the file is empty, delete the file and this note.
 
+## JSCAD is retired. Do not build new modelling work on it.
+
+**Decision, 2026-09-01.** JSCAD is the engine reSHape currently runs on and it
+is the thing being replaced. It is not a target. Anything new that needs
+geometry should be written so that the swap does not have to touch it.
+
+This note exists because the tree does not say so on its own: `HANDOFF.md`
+describes reSHape as "a plain-words surface over `@jscad/modeling`", the
+vendored bundle sits in `public/reshape/lib/`, and 227 doc examples run against
+it in `npm test`. Read only the code and you would reasonably conclude JSCAD is
+the direction. It is not.
+
+**It cannot simply be deleted.** Every preview goes through it, the whole
+reference teaches its API, and removing it breaks the app. Retired here means
+*no new dependence*, not *gone*.
+
+### Where the line already falls
+
+Measured 2026-09-01 across the 55 files that round of work touched:
+
+| Layer | Couples to JSCAD? |
+| --- | --- |
+| `lib/least-squares.ts`, `lib/sketch-solve.ts`, `lib/sketch-arc.ts` | **no** -- zero mentions |
+| `components/model/*` (Rules panel, handles, overlay) | **no** -- zero mentions |
+| `lib/model-types.ts` (`ModelDoc`, the Feature kinds) | comments only |
+| **`lib/model-codegen.ts`** | **yes -- 11 real call sites. This is the translation layer** |
+| `public/reshape/reshape.js` + `public/reshape/lib/` | yes -- the shim and the bundle |
+| `public/reshape/docs/reference.md` + its 227 examples | yes -- they teach JSCAD's API by name |
+
+`ModelDoc` is the interface and it is already the right one. Everything above it
+is first-party and portable; `model-codegen.ts` is the one file that turns a
+document into engine calls. **Keep it that way.** A new feature that reaches
+past `ModelDoc` into JSCAD directly is the thing this note is trying to prevent.
+
+### What has already moved off it
+
+The sketch solver. `lib/sketch-solve.ts` was relaxation and is now least
+squares over `lib/least-squares.ts` -- first-party, MIT, no payload, and able to
+express tangency, which relaxation could not. That is the pattern for the rest:
+own the layer, keep `ModelDoc` as the seam.
+
+### What has NOT moved, and why
+
+A B-rep kernel was measured and refused on 2026-09-01: the only browser option
+is OpenCascade at **21.9 MB and LGPL-2.1-only**, against **0.41 MB and MIT**
+today, to lift 34 refused tools of which 28 are sheet metal and surfacing this
+course does not want. Full reasoning is in `.gauntlet/parity.json` on all four
+kernel-blocked refusal groups, and in `~/.claude/plans/reshape-fusion-parity.md`.
+Retiring JSCAD does not mean OpenCascade is the answer.
+
 ## Runtime layout
 
 - **Client** — React 19 (+ CodeMirror, Zustand, lucide-react). Builds to `out/` via
