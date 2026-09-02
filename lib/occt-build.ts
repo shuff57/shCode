@@ -101,6 +101,118 @@ function coneOf(oc: Occt, radius: number, height: number): any {
   return new oc.BRepPrimAPI_MakeRevol(face, axis, 2 * Math.PI, true).Shape();
 }
 
+// ---- Sketches ---------------------------------------------------------------
+//
+// The part of the adapter that pays off the architecture. `outlineOf()` in
+// lib/sketch-arc.ts already derives the drawn outline from the design corners
+// -- applying rounds, chamfers and bows, producing trim points and bulges --
+// and it does not know a kernel exists. So this consumes its output rather than
+// re-deriving anything, and every hour spent on rounds and chamfers over the
+// last weeks carries across untouched. That is what it means for ModelDoc to be
+// the seam.
+
+/**
+ * Where a sketch's (u, v) lands in the world, and which way an extrude goes.
+ *
+ * These are READ OFF the built solid, not derived from the plane names --
+ * because JSCAD does not extrude along a normal. `extrudeOnPlane` pulls the
+ * profile along +Z and then TURNS the solid, and the turns it picked decide
+ * both the axis mapping and the direction:
+ *
+ *   xz: rotateX(+90) sends +Y to +Z and +Z to -Y
+ *   yz: rotateY(-90) sends +X to +Z and +Z to -X
+ *
+ * So on xz the sweep runs toward -Y, and on yz the sketch's u lands on +Z
+ * while v lands on +Y -- transposed from what the plane's name suggests.
+ * Confirmed against the oracle's measured bounding boxes rather than argued:
+ * sketch-on-yz-offset spans [[-2,0,0],[10,25,40]], which is only possible if
+ * u is the 40 on Z and v is the 25 on Y.
+ *
+ * `dir` is the sweep direction as a multiple of the normal.
+ */
+const PLANE_AXES: Record<string, { u: Vec3; v: Vec3; n: Vec3; dir: number }> = {
+  xy: { u: [1, 0, 0], v: [0, 1, 0], n: [0, 0, 1], dir: 1 },
+  xz: { u: [1, 0, 0], v: [0, 0, 1], n: [0, 1, 0], dir: -1 },
+  yz: { u: [0, 0, 1], v: [0, 1, 0], n: [1, 0, 0], dir: -1 },
+};
+
+/** A sketch point in plane coordinates, placed in the world. Mirrors the
+ *  `world()` helper in lib/model-handles.ts exactly -- if these two ever
+ *  disagree, the drag handles stop landing on the shape. */
+function onPlane(oc: Occt, plane: string, offset: number, pu: number, pv: number): any {
+  const a = PLANE_AXES[plane] ?? PLANE_AXES.xy;
+  return new oc.gp_Pnt(
+    a.u[0] * pu + a.v[0] * pv + a.n[0] * offset,
+    a.u[1] * pu + a.v[1] * pv + a.n[1] * offset,
+    a.u[2] * pu + a.v[2] * pv + a.n[2] * offset,
+  );
+}
+
+/**
+ * The sketch's outline as a closed wire.
+ *
+ * A circle is its own case: `shape: 'circle'` means the two stored points are
+ * the ends of a diameter, not a two-corner polygon, and a real circular edge is
+ * both simpler and exact where a sampled ring would not be.
+ *
+ * A bulged edge becomes a genuine arc. `arcFromBulge()` gives the centre,
+ * radius and angles; the arc is then built through three points, which is the
+ * one arc constructor bound in this build and is stable when the sweep is
+ * nearly flat.
+ */
+function sketchWire(oc: Occt, arc: any, f: any): any {
+  const plane = f.plane ?? 'xy';
+  const offset = f.offset ?? 0;
+  const at = (p: number[]) => onPlane(oc, plane, offset, p[0], p[1]);
+
+  const circle = arc.circleOf(f);
+  if (circle) {
+    const a = PLANE_AXES[plane] ?? PLANE_AXES.xy;
+    const centre = at(circle.center);
+    const axis = new oc.gp_Ax2(centre, new oc.gp_Dir(a.n[0], a.n[1], a.n[2]));
+    const edge = new oc.BRepBuilderAPI_MakeEdge(new oc.gp_Circ(axis, circle.radius)).Edge();
+    const w = new oc.BRepBuilderAPI_MakeWire();
+    w.Add(edge);
+    return w.Wire();
+  }
+
+  const outline = arc.outlineOf(f);
+  if (!outline.ok) return null;
+  const pts: number[][] = outline.points;
+  const bulges: Record<number, number> = outline.bulges ?? {};
+  const n = pts.length;
+  if (n < 3) return null;
+
+  const w = new oc.BRepBuilderAPI_MakeWire();
+  for (let i = 0; i < n; i++) {
+    const a2 = pts[i];
+    const b2 = pts[(i + 1) % n];
+    const g = bulges[i];
+    if (!g) {
+      w.Add(new oc.BRepBuilderAPI_MakeEdge(at(a2), at(b2)).Edge());
+      continue;
+    }
+    const { center, radius, startAngle, endAngle } = arc.arcFromBulge(a2, b2, g);
+    let sweep = endAngle - startAngle;
+    if (g > 0 && sweep < 0) sweep += Math.PI * 2;
+    if (g < 0 && sweep > 0) sweep -= Math.PI * 2;
+    const mid = startAngle + sweep / 2;
+    const through = [center[0] + radius * Math.cos(mid), center[1] + radius * Math.sin(mid)];
+    const made = new oc.GC_MakeArcOfCircle(at(a2), at(through), at(b2));
+    w.Add(new oc.BRepBuilderAPI_MakeEdge(made.Value()).Edge());
+  }
+  return w.Wire();
+}
+
+/** The sketch as a flat face, ready to be pulled or spun. */
+function sketchFace(oc: Occt, arc: any, f: any): any {
+  const wire = sketchWire(oc, arc, f);
+  if (!wire) return null;
+  // (wire, onlyPlane) -- the single-argument overload binds to gp_Torus in this
+  // build. See the note on coneOf().
+  return new oc.BRepBuilderAPI_MakeFace(wire, false).Face();
+}
+
 /** One primitive, centred where the feature says. */
 function primitiveOf(oc: Occt, f: Feature): any {
   switch (f.kind) {
@@ -132,7 +244,11 @@ function primitiveOf(oc: Occt, f: Feature): any {
 /** Build every feature in the document, in order, returning them by id.
  *  Anything this slice does not handle yet comes back absent rather than
  *  throwing, so a partial adapter can still be measured on what it does do. */
-export function buildDoc(oc: Occt, doc: ModelDoc): Map<string, any> {
+/** `arc` is lib/sketch-arc.ts, passed in rather than imported so this file
+ *  can be compiled and measured on its own. It is the outline authority --
+ *  rounds, chamfers and bows are all already derived there, correctly, by
+ *  code that predates the kernel and does not know about it. */
+export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): Map<string, any> {
   const built = new Map<string, any>();
   for (const f of doc.features) {
     let shape: any = null;
@@ -148,6 +264,48 @@ export function buildDoc(oc: Occt, doc: ModelDoc): Map<string, any> {
             : f.op === 'subtract' ? 'BRepAlgoAPI_Cut' : 'BRepAlgoAPI_Common';
           return new oc[op](a, b).Shape();
         });
+      }
+    } else if (f.kind === 'sketch') {
+      // A sketch is kept as a FACE, not a solid. Nothing renders it on its
+      // own -- an extrude or a revolve consumes it -- which is the same rule
+      // the JSCAD path follows and why a bare sketch is not returned as the
+      // model.
+      if (arc) shape = sketchFace(oc, arc, f);
+    } else if (f.kind === 'extrude') {
+      const face = built.get(f.target);
+      const src = doc.features.find((x) => x.id === f.target);
+      if (face && src && src.kind === 'sketch') {
+        const a = PLANE_AXES[src.plane ?? 'xy'] ?? PLANE_AXES.xy;
+        const h = f.height * a.dir;
+        const v = new oc.gp_Vec(a.n[0] * h, a.n[1] * h, a.n[2] * h);
+        shape = new oc.BRepPrimAPI_MakePrism(face, v, false, true).Shape();
+      }
+    } else if (f.kind === 'revolve') {
+      const face = built.get(f.target);
+      const src = doc.features.find((x) => x.id === f.target);
+      if (face && src && src.kind === 'sketch') {
+        const a = PLANE_AXES[src.plane ?? 'xy'] ?? PLANE_AXES.xy;
+        // Spun about the plane's own U axis through the origin, matching what
+        // extrudeRotate does on the JSCAD side.
+        const axis = new oc.gp_Ax1(
+          new oc.gp_Pnt(0, 0, 0),
+          new oc.gp_Dir(a.u[0], a.u[1], a.u[2]),
+        );
+        shape = new oc.BRepPrimAPI_MakeRevol(face, axis, (f.angle * Math.PI) / 180, true).Shape();
+      }
+    } else if (f.kind === 'blend') {
+      // A REAL loft. On the JSCAD side this is extrudeFromSlices with two
+      // hand-resampled rings and a winding fix; here the kernel skins between
+      // two wires and the resampling problem does not exist.
+      const [loId, hiId] = f.targets;
+      const lo = doc.features.find((x) => x.id === loId);
+      const hi = doc.features.find((x) => x.id === hiId);
+      if (arc && lo && hi && lo.kind === 'sketch' && hi.kind === 'sketch') {
+        const through = new oc.BRepOffsetAPI_ThruSections(true, false, 1e-6);
+        through.AddWire(sketchWire(oc, arc, lo));
+        through.AddWire(sketchWire(oc, arc, hi));
+        through.Build(new oc.Message_ProgressRange());
+        shape = through.Shape();
       }
     } else if (f.kind === 'move') {
       const src = built.get(f.target);

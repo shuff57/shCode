@@ -51,7 +51,7 @@ try {
     process.execPath,
     [
       path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-      'lib/occt-build.ts', 'lib/model-types.ts',
+      'lib/occt-build.ts', 'lib/model-types.ts', 'lib/sketch-arc.ts',
       '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',
     ],
     { cwd: root, stdio: 'inherit' },
@@ -59,6 +59,7 @@ try {
   writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
   const require = createRequire(import.meta.url);
   const adapter = require(path.join(out, 'occt-build.js'));
+  const arc = require(path.join(out, 'sketch-arc.js'));
 
   const oc = await (await import(pathToFileURL(path.join(dir, 'replicad_single.js')).href)).default();
   console.log('OpenCascade up, ' + Object.keys(oc).length + ' exports\n');
@@ -89,6 +90,40 @@ try {
       { id: 'b1', kind: 'box', size: [20, 20, 20], center: [30, 0, 0] },
       { id: 'mir1', kind: 'mirror', target: 'b1', plane: 'yz' },
     ],
+    // --- sketch-based, the slice this run adds ---
+    'sketch-extrude': [
+      { id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0, points: [[0,0],[40,0],[40,25],[0,25]] },
+      { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
+    ],
+    'sketch-on-xz': [
+      { id: 'sk1', kind: 'sketch', plane: 'xz', offset: 0, points: [[0,0],[40,0],[40,25],[0,25]] },
+      { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
+    ],
+    'sketch-on-yz-offset': [
+      { id: 'sk1', kind: 'sketch', plane: 'yz', offset: 10, points: [[0,0],[40,0],[40,25],[0,25]] },
+      { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
+    ],
+    'circle-extrude': [
+      { id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0, shape: 'circle', points: [[-15,0],[15,0]] },
+      { id: 'e1', kind: 'extrude', target: 'sk1', height: 20 },
+    ],
+    'rounded-corner': [
+      { id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0, points: [[0,0],[40,0],[40,25],[0,25]], rounds: { 1: 6 } },
+      { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
+    ],
+    'chamfered-corner': [
+      { id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0, points: [[0,0],[40,0],[40,25],[0,25]], chamfers: { 1: 6 } },
+      { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
+    ],
+    'bowed-edge': [
+      { id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0, points: [[0,0],[40,0],[40,25],[0,25]], bulges: { 0: 0.4 } },
+      { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
+    ],
+    blend: [
+      { id: 'sa', kind: 'sketch', plane: 'xy', offset: 0, points: [[-20,-20],[20,-20],[20,20],[-20,20]] },
+      { id: 'sb', kind: 'sketch', plane: 'xy', offset: 30, points: [[-5,-5],[5,-5],[5,5],[-5,5]] },
+      { id: 'bl1', kind: 'blend', targets: ['sa', 'sb'] },
+    ],
     moved: [
       { id: 'b1', kind: 'box', size: [20, 20, 20], center: [0, 0, 0] },
       { id: 'mv1', kind: 'move', target: 'b1', offset: [15, 5, 0] },
@@ -100,7 +135,7 @@ try {
     if (!want) { check(name, false, 'no oracle entry'); continue; }
     let got;
     try {
-      const built = adapter.buildDoc(oc, { version: 1, features });
+      const built = adapter.buildDoc(oc, { version: 1, features }, arc);
       const last = built.get(features[features.length - 1].id);
       if (!last) { check(name, false, 'the adapter built nothing for it'); continue; }
       got = adapter.measureShape(oc, last);
