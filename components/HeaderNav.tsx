@@ -61,6 +61,13 @@ export default function HeaderNav() {
       {loaded && user?.role === 'student' && (
         <Link href="/issues" className="text-white">Issues</Link>
       )}
+      {/* The student's own gradebook. Until 2026-09-02 /progress was linked
+          from NOWHERE in the app — the score table, the due dates and the
+          teacher's override comments all rendered on a page reachable only by
+          typing the URL. scripts/check-reachable.mjs now holds that open. */}
+      {loaded && user?.role === 'student' && (
+        <Link href="/progress" className="text-white">Progress</Link>
+      )}
       {loaded && user?.role === 'admin' && (
         <Link href="/admin/users" className="text-white">Users</Link>
       )}
