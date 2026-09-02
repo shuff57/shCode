@@ -1123,6 +1123,58 @@ const proved = new Set();
       String(gp(a, 's') + gp(b, 's')));
     proved.add('gprop-sum');
   }
+
+  // ---- turn: translate-to-middle, rotate, translate back -------------------
+  //
+  // reSHape's turn pivots a shape about its OWN bounding-box middle, not the
+  // world origin -- api.turn in lib/occt-api.ts composes it from exactly the
+  // three gp_Trsf calls performed here. A rotation that silently did nothing
+  // would still leave the volume unchanged, so this has to show the shape
+  // MOVED too: a box built away from the origin, turned 90 degrees, has to
+  // come back centred on the SAME middle (the "in place" half) with its X and
+  // Y extents swapped (the "it actually turned" half).
+  {
+    const raw = new occ.BRepPrimAPI_MakeBox(40, 20, 20).Shape();
+    const away = new occ.gp_Trsf();
+    away.SetTranslation(new occ.gp_Vec(40, 0, 0));
+    const box = new occ.BRepBuilderAPI_Transform(raw, away, false).Shape();
+
+    const before = new occ.Bnd_Box();
+    occ.BRepBndLib.AddOptimal(box, before, true, true);
+    before.SetGap(0);
+    const bLo = before.CornerMin();
+    const bHi = before.CornerMax();
+    check('the box to turn sits at [40,0,0] .. [80,20,20], not the origin',
+      close(bLo.X(), 40, 1e-6) && close(bHi.X(), 80, 1e-6) && close(bHi.Y(), 20, 1e-6),
+      [bLo.X(), bHi.X(), bLo.Y(), bHi.Y()].join(', '));
+
+    const mid = [(bLo.X() + bHi.X()) / 2, (bLo.Y() + bHi.Y()) / 2, (bLo.Z() + bHi.Z()) / 2];
+    const toOrigin = new occ.gp_Trsf();
+    toOrigin.SetTranslation(new occ.gp_Vec(-mid[0], -mid[1], -mid[2]));
+    const atOrigin = new occ.BRepBuilderAPI_Transform(box, toOrigin, false).Shape();
+    const spin = new occ.gp_Trsf();
+    spin.SetRotation(new occ.gp_Ax1(P(0, 0, 0), new occ.gp_Dir(0, 0, 1)), Math.PI / 2);
+    const spun = new occ.BRepBuilderAPI_Transform(atOrigin, spin, false).Shape();
+    const back = new occ.gp_Trsf();
+    back.SetTranslation(new occ.gp_Vec(mid[0], mid[1], mid[2]));
+    const turned = new occ.BRepBuilderAPI_Transform(spun, back, false).Shape();
+
+    const after = new occ.Bnd_Box();
+    occ.BRepBndLib.AddOptimal(turned, after, true, true);
+    after.SetGap(0);
+    const aLo = after.CornerMin();
+    const aHi = after.CornerMax();
+    const aMid = [(aLo.X() + aHi.X()) / 2, (aLo.Y() + aHi.Y()) / 2, (aLo.Z() + aHi.Z()) / 2];
+    check('recipe turn: the middle it pivots about does not move',
+      close(aMid[0], mid[0], 1e-9) && close(aMid[1], mid[1], 1e-9) && close(aMid[2], mid[2], 1e-9),
+      aMid.join(', ') + ' vs ' + mid.join(', '));
+    check('...while a 90-degree turn swaps which way the box runs long',
+      close(aHi.X() - aLo.X(), 20, 1e-6) && close(aHi.Y() - aLo.Y(), 40, 1e-6),
+      'dx=' + (aHi.X() - aLo.X()) + ' dy=' + (aHi.Y() - aLo.Y()));
+    check('...and the volume the pivot leaves untouched',
+      close(gp(turned, 'v'), 40 * 20 * 20, 1e-6), String(gp(turned, 'v')));
+    proved.add('turn-inplace-pivot');
+  }
 }
 
 // ---- every recipe verdict now points at a proof that really ran ------------

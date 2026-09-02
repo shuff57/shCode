@@ -145,7 +145,25 @@ try {
   // up is a false positive from the crude parse and is not the classification's
   // problem -- which is measured rather than assumed, by intersecting with the
   // real export list.
-  const exported = apiNames(loadModeling().jscad);
+  //
+  // RESHAPE_ONLY is the one deliberate exception, and it is a fixed, tiny list
+  // rather than a pattern -- turn and sit slipped past this whole gate once
+  // already, and the exported.has(n) intersection is *why*: both are called
+  // bare in the docs, but neither is a jscad export at all, so they were
+  // dropped here before unclassified() ever saw them, silently, with no WARN.
+  // That is a DIFFERENT hole from the dot-prefix one two paragraphs up --
+  // minkowskiSum is a real export missed by the CALL SYNTAX; turn and sit are
+  // missed because they are not exports in the first place, no matter how they
+  // are called. Widening the dot-regex would not have touched this one.
+  //
+  // This does not reopen the vec3.scale / transforms.scale misattribution that
+  // widening the dot-regex caused: that bug came from matching a bare name
+  // across every module without knowing which module a call went through.
+  // This list adds two specific, already-classified names with no other export
+  // to be confused with, and only when called bare -- it changes nothing about
+  // how dotted calls are read.
+  const RESHAPE_ONLY = new Set(['turn', 'sit']);
+  const exported = new Set([...apiNames(loadModeling().jscad).keys(), ...RESHAPE_ONLY]);
   const called = new Set();
   for (const p of pages) for (const n of p.names) if (exported.has(n)) called.add(n);
   note(`${pages.length} pages call ${called.size} distinct @jscad/modeling names`);

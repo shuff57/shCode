@@ -237,6 +237,28 @@ export const SURFACE: SurfaceName[] = [
     note: 'Bounding-box arithmetic and a translate -- the same recipe center uses, with '
       + 'the corner chosen per axis. This is what sit() is built on.',
     needs: 'Bnd_Box + BRepBndLib, then a translate', kernel: ['Bnd_Box'] },
+  // turn and sit have no `module` to be exported from -- neither is a
+  // @jscad/modeling name at all, renamed or otherwise. They are the two of
+  // reSHape's twelve extra names (public/reshape/reshape.js) that are not a
+  // pure rename plus a bracket: turn pivots about the shape's own middle where
+  // rotate spins about the world origin, and sit refuses the options align
+  // accepts. Both are still fully specified against real library calls --
+  // occt-api.ts's own banner calls turn out by name as the one deliberate
+  // divergence -- so they get a verdict here too, and
+  // scripts/test-script-surface.mjs's RESHAPE_ONLY set is what keeps the
+  // "every classified name is a real @jscad/modeling export" control from
+  // reading these two as stale.
+  { name: 'sit', module: 'transforms', proof: 'bbox-arithmetic', serves: 'recipe',
+    note: 'align with modes fixed to [\'none\', \'none\', \'min\'] -- the exact recipe '
+      + 'align already proves, just with X and Y left alone.',
+    needs: 'the align path, called with a fixed mode', kernel: ['Bnd_Box'] },
+  { name: 'turn', module: 'transforms', proof: 'turn-inplace-pivot', serves: 'recipe',
+    note: 'Translate the shape\'s own bounding-box middle to the origin, rotate, '
+      + 'translate back -- turn pivots in place where rotate spins about the world '
+      + 'origin, and reshape.js measured what that costs a student who moves a shape '
+      + 'and then turns it. Degrees are converted with degToRad on the way in.',
+    needs: 'Bnd_Box for the middle, then gp_Trsf translate + gp_Trsf rotate',
+    kernel: ['Bnd_Box', 'gp_Trsf', 'BRepBuilderAPI_Transform'] },
 
   // ---- booleans -----------------------------------------------------------
   { name: 'union', module: 'booleans', serves: 'exact',

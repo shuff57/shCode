@@ -1381,6 +1381,51 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
     return made.length === 1 ? made[0] : made;
   };
 
+  /**
+   * sit(shape) -- drop the shape so its lowest point rests on z = 0.
+   *
+   * Not a new recipe: public/reshape/reshape.js builds sit from
+   * transforms.align({ modes: ['none', 'none', 'min'], relativeTo: [0, 0, 0] }, shape),
+   * and api.align above already treats an axis whose mode is neither 'center'
+   * nor 'min' nor 'max' as untouched -- so 'none' already means "leave this
+   * axis alone" with no extra code. sit is that same call, fixed.
+   */
+  api.sit = (...shapes: any[]) =>
+    api.align({ modes: ['none', 'none', 'min'], relativeTo: [0, 0, 0] }, ...shapes);
+
+  const middleOf = (s: any): Vec3 => {
+    const [lo, hi] = bounds(s);
+    return [(lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, (lo[2] + hi[2]) / 2];
+  };
+
+  /**
+   * turn(degrees, shape) -- rotate IN PLACE, about the shape's own
+   * bounding-box middle, in DEGREES rather than radians.
+   *
+   * This is the one name in this file with no jscad rename behind it at all --
+   * see the banner at the top of this file. api.rotate above spins about the
+   * WORLD origin, which is what @jscad/modeling's rotate does and what a
+   * student who moves a shape and then rotates it gets burned by; turn's
+   * recipe is measure the shape's own middle, translate it to the origin,
+   * rotate, translate back -- exactly what public/reshape/reshape.js's turn()
+   * does over the real library's translate/rotate, replayed here over gp_Trsf.
+   *
+   * Angle argument comes FIRST, matching reshape.js and unlike every other
+   * transform here: turn(90, shape) about Z, or turn([0, 90, 0], shape) to
+   * pick the axis.
+   */
+  api.turn = (degrees: number | Vec3, ...shapes: any[]) => {
+    const spin: Vec3 = typeof degrees === 'number' ? [0, 0, degrees] : degrees;
+    const radians: Vec3 = [api.degToRad(spin[0]), api.degToRad(spin[1]), api.degToRad(spin[2])];
+    const made = shapes.flat().filter(isShape).map((s: any) => {
+      const mid = middleOf(s);
+      const atOrigin = moved(s, [-mid[0], -mid[1], -mid[2]]);
+      const spun = api.rotate(radians, atOrigin);
+      return moved(spun, mid);
+    });
+    return made.length === 1 ? made[0] : made;
+  };
+
   // ---- hull, which is ours -------------------------------------------------
   //
   // Wired to lib/hull.ts through the tessellation, because a B-rep sphere has no
@@ -1640,7 +1685,7 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
     'star', 'triangle', 'roundedCuboid', 'geodesicSphere', 'arc', 'line']);
   api.transforms = ns(['translate', 'translateX', 'translateY', 'translateZ',
     'rotate', 'rotateX', 'rotateY', 'rotateZ', 'scale', 'mirrorX', 'mirrorY',
-    'mirrorZ', 'center', 'centerX', 'centerY', 'centerZ', 'align']);
+    'mirrorZ', 'center', 'centerX', 'centerY', 'centerZ', 'align', 'turn', 'sit']);
   api.booleans = ns(['union', 'subtract', 'intersect', 'scission']);
   api.extrusions = ns(['extrudeLinear', 'extrudeRotate', 'extrudeFromSlices', 'project']);
   api.extrusions.slice = {
