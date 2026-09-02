@@ -85,6 +85,20 @@ function fixtures(types) {
       sketch('sk1', 'xz', 0, [[10, 0], [20, 0], [20, 30], [10, 30]]),
       { id: 'r1', kind: 'revolve', target: 'sk1', angle: 360 },
     ),
+    // Three planes, one profile. These SHOULD differ and today they do not:
+    // revolve does not go through extrudeOnPlane at all, it calls
+    // extrudeRotate on the raw 2D profile, which sweeps around world Z
+    // whatever plane the sketch sits on. Recorded so the defect is measured
+    // rather than assumed, and so the day it is fixed, two of these three
+    // move and the third does not.
+    'revolve-on-xy': doc(
+      sketch('sk1', 'xy', 0, [[10, 0], [20, 0], [20, 30], [10, 30]]),
+      { id: 'r1', kind: 'revolve', target: 'sk1', angle: 360 },
+    ),
+    'revolve-on-yz': doc(
+      sketch('sk1', 'yz', 0, [[10, 0], [20, 0], [20, 30], [10, 30]]),
+      { id: 'r1', kind: 'revolve', target: 'sk1', angle: 360 },
+    ),
     'circle-extrude': doc(
       { id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0, shape: 'circle', points: [[-15, 0], [15, 0]] },
       { id: 'e1', kind: 'extrude', target: 'sk1', height: 20 },
@@ -275,6 +289,7 @@ try {
   const CURVED = new Set([
     'box-rounded', 'cylinder', 'cone', 'sphere', 'torus', 'sketch-revolve',
     'circle-extrude', 'rounded-corner', 'bowed-edge', 'boolean-cut',
+    'revolve-on-xy', 'revolve-on-yz',
     'boolean-union', 'boolean-intersect',
   ]);
   for (const [name, doc] of Object.entries(fixtures(types))) {
