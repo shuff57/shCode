@@ -159,4 +159,55 @@ module.exports = function run({ hull, check, near }) {
   check('...and satisfies Euler F = 2V - 4',
     cloud.triangles.length === 2 * cloud.used.length - 4,
     `${cloud.triangles.length} faces, ${cloud.used.length} vertices`);
+
+  console.log('\n=== it does not fall apart when the point set gets dense ===');
+
+  // THE REGRESSION THIS EXISTS FOR, measured 2026-09-02. The tolerance floored
+  // at span squared regardless of how big the face was, so once the hull got
+  // dense enough for its faces to be small, that floor sat millions of times
+  // above the distances being judged: genuinely visible faces read as invisible,
+  // the horizon stopped closing, and the face set stopped being a surface.
+  //
+  // It did not throw and it did not return a wrong number. On 6000 points the
+  // face count tracked 2i-4 exactly to i=3000, then went 6427 -> 178731 in five
+  // hundred points and the process died on memory -- which was first diagnosed
+  // as allocation churn, wrongly, because the symptom was a heap error.
+  //
+  // 4000 points is past where the collapse began, so this fails on the old code
+  // and is the check that would have caught it. Euler is the assertion that
+  // matters: a hull that has stopped being a surface breaks it immediately,
+  // while a volume can stay plausible for a while.
+  let s2 = 7;
+  const rand = () => {
+    s2 |= 0; s2 = (s2 + 0x6D2B79F5) | 0;
+    let t = Math.imul(s2 ^ (s2 >>> 15), 1 | s2);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const DENSE = [];
+  for (let i = 0; i < 4000; i++) {
+    const z = 2 * rand() - 1;
+    const t = 2 * Math.PI * rand();
+    const rr = Math.sqrt(1 - z * z);
+    DENSE.push([10 * rr * Math.cos(t), 10 * rr * Math.sin(t), 10 * z]);
+  }
+  const dense = convexHull(DENSE);
+  check('4000 points on a sphere still hull', dense !== null);
+  check('...with every one of them ON the hull, since every one is on the sphere',
+    dense.used.length === 4000, `${dense.used.length} of 4000`);
+  check('...and Euler still exact, so it is still a closed surface',
+    dense.triangles.length === 2 * dense.used.length - 4,
+    `${dense.triangles.length} faces, ${dense.used.length} vertices`);
+  check('...to a volume closer to the sphere than the 400-point one managed',
+    near(hullVolume(DENSE, dense), (4 / 3) * Math.PI * 1000, 0.005),
+    String(hullVolume(DENSE, dense)));
+
+  // CONTROL: duplicated points must be swallowed, not counted twice. A hull that
+  // survives dense input by loosening its tolerance would start keeping these.
+  const DOUBLED = DENSE.slice(0, 1000).flatMap((p) => [p, [...p]]);
+  const doubled = convexHull(DOUBLED);
+  check('CONTROL: each point duplicated is still hulled once',
+    doubled.used.length === 1000, `${doubled.used.length} of 1000 distinct`);
+  check('...and that hull is a closed surface too',
+    doubled.triangles.length === 2 * doubled.used.length - 4);
 };

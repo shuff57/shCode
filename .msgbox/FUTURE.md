@@ -13,9 +13,18 @@ geometry we owe, the other is a line in a build config.
 **Owed to us: the hull recipe.** `lib/hull.ts` exists and is measured -- its
 triangles sew into a solid OpenCascade agrees is a solid, and the two volumes
 agree to ten digits. What is NOT done is wiring it behind the `hull`,
-`hullChain` and `hullPoints2` names, which needs a decision first: hulling a
-CURVED solid means sampling its surface, and how densely is a real choice
-nobody has made. 11 pages wait on this.
+`hullChain` and `hullPoints2` names. 11 pages wait on this.
+
+RESOLVED 2026-09-02, and the question turned out not to be the question. This
+was parked as "how densely to sample a curved solid, which is a decision
+nobody has made". Measured against JSCAD's own hull on the docs' two-sphere
+example, the density was never the constraint -- our hull was 10 to 40 times
+slower at equal accuracy and did not finish past ~2000 points, and underneath
+that it had a tolerance bug that collapsed the hull's topology at ~3000. Both
+fixed. The answer to the parked question is that there IS no new dial: the
+tessellation's own deflection is the sampling density, and at its default the
+result is 0.475% off exact in 19-71 ms, against 1.66% for what the docs ship
+today. Wiring is now ordinary work, not a decision.
 
 **Owed by the build: `BRepBuilderAPI_GTransform`.** Non-uniform scale --
 `scale([3, 1, 1], s)`, `scaleZ`, a general `transform` matrix, `ellipsoid` --
