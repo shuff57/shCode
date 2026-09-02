@@ -52,15 +52,32 @@ squares over `lib/least-squares.ts` -- first-party, MIT, no payload, and able to
 express tangency, which relaxation could not. That is the pattern for the rest:
 own the layer, keep `ModelDoc` as the seam.
 
-### What has NOT moved, and why
+### The kernel: B-rep, and the hard part is not the kernel
 
-A B-rep kernel was measured and refused on 2026-09-01: the only browser option
-is OpenCascade at **21.9 MB and LGPL-2.1-only**, against **0.41 MB and MIT**
-today, to lift 34 refused tools of which 28 are sheet metal and surfacing this
-course does not want. Full reasoning is in `.gauntlet/parity.json` on all four
-kernel-blocked refusal groups, and in `~/.claude/plans/reshape-fusion-parity.md`.
-Retiring JSCAD does not mean OpenCascade is the answer.
+A B-rep kernel WAS refused on 2026-09-01 and the refusal was reversed the same
+day. The refusal weighed B-rep by which toolbar entries it unlocks; the goal is
+a true parametric modeller with persistent face and edge references, and that is
+a representation, not a feature list. A mesh has no face to refer to -- which is
+exactly why Bevel on a cylinder is currently a hull of two cylinders instead of
+a chamfer.
 
+Corrected numbers, since the first pass overstated them: OpenCascade via
+`replicad-opencascadejs` is 21.9 MB uncompressed but **6.9 MB gzipped**, cached
+after first load, and the runner is already conditional on
+`lesson.preview === 'reshape'` rather than loading on every page. LGPL-2.1 for a
+wasm module loaded at runtime is the case that licence was written for and does
+not reach our own code.
+
+**The hard part is topological naming.** B-rep gives ADDRESSABLE faces, not
+PERSISTENT ones: change an upstream dimension, OCCT rebuilds, and the face
+indices are new. "Face 3" may not be the face the student clicked. FreeCAD lived
+with this as its most notorious defect for over a decade. It is a design problem
+we own on top of the kernel, and adopting the kernel is the easy half.
+
+One structural advantage: `ModelDoc` is already a feature history -- an ordered
+list of operations with stable ids -- which is exactly what a naming scheme needs
+and what most CAD systems have to retrofit. Ours exists because the timeline
+demanded it.
 ## Runtime layout
 
 - **Client** — React 19 (+ CodeMirror, Zustand, lucide-react). Builds to `out/` via
