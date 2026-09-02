@@ -1,5 +1,5 @@
 {
-  "sha": "5d38606daaa008e3f9bdbfc35527c76c34870ea5",
+  "sha": "0b3514b3e0c66f57ba245dbc65ed89eeee3e471d",
   "takenAt": "2026-09-02",
   "models": {
     "box": {
@@ -476,16 +476,16 @@
       "closed": true,
       "_points": [
         [
-          3.6671,
-          0.0093
+          3.6583,
+          -0.3369
         ],
         [
-          35.8093,
-          -3.4984
+          35.8027,
+          -3.2971
         ],
         [
-          40.5236,
-          28.4892
+          40.539,
+          28.634
         ],
         [
           0,
@@ -532,16 +532,16 @@
       "closed": true,
       "_points": [
         [
-          -0.1609,
-          1.4059
+          -0.0772,
+          1.3001
         ],
         [
-          40.8783,
-          4.6251
+          40.8429,
+          4.8194
         ],
         [
-          39.2825,
-          24.969
+          39.1206,
+          24.8451
         ],
         [
           0,
@@ -595,20 +595,20 @@
       "closed": true,
       "_points": [
         [
-          3.8068,
-          -3.6932
+          3.75,
+          -3.75
         ],
         [
-          36.1932,
-          -3.6932
+          36.25,
+          -3.75
         ],
         [
-          36.1932,
-          28.6932
+          36.25,
+          28.75
         ],
         [
-          3.8068,
-          28.6932
+          3.75,
+          28.75
         ]
       ],
       "_residual": 0
@@ -616,7 +616,7 @@
     "two-lengths-one-edge": {
       "satisfied": [
         false,
-        true,
+        false,
         true
       ],
       "overConstrained": true,
@@ -625,23 +625,24 @@
       "closed": true,
       "_points": [
         [
-          15.6705,
-          0.109
+          7.5906,
+          0.1116
         ],
         [
-          25.5159,
-          1.8604
+          32.5879,
+          0.4789
         ],
         [
-          38.8136,
-          23.0305
+          39.8215,
+          24.4095
         ],
         [
           0,
           25
         ]
       ],
-      "_residual": 30
+      "_residual": 15,
+      "note": "BASELINE CHANGED 2026-09-01 when the solver became least squares, and the new answer is the better one. Edge 0 is asked to be both 40 and 10. Relaxation settled it at 10 -- satisfying one of two contradictory rules and marking only the other, which tells a student the 40 is the problem when the two are equally at fault. Least squares settles at 25, the compromise, and marks BOTH. The innocent third rule (edge 1 = 25) is still not marked, which is what makes this discrimination rather than lighting everything up."
     },
     "impossible-triangle": {
       "satisfied": [
@@ -655,19 +656,20 @@
       "closed": true,
       "_points": [
         [
-          3.9588,
-          2.9823
+          1.3402,
+          -0.9785
         ],
         [
-          40.7037,
-          -4.0757
+          38.6629,
+          -0.9766
         ],
         [
-          15.3375,
-          31.0933
+          19.9999,
+          31.3449
         ]
       ],
-      "_residual": 35.3241
+      "_residual": 25.8521,
+      "note": "Held through the solver swap, but only after the loophole was closed. Least squares aims at whatever makes the residuals small, and an angle residual scaled by the sketch size RECOMPUTED from the points being solved gave it a way to make an impossible rule look met by shrinking: it collapsed all three corners onto one point, twice, and reported every rule satisfied. Freezing the scale at the input removed the incentive. Reporting a full-size miss for a zero-length edge was also tried and reverted -- it made the solver chase degenerate edges apart, moving corners nobody asked it to move. The triangle now keeps 37.30-unit sides and says the rules disagree."
     }
   }
 }

@@ -197,13 +197,31 @@ module.exports = function run(dir) {
     near(Math.abs(angleDiff(edgeAngle(perp.points, 0), edgeAngle(perp.points, 2))), Math.PI / 2, 1e-3),
     `${edgeAngle(perp.points, 0).toFixed(4)} vs ${edgeAngle(perp.points, 2).toFixed(4)}`);
 
-  // Length preservation is the whole point of rotating around the right pivot.
+  // Making two edges parallel must not wreck the shape. What "wreck" means is
+  // the triage worth writing down, because the old relaxation preserved length
+  // EXACTLY -- it rotated each edge about a chosen pivot, so length could not
+  // change by construction -- and a least-squares solver has no such guarantee:
+  // it moves corners, and a small length change is a legitimate part of the
+  // cheapest arrangement that makes the rule true.
+  //
+  // So the bar is proportion, not equality. 0.5% is far tighter than anything a
+  // student could see and far looser than a defect: the first version of this
+  // solver, before the smallest-change term existed, stretched this same edge
+  // from 40 to 265. That is what this check is for. The exact-preservation
+  // property is reported below as a delta rather than demanded.
   const lenBefore = [S.edgeLength(lean2, 0), S.edgeLength(lean2, 2)];
   const parLen = S.solveSketch(lean2, [{ kind: 'parallel', edge: 0, other: 2 }]);
-  check('parallel preserves both edge lengths (no corner pinned)',
-    near(S.edgeLength(parLen.points, 0), lenBefore[0], 1e-3)
-    && near(S.edgeLength(parLen.points, 2), lenBefore[1], 1e-3),
-    `${S.edgeLength(parLen.points, 0).toFixed(3)}/${lenBefore[0].toFixed(3)} and ${S.edgeLength(parLen.points, 2).toFixed(3)}/${lenBefore[1].toFixed(3)}`);
+  const drift = (got, want) => Math.abs(got - want) / want;
+  const d0 = drift(S.edgeLength(parLen.points, 0), lenBefore[0]);
+  const d2 = drift(S.edgeLength(parLen.points, 2), lenBefore[1]);
+  check('parallel does not stretch either edge (no corner pinned)',
+    d0 < 0.005 && d2 < 0.005,
+    `${(d0 * 100).toFixed(2)}% and ${(d2 * 100).toFixed(2)}% -- a stretch, not a rotation`);
+  delta('edge length is preserved to about a quarter of a percent, not exactly',
+    `${(d0 * 100).toFixed(3)}% and ${(d2 * 100).toFixed(3)}%. Relaxation held it exactly by`
+    + ' rotating about a pivot; least squares trades a hair of length for the'
+    + ' cheapest arrangement overall. Either is correct -- what matters is that'
+    + ' the shape survives, which the PASS above checks.');
 
   // Pin one endpoint of edge 0; the pivot must move to the other endpoint so
   // the edge still rotates without changing length, and the pin never moves.
@@ -211,9 +229,10 @@ module.exports = function run(dir) {
     { kind: 'parallel', edge: 0, other: 2 },
     { kind: 'lock', corner: 0 },
   ]);
-  check('...and still preserves length with one corner pinned',
-    near(S.edgeLength(parPin.points, 0), lenBefore[0], 1e-3),
-    `${S.edgeLength(parPin.points, 0).toFixed(3)} vs ${lenBefore[0].toFixed(3)}`);
+  const dPin = Math.abs(S.edgeLength(parPin.points, 0) - lenBefore[0]) / lenBefore[0];
+  check('...and does not stretch it with one corner pinned either',
+    dPin < 0.005,
+    `${(dPin * 100).toFixed(2)}% -- before the smallest-change term this was 399 against 40`);
   check('...and the pinned corner does not move at all',
     parPin.points[0][0] === 0 && parPin.points[0][1] === 0,
     JSON.stringify(parPin.points[0]));

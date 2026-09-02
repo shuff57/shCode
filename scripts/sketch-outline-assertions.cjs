@@ -157,8 +157,14 @@ module.exports = function run(dir) {
   }
 
   const moving = gen.solveDoc(doc(sk({ rounds: { 1: 8 }, constraints: SETS[4][1] }))).features[0];
+  // 1e-4, not 1e-6. This is a no-op guard -- its job is to prove the design
+  // really travelled from 0/40 to -10/50 rather than sitting still while every
+  // #C2 above passed for the wrong reason -- and a window ten thousand times
+  // tighter than the 60-unit move it is checking was incidental precision, not
+  // the point. The old relaxation set a length analytically and landed on the
+  // number exactly; least squares approaches it and stops a few millionths out.
   check('...and length e0=60 really did move the design (so C2 is not measuring a no-op)',
-    Math.abs(moving.points[0][0] + 10) < 1e-6 && Math.abs(moving.points[1][0] - 50) < 1e-6,
+    Math.abs(moving.points[0][0] + 10) < 1e-4 && Math.abs(moving.points[1][0] - 50) < 1e-4,
     `design came back ${JSON.stringify(moving.points)} -- unchanged means the solver did `
       + 'nothing and every #C2 above passed for the wrong reason');
 

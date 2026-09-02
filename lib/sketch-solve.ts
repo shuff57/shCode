@@ -5,13 +5,33 @@
 // corner pinned. That is most of what a first sketch needs, and all of it is
 // reachable without arcs.
 //
-// The method is relaxation, not a matrix solve. Each constraint is asked, in
-// turn, to nudge its own corners the smallest distance that would satisfy it;
-// repeat until nothing moves. It is a handful of lines, it degrades sensibly
-// when constraints disagree (it settles on a compromise rather than throwing),
-// and it stays fast because a sketch has a dozen corners rather than a
-// thousand. A proper solver earns its place when arcs and tangency arrive --
-// relaxation cannot do those, and that is the moment for planegcs.
+// The method is least squares over the residuals, not relaxation.
+//
+// It used to be relaxation: ask each rule in turn to nudge its own corners
+// the smallest distance that would satisfy it, and repeat until nothing
+// moves. That is a handful of lines and it works for straight edges, but it
+// cannot express tangency at all -- there is no direction to nudge a line
+// that makes it "closer to tangent" one rule at a time -- and this file said
+// so, naming planegcs as the moment that arrived. Arcs arrived in the
+// 2026-09-01 bow work, so it did.
+//
+// What replaced it is ours rather than vendored, for three reasons measured
+// at the time: planegcs is a 600 KB LGPL wasm blob in a bundle that is
+// otherwise MIT, its wrapper initialises asynchronously while this function
+// is called synchronously from React render paths and from a sync test
+// harness, and residualsOf() below already computed the hard half -- one
+// number per rule, all in distance units, which IS the residual vector a
+// least-squares solver needs.
+//
+// So: every rule is written as "how wrong is this", and lib/least-squares.ts
+// moves the corners until all of those are as close to zero as they can get,
+// all at once. Adding a rule means writing what wrong means for it and
+// nothing else -- no derivative by hand, no new solver. It still degrades
+// sensibly when rules disagree, because a least-squares answer to a
+// contradiction IS the compromise, and it still stays fast because a sketch
+// has a dozen corners rather than a thousand.
+
+import { leastSquares } from './least-squares';
 
 export type Point = [number, number];
 
@@ -75,137 +95,89 @@ export function solveSketch(
     return { points: pts, residual: 0, iterations: 0, overConstrained: false };
   }
 
-  const fixed = new Set<number>(pinned);
-  for (const c of constraints) if (c.kind === 'lock') fixed.add(c.corner);
+  // A pin is not a rule to be satisfied, it is a coordinate that does not
+  // move. So pinned corners come OUT of the unknowns rather than going in as
+  // residuals: the solver never has to trade a pin off against anything, which
+  // is exactly what a student means by pinning a corner. `pinned` carries the
+  // corner currently under the pointer during a drag, for the same reason.
+  const fixed = new Set<number>();
+  const wrap = (i: number) => ((i % n) + n) % n;
+  for (const p of pinned) fixed.add(wrap(p));
+  for (const c of constraints) if (c.kind === 'lock') fixed.add(wrap(c.corner));
 
-  // Move two corners toward a target, sharing the correction. A pinned corner
-  // takes none of it, which is what makes a drag feel like a drag.
-  const share = (a: number, b: number): [number, number] => {
-    const fa = fixed.has(a);
-    const fb = fixed.has(b);
-    if (fa && fb) return [0, 0];
-    if (fa) return [0, 1];
-    if (fb) return [1, 0];
-    return [0.5, 0.5];
-  };
-
-  // Rotate edge `edge` by `delta` radians around a pivot chosen the same
-  // pinned-aware way share() chooses its weights: rotating around a FIXED
-  // endpoint (or the midpoint, when neither is fixed) cannot change the
-  // edge's own length, because the moving point(s) stay the same distance
-  // from whichever point they're rotating around. This is what makes
-  // Parallel/Perpendicular safe to combine with Pin a corner -- the naive
-  // version (average two independently-rotated endpoints) would NOT
-  // preserve length, and does not appear anywhere in this function.
-  const rotateEdgeBy = (edge: number, delta: number): number => {
-    const [p, q] = edgeCorners(edge, n);
-    const fp = fixed.has(p);
-    const fq = fixed.has(q);
-    if (fp && fq) return 0;
-    const dx = pts[q][0] - pts[p][0];
-    const dy = pts[q][1] - pts[p][1];
-    const len = Math.hypot(dx, dy);
-    if (len < 1e-9) return 0; // no direction to rotate
-    const pivot: Point = fp ? pts[p] : fq ? pts[q] : [
-      (pts[p][0] + pts[q][0]) / 2,
-      (pts[p][1] + pts[q][1]) / 2,
-    ];
-    const cos = Math.cos(delta);
-    const sin = Math.sin(delta);
-    const rotatePoint = (idx: number) => {
-      const vx = pts[idx][0] - pivot[0];
-      const vy = pts[idx][1] - pivot[1];
-      pts[idx][0] = pivot[0] + vx * cos - vy * sin;
-      pts[idx][1] = pivot[1] + vx * sin + vy * cos;
-    };
-    if (!fp) rotatePoint(p);
-    if (!fq) rotatePoint(q);
-    return Math.abs(delta) * len; // arc length moved -- feeds `moved` below
-  };
-
-  let iterations = 0;
-  let moved = Infinity;
-
-  while (iterations < MAX_ITERATIONS && moved > TOL) {
-    moved = 0;
-    iterations++;
-
-    for (const c of constraints) {
-      if (c.kind === 'lock') continue;
-
-      if (c.kind === 'horizontal' || c.kind === 'vertical') {
-        const axis = c.kind === 'horizontal' ? 1 : 0;
-        const [a, b] = edgeCorners(c.edge, n);
-        const [wa, wb] = share(a, b);
-        if (!wa && !wb) continue;
-        const diff = pts[b][axis] - pts[a][axis];
-        pts[a][axis] += diff * wa;
-        pts[b][axis] -= diff * wb;
-        moved = Math.max(moved, Math.abs(diff));
-        continue;
-      }
-
-      // length and equal are the same nudge with a different target. This
-      // block is guarded to length/equal only: it is NOT continue-terminated,
-      // so without the guard a parallel/perpendicular constraint would fall
-      // through and stretch its edge to the average of the two lengths,
-      // silently destroying the length that rotateEdgeBy exists to preserve.
-      if (c.kind === 'length' || c.kind === 'equal') {
-        const [a, b] = edgeCorners(c.edge, n);
-        const target =
-          c.kind === 'length'
-            ? c.value
-            : (edgeLength(pts, c.edge) + edgeLength(pts, c.other)) / 2;
-
-        const apply = (edge: number, want: number) => {
-          const [p, q] = edgeCorners(edge, n);
-          const dx = pts[q][0] - pts[p][0];
-          const dy = pts[q][1] - pts[p][1];
-          const len = Math.hypot(dx, dy);
-          // A zero-length edge has no direction to grow along. Nudging it in an
-          // arbitrary one would make the result depend on iteration order.
-          if (len < 1e-9) return;
-          const [wp, wq] = share(p, q);
-          if (!wp && !wq) return;
-          const scale = (want - len) / len;
-          pts[p][0] -= dx * scale * wp;
-          pts[p][1] -= dy * scale * wp;
-          pts[q][0] += dx * scale * wq;
-          pts[q][1] += dy * scale * wq;
-          moved = Math.max(moved, Math.abs(want - len));
-        };
-
-        apply(c.edge, target);
-        if (c.kind === 'equal') apply(c.other, target);
-        continue;
-      }
-
-      if (c.kind === 'parallel' || c.kind === 'perpendicular') {
-        const angleA = edgeAngle(pts, c.edge, n);
-        const angleB = edgeAngle(pts, c.other, n);
-        if (angleA === null || angleB === null) continue; // a zero-length edge has no angle to match
-        const target = c.kind === 'perpendicular' ? Math.PI / 2 : 0;
-        let diff = (angleB - angleA - target) % Math.PI;
-        if (diff > Math.PI / 2) diff -= Math.PI;
-        if (diff <= -Math.PI / 2) diff += Math.PI;
-        const movedA = rotateEdgeBy(c.edge, diff / 2);
-        const movedB = rotateEdgeBy(c.other, -diff / 2);
-        moved = Math.max(moved, movedA, movedB);
-        continue;
-      }
-    }
+  const flat: number[] = [];
+  for (const p of pts) flat.push(p[0], p[1]);
+  const free: number[] = [];
+  for (let i = 0; i < n; i++) {
+    if (fixed.has(i)) continue;
+    free.push(2 * i, 2 * i + 1);
   }
 
-  return {
-    points: pts,
-    residual: residualOf(pts, constraints),
-    iterations,
-    // Relaxation stops moving when it has settled. Still-large error after it
-    // settles means the constraints disagree, not that it needed longer.
-    overConstrained: residualOf(pts, constraints) > 1e-3,
+  /** Put the free coordinates back among the fixed ones. */
+  const expand = (x: number[]): Point[] => {
+    const all = flat.slice();
+    for (let j = 0; j < free.length; j++) all[free[j]] = x[j];
+    const out: Point[] = [];
+    for (let i = 0; i < n; i++) out.push([all[2 * i], all[2 * i + 1]]);
+    return out;
   };
-}
 
+  // residualsOf is the rulebook, unchanged and already tested. Everything the
+  // solver knows about sketches comes through this one call.
+  // A weak pull back toward where each corner started, appended to the real
+  // rules. Without it the solver is free to satisfy a rule any way it likes,
+  // and "any way" includes absurd ones: measured 2026-09-01, making two edges
+  // parallel stretched a 40-unit edge to 265 and a pinned variant to 399,
+  // because rotating and stretching both satisfy parallel equally well and
+  // nothing preferred the one that keeps the shape.
+  //
+  // The weight is small on purpose. It is a tie-breaker, not a rule: it picks
+  // among the answers that satisfy everything, and it must never be able to
+  // outvote an actual constraint. This is what a CAD solver means by solving
+  // for the smallest change, and it is also where relaxation's old habit of
+  // "meeting in the middle" comes from -- that behaviour is recovered here as
+  // a consequence rather than written in by hand.
+  // Measured once, from the sketch as drawn, and held for the whole solve.
+  const startScale = sketchScale(pts);
+  // Small enough that it cannot measurably bend a real rule, big enough to
+  // decide between answers a rule is indifferent to. At 1e-3 it bent them: the
+  // rules settled 1e-5 out instead of 1e-9.
+  const HOME_PULL = 1e-3;
+  const home = free.map((k) => flat[k]);
+  const rules = (x: number[]) => residualsOf(expand(x), constraints, startScale);
+
+  // Two passes, and the second one is not optional.
+  //
+  // Pass one solves the rules WITH the pull, which is what picks a sensible
+  // arrangement out of the many that satisfy them. But adding the pull moves
+  // where the best answer IS: at the joint optimum the rules sit slightly out,
+  // because the last scrap of rule accuracy costs more pull than it saves.
+  // Measured: a length asked to be 60 settled at 60.00001. Excluding the pull
+  // from the stopping test does not help -- that changes when to stop, not
+  // where the optimum lies.
+  //
+  // Pass two re-solves the rules ALONE, starting from pass one's answer. It
+  // begins in the right basin and already near the answer, so it converges to
+  // real rule satisfaction without wandering back to the arrangements the pull
+  // was there to rule out.
+  const guided = leastSquares(
+    home,
+    (x) => {
+      const r = rules(x);
+      for (let j = 0; j < x.length; j++) r.push(HOME_PULL * (x[j] - home[j]));
+      return r;
+    },
+    { tolerance: 1e-6, maxIterations: 200, primaryCount: constraints.length },
+  );
+  const fit = leastSquares(guided.x, rules, { tolerance: 1e-9, maxIterations: 100 });
+
+  const points = expand(fit.x);
+  const residual = residualOf(points, constraints);
+  // Same 1e-3 the panel and the canvas mark a losing rule with, so "the panel
+  // says these disagree" and "the solver says it is over-constrained" cannot
+  // come apart.
+  return { points, residual, iterations: fit.iterations, overConstrained: residual > 1e-3 };
+}
 /** How far each constraint is from being satisfied, parallel to `constraints`.
  *
  *  Every entry is a DISTANCE, so the numbers are comparable across kinds and
@@ -221,8 +193,28 @@ export function solveSketch(
  *  Collateral is possible: a third rule can be dragged off true by a conflict
  *  it is not part of, and it will appear in the set. Over-reporting is the
  *  safe direction -- every rule genuinely in the conflict is always present. */
-export function residualsOf(pts: Point[], constraints: Constraint[]): number[] {
+/** `scale` turns an angle into a distance. It defaults to the sketch's own
+ *  size, which is right for a reader asking "how wrong is this now" -- and
+ *  wrong for a SOLVER, which must be handed the size measured once at the
+ *  start. A scale recomputed from the points being solved shrinks as they do,
+ *  so shrinking the whole sketch makes every angle rule look better: measured
+ *  2026-09-01, the impossible triangle collapsed to a 0.00002-wide speck and
+ *  reported a residual of 2e-5. Freezing the scale removes the incentive. */
+export function residualsOf(
+  pts: Point[],
+  constraints: Constraint[],
+  scaleOverride?: number,
+): number[] {
   const n = pts.length;
+  // One size for the whole sketch, used to turn an angle into a distance.
+  // It is deliberately NOT the length of the edges being judged. Scaling an
+  // angle error by its own edge means a shorter edge reports a smaller error
+  // for the same wrongness -- harmless when a person reads it, and an open
+  // invitation to a solver, which will happily shrink an edge to nothing to
+  // make a rule it cannot satisfy look satisfied. Measured 2026-09-01: three
+  // mutually perpendicular edges of a triangle, which is impossible,
+  // collapsed to a single point at [13.25, 9.38] and reported every rule met.
+  const scale = scaleOverride ?? sketchScale(pts);
   return constraints.map((c) => {
     if (c.kind === 'lock') return 0;
     if (c.kind === 'horizontal' || c.kind === 'vertical') {
@@ -231,15 +223,31 @@ export function residualsOf(pts: Point[], constraints: Constraint[]): number[] {
       return Math.abs(pts[b][axis] - pts[a][axis]);
     }
     if (c.kind === 'length') return Math.abs(edgeLength(pts, c.edge) - c.value);
-    return residualOfPair(pts, c, n);
+    return residualOfPair(pts, c, n, scale);
   });
 }
 
 /** equal / parallel / perpendicular -- the kinds that name two edges. */
+/** The sketch's own size, as a distance: the diagonal of the box around its
+ *  corners. Never zero -- a degenerate sketch falls back to 1 so an angle
+ *  residual stays a real number instead of vanishing. */
+function sketchScale(pts: Point[]): number {
+  let minX = Infinity; let minY = Infinity; let maxX = -Infinity; let maxY = -Infinity;
+  for (const p of pts) {
+    if (p[0] < minX) minX = p[0];
+    if (p[0] > maxX) maxX = p[0];
+    if (p[1] < minY) minY = p[1];
+    if (p[1] > maxY) maxY = p[1];
+  }
+  const d = Math.hypot(maxX - minX, maxY - minY);
+  return Number.isFinite(d) && d > 1e-9 ? d : 1;
+}
+
 function residualOfPair(
   pts: Point[],
   c: Extract<Constraint, { other: number }>,
   n: number,
+  scale: number,
 ): number {
   if (c.kind === 'equal') {
     return Math.abs(edgeLength(pts, c.edge) - edgeLength(pts, c.other));
@@ -247,6 +255,16 @@ function residualOfPair(
   const angleA = edgeAngle(pts, c.edge, n);
   const angleB = edgeAngle(pts, c.other, n);
   // A zero-length edge has no direction, so there is nothing to be off by.
+  //
+  // This DID become a loophole when the solver changed: three mutually
+  // perpendicular edges of a triangle are impossible, and least squares found
+  // it could collapse all three corners onto one point and be told every rule
+  // was met. Reporting a full-size miss here was tried and is not the fix --
+  // it made the solver chase degenerate edges apart, moving corners a student
+  // never asked it to move. The fix is the frozen `scale` above: once shrinking
+  // the sketch stops shrinking the residual, collapsing buys nothing and the
+  // solver never goes there. Measured after that change: the same impossible
+  // triangle keeps 37.30-unit sides and reports itself over-constrained.
   if (angleA === null || angleB === null) return 0;
   const target = c.kind === 'perpendicular' ? Math.PI / 2 : 0;
   let diff = (angleB - angleA - target) % Math.PI;
@@ -256,7 +274,7 @@ function residualOfPair(
   // other kind's residual is a distance, and mixing units here would make the
   // fighting/overConstrained thresholds (both calibrated at 1e-3 in distance
   // units) meaningless.
-  return Math.abs(diff) * Math.max(edgeLength(pts, c.edge), edgeLength(pts, c.other));
+  return Math.abs(diff) * scale;
 }
 
 export function residualOf(pts: Point[], constraints: Constraint[]): number {
