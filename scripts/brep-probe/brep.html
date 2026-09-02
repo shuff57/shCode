@@ -87,7 +87,41 @@ try {
   step('1 — kernel');
   const t0 = performance.now();
   const initModule = (await import('./replicad_single.js')).default;
-  const oc = await initModule();
+
+  // THE BYTES CAN COME FROM THE PARENT, AND MEASUREMENT SAYS THEY MUST.
+  //
+  // The obvious way to hide the download is to prefetch the wasm from the page
+  // that hosts the preview, so it is cached before the frame asks. Measured
+  // 2026-09-02 at 1.5 Mbps: it does not work, and it is not neutral -- it is
+  // exactly twice as slow.
+  //
+  //   cold                 frame init 39.6 s   1 request   41.6 s total
+  //   warmed from parent   prefetch   39.3 s
+  //                        frame init 39.7 s   2 requests  80.8 s total
+  //
+  // This frame is sandboxed without allow-same-origin, so it is an OPAQUE
+  // origin, and the browser partitions its HTTP cache separately from the
+  // parent's. The parent's copy is invisible here. Every student would have
+  // paid for the kernel twice.
+  //
+  // So the parent fetches it and POSTS THE BYTES IN. Emscripten takes them
+  // directly as `wasmBinary` and never touches the network, which sidesteps the
+  // partition entirely rather than fighting it. The ArrayBuffer is transferred,
+  // not copied. Nothing about the sandbox changes: these are the bytes of a
+  // public static asset, and the frame still cannot reach /api as the student.
+  const handed = await new Promise((resolve) => {
+    // Nothing to wait for if we were opened directly rather than by a host.
+    if (window.parent === window) { resolve(null); return; }
+    const timer = setTimeout(() => resolve(null), 250);
+    window.addEventListener('message', (e) => {
+      if (!e.data || e.data.type !== 'brep-kernel-bytes') return;
+      clearTimeout(timer);
+      resolve(e.data.bytes);
+    }, { once: true });
+    try { parent.postMessage({ type: 'brep-kernel-please' }, '*'); } catch (err) { /* opaque */ }
+  });
+  report.handedBytes = handed ? handed.byteLength : 0;
+  const oc = await initModule(handed ? { wasmBinary: new Uint8Array(handed) } : {});
   const initMs = Math.round(performance.now() - t0);
   report.initMs = initMs;
   report.exports = Object.keys(oc).length;

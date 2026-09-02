@@ -3,6 +3,53 @@
 Ideas parked for later. Not scheduled, not specced. Newest first.
 Lives beside `log.jsonl` so it ships with the repo and travels between machines.
 
+## The kernel download is movable, but not by caching (2026-09-02)
+
+Measured, `scripts/measure-brep-warming.py`, 1.5 Mbps, cache cleared each run.
+
+| run | prefetch | frame init | total | wasm requests |
+| --- | --- | --- | --- | --- |
+| cold, no warming (control) | - | 39,857 ms | 41.8 s | 1 |
+| warmed from the parent page | 39,267 ms | 39,974 ms | **81.3 s** | **2** |
+| parent hands the bytes over | 39,333 ms | **434 ms** | 41.8 s | 1 |
+
+**Cache warming does not work and is not neutral -- it doubles the wait.** The
+preview iframe is sandboxed without `allow-same-origin`, so it is an opaque
+origin and the browser partitions its HTTP cache away from the parent's. The
+parent's copy is invisible to it; the student pays for 3.82 MB twice.
+
+**Handing the bytes across does work.** The parent fetches the kernel and posts
+the ArrayBuffer into the frame, which gives it to emscripten as `wasmBinary`.
+The frame never touches the network, so the partition never applies. Frame init
+drops from 39.9 s to 434 ms and the file crosses the wire once. The sandbox is
+unchanged -- these are the bytes of a public static asset, handed to a frame
+that still cannot reach `/api` as the student.
+
+### What this makes possible
+
+The download becomes schedulable rather than blocking. The total wall clock is
+unchanged in the harness only because it fetches serially to keep the
+comparison honest; in the app that fetch belongs behind something the student
+is already doing.
+
+The best place for it is the 2D sketcher. `lib/sketch-solve.ts` and
+`lib/least-squares.ts` are first-party JavaScript with no kernel at all, so a
+student can draw, constrain and watch geometry move INSTANTLY while the 3.82 MB
+arrives quietly. They pay 434 ms at the moment they extrude.
+
+This is also, incidentally, why JSketcher feels fast: checked 2026-09-02, it
+depends on `jsketcher-occ-engine` -- "prebuilt occ wasm", 34.58 MB unpacked --
+so it is the same kernel we use, in a larger package. Its 2D is JS and its 3D
+is OpenCascade, which is the split described above.
+
+### And there is no lighter B-rep kernel to switch to
+
+Checked the same day: `manifold-3d` is 2.63 MB and `three-bvh-csg` is 1.32 MB,
+and both are MESH libraries -- no addressable faces, no fillet on one edge, no
+selection surviving an edit. They are what JSCAD already gives. Every browser
+parametric modeller uses OpenCascade wasm, and our 3.82 MB gzipped build is
+smaller than any of them ship.
+
 ## A custom kernel build cuts the download 44% (2026-09-02)
 
 Built and measured, not estimated. `scripts/occt-bindings.yml` is the class
