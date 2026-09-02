@@ -100,6 +100,9 @@ export interface ApiDeps {
   tessellate?: (oc: Occt, shape: any, opts?: any) => { polygons: Array<{ vertices: number[][] }> } | null;
   /** lib/hull.ts convexHull. Needed only by hull. */
   convexHull?: (pts: Array<[number, number, number]>) => { triangles: Array<[number, number, number]> } | null;
+  /** lib/hull.ts convexHull2 -- the flat twin. Needed by hull() on 2D shapes
+   *  and by hullPoints2. */
+  convexHull2?: (pts: Array<[number, number]>) => { used: number[]; boundary: number[] } | null;
   /** Sampling density for hull. The mesh deflection IS the density -- there is
    *  no second dial, which is the measured answer to the question this was
    *  parked on. See lib/hull.ts. */
@@ -356,6 +359,165 @@ function makeColors(colorize: any) {
   };
 }
 
+// ---------------------------------------------------------------------------
+// path2 geometry, in plain arithmetic
+// ---------------------------------------------------------------------------
+//
+// JSCAD's path2 has no curve type at all -- appendArc and appendBezier are
+// documented as tessellating into "little straight steps" at append time, and
+// toPoints is expected to read those steps back out (the arc/bezier doc pages
+// print the point COUNT after appending one). So a path here is built the
+// same way: every append adds ordinary points to a flat list, and the wire
+// that finally goes to the kernel is a polygon through them, the same as
+// polygon() and rectangle() already build. That is a deliberate departure
+// from "build the real curve" elsewhere in this file -- the real curve is not
+// what toPoints or a downstream geom2.fromPoints could read a count or a
+// corner back out of.
+
+/**
+ * The circle through two endpoints with a given radius, one of the four SVG
+ * arc flags pick out -- JSCAD's path2.appendArc reads clockwise and large the
+ * same way an SVG arc command reads its sweep and large-arc flags. Two points
+ * and a radius do not name one curve; these two booleans are what choose
+ * among the two centres and, for each, the short or the long way round.
+ *
+ * Growing a too-small radius rather than refusing is JSCAD's own quiet
+ * behaviour, named on the appendArc doc page, and reproduced here rather than
+ * treated as a bug.
+ */
+function circularArcThrough(
+  s: [number, number], e: [number, number], radius: number,
+  clockwise: boolean, large: boolean,
+): { center: [number, number]; radius: number; startAngle: number; sweep: number } {
+  const x1p = (s[0] - e[0]) / 2;
+  const y1p = (s[1] - e[1]) / 2;
+  let r = Math.abs(radius);
+  const lam = (x1p * x1p + y1p * y1p) / (r * r);
+  if (lam > 1) r *= Math.sqrt(lam);
+  // clockwise, in this Y-up plane, is the NEGATIVE mathematical angle
+  // direction -- the opposite sense from an SVG sweep-flag of 1, which reads
+  // positive-angle on a Y-down canvas.
+  const fS = clockwise ? 0 : 1;
+  const fA = large ? 1 : 0;
+  const sq = x1p * x1p + y1p * y1p;
+  const signCE = fA === fS ? -1 : 1;
+  const co = sq > 0 ? signCE * Math.sqrt(Math.max(0, (r * r - sq) / sq)) : 0;
+  const cxp = co * y1p;
+  const cyp = -co * x1p;
+  const cx = cxp + (s[0] + e[0]) / 2;
+  const cy = cyp + (s[1] + e[1]) / 2;
+  const a1 = Math.atan2((s[1] - cy) / r, (s[0] - cx) / r);
+  const a2 = Math.atan2((e[1] - cy) / r, (e[0] - cx) / r);
+  let sweep = a2 - a1;
+  if (!fS && sweep > 0) sweep -= TAU;
+  if (fS && sweep < 0) sweep += TAU;
+  return { center: [cx, cy], radius: r, startAngle: a1, sweep };
+}
+
+/** `segments` straight steps along the arc from `s` to `e`, landing exactly
+ *  on `e` rather than accumulating the usual trig rounding. */
+function arcSteps(
+  s: [number, number], e: [number, number], radius: number,
+  clockwise: boolean, large: boolean, segments: number,
+): Array<[number, number]> {
+  const dx = e[0] - s[0]; const dy = e[1] - s[1];
+  if (Math.hypot(dx, dy) < 1e-12) return [[e[0], e[1]]];
+  const { center, radius: r, startAngle, sweep } = circularArcThrough(s, e, radius, clockwise, large);
+  const n = Math.max(1, Math.floor(segments));
+  const pts: Array<[number, number]> = [];
+  for (let i = 1; i <= n; i++) {
+    if (i === n) { pts.push([e[0], e[1]]); break; }
+    const a = startAngle + sweep * (i / n);
+    pts.push([center[0] + r * Math.cos(a), center[1] + r * Math.sin(a)]);
+  }
+  return pts;
+}
+
+/** One point on a Bezier curve, by De Casteljau's construction -- works for
+ *  any degree, which appendBezier needs: the doc's own example is cubic (one
+ *  start point plus three controlPoints), and nothing pins the degree at 3. */
+function bezierPoint(controls: Array<[number, number]>, t: number): [number, number] {
+  let pts = controls.map((p) => [p[0], p[1]] as [number, number]);
+  while (pts.length > 1) {
+    const next: Array<[number, number]> = [];
+    for (let i = 0; i < pts.length - 1; i++) {
+      next.push([
+        pts[i][0] + (pts[i + 1][0] - pts[i][0]) * t,
+        pts[i][1] + (pts[i + 1][1] - pts[i][1]) * t,
+      ]);
+    }
+    pts = next;
+  }
+  return pts[0];
+}
+
+/** `segments` straight steps along a Bezier that starts at `controls[0]` and
+ *  is pulled toward every point after it, landing exactly on the last one. */
+function bezierSteps(controls: Array<[number, number]>, segments: number): Array<[number, number]> {
+  const n = Math.max(1, Math.floor(segments));
+  const pts: Array<[number, number]> = [];
+  for (let i = 1; i <= n; i++) {
+    pts.push(i === n ? [controls[controls.length - 1][0], controls[controls.length - 1][1]]
+      : bezierPoint(controls, i / n));
+  }
+  return pts;
+}
+
+/**
+ * One face of an icosahedron, cut into T^2 small triangles by barycentric
+ * subdivision and pushed out onto a sphere of radius `r` -- geodesicSphere's
+ * whole geometry. T is frequency / 6 rounded down, which is JSCAD's own odd
+ * scaling (frequency 6 is an unsubdivided icosahedron, T = 1) and is applied
+ * by the caller, not here.
+ */
+function subdivideIcoFace(
+  a: [number, number, number], b: [number, number, number], c: [number, number, number],
+  T: number, r: number,
+): Array<[[number, number, number], [number, number, number], [number, number, number]]> {
+  const grid: Array<Array<[number, number, number]>> = [];
+  for (let i = 0; i <= T; i++) {
+    grid[i] = [];
+    for (let j = 0; j <= T - i; j++) {
+      const k = T - i - j;
+      const px = (a[0] * i + b[0] * j + c[0] * k) / T;
+      const py = (a[1] * i + b[1] * j + c[1] * k) / T;
+      const pz = (a[2] * i + b[2] * j + c[2] * k) / T;
+      const n = Math.hypot(px, py, pz) || 1;
+      grid[i][j] = [(px / n) * r, (py / n) * r, (pz / n) * r];
+    }
+  }
+  const tris: Array<[[number, number, number], [number, number, number], [number, number, number]]> = [];
+  for (let i = 0; i < T; i++) {
+    for (let j = 0; j < T - i; j++) {
+      tris.push([grid[i][j], grid[i + 1][j], grid[i][j + 1]]);
+      if (j < T - i - 1) tris.push([grid[i + 1][j], grid[i + 1][j + 1], grid[i][j + 1]]);
+    }
+  }
+  return tris;
+}
+
+/** The standard 12 icosahedron vertices, radius-1, and its 20 triangular
+ *  faces by index -- the seed geodesicSphere subdivides. */
+function icosahedron(): { verts: Array<[number, number, number]>; faces: Array<[number, number, number]> } {
+  const phi = (1 + Math.sqrt(5)) / 2;
+  const raw: Array<[number, number, number]> = [
+    [-1, phi, 0], [1, phi, 0], [-1, -phi, 0], [1, -phi, 0],
+    [0, -1, phi], [0, 1, phi], [0, -1, -phi], [0, 1, -phi],
+    [phi, 0, -1], [phi, 0, 1], [-phi, 0, -1], [-phi, 0, 1],
+  ];
+  const verts = raw.map(([x, y, z]) => {
+    const n = Math.hypot(x, y, z);
+    return [x / n, y / n, z / n] as [number, number, number];
+  });
+  const faces: Array<[number, number, number]> = [
+    [0, 11, 5], [0, 5, 1], [0, 1, 7], [0, 7, 10], [0, 10, 11],
+    [1, 5, 9], [5, 11, 4], [11, 10, 2], [10, 7, 6], [7, 1, 8],
+    [3, 9, 4], [3, 4, 2], [3, 2, 6], [3, 6, 8], [3, 8, 9],
+    [4, 9, 5], [2, 4, 11], [6, 2, 10], [8, 6, 7], [9, 8, 1],
+  ];
+  return { verts, faces };
+}
+
 export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
   const progress = () => new oc.Message_ProgressRange();
   const P = (x: number, y: number, z: number) => new oc.gp_Pnt(x, y, z);
@@ -485,6 +647,11 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
     star: ['vertices', 'outerRadius', 'innerRadius', 'center', 'startAngle', 'density'],
     extrudeLinear: ['height', 'twistAngle', 'twistSteps', 'repair'],
     extrudeRotate: ['angle', 'startAngle', 'overflow'],
+    roundedCuboid: ['size', 'center', 'roundRadius', 'segments'],
+    geodesicSphere: ['radius', 'center', 'frequency'],
+    arc: ['radius', 'startAngle', 'endAngle', 'center'],
+    expand: ['delta', 'corners', 'segments'],
+    extrudeFromSlices: ['numberOfSlices', 'callback'],
   };
 
   const refuseUnknown = (name: string, o: Record<string, any>) => {
@@ -551,6 +718,43 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
   };
   const faceFrom = (wire: any): any =>
     new oc.BRepBuilderAPI_MakeFace(wire, false).Face();
+
+  /**
+   * path2's whole representation: an open or closed WIRE built from a flat
+   * point list, with `.isClosed` and `.__points` attached to the embind
+   * object as plain JS properties.
+   *
+   * It has to be a real shape and not a wrapper, because path2.fromPoints has
+   * to come back out of translate() and mirrorX() usable -- "Three kinds of
+   * shape" returns one through translate() directly. A plain object would be
+   * silently dropped by every transform's `.filter(isShape)`. isClosed reads
+   * as a PROPERTY on the docs' own pages (`line.isClosed`), not a method, so
+   * it is set rather than left as the wire's own Closed() -- which agrees
+   * here but there is no reason to depend on that agreement.
+   */
+  const pathWire = (points: Array<[number, number]>, closed: boolean): any => {
+    const w = new oc.BRepBuilderAPI_MakeWire();
+    const n = closed ? points.length : points.length - 1;
+    for (let i = 0; i < n; i++) {
+      const a = points[i];
+      const b = points[(i + 1) % points.length];
+      w.Add(new oc.BRepBuilderAPI_MakeEdge(P(a[0], a[1], 0), P(b[0], b[1], 0)).Edge());
+    }
+    const wire = w.Wire();
+    (wire as any).isClosed = closed;
+    (wire as any).__points = points;
+    return wire;
+  };
+
+  /** A path with fewer than two points has no edge to build yet -- only
+   *  appendPoints/appendArc/appendBezier/close ever see one, never translate
+   *  or extrude, so it does not need to be a real shape until it has one. */
+  const pathValue = (points: Array<[number, number]>, closed: boolean): any =>
+    (points.length < 2 ? { __points: points, isClosed: closed } : pathWire(points, closed));
+
+  const isPathVal = (v: any): boolean => !!v && Array.isArray(v.__points);
+
+  const pathPoints = (v: any): Array<[number, number]> => v.__points.map((p: any): [number, number] => [p[0], p[1]]);
 
   const api: Api = { colorOf } as Api;
 
@@ -685,6 +889,68 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
     return sol.Solid();
   };
 
+  /**
+   * roundedCuboid: a box, then every one of its 12 edges filleted at once.
+   *
+   * JSCAD has no fillet of its own -- see the expansions chapter -- and gets a
+   * rounded box a different way, by building the rounded faces directly. This
+   * kernel already HAS a real edge fillet (lib/topo-history.ts, for the model
+   * editor's own Bevel feature), so the honest route is to build the sharp
+   * box this file already knows how to build and fillet every edge of it,
+   * rather than inventing a second construction.
+   */
+  api.roundedCuboid = (...args: any[]) => {
+    const o = opts(args, ['size']); refuseUnknown('roundedCuboid', o);
+    const s: Vec3 = o.size || [2, 2, 2];
+    const c = centre(o);
+    const r = o.roundRadius ?? 0.2;
+    const sharp = api.cuboid({ size: s, center: c });
+    const edges = explore(sharp, oc.TopAbs_ShapeEnum.TopAbs_EDGE);
+    const mk = new oc.BRepFilletAPI_MakeFillet(sharp, oc.ChFi3d_FilletShape.ChFi3d_Rational);
+    for (const e of edges) mk.Add(r, oc.TopoDS.Edge(e));
+    mk.Build(progress());
+    if (mk.IsDone && !mk.IsDone()) {
+      throw new Error(
+        `roundedCuboid: roundRadius ${r} is too big for a ${s[0]} x ${s[1]} x ${s[2]} box.`,
+      );
+    }
+    return mk.Shape();
+  };
+
+  /**
+   * geodesicSphere: an icosahedron, subdivided into small triangles and
+   * pushed out onto a sphere -- a faceted ball whose facets ARE its geometry,
+   * the same reason polyhedron() above is a recipe rather than an
+   * approximation of anything.
+   *
+   * frequency is JSCAD's own odd scaling: 6 is an unsubdivided icosahedron
+   * (20 triangles), and it rounds DOWN to the nearest multiple of six before
+   * that -- 12 and 17 both give T = 2 and the same 80 triangles. `center` is
+   * dropped rather than refused, matching the doc page's own observation that
+   * the library ignores it too.
+   */
+  api.geodesicSphere = (...args: any[]) => {
+    const o = opts(args, ['radius']); refuseUnknown('geodesicSphere', o);
+    const r = o.radius ?? 1;
+    const T = Math.max(1, Math.floor((o.frequency ?? 6) / 6));
+    const { verts, faces } = icosahedron();
+    const sew = new oc.BRepBuilderAPI_Sewing(1e-6, true, true, true, false);
+    for (const [ia, ib, ic] of faces) {
+      for (const tri of subdivideIcoFace(verts[ia], verts[ib], verts[ic], T, r)) {
+        const w = new oc.BRepBuilderAPI_MakeWire();
+        for (let k = 0; k < 3; k++) {
+          const a = tri[k]; const b = tri[(k + 1) % 3];
+          w.Add(new oc.BRepBuilderAPI_MakeEdge(P(a[0], a[1], a[2]), P(b[0], b[1], b[2])).Edge());
+        }
+        sew.Add(faceFrom(w.Wire()));
+      }
+    }
+    sew.Perform(progress());
+    const sol = new oc.BRepBuilderAPI_MakeSolid();
+    sol.Add(oc.TopoDS.Shell(sew.SewedShape()));
+    return sol.Solid();
+  };
+
   // ---- primitives, 2D ------------------------------------------------------
 
   api.rectangle = (...args: any[]) => {
@@ -768,12 +1034,77 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
     return faceFrom(wireFrom(pts));
   };
 
+  /**
+   * arc: a trimmed gp_Circ -- a real curve, not a tessellated path2. Open
+   * paths ARE ordinary edges on a B-rep, which is the whole reason it is
+   * exact rather than a recipe. Called with no options it draws a whole
+   * circle, which is closed the same way fromPoints({closed:true}) is.
+   */
+  api.arc = (...args: any[]) => {
+    const o = opts(args, ['radius']); refuseUnknown('arc', o);
+    const r = o.radius ?? 1;
+    const c = centre(o);
+    const start = o.startAngle ?? 0;
+    const end = o.endAngle ?? TAU;
+    const full = Math.abs(end - start) >= TAU - 1e-9;
+    const circ = new oc.gp_Circ(new oc.gp_Ax2(P(c[0], c[1], 0), D(0, 0, 1)), r);
+    const edge = full
+      ? new oc.BRepBuilderAPI_MakeEdge(circ).Edge()
+      : new oc.BRepBuilderAPI_MakeEdge(circ, start, end).Edge();
+    const w = new oc.BRepBuilderAPI_MakeWire();
+    w.Add(edge);
+    const wire = w.Wire();
+    (wire as any).isClosed = full;
+    return wire;
+  };
+
+  /** line: an edge between points, or several joined end to end -- a path,
+   *  the same as arc(). Bare array only; JSCAD's line takes no options
+   *  object at all. */
+  api.line = (points: any) => {
+    if (!Array.isArray(points)) throw new Error('points must be an array');
+    return pathWire(points.map((p: any): [number, number] => [p[0], p[1]]), false);
+  };
+
   // ---- extrusions ----------------------------------------------------------
+
+  /**
+   * A profile ready for BRepPrimAPI_MakePrism: an ordinary flat shape passed
+   * straight through, a closed path2 wire turned into a face first (a bare
+   * wire prisms into a hollow SHELL, not a solid -- measured, 0 volume --
+   * because nothing tells the kernel which side is inside), an open path
+   * refused with JSCAD's own wording, and a solid refused before it ever
+   * reaches the kernel.
+   *
+   * That last refusal is the one this file did not use to make. Handed a
+   * solid, extrudeLinear used to reach BRepPrimAPI_MakePrism and let OpenCascade
+   * throw -- a raw WebAssembly.Exception that decodes to "Solids are not
+   * Processed" and prints as [object WebAssembly.Exception] with no .message
+   * and no stack. The real library is silent instead: it hands the same solid
+   * back unchanged, which is its own documented trap ("Extruding a solid does
+   * nothing"). Neither answer is available here -- there is no sensible
+   * "extrude a solid" result to hand back -- so the type is checked before
+   * the call, and the refusal reads the way reSHape's own extrudeLinear wrapper
+   * (public/reshape/reshape.js) already reads for the same mistake.
+   */
+  const extrudeProfile = (f: any): any => {
+    if (isPathVal(f)) {
+      if (!f.isClosed) throw new Error('extruded path must be closed');
+      return faceFrom(f);
+    }
+    if (isSolid(f)) {
+      throw new Error(
+        'extrudeLinear needs a flat 2D shape -- you gave it a solid. Build the flat '
+        + 'outline first (rectangle, circle, or a boolean of them), then extrudeLinear that.',
+      );
+    }
+    return f;
+  };
 
   api.extrudeLinear = (...args: any[]) => {
     const o = isOpts(args[0]) ? args[0] : { height: args[0] };
     refuseUnknown('extrudeLinear', o);
-    const shapes = args.filter(isShape);
+    const shapes = args.filter((a: any) => isShape(a) || isPathVal(a)).map(extrudeProfile);
     const h = o.height ?? 1;
     const made = shapes.map((f: any) =>
       new oc.BRepPrimAPI_MakePrism(f, V(0, 0, h), false, true).Shape());
@@ -785,6 +1116,30 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
     refuseUnknown('extrudeRotate', o);
     const shape = args.find(isShape);
     const angle = o.angle ?? TAU;
+    // THE PROFILE MAY NOT CROSS x = 0, and this is a check rather than a
+    // caught exception on purpose. JSCAD's own answer to a straddling profile
+    // is to silently discard whatever crossed the line -- "Keep the profile
+    // out of the middle" teaches exactly that, with no error and nothing in
+    // the viewer to say so. OpenCascade has no such discard: MakeRevol on a
+    // self-intersecting swept surface fails outright, decoding to
+    // "StdFail_NotDone: BRep_API: command not done", a raw WebAssembly.Exception
+    // with no .message and no stack. Since the bounding box already answers
+    // "does any point cross the axis" before the kernel is ever called, the
+    // clear refusal is a type check, not a caught exception.
+    // A profile drawn touching x = 0 -- the basic extrudeRotate example does
+    // this on purpose -- measures a hair negative here (BRepBndLib's own
+    // arithmetic, not the 1e-7 padding bounds() already strips with SetGap(0)).
+    // -1e-4 catches a real crossing, which in every documented example is at
+    // least whole millimetres, while leaving a profile that only touches alone.
+    const [lo] = bounds(shape);
+    if (lo[0] < -1e-4) {
+      throw new Error(
+        `extrudeRotate revolves the profile around x = 0, and this one reaches x = `
+        + `${lo[0].toFixed(3)}. Move it clear of the line first (see "Keep the profile `
+        + 'out of the middle") -- this kernel refuses a crossing profile rather than '
+        + 'silently discarding the part that crosses.',
+      );
+    }
     // MEASURED, not assumed. JSCAD reads the flat profile as a cross-section in
     // the half-plane: its X is the RADIUS and its Y is the HEIGHT, and the sweep
     // is about world Z. A rectangle at x 10..20, y -15..15 comes back spanning
@@ -800,6 +1155,108 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
     return new oc.BRepPrimAPI_MakeRevol(
       upright, new oc.gp_Ax1(P(0, 0, 0), D(0, 0, 1)), angle, true,
     ).Shape();
+  };
+
+  /**
+   * extrudeFromSlices: a loft between hand-drawn cross-sections, RULED rather
+   * than smooth. scripts/test-occt-adapter.mjs already proved this exact
+   * construction (a square frustum, measured against h/3(A1+A2+sqrt(A1A2)));
+   * this is that proof wired up to the callback the docs teach, plus
+   * extrusions.slice, the one sub-namespace this section needs a line of its
+   * own to reach.
+   *
+   * Ruled rather than smooth (true rather than false in the constructor's
+   * second place) on purpose: a smooth loft would silently reinterpret a
+   * twisted callback instead of refusing it, and the docs' own "Which
+   * extrusion do I want?" page is explicit that this is the narrow tool for
+   * when the cross-section changes, not a general blend.
+   */
+  api.extrudeFromSlices = (...args: any[]) => {
+    const o = isOpts(args[0]) ? args[0] : {};
+    refuseUnknown('extrudeFromSlices', o);
+    const base = args.find(isShape);
+    if (!base) {
+      throw new Error(
+        'extrudeFromSlices needs the starting shape as its second argument, '
+        + 'even when the callback ignores it.',
+      );
+    }
+    const n = o.numberOfSlices ?? 2;
+    if (n < 2) throw new Error('extrudeFromSlices needs at least 2 slices.');
+    if (typeof o.callback !== 'function') {
+      throw new Error('extrudeFromSlices needs a callback that returns a slice.');
+    }
+    const mk = new oc.BRepOffsetAPI_ThruSections(true, true, 1e-6);
+    for (let i = 0; i < n; i++) {
+      const pts: number[][] = o.callback(i / (n - 1));
+      const w = new oc.BRepBuilderAPI_MakeWire();
+      for (let k = 0; k < pts.length; k++) {
+        const a = pts[k]; const b = pts[(k + 1) % pts.length];
+        w.Add(new oc.BRepBuilderAPI_MakeEdge(P(a[0], a[1], a[2]), P(b[0], b[1], b[2])).Edge());
+      }
+      mk.AddWire(w.Wire());
+    }
+    mk.Build(progress());
+    return mk.Shape();
+  };
+
+  /**
+   * project: the shadow a solid casts straight down onto the grid.
+   *
+   * Not HLRBRep_Algo's edge-soup, which still needs the visible outline edges
+   * matched back into loops (an outer boundary AND the right inner ones for
+   * holes) before there is a face to hand back. Tessellating the solid and
+   * unioning every triangle's flattened footprint gets the same answer by a
+   * route this file already owns: a vertical wall's own triangles are
+   * edge-on to the view and collapse to zero area when flattened, so they
+   * drop out on their own, and a hole that goes all the way through has no
+   * triangle at all over it -- which is exactly "stays a hole" and
+   * "overhangs get filled in" without either rule being written down anywhere.
+   */
+  /**
+   * Fuse a list of faces pairwise in a balanced tree rather than one long
+   * chain. MEASURED on the torus doc page: a chain of ~1000 flattened
+   * triangles never finished inside several minutes, because every fuse
+   * grows the ONE accumulating shape a chain keeps re-intersecting against.
+   * A tree keeps every fuse between two comparably-small shapes -- the same
+   * project() page finishes in under 4 seconds this way.
+   */
+  const fuseTree = (shapes: any[]): any => {
+    if (shapes.length === 1) return shapes[0];
+    const mid = Math.floor(shapes.length / 2);
+    const a = fuseTree(shapes.slice(0, mid));
+    const b = fuseTree(shapes.slice(mid));
+    const op = new oc.BRepAlgoAPI_Fuse(a, b, progress());
+    op.Build(progress());
+    return op.Shape();
+  };
+
+  api.project = (...args: any[]) => {
+    const o = isOpts(args[0]) ? args[0] : {};
+    refuseUnknown('project', o);
+    const shape = args.find(isShape);
+    if (!shape) throw new Error('project needs a solid to project.');
+    if (!deps.tessellate) throw new Error('project needs the mesh bridge (tessellate) passed to createApi.');
+    // A coarser ANGULAR tolerance than the render mesh uses -- MEASURED that
+    // deflection alone does nothing for a curved shape like a torus (5040
+    // triangles from 0.05 all the way to 3.0), because angular is what a
+    // periodic curved surface's facet count actually answers to. The outline
+    // only needs to be recognisably the right shape, not render-quality.
+    const g = deps.tessellate(oc, shape, { deflection: deps.deflection ?? 0.05, angular: 0.6 });
+    if (!g) throw new Error('project needs a shape with a drawable surface.');
+    const faces: any[] = [];
+    for (const poly of g.polygons) {
+      const v = poly.vertices;
+      // Twice the signed area of the flattened triangle. Zero for a wall
+      // edge-on to the view -- a degenerate loop MakeFace would refuse.
+      const area2 = (v[1][0] - v[0][0]) * (v[2][1] - v[0][1])
+        - (v[2][0] - v[0][0]) * (v[1][1] - v[0][1]);
+      if (Math.abs(area2) < 1e-9) continue;
+      const pts2: Array<[number, number]> = v.map((p: number[]) => [p[0], p[1]]);
+      faces.push(faceFrom(wireFrom(pts2)));
+    }
+    if (!faces.length) throw new Error('project found nothing to project -- every triangle was edge-on to the view.');
+    return fuseTree(faces);
   };
 
   // ---- booleans ------------------------------------------------------------
@@ -932,12 +1389,56 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
   // two-sphere example, the default lands 0.475% off the exact capsule volume
   // against 1.66% for the 24-segment mesh the docs ship today.
   api.hull = (...args: any[]) => {
-    if (!deps.tessellate || !deps.convexHull) {
-      throw new Error('hull needs tessellate and convexHull passed to createApi');
+    const shapes = args.flat().filter(isShape);
+    // "Both sides have to match": hull refuses a mix of flat and solid the
+    // same way union/subtract/intersect do, in the library's own wording.
+    // MEASURED gap before this existed: nothing stopped a flat shape's z = 0
+    // points and a solid's real ones from being thrown into the same 3D hull
+    // together, which would have built A shape, just not one anyone asked for.
+    const anySolid = shapes.some(isSolid);
+    const anyFlat = shapes.some((s: any) => !isSolid(s));
+    if (anySolid && anyFlat) {
+      throw new Error('hull: only hulls of the same type are supported');
+    }
+    if (!deps.tessellate) {
+      throw new Error('hull needs tessellate passed to createApi');
+    }
+    if (anyFlat) {
+      // The 2D case: every input is a flat face, and the hull of flat things
+      // is flat. Tessellating a face still works -- BRepMesh_IncrementalMesh
+      // does not care that the shape it is meshing has no volume -- so the
+      // same sample-then-hull recipe applies, one dimension down.
+      if (!deps.convexHull2) throw new Error('hull needs convexHull2 passed to createApi');
+      const pts2: Array<[number, number]> = [];
+      const seen2 = new Set<string>();
+      for (const s of shapes) {
+        const g = deps.tessellate(oc, s, { deflection: deps.deflection ?? 0.05 });
+        if (!g) continue;
+        for (const poly of g.polygons) {
+          for (const v of poly.vertices) {
+            const k = `${v[0].toFixed(6)},${v[1].toFixed(6)}`;
+            if (seen2.has(k)) continue;
+            seen2.add(k);
+            pts2.push([v[0], v[1]]);
+          }
+        }
+      }
+      const h2 = deps.convexHull2(pts2);
+      if (!h2) throw new Error('those shapes are flat, so their hull would have no thickness');
+      const w = new oc.BRepBuilderAPI_MakeWire();
+      for (let i = 0; i < h2.boundary.length; i++) {
+        const a = pts2[h2.boundary[i]];
+        const b = pts2[h2.boundary[(i + 1) % h2.boundary.length]];
+        w.Add(new oc.BRepBuilderAPI_MakeEdge(P(a[0], a[1], 0), P(b[0], b[1], 0)).Edge());
+      }
+      return faceFrom(w.Wire());
+    }
+    if (!deps.convexHull) {
+      throw new Error('hull needs convexHull passed to createApi');
     }
     const pts: Array<[number, number, number]> = [];
     const seen = new Set<string>();
-    for (const s of args.flat().filter(isShape)) {
+    for (const s of shapes) {
       const g = deps.tessellate(oc, s, { deflection: deps.deflection ?? 0.05 });
       if (!g) continue;
       for (const poly of g.polygons) {
@@ -973,6 +1474,17 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
     const links = [];
     for (let i = 0; i + 1 < shapes.length; i++) links.push(api.hull(shapes[i], shapes[i + 1]));
     return api.union(...links);
+  };
+
+  /** hullPoints2: the 2D hull one level down from hull() -- points in,
+   *  points out, no shape at either end. Returns the boundary in the winding
+   *  convexHull2 already produced, which is what geom2.fromPoints needs. */
+  api.hullPoints2 = (points: any[]) => {
+    if (!deps.convexHull2) throw new Error('hullPoints2 needs convexHull2 passed to createApi');
+    const pts2: Array<[number, number]> = points.map((p: any) => [p[0], p[1]]);
+    const h2 = deps.convexHull2(pts2);
+    if (!h2) return [];
+    return h2.boundary.map((i: number) => [pts2[i][0], pts2[i][1]]);
   };
 
   // ---- measurements --------------------------------------------------------
@@ -1012,6 +1524,19 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
     oc.BRepGProp.VolumeProperties(s, g, true, false, false);
     const c = g.CentreOfMass();
     return [c.X(), c.Y(), c.Z()];
+  };
+
+  /**
+   * measureEpsilon: a margin sized to the shape, for comparing two measured
+   * numbers without ===. MEASURED against the doc's own worked example: a
+   * 30x20x10 brick gives (30+20+10)/3 * 1e-5 = 0.0002, which is the exact
+   * figure "when 30 is not 30" states. 1e-5 is the same EPS api.constants
+   * already carries.
+   */
+  api.measureEpsilon = (s: any) => {
+    const [lo, hi] = bounds(s);
+    const sum = (hi[0] - lo[0]) + (hi[1] - lo[1]) + (hi[2] - lo[2]);
+    return (1e-5 * sum) / 3;
   };
 
   // ---- colour, which the kernel does not carry -----------------------------
@@ -1112,17 +1637,23 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
 
   api.primitives = ns(['cuboid', 'cube', 'sphere', 'cylinder', 'cylinderElliptic',
     'torus', 'polyhedron', 'rectangle', 'square', 'circle', 'ellipse', 'polygon',
-    'star', 'triangle']);
+    'star', 'triangle', 'roundedCuboid', 'geodesicSphere', 'arc', 'line']);
   api.transforms = ns(['translate', 'translateX', 'translateY', 'translateZ',
     'rotate', 'rotateX', 'rotateY', 'rotateZ', 'scale', 'mirrorX', 'mirrorY',
     'mirrorZ', 'center', 'centerX', 'centerY', 'centerZ', 'align']);
   api.booleans = ns(['union', 'subtract', 'intersect', 'scission']);
-  api.extrusions = ns(['extrudeLinear', 'extrudeRotate']);
+  api.extrusions = ns(['extrudeLinear', 'extrudeRotate', 'extrudeFromSlices', 'project']);
+  api.extrusions.slice = {
+    // extrusions.slice.fromPoints: a slice is just its point list, one level
+    // down from extrusions the way the docs describe reaching it -- there is
+    // no separate slice type for extrudeFromSlices to unwrap.
+    fromPoints: (points: any[]) => points.map((p: any) => [p[0], p[1], p[2]]),
+  };
   api.measurements = ns(['measureVolume', 'measureArea', 'measureBoundingBox',
     'measureDimensions', 'measureCenter', 'measureCenterOfMass',
     'measureBoundingSphere', 'measureAggregateVolume', 'measureAggregateArea',
-    'measureAggregateBoundingBox']);
-  api.hulls = ns(['hull', 'hullChain']);
+    'measureAggregateBoundingBox', 'measureEpsilon']);
+  api.hulls = ns(['hull', 'hullChain', 'hullPoints2']);
   api.utils = ns(['degToRad', 'radToDeg', 'flatten', 'areAllShapesTheSameType',
     'insertSorted', 'radiusToSegments']);
   api.colors = colorApi;
@@ -1151,14 +1682,82 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
         const g = deps.tessellate(oc, v, { deflection: deps.deflection ?? 0.05 });
         return g ? g.polygons : [];
       },
+      /**
+       * geom3.create: the bag of faces toPolygons hands out, sewn back into a
+       * solid -- same recipe as polyhedron() and hull() above, from triangles
+       * instead of indexed points. Per-face colour (the whole point of the
+       * doc page this exists for) does not survive: colorOf is keyed to a
+       * shape, not to one of its faces, and there is nowhere else on a
+       * B-rep to keep it. The rebuilt solid is real and measures the same
+       * either way; only the paint is the divergence.
+       */
+      create: (polygons: any[]) => {
+        const sew = new oc.BRepBuilderAPI_Sewing(1e-6, true, true, true, false);
+        for (const poly of polygons) {
+          const verts: number[][] = poly.vertices;
+          const w = new oc.BRepBuilderAPI_MakeWire();
+          for (let i = 0; i < verts.length; i++) {
+            const a = verts[i]; const b = verts[(i + 1) % verts.length];
+            w.Add(new oc.BRepBuilderAPI_MakeEdge(P(a[0], a[1], a[2]), P(b[0], b[1], b[2])).Edge());
+          }
+          sew.Add(faceFrom(w.Wire()));
+        }
+        sew.Perform(progress());
+        const sol = new oc.BRepBuilderAPI_MakeSolid();
+        sol.Add(oc.TopoDS.Shell(sew.SewedShape()));
+        return sol.Solid();
+      },
     },
     geom2: {
       isA: (v: any) => isShape(v) && !isSolid(v)
         && explore(v, oc.TopAbs_ShapeEnum.TopAbs_FACE).length > 0,
+      /** geom2.fromPoints: corners straight into a face -- the same
+       *  construction rectangle/polygon already use, open here to whatever
+       *  list a path (or a hand-rolled hull) handed back. */
+      fromPoints: (points: any[]) => {
+        if (points.length < 3) throw new Error('geom2.fromPoints needs at least 3 corners.');
+        return faceFrom(wireFrom(points.map((p: any): [number, number] => [p[0], p[1]])));
+      },
     },
     path2: {
       isA: (v: any) => isShape(v) && !isSolid(v)
         && explore(v, oc.TopAbs_ShapeEnum.TopAbs_FACE).length === 0,
+      /** path2.fromPoints: the whole of path2's construction -- see the
+       *  banner above pathWire for why a path is a real wire and not a
+       *  wrapper around a point list. */
+      fromPoints: (o: any, points: any[]) =>
+        pathValue(points.map((p: any): [number, number] => [p[0], p[1]]), !!(o && o.closed)),
+      toPoints: (path: any): Array<[number, number]> => pathPoints(path),
+      appendPoints: (newPoints: any[], path: any): any => {
+        if (path.isClosed) throw new Error('Cannot concatenate to a closed path');
+        return pathValue([...pathPoints(path), ...newPoints.map((p: any): [number, number] => [p[0], p[1]])], false);
+      },
+      appendArc: (o: any, path: any): any => {
+        if (path.isClosed) throw new Error('Cannot concatenate to a closed path');
+        const pts = pathPoints(path);
+        const s = pts[pts.length - 1];
+        const e: [number, number] = [o.endpoint[0], o.endpoint[1]];
+        const rx = Array.isArray(o.radius) ? o.radius[0] : o.radius;
+        const ry = Array.isArray(o.radius) ? o.radius[1] : o.radius;
+        if (Math.abs(rx - ry) > 1e-9) {
+          throw new Error(
+            'appendArc: an elliptical arc (unequal radius[0] and radius[1]) is not '
+            + 'supported on this kernel -- use equal radii.',
+          );
+        }
+        const steps = arcSteps(s, e, rx, !!o.clockwise, !!o.large, o.segments ?? 16);
+        return pathValue([...pts, ...steps], false);
+      },
+      appendBezier: (o: any, path: any): any => {
+        if (path.isClosed) throw new Error('Cannot concatenate to a closed path');
+        const pts = pathPoints(path);
+        const s = pts[pts.length - 1];
+        const controls: Array<[number, number]> = [s, ...o.controlPoints.map((p: any): [number, number] => [p[0], p[1]])];
+        const steps = bezierSteps(controls, o.segments ?? 16);
+        return pathValue([...pts, ...steps], false);
+      },
+      close: (path: any): any => (path.isClosed ? path : pathValue(pathPoints(path), true)),
+      reverse: (path: any): any => pathValue(pathPoints(path).reverse(), path.isClosed),
     },
   };
 
@@ -1229,6 +1828,33 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
     return made.length === 1 ? made[0] : made;
   };
 
+  /**
+   * The single Face or Wire BRepOffsetAPI_MakeOffset actually accepts.
+   *
+   * MEASURED: offset({corners:'round'}, union(rectangle(60,20), rectangle(20,60)))
+   * threw "Expected null or instance of TopoDS_Wire, got an instance of
+   * TopoDS_Shape". A union of two faces comes back a Compound -- five
+   * coplanar sub-faces the boolean never merged, not the single outline it
+   * looks like -- and embind will not downcast a Compound to the Face or Wire
+   * the constructor wants, whatever is actually inside it. Unifying the
+   * coplanar faces first is the same fix retessellate gives a hand-built
+   * solid; here it is required just to get a shape the offset call can hold.
+   */
+  const asOffsetSpine = (s: any): any => {
+    const t = s.ShapeType();
+    if (t === oc.TopAbs_ShapeEnum.TopAbs_FACE || t === oc.TopAbs_ShapeEnum.TopAbs_WIRE) return s;
+    const unify = new oc.ShapeUpgrade_UnifySameDomain(s, true, true, false);
+    unify.Build();
+    const faces = explore(unify.Shape(), oc.TopAbs_ShapeEnum.TopAbs_FACE);
+    if (faces.length !== 1) {
+      throw new Error(
+        `offset needs a single flat outline; this shape has ${faces.length} separate `
+        + 'faces in it that a union did not merge into one.',
+      );
+    }
+    return oc.TopoDS.Face(faces[0]);
+  };
+
   /** offset, on the real curve rather than on a polyline. */
   api.offset = (...args: any[]) => {
     const o = isOpts(args[0]) ? args[0] : { delta: args[0] };
@@ -1240,7 +1866,7 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
       ? oc.GeomAbs_JoinType.GeomAbs_Arc
       : oc.GeomAbs_JoinType.GeomAbs_Intersection;
     const made = args.filter(isShape).map((f: any) => {
-      const mk = new oc.BRepOffsetAPI_MakeOffset(f, join, false);
+      const mk = new oc.BRepOffsetAPI_MakeOffset(asOffsetSpine(f), join, false);
       mk.Perform(o.delta ?? 1, 0);
       return faceFrom(oc.TopoDS.Wire(mk.Shape()));
     });
@@ -1256,13 +1882,71 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
     // outline gives a bounding box 48 x 38, so the wall runs `size` OUTWARD and
     // `size` inward -- it is 2 * size thick, not size. Reading it as a
     // half-offset built walls 17% too thin.
-    const made = args.filter(isShape).map((f: any) => {
+    const made = args.filter((a: any) => isShape(a) || isPathVal(a)).map((f: any) => {
+      // An OPEN path has no inside to hollow out -- it has zero width to
+      // begin with. MEASURED: offsetting it both ways and subtracting built
+      // an empty shape (Bnd_Box is void on the result) every time, because
+      // the "inward" offset of a zero-width spine has nothing to shrink into.
+      // A single outward offset already IS the whole cross-section: a
+      // racetrack running `size` out from the line on every side, ends
+      // included, which offset's own isOpenResult=false constructs in one
+      // call (see asOffsetSpine's comment for why that spine can be a bare
+      // Wire). A closed path still has an inside, and the ring logic below
+      // is unchanged for it.
+      //
+      // MEASURED, and not yet closed: the racetrack this builds runs 6-7%
+      // over JSCAD's own extrudeRectangular on a multi-segment open path (a
+      // V and a zigzag, both docs pages) -- correct in shape and direction,
+      // wrong by more than the usual mesh-vs-exact margin, and unmoved by
+      // switching corners between 'edge' and 'round'. The bounding box
+      // agrees to within 2% on both, so the divergence is at the INTERIOR
+      // joints, not the outline's extent -- worth a second look, not yet
+      // found.
+      if (isPathVal(f) && !f.isClosed) {
+        const outline = api.offset({ delta: size }, f);
+        return new oc.BRepPrimAPI_MakePrism(outline, V(0, 0, height), false, true).Shape();
+      }
       const outer = api.offset({ delta: size }, f);
       const inner = api.offset({ delta: -size }, f);
       return api.subtract(
         new oc.BRepPrimAPI_MakePrism(outer, V(0, 0, height), false, true).Shape(),
         new oc.BRepPrimAPI_MakePrism(inner, V(0, 0, height), false, true).Shape(),
       );
+    });
+    return made.length === 1 ? made[0] : made;
+  };
+  // Namespaced here rather than in the ns() list above: that list runs before
+  // this function exists yet, so ns() would find nothing to copy and quietly
+  // drop it. "extrusions.extrudeRectangular is not a function" was exactly
+  // that -- the bare name worked, the namespaced one silently did not.
+  api.extrusions.extrudeRectangular = api.extrudeRectangular;
+
+  /**
+   * expand: offset's counterpart for a solid -- every face slides outward by
+   * delta and every edge and corner comes back rounded. Round is the only
+   * corner style a 3D offset has, which is refused by name here the same way
+   * JSCAD refuses it, and a negative delta is refused too: on a solid, expand
+   * only grows.
+   */
+  api.expand = (...args: any[]) => {
+    const o = isOpts(args[0]) ? args[0] : { delta: args[0] };
+    refuseUnknown('expand', o);
+    const corners = o.corners ?? 'round';
+    if (corners !== 'round') {
+      throw new Error('corners must be "round" for 3D geometries');
+    }
+    const delta = o.delta ?? 1;
+    if (delta < 0) {
+      throw new Error('expand only grows a solid; a negative delta is not supported here.');
+    }
+    const made = args.filter(isShape).map((s: any) => {
+      if (!isSolid(s)) throw new Error('expand needs a solid; offset takes a flat outline instead.');
+      const mk = new oc.BRepOffsetAPI_MakeOffsetShape();
+      mk.PerformByJoin(
+        s, delta, 1e-4, oc.BRepOffset_Mode.BRepOffset_Skin, false, false,
+        oc.GeomAbs_JoinType.GeomAbs_Arc, false,
+      );
+      return mk.Shape();
     });
     return made.length === 1 ? made[0] : made;
   };
