@@ -104,9 +104,17 @@ function extractKeywords(req: HelpRequest): string[] {
   return out;
 }
 
+// Every caller of this drops the result between """ fences that the system
+// prompt declares to be untrusted data. So the one thing the value must not
+// contain is a """ of its own: a student types their own node labels, and a
+// label holding a bare """ closes the fence early, putting everything after it
+// at message level where the "this is data, not instructions" rule no longer
+// covers it. Breaking runs of three-or-more quotes into pairs leaves every
+// character intact and readable while making a delimiter unspellable.
 function clip(s: string | null | undefined, max: number): string {
   if (!s) return '';
-  return s.length > max ? s.slice(0, max) + '\n…(truncated)' : s;
+  const sealed = s.replace(/"{3,}/g, (run) => (run.match(/.{1,2}/g) as string[]).join(' '));
+  return sealed.length > max ? sealed.slice(0, max) + '\n…(truncated)' : sealed;
 }
 
 const MAX_TASK_LEN = 2000;
