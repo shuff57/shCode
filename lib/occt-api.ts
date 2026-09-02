@@ -47,8 +47,14 @@ export type Vec3 = [number, number, number];
  *  which classifies `colorize` as ours for exactly this reason. */
 export interface Api {
   [name: string]: any;
-  /** shape -> [r, g, b, a], for whatever draws the result. */
-  colors: Map<any, number[]>;
+  /**
+   * shape -> [r, g, b, a], for whatever draws the result.
+   *
+   * NOT called `colors`: that name is a NAMESPACE the documented examples use
+   * (`colors.colorize`, `colors.hexToRgb`), and putting a Map there would
+   * shadow it with something that has no methods at all.
+   */
+  colorOf: Map<any, number[]>;
 }
 
 const TAU = Math.PI * 2;
@@ -71,6 +77,256 @@ export interface ApiDeps {
   deflection?: number;
 }
 
+// ---------------------------------------------------------------------------
+// THE REST OF THE SURFACE: maths, colour, and the namespaced forms
+// ---------------------------------------------------------------------------
+//
+// Measured 2026-09-02: of the 68 documented pages that could not run on this
+// layer, most were not blocked by geometry at all. Thirty-three reached for a
+// NAMESPACE -- `primitives.sphere`, `maths.vec3`, `geometries.geom3` -- which
+// the shim installs alongside the bare names and which this layer simply did
+// not have. Eleven wanted a colour conversion, which is arithmetic. Several
+// wanted vector maths, which is also arithmetic.
+//
+// So the largest single block on running the documentation was plumbing, and it
+// is worth saying that plainly rather than letting a 52% agreement figure stand
+// as if it measured the kernel.
+//
+// EVERYTHING BELOW IS FIRST-PARTY. It would have been quicker to import
+// @jscad/modeling's own colour and maths modules -- they are pure functions with
+// no geometry in them -- and that would have left the B-rep runtime loading
+// JSCAD forever, which is the one thing this conversion exists to stop.
+
+/** CSS colour names, extracted from @jscad/modeling rather than typed: a table
+ *  is data, and a mistyped entry is a wrong colour nobody notices. 147 names. */
+const CSS_COLORS: Record<string, number[]> = {
+    aliceblue: [0.941176, 0.972549, 1.0], antiquewhite: [0.980392, 0.921569, 0.843137], aqua: [0.0, 1.0, 1.0],
+    aquamarine: [0.498039, 1.0, 0.831373], azure: [0.941176, 1.0, 1.0], beige: [0.960784, 0.960784, 0.862745],
+    bisque: [1.0, 0.894118, 0.768627], black: [0.0, 0.0, 0.0], blanchedalmond: [1.0, 0.921569, 0.803922],
+    blue: [0.0, 0.0, 1.0], blueviolet: [0.541176, 0.168627, 0.886275], brown: [0.647059, 0.164706, 0.164706],
+    burlywood: [0.870588, 0.721569, 0.529412], cadetblue: [0.372549, 0.619608, 0.627451], chartreuse: [0.498039, 1.0, 0.0],
+    chocolate: [0.823529, 0.411765, 0.117647], coral: [1.0, 0.498039, 0.313725], cornflowerblue: [0.392157, 0.584314, 0.929412],
+    cornsilk: [1.0, 0.972549, 0.862745], crimson: [0.862745, 0.078431, 0.235294], cyan: [0.0, 1.0, 1.0],
+    darkblue: [0.0, 0.0, 0.545098], darkcyan: [0.0, 0.545098, 0.545098], darkgoldenrod: [0.721569, 0.52549, 0.043137],
+    darkgray: [0.662745, 0.662745, 0.662745], darkgreen: [0.0, 0.392157, 0.0], darkgrey: [0.662745, 0.662745, 0.662745],
+    darkkhaki: [0.741176, 0.717647, 0.419608], darkmagenta: [0.545098, 0.0, 0.545098], darkolivegreen: [0.333333, 0.419608, 0.184314],
+    darkorange: [1.0, 0.54902, 0.0], darkorchid: [0.6, 0.196078, 0.8], darkred: [0.545098, 0.0, 0.0],
+    darksalmon: [0.913725, 0.588235, 0.478431], darkseagreen: [0.560784, 0.737255, 0.560784], darkslateblue: [0.282353, 0.239216, 0.545098],
+    darkslategray: [0.184314, 0.309804, 0.309804], darkslategrey: [0.184314, 0.309804, 0.309804], darkturquoise: [0.0, 0.807843, 0.819608],
+    darkviolet: [0.580392, 0.0, 0.827451], deeppink: [1.0, 0.078431, 0.576471], deepskyblue: [0.0, 0.74902, 1.0],
+    dimgray: [0.411765, 0.411765, 0.411765], dimgrey: [0.411765, 0.411765, 0.411765], dodgerblue: [0.117647, 0.564706, 1.0],
+    firebrick: [0.698039, 0.133333, 0.133333], floralwhite: [1.0, 0.980392, 0.941176], forestgreen: [0.133333, 0.545098, 0.133333],
+    fuchsia: [1.0, 0.0, 1.0], gainsboro: [0.862745, 0.862745, 0.862745], ghostwhite: [0.972549, 0.972549, 1.0],
+    gold: [1.0, 0.843137, 0.0], goldenrod: [0.854902, 0.647059, 0.12549], gray: [0.501961, 0.501961, 0.501961],
+    green: [0.0, 0.501961, 0.0], greenyellow: [0.678431, 1.0, 0.184314], grey: [0.501961, 0.501961, 0.501961],
+    honeydew: [0.941176, 1.0, 0.941176], hotpink: [1.0, 0.411765, 0.705882], indianred: [0.803922, 0.360784, 0.360784],
+    indigo: [0.294118, 0.0, 0.509804], ivory: [1.0, 1.0, 0.941176], khaki: [0.941176, 0.901961, 0.54902],
+    lavender: [0.901961, 0.901961, 0.980392], lavenderblush: [1.0, 0.941176, 0.960784], lawngreen: [0.486275, 0.988235, 0.0],
+    lemonchiffon: [1.0, 0.980392, 0.803922], lightblue: [0.678431, 0.847059, 0.901961], lightcoral: [0.941176, 0.501961, 0.501961],
+    lightcyan: [0.878431, 1.0, 1.0], lightgoldenrodyellow: [0.980392, 0.980392, 0.823529], lightgray: [0.827451, 0.827451, 0.827451],
+    lightgreen: [0.564706, 0.933333, 0.564706], lightgrey: [0.827451, 0.827451, 0.827451], lightpink: [1.0, 0.713725, 0.756863],
+    lightsalmon: [1.0, 0.627451, 0.478431], lightseagreen: [0.12549, 0.698039, 0.666667], lightskyblue: [0.529412, 0.807843, 0.980392],
+    lightslategray: [0.466667, 0.533333, 0.6], lightslategrey: [0.466667, 0.533333, 0.6], lightsteelblue: [0.690196, 0.768627, 0.870588],
+    lightyellow: [1.0, 1.0, 0.878431], lime: [0.0, 1.0, 0.0], limegreen: [0.196078, 0.803922, 0.196078],
+    linen: [0.980392, 0.941176, 0.901961], magenta: [1.0, 0.0, 1.0], maroon: [0.501961, 0.0, 0.0],
+    mediumaquamarine: [0.4, 0.803922, 0.666667], mediumblue: [0.0, 0.0, 0.803922], mediumorchid: [0.729412, 0.333333, 0.827451],
+    mediumpurple: [0.576471, 0.439216, 0.858824], mediumseagreen: [0.235294, 0.701961, 0.443137], mediumslateblue: [0.482353, 0.407843, 0.933333],
+    mediumspringgreen: [0.0, 0.980392, 0.603922], mediumturquoise: [0.282353, 0.819608, 0.8], mediumvioletred: [0.780392, 0.082353, 0.521569],
+    midnightblue: [0.098039, 0.098039, 0.439216], mintcream: [0.960784, 1.0, 0.980392], mistyrose: [1.0, 0.894118, 0.882353],
+    moccasin: [1.0, 0.894118, 0.709804], navajowhite: [1.0, 0.870588, 0.678431], navy: [0.0, 0.0, 0.501961],
+    oldlace: [0.992157, 0.960784, 0.901961], olive: [0.501961, 0.501961, 0.0], olivedrab: [0.419608, 0.556863, 0.137255],
+    orange: [1.0, 0.647059, 0.0], orangered: [1.0, 0.270588, 0.0], orchid: [0.854902, 0.439216, 0.839216],
+    palegoldenrod: [0.933333, 0.909804, 0.666667], palegreen: [0.596078, 0.984314, 0.596078], paleturquoise: [0.686275, 0.933333, 0.933333],
+    palevioletred: [0.858824, 0.439216, 0.576471], papayawhip: [1.0, 0.937255, 0.835294], peachpuff: [1.0, 0.854902, 0.72549],
+    peru: [0.803922, 0.521569, 0.247059], pink: [1.0, 0.752941, 0.796078], plum: [0.866667, 0.627451, 0.866667],
+    powderblue: [0.690196, 0.878431, 0.901961], purple: [0.501961, 0.0, 0.501961], red: [1.0, 0.0, 0.0],
+    rosybrown: [0.737255, 0.560784, 0.560784], royalblue: [0.254902, 0.411765, 0.882353], saddlebrown: [0.545098, 0.270588, 0.07451],
+    salmon: [0.980392, 0.501961, 0.447059], sandybrown: [0.956863, 0.643137, 0.376471], seagreen: [0.180392, 0.545098, 0.341176],
+    seashell: [1.0, 0.960784, 0.933333], sienna: [0.627451, 0.321569, 0.176471], silver: [0.752941, 0.752941, 0.752941],
+    skyblue: [0.529412, 0.807843, 0.921569], slateblue: [0.415686, 0.352941, 0.803922], slategray: [0.439216, 0.501961, 0.564706],
+    slategrey: [0.439216, 0.501961, 0.564706], snow: [1.0, 0.980392, 0.980392], springgreen: [0.0, 1.0, 0.498039],
+    steelblue: [0.27451, 0.509804, 0.705882], tan: [0.823529, 0.705882, 0.54902], teal: [0.0, 0.501961, 0.501961],
+    thistle: [0.847059, 0.74902, 0.847059], tomato: [1.0, 0.388235, 0.278431], turquoise: [0.25098, 0.878431, 0.815686],
+    violet: [0.933333, 0.509804, 0.933333], wheat: [0.960784, 0.870588, 0.701961], white: [1.0, 1.0, 1.0],
+    whitesmoke: [0.960784, 0.960784, 0.960784], yellow: [1.0, 1.0, 0.0], yellowgreen: [0.603922, 0.803922, 0.196078],
+};
+
+/** Vector and matrix helpers, in the library's own out-first shape --
+ *  vec3.add(vec3.create(), a, b) writes into the first argument and returns it.
+ *  Copied because the documented examples are written against it. */
+function makeMaths() {
+  const v3 = {
+    create: () => [0, 0, 0],
+    clone: (a: number[]) => [a[0], a[1], a[2]],
+    add: (o: number[], a: number[], b: number[]) => {
+      o[0] = a[0] + b[0]; o[1] = a[1] + b[1]; o[2] = a[2] + b[2]; return o;
+    },
+    subtract: (o: number[], a: number[], b: number[]) => {
+      o[0] = a[0] - b[0]; o[1] = a[1] - b[1]; o[2] = a[2] - b[2]; return o;
+    },
+    scale: (o: number[], a: number[], n: number) => {
+      o[0] = a[0] * n; o[1] = a[1] * n; o[2] = a[2] * n; return o;
+    },
+    length: (a: number[]) => Math.hypot(a[0], a[1], a[2]),
+    distance: (a: number[], b: number[]) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]),
+    normalize: (o: number[], a: number[]) => {
+      const n = Math.hypot(a[0], a[1], a[2]) || 1;
+      o[0] = a[0] / n; o[1] = a[1] / n; o[2] = a[2] / n; return o;
+    },
+    dot: (a: number[], b: number[]) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2],
+    cross: (o: number[], a: number[], b: number[]) => {
+      o[0] = a[1] * b[2] - a[2] * b[1];
+      o[1] = a[2] * b[0] - a[0] * b[2];
+      o[2] = a[0] * b[1] - a[1] * b[0];
+      return o;
+    },
+    fromValues: (x: number, y: number, z: number) => [x, y, z],
+  };
+  const v2 = {
+    create: () => [0, 0],
+    clone: (a: number[]) => [a[0], a[1]],
+    add: (o: number[], a: number[], b: number[]) => { o[0] = a[0] + b[0]; o[1] = a[1] + b[1]; return o; },
+    subtract: (o: number[], a: number[], b: number[]) => { o[0] = a[0] - b[0]; o[1] = a[1] - b[1]; return o; },
+    scale: (o: number[], a: number[], n: number) => { o[0] = a[0] * n; o[1] = a[1] * n; return o; },
+    length: (a: number[]) => Math.hypot(a[0], a[1]),
+    fromValues: (x: number, y: number) => [x, y],
+    fromAngleRadians: (o: number[], r: number) => { o[0] = Math.cos(r); o[1] = Math.sin(r); return o; },
+    fromAngleDegrees: (o: number[], d: number) => {
+      const r = (d / 180) * Math.PI;
+      o[0] = Math.cos(r); o[1] = Math.sin(r); return o;
+    },
+  };
+  // Column-major 4x4, the same layout gl-matrix and @jscad/modeling use.
+  const m4 = {
+    create: () => [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+    identity: (o: number[]) => {
+      for (let i = 0; i < 16; i++) o[i] = i % 5 === 0 ? 1 : 0;
+      return o;
+    },
+    fromTranslation: (o: number[], v: number[]) => {
+      m4.identity(o); o[12] = v[0]; o[13] = v[1]; o[14] = v[2]; return o;
+    },
+    fromScaling: (o: number[], v: number[]) => {
+      m4.identity(o); o[0] = v[0]; o[5] = v[1]; o[10] = v[2]; return o;
+    },
+    fromZRotation: (o: number[], r: number) => {
+      const s = Math.sin(r); const c = Math.cos(r);
+      m4.identity(o); o[0] = c; o[1] = s; o[4] = -s; o[5] = c; return o;
+    },
+    fromXRotation: (o: number[], r: number) => {
+      const s = Math.sin(r); const c = Math.cos(r);
+      m4.identity(o); o[5] = c; o[6] = s; o[9] = -s; o[10] = c; return o;
+    },
+    fromYRotation: (o: number[], r: number) => {
+      const s = Math.sin(r); const c = Math.cos(r);
+      m4.identity(o); o[0] = c; o[2] = -s; o[8] = s; o[10] = c; return o;
+    },
+    multiply: (o: number[], a: number[], b: number[]) => {
+      const r = new Array(16).fill(0);
+      for (let c = 0; c < 4; c++) {
+        for (let rw = 0; rw < 4; rw++) {
+          let sum = 0;
+          for (let k = 0; k < 4; k++) sum += a[k * 4 + rw] * b[c * 4 + k];
+          r[c * 4 + rw] = sum;
+        }
+      }
+      for (let i = 0; i < 16; i++) o[i] = r[i];
+      return o;
+    },
+  };
+  return { vec2: v2, vec3: v3, mat4: m4 };
+}
+
+/** Colour conversions. Arithmetic, no geometry, no kernel. */
+function makeColors(colorize: any) {
+  const clamp = (n: number) => Math.min(1, Math.max(0, n));
+  const hueToColorComponent = (p: number, q: number, t0: number) => {
+    let t = t0;
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  };
+  const hslToRgb = (vals: number[], ...rest: number[]) => {
+    const [h, s, l, ...a] = Array.isArray(vals) ? vals : [vals, ...rest];
+    if (s === 0) return [l, l, l, ...a];
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    return [
+      hueToColorComponent(p, q, h + 1 / 3),
+      hueToColorComponent(p, q, h),
+      hueToColorComponent(p, q, h - 1 / 3),
+      ...a,
+    ];
+  };
+  const rgbToHsl = (vals: number[], ...rest: number[]) => {
+    const [r, g, b, ...a] = Array.isArray(vals) ? vals : [vals, ...rest];
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const l = (max + min) / 2;
+    if (max === min) return [0, 0, l, ...a];
+    const d = max - min;
+    const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    let h;
+    if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    return [h / 6, s, l, ...a];
+  };
+  const hsvToRgb = (vals: number[], ...rest: number[]) => {
+    const [h, s, v, ...a] = Array.isArray(vals) ? vals : [vals, ...rest];
+    const i = Math.floor(h * 6);
+    const f = h * 6 - i;
+    const p = v * (1 - s);
+    const q = v * (1 - f * s);
+    const t = v * (1 - (1 - f) * s);
+    const table = [[v, t, p], [q, v, p], [p, v, t], [p, q, v], [t, p, v], [v, p, q]];
+    return [...table[i % 6], ...a];
+  };
+  const rgbToHsv = (vals: number[], ...rest: number[]) => {
+    const [r, g, b, ...a] = Array.isArray(vals) ? vals : [vals, ...rest];
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const d = max - min;
+    const s = max === 0 ? 0 : d / max;
+    let h = 0;
+    if (max !== min) {
+      if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+      else if (max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h /= 6;
+    }
+    return [h, s, max, ...a];
+  };
+  const hexToRgb = (hex: string) => {
+    const s = hex.replace('#', '');
+    const n = parseInt(s.slice(0, 6), 16);
+    const out = [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+    if (s.length === 8) out.push(parseInt(s.slice(6, 8), 16) / 255);
+    return out;
+  };
+  const rgbToHex = (vals: number[], ...rest: number[]) => {
+    const v = Array.isArray(vals) ? vals : [vals, ...rest];
+    const two = (n: number) => Math.round(clamp(n) * 255).toString(16).padStart(2, '0');
+    return '#' + v.slice(0, 3).map(two).join('');
+  };
+  const colorNameToRgb = (name: string) => CSS_COLORS[String(name).toLowerCase()];
+  return {
+    colorize,
+    colorNameToRgb,
+    cssColors: CSS_COLORS,
+    hexToRgb,
+    rgbToHex,
+    hslToRgb,
+    rgbToHsl,
+    hsvToRgb,
+    rgbToHsv,
+    hueToColorComponent,
+  };
+}
+
 export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
   const progress = () => new oc.Message_ProgressRange();
   const P = (x: number, y: number, z: number) => new oc.gp_Pnt(x, y, z);
@@ -89,7 +345,7 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
   const V = (x: number, y: number, z: number) => new oc.gp_Vec(x, y, z);
   const D = (x: number, y: number, z: number) => new oc.gp_Dir(x, y, z);
 
-  const colors = new Map<any, number[]>();
+  const colorOf = new Map<any, number[]>();
 
   // ---- shape plumbing -----------------------------------------------------
 
@@ -267,7 +523,7 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
   const faceFrom = (wire: any): any =>
     new oc.BRepBuilderAPI_MakeFace(wire, false).Face();
 
-  const api: Api = { colors } as Api;
+  const api: Api = { colorOf } as Api;
 
   // ---- primitives, 3D ------------------------------------------------------
 
@@ -736,13 +992,253 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
   // coloured model measures exactly as the uncoloured one does.
   api.colorize = (color: number[], ...shapes: any[]) => {
     const made = shapes.flat().filter(isShape);
-    for (const s of made) colors.set(s, color);
+    for (const s of made) colorOf.set(s, color);
     return made.length === 1 ? made[0] : made;
   };
 
   // ---- pure arithmetic -----------------------------------------------------
   api.degToRad = (d: number) => (d / 180) * Math.PI;
   api.radToDeg = (r: number) => (r / Math.PI) * 180;
+  api.flatten = (a: any[]) => a.flat(Infinity);
+  api.areAllShapesTheSameType = (list: any[]) => {
+    const kinds = list.map((s) => (isSolid(s) ? 3 : 2));
+    return kinds.every((k) => k === kinds[0]);
+  };
+  api.insertSorted = (list: any[], item: any, cmp: (a: any, b: any) => number) => {
+    let i = 0;
+    while (i < list.length && cmp(list[i], item) < 0) i++;
+    list.splice(i, 0, item);
+    return list;
+  };
+  /** How many segments a mesh would need for a given radius. Meaningless to the
+   *  kernel -- it stores the real curve -- but it is arithmetic a documented
+   *  example calls, and answering it faithfully costs nothing. */
+  api.radiusToSegments = (radius: number, minimum = 16, resolution = 0.1) =>
+    Math.max(minimum, Math.ceil(Math.PI / Math.acos(Math.max(-1, Math.min(1,
+      1 - resolution / radius)))) * 2);
+
+  /**
+   * The bounding SPHERE, which is not the bounding box's corner.
+   *
+   * Measured: JSCAD returns radius 15 for sphere({ radius: 15 }), while the
+   * distance to the bounding box's corner is 15 * sqrt(3) = 25.98. Reading the
+   * corner gave a sphere 73% too big, and a page that builds something from the
+   * measurement was 36% wrong by volume as a result.
+   *
+   * So the real thing: the centre of the box, and the furthest the surface
+   * actually reaches from it. That needs points on the surface, which is the
+   * tessellator's job -- and it is why this is the one measurement here that
+   * depends on the mesh bridge.
+   */
+  api.measureBoundingSphere = (s: any) => {
+    const [lo, hi] = bounds(s);
+    const c: Vec3 = [(lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, (lo[2] + hi[2]) / 2];
+    if (!deps.tessellate) {
+      return [c, Math.hypot(hi[0] - c[0], hi[1] - c[1], hi[2] - c[2])];
+    }
+    const g = deps.tessellate(oc, s, { deflection: deps.deflection ?? 0.05 });
+    if (!g) return [c, Math.hypot(hi[0] - c[0], hi[1] - c[1], hi[2] - c[2])];
+    // THE CENTRE IS THE BOX CENTRE, AND THIS IS THE ONE PLACE THIS FILE
+    // KNOWINGLY DISAGREES WITH JSCAD.
+    //
+    // @jscad/modeling centres its bounding sphere on the CENTROID OF THE MESH
+    // VERTICES. Measured on the docs' own hulled blob it returns centre 10.186
+    // radius 23.814, where the box centre gives 12.006 radius 21.993 -- a
+    // genuinely tighter enclosing sphere, and a different pair of numbers.
+    //
+    // Matching JSCAD was tried and is not possible. A vertex centroid is a
+    // property of the MESH, not of the shape: it moves with tessellation
+    // density, and a B-rep has no canonical vertex set to take it from. Copying
+    // the algorithm made the disagreement WORSE, from 14% to 80%, because our
+    // tessellation distributes vertices differently from a 24-segment sphere's.
+    //
+    // So the box centre, which is defined by the shape rather than by how
+    // finely it was drawn, and the divergence is recorded rather than chased.
+    // scripts/test-occt-api.mjs names this page for the same reason.
+    let r = 0;
+    for (const poly of g.polygons) {
+      for (const v of poly.vertices) {
+        const d = Math.hypot(v[0] - c[0], v[1] - c[1], v[2] - c[2]);
+        if (d > r) r = d;
+      }
+    }
+    return [c, r];
+  };
+
+  // ---- the namespaced forms ------------------------------------------------
+  //
+  // MEASURED, not guessed: thirty-three of the sixty-eight documented pages
+  // that could not run were blocked here and nowhere else. The runner's shim
+  // installs both -- bare `cuboid` AND `primitives.cuboid`, the same function
+  // object either way -- because a student pasting an example off jscad.app
+  // gets the namespaced form. Same arrangement here, and the SAME function
+  // objects rather than copies, so the two spellings can never drift.
+  const maths = makeMaths();
+  const colorApi = makeColors(api.colorize);
+
+  const ns = (names: string[]) =>
+    Object.fromEntries(names.filter((n) => api[n]).map((n) => [n, api[n]]));
+
+  api.primitives = ns(['cuboid', 'cube', 'sphere', 'cylinder', 'cylinderElliptic',
+    'torus', 'polyhedron', 'rectangle', 'square', 'circle', 'ellipse', 'polygon',
+    'star', 'triangle']);
+  api.transforms = ns(['translate', 'translateX', 'translateY', 'translateZ',
+    'rotate', 'rotateX', 'rotateY', 'rotateZ', 'scale', 'mirrorX', 'mirrorY',
+    'mirrorZ', 'center', 'centerX', 'centerY', 'centerZ', 'align']);
+  api.booleans = ns(['union', 'subtract', 'intersect', 'scission']);
+  api.extrusions = ns(['extrudeLinear', 'extrudeRotate']);
+  api.measurements = ns(['measureVolume', 'measureArea', 'measureBoundingBox',
+    'measureDimensions', 'measureCenter', 'measureCenterOfMass',
+    'measureBoundingSphere', 'measureAggregateVolume', 'measureAggregateArea',
+    'measureAggregateBoundingBox']);
+  api.hulls = ns(['hull', 'hullChain']);
+  api.utils = ns(['degToRad', 'radToDeg', 'flatten', 'areAllShapesTheSameType',
+    'insertSorted', 'radiusToSegments']);
+  api.colors = colorApi;
+  api.maths = maths;
+  api.vec2 = maths.vec2;
+  api.vec3 = maths.vec3;
+  api.mat4 = maths.mat4;
+  api.constants = { TAU, EPS: 1e-5 };
+  api.TAU = TAU;
+
+  // The geometry namespace, as far as it honestly goes.
+  //
+  // `isA` is a question a B-rep answers directly -- has it a solid in it, a
+  // face, a wire -- so those are exact. `toPolygons` goes through the
+  // tessellator, which is the only honest reading of it here: JSCAD's polygons
+  // ARE its geometry, while ours are a drawing of it, and a page that asks for
+  // them is asking what the renderer would draw. Everything else on geom3,
+  // geom2 and path2 is a mesh-shaped constructor and is deliberately absent
+  // rather than approximated -- an unported name is reported by the gate,
+  // whereas a wrong one is not.
+  api.geometries = {
+    geom3: {
+      isA: (v: any) => isShape(v) && isSolid(v),
+      toPolygons: (v: any) => {
+        if (!deps.tessellate) throw new Error('toPolygons needs the mesh bridge');
+        const g = deps.tessellate(oc, v, { deflection: deps.deflection ?? 0.05 });
+        return g ? g.polygons : [];
+      },
+    },
+    geom2: {
+      isA: (v: any) => isShape(v) && !isSolid(v)
+        && explore(v, oc.TopAbs_ShapeEnum.TopAbs_FACE).length > 0,
+    },
+    path2: {
+      isA: (v: any) => isShape(v) && !isSolid(v)
+        && explore(v, oc.TopAbs_ShapeEnum.TopAbs_FACE).length === 0,
+    },
+  };
+
+  // Bare namespace names too, the way the shim installs them, so
+  // `geom3.toPolygons(x)` works without reaching through `geometries`.
+  // ---- bare names for everything the shim installs bare --------------------
+  //
+  // The colour helpers were reachable as `colors.hexToRgb` and NOT as
+  // `hexToRgb`, which is how six pages stayed blocked after the namespaces
+  // landed. The runner's shim installs both spellings of every export, so this
+  // layer has to as well -- and from the SAME function objects, so they cannot
+  // drift.
+  for (const [k, v] of Object.entries(colorApi)) if (!api[k]) api[k] = v;
+
+  /** The library's own numeric sort comparator, used by documented examples
+   *  that sort measurements before printing them. Arithmetic. */
+  api.fnNumberSort = (a: number, b: number) => a - b;
+
+  /** transforms.mirror with an explicit normal. The single-axis forms above are
+   *  the common case; this is the general one. */
+  api.mirror = (...args: any[]) => {
+    const o = isOpts(args[0]) ? args[0] : {};
+    const n: Vec3 = o.normal || [0, 0, 1];
+    // THE ORIGIN IS NOT OPTIONAL TO HONOUR. Measured: mirroring a box spanning
+    // x 15..25 across the plane at x = 5 gives -15..-5, and ignoring the origin
+    // gives -25..-15. The VOLUME is identical either way -- it is a mirror --
+    // so only the bounding box catches it, which is the third time in this file
+    // a volume-only check would have passed a wrong answer.
+    const org: Vec3 = o.origin || [0, 0, 0];
+    const t = new oc.gp_Trsf();
+    t.SetMirror(new oc.gp_Ax2(P(org[0], org[1], org[2]), D(n[0], n[1], n[2])));
+    const made = args.filter(isShape).map((x: any) => applied(x, t));
+    return made.length === 1 ? made[0] : made;
+  };
+
+  /**
+   * ellipsoid, refused BY NAME rather than left undefined.
+   *
+   * Three unequal radii is a sphere stretched unequally, which is the one
+   * operation with no path in this build -- see `scale`. An undefined name
+   * reports "ellipsoid is not defined", which reads like an oversight; this
+   * says what is actually wrong and what would fix it.
+   */
+  api.ellipsoid = (...args: any[]) => {
+    const o = opts(args, ['radius']);
+    const r = o.radius || [1, 1, 1];
+    if (r[0] === r[1] && r[1] === r[2]) return api.sphere({ radius: r[0], center: centre(o) });
+    throw new Error(
+      'an ellipsoid with unequal radii needs BRepBuilderAPI_GTransform, which this '
+      + 'OpenCascade build does not expose. A sphere, or an axisymmetric revolve, works.',
+    );
+  };
+
+  /** transform, refused for the same reason and with the same care. A rigid or
+   *  uniformly-scaled matrix would be fine; the general one is not. */
+  api.transform = (m: number[], ...shapes: any[]) => {
+    const uniform = Math.abs(m[0] - m[5]) < 1e-12 && Math.abs(m[5] - m[10]) < 1e-12;
+    const noShear = [1, 2, 4, 6, 8, 9].every((i) => Math.abs(m[i]) < 1e-12);
+    if (!uniform || !noShear) {
+      throw new Error(
+        'a matrix with shear or unequal scale needs BRepBuilderAPI_GTransform, which '
+        + 'this OpenCascade build does not expose.',
+      );
+    }
+    const t = new oc.gp_Trsf();
+    t.SetValues(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14]);
+    const made = shapes.flat().filter(isShape).map((x: any) => applied(x, t));
+    return made.length === 1 ? made[0] : made;
+  };
+
+  /** offset, on the real curve rather than on a polyline. */
+  api.offset = (...args: any[]) => {
+    const o = isOpts(args[0]) ? args[0] : { delta: args[0] };
+    // JSCAD's `corners` defaults to 'edge' -- the offset edges are extended
+    // until they meet, leaving a sharp corner. 'round' is the OTHER option, and
+    // defaulting to it here made an offset rectangle measurably smaller than
+    // the one the docs draw. GeomAbs_Intersection is the sharp one.
+    const join = o.corners === 'round'
+      ? oc.GeomAbs_JoinType.GeomAbs_Arc
+      : oc.GeomAbs_JoinType.GeomAbs_Intersection;
+    const made = args.filter(isShape).map((f: any) => {
+      const mk = new oc.BRepOffsetAPI_MakeOffset(f, join, false);
+      mk.Perform(o.delta ?? 1, 0);
+      return faceFrom(oc.TopoDS.Wire(mk.Shape()));
+    });
+    return made.length === 1 ? made[0] : made;
+  };
+
+  /** extrudeRectangular: offset the outline, then extrude the ring between. */
+  api.extrudeRectangular = (...args: any[]) => {
+    const o = isOpts(args[0]) ? args[0] : {};
+    const size = o.size ?? 1;
+    const height = o.height ?? 1;
+    // MEASURED: extrudeRectangular({ size: 4, height: 10 }) on a 40 x 30
+    // outline gives a bounding box 48 x 38, so the wall runs `size` OUTWARD and
+    // `size` inward -- it is 2 * size thick, not size. Reading it as a
+    // half-offset built walls 17% too thin.
+    const made = args.filter(isShape).map((f: any) => {
+      const outer = api.offset({ delta: size }, f);
+      const inner = api.offset({ delta: -size }, f);
+      return api.subtract(
+        new oc.BRepPrimAPI_MakePrism(outer, V(0, 0, height), false, true).Shape(),
+        new oc.BRepPrimAPI_MakePrism(inner, V(0, 0, height), false, true).Shape(),
+      );
+    });
+    return made.length === 1 ? made[0] : made;
+  };
+
+  api.geom3 = api.geometries.geom3;
+  api.geom2 = api.geometries.geom2;
+  api.path2 = api.geometries.path2;
 
   return api;
 }

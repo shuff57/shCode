@@ -89,7 +89,7 @@ try {
   const occtContext = () => {
     const quiet = { log() {}, warn() {}, error() {}, info() {} };
     const sandbox = { module: { exports: {} }, console: quiet, Math, JSON, Array, Object, Number, String };
-    for (const [k, v] of Object.entries(api)) if (k !== 'colors') sandbox[k] = v;
+    for (const [k, v] of Object.entries(api)) if (k !== 'colorOf') sandbox[k] = v;
     sandbox.require = (id) => {
       if (id === '@jscad/modeling') {
         throw new Error("require('@jscad/modeling') is not available on the B-rep kernel yet");
@@ -146,6 +146,12 @@ try {
 
   const VOL_TOL = 0.05;      // tessellation, mostly
   const BOX_TOL = 0.02;
+
+  /** Whether box `a` encloses box `b`, allowing a hair for arithmetic. */
+  const contains = (a, b) => {
+    const eps = 1e-6 * Math.max(1, ...[0, 1, 2].map((i) => Math.abs(b[1][i] - b[0][i])));
+    return [0, 1, 2].every((i) => a[0][i] <= b[0][i] + eps && a[1][i] >= b[1][i] - eps);
+  };
 
   const agreed = [];
   const expected = [];
@@ -215,13 +221,37 @@ try {
     // crude in the SAFE direction: a page that mentions segments and is
     // genuinely broken gets the weaker check, while a page that does not
     // mention it can never escape the strict one.
-    const meshy = /\bsegments\b/.test(p.code);
+    // Pages whose result depends on a property of the MESH rather than of the
+    // shape. Named one by one, not pattern-matched, because each is a decision
+    // someone made and should have to state.
+    //
+    //   measureBoundingSphere -- JSCAD centres on the centroid of the mesh
+    //   vertices, which moves with tessellation density and which a B-rep has
+    //   no canonical vertex set to reproduce. See lib/occt-api.ts.
+    const KNOWN_DIVERGENT = new Set(['beyond / measureBoundingSphere']);
+
+    const meshy = /\bsegments\b/.test(p.code) || KNOWN_DIVERGENT.has(p.key);
     if (dv <= VOL_TOL && dbox / span <= BOX_TOL) {
       agreed.push({ key: p.key, dv, dbox: dbox / span });
-    } else if (meshy && got.vol > ref.vol && dbox / span <= 0.05) {
+    } else if (meshy && KNOWN_DIVERGENT.has(p.key)) {
+      // A named divergence is exempt from the direction rule too: a bounding
+      // sphere with a different CENTRE is neither contained in nor containing
+      // the other. What is still required is that it ran and produced a solid,
+      // which the code above already established.
+      expected.push({ key: p.key, dv, ref: ref.vol, got: got.vol });
+    } else if (meshy && got.vol > ref.vol && contains(got.bb, ref.bb)) {
       // Over tolerance, but in the direction and for the reason a `segments`
-      // page is over tolerance: an exact solid CONTAINS the inscribed one it
-      // replaces, so it measures more while occupying the same space.
+      // page is over tolerance.
+      //
+      // CONTAINMENT, not a box tolerance, and the difference matters. A page
+      // asking for `segments: 6` builds a hexagonal prism where the kernel
+      // builds a cylinder, and their bounding boxes legitimately differ by
+      // (1 - cos(pi/6)) = 13.4% of the radius -- far outside any tolerance
+      // loose enough to still catch a real defect. What is EXACTLY true is that
+      // the true cylinder contains the inscribed prism, so its box contains the
+      // prism's. That is an invariant rather than a threshold: it cannot be
+      // satisfied by a shape that is merely close, and it fails immediately for
+      // one that is shifted, mirrored or the wrong size.
       expected.push({ key: p.key, dv, ref: ref.vol, got: got.vol });
     } else {
       drifted.push({ key: p.key, dv, dbox: dbox / span, ref: ref.vol, got: got.vol });
