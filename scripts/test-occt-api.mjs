@@ -159,18 +159,25 @@ try {
   const unported = new Map();   // name -> pages
   const broke = [];
   const jscadOnly = [];
+  const noVolume = [];
 
   for (const p of pages) {
-    let ref;
+    let ref = null;
+    let refBroke = false;
     try {
       const { ctx } = createSimpleContext({ consoleImpl: { log() {}, warn() {}, error() {} } });
       const r = runProgram(ctx, p.code, p.key);
-      if (!r.ok || !r.main || r.geometry === undefined) { jscadOnly.push(p.key); continue; }
-      ref = measureJscad(r.geometry);
-    } catch (e) { jscadOnly.push(p.key); continue; }
-    if (!(ref.vol > 0)) { jscadOnly.push(p.key); continue; }   // 2D or empty: no volume to compare
+      if (!r.ok || !r.main || r.geometry === undefined) refBroke = true;
+      else ref = measureJscad(r.geometry);
+    } catch (e) { refBroke = true; }
 
-    let got;
+    // Run OCCT UNCONDITIONALLY -- this is the fix. The context costs nothing
+    // to build, and a page the old engine could not measure (because it is 2D,
+    // or because it failed outright) still deserves to be asked whether it
+    // even BUILDS on the new kernel. Deciding that from the JSCAD side, before
+    // OpenCascade is ever touched, let the engine being retired set the
+    // denominator -- which is the bug this file exists to fix.
+    let got = null;
     try {
       const r = runProgram(occtContext(), p.code, p.key);
       if (!r.ok) {
@@ -179,18 +186,29 @@ try {
           if (!unported.has(m[1])) unported.set(m[1], []);
           unported.get(m[1]).push(p.key);
         } else broke.push(`${p.key}: ${r.error.message.slice(0, 90)}`);
-        continue;
+      } else if (!r.main || r.geometry === undefined) {
+        broke.push(`${p.key}: no geometry`);
+      } else {
+        got = measureOcct(r.geometry);
       }
-      if (!r.main || r.geometry === undefined) { broke.push(`${p.key}: no geometry`); continue; }
-      got = measureOcct(r.geometry);
     } catch (e) {
       const m = /(\w+) is not defined/.exec(String(e.message));
       if (m) {
         if (!unported.has(m[1])) unported.set(m[1], []);
         unported.get(m[1]).push(p.key);
       } else broke.push(`${p.key}: ${String(e.message).slice(0, 90)}`);
+    }
+
+    if (refBroke) { jscadOnly.push(p.key); continue; }   // nothing to grade against, whatever OCCT did
+    if (!(ref.vol > 0)) {
+      // 2D or path output: the reference engine has no volume to compare.
+      // Whether OCCT built ANYTHING is exactly the question the old skip
+      // never asked. A throw was already filed into unported/broke above; a
+      // build is not a failure, just not gradeable by volume.
+      if (got !== null) noVolume.push(p.key);
       continue;
     }
+    if (got === null) continue;   // already filed into unported/broke above
 
     const dv = Math.abs(got.vol - ref.vol) / ref.vol;
     const dbox = Math.max(
@@ -268,7 +286,22 @@ try {
     + `(a segments page -- the exact kernel measures more), ${drifted.length} differ, `
     + `${[...unported.values()].reduce((n, l) => n + l.length, 0)} blocked on an unported name, `
     + `${broke.length} threw`);
-  console.log(`  ----  ${jscadOnly.length} skipped (2D, no main, or no volume to compare)`);
+  console.log(`  ----  ${noVolume.length} build on OCCT with no volume to compare (2D or path output)`);
+  console.log(`  ----  ${jscadOnly.length} pages whose JSCAD reference itself never built `
+    + `(nothing to grade against, whatever OCCT did)`);
+
+  // THE HONEST NUMBER. A page counts as portable only if it actually ran on
+  // OpenCascade and produced the right thing -- agreeing, or differing for the
+  // one reason a mesh-vs-exact comparison is supposed to differ, or building
+  // fine with nothing to measure by volume. This is deliberately NOT the same
+  // number lib/script-surface.ts prints: that one is a STATIC count of whether
+  // each NAME has a verdict, answering "do we have a plan for this". This one
+  // is AS-BUILT, answering "does it actually happen". They read the same at a
+  // glance and are not; quoting one for the other is exactly the mistake that
+  // let 18 pages run zero comparisons and still print ALL PASS.
+  const portable = agreed.length + expected.length + noVolume.length;
+  console.log(`\n  ----  ${portable} / ${pages.length} pages actually build the same thing on `
+    + 'OpenCascade (AS-BUILT, not the static name-by-name count)');
 
   if (unported.size) {
     console.log('\n  names not ported yet, by how many pages each blocks:');
@@ -294,6 +327,10 @@ try {
     console.log('\n  pages that threw:');
     for (const b of broke.slice(0, 15)) console.log('  ----    ' + b);
   }
+  if (noVolume.length) {
+    console.log('\n  pages with no volume to compare, but which DO build on OCCT:');
+    for (const k of noVolume) console.log('  ----    ' + k);
+  }
 
   check('the harness really ran both engines on real pages',
     comparable > 20, `${comparable} comparable pages — too few to mean anything`);
@@ -302,6 +339,19 @@ try {
     'a page that runs and disagrees is a wrong shape, which is the failure this '
     + 'file exists for — an unported NAME is a different problem and is counted '
     + 'separately above');
+
+  // THE BUDGET. A page with nothing to compare by volume is not itself a
+  // defect -- 2D output and open paths are supposed to have no volume. What
+  // WOULD be a defect is this bucket growing unwatched, the way the 18-page
+  // skip it replaces did for however long nobody looked. So this is a budget
+  // pinned to today's measured count, not a blanket "must be zero": turning
+  // every one of these red would make the suite noisy for pages that are
+  // working correctly, and a gate that stays red for a reason nobody can fix
+  // gets suppressed within a week -- worse than the hole it replaces.
+  check('no page goes unmeasured without someone noticing',
+    noVolume.length <= 3,
+    `${noVolume.length} pages build on OCCT with nothing to grade by volume (see the `
+    + 'list above) — investigate each by name before raising this budget');
 
   // ---- the direction, which a tolerance alone would hide -------------------
   //

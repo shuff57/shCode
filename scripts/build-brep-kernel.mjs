@@ -49,6 +49,10 @@ const occtDir = argIdx > -1 ? process.argv[argIdx + 1] : process.env.OCCT_DIR;
 /** Our own layer. occt-build is the entry; the rest are what it reaches. */
 const SOURCES = [
   'lib/occt-build.ts',
+  // The TAUGHT vocabulary, which occt-build does not reach: the mouse path goes
+  // through buildDoc(), the script path goes through createApi(). Both halves
+  // of the modeller have to be in the bundle or one of them 404s at import.
+  'lib/occt-api.ts',
   'lib/occt-mesh.ts',
   'lib/model-types.ts',
   'lib/sketch-arc.ts',
@@ -56,6 +60,10 @@ const SOURCES = [
   'lib/topo-resolve.ts',
   'lib/topo-history.ts',
   'lib/hull.ts',
+  // three.js's twin of occt-mesh.ts -- runner-brep.html draws through this
+  // instead of the JSCAD/regl geom3 path. Type-only 'three' import, so tsc
+  // erases it and this file carries no runtime dependency on three itself.
+  'lib/occt-three.ts',
 ];
 
 mkdirSync(dest, { recursive: true });
@@ -91,6 +99,42 @@ for (const f of readdirSync(dest)) {
 }
 console.log(`compiled ${SOURCES.length} sources, rewrote imports in ${rewritten} file(s)`);
 
+// three.js, vendored the same way the wasm kernel is: copied at build time,
+// not committed. runner-brep.html draws with three.js instead of
+// @jscad/regl-renderer, and an ES module import of three needs the SAME
+// Access-Control-Allow-Origin cover the OpenCascade module needs -- see the
+// file-header comment on why /reshape/kernel/ carries that header and
+// public/reshape/lib/ (the classic-script JSCAD bundles) does not. There is no
+// UMD build of three.js any more (dropped upstream), so a <script src> tag
+// cannot load it; it has to be an ES module, which is what puts it here rather
+// than beside jscad-modeling.min.js.
+// three.module.min.js imports `from "./three.core.min.js"` -- a recent-ish
+// split upstream that is easy to miss because node_modules/three's own
+// package.json "exports" map hides it entirely (it resolves "three" straight
+// to three.module.min.js and never mentions the core file by name). Measured
+// 2026-09-02: without this second copy, the module loads fine everywhere the
+// two files sit side by side in node_modules and then 404s the moment
+// three.module.min.js is copied out on its own.
+for (const f of ['three.module.min.js', 'three.core.min.js']) {
+  copyFileSync(
+    path.join(root, 'node_modules', 'three', 'build', f),
+    path.join(dest, f),
+  );
+}
+{
+  // OrbitControls imports `from 'three'` -- a bare specifier, which only
+  // resolves under a bundler or an import map. This page has neither (see the
+  // NO BUNDLER note above), so the one import line is rewritten to the
+  // relative path of the file just vendored beside it.
+  const p = path.join(dest, 'OrbitControls.js');
+  const src = readFileSync(
+    path.join(root, 'node_modules', 'three', 'examples', 'jsm', 'controls', 'OrbitControls.js'),
+    'utf8',
+  );
+  writeFileSync(p, src.replace(/(\bfrom\s+['"])three(['"])/, '$1./three.module.min.js$2'));
+}
+console.log('  three.module.min.js, three.core.min.js, OrbitControls.js  (vendored from node_modules/three)');
+
 // THE CONTROL, and the reason it is a file rather than an argument.
 //
 // public/_headers grants Access-Control-Allow-Origin on /reshape/kernel/* and
@@ -114,23 +158,6 @@ writeFileSync(
 );
 console.log('wrote public/reshape/kernel-cors-control.js (must NOT be loadable from the frame)');
 
-if (!occtDir || !existsSync(path.join(occtDir, 'replicad_single.js'))) {
-  console.log('\nNo OpenCascade build given, so the kernel itself was NOT copied.');
-  console.log('  node scripts/build-brep-kernel.mjs --occt <dir with replicad_single.js>');
-  console.log('This is a partial bundle: a page loading it would 404 on the wasm.');
-  process.exit(0);
-}
-
-for (const f of ['replicad_single.js', 'replicad_single.wasm']) {
-  const from = path.join(occtDir, f);
-  if (!existsSync(from)) {
-    console.error(`missing ${f} in ${occtDir}`);
-    process.exit(1);
-  }
-  copyFileSync(from, path.join(dest, f));
-  console.log(`  ${f}  ${(statSync(from).size / 1024 / 1024).toFixed(2)} MB`);
-}
-
 // THE PROBE PAGES, copied in rather than living in public/.
 //
 // next.config.js sets output: 'export', which copies public/ wholesale into the
@@ -143,10 +170,46 @@ for (const f of ['replicad_single.js', 'replicad_single.wasm']) {
 // build drops a working copy INSIDE the one gitignored directory. So the probe
 // exists exactly when the kernel does, and neither can reach production without
 // somebody deliberately un-ignoring a path.
-for (const f of ['brep.html', 'brep-check.html']) {
+//
+// THIS RUNS BEFORE THE no-kernel EXIT, and that ordering is a fix rather than a
+// preference. It used to sit after it, so a rerun without --occt against an
+// ALREADY-POPULATED dest recompiled every source, skipped the probes, and left
+// play.html 404ing while every module beside it resolved. The invariant is "the
+// probe exists when the KERNEL does", and the kernel being on disk is what that
+// means -- not whether a flag was passed on this particular run.
+// runner-brep.html rides with the probes for a REASON, not by convenience.
+// public/ is copied wholesale by the static export, and the kernel it needs
+// lives in the one gitignored directory -- so a copy sitting in
+// public/reshape/ would deploy to a public URL and 404 on its own wasm,
+// showing an error panel with the school's name on it. Generated in here, it
+// exists exactly when the kernel does. scripts/test-script-surface.mjs
+// enforces this and caught it the day it was first written to the wrong place.
+// When the B-rep runner becomes THE runner, it ships together with a kernel
+// that is no longer gitignored, and this line moves with it.
+const probes = ['brep.html', 'brep-check.html', 'play.html', 'runner-brep.html'];
+for (const f of probes) {
   copyFileSync(path.join(here, 'brep-probe', f), path.join(dest, f));
 }
-console.log('  brep.html, brep-check.html  (probe, dev only)');
+console.log('  ' + probes.join(', ') + '  (probe, dev only)');
+
+if (!occtDir || !existsSync(path.join(occtDir, 'replicad_single.js'))) {
+  console.log('\nNo OpenCascade build given, so the kernel itself was NOT copied.');
+  console.log('  node scripts/build-brep-kernel.mjs --occt <dir with replicad_single.js>');
+  console.log(existsSync(path.join(dest, 'replicad_single.wasm'))
+    ? 'A kernel is already in place from an earlier run, so the bundle still works.'
+    : 'This is a partial bundle: a page loading it would 404 on the wasm.');
+  process.exit(0);
+}
+
+for (const f of ['replicad_single.js', 'replicad_single.wasm']) {
+  const from = path.join(occtDir, f);
+  if (!existsSync(from)) {
+    console.error(`missing ${f} in ${occtDir}`);
+    process.exit(1);
+  }
+  copyFileSync(from, path.join(dest, f));
+  console.log(`  ${f}  ${(statSync(from).size / 1024 / 1024).toFixed(2)} MB`);
+}
 
 console.log(`\nkernel bundle ready at public/reshape/kernel/`);
 console.log('  probe:  npm run dev  ->  http://localhost:3002/reshape/kernel/brep-check.html');

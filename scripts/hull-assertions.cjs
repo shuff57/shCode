@@ -210,4 +210,128 @@ module.exports = function run({ hull, check, near }) {
     doubled.used.length === 1000, `${doubled.used.length} of 1000 distinct`);
   check('...and that hull is a closed surface too',
     doubled.triangles.length === 2 * doubled.used.length - 4);
+
+  // ===========================================================================
+  // THE 2D CASE
+  // ===========================================================================
+
+  const { convexHull2, hull2Area } = hull;
+  // Twice the signed area of (o, a, b) -- same definition as the private
+  // cross2 in lib/hull.ts, kept local here since that one is not exported.
+  const cross2 = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+
+  console.log('\n=== a 2D hull of flat corners is exact ===');
+
+  const SQUARE = [[0, 0], [10, 0], [10, 10], [0, 10]];
+  const square = convexHull2(SQUARE);
+  check('a square hulls', square !== null);
+  check('...keeping all four corners',
+    square.used.length === 4 && square.boundary.length === 4, JSON.stringify(square));
+  check('...to exactly its own area',
+    near(hull2Area(SQUARE, square), 100, 1e-9), String(hull2Area(SQUARE, square)));
+
+  // THE CONTROL for "no dents", one dimension down: an interior point changes
+  // nothing. An implementation that just wound whatever it was handed would
+  // report a different area and a fifth used corner here.
+  const SQ_MID = [...SQUARE, [5, 5]];
+  const sqMid = convexHull2(SQ_MID);
+  check('CONTROL: a point INSIDE the square is swallowed, not kept',
+    sqMid.used.length === 4 && !sqMid.used.includes(4), JSON.stringify(sqMid.used));
+  check('...and the area does not move',
+    near(hull2Area(SQ_MID, sqMid), 100, 1e-9), String(hull2Area(SQ_MID, sqMid)));
+
+  console.log('\n=== a concave outline hulls to its convex boundary ===');
+
+  // An L-tromino: a 10x10 square with its top-right 5x5 corner cut away.
+  // (10,10) itself is not a vertex of this shape at all -- the cut REMOVES
+  // it -- so the hull cannot be the square; it is the pentagon that results
+  // from drawing one straight edge across the missing corner, from (10,5)
+  // to (5,10). The one point strictly behind that edge, the reflex corner
+  // at (5,5), is what "no dents" swallows.
+  //
+  // Analytic area: the pentagon is the 10x10 square (100) minus the 5x5
+  // triangle cut off by the (10,5)-(5,10) edge (12.5), i.e. 87.5.
+  const L_SHAPE = [
+    [0, 0], [10, 0], [10, 5], [5, 5], [5, 10], [0, 10],
+  ];
+  const lShape = convexHull2(L_SHAPE);
+  check('the L-tromino\'s hull swallows only its reflex corner',
+    lShape.used.length === 5 && !lShape.used.includes(3), JSON.stringify(lShape.used));
+  check('...and measures the analytic 87.5, not the shape\'s own 75',
+    near(hull2Area(L_SHAPE, lShape), 87.5, 1e-9), String(hull2Area(L_SHAPE, lShape)));
+
+  console.log('\n=== collinear points are dropped, not kept ===');
+
+  // A square with an extra point at the midpoint of one edge. Under the
+  // documented convention (drop, matching the reference engine's own
+  // hullPoints2) the midpoint is not a hull vertex even though it sits
+  // exactly on the boundary -- only the two real corners survive that side.
+  const MIDEDGE = [[0, 0], [5, 0], [10, 0], [10, 10], [0, 10]];
+  const midedge = convexHull2(MIDEDGE);
+  check('a point exactly on an edge is dropped, per the stated convention',
+    midedge.used.length === 4 && !midedge.used.includes(1), JSON.stringify(midedge.used));
+  check('...and the area is still exactly the square\'s',
+    near(hull2Area(MIDEDGE, midedge), 100, 1e-9), String(hull2Area(MIDEDGE, midedge)));
+
+  console.log('\n=== degenerate 2D inputs do something sane ===');
+
+  check('two points is too few', convexHull2([[0, 0], [1, 1]]) === null);
+  check('every point in the same place has no hull',
+    convexHull2([[3, 4], [3, 4], [3, 4], [3, 4]]) === null);
+  check('every point on one line has no hull',
+    convexHull2([[0, 0], [1, 0], [2, 0], [3, 0], [1.5, 0]]) === null);
+  check('...even when the line is not axis-aligned',
+    convexHull2([[0, 0], [2, 2], [4, 4], [1, 1], [3, 3]]) === null);
+
+  console.log('\n=== randomised: every input point is inside or on the hull, and the hull is convex ===');
+
+  // The check that actually catches a WRONG hull rather than merely a slow or
+  // crashing one: for each random point set, (a) no input point sits strictly
+  // outside the reported boundary, and (b) the boundary itself turns the same
+  // way -- left -- at every one of its own vertices. A hull that swallowed a
+  // point it should have kept fails (a); a hull that is not actually convex
+  // (a bug in the chain-building, say) fails (b).
+  let s3 = 99;
+  const rnd2 = () => {
+    s3 |= 0; s3 = (s3 + 0x6D2B79F5) | 0;
+    let t = Math.imul(s3 ^ (s3 >>> 15), 1 | s3);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+
+  let allInside = true;
+  let allConvex = true;
+  let badTrial = -1;
+  for (let trial = 0; trial < 300; trial++) {
+    const count = 5 + Math.floor(rnd2() * 40);
+    const pts = [];
+    for (let i = 0; i < count; i++) pts.push([rnd2() * 100, rnd2() * 100]);
+    const h = convexHull2(pts);
+    if (!h) continue;                             // the rare all-collinear draw; not this check's job
+
+    // (a) every input point inside or on the hull: for each polygon edge, no
+    // point may sit strictly to its right (a positive-area convex polygon's
+    // interior is always to the left of each of its own CCW edges).
+    for (const p of pts) {
+      for (let i = 0; i < h.boundary.length; i++) {
+        const a = pts[h.boundary[i]];
+        const b = pts[h.boundary[(i + 1) % h.boundary.length]];
+        const cr = (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0]);
+        if (cr < -1e-6) { allInside = false; badTrial = trial; }
+      }
+    }
+
+    // (b) convex at every vertex: consecutive boundary edges all turn the
+    // same way (left, since the winding is CCW).
+    for (let i = 0; i < h.boundary.length; i++) {
+      const o = pts[h.boundary[i]];
+      const a = pts[h.boundary[(i + 1) % h.boundary.length]];
+      const b = pts[h.boundary[(i + 2) % h.boundary.length]];
+      if (cross2(o, a, b) < -1e-6) { allConvex = false; badTrial = trial; }
+    }
+  }
+  check('300 random point sets: every input point is inside or on its hull',
+    allInside, `first bad trial ${badTrial}`);
+  check('...and every hull is convex at every vertex',
+    allConvex, `first bad trial ${badTrial}`);
 };

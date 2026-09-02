@@ -13,6 +13,20 @@ import AiHelpPanel from './AiHelpPanel';
 import TextureEditor from './TextureEditor';
 import DocsDrawer from './DocsDrawer';
 import ModelEditor from './model/ModelEditor';
+// three.js, not @jscad/regl-renderer, and the reason is subtraction rather than
+// speed. Measured 2026-09-02 on the same document and kernel, one variable:
+// regl 76.70 ms to redraw, three 79.10 ms -- a tie inside the run-to-run noise.
+// (The draw STAGE really did drop 19.6 -> 3.7 ms, but a 16 ms saving inside a
+// 77 ms pipeline never reaches a hand.) So this is not a performance choice: the
+// regl renderer IS a JSCAD package, JSCAD is being removed, and three is what
+// replaces it. The tie is the good news -- the removal costs nothing.
+//
+// What it buys that regl structurally cannot: a Raycaster, so a student can
+// click a FACE (the whole point of a B-rep is that faces have names -- ModelDoc
+// already stores `edge: TopoName` for a fillet and only the picking is missing),
+// and world-to-screen projection, which is what the sandboxed iframe is
+// currently doing on our behalf to place drag handles.
+import BrepViewport, { type BrepViewportStats } from './model/BrepViewportThree';
 import HandleOverlay, { type AnchorPoint, type SketchOutline } from './model/HandleOverlay';
 import { outlineOf } from '../lib/sketch-arc';
 import { handlesFor, planeAnchor } from '../lib/model-handles';
@@ -87,6 +101,27 @@ export default function SandboxWorkspace() {
   // Toggling to Code shows that generated source, read-only -- editing it would
   // need the code parsed back into features, which is a permanent non-goal.
   const [build, setBuild] = useState(false);
+
+  // WHICH GEOMETRY ENGINE DRAWS BUILD MODE.
+  //
+  // Opt-in through ?engine=brep rather than a stored preference or a default,
+  // because this is a spike: the B-rep path does not yet project drag handles
+  // (the iframe does that today, using its own camera -- see the anchors
+  // effect below), so it is strictly less capable than the JSCAD path until
+  // that lands. A query parameter also means the measurement harness can pin
+  // an engine without clicking anything, which a toggle in the UI would not.
+  //
+  // Read in an effect rather than at first render: this app is a static export,
+  // so the server-rendered HTML has no location and reading one during render
+  // is a hydration mismatch.
+  const [brepEngine, setBrepEngine] = useState(false);
+  useEffect(() => {
+    try {
+      setBrepEngine(new URLSearchParams(window.location.search).get('engine') === 'brep');
+    } catch {
+      /* no window, or a URL we cannot parse: stay on the engine that works */
+    }
+  }, []);
   const [doc, setDoc] = useState<ModelDoc>(EMPTY_DOC);
   const [selected, setSelected] = useState<string[]>([]);
   // Rollback bar: the boundary index (0..features.length) past which features
@@ -907,7 +942,26 @@ export default function SandboxWorkspace() {
             ) : isReshape ? (
               <div className="reshape-pane">
                 <div className="reshape-pane-view">
-                  <ReshapePreview ref={frameRef} code={code} runKey={runKey} />
+                  {brepEngine && build ? (
+                    // NO IFRAME ON THIS PATH, and that is the whole point of it.
+                    // ReshapePreview builds a URL out of the generated source and
+                    // remounts the frame on every change, so each edit costs a
+                    // full page navigation plus a rebuild from zero. The sandbox
+                    // exists to contain STUDENT CODE; Build mode runs none -- the
+                    // shapes come from the toolbar, and the app builds them
+                    // itself. So the frame is pure latency here and is dropped.
+                    <BrepViewport
+                      doc={effectiveDoc}
+                      onStats={(st: BrepViewportStats) => {
+                        // The params panel reads one number, so hand it the one a
+                        // hand can feel: everything between the edit and the pixels.
+                        setRebuildMs(Math.round(st.buildMs + st.meshMs + st.drawMs));
+                        setStale(st.triangles > 0 ? null : 'empty');
+                      }}
+                    />
+                  ) : (
+                    <ReshapePreview ref={frameRef} code={code} runKey={runKey} />
+                  )}
                   {build && (
                     <HandleOverlay
                       points={anchors}

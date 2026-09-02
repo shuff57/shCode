@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<!--
+  PATHS ARE SIBLING-RELATIVE, because this file is GENERATED INTO
+  public/reshape/kernel/ rather than living beside it.
+
+  It was first written at public/reshape/runner-brep.html with ./kernel/
+  prefixes, and scripts/test-script-surface.mjs rejected it the same day:
+  public/ is copied wholesale by the static export, while the kernel it needs
+  sits in the one gitignored directory. A copy in public/reshape/ would have
+  deployed to a public URL and 404'd on its own wasm, showing an error panel
+  with the school's name on it. Generated into the kernel directory instead,
+  it exists exactly when the kernel does -- the same rule brep.html and
+  play.html follow, which is why they use ./ too.
+
+  WHEN THIS BECOMES THE REAL RUNNER, it moves back out to public/reshape/
+  alongside a kernel that is no longer gitignored, and these prefixes come
+  back. That is a deliberate step, not an accident to guard against.
+-->
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>reSHape B-rep runner</title>
+<!--
+  THE OCCT TWIN OF public/reshape/runner.html.
+
+  Same job -- run a student's script.js in a sandboxed opaque-origin frame and
+  draw whatever it returns -- on OpenCascade + three.js instead of
+  @jscad/modeling + @jscad/regl-renderer. runner.html is UNTOUCHED: students use
+  it today, and the two files being separate is what lets them be compared.
+
+  THE MESSAGE PROTOCOL IS BYTE-COMPATIBLE WITH runner.html, in both directions,
+  because components/SandboxWorkspace.tsx and components/ReshapeParamsPanel.tsx
+  do not know which engine drew the frame they are talking to:
+
+    outbound: preview-console, preview-error, preview-eval-result,
+              reshape-anchors, reshape-params, reshape-rebuilt
+    inbound:  preview-eval, reshape-set-params, reshape-set-anchors,
+              reshape-set-savebar
+
+  WHY THE VOCABULARY COMES FROM lib/occt-api.ts's createApi() DIRECTLY, RATHER
+  THAN LOADING public/reshape/reshape.js ON TOP OF IT THE WAY runner.html LOADS
+  IT ON TOP OF @jscad/modeling.
+  reshape.js's own isGeometry() duck-types a JSCAD geom by checking for
+  `.polygons` / `.sides` / `.points` arrays, and uses that to decide whether a
+  student's argument is a shape or a trailing { } options object. A raw
+  OpenCascade TopoDS_Shape has none of those properties, so isGeometry() would
+  call every shape "not geometry", isOptionsObject() would call it an options
+  object, and reSHape's box()/ball()/tube() sugar would misfire on the very
+  first call. Patching that duck-type would mean editing a file runner.html
+  also loads -- a shared file is exactly the wrong place to make an engine
+  distinction, and the risk is to the JSCAD runner students use today, not to
+  this one. createApi() already ships the taught vocabulary AS bare names PLUS
+  the namespaced modules (primitives.cuboid, transforms.translate, ...) --
+  see its own file header -- so this runner installs that object's keys onto
+  window exactly the way runner.html's shim installs @jscad/modeling's, and
+  stops there. The reSHape ELEVEN-EXTRA-NAME sugar layer (box, ball, tube, ...)
+  is therefore NOT available in this engine yet; scripts/brep-probe/play.html
+  is the reference this was built against, and it makes the same call for the
+  same reason.
+
+  THE KERNEL LOADS THROUGH THE SAME BYTE HANDOFF scripts/brep-probe/warm.html
+  and brep.html measured and proved out: this frame is sandboxed WITHOUT
+  allow-same-origin (see components/ReshapePreview.tsx's comment on why), which
+  makes it an OPAQUE origin with its own HTTP cache partition, so a parent that
+  merely prefetches the wasm buys nothing -- measured 2026-09-02, prefetching
+  DOUBLED the wait under throttling rather than removing it. So the parent is
+  asked for the bytes (`brep-kernel-please`) and, if it has them, hands them
+  back as a transferred ArrayBuffer (`brep-kernel-bytes`) for Emscripten to take
+  as `wasmBinary` -- no network request at all on that path. Nothing sends that
+  message today (components/SandboxWorkspace.tsx does not yet mount this file),
+  so until that wiring lands this runner falls back to the kernel's own network
+  fetch, which still works because /reshape/kernel/* already carries
+  Access-Control-Allow-Origin (public/_headers) for exactly this file's sake.
+
+  three.js loads the same way, for the same reason: there is no UMD build of it
+  any more, so it can only be pulled in as an ES module, which is only ever
+  fetched in CORS mode -- see scripts/build-brep-kernel.mjs for where it is
+  vendored to public/reshape/kernel/ alongside the wasm rather than beside the
+  classic-script JSCAD bundles in public/reshape/lib/.
+
+  RENDERING follows components/model/BrepViewportThree.tsx: an indexed
+  BufferGeometry per solid (lib/occt-three.ts's tessellateToThree), EdgesGeometry
+  for the facet-seam lines, OrbitControls, and RENDER ON DEMAND rather than a
+  permanent requestAnimationFrame loop -- runner.html's regl path repaints 364
+  times a second while idle, which is exactly what makes an external rebuild
+  timing measurement noisy, and there is no reason to inherit that here.
+
+  SAVE STL / 3MF / OBJ IS A STUB. lib/mesh-export.ts is being written in
+  parallel by another pass of this work; the buttons are wired to a function
+  that says so rather than to a working exporter. See saveStub() below.
+-->
+<style>
+	html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #36333a; color: #f8f8f2; font-family: system-ui, sans-serif; }
+	#__occtViewer { width: 100vw; height: 100vh; }
+	#__occtViewer canvas { display: block; }
+	#__occtStatus { position: fixed; bottom: 8px; left: 8px; color: #6272a4; font: 12px/1.4 monospace; pointer-events: none; z-index: 10; }
+	#__occtSave { position: fixed; top: 8px; right: 8px; display: none; gap: 6px; z-index: 20; }
+	#__occtSave button { font: 12px/1 'Fira Code', Consolas, monospace; color: #f8f8f2; background: #44475a; border: 1px solid #6272a4; border-radius: 4px; padding: 7px 11px; cursor: pointer; }
+	#__occtSave button:hover { background: #6272a4; }
+	#__occtSave button:disabled { opacity: 0.45; cursor: default; }
+	#__occtSaveNote { position: fixed; top: 40px; right: 8px; color: #50fa7b; font: 11px/1.4 monospace; text-align: right; pointer-events: none; z-index: 20; }
+	#__occtError { position: fixed; top: 0; left: 0; right: 0; background: rgba(220,38,38,0.92); color: #fff; padding: 8px 12px; font: 12px/1.4 monospace; white-space: pre-wrap; display: none; z-index: 100; }
+</style>
+<script>
+// Pipe console + errors to parent (matches runner.html's preview-console
+// protocol byte for byte). Copied rather than shared, same as everything else
+// in this file: the two runners load from different origins-of-truth (one a
+// classic <script src>, one a dynamic import) and have no common module to
+// hold this in without inventing a third file neither of them owns yet.
+(function() {
+	function send(type, args) {
+		try {
+			var safe = Array.prototype.slice.call(args).map(function(a) {
+				if (a instanceof Error) return a.stack || a.message;
+				if (typeof a === 'object') { try { return JSON.parse(JSON.stringify(a)); } catch(e){ return String(a); } }
+				return a;
+			});
+			window.parent.postMessage({ source: 'preview-console', type: type, args: safe }, '*');
+		} catch (e) { /* parent gone */ }
+	}
+	['log','warn','error','info'].forEach(function(t) {
+		var orig = console[t];
+		console[t] = function() { send(t, arguments); orig.apply(console, arguments); };
+	});
+
+	// Same WebKit sourceURL caveat runner.html documents at length: only the
+	// spelling of "which files are ours" changes here, from /lib/ to /kernel/ --
+	// the vendored OpenCascade + three.js bundle lives at
+	// /reshape/kernel/, not /reshape/lib/, in this runner.
+	function engineFrame(err) {
+		if (!err) return null;
+		if (!Object.prototype.hasOwnProperty.call(window.__previewSources || {}, 'script.js')) return null;
+
+		var lines = String(err.stack || '').split('\n');
+		var rx = /:(\d+):(\d+)\)?\s*$/;
+		for (var i = 0; i < lines.length; i++) {
+			if (lines[i].indexOf('/kernel/') !== -1) continue;
+			var m = rx.exec(lines[i].replace(/\s+$/, ''));
+			if (m) return { file: 'script.js', line: parseInt(m[1], 10), col: parseInt(m[2], 10) };
+		}
+
+		var src = String(err.sourceURL || err.fileName || '');
+		if (src.indexOf('/kernel/') !== -1) return null;
+		var line = (typeof err.line === 'number') ? err.line : err.lineNumber;
+		var col = (typeof err.column === 'number') ? err.column : err.columnNumber;
+		if (typeof line !== 'number' || !line) return null;
+		return { file: 'script.js', line: line, col: (typeof col === 'number') ? col : 0 };
+	}
+
+	function parseStudentFrame(stack) {
+		if (!stack) return null;
+		var sources = window.__previewSources || {};
+		var lines = String(stack).split('\n');
+		var rx = /([A-Za-z_][\w./-]*\.js):(\d+):(\d+)/;
+		for (var i = 0; i < lines.length; i++) {
+			var m = rx.exec(lines[i]);
+			if (m && Object.prototype.hasOwnProperty.call(sources, m[1])) {
+				return { file: m[1], line: parseInt(m[2], 10), col: parseInt(m[3], 10) };
+			}
+		}
+		return null;
+	}
+	function lineSnippet(file, line) {
+		var src = (window.__previewSources || {})[file];
+		if (!src || !line) return '';
+		var arr = src.split('\n');
+		return (arr[line - 1] || '').replace(/^\s+/, '').slice(0, 200);
+	}
+	function reportError(err, fallbackMsg, fbFile, fbLine, fbCol) {
+		var loc = parseStudentFrame(err && err.stack) || engineFrame(err);
+		if (!loc && fbFile && (window.__previewSources || {})[fbFile]) {
+			loc = { file: fbFile, line: fbLine || 0, col: fbCol || 0 };
+		}
+		var name = (err && err.name) || 'Error';
+		var msg = (err && err.message) || fallbackMsg || String(err);
+		var file = loc ? loc.file : null;
+		var line = loc ? loc.line : null;
+		var col = loc ? loc.col : null;
+		try {
+			window.parent.postMessage({
+				source: 'preview-error',
+				error: { name: name, message: msg, file: file, line: line, col: col, snippet: file ? lineSnippet(file, line) : '' }
+			}, '*');
+		} catch (e) { /* parent gone */ }
+		var locStr = file ? file + ':' + line + (col ? ':' + col : '') : '';
+		send('error', [name + ': ' + msg + (locStr ? '  (' + locStr + ')' : '')]);
+		var el = document.getElementById('__occtError');
+		if (el) {
+			el.style.display = 'block';
+			el.textContent = name + ': ' + msg + (locStr ? '  @ ' + locStr : '');
+		}
+	}
+	window.__previewFail = function(msg) {
+		reportError({ name: 'Error', message: msg }, msg);
+	};
+	window.addEventListener('error', function(e) {
+		reportError(e.error, e.message, e.filename, e.lineno, e.colno);
+	});
+	window.addEventListener('unhandledrejection', function(e) {
+		var r = e.reason;
+		var err = (r && r.stack) ? r : new Error(r && r.message ? r.message : String(r));
+		reportError(err, 'Unhandled promise rejection');
+	});
+
+	// REPL, identical contract to runner.html: parent posts
+	// { source: 'preview-eval', id, expr }, we eval at global scope and post
+	// back { source: 'preview-eval-result', id, ok, text }.
+	function inspect(v, depth) {
+		depth = depth || 0;
+		if (v === null) return 'null';
+		if (v === undefined) return 'undefined';
+		var t = typeof v;
+		if (t === 'string') return JSON.stringify(v);
+		if (t === 'number' || t === 'bigint' || t === 'boolean' || t === 'symbol') return String(v);
+		if (t === 'function') return 'ƒ ' + (v.name || '(anonymous)') + '()';
+		if (t !== 'object') return String(v);
+		if (v instanceof Error) return v.stack || v.message;
+		var c = v.constructor;
+		var name = '';
+		while (c && c !== Function.prototype) {
+			if (c.name) { name = c.name; break; }
+			c = Object.getPrototypeOf(c);
+		}
+		var ctor = (name && name !== 'Object') ? name : '';
+		if (depth >= 1) return ctor ? ctor + ' { … }' : '{…}';
+		if (Array.isArray(v)) {
+			var items = v.slice(0, 6).map(function(x) { return inspect(x, depth + 1); });
+			if (v.length > 6) items.push('… +' + (v.length - 6));
+			return '[' + items.join(', ') + ']';
+		}
+		var keys;
+		try { keys = Object.keys(v); } catch (_) { return ctor ? ctor + ' { … }' : '{…}'; }
+		var shown = keys.slice(0, 6);
+		var pairs = shown.map(function(k) {
+			var val;
+			try { val = inspect(v[k], depth + 1); } catch (_) { val = '<unreadable>'; }
+			return k + ': ' + val;
+		});
+		if (keys.length > 6) pairs.push('… +' + (keys.length - 6));
+		return (ctor ? ctor + ' ' : '') + '{ ' + pairs.join(', ') + ' }';
+	}
+	window.addEventListener('message', function(e) {
+		var d = e.data;
+		if (!d || d.source !== 'preview-eval') return;
+		var out, ok = true, text;
+		try {
+			out = (0, eval)(d.expr);
+			text = inspect(out);
+		} catch (x) {
+			ok = false;
+			text = (x && (x.stack || x.message)) || String(x);
+		}
+		try {
+			window.parent.postMessage({ source: 'preview-eval-result', id: d.id, ok: ok, text: text }, '*');
+		} catch (_) { /* parent gone */ }
+	});
+})();
+</script>
+</head>
+<body>
+<div id="__occtError"></div>
+<div id="__occtViewer"></div>
+<div id="__occtStatus">Loading…</div>
+<div id="__occtSave">
+	<button type="button" data-format="stl">Save STL</button>
+	<button type="button" data-format="3mf">Save 3MF</button>
+	<button type="button" data-format="obj">Save OBJ</button>
+</div>
+<div id="__occtSaveNote"></div>
+<script>
+// Same top-frame guard runner.html carries, and for the identical reason: this
+// frame is sandboxed WITHOUT allow-same-origin specifically so student code
+// cannot reach /api/* with the signed-in user's cookie. Opened directly (a
+// link, not the iframe), there is no sandbox at all, and injecting student
+// code onto the app's own origin would be the same hole. Defence in depth
+// behind the sandbox attribute, not a substitute for it.
+(function() {
+	if (window.top === window.self) {
+		document.body.innerHTML = '';
+		var warn = document.createElement('p');
+		warn.style.cssText = 'font:14px system-ui;color:#f8f8f2;background:#282a36;margin:0;padding:24px';
+		warn.textContent = 'This preview only runs inside shCode. Open a lesson or the docs instead.';
+		document.body.appendChild(warn);
+		window.__occtNoRun = true;
+		return;
+	}
+	var params = new URLSearchParams(location.search);
+	var encoded = params.get('code');
+	if (!encoded) { window.__occtNoRun = true; return; }
+	var code;
+	try {
+		var b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+		while (b64.length % 4) b64 += '=';
+		code = decodeURIComponent(escape(atob(b64)));
+	} catch (e) {
+		console.error('Failed to decode your program: ' + (e.message || e));
+		window.__occtNoRun = true;
+		return;
+	}
+	// Stashed here, same as runner.html, so the error handler above can look up
+	// the offending line the moment the script is injected -- which happens
+	// later, in the module below, once the kernel is ready.
+	window.__previewSources = { 'script.js': code };
+	window.__occtPendingCode = code;
+})();
+</script>
+<script type="module">
+// ---------------------------------------------------------------------------
+// Load the kernel + three.js, install the vocabulary, run the student's
+// program, draw it, and keep it in sync with the Dimensions panel.
+//
+// This is one long async IIFE rather than runner.html's run-to-completion
+// script, because everything from the kernel down is behind a promise. There
+// is no equivalent of runner.html's "declaration order" hazard here (see
+// scripts/check-runner-hoisting.mjs's header for what that was) -- nothing in
+// this file is a `var` reassigned after a callback fires; the state three.js
+// needs across rebuilds lives in the closures set up in initScene(), called
+// exactly once.
+// ---------------------------------------------------------------------------
+(async function () {
+	if (window.__occtNoRun) return;
+
+	var statusEl = document.getElementById('__occtStatus');
+	var container = document.getElementById('__occtViewer');
+
+	function fail(msg) {
+		statusEl.textContent = '';
+		window.__previewFail(msg);
+	}
+
+	// ---- 1. the kernel, three.js, and our own vocabulary layer -------------
+
+	var THREE, OrbitControls, oc, api, meshMod, occtThree;
+	try {
+		statusEl.textContent = 'Loading three.js…';
+		var threeMod = await import('./three.module.min.js');
+		THREE = threeMod;
+		OrbitControls = (await import('./OrbitControls.js')).OrbitControls;
+
+		statusEl.textContent = 'Loading the modelling kernel (OpenCascade, ~23 MB the first time)…';
+		var initReplicad = (await import('./replicad_single.js')).default;
+
+		// THE BYTE HANDOFF. See the file-header comment for why a parent that
+		// merely prefetches the wasm cannot help an opaque-origin frame, and why
+		// this asks for the bytes directly instead. window.parent === window.self
+		// means we were opened with no host at all (a direct link, or this exact
+		// file loaded standalone for testing) -- there is nothing to ask.
+		var handed = await new Promise(function (resolve) {
+			if (window.parent === window) { resolve(null); return; }
+			var timer = setTimeout(function () { resolve(null); }, 250);
+			window.addEventListener('message', function (e) {
+				if (!e.data || e.data.type !== 'brep-kernel-bytes') return;
+				clearTimeout(timer);
+				resolve(e.data.bytes);
+			}, { once: true });
+			try { window.parent.postMessage({ type: 'brep-kernel-please' }, '*'); } catch (err) { /* opaque */ }
+		});
+		oc = await initReplicad(handed ? { wasmBinary: new Uint8Array(handed) } : {});
+
+		statusEl.textContent = 'Loading the taught vocabulary…';
+		var apiMod = await import('./occt-api.js');
+		meshMod = await import('./occt-mesh.js');
+		var hullMod = await import('./hull.js');
+		occtThree = await import('./occt-three.js');
+		api = apiMod.createApi(oc, { tessellate: meshMod.tessellate, convexHull: hullMod.convexHull });
+	} catch (e) {
+		fail('Failed to load the B-rep engine: ' + (e && e.message ? e.message : e) +
+			'\n\nTry refreshing the page.');
+		return;
+	}
+
+	// ---- 2. install the vocabulary on window --------------------------------
+	//
+	// Same precedence rule runner.html's shim documents at length: a name
+	// already on window (a browser built-in, or one of this file's own helpers
+	// declared above) is never clobbered, and what gets skipped is reported
+	// rather than silently dropped. createApi() already returns BOTH the bare
+	// names (cuboid, subtract, translate, ...) and the namespaced modules
+	// (primitives.cuboid, ...) from the SAME function objects -- see its own
+	// file header -- so there is no second pass to build those namespaces here
+	// the way runner.html's MODULE_ORDER loop does for @jscad/modeling.
+	(function installVocabulary() {
+		var skipped = [];
+		for (var name in api) {
+			if (!Object.prototype.hasOwnProperty.call(api, name)) continue;
+			if (name in window) { skipped.push(name); continue; }
+			window[name] = api[name];
+		}
+		window.__occtBareNamesSkipped = skipped;
+		if (skipped.length) {
+			console.warn(
+				'reSHape (B-rep engine): ' + skipped.length + ' name(s) could not be added to scope ' +
+				'because something already owns them here: ' + skipped.join(', ') + '.'
+			);
+		}
+	})();
+
+	if (!window.__occtPendingCode) { statusEl.textContent = ''; return; } // nothing submitted
+
+	// ---- 3. run the student's script.js -------------------------------------
+	//
+	// Injected as a real <script>, not eval()'d, for the same reason
+	// runner.html does it this way: top-level let/const/class in the student's
+	// file become real globals, and //# sourceURL is what lets the error
+	// reporter above attribute a thrown line to "script.js" instead of to this
+	// document. Same synchronous completion flag runner.html sets: appendChild
+	// of a classic script with textContent runs it inline, so by the time
+	// appendChild returns the flag is set UNLESS the script threw (in which
+	// case window.onerror above has already reported it, and findMain() below
+	// simply finds nothing and reports its own "no main()" message).
+	window.module = window.module || { exports: {} };
+	var s = document.createElement('script');
+	s.textContent = window.__occtPendingCode +
+		'\n;window.__occtScriptCompleted = true;\n//# sourceURL=script.js';
+	document.head.appendChild(s);
+	if (!window.__occtScriptCompleted) { statusEl.textContent = ''; return; }
+
+	// ---- 4. find main(), the same way runner.html does ----------------------
+
+	function findMain() {
+		var exp = window.module && window.module.exports;
+		if (exp && typeof exp.main === 'function') return exp.main;
+		if (typeof exp === 'function') return exp;
+		try {
+			var f = (0, eval)('typeof main !== "undefined" ? main : undefined');
+			if (typeof f === 'function') return f;
+		} catch (e) { /* not declared */ }
+		return null;
+	}
+
+	function paramDefs() {
+		var defs = null;
+		var exp = window.module && window.module.exports;
+		if (exp && typeof exp.getParameterDefinitions === 'function') defs = exp.getParameterDefinitions;
+		if (!defs) {
+			try {
+				var g = (0, eval)('typeof getParameterDefinitions !== "undefined" ? getParameterDefinitions : undefined');
+				if (typeof g === 'function') defs = g;
+			} catch (e) { /* not declared */ }
+		}
+		if (!defs) return [];
+		try { return defs() || []; } catch (e) { return []; }
+	}
+	function initialOf(d) {
+		if (!d || d.name === undefined) return undefined;
+		if (d.initial !== undefined) return d.initial;
+		if (d.default !== undefined) return d.default;
+		return undefined;
+	}
+	function defaultParams() {
+		var out = {};
+		var list = paramDefs();
+		for (var i = 0; i < list.length; i++) {
+			var v = initialOf(list[i]);
+			if (v !== undefined) out[list[i].name] = v;
+		}
+		return out;
+	}
+
+	var mainFn = findMain();
+	if (!mainFn) {
+		fail('No main() function found.\n\nYour program needs a function called main that returns a shape:\n\n  function main() {\n    return cuboid(10, 10, 10)\n  }\n\n(Adding "module.exports = { main }" is optional here — it is what lets the same file run on jscad.app.)');
+		return;
+	}
+
+	// ---- 5. the three.js scene, matching components/model/BrepViewportThree.tsx
+
+	var scene = new THREE.Scene();
+	scene.background = new THREE.Color(0x282a36);
+
+	var camera = new THREE.PerspectiveCamera(
+		45, Math.max(1, container.clientWidth) / Math.max(1, container.clientHeight), 0.1, 100000
+	);
+	camera.up.set(0, 0, 1); // Z-up, same convention as every other view of a model in this app.
+	camera.position.set(140, 160, 130);
+	camera.lookAt(0, 0, 0);
+
+	var renderer = new THREE.WebGLRenderer({
+		antialias: true,
+		// Without this a headless read of the canvas (a screenshot-based
+		// measurement, the same technique scripts/measure-modeller.py uses)
+		// sees a cleared buffer even though the eye saw a correct frame.
+		preserveDrawingBuffer: true,
+	});
+	renderer.setPixelRatio(window.devicePixelRatio || 1);
+	renderer.setSize(container.clientWidth, container.clientHeight);
+	container.appendChild(renderer.domElement);
+
+	scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+	var key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(100, 200, 150);
+	var fillLight = new THREE.DirectionalLight(0xffffff, 0.4); fillLight.position.set(-120, -80, 60);
+	scene.add(key, fillLight);
+
+	var grid = new THREE.GridHelper(400, 40, 0x8be9fd, 0x44475a);
+	grid.rotation.x = Math.PI / 2; // three's GridHelper defaults to Y-up (the XZ plane).
+	grid.material.transparent = true;
+	grid.material.opacity = 0.35;
+	scene.add(grid);
+	scene.add(new THREE.AxesHelper(60));
+
+	var solidGroup = new THREE.Group();
+	scene.add(solidGroup);
+
+	var controls = new OrbitControls(camera, renderer.domElement);
+	controls.target.set(0, 0, 0);
+	controls.enableDamping = true;
+	controls.dampingFactor = 0.1;
+
+	function renderNow() { renderer.render(scene, camera); }
+
+	// RENDER ON DEMAND -- see the file header. The only thing that needs a
+	// per-frame loop is OrbitControls' damping tail after a drag, and that loop
+	// stops itself the instant update() reports nothing moved.
+	var dampingRaf = null;
+	function dampingTick() {
+		var stillMoving = controls.update();
+		renderNow();
+		if (anchorsDirty) { anchorsDirty = false; projectAnchors(); }
+		dampingRaf = stillMoving ? requestAnimationFrame(dampingTick) : null;
+	}
+	controls.addEventListener('start', function () {
+		if (dampingRaf === null) dampingRaf = requestAnimationFrame(dampingTick);
+	});
+	controls.addEventListener('change', function () { anchorsDirty = true; });
+
+	window.addEventListener('resize', function () {
+		camera.aspect = Math.max(1, container.clientWidth) / Math.max(1, container.clientHeight);
+		camera.updateProjectionMatrix();
+		renderer.setSize(container.clientWidth, container.clientHeight);
+		anchorsDirty = true;
+		renderNow();
+	});
+
+	renderNow();
+
+	// ---- 6. drag handles: parent sends specs, we project to screen ----------
+	//
+	// Same division of labour runner.html documents: the parent knows the
+	// model and sends world-space points, this frame owns the camera and turns
+	// them into screen coordinates. three.js makes the projection itself much
+	// shorter than runner.html's hand-rolled column-major matrix multiply --
+	// Vector3.applyMatrix4 does the perspective divide -- but "is this point in
+	// front of the camera at all" still has to be answered separately, because
+	// applyMatrix4 divides by w unconditionally and a point behind the camera
+	// produces a MIRRORED but not obviously wrong-looking result. View-space Z
+	// answers it directly: three's camera looks down its own local -Z, so a
+	// point with a POSITIVE view-space Z is behind it.
+	var anchors = [];
+	var anchorsDirty = false;
+	var mvp = new THREE.Matrix4();
+	var viewMat = new THREE.Matrix4();
+	function inFrontOfCamera(p) {
+		var v = new THREE.Vector3(p[0], p[1], p[2]).applyMatrix4(viewMat);
+		return v.z < 0;
+	}
+	function toScreen(p, out) {
+		var v = new THREE.Vector3(p[0], p[1], p[2]).applyMatrix4(mvp);
+		out[0] = (v.x * 0.5 + 0.5) * container.clientWidth;
+		out[1] = (1 - (v.y * 0.5 + 0.5)) * container.clientHeight;
+	}
+	var aHere = [0, 0], aThere = [0, 0];
+	function projectAnchors() {
+		if (!anchors.length) {
+			try { window.parent.postMessage({ source: 'reshape-anchors', points: [] }, '*'); } catch (_) {}
+			return;
+		}
+		camera.updateMatrixWorld();
+		viewMat.copy(camera.matrixWorldInverse);
+		mvp.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+		var points = [];
+		for (var i = 0; i < anchors.length; i++) {
+			var a = anchors[i];
+			if (!inFrontOfCamera(a.origin)) continue;
+			toScreen(a.origin, aHere);
+			toScreen([a.origin[0] + a.axis[0], a.origin[1] + a.axis[1], a.origin[2] + a.axis[2]], aThere);
+			var dx = aThere[0] - aHere[0], dy = aThere[1] - aHere[1];
+			var px = Math.sqrt(dx * dx + dy * dy);
+			if (px < 0.001) continue; // axis points at the camera; undraggable
+			var pt = {
+				param: a.param, label: a.label, kind: a.kind,
+				x: aHere[0], y: aHere[1],
+				dirX: dx / px, dirY: dy / px, pxPerUnit: px,
+				ux: dx, uy: dy
+			};
+			if (a.axisV && a.paramV) {
+				toScreen([a.origin[0] + a.axisV[0], a.origin[1] + a.axisV[1], a.origin[2] + a.axisV[2]], aThere);
+				pt.paramV = a.paramV;
+				pt.vx = aThere[0] - aHere[0];
+				pt.vy = aThere[1] - aHere[1];
+			}
+			points.push(pt);
+		}
+		try { window.parent.postMessage({ source: 'reshape-anchors', points: points }, '*'); } catch (_) {}
+	}
+
+	// ---- 7. save bar (stub) --------------------------------------------------
+	//
+	// lib/mesh-export.ts, which will replace @jscad/io's serializers for this
+	// engine, is being written in a parallel pass of this same effort and is
+	// not wired to anything yet. Rather than block this runner on it, the
+	// buttons stay visible (so the UI does not silently change shape once a
+	// model exists) and clicking one says plainly that export is not built for
+	// this engine yet -- the same non-fatal, not-reported-to-parent path
+	// runner.html uses for a save that declines on purpose, since a failed
+	// export is not a failed build.
+	var lastShapes = null;
+	(function () {
+		var bar = document.getElementById('__occtSave');
+		var note = document.getElementById('__occtSaveNote');
+		function saveStub(key) {
+			var msg = 'Save ' + key.toUpperCase() + ' is not built for the B-rep engine yet ' +
+				'(lib/mesh-export.ts is in progress). The model above is real; only the export is missing.';
+			console.log(msg);
+			var el = document.getElementById('__occtError');
+			if (el) { el.style.display = 'block'; el.textContent = msg; }
+		}
+		if (bar) {
+			bar.addEventListener('click', function (ev) {
+				var key = ev.target && ev.target.getAttribute && ev.target.getAttribute('data-format');
+				if (key) saveStub(key);
+			});
+		}
+		window.__occtEnableSaving = function (shapes) {
+			lastShapes = shapes;
+			if (bar) bar.style.display = 'flex';
+		};
+	})();
+
+	// ---- 8. build -> mesh -> draw --------------------------------------------
+
+	/** Every top-level shape main() can hand back, flattened to a plain array.
+	 *  createApi()'s own functions already collapse a single result down to a
+	 *  bare shape (not a one-element array) -- see e.g. api.union -- so a
+	 *  student's main() may return either shape. */
+	function shapesOf(result) {
+		if (!result) return [];
+		return Array.isArray(result) ? result.flat(Infinity).filter(Boolean) : [result];
+	}
+
+	var solidMaterial = new THREE.MeshStandardMaterial({ color: 0xff6600, roughness: 0.6, metalness: 0.1 });
+	var edgeMaterial = new THREE.LineBasicMaterial({ color: 0x1a1a1a });
+	var fittedOnce = false;
+
+	/** Frame the camera on whatever is on screen -- the built solids if there
+	 *  are any, the drag-handle anchors otherwise (the sketch-plane placeholder
+	 *  case runner.html's fitAnchors() exists for). Done ONCE per load, same as
+	 *  runner.html: refitting on every parameter edit would yank the view out
+	 *  from under a student mid-drag. */
+	function fitViewIfNeeded() {
+		if (fittedOnce) return;
+		var box = new THREE.Box3();
+		var any = false;
+		solidGroup.traverse(function (o) { if (o.isMesh) { box.expandByObject(o); any = true; } });
+		if (!any) {
+			for (var i = 0; i < anchors.length; i++) {
+				box.expandByPoint(new THREE.Vector3(anchors[i].origin[0], anchors[i].origin[1], anchors[i].origin[2]));
+				any = true;
+			}
+		}
+		if (!any || box.isEmpty()) return;
+		var sphere = new THREE.Sphere();
+		box.getBoundingSphere(sphere);
+		if (!isFinite(sphere.radius) || sphere.radius < 0.001) return;
+		var dir = new THREE.Vector3(140, 160, 130).normalize();
+		var dist = (sphere.radius * 1.6) / Math.sin((camera.fov / 2) * Math.PI / 180);
+		camera.position.copy(sphere.center).addScaledVector(dir, dist);
+		controls.target.copy(sphere.center);
+		camera.lookAt(sphere.center);
+		fittedOnce = true;
+	}
+
+	function drawShapes(shapes) {
+		solidGroup.traverse(function (o) { if (o.isMesh) o.geometry && o.geometry.dispose(); });
+		solidGroup.clear();
+		var meshed = [];
+		for (var i = 0; i < shapes.length; i++) {
+			var m = occtThree.tessellateToThree(THREE, oc, shapes[i], { deflection: 0.05 });
+			if (m) meshed.push(m);
+		}
+		for (var j = 0; j < meshed.length; j++) {
+			var mesh = new THREE.Mesh(meshed[j].geometry, solidMaterial);
+			mesh.userData.faceRanges = meshed[j].faces;
+			solidGroup.add(mesh);
+			var edgesGeom = new THREE.EdgesGeometry(meshed[j].geometry, 25);
+			mesh.add(new THREE.LineSegments(edgesGeom, edgeMaterial));
+		}
+		return meshed;
+	}
+
+	var liveParams = defaultParams();
+	try {
+		window.parent.postMessage({
+			source: 'reshape-params',
+			defs: JSON.parse(JSON.stringify(paramDefs(), function (k, v) {
+				return typeof v === 'function' ? undefined : v;
+			})),
+			values: liveParams
+		}, '*');
+	} catch (_) { /* parent gone, or nothing serialisable */ }
+
+	function rebuildFailed(e) {
+		window.dispatchEvent(new ErrorEvent('error', { error: e, message: e && e.message, filename: 'script.js' }));
+		try { window.parent.postMessage({ source: 'reshape-rebuilt', ms: 0, failed: true }, '*'); } catch (_) {}
+	}
+
+	function runAndDraw(params, isFirstRun) {
+		for (var k in params) { if (Object.prototype.hasOwnProperty.call(params, k)) liveParams[k] = params[k]; }
+		var t0 = performance.now();
+		var result;
+		try {
+			result = mainFn(liveParams);
+		} catch (e) {
+			if (isFirstRun) {
+				window.dispatchEvent(new ErrorEvent('error', { error: e, message: e && e.message, filename: 'script.js' }));
+				statusEl.textContent = '';
+			} else {
+				rebuildFailed(e);
+			}
+			return;
+		}
+		function settle(value) {
+			var shapes = shapesOf(value);
+			if (shapes.length === 0) {
+				if (isFirstRun) { fail('main() returned nothing. Make sure you return a shape.\n\nExample:  return cuboid(10, 10, 10)'); return; }
+				try { window.parent.postMessage({ source: 'reshape-rebuilt', ms: 0, empty: true }, '*'); } catch (_) {}
+				return;
+			}
+			var meshed;
+			try {
+				meshed = drawShapes(shapes);
+			} catch (e) {
+				fail('Render error: ' + (e && e.message ? e.message : e));
+				return;
+			}
+			if (meshed.length === 0) {
+				// The kernel built a solid but produced nothing to draw -- same
+				// "the numbers no longer describe what is on screen" case as an
+				// empty geometry, and reported the same way.
+				if (isFirstRun) { fail('Your shape built, but nothing came out drawable. Check for a degenerate size (0, or negative).'); return; }
+				try { window.parent.postMessage({ source: 'reshape-rebuilt', ms: 0, empty: true }, '*'); } catch (_) {}
+				return;
+			}
+			fitViewIfNeeded();
+			renderNow();
+			anchorsDirty = true;
+			window.__occtEnableSaving(shapes);
+			statusEl.textContent = '';
+			var ms = performance.now() - t0;
+			try { window.parent.postMessage({ source: 'reshape-rebuilt', ms: ms }, '*'); } catch (_) {}
+		}
+		function asyncFailed(e) {
+			if (isFirstRun) {
+				window.dispatchEvent(new ErrorEvent('error', { error: e, message: e && e.message, filename: 'script.js' }));
+				statusEl.textContent = '';
+			} else {
+				rebuildFailed(e);
+			}
+		}
+		if (result && typeof result.then === 'function') {
+			result.then(settle, asyncFailed);
+		} else {
+			settle(result);
+		}
+	}
+
+	window.addEventListener('message', function (e) {
+		var d = e.data;
+		if (d && d.source === 'reshape-set-anchors') {
+			anchors = Array.isArray(d.anchors) ? d.anchors : [];
+			anchorsDirty = true;
+			projectAnchors();
+			return;
+		}
+		if (d && d.source === 'reshape-set-savebar') {
+			var bar = document.getElementById('__occtSave');
+			var note = document.getElementById('__occtSaveNote');
+			if (bar) {
+				if (d.bottom) { bar.style.top = 'auto'; bar.style.bottom = '8px'; }
+				else { bar.style.top = (d.offset || 0) + 'px'; bar.style.bottom = 'auto'; }
+			}
+			if (note) {
+				if (d.bottom) { note.style.top = 'auto'; note.style.bottom = '40px'; }
+				else { note.style.top = (d.offset || 0) + 32 + 'px'; note.style.bottom = 'auto'; }
+			}
+			return;
+		}
+		if (!d || d.source !== 'reshape-set-params' || !d.params) return;
+		runAndDraw(d.params, false);
+	});
+
+	statusEl.textContent = 'Running your code…';
+	runAndDraw({}, true);
+})();
+</script>
+</body>
+</html>

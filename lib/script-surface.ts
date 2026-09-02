@@ -251,6 +251,12 @@ export const SURFACE: SurfaceName[] = [
       + 'compound -- a B-rep knows what is connected to what without being asked.',
     needs: 'TopExp_Explorer over TopAbs_SOLID',
     kernel: ['TopExp_Explorer', 'TopAbs_ShapeEnum'] },
+  { name: 'minkowskiSum', module: 'booleans', serves: 'absent',
+    note: 'OpenCascade ships no Minkowski sum -- zero of the 498 exports match '
+      + '/minkowski/i, the same count that refuses hull. Nothing to bind; sweeping one '
+      + 'solid over every point of another is a different algorithm from anything '
+      + 'BRepOffsetAPI or BRepAlgoAPI provide, so this is owned or the page stops working.',
+    needs: 'a first-party Minkowski sum, the way lib/hull.ts owns hull' },
 
   // ---- extrusions ---------------------------------------------------------
   { name: 'extrudeLinear', module: 'extrusions', serves: 'exact',

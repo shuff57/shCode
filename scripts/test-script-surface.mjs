@@ -94,6 +94,18 @@ try {
   // costs a false "unclassified" and someone adds a line; under-reading would
   // let a real name slip past the gate unjudged, which is the error that
   // matters.
+  //
+  // The dot exclusion is why `minkowski.minkowskiSum(...)` -- the docs' only
+  // call to it -- is invisible to this scan even after minkowskiSum gets a
+  // verdict in SURFACE, and shows up below as "no example calls this any
+  // more". Tried lifting the exclusion once: it also picked up `vec3.scale(`
+  // and `vec2.scale(` and misfiled four unrelated `maths` pages under
+  // `transforms`' `scale` refusal, because JSCAD really does export different
+  // functions under the same bare name in different modules. Bare-name
+  // matching cannot tell those apart without tracking which module each call
+  // came through, so the safer wrong answer -- a spurious WARN here -- stands
+  // over the more dangerous one -- a real page misclassified as blocked by a
+  // name it never calls.
 
   console.log('\n=== documented examples against the classification ===');
 

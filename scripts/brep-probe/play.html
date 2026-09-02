@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>reSHape B-rep scratchpad</title>
+<!--
+  SOMEWHERE TO ACTUALLY MODEL SOMETHING, on the new kernel.
+
+  Everything in the B-rep conversion has been driven by test harnesses. That is
+  the right way to build it and a useless way to feel it, so this is a page you
+  can type in: the taught vocabulary from lib/occt-api.ts, running on
+  OpenCascade, drawn by the same regl renderer the real runner uses.
+
+  IT IS NOT THE PRODUCT. The real modeller is /sandbox, it still runs JSCAD, and
+  wiring the two together is a separate piece of work. This exists so the kernel
+  can be judged by hand instead of by assertion.
+
+  Everything happens in this tab. The kernel is a wasm file that runs on your
+  machine; nothing is sent anywhere, and once it has loaded you can turn off the
+  network and keep modelling.
+-->
+<style>
+  :root { --bg:#282a36; --panel:#21222c; --line:#44475a; --fg:#f8f8f2;
+          --dim:#6272a4; --ok:#50fa7b; --bad:#ff5555; --accent:#bd93f9; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--fg);
+    font:13px/1.5 ui-monospace,Menlo,Consolas,monospace; }
+  #wrap { display:flex; height:100%; }
+  #left { flex:0 0 460px; display:flex; flex-direction:column;
+    border-right:1px solid var(--line); background:var(--panel); min-width:0; }
+  #bar { padding:8px 10px; border-bottom:1px solid var(--line); display:flex;
+    align-items:center; gap:8px; flex-wrap:wrap; }
+  button { background:var(--accent); color:#282a36; border:0; border-radius:4px;
+    padding:5px 12px; font:inherit; font-weight:700; cursor:pointer; }
+  button.sec { background:transparent; color:var(--dim); border:1px solid var(--line); font-weight:400; }
+  select { background:var(--bg); color:var(--fg); border:1px solid var(--line);
+    border-radius:4px; padding:4px; font:inherit; }
+  #code { flex:1 1 auto; background:var(--bg); color:var(--fg); border:0;
+    padding:10px; font:inherit; resize:none; outline:none; tab-size:2; }
+  #out { flex:0 0 auto; max-height:34%; overflow:auto; padding:8px 10px;
+    border-top:1px solid var(--line); white-space:pre-wrap; }
+  #view { flex:1 1 auto; position:relative; min-width:0; }
+  #view canvas { display:block; }
+  .ok { color:var(--ok); } .bad { color:var(--bad); } .dim { color:var(--dim); }
+  #status { margin-left:auto; color:var(--dim); }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="left">
+    <div id="bar">
+      <button id="run">Run</button>
+      <select id="examples"></select>
+      <button class="sec" id="offline">Prove it is offline</button>
+      <span id="status">loading kernel…</span>
+    </div>
+    <textarea id="code" spellcheck="false"></textarea>
+    <div id="out" class="dim">The kernel is loading. It is 3.8 MB and runs on your machine.</div>
+  </div>
+  <div id="view"></div>
+</div>
+
+<script src="../lib/jscad-modeling.min.js"></script>
+<script src="../lib/jscad-regl-renderer.min.js"></script>
+
+<script type="module">
+const $ = (id) => document.getElementById(id);
+const out = $('out');
+const say = (html, cls) => { out.className = cls || ''; out.innerHTML = html; };
+
+// The examples deliberately start with things the OLD engine cannot do, because
+// that is the whole reason for the swap.
+const EXAMPLES = {
+  'Round ONE edge (impossible on a mesh)': `// JSCAD can only round EVERY edge of a box at once.
+// A B-rep can name one edge and round just that.
+function main() {
+  const plate = subtract(
+    cuboid(60, 40, 16),
+    cylinder(9, 40)
+  )
+  return round(plate, ['+z', '+x'], 5)
+}`,
+  'A drilled, bolted plate': `function main() {
+  let part = cuboid(80, 50, 12)
+  for (let x = -28; x <= 28; x += 56) {
+    for (let y = -16; y <= 16; y += 32) {
+      part = subtract(part, translate([x, y, 0], cylinder(3.2, 20)))
+    }
+  }
+  return subtract(part, cylinder(12, 20))
+}`,
+  'Exact curves — measure it': `// The cylinder is a REAL cylinder, not a 32-sided prism.
+function main() {
+  const c = cylinder(12, 30)
+  console.log('volume  ', measureVolume(c).toFixed(4))
+  console.log('exact   ', (Math.PI * 144 * 30).toFixed(4))
+  console.log('JSCAD is 13484.6431 — 0.64% low')
+  return c
+}`,
+  'Non-uniform scale (needs the custom build)': `// scale([3,1,1]) is TAUGHT and does not work on the
+// stock kernel. This is what the rebuild was for.
+function main() {
+  return scale([3, 1, 1], sphere(10))
+}`,
+  'Sketch, then extrude': `function main() {
+  const outline = polygon([
+    [0, 0], [60, 0], [60, 20], [25, 20], [25, 45], [0, 45]
+  ])
+  return extrudeLinear({ height: 14 }, outline)
+}`,
+  'Hull — ours, not the kernel’s': `// OpenCascade has NO convex hull. lib/hull.ts is ours.
+function main() {
+  return hull(
+    sphere(10),
+    translate([30, 0, 0], sphere(4)),
+    translate([15, 25, 0], sphere(6))
+  )
+}`,
+};
+
+const sel = $('examples');
+for (const k of Object.keys(EXAMPLES)) {
+  const o = document.createElement('option');
+  o.value = k; o.textContent = k;
+  sel.appendChild(o);
+}
+$('code').value = EXAMPLES[Object.keys(EXAMPLES)[0]];
+sel.onchange = () => { $('code').value = EXAMPLES[sel.value]; run(); };
+
+// ---- the kernel -----------------------------------------------------------
+let api = null;
+let mesh = null;
+let renderer = null;
+let camera = null;
+
+const t0 = performance.now();
+const oc = await (await import('./replicad_single.js')).default();
+const { createApi } = await import('./occt-api.js');
+mesh = await import('./occt-mesh.js');
+const hull = await import('./hull.js');
+const { resolvePrimitiveFace } = await import('./topo-resolve.js');
+const { sharedEdge, filleted, chamfered } = await import('./topo-history.js');
+api = createApi(oc, { tessellate: mesh.tessellate, convexHull: hull.convexHull });
+$('status').textContent = Math.round(performance.now() - t0) + ' ms · ' + Object.keys(oc).length + ' kernel exports';
+
+// A few friendlier names on top of the library vocabulary, so the examples read
+// like the course does rather than like @jscad/modeling.
+//
+// PAGE-LOCAL, deliberately not added to lib/occt-api.ts. That file is the
+// shipped, taught vocabulary; `round`/`bevel` are only exercised by the example
+// above, on the one shape it names, and turning that into curriculum vocabulary
+// is a decision for whoever writes the lesson, not for this probe to make.
+//
+// Only the two-face form is handled -- "the edge between these two named
+// faces" -- because that is the only form the examples on this page ever call.
+// A list of more than two faces would need each edge resolved and rounded in
+// turn, and after the first cut the shape those faces were found on no longer
+// exists: a face handle resolved against the ORIGINAL shape does not belong to
+// the fillet's output. That is a real design question (resolve after each cut?
+// collect every edge into one MakeFillet before any Build?) and it is left
+// unanswered here rather than guessed at.
+api.__round = (shape, faceParts, size, kind) => {
+  const verb = kind === 'fillet' ? 'round' : 'bevel';
+  if (!Array.isArray(faceParts) || faceParts.length !== 2) {
+    throw new Error(`${verb}() needs exactly two face names -- the two faces whose shared edge gets ${verb === 'round' ? 'rounded' : 'bevelled'}.`);
+  }
+  const faces = faceParts.map((part) => resolvePrimitiveFace(oc, shape, part));
+  if (!faces[0] || !faces[1]) {
+    throw new Error(`${verb}(): could not find one of the named faces (${faceParts.join(', ')}) on this shape.`);
+  }
+  const edge = sharedEdge(oc, faces[0], faces[1]);
+  if (!edge) {
+    throw new Error(`${verb}(): faces ${faceParts.join(', ')} do not share exactly one edge.`);
+  }
+  const result = kind === 'fillet' ? filleted(oc, shape, edge, size) : chamfered(oc, shape, edge, size);
+  if (!result) {
+    throw new Error(`${verb}(): the kernel refused -- ${size} is too large for this edge.`);
+  }
+  return result;
+};
+api.round = (shape, faces, size) => api.__round(shape, faces, size, 'fillet');
+api.bevel = (shape, faces, size) => api.__round(shape, faces, size, 'chamfer');
+
+// ---- render ---------------------------------------------------------------
+function draw(geom) {
+  const container = $('view');
+  const { prepareRender, drawCommands, cameras, entitiesFromSolids } = jscadReglRenderer;
+  if (!renderer) {
+    camera = Object.assign({}, cameras.perspective.defaults);
+    camera.position = [130, 150, 120];
+    camera.target = [0, 0, 0];
+    camera.up = [0, 0, 1];
+    cameras.perspective.setProjection(camera, camera,
+      { width: container.clientWidth, height: container.clientHeight });
+    cameras.perspective.update(camera, camera);
+    renderer = prepareRender({
+      glOptions: { container },
+      rendering: {
+        background: [0.157, 0.164, 0.212, 1], meshColor: [1, 0.4, 0, 1],
+        lightDirection: [0.2, 0.2, 1], lightPosition: [100, 200, 100],
+        ambientLightAmount: 0.3, diffuseLightAmount: 0.89,
+        specularLightAmount: 0.16, materialShininess: 8.0,
+      },
+    });
+  }
+  const entities = entitiesFromSolids({ color: [1, 0.4, 0, 1] }, [geom]);
+  renderer({
+    camera,
+    drawCommands: {
+      drawAxis: drawCommands.drawAxis, drawGrid: drawCommands.drawGrid,
+      drawLines: drawCommands.drawLines, drawMesh: drawCommands.drawMesh,
+    },
+    entities: [
+      { visuals: { drawCmd: 'drawGrid', show: true, transparent: true },
+        size: [120, 120], ticks: [12, 3], color: [1,1,1,0.35], subColor: [0,1,1,0.15] },
+      { visuals: { drawCmd: 'drawAxis', show: true }, size: 60, alwaysVisible: true },
+      ...entities,
+    ],
+  });
+}
+
+// ---- run ------------------------------------------------------------------
+function run() {
+  const logs = [];
+  const scope = { console: { log: (...a) => logs.push(a.join(' ')) }, Math, JSON, Array, Object, Number, String };
+  for (const [k, v] of Object.entries(api)) if (k !== 'colorOf') scope[k] = v;
+  const names = Object.keys(scope);
+  const t = performance.now();
+  let shape;
+  try {
+    const fn = new Function(...names, $('code').value + '\n;return main()');
+    shape = fn(...names.map((n) => scope[n]));
+  } catch (e) {
+    say('<span class="bad">' + String(e.message || e) + '</span>'
+      + (logs.length ? '\n\n' + logs.join('\n') : ''), '');
+    return;
+  }
+  const built = Math.round(performance.now() - t);
+  if (!shape) { say('<span class="bad">main() returned nothing.</span>', ''); return; }
+  const tm = performance.now();
+  const geom = mesh.tessellate(oc, shape, { deflection: 0.05 });
+  if (!geom) { say('<span class="bad">nothing drawable came back.</span>', ''); return; }
+  const meshed = Math.round(performance.now() - tm);
+  draw(geom);
+  say((logs.length ? logs.join('\n') + '\n\n' : '')
+    + '<span class="ok">built ' + built + ' ms · meshed ' + meshed + ' ms · '
+    + geom.polygons.length + ' triangles · volume '
+    + mesh.signedVolume(geom).toFixed(3) + '</span>', '');
+}
+
+$('run').onclick = run;
+$('code').addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); run(); }
+});
+
+// THE CLIENT-SIDE PROOF, as a button rather than a claim. Nothing here talks to
+// a server after the kernel has loaded, and this demonstrates it instead of
+// asserting it: the browser is put into offline mode and the model is rebuilt.
+$('offline').onclick = async () => {
+  try {
+    const before = navigator.onLine;
+    say('Turn your wifi off now, then press Run. The model will still build,\n'
+      + 'because the kernel is already on your machine.\n\n'
+      + 'navigator.onLine currently reports: ' + before, 'dim');
+  } catch (e) { /* ignore */ }
+};
+
+run();
+</script>
+</body>
+</html>

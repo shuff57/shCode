@@ -341,3 +341,139 @@ export function hullVolume(pts: Pt[], h: Hull): number {
   }
   return Math.abs(v);
 }
+
+// ---------------------------------------------------------------------------
+// THE 2D CASE
+// ---------------------------------------------------------------------------
+//
+// A 2D shape in this engine is a face on the XY plane (see the comment on
+// `isSolid`/`isShape` in lib/occt-api.ts), and "hand hull two flat circles"
+// must come back flat too -- a stadium outline, not a wedge with a floor and
+// a ceiling. Tessellating a flat face and running it through convexHull()
+// above answers a different question: that function's whole first act is
+// hunting for a FOURTH point off the other three's plane, and a flat input
+// has none by definition, so it always returns null there. Six documented
+// pages need the flat answer instead of that null, and this is it.
+//
+// Deliberately NOT the 3D algorithm one dimension down. Gift-wrapping is the
+// usual first instinct for a 2D hull -- start on the boundary and keep
+// turning the same way -- and it is a worse fit here than it looks: a run of
+// collinear points along one side makes "which neighbour comes next"
+// ambiguous, and untangling that with a tie-break rule is exactly the kind of
+// code that is easy to get subtly wrong and hard to catch failing. Monotone
+// chain (Andrew's algorithm) sorts the points once and walks the sorted list
+// twice; a collinear run resolves itself as a side effect of the sort instead
+// of as a case the code has to notice and handle.
+
+/** A 2D point. */
+export type Pt2 = [number, number];
+
+/** The 2D hull: the same two facts as Hull, one dimension down. There is no
+ *  `triangles` here because a polygon does not need triangulating to be a
+ *  shape -- `boundary` already is the shape, wound counter-clockwise. */
+export interface Hull2 {
+  /** The points that ended up ON the hull, in input order (a set, for a
+   *  caller asking "was point i kept" -- same role as Hull.used). */
+  used: number[];
+  /** The hull polygon: indices into the input points, wound
+   *  counter-clockwise, each one joined to the next and the last back to the
+   *  first. This is what a caller turns into a wire. */
+  boundary: number[];
+}
+
+/** Twice the signed area of triangle (o, a, b). Positive when b is to the
+ *  left of the ray o->a (a genuine left turn), zero on the line, negative to
+ *  the right. Not normalised, for the same reason `above()` above is cheap to
+ *  compute and only its SIGN matters at the call site that needs no distance. */
+const cross2 = (o: Pt2, a: Pt2, b: Pt2): number =>
+  (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+
+/**
+ * The convex hull of a 2D point set, or null when there is no hull to take --
+ * fewer than three points, every point in the same place, or every point on
+ * one line. All three have zero area, which is the 2D analogue of the flat
+ * (zero-volume) refusal above.
+ *
+ * COLLINEAR POINTS ARE DROPPED, not kept as extra hull vertices. Three points
+ * in a row on the same edge would all "belong" to the hull under a loose
+ * reading, but the middle one carries no information -- it sits exactly where
+ * its two neighbours already say a straight edge must pass, and keeping it is
+ * how a hull with four real corners ends up reporting seven vertices because
+ * one side happened to have collinear input on it. This also matches the
+ * reference engine's own hullPoints2, whose Graham scan pops a point the
+ * instant the turn through it is `<= EPSILON` rather than keeping it -- so a
+ * script that already runs against that engine sees the same vertex count
+ * here. A caller that wants every input point lying ON an edge, not just the
+ * corners, is asking point-in-polygon, which is a different question from
+ * "what is the hull" and does not belong in this function.
+ *
+ * `tol` is a distance-scale tolerance built the same way the 3D code above
+ * builds `eps` -- relative to the point set's own span, so a tiny sketch and
+ * a room-sized one are not judged against the same fixed number. `cross2`
+ * has the same units as the 3D file's line-off-axis test (a single cross
+ * product), so it is compared against the identical `eps * span`, not a new
+ * constant invented for this function.
+ */
+export function convexHull2(pts: Pt2[]): Hull2 | null {
+  const n = pts.length;
+  if (n < 3) return null;
+
+  let lo: Pt2 = [Infinity, Infinity];
+  let hi: Pt2 = [-Infinity, -Infinity];
+  for (const p of pts) {
+    if (p[0] < lo[0]) lo[0] = p[0];
+    if (p[1] < lo[1]) lo[1] = p[1];
+    if (p[0] > hi[0]) hi[0] = p[0];
+    if (p[1] > hi[1]) hi[1] = p[1];
+  }
+  const span = Math.max(hi[0] - lo[0], hi[1] - lo[1]);
+  if (!(span > 0)) return null;                  // every point in the same place
+  const tol = span * (span * 1e-9);               // eps * span, eps = span * 1e-9
+
+  const order = [...pts.keys()].sort((i, j) =>
+    (pts[i][0] !== pts[j][0] ? pts[i][0] - pts[j][0] : pts[i][1] - pts[j][1]));
+
+  // One direction of the walk. Pop the last point on the chain while it and
+  // its predecessor no longer make a strict left turn through the next point
+  // -- collinear (== tol) and clockwise (< 0) are both dropped, per the
+  // convention above.
+  const chain = (seq: number[]): number[] => {
+    const h: number[] = [];
+    for (const i of seq) {
+      while (h.length >= 2 && cross2(pts[h[h.length - 2]], pts[h[h.length - 1]], pts[i]) <= tol) {
+        h.pop();
+      }
+      h.push(i);
+    }
+    return h;
+  };
+
+  const lower = chain(order);
+  const upper = chain([...order].reverse());
+  // Each half repeats the other half's first and last point at the seam;
+  // drop one copy of each so the splice is a clean closed polygon.
+  const boundary = lower.slice(0, -1).concat(upper.slice(0, -1));
+  if (boundary.length < 3) return null;           // every point on one line
+
+  return { used: [...new Set(boundary)].sort((a, b) => a - b), boundary };
+}
+
+/**
+ * The area the hull encloses. The 2D twin of hullVolume() above, for the same
+ * reason: it is what makes this function checkable on its own arithmetic
+ * rather than by eye -- a square's hull must measure exactly its own area,
+ * still exactly once an interior point is added, and a concave outline's hull
+ * must measure exactly the analytic area of its convex boundary.
+ *
+ * The shoelace formula, which `boundary` is already wound correctly for.
+ */
+export function hull2Area(pts: Pt2[], h: Hull2): number {
+  let a = 0;
+  const b = h.boundary;
+  for (let i = 0; i < b.length; i++) {
+    const p = pts[b[i]];
+    const q = pts[b[(i + 1) % b.length]];
+    a += p[0] * q[1] - q[0] * p[1];
+  }
+  return Math.abs(a) / 2;
+}
