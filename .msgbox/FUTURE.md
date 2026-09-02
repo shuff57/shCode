@@ -3,6 +3,47 @@
 Ideas parked for later. Not scheduled, not specced. Newest first.
 Lives beside `log.jsonl` so it ships with the repo and travels between machines.
 
+## The new vocabulary: keep the names, fix what misleads (2026-09-02)
+
+Operator decision, taken once it was settled that the book and lessons are
+being rewritten around the new engine.
+
+lib/occt-api.ts opens with the rule "JSCAD's semantics, not a better idea" --
+copy the awkward parts, because an existing student file must build what it
+built before. **That rule no longer holds**, and the rationale under it is
+gone too: reSHape's stated design goal was graduation ("nothing to undo, the
+real names are still in scope, paste it into jscad.app"), and there is no
+jscad.app destination once JSCAD is removed.
+
+What was chosen, of three options:
+
+- Names and call shapes stay as they are, so most lesson code survives a light
+  edit rather than a rewrite.
+- The things MEASURED as actively harmful get fixed. `torus` is the case on
+  record: JSCAD's `outerRadius` is the circle the tube travels along and its
+  `innerRadius` is the tube itself, and public/reshape/reshape.js documents at
+  length how both mislead -- reading them the obvious way builds 44 x 44 x 8
+  or 56 x 56 x 20, silently. Those become `ringRadius` and `tubeRadius`.
+- Mesh-only options are REFUSED BY NAME rather than emulated or ignored.
+  `sphere(15, { segments: 24 })` answers "a B-rep sphere is exact; there are
+  no segments to choose" instead of quietly building something else.
+
+Rejected: copying JSCAD name for name (carries its design errors forever, for
+a compatibility that has nowhere to graduate to). Rejected: a fresh vocabulary
+(more lesson rewriting than the gain justifies).
+
+### What this changes in the code
+
+- The "JSCAD's semantics, not a better idea" banner in lib/occt-api.ts is now
+  wrong as written and must be rewritten to say what was actually decided.
+- scripts/test-occt-api.mjs compares against JSCAD as the BAR. It becomes a
+  transitional regression check instead -- useful while the lessons are being
+  rewritten, and retired when they are. Any name deliberately changed has to
+  be listed there, the way the bounding-sphere divergence already is.
+- The refusal messages become the teaching surface. A refused mesh-only option
+  is the only place a student meets the difference between the two engines, so
+  the sentence matters more than the refusal.
+
 ## What the B-rep preview would cost a student (2026-09-02)
 
 Measured, cold cache, per profile. `scripts/measure-brep-load.py` re-runs it.
