@@ -15,6 +15,20 @@ module.exports = function run(dir) {
     else { fails.push(name); console.log(`  FAIL  ${name}${detail ? ' -- ' + detail : ''}`); }
   };
 
+  // A fact about HOW THIS SOLVER settles, not about whether it is right.
+  // Reported, never gated -- the same bargain scripts/test-moshion.mjs makes
+  // with its deliberate p5play deltas.
+  //
+  // The distinction is load-bearing now that the solver is being replaced.
+  // Relaxation nudges every constraint a little each pass, so when a rule can
+  // be satisfied more than one way it lands in the middle of the options. A
+  // matrix solver reaches a different resting place and is exactly as correct.
+  // An assertion that pins the resting place would fail the new solver for not
+  // being the old one, which is the single most likely way this swap gets
+  // talked out of a correct answer.
+  const deltas = [];
+  const delta = (name, detail) => { deltas.push([name, detail]); };
+
   const near = (a, b, tol = 1e-3) => Math.abs(a - b) < tol;
   const rect = () => [[0, 0], [40, 0], [40, 25], [0, 25]];
 
@@ -33,9 +47,10 @@ module.exports = function run(dir) {
   const flat = S.solveSketch(skew, [{ kind: 'horizontal', edge: 0 }]);
   check('horizontal levels an edge', near(flat.points[0][1], flat.points[1][1]),
     `${flat.points[0][1]} vs ${flat.points[1][1]}`);
-  check('...by meeting in the middle, not dragging one to the other',
-    near(flat.points[0][1], 3) && near(flat.points[1][1], 3),
-    JSON.stringify([flat.points[0], flat.points[1]]));
+  delta('relaxation meets in the middle rather than dragging one corner to the other',
+    `both ends of the levelled edge sat at y=${flat.points[0][1].toFixed(3)}; the edge ran `
+    + `0 to 6, so the midpoint is 3. Any y is correct as long as the two agree, which is
+       what the PASS above actually checks`);
 
   const lean = [[0, 0], [40, 0], [46, 25], [0, 25]];
   const upright = S.solveSketch(lean, [{ kind: 'vertical', edge: 1 }]);
@@ -100,8 +115,10 @@ module.exports = function run(dir) {
     && near(boxed.points[2][1], boxed.points[3][1])
     && near(boxed.points[3][0], boxed.points[0][0]),
     JSON.stringify(boxed.points));
-  check('...and it converges rather than running out of iterations',
-    boxed.iterations < 300, `${boxed.iterations} iterations`);
+  delta('relaxation converges on a satisfiable box well inside its iteration cap',
+    `${boxed.iterations} of 300. A solver without a relaxation loop has no`
+    + ' comparable number; what has to stay true is that the rules come out met,'
+    + ' which the PASS above checks.');
 
   const squared = S.solveSketch(rect(), [
     { kind: 'horizontal', edge: 0 },
@@ -352,6 +369,13 @@ module.exports = function run(dir) {
     JSON.stringify([...panelEdges].sort((a, b) => a - b)) === JSON.stringify(litEdges),
     JSON.stringify([...panelEdges]) + ' vs ' + JSON.stringify(litEdges));
 
+
+  if (deltas.length) {
+    console.log('\n=== HOW THIS SOLVER SETTLES (reported, never gated) ===');
+    for (const [name, detail] of deltas) {
+      console.log('  ~  ' + name + '\n       ' + String(detail).replace(/\s+/g, ' ').trim());
+    }
+  }
 
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;

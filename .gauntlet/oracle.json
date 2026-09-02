@@ -1,5 +1,5 @@
 {
-  "sha": "03382a80a153c7f619a67735a0db9c6fd977112b",
+  "sha": "5d38606daaa008e3f9bdbfc35527c76c34870ea5",
   "takenAt": "2026-09-02",
   "models": {
     "box": {
@@ -353,6 +353,321 @@
         ]
       ],
       "polys": 6
+    }
+  },
+  "sketches": {
+    "nothing-asked": {
+      "satisfied": [],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          0,
+          0
+        ],
+        [
+          40,
+          0
+        ],
+        [
+          40,
+          25
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "horizontal": {
+      "satisfied": [
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          0,
+          3
+        ],
+        [
+          40,
+          3
+        ],
+        [
+          40,
+          25
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "vertical": {
+      "satisfied": [
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          0,
+          0
+        ],
+        [
+          43,
+          0
+        ],
+        [
+          43,
+          25
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "length": {
+      "satisfied": [
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          5,
+          0
+        ],
+        [
+          35,
+          0
+        ],
+        [
+          40,
+          25
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "equal": {
+      "satisfied": [
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          3.6671,
+          0.0093
+        ],
+        [
+          35.8093,
+          -3.4984
+        ],
+        [
+          40.5236,
+          28.4892
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "parallel": {
+      "satisfied": [
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          0,
+          0
+        ],
+        [
+          40,
+          0
+        ],
+        [
+          46,
+          25
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "perpendicular": {
+      "satisfied": [
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          -0.1609,
+          1.4059
+        ],
+        [
+          40.8783,
+          4.6251
+        ],
+        [
+          39.2825,
+          24.969
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "lock-holds-a-corner": {
+      "satisfied": [
+        true,
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [
+        true
+      ],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          0,
+          0
+        ],
+        [
+          40,
+          0
+        ],
+        [
+          40,
+          25
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 0
+    },
+    "a-real-square": {
+      "satisfied": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "overConstrained": false,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          3.8068,
+          -3.6932
+        ],
+        [
+          36.1932,
+          -3.6932
+        ],
+        [
+          36.1932,
+          28.6932
+        ],
+        [
+          3.8068,
+          28.6932
+        ]
+      ],
+      "_residual": 0
+    },
+    "two-lengths-one-edge": {
+      "satisfied": [
+        false,
+        true,
+        true
+      ],
+      "overConstrained": true,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          15.6705,
+          0.109
+        ],
+        [
+          25.5159,
+          1.8604
+        ],
+        [
+          38.8136,
+          23.0305
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "_residual": 30
+    },
+    "impossible-triangle": {
+      "satisfied": [
+        false,
+        false,
+        false
+      ],
+      "overConstrained": true,
+      "locksHeld": [],
+      "finite": true,
+      "closed": true,
+      "_points": [
+        [
+          3.9588,
+          2.9823
+        ],
+        [
+          40.7037,
+          -4.0757
+        ],
+        [
+          15.3375,
+          31.0933
+        ]
+      ],
+      "_residual": 35.3241
     }
   }
 }
