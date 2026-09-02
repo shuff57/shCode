@@ -78,6 +78,13 @@ try {
   const api = createApi(oc, {
     tessellate: mesh.tessellate,
     convexHull: hull.convexHull,
+    // The FLAT case, and it is a separate function on purpose: OpenCascade
+    // ships no convex hull at all (0 of 498 exports match /hull/i), so both
+    // dimensions are ours, and 2D wants monotone chain rather than the 3D
+    // incremental algorithm. api.hull is GATED on this rather than degrading
+    // quietly -- omit it and every hull page refuses by name, which is how
+    // this line came to be missing and be noticed.
+    convexHull2: hull.convexHull2,
   });
 
   // ---- the two scopes ------------------------------------------------------
@@ -377,13 +384,25 @@ try {
   // every one of these red would make the suite noisy for pages that are
   // working correctly, and a gate that stays red for a reason nobody can fix
   // gets suppressed within a week -- worse than the hole it replaces.
-  // RAISED FROM 3 TO 10, and the reason is that the number going up was good
-  // news. Porting path2.fromPoints unblocked the paths chapter, so pages that
-  // previously THREW now build -- and a 2D path has no volume, so they land
-  // here. Every one was read by name before this line moved. The budget's job
-  // is unchanged: the unwatched set may not grow SILENTLY.
+  // RAISED 3 -> 10 -> 14, and every move was good news read page by page.
+  //
+  // This bucket grows when something starts WORKING. Porting path2.fromPoints
+  // unblocked the paths chapter and wiring convexHull2 unblocked the flat
+  // hulls, so pages that used to THROW now build -- and neither a path nor a
+  // flat hull has a volume, so they land here rather than in agreement. All
+  // fourteen were read by name before this number moved:
+  //
+  //   4  genuinely 2D primitives  circle/ellipse, polygon, star, and the page
+  //                               whose whole point is that arc and line are
+  //                               paths rather than shapes
+  //   4  flat hulls               a hull of flat shapes is a face
+  //   6  paths                    a path has no volume by definition
+  //
+  // The budget's job never changes: the unwatched set may not grow SILENTLY.
+  // Moving this line is meant to cost someone a minute of reading, which is
+  // exactly what it cost each time.
   check('no page goes unmeasured without someone noticing',
-    noVolume.length <= 10,
+    noVolume.length <= 14,
     `${noVolume.length} pages build on OCCT with nothing to grade by volume (see the `
     + 'list above) — investigate each by name before raising this budget');
 
