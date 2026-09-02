@@ -64,8 +64,11 @@ with sync_playwright() as p:
         pg.wait_for_timeout(500)
         # Reading the PNG back off a canvas is the same-origin question. A
         # tainted canvas would surface here as the error message, not a crash.
-        msg = pg.locator("p").filter(has_text="Loaded coin").count()
-        check("a built-in loads into the grid (canvas not tainted)", msg == 1)
+        # Text, not element type: the status message moved from a <p> under
+        # the canvas into a <span> in the full-width action bar, and a
+        # type-bound selector reported a working feature broken.
+        check("a built-in loads into the grid (canvas not tainted)",
+              "Loaded coin" in pg.inner_text("body"))
 
         # Count inside the grid by its data hook, not by cell size -- the cell
         # size is adaptive (it shrinks to fit the sandbox drawer), and an
@@ -95,8 +98,9 @@ with sync_playwright() as p:
     pg.click("button:text-is('SAVE')")
     pg.wait_for_timeout(400)
 
-    saved_ok = pg.locator("p").filter(has_text="driveTest").count() >= 1
-    check("saving reports success and names the code to write", saved_ok)
+    body_after_save = pg.inner_text("body")
+    check("saving reports success and names the code to write",
+          "driveTest" in body_after_save and "Saved" in body_after_save)
 
     stored = pg.evaluate("""() => {
         try {
@@ -173,6 +177,33 @@ with sync_playwright() as p:
     }""")
     check("playback and naming share one inline row",
           bool(inline) and inline["playToName"] < 6 and inline["nameToSave"] < 6, inline)
+
+    # The bar is OUTSIDE the canvas column, spanning all three. Measured
+    # against the rail and settings edges, because "under the canvas" alone
+    # was also true when it was nested inside the canvas card.
+    spans = pg.evaluate("""() => {
+        const play = document.querySelector('button[title="Play / pause  (Space)"]');
+        const grid = document.querySelector('[data-texture-grid]');
+        const rail = [...document.querySelectorAll('button')].find((b) => b.textContent.trim() === 'NEW');
+        const settings = document.querySelector('input[aria-label="pixel size"]');
+        if (!play || !grid || !rail || !settings) return null;
+        const bar = play.parentElement.getBoundingClientRect();
+        const r = (e) => e.getBoundingClientRect();
+        return {
+            leftOfRail: Math.round(bar.left - r(rail).left) <= 14,
+            rightOfSettings: Math.round(r(settings).right - bar.right) <= 14,
+            belowGrid: bar.top >= r(grid).bottom,
+            notInsideCanvasCard: !play.closest('[data-texture-grid]'),
+            barWidth: Math.round(bar.width),
+            gridWidth: Math.round(r(grid).width),
+        };
+    }""")
+    check("the action bar spans past the tool rail on the left",
+          bool(spans) and spans["leftOfRail"], spans)
+    check("...and past the settings column on the right",
+          bool(spans) and spans["rightOfSettings"], spans)
+    check("...so it is wider than the canvas it sits under",
+          bool(spans) and spans["barWidth"] > spans["gridWidth"], spans)
     check("there is exactly one SAVE button", bool(under) and under["saveCount"] == 1, under)
     check("tool rail sits left of the canvas", bool(order) and order["railLeftOfGrid"], order)
     check("settings sit right of the canvas", bool(order) and order["settingsRightOfGrid"], order)

@@ -881,64 +881,6 @@ export default function TextureEditor() {
             })}
           </div>
 
-          {/* Playback and naming sit UNDER the canvas rather than off in the
-              settings column: both are things you reach for while looking at
-              the drawing, and the eye should not have to leave it. The right
-              column keeps what you set once and forget -- size, zoom, speed. */}
-          {/* One inline row, hard against the bottom of the grid: playback and
-              naming are both reached while looking at the drawing, so they sit
-              on the same line rather than stacking away from it. The right
-              column keeps only what you set once and forget. */}
-          <div
-            style={{
-              display: 'flex', gap: 8, marginTop: 8, alignItems: 'center',
-              // Wraps only when it genuinely cannot fit -- in the sandbox
-              // drawer this becomes two or three lines instead of overflowing.
-              flexWrap: 'wrap', justifyContent: 'center',
-              width: w * cell, maxWidth: '100%',
-            }}
-          >
-            <button
-              style={{ ...btn(playing, frames.length < 2), minWidth: 72 }}
-              onClick={() => setPlaying((p) => !p)}
-              disabled={frames.length < 2}
-              title="Play / pause  (Space)"
-            >
-              {playing ? '⏸ Pause' : '▶ Play'}
-            </button>
-            <button style={btn(onion)} onClick={() => setOnion((v) => !v)} title="Onion skin">
-              ◍ Onion
-            </button>
-            <button style={btn(zoom === null)} onClick={() => setZoom(null)} title="Fit the grid to this panel">
-              ⛶ Fit
-            </button>
-
-            <span style={{ width: 1, height: 22, background: 'var(--border)', margin: '0 2px' }} />
-
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="name it…"
-              aria-label="texture name"
-              onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); }}
-              style={{
-                width: 132, boxSizing: 'border-box', padding: '6px 8px',
-                background: 'var(--muted)', color: 'var(--text)',
-                border: '1px solid var(--border)', borderRadius: 6, fontSize: 13,
-              }}
-            />
-            <button style={{ ...btn(true), padding: '6px 14px' }} onClick={handleSave}>SAVE</button>
-          </div>
-
-          {message && (
-            <p style={{
-              fontSize: 12, lineHeight: 1.45, marginTop: 10, marginBottom: 0, maxWidth: 460,
-              textAlign: 'center', color: message.bad ? '#e8607a' : '#7ec850',
-            }}>
-              {message.text}
-            </p>
-          )}
-
           {showHelp && (
             <div style={{
               marginTop: 10, padding: 10, borderRadius: 6, alignSelf: 'stretch',
@@ -1031,6 +973,59 @@ export default function TextureEditor() {
           )}
 
         </div>
+      </div>
+
+      {/* ---- the action bar, spanning all three columns ----
+          Outside the canvas card on purpose: playback and naming are not
+          properties of the grid, they are what you do to the whole texture.
+          Full width also gives the row somewhere to go in the sandbox drawer,
+          where a grid-width row had nothing but the grid to sit under. */}
+      <div
+        style={{
+          ...card, marginTop: 10, padding: '8px 12px',
+          display: 'flex', gap: 8, alignItems: 'center',
+          flexWrap: 'wrap', justifyContent: 'center',
+        }}
+      >
+        <button
+          style={{ ...btn(playing, frames.length < 2), minWidth: 72 }}
+          onClick={() => setPlaying((p) => !p)}
+          disabled={frames.length < 2}
+          title="Play / pause  (Space)"
+        >
+          {playing ? '⏸ Pause' : '▶ Play'}
+        </button>
+        <button style={btn(onion)} onClick={() => setOnion((v) => !v)} title="Onion skin">
+          ◍ Onion
+        </button>
+        <button style={btn(zoom === null)} onClick={() => setZoom(null)} title="Fit the grid to this panel">
+          ⛶ Fit
+        </button>
+
+        <span style={{ width: 1, height: 22, background: 'var(--border)', margin: '0 4px' }} />
+
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="name it…"
+          aria-label="texture name"
+          onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); }}
+          style={{
+            width: 150, boxSizing: 'border-box', padding: '6px 8px',
+            background: 'var(--muted)', color: 'var(--text)',
+            border: '1px solid var(--border)', borderRadius: 6, fontSize: 13,
+          }}
+        />
+        <button style={{ ...btn(true), padding: '6px 16px' }} onClick={handleSave}>SAVE</button>
+
+        {message && (
+          <span style={{
+            fontSize: 12, lineHeight: 1.4, marginLeft: 4,
+            color: message.bad ? '#e8607a' : '#7ec850',
+          }}>
+            {message.text}
+          </span>
+        )}
       </div>
 
       {/* ---- LOAD: the library, their modal as an inline panel ---- */}
