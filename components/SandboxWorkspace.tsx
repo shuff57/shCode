@@ -36,6 +36,7 @@ import { EMPTY_DOC, type Feature, type ModelDoc, newPolygonSketch, newRectangleS
 import type { TopoName } from '../lib/topo-name';
 import {
   applyParam,
+  generatedParams,
   paramValues as docParams,
   solveDoc,
   solveSketchDrag,
@@ -562,6 +563,31 @@ export default function SandboxWorkspace() {
     if (doc.features.length === 0) return [planeAnchor('xy', 0)];
     return doc.features.filter((f) => selected.includes(f.id)).flatMap((f) => handlesFor(f, doc));
   }, [build, doc, selected, drawTool]);
+
+  // B-rep Dimensions panel defs. The JSCAD runner publishes its own defs by
+  // postMessage (the `paramDefs` state above); the B-rep engine has no such
+  // channel -- its numbers come from the doc itself, via generatedParams().
+  // Scoped to `selected`, the same call the 3D handle overlay above makes: the
+  // panel is a 208px sidebar, and every GeneratedParam.name is
+  // `${featureId}_${slot}` (model-codegen.ts's pname()), so a startsWith check
+  // per selected id is the whole filter. Empty when nothing is selected --
+  // the panel's own placeholder state, which is correct here: nothing
+  // selected means no dimensions to edit. `doc`, not effectiveDoc, matching
+  // the handlesFor() call it sits beside: one source of truth for the live doc.
+  const brepParamDefs = useMemo(() => {
+    if (!brepEngine) return [];
+    if (selected.length === 0) return [];
+    return generatedParams(doc)
+      .filter((p) => selected.some((id) => p.name.startsWith(`${id}_`)))
+      .map((p): ParamDef => ({
+        name: p.name,
+        caption: p.caption,
+        initial: p.value,
+        min: p.min,
+        max: p.max,
+        step: p.step,
+      }));
+  }, [brepEngine, doc, selected]);
   const scales = useMemo(
     () => Object.fromEntries(specs.map((h) => [h.param, h.scale])),
     [specs]
@@ -1315,7 +1341,7 @@ export default function SandboxWorkspace() {
                 {runKey > 0 && (
                   <aside className="reshape-pane-params">
                     <ReshapeParamsPanel
-                      defs={paramDefs}
+                      defs={brepEngine ? brepParamDefs : paramDefs}
                       values={paramValues}
                       onChange={sendParams}
                       onCommit={commitParams}
