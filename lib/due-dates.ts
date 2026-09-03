@@ -49,6 +49,10 @@ export interface DueDatesSnapshot {
   classes: ClassDue[];
   /** Lesson ids this student has a standing early-access grant for. */
   overrides: Set<string>;
+  /** Lesson ids whose due date is waived for this student — resolveDue()
+   *  treats these as if no due date were ever set, so nothing about them
+   *  reads as late. */
+  dueWaivers: Set<string>;
 }
 
 export interface ResolvedDue {
@@ -58,7 +62,13 @@ export interface ResolvedDue {
   ambiguous: boolean;
 }
 
-const empty: DueDatesSnapshot = { loaded: false, authed: false, classes: [], overrides: new Set() };
+const empty: DueDatesSnapshot = {
+  loaded: false,
+  authed: false,
+  classes: [],
+  overrides: new Set(),
+  dueWaivers: new Set(),
+};
 let cache: DueDatesSnapshot = empty;
 let inflight: Promise<DueDatesSnapshot> | null = null;
 const subs = new Set<(s: DueDatesSnapshot) => void>();
@@ -85,9 +95,15 @@ export interface ResolvedOpen {
 async function load(): Promise<DueDatesSnapshot> {
   try {
     const res = await fetch('/api/my-due-dates', { credentials: 'include' });
-    if (res.status === 401) return { loaded: true, authed: false, classes: [], overrides: new Set() };
+    if (res.status === 401) {
+      return { loaded: true, authed: false, classes: [], overrides: new Set(), dueWaivers: new Set() };
+    }
     if (!res.ok) throw new Error(`my-due-dates GET ${res.status}`);
-    const data = (await res.json()) as { classes?: ApiClass[]; overrides?: string[] };
+    const data = (await res.json()) as {
+      classes?: ApiClass[];
+      overrides?: string[];
+      dueWaivers?: string[];
+    };
     return {
       loaded: true,
       authed: true,
@@ -98,13 +114,14 @@ async function load(): Promise<DueDatesSnapshot> {
         openIndex: buildOpenIndex(c.openRows ?? []),
       })),
       overrides: new Set(data.overrides ?? []),
+      dueWaivers: new Set(data.dueWaivers ?? []),
     };
   } catch {
     // A due date is advisory and an open date is a gate, but both fail the
     // same way on purpose: no classes means no dates, which means no badges
     // and nothing locked. A network blip must never seal a student out of
     // work they can already see.
-    return { loaded: true, authed: false, classes: [], overrides: new Set() };
+    return { loaded: true, authed: false, classes: [], overrides: new Set(), dueWaivers: new Set() };
   }
 }
 
@@ -144,6 +161,11 @@ export function resolveDue(
   moduleId?: string | null,
   unitId?: string | null,
 ): ResolvedDue | null {
+  // A waiver clears the due date entirely for this student on this lesson —
+  // resolveDue returns null exactly as it would for a lesson nobody ever
+  // dated, so DueBadge (and every future caller of this function) renders
+  // nothing rather than a red "late" state, with no per-caller change needed.
+  if (snap.dueWaivers.has(lessonId)) return null;
   let best: ResolvedDue | null = null;
   let matches = 0;
   for (const cls of snap.classes) {

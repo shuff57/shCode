@@ -271,6 +271,22 @@ export async function loadStudentLessonOverrides(db: D1Database, email: string):
   return new Set((result.results ?? []).map((r) => r.lesson_id));
 }
 
+// Every lesson id this student's due date is waived on (lesson_due_waivers,
+// 0025), across every class they are currently enrolled in. Same
+// enrollment-scoping reasoning as loadStudentLessonOverrides.
+export async function loadStudentDueWaivers(db: D1Database, email: string): Promise<Set<string>> {
+  const result = await db
+    .prepare(
+      `SELECT DISTINCT o.lesson_id AS lesson_id
+         FROM lesson_due_waivers o
+         JOIN enrollments e ON e.class_id = o.class_id AND e.student_email = o.student_email
+        WHERE o.student_email = ? AND e.expires_at > ?`,
+    )
+    .bind(email, Date.now())
+    .all<{ lesson_id: string }>();
+  return new Set((result.results ?? []).map((r) => r.lesson_id));
+}
+
 // True when the student may open this lesson right now, as far as the
 // "available after" gate is concerned. An override grant short-circuits the
 // open-date check entirely. The sequential green-to-advance rule is a

@@ -499,7 +499,8 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                             ariaSuffix={lesson.title}
                           />
 
-                          <LessonAccessChip classId={classId} lessonId={lesson.id} lessonTitle={lesson.title} />
+                          <LessonAccessChip classId={classId} lessonId={lesson.id} lessonTitle={lesson.title} kind="early" />
+                          <LessonAccessChip classId={classId} lessonId={lesson.id} lessonTitle={lesson.title} kind="late" />
                         </div>
                       );
                     })}
