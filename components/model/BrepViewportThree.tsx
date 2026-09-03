@@ -11,8 +11,12 @@
 // OpenCascade solid into JSCAD's own geom3 shape so that renderer can draw it.
 // three.js replaces it, and unlocks two things regl cannot do structurally:
 // Raycaster (clicking an addressable B-rep face or edge) and world->screen
-// projection (dragging a dimension handle). Only the first is built here --
-// world->screen projection is still a future use.
+// projection (dragging a dimension handle). Both are built now -- see
+// projectAnchors() below for the second, ported from
+// public/reshape/kernel/runner-brep.html's own implementation of the exact
+// same protocol (`anchors`/`onAnchors` here stand in for that file's
+// `reshape-set-anchors` / `reshape-anchors` postMessage pair -- same pixel
+// contract, no iframe boundary to cross).
 //
 // PICKING, IN TWO HALVES. A hover or a click first resolves to a piece of
 // three.js geometry (a triangle range for a face, one THREE.Line for an
@@ -33,7 +37,14 @@
 // kernel's own topology (see EDGE_THRESHOLD_DEGREES). A pickable edge has to
 // be a real TopoDS_Edge, discretised straight off the B-rep curve, so this
 // keeps a SEPARATE, invisible set of THREE.Line objects (see
-// lib/occt-three.ts's edgesToThree()) purely for Raycaster to hit.
+// lib/occt-three.ts's edgesToThree()) purely for Raycaster to hit -- and,
+// alongside each one, a THIRD piece of geometry: a pre-built highlight TUBE
+// (see edgeTubeGeometry()), because a THREE.Line's own width cannot be
+// trusted to render as more than 1px. All three are built ONCE per edge in
+// drawGeoms(); hovering and selecting only ever swap which shared material a
+// tube wears and toggle `.visible` -- see setHoveredEdgeTube() /
+// setSelectedEdgeTube() for why that used to be a real per-pointermove cost
+// and no longer is.
 //
 // KERNEL LOADING is copied from BrepViewport.tsx, not imported from it -- that
 // file is under a measurement freeze right now (see the task this component
@@ -48,10 +59,12 @@ import type * as THREE_NS from 'three';
 import type { OrbitControls as OrbitControlsType } from 'three/examples/jsm/controls/OrbitControls.js';
 import type { Feature, ModelDoc } from '../../lib/model-types';
 import { topLevel } from '../../lib/model-types';
-import { edgeToThreeGeometry, edgesToThree, tessellateToThree, type EdgePick, type FaceRange } from '../../lib/occt-three';
+import { edgesToThree, tessellateToThree, type FaceRange } from '../../lib/occt-three';
 import { nameEdgeOnCurrentShape, resolveName } from '../../lib/topo-resolve';
 import type { TopoName } from '../../lib/topo-name';
 import type { BuildResult } from '../../lib/occt-build';
+import type { HandleSpec } from '../../lib/model-handles';
+import type { AnchorPoint } from './HandleOverlay';
 
 const KERNEL_BASE = '/reshape/kernel';
 
@@ -122,6 +135,24 @@ interface Props {
    * undefined shows nothing -- an empty badge is not information.
    */
   selectedCount?: number;
+  /**
+   * Drag-handle specs to project to screen, world space -- the same
+   * `HandleSpec[]` SandboxWorkspace.tsx already computes via handlesFor() and
+   * posts into the JSCAD runner as `reshape-set-anchors`. This is that same
+   * data reaching this component directly instead, since there is no iframe
+   * boundary here to cross.
+   */
+  anchors?: HandleSpec[];
+  /**
+   * Fired with the projected result -- container-relative CSS pixels, the
+   * same `AnchorPoint[]` shape the JSCAD runner posts back as
+   * `reshape-anchors` -- every time it changes: once per new `anchors` prop,
+   * and once per animation frame while the camera is moving (orbit, pan,
+   * zoom, and the damping tail after any of them). See projectAnchors() for
+   * why a moving camera needs its own flush point on a render-on-demand
+   * viewport.
+   */
+  onAnchors?: (points: AnchorPoint[]) => void;
 }
 
 /** The handful of kernel exports this component calls, loaded once. Loose
@@ -212,17 +243,17 @@ const round = (n: number) => Math.round(n * 10) / 10;
  *  adding them means rebuilding that kernel, not this renderer. */
 const EDGE_THRESHOLD_DEGREES = 25;
 
-/** How fat a hovered/selected edge highlight tube is, in world units --
- *  real geometry, not a screen-space line width (see edgeTubeGeometry()'s
- *  own doc comment for why that distinction is the whole fix). Selected is
- *  thicker than hover on purpose: it is meant to stay the more emphatic of
- *  the two states once both are actually visible, which is a genuine
- *  distinction worth keeping -- not hover being loud enough that it needed
- *  compensating for. Tuned by eye against this app's own primitive sizes
- *  (10-40 unit boxes and cylinders): visible at a glance without reading as
- *  a bigger part of the model than it is. */
-const HOVER_EDGE_RADIUS = 0.6;
-const SELECTED_EDGE_RADIUS = 0.9;
+/** How fat an edge highlight tube is, in world units -- real geometry, not a
+ *  screen-space line width (see edgeTubeGeometry()'s own doc comment for
+ *  why that distinction is the whole fix). ONE size for both hover and
+ *  selected: each edge now gets exactly one pre-built tube (see the pooling
+ *  note above the material definitions below), reused for whichever role is
+ *  currently active, so there is no separate "selected tube" to size
+ *  differently -- the two states are told apart by colour alone, which is
+ *  what actually carries the distinction; thickness was never load-bearing
+ *  for that. Tuned by eye against this app's own primitive sizes (10-40
+ *  unit boxes and cylinders). */
+const EDGE_TUBE_RADIUS = 0.75;
 
 /**
  * Renders a ModelDoc through the OpenCascade B-rep kernel, live, in the page,
@@ -232,7 +263,9 @@ const SELECTED_EDGE_RADIUS = 0.9;
  * scope line BrepViewport.tsx draws: every doc change rebuilds every feature
  * from scratch through lib/occt-build.ts.
  */
-export default function BrepViewportThree({ doc, deflection, onStats, onPick, pick, selectedCount }: Props) {
+export default function BrepViewportThree({
+  doc, deflection, onStats, onPick, pick, selectedCount, anchors, onAnchors,
+}: Props) {
   const [phase, setPhase] = useState<'loading' | 'ready' | 'error'>('loading');
   const [loadError, setLoadError] = useState<string | null>(null);
   const [buildError, setBuildError] = useState<string | null>(null);
@@ -273,6 +306,22 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
   onPickRef.current = onPick;
   const pickRef = useRef(pick);
   pickRef.current = pick;
+  // Same stale-closure reasoning as docRef above: projectAnchors() is a
+  // component-level function (reads refs, not props) so it can be called
+  // both from inside the scene-setup effect's camera-change handler and from
+  // the doc-rebuild effect, without either one recreating it.
+  const anchorsRef = useRef<HandleSpec[]>(anchors ?? []);
+  anchorsRef.current = anchors ?? [];
+  const onAnchorsRef = useRef(onAnchors);
+  onAnchorsRef.current = onAnchors;
+  // Set by the camera's own 'change' event, consumed (and cleared) inside the
+  // SAME per-frame damping loop that already exists for repainting the scene
+  // -- the identical flush point runner-brep.html's own projectAnchors() uses
+  // (its `anchorsDirty`, set on 'change', read inside its dampingTick), so a
+  // moving camera never leaves a handle projected at a stale position without
+  // re-projecting on every single 'change' event -- once per animation frame,
+  // the same cadence the repaint itself already runs at, is what this buys.
+  const anchorsDirtyRef = useRef(false);
 
   /** All CURRENT pickable edge lines, flat across every mesh -- rebuilt by
    *  drawGeoms() on every doc change. Flat rather than found by searching
@@ -287,10 +336,17 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
    *  restorePicks(). */
   const hoverFaceMeshRef = useRef<THREE_NS.Mesh | null>(null);
   const selectedFaceMeshRef = useRef<THREE_NS.Mesh | null>(null);
-  // Edge highlights are TUBE MESHES, not THREE.Line -- see edgeTubeGeometry()'s
-  // doc comment for why a line's own width cannot be trusted to be visible.
-  const hoverEdgeMeshRef = useRef<THREE_NS.Mesh | null>(null);
-  const selectedEdgeMeshRef = useRef<THREE_NS.Mesh | null>(null);
+  // Edge highlights are POOLED TUBE MESHES, one built per topological edge in
+  // drawGeoms() -- see the pooling note above their material definitions in
+  // the scene-setup effect. These two refs hold the two SHARED materials
+  // (never per-edge, never per-hover) and which tube, if any, is currently
+  // wearing each role. A tube can be both at once (the student is hovering
+  // the edge they already selected) -- see setSelectedEdgeTube()'s handling
+  // of that case.
+  const hoverEdgeMaterialRef = useRef<THREE_NS.Material | null>(null);
+  const selectedEdgeMaterialRef = useRef<THREE_NS.Material | null>(null);
+  const hoveredEdgeTubeRef = useRef<THREE_NS.Mesh | null>(null);
+  const selectedEdgeTubeRef = useRef<THREE_NS.Mesh | null>(null);
   /** The student's face selection, kept LOCALLY rather than lifted the way
    *  the edge `pick` prop is: nothing outside this component consumes a
    *  picked face yet (see the file header), so there is no TopoName to
@@ -397,12 +453,75 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
     const dampingTick = () => {
       const stillMoving = controls.update();
       renderNow();
+      // The one flush point a render-on-demand viewport needs for handles: a
+      // moving camera fires 'change' on every frame it actually moves (see
+      // onControlsChange below), and this is the SAME per-frame loop already
+      // running for the repaint, not a second one -- projecting on every
+      // 'change' event directly would mean re-projecting far more often than
+      // the screen repaints, for no picture anyone sees between those extra
+      // runs.
+      if (anchorsDirtyRef.current) { anchorsDirtyRef.current = false; projectAnchors(); }
       dampingRafRef.current = stillMoving ? requestAnimationFrame(dampingTick) : null;
     };
     const onControlsStart = () => {
       if (dampingRafRef.current === null) dampingRafRef.current = requestAnimationFrame(dampingTick);
     };
     controls.addEventListener('start', onControlsStart);
+    // NOT a second render trigger -- see the long comment on dampingTick's own
+    // loop above for why a 'change' listener must never itself schedule a
+    // frame. This one only marks anchors stale; dampingTick (already running
+    // for the whole gesture, because 'start' fires before any 'change' can)
+    // is what actually re-projects them, once per frame, not once per event.
+    const onControlsChange = () => { anchorsDirtyRef.current = true; };
+    controls.addEventListener('change', onControlsChange);
+
+    // ---- keep the renderer/camera in sync with the CONTAINER'S OWN size ----
+    //
+    // FOUND WHILE VERIFYING DRAG HANDLES, not assumed. renderer.setSize()
+    // above reads container.clientWidth/clientHeight exactly ONCE, at mount.
+    // Nothing before this line ever measured it again -- there was no resize
+    // handling in this component at all. In Build mode specifically, the
+    // container's settled width is NARROWER than whatever it measured at
+    // mount (the ribbon, the "N Selected" badge, and the bottom timeline
+    // strip's 58px padding all land on `.reshape-pane-view` in renders this
+    // effect does not re-run for), so the canvas's OWN backing size -- and
+    // the camera's aspect ratio, baked in at construction from that same
+    // stale measurement -- silently drift out of sync with the box the
+    // canvas actually has to fit. Measured directly: a 40-unit box's own
+    // faces render inside a correctly-proportioned canvas (nothing LOOKS
+    // stretched, because the canvas simply overflows its container by the
+    // difference rather than squeezing into it), but a handle projected
+    // through the CURRENT container width lands scaled by roughly
+    // (current width / stale width) off of where the geometry it is meant to
+    // sit on actually is -- exactly the systematic, not-off-by-a-few-pixels
+    // mismatch a screenshot catches and a hex/pixel diff would not think to
+    // look for.
+    //
+    // ResizeObserver, not a window 'resize' listener: the container's size
+    // changes because of a CSS/layout change (switching to Build mode, the
+    // timeline strip mounting), not because the browser window itself
+    // resized, and only the former is guaranteed to fire on this container
+    // specifically.
+    const resizeObserver = new ResizeObserver(() => {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (w < 1 || h < 1) return;
+      // No "did it actually change" guard here -- ResizeObserver only ever
+      // invokes this callback when the observed box's size genuinely
+      // changed, and comparing against renderer.domElement.width/height
+      // would compare CSS pixels against DEVICE pixels the moment
+      // devicePixelRatio is not 1, which is a false-mismatch on every call.
+      renderer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderNow();
+      // A resize can happen with no orbit gesture in progress at all (the
+      // student never touched the camera), so this cannot wait for
+      // dampingTick's own flush point -- there may be no damping loop
+      // running to consume it.
+      projectAnchors();
+    });
+    resizeObserver.observe(container);
 
     sceneRef.current = scene;
     cameraRef.current = camera;
@@ -449,36 +568,48 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
     selectedFaceMesh.renderOrder = 1;
     scene.add(selectedFaceMesh);
 
-    // Edges are TUBE MESHES (real geometry, real width -- see
-    // edgeTubeGeometry()'s doc comment) rather than THREE.Line, and draw ON
-    // TOP (depthTest off) rather than offset like the faces above: a face
+    // Edges highlight as TUBE MESHES (real geometry, real width -- see
+    // edgeTubeGeometry()'s doc comment) rather than THREE.Line, drawn ON TOP
+    // (depthTest off) rather than offset like the faces above: a face
     // highlight can ride the same surface it highlights, but an edge
     // highlight sitting exactly on the model's own silhouette z-fights no
-    // matter how small an offset is chosen. Cyan for hover, matching this
-    // app's own existing "informational" accent (the grid and the Z axis
-    // already use it) -- distinct from the model's orange, from selected's
-    // pink, and not a copy of any color a competing tool uses for the same
-    // state.
-    const hoverEdgeMesh = new THREE.Mesh(
-      new THREE.BufferGeometry(),
-      new THREE.MeshBasicMaterial({ color: 0x8be9fd, depthTest: false }),
-    );
-    hoverEdgeMesh.visible = false;
-    hoverEdgeMesh.renderOrder = 2;
-    scene.add(hoverEdgeMesh);
-
-    const selectedEdgeMesh = new THREE.Mesh(
-      new THREE.BufferGeometry(),
-      new THREE.MeshBasicMaterial({ color: 0xff79c6, depthTest: false }),
-    );
-    selectedEdgeMesh.visible = false;
-    selectedEdgeMesh.renderOrder = 2;
-    scene.add(selectedEdgeMesh);
+    // matter how small an offset is chosen.
+    //
+    // POOLED, NOT REBUILT. Measured across three capture rounds: rebuilding
+    // a TubeGeometry from scratch on every pointermove cost 17-70ms of CPU
+    // on a software renderer -- always under one frame, so it never failed
+    // the latency bar, but real cost on a school laptop for what used to be
+    // a single BufferAttribute swap. drawGeoms() now builds ONE tube per
+    // topological edge, once, alongside the invisible raycasting line it
+    // already built there (see edgePickLinesRef) -- hovering and selecting
+    // an edge is then just handing its PRE-BUILT tube one of these two
+    // SHARED materials and toggling `.visible`, never constructing geometry.
+    // setHoveredEdgeTube()/setSelectedEdgeTube() below own that bookkeeping.
+    //
+    // Violet, not cyan, for hover. Cyan was already on screen twice --
+    // measured directly against this file's own scene, not the palette in
+    // the abstract:
+    //   body orange   0xff6600  hue  24    (the ORIGINAL defect: too close to this)
+    //   X axis        red->orange           hue   0
+    //   Y axis        green->yellow-green   hue ~120
+    //   grid centre   0x8be9fd              hue 193  (GridHelper() a few lines up)
+    //   Z axis        blue->light blue      hue ~230  (THREE.AxesHelper's own default)
+    //   selected      0xff79c6              hue 326
+    // A saturated cyan hover (hue 193) sat almost on top of the grid centre
+    // line and a few degrees from the Z axis's own light-blue tail -- it
+    // stopped competing with the body and started competing with the
+    // scene's own furniture. 0xbb55f6 sits at hue ~278: the one gap in that
+    // list wide enough to matter, roughly 48 degrees from the Z axis on one
+    // side and 48 degrees from selected pink on the other -- clearly apart
+    // from every always-on colour in the viewport AND from selected, which
+    // is the one distinction this app cannot afford to spend.
+    const hoverEdgeMaterial = new THREE.MeshBasicMaterial({ color: 0xbb55f6, depthTest: false });
+    const selectedEdgeMaterial = new THREE.MeshBasicMaterial({ color: 0xff79c6, depthTest: false });
+    hoverEdgeMaterialRef.current = hoverEdgeMaterial;
+    selectedEdgeMaterialRef.current = selectedEdgeMaterial;
 
     hoverFaceMeshRef.current = hoverFaceMesh;
     selectedFaceMeshRef.current = selectedFaceMesh;
-    hoverEdgeMeshRef.current = hoverEdgeMesh;
-    selectedEdgeMeshRef.current = selectedEdgeMesh;
 
     // ---- raycasting -----------------------------------------------------
     const raycaster = new THREE.Raycaster();
@@ -527,23 +658,21 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
 
     function applyHover(hit: Hit | null) {
       hoverFaceMesh.visible = false;
-      hoverEdgeMesh.visible = false;
       // A cheap, immediate second cue: the cursor tells a student an edge or
       // face is interactive before they have even noticed the highlight, or
       // known that picking exists at all. Reverts to the container's own
       // CSS cursor (the inline 'grab' set below, while phase is 'ready')
       // rather than a hardcoded default.
       renderer.domElement.style.cursor = hit ? 'pointer' : '';
-      if (!hit) return;
+      if (!hit) {
+        setHoveredEdgeTube(null);
+        return;
+      }
       if (hit.kind === 'face') {
+        setHoveredEdgeTube(null);
         paintFaceHighlight(THREE, hoverFaceMesh, hit.mesh, hit.range);
       } else {
-        const pos = hit.line.geometry.getAttribute('position');
-        if (pos) {
-          hoverEdgeMesh.geometry.dispose();
-          hoverEdgeMesh.geometry = edgeTubeGeometry(THREE, pos.array, HOVER_EDGE_RADIUS);
-          hoverEdgeMesh.visible = true;
-        }
+        setHoveredEdgeTube(hit.line.userData.tubeMesh as THREE_NS.Mesh);
       }
     }
 
@@ -574,7 +703,7 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
       const hit = hitAt(e.clientX, e.clientY);
       if (!hit) {
         selectedFaceMesh.visible = false;
-        selectedEdgeMesh.visible = false;
+        setSelectedEdgeTube(null);
         selectedFaceStateRef.current = null;
         onPickRef.current?.(null);
         renderNow();
@@ -584,7 +713,7 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         const featureId = hit.mesh.userData.featureId as string;
         selectedFaceStateRef.current = { featureId, faceIndex: hit.range.index };
         paintFaceHighlight(THREE, selectedFaceMesh, hit.mesh, hit.range);
-        selectedEdgeMesh.visible = false;
+        setSelectedEdgeTube(null);
         onPickRef.current?.({ kind: 'face', target: featureId, faceIndex: hit.range.index });
       } else {
         const { featureId, kernelEdge } = hit.line.userData as {
@@ -603,12 +732,7 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         const name = built
           ? nameEdgeOnCurrentShape(kernelRef.current!.oc, built, docRef.current, featureId, kernelEdge)
           : null;
-        const pos = hit.line.geometry.getAttribute('position');
-        if (pos) {
-          selectedEdgeMesh.geometry.dispose();
-          selectedEdgeMesh.geometry = edgeTubeGeometry(THREE, pos.array, SELECTED_EDGE_RADIUS);
-          selectedEdgeMesh.visible = true;
-        }
+        setSelectedEdgeTube(hit.line.userData.tubeMesh as THREE_NS.Mesh);
         selectedFaceMesh.visible = false;
         selectedFaceStateRef.current = null;
         onPickRef.current?.({ kind: 'edge', target: featureId, name });
@@ -623,6 +747,8 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
 
     return () => {
       controls.removeEventListener('start', onControlsStart);
+      controls.removeEventListener('change', onControlsChange);
+      resizeObserver.disconnect();
       renderer.domElement.removeEventListener('pointermove', onPointerMove);
       renderer.domElement.removeEventListener('pointerleave', onPointerLeave);
       renderer.domElement.removeEventListener('click', onClick);
@@ -635,10 +761,16 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         const mesh = obj as THREE_NS.Mesh;
         mesh.geometry?.dispose?.();
       });
-      [hoverFaceMesh, selectedFaceMesh, hoverEdgeMesh, selectedEdgeMesh].forEach((obj) => {
+      [hoverFaceMesh, selectedFaceMesh].forEach((obj) => {
         obj.geometry.dispose();
         (obj.material as THREE_NS.Material).dispose();
       });
+      // Edge tube geometries are disposed by the solidGroup.traverse() above
+      // (they are children of the shape meshes it just walked); these two
+      // materials are the only thing outside that tree, shared across every
+      // tube rather than owned by one.
+      hoverEdgeMaterial.dispose();
+      selectedEdgeMaterial.dispose();
       rendererRef.current = null;
       sceneRef.current = null;
       cameraRef.current = null;
@@ -646,12 +778,96 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
       solidGroupRef.current = null;
       hoverFaceMeshRef.current = null;
       selectedFaceMeshRef.current = null;
-      hoverEdgeMeshRef.current = null;
-      selectedEdgeMeshRef.current = null;
+      hoverEdgeMaterialRef.current = null;
+      selectedEdgeMaterialRef.current = null;
+      hoveredEdgeTubeRef.current = null;
+      selectedEdgeTubeRef.current = null;
       edgePickLinesRef.current = [];
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
+
+  /**
+   * Project every current `anchors` spec (world space) to screen pixels and
+   * hand the result to `onAnchors` -- the world->screen half of drag handles,
+   * ported line-for-line from public/reshape/kernel/runner-brep.html's own
+   * projectAnchors() (see that file's "6. drag handles" section). Same
+   * reasoning, restated here because there is no second file to point at
+   * inside this one:
+   *
+   * "IN FRONT OF CAMERA" IS NOT FREE. THREE.Vector3.applyMatrix4() divides by
+   * w unconditionally, and a point BEHIND the camera produces a mirrored, not
+   * obviously-wrong result -- so each anchor's view-space Z is checked first
+   * (the camera looks down its own local -Z, so a positive view-space Z means
+   * behind it) and dropped rather than drawn somewhere nonsensical.
+   *
+   * `ux`/`uy` (and `vx`/`vy` for a planar handle) are the RAW screen-pixel
+   * delta for one world unit along that axis -- not normalised, unlike
+   * `dirX`/`dirY` -- because HandleOverlay.tsx solves the pointer's screen
+   * movement onto two possibly-non-perpendicular projected axes (they stop
+   * being perpendicular the moment the camera turns), and that solve needs
+   * the actual per-axis scale, not just a direction.
+   *
+   * A handle whose axis currently points AT the camera (pxPerUnit under a
+   * pixel) is dropped rather than kept at a division-by-near-zero: an
+   * undraggable dot is worse than no dot, the same principle every refusal-
+   * with-a-reason in this codebase follows, just with no sentence to show for
+   * it here -- there is nowhere on a screen dot to put one.
+   */
+  function projectAnchors() {
+    const three = threeRef.current;
+    const camera = cameraRef.current;
+    const container = containerRef.current;
+    if (!three || !camera || !container) return;
+    const { THREE } = three;
+
+    const specs = anchorsRef.current;
+    if (!specs.length) {
+      onAnchorsRef.current?.([]);
+      return;
+    }
+
+    camera.updateMatrixWorld();
+    const viewMat = camera.matrixWorldInverse;
+    const mvp = new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, viewMat);
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+
+    const inFrontOfCamera = (p: [number, number, number]) =>
+      new THREE.Vector3(p[0], p[1], p[2]).applyMatrix4(viewMat).z < 0;
+    const toScreen = (p: [number, number, number]): [number, number] => {
+      const v = new THREE.Vector3(p[0], p[1], p[2]).applyMatrix4(mvp);
+      return [(v.x * 0.5 + 0.5) * w, (1 - (v.y * 0.5 + 0.5)) * h];
+    };
+
+    const points: AnchorPoint[] = [];
+    for (const a of specs) {
+      if (!inFrontOfCamera(a.origin)) continue;
+      const [hx, hy] = toScreen(a.origin);
+      const [tx, ty] = toScreen([
+        a.origin[0] + a.axis[0], a.origin[1] + a.axis[1], a.origin[2] + a.axis[2],
+      ]);
+      const dx = tx - hx;
+      const dy = ty - hy;
+      const px = Math.hypot(dx, dy);
+      if (px < 0.001) continue;
+      const pt: AnchorPoint = {
+        param: a.param, label: a.label, kind: a.kind,
+        x: hx, y: hy, dirX: dx / px, dirY: dy / px, pxPerUnit: px,
+        ux: dx, uy: dy,
+      };
+      if (a.axisV && a.paramV) {
+        const [vsx, vsy] = toScreen([
+          a.origin[0] + a.axisV[0], a.origin[1] + a.axisV[1], a.origin[2] + a.axisV[2],
+        ]);
+        pt.paramV = a.paramV;
+        pt.vx = vsx - hx;
+        pt.vy = vsy - hy;
+      }
+      points.push(pt);
+    }
+    onAnchorsRef.current?.(points);
+  }
 
   /** Which FaceRange a hit triangle belongs to -- the geometric half of
    *  resolving a Raycaster hit back to a TopoDS_Face. `triangleIndex` is
@@ -730,6 +946,54 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
     return new THREE.TubeGeometry(path, Math.max(2, verts.length * 4), radius, 8, false);
   }
 
+  /**
+   * Which tube, if any, is currently wearing the HOVER role. Never
+   * constructs geometry -- every edge already has its own pre-built tube
+   * (see drawGeoms()); this only swaps `.material` and toggles `.visible`.
+   *
+   * A tube that is ALSO the current selection is left alone: selected wins
+   * outright rather than the two materials fighting over the same mesh, so
+   * hovering the edge you already selected does not visually do anything --
+   * which is the same behaviour the old two-independent-overlays design had
+   * by construction, kept on purpose rather than by accident.
+   */
+  function setHoveredEdgeTube(tube: THREE_NS.Mesh | null) {
+    const prev = hoveredEdgeTubeRef.current;
+    if (prev === tube) return;
+    if (prev && prev !== selectedEdgeTubeRef.current) prev.visible = false;
+    hoveredEdgeTubeRef.current = tube;
+    if (tube && tube !== selectedEdgeTubeRef.current && hoverEdgeMaterialRef.current) {
+      tube.material = hoverEdgeMaterialRef.current;
+      tube.visible = true;
+    }
+  }
+
+  /**
+   * Which tube, if any, is currently wearing the SELECTED role -- same
+   * no-geometry contract as setHoveredEdgeTube() above.
+   *
+   * The one asymmetry: if the tube being DESELECTED is still the one being
+   * hovered (the student clicked, then clicked empty space without moving
+   * the mouse away), it reverts to the hover material and stays visible
+   * rather than disappearing out from under the cursor.
+   */
+  function setSelectedEdgeTube(tube: THREE_NS.Mesh | null) {
+    const prev = selectedEdgeTubeRef.current;
+    if (prev === tube) return;
+    if (prev) {
+      if (prev === hoveredEdgeTubeRef.current && hoverEdgeMaterialRef.current) {
+        prev.material = hoverEdgeMaterialRef.current;
+      } else {
+        prev.visible = false;
+      }
+    }
+    selectedEdgeTubeRef.current = tube;
+    if (tube && selectedEdgeMaterialRef.current) {
+      tube.material = selectedEdgeMaterialRef.current;
+      tube.visible = true;
+    }
+  }
+
   /** Replace the drawn solids and render exactly one frame. Never called from
    *  inside a loop -- see the render-on-demand note above. Returns the meshes
    *  it created so the caller can re-apply a persisted selection against
@@ -746,23 +1010,25 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
     const camera = cameraRef.current;
     const hoverFaceMesh = hoverFaceMeshRef.current;
     const selectedFaceMesh = selectedFaceMeshRef.current;
-    const hoverEdgeMesh = hoverEdgeMeshRef.current;
-    const selectedEdgeMesh = selectedEdgeMeshRef.current;
     if (!three || !kernel || !group || !renderer || !scene || !camera
-      || !hoverFaceMesh || !selectedFaceMesh || !hoverEdgeMesh || !selectedEdgeMesh) {
+      || !hoverFaceMesh || !selectedFaceMesh) {
       throw new Error('the three.js scene has not been created yet');
     }
     const { THREE } = three;
 
-    // Both highlights are hidden BEFORE the meshes they might be borrowing
-    // attributes from are disposed below -- a highlight left pointing at a
-    // disposed geometry is a stale GPU buffer, not just a stale selection.
-    // restorePicks(), called after this returns, is what re-shows the
-    // selection against the fresh meshes.
+    // Both face highlights are hidden BEFORE the meshes they might be
+    // borrowing attributes from are disposed below -- a highlight left
+    // pointing at a disposed geometry is a stale GPU buffer, not just a
+    // stale selection. The edge tube pool is about to be thrown away
+    // entirely (every tube is a child of a mesh the traverse below disposes),
+    // so hover/selected edge state is dropped here too rather than left
+    // pointing at geometry that no longer exists; restorePicks(), called
+    // after this returns, re-establishes the selected one against the FRESH
+    // pool.
     hoverFaceMesh.visible = false;
-    hoverEdgeMesh.visible = false;
     selectedFaceMesh.visible = false;
-    selectedEdgeMesh.visible = false;
+    hoveredEdgeTubeRef.current = null;
+    selectedEdgeTubeRef.current = null;
 
     group.traverse((obj) => (obj as THREE_NS.Mesh).geometry?.dispose?.());
     group.clear();
@@ -812,6 +1078,28 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         line.userData.kernelEdge = edge;
         mesh.add(line);
         edgePickLinesRef.current.push(line);
+
+        // This edge's highlight, built ONCE here rather than on every hover
+        // -- see the pooling note above hoverEdgeMaterial's definition in
+        // the scene-setup effect for why. Starts invisible with no material
+        // assigned that matters (it is never drawn until setHoveredEdgeTube()
+        // / setSelectedEdgeTube() hands it one); reachable from a raycast hit
+        // via the SAME line's userData, which is the only lookup path
+        // applyHover()/onClick() need.
+        const pos = lineGeom.getAttribute('position');
+        // Material is whichever of the two shared ones is live -- it never
+        // matters which, since `.visible` stays false until a role is
+        // assigned, and both refs are populated before drawGeoms() can run
+        // (phase only reaches 'ready' after the scene-setup effect that
+        // creates them).
+        const tube = new THREE.Mesh(
+          pos ? edgeTubeGeometry(THREE, pos.array, EDGE_TUBE_RADIUS) : new THREE.BufferGeometry(),
+          hoverEdgeMaterialRef.current!,
+        );
+        tube.visible = false;
+        tube.renderOrder = 2;
+        mesh.add(tube);
+        line.userData.tubeMesh = tube;
       }
     }
 
@@ -831,34 +1119,29 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
   function restorePicks(meshes: THREE_NS.Mesh[], built: BuildResult) {
     const three = threeRef.current;
     const kernel = kernelRef.current;
-    const selectedEdgeMesh = selectedEdgeMeshRef.current;
     const selectedFaceMesh = selectedFaceMeshRef.current;
-    if (!three || !kernel || !selectedEdgeMesh || !selectedFaceMesh) return;
+    if (!three || !kernel || !selectedFaceMesh) return;
     const { THREE } = three;
 
+    // No geometry construction here either -- resolve the NAME to a real
+    // kernel edge on the fresh shape (same mechanism a FilletFeature itself
+    // resolves against), then find which of the CURRENT pool's pre-built
+    // tubes is that same edge by IsSame(), and just hand it the selected
+    // role. Either nothing is picked, the name no longer resolves (see
+    // whyNameLost() in lib/topo-name.ts for why in words a student can act
+    // on -- that story is the caller's to tell), or -- should not happen,
+    // handled the same honest way regardless -- it resolves but no tube in
+    // the current pool matches: all three collapse to the same
+    // "nothing selected" outcome via the ?? null below.
     const p = pickRef.current;
     const edge = p ? resolveName(kernel.oc, p.name, built) : null;
-    if (edge) {
-      // edgeToThreeGeometry() hands back a bare position-only line geometry
-      // -- exactly what discretizeEdge() sampled, nothing more -- so its
-      // points are read back and rebuilt as a tube rather than assigned to
-      // this Mesh directly; a Mesh with no index and only a position
-      // attribute renders as garbage triangles, not a line.
-      const lineGeom = edgeToThreeGeometry(THREE, kernel.oc, edge);
-      const pos = lineGeom.getAttribute('position');
-      selectedEdgeMesh.geometry.dispose();
-      selectedEdgeMesh.geometry = pos
-        ? edgeTubeGeometry(THREE, pos.array, SELECTED_EDGE_RADIUS)
-        : new THREE.BufferGeometry();
-      lineGeom.dispose();
-      selectedEdgeMesh.visible = true;
-    } else {
-      // Either nothing is picked, or the name no longer resolves -- see
-      // whyNameLost() in lib/topo-name.ts for why in words a student can
-      // act on. That story is the caller's to tell; this component only
-      // stops showing a selection that no longer exists.
-      selectedEdgeMesh.visible = false;
-    }
+    const line = edge
+      ? edgePickLinesRef.current.find((l) => {
+          const kernelEdge = l.userData.kernelEdge;
+          return kernelEdge && typeof kernelEdge.IsSame === 'function' && kernelEdge.IsSame(edge);
+        })
+      : undefined;
+    setSelectedEdgeTube((line?.userData.tubeMesh as THREE_NS.Mesh | undefined) ?? null);
 
     const sel = selectedFaceStateRef.current;
     const mesh = sel ? meshes.find((m) => m.userData.featureId === sel.featureId) : undefined;
@@ -960,6 +1243,21 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
     if (renderer && scene && camera) renderer.render(scene, camera);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, pick]);
+
+  // ---- re-project handles whenever the SPECS change, independent of the
+  // camera ------------------------------------------------------------------
+  // A new `anchors` array means a different feature got selected, a drag
+  // moved the shape it belongs to (SandboxWorkspace's own handlesFor() runs
+  // off `doc`, so a rebuild produces a fresh array), or a draw tool started
+  // -- any of which needs a fresh projection right away, not whenever the
+  // camera next happens to move. The camera-driven case (orbiting without
+  // touching a handle) is the OTHER flush point, inside dampingTick above;
+  // this is the one for everything else.
+  useEffect(() => {
+    if (phase !== 'ready') return;
+    projectAnchors();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, anchors]);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: 320, background: COLORS.bg }}>

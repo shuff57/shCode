@@ -1006,6 +1006,15 @@ export default function SandboxWorkspace() {
                       }}
                       pick={pickedEdge?.edge ? { target: pickedEdge.target, name: pickedEdge.edge } : null}
                       selectedCount={selected.length}
+                      // The B-rep engine's own producer for the SAME `anchors`
+                      // state the JSCAD path fills from the iframe's
+                      // 'reshape-anchors' postMessage (see the `onMessage`
+                      // handler above) -- one piece of state, two producers,
+                      // so HandleOverlay below needs no engine-specific
+                      // branch at all. `specs` is the exact HandleSpec[] the
+                      // iframe path already posts as 'reshape-set-anchors'.
+                      anchors={specs}
+                      onAnchors={setAnchors}
                     />
                   ) : (
                     <ReshapePreview
