@@ -322,6 +322,11 @@ export default function BrepViewportThree({
   doc, deflection, onStats, onPick, pick, selectedCount, anchors, onAnchors, onMesh,
 }: Props) {
   const [phase, setPhase] = useState<'loading' | 'ready' | 'error'>('loading');
+  // Which view-strip preset the camera is sitting on, or null once the
+  // student has dragged away from it. A blind judge could not tell the
+  // Underneath view from Top -- straight up and straight down look alike --
+  // so the strip itself says which one is active.
+  const [preset, setPreset] = useState<'home' | 'top' | 'front' | 'underneath' | null>('home');
   const [loadError, setLoadError] = useState<string | null>(null);
   const [buildError, setBuildError] = useState<string | null>(null);
   /** Whether the pointer is CURRENTLY over a pickable edge -- drives the
@@ -556,6 +561,7 @@ export default function BrepViewportThree({
       dampingRafRef.current = stillMoving ? requestAnimationFrame(dampingTick) : null;
     };
     const onControlsStart = () => {
+      setPreset(null);
       if (dampingRafRef.current === null) dampingRafRef.current = requestAnimationFrame(dampingTick);
     };
     controls.addEventListener('start', onControlsStart);
@@ -1514,16 +1520,16 @@ export default function BrepViewportThree({
         // family as selectionBadgeStyle/edgeHintStyle so it reads as this
         // app's existing "small overlay" language rather than a new one.
         <div style={viewStripStyle}>
-          <button type="button" title="Back to the starting view" style={viewStripButtonStyle} onClick={() => lookFrom(HOME_DIR)}>
+          <button type="button" title="Back to the starting view" style={preset === 'home' ? viewStripActiveStyle : viewStripButtonStyle} aria-pressed={preset === 'home'} onClick={() => { lookFrom(HOME_DIR); setPreset('home'); }}>
             Home
           </button>
-          <button type="button" title="Look from above" style={viewStripButtonStyle} onClick={() => lookFrom(TOP_DIR)}>
+          <button type="button" title="Look from above" style={preset === 'top' ? viewStripActiveStyle : viewStripButtonStyle} aria-pressed={preset === 'top'} onClick={() => { lookFrom(TOP_DIR); setPreset('top'); }}>
             Top
           </button>
-          <button type="button" title="Look from the front" style={viewStripButtonStyle} onClick={() => lookFrom(FRONT_DIR)}>
+          <button type="button" title="Look from the front" style={preset === 'front' ? viewStripActiveStyle : viewStripButtonStyle} aria-pressed={preset === 'front'} onClick={() => { lookFrom(FRONT_DIR); setPreset('front'); }}>
             Front
           </button>
-          <button type="button" title="Look at the underside" style={viewStripButtonStyle} onClick={() => lookFrom(UNDERNEATH_DIR)}>
+          <button type="button" title="Look at the underside" style={preset === 'underneath' ? viewStripActiveStyle : viewStripButtonStyle} aria-pressed={preset === 'underneath'} onClick={() => { lookFrom(UNDERNEATH_DIR); setPreset('underneath'); }}>
             Underneath
           </button>
         </div>
@@ -1606,6 +1612,10 @@ const viewStripStyle: React.CSSProperties = {
 const viewStripButtonStyle: React.CSSProperties = {
   padding: '4px 10px', background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 999,
   font: '12px ui-monospace, Menlo, Consolas, monospace', color: COLORS.fg, cursor: 'pointer',
+};
+
+const viewStripActiveStyle: React.CSSProperties = {
+  ...viewStripButtonStyle, background: COLORS.fg, color: COLORS.bg, borderColor: COLORS.fg,
 };
 
 // Same visual family as selectionBadgeStyle (same pill), deliberately -- a

@@ -106,12 +106,25 @@
           "fix": "0339884 screen-space edge band, crosshair, hint, badge and Round titles; e86c8b9 0.5 radius steps"
         }
       }
+    },
+    {
+      "round": 3,
+      "pieces": {
+        "camera": {
+          "winner": "ours",
+          "confidence": "high",
+          "why": "B has word-labeled camera preset buttons (Home, Top, Front, Underneath) right under the canvas, so reaching the bottom view is one click on a button that says what it does, needing 0 keystrokes and only 8 clicks total for the whole task. A has no labeled view controls: the first drag on the canvas produced a rubber-band selection box (A_2) instead of rotating anything, and the person only got anywhere by fumbling with an unlabeled corner axis-triad, burning 34 clicks and 34 keystrokes before landing on a flat face-on view (A_5/A_6) that carries no text saying whether it is top or bottom.",
+          "gap_ours": "The hole in the reached view (B_2) renders as a small dark circle with a faint mark inside rather than an unmistakably open see-through void, so confirming it is a true opening (not just a shaded circle) takes a beat of close looking even though the navigation itself was trivial.",
+          "gap_chili3d": "No labeled orientation control anywhere on screen; the beginner's natural instinct (drag the canvas) triggers a selection box, not a rotate, and the only path to a flat view is an unlabeled corner gizmo that gives no textual confirmation of which face you ended up looking at.",
+          "fix": "c793428 view strip + underside light; active preset marked in the strip"
+        }
+      }
     }
   ],
   "summary": {
-    "pieces": 11,
-    "won_blind": 11,
-    "rounds": 2,
+    "pieces": 12,
+    "won_blind": 12,
+    "rounds": 3,
     "closed": "2026-09-03",
     "open_gaps_named_by_judges": {
       "first-minute": "The tool a beginner actually wants (reSHape/Build) is not the default landing tab -- they land on moSHion (a 2D code canvas) first and must discover and click through two more labeled tabs (reSHape, then Build) before any guidance appears, adding navigation overhead the raw click count doesn't fully capture.",
@@ -119,12 +132,12 @@
       "hollow": "The failure signal is a small warning triangle icon on a tab label, not an explanatory sentence, so a 14-year-old sees 'something's wrong' but not why or what to change; neither screen actually shows a cutaway proving the box went hollow.",
       "pattern": "Default array-spacing value is narrower than the box itself, so the first result silently merges the copies until the student corrects it.",
       "mirror": "After mirroring, the right-side panel switches to an intimidating code-level message ('No dimensions declared. Add a getParameterDefinitions() function...') instead of showing the new part's dimensions, which would confuse a beginner even though the geometry itself is correct.",
-      "hole": "The default depth of 22 that made this hole go through is an arbitrary number disconnected from the box's actual height in the UI; a beginner has no way to know the hole broke through rather than just going deep, since neither B screenshot shows the bottom face where the exit hole would be visible.",
       "dimensions-panel": "No unit is shown anywhere on the numbers (just '40', '20', no mm/in/cm label), so a student setting an exact size has no idea what unit they're actually specifying.",
       "refusal-messages": "The warning explains the collapse and that the invalid change was not applied, but doesn't explicitly say what to try (e.g. suggest a max safe thickness) \u2014 the student has to discover 19 works by trial and error on the slider rather than being told a bound.",
       "handles": "Six sliders plus number fields all update simultaneously (64 ms) with no labeling of which colored dot maps to which slider, so a beginner could drag the right handle without understanding why the panel changed.",
       "timeline": "Selecting Mirror 1 shows no data panel at all ('Select a shape to see its dimensions') -- confirming the mirror survived requires eyeballing the 3D view rather than reading a value.",
-      "fillet": "The oversize clamp is silent -- the slider just stops at 9.5 with no plain-language reason shown, so a beginner still doesn't learn why 10 didn't work."
+      "fillet": "The oversize clamp is silent -- the slider just stops at 9.5 with no plain-language reason shown, so a beginner still doesn't learn why 10 didn't work.",
+      "camera": "The hole in the reached view (B_2) renders as a small dark circle with a faint mark inside rather than an unmistakably open see-through void, so confirming it is a true opening (not just a shaded circle) takes a beat of close looking even though the navigation itself was trivial."
     }
   }
 }
