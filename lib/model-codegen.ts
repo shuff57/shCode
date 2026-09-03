@@ -44,6 +44,11 @@ export interface GeneratedParam {
 
 const AXIS = ['width', 'depth', 'height'] as const;
 
+/** The primitive face parts an open hollow can be built from in JSCAD --
+ *  the three axis-aligned pairs, never 'side' (a cylinder's curved wall has
+ *  no flat slab to cut). See the 'shell' branch of featureExpr() below. */
+const OPEN_FACE_PARTS = new Set(['+x', '-x', '+y', '-y', '+z', '-z']);
+
 function num(n: number): string {
   return Number.isFinite(n) ? String(Number(n.toFixed(6))) : '0';
 }
@@ -674,7 +679,26 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
   if (f.kind === 'shell') {
     needs.add('shellOp');
     needs.add('transforms');
-    return `shellOp(${f.target}, p.${pname(f.id, 'thickness')})`;
+    // JSCAD has no face-selecting shell -- shellOp() (see its own comment
+    // below) is a whole-body scale-and-subtract with nothing to point an
+    // opening at. The one case this CAN represent: f.open names a face of a
+    // box or cylinder PRIMITIVE, on one of the three axis-aligned sides
+    // (namePrimitiveFace()'s '+x'/'-x'/'+y'/'-y'/'+z'/'-z' -- not 'side',
+    // the curved wall of a cylinder, which has no flat slab to cut). For
+    // that case shellOpenOp() builds the ordinary closed shell and then
+    // subtracts a slab off the named end, deep enough to clear the wall the
+    // shell just built -- same bounding-box reasoning shellOp() already
+    // uses. Any other name (a face from a boolean, a fillet, a curved side)
+    // is not representable here, so the closed shell is emitted with a
+    // comment saying so rather than silently doing nothing.
+    if (f.open && f.open.cause === 'primitive' && OPEN_FACE_PARTS.has(f.open.part)) {
+      needs.add('shellOpenOp');
+      const axis = f.open.part[1];
+      const sign = f.open.part[0] === '+' ? 1 : -1;
+      return `shellOpenOp(${f.target}, p.${pname(f.id, 'thickness')}, '${axis}', ${sign})`;
+    }
+    const openComment = f.open ? ' // open face not representable in JSCAD' : '';
+    return `shellOp(${f.target}, p.${pname(f.id, 'thickness')})${openComment}`;
   }
 
   if (f.kind === 'move') {
@@ -1040,6 +1064,29 @@ function shellOp(shape, thickness) {
   const inner = transforms.translate(mid, transforms.scale(factor,
     transforms.translate([-mid[0], -mid[1], -mid[2]], shape)))
   return booleans.subtract(shape, inner)
+}`,
+  shellOpenOp: `// Same hollow as shellOp(), then the wall on ONE named side is cut away
+// so that side is open -- 'x'/'y'/'z' is which bounding-box axis, sign is
+// +1 (the high end) or -1 (the low end). JSCAD has no face picker, so this
+// reads the same bounding box shellOp() already reads and subtracts a slab
+// spanning the whole part off that one end, deep enough to clear the wall
+// shellOp() just built. The slab overhangs by 1 unit on every side (the two
+// axes it spans fully, and past the surface on the axis it cuts into) so a
+// sliver of skin cannot survive floating-point rounding at the boundary.
+function shellOpenOp(shape, thickness, axis, sign) {
+  const hollow = shellOp(shape, thickness)
+  const box = measurements.measureBoundingBox(shape)
+  const size = [box[1][0] - box[0][0], box[1][1] - box[0][1], box[1][2] - box[0][2]]
+  const mid = [(box[0][0] + box[1][0]) / 2, (box[0][1] + box[1][1]) / 2, (box[0][2] + box[1][2]) / 2]
+  const i = axis === 'x' ? 0 : axis === 'y' ? 1 : 2
+  const margin = 1
+  const slab = size.map((s) => s + 2 * margin)
+  slab[i] = thickness + margin
+  const center = mid.slice()
+  center[i] = sign > 0
+    ? box[1][i] - thickness / 2 + margin / 2
+    : box[0][i] + thickness / 2 - margin / 2
+  return booleans.subtract(hollow, cuboid(slab[0], slab[1], slab[2], { center }))
 }`,
   mirrorThroughFace: `// Mirror through a face of the part itself, not empty space at world
 // zero. JSCAD solids have no picker for "this face" -- the closest honest

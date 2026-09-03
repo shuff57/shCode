@@ -162,6 +162,16 @@ interface Props {
    *  so the sandbox stops pinning a selection that no longer points at
    *  anything useful (its target feature is now consumed -- see topLevel()). */
   onClearPickedEdge?: () => void;
+  /** The last FACE picked in the viewport, the same way pickedEdge tracks an
+   *  edge -- see ShellFeature.open. `face` is null the same way pickedEdge's
+   *  `edge` can be: a real pick that could not be traced back to a named
+   *  primitive face (see nameFaceOnCurrentShape() in lib/topo-resolve.ts).
+   *  openHollow() below only acts on a non-null face and otherwise refuses
+   *  with a reason, rather than falling back to a closed hollow silently. */
+  pickedFace?: { target: string; face: TopoName | null } | null;
+  /** Called once a picked face has been consumed into a new open ShellFeature,
+   *  the same reason onClearPickedEdge exists. */
+  onClearPickedFace?: () => void;
   /** Feature id -> why that feature could not be built, from the B-rep build.
    *  A refused feature is ABSENT from the model but still present in the
    *  history, which without this marker looks like the app ignoring a click. */
@@ -170,7 +180,7 @@ interface Props {
 
 type BoolOp = 'union' | 'subtract' | 'intersect';
 type PatternMode = 'linear' | 'circular';
-type MenuId = 'shape' | 'bool' | 'round' | 'pattern' | 'move' | 'mirror' | 'hole' | null;
+type MenuId = 'shape' | 'bool' | 'round' | 'pattern' | 'move' | 'mirror' | 'hole' | 'hollow' | null;
 
 function shapeIcon(kind: ShapeKind) {
   if (kind === 'box') return <BoxIcon size={14} />;
@@ -359,7 +369,7 @@ function FlyoutButton({
 }
 
 export default function ModelEditor({
-  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, onStartDraw, pickedEdge, onClearPickedEdge, refusals,
+  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, onStartDraw, pickedEdge, onClearPickedEdge, pickedFace, onClearPickedFace, refusals,
 }: Props) {
   const [note, setNote] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -945,6 +955,29 @@ export default function ModelEditor({
     say(null);
   }
 
+  /** The Open Hollow variant -- newShell with the picked face carried as
+   *  ShellFeature.open, so the kernel leaves that one face uncapped instead
+   *  of building the fully closed default. Deliberately a SEPARATE explicit
+   *  choice from hollow() above, never its default: a face is almost always
+   *  picked by the time Hollow is pressed (clicking a face is also how a
+   *  shape gets selected), so defaulting to open here would silently change
+   *  what the plain Hollow button does for every student who happens to
+   *  have clicked a face first. */
+  function openHollow() {
+    const why = whyCannotSolidOp(chosen, 'hollow out');
+    if (why) { say(why); return; }
+    if (!pickedFaceUsable || !pickedFace?.face) {
+      say('Click the face to leave open, then Open hollow.');
+      return;
+    }
+    const f = newShell(doc, chosen[0].id, pickedFace.face);
+    onChange({ ...doc, features: [...doc.features, f] });
+    setSelected([f.id]);
+    onClearPickedFace?.();
+    setMenu(null);
+    say('Hollowed, open at the face you clicked.');
+  }
+
   function moveTool(copy: boolean) {
     const why = whyCannotSolidOp(chosen, 'move');
     if (why) { say(why); return; }
@@ -1082,6 +1115,15 @@ export default function ModelEditor({
         : null;
   const solidOpBlockedBy = whyCannotSolidOp(chosen, 'use');
   const canSolidOp = solidOpBlockedBy === null;
+  // Same staleness guard pickedEdgeUsable uses above: picking a face also
+  // selects its owning shape, so if the student has since chosen something
+  // else, chosen[0] no longer matches pickedFace.target and Open Hollow goes
+  // back to disabled rather than silently hollowing the wrong shape open.
+  const pickedFaceUsable =
+    !!pickedFace?.face && chosen.length === 1 && chosen[0].id === pickedFace.target;
+  const openHollowBlockedBy = !canSolidOp
+    ? solidOpBlockedBy
+    : pickedFaceUsable ? null : 'Click the face to leave open, then Open hollow.';
 
   // Group visibility for the search filter: a group's divider and wrapper
   // only render when at least one of its tools' names still matches.
@@ -1257,15 +1299,26 @@ export default function ModelEditor({
                   },
                 ]}
               />
-              {matches('Hollow') && (
-                <button
-                  onClick={hollow}
-                  disabled={!canSolidOp}
-                  title={solidOpBlockedBy ?? 'Hollow the selected solid out, leaving a wall'}
-                >
-                  <PackageOpen size={14} /> Hollow
-                </button>
-              )}
+              <FlyoutButton
+                label="Hollow"
+                icon={<PackageOpen size={14} />}
+                onMain={hollow}
+                disabled={!canSolidOp}
+                title={solidOpBlockedBy ?? 'Hollow the selected solid out, leaving a wall'}
+                open={menu === 'hollow'}
+                onToggleOpen={() => toggleMenu('hollow')}
+                matches={matches}
+                searchActive={searchActive}
+                variants={[
+                  {
+                    id: 'open-face', label: 'Open hollow',
+                    icon: <PackageOpen size={14} />,
+                    onClick: openHollow,
+                    disabled: openHollowBlockedBy !== null,
+                    title: openHollowBlockedBy ?? 'Hollow out, leaving the face you clicked open',
+                  },
+                ]}
+              />
             </div>
             <div className="model-tool-divider" />
           </>
@@ -1504,7 +1557,7 @@ export default function ModelEditor({
                     </em>
                   )}
                   {f.kind === 'shell' && (
-                    <em className="model-detail"> {names[f.target] ?? f.target}, wall {f.thickness}</em>
+                    <em className="model-detail"> {names[f.target] ?? f.target}, wall {f.thickness}{f.open ? ', open' : ''}</em>
                   )}
                   {f.kind === 'move' && (
                     <em className="model-detail">
@@ -1618,7 +1671,7 @@ export default function ModelEditor({
                     </em>
                   )}
                   {f.kind === 'shell' && (
-                    <em className="model-detail"> {names[f.target] ?? f.target}, wall {f.thickness}</em>
+                    <em className="model-detail"> {names[f.target] ?? f.target}, wall {f.thickness}{f.open ? ', open' : ''}</em>
                   )}
                   {f.kind === 'move' && (
                     <em className="model-detail">

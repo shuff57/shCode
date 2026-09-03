@@ -1001,10 +1001,35 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
             );
             shape = src;
           } else {
+            // f.open names the face to leave open, the same way f.face does
+            // for a draft (see that branch above) -- resolveNameAsUsedBy
+            // because f.open may have been named against an earlier feature
+            // than f.target. MakeThickSolidByJoin's closing-face list is "the
+            // faces to remove," measured directly against this kernel build:
+            // .Append() IS bound on NCollection_List_TopoDS_Shape (confirmed
+            // 2026-09-03 against public/reshape/kernel/replicad_single.wasm --
+            // topo-history.ts's own trap comment lists only Assign/First/
+            // RemoveFirst because that file only ever reads a list back, never
+            // builds one). An unresolved f.open does NOT fall back to "shown
+            // without it" the way every other refusal in this file does --
+            // the fallback here is a closed hollow, which is still a correct
+            // (if not what was asked for) build, not an absent one.
+            let openFace: any = null;
+            if (f.open) {
+              const partial: BuildResult = { shapes: built, ops, sweeps };
+              openFace = resolveNameAsUsedBy(oc, f.open, partial, f.target);
+              if (!openFace) {
+                refusals.set(
+                  f.id,
+                  `${label(f.id)} could not find the face to leave open -- ${label(f.id)} is shown closed.`,
+                );
+              }
+            }
             let inner: any = null;
             try {
               const op = new oc.BRepOffsetAPI_MakeThickSolid();
               const closingFaces = new oc.NCollection_List_TopoDS_Shape();
+              if (openFace) closingFaces.Append(openFace);
               op.MakeThickSolidByJoin(
                 src, closingFaces, -f.thickness, 1e-6,
                 oc.BRepOffset_Mode.BRepOffset_Skin, false, false,
@@ -1021,7 +1046,24 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
               inner = null;
             }
             if (inner) {
-              const cut = boolean('BRepAlgoAPI_Cut', src, inner, f.id, [f.target]);
+              // MakeThickSolidByJoin's own contract, measured directly
+              // against this kernel (2026-09-03), not assumed from the
+              // OCCT docs: with an EMPTY closing list, op.Shape() (= inner
+              // here) is the raw offset SOLID alone -- src minus it is what
+              // actually makes a shell, which is the cut below. With a
+              // NON-EMPTY list (openFace appended above), op.Shape() is
+              // already the FINISHED open shell -- cutting src minus THAT
+              // double-applies the hollowing. Measured on the box(40,40,20)
+              // /thickness-2/open-+z fixture: cutting here anyway gave
+              // volume 23328 with the outer bbox shrunk to +-18 on x and y
+              // (src minus an already-hollow shell, not src minus the plain
+              // offset solid) instead of the correct 8672 with the bbox
+              // unchanged at +-20. No OpRecord is pushed for this feature
+              // when openFace is set, since no boolean actually ran here --
+              // a name written against a later feature that reaches back
+              // through an OPEN shell to one of its faces is not yet
+              // resolvable, the same honest gap `made` names already have.
+              const cut = openFace ? inner : boolean('BRepAlgoAPI_Cut', src, inner, f.id, [f.target]);
               // IsDone() is not the whole story. Measured 2026-09-03: on a
               // box with ONE edge rounded, the offset reports done, the cut
               // "succeeds", and what comes out has no drawable faces -- the

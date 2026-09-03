@@ -1178,6 +1178,75 @@ try {
       'topLevel() -> built.shapes produced ZERO drawable shapes');
   }
 
+  console.log('\n=== shell.open: an exact-volume check against the real kernel, not a fixture oracle ===');
+  console.log('    (a hand-derived analytic answer, the same discipline the header above requires)');
+  {
+    // A box's +z cap is named exactly the way namePrimitiveFace() itself
+    // spells it -- see PRIMITIVE_FACE_PARTS in lib/topo-resolve.ts. Resolved
+    // directly by feature id here (the fixture IS the primitive, nothing sits
+    // between the name and the shape), which is the same shortcut every other
+    // `topoName` in this file takes for a fresh primitive.
+    const openTop = { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' };
+    const boxDoc = {
+      version: 1,
+      features: [
+        { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+        { id: 'shell1', kind: 'shell', target: 'b1', thickness: 2, open: openTop },
+      ],
+    };
+    const builtBox = adapter.buildDoc(oc, boxDoc, arc);
+    const boxRefusal = builtBox.refusals && builtBox.refusals.get('shell1');
+    console.log('  refusal: ' + (boxRefusal ?? 'none'));
+    const boxShape = builtBox.shapes.get('shell1');
+    const boxMeasured = boxShape ? adapter.measureShape(oc, boxShape) : null;
+    // Uncovered on top, so the inner void (2mm wall in from all six faces of
+    // a 40x40x20 box) now opens straight through the outer top face instead
+    // of being capped 2mm below it -- 36 wide, 36 deep, and reaching the
+    // FULL 18mm remaining height (20 - 2, only the bottom wall left) rather
+    // than the 16 a fully-closed shell would leave.
+    const boxExpectedVolume = 40 * 40 * 20 - 36 * 36 * 18;
+    console.log('  volume: ' + boxMeasured?.volume + '  expected: ' + boxExpectedVolume);
+    check('box 40x40x20 shelled 2 thick, open at +z: volume is 32000 - 36*36*18',
+      !!boxMeasured && Math.abs(boxMeasured.volume - boxExpectedVolume) < 1e-3,
+      'got ' + boxMeasured?.volume);
+    // The opening removes a CAP, not a bite out of the outer shape -- the
+    // wall around the rim is still full height, so the outer envelope this
+    // file's own header cares about (build -> resolve -> still the same
+    // part) has to read exactly like the closed box's own bbox.
+    const boxExpectedBbox = [[-20, -20, -10], [20, 20, 10]];
+    const boxBboxOk = !!boxMeasured && boxExpectedBbox.every((corner, i) =>
+      corner.every((v, j) => Math.abs(boxMeasured.bbox[i][j] - v) < 1e-3));
+    console.log('  bbox: ' + JSON.stringify(boxMeasured?.bbox) + '  expected: ' + JSON.stringify(boxExpectedBbox));
+    check('...and its outer bounding box is UNCHANGED -- the opening does not shrink the part',
+      boxBboxOk,
+      'got ' + JSON.stringify(boxMeasured?.bbox));
+
+    // A cylinder's two caps are named '+z'/'-z' too -- see
+    // PRIMITIVE_FACE_PARTS['cylinder'] in lib/topo-resolve.ts; only its
+    // curved wall gets the special 'side' name, and 'side' is deliberately
+    // NOT one of the parts lib/model-codegen.ts treats as JSCAD-representable
+    // (there is no flat slab to cut off a curve), so this fixture only ever
+    // exercises a cap.
+    const openCylTop = { cause: 'primitive', feature: 'c1', kind: 'face', part: '+z' };
+    const cylDoc = {
+      version: 1,
+      features: [
+        { id: 'c1', kind: 'cylinder', radius: 15, height: 80, center: [0, 0, 0] },
+        { id: 'shell2', kind: 'shell', target: 'c1', thickness: 2, open: openCylTop },
+      ],
+    };
+    const builtCyl = adapter.buildDoc(oc, cylDoc, arc);
+    const cylRefusal = builtCyl.refusals && builtCyl.refusals.get('shell2');
+    console.log('  refusal: ' + (cylRefusal ?? 'none'));
+    const cylShape = builtCyl.shapes.get('shell2');
+    const cylMeasured = cylShape ? adapter.measureShape(oc, cylShape) : null;
+    const cylExpectedVolume = Math.PI * 15 * 15 * 80 - Math.PI * 13 * 13 * 78;
+    console.log('  volume: ' + cylMeasured?.volume + '  expected: ' + cylExpectedVolume);
+    check('cylinder r15 h80 shelled 2 thick, open at +z: volume is pi*15^2*80 - pi*13^2*78',
+      !!cylMeasured && Math.abs(cylMeasured.volume - cylExpectedVolume) < 1e-2,
+      'got ' + cylMeasured?.volume);
+  }
+
   // ======================================================================
   // Causes this file does NOT exercise, and why.
   // ======================================================================

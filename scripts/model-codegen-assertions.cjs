@@ -928,6 +928,28 @@ module.exports = function run(dir) {
   check('newHole() on a rotated cylinder falls back to depth 10',
     types.newHole(tiltedCylDoc, 'c2').depth === 10);
 
+  console.log('\n=== newShape() spaces a second shape out, not on top of the first ===');
+
+  // A second primitive used to land at [0, 0, 0] no matter what already
+  // existed -- invisible, hidden inside the first shape, findable only by
+  // a student who thought to open the x field. newShape() now walks the
+  // doc's existing primitives and starts the new one past all of them.
+  check('newShape() on an empty doc still starts a box at the origin',
+    JSON.stringify(types.newShape(doc(), 'box').center) === JSON.stringify([0, 0, 0]));
+  // A 40-wide box at the origin reaches to x=20. A second 40-wide box also
+  // needs 20 to its own left, plus the 10-unit gap: 20 + 20 + 10 = 50.
+  check('newShape() places a second box after a 40-wide box at x=50',
+    types.newShape(defaultBoxDoc, 'box').center[0] === 50);
+  // Same box, but the new shape is a cylinder: its OWN half-width is its
+  // radius (10), not a box's half-size, so the gap comes out smaller: 20 (the
+  // box's own reach) + 10 (the cylinder's radius) + 10 (the gap) = 40.
+  check('newShape() places a cylinder after a box using the cylinder\'s own radius, not the box\'s',
+    types.newShape(defaultBoxDoc, 'cylinder').center[0] === 40);
+  // The other two axes are left alone -- only x moves shapes apart.
+  check('newShape() never moves the new shape off the y or z axis',
+    types.newShape(defaultBoxDoc, 'box').center[1] === 0
+    && types.newShape(defaultBoxDoc, 'box').center[2] === 0);
+
   const widerCorners = gen.applyParam(gen.applyParam(cornersDoc, 'hole1_dx', 25), 'hole1_dy', 18);
   check('applyParam widens the corner spacing without touching diameter, depth or centre',
     widerCorners.features[1].corners.dx === 25
@@ -1023,6 +1045,51 @@ module.exports = function run(dir) {
   check('a shell is genuinely hollow: less than the solid, more than nothing',
     shellBuilt.volume > 0 && shellBuilt.volume < 40 * 40 * 20 * 0.85,
     `${shellBuilt.volume.toFixed(0)} vs solid ${40 * 40 * 20}`);
+  check('no shell.open field means no "not representable" comment either',
+    !shellSrc.includes('open face not representable'));
+
+  console.log('\n=== shell open face (Hollow, leaving one face open) ===');
+
+  check('newShell with no open argument carries no open field',
+    types.newShell(doc(box('b1')), 'b1').open === undefined);
+  const openZName = { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' };
+  check('newShell(doc, target, open) stores the face name',
+    types.newShell(doc(box('b1')), 'b1', openZName).open === openZName);
+
+  const shellOpenDoc = doc(
+    box('b1', { size: [40, 40, 20] }),
+    { id: 'shell1', kind: 'shell', target: 'b1', thickness: 4, open: openZName },
+  );
+  const shellOpenSrc = gen.toReshape(shellOpenDoc);
+  check('an open primitive-face shell emits the slab-subtraction helper',
+    shellOpenSrc.includes('function shellOpenOp('));
+  check('...built ON TOP of the same closed-shell helper, not instead of it',
+    shellOpenSrc.includes('function shellOp('));
+  check('...and calls it with the axis and sign read off the face name',
+    shellOpenSrc.includes("shellOpenOp(b1, p.shell1_thickness, 'z', 1)"));
+  check('the closed shell from the SAME doc (no open field) never mentions shellOpenOp',
+    !shellSrc.includes('shellOpenOp'));
+
+  const shellOpenBuilt = build(shellOpenSrc);
+  check('an open hollow is a real, positive volume',
+    shellOpenBuilt.volume > 0);
+  check('an open hollow removes MORE material than the closed one -- the same wall, minus one whole cap',
+    shellOpenBuilt.volume < shellBuilt.volume,
+    `open ${shellOpenBuilt.volume.toFixed(0)} vs closed ${shellBuilt.volume.toFixed(0)}`);
+
+  // A cylinder's curved side has no flat slab a bounding-box cut can remove
+  // -- the one primitive face JSCAD genuinely cannot represent as "open".
+  const sideName = { cause: 'primitive', feature: 'c1', kind: 'face', part: 'side' };
+  const shellSideDoc = doc(
+    cyl('c1', { radius: 10, height: 40 }),
+    { id: 'shell2', kind: 'shell', target: 'c1', thickness: 2, open: sideName },
+  );
+  const shellSideSrc = gen.toReshape(shellSideDoc);
+  check("a cylinder's curved side is not representable -- no shellOpenOp call",
+    !shellSideSrc.includes('shellOpenOp('));
+  check('...the closed shell is emitted instead', shellSideSrc.includes('function shellOp('));
+  check('...with a comment saying it is a deliberate, documented gap',
+    shellSideSrc.includes('// open face not representable in JSCAD'));
 
   console.log('\n=== move (Move) ===');
 

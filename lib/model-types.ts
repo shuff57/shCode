@@ -301,6 +301,13 @@ export interface ShellFeature {
   name?: string;
   target: string;
   thickness: number;
+  /**
+   * The face to leave open, named the way the student clicked it -- see
+   * DraftFeature.face for the same pattern. Absent means fully closed, which
+   * stays the default: a closed hollow is what most students ask for first,
+   * and it is what the oracle fixture `shell-2` already records.
+   */
+  open?: TopoName;
 }
 
 /**
@@ -444,6 +451,7 @@ export function topoRefs(f: Feature): string[] {
   const names: TopoName[] = [];
   if (f.kind === 'fillet') names.push(f.edge);
   if (f.kind === 'draft' && f.face) names.push(f.face);
+  if (f.kind === 'shell' && f.open) names.push(f.open);
   return [...new Set(names.flatMap(featureChain))];
 }
 
@@ -824,8 +832,10 @@ export function newHoleCorners(doc: ModelDoc, target: string): HoleFeature {
   };
 }
 
-export function newShell(doc: ModelDoc, target: string): ShellFeature {
-  return { id: nextId(doc, 'shell'), kind: 'shell', target, thickness: 2 };
+export function newShell(doc: ModelDoc, target: string, open?: TopoName): ShellFeature {
+  const f: ShellFeature = { id: nextId(doc, 'shell'), kind: 'shell', target, thickness: 2 };
+  if (open) f.open = open;
+  return f;
 }
 
 export function newMove(doc: ModelDoc, target: string, copy = false): MoveFeature {
@@ -851,20 +861,62 @@ export function addCorner(f: SketchFeature, index: number): SketchFeature {
   return splitEdge(f, index);
 }
 
+/** Half-extent a freshly created shape of this kind would have along world X,
+ *  matching the literal size/radius defaults newShape() assigns below. Used
+ *  only to decide where the NEW shape should sit -- see newShape()'s comment. */
+function newHalfWidthX(kind: ShapeKind): number {
+  if (kind === 'box') return 20; // size: [40, ...] -> half is 20
+  if (kind === 'cylinder') return 10; // radius: 10
+  if (kind === 'cone') return 12; // radius: 12
+  if (kind === 'torus') return 18; // ringRadius 14 + tubeRadius 4
+  return 15; // sphere radius: 15
+}
+
+/** How far an existing primitive's own edge already reaches along +x --
+ *  center[0] + its own half-width or radius, unrotated (same fallback stance
+ *  as extentAlong() above: this is a DEFAULT-PICKING helper, not real
+ *  geometry, so a rotated shape is read as if it were not). null for
+ *  anything that is not a plain primitive -- a combine, hole or shell has no
+ *  size of its own to read here; the primitive underneath it already counts. */
+function shapeRightEdgeX(f: Feature): number | null {
+  if (f.kind === 'box') return f.center[0] + f.size[0] / 2;
+  if (f.kind === 'cylinder' || f.kind === 'cone') return f.center[0] + f.radius;
+  if (f.kind === 'sphere') return f.center[0] + f.radius;
+  if (f.kind === 'torus') return f.center[0] + f.ringRadius + f.tubeRadius;
+  return null;
+}
+
+/**
+ * A second shape used to land exactly on top of the first -- every primitive
+ * is born at world zero, so a student's second box was invisible, hidden
+ * inside the first, with no clue anything but the x field would ever explain
+ * why (a moderate-lens student found this only by discovering that field).
+ *
+ * The first shape in an empty doc still gets [0, 0, 0] -- there is nothing to
+ * clear yet, and 0 is the friendliest place to start building. Every shape
+ * after that is placed just past the rightmost edge of whatever primitives
+ * already exist, with a 10-unit gap so the two are visibly separate rather
+ * than touching.
+ */
 export function newShape(doc: ModelDoc, kind: ShapeKind): Feature {
+  const edges = doc.features
+    .map(shapeRightEdgeX)
+    .filter((x): x is number => x !== null);
+  const cx = edges.length === 0 ? 0 : Math.max(...edges) + newHalfWidthX(kind) + 10;
+
   if (kind === 'box') {
-    return { id: nextId(doc, 'box'), kind, size: [40, 40, 20], center: [0, 0, 0] };
+    return { id: nextId(doc, 'box'), kind, size: [40, 40, 20], center: [cx, 0, 0] };
   }
   if (kind === 'cylinder') {
-    return { id: nextId(doc, 'cyl'), kind, radius: 10, height: 40, center: [0, 0, 0] };
+    return { id: nextId(doc, 'cyl'), kind, radius: 10, height: 40, center: [cx, 0, 0] };
   }
   if (kind === 'cone') {
-    return { id: nextId(doc, 'cone'), kind, radius: 12, height: 30, center: [0, 0, 0] };
+    return { id: nextId(doc, 'cone'), kind, radius: 12, height: 30, center: [cx, 0, 0] };
   }
   if (kind === 'torus') {
-    return { id: nextId(doc, 'ring'), kind, ringRadius: 14, tubeRadius: 4, center: [0, 0, 0] };
+    return { id: nextId(doc, 'ring'), kind, ringRadius: 14, tubeRadius: 4, center: [cx, 0, 0] };
   }
-  return { id: nextId(doc, 'ball'), kind, radius: 15, center: [0, 0, 0] };
+  return { id: nextId(doc, 'ball'), kind, radius: 15, center: [cx, 0, 0] };
 }
 
 function labelOf(f: Feature): string {

@@ -68,7 +68,7 @@ import type { OrbitControls as OrbitControlsType } from 'three/examples/jsm/cont
 import type { Feature, ModelDoc } from '../../lib/model-types';
 import { topLevel } from '../../lib/model-types';
 import { edgesToThree, tessellateToThree, type FaceRange } from '../../lib/occt-three';
-import { nameEdgeOnCurrentShape, resolveName } from '../../lib/topo-resolve';
+import { facesOf, nameEdgeOnCurrentShape, nameFaceOnCurrentShape, resolveName } from '../../lib/topo-resolve';
 import type { TopoName } from '../../lib/topo-name';
 import type { BuildResult } from '../../lib/occt-build';
 import type { HandleSpec } from '../../lib/model-handles';
@@ -128,14 +128,17 @@ export interface BrepViewportStats {
  *
  * `faceIndex` is a FaceRange.index -- the face's position in the shape's own
  * face walk, stable across camera moves and rebuilds of an unchanged shape
- * (see lib/occt-three.ts). An edge's `name` is null when the edge is real
- * and gets highlighted like any other, but could not be traced back to any
- * primitive -- see nameEdgeOnCurrentShape() in lib/topo-resolve.ts for
- * which edges that covers and which it honestly refuses. The caller can
- * still show it was picked; it just cannot build a Fillet from it.
+ * (see lib/occt-three.ts) -- kept alongside `name` because it is what
+ * paintFaceHighlight() re-finds the same face by, cheaper than resolving a
+ * name back down to a kernel face. A face or edge's `name` is null when the
+ * pick is real and gets highlighted like any other, but could not be traced
+ * back to any primitive -- see nameFaceOnCurrentShape()/nameEdgeOnCurrentShape()
+ * in lib/topo-resolve.ts for which faces/edges that covers and which they
+ * honestly refuse. The caller can still show it was picked; it just cannot
+ * build a Fillet, or an open Hollow, from it.
  */
 export type ViewportPick =
-  | { kind: 'face'; target: string; faceIndex: number }
+  | { kind: 'face'; target: string; faceIndex: number; name: TopoName | null }
   | { kind: 'edge'; target: string; name: TopoName | null };
 
 interface Props {
@@ -903,7 +906,18 @@ export default function BrepViewportThree({
         selectedFaceStateRef.current = { featureId, faceIndex: hit.range.index };
         paintFaceHighlight(THREE, selectedFaceMesh, hit.mesh, hit.range);
         setSelectedEdgeTube(null);
-        onPickRef.current?.({ kind: 'face', target: featureId, faceIndex: hit.range.index });
+        // Resolved the same way an edge's `name` is, just off the other end
+        // of facesOf()'s own walk: FaceRange.index is this face's position
+        // in that SAME stable order (see FaceRange's own doc comment in
+        // lib/occt-three.ts), so indexing back into it recovers the exact
+        // kernel TopoDS_Face the click landed on.
+        const built = lastBuiltRef.current;
+        const shape = built?.shapes.get(featureId);
+        const kernelFace = shape ? facesOf(kernelRef.current!.oc, shape)[hit.range.index] : undefined;
+        const name = built && kernelFace
+          ? nameFaceOnCurrentShape(kernelRef.current!.oc, built, docRef.current, featureId, kernelFace)
+          : null;
+        onPickRef.current?.({ kind: 'face', target: featureId, faceIndex: hit.range.index, name });
       } else {
         const { featureId, kernelEdge } = hit.line.userData as {
           featureId: string; kernelEdge: any;

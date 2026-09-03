@@ -602,23 +602,37 @@ export function nameEdgeOnCurrentShape(
     edgesOf(oc, f).some((e) => e.IsSame(edge)));
   if (adjacent.length !== 2) return null;
 
+  const a = nameFaceOnCurrentShape(oc, build, doc, pickedFeature, adjacent[0]);
+  const b = nameFaceOnCurrentShape(oc, build, doc, pickedFeature, adjacent[1]);
+  return a && b ? { cause: 'between', feature: a.feature, kind: 'edge', of: [a, b] } : null;
+}
+
+/**
+ * Name a FACE picked on the CURRENT top-level shape of `pickedFeature`, by
+ * the same brute-force-but-bounded search nameEdgeOnCurrentShape() already
+ * runs for each of an edge's two adjacent faces (see that function's own
+ * doc comment for why the search direction has to run backwards from "try
+ * every primitive" rather than forwards from the click) -- extracted here so
+ * a face pick that never touches an edge (Hollow's "leave this face open",
+ * a future Draft or Mirror picker) can resolve a name too, not only a Round.
+ */
+export function nameFaceOnCurrentShape(
+  oc: Occt,
+  build: BuildResult,
+  doc: { features: Array<{ id: string; kind: string }> },
+  pickedFeature: string,
+  face: any,
+): TopoName | null {
   const primitives = doc.features.filter(
     (f): f is { id: string; kind: 'box' | 'cylinder' } => f.kind === 'box' || f.kind === 'cylinder',
   );
-
-  function nameFace(face: any): TopoName | null {
-    for (const prim of primitives) {
-      if (!build.shapes.get(prim.id)) continue;
-      for (const part of PRIMITIVE_FACE_PARTS[prim.kind]) {
-        const candidate: TopoName = { cause: 'primitive', feature: prim.id, kind: 'face', part };
-        const resolved = resolveNameAsUsedBy(oc, candidate, build, pickedFeature);
-        if (resolved && resolved.IsSame(face)) return candidate;
-      }
+  for (const prim of primitives) {
+    if (!build.shapes.get(prim.id)) continue;
+    for (const part of PRIMITIVE_FACE_PARTS[prim.kind]) {
+      const candidate: TopoName = { cause: 'primitive', feature: prim.id, kind: 'face', part };
+      const resolved = resolveNameAsUsedBy(oc, candidate, build, pickedFeature);
+      if (resolved && resolved.IsSame(face)) return candidate;
     }
-    return null;
   }
-
-  const a = nameFace(adjacent[0]);
-  const b = nameFace(adjacent[1]);
-  return a && b ? { cause: 'between', feature: a.feature, kind: 'edge', of: [a, b] } : null;
+  return null;
 }

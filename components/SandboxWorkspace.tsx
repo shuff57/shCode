@@ -207,10 +207,23 @@ export default function SandboxWorkspace() {
   }, []);
   const [doc, setDoc] = useState<ModelDoc>(EMPTY_DOC);
   const [selected, setSelected] = useState<string[]>([]);
+  // A selection can outlive its feature (Undo removes the step that was
+  // selected). Measured 2026-09-03: the badge read "1 Selected", no chip
+  // was lit, and the panel said "This step has no numbers to adjust" for a
+  // step that no longer existed. Prune to ids the document still has.
+  useEffect(() => {
+    setSelected((s) => {
+      const keep = s.filter((id) => doc.features.some((f) => f.id === id));
+      return keep.length === s.length ? s : keep;
+    });
+  }, [doc]);
   // An edge picked in the B-rep viewport (BrepViewportThree's onPick), lifted
   // here for the same reason `selected` is: ModelEditor's Round/Bevel needs
   // it, and the viewport that produced it is a sibling, not a parent.
   const [pickedEdge, setPickedEdge] = useState<{ target: string; edge: TopoName | null } | null>(null);
+  // Same lift, for a picked FACE -- ModelEditor's Hollow flyout needs it for
+  // ShellFeature.open (see that field's own doc comment in lib/model-types.ts).
+  const [pickedFace, setPickedFace] = useState<{ target: string; face: TopoName | null } | null>(null);
   // Rollback bar: the boundary index (0..features.length) past which features
   // are suppressed from the rebuilt model. null means "show everything". This
   // is a view change, not a structural edit -- see the effect below.
@@ -796,6 +809,7 @@ export default function SandboxWorkspace() {
       loadDoc(EMPTY_DOC);
       setSelected([]);
       setPickedEdge(null);
+      setPickedFace(null);
       past.current = [];
       future.current = [];
       setDepth({ back: 0, forward: 0 });
@@ -806,6 +820,27 @@ export default function SandboxWorkspace() {
       stopRun();
       setLogs([]);
     }
+  }
+
+  // A name for a downloaded file that actually tells two exports apart.
+  // Before this every STL was "model.stl" -- a student exporting twice in one
+  // sitting (try a fillet, export, undo it, export again) got two files a
+  // browser calls "model.stl" and "model (1).stl", neither of which says
+  // which is which. Feature count plus a minute-resolution timestamp is
+  // cheap to compute from what is already on hand (docRef, not doc -- this
+  // is called from a plain function, not a hook) and is enough to tell two
+  // exports in the same session apart without asking the student to rename
+  // anything. Unpinned design decision: named by feature COUNT, not by the
+  // first feature's own name -- a model's shape (and so a good name for it)
+  // usually comes from its LAST few features, not its first, and doc.features
+  // is already the number this file's own comments call the state that matters.
+  function exportFilename(ext: string): string {
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`
+      + `-${pad(now.getHours())}${pad(now.getMinutes())}`;
+    const n = docRef.current.features.length;
+    return `reshape-${n}-feature${n === 1 ? '' : 's'}-${stamp}.${ext}`;
   }
 
   // The B-rep Save STL button. Deliberately an ordinary <a download> with a
@@ -828,7 +863,7 @@ export default function SandboxWorkspace() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'model.stl';
+    a.download = exportFilename('stl');
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -849,7 +884,7 @@ export default function SandboxWorkspace() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'model.obj';
+    a.download = exportFilename('obj');
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -874,7 +909,7 @@ export default function SandboxWorkspace() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'model.3mf';
+    a.download = exportFilename('3mf');
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -1223,6 +1258,8 @@ export default function SandboxWorkspace() {
                 onContentChange={setCardHasContent}
                 pickedEdge={pickedEdge}
                 onClearPickedEdge={() => setPickedEdge(null)}
+                pickedFace={pickedFace}
+                onClearPickedFace={() => setPickedFace(null)}
                 refusals={refusals}
               />
             ) : (
@@ -1300,14 +1337,16 @@ export default function SandboxWorkspace() {
                         // list -- Round/Bevel's existing `chosen.length === 1`
                         // gate then just works, with no separate edge-aware
                         // gate to keep in sync. Clicking empty space clears
-                        // both, matching Onshape's own click-away-to-deselect.
+                        // all three, matching Onshape's own click-away-to-deselect.
                         if (!p) {
                           setSelected([]);
                           setPickedEdge(null);
+                          setPickedFace(null);
                           return;
                         }
                         setSelected([p.target]);
                         setPickedEdge(p.kind === 'edge' ? { target: p.target, edge: p.name } : null);
+                        setPickedFace(p.kind === 'face' ? { target: p.target, face: p.name } : null);
                       }}
                       pick={pickedEdge?.edge ? { target: pickedEdge.target, name: pickedEdge.edge } : null}
                       selectedCount={selected.length}
