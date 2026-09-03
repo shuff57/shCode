@@ -6,8 +6,8 @@
     "node": ">=22.18"
   },
   "scripts": {
-    "dev": "node server.js",
-    "prebuild": "node scripts/check-lesson-numbers.mjs && node scripts/check-assignment-codes.mjs && node scripts/generate-lessons-manifest.mjs && node scripts/generate-ai-graders.mjs && node scripts/generate-solutions.mjs && node scripts/generate-lesson-starters.mjs && node scripts/check-moshion-textures.mjs && node scripts/check-solution-leak.mjs",
+    "dev": "node scripts/build-brep-kernel.mjs && node server.js",
+    "prebuild": "node scripts/build-brep-kernel.mjs && node scripts/check-lesson-numbers.mjs && node scripts/check-assignment-codes.mjs && node scripts/generate-lessons-manifest.mjs && node scripts/generate-ai-graders.mjs && node scripts/generate-solutions.mjs && node scripts/generate-lesson-starters.mjs && node scripts/check-moshion-textures.mjs && node scripts/check-solution-leak.mjs",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
     "test:occt": "node scripts/test-occt-adapter.mjs",
