@@ -90,6 +90,28 @@ const COLORS = {
   accent: '#bd93f9',
 };
 
+// View-strip preset directions, as [x, y, z] to normalise at click time.
+// Z-UP, not Y-up -- this scene sets `camera.up.set(0, 0, 1)` (see the scene
+// setup effect below), matching every other view of a ModelDoc in this app
+// (extrude runs along +Z). So "straight down" is +Z and "straight up from
+// below" is -Z, not the +/-Y a Y-up engine would use.
+// HOME mirrors the literal initial `camera.position.set(140, 160, 130)`
+// below, just as a direction (lookFrom() re-applies it at whatever distance
+// the student has since zoomed to, not the original distance).
+// TOP/UNDERNEATH carry a tiny epsilon off the Z axis -- landing the camera
+// EXACTLY on the up axis is a spherical-coordinate singularity for
+// OrbitControls (azimuth becomes undefined), not something a maxPolarAngle
+// clamp would prevent; this component deliberately sets no clamp (the
+// freedom to orbit anywhere, including upside down, is the point).
+// FRONT is +Y: SketchConstraints.tsx calls the xz plane "Front" ("standing
+// up facing you"), and +Y is the axis Home's own camera position leans on
+// hardest (160, the largest of the three coordinates) -- the axis already
+// facing the viewer in the starting view.
+const HOME_DIR: [number, number, number] = [140, 160, 130];
+const TOP_DIR: [number, number, number] = [0.001, 0.001, 1];
+const FRONT_DIR: [number, number, number] = [0, 1, 0];
+const UNDERNEATH_DIR: [number, number, number] = [0.001, 0.001, -1];
+
 export interface BrepViewportStats {
   buildMs: number;
   meshMs: number;
@@ -459,7 +481,23 @@ export default function BrepViewportThree({
     key.position.set(100, 200, 150);
     const fill = new THREE.DirectionalLight(0xffffff, 0.4);
     fill.position.set(-120, -80, 60);
-    scene.add(ambient, key, fill);
+    // Every light above sits at a POSITIVE z -- fine for the top-down Home
+    // view, but it leaves every face whose normal points the other way (the
+    // underside of a box, the far wall of a through hole) lit by ambient
+    // alone. `under` mirrors `fill`'s x/y lean with a NEGATIVE z so the
+    // "Underneath" view strip preset (see lookFrom() above; this scene is
+    // Z-up) actually shows something instead of a near-black silhouette --
+    // it's the light this component was missing, not a from-below CAMERA
+    // preset also having to add its own light. 1.0 (roughly `key`'s order,
+    // not `fill`'s -- 0.5 measured too dim: the bottom face landed at only
+    // ~1.86x the background's brightness, short of the 2x floor a hole's
+    // exit needs to read as a hole and not a shadow) but confined to the
+    // -z hemisphere, so it adds NOTHING to any face the Home view can see --
+    // measured at an exact 0 pixel diff over the model region, before vs.
+    // after this light existed at all.
+    const under = new THREE.DirectionalLight(0xffffff, 1.0);
+    under.position.set(-100, -80, -150);
+    scene.add(ambient, key, fill, under);
 
     // Default GridHelper lies in the XZ (y=0) plane -- a Y-up convention.
     // Rotated onto the XY (z=0) plane to match the Z-up scene.
@@ -955,6 +993,36 @@ export default function BrepViewportThree({
    * with-a-reason in this codebase follows, just with no sentence to show for
    * it here -- there is nowhere on a screen dot to put one.
    */
+  /** View strip. Re-aims the camera along a preset DIRECTION while keeping
+   *  BOTH the orbit target and the current distance from it -- a beginner
+   *  who has already zoomed in should not get zoomed back out just for
+   *  clicking "Top". A snap, not an animated fly-to: render-on-demand means
+   *  the one-frame repaint below is the whole cost, and `controls.update()`
+   *  first re-derives OrbitControls' own internal spherical coordinates
+   *  from the new position so the NEXT drag orbits smoothly from here
+   *  rather than jumping back toward wherever the old spherical state
+   *  thought the camera was. */
+  function lookFrom(dir: [number, number, number]) {
+    const three = threeRef.current;
+    const camera = cameraRef.current;
+    const controls = controlsRef.current;
+    const renderer = rendererRef.current;
+    const scene = sceneRef.current;
+    if (!three || !camera || !controls || !renderer || !scene) return;
+    const { THREE } = three;
+    const distance = camera.position.distanceTo(controls.target);
+    const direction = new THREE.Vector3(dir[0], dir[1], dir[2]).normalize();
+    camera.position.copy(controls.target).addScaledVector(direction, distance);
+    controls.update();
+    renderer.render(scene, camera);
+    // Camera-driven, not a drag -- setting camera.position directly does not
+    // run through OrbitControls' own 'change' listener path the way a drag
+    // does, so the dampingTick flush point that normally keeps handles in
+    // sync never fires for this. Same reasoning as the ResizeObserver
+    // callback above: reproject right here instead.
+    projectAnchors();
+  }
+
   function projectAnchors() {
     const three = threeRef.current;
     const camera = cameraRef.current;
@@ -1437,6 +1505,29 @@ export default function BrepViewportThree({
           <div style={{ color: COLORS.fg }}>{buildError}</div>
         </div>
       )}
+      {phase === 'ready' && (
+        // Four plain-word camera presets, not an icon strip -- the gap this
+        // fixes isn't that orbiting is hard, it's that nothing on screen
+        // says orbiting is POSSIBLE at all (OrbitControls has no
+        // maxPolarAngle, but a beginner who never tries dragging past
+        // vertical has no way to discover that). Bottom-left, same pill
+        // family as selectionBadgeStyle/edgeHintStyle so it reads as this
+        // app's existing "small overlay" language rather than a new one.
+        <div style={viewStripStyle}>
+          <button type="button" title="Back to the starting view" style={viewStripButtonStyle} onClick={() => lookFrom(HOME_DIR)}>
+            Home
+          </button>
+          <button type="button" title="Look from above" style={viewStripButtonStyle} onClick={() => lookFrom(TOP_DIR)}>
+            Top
+          </button>
+          <button type="button" title="Look from the front" style={viewStripButtonStyle} onClick={() => lookFrom(FRONT_DIR)}>
+            Front
+          </button>
+          <button type="button" title="Look at the underside" style={viewStripButtonStyle} onClick={() => lookFrom(UNDERNEATH_DIR)}>
+            Underneath
+          </button>
+        </div>
+      )}
       {phase === 'ready' && (hoveringEdge && !pick || !!selectedCount) && (
         <div style={topRightStackStyle}>
           {/* Shown ONLY while hovering an edge with nothing picked yet --
@@ -1487,6 +1578,34 @@ const topRightStackStyle: React.CSSProperties = {
 const selectionBadgeStyle: React.CSSProperties = {
   padding: '4px 10px', background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 999,
   font: '12px ui-monospace, Menlo, Consolas, monospace', color: COLORS.fg, pointerEvents: 'none',
+};
+
+// Bottom-left, sized to its own content (not `errorPanelStyle`'s full-width
+// left:12/right:12 strip) so it can never steal a pointer event over the
+// rest of the canvas -- only the small box the four buttons actually
+// occupy is clickable.
+//
+// left: 70, not 12 -- FOUND BY AN ACTUAL FAILED CLICK, not by inspection.
+// SandboxWorkspace.tsx's Build-mode host collapses its "Code" card to a
+// 46px-wide rail (`#editorPane.is-card-empty`/`.is-tools-hidden`) pinned at
+// `left: 12px` for the ENTIRE canvas height (top:48 to bottom:12) whenever
+// there is no note or sketch to show -- exactly the state a fresh
+// box-then-hole document is in. That rail sits on TOP of this canvas (the
+// two panes are absolutely positioned over the same area, not laid out
+// side by side), so a literal left:12 strip lands directly under it: a
+// real click on "Home" there hit the rail, not this button. 70 clears the
+// rail's right edge (12 + 46 = 58) with an 12px gap. On a host with no such
+// rail (app/brep-three/page.tsx, app/brep-test/page.tsx) this is just a
+// slightly wider left margin than the minimum -- no functional cost.
+const viewStripStyle: React.CSSProperties = {
+  position: 'absolute', left: 70, bottom: 12, display: 'flex', gap: 6,
+};
+
+// Same pill family as selectionBadgeStyle/edgeHintStyle, but NOT
+// pointerEvents: 'none' -- these are real buttons, not a status readout.
+const viewStripButtonStyle: React.CSSProperties = {
+  padding: '4px 10px', background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 999,
+  font: '12px ui-monospace, Menlo, Consolas, monospace', color: COLORS.fg, cursor: 'pointer',
 };
 
 // Same visual family as selectionBadgeStyle (same pill), deliberately -- a

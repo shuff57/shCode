@@ -1420,7 +1420,8 @@ export default function ModelEditor({
           {doc.features.length === 0 && (
             <li className="model-empty">
               Nothing here yet. Add a box, select it, and press{' '}
-              <strong>Hole</strong> to drill through it.
+              <strong>Hole</strong> to drill through it. Drag the view to
+              spin it.
             </li>
           )}
           {doc.features.map((f, i) => {
@@ -1554,7 +1555,8 @@ export default function ModelEditor({
           {doc.features.length === 0 && (
             <li className="model-empty">
               Nothing here yet. Add a box, select it, and press{' '}
-              <strong>Hole</strong> to drill through it.
+              <strong>Hole</strong> to drill through it. Drag the view to
+              spin it.
             </li>
           )}
           {doc.features.map((f, i) => {
