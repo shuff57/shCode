@@ -231,9 +231,32 @@ export default function SandboxWorkspace() {
       // allow-same-origin, so its origin is opaque ("null") by design.
       if (frameRef.current && e.source !== frameRef.current.contentWindow) return;
       const d = e.data as {
-        source?: string; defs?: ParamDef[]; values?: ParamValues;
+        source?: string; type?: string; defs?: ParamDef[]; values?: ParamValues;
         ms?: number; empty?: boolean; failed?: boolean; points?: AnchorPoint[];
       };
+      if (d?.type === 'brep-kernel-please') {
+        // THE BYTE HANDOFF. The frame is sandboxed without allow-same-origin,
+        // so it is an opaque origin with its own HTTP cache partition -- the
+        // parent's own fetch of this file does nothing for it. So the frame
+        // asks for the wasm directly and the parent hands it over as a
+        // transferred ArrayBuffer, which took the kernel's start-up from
+        // 39,857ms to 434ms (measured 2026-09-02, see runner-brep.html).
+        //
+        // Fetched FRESH on every request rather than cached in a variable: a
+        // transferred ArrayBuffer is detached at the sender, so a cached copy
+        // would only serve the first ask and leave nothing for a second frame
+        // (Stop, then Run again). A plain fetch of a same-origin, browser-
+        // cached asset costs nothing close to a real network round trip, so
+        // there is no reason to hold a 22.9MB copy in JS heap to avoid it.
+        const from = e.source;
+        fetch('/reshape/kernel/replicad_single.wasm')
+          .then((r) => r.arrayBuffer())
+          .then((bytes) => {
+            (from as Window | null)?.postMessage({ type: 'brep-kernel-bytes', bytes }, '*', [bytes]);
+          })
+          .catch(() => { /* the runner falls back to its own network fetch */ });
+        return;
+      }
       if (d?.source === 'reshape-params') {
         frameRef.current?.contentWindow?.postMessage(
           { source: 'reshape-set-anchors', anchors: specsRef.current },
@@ -960,7 +983,15 @@ export default function SandboxWorkspace() {
                       }}
                     />
                   ) : (
-                    <ReshapePreview ref={frameRef} code={code} runKey={runKey} />
+                    <ReshapePreview
+                      ref={frameRef}
+                      code={code}
+                      runKey={runKey}
+                      // Only reached here when NOT (brepEngine && build) --
+                      // see the ternary above -- so brepEngine true means
+                      // Code mode, the one place this runner is meant for.
+                      engine={brepEngine ? 'brep' : 'jscad'}
+                    />
                   )}
                   {build && (
                     <HandleOverlay

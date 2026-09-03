@@ -285,6 +285,25 @@
 		window.__occtNoRun = true;
 		return;
 	}
+
+	// THIS FRAME OUTLIVES ITS FIRST PROGRAM. components/ReshapePreview.tsx
+	// mounts this file ONCE and pushes every later Run's code in with
+	// `reshape-set-code` instead of navigating a new `?code=` -- a fresh
+	// mount is what the 22.9MB kernel is too slow to afford twice. Queued
+	// here, before the kernel has even started loading, so a Run pressed
+	// again while that ~2s load is still in flight is never silently
+	// dropped: the module below drains this queue -- keeping only the
+	// latest entry -- the moment it is ready to run something, then hands
+	// off to its own listener for anything that arrives after.
+	window.__occtCodeQueue = [];
+	window.__occtReady = false;
+	window.addEventListener('message', function (e) {
+		var d = e.data;
+		if (!d || d.source !== 'reshape-set-code' || typeof d.code !== 'string') return;
+		if (window.__occtReady) return; // the module below owns live pushes from here
+		window.__occtCodeQueue.push(d.code);
+	});
+
 	var params = new URLSearchParams(location.search);
 	var encoded = params.get('code');
 	if (!encoded) { window.__occtNoRun = true; return; }
@@ -396,51 +415,85 @@
 		}
 	})();
 
+	// THE FRAME OUTLIVES THE FIRST PROGRAM (see __occtCodeQueue in the
+	// synchronous <script> above). From here on "the student's code" means
+	// whatever the latest push says it is, so this drains anything that
+	// arrived while the kernel was loading -- keeping only the last one, since
+	// a second Run pressed before the first even started supersedes it rather
+	// than queueing behind it -- and hands live pushes to this module's own
+	// listener from now on.
+	window.__occtReady = true;
+	if (window.__occtCodeQueue.length) {
+		window.__occtPendingCode = window.__occtCodeQueue[window.__occtCodeQueue.length - 1];
+	}
+	window.__occtCodeQueue = [];
 	if (!window.__occtPendingCode) { statusEl.textContent = ''; return; } // nothing submitted
 
-	// ---- 3. run the student's script.js -------------------------------------
+	// ---- 3 & 4. run the student's script.js, then find main() ---------------
 	//
-	// Injected as a real <script>, not eval()'d, for the same reason
-	// runner.html does it this way: top-level let/const/class in the student's
-	// file become real globals, and //# sourceURL is what lets the error
-	// reporter above attribute a thrown line to "script.js" instead of to this
-	// document. Same synchronous completion flag runner.html sets: appendChild
-	// of a classic script with textContent runs it inline, so by the time
-	// appendChild returns the flag is set UNLESS the script threw (in which
-	// case window.onerror above has already reported it, and findMain() below
-	// simply finds nothing and reports its own "no main()" message).
-	window.module = window.module || { exports: {} };
-	var s = document.createElement('script');
-	s.textContent = window.__occtPendingCode +
-		'\n;window.__occtScriptCompleted = true;\n//# sourceURL=script.js';
-	document.head.appendChild(s);
-	if (!window.__occtScriptCompleted) { statusEl.textContent = ''; return; }
-
-	// ---- 4. find main(), the same way runner.html does ----------------------
-
-	function findMain() {
-		var exp = window.module && window.module.exports;
-		if (exp && typeof exp.main === 'function') return exp.main;
-		if (typeof exp === 'function') return exp;
-		try {
-			var f = (0, eval)('typeof main !== "undefined" ? main : undefined');
-			if (typeof f === 'function') return f;
-		} catch (e) { /* not declared */ }
-		return null;
+	// A FRESH FUNCTION SCOPE PER RUN, STILL A CLASSIC <script> TAG. Injected
+	// the same way runner.html does it -- a real <script> element, not
+	// eval()'d directly -- for the SAME reason runner.html gives: this whole
+	// document is a `<script type="module">`, which is always strict mode,
+	// and eval() called from strict code forces the evaluated text strict too
+	// (no implicit globals, no Annex B leniency). A plain classic script
+	// element is its own top-level execution context, sloppy by default
+	// regardless of the module around it, matching what students get on
+	// runner.html and on jscad.app.
+	//
+	// What's different from a plain injected script -- and the actual fix for
+	// "Identifier 'x' has already been declared" on a second Run -- is that
+	// the student's code is wrapped in `(function () { ... })()` inside that
+	// tag rather than left at the tag's own top level. A CLASSIC SCRIPT'S
+	// top-level `let`/`const`/`class` land in ONE global lexical environment
+	// that lives for the life of the document, so re-injecting the same
+	// top-level `let x` a second time throws -- that is exactly the
+	// remount-per-run design runner.html leans on, and exactly what this
+	// engine cannot afford (a fresh iframe means a fresh 22.9MB kernel load).
+	// Declared inside a function expression instead, `let x` is an ordinary
+	// function-scoped local of THAT CALL: every Run creates a brand new
+	// function object and invocation, so nothing a previous run declared can
+	// collide with -- or leak into -- the next one. main() keeps working
+	// exactly as students write it, because its closure still captures
+	// whatever the wrapper's scope holds, the same way a nested function
+	// always can.
+	//
+	// Finding main() no longer means asking the GLOBAL object "do you have
+	// this name" (which is what a real <script> tag would have made true, and
+	// what runner.html itself still does) -- the wrapper cannot leak it out
+	// that way any more than it can leak `let x` out. So the wrapper asks
+	// itself, in its own last statement, and hands the answer back as its
+	// return value.
+	function execStudentCode(code) {
+		window.__occtScriptCompleted = false;
+		window.__occtRunResult = null;
+		window.module = { exports: {} }; // fresh every run: a stale export must not survive to the next one
+		var s = document.createElement('script');
+		s.textContent =
+			'window.__occtRunResult = (function () {' + code +
+			'\n;window.__occtScriptCompleted = true;' +
+			'\nreturn { main: typeof main !== "undefined" ? main : undefined,' +
+			' getParameterDefinitions: typeof getParameterDefinitions !== "undefined" ? getParameterDefinitions : undefined };' +
+			'\n})();\n//# sourceURL=script.js';
+		document.head.appendChild(s);
+		document.head.removeChild(s); // already ran inline by the time appendChild returns; nothing needs the node kept
+		if (!window.__occtScriptCompleted) return null; // the script threw; window.onerror already reported it
+		var exp = (window.module && window.module.exports) || {};
+		var found = window.__occtRunResult || {};
+		return {
+			main: (typeof exp.main === 'function') ? exp.main : (typeof exp === 'function' ? exp : found.main),
+			getParameterDefinitions:
+				(typeof exp.getParameterDefinitions === 'function') ? exp.getParameterDefinitions : found.getParameterDefinitions,
+		};
 	}
 
+	var mainFn = null;
+	var currentGetParamDefs = null;
+	var liveParams = null;
+
 	function paramDefs() {
-		var defs = null;
-		var exp = window.module && window.module.exports;
-		if (exp && typeof exp.getParameterDefinitions === 'function') defs = exp.getParameterDefinitions;
-		if (!defs) {
-			try {
-				var g = (0, eval)('typeof getParameterDefinitions !== "undefined" ? getParameterDefinitions : undefined');
-				if (typeof g === 'function') defs = g;
-			} catch (e) { /* not declared */ }
-		}
-		if (!defs) return [];
-		try { return defs() || []; } catch (e) { return []; }
+		if (!currentGetParamDefs) return [];
+		try { return currentGetParamDefs() || []; } catch (e) { return []; }
 	}
 	function initialOf(d) {
 		if (!d || d.name === undefined) return undefined;
@@ -458,7 +511,10 @@
 		return out;
 	}
 
-	var mainFn = findMain();
+	var __firstRun = execStudentCode(window.__occtPendingCode);
+	if (!__firstRun) return; // execStudentCode already reported the failure
+	mainFn = __firstRun.main;
+	currentGetParamDefs = __firstRun.getParameterDefinitions;
 	if (!mainFn) {
 		fail('No main() function found.\n\nYour program needs a function called main that returns a shape:\n\n  function main() {\n    return cuboid(10, 10, 10)\n  }\n\n(Adding "module.exports = { main }" is optional here — it is what lets the same file run on jscad.app.)');
 		return;
@@ -688,16 +744,46 @@
 		return meshed;
 	}
 
-	var liveParams = defaultParams();
-	try {
-		window.parent.postMessage({
-			source: 'reshape-params',
-			defs: JSON.parse(JSON.stringify(paramDefs(), function (k, v) {
-				return typeof v === 'function' ? undefined : v;
-			})),
-			values: liveParams
-		}, '*');
-	} catch (_) { /* parent gone, or nothing serialisable */ }
+	// One-time load vs. every later Run, folded into the SAME function: a
+	// reload only differs from the page's first load in that the scene it
+	// draws into already exists (loadCode() below re-enters here instead of
+	// falling through from the execStudentCode() call above it).
+	function runLoadedProgram() {
+		liveParams = defaultParams();
+		try {
+			window.parent.postMessage({
+				source: 'reshape-params',
+				defs: JSON.parse(JSON.stringify(paramDefs(), function (k, v) {
+					return typeof v === 'function' ? undefined : v;
+				})),
+				values: liveParams
+			}, '*');
+		} catch (_) { /* parent gone, or nothing serialisable */ }
+		statusEl.textContent = 'Running your code…';
+		runAndDraw({}, true);
+	}
+
+	// Re-entry point for `reshape-set-code`: a later Run, on the SAME living
+	// frame. Nothing from the previous run survives this on purpose --
+	// execStudentCode() above gives the new code its own fresh function
+	// scope, window.module is reset inside it, and fittedOnce resets here so
+	// the camera frames whatever this program draws instead of keeping a
+	// framing chosen for a completely different shape. drawShapes() already
+	// disposes the previous run's meshes on every call (see above), so the
+	// solids themselves need no extra cleanup here.
+	function loadCode(code) {
+		window.__previewSources = { 'script.js': code };
+		fittedOnce = false;
+		var found = execStudentCode(code);
+		if (!found) return; // execStudentCode already reported the failure
+		mainFn = found.main;
+		currentGetParamDefs = found.getParameterDefinitions;
+		if (!mainFn) {
+			fail('No main() function found.\n\nYour program needs a function called main that returns a shape:\n\n  function main() {\n    return cuboid(10, 10, 10)\n  }\n\n(Adding "module.exports = { main }" is optional here — it is what lets the same file run on jscad.app.)');
+			return;
+		}
+		runLoadedProgram();
+	}
 
 	function rebuildFailed(e) {
 		window.dispatchEvent(new ErrorEvent('error', { error: e, message: e && e.message, filename: 'script.js' }));
@@ -766,6 +852,10 @@
 
 	window.addEventListener('message', function (e) {
 		var d = e.data;
+		if (d && d.source === 'reshape-set-code' && typeof d.code === 'string') {
+			loadCode(d.code);
+			return;
+		}
 		if (d && d.source === 'reshape-set-anchors') {
 			anchors = Array.isArray(d.anchors) ? d.anchors : [];
 			anchorsDirty = true;
@@ -789,8 +879,7 @@
 		runAndDraw(d.params, false);
 	});
 
-	statusEl.textContent = 'Running your code…';
-	runAndDraw({}, true);
+	runLoadedProgram(); // the code found by execStudentCode() above, before the scene existed
 })();
 </script>
 </body>

@@ -631,7 +631,7 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
    * sentence.
    */
   const KNOWN: Record<string, string[]> = {
-    cuboid: ['size', 'center', 'width', 'depth', 'height'],
+    cuboid: ['size', 'center', 'width', 'depth', 'height', 'roundRadius'],
     cube: ['size', 'center'],
     sphere: ['radius', 'center'],
     cylinder: ['radius', 'height', 'center'],
@@ -762,6 +762,24 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
 
   api.cuboid = (...args: any[]) => {
     const o = opts(args, ['width', 'depth', 'height']); refuseUnknown('cuboid', o);
+    // ROUNDED CORNERS ARE NOW BUILDABLE, so stop refusing them.
+    //
+    // This option used to be refused by name, and that was right at the time:
+    // silently ignoring it returns a SHARP box and says nothing, so a student
+    // sees a shape that is simply wrong with no clue why. A sentence beats a
+    // wrong answer. But a shape beats a sentence, and roundedCuboid exists now
+    // -- it fillets all twelve edges through the same BRepFilletAPI the model
+    // editor's Bevel feature uses.
+    //
+    // Measured 2026-09-02: the sandbox's own reSHape starter calls
+    // `cuboid(w, d, h, { roundRadius })` on its line 16, so the FIRST thing a
+    // student saw after switching to this engine was that refusal. Delegating
+    // costs nothing when the option is absent -- the check below is one
+    // property read on a path that ran millions of times without it.
+    if (typeof o.roundRadius === 'number' && o.roundRadius > 0) {
+      const rs: Vec3 = o.size || [o.width ?? 2, o.depth ?? 2, o.height ?? 2];
+      return api.roundedCuboid({ size: rs, center: centre(o), roundRadius: o.roundRadius });
+    }
     const s: Vec3 = o.size || [o.width ?? 2, o.depth ?? 2, o.height ?? 2];
     const c = centre(o);
     // MakeBox grows from a corner; every JSCAD primitive is centred.
