@@ -819,6 +819,216 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
         // mirrored part has to be nameable too.
         shape = boolean('BRepAlgoAPI_Fuse', src, flipped, f.id, [f.target]);
       }
+    } else if (f.kind === 'pattern') {
+      // Matches patternLines() in lib/model-codegen.ts exactly: at i = 0 both
+      // modes are identity, so the loop's first instance IS the original,
+      // unmoved -- f.count total instances (original included) fused into
+      // one shape. Circular orbits the WORLD axis (a line through the origin
+      // along f.axis), NOT the target's own centre -- see that function's
+      // own long comment on why the centre-of-target pivot was tried and was
+      // wrong (every copy lands on the original, unions into one no-op).
+      const src = built.get(f.target);
+      if (src) {
+        if (f.count < 1) {
+          refusals.set(
+            f.id,
+            `${label(f.id)} needs at least one copy -- ${label(f.id)} is shown without it.`,
+          );
+          shape = src;
+        } else {
+          const instances: any[] = [];
+          for (let i = 0; i < f.count; i++) {
+            let inst = src;
+            if (f.mode === 'circular') {
+              const axisVec: Vec3 = f.axis === 'x' ? [1, 0, 0] : f.axis === 'y' ? [0, 1, 0] : [0, 0, 1];
+              const angleDeg = ((f.totalAngle ?? 360) / f.count) * i;
+              if (angleDeg !== 0) {
+                const t = new oc.gp_Trsf();
+                t.SetRotation(
+                  new oc.gp_Ax1(new oc.gp_Pnt(0, 0, 0), new oc.gp_Dir(axisVec[0], axisVec[1], axisVec[2])),
+                  angleDeg * DEG,
+                );
+                inst = new oc.BRepBuilderAPI_Transform(src, t, false).Shape();
+              }
+            } else {
+              const step = f.step ?? [0, 0, 0];
+              inst = moved(oc, src, [step[0] * i, step[1] * i, step[2] * i]);
+            }
+            instances.push(inst);
+          }
+          // NOT recorded per-instance into `ops` -- the same choice mirror()
+          // above makes for its own reflected copy: only the fuse chain that
+          // produces f.id's own shape is a target-history step worth naming.
+          // An edge selected on instance 2 of a pattern will not resolve for
+          // a later fillet; acceptable here for the same reason it is
+          // acceptable for mirror's reflected half, rather than inventing new
+          // per-instance naming machinery for it.
+          shape = instances[0];
+          for (let i = 1; i < instances.length; i++) {
+            shape = boolean('BRepAlgoAPI_Fuse', shape, instances[i], f.id, [f.target]);
+          }
+        }
+      }
+    } else if (f.kind === 'hole') {
+      // Sugar over cylinder + subtract, exactly mirroring the JSCAD
+      // behavioural contract in featureExpr()'s 'hole' branch and
+      // holePatternLines() in lib/model-codegen.ts: f.center is an offset
+      // from the TARGET's own bounding-box centre, never a world position.
+      const src = built.get(f.target);
+      if (src) {
+        if (f.diameter <= 0 || f.depth <= 0) {
+          refusals.set(
+            f.id,
+            `${label(f.id)}'s diameter and depth must both be greater than zero -- `
+              + `${label(f.id)} is shown without it.`,
+          );
+          shape = src;
+        } else {
+          const { bbox } = measureShape(oc, src);
+          const cx = (bbox[0][0] + bbox[1][0]) / 2 + f.center[0];
+          const cy = (bbox[0][1] + bbox[1][1]) / 2 + f.center[1];
+          const cz = (bbox[0][2] + bbox[1][2]) / 2 + f.center[2];
+          // The two bbox dimensions the bore's own diameter has to fit
+          // inside -- whichever two axes are NOT the one it drills along.
+          const perp = f.axis === 'x' ? [bbox[1][1] - bbox[0][1], bbox[1][2] - bbox[0][2]]
+            : f.axis === 'y' ? [bbox[1][0] - bbox[0][0], bbox[1][2] - bbox[0][2]]
+            : [bbox[1][0] - bbox[0][0], bbox[1][1] - bbox[0][1]];
+          if (f.diameter > Math.min(...perp)) {
+            refusals.set(
+              f.id,
+              `Boring ${label(f.id)} at diameter ${f.diameter} would not fit ${label(f.target)} -- `
+                + `${label(f.id)} is shown without it.`,
+            );
+            shape = src;
+          } else {
+            // One bore, built centred on its own axis -- matching JSCAD's
+            // cylinder(), which is centred, not BRepPrimAPI_MakeCylinder's
+            // own grows-from-zero placement -- then tilted to lie along
+            // f.axis: 'x' -> rotate 90 deg about Y, 'y' -> rotate 90 deg
+            // about X, 'z' -> no rotation, since the bore's own local axis
+            // already starts along Z. See the hole codegen's `tilted` var in
+            // lib/model-codegen.ts.
+            const bore = () => {
+              let cyl = new oc.BRepPrimAPI_MakeCylinder(f.diameter / 2, f.depth).Shape();
+              cyl = moved(oc, cyl, [0, 0, -f.depth / 2]);
+              if (f.axis === 'x' || f.axis === 'y') {
+                const t = new oc.gp_Trsf();
+                const dir: Vec3 = f.axis === 'x' ? [0, 1, 0] : [1, 0, 0];
+                t.SetRotation(
+                  new oc.gp_Ax1(new oc.gp_Pnt(0, 0, 0), new oc.gp_Dir(dir[0], dir[1], dir[2])),
+                  Math.PI / 2,
+                );
+                cyl = new oc.BRepBuilderAPI_Transform(cyl, t, false).Shape();
+              }
+              return cyl;
+            };
+            const centers: Vec3[] = f.corners
+              ? [
+                  [cx - f.corners.dx, cy - f.corners.dy, cz],
+                  [cx + f.corners.dx, cy - f.corners.dy, cz],
+                  [cx - f.corners.dx, cy + f.corners.dy, cz],
+                  [cx + f.corners.dx, cy + f.corners.dy, cz],
+                ]
+              : [[cx, cy, cz]];
+            // All bores fused into ONE tool before the cut -- not a chain of
+            // N separate cuts -- matching holePatternLines()'s own comment on
+            // why that matters: overlapping bores subtracted one at a time
+            // can have a later cut refill material the earlier one just
+            // removed. This fuse is scratch tool-building, not a
+            // target-history step, so it is NOT recorded into `ops`; only the
+            // final cut below is.
+            let tool = moved(oc, bore(), centers[0]);
+            for (let i = 1; i < centers.length; i++) {
+              const next = moved(oc, bore(), centers[i]);
+              const op = new oc.BRepAlgoAPI_Fuse(tool, next);
+              op.Build(new oc.Message_ProgressRange());
+              tool = op.Shape();
+            }
+            shape = boolean('BRepAlgoAPI_Cut', src, tool, f.id, [f.target]);
+          }
+        }
+      }
+    } else if (f.kind === 'shell') {
+      // JSCAD's shellOp() is an explicitly-documented approximation: scale a
+      // copy of the whole body inward around its own bbox centre and
+      // subtract it, because the vendored bundle has no boolean offset --
+      // see that function's own comment in lib/model-codegen.ts. OCCT has
+      // the real operation: BRepOffsetAPI_MakeThickSolid with an EMPTY
+      // closing-face list computes a genuine constant-distance inward offset
+      // of the WHOLE solid -- measured against the kernel directly: a
+      // 100x20x20 box offset by -2 comes back inset by exactly 2 on every
+      // face, not a different amount on the long axis than the short ones
+      // the way JSCAD's scale hack would produce. Subtracting that offset
+      // solid from the source gives a uniform-thickness hollow shell.
+      // ShellFeature has no face-selection field, so "fully closed, no
+      // opening" is the contract to match, which an empty closing-face list
+      // is exactly.
+      //
+      // API NOTE, measured against this binding directly rather than
+      // assumed: it exposes MakeThickSolidByJoin, which needs an explicit
+      // (even if empty) NCollection_List_TopoDS_Shape of faces to remove --
+      // there is no separately-bound TopTools_ListOfShape class in this
+      // build. MakeThickSolidBySimple is also exposed and takes fewer
+      // arguments, but comes back with IsDone() === false on a plain box at
+      // every offset tried, with no exception -- confirmed not a usage error
+      // by probing every argument combination and inspecting IsDone()
+      // directly. MakeThickSolidByJoin with an empty list is the one that
+      // actually works on this kernel, not merely the one guessed first.
+      const src = built.get(f.target);
+      if (src) {
+        if (f.thickness <= 0) {
+          refusals.set(
+            f.id,
+            `${label(f.id)}'s thickness must be greater than zero -- ${label(f.id)} is shown without it.`,
+          );
+          shape = src;
+        } else {
+          const { bbox } = measureShape(oc, src);
+          const smallest = Math.min(
+            bbox[1][0] - bbox[0][0],
+            bbox[1][1] - bbox[0][1],
+            bbox[1][2] - bbox[0][2],
+          );
+          if (2 * f.thickness >= smallest) {
+            refusals.set(
+              f.id,
+              `Hollowing ${label(f.id)} to ${f.thickness} thick would collapse it -- `
+                + `${label(f.id)} is shown without it.`,
+            );
+            shape = src;
+          } else {
+            let inner: any = null;
+            try {
+              const op = new oc.BRepOffsetAPI_MakeThickSolid();
+              const closingFaces = new oc.NCollection_List_TopoDS_Shape();
+              op.MakeThickSolidByJoin(
+                src, closingFaces, -f.thickness, 1e-6,
+                oc.BRepOffset_Mode.BRepOffset_Skin, false, false,
+                oc.GeomAbs_JoinType.GeomAbs_Arc, false,
+              );
+              op.Build(new oc.Message_ProgressRange());
+              if (op.IsDone()) inner = op.Shape();
+            } catch {
+              // A degenerate offset -- thicker than the guard above should
+              // have let through, or some other kernel-side limit this file
+              // has not characterised -- throws a bare exception instead of
+              // reporting IsDone() false. Treated the same as any other
+              // refusal.
+              inner = null;
+            }
+            if (inner) {
+              shape = boolean('BRepAlgoAPI_Cut', src, inner, f.id, [f.target]);
+            } else {
+              refusals.set(
+                f.id,
+                `Hollowing ${label(f.id)} to ${f.thickness} thick did not succeed -- `
+                  + `${label(f.id)} is shown without it.`,
+              );
+              shape = src;
+            }
+          }
+        }
+      }
     }
     if (shape) built.set(f.id, shape);
   }
