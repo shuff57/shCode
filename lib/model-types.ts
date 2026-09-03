@@ -756,13 +756,44 @@ export function newMirror(
   return { id: nextId(doc, 'mir'), kind: 'mirror', target, plane };
 }
 
+/**
+ * How far the named feature's solid reaches along one world axis, when that
+ * can be read straight off a primitive. Follows `target` links (hole, shell,
+ * fillet, move, pattern, mirror ... anything with a `target: string`) back
+ * to the primitive they were built from, at most 16 hops. Returns null when
+ * the root is not a plain box/cylinder or the primitive is rotated -- callers fall
+ * back to a flat default then. This is a DEFAULT-PICKING helper, not
+ * geometry: a pattern or mirror does change the true extent and this
+ * deliberately ignores that.
+ */
+export function extentAlong(doc: ModelDoc, featureId: string, axis: Axis3): number | null {
+  let id: string | undefined = featureId;
+  for (let hop = 0; hop < 16 && id; hop++) {
+    const f: Feature | undefined = doc.features.find(feat => feat.id === id);
+    if (!f) return null;
+    if (f.kind === 'box') {
+      if (f.rotate && f.rotate.some(v => v !== 0)) return null;
+      return axis === 'x' ? f.size[0] : axis === 'y' ? f.size[1] : f.size[2];
+    }
+    if (f.kind === 'cylinder') {
+      if (f.rotate && f.rotate.some(v => v !== 0)) return null;
+      return axis === 'z' ? f.height : f.radius * 2;
+    }
+    id = 'target' in f ? f.target : undefined;
+  }
+  return null;
+}
+
 export function newPattern(
   doc: ModelDoc, target: string, mode: 'linear' | 'circular' = 'linear'
 ): PatternFeature {
   const id = nextId(doc, 'pat');
-  return mode === 'linear'
-    ? { id, kind: 'pattern', target, mode, count: 3, step: [30, 0, 0] }
-    : { id, kind: 'pattern', target, mode, count: 6, axis: 'z', totalAngle: 360 };
+  if (mode === 'linear') {
+    const extent = extentAlong(doc, target, 'x');
+    const step: Vec3 = extent != null ? [Math.ceil(extent * 1.5), 0, 0] : [30, 0, 0];
+    return { id, kind: 'pattern', target, mode, count: 3, step };
+  }
+  return { id, kind: 'pattern', target, mode, count: 6, axis: 'z', totalAngle: 360 };
 }
 
 /** center: [0, 0, 0] is not world zero -- see HoleFeature.center. It is "no
@@ -771,9 +802,11 @@ export function newPattern(
  *  actually sits. A doc-level default has no target geometry to ask, which
  *  is exactly why the interpretation lives in codegen and not here. */
 export function newHole(doc: ModelDoc, target: string): HoleFeature {
+  const extent = extentAlong(doc, target, 'z');
+  const depth = extent != null ? extent + 2 : 10;
   return {
     id: nextId(doc, 'hole'), kind: 'hole', target,
-    diameter: 6, depth: 10, center: [0, 0, 0], axis: 'z',
+    diameter: 6, depth, center: [0, 0, 0], axis: 'z',
   };
 }
 
@@ -782,9 +815,11 @@ export function newHole(doc: ModelDoc, target: string): HoleFeature {
  *  makes exact; only ever offered while boring straight down, which is the
  *  bolt-pattern case this exists for. */
 export function newHoleCorners(doc: ModelDoc, target: string): HoleFeature {
+  const extent = extentAlong(doc, target, 'z');
+  const depth = extent != null ? extent + 2 : 10;
   return {
     id: nextId(doc, 'hole'), kind: 'hole', target,
-    diameter: 6, depth: 10, center: [0, 0, 0], axis: 'z',
+    diameter: 6, depth, center: [0, 0, 0], axis: 'z',
     corners: { dx: 15, dy: 10 },
   };
 }

@@ -1,0 +1,61 @@
+{
+  "bar": "Chili3D v0.7.0 at https://chili3d.com (OpenCascade wasm + three.js)",
+  "judge": "visual-analyzer, anonymized A/B packs, key withheld",
+  "date": "2026-09-03",
+  "rounds": [
+    {
+      "round": 1,
+      "pieces": {
+        "first-minute": {
+          "winner": "ours",
+          "confidence": "high",
+          "why": "B reached a correct result in fewer clicks (3 vs 6) and fewer reads (6 vs 7) per the measured metrics, and its screens show plain-English guidance the whole way (tab labels 'Code'/'Build', and an in-canvas hint literally saying 'Add a box, then a cylinder, select both and press Cut') rather than requiring interpretation. A's screen after loading drops the user straight into a dense, icon-only professional ribbon with jargon labels (Sew, Explode, To Wire, To Compound, To Solid) and no in-canvas guidance, relying only on a small status-bar line about mouse buttons.",
+          "gap_ours": "The tool a beginner actually wants (reSHape/Build) is not the default landing tab -- they land on moSHion (a 2D code canvas) first and must discover and click through two more labeled tabs (reSHape, then Build) before any guidance appears, adding navigation overhead the raw click count doesn't fully capture.",
+          "gap_chili3d": "The toolbar is a wall of unlabeled/jargon icons (Loft, Sweep, Revolve, Chamfer, Sew, Explode, To Wire, To Compound, To Solid) with zero in-canvas hint about what to click first -- a beginner has to already know CAD vocabulary to make a first move."
+        },
+        "box": {
+          "winner": "ours",
+          "confidence": "high",
+          "why": "A's single screen shows a labeled Dimensions panel with the box's width/depth/height as plain numbers (40, 40, 20) next to live sliders, framed in a normal zoomed-to-fit 3D view with a visible ground grid for scale -- in 3 clicks and 0 keystrokes. B gets to the same correct numbers but only after 9 clicks and 15 keystrokes, its Length/Width/Height fields sit at the bottom of a scrolled properties panel with cut-off rows above them, and the viewport is zoomed in so tight and rotated so oddly that the box reads as an ambiguous green-outlined polyhedron rather than a recognizable box.",
+          "gap_ours": "Seven separate labeled fields (width/depth/height plus x/y/z position) on one panel is a lot for a first-timer to parse even though only three matter for this task -- nothing visually distinguishes 'the 3 you need' from 'the 3 you can ignore'.",
+          "gap_chili3d": "The extreme zoom/rotation plus green selection-outline wireframe makes the shape unreadable as a box at a glance, and the correct values are buried at the bottom of a properties panel that needs scrolling past unrelated Translation/Scale/Rotation rows to find Length/Width/Height."
+        },
+        "hole": {
+          "winner": "chili3d",
+          "confidence": "medium",
+          "why": "B_1 shows the DEFAULT hole depth (10) producing a blind hole, visible only as a faint split line inside the circle in a top-down view identical in every other way to a through hole; a beginner reading that screen has no visual cue the hole failed to satisfy 'THROUGH the box' and would very plausibly ship it uncorrected. A reaches a correct through-hole (visible in A_1's Boolean cut with the far-side silhouette) at the default attempt, at the cost of far more clicks/keystrokes/reads.",
+          "gap_ours": "The default hole depth silently produces a blind hole instead of a through hole, and the top-down default view gives almost no visual signal that it's wrong -- a beginner has to already know to check another angle to catch it.",
+          "gap_chili3d": "21 clicks, 33 keystrokes, 10 reads to get one through-hole is a lot of surface area (draw circle, set working plane, extrude, boolean cut) for a beginner to navigate without getting lost."
+        },
+        "hollow": {
+          "winner": "ours",
+          "confidence": "high",
+          "why": "B_2 marks the too-thick case with a visible warning triangle on the step tab, while A_2 silently renders a self-intersecting sliver of triangles with no error text anywhere on screen. B also does the whole task in 5 clicks/3 keystrokes/2 reads versus A's 14 clicks/17 keystrokes/10 reads for the same correct-on-paper result.",
+          "gap_ours": "The failure signal is a small warning triangle icon on a tab label, not an explanatory sentence, so a 14-year-old sees 'something's wrong' but not why or what to change; neither screen actually shows a cutaway proving the box went hollow.",
+          "gap_chili3d": "When the wall is too thick, the tool gives no words at all, just corrupted degenerate geometry, and getting there in the first place costs nearly 3x the clicks and 5x the reads of the other tool."
+        },
+        "pattern": {
+          "winner": "ours",
+          "confidence": "high",
+          "why": "A finished at 6 clicks/3 keystrokes/2 reads versus B's 13 clicks/15 keystrokes/9 reads, both ending correct, so A is the clear efficiency winner even counting the correction. A_1's default step-x of 30 on a wider box overlapped the copies into one blob, but a beginner would see that failure immediately on screen and the fix (A_2, step-x 50) is a single field edit already folded into A's 6-click total. B's single screen shows a tight, rotated close-up that does not clearly read as three boxes in a row, and getting there cost far more reading and typing.",
+          "gap_ours": "Default array-spacing value is narrower than the box itself, so the first result silently merges the copies until the student corrects it.",
+          "gap_chili3d": "Roughly double A's clicks and reads and 5x the keystrokes to reach the same correct result, with a final view too zoomed/rotated to easily confirm three separated boxes at a glance."
+        },
+        "fillet": {
+          "winner": "chili3d",
+          "confidence": "high",
+          "why": "A_2 shows the fillet applied to every edge of the box (a smooth bowl shape) instead of the one selected edge, and the properties panel shows an unrelated developer-facing error ('Add a getParameterDefinitions() function...') rather than anything about the fillet -- correct=false and the failure is incomprehensible to a beginner. B_1 correctly rounds only the one selected corner/edge, and although B_2's oversize case also surfaces a raw error ('Fillet Error: RuntimeError: Aborted(undefined)...'), the model itself is left intact and unrounded rather than corrupted into the wrong shape, so a beginner can at least see nothing happened and retry.",
+          "gap_ours": "Filleting one edge silently rounds the whole box into a bowl -- the core operation is wrong even at a normal radius, and the only feedback shown is a code-level error about missing parameter definitions that has nothing to do with fillets.",
+          "gap_chili3d": "The oversize-radius failure is a raw runtime stack-trace string ('RuntimeError: Aborted(undefined). Build with -sASSERTIONS...') with zero plain-language explanation of what went wrong or what radius would work, and getting to a correct single-edge fillet cost roughly 2x A's clicks and reads."
+        },
+        "mirror": {
+          "winner": "ours",
+          "confidence": "high",
+          "why": "A got two boxes with 7 clicks, 3 keystrokes, 4 reads, and A_2 shows a clean, obviously-correct pair of boxes sitting flush at the mirror plane. B took 14 clicks and 15 keystrokes (roughly double and 5x A) for 6 reads, and B_2 shows two overlapping, differently-rotated quadrilaterals that do not visually read as a clean mirrored pair even though the tree lists a Box_copy.",
+          "gap_ours": "After mirroring, the right-side panel switches to an intimidating code-level message ('No dimensions declared. Add a getParameterDefinitions() function...') instead of showing the new part's dimensions, which would confuse a beginner even though the geometry itself is correct.",
+          "gap_chili3d": "The mirror operation costs far more typing and clicking (15 keystrokes suggests manually entering plane/offset values), and the resulting view (B_2) shows the two boxes overlapping at odd rotations rather than sitting cleanly side by side, so a beginner has no visual confirmation the mirror actually did the right thing."
+        }
+      }
+    }
+  ]
+}

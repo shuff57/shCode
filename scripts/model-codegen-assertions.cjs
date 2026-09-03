@@ -889,6 +889,45 @@ module.exports = function run(dir) {
     types.newHoleCorners(doc(), 'b1').corners !== undefined
     && types.newHoleCorners(doc(), 'b1').axis === 'z');
 
+  // Target-aware defaults: a hole reads the target's own extent along its
+  // bore axis so the default pokes through rather than landing as an
+  // invisible blind pocket, and a linear pattern's step clears the target's
+  // width instead of fusing the copies into one blob.
+  const defaultBoxDoc = doc(box('b1'));
+  check('newHole() on a 40x40x20 box bores all the way through (depth 22)',
+    types.newHole(defaultBoxDoc, 'b1').depth === 22);
+  check('newHoleCorners() on a 40x40x20 box bores all the way through (depth 22)',
+    types.newHoleCorners(defaultBoxDoc, 'b1').depth === 22);
+  check('newPattern() linear on a 40-wide box steps clear of it ([60, 0, 0])',
+    JSON.stringify(types.newPattern(defaultBoxDoc, 'b1', 'linear').step) === JSON.stringify([60, 0, 0]));
+
+  const cylDoc = doc(cyl('c1', { radius: 5, height: 30 }));
+  check('newHole() on a r5 h30 cylinder bores all the way through (depth 32)',
+    types.newHole(cylDoc, 'c1').depth === 32);
+  check('newPattern() linear on a r5 cylinder steps clear of it ([15, 0, 0])',
+    JSON.stringify(types.newPattern(cylDoc, 'c1', 'linear').step) === JSON.stringify([15, 0, 0]));
+
+  const chainHole = types.newHole(defaultBoxDoc, 'b1');
+  const chainDoc = doc(box('b1'), chainHole);
+  check('newHole() chained onto a hole on the box still reads the box (depth 22)',
+    types.newHole(chainDoc, chainHole.id).depth === 22);
+
+  check('newHole() on a target id that does not exist falls back to depth 10',
+    types.newHole(defaultBoxDoc, 'does-not-exist').depth === 10);
+  check('newPattern() linear on a target id that does not exist falls back to [30, 0, 0]',
+    JSON.stringify(types.newPattern(defaultBoxDoc, 'does-not-exist', 'linear').step) === JSON.stringify([30, 0, 0]));
+
+  const rotatedBoxDoc = doc(box('b2', { rotate: [0, 90, 0] }));
+  check('newHole() on a rotated box falls back to depth 10',
+    types.newHole(rotatedBoxDoc, 'b2').depth === 10);
+  check('newPattern() linear on a rotated box falls back to [30, 0, 0]',
+    JSON.stringify(types.newPattern(rotatedBoxDoc, 'b2', 'linear').step) === JSON.stringify([30, 0, 0]));
+
+  // Same rule for a tilted cylinder: its reach along z is no longer its height.
+  const tiltedCylDoc = doc({ id: 'c2', kind: 'cylinder', radius: 5, height: 30, center: [0, 0, 0], rotate: [90, 0, 0] });
+  check('newHole() on a rotated cylinder falls back to depth 10',
+    types.newHole(tiltedCylDoc, 'c2').depth === 10);
+
   const widerCorners = gen.applyParam(gen.applyParam(cornersDoc, 'hole1_dx', 25), 'hole1_dy', 18);
   check('applyParam widens the corner spacing without touching diameter, depth or centre',
     widerCorners.features[1].corners.dx === 25
