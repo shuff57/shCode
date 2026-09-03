@@ -4,7 +4,7 @@
 // getParameterDefinitions() and drives main(params) directly, so changing a
 // number rebuilds the model without reloading the runner.
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 export interface ParamDef {
   name: string;
@@ -23,6 +23,9 @@ export type ParamValues = Record<string, unknown>;
 
 interface Props {
   defs: ParamDef[];
+  /** Shown when `defs` is empty. The default names getParameterDefinitions(),
+   *  which only makes sense in Code mode; Build mode passes its own. */
+  emptyMessage?: ReactNode;
   values: ParamValues;
   onChange: (next: ParamValues) => void;
   /** End of a gesture — a whole slider drag is one undo, not sixty. */
@@ -64,7 +67,7 @@ function settle(n: number, d: ParamDef) {
 }
 
 export default function ReshapeParamsPanel({
-  defs, values, onChange, onCommit, lastMs, stale,
+  defs, values, onChange, onCommit, lastMs, stale, emptyMessage,
 }: Props) {
   // What is in the text box, deliberately NOT the same as the model value:
   // half-typed input like "" or "-" has to survive on screen without being
@@ -113,8 +116,12 @@ export default function ReshapeParamsPanel({
   if (defs.length === 0) {
     return (
       <div className="reshape-params-empty">
-        No dimensions declared. Add a <code>getParameterDefinitions()</code> function
-        returning a list of names and this panel fills in.
+        {emptyMessage ?? (
+          <>
+            No dimensions declared. Add a <code>getParameterDefinitions()</code> function
+            returning a list of names and this panel fills in.
+          </>
+        )}
         <style>{`
           .reshape-params-empty { padding: 10px 12px; color: #6272a4; font-size: 12px; line-height: 1.5; }
           .reshape-params-empty code { color: #8be9fd; }

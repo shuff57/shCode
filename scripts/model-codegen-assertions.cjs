@@ -1415,7 +1415,9 @@ module.exports = function run(dir) {
     check('generatedParams emits one size param for a fillet',
       sizeParam !== undefined, params.map((p) => p.name).join(', '));
     check('...bounded by the named box\'s own maxRound, never below the current size',
-      sizeParam !== undefined && sizeParam.min === 0.1
+      // 0.5 from 0.5: the stops must include every whole and half number,
+      // or a student typing 3 lands on 3.1 (measured 2026-09-03).
+      sizeParam !== undefined && sizeParam.min === 0.5 && sizeParam.step === 0.5
         && sizeParam.max === types.maxRound(box('b1')) && sizeParam.max >= fillet.size,
       sizeParam && JSON.stringify(sizeParam));
 

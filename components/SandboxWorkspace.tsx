@@ -1342,6 +1342,9 @@ export default function SandboxWorkspace() {
                   <aside className="reshape-pane-params">
                     <ReshapeParamsPanel
                       defs={brepEngine ? brepParamDefs : paramDefs}
+                      emptyMessage={brepEngine
+                        ? (selected.length ? 'This step has no numbers to adjust.' : 'Select a shape to see its dimensions.')
+                        : undefined}
                       values={paramValues}
                       onChange={sendParams}
                       onCommit={commitParams}

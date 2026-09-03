@@ -160,7 +160,10 @@ export function generatedParams(doc: ModelDoc): GeneratedParam[] {
       const root = doc.features.find((x) => x.id === rootFeature(f.edge));
       const ceiling = root && isRoundable(root) ? maxRound(root) : f.size;
       push('size', f.style === 'chamfer' ? 'cut' : 'radius', f.size, {
-        min: 0.1,
+        // 0.5-step from 0.5, so every whole and half number is a stop the
+        // slider can land on; from 0.1 the stops were 0.1, 0.6, 1.1 ... and
+        // typing 3 snapped to 3.1 with no warning.
+        min: 0.5,
         max: Math.max(ceiling, f.size),
         step: 0.5,
       });

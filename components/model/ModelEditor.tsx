@@ -1403,8 +1403,8 @@ export default function ModelEditor({
         <ol className="model-list model-timeline">
           {doc.features.length === 0 && (
             <li className="model-empty">
-              Nothing here yet. Add a box, then a cylinder, select both and press{' '}
-              <strong>Cut</strong> to drill a hole through it.
+              Nothing here yet. Add a box, select it, and press{' '}
+              <strong>Hole</strong> to drill through it.
             </li>
           )}
           {doc.features.map((f, i) => {
@@ -1537,8 +1537,8 @@ export default function ModelEditor({
         <ol className="model-list">
           {doc.features.length === 0 && (
             <li className="model-empty">
-              Nothing here yet. Add a box, then a cylinder, select both and press{' '}
-              <strong>Cut</strong> to drill a hole through it.
+              Nothing here yet. Add a box, select it, and press{' '}
+              <strong>Hole</strong> to drill through it.
             </li>
           )}
           {doc.features.map((f, i) => {
