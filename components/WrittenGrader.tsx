@@ -11,6 +11,7 @@ import {
   recordSubmission,
   fetchSubmissions,
 } from '../lib/written-grader-store';
+import SolutionPanel from './SolutionPanel';
 
 export interface AiRubricItem {
   id: string;
@@ -331,9 +332,16 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         </div>
       ) : null}
 
-      <label style={{ display: 'block', fontSize: 13, color: '#aaa', marginBottom: 4 }}>
-        Your response
-      </label>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+        <label style={{ fontSize: 13, color: '#aaa' }}>Your response</label>
+        <SolutionPanel
+          lessonId={lessonId}
+          onInsert={(files) => {
+            const text = files['answer.md'] ?? Object.values(files)[0] ?? '';
+            setResponse(text);
+          }}
+        />
+      </div>
       <textarea
         value={response}
         onChange={(e) => setResponse(e.target.value)}

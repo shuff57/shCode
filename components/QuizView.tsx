@@ -11,6 +11,7 @@ import { withInlineCode } from './InlineCode';
 import { sourceHintNumbers, sourceHintParts } from '../lib/source-hint';
 import { buildQuizView } from '../lib/quiz-variant';
 import { getCurrentUser } from '../lib/auth';
+import SolutionPanel from './SolutionPanel';
 
 interface Props {
   lessonId: string;
@@ -173,19 +174,26 @@ export default function QuizView({ lessonId, config }: Props) {
 
   return (
     <section style={{ marginTop: 36, paddingTop: 20, borderTop: '2px solid #44475a' }}>
-      <h2
-        style={{
-          fontSize: 20,
-          marginBottom: 6,
-          color: '#f8f8f2',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-        }}
-      >
-        <ListChecks size={18} color="#f1fa8c" />
-        Check your understanding
-      </h2>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+        <h2
+          style={{
+            fontSize: 20,
+            margin: 0,
+            color: '#f8f8f2',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
+          <ListChecks size={18} color="#f1fa8c" />
+          Check your understanding
+        </h2>
+        {summative && (
+          <div style={{ marginLeft: 'auto' }}>
+            <SolutionPanel lessonId={lessonId} readOnly />
+          </div>
+        )}
+      </div>
       <p style={{ color: '#888', fontSize: 13, margin: '0 0 20px' }}>
         {summative
           ? `Answer all ${questions.length}. You can change an answer as often as you like before you submit, but submitting is final and nothing is marked here — your teacher hands the score back.`

@@ -226,7 +226,15 @@ export default function ContentLessonView({ lesson }: Props) {
         <WrittenGrader
           lessonId={lesson.id}
           lessonTitle={lesson.title}
-          prompt={meta.aiGrader.prompt ?? contentMd.slice(0, 2000)}
+          // aiGrader.prompt is the grading brief -- on a summative item it
+          // spells out the accepted answers, so a student reading it would be
+          // reading the rubric mid-exam. The grader still gets the full text
+          // server-side (functions/api/grade-written.ts reads it from
+          // public/ai-graders.json, never from this prop). content.md above
+          // already states the actual questions, so there is nothing lost by
+          // showing nothing here. Formative items are unaffected -- their
+          // prompt IS the instructions and keeps rendering as before.
+          prompt={meta.aiGrader.summative ? '' : (meta.aiGrader.prompt ?? contentMd.slice(0, 2000))}
           config={meta.aiGrader}
         />
       ) : (

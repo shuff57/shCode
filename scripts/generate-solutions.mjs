@@ -2,24 +2,37 @@
 // lessonId → { filePath: text }. The Pages Function at
 // /api/lesson-solution/[id] reads this map and gates it to admin/teacher.
 //
-// Two authoring forms, in priority order:
+// Three authoring forms, in priority order:
 //
 //   lessons/<id>/solution/      every file in it, keyed by its path relative
 //                               to solution/. Use this when the assignment
 //                               grades more than script.js.
 //   lessons/<id>/solution.js    the single-file form. Recorded as script.js.
+//   (neither, but quiz.summative: true)
+//                               an answer key is SYNTHESISED from the
+//                               lesson's own lesson.json — every question,
+//                               every form, the correct option and its
+//                               explanation. Not hand-authored, so it cannot
+//                               drift from the quiz a student actually sees:
+//                               lib/quiz-redact.ts strips this same data out
+//                               of the client bundle, this script reads it
+//                               from the source lesson.json, which still has
+//                               it. See buildQuizAnswerKey below.
 //
-// A lesson with both is a mistake — the directory wins and this script says so
-// loudly, because a stale solution.js sitting beside a solution/ is exactly the
-// kind of second copy that drifts.
+// A lesson with both solution/ and solution.js is a mistake — the directory
+// wins and this script says so loudly, because a stale solution.js sitting
+// beside a solution/ is exactly the kind of second copy that drifts.
 //
-// Neither form reaches the static client bundle: lib/lessons.ts and
-// scripts/generate-lesson-starters.mjs both exclude them, so this generated
-// file is the only path by which a reference answer ever leaves the repo.
+// None of the three reaches the static client bundle: lib/lessons.ts and
+// scripts/generate-lesson-starters.mjs both exclude solution/ and
+// solution.js, and the synthesised key is never written to disk at all — so
+// this generated file is the only path by which a reference answer ever
+// leaves the repo.
 
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { buildQuizAnswerKey } from '../lib/quiz-answer-key.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
@@ -83,8 +96,20 @@ for (const id of dirs) {
 
   try {
     map[id] = { 'script.js': await fs.readFile(fileForm, 'utf8') };
+    continue;
   } catch {
-    /* no solution for this lesson — skip */
+    /* no solution.js either — fall through to the synthesised quiz key */
+  }
+
+  try {
+    const lesson = JSON.parse(
+      await fs.readFile(path.join(lessonsDir, id, 'lesson.json'), 'utf8'),
+    );
+    if (lesson.quiz?.summative) {
+      map[id] = { 'answer-key.txt': buildQuizAnswerKey(lesson) };
+    }
+  } catch {
+    /* no lesson.json, or it doesn't parse — nothing to synthesise */
   }
 }
 

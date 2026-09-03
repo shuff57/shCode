@@ -1,13 +1,18 @@
-// A summative quiz's answer key must not appear in the page it is asked on.
+// A summative quiz's answer key, or a summative written item's grading
+// rubric, must not appear in the page it is asked on.
 //
-// WHY THIS EXISTS. Every "don't reveal it yet" rule in QuizView governs what is
-// DRAWN. None of them governs what is SHIPPED, and /lesson/[lessonId]/ is a
-// static export whose body is a client component -- so the whole lesson object,
-// `quiz.answer` and `quiz.explanation` included, was serialised into the page's
-// RSC payload. Measured 2026-09-02 on the Chapter 1 individual PA: View Source
-// on the built page returned all three forms, all 18 answer indices and every
-// explanation, before a single question had been answered.
-// lib/quiz-redact.ts strips them now; this measures that it stayed stripped.
+// WHY THIS EXISTS. Every "don't reveal it yet" rule in QuizView and
+// WrittenGrader governs what is DRAWN. None of them governs what is SHIPPED,
+// and /lesson/[lessonId]/ is a static export whose body is a client component
+// -- so the whole lesson object was serialised into the page's RSC payload.
+// Measured 2026-09-02 on the Chapter 1 individual PA: View Source on the built
+// quiz page returned all three forms, all 18 answer indices and every
+// explanation, before a single question had been answered. Measured again
+// 2026-09-03 on the same PA's written items: even after WrittenGrader stopped
+// RENDERING `aiGrader.prompt` as on-page instructions, the raw grading rubric
+// -- naming every accepted answer -- was still sitting in the built page,
+// because the `config` prop still carried the untouched object.
+// lib/quiz-redact.ts strips both now; this measures that they stayed stripped.
 //
 // The check reads the BUILT output, not the source, because the source was
 // never the thing that was wrong.
@@ -34,11 +39,12 @@ for (const dir of fs.readdirSync(LESSONS)) {
   if (!fs.existsSync(file)) continue;
   let lesson;
   try { lesson = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { continue; }
-  if (lesson.quiz?.summative) summative.push({ dir, lesson });
+  if (lesson.quiz?.summative) summative.push({ dir, lesson, kind: 'quiz' });
+  if (lesson.aiGrader?.summative) summative.push({ dir, lesson, kind: 'aiGrader' });
 }
 
 if (summative.length === 0) {
-  console.log('[check-quiz-key-leak] no summative quizzes authored — nothing to check');
+  console.log('[check-quiz-key-leak] no summative quiz or written item authored — nothing to check');
   process.exit(0);
 }
 
@@ -53,7 +59,7 @@ let failures = 0;
 let checked = 0;
 let unchecked = 0;
 
-for (const { dir, lesson } of summative) {
+for (const { dir, lesson, kind } of summative) {
   const page = path.join(OUT, lesson.id ?? dir, 'index.html');
   if (!fs.existsSync(page)) {
     // out/ exists but predates this lesson -- a stale build, not a leak. Same
@@ -67,21 +73,36 @@ for (const { dir, lesson } of summative) {
   checked++;
   const html = fs.readFileSync(page, 'utf8');
 
-  // Three separate tells, because one of them alone is easy to dodge by
-  // accident: the field name, the prose, and the correct option's own text.
   const hits = [];
-  if (/\\?"answer\\?":\s*\d/.test(html)) hits.push('an "answer" index');
-  if (/\\?"explanation\\?":/.test(html)) hits.push('an "explanation" field');
 
-  for (const q of lesson.quiz.questions ?? []) {
-    if (q.explanation && html.includes(q.explanation.slice(0, 40))) {
-      hits.push(`the explanation text of ${q.id}`);
-      break;
+  if (kind === 'quiz') {
+    // Three separate tells, because one of them alone is easy to dodge by
+    // accident: the field name, the prose, and the correct option's own text.
+    if (/\\?"answer\\?":\s*\d/.test(html)) hits.push('an "answer" index');
+    if (/\\?"explanation\\?":/.test(html)) hits.push('an "explanation" field');
+    for (const q of lesson.quiz.questions ?? []) {
+      if (q.explanation && html.includes(q.explanation.slice(0, 40))) {
+        hits.push(`the explanation text of ${q.id}`);
+        break;
+      }
+    }
+  } else {
+    // The grading prompt names every accepted answer; a substring of it in
+    // the built page means the whole rubric rode along. 60 chars is enough to
+    // rule out a coincidental match against unrelated page text.
+    const prompt = lesson.aiGrader?.prompt ?? '';
+    if (prompt.length >= 60 && html.includes(prompt.slice(0, 60))) {
+      hits.push('the aiGrader.prompt grading brief');
+    }
+    for (const r of lesson.aiGrader?.rubric ?? []) {
+      if (r.description && r.description.length >= 40 && html.includes(r.description.slice(0, 40))) {
+        hits.push(`the rubric description of "${r.id}"`);
+      }
     }
   }
 
   if (hits.length) {
-    console.log(`FAIL ${dir}: the built page contains ${hits.join(', ')} — `
+    console.log(`FAIL ${dir} (${kind}): the built page contains ${hits.join(', ')} — `
       + 'the answer key ships to the student. See lib/quiz-redact.ts.');
     failures++;
   }
@@ -89,8 +110,8 @@ for (const { dir, lesson } of summative) {
 
 console.log(
   failures
-    ? `\n[check-quiz-key-leak] ${failures} FAILURE(S) across ${summative.length} summative quiz(zes)`
-    : `\n[check-quiz-key-leak] OK - ${checked} summative quiz page(s) ship no answer key`
+    ? `\n[check-quiz-key-leak] ${failures} FAILURE(S) across ${summative.length} summative item(s)`
+    : `\n[check-quiz-key-leak] OK - ${checked} summative page(s) ship no answer key`
       + (unchecked ? ` (${unchecked} NOT CHECKED - stale build)` : ''),
 );
 process.exit(failures ? 1 : 0);

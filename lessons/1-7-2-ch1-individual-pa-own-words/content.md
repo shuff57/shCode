@@ -25,14 +25,15 @@ let x = 12.5;
 // set y
 let y = 3;
 // multiply
-let z = x * y;
+let z = x * x;
 console.log(z);
 ```
 
-It runs, and it prints the right number.
+It runs without crashing — but that's not the same as being right.
 
-- Name **two** things that are still wrong with it.
-- For each, say what it costs the next person who has to change this code.
+- There's more than two things wrong here. Name **two**.
+- For each, say what it costs — the next person to change this code, or
+  whoever trusts the number that comes out.
 - One of your two has to be about the comments.
 
 ---

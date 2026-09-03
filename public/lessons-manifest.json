@@ -1306,6 +1306,51 @@
       "week": null
     },
     {
+      "id": "1-7-1-ch1-individual-pa-concepts",
+      "title": "1.7.1 Individual PA Part 1: Concepts and Traces",
+      "unit": "1.7 Chapter 1 Individual Performance Assessment",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-7-2-ch1-individual-pa-own-words",
+      "title": "1.7.2 Individual PA Part 2: In Your Own Words",
+      "unit": "1.7 Chapter 1 Individual Performance Assessment",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-7-3-ch1-individual-pa-find-and-fix",
+      "title": "1.7.3 Individual PA Part 3: Find and Fix",
+      "unit": "1.7 Chapter 1 Individual Performance Assessment",
+      "preview": "console",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-7-4-ch1-individual-pa-chart-it",
+      "title": "1.7.4 Individual PA Part 4: Chart It",
+      "unit": "1.7 Chapter 1 Individual Performance Assessment",
+      "preview": "diagram",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
+      "id": "1-7-5-ch1-individual-pa-write-the-steps",
+      "title": "1.7.5 Individual PA Part 5: Write the Steps",
+      "unit": "1.7 Chapter 1 Individual Performance Assessment",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 1: JavaScript Fundamentals",
+      "week": null
+    },
+    {
       "id": "2-1-1-slides",
       "title": "2.1.1 Slides: Conditionals",
       "unit": "2.1 Conditionals",
