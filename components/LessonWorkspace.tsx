@@ -30,6 +30,7 @@ import GradeReportView from './GradeReport';
 import TeacherPushBanner from './TeacherPushBanner';
 import CrossDeviceSyncBanner from './CrossDeviceSyncBanner';
 import DocsDrawer from './DocsDrawer';
+import TextureEditor from './TextureEditor';
 import AiHelpPanel from './AiHelpPanel';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import SolutionPanel from './SolutionPanel';
@@ -657,6 +658,31 @@ export default function LessonWorkspace({
               </a>
             ) : undefined,
           },
+          // Only moSHion lessons have sprites, so only they can use a texture.
+          // Without this tab the student has to leave their code, draw on
+          // /textures, and navigate back; the editor writes to the same
+          // localStorage the preview bridge hydrates, so the name is ready as
+          // soon as they hit Run. `#8be9fd` is already the File tab's colour.
+          ...(isMoshionMode
+            ? ([
+                {
+                  key: 'textures',
+                  label: 'Textures',
+                  color: '#ff79c6',
+                  content: <TextureEditor />,
+                  headerExtra: (
+                    <a
+                      href="/textures"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-secondary btn-sm"
+                    >
+                      Full page ↗
+                    </a>
+                  ),
+                },
+              ] as DrawerTab[])
+            : []),
           // The teaching for a console lesson lives in lesson.json's `steps` —
           // what console.log does, why numbers take no quotes, what a boolean
           // is. Nothing mounted LessonSteps, so all of it was invisible and the
