@@ -1049,7 +1049,11 @@ export default function ModelEditor({
   // card only holds the note and the sketch rules. When both are gone the
   // card is empty and collapses to the rail on its own -- an empty card over
   // the canvas is a click-eater with nothing to say.
-  const cardHasContent = Boolean(note) || Boolean(activeSketch);
+  // In Build mode the note is shown in the timeline strip (below), not in
+  // the card: measured 2026-09-03, the "Rounded every edge..." teaching note
+  // opened the card to 420 px over the canvas and it never closed, covering
+  // the view strip's Home button.
+  const cardHasContent = (Boolean(note) && !timelineHost) || Boolean(activeSketch);
   useEffect(() => {
     onContentChange?.(cardHasContent);
   }, [cardHasContent, onContentChange]);
@@ -1414,7 +1418,11 @@ export default function ModelEditor({
       </div>,
         ribbonHost
       ) : null}
-      {note && <p className="model-note">{note}</p>}
+      {note && !timelineHost && <p className="model-note">{note}</p>}
+      {timelineHost && note ? createPortal(
+        <p className="model-note model-note-timeline">{note}</p>,
+        timelineHost
+      ) : null}
       {timelineHost ? createPortal(
         <ol className="model-list model-timeline">
           {doc.features.length === 0 && (
@@ -1760,6 +1768,7 @@ export default function ModelEditor({
           color: #ffb86c; background-color: #3a2f22;
           border-left: 2px solid #ffb86c; flex-shrink: 0;
         }
+        .model-note-timeline { align-self: center; margin-left: 8px; margin-right: 8px; max-width: 46ch; order: 2; }
         .model-list { margin: 0; padding: 6px; list-style: none; overflow-y: auto; flex: 1 1 auto; }
         /* The parametric timeline: the same feature list, laid out as a
            horizontal strip of chips across the bottom of the canvas, Fusion
