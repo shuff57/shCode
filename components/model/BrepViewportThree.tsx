@@ -1615,7 +1615,9 @@ const viewStripButtonStyle: React.CSSProperties = {
 };
 
 const viewStripActiveStyle: React.CSSProperties = {
-  ...viewStripButtonStyle, background: COLORS.fg, color: COLORS.bg, borderColor: COLORS.fg,
+  // `border`, not `borderColor`: the base style sets the shorthand, and React
+  // warns (and can mis-apply) when a longhand overrides it on rerender.
+  ...viewStripButtonStyle, background: COLORS.fg, color: COLORS.bg, border: `1px solid ${COLORS.fg}`,
 };
 
 // Same visual family as selectionBadgeStyle (same pill), deliberately -- a
