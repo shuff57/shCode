@@ -74,6 +74,14 @@
           "why": "B's panel (A_1/A_2) labels each field with the object and property together, 'Box 1 width' / 'Box 1 depth' / 'Box 1 height', right next to a slider and a plain number box, and nothing else is on the panel; setting 40x40x20 took 3 clicks, 0 keystrokes, 2 reads. A's Properties panel (A_2/A_3) makes the student scroll past Name, a collapsible Matrix (Translation/Scale/Rotation), Material, Shape Type, and a raw multi-decimal Location string before reaching Length/Width/Height, costing 9 clicks, 15 keystrokes, 4 reads for the same result. B's third screen (Hole feature) shows the same 'Hole 1 diameter/depth/x/y/z' convention holding up across a different feature, so the pattern generalizes; A's third screen is still the same scrolled Box properties list.",
           "gap_ours": "No unit is shown anywhere on the numbers (just '40', '20', no mm/in/cm label), so a student setting an exact size has no idea what unit they're actually specifying.",
           "gap_chili3d": "The size fields (Length/Width/Height) are buried at the bottom of a generic Properties panel behind unrelated transform/material/location fields a beginner has no reason to touch, so finding 'where the size lives' is itself the hard part."
+        },
+        "refusal-messages": {
+          "winner": "ours",
+          "confidence": "high",
+          "why": "B shows a plain-English banner: \"Hollowing Hollow 1 to 40 thick would collapse it \u2013 Hollow 1 is shown without it,\" naming the exact operation, the exact bad value, the exact consequence, and what B did instead (skip it), then lets the student drag the same slider down to a working value (19) and see it resolve. A's only feedback is \"Fillet Error: RuntimeError: Aborted(undefined). Build with -sASSERTIONS for more info,\" a raw engine crash string with no shape-language, no cause, and no next action.",
+          "gap_ours": "The warning explains the collapse and that the invalid change was not applied, but doesn't explicitly say what to try (e.g. suggest a max safe thickness) \u2014 the student has to discover 19 works by trial and error on the slider rather than being told a bound.",
+          "gap_chili3d": "The message is a compiler/runtime stack-trace fragment (\"RuntimeError: Aborted(undefined)\", \"Build with -sASSERTIONS\") \u2014 a 14-year-old will notice something broke but cannot learn why or what number to try next from it; nothing in the message even names \"fillet\" or \"radius.\"",
+          "fix": "16ac8e4 refusal sentence in the Dimensions panel"
         }
       }
     }
