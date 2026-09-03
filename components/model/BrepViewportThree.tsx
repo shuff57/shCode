@@ -329,6 +329,10 @@ export default function BrepViewportThree({
   const [preset, setPreset] = useState<'home' | 'top' | 'front' | 'underneath' | null>('home');
   const [loadError, setLoadError] = useState<string | null>(null);
   const [buildError, setBuildError] = useState<string | null>(null);
+  // A stage that is empty ON PURPOSE (nothing yet, or only flat sketches)
+  // gets a hint, not the red panel. Measured 2026-09-03: a beginner who had
+  // just drawn a circle read "Could not build this model" as their mistake.
+  const [stageHint, setStageHint] = useState<string | null>(null);
   /** Whether the pointer is CURRENTLY over a pickable edge -- drives the
    *  "click this edge" hint below. React state, not a ref, because it has to
    *  cause a render (the hint is JSX); set from inside applyHover(), which
@@ -1393,7 +1397,9 @@ export default function BrepViewportThree({
         // EMPTY_DOC, so without this branch the workspace greets a student
         // with an error before they have done anything. Draw the empty stage
         // (grid + axes already sit in the scene) and report zero.
-        if (doc.features.length === 0) {
+        const onlySketches = doc.features.length > 0 && doc.features.every((f) => f.kind === 'sketch');
+        if (doc.features.length === 0 || onlySketches) {
+          setStageHint(onlySketches ? 'A sketch is flat. Select it and press Pull to make it solid.' : null);
           const t = performance.now();
           const meshes = drawGeoms([]);
           lastBuiltRef.current = built;
@@ -1431,6 +1437,7 @@ export default function BrepViewportThree({
       const drawMs = performance.now() - t2;
 
       if (cancelled) return;
+      setStageHint(null);
       setBuildError(null);
       const triangles = meshed.reduce((n, m) => n + (m.geometry.getIndex()?.count ?? 0) / 3, 0);
       onStatsRef.current?.({
@@ -1504,6 +1511,9 @@ export default function BrepViewportThree({
           </div>
           <div style={{ color: COLORS.fg, maxWidth: 480, textAlign: 'center' }}>{loadError}</div>
         </div>
+      )}
+      {phase === 'ready' && stageHint && !buildError && (
+        <div style={stageHintStyle}>{stageHint}</div>
       )}
       {phase === 'ready' && buildError && (
         <div style={errorPanelStyle}>
@@ -1623,6 +1633,13 @@ const viewStripActiveStyle: React.CSSProperties = {
 // Same visual family as selectionBadgeStyle (same pill), deliberately -- a
 // student who has already learned "small pill top-right = status" should
 // not have to learn a second visual language for this one.
+// Centred over the stage, same pill family: a hint, not an error.
+const stageHintStyle: React.CSSProperties = {
+  position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)',
+  padding: '4px 10px', background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 999,
+  font: '12px ui-monospace, Menlo, Consolas, monospace', color: COLORS.fg, pointerEvents: 'none',
+};
+
 const edgeHintStyle: React.CSSProperties = {
   padding: '4px 10px', background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 999,
   font: '12px ui-monospace, Menlo, Consolas, monospace', color: COLORS.fg, pointerEvents: 'none',
