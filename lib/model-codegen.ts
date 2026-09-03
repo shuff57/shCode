@@ -25,10 +25,13 @@ import {
   type ModelDoc,
   type Vec3,
   canRotate,
+  isRoundable,
   isShape,
+  maxRound,
   nameMap,
   topLevel,
 } from './model-types';
+import { rootFeature } from './topo-name';
 
 export interface GeneratedParam {
   name: string;
@@ -146,6 +149,21 @@ export function generatedParams(doc: ModelDoc): GeneratedParam[] {
       push('thickness', 'wall', f.thickness, { min: 0.5, max: 40, step: 0.5 });
     } else if (f.kind === 'move') {
       pushCentre(out, f.id, label, f.offset);
+    } else if (f.kind === 'fillet') {
+      // The ceiling is the same one maxRound() gives the box/cylinder's own
+      // round slider -- borrowed from the root primitive the named edge
+      // actually sits on (rootFeature() of f.edge), not from f.target, which
+      // can be a later feature in the chain. A root this file cannot resolve
+      // to a primitive falls back to the stored value itself: not roomy, but
+      // never a max below the current size, which is the bug this whole
+      // pattern exists to avoid (see the sketch-round comment above).
+      const root = doc.features.find((x) => x.id === rootFeature(f.edge));
+      const ceiling = root && isRoundable(root) ? maxRound(root) : f.size;
+      push('size', f.style === 'chamfer' ? 'cut' : 'radius', f.size, {
+        min: 0.1,
+        max: Math.max(ceiling, f.size),
+        step: 0.5,
+      });
     }
     // mirror carries no numeric slot -- its only input is a plane choice.
   });
@@ -328,6 +346,7 @@ export function applyParam(doc: ModelDoc, name: string, value: number): ModelDoc
         return { ...f, offset };
       }
     }
+    if (f.kind === 'fillet' && slot === 'size') { changed = true; return { ...f, size: value }; }
     return f;
   });
 

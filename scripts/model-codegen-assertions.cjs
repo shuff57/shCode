@@ -1391,6 +1391,58 @@ module.exports = function run(dir) {
       'two chamfers should remove exactly twice one chamfer');
   }
 
+  // ---------------------------------------------------- the fillet handle --
+  // A fillet's radius must round-trip through applyParam before any UI work
+  // on the drag handle means anything: without this branch applyParam falls
+  // through to `return f`, `changed` stays false, and SandboxWorkspace's
+  // commitParams hits its early return -- a handle that tracks the pointer
+  // and a tooltip that counts up while the geometry never moves. That exact
+  // silent-success shape is what this pair of checks exists to catch.
+  console.log('\n=== a fillet\'s size param round-trips through applyParam ===');
+  {
+    const edge = {
+      cause: 'between', feature: 'r1', kind: 'edge',
+      of: [
+        { cause: 'primitive', feature: 'b1', kind: 'face', part: '+x' },
+        { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' },
+      ],
+    };
+    const fillet = { id: 'r1', kind: 'fillet', target: 'b1', edge, size: 3, style: 'fillet' };
+    const filletDoc = doc(box('b1'), fillet);
+
+    const params = gen.generatedParams(filletDoc);
+    const sizeParam = params.find((p) => p.name === 'r1_size');
+    check('generatedParams emits one size param for a fillet',
+      sizeParam !== undefined, params.map((p) => p.name).join(', '));
+    check('...bounded by the named box\'s own maxRound, never below the current size',
+      sizeParam !== undefined && sizeParam.min === 0.1
+        && sizeParam.max === types.maxRound(box('b1')) && sizeParam.max >= fillet.size,
+      sizeParam && JSON.stringify(sizeParam));
+
+    const moved = gen.applyParam(filletDoc, 'r1_size', 7);
+    const movedFillet = moved.features.find((x) => x.id === 'r1');
+    check('applyParam actually writes the fillet size (not the silent no-op fallthrough)',
+      moved !== filletDoc && movedFillet !== undefined && movedFillet.size === 7,
+      movedFillet && JSON.stringify(movedFillet));
+    check('...and leaves the box it targets untouched',
+      moved.features.find((x) => x.id === 'b1').size.join() === '40,40,20');
+
+    const chamferDoc = doc(box('b1'), { ...fillet, style: 'chamfer' });
+    check('a chamfer-style fillet shares the same r1_size slot, not a style-named one',
+      gen.generatedParams(chamferDoc).some((p) => p.name === 'r1_size'));
+    check('...and still round-trips through applyParam',
+      gen.applyParam(chamferDoc, 'r1_size', 9).features.find((x) => x.id === 'r1').size === 9);
+
+    // A fillet whose edge cannot be traced to a box/cylinder in this doc still
+    // gets a usable slider -- just bounded by its own current value rather
+    // than a borrowed ceiling.
+    const orphanEdge = { ...edge, of: [{ ...edge.of[0], feature: 'gone' }, { ...edge.of[1], feature: 'gone' }] };
+    const orphanDoc = doc(box('b1'), { ...fillet, edge: orphanEdge, size: 5 });
+    const orphanParam = gen.generatedParams(orphanDoc).find((p) => p.name === 'r1_size');
+    check('an orphaned root falls back to the stored size rather than throwing',
+      orphanParam !== undefined && orphanParam.max === 5, orphanParam && JSON.stringify(orphanParam));
+  }
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };

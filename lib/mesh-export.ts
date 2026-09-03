@@ -99,6 +99,33 @@ function triangleNormal(mesh: MeshInput, t: number): Vec3 {
 }
 
 /**
+ * Concatenates several triangle meshes into the single MeshInput
+ * writeSTL/writeOBJ/write3MF expect, offsetting each mesh's own indices by
+ * the running vertex count so winding and triangle membership survive the
+ * merge.
+ *
+ * Exists for BrepViewportThree.tsx: a ModelDoc can have more than one
+ * top-level shape (two boxes never combined into one solid), and that is
+ * still one file to export -- the same flattening JSCAD's own Save STL does
+ * to a `solids` array before serializing it.
+ */
+export function mergeMeshes(meshes: MeshInput[]): MeshInput {
+  const positions: number[] = [];
+  const indices: number[] = [];
+  for (const mesh of meshes) {
+    const base = positions.length / 3;
+    for (let i = 0; i < mesh.positions.length; i++) positions.push(mesh.positions[i]);
+    if (mesh.indices) {
+      for (let i = 0; i < mesh.indices.length; i++) indices.push(mesh.indices[i] + base);
+    } else {
+      const n = mesh.positions.length / 3;
+      for (let i = 0; i < n; i++) indices.push(base + i);
+    }
+  }
+  return { positions, indices };
+}
+
+/**
  * Converts occt-mesh.ts's ungrouped Geom3 (`{ polygons: [{ vertices:
  * [[x,y,z] x3] }] }`) into a MeshInput. Takes the polygon shape structurally
  * -- an inline type, not an import of lib/occt-mesh.ts's `Geom3` -- for the

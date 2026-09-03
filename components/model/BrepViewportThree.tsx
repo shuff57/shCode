@@ -46,6 +46,14 @@
 // setSelectedEdgeTube() for why that used to be a real per-pointermove cost
 // and no longer is.
 //
+// EXPORT. This component does not write files -- it hands out the built
+// triangles as a plain MeshInput (lib/mesh-export.ts, see the onMesh prop)
+// every time a rebuild finishes, and SandboxWorkspace.tsx owns the actual
+// Export STL button and the blob-URL download. Keeping the write side out of
+// here is deliberate: a renderer that also knows about STL/OBJ/3MF headers is
+// a renderer that has stopped being one, and lib/mesh-export.ts is the
+// existing, already-tested writer -- nothing here re-implements it.
+//
 // KERNEL LOADING is copied from BrepViewport.tsx, not imported from it -- that
 // file is under a measurement freeze right now (see the task this component
 // was written for) and this one needs its own module-level promises anyway,
@@ -65,6 +73,7 @@ import type { TopoName } from '../../lib/topo-name';
 import type { BuildResult } from '../../lib/occt-build';
 import type { HandleSpec } from '../../lib/model-handles';
 import type { AnchorPoint } from './HandleOverlay';
+import { mergeMeshes, type MeshInput } from '../../lib/mesh-export';
 
 const KERNEL_BASE = '/reshape/kernel';
 
@@ -153,6 +162,17 @@ interface Props {
    * viewport.
    */
   onAnchors?: (points: AnchorPoint[]) => void;
+  /**
+   * Fired with the built geometry every time a rebuild finishes -- one merged
+   * MeshInput (lib/mesh-export.ts) across every top-level shape, or null when
+   * there is nothing drawable (the empty document, or a build error). This is
+   * the same triangle data drawGeoms() puts on screen, just handed out in the
+   * structural {positions, indices} shape the exporter wants instead of a
+   * THREE.BufferGeometry, so a caller can wire STL/OBJ/3MF export without
+   * this component knowing anything about file formats or download buttons --
+   * see SandboxWorkspace.tsx's Export STL button, the one place that reads it.
+   */
+  onMesh?: (mesh: MeshInput | null) => void;
 }
 
 /** The handful of kernel exports this component calls, loaded once. Loose
@@ -264,7 +284,7 @@ const EDGE_TUBE_RADIUS = 0.75;
  * from scratch through lib/occt-build.ts.
  */
 export default function BrepViewportThree({
-  doc, deflection, onStats, onPick, pick, selectedCount, anchors, onAnchors,
+  doc, deflection, onStats, onPick, pick, selectedCount, anchors, onAnchors, onMesh,
 }: Props) {
   const [phase, setPhase] = useState<'loading' | 'ready' | 'error'>('loading');
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -294,6 +314,8 @@ export default function BrepViewportThree({
   const dampingRafRef = useRef<number | null>(null);
   const onStatsRef = useRef(onStats);
   onStatsRef.current = onStats;
+  const onMeshRef = useRef(onMesh);
+  onMeshRef.current = onMesh;
   // The scene-setup effect below only re-runs on a `phase` change (see its
   // own dep array), so its onClick closure is created ONCE and would
   // otherwise keep reading whatever `doc` was current at that moment --
@@ -1199,6 +1221,7 @@ export default function BrepViewportThree({
           onStatsRef.current?.({
             buildMs: round(buildMs), meshMs: 0, drawMs: round(performance.now() - t), triangles: 0,
           });
+          onMeshRef.current?.(null);
           return;
         }
         throw new Error('The document built without error, but nothing came out as a top-level shape.');
@@ -1229,8 +1252,17 @@ export default function BrepViewportThree({
       onStatsRef.current?.({
         buildMs: round(buildMs), meshMs: round(meshMs), drawMs: round(drawMs), triangles,
       });
+      // The same triangles just drawn, handed out structurally for
+      // SandboxWorkspace's Export STL button -- see the onMesh prop doc.
+      onMeshRef.current?.(mergeMeshes(meshed.map((m) => ({
+        positions: m.geometry.attributes.position.array as ArrayLike<number>,
+        indices: m.geometry.getIndex()?.array as ArrayLike<number> | undefined,
+      }))));
     } catch (e: any) {
-      if (!cancelled) setBuildError(String(e?.message ?? e));
+      if (!cancelled) {
+        setBuildError(String(e?.message ?? e));
+        onMeshRef.current?.(null);
+      }
     }
 
     return () => { cancelled = true; };

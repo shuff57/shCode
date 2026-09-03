@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronDown, ChevronUp, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw } from 'lucide-react';
+import { ChevronDown, ChevronUp, Download, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw } from 'lucide-react';
 import { useLessonStore } from '../lib/store';
 import CodeEditor from './CodeEditor';
 import MoshionPreview from './MoshionPreview';
@@ -28,6 +28,7 @@ import ModelEditor from './model/ModelEditor';
 // screen projection, which is what the sandboxed iframe still does on our
 // behalf to place drag handles.
 import BrepViewport, { type BrepViewportStats, type ViewportPick } from './model/BrepViewportThree';
+import { writeSTL, type MeshInput } from '../lib/mesh-export';
 import HandleOverlay, { type AnchorPoint, type SketchOutline } from './model/HandleOverlay';
 import { outlineOf } from '../lib/sketch-arc';
 import { handlesFor, planeAnchor } from '../lib/model-handles';
@@ -170,6 +171,13 @@ export default function SandboxWorkspace() {
   // the rail on its own -- an empty card over the canvas is a click-eater.
   const [cardHasContent, setCardHasContent] = useState(true);
   const [anchors, setAnchors] = useState<AnchorPoint[]>([]);
+  // The B-rep viewport's own Export STL producer -- see BrepViewportThree's
+  // onMesh prop. Held in a ref (the button's click handler reads it fresh,
+  // and does not need a render on every rebuild) plus one boolean bit of
+  // state so the button itself can grey out when there is nothing to export
+  // yet (the empty document) or not right now (a build error).
+  const meshRef = useRef<MeshInput | null>(null);
+  const [hasMesh, setHasMesh] = useState(false);
   // The frame reloads on every structural edit, so specs posted at the moment
   // runKey changes arrive before the runner has a listener and are simply lost.
   // Held in a ref and re-sent when the runner announces its parameters, which
@@ -433,7 +441,7 @@ export default function SandboxWorkspace() {
     if (!build) return [];
     if (drawTool) return [planeAnchor('xy', 0)];
     if (doc.features.length === 0) return [planeAnchor('xy', 0)];
-    return doc.features.filter((f) => selected.includes(f.id)).flatMap(handlesFor);
+    return doc.features.filter((f) => selected.includes(f.id)).flatMap((f) => handlesFor(f, doc));
   }, [build, doc, selected, drawTool]);
   const scales = useMemo(
     () => Object.fromEntries(specs.map((h) => [h.param, h.scale])),
@@ -636,6 +644,33 @@ export default function SandboxWorkspace() {
       stopRun();
       setLogs([]);
     }
+  }
+
+  // The B-rep Save STL button. Deliberately an ordinary <a download> with a
+  // blob URL, not a message posted into a sandboxed frame -- unlike the
+  // JSCAD runner's own Save buttons, this button lives in the app's own
+  // chrome, not inside a sandboxed iframe, so there is no opaque-origin
+  // download restriction to work around here (see the uploads route's CLAUDE.md
+  // note on why that iframe has no allow-same-origin -- this button is
+  // outside it entirely).
+  function exportSTL() {
+    const mesh = meshRef.current;
+    if (!mesh) return;
+    const bytes = writeSTL(mesh);
+    // bytes.buffer, not bytes: TS's lib.dom types pin BlobPart's ArrayBufferView
+    // to a plain ArrayBuffer, while Uint8Array's own type is now generic over
+    // ArrayBufferLike (which also covers SharedArrayBuffer) -- a real type-system
+    // mismatch, not a real runtime risk, since writeSTL allocates its own
+    // `new ArrayBuffer(...)` and returns a Uint8Array over the whole thing.
+    const blob = new Blob([bytes.buffer as ArrayBuffer], { type: 'application/sla' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'model.stl';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
   }
 
   useEffect(() => {
@@ -918,6 +953,17 @@ export default function SandboxWorkspace() {
             <RotateCcw size={12} />
             Reset
           </button>
+          {brepEngine && build && (
+            <button
+              style={hasMesh ? chipStyle : { ...chipStyle, opacity: 0.35, cursor: 'not-allowed' }}
+              onClick={exportSTL}
+              disabled={!hasMesh}
+              title={hasMesh ? 'Download the current model as an STL file' : 'Build a shape first'}
+            >
+              <Download size={12} />
+              Export STL
+            </button>
+          )}
           <button
             style={chipStyle}
             onClick={toggleFull}
@@ -1023,6 +1069,10 @@ export default function SandboxWorkspace() {
                       // iframe path already posts as 'reshape-set-anchors'.
                       anchors={specs}
                       onAnchors={setAnchors}
+                      onMesh={(m) => {
+                        meshRef.current = m;
+                        setHasMesh(m !== null);
+                      }}
                     />
                   ) : (
                     <ReshapePreview

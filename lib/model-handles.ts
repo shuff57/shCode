@@ -9,7 +9,7 @@
 // box grows both ways at once, so its face only keeps up with the pointer if
 // the width changes by twice the drag.
 
-import { isShape, type Feature, type SketchPlane } from './model-types';
+import { isShape, type Feature, type ModelDoc, type SketchPlane } from './model-types';
 import { maxFilletRadius } from './sketch-arc';
 
 export type HandleKind = 'size' | 'move' | 'turn' | 'point' | 'radius';
@@ -202,9 +202,75 @@ function sketchHandles(f: Extract<Feature, { kind: 'sketch' }>): HandleSpec[] {
   return [...corners, ...radii];
 }
 
-export function handlesFor(f: Feature): HandleSpec[] {
+// A named box face's outward normal -- the same table topo-resolve.ts keeps
+// for the kernel side, kept separately here rather than imported so this file
+// never pulls in the kernel module. Faces only: cylinders are refused below.
+const FACE_NORMALS: Record<string, [number, number, number]> = {
+  '+x': [1, 0, 0], '-x': [-1, 0, 0],
+  '+y': [0, 1, 0], '-y': [0, -1, 0],
+  '+z': [0, 0, 1], '-z': [0, 0, -1],
+};
+
+/**
+ * A drag handle for one round or bevel of a box edge -- the only way a
+ * student can change that radius, since the B-rep params panel is otherwise
+ * empty for every fillet (see SandboxWorkspace's paramDefs, which nothing on
+ * this engine ever populates).
+ *
+ * A direct port of the sketch corner-radius handle above: it too sits at its
+ * trim point, a distance r from the corner, with scale tan(interior/2). A box
+ * edge's cross-section is always 90 degrees, so that law degenerates to 1 --
+ * see the caller's own note on why that alone cannot be the check.
+ *
+ * `doc` is required here (not optional) because a fillet has no geometry of
+ * its own to measure -- everything below comes from the box it names an edge
+ * of. No `doc` and no box named by that edge both mean no handle.
+ */
+function filletHandles(f: Extract<Feature, { kind: 'fillet' }>, doc?: ModelDoc): HandleSpec[] {
+  if (!doc) return [];
+  const e = f.edge;
+  if (e.cause !== 'between') return [];
+  const [a, b] = e.of;
+  if (a.cause !== 'primitive' || b.cause !== 'primitive') return [];
+  // An edge can in principle root in two different features (topo-name.ts's
+  // own doc comment on rootFeature/featureChain) -- and then there is no
+  // single box to measure the edge from.
+  if (a.feature !== b.feature) return [];
+  const root = doc.features.find((x) => x.id === a.feature);
+  if (!root || root.kind !== 'box') return [];
+
+  // The stored `of` order is KERNEL FACE ORDER (topo-resolve.ts:186-188), not
+  // a stable one -- two students picking the same edge can get opposite
+  // orders. Sorting is arbitrary but deterministic, which is the whole
+  // requirement: face A is whichever part string sorts first.
+  const [partA, partB] = [a.part, b.part].sort();
+  const nA = FACE_NORMALS[partA];
+  const nB = FACE_NORMALS[partB];
+  if (!nA || !nB) return [];
+
+  const mid: [number, number, number] = [...root.center];
+  for (const n of [nA, nB]) {
+    const axis = n[0] !== 0 ? 0 : n[1] !== 0 ? 1 : 2;
+    mid[axis] = root.center[axis] + Math.sign(n[axis]) * root.size[axis] / 2;
+  }
+
+  return [{
+    kind: 'radius',
+    param: `${f.id}_size`,
+    origin: [mid[0] - nB[0] * f.size, mid[1] - nB[1] * f.size, mid[2] - nB[2] * f.size],
+    axis: [-nB[0], -nB[1], -nB[2]],
+    scale: 1,
+    label: 'round edge',
+  }];
+}
+
+export function handlesFor(f: Feature, doc?: ModelDoc): HandleSpec[] {
   // A sketch gets its own two-axis corner handles; see sketchHandles.
   if (f.kind === 'sketch') return sketchHandles(f);
+  // A fillet is not a shape -- it names an edge of one -- so it has to be
+  // caught before the isShape() guard below, which would otherwise send it
+  // straight to the empty return.
+  if (f.kind === 'fillet') return filletHandles(f, doc);
   if (!isShape(f)) return [];
   const [cx, cy, cz] = f.center;
   const size: HandleSpec[] = [];

@@ -30,6 +30,14 @@
 //   3MF. Unzips the writer's own output with jszip and counts <vertex> and
 //   <triangle> tags in 3D/3dmodel.model against the input counts.
 //
+//   MERGE. mergeMeshes() -- added for BrepViewportThree.tsx's Export STL
+//   button, which can have more than one top-level shape to flatten into one
+//   file -- offsets a second mesh's indices by the first's vertex count.
+//   Checked against the realistic bug (forgetting the offset) rather than
+//   just checking the happy path: an un-offset merge is asserted to give a
+//   DIFFERENT, wrong volume, so the correctness check above is proven able
+//   to fail.
+//
 //   WINDING. Built from a cube whose six faces are constructed with a known
 //   outward normal each (see buildCube below) -- the same shape
 //   lib/occt-mesh.ts's header warns is the realistic failure case, since a
@@ -40,7 +48,7 @@
 //
 // Run: node scripts/test-mesh-export.mjs   (also part of `npm test`)
 
-import { writeSTL, writeOBJ, write3MF } from '../lib/mesh-export.ts';
+import { writeSTL, writeOBJ, write3MF, mergeMeshes } from '../lib/mesh-export.ts';
 import JSZip from 'jszip';
 
 let pass = 0;
@@ -262,6 +270,39 @@ console.log('3MF: structure and counts (cube)');
     ok('3MF vertex count matches input', vertexTags === cube.positions.length / 3, `got ${vertexTags}`);
     ok('3MF triangle count matches input', triangleTags === triCount(cube), `got ${triangleTags}`);
   }
+}
+
+console.log('mergeMeshes: unindexed + indexed, offset arithmetic (BrepViewportThree.tsx export)');
+{
+  // cube has NO index buffer (buildCube's own shape); sphere does -- so this
+  // exercises both branches mergeMeshes has to get right: synthesizing
+  // sequential indices for the unindexed part, and OFFSETTING the real ones
+  // for the indexed part by the running vertex count.
+  const merged = mergeMeshes([cube, sphere]);
+  const expectedTris = triCount(cube) + triCount(sphere);
+  const expectedVerts = cube.positions.length / 3 + sphere.positions.length / 3;
+  ok('merged triangle count is the sum of the parts', triCount(merged) === expectedTris, `got ${triCount(merged)}`);
+  ok('merged vertex count is the sum of the parts', merged.positions.length / 3 === expectedVerts, `got ${merged.positions.length / 3}`);
+
+  // Two closed, outward-wound surfaces sum their enclosed volumes under the
+  // same divergence-theorem sum regardless of whether they overlap in space
+  // (this is the same formula signedVolumeOf() already uses) -- so a correct
+  // merge's volume is exactly the two inputs' volumes added, and a merge that
+  // corrupted the second mesh's indices (the realistic bug -- forgetting the
+  // offset, or applying it twice) would NOT land here by coincidence.
+  const expectedVol = signedVolumeOf(cube) + signedVolumeOf(sphere);
+  const vol = signedVolumeOf(merged);
+  const relErr = Math.abs(vol - expectedVol) / expectedVol;
+  ok('merged signed volume is the sum of the parts', relErr < 1e-4, `got ${vol}, expected ${expectedVol}`);
+
+  // KNOWN-BAD CHECK: the check above actually has to be sensitive to the
+  // offset, not just structurally always-true. Rebuild the same merge but
+  // WITHOUT offsetting the sphere's indices (the realistic bug this function
+  // exists to avoid) and confirm the volume check above would have caught it.
+  const naiveIndices = [...(cube.indices ?? [...Array(cube.positions.length / 3).keys()]), ...sphere.indices];
+  const naiveVol = signedVolumeOf({ positions: merged.positions, indices: naiveIndices });
+  ok('an un-offset merge (the bug this guards against) gives a different, wrong volume',
+    Math.abs(naiveVol - expectedVol) / expectedVol > 1e-3, `naive got ${naiveVol}, correct is ${expectedVol}`);
 }
 
 console.log('');
