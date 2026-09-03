@@ -34,8 +34,14 @@ const re = new RegExp(r4.pattern, r4.flags || '');
 // The same comment strip lib/grader.ts applies (stripComments defaults true).
 const strip = (src) => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
 
-const starter = fs.readFileSync(path.join(DIR, 'script.js'), 'utf8');
-const solution = fs.readFileSync(path.join(DIR, 'solution.js'), 'utf8');
+// Normalized to LF on read: script.js checks out CRLF on Windows (git
+// core.autocrlf), and BUG below is a plain LF string. Without this, every
+// case here fails on a Windows checkout while passing in CI -- not a real
+// content difference, just two line-ending conventions disagreeing about a
+// string the actual grader regex (functions/api's stripComments + RegExp)
+// doesn't care about either way.
+const starter = fs.readFileSync(path.join(DIR, 'script.js'), 'utf8').replace(/\r\n/g, '\n');
+const solution = fs.readFileSync(path.join(DIR, 'solution.js'), 'utf8').replace(/\r\n/g, '\n');
 
 // The two lines the fix replaces, verbatim from the starter.
 const BUG = 'count = 2;\nlet wrapFee = 1.5 * count;';
