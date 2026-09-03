@@ -56,6 +56,26 @@
           "gap_chili3d": "The mirror operation costs far more typing and clicking (15 keystrokes suggests manually entering plane/offset values), and the resulting view (B_2) shows the two boxes overlapping at odd rotations rather than sitting cleanly side by side, so a beginner has no visual confirmation the mirror actually did the right thing."
         }
       }
+    },
+    {
+      "round": 2,
+      "pieces": {
+        "hole": {
+          "winner": "ours",
+          "confidence": "medium",
+          "why": "Same reported correctness, but B took 5 clicks, 0 keystrokes, and 6 reads against A's 21 clicks, 33 keystrokes, and 10 reads for the identical hole. A's tree shows a separate sketch-plus-Boolean feature path (drawing a circle, typing dimensions, then a cut), which is exactly why its keystroke count is so much higher. B's single Hole feature with a default depth (22) already deeper than the box needed no typed input at all.",
+          "gap_ours": "The default depth of 22 that made this hole go through is an arbitrary number disconnected from the box's actual height in the UI; a beginner has no way to know the hole broke through rather than just going deep, since neither B screenshot shows the bottom face where the exit hole would be visible.",
+          "gap_chili3d": "The circle-then-cut workflow forces a beginner to draw a sketch, type numeric values, and separately trigger a boolean cut, with no visible confirmation in the single screenshot that the cut went all the way through the bottom face.",
+          "fix": "e2e131c hole depth defaults to target extent + 2"
+        },
+        "dimensions-panel": {
+          "winner": "ours",
+          "confidence": "high",
+          "why": "B's panel (A_1/A_2) labels each field with the object and property together, 'Box 1 width' / 'Box 1 depth' / 'Box 1 height', right next to a slider and a plain number box, and nothing else is on the panel; setting 40x40x20 took 3 clicks, 0 keystrokes, 2 reads. A's Properties panel (A_2/A_3) makes the student scroll past Name, a collapsible Matrix (Translation/Scale/Rotation), Material, Shape Type, and a raw multi-decimal Location string before reaching Length/Width/Height, costing 9 clicks, 15 keystrokes, 4 reads for the same result. B's third screen (Hole feature) shows the same 'Hole 1 diameter/depth/x/y/z' convention holding up across a different feature, so the pattern generalizes; A's third screen is still the same scrolled Box properties list.",
+          "gap_ours": "No unit is shown anywhere on the numbers (just '40', '20', no mm/in/cm label), so a student setting an exact size has no idea what unit they're actually specifying.",
+          "gap_chili3d": "The size fields (Length/Width/Height) are buried at the bottom of a generic Properties panel behind unrelated transform/material/location fields a beginner has no reason to touch, so finding 'where the size lives' is itself the hard part."
+        }
+      }
     }
   ]
 }
