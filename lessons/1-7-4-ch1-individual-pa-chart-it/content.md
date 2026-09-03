@@ -1,49 +1,41 @@
 ## Chapter 1 Individual PA — Part 4 of 5: Chart It
 
-**Worth 10 of the 100 points on this test.** One flowchart, drawn alone, from one
-of the three problems below.
+**10 points. One flowchart, drawn alone.**
 
-Part 5 asks you to write the steps for **the same problem**, so pick one now and
-stay with it.
+- Pick **one** problem below. Part 5 writes the steps for the *same* one.
+- Three shapes only — oval, rectangle, diamond (1.5.25, 1.5.26).
+- Press **Check my diagram** as often as you like. It is free, and red costs you
+  nothing.
+- The checks say whether it is a *legal* flowchart, never whether it answers the
+  problem. A green chart of the wrong problem still scores nothing.
 
-### Only three shapes
-
-Oval, rectangle, diamond — the three from 1.5.25 and 1.5.26. The editor offers
-more and none of them are needed here.
-
-| Shape | What it is for |
+| Shape | Use it for |
 | --- | --- |
 | Oval | where the program begins, and where it finishes |
 | Rectangle | something the program does: get a value, work one out, report one |
-| Diamond | a yes/no question, with exactly two ways out, both labelled |
+| Diamond | a yes/no question — exactly two ways out, both labelled |
 
 ### Pick one
 
-**1. Backpack Check**
+**1. Backpack Check** — you know the number of textbooks, what one textbook
+weighs, and the student's own weight.
 
-You know how many textbooks are in a backpack and what one textbook weighs, and
-you know the student's own weight. Work out **what the backpack weighs**, and
-compare it against the guideline of **one tenth of the student's weight**.
+- Work out: what the backpack weighs
+- Compare against: **one tenth of the student's weight**
 
-**2. Screen Time**
+**2. Screen Time** — you know the minutes of screen time used across **seven
+days**.
 
-You know how many minutes of screen time were used across seven days. Work out
-the **daily average**, and compare it against the **120 minutes a day** that was
-agreed at home.
+- Work out: the daily average
+- Compare against: **120 minutes a day**
 
-**3. Print Job**
+**3. Print Job** — you know how many pages the document is, at **8 cents a
+page**.
 
-You know how many pages a document is and that printing costs **8 cents a page**.
-Work out **what the job costs**, and compare it against the **$5.00** left in the
-print account.
+- Work out: what the job costs
+- Compare against: the **$5.00** left in the print account
 
-### What a finished chart looks like here
+### The shape of a finished chart
 
-Start, some rectangles that get the numbers and work out the one value the
-problem is about, a diamond asking the comparison, a different rectangle on each
-branch saying what the answer is, and End.
-
-**Press Check my diagram as often as you like.** The checks are free, they run in
-your browser, and they cost you nothing when they are red. They judge whether
-you have drawn a legal flowchart — never whether it solves the right problem, so
-a green chart of the wrong problem still scores nothing.
+Start → get the numbers → work out the one value → a diamond asking the
+comparison → a different report on each branch → End.
