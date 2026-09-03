@@ -12,7 +12,7 @@
 // it -- do not edit that file to keep this one in sync; copy forward instead.
 
 import { useState } from 'react';
-import BrepViewportThree, { type BrepViewportStats } from '../../components/model/BrepViewportThree';
+import BrepViewportThree, { type BrepViewportStats, type ViewportPick } from '../../components/model/BrepViewportThree';
 import {
   EMPTY_DOC,
   newExtrude,
@@ -58,6 +58,10 @@ export default function BrepThreePage() {
   const [doc, setDoc] = useState<ModelDoc>(buildInitialDoc);
   const [stats, setStats] = useState<BrepViewportStats | null>(null);
   const [rebuilds, setRebuilds] = useState(0);
+  // Face/edge picking readout -- exercises BrepViewportThree's onPick/pick,
+  // exposed on window too so a headless (Playwright) pass can read a pick
+  // without needing to parse rendered text.
+  const [pick, setPick] = useState<ViewportPick | null>(null);
 
   function bumpHeight(delta: number) {
     setDoc((d) => ({
@@ -102,6 +106,22 @@ export default function BrepThreePage() {
           <button onClick={() => bumpBoxWidth(5)} style={btnStyle}>+5</button>
         </div>
 
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ color: '#8be9fd', marginBottom: 6 }}>Document</div>
+          <button onClick={() => { setDoc(buildInitialDoc()); setRebuilds((n) => n + 1); }} style={btnStyle}>
+            L-shaped cut
+          </button>
+          <button
+            onClick={() => {
+              setDoc({ version: 1, features: [{ id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] }] });
+              setRebuilds((n) => n + 1);
+            }}
+            style={btnStyle}
+          >
+            Plain box
+          </button>
+        </div>
+
         <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid #44475a' }}>
           <div style={{ color: '#8be9fd', marginBottom: 6 }}>onStats (last rebuild)</div>
           {stats ? (
@@ -116,10 +136,27 @@ export default function BrepThreePage() {
           )}
           <div style={{ color: '#6272a4', marginTop: 8 }}>manual rebuilds triggered: {rebuilds}</div>
         </div>
+
+        <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid #44475a' }}>
+          <div style={{ color: '#8be9fd', marginBottom: 6 }}>last pick</div>
+          {pick ? (
+            <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{JSON.stringify(pick, null, 2)}</pre>
+          ) : (
+            <div style={{ color: '#6272a4' }}>hover a face or edge, click to select</div>
+          )}
+        </div>
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
-        <BrepViewportThree doc={doc} onStats={setStats} />
+        <BrepViewportThree
+          doc={doc}
+          onStats={setStats}
+          onPick={(p) => {
+            setPick(p);
+            if (typeof window !== 'undefined') (window as any).__lastPick = p;
+          }}
+          pick={pick?.kind === 'edge' && pick.name ? { target: pick.target, name: pick.name } : null}
+        />
       </div>
     </div>
   );

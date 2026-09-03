@@ -563,13 +563,25 @@ export function whyCannotRound(f: Feature): string | null {
     return 'Rounding works on the original shape, not a repeated copy. Round it before you repeat it.';
   }
   if (f.kind === 'move') {
+    // This refuses the WHOLE-SHAPE round only -- round/roundStyle are fields
+    // a box or cylinder itself carries, and a Move has neither. It used to
+    // say (in effect) that a moved shape cannot be rounded at all, which
+    // stopped being true the day Move started recording its transform as a
+    // real, resolvable operation (see the long comment on the 'move' branch
+    // in lib/occt-build.ts): a single named edge of a moved shape resolves
+    // and builds correctly now, via nameEdgeOnCurrentShape() in
+    // lib/topo-resolve.ts. ModelEditor's round() tries exactly that path
+    // FIRST and this message is only ever shown once it has already failed
+    // -- nothing was picked, or the pick did not resolve -- so the real
+    // remedy is named here too, not just the old one.
+    //
     // Copy leaves the original standing right there in the list -- telling a
     // student to round "before you move it" when nothing moved (the row even
     // says "(copy)") points them at a step that already happened to a shape
     // that is still available to round directly.
     return f.copy
-      ? 'Rounding works on the original shape, not a copy made by Move. Round it before you copy it.'
-      : 'Rounding works on the original shape, not a moved copy. Round it before you move it.';
+      ? 'Rounding the whole shape works on the original, not a copy made by Move — round the original before you copy it, or click one edge of this copy in the viewport to round just that edge.'
+      : 'Rounding the whole shape works on the original, not a moved copy — round it before you move it, or click one edge of this shape in the viewport to round just that edge.';
   }
   return null;
 }

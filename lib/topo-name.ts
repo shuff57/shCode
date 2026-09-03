@@ -78,10 +78,30 @@ export type TopoName =
   /** A face of a primitive, named by the direction it faces or its role.
    *  `b1.face[+z]`, `c1.face[side]`. Primitives have a fixed, knowable set. */
   | { cause: 'primitive'; feature: string; kind: TopoKind; part: string }
-  /** A face or edge an extrude or revolve swept from one sketch edge.
-   *  `e1.side[sk1.edge0]`. The sketch edge index is itself already stable --
-   *  reindex() in lib/sketch-arc.ts keeps it so across corner insertion and
-   *  removal, which is why this is a sound thing to name from. */
+  /**
+   * A face or edge an extrude or revolve swept from one sketch edge.
+   * `e1.side[sk1.edge0]`.
+   *
+   * The sketch edge index is stable across a corner inserted SOMEWHERE ELSE
+   * on the outline -- reindex() in lib/sketch-arc.ts shifts every index past
+   * the seam so this one does not silently start meaning a neighbour.
+   *
+   * It is NOT stable across a corner inserted into THIS edge itself.
+   * addCorner() splits one edge into two, and reindex()'s own rule -- shift
+   * every index greater than the seam -- leaves the split edge's own number
+   * on its first half by construction, since an edge is never greater than
+   * itself. A name written against the whole original edge then silently
+   * resolves to half of it with full confidence: measured, `swept edge:0`
+   * on a 40-wide sketch side (wall centre x=20, area 480) after
+   * addCorner(sk1, 0) resolves to x=10, area 240 -- see the case in
+   * scripts/test-topo-resolve.mjs marked SKIP/UNTESTABLE for exactly this,
+   * with the numbers. This is a known, unresolved limitation, not merely an
+   * untested corner: fixing it needs a design-edge identity that survives
+   * being split rather than only reindexed, which is a larger change than a
+   * bug-fix pass carries. Do not repeat the old claim that this index is
+   * simply stable -- it is stable against everything reindex() covers and
+   * nothing more.
+   */
   | { cause: 'swept'; feature: string; kind: TopoKind; from: string; edge: number }
   /** The face a sweep made from a ROUNDED OR CHAMFERED CORNER of its sketch.
    *  `e1.face[sk1.corner2]`.
@@ -99,9 +119,40 @@ export type TopoName =
   /** A part that came through an operation unchanged, keeping its identity.
    *  The common case for a boolean: most faces are untouched. */
   | { cause: 'carried'; feature: string; kind: TopoKind; of: TopoName }
-  /** One of several pieces an operation cut a single parent part into. The
-   *  discriminator, not an ordinal, is what tells the pieces apart. */
-  | { cause: 'split'; feature: string; kind: TopoKind; of: TopoName; at: OnPoint }
+  /**
+   * One of several pieces an operation cut a single parent part into. The
+   * discriminator, not an ordinal, is what tells the pieces apart.
+   *
+   * `side` is a SECOND, independent check alongside `at`, and it exists to
+   * close a real hole in the first one -- see the long note above
+   * fractionOnFace() in lib/topo-history.ts and pushThrough()'s use of it in
+   * lib/topo-resolve.ts. `at` is anchored to the PARENT face alone, and a
+   * parent that TRANSLATES relative to a tool that does not move looks, from
+   * the parent's own local frame, exactly like one that GROWS -- the
+   * fraction cannot tell those apart, and on a translate it can walk the
+   * discriminator clean across the cut into the SIBLING piece. `at` alone
+   * would then confidently return the wrong piece.
+   *
+   * `side` is which extreme of `axis` (0=x, 1=y, 2=z, in WORLD coordinates,
+   * not the parent's parameter space) the chosen piece's centroid sat at
+   * among ITS SIBLINGS, at the moment the name was written -- 'lo' if it was
+   * the minimum, 'hi' if the maximum. That is information `at` cannot
+   * recover by itself: `at` is a point ON the chosen piece and says nothing
+   * about where the OTHER piece was. Resolving a name now requires BOTH
+   * checks to agree -- the point must land on a piece, AND that piece must
+   * still be the same extreme among its current siblings -- and refuses
+   * (null) rather than guess when they disagree. That is strictly a
+   * TIGHTENING: every case `at` alone resolved correctly still has `side`
+   * agree, since nothing moved the pieces across the axis that mattered.
+   *
+   * Absent on a name that predates this field, or when the pieces had no
+   * axis with enough spread to rank -- both fall back to `at` alone, which
+   * is the pre-existing behaviour rather than a regression.
+   */
+  | {
+    cause: 'split'; feature: string; kind: TopoKind; of: TopoName; at: OnPoint;
+    side?: { axis: 0 | 1 | 2; dir: 'lo' | 'hi' };
+  }
   /** A part that did not exist before this operation -- the wall a subtraction
    *  cuts, the seam a union makes. It has no ancestor to name, so it is named
    *  by its maker and located by a discriminator. */
@@ -138,7 +189,14 @@ export function formatName(n: TopoName): string {
     case 'rounded': return `${n.feature}.${n.kind}[${n.from}.corner${n.corner}]`;
     case 'cap': return `${n.feature}.cap[${n.end}]`;
     case 'carried': return `${n.feature}.same[${formatName(n.of)}]`;
-    case 'split': return `${n.feature}.split[${formatName(n.of)}, ${at(n.at)}]`;
+    case 'split': {
+      // `side` is appended only when present, so a name written before this
+      // field existed formats exactly as it always did -- see the field's
+      // own doc comment for why an absent side falls back rather than
+      // regressing.
+      const side = n.side ? `, ${n.side.dir}(${n.side.axis})` : '';
+      return `${n.feature}.split[${formatName(n.of)}, ${at(n.at)}${side}]`;
+    }
     case 'made': return `${n.feature}.made[${n.kind}, ${at(n.at)}]`;
     case 'between': {
       // Sorted, not written in the order the caller happened to pick the two

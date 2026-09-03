@@ -20,9 +20,9 @@
 // than silently, and the alternative is carrying a megabyte and a half of
 // generated declarations for thirty functions.
 
-import type { Feature, ModelDoc, Vec3 } from './model-types';
+import type { Feature, ModelDoc, RoundStyle, Vec3 } from './model-types';
 import { chamfered, drafted, edgeThrough, filleted } from './topo-history';
-import { facesOf, resolveName, resolvePrimitiveFace } from './topo-resolve';
+import { facesOf, resolveName, resolveNameAsUsedBy, resolvePrimitiveFace } from './topo-resolve';
 
 /** The handful of OpenCascade entry points this adapter uses. Loose on
  *  purpose -- see the note above. */
@@ -187,6 +187,73 @@ function coneOf(oc: Occt, radius: number, height: number): any {
   const face = new oc.BRepBuilderAPI_MakeFace(wire.Wire(), false).Face();
   const axis = new oc.gp_Ax1(new oc.gp_Pnt(0, 0, 0), new oc.gp_Dir(0, 0, 1));
   return new oc.BRepPrimAPI_MakeRevol(face, axis, 2 * Math.PI, true).Shape();
+}
+
+/**
+ * Whole-shape Round/Bevel -- fillet or chamfer EVERY edge of a freshly built
+ * primitive at once.
+ *
+ * THE BUG THIS CLOSES. Box and cylinder primitives carry `round`/`roundStyle`
+ * (see BoxFeature/CylinderFeature in lib/model-types.ts), and this file never
+ * read either field: it built the sharp primitive and stopped. `doc.features`
+ * came back correctly updated, the geometry did not change, and nothing said
+ * so -- a document field that looks right sitting next to a shape that is
+ * simply wrong, with nothing on screen to notice, which is exactly the
+ * failure lib/occt-api.ts's own KNOWN/refuseUnknown mechanism exists to
+ * prevent for code mode and this file had no equivalent of for Build mode.
+ *
+ * NOT a second way to fillet a primitive: this mirrors roundedCuboid() in
+ * lib/occt-api.ts exactly -- gather every edge, add them all to ONE
+ * BRepFilletAPI_MakeFillet (or _MakeChamfer for a chamfer), Build() once.
+ *
+ * MEASURED, not assumed, on the cylinder case: TopExp_Explorer returns each
+ * edge once per FACE that borders it, so a cylinder's two rim circles come
+ * back TWICE each and its own seam line (the vertical join where the curved
+ * face's periodic parameterisation closes on itself, not a real corner)
+ * twice more -- six entries for three real edges. Deduped by IsSame() before
+ * anything is added. The seam line is left IN rather than filtered out: it
+ * has no dihedral angle to round, and measured against the kernel directly,
+ * handing it to either BRepFilletAPI_MakeFillet or _MakeChamfer is a
+ * harmless no-op, not an error -- filtering it out changed nothing but the
+ * code's own complexity.
+ *
+ * BOTH styles build for BOTH primitives -- measured, not assumed, so there is
+ * no "only one is buildable" case to refuse between fillet and chamfer here.
+ * What DOES need a loud refusal is a radius the shape's edges cannot take
+ * (BRepFilletAPI reports it two different ways, same as the single-edge
+ * fillet() in lib/topo-history.ts): this throws rather than swallowing
+ * either one into null, because null here would silently drop the WHOLE
+ * primitive from the build, and a caught exception turned into null is
+ * exactly the shape of the fillet-after-move defect fixed earlier this
+ * session. lib/occt-build.ts's own callers (BrepViewport.tsx and
+ * BrepViewportThree.tsx) already wrap buildDoc() in a try/catch that shows
+ * e.message in the "Could not build this model" panel, so throwing here
+ * reaches a student as a sentence rather than a silent sharp shape.
+ */
+function roundedEdges(oc: Occt, sharp: any, radius: number, style: RoundStyle, label: string): any {
+  const edges: any[] = [];
+  const exp = new oc.TopExp_Explorer(sharp, oc.TopAbs_ShapeEnum.TopAbs_EDGE, oc.TopAbs_ShapeEnum.TopAbs_SHAPE);
+  while (exp.More()) {
+    const e = exp.Current();
+    if (!edges.some((u) => u.IsSame(e))) edges.push(e.clone());
+    exp.Next();
+  }
+  const mk = style === 'chamfer'
+    ? new oc.BRepFilletAPI_MakeChamfer(sharp)
+    : new oc.BRepFilletAPI_MakeFillet(sharp, oc.ChFi3d_FilletShape.ChFi3d_Rational);
+  for (const e of edges) mk.Add(radius, oc.TopoDS.Edge(e));
+  let failed = false;
+  try {
+    mk.Build(new oc.Message_ProgressRange());
+    failed = !!(mk.IsDone && !mk.IsDone());
+  } catch {
+    failed = true;
+  }
+  if (failed) {
+    const verb = style === 'chamfer' ? 'Chamfering' : 'Rounding';
+    throw new Error(`${verb} ${label} at radius ${radius} failed -- the radius is too big for this shape's edges.`);
+  }
+  return mk.Shape();
 }
 
 // ---- Sketches ---------------------------------------------------------------
@@ -355,11 +422,21 @@ function primitiveOf(oc: Occt, f: Feature): any {
     case 'box': {
       const [w, d, h] = f.size;
       // MakeBox grows from the origin corner; a ModelDoc box is centred.
-      const raw = new oc.BRepPrimAPI_MakeBox(w, d, h).Shape();
+      let raw = new oc.BRepPrimAPI_MakeBox(w, d, h).Shape();
+      // Whole-shape Round/Bevel, applied to the SHARP, still-at-the-origin
+      // box -- before centring, so the centring translate below still uses
+      // the box's own nominal (unrounded) w/d/h, which is what keeps a
+      // rounded box's nominal footprint centred exactly where an unrounded
+      // one would be, same as the per-edge FilletFeature and JSCAD's
+      // roundedCuboid both already do.
+      if (f.round) raw = roundedEdges(oc, raw, f.round, f.roundStyle ?? 'fillet', `box ${f.id} (${w}x${d}x${h})`);
       return turned(oc, moved(oc, raw, [-w / 2, -d / 2, -h / 2]), f.rotate, [0, 0, 0]);
     }
     case 'cylinder': {
-      const raw = new oc.BRepPrimAPI_MakeCylinder(f.radius, f.height).Shape();
+      let raw = new oc.BRepPrimAPI_MakeCylinder(f.radius, f.height).Shape();
+      if (f.round) {
+        raw = roundedEdges(oc, raw, f.round, f.roundStyle ?? 'fillet', `cylinder ${f.id} (radius ${f.radius}, height ${f.height})`);
+      }
       return turned(oc, moved(oc, raw, [0, 0, -f.height / 2]), f.rotate, [0, 0, 0]);
     }
     case 'cone': {
@@ -506,7 +583,11 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
       // rather than the same index.
       const src = built.get(f.target);
       const partial: BuildResult = { shapes: built, ops, sweeps };
-      const edge = src ? resolveName(oc, f.edge, partial) : null;
+      // resolveNameAsUsedBy, not resolveName: f.edge may be named against an
+      // earlier feature (the box) than f.target actually is (a moved copy of
+      // it). See the 'move' branch below for why that gap existed and how
+      // it is closed.
+      const edge = src ? resolveNameAsUsedBy(oc, f.edge, partial, f.target) : null;
       if (src && edge) {
         shape = f.style === 'chamfer'
           ? chamfered(oc, src, edge, f.size)
@@ -539,12 +620,47 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
         shape = cur;
       } else if (src && f.face) {
         const partial: BuildResult = { shapes: built, ops, sweeps };
-        const face = resolveName(oc, f.face, partial);
+        // Same reason as the fillet branch above: f.face may be named
+        // against an earlier feature than f.target.
+        const face = resolveNameAsUsedBy(oc, f.face, partial, f.target);
         if (face) shape = drafted(oc, src, face, axis, rad, f.neutral);
       }
     } else if (f.kind === 'move') {
+      // Recorded as an OpRecord, exactly like the booleans below, rather than
+      // just calling moved() and forgetting it happened.
+      //
+      // WHY THIS MATTERS. A name is a path through history, not a position
+      // in the result -- topo-name.ts's whole premise. `move` used to be
+      // invisible to that history: it called moved() and threw the transform
+      // away, so a name written against the shape BEFORE a move (an edge
+      // picked, then the part relocated) resolved against the PRE-move
+      // shape. Handing that stale edge to BRepFilletAPI.Add() on the MOVED
+      // solid does not find a wrong edge -- it finds no edge at all and
+      // throws a bare `WebAssembly.Exception {}`, which refusable() in
+      // topo-history.ts turns into null exactly the way an oversized fillet
+      // radius does. The feature then silently disappears from the build:
+      // no entry in `built`, no error, the student's round just gone.
+      //
+      // MEASURED, not assumed: `BRepBuilderAPI_Transform` -- unlike a bare
+      // translation done by hand -- implements the same ModifyShape history
+      // interface a boolean does. IsDeleted()/Modified() answer for it the
+      // same way faceFate() already expects, on faces AND edges alike, so
+      // recording it here needs no new machinery -- pushThrough() in
+      // topo-resolve.ts (via resolveNameAsUsedBy) already knows what to do
+      // with an OpRecord. Confirmed against the kernel directly: an edge at
+      // world (0,0,10) on an unmoved box comes back from Modified() at world
+      // (10,0,10) after a translate-by-10, and handing THAT edge to a fillet
+      // on the moved shape succeeds where the stale one threw.
       const src = built.get(f.target);
-      if (src) shape = moved(oc, src, f.offset);
+      if (src) {
+        const t = new oc.gp_Trsf();
+        t.SetTranslation(new oc.gp_Vec(f.offset[0], f.offset[1], f.offset[2]));
+        const op = new oc.BRepBuilderAPI_Transform(src, t, false);
+        const list = ops.get(f.id) ?? [];
+        list.push({ op, inputs: [f.target] });
+        ops.set(f.id, list);
+        shape = op.Shape();
+      }
     } else if (f.kind === 'mirror') {
       const src = built.get(f.target);
       if (src) {

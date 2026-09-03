@@ -80,6 +80,7 @@ import {
 } from '../../lib/sketch-arc';
 import {
   type Feature,
+  type FilletFeature,
   type ModelDoc,
   type RoundStyle,
   type SketchPlane,
@@ -108,6 +109,7 @@ import {
   whyCannotOrbit,
   whyCannotRound,
 } from '../../lib/model-types';
+import type { TopoName } from '../../lib/topo-name';
 
 interface Props {
   doc: ModelDoc;
@@ -144,6 +146,22 @@ interface Props {
    *  this just flips it on; the tool stays active until two clicks place a
    *  shape or Escape cancels it. */
   onStartDraw?: (tool: 'rect' | 'polygon') => void;
+  /**
+   * An edge picked in the 3D viewport (BrepViewportThree's `onPick`), lifted
+   * up alongside `selected` for the same reason: the pick outlives any one
+   * render and the sandbox is what owns the viewport this came from.
+   *
+   * `edge` is null when the picked edge is real (and highlighted in the
+   * viewport) but could not be turned into a TopoName -- anything past a box
+   * or cylinder; see nameEdgeBetweenPrimitiveFaces() in lib/topo-resolve.ts.
+   * round() below only acts on a non-null edge and otherwise falls back to
+   * the whole-shape tool, same as picking nothing at all.
+   */
+  pickedEdge?: { target: string; edge: TopoName | null } | null;
+  /** Called once a picked edge has been consumed into a new FilletFeature,
+   *  so the sandbox stops pinning a selection that no longer points at
+   *  anything useful (its target feature is now consumed -- see topLevel()). */
+  onClearPickedEdge?: () => void;
 }
 
 type BoolOp = 'union' | 'subtract' | 'intersect';
@@ -327,7 +345,7 @@ function FlyoutButton({
 }
 
 export default function ModelEditor({
-  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, onStartDraw,
+  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, onStartDraw, pickedEdge, onClearPickedEdge,
 }: Props) {
   const [note, setNote] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -473,6 +491,49 @@ export default function ModelEditor({
   }
 
   function round(style: RoundStyle) {
+    // A picked EDGE (a click in the 3D viewport) takes priority over the
+    // whole-shape round below -- see FilletFeature's own doc comment for why
+    // this is a different feature kind, not a narrower case of the same
+    // round() call. Guarded against staleness by re-checking `chosen`
+    // rather than trusting the prop on its own: picking an edge always
+    // selects its owning shape too (see the sandbox's onPick wiring), so if
+    // the student has since chosen something else from the feature list,
+    // chosen[0] no longer matches pickedEdge.target and this falls straight
+    // through to the whole-shape path below -- the same one that always ran
+    // before edge-picking existed.
+    if (pickedEdge?.edge && chosen.length === 1 && chosen[0].id === pickedEdge.target) {
+      // The picked SHAPE need not itself be isRoundable() -- that check is
+      // only meaningful for the whole-shape path below, which writes
+      // round/roundStyle fields a box or cylinder carries directly. A
+      // Fillet targets one NAMED EDGE, and that edge's own name (resolved
+      // by nameEdgeOnCurrentShape() in the viewport) can be rooted at a
+      // primitive sitting underneath a Move, a Hole, or anything else --
+      // see FilletFeature's doc comment. The size default still wants a
+      // real dimension to shrink from where one is reachable: walk back to
+      // whichever primitive the edge's name is actually rooted at
+      // (pickedEdge.edge.feature) and use maxRound() on THAT, falling back
+      // to a flat default when the root is not a plain box/cylinder --
+      // e.g. two different primitives met at this edge in a Combine, which
+      // nameEdgeOnCurrentShape() only ever names when it traces to ONE.
+      const edge = pickedEdge.edge;
+      const root = doc.features.find((x) => x.id === edge.feature);
+      const size = root && isRoundable(root) ? Math.min(maxRound(root), 4) : 4;
+      const f: FilletFeature = {
+        id: nextId(doc, style === 'chamfer' ? 'bevel' : 'round'),
+        kind: 'fillet',
+        target: pickedEdge.target,
+        edge,
+        size,
+        style,
+      };
+      onChange({ ...doc, features: [...doc.features, f] });
+      setSelected([f.id]);
+      onClearPickedEdge?.();
+      setLastRound(style);
+      setMenu(null);
+      say(null);
+      return;
+    }
     if (chosen.length !== 1) {
       say('Pick one shape to round.');
       return;
@@ -976,7 +1037,18 @@ export default function ModelEditor({
   const canCombine = chosen.length >= 2;
   // Same unconditional-reason rule as whyCannotSolidOp: a gated button never
   // goes silent, even at the most common early state (nothing picked yet).
-  const roundBlockedBy = chosen.length !== 1 ? 'Pick one shape to round.' : whyCannotRound(chosen[0]);
+  //
+  // A usable picked edge overrides whyCannotRound() entirely -- round()
+  // above tries that path FIRST and it does not care whether the picked
+  // SHAPE is itself roundable, only whether the picked EDGE resolved to a
+  // name. Without this the button stayed disabled the instant anything
+  // (a Move, a Hole, ...) sat on top of the primitive the edge came from,
+  // even though clicking Round would have worked.
+  const pickedEdgeUsable =
+    !!pickedEdge?.edge && chosen.length === 1 && chosen[0].id === pickedEdge.target;
+  const roundBlockedBy = pickedEdgeUsable
+    ? null
+    : chosen.length !== 1 ? 'Pick one shape to round.' : whyCannotRound(chosen[0]);
   const canRound = roundBlockedBy === null;
   const turnBlockedBy =
     chosen.length !== 1

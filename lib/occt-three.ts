@@ -208,3 +208,127 @@ export function triangleCount(geometry: THREE.BufferGeometry | null): number {
   const idx = geometry.getIndex();
   return idx ? idx.count / 3 : 0;
 }
+
+// ---- edge picking -----------------------------------------------------------
+//
+// The face-picking half above was built for a future Raycaster picker; this
+// is that future's edge half. See components/model/BrepViewportThree.tsx for
+// how both get wired to a mouse.
+
+/** Curve deflection for edge-PICKING geometry, tuned separately from
+ *  DEFAULT_DEFLECTION/DEFAULT_ANGULAR above. Those tune what a face looks
+ *  like up close; this only has to look right at hover distance and be cheap
+ *  to raycast against on every pointermove, so it is deliberately coarser. */
+const EDGE_PICK_ANGULAR_DEFLECTION = 0.3;
+const EDGE_PICK_CURVATURE_DEFLECTION = 0.2;
+
+/**
+ * Every UNIQUE topological edge of `shape`, in the kernel's own order.
+ *
+ * WHY THIS IS NOT THE SAME LIST AS THE DRAWN SILHOUETTE in
+ * BrepViewportThree.tsx. That silhouette is THREE.EdgesGeometry over the
+ * TESSELLATION: it finds facet boundaries past a normal-angle threshold,
+ * which looks right and is not the kernel's own topology -- a curved face's
+ * own facets mostly do not qualify, and a flat face split by the mesher
+ * never gains a false one either way. Picking one addressable edge -- the
+ * whole point of a Fillet on a named edge -- needs the REAL edges,
+ * discretised straight off the B-rep curve, not inferred from triangles.
+ *
+ * DEDUPED ON PURPOSE. TopExp_Explorer(shape, TopAbs_EDGE) walks every FACE's
+ * boundary, and a solid's edges are each shared by exactly two faces -- so a
+ * box's 12 real edges come back as 24 raw hits, one from each side. Keeping
+ * only the first occurrence of each (by IsSame(), same discipline
+ * facesOf()'s siblings in lib/topo-*.ts use throughout) is what turns a
+ * boundary-crossing count back into an edge count.
+ */
+function uniqueEdgesOf(oc: Occt, shape: any): any[] {
+  const exp = new oc.TopExp_Explorer(
+    shape,
+    oc.TopAbs_ShapeEnum.TopAbs_EDGE,
+    oc.TopAbs_ShapeEnum.TopAbs_SHAPE,
+  );
+  const out: any[] = [];
+  while (exp.More()) {
+    // .clone() -- same discipline lib/topo-history.ts's own edgesOf() uses --
+    // keeps each result valid once the explorer moves past it, rather than a
+    // view that dangles on the next exp.Next().
+    const edge = exp.Current().clone();
+    if (!out.some((e) => e.IsSame(edge))) out.push(edge);
+    exp.Next();
+  }
+  return out;
+}
+
+/**
+ * One edge's curve, sampled to a flat [x,y,z, x,y,z, ...] point list in world
+ * coordinates. No separate location correction is needed here the way
+ * tessellateToThree() needs one for a face's triangulation: that trap is
+ * specific to Poly_Triangulation, which OpenCascade caches in the face's own
+ * local frame so one triangulation can be shared by several placed
+ * instances. A curve adaptor built straight off an edge obtained by walking
+ * `shape` carries no such cache and already answers in world space -- the
+ * same reason faceCentre() in lib/topo-resolve.ts needs no correction either.
+ */
+function discretizeEdge(oc: Occt, edge: any): number[] {
+  // TopExp_Explorer's Current() (and so uniqueEdgesOf()'s own results) comes
+  // back typed as the generic TopoDS_Shape -- fine for IsSame() and for
+  // facesOf()'s siblings elsewhere in lib/topo-*.ts, which take that generic
+  // type, but BRepAdaptor_Curve's constructor is bound to take specifically a
+  // TopoDS_Edge and embind enforces that at the type level, not just at
+  // runtime: without this downcast it throws "Expected null or instance of
+  // TopoDS_Edge, got an instance of TopoDS_Shape" rather than silently
+  // working. TopoDS.Edge() is the same downcast lib/occt-build.ts already
+  // uses before handing a face to oc.TopoDS.Face().
+  const curve = new oc.BRepAdaptor_Curve(oc.TopoDS.Edge(edge));
+  const disc = new oc.GCPnts_TangentialDeflection(
+    curve, EDGE_PICK_ANGULAR_DEFLECTION, EDGE_PICK_CURVATURE_DEFLECTION,
+  );
+  const pts: number[] = [];
+  for (let i = 1; i <= disc.NbPoints(); i++) {
+    const p = disc.Value(i);
+    pts.push(p.X(), p.Y(), p.Z());
+  }
+  return pts;
+}
+
+/**
+ * discretizeEdge(), wrapped as a ready-to-draw three.js line geometry.
+ *
+ * Exported on its own, not only looped over by edgesToThree() below, because
+ * re-resolving a SAVED edge selection after a rebuild (a dimension edit, an
+ * undo -- anything that throws away every mesh, see the file header of
+ * BrepViewportThree.tsx) needs exactly one edge's line, not a fresh walk of
+ * the whole shape.
+ */
+export function edgeToThreeGeometry(
+  THREE: typeof import('three'), oc: Occt, edge: any,
+): THREE.BufferGeometry {
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(discretizeEdge(oc, edge), 3));
+  return geometry;
+}
+
+/** One pickable edge: the kernel TopoDS_Edge a raycast hit resolves to, paired
+ *  with the line geometry drawn (or raycast against) for it. */
+export interface EdgePick {
+  edge: any;
+  geometry: THREE.BufferGeometry;
+}
+
+/**
+ * Every unique topological edge of `shape`, each as its own line geometry
+ * paired with the kernel edge it came from -- so a Raycaster hit on one LINE
+ * resolves back to a real TopoDS_Edge, the same way a hit triangle resolves
+ * back to a TopoDS_Face through FaceRange above.
+ *
+ * ONE THREE.Line PER EDGE, deliberately, rather than one merged
+ * LineSegments carrying all of them: Raycaster reports which OBJECT it hit,
+ * not which segment within it, and an edge has to be individually
+ * addressable to be individually filletable.
+ */
+export function edgesToThree(THREE: typeof import('three'), oc: Occt, shape: any): EdgePick[] {
+  return uniqueEdgesOf(oc, shape).map((edge) => ({
+    edge,
+    geometry: edgeToThreeGeometry(THREE, oc, edge),
+  }));
+}

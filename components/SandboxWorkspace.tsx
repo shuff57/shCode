@@ -22,15 +22,17 @@ import ModelEditor from './model/ModelEditor';
 // replaces it. The tie is the good news -- the removal costs nothing.
 //
 // What it buys that regl structurally cannot: a Raycaster, so a student can
-// click a FACE (the whole point of a B-rep is that faces have names -- ModelDoc
-// already stores `edge: TopoName` for a fillet and only the picking is missing),
-// and world-to-screen projection, which is what the sandboxed iframe is
-// currently doing on our behalf to place drag handles.
-import BrepViewport, { type BrepViewportStats } from './model/BrepViewportThree';
+// click a face or edge -- the whole point of a B-rep is that they have names,
+// and BrepViewportThree's onPick/pick below (wired to `pickedEdge` here and
+// to ModelEditor's Round/Bevel) is that picking, now built -- and world-to-
+// screen projection, which is what the sandboxed iframe still does on our
+// behalf to place drag handles.
+import BrepViewport, { type BrepViewportStats, type ViewportPick } from './model/BrepViewportThree';
 import HandleOverlay, { type AnchorPoint, type SketchOutline } from './model/HandleOverlay';
 import { outlineOf } from '../lib/sketch-arc';
 import { handlesFor, planeAnchor } from '../lib/model-handles';
 import { EMPTY_DOC, type Feature, type ModelDoc, newPolygonSketch, newRectangleSketch } from '../lib/model-types';
+import type { TopoName } from '../lib/topo-name';
 import {
   applyParam,
   paramValues as docParams,
@@ -124,6 +126,10 @@ export default function SandboxWorkspace() {
   }, []);
   const [doc, setDoc] = useState<ModelDoc>(EMPTY_DOC);
   const [selected, setSelected] = useState<string[]>([]);
+  // An edge picked in the B-rep viewport (BrepViewportThree's onPick), lifted
+  // here for the same reason `selected` is: ModelEditor's Round/Bevel needs
+  // it, and the viewport that produced it is a sibling, not a parent.
+  const [pickedEdge, setPickedEdge] = useState<{ target: string; edge: TopoName | null } | null>(null);
   // Rollback bar: the boundary index (0..features.length) past which features
   // are suppressed from the rebuilt model. null means "show everything". This
   // is a view change, not a structural edit -- see the effect below.
@@ -933,6 +939,8 @@ export default function SandboxWorkspace() {
                 collapsible
                 onCollapsed={setToolsHidden}
                 onContentChange={setCardHasContent}
+                pickedEdge={pickedEdge}
+                onClearPickedEdge={() => setPickedEdge(null)}
               />
             ) : (
               <CodeEditor />
@@ -981,6 +989,23 @@ export default function SandboxWorkspace() {
                         setRebuildMs(Math.round(st.buildMs + st.meshMs + st.drawMs));
                         setStale(st.triangles > 0 ? null : 'empty');
                       }}
+                      onPick={(p: ViewportPick | null) => {
+                        // Picking a face or an edge also selects its owning
+                        // shape, the same as clicking its row in the feature
+                        // list -- Round/Bevel's existing `chosen.length === 1`
+                        // gate then just works, with no separate edge-aware
+                        // gate to keep in sync. Clicking empty space clears
+                        // both, matching Onshape's own click-away-to-deselect.
+                        if (!p) {
+                          setSelected([]);
+                          setPickedEdge(null);
+                          return;
+                        }
+                        setSelected([p.target]);
+                        setPickedEdge(p.kind === 'edge' ? { target: p.target, edge: p.name } : null);
+                      }}
+                      pick={pickedEdge?.edge ? { target: pickedEdge.target, name: pickedEdge.edge } : null}
+                      selectedCount={selected.length}
                     />
                   ) : (
                     <ReshapePreview

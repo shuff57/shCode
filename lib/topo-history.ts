@@ -178,10 +178,30 @@ function uvRange(oc: Occt, face: any): { u0: number; u1: number; v0: number; v1:
 // left and right pieces at 40, 70 and 26 wide. A fraction is also what a person
 // means by "the left one" -- a relative position on the face -- where a raw
 // parameter means "so many millimetres from an arbitrary corner", which nobody
-// means. It has a failure mode of its own and it is worth naming: a face that
-// grows while the feature splitting it stays put will eventually drag the
-// fraction off the intended piece. That is the case where the answer is null,
-// and null is the honest answer.
+// means.
+//
+// It has a failure mode of its own, and it is worth being precise about which
+// one -- an earlier version of this note claimed only the honest half. A face
+// that shrinks relative to the feature splitting it -- because it genuinely
+// shrinks, or because it SLIDES past a cut that does not move, which looks
+// identical from the face's own local frame -- drags the fraction toward and
+// eventually off the intended piece. Off the edge of the piece into the
+// material the cut removed, the answer is null, and that half was always
+// honest. But push far enough and the SAME fraction can walk clean through
+// that gap and land inside the SIBLING piece instead -- a confident, wrong
+// answer, not a null one. Measured, not hypothetical: a box translating past
+// a fixed groove does exactly this once it has moved about a third of the
+// groove's own width beyond centre.
+//
+// That is why the 'split' cause carries a second field, `side` (see its own
+// doc comment in lib/topo-name.ts), independent of the fraction: which
+// extreme of which axis the chosen piece sat at among its siblings when the
+// name was written. A piece the fraction finds has to ALSO still be that
+// extreme among its current siblings, or the answer is null instead of the
+// wrong piece -- see pushThrough() in lib/topo-resolve.ts. With that check in
+// place the sentence above is true without qualification: every way this
+// discriminator can miss now lands on null, never on a piece that was not
+// meant.
 
 /** Where a world point sits on a face, as a fraction of that face's own
  *  parameter range. Null if it does not lie on the face's surface. */
