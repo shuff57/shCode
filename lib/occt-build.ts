@@ -21,6 +21,8 @@
 // generated declarations for thirty functions.
 
 import type { Feature, ModelDoc, RoundStyle, Vec3 } from './model-types';
+import { nameMap } from './model-types';
+import { whyNameLost } from './topo-name';
 import { chamfered, drafted, edgeThrough, filleted } from './topo-history';
 import { facesOf, resolveName, resolveNameAsUsedBy, resolvePrimitiveFace } from './topo-resolve';
 
@@ -90,6 +92,27 @@ export interface BuildResult {
   shapes: Map<string, any>;
   ops: Map<string, OpRecord[]>;
   sweeps: Map<string, SweepRecord>;
+  /**
+   * Why a feature that IS in `shapes` is not what its document row asked
+   * for -- a fillet whose radius did not fit, an edge name that no longer
+   * resolves. Keyed by the feature's own id, sentence in words a student
+   * can act on.
+   *
+   * Optional, and the callers inside this file's own loop that build a
+   * `partial: BuildResult` to resolve a name against never set it -- none of
+   * resolveName()/resolveNameAsUsedBy() read it, so there is nothing to
+   * carry there. Only the RETURNED BuildResult from buildDoc() is ever
+   * expected to have entries in it.
+   *
+   * The absence of an id here is not itself a claim that the feature built
+   * cleanly -- a feature that was never reachable at all (its own target
+   * missing) has no shape AND no refusal, same as before this field existed.
+   * This only covers refusals this file now catches rather than swallows:
+   * currently the per-edge `fillet` feature. See its own comment in
+   * buildDoc() for why whole-shape Round on a primitive is deliberately
+   * NOT covered here and throws instead.
+   */
+  refusals?: Map<string, string>;
 }
 
 /** One outline segment and a point known to lie on it, in world coordinates.
@@ -465,6 +488,22 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
   const built = new Map<string, any>();
   const ops = new Map<string, OpRecord[]>();
   const sweeps = new Map<string, SweepRecord>();
+  // Half A of the silent-fillet-refusal fix: something has to notice a
+  // refusal and say why, in the words this repo already uses elsewhere
+  // (whyNotOnJscad, whyCannotRound, whyCannotRoundCorner). These three are
+  // exactly what whyNameLost() itself needs and nothing more -- computed
+  // once here because they only depend on `doc`, not on anything built so
+  // far, and every fillet in the loop below can share them.
+  const refusals = new Map<string, string>();
+  const names = nameMap(doc);
+  const label = (id: string): string => names[id] ?? id;
+  const featureExists = (id: string): boolean => doc.features.some((x) => x.id === id);
+  const sketchEdgeCount = (id: string): number | null => {
+    const sk = doc.features.find((x) => x.id === id);
+    // A closed outline has as many design edges as design corners -- see the
+    // same rule in whyNameLost()'s own doc comment in lib/topo-name.ts.
+    return sk && sk.kind === 'sketch' ? sk.points.length : null;
+  };
   /** Filled by the sketch branch, read by the extrude branch. The profile face
    *  is built once and only once -- rebuilding it to get the marks would be two
    *  copies of the same derivation, free to drift apart. */
@@ -588,15 +627,54 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
       // it). See the 'move' branch below for why that gap existed and how
       // it is closed.
       const edge = src ? resolveNameAsUsedBy(oc, f.edge, partial, f.target) : null;
-      if (src && edge) {
-        shape = f.style === 'chamfer'
-          ? chamfered(oc, src, edge, f.size)
-          : filleted(oc, src, edge, f.size);
+      // Was: a null edge, or a size the edge cannot take, left `shape` null
+      // and the feature silently absent -- "the caller's to report", except
+      // no caller ever did (grepped: whyNameLost() is referenced in five
+      // comments and called from zero components or lib files). The
+      // catastrophe this produced: topLevel() in lib/model-types.ts marks
+      // `f.target` consumed PURELY STRUCTURALLY, with no idea whether the
+      // fillet actually built, so a refused fillet took its own target out
+      // of the running while contributing nothing itself -- a part with one
+      // too-large radius vanished from the viewport with no explanation.
+      //
+      // TWO DIFFERENT REFUSALS, two different sentences, on purpose: naming
+      // a lost face when the real problem is a size that does not fit would
+      // send a student looking for a face that is still there.
+      if (src) {
+        if (edge) {
+          shape = f.style === 'chamfer'
+            ? chamfered(oc, src, edge, f.size)
+            : filleted(oc, src, edge, f.size);
+          if (!shape) {
+            // The name resolved to a real edge; the KERNEL refused the
+            // operation on it (radius/distance too big for that edge). Not
+            // a lost name -- whyNameLost() would be the wrong sentence here.
+            const verb = f.style === 'chamfer' ? 'Chamfering' : 'Rounding';
+            refusals.set(
+              f.id,
+              `${verb} ${label(f.id)} at ${f.size} would not fit its edge -- `
+                + `${label(f.id)} is shown without it.`,
+            );
+          }
+        } else {
+          // The NAME itself is lost -- a feature or sketch edge it pointed
+          // at is gone. whyNameLost() already knows the words for this; it
+          // was simply never called.
+          const why = whyNameLost(f.edge, featureExists, sketchEdgeCount, label);
+          refusals.set(
+            f.id,
+            why ?? `${label(f.id)}'s edge could not be found -- ${label(f.id)} is shown without it.`,
+          );
+        }
+        // Half B: do not take the target down with a refused feature. The
+        // student's actual part -- unrounded, but present -- is a strictly
+        // better resting state than an empty viewport, and it is what makes
+        // the sentence above land somewhere: a reason attached to a shape
+        // nobody can see helps nobody. This is the fillet feature's OWN
+        // built.shapes entry, so it is exactly what topLevel() already
+        // expects to find there -- no change needed in lib/model-types.ts.
+        if (!shape) shape = src;
       }
-      // A null edge, or a size the edge cannot take, leaves `shape` null and
-      // the feature absent from the build. That is the same refusal every
-      // other unresolvable name gets, and it is the caller's to report --
-      // whyNameLost() in lib/topo-name.ts says which face went.
     } else if (f.kind === 'draft') {
       const src = built.get(f.target);
       const axis: Vec3 = f.pull === 'x' ? [1, 0, 0] : f.pull === 'y' ? [0, 1, 0] : [0, 0, 1];
@@ -696,7 +774,7 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
     }
     if (shape) built.set(f.id, shape);
   }
-  return { shapes: built, ops, sweeps };
+  return { shapes: built, ops, sweeps, refusals };
 }
 
 /** Volume and bounding box, straight from the kernel. Exact for curved

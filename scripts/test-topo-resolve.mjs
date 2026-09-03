@@ -814,8 +814,15 @@ try {
     // replaced that corner with a fillet FACE, and the two named faces are
     // no longer adjacent. resolveName's existing sharedEdge() check (exactly
     // one shared edge, or refuse) already covers this with no special case
-    // needed: the edge-targeted fillet feature correctly comes out ABSENT
-    // from the build rather than double-rounding or crashing.
+    // needed.
+    //
+    // UPDATED for the silent-fillet-refusal fix below (item 13): a null
+    // edge from resolveName is now one of the two refusals that fix
+    // reports and survives -- so `f1` comes out PRESENT, as a pass-through
+    // of the whole-rounded box (unchanged, not double-rounded), with a
+    // lost-name reason recorded. This test originally asserted `f1` was
+    // ABSENT, which was correct for the old (silent) behaviour and is
+    // exactly the resting state item 13 replaces.
     const edgeName = {
       cause: 'between', feature: 'b1', kind: 'edge',
       of: [
@@ -834,13 +841,150 @@ try {
     try { built = adapter.buildDoc(oc, doc, arc); } catch (e) { threw = e; }
     const b1Shape = built ? built.shapes.get('b1') : null;
     const f1Shape = built ? built.shapes.get('f1') : null;
+    const f1Reason = built && built.refusals ? built.refusals.get('f1') : undefined;
     console.log('  build threw?           ' + (threw ? 'yes -- ' + (threw.message || threw) : 'no'));
     console.log('  b1 (whole-rounded box) ' + (b1Shape ? adapter.measureShape(oc, b1Shape).volume : 'absent'));
     console.log('  f1 (named-edge fillet) ' + (f1Shape ? adapter.measureShape(oc, f1Shape).volume : 'absent'));
+    console.log('  f1 reason              ' + JSON.stringify(f1Reason));
     check('interaction: the whole-rounded box still builds',
       !threw && !!b1Shape, threw ? (threw.message || String(threw)) : 'b1 missing from built.shapes');
-    check('interaction: the now-unreachable named-edge fillet refuses (absent), rather than crashing or double-rounding',
-      !threw && !f1Shape, f1Shape ? 'f1 built when its named edge should no longer exist' : undefined);
+    check('interaction: the now-unreachable named-edge fillet survives as the unchanged rounded box, with a reason',
+      !threw && !!f1Shape && Math.abs(adapter.measureShape(oc, f1Shape).volume - adapter.measureShape(oc, b1Shape).volume) <= 1e-3
+        && typeof f1Reason === 'string' && f1Reason.length > 0,
+      f1Shape ? `f1 volume ${adapter.measureShape(oc, f1Shape).volume} vs b1 ${b1Shape ? adapter.measureShape(oc, b1Shape).volume : 'n/a'}, reason ${JSON.stringify(f1Reason)}`
+        : 'f1 is absent from built.shapes');
+  }
+
+  // ======================================================================
+  // 13. SILENT FILLET REFUSAL -- lib/occt-build.ts's own comment above the
+  //    fillet branch documented a deliberate design: a null edge, or a size
+  //    the edge cannot take, leaves the feature absent from the build, and
+  //    "it is the caller's to report -- whyNameLost() ... says which face
+  //    went." Nobody ever called it. No component and no lib file did.
+  //
+  //    THE CATASTROPHE. topLevel() in lib/model-types.ts marks a fillet's
+  //    TARGET consumed purely structurally -- it never checks whether the
+  //    fillet actually built. So a refused fillet takes its own target out
+  //    of the running (consumed) while contributing nothing itself (absent
+  //    from built.shapes): a box with one fillet feature whose radius does
+  //    not fit ends the whole build with ZERO top-level shapes. A student
+  //    who drags a radius one notch too far watches their entire part
+  //    disappear with no explanation.
+  //
+  //    TWO DIFFERENT REFUSALS, two different sentences -- conflating them
+  //    would send a student looking for a face that is still there:
+  //      - the NAME does not resolve (a feature or sketch edge it pointed
+  //        at is gone) -- whyNameLost()'s job exactly, and it already knows
+  //        the words.
+  //      - the name resolves FINE and the KERNEL refuses the operation (a
+  //        radius too big for the edge) -- not a lost name at all, so a
+  //        different sentence naming the size instead.
+  //    Both leave the UNCHANGED source shape in place of the failed one
+  //    (built.shapes still gets an entry for the fillet's own id) rather
+  //    than taking the part down with the feature -- checked here by volume,
+  //    the same reason every other case in this file checks geometry rather
+  //    than trusting a document field.
+  // ======================================================================
+  console.log('\n=== silent fillet refusal: kernel refuses a resolved edge (radius too big) ===');
+  {
+    // 10x10x10 box, radius 20 on one edge -- nowhere close to fitting.
+    const doc = {
+      version: 1,
+      features: [
+        { id: 'b1', kind: 'box', size: [10, 10, 10], center: [0, 0, 0] },
+        {
+          id: 'f1', kind: 'fillet', target: 'b1', size: 20, style: 'fillet',
+          edge: {
+            cause: 'between', feature: 'b1', kind: 'edge',
+            of: [
+              { cause: 'primitive', feature: 'b1', kind: 'face', part: '+x' },
+              { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' },
+            ],
+          },
+        },
+      ],
+    };
+    const built = adapter.buildDoc(oc, doc, arc);
+    const shape = built.shapes.get('f1');
+    const reason = built.refusals ? built.refusals.get('f1') : undefined;
+    console.log('  f1 present?     ' + (shape ? 'yes' : 'no'));
+    console.log('  f1 volume       ' + (shape ? adapter.measureShape(oc, shape).volume : 'n/a'));
+    console.log('  reason          ' + JSON.stringify(reason));
+    check('kernel-refused fillet: the part survives, sharp, in place of the failed round',
+      !!shape && Math.abs(adapter.measureShape(oc, shape).volume - 1000) <= 1e-6,
+      shape ? `volume ${adapter.measureShape(oc, shape).volume}, want 1000 (unrounded 10x10x10)` : 'f1 is absent from built.shapes');
+    check('kernel-refused fillet: a reason is reported, and it names the SIZE, not a lost face',
+      typeof reason === 'string' && /fit|radius|size|20/i.test(reason) && !/no longer in the model/i.test(reason),
+      'got: ' + JSON.stringify(reason));
+  }
+
+  console.log('\n=== silent fillet refusal: the edge name itself cannot resolve (genuinely lost) ===');
+  {
+    // The edge name points at a feature ('ghost') that does not exist in the
+    // document at all -- the OTHER refusal, and it must read differently
+    // from the size-refusal case above: whyNameLost() names what went.
+    const doc = {
+      version: 1,
+      features: [
+        { id: 'b1', kind: 'box', size: [10, 10, 10], center: [0, 0, 0] },
+        {
+          id: 'f1', kind: 'fillet', target: 'b1', size: 1, style: 'fillet',
+          edge: {
+            cause: 'between', feature: 'b1', kind: 'edge',
+            of: [
+              { cause: 'primitive', feature: 'ghost', kind: 'face', part: '+x' },
+              { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' },
+            ],
+          },
+        },
+      ],
+    };
+    const built = adapter.buildDoc(oc, doc, arc);
+    const shape = built.shapes.get('f1');
+    const reason = built.refusals ? built.refusals.get('f1') : undefined;
+    console.log('  f1 present?     ' + (shape ? 'yes' : 'no'));
+    console.log('  f1 volume       ' + (shape ? adapter.measureShape(oc, shape).volume : 'n/a'));
+    console.log('  reason          ' + JSON.stringify(reason));
+    check('lost-name fillet: the part survives, sharp, in place of the failed round',
+      !!shape && Math.abs(adapter.measureShape(oc, shape).volume - 1000) <= 1e-6,
+      shape ? `volume ${adapter.measureShape(oc, shape).volume}, want 1000` : 'f1 is absent from built.shapes');
+    check('lost-name fillet: the reason names the LOST FACE, and reads differently from the size-refusal case',
+      typeof reason === 'string' && /no longer in the model|ghost/i.test(reason) && !/fit/i.test(reason),
+      'got: ' + JSON.stringify(reason));
+  }
+
+  console.log('\n=== silent fillet refusal: the previously-catastrophic case, checked the way the viewport actually renders ===');
+  {
+    // Same fixture as the size-refusal case: a box whose ONLY top-level
+    // feature (per topLevel()) is the fillet -- the box itself is consumed
+    // by it, structurally, whether or not the fillet actually builds. This
+    // is the exact path BrepViewport*.tsx walks to decide what to draw:
+    // topLevel(doc).map(f => built.shapes.get(f.id)).filter(Boolean).
+    const doc = {
+      version: 1,
+      features: [
+        { id: 'b1', kind: 'box', size: [10, 10, 10], center: [0, 0, 0] },
+        {
+          id: 'f1', kind: 'fillet', target: 'b1', size: 20, style: 'fillet',
+          edge: {
+            cause: 'between', feature: 'b1', kind: 'edge',
+            of: [
+              { cause: 'primitive', feature: 'b1', kind: 'face', part: '+x' },
+              { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' },
+            ],
+          },
+        },
+      ],
+    };
+    const built = adapter.buildDoc(oc, doc, arc);
+    const rendered = model.topLevel(doc)
+      .map((f) => built.shapes.get(f.id))
+      .filter(Boolean);
+    console.log('  topLevel() feature ids   ' + JSON.stringify(model.topLevel(doc).map((f) => f.id)));
+    console.log('  shapes the viewport would actually draw: ' + rendered.length);
+    check('the previously-catastrophic case: a refused fillet does not empty the viewport',
+      rendered.length > 0,
+      'topLevel() -> built.shapes produced ZERO drawable shapes, which is the exact bug reported');
   }
 
   // ======================================================================
