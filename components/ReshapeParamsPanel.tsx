@@ -70,6 +70,24 @@ function settle(n: number, d: ParamDef) {
   return v;
 }
 
+// Range-only half of settle(), for the live keystroke below. No step-rounding
+// here: quantizing mid-type would fight a student still typing a value like
+// 7.37 into a step:1 field, which settle()'s own comment already refuses to
+// do "on the way out." What DOES need to happen live is min/max -- without it,
+// a typed -10 gets pushed to the model exactly as typed (a beginner's build
+// showed the box render as if width were 10, not -10 or 1: the sign silently
+// vanished somewhere past this panel), while the text box still reads "-10"
+// until the field is blurred. Clamping the PUSHED value, not the DRAFT text,
+// keeps typing "-10" character by character possible -- the box on screen
+// just tracks the model's real, in-range value the whole time instead of a
+// value nothing downstream actually honors.
+function clampRange(v: number, d: ParamDef) {
+  let r = v;
+  if (typeof d.min === 'number') r = Math.max(d.min, r);
+  if (typeof d.max === 'number') r = Math.min(d.max, r);
+  return r;
+}
+
 export default function ReshapeParamsPanel({
   defs, values, onChange, onCommit, lastMs, stale, emptyMessage, notice,
 }: Props) {
@@ -249,7 +267,11 @@ export default function ReshapeParamsPanel({
                   const v = Number(t);
                   // Push only what parses. An empty or half-typed box leaves the
                   // model exactly as it was rather than collapsing it to zero.
-                  if (t.trim() !== '' && Number.isFinite(v)) push(d.name, v);
+                  // The pushed value is range-clamped (clampRange, not the
+                  // full settle()) so the shape on screen never diverges from
+                  // what the text box will settle to on blur -- see
+                  // clampRange's own comment.
+                  if (t.trim() !== '' && Number.isFinite(v)) push(d.name, clampRange(v, d));
                 }}
                 onBlur={() => {
                   // Clamp on the way out, never mid-keystroke: snapping while
