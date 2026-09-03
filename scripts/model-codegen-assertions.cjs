@@ -1457,7 +1457,9 @@ module.exports = function run(dir) {
       // 0.5 from 0.5: the stops must include every whole and half number,
       // or a student typing 3 lands on 3.1 (measured 2026-09-03).
       sizeParam !== undefined && sizeParam.min === 0.5 && sizeParam.step === 0.5
-        && sizeParam.max === types.maxRound(box('b1')) && sizeParam.max >= fillet.size,
+        // The ceiling sits on the 0.5 grid (9.5 for a 20-tall box, not 9.99),
+        // so a typed oversize value and the slider agree.
+        && sizeParam.max === Math.floor(types.maxRound(box('b1')) / 0.5) * 0.5 && sizeParam.max >= fillet.size,
       sizeParam && JSON.stringify(sizeParam));
 
     const moved = gen.applyParam(filletDoc, 'r1_size', 7);

@@ -164,7 +164,9 @@ export function generatedParams(doc: ModelDoc): GeneratedParam[] {
         // slider can land on; from 0.1 the stops were 0.1, 0.6, 1.1 ... and
         // typing 3 snapped to 3.1 with no warning.
         min: 0.5,
-        max: Math.max(ceiling, f.size),
+        // On the step grid, or a typed 15 clamps the text box to 9.99 while
+        // the slider beside it sits on 9.5 (measured 2026-09-03).
+        max: Math.max(Math.floor(ceiling / 0.5) * 0.5, f.size),
         step: 0.5,
       });
     }
