@@ -252,9 +252,29 @@ export async function resolveOpenForStudent(
   return earliest;
 }
 
+// Every lesson id this student has a standing early-access grant for
+// (lesson_access_overrides, 0024), across every class they are CURRENTLY
+// enrolled in. Joined against enrollments the same way loadStudentDueRows
+// scopes by e.expires_at — a grant made by a class the student has since
+// left (or that expired at the school-year rollover) stops applying rather
+// than lingering as an orphaned bypass.
+export async function loadStudentLessonOverrides(db: D1Database, email: string): Promise<Set<string>> {
+  const result = await db
+    .prepare(
+      `SELECT DISTINCT o.lesson_id AS lesson_id
+         FROM lesson_access_overrides o
+         JOIN enrollments e ON e.class_id = o.class_id AND e.student_email = o.student_email
+        WHERE o.student_email = ? AND e.expires_at > ?`,
+    )
+    .bind(email, Date.now())
+    .all<{ lesson_id: string }>();
+  return new Set((result.results ?? []).map((r) => r.lesson_id));
+}
+
 // True when the student may open this lesson right now, as far as the
-// "available after" gate is concerned. The sequential green-to-advance rule
-// is a separate, independent gate — both must pass.
+// "available after" gate is concerned. An override grant short-circuits the
+// open-date check entirely. The sequential green-to-advance rule is a
+// separate, independent gate — both must pass.
 export async function isLessonAvailableForStudent(
   env: DueEnv,
   request: Request,
@@ -262,5 +282,7 @@ export async function isLessonAvailableForStudent(
   lessonId: string,
   now: number = Date.now(),
 ): Promise<boolean> {
+  const overrides = await loadStudentLessonOverrides(env.DB, email);
+  if (overrides.has(lessonId)) return true;
   return isAvailable(await resolveOpenForStudent(env, request, email, lessonId), now);
 }

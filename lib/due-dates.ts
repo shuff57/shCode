@@ -47,6 +47,8 @@ export interface DueDatesSnapshot {
   loaded: boolean;
   authed: boolean;
   classes: ClassDue[];
+  /** Lesson ids this student has a standing early-access grant for. */
+  overrides: Set<string>;
 }
 
 export interface ResolvedDue {
@@ -56,7 +58,7 @@ export interface ResolvedDue {
   ambiguous: boolean;
 }
 
-const empty: DueDatesSnapshot = { loaded: false, authed: false, classes: [] };
+const empty: DueDatesSnapshot = { loaded: false, authed: false, classes: [], overrides: new Set() };
 let cache: DueDatesSnapshot = empty;
 let inflight: Promise<DueDatesSnapshot> | null = null;
 const subs = new Set<(s: DueDatesSnapshot) => void>();
@@ -83,9 +85,9 @@ export interface ResolvedOpen {
 async function load(): Promise<DueDatesSnapshot> {
   try {
     const res = await fetch('/api/my-due-dates', { credentials: 'include' });
-    if (res.status === 401) return { loaded: true, authed: false, classes: [] };
+    if (res.status === 401) return { loaded: true, authed: false, classes: [], overrides: new Set() };
     if (!res.ok) throw new Error(`my-due-dates GET ${res.status}`);
-    const data = (await res.json()) as { classes?: ApiClass[] };
+    const data = (await res.json()) as { classes?: ApiClass[]; overrides?: string[] };
     return {
       loaded: true,
       authed: true,
@@ -95,13 +97,14 @@ async function load(): Promise<DueDatesSnapshot> {
         index: buildDueIndex(c.rows ?? []),
         openIndex: buildOpenIndex(c.openRows ?? []),
       })),
+      overrides: new Set(data.overrides ?? []),
     };
   } catch {
     // A due date is advisory and an open date is a gate, but both fail the
     // same way on purpose: no classes means no dates, which means no badges
     // and nothing locked. A network blip must never seal a student out of
     // work they can already see.
-    return { loaded: true, authed: false, classes: [] };
+    return { loaded: true, authed: false, classes: [], overrides: new Set() };
   }
 }
 
@@ -240,6 +243,14 @@ export function lessonAvailability(
   // Not loaded yet = don't lock. Locking on an unloaded snapshot would flash
   // a lock on every lesson on every cold page load.
   if (!snap.loaded) return ALWAYS_AVAILABLE;
+  // A per-student grant (lesson_access_overrides) short-circuits the open
+  // date entirely — that is the whole point of it. openAt is still reported
+  // when one resolves, so a card can show "opens Sep 15" struck through or
+  // similar rather than looking like nothing was ever locked here.
+  if (snap.overrides.has(lessonId)) {
+    const open = resolveOpen(snap, lessonId, moduleId, unitId);
+    return { available: true, openAt: open?.openAt ?? null, className: open?.className, ambiguous: false };
+  }
   const open = resolveOpen(snap, lessonId, moduleId, unitId);
   if (!open) return ALWAYS_AVAILABLE;
   return {

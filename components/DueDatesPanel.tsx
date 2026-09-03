@@ -26,6 +26,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ChevronDown, ChevronRight, X } from 'lucide-react';
+import LessonAccessChip from './LessonAccessChip';
 import {
   buildDueIndex,
   buildOpenIndex,
@@ -497,6 +498,8 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                             onClear={() => { void write('due', [{ scope: 'lesson', scopeId: lesson.id, date: null }]); }}
                             ariaSuffix={lesson.title}
                           />
+
+                          <LessonAccessChip classId={classId} lessonId={lesson.id} lessonTitle={lesson.title} />
                         </div>
                       );
                     })}
