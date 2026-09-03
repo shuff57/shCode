@@ -1042,6 +1042,143 @@ try {
   }
 
   // ======================================================================
+  // 14. SILENT DRAFT REFUSAL -- the identical hole, in draft's single
+  //    NAMED-FACE branch (f.kind === 'draft', the `else if (src && f.face)`
+  //    arm). Same two causes, same two sentences, same pass-through --
+  //    reusing every helper item 13 built rather than inventing a second
+  //    mechanism: the SAME `refusals` map, `label`/`featureExists`/
+  //    `sketchEdgeCount`, the SAME whyNameLost() call.
+  //
+  //    THE ONE WORDING RULE THAT MATTERS: a draft's kernel refusal must NOT
+  //    reuse the fillet's "would not fit its edge" wording with the number
+  //    swapped -- a draft has no edge, it has an ANGLE on a FACE. Reusing
+  //    fillet's words would send a student looking for an edge that was
+  //    never involved. This is checked below the same way item 13 checked
+  //    fillet's two sentences: by regex, both directions.
+  //
+  //    THE `whole` VARIANT (Body Draft, every side face) does NOT have this
+  //    hole, and it is worth saying why rather than assuming: it resolves NO
+  //    NAME at all -- it walks facesOf(oc, src) directly, so whyNameLost()
+  //    has nothing to apply to -- and it can never produce a null `shape`,
+  //    because it starts `cur = src` and only ever advances `cur` on a face
+  //    that succeeds; a face that refuses just costs that face (the file's
+  //    own existing comment already says so). Worst case, every face
+  //    refuses and the result is `src` unchanged -- present, inert, exactly
+  //    the resting state item 13/14 deliberately produce for the named
+  //    cases, arrived at for free. Not tested here because there is nothing
+  //    to provoke: no name to lose, no single kernel call whose refusal
+  //    could ever leave `shape` null.
+  // ======================================================================
+
+  /** Volume of a box (W x D x H) with its +x face drafted by `angleDeg`,
+   *  pulled along +z from a neutral plane at the box's own bottom (-H/2) --
+   *  independent of the resolver: the drafted face is a slanted plane, so
+   *  the solid is a trapezoidal prism whose cross-section at height h above
+   *  neutral has x-extent (W - h*tan(angle)); integrating over h from 0 to H
+   *  gives D*(W*H - tan(angle)*H^2/2). Verified against the kernel to 10
+   *  significant figures before being trusted (29088.238125870386 measured,
+   *  29088.23812587038 predicted, at W=D=40, H=20, angle=20). */
+  function draftedBoxVolume(W, D, H, angleDeg) {
+    const rad = (angleDeg * Math.PI) / 180;
+    return D * (W * H - (Math.tan(rad) * H * H) / 2);
+  }
+
+  const draftFaceName = { cause: 'primitive', feature: 'b1', kind: 'face', part: '+x' };
+  const boxForDraftTests = { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] };
+
+  console.log('\n=== silent draft refusal: kernel refuses a resolved face (angle too steep) ===');
+  {
+    // 80 degrees on the box's +x face -- MEASURED refused (IsDone() false
+    // via BRepOffsetAPI_DraftAngle), not derived from a formula. 70 through
+    // 89 all refuse on this fixture; 80 is comfortably inside that band.
+    const doc = {
+      version: 1,
+      features: [boxForDraftTests, { id: 'f1', kind: 'draft', target: 'b1', face: draftFaceName, angle: 80, pull: 'z', neutral: -10 }],
+    };
+    const built = adapter.buildDoc(oc, doc, arc);
+    const shape = built.shapes.get('f1');
+    const reason = built.refusals ? built.refusals.get('f1') : undefined;
+    console.log('  f1 present?     ' + (shape ? 'yes' : 'no'));
+    console.log('  f1 volume       ' + (shape ? adapter.measureShape(oc, shape).volume : 'n/a'));
+    console.log('  reason          ' + JSON.stringify(reason));
+    check('kernel-refused draft: the part survives, sharp, in place of the failed tilt',
+      !!shape && Math.abs(adapter.measureShape(oc, shape).volume - 40 * 40 * 20) <= 1e-6,
+      shape ? `volume ${adapter.measureShape(oc, shape).volume}, want ${40 * 40 * 20}` : 'f1 is absent from built.shapes');
+    check('kernel-refused draft: the reason names the ANGLE, not an edge, and not a lost face',
+      typeof reason === 'string' && /degree|angle|80/i.test(reason)
+        && !/no longer in the model/i.test(reason) && !/\bedge\b/i.test(reason),
+      'got: ' + JSON.stringify(reason));
+  }
+
+  console.log('\n=== silent draft refusal: a GENEROUS angle must still succeed ===');
+  {
+    // The complement, same reason item 13 needed one: a fix that refused
+    // every draft would pass every check above and fail only this one.
+    const angle = 20;
+    const wantVol = draftedBoxVolume(40, 40, 20, angle);
+    const doc = {
+      version: 1,
+      features: [boxForDraftTests, { id: 'f1', kind: 'draft', target: 'b1', face: draftFaceName, angle, pull: 'z', neutral: -10 }],
+    };
+    const built = adapter.buildDoc(oc, doc, arc);
+    const shape = built.shapes.get('f1');
+    const reason = built.refusals ? built.refusals.get('f1') : undefined;
+    const gotVol = shape ? adapter.measureShape(oc, shape).volume : null;
+    console.log('  f1 present?     ' + (shape ? 'yes' : 'no'));
+    console.log('  f1 volume       ' + gotVol);
+    console.log('  predicted (independent of the resolver)  ' + wantVol.toFixed(4));
+    console.log('  reason          ' + JSON.stringify(reason));
+    check('generous-angle draft: actually builds the tilt, not the sharp fallback',
+      gotVol !== null && Math.abs(gotVol - wantVol) <= 1e-3,
+      gotVol === null ? 'f1 is absent from built.shapes' : `got ${gotVol}\n        want ${wantVol.toFixed(4)}`);
+    check('generous-angle draft: no refusal recorded for an angle that actually worked',
+      reason === undefined, 'got a refusal for an angle that built fine: ' + JSON.stringify(reason));
+  }
+
+  console.log('\n=== silent draft refusal: the face name itself cannot resolve (genuinely lost) ===');
+  {
+    const doc = {
+      version: 1,
+      features: [
+        boxForDraftTests,
+        {
+          id: 'f1', kind: 'draft', target: 'b1', angle: 20, pull: 'z', neutral: -10,
+          face: { cause: 'primitive', feature: 'ghost', kind: 'face', part: '+x' },
+        },
+      ],
+    };
+    const built = adapter.buildDoc(oc, doc, arc);
+    const shape = built.shapes.get('f1');
+    const reason = built.refusals ? built.refusals.get('f1') : undefined;
+    console.log('  f1 present?     ' + (shape ? 'yes' : 'no'));
+    console.log('  f1 volume       ' + (shape ? adapter.measureShape(oc, shape).volume : 'n/a'));
+    console.log('  reason          ' + JSON.stringify(reason));
+    check('lost-name draft: the part survives, sharp, in place of the failed tilt',
+      !!shape && Math.abs(adapter.measureShape(oc, shape).volume - 40 * 40 * 20) <= 1e-6,
+      shape ? `volume ${adapter.measureShape(oc, shape).volume}, want ${40 * 40 * 20}` : 'f1 is absent from built.shapes');
+    check('lost-name draft: the reason names the LOST FACE, and reads differently from the angle-refusal case',
+      typeof reason === 'string' && /no longer in the model|ghost/i.test(reason) && !/degree|angle/i.test(reason),
+      'got: ' + JSON.stringify(reason));
+  }
+
+  console.log('\n=== silent draft refusal: the previously-catastrophic case, checked the way the viewport actually renders ===');
+  {
+    const doc = {
+      version: 1,
+      features: [boxForDraftTests, { id: 'f1', kind: 'draft', target: 'b1', face: draftFaceName, angle: 80, pull: 'z', neutral: -10 }],
+    };
+    const built = adapter.buildDoc(oc, doc, arc);
+    const rendered = model.topLevel(doc)
+      .map((f) => built.shapes.get(f.id))
+      .filter(Boolean);
+    console.log('  topLevel() feature ids   ' + JSON.stringify(model.topLevel(doc).map((f) => f.id)));
+    console.log('  shapes the viewport would actually draw: ' + rendered.length);
+    check('the previously-catastrophic case: a refused draft does not empty the viewport',
+      rendered.length > 0,
+      'topLevel() -> built.shapes produced ZERO drawable shapes');
+  }
+
+  // ======================================================================
   // Causes this file does NOT exercise, and why.
   // ======================================================================
   skip("'made' (a face an operation invents from nothing)",

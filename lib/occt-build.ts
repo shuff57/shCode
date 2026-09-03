@@ -94,9 +94,26 @@ export interface BuildResult {
   sweeps: Map<string, SweepRecord>;
   /**
    * Why a feature that IS in `shapes` is not what its document row asked
-   * for -- a fillet whose radius did not fit, an edge name that no longer
-   * resolves. Keyed by the feature's own id, sentence in words a student
-   * can act on.
+   * for -- a fillet whose radius did not fit, a draft angle too steep, an
+   * edge or face name that no longer resolves. Keyed by the feature's own
+   * id, sentence in words a student can act on.
+   *
+   * THIS FIELD AND THE PASS-THROUGH IT DESCRIBES ARE ONE BEHAVIOUR, NOT TWO.
+   * When a fillet or draft is refused, `shape` falls back to the unmodified
+   * source (`if (!shape) shape = src;`, in both branches below) rather than
+   * staying null -- which is the right resting state ONLY because the
+   * reason ends up here and is retrievable. Ship the pass-through without
+   * ever reading this map in the UI and the result is a NEW instance of the
+   * exact defect this fix removed: a feature that reports success (present,
+   * geometry looks fine) and quietly is not what its document row says --
+   * the document says "Round 1", the shape has no round, and nothing but
+   * this map knows. The intended reader is a per-feature channel on that
+   * feature's own timeline row (matching whyCannotRound and its siblings),
+   * not the document-wide "Could not build this model" panel -- that panel
+   * means the whole document failed, and this is the opposite case: the
+   * document built fine, one feature just is not what it says. If you are
+   * touching the caller that reads `built`, wire this in; do not carry the
+   * pass-through forward on its own.
    *
    * Optional, and the callers inside this file's own loop that build a
    * `partial: BuildResult` to resolve a name against never set it -- none of
@@ -107,10 +124,12 @@ export interface BuildResult {
    * The absence of an id here is not itself a claim that the feature built
    * cleanly -- a feature that was never reachable at all (its own target
    * missing) has no shape AND no refusal, same as before this field existed.
-   * This only covers refusals this file now catches rather than swallows:
-   * currently the per-edge `fillet` feature. See its own comment in
-   * buildDoc() for why whole-shape Round on a primitive is deliberately
-   * NOT covered here and throws instead.
+   * Currently covers the per-edge `fillet` feature and draft's single named
+   * face. Body Draft (`draft` with `whole: true`) does NOT have this hole --
+   * see the comment on that branch in buildDoc() for why. Whole-shape Round
+   * on a primitive (BoxFeature/CylinderFeature's own `round`) is deliberately
+   * NOT covered here and throws instead -- see roundedEdges()'s own comment
+   * for why that one stays loud rather than falling back.
    */
   refusals?: Map<string, string>;
 }
@@ -701,7 +720,36 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
         // Same reason as the fillet branch above: f.face may be named
         // against an earlier feature than f.target.
         const face = resolveNameAsUsedBy(oc, f.face, partial, f.target);
-        if (face) shape = drafted(oc, src, face, axis, rad, f.neutral);
+        // The identical silent-refusal hole as the fillet branch above, and
+        // the identical fix, reusing every helper built for it -- see this
+        // file's own header note on the `refusals` field for why the two
+        // halves (reporting, pass-through) are one behaviour and must ship
+        // together. The ONE thing that must differ is the wording: a draft
+        // has no edge, it has an ANGLE on a FACE, and reusing the fillet's
+        // "would not fit its edge" sentence with the number swapped would
+        // send a student looking for an edge that was never involved.
+        //
+        // Body Draft (the `whole` branch above) does NOT have this hole: it
+        // resolves no name at all, and it can never produce a null shape --
+        // it starts at `src` and only ever advances on a face that succeeds,
+        // so a refused face just costs that face, which is already this
+        // file's own documented design for it.
+        if (face) {
+          shape = drafted(oc, src, face, axis, rad, f.neutral);
+          if (!shape) {
+            refusals.set(
+              f.id,
+              `Tilting ${label(f.id)} at ${f.angle} degrees would not fit -- ${label(f.id)} is shown without it.`,
+            );
+          }
+        } else {
+          const why = whyNameLost(f.face, featureExists, sketchEdgeCount, label);
+          refusals.set(
+            f.id,
+            why ?? `${label(f.id)}'s face could not be found -- ${label(f.id)} is shown without it.`,
+          );
+        }
+        if (!shape) shape = src;
       }
     } else if (f.kind === 'move') {
       // Recorded as an OpRecord, exactly like the booleans below, rather than
