@@ -603,13 +603,21 @@ console.log('');
     Math.abs(vol(bevelled.shapes.get('r1')) - (24000 - (16 * 30) / 2)) < 0.01,
     'got ' + vol(bevelled.shapes.get('r1')) + ', analytic ' + (24000 - 240));
 
-  // An edge that cannot take the radius is refused, not silently ignored.
-  check('a radius the edge cannot take produces nothing, rather than a sharp body',
-    bar(40, 30, 20, R(400, 'fillet')).shapes.get('r1') === undefined,
-    'an over-large round must not quietly return the unrounded solid');
-  check('...and neither does an edge name that does not resolve',
-    bar(40, 30, 20, { ...R(4, 'fillet'),
-      edge: { ...TOP_RIGHT, of: [FACE('+z'), FACE('-z')] } }).shapes.get('r1') === undefined);
+  // An edge that cannot take the radius is refused, not silently ignored:
+  // the part survives SHARP under the feature's own id AND the refusal is
+  // recorded, so the timeline can mark the step and the panel can say why.
+  // (This used to assert the feature produced nothing; that left the whole
+  // model missing on screen, which is the policy buildDoc's fillet branch
+  // now documents as the bug it closed.)
+  const tooBig = bar(40, 30, 20, R(400, 'fillet'));
+  check('a radius the edge cannot take keeps the part sharp and records a refusal',
+    tooBig.refusals.has('r1') && Math.abs(vol(tooBig.shapes.get('r1')) - 24000) < 0.01,
+    'refused: ' + tooBig.refusals.get('r1') + ', vol ' + vol(tooBig.shapes.get('r1')));
+  const lostName = bar(40, 30, 20, { ...R(4, 'fillet'),
+    edge: { ...TOP_RIGHT, of: [FACE('+z'), FACE('-z')] } });
+  check('...and so does an edge name that does not resolve',
+    lostName.refusals.has('r1') && Math.abs(vol(lostName.shapes.get('r1')) - 24000) < 0.01,
+    'refused: ' + lostName.refusals.get('r1') + ', vol ' + vol(lostName.shapes.get('r1')));
 
   // DRAFT: tilt one face away from a neutral plane at the base.
   const D = (extra) => ({
