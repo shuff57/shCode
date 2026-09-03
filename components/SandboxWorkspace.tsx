@@ -28,7 +28,7 @@ import ModelEditor from './model/ModelEditor';
 // screen projection, which is what the sandboxed iframe still does on our
 // behalf to place drag handles.
 import BrepViewport, { type BrepViewportStats, type ViewportPick } from './model/BrepViewportThree';
-import { writeSTL, type MeshInput } from '../lib/mesh-export';
+import { writeSTL, writeOBJ, write3MF, type MeshInput } from '../lib/mesh-export';
 import HandleOverlay, { type AnchorPoint, type SketchOutline } from './model/HandleOverlay';
 import { outlineOf } from '../lib/sketch-arc';
 import { handlesFor, planeAnchor } from '../lib/model-handles';
@@ -792,6 +792,52 @@ export default function SandboxWorkspace() {
     URL.revokeObjectURL(url);
   }
 
+  // The B-rep Export OBJ button. Same download pattern as exportSTL above,
+  // for the same reason -- this button lives in the app's own chrome, not
+  // inside a sandboxed iframe, so there is no opaque-origin restriction. The
+  // only shape difference is that writeOBJ returns a string rather than
+  // bytes, so the Blob wraps text (text/plain: OBJ has no
+  // universally-supported dedicated MIME type).
+  function exportOBJ() {
+    const mesh = meshRef.current;
+    if (!mesh) return;
+    const text = writeOBJ(mesh);
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'model.obj';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // The B-rep Export 3MF button. The one async exporter of the three -- the
+  // zip layer is JSZip's generateAsync -- so this handler awaits. The mesh is
+  // captured in a local BEFORE the await, so an edit that lands mid-export
+  // (moving meshRef.current) cannot change what this export writes: it uses
+  // the mesh that existed at click time.
+  async function export3MF() {
+    const mesh = meshRef.current;
+    if (!mesh) return;
+    const bytes = await write3MF(mesh);
+    // bytes.buffer, not bytes, for the same lib.dom reason exportSTL's own
+    // comment explains: BlobPart pins its ArrayBufferView to a plain
+    // ArrayBuffer, while Uint8Array's type is generic over ArrayBufferLike.
+    // A type-system mismatch, not a runtime one -- write3MF allocates its own
+    // buffer and returns a Uint8Array over the whole thing.
+    const blob = new Blob([bytes.buffer as ArrayBuffer], { type: 'application/vnd.ms-package.3dmanufacturing-3dmodel+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'model.3mf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === 'Enter') {
@@ -1073,15 +1119,35 @@ export default function SandboxWorkspace() {
             Reset
           </button>
           {brepEngine && build && (
-            <button
-              style={hasMesh ? chipStyle : { ...chipStyle, opacity: 0.35, cursor: 'not-allowed' }}
-              onClick={exportSTL}
-              disabled={!hasMesh}
-              title={hasMesh ? 'Download the current model as an STL file' : 'Build a shape first'}
-            >
-              <Download size={12} />
-              Export STL
-            </button>
+            <>
+              <button
+                style={hasMesh ? chipStyle : { ...chipStyle, opacity: 0.35, cursor: 'not-allowed' }}
+                onClick={exportSTL}
+                disabled={!hasMesh}
+                title={hasMesh ? 'Download the current model as an STL file' : 'Build a shape first'}
+              >
+                <Download size={12} />
+                Export STL
+              </button>
+              <button
+                style={hasMesh ? chipStyle : { ...chipStyle, opacity: 0.35, cursor: 'not-allowed' }}
+                onClick={exportOBJ}
+                disabled={!hasMesh}
+                title={hasMesh ? 'Download the current model as an OBJ file' : 'Build a shape first'}
+              >
+                <Download size={12} />
+                Export OBJ
+              </button>
+              <button
+                style={hasMesh ? chipStyle : { ...chipStyle, opacity: 0.35, cursor: 'not-allowed' }}
+                onClick={export3MF}
+                disabled={!hasMesh}
+                title={hasMesh ? 'Download the current model as a 3MF file' : 'Build a shape first'}
+              >
+                <Download size={12} />
+                Export 3MF
+              </button>
+            </>
           )}
           <button
             style={chipStyle}
