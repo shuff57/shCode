@@ -77,6 +77,28 @@ interface Props {
   drawing?: boolean;
   /** Plane (u, v) of a click while `drawing` is true. */
   onPlace?: (u: number, v: number) => void;
+  /**
+   * How much of the layer's OWN bottom edge to leave uncovered, in CSS
+   * pixels. Defaults to 0 -- plain `inset:0`, filling its containing block
+   * exactly.
+   *
+   * EXISTS BECAUSE `inset:0` ON AN ABSOLUTELY POSITIONED ELEMENT RESOLVES
+   * AGAINST THE CONTAINING BLOCK'S PADDING EDGE, NOT ITS CONTENT EDGE -- a
+   * genuine CSS rule, not a bug, but one the host that renders this overlay
+   * got backwards for a while. SandboxWorkspace.tsx's Build mode reserves
+   * space for its timeline strip with `padding-bottom` on the shared
+   * container this layer sits in, on the (documented, and wrong) assumption
+   * that padding on that ancestor would shrink this layer the same way it
+   * shrinks the flex-sized render surface (the JSCAD iframe, or
+   * BrepViewportThree's canvas) beside it. It does not: a flex child
+   * respects its container's padding because it lays out in the CONTENT
+   * box; this layer's own `inset:0` still measures against the fuller
+   * PADDING box, so it stood exactly as many pixels taller as the padding
+   * reserved -- measured directly on BOTH render paths, same gap, same
+   * cause, not something specific to either engine. Passing that same
+   * reservation back in here is what makes the two match again.
+   */
+  bottomInset?: number;
 }
 
 /**
@@ -269,7 +291,7 @@ function edgePolyline(
 }
 
 export default function HandleOverlay({
-  points, values, scales, onDrag, onCommit, outlines, drawing, onPlace,
+  points, values, scales, onDrag, onCommit, outlines, drawing, onPlace, bottomInset = 0,
 }: Props) {
   const [dragging, setDragging] = useState<string | null>(null);
   // The layer's own DOM node, so a click's viewport position can be converted
@@ -369,7 +391,14 @@ export default function HandleOverlay({
   }
 
   return (
-    <div className="handle-layer" ref={layerRef}>
+    <div
+      className="handle-layer"
+      ref={layerRef}
+      // Inline, so it wins over the class's plain `inset:0` for this one
+      // side without a second class or a !important -- see bottomInset's own
+      // doc comment on Props for why the class alone cannot know this.
+      style={bottomInset ? { bottom: bottomInset } : undefined}
+    >
       {/* The outline is drawn, not built. A sketch is a flat profile, not a
           solid, so the renderer has nothing to show for it until something
           extrudes it -- but a student needs to see what they are drawing. */}

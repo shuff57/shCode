@@ -58,6 +58,14 @@ import {
 
 const MODE_KEY = 'shCode:sandbox-mode';
 const BUILD_KEY = 'shCode:sandbox-reshape-build';
+// Build mode's timeline strip height, and the matching bottom reservation on
+// .reshape-pane-view -- ONE constant for both, because they drifting apart is
+// exactly how the render surface and the handle overlay stopped sharing a
+// box for a while (see the long comment on .reshape-pane-view's own
+// padding-bottom rule, and HandleOverlay's bottomInset prop, for the CSS
+// reason absolute positioning does not just inherit a flex child's padding
+// the way it looks like it should).
+const TIMELINE_HEIGHT_PX = 58;
 
 // The plain outlined chip the Reset and Full screen buttons both wear.
 const chipStyle: React.CSSProperties = {
@@ -1037,6 +1045,12 @@ export default function SandboxWorkspace() {
                       outlines={outlines}
                       drawing={drawTool != null}
                       onPlace={handlePlace}
+                      // This JSX only renders while build is true, which is
+                      // exactly when .sandbox-shell carries is-build and the
+                      // padding-bottom rule above is active -- so this is
+                      // never conditional on anything this prop's own value
+                      // needs to check.
+                      bottomInset={TIMELINE_HEIGHT_PX}
                     />
                   )}
                 </div>
@@ -1219,7 +1233,7 @@ export default function SandboxWorkspace() {
           left: calc(min(420px, 45%) + 24px);
           right: 220px;
           bottom: 0;
-          height: 58px;
+          height: ${TIMELINE_HEIGHT_PX}px;
           z-index: 25;
           display: flex;
           align-items: stretch;
@@ -1238,11 +1252,22 @@ export default function SandboxWorkspace() {
            Fixed by ending the VIEW above the strip rather than by moving the
            runner's bar. The runner is shared with the docs pages and the
            lessons, where there is no timeline to dodge, so its layout is not
-           this host's to bend. Padding the shared container also keeps the
-           handle overlay in step: it is inset:0 on this same box, so the
-           frame and the handles shrink together and a corner handle stays on
-           the corner it belongs to. */
-        .sandbox-shell.is-build .reshape-pane-view { padding-bottom: 58px; }
+           this host's to bend.
+
+           THIS COMMENT USED TO CLAIM padding-bottom ALSO kept the handle
+           overlay in step, on the theory that .handle-layer's inset:0 on
+           this same box would shrink along with the render surface. Measured
+           directly and it does not: inset:0 on an absolutely positioned
+           element resolves against the containing block's PADDING edge, not
+           its content edge, so the padding that correctly shrinks the
+           FLEX-SIZED render surface (a real content-box citizen) leaves
+           .handle-layer standing the full, unshrunk padding-box height --
+           TIMELINE_HEIGHT_PX taller than the thing it is meant to overlay
+           exactly. Confirmed on BOTH the JSCAD iframe and the B-rep canvas,
+           same gap, same cause -- not an engine-specific bug. HandleOverlay's
+           own bottomInset prop is the actual fix; this rule now only owns
+           the render surface's own reservation. */
+        .sandbox-shell.is-build .reshape-pane-view { padding-bottom: ${TIMELINE_HEIGHT_PX}px; }
         .sandbox-shell.is-build .sandbox-timeline .model-timeline {
           flex: 1 1 auto;
           min-width: 0;
