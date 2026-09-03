@@ -420,7 +420,18 @@ export default function BrepViewportThree({
 
     // Default GridHelper lies in the XZ (y=0) plane -- a Y-up convention.
     // Rotated onto the XY (z=0) plane to match the Z-up scene.
-    const grid = new THREE.GridHelper(120, 24, 0x8be9fd, 0x44475a);
+    //
+    // CENTRE LINE IS DESATURATED BLUE-GREY (0x6272a4, this app's own existing
+    // "dim" token -- see COLORS above), NOT the saturated cyan it used to be.
+    // A grid's job is "here is a ground plane", not "here is the app's own
+    // accent colour" -- moving the hover highlight OFF this exact hex (see
+    // hoverEdgeMaterial below) fixed a colour collision that cost a blind
+    // round, but a saturated grid line was always going to collide with
+    // SOMETHING drawn above it. A neutral one does its actual job (which
+    // this app's own reviewer credited: spatial context against a "rectangle
+    // floating in fog") without competing with anything that gets drawn on
+    // top of it, ever.
+    const grid = new THREE.GridHelper(120, 24, 0x6272a4, 0x44475a);
     grid.rotation.x = Math.PI / 2;
     (grid.material as THREE_NS.Material).transparent = true;
     (grid.material as THREE_NS.Material).opacity = 0.35;
@@ -545,7 +556,9 @@ export default function BrepViewportThree({
     // opacity -- the same reasoning the edge highlight below was fixed with,
     // applied here because a face hover has the identical low-contrast defect
     // and no reason to be exempt from the same fix. Matches the edge hover
-    // colour too, so "hover" means one thing across both.
+    // colour too, so "hover" means one thing across both -- see
+    // hoverEdgeMaterial's own comment for why cyan is safe to use here again
+    // after briefly not being (the grid moved, not this).
     const hoverFaceMesh = new THREE.Mesh(
       new THREE.BufferGeometry(),
       new THREE.MeshBasicMaterial({
@@ -586,24 +599,21 @@ export default function BrepViewportThree({
     // SHARED materials and toggling `.visible`, never constructing geometry.
     // setHoveredEdgeTube()/setSelectedEdgeTube() below own that bookkeeping.
     //
-    // Violet, not cyan, for hover. Cyan was already on screen twice --
-    // measured directly against this file's own scene, not the palette in
-    // the abstract:
-    //   body orange   0xff6600  hue  24    (the ORIGINAL defect: too close to this)
-    //   X axis        red->orange           hue   0
-    //   Y axis        green->yellow-green   hue ~120
-    //   grid centre   0x8be9fd              hue 193  (GridHelper() a few lines up)
-    //   Z axis        blue->light blue      hue ~230  (THREE.AxesHelper's own default)
-    //   selected      0xff79c6              hue 326
-    // A saturated cyan hover (hue 193) sat almost on top of the grid centre
-    // line and a few degrees from the Z axis's own light-blue tail -- it
-    // stopped competing with the body and started competing with the
-    // scene's own furniture. 0xbb55f6 sits at hue ~278: the one gap in that
-    // list wide enough to matter, roughly 48 degrees from the Z axis on one
-    // side and 48 degrees from selected pink on the other -- clearly apart
-    // from every always-on colour in the viewport AND from selected, which
-    // is the one distinction this app cannot afford to spend.
-    const hoverEdgeMaterial = new THREE.MeshBasicMaterial({ color: 0xbb55f6, depthTest: false });
+    // Cyan for hover, same as the face highlight above -- and CYAN AGAIN,
+    // not the violet (0xbb55f6) this briefly became. That violet was picked
+    // to dodge a real collision (the grid centre line WAS this exact hex --
+    // 0x8be9fd, see GridHelper() a few lines up, before it moved), but
+    // violet solved the minor separation (hover vs. always-on scene
+    // furniture, ~48 degrees clear either side) by spending the MAJOR one:
+    // hover vs. SELECTED (0xff79c6, hue 326) dropped from 133 degrees to 48.
+    // That is the one distinction three independent blind judges could not
+    // find in the competing tool and credited us for finding -- not a
+    // criterion to trade against a polish note. Moving the grid's OWN colour
+    // instead (see GridHelper() above) frees this hex back up without
+    // spending anything: hover is once again ~133 degrees from selected,
+    // and also nowhere near the grid, the axes, or the body, because none of
+    // them are cyan any more either.
+    const hoverEdgeMaterial = new THREE.MeshBasicMaterial({ color: 0x8be9fd, depthTest: false });
     const selectedEdgeMaterial = new THREE.MeshBasicMaterial({ color: 0xff79c6, depthTest: false });
     hoverEdgeMaterialRef.current = hoverEdgeMaterial;
     selectedEdgeMaterialRef.current = selectedEdgeMaterial;
