@@ -127,6 +127,42 @@ for (const { dir, lesson, kind } of summative) {
   }
 }
 
+// The home page is not a lesson page and was therefore never opened by the
+// loop above -- which is exactly where the worst copy was. app/page.tsx hands
+// every lesson in the course to a `use client` component, so before it
+// projected them down to card fields, out/index.html carried 121 explanations
+// and every grading brief. Check it against EVERY summative item, not one.
+const home = path.join(ROOT, 'out', 'index.html');
+if (fs.existsSync(home)) {
+  const html = fs.readFileSync(home, 'utf8');
+  for (const { dir, lesson, kind } of summative) {
+    const hits = [];
+    if (kind === 'quiz') {
+      for (const q of lesson.quiz.questions ?? []) {
+        if (q.explanation && html.includes(q.explanation.slice(0, 40))) {
+          hits.push(`the explanation text of ${q.id}`);
+          break;
+        }
+      }
+    } else {
+      const prompt = lesson.aiGrader?.prompt ?? '';
+      if (prompt.length >= 60 && html.includes(prompt.slice(0, 60))) {
+        hits.push('the aiGrader.prompt grading brief');
+      }
+    }
+    if (hits.length) {
+      console.log(`FAIL ${dir} (${kind}): out/index.html -- the HOME PAGE -- contains `
+        + `${hits.join(', ')}. app/page.tsx must send cards only, not whole lessons.`);
+      failures++;
+    }
+  }
+  checked++;
+} else {
+  console.log('NOT CHECKED: no out/index.html, so the home page is unverified.');
+  if (!allowMissing) failures++;
+  unchecked++;
+}
+
 console.log(
   failures
     ? `\n[check-quiz-key-leak] ${failures} FAILURE(S) across ${summative.length} summative item(s)`
