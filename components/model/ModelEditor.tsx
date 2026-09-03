@@ -372,6 +372,12 @@ export default function ModelEditor({
   doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, onStartDraw, pickedEdge, onClearPickedEdge, pickedFace, onClearPickedFace, refusals,
 }: Props) {
   const [note, setNote] = useState<string | null>(null);
+  // An empty document has nothing for a note to be about: Reset clears the
+  // model but used to leave "Hollowed, open at the face you clicked." beside
+  // "Nothing here yet" (moderate lens, round 2).
+  useEffect(() => {
+    if (doc.features.length === 0) setNote(null);
+  }, [doc.features.length]);
   const [search, setSearch] = useState('');
   const [menu, setMenu] = useState<MenuId>(null);
   // A collapsible editor starts out expanded: the tools are the point of
