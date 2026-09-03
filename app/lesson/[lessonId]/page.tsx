@@ -5,6 +5,7 @@ import LessonAccessGate from '../../../components/LessonAccessGate';
 import { getLesson, loadLessons } from '../../../lib/lessons';
 import { getModule } from '../../../lib/curriculum';
 import { rendersAsContent } from '../../../lib/lesson-view';
+import { redactLessonForClient } from '../../../lib/quiz-redact';
 
 export async function generateStaticParams() {
   const lessons = await loadLessons();
@@ -39,9 +40,13 @@ export default async function LessonPage({
   ) : null;
 
   const siblingIds = mod ? mod.lessons.map((l) => l.id) : [];
-  const body = rendersAsContent(lesson)
-    ? <ContentLessonView lesson={lesson} />
-    : <LessonWorkspace lesson={lesson} />;
+  // The last point at which the answer key can be taken out. Both views below
+  // are 'use client', so whatever is handed to them is serialised into the
+  // page and readable with View Source. See lib/quiz-redact.ts.
+  const forClient = redactLessonForClient(lesson);
+  const body = rendersAsContent(forClient)
+    ? <ContentLessonView lesson={forClient} />
+    : <LessonWorkspace lesson={forClient} />;
 
   return (
     <>

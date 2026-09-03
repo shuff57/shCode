@@ -203,7 +203,64 @@ const q = (id, variant) => ({
 eq(buildQuizView({ questions: [] }, 'x', 'y').questions, [], 'empty/questions');
 eq(buildQuizView({}, 'x', 'y').questions, [], 'empty/config');
 
+// ---- redaction: the answer key must not leave the server -------------------
+const { redactQuiz, redactLessonForClient, isSummativeQuiz } = require(LIB + '/quiz-redact.js');
+
+{
+  const authored = {
+    summative: true,
+    shuffle: true,
+    variants: ['a', 'b'],
+    questions: [
+      { id: 'q1', question: 'Q1', code: 'let x = 1;', options: ['a', 'b', 'c'], answer: 2,
+        explanation: 'because c', source: '1.2.7', variant: 'a' },
+      { id: 'q2', question: 'Q2', options: ['a', 'b', 'c'], answer: 0,
+        explanation: 'because a', source: '1.2.9', variant: 'b' },
+    ],
+  };
+  const out = redactQuiz(authored);
+  const blob = JSON.stringify(out);
+
+  ok(!/"answer"/.test(blob), 'redact/answer', 'an answer index survived redaction');
+  ok(!/"explanation"/.test(blob), 'redact/explanation', 'an explanation survived redaction');
+  ok(!/because/.test(blob), 'redact/explanation text', 'explanation prose survived redaction');
+  ok(!/"source"/.test(blob), 'redact/source', 'the reread hint survived -- it names the topic');
+
+  // Everything a student needs in order to ANSWER must still be there.
+  eq(out.questions.map((q) => q.id), ['q1', 'q2'], 'redact/keeps questions');
+  eq(out.questions[0].options, ['a', 'b', 'c'], 'redact/keeps options');
+  eq(out.questions[0].code, 'let x = 1;', 'redact/keeps code');
+  eq(out.questions[0].variant, 'a', 'redact/keeps variant');
+  eq(out.variants, ['a', 'b'], 'redact/keeps forms');
+  eq(out.summative, true, 'redact/keeps summative');
+  eq(out.shuffle, true, 'redact/keeps shuffle');
+
+  // The authored object is untouched -- the server still holds the key.
+  eq(authored.questions[0].answer, 2, 'redact/pure');
+  eq(authored.questions[0].explanation, 'because c', 'redact/pure explanation');
+}
+
+{
+  // A module quiz is formative and keeps its marking.
+  const formative = { questions: [{ id: 'q1', question: 'Q', options: ['a', 'b', 'c'],
+    answer: 1, explanation: 'why' }] };
+  eq(isSummativeQuiz(formative), false, 'redact/formative detection');
+  eq(redactQuiz(formative), formative, 'redact/formative untouched');
+}
+
+{
+  // The lesson wrapper is what the server page actually calls.
+  const lesson = { id: 'l1', title: 'T', quiz: { summative: true,
+    questions: [{ id: 'q1', question: 'Q', options: ['a', 'b'], answer: 1, explanation: 'why' }] } };
+  const sent = redactLessonForClient(lesson);
+  ok(!/"answer"/.test(JSON.stringify(sent)), 'redact/lesson', 'the key reached the client object');
+  eq(sent.title, 'T', 'redact/lesson keeps the rest');
+  eq(lesson.quiz.questions[0].answer, 1, 'redact/lesson pure');
+  const plain = { id: 'l2', title: 'T2' };
+  eq(redactLessonForClient(plain), plain, 'redact/lesson without a quiz');
+}
+
 console.log(
-  failures ? `\n${failures} FAILURE(S)` : '\nALL PASS  (quiz-variant: seeding, forms, shuffling)',
+  failures ? `\n${failures} FAILURE(S)` : '\nALL PASS  (quiz-variant: seeding, forms, shuffling, redaction)',
 );
 process.exit(failures ? 1 : 0);

@@ -123,10 +123,17 @@ export interface QuizQuestion {
   code?: string;
   /** Two or more. Exactly one is correct; the rest must be wrong, not merely worse. */
   options: string[];
-  /** 0-based index into `options`. */
-  answer: number;
-  /** Shown after submitting, right or wrong. Says why, never just "correct". */
-  explanation: string;
+  /**
+   * 0-based index into `options`. Required when authoring -- scripts/test-quiz.mjs
+   * fails a lesson without it -- and ABSENT on the client for a summative quiz,
+   * where lib/quiz-redact.ts strips the key before the page is serialised.
+   */
+  answer?: number;
+  /**
+   * Shown after submitting, right or wrong. Says why, never just "correct".
+   * Required when authoring; stripped for a summative quiz alongside `answer`.
+   */
+  explanation?: string;
   /** Displayed lesson number to reread, e.g. "1.4.5". */
   source?: string;
   /**

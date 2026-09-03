@@ -1,4 +1,4 @@
-## Chapter 1 Test — Part 2 of 5: In Your Own Words
+## Chapter 1 Individual PA — Part 2 of 5: In Your Own Words
 
 **Worth 10 of the 100 points on this test.** Three short answers. Two or three
 sentences each is plenty; nobody is counting words.

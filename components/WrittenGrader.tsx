@@ -9,6 +9,7 @@ import {
   fetchDraft,
   saveDraft,
   recordSubmission,
+  fetchSubmissions,
 } from '../lib/written-grader-store';
 
 export interface AiRubricItem {
@@ -113,7 +114,12 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
   const totalPossible = config.rubric.reduce((s, r) => s + r.points, 0);
   // A test, not a practice assignment: see AiGraderConfig.summative.
   const summative = !!config.summative;
-  const locked = summative && !!result;
+  // Submitted-before is answered by the SERVER, not by this browser. Seeding it
+  // from the localStorage cache alone -- which is all this did until 2026-09-02
+  // -- meant clearing site data, switching browser, or picking up a second
+  // device handed the student a fresh unlocked Submit on a one-shot assessment.
+  const [alreadySubmitted, setAlreadySubmitted] = useState(false);
+  const locked = summative && (!!result || alreadySubmitted);
 
   useEffect(() => {
     // Local cache is the always-available fallback; server draft is canonical
@@ -121,8 +127,14 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
     let cancelled = false;
     const local = loadState(lessonId);
     (async () => {
-      const serverDraft = progress.authed ? await fetchDraft(lessonId) : null;
+      const [serverDraft, priorSubmissions] = await Promise.all([
+        progress.authed ? fetchDraft(lessonId) : Promise.resolve(null),
+        progress.authed && config.summative
+          ? fetchSubmissions(lessonId)
+          : Promise.resolve([]),
+      ]);
       if (cancelled) return;
+      if (priorSubmissions.length > 0) setAlreadySubmitted(true);
       if (serverDraft && serverDraft.response) {
         setResponse(serverDraft.response);
       } else {
@@ -134,7 +146,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
     return () => {
       cancelled = true;
     };
-  }, [lessonId, progress.authed]);
+  }, [lessonId, progress.authed, config.summative]);
 
   useEffect(() => {
     if (!loaded) return;
@@ -434,7 +446,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         </div>
       )}
 
-      {result && summative ? (
+      {(result || alreadySubmitted) && summative ? (
         <div
           style={{
             marginTop: 16,

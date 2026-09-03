@@ -1,4 +1,4 @@
-## Chapter 1 Test — Part 1 of 5: Concepts and Traces
+## Chapter 1 Individual PA — Part 1 of 5: Concepts and Traces
 
 **Worth 40 of the 100 points on this test.** Eight questions: three about ideas
 from the chapter, five where you read a short program and say what it prints.

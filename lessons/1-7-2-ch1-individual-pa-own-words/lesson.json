@@ -1,0 +1,51 @@
+{
+  "id": "1-7-2-ch1-individual-pa-own-words",
+  "title": "1.7.2 Individual PA Part 2: In Your Own Words",
+  "description": "Three short answers: umbrella activities, what is wrong with a working but badly written program, and high-level against low-level languages. One submission, no feedback on screen.",
+  "type": "assignment",
+  "estimateMins": 7,
+  "category": "Unit 1: JavaScript Fundamentals",
+  "unit": "1.7 Chapter 1 Individual Performance Assessment",
+  "preview": "assignment",
+  "slos": [
+    "SLO-1",
+    "SLO-2"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "steps": [],
+  "requirements": [],
+  "assignmentCode": "A1.7.2",
+  "aiGrader": {
+    "summative": true,
+    "rubricTitle": "Chapter 1 Test, Part 2: short answers",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "contextDocs": [],
+    "prompt": "This is a closed-book chapter test sat individually in class. Mark three short answers written in the student's own words. Two or three sentences per answer is a complete answer; do not reward length.\n\nQUESTION 1 -- Umbrella activities. Chapter 1 (1.1.10) split the work into framework activities and umbrella activities. The student must say what makes an activity an umbrella activity -- that it runs ALONGSIDE the framework activities across the whole project rather than happening at one point in it -- name one. The six this course taught in 1.1.10 are training/communication, risk management, configuration management, quality management, architecture management and security management -- accept any of those six, and accept a close paraphrase of one (a student who writes \"version control\" for configuration management, or \"quality assurance\" for quality management, has named the right thing). Accept a real umbrella activity outside that six only if the student also shows it runs throughout, and say what would go wrong on a project that skipped it. Naming an umbrella activity without the 'runs throughout' idea is partial. Naming a FRAMEWORK activity (inception, elaboration, construction, deployment) instead is missing.\n\nQUESTION 2 -- Reading a working but badly written program. The student was shown this:\n\n  // set x\n  let x = 12.5;\n  // set y\n  let y = 3;\n  // multiply\n  let z = x * y;\n  console.log(z);\n\nIt runs and prints the right number. The student must name TWO things wrong with it and say what each costs the next person to change the code. At least one has to be about the comments. Acceptable answers: the names x, y and z say nothing about what the values mean (1.3.6, 1.3.7); the comments restate the syntax rather than explaining why, so they add nothing a reader could not see (1.3.4); the printed number has no label so the output does not say what it is; the price-like value 12.5 is not named and cannot be found later. Credit any specific, correct fault with a real consequence. Do NOT credit 'it needs more comments' on its own -- the fault is that these comments say nothing, and more of them would be worse.\n\nQUESTION 3 -- High-level and low-level. The student must distinguish the two by distance from the hardware: a high-level language reads closer to human language and hides how the machine works, a low-level language is closer to what the processor actually does and the programmer manages more of it themselves (1.4.5). Then one real reason to choose the lower-level one: speed, tight control over memory, small devices with little to spare, writing something an operating system or driver needs. A reason that amounts to 'it is more professional' is missing.\n\nMark each answer against its own criterion only. This is a test: report what the student wrote, do not coach.",
+    "rubric": [
+      {
+        "id": "umbrella",
+        "title": "Umbrella activities",
+        "description": "Says what makes an activity an umbrella activity (it runs across the whole project, alongside the framework activities), names a real one, and says what skipping it would cost.",
+        "points": 0
+      },
+      {
+        "id": "conventions",
+        "title": "What is wrong with the snippet",
+        "description": "Names two specific faults with real consequences for the next reader, at least one of them about the comments saying nothing rather than there being too few.",
+        "points": 0
+      },
+      {
+        "id": "abstraction",
+        "title": "High-level against low-level",
+        "description": "Distinguishes the two by distance from the hardware and gives one genuine reason to accept the harder language.",
+        "points": 0
+      }
+    ]
+  }
+}

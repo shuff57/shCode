@@ -60,6 +60,10 @@ export default function QuizView({ lessonId, config }: Props) {
   // A test, not a module quiz: see QuizConfig.summative.
   const summative = !!config.summative;
   const locked = summative && graded;
+  // A summative quiz arrives with its answer key stripped (lib/quiz-redact.ts),
+  // so the browser cannot mark it and must not pretend to. Everything that
+  // reports or records a score is switched off rather than left to report 0.
+  const hasKey = questions.some((q) => q.answer !== undefined);
   const answeredCount = questions.filter((q) => answers[q.id] !== undefined).length;
   const allAnswered = answeredCount === questions.length && questions.length > 0;
   const correctCount = countCorrect(questions, answers);
@@ -139,7 +143,7 @@ export default function QuizView({ lessonId, config }: Props) {
     // Gating the next part behind a score would strand a student halfway
     // through their own exam.
     if (summative || correctCount >= needed) {
-      await recordLessonCompleted(lessonId, correctCount);
+      await recordLessonCompleted(lessonId, hasKey ? correctCount : undefined);
       setTimeout(() => navigateToNextLesson(lessonId), 1800);
     }
     if (progress.authed) {
@@ -151,10 +155,13 @@ export default function QuizView({ lessonId, config }: Props) {
           quiz: questions.map((q) => ({
             id: q.id,
             picked: answers[q.id],
-            correct: answers[q.id] === q.answer,
+            ...(hasKey ? { correct: answers[q.id] === q.answer } : {}),
           })),
         },
-        score: correctCount,
+        // No key in the browser means no score from the browser. The row goes
+        // in unscored, which is what the teacher queue already renders as
+        // "needs marking"; scripts/score-quiz.mjs turns the picks into marks.
+        ...(hasKey ? { score: correctCount } : {}),
         possible: questions.length,
       });
       saveDraft(lessonId, payload);
@@ -303,7 +310,7 @@ export default function QuizView({ lessonId, config }: Props) {
                   <CircleX size={16} color="#ff5555" style={{ flexShrink: 0, marginTop: 2 }} />
                 )}
                 <span>
-                  {withInlineCode(q.explanation)}
+                  {withInlineCode(q.explanation ?? '')}
                   {q.source ? (
                     <span style={{ color: '#6272a4' }}>
                       {' (reread '}

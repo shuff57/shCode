@@ -1,11 +1,11 @@
 {
-  "id": "1-7-4-ch1-test-chart-it",
-  "title": "1.7.4 Chapter 1 Test, Part 4: Chart It",
+  "id": "1-7-4-ch1-individual-pa-chart-it",
+  "title": "1.7.4 Individual PA Part 4: Chart It",
   "description": "Pick one of three problems and chart it alone, using only the three shapes the book teaches. Part 5 writes the steps for the same problem.",
   "type": "assignment",
   "estimateMins": 7,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "1.7 Chapter 1 Individual Test",
+  "unit": "1.7 Chapter 1 Individual Performance Assessment",
   "preview": "diagram",
   "slos": [
     "SLO-1",
@@ -17,10 +17,18 @@
   "diagram": {
     "starter": "flowchart TD\n  A([Start])\n  Z([End])",
     "rules": [
-      { "id": "one-start" },
-      { "id": "has-end" },
-      { "id": "all-labeled" },
-      { "id": "no-orphans" },
+      {
+        "id": "one-start"
+      },
+      {
+        "id": "has-end"
+      },
+      {
+        "id": "all-labeled"
+      },
+      {
+        "id": "no-orphans"
+      },
       {
         "id": "min-process",
         "count": 3,
@@ -31,10 +39,18 @@
         "count": 1,
         "title": "Uses at least one decision diamond"
       },
-      { "id": "decision-two-exits" },
-      { "id": "decision-labeled" },
-      { "id": "reaches-end" },
-      { "id": "no-self-loop" }
+      {
+        "id": "decision-two-exits"
+      },
+      {
+        "id": "decision-labeled"
+      },
+      {
+        "id": "reaches-end"
+      },
+      {
+        "id": "no-self-loop"
+      }
     ]
   },
   "grading": {

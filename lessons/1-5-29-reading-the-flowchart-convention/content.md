@@ -48,7 +48,7 @@ An assignment may add a floor on top: "at least one diamond", "at least six shap
 
 ### What the checker cannot see
 
-All eight can be green on a chart that is wrong. The checker knows whether your drawing is a *legal flowchart*. It has no idea whether it solves the problem you were given.
+All nine can be green on a chart that is wrong. The checker knows whether your drawing is a *legal flowchart*. It has no idea whether it solves the problem you were given.
 
 Nobody is checking automatically that:
 

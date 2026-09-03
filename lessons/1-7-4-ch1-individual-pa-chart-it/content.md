@@ -1,4 +1,4 @@
-## Chapter 1 Test — Part 4 of 5: Chart It
+## Chapter 1 Individual PA — Part 4 of 5: Chart It
 
 **Worth 10 of the 100 points on this test.** One flowchart, drawn alone, from one
 of the three problems below.

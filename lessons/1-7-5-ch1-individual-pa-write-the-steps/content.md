@@ -1,4 +1,4 @@
-## Chapter 1 Test — Part 5 of 5: Write the Steps
+## Chapter 1 Individual PA — Part 5 of 5: Write the Steps
 
 **Worth 20 of the 100 points on this test**, and it is the largest single item on
 it. Write the **pseudocode** for the problem you charted in Part 4 -- the same
@@ -6,6 +6,23 @@ one, not a different one.
 
 **Not JavaScript.** Plain English, arranged like code. Chapter 1 has not taught
 you how to write a decision as real code, and this is not asking you to guess.
+
+### The three problems again, so you do not have to go back
+
+Use the one you charted. The numbers are the same ones Part 4 gave you.
+
+**1. Backpack Check** — the number of textbooks, what one textbook weighs, and the
+student's own weight. Work out what the backpack weighs; compare it against **one
+tenth of the student's weight**.
+
+**2. Screen Time** — the minutes of screen time used across **seven days**. Work out
+the daily average; compare it against **120 minutes a day**.
+
+**3. Print Job** — the number of pages, at **8 cents a page**. Work out what the job
+costs; compare it against the **$5.00** left in the print account.
+
+Part 4 is still there if you want to look at your own chart — it is the lesson
+before this one and going back costs you nothing.
 
 ### The two rules
 
