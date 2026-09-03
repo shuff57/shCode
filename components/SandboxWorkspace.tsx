@@ -784,6 +784,20 @@ export default function SandboxWorkspace() {
   }
 
   function reset() {
+    // Build mode has no "starter code" to go back to -- the model IS the
+    // work. Measured 2026-09-03: the old confirm said "Reset code to the
+    // starter", the student pressed OK, and Box 1 / Round 1 were still there;
+    // the next Add-a-box then stacked on top of the old one.
+    if (mode.preview === 'reshape' && build) {
+      if (!window.confirm('Clear the model and start again? Unsaved work will be lost.')) return;
+      loadDoc(EMPTY_DOC);
+      setSelected([]);
+      setPickedEdge(null);
+      past.current = [];
+      future.current = [];
+      setDepth({ back: 0, forward: 0 });
+      return;
+    }
     if (window.confirm('Reset code to the starter? Unsaved work will be lost.')) {
       setLesson(lesson);
       stopRun();
