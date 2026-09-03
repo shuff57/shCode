@@ -96,8 +96,35 @@
           "why": "A's step list keeps literal names (Box 1, Hole 1, Mirror 1) the whole time; clicking Hole 1 surfaces its own diameter/depth/x/y/z fields directly, and Mirror 1 is still present and visible in the final screen (A_3) alongside both holes. B's item tree only ever shows generic names (Boolean, Boolean_copy, then Cylinder, Box) that never say 'hole' or 'mirror', and reaching the hole's own parameters required entering/editing the Boolean node, after which Boolean_copy (the mirror) vanishes from both the tree and the 3D view in B_3 and stays gone in B_4 -- the last screen provided shows no mirror at all, contradicting the reported correct:true.",
           "gap_ours": "Selecting Mirror 1 shows no data panel at all ('Select a shape to see its dimensions') -- confirming the mirror survived requires eyeballing the 3D view rather than reading a value.",
           "gap_chili3d": "Editing the hole means drilling into the Boolean feature, which removes the mirror copy from the item tree and viewport while you work -- exactly the 'destroy later steps to reach an earlier one' failure the task flags, compounded by node names (Boolean/Boolean_copy/Cylinder/Box) that don't say what any step actually is."
+        },
+        "fillet": {
+          "winner": "ours",
+          "confidence": "high",
+          "why": "A_1 puts an explicit on-canvas banner reading 'Click this edge to round or bevel just it' directly over the model before the person does anything else, while B_1/B_2 give only a tiny bottom-status-bar line 'Please select edges' that competes with an unrelated hint already sitting there. A finished in 6 clicks/2 keystrokes and B in 13 clicks/17 keystrokes for the same correct one-edge, radius-3 result. On the oversize radius, A_4 silently clamps the slider to 9.5 with a clean model and no scary text, while B_4 throws a raw engine crash ('Fillet Error: RuntimeError: Aborted(undefined). Build with -sASSERTIONS for more info.') that a 14-year-old cannot parse or act on.",
+          "gap_ours": "The oversize clamp is silent -- the slider just stops at 9.5 with no plain-language reason shown, so a beginner still doesn't learn why 10 didn't work.",
+          "gap_chili3d": "Edge-clickability is signaled only by a small, easily-missed status-bar string after already finding and opening the Fillet tool, and the oversize-radius path exposes a raw internal runtime error instead of any human explanation.",
+          "fix": "0339884 screen-space edge band, crosshair, hint, badge and Round titles; e86c8b9 0.5 radius steps"
         }
       }
     }
-  ]
+  ],
+  "summary": {
+    "pieces": 11,
+    "won_blind": 11,
+    "rounds": 2,
+    "closed": "2026-09-03",
+    "open_gaps_named_by_judges": {
+      "first-minute": "The tool a beginner actually wants (reSHape/Build) is not the default landing tab -- they land on moSHion (a 2D code canvas) first and must discover and click through two more labeled tabs (reSHape, then Build) before any guidance appears, adding navigation overhead the raw click count doesn't fully capture.",
+      "box": "Seven separate labeled fields (width/depth/height plus x/y/z position) on one panel is a lot for a first-timer to parse even though only three matter for this task -- nothing visually distinguishes 'the 3 you need' from 'the 3 you can ignore'.",
+      "hollow": "The failure signal is a small warning triangle icon on a tab label, not an explanatory sentence, so a 14-year-old sees 'something's wrong' but not why or what to change; neither screen actually shows a cutaway proving the box went hollow.",
+      "pattern": "Default array-spacing value is narrower than the box itself, so the first result silently merges the copies until the student corrects it.",
+      "mirror": "After mirroring, the right-side panel switches to an intimidating code-level message ('No dimensions declared. Add a getParameterDefinitions() function...') instead of showing the new part's dimensions, which would confuse a beginner even though the geometry itself is correct.",
+      "hole": "The default depth of 22 that made this hole go through is an arbitrary number disconnected from the box's actual height in the UI; a beginner has no way to know the hole broke through rather than just going deep, since neither B screenshot shows the bottom face where the exit hole would be visible.",
+      "dimensions-panel": "No unit is shown anywhere on the numbers (just '40', '20', no mm/in/cm label), so a student setting an exact size has no idea what unit they're actually specifying.",
+      "refusal-messages": "The warning explains the collapse and that the invalid change was not applied, but doesn't explicitly say what to try (e.g. suggest a max safe thickness) \u2014 the student has to discover 19 works by trial and error on the slider rather than being told a bound.",
+      "handles": "Six sliders plus number fields all update simultaneously (64 ms) with no labeling of which colored dot maps to which slider, so a beginner could drag the right handle without understanding why the panel changed.",
+      "timeline": "Selecting Mirror 1 shows no data panel at all ('Select a shape to see its dimensions') -- confirming the mirror survived requires eyeballing the 3D view rather than reading a value.",
+      "fillet": "The oversize clamp is silent -- the slider just stops at 9.5 with no plain-language reason shown, so a beginner still doesn't learn why 10 didn't work."
+    }
+  }
 }
