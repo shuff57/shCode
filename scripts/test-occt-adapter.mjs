@@ -180,6 +180,76 @@ try {
       { id: 'b1', kind: 'box', size: [20, 20, 20], center: [0, 0, 0] },
       { id: 'mv1', kind: 'move', target: 'b1', offset: [15, 5, 0] },
     ],
+    // --- the Build tools measured against the oracle for the first time,
+    // fed through the SAME generic pass/fail rule every fixture above uses:
+    // flat must match JSCAD to the digit, curved is allowed 2%, and an
+    // exact+curved fixture must land on the analytic number and have moved
+    // off JSCAD's. Same doc shapes as scripts/oracle-measure.mjs's new
+    // fixtures, on purpose -- these are the same edge/face names too.
+    'hole-through': [
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      { id: 'hole1', kind: 'hole', target: 'b1', diameter: 6, depth: 22, center: [0, 0, 0], axis: 'z' },
+    ],
+    'hole-blind': [
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      { id: 'hole1', kind: 'hole', target: 'b1', diameter: 6, depth: 10, center: [0, 0, 0], axis: 'z' },
+    ],
+    'hole-corners': [
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      {
+        id: 'hole1', kind: 'hole', target: 'b1', diameter: 6, depth: 22,
+        center: [0, 0, 0], axis: 'z', corners: { dx: 15, dy: 10 },
+      },
+    ],
+    'hole-x-axis': [
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      { id: 'hole1', kind: 'hole', target: 'b1', diameter: 6, depth: 42, center: [0, 0, 0], axis: 'x' },
+    ],
+    'shell-2': [
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      { id: 'shell1', kind: 'shell', target: 'b1', thickness: 2 },
+    ],
+    'pattern-linear-3': [
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      { id: 'pat1', kind: 'pattern', target: 'b1', mode: 'linear', count: 3, step: [60, 0, 0] },
+    ],
+    'pattern-circular-6': [
+      { id: 'b1', kind: 'box', size: [10, 10, 10], center: [30, 0, 0] },
+      { id: 'pat1', kind: 'pattern', target: 'b1', mode: 'circular', count: 6, axis: 'z', totalAngle: 360 },
+    ],
+    'round-one-edge': [
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      {
+        id: 'r1', kind: 'fillet', target: 'b1', size: 4, style: 'fillet',
+        edge: {
+          cause: 'between', feature: 'b1', kind: 'edge',
+          of: [
+            { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' },
+            { cause: 'primitive', feature: 'b1', kind: 'face', part: '+x' },
+          ],
+        },
+      },
+    ],
+    'bevel-one-edge': [
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      {
+        id: 'r1', kind: 'fillet', target: 'b1', size: 4, style: 'chamfer',
+        edge: {
+          cause: 'between', feature: 'b1', kind: 'edge',
+          of: [
+            { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' },
+            { cause: 'primitive', feature: 'b1', kind: 'face', part: '+x' },
+          ],
+        },
+      },
+    ],
+    'draft-one-face': [
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      {
+        id: 'd1', kind: 'draft', target: 'b1', angle: 8, pull: 'z', neutral: -10,
+        face: { cause: 'primitive', feature: 'b1', kind: 'face', part: '+x' },
+      },
+    ],
   };
 
   for (const [name, features] of Object.entries(DOCS)) {
@@ -197,16 +267,57 @@ try {
     }
 
     const db = Math.max(...want.bbox.flatMap((row, i) => row.map((v, j) => Math.abs(got.bbox[i][j] - v))));
-    if (want.exact !== undefined && want.curved) {
+    // JSCAD never runs a fillet, chamfer or draft at all -- whyNotOnJscad()
+    // in lib/model-types.ts, and featureExpr()'s fillet/draft branch in
+    // lib/model-codegen.ts passes the target straight through unchanged.
+    // So `want.volume` for one of these three is not a worse MEASUREMENT of
+    // the shape the way a tessellated cylinder is -- it is the UNMODIFIED
+    // target, because the feature never ran on that engine. Holding B-rep to
+    // "moved far enough off JSCAD" tests whether JSCAD's number is wrong,
+    // which it structurally cannot be here (there is nothing to be wrong
+    // ABOUT), so this gets its own rule instead of the curved+exact one
+    // below, which is for tessellation error, not absence. round-one-edge
+    // used to pass the check below for exactly this reason -- "moved off
+    // JSCAD" read as "moved off a feature JSCAD never built" -- and passing
+    // for that reason is not a real pass, so it moved here too, alongside
+    // bevel-one-edge and draft-one-face, which fail the same check below for
+    // the same underlying cause. UNMODIFIED_TARGET_VOLUME is the shared
+    // 40x40x20 box (32000) all three of these fixtures sit on.
+    const UNMODIFIED_TARGET_VOLUME = 32000;
+    if (want.jscadLacks) {
+      const dExact = Math.abs(got.volume - want.exact) / want.exact;
+      const jscadIsUnmodified = Math.abs(want.volume - UNMODIFIED_TARGET_VOLUME) < 1e-6;
+      check(
+        name + ' lands on the exact volume; JSCAD cannot represent this feature -- recorded as a deliberate difference',
+        dExact < 1e-6 && jscadIsUnmodified,
+        'B-rep got ' + got.volume + ' vs exact ' + want.exact + ' (' + (dExact * 100).toFixed(6)
+          + '% off); JSCAD recorded ' + want.volume + ', expected the unmodified target '
+          + UNMODIFIED_TARGET_VOLUME,
+      );
+    } else if (want.exact !== undefined && want.curved) {
       // The prediction: it should land on the ANALYTIC number, not the
       // tessellated one, and it should have moved off the tessellated one.
       const dExact = Math.abs(got.volume - want.exact) / want.exact;
       const moved = Math.abs(got.volume - want.volume) / want.volume;
+      // Exactness is the STRONGER claim than "moved far enough off JSCAD."
+      // The moved-off-tessellation floor exists to catch a kernel that
+      // merely echoed JSCAD's own (slightly tessellated) number instead of
+      // computing its own -- a result sitting on the analytic value to
+      // within 1e-6 relative cannot be that, whatever fraction of the whole
+      // shape the curved feature happens to be. Measured need: a small bore
+      // in a big flat host (hole-through/blind/corners/x-axis) moves the
+      // WHOLE solid's volume by only 0.01-0.05% even though the REMOVED
+      // material itself carries the usual ~0.6% cylinder-tessellation error
+      // -- under the 0.1% floor even though B-rep landed exactly on the
+      // analytic bore. The floor still applies below, unwaived, whenever the
+      // result is not that exact -- it is not being loosened, only bypassed
+      // for the one case it cannot actually be testing for.
+      const landsExactly = dExact < 1e-6;
       check(name + ' lands on the exact volume, not the tessellated one',
-        dExact < 0.0005 && moved > 0.001,
+        landsExactly || (dExact < 0.0005 && moved > 0.001),
         'got ' + got.volume + ', exact ' + want.exact + ', jscad ' + want.volume
-          + ' (' + (dExact * 100).toFixed(3) + '% from exact, moved '
-          + (moved * 100).toFixed(2) + '%)');
+          + ' (' + (dExact * 100).toFixed(4) + '% from exact, moved '
+          + (moved * 100).toFixed(2) + '%)' + (landsExactly ? ' -- exact match, floor waived' : ''));
     } else if (want.curved) {
       const dv = Math.abs(got.volume - want.volume) / want.volume;
       check(name + ' is within the curved tolerance of the oracle', dv < 0.02,

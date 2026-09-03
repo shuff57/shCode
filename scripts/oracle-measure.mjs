@@ -61,6 +61,12 @@ const BOX_TOL = 0.01;
  *  argue with when it disagrees. */
 function fixtures(types) {
   const doc = (...features) => ({ version: 1, features });
+  // A face/edge name, spelled exactly like the ones lib/occt-build.ts's own
+  // fillet/draft checks already build (script comment "TOP_RIGHT" there) --
+  // reused rather than reinvented so the same edge is what both this file and
+  // the adapter's own hand test point at.
+  const FACE = (part) => ({ cause: 'primitive', feature: 'b1', kind: 'face', part });
+  const TOP_RIGHT = { cause: 'between', feature: 'b1', kind: 'edge', of: [FACE('+z'), FACE('+x')] };
   const sketch = (id, plane = 'xy', offset = 0, pts = null) => ({
     id, kind: 'sketch', plane, offset,
     points: pts || [[0, 0], [40, 0], [40, 25], [0, 25]],
@@ -150,6 +156,67 @@ function fixtures(types) {
       { id: 'mv1', kind: 'move', target: 'b1', offset: [15, 5, 0] },
     ),
     turned: doc({ id: 'b1', kind: 'box', size: [40, 20, 10], center: [0, 0, 0], rotate: [0, 0, 45] }),
+
+    // ---- the Build tools added since this oracle last grew: hole, shell,
+    // pattern, a fillet/chamfer on a NAMED edge, and draft. All ten sit on
+    // the same 40x40x20 box (b1, centred at the origin) unless noted, so a
+    // reader can hold one shape in their head across the whole list.
+    'hole-through': doc(
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      { id: 'hole1', kind: 'hole', target: 'b1', diameter: 6, depth: 22, center: [0, 0, 0], axis: 'z' },
+    ),
+    // depth 10 on a 20-thick box: the bore spans z -5..5, entirely inside
+    // the solid on both sides -- a pocket, not a through-hole.
+    'hole-blind': doc(
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      { id: 'hole1', kind: 'hole', target: 'b1', diameter: 6, depth: 10, center: [0, 0, 0], axis: 'z' },
+    ),
+    'hole-corners': doc(
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      {
+        id: 'hole1', kind: 'hole', target: 'b1', diameter: 6, depth: 22,
+        center: [0, 0, 0], axis: 'z', corners: { dx: 15, dy: 10 },
+      },
+    ),
+    'hole-x-axis': doc(
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      { id: 'hole1', kind: 'hole', target: 'b1', diameter: 6, depth: 42, center: [0, 0, 0], axis: 'x' },
+    ),
+    'shell-2': doc(
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      { id: 'shell1', kind: 'shell', target: 'b1', thickness: 2 },
+    ),
+    'pattern-linear-3': doc(
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      { id: 'pat1', kind: 'pattern', target: 'b1', mode: 'linear', count: 3, step: [60, 0, 0] },
+    ),
+    // A DIFFERENT target -- a small cube standing off-axis at [30,0,0] -- not
+    // b1. Orbiting the world z axis at the origin, six 10-cubes spaced 60
+    // degrees apart at radius 30: chord between neighbours is
+    // 2*30*sin(30deg) = 30, against a rotated cube's own half-diagonal of
+    // sqrt(5^2+5^2) = 7.07 -- nowhere near touching.
+    'pattern-circular-6': doc(
+      { id: 'b1', kind: 'box', size: [10, 10, 10], center: [30, 0, 0] },
+      { id: 'pat1', kind: 'pattern', target: 'b1', mode: 'circular', count: 6, axis: 'z', totalAngle: 360 },
+    ),
+    // Modify Fillet / Bevel / Draft do not build on JSCAD at all --
+    // whyNotOnJscad() in lib/model-types.ts, and featureExpr()'s fillet/draft
+    // branch in lib/model-codegen.ts passes the target straight through with
+    // a comment. So JSCAD's own recorded number for these three is the PLAIN
+    // BOX, unrounded -- that gap between engines is the finding these three
+    // fixtures exist to measure, not a defect in the fixture.
+    'round-one-edge': doc(
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      { id: 'r1', kind: 'fillet', target: 'b1', edge: TOP_RIGHT, size: 4, style: 'fillet' },
+    ),
+    'bevel-one-edge': doc(
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      { id: 'r1', kind: 'fillet', target: 'b1', edge: TOP_RIGHT, size: 4, style: 'chamfer' },
+    ),
+    'draft-one-face': doc(
+      { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+      { id: 'd1', kind: 'draft', target: 'b1', angle: 8, pull: 'z', neutral: -10, face: FACE('+x') },
+    ),
   };
 }
 
@@ -292,17 +359,78 @@ try {
     'sketch-revolve': Math.PI * (20 * 20 - 10 * 10) * 30,
     'revolve-on-xy': Math.PI * (20 * 20 - 10 * 10) * 30,
     'revolve-on-yz': Math.PI * (20 * 20 - 10 * 10) * 30,
+
+    // ---- the ten Build-tool fixtures. 32000 is the 40x40x20 box (b1) they
+    // all start from unless noted.
+    // Through hole: the bore (depth 22) exceeds the box's own 20-thick
+    // extent, so only the box's height is actually removed: r=3, h=20.
+    'hole-through': 32000 - Math.PI * 3 * 3 * 20,
+    // Blind: the bore (depth 10) sits entirely inside the box, so its own
+    // full height is what disappears.
+    'hole-blind': 32000 - Math.PI * 3 * 3 * 10,
+    // Four bores, same reasoning as hole-through, clear of each other and of
+    // the box edges (centres +-15/+-10 from the middle of a 40x40 face).
+    'hole-corners': 32000 - 4 * Math.PI * 3 * 3 * 20,
+    // Bored along x: depth 42 exceeds the box's 40-wide x extent, so only
+    // that 40 is removed.
+    'hole-x-axis': 32000 - Math.PI * 3 * 3 * 40,
+    // Shell: JSCAD's shellOp scales each axis by (size - 2*thickness)/size
+    // about the bbox centre, which for an axis-aligned box IS the true
+    // per-face offset -- 40x40x20 shelled by 2 leaves a 36x36x16 cavity.
+    'shell-2': 32000 - 36 * 36 * 16,
+    // Linear pattern: 3 copies 60 apart, each 40 wide -- clear by 20 on
+    // every side, so three whole, unclipped boxes.
+    'pattern-linear-3': 3 * 32000,
+    // Circular pattern: see the fixture's own comment on why the six
+    // 10-cubes at radius 30 never touch.
+    'pattern-circular-6': 6 * 1000,
+    // Round one edge (length 40, the box's y-run) at radius 4: a fillet
+    // removes the corner of a quarter-circle from a square corner, i.e.
+    // (1 - pi/4) of a 4x4 square, extruded along the 40-long edge.
+    'round-one-edge': 32000 - (1 - Math.PI / 4) * 4 * 4 * 40,
+    // Bevel the same edge: a chamfer takes off a right triangle whose two
+    // legs are the cut size (4), i.e. half the 4x4 square, along the same
+    // 40-long edge.
+    'bevel-one-edge': 32000 - (4 * 4 * 40) / 2,
+    // Draft: the +x face pivots at z=-10 (its own bottom, since the box runs
+    // z -10..10) and leans 8 degrees over the 20-tall height. At the top the
+    // face has swung in by 20*tan(8deg); the missing sliver is a right
+    // triangle of base 20*tan(8deg) and height 20, run along the box's
+    // 40-long y edge. The adapter's own draft check (bar(40,30,20) loses
+    // material at this same angle/neutral) fixes the sign: material is LOST,
+    // not gained.
+    'draft-one-face': 32000 - ((20 * Math.tan((8 * Math.PI) / 180)) * 20) / 2 * 40,
   };
   const CURVED = new Set([
     'box-rounded', 'cylinder', 'cone', 'sphere', 'torus', 'sketch-revolve',
     'circle-extrude', 'rounded-corner', 'bowed-edge', 'boolean-cut',
     'revolve-on-xy', 'revolve-on-yz',
     'boolean-union', 'boolean-intersect',
+    'hole-through', 'hole-blind', 'hole-corners', 'hole-x-axis',
   ]);
+  // round-one-edge is deliberately NOT in CURVED: what JSCAD actually
+  // records for it is a plain, sharp, six-face box (polys=6) -- the fillet
+  // never ran -- so there is no tessellated curve here for JSCAD to be
+  // measurably close to or far from. It gets its own rule via JSCAD_LACKS
+  // below instead of the curved+exact one meant for tessellation error.
+  // Fillet, chamfer and draft do not build on JSCAD at all -- whyNotOnJscad()
+  // in lib/model-types.ts, and featureExpr()'s fillet/draft branch in
+  // lib/model-codegen.ts passes the target straight through with a comment.
+  // So JSCAD's own recorded number for these three is not a worse measurement
+  // of the same shape (the way a tessellated cylinder is) -- it is the
+  // UNMODIFIED target, because the feature never ran on this engine at all.
+  // That is a different kind of disagreement than tessellation error, and
+  // conflating the two let round-one-edge pass test-occt-adapter.mjs's
+  // exact+curved check for the wrong reason: "moved off JSCAD" read as
+  // "moved off a totally absent feature," not as "moved off tessellation
+  // noise," which is what that check was built to detect. Flagging it here
+  // lets the adapter give these three their own, honest rule instead.
+  const JSCAD_LACKS = new Set(['round-one-edge', 'bevel-one-edge', 'draft-one-face']);
   for (const [name, doc] of Object.entries(fixtures(types))) {
     try {
       results[name] = measure(sandbox, M, gen.toReshape(doc));
       if (CURVED.has(name)) results[name].curved = true;
+      if (JSCAD_LACKS.has(name)) results[name].jscadLacks = true;
       if (EXACT[name] !== undefined) {
         results[name].exact = Math.round(EXACT[name] * 1e4) / 1e4;
       }

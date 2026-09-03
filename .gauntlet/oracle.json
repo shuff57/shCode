@@ -1,6 +1,6 @@
 {
-  "sha": "0ca0a8e65c7abd512c910836a44c4e5b073138a6",
-  "takenAt": "2026-09-02",
+  "sha": "40235606930c4949ab29d4bebfd539dcd218776a",
+  "takenAt": "2026-09-03",
   "models": {
     "box": {
       "volume": 24000,
@@ -409,6 +409,183 @@
         ]
       ],
       "polys": 6
+    },
+    "hole-through": {
+      "volume": 31438.1399,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 104,
+      "curved": true,
+      "exact": 31434.5133
+    },
+    "hole-blind": {
+      "volume": 31719.0699,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 40,
+      "curved": true,
+      "exact": 31717.2567
+    },
+    "hole-corners": {
+      "volume": 29752.5595,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 330,
+      "curved": true,
+      "exact": 29738.0533
+    },
+    "hole-x-axis": {
+      "volume": 30876.2797,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 104,
+      "curved": true,
+      "exact": 30869.0266
+    },
+    "shell-2": {
+      "volume": 11264,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 12,
+      "exact": 11264
+    },
+    "pattern-linear-3": {
+      "volume": 96000,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          140,
+          20,
+          10
+        ]
+      ],
+      "polys": 18,
+      "exact": 96000
+    },
+    "pattern-circular-6": {
+      "volume": 6000,
+      "bbox": [
+        [
+          -35,
+          -32.8109,
+          -5
+        ],
+        [
+          35,
+          32.8109,
+          5
+        ]
+      ],
+      "polys": 36,
+      "exact": 6000
+    },
+    "round-one-edge": {
+      "volume": 32000,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 6,
+      "jscadLacks": true,
+      "exact": 31862.6548
+    },
+    "bevel-one-edge": {
+      "volume": 32000,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 6,
+      "jscadLacks": true,
+      "exact": 31680
+    },
+    "draft-one-face": {
+      "volume": 32000,
+      "bbox": [
+        [
+          -20,
+          -20,
+          -10
+        ],
+        [
+          20,
+          20,
+          10
+        ]
+      ],
+      "polys": 6,
+      "jscadLacks": true,
+      "exact": 30875.6733
     }
   },
   "sketches": {
