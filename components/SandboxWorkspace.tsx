@@ -68,6 +68,69 @@ const BUILD_KEY = 'shCode:sandbox-reshape-build';
 // the way it looks like it should).
 const TIMELINE_HEIGHT_PX = 58;
 
+// The B-rep live-preview degrade guard's threshold, in ms of buildMs+meshMs+
+// drawMs combined (the same total the params panel already shows as one
+// number). Chosen from measurement, not a round number: every STEADY-STATE
+// rebuild measured while designing this (a plain box, one named-edge fillet
+// at radius 4, the same fillet re-dragged toward its minimum, and two
+// chained fillets) landed at 5-10ms once the kernel's WASM code path for
+// that operation had run once already in the session. The only numbers seen
+// above this line were COLD, one-time "first call down this code path this
+// session" costs (38-54ms) -- paid once, at the moment a feature is first
+// created, never again for that same kind of edit -- so 25ms sits with
+// margin above every real per-drag cost measured and still well under every
+// cold one, without needing to guess how much margin a heavier document
+// (more fillets, a shell, a pattern) might need beyond what was tested.
+const PREVIEW_DEGRADE_MS = 25;
+
+/**
+ * Folds a batch of pending param edits into `base` the same way `commitParams`
+ * always has -- `applyParam` per entry, then one `solveDoc` -- extracted so
+ * the B-rep live-preview path (below) can compute the SAME doc a real commit
+ * would produce, without actually committing it. Identity is preserved when
+ * nothing changes (see applyParam's and solveDoc's own contracts), which is
+ * what lets a caller cheaply test "did this actually change anything".
+ */
+function foldParams(base: ModelDoc, pending: ParamValues): ModelDoc {
+  let next = base;
+  for (const [k, v] of Object.entries(pending)) {
+    if (typeof v === 'number') next = applyParam(next, k, v);
+  }
+  if (next === base) return base;
+  return solveDoc(next);
+}
+
+/**
+ * Content equality for the refusals map, so the onStats handler can hold
+ * identity stable when a rebuild refused the same features as the last one.
+ *
+ * The reason it exists is the drag hot path: the B-rep live preview fires
+ * onStats on EVERY rebuild -- every frame of a live drag -- and each build
+ * returns a brand-new refusals Map even when nothing about it changed. A
+ * naive setRefusals(st.refusals) would hand React a fresh object every frame
+ * and re-render ModelEditor's feature rows per frame per drag. This compares
+ * size, then each key and its sentence, so identity only changes when the
+ * CONTENT does. `undefined` and an empty map are the same thing: nothing
+ * refused.
+ */
+function refusalsUnchanged(
+  prev: Map<string, string> | undefined,
+  next: Map<string, string> | undefined,
+): boolean {
+  const a = prev ?? EMPTY_REFUSALS;
+  const b = next ?? EMPTY_REFUSALS;
+  if (a.size !== b.size) return false;
+  for (const [id, why] of b) {
+    const prevWhy = a.get(id);
+    if (prevWhy === undefined || prevWhy !== why) return false;
+  }
+  return true;
+}
+
+// Shared empty stand-in for the comparison above only -- never stored, so a
+// caller's map identity is never clobbered by this one.
+const EMPTY_REFUSALS: Map<string, string> = new Map();
+
 // The plain outlined chip the Reset and Full screen buttons both wear.
 const chipStyle: React.CSSProperties = {
   padding: '6px 14px',
@@ -107,6 +170,11 @@ export default function SandboxWorkspace() {
   const [paramValues, setParamValues] = useState<ParamValues>({});
   const [rebuildMs, setRebuildMs] = useState<number | null>(null);
   const [stale, setStale] = useState<'empty' | 'error' | null>(null);
+  // Feature id -> why that feature could not be built (from the B-rep build's
+  // refusals map). Held at component level so ModelEditor can mark the
+  // feature's own timeline row. Guarded by refusalsUnchanged() -- see its
+  // comment for the drag hot path reason.
+  const [refusals, setRefusals] = useState<Map<string, string> | undefined>(undefined);
 
   // Build mode: the model is a ModelDoc and the code is generated from it.
   // Toggling to Code shows that generated source, read-only -- editing it would
@@ -386,6 +454,35 @@ export default function SandboxWorkspace() {
   // 62 anchor round-trips for 24 pointer moves before this split.
   const uncommitted = useRef<ParamValues>({});
 
+  // B-rep live preview while dragging a dimension. JSCAD gets this for free
+  // through the postMessage below -- the runner rebuilds on every message it
+  // receives. The B-rep viewport has no such channel (no iframe to postMessage
+  // into), so this is the second half of the same idea: a PREVIEW doc, thrown
+  // away on release, fed to BrepViewport's `doc` prop instead of the
+  // committed one while a drag is live. `null` means "nothing to preview,
+  // show the committed doc" -- the ordinary state outside a drag.
+  const previewDocRef = useRef<ModelDoc | null>(null);
+  const [previewDoc, setPreviewDoc] = useState<ModelDoc | null>(null);
+  // At most one preview rebuild is ever scheduled at a time -- a burst of
+  // pointermoves between two frames collapses onto whichever `previewDocRef`
+  // value is current when the callback actually runs, which is the entire
+  // throttle. No cancellation logic beyond this: `kernel.buildDoc` runs
+  // synchronously on the main thread (BrepViewportThree.tsx's build effect is
+  // a plain function call, not awaited, not in a worker), so only one rebuild
+  // can ever be in flight and the browser cannot even deliver the pointerup
+  // that would end the drag until it returns.
+  const previewRafRef = useRef<number | null>(null);
+  // The degrade guard: once a rebuild measures slower than PREVIEW_DEGRADE_MS
+  // (see its own comment), this trips and stays tripped for the rest of the
+  // CURRENT drag -- checked by the rAF callback below, cleared in
+  // commitParams on release. A document too heavy to preview live degrades to
+  // today's release-only behaviour, not to a preview that laggily trails the
+  // cursor.
+  const previewDegradedRef = useRef(false);
+  useEffect(() => () => {
+    if (previewRafRef.current != null) cancelAnimationFrame(previewRafRef.current);
+  }, []);
+
   const sendParams = useCallback((next: ParamValues) => {
     // A constrained corner drags its neighbours with it, so the solver decides
     // what actually moved -- the pointer only proposes.
@@ -403,28 +500,50 @@ export default function SandboxWorkspace() {
       { source: 'reshape-set-params', params: solved },
       '*'
     );
-  }, []);
+
+    if (brepEngine && build && !previewDegradedRef.current) {
+      previewDocRef.current = foldParams(docRef.current, uncommitted.current);
+      if (previewRafRef.current == null) {
+        previewRafRef.current = requestAnimationFrame(() => {
+          previewRafRef.current = null;
+          // The guard may have tripped while this frame was queued -- an
+          // onStats from the very rebuild that scheduled it, arriving before
+          // the frame fires. Recheck rather than trust the state at schedule
+          // time.
+          if (previewDegradedRef.current) return;
+          setPreviewDoc(previewDocRef.current);
+        });
+      }
+    }
+  }, [brepEngine, build]);
 
   // Fold pending values into the doc, so the generated code describes the same
   // numbers the panel does. Cheap and rare -- once per drag, or per typed edit.
   const commitParams = useCallback(() => {
     const pending = uncommitted.current;
     uncommitted.current = {};
-    if (!Object.keys(pending).length) return;
-    let next = docRef.current;
-    for (const [k, v] of Object.entries(pending)) {
-      if (typeof v === 'number') next = applyParam(next, k, v);
+    // Every drag ends here, on both engines -- so this is also where the B-rep
+    // live preview (if any) resets for the next one: cancel a still-pending
+    // rAF, drop the preview doc back to null (the committed rebuild below, or
+    // the one already on screen, takes over), and un-trip the degrade guard.
+    if (previewRafRef.current != null) {
+      cancelAnimationFrame(previewRafRef.current);
+      previewRafRef.current = null;
     }
-    // applyParam hands back the same object when nothing matched, so identity
+    previewDocRef.current = null;
+    previewDegradedRef.current = false;
+    setPreviewDoc(null);
+    if (!Object.keys(pending).length) return;
+    const next = foldParams(docRef.current, pending);
+    // foldParams hands back the same object when nothing matched, so identity
     // is the test. Without it, editing the starter's dimensions in Code mode
     // filled the history with entries that undo to exactly the same model.
-    if (next === docRef.current) return;
-    // Through the same gate loadDoc() uses. This path used to call setDoc()
-    // directly, so applyParam's output was the ONE way into the doc that was
-    // never solved and never checked -- a doc adopted here could carry a rule
-    // it did not obey and a design the outline builder would have refused.
-    // Two adoption paths, one gate, is how a fix gets quietly bypassed.
-    next = solveDoc(next);
+    // foldParams already runs solveDoc -- through the same gate loadDoc()
+    // uses. This path used to call setDoc() directly, so applyParam's output
+    // was the ONE way into the doc that was never solved and never checked --
+    // a doc adopted here could carry a rule it did not obey and a design the
+    // outline builder would have refused. Two adoption paths, one gate, is
+    // how a fix gets quietly bypassed.
     if (next === docRef.current) return;
     remember(docRef.current);
     setDoc(next);
@@ -995,6 +1114,7 @@ export default function SandboxWorkspace() {
                 onContentChange={setCardHasContent}
                 pickedEdge={pickedEdge}
                 onClearPickedEdge={() => setPickedEdge(null)}
+                refusals={refusals}
               />
             ) : (
               <CodeEditor />
@@ -1036,12 +1156,34 @@ export default function SandboxWorkspace() {
                     // shapes come from the toolbar, and the app builds them
                     // itself. So the frame is pure latency here and is dropped.
                     <BrepViewport
-                      doc={effectiveDoc}
+                      // The live preview while dragging, or the committed doc
+                      // the rest of the time -- see previewDoc's own comment.
+                      doc={previewDoc ?? effectiveDoc}
                       onStats={(st: BrepViewportStats) => {
+                        const total = st.buildMs + st.meshMs + st.drawMs;
+                        // The degrade guard only judges PREVIEW rebuilds, not
+                        // every rebuild onStats reports -- adding a shape, an
+                        // undo, or any other structural edit also lands here,
+                        // and the first one of those in a session is exactly
+                        // the COLD, one-time-per-code-path cost
+                        // PREVIEW_DEGRADE_MS's own comment says not to judge
+                        // a drag by. `previewDoc` (read fresh from this
+                        // render's closure) is non-null only while THIS
+                        // rebuild's `doc` prop was actually the live-preview
+                        // one, so a slow structural rebuild can no longer
+                        // permanently poison every later drag in the session.
+                        if (previewDoc != null && total > PREVIEW_DEGRADE_MS) {
+                          previewDegradedRef.current = true;
+                          setPreviewDoc(null);
+                        }
                         // The params panel reads one number, so hand it the one a
                         // hand can feel: everything between the edit and the pixels.
-                        setRebuildMs(Math.round(st.buildMs + st.meshMs + st.drawMs));
+                        setRebuildMs(Math.round(total));
                         setStale(st.triangles > 0 ? null : 'empty');
+                        // Refusals: state is only touched when the CONTENT
+                        // differs from what is held, so an unchanged refusal
+                        // set costs no render even on a per-frame hot path.
+                        if (!refusalsUnchanged(refusals, st.refusals)) setRefusals(st.refusals);
                       }}
                       onPick={(p: ViewportPick | null) => {
                         // Picking a face or an edge also selects its owning

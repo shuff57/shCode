@@ -560,9 +560,19 @@ module.exports = function run(dir) {
   check('...the outline the overlay draws comes from outlineOf, not from f.points',
     /outlineOf\(f\)/.test(wsSrc) && /basis: o\.basis/.test(wsSrc),
     'SandboxWorkspace.tsx still hands the raw feature points to the overlay');
+  // The gate moved into foldParams when the B-rep live preview landed, so this
+  // reads the property where it now lives rather than grepping for the old
+  // line -- and there are THREE adoption paths to cover now, not two: a
+  // commit, and the preview doc a drag feeds to the viewport. Both fold
+  // through the one function, which is the whole reason it was extracted.
+  const foldSrc = (wsSrc.match(/function foldParams[\s\S]*?\n\}/) || [''])[0];
   check('...commitParams goes through the same gate loadDoc does',
-    /next = solveDoc\(next\)/.test(wsSrc),
-    'applyParam output reaches the doc ungated -- two adoption paths, one gate');
+    /= foldParams\(docRef\.current, pending\)/.test(wsSrc)
+      && /return solveDoc\(next\);/.test(foldSrc),
+    'applyParam output reaches the doc ungated -- three adoption paths, one gate');
+  check('...and so does the live-preview doc a drag puts on screen',
+    /previewDocRef\.current = foldParams\(/.test(wsSrc),
+    'the preview doc is built without the gate the committed one goes through');
   check('...the constraint toggle refuses a collapsing rule out loud',
     /outlineOf\(\{ \.\.\.f, points \}\)/.test(editorSrc) && /if \(!outline\.ok\)/.test(editorSrc),
     'ModelEditor.setConstraints applies any rule the solver will accept, collapse included');

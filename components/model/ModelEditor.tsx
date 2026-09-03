@@ -162,6 +162,10 @@ interface Props {
    *  so the sandbox stops pinning a selection that no longer points at
    *  anything useful (its target feature is now consumed -- see topLevel()). */
   onClearPickedEdge?: () => void;
+  /** Feature id -> why that feature could not be built, from the B-rep build.
+   *  A refused feature is ABSENT from the model but still present in the
+   *  history, which without this marker looks like the app ignoring a click. */
+  refusals?: Map<string, string>;
 }
 
 type BoolOp = 'union' | 'subtract' | 'intersect';
@@ -345,7 +349,7 @@ function FlyoutButton({
 }
 
 export default function ModelEditor({
-  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, onStartDraw, pickedEdge, onClearPickedEdge,
+  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, onStartDraw, pickedEdge, onClearPickedEdge, refusals,
 }: Props) {
   const [note, setNote] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -1406,6 +1410,7 @@ export default function ModelEditor({
           {doc.features.map((f, i) => {
             const on = selected.includes(f.id);
             const rolledBack = rollbackIndex != null && i >= rollbackIndex;
+            const refusedWhy = refusals?.get(f.id);
             return (
               <Fragment key={f.id}>
                 <button
@@ -1433,10 +1438,18 @@ export default function ModelEditor({
                     'model-row' + (on ? ' is-on' : '') + (shownIds.has(f.id) ? '' : ' is-consumed') + (rolledBack ? ' is-rolled-back' : '')
                   }
                   onClick={(e) => pick(f.id, e.ctrlKey || e.metaKey || e.shiftKey)}
+                  title={refusedWhy}
+                  aria-label={refusedWhy ? `${names[f.id]}: ${refusedWhy}` : undefined}
                 >
                 <span className="model-step">{i + 1}</span>
                 <span className="model-name">
                   {names[f.id]}
+                  {refusedWhy && (
+                    <>
+                      <span className="model-refused" aria-hidden="true">⚠</span>
+                      <span className="model-refused-why">{refusedWhy}</span>
+                    </>
+                  )}
                   {f.kind === 'sketch' && (
                     <em className="model-detail">
                       {' '}{f.points.length} corners, {f.plane}
@@ -1530,6 +1543,7 @@ export default function ModelEditor({
           )}
           {doc.features.map((f, i) => {
             const on = selected.includes(f.id);
+            const refusedWhy = refusals?.get(f.id);
             return (
               <li
                 key={f.id}
@@ -1537,10 +1551,18 @@ export default function ModelEditor({
                   'model-row' + (on ? ' is-on' : '') + (shownIds.has(f.id) ? '' : ' is-consumed')
                 }
                 onClick={(e) => pick(f.id, e.ctrlKey || e.metaKey || e.shiftKey)}
+                title={refusedWhy}
+                aria-label={refusedWhy ? `${names[f.id]}: ${refusedWhy}` : undefined}
               >
                 <span className="model-step">{i + 1}</span>
                 <span className="model-name">
                   {names[f.id]}
+                  {refusedWhy && (
+                    <>
+                      <span className="model-refused" aria-hidden="true">⚠</span>
+                      <span className="model-refused-why">{refusedWhy}</span>
+                    </>
+                  )}
                   {f.kind === 'sketch' && (
                     <em className="model-detail">
                       {' '}{f.points.length} corners, {f.plane}
@@ -1800,6 +1822,10 @@ export default function ModelEditor({
           white-space: nowrap;
         }
         .model-timeline .model-detail { display: none; }
+        /* The refusal sentence is panel-only: the timeline truncates prose to
+           nothing (see .model-timeline .model-name), so there the row's title
+           and aria-label carry it, with the ⚠ glyph alone as the marker. */
+        .model-timeline .model-refused-why { display: none; }
         .model-timeline .model-move {
           position: absolute;
           right: 2px;
@@ -1843,6 +1869,20 @@ export default function ModelEditor({
         }
         .model-name { flex: 1 1 auto; min-width: 0; }
         .model-detail { color: #6272a4; font-style: normal; }
+        /* A refused feature: built around, but not the feature itself. The ⚠
+           shows in BOTH the timeline and the panel list; the sentence after
+           the name is panel-only -- hidden in the timeline, where the row's
+           title and aria-label carry the sentence instead. Orange, not red:
+           the part built and is still usable, one step of it is missing. */
+        .model-refused { color: #ffb86c; margin-left: 4px; }
+        .model-refused-why {
+          display: block;
+          margin-left: 4px;
+          color: #ffb86c;
+          font-style: normal;
+          font-size: 11px;
+          white-space: normal;
+        }
         .model-move { display: inline-flex; gap: 2px; }
         .model-move button {
           padding: 2px; line-height: 0; background: transparent;

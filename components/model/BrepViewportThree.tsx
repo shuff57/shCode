@@ -95,6 +95,10 @@ export interface BrepViewportStats {
   meshMs: number;
   drawMs: number;
   triangles: number;
+  /** Feature id -> the sentence saying why that feature could not be built.
+   *  Absent or empty means everything in the document built. Comes straight
+   *  from BuildResult.refusals; see lib/occt-build.ts. */
+  refusals?: Map<string, string>;
 }
 
 /**
@@ -1220,6 +1224,7 @@ export default function BrepViewportThree({
           setBuildError(null);
           onStatsRef.current?.({
             buildMs: round(buildMs), meshMs: 0, drawMs: round(performance.now() - t), triangles: 0,
+            refusals: built.refusals,
           });
           onMeshRef.current?.(null);
           return;
@@ -1251,6 +1256,7 @@ export default function BrepViewportThree({
       const triangles = meshed.reduce((n, m) => n + (m.geometry.getIndex()?.count ?? 0) / 3, 0);
       onStatsRef.current?.({
         buildMs: round(buildMs), meshMs: round(meshMs), drawMs: round(drawMs), triangles,
+        refusals: built.refusals,
       });
       // The same triangles just drawn, handed out structurally for
       // SandboxWorkspace's Export STL button -- see the onMesh prop doc.
