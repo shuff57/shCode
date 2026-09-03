@@ -1345,6 +1345,7 @@ export default function SandboxWorkspace() {
                       emptyMessage={brepEngine
                         ? (selected.length ? 'This step has no numbers to adjust.' : 'Select a shape to see its dimensions.')
                         : undefined}
+                      notice={brepEngine && selected.length === 1 ? refusals?.get(selected[0]) ?? null : null}
                       values={paramValues}
                       onChange={sendParams}
                       onCommit={commitParams}

@@ -26,6 +26,10 @@ interface Props {
   /** Shown when `defs` is empty. The default names getParameterDefinitions(),
    *  which only makes sense in Code mode; Build mode passes its own. */
   emptyMessage?: ReactNode;
+  /** A sentence about the selected step the kernel refused to build --
+   *  the timeline chip only has room for a warning mark; this is where the
+   *  words go. */
+  notice?: string | null;
   values: ParamValues;
   onChange: (next: ParamValues) => void;
   /** End of a gesture — a whole slider drag is one undo, not sixty. */
@@ -67,7 +71,7 @@ function settle(n: number, d: ParamDef) {
 }
 
 export default function ReshapeParamsPanel({
-  defs, values, onChange, onCommit, lastMs, stale, emptyMessage,
+  defs, values, onChange, onCommit, lastMs, stale, emptyMessage, notice,
 }: Props) {
   // What is in the text box, deliberately NOT the same as the model value:
   // half-typed input like "" or "-" has to survive on screen without being
@@ -116,6 +120,7 @@ export default function ReshapeParamsPanel({
   if (defs.length === 0) {
     return (
       <div className="reshape-params-empty">
+        {notice && <p className="reshape-params-empty-warn reshape-params-notice">{notice}</p>}
         {emptyMessage ?? (
           <>
             No dimensions declared. Add a <code>getParameterDefinitions()</code> function
@@ -141,6 +146,7 @@ export default function ReshapeParamsPanel({
         )}
       </div>
 
+      {notice && <p className="reshape-params-empty-warn reshape-params-notice">{notice}</p>}
       {stale && (
         <p className="reshape-params-empty-warn">
           {stale === 'empty'
