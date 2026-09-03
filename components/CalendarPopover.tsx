@@ -38,8 +38,12 @@ const MONTHS = [
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
-const PANEL_W = 244;
-const PANEL_H = 292;
+const PANEL_W = 264;
+// Grown from 292 once the panel started carrying more than the grid: a time
+// row, and — when `extra` is passed — a whole second date's worth of fields.
+// This only feeds the flip-above-if-it-would-clip math, so an under-estimate
+// isn't a hard bug, just an occasional few px of avoidable overlap.
+const PANEL_H = 380;
 
 function pad(n: number): string {
   return String(n).padStart(2, '0');
@@ -81,6 +85,8 @@ export interface CalendarPopoverProps {
   time?: string;
   onTimeChange?: (time: string) => void;
   timeLabel?: string;
+  /** Extra content rendered below the time row, above the Today/Clear footer. */
+  extra?: React.ReactNode;
 }
 
 export default function CalendarPopover({
@@ -93,6 +99,7 @@ export default function CalendarPopover({
   time,
   onTimeChange,
   timeLabel = 'Time',
+  extra,
 }: CalendarPopoverProps) {
   const selected = parseISO(value);
   const todayParts = parseISO(today);
@@ -277,6 +284,8 @@ export default function CalendarPopover({
           />
         </div>
       )}
+
+      {extra}
 
       <div
         style={{
