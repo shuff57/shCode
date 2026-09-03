@@ -1,26 +1,42 @@
 'use client';
 
-// Teacher-side due-date store: the rows for ONE chosen class, plus a writer.
+// Teacher-side date store: the rows for ONE chosen class, for BOTH "Due" and
+// "Opens", plus a writer for each.
 //
 // This is deliberately separate from lib/due-dates.ts. That store answers
-// "when is this due for me?" and reads /api/my-due-dates, which is scoped by
-// enrollment — a teacher is not enrolled in their own class, so it returns
-// nothing for them. This one answers "when have I set this for Period 3?" and
-// reads the class's own rows, which is the thing an editor has to edit.
+// "when is this due/open for me?" and reads /api/my-due-dates, which is
+// scoped by enrollment — a teacher is not enrolled in their own class, so it
+// returns nothing for them. This one answers "what have I set this to for
+// Period 3?" and reads the class's own rows, which is the thing an editor
+// has to edit.
 //
 // Same singleton + pub/sub shape as lib/progress.ts so every chip on the page
 // shares one fetch and one re-render.
+//
+// Generalized 2026-09-03 from a Due-only store, so a teacher can also set
+// "Opens" from the same home-page cards, not only from the /teacher due-dates
+// panel. EVERY function that existed before this still has its EXACT old
+// name and signature and still means "due" — nothing that already depended
+// on this file changed behavior. What's new is a parallel set of `open*`
+// functions with the same shapes, backed by a second cache (`open`) fetched
+// alongside the due one so there is still only one /api/me and one
+// /api/classes round trip per page, not two.
 
 import { useEffect, useState } from 'react';
 import {
   buildDueIndex,
+  buildOpenIndex,
   moduleDueSummary,
   resolveDueAt,
   type DueDateRow,
   type DueIndex,
   type DueScope,
   type ModuleDueSummary,
+  type OpenDateRow,
 } from './due-dates-core';
+
+type Kind = 'due' | 'open';
+const ENDPOINT: Record<Kind, string> = { due: 'due-dates', open: 'open-dates' };
 
 const ACTIVE_CLASS_KEY = 'shcode.dueDates.activeClass';
 
@@ -29,28 +45,36 @@ export interface DueClassOption {
   name: string;
 }
 
+interface KindState {
+  index: DueIndex;
+  /** Rows keyed "scope:scopeId" -> epoch ms, for "does this level own a row?" */
+  own: Map<string, number>;
+}
+
 export interface TeacherDueSnapshot {
   loaded: boolean;
   /** Role allows editing AND at least one class is manageable. */
   canEdit: boolean;
   classes: DueClassOption[];
   activeClassId: string | null;
-  index: DueIndex;
-  /** Rows keyed "scope:scopeId" -> epoch ms, for "does this level own a row?" */
-  own: Map<string, number>;
+  /** @internal — read through ownDate/resolveForClass/etc, not directly. */
+  due: KindState;
+  /** @internal — read through ownOpenDate/resolveOpenForClass/etc, not directly. */
+  open: KindState;
   saving: boolean;
   error: string | null;
 }
 
 const emptyIndex = (): DueIndex => ({ lesson: new Map(), module: new Map(), unit: new Map() });
+const emptyKindState = (): KindState => ({ index: emptyIndex(), own: new Map() });
 
 const empty: TeacherDueSnapshot = {
   loaded: false,
   canEdit: false,
   classes: [],
   activeClassId: null,
-  index: emptyIndex(),
-  own: new Map(),
+  due: emptyKindState(),
+  open: emptyKindState(),
   saving: false,
   error: null,
 };
@@ -81,23 +105,25 @@ function writeStoredClass(id: string | null) {
   }
 }
 
-interface ApiDueRow {
-  scope: DueScope;
-  scopeId: string;
-  dueAt: number;
-}
-
-async function fetchRows(classId: string): Promise<ApiDueRow[]> {
-  const res = await fetch(`/api/classes/${classId}/due-dates`, { credentials: 'include' });
-  if (!res.ok) throw new Error(`due-dates GET ${res.status}`);
-  const data = (await res.json()) as { dueDates?: ApiDueRow[] };
-  return data.dueDates ?? [];
-}
-
-function indexRows(rows: ApiDueRow[]): { index: DueIndex; own: Map<string, number> } {
+async function fetchKind(classId: string, kind: Kind): Promise<KindState> {
+  const res = await fetch(`/api/classes/${classId}/${ENDPOINT[kind]}`, { credentials: 'include' });
+  if (!res.ok) throw new Error(`${ENDPOINT[kind]} GET ${res.status}`);
   const own = new Map<string, number>();
-  for (const r of rows) own.set(`${r.scope}:${r.scopeId}`, r.dueAt);
-  return { index: buildDueIndex(rows as DueDateRow[]), own };
+  if (kind === 'due') {
+    const data = (await res.json()) as { dueDates?: { scope: DueScope; scopeId: string; dueAt: number }[] };
+    const rows = data.dueDates ?? [];
+    for (const r of rows) own.set(`${r.scope}:${r.scopeId}`, r.dueAt);
+    return { index: buildDueIndex(rows as DueDateRow[]), own };
+  }
+  const data = (await res.json()) as { openDates?: { scope: DueScope; scopeId: string; openAt: number }[] };
+  const rows = data.openDates ?? [];
+  for (const r of rows) own.set(`${r.scope}:${r.scopeId}`, r.openAt);
+  return { index: buildOpenIndex(rows as OpenDateRow[]), own };
+}
+
+async function fetchBoth(classId: string): Promise<{ due: KindState; open: KindState }> {
+  const [due, open] = await Promise.all([fetchKind(classId, 'due'), fetchKind(classId, 'open')]);
+  return { due, open };
 }
 
 async function load(): Promise<void> {
@@ -140,15 +166,15 @@ async function load(): Promise<void> {
   writeStoredClass(activeClassId);
 
   try {
-    const { index, own } = indexRows(await fetchRows(activeClassId));
-    set({ loaded: true, canEdit: true, classes, activeClassId, index, own, error: null });
+    const { due, open } = await fetchBoth(activeClassId);
+    set({ loaded: true, canEdit: true, classes, activeClassId, due, open, error: null });
   } catch {
     set({
       loaded: true,
       canEdit: true,
       classes,
       activeClassId,
-      error: 'Could not load due dates for this class.',
+      error: 'Could not load dates for this class.',
     });
   }
 }
@@ -177,41 +203,29 @@ export function useTeacherDue(): TeacherDueSnapshot {
 export async function selectClass(classId: string): Promise<void> {
   if (classId === cache.activeClassId) return;
   writeStoredClass(classId);
-  set({ activeClassId: classId, index: emptyIndex(), own: new Map(), saving: true, error: null });
+  set({ activeClassId: classId, due: emptyKindState(), open: emptyKindState(), saving: true, error: null });
   try {
-    const { index, own } = indexRows(await fetchRows(classId));
-    set({ index, own, saving: false });
+    const { due, open } = await fetchBoth(classId);
+    set({ due, open, saving: false });
   } catch {
-    set({ saving: false, error: 'Could not load due dates for this class.' });
+    set({ saving: false, error: 'Could not load dates for this class.' });
   }
 }
 
-/**
- * Write one due date. `date` is a zoneless YYYY-MM-DD straight off an
- * <input type="date">, or null to clear the row and fall back to inheritance.
- *
- * Always re-reads afterwards rather than patching the cache locally: the
- * server converts the calendar date to 23:59:59.999 in the school timezone,
- * so the resulting epoch ms is not ours to guess.
- */
-export async function setDueDate(
-  scope: DueScope,
-  scopeId: string,
-  date: string | null,
-): Promise<boolean> {
+async function writeOne(kind: Kind, scope: DueScope, scopeId: string, date: string | null): Promise<boolean> {
   const classId = cache.activeClassId;
   if (!classId) return false;
   set({ saving: true, error: null });
   try {
-    const res = await fetch(`/api/classes/${classId}/due-dates`, {
+    const res = await fetch(`/api/classes/${classId}/${ENDPOINT[kind]}`, {
       method: 'PUT',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ entries: [{ scope, scopeId, date }] }),
     });
-    if (!res.ok) throw new Error(`due-dates PUT ${res.status}`);
-    const { index, own } = indexRows(await fetchRows(classId));
-    set({ index, own, saving: false });
+    if (!res.ok) throw new Error(`${ENDPOINT[kind]} PUT ${res.status}`);
+    const state = await fetchKind(classId, kind);
+    set(kind === 'due' ? { due: state, saving: false } : { open: state, saving: false });
     return true;
   } catch {
     set({ saving: false, error: 'Could not save that date.' });
@@ -219,34 +233,32 @@ export async function setDueDate(
   }
 }
 
-/**
- * Push a module's date onto the module row and clear every child override in
- * one batch, so a "Mixed" module snaps back to a single date.
- */
-export async function applyModuleDateToAll(
+async function applyModuleToAll(
+  kind: Kind,
   moduleId: string,
   date: string,
   lessonIds: readonly string[],
 ): Promise<boolean> {
   const classId = cache.activeClassId;
   if (!classId) return false;
+  const own = kind === 'due' ? cache.due.own : cache.open.own;
   const entries: { scope: DueScope; scopeId: string; date: string | null }[] = [
     { scope: 'module', scopeId: moduleId, date },
     ...lessonIds
-      .filter((id) => cache.own.has(`lesson:${id}`))
+      .filter((id) => own.has(`lesson:${id}`))
       .map((id) => ({ scope: 'lesson' as DueScope, scopeId: id, date: null })),
   ];
   set({ saving: true, error: null });
   try {
-    const res = await fetch(`/api/classes/${classId}/due-dates`, {
+    const res = await fetch(`/api/classes/${classId}/${ENDPOINT[kind]}`, {
       method: 'PUT',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ entries }),
     });
-    if (!res.ok) throw new Error(`due-dates PUT ${res.status}`);
-    const { index, own } = indexRows(await fetchRows(classId));
-    set({ index, own, saving: false });
+    if (!res.ok) throw new Error(`${ENDPOINT[kind]} PUT ${res.status}`);
+    const state = await fetchKind(classId, kind);
+    set(kind === 'due' ? { due: state, saving: false } : { open: state, saving: false });
     return true;
   } catch {
     set({ saving: false, error: 'Could not save that date.' });
@@ -254,10 +266,35 @@ export async function applyModuleDateToAll(
   }
 }
 
-// ---- read helpers over the active class -----------------------------------
+// ---- Due: unchanged names, unchanged signatures, unchanged behavior -------
+
+/**
+ * Write one due date. `date` is a zoneless YYYY-MM-DD straight off an
+ * <input type="date">, or null to clear the row and fall back to
+ * inheritance.
+ *
+ * Always re-reads afterwards rather than patching the cache locally: the
+ * server converts the calendar date to 23:59:59.999 in the school timezone,
+ * so the resulting epoch ms is not ours to guess.
+ */
+export function setDueDate(scope: DueScope, scopeId: string, date: string | null): Promise<boolean> {
+  return writeOne('due', scope, scopeId, date);
+}
+
+/**
+ * Push a module's due date onto the module row and clear every child
+ * override in one batch, so a "Mixed" module snaps back to a single date.
+ */
+export function applyModuleDateToAll(
+  moduleId: string,
+  date: string,
+  lessonIds: readonly string[],
+): Promise<boolean> {
+  return applyModuleToAll('due', moduleId, date, lessonIds);
+}
 
 export function ownDate(snap: TeacherDueSnapshot, scope: DueScope, scopeId: string): number | null {
-  return snap.own.get(`${scope}:${scopeId}`) ?? null;
+  return snap.due.own.get(`${scope}:${scopeId}`) ?? null;
 }
 
 export function resolveForClass(
@@ -266,7 +303,7 @@ export function resolveForClass(
   moduleId?: string | null,
   unitId?: string | null,
 ): number | null {
-  return resolveDueAt(snap.index, { lessonId, moduleId, unitId });
+  return resolveDueAt(snap.due.index, { lessonId, moduleId, unitId });
 }
 
 export function moduleSummaryForClass(
@@ -275,5 +312,50 @@ export function moduleSummaryForClass(
   lessonIds: readonly string[],
   unitId?: string | null,
 ): ModuleDueSummary {
-  return moduleDueSummary(snap.index, moduleId, lessonIds, unitId);
+  return moduleDueSummary(snap.due.index, moduleId, lessonIds, unitId);
+}
+
+// ---- Opens: same shapes, "open" instead of "due" ---------------------------
+//
+// A date with no time here defaults to MIDNIGHT (start of the day), not end
+// of day — that is what the open-dates route itself defaults to, and it is
+// the more common ask ("available Monday") than a precise hour. A teacher who
+// needs an exact time (the way 1.7 opened at 12:30 PM sharp) still has the
+// full /teacher due-dates panel, which carries a time input; this chip is the
+// quick, common-case path, not a replacement for that panel.
+
+/** Write one "available after" date. Same contract as setDueDate. */
+export function setOpenDate(scope: DueScope, scopeId: string, date: string | null): Promise<boolean> {
+  return writeOne('open', scope, scopeId, date);
+}
+
+/** Same contract as applyModuleDateToAll, for Opens. */
+export function applyModuleOpenDateToAll(
+  moduleId: string,
+  date: string,
+  lessonIds: readonly string[],
+): Promise<boolean> {
+  return applyModuleToAll('open', moduleId, date, lessonIds);
+}
+
+export function ownOpenDate(snap: TeacherDueSnapshot, scope: DueScope, scopeId: string): number | null {
+  return snap.open.own.get(`${scope}:${scopeId}`) ?? null;
+}
+
+export function resolveOpenForClass(
+  snap: TeacherDueSnapshot,
+  lessonId: string,
+  moduleId?: string | null,
+  unitId?: string | null,
+): number | null {
+  return resolveDueAt(snap.open.index, { lessonId, moduleId, unitId });
+}
+
+export function moduleOpenSummaryForClass(
+  snap: TeacherDueSnapshot,
+  moduleId: string,
+  lessonIds: readonly string[],
+  unitId?: string | null,
+): ModuleDueSummary {
+  return moduleDueSummary(snap.open.index, moduleId, lessonIds, unitId);
 }

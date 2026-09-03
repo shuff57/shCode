@@ -1,8 +1,8 @@
 'use client';
 
-// The editable due-date chip a teacher sees on the right edge of a module row
-// or a lesson card. Students never see this — it renders null unless
-// useTeacherDue() says the signed-in user can manage a class.
+// The editable due-date / open-date chip a teacher sees on the right edge of
+// a module row or a lesson card. Students never see this — it renders null
+// unless useTeacherDue() says the signed-in user can manage a class.
 //
 // Three visual states, because "no date" and "a date it inherited" and "a date
 // I set here" are three different things to a teacher and only the third is
@@ -12,15 +12,22 @@
 //   Sep 11         inherited from the module (dimmed, italic)
 //   Sep 18  x      this row owns the date (solid, clearable)
 //
+// One chip, two kinds (`kind` prop, default 'due'): Due is advisory and
+// color-codes by status (late/today/upcoming); Opens is a lock, has no "late"
+// concept, and always reads in the same lock-purple as OpensBadge so a
+// teacher recognizes it as the same idea whether it's read-only or editable.
+//
 // Chips live inside <summary> elements, so every interactive part stops the
 // click from toggling the accordion it sits in.
 
 import { useRef, useState } from 'react';
-import { CalendarClock, X } from 'lucide-react';
+import { CalendarClock, LockKeyhole, X } from 'lucide-react';
 import CalendarPopover from './CalendarPopover';
 import {
   applyModuleDateToAll,
+  applyModuleOpenDateToAll,
   setDueDate,
+  setOpenDate,
   useTeacherDue,
 } from '../lib/due-dates-edit';
 import { dueStatus, formatDue, schoolDateString, type DueScope } from '../lib/due-dates-core';
@@ -31,6 +38,7 @@ const C = {
   late: '#ff5555',
   today: '#f1fa8c',
   set: '#8be9fd',
+  open: '#bd93f9',
   border: '#44475a',
   bg: '#282a36',
 };
@@ -56,6 +64,8 @@ export interface DueDateChipProps {
   /** Sit at the right edge of a flex row. Costs nothing when the chip is hidden. */
   pushRight?: boolean;
   size?: 'sm' | 'md';
+  /** 'due' (default) is advisory; 'open' is the "available after" lock. */
+  kind?: 'due' | 'open';
 }
 
 export default function DueDateChip({
@@ -69,6 +79,7 @@ export default function DueDateChip({
   moduleLessonIds,
   pushRight = false,
   size = 'sm',
+  kind = 'due',
 }: DueDateChipProps) {
   const due = useTeacherDue();
   const [open, setOpen] = useState(false);
@@ -76,6 +87,8 @@ export default function DueDateChip({
 
   if (!due.canEdit || !due.activeClassId) return null;
 
+  const isOpenKind = kind === 'open';
+  const noun = isOpenKind ? 'open date' : 'due date';
   const fontSize = size === 'md' ? 13 : 12;
   const stop = (e: { preventDefault: () => void; stopPropagation: () => void }) => {
     e.preventDefault();
@@ -91,9 +104,11 @@ export default function DueDateChip({
     // Setting a date on a Mixed module is the "apply to all" gesture — the
     // point of picking one date for a module whose children disagree.
     if (scope === 'module' && mixed && moduleLessonIds) {
-      void applyModuleDateToAll(scopeId, date, moduleLessonIds);
+      void (isOpenKind
+        ? applyModuleOpenDateToAll(scopeId, date, moduleLessonIds)
+        : applyModuleDateToAll(scopeId, date, moduleLessonIds));
     } else {
-      void setDueDate(scope, scopeId, date);
+      void (isOpenKind ? setOpenDate(scope, scopeId, date) : setDueDate(scope, scopeId, date));
     }
   };
 
@@ -108,21 +123,21 @@ export default function DueDateChip({
     color = C.dim;
     title =
       min !== null && max !== null
-        ? `Lessons here are due between ${formatDue(min)} and ${formatDue(max)} — pick a date to apply one to all of them`
-        : 'Lessons here have different due dates';
+        ? `Lessons here ${isOpenKind ? 'open' : 'are due'} between ${formatDue(min)} and ${formatDue(max)} — pick a date to apply one to all of them`
+        : `Lessons here have different ${isOpenKind ? 'open' : 'due'} dates`;
   } else if (ownAt !== null) {
     label = formatDue(ownAt);
-    color = colorFor(ownAt);
-    title = `Due date set on this ${scope}. Click to change, x to clear.`;
+    color = isOpenKind ? C.open : colorFor(ownAt);
+    title = `${isOpenKind ? 'Opens' : 'Due'} date set on this ${scope}. Click to change, x to clear.`;
   } else if (resolvedAt !== null) {
     label = formatDue(resolvedAt);
     color = C.dim;
     italic = true;
-    title = `Inherited from the module. Click to give this ${scope} its own date.`;
+    title = `Inherited from the module. Click to give this ${scope} its own ${noun}.`;
   } else {
-    label = '+ due';
+    label = isOpenKind ? '+ opens' : '+ due';
     color = C.dim;
-    title = `Set a due date for this ${scope}`;
+    title = `Set an ${noun} for this ${scope}`;
   }
 
   return (
@@ -161,7 +176,11 @@ export default function DueDateChip({
           opacity: due.saving ? 0.6 : 1,
         }}
       >
-        <CalendarClock size={fontSize} strokeWidth={2} />
+        {isOpenKind ? (
+          <LockKeyhole size={fontSize} strokeWidth={2} />
+        ) : (
+          <CalendarClock size={fontSize} strokeWidth={2} />
+        )}
         {label}
       </button>
 
@@ -176,7 +195,7 @@ export default function DueDateChip({
               ? undefined
               : () => {
                   setOpen(false);
-                  void setDueDate(scope, scopeId, null);
+                  void (isOpenKind ? setOpenDate(scope, scopeId, null) : setDueDate(scope, scopeId, null));
                 }
           }
           onClose={() => setOpen(false)}
@@ -188,13 +207,13 @@ export default function DueDateChip({
           type="button"
           title={
             scope === 'module'
-              ? 'Clear this module’s due date'
-              : 'Clear this override and go back to the module’s date'
+              ? `Clear this module’s ${noun}`
+              : `Clear this override and go back to the module’s ${isOpenKind ? 'open date' : 'due date'}`
           }
           disabled={due.saving}
           onClick={(e) => {
             stop(e);
-            void setDueDate(scope, scopeId, null);
+            void (isOpenKind ? setOpenDate(scope, scopeId, null) : setDueDate(scope, scopeId, null));
           }}
           style={{
             display: 'inline-flex',

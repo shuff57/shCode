@@ -9,7 +9,7 @@ import { lessonHref } from '../lib/lesson-href';
 import { moduleIdFromTitle, resolveDue, useDueDates, useLessonAvailability } from '../lib/due-dates';
 import DueBadge, { OpensBadge } from './DueBadge';
 import DueDateChip from './DueDateChip';
-import { ownDate, resolveForClass, useTeacherDue } from '../lib/due-dates-edit';
+import { ownDate, ownOpenDate, resolveForClass, resolveOpenForClass, useTeacherDue } from '../lib/due-dates-edit';
 
 const typeBadgeColors: Record<string, string> = {
   lesson: '#5baafd',
@@ -111,6 +111,13 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
         />
         {/* Teacher only, and pushed to the right edge of the card. Renders
             null for a student, so it costs no layout there. */}
+        <DueDateChip
+          scope="lesson"
+          scopeId={lesson.id}
+          resolvedAt={resolveOpenForClass(teacherDue, lesson.id, moduleId, lesson.category ?? null)}
+          ownAt={ownOpenDate(teacherDue, 'lesson', lesson.id)}
+          kind="open"
+        />
         <DueDateChip
           scope="lesson"
           scopeId={lesson.id}
