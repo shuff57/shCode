@@ -417,10 +417,20 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
     // `scene` directly, not inside `solidGroup`, so they survive a rebuild's
     // group.clear(); drawGeoms() and restorePicks() repoint them at fresh
     // geometry instead.
+    // Cyan, not the Dracula pale-yellow (#f1fa8c) this used to be -- measured
+    // against the model's own body colour, not the palette in the abstract:
+    // #f1fa8c sits an adjacent ~35 degrees from the solid's orange (#ff6600)
+    // on the hue wheel, so a translucent wash of it reads as a barely-lighter
+    // shade of the same orange, not a highlight. Cyan sits close to
+    // COMPLEMENTARY to orange (~155 degrees away) and separates at almost any
+    // opacity -- the same reasoning the edge highlight below was fixed with,
+    // applied here because a face hover has the identical low-contrast defect
+    // and no reason to be exempt from the same fix. Matches the edge hover
+    // colour too, so "hover" means one thing across both.
     const hoverFaceMesh = new THREE.Mesh(
       new THREE.BufferGeometry(),
       new THREE.MeshBasicMaterial({
-        color: 0xf1fa8c, transparent: true, opacity: 0.35,
+        color: 0x8be9fd, transparent: true, opacity: 0.35,
         polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4,
       }),
     );
