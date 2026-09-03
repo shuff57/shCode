@@ -1104,8 +1104,9 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
             } else {
               refusals.set(
                 f.id,
-                `Hollowing ${label(f.id)} to ${f.thickness} thick did not succeed -- `
-                  + `${label(f.id)} is shown without it.`,
+                `Hollowing ${label(f.id)} to ${f.thickness} thick did not work after the steps before it -- `
+                  + `this kernel cannot hollow a shape that already has a hole or a round. `
+                  + `Hollow first, then drill or round. ${label(f.id)} is shown without it.`,
               );
               shape = src;
             }
