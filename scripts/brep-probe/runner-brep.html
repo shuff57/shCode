@@ -727,7 +727,13 @@
 	}
 
 	function drawShapes(shapes) {
-		solidGroup.traverse(function (o) { if (o.isMesh) o.geometry && o.geometry.dispose(); });
+		// Dispose EVERYTHING from the previous run before building the new one --
+		// not just the solid meshes. Missed the first time: `o.isMesh` is false
+		// for a THREE.LineSegments, so the per-face edge overlay's own
+		// EdgesGeometry (added as a child of each mesh, not of solidGroup
+		// directly) was never released, only the solid it outlined. Traversing
+		// picks up both kinds of child regardless of nesting depth.
+		solidGroup.traverse(function (o) { if (o.geometry) o.geometry.dispose(); });
 		solidGroup.clear();
 		var meshed = [];
 		for (var i = 0; i < shapes.length; i++) {
@@ -742,6 +748,30 @@
 			mesh.add(new THREE.LineSegments(edgesGeom, edgeMaterial));
 		}
 		return meshed;
+	}
+
+	/** Total triangle count actually on screen -- reported alongside timing so
+	 *  a caller can tell "the frame kept the last run's shapes" (count keeps
+	 *  climbing) apart from "it drew a bigger one" (count matches this run's
+	 *  own geometry) without reading pixels. */
+	function triangleCountOf(meshed) {
+		var total = 0;
+		for (var i = 0; i < meshed.length; i++) {
+			var geom = meshed[i].geometry;
+			if (!geom) continue;
+			total += geom.index ? (geom.index.count / 3) : (geom.attributes.position.count / 3);
+		}
+		return total;
+	}
+
+	/** A coarse but honest signal for "is the wasm heap still growing after the
+	 *  shapes that grew it are gone" -- WebAssembly.Memory only ever grows, so
+	 *  this cannot prove nothing leaks, but a value that keeps climbing every
+	 *  run without settling is the same shape a real per-run leak would leave. */
+	function wasmHeapBytes() {
+		try {
+			return (oc.wasmMemory && oc.wasmMemory.buffer) ? oc.wasmMemory.buffer.byteLength : null;
+		} catch (e) { return null; }
 	}
 
 	// One-time load vs. every later Run, folded into the SAME function: a
@@ -833,7 +863,15 @@
 			window.__occtEnableSaving(shapes);
 			statusEl.textContent = '';
 			var ms = performance.now() - t0;
-			try { window.parent.postMessage({ source: 'reshape-rebuilt', ms: ms }, '*'); } catch (_) {}
+			// triangles/wasmBytes are additive diagnostics -- existing listeners
+			// (ReshapeParamsPanel etc.) read `ms`/`empty`/`failed` and ignore
+			// fields they don't know, so this cannot break them.
+			try {
+				window.parent.postMessage({
+					source: 'reshape-rebuilt', ms: ms,
+					triangles: triangleCountOf(meshed), wasmBytes: wasmHeapBytes()
+				}, '*');
+			} catch (_) {}
 		}
 		function asyncFailed(e) {
 			if (isFirstRun) {
