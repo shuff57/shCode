@@ -1021,7 +1021,35 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
               inner = null;
             }
             if (inner) {
-              shape = boolean('BRepAlgoAPI_Cut', src, inner, f.id, [f.target]);
+              const cut = boolean('BRepAlgoAPI_Cut', src, inner, f.id, [f.target]);
+              // IsDone() is not the whole story. Measured 2026-09-03: on a
+              // box with ONE edge rounded, the offset reports done, the cut
+              // "succeeds", and what comes out has no drawable faces -- the
+              // viewport threw "tessellateToThree() returned nothing
+              // drawable" and the student's whole model vanished. A hollow
+              // must keep some of the source and lose some: anything else is
+              // a refusal, shown without it, like every other refusal here.
+              // Measuring the bad result can itself throw a wasm exception
+              // (measured: VolumeProperties on that shape), so a throw counts
+              // as "not sane" rather than escaping to the error panel.
+              let sane = false;
+              try {
+                const vSrc = measureShape(oc, src).volume;
+                const vCut = measureShape(oc, cut).volume;
+                sane = Number.isFinite(vCut) && vCut > 0 && vCut < vSrc;
+              } catch {
+                sane = false;
+              }
+              if (sane) {
+                shape = cut;
+              } else {
+                refusals.set(
+                  f.id,
+                  `Hollowing ${label(f.id)} did not work on this shape (rounded edges are `
+                    + `the usual reason) -- ${label(f.id)} is shown without it.`,
+                );
+                shape = src;
+              }
             } else {
               refusals.set(
                 f.id,
