@@ -35,7 +35,7 @@
     {
       "id": "s4",
       "title": "One variable, one meaning",
-      "instructions": "One of the logic bugs is a variable being used for two different things. Do not fix it by moving lines around -- give the second meaning its own variable, named wrappedCount."
+      "instructions": "One of the logic bugs is a variable being used for two different things. Do not fix it by moving lines around, and do not just delete the second use -- give the second meaning a variable of its own. The name is yours to pick: anything that says what it counts, as long as it is not count."
     }
   ],
   "requirements": [
@@ -79,9 +79,9 @@
       "description": "The receipt reports the number of notebooks that were actually ordered.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?![\\s\\S]*\\bcount\\s*=\\s*2\\b)(?=[\\s\\S]*\\b(?:let|const)\\s+wrappedCount\\b)(?=[\\s\\S]*\\bwrappedCount\\s*=\\s*2\\b)[\\s\\S]*$",
+      "pattern": "^(?![\\s\\S]*\\bcount\\s*=\\s*2\\b)(?=[\\s\\S]*\\b(?:let|const)\\s+([A-Za-z_$][A-Za-z0-9_$]*)\\s*=\\s*2\\s*;[\\s\\S]*\\bwrapFee\\s*=[^;\\n]*(?<![A-Za-z0-9_$])\\1(?![A-Za-z0-9_$]))[\\s\\S]*$",
       "flags": "",
-      "hint": "Follow the value that line prints, from where it is set to where it is printed.",
+      "hint": "Follow the value that line prints, from where it is set to where it is printed. The second meaning needs a variable of its own; you choose its name.",
       "points": 0
     },
     {
@@ -100,7 +100,8 @@
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "summative": true
   },
   "assignmentCode": "A1.7.3"
 }

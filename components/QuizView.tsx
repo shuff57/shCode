@@ -60,13 +60,20 @@ export default function QuizView({ lessonId, config }: Props) {
   const questions = view.questions.map((v) => v.question);
   // A test, not a module quiz: see QuizConfig.summative.
   const summative = !!config.summative;
-  const locked = summative && graded;
   // A summative quiz arrives with its answer key stripped (lib/quiz-redact.ts),
   // so the browser cannot mark it and must not pretend to. Everything that
   // reports or records a score is switched off rather than left to report 0.
   const hasKey = questions.some((q) => q.answer !== undefined);
   const answeredCount = questions.filter((q) => answers[q.id] !== undefined).length;
   const allAnswered = answeredCount === questions.length && questions.length > 0;
+  // On a test, Submit is never withheld for blanks -- see Grading.summative.
+  // A student who cannot do question 4 must still be able to hand in 1-3 and
+  // reach the next part, or the lock costs them the marks they had.
+  const canSubmit = summative ? answeredCount > 0 : allAnswered;
+  // ...and the paper only becomes final once it is FULLY answered. Locking on
+  // a partial hand-in would trade one trap for another: submit five of eight
+  // to unlock Part 2, then never be allowed back to finish the other three.
+  const locked = summative && graded && allAnswered;
   const correctCount = countCorrect(questions, answers);
   const needed = passThreshold(questions.length, config.passPercent);
   const passed = graded && correctCount >= needed;
@@ -136,7 +143,7 @@ export default function QuizView({ lessonId, config }: Props) {
   }
 
   async function submit() {
-    if (!allAnswered) return;
+    if (!canSubmit) return;
     setGraded(true);
     const payload = JSON.stringify({ answers, graded: true });
 
@@ -196,7 +203,7 @@ export default function QuizView({ lessonId, config }: Props) {
       </div>
       <p style={{ color: '#888', fontSize: 13, margin: '0 0 20px' }}>
         {summative
-          ? `Answer all ${questions.length}. You can change an answer as often as you like before you submit, but submitting is final and nothing is marked here — your teacher hands the score back.`
+          ? `Answer all ${questions.length}. Nothing is marked here — your teacher hands the score back. If one has you stuck, submit what you have and move on: the next part unlocks and you can come back to this one. Once all ${questions.length} are answered, submitting is final.`
           : `Pick the answer that fits best for each question. You need ${needed} of ${questions.length} right to move on, and you can change your answers and try again as many times as you like.`}
       </p>
 
@@ -352,22 +359,24 @@ export default function QuizView({ lessonId, config }: Props) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 18, flexWrap: 'wrap' }}>
         <button
           onClick={submit}
-          disabled={!allAnswered || locked}
+          disabled={!canSubmit || locked}
           style={{
-            background: allAnswered ? '#bd93f9' : '#44475a',
-            color: allAnswered ? '#282a36' : '#888',
+            background: canSubmit ? '#bd93f9' : '#44475a',
+            color: canSubmit ? '#282a36' : '#888',
             border: 'none',
             borderRadius: 6,
             padding: '10px 20px',
             fontSize: 14,
             fontWeight: 600,
-            cursor: allAnswered ? 'pointer' : 'not-allowed',
+            cursor: canSubmit ? 'pointer' : 'not-allowed',
           }}
         >
           {summative
             ? locked
               ? 'Submitted'
-              : 'Submit my answers'
+              : allAnswered
+                ? 'Submit my answers'
+                : `Submit what I have (${answeredCount} of ${questions.length})`
             : graded
               ? 'Check again'
               : 'Check my answers'}
@@ -382,10 +391,19 @@ export default function QuizView({ lessonId, config }: Props) {
 
         {graded && summative ? (
           <span
-            style={{ color: '#50fa7b', fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}
+            style={{
+              color: allAnswered ? '#50fa7b' : '#ffb86c',
+              fontSize: 14,
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
           >
             <CircleCheck size={16} />
-            Submitted — all {questions.length} answers are with your teacher.
+            {allAnswered
+              ? `Submitted — all ${questions.length} answers are with your teacher.`
+              : `Submitted ${answeredCount} of ${questions.length}. The next part is unlocked, and this one stays open — come back and answer the rest if you have time.`}
           </span>
         ) : null}
 

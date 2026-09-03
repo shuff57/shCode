@@ -604,11 +604,21 @@ export default function LessonWorkspace({
   // uncaught runtime error from the most recent run blocks Submit so
   // students can't ship code that satisfies static graders but crashes.
   const isNoPoints = totalPossible === 0;
+  // A part of a sat test (Grading.summative) drops BOTH gates. The
+  // requirements gate, because a student who cannot fix Part 3's syntax
+  // error would otherwise sit behind a locked Part 4 and Part 5 and lose the
+  // marks they had. And the runtimeError gate for the same reason and more
+  // sharply: on a find-and-fix, code that still crashes is the normal state
+  // of a partial attempt, so blocking on it locks in exactly the student the
+  // test most needs to hear from. Submitting broken code on a test is
+  // allowed; it is what the marker is for.
+  const isSummative = !!lesson.grading?.summative;
   const canSubmit =
-    !runtimeError &&
-    (isMoshionMode || isNoPoints
-      ? allRequirementsPassed
-      : totalScore >= (lesson.grading?.passingScore ?? 0));
+    isSummative ||
+    (!runtimeError &&
+      (isMoshionMode || isNoPoints
+        ? allRequirementsPassed
+        : totalScore >= (lesson.grading?.passingScore ?? 0)));
   // Any lesson with graded criteria keeps the score header, not just the
   // assignment routes — ch2's labs are `type: "lesson"` but still scored.
   const showAssignmentHeader = isAssignment || isMoshionMode || totalCriteria > 0;
@@ -979,6 +989,7 @@ export default function LessonWorkspace({
         onClose={() => setSubmitOpen(false)}
         onConfirm={confirmSubmit}
         report={gradeReport}
+        summative={isSummative}
       />
       <KeyboardShortcutModal
         isOpen={shortcutModalOpen}

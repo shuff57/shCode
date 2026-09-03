@@ -81,9 +81,16 @@ for (const row of rows) {
   const asked = picks.length;
   let right = 0;
   const wrong = [];
+  // A summative quiz can be handed in with blanks -- that is deliberate, so a
+  // student stuck on question 4 can still hand in 1-3 and reach the next part.
+  // Blanks are wrong for the mark, but they are not the same THING as a wrong
+  // answer, and only the teacher can tell "ran out of time" from "got it wrong"
+  // if the two are separated here.
+  const blank = [];
   for (const p of picks) {
     if (!key.has(p.id)) continue;                 // a question retired since
-    if (p.picked === key.get(p.id)) right++;
+    if (p.picked === undefined || p.picked === null) blank.push(p.id);
+    else if (p.picked === key.get(p.id)) right++;
     else wrong.push(p.id);
   }
   const prior = byStudent.get(row.student_email);
@@ -93,6 +100,7 @@ for (const row of rows) {
     right,
     asked,
     wrong,
+    blank,
     at: row.submitted_at,
     attempts: (prior?.attempts ?? 0) + 1,
   });
@@ -101,25 +109,36 @@ for (const row of rows) {
 const marks = [...byStudent.values()].sort((a, b) => a.email.localeCompare(b.email));
 
 if (asCsv) {
-  console.log('email,form,right,asked,attempts,missed');
+  console.log('email,form,right,asked,blank,attempts,missed,unanswered');
   for (const m of marks) {
-    console.log(`${m.email},${m.variant},${m.right},${m.asked},${m.attempts},"${m.wrong.join(' ')}"`);
+    console.log(
+      `${m.email},${m.variant},${m.right},${m.asked},${m.blank.length},${m.attempts},`
+      + `"${m.wrong.join(' ')}","${m.blank.join(' ')}"`,
+    );
   }
 } else {
   console.log(`\n${lessonId} — ${marks.length} student(s)\n`);
   const w = Math.max(...marks.map((m) => m.email.length), 5);
-  console.log(`${'email'.padEnd(w)}  form  score   missed`);
+  console.log(`${'email'.padEnd(w)}  form  score   missed / [blank]`);
   for (const m of marks) {
-    const flag = m.attempts > 1 ? `  [${m.attempts} ATTEMPTS]` : '';
+    const flag = m.attempts > 1 ? `  (${m.attempts} hand-ins)` : '';
+    const blanks = m.blank.length ? `  [blank: ${m.blank.join(' ')}]` : '';
     console.log(
       `${m.email.padEnd(w)}  ${String(m.variant).padEnd(4)}  ${m.right}/${m.asked}`
-      + `     ${m.wrong.join(' ') || '-'}${flag}`,
+      + `     ${m.wrong.join(' ') || '-'}${blanks}${flag}`,
     );
+  }
+  const partial = marks.filter((m) => m.blank.length > 0);
+  if (partial.length) {
+    console.log(`\n${partial.length} student(s) left questions blank. That is allowed: a `
+      + 'test part can be handed in unfinished so the parts after it unlock, and the '
+      + 'paper stays open until every question is answered. Blanks score nothing.');
   }
   const repeats = marks.filter((m) => m.attempts > 1);
   if (repeats.length) {
-    console.log(`\n${repeats.length} student(s) submitted more than once. A summative quiz `
-      + 'locks after one submission, so read those rows before entering a mark.');
+    console.log(`\n${repeats.length} student(s) handed in more than once. Expected when the `
+      + 'first hand-in was partial -- the LATEST row is the one scored above. A student '
+      + 'with several hand-ins and no blanks is worth a look.');
   }
   console.log('\nEach question is worth 5 points on the Chapter 1 PA: score x 5.');
 }

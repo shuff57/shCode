@@ -161,6 +161,9 @@ export default function DiagramAssignmentView({
     setError(null);
   }, []);
 
+  // One part of a sat test -- see DiagramConfig.summative.
+  const summative = !!config.summative;
+
   const runChecks = useCallback((): CheckResult[] => {
     const results = checkDiagram(doc, rules);
     setChecks(results);
@@ -176,7 +179,10 @@ export default function DiagramAssignmentView({
 
   async function submit() {
     const results = runChecks();
-    if (!allPassed(results)) return;
+    // On a test the structural checks stop being a gate: a student who cannot
+    // get a second exit off their diamond would otherwise never reach Part 5.
+    // See DiagramConfig.summative.
+    if (!allPassed(results) && !summative) return;
 
     // Structure-only lesson: the checks are the whole grade.
     if (!config.aiGrader) {
@@ -186,7 +192,11 @@ export default function DiagramAssignmentView({
           lessonId,
           response: JSON.stringify(doc),
           gradeJson: { structural: results },
-          score: results.length,
+          // The real number passed, not results.length. Before summative
+          // charts could be handed in partial this branch only ran on a clean
+          // sweep, so the two were the same number; now they are not, and
+          // recording the length would hand a half-finished chart full marks.
+          score: results.filter((r) => r.passed).length,
           possible: results.length,
         });
         saveDraft(lessonId, JSON.stringify(doc));
@@ -258,6 +268,7 @@ export default function DiagramAssignmentView({
   );
   const structureOk = checks !== null && allPassed(checks);
   const promptText = config.prompt ?? fallbackPrompt ?? '';
+  const failedCount = checks ? checks.filter((c) => !c.passed).length : 0;
 
   if (!loaded) return null;
 
@@ -351,7 +362,9 @@ export default function DiagramAssignmentView({
               ? result
                 ? 'Re-submit for feedback'
                 : 'Submit for feedback'
-              : 'Submit'}
+              : summative && checks !== null && failedCount > 0
+                ? 'Hand in what I have'
+                : 'Submit'}
         </button>
 
         <button
@@ -402,6 +415,12 @@ export default function DiagramAssignmentView({
             <ListChecks size={16} />
             Flowchart structure — {checks.filter((c) => c.passed).length} / {checks.length} checks passed
           </h3>
+          {summative && failedCount > 0 && (
+            <p style={{ margin: '0 0 8px', color: '#ffb86c', fontSize: 12.5, lineHeight: 1.5 }}>
+              This is a test, so you can hand the chart in like this. It unlocks the
+              next part and your teacher marks it — come back if you have time.
+            </p>
+          )}
           <div style={{ display: 'grid', gap: 8 }}>
             {checks.map((c) => (
               <div

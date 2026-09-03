@@ -80,6 +80,24 @@ export interface Grading {
   totalPoints: number;
   passingScore: number;
   allowLateSubmit?: boolean;
+  /**
+   * This item is one part of a test the student sits in one sitting.
+   *
+   * On a practice assignment Submit is the reward for getting everything
+   * green, which is right: the checklist IS the teaching. On a test it is
+   * backwards. A student who cannot fix the syntax error in Part 3 is then
+   * held behind a locked Part 4 and Part 5 and never gets to answer the
+   * questions they could have answered. So on a summative item Submit is
+   * always available, an incomplete attempt still records completion, and
+   * the next part unlocks -- green-to-advance here means "you sat it", not
+   * "you passed it". Marking happens afterwards, off the student's screen.
+   *
+   * This is the console/requirements-graded twin of `QuizConfig.summative`
+   * and `AiGraderConfig.summative`; `DiagramConfig.summative` is the third.
+   * scripts/check-summative-parts.mjs measures that every part of a test
+   * unit sets whichever one its renderer reads.
+   */
+  summative?: boolean;
 }
 
 export interface Lesson {

@@ -8,9 +8,11 @@ interface SubmitDialogProps {
   onClose: () => void;
   onConfirm: () => void;
   report: GradeReport | null;
+  /** One part of a sat test — see Grading.summative. */
+  summative?: boolean;
 }
 
-export default function SubmitDialog({ isOpen, onClose, onConfirm, report }: SubmitDialogProps) {
+export default function SubmitDialog({ isOpen, onClose, onConfirm, report, summative = false }: SubmitDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -25,6 +27,10 @@ export default function SubmitDialog({ isOpen, onClose, onConfirm, report }: Sub
   const isNoPoints = report.totalPossible === 0;
   const allPassed = report.results.every((r) => r.status === 'passed');
   const belowPassing = !isNoPoints && report.totalScore < report.passingScore;
+  // On a test the red crosses below are not a reason to cancel, and a dialog
+  // that only shows them reads like one. Say so before the list, or a student
+  // backs out of handing in the work they did have.
+  const partialOnTest = summative && !allPassed;
 
   return (
     <dialog
@@ -37,7 +43,14 @@ export default function SubmitDialog({ isOpen, onClose, onConfirm, report }: Sub
     >
       <div className="commit-dialog-content">
         <h3>Submit Assignment</h3>
-        {belowPassing && (
+        {partialOnTest && (
+          <p className="submit-warning">
+            Not everything below is green, and that is fine — this is a test.
+            Hand in what you have: it unlocks the next part, and your teacher
+            marks it. You can come back to this one if you have time.
+          </p>
+        )}
+        {belowPassing && !summative && (
           <p className="submit-warning">
             Your score ({report.totalScore}/{report.totalPossible}) is below the passing
             threshold ({report.passingScore}). You can still submit, but it will not count as passing.
@@ -63,7 +76,7 @@ export default function SubmitDialog({ isOpen, onClose, onConfirm, report }: Sub
         <div className="commit-dialog-actions">
           <button className="btn-secondary" onClick={onClose}>Cancel</button>
           <button className="btn-primary" onClick={onConfirm}>
-            Confirm Submission
+            {partialOnTest ? 'Hand in what I have' : 'Confirm Submission'}
           </button>
         </div>
       </div>
