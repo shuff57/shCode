@@ -444,8 +444,16 @@ export default function SandboxWorkspace() {
   }, []);
 
   const applyDoc = useCallback((next: ModelDoc) => {
+    // A structural change from the editor is built from the committed doc.
+    // If a dimension edit is still pending (a slider mid-gesture, a preview
+    // never committed), fold it into the change rather than dropping it:
+    // the pending values are keyed by feature and slot, so they land on
+    // `next` exactly as they would have on the doc it was built from.
+    const pending = uncommitted.current;
+    uncommitted.current = {};
+    const merged = Object.keys(pending).length ? foldParams(next, pending) : next;
     remember(docRef.current);
-    loadDoc(next);
+    loadDoc(merged);
   }, [remember, loadDoc]);
 
   const undo = useCallback(() => {

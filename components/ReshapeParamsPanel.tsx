@@ -252,6 +252,13 @@ export default function ReshapeParamsPanel({
                     setDraft((p) => ({ ...p, [d.name]: String(v) }));
                     push(d.name, v);
                   }}
+                  // The slider previewed live but never committed: a dragged
+                  // or arrow-keyed value sat pending until the next tool built
+                  // from the committed document and dropped it (measured
+                  // 2026-09-03: x set to 20 by slider, Round, x back to 0).
+                  onPointerUp={commit}
+                  onKeyUp={commit}
+                  onBlur={commit}
                 />
               )}
               <input
