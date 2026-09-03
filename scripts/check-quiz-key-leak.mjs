@@ -29,7 +29,17 @@ import path from 'node:path';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const LESSONS = path.join(ROOT, 'lessons');
-const OUT = path.join(ROOT, 'out', 'lesson');
+// BOTH routes, not just /lesson/. generateStaticParams() exports every lesson
+// id under both prefixes, so a summative item has two built pages, and only
+// one of them is the one students are actually sent to: lib/lesson-href.ts
+// routes `type: "assignment"` -- which every part of a chapter PA is -- to
+// /assignment/. Measured 2026-09-03 on the Chapter 1 PA: /lesson/ redacted,
+// /assignment/ did not, and this check reported OK because it only ever
+// opened the page nobody visits. Check every built page there is.
+const OUT_ROOTS = [
+  path.join(ROOT, 'out', 'lesson'),
+  path.join(ROOT, 'out', 'assignment'),
+];
 
 const allowMissing = process.argv.includes('--allow-missing');
 
@@ -48,8 +58,8 @@ if (summative.length === 0) {
   process.exit(0);
 }
 
-if (!fs.existsSync(OUT)) {
-  const msg = `[check-quiz-key-leak] NOT CHECKED — no out/ directory. `
+if (!OUT_ROOTS.some((d) => fs.existsSync(d))) {
+  const msg = `[check-quiz-key-leak] NOT CHECKED — no built pages under out/. `
     + `${summative.length} summative quiz(zes) unverified. Run \`npm run build\` first.`;
   console.log(msg);
   process.exit(allowMissing ? 0 : 1);
@@ -60,16 +70,23 @@ let checked = 0;
 let unchecked = 0;
 
 for (const { dir, lesson, kind } of summative) {
-  const page = path.join(OUT, lesson.id ?? dir, 'index.html');
-  if (!fs.existsSync(page)) {
+  const id = lesson.id ?? dir;
+  const pages = OUT_ROOTS
+    .map((root) => path.join(root, id, 'index.html'))
+    .filter((f) => fs.existsSync(f));
+  if (pages.length === 0) {
     // out/ exists but predates this lesson -- a stale build, not a leak. Same
     // rule as a missing out/: unverified, and it says so rather than passing.
-    console.log(`NOT CHECKED ${dir}: no built page at out/lesson/${lesson.id ?? dir}/`
-      + ' -- the build predates this lesson. Run `npm run build`.');
+    console.log(`NOT CHECKED ${dir}: no built page at out/lesson/${id}/ nor `
+      + `out/assignment/${id}/ -- the build predates this lesson. Run npm run build.`);
     if (!allowMissing) failures++;
     unchecked++;
     continue;
   }
+
+  // Every built page, because the leak was on the one that was not read.
+  for (const page of pages) {
+  const route = path.relative(path.join(ROOT, 'out'), page).split(path.sep)[0];
   checked++;
   const html = fs.readFileSync(page, 'utf8');
 
@@ -102,9 +119,11 @@ for (const { dir, lesson, kind } of summative) {
   }
 
   if (hits.length) {
-    console.log(`FAIL ${dir} (${kind}): the built page contains ${hits.join(', ')} — `
-      + 'the answer key ships to the student. See lib/quiz-redact.ts.');
+    console.log(`FAIL ${dir} (${kind}): the built /${route}/ page contains `
+      + `${hits.join(', ')} — the answer key ships to the student. `
+      + 'See lib/quiz-redact.ts, and check that THIS route redacts before the `use client` boundary.');
     failures++;
+  }
   }
 }
 
