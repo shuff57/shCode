@@ -207,8 +207,18 @@ function roundLabel(style: RoundStyle) {
 function roundIcon(style: RoundStyle) {
   return style === 'fillet' ? <SquareRoundCorner size={14} /> : <Octagon size={14} />;
 }
-function roundDescription(style: RoundStyle) {
-  return style === 'fillet' ? 'Round the edges' : 'Slice the edges off at an angle';
+// `edgePicked` is `pickedEdgeUsable` at the call site: round() tries the
+// single-edge Fillet path FIRST whenever that is true (see round()'s own
+// doc comment), so the button's title has to say so BEFORE the click, not
+// just after -- a title that always read "Round the edges" was the whole
+// reason single-edge rounding was invisible even though it already worked.
+function roundDescription(style: RoundStyle, edgePicked: boolean) {
+  if (edgePicked) {
+    return style === 'fillet' ? 'Round this edge' : 'Bevel this edge';
+  }
+  return style === 'fillet'
+    ? 'Round every edge. To round just one, click that edge first.'
+    : 'Bevel every edge. To bevel just one, click that edge first.';
 }
 const ROUND_STYLES: RoundStyle[] = ['fillet', 'chamfer'];
 
@@ -558,7 +568,13 @@ export default function ModelEditor({
     });
     setLastRound(style);
     setMenu(null);
-    say(null);
+    // The whole-shape path just ran, which means single-edge rounding was
+    // NOT used -- the one moment a student is guaranteed to be looking at
+    // this panel and thinking about rounding at all, so it is also the best
+    // moment to teach the narrower tool exists, for next time.
+    say(style === 'fillet'
+      ? 'Rounded every edge. To round one edge, click it first, then Round.'
+      : 'Beveled every edge. To bevel one edge, click it first, then Round.');
   }
 
   // Rotation is opt-in per shape, the same way rounding is: three angle rows
@@ -1197,7 +1213,7 @@ export default function ModelEditor({
                 icon={roundIcon(lastRound)}
                 onMain={() => round(lastRound)}
                 disabled={!canRound}
-                title={roundBlockedBy ?? roundDescription(lastRound)}
+                title={roundBlockedBy ?? roundDescription(lastRound, pickedEdgeUsable)}
                 open={menu === 'round'}
                 onToggleOpen={() => toggleMenu('round')}
                 matches={matches}

@@ -267,6 +267,15 @@ const round = (n: number) => Math.round(n * 10) / 10;
  *  adding them means rebuilding that kernel, not this renderer. */
 const EDGE_THRESHOLD_DEGREES = 25;
 
+/** How close, in CSS pixels, the cursor has to be to an edge's SCREEN-SPACE
+ *  projection for that edge to win over the face behind it -- see hitAt()'s
+ *  own comment for why this replaced a world-space threshold entirely.
+ *  Measured requirement was "grabbable at least 6px either side of the
+ *  edge's true screen position"; 8 leaves a little margin above that floor
+ *  without two edges of a small primitive both claiming one corner (also
+ *  measured -- see hitAt()). */
+const EDGE_HIT_BAND_PX = 8;
+
 /** How fat an edge highlight tube is, in world units -- real geometry, not a
  *  screen-space line width (see edgeTubeGeometry()'s own doc comment for
  *  why that distinction is the whole fix). ONE size for both hover and
@@ -293,6 +302,14 @@ export default function BrepViewportThree({
   const [phase, setPhase] = useState<'loading' | 'ready' | 'error'>('loading');
   const [loadError, setLoadError] = useState<string | null>(null);
   const [buildError, setBuildError] = useState<string | null>(null);
+  /** Whether the pointer is CURRENTLY over a pickable edge -- drives the
+   *  "click this edge" hint below. React state, not a ref, because it has to
+   *  cause a render (the hint is JSX); set from inside applyHover(), which
+   *  lives in the scene-setup effect below but closes over the setter
+   *  returned by this hook, which React guarantees is referentially stable
+   *  across renders -- no staleness risk from that effect's `[phase]`-only
+   *  dependency array. */
+  const [hoveringEdge, setHoveringEdge] = useState(false);
   const [loadingNote, setLoadingNote] = useState(
     'loading the modelling kernel + three.js -- the kernel is ~22.9 MB, once per session'
   );
@@ -656,50 +673,138 @@ export default function BrepViewportThree({
       | { kind: 'face'; mesh: THREE_NS.Mesh; range: FaceRange }
       | { kind: 'edge'; line: THREE_NS.Line };
 
+    // The closest point on ONE edge's screen-space polyline to the cursor,
+    // in CSS pixels, plus the world distance from the camera to that closest
+    // point (its "depth") -- see hitAt() below for why this replaced a
+    // world-space Raycaster.Line test, and why depth is needed at all
+    // (occlusion: a genuinely far edge must not out-rank a face in front of
+    // it just because it happens to project near the cursor).
+    //
+    // Projects every discretised vertex of the edge with THREE.Vector3.
+    // project(camera) -- the same NDC math hitAt()'s own cursor->ray
+    // conversion runs in reverse -- rather than reusing Raycaster at all:
+    // there is no ray-to-segment test here, only 2D point-to-polyline
+    // distance in the plane everyone actually looks at (the screen).
+    function closestEdgeScreenDist(
+      line: THREE_NS.Line, rectW: number, rectH: number, cursor: { x: number; y: number },
+    ): { distPx: number; depth: number } {
+      const pos = line.geometry.getAttribute('position');
+      const toScreen = (i: number) => {
+        const world = new THREE.Vector3(pos.getX(i), pos.getY(i), pos.getZ(i))
+          .applyMatrix4(line.matrixWorld);
+        const depth = camera.position.distanceTo(world);
+        world.project(camera);
+        return {
+          x: (world.x * 0.5 + 0.5) * rectW,
+          y: (1 - (world.y * 0.5 + 0.5)) * rectH,
+          depth,
+        };
+      };
+      let bestDistPx = Infinity;
+      let bestDepth = Infinity;
+      for (let i = 0; i + 1 < pos.count; i++) {
+        const a = toScreen(i);
+        const b = toScreen(i + 1);
+        const abx = b.x - a.x;
+        const aby = b.y - a.y;
+        const lenSq = abx * abx + aby * aby;
+        const t = lenSq > 1e-9
+          ? Math.max(0, Math.min(1, ((cursor.x - a.x) * abx + (cursor.y - a.y) * aby) / lenSq))
+          : 0;
+        const cx = a.x + abx * t;
+        const cy = a.y + aby * t;
+        const distPx = Math.hypot(cursor.x - cx, cursor.y - cy);
+        if (distPx < bestDistPx) {
+          bestDistPx = distPx;
+          bestDepth = a.depth + (b.depth - a.depth) * t;
+        }
+      }
+      return { distPx: bestDistPx, depth: bestDepth };
+    }
+
     function hitAt(clientX: number, clientY: number): Hit | null {
       const rect = renderer.domElement.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return null;
+      const cursor = { x: clientX - rect.left, y: clientY - rect.top };
       const ndc = new THREE.Vector2(
-        ((clientX - rect.left) / rect.width) * 2 - 1,
-        -((clientY - rect.top) / rect.height) * 2 + 1,
+        (cursor.x / rect.width) * 2 - 1,
+        -(cursor.y / rect.height) * 2 + 1,
       );
       raycaster.setFromCamera(ndc, camera);
 
-      // A world-space threshold has to track how far the camera sits from
-      // what it is looking at, or an edge feels grabbable at one zoom level
-      // and impossible at another. Onshape's own "pickable slightly before
-      // the cursor is exactly on it" is a constant SCREEN distance;
-      // scaling by distance-to-target is the closest a world-space
-      // threshold can get to that without also reading the camera's FOV and
-      // viewport height. 0.006 was tuned by eye against this app's own
-      // primitive sizes (10-40 unit boxes and cylinders): generous enough to
-      // grab an edge a few pixels early, not so generous that two edges of a
-      // small part both claim the same click. The floor keeps a very close
-      // camera from shrinking the threshold to nothing.
-      const dist = camera.position.distanceTo(controls.target);
-      raycaster.params.Line = { threshold: Math.max(0.4, dist * 0.006) };
-
-      // Edges are tested FIRST and win outright on any hit within threshold
-      // -- the same "pickable slightly before exact" priority Onshape gives
-      // edges over the face behind them.
-      const edgeHits = raycaster.intersectObjects(edgePickLinesRef.current, false);
-      if (edgeHits.length > 0) return { kind: 'edge', line: edgeHits[0].object as THREE_NS.Line };
-
+      // Face hit, tested first here purely to have a DEPTH reference for the
+      // edge occlusion check below -- which kind actually gets RETURNED is
+      // still edge-first, same priority as before (see the return logic at
+      // the bottom of this function).
       const faceHits = raycaster.intersectObjects(solidGroup.children, false);
-      const hit = faceHits.find((h) => h.faceIndex != null);
-      if (!hit) return null;
-      const range = faceRangeFor(hit.object as THREE_NS.Mesh, hit.faceIndex!);
-      return range ? { kind: 'face', mesh: hit.object as THREE_NS.Mesh, range } : null;
+      const faceHit = faceHits.find((h) => h.faceIndex != null);
+
+      // EDGE HIT TEST, IN SCREEN PIXELS -- NOT a world-space distance.
+      //
+      // This used to be raycaster.params.Line.threshold, a fixed WORLD-space
+      // distance from the ray to the edge's 3D line, scaled by camera
+      // distance. Measured one-sided in practice: a box's near vertical
+      // edge is shared by two faces that meet the camera at DIFFERENT
+      // foreshortening angles (one closer to face-on, one closer to
+      // edge-on / receding into depth). Moving the cursor one pixel toward
+      // the more edge-on side sweeps the ray through much LESS world-space
+      // distance near the true edge line than moving it one pixel toward
+      // the more face-on side (or off the model into open air) does -- so a
+      // single fixed world threshold cleared an 11px-wide band on one side
+      // and essentially nothing on the other, even though the student's
+      // cursor moved the same number of screen pixels either way. A
+      // world-space number simply cannot be that direction-agnostic; a
+      // screen-space one is, by construction -- a pixel is a pixel
+      // regardless of which face happens to sit behind the cursor.
+      let bestEdgeDistPx = Infinity;
+      let bestEdgeDepth = Infinity;
+      let bestEdgeLine: THREE_NS.Line | null = null;
+      for (const line of edgePickLinesRef.current) {
+        const { distPx, depth } = closestEdgeScreenDist(line, rect.width, rect.height, cursor);
+        if (distPx < bestEdgeDistPx) {
+          bestEdgeDistPx = distPx;
+          bestEdgeDepth = depth;
+          bestEdgeLine = line;
+        }
+      }
+      // Only the SINGLE closest edge is ever a candidate (never "all edges
+      // within the band"), so two edges meeting at a corner cannot both
+      // claim one pointer position -- whichever is nearer in screen space
+      // wins outright.
+      //
+      // An edge sits ON the boundary of whichever face(s) meet there, so its
+      // depth should match a face hit at the same pixel almost exactly; this
+      // tolerance is only slack for the edge's own discretisation and the
+      // two hits' slightly different sample points, not a second occlusion
+      // system -- it exists so a genuinely FAR edge (the back of a box,
+      // glimpsed through open space near a front edge in screen space) can
+      // never out-rank a face that is actually in front of it.
+      const dist = camera.position.distanceTo(controls.target);
+      const occluded = !!faceHit && bestEdgeDepth > faceHit.distance + Math.max(0.5, dist * 0.01);
+      if (bestEdgeLine && bestEdgeDistPx <= EDGE_HIT_BAND_PX && !occluded) {
+        return { kind: 'edge', line: bestEdgeLine };
+      }
+
+      if (!faceHit) return null;
+      const range = faceRangeFor(faceHit.object as THREE_NS.Mesh, faceHit.faceIndex!);
+      return range ? { kind: 'face', mesh: faceHit.object as THREE_NS.Mesh, range } : null;
     }
 
     function applyHover(hit: Hit | null) {
       hoverFaceMesh.visible = false;
       // A cheap, immediate second cue: the cursor tells a student an edge or
       // face is interactive before they have even noticed the highlight, or
-      // known that picking exists at all. Reverts to the container's own
-      // CSS cursor (the inline 'grab' set below, while phase is 'ready')
-      // rather than a hardcoded default.
-      renderer.domElement.style.cursor = hit ? 'pointer' : '';
+      // known that picking exists at all. `crosshair` for an edge, distinct
+      // from `pointer` for a face, so the cursor itself hints that an edge
+      // click is a DIFFERENT, more precise action than a face click -- it
+      // used to be `pointer` for both, plus idle-over-model, which told a
+      // student nothing. Reverts to the container's own CSS cursor (the
+      // inline 'grab' set below, while phase is 'ready') rather than a
+      // hardcoded default.
+      renderer.domElement.style.cursor = hit ? (hit.kind === 'edge' ? 'crosshair' : 'pointer') : '';
+      // Drives the "click this edge" hint (JSX below) -- see hoveringEdge's
+      // own doc comment for why this is React state, not a ref.
+      setHoveringEdge(hit?.kind === 'edge');
       if (!hit) {
         setHoveredEdgeTube(null);
         return;
@@ -1332,8 +1437,20 @@ export default function BrepViewportThree({
           <div style={{ color: COLORS.fg }}>{buildError}</div>
         </div>
       )}
-      {phase === 'ready' && !!selectedCount && (
-        <div style={selectionBadgeStyle}>{selectedCount} Selected</div>
+      {phase === 'ready' && (hoveringEdge && !pick || !!selectedCount) && (
+        <div style={topRightStackStyle}>
+          {/* Shown ONLY while hovering an edge with nothing picked yet --
+             the only on-screen word telling a student single-edge rounding
+             is a thing they can do BEFORE they stumble into it by accident.
+             Not a `title=` tooltip: those need ~1s of a still pointer, and
+             this has to appear the instant the cursor lands on the edge. */}
+          {hoveringEdge && !pick && (
+            <div style={edgeHintStyle}>Click this edge to round or bevel just it</div>
+          )}
+          {!!selectedCount && (
+            <div style={selectionBadgeStyle}>{pick ? '1 edge picked' : `${selectedCount} Selected`}</div>
+          )}
+        </div>
       )}
     </div>
   );
@@ -1354,10 +1471,28 @@ const errorPanelStyle: React.CSSProperties = {
 // top: 56, not 12 -- Build mode floats a 48px tool ribbon OVER the top of
 // this component's own canvas (see HANDOFF.md's "Build floats a 48px ribbon
 // over that band"), so a plain top-right corner sits directly under its
-// buttons. This clears it while staying a normal top-right badge on every
+// buttons. This clears it while staying a normal top-right stack on every
 // OTHER host (app/brep-three/page.tsx has no ribbon at all).
+//
+// A column, not a single fixed-position badge, because the hint and the
+// selection badge can be true AT THE SAME TIME -- a shape already selected
+// in the model tree (selectedCount > 0) while the student hovers one of its
+// edges before clicking. Stacking avoids the two pills drawing on top of
+// each other in that case; either can also appear alone.
+const topRightStackStyle: React.CSSProperties = {
+  position: 'absolute', top: 56, right: 12, display: 'flex', flexDirection: 'column',
+  alignItems: 'flex-end', gap: 6, pointerEvents: 'none',
+};
+
 const selectionBadgeStyle: React.CSSProperties = {
-  position: 'absolute', top: 56, right: 12, padding: '4px 10px',
-  background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 999,
+  padding: '4px 10px', background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 999,
+  font: '12px ui-monospace, Menlo, Consolas, monospace', color: COLORS.fg, pointerEvents: 'none',
+};
+
+// Same visual family as selectionBadgeStyle (same pill), deliberately -- a
+// student who has already learned "small pill top-right = status" should
+// not have to learn a second visual language for this one.
+const edgeHintStyle: React.CSSProperties = {
+  padding: '4px 10px', background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 999,
   font: '12px ui-monospace, Menlo, Consolas, monospace', color: COLORS.fg, pointerEvents: 'none',
 };
