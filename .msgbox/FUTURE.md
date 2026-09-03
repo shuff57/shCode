@@ -3,6 +3,39 @@
 Ideas parked for later. Not scheduled, not specced. Newest first.
 Lives beside `log.jsonl` so it ships with the repo and travels between machines.
 
+## Warn during a fillet drag, without asking the kernel (2026-09-03)
+
+A student can drag a fillet radius to a value the kernel refuses and gets no hint
+until they let go. There is no ceiling to clamp against: `maxRound()` says 9.99 on a
+40x40x20 box where a single-edge radius of 27 builds cleanly (it was written for
+rounding all twelve edges at once), and the kernel's own limit is not monotonic --
+all-twelve on a 10-cube fails at r=5, succeeds 6 to 9.9, and fails again at 10+.
+So a computed cap is not available and inventing one would refuse legitimate work.
+
+**The idea: a necessary condition is cheap even though the sufficient one is not.**
+A fillet needs room on both faces it blends into, so r cannot exceed roughly the
+smaller of the two adjacent faces' extents measured perpendicular to that edge --
+pure arithmetic on the primitive's own w/d/h in the ModelDoc, no kernel call,
+computable every frame for free.
+
+It is deliberately ONE-DIRECTIONAL, and the honesty is the whole point:
+
+| ratio `r / min(extentA, extentB)` | what it means |
+| --- | --- |
+| comfortably under 1 | **nothing.** Corner interactions still refuse some of these |
+| comfortably over 1 | near-certain refusal -- worth showing |
+
+So it is worded "this is probably too big", never "this will build". The real
+answer stays exactly what it is now: the kernel call on release, unchanged, with
+the refusal sentence `built.refusals` already carries.
+
+Where it would go: wherever the drag handle already has the doc and the edge name
+in hand. The closed forms worked out on 2026-09-03 already establish which
+dimension a fillet consumes, so the ratio is a one-line computation.
+
+Not built. Parked because the refusal is now legible on release, which was the
+important half -- see commits 7553592 and 3eea65b.
+
 ## The kernel download is movable, but not by caching (2026-09-02)
 
 Measured, `scripts/measure-brep-warming.py`, 1.5 Mbps, cache cleared each run.
