@@ -862,14 +862,20 @@ try {
   //    "it is the caller's to report -- whyNameLost() ... says which face
   //    went." Nobody ever called it. No component and no lib file did.
   //
-  //    THE CATASTROPHE. topLevel() in lib/model-types.ts marks a fillet's
-  //    TARGET consumed purely structurally -- it never checks whether the
-  //    fillet actually built. So a refused fillet takes its own target out
-  //    of the running (consumed) while contributing nothing itself (absent
-  //    from built.shapes): a box with one fillet feature whose radius does
-  //    not fit ends the whole build with ZERO top-level shapes. A student
-  //    who drags a radius one notch too far watches their entire part
-  //    disappear with no explanation.
+  //    WHAT topLevel() DOES. It marks a fillet's TARGET consumed PURELY
+  //    STRUCTURALLY -- it never checks whether the fillet actually built. So
+  //    a refused fillet takes its own target out of the running (consumed)
+  //    while contributing nothing itself (absent from built.shapes): a box
+  //    with one fillet feature whose radius does not fit ends the whole
+  //    build with ZERO top-level shapes -- measured directly below via the
+  //    same topLevel()+built.shapes expression the viewport actually walks.
+  //    (Corrected from an earlier draft of this note: in the browser this
+  //    reads as the LAST GOOD render freezing under the "Could not build
+  //    this model" banner, not a blank viewport -- the effect throws before
+  //    drawGeoms() replaces the scene. Still worth fixing: the frozen part
+  //    reflects whatever the document looked like BEFORE this edit, and the
+  //    banner's generic "nothing came out as a top-level shape" names
+  //    nothing the student can act on.)
   //
   //    TWO DIFFERENT REFUSALS, two different sentences -- conflating them
   //    would send a student looking for a face that is still there:
@@ -883,26 +889,46 @@ try {
   //    (built.shapes still gets an entry for the fillet's own id) rather
   //    than taking the part down with the feature -- checked here by volume,
   //    the same reason every other case in this file checks geometry rather
-  //    than trusting a document field.
+  //    than trusting a document field. This makes the pass-through resting
+  //    state STRICTLY better than the frozen-stale one it replaces: it shows
+  //    the part as the document actually reads right now (any OTHER edit in
+  //    the same change is reflected), just without the round, whereas a
+  //    frozen render can be showing a document state that no longer exists.
+  //
+  //    DO NOT DERIVE THE "TOO BIG" CASE FROM A CLOSED-FORM CEILING. Measured
+  //    directly against the kernel on a 40x40x20 box, one VERTICAL edge
+  //    (length 20, where +x meets +y): radius 27 builds a clean single-edge
+  //    fillet with no error at all, and radius 504 is refused -- a single
+  //    edge's real ceiling is nowhere near maxRound()'s whole-shape estimate
+  //    (9.99 on that box), because maxRound was written for all twelve edges
+  //    at once, which self-intersects far sooner. So the case below uses a
+  //    value confirmed refused by actually calling BRepFilletAPI, not a
+  //    formula, and the NEXT case after it proves the fix does not
+  //    over-refuse: it fillets that same 40x40x20 box's edge at radius 27
+  //    and asserts it BUILDS, matching the exact analytic volume for a
+  //    single straight edge -- a fix that refuses everything would pass
+  //    every check above and fail only this one.
   // ======================================================================
+  // The SAME edge (the vertical one where +x meets +y, length 20) on the
+  // SAME 40x40x20 box is used for both cases below -- one radius the kernel
+  // refuses (504), one it does not (27) -- so the two are directly
+  // comparable and neither can be explained away by a fixture difference.
+  const edgeXY = {
+    cause: 'between', feature: 'b1', kind: 'edge',
+    of: [
+      { cause: 'primitive', feature: 'b1', kind: 'face', part: '+x' },
+      { cause: 'primitive', feature: 'b1', kind: 'face', part: '+y' },
+    ],
+  };
+  const boxForEdgeTests = { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] };
+
   console.log('\n=== silent fillet refusal: kernel refuses a resolved edge (radius too big) ===');
   {
-    // 10x10x10 box, radius 20 on one edge -- nowhere close to fitting.
+    // Radius 504 on a 20-long edge -- MEASURED refused (BRepFilletAPI
+    // IsDone() false), not derived from maxRound() or any other formula.
     const doc = {
       version: 1,
-      features: [
-        { id: 'b1', kind: 'box', size: [10, 10, 10], center: [0, 0, 0] },
-        {
-          id: 'f1', kind: 'fillet', target: 'b1', size: 20, style: 'fillet',
-          edge: {
-            cause: 'between', feature: 'b1', kind: 'edge',
-            of: [
-              { cause: 'primitive', feature: 'b1', kind: 'face', part: '+x' },
-              { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' },
-            ],
-          },
-        },
-      ],
+      features: [boxForEdgeTests, { id: 'f1', kind: 'fillet', target: 'b1', size: 504, style: 'fillet', edge: edgeXY }],
     };
     const built = adapter.buildDoc(oc, doc, arc);
     const shape = built.shapes.get('f1');
@@ -911,11 +937,39 @@ try {
     console.log('  f1 volume       ' + (shape ? adapter.measureShape(oc, shape).volume : 'n/a'));
     console.log('  reason          ' + JSON.stringify(reason));
     check('kernel-refused fillet: the part survives, sharp, in place of the failed round',
-      !!shape && Math.abs(adapter.measureShape(oc, shape).volume - 1000) <= 1e-6,
-      shape ? `volume ${adapter.measureShape(oc, shape).volume}, want 1000 (unrounded 10x10x10)` : 'f1 is absent from built.shapes');
+      !!shape && Math.abs(adapter.measureShape(oc, shape).volume - 40 * 40 * 20) <= 1e-6,
+      shape ? `volume ${adapter.measureShape(oc, shape).volume}, want ${40 * 40 * 20} (unrounded 40x40x20)` : 'f1 is absent from built.shapes');
     check('kernel-refused fillet: a reason is reported, and it names the SIZE, not a lost face',
-      typeof reason === 'string' && /fit|radius|size|20/i.test(reason) && !/no longer in the model/i.test(reason),
+      typeof reason === 'string' && /fit|radius|size|504/i.test(reason) && !/no longer in the model/i.test(reason),
       'got: ' + JSON.stringify(reason));
+  }
+
+  console.log('\n=== silent fillet refusal: a GENEROUS radius must still succeed (the fix must not over-refuse) ===');
+  {
+    // The complement of the case above and just as load-bearing: a fix that
+    // refused every radius would pass every check in this file except this
+    // one. Radius 27 on the SAME edge -- MEASURED to build cleanly -- must
+    // come out actually rounded, matching the single-straight-edge closed
+    // form exactly, with NO refusal recorded.
+    const r = 27, L = 20;
+    const wantVol = 40 * 40 * 20 - (1 - Math.PI / 4) * r * r * L;
+    const doc = {
+      version: 1,
+      features: [boxForEdgeTests, { id: 'f1', kind: 'fillet', target: 'b1', size: r, style: 'fillet', edge: edgeXY }],
+    };
+    const built = adapter.buildDoc(oc, doc, arc);
+    const shape = built.shapes.get('f1');
+    const reason = built.refusals ? built.refusals.get('f1') : undefined;
+    const gotVol = shape ? adapter.measureShape(oc, shape).volume : null;
+    console.log('  f1 present?     ' + (shape ? 'yes' : 'no'));
+    console.log('  f1 volume       ' + gotVol);
+    console.log('  predicted (independent of the resolver)  ' + wantVol.toFixed(4));
+    console.log('  reason          ' + JSON.stringify(reason));
+    check('generous-radius fillet: actually builds the round, not the sharp fallback',
+      gotVol !== null && Math.abs(gotVol - wantVol) <= 1e-3,
+      gotVol === null ? 'f1 is absent from built.shapes' : `got ${gotVol}\n        want ${wantVol.toFixed(4)}`);
+    check('generous-radius fillet: no refusal recorded for a radius that actually worked',
+      reason === undefined, 'got a refusal for a radius that built fine: ' + JSON.stringify(reason));
   }
 
   console.log('\n=== silent fillet refusal: the edge name itself cannot resolve (genuinely lost) ===');
