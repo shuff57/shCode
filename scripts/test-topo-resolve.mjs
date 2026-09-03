@@ -1247,6 +1247,45 @@ try {
       'got ' + cylMeasured?.volume);
   }
 
+  // ----------------------------------------------------------------------
+  // A kernel LIMITATION, pinned so a kernel upgrade flips it visibly rather
+  // than silently. Measured 2026-09-03: hollowing a box that already has a
+  // through hole -- the offset succeeds (inner volume exact) but the
+  // BRepAlgoAPI_Cut of source minus offset reports IsDone() false (fuzzy
+  // values, SetNonDestructive, every join mode tried; Common on the same
+  // pair succeeds). The adapter refuses with a sentence naming the order
+  // that works and keeps the source. Hollow first, then drill, does work.
+  // If the first check below ever FAILS because the hollow succeeded, the
+  // limitation is gone: delete this block and the message's second clause.
+  {
+    console.log('
+kernel limitation: hollow after a hole');
+    const box = { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] };
+    const holeFirst = { version: 1, features: [
+      box,
+      { id: 'h1', kind: 'hole', target: 'b1', diameter: 6, depth: 22, center: [0, 0, 0], axis: 'z' },
+      { id: 's1', kind: 'shell', target: 'h1', thickness: 2 },
+    ] };
+    const a = adapter.buildDoc(oc, holeFirst, arc);
+    const why = a.refusals && a.refusals.get('s1');
+    console.log('  refusal: ' + (why ?? 'none'));
+    const kept = a.shapes.get('s1') ? adapter.measureShape(oc, a.shapes.get('s1')).volume : NaN;
+    check('hole then hollow: refused with the order that works, source kept',
+      typeof why === 'string' && why.includes('Hollow first') && Math.abs(kept - (32000 - Math.PI * 9 * 20)) < 1e-2,
+      'refusal=' + why + ' kept volume=' + kept);
+    const shellFirst = { version: 1, features: [
+      box,
+      { id: 's1', kind: 'shell', target: 'b1', thickness: 2 },
+      { id: 'h1', kind: 'hole', target: 's1', diameter: 6, depth: 22, center: [0, 0, 0], axis: 'z' },
+    ] };
+    const b = adapter.buildDoc(oc, shellFirst, arc);
+    const v = b.shapes.get('h1') ? adapter.measureShape(oc, b.shapes.get('h1')).volume : NaN;
+    const want = 32000 - 36 * 36 * 16 - Math.PI * 9 * 4;
+    console.log('  hollow then hole volume: ' + v + '  expected: ' + want);
+    check('hollow then hole: builds, volume is the shell minus the two wall punctures',
+      !(b.refusals && b.refusals.get('h1')) && Math.abs(v - want) < 1e-2, 'got ' + v);
+  }
+
   // ======================================================================
   // Causes this file does NOT exercise, and why.
   // ======================================================================

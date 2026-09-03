@@ -1087,8 +1087,17 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
               } else {
                 refusals.set(
                   f.id,
-                  `Hollowing ${label(f.id)} did not work on this shape (rounded edges are `
-                    + `the usual reason) -- ${label(f.id)} is shown without it.`,
+                  // Measured 2026-09-03: the offset itself succeeds on a box
+                  // with a through hole (inner volume exact), and it is the
+                  // BRepAlgoAPI_Cut of source minus offset that reports
+                  // IsDone() false -- fuzzy values, SetNonDestructive and every
+                  // join mode were tried; Common on the same pair succeeds.
+                  // On a box with one rounded edge the cut "succeeds" and the
+                  // result has no drawable faces. Either way the honest thing
+                  // is the order that works: hollow first, then drill or round.
+                  `Hollowing ${label(f.id)} did not work after the steps before it -- `
+                    + `this kernel cannot hollow a shape that already has a hole or a round. `
+                    + `Hollow first, then drill or round. ${label(f.id)} is shown without it.`,
                 );
                 shape = src;
               }
