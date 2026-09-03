@@ -74,6 +74,13 @@ export interface CalendarPopoverProps {
   onPick: (date: string) => void;
   onClear?: () => void;
   onClose: () => void;
+  /**
+   * HH:MM in the school timezone, shown as a time row under the grid. Omit
+   * `onTimeChange` entirely for a date-only popover (nothing renders).
+   */
+  time?: string;
+  onTimeChange?: (time: string) => void;
+  timeLabel?: string;
 }
 
 export default function CalendarPopover({
@@ -83,6 +90,9 @@ export default function CalendarPopover({
   onPick,
   onClear,
   onClose,
+  time,
+  onTimeChange,
+  timeLabel = 'Time',
 }: CalendarPopoverProps) {
   const selected = parseISO(value);
   const todayParts = parseISO(today);
@@ -230,6 +240,43 @@ export default function CalendarPopover({
           );
         })}
       </div>
+
+      {onTimeChange && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            marginTop: 8,
+            paddingTop: 8,
+            borderTop: `1px solid ${C.border}`,
+          }}
+        >
+          <label htmlFor="calendar-popover-time" style={{ color: C.dim, fontSize: 12 }}>
+            {timeLabel}
+          </label>
+          <input
+            id="calendar-popover-time"
+            type="time"
+            value={time ?? ''}
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => {
+              e.stopPropagation();
+              onTimeChange(e.target.value);
+            }}
+            style={{
+              background: C.raised,
+              border: `1px solid ${C.border}`,
+              borderRadius: 4,
+              color: C.text,
+              fontSize: 12,
+              fontFamily: 'inherit',
+              padding: '2px 4px',
+              colorScheme: 'dark',
+            }}
+          />
+        </div>
+      )}
 
       <div
         style={{

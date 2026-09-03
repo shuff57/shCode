@@ -212,7 +212,13 @@ export async function selectClass(classId: string): Promise<void> {
   }
 }
 
-async function writeOne(kind: Kind, scope: DueScope, scopeId: string, date: string | null): Promise<boolean> {
+async function writeOne(
+  kind: Kind,
+  scope: DueScope,
+  scopeId: string,
+  date: string | null,
+  time?: string | null,
+): Promise<boolean> {
   const classId = cache.activeClassId;
   if (!classId) return false;
   set({ saving: true, error: null });
@@ -221,7 +227,7 @@ async function writeOne(kind: Kind, scope: DueScope, scopeId: string, date: stri
       method: 'PUT',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ entries: [{ scope, scopeId, date }] }),
+      body: JSON.stringify({ entries: [{ scope, scopeId, date, ...(time ? { time } : {}) }] }),
     });
     if (!res.ok) throw new Error(`${ENDPOINT[kind]} PUT ${res.status}`);
     const state = await fetchKind(classId, kind);
@@ -238,12 +244,13 @@ async function applyModuleToAll(
   moduleId: string,
   date: string,
   lessonIds: readonly string[],
+  time?: string | null,
 ): Promise<boolean> {
   const classId = cache.activeClassId;
   if (!classId) return false;
   const own = kind === 'due' ? cache.due.own : cache.open.own;
-  const entries: { scope: DueScope; scopeId: string; date: string | null }[] = [
-    { scope: 'module', scopeId: moduleId, date },
+  const entries: { scope: DueScope; scopeId: string; date: string | null; time?: string }[] = [
+    { scope: 'module', scopeId: moduleId, date, ...(time ? { time } : {}) },
     ...lessonIds
       .filter((id) => own.has(`lesson:${id}`))
       .map((id) => ({ scope: 'lesson' as DueScope, scopeId: id, date: null })),
@@ -271,14 +278,20 @@ async function applyModuleToAll(
 /**
  * Write one due date. `date` is a zoneless YYYY-MM-DD straight off an
  * <input type="date">, or null to clear the row and fall back to
- * inheritance.
+ * inheritance. `time` is an optional HH:MM in the school timezone —
+ * omitted (or null) keeps the server's own default, end of the school day.
  *
  * Always re-reads afterwards rather than patching the cache locally: the
- * server converts the calendar date to 23:59:59.999 in the school timezone,
+ * server converts the calendar date to an instant in the school timezone,
  * so the resulting epoch ms is not ours to guess.
  */
-export function setDueDate(scope: DueScope, scopeId: string, date: string | null): Promise<boolean> {
-  return writeOne('due', scope, scopeId, date);
+export function setDueDate(
+  scope: DueScope,
+  scopeId: string,
+  date: string | null,
+  time?: string | null,
+): Promise<boolean> {
+  return writeOne('due', scope, scopeId, date, time);
 }
 
 /**
@@ -289,8 +302,9 @@ export function applyModuleDateToAll(
   moduleId: string,
   date: string,
   lessonIds: readonly string[],
+  time?: string | null,
 ): Promise<boolean> {
-  return applyModuleToAll('due', moduleId, date, lessonIds);
+  return applyModuleToAll('due', moduleId, date, lessonIds, time);
 }
 
 export function ownDate(snap: TeacherDueSnapshot, scope: DueScope, scopeId: string): number | null {
@@ -325,8 +339,13 @@ export function moduleSummaryForClass(
 // quick, common-case path, not a replacement for that panel.
 
 /** Write one "available after" date. Same contract as setDueDate. */
-export function setOpenDate(scope: DueScope, scopeId: string, date: string | null): Promise<boolean> {
-  return writeOne('open', scope, scopeId, date);
+export function setOpenDate(
+  scope: DueScope,
+  scopeId: string,
+  date: string | null,
+  time?: string | null,
+): Promise<boolean> {
+  return writeOne('open', scope, scopeId, date, time);
 }
 
 /** Same contract as applyModuleDateToAll, for Opens. */
@@ -334,8 +353,9 @@ export function applyModuleOpenDateToAll(
   moduleId: string,
   date: string,
   lessonIds: readonly string[],
+  time?: string | null,
 ): Promise<boolean> {
-  return applyModuleToAll('open', moduleId, date, lessonIds);
+  return applyModuleToAll('open', moduleId, date, lessonIds, time);
 }
 
 export function ownOpenDate(snap: TeacherDueSnapshot, scope: DueScope, scopeId: string): number | null {

@@ -30,7 +30,14 @@ import {
   setOpenDate,
   useTeacherDue,
 } from '../lib/due-dates-edit';
-import { dueStatus, formatDue, schoolDateString, type DueScope } from '../lib/due-dates-core';
+import {
+  dueStatus,
+  formatDue,
+  formatDueTime,
+  schoolDateString,
+  schoolTimeString,
+  type DueScope,
+} from '../lib/due-dates-core';
 
 const C = {
   dim: '#6272a4',
@@ -83,6 +90,11 @@ export default function DueDateChip({
 }: DueDateChipProps) {
   const due = useTeacherDue();
   const [open, setOpen] = useState(false);
+  // null = "not touched this session" -> falls back to the time already on
+  // the row (or blank for a row with no date yet). A non-null value is what
+  // the teacher is actively typing, and survives across open/close so a time
+  // set before a date is picked isn't lost.
+  const [timeDraft, setTimeDraft] = useState<string | null>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
 
   if (!due.canEdit || !due.activeClassId) return null;
@@ -98,17 +110,33 @@ export default function DueDateChip({
   // What the calendar opens on: this row's own date if it has one, otherwise
   // the date it inherits, so a teacher lands in the right month either way.
   const anchorDate = ownAt ?? resolvedAt;
+  const effectiveTime = timeDraft ?? (anchorDate !== null ? schoolTimeString(anchorDate) : '');
 
   const commit = (date: string) => {
     setOpen(false);
+    const time = timeDraft || undefined;
+    setTimeDraft(null);
     // Setting a date on a Mixed module is the "apply to all" gesture — the
     // point of picking one date for a module whose children disagree.
     if (scope === 'module' && mixed && moduleLessonIds) {
       void (isOpenKind
-        ? applyModuleOpenDateToAll(scopeId, date, moduleLessonIds)
-        : applyModuleDateToAll(scopeId, date, moduleLessonIds));
+        ? applyModuleOpenDateToAll(scopeId, date, moduleLessonIds, time)
+        : applyModuleDateToAll(scopeId, date, moduleLessonIds, time));
     } else {
-      void (isOpenKind ? setOpenDate(scope, scopeId, date) : setDueDate(scope, scopeId, date));
+      void (isOpenKind ? setOpenDate(scope, scopeId, date, time) : setDueDate(scope, scopeId, date, time));
+    }
+  };
+
+  // Adjusting the time on a row that already has its OWN date re-saves right
+  // away, same date, new time — matches the "writes go straight through on
+  // change" convention everywhere else in this store. A row with no date of
+  // its own yet (inheriting, or nothing set) has nothing to attach the time
+  // to until a day is picked, so this just holds the draft.
+  const changeTime = (t: string) => {
+    setTimeDraft(t);
+    if (ownAt !== null) {
+      const date = schoolDateString(ownAt);
+      void (isOpenKind ? setOpenDate(scope, scopeId, date, t) : setDueDate(scope, scopeId, date, t));
     }
   };
 
@@ -126,11 +154,11 @@ export default function DueDateChip({
         ? `Lessons here ${isOpenKind ? 'open' : 'are due'} between ${formatDue(min)} and ${formatDue(max)} — pick a date to apply one to all of them`
         : `Lessons here have different ${isOpenKind ? 'open' : 'due'} dates`;
   } else if (ownAt !== null) {
-    label = formatDue(ownAt);
+    label = formatDueTime(ownAt);
     color = isOpenKind ? C.open : colorFor(ownAt);
     title = `${isOpenKind ? 'Opens' : 'Due'} date set on this ${scope}. Click to change, x to clear.`;
   } else if (resolvedAt !== null) {
-    label = formatDue(resolvedAt);
+    label = formatDueTime(resolvedAt);
     color = C.dim;
     italic = true;
     title = `Inherited from the module. Click to give this ${scope} its own ${noun}.`;
@@ -190,11 +218,15 @@ export default function DueDateChip({
           value={anchorDate === null ? null : schoolDateString(anchorDate)}
           today={schoolDateString(Date.now())}
           onPick={commit}
+          time={effectiveTime}
+          onTimeChange={changeTime}
+          timeLabel={isOpenKind ? 'Opens at' : 'Due at'}
           onClear={
             ownAt === null
               ? undefined
               : () => {
                   setOpen(false);
+                  setTimeDraft(null);
                   void (isOpenKind ? setOpenDate(scope, scopeId, null) : setDueDate(scope, scopeId, null));
                 }
           }
@@ -213,6 +245,7 @@ export default function DueDateChip({
           disabled={due.saving}
           onClick={(e) => {
             stop(e);
+            setTimeDraft(null);
             void (isOpenKind ? setOpenDate(scope, scopeId, null) : setDueDate(scope, scopeId, null));
           }}
           style={{

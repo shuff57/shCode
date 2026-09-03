@@ -6,7 +6,13 @@ import HomeModuleLessons from './HomeModuleLessons';
 import UnitProgressBadge from './UnitProgressBadge';
 import DueClassPicker from './DueClassPicker';
 import DueDateChip from './DueDateChip';
-import { moduleSummaryForClass, ownDate, useTeacherDue } from '../lib/due-dates-edit';
+import {
+  moduleOpenSummaryForClass,
+  moduleSummaryForClass,
+  ownDate,
+  ownOpenDate,
+  useTeacherDue,
+} from '../lib/due-dates-edit';
 import type { Lesson } from '../lib/types';
 
 /** Subset of ModuleSummary needed by the home page accordion. */
@@ -218,17 +224,32 @@ function ModuleDueChip({
   unitId: string | null;
 }) {
   const summary = moduleSummaryForClass(snap, moduleId, lessonIds, unitId);
+  const openSummary = moduleOpenSummaryForClass(snap, moduleId, lessonIds, unitId);
   return (
-    <DueDateChip
-      scope="module"
-      scopeId={moduleId}
-      resolvedAt={summary.ownDueAt ?? summary.dueAt}
-      ownAt={ownDate(snap, 'module', moduleId)}
-      mixed={summary.kind === 'mixed'}
-      min={summary.min}
-      max={summary.max}
-      moduleLessonIds={lessonIds}
-      size="md"
-    />
+    <>
+      <DueDateChip
+        scope="module"
+        scopeId={moduleId}
+        resolvedAt={openSummary.ownDueAt ?? openSummary.dueAt}
+        ownAt={ownOpenDate(snap, 'module', moduleId)}
+        mixed={openSummary.kind === 'mixed'}
+        min={openSummary.min}
+        max={openSummary.max}
+        moduleLessonIds={lessonIds}
+        size="md"
+        kind="open"
+      />
+      <DueDateChip
+        scope="module"
+        scopeId={moduleId}
+        resolvedAt={summary.ownDueAt ?? summary.dueAt}
+        ownAt={ownDate(snap, 'module', moduleId)}
+        mixed={summary.kind === 'mixed'}
+        min={summary.min}
+        max={summary.max}
+        moduleLessonIds={lessonIds}
+        size="md"
+      />
+    </>
   );
 }
