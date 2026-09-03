@@ -180,7 +180,10 @@ export default function SandboxWorkspace() {
   // Build mode: the model is a ModelDoc and the code is generated from it.
   // Toggling to Code shows that generated source, read-only -- editing it would
   // need the code parsed back into features, which is a permanent non-goal.
-  const [build, setBuild] = useState(false);
+  // Build is the default side of reSHape (operator decision 2026-09-03: a
+  // beginner landing on the Code editor was the first-minute stumble the
+  // Chili3D gauntlet's judge named). Code is a stored opt-out, below.
+  const [build, setBuild] = useState(true);
 
   // WHICH GEOMETRY ENGINE DRAWS BUILD MODE.
   //
@@ -285,7 +288,7 @@ export default function SandboxWorkspace() {
         setModeId(saved as SandboxModeId);
       }
       const b = window.localStorage.getItem(BUILD_KEY);
-      if (b === '1') setBuild(true);
+      if (b === '0') setBuild(false);
     } catch { /* private mode */ }
   }, []);
 
