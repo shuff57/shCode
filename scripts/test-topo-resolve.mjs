@@ -1258,8 +1258,8 @@ try {
   // If the first check below ever FAILS because the hollow succeeded, the
   // limitation is gone: delete this block and the message's second clause.
   {
-    console.log('
-kernel limitation: hollow after a hole');
+    console.log('');
+    console.log('kernel limitation: hollow after a hole');
     const box = { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] };
     const holeFirst = { version: 1, features: [
       box,
