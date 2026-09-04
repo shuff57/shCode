@@ -5,6 +5,7 @@
 // number rebuilds the model without reloading the runner.
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { displayNumber } from '../lib/format-number';
 
 export interface ParamDef {
   name: string;
@@ -230,7 +231,18 @@ export default function ReshapeParamsPanel({
         }
 
         const num = typeof raw === 'number' ? raw : Number(raw) || 0;
+        // `text` stays full precision -- it is what parsed/bad/settle() and the
+        // arrow-key math below actually compute from, so a value nobody typed
+        // (a solver's own "39.99999630790447") never gets silently snapped to
+        // "40" just because the field was focused and blurred without an edit.
+        // `displayText` is the ONLY thing that changes for a beginner-facing
+        // readout: rounded via lib/format-number.ts's displayNumber() while
+        // nothing is being typed, and identical to `text` (so mid-keystroke
+        // input like "" or "-" survives) the moment the student types anything
+        // -- see that file's own comment for why the raw float was a real bug,
+        // not just untidy.
         const text = draft[d.name] ?? String(num);
+        const displayText = draft[d.name] ?? displayNumber(num);
         const parsed = Number(text);
         const bad = text.trim() === '' || !Number.isFinite(parsed);
         const hasRange = typeof d.min === 'number' && typeof d.max === 'number';
@@ -267,7 +279,7 @@ export default function ReshapeParamsPanel({
                 inputMode="decimal"
                 className={bad ? 'is-bad' : undefined}
                 aria-invalid={bad || undefined}
-                value={text}
+                value={displayText}
                 onChange={(e) => {
                   const t = e.target.value;
                   setDraft((p) => ({ ...p, [d.name]: t }));

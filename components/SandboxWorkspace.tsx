@@ -97,6 +97,20 @@ function capitalize(name: string): string {
   return name.length ? name[0].toUpperCase() + name.slice(1) : name;
 }
 
+/** True once a Pull, a Spin, or a Blend has consumed this sketch into a
+ *  solid -- the same three kinds `sketchClaimedBy` in ModelEditor.tsx checks
+ *  for pull()/spin() (extrude/revolve only; that function is private to this
+ *  file's own worry about re-pulling an already-pulled sketch, not about
+ *  drawing). Shared by `specs` and `outlines` below so a sketch counts as
+ *  "still worth drawing" the same way in both places -- they used to check
+ *  this independently and drifted (see `outlines`'s own comment). */
+function sketchIsUnconsumed(doc: ModelDoc, sketchId: string): boolean {
+  return !doc.features.some((f) =>
+    ((f.kind === 'extrude' || f.kind === 'revolve') && f.target === sketchId)
+    || (f.kind === 'blend' && f.targets.includes(sketchId))
+  );
+}
+
 /**
  * Folds a batch of pending param edits into `base` the same way `commitParams`
  * always has -- `applyParam` per entry, then one `solveDoc` -- extracted so
@@ -707,13 +721,24 @@ export default function SandboxWorkspace() {
   // is handed over to be edited by hand, and the shape tools stop driving it --
   // going back the other way would mean parsing JavaScript into features, which
   // is a permanent non-goal.
-  // Only the selected shape gets handles: every shape at once is a screenful
-  // of dots with no way to tell which belongs to what.
+  // Only the selected SOLID gets handles: every solid at once is a screenful
+  // of dots (turn, centre, one per dimension...) with no way to tell which
+  // belongs to what. A SKETCH is the one exception -- its whole handful of
+  // corner handles doubles as the anchors HandleOverlay's projectOutline()
+  // needs to draw the outline at all (see `outlines`'s own comment on why an
+  // unselected sketch must stay visible), so every unconsumed sketch keeps
+  // its anchors regardless of selection, while a solid still only gets them
+  // once picked.
   const specs = useMemo(() => {
     if (!build) return [];
     if (drawTool) return [planeAnchor('xy', 0)];
     if (doc.features.length === 0) return [planeAnchor('xy', 0)];
-    return doc.features.filter((f) => selected.includes(f.id)).flatMap((f) => handlesFor(f, doc));
+    const picked = doc.features.filter((f) => selected.includes(f.id)).flatMap((f) => handlesFor(f, doc));
+    const otherSketches = doc.features
+      .filter((f): f is Feature & { kind: 'sketch' } =>
+        f.kind === 'sketch' && !selected.includes(f.id) && sketchIsUnconsumed(doc, f.id))
+      .flatMap((f) => handlesFor(f, doc));
+    return [...picked, ...otherSketches];
   }, [build, doc, selected, drawTool]);
 
   // B-rep Dimensions panel defs. The JSCAD runner publishes its own defs by
@@ -790,14 +815,21 @@ export default function SandboxWorkspace() {
     return part ? `${base} · ${part}` : base;
   }, [selected, doc, pickedFace, pickedEdge]);
 
-  // One entry per selected sketch: its corner parameters (so the overlay can
-  // look up each corner's projected anchor) alongside the plane geometry
-  // that decides what gets drawn between them -- straight, an arc, or the
-  // full circle a two-point diameter tag means.
+  // One entry per UNCONSUMED sketch -- every sketch nothing has Pulled, Spun,
+  // or Blended yet (sketchIsUnconsumed, shared with `specs` above so the two
+  // never drift on what "still worth drawing" means), not only the currently
+  // selected one. Used to draw a sketch, not just build it. Widened
+  // 2026-09-04: a beginner drew a rectangle, clicked Box to start the next
+  // shape (which deselects the sketch), and the rectangle vanished from the
+  // canvas with nothing on screen saying it was still there, waiting to be
+  // Pulled -- it only came back on reselecting the "Sketch 1" chip.
+  // `selected` on each entry is what lets the overlay still tell the one
+  // currently picked apart from the others once more than one is unconsumed
+  // at a time.
   const outlines = useMemo(
-    () =>
-      doc.features
-        .filter((f): f is Feature & { kind: 'sketch' } => f.kind === 'sketch' && selected.includes(f.id))
+    () => {
+      return doc.features
+        .filter((f): f is Feature & { kind: 'sketch' } => f.kind === 'sketch' && sketchIsUnconsumed(doc, f.id))
         .map((f): SketchOutline => {
           // outlineOf() is the ONLY producer of an arc's endpoints -- see its
           // comment in lib/sketch-arc.ts. The overlay draws what it returns
@@ -812,8 +844,10 @@ export default function SandboxWorkspace() {
             shape: f.shape,
             bulges: o.bulges,
             constraints: f.constraints ?? [],
+            selected: selected.includes(f.id),
           };
-        }),
+        });
+    },
     [doc, selected]
   );
 
@@ -1622,7 +1656,7 @@ export default function SandboxWorkspace() {
                       onCommit={commitParams}
                       onTap={(x, y) => pickAtRef.current?.(x, y)}
                       outlines={outlines}
-                      drawing={drawTool != null}
+                      drawing={drawTool ?? false}
                       onPlace={handlePlace}
                       // This JSX only renders while build is true, which is
                       // exactly when .sandbox-shell carries is-build and the

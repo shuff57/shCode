@@ -42,6 +42,12 @@ export interface SketchOutline {
   /** The sketch's constraints, so the overlay can mark which edges carry one.
    *  Plain data like everything else here -- the overlay never writes them. */
   constraints?: Constraint[];
+  /** True for the sketch the model tree currently has selected. SandboxWorkspace
+   *  now draws every UNCONSUMED sketch (not only the selected one -- see its
+   *  own `outlines` comment), so this is what lets the selected one still read
+   *  as the one a drag or a Pull/Spin acts on, once more than one is on screen
+   *  at a time. */
+  selected?: boolean;
 }
 
 export interface AnchorPoint {

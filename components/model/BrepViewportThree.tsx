@@ -113,6 +113,19 @@ const TOP_DIR: [number, number, number] = [0.001, 0.001, 1];
 const FRONT_DIR: [number, number, number] = [0, 1, 0];
 const UNDERNEATH_DIR: [number, number, number] = [0.001, 0.001, -1];
 
+// A sketch's own (u, v) axes and normal, per plane -- fitToModel()'s only use
+// (see that function's own comment for why). Matches lib/model-handles.ts's
+// PLANE_AXES/planeNormal exactly; kept as a separate, local copy rather than
+// importing a private helper from a file this component does not otherwise
+// touch, for three fixed unit vectors that will not drift.
+const SKETCH_PLANE_AXES: Record<string, {
+  u: [number, number, number]; v: [number, number, number]; n: [number, number, number];
+}> = {
+  xy: { u: [1, 0, 0], v: [0, 1, 0], n: [0, 0, 1] },
+  xz: { u: [1, 0, 0], v: [0, 0, 1], n: [0, 1, 0] },
+  yz: { u: [0, 1, 0], v: [0, 0, 1], n: [1, 0, 0] },
+};
+
 export interface BrepViewportStats {
   buildMs: number;
   meshMs: number;
@@ -1147,6 +1160,27 @@ export default function BrepViewportThree({
     const { THREE } = three;
 
     const box = new THREE.Box3().setFromObject(group);
+    // A sketch draws nothing into `group` -- HandleOverlay renders it as a
+    // DOM/SVG overlay, entirely outside this three.js scene -- so a
+    // sketch-only document (a fresh Sketch/Circle/Polygon, nothing Pulled
+    // yet) left `box` empty and the very first shape a student ever drew
+    // never got fit at all. Corner points are read straight off `doc` (this
+    // component already has it) and projected through the SAME plane axes
+    // SandboxWorkspace's own planeAnchor()/sketchHandles() use, so a sketch on
+    // the xz or yz plane still ends up at its real 3D position rather than
+    // being read as if it were flat on the ground.
+    for (const f of doc.features) {
+      if (f.kind !== 'sketch') continue;
+      const { u, v, n } = SKETCH_PLANE_AXES[f.plane ?? 'xy'] ?? SKETCH_PLANE_AXES.xy;
+      const off = f.offset ?? 0;
+      for (const [pu, pv] of f.points) {
+        box.expandByPoint(new THREE.Vector3(
+          n[0] * off + u[0] * pu + v[0] * pv,
+          n[1] * off + u[1] * pu + v[1] * pv,
+          n[2] * off + u[2] * pu + v[2] * pv,
+        ));
+      }
+    }
     if (box.isEmpty()) return;
     const bbox: Box3Like = {
       min: [box.min.x, box.min.y, box.min.z],
@@ -1545,11 +1579,13 @@ export default function BrepViewportThree({
         const onlySketches = doc.features.length > 0 && doc.features.every((f) => f.kind === 'sketch');
         if (doc.features.length === 0 || onlySketches) {
           setStageHint(onlySketches ? 'A sketch is flat. Select it and press Pull to make it solid.' : null);
-          // No solid on screen -- rearm the auto-fit so the NEXT shape (a
-          // fresh box after Undo cleared everything, say) gets its own fit
-          // rather than inheriting whatever distance a since-deleted model
-          // left the camera at. See hasFitOnceRef's own comment.
-          hasFitOnceRef.current = false;
+          // No solid on screen -- rearm the auto-fit whenever the doc is
+          // TRULY empty, so the NEXT shape (a fresh box after Undo cleared
+          // everything, say) gets its own fit rather than inheriting
+          // whatever distance a since-deleted model left the camera at. See
+          // hasFitOnceRef's own comment. A sketch-only doc does NOT rearm
+          // here -- it gets its own first-shape fit call below instead.
+          if (doc.features.length === 0) hasFitOnceRef.current = false;
           const t = performance.now();
           const meshes = drawGeoms([]);
           lastBuiltRef.current = built;
@@ -1557,6 +1593,17 @@ export default function BrepViewportThree({
           restorePicks(meshes, built);
           if (cancelled) return;
           setBuildError(null);
+          // A sketch draws no three.js mesh at all -- solidGroupRef stays
+          // empty for as long as nothing has been Pulled -- so THIS branch,
+          // not the meshed-solid branch below, is the only place a
+          // sketch-only document's first shape ever gets fit. Measured
+          // 2026-09-04: a fresh 40x25 Sketch rendered at the plain HOME_DIR
+          // distance, small and un-fit, because fitToModel() was only ever
+          // called from the branch a bare sketch never reaches.
+          if (onlySketches && !hasFitOnceRef.current) {
+            hasFitOnceRef.current = true;
+            fitToModel(HOME_DIR);
+          }
           onStatsRef.current?.({
             buildMs: round(buildMs), meshMs: 0, drawMs: round(performance.now() - t), triangles: 0,
             refusals: built.refusals,
@@ -1796,8 +1843,14 @@ const viewStripActiveStyle: React.CSSProperties = {
 // student who has already learned "small pill top-right = status" should
 // not have to learn a second visual language for this one.
 // Centred over the stage, same pill family: a hint, not an error.
+// top: 56, not 12 -- same reasoning as topRightStackStyle's own comment
+// above: Build mode floats a 48px tool ribbon over the top of this
+// component's own canvas, so a plain top:12 pill sits directly under the
+// ribbon's buttons rather than below them. Measured 2026-09-04: "A sketch is
+// flat. Select it and press Pull to make it solid." was drawn over the
+// Rectangle/Polygon/Corner icons, covering them while it was showing.
 const stageHintStyle: React.CSSProperties = {
-  position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)',
+  position: 'absolute', top: 56, left: '50%', transform: 'translateX(-50%)',
   padding: '4px 10px', background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 999,
   font: '12px ui-monospace, Menlo, Consolas, monospace', color: COLORS.fg, pointerEvents: 'none',
 };
