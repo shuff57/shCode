@@ -1,0 +1,61 @@
+{
+  "id": "8-1-8-lab-read-the-script",
+  "title": "8.1.8 Lab: Read the Script",
+  "description": "Switch to Code, find the number that controls the hole, and change it. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 3: reSHape: Solid Modelling",
+  "unit": "8.1 Solid Shapes",
+  "preview": "reshape",
+  "mode": "both",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Switch to Code",
+      "instructions": "You're starting from a 40 x 40 x 20 mm box with a 6 mm hole through it, already built. Press the Code tab at the top left to see it written out as text.",
+      "hints": [
+        "Code and Build are the two tabs in the top-left corner, next to each other.",
+        "You should see two lines: one starting with const box1 = box(...), and one starting with hole(box1, ...)."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Find the hole's number and change it",
+      "instructions": "On the hole(box1, { across: 6 }) line, change the 6 to a 10. Leave everything else on that line exactly as it is.",
+      "hints": [
+        "The number is inside the curly braces, right after across:.",
+        "Don't add or remove any punctuation — just replace the digit 6 with 10."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Run it",
+      "instructions": "Press Run. Switch back to Build and check the hole in the 3D view — it should look noticeably wider than before.",
+      "hints": [
+        "If nothing changed, make sure you pressed Run after editing the text."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A 10 mm hole through the box",
+      "description": "The box has a hole 10 mm across, drilled through the top face.",
+      "type": "model",
+      "expect": [
+        { "kind": "box", "size": [40, 40, 20] },
+        { "kind": "hole", "diameter": 10 }
+      ],
+      "hint": "In Code, change the 6 in hole(box1, { across: 6 }) to 10, then press Run.",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

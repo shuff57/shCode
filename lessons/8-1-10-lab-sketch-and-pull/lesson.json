@@ -1,0 +1,61 @@
+{
+  "id": "8-1-10-lab-sketch-and-pull",
+  "title": "8.1.10 Lab: Sketch and Pull",
+  "description": "Draw a flat rectangle and pull it up into a solid. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 3: reSHape: Solid Modelling",
+  "unit": "8.1 Solid Shapes",
+  "preview": "reshape",
+  "mode": "visual",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Draw a rectangle",
+      "instructions": "Press the Sketch tool in the toolbar. A flat rectangle appears on the ground, 40 mm one way and 25 mm the other.",
+      "hints": [
+        "Nothing is solid yet - a sketch is flat, like a drawing on a piece of paper lying on the ground."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Make it 40 x 20",
+      "instructions": "In the Dimensions panel, two fields read 25: \"Sketch 1 corner 3 up\" and \"Sketch 1 corner 4 up\". Type 20 in both, so the rectangle is 40 mm by 20 mm.",
+      "hints": [
+        "The width side (40) is already correct - you're only changing the 25s.",
+        "Watch the rectangle in the 3D view get shorter on one side as you type."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Pull it into a solid",
+      "instructions": "With the sketch selected, press the Pull tool. In the Dimensions panel, type 10 in the height field.",
+      "hints": [
+        "The rectangle turns into a solid block standing 10 mm tall.",
+        "Look for the field named \"Pull 1 height\" in the Dimensions panel."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A 40 x 20 rectangle pulled 10 mm tall",
+      "description": "A flat 40 mm by 20 mm rectangle, pulled into a solid 10 mm tall.",
+      "type": "model",
+      "expect": [
+        { "kind": "sketch", "width": 40, "depth": 20 },
+        { "kind": "extrude", "height": 10 }
+      ],
+      "hint": "Press Sketch, set both 25 fields to 20, then press Pull and type 10.",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

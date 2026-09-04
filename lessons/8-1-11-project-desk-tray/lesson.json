@@ -1,0 +1,61 @@
+{
+  "id": "8-1-11-project-desk-tray",
+  "title": "8.1.11 Project: Desk Tray",
+  "description": "Put it all together: a box, hollowed into a tray, with one softened edge. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 15,
+  "category": "Unit 3: reSHape: Solid Modelling",
+  "unit": "8.1 Solid Shapes",
+  "preview": "reshape",
+  "mode": "both",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Add the box",
+      "instructions": "Press the Box tool. In the Dimensions panel, type 80 in width, 50 in depth, and 20 in height.",
+      "hints": [
+        "This is the same first step as every box you've built this unit - just three different numbers."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Hollow it into a tray",
+      "instructions": "Click the top face, then press Hollow. Check that wall reads 2 in the Dimensions panel.",
+      "hints": [
+        "A message under the 3D view should read \"Hollow 1 is open at the top face.\" That's what makes it a tray instead of a sealed block."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Round one edge",
+      "instructions": "Click right on one edge of the tray - the line where two faces meet, not the middle of a face. Press Round, then type 3 in the radius field.",
+      "hints": [
+        "Round the hollow's outer edge, not a face - the label above the Dimensions panel should read \"edge\", not a face name.",
+        "It doesn't matter which order you build the hollow and the round in - reSHape moves the hollow ahead of the round for you automatically."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "An 80 x 50 x 20 tray with one rounded edge",
+      "description": "An 80 x 50 x 20 mm box, hollowed to 2 mm walls with the top open, with one edge rounded to a 3 mm radius.",
+      "type": "model",
+      "expect": [
+        { "kind": "box", "size": [80, 50, 20] },
+        { "kind": "shell", "thickness": 2, "open": true },
+        { "kind": "fillet", "size": 3 }
+      ],
+      "hint": "Box 80 x 50 x 20, Hollow wall 2 open top, Round one edge to 3 - any order.",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

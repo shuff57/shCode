@@ -1,0 +1,61 @@
+{
+  "id": "8-1-9-lab-write-it-yourself",
+  "title": "8.1.9 Lab: Write It Yourself",
+  "description": "Write a box and a hole in Code, from scratch, with no buttons. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 3: reSHape: Solid Modelling",
+  "unit": "8.1 Solid Shapes",
+  "preview": "reshape",
+  "mode": "code",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Write the box",
+      "instructions": "In script.js, write a line that makes a box 30 mm wide, 30 mm deep, and 10 mm tall, and saves it to a variable called b.",
+      "hints": [
+        "The pattern is const b = box(width, depth, height).",
+        "Put the three numbers in order: width, then depth, then height."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Write the hole",
+      "instructions": "On the next line, drill a hole 5 mm across through b.",
+      "hints": [
+        "The pattern is hole(b, { across: 5 }).",
+        "Don't forget the curly braces around across: 5."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Run it",
+      "instructions": "Press Run and check the 3D view: a small flat box with a hole through it.",
+      "hints": [
+        "If the view stays empty, check for a red error in the console below the editor and fix the line it points to."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A 30 x 30 x 10 box with a 5 mm hole",
+      "description": "A box 30 mm wide, 30 mm deep, and 10 mm tall, with a hole 5 mm across drilled through it.",
+      "type": "model",
+      "expect": [
+        { "kind": "box", "size": [30, 30, 10] },
+        { "kind": "hole", "diameter": 5 }
+      ],
+      "hint": "const b = box(30, 30, 10), then hole(b, { across: 5 }).",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
