@@ -8,6 +8,7 @@ import { lessonAvailability, resolveDue, resolveModuleSummary, useDueDates, useN
 import DueBadge, { ModuleDueBadge, OpensBadge } from './DueBadge';
 import DueClassPicker from './DueClassPicker';
 import DueDateChip from './DueDateChip';
+import LessonAccessChip from './LessonAccessChip';
 import { moduleSummaryForClass, ownDate, resolveForClass, useTeacherDue } from '../lib/due-dates-edit';
 
 interface LessonItem {
@@ -226,6 +227,25 @@ export default function ModuleLessonsList({
               ownAt={ownDate(teacherDue, 'lesson', l.id)}
               pushRight
             />
+            {/* Same roster-checkbox controls as the home-page card and the
+                Due Dates panel — this list is the third and last place a
+                teacher edits a lesson's dates, so it gets the same pair. */}
+            {teacherDue.canEdit && teacherDue.activeClassId && (
+              <>
+                <LessonAccessChip
+                  classId={teacherDue.activeClassId}
+                  lessonId={l.id}
+                  lessonTitle={l.displayTitle}
+                  kind="early"
+                />
+                <LessonAccessChip
+                  classId={teacherDue.activeClassId}
+                  lessonId={l.id}
+                  lessonTitle={l.displayTitle}
+                  kind="late"
+                />
+              </>
+            )}
           </>
         );
 
