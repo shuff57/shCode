@@ -904,6 +904,70 @@ module.exports = function run(dir) {
     && clampedStillDistinct.b.x - 12 >= -1e-6 && clampedStillDistinct.b.x + 12 <= 40 + 1e-6,
     JSON.stringify(clampedStillDistinct));
 
+  console.log('\n=== layoutLabels: a drawn HANDLE is an obstacle too, not only other labels ===');
+
+  const onAHandle = outline.layoutLabels(
+    [{ id: 'diam', x: 300, y: 300, width: 24, height: 16, alongX: 1, alongY: 0 }],
+    viewport,
+    [{ x: 300, y: 300, width: 13, height: 13 }],
+  );
+  check('a label sitting exactly on a handle is moved clear of it',
+    !overlap({ ...onAHandle.diam, width: 24, height: 16 }, { x: 300, y: 300, width: 13, height: 13 }),
+    JSON.stringify(onAHandle));
+
+  const handleNeverMoves = outline.layoutLabels(
+    [{ id: 'diam', x: 300, y: 300, width: 24, height: 16, alongX: 1, alongY: 0 }],
+    viewport,
+    [{ x: 300, y: 300, width: 13, height: 13 }],
+  );
+  check('...and the handle itself is never in the result -- layoutLabels only ever reports label ids',
+    Object.keys(handleNeverMoves).length === 1 && 'diam' in handleNeverMoves, JSON.stringify(handleNeverMoves));
+
+  const clearOfBoth = outline.layoutLabels(
+    [
+      { id: 'a', x: 500, y: 400, width: 20, height: 14, alongX: 1, alongY: 0 },
+      { id: 'b', x: 502, y: 401, width: 20, height: 14, alongX: 1, alongY: 0 },
+    ],
+    viewport,
+    [{ x: 500, y: 400, width: 13, height: 13 }],
+  );
+  const boxOf2 = (r) => ({ ...r, width: 20, height: 14 });
+  check('a label can be pushed clear of BOTH a colliding label and a handle in the same pass',
+    !overlap(boxOf2(clearOfBoth.a), { x: 500, y: 400, width: 13, height: 13 })
+    && !overlap(boxOf2(clearOfBoth.b), { x: 500, y: 400, width: 13, height: 13 })
+    && !overlap(boxOf2(clearOfBoth.a), boxOf2(clearOfBoth.b)),
+    JSON.stringify(clearOfBoth));
+
+  const noObstaclesAtAll = outline.layoutLabels(
+    [{ id: 'a', x: 250, y: 250, width: 20, height: 14, alongX: 1, alongY: 0 }],
+    viewport,
+  );
+  check('omitting obstacles entirely behaves exactly as before -- a lone label never moves',
+    noObstaclesAtAll.a.x === 250 && noObstaclesAtAll.a.y === 250, JSON.stringify(noObstaclesAtAll));
+
+  // Reproduces a real live case, byte-for-byte: a circle's own diameter
+  // label boxed in between two point handles 20.4px apart and a rounded
+  // corner's radius handle just past them -- a fixed-step "slide away from
+  // whichever ONE thing you're touching" pass bounced this label between
+  // two positions forever, since escaping either handle landed it squarely
+  // on the other. Measured 2026-09-04, screenshot item18-01-both-sketches.png.
+  const denseCluster = outline.layoutLabels(
+    [{ id: 'diam', x: 306.1, y: 415.94, width: 27, height: 16, alongX: 1, alongY: 0 }],
+    { width: 884, height: 662 },
+    [
+      { x: 293.37, y: 415.94, width: 20, height: 16 },
+      { x: 306.1, y: 415.94, width: 10, height: 10 },
+      { x: 326.48, y: 415.94, width: 11, height: 11 },
+    ],
+  );
+  const clearOfAllThree = ![
+    { x: 293.37, y: 415.94, width: 20, height: 16 },
+    { x: 306.1, y: 415.94, width: 10, height: 10 },
+    { x: 326.48, y: 415.94, width: 11, height: 11 },
+  ].some((o) => overlap({ ...denseCluster.diam, width: 27, height: 16 }, o));
+  check('a label boxed in by THREE nearby obstacles escapes all of them in one pass, not a 2-cycle',
+    clearOfAllThree, JSON.stringify(denseCluster));
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };

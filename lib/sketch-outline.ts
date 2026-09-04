@@ -360,16 +360,101 @@ export interface LabelBox {
   alongY: number;
 }
 
-/** Two axis-aligned boxes, already centred at (x, y) with the given full
- *  width/height, overlap. */
-function boxesOverlap(a: LabelBox, b: LabelBox): boolean {
-  return Math.abs(a.x - b.x) * 2 < a.width + b.width
-    && Math.abs(a.y - b.y) * 2 < a.height + b.height;
+/** A fixed obstacle a label must clear -- a drawn handle's own screen box,
+ *  today. Never moves, unlike a LabelBox: it has no `alongX`/`alongY`
+ *  because it never slides, only labels do. */
+export interface LabelObstacle {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+type ScreenBox = { x: number; y: number; width: number; height: number };
+
+/** Merges a list of (already possibly overlapping or touching) [lo, hi]
+ *  spans into the smallest equivalent set of disjoint ones. */
+function mergeSpans(spans: Array<[number, number]>): Array<[number, number]> {
+  if (spans.length === 0) return [];
+  const sorted = [...spans].sort((a, b) => a[0] - b[0]);
+  const merged: Array<[number, number]> = [[sorted[0][0], sorted[0][1]]];
+  for (const [lo, hi] of sorted.slice(1)) {
+    const last = merged[merged.length - 1];
+    if (lo <= last[1]) last[1] = Math.max(last[1], hi);
+    else merged.push([lo, hi]);
+  }
+  return merged;
 }
 
 /**
- * Where each label actually lands after two beginner-facing fixes: nothing
- * sits outside the viewport, and no two labels sit on top of each other.
+ * Moves `cur` the shortest distance along ITS OWN axis to a point clear of
+ * every blocker (another label, or a fixed obstacle) that actually stands
+ * in the way -- not one pairwise nudge at a time. A fixed per-collision
+ * step can retrace itself forever once three or more blockers crowd within
+ * one label's own width of each other: escaping the nearest one lands
+ * squarely in a second's forbidden zone, and escaping THAT lands back in
+ * the first's. Measured 2026-09-04: a circle's diameter label boxed in by
+ * two nearby drag handles plus a design corner's own point handle,
+ * bouncing between the same two positions forever under a first pass that
+ * moved one fixed-size step per collision found.
+ *
+ * Works by building, along `cur`'s own slide axis, the "forbidden" span
+ * every blocker rules out -- both boxes' half-sizes already folded in, so
+ * the span is exactly where `cur`'s own centre may not sit. EVERY blocker
+ * counts, not only ones `cur` already overlaps: one it does not overlap
+ * YET can still sit directly across the only escape route from one it
+ * does. A blocker whose PERPENDICULAR position puts it nowhere near `cur`'s
+ * own path is skipped -- otherwise a box merely close along one axis, but
+ * nowhere near the actual line `cur` can slide along, would wall off a
+ * stretch of that line it could never really reach. Overlapping and
+ * touching spans are merged, and `cur` jumps straight to whichever merged
+ * span's edge is nearest -- one exact move, not a search. Returns false
+ * (no move) when `cur` was never inside any span to begin with.
+ */
+function slideClear(cur: LabelBox, blockers: ScreenBox[]): boolean {
+  const len = Math.hypot(cur.alongX, cur.alongY) || 1;
+  const ux = cur.alongX / len;
+  const uy = cur.alongY / len;
+  const px = -uy;
+  const py = ux;
+  const curHalfAlong = (Math.abs(ux) * cur.width + Math.abs(uy) * cur.height) / 2;
+  const curHalfPerp = (Math.abs(px) * cur.width + Math.abs(py) * cur.height) / 2;
+  const curAlong = ux * cur.x + uy * cur.y;
+  const curPerp = px * cur.x + py * cur.y;
+
+  const forbidden: Array<[number, number]> = [];
+  for (const b of blockers) {
+    const bHalfPerp = (Math.abs(px) * b.width + Math.abs(py) * b.height) / 2;
+    const bPerp = px * b.x + py * b.y;
+    if (Math.abs(bPerp - curPerp) >= bHalfPerp + curHalfPerp) continue;
+    const bHalfAlong = (Math.abs(ux) * b.width + Math.abs(uy) * b.height) / 2;
+    const bAlong = ux * b.x + uy * b.y;
+    forbidden.push([bAlong - bHalfAlong - curHalfAlong, bAlong + bHalfAlong + curHalfAlong]);
+  }
+  if (forbidden.length === 0) return false;
+
+  const merged = mergeSpans(forbidden);
+  if (!merged.some(([lo, hi]) => curAlong > lo && curAlong < hi)) return false;
+
+  let bestPoint = 0;
+  let bestDir = 1;
+  let bestDist = Infinity;
+  for (const [lo, hi] of merged) {
+    for (const [point, dir] of [[lo, -1], [hi, 1]] as const) {
+      const d = Math.abs(point - curAlong);
+      if (d < bestDist) { bestDist = d; bestPoint = point; bestDir = dir; }
+    }
+  }
+  const delta = bestPoint + bestDir - curAlong;
+  cur.x += ux * delta;
+  cur.y += uy * delta;
+  return true;
+}
+
+/**
+ * Where each label actually lands after three beginner-facing fixes:
+ * nothing sits outside the viewport, no two labels sit on top of each
+ * other, and no label sits on top of a drawn drag handle.
  *
  * Measured 2026-09-04, blind judge round 2: a "40" label sitting on the Y
  * axis and a second, unrelated "40" floating over open canvas -- called out
@@ -378,43 +463,38 @@ function boxesOverlap(a: LabelBox, b: LabelBox): boolean {
  * pixels once projected. Neither label was wrong; nothing had ever checked
  * whether two labels' pixels actually overlapped.
  *
- * The collision pass is a few fixed rounds of "slide the later label along
- * its own edge, away from whichever earlier label it overlaps, by a
- * fraction of its own size" -- deterministic (same input order always
- * produces the same output, which is what makes this testable at all) and
- * cheap enough for the handful of labels one sketch ever carries at once.
- * Earlier labels in the input order are never moved by a later one, so a
- * caller that lists its most load-bearing labels first (edge lengths before
- * glyph chips, say) gets those held still and the rest negotiated around
- * them.
+ * Measured again 2026-09-04: a circle's own "⌀20" text sitting half under
+ * its own centre-drag handle. A handle is not a label, so it never went
+ * into `boxes` -- but it is exactly as real an obstacle on screen, and it
+ * has one property no label has: it never yields. `obstacles` carries
+ * those, checked the same way but never added to `placed`, so a label
+ * slides clear of a handle and the handle itself never moves an inch.
+ *
+ * The collision pass is a few fixed rounds of "move the later label clear
+ * of whichever earlier labels AND obstacles actually stand in its way" (see
+ * slideClear's own comment for how one label resolves several blockers at
+ * once) -- deterministic (same input order always produces the same
+ * output, which is what makes this testable at all) and cheap enough for
+ * the handful of labels one sketch ever carries at once. Earlier labels in
+ * the input order are never moved by a later one, so a caller that lists
+ * its most load-bearing labels first (edge lengths before glyph chips, say)
+ * gets those held still and the rest negotiated around them. Obstacles are
+ * not "earlier" or "later" -- a handle is always there, so every label is
+ * checked against every obstacle regardless of order.
  */
 export function layoutLabels(
   boxes: LabelBox[],
   viewport: { width: number; height: number },
+  obstacles: LabelObstacle[] = [],
 ): Record<string, { x: number; y: number }> {
   const placed: LabelBox[] = boxes.map((b) => ({ ...b }));
   const STEP_ROUNDS = 8;
   for (let round = 0; round < STEP_ROUNDS; round++) {
     let movedAny = false;
-    for (let i = 1; i < placed.length; i++) {
+    for (let i = 0; i < placed.length; i++) {
       const cur = placed[i];
-      for (let j = 0; j < i; j++) {
-        const other = placed[j];
-        if (!boxesOverlap(cur, other)) continue;
-        const len = Math.hypot(cur.alongX, cur.alongY) || 1;
-        const ux = cur.alongX / len;
-        const uy = cur.alongY / len;
-        // Which way along the edge actually increases separation -- moving
-        // blind could just as easily walk two labels deeper into each
-        // other if they happen to be offset against the chosen sign.
-        const towardX = cur.x - other.x;
-        const towardY = cur.y - other.y;
-        const sign = ux * towardX + uy * towardY >= 0 ? 1 : -1;
-        const step = Math.max(cur.width, cur.height) * 0.6;
-        cur.x += ux * sign * step;
-        cur.y += uy * sign * step;
-        movedAny = true;
-      }
+      const blockers = [...placed.slice(0, i), ...obstacles];
+      if (slideClear(cur, blockers)) movedAny = true;
     }
     if (!movedAny) break;
   }

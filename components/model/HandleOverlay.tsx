@@ -13,7 +13,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { arcFromBulge, type Point } from '../../lib/sketch-arc';
 import { type Constraint, edgeLength, losingEdges, residualsOf } from '../../lib/sketch-solve';
-import { circleLabel, formatLabel, type LabelBox, layoutLabels, sketchLabels, treatmentsFromOutline } from '../../lib/sketch-outline';
+import { circleLabel, formatLabel, type LabelBox, type LabelObstacle, layoutLabels, sketchLabels, treatmentsFromOutline } from '../../lib/sketch-outline';
 
 /**
  * One selected sketch's outline, in plane coordinates -- what the overlay
@@ -691,14 +691,35 @@ export default function HandleOverlay({
     return { o, n, pts, basis, chips, chipSpots, edgeSpots, cornerLabels, cornerSpots, labels, bowSpots, circleSpot, circleText, labelBoxes };
   }).filter((r): r is NonNullable<typeof r> => r !== null);
 
+  // Every drawn HANDLE is an obstacle too, not only other labels -- a drag
+  // point is a real, fixed thing a student has to click, and it never had
+  // anywhere to go. Measured 2026-09-04: a circle's own "⌀20" text sitting
+  // half under a nearby handle, on a sketch that happened to share the
+  // origin with another sketch's corner. Screen size is a lookup on the
+  // handle's own `kind`, matching the CSS this same file draws each one
+  // with below -- see the .handle rules for where each number comes from.
+  // Uses each handle's REST position (`a.x`/`a.y`), not the offset one it
+  // draws at mid-drag: a label sliding out from under the handle currently
+  // being dragged is a much smaller miss than the complexity of threading
+  // the live drag offset through this pass for it.
+  const handleObstacles: LabelObstacle[] = points.map((a) => {
+    const [w, h] = a.kind === 'move' ? [11, 11]
+      : a.kind === 'turn' ? [15, 15]
+      : a.kind === 'radius' ? [11, 11]
+      : a.kind === 'point' ? [10, 10]
+      : [13, 13];
+    return { x: a.x, y: a.y, width: w, height: h };
+  });
+
   // Laid out ACROSS every sketch at once -- see the comment above
   // outlineRenders for why a per-sketch pass let two different sketches'
   // labels sit on the same pixels.
   const viewportRect = layerRef.current?.getBoundingClientRect();
-  const laidOut = layoutLabels(outlineRenders.flatMap((r) => r.labelBoxes), {
-    width: viewportRect?.width ?? 4000,
-    height: viewportRect?.height ?? 4000,
-  });
+  const laidOut = layoutLabels(
+    outlineRenders.flatMap((r) => r.labelBoxes),
+    { width: viewportRect?.width ?? 4000, height: viewportRect?.height ?? 4000 },
+    handleObstacles,
+  );
 
   return (
     <div
