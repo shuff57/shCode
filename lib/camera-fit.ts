@@ -63,6 +63,19 @@ export const MIN_FIT_DISTANCE = 20;
  * itself derives `tan(hFov/2) = tan(vFov/2) * aspect` -- governs instead,
  * and is always the narrower of the two when width < height.
  *
+ * `occludedWidth` is how many pixels of `viewportWidth`, on one side, a
+ * docked UI panel covers -- the Rules panel when a sketch is being viewed
+ * flat, say. Subtracted from `viewportWidth` BEFORE the aspect ratio is
+ * computed, so the fit is against the space a student can actually SEE, not
+ * the canvas element's full width. This is deliberately independent of
+ * whether the canvas element has already been resized by the browser's own
+ * layout for that panel (a real docked flex column normally does resize the
+ * canvas, given time) -- passing the panel's own known width here makes the
+ * fit correct on the very first frame a panel appears, with no dependency on
+ * a ResizeObserver callback having already fired first. Clamped to leave at
+ * least 1px of visible width, so an occlusion wider than the viewport itself
+ * cannot flip the effective width negative.
+ *
  * A degenerate bbox (`bboxLongestDimension` <= 0) or an unmeasurable viewport
  * (either side <= 0) returns `MIN_FIT_DISTANCE` rather than a distance of
  * zero or `Infinity`.
@@ -73,13 +86,15 @@ export function fitDistance(
   viewportHeight: number,
   fovDegrees: number,
   fillFraction: number = DEFAULT_FILL_FRACTION,
+  occludedWidth = 0,
 ): number {
   const longest = bboxLongestDimension(bbox);
   if (!(longest > 0) || !(viewportWidth > 0) || !(viewportHeight > 0) || !(fillFraction > 0)) {
     return MIN_FIT_DISTANCE;
   }
 
-  const aspect = viewportWidth / viewportHeight;
+  const visibleWidth = Math.max(viewportWidth - Math.max(occludedWidth, 0), 1);
+  const aspect = visibleWidth / viewportHeight;
   const verticalHalf = (fovDegrees * Math.PI) / 360; // fovDegrees / 2, in radians
   const shortSideHalf = aspect >= 1 ? verticalHalf : Math.atan(Math.tan(verticalHalf) * aspect);
 

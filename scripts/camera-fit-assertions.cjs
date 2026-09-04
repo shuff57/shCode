@@ -91,6 +91,41 @@ module.exports = function run(dir) {
   check('a real result is never below the floor even for a tiny box',
     fit.fitDistance({ min: [0, 0, 0], max: [0.001, 0.001, 0.001] }, 1164, 662, 45) === fit.MIN_FIT_DISTANCE);
 
+  console.log('\n=== fitDistance: occludedWidth -- a docked panel eating part of the canvas ===');
+
+  {
+    // A Rules panel eating 300px of a 1164px-wide, 662px-tall canvas leaves
+    // 864px visible -- still landscape (864 > 662), so the vertical-fov-only
+    // formula still applies and the distance should be IDENTICAL to a plain
+    // 864-wide canvas with no occlusion at all.
+    const dOccluded = fit.fitDistance(box40, 1164, 662, 45, undefined, 300);
+    const dPlain864 = fit.fitDistance(box40, 864, 662, 45);
+    check('occluding 300px of a 1164px canvas gives the SAME distance as a plain 864px canvas (still landscape)',
+      close(dOccluded, dPlain864, 1e-9), `${dOccluded} vs ${dPlain864}`);
+    // Height is still the limiting side (864 > 662), so this is IDENTICAL to
+    // the unoccluded distance too -- the landscape formula never depended on
+    // width to begin with (see the "MUCH wider viewport" case above). The
+    // model's on-screen SIZE in pixels does not need to change just because
+    // a panel narrowed the strip it sits in; it now simply reads as a bigger
+    // fraction of that narrower strip, which is the whole point of the fix.
+    check('while still landscape, occluding width changes nothing -- height alone governs, exactly as the unoccluded case already does',
+      close(dOccluded, dLandscape, 1e-9), `${dOccluded} vs ${dLandscape}`);
+  }
+  {
+    // Occlusion big enough to flip landscape into portrait: 1164 - 700 = 464,
+    // narrower than the 662px height.
+    const dFlipped = fit.fitDistance(box40, 1164, 662, 45, undefined, 700);
+    const dPortraitEquivalent = fit.fitDistance(box40, 464, 662, 45);
+    check('enough occlusion flips the aspect branch to portrait, matching a plain 464-wide portrait canvas',
+      close(dFlipped, dPortraitEquivalent, 1e-9), `${dFlipped} vs ${dPortraitEquivalent}`);
+  }
+  check('occludedWidth omitted defaults to 0 -- identical to the unoccluded distance',
+    close(fit.fitDistance(box40, 1164, 662, 45, undefined), dLandscape, 1e-9));
+  check('a negative occludedWidth is treated as zero, not as ADDING visible space',
+    close(fit.fitDistance(box40, 1164, 662, 45, undefined, -500), dLandscape, 1e-9));
+  check('an occludedWidth >= the whole viewport floors the visible width at 1px rather than going negative or zero',
+    Number.isFinite(fit.fitDistance(box40, 1164, 662, 45, undefined, 5000)));
+
   console.log(fails.length === 0
     ? `\nall ${pass} checks passed`
     : `\n${fails.length} failed`);

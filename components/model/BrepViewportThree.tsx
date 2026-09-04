@@ -74,7 +74,7 @@ import type { BuildResult } from '../../lib/occt-build';
 import type { HandleSpec } from '../../lib/model-handles';
 import type { AnchorPoint } from './HandleOverlay';
 import { mergeMeshes, type MeshInput } from '../../lib/mesh-export';
-import { bboxCenter, fitDistance, type Box3Like } from '../../lib/camera-fit';
+import { bboxCenter, DEFAULT_FILL_FRACTION, fitDistance, type Box3Like } from '../../lib/camera-fit';
 
 const KERNEL_BASE = '/reshape/kernel';
 
@@ -246,6 +246,38 @@ interface Props {
    * is worse than a caller finding pickAt briefly unset.
    */
   registerPickAt?: (fn: ((clientX: number, clientY: number) => void) | null) => void;
+  /**
+   * The plane of the single sketch currently selected, or null when nothing
+   * (or something other than exactly one sketch) is selected --
+   * SandboxWorkspace.tsx derives this from `selected`/`doc` the same way it
+   * already derives `selectionLabel`.
+   *
+   * A transition from null to a plane means "the student just started
+   * looking at a sketch flat": the camera saves its current orbit (so
+   * selecting a solid again can put it back -- see viewpointBeforeSketchRef's
+   * own comment), looks straight down that plane's own normal (Ground -> the
+   * TOP_DIR the view strip already uses, Front -> FRONT_DIR, Side -> the new
+   * SIDE_DIR), and fits to the sketch the same way fitToModel() fits a
+   * solid, MINUS `panelOcclusionPx` of visible width (the Rules panel
+   * appearing alongside it). A transition from a plane back to null restores
+   * the saved orbit. No-op while the plane string does not change (staying
+   * on the same sketch, or switching to a different sketch on the SAME
+   * plane, is not a new "entering flat view" event).
+   */
+  sketchPlane?: 'xy' | 'xz' | 'yz' | null;
+  /**
+   * How many pixels of docked UI panel currently sit to one side of the
+   * canvas -- the Rules panel's own width while a sketch is being viewed
+   * flat, passed straight to lib/camera-fit.ts's fitDistance() as its
+   * `occludedWidth` argument (see that function's own comment for why this
+   * is a known constant handed in, not something read back off the DOM).
+   * Only read at the moment `sketchPlane` transitions from null to a plane;
+   * this component does not re-fit on every later render just because this
+   * number happened to change (the Dimensions panel is effectively always
+   * open in Build mode and does not itself trigger a re-fit either -- see
+   * fitToModel()'s own "never on every rebuild" rule).
+   */
+  panelOcclusionPx?: number;
 }
 
 /** The handful of kernel exports this component calls, loaded once. Loose
@@ -367,6 +399,7 @@ const EDGE_TUBE_RADIUS = 0.75;
  */
 export default function BrepViewportThree({
   doc, deflection, onStats, onPick, pick, selectedCount, selectionLabel, anchors, onAnchors, onMesh, registerPickAt,
+  sketchPlane, panelOcclusionPx,
 }: Props) {
   const [phase, setPhase] = useState<'loading' | 'ready' | 'error'>('loading');
   // Which view-strip preset the camera is sitting on, or null once the
@@ -417,6 +450,23 @@ export default function BrepViewportThree({
    *  NEXT shape gets its own automatic fit rather than inheriting whatever
    *  distance a since-deleted model happened to leave the camera at. */
   const hasFitOnceRef = useRef(false);
+  /** The orbit (camera position + controls target) the student had right
+   *  before `sketchPlane` first went from null to a plane -- i.e. right
+   *  before this component snapped to a flat, straight-on view of a sketch.
+   *  Null whenever no such view is currently active. Restored verbatim the
+   *  moment `sketchPlane` goes back to null (selecting a solid again, or
+   *  deselecting entirely) -- see that prop's own effect below -- so looking
+   *  at a sketch flat is a visit, not a one-way trip out of whatever angle
+   *  the student had actually orbited to. */
+  const savedOrbitRef = useRef<{
+    position: [number, number, number]; target: [number, number, number];
+  } | null>(null);
+  /** The `sketchPlane` value as of the last time this effect ran, so the
+   *  effect below can tell null->plane (entering flat view: save + snap),
+   *  plane->null (leaving: restore), and plane->a-different-plane (switching
+   *  which sketch is being viewed flat: just re-aim, the ORIGINAL saved
+   *  orbit stays put) apart from a re-render that changed nothing. */
+  const prevSketchPlaneRef = useRef<'xy' | 'xz' | 'yz' | null>(null);
   const onStatsRef = useRef(onStats);
   onStatsRef.current = onStats;
   const onMeshRef = useRef(onMesh);
@@ -1148,27 +1198,24 @@ export default function BrepViewportThree({
    * exists for a different case (a non-empty but vanishingly small model),
    * not for "there is no model at all".
    */
-  function fitToModel(dir: [number, number, number]) {
+  /**
+   * The world-space extent of everything worth fitting a camera to: every
+   * drawn solid mesh, PLUS every sketch's own corner points, projected
+   * through that sketch's own plane axes and offset. A sketch draws no
+   * three.js mesh at all -- HandleOverlay renders it as a DOM/SVG overlay,
+   * entirely outside this scene -- so `solidGroupRef` alone can never see
+   * one; without this half a sketch-only document's first shape (or a
+   * sketch viewed flat -- see viewSketchPlane()) never got fit, or got fit
+   * as if it sat flat on the ground regardless of its real plane. Returns
+   * null (not an empty Box3) when the scene itself is not ready yet, so
+   * callers can tell "nothing to fit around" apart from "not ready".
+   */
+  function computeSceneBox(): THREE_NS.Box3 | null {
     const three = threeRef.current;
-    const camera = cameraRef.current;
-    const controls = controlsRef.current;
-    const renderer = rendererRef.current;
-    const scene = sceneRef.current;
-    const container = containerRef.current;
     const group = solidGroupRef.current;
-    if (!three || !camera || !controls || !renderer || !scene || !container || !group) return;
+    if (!three || !group) return null;
     const { THREE } = three;
-
     const box = new THREE.Box3().setFromObject(group);
-    // A sketch draws nothing into `group` -- HandleOverlay renders it as a
-    // DOM/SVG overlay, entirely outside this three.js scene -- so a
-    // sketch-only document (a fresh Sketch/Circle/Polygon, nothing Pulled
-    // yet) left `box` empty and the very first shape a student ever drew
-    // never got fit at all. Corner points are read straight off `doc` (this
-    // component already has it) and projected through the SAME plane axes
-    // SandboxWorkspace's own planeAnchor()/sketchHandles() use, so a sketch on
-    // the xz or yz plane still ends up at its real 3D position rather than
-    // being read as if it were flat on the ground.
     for (const f of doc.features) {
       if (f.kind !== 'sketch') continue;
       const { u, v, n } = SKETCH_PLANE_AXES[f.plane ?? 'xy'] ?? SKETCH_PLANE_AXES.xy;
@@ -1181,7 +1228,21 @@ export default function BrepViewportThree({
         ));
       }
     }
-    if (box.isEmpty()) return;
+    return box;
+  }
+
+  function fitToModel(dir: [number, number, number]) {
+    const three = threeRef.current;
+    const camera = cameraRef.current;
+    const controls = controlsRef.current;
+    const renderer = rendererRef.current;
+    const scene = sceneRef.current;
+    const container = containerRef.current;
+    if (!three || !camera || !controls || !renderer || !scene || !container) return;
+    const { THREE } = three;
+
+    const box = computeSceneBox();
+    if (!box || box.isEmpty()) return;
     const bbox: Box3Like = {
       min: [box.min.x, box.min.y, box.min.z],
       max: [box.max.x, box.max.y, box.max.z],
@@ -1197,6 +1258,64 @@ export default function BrepViewportThree({
     // Same reasoning as lookFrom()'s own final line: this sets camera state
     // directly rather than through a drag, so the dampingTick flush point
     // never fires for it and handles need reprojecting here instead.
+    projectAnchors();
+  }
+
+  /**
+   * Looks straight down a sketch plane's own normal (Ground/xy -> the same
+   * direction the Top view-strip preset uses, Front/xz -> Front, Side/yz ->
+   * from +x) and fits to the scene the way fitToModel() does, but with
+   * `occludedWidthPx` of the canvas subtracted from the fit (see
+   * fitDistance()'s own comment) AND the framing shifted sideways so the
+   * model centres in the VISIBLE strip, not the full canvas -- a Rules panel
+   * docked on one side must never cover any of it.
+   *
+   * Does not touch `hasFitOnceRef` or save/restore any orbit itself -- see
+   * the `sketchPlane` prop effect below, which is the only caller and owns
+   * that bookkeeping, so this stays a pure "look here, fit this" primitive
+   * usable the same way regardless of why it was called.
+   */
+  function viewSketchPlane(plane: 'xy' | 'xz' | 'yz', occludedWidthPx: number) {
+    const three = threeRef.current;
+    const camera = cameraRef.current;
+    const controls = controlsRef.current;
+    const renderer = rendererRef.current;
+    const scene = sceneRef.current;
+    const container = containerRef.current;
+    if (!three || !camera || !controls || !renderer || !scene || !container) return;
+    const { THREE } = three;
+
+    const box = computeSceneBox();
+    if (!box || box.isEmpty()) return;
+    const bbox: Box3Like = {
+      min: [box.min.x, box.min.y, box.min.z],
+      max: [box.max.x, box.max.y, box.max.z],
+    };
+    const center = bboxCenter(bbox);
+    const distance = fitDistance(
+      bbox, container.clientWidth, container.clientHeight, camera.fov,
+      DEFAULT_FILL_FRACTION, occludedWidthPx,
+    );
+
+    const { n } = SKETCH_PLANE_AXES[plane] ?? SKETCH_PLANE_AXES.xy;
+    const direction = new THREE.Vector3(n[0], n[1], n[2]).normalize();
+
+    // Re-centre into the VISIBLE strip: the occluded half of the canvas is
+    // pure dead space, so the model's on-screen centre must sit at the
+    // visible strip's own centre, not the full canvas's. That is a lateral
+    // shift of half the occluded width, converted from screen pixels to
+    // world units at the distance just computed (the same
+    // world-per-pixel relationship fitDistance()'s own derivation uses,
+    // inverted), then applied to BOTH camera.position and controls.target
+    // so the orbit still turns around the same visual point afterward.
+    const worldPerPixel = (2 * distance * Math.tan((camera.fov * Math.PI) / 360)) / container.clientHeight;
+    const shiftWorld = (occludedWidthPx / 2) * worldPerPixel;
+    const right = new THREE.Vector3().crossVectors(direction, camera.up).normalize();
+
+    controls.target.set(center[0], center[1], center[2]).addScaledVector(right, -shiftWorld);
+    camera.position.copy(controls.target).addScaledVector(direction, distance);
+    controls.update();
+    renderer.render(scene, camera);
     projectAnchors();
   }
 
@@ -1667,6 +1786,69 @@ export default function BrepViewportThree({
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, doc, deflection]);
+
+  // ---- entering/leaving a flat sketch view -----------------------------
+  //
+  // See `sketchPlane`'s own prop doc for the contract. This only reacts to
+  // the plane STRING changing (via prevSketchPlaneRef), never to `doc`
+  // changing on its own -- editing a dimension or adding a step while a
+  // sketch is being viewed flat must not re-snap the camera, the same "never
+  // on every rebuild" rule fitToModel()'s own first-shape call follows.
+  //
+  // DECLARED AFTER the build effect above on purpose, not merely below it by
+  // convention: React runs effects in declaration order every render, and a
+  // brand-new sketch changes BOTH `doc` and `sketchPlane` on the SAME
+  // render -- the build effect's own first-shape auto-fit (fitToModel(
+  // HOME_DIR)) would otherwise run AFTER this one and clobber the flat view
+  // with the isometric Home angle. Measured 2026-09-04: with this effect
+  // declared earlier in the file, a fresh Sketch rendered as a skewed
+  // parallelogram (still isometric Home) instead of a straight-down
+  // rectangle, because the build effect's own fit ran second and won.
+  useEffect(() => {
+    if (phase !== 'ready') return;
+    const camera = cameraRef.current;
+    const controls = controlsRef.current;
+    const renderer = rendererRef.current;
+    const scene = sceneRef.current;
+    const prev = prevSketchPlaneRef.current;
+    const next = sketchPlane ?? null;
+    if (prev === next) return;
+    prevSketchPlaneRef.current = next;
+
+    if (next && !prev) {
+      // Entering flat view: remember exactly where the student was orbited
+      // to, so leaving it can put them back rather than stranding them at
+      // whatever the flat view happened to leave the camera at.
+      if (camera && controls) {
+        savedOrbitRef.current = {
+          position: [camera.position.x, camera.position.y, camera.position.z],
+          target: [controls.target.x, controls.target.y, controls.target.z],
+        };
+      }
+      viewSketchPlane(next, panelOcclusionPx ?? 0);
+    } else if (!next && prev) {
+      // Leaving flat view: restore the saved orbit verbatim, if there is
+      // one -- absent only if the camera/controls were not ready at the
+      // moment flat view was entered, an edge case not worth a fallback fit
+      // for (the LAST thing this component did was already fit or orbit
+      // correctly; leaving it alone is the safe default).
+      const saved = savedOrbitRef.current;
+      if (saved && camera && controls && renderer && scene) {
+        camera.position.set(saved.position[0], saved.position[1], saved.position[2]);
+        controls.target.set(saved.target[0], saved.target[1], saved.target[2]);
+        controls.update();
+        renderer.render(scene, camera);
+        projectAnchors();
+      }
+      savedOrbitRef.current = null;
+    } else if (next && prev) {
+      // Switching which plane is being viewed flat (a different sketch, or
+      // the same sketch's plane changed) -- re-aim, but the ORIGINAL saved
+      // orbit from before either flat view stays exactly as it was.
+      viewSketchPlane(next, panelOcclusionPx ?? 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, sketchPlane]);
 
   // ---- keep the edge highlight in sync when ONLY `pick` changes -------------
   // Clearing a selection from the model tree, or picking a different edge

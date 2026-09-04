@@ -435,6 +435,18 @@ export default function ModelEditor({
     typeof document !== 'undefined' && collapsible && !collapsed
       ? document.getElementById('reshapeTimeline')
       : null;
+  // The Rules panel is a docked column beside the canvas (Fusion/Onshape
+  // style), not an overlay inside this card -- same portal pattern as the
+  // ribbon and the timeline, and the same reason: the host is a real flex
+  // sibling of the viewport SandboxWorkspace renders, so it exists before
+  // this component mounts and narrowing the canvas is normal CSS layout
+  // rather than something this component has to reach out and cause itself.
+  // Measured 2026-09-04: as a floating card overlay it sat at x=32-450 over
+  // the canvas and clipped a corner's own "20" label under it.
+  const rulesHost =
+    typeof document !== 'undefined' && collapsible && !collapsed
+      ? document.getElementById('reshapeRules')
+      : null;
 
   // Alt+C (Onshape's own shortcut) focuses Search tools; Escape closes
   // whichever flyout is open, wherever focus happens to be.
@@ -1143,15 +1155,19 @@ export default function ModelEditor({
   const activeSketch =
     chosen.length === 1 && chosen[0].kind === 'sketch' ? chosen[0] : null;
 
-  // The feature list lives in the bottom timeline (Fusion 360 style), so the
-  // card only holds the note and the sketch rules. When both are gone the
+  // The feature list lives in the bottom timeline (Fusion 360 style) and the
+  // sketch rules live in the docked #reshapeRules column now (see rulesHost's
+  // own comment), so the card only holds the note. When that is gone too the
   // card is empty and collapses to the rail on its own -- an empty card over
   // the canvas is a click-eater with nothing to say.
   // In Build mode the note is shown in the timeline strip (below), not in
   // the card: measured 2026-09-03, the "Rounded every edge..." teaching note
   // opened the card to 420 px over the canvas and it never closed, covering
   // the view strip's Home button.
-  const cardHasContent = (Boolean(note) && !timelineHost) || Boolean(activeSketch);
+  // `activeSketch` only still forces the card open when there is no
+  // `rulesHost` to dock into -- the inline-fallback path (a bare embed with
+  // no docked column) still needs the card for it, same as before.
+  const cardHasContent = (Boolean(note) && !timelineHost) || (Boolean(activeSketch) && !rulesHost);
   useEffect(() => {
     onContentChange?.(cardHasContent);
   }, [cardHasContent, onContentChange]);
@@ -1799,24 +1815,31 @@ export default function ModelEditor({
       {/* A circle reaches the panel too now. It gets the plane row alone --
           it has no edges to rule and no corners to pin -- but before this the
           whole panel was skipped for it, so a circle was born on the ground
-          and could never stand up. */}
-      {activeSketch && (
-        <SketchConstraints
-          points={activeSketch.points}
-          bulges={activeSketch.bulges}
-          rounds={activeSketch.rounds}
-          chamfers={activeSketch.chamfers}
-          constraints={activeSketch.constraints ?? []}
-          onChange={(next) => setConstraints(activeSketch, next)}
-          onRound={(corner, radius) => roundSketchCorner(activeSketch, corner, radius)}
-          onChamfer={(corner, distance) => chamferSketchCorner(activeSketch, corner, distance)}
-          onBow={(edge, bow) => bowSketchEdge(activeSketch, edge, bow)}
-          onRemoveCorner={(corner) => dropSketchCorner(activeSketch, corner)}
-          plane={activeSketch.plane}
-          shape={activeSketch.shape}
-          onPlane={(plane) => setSketchPlane(activeSketch, plane)}
-        />
-      )}
+          and could never stand up.
+          Portaled into the docked #reshapeRules host when one exists (see
+          rulesHost's own comment); falls back to rendering right here, as
+          before, for any host that never mounted the docked column (a bare
+          embed of this component with no SandboxWorkspace around it). */}
+      {activeSketch && (() => {
+        const rules = (
+          <SketchConstraints
+            points={activeSketch.points}
+            bulges={activeSketch.bulges}
+            rounds={activeSketch.rounds}
+            chamfers={activeSketch.chamfers}
+            constraints={activeSketch.constraints ?? []}
+            onChange={(next) => setConstraints(activeSketch, next)}
+            onRound={(corner, radius) => roundSketchCorner(activeSketch, corner, radius)}
+            onChamfer={(corner, distance) => chamferSketchCorner(activeSketch, corner, distance)}
+            onBow={(edge, bow) => bowSketchEdge(activeSketch, edge, bow)}
+            onRemoveCorner={(corner) => dropSketchCorner(activeSketch, corner)}
+            plane={activeSketch.plane}
+            shape={activeSketch.shape}
+            onPlane={(plane) => setSketchPlane(activeSketch, plane)}
+          />
+        );
+        return rulesHost ? createPortal(rules, rulesHost) : rules;
+      })()}
 
       <style>{`
         .model-editor { display: flex; flex-direction: column; height: 100%; min-height: 0; overflow: hidden; }

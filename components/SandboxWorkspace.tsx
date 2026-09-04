@@ -71,6 +71,18 @@ const BUILD_KEY = 'shCode:sandbox-reshape-build';
 // the way it looks like it should).
 const TIMELINE_HEIGHT_PX = 58;
 
+// The Rules panel's own docked-column width, once it becomes one -- see the
+// #reshapeRules host below. Fed to BrepViewportThree's `panelOcclusionPx` as
+// a KNOWN constant, not measured off the DOM, so the very first frame a
+// sketch is viewed flat already fits around it correctly rather than racing
+// a ResizeObserver callback that has not fired yet. The Dimensions panel's
+// own 208px does NOT need a matching constant here: it is effectively always
+// open in Build mode, so `container.clientWidth` (read where the fit
+// actually runs) already reflects it by the time anything in this file could
+// react to a NEW event -- the Rules panel is the one that genuinely appears
+// and disappears within a single render.
+const RULES_PANEL_WIDTH_PX = 280;
+
 // The B-rep live-preview degrade guard's threshold, in ms of buildMs+meshMs+
 // drawMs combined (the same total the params panel already shows as one
 // number). Chosen from measurement, not a round number: every STEADY-STATE
@@ -834,6 +846,18 @@ export default function SandboxWorkspace() {
     return part ? `${base} · ${part}` : base;
   }, [selected, doc, pickedFace, pickedEdge]);
 
+  // The plane of the single sketch currently selected, or null -- SAME
+  // condition ModelEditor.tsx's own `activeSketch` uses (exactly one
+  // feature selected, and it is a sketch), computed independently here
+  // because the viewport that needs to react to it (BrepViewportThree) is a
+  // sibling of ModelEditor, not a parent or child. Feeds `sketchPlane`
+  // below, which is what tells the viewport to look at the sketch flat.
+  const activeSketchPlane = useMemo<'xy' | 'xz' | 'yz' | null>(() => {
+    if (selected.length !== 1) return null;
+    const f = doc.features.find((x) => x.id === selected[0]);
+    return f && f.kind === 'sketch' ? (f.plane ?? 'xy') : null;
+  }, [selected, doc]);
+
   // One entry per UNCONSUMED sketch -- every sketch nothing has Pulled, Spun,
   // or Blended yet (sketchIsUnconsumed, shared with `specs` above so the two
   // never drift on what "still worth drawing" means), not only the currently
@@ -1545,6 +1569,19 @@ export default function SandboxWorkspace() {
               </>
             ) : isReshape ? (
               <div className="reshape-pane">
+                {/* The Rules panel's docked home. ModelEditor portals
+                    SketchConstraints in here (same pattern as the ribbon and
+                    the timeline) whenever exactly one sketch is selected, so
+                    a beginner lens no longer finds it floating OVER the
+                    canvas covering the sketch's own left edge -- measured
+                    2026-09-04, ours-r2/2d/03-rounded-corner.png: the panel
+                    spanned x=32-450 and clipped a "20" label under it. A
+                    real flex sibling of .reshape-pane-view, not an overlay,
+                    so the canvas genuinely narrows instead of something
+                    sitting on top of it -- aria-hidden and CSS both key off
+                    whether it actually has a child, so it takes no width at
+                    all the rest of the time. */}
+                <div id="reshapeRules" className="reshape-pane-rules" aria-hidden={!(isReshape && build)} />
                 <div className="reshape-pane-view">
                   {brepEngine && build ? (
                     // NO IFRAME ON THIS PATH, and that is the whole point of it.
@@ -1633,6 +1670,8 @@ export default function SandboxWorkspace() {
                       pick={pickedEdge?.edge ? { target: pickedEdge.target, name: pickedEdge.edge } : null}
                       selectedCount={selected.length}
                       selectionLabel={selectionLabel}
+                      sketchPlane={activeSketchPlane}
+                      panelOcclusionPx={activeSketchPlane ? RULES_PANEL_WIDTH_PX : 0}
                       // The B-rep engine's own producer for the SAME `anchors`
                       // state the JSCAD path fills from the iframe's
                       // 'reshape-anchors' postMessage (see the `onMessage`
@@ -1808,6 +1847,21 @@ export default function SandboxWorkspace() {
           min-height: 280px;
         }
         .reshape-pane { display: flex; height: 100%; min-height: 0; }
+        /* :empty, not a class toggle or React state -- SketchConstraints
+           portals in and out via ModelEditor's own #reshapeRules lookup (the
+           same pattern as the ribbon/timeline hosts), so whether this host
+           HAS a child already says everything a separate "is a sketch
+           selected" flag would only duplicate. Zero width and display:none
+           together (not width:0 alone) so it never keeps a 1px border or
+           padding sliver while empty. */
+        .reshape-pane-rules:empty { display: none; }
+        .reshape-pane-rules:not(:empty) {
+          flex: 0 0 ${RULES_PANEL_WIDTH_PX}px;
+          min-width: 0;
+          overflow-y: auto;
+          border-right: 1px solid var(--border);
+          background: var(--card);
+        }
         .reshape-pane-view { flex: 1 1 auto; min-width: 0; display: flex; position: relative; }
         .reshape-pane-view .reshape-frame, .reshape-pane-view .reshape-empty { flex: 1; }
         .reshape-pane-params {
@@ -1999,6 +2053,14 @@ export default function SandboxWorkspace() {
           /* The toolbar floats at top:0 (48px), over the canvas. The panel
              must clear that same band -- the identical offset #editorPane
              uses. align-items: stretch shrinks the panel from the top. */
+          margin-top: 48px;
+        }
+        /* Same reasoning, same offset, as .reshape-pane-params right above --
+           the docked Rules column sits in the exact same flex row and floats
+           under the SAME 48px ribbon otherwise. Measured 2026-09-04: without
+           this, "RULES" and the Sits-on buttons rendered directly under the
+           Code/Build toggle and the shape-tool icons. */
+        .sandbox-shell.is-build .reshape-pane-rules:not(:empty) {
           margin-top: 48px;
         }
         /* The toolbar floats over the preview, so the preview owns the whole
