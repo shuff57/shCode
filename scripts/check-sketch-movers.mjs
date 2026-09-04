@@ -30,6 +30,15 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 // file -> function -> why it is allowed to write this.
 const SANCTIONED = {
+  // The script runtime never moves a point. sk.rect(), sk.circle() and
+  // sk.polygon() describe a sketch from scratch: they write the whole points
+  // array AND reset rounds, chamfers and bulges in the same replaceFeature()
+  // call, so no key can describe a point that has since moved. sk.round() and
+  // sk.chamfer() then go through filletCorner/chamferCorner like the Rules
+  // panel does.
+  'lib/reshape-script.ts': {
+    runScript: 'replaces a sketch whole (points + rounds + chamfers + bulges together); never moves a point under a key',
+  },
   'lib/sketch-arc.ts': {
     splitEdge: 'owns the split, including dividing an arc into two arcs that retrace it',
     filletCorner: 'builds the trim points and the arc; the one place they are constructed',

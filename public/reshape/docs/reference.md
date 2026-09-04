@@ -227,7 +227,7 @@ A 40 × 40 × 20 box with thick 5 mm walls.
 
 A **round** smooths edges into curves. A **bevel** cuts edges at an angle.
 
-`round(b, 3)` rounds every edge of the shape to a 3 mm radius. On a box or cylinder, this softens all the sharp corners at once. On a shape with curved or complex edges, every edge gets the same treatment.
+`round(b, 3)` rounds every edge of the shape to a 3 mm radius. On a box or cylinder, this softens all the sharp corners at once, and it shows in the timeline as part of the shape ("Box 1, corner 3") rather than as its own step, because it is a property of the shape. Rounding one edge is its own step ("Round 1").
 
 `round(b.edge('top', 'front'), 3)` rounds only the edge between the top and front faces, named by the two faces it connects. This lets you soften one edge while leaving others sharp. Use this for detail work—rounding just the corner where two faces meet, leaving the rest untouched.
 

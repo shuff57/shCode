@@ -144,7 +144,7 @@ hole(b, { across: 6 })`,
     pages: [
       {
         title: 'round: smoothing edges',
-        body: `round(b, 3) rounds every edge. round(b.edge('top', 'front'), 2) rounds one edge named by its two faces.`,
+        body: `Rounding every edge of a box or cylinder is a property of the shape and shows on its own chip ("Box 1, corner 3"); rounding one edge is its own step ("Round 1"). round(b, 3) rounds every edge. round(b.edge('top', 'front'), 2) rounds one edge named by its two faces.`,
         code: `const b = box(30, 20, 10)
 round(b, 3)`,
       },
