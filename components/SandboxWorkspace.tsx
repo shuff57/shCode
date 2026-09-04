@@ -32,7 +32,7 @@ import { writeSTL, writeOBJ, write3MF, type MeshInput } from '../lib/mesh-export
 import HandleOverlay, { type AnchorPoint, type SketchOutline } from './model/HandleOverlay';
 import { outlineOf } from '../lib/sketch-arc';
 import { handlesFor, planeAnchor } from '../lib/model-handles';
-import { EMPTY_DOC, type Feature, type ModelDoc, newPolygonSketch, newRectangleSketch } from '../lib/model-types';
+import { EMPTY_DOC, type Feature, isSketchOnly, type ModelDoc, nameMap, newPolygonSketch, newRectangleSketch } from '../lib/model-types';
 import { ownerOf } from '../lib/model-selection';
 import type { TopoName } from '../lib/topo-name';
 import {
@@ -760,6 +760,36 @@ export default function SandboxWorkspace() {
     [specs]
   );
 
+  // The viewport's selection badge names the thing, instead of leaving a
+  // beginner to trust a bare count. "edge" is the only part word a pick can
+  // resolve today (nameFaceOnCurrentShape() only ever returns a primitive
+  // face's own part or null -- see lib/model-selection.ts's PickName comment
+  // for why a hole's own wall or a round's own face carry no name to read a
+  // part word from, and correctly fall back to just the owner's name here
+  // too). +z/-z map to the same top/bottom words the view strip already
+  // uses; +x/-x/+y/-y are printed as-is rather than guessed at as
+  // front/back/left/right, which depends on which way the camera happens to
+  // be facing and this app deliberately never assumes (see lib/topo-name.ts's
+  // own "no answer is better than a confidently wrong one" rule).
+  const selectionLabel = useMemo(() => {
+    if (selected.length === 0) return null;
+    if (selected.length > 1) return `${selected.length} selected`;
+    const id = selected[0];
+    if (!doc.features.some((f) => f.id === id)) return null;
+    const base = nameMap(doc)[id] ?? id;
+    const partWord = (name: TopoName | null | undefined): string | null => {
+      if (!name) return null;
+      if (name.cause === 'between') return 'edge';
+      if (name.cause === 'primitive' && name.kind === 'face') {
+        const words: Record<string, string> = { '+z': 'top', '-z': 'bottom', side: 'side' };
+        return `${words[name.part] ?? name.part} face`;
+      }
+      return null;
+    };
+    const part = partWord(pickedFace?.face) ?? partWord(pickedEdge?.edge);
+    return part ? `${base} · ${part}` : base;
+  }, [selected, doc, pickedFace, pickedEdge]);
+
   // One entry per selected sketch: its corner parameters (so the overlay can
   // look up each corner's projected anchor) alongside the plane geometry
   // that decides what gets drawn between them -- straight, an arc, or the
@@ -1418,6 +1448,7 @@ export default function SandboxWorkspace() {
                 rollbackIndex={rollbackIndex}
                 onRollback={setRollbackIndex}
                 onStartDraw={setDrawTool}
+                drawTool={drawTool}
                 onUndo={undo}
                 onRedo={redo}
                 canUndo={depth.back > 0}
@@ -1494,7 +1525,22 @@ export default function SandboxWorkspace() {
                         // The params panel reads one number, so hand it the one a
                         // hand can feel: everything between the edit and the pixels.
                         setRebuildMs(Math.round(total));
-                        setStale(st.triangles > 0 ? null : 'empty');
+                        // Zero triangles is only a FAILURE when the doc contains
+                        // something that should have produced a solid. A bare
+                        // Sketch/Circle/Polygon nobody has Pulled yet is zero
+                        // triangles by construction -- flat is not built, not
+                        // broken -- and isSketchOnly() covers the empty doc too,
+                        // so a fresh session no longer opens on "These numbers
+                        // leave nothing behind" before a student has done
+                        // anything (measured 2026-09-04, build-2d-sketch: it
+                        // showed immediately and survived Reset, because it was
+                        // never state to begin with -- it was recomputed fresh
+                        // from a triangle count that is legitimately 0 for any
+                        // sketch-only doc). The existing stage hint ("A sketch
+                        // is flat. Select it and press Pull...") already tells a
+                        // student what to do; this warning is for the OTHER
+                        // case, where a solid was expected and something ate it.
+                        setStale(st.triangles > 0 || isSketchOnly(previewDoc ?? effectiveDoc) ? null : 'empty');
                         // Refusals: state is only touched when the CONTENT
                         // differs from what is held, so an unchanged refusal
                         // set costs no render even on a per-frame hot path.
@@ -1533,6 +1579,7 @@ export default function SandboxWorkspace() {
                       }}
                       pick={pickedEdge?.edge ? { target: pickedEdge.target, name: pickedEdge.edge } : null}
                       selectedCount={selected.length}
+                      selectionLabel={selectionLabel}
                       // The B-rep engine's own producer for the SAME `anchors`
                       // state the JSCAD path fills from the iframe's
                       // 'reshape-anchors' postMessage (see the `onMessage`

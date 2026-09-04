@@ -472,6 +472,26 @@ export interface ModelDoc {
   features: Feature[];
 }
 
+/**
+ * True when nothing in the doc could ever produce a 3D solid: it is empty,
+ * or every feature in it is a bare `sketch` -- flat by construction until a
+ * Pull or a Spin turns one into an extrude/revolve.
+ *
+ * Exists so a caller watching the mesh a build produced can tell "zero
+ * triangles because nothing solid was ever asked for" apart from "zero
+ * triangles because something that SHOULD be solid came out empty" (an
+ * over-large Hole eating the whole part, say). Those two used to be the same
+ * signal -- SandboxWorkspace.tsx's `stale` gate read triangle count alone,
+ * so a brand-new session (EMPTY_DOC, before a student has drawn anything)
+ * and a fresh Sketch/Circle/Polygon both showed the same "These numbers
+ * leave nothing behind" warning immediately, for a document that was never
+ * broken -- see that call site's own comment for the fix this predicate
+ * unblocks.
+ */
+export function isSketchOnly(doc: ModelDoc): boolean {
+  return doc.features.length === 0 || doc.features.every((f) => f.kind === 'sketch');
+}
+
 export const EMPTY_DOC: ModelDoc = { version: 1, features: [] };
 
 /** A positioned primitive: has a centre, and can carry handles. Listed

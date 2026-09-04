@@ -146,6 +146,12 @@ interface Props {
    *  this just flips it on; the tool stays active until two clicks place a
    *  shape or Escape cancels it. */
   onStartDraw?: (tool: 'rect' | 'polygon') => void;
+  /** Which click-to-draw tool is currently armed, or null -- the sandbox's
+   *  own `drawTool` state, mirrored down so the Rectangle/Polygon buttons can
+   *  show they are waiting for a click rather than looking identical to
+   *  every other tool. Escape already clears the sandbox's own state (see
+   *  its own keydown listener), so this alone is what makes that visible. */
+  drawTool?: 'rect' | 'polygon' | null;
   /**
    * An edge picked in the 3D viewport (BrepViewportThree's `onPick`), lifted
    * up alongside `selected` for the same reason: the pick outlives any one
@@ -369,7 +375,7 @@ function FlyoutButton({
 }
 
 export default function ModelEditor({
-  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, onStartDraw, pickedEdge, onClearPickedEdge, pickedFace, onClearPickedFace, refusals,
+  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, onStartDraw, drawTool, pickedEdge, onClearPickedEdge, pickedFace, onClearPickedFace, refusals,
 }: Props) {
   const [note, setNote] = useState<string | null>(null);
   // An empty document has nothing for a note to be about: Reset clears the
@@ -1179,12 +1185,24 @@ export default function ModelEditor({
                 </button>
               )}
               {matches('Rectangle') && (
-                <button onClick={() => onStartDraw?.('rect')} title="Click two corners to draw a rectangle">
+                <button
+                  onClick={() => onStartDraw?.('rect')}
+                  aria-pressed={drawTool === 'rect'}
+                  title={drawTool === 'rect'
+                    ? 'Click two corners to draw a rectangle (armed -- Escape cancels)'
+                    : 'Click two corners to draw a rectangle'}
+                >
                   <Square size={14} /> Rectangle
                 </button>
               )}
               {matches('Polygon') && (
-                <button onClick={() => onStartDraw?.('polygon')} title="Click a center, then a corner, to draw a hexagon">
+                <button
+                  onClick={() => onStartDraw?.('polygon')}
+                  aria-pressed={drawTool === 'polygon'}
+                  title={drawTool === 'polygon'
+                    ? 'Click a center, then a corner, to draw a hexagon (armed -- Escape cancels)'
+                    : 'Click a center, then a corner, to draw a hexagon'}
+                >
                   <Hexagon size={14} /> Polygon
                 </button>
               )}
@@ -1784,6 +1802,18 @@ export default function ModelEditor({
         .model-tools button:active:not(:disabled) { background: #44475a; }
         .model-tools button:disabled { opacity: 0.35; cursor: not-allowed; }
         .model-tools button:focus-visible { outline: 1px solid #8be9fd; outline-offset: 1px; }
+        /* A click-to-draw tool waiting for its placement click -- Rectangle
+           or Polygon armed. Distinct from :active (a fleeting mouse-down)
+           and from hover: this has to read as "still on" between clicks,
+           with nothing but a canvas cursor otherwise saying so. The accent
+           token, not the hover grey, so it survives a hover/unhover over the
+           SAME button while armed. */
+        .model-tools button[aria-pressed="true"] {
+          background: #44475a; border-color: #bd93f9; color: #f8f8f2;
+        }
+        .model-tools button[aria-pressed="true"]:hover:not(:disabled) {
+          background: #4b4e63; border-color: #bd93f9;
+        }
         .model-flyout { position: relative; display: inline-flex; flex: 0 0 auto; }
         /* Sits ON the main button's corner, Onshape-style: the corner opens
            the family, the rest of the face runs the tool on its face. */
