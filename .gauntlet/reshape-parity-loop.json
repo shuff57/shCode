@@ -1,0 +1,40 @@
+{
+  "loop": "reSHape visual + workflow parity, simplified for beginners",
+  "started": "2026-09-03T20:40-07:00",
+  "closed": "2026-09-04T06:00-07:00",
+  "bars": {
+    "3d": "Chili3D, https://chili3d.com, fetched live at 1440x900 (bars/chili3d/final in the session scratchpad; zoomed r2 shots because its 40 mm box is 18 px at default zoom)",
+    "2d": "jsketcher's standalone sketcher, web/sketcher.html from https://github.com/xibyte/jsketcher run from source on :3100 (the live web-cad.org build has no sketcher; verified through its own action registry)"
+  },
+  "method": "Fixed task list (3D T1-T6, 2D S1-S6; S3 = round the corner between two lines with a tangent arc, since ours has no line or arc tool). Browser lenses capture ours and each bar in fresh contexts; blind visual-analyzer critics judge A/B packs with labels stripped and, from round 3, app headers cropped (round 1-2 judges could read the product names). Motion in frames from recorded video (Playwright records at 25 fps, so one frame is 40 ms). Every fix landed with a check the lead owns and was verified in the lead's own browser before commit.",
+  "verdicts": {
+    "r1": "3D ours 6/8 (4 by default: Chili3D shots empty/mis-state); 2D jsketcher 5/6; our sketch was invisible in the viewport, the Dimensions panel never mounted on a pure Build session",
+    "r2": "3D ours 7/8 and all four visual pieces; 2D jsketcher 6/6 (isometric skew, panel overlaying the canvas, arc under a circle on the same corner)",
+    "r3": "3D ours 7/8 and all five pieces incl. steps; 2D jsketcher 4/6 (two of them the brief's own doing)",
+    "r4": "3D ours 6/8, four pieces (shading lost on a closed shell + a fillet cap); 2D ours 5/6, four pieces (selection lost)",
+    "r5 (targeted)": "3D fillet pair + shading piece -> ours (Chili3D's round is two flat facets with a seam); shell pair Chili3D (fixed after by item Q); 2D both pairs + selection -> ours"
+  },
+  "pieces_final": {
+    "3d": ["shading-edges", "selection-hover", "camera", "grid-dimensions", "steps"],
+    "2d": ["tools", "rules (tangent/equal/dimension)", "grid-dimensions", "selection", "steps"],
+    "both": ["motion: parity by numbers (<= 1 captured frame on all three)"]
+  },
+  "commits": "e2e3e055 .. 61660ec7 (25 commits on cs-3d): panel always mounted + owner resolution via topological names; framing (Home fits); sketch drawn with labels, dimension lines, R/C, rubber bands; rectangle rules; LM damping floor relative + multistart; newest rule wins with a note; circle across/centre + born at the sketch centre; flat docked sketch view with orbit restore; every visible edge pickable (hitAt tries all in-band candidates); Hollow auto-placed before holes/rounds and opened at the picked face; fillet and shell ops registered in the build history so names survive them; sticky lit edge with pill; labels clear of each other and of handles (free-space search)",
+  "kernel_and_naming_facts": [
+    "BRepFilletAPI_MakeFillet: faces map through Modified(); an untouched neighbouring EDGE reports IsDeleted true, so a between-name is resolved through its two faces, never through edge history",
+    "BRepOffsetAPI_MakeThickSolid with an open face: the opened face is IsDeleted with one Generated() successor (the rim)",
+    "the default camera made a 40 mm box 180 px wide; a 3 mm round was pixel-identical to sharp until Home fitted the model"
+  ],
+  "bars_facts": [
+    "Chili3D: hover, face select and edge select are byte-identical whole-body green outlines; no bottom/home preset found; Shell flaky on hole+fillet ('error: shell failed'); no numeric size after selection; its single-edge fillet renders as two flat facets",
+    "jsketcher sketcher: no grid; Enter does not commit a typed dimension (Apply does); Ctrl+Z does nothing; over-constraint silently breaks the shape; selection named only in a side list"
+  ],
+  "left_open": [
+    "single-edge fillet on a box ends in a sharp cap at the bottom vertex (OCCT single-edge fillet termination); Chili3D's blends",
+    "sketch rules are mouse-only; the script drops them with a comment",
+    "two lens findings never reproduced on a clean tree: Dimensions fields reading 0 after a face pick; a Hole diameter slider/text mismatch",
+    "git push (never done by the loop); JSCAD runner retirement"
+  ],
+  "collision": "one builder reverted another's uncommitted debug block in a file it did not hold; no work was lost (it was already committed) but both briefs now carry the rule: a dirty unclaimed file is off limits",
+  "deployment": "see the progress page log; production https://shcode.pages.dev"
+}

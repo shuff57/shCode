@@ -50,6 +50,16 @@ in-app page on the kernel (195/195). Record: `.gauntlet/reshape-script-loop.json
 The JSCAD runner and `public/reshape/lib/` are due for deletion one release
 after this.
 
+**Update, 2026-09-04.** Visual and workflow parity loop against Chili3D (3D)
+and jsketcher's standalone sketcher (2D), blind judges, five rounds: all
+twelve pieces ours or at parity. Record and the kernel/naming facts it
+settled: `.gauntlet/reshape-parity-loop.json`. Two rules it left in the
+code: every operation that rebuilds the shape registers an op in the build
+history (fillet and shell now do, like the booleans), and a `between` edge
+name is resolved through its two faces, never through a fillet's edge
+history. The Rules panel is a docked column; a sketch is viewed flat and
+fitted to the visible canvas; Home fits the model.
+
 ### Where the line already falls
 
 Measured 2026-09-01 across the 55 files that round of work touched:
