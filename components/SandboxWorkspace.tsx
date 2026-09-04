@@ -2085,6 +2085,30 @@ export default function SandboxWorkspace() {
            Code/Build toggle and the shape-tool icons. */
         .sandbox-shell.is-build .reshape-pane-rules:not(:empty) {
           margin-top: 48px;
+          /* .reshape-pane stretches this column to its own full height by
+             default (align-items: stretch), which is the height of the
+             CANVAS -- but .sandbox-timeline is absolutely positioned at
+             bottom:0 of that same box, UNDER this column in DOM order but
+             ABOVE it in paint order (z-index 25 vs this column's 41).
+             Without this, the column's own opaque background painted clean
+             over the timeline's left end for the whole height it stretched
+             to -- measured 2026-09-04, ours-r3/2d/03-rounded-corner.png:
+             the column ran to y=820 and the "Sketch 1"/"Sketch 2" chips at
+             x~90 never rendered at all. Shrinking the column by
+             TIMELINE_HEIGHT_PX ends its box (and its background) right
+             where the strip begins, the same way .reshape-pane-view already
+             reserves that same strip with its own padding-bottom below --
+             BUT the height alone left a REMAINING 48px overlap the first
+             time this was measured (2026-09-04, a live page.mouse click on
+             the "Sketch 1" chip landed on #reshapeRules per Playwright's own
+             own intercept message, confirmed with getBoundingClientRect:
+             rules bottom 811 vs timeline top 763). The 48px margin-top
+             above is ADDED on top of this box within the flex container, not
+             absorbed into "100%" -- height alone only accounts for the
+             column's own box, not the margin pushing it down first, so
+             both have to come out of the same 100% for the margin box's
+             own bottom edge to land exactly on the timeline's own top. */
+          height: calc(100% - 48px - ${TIMELINE_HEIGHT_PX}px);
         }
         /* The toolbar floats over the preview, so the preview owns the whole
            window and the two read as one space. */

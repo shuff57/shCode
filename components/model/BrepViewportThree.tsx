@@ -377,6 +377,32 @@ const EDGE_THRESHOLD_DEGREES = 25;
  *  measured -- see hitAt()). */
 const EDGE_HIT_BAND_PX = 8;
 
+/** The occlusion depth tolerance's own scale factor, as a fraction of camera
+ *  distance -- see hitAt()'s occlusion loop for the full story. 1% used to
+ *  be tight enough to reject a genuinely far edge (tens of world units
+ *  away) while still being "basically zero" for a truly coincident one --
+ *  true for most of a box's own edges, measured at gaps of 1.6-5 world
+ *  units against a ~240-unit camera distance (2.4-unit tolerance). But a
+ *  flat, unforeshortened face has NO discretisation error to forgive in the
+ *  first place; the tolerance only ever exists for a heavily FORESHORTENED
+ *  one, where a fraction of a screen pixel of ray angle already sweeps
+ *  across several world units of a grazing surface's own depth -- and nothing
+ *  says every edge of every primitive is foreshortened by the same amount.
+ *  Measured 2026-09-04: this app's own default camera (140, 160, 130) is not
+ *  a true 45-degree isometric, and a fresh box's own top-left edge (the one
+ *  edge among nine that a round-3 blind lens could never hover or pick) sat
+ *  at a 2.8-unit gap against a 2.4-unit tolerance -- 0.4 units short, at a
+ *  point where the cursor was already 0.1px from the edge's own screen
+ *  projection, not a stale or far candidate -- and the camera-to-target
+ *  distance driving the tolerance was only ~111 units there (a 40mm box
+ *  fitted to 45% of the viewport), not the ~240 a first measurement
+ *  assumed, so 1% (2.2) undershot even a widened 2% (2.2) attempt; 5% (5.6)
+ *  covers the measured 2.8-unit gap with margin while staying a full 7-8x
+ *  below every genuinely-occluded gap this file's own tests measure (a
+ *  hidden edge one whole primitive-width away, ~40 units, at this same
+ *  camera distance). */
+const EDGE_OCCLUSION_TOLERANCE_FRACTION = 0.05;
+
 /** How fat an edge highlight tube is, in world units -- real geometry, not a
  *  screen-space line width (see edgeTubeGeometry()'s own doc comment for
  *  why that distinction is the whole fix). ONE size for both hover and
@@ -912,22 +938,20 @@ export default function BrepViewportThree({
       // world-space number simply cannot be that direction-agnostic; a
       // screen-space one is, by construction -- a pixel is a pixel
       // regardless of which face happens to sit behind the cursor.
-      let bestEdgeDistPx = Infinity;
-      let bestEdgeDepth = Infinity;
-      let bestEdgeLine: THREE_NS.Line | null = null;
+      // EVERY edge within the band is a candidate now, not only the single
+      // closest one -- see the loop below for why "closest wins outright"
+      // used to lose a real edge outright instead of just falling back.
+      // Two edges meeting at a corner still cannot both win: they are tried
+      // CLOSEST-FIRST, and the first one to pass the occlusion check below
+      // is returned immediately, so whichever is nearer in screen space
+      // still wins whenever both are genuinely visible.
+      const candidates: { distPx: number; depth: number; line: THREE_NS.Line }[] = [];
       for (const line of edgePickLinesRef.current) {
         const { distPx, depth } = closestEdgeScreenDist(line, rect.width, rect.height, cursor);
-        if (distPx < bestEdgeDistPx) {
-          bestEdgeDistPx = distPx;
-          bestEdgeDepth = depth;
-          bestEdgeLine = line;
-        }
+        if (distPx <= EDGE_HIT_BAND_PX) candidates.push({ distPx, depth, line });
       }
-      // Only the SINGLE closest edge is ever a candidate (never "all edges
-      // within the band"), so two edges meeting at a corner cannot both
-      // claim one pointer position -- whichever is nearer in screen space
-      // wins outright.
-      //
+      candidates.sort((a, b) => a.distPx - b.distPx);
+
       // An edge sits ON the boundary of whichever face(s) meet there, so its
       // depth should match a face hit at the same pixel almost exactly; this
       // tolerance is only slack for the edge's own discretisation and the
@@ -935,10 +959,28 @@ export default function BrepViewportThree({
       // system -- it exists so a genuinely FAR edge (the back of a box,
       // glimpsed through open space near a front edge in screen space) can
       // never out-rank a face that is actually in front of it.
+      //
+      // THE BUG THIS REPLACED: only ever tracking the single screen-closest
+      // candidate. A square-footprint box viewed from this app's own
+      // slightly off-axis default camera (140, 160, 130 -- not a true 45
+      // degree isometric) can put a genuinely FAR, hidden edge fractions of
+      // a pixel closer to the cursor than the true visible one at certain
+      // points along it -- measured 2026-09-04: hovering the box's own
+      // top-left edge found a "closest" candidate at depth 132 while every
+      // other visible top-face edge sat at depth ~90-100, a ~40-unit gap
+      // (the box's own 40mm width) that is a different edge entirely, not
+      // discretisation slop. The occlusion check correctly rejected that
+      // far edge -- but with only one candidate ever tried, rejecting it
+      // meant giving up on the pixel entirely, even though the TRUE visible
+      // edge was very likely a second candidate within the very same band.
+      // Trying every in-band candidate, nearest first, until one survives
+      // occlusion fixes exactly that without loosening the occlusion test
+      // itself (which stays exactly as strict, and still does its real job
+      // of rejecting a genuinely hidden edge glimpsed through open space).
       const dist = camera.position.distanceTo(controls.target);
-      const occluded = !!faceHit && bestEdgeDepth > faceHit.distance + Math.max(0.5, dist * 0.01);
-      if (bestEdgeLine && bestEdgeDistPx <= EDGE_HIT_BAND_PX && !occluded) {
-        return { kind: 'edge', line: bestEdgeLine };
+      for (const c of candidates) {
+        const occluded = !!faceHit && c.depth > faceHit.distance + Math.max(0.5, dist * EDGE_OCCLUSION_TOLERANCE_FRACTION);
+        if (!occluded) return { kind: 'edge', line: c.line };
       }
 
       if (!faceHit) return null;
