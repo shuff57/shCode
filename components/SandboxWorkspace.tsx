@@ -187,20 +187,20 @@ export default function SandboxWorkspace() {
 
   // WHICH GEOMETRY ENGINE DRAWS BUILD MODE.
   //
-  // Opt-in through ?engine=brep rather than a stored preference or a default,
-  // because this is a spike: the B-rep path does not yet project drag handles
-  // (the iframe does that today, using its own camera -- see the anchors
-  // effect below), so it is strictly less capable than the JSCAD path until
-  // that lands. A query parameter also means the measurement harness can pin
-  // an engine without clicking anything, which a toggle in the UI would not.
+  // B-rep is the default engine (operator decision 2026-09-03, after the
+  // Chili3D gauntlet and the B-rep-default loop: oracle 134/134, three
+  // student lenses through the Build tools twice). ?engine=jscad opts back
+  // into the JSCAD path, which stays reachable until the reference docs are
+  // rewritten off it. A query parameter rather than a toggle so the
+  // measurement harness can pin an engine without clicking anything.
   //
   // Read in an effect rather than at first render: this app is a static export,
   // so the server-rendered HTML has no location and reading one during render
   // is a hydration mismatch.
-  const [brepEngine, setBrepEngine] = useState(false);
+  const [brepEngine, setBrepEngine] = useState(true);
   useEffect(() => {
     try {
-      setBrepEngine(new URLSearchParams(window.location.search).get('engine') === 'brep');
+      setBrepEngine(new URLSearchParams(window.location.search).get('engine') !== 'jscad');
     } catch {
       /* no window, or a URL we cannot parse: stay on the engine that works */
     }
