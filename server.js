@@ -148,11 +148,44 @@ app.prepare().then(() => {
     res.json({ ok: true, ...devLessonModes });
   });
 
+  // Held in memory for the life of the process so `DEV_ROLE=student` walks a
+  // module the way a student does: Submit turns the lesson green and the next
+  // one unlocks after navigation. Before this, POST was a no-op and GET always
+  // returned {}, so every lesson past the first read "Lesson locked" the
+  // moment the page reloaded. Restarting the server is the reset.
+  const devLessonState = { states: {}, scores: {} };
   server.get('/api/lesson-state', (_req, res) => {
-    res.json({ states: {}, scores: {}, role: DEV_ROLE });
+    res.json({ ...devLessonState, role: DEV_ROLE });
   });
-  server.post('/api/lesson-state/:lessonId', (_req, res) => {
+  server.post('/api/lesson-state/:lessonId', express.json(), (req, res) => {
+    const { lessonId } = req.params;
+    const { state, score } = req.body || {};
+    if (state === 'completed') {
+      devLessonState.states[lessonId] = 'completed';
+      if (typeof score === 'number') devLessonState.scores[lessonId] = score;
+    } else if (state === 'started' && !devLessonState.states[lessonId]) {
+      devLessonState.states[lessonId] = 'started';
+    }
     res.json({ ok: true });
+  });
+  server.delete('/api/lesson-state/:lessonId', (req, res) => {
+    delete devLessonState.states[req.params.lessonId];
+    delete devLessonState.scores[req.params.lessonId];
+    res.json({ ok: true });
+  });
+  // Submit records a submission before it marks the lesson complete and
+  // refuses to complete when that POST fails (LessonWorkspace.confirmSubmit),
+  // so without this stub no graded lesson can ever turn green in dev. The
+  // real route is functions/api/lesson-submissions.ts.
+  const devSubmissions = [];
+  server.get('/api/lesson-submissions', (req, res) => {
+    const lessonId = req.query.lessonId;
+    res.json({ submissions: devSubmissions.filter((s) => !lessonId || s.lessonId === lessonId) });
+  });
+  server.post('/api/lesson-submissions', express.json({ limit: '1mb' }), (req, res) => {
+    const body = req.body || {};
+    devSubmissions.push({ ...body, studentEmail: DEV_EMAIL, submittedAt: Date.now() });
+    res.json({ ok: true, id: body.id });
   });
   // The student gradebook on /progress. The real route is
   // functions/api/my-gradebook.ts, reading lesson_state + lesson_submissions

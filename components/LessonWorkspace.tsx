@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { ChangeEvent } from 'react';
+import dynamic from 'next/dynamic';
 import type { Lesson } from '../lib/types';
 import { useLessonStore, flattenFiles } from '../lib/store';
 import { buildPreviewHtml } from '../lib/preview-builder';
@@ -10,13 +11,14 @@ import { recordSubmission } from '../lib/written-grader-store';
 import { recordLessonCompleted } from '../lib/progress';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
 import { grade } from '../lib/grader';
-import type { GradeReport as GradeReportType } from '../lib/grader';
+import type { GradeReport as GradeReportType, GradeContext } from '../lib/grader';
+import { NO_TEACHER_MODES, resolveMode, type TeacherModes } from '../lib/lesson-mode';
+import type { ModelDoc } from '../lib/model-types';
 
 import { RUNNER_SOURCE, RUN_MAX_LOGS, RUN_TIMEOUT_MS } from '../lib/js-runner-source';
 import FileExplorer from './FileExplorer';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
-import ReshapePreview from './ReshapePreview';
 import MoshionPreview from './MoshionPreview';
 import RequirementsSection from './RequirementsSection';
 import PlanChartPanel from './PlanChartPanel';
@@ -36,6 +38,11 @@ import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import SolutionPanel from './SolutionPanel';
 import KeyboardShortcutModal from './KeyboardShortcutModal';
 import { RotateCcw, Send } from 'lucide-react';
+
+// The B-rep kernel + three.js viewport are heavy; the ~270-odd non-reshape
+// lesson pages should never pay for them. Same pattern DiagramAssignmentView
+// uses for DiagramEditor.
+const ReshapeStudio = dynamic(() => import('./reshape/ReshapeStudio'), { ssr: false });
 
 interface LessonWorkspaceProps {
   lesson: Lesson;
@@ -86,8 +93,32 @@ export default function LessonWorkspace({
   const [srcDoc, setSrcDoc] = useState('');
   const [runKey, setRunKey] = useState(0);
   const [q5Code, setQ5Code] = useState('');
-  const [reshapeCode, setReshapeCode] = useState('');
   const [isRunning, setIsRunning] = useState(false);
+  // reSHape's own latest built ModelDoc, for a 'model' requirement (see
+  // lib/grader.ts's TODO(A2) call site below) -- ReshapeStudio reports it
+  // through onDocChange, null until its first successful build.
+  const [latestModelDoc, setLatestModelDoc] = useState<ModelDoc | null>(null);
+  // Bumped on Reset to force ReshapeStudio to remount: it only hydrates its
+  // model from script.js once, at mount (see its own file header), so
+  // restoring the starter text while it stays mounted would leave the OLD
+  // model on screen next to the NEW starter.
+  const [reshapeResetKey, setReshapeResetKey] = useState(0);
+  // Which side(s) of reSHape this lesson gets -- the teacher's class-wide
+  // gate, a per-assignment override, or the lesson's own declared `mode`,
+  // resolved the same way SandboxWorkspace resolves its own gate. Defaults
+  // to 'both' (unreadable gate => never lock anyone out).
+  const [teacherModes, setTeacherModes] = useState<TeacherModes>(NO_TEACHER_MODES);
+  useEffect(() => {
+    let live = true;
+    fetch('/api/my-lesson-modes')
+      .then((r) => (r.ok ? r.json() : NO_TEACHER_MODES))
+      .then((m) => { if (live) setTeacherModes(m ?? NO_TEACHER_MODES); })
+      .catch(() => { /* no gate readable, so no gate applied */ });
+    return () => { live = false; };
+  }, []);
+  const reshapeMode = resolveMode(lesson.id, teacherModes, lesson.mode ?? null).mode;
+  const reshapeSides: ('build' | 'code')[] =
+    reshapeMode === 'visual' ? ['build'] : reshapeMode === 'code' ? ['code'] : ['build', 'code'];
   const [resetMsg, setResetMsg] = useState<string | null>(null);
   const [consoleOutput, setConsoleOutput] = useState<Array<{type: string; message: string; timestamp: string}>>([]);
   // Bumped on every Run/Stop (and on HTML auto-rebuild) so the Console
@@ -270,19 +301,9 @@ export default function LessonWorkspace({
   const isReshapeMode = lesson.preview === 'reshape';
   const isMoshionMode = lesson.preview === 'moshion';
 
-  // For JSCAD lessons: auto-run on first load
-  useEffect(() => {
-    if (!isReshapeMode) return;
-    const scriptContent = files['script.js'] || '';
-    if (!scriptContent.trim()) return;
-    const to = setTimeout(() => {
-      setReshapeCode(scriptContent);
-      setRunKey((k) => k + 1);
-      setIsRunning(true);
-      setTimeout(() => runTests(), 600);
-    }, 300);
-    return () => clearTimeout(to);
-  }, [isReshapeMode]); // only on mount, not on every keystroke
+  // reSHape lessons need no auto-run effect here: ReshapeStudio hydrates its
+  // own model from script.js on mount and reports the built doc back through
+  // onDocChange, which runTests() below reads.
 
   // For HTML lessons: auto-build preview on every change (debounced)
   useEffect(() => {
@@ -395,19 +416,6 @@ export default function LessonWorkspace({
     worker.postMessage(scriptContent);
   }
 
-  // For JSCAD lessons: snapshot the current code and bump runKey to reload the
-  // iframe. Same shape as runQ5 — the runner lives at /reshape/runner.html and
-  // reads the code from its ?code= param.
-  function runReshape() {
-    setRuntimeError(null);
-    setReshapeCode(files['script.js'] || '');
-    setRunKey((k) => k + 1);
-    setConsoleResetKey((k) => k + 1);
-    setConsoleOpen(true);
-    setIsRunning(true);
-    setTimeout(() => runTests(), 600);
-  }
-
   // For moSHion lessons: snapshot the current code and bump runKey to reload the iframe.
   // We snapshot so edits after Run don't re-trigger the iframe until the next Run.
   function runQ5() {
@@ -423,7 +431,6 @@ export default function LessonWorkspace({
   // Stop unloads the iframe back to its empty state without touching the editor.
   function stopRun() {
     setQ5Code('');
-    setReshapeCode('');
     setSrcDoc('');
     setRunKey(0);
     setConsoleResetKey((k) => k + 1);
@@ -475,7 +482,8 @@ export default function LessonWorkspace({
         if (isConsoleMode) {
           runCode();
         } else if (isReshapeMode) {
-          runReshape();
+          // ReshapeStudio owns its own Ctrl+Enter handling, scoped to its
+          // Code side -- see that component's own keydown effect.
         } else if (isMoshionMode) {
           runQ5();
         } else {
@@ -511,11 +519,18 @@ export default function LessonWorkspace({
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
+  // A 'model' requirement (lib/model-check.ts, via lib/grader.ts's checkModel)
+  // grades reSHape's live ModelDoc, not script.js's text -- so no "flush the
+  // pending Build -> script write first" is needed for it specifically: it
+  // reads `latestModelDoc`, which ReshapeStudio keeps current independent of
+  // the (debounced, <=300ms) script.js text sync.
   function runTests() {
+    const context: GradeContext = { modelDoc: latestModelDoc };
     const report = grade(
       lesson.requirements,
       files,
-      lesson.grading?.passingScore || 0
+      lesson.grading?.passingScore || 0,
+      context
     );
     setRequirements(
       lesson.requirements.map((r) => ({
@@ -527,14 +542,16 @@ export default function LessonWorkspace({
   }
 
   const runClientGrade = useCallback(() => {
+    const context: GradeContext = { modelDoc: latestModelDoc };
     const report = grade(
       lesson.requirements,
       files,
-      lesson.grading?.passingScore || 0
+      lesson.grading?.passingScore || 0,
+      context
     );
     setGradeReport(report);
     return report;
-  }, [lesson, files]);
+  }, [lesson, files, latestModelDoc]);
 
   const handleCommit = async (message: string) => {
     try {
@@ -787,21 +804,26 @@ export default function LessonWorkspace({
           <div className="run-toolbar">
             {(isConsoleMode || isReshapeMode || isMoshionMode) && (
               <>
-                {isRunning && (isReshapeMode || isMoshionMode) ? (
-                  <button
-                    className="btn-run"
-                    style={{ background: '#ff5555', borderColor: '#ff5555' }}
-                    onClick={stopRun}
-                  >
-                    ■ Stop
-                  </button>
-                ) : (
-                  <button
-                    className="btn-run"
-                    onClick={isReshapeMode ? runReshape : isMoshionMode ? runQ5 : runCode}
-                  >
-                    ▶ Run
-                  </button>
+                {/* reSHape's own Run/Stop lives inside ReshapeStudio's Code
+                    side (hidden entirely on its Build side) -- see that
+                    component's own toolbar. */}
+                {!isReshapeMode && (
+                  isRunning && isMoshionMode ? (
+                    <button
+                      className="btn-run"
+                      style={{ background: '#ff5555', borderColor: '#ff5555' }}
+                      onClick={stopRun}
+                    >
+                      ■ Stop
+                    </button>
+                  ) : (
+                    <button
+                      className="btn-run"
+                      onClick={isMoshionMode ? runQ5 : runCode}
+                    >
+                      ▶ Run
+                    </button>
+                  )
                 )}
                 <button
                   style={{
@@ -823,6 +845,7 @@ export default function LessonWorkspace({
                       setSolutionLoaded(false);
                       setResetMsg('Code reset to starter.');
                       setTimeout(() => setResetMsg(null), 2500);
+                      if (isReshapeMode) setReshapeResetKey((k) => k + 1);
                     }
                   }}
                 >
@@ -914,42 +937,61 @@ export default function LessonWorkspace({
             </div>
           </div>
           <div className="editor-preview-container" id="split">
-            <div className="pane" id="editorPane">
-              <CodeEditor />
-            </div>
-            <div
-              className="divider"
-              id="divider"
-              tabIndex={0}
-              aria-label="Resize editor and preview"
-            >
-              <span className="drag-handle" aria-hidden="true"></span>
-            </div>
-            <div className="pane" id="previewPane">
-              {isConsoleMode ? (
-                <>
-                  <div className="output-header">Output</div>
-                  <pre className="console-output run-output">
-                    {consoleOutput.length === 0 ? (
-                      <div className="console-empty">Click Run to see output.</div>
-                    ) : (
-                      consoleOutput.map((log, i) => (
-                        <div key={i} className={`log-entry log-${log.type}`}>
-                          <span className="log-msg">{log.message}</span>
-                        </div>
-                      ))
-                    )}
-                  </pre>
-                </>
-              ) : isReshapeMode ? (
-                <ReshapePreview code={reshapeCode} runKey={runKey} />
-              ) : isMoshionMode ? (
-                <MoshionPreview code={q5Code} runKey={runKey} />
-              ) : (
-                <LivePreview srcDoc={srcDoc} />
-              )}
-            </div>
-            <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
+            {isReshapeMode ? (
+              // ReshapeStudio is self-contained (its own toolbar, its own
+              // CodeEditor for the Code side, its own model tools for the
+              // Build side) -- it replaces this whole split rather than
+              // sharing it with a second, redundant CodeEditor in
+              // #editorPane. Same pattern SandboxWorkspace uses for its own
+              // reshape tab. The outer pane-resize effect above no-ops
+              // gracefully (early return) with #editorPane/#previewPane
+              // absent from the DOM.
+              <ReshapeStudio
+                key={`${lesson.id}-${reshapeResetKey}`}
+                value={files['script.js'] ?? ''}
+                onChange={(t) => updateFile('script.js', t)}
+                sides={reshapeSides}
+                onDocChange={setLatestModelDoc}
+                lessonId={lesson.id}
+              />
+            ) : (
+              <>
+                <div className="pane" id="editorPane">
+                  <CodeEditor />
+                </div>
+                <div
+                  className="divider"
+                  id="divider"
+                  tabIndex={0}
+                  aria-label="Resize editor and preview"
+                >
+                  <span className="drag-handle" aria-hidden="true"></span>
+                </div>
+                <div className="pane" id="previewPane">
+                  {isConsoleMode ? (
+                    <>
+                      <div className="output-header">Output</div>
+                      <pre className="console-output run-output">
+                        {consoleOutput.length === 0 ? (
+                          <div className="console-empty">Click Run to see output.</div>
+                        ) : (
+                          consoleOutput.map((log, i) => (
+                            <div key={i} className={`log-entry log-${log.type}`}>
+                              <span className="log-msg">{log.message}</span>
+                            </div>
+                          ))
+                        )}
+                      </pre>
+                    </>
+                  ) : isMoshionMode ? (
+                    <MoshionPreview code={q5Code} runKey={runKey} />
+                  ) : (
+                    <LivePreview srcDoc={srcDoc} />
+                  )}
+                </div>
+                <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
+              </>
+            )}
           </div>
           {!isConsoleMode && (
             <details
