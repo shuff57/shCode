@@ -849,17 +849,36 @@ export default function SandboxWorkspace() {
     return part ? `${base} · ${part}` : base;
   }, [selected, doc, pickedFace, pickedEdge]);
 
-  // The plane of the single sketch currently selected, or null -- SAME
-  // condition ModelEditor.tsx's own `activeSketch` uses (exactly one
-  // feature selected, and it is a sketch), computed independently here
-  // because the viewport that needs to react to it (BrepViewportThree) is a
-  // sibling of ModelEditor, not a parent or child. Feeds `sketchPlane`
-  // below, which is what tells the viewport to look at the sketch flat.
+  // The plane to view flat, or null -- SAME condition ModelEditor.tsx's own
+  // `activeSketch` uses (exactly one feature selected, and it is a sketch)
+  // for a sketch already drawn, computed independently here because the
+  // viewport that needs to react to it (BrepViewportThree) is a sibling of
+  // ModelEditor, not a parent or child. Feeds `sketchPlane` below, which is
+  // what tells the viewport to look at the plane flat.
+  //
+  // ALSO true while Rectangle/Polygon is armed (drawTool set), even before
+  // anything is placed -- a beginner drawing a rectangle in the tilted iso
+  // view was drawing into a foreshortened parallelogram-looking rubber band,
+  // not the rectangle they were actually placing. Both tools always draw on
+  // the 'xy' plane today (see handlePlace() and the `planeAnchor('xy', 0)`
+  // anchor below -- neither has a plane picker yet), so this hardcodes the
+  // same plane rather than guessing one from state that doesn't exist.
+  //
+  // No separate orbit-restore wiring needed for this: handlePlace() selects
+  // the newly placed sketch on success, so `selected` alone still resolves
+  // to 'xy' right through the placement and the flat view holds, exactly
+  // like an already-drawn sketch being selected; Escape clears drawTool
+  // without touching `selected`, so with nothing selected beforehand (the
+  // ordinary case -- picking Rectangle from the toolbar) this falls through
+  // to null and BrepViewportThree's own save/restore (see its `sketchPlane`
+  // effect) puts the orbit back exactly as item F already does for a
+  // deselected sketch.
   const activeSketchPlane = useMemo<'xy' | 'xz' | 'yz' | null>(() => {
+    if (drawTool) return 'xy';
     if (selected.length !== 1) return null;
     const f = doc.features.find((x) => x.id === selected[0]);
     return f && f.kind === 'sketch' ? (f.plane ?? 'xy') : null;
-  }, [selected, doc]);
+  }, [drawTool, selected, doc]);
 
   // One entry per UNCONSUMED sketch -- every sketch nothing has Pulled, Spun,
   // or Blended yet (sketchIsUnconsumed, shared with `specs` above so the two

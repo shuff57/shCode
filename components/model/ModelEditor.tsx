@@ -83,6 +83,7 @@ import {
   type FilletFeature,
   type ModelDoc,
   type RoundStyle,
+  type SketchFeature,
   type SketchPlane,
   addCorner,
   canRotate,
@@ -102,6 +103,7 @@ import {
   newShell,
   newSketch,
   shellInsertion,
+  sketchBBoxCentre,
   whyCannotBlend,
   newMove,
   nextId,
@@ -668,7 +670,21 @@ export default function ModelEditor({
   }
 
   function startCircleSketch() {
-    const f = newCircleSketch(doc);
+    // A circle born at the origin, next to a rectangle sitting somewhere
+    // else on the same plane, made "a circle at the rectangle's centre" a
+    // hand-typed-numbers exercise -- see newCircleSketch()'s own doc
+    // comment. Reuses `chosen`, not `activeSketch` (defined further down,
+    // after this function), for the exactly-one-sketch-selected case; a
+    // sketch that is the ONLY one in the document counts too, so drawing a
+    // rectangle and immediately pressing Circle (nothing explicitly
+    // selected yet beyond the rectangle newSketch() itself just selected)
+    // still centres on it.
+    const sketches = doc.features.filter((x): x is SketchFeature => x.kind === 'sketch');
+    const target: SketchFeature | null =
+      chosen.length === 1 && chosen[0].kind === 'sketch' ? (chosen[0] as SketchFeature)
+        : sketches.length === 1 ? sketches[0]
+          : null;
+    const f = newCircleSketch(doc, target?.plane ?? 'xy', target ? sketchBBoxCentre(target.points) : undefined);
     onChange({ ...doc, features: [...doc.features, f] });
     setSelected([f.id]);
     say('Drag either handle to resize it, then press Pull or Spin to make it solid.');

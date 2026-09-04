@@ -1327,12 +1327,23 @@ export default function BrepViewportThree({
     if (!three || !camera || !controls || !renderer || !scene || !container) return;
     const { THREE } = three;
 
+    // A totally empty scene box is real, not a bug to guard against, the
+    // moment this is called for an ARMED draw tool rather than an existing
+    // sketch: item M puts a beginner into flat view the instant Rectangle/
+    // Polygon is picked, before either of the two placing clicks has
+    // happened, so there is nothing on the plane yet to derive an extent
+    // from. fitToModel()'s own callers can all safely bail out on empty (a
+    // Home/Top/Front press with nothing built yet has nothing worth
+    // fitting to), but bailing out here left the camera stuck at whatever
+    // orbit it already had -- the exact silent no-op this fix exists to
+    // avoid. Falls back to the grid's own drawn extent (GridHelper(120, ...)
+    // a few hundred lines up -- -60 to 60) so "look at the plane" still
+    // means something concrete: the same square the student is already
+    // looking at on screen.
     const box = computeSceneBox();
-    if (!box || box.isEmpty()) return;
-    const bbox: Box3Like = {
-      min: [box.min.x, box.min.y, box.min.z],
-      max: [box.max.x, box.max.y, box.max.z],
-    };
+    const bbox: Box3Like = box && !box.isEmpty()
+      ? { min: [box.min.x, box.min.y, box.min.z], max: [box.max.x, box.max.y, box.max.z] }
+      : { min: [-60, -60, 0], max: [60, 60, 0] };
     const center = bboxCenter(bbox);
     const distance = fitDistance(
       bbox, container.clientWidth, container.clientHeight, camera.fov,
@@ -1761,7 +1772,18 @@ export default function BrepViewportThree({
           // 2026-09-04: a fresh 40x25 Sketch rendered at the plain HOME_DIR
           // distance, small and un-fit, because fitToModel() was only ever
           // called from the branch a bare sketch never reaches.
-          if (onlySketches && !hasFitOnceRef.current) {
+          // Skipped while `sketchPlane` is already set: item M puts a
+          // beginner into flat view the moment Rectangle/Polygon is armed,
+          // BEFORE this sketch feature exists at all, so by the time it
+          // first appears here the camera is already exactly where it
+          // should be. Measured 2026-09-04: without this guard, placing the
+          // very first shape from an armed draw tool snapped straight back
+          // to the isometric HOME_DIR the instant the second click landed,
+          // turning the just-drawn rectangle into a skewed parallelogram on
+          // screen -- the same "first shape ever" fit this guards for a
+          // built solid below, just reached from the sketch-only branch
+          // instead.
+          if (onlySketches && !hasFitOnceRef.current && !sketchPlane) {
             hasFitOnceRef.current = true;
             fitToModel(HOME_DIR);
           }
