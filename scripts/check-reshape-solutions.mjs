@@ -8,12 +8,19 @@
 //
 // Both the reference and the starter are run through reSHape Script's
 // runScript() -- the compiled runtime script-runner.html actually loads --
-// to get a ModelDoc, then checked with checkModel(). No kernel/wasm needed:
-// runScript() builds the feature tree, not the mesh (see
-// test-reshape.mjs's own "runs" check and test-reshape-script.mjs, neither
-// of which needs --occt for this).
+// to get a ModelDoc. That doc is ALSO built on a real B-rep kernel (the same
+// pre-built public/reshape/kernel/ bundle test-reshape-script.mjs's --occt
+// step and test-occt-adapter.mjs load, copied here rather than reinvented),
+// because the kernel can REFUSE a feature the doc-only check has no way to
+// see -- 8.1.11's `round(b.edge('top','front'), 3)` after a 2mm hollow passes
+// checkModel() on the doc alone but the kernel rejects it ("Rounding Round 1
+// at 3 would not fit its edge"), and lib/model-check.ts's checkModel() now
+// treats a refused feature as absent (its `refusals` param, lib/occt-build.ts
+// BuildResult.refusals). A reference the kernel refuses can never pass in the
+// app, so it must never pass this gate either.
 //
-// Run: node scripts/check-reshape-solutions.mjs   (also part of `npm test`)
+// Run: node scripts/check-reshape-solutions.mjs [--occt <dir>]
+//      (also part of `npm test`; --occt defaults to public/reshape/kernel)
 import { execFileSync } from 'child_process';
 import { mkdtempSync, rmSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'fs';
 import { tmpdir } from 'os';
@@ -49,6 +56,19 @@ if (!existsSync(SCRIPT_RUNTIME)) {
   process.exit(1);
 }
 
+// --occt <dir>, defaulting to the kernel bundle that already ships with the
+// repo. Unlike test-occt-adapter.mjs (which compiles lib/occt-build.ts fresh
+// into a tmpdir), the files under public/reshape/kernel/ are ALREADY built --
+// build-brep-kernel.mjs put them there -- so they are loaded directly, no tsc
+// step needed for this half.
+const occtFlagIdx = process.argv.indexOf('--occt');
+const occtDir = occtFlagIdx > -1 ? process.argv[occtFlagIdx + 1] : path.join(root, 'public/reshape/kernel');
+if (!existsSync(path.join(occtDir, 'replicad_single.js'))) {
+  console.error(`${path.relative(root, occtDir)} has no replicad_single.js -- `
+    + 'run node scripts/build-brep-kernel.mjs --occt <dir with replicad_single.js>');
+  process.exit(1);
+}
+
 const out = mkdtempSync(path.join(tmpdir(), 'shcode-reshape-solutions-'));
 let failures = 0;
 let checkedAny = false;
@@ -72,11 +92,25 @@ try {
   const { checkModel } = require(path.join(out, 'model-check.js'));
   const { runScript } = await import(pathToFileURL(SCRIPT_RUNTIME).href);
 
+  // The kernel loads once for the whole module's labs, not once per lesson --
+  // ~9 labs at one wasm init is well inside the ~60s budget; nine separate
+  // inits would not be.
+  const { buildDoc: buildOnKernel } = await import(pathToFileURL(path.join(occtDir, 'occt-build.js')).href);
+  const arc = await import(pathToFileURL(path.join(occtDir, 'sketch-arc.js')).href);
+  const oc = await (await import(pathToFileURL(path.join(occtDir, 'replicad_single.js')).href)).default();
+
   const buildDoc = (code) => {
     const r = runScript(code);
     const errs = Array.isArray(r && r.errors) ? r.errors : [];
     if (errs.length) return { doc: null, error: String(errs[0].message || errs[0]) };
     return { doc: r.doc ?? null, error: null };
+  };
+
+  // Flattened the way lib/model-check.ts's `Refusals` type wants it: plain
+  // object, feature id -> the kernel's own sentence for why it dropped it.
+  const kernelRefusals = (doc) => {
+    const built = buildOnKernel(oc, doc, arc);
+    return Object.fromEntries(built.refusals ?? new Map());
   };
 
   for (const id of readdirSync(lessonsDir).sort()) {
@@ -106,7 +140,27 @@ try {
       continue;
     }
 
-    const refResults = modelReqs.map((r) => checkModel(r, refDoc));
+    let refRefusals;
+    try {
+      refRefusals = kernelRefusals(refDoc);
+    } catch (e) {
+      failures++;
+      console.error(`FAIL ${id}: reference solution does not build on the kernel: ${String(e.message || e).slice(0, 160)}`);
+      continue;
+    }
+    const refRefusedIds = Object.keys(refRefusals);
+    if (refRefusedIds.length) {
+      // A refusal is its own failure, not just an input to checkModel -- the
+      // doc-only check can pass a reference the kernel actually rejects (that
+      // is exactly what happened with 8.1.11), so this must fail here even if
+      // checkModel(refDoc) below would have said everything matched.
+      failures++;
+      console.error(`FAIL ${id}: kernel refuses reference feature ${refRefusedIds[0]}`
+        + ` -- ${refRefusals[refRefusedIds[0]]}`);
+      continue;
+    }
+
+    const refResults = modelReqs.map((r) => checkModel(r, refDoc, refRefusals));
     const refFailed = refResults.filter((r) => !r.passed);
     if (refFailed.length) {
       failures++;
@@ -124,10 +178,16 @@ try {
 
     const { doc: starterDoc, error: starterError } = buildDoc(starterSrc);
     // A starter that fails to run at all trivially fails every requirement --
-    // that is a scaffold, not an error to report.
+    // that is a scaffold, not an error to report. A scaffold that DOES run
+    // but the kernel can't build (half-finished geometry) is the same kind of
+    // trivial fail, not a script error worth surfacing.
+    let starterRefusals = {};
+    if (!starterError) {
+      try { starterRefusals = kernelRefusals(starterDoc); } catch { /* scaffold, not a solution -- expected to fail */ }
+    }
     const starterResults = starterError
       ? modelReqs.map(() => ({ passed: false }))
-      : modelReqs.map((r) => checkModel(r, starterDoc));
+      : modelReqs.map((r) => checkModel(r, starterDoc, starterRefusals));
     const starterPassed = starterResults.filter((r) => r.passed).length;
 
     if (starterPassed === modelReqs.length) {
