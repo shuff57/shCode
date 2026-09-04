@@ -49,7 +49,7 @@ thing it acts on.
 const b = box(40, 40, 20)                 // width, depth, height, centred at the origin
 const c = cylinder(30, 80)                // across, tall
 const s = sphere(30)                      // across
-const k = cone(30, 10, 40)                // across at the base, across at the top, tall
+const k = cone(30, 40)                    // across at the base, tall (comes to a point: ConeFeature has one radius)
 const r = ring(40, 8)                     // across, tube across (torus)
 box(40, 40, 20, { at: [50, 0, 0] })       // any shape takes `at`
 box(40, 40, 20, { corner: 4 })            // round every edge of a box or cylinder
@@ -117,6 +117,19 @@ tool's automatic slider.
 No `require`, no modules, no raw kernel calls, no mesh access, no
 `getParameterDefinitions`, no `main()`. A script is a straight run of steps;
 loops and `if` are ordinary JavaScript and simply add steps.
+
+## Amendments from the build (2026-09-03)
+
+- `cone(across, tall)`: two arguments. `ConeFeature` carries one radius, so a
+  frustum is not expressible; the Build tool makes the same cone.
+- `sk.round(corner, radius)` and `sk.chamfer(corner, distance)`: sketch corner
+  treatments the Rules panel already supports; without them a rounded sketch
+  corner is unreachable from a script and the oracle round trip fails.
+- `draft(face, angle, { from: 'bottom' })` also accepts `{ neutral: N }` as an
+  escape hatch, because `DraftFeature.neutral` is not always a bounding-box
+  extreme.
+- `holes(b, { apart: [dx, dy] })` is full corner-to-corner spacing; the
+  document stores half-spacings.
 
 ## Runtime pieces
 
