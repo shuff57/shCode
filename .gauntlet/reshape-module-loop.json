@@ -46,8 +46,7 @@
     "Delete on a timeline row cascades to every downstream step with no confirmation (moderate r4 wiped a model with an imprecise click)",
     "a model requirement passes on geometry alone; which side (mouse or script) produced it is not measured (advanced lens's standing objection)",
     "8.1.11 hint 3 (delete a refused Round step and retry) was never exercised by a lens",
-    "uncommitted work is lost on reload for every lesson type (progress saves on commit/submit); pre-existing, not module-specific",
-    "git push never done by the loop"
+    "uncommitted work is lost on reload for every lesson type (progress saves on commit/submit); pre-existing, not module-specific"
   ],
   "lens_evidence": "session scratchpad lens-r1 .. lens-r4/<lens>/ (transcripts, screenshots, summary.json), critic-r1/*.md",
   "gate": "npm test exit 0 at close (reSHape gate 370/370; two source scans repointed from SandboxWorkspace.tsx to ReshapeStudio.tsx after the extraction)",
@@ -56,5 +55,6 @@
     "url": "https://680e0765.shcode.pages.dev",
     "production": "https://shcode.pages.dev",
     "verified_live": "lessons-manifest.json lists all 11 module-8.1 ids; /assignment/8-1-2-lab-your-first-box/ and /lesson/8-1-1-... 200; probes 404; occt-build.js 200; wasm application/wasm with Access-Control-Allow-Origin: *; today's tooltip string present in the shipped chunk; live sandbox Build check 6/6 (Box 1 on the live kernel). Lesson pages are sequence-locked for a signed-out visitor, so the in-lesson studio was verified on the dev server (20/20) and the shared chunk on the live host"
-  }
+  },
+  "pushed": "origin/cs-3d at 92b2e261, 2026-09-04"
 }
