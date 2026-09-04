@@ -168,6 +168,25 @@ export function leastSquares(
       Jtr[a] = s;
     }
 
+    // A direction the residuals genuinely do not see -- J's column for that
+    // input is all zero, so JtJ's diagonal entry there is exactly 0 too --
+    // gets essentially NO damping from `Math.max(v, 1e-12)`: at a starting
+    // lambda of 1e-3 that adds 1e-15, nowhere near enough to keep
+    // `solveLinear` from returning a delta of thousands of units along it.
+    // Measured 2026-09-01: stacking equal + parallel + perpendicular left the
+    // shape with exactly this kind of flat direction (their combination fixes
+    // every angle and every ratio but nothing about absolute scale, and pass
+    // two carries no HOME_PULL to fall back on), and a single step sent one
+    // corner to 4668.3mm on nothing more than finite-difference noise reading
+    // as "downhill" in a direction with zero true curvature. The floor below
+    // is relative to THIS matrix's own best-constrained direction rather than
+    // a fixed constant, so a flat direction is damped in proportion to how
+    // seriously the rest of the system is already being held down -- and the
+    // millimetres-vs-metres scale independence below is unaffected, because a
+    // uniformly-rescaled problem rescales maxDiag right along with it.
+    const maxDiag = JtJ.reduce((worst, row, i) => Math.max(worst, row[i]), 0);
+    const floor = Math.max(1e-12, maxDiag * 1e-6);
+
     // Try a step. If it does not improve, damp harder and try again -- up to a
     // point, past which no step of any size helps and the answer is as good as
     // this method gets.
@@ -177,7 +196,7 @@ export function leastSquares(
         // Damping scaled by the diagonal, not added flat: a sketch measured in
         // millimetres and one measured in metres should behave the same, and a
         // flat lambda makes them behave differently.
-        a === b ? v + lambda * Math.max(v, 1e-12) : v
+        a === b ? v + lambda * Math.max(v, floor) : v
       )));
       const delta = solveLinear(A, Jtr.map((v) => -v));
       if (delta) {

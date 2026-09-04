@@ -160,16 +160,75 @@ export function solveSketch(
   // begins in the right basin and already near the answer, so it converges to
   // real rule satisfaction without wandering back to the arrangements the pull
   // was there to rule out.
-  const guided = leastSquares(
-    home,
-    (x) => {
-      const r = rules(x);
-      for (let j = 0; j < x.length; j++) r.push(HOME_PULL * (x[j] - home[j]));
-      return r;
-    },
-    { tolerance: 1e-6, maxIterations: 200, primaryCount: constraints.length },
+  const runPass = (start: number[]) => {
+    const guided = leastSquares(
+      start,
+      (x) => {
+        const r = rules(x);
+        for (let j = 0; j < x.length; j++) r.push(HOME_PULL * (x[j] - start[j]));
+        return r;
+      },
+      { tolerance: 1e-6, maxIterations: 200, primaryCount: constraints.length },
+    );
+    // 100 measured too tight for an otherwise perfectly satisfiable rectangle:
+    // four alternating horizontal/vertical rules plus two length rules
+    // converges here in a straight, unhurried line rather than LM's usual
+    // fast finish near the optimum, and was still at 1.5e-6 residual when the
+    // cap cut it off (2026-09-03). 300 brings that same case under 1e-6, and
+    // costs nothing extra on a sketch that was already converging fast.
+    return leastSquares(guided.x, rules, { tolerance: 1e-9, maxIterations: 300 });
+  };
+
+  // The two-pass procedure above is run more than once when it lands badly,
+  // because this landscape genuinely has more than one basin. Measured
+  // 2026-09-03: stacking a THIRD perpendicular rule onto two already-solved
+  // ones (a rectangle built up one rule at a time, exactly the order a
+  // student stacking rules produces) collapsed two corners onto each other,
+  // residual 23.3, reported as "these rules cannot all be true" -- yet the
+  // achievable rectangle was right there, residual 0, one basin over. It is
+  // not a numerical near-miss: rounding that SAME starting point to two
+  // decimal places was enough to land in the good basin instead, and an
+  // independent per-coordinate nudge of about a third of the sketch's own
+  // size found it on the very first try. So a handful of small, DETERMINISTIC
+  // jitters around the honest starting point -- fixed seed, not Math.random,
+  // so the same sketch always resolves the same way -- stands in for the
+  // multiple starting guesses a real solver would try. A genuine conflict is
+  // unaffected: the three-mutually-perpendicular-edges triangle below still
+  // reports itself over-constrained after the same jitters, because every
+  // basin there is a bad one and jittering cannot manufacture a good one.
+  // A truly zero-length edge is not a bad basin to escape -- it is a
+  // direction the geometry does not define at all, and a length or angle
+  // rule on it is correctly left unmet rather than resolved by whichever way
+  // a random nudge happens to open it. Jittering would "fix" it anyway (any
+  // nonzero nudge invents SOME direction), so it is excluded up front rather
+  // than relied on to fail differently from the collapse case above.
+  const hasZeroLengthEdge = Array.from({ length: n }, (_, i) => edgeLength(pts, i)).some(
+    (len) => len < 1e-9,
   );
-  const fit = leastSquares(guided.x, rules, { tolerance: 1e-9, maxIterations: 100 });
+
+  let fit = runPass(home);
+  let best = residualOf(expand(fit.x), constraints);
+  if (best > 1e-3 && !hasZeroLengthEdge) {
+    const scale = startScale;
+    let seed = 0x5ee2020;
+    const rand = () => {
+      // mulberry32 -- small, dependency-free, and the point of using it here
+      // over Math.random is that the SAME sketch always jitters the SAME way.
+      seed = (seed + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    for (let trial = 0; trial < 6 && best > 1e-3; trial++) {
+      const jittered = home.map((v) => v + (rand() - 0.5) * scale * 0.3);
+      const candidate = runPass(jittered);
+      const residualHere = residualOf(expand(candidate.x), constraints);
+      if (residualHere < best) {
+        fit = candidate;
+        best = residualHere;
+      }
+    }
+  }
 
   const points = expand(fit.x);
   const residual = residualOf(points, constraints);

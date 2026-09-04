@@ -645,6 +645,23 @@ export function nextId(doc: ModelDoc, prefix: string): string {
 
 export type ShapeKind = 'box' | 'cylinder' | 'sphere' | 'cone' | 'torus';
 
+/**
+ * A born-axis-aligned rectangle's four edges, alternating horizontal and
+ * vertical -- which is what KEEPS it a rectangle. Without this, typing a
+ * Length on one edge had nothing holding the other three square to it: the
+ * solver satisfied the new length by whatever arrangement was cheapest, and
+ * setting edge0=40 then edge1=20 measurably left edge2 and edge3 at 40.1 and
+ * 24.9, not 40 and 20 (2026-09-03). Two length rules plus these four is
+ * exactly a rectangle's four degrees of freedom (width, height, position),
+ * with nothing left for the solver to trade away.
+ */
+const RECTANGLE_CONSTRAINTS: SketchConstraint[] = [
+  { kind: 'horizontal', edge: 0 },
+  { kind: 'vertical', edge: 1 },
+  { kind: 'horizontal', edge: 2 },
+  { kind: 'vertical', edge: 3 },
+];
+
 /** A rectangle to start from. An empty canvas with no corners gives a student
  *  nothing to grab, and every real sketch begins by editing a shape anyway. */
 export function newSketch(doc: ModelDoc, plane: SketchPlane = 'xy'): SketchFeature {
@@ -654,6 +671,7 @@ export function newSketch(doc: ModelDoc, plane: SketchPlane = 'xy'): SketchFeatu
     plane,
     offset: 0,
     points: [[0, 0], [40, 0], [40, 25], [0, 25]],
+    constraints: RECTANGLE_CONSTRAINTS.slice(),
   };
 }
 
@@ -691,6 +709,7 @@ export function newRectangleSketch(
     plane,
     offset: 0,
     points: [[loU, loV], [hiU, loV], [hiU, hiV], [loU, hiV]],
+    constraints: RECTANGLE_CONSTRAINTS.slice(),
   };
 }
 

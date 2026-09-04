@@ -326,7 +326,37 @@ export default function HandleOverlay({
   const start = useRef({ x: 0, y: 0, value: 0, valueV: 0, ax: 0, ay: 0 });
   const [alongV, setAlongV] = useState(0);
   const raf = useRef<number | null>(null);
-  const pending = useRef<{ param: string; value: number } | null>(null);
+  const pending = useRef<{ param: string; value: number }[]>([]);
+  // A circle sketch is two points, ends of a diameter, with no separate
+  // centre/radius field anywhere in the doc -- moving one point's handle
+  // just moved that point, and the other one sat still. Measured 2026-09-03:
+  // dragging one diameter handle from 10 to 5 left the other at -10, silently
+  // shifting the circle's centre and its actual diameter to 15, not 10 -- and
+  // nothing on screen said the two handles were not linked. So a circle's
+  // point handle carries the OTHER point's params here, captured once at
+  // pointerdown (the centre cannot be recomputed live from `outlines`,
+  // because on every frame after the first it would already reflect this
+  // same drag's own half-applied move, and averaging a moving point with
+  // itself drifts the centre a little further each frame). The `u`-suffix
+  // convention it relies on to find the partner's `v` param is model-handles
+  // .ts's own (`${id}_p${n}u` / `${id}_p${n}v`), both files this build owns.
+  const mirror = useRef<{ param: string; paramV: string; centreU: number; centreV: number } | null>(null);
+  function circleMirrorFor(param: string) {
+    for (const o of outlines ?? []) {
+      if (o.shape !== 'circle' || o.corners.length !== 2) continue;
+      const i = o.corners.indexOf(param);
+      if (i < 0) continue;
+      const otherU = o.corners[1 - i];
+      if (!otherU.endsWith('u')) continue;
+      return {
+        param: otherU,
+        paramV: `${otherU.slice(0, -1)}v`,
+        centreU: (o.design[0][0] + o.design[1][0]) / 2,
+        centreV: (o.design[0][1] + o.design[1][1]) / 2,
+      };
+    }
+    return null;
+  }
 
   useEffect(() => () => {
     if (raf.current !== null) cancelAnimationFrame(raf.current);
@@ -350,22 +380,16 @@ export default function HandleOverlay({
 
   // One update per frame. A pointer can fire far faster than a rebuild
   // finishes, and every extra send is geometry that is stale before it lands.
-  const pendingV = useRef<{ param: string; value: number } | null>(null);
-
-  function push(param: string, value: number, paramV?: string, valueV?: number) {
-    pending.current = { param, value };
-    pendingV.current = paramV !== undefined && valueV !== undefined
-      ? { param: paramV, value: valueV }
-      : null;
+  // A plain list rather than a fixed param/paramV pair, because a circle's
+  // mirrored partner point adds two more entries to the same frame's batch.
+  function push(updates: { param: string; value: number }[]) {
+    pending.current = updates;
     if (raf.current !== null) return;
     raf.current = requestAnimationFrame(() => {
       raf.current = null;
-      const p = pending.current;
-      const q = pendingV.current;
-      pending.current = null;
-      pendingV.current = null;
-      if (p) onDrag(p.param, p.value);
-      if (q) onDrag(q.param, q.value);
+      const items = pending.current;
+      pending.current = [];
+      for (const { param, value } of items) onDrag(param, value);
     });
   }
 
@@ -376,12 +400,9 @@ export default function HandleOverlay({
       cancelAnimationFrame(raf.current);
       raf.current = null;
     }
-    const p = pending.current;
-    const q = pendingV.current;
-    pending.current = null;
-    pendingV.current = null;
-    if (p) onDrag(p.param, p.value);
-    if (q) onDrag(q.param, q.value);
+    const items = pending.current;
+    pending.current = [];
+    for (const { param, value } of items) onDrag(param, value);
     onCommit();
   }
 
@@ -550,6 +571,7 @@ export default function HandleOverlay({
                 valueV: typeof rawV === 'number' ? rawV : 0,
                 ax: a.x, ay: a.y,
               };
+              mirror.current = a.paramV ? circleMirrorFor(a.param) : null;
               dragStarted.current = false;
               setAlongPx(0);
               setAlongV(0);
@@ -580,16 +602,30 @@ export default function HandleOverlay({
                 const dv = (a.ux * dy - a.uy * dx) / det;
                 setAlongPx(du * a.ux + dv * a.vx);
                 setAlongV(du * a.uy + dv * a.vy);
-                push(
-                  a.param, Math.round((start.current.value + du) * 100) / 100,
-                  a.paramV, Math.round((start.current.valueV + dv) * 100) / 100
-                );
+                const newU = Math.round((start.current.value + du) * 100) / 100;
+                const newV = Math.round((start.current.valueV + dv) * 100) / 100;
+                const updates = [
+                  { param: a.param, value: newU },
+                  { param: a.paramV, value: newV },
+                ];
+                // The other end of a circle's diameter moves opposite this
+                // one, through the centre this drag started from -- so the
+                // centre holds still and the diameter stays a straight line
+                // through it, rather than one end wandering off on its own.
+                const m = mirror.current;
+                if (m) {
+                  updates.push(
+                    { param: m.param, value: Math.round((2 * m.centreU - newU) * 100) / 100 },
+                    { param: m.paramV, value: Math.round((2 * m.centreV - newV) * 100) / 100 },
+                  );
+                }
+                push(updates);
                 return;
               }
               const px = dx * a.dirX + dy * a.dirY;
               setAlongPx(px);
               const next = start.current.value + (px / a.pxPerUnit) * (scales[a.param] ?? 1);
-              push(a.param, Math.max(0.1, Math.round(next * 100) / 100));
+              push([{ param: a.param, value: Math.max(0.1, Math.round(next * 100) / 100) }]);
             }}
             onPointerUp={(e) => {
               try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* gone */ }

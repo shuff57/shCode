@@ -33,6 +33,7 @@ import HandleOverlay, { type AnchorPoint, type SketchOutline } from './model/Han
 import { outlineOf } from '../lib/sketch-arc';
 import { handlesFor, planeAnchor } from '../lib/model-handles';
 import { EMPTY_DOC, type Feature, type ModelDoc, newPolygonSketch, newRectangleSketch } from '../lib/model-types';
+import { ownerOf } from '../lib/model-selection';
 import type { TopoName } from '../lib/topo-name';
 import {
   applyParam,
@@ -1512,7 +1513,21 @@ export default function SandboxWorkspace() {
                           setPickedFace(null);
                           return;
                         }
-                        setSelected([p.target]);
+                        // ownerOf() re-checks p.target against the CURRENT doc
+                        // before trusting it as a selection -- a pick can still
+                        // be in flight the moment an Undo or rollback removes
+                        // the feature it named (see that helper's own comment).
+                        // Leaving `selected` alone on a stale pick beats
+                        // pointing the Dimensions panel at a step that no
+                        // longer exists, which used to read as "This step has
+                        // no numbers to adjust" for a step very much still in
+                        // the timeline. pickedEdge/pickedFace still record the
+                        // raw pick either way -- Round/Hollow's own gates
+                        // re-check `chosen` against them, so a stale target
+                        // there just falls through to "pick one shape" same as
+                        // it always has.
+                        const owner = ownerOf(doc, p);
+                        if (owner) setSelected([owner]);
                         setPickedEdge(p.kind === 'edge' ? { target: p.target, edge: p.name } : null);
                         setPickedFace(p.kind === 'face' ? { target: p.target, face: p.name } : null);
                       }}
@@ -1571,13 +1586,29 @@ export default function SandboxWorkspace() {
                     />
                   )}
                 </div>
-                {runKey > 0 && (
+                {/* Build mode's own numbers come straight from the doc via
+                    generatedParams() (see brepParamDefs above), not from a
+                    runKey-driven rebuild -- there is no iframe to reload. Gating
+                    this panel on `runKey > 0` therefore starved it the moment
+                    scriptEngine became Build's default (operator decision
+                    2026-09-03): loadDoc() deliberately stops bumping runKey once
+                    scriptEngine is on (see its own long comment on why), so
+                    runKey now sits at its initial 0 for the entire life of a
+                    Build session and this whole aside never mounted -- a
+                    beginner lens confirmed it (2026-09-03): after placing a box,
+                    `.reshape-pane-params` was absent from the page entirely, not
+                    merely showing its empty state. Code mode still needs the
+                    runKey gate -- its numbers really do come from a script that
+                    has not run yet -- so only Build gets the unconditional path. */}
+                {(runKey > 0 || (isReshape && build)) && (
                   <aside className="reshape-pane-params">
                     <ReshapeParamsPanel
                       defs={brepEngine ? brepParamDefs : paramDefs}
                       emptyMessage={brepEngine
                         ? (build
-                          ? (selected.length ? 'This step has no numbers to adjust.' : 'Select a shape to see its dimensions.')
+                          ? (selected.length
+                            ? 'This step has no numbers to adjust.'
+                            : 'Pick a step in the timeline, or a face on the model, to see its numbers.')
                           : "Run a script and its numbers appear here. param('name', value) gives one a caption.")
                         : undefined}
                       notice={

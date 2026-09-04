@@ -120,6 +120,98 @@ module.exports = function run(dir) {
     + ' comparable number; what has to stay true is that the rules come out met,'
     + ' which the PASS above checks.');
 
+  // A rectangle born from the Sketch/Rectangle tools carries these four rules
+  // from the start (lib/model-types.ts, RECTANGLE_CONSTRAINTS) precisely so
+  // typing a Length does not need re-squaring by hand. Measured 2026-09-03: a
+  // FREE rectangle (no h/v rules) that had 40 and 20 typed onto two edges
+  // settled at 40 / 20 / 40.1 / 24.9, not a rectangle at all. Feeding the
+  // edits through one at a time, the way the Dimensions panel actually
+  // commits them, is the real path -- a single combined solve can hide a
+  // per-step regression a sequential one would not.
+  const rectRules = [
+    { kind: 'horizontal', edge: 0 },
+    { kind: 'vertical', edge: 1 },
+    { kind: 'horizontal', edge: 2 },
+    { kind: 'vertical', edge: 3 },
+  ];
+  const step1 = S.solveSketch(rect(), [...rectRules, { kind: 'length', edge: 0, value: 40 }]);
+  const step2 = S.solveSketch(step1.points, [
+    ...rectRules, { kind: 'length', edge: 0, value: 40 }, { kind: 'length', edge: 1, value: 20 },
+  ]);
+  check('a born-rectangle sketch stays exactly 40 x 20 after typing both lengths',
+    near(S.edgeLength(step2.points, 0), 40, 1e-5)
+    && near(S.edgeLength(step2.points, 1), 20, 1e-5)
+    && near(S.edgeLength(step2.points, 2), 40, 1e-5)
+    && near(S.edgeLength(step2.points, 3), 20, 1e-5),
+    JSON.stringify(step2.points.map((p) => p.map((n) => +n.toFixed(3)))));
+  const edgeVec = (pts, n) => {
+    const [a, b] = S.edgeCorners(n, pts.length);
+    return [pts[b][0] - pts[a][0], pts[b][1] - pts[a][1]];
+  };
+  // The COSINE of the angle between consecutive edges, not the raw dot
+  // product: a raw dot product is scaled by both edges' lengths (here
+  // roughly 40 x 20 = 800), so an absolute 1e-6 bar on it is really an angle
+  // bar 800x LOOSER than 1e-6 on one edge pair and tighter on another.
+  // Dividing out both lengths makes it a comparison of angle alone --
+  // cos(90 degrees) = 0 -- which is what "right angles within 1e-6" means
+  // for a shape whose own size is not 1 unit.
+  check('...with actual right angles, not just the right side lengths',
+    [0, 1, 2, 3].every((n) => {
+      const e0 = edgeVec(step2.points, n);
+      const e1 = edgeVec(step2.points, (n + 1) % 4);
+      const l0 = Math.hypot(e0[0], e0[1]);
+      const l1 = Math.hypot(e1[0], e1[1]);
+      return Math.abs((e0[0] * e1[0] + e0[1] * e1[1]) / (l0 * l1)) < 1e-6;
+    }),
+    JSON.stringify(step2.points));
+
+  // Stacking equal/parallel/perpendicular rules one at a time -- exactly the
+  // order a student builds them in the Rules panel -- used to blow up:
+  // measured 2026-09-03, a starting quad plus two lengths plus two
+  // perpendicular rules plus a THIRD collapsed two corners onto each other
+  // (residual 23.3) instead of landing on the achievable 40 x 20 rectangle
+  // one basin over, and removing the offending rule again did not recover --
+  // it stayed at the bad point because nothing in the solver was anchored to
+  // anywhere else. The fixture below is the literal sequence that produced
+  // it: a non-axis-aligned starting quad (a freshly dragged rectangle is
+  // never axis-aligned), two lengths, two perpendicular rules, then the
+  // third.
+  let stackPts = [[0, 0], [6.4, 0], [6.4, 15.7], [0, 15.7]];
+  const stack = (cs) => { const r = S.solveSketch(stackPts, cs); stackPts = r.points; return r; };
+  stack([{ kind: 'length', edge: 0, value: 40 }]);
+  stack([{ kind: 'length', edge: 0, value: 40 }, { kind: 'length', edge: 1, value: 20 }]);
+  stack([
+    { kind: 'length', edge: 0, value: 40 }, { kind: 'length', edge: 1, value: 20 },
+    { kind: 'perpendicular', edge: 0, other: 1 },
+  ]);
+  const twoPerp = stack([
+    { kind: 'length', edge: 0, value: 40 }, { kind: 'length', edge: 1, value: 20 },
+    { kind: 'perpendicular', edge: 0, other: 1 }, { kind: 'perpendicular', edge: 1, other: 2 },
+  ]);
+  check('two perpendicular rules on top of two lengths settle, not just avoid NaN',
+    !twoPerp.overConstrained, `residual ${twoPerp.residual}`);
+  const preThird = stackPts.map((p) => p.slice());
+  const scaleOf = (pts) => Math.max(1, Math.hypot(
+    Math.max(...pts.map((p) => p[0])) - Math.min(...pts.map((p) => p[0])),
+    Math.max(...pts.map((p) => p[1])) - Math.min(...pts.map((p) => p[1])),
+  ));
+  const threePerp = stack([
+    { kind: 'length', edge: 0, value: 40 }, { kind: 'length', edge: 1, value: 20 },
+    { kind: 'perpendicular', edge: 0, other: 1 }, { kind: 'perpendicular', edge: 1, other: 2 },
+    { kind: 'perpendicular', edge: 2, other: 3 },
+  ]);
+  check('a third perpendicular rule settles too, rather than exploding to thousands of mm',
+    !threePerp.overConstrained && scaleOf(threePerp.points) < 10 * scaleOf(preThird),
+    `residual ${threePerp.residual}, scale ${scaleOf(threePerp.points)} vs pre-rule ${scaleOf(preThird)}`);
+  const afterRemoval = stack([
+    { kind: 'length', edge: 0, value: 40 }, { kind: 'length', edge: 1, value: 20 },
+    { kind: 'perpendicular', edge: 0, other: 1 }, { kind: 'perpendicular', edge: 1, other: 2 },
+  ]);
+  const minEdge = Math.min(...[0, 1, 2, 3].map((n) => S.edgeLength(afterRemoval.points, n)));
+  check('removing the offending rule settles on a real quadrilateral, not a collapsed one',
+    !afterRemoval.overConstrained && minEdge > 1,
+    `residual ${afterRemoval.residual}, shortest edge ${minEdge}`);
+
   const squared = S.solveSketch(rect(), [
     { kind: 'horizontal', edge: 0 },
     { kind: 'vertical', edge: 1 },
