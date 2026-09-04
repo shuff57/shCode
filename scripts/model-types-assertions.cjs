@@ -120,6 +120,44 @@ module.exports = function run(dir) {
       !('open' in closed), JSON.stringify(closed));
   }
 
+  console.log('\n=== sketchBBoxCentre: a pure bounding-box centre, not an area centroid ===');
+
+  {
+    const c = types.sketchBBoxCentre([[0, 0], [40, 0], [40, 25], [0, 25]]);
+    check('the default rectangle sketch reads (20, 12.5) -- the exact number the round-3 lens found missing',
+      c[0] === 20 && c[1] === 12.5, JSON.stringify(c));
+  }
+  {
+    const c = types.sketchBBoxCentre([[-10, -5], [10, -5], [10, 5], [-10, 5]]);
+    check('a shape centred on the origin already reads (0, 0)', c[0] === 0 && c[1] === 0, JSON.stringify(c));
+  }
+  {
+    const c = types.sketchBBoxCentre([[3, 8], [3, 8]]);
+    check('a degenerate single-point-repeated shape reads that point, not NaN',
+      c[0] === 3 && c[1] === 8, JSON.stringify(c));
+  }
+  {
+    const c = types.sketchBBoxCentre([]);
+    check('nothing to centre on reads the origin, not NaN or a throw', c[0] === 0 && c[1] === 0, JSON.stringify(c));
+  }
+
+  console.log('\n=== newCircleSketch: an optional centre, defaulting to the origin ===');
+
+  {
+    const f = types.newCircleSketch(doc(), 'xy');
+    check('omitting centre entirely keeps the original origin-centred circle',
+      JSON.stringify(f.points) === JSON.stringify([[-10, 0], [10, 0]]), JSON.stringify(f.points));
+  }
+  {
+    const f = types.newCircleSketch(doc(), 'xy', [20, 12.5]);
+    check('a supplied centre offsets BOTH diameter endpoints by that centre, radius unchanged',
+      JSON.stringify(f.points) === JSON.stringify([[10, 12.5], [30, 12.5]]), JSON.stringify(f.points));
+  }
+  {
+    const f = types.newCircleSketch(doc(), 'xz', [5, -5]);
+    check('the plane argument still passes through untouched alongside a centre', f.plane === 'xz', f.plane);
+  }
+
   console.log(fails.length === 0
     ? `\nall ${pass} checks passed`
     : `\n${fails.length} failed`);

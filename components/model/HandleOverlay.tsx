@@ -560,6 +560,146 @@ export default function HandleOverlay({
     if (!degenerate) drawFirstLocal.current = null;
   }
 
+  // Every sketch's labels are laid out TOGETHER, not one sketch at a time --
+  // otherwise two DIFFERENT sketches' labels (Sketch 1's "R3" sitting right
+  // over Sketch 2's "diameter 10") never even see each other, because each
+  // sketch's own layoutLabels() call only knew about its own boxes. Ids are
+  // prefixed with the outline's own index so a rectangle's "edge-0" in one
+  // sketch can never collide, as a KEY, with another sketch's "edge-0".
+  // Measured 2026-09-04: a beginner-lens shot with two sketches on the same
+  // plane showed exactly this collision.
+  const outlineRenders = (outlines ?? []).map((o, n) => {
+    const projected = projectOutline(o, at);
+    if (!projected || projected.pts.length < 2) return null;
+    const { pts, basis } = projected;
+    // A chip groups the glyphs on one edge and gives them a backdrop,
+    // so they stay readable sitting over the outline.
+    //
+    // Colour is PER GLYPH, not per chip. Reddening the whole chip is
+    // one line shorter and wrong: an edge can carry a satisfied length
+    // rule and a losing equal rule at once, and painting both red says
+    // the length is a culprit when it is not. Naming the guilty rule
+    // exactly is the entire point of this feature -- Onshape reddens
+    // the offending glyph and leaves the innocent one alone, and a
+    // first pass here got that backwards.
+    const chips = new Map<number, { text: string; losing: boolean }[]>();
+    for (const g of edgeGlyphs(o.design, o.constraints ?? [])) {
+      if (!glyphAt(at, o.corners, g.edge)) continue;
+      chips.set(g.edge, [...(chips.get(g.edge) ?? []), { text: g.text, losing: g.losing }]);
+    }
+    // The actual numbers on the geometry -- "40", "20", "R3" -- not
+    // just which rule is set. lib/sketch-outline.ts lays these out in
+    // plane coordinates; the treatments it needs to tell a round or a
+    // chamfer from a genuinely bowed edge are read back off the
+    // RENDERED outline (see treatmentsFromOutline's own comment),
+    // because SketchOutline never carries the raw rounds/chamfers
+    // dict through -- and o.bulges itself must NOT be handed to
+    // sketchLabels raw: its keys are positions in the rendered
+    // outline, not design edge numbers, once any corner has trim
+    // points inserted ahead of a later edge. Measured 2026-09-04:
+    // that raw hand-off drew a spurious bow label on the very arc a
+    // corner round had just created.
+    // Round/chamfer labels come from treatmentsFromOutline's OWN
+    // `corners` list, not sketchLabels' -- they need the arc/cut's
+    // real midpoint (only the rendered outline knows that), not the
+    // design corner sketchLabels works from. See treatmentsFromOutline's
+    // own comment: a label placed at the design corner sits exactly
+    // where that corner's own drag handle already is, and the two
+    // together can hide a small round's entire visible arc.
+    const { edgeBulges, corners: cornerLabels } = treatmentsFromOutline(o.design, o.points, o.basis, o.bulges);
+    const labels = o.shape === 'circle'
+      ? { edges: [], corners: [], bows: [] }
+      : sketchLabels(o.design, o.constraints ?? [], undefined, undefined, edgeBulges);
+
+    // Every label this outline wants to draw, projected to screen
+    // FIRST, so collisions are judged in the space they actually
+    // happen in -- two labels can sit far apart in the plane and
+    // still land on the same pixels once the camera forshortens
+    // one of them, which is exactly how "two duplicate 40s" (a
+    // beginner-lens finding, 2026-09-04) turned out to be two
+    // DIFFERENT edges that both measured 40, not a bug that drew
+    // one label twice. Edge/dimension labels list first, so a
+    // collision moves the corner/bow/circle label sliding into
+    // them rather than the load-bearing edge number.
+    const labelBoxes: LabelBox[] = [];
+    // A constraint glyph chip (the little "—"/"↔"/"|" pill a rule
+    // draws on its edge) is a label too, and the FIRST collision
+    // this fix actually found live wasn't two length numbers at
+    // all -- it was a chip sitting on top of a length label one
+    // edge over. Listed before the length labels below so a chip
+    // (which also names WHICH rule is set, not just a number) holds
+    // its ground and a colliding length label slides instead.
+    const chipSpots = new Map<number, { x: number; y: number }>();
+    for (const [edge, glyphs] of chips) {
+      const spot = glyphAt(at, o.corners, edge);
+      const anchor = at.get(o.corners[edge]);
+      const b = at.get(o.corners[(edge + 1) % o.corners.length]);
+      if (!spot || !anchor) continue;
+      chipSpots.set(edge, spot);
+      const w = glyphs.length * 13 + 8;
+      labelBoxes.push({
+        id: `${n}:chip-${edge}`, x: spot.x, y: spot.y, width: w, height: 18,
+        alongX: b ? b.x - anchor.x : 1, alongY: b ? b.y - anchor.y : 0,
+      });
+    }
+    const edgeSpots = new Map<string, { x: number; y: number }>();
+    for (const l of labels.edges) {
+      const anchor = at.get(o.corners[l.edge]);
+      if (!anchor || anchor.ux === undefined || anchor.uy === undefined) continue;
+      const spot = projectFrom(anchor, o.design[l.edge], [l.x, l.y]);
+      const b = at.get(o.corners[(l.edge + 1) % o.corners.length]);
+      const alongX = b ? b.x - anchor.x : 1;
+      const alongY = b ? b.y - anchor.y : 0;
+      const id = `${n}:edge-${l.edge}`;
+      edgeSpots.set(id, spot);
+      labelBoxes.push({ id, x: spot.x, y: spot.y, width: l.text.length * 7 + 6, height: 16, alongX, alongY });
+    }
+    const cornerSpots = new Map<string, { x: number; y: number }>();
+    for (const l of cornerLabels) {
+      const anchor = at.get(o.corners[l.corner]);
+      if (!anchor || anchor.ux === undefined || anchor.uy === undefined) continue;
+      const projected = projectFrom(anchor, o.design[l.corner], [l.x, l.y]);
+      const spot = pushFromAnchor(anchor, projected, 18);
+      const id = `${n}:corner-${l.corner}`;
+      cornerSpots.set(id, spot);
+      // Slides sideways along the anchor's own U axis by default --
+      // a corner label has no single "edge" of its own the way an
+      // edge label does, so any fixed direction that is not the
+      // outward push itself (which would undo the offset) will do.
+      labelBoxes.push({ id, x: spot.x, y: spot.y, width: l.text.length * 7 + 6, height: 16, alongX: anchor.ux, alongY: anchor.uy });
+    }
+    const bowSpots = new Map<string, { x: number; y: number }>();
+    for (const l of labels.bows) {
+      const anchor = at.get(o.corners[l.edge]);
+      if (!anchor || anchor.ux === undefined || anchor.uy === undefined) continue;
+      const spot = projectFrom(anchor, o.design[l.edge], [l.x, l.y]);
+      const id = `${n}:bow-${l.edge}`;
+      bowSpots.set(id, spot);
+      labelBoxes.push({ id, x: spot.x, y: spot.y, width: l.text.length * 7 + 6, height: 16, alongX: anchor.ux, alongY: anchor.uy });
+    }
+    let circleSpot: { x: number; y: number } | null = null;
+    let circleText = '';
+    if (o.shape === 'circle') {
+      const c = circleLabel(o.design);
+      const anchor = at.get(o.corners[0]);
+      if (c && anchor && anchor.ux !== undefined && anchor.uy !== undefined) {
+        circleSpot = projectFrom(anchor, o.design[0], [c.x, c.y]);
+        circleText = c.text;
+        labelBoxes.push({ id: `${n}:circle`, x: circleSpot.x, y: circleSpot.y, width: circleText.length * 7 + 6, height: 16, alongX: 1, alongY: 0 });
+      }
+    }
+    return { o, n, pts, basis, chips, chipSpots, edgeSpots, cornerLabels, cornerSpots, labels, bowSpots, circleSpot, circleText, labelBoxes };
+  }).filter((r): r is NonNullable<typeof r> => r !== null);
+
+  // Laid out ACROSS every sketch at once -- see the comment above
+  // outlineRenders for why a per-sketch pass let two different sketches'
+  // labels sit on the same pixels.
+  const viewportRect = layerRef.current?.getBoundingClientRect();
+  const laidOut = layoutLabels(outlineRenders.flatMap((r) => r.labelBoxes), {
+    width: viewportRect?.width ?? 4000,
+    height: viewportRect?.height ?? 4000,
+  });
+
   return (
     <div
       className="handle-layer"
@@ -572,134 +712,13 @@ export default function HandleOverlay({
       {/* The outline is drawn, not built. A sketch is a flat profile, not a
           solid, so the renderer has nothing to show for it until something
           extrudes it -- but a student needs to see what they are drawing. */}
-      {outlines && outlines.length > 0 && (
+      {outlineRenders.length > 0 && (
         <svg className="sketch-lines" aria-hidden="true">
-          {outlines.map((o, n) => {
-            const projected = projectOutline(o, at);
-            if (!projected || projected.pts.length < 2) return null;
-            const { pts, basis } = projected;
-            // A chip groups the glyphs on one edge and gives them a backdrop,
-            // so they stay readable sitting over the outline.
-            //
-            // Colour is PER GLYPH, not per chip. Reddening the whole chip is
-            // one line shorter and wrong: an edge can carry a satisfied length
-            // rule and a losing equal rule at once, and painting both red says
-            // the length is a culprit when it is not. Naming the guilty rule
-            // exactly is the entire point of this feature -- Onshape reddens
-            // the offending glyph and leaves the innocent one alone, and a
-            // first pass here got that backwards.
-            const chips = new Map<number, { text: string; losing: boolean }[]>();
-            for (const g of edgeGlyphs(o.design, o.constraints ?? [])) {
-              if (!glyphAt(at, o.corners, g.edge)) continue;
-              chips.set(g.edge, [...(chips.get(g.edge) ?? []), { text: g.text, losing: g.losing }]);
-            }
-            // The actual numbers on the geometry -- "40", "20", "R3" -- not
-            // just which rule is set. lib/sketch-outline.ts lays these out in
-            // plane coordinates; the treatments it needs to tell a round or a
-            // chamfer from a genuinely bowed edge are read back off the
-            // RENDERED outline (see treatmentsFromOutline's own comment),
-            // because SketchOutline never carries the raw rounds/chamfers
-            // dict through -- and o.bulges itself must NOT be handed to
-            // sketchLabels raw: its keys are positions in the rendered
-            // outline, not design edge numbers, once any corner has trim
-            // points inserted ahead of a later edge. Measured 2026-09-04:
-            // that raw hand-off drew a spurious bow label on the very arc a
-            // corner round had just created.
-            // Round/chamfer labels come from treatmentsFromOutline's OWN
-            // `corners` list, not sketchLabels' -- they need the arc/cut's
-            // real midpoint (only the rendered outline knows that), not the
-            // design corner sketchLabels works from. See treatmentsFromOutline's
-            // own comment: a label placed at the design corner sits exactly
-            // where that corner's own drag handle already is, and the two
-            // together can hide a small round's entire visible arc.
-            const { edgeBulges, corners: cornerLabels } = treatmentsFromOutline(o.design, o.points, o.basis, o.bulges);
-            const labels = o.shape === 'circle'
-              ? { edges: [], corners: [], bows: [] }
-              : sketchLabels(o.design, o.constraints ?? [], undefined, undefined, edgeBulges);
-
-            // Every label this outline wants to draw, projected to screen
-            // FIRST, so collisions are judged in the space they actually
-            // happen in -- two labels can sit far apart in the plane and
-            // still land on the same pixels once the camera forshortens
-            // one of them, which is exactly how "two duplicate 40s" (a
-            // beginner-lens finding, 2026-09-04) turned out to be two
-            // DIFFERENT edges that both measured 40, not a bug that drew
-            // one label twice. Edge/dimension labels list first, so a
-            // collision moves the corner/bow/circle label sliding into
-            // them rather than the load-bearing edge number.
-            const labelBoxes: LabelBox[] = [];
-            // A constraint glyph chip (the little "—"/"↔"/"|" pill a rule
-            // draws on its edge) is a label too, and the FIRST collision
-            // this fix actually found live wasn't two length numbers at
-            // all -- it was a chip sitting on top of a length label one
-            // edge over. Listed before the length labels below so a chip
-            // (which also names WHICH rule is set, not just a number) holds
-            // its ground and a colliding length label slides instead.
-            const chipSpots = new Map<number, { x: number; y: number }>();
-            for (const [edge, glyphs] of chips) {
-              const spot = glyphAt(at, o.corners, edge);
-              const anchor = at.get(o.corners[edge]);
-              const b = at.get(o.corners[(edge + 1) % o.corners.length]);
-              if (!spot || !anchor) continue;
-              chipSpots.set(edge, spot);
-              const w = glyphs.length * 13 + 8;
-              labelBoxes.push({
-                id: `chip-${edge}`, x: spot.x, y: spot.y, width: w, height: 18,
-                alongX: b ? b.x - anchor.x : 1, alongY: b ? b.y - anchor.y : 0,
-              });
-            }
-            const edgeSpots = new Map<string, { x: number; y: number }>();
-            for (const l of labels.edges) {
-              const anchor = at.get(o.corners[l.edge]);
-              if (!anchor || anchor.ux === undefined || anchor.uy === undefined) continue;
-              const spot = projectFrom(anchor, o.design[l.edge], [l.x, l.y]);
-              const b = at.get(o.corners[(l.edge + 1) % o.corners.length]);
-              const alongX = b ? b.x - anchor.x : 1;
-              const alongY = b ? b.y - anchor.y : 0;
-              const id = `edge-${l.edge}`;
-              edgeSpots.set(id, spot);
-              labelBoxes.push({ id, x: spot.x, y: spot.y, width: l.text.length * 7 + 6, height: 16, alongX, alongY });
-            }
-            const cornerSpots = new Map<string, { x: number; y: number }>();
-            for (const l of cornerLabels) {
-              const anchor = at.get(o.corners[l.corner]);
-              if (!anchor || anchor.ux === undefined || anchor.uy === undefined) continue;
-              const projected = projectFrom(anchor, o.design[l.corner], [l.x, l.y]);
-              const spot = pushFromAnchor(anchor, projected, 18);
-              const id = `corner-${l.corner}`;
-              cornerSpots.set(id, spot);
-              // Slides sideways along the anchor's own U axis by default --
-              // a corner label has no single "edge" of its own the way an
-              // edge label does, so any fixed direction that is not the
-              // outward push itself (which would undo the offset) will do.
-              labelBoxes.push({ id, x: spot.x, y: spot.y, width: l.text.length * 7 + 6, height: 16, alongX: anchor.ux, alongY: anchor.uy });
-            }
-            const bowSpots = new Map<string, { x: number; y: number }>();
-            for (const l of labels.bows) {
-              const anchor = at.get(o.corners[l.edge]);
-              if (!anchor || anchor.ux === undefined || anchor.uy === undefined) continue;
-              const spot = projectFrom(anchor, o.design[l.edge], [l.x, l.y]);
-              const id = `bow-${l.edge}`;
-              bowSpots.set(id, spot);
-              labelBoxes.push({ id, x: spot.x, y: spot.y, width: l.text.length * 7 + 6, height: 16, alongX: anchor.ux, alongY: anchor.uy });
-            }
-            let circleSpot: { x: number; y: number } | null = null;
-            let circleText = '';
-            if (o.shape === 'circle') {
-              const c = circleLabel(o.design);
-              const anchor = at.get(o.corners[0]);
-              if (c && anchor && anchor.ux !== undefined && anchor.uy !== undefined) {
-                circleSpot = projectFrom(anchor, o.design[0], [c.x, c.y]);
-                circleText = c.text;
-                labelBoxes.push({ id: 'circle', x: circleSpot.x, y: circleSpot.y, width: circleText.length * 7 + 6, height: 16, alongX: 1, alongY: 0 });
-              }
-            }
-            const viewportRect = layerRef.current?.getBoundingClientRect();
-            const laidOut = layoutLabels(labelBoxes, {
-              width: viewportRect?.width ?? 4000,
-              height: viewportRect?.height ?? 4000,
-            });
-
+          {outlineRenders.map((r) => {
+            const {
+              o, n, pts, basis, chips, chipSpots, edgeSpots, cornerLabels,
+              cornerSpots, labels, bowSpots, circleSpot, circleText,
+            } = r;
             return (
               <g key={n}>
                 <polygon
@@ -744,7 +763,7 @@ export default function HandleOverlay({
                   );
                 })}
                 {[...chips].map(([edge, glyphs]) => {
-                  const spot = laidOut[`chip-${edge}`] ?? chipSpots.get(edge);
+                  const spot = laidOut[`${n}:chip-${edge}`] ?? chipSpots.get(edge);
                   if (!spot) return null;
                   // #bd93f9 is the same purple the panel paints a set control
                   // with, so "this rule is on" looks the same in both places.
@@ -787,7 +806,7 @@ export default function HandleOverlay({
                   );
                 })}
                 {labels.edges.map((l) => {
-                  const id = `edge-${l.edge}`;
+                  const id = `${n}:edge-${l.edge}`;
                   const spot = edgeSpots.get(id);
                   const textSpot = laidOut[id];
                   if (!spot || !textSpot) return null;
@@ -855,7 +874,7 @@ export default function HandleOverlay({
                   );
                 })}
                 {cornerLabels.map((l) => {
-                  const id = `corner-${l.corner}`;
+                  const id = `${n}:corner-${l.corner}`;
                   const textSpot = laidOut[id] ?? cornerSpots.get(id);
                   if (!textSpot) return null;
                   return (
@@ -872,7 +891,7 @@ export default function HandleOverlay({
                   );
                 })}
                 {labels.bows.map((l) => {
-                  const id = `bow-${l.edge}`;
+                  const id = `${n}:bow-${l.edge}`;
                   const textSpot = laidOut[id] ?? bowSpots.get(id);
                   if (!textSpot) return null;
                   return (
@@ -889,7 +908,7 @@ export default function HandleOverlay({
                   );
                 })}
                 {circleSpot && (() => {
-                  const textSpot = laidOut.circle ?? circleSpot;
+                  const textSpot = laidOut[`${n}:circle`] ?? circleSpot;
                   return (
                     <text
                       x={textSpot.x}

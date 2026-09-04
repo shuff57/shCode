@@ -697,16 +697,40 @@ export function newSketch(doc: ModelDoc, plane: SketchPlane = 'xy'): SketchFeatu
 
 /** A circle, drawn as the two ends of a diameter -- see SketchFeature.shape.
  *  Not a rectangle-with-round-corners and not four points: the tag is the
- *  only thing that makes it a circle, so the data says so directly. */
-export function newCircleSketch(doc: ModelDoc, plane: SketchPlane = 'xy'): SketchFeature {
+ *  only thing that makes it a circle, so the data says so directly.
+ *
+ *  `centre` defaults to the origin -- a beginner asked for "a circle at the
+ *  rectangle's centre" had no better move than typing the numbers out by
+ *  hand, so the tool call site (ModelEditor.tsx) works out where the
+ *  selected sketch actually sits and passes that in. Measured 2026-09-04. */
+export function newCircleSketch(
+  doc: ModelDoc, plane: SketchPlane = 'xy', centre: [number, number] = [0, 0],
+): SketchFeature {
   return {
     id: nextId(doc, 'sk'),
     kind: 'sketch',
     plane,
     offset: 0,
-    points: [[-10, 0], [10, 0]],
+    points: [[centre[0] - 10, centre[1]], [centre[0] + 10, centre[1]]],
     shape: 'circle',
   };
+}
+
+/** The plain bounding-box centre of a sketch's DESIGN corners -- not an
+ *  area-weighted centroid (lib/sketch-outline.ts's centroidOf is that, and
+ *  stays private to the label-placement math it exists for). A pure
+ *  function so a tool call site can ask "where does this sketch sit" without
+ *  reaching into the outline/label machinery for an answer this simple.
+ *  Empty input reads as the origin -- there is nothing to centre on. */
+export function sketchBBoxCentre(points: Array<[number, number]>): [number, number] {
+  if (points.length === 0) return [0, 0];
+  let loU = points[0][0], hiU = points[0][0];
+  let loV = points[0][1], hiV = points[0][1];
+  for (const [u, v] of points) {
+    if (u < loU) loU = u; else if (u > hiU) hiU = u;
+    if (v < loV) loV = v; else if (v > hiV) hiV = v;
+  }
+  return [(loU + hiU) / 2, (loV + hiV) / 2];
 }
 
 /**
