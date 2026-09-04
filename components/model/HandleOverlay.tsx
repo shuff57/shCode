@@ -11,8 +11,9 @@
 // the drag, which is what keeps the model still while a dimension moves.
 
 import { useEffect, useRef, useState } from 'react';
-import { arcFromBulge, type Point } from '../../lib/sketch-arc';
+import { arcFromBulge, segmentRoles, type Point } from '../../lib/sketch-arc';
 import { type Constraint, losingEdges, residualsOf } from '../../lib/sketch-solve';
+import { sketchLabels } from '../../lib/sketch-outline';
 
 /**
  * One selected sketch's outline, in plane coordinates -- what the overlay
@@ -81,9 +82,18 @@ interface Props {
    * means a tap on a handle does nothing, same as before this prop existed.
    */
   onTap?: (clientX: number, clientY: number) => void;
-  /** When true, a click-to-draw tool is active: a transparent catcher fills
-   *  the layer and reports each click's plane coordinates via `onPlace`. */
-  drawing?: boolean;
+  /**
+   * When set, a click-to-draw tool is active: a transparent catcher fills
+   * the layer and reports each click's plane coordinates via `onPlace`. The
+   * tool name ('rect' | 'polygon') picks which shape the rubber band between
+   * the first and second click draws; a plain `true` (every call site as of
+   * this writing) falls back to a rectangle preview, since that is still
+   * better than no preview at all for the one caller that has not yet been
+   * updated to pass its actual drawTool through -- see the doc comment on
+   * SandboxWorkspace.tsx's own `drawing={drawTool != null}` line for the
+   * one-line change that unlocks the hexagon preview too.
+   */
+  drawing?: boolean | 'rect' | 'polygon';
   /** Plane (u, v) of a click while `drawing` is true. */
   onPlace?: (u: number, v: number) => void;
   /**
@@ -194,6 +204,41 @@ function edgeGlyphs(
     }
   });
   return out;
+}
+
+/**
+ * Which design corners carry a round or a chamfer, and what value to label
+ * them with -- recovered from the RENDERED outline alone, because
+ * `SketchOutline` (SandboxWorkspace.tsx's own carrier) never threads the raw
+ * `rounds`/`chamfers` dicts through, only `design`, `points`, `bulges` and
+ * `basis`. A 'corner' segment (segmentRoles) WITH a bulge is a round, sized
+ * by arcFromBulge's own radius off the same two trim points outlineOf()
+ * already produced; one with no bulge is a chamfer, sized by a trim point's
+ * distance back to the original corner (`design[basis]`) -- the corner
+ * itself, not a derived point, because that distance is exactly what
+ * chamferCorner() asked outlineOf() to cut.
+ */
+function cornerTreatmentsFrom(o: SketchOutline): { rounds: Record<number, number>; chamfers: Record<number, number> } {
+  const rounds: Record<number, number> = {};
+  const chamfers: Record<number, number> = {};
+  if (o.shape === 'circle') return { rounds, chamfers };
+  const count = o.points.length;
+  const roles = segmentRoles(o.basis);
+  for (let i = 0; i < count; i++) {
+    if (roles[i]?.role !== 'corner') continue;
+    const corner = roles[i].index;
+    const design = o.design[corner];
+    if (!design) continue;
+    const a = o.points[i];
+    const b = o.points[(i + 1) % count];
+    const bulge = o.bulges?.[i];
+    if (bulge) {
+      rounds[corner] = arcFromBulge(a, b, bulge).radius;
+    } else {
+      chamfers[corner] = Math.hypot(a[0] - design[0], a[1] - design[1]);
+    }
+  }
+  return { rounds, chamfers };
 }
 
 /** The outline's screen points, or null when a corner anchor is not on
@@ -341,6 +386,17 @@ export default function HandleOverlay({
   // convention it relies on to find the partner's `v` param is model-handles
   // .ts's own (`${id}_p${n}u` / `${id}_p${n}v`), both files this build owns.
   const mirror = useRef<{ param: string; paramV: string; centreU: number; centreV: number } | null>(null);
+  // The rubber band between the first and second click of Rectangle/Polygon
+  // placement. `drawFirstLocal` mirrors the parent's own first-click state
+  // (see handleCanvasClick's own comment); `drawPointer` is wherever the
+  // mouse is right now, tracked only while a first click is already down --
+  // there is nothing to preview before that, and tracking it unconditionally
+  // would re-render this layer on every mouse move even with no tool active.
+  const drawFirstLocal = useRef<Point | null>(null);
+  const [drawPointer, setDrawPointer] = useState<Point | null>(null);
+  useEffect(() => {
+    if (!drawing) { drawFirstLocal.current = null; setDrawPointer(null); }
+  }, [drawing]);
   function circleMirrorFor(param: string) {
     for (const o of outlines ?? []) {
       if (o.shape !== 'circle' || o.corners.length !== 2) continue;
@@ -410,25 +466,50 @@ export default function HandleOverlay({
 
   const at = new Map(points.map((p) => [p.param, p]));
 
-  // A click (not a drag) measured against the plane anchor's own screen
-  // position. The anchor sits at plane-coordinate (0,0), so this is the
-  // click's absolute (u, v), not a delta -- the same inverse projection the
-  // two-axis drag uses, with dx,dy being the click's offset from the anchor.
-  function handleCanvasClick(e: React.MouseEvent) {
-    if (!drawing || !onPlace || !layerRef.current) return;
+  // A click or a hover (not a drag) measured against the plane anchor's own
+  // screen position. The anchor sits at plane-coordinate (0,0), so this is
+  // the pointer's absolute (u, v), not a delta -- the same inverse
+  // projection the two-axis drag uses, with dx,dy being the offset from the
+  // anchor.
+  function planeCoordsAt(clientX: number, clientY: number): Point | null {
+    if (!layerRef.current) return null;
     const rect = layerRef.current.getBoundingClientRect();
-    const localX = e.clientX - rect.left;
-    const localY = e.clientY - rect.top;
+    const localX = clientX - rect.left;
+    const localY = clientY - rect.top;
     const origin = points.find((p) => p.param === '__planeOrigin');
     if (!origin || origin.ux === undefined || origin.uy === undefined
-        || origin.vx === undefined || origin.vy === undefined) return;
+        || origin.vx === undefined || origin.vy === undefined) return null;
     const dx = localX - origin.x;
     const dy = localY - origin.y;
     const det = origin.ux * origin.vy - origin.uy * origin.vx;
-    if (Math.abs(det) < 1e-6) return;
+    if (Math.abs(det) < 1e-6) return null;
     const u = (dx * origin.vy - dy * origin.vx) / det;
     const v = (origin.ux * dy - origin.uy * dx) / det;
-    onPlace(u, v);
+    return [u, v];
+  }
+
+  function handleCanvasClick(e: React.MouseEvent) {
+    if (!drawing || !onPlace) return;
+    const uv = planeCoordsAt(e.clientX, e.clientY);
+    if (!uv) return;
+    // Mirrors the parent's own first-click/second-click state (SandboxWork
+    // space.tsx's drawFirst) purely for the rubber band below -- the parent
+    // is still the one actually deciding what gets built. A degenerate
+    // second click (too close to the first, same floor newRectangleSketch/
+    // newPolygonSketch use) leaves drawFirstLocal set, matching the parent's
+    // own "stay in draw mode, let them click again" behaviour, so the band
+    // keeps tracking the SAME first corner rather than restarting on it.
+    if (drawFirstLocal.current === null) {
+      drawFirstLocal.current = uv;
+      onPlace(uv[0], uv[1]);
+      return;
+    }
+    const [fu, fv] = drawFirstLocal.current;
+    const degenerate = drawing === 'polygon'
+      ? Math.hypot(uv[0] - fu, uv[1] - fv) < 1
+      : Math.abs(uv[0] - fu) < 1 || Math.abs(uv[1] - fv) < 1;
+    onPlace(uv[0], uv[1]);
+    if (!degenerate) drawFirstLocal.current = null;
   }
 
   return (
@@ -464,6 +545,16 @@ export default function HandleOverlay({
               if (!glyphAt(at, o.corners, g.edge)) continue;
               chips.set(g.edge, [...(chips.get(g.edge) ?? []), { text: g.text, losing: g.losing }]);
             }
+            // The actual numbers on the geometry -- "40", "20", "R3" -- not
+            // just which rule is set. lib/sketch-outline.ts lays these out in
+            // plane coordinates; the treatments it needs to tell a round from
+            // a chamfer are read back off the RENDERED outline (see
+            // cornerTreatmentsFrom's own comment), because SketchOutline
+            // never carries the raw rounds/chamfers dict through.
+            const { rounds, chamfers } = cornerTreatmentsFrom(o);
+            const labels = o.shape === 'circle'
+              ? { edges: [], corners: [], bows: [] }
+              : sketchLabels(o.design, o.constraints ?? [], rounds, chamfers, o.bulges);
             return (
               <g key={n}>
                 <polygon
@@ -527,6 +618,102 @@ export default function HandleOverlay({
                         </text>
                       ))}
                     </g>
+                  );
+                })}
+                {labels.edges.map((l) => {
+                  const anchor = at.get(o.corners[l.edge]);
+                  if (!anchor || anchor.ux === undefined || anchor.uy === undefined) return null;
+                  const spot = projectFrom(anchor, o.design[l.edge], [l.x, l.y]);
+                  // A ruled length also gets a thin dimension line -- ticks at
+                  // both ends, parallel to the edge -- so a DRIVEN measurement
+                  // reads differently from a passive one, the way jsketcher's
+                  // own dimension lines do. Drawn between the two corner
+                  // anchors directly (screen space), not reprojected through
+                  // `spot`, so the line stays exactly parallel to the edge on
+                  // screen regardless of how far the label itself sits out.
+                  const a = at.get(o.corners[l.edge]);
+                  const b = at.get(o.corners[(l.edge + 1) % o.corners.length]);
+                  const TICK = 4;
+                  let dimLine: { x1: number; y1: number; x2: number; y2: number; tickX: number; tickY: number } | null = null;
+                  if (l.kind === 'dimension' && a && b) {
+                    const dx = b.x - a.x;
+                    const dy = b.y - a.y;
+                    const len = Math.hypot(dx, dy);
+                    if (len > 1e-6) {
+                      // Perpendicular unit vector -- also the tick direction,
+                      // computed once rather than re-derived per tick mark.
+                      const px = -dy / len;
+                      const py = dx / len;
+                      // How far off the edge line the label itself landed,
+                      // projected onto that perpendicular -- so the dimension
+                      // line sits at the label's own offset, not a second,
+                      // independently guessed one.
+                      const off = (spot.x - (a.x + b.x) / 2) * px + (spot.y - (a.y + b.y) / 2) * py;
+                      dimLine = {
+                        x1: a.x + px * off, y1: a.y + py * off,
+                        x2: b.x + px * off, y2: b.y + py * off,
+                        tickX: px * TICK, tickY: py * TICK,
+                      };
+                    }
+                  }
+                  return (
+                    <g key={`len-${l.edge}`}>
+                      {dimLine && (
+                        <g className="sketch-dim">
+                          <line x1={dimLine.x1} y1={dimLine.y1} x2={dimLine.x2} y2={dimLine.y2} />
+                          <line
+                            x1={dimLine.x1 - dimLine.tickX} y1={dimLine.y1 - dimLine.tickY}
+                            x2={dimLine.x1 + dimLine.tickX} y2={dimLine.y1 + dimLine.tickY}
+                          />
+                          <line
+                            x1={dimLine.x2 - dimLine.tickX} y1={dimLine.y2 - dimLine.tickY}
+                            x2={dimLine.x2 + dimLine.tickX} y2={dimLine.y2 + dimLine.tickY}
+                          />
+                        </g>
+                      )}
+                      <text
+                        x={spot.x}
+                        y={spot.y}
+                        className={l.kind === 'dimension' ? 'sketch-dim-text' : 'sketch-len-text'}
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                      >
+                        {l.text}
+                      </text>
+                    </g>
+                  );
+                })}
+                {labels.corners.map((l) => {
+                  const anchor = at.get(o.corners[l.corner]);
+                  if (!anchor) return null;
+                  return (
+                    <text
+                      key={`corner-${l.corner}`}
+                      x={anchor.x + 12}
+                      y={anchor.y - 12}
+                      className="sketch-round-text"
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                    >
+                      {l.text}
+                    </text>
+                  );
+                })}
+                {labels.bows.map((l) => {
+                  const anchor = at.get(o.corners[l.edge]);
+                  if (!anchor || anchor.ux === undefined || anchor.uy === undefined) return null;
+                  const spot = projectFrom(anchor, o.design[l.edge], [l.x, l.y]);
+                  return (
+                    <text
+                      key={`bow-${l.edge}`}
+                      x={spot.x}
+                      y={spot.y}
+                      className="sketch-len-text"
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                    >
+                      {l.text}
+                    </text>
                   );
                 })}
               </g>
@@ -653,9 +840,66 @@ export default function HandleOverlay({
         <div
           className="draw-catcher"
           onClick={handleCanvasClick}
+          onMouseMove={(e) => {
+            if (!drawFirstLocal.current) return;
+            const uv = planeCoordsAt(e.clientX, e.clientY);
+            if (uv) setDrawPointer(uv);
+          }}
           aria-label="Click to place a point on the sketch plane"
         />
       )}
+      {/* The rubber band: the shape that would result if the SECOND click
+          landed right here. Nothing rendered this before -- a beginner
+          moving the mouse between the two clicks of Rectangle or Polygon saw
+          no feedback at all, unlike a real CAD tool's drag preview. Plane
+          coordinates only (this is what sketchLabels/outlineOf both already
+          work in); the screen projection reuses the same plane-origin anchor
+          handleCanvasClick's inverse projection already resolves against. */}
+      {drawing && drawFirstLocal.current && drawPointer && (() => {
+        const origin = points.find((p) => p.param === '__planeOrigin');
+        if (!origin || origin.ux === undefined || origin.uy === undefined
+            || origin.vx === undefined || origin.vy === undefined) return null;
+        const toScreen = ([u, v]: Point) => ({
+          x: origin.x + u * origin.ux! + v * origin.vx!,
+          y: origin.y + u * origin.uy! + v * origin.vy!,
+        });
+        const [fu, fv] = drawFirstLocal.current;
+        const [pu, pv] = drawPointer;
+        let planePts: Point[];
+        if (drawing === 'polygon') {
+          // Same construction as newPolygonSketch (lib/model-types.ts): the
+          // first click is the centre, the pointer is one vertex, six sides.
+          const dx = pu - fu;
+          const dy = pv - fv;
+          const radius = Math.hypot(dx, dy);
+          const startAngle = Math.atan2(dy, dx);
+          planePts = Array.from({ length: 6 }, (_, i) => {
+            const a = startAngle + (i / 6) * Math.PI * 2;
+            return [fu + radius * Math.cos(a), fv + radius * Math.sin(a)] as Point;
+          });
+        } else {
+          // newRectangleSketch's own construction: axis-aligned corners of
+          // the box the two clicks describe, whichever way they were dragged.
+          const loU = Math.min(fu, pu), hiU = Math.max(fu, pu);
+          const loV = Math.min(fv, pv), hiV = Math.max(fv, pv);
+          planePts = [[loU, loV], [hiU, loV], [hiU, hiV], [loU, hiV]];
+        }
+        return (
+          // pointer-events: none is load-bearing here, not decorative: this
+          // svg renders AFTER the draw-catcher div in the DOM (it needs
+          // drawFirstLocal/drawPointer, which only exist once the catcher is
+          // already up), so without it the rubber band's own painted fill
+          // would sit on top and swallow the SECOND click it exists to
+          // preview -- an SVG shape with a fill is pointer-reachable by
+          // default.
+          <svg className="sketch-lines" aria-hidden="true" style={{ pointerEvents: 'none' }}>
+            <polygon
+              className="rubber-band"
+              points={planePts.map((q) => { const s = toScreen(q); return `${s.x},${s.y}`; }).join(' ')}
+            />
+          </svg>
+        );
+      })()}
       {/* Rendered after the draw-catcher so its × is clickable mid-draw, and
           after the svg, which is aria-hidden -- this is the only thing that
           announces a conflict to a screen reader. */}
@@ -694,6 +938,32 @@ export default function HandleOverlay({
         .sketch-lines .is-losing {
           fill: none;
           stroke: #ff5555; stroke-width: 2.5; stroke-dasharray: 5 3;
+        }
+        /* The three kinds of number drawn on top of a sketch: a plain length
+           nobody has ruled (dim token, same "just information" weight as a
+           handle's title tooltip), a driven dimension (fg token -- brighter,
+           because a rule set on purpose is a decision, not a readout), and a
+           round/chamfer radius (the panel's own "costly" amber, tying it to
+           the same control that set it). None of the three reuse the rule
+           glyphs' purple/red -- those already mean "which rule, and is it
+           losing"; these mean "what is the number right now". */
+        .sketch-lines .sketch-len-text {
+          fill: #6272a4; font-size: 11px; font-variant-numeric: tabular-nums;
+          paint-order: stroke; stroke: #282a36; stroke-width: 3px;
+        }
+        .sketch-lines .sketch-dim-text {
+          fill: #f8f8f2; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums;
+          paint-order: stroke; stroke: #282a36; stroke-width: 3px;
+        }
+        .sketch-lines .sketch-round-text {
+          fill: #ffb86c; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums;
+          paint-order: stroke; stroke: #282a36; stroke-width: 3px;
+        }
+        /* A dimension line's own stroke, thin and solid -- jsketcher draws
+           these with a lighter weight than the outline itself, which is what
+           tells a measurement apart from geometry at a glance. */
+        .sketch-lines .sketch-dim line {
+          stroke: #f8f8f2; stroke-width: 1; opacity: 0.7;
         }
         /* The Rules panel names which rules disagree and this does not repeat
            that -- it exists to be impossible to miss and to point at the red. */

@@ -23,6 +23,7 @@ try {
       'lib/model-types.ts',
       'lib/model-codegen.ts',
       'lib/model-handles.ts',
+      'lib/sketch-outline.ts',
       '--outDir', out,
       '--module', 'commonjs',
       '--target', 'es2022',

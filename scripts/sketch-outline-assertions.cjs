@@ -22,6 +22,7 @@ module.exports = function run(dir) {
   const gen = require(path.join(dir, 'model-codegen.js'));
   const handles = require(path.join(dir, 'model-handles.js'));
   const solve = require(path.join(dir, 'sketch-solve.js'));
+  const outline = require(path.join(dir, 'sketch-outline.js'));
 
   let pass = 0;
   const fails = [];
@@ -646,6 +647,87 @@ module.exports = function run(dir) {
       && cham.find((r) => r.role === 'corner').index === 1
       && cham.filter((r) => r.role === 'edge').map((r) => r.index).join(',') === '0,1,2,3',
     JSON.stringify(cham));
+
+  console.log('\n=== sketch-outline: what the on-canvas labels say and where ===');
+
+  const near5 = (a, b, tol = 1e-6) => Math.abs(a - b) < tol;
+
+  check('two decimals only when needed', outline.formatLabel(40) === '40'
+    && outline.formatLabel(17.5) === '17.5'
+    && outline.formatLabel(17.25) === '17.25'
+    && outline.formatLabel(17.256) === '17.26'
+    && outline.formatLabel(40.0001) === '40',
+    JSON.stringify([outline.formatLabel(40), outline.formatLabel(17.5), outline.formatLabel(17.25), outline.formatLabel(17.256), outline.formatLabel(40.0001)]));
+
+  const rectLabels = outline.sketchLabels(square.points, []);
+  check('a rectangle gets four edge labels, one per edge',
+    rectLabels.edges.length === 4, JSON.stringify(rectLabels.edges));
+  check('opposite edges read the same length -- 40/20/40/20',
+    rectLabels.edges.map((l) => l.text).join(',') === '40,20,40,20',
+    JSON.stringify(rectLabels.edges.map((l) => l.text)));
+  check('nothing is ruled, so every label is a plain length, not a dimension',
+    rectLabels.edges.every((l) => l.kind === 'length'));
+  check('no rounds, no chamfers, no bows means no corner or bow labels',
+    rectLabels.corners.length === 0 && rectLabels.bows.length === 0);
+
+  // Edge 0 runs (0,0) -> (40,0). Its outward normal is -y (the rectangle's
+  // centroid at (20,10) sits on the +y side), so the label lands BELOW the
+  // edge, at y = 0 - LABEL_OFFSET -- outside the shape, never crossing it.
+  const e0 = rectLabels.edges.find((l) => l.edge === 0);
+  check('edge 0\'s label sits at its midpoint, offset OUTWARD (away from centroid)',
+    near5(e0.x, 20) && e0.y < 0, JSON.stringify(e0));
+  // Edge 1 runs (40,0) -> (40,20); centroid is on the -x side, so this label
+  // lands to the RIGHT of the shape (x > 40).
+  const e1 = rectLabels.edges.find((l) => l.edge === 1);
+  check('edge 1\'s label also sits outward, on the opposite side from the centroid',
+    near5(e1.y, 10) && e1.x > 40, JSON.stringify(e1));
+
+  const ruledLabels = outline.sketchLabels(square.points, [{ kind: 'length', edge: 0, value: 40 }]);
+  check('a Length rule on edge 0 draws THAT edge as a dimension, not a length',
+    ruledLabels.edges.find((l) => l.edge === 0).kind === 'dimension'
+    && ruledLabels.edges.filter((l) => l.kind === 'length').length === 3,
+    JSON.stringify(ruledLabels.edges));
+
+  const roundLabels = outline.sketchLabels(square.points, [], { 1: 3 });
+  check('a rounded corner gets an "R" label at that corner, and the edges stay labelled straight',
+    roundLabels.corners.length === 1
+    && roundLabels.corners[0].corner === 1
+    && roundLabels.corners[0].kind === 'round'
+    && roundLabels.corners[0].text === 'R3'
+    && roundLabels.edges.length === 4,
+    JSON.stringify(roundLabels.corners));
+
+  const chamferLabels = outline.sketchLabels(square.points, [], undefined, { 2: 2.5 });
+  check('a chamfered corner gets a "C" label',
+    chamferLabels.corners.length === 1
+    && chamferLabels.corners[0].kind === 'chamfer'
+    && chamferLabels.corners[0].text === 'C2.5',
+    JSON.stringify(chamferLabels.corners));
+
+  const bothLabels = outline.sketchLabels(square.points, [], { 0: 4 }, { 0: 4 });
+  check('a corner asked for both is labelled ROUND, not chamfer -- outlineOf\'s own tie-break',
+    bothLabels.corners.length === 1 && bothLabels.corners[0].kind === 'round',
+    JSON.stringify(bothLabels.corners));
+
+  // A legacy bulge on edge 0: the edge is curved, so it gets a bow label
+  // instead of a straight length, and the label sits on the arc's own peak
+  // (further from the chord than the chord midpoint itself), not crossing
+  // into the shape.
+  const bowed = outline.sketchLabels(square.points, [], undefined, undefined, { 0: 0.5 });
+  check('a bowed (legacy bulge) edge is skipped as a straight length',
+    bowed.edges.length === 3 && !bowed.edges.some((l) => l.edge === 0),
+    JSON.stringify(bowed.edges));
+  check('...and gets exactly one bow label instead, signed positive for a positive bulge',
+    bowed.bows.length === 1 && bowed.bows[0].edge === 0 && bowed.bows[0].text.startsWith('+'),
+    JSON.stringify(bowed.bows));
+  const bowPeakY = bowed.bows[0].y;
+  check('...positioned outside the chord, on the far side from the rectangle\'s own middle',
+    bowPeakY < 0, `peak at y=${bowPeakY}, chord runs along y=0, centroid is at y=10`);
+
+  check('a collapsed (zero-length) edge is skipped rather than producing a NaN label',
+    outline.sketchLabels([[5, 5], [5, 5], [40, 25]], []).edges.every(
+      (l) => Number.isFinite(l.x) && Number.isFinite(l.y)
+    ));
 
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;

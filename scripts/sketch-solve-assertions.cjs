@@ -480,6 +480,28 @@ module.exports = function run(dir) {
     JSON.stringify([...panelEdges].sort((a, b) => a - b)) === JSON.stringify(litEdges),
     JSON.stringify([...panelEdges]) + ' vs ' + JSON.stringify(litEdges));
 
+  // A conflict banner reported on the CANVAS (HandleOverlay.tsx) and in the
+  // RULES PANEL (SketchConstraints.tsx) both key off losingEdges()/residualOf
+  // freshly, every render, off whichever sketch is currently selected -- so
+  // the pin here is that the FUNCTION itself carries no memory of a previous
+  // sketch's trouble: a conflicting doc followed by an unrelated, unconflicted
+  // one must come back clean, not still flagged. (Measured 2026-09-04: the
+  // lens's own persisting banner turned out to be a DIFFERENT, unrelated
+  // message -- ReshapeParamsPanel's `stale === 'empty'` notice, which
+  // SandboxWorkspace.tsx sets from the B-rep viewport's triangle count and
+  // which fires on ANY bare, not-yet-pulled sketch, conflict or not, freshly
+  // drawn or not. This solver-side claim was already true; it is pinned here
+  // so a future change to losingEdges/residualOf cannot quietly reintroduce
+  // cross-sketch leakage without a test noticing.)
+  const conflicting = S.losingEdges(fightSolved.points, fight);
+  check('a genuinely conflicting sketch reddens something, to set up the next check',
+    conflicting.length > 0, JSON.stringify(conflicting));
+  const unrelatedCircle = [[-10, 0], [10, 0]];
+  check('an unrelated sketch solved right after reddens nothing left over',
+    S.losingEdges(unrelatedCircle, []).length === 0,
+    JSON.stringify(S.losingEdges(unrelatedCircle, [])));
+  check('...and its residual reads clean, not the previous sketch\'s',
+    S.residualOf(unrelatedCircle, []) === 0);
 
   if (deltas.length) {
     console.log('\n=== HOW THIS SOLVER SETTLES (reported, never gated) ===');
