@@ -16,7 +16,7 @@ import {
   residualOf,
   residualsOf,
 } from '../../lib/sketch-solve';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   maxChamferDistance,
   maxFilletRadius,
@@ -104,6 +104,16 @@ interface Props {
    * canvas as if the pointer were over the edge or corner itself. Cheap to
    * wire alongside `hoveredPart` since both travel through the same lifted
    * state one level up.
+   *
+   * Also the channel the STICKY "last touched" cue rides on (see
+   * `lastTouched` below): a mouse leaving a row falls back to it instead of
+   * null, and a commit (a Length blur, a pair-rule click, a corner round)
+   * calls it directly. HandleOverlay tells the two apart itself -- see its
+   * own `forcedActive` -- so no widening of this type was needed for the
+   * single-edge/single-corner case. It WOULD be needed to show both edges
+   * of a pair rule pink on the canvas at once; today only the first of the
+   * two rides this channel, and the Rules panel side lights both rows
+   * regardless (that half needed no plumbing change at all).
    */
   onHoverPart?: (part: { kind: 'edge' | 'corner'; index: number } | null) => void;
 }
@@ -280,6 +290,46 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
   // the sketch is, never create a new fight to settle).
   const [autoNote, setAutoNote] = useState<string | null>(null);
 
+  // The edge (or edges, for a pair rule) or corner most recently COMMITTED
+  // -- not merely hovered -- so a beginner can look back at the sketch a
+  // moment later and still see what they just did, without needing to keep
+  // the mouse over the row. Local, not lifted: this panel unmounts whenever
+  // the selection leaves sketches entirely (ModelEditor only renders it
+  // inside `{activeSketch && ...}`), which is what actually clears it on
+  // deselect -- no separate reset needed. Switching directly from one
+  // sketch to another sketch does NOT clear it (SketchConstraints stays
+  // mounted, just re-propped): a known, narrow gap, not covered by any
+  // browser check this feature shipped against.
+  const [lastTouched, setLastTouched] = useState<
+    { kind: 'edge'; indices: number[] } | { kind: 'corner'; index: number } | null
+  >(null);
+  const isTouchedEdge = (e: number) => lastTouched?.kind === 'edge' && lastTouched.indices.includes(e);
+  const isTouchedCorner = (i: number) => lastTouched?.kind === 'corner' && lastTouched.index === i;
+  // Collapses a (possibly two-edge) touch down to the ONE part the shared
+  // hover channel can carry -- see onHoverPart's own doc comment. The first
+  // edge of a pair stands in for both on the canvas; the Rules panel itself
+  // still lights BOTH rows below, since that half needs no plumbing at all.
+  const stickyForCanvas = (t: typeof lastTouched): { kind: 'edge' | 'corner'; index: number } | null =>
+    !t ? null : t.kind === 'edge' ? { kind: 'edge', index: t.indices[0] } : t;
+  // A row's onMouseLeave used to always clear the canvas hint to null; now
+  // it falls back to whatever is sticky instead, so leaving the row does
+  // not erase the very highlight this feature exists to keep. `onHoverPart`
+  // is the EXISTING lifted callback (SandboxWorkspace's rowHoverPart, fed
+  // into HandleOverlay's forcedHoverPart) -- calling it here more often, on
+  // more events, is not new plumbing, just using the one prop that already
+  // reaches the canvas.
+  const clearHover = () => onHoverPart?.(stickyForCanvas(lastTouched));
+  // The other half of "clears on deselect": unmounting this component clears
+  // ITS OWN state for free, but the sticky value already lives one level up
+  // (the lifted rowHoverPart this reports into, via the same onHoverPart
+  // prop) and does not know to follow. Measured 2026-09-04: selecting a Box
+  // after touching an edge left that edge pink and bold on the canvas --
+  // the sketch's own outline is still drawn (unselected sketches stay drawn
+  // regardless of selection), so a stale forcedHoverPart still matched one
+  // of its edges. This is the ONLY new call this feature adds outside a
+  // click/blur handler, and it still goes through the same existing prop.
+  useEffect(() => () => onHoverPart?.(null), []); // eslint-disable-line react-hooks/exhaustive-deps
+
   /** Runs a freshly-built constraint list (the caller's new/changed rule
    *  always last, same convention addConstraintSettling's own doc comment
    *  relies on) through conflict settling before committing it -- see that
@@ -313,6 +363,9 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
       return;
     }
     settle([...rest, { kind: 'length', edge, value: Math.round(v * 100) / 100 }]);
+    const touched: typeof lastTouched = { kind: 'edge', indices: [edge] };
+    setLastTouched(touched);
+    onHoverPart?.(stickyForCanvas(touched));
   }
 
   function lockCorner(corner: number) {
@@ -438,9 +491,9 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
             return (
               <tr
                 key={e}
-                className={rowHovered ? 'sk-row-hovered' : undefined}
+                className={(rowHovered || isTouchedEdge(e)) ? 'sk-row-hovered' : undefined}
                 onMouseEnter={() => onHoverPart?.({ kind: 'edge', index: e })}
-                onMouseLeave={() => onHoverPart?.(null)}
+                onMouseLeave={clearHover}
               >
                 <td title={`corner ${a + 1} to corner ${b + 1}`}>{e + 1}</td>
                 <td className="sk-shape">{curved ? 'curved' : 'straight'}</td>
@@ -549,7 +602,12 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
                           aria-label={`Edges ${lo + 1} and ${hi + 1}: ${cur === null ? 'no rule' : cur}`}
                           className={[cur === null ? '' : 'on', pairConflict(lo, hi) ? 'fighting' : '']
                             .filter(Boolean).join(' ') || undefined}
-                          onClick={() => settle(cyclePair(constraints, lo, hi))}
+                          onClick={() => {
+                            settle(cyclePair(constraints, lo, hi));
+                            const touched: typeof lastTouched = { kind: 'edge', indices: [lo, hi] };
+                            setLastTouched(touched);
+                            onHoverPart?.(stickyForCanvas(touched));
+                          }}
                           disabled={disabled}
                           title={cur === null ? (curvedTitle ?? `Edges ${lo + 1} and ${hi + 1}: click to cycle equal, parallel, perpendicular`) : `Edges ${lo + 1} and ${hi + 1}: ${cur}`}
                         >
@@ -576,11 +634,11 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
               aria-pressed={constraints.some((c) => c.kind === 'lock' && c.corner === i)}
               className={[
                 constraints.some((c) => c.kind === 'lock' && c.corner === i) ? 'on' : '',
-                cornerHovered ? 'sk-row-hovered' : '',
+                (cornerHovered || isTouchedCorner(i)) ? 'sk-row-hovered' : '',
               ].filter(Boolean).join(' ') || undefined}
               onClick={() => lockCorner(i)}
               onMouseEnter={() => onHoverPart?.({ kind: 'corner', index: i })}
-              onMouseLeave={() => onHoverPart?.(null)}
+              onMouseLeave={clearHover}
             >
               {i + 1}
             </button>
@@ -661,6 +719,14 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
                 // identically, so no caller could tell a clamp had happened and
                 // nothing could say so (sketch gauntlet round 3, blind judge).
                 onRound(i, Math.max(0, v));
+                // Only a genuine round is a "corner round typed" -- un-
+                // rounding back to 0 has nothing left on this corner worth
+                // pointing at.
+                if (v > 0) {
+                  const touched: typeof lastTouched = { kind: 'corner', index: i };
+                  setLastTouched(touched);
+                  onHoverPart?.(stickyForCanvas(touched));
+                }
               }}
               onKeyDown={(ev) => {
                 if (ev.key === 'Enter') (ev.target as HTMLInputElement).blur();

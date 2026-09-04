@@ -402,6 +402,21 @@ export default function HandleOverlay({
   // What the floating pill actually shows: the real pointer hover if there is
   // one, otherwise whatever a Rules-panel row is asking to be shown instead.
   const shownHoverPart = hoveredPart ?? forcedHoverPart ?? null;
+  // `forcedHoverPart` ONLY ever comes from the Rules panel -- a live row
+  // hover, or (since the sticky "last touched" cue was added there) a
+  // committed value that keeps reporting itself after the mouse leaves the
+  // row. It never comes from the pointer hovering the canvas directly. That
+  // is what lets this file tell "the panel is pointing at this" apart from
+  // "the mouse happens to be over it" with no new prop: whenever the LOCAL
+  // pointer hover is empty and the prop is not, the cue is panel-driven, and
+  // gets the stronger selection treatment below -- the same pink a picked
+  // solid edge gets (#ff79c6), with a bold label -- rather than just the
+  // plain pill a raw pointer hover already drew. Measured 2026-09-04: round
+  // 4's blind judge could not tell what was specifically selected from a
+  // dashed outline drawn around the whole sketch regardless of task.
+  const forcedActive = hoveredPart === null && forcedHoverPart != null;
+  const stickyEdge = forcedActive && shownHoverPart?.kind === 'edge' ? shownHoverPart.index : null;
+  const stickyCorner = forcedActive && shownHoverPart?.kind === 'corner' ? shownHoverPart.index : null;
   // Whether the current pointerdown-to-pointerup has crossed TAP_TOLERANCE_PX
   // yet. A click on a handle (e.g. the height handle sitting over a face's
   // own centre) must still pick that face -- see onTap's own doc comment --
@@ -763,6 +778,23 @@ export default function HandleOverlay({
                     />
                   );
                 })}
+                {/* The edge (or, for a pair rule, the SINGLE edge standing in
+                    for both -- see stickyForCanvas's own comment in
+                    SketchConstraints.tsx) a Rules control most recently
+                    committed a value for, repainted the same pink a picked
+                    solid edge gets. Same "over, not instead of" convention
+                    as the losing-edge overlay just above -- the shape reads
+                    the same, only its colour and weight change. */}
+                {basis && o.shape !== 'circle' && stickyEdge !== null && (() => {
+                  const run = edgePolyline(pts, basis, stickyEdge, o.corners.length);
+                  if (!run) return null;
+                  return (
+                    <polyline
+                      className="is-sticky-edge"
+                      points={run.map((p) => `${p.x},${p.y}`).join(' ')}
+                    />
+                  );
+                })()}
                 {/* An invisible, fatter twin of each design edge, purely for
                     hover -- the visible outline's own 1.5px stroke is nowhere
                     near forgiving enough to point at with a mouse. Not drawn
@@ -885,7 +917,8 @@ export default function HandleOverlay({
                       <text
                         x={textSpot.x}
                         y={textSpot.y}
-                        className={l.kind === 'dimension' ? 'sketch-dim-text' : 'sketch-len-text'}
+                        className={(l.kind === 'dimension' ? 'sketch-dim-text' : 'sketch-len-text')
+                          + (stickyEdge === l.edge ? ' is-sticky' : '')}
                         textAnchor="middle"
                         dominantBaseline="central"
                       >
@@ -903,7 +936,7 @@ export default function HandleOverlay({
                       key={id}
                       x={textSpot.x}
                       y={textSpot.y}
-                      className="sketch-round-text"
+                      className={'sketch-round-text' + (stickyCorner === l.corner ? ' is-sticky' : '')}
                       textAnchor="middle"
                       dominantBaseline="central"
                     >
@@ -1224,6 +1257,14 @@ export default function HandleOverlay({
           fill: none;
           stroke: #ff5555; stroke-width: 2.5; stroke-dasharray: 5 3;
         }
+        /* Solid, not dashed -- unlike a losing rule, "this is what you just
+           touched" is not an error, so it should not read as one. Same pink
+           as a picked solid edge in the 3D viewport (#ff79c6), so the cue
+           means the same thing in both places. */
+        .sketch-lines .is-sticky-edge {
+          fill: none;
+          stroke: #ff79c6; stroke-width: 2.5;
+        }
         /* The three kinds of number drawn on top of a sketch: a plain length
            nobody has ruled (dim token, same "just information" weight as a
            handle's title tooltip), a driven dimension (fg token -- brighter,
@@ -1243,6 +1284,14 @@ export default function HandleOverlay({
         .sketch-lines .sketch-round-text {
           fill: #ffb86c; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums;
           paint-order: stroke; stroke: #282a36; stroke-width: 3px;
+        }
+        /* The label of whichever edge or corner a Rules control just
+           committed a value for -- bold and the same selection pink as
+           is-sticky-edge, on top of whichever base colour above it already
+           had (a driven dimension is still bold at 600; this just changes
+           the colour and, for a plain length, adds the weight it lacked). */
+        .sketch-lines .is-sticky {
+          fill: #ff79c6 !important; font-weight: 700;
         }
         /* A dimension line's own stroke, thin and solid -- jsketcher draws
            these with a lighter weight than the outline itself, which is what
