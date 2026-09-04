@@ -675,7 +675,7 @@ export type ShapeKind = 'box' | 'cylinder' | 'sphere' | 'cone' | 'torus';
  * exactly a rectangle's four degrees of freedom (width, height, position),
  * with nothing left for the solver to trade away.
  */
-const RECTANGLE_CONSTRAINTS: SketchConstraint[] = [
+export const RECTANGLE_CONSTRAINTS: SketchConstraint[] = [
   { kind: 'horizontal', edge: 0 },
   { kind: 'vertical', edge: 1 },
   { kind: 'horizontal', edge: 2 },

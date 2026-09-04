@@ -39,6 +39,7 @@ import {
   type SketchFeature,
   newShape,
   newSketch,
+  RECTANGLE_CONSTRAINTS,
   extentAlong,
 } from './model-types';
 import { generatedParams, pname } from './model-codegen';
@@ -72,6 +73,35 @@ function litVec(v: readonly number[]): string {
 
 function near(a: number, b: number, tol = 1e-6): boolean {
   return Math.abs(a - b) <= tol;
+}
+
+/** Exactly the rectangle rules a Rectangle-tool (or plain Sketch-tool)
+ *  sketch is born with -- lib/model-types.ts's own RECTANGLE_CONSTRAINTS,
+ *  structurally, not by reference (a doc that survived a save/load cycle
+ *  carries its own object instances). */
+function hasRectangleConstraints(constraints?: SketchFeature['constraints']): boolean {
+  if (!constraints || constraints.length !== RECTANGLE_CONSTRAINTS.length) return false;
+  return RECTANGLE_CONSTRAINTS.every((want, i) => {
+    const got = constraints[i];
+    return got?.kind === want.kind && 'edge' in got && got.edge === (want as { edge: number }).edge;
+  });
+}
+
+/**
+ * Width, height and centre of a 4-point outline in EXACTLY the corner order
+ * newRectangleSketch()/.rect() produce -- [[loU,loV],[hiU,loV],[hiU,hiV],
+ * [loU,hiV]] -- or null if the points are not that shape. Order-sensitive on
+ * purpose: a rectangle drawn or rotated by hand into some other winding is
+ * not what .rect() can express, and .polygon() is the honest fallback for it.
+ */
+function rectDims(points: Array<[number, number]>): [number, number, number, number] | null {
+  if (points.length !== 4) return null;
+  const [p0, p1, p2, p3] = points;
+  if (!near(p0[1], p1[1]) || !near(p1[0], p2[0]) || !near(p2[1], p3[1]) || !near(p3[0], p0[0])) return null;
+  const w = Math.abs(p1[0] - p0[0]);
+  const h = Math.abs(p2[1] - p1[1]);
+  if (!(w > 1e-9) || !(h > 1e-9)) return null;
+  return [w, h, (p0[0] + p1[0]) / 2, (p0[1] + p2[1]) / 2];
 }
 
 const FACE_WORD: Record<string, string> = {
@@ -302,11 +332,20 @@ export function toScript(doc: ModelDoc, namedParams?: readonly ScriptParamRef[])
       const offsetArg = f.offset !== 0 ? `, ${lit(f.offset)}` : '';
       lines.push(`const ${f.id} = sketch('${plane}'${offsetArg})`);
       const fresh = newSketch({ version: 1, features: [] }, f.plane);
-      const isDefault =
-        !f.shape && !f.rounds && !f.chamfers && !f.bulges &&
+      // A sketch whose points ARE an axis-aligned rectangle and whose rules
+      // ARE exactly the rectangle set (lib/model-types.ts's own
+      // RECTANGLE_CONSTRAINTS, both newSketch()/newRectangleSketch() and
+      // sketch()/.rect() write this same set) is what the Sketch and
+      // Rectangle tools build -- and what .rect() can reproduce exactly.
+      // Anything else -- a plain polygon, a shape a corner drag pulled off
+      // axis, or rules a student set by hand through the panel -- is outside
+      // .rect()'s language and falls through to .polygon() below.
+      const rectRules = hasRectangleConstraints(f.constraints);
+      const isPristineDefault =
+        !f.shape && !f.rounds && !f.chamfers && !f.bulges && rectRules &&
         f.points.length === fresh.points.length &&
         f.points.every((p, k) => near(p[0], fresh.points[k][0]) && near(p[1], fresh.points[k][1]));
-      if (isDefault) {
+      if (isPristineDefault) {
         // Untouched Sketch-tool starter -- nothing more to say.
       } else if (f.shape === 'circle' && f.points.length === 2) {
         const [a, b] = f.points;
@@ -315,7 +354,27 @@ export function toScript(doc: ModelDoc, namedParams?: readonly ScriptParamRef[])
         const at = near(cx, 0) && near(cy, 0) ? '' : `, { at: [${lit(cx)}, ${lit(cy)}] }`;
         lines.push(`${f.id}.circle(${numText(bindings, f.id, 'across', lit(across))}${at})`);
       } else {
-        lines.push(`${f.id}.polygon([${f.points.map((p) => litVec(p)).join(', ')}])`);
+        const rect = !f.shape ? rectDims(f.points) : null;
+        if (rect && rectRules) {
+          const [w, h, cx, cy] = rect;
+          const at = near(cx, 0) && near(cy, 0) ? '' : `, { at: [${lit(cx)}, ${lit(cy)}] }`;
+          lines.push(
+            `${f.id}.rect(${numText(bindings, f.id, 'width', lit(w))}, ${numText(bindings, f.id, 'height', lit(h))}${at})`,
+          );
+        } else {
+          lines.push(`${f.id}.polygon([${f.points.map((p) => litVec(p)).join(', ')}])`);
+          // A rule set by hand through the Rules panel -- equal, parallel,
+          // a Length, or the rectangle set itself sitting on a shape .rect()
+          // cannot describe (not axis-aligned, a corner dragged off, and so
+          // on) -- has no .polygon() equivalent in the language this round.
+          // Said out loud rather than silently dropped: a generated script
+          // with a bare .polygon() and no comment would read as though
+          // nothing had ever been asked of that edge.
+          if (f.constraints && f.constraints.length > 0) {
+            const n = f.constraints.length;
+            lines.push(`// ${n} rule${n === 1 ? '' : 's'} set in Build ${n === 1 ? 'is' : 'are'} not written here`);
+          }
+        }
         for (const [k, r] of Object.entries(f.rounds ?? {})) {
           if (r > 0) lines.push(`${f.id}.round(${k}, ${lit(r)})`);
         }

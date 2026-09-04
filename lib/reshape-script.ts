@@ -58,6 +58,7 @@ import {
   newMove,
   newPattern,
   newSketch,
+  RECTANGLE_CONSTRAINTS,
   newExtrude,
   newRevolve,
   newMirror,
@@ -698,7 +699,15 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
           [ax - ww / 2, ay + hh / 2],
         ];
         const cur = findFeature(id) as SketchFeature;
-        replaceFeature(id, { ...cur, points, shape: undefined, rounds: undefined, chamfers: undefined, bulges: undefined });
+        // Same rules a Rectangle-tool sketch is born with (lib/model-types.ts
+        // RECTANGLE_CONSTRAINTS) -- set explicitly here rather than relying
+        // on `cur` already carrying them (it does, from sketch()'s own
+        // newSketch() call, but that inheritance breaks the moment .rect()
+        // follows a .polygon() or .circle() on the same handle).
+        replaceFeature(id, {
+          ...cur, points, shape: undefined, rounds: undefined, chamfers: undefined, bulges: undefined,
+          constraints: RECTANGLE_CONSTRAINTS.slice(),
+        });
         return handle;
       },
       circle(d, opts) {
@@ -714,6 +723,12 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
           rounds: undefined,
           chamfers: undefined,
           bulges: undefined,
+          // newCircleSketch() never carries a rule -- the Rules panel shows
+          // only the plane row for a circle (no edges to rule). Explicit,
+          // not inherited: `cur` may still be holding the rectangle set from
+          // an earlier sketch('top') or .rect() on this same handle, and a
+          // circle has no edge 0-3 for those to mean anything about.
+          constraints: undefined,
         });
         return handle;
       },
@@ -728,7 +743,14 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
           return [requiredNumber('.polygon()', `point ${i + 1} x`, p[0]) as number, requiredNumber('.polygon()', `point ${i + 1} y`, p[1]) as number];
         });
         const cur = findFeature(id) as SketchFeature;
-        replaceFeature(id, { ...cur, points, shape: undefined, rounds: undefined, chamfers: undefined, bulges: undefined });
+        // newPolygonSketch() never carries a rule either, and the rectangle
+        // set specifically indexes edges 0-3 -- meaningless, and dangerous
+        // (an out-of-range edge index) once the shape has more or fewer
+        // sides than that. Explicit clear, same reasoning as .circle()'s own.
+        replaceFeature(id, {
+          ...cur, points, shape: undefined, rounds: undefined, chamfers: undefined, bulges: undefined,
+          constraints: undefined,
+        });
         return handle;
       },
       round(corner, radius) {

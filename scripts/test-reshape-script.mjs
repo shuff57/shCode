@@ -67,9 +67,26 @@ function oracleFixtures() {
   const doc = (...features) => ({ version: 1, features });
   const FACE = (part) => ({ cause: 'primitive', feature: 'b1', kind: 'face', part });
   const TOP_RIGHT = { cause: 'between', feature: 'b1', kind: 'edge', of: [FACE('+z'), FACE('+x')] };
+  // The default (no `pts` override) is what newSketch()/the Sketch tool
+  // actually build, rectangle rules included (lib/model-types.ts's own
+  // RECTANGLE_CONSTRAINTS) -- copied verbatim here, same "not imported"
+  // discipline as the rest of this file's fixtures, so a change to that
+  // constant is a change two places have to agree, on purpose. A CUSTOM
+  // `pts` fixture is not built through newSketch()/newRectangleSketch() at
+  // all (it is whatever shape the test wants), so it carries no rules of its
+  // own -- reshape-script.ts's own sketch('top').polygon(...) does not
+  // invent any either.
   const sketch = (id, plane = 'xy', offset = 0, pts = null) => ({
     id, kind: 'sketch', plane, offset,
     points: pts || [[0, 0], [40, 0], [40, 25], [0, 25]],
+    ...(pts ? {} : {
+      constraints: [
+        { kind: 'horizontal', edge: 0 },
+        { kind: 'vertical', edge: 1 },
+        { kind: 'horizontal', edge: 2 },
+        { kind: 'vertical', edge: 3 },
+      ],
+    }),
   });
   const hex = [];
   for (let i = 0; i < 6; i++) {
