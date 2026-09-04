@@ -23,7 +23,7 @@
     {
       "id": "s2",
       "title": "Make it 40 x 20",
-      "instructions": "In the Dimensions panel, two fields read 25: \"Sketch 1 corner 3 up\" and \"Sketch 1 corner 4 up\". Type 20 in both, so the rectangle is 40 mm by 20 mm.",
+      "instructions": "In the Dimensions panel, find \"Sketch 1 corner 3 up\" - it reads 25. Type 20 there. reSHape keeps the sketch a rectangle, so \"Sketch 1 corner 4 up\" usually follows to 20 on its own; if it still reads 25, type 20 there too. The rectangle is now 40 mm by 20 mm.",
       "hints": [
         "The width side (40) is already correct - you're only changing the 25s.",
         "Watch the rectangle in the 3D view get shorter on one side as you type."
@@ -46,8 +46,15 @@
       "description": "A flat 40 mm by 20 mm rectangle, pulled into a solid 10 mm tall.",
       "type": "model",
       "expect": [
-        { "kind": "sketch", "width": 40, "depth": 20 },
-        { "kind": "extrude", "height": 10 }
+        {
+          "kind": "sketch",
+          "width": 40,
+          "depth": 20
+        },
+        {
+          "kind": "extrude",
+          "height": 10
+        }
       ],
       "hint": "Press Sketch, set both 25 fields to 20, then press Pull and type 10.",
       "points": 0

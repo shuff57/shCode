@@ -15,10 +15,11 @@
     {
       "id": "s1",
       "title": "Pick one edge, not a face",
-      "instructions": "You're starting from a 40 x 40 x 20 mm box. Click right on the line where two faces meet — not in the middle of a face. You'll know it worked if the label above the Dimensions panel reads \"Box 1 · edge\".",
+      "instructions": "You're starting from a 40 x 40 x 20 mm box. Move the mouse slowly onto the line where two faces meet: when the mouse is on an edge, the edge lights up pink and a small label names it. Click while it is lit. You'll know it worked if the label above the Dimensions panel reads \"Box 1 · edge\".",
       "hints": [
-        "Look for the thin line along the top of the box where two faces meet, and click exactly on it.",
-        "If the label reads \"top face\" instead of \"edge\", you clicked a little too far from the line. Try again, right on it."
+        "Look for the thin line along the top of the box where two faces meet. Slide the mouse across it until it turns pink, then click without moving.",
+        "If the label reads \"top face\" instead of \"edge\", you clicked a little too far from the line. Try again, right on it.",
+        "Hard to see the edge? Drag in the 3D view to turn the box, or press Home to fit it."
       ]
     },
     {
@@ -38,8 +39,19 @@
       "description": "The box has a single edge rounded to a 3 mm radius.",
       "type": "model",
       "expect": [
-        { "kind": "box", "size": [40, 40, 20] },
-        { "kind": "fillet", "size": 3, "style": "fillet" }
+        {
+          "kind": "box",
+          "size": [
+            40,
+            40,
+            20
+          ]
+        },
+        {
+          "kind": "fillet",
+          "size": 3,
+          "style": "fillet"
+        }
       ],
       "hint": "Click exactly on one edge (the label should read \"edge\", not a face name), then press Round and type 3 in the radius field.",
       "points": 0

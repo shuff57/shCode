@@ -31,10 +31,12 @@
     {
       "id": "s3",
       "title": "Round an upright corner edge",
-      "instructions": "Click right on one of the vertical edges of the tray, where the front face meets a side face - an upright corner edge, not the thin top rim. Press Round, then type 3 in the radius field.",
+      "instructions": "Move the mouse onto one of the vertical edges of the tray, where the front face meets a side face - an upright corner edge, not the thin top rim. Aim about halfway down the edge, well below the rim, and click when the edge lights up pink. Press Round, then type 3 in the radius field.",
       "hints": [
         "The top rim is only 2 mm thick after the hollow, so a 3 mm round doesn't fit there and reSHape will refuse it. An upright corner edge is thick enough to take it.",
-        "Round the hollow's outer edge, not a face - the label above the Dimensions panel should read \"edge\", not a face name."
+        "Near the rim the inner corner of the hollow sits right behind the outer one, and a click there can grab the wrong edge. Halfway down, only the outer edge is under the mouse.",
+        "If reSHape says the round would not fit, the step shows a warning: click Undo (Ctrl+Z), pick the edge again lower down, and try once more.",
+        "The label above the Dimensions panel should read \"edge\", not a face name."
       ]
     }
   ],
@@ -45,9 +47,23 @@
       "description": "An 80 x 50 x 20 mm box, hollowed to 2 mm walls with the top open, with one upright corner edge rounded to a 3 mm radius.",
       "type": "model",
       "expect": [
-        { "kind": "box", "size": [80, 50, 20] },
-        { "kind": "shell", "thickness": 2, "open": true },
-        { "kind": "fillet", "size": 3 }
+        {
+          "kind": "box",
+          "size": [
+            80,
+            50,
+            20
+          ]
+        },
+        {
+          "kind": "shell",
+          "thickness": 2,
+          "open": true
+        },
+        {
+          "kind": "fillet",
+          "size": 3
+        }
       ],
       "hint": "Box 80 x 50 x 20, Hollow wall 2 open top, then Round an upright corner edge to 3.",
       "points": 0
