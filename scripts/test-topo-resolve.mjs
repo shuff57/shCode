@@ -1315,6 +1315,81 @@ try {
       'got ' + cylMeasured?.volume);
   }
 
+  console.log('\n=== item Q: an open shell registers its OWN op, so a name pushed through it resolves ===');
+  console.log('    (round-5 lens: Box, Hole, Round on an edge, Hollow open at the picked face --');
+  console.log('     the reorder puts the shell BEFORE the round, so the round\'s own edge name has');
+  console.log('     to resolve on the OPENED shell\'s shape, not the bare box it was written against)');
+  {
+    // Same box+open-shell fixture as the volume check just above, but this
+    // half asks the actual naming question item Q is about: does
+    // between(+z, -y) -- the box's own top-front edge, named the ordinary
+    // way, with no idea a shell is coming -- still resolve once it has to
+    // be pushed THROUGH an open shell to reach the shell's own result. The
+    // +z face is the one that got REMOVED by the opening (no Modified()
+    // path -- see FilletResult's sibling comment on faceFate() in
+    // lib/topo-history.ts for why Generated() has to be tried too); the -y
+    // face is untouched and should still resolve by ordinary Modified()/
+    // kept. sharedEdge() of the two is the OUTER rim edge the round-5 lens
+    // needed and could not get before this fix.
+    const topFrontEdge = {
+      cause: 'between', feature: 'b1', kind: 'edge',
+      of: [
+        { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' },
+        { cause: 'primitive', feature: 'b1', kind: 'face', part: '-y' },
+      ],
+    };
+    const openTopAgain = { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' };
+    const shellDoc = {
+      version: 1,
+      features: [
+        { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+        { id: 'shell1', kind: 'shell', target: 'b1', thickness: 2, open: openTopAgain },
+      ],
+    };
+    const builtShell = adapter.buildDoc(oc, shellDoc, arc);
+    const shellShape = builtShell.shapes.get('shell1');
+    const resolvedEdge = shellShape
+      ? topo.resolveNameAsUsedBy(oc, topFrontEdge, builtShell, 'shell1')
+      : null;
+    console.log('  shell1 built: ' + !!shellShape + '  edge resolved: ' + !!resolvedEdge);
+    check('an edge named on the box, pushed through an OPEN shell, resolves rather than coming back null',
+      !!shellShape && !!resolvedEdge);
+
+    // Now the payoff: fillet THAT edge on the shell's own result, and check
+    // the volume against the unfilleted shell -- the exact "round after an
+    // open hollow" sequence the lens ran, minus the earlier Hole/reorder
+    // machinery this file's other sections already cover on their own.
+    const filletDoc = {
+      version: 1,
+      features: [
+        ...shellDoc.features,
+        { id: 'r1', kind: 'fillet', target: 'shell1', edge: topFrontEdge, size: 1, style: 'fillet' },
+      ],
+    };
+    const builtFillet = adapter.buildDoc(oc, filletDoc, arc);
+    const filletRefusal = builtFillet.refusals && builtFillet.refusals.get('r1');
+    const filletShape = builtFillet.shapes.get('r1');
+    console.log('  refusal: ' + (filletRefusal ?? 'none'));
+    if (shellShape && filletShape) {
+      const unfilletedVolume = adapter.measureShape(oc, shellShape).volume;
+      const filletedVolume = adapter.measureShape(oc, filletShape).volume;
+      // The rim edge is 40 long (the box's own top-front edge, unmoved by
+      // the opening -- see the shell.open bbox check just above: the outer
+      // envelope does not shrink). Same closed form as every other
+      // single-edge fillet in this file: (1 - pi/4) * r^2 * L.
+      const removed = (1 - Math.PI / 4) * 1 * 1 * 40;
+      const expectedFilletedVolume = unfilletedVolume - removed;
+      console.log('  unfilleted volume  ' + unfilletedVolume);
+      console.log('  filleted volume    ' + filletedVolume + '  expected  ' + expectedFilletedVolume.toFixed(4));
+      check('fillet after an open hollow: rounds the rim edge, volume matches the closed form against the unfilleted shell',
+        Math.abs(filletedVolume - expectedFilletedVolume) <= 1e-3,
+        `got ${filletedVolume}\n        want ${expectedFilletedVolume.toFixed(4)}`);
+    } else {
+      check('fillet after an open hollow: the feature builds at all', false,
+        `shell1 present: ${!!shellShape}, r1 present: ${!!filletShape}` + (filletRefusal ? `, refusal: ${filletRefusal}` : ''));
+    }
+  }
+
   // ----------------------------------------------------------------------
   // A kernel LIMITATION, pinned so a kernel upgrade flips it visibly rather
   // than silently. Measured 2026-09-03: hollowing a box that already has a

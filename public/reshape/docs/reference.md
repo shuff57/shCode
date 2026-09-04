@@ -218,6 +218,14 @@ round(b.edge('top', 'front'), 1)
 
 Every kind of step on one box, in the order that builds: the shape, a 2 mm hollow, a 6 mm hole through, and one edge of the result rounded to 1.
 
+```js hollow-open-round-rim
+const b = box(40, 40, 20)
+hollow(b, { wall: 2, open: 'top' })
+round(b.edge('top', 'front'), 1)
+```
+
+A 40 × 40 × 20 box hollowed with 2 mm walls and the top open, with the top-front rim edge -- the boundary the opening left behind, not a face of the hollow itself -- rounded to 1 mm; ≈8663 mm³.
+
 ```js hollow-thin-wall
 const b = box(40, 40, 20)
 hollow(b, { wall: 1 })

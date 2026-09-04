@@ -87,11 +87,26 @@ export type Fate =
   | { kind: 'deleted' };
 
 /**
- * Ask one boolean what became of one face.
+ * Ask one boolean (or fillet, or shell) what became of one face.
  *
  * This is the whole mechanism. Everything above it -- carrying a fillet across
  * a rebuild, telling a student their selection is gone -- is bookkeeping on top
  * of these four answers.
+ *
+ * IsDeleted() true does not end the question the way it used to. An open
+ * hollow's own closing face is the case that forced this open: the face
+ * itself does not survive (there is a hole where it was, not a modified
+ * version of it), but BRepOffsetAPI_MakeThickSolid still GENERATES real
+ * geometry from it -- the rim where the opening meets the part's own outer
+ * wall -- and a between() name naming an edge at that rim needs exactly that
+ * face to resolve pushForward against. Modified() answers "what did this
+ * face become"; Generated() answers "what did this operation BUILD from a
+ * face that itself did not persist" -- a different question IsDeleted()
+ * being true does not settle either way, so Generated() is only tried once
+ * Modified()'s own precondition (the face persisting at all) has already
+ * failed. Zero results from Generated() is the same honest "genuinely gone"
+ * answer this always returned; a fillet or a plain boolean simply never has
+ * anything there, so this costs them nothing.
  */
 export function faceFate(oc: Occt, op: any, face: any): Fate {
   if (!op || !face) return { kind: 'deleted' };
@@ -103,7 +118,17 @@ export function faceFate(oc: Occt, op: any, face: any): Fate {
     // caller asked a reasonable question and the answer is "not mine".
     return { kind: 'deleted' };
   }
-  if (gone) return { kind: 'deleted' };
+  if (gone) {
+    let gen: any[] = [];
+    try {
+      gen = listShapes(oc, op.Generated(face));
+    } catch {
+      gen = [];
+    }
+    if (gen.length === 0) return { kind: 'deleted' };
+    if (gen.length === 1) return { kind: 'replaced', face: gen[0] };
+    return { kind: 'split', pieces: gen };
+  }
   const mod = listShapes(oc, op.Modified(face));
   if (mod.length === 0) return { kind: 'kept', face };
   if (mod.length === 1) return { kind: 'replaced', face: mod[0] };

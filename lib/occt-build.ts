@@ -57,10 +57,15 @@ export interface Built {
 export interface OpRecord {
   op: any;
   inputs: string[];
-  /** Set only for a fillet/chamfer's own op record -- see pushThrough()'s own
-   *  comment in lib/topo-resolve.ts for why an EDGE pushed through one of
-   *  these is treated specially, unlike a face. */
-  kind?: 'fillet';
+  /** Which kind of op this is, when a caller needs to tell it apart from a
+   *  plain boolean -- 'fillet' for a Round/Bevel's own builder, 'shell' for
+   *  an OPEN hollow's BRepOffsetAPI_MakeThickSolid (no boolean runs on that
+   *  path; see the shell branch's own comment for why its op is registered
+   *  directly). Undefined for an ordinary boolean() call. See faceFate()'s
+   *  own doc comment in lib/topo-history.ts for why 'shell' needs a
+   *  Generated() fallback a plain boolean or fillet op never has to reach
+   *  for -- the opened face itself is genuinely gone, not modified. */
+  kind?: 'fillet' | 'shell';
 }
 
 /** One outline segment of a sketch, paired with the edge it became in the
@@ -1042,8 +1047,13 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
               }
             }
             let inner: any = null;
+            // Lifted out of the try block below so the open-hollow branch
+            // can register it as an OpRecord after `sane` passes -- see
+            // that branch's own comment.
+            let shellOp: any = null;
             try {
               const op = new oc.BRepOffsetAPI_MakeThickSolid();
+              shellOp = op;
               const closingFaces = new oc.NCollection_List_TopoDS_Shape();
               if (openFace) closingFaces.Append(openFace);
               op.MakeThickSolidByJoin(
@@ -1074,11 +1084,7 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
               // volume 23328 with the outer bbox shrunk to +-18 on x and y
               // (src minus an already-hollow shell, not src minus the plain
               // offset solid) instead of the correct 8672 with the bbox
-              // unchanged at +-20. No OpRecord is pushed for this feature
-              // when openFace is set, since no boolean actually ran here --
-              // a name written against a later feature that reaches back
-              // through an OPEN shell to one of its faces is not yet
-              // resolvable, the same honest gap `made` names already have.
+              // unchanged at +-20.
               const cut = openFace ? inner : boolean('BRepAlgoAPI_Cut', src, inner, f.id, [f.target]);
               // IsDone() is not the whole story. Measured 2026-09-03: on a
               // box with ONE edge rounded, the offset reports done, the cut
@@ -1100,6 +1106,15 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
               }
               if (sane) {
                 shape = cut;
+                // No boolean runs on the open-shell path (op.Shape() IS the
+                // finished result already, see the comment above) -- register
+                // the offset builder's OWN op so a later feature's name can
+                // still be pushed through it, the same way boolean()'s cut
+                // already does for the closed path. See faceFate()'s own doc
+                // comment in lib/topo-history.ts for why this needs a
+                // Generated() fallback a plain boolean op never has to reach
+                // for.
+                if (openFace) ops.set(f.id, [{ op: shellOp, inputs: [f.target], kind: 'shell' }]);
               } else {
                 refusals.set(
                   f.id,
