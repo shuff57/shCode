@@ -296,6 +296,18 @@ export default function SandboxWorkspace() {
   // Same lift, for a picked FACE -- ModelEditor's Hollow flyout needs it for
   // ShellFeature.open (see that field's own doc comment in lib/model-types.ts).
   const [pickedFace, setPickedFace] = useState<{ target: string; face: TopoName | null } | null>(null);
+  // HandleOverlay's own `hoveredPart` (an edge/corner of a sketch outline,
+  // pointer-driven), lifted for the SAME reason pickedEdge/pickedFace are --
+  // HandleOverlay and ModelEditor are siblings here, and SketchConstraints
+  // (which needs it to light the matching Rules row) lives inside the
+  // latter. `rowHoverPart` is the REVERSE direction: SketchConstraints
+  // reporting its own row hover back up, fed into HandleOverlay's
+  // `forcedHoverPart` so hovering a row shows the same pill a canvas hover
+  // would. Two separate pieces of state, not one shared value, so a stale
+  // canvas hover left over from a moment ago can never be read as "the Rules
+  // panel is asking for this edge" or vice versa.
+  const [pointerHoverPart, setPointerHoverPart] = useState<{ kind: 'edge' | 'corner'; index: number } | null>(null);
+  const [rowHoverPart, setRowHoverPart] = useState<{ kind: 'edge' | 'corner'; index: number } | null>(null);
   // Rollback bar: the boundary index (0..features.length) past which features
   // are suppressed from the rebuilt model. null means "show everything". This
   // is a view change, not a structural edit -- see the effect below.
@@ -1526,6 +1538,8 @@ export default function SandboxWorkspace() {
                 onRollback={setRollbackIndex}
                 onStartDraw={setDrawTool}
                 drawTool={drawTool}
+                hoveredPart={pointerHoverPart}
+                onHoverPart={setRowHoverPart}
                 onUndo={undo}
                 onRedo={redo}
                 canUndo={depth.back > 0}
@@ -1716,6 +1730,8 @@ export default function SandboxWorkspace() {
                       outlines={outlines}
                       drawing={drawTool ?? false}
                       onPlace={handlePlace}
+                      onHoverPart={setPointerHoverPart}
+                      forcedHoverPart={rowHoverPart}
                       // This JSX only renders while build is true, which is
                       // exactly when .sandbox-shell carries is-build and the
                       // padding-bottom rule above is active -- so this is
@@ -1861,6 +1877,22 @@ export default function SandboxWorkspace() {
           overflow-y: auto;
           border-right: 1px solid var(--border);
           background: var(--card);
+          /* Above #editorPane's own z-index:40 (see that rule's own
+             comment). #editorPane is positioned absolute, left:12px, and
+             floats over the CANVAS by design, which was fine right up until
+             this dock started sitting there too: even COLLAPSED to its 46px
+             rail, #editorPane spans x=32-78 in the app's own default
+             layout, squarely inside this column's own x=20-300 -- measured
+             2026-09-04, a real page.mouse.click at a .sk-pairs-grid
+             button's centre landed on #editorPane's own div, not the
+             button, confirmed with document.elementFromPoint. Rules is the
+             thing meant to be clickable in that space now; #editorPane's
+             rail (a click-to-expand affordance for a card that, while a
+             sketch is active, no longer holds anything Rules didn't already
+             take over -- see cardHasContent's own comment) is not worth
+             losing that click over. */
+          position: relative;
+          z-index: 41;
         }
         .reshape-pane-view { flex: 1 1 auto; min-width: 0; display: flex; position: relative; }
         .reshape-pane-view .reshape-frame, .reshape-pane-view .reshape-empty { flex: 1; }

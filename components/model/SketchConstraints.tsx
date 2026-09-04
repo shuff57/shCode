@@ -88,6 +88,24 @@ interface Props {
   shape?: 'circle';
   /** Move the whole sketch onto another plane. The caller owns the write. */
   onPlane: (plane: 'xy' | 'xz' | 'yz') => void;
+  /**
+   * The edge or corner currently hovered on the CANVAS (HandleOverlay.tsx's
+   * own `hoveredPart`, lifted through SandboxWorkspace and ModelEditor) --
+   * so a beginner does not have to cross-reference the table by row number
+   * to know which cyan line they are looking at. Highlights an edge's whole
+   * `<tr>`, or the matching "Pin a corner" button for a corner (there is no
+   * single per-corner row otherwise -- Round/Chamfer/Remove each have their
+   * own). Null means nothing is hovered.
+   */
+  hoveredPart?: { kind: 'edge' | 'corner'; index: number } | null;
+  /**
+   * The reverse direction: hovering the highlighted row/button here reports
+   * it upward, so HandleOverlay can show the SAME floating pill over the
+   * canvas as if the pointer were over the edge or corner itself. Cheap to
+   * wire alongside `hoveredPart` since both travel through the same lifted
+   * state one level up.
+   */
+  onHoverPart?: (part: { kind: 'edge' | 'corner'; index: number } | null) => void;
 }
 
 function has(cs: Constraint[], kind: Constraint['kind'], edge: number) {
@@ -195,6 +213,15 @@ const PANEL_CSS = `
         .sk-pairs-grid td button.fighting:not(.on) { color: #ff5555; }
         .sk-table button:disabled { opacity: 0.35; cursor: not-allowed; }
         .sk-table input:disabled { opacity: 0.35; cursor: not-allowed; }
+        /* Lights up the whole edge row (or the matching Pin-corner button)
+           when HandleOverlay reports the canvas is hovering it -- see
+           hoveredPart's own doc comment. The accent token, not a border
+           colour swap: the fighting rule above already owns red, and this is
+           a different kind of thing being pointed at, not a problem.
+           NB: no backticks in this comment -- see the note further up this
+           same style block for why. */
+        tr.sk-row-hovered { background: rgba(189, 147, 249, 0.14); }
+        button.sk-row-hovered { box-shadow: 0 0 0 1px #bd93f9; }
         .sk-pins, .sk-rounds, .sk-chamfers, .sk-bows, .sk-drops, .sk-planes { display: flex; align-items: center; gap: 4px; margin-top: 8px; color: #6272a4; }
         .sk-rounds input, .sk-chamfers input, .sk-bows input {
           width: 42px; background: var(--bg); color: var(--text);
@@ -220,7 +247,7 @@ const PANEL_CSS = `
         .sk-pairs-grid td button:disabled { opacity: 0.35; cursor: not-allowed; }
       `;
 
-export default function SketchConstraints({ points, bulges, rounds, chamfers, constraints, onChange, onRound, onChamfer, onBow, onRemoveCorner, plane, onPlane, shape }: Props) {
+export default function SketchConstraints({ points, bulges, rounds, chamfers, constraints, onChange, onRound, onChamfer, onBow, onRemoveCorner, plane, onPlane, shape, hoveredPart, onHoverPart }: Props) {
   const count = points.length;
   const residual = residualOf(points, constraints);
   const fighting = residual > 1e-3;
@@ -407,8 +434,14 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
             const curvedTitle = curved
               ? "This edge is a rounded corner's arc. Across, Up and Length only make sense on a straight edge."
               : undefined;
+            const rowHovered = hoveredPart?.kind === 'edge' && hoveredPart.index === e;
             return (
-              <tr key={e}>
+              <tr
+                key={e}
+                className={rowHovered ? 'sk-row-hovered' : undefined}
+                onMouseEnter={() => onHoverPart?.({ kind: 'edge', index: e })}
+                onMouseLeave={() => onHoverPart?.(null)}
+              >
                 <td title={`corner ${a + 1} to corner ${b + 1}`}>{e + 1}</td>
                 <td className="sk-shape">{curved ? 'curved' : 'straight'}</td>
                 <td>
@@ -522,17 +555,25 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
 
       <div className="sk-pins">
         <span>Pin a corner:</span>
-        {points.map((_, i) => (
-          <button
-            key={i}
-            aria-label={`Pin corner ${i + 1}`}
-            aria-pressed={constraints.some((c) => c.kind === 'lock' && c.corner === i)}
-            className={constraints.some((c) => c.kind === 'lock' && c.corner === i) ? 'on' : undefined}
-            onClick={() => lockCorner(i)}
-          >
-            {i + 1}
-          </button>
-        ))}
+        {points.map((_, i) => {
+          const cornerHovered = hoveredPart?.kind === 'corner' && hoveredPart.index === i;
+          return (
+            <button
+              key={i}
+              aria-label={`Pin corner ${i + 1}`}
+              aria-pressed={constraints.some((c) => c.kind === 'lock' && c.corner === i)}
+              className={[
+                constraints.some((c) => c.kind === 'lock' && c.corner === i) ? 'on' : '',
+                cornerHovered ? 'sk-row-hovered' : '',
+              ].filter(Boolean).join(' ') || undefined}
+              onClick={() => lockCorner(i)}
+              onMouseEnter={() => onHoverPart?.({ kind: 'corner', index: i })}
+              onMouseLeave={() => onHoverPart?.(null)}
+            >
+              {i + 1}
+            </button>
+          );
+        })}
       </div>
 
       {/* addCorner() has existed since the first sketch build with no way to

@@ -124,6 +124,25 @@ interface Props {
    * reservation back in here is what makes the two match again.
    */
   bottomInset?: number;
+  /**
+   * Fired whenever the pointer-driven hover (an edge or corner of the
+   * outline) changes -- lifted so SandboxWorkspace can also light the
+   * matching Rules row (SketchConstraints, a sibling this component knows
+   * nothing about directly). Null the moment nothing is hovered, same as
+   * `hoveredPart` itself. Not memoized against a stale closure with a ref,
+   * the way this file's other callback props are not either -- callers pass
+   * a stable setter, not a fresh one each render.
+   */
+  onHoverPart?: (part: { kind: 'edge' | 'corner'; index: number } | null) => void;
+  /**
+   * The reverse direction: hovering a ROW in the Rules panel names an
+   * edge/corner here exactly as if the mouse were over its own SVG hit
+   * target, showing the same floating pill. ORed with the real pointer
+   * hover in `hoveredPart` -- pointer hover wins if somehow both are set,
+   * though in practice a mouse cannot be over both a canvas edge and a
+   * Rules-panel row at once.
+   */
+  forcedHoverPart?: { kind: 'edge' | 'corner'; index: number } | null;
 }
 
 /**
@@ -360,6 +379,7 @@ const TAP_TOLERANCE_PX = 4;
 
 export default function HandleOverlay({
   points, values, scales, onDrag, onCommit, onTap, outlines, drawing, onPlace, bottomInset = 0,
+  onHoverPart, forcedHoverPart,
 }: Props) {
   const [dragging, setDragging] = useState<string | null>(null);
   // A floating name for whichever edge or corner of the SELECTED sketch the
@@ -371,6 +391,17 @@ export default function HandleOverlay({
   // than left stale, since the outline this refers to can change shape
   // (a drag, a Length commit) while the pointer sits still over it.
   const [hoveredPart, setHoveredPart] = useState<{ kind: 'edge' | 'corner'; index: number } | null>(null);
+  // Lifted for SandboxWorkspace/SketchConstraints -- see onHoverPart's own
+  // doc comment. Only the pointer-driven value is reported upward (not the
+  // merged `shownHover` the pill below reads), so hovering a Rules row does
+  // not loop back around and report itself as a fresh pointer hover.
+  useEffect(() => {
+    onHoverPart?.(hoveredPart);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hoveredPart]);
+  // What the floating pill actually shows: the real pointer hover if there is
+  // one, otherwise whatever a Rules-panel row is asking to be shown instead.
+  const shownHoverPart = hoveredPart ?? forcedHoverPart ?? null;
   // Whether the current pointerdown-to-pointerup has crossed TAP_TOLERANCE_PX
   // yet. A click on a handle (e.g. the height handle sitting over a face's
   // own centre) must still pick that face -- see onTap's own doc comment --
@@ -871,10 +902,10 @@ export default function HandleOverlay({
                     </text>
                   );
                 })()}
-                {hoveredPart && o.shape !== 'circle' && (() => {
-                  const idx = hoveredPart.index;
+                {shownHoverPart && o.shape !== 'circle' && (() => {
+                  const idx = shownHoverPart.index;
                   if (idx < 0 || idx >= o.corners.length) return null;
-                  const text = hoveredPart.kind === 'edge'
+                  const text = shownHoverPart.kind === 'edge'
                     ? `Edge ${idx + 1} · ${formatLabel(edgeLength(o.design, idx))}`
                     : `Corner ${idx + 1}`;
                   const anchor = at.get(o.corners[idx]);

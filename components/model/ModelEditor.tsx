@@ -184,6 +184,16 @@ interface Props {
    *  A refused feature is ABSENT from the model but still present in the
    *  history, which without this marker looks like the app ignoring a click. */
   refusals?: Map<string, string>;
+  /** Which edge/corner of the active sketch's outline the CANVAS is
+   *  currently hovering (HandleOverlay's own `hoveredPart`, lifted through
+   *  SandboxWorkspace since HandleOverlay and this component are siblings,
+   *  not parent/child) -- forwarded straight to SketchConstraints so it can
+   *  light the matching Rules row. */
+  hoveredPart?: { kind: 'edge' | 'corner'; index: number } | null;
+  /** The reverse direction: SketchConstraints reports its OWN row hover
+   *  here, forwarded straight up to SandboxWorkspace so HandleOverlay can
+   *  show the same floating pill it would for a canvas hover. */
+  onHoverPart?: (part: { kind: 'edge' | 'corner'; index: number } | null) => void;
 }
 
 type BoolOp = 'union' | 'subtract' | 'intersect';
@@ -378,6 +388,7 @@ function FlyoutButton({
 
 export default function ModelEditor({
   doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, onStartDraw, drawTool, pickedEdge, onClearPickedEdge, pickedFace, onClearPickedFace, refusals,
+  hoveredPart, onHoverPart,
 }: Props) {
   const [note, setNote] = useState<string | null>(null);
   // An empty document has nothing for a note to be about: Reset clears the
@@ -1836,6 +1847,8 @@ export default function ModelEditor({
             plane={activeSketch.plane}
             shape={activeSketch.shape}
             onPlane={(plane) => setSketchPlane(activeSketch, plane)}
+            hoveredPart={hoveredPart}
+            onHoverPart={onHoverPart}
           />
         );
         return rulesHost ? createPortal(rules, rulesHost) : rules;
