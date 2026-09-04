@@ -101,34 +101,53 @@ export function generatedParams(doc: ModelDoc): GeneratedParam[] {
       push('radius', 'radius', f.radius);
       pushCentre(out, f.id, label, f.center);
     } else if (f.kind === 'sketch') {
-      // Two per corner. A sketch with a dozen corners is a long panel, which is
-      // why the corners are dragged rather than typed most of the time.
-      f.points.forEach(([u, v], n) => {
-        out.push({ name: pname(f.id, `p${n}u`), caption: `${label} corner ${n + 1} across`, value: u, min: -500, max: 500, step: 1 });
-        out.push({ name: pname(f.id, `p${n}v`), caption: `${label} corner ${n + 1} up`, value: v, min: -500, max: 500, step: 1 });
-      });
-      // One slider per corner the student rounded. Emitted from `rounds`, the
-      // request -- so the radius is a live parameter the frame can be handed
-      // without regenerating the source, exactly like every other dimension.
-      // Before this the radius existed only baked into a bulge literal, which
-      // is why nothing anywhere in the app could show a student what it was.
-      for (const [key, want] of Object.entries(f.rounds ?? {})) {
-        const k = Number(key);
-        if (!Number.isInteger(k) || k < 0 || k >= f.points.length || !(want > 0)) continue;
-        const ceiling = maxFilletRadius(f.points, k, f.bulges);
-        out.push({
-          name: pname(f.id, `r${k}`),
-          caption: `${label} corner ${k + 1} round`,
-          value: want,
-          min: 0,
-          // The ceiling can sit BELOW what is currently stored (another round
-          // on the shared edge, or a corner the solver has since sharpened).
-          // Clamping the slider's max below its own value would snap the
-          // radius down the first time the panel rendered, silently -- which
-          // is the shape of bug this whole round exists to stop.
-          max: Math.max(ceiling, want),
-          step: 0.5,
+      if (f.shape === 'circle' && f.points.length === 2) {
+        // A circle is stored as the two ends of a diameter (see
+        // newCircleSketch's own comment on why) -- but that is a storage
+        // choice, not something a student should have to reverse-engineer
+        // from two raw corner coordinates to answer "how big is this
+        // circle". Measured 2026-09-04: the lens had to compute a diameter
+        // by hand from "corner 1 across -5, corner 2 across 5" to hit an
+        // exact Ø10. "Across" (not "diameter") matches the Rectangle/Box
+        // tools' own vocabulary for a straight-line measurement.
+        const [p0, p1] = f.points;
+        const across = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]);
+        const cx = (p0[0] + p1[0]) / 2;
+        const cy = (p0[1] + p1[1]) / 2;
+        push('across', 'across', across);
+        out.push({ name: pname(f.id, 'x'), caption: `${label} centre x`, value: cx, min: -500, max: 500, step: 1 });
+        out.push({ name: pname(f.id, 'y'), caption: `${label} centre y`, value: cy, min: -500, max: 500, step: 1 });
+      } else {
+        // Two per corner. A sketch with a dozen corners is a long panel,
+        // which is why the corners are dragged rather than typed most of
+        // the time.
+        f.points.forEach(([u, v], n) => {
+          out.push({ name: pname(f.id, `p${n}u`), caption: `${label} corner ${n + 1} across`, value: u, min: -500, max: 500, step: 1 });
+          out.push({ name: pname(f.id, `p${n}v`), caption: `${label} corner ${n + 1} up`, value: v, min: -500, max: 500, step: 1 });
         });
+        // One slider per corner the student rounded. Emitted from `rounds`, the
+        // request -- so the radius is a live parameter the frame can be handed
+        // without regenerating the source, exactly like every other dimension.
+        // Before this the radius existed only baked into a bulge literal, which
+        // is why nothing anywhere in the app could show a student what it was.
+        for (const [key, want] of Object.entries(f.rounds ?? {})) {
+          const k = Number(key);
+          if (!Number.isInteger(k) || k < 0 || k >= f.points.length || !(want > 0)) continue;
+          const ceiling = maxFilletRadius(f.points, k, f.bulges);
+          out.push({
+            name: pname(f.id, `r${k}`),
+            caption: `${label} corner ${k + 1} round`,
+            value: want,
+            min: 0,
+            // The ceiling can sit BELOW what is currently stored (another round
+            // on the shared edge, or a corner the solver has since sharpened).
+            // Clamping the slider's max below its own value would snap the
+            // radius down the first time the panel rendered, silently -- which
+            // is the shape of bug this whole round exists to stop.
+            max: Math.max(ceiling, want),
+            step: 0.5,
+          });
+        }
       }
       push('offset', 'offset', f.offset, { min: -500, max: 500, step: 1 });
     } else if (f.kind === 'extrude') {
@@ -277,6 +296,37 @@ export function applyParam(doc: ModelDoc, name: string, value: number): ModelDoc
       if (slot === 'tube') { changed = true; return { ...f, tubeRadius: value }; }
     }
     if (f.kind === 'sketch') {
+      if (f.shape === 'circle' && f.points.length === 2 && (slot === 'across' || slot === 'x' || slot === 'y')) {
+        const [p0, p1] = f.points;
+        const cx = (p0[0] + p1[0]) / 2;
+        const cy = (p0[1] + p1[1]) / 2;
+        // Half the diameter vector, kept fixed by 'x'/'y' (moving the centre
+        // must not change the size) and only rescaled -- never re-aimed -- by
+        // 'across' (so dragging one handle earlier does not un-do a diameter
+        // the student dragged into some other direction).
+        const hx = (p1[0] - p0[0]) / 2;
+        const hy = (p1[1] - p0[1]) / 2;
+        if (slot === 'across') {
+          const halfLen = Math.hypot(hx, hy);
+          const newHalf = Math.max(0, value) / 2;
+          const dirx = halfLen > 1e-9 ? hx / halfLen : 1;
+          const diry = halfLen > 1e-9 ? hy / halfLen : 0;
+          const points: Array<[number, number]> = [
+            [cx - dirx * newHalf, cy - diry * newHalf],
+            [cx + dirx * newHalf, cy + diry * newHalf],
+          ];
+          changed = true;
+          return { ...f, points };
+        }
+        const newCx = slot === 'x' ? value : cx;
+        const newCy = slot === 'y' ? value : cy;
+        const points: Array<[number, number]> = [
+          [newCx - hx, newCy - hy],
+          [newCx + hx, newCy + hy],
+        ];
+        changed = true;
+        return { ...f, points };
+      }
       // slot is p<n>u or p<n>v
       const m = /^p(\d+)([uv])$/.exec(slot);
       if (m) {
@@ -528,9 +578,18 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
     // polygon() on two points would draw a degenerate line, not a circle.
     if (f.shape === 'circle' && f.points.length === 2) {
       needs.add('discAcross');
-      const a = `[p.${pname(f.id, 'p0u')}, p.${pname(f.id, 'p0v')}]`;
-      const b = `[p.${pname(f.id, 'p1u')}, p.${pname(f.id, 'p1v')}]`;
-      return `discAcross(${a}, ${b})`;
+      // generatedParams() emits this sketch's panel/param slots as
+      // across/x/y, not the raw p0u/p0v/p1u/p1v this used to reference --
+      // see that function's own comment on why. Safe to rebuild the
+      // diameter as a horizontal pair here regardless of which direction the
+      // ACTUAL stored points point: discAcross only cares about the length
+      // between its two arguments and their midpoint, and a circle looks
+      // identical no matter which of its diameters you hand it -- there is
+      // no rotation to lose.
+      const across = `p.${pname(f.id, 'across')}`;
+      const cx = `p.${pname(f.id, 'x')}`;
+      const cy = `p.${pname(f.id, 'y')}`;
+      return `discAcross([${cx} - ${across} / 2, ${cy}], [${cx} + ${across} / 2, ${cy}])`;
     }
     const pts = f.points
       .map((_, n) => `[p.${pname(f.id, `p${n}u`)}, p.${pname(f.id, `p${n}v`)}]`)

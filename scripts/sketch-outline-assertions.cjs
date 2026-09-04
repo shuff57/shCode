@@ -659,6 +659,23 @@ module.exports = function run(dir) {
     && outline.formatLabel(40.0001) === '40',
     JSON.stringify([outline.formatLabel(40), outline.formatLabel(17.5), outline.formatLabel(17.25), outline.formatLabel(17.256), outline.formatLabel(40.0001)]));
 
+  const originCircle = outline.circleLabel([[-5, 0], [5, 0]]);
+  check('a circle across 10 at the origin reads "⌀10" at the centre',
+    near5(originCircle.x, 0) && near5(originCircle.y, 0) && originCircle.text === '⌀10',
+    JSON.stringify(originCircle));
+  const offCentreCircle = outline.circleLabel([[0, 3], [10, 3]]);
+  check('a circle of across 10 at centre (5, 3) reads "⌀10" there, not at the origin',
+    near5(offCentreCircle.x, 5) && near5(offCentreCircle.y, 3) && offCentreCircle.text === '⌀10',
+    JSON.stringify(offCentreCircle));
+  check('the label follows whichever diameter is actually stored, not just a horizontal one',
+    (() => {
+      const c = outline.circleLabel([[0, 0], [0, 8]]); // vertical diameter, across 8
+      return near5(c.x, 0) && near5(c.y, 4) && c.text === '⌀8';
+    })(),
+    JSON.stringify(outline.circleLabel([[0, 0], [0, 8]])));
+  check('circleLabel is null for anything that is not exactly two points',
+    outline.circleLabel(square.points) === null && outline.circleLabel([[0, 0]]) === null);
+
   const rectLabels = outline.sketchLabels(square.points, []);
   check('a rectangle gets four edge labels, one per edge',
     rectLabels.edges.length === 4, JSON.stringify(rectLabels.edges));

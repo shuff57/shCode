@@ -13,7 +13,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { arcFromBulge, type Point } from '../../lib/sketch-arc';
 import { type Constraint, losingEdges, residualsOf } from '../../lib/sketch-solve';
-import { sketchLabels, treatmentsFromOutline } from '../../lib/sketch-outline';
+import { circleLabel, sketchLabels, treatmentsFromOutline } from '../../lib/sketch-outline';
 
 /**
  * One selected sketch's outline, in plane coordinates -- what the overlay
@@ -694,6 +694,23 @@ export default function HandleOverlay({
                     </text>
                   );
                 })}
+                {o.shape === 'circle' && (() => {
+                  const c = circleLabel(o.design);
+                  const anchor = at.get(o.corners[0]);
+                  if (!c || !anchor || anchor.ux === undefined || anchor.uy === undefined) return null;
+                  const spot = projectFrom(anchor, o.design[0], [c.x, c.y]);
+                  return (
+                    <text
+                      x={spot.x}
+                      y={spot.y}
+                      className="sketch-dim-text"
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                    >
+                      {c.text}
+                    </text>
+                  );
+                })()}
               </g>
             );
           })}

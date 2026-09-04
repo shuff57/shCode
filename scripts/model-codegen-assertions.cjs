@@ -1135,7 +1135,7 @@ module.exports = function run(dir) {
   const circleDoc = doc(circleSketch, pull('e2', 'sk2'));
   const circleSrc = gen.toReshape(circleDoc);
   check('#7 a tagged circle emits discAcross, not poly',
-    circleSrc.includes('discAcross([p.sk2_p0u, p.sk2_p0v], [p.sk2_p1u, p.sk2_p1v])')
+    circleSrc.includes('discAcross([p.sk2_x - p.sk2_across / 2, p.sk2_y], [p.sk2_x + p.sk2_across / 2, p.sk2_y])')
     && !/\bpoly\(\[\[?p\.sk2/.test(circleSrc));
   check('...and the helper is defined', circleSrc.includes('function discAcross('));
   // Built through the extrude, not the bare sketch -- a bare sketch is never
@@ -1147,11 +1147,60 @@ module.exports = function run(dir) {
     `width ${(circleBuilt.bbox[1][0] - circleBuilt.bbox[0][0]).toFixed(1)} -- a broken implementation ` +
     `that reads the point distance itself as the radius would draw one twice this size`);
 
-  check('#8 a circle keeps its four corner params -- p0u/p0v/p1u/p1v -- not derived r/cx/cy',
-    gen.generatedParams(doc(circleSketch)).map((p) => p.name).sort().join() === 'sk2_offset,sk2_p0u,sk2_p0v,sk2_p1u,sk2_p1v',
-    `got ${gen.generatedParams(doc(circleSketch)).map((p) => p.name).sort().join()} -- a derived-params implementation ` +
-    `would emit sk2_r/sk2_cx/sk2_cy instead, and sketchHandles() (lib/model-handles.ts) builds every drag handle ` +
-    `from f.points, so a circle built that way would have no draggable handles at all`);
+  // #8 was pinned the other way once: "a circle keeps its four corner params,
+  // not derived r/cx/cy", because sketchHandles() (lib/model-handles.ts)
+  // builds every drag HANDLE from f.points, and a derived-params circle
+  // looked like it would have no draggable handles at all. That conflated
+  // two independent lists. Handles are untouched by this change -- they
+  // still come straight off f.points, same as every other sketch -- and are
+  // covered by scripts/test-model-handles.mjs, not this file. What changed
+  // is only the DIMENSIONS PANEL, which is exactly where the real defect
+  // was: "corner 1 across -5, corner 2 across 5" made a student reverse an
+  // exact Ø10 by hand (measured 2026-09-04). The panel now reads "across"
+  // (a real diameter) and "centre x"/"centre y", not two raw endpoints.
+  check('#8 a circle\'s PANEL params are derived -- across/centre x/centre y -- not raw corner coordinates',
+    gen.generatedParams(doc(circleSketch)).map((p) => p.name).sort().join() === 'sk2_across,sk2_offset,sk2_x,sk2_y',
+    `got ${gen.generatedParams(doc(circleSketch)).map((p) => p.name).sort().join()}`);
+  check('...captioned "across", "centre x", "centre y", reading the diameter and midpoint of the stored points',
+    // "Sketch 1", not "Sketch 2" -- nameMap() numbers sketches by their ORDER
+    // in this doc, not by the literal id string, and this doc has only one.
+    gen.generatedParams(doc(circleSketch)).find((p) => p.name === 'sk2_across').caption === 'Sketch 1 across'
+    && gen.generatedParams(doc(circleSketch)).find((p) => p.name === 'sk2_across').value === 10
+    && gen.generatedParams(doc(circleSketch)).find((p) => p.name === 'sk2_x').caption === 'Sketch 1 centre x'
+    && gen.generatedParams(doc(circleSketch)).find((p) => p.name === 'sk2_x').value === 20
+    && gen.generatedParams(doc(circleSketch)).find((p) => p.name === 'sk2_y').caption === 'Sketch 1 centre y'
+    && gen.generatedParams(doc(circleSketch)).find((p) => p.name === 'sk2_y').value === 12.5,
+    JSON.stringify(gen.generatedParams(doc(circleSketch))));
+
+  console.log('\n=== a circle\'s panel params round-trip through applyParam ===');
+
+  const acrossDoc = { version: 1, features: [{ id: 'sk3', kind: 'sketch', plane: 'xy', offset: 0, shape: 'circle', points: [[0, 3], [10, 3]] }] };
+  check('a circle of across 10 at centre (5, 3) is stored as points (0,3) and (10,3)',
+    JSON.stringify(gen.generatedParams(acrossDoc).map((p) => [p.name, p.value])) ===
+    JSON.stringify([['sk3_across', 10], ['sk3_x', 5], ['sk3_y', 3], ['sk3_offset', 0]]),
+    JSON.stringify(gen.generatedParams(acrossDoc)));
+
+  const draggedAcross = gen.applyParam(acrossDoc, 'sk3_across', 20);
+  const draggedAcrossSk = draggedAcross.features[0];
+  check('dragging across to 20 keeps the centre at (5, 3)',
+    Math.abs((draggedAcrossSk.points[0][0] + draggedAcrossSk.points[1][0]) / 2 - 5) < 1e-9
+    && Math.abs((draggedAcrossSk.points[0][1] + draggedAcrossSk.points[1][1]) / 2 - 3) < 1e-9
+    && Math.abs(Math.hypot(
+      draggedAcrossSk.points[1][0] - draggedAcrossSk.points[0][0],
+      draggedAcrossSk.points[1][1] - draggedAcrossSk.points[0][1],
+    ) - 20) < 1e-9,
+    JSON.stringify(draggedAcrossSk.points));
+
+  const draggedCentre = gen.applyParam(gen.applyParam(acrossDoc, 'sk3_x', 50), 'sk3_y', -8);
+  const draggedCentreSk = draggedCentre.features[0];
+  check('dragging the centre to (50, -8) keeps across at 10',
+    Math.abs(Math.hypot(
+      draggedCentreSk.points[1][0] - draggedCentreSk.points[0][0],
+      draggedCentreSk.points[1][1] - draggedCentreSk.points[0][1],
+    ) - 10) < 1e-9
+    && Math.abs((draggedCentreSk.points[0][0] + draggedCentreSk.points[1][0]) / 2 - 50) < 1e-9
+    && Math.abs((draggedCentreSk.points[0][1] + draggedCentreSk.points[1][1]) / 2 - (-8)) < 1e-9,
+    JSON.stringify(draggedCentreSk.points));
 
   console.log('\n=== sketch build 1: Corner refuses on a circle (Finding 3, sketch gauntlet round 2) ===');
 

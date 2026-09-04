@@ -56,6 +56,18 @@ export interface BowLabel {
   text: string;
 }
 
+export interface CircleLabel {
+  /** The circle's own centre -- the one point on it that reads clearly
+   *  regardless of how the two stored diameter endpoints happen to be
+   *  oriented, and the same point the Dimensions panel's "centre x"/"centre
+   *  y" fields already describe. */
+  x: number;
+  y: number;
+  /** "⌀10" -- the diameter symbol, matching what the Dimensions panel
+   *  now also calls "across" (lib/model-codegen.ts's generatedParams). */
+  text: string;
+}
+
 export interface SketchLabels {
   edges: EdgeLabel[];
   corners: CornerLabel[];
@@ -150,6 +162,22 @@ export function treatmentsFromOutline(
     }
   }
   return { rounds, chamfers, edgeBulges };
+}
+
+/**
+ * The one label a circle sketch carries -- its diameter, at its centre.
+ * Null for anything that is not a two-point diameter (a plain sketch has no
+ * single "size" to show this way; sketchLabels() below is its own answer).
+ */
+export function circleLabel(points: Point[]): CircleLabel | null {
+  if (points.length !== 2) return null;
+  const [a, b] = points;
+  const across = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  return {
+    x: (a[0] + b[0]) / 2,
+    y: (a[1] + b[1]) / 2,
+    text: `⌀${formatLabel(across)}`,
+  };
 }
 
 /**
