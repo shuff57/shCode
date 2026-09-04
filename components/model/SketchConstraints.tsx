@@ -472,6 +472,18 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
                 </td>
                 <td>
                   <input
+                    // Forces a remount whenever the STORED rule's own value
+                    // changes -- including to "no rule at all" -- rather than
+                    // trusting defaultValue to notice. defaultValue is read
+                    // ONCE, at mount, and React has no other reason to remount
+                    // this exact input (same position in the same map, every
+                    // render): settle() removing edge 2's length rule out from
+                    // under the student left this box still showing the
+                    // typed-in "20" as a literal value, which starves the
+                    // placeholder (the live measured length) of ever being
+                    // seen, because a placeholder only shows on an EMPTY
+                    // value. Measured 2026-09-04.
+                    key={fixed && fixed.kind === 'length' ? `len-${e}-${fixed.value}` : `len-${e}-empty`}
                     type="text"
                     inputMode="decimal"
                     aria-label={`Edge ${e + 1} length`}

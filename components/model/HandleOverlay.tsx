@@ -1110,6 +1110,7 @@ export default function HandleOverlay({
           const loV = Math.min(fv, pv), hiV = Math.max(fv, pv);
           planePts = [[loU, loV], [hiU, loV], [hiU, hiV], [loU, hiV]];
         }
+        const screenPts = planePts.map(toScreen);
         return (
           // pointer-events: none is load-bearing here, not decorative: this
           // svg renders AFTER the draw-catcher div in the DOM (it needs
@@ -1121,8 +1122,21 @@ export default function HandleOverlay({
           <svg className="sketch-lines" aria-hidden="true" style={{ pointerEvents: 'none' }}>
             <polygon
               className="rubber-band"
-              points={planePts.map((q) => { const s = toScreen(q); return `${s.x},${s.y}`; }).join(' ')}
+              points={screenPts.map((s) => `${s.x},${s.y}`).join(' ')}
             />
+            {/* A rectangle whose two clicked corners sit nearly along the
+                sketch plane's own U or V axis, as THIS camera angle happens
+                to project it, previews as a genuinely thin sliver -- correct
+                (it is exactly what a second click there would build), but a
+                bare thin polygon reads as a stray diagonal line rather than
+                "a rectangle, just a narrow one". Measured 2026-09-04: the
+                Home preset's default direction projects world Y almost
+                exactly along one common drag diagonal. Corner dots make the
+                four vertices legible even when the fill between them is
+                only a couple of pixels wide. */}
+            {screenPts.map((s, i) => (
+              <circle key={i} className="rubber-band-corner" cx={s.x} cy={s.y} r={3} />
+            ))}
           </svg>
         );
       })()}
@@ -1157,6 +1171,11 @@ export default function HandleOverlay({
         .sketch-lines polygon {
           fill: rgba(139, 233, 253, 0.12);
           stroke: #8be9fd; stroke-width: 1.5; stroke-dasharray: 5 3;
+        }
+        /* Corner dots on the rubber band -- see the comment where these are
+           rendered for why a thin-but-correct preview needs them. */
+        .sketch-lines .rubber-band-corner {
+          fill: #8be9fd; stroke: #282a36; stroke-width: 1;
         }
         /* Still dashed, so it still reads as a sketch line rather than a new
            kind of geometry. Wider than the outline underneath it so the red
