@@ -64,6 +64,19 @@ const SOURCES = [
   // instead of the JSCAD/regl geom3 path. Type-only 'three' import, so tsc
   // erases it and this file carries no runtime dependency on three itself.
   'lib/occt-three.ts',
+  // The script-runner's interpreter (see public/reshape/script-runner.html
+  // and lib/reshape-script.ts's own header). It never touches OpenCascade or
+  // three.js -- it only builds a ModelDoc -- but it has to compile to a real
+  // ES module here rather than ship through Next's own bundle, because it
+  // has to run inside the SAME sandboxed, allow-same-origin-less iframe
+  // model-types.ts's compiled twin already runs in, for the same reason:
+  // student code must never execute in the parent's own origin. model-codegen
+  // is dragged in as a dependency (pname(), generatedParams(), applyParam())
+  // rather than duplicated -- see reshape-script.ts's num() for why the two
+  // must agree on one key format.
+  'lib/reshape-script.ts',
+  'lib/model-codegen.ts',
+  'lib/sketch-solve.ts',
 ];
 
 mkdirSync(dest, { recursive: true });

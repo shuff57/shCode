@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>reSHape script runner</title>
+<!--
+  THE SCRIPT-MODE TWIN OF public/reshape/runner.html AND
+  public/reshape/kernel/runner-brep.html -- and much smaller than either,
+  because it draws NOTHING. Code mode's picture comes from the SAME B-rep
+  viewport Build mode already renders (components/model/BrepViewportThree.tsx,
+  mounted by components/SandboxWorkspace.tsx) once the parent adopts the doc
+  this frame hands it -- see lib/reshape-script.ts's file header for "the one
+  idea" this whole feature turns on. So this frame's entire job is: eval the
+  student's script, turn it into a ModelDoc, and post it out. No kernel, no
+  three.js, no canvas.
+
+  WHY IT LIVES OUTSIDE /reshape/kernel/, unlike script-runner's own compiled
+  interpreter (public/reshape/kernel/reshape-script.js -- see
+  scripts/build-brep-kernel.mjs's SOURCES list). That file has no wasm
+  dependency, so unlike runner-brep.html it needs no gitignored kernel build
+  to exist and can ship with every deploy the way runner.html does. The ES
+  MODULE import below still has to resolve under the CORS-covered prefix
+  though (see build-brep-kernel.mjs's own header on why an opaque-origin
+  iframe's module fetch needs Access-Control-Allow-Origin regardless of which
+  page issues it) -- './kernel/reshape-script.js' satisfies that from here.
+
+  REMOUNT PER RUN, not a persistent frame with a live push. Unlike the 22.9 MB
+  OpenCascade kernel runner-brep.html exists to amortise, this frame carries
+  no expensive one-time load -- reshape-script.js is a few dozen KB of plain
+  interpreter -- so components/ReshapePreview.tsx treats 'script' exactly
+  like 'jscad': a fresh runKey remounts it.
+
+  THE MESSAGE PROTOCOL (see lib/reshape-script.ts's RunResult and the spec at
+  .gauntlet/SPEC-reshape-script.md):
+
+    outbound: preview-console, reshape-doc { doc, params }, preview-error
+    inbound:  reshape-set-params { params }  (re-runs with those overrides)
+
+  Deliberately NOT the JSCAD/B-rep runners' vocabulary (reshape-params,
+  reshape-anchors, reshape-rebuilt, reshape-set-anchors, preview-eval): this
+  frame builds a document, not a picture, so it has no anchors to project and
+  nothing living to eval an expression against between runs.
+-->
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #282a36; color: #f8f8f2; font: 13px/1.5 'Fira Code', Consolas, monospace; }
+  #status { padding: 14px 16px; }
+  #status .hint { color: #6272a4; }
+  #status .ok { color: #50fa7b; }
+  #status .err { color: #ff5555; white-space: pre-wrap; }
+</style>
+<script>
+// Console + top-frame guard, copied from runner.html/runner-brep.html rather
+// than shared -- same reason those two do not share it with each other: each
+// runner loads from a different origin-of-truth and there is no common
+// module yet worth inventing to hold three copies of eleven lines.
+(function () {
+  function send(type, args) {
+    try {
+      var safe = Array.prototype.slice.call(args).map(function (a) {
+        if (a instanceof Error) return a.stack || a.message;
+        if (typeof a === 'object') { try { return JSON.parse(JSON.stringify(a)); } catch (e) { return String(a); } }
+        return a;
+      });
+      window.parent.postMessage({ source: 'preview-console', type: type, args: safe }, '*');
+    } catch (e) { /* parent gone */ }
+  }
+  ['log', 'warn', 'error', 'info'].forEach(function (t) {
+    var orig = console[t];
+    console[t] = function () { send(t, arguments); orig.apply(console, arguments); };
+  });
+
+  if (window.top === window.self) {
+    document.body.innerHTML = '';
+    var warn = document.createElement('p');
+    warn.style.cssText = 'font:14px system-ui;color:#f8f8f2;background:#282a36;margin:0;padding:24px';
+    warn.textContent = 'This preview only runs inside shCode. Open a lesson or the docs instead.';
+    document.body.appendChild(warn);
+    window.__scriptNoRun = true;
+  }
+})();
+</script>
+</head>
+<body>
+<div id="status"><span class="hint">Loading…</span></div>
+<script type="module">
+(async function () {
+  if (window.__scriptNoRun) return;
+
+  var statusEl = document.getElementById('status');
+  function setStatus(html) { statusEl.innerHTML = html; }
+
+  function reportError(message, line) {
+    setStatus('<span class="err">' + message.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</span>');
+    try {
+      window.parent.postMessage({
+        source: 'preview-error',
+        error: { name: 'Error', message: message, file: 'script.js', line: line, col: 0, snippet: '' },
+      }, '*');
+    } catch (e) { /* parent gone */ }
+  }
+
+  var params = new URLSearchParams(location.search);
+  var encoded = params.get('code');
+  if (!encoded) { setStatus('<span class="hint">Nothing to run yet.</span>'); return; }
+  var source;
+  try {
+    var b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    source = decodeURIComponent(escape(atob(b64)));
+  } catch (e) {
+    reportError('Failed to decode your program: ' + (e && e.message ? e.message : e), null);
+    return;
+  }
+
+  var runScript;
+  try {
+    var mod = await import('./kernel/reshape-script.js');
+    runScript = mod.runScript;
+  } catch (e) {
+    reportError(
+      'Failed to load the script engine: ' + (e && e.message ? e.message : e) +
+        '\n\n(node scripts/build-brep-kernel.mjs has to have run at least once in this checkout.)',
+      null
+    );
+    return;
+  }
+
+  // Values accumulate across drags the same way runner-brep.html's liveParams
+  // does -- a slider drag only ever sends the ONE param that moved, not every
+  // value on the panel.
+  var liveValues = {};
+
+  function runAndReport(values) {
+    var result;
+    try {
+      result = runScript(source, { values: values });
+    } catch (e) {
+      // runScript() catches every error from the student's own program
+      // internally and reports it through result.errors -- reaching this
+      // catch means runScript ITSELF broke, which is this file's own bug,
+      // not the student's.
+      reportError('The script engine failed unexpectedly: ' + (e && e.message ? e.message : e), null);
+      return;
+    }
+    if (result.errors.length > 0) {
+      var first = result.errors[0];
+      reportError(first.message, first.line);
+      return;
+    }
+    var featureWord = result.doc.features.length === 1 ? 'step' : 'steps';
+    setStatus('<span class="ok">Built ' + result.doc.features.length + ' ' + featureWord + '.</span> ' +
+      '<span class="hint">Switch to Build to see it.</span>');
+    try {
+      window.parent.postMessage({ source: 'reshape-doc', doc: result.doc, params: result.params }, '*');
+    } catch (e) { /* parent gone */ }
+  }
+
+  window.addEventListener('message', function (e) {
+    var d = e.data;
+    if (!d || d.source !== 'reshape-set-params' || !d.params) return;
+    for (var k in d.params) {
+      if (Object.prototype.hasOwnProperty.call(d.params, k)) liveValues[k] = d.params[k];
+    }
+    runAndReport(liveValues);
+  });
+
+  runAndReport(liveValues);
+})();
+</script>
+</body>
+</html>
