@@ -431,6 +431,9 @@ export default function BrepViewportThree({
    *  FaceRange.index instead -- a weaker guarantee than a real name, good
    *  enough for a selection nothing downstream depends on yet. */
   const selectedFaceStateRef = useRef<{ featureId: string; faceIndex: number } | null>(null);
+  /** A face pick emitted without a name (the build was mid-swap). Re-named
+   *  once the next build lands; null when the last pick was named. */
+  const unnamedFacePickRef = useRef<{ featureId: string; faceIndex: number } | null>(null);
   /** The most recent successful build, cached so a `pick` change ALONE (the
    *  student cleared the selection from the model tree, say, rather than by
    *  clicking the viewport) can re-run restorePicks() without repeating the
@@ -917,6 +920,11 @@ export default function BrepViewportThree({
         const name = built && kernelFace
           ? nameFaceOnCurrentShape(kernelRef.current!.oc, built, docRef.current, featureId, kernelFace)
           : null;
+        // A pick that lands inside the first frames of a rebuild can miss
+        // its name (measured 2026-09-03: 1 of 20 picks at 0 ms after a
+        // resize). Remember whether it was named so restorePicks() can try
+        // again on the build that replaces this one.
+        unnamedFacePickRef.current = name ? null : { featureId, faceIndex: hit.range.index };
         onPickRef.current?.({ kind: 'face', target: featureId, faceIndex: hit.range.index, name });
       } else {
         const { featureId, kernelEdge } = hit.line.userData as {
@@ -1383,6 +1391,18 @@ export default function BrepViewportThree({
       : undefined;
     if (mesh && range) {
       paintFaceHighlight(THREE, selectedFaceMesh, mesh, range);
+      const pending = unnamedFacePickRef.current;
+      if (pending && sel && pending.featureId === sel.featureId && pending.faceIndex === sel.faceIndex) {
+        const shape = built.shapes.get(sel.featureId);
+        const kernelFace = shape ? facesOf(kernel.oc, shape)[sel.faceIndex] : undefined;
+        const name = kernelFace
+          ? nameFaceOnCurrentShape(kernel.oc, built, docRef.current, sel.featureId, kernelFace)
+          : null;
+        if (name) {
+          unnamedFacePickRef.current = null;
+          onPickRef.current?.({ kind: 'face', target: sel.featureId, faceIndex: sel.faceIndex, name });
+        }
+      }
     } else {
       selectedFaceMesh.visible = false;
       selectedFaceStateRef.current = null;
