@@ -42,6 +42,7 @@ import {
   solveSketchDrag,
   toReshape,
 } from '../lib/model-codegen';
+import { toScript } from '../lib/reshape-script-gen';
 import { RUNNER_SOURCE, RUN_TIMEOUT_MS } from '../lib/js-runner-source';
 import {
   NO_TEACHER_MODES,
@@ -198,13 +199,32 @@ export default function SandboxWorkspace() {
   // so the server-rendered HTML has no location and reading one during render
   // is a hydration mismatch.
   const [brepEngine, setBrepEngine] = useState(true);
+  // reSHape Script (lib/reshape-script.ts) is Code mode's language whenever
+  // the kernel is the engine: the reference teaches it and the starter is
+  // written in it (.gauntlet/SPEC-reshape-script.md, migration step 5,
+  // 2026-09-03). ?engine=jscad puts BOTH sides back on JSCAD; ?script=0
+  // keeps the kernel for Build but the JSCAD runner for Code, for the one
+  // release the legacy runner still ships.
+  const [scriptEngine, setScriptEngine] = useState(true);
   useEffect(() => {
     try {
-      setBrepEngine(new URLSearchParams(window.location.search).get('engine') !== 'jscad');
+      const q = new URLSearchParams(window.location.search);
+      const kernel = q.get('engine') !== 'jscad';
+      setBrepEngine(kernel);
+      setScriptEngine(kernel && q.get('script') !== '0');
     } catch {
       /* no window, or a URL we cannot parse: stay on the engine that works */
     }
   }, []);
+  // The last doc the script runner produced from a successful Run, so
+  // switching Code -> Build has something to adopt -- see chooseBuild()'s
+  // `on` branch. Only ever written from the 'reshape-doc' message below,
+  // which only ever arrives from the sandboxed script-runner.html frame:
+  // this is the one and only place a script's own doc reaches the parent,
+  // and it always arrives ALREADY BUILT by the sandbox, never as text this
+  // component would have to evaluate itself -- see lib/reshape-script.ts's
+  // comment on why runScript() must never run in the app's own origin.
+  const [scriptDoc, setScriptDoc] = useState<ModelDoc | null>(null);
   const [doc, setDoc] = useState<ModelDoc>(EMPTY_DOC);
   const [selected, setSelected] = useState<string[]>([]);
   // A selection can outlive its feature (Undo removes the step that was
@@ -345,6 +365,7 @@ export default function SandboxWorkspace() {
       const d = e.data as {
         source?: string; type?: string; defs?: ParamDef[]; values?: ParamValues;
         ms?: number; empty?: boolean; failed?: boolean; points?: AnchorPoint[];
+        doc?: ModelDoc; params?: unknown;
       };
       if (d?.type === 'brep-kernel-please') {
         // THE BYTE HANDOFF. The frame is sandboxed without allow-same-origin,
@@ -387,6 +408,14 @@ export default function SandboxWorkspace() {
         if (!d.empty && !d.failed) setRebuildMs(d.ms);
       } else if (d?.source === 'reshape-anchors') {
         setAnchors(Array.isArray(d.points) ? d.points : []);
+      } else if (d?.source === 'reshape-doc') {
+        // The script runner's own success message -- see
+        // public/reshape/script-runner.html. Stashed for chooseBuild()'s
+        // Code -> Build handoff; nothing here touches `doc`/`build` state
+        // directly, so the model a student is editing in Build is never
+        // silently replaced by a Run that happened while they were in Code.
+        setScriptDoc(d.doc ?? null);
+        setStale(null);
       } else if (d?.source === 'preview-error') {
         // A script that throws on load never reaches reshape-rebuilt, so without
         // this the failure is visible only inside the frame — and the panel
@@ -701,12 +730,25 @@ export default function SandboxWorkspace() {
         + 'after this, but the shape tools will no longer be driving it.'
       );
       if (!ok) return;
-      updateFile('script.js', toReshape(doc));
+      // scriptEngine: toScript(), not toReshape() -- a reSHape Script is
+      // parseable back into a doc (see runScript() in lib/reshape-script.ts),
+      // so Code keeps its OWN copy of the model (scriptDoc) that a later
+      // switch back to Build can adopt. That is new: toReshape()'s JSCAD is
+      // deliberately one-way (see model-types.ts's own header), and this is
+      // the first doc-round-trippable text this editor has ever held.
+      updateFile('script.js', scriptEngine ? toScript(doc) : toReshape(doc));
+      setScriptDoc(doc);
       setDoc(EMPTY_DOC);
       setSelected([]);
       past.current = [];
       future.current = [];
       setDepth({ back: 0, forward: 0 });
+    } else if (on && scriptEngine && scriptDoc) {
+      // Code -> Build: adopt whatever the script last built (the most
+      // recent Run's own 'reshape-doc' message, not a live re-parse of
+      // whatever text sits in the editor right now -- Run is still what
+      // commits an edit, the same contract every other engine already has).
+      loadDoc(scriptDoc);
     }
     try { window.localStorage.setItem(BUILD_KEY, on ? '1' : '0'); } catch { /* private mode */ }
     setBuild(on);
@@ -1385,14 +1427,15 @@ export default function SandboxWorkspace() {
                       runKey={runKey}
                       // Only reached here when NOT (brepEngine && build) --
                       // see the ternary above -- so this is Code mode. Code
-                      // mode stays on the JSCAD runner for now: the script the
-                      // editor holds is the JSCAD-flavoured one toReshape()
-                      // emits and the reference docs teach, and the B-rep
-                      // probe runner cannot run it (measured 2026-09-03:
-                      // "require is not defined" from runner-brep.html). The
-                      // scripting version for the kernel is specced separately;
-                      // when it lands, this becomes brepEngine ? 'brep' : 'jscad'.
-                      engine="jscad"
+                      // mode stays on the JSCAD runner by default: the script
+                      // the editor holds is the JSCAD-flavoured one
+                      // toReshape() emits and the reference docs teach.
+                      // ?script=1 opts into reSHape Script instead (see
+                      // scriptEngine's own comment) -- this frame then draws
+                      // nothing itself (script-runner.html's file header) and
+                      // exists only to turn `code` into the doc Build mode
+                      // picks up through chooseBuild()'s Code -> Build path.
+                      engine={scriptEngine ? 'script' : 'jscad'}
                     />
                   )}
                   {build && (
@@ -1420,7 +1463,9 @@ export default function SandboxWorkspace() {
                     <ReshapeParamsPanel
                       defs={brepEngine ? brepParamDefs : paramDefs}
                       emptyMessage={brepEngine
-                        ? (selected.length ? 'This step has no numbers to adjust.' : 'Select a shape to see its dimensions.')
+                        ? (build
+                          ? (selected.length ? 'This step has no numbers to adjust.' : 'Select a shape to see its dimensions.')
+                          : "Run a script and its numbers appear here. param('name', value) gives one a caption.")
                         : undefined}
                       notice={brepEngine && selected.length === 1 ? refusals?.get(selected[0]) ?? null : null}
                       values={paramValues}
