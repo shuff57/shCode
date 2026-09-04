@@ -105,6 +105,17 @@ export interface OutlineTreatments {
   chamfers: Record<number, number>;
   /** Design edge -> bulge, for an edge the student genuinely bowed. */
   edgeBulges: Record<number, number>;
+  /**
+   * Where the "R3"/"C2.5" label for each treated corner actually belongs --
+   * on the ARC (or chamfer cut)'s own midpoint, offset outward, not at the
+   * design corner. Measured 2026-09-04: a label placed at the design corner
+   * sits exactly where that corner's own drag handle already is, and the
+   * handle (a fixed screen size) is comparable to or bigger than a small
+   * round's whole visible arc, so the label AND the handle together made the
+   * corner read as perfectly sharp with a stray "R3" floating beside it,
+   * even though the arc was correctly drawn underneath.
+   */
+  corners: CornerLabel[];
 }
 
 /**
@@ -140,6 +151,7 @@ export function treatmentsFromOutline(
   const rounds: Record<number, number> = {};
   const chamfers: Record<number, number> = {};
   const edgeBulges: Record<number, number> = {};
+  const corners: CornerLabel[] = [];
   const count = points.length;
   const roles = segmentRoles(basis);
   for (let i = 0; i < count; i++) {
@@ -155,13 +167,54 @@ export function treatmentsFromOutline(
     if (!d) continue;
     const a = points[i];
     const b = points[(i + 1) % count];
+    const mx = (a[0] + b[0]) / 2;
+    const my = (a[1] + b[1]) / 2;
     if (bulge) {
-      rounds[corner] = arcFromBulge(a, b, bulge).radius;
+      const { center, radius } = arcFromBulge(a, b, bulge);
+      rounds[corner] = radius;
+      // The arc's own peak (same construction as a bowed edge's label,
+      // above): the point on the arc's circle in the direction from its
+      // centre through the chord midpoint, then pushed a little further
+      // out so the text clears the curve itself, not just the chord.
+      const dx = mx - center[0];
+      const dy = my - center[1];
+      const dlen = Math.hypot(dx, dy) || 1;
+      corners.push({
+        corner,
+        kind: 'round',
+        x: center[0] + (dx / dlen) * (radius + LABEL_OFFSET),
+        y: center[1] + (dy / dlen) * (radius + LABEL_OFFSET),
+        text: `R${formatLabel(radius)}`,
+      });
     } else {
-      chamfers[corner] = Math.hypot(a[0] - d[0], a[1] - d[1]);
+      const distance = Math.hypot(a[0] - d[0], a[1] - d[1]);
+      chamfers[corner] = distance;
+      // A chamfer's cut is straight, so there is no arc centre to push past
+      // the way a round's label does -- but the SAME idea applies: continue
+      // from the trim segment's midpoint THROUGH the original design
+      // corner, and a little further. The perpendicular to the chord is
+      // NOT safe here: at a corner near 90 degrees with roughly equal trim
+      // on both sides, that perpendicular points almost exactly back at the
+      // corner instead of past it (measured while writing this: it landed
+      // the label 0.17 units from the corner it was supposed to clear, on a
+      // 4-unit chamfer -- functionally the same collision as the original
+      // bug). Corner-through-midpoint, continued, always points away from
+      // the interior, because the trim points are themselves already
+      // between the corner and the interior by construction.
+      let dxOut = d[0] - mx;
+      let dyOut = d[1] - my;
+      const dOutLen = Math.hypot(dxOut, dyOut) || 1;
+      dxOut /= dOutLen; dyOut /= dOutLen;
+      corners.push({
+        corner,
+        kind: 'chamfer',
+        x: d[0] + dxOut * LABEL_OFFSET,
+        y: d[1] + dyOut * LABEL_OFFSET,
+        text: `C${formatLabel(distance)}`,
+      });
     }
   }
-  return { rounds, chamfers, edgeBulges };
+  return { rounds, chamfers, edgeBulges, corners };
 }
 
 /**
@@ -279,4 +332,104 @@ export function sketchLabels(
   }
 
   return { edges, corners, bows };
+}
+
+export interface LabelBox {
+  /** Caller's own key -- handed back unchanged, so the result can be
+   *  matched to whichever label it came from without relying on array
+   *  order surviving the pass. */
+  id: string;
+  /** Centre, in SCREEN pixels (this stage runs after projection -- a
+   *  collision is a screen-space fact, not a plane-space one: two labels on
+   *  opposite sides of a sketch can be far apart in the plane and still
+   *  land on the same pixels once the camera foreshortens one of them). */
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  /**
+   * Unit-ish direction this label may slide along to get clear of another
+   * one -- the edge (or arc chord) it sits beside, never the perpendicular
+   * a caller already used to push it outward. Sliding along the edge keeps
+   * a length label roughly where a student expects it (beside ITS edge);
+   * sliding perpendicular would walk it back toward the shape or further
+   * from it, changing what "offset outward" already decided. Normalized
+   * internally, so any nonzero vector works.
+   */
+  alongX: number;
+  alongY: number;
+}
+
+/** Two axis-aligned boxes, already centred at (x, y) with the given full
+ *  width/height, overlap. */
+function boxesOverlap(a: LabelBox, b: LabelBox): boolean {
+  return Math.abs(a.x - b.x) * 2 < a.width + b.width
+    && Math.abs(a.y - b.y) * 2 < a.height + b.height;
+}
+
+/**
+ * Where each label actually lands after two beginner-facing fixes: nothing
+ * sits outside the viewport, and no two labels sit on top of each other.
+ *
+ * Measured 2026-09-04, blind judge round 2: a "40" label sitting on the Y
+ * axis and a second, unrelated "40" floating over open canvas -- called out
+ * by name as "two duplicate '40' labels" even though they were two
+ * DIFFERENT edges that happened to both measure 40 and land on overlapping
+ * pixels once projected. Neither label was wrong; nothing had ever checked
+ * whether two labels' pixels actually overlapped.
+ *
+ * The collision pass is a few fixed rounds of "slide the later label along
+ * its own edge, away from whichever earlier label it overlaps, by a
+ * fraction of its own size" -- deterministic (same input order always
+ * produces the same output, which is what makes this testable at all) and
+ * cheap enough for the handful of labels one sketch ever carries at once.
+ * Earlier labels in the input order are never moved by a later one, so a
+ * caller that lists its most load-bearing labels first (edge lengths before
+ * glyph chips, say) gets those held still and the rest negotiated around
+ * them.
+ */
+export function layoutLabels(
+  boxes: LabelBox[],
+  viewport: { width: number; height: number },
+): Record<string, { x: number; y: number }> {
+  const placed: LabelBox[] = boxes.map((b) => ({ ...b }));
+  const STEP_ROUNDS = 8;
+  for (let round = 0; round < STEP_ROUNDS; round++) {
+    let movedAny = false;
+    for (let i = 1; i < placed.length; i++) {
+      const cur = placed[i];
+      for (let j = 0; j < i; j++) {
+        const other = placed[j];
+        if (!boxesOverlap(cur, other)) continue;
+        const len = Math.hypot(cur.alongX, cur.alongY) || 1;
+        const ux = cur.alongX / len;
+        const uy = cur.alongY / len;
+        // Which way along the edge actually increases separation -- moving
+        // blind could just as easily walk two labels deeper into each
+        // other if they happen to be offset against the chosen sign.
+        const towardX = cur.x - other.x;
+        const towardY = cur.y - other.y;
+        const sign = ux * towardX + uy * towardY >= 0 ? 1 : -1;
+        const step = Math.max(cur.width, cur.height) * 0.6;
+        cur.x += ux * sign * step;
+        cur.y += uy * sign * step;
+        movedAny = true;
+      }
+    }
+    if (!movedAny) break;
+  }
+
+  // Kept inside the canvas last, so a slide that resolved a collision near
+  // an edge cannot be undone by the clamp, and a clamp near a corner cannot
+  // reintroduce a collision the slide pass never got a chance to see.
+  for (const b of placed) {
+    const halfW = b.width / 2;
+    const halfH = b.height / 2;
+    b.x = Math.min(Math.max(b.x, halfW), Math.max(halfW, viewport.width - halfW));
+    b.y = Math.min(Math.max(b.y, halfH), Math.max(halfH, viewport.height - halfH));
+  }
+
+  const out: Record<string, { x: number; y: number }> = {};
+  for (const b of placed) out[b.id] = { x: b.x, y: b.y };
+  return out;
 }

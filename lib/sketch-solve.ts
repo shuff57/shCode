@@ -354,6 +354,67 @@ export function describe(c: Constraint): string {
   return `corner ${c.corner + 1} pinned`;
 }
 
+/** Same claim as describe(), phrased as the thing that just left rather than
+ *  the thing that is still true -- "Edge 2's length 20", not "edge 2 = 20".
+ *  Capitalised because it opens the sentence describeRemovalNote() builds. */
+function describeAsRemoved(c: Constraint): string {
+  if (c.kind === 'horizontal') return `Edge ${c.edge + 1}'s across rule`;
+  if (c.kind === 'vertical') return `Edge ${c.edge + 1}'s up rule`;
+  if (c.kind === 'length') return `Edge ${c.edge + 1}'s length ${c.value}`;
+  if (c.kind === 'equal') return `Edge ${c.edge + 1} = Edge ${c.other + 1}`;
+  if (c.kind === 'parallel') return `Edge ${c.edge + 1} ∥ Edge ${c.other + 1}`;
+  if (c.kind === 'perpendicular') return `Edge ${c.edge + 1} ⊥ Edge ${c.other + 1}`;
+  return `Corner ${c.corner + 1}'s pin`;
+}
+
+/** "Edge 2's length 20 was removed so edge 1 = edge 2 could hold." -- the
+ *  panel note addConstraintSettling's caller shows in place of the red
+ *  conflict banner, when settling the new rule cost an older one. */
+export function describeRemovalNote(removed: Constraint, added: Constraint): string {
+  return `${describeAsRemoved(removed)} was removed so ${describe(added)} could hold.`;
+}
+
+export interface ConflictResolution {
+  constraints: Constraint[];
+  /** The older rule that had to go to make room for the new one, or null
+   *  when nothing needed to -- either the new rule fit cleanly, or no
+   *  single older rule's removal would have settled it (the banner is the
+   *  honest answer in that case, and `constraints` here is just `next`,
+   *  unchanged, same as if this function had never been called). */
+  removed: Constraint | null;
+}
+
+/**
+ * Settles a newly-added rule the way a beginner means it: `next`'s own last
+ * entry is the rule they just clicked or typed (every SketchConstraints.tsx
+ * handler appends there), and if the result is unsatisfiable, the fix a
+ * beginner wants is not a red banner over the rule they just finished
+ * setting -- it is "whichever OLDER rule is in the way, gone".
+ *
+ * Measured 2026-09-04: cycling "Edges 1 and 2" to equal after both edges
+ * already carried fixed, different lengths (40 and 20) landed the sketch in
+ * "these rules cannot all be true", garbled numbers, red banner -- for a
+ * rule the student had just asked for on purpose.
+ *
+ * Tries removing each older rule in turn, OLDEST first (array order, since
+ * every rule already sits in the order it was added), and keeps the first
+ * single removal that resolves it. A conflict that needs more than one rule
+ * gone is left alone, banner included: this is a nudge for the ordinary
+ * "these two just started disagreeing" case, not a general re-solver for
+ * every possible contradiction.
+ */
+export function addConstraintSettling(points: Point[], next: Constraint[]): ConflictResolution {
+  if (next.length === 0) return { constraints: next, removed: null };
+  if (!solveSketch(points, next).overConstrained) return { constraints: next, removed: null };
+  for (let i = 0; i < next.length - 1; i++) {
+    const candidate = next.filter((_, idx) => idx !== i);
+    if (!solveSketch(points, candidate).overConstrained) {
+      return { constraints: candidate, removed: next[i] };
+    }
+  }
+  return { constraints: next, removed: null };
+}
+
 /** Which DESIGN EDGES are named by a constraint that is still violated after a
  *  solve -- the geometry a student should be looking at, as opposed to
  *  `residualsOf`, which names the rules.

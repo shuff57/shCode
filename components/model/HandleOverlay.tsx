@@ -12,8 +12,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { arcFromBulge, type Point } from '../../lib/sketch-arc';
-import { type Constraint, losingEdges, residualsOf } from '../../lib/sketch-solve';
-import { circleLabel, sketchLabels, treatmentsFromOutline } from '../../lib/sketch-outline';
+import { type Constraint, edgeLength, losingEdges, residualsOf } from '../../lib/sketch-solve';
+import { circleLabel, formatLabel, type LabelBox, layoutLabels, sketchLabels, treatmentsFromOutline } from '../../lib/sketch-outline';
 
 /**
  * One selected sketch's outline, in plane coordinates -- what the overlay
@@ -175,6 +175,42 @@ function glyphAt(
   };
 }
 
+/**
+ * A screen point pushed at least `minPx` away from `anchor`, in whatever
+ * direction `target` (already projected to screen) happens to lie -- never
+ * less than that, however foreshortened `target` itself turns out to be.
+ *
+ * Exists because a PLANE-space "outward" offset (what treatmentsFromOutline
+ * computes for a round/chamfer label) is correct as a direction but not as a
+ * promise of screen distance: a plane direction that happens to point mostly
+ * toward or away from the camera projects to almost no lateral movement at
+ * all. Measured 2026-09-04: "Round corner 1" on a fresh default sketch --
+ * corner 0 sits exactly at the world origin, which the Home camera looks
+ * roughly straight down the axis of -- projected a real, correctly-outward
+ * 3-unit plane offset to under 5 screen pixels, leaving the "R3" label
+ * sitting on top of the corner's own drag handle exactly as before the fix.
+ * A DIFFERENT corner (not at the origin) cleared the same handle cleanly
+ * with the same plane-space formula, so the direction was never wrong -- only
+ * the DISTANCE this one camera angle was willing to show it at.
+ */
+function pushFromAnchor(
+  anchor: { x: number; y: number },
+  target: { x: number; y: number },
+  minPx: number,
+): { x: number; y: number } {
+  const dx = target.x - anchor.x;
+  const dy = target.y - anchor.y;
+  const len = Math.hypot(dx, dy);
+  // Straight up is as good a default as any when the projected direction
+  // degenerates to (near) zero -- rare (the offset would have to project
+  // almost exactly along the camera's own view ray), but a label at exactly
+  // the anchor is the one outcome this function exists to rule out.
+  const ux = len > 1e-6 ? dx / len : 0;
+  const uy = len > 1e-6 ? dy / len : -1;
+  const push = Math.max(len, minPx);
+  return { x: anchor.x + ux * push, y: anchor.y + uy * push };
+}
+
 const GLYPH_TEXT: Record<Exclude<Constraint['kind'], 'lock'>, string> = {
   horizontal: '—',
   vertical: '|',
@@ -326,6 +362,15 @@ export default function HandleOverlay({
   points, values, scales, onDrag, onCommit, onTap, outlines, drawing, onPlace, bottomInset = 0,
 }: Props) {
   const [dragging, setDragging] = useState<string | null>(null);
+  // A floating name for whichever edge or corner of the SELECTED sketch the
+  // pointer is currently over -- "Edge 2 · 20", "Corner 1" -- so a beginner
+  // does not have to cross-reference the Rules table by row number to know
+  // which cyan line they are looking at. Measured 2026-09-04, blind judge
+  // round 2: "a generic cyan dashed outline and square handles on a selected
+  // edge with no floating name". Cleared whenever nothing is hovered rather
+  // than left stale, since the outline this refers to can change shape
+  // (a drag, a Length commit) while the pointer sits still over it.
+  const [hoveredPart, setHoveredPart] = useState<{ kind: 'edge' | 'corner'; index: number } | null>(null);
   // Whether the current pointerdown-to-pointerup has crossed TAP_TOLERANCE_PX
   // yet. A click on a handle (e.g. the height handle sitting over a face's
   // own centre) must still pick that face -- see onTap's own doc comment --
@@ -529,10 +574,101 @@ export default function HandleOverlay({
             // points inserted ahead of a later edge. Measured 2026-09-04:
             // that raw hand-off drew a spurious bow label on the very arc a
             // corner round had just created.
-            const { rounds, chamfers, edgeBulges } = treatmentsFromOutline(o.design, o.points, o.basis, o.bulges);
+            // Round/chamfer labels come from treatmentsFromOutline's OWN
+            // `corners` list, not sketchLabels' -- they need the arc/cut's
+            // real midpoint (only the rendered outline knows that), not the
+            // design corner sketchLabels works from. See treatmentsFromOutline's
+            // own comment: a label placed at the design corner sits exactly
+            // where that corner's own drag handle already is, and the two
+            // together can hide a small round's entire visible arc.
+            const { edgeBulges, corners: cornerLabels } = treatmentsFromOutline(o.design, o.points, o.basis, o.bulges);
             const labels = o.shape === 'circle'
               ? { edges: [], corners: [], bows: [] }
-              : sketchLabels(o.design, o.constraints ?? [], rounds, chamfers, edgeBulges);
+              : sketchLabels(o.design, o.constraints ?? [], undefined, undefined, edgeBulges);
+
+            // Every label this outline wants to draw, projected to screen
+            // FIRST, so collisions are judged in the space they actually
+            // happen in -- two labels can sit far apart in the plane and
+            // still land on the same pixels once the camera forshortens
+            // one of them, which is exactly how "two duplicate 40s" (a
+            // beginner-lens finding, 2026-09-04) turned out to be two
+            // DIFFERENT edges that both measured 40, not a bug that drew
+            // one label twice. Edge/dimension labels list first, so a
+            // collision moves the corner/bow/circle label sliding into
+            // them rather than the load-bearing edge number.
+            const labelBoxes: LabelBox[] = [];
+            // A constraint glyph chip (the little "—"/"↔"/"|" pill a rule
+            // draws on its edge) is a label too, and the FIRST collision
+            // this fix actually found live wasn't two length numbers at
+            // all -- it was a chip sitting on top of a length label one
+            // edge over. Listed before the length labels below so a chip
+            // (which also names WHICH rule is set, not just a number) holds
+            // its ground and a colliding length label slides instead.
+            const chipSpots = new Map<number, { x: number; y: number }>();
+            for (const [edge, glyphs] of chips) {
+              const spot = glyphAt(at, o.corners, edge);
+              const anchor = at.get(o.corners[edge]);
+              const b = at.get(o.corners[(edge + 1) % o.corners.length]);
+              if (!spot || !anchor) continue;
+              chipSpots.set(edge, spot);
+              const w = glyphs.length * 13 + 8;
+              labelBoxes.push({
+                id: `chip-${edge}`, x: spot.x, y: spot.y, width: w, height: 18,
+                alongX: b ? b.x - anchor.x : 1, alongY: b ? b.y - anchor.y : 0,
+              });
+            }
+            const edgeSpots = new Map<string, { x: number; y: number }>();
+            for (const l of labels.edges) {
+              const anchor = at.get(o.corners[l.edge]);
+              if (!anchor || anchor.ux === undefined || anchor.uy === undefined) continue;
+              const spot = projectFrom(anchor, o.design[l.edge], [l.x, l.y]);
+              const b = at.get(o.corners[(l.edge + 1) % o.corners.length]);
+              const alongX = b ? b.x - anchor.x : 1;
+              const alongY = b ? b.y - anchor.y : 0;
+              const id = `edge-${l.edge}`;
+              edgeSpots.set(id, spot);
+              labelBoxes.push({ id, x: spot.x, y: spot.y, width: l.text.length * 7 + 6, height: 16, alongX, alongY });
+            }
+            const cornerSpots = new Map<string, { x: number; y: number }>();
+            for (const l of cornerLabels) {
+              const anchor = at.get(o.corners[l.corner]);
+              if (!anchor || anchor.ux === undefined || anchor.uy === undefined) continue;
+              const projected = projectFrom(anchor, o.design[l.corner], [l.x, l.y]);
+              const spot = pushFromAnchor(anchor, projected, 18);
+              const id = `corner-${l.corner}`;
+              cornerSpots.set(id, spot);
+              // Slides sideways along the anchor's own U axis by default --
+              // a corner label has no single "edge" of its own the way an
+              // edge label does, so any fixed direction that is not the
+              // outward push itself (which would undo the offset) will do.
+              labelBoxes.push({ id, x: spot.x, y: spot.y, width: l.text.length * 7 + 6, height: 16, alongX: anchor.ux, alongY: anchor.uy });
+            }
+            const bowSpots = new Map<string, { x: number; y: number }>();
+            for (const l of labels.bows) {
+              const anchor = at.get(o.corners[l.edge]);
+              if (!anchor || anchor.ux === undefined || anchor.uy === undefined) continue;
+              const spot = projectFrom(anchor, o.design[l.edge], [l.x, l.y]);
+              const id = `bow-${l.edge}`;
+              bowSpots.set(id, spot);
+              labelBoxes.push({ id, x: spot.x, y: spot.y, width: l.text.length * 7 + 6, height: 16, alongX: anchor.ux, alongY: anchor.uy });
+            }
+            let circleSpot: { x: number; y: number } | null = null;
+            let circleText = '';
+            if (o.shape === 'circle') {
+              const c = circleLabel(o.design);
+              const anchor = at.get(o.corners[0]);
+              if (c && anchor && anchor.ux !== undefined && anchor.uy !== undefined) {
+                circleSpot = projectFrom(anchor, o.design[0], [c.x, c.y]);
+                circleText = c.text;
+                labelBoxes.push({ id: 'circle', x: circleSpot.x, y: circleSpot.y, width: circleText.length * 7 + 6, height: 16, alongX: 1, alongY: 0 });
+              }
+            }
+            const viewportRect = layerRef.current?.getBoundingClientRect();
+            const laidOut = layoutLabels(labelBoxes, {
+              width: viewportRect?.width ?? 4000,
+              height: viewportRect?.height ?? 4000,
+            });
+
             return (
               <g key={n}>
                 <polygon
@@ -556,8 +692,29 @@ export default function HandleOverlay({
                     />
                   );
                 })}
+                {/* An invisible, fatter twin of each design edge, purely for
+                    hover -- the visible outline's own 1.5px stroke is nowhere
+                    near forgiving enough to point at with a mouse. Not drawn
+                    for a circle: it has no design edges, only its own
+                    already-labelled rim. */}
+                {o.shape !== 'circle' && basis && o.design.map((_, e) => {
+                  const run = edgePolyline(pts, basis, e, o.corners.length);
+                  if (!run) return null;
+                  return (
+                    <polyline
+                      key={`hit-${e}`}
+                      className="sketch-edge-hit"
+                      points={run.map((p) => `${p.x},${p.y}`).join(' ')}
+                      onMouseEnter={() => setHoveredPart({ kind: 'edge', index: e })}
+                      onMouseLeave={() =>
+                        setHoveredPart((cur) => (cur?.kind === 'edge' && cur.index === e ? null : cur))
+                      }
+                    />
+                  );
+                })}
                 {[...chips].map(([edge, glyphs]) => {
-                  const spot = glyphAt(at, o.corners, edge)!;
+                  const spot = laidOut[`chip-${edge}`] ?? chipSpots.get(edge);
+                  if (!spot) return null;
                   // #bd93f9 is the same purple the panel paints a set control
                   // with, so "this rule is on" looks the same in both places.
                   // The first pass used #6272a4 and measured unreadable at 4x
@@ -599,9 +756,10 @@ export default function HandleOverlay({
                   );
                 })}
                 {labels.edges.map((l) => {
-                  const anchor = at.get(o.corners[l.edge]);
-                  if (!anchor || anchor.ux === undefined || anchor.uy === undefined) return null;
-                  const spot = projectFrom(anchor, o.design[l.edge], [l.x, l.y]);
+                  const id = `edge-${l.edge}`;
+                  const spot = edgeSpots.get(id);
+                  const textSpot = laidOut[id];
+                  if (!spot || !textSpot) return null;
                   // A ruled length also gets a thin dimension line -- ticks at
                   // both ends, parallel to the edge -- so a DRIVEN measurement
                   // reads differently from a passive one, the way jsketcher's
@@ -609,6 +767,10 @@ export default function HandleOverlay({
                   // anchors directly (screen space), not reprojected through
                   // `spot`, so the line stays exactly parallel to the edge on
                   // screen regardless of how far the label itself sits out.
+                  // Anchored to the label's ORIGINAL projected position, not
+                  // its post-collision one -- the line marks where the edge
+                  // actually measures from, and only the number needs to
+                  // dodge a neighbour.
                   const a = at.get(o.corners[l.edge]);
                   const b = at.get(o.corners[(l.edge + 1) % o.corners.length]);
                   const TICK = 4;
@@ -650,8 +812,8 @@ export default function HandleOverlay({
                         </g>
                       )}
                       <text
-                        x={spot.x}
-                        y={spot.y}
+                        x={textSpot.x}
+                        y={textSpot.y}
                         className={l.kind === 'dimension' ? 'sketch-dim-text' : 'sketch-len-text'}
                         textAnchor="middle"
                         dominantBaseline="central"
@@ -661,14 +823,15 @@ export default function HandleOverlay({
                     </g>
                   );
                 })}
-                {labels.corners.map((l) => {
-                  const anchor = at.get(o.corners[l.corner]);
-                  if (!anchor) return null;
+                {cornerLabels.map((l) => {
+                  const id = `corner-${l.corner}`;
+                  const textSpot = laidOut[id] ?? cornerSpots.get(id);
+                  if (!textSpot) return null;
                   return (
                     <text
-                      key={`corner-${l.corner}`}
-                      x={anchor.x + 12}
-                      y={anchor.y - 12}
+                      key={id}
+                      x={textSpot.x}
+                      y={textSpot.y}
                       className="sketch-round-text"
                       textAnchor="middle"
                       dominantBaseline="central"
@@ -678,14 +841,14 @@ export default function HandleOverlay({
                   );
                 })}
                 {labels.bows.map((l) => {
-                  const anchor = at.get(o.corners[l.edge]);
-                  if (!anchor || anchor.ux === undefined || anchor.uy === undefined) return null;
-                  const spot = projectFrom(anchor, o.design[l.edge], [l.x, l.y]);
+                  const id = `bow-${l.edge}`;
+                  const textSpot = laidOut[id] ?? bowSpots.get(id);
+                  if (!textSpot) return null;
                   return (
                     <text
-                      key={`bow-${l.edge}`}
-                      x={spot.x}
-                      y={spot.y}
+                      key={id}
+                      x={textSpot.x}
+                      y={textSpot.y}
                       className="sketch-len-text"
                       textAnchor="middle"
                       dominantBaseline="central"
@@ -694,21 +857,46 @@ export default function HandleOverlay({
                     </text>
                   );
                 })}
-                {o.shape === 'circle' && (() => {
-                  const c = circleLabel(o.design);
-                  const anchor = at.get(o.corners[0]);
-                  if (!c || !anchor || anchor.ux === undefined || anchor.uy === undefined) return null;
-                  const spot = projectFrom(anchor, o.design[0], [c.x, c.y]);
+                {circleSpot && (() => {
+                  const textSpot = laidOut.circle ?? circleSpot;
                   return (
                     <text
-                      x={spot.x}
-                      y={spot.y}
+                      x={textSpot.x}
+                      y={textSpot.y}
                       className="sketch-dim-text"
                       textAnchor="middle"
                       dominantBaseline="central"
                     >
-                      {c.text}
+                      {circleText}
                     </text>
+                  );
+                })()}
+                {hoveredPart && o.shape !== 'circle' && (() => {
+                  const idx = hoveredPart.index;
+                  if (idx < 0 || idx >= o.corners.length) return null;
+                  const text = hoveredPart.kind === 'edge'
+                    ? `Edge ${idx + 1} · ${formatLabel(edgeLength(o.design, idx))}`
+                    : `Corner ${idx + 1}`;
+                  const anchor = at.get(o.corners[idx]);
+                  if (!anchor) return null;
+                  // A screen-space nudge, not a plane-space one -- same
+                  // reasoning as pushFromAnchor above: this pill has to clear
+                  // the corner/edge it names regardless of which way the
+                  // camera happens to foreshorten the sketch's own plane.
+                  const spot = { x: anchor.x, y: anchor.y - 22 };
+                  return (
+                    <g className="sketch-name-pill">
+                      <rect
+                        x={spot.x - (text.length * 3.6 + 8)}
+                        y={spot.y - 9}
+                        width={text.length * 7.2 + 16}
+                        height={18}
+                        rx={9}
+                      />
+                      <text x={spot.x} y={spot.y} textAnchor="middle" dominantBaseline="central">
+                        {text}
+                      </text>
+                    </g>
                   );
                 })()}
               </g>
@@ -743,6 +931,18 @@ export default function HandleOverlay({
             style={{ left, top }}
             aria-label={`Drag ${a.label}`}
             title={`${a.label}${typeof raw === 'number' ? ` — ${Math.round(raw * 100) / 100}` : ''}`}
+            onMouseEnter={() => {
+              if (a.kind !== 'point') return;
+              const m = /_p(\d+)u$/.exec(a.param);
+              if (m) setHoveredPart({ kind: 'corner', index: Number(m[1]) });
+            }}
+            onMouseLeave={() => {
+              const m = /_p(\d+)u$/.exec(a.param);
+              if (m) {
+                const index = Number(m[1]);
+                setHoveredPart((cur) => (cur?.kind === 'corner' && cur.index === index ? null : cur));
+              }
+            }}
             onPointerDown={(e) => {
               e.preventDefault();
               e.currentTarget.setPointerCapture(e.pointerId);
@@ -959,6 +1159,25 @@ export default function HandleOverlay({
            tells a measurement apart from geometry at a glance. */
         .sketch-lines .sketch-dim line {
           stroke: #f8f8f2; stroke-width: 1; opacity: 0.7;
+        }
+        /* A fat, invisible twin of each design edge, purely so a mouse has
+           something realistic to land on -- the visible outline's own
+           1.5px stroke is not a fair target. stroke: transparent (not
+           none) is load-bearing: SVG hit-testing under the default
+           visiblePainted only fires for a stroke that IS painted, alpha
+           notwithstanding -- "none" would make this shape click-through. */
+        .sketch-lines .sketch-edge-hit {
+          fill: none; stroke: transparent; stroke-width: 14px;
+          pointer-events: stroke; cursor: pointer;
+        }
+        /* The floating name pill -- same dark-panel-on-line-border family
+           every other pill in this app already wears, just small enough to
+           sit beside a single edge or corner without crowding the handle. */
+        .sketch-lines .sketch-name-pill rect {
+          fill: #282a36; stroke: #6272a4; stroke-width: 1;
+        }
+        .sketch-lines .sketch-name-pill text {
+          fill: #f8f8f2; font-size: 11px; font-weight: 600;
         }
         /* The Rules panel names which rules disagree and this does not repeat
            that -- it exists to be impossible to miss and to point at the red. */

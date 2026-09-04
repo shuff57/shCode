@@ -503,6 +503,68 @@ module.exports = function run(dir) {
   check('...and its residual reads clean, not the previous sketch\'s',
     S.residualOf(unrelatedCircle, []) === 0);
 
+  console.log('\n=== addConstraintSettling: the rule you just made wins, not the banner ===');
+
+  // rect() = [[0,0],[40,0],[40,25],[0,25]], no h/v of its own. Edge 1
+  // (index 1)'s length is the OLDER rule here on purpose -- it sits FIRST
+  // in the array, matching the array-order convention every
+  // SketchConstraints.tsx handler already appends to (oldest first).
+  const startRect = rect();
+  const beforeEqual = [
+    { kind: 'length', edge: 1, value: 20 },
+    { kind: 'length', edge: 0, value: 40 },
+  ];
+  const afterEqual = [...beforeEqual, { kind: 'equal', edge: 0, other: 1 }];
+  check('the raw addition really would be a conflict -- both lengths fixed AND made equal',
+    S.solveSketch(startRect, afterEqual).overConstrained, 'setup check, not the fix under test');
+
+  const settledEqual = S.addConstraintSettling(startRect, afterEqual);
+  check('cycling Edges 1&2 to equal settles clean -- no conflict left standing',
+    !S.solveSketch(startRect, settledEqual.constraints).overConstrained,
+    JSON.stringify(settledEqual));
+  check('...by dropping edge 1\'s length rule specifically (the OLDER of the two, not edge 0\'s)',
+    settledEqual.removed && settledEqual.removed.kind === 'length' && settledEqual.removed.edge === 1
+    && settledEqual.constraints.some((c) => c.kind === 'length' && c.edge === 0 && c.value === 40)
+    && !settledEqual.constraints.some((c) => c.kind === 'length' && c.edge === 1),
+    JSON.stringify(settledEqual));
+  check('...and the note reads exactly the sentence a beginner needs',
+    S.describeRemovalNote(settledEqual.removed, afterEqual[afterEqual.length - 1])
+      === "Edge 2's length 20 was removed so edge 1 = edge 2 could hold.",
+    S.describeRemovalNote(settledEqual.removed, afterEqual[afterEqual.length - 1]));
+
+  // Then: typing 25 into edge 1's Length box. setLength() always filters out
+  // any EXISTING length rule on that same edge before appending the new one
+  // (SketchConstraints.tsx's own convention) -- so this is a plain add, not
+  // a second settling case, and it should need no removal at all.
+  const afterLength = [
+    ...settledEqual.constraints.filter((c) => !(c.kind === 'length' && c.edge === 0)),
+    { kind: 'length', edge: 0, value: 25 },
+  ];
+  const settledLength = S.addConstraintSettling(startRect, afterLength);
+  check('typing 25 on edge 1 needs no removal at all -- it never conflicted with equal',
+    settledLength.removed === null, JSON.stringify(settledLength));
+  const bothAt25 = S.solveSketch(startRect, settledLength.constraints);
+  check('...and both edges actually settle at 25',
+    near(S.edgeLength(bothAt25.points, 0), 25) && near(S.edgeLength(bothAt25.points, 1), 25),
+    JSON.stringify(bothAt25.points));
+
+  // The banner still has to be the honest answer when NO single removal
+  // would fix it -- addConstraintSettling must not invent a multi-rule
+  // rewrite just to make the red banner go away. Three DIFFERENT lengths on
+  // the SAME edge is exactly that: dropping any one of the three still
+  // leaves two different values fighting over the same edge, so no single
+  // removal ever clears it (unlike three mutually perpendicular triangle
+  // edges, where dropping any ONE of the three resolves it immediately --
+  // measured while writing this test, and the wrong fixture to use here).
+  const trulyStuck = S.addConstraintSettling(rect(), [
+    { kind: 'length', edge: 0, value: 10 },
+    { kind: 'length', edge: 0, value: 20 },
+    { kind: 'length', edge: 0, value: 30 },
+  ]);
+  check('a conflict that needs more than one rule gone is left alone -- banner included',
+    trulyStuck.removed === null && trulyStuck.constraints.length === 3,
+    JSON.stringify(trulyStuck));
+
   if (deltas.length) {
     console.log('\n=== HOW THIS SOLVER SETTLES (reported, never gated) ===');
     for (const [name, detail] of deltas) {

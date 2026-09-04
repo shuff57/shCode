@@ -8,12 +8,15 @@
 import {
   type Constraint,
   type Point,
+  addConstraintSettling,
   describe,
+  describeRemovalNote,
   edgeCorners,
   edgeLength,
   residualOf,
   residualsOf,
 } from '../../lib/sketch-solve';
+import { useState } from 'react';
 import {
   maxChamferDistance,
   maxFilletRadius,
@@ -135,6 +138,12 @@ const PANEL_CSS = `
           margin: 0 0 8px; padding: 6px 8px; font-size: 11px; line-height: 1.45;
           color: #ffb86c; background-color: #3a2f22; border-left: 2px solid #ffb86c;
         }
+        /* The settled-not-stuck case: purple, the same "a rule is set" colour
+           the table's own .on buttons use, not the amber a genuine conflict
+           still gets -- this note is reporting a fix, not a warning. */
+        .sk-rules-note-info {
+          color: #bd93f9; background-color: #2d2b3a; border-left-color: #bd93f9;
+        }
         .sk-table { width: 100%; border-collapse: collapse; }
         .sk-table th {
           text-align: left; font-weight: normal; color: #6272a4;
@@ -236,6 +245,25 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
     );
   const namedConflict = constraints.filter(conflicted).map(describe);
 
+  // The sentence shown in place of the red banner when adding a rule cost an
+  // older one its place -- "Edge 2's length 20 was removed so edge 1 = edge
+  // 2 could hold." Cleared on every settle() call before the new attempt, so
+  // it never lingers past the edit that explains it, and left untouched by a
+  // plain removal (unchecking a box can only ever reduce how over-constrained
+  // the sketch is, never create a new fight to settle).
+  const [autoNote, setAutoNote] = useState<string | null>(null);
+
+  /** Runs a freshly-built constraint list (the caller's new/changed rule
+   *  always last, same convention addConstraintSettling's own doc comment
+   *  relies on) through conflict settling before committing it -- see that
+   *  function's header for why beginners get the older rule dropped instead
+   *  of a banner over the rule they just asked for. */
+  function settle(next: Constraint[]) {
+    const result = addConstraintSettling(points, next);
+    setAutoNote(result.removed ? describeRemovalNote(result.removed, next[next.length - 1]) : null);
+    onChange(result.constraints);
+  }
+
   function toggle(kind: 'horizontal' | 'vertical', edge: number) {
     if (has(constraints, kind, edge)) {
       onChange(constraints.filter((c) => !('edge' in c && c.edge === edge && c.kind === kind)));
@@ -247,7 +275,7 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
     const cleaned = constraints.filter(
       (c) => !('edge' in c && c.edge === edge && c.kind === other)
     );
-    onChange([...cleaned, { kind, edge }]);
+    settle([...cleaned, { kind, edge }]);
   }
 
   function setLength(edge: number, raw: string) {
@@ -257,16 +285,16 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
       onChange(rest);
       return;
     }
-    onChange([...rest, { kind: 'length', edge, value: Math.round(v * 100) / 100 }]);
+    settle([...rest, { kind: 'length', edge, value: Math.round(v * 100) / 100 }]);
   }
 
   function lockCorner(corner: number) {
     const held = constraints.some((c) => c.kind === 'lock' && c.corner === corner);
-    onChange(
-      held
-        ? constraints.filter((c) => !(c.kind === 'lock' && c.corner === corner))
-        : [...constraints, { kind: 'lock', corner }]
-    );
+    if (held) {
+      onChange(constraints.filter((c) => !(c.kind === 'lock' && c.corner === corner)));
+      return;
+    }
+    settle([...constraints, { kind: 'lock', corner }]);
   }
 
   // Named for where the sketch SITS, not for its axis letters, with the real
@@ -344,6 +372,16 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
             </>
           )}
         </p>
+      )}
+
+      {/* Not a warning -- this is the beginner-facing case working exactly as
+          intended: the rule just clicked or typed is the one that survives,
+          and an older rule quietly made room for it. Shown in place of the
+          red banner above, never alongside it -- `fighting` is false
+          whenever this has something to say, because settle() only leaves a
+          note when it found a fix that actually resolved the conflict. */}
+      {!fighting && autoNote && (
+        <p className="sk-rules-note sk-rules-note-info">{autoNote}</p>
       )}
 
       {planeRow}
@@ -466,7 +504,7 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
                           aria-label={`Edges ${lo + 1} and ${hi + 1}: ${cur === null ? 'no rule' : cur}`}
                           className={[cur === null ? '' : 'on', pairConflict(lo, hi) ? 'fighting' : '']
                             .filter(Boolean).join(' ') || undefined}
-                          onClick={() => onChange(cyclePair(constraints, lo, hi))}
+                          onClick={() => settle(cyclePair(constraints, lo, hi))}
                           disabled={disabled}
                           title={cur === null ? (curvedTitle ?? `Edges ${lo + 1} and ${hi + 1}: click to cycle equal, parallel, perpendicular`) : `Edges ${lo + 1} and ${hi + 1}: ${cur}`}
                         >

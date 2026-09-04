@@ -735,6 +735,35 @@ module.exports = function run(dir) {
   check('...and finds no genuinely bowed edge in a doc that only has a round',
     Object.keys(treatments.edgeBulges).length === 0, JSON.stringify(treatments.edgeBulges));
 
+  // The regression this file exists to pin: a round's label used to sit AT
+  // the design corner -- exactly where that corner's own drag handle already
+  // is, which for a small radius can hide the whole visible arc behind the
+  // handle and read as "no round was drawn at all" (measured live,
+  // 2026-09-04, Round corner 1 = 3 on a 40x20 rectangle: R3 showed, the
+  // corner still looked perfectly sharp). The label must sit on the ARC's
+  // own midpoint, past it, not on the corner.
+  const designCorner1 = square.points[1];
+  const roundLabelPos = treatments.corners.find((c) => c.corner === 1);
+  const distFromDesignCorner = Math.hypot(roundLabelPos.x - designCorner1[0], roundLabelPos.y - designCorner1[1]);
+  check('a round\'s label is NOT placed at the design corner -- it is a real distance from it',
+    distFromDesignCorner > 1,
+    `label at (${roundLabelPos.x.toFixed(2)}, ${roundLabelPos.y.toFixed(2)}), corner at (${designCorner1[0]}, ${designCorner1[1]}), distance ${distFromDesignCorner.toFixed(2)}`);
+  check('...specifically OUTWARD -- further from the rectangle than the corner itself, not into it',
+    roundLabelPos.x > designCorner1[0] && roundLabelPos.y < designCorner1[1],
+    JSON.stringify(roundLabelPos));
+
+  // Same claim for a chamfer: its trim segment is straight, so the label is
+  // the segment's own midpoint, offset outward -- not the design corner.
+  const renderedChamferForLabel = arc.outlineOf({ ...square, chamfers: { 1: 4 } });
+  const chamferTreatForLabel = outline.treatmentsFromOutline(
+    square.points, renderedChamferForLabel.points, renderedChamferForLabel.basis, renderedChamferForLabel.bulges,
+  );
+  const chamferLabelPos = chamferTreatForLabel.corners.find((c) => c.corner === 1);
+  const chamferDistFromCorner = Math.hypot(chamferLabelPos.x - designCorner1[0], chamferLabelPos.y - designCorner1[1]);
+  check('a chamfer\'s label also sits away from the design corner, outward',
+    chamferDistFromCorner > 1 && chamferLabelPos.x > designCorner1[0],
+    `label at (${chamferLabelPos.x.toFixed(2)}, ${chamferLabelPos.y.toFixed(2)}), distance ${chamferDistFromCorner.toFixed(2)}`);
+
   const pipelineLabels = outline.sketchLabels(
     square.points, [], treatments.rounds, treatments.chamfers, treatments.edgeBulges,
   );
@@ -808,6 +837,72 @@ module.exports = function run(dir) {
     outline.sketchLabels([[5, 5], [5, 5], [40, 25]], []).edges.every(
       (l) => Number.isFinite(l.x) && Number.isFinite(l.y)
     ));
+
+  console.log('\n=== layoutLabels: no two duplicate-looking labels sit on the same pixels ===');
+
+  const viewport = { width: 800, height: 600 };
+  const overlap = (a, b) => Math.abs(a.x - b.x) * 2 < a.width + b.width && Math.abs(a.y - b.y) * 2 < a.height + b.height;
+
+  const twoForties = outline.layoutLabels(
+    [
+      { id: 'a', x: 400, y: 300, width: 24, height: 16, alongX: 1, alongY: 0 },
+      { id: 'b', x: 402, y: 301, width: 24, height: 16, alongX: 1, alongY: 0 },
+    ],
+    viewport,
+  );
+  check('two labels landing on the same pixels ("two duplicate 40s") no longer overlap after layout',
+    !overlap({ ...twoForties.a, width: 24, height: 16 }, { ...twoForties.b, width: 24, height: 16 }),
+    JSON.stringify(twoForties));
+  check('...and the FIRST one (a) is not the one that moved -- earlier labels hold still',
+    twoForties.a.x === 400 && twoForties.a.y === 300, JSON.stringify(twoForties.a));
+
+  const farApart = outline.layoutLabels(
+    [
+      { id: 'a', x: 100, y: 100, width: 20, height: 14, alongX: 1, alongY: 0 },
+      { id: 'b', x: 700, y: 500, width: 20, height: 14, alongX: 0, alongY: 1 },
+    ],
+    viewport,
+  );
+  check('labels nowhere near each other are left exactly where they were',
+    farApart.a.x === 100 && farApart.a.y === 100 && farApart.b.x === 700 && farApart.b.y === 500,
+    JSON.stringify(farApart));
+
+  const offCanvas = outline.layoutLabels(
+    [{ id: 'a', x: -30, y: 900, width: 20, height: 14, alongX: 1, alongY: 0 }],
+    viewport,
+  );
+  check('a label that projected off-canvas is pulled back fully inside the viewport',
+    offCanvas.a.x - 10 >= 0 && offCanvas.a.x + 10 <= viewport.width
+    && offCanvas.a.y - 7 >= 0 && offCanvas.a.y + 7 <= viewport.height,
+    JSON.stringify(offCanvas.a));
+
+  const threeStacked = outline.layoutLabels(
+    [
+      { id: 'a', x: 200, y: 200, width: 24, height: 16, alongX: 1, alongY: 0 },
+      { id: 'b', x: 200, y: 200, width: 24, height: 16, alongX: 1, alongY: 0 },
+      { id: 'c', x: 200, y: 200, width: 24, height: 16, alongX: 1, alongY: 0 },
+    ],
+    viewport,
+  );
+  const boxOf = (r) => ({ ...r, width: 24, height: 16 });
+  check('three labels stacked exactly on top of each other all end up clear of one another',
+    !overlap(boxOf(threeStacked.a), boxOf(threeStacked.b))
+    && !overlap(boxOf(threeStacked.a), boxOf(threeStacked.c))
+    && !overlap(boxOf(threeStacked.b), boxOf(threeStacked.c)),
+    JSON.stringify(threeStacked));
+
+  const viewportTiny = { width: 40, height: 40 };
+  const clampedStillDistinct = outline.layoutLabels(
+    [
+      { id: 'a', x: 20, y: 20, width: 24, height: 16, alongX: 1, alongY: 0 },
+      { id: 'b', x: 22, y: 21, width: 24, height: 16, alongX: 1, alongY: 0 },
+    ],
+    viewportTiny,
+  );
+  check('every label stays fully inside even a viewport too small to separate them cleanly',
+    clampedStillDistinct.a.x - 12 >= -1e-6 && clampedStillDistinct.a.x + 12 <= 40 + 1e-6
+    && clampedStillDistinct.b.x - 12 >= -1e-6 && clampedStillDistinct.b.x + 12 <= 40 + 1e-6,
+    JSON.stringify(clampedStillDistinct));
 
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
