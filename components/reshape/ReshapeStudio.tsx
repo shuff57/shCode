@@ -547,7 +547,11 @@ export default function ReshapeStudio({
   // while on Build, the last script run's doc while on Code (falling back
   // to `doc` before any Run happens there, e.g. right after mount hydration).
   useEffect(() => {
-    if (!hydrated) return;
+    // Before hydration the doc is still the empty placeholder and the caller
+    // already holds null -- unless the student has started building in the
+    // gap (or the mount run never answers, e.g. a comment-only starter), in
+    // which case what they built must still reach the grader.
+    if (!hydrated && doc.features.length === 0) return;
     onDocChangeRef.current?.(build ? doc : (scriptDoc ?? doc));
   }, [hydrated, build, doc, scriptDoc]);
 

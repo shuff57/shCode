@@ -301,9 +301,18 @@ export default function LessonWorkspace({
   const isReshapeMode = lesson.preview === 'reshape';
   const isMoshionMode = lesson.preview === 'moshion';
 
-  // reSHape lessons need no auto-run effect here: ReshapeStudio hydrates its
-  // own model from script.js on mount and reports the built doc back through
-  // onDocChange, which runTests() below reads.
+  // reSHape lessons: ReshapeStudio hydrates its own model from script.js on
+  // mount and reports every built doc back through onDocChange. Grading has
+  // to follow that doc, not a Run button (a Build-only lesson has none), so
+  // every model change re-grades after a short settle. Without this the
+  // requirement card stayed red under a correct box and Submit never
+  // enabled -- found by the moderate lens on 8.1.2, 2026-09-04.
+  useEffect(() => {
+    if (!isReshapeMode) return;
+    const to = setTimeout(() => runTests(), 250);
+    return () => clearTimeout(to);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isReshapeMode, latestModelDoc, files]);
 
   // For HTML lessons: auto-build preview on every change (debounced)
   useEffect(() => {
