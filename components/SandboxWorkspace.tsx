@@ -1384,9 +1384,15 @@ export default function SandboxWorkspace() {
                       code={code}
                       runKey={runKey}
                       // Only reached here when NOT (brepEngine && build) --
-                      // see the ternary above -- so brepEngine true means
-                      // Code mode, the one place this runner is meant for.
-                      engine={brepEngine ? 'brep' : 'jscad'}
+                      // see the ternary above -- so this is Code mode. Code
+                      // mode stays on the JSCAD runner for now: the script the
+                      // editor holds is the JSCAD-flavoured one toReshape()
+                      // emits and the reference docs teach, and the B-rep
+                      // probe runner cannot run it (measured 2026-09-03:
+                      // "require is not defined" from runner-brep.html). The
+                      // scripting version for the kernel is specced separately;
+                      // when it lands, this becomes brepEngine ? 'brep' : 'jscad'.
+                      engine="jscad"
                     />
                   )}
                   {build && (
