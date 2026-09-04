@@ -591,6 +591,74 @@ try {
   }
 
   // ======================================================================
+  // 15. FILLET AFTER FILLET, SAME BOX, DIFFERENT EDGE -- reference.md's own
+  //    round-then-bevel regression (green on cd149400, broken the moment a
+  //    fillet started recording an op history at all, since ops.set(round1)
+  //    let chainToFeature find a real one-hop path where before it found
+  //    none). Round 2's edge -- between(top, back) -- is named against the
+  //    box, same as Round 1's, but has to resolve on ROUND 1's shape: the
+  //    top face Round 1 sits on was MODIFIED by it (its own edge got
+  //    rounded away, trimming the face), while the back face is untouched.
+  //
+  //    Naively pushing the RESOLVED EDGE (from sharedEdge() on the box's own
+  //    raw shape) through Round 1's op asks BRepFilletAPI_MakeFillet a
+  //    question its history does not answer reliably for an edge merely
+  //    bordering a trimmed face: IsDeleted() came back true for the
+  //    untouched, geometrically identical back edge. resolveNameAsUsedBy()
+  //    now decomposes a `between` name BEFORE pushing anything -- each face
+  //    is pushed through separately (the top face via Modified(), correctly
+  //    reported since item O's own fix proved fillet history IS reliable
+  //    for faces; the back face survives unchanged) -- and sharedEdge() is
+  //    found on the two RESULTS, never asking the fillet about an edge's
+  //    own fate at all.
+  //
+  //    Expected volume: two independent (1 - pi/4) * r^2 * L removals, one
+  //    per rounded edge -- the two edges (top-front, top-back) are both 40
+  //    long and 40 apart, nowhere near close enough to interact.
+  // ======================================================================
+  console.log('\n=== fillet after fillet: rounding two DIFFERENT edges of the same box in sequence ===');
+  {
+    const topFrontEdge = {
+      cause: 'between', feature: 'b1', kind: 'edge',
+      of: [
+        { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' },
+        { cause: 'primitive', feature: 'b1', kind: 'face', part: '-y' },
+      ],
+    };
+    const topBackEdge = {
+      cause: 'between', feature: 'b1', kind: 'edge',
+      of: [
+        { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' },
+        { cause: 'primitive', feature: 'b1', kind: 'face', part: '+y' },
+      ],
+    };
+    const doc = {
+      version: 1,
+      features: [
+        { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
+        { id: 'r1', kind: 'fillet', target: 'b1', edge: topFrontEdge, size: 1, style: 'fillet' },
+        { id: 'r2', kind: 'fillet', target: 'r1', edge: topBackEdge, size: 1, style: 'fillet' },
+      ],
+    };
+    const built = adapter.buildDoc(oc, doc, arc);
+    const shape = built.shapes.get('r2');
+    const perEdge = (1 - Math.PI / 4) * 1 * 1 * 40;
+    const wantVolume = 40 * 40 * 20 - 2 * perEdge;
+    if (!shape) {
+      check('fillet after fillet: Round 2 builds at all', false,
+        'built.shapes has no entry for r2 -- the between(top, back) name could not be '
+        + 'resolved against Round 1\'s shape (the exact round-then-bevel regression)');
+    } else {
+      const { volume } = adapter.measureShape(oc, shape);
+      console.log('  volume     ' + volume);
+      console.log('  predicted (independent of the resolver)  ' + wantVolume.toFixed(4));
+      check('fillet after fillet: BOTH edges are rounded -- the untouched one is still found by name',
+        Math.abs(volume - wantVolume) <= 1e-3,
+        `got ${volume}\n        want ${wantVolume.toFixed(4)}`);
+    }
+  }
+
+  // ======================================================================
   // 11. DEFECT 3 -- `swept` names a wall by the sketch's DESIGN EDGE INDEX,
   //    and lib/topo-name.ts's own doc comment claims that index is stable
   //    across corner insertion because reindex() (lib/sketch-arc.ts) keeps

@@ -294,23 +294,6 @@ function pushThrough(
   let cur = face;
   let consumedSplit = false;
   for (const rec of chain) {
-    // A fillet/chamfer's own history is reliable for the face question this
-    // was built to answer (item O: a box's own top face pushed through a
-    // Round on some other edge entirely) but NOT for an edge on that same
-    // face that the fillet merely trimmed in passing, without touching it
-    // directly -- measured 2026-09-04 (reference.md's own round-then-bevel
-    // example): rounding the box's top-front edge, then asking whether the
-    // SAME box's top-back edge survived, reported IsDeleted() true even
-    // though the edge is untouched and geometrically identical. Booleans
-    // (Hole, Combine) do not have this problem -- their own history is
-    // exact for edges too, which is why this only special-cases `kind:
-    // 'fillet'`. Treating it as kept, rather than querying at all, is
-    // exactly the PRE-EXISTING behaviour for every edge case before fillets
-    // were ever registered here at all (chainToFeature simply never found a
-    // fillet in its graph, so resolveNameAsUsedBy fell back to the
-    // unpushed name) -- this keeps that working behaviour for edges while
-    // still fixing it for faces.
-    if (rec.kind === 'fillet' && cur.ShapeType() === oc.TopAbs_ShapeEnum.TopAbs_EDGE) continue;
     const fate = faceFate(oc, rec.op, cur);
     if (fate.kind === 'deleted') return null;
     if (fate.kind === 'kept' || fate.kind === 'replaced') {
@@ -412,6 +395,26 @@ function chainToFeature(build: BuildResult, from: string, to: string): OpRecord[
 export function resolveNameAsUsedBy(
   oc: Occt, name: TopoName, build: BuildResult, usedByFeature: string,
 ): any | null {
+  // `between` is decomposed BEFORE any push, not after: resolveName()'s own
+  // `between` branch finds sharedEdge() on the two faces' ORIGINAL shape,
+  // and pushing THAT EDGE forward through a fillet asks its history a
+  // question fillets do not answer reliably -- an edge merely bordering a
+  // face the fillet trimmed (not the edge it actually rounded) can come
+  // back IsDeleted() true even though it is untouched and geometrically
+  // identical (measured 2026-09-04, reference.md's own round-then-bevel:
+  // Round 1 on the box's top-front edge left the box's OWN top-back edge,
+  // pushed this way, unresolvable). Pushing each FACE instead -- which is
+  // exactly what item O's own fix already proved reliable, fillet's
+  // Modified()/IsDeleted() history being accurate for faces -- and finding
+  // sharedEdge() on the two RESULTS answers the same question without ever
+  // asking a fillet about an edge's own fate. Recursive, not a single
+  // level: each face name can itself need pushing through more than one
+  // hop, the same as any other name here.
+  if (name.cause === 'between') {
+    const a = resolveNameAsUsedBy(oc, name.of[0], build, usedByFeature);
+    const b = resolveNameAsUsedBy(oc, name.of[1], build, usedByFeature);
+    return a && b ? sharedEdge(oc, a, b) : null;
+  }
   const found = resolveName(oc, name, build);
   if (!found || name.feature === usedByFeature) return found;
   const chain = chainToFeature(build, name.feature, usedByFeature);
