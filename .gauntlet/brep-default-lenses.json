@@ -1,0 +1,54 @@
+{
+  "gauntlet": "Can the B-rep engine become reSHape's default? (re-scoped to the sandbox: no live lesson uses reSHape)",
+  "date": "2026-09-03",
+  "halfA": {
+    "bar": "the JSCAD build as oracle, per Build tool",
+    "record": ".gauntlet/oracle.json + scripts/test-occt-adapter.mjs --occt public/reshape/kernel",
+    "result": "134/134; ten fixtures added; B-rep on the analytic volume for all; round, bevel and draft recorded as deliberate differences (JSCAD has no such feature)",
+    "commit": "130d8b9"
+  },
+  "halfB": {
+    "bar": "three cs-student lenses (beginner, moderate, advanced) work TASKS-student-lenses.md on the sandbox Build side",
+    "rounds": [
+      {
+        "round": 1,
+        "finished": {"beginner": "10/10", "moderate": "8 + 2 partly", "advanced": "10/10"},
+        "found_and_fixed": [
+          {"finding": "teaching note after Round every edge opened the tool card over the canvas and covered the view strip", "commit": "4023560"},
+          {"finding": "a sketch-only document showed the red 'Could not build' panel", "commit": "46017a2"},
+          {"finding": "a selection outlived the step Undo removed", "commit": "ba781ae"},
+          {"finding": "typed value below min shown but built at its magnitude (live preview never clamped)", "commit": "b82f1c6"},
+          {"finding": "every export was model.stl", "commit": "ba781ae"},
+          {"finding": "a second shape landed inside the first", "commit": "ba781ae"},
+          {"finding": "Hollow could not leave a face open (pencil cup impossible)", "commit": "ba781ae"}
+        ],
+        "not_defects": ["tasks 1-4 satisfied by defaults (intended for beginners; graders must not score understanding from these alone)"]
+      },
+      {
+        "round": 2,
+        "finished": {"beginner": "8 + 2", "moderate": "10/10 clean", "advanced": "10/10"},
+        "found_and_fixed": [
+          {"finding": "Reset left the last teaching note on an empty canvas", "commit": "987df2b"},
+          {"finding": "hollow after a hole refused with a message blaming rounded edges", "commit": "dce15f7", "note": "kernel limitation pinned in scripts/test-topo-resolve.mjs: this OpenCascade build's Cut of source minus offset reports not done on a solid with a through hole; Common succeeds; hollow-then-drill works exactly"},
+          {"finding": "a slider-set value was dropped by the next tool (slider never committed)", "commit": "9eceae2"},
+          {"finding": "a face picked inside a rebuild's first frames had no name (1 of 20 trials)", "commit": "a77a94b"},
+          {"finding": "click on the centre of a selected shape's top face hit its height handle, never the face", "commit": "ca5662d"},
+          {"finding": "exports within one minute shared a name; hollow-after-round used the old wording", "commit": "5371b03"}
+        ],
+        "not_defects": ["the main Mirror click opens the plane picker until a plane is chosen", "the 'Reset' the advanced lens pressed was not the Reset chip (which confirms and clears)", "typed 99999 clamps to the slider's max at that moment and the max then grows by design"]
+      }
+    ],
+    "still_open": [
+      "hollow after a hole or a round is refused (kernel), so the task list's natural order (hole, then hollow) needs the student to reorder; a kernel upgrade may lift it (the pinned test will say)",
+      "cylinder's field says radius where hole's says diameter",
+      "one-edge Round is a timeline step, every-edge Round is a property on the box",
+      "proving 'open at the top' from the Top view on a cup whose opening equals the wall is hard without shading cues",
+      "no Draft button and no hole-along-x control in the Build UI (fixtures exist, UI does not)"
+    ]
+  },
+  "to_flip_the_default": [
+    "decide to ship the kernel bundle (6.9 MB gzipped, gitignored today; prebuild now rebuilds it, deploy from a clean worktree)",
+    "make ?engine=brep the default in SandboxWorkspace and keep JSCAD reachable for the reference docs until they are rewritten",
+    "rewrite public/reshape/docs/reference.md and its 227 examples for the Build UI, or keep Code mode on JSCAD"
+  ]
+}
