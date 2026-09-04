@@ -1244,9 +1244,18 @@ export default function ModelEditor({
   // top of the primitive the pick came from.
   const pickedEdgeUsable =
     !!pickedEdge?.edge && chosen.length === 1 && chosen[0].id === ownerOf(doc, pickedEdge);
+  // A click near the rim of an open hollow lands on the hollow's INNER
+  // corner edge, which has no name to round; the generic hollow sentence
+  // then reads as nonsense to a student who has just picked an edge (both
+  // student lenses hit this on the 8.1.11 tray, 2026-09-04). Say what they
+  // caught and where the outer edge is.
   const roundBlockedBy = pickedEdgeUsable
     ? null
-    : chosen.length !== 1 ? 'Pick one shape to round.' : whyCannotRound(chosen[0]);
+    : chosen.length !== 1
+      ? 'Pick one shape to round.'
+      : pickedEdge && !pickedEdge.edge && chosen[0].kind === 'shell'
+        ? "That is the hollow's inner edge. Click the outer corner lower down, where the label names the shape itself, and round that."
+        : whyCannotRound(chosen[0]);
   const canRound = roundBlockedBy === null;
   const turnBlockedBy =
     chosen.length !== 1
