@@ -1,7 +1,7 @@
 {
   "id": "8-1-6-lab-hollow-it-out",
   "title": "8.1.6 Lab: Hollow It Out",
-  "description": "Hollow out the box into an open-topped shell with the Hollow tool. Auto-graded.",
+  "description": "Hollow out the box into an open-topped shell with the Hollow tool, with walls 3 mm thick. Auto-graded.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 3: reSHape: Solid Modelling",
@@ -23,24 +23,35 @@
     {
       "id": "s2",
       "title": "Hollow it out",
-      "instructions": "Press the Hollow tool in the toolbar. The box becomes an open-topped shell, like a cup. In the Dimensions panel, check that wall reads 2 — if it doesn't, type 2.",
+      "instructions": "Press the Hollow tool in the toolbar. The box becomes an open-topped shell, like a cup. In the Dimensions panel, wall reads 2 - type 3, so the walls are 3 mm thick.",
       "hints": [
         "A message under the 3D view should read \"Hollow 1 is open at the top face.\" That's the open top you want — you don't need any other tool for it.",
-        "Look for the field named \"Hollow 1 wall\" in the Dimensions panel."
+        "Look for the field named \"Hollow 1 wall\" in the Dimensions panel. Click its number box, type 3, and press Enter."
       ]
     }
   ],
   "requirements": [
     {
       "id": "r1",
-      "title": "An open-topped shell, 2 mm walls",
-      "description": "The box is hollowed to 2 mm walls with the top face left open.",
+      "title": "An open-topped shell, 3 mm walls",
+      "description": "The box is hollowed to 3 mm walls with the top face left open.",
       "type": "model",
       "expect": [
-        { "kind": "box", "size": [40, 40, 20] },
-        { "kind": "shell", "thickness": 2, "open": true }
+        {
+          "kind": "box",
+          "size": [
+            40,
+            40,
+            20
+          ]
+        },
+        {
+          "kind": "shell",
+          "thickness": 3,
+          "open": true
+        }
       ],
-      "hint": "Click the top face, then press Hollow. Check that the wall field reads 2 and the message says the top is open.",
+      "hint": "Click the top face, then press Hollow. Type 3 in the wall field and check the message says the top is open.",
       "points": 0
     }
   ],
