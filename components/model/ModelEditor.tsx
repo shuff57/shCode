@@ -101,6 +101,7 @@ import {
   newShape,
   newShell,
   newSketch,
+  shellInsertion,
   whyCannotBlend,
   newMove,
   nextId,
@@ -110,6 +111,7 @@ import {
   whyCannotRound,
 } from '../../lib/model-types';
 import type { TopoName } from '../../lib/topo-name';
+import { ownerOf } from '../../lib/model-selection';
 
 interface Props {
   doc: ModelDoc;
@@ -534,10 +536,22 @@ export default function ModelEditor({
     // rather than trusting the prop on its own: picking an edge always
     // selects its owning shape too (see the sandbox's onPick wiring), so if
     // the student has since chosen something else from the feature list,
-    // chosen[0] no longer matches pickedEdge.target and this falls straight
+    // chosen[0] no longer matches the edge's owner and this falls straight
     // through to the whole-shape path below -- the same one that always ran
     // before edge-picking existed.
-    if (pickedEdge?.edge && chosen.length === 1 && chosen[0].id === pickedEdge.target) {
+    //
+    // ownerOf(doc, pickedEdge), NOT pickedEdge.target directly -- REGRESSION,
+    // measured 2026-09-04: once a Hole sat on top of the box the edge came
+    // from, `pickedEdge.target` is the TIP of the chain ("Hole 1", the
+    // feature whose mesh batch currently draws that edge -- see
+    // lib/model-selection.ts's PickName comment), but `selected` (and so
+    // `chosen[0].id`) is the RESOLVED owner the sandbox's onPick handler now
+    // sets via the SAME ownerOf() -- "Box 1" for an edge that traces back to
+    // a primitive face. Comparing chosen[0].id straight against the raw
+    // target compared "Box 1" to "Hole 1", always failed, and silently fell
+    // through to the whole-shape round -- exactly the bug report's "Rounded
+    // every edge" / "Box 1 corner" result for a click that named one edge.
+    if (pickedEdge?.edge && chosen.length === 1 && chosen[0].id === ownerOf(doc, pickedEdge)) {
       // The picked SHAPE need not itself be isRoundable() -- that check is
       // only meaningful for the whole-shape path below, which writes
       // round/roundStyle fields a box or cylinder carries directly. A
@@ -958,13 +972,52 @@ export default function ModelEditor({
     say(null);
   }
 
+  /** English-joins a list of names for the note text below --
+   *  "Hole 1", "Hole 1 and Round 1", "Hole 1, Round 1, and Draft 1". */
+  function joinNames(names: string[]): string {
+    if (names.length <= 1) return names[0] ?? '';
+    if (names.length === 2) return `${names[0]} and ${names[1]}`;
+    return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
+  }
+
+  /** Builds a new Shell feature and splices it into the document at the
+   *  position shellInsertion() says it belongs -- see that function's own
+   *  comment for why "where the student clicked" and "where the feature
+   *  actually has to go" are not always the same array index. Shared by
+   *  hollow() and openHollow() so the reordering logic exists in exactly one
+   *  place. Returns the built doc, the new feature (for selecting it), and
+   *  the note to show, or null when nothing needed reordering. */
+  function insertShell(open?: TopoName): { next: ModelDoc; feature: Feature; note: string | null } {
+    const { target, insertAt, rewireId } = shellInsertion(doc, chosen[0].id);
+    const f = newShell(doc, target, open);
+    const features = [...doc.features];
+    features.splice(insertAt, 0, f);
+    const next: ModelDoc = rewireId
+      ? {
+        ...doc,
+        features: features.map((x) => (x.id === rewireId && 'target' in x ? { ...x, target: f.id } : x)),
+      }
+      : { ...doc, features };
+    if (!rewireId) return { next, feature: f, note: null };
+    // Named off `next` (after insertion), not `doc` -- nameMap() numbers
+    // per kind by creationOrder(id), not array position, so this is safe
+    // either way, but the new Hollow's own name only exists in `next`.
+    const names = nameMap(next);
+    const movedPast = features.slice(insertAt + 1).map((x) => names[x.id] ?? x.id);
+    return {
+      next,
+      feature: f,
+      note: `${names[f.id]} was placed before ${joinNames(movedPast)} so it could build.`,
+    };
+  }
+
   function hollow() {
     const why = whyCannotSolidOp(chosen, 'hollow out');
     if (why) { say(why); return; }
-    const f = newShell(doc, chosen[0].id);
-    onChange({ ...doc, features: [...doc.features, f] });
-    setSelected([f.id]);
-    say(null);
+    const { next, feature, note } = insertShell();
+    onChange(next);
+    setSelected([feature.id]);
+    say(note);
   }
 
   /** The Open Hollow variant -- newShell with the picked face carried as
@@ -982,12 +1035,12 @@ export default function ModelEditor({
       say('Click the face to leave open, then Open hollow.');
       return;
     }
-    const f = newShell(doc, chosen[0].id, pickedFace.face);
-    onChange({ ...doc, features: [...doc.features, f] });
-    setSelected([f.id]);
+    const { next, feature, note } = insertShell(pickedFace.face);
+    onChange(next);
+    setSelected([feature.id]);
     onClearPickedFace?.();
     setMenu(null);
-    say('Hollowed, open at the face you clicked.');
+    say(note ?? 'Hollowed, open at the face you clicked.');
   }
 
   function moveTool(copy: boolean) {
@@ -1113,8 +1166,13 @@ export default function ModelEditor({
   // name. Without this the button stayed disabled the instant anything
   // (a Move, a Hole, ...) sat on top of the primitive the edge came from,
   // even though clicking Round would have worked.
+  // ownerOf(doc, pickedEdge/pickedFace), not the raw .target -- see round()'s
+  // own comment on the regression this exact pattern caused: the raw target
+  // is the TIP of the feature chain, `chosen[0].id` is the RESOLVED owner,
+  // and the two stop matching the moment anything (a Hole, a Move) sits on
+  // top of the primitive the pick came from.
   const pickedEdgeUsable =
-    !!pickedEdge?.edge && chosen.length === 1 && chosen[0].id === pickedEdge.target;
+    !!pickedEdge?.edge && chosen.length === 1 && chosen[0].id === ownerOf(doc, pickedEdge);
   const roundBlockedBy = pickedEdgeUsable
     ? null
     : chosen.length !== 1 ? 'Pick one shape to round.' : whyCannotRound(chosen[0]);
@@ -1129,10 +1187,11 @@ export default function ModelEditor({
   const canSolidOp = solidOpBlockedBy === null;
   // Same staleness guard pickedEdgeUsable uses above: picking a face also
   // selects its owning shape, so if the student has since chosen something
-  // else, chosen[0] no longer matches pickedFace.target and Open Hollow goes
-  // back to disabled rather than silently hollowing the wrong shape open.
+  // else, chosen[0] no longer matches the face's resolved owner and Open
+  // Hollow goes back to disabled rather than silently hollowing the wrong
+  // shape open.
   const pickedFaceUsable =
-    !!pickedFace?.face && chosen.length === 1 && chosen[0].id === pickedFace.target;
+    !!pickedFace?.face && chosen.length === 1 && chosen[0].id === ownerOf(doc, pickedFace);
   const openHollowBlockedBy = !canSolidOp
     ? solidOpBlockedBy
     : pickedFaceUsable ? null : 'Click the face to leave open, then Open hollow.';

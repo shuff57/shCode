@@ -55,6 +55,20 @@ module.exports = function run(dir) {
   check('a plain box face, still tagged +z, resolves to Box 1 even though Hole 1 now draws the mesh',
     sel.ownerOf(d2, { target: 'hole1', name: primitiveFace('box1', '+z') }) === 'box1');
 
+  // REGRESSION, measured 2026-09-04: components/model/ModelEditor.tsx's
+  // round() compared `chosen[0].id` (the SELECTED feature, set from this
+  // exact ownerOf() resolution) against `pickedEdge.target` DIRECTLY -- the
+  // raw tip-of-chain, never resolved. Once a Hole sat on top of the box the
+  // edge came from, `chosen[0].id` read "box1" and `pickedEdge.target` read
+  // "hole1", the comparison always failed, and Round silently fell through
+  // to the whole-shape path -- "Rounded every edge" for a click that named
+  // one. The fix is round() (and the two usable-picked-* checks beside it)
+  // comparing against ownerOf(doc, pickedEdge) instead of the raw target --
+  // this is the exact case that regression needs to keep passing: an edge
+  // whose OWNER (a primitive box) and whose TARGET (a later Hole) disagree.
+  check('an edge on a box that a later Hole now draws the mesh for still resolves to the box, not the hole',
+    sel.ownerOf(d2, { target: 'hole1', edge: between(primitiveFace('box1', '+z'), primitiveFace('box1', '+x')) }) === 'box1');
+
   console.log('\n=== ownerOf: no name to resolve -- falls back to target (tip of the chain) ===');
 
   check('a hole\'s own new wall has no primitive lineage (name is null) -- falls back to the hole itself',

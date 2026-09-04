@@ -877,6 +877,62 @@ export function newShell(doc: ModelDoc, target: string, open?: TopoName): ShellF
   return f;
 }
 
+/**
+ * Where a new Hollow (Shell) feature actually belongs, given the feature the
+ * student picked to hollow.
+ *
+ * A Shell is an INWARD OFFSET cut from its own target's shape. If a Hole or a
+ * Round already sits anywhere between the picked feature and the primitive
+ * it descends from, hollowing the shape AS IT CURRENTLY LOOKS is exactly the
+ * case occt-build.ts's own 'shell' branch refuses -- "this kernel cannot
+ * hollow a shape that already has a hole or a round" is a real numerical
+ * limit of the offset-then-cut it runs, not a data-model rule this file
+ * enforces. But which shape gets shelled is a MODELLING CHOICE, not a fact
+ * about the geometry: shelling the ORIGINAL primitive, before that hole or
+ * round ever cut it, produces exactly the part a student meant (a hollowed
+ * box that still has its hole and its round) and hits none of that limit,
+ * because it never touches a hole-or-rounded shape at all.
+ *
+ * Walks the picked feature's `target` chain back to its root (a primitive,
+ * or anything with no `target` field), and returns:
+ *  - `target`: what the new Shell should actually target -- the picked
+ *    feature itself when nothing in its ancestry is a hole or a round, or
+ *    the first ancestor found BEFORE the first hole/round otherwise.
+ *  - `insertAt`: the array index to splice the new feature in at -- the
+ *    end of the document in the ordinary case, or immediately after
+ *    `target`'s own position when reordering.
+ *  - `rewireId`: null in the ordinary case, or the id of the first
+ *    hole/round in the chain -- the caller must repoint THAT feature's own
+ *    `target` at the new Shell's id once it exists, so the rest of the chain
+ *    (everything already built from it) keeps building on top of the shell
+ *    instead of on the bare primitive.
+ *
+ * A combine's plural `targets` is not walked -- this only ever needs to
+ * cross the single-`target` chain a Hole/Fillet/Extrude/Revolve/Shell/Move
+ * already forms, and a Combine sitting in that ancestry is treated as a root
+ * (a reasonable stopping point, not a claim that nothing beyond it matters).
+ */
+export function shellInsertion(
+  doc: ModelDoc,
+  pickedId: string,
+): { target: string; insertAt: number; rewireId: string | null } {
+  const chain: Feature[] = [];
+  let cur: Feature | undefined = doc.features.find((f) => f.id === pickedId);
+  while (cur) {
+    chain.unshift(cur);
+    const t = 'target' in cur ? cur.target : undefined;
+    cur = t ? doc.features.find((f) => f.id === t) : undefined;
+  }
+  const blockerIndex = chain.findIndex((f) => f.kind === 'hole' || f.kind === 'fillet');
+  if (blockerIndex <= 0) {
+    return { target: pickedId, insertAt: doc.features.length, rewireId: null };
+  }
+  const root = chain[blockerIndex - 1];
+  const blocker = chain[blockerIndex];
+  const insertAt = doc.features.findIndex((f) => f.id === root.id) + 1;
+  return { target: root.id, insertAt, rewireId: blocker.id };
+}
+
 export function newMove(doc: ModelDoc, target: string, copy = false): MoveFeature {
   return { id: nextId(doc, 'move'), kind: 'move', target, offset: [20, 0, 0], copy };
 }

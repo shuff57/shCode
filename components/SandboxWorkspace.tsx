@@ -802,7 +802,7 @@ export default function SandboxWorkspace() {
     const id = selected[0];
     if (!doc.features.some((f) => f.id === id)) return null;
     const base = nameMap(doc)[id] ?? id;
-    const partWord = (name: TopoName | null | undefined): string | null => {
+    const resolvedPart = (name: TopoName | null | undefined): string | null => {
       if (!name) return null;
       if (name.cause === 'between') return 'edge';
       if (name.cause === 'primitive' && name.kind === 'face') {
@@ -811,7 +811,26 @@ export default function SandboxWorkspace() {
       }
       return null;
     };
-    const part = partWord(pickedFace?.face) ?? partWord(pickedEdge?.edge);
+    // Prefer a specific resolved part word (a primitive face's own +z/-z/
+    // side, or "edge" for a name that traced to two of them); fall back to
+    // the pick's own KIND -- "edge" or "face" -- when the topological
+    // resolver has no name for it at all, so the SAME kind of pick always
+    // names its part. Measured 2026-09-04: an edge on a plain box read
+    // "Box 1 · edge" (a name resolved), but the hole's own rim -- which has
+    // "no recorded path back to any primitive" (see PickName's own comment)
+    // and so never gets a name -- read bare "Hole 1", with no part word at
+    // all, for the same kind of click.
+    //
+    // ownerOf(doc, pickedEdge/pickedFace) === id is the SAME staleness guard
+    // ModelEditor.tsx's pickedEdgeUsable/pickedFaceUsable use: the timeline's
+    // own pick() (a chip click) never clears pickedEdge/pickedFace, so a
+    // stale pick from an earlier viewport click must not paint a part word
+    // onto whatever got selected afterward some other way.
+    const part = pickedEdge && ownerOf(doc, pickedEdge) === id
+      ? (resolvedPart(pickedEdge.edge) ?? 'edge')
+      : pickedFace && ownerOf(doc, pickedFace) === id
+        ? (resolvedPart(pickedFace.face) ?? 'face')
+        : null;
     return part ? `${base} · ${part}` : base;
   }, [selected, doc, pickedFace, pickedEdge]);
 
