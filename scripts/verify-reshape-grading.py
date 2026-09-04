@@ -36,6 +36,11 @@ with sync_playwright() as p:
     check("1 Submit disabled before building", submit.is_disabled())
     page.get_by_role("button", name=re.compile(r"^Box$", re.I)).first.click()
     page.wait_for_timeout(3500)
+    # 8.1.2 wants 40 x 40 x 30 (the default box is 40 x 40 x 20): type the height.
+    lab = page.get_by_text("Box 1 height", exact=True).first
+    h = lab.locator("xpath=following::input[not(@type='range')][1]")
+    h.click(); h.fill("30"); page.keyboard.press("Enter"); page.wait_for_timeout(2500)
+    print("      height box now reads", h.input_value())
     chips = page.locator(".model-timeline .model-row .model-name").all_inner_texts()
     check("2 Box 1 is in the timeline", "Box 1" in chips, chips)
     ok = False
@@ -43,7 +48,7 @@ with sync_playwright() as p:
         if page.locator(".pass").count() >= 1 and not submit.is_disabled(): ok = True; break
         page.wait_for_timeout(500)
     print("      after: pass cards", page.locator(".pass").count(), "fail cards", page.locator(".fail").count(), "submit disabled", submit.is_disabled())
-    check("3 the model requirement turns green and Submit enables after Box", ok)
+    check("3 the model requirement turns green and Submit enables after Box + height 30", ok)
     page.screenshot(path=os.path.join(OUT, "after-box.png"), full_page=True)
     # reload keeps it
     page.reload(wait_until="load"); page.locator(".model-timeline, .reshape-pane-view").first.wait_for(timeout=60000)
