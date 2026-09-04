@@ -202,6 +202,20 @@ interface Props {
    * see SandboxWorkspace.tsx's Export STL button, the one place that reads it.
    */
   onMesh?: (mesh: MeshInput | null) => void;
+  /**
+   * Hands the caller this component's own pick function -- the exact code
+   * path `onClick` below runs (face/edge hit test, naming, highlight paint,
+   * `onPick` emission), invokable from OUTSIDE a real pointer event on the
+   * canvas. Exists for HandleOverlay.tsx's `onTap`: a click that lands on a
+   * drag handle never reaches this component's own click listener (the
+   * handle is a separate DOM element sitting on top), so a tap there has no
+   * other way to still pick whatever face or edge is underneath it.
+   *
+   * Called once with the live function whenever the render effect (re)runs,
+   * and with `null` on cleanup -- a stale closure over a disposed renderer
+   * is worse than a caller finding pickAt briefly unset.
+   */
+  registerPickAt?: (fn: ((clientX: number, clientY: number) => void) | null) => void;
 }
 
 /** The handful of kernel exports this component calls, loaded once. Loose
@@ -322,7 +336,7 @@ const EDGE_TUBE_RADIUS = 0.75;
  * from scratch through lib/occt-build.ts.
  */
 export default function BrepViewportThree({
-  doc, deflection, onStats, onPick, pick, selectedCount, anchors, onAnchors, onMesh,
+  doc, deflection, onStats, onPick, pick, selectedCount, anchors, onAnchors, onMesh, registerPickAt,
 }: Props) {
   const [phase, setPhase] = useState<'loading' | 'ready' | 'error'>('loading');
   // Which view-strip preset the camera is sitting on, or null once the
@@ -371,6 +385,8 @@ export default function BrepViewportThree({
   onStatsRef.current = onStats;
   const onMeshRef = useRef(onMesh);
   onMeshRef.current = onMesh;
+  const registerPickAtRef = useRef(registerPickAt);
+  registerPickAtRef.current = registerPickAt;
   // The scene-setup effect below only re-runs on a `phase` change (see its
   // own dep array), so its onClick closure is created ONCE and would
   // otherwise keep reading whatever `doc` was current at that moment --
@@ -890,12 +906,12 @@ export default function BrepViewportThree({
       applyHover(null);
       renderNow();
     }
-    function onClick(e: MouseEvent) {
-      // Left click only. This app's own navigation convention is right-drag
-      // to orbit and left-drag is a deliberate no-op (see HANDOFF.md), so a
-      // plain left click never contends with OrbitControls for the gesture.
-      if (e.button !== 0) return;
-      const hit = hitAt(e.clientX, e.clientY);
+    // The face/edge hit-test-and-select path, factored out of onClick below
+    // so it can also run for a HandleOverlay tap (see registerPickAt's own
+    // doc comment) -- same naming, same highlight paint, same onPick emission
+    // either way, rather than a second copy that could drift from this one.
+    function pickAt(clientX: number, clientY: number) {
+      const hit = hitAt(clientX, clientY);
       if (!hit) {
         selectedFaceMesh.visible = false;
         setSelectedEdgeTube(null);
@@ -950,13 +966,22 @@ export default function BrepViewportThree({
       }
       renderNow();
     }
+    function onClick(e: MouseEvent) {
+      // Left click only. This app's own navigation convention is right-drag
+      // to orbit and left-drag is a deliberate no-op (see HANDOFF.md), so a
+      // plain left click never contends with OrbitControls for the gesture.
+      if (e.button !== 0) return;
+      pickAt(e.clientX, e.clientY);
+    }
     renderer.domElement.addEventListener('pointermove', onPointerMove);
     renderer.domElement.addEventListener('pointerleave', onPointerLeave);
     renderer.domElement.addEventListener('click', onClick);
+    registerPickAtRef.current?.(pickAt);
 
     renderNow();
 
     return () => {
+      registerPickAtRef.current?.(null);
       controls.removeEventListener('start', onControlsStart);
       controls.removeEventListener('change', onControlsChange);
       resizeObserver.disconnect();

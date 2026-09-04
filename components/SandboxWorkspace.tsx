@@ -263,6 +263,11 @@ export default function SandboxWorkspace() {
   // yet (the empty document) or not right now (a build error).
   const meshRef = useRef<MeshInput | null>(null);
   const [hasMesh, setHasMesh] = useState(false);
+  // BrepViewportThree's own pick function, handed up via `registerPickAt` --
+  // see that prop's doc comment. A ref, not state: HandleOverlay's `onTap`
+  // needs to call whatever the viewport currently has registered, not
+  // trigger a render of its own.
+  const pickAtRef = useRef<((clientX: number, clientY: number) => void) | null>(null);
   // The frame reloads on every structural edit, so specs posted at the moment
   // runKey changes arrive before the runner has a listener and are simply lost.
   // Held in a ref and re-sent when the runner announces its parameters, which
@@ -1371,6 +1376,7 @@ export default function SandboxWorkspace() {
                         meshRef.current = m;
                         setHasMesh(m !== null);
                       }}
+                      registerPickAt={(fn) => { pickAtRef.current = fn; }}
                     />
                   ) : (
                     <ReshapePreview
@@ -1390,6 +1396,7 @@ export default function SandboxWorkspace() {
                       scales={scales}
                       onDrag={(param, value) => sendParams({ [param]: value })}
                       onCommit={commitParams}
+                      onTap={(x, y) => pickAtRef.current?.(x, y)}
                       outlines={outlines}
                       drawing={drawTool != null}
                       onPlace={handlePlace}

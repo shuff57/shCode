@@ -72,6 +72,15 @@ interface Props {
   outlines?: SketchOutline[];
   /** Called once when the drag ends, to fold the result back into the doc. */
   onCommit: () => void;
+  /**
+   * Fired instead of a drag when a pointerdown+pointerup on a handle moved
+   * less than TAP_TOLERANCE_PX -- a tap, not a drag. Must act exactly as a
+   * click on the canvas underneath the handle would: this component emits
+   * no `onDrag` and no `onCommit` for that interaction, so the caller is
+   * expected to run its own pick (face/edge) at this point instead. Absent
+   * means a tap on a handle does nothing, same as before this prop existed.
+   */
+  onTap?: (clientX: number, clientY: number) => void;
   /** When true, a click-to-draw tool is active: a transparent catcher fills
    *  the layer and reports each click's plane coordinates via `onPlace`. */
   drawing?: boolean;
@@ -290,10 +299,21 @@ function edgePolyline(
   return null;
 }
 
+/** How far the pointer may travel between down and up before a handle
+ *  interaction counts as a drag rather than a tap -- see onTap's own doc
+ *  comment. Screen pixels, not world units: a tap has to feel the same
+ *  regardless of what the handle happens to be scaled to right now. */
+const TAP_TOLERANCE_PX = 4;
+
 export default function HandleOverlay({
-  points, values, scales, onDrag, onCommit, outlines, drawing, onPlace, bottomInset = 0,
+  points, values, scales, onDrag, onCommit, onTap, outlines, drawing, onPlace, bottomInset = 0,
 }: Props) {
   const [dragging, setDragging] = useState<string | null>(null);
+  // Whether the current pointerdown-to-pointerup has crossed TAP_TOLERANCE_PX
+  // yet. A click on a handle (e.g. the height handle sitting over a face's
+  // own centre) must still pick that face -- see onTap's own doc comment --
+  // so a real drag has to be told apart from a tap that never left the spot.
+  const dragStarted = useRef(false);
   // The layer's own DOM node, so a click's viewport position can be converted
   // to the same container-relative space the anchor x/y already use. Handles
   // only ever need DELTAS from their own pointerdown, so nothing needed this
@@ -530,6 +550,7 @@ export default function HandleOverlay({
                 valueV: typeof rawV === 'number' ? rawV : 0,
                 ax: a.x, ay: a.y,
               };
+              dragStarted.current = false;
               setAlongPx(0);
               setAlongV(0);
               setDragging(a.param);
@@ -538,6 +559,15 @@ export default function HandleOverlay({
               if (dragging !== a.param) return;
               const dx = e.clientX - start.current.x;
               const dy = e.clientY - start.current.y;
+              // Below tolerance: hold still. No visual move, no push() --
+              // this is what keeps a tap from ever reaching onDrag as a
+              // zero-length drag. Once it crosses, the rest of this handler
+              // is unchanged and computes off the FULL delta from pointerdown,
+              // so nothing is lost by having ignored the small moves before it.
+              if (!dragStarted.current) {
+                if (Math.hypot(dx, dy) < TAP_TOLERANCE_PX) return;
+                dragStarted.current = true;
+              }
               // Movement along the handle's own screen direction, in units.
               // Two directions at once for a sketch corner. The projected axes
               // are not perpendicular on screen once the camera turns, so the
@@ -563,13 +593,22 @@ export default function HandleOverlay({
             }}
             onPointerUp={(e) => {
               try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* gone */ }
+              const wasDrag = dragStarted.current;
               setDragging(null);
               setAlongPx(0);
               setAlongV(0);
-              commit();
+              if (wasDrag) {
+                commit();
+              } else {
+                // A tap: act exactly as a click on the canvas at this point
+                // would, instead of committing a zero-length drag.
+                onTap?.(e.clientX, e.clientY);
+              }
             }}
             onPointerCancel={() => {
-              setDragging(null); setAlongPx(0); setAlongV(0); commit();
+              const wasDrag = dragStarted.current;
+              setDragging(null); setAlongPx(0); setAlongV(0);
+              if (wasDrag) commit();
             }}
           />
         );
