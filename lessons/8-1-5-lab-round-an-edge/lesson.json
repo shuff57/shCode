@@ -15,9 +15,9 @@
     {
       "id": "s1",
       "title": "Pick one edge, not a face",
-      "instructions": "You're starting from a 40 x 40 x 20 mm box. Move the mouse slowly onto the line where two faces meet: when the mouse is on an edge, the edge lights up pink and a small label names it. Click while it is lit. You'll know it worked if the label above the Dimensions panel reads \"Box 1 · edge\".",
+      "instructions": "You're starting from a 40 x 40 x 20 mm box. Move the mouse slowly onto the line where two faces meet: when the mouse is on an edge, the edge lights up light blue and a small label names it. Click while it is lit; it turns pink to show it is selected. You'll know it worked if the label above the Dimensions panel reads \"Box 1 · edge\".",
       "hints": [
-        "Look for the thin line along the top of the box where two faces meet. Slide the mouse across it until it turns pink, then click without moving.",
+        "Look for the thin line along the top of the box where two faces meet. Slide the mouse across it until it lights up light blue, then click without moving. Pink means it is selected.",
         "If the label reads \"top face\" instead of \"edge\", you clicked a little too far from the line. Try again, right on it.",
         "Hard to see the edge? Drag in the 3D view to turn the box, or press Home to fit it."
       ]

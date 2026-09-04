@@ -31,11 +31,11 @@
     {
       "id": "s3",
       "title": "Round an upright corner edge",
-      "instructions": "Move the mouse onto one of the vertical edges of the tray, where the front face meets a side face - an upright corner edge, not the thin top rim. Aim about halfway down the edge, well below the rim, and click when the edge lights up pink. Press Round, then type 3 in the radius field.",
+      "instructions": "Move the mouse onto one of the vertical edges of the tray, where the front face meets a side face - an upright corner edge, not the thin top rim. Aim about halfway down the edge, well below the rim, and click when the edge lights up light blue. The label above the Dimensions panel must read \"Box 1 · edge\". Press Round, then type 3 in the radius field.",
       "hints": [
         "The top rim is only 2 mm thick after the hollow, so a 3 mm round doesn't fit there and reSHape will refuse it. An upright corner edge is thick enough to take it.",
-        "Near the rim the inner corner of the hollow sits right behind the outer one, and a click there can grab the wrong edge. Halfway down, only the outer edge is under the mouse.",
-        "If reSHape says the round would not fit, the step shows a warning: click Undo (Ctrl+Z), pick the edge again lower down, and try once more.",
+        "If the label reads \"Hollow 1 · edge\", you caught the inner corner of the hollow, which sits right behind the outer one near the rim; Round stays greyed out for it. Click again lower down the same edge until the label reads \"Box 1 · edge\".",
+        "If a warning appears on the Round 1 step (the round would not fit), click that step in the timeline, press the Delete button in the toolbar, pick a point lower down the edge, and press Round again.",
         "The label above the Dimensions panel should read \"edge\", not a face name."
       ]
     }
