@@ -30,13 +30,25 @@ reference teaches its API, and removing it breaks the app. Retired here means
 **Update, 2026-09-03.** The B-rep kernel is now the DEFAULT engine for
 reSHape's Build side (`?engine=jscad` opts back in) and ships with the site
 (`public/reshape/kernel/`, gitignored, rebuilt by `prebuild`; deploy from a
-worktree with the wasm copied in). Code mode still runs the JSCAD runner
-because the script the editor holds and the reference teach JSCAD's API; the
-kernel's own scripting surface is specced in `.gauntlet/` and is the next
-piece. The gauntlets that settled this: `.gauntlet/chili3d-verdicts.json`
+worktree with the wasm copied in). The gauntlets that settled this: `.gauntlet/chili3d-verdicts.json`
 (12/12 blind vs Chili3D), `.gauntlet/oracle.json` + `scripts/test-occt-adapter.mjs`
 (134/134 vs the JSCAD oracle), `.gauntlet/brep-default-lenses.json` (three
 student lenses, two rounds).
+
+**Update, 2026-09-03, later.** Code mode now runs **reSHape Script**
+(`lib/reshape-script.ts`, spec `.gauntlet/SPEC-reshape-script.md`): a script
+is the Build timeline written down, every call appends a feature to the same
+`ModelDoc`, the sandboxed iframe (`public/reshape/script-runner.html`) posts
+JSON only and the parent builds it on the kernel. `public/reshape/docs/reference.md`
+and `lib/reshape-docs.ts` teach that language; the JSCAD reference is
+`public/reshape/docs/jscad-legacy.md`, reachable with `?engine=jscad`
+(`?script=0` keeps the kernel for Build but the JSCAD runner for Code). Every
+check that measures the JSCAD shim (`test-reshape.mjs`, `reshape-simple-checks.mjs`,
+`check-docs-prose.mjs`) reads the legacy file through the harness's
+`docText.legacy()`; `test-reshape-script.mjs` runs every reference fence and
+in-app page on the kernel (195/195). Record: `.gauntlet/reshape-script-loop.json`.
+The JSCAD runner and `public/reshape/lib/` are due for deletion one release
+after this.
 
 ### Where the line already falls
 

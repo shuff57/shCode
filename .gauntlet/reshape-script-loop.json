@@ -1,0 +1,43 @@
+{
+  "loop": "reSHape Script: the timeline, written down",
+  "started": "2026-09-03T17:15-07:00",
+  "closed": "2026-09-03T20:25-07:00",
+  "spec": ".gauntlet/SPEC-reshape-script.md",
+  "bar": "Every reference example builds on the kernel and agrees with the JSCAD oracle where JSCAD could express it; every Build-only tool is one line; three student lenses finish the first ten pages of the new reference without the language or the runner in the way.",
+  "shipped": {
+    "commit": "0e6ef8d4",
+    "deployment": "https://8c616255.shcode.pages.dev",
+    "production": "https://shcode.pages.dev",
+    "verified_live": "verify-five.py 10/10 in Chromium on shcode.pages.dev; /reshape/kernel/reshape-script.js carries the typo hint; probes 404; wasm application/wasm with Access-Control-Allow-Origin: *"
+  },
+  "gates": {
+    "test-reshape-script (kernel oracle: fences, in-app pages, refusals, round trips)": "195/195",
+    "test-reshape (JSCAD shim, retargeted at jscad-legacy.md)": "370/370",
+    "test-reshape-docs (+ refusal sentences must be runtime templates)": "ALL PASS, 1 warning",
+    "check-docs-prose (JSCAD calls are the drift now)": "0/29 pages",
+    "test-model-codegen": "286/286",
+    "npm test end to end": "exit 0 on a28e4a18 and on 70f54f14 (same tree as 0e6ef8d4)"
+  },
+  "lenses": {
+    "advanced": "10/10; found: thrown script leaves zero chips; negative sizes absorbed; param() lost on a Build visit; whole-shape round has no chip",
+    "beginner": "10/10; confirmed the three; found: boxx surfaces a raw ReferenceError; declared max 10 shown as a 0.5-40 slider",
+    "moderate": "10/10 on the pre-fix intro (hit the ordering contradiction); confirmed param() loss; four invented refusal sentences in the reference"
+  },
+  "fixes": [
+    "a throw part-way posts the steps that built; a first-line throw keeps the last good Build",
+    "sizes, walls, depths, corners, counts must be positive, with the house sentence",
+    "misspelled call: 'boxx is not a tool here. Did you mean box()?' (edit distance within max(2, ceil(len/2)); far names get no guess)",
+    "param() carries through RunResult.namedParams; toScript re-declares it; the panel shows its caption and bounds; a drag lands inside the param() line; survives repeated Code<->Build without a Run",
+    "the docs' ordering rule, measured: shape -> hollow -> holes -> single-edge rounds; whole-shape round and hollow cannot share a shape in either order; the runtime sentence that said otherwise now says to pick an edge",
+    "the Refusals section quotes the runtime's real sentences; a check holds every quoted refusal to a runtime template"
+  ],
+  "kernel_limits_recorded": [
+    "BRepAlgoAPI_Cut of source minus offset fails after any hole or fillet (hollow must come first)",
+    "a corner-rounded primitive counts as a round for that rule"
+  ],
+  "left_for_the_operator": [
+    "retire the JSCAD runner and public/reshape/lib/ one release after this (?engine=jscad and ?script=0 keep it reachable)",
+    "git push (cs-3d is ~80 commits ahead of origin; never pushed by the loop)",
+    "a param() bound to two slots collapses into one panel row (noted in lib/reshape-script.ts)"
+  ]
+}
