@@ -34,7 +34,7 @@ import { outlineOf } from '../lib/sketch-arc';
 import { handlesFor, planeAnchor } from '../lib/model-handles';
 import { EMPTY_DOC, type Feature, isSketchOnly, type ModelDoc, nameMap, newPolygonSketch, newRectangleSketch } from '../lib/model-types';
 import { ownerOf } from '../lib/model-selection';
-import type { TopoName } from '../lib/topo-name';
+import { partWordFor, type TopoName } from '../lib/topo-name';
 import {
   applyParam,
   generatedParams,
@@ -826,15 +826,6 @@ export default function SandboxWorkspace() {
     const id = selected[0];
     if (!doc.features.some((f) => f.id === id)) return null;
     const base = nameMap(doc)[id] ?? id;
-    const resolvedPart = (name: TopoName | null | undefined): string | null => {
-      if (!name) return null;
-      if (name.cause === 'between') return 'edge';
-      if (name.cause === 'primitive' && name.kind === 'face') {
-        const words: Record<string, string> = { '+z': 'top', '-z': 'bottom', side: 'side' };
-        return `${words[name.part] ?? name.part} face`;
-      }
-      return null;
-    };
     // Prefer a specific resolved part word (a primitive face's own +z/-z/
     // side, or "edge" for a name that traced to two of them); fall back to
     // the pick's own KIND -- "edge" or "face" -- when the topological
@@ -851,9 +842,9 @@ export default function SandboxWorkspace() {
     // stale pick from an earlier viewport click must not paint a part word
     // onto whatever got selected afterward some other way.
     const part = pickedEdge && ownerOf(doc, pickedEdge) === id
-      ? (resolvedPart(pickedEdge.edge) ?? 'edge')
+      ? (partWordFor(pickedEdge.edge) ?? 'edge')
       : pickedFace && ownerOf(doc, pickedFace) === id
-        ? (resolvedPart(pickedFace.face) ?? 'face')
+        ? (partWordFor(pickedFace.face) ?? 'face')
         : null;
     return part ? `${base} · ${part}` : base;
   }, [selected, doc, pickedFace, pickedEdge]);

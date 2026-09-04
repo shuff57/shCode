@@ -97,6 +97,29 @@ module.exports = function run(dir) {
       r.target === 'b2' && r.insertAt === 2 && r.rewireId === null, JSON.stringify(r));
   }
 
+  console.log('\n=== newShell: opens at a picked face when one is supplied ===');
+
+  {
+    const d = doc(box('b1'));
+    const topFace = { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' };
+    const opened = types.newShell(d, 'b1', topFace);
+    check('a face name supplied to newShell sets ShellFeature.open to that exact name',
+      opened.kind === 'shell' && opened.target === 'b1' && JSON.stringify(opened.open) === JSON.stringify(topFace),
+      JSON.stringify(opened));
+  }
+  {
+    const d = doc(box('b1'));
+    const closed = types.newShell(d, 'b1');
+    check('no face name supplied leaves ShellFeature.open absent -- stays fully closed, as before this feature existed',
+      closed.kind === 'shell' && closed.target === 'b1' && !('open' in closed), JSON.stringify(closed));
+  }
+  {
+    const d = doc(box('b1'));
+    const closed = types.newShell(d, 'b1', undefined);
+    check('an explicit undefined behaves the same as omitting the argument entirely',
+      !('open' in closed), JSON.stringify(closed));
+  }
+
   console.log(fails.length === 0
     ? `\nall ${pass} checks passed`
     : `\n${fails.length} failed`);

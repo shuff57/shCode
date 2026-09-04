@@ -208,6 +208,46 @@ export function formatName(n: TopoName): string {
   }
 }
 
+/** Human words for a PRIMITIVE face's own `part` -- "top"/"bottom" for a
+ *  box or cylinder's +z/-z (matching the Top/Underneath view-strip preset
+ *  words), "side" for a cylinder's own wraparound face. +x/-x/+y/-y are
+ *  deliberately absent: which way is "front" or "left" depends on which way
+ *  the camera happens to be facing, and this app already refuses to guess
+ *  that anywhere else (see `partWordFor`'s own comment) -- printing the
+ *  literal part name is the honest fallback, not a gap to fill in later. */
+const PRIMITIVE_PART_WORDS: Record<string, string> = { '+z': 'top', '-z': 'bottom', side: 'side' };
+
+/**
+ * The single word (or two) a student-facing sentence uses for WHICH part of
+ * a feature a name points at -- "top face", "edge" -- or null when the name
+ * does not resolve to anything with its own part word.
+ *
+ * This is the ONE place that decision is made. SandboxWorkspace.tsx's
+ * selection badge ("Box 1 · top face") and ModelEditor.tsx's Hollow note
+ * ("Hollow 1 is open at the top face") both call this rather than each
+ * carrying their own copy, specifically so the two can never drift apart --
+ * measured 2026-09-04 as a real risk the first time this logic existed in
+ * exactly one of them.
+ *
+ * An edge (`between`) always says "edge", regardless of which two faces it
+ * connects -- there is no finer word for an edge the way there is for a
+ * face. A primitive face uses PRIMITIVE_PART_WORDS, falling back to the
+ * literal part string for +x/-x/+y/-y (see that map's own comment for why
+ * those are not guessed at). Anything else -- a hole's own wall, a round's
+ * own filleted face, all of which have "no recorded path back to any
+ * primitive" and so never carry a `primitive` or `between` cause -- returns
+ * null, the same "no answer is better than a confidently wrong one" rule
+ * this file's own header states for names that fail to resolve.
+ */
+export function partWordFor(n: TopoName | null | undefined): string | null {
+  if (!n) return null;
+  if (n.cause === 'between') return 'edge';
+  if (n.cause === 'primitive' && n.kind === 'face') {
+    return `${PRIMITIVE_PART_WORDS[n.part] ?? n.part} face`;
+  }
+  return null;
+}
+
 /** The feature a name ultimately hangs off -- the earliest one in the chain.
  *  This is what a dependency check asks for: delete that feature and every
  *  name rooted in it is gone, which is a thing to say out loud rather than

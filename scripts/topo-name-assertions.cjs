@@ -173,6 +173,29 @@ module.exports = function run(dir) {
     N.formatName({ cause: 'carried', feature: 'op1', kind: 'edge', of: edge })
       === 'op1.same[c1.edge[c1.face[+x] ^ c1.face[+z]]]');
 
+  // partWordFor(): the one shared source SandboxWorkspace.tsx's selection
+  // badge and ModelEditor.tsx's Hollow note both call, so "Box 1 · top face"
+  // and "Hollow 1 is open at the top face" can never name a face two
+  // different ways.
+  check('a box\'s own +z face reads "top face", the same word the Top view-strip preset uses',
+    N.partWordFor({ cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' }) === 'top face');
+  check('-z reads "bottom face", matching the Underneath preset',
+    N.partWordFor({ cause: 'primitive', feature: 'b1', kind: 'face', part: '-z' }) === 'bottom face');
+  check('a cylinder\'s wraparound face reads "side face"',
+    N.partWordFor({ cause: 'primitive', feature: 'c1', kind: 'face', part: 'side' }) === 'side face');
+  check('+x/-x/+y/-y are printed literally, never guessed at as front/back/left/right',
+    N.partWordFor({ cause: 'primitive', feature: 'b1', kind: 'face', part: '+x' }) === '+x face'
+    && N.partWordFor({ cause: 'primitive', feature: 'b1', kind: 'face', part: '-y' }) === '-y face');
+  check('an edge always reads plain "edge", regardless of which two faces it connects',
+    N.partWordFor(edge) === 'edge');
+  check('null resolves to null, not a thrown error',
+    N.partWordFor(null) === null);
+  check('undefined resolves to null the same way',
+    N.partWordFor(undefined) === null);
+  check('a name with no part word of its own (made/cap/swept/rounded/split/carried) returns null, not a guess',
+    N.partWordFor({ cause: 'made', feature: 'h1', kind: 'face', at: { u: 0.5, v: 0.5 } }) === null
+    && N.partWordFor({ cause: 'cap', feature: 'e1', kind: 'face', end: 'top' }) === null);
+
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;
 };
