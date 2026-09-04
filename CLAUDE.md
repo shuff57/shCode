@@ -27,6 +27,17 @@ the direction. It is not.
 reference teaches its API, and removing it breaks the app. Retired here means
 *no new dependence*, not *gone*.
 
+**Update, 2026-09-03.** The B-rep kernel is now the DEFAULT engine for
+reSHape's Build side (`?engine=jscad` opts back in) and ships with the site
+(`public/reshape/kernel/`, gitignored, rebuilt by `prebuild`; deploy from a
+worktree with the wasm copied in). Code mode still runs the JSCAD runner
+because the script the editor holds and the reference teach JSCAD's API; the
+kernel's own scripting surface is specced in `.gauntlet/` and is the next
+piece. The gauntlets that settled this: `.gauntlet/chili3d-verdicts.json`
+(12/12 blind vs Chili3D), `.gauntlet/oracle.json` + `scripts/test-occt-adapter.mjs`
+(134/134 vs the JSCAD oracle), `.gauntlet/brep-default-lenses.json` (three
+student lenses, two rounds).
+
 ### Where the line already falls
 
 Measured 2026-09-01 across the 55 files that round of work touched:
