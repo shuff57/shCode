@@ -489,19 +489,15 @@ export default function SandboxWorkspace() {
   // rollback boundary itself, not to structural edits.
   useEffect(() => {
     if (!build) return;
-    // scriptEngine implies brepEngine (see where it is read), and Build mode
-    // under brepEngine never reads `code` at all (it renders BrepViewport) --
-    // so this branch only matters for the legacy !brepEngine JSCAD path,
-    // where scriptEngine is always false. Keeping it in step anyway (rather
-    // than assuming that) is what stops `code` from going stale with the
-    // WRONG language the moment any caller of it changes.
-    //
-    // scriptNamedParams passed through -- see loadDoc()'s own comment on why
-    // this must NOT be the namedParams-less call it used to be.
-    setCode(scriptEngine ? toScript(effectiveDoc, scriptNamedParams ?? undefined) : toReshape(effectiveDoc));
+    // scriptEngine: skip entirely -- see loadDoc()'s own comment on why
+    // touching `code`/runKey here has no reader to serve (Build mode never
+    // renders ReshapePreview once brepEngine is on, and scriptEngine implies
+    // brepEngine) and is where the real damage came from.
+    if (scriptEngine) return;
+    setCode(toReshape(effectiveDoc));
     setRunKey((k) => k + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rollbackIndex, scriptEngine, scriptNamedParams]);
+  }, [rollbackIndex, scriptEngine]);
 
   // Regenerate and reload. The slow path, and the only one structure takes.
   const loadDoc = useCallback((raw: ModelDoc) => {
@@ -518,45 +514,55 @@ export default function SandboxWorkspace() {
     setRebuildMs(null);
     setStale(null);
     setRollbackIndex(null);
-    // scriptEngine-aware for the same reason the rollback effect above is --
-    // measured 2026-09-04: without this, a Code -> Build -> Code round trip
-    // left `code` holding the STALE toReshape() text loadDoc() last wrote
-    // (JSCAD, complete with a require() call), and the moment Code's
-    // ReshapePreview remounted on the runKey this bump below causes, it
-    // handed that JSCAD text to the DSL's script-runner.html and threw
-    // "require is not defined" -- a real error banner over a doc that had
-    // built perfectly cleanly.
+    // scriptEngine: do NOT touch `code`/runKey at all. Two fixes lived here
+    // in turn before this one, and both were still wrong in the same way --
+    // worth leaving both failures on record rather than only the final
+    // answer, since the next person tempted to "regenerate code here too"
+    // will reach for exactly this spot.
     //
-    // scriptNamedParams IS passed through here, and that is a correction of
-    // this same comment's earlier claim that loadDoc() has none to offer --
-    // measured 2026-09-04 (team lead's independent pass): Code -> Build ->
-    // Code (no edit, no Run) silently lost a param(). The chain: this
-    // function's OWN setCode() call above regenerated `code` WITHOUT
-    // namedParams while still literal-only; the moment Code mode's
-    // ReshapePreview then MOUNTS (build flips false->true is not a
-    // remount, but true->false the first time a Run has happened IS one --
-    // it was not in the tree at all while build was true), it auto-evaluates
-    // whatever `code` currently holds -- a real re-run the student never
-    // asked for, but one script-runner.html cannot tell apart from a
-    // genuine one. That auto-run's own 'reshape-doc' reply -- reporting
-    // ZERO named params, because the code it was HANDED had none -- then
-    // overwrote scriptDoc/scriptNamedParams with the literal-only version,
-    // and the caption/bounds a script had declared were gone from that
-    // point on, even though the STUDENT'S EDITOR (fileContents, written by
-    // chooseBuild()'s Build -> Code branch, unaffected by this function)
-    // still showed the correct param() line the whole time. Passing
-    // scriptNamedParams here means the auto-run evaluates the SAME correct,
-    // param()-declaring text chooseBuild() already put in the editor, so
-    // its reply reports the same bindings back rather than erasing them --
-    // self-correcting rather than merely deferred, because toScript()'s own
-    // "stillLive" check (see that file) already drops a binding whose slot
-    // no longer exists in `next`, so a stale array here from an unrelated
-    // caller (undo, redo, Reset, the draw tool) degrades to plain literals
-    // exactly as before, never to a wrong caption.
-    setCode(scriptEngine ? toScript(next, scriptNamedParams ?? undefined) : toReshape(next));
-    setRunKey((k) => k + 1);
+    // FIRST (measured 2026-09-04): setCode(toReshape(next)) unconditionally
+    // -- JSCAD text, `require()` call and all. The moment Code mode's
+    // ReshapePreview next mounted (build flips true -> false is a fresh
+    // mount: the component is not in the tree at all while build is true,
+    // so this is not a "remount on a changed key", it is entering the tree
+    // for the first time since) and auto-evaluated whatever `code` held --
+    // a re-run the student never asked for, but one script-runner.html
+    // cannot tell apart from a real one -- it threw "require is not
+    // defined" over a doc that had built perfectly cleanly.
+    //
+    // SECOND (measured 2026-09-04, team lead's independent pass):
+    // setCode(toScript(next, scriptNamedParams)) -- the DSL, WITH the
+    // binding array threaded through, on the theory that the auto-eval
+    // would now just reconfirm the same bindings instead of erasing them.
+    // It still lost param() on a SECOND Code -> Build -> Code cycle with no
+    // Run in between. Passing scriptNamedParams here made the auto-eval's
+    // OWN reply correct in isolation, but every call into this function
+    // still means "a fresh iframe mounts and race a genuine Run for the
+    // last word on scriptDoc/scriptNamedParams" -- and this function has no
+    // way to know whether that reply lands before or after the NEXT thing
+    // the student does with it.
+    //
+    // THE ACTUAL FIX is to stop creating that race at all. Build mode never
+    // reads `code` once brepEngine is on (it renders BrepViewport), and
+    // scriptEngine implies brepEngine -- so this function bumping runKey
+    // was NEVER load-bearing for anything scriptEngine needs; it only ever
+    // existed for the legacy !brepEngine JSCAD path, where Build mode's own
+    // preview IS ReshapePreview. Skipping the update here means `code` and
+    // runKey stay exactly what the student's own last real Run left them
+    // at, so the NEXT time ReshapePreview mounts (any later Code visit,
+    // any number of Build round trips later, with or without an edit) it
+    // auto-evaluates that SAME original source -- byte-identical to what
+    // already ran cleanly -- rather than a derivative this function
+    // manufactured and handed to an iframe racing the rest of the app.
+    // chooseBuild()'s OWN Build -> Code branch is what keeps the EDITOR
+    // (fileContents) and scriptDoc in step; this function never fed either
+    // of those anyway.
+    if (!scriptEngine) {
+      setCode(toReshape(next));
+      setRunKey((k) => k + 1);
+    }
     setIsRunning(true);
-  }, [scriptEngine, scriptNamedParams]);
+  }, [scriptEngine]);
 
   const remember = useCallback((prev: ModelDoc) => {
     past.current = [...past.current.slice(-49), prev];
