@@ -4,7 +4,7 @@ You've been building parts by pressing buttons: Box, Hole, Round, Hollow. The wh
 
 Switch to Code on any part you've built and you'll see it. A box you added shows up as `const box1 = box(40, 40, 20)`. Drill a hole in it, and a second line appears: `hole(box1, { across: 6 })`. The numbers in the text are exactly the numbers you typed into the Dimensions panel — not similar, not rounded. The same numbers.
 
-Even the names line up. The timeline chip that reads "Box 1" becomes the variable `box1` in the Code. "Hole 1" becomes `hole1` if a later step needs to grab it again. reSHape didn't invent a separate naming scheme for Code — it just wrote down the names the timeline was already using.
+Even the names line up, where a name is needed. The timeline chip that reads "Box 1" becomes the variable `box1` in the Code — a box gets a name because a later step needs to say which shape it's working on. A hole doesn't get a name of its own: it's written as one line that already names the shape it goes into, `hole(box1, { across: 6 })`. reSHape didn't invent a separate naming scheme for Code — it just wrote down the names the timeline was already using, and left unnamed the steps nothing later needs to point back to.
 
 ```js
 const box1 = box(40, 40, 20)
@@ -18,7 +18,7 @@ This matters starting with the next lesson: once a part exists as text, you can 
 **What you'll learn from it:**
 - Every Build step becomes one line of Code, in the same order it was built.
 - The numbers in the Code are exactly the numbers from the Dimensions panel.
-- The names in the Code (`box1`, `hole1`) match the timeline chip names (Box 1, Hole 1).
+- A shape that later steps need to point back to gets a name (`box1`); a step like a hole just names the shape it acts on and needs no name of its own.
 - Build and Code show the same part — not two parts, one part, two views.
 
 ---

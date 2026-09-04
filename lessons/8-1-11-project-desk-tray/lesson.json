@@ -30,11 +30,11 @@
     },
     {
       "id": "s3",
-      "title": "Round one edge",
-      "instructions": "Click right on one edge of the tray - the line where two faces meet, not the middle of a face. Press Round, then type 3 in the radius field.",
+      "title": "Round an upright corner edge",
+      "instructions": "Click right on one of the vertical edges of the tray, where the front face meets a side face - an upright corner edge, not the thin top rim. Press Round, then type 3 in the radius field.",
       "hints": [
-        "Round the hollow's outer edge, not a face - the label above the Dimensions panel should read \"edge\", not a face name.",
-        "It doesn't matter which order you build the hollow and the round in - reSHape moves the hollow ahead of the round for you automatically."
+        "The top rim is only 2 mm thick after the hollow, so a 3 mm round doesn't fit there and reSHape will refuse it. An upright corner edge is thick enough to take it.",
+        "Round the hollow's outer edge, not a face - the label above the Dimensions panel should read \"edge\", not a face name."
       ]
     }
   ],
@@ -42,14 +42,14 @@
     {
       "id": "r1",
       "title": "An 80 x 50 x 20 tray with one rounded edge",
-      "description": "An 80 x 50 x 20 mm box, hollowed to 2 mm walls with the top open, with one edge rounded to a 3 mm radius.",
+      "description": "An 80 x 50 x 20 mm box, hollowed to 2 mm walls with the top open, with one upright corner edge rounded to a 3 mm radius.",
       "type": "model",
       "expect": [
         { "kind": "box", "size": [80, 50, 20] },
         { "kind": "shell", "thickness": 2, "open": true },
         { "kind": "fillet", "size": 3 }
       ],
-      "hint": "Box 80 x 50 x 20, Hollow wall 2 open top, Round one edge to 3 - any order.",
+      "hint": "Box 80 x 50 x 20, Hollow wall 2 open top, then Round an upright corner edge to 3.",
       "points": 0
     }
   ],

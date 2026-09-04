@@ -2,4 +2,4 @@
 
 // Nothing built yet. On the Build side, press the Box tool and click
 // in the 3D view to place a box. Then check its width, depth, and
-// height in the Dimensions panel on the right: 40, 40, 20.
+// height in the Dimensions panel on the right: 40, 40, 30.
