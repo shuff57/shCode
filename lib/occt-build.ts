@@ -57,6 +57,10 @@ export interface Built {
 export interface OpRecord {
   op: any;
   inputs: string[];
+  /** Set only for a fillet/chamfer's own op record -- see pushThrough()'s own
+   *  comment in lib/topo-resolve.ts for why an EDGE pushed through one of
+   *  these is treated specially, unlike a face. */
+  kind?: 'fillet';
 }
 
 /** One outline segment of a sketch, paired with the edge it became in the
@@ -661,9 +665,21 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
       // send a student looking for a face that is still there.
       if (src) {
         if (edge) {
-          shape = f.style === 'chamfer'
+          const result = f.style === 'chamfer'
             ? chamfered(oc, src, edge, f.size)
             : filleted(oc, src, edge, f.size);
+          shape = result?.shape ?? null;
+          if (result) {
+            // Registered exactly like a boolean's own op record (see the
+            // `boolean()` helper above) -- this is the fix described in
+            // FilletResult's own doc comment in lib/topo-history.ts: without
+            // it, a face untouched by this fillet (the box's own top face,
+            // say, with the round on some other edge entirely) had no
+            // recorded path forward at all, and nameFaceOnCurrentShape()
+            // could never re-identify it once a Round exists anywhere in
+            // the chain.
+            ops.set(f.id, [{ op: result.op, inputs: [f.target], kind: 'fillet' }]);
+          }
           if (!shape) {
             // The name resolved to a real edge; the KERNEL refused the
             // operation on it (radius/distance too big for that edge). Not

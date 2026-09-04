@@ -192,9 +192,32 @@ module.exports = function run(dir) {
     N.partWordFor(null) === null);
   check('undefined resolves to null the same way',
     N.partWordFor(undefined) === null);
-  check('a name with no part word of its own (made/cap/swept/rounded/split/carried) returns null, not a guess',
+  check('a name with no part word of its own (made/cap/swept/rounded) returns null, not a guess',
     N.partWordFor({ cause: 'made', feature: 'h1', kind: 'face', at: { u: 0.5, v: 0.5 } }) === null
     && N.partWordFor({ cause: 'cap', feature: 'e1', kind: 'face', end: 'top' }) === null);
+  check('a face carried through one operation untouched still reads by its ORIGINAL primitive part word -- the exact case a Hole/Round left a box\'s own top face reading as owned by the Round feature, not the Box',
+    N.partWordFor({
+      cause: 'carried', feature: 'h1',
+      of: { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' },
+    }) === 'top face');
+  check('...and through TWO nested carries (Hole, then Round), same as the round-4 lens\'s own Box/Hole/Round/Hollow sequence',
+    N.partWordFor({
+      cause: 'carried', feature: 'r1',
+      of: {
+        cause: 'carried', feature: 'h1',
+        of: { cause: 'primitive', feature: 'b1', kind: 'face', part: '+z' },
+      },
+    }) === 'top face');
+  check('a split piece carried from a primitive face also unwraps to that primitive\'s own part word',
+    N.partWordFor({
+      cause: 'split', feature: 'm1', kind: 'face', at: { u: 0.5, v: 0.5 },
+      of: { cause: 'primitive', feature: 'b1', kind: 'face', part: 'side' },
+    }) === 'side face');
+  check('carried/split still returns null when what they wrap has no part word of its own',
+    N.partWordFor({
+      cause: 'carried', feature: 'r2',
+      of: { cause: 'made', feature: 'h1', kind: 'face', at: { u: 0.5, v: 0.5 } },
+    }) === null);
 
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
   return fails.length === 0;

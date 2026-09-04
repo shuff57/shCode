@@ -294,6 +294,23 @@ function pushThrough(
   let cur = face;
   let consumedSplit = false;
   for (const rec of chain) {
+    // A fillet/chamfer's own history is reliable for the face question this
+    // was built to answer (item O: a box's own top face pushed through a
+    // Round on some other edge entirely) but NOT for an edge on that same
+    // face that the fillet merely trimmed in passing, without touching it
+    // directly -- measured 2026-09-04 (reference.md's own round-then-bevel
+    // example): rounding the box's top-front edge, then asking whether the
+    // SAME box's top-back edge survived, reported IsDeleted() true even
+    // though the edge is untouched and geometrically identical. Booleans
+    // (Hole, Combine) do not have this problem -- their own history is
+    // exact for edges too, which is why this only special-cases `kind:
+    // 'fillet'`. Treating it as kept, rather than querying at all, is
+    // exactly the PRE-EXISTING behaviour for every edge case before fillets
+    // were ever registered here at all (chainToFeature simply never found a
+    // fillet in its graph, so resolveNameAsUsedBy fell back to the
+    // unpushed name) -- this keeps that working behaviour for edges while
+    // still fixing it for faces.
+    if (rec.kind === 'fillet' && cur.ShapeType() === oc.TopAbs_ShapeEnum.TopAbs_EDGE) continue;
     const fate = faceFate(oc, rec.op, cur);
     if (fate.kind === 'deleted') return null;
     if (fate.kind === 'kept' || fate.kind === 'replaced') {
@@ -328,10 +345,25 @@ function pushThrough(
  * why that gap is a real, silent defect and not a hypothetical one.
  *
  * A breadth-first search over `build.ops`, one hop at a time: from the
- * current feature, chainFor() is tried against every OTHER feature that has
- * recorded ops, and any that answers with a non-empty chain (meaning that
- * feature's history actually consumes the current one) is a valid next hop.
- * Multiple moves or booleans stacked in sequence are walked one after
+ * current feature, a candidate is a valid next hop only when its OWN ops
+ * actually name `feature` as one of their inputs -- checked directly here,
+ * NOT by trusting chainFor()'s return length. chainFor()'s own "ancestor not
+ * mentioned" fallback deliberately returns the WHOLE chain rather than an
+ * empty one (see its own doc comment: "it went in at the beginning"), which
+ * is the right answer for `carried`/`split` resolution, where the name's own
+ * `feature` field is guaranteed to be that op's actual feature. It is the
+ * WRONG answer here: with two or more features holding their own op records
+ * (a Hole, then a Round on some other edge entirely -- neither one about the
+ * other), that fallback made an UNRELATED candidate look connected, so a
+ * two-hop path (through the Hole, then the Round) was found as a bogus
+ * one-hop shortcut straight to the Round -- silently pushing a face through
+ * an operation it was never actually part of. Measured 2026-09-04: exactly
+ * this shortcut is why a box's own untouched top face could not be named
+ * once a Round existed anywhere in the chain, no matter which edge it
+ * rounded -- see FilletResult's own doc comment in lib/topo-history.ts for
+ * the fuller story this bug was found chasing.
+ *
+ * Multiple moves or booleans stacked in sequence are walked one hop after
  * another rather than assumed to be a single step, so this is not limited to
  * the one-hop case a fillet-after-move produces.
  */
@@ -344,6 +376,8 @@ function chainToFeature(build: BuildResult, from: string, to: string): OpRecord[
     for (const { feature, chain } of frontier) {
       for (const candidate of build.ops.keys()) {
         if (visited.has(candidate)) continue;
+        const list = build.ops.get(candidate) ?? [];
+        if (!list.some((r) => r.inputs.includes(feature))) continue;
         const hop = chainFor(build, candidate, feature);
         if (!hop.length) continue;
         const chainSoFar = [...chain, ...hop];

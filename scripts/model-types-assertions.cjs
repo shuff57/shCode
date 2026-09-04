@@ -97,6 +97,33 @@ module.exports = function run(dir) {
       r.target === 'b2' && r.insertAt === 2 && r.rewireId === null, JSON.stringify(r));
   }
 
+  console.log('\n=== shellInsertion: the item O regression -- picking the ROOT face, not the tip ===');
+
+  {
+    const d = doc(box('b1'), hole('h1', 'b1'), fillet('r1', 'h1'));
+    const r = types.shellInsertion(d, 'b1');
+    check('picking Box 1 itself (a face pick resolved to the primitive that owns it, not the chain\'s tip) still finds the Hole immediately downstream and reorders before it',
+      r.target === 'b1' && r.insertAt === 1 && r.rewireId === 'h1', JSON.stringify(r));
+  }
+  {
+    const d = doc(box('b1'), fillet('r1', 'b1'));
+    const r = types.shellInsertion(d, 'b1');
+    check('picking the root with a lone Round directly downstream reorders before it the same way',
+      r.target === 'b1' && r.insertAt === 1 && r.rewireId === 'r1', JSON.stringify(r));
+  }
+  {
+    const d = doc(box('b1'));
+    const r = types.shellInsertion(d, 'b1');
+    check('picking the root with NOTHING downstream still just appends -- the forward check finds no direct hop and does not invent one',
+      r.target === 'b1' && r.insertAt === 1 && r.rewireId === null, JSON.stringify(r));
+  }
+  {
+    const d = doc(box('b1'), { id: 'm1', kind: 'move', target: 'b1', offset: [10, 0, 0], copy: false }, fillet('r1', 'm1'));
+    const r = types.shellInsertion(d, 'b1');
+    check('a Move sitting directly downstream of the root is not itself a blocker, and is NOT skipped over even though a Round sits further down -- rewiring a non-blocker would silently drop what it does',
+      r.target === 'b1' && r.insertAt === 3 && r.rewireId === null, JSON.stringify(r));
+  }
+
   console.log('\n=== newShell: opens at a picked face when one is supplied ===');
 
   {

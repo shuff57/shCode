@@ -229,18 +229,35 @@ const PRIMITIVE_PART_WORDS: Record<string, string> = { '+z': 'top', '-z': 'botto
  * measured 2026-09-04 as a real risk the first time this logic existed in
  * exactly one of them.
  *
+ * `carried`/`split` are unwrapped first, exactly the way rootFeature() below
+ * unwraps them to find which feature a name is rooted in -- a face an
+ * operation passed through untouched (a box's own top face, after a Hole
+ * drilled into its side and a Round on some other edge) is STILL a
+ * primitive face for this purpose, even though its own immediate `.feature`
+ * now names whichever operation last carried it forward. Measured
+ * 2026-09-04: clicking that exact top face resolved (correctly) to the
+ * Round feature as its OWNER (topological naming can only say who most
+ * recently touched a face, not who originally made it, for `chosen`/
+ * `pickedFaceUsable` purposes) with a `carried` name wrapping a `carried`
+ * name wrapping the box's own `primitive` one -- and without this
+ * unwrapping, Hollow silently built correctly open at that face (`open`
+ * itself was never null) while its own note stayed silent about it, because
+ * partWordFor() saw only the outermost `carried` cause and returned null.
+ *
  * An edge (`between`) always says "edge", regardless of which two faces it
  * connects -- there is no finer word for an edge the way there is for a
  * face. A primitive face uses PRIMITIVE_PART_WORDS, falling back to the
  * literal part string for +x/-x/+y/-y (see that map's own comment for why
  * those are not guessed at). Anything else -- a hole's own wall, a round's
  * own filleted face, all of which have "no recorded path back to any
- * primitive" and so never carry a `primitive` or `between` cause -- returns
- * null, the same "no answer is better than a confidently wrong one" rule
- * this file's own header states for names that fail to resolve.
+ * primitive" and so never carry a `primitive` or `between` cause even once
+ * unwrapped -- returns null, the same "no answer is better than a
+ * confidently wrong one" rule this file's own header states for names that
+ * fail to resolve.
  */
 export function partWordFor(n: TopoName | null | undefined): string | null {
   if (!n) return null;
+  if (n.cause === 'carried' || n.cause === 'split') return partWordFor(n.of);
   if (n.cause === 'between') return 'edge';
   if (n.cause === 'primitive' && n.kind === 'face') {
     return `${PRIMITIVE_PART_WORDS[n.part] ?? n.part} face`;

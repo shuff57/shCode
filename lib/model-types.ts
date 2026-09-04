@@ -935,6 +935,26 @@ export function newShell(doc: ModelDoc, target: string, open?: TopoName): ShellF
  * cross the single-`target` chain a Hole/Fillet/Extrude/Revolve/Shell/Move
  * already forms, and a Combine sitting in that ancestry is treated as a root
  * (a reasonable stopping point, not a claim that nothing beyond it matters).
+ *
+ * THE FORWARD CASE, added after the backward-only version shipped a real
+ * double-body bug: a face pick resolves to whichever feature OWNS that
+ * face (see ownerOf()/nameFaceOnCurrentShape()), which can be an upstream
+ * ROOT even after later features built on top of it -- a Hole, a Round on
+ * some other edge, neither of which touched the picked face at all. Picking
+ * a box's own top face after Box -> Hole -> Round used to pass the box's
+ * own id as `pickedId` with NOTHING in its backward ancestry (a primitive
+ * has no `target`), so this returned "append at the end, no reorder" --
+ * and the Hollow that got appended targeted the box DIRECTLY, leaving Hole
+ * and Round dangling off the ORIGINAL box in their own untouched branch.
+ * `topLevel()` then had two unconsumed leaves (the Hole/Round chain's own
+ * tip, and the new Hollow) and rendered BOTH, overlapping, as if the model
+ * had silently forked in two. Checked as a single direct hop, not a further
+ * walk down the whole downstream chain: reordering past anything ELSE
+ * requires rewiring THAT feature's own `target`, and rewiring a feature
+ * that is not itself the blocker would silently drop whatever it does (a
+ * Move in between, say) -- so this only ever reorders past a blocker that
+ * targets the picked feature directly, the same one-hop case the backward
+ * walk above already only ever rewires.
  */
 export function shellInsertion(
   doc: ModelDoc,
@@ -948,13 +968,18 @@ export function shellInsertion(
     cur = t ? doc.features.find((f) => f.id === t) : undefined;
   }
   const blockerIndex = chain.findIndex((f) => f.kind === 'hole' || f.kind === 'fillet');
-  if (blockerIndex <= 0) {
-    return { target: pickedId, insertAt: doc.features.length, rewireId: null };
+  if (blockerIndex > 0) {
+    const root = chain[blockerIndex - 1];
+    const blocker = chain[blockerIndex];
+    const insertAt = doc.features.findIndex((f) => f.id === root.id) + 1;
+    return { target: root.id, insertAt, rewireId: blocker.id };
   }
-  const root = chain[blockerIndex - 1];
-  const blocker = chain[blockerIndex];
-  const insertAt = doc.features.findIndex((f) => f.id === root.id) + 1;
-  return { target: root.id, insertAt, rewireId: blocker.id };
+  const direct = doc.features.find((f) => 'target' in f && f.target === pickedId);
+  if (direct && (direct.kind === 'hole' || direct.kind === 'fillet')) {
+    const insertAt = doc.features.findIndex((f) => f.id === pickedId) + 1;
+    return { target: pickedId, insertAt, rewireId: direct.id };
+  }
+  return { target: pickedId, insertAt: doc.features.length, rewireId: null };
 }
 
 export function newMove(doc: ModelDoc, target: string, copy = false): MoveFeature {

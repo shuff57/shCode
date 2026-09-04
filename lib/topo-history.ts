@@ -397,7 +397,31 @@ export function sharedEdge(oc: Occt, a: any, b: any): any | null {
  * ordinary choice and the only one of the three that is exact for a constant
  * radius on a straight edge.
  */
-export function filleted(oc: Occt, shape: any, edge: any, radius: number): any | null {
+/** A fillet's result, plus the builder itself -- BRepFilletAPI_MakeFillet
+ *  exposes the SAME IsDeleted()/Modified() history query interface a
+ *  boolean's builder does (measured 2026-09-04: this kernel build binds all
+ *  three of IsDeleted/Modified/Generated on it), so the caller can register
+ *  it in BuildResult.ops exactly like occt-build.ts's own boolean() helper
+ *  does -- see that function's own comment. Without this, a face nothing
+ *  about the fillet touched (a box's own top face, after a Round on some
+ *  other edge entirely) had NO recorded path forward at all: chainToFeature()
+ *  never finds a hop into a fillet feature's own id, resolveNameAsUsedBy()
+ *  falls back to the name resolved on its ORIGINAL pre-fillet shape, and
+ *  IsSame() against the post-fillet tessellation fails -- fillet, unlike a
+ *  boolean, does not reliably preserve untouched faces' own TShape identity,
+ *  so the two are never "the same" object even though they are the same
+ *  face. The practical cost: Hollow, opened at a face picked after a Round
+ *  exists anywhere in the chain, silently built fully closed -- the pick
+ *  still highlighted correctly (that path resolves the CURRENT tip's own
+ *  face, not this one), but nameFaceOnCurrentShape() returned null for the
+ *  SAME face when hollow() asked "which named face is this", so
+ *  pickedFaceUsable stayed false and `open` was never passed to newShell(). */
+export interface FilletResult {
+  shape: any;
+  op: any;
+}
+
+export function filleted(oc: Occt, shape: any, edge: any, radius: number): FilletResult | null {
   if (!shape || !edge || !(radius > 0)) return null;
   return refusable(() => {
     const mk = new oc.BRepFilletAPI_MakeFillet(shape, oc.ChFi3d_FilletShape.ChFi3d_Rational);
@@ -406,19 +430,22 @@ export function filleted(oc: Occt, shape: any, edge: any, radius: number): any |
     // A radius the edge cannot take -- bigger than the faces beside it --
     // leaves IsDone false. Returning the unfilleted shape would silently
     // ignore the student; null is the caller's cue to say so.
-    return mk.IsDone && !mk.IsDone() ? null : mk.Shape();
+    return mk.IsDone && !mk.IsDone() ? null : { shape: mk.Shape(), op: mk };
   });
 }
 
 /** Cut one edge off flat, at `distance` from it. The chamfer to filleted()'s
- *  round, and the same story: one named edge, not all of them. */
-export function chamfered(oc: Occt, shape: any, edge: any, distance: number): any | null {
+ *  round, and the same story: one named edge, not all of them. Returns the
+ *  same shape+op pair, for the same reason -- see FilletResult's own doc
+ *  comment; BRepFilletAPI_MakeChamfer shares its base class's history query
+ *  interface with BRepFilletAPI_MakeFillet. */
+export function chamfered(oc: Occt, shape: any, edge: any, distance: number): FilletResult | null {
   if (!shape || !edge || !(distance > 0)) return null;
   return refusable(() => {
     const mk = new oc.BRepFilletAPI_MakeChamfer(shape);
     mk.Add(distance, oc.TopoDS.Edge(edge));
     mk.Build(new oc.Message_ProgressRange());
-    return mk.IsDone && !mk.IsDone() ? null : mk.Shape();
+    return mk.IsDone && !mk.IsDone() ? null : { shape: mk.Shape(), op: mk };
   });
 }
 
