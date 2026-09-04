@@ -483,6 +483,12 @@ export default function LessonWorkspace({
     return () => clearTimeout(timer);
   }, [files, commits, solutionLoaded]);
 
+  // The shortcut effect below registers once ([] deps), so it would call the
+  // runTests closure from the first render forever -- grading a reSHape
+  // lesson against the null doc it held at mount (moderate lens, 2026-09-04).
+  const runTestsRef = useRef(runTests);
+  useEffect(() => { runTestsRef.current = runTests; });
+
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -505,7 +511,7 @@ export default function LessonWorkspace({
       }
       if (e.ctrlKey && e.shiftKey && e.key === 'T') {
         e.preventDefault();
-        runTests();
+        runTestsRef.current();
       }
       if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
         // CodeMirror is a contenteditable <div>, not a <textarea>: without these
