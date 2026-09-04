@@ -39,17 +39,16 @@ export const sections: DocSection[] = [
         title: 'A script is the timeline written down',
         body: `reSHape scripts describe 3D models step by step. You make a shape, then change it: drill a hole, hollow it out, round its edges. Each line adds one step to the timeline, the way the Build toolbar does. The timeline shows Box 1, Hole 1, Hollow 1, Round 1 in order.`,
         code: `const b = box(40, 40, 20)
-hole(b, { across: 6 })
 hollow(b, { wall: 2 })
-round(b, 3)`,
+hole(b, { across: 6 })`,
       },
       {
         title: 'Numbers and units',
         body: `All measurements are in millimetres. Angles are in degrees. Every number is a parameter—drag a slider and the model rebuilds. The last shape built shows in the viewport.`,
         code: `const size = 40
 const b = box(size, size, size / 2)
-hole(b, { across: 6 })
-hollow(b, { wall: 2 })`,
+hollow(b, { wall: 2 })
+hole(b, { across: 6 })`,
       },
       {
         title: 'Building at the origin',
@@ -132,7 +131,7 @@ hollow(b, { wall: 2 })`,
       },
       {
         title: 'Hollow first, then hole',
-        body: `Hollow before you drill. Hollowing after a hole may be refused by the kernel.`,
+        body: `Hollow before you drill: this kernel cannot hollow a shape that already has a hole in it, so the hole comes second.`,
         code: `const b = box(40, 40, 20)
 hollow(b, { wall: 2 })
 hole(b, { across: 6 })`,
@@ -289,8 +288,8 @@ hollow(b, { wall })`,
         title: 'The timeline and panel',
         body: `The timeline shows each step (Box 1, Hole 1, Hollow 1). The Dimensions panel shows sliders for every number. Click a timeline chip to highlight its slider.`,
         code: `const b = box(40, 40, 20)
-hole(b, { across: 6 })
 hollow(b, { wall: 2 })
+hole(b, { across: 6 })
 round(b.edge('top', 'front'), 3)`,
       },
     ],
@@ -301,10 +300,9 @@ round(b.edge('top', 'front'), 3)`,
     pages: [
       {
         title: 'Refusals and their meanings',
-        body: `"Hollowing Hollow 1 to 15 thick would collapse it—the wall has to be under 10." — Reduce the wall thickness. "Hole 1 cannot drill through this face—the face is too small." — Make the hole smaller. "Hollow 1 refused—Cannot hollow after certain operations." — Try hollowing first, before rounding.`,
+        body: `When a step cannot be built, the app keeps the last good shape, marks the step with a warning, and says why in the panel. The sentences are the same ones the Build tools use. "Hollowing Hollow 1 to 15 thick would collapse it -- the wall has to be under 10. Hollow 1 is shown without it." means make the wall thinner. "Boring Hole 1 at diameter 100 would not fit Box 1 -- Hole 1 is shown without it." means make the hole smaller. "Hollowing Hollow 1 did not work after the steps before it -- this kernel cannot hollow a shape that already has a hole or a round. Hollow first, then drill or round." means reorder your lines. The example below is refused on purpose so you can see one.`,
         code: `const b = box(40, 40, 20)
-hollow(b, { wall: 2 })
-round(b, 2)`,
+hollow(b, { wall: 15 })`,
       },
     ],
   },
@@ -318,7 +316,7 @@ round(b, 2)`,
         code: `const base = box(40, 40, 5, { at: [0, 0, 2.5] })
 const post = cylinder(6, 20, { at: [0, 0, 10] })
 join(base, post)
-round(base.edge('top', 'side'), 1)`,
+round(post.edge('top', 'side'), 1)`,
       },
     ],
   },

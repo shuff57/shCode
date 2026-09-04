@@ -8,12 +8,11 @@ A script is a straight run of steps. You make a shape, then change it: drill a h
 
 ```js intro-basic
 const b = box(40, 40, 20)
-hole(b, { across: 6 })
 hollow(b, { wall: 2 })
-round(b, 3)
+hole(b, { across: 6 })
 ```
 
-A 40 × 40 × 20 box, drilled through with a 6mm hole, hollowed to 2mm walls, with all edges rounded to 3mm. Each line adds one step (Box 1, Hole 1, Hollow 1, Round 1) to the timeline.
+A 40 × 40 × 20 box, hollowed to 2 mm walls, then drilled through with a 6 mm hole. Each line adds one step (Box 1, Hollow 1, Hole 1) to the timeline. Hollow comes before the hole on purpose: this kernel cannot hollow a shape that already has a hole or a round in it.
 
 Every call returns the handle it acted on, so you can keep building on the same shape or save intermediate results to variables. Change a number and every part that depends on it changes with it. That is parametric design: the model is a program.
 
@@ -208,7 +207,7 @@ hollow(b, { wall: 2 })
 hole(b, { across: 6 })
 ```
 
-A 40 × 40 × 20 box hollowed first with 2 mm walls, then drilled through. Hollow first, then hole, because hollowing after a hole may be refused by the kernel.
+A 40 × 40 × 20 box hollowed first with 2 mm walls, then drilled through. Hollow first, then hole: this kernel cannot hollow a shape that already has a hole in it.
 
 ```js hollow-thin-wall
 const b = box(40, 40, 20)
@@ -268,7 +267,7 @@ A cylinder with the top rim rounded.
 const b = box(40, 40, 20)
 round(b.edge('top', 'front'), 1)
 round(b.edge('top', 'back'), 1)
-bevel(b.edge('left', 'top'), 2)
+bevel(b.edge('bottom', 'front'), 2)
 ```
 
 A 40 × 40 × 20 box with selective rounding and bevelling.
@@ -379,8 +378,8 @@ A 40 × 20 × 10 box rotated 90 degrees, standing up on one edge.
 
 ```js move-and-turn
 const b = box(20, 20, 10)
-move(b, [30, 0, 0])
 turn(b, [0, 0, 30])
+move(b, [30, 0, 0])
 ```
 
 A 20 × 20 × 10 box moved and then rotated.
@@ -512,6 +511,8 @@ A **param** is a named number that appears as a slider on the Dimensions panel. 
 
 Every number in your model is already a slider. Unnamed numbers get automatic captions from the Build tool defaults. `param` lets you name it and set bounds.
 
+A variable cannot share a name with a tool: `const holes = param('holes', 3)` is refused because `holes()` is the four-corners tool. Call it `count` instead.
+
 ```js param-basic
 const wall = param('wall', 2, { min: 0.5, max: 10 })
 const b = box(40, 40, 20)
@@ -523,9 +524,9 @@ A 40 × 40 × 20 box with a parametric wall thickness.
 ```js param-multiple
 const width = param('width', 40, { min: 20, max: 80 })
 const height = param('height', 20, { min: 10, max: 40 })
-const holes = param('holes', 3, { min: 1, max: 6 })
-const b = box(width, 40, height)
-repeatAround(b, { count: holes, axis: 'z' })
+const count = param('holes', 3, { min: 1, max: 6 })
+const b = box(width, 40, height, { at: [60, 0, 0] })
+repeatAround(b, { count: count, axis: 'z' })
 hole(b, { across: 4 })
 ```
 
@@ -551,8 +552,8 @@ You can see exactly which number is which by clicking a timeline chip—it highl
 
 ```js timeline-example
 const b = box(40, 40, 20)
-hole(b, { across: 6 })
 hollow(b, { wall: 2 })
+hole(b, { across: 6 })
 round(b.edge('top', 'front'), 3)
 ```
 
@@ -594,7 +595,7 @@ For 3D printing, make sure your model is closed (no holes or gaps), dimensions a
 const base = box(40, 40, 5, { at: [0, 0, 2.5] })
 const post = cylinder(6, 20, { at: [0, 0, 10] })
 join(base, post)
-round(base.edge('top', 'side'), 1)
+round(post.edge('top', 'side'), 1)
 ```
 
 A completed model ready for export: a base plate with a centred post and smooth top edge.

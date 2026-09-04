@@ -47,7 +47,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   PATHS, createShimContext, runProgram, isGeometry, captureConsole,
-  loadModeling, apiNames, documentedNames, docText,
+  documentedNames, docText,
 } from './reshape-harness.mjs';
 import { createSimpleContext } from './reshape-simple-checks.mjs';
 
@@ -208,85 +208,84 @@ for (const [label, p, globalName] of [
 }
 
 // ---------------------------------------------------------------------------
-// EVERY DOCUMENTED EXAMPLE RUNS
+// EVERY DOCUMENTED EXAMPLE RUNS -- THE LEGACY JSCAD REFERENCE ONLY
 // ---------------------------------------------------------------------------
 //
-// Compile lib/reshape-docs.ts to CommonJS in a temp dir and require the real
-// `sections` array. Reading the docs as data is what gives every result a
-// section slug and a page title instead of a line number.
+// lib/reshape-docs.ts's `code` fields are reSHape SCRIPT now (the DSL
+// scripts/reshape-script.ts runs, tested against a real kernel by
+// scripts/test-reshape-script.mjs, in the very same ownership as this file).
+// Feeding them to the JSCAD shim below would be testing the wrong language
+// against the wrong runtime -- every one of them would report "box is not
+// defined" or worse, silently return whatever @jscad/modeling's OWN box()
+// means, and neither result says anything about whether the DSL script is
+// correct. So this group's material moved: public/reshape/docs/jscad-legacy.md
+// is now the JSCAD reference (the page the DSL rewrite displaced), and it is
+// this group's job for as long as that page still ships behind ?engine=jscad
+// (see .gauntlet/SPEC-reshape-script.md's migration step 3).
+//
+// Read as markdown, not as data -- unlike lib/reshape-docs.ts, jscad-legacy.md
+// has no compiled `sections` array to require, so its ```js fences are parsed
+// the same way scripts/reshape-harness.mjs's own referenceExamples() parses
+// reference.md's (an optional slug after `js`, everything up to the matching
+// closing fence). Untagged fences (jscad-legacy.md has several -- a
+// require()-form counterpart shown right after a `shcode-only` shortcut, for
+// instance) are labelled by line number instead of a slug, so nothing is
+// silently skipped for lacking a name.
 
-section('documented examples');
+section('documented examples (JSCAD legacy reference)');
 
-const outDir = mkdtempSync(path.join(tmpdir(), 'shcode-reshape-docs-'));
-let sections = null;
+const LEGACY_PATH = path.join(root, 'public/reshape/docs/jscad-legacy.md');
 
-try {
-  try {
-    execFileSync(
-      process.execPath,
-      [
-        path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-        'lib/docs-core.ts',
-        'lib/reshape-docs.ts',
-        '--outDir', outDir,
-        '--module', 'commonjs',
-        '--target', 'es2022',
-        '--skipLibCheck',
-      ],
-      { cwd: root, stdio: 'inherit' },
-    );
-    // tsc emits bare .js; mark the temp dir CommonJS so an ancestor
-    // package.json with "type": "module" can't reinterpret them as ESM.
-    writeFileSync(path.join(outDir, 'package.json'), '{"type":"commonjs"}');
-    const require = createRequire(path.join(outDir, 'noop.cjs'));
-    sections = require(path.join(outDir, 'reshape-docs.js')).sections;
-  } catch (e) {
-    ok('lib/reshape-docs.ts compiles and exports `sections`', false, e.message);
+function parseLegacyExamples(mdPath) {
+  const src = readFileSync(mdPath, 'utf8');
+  const rx = /^```js([^\n]*)\n([\s\S]*?)^```$/gm;
+  const out = [];
+  let m;
+  while ((m = rx.exec(src)) !== null) {
+    const tag = (m[1] || '').trim();
+    const line = src.slice(0, m.index).split('\n').length + 1;
+    out.push({ label: tag || `line ${line}`, code: m[2] });
   }
+  return out;
+}
 
-  if (sections) {
-    ok('lib/reshape-docs.ts compiles and exports `sections`', Array.isArray(sections) && sections.length > 0,
-      `got ${JSON.stringify(sections)?.slice(0, 80)}`);
+const legacyExamples = existsSync(LEGACY_PATH) ? parseLegacyExamples(LEGACY_PATH) : null;
+ok('public/reshape/docs/jscad-legacy.md exists', legacyExamples !== null, `missing ${rel(LEGACY_PATH)}`);
 
-    const pages = [];
-    for (const s of sections) {
-      for (const p of s.pages || []) {
-        pages.push({ slug: s.slug, sectionTitle: s.title, title: p.title, code: p.code });
-      }
+if (legacyExamples) {
+  note(`${legacyExamples.length} fenced examples in jscad-legacy.md`);
+  ok('the legacy reference still carries examples', legacyExamples.length > 0, 'no ```js fence found');
+
+  // Every example runs in the SAME scope the JSCAD runner gives a student:
+  // the vendored bundle, the additive shim cut live out of runner.html, AND
+  // reshape.js -- this file predates the DSL and some of its examples still
+  // use the eleven-name sugar layer (box, ball, tube, ...), not only bare
+  // @jscad/modeling calls. One fresh context per example — module.exports
+  // persists otherwise, and an example with no main() would inherit the
+  // previous one's.
+  for (const ex of legacyExamples) {
+    // 'skeleton' is the program template with main() left empty on purpose:
+    // it does not build a shape, so 'main() returned undefined' is its
+    // correct behaviour, not an example that broke.
+    if (ex.label === 'skeleton') continue;
+    const label = `jscad-legacy.md: ${ex.label}`;
+    const cap = captureConsole();
+    let r;
+    try {
+      const { ctx } = createSimpleContext({ consoleImpl: cap.console });
+      r = runProgram(ctx, ex.code, `jscad-legacy.md<${ex.label}>`);
+    } catch (e) {
+      ok(label, false, `context build threw: ${e.message}`);
+      continue;
     }
-    const withCode = pages.filter((p) => typeof p.code === 'string' && p.code.trim());
-    note(`${sections.length} sections, ${pages.length} pages, ${withCode.length} carrying a code example`);
-    ok('the docs still carry examples', withCode.length > 0, 'no page has a `code` field');
-
-    // Every example runs in the SAME scope the runner gives a student: the
-    // vendored bundle, the additive shim cut live out of runner.html, AND
-    // reshape.js. That last one is not optional any more -- these examples are
-    // written in reSHape words, so a shim-only context reports every one of
-    // them as "box is not defined" while the page they came from renders fine.
-    // One fresh context per example — module.exports persists otherwise, and a
-    // page with no main() would inherit the previous page's.
-    for (const p of withCode) {
-      const label = `${p.slug} / ${p.title}`;
-      const cap = captureConsole();
-      let r;
-      try {
-        const { ctx } = createSimpleContext({ consoleImpl: cap.console });
-        r = runProgram(ctx, p.code, `lib/reshape-docs.ts<${label}>`);
-      } catch (e) {
-        ok(label, false, `context build threw: ${e.message}`);
-        continue;
-      }
-      if (!r.ok) { ok(label, false, `${r.phase}: ${r.error.message}`); continue; }
-      if (!r.main) { ok(label, false, 'no main() to call'); continue; }
-      if (r.geometry === undefined) { ok(label, false, 'main() returned undefined'); continue; }
-      const errs = cap.lines.filter((l) => l.type === 'error');
-      if (errs.length) { ok(label, false, `console.error: ${errs[0].text.slice(0, 140)}`); continue; }
-      ok(label, isGeometry(r.geometry),
-        `main() returned ${Array.isArray(r.geometry) ? `an array of ${r.geometry.length}` : typeof r.geometry} the renderer could not draw`);
-    }
+    if (!r.ok) { ok(label, false, `${r.phase}: ${r.error.message}`); continue; }
+    if (!r.main) { ok(label, false, 'no main() to call'); continue; }
+    if (r.geometry === undefined) { ok(label, false, 'main() returned undefined'); continue; }
+    const errs = cap.lines.filter((l) => l.type === 'error');
+    if (errs.length) { ok(label, false, `console.error: ${errs[0].text.slice(0, 140)}`); continue; }
+    ok(label, isGeometry(r.geometry),
+      `main() returned ${Array.isArray(r.geometry) ? `an array of ${r.geometry.length}` : typeof r.geometry} the renderer could not draw`);
   }
-} finally {
-  rmSync(outDir, { recursive: true, force: true });
 }
 
 // ---------------------------------------------------------------------------
@@ -346,23 +345,58 @@ section('both call styles');
 // (reference.md is the offline copy, the in-app docs are the taught path). What
 // is NOT allowed is differing without anyone noticing, so the count is printed
 // every run.
+//
+// Candidates used to be every @jscad/modeling export; both references are DSL
+// now, so the candidate list is the DSL's own vocabulary instead --
+// lib/reshape-script.ts's VOCABULARY constant, the same array runScript()
+// builds its `globals` object from (see that file's own comment on why it is
+// exported: this gate is exactly the reader that constant exists for). Read
+// as compiled data rather than grepped for a hand-copied list, so a DSL call
+// added there and never mentioned here is measured, not assumed.
 
 section('doc drift (warnings)');
 
-const { jscad: bundleApi } = loadModeling();
-const exportNames = [...apiNames(bundleApi).keys()].sort();
+const vocabOutDir = mkdtempSync(path.join(tmpdir(), 'shcode-reshape-vocab-'));
+let VOCABULARY = null;
+try {
+  execFileSync(
+    process.execPath,
+    [
+      path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
+      'lib/reshape-script.ts', 'lib/model-types.ts', 'lib/model-codegen.ts',
+      'lib/sketch-arc.ts', 'lib/sketch-solve.ts', 'lib/topo-name.ts',
+      '--outDir', vocabOutDir, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',
+    ],
+    { cwd: root, stdio: 'inherit' },
+  );
+  writeFileSync(path.join(vocabOutDir, 'package.json'), '{"type":"commonjs"}');
+  const requireVocab = createRequire(path.join(vocabOutDir, 'noop.cjs'));
+  VOCABULARY = requireVocab(path.join(vocabOutDir, 'reshape-script.js')).VOCABULARY;
+} catch (e) {
+  ok('lib/reshape-script.ts compiles and exports `VOCABULARY`', false, e.message);
+} finally {
+  rmSync(vocabOutDir, { recursive: true, force: true });
+}
 
-const inAppDocumented = documentedNames(docText.inApp(), exportNames);
-const refDocumented = documentedNames(docText.reference(), exportNames);
+ok(
+  'lib/reshape-script.ts compiles and exports `VOCABULARY`',
+  Array.isArray(VOCABULARY) && VOCABULARY.length > 0,
+  `got ${JSON.stringify(VOCABULARY)?.slice(0, 80)}`
+);
 
-const onlyInApp = exportNames.filter((n) => inAppDocumented.has(n) && !refDocumented.has(n));
-const onlyRef = exportNames.filter((n) => refDocumented.has(n) && !inAppDocumented.has(n));
+const dslNames = Array.isArray(VOCABULARY) ? [...VOCABULARY].sort() : [];
+
+const inAppDocumented = documentedNames(docText.inApp(), dslNames);
+const refDocumented = documentedNames(docText.reference(), dslNames);
+
+const onlyInApp = dslNames.filter((n) => inAppDocumented.has(n) && !refDocumented.has(n));
+const onlyRef = dslNames.filter((n) => refDocumented.has(n) && !inAppDocumented.has(n));
 
 if (onlyInApp.length === 0) ok('nothing in lib/reshape-docs.ts is missing from reference.md', true);
-else warn(`${onlyInApp.length} function(s) in lib/reshape-docs.ts but not in reference.md`, onlyInApp.join(', '));
+else warn(`${onlyInApp.length} call(s) in lib/reshape-docs.ts but not in reference.md`, onlyInApp.join(', '));
 
 if (onlyRef.length === 0) ok('nothing in reference.md is missing from lib/reshape-docs.ts', true);
-else warn(`${onlyRef.length} function(s) in reference.md but not in lib/reshape-docs.ts`, onlyRef.join(', '));
+else warn(`${onlyRef.length} call(s) in reference.md but not in lib/reshape-docs.ts`, onlyRef.join(', '));
 
 note(`drift total: ${onlyInApp.length + onlyRef.length} name(s)`);
 
@@ -374,15 +408,17 @@ section('coverage');
 
 {
   const documented = new Set([...inAppDocumented, ...refDocumented]);
-  const y = exportNames.length;
+  const y = dslNames.length;
   const x = documented.size;
   const z = y === 0 ? 0 : Math.round((x / y) * 1000) / 10;
-  console.log(`  ----  documented ${x} / ${y} exports (${z}%)`);
+  console.log(`  ----  documented ${x} / ${y} DSL calls (${z}%)`);
   console.log(`  ----    lib/reshape-docs.ts: ${inAppDocumented.size}   reference.md: ${refDocumented.size}`);
-  // 94 uniquely-named exported functions across the 15 modules as of
-  // @jscad/modeling@2.13.0. The floor only has to catch a bundle that failed to
-  // load and reported 0/0 as "100%".
-  ok('the bundle exposes a real API surface to measure against', y > 50, `only ${y} exported functions`);
+  console.log(`  ----    undocumented: ${dslNames.filter((n) => !documented.has(n)).join(', ') || '(none)'}`);
+  // 24 DSL calls as of this pass (see VOCABULARY in lib/reshape-script.ts).
+  // The floor only has to catch VOCABULARY failing to load and reporting
+  // 0/0 as "100%" -- it is not a claim that the DSL will always have at
+  // least 20 calls, only that a healthy load has noticeably more than zero.
+  ok('the DSL exposes a real vocabulary to measure against', y >= 20, `only ${y} DSL calls`);
   ok('the docs cover something', x > 0);
 }
 
