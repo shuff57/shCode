@@ -178,7 +178,7 @@ A **hollow** removes the inside of a shape, leaving a shell with walls of a thic
 
 The wall thickness is measured inward from each surface. A 40 × 40 × 20 box hollowed with 2 mm walls becomes a shell with 2 mm thick walls all around.
 
-**Hollow before you drill or round.** You can hollow first, then drill holes. But hollowing after certain operations (like a round or fillet) is sometimes refused by the kernel. The timeline will show the refusal message if that happens.
+**The order that always builds: shape, hollow, holes, then single-edge rounds and bevels.** `hollow` comes first because this kernel cannot hollow a shape that already has a hole or a round in it; asked later, the timeline shows "Hollowing Hollow 1 did not work after the steps before it -- this kernel cannot hollow a shape that already has a hole or a round. Hollow first, then drill or round. Hollow 1 is shown without it." A hollowed shape rounds its edges one at a time, with `round(b.edge('top', 'front'), 1)`. Rounding every edge at once (`round(b, 3)`) is a property of the shape itself, and a shape cannot have both that and a hollow: before the hollow, the kernel refuses the hollow; after it, the script stops with "Rounding works on a shape, not a hollowed-out one. A hollow shape rounds its edges one at a time: pick an edge and round that." Round every edge only on shapes you do not hollow, and before any hole.
 
 ```js hollow-closed
 const b = box(40, 40, 20)
@@ -208,6 +208,15 @@ hole(b, { across: 6 })
 ```
 
 A 40 × 40 × 20 box hollowed first with 2 mm walls, then drilled through. Hollow first, then hole: this kernel cannot hollow a shape that already has a hole in it.
+
+```js hollow-full-order
+const b = box(40, 40, 20)
+hollow(b, { wall: 2 })
+hole(b, { across: 6 })
+round(b.edge('top', 'front'), 1)
+```
+
+Every kind of step on one box, in the order that builds: the shape, a 2 mm hollow, a 6 mm hole through, and one edge of the result rounded to 1.
 
 ```js hollow-thin-wall
 const b = box(40, 40, 20)
@@ -561,21 +570,27 @@ Four timeline steps appear: Box 1, Hole 1, Hollow 1, Round 1. Each is a chip you
 
 ## When a step is refused
 
-Sometimes the kernel cannot build what you ask. A refusal message appears in the timeline, blocking that step and everything after it. The message tells you exactly why and how to fix it.
+Two different things can go wrong, and they look different on screen.
 
-**Message: "Hollowing Hollow 1 to 15 thick would collapse it—the wall has to be under 10."**
-You asked for walls thicker than the shape allows. Reduce the wall thickness parameter or make the shape larger.
+**The kernel refuses a step.** The step gets a warning chip, the panel says why, and the shape is shown without that step; everything after it still builds. The sentences are the Build tools' own:
 
-**Message: "Hole 1 cannot drill through this face—the face is too small or oddly shaped."**
-The hole's diameter is larger than the face can accommodate, or the geometry is too complex to calculate. Make the hole smaller or pick a different face.
+- **"Hollowing Hollow 1 to 15 thick would collapse it -- the wall has to be under 10. Hollow 1 is shown without it."** Make the wall thinner than the number it names.
+- **"Boring Hole 1 at diameter 100 would not fit Box 1 -- Hole 1 is shown without it."** Make the hole smaller than the face it goes through.
+- **"Rounding Round 1 at 30 would not fit its edge -- Round 1 is shown without it."** Use a smaller radius, or `bevel` instead.
+- **"Hollowing Hollow 1 did not work after the steps before it -- this kernel cannot hollow a shape that already has a hole or a round. Hollow first, then drill or round. Hollow 1 is shown without it."** Move the `hollow` line above the `hole` and single-edge `round` lines.
 
-**Message: "Round 1 refused—Fillet on this edge is too complex; try a smaller radius."**
-The fillet radius is too large for the edge. Reduce the radius or try bevelling instead of rounding.
+**The script stops at a line.** Some orders cannot be a step at all, so the script stops there and the message names the line:
 
-**Message: "Hollow 1 refused—Cannot hollow after certain operations."**
-You tried to hollow after a round or fillet. Try hollowing first, before rounding the interior walls instead.
+- **"Rounding works on a shape, not a hollowed-out one. A hollow shape rounds its edges one at a time: pick an edge and round that."** `round(b, 3)` and `hollow` cannot both be on one shape, in either order. Round the hollowed shape's edges one at a time: `round(b.edge('top', 'front'), 1)`.
+- **"Rounding works on the shape, not the hole cut into it. Round the shape before you drill it."** The same rule, before `hole`.
+- **"Rounding works on a shape, not a combination. Round the shape before you cut it."** The same rule, before `join`, `cut` or `keep`.
 
-The refusal stops the timeline there. All steps before it are valid and visible. Fix the refused step by changing its parameters, and the timeline updates.
+```js refusal-wall
+const b = box(40, 40, 20)
+hollow(b, { wall: 15 })
+```
+
+This one is refused on purpose so you can see what it looks like: Hollow 1 gets the warning chip and the box is shown solid. Change 15 to anything under 10 and the hollow appears.
 
 ## Exporting your model
 

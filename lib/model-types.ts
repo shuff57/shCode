@@ -562,7 +562,7 @@ export function whyCannotRound(f: Feature): string | null {
     return 'Rounding works on the shape, not the hole cut into it. Round the shape before you drill it.';
   }
   if (f.kind === 'shell') {
-    return 'Rounding works on a shape, not a hollowed-out one. Round the shape before you hollow it out.';
+    return 'Rounding works on a shape, not a hollowed-out one. A hollow shape rounds its edges one at a time: pick an edge and round that.';
   }
   if (f.kind === 'mirror') {
     return 'Rounding works on the original shape, not a mirrored copy. Round it before you mirror it.';

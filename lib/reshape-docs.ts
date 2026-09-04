@@ -130,11 +130,12 @@ holes(b, { across: 4, apart: [15, 15] })`,
 hollow(b, { wall: 2 })`,
       },
       {
-        title: 'Hollow first, then hole',
-        body: `Hollow before you drill: this kernel cannot hollow a shape that already has a hole in it, so the hole comes second.`,
+        title: 'The order that always builds',
+        body: `Shape, hollow, holes, then single-edge rounds and bevels. hollow comes first because this kernel cannot hollow a shape that already has a hole or a round in it; asked later, the panel says "Hollowing Hollow 1 did not work after the steps before it -- this kernel cannot hollow a shape that already has a hole or a round. Hollow first, then drill or round. Hollow 1 is shown without it." A hollowed shape rounds its edges one at a time with round(b.edge('top', 'front'), 1). round(b, 3) rounds every edge of the shape itself and cannot be combined with a hollow in either order: after the hollow the script stops with "Rounding works on a shape, not a hollowed-out one. A hollow shape rounds its edges one at a time: pick an edge and round that."`,
         code: `const b = box(40, 40, 20)
 hollow(b, { wall: 2 })
-hole(b, { across: 6 })`,
+hole(b, { across: 6 })
+round(b.edge('top', 'front'), 1)`,
       },
     ],
   },
@@ -300,7 +301,7 @@ round(b.edge('top', 'front'), 3)`,
     pages: [
       {
         title: 'Refusals and their meanings',
-        body: `When a step cannot be built, the app keeps the last good shape, marks the step with a warning, and says why in the panel. The sentences are the same ones the Build tools use. "Hollowing Hollow 1 to 15 thick would collapse it -- the wall has to be under 10. Hollow 1 is shown without it." means make the wall thinner. "Boring Hole 1 at diameter 100 would not fit Box 1 -- Hole 1 is shown without it." means make the hole smaller. "Hollowing Hollow 1 did not work after the steps before it -- this kernel cannot hollow a shape that already has a hole or a round. Hollow first, then drill or round." means reorder your lines. The example below is refused on purpose so you can see one.`,
+        body: `Two different things can go wrong. When the kernel refuses a step, the step gets a warning chip, the panel says why, and the shape is shown without that step; everything after it still builds. The sentences are the Build tools' own. "Hollowing Hollow 1 to 15 thick would collapse it -- the wall has to be under 10. Hollow 1 is shown without it." means make the wall thinner. "Boring Hole 1 at diameter 100 would not fit Box 1 -- Hole 1 is shown without it." means make the hole smaller. "Hollowing Hollow 1 did not work after the steps before it -- this kernel cannot hollow a shape that already has a hole or a round. Hollow first, then drill or round. Hollow 1 is shown without it." means move the hollow line up. When an order cannot be a step at all, the script stops at that line instead: "Rounding works on a shape, not a hollowed-out one. A hollow shape rounds its edges one at a time: pick an edge and round that." means use b.edge() and round one edge at a time; a hollow shape cannot have every edge rounded. The example below is refused on purpose so you can see one.`,
         code: `const b = box(40, 40, 20)
 hollow(b, { wall: 15 })`,
       },

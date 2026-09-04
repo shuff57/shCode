@@ -404,6 +404,45 @@ note(`drift total: ${onlyInApp.length + onlyRef.length} name(s)`);
 // COVERAGE
 // ---------------------------------------------------------------------------
 
+section('refusal sentences are the runtime\'s own');
+{
+  // reference.md's "When a step is refused" section and the in-app Refusals
+  // page quote what the app says. On 2026-09-03 a student lens hit two real
+  // sentences and found neither in the doc, which quoted four invented ones.
+  // So: every quoted sentence that reads like a refusal must be an instance of
+  // a string template in the runtime. `${...}` in a template matches anything;
+  // `a -- ` + `b` continuations are joined before extraction.
+  const SOURCES = ['lib/occt-build.ts', 'lib/model-types.ts', 'lib/reshape-script.ts'];
+  const templates = [];
+  for (const f of SOURCES) {
+    let s = readFileSync(path.join(root, f), 'utf8').replace(/\r\n/g, '\n');
+    s = s.replace(/`\s*\n\s*\+\s*`/g, '');
+    for (const m of s.matchAll(/`((?:[^`\\]|\\.)*)`|'((?:[^'\\\n]|\\.)*)'/g)) {
+      const lit = m[1] ?? m[2];
+      if (!lit || lit.length < 25 || !lit.includes(' ')) continue;
+      const rx = '^' + lit.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\$\\\{.*?\\\}/g, '.+?') + '$';
+      templates.push(new RegExp(rx));
+    }
+  }
+  ok('the runtime yields refusal templates to compare against', templates.length >= 20, `${templates.length} templates`);
+  const looksLikeRefusal = (q) => / -- /.test(q) || /Round the shape before/.test(q);
+  const DOCS = [
+    ['public/reshape/docs/reference.md', readFileSync(PATHS.reference, 'utf8')],
+    ['lib/reshape-docs.ts', readFileSync(PATHS.inAppDocs, 'utf8')],
+  ];
+  let quotes = 0;
+  for (const [where, text] of DOCS) {
+    for (const m of text.matchAll(/"([^"\n]{20,})"/g)) {
+      const q = m[1];
+      if (!looksLikeRefusal(q)) continue;
+      quotes++;
+      const line = text.slice(0, m.index).split('\n').length;
+      ok(`${where}:${line} quotes a sentence the runtime can say`, templates.some((rx) => rx.test(q)), q);
+    }
+  }
+  ok('the quote scan found the refusal sentences', quotes >= 8, `${quotes} quoted refusals across both documents`);
+}
+
 section('coverage');
 
 {
