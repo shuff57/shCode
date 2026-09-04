@@ -138,6 +138,9 @@ export const SURFACE: SurfaceName[] = [
   { name: 'cuboid', module: 'primitives', serves: 'exact',
     note: 'BRepPrimAPI_MakeBox. Flat, so the volume matches JSCAD to the digit.',
     kernel: ['BRepPrimAPI_MakeBox'] },
+  { name: 'cube', module: 'primitives', serves: 'exact',
+    note: 'cuboid with one size; the legacy reference still calls it.',
+    kernel: ['BRepPrimAPI_MakeBox'] },
   { name: 'cylinder', module: 'primitives', serves: 'exact',
     note: 'BRepPrimAPI_MakeCylinder, and more correct: JSCAD builds a 32-sided prism, '
       + 'which measured 0.64% under the true volume for r12 h30.',
@@ -204,6 +207,8 @@ export const SURFACE: SurfaceName[] = [
     kernel: ['gp_Trsf'] },
   { name: 'rotateX', module: 'transforms', serves: 'exact', note: 'gp_Trsf.SetRotation.',
     kernel: ['gp_Trsf'] },
+  { name: 'rotate', module: 'transforms', serves: 'exact',
+    note: 'three Euler angles; the legacy reference still calls it.', kernel: ['gp_Trsf'] },
   { name: 'rotateZ', module: 'transforms', serves: 'exact', note: 'gp_Trsf.SetRotation.',
     kernel: ['gp_Trsf'] },
   { name: 'mirror', module: 'transforms', serves: 'exact', note: 'gp_Trsf.SetMirror.',

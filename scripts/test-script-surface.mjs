@@ -131,15 +131,20 @@ try {
     return [...called].filter((n) => !declared.has(n));
   };
 
+  // The typed half this file judges is the JSCAD vocabulary. Since 2026-09-03
+  // lib/reshape-docs.ts and reference.md teach reSHape Script (a different,
+  // kernel-native surface with its own gate, scripts/test-reshape-script.mjs),
+  // so the examples judged here come from the legacy reference, which is the
+  // last place the JSCAD names are still documented.
+  const legacy = readFileSync(path.join(root, 'public', 'reshape', 'docs', 'jscad-legacy.md'), 'utf8');
   const pages = [];
-  for (const s of sections) {
-    for (const p of s.pages || []) {
-      if (typeof p.code === 'string' && p.code.trim()) {
-        pages.push({ key: `${s.slug} / ${p.title}`, names: namesIn(p.code) });
-      }
-    }
+  const fence = /```js(?:[ \t]+([^\r\n]+))?\r?\n([\s\S]*?)```/g;
+  let fm;
+  while ((fm = fence.exec(legacy))) {
+    if (!fm[2].trim()) continue;
+    pages.push({ key: `jscad-legacy.md: ${(fm[1] || 'unnamed').trim()}`, names: namesIn(fm[2]) });
   }
-  check('the docs still carry runnable examples', pages.length > 100, `${pages.length} pages`);
+  check('the legacy reference still carries runnable examples', pages.length > 30, `${pages.length} fenced examples`);
 
   // Only names the BUNDLE exports are API calls. Anything else the read picked
   // up is a false positive from the crude parse and is not the classification's
@@ -219,10 +224,12 @@ try {
   // classification stops finding anything, so the CEILING is asserted too: if
   // every page suddenly reads as portable, either the blocked names got fixed
   // (in which case delete this) or the read stopped working (much more likely).
-  check('CONTROL: the blocked pages are actually being found',
-    blocked.length > 0,
-    'no page reads as blocked — either hull and non-uniform scale now have paths, '
-    + 'or namesIn() stopped seeing names');
+  // The legacy reference happens to use neither hull nor a non-uniform scale,
+  // so the control asks the classifier directly: the two names this file
+  // exists to keep honest must still read as blocked.
+  check('CONTROL: hull and non-uniform scale still read as blocked',
+    surface.blockedNames(['hull', 'scale']).length === 2,
+    'one of them now has a path, or blockedNames() stopped answering');
 
   // -------------------------------------------------------------------------
   // NOTHING DEV-ONLY IS SITTING WHERE IT WOULD SHIP
@@ -244,8 +251,11 @@ try {
 
   const shipped = readdirSync(path.join(root, 'public', 'reshape'))
     .filter((f) => f.endsWith('.html'));
-  check('the only page public/reshape ships is the student runner',
-    shipped.length === 1 && shipped[0] === 'runner.html',
+  // Two student runners ship on purpose: runner.html (JSCAD, the ?engine=jscad
+  // path for one more release) and script-runner.html (reSHape Script).
+  const allowed = ['runner.html', 'script-runner.html'];
+  check('the only pages public/reshape ships are the two student runners',
+    shipped.length === allowed.length && allowed.every((f) => shipped.includes(f)),
     shipped.join(', ') + ' — a probe or diagnostic page here WILL be deployed; '
     + 'generate it into public/reshape/kernel/ instead');
 
