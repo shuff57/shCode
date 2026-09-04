@@ -36,5 +36,10 @@
     "git push (never done by the loop); JSCAD runner retirement"
   ],
   "collision": "one builder reverted another's uncommitted debug block in a file it did not hold; no work was lost (it was already committed) but both briefs now carry the rule: a dirty unclaimed file is off limits",
-  "deployment": "see the progress page log; production https://shcode.pages.dev"
+  "deployment": {
+    "commit": "61660ec7",
+    "url": "https://1cdf0ef8.shcode.pages.dev",
+    "production": "https://shcode.pages.dev",
+    "verified_live": "probes 404; wasm application/wasm with Access-Control-Allow-Origin: *; occt-build.js carries the shell op; browser checks on shcode.pages.dev: panel 6/6, rectangle rules 5/5, round+hollow 6/6, overlay 4/6 where the two misses are the probe (labels arrive at 2.4 s on a cold load with the first kernel build; the rubber band's dash is a CSS class, not an attribute)"
+  }
 }
