@@ -98,6 +98,9 @@ export default function LessonWorkspace({
   // lib/grader.ts's TODO(A2) call site below) -- ReshapeStudio reports it
   // through onDocChange, null until its first successful build.
   const [latestModelDoc, setLatestModelDoc] = useState<ModelDoc | null>(null);
+  // Feature ids the kernel refused to build, from the same report; a
+  // declared Round the kernel "shows without" must not pass a model check.
+  const [latestRefusals, setLatestRefusals] = useState<Record<string, string> | null>(null);
   // Bumped on Reset to force ReshapeStudio to remount: it only hydrates its
   // model from script.js once, at mount (see its own file header), so
   // restoring the starter text while it stays mounted would leave the OLD
@@ -312,7 +315,7 @@ export default function LessonWorkspace({
     const to = setTimeout(() => runTests(), 250);
     return () => clearTimeout(to);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReshapeMode, latestModelDoc, files]);
+  }, [isReshapeMode, latestModelDoc, latestRefusals, files]);
 
   // For HTML lessons: auto-build preview on every change (debounced)
   useEffect(() => {
@@ -540,7 +543,7 @@ export default function LessonWorkspace({
   // reads `latestModelDoc`, which ReshapeStudio keeps current independent of
   // the (debounced, <=300ms) script.js text sync.
   function runTests() {
-    const context: GradeContext = { modelDoc: latestModelDoc };
+    const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals };
     const report = grade(
       lesson.requirements,
       files,
@@ -557,7 +560,7 @@ export default function LessonWorkspace({
   }
 
   const runClientGrade = useCallback(() => {
-    const context: GradeContext = { modelDoc: latestModelDoc };
+    const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals };
     const report = grade(
       lesson.requirements,
       files,
@@ -566,7 +569,7 @@ export default function LessonWorkspace({
     );
     setGradeReport(report);
     return report;
-  }, [lesson, files, latestModelDoc]);
+  }, [lesson, files, latestModelDoc, latestRefusals]);
 
   const handleCommit = async (message: string) => {
     try {
@@ -966,7 +969,10 @@ export default function LessonWorkspace({
                 value={files['script.js'] ?? ''}
                 onChange={(t) => updateFile('script.js', t)}
                 sides={reshapeSides}
-                onDocChange={setLatestModelDoc}
+                onDocChange={(doc, refusals) => {
+                  setLatestModelDoc(doc);
+                  setLatestRefusals(refusals ?? null);
+                }}
                 lessonId={lesson.id}
               />
             ) : (

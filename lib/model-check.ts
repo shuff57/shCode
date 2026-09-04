@@ -165,9 +165,18 @@ function describeFeature(kind: string, get: (name: string) => unknown): string {
   }
 }
 
+/** Feature ids the kernel could not build, with its reason for each --
+ *  BuildResult.refusals (lib/occt-build.ts) flattened to a plain object so it
+ *  crosses the grading boundary as JSON. A refused feature is in the doc but
+ *  not in the shape ("Rounding Round 1 at 3 would not fit its edge, shown
+ *  without it"), so for grading it does not exist: the moderate lens passed
+ *  8.1.11 with a sharp corner and a declared Round, 2026-09-04. */
+export type Refusals = Readonly<Record<string, string>>;
+
 export function checkModel(
   req: { expect?: ModelExpect[]; tolerance?: number },
-  doc: ModelDoc | null
+  doc: ModelDoc | null,
+  refusals?: Refusals | null
 ): ModelCheckResult {
   const expect = req.expect ?? [];
 
@@ -178,6 +187,7 @@ export function checkModel(
   const tolerance = req.tolerance ?? DEFAULT_TOLERANCE;
   const used = new Set<string>();
   const missing: ModelExpect[] = [];
+  const refused = refusals ?? {};
 
   for (const entry of expect) {
     const { kind, ...fields } = entry;
@@ -186,6 +196,7 @@ export function checkModel(
     for (const f of doc.features) {
       if (f.kind !== kind) continue;
       if (used.has(f.id)) continue;
+      if (refused[f.id] !== undefined) continue;
       if (fieldNames.every((name) => matchField(f, name, fields[name], tolerance))) {
         matchedId = f.id;
         break;
@@ -201,11 +212,16 @@ export function checkModel(
   const { kind } = first;
   const expectedFields = first as Record<string, unknown>;
   const expectedDesc = describeFeature(kind, (name) => expectedFields[name]);
+  // A refused feature of the wanted kind is the most useful thing to name:
+  // the student did the step and the kernel could not build it.
+  const refusedOfKind = doc.features.find((f) => f.kind === kind && refused[f.id] !== undefined);
   const candidate =
-    doc.features.find((f) => f.kind === kind && !used.has(f.id)) ??
-    doc.features.find((f) => f.kind === kind);
+    doc.features.find((f) => f.kind === kind && !used.has(f.id) && refused[f.id] === undefined) ??
+    doc.features.find((f) => f.kind === kind && refused[f.id] === undefined);
 
-  const message = candidate
+  const message = refusedOfKind && !candidate
+    ? `Expected ${expectedDesc}; the ${kind} could not be built: ${refused[refusedOfKind.id]}`
+    : candidate
     ? `Expected ${expectedDesc}, found ${describeFeature(kind, (name) => resolveField(candidate, name).value)}.`
     : `Expected ${expectedDesc}; there is no ${kind}.`;
 

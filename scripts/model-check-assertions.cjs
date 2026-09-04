@@ -171,6 +171,26 @@ module.exports = function run(dir) {
       r.message === 'Expected a hole across 6; there is no hole.', r.message);
   }
 
+  console.log('\n=== refused features do not count ===');
+  {
+    const d = doc(box('b1', [80, 50, 20]), shell('s1', 'b1', 2, null), fillet('f1', 'b1', 3, 'fillet', null));
+    const why = 'Rounding Round 1 at 3 would not fit its edge, shown without it';
+    const r = checkModel(req([{ kind: 'box', size: [80, 50, 20] }, { kind: 'fillet', size: 3 }]), d, { f1: why });
+    check('a declared fillet the kernel refused does not satisfy the entry', r.passed === false, JSON.stringify(r));
+    check('the message carries the kernel\'s reason',
+      r.message === `Expected a fillet 3; the fillet could not be built: ${why}`, r.message);
+  }
+  {
+    const d = doc(box('b1', [80, 50, 20]), fillet('f1', 'b1', 3, 'fillet', null), fillet('f2', 'b1', 3, 'fillet', null));
+    const r = checkModel(req([{ kind: 'fillet', size: 3 }]), d, { f1: 'would not fit' });
+    check('a second, built fillet still satisfies the entry', r.passed === true, JSON.stringify(r));
+  }
+  {
+    const d = doc(box('b1', [80, 50, 20]), fillet('f1', 'b1', 3, 'fillet', null));
+    const r = checkModel(req([{ kind: 'fillet', size: 3 }]), d, null);
+    check('null refusals means nothing is refused', r.passed === true, JSON.stringify(r));
+  }
+
   console.log(`\n${pass} passed, ${fails.length} failed`);
   return fails.length === 0;
 };

@@ -54,7 +54,7 @@ export type ReshapeStudioProps = {
   startSide?: 'build' | 'code';
   /** The latest built doc, for a caller's grading pass. Called with `null`
    *  until the very first successful build (mount hydration or a Run). */
-  onDocChange?: (doc: ModelDoc | null) => void;
+  onDocChange?: (doc: ModelDoc | null, refusals?: Record<string, string>) => void;
   /** For per-lesson UI keys; pass 'sandbox' from the sandbox. Currently
    *  unused by anything DOM-id-scoped (ModelEditor's ribbon/rules/timeline
    *  hosts are hardcoded ids and only one ReshapeStudio is ever mounted at a
@@ -552,8 +552,12 @@ export default function ReshapeStudio({
     // gap (or the mount run never answers, e.g. a comment-only starter), in
     // which case what they built must still reach the grader.
     if (!hydrated && doc.features.length === 0) return;
-    onDocChangeRef.current?.(build ? doc : (scriptDoc ?? doc));
-  }, [hydrated, build, doc, scriptDoc]);
+    // Refusals ride along so a declared-but-unbuilt feature (a Round the
+    // kernel "shows without") cannot satisfy a model requirement. They land
+    // after the kernel build, later than the doc, so this fires again then.
+    const refused = refusals && refusals.size > 0 ? Object.fromEntries(refusals) : undefined;
+    onDocChangeRef.current?.(build ? doc : (scriptDoc ?? doc), refused);
+  }, [hydrated, build, doc, scriptDoc, refusals]);
 
   // Build -> script.js. Debounced so a drag doesn't write on every frame
   // (dimension drags only land in `doc` on release anyway -- see

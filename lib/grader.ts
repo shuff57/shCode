@@ -1,6 +1,6 @@
 import type { Requirement } from './types';
 import type { ModelDoc } from './model-types';
-import { checkModel } from './model-check';
+import { checkModel, type Refusals } from './model-check';
 
 /** The reSHape ModelDoc a `model` requirement checks against. Optional and
  *  last so every existing caller — which passes only
@@ -9,6 +9,9 @@ import { checkModel } from './model-check';
  *  requirement then fails via checkModel's own null-doc message. */
 export interface GradeContext {
   modelDoc?: ModelDoc | null;
+  /** Feature ids the kernel refused to build, with its reason; a refused
+   *  feature does not count towards a `model` requirement. */
+  refusals?: Refusals | null;
 }
 
 export interface GradeResult {
@@ -142,7 +145,7 @@ export function grade(
         passed = false;
         break;
       case 'model':
-        passed = checkModel(req, context?.modelDoc ?? null).passed;
+        passed = checkModel(req, context?.modelDoc ?? null, context?.refusals ?? null).passed;
         break;
     }
 
