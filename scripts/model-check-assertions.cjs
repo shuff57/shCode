@@ -178,7 +178,13 @@ module.exports = function run(dir) {
     const r = checkModel(req([{ kind: 'box', size: [80, 50, 20] }, { kind: 'fillet', size: 3 }]), d, { f1: why });
     check('a declared fillet the kernel refused does not satisfy the entry', r.passed === false, JSON.stringify(r));
     check('the message carries the kernel\'s reason',
-      r.message === `Expected a fillet 3; the fillet could not be built: ${why}`, r.message);
+      r.message === `Expected a round 3; the round could not be built: ${why}`, r.message);
+  }
+  {
+    const d = doc(box('b1', [80, 50, 20]));
+    const r = checkModel(req([{ kind: 'shell', thickness: 2 }]), d);
+    check('messages use the course\'s words: hollow, not shell',
+      r.message === 'Expected a hollow with a 2 wall; there is no hollow.', r.message);
   }
   {
     const d = doc(box('b1', [80, 50, 20]), fillet('f1', 'b1', 3, 'fillet', null), fillet('f2', 'b1', 3, 'fillet', null));

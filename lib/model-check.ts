@@ -125,6 +125,20 @@ function fmtNum(n: unknown): string {
 /** A plain-English name for a feature (real or hoped-for), built from
  *  whichever named fields `get` can answer. Shared by the "expected" and
  *  "found" halves of a failure message — see checkModel(). */
+/** The word the course uses for a feature kind: the module brief replaced
+ *  "fillet" and "shell" with round and hollow, and a failure message is
+ *  read by a beginner who has only ever seen the course's words. */
+export function studentWord(kind: string, style?: unknown): string {
+  switch (kind) {
+    case 'fillet': return style === 'chamfer' ? 'bevel' : 'round';
+    case 'shell': return 'hollow';
+    case 'extrude': return 'pull';
+    case 'revolve': return 'spin';
+    case 'combine': return 'join';
+    default: return kind;
+  }
+}
+
 function describeFeature(kind: string, get: (name: string) => unknown): string {
   switch (kind) {
     case 'box': {
@@ -152,16 +166,16 @@ function describeFeature(kind: string, get: (name: string) => unknown): string {
     }
     case 'shell': {
       const t = get('thickness');
-      return t !== undefined ? `a shell ${fmtNum(t)} thick` : 'a shell';
+      return t !== undefined ? `a hollow with a ${fmtNum(t)} wall` : 'a hollow';
     }
     case 'fillet': {
       const style = get('style');
       const size = get('size');
-      const word = style === 'chamfer' ? 'a bevel' : 'a fillet';
+      const word = `a ${studentWord('fillet', style)}`;
       return size !== undefined ? `${word} ${fmtNum(size)}` : word;
     }
     default:
-      return `a ${kind}`;
+      return `a ${studentWord(kind)}`;
   }
 }
 
@@ -219,11 +233,12 @@ export function checkModel(
     doc.features.find((f) => f.kind === kind && !used.has(f.id) && refused[f.id] === undefined) ??
     doc.features.find((f) => f.kind === kind && refused[f.id] === undefined);
 
+  const word = studentWord(kind, expectedFields.style);
   const message = refusedOfKind && !candidate
-    ? `Expected ${expectedDesc}; the ${kind} could not be built: ${refused[refusedOfKind.id]}`
+    ? `Expected ${expectedDesc}; the ${word} could not be built: ${refused[refusedOfKind.id]}`
     : candidate
     ? `Expected ${expectedDesc}, found ${describeFeature(kind, (name) => resolveField(candidate, name).value)}.`
-    : `Expected ${expectedDesc}; there is no ${kind}.`;
+    : `Expected ${expectedDesc}; there is no ${word}.`;
 
   return { passed: false, missing, message };
 }

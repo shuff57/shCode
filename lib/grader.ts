@@ -128,6 +128,7 @@ export function grade(
   const results: GradeResult[] = requirements.map((req) => {
     const type = req.type || 'regex';
     let passed = false;
+    let modelMessage: string | null = null;
 
     switch (type) {
       case 'regex':
@@ -145,7 +146,14 @@ export function grade(
         passed = false;
         break;
       case 'model':
-        passed = checkModel(req, context?.modelDoc ?? null, context?.refusals ?? null).passed;
+        {
+          const result = checkModel(req, context?.modelDoc ?? null, context?.refusals ?? null);
+          passed = result.passed;
+          // The checker's own sentence ("Expected a round 3; the round could
+          // not be built: ...") is the only place the kernel's reason reaches
+          // the student without clicking the warning step.
+          if (!passed && result.message) modelMessage = result.message;
+        }
         break;
     }
 
@@ -159,7 +167,7 @@ export function grade(
       // why, so a correct-looking answer that missed by one token read as
       // the grader being arbitrary (issue report #9). Both renderers
       // already handled `messages`; nothing ever filled it.
-      messages: !passed && req.hint ? [req.hint] : [],
+      messages: passed ? [] : [...(modelMessage ? [modelMessage] : []), ...(req.hint ? [req.hint] : [])],
       pointsEarned: passed ? points : 0,
       pointsPossible: points,
     };
