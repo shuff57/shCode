@@ -109,13 +109,18 @@ interface Props {
    * `lastTouched` below): a mouse leaving a row falls back to it instead of
    * null, and a commit (a Length blur, a pair-rule click, a corner round)
    * calls it directly. HandleOverlay tells the two apart itself -- see its
-   * own `forcedActive` -- so no widening of this type was needed for the
-   * single-edge/single-corner case. It WOULD be needed to show both edges
-   * of a pair rule pink on the canvas at once; today only the first of the
-   * two rides this channel, and the Rules panel side lights both rows
-   * regardless (that half needed no plumbing change at all).
+   * own `forcedActive`.
+   *
+   * Widened to also take an ARRAY: a pair rule (edge 1 = edge 2) touches TWO
+   * edges at once, and the single-value form could only ever carry the
+   * first of them -- HandleOverlay lit both Rules rows (that half needed no
+   * plumbing at all) but only the one edge pink on the canvas. `index` is
+   * still a plain number for the single-part case rather than a one-element
+   * array everywhere, so every existing live-hover call site (a row's own
+   * onMouseEnter, naming just itself) stays exactly as it was.
    */
-  onHoverPart?: (part: { kind: 'edge' | 'corner'; index: number } | null) => void;
+  onHoverPart?: (part: { kind: 'edge' | 'corner'; index: number }
+    | { kind: 'edge' | 'corner'; index: number }[] | null) => void;
 }
 
 function has(cs: Constraint[], kind: Constraint['kind'], edge: number) {
@@ -305,12 +310,13 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
   >(null);
   const isTouchedEdge = (e: number) => lastTouched?.kind === 'edge' && lastTouched.indices.includes(e);
   const isTouchedCorner = (i: number) => lastTouched?.kind === 'corner' && lastTouched.index === i;
-  // Collapses a (possibly two-edge) touch down to the ONE part the shared
-  // hover channel can carry -- see onHoverPart's own doc comment. The first
-  // edge of a pair stands in for both on the canvas; the Rules panel itself
-  // still lights BOTH rows below, since that half needs no plumbing at all.
-  const stickyForCanvas = (t: typeof lastTouched): { kind: 'edge' | 'corner'; index: number } | null =>
-    !t ? null : t.kind === 'edge' ? { kind: 'edge', index: t.indices[0] } : t;
+  // Pushes a (possibly two-edge) touch through the shared hover channel --
+  // see onHoverPart's own doc comment. A pair rule's two edges both ride
+  // through as an array now; a corner (always exactly one) stays a plain
+  // single value, matching every other call site on this channel.
+  const stickyForCanvas = (t: typeof lastTouched)
+  : { kind: 'edge' | 'corner'; index: number } | { kind: 'edge' | 'corner'; index: number }[] | null =>
+    !t ? null : t.kind === 'edge' ? t.indices.map((index) => ({ kind: 'edge' as const, index })) : t;
   // A row's onMouseLeave used to always clear the canvas hint to null; now
   // it falls back to whatever is sticky instead, so leaving the row does
   // not erase the very highlight this feature exists to keep. `onHoverPart`

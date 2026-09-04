@@ -194,8 +194,12 @@ interface Props {
   hoveredPart?: { kind: 'edge' | 'corner'; index: number } | null;
   /** The reverse direction: SketchConstraints reports its OWN row hover
    *  here, forwarded straight up to SandboxWorkspace so HandleOverlay can
-   *  show the same floating pill it would for a canvas hover. */
-  onHoverPart?: (part: { kind: 'edge' | 'corner'; index: number } | null) => void;
+   *  show the same floating pill it would for a canvas hover. Widened to
+   *  also carry an array -- see SketchConstraints.tsx's own onHoverPart doc
+   *  comment for why (a pair rule touches two edges at once). This
+   *  component is a pure pass-through for the prop either way. */
+  onHoverPart?: (part: { kind: 'edge' | 'corner'; index: number }
+    | { kind: 'edge' | 'corner'; index: number }[] | null) => void;
 }
 
 type BoolOp = 'union' | 'subtract' | 'intersect';

@@ -141,8 +141,16 @@ interface Props {
    * hover in `hoveredPart` -- pointer hover wins if somehow both are set,
    * though in practice a mouse cannot be over both a canvas edge and a
    * Rules-panel row at once.
+   *
+   * Also takes an ARRAY: a pair rule (edge 1 = edge 2) reports BOTH edges
+   * through this one channel, so the sticky highlight below can light both
+   * on the canvas rather than just the first -- see stickyEdges' own
+   * comment. The floating name pill only ever names one part regardless
+   * (there is no sensible way to show two numbers in one pill), so it reads
+   * the first entry of an array the same way a single value always worked.
    */
-  forcedHoverPart?: { kind: 'edge' | 'corner'; index: number } | null;
+  forcedHoverPart?: { kind: 'edge' | 'corner'; index: number }
+    | { kind: 'edge' | 'corner'; index: number }[] | null;
 }
 
 /**
@@ -401,7 +409,16 @@ export default function HandleOverlay({
   }, [hoveredPart]);
   // What the floating pill actually shows: the real pointer hover if there is
   // one, otherwise whatever a Rules-panel row is asking to be shown instead.
+  // `hoveredPart` (the pointer) is always a single value; `forcedHoverPart`
+  // (the Rules panel) can be an array now -- see that prop's own doc
+  // comment. Normalised to a flat list once here so every reader below
+  // (the pill, the sticky edges/corners) works off the same shape.
   const shownHoverPart = hoveredPart ?? forcedHoverPart ?? null;
+  const shownHoverParts: { kind: 'edge' | 'corner'; index: number }[] =
+    shownHoverPart == null ? [] : Array.isArray(shownHoverPart) ? shownHoverPart : [shownHoverPart];
+  // The pill only ever names ONE part -- see forcedHoverPart's own doc
+  // comment for why an array collapses to its first entry here specifically.
+  const pillPart = shownHoverParts[0] ?? null;
   // `forcedHoverPart` ONLY ever comes from the Rules panel -- a live row
   // hover, or (since the sticky "last touched" cue was added there) a
   // committed value that keeps reporting itself after the mouse leaves the
@@ -414,9 +431,19 @@ export default function HandleOverlay({
   // plain pill a raw pointer hover already drew. Measured 2026-09-04: round
   // 4's blind judge could not tell what was specifically selected from a
   // dashed outline drawn around the whole sketch regardless of task.
+  //
+  // ARRAYS, not single values, from here down: a pair rule (edge 1 = edge
+  // 2) touches two edges at once, and both now ride the same channel (see
+  // SketchConstraints.tsx's own stickyForCanvas) -- so every edge/corner in
+  // `shownHoverParts` gets the sticky treatment, not just the first one.
+  // Measured 2026-09-04: before this, clicking the pair grid for 1/2 lit
+  // both Rules rows (that half never needed plumbing) but only edge 1 pink
+  // on the canvas.
   const forcedActive = hoveredPart === null && forcedHoverPart != null;
-  const stickyEdge = forcedActive && shownHoverPart?.kind === 'edge' ? shownHoverPart.index : null;
-  const stickyCorner = forcedActive && shownHoverPart?.kind === 'corner' ? shownHoverPart.index : null;
+  const stickyEdges = forcedActive
+    ? shownHoverParts.filter((p) => p.kind === 'edge').map((p) => p.index) : [];
+  const stickyCorners = forcedActive
+    ? shownHoverParts.filter((p) => p.kind === 'corner').map((p) => p.index) : [];
   // Whether the current pointerdown-to-pointerup has crossed TAP_TOLERANCE_PX
   // yet. A click on a handle (e.g. the height handle sitting over a face's
   // own centre) must still pick that face -- see onTap's own doc comment --
@@ -778,23 +805,24 @@ export default function HandleOverlay({
                     />
                   );
                 })}
-                {/* The edge (or, for a pair rule, the SINGLE edge standing in
-                    for both -- see stickyForCanvas's own comment in
-                    SketchConstraints.tsx) a Rules control most recently
-                    committed a value for, repainted the same pink a picked
-                    solid edge gets. Same "over, not instead of" convention
-                    as the losing-edge overlay just above -- the shape reads
-                    the same, only its colour and weight change. */}
-                {basis && o.shape !== 'circle' && stickyEdge !== null && (() => {
-                  const run = edgePolyline(pts, basis, stickyEdge, o.corners.length);
+                {/* The edge (or, for a pair rule, BOTH edges -- see
+                    stickyForCanvas's own comment in SketchConstraints.tsx)
+                    a Rules control most recently committed a value for,
+                    repainted the same pink a picked solid edge gets. Same
+                    "over, not instead of" convention as the losing-edge
+                    overlay just above -- the shape reads the same, only its
+                    colour and weight change. */}
+                {basis && o.shape !== 'circle' && stickyEdges.map((se) => {
+                  const run = edgePolyline(pts, basis, se, o.corners.length);
                   if (!run) return null;
                   return (
                     <polyline
+                      key={`sticky-${se}`}
                       className="is-sticky-edge"
                       points={run.map((p) => `${p.x},${p.y}`).join(' ')}
                     />
                   );
-                })()}
+                })}
                 {/* An invisible, fatter twin of each design edge, purely for
                     hover -- the visible outline's own 1.5px stroke is nowhere
                     near forgiving enough to point at with a mouse. Not drawn
@@ -918,7 +946,7 @@ export default function HandleOverlay({
                         x={textSpot.x}
                         y={textSpot.y}
                         className={(l.kind === 'dimension' ? 'sketch-dim-text' : 'sketch-len-text')
-                          + (stickyEdge === l.edge ? ' is-sticky' : '')}
+                          + (stickyEdges.includes(l.edge) ? ' is-sticky' : '')}
                         textAnchor="middle"
                         dominantBaseline="central"
                       >
@@ -936,7 +964,7 @@ export default function HandleOverlay({
                       key={id}
                       x={textSpot.x}
                       y={textSpot.y}
-                      className={'sketch-round-text' + (stickyCorner === l.corner ? ' is-sticky' : '')}
+                      className={'sketch-round-text' + (stickyCorners.includes(l.corner) ? ' is-sticky' : '')}
                       textAnchor="middle"
                       dominantBaseline="central"
                     >
@@ -975,10 +1003,10 @@ export default function HandleOverlay({
                     </text>
                   );
                 })()}
-                {shownHoverPart && o.shape !== 'circle' && (() => {
-                  const idx = shownHoverPart.index;
+                {pillPart && o.shape !== 'circle' && (() => {
+                  const idx = pillPart.index;
                   if (idx < 0 || idx >= o.corners.length) return null;
-                  const text = shownHoverPart.kind === 'edge'
+                  const text = pillPart.kind === 'edge'
                     ? `Edge ${idx + 1} · ${formatLabel(edgeLength(o.design, idx))}`
                     : `Corner ${idx + 1}`;
                   const anchor = at.get(o.corners[idx]);

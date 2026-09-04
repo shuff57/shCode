@@ -306,8 +306,17 @@ export default function SandboxWorkspace() {
   // would. Two separate pieces of state, not one shared value, so a stale
   // canvas hover left over from a moment ago can never be read as "the Rules
   // panel is asking for this edge" or vice versa.
+  //
+  // `rowHoverPart` also carries an ARRAY now, not just a single part: a pair
+  // rule (edge 1 = edge 2) touches two edges at once, and SketchConstraints
+  // pushes both through this SAME channel so HandleOverlay can light both on
+  // the canvas, not just the first -- see SketchConstraints.tsx's own
+  // onHoverPart doc comment. `pointerHoverPart` stays single: a pointer can
+  // only ever be over one edge on the canvas at a time.
   const [pointerHoverPart, setPointerHoverPart] = useState<{ kind: 'edge' | 'corner'; index: number } | null>(null);
-  const [rowHoverPart, setRowHoverPart] = useState<{ kind: 'edge' | 'corner'; index: number } | null>(null);
+  const [rowHoverPart, setRowHoverPart] = useState<
+    { kind: 'edge' | 'corner'; index: number } | { kind: 'edge' | 'corner'; index: number }[] | null
+  >(null);
   // Rollback bar: the boundary index (0..features.length) past which features
   // are suppressed from the rebuilt model. null means "show everything". This
   // is a view change, not a structural edit -- see the effect below.
