@@ -54,8 +54,13 @@ function num(n: number): string {
 }
 
 /** Param names must survive an edit, or pushing values into a live frame
- *  would land on the wrong slot. Keyed by feature id, never by position. */
-function pname(id: string, slot: string): string {
+ *  would land on the wrong slot. Keyed by feature id, never by position.
+ *  Exported so lib/reshape-script.ts can correlate a script's own `param()`
+ *  name with the exact doc slot it lands in, using the identical key format
+ *  generatedParams() below already uses -- two different producers of the
+ *  same panel row must agree on its key, or a slider drawn from one and a
+ *  value pushed by the other silently miss each other. */
+export function pname(id: string, slot: string): string {
   return `${id}_${slot}`;
 }
 

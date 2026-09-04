@@ -18,6 +18,21 @@
 // primitive, sketch, boolean, mirror or move-with-copy gets a new one; a
 // hole, hollow, one-edge round or bevel, draft, repeat or plain move
 // (consuming, per lib/model-types.ts's topLevel()) inherits its target's.
+//
+// NAMED PARAMS ARE THE SECOND HARD PART, added 2026-09-04 after the advanced
+// student lens measured it missing: Build -> Code used to always emit a
+// literal (`hollow(box1, { wall: 2 })`), even when the script that BUILT
+// this doc had named that 2 with `param('wall', 2, { min: 0.5, max: 10 })`.
+// The caption and bounds were silently lost the moment a doc round-tripped
+// through Build, because nothing carried the binding between "this doc slot"
+// and "this script variable" back out of runScript(). lib/reshape-script.ts's
+// RunResult.namedParams now does (see its own doc comment); the optional
+// second argument here is that array, and paramBindings() below turns it
+// into the one thing this file actually needs -- a slot key -> variable name
+// map -- which numText()/optText() consult everywhere a literal would
+// otherwise be printed. Passing nothing (the Build-mode doc, which was never
+// built by a script and carries no param() calls at all) reproduces exactly
+// today's literal-only output.
 
 import {
   type ModelDoc,
@@ -26,7 +41,24 @@ import {
   newSketch,
   extentAlong,
 } from './model-types';
+import { generatedParams, pname } from './model-codegen';
 import type { TopoName } from './topo-name';
+
+/** Just enough of lib/reshape-script.ts's NamedParamDef for this file to read
+ *  -- a type-only import of the real one would work too, but this file has
+ *  no other reason to depend on the interpreter, and duplicating a three-line
+ *  shape here keeps it that way. Keep in sync with NamedParamDef by hand;
+ *  scripts/test-reshape-script.mjs's round-trip checks catch a drift that
+ *  breaks anything real. */
+export interface ScriptParamRef {
+  name: string;
+  caption: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  slots: string[];
+}
 
 function lit(n: number): string {
   if (!Number.isFinite(n)) return '0';
@@ -85,9 +117,11 @@ function defaultCenter(doc: ModelDoc, upTo: number, kind: 'box' | 'cylinder' | '
   return (newShape({ version: 1, features: doc.features.slice(0, upTo) }, kind) as { center: readonly number[] }).center;
 }
 
-function emitAt(center: readonly number[], def: readonly number[]): string {
-  if (center.every((v, i) => near(v, def[i]))) return '';
-  return `, { at: ${litVec(center)} }`;
+function emitAt(bindings: Map<string, string>, featureId: string, center: readonly number[], def: readonly number[]): string {
+  const bound = ['x', 'y', 'z'].some((s) => bindings.has(pname(featureId, s)));
+  if (!bound && center.every((v, i) => near(v, def[i]))) return '';
+  const parts = ['x', 'y', 'z'].map((s, i) => numText(bindings, featureId, s, lit(center[i])));
+  return `, { at: [${parts.join(', ')}] }`;
 }
 
 /** Draft's `from` word, reversed out of pull + neutral -- try both words that
@@ -110,47 +144,156 @@ function draftFromWord(doc: ModelDoc, rootId: string, pull: 'x' | 'y' | 'z', neu
   return null;
 }
 
-export function toScript(doc: ModelDoc): string {
+// ---------------------------------------------------------------------------
+// Named-param substitution -- see the file header.
+// ---------------------------------------------------------------------------
+
+/** slot key (pname(featureId, slot)) -> the script variable name a param()
+ *  call declared for it. Built once per toScript() call from
+ *  RunResult.namedParams; empty when the doc was never built by a script
+ *  (the ordinary Build-mode case), so every lookup below misses and this
+ *  file's output is unchanged from before named params existed. */
+function paramBindings(namedParams: readonly ScriptParamRef[] | undefined): Map<string, string> {
+  const map = new Map<string, string>();
+  if (!namedParams) return map;
+  for (const p of namedParams) {
+    for (const slot of p.slots) map.set(slot, p.name);
+  }
+  return map;
+}
+
+/** A single numeric value: the bound param's own variable name if this doc
+ *  slot has one, else the literal text the caller already computed. Correct
+ *  regardless of what arithmetic produced `literalText` (a diameter halved
+ *  into a radius, a spacing halved into a corner offset, ...) because the
+ *  correlation was recorded on the RAW pre-transform value in
+ *  lib/reshape-script.ts's num(), and re-emitting the same variable name
+ *  where that raw value used to go reproduces the identical doc field when
+ *  the transform reapplies on the next run. */
+function numText(bindings: Map<string, string>, featureId: string, slot: string, literalText: string): string {
+  return bindings.get(pname(featureId, slot)) ?? literalText;
+}
+
+/** One `key: value` entry in an options object, or the bare-shorthand `key`
+ *  when the bound param's own name happens to match the option key (the
+ *  common, encouraged case: `param('wall', 2, ...)` feeding `{ wall }`). */
+function optText(bindings: Map<string, string>, featureId: string, slot: string, key: string, literalText: string): string {
+  const paramName = bindings.get(pname(featureId, slot));
+  if (!paramName) return `${key}: ${literalText}`;
+  return paramName === key ? key : `${key}: ${paramName}`;
+}
+
+export function toScript(doc: ModelDoc, namedParams?: readonly ScriptParamRef[]): string {
   const varOf = chainVars(doc);
   const byId = new Map(doc.features.map((f) => [f.id, f]));
   const v = (id: string) => varOf.get(id) ?? id;
+  const bindings = paramBindings(namedParams);
+  // The authoritative "which slots exist in THIS doc, right now, and what
+  // are they currently set to" -- generatedParams() (the same function the
+  // Dimensions panel itself reads) is the one thing that actually knows.
+  // Used two ways below: deciding whether a param() declaration is still
+  // live at all (at least one of its recorded slots has to still exist),
+  // and -- the fix for a real bug this file's own drag-then-round-trip test
+  // caught -- reading the VALUE to declare it with. A Build-mode slider
+  // drag calls applyParam() straight on the doc; it has no idea a slot was
+  // ever named, so it never touches namedParams[i].value, which is why that
+  // field can be stale the moment a drag has happened since the script last
+  // ran. The doc itself is never stale -- it is what the drag just wrote.
+  const liveValues = new Map(generatedParams(doc).map((p) => [p.name, p.value]));
   const lines: string[] = [];
+
+  // Every param() declaration first, in the order the script originally
+  // registered them (RunResult.namedParams preserves that order -- see
+  // runScript()'s own `namedParams` Map) -- a variable has to exist before
+  // any feature line below can reference it. A param whose every bound slot
+  // has since gone missing from THIS doc (the feature it fed was deleted, or
+  // this is a stale namedParams array from a different doc entirely) is
+  // skipped rather than emitted dead: declaring `wall` and never using it is
+  // not what round-tripping a doc should produce.
+  if (namedParams) {
+    for (const p of namedParams) {
+      // Skip a param() whose every bound slot has gone missing from THIS
+      // doc (its feature was deleted, or namedParams came from a different
+      // doc entirely) -- declaring a variable nothing below will reference
+      // is worse than falling back to the literal it used to be.
+      if (p.slots.length === 0) continue;
+      const liveSlot = p.slots.find((s) => liveValues.has(s));
+      if (liveSlot === undefined) continue;
+      // The doc's OWN current value at that slot, not p.value -- see
+      // liveValues's own comment for why those two can disagree.
+      const currentValue = liveValues.get(liveSlot)!;
+      const opts: string[] = [];
+      if (!near(p.min, 0)) opts.push(`min: ${lit(p.min)}`);
+      if (!near(p.max, Math.max(100, Math.ceil(Math.abs(p.value) * 4) || 100))) opts.push(`max: ${lit(p.max)}`);
+      if (p.step !== 1) opts.push(`step: ${lit(p.step)}`);
+      if (p.caption !== p.name) opts.push(`caption: '${p.caption.replace(/'/g, "\\'")}'`);
+      const optsText = opts.length ? `, { ${opts.join(', ')} }` : '';
+      lines.push(`const ${p.name} = param('${p.name}', ${lit(currentValue)}${optsText})`);
+    }
+  }
 
   doc.features.forEach((f, i) => {
     if (f.kind === 'box') {
       const def = defaultCenter(doc, i, 'box');
-      const at = emitAt(f.center, def);
-      lines.push(`const ${f.id} = box(${lit(f.size[0])}, ${lit(f.size[1])}, ${lit(f.size[2])}${at})`);
-      if (f.round) lines.push(`round(${f.id}, ${lit(f.round)})`);
-      if (f.rotate && f.rotate.some((n) => n !== 0)) lines.push(`turn(${f.id}, ${litVec(f.rotate)})`);
+      const at = emitAt(bindings, f.id, f.center, def);
+      const w = numText(bindings, f.id, 'width', lit(f.size[0]));
+      const d = numText(bindings, f.id, 'depth', lit(f.size[1]));
+      const h = numText(bindings, f.id, 'height', lit(f.size[2]));
+      lines.push(`const ${f.id} = box(${w}, ${d}, ${h}${at})`);
+      if (f.round) lines.push(`round(${f.id}, ${numText(bindings, f.id, 'round', lit(f.round))})`);
+      if (f.rotate && f.rotate.some((n) => n !== 0)) {
+        const rx = numText(bindings, f.id, 'rx', lit(f.rotate[0]));
+        const ry = numText(bindings, f.id, 'ry', lit(f.rotate[1]));
+        const rz = numText(bindings, f.id, 'rz', lit(f.rotate[2]));
+        lines.push(`turn(${f.id}, [${rx}, ${ry}, ${rz}])`);
+      }
       return;
     }
     if (f.kind === 'cylinder') {
       const def = defaultCenter(doc, i, 'cylinder');
-      const at = emitAt(f.center, def);
-      lines.push(`const ${f.id} = cylinder(${lit(f.radius * 2)}, ${lit(f.height)}${at})`);
-      if (f.round) lines.push(`round(${f.id}, ${lit(f.round)})`);
-      if (f.rotate && f.rotate.some((n) => n !== 0)) lines.push(`turn(${f.id}, ${litVec(f.rotate)})`);
+      const at = emitAt(bindings, f.id, f.center, def);
+      const across = numText(bindings, f.id, 'radius', lit(f.radius * 2));
+      const tall = numText(bindings, f.id, 'height', lit(f.height));
+      lines.push(`const ${f.id} = cylinder(${across}, ${tall}${at})`);
+      if (f.round) lines.push(`round(${f.id}, ${numText(bindings, f.id, 'round', lit(f.round))})`);
+      if (f.rotate && f.rotate.some((n) => n !== 0)) {
+        const rx = numText(bindings, f.id, 'rx', lit(f.rotate[0]));
+        const ry = numText(bindings, f.id, 'ry', lit(f.rotate[1]));
+        const rz = numText(bindings, f.id, 'rz', lit(f.rotate[2]));
+        lines.push(`turn(${f.id}, [${rx}, ${ry}, ${rz}])`);
+      }
       return;
     }
     if (f.kind === 'sphere') {
       const def = defaultCenter(doc, i, 'sphere');
-      const at = emitAt(f.center, def);
-      lines.push(`const ${f.id} = sphere(${lit(f.radius * 2)}${at})`);
+      const at = emitAt(bindings, f.id, f.center, def);
+      const across = numText(bindings, f.id, 'radius', lit(f.radius * 2));
+      lines.push(`const ${f.id} = sphere(${across}${at})`);
       return;
     }
     if (f.kind === 'cone') {
       const def = defaultCenter(doc, i, 'cone');
-      const at = emitAt(f.center, def);
-      lines.push(`const ${f.id} = cone(${lit(f.radius * 2)}, ${lit(f.height)}${at})`);
-      if (f.rotate && f.rotate.some((n) => n !== 0)) lines.push(`turn(${f.id}, ${litVec(f.rotate)})`);
+      const at = emitAt(bindings, f.id, f.center, def);
+      const across = numText(bindings, f.id, 'radius', lit(f.radius * 2));
+      const tall = numText(bindings, f.id, 'height', lit(f.height));
+      lines.push(`const ${f.id} = cone(${across}, ${tall}${at})`);
+      if (f.rotate && f.rotate.some((n) => n !== 0)) {
+        const rx = numText(bindings, f.id, 'rx', lit(f.rotate[0]));
+        const ry = numText(bindings, f.id, 'ry', lit(f.rotate[1]));
+        const rz = numText(bindings, f.id, 'rz', lit(f.rotate[2]));
+        lines.push(`turn(${f.id}, [${rx}, ${ry}, ${rz}])`);
+      }
       return;
     }
     if (f.kind === 'torus') {
+      // ring()'s two arguments are never correlated to a param() -- see
+      // lib/reshape-script.ts's own ring() comment (neither ringRadius nor
+      // tubeRadius is stored verbatim) -- so this branch has no substitution
+      // to make even when namedParams is non-empty.
       const across = 2 * (f.ringRadius + f.tubeRadius);
       const tubeAcross = 2 * f.tubeRadius;
       const def = defaultCenter(doc, i, 'torus');
-      const at = emitAt(f.center, def);
+      const at = emitAt(bindings, f.id, f.center, def);
       lines.push(`const ${f.id} = ring(${lit(across)}, ${lit(tubeAcross)}${at})`);
       return;
     }
@@ -170,7 +313,7 @@ export function toScript(doc: ModelDoc): string {
         const cx = (a[0] + b[0]) / 2, cy = (a[1] + b[1]) / 2;
         const across = Math.hypot(b[0] - a[0], b[1] - a[1]);
         const at = near(cx, 0) && near(cy, 0) ? '' : `, { at: [${lit(cx)}, ${lit(cy)}] }`;
-        lines.push(`${f.id}.circle(${lit(across)}${at})`);
+        lines.push(`${f.id}.circle(${numText(bindings, f.id, 'across', lit(across))}${at})`);
       } else {
         lines.push(`${f.id}.polygon([${f.points.map((p) => litVec(p)).join(', ')}])`);
         for (const [k, r] of Object.entries(f.rounds ?? {})) {
@@ -183,11 +326,11 @@ export function toScript(doc: ModelDoc): string {
       return;
     }
     if (f.kind === 'extrude') {
-      lines.push(`const ${f.id} = pull(${v(f.target)}, ${lit(f.height)})`);
+      lines.push(`const ${f.id} = pull(${v(f.target)}, ${numText(bindings, f.id, 'height', lit(f.height))})`);
       return;
     }
     if (f.kind === 'revolve') {
-      lines.push(`const ${f.id} = spin(${v(f.target)}, ${lit(f.angle)})`);
+      lines.push(`const ${f.id} = spin(${v(f.target)}, ${numText(bindings, f.id, 'angle', lit(f.angle))})`);
       return;
     }
     if (f.kind === 'blend') {
@@ -195,7 +338,7 @@ export function toScript(doc: ModelDoc): string {
       const lo = byId.get(loId) as SketchFeature | undefined;
       const hi = byId.get(hiId) as SketchFeature | undefined;
       const gap = (hi?.offset ?? 0) - (lo?.offset ?? 0);
-      lines.push(`const ${f.id} = blend(${v(loId)}, ${v(hiId)}, ${lit(gap)})`);
+      lines.push(`const ${f.id} = blend(${v(loId)}, ${v(hiId)}, ${numText(bindings, hiId, 'offset', lit(gap))})`);
       return;
     }
     if (f.kind === 'combine') {
@@ -209,7 +352,10 @@ export function toScript(doc: ModelDoc): string {
       return;
     }
     if (f.kind === 'move') {
-      const args = `${v(f.target)}, ${litVec(f.offset)}`;
+      const x = numText(bindings, f.id, 'x', lit(f.offset[0]));
+      const y = numText(bindings, f.id, 'y', lit(f.offset[1]));
+      const z = numText(bindings, f.id, 'z', lit(f.offset[2]));
+      const args = `${v(f.target)}, [${x}, ${y}, ${z}]`;
       if (f.copy) {
         lines.push(`const ${f.id} = move(${args}, { copy: true })`);
       } else {
@@ -218,27 +364,53 @@ export function toScript(doc: ModelDoc): string {
       return;
     }
     if (f.kind === 'pattern') {
+      const countText = numText(bindings, f.id, 'count', lit(f.count));
       if (f.mode === 'linear') {
         const step = f.step ?? [0, 0, 0];
-        const stepArg = step[1] === 0 && step[2] === 0 ? lit(step[0]) : litVec(step);
-        lines.push(`repeat(${v(f.target)}, { count: ${lit(f.count)}, step: ${stepArg} })`);
+        // Only the bare-number shorthand (`step: N`, meaning [N, 0, 0]) is
+        // ever correlated to a param() -- lib/reshape-script.ts's repeat()
+        // only calls num() on that path, never on the full-vector form -- so
+        // that is the only case substitution applies to here.
+        const stepArg =
+          step[1] === 0 && step[2] === 0
+            ? numText(bindings, f.id, 'stepx', lit(step[0]))
+            : litVec(step);
+        lines.push(`repeat(${v(f.target)}, { count: ${countText}, step: ${stepArg} })`);
       } else {
-        const angle = f.totalAngle !== undefined && f.totalAngle !== 360 ? `, angle: ${lit(f.totalAngle)}` : '';
-        lines.push(`repeatAround(${v(f.target)}, { count: ${lit(f.count)}, axis: '${f.axis ?? 'z'}'${angle} })`);
+        const angle =
+          f.totalAngle !== undefined && f.totalAngle !== 360
+            ? `, angle: ${numText(bindings, f.id, 'totalangle', lit(f.totalAngle))}`
+            : '';
+        lines.push(`repeatAround(${v(f.target)}, { count: ${countText}, axis: '${f.axis ?? 'z'}'${angle} })`);
       }
       return;
     }
     if (f.kind === 'hole') {
-      const opts: string[] = [`across: ${lit(f.diameter)}`];
+      // HoleFeature.center is keyed to the HOLE's own id (f.id), not the
+      // target's -- matching generatedParams()'s hole branch, and the fix in
+      // lib/reshape-script.ts's holeAxisAndCenter() this substitution work
+      // caught (it used to correlate against the target instead).
+      const opts: string[] = [optText(bindings, f.id, 'diameter', 'across', lit(f.diameter))];
       const extent = extentAlong(doc, f.target, f.axis);
       const throughDepth = extent != null ? extent + 2 : null;
-      if (throughDepth == null || !near(f.depth, throughDepth)) opts.push(`deep: ${lit(f.depth)}`);
+      if (throughDepth == null || !near(f.depth, throughDepth)) {
+        opts.push(optText(bindings, f.id, 'depth', 'deep', lit(f.depth)));
+      }
       if (f.axis !== 'z') opts.push(`along: '${f.axis}'`);
-      const [ca, cb] =
-        f.axis === 'z' ? [f.center[0], f.center[1]] : f.axis === 'y' ? [f.center[0], f.center[2]] : [f.center[1], f.center[2]];
-      if (!near(ca, 0) || !near(cb, 0)) opts.push(`at: [${lit(ca)}, ${lit(cb)}]`);
+      const [ca, cb, slotA, slotB] =
+        f.axis === 'z' ? [f.center[0], f.center[1], 'x', 'y']
+          : f.axis === 'y' ? [f.center[0], f.center[2], 'x', 'z']
+          : [f.center[1], f.center[2], 'y', 'z'];
+      const atBound = bindings.has(pname(f.id, slotA)) || bindings.has(pname(f.id, slotB));
+      if (atBound || !near(ca, 0) || !near(cb, 0)) {
+        const at = numText(bindings, f.id, slotA, lit(ca));
+        const bt = numText(bindings, f.id, slotB, lit(cb));
+        opts.push(`at: [${at}, ${bt}]`);
+      }
       if (f.corners) {
-        opts.push(`apart: [${lit(f.corners.dx * 2)}, ${lit(f.corners.dy * 2)}]`);
+        const apartX = numText(bindings, f.id, 'dx', lit(f.corners.dx * 2));
+        const apartY = numText(bindings, f.id, 'dy', lit(f.corners.dy * 2));
+        opts.push(`apart: [${apartX}, ${apartY}]`);
         lines.push(`holes(${v(f.target)}, { ${opts.join(', ')} })`);
       } else {
         lines.push(`hole(${v(f.target)}, { ${opts.join(', ')} })`);
@@ -246,7 +418,7 @@ export function toScript(doc: ModelDoc): string {
       return;
     }
     if (f.kind === 'shell') {
-      const opts: string[] = [`wall: ${lit(f.thickness)}`];
+      const opts: string[] = [optText(bindings, f.id, 'thickness', 'wall', lit(f.thickness))];
       if (f.open && f.open.cause === 'primitive') opts.push(`open: '${faceWord(f.open.part)}'`);
       lines.push(`hollow(${v(f.target)}, { ${opts.join(', ')} })`);
       return;
@@ -257,7 +429,7 @@ export function toScript(doc: ModelDoc): string {
       const wordOf = (n: TopoName) => (n.cause === 'primitive' ? faceWord(n.part) : 'top');
       const ref = `${v(f.target)}.edge('${wordOf(a)}', '${wordOf(b)}')`;
       const fn = f.style === 'chamfer' ? 'bevel' : 'round';
-      lines.push(`const ${f.id} = ${fn}(${ref}, ${lit(f.size)})`);
+      lines.push(`const ${f.id} = ${fn}(${ref}, ${numText(bindings, f.id, 'size', lit(f.size))})`);
       return;
     }
     if (f.kind === 'draft') {
@@ -270,7 +442,7 @@ export function toScript(doc: ModelDoc): string {
         !f.whole && f.face && f.face.cause === 'primitive'
           ? `${v(f.target)}.face('${faceWord(f.face.part)}')`
           : v(f.target);
-      lines.push(`const ${f.id} = draft(${ref}, ${lit(f.angle)}, { ${opts.join(', ')} })`);
+      lines.push(`const ${f.id} = draft(${ref}, ${numText(bindings, f.id, 'angle', lit(f.angle))}, { ${opts.join(', ')} })`);
       return;
     }
   });

@@ -92,9 +92,33 @@ export interface ScriptError {
   line: number | null;
 }
 
+/**
+ * A param() the script named, alongside every doc slot (pname() keys) its
+ * value fed -- what toScript(doc, namedParams) needs to regenerate
+ * `const wall = param('wall', 2, { min: 0.5, max: 10 })` once and reference
+ * the same variable at every place it was used, instead of the name and
+ * bounds being lost to a literal the moment the doc round-trips through
+ * Build (see reshape-script-gen.ts's own header). `slots` is USUALLY one
+ * entry (the common `hollow(b, { wall })` case); it can be more than one if
+ * the same variable is read into more than one call (`const s = param(...);
+ * box(s, s, s)`), in which case every slot gets the same substitution, even
+ * though today's per-slot Dimensions panel still shows one row per slot --
+ * see the file-level design-decision note at the bottom of this file.
+ */
+export interface NamedParamDef extends ParamDef {
+  slots: string[];
+}
+
 export interface RunResult {
   doc: ModelDoc;
+  /** Panel-facing, keyed the same way generatedParams() already keys a
+   *  Build-mode slider (`pname(featureId, slot)`) -- unchanged shape from
+   *  before NamedParamDef existed, so nothing that already reads this array
+   *  needs to change. */
   params: ParamDef[];
+  /** Every param() the script declared, keyed by ITS OWN name -- see
+   *  NamedParamDef's own comment. Empty when the script named nothing. */
+  namedParams: NamedParamDef[];
   errors: ScriptError[];
 }
 
@@ -152,6 +176,67 @@ function lineOf(err: unknown): number | null {
 function messageOf(err: unknown): string {
   if (err instanceof Error) return err.message;
   return String(err);
+}
+
+/** Classic edit distance -- insert, delete, substitute, each cost 1. Used
+ *  only to find the closest VOCABULARY word to a name a script misspelled;
+ *  nothing here needs to be fast, a script's undefined names are typed by
+ *  hand and there are at most 24 candidates to compare against. */
+function levenshtein(a: string, b: string): number {
+  const rows = a.length + 1;
+  const cols = b.length + 1;
+  const d: number[][] = Array.from({ length: rows }, () => new Array<number>(cols).fill(0));
+  for (let i = 0; i < rows; i++) d[i][0] = i;
+  for (let j = 0; j < cols; j++) d[0][j] = j;
+  for (let i = 1; i < rows; i++) {
+    for (let j = 1; j < cols; j++) {
+      d[i][j] = a[i - 1] === b[j - 1]
+        ? d[i - 1][j - 1]
+        : 1 + Math.min(d[i - 1][j - 1], d[i - 1][j], d[i][j - 1]);
+    }
+  }
+  return d[a.length][b.length];
+}
+
+/**
+ * Beginner-lens finding, 2026-09-04: a misspelled call (`boxx(10)`) surfaced
+ * the raw engine message -- "boxx is not defined" -- which is true and
+ * useless to someone who has never heard the word "defined" used that way.
+ * A ReferenceError of exactly that shape gets rewritten in the house voice,
+ * naming the nearest word in VOCABULARY by edit distance: there are only 24
+ * candidates, so "nearest" is always cheap and, for an actual typo, always
+ * the right one. Every OTHER error (a validation throw, a plain JS bug in
+ * the student's own logic) passes through messageOf() unchanged -- this
+ * rewrite is narrowly scoped to the one error shape a name that does not
+ * exist produces.
+ *
+ * A misspelling FAR from every real name (a genuine undeclared variable, not
+ * a typo of a tool) drops the "Did you mean" half rather than guessing --
+ * offering `box()` for `totallyUnrelatedName` would be a worse answer than no
+ * answer. "Far" is edit distance beyond half the name's own length (floored
+ * at 2, so a short name like "abc" still gets a real cutoff rather than
+ * "distance > 1.5" rounding away to nothing) -- generous enough that any
+ * plausible one- or two-letter typo of a 3-24-letter word still qualifies,
+ * and tight enough that an unrelated word does not.
+ */
+function friendlyMessage(err: unknown): string {
+  if (err instanceof ReferenceError) {
+    const m = /^([A-Za-z_$][\w$]*) is not defined$/.exec(err.message);
+    if (m) {
+      const name = m[1];
+      let nearest: string = VOCABULARY[0];
+      let best = Infinity;
+      for (const word of VOCABULARY) {
+        const d = levenshtein(name, word);
+        if (d < best) { best = d; nearest = word; }
+      }
+      const closeEnough = best <= Math.max(2, Math.ceil(name.length / 2));
+      return closeEnough
+        ? `${name} is not a tool here. Did you mean ${nearest}()?`
+        : `${name} is not a tool here.`;
+    }
+  }
+  return messageOf(err);
 }
 
 // ---------------------------------------------------------------------------
@@ -228,6 +313,41 @@ function optionalNumber(fn: string, label: string, v: unknown): number | undefin
     throw new Error(`${fn}'s ${label} has to be a number, and you gave it ${describe(v)}.`);
   }
   return v as number;
+}
+
+/**
+ * A dimension that has to be MORE than zero -- a size, a diameter, a wall
+ * thickness, a pocket depth. Silently building a 10 mm box from
+ * `box(-10, -10, -10)` (measured 2026-09-04: the advanced student lens found
+ * this on the first pass) is the same class of defect whyCannotRound() and
+ * its siblings exist to close elsewhere in this app -- a control that
+ * quietly does something other than what was asked, with nothing on screen
+ * saying so. `${fn}():` (with the parens) is a deliberately different
+ * template from requiredNumber()'s `${fn}'s ${label}` -- this is a distinct
+ * failure ("the number means something impossible"), not "not a number at
+ * all", and the two should never read as the same sentence reworded.
+ */
+function positiveNumber(fn: string, label: string, v: unknown): number {
+  const n = requiredNumber(fn, label, v);
+  const val = unwrap(n);
+  if (!(val > 0)) {
+    throw new Error(`${fn}(): a size has to be a positive number -- got ${val} for ${label}.`);
+  }
+  return n; // still possibly boxed -- caller unwraps (and correlates) via num()
+}
+
+/**
+ * A count of copies -- repeat()/repeatAround(). Has to be a whole number of
+ * at least one; refused rather than silently rounded or clamped, the same
+ * stance positiveNumber() takes on a bad size.
+ */
+function wholeNumberAtLeastOne(fn: string, label: string, v: unknown): number {
+  const n = requiredNumber(fn, label, v);
+  const val = unwrap(n);
+  if (!(val >= 1) || !Number.isInteger(val)) {
+    throw new Error(`${fn}(): ${label} has to be a whole number of at least 1 -- got ${val}.`);
+  }
+  return n;
 }
 
 function isPlainOptions(v: unknown): v is Record<string, unknown> {
@@ -467,7 +587,7 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
     opts: unknown,
     setDims: (f: Feature, id: string) => void
   ): SolidHandle {
-    for (let i = 0; i < argNames.length; i++) requiredNumber(fn, argNames[i], args[i]);
+    for (let i = 0; i < argNames.length; i++) positiveNumber(fn, argNames[i], args[i]);
     const allowCorner = kind === 'box' || kind === 'cylinder';
     const extra = readOptions(fn, allowCorner ? ['at', 'corner'] : ['at'], opts);
     const base = newShape(docNow(), kind);
@@ -482,7 +602,7 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
       ];
     }
     if (allowCorner && extra.corner !== undefined) {
-      const c = requiredNumber(fn, 'corner', extra.corner);
+      const c = positiveNumber(fn, 'corner', extra.corner);
       (base as BoxFeature | CylinderFeature).round = num(c, id, 'round');
     }
     pushFeature(base);
@@ -674,7 +794,17 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
 
   // ---- holes --------------------------------------------------------------
 
-  function holeAxisAndCenter(fn: string, target: SolidHandle, opts: Record<string, unknown>): { axis: Axis3; center: Vec3 } {
+  /** `holeId` -- the hole FEATURE's own id, not the target's -- has to be
+   *  known before this runs, because HoleFeature.center is keyed
+   *  (pname(holeId, 'x'/'y'/'z'), per generatedParams()'s hole branch in
+   *  lib/model-codegen.ts) to the HOLE, not to the shape it drills into.
+   *  Correlating a param() here against target.id instead (the bug this
+   *  comment replaces, caught while wiring toScript's own {at} substitution
+   *  through the same slot names) would silently attach the caption/bounds
+   *  to the TARGET's unrelated position slider instead of the hole's. */
+  function holeAxisAndCenter(
+    fn: string, holeId: string, opts: Record<string, unknown>
+  ): { axis: Axis3; center: Vec3 } {
     let axis: Axis3 = 'z';
     if (opts.along !== undefined) {
       if (opts.along !== 'x' && opts.along !== 'y' && opts.along !== 'z') {
@@ -688,9 +818,9 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
       // The two in-plane axes, in the order a student would read a face:
       // "which two numbers am I not choosing" -- see the file-level design
       // note on this at the bottom of the file.
-      if (axis === 'z') center = [num(a, target.id, 'x'), num(b, target.id, 'y'), 0];
-      else if (axis === 'y') center = [num(a, target.id, 'x'), 0, num(b, target.id, 'z')];
-      else center = [0, num(a, target.id, 'y'), num(b, target.id, 'z')];
+      if (axis === 'z') center = [num(a, holeId, 'x'), num(b, holeId, 'y'), 0];
+      else if (axis === 'y') center = [num(a, holeId, 'x'), 0, num(b, holeId, 'z')];
+      else center = [0, num(a, holeId, 'y'), num(b, holeId, 'z')];
     }
     return { axis, center };
   }
@@ -699,13 +829,13 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
     if (!isHandle(target)) throw new Error('hole() needs a shape to drill into: hole(shape, { across: 6 }).');
     const extra = readOptions('hole', ['across', 'deep', 'at', 'along'], opts);
     if (extra.across === undefined) throw new Error('hole() needs { across: <number> } for the bit\'s diameter.');
-    const across = requiredNumber('hole', 'across', extra.across);
-    const { axis, center } = holeAxisAndCenter('hole', target, extra);
+    const across = positiveNumber('hole', 'across', extra.across);
     const base = newHole(docNow(), target.id);
+    const { axis, center } = holeAxisAndCenter('hole', base.id, extra);
     base.axis = axis;
     base.diameter = num(across, base.id, 'diameter');
     if (extra.deep !== undefined) {
-      base.depth = num(requiredNumber('hole', 'deep', extra.deep), base.id, 'depth');
+      base.depth = num(positiveNumber('hole', 'deep', extra.deep), base.id, 'depth');
     } else {
       const extent = extentAlong(docNow(), target.id, axis);
       base.depth = extent != null ? extent + 2 : 10;
@@ -721,14 +851,14 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
     const extra = readOptions('holes', ['across', 'apart', 'at', 'along'], opts);
     if (extra.across === undefined) throw new Error('holes() needs { across: <number> } for the bit\'s diameter.');
     if (extra.apart === undefined) throw new Error('holes() needs { apart: [across, up] } for the corner-to-corner spacing.');
-    const across = requiredNumber('holes', 'across', extra.across);
+    const across = positiveNumber('holes', 'across', extra.across);
     const [spanX, spanY] = readVec2('holes', 'apart', extra.apart);
-    const { axis, center } = holeAxisAndCenter('holes', target, extra);
     const base = newHoleCorners(docNow(), target.id);
+    const { axis, center } = holeAxisAndCenter('holes', base.id, extra);
     base.axis = axis;
     base.diameter = num(across, base.id, 'diameter');
     if (extra.deep !== undefined) {
-      base.depth = num(requiredNumber('holes', 'deep', extra.deep), base.id, 'depth');
+      base.depth = num(positiveNumber('holes', 'deep', extra.deep), base.id, 'depth');
     } else {
       const extent = extentAlong(docNow(), target.id, axis);
       base.depth = extent != null ? extent + 2 : 10;
@@ -749,7 +879,7 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
     if (!isHandle(target)) throw new Error('hollow() needs a shape: hollow(shape, { wall: 2 }).');
     const extra = readOptions('hollow', ['wall', 'open'], opts);
     if (extra.wall === undefined) throw new Error('hollow() needs { wall: <number> } for the wall thickness.');
-    const wall = requiredNumber('hollow', 'wall', extra.wall);
+    const wall = positiveNumber('hollow', 'wall', extra.wall);
     let open: TopoName | undefined;
     if (extra.open !== undefined) {
       const part = facePart('hollow', extra.open, false);
@@ -807,9 +937,9 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
     if (!isHandle(target)) throw new Error('repeat() needs a shape: repeat(shape, { count: 3, step: 60 }).');
     const extra = readOptions('repeat', ['count', 'step'], opts);
     if (extra.count === undefined) throw new Error('repeat() needs { count: <number> }.');
-    const count = requiredNumber('repeat', 'count', extra.count);
+    const count = wholeNumberAtLeastOne('repeat', 'count', extra.count);
     const base = newPattern(docNow(), target.id, 'linear');
-    base.count = Math.max(1, Math.round(num(count, base.id, 'count')));
+    base.count = num(count, base.id, 'count');
     if (extra.step !== undefined) {
       if (typeof extra.step === 'number' || extra.step instanceof Number) {
         base.step = [num(extra.step, base.id, 'stepx'), 0, 0];
@@ -826,9 +956,9 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
     if (!isHandle(target)) throw new Error('repeatAround() needs a shape: repeatAround(shape, { count: 6, axis: "z" }).');
     const extra = readOptions('repeatAround', ['count', 'axis', 'angle'], opts);
     if (extra.count === undefined) throw new Error('repeatAround() needs { count: <number> }.');
-    const count = requiredNumber('repeatAround', 'count', extra.count);
+    const count = wholeNumberAtLeastOne('repeatAround', 'count', extra.count);
     const base = newPattern(docNow(), target.id, 'circular');
-    base.count = Math.max(1, Math.round(num(count, base.id, 'count')));
+    base.count = num(count, base.id, 'count');
     if (extra.axis !== undefined) {
       if (extra.axis !== 'x' && extra.axis !== 'y' && extra.axis !== 'z') {
         throw new Error(`repeatAround()'s "axis" has to be 'x', 'y' or 'z'. You gave it ${describe(extra.axis)}.`);
@@ -1019,7 +1149,7 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
     const fn = new Function(...names, wrapped);
     fn(...names.map((n) => globals[n]));
   } catch (err) {
-    errors.push({ message: messageOf(err), line: lineOf(err) });
+    errors.push({ message: friendlyMessage(err), line: lineOf(err) });
   }
 
   const doc = docNow();
@@ -1059,7 +1189,24 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
     if (!consumedNames.has(def.name)) params.push(def);
   }
 
-  return { doc: finalDoc, params, errors };
+  // Every doc slot (pname key) each NAMED param's value fed, grouped by the
+  // param's OWN name -- the inverse of slotOverrides, and what
+  // toScript(doc, namedParams) needs to know where to write `wall` instead
+  // of a literal. Built from slotOverrides rather than re-walking the doc:
+  // slotOverrides is recorded at the exact moment num() consumed a
+  // ParamNumber, which is the only place that correlation ever existed.
+  const slotsByParamName = new Map<string, string[]>();
+  for (const [slotKey, paramName] of slotOverrides) {
+    const list = slotsByParamName.get(paramName);
+    if (list) list.push(slotKey);
+    else slotsByParamName.set(paramName, [slotKey]);
+  }
+  const namedParamsOut: NamedParamDef[] = [...namedParams.values()].map((def) => ({
+    ...def,
+    slots: slotsByParamName.get(def.name) ?? [],
+  }));
+
+  return { doc: finalDoc, params, namedParams: namedParamsOut, errors };
 }
 
 // ---------------------------------------------------------------------------
@@ -1092,4 +1239,13 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
 //    else in the app derives it this way yet. A {neutral: N} escape hatch is
 //    added alongside {from} so any doc (not only ones whose neutral sits
 //    exactly on a bounding-box extreme) still round-trips through toScript().
+// 6. A param() bound to MORE than one doc slot (`const s = param('s', 20);
+//    box(s, s, s)`) still gets one Dimensions-panel row PER SLOT (three, for
+//    that example), each independently draggable -- dragging one does not
+//    move the other two, even though toScript(doc, namedParams) will
+//    correctly regenerate all three as `s` on Code -> Build -> Code. A
+//    single slider driving every bound slot at once would need the PANEL
+//    (components/ReshapePreview.tsx / ReshapeParamsPanel.tsx), not this
+//    file, to collapse NamedParamDef.slots into one row -- out of scope for
+//    the fixes this note was added alongside (2026-09-04).
 // ---------------------------------------------------------------------------

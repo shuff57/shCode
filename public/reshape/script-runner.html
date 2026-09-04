@@ -33,13 +33,20 @@
   THE MESSAGE PROTOCOL (see lib/reshape-script.ts's RunResult and the spec at
   .gauntlet/SPEC-reshape-script.md):
 
-    outbound: preview-console, reshape-doc { doc, params }, preview-error
+    outbound: preview-console, reshape-doc { doc, params, namedParams }, preview-error
     inbound:  reshape-set-params { params }  (re-runs with those overrides)
 
   Deliberately NOT the JSCAD/B-rep runners' vocabulary (reshape-params,
   reshape-anchors, reshape-rebuilt, reshape-set-anchors, preview-eval): this
   frame builds a document, not a picture, so it has no anchors to project and
   nothing living to eval an expression against between runs.
+
+  A THROW PART-WAY THROUGH STILL POSTS reshape-doc, with whatever built
+  before the throw -- runScript() always returns that partial doc alongside
+  its error (docNow() runs unconditionally, try/catch or not). Only a throw
+  on the very FIRST line, where the partial doc is empty, skips the post --
+  see runAndReport()'s own comment on why an empty doc must never overwrite
+  whatever the student's last successful Run already put in Build.
 -->
 <style>
   html, body { margin: 0; padding: 0; height: 100%; background: #282a36; color: #f8f8f2; font: 13px/1.5 'Fira Code', Consolas, monospace; }
@@ -130,6 +137,15 @@
   // value on the panel.
   var liveValues = {};
 
+  function postDoc(result) {
+    try {
+      window.parent.postMessage(
+        { source: 'reshape-doc', doc: result.doc, params: result.params, namedParams: result.namedParams },
+        '*'
+      );
+    } catch (e) { /* parent gone */ }
+  }
+
   function runAndReport(values) {
     var result;
     try {
@@ -144,15 +160,24 @@
     }
     if (result.errors.length > 0) {
       var first = result.errors[0];
+      // A throw part-way through still leaves everything BEFORE it standing
+      // -- runScript() already returns that partial doc alongside the error
+      // (see its own doc comment), so post it too, unless it is EMPTY: a
+      // throw on the very first line has nothing new to show, and posting
+      // an empty doc here would REPLACE whatever the student's last good
+      // Run already put in Build with nothing -- see
+      // components/SandboxWorkspace.tsx's 'reshape-doc' handler, which
+      // adopts whatever doc arrives unconditionally. Order matters: the
+      // doc first, so the parent's model updates before the error banner
+      // does, matching "here is what worked, and here is what didn't."
+      if (result.doc.features.length > 0) postDoc(result);
       reportError(first.message, first.line);
       return;
     }
     var featureWord = result.doc.features.length === 1 ? 'step' : 'steps';
     setStatus('<span class="ok">Built ' + result.doc.features.length + ' ' + featureWord + '.</span> ' +
       '<span class="hint">Switch to Build to see it.</span>');
-    try {
-      window.parent.postMessage({ source: 'reshape-doc', doc: result.doc, params: result.params }, '*');
-    } catch (e) { /* parent gone */ }
+    postDoc(result);
   }
 
   window.addEventListener('message', function (e) {

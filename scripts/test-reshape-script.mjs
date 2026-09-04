@@ -290,7 +290,7 @@ function docsEqualUpToIds(original, reconstructed) {
 // ---------------------------------------------------------------------------
 
 const out = mkdtempSync(path.join(tmpdir(), 'shcode-reshape-script-'));
-let script, gen, types;
+let script, gen, types, codegen;
 try {
   execFileSync(
     process.execPath,
@@ -308,6 +308,7 @@ try {
   script = require(path.join(out, 'reshape-script.js'));
   gen = require(path.join(out, 'reshape-script-gen.js'));
   types = require(path.join(out, 'model-types.js'));
+  codegen = require(path.join(out, 'model-codegen.js'));
 } catch (e) {
   console.error('failed to compile lib/reshape-script.ts and friends: ' + (e && e.message ? e.message : e));
   rmSync(out, { recursive: true, force: true });
@@ -368,6 +369,246 @@ refuses('param() reusing a name', 'param("wall", 2)\nparam("wall", 3)', 'already
 refuses('sketch() with a bad plane', "sketch('under')", "needs a plane word");
 refuses('.polygon() with two points', 'const sk = sketch("top")\nsk.polygon([[0,0],[1,1]])', 'at least three');
 refuses('blend() with a solid', 'const b = box(40, 40, 20)\nblend(b, b, 20)', 'blend() needs two sketches');
+
+// ---- negative/zero sizes are refused, not silently absorbed -----------
+// Advanced-lens finding, 2026-09-04: box(-10, -10, -10) used to build a
+// 10 mm box with no message (Math.abs()-shaped silent absorption
+// somewhere down the line). Every size/across/tall/wall/deep argument now
+// goes through positiveNumber() in lib/reshape-script.ts.
+refuses('box() with a negative width', 'box(-10, 10, 10)', 'box(): a size has to be a positive number -- got -10 for width.');
+refuses('box() with a zero height', 'box(10, 10, 0)', 'box(): a size has to be a positive number -- got 0 for height.');
+refuses('cylinder() with a negative across', 'cylinder(-10, 10)', 'cylinder(): a size has to be a positive number -- got -10 for across.');
+refuses('sphere() with a zero across', 'sphere(0)', 'sphere(): a size has to be a positive number -- got 0 for across.');
+refuses('cone() with a negative tall', 'cone(10, -5)', 'cone(): a size has to be a positive number -- got -5 for tall.');
+refuses('ring() with a negative tubeAcross', 'ring(40, -8)', 'ring(): a size has to be a positive number -- got -8 for tubeAcross.');
+refuses(
+  'hole() with a negative across',
+  'const b = box(40, 40, 20)\nhole(b, { across: -6 })',
+  'hole(): a size has to be a positive number -- got -6 for across.'
+);
+refuses(
+  'hole() with a zero deep',
+  'const b = box(40, 40, 20)\nhole(b, { across: 6, deep: 0 })',
+  'hole(): a size has to be a positive number -- got 0 for deep.'
+);
+refuses(
+  'hollow() with a negative wall',
+  'const b = box(40, 40, 20)\nhollow(b, { wall: -2 })',
+  'hollow(): a size has to be a positive number -- got -2 for wall.'
+);
+refuses(
+  'box() with a negative corner',
+  'box(40, 40, 20, { corner: -3 })',
+  'box(): a size has to be a positive number -- got -3 for corner.'
+);
+
+// ---- count has to be a whole number of at least one --------------------
+refuses(
+  'repeat() with a zero count',
+  'const b = box(10, 10, 10)\nrepeat(b, { count: 0, step: 20 })',
+  'repeat(): count has to be a whole number of at least 1 -- got 0.'
+);
+refuses(
+  'repeat() with a fractional count',
+  'const b = box(10, 10, 10)\nrepeat(b, { count: 2.5, step: 20 })',
+  'repeat(): count has to be a whole number of at least 1 -- got 2.5.'
+);
+refuses(
+  'repeatAround() with a negative count',
+  "const b = box(10, 10, 10, { at: [30, 0, 0] })\nrepeatAround(b, { count: -1, axis: 'z' })",
+  'repeatAround(): count has to be a whole number of at least 1 -- got -1.'
+);
+
+// ---- a misspelled call gets the nearest VOCABULARY word, not a raw
+// ReferenceError -- beginner-lens finding, 2026-09-04.
+refuses('a misspelled call gets a "did you mean" hint', 'boxx(10)', 'boxx is not a tool here. Did you mean box()?');
+refuses(
+  'a misspelled step gets a "did you mean" hint',
+  'const b = box(10, 10, 10)\nhollo(b, { wall: 2 })',
+  'hollo is not a tool here. Did you mean hollow()?'
+);
+// A name far from every VOCABULARY word is a genuine undeclared variable,
+// not a typo -- guessing a suggestion for it would be a worse answer than
+// none, so the "Did you mean" half is dropped entirely.
+refuses(
+  'a name far from every tool gets no guess',
+  'totallyUnrelatedName(10)',
+  'totallyUnrelatedName is not a tool here.'
+);
+{
+  const r = script.runScript('totallyUnrelatedName(10)');
+  check(
+    'the no-guess message really has no "Did you mean" in it',
+    r.errors.length === 1 && !/Did you mean/.test(r.errors[0].message),
+    JSON.stringify(r.errors)
+  );
+}
+{
+  // The line still points at the misspelled call, exactly like any other
+  // refusal -- the message changed, the line-recovery machinery did not.
+  const r = script.runScript('const b = box(10, 10, 10)\nboxx(b)');
+  check(
+    'the "did you mean" hint still carries the right line',
+    r.errors.length === 1 && r.errors[0].line === 2,
+    JSON.stringify(r.errors)
+  );
+}
+
+// ---- a script that throws part-way keeps what ran before it ------------
+// Advanced-lens finding, 2026-09-04: a throw used to leave ZERO chips in
+// Build, discarding the steps that built successfully. runScript() itself
+// already returned the partial doc alongside the error (docNow() runs
+// unconditionally after the try/catch) -- what was missing was
+// public/reshape/script-runner.html posting it. These two assert the
+// CONTRACT runScript() promises; the browser-verified steps below assert
+// the runner and the parent actually honour it.
+console.log('\n=== (c2) a throw keeps the doc built so far ===');
+{
+  const r = script.runScript('const b = box(40, 40, 20)\nhole(b, { across: 6 })\nround(b, "oops")');
+  check(
+    'mid-script throw: the two good steps survive',
+    r.doc.features.length === 2 && r.doc.features[0].kind === 'box' && r.doc.features[1].kind === 'hole',
+    `got ${r.doc.features.length} feature(s): ${JSON.stringify(r.doc.features.map((f) => f.kind))}`
+  );
+  check('mid-script throw: the error is reported, with a line', r.errors.length === 1 && r.errors[0].line === 3, JSON.stringify(r.errors));
+}
+{
+  const r = script.runScript('box("oops", 40, 20)');
+  check(
+    'first-line throw: the doc is empty (nothing to keep)',
+    r.doc.features.length === 0,
+    `got ${r.doc.features.length} feature(s)`
+  );
+  check('first-line throw: the error is reported, with a line', r.errors.length === 1 && r.errors[0].line === 1, JSON.stringify(r.errors));
+}
+
+// ---- param() survives Build -> Code without a drag ----------------------
+// Advanced-lens finding, 2026-09-04: toScript(doc) used to regenerate
+// `hollow(box1, { wall: 2 })` -- the name and bounds param('wall', 2, {...})
+// declared were gone, so the panel fell back to the auto-derived 0.5-40
+// instead of the declared 0.5-10. Fixed by carrying RunResult.namedParams
+// (feature/slot bindings runScript() already computed) through to
+// toScript(doc, namedParams).
+console.log('\n=== (c3) param() round-trips through toScript(doc, namedParams) ===');
+{
+  const src = "const wall = param('wall', 2, { min: 0.5, max: 10 })\nconst b = box(40, 40, 20)\nhollow(b, { wall })";
+  const first = script.runScript(src);
+  check('param round-trip: the script runs clean', first.errors.length === 0, JSON.stringify(first.errors));
+  check(
+    'param round-trip: namedParams reports wall with its own bounds',
+    first.namedParams.length === 1 && first.namedParams[0].name === 'wall'
+      && first.namedParams[0].min === 0.5 && first.namedParams[0].max === 10
+      && first.namedParams[0].slots.length === 1,
+    JSON.stringify(first.namedParams)
+  );
+  const regenerated = gen.toScript(first.doc, first.namedParams);
+  check(
+    'toScript(doc, namedParams) re-declares param(\'wall\', ...) with its bounds',
+    /param\('wall', 2, \{ min: 0\.5, max: 10 \}\)/.test(regenerated),
+    regenerated
+  );
+  check(
+    'toScript(doc, namedParams) uses `wall` in hollow(), not a literal 2',
+    /hollow\([^)]*\{\s*wall\s*\}\)/.test(regenerated) && !/wall:\s*2\b/.test(regenerated),
+    regenerated
+  );
+  const second = script.runScript(regenerated);
+  check('the regenerated script itself runs clean', second.errors.length === 0, JSON.stringify(second.errors));
+  const why = docsEqualUpToIds(first.doc, second.doc);
+  check('runScript(toScript(doc, namedParams)).doc equals the original doc', !why, why);
+  check(
+    'the regenerated script STILL reports wall as a named param with the same bounds',
+    second.namedParams.length === 1 && second.namedParams[0].name === 'wall'
+      && second.namedParams[0].min === 0.5 && second.namedParams[0].max === 10,
+    JSON.stringify(second.namedParams)
+  );
+  // Without namedParams (the ordinary Build-mode doc, never built by a
+  // script), toScript() falls back to exactly today's literal-only output.
+  const literalOnly = gen.toScript(first.doc);
+  check(
+    'toScript(doc) with no namedParams argument still emits a literal',
+    /wall:\s*2\b/.test(literalOnly) && !/param\(/.test(literalOnly),
+    literalOnly
+  );
+
+  // A Build-mode slider drag never touches namedParams -- it calls
+  // applyParam() straight on the doc (the same path a real drag in the
+  // Dimensions panel takes) -- so namedParams[0].value is now STALE (still
+  // 2) while the doc itself says 7. Beginner-lens finding, 2026-09-04:
+  // toScript() used to print the stale namedParams value, so a dragged
+  // slider's new number never reached the regenerated param() line at all.
+  const draggedDoc = codegen.applyParam(first.doc, first.namedParams[0].slots[0], 7);
+  check('applyParam() actually changed the doc (sanity)', draggedDoc !== first.doc);
+  const afterDrag = gen.toScript(draggedDoc, first.namedParams);
+  check(
+    "toScript(doc, namedParams) after a drag prints the DOC's current value, not the stale namedParams one",
+    /param\('wall', 7,/.test(afterDrag) && !/param\('wall', 2,/.test(afterDrag),
+    afterDrag
+  );
+}
+
+// ---- the FULL Code -> Build -> Code -> Build -> drag -> Code sequence ---
+// Regression, 2026-09-04 (team lead's independent browser pass): a param()
+// survived ONE Code <-> Build round trip but was silently gone by the
+// second, WITHOUT the student ever pressing Run again. Root cause was in
+// components/SandboxWorkspace.tsx, not in this file's own functions: its
+// loadDoc() regenerated the live `code` state via toScript(next) with NO
+// namedParams argument, so the moment Code mode's ReshapePreview mounted
+// fresh and auto-evaluated that stale text (a real re-run the student never
+// asked for, indistinguishable to script-runner.html from one they did),
+// the reply reported ZERO named params and overwrote the correct ones.
+// This test cannot exercise the React component, but it can and does
+// exercise the exact SEQUENCE of toScript()/runScript()/applyParam() calls
+// that sequence produces at each step -- run, adopt with namedParams
+// (loadDoc), auto-eval that same text on the Code mount, adopt AGAIN
+// (second loadDoc), drag (applyParam), regenerate once more -- which is
+// precisely the shape a browser-level repro cannot narrow down to. Swap
+// `codeAfterFirstBuild` below back to `gen.toScript(run1.doc)` (no
+// namedParams -- the bug) to see this test fail the same way the report
+// did, at the very next check.
+console.log('\n=== (c4) the full two-round-trip sequence: param() must survive without a Run ===');
+{
+  const src = "const wall = param('wall', 2, { min: 0.5, max: 10 })\nconst b = box(40, 40, 20)\nhollow(b, { wall })";
+
+  // Step 1: Run.
+  const run1 = script.runScript(src);
+  check('two-round-trip: the first run is clean', run1.errors.length === 0, JSON.stringify(run1.errors));
+
+  // chooseBuild(true): loadDoc()'s OWN setCode() call, WITH namedParams --
+  // the fix. chooseBuild(false) writes the identical text to the editor.
+  const codeAfterFirstBuild = gen.toScript(run1.doc, run1.namedParams);
+
+  // Code mode's ReshapePreview mounts fresh and auto-evaluates whatever
+  // `code` currently holds -- a re-run the student never pressed Run for.
+  const autoRun = script.runScript(codeAfterFirstBuild);
+  check('two-round-trip: the auto-eval on the Code mount is clean', autoRun.errors.length === 0, JSON.stringify(autoRun.errors));
+  check(
+    'two-round-trip: the auto-eval still reports wall as a named param, not wiped',
+    autoRun.namedParams.length === 1 && autoRun.namedParams[0].name === 'wall'
+      && autoRun.namedParams[0].min === 0.5 && autoRun.namedParams[0].max === 10,
+    JSON.stringify(autoRun.namedParams)
+  );
+
+  // chooseBuild(true) a second time: loadDoc() runs again, from whatever
+  // the auto-eval just reported.
+  const codeAfterSecondBuild = gen.toScript(autoRun.doc, autoRun.namedParams);
+  check(
+    'two-round-trip: param() survives the SECOND Build visit with no edit and no Run',
+    /param\('wall', 2, \{ min: 0\.5, max: 10 \}\)/.test(codeAfterSecondBuild),
+    codeAfterSecondBuild
+  );
+
+  // A slider drag on Hollow 1: applyParam() straight on the doc, same as a
+  // real drag in the Dimensions panel.
+  const dragged = codegen.applyParam(autoRun.doc, autoRun.namedParams[0].slots[0], 10);
+  const codeAfterDrag = gen.toScript(dragged, autoRun.namedParams);
+  check(
+    'two-round-trip: a drag on the SECOND visit lands inside param(), not a literal',
+    /param\('wall', 10, \{ min: 0\.5, max: 10 \}\)/.test(codeAfterDrag)
+      && /hollow\([^)]*\{\s*wall\s*\}\)/.test(codeAfterDrag),
+    codeAfterDrag
+  );
+}
 
 // ---- (b) volume/bbox against a real kernel -----------------------------
 

@@ -42,7 +42,7 @@ import {
   solveSketchDrag,
   toReshape,
 } from '../lib/model-codegen';
-import { toScript } from '../lib/reshape-script-gen';
+import { toScript, type ScriptParamRef } from '../lib/reshape-script-gen';
 import { RUNNER_SOURCE, RUN_TIMEOUT_MS } from '../lib/js-runner-source';
 import {
   NO_TEACHER_MODES,
@@ -84,6 +84,17 @@ const TIMELINE_HEIGHT_PX = 58;
 // cold one, without needing to guess how much margin a heavier document
 // (more fillets, a shell, a pattern) might need beyond what was tested.
 const PREVIEW_DEGRADE_MS = 25;
+
+/** "wall" -> "Wall" -- the Dimensions-panel caption a param() gets when the
+ *  script named it but gave no explicit { caption }. Display-only: never
+ *  written back into the stored param name or caption, which stay
+ *  lowercase (see lib/reshape-script.ts's param() and toScript()'s own
+ *  `p.caption !== p.name` check -- capitalising the STORED default there
+ *  instead would make every param round-trip through an unwanted explicit
+ *  `caption: 'Wall'` it never asked for). */
+function capitalize(name: string): string {
+  return name.length ? name[0].toUpperCase() + name.slice(1) : name;
+}
 
 /**
  * Folds a batch of pending param edits into `base` the same way `commitParams`
@@ -225,6 +236,20 @@ export default function SandboxWorkspace() {
   // component would have to evaluate itself -- see lib/reshape-script.ts's
   // comment on why runScript() must never run in the app's own origin.
   const [scriptDoc, setScriptDoc] = useState<ModelDoc | null>(null);
+  // The SAME message's `namedParams` -- every param() the script declared,
+  // with the doc slots its value fed (lib/reshape-script.ts's
+  // NamedParamDef). Carried alongside scriptDoc so a later Build -> Code
+  // still has the caption/bounds a param() call gave a number, instead of
+  // toScript() falling back to the auto-derived ones the moment the doc
+  // round-trips through Build -- see chooseBuild()'s Build -> Code branch.
+  const [scriptNamedParams, setScriptNamedParams] = useState<ScriptParamRef[] | null>(null);
+  // The exact sentence a script's own throw reported (with its line, when
+  // one was recoverable) -- see the 'preview-error' handler below. Shown
+  // through ReshapeParamsPanel's `notice` prop in Code mode, the same slot
+  // Build mode uses for a kernel refusal, so "here is what worked, and here
+  // is what didn't" is not just the generic stale-panel sentence but the
+  // actual message a script author can act on.
+  const [scriptErrorMessage, setScriptErrorMessage] = useState<string | null>(null);
   const [doc, setDoc] = useState<ModelDoc>(EMPTY_DOC);
   const [selected, setSelected] = useState<string[]>([]);
   // A selection can outlive its feature (Undo removes the step that was
@@ -365,7 +390,8 @@ export default function SandboxWorkspace() {
       const d = e.data as {
         source?: string; type?: string; defs?: ParamDef[]; values?: ParamValues;
         ms?: number; empty?: boolean; failed?: boolean; points?: AnchorPoint[];
-        doc?: ModelDoc; params?: unknown;
+        doc?: ModelDoc; params?: unknown; namedParams?: ScriptParamRef[];
+        error?: { message?: string; line?: number | null };
       };
       if (d?.type === 'brep-kernel-please') {
         // THE BYTE HANDOFF. The frame is sandboxed without allow-same-origin,
@@ -409,23 +435,40 @@ export default function SandboxWorkspace() {
       } else if (d?.source === 'reshape-anchors') {
         setAnchors(Array.isArray(d.points) ? d.points : []);
       } else if (d?.source === 'reshape-doc') {
-        // The script runner's own success message -- see
-        // public/reshape/script-runner.html. Stashed for chooseBuild()'s
+        // The script runner's own success (or partial-on-throw) message --
+        // see public/reshape/script-runner.html. Stashed for chooseBuild()'s
         // Code -> Build handoff; nothing here touches `doc`/`build` state
         // directly, so the model a student is editing in Build is never
         // silently replaced by a Run that happened while they were in Code.
+        // The runner only ever sends this with a NON-EMPTY doc (see its own
+        // comment on why an empty one is withheld instead), so there is no
+        // "empty doc" case to special-case here -- whatever arrives is
+        // adopted as the latest good build, partial-on-throw included.
         setScriptDoc(d.doc ?? null);
+        setScriptNamedParams(Array.isArray(d.namedParams) ? d.namedParams : []);
         setStale(null);
+        // A doc arriving here means the run got at least this far cleanly --
+        // any error notice still showing is from a PREVIOUS run and no
+        // longer describes the current state. A 'preview-error' for THIS
+        // run, if one follows (the partial-doc-on-throw case), sets it again
+        // right after -- see that handler below and script-runner.html's own
+        // ordering comment on why the doc is posted before the error.
+        setScriptErrorMessage(null);
       } else if (d?.source === 'preview-error') {
         // A script that throws on load never reaches reshape-rebuilt, so without
         // this the failure is visible only inside the frame — and the panel
         // goes on showing numbers for a model that was never built.
         setStale('error');
+        if (scriptEngine && !build) {
+          const line = typeof d.error?.line === 'number' ? d.error.line : null;
+          const msg = d.error?.message ?? 'The script stopped before it finished.';
+          setScriptErrorMessage(line ? `Line ${line}: ${msg}` : msg);
+        }
       }
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, [mode.preview, build]);
+  }, [mode.preview, build, scriptEngine]);
 
   // Read inside callbacks that must not rebuild on every doc change, and to
   // keep history bookkeeping out of a state updater -- React may call one twice.
@@ -446,10 +489,19 @@ export default function SandboxWorkspace() {
   // rollback boundary itself, not to structural edits.
   useEffect(() => {
     if (!build) return;
-    setCode(toReshape(effectiveDoc));
+    // scriptEngine implies brepEngine (see where it is read), and Build mode
+    // under brepEngine never reads `code` at all (it renders BrepViewport) --
+    // so this branch only matters for the legacy !brepEngine JSCAD path,
+    // where scriptEngine is always false. Keeping it in step anyway (rather
+    // than assuming that) is what stops `code` from going stale with the
+    // WRONG language the moment any caller of it changes.
+    //
+    // scriptNamedParams passed through -- see loadDoc()'s own comment on why
+    // this must NOT be the namedParams-less call it used to be.
+    setCode(scriptEngine ? toScript(effectiveDoc, scriptNamedParams ?? undefined) : toReshape(effectiveDoc));
     setRunKey((k) => k + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rollbackIndex]);
+  }, [rollbackIndex, scriptEngine, scriptNamedParams]);
 
   // Regenerate and reload. The slow path, and the only one structure takes.
   const loadDoc = useCallback((raw: ModelDoc) => {
@@ -466,10 +518,45 @@ export default function SandboxWorkspace() {
     setRebuildMs(null);
     setStale(null);
     setRollbackIndex(null);
-    setCode(toReshape(next));
+    // scriptEngine-aware for the same reason the rollback effect above is --
+    // measured 2026-09-04: without this, a Code -> Build -> Code round trip
+    // left `code` holding the STALE toReshape() text loadDoc() last wrote
+    // (JSCAD, complete with a require() call), and the moment Code's
+    // ReshapePreview remounted on the runKey this bump below causes, it
+    // handed that JSCAD text to the DSL's script-runner.html and threw
+    // "require is not defined" -- a real error banner over a doc that had
+    // built perfectly cleanly.
+    //
+    // scriptNamedParams IS passed through here, and that is a correction of
+    // this same comment's earlier claim that loadDoc() has none to offer --
+    // measured 2026-09-04 (team lead's independent pass): Code -> Build ->
+    // Code (no edit, no Run) silently lost a param(). The chain: this
+    // function's OWN setCode() call above regenerated `code` WITHOUT
+    // namedParams while still literal-only; the moment Code mode's
+    // ReshapePreview then MOUNTS (build flips false->true is not a
+    // remount, but true->false the first time a Run has happened IS one --
+    // it was not in the tree at all while build was true), it auto-evaluates
+    // whatever `code` currently holds -- a real re-run the student never
+    // asked for, but one script-runner.html cannot tell apart from a
+    // genuine one. That auto-run's own 'reshape-doc' reply -- reporting
+    // ZERO named params, because the code it was HANDED had none -- then
+    // overwrote scriptDoc/scriptNamedParams with the literal-only version,
+    // and the caption/bounds a script had declared were gone from that
+    // point on, even though the STUDENT'S EDITOR (fileContents, written by
+    // chooseBuild()'s Build -> Code branch, unaffected by this function)
+    // still showed the correct param() line the whole time. Passing
+    // scriptNamedParams here means the auto-run evaluates the SAME correct,
+    // param()-declaring text chooseBuild() already put in the editor, so
+    // its reply reports the same bindings back rather than erasing them --
+    // self-correcting rather than merely deferred, because toScript()'s own
+    // "stillLive" check (see that file) already drops a binding whose slot
+    // no longer exists in `next`, so a stale array here from an unrelated
+    // caller (undo, redo, Reset, the draw tool) degrades to plain literals
+    // exactly as before, never to a wrong caption.
+    setCode(scriptEngine ? toScript(next, scriptNamedParams ?? undefined) : toReshape(next));
     setRunKey((k) => k + 1);
     setIsRunning(true);
-  }, []);
+  }, [scriptEngine, scriptNamedParams]);
 
   const remember = useCallback((prev: ModelDoc) => {
     past.current = [...past.current.slice(-49), prev];
@@ -635,17 +722,32 @@ export default function SandboxWorkspace() {
   const brepParamDefs = useMemo(() => {
     if (!brepEngine) return [];
     if (selected.length === 0) return [];
+    // Beginner-lens finding, 2026-09-04: param('wall', 2, { min: 0.5, max: 10 })
+    // still showed as "Hollow 1 wall", 0.5-40 -- the auto-derived def
+    // generatedParams() always builds, ignoring that this slot was ever
+    // named. scriptNamedParams (set from the script runner's own
+    // 'reshape-doc' message -- see that handler above) carries exactly
+    // which doc slot (pname() key) each param() bound, so a slot with a
+    // binding here wins the caption a script actually gave it -- its own
+    // name, capitalised, unless the script set an explicit { caption } --
+    // and the declared min/max/step, not the Build tool's guess at them.
+    const bindings = new Map<string, ScriptParamRef>();
+    if (scriptNamedParams) {
+      for (const p of scriptNamedParams) {
+        for (const slot of p.slots) bindings.set(slot, p);
+      }
+    }
     return generatedParams(doc)
       .filter((p) => selected.some((id) => p.name.startsWith(`${id}_`)))
-      .map((p): ParamDef => ({
-        name: p.name,
-        caption: p.caption,
-        initial: p.value,
-        min: p.min,
-        max: p.max,
-        step: p.step,
-      }));
-  }, [brepEngine, doc, selected]);
+      .map((p): ParamDef => {
+        const named = bindings.get(p.name);
+        if (!named) {
+          return { name: p.name, caption: p.caption, initial: p.value, min: p.min, max: p.max, step: p.step };
+        }
+        const caption = named.caption !== named.name ? named.caption : capitalize(named.name);
+        return { name: p.name, caption, initial: p.value, min: named.min, max: named.max, step: named.step };
+      });
+  }, [brepEngine, doc, selected, scriptNamedParams]);
   const scales = useMemo(
     () => Object.fromEntries(specs.map((h) => [h.param, h.scale])),
     [specs]
@@ -736,7 +838,12 @@ export default function SandboxWorkspace() {
       // switch back to Build can adopt. That is new: toReshape()'s JSCAD is
       // deliberately one-way (see model-types.ts's own header), and this is
       // the first doc-round-trippable text this editor has ever held.
-      updateFile('script.js', scriptEngine ? toScript(doc) : toReshape(doc));
+      // scriptNamedParams may be stale (left over from an earlier script,
+      // or never set at all for a doc built purely by mouse) -- harmless:
+      // toScript() only re-declares a param() whose bound slot still
+      // actually exists in THIS doc (see its own "stillLive" check), so a
+      // mismatched leftover is silently ignored rather than mis-applied.
+      updateFile('script.js', scriptEngine ? toScript(doc, scriptNamedParams ?? undefined) : toReshape(doc));
       setScriptDoc(doc);
       setDoc(EMPTY_DOC);
       setSelected([]);
@@ -1467,7 +1574,11 @@ export default function SandboxWorkspace() {
                           ? (selected.length ? 'This step has no numbers to adjust.' : 'Select a shape to see its dimensions.')
                           : "Run a script and its numbers appear here. param('name', value) gives one a caption.")
                         : undefined}
-                      notice={brepEngine && selected.length === 1 ? refusals?.get(selected[0]) ?? null : null}
+                      notice={
+                        scriptEngine && !build && scriptErrorMessage
+                          ? scriptErrorMessage
+                          : brepEngine && selected.length === 1 ? refusals?.get(selected[0]) ?? null : null
+                      }
                       values={paramValues}
                       onChange={sendParams}
                       onCommit={commitParams}
