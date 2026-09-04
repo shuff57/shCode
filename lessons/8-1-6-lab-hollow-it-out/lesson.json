@@ -1,0 +1,52 @@
+{
+  "id": "8-1-6-lab-hollow-it-out",
+  "title": "8.1.6 Lab: Hollow It Out",
+  "description": "Hollow out the box into an open-topped shell with the Hollow tool. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 3: reSHape: Solid Modelling",
+  "unit": "8.1 Solid Shapes",
+  "preview": "reshape",
+  "mode": "visual",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Click the top face of the box",
+      "instructions": "You're starting from a 40 x 40 x 20 mm box. Click the flat top face of the box in the 3D view to select it.",
+      "hints": [
+        "This is the same face you'd click to drill a hole — the middle of the flat top."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Hollow it out",
+      "instructions": "Press the Hollow tool in the toolbar. The box becomes an open-topped shell, like a cup. In the Dimensions panel, check that wall reads 2 — if it doesn't, type 2.",
+      "hints": [
+        "A message under the 3D view should read \"Hollow 1 is open at the top face.\" That's the open top you want — you don't need any other tool for it.",
+        "Look for the field named \"Hollow 1 wall\" in the Dimensions panel."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "An open-topped shell, 2 mm walls",
+      "description": "The box is hollowed to 2 mm walls with the top face left open.",
+      "type": "model",
+      "expect": [
+        { "kind": "box", "size": [40, 40, 20] },
+        { "kind": "shell", "thickness": 2, "open": true }
+      ],
+      "hint": "Click the top face, then press Hollow. Check that the wall field reads 2 and the message says the top is open.",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

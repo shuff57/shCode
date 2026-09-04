@@ -1,0 +1,52 @@
+{
+  "id": "8-1-2-lab-your-first-box",
+  "title": "8.1.2 Lab: Your First Box",
+  "description": "Add your first box in reSHape and set its size in the Dimensions panel. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 3: reSHape: Solid Modelling",
+  "unit": "8.1 Solid Shapes",
+  "preview": "reshape",
+  "mode": "visual",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Add a box",
+      "instructions": "Press the Box tool in the toolbar (the cube icon), then click anywhere in the 3D view to place it.",
+      "hints": [
+        "The Box tool's tooltip reads \"Add a box\" when you hover it.",
+        "A box appears at the center once you click in the 3D view."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Set its size in the Dimensions panel",
+      "instructions": "With the box selected, look at the Dimensions panel on the right. Type 40 in width, 40 in depth, and 20 in height.",
+      "hints": [
+        "The box may already show 40, 40, and 20 — that's fine, those are the numbers you want. Type them in to be sure.",
+        "Each field has a slider above it and a number box below it. Click the number box and type to change it exactly."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A 40 x 40 x 20 mm box",
+      "description": "The part is a single box, 40 mm wide, 40 mm deep, and 20 mm tall.",
+      "type": "model",
+      "expect": [
+        { "kind": "box", "size": [40, 40, 20] }
+      ],
+      "hint": "Press the Box tool, click in the 3D view, then check that width, depth, and height read 40, 40, 20 in the Dimensions panel.",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

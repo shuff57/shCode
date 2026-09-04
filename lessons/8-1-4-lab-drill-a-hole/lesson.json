@@ -1,0 +1,53 @@
+{
+  "id": "8-1-4-lab-drill-a-hole",
+  "title": "8.1.4 Lab: Drill a Hole",
+  "description": "Pick a face and drill a hole through it with the Hole tool. Auto-graded.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 3: reSHape: Solid Modelling",
+  "unit": "8.1 Solid Shapes",
+  "preview": "reshape",
+  "mode": "visual",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Click the top face of the box",
+      "instructions": "You're starting from a 40 x 40 x 20 mm box. Click the flat top face of the box in the 3D view to select it.",
+      "hints": [
+        "Click near the middle of the top face, not near an edge or corner."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Drill the hole",
+      "instructions": "Press the Hole tool in the toolbar. A hole appears through the top of the box. In the Dimensions panel, check that diameter reads 6 — if it doesn't, type 6.",
+      "hints": [
+        "The Hole tool's tooltip reads \"Pick one shape to use\" until you have a face selected.",
+        "The new step shows up in the timeline as \"Hole 1\".",
+        "Look for the field named \"Hole 1 diameter\" in the Dimensions panel."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A 6 mm hole through the box",
+      "description": "The box has a hole 6 mm across, drilled through the top face.",
+      "type": "model",
+      "expect": [
+        { "kind": "box", "size": [40, 40, 20] },
+        { "kind": "hole", "diameter": 6 }
+      ],
+      "hint": "Click the top face, then press Hole. Check that the diameter field reads 6.",
+      "points": 0
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

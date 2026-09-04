@@ -1,0 +1,21 @@
+{
+  "id": "8-1-1-reading-a-part-is-a-list-of-steps",
+  "title": "8.1.1 Reading: A Part Is a List of Steps",
+  "description": "Meet reSHape: a part is a recipe of steps you can always go back and change, in millimetres, shown as buttons or as text.",
+  "type": "lesson",
+  "estimateMins": 8,
+  "category": "Unit 3: reSHape: Solid Modelling",
+  "unit": "8.1 Solid Shapes",
+  "preview": "reading",
+  "slos": [
+    "SLO-2"
+  ],
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
