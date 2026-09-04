@@ -11,7 +11,7 @@
 // needs to know a screen exists -- which is what makes it testable with
 // plain arithmetic instead of a browser.
 
-import { arcFromBulge, bowOf, type Point } from './sketch-arc';
+import { arcFromBulge, bowOf, segmentRoles, type Point } from './sketch-arc';
 import { type Constraint, edgeCorners, edgeLength } from './sketch-solve';
 
 export interface EdgeLabel {
@@ -86,6 +86,72 @@ function centroidOf(points: Point[]): Point {
   return [sx / points.length, sy / points.length];
 }
 
+export interface OutlineTreatments {
+  /** Design corner -> radius, for a corner outlineOf() rounded. */
+  rounds: Record<number, number>;
+  /** Design corner -> distance, for a corner outlineOf() chamfered. */
+  chamfers: Record<number, number>;
+  /** Design edge -> bulge, for an edge the student genuinely bowed. */
+  edgeBulges: Record<number, number>;
+}
+
+/**
+ * Reads back, from a RENDERED outline alone, which design corners carry a
+ * round or a chamfer (and what value to label them with), and separately
+ * which design EDGES carry a genuine bow.
+ *
+ * The split matters because outlineOf() represents a corner's own trim arc
+ * as a bulge too -- at its POSITION in the rendered outline, which is not
+ * the same number as the design edge it sits near once any earlier corner
+ * has already inserted trim points. Handing that raw bulge dict straight to
+ * sketchLabels() as if it were edge-indexed mislabels the corner's own arc
+ * as a bowed edge. Measured 2026-09-04: "Round a corner 1" drew "R3" at the
+ * corner correctly, AND a spurious "+8.28" on the very arc the round had
+ * just created, because the arc's rendered-position bulge collided with a
+ * real edge index once read that way.
+ *
+ * A 'corner' segment (segmentRoles) WITH a bulge is a round, sized by
+ * arcFromBulge's own radius off the same two trim points outlineOf() already
+ * produced; one with no bulge is a chamfer, sized by a trim point's distance
+ * back to the original corner (`design[basis]`) -- the corner itself, not a
+ * derived point, because that is exactly the distance chamferCorner() asked
+ * outlineOf() to cut. A 'edge' segment's bulge, in contrast, IS still keyed
+ * by a real design edge number (nothing has touched that edge), so it passes
+ * through unchanged.
+ */
+export function treatmentsFromOutline(
+  design: Point[],
+  points: Point[],
+  basis: number[],
+  bulges?: Record<number, number>,
+): OutlineTreatments {
+  const rounds: Record<number, number> = {};
+  const chamfers: Record<number, number> = {};
+  const edgeBulges: Record<number, number> = {};
+  const count = points.length;
+  const roles = segmentRoles(basis);
+  for (let i = 0; i < count; i++) {
+    const role = roles[i];
+    if (!role) continue;
+    const bulge = bulges?.[i];
+    if (role.role === 'edge') {
+      if (bulge) edgeBulges[role.index] = bulge;
+      continue;
+    }
+    const corner = role.index;
+    const d = design[corner];
+    if (!d) continue;
+    const a = points[i];
+    const b = points[(i + 1) % count];
+    if (bulge) {
+      rounds[corner] = arcFromBulge(a, b, bulge).radius;
+    } else {
+      chamfers[corner] = Math.hypot(a[0] - d[0], a[1] - d[1]);
+    }
+  }
+  return { rounds, chamfers, edgeBulges };
+}
+
 /**
  * The labels a selected sketch's outline should carry, in plane coordinates.
  *
@@ -95,9 +161,12 @@ function centroidOf(points: Point[]): Point {
  * the Rules panel's own placeholder already reads them -- only the corner
  * itself additionally gets an "R"/"C" label. `bulges` is the LEGACY
  * curved-edge form (a bulge baked directly onto a design edge, from before
- * that refactor): an edge carrying one has no straight length to report, so
- * it is skipped here and given a bow label instead, the same "curved" test
- * SketchConstraints.tsx already uses.
+ * that refactor) OR a genuine bow from "Bow an edge": an edge carrying one
+ * has no straight length to report, so it is skipped here and given a bow
+ * label instead, the same "curved" test SketchConstraints.tsx already uses.
+ * This must be design-edge-indexed, not outline-position-indexed -- see
+ * treatmentsFromOutline's own comment for why those are not the same number
+ * once any corner in the sketch has been rounded or chamfered.
  */
 export function sketchLabels(
   points: Point[],

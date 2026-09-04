@@ -697,6 +697,69 @@ module.exports = function run(dir) {
     && roundLabels.edges.length === 4,
     JSON.stringify(roundLabels.corners));
 
+  // The FULL pipeline HandleOverlay.tsx actually runs: outlineOf() renders
+  // the round as trim points plus a bulge on the arc segment, and that
+  // bulge's KEY is the arc's own POSITION in the rendered outline, not the
+  // design edge number sitting nearest it. Handing that raw bulge dict to
+  // sketchLabels as if it were edge-indexed mislabels the round's own arc as
+  // a bowed edge -- measured 2026-09-04 live: "Round a corner 1" drew "R3"
+  // at the corner AND a spurious "+8.28" on the arc itself.
+  // treatmentsFromOutline is the fix: it reads segmentRoles back off the
+  // RENDERED outline, so a 'corner' segment's bulge becomes a round (never a
+  // bow) regardless of what position it landed at.
+  const renderedRound = arc.outlineOf({ ...square, rounds: { 1: 3 } });
+  const treatments = outline.treatmentsFromOutline(
+    square.points, renderedRound.points, renderedRound.basis, renderedRound.bulges,
+  );
+  check('treatmentsFromOutline recovers the SAME round the direct call above found',
+    treatments.rounds[1] !== undefined && Math.abs(treatments.rounds[1] - 3) < 1e-6
+    && Object.keys(treatments.chamfers).length === 0,
+    JSON.stringify(treatments));
+  check('...and finds no genuinely bowed edge in a doc that only has a round',
+    Object.keys(treatments.edgeBulges).length === 0, JSON.stringify(treatments.edgeBulges));
+
+  const pipelineLabels = outline.sketchLabels(
+    square.points, [], treatments.rounds, treatments.chamfers, treatments.edgeBulges,
+  );
+  check('end to end: rounding corner 1 draws exactly one R label and ZERO bow labels',
+    pipelineLabels.corners.length === 1
+    && pipelineLabels.corners[0].kind === 'round'
+    && pipelineLabels.corners[0].text === 'R3'
+    && pipelineLabels.bows.length === 0,
+    JSON.stringify({ corners: pipelineLabels.corners, bows: pipelineLabels.bows }));
+
+  // Same claim, chamfer side: a chamfer's own trim segment must not read as
+  // a bow either (it has no bulge at all, but the regression is worth
+  // pinning the same way rather than trusting a bulge-less segment "just
+  // works" by accident).
+  const renderedChamfer = arc.outlineOf({ ...square, chamfers: { 2: 4 } });
+  const chamferTreatments = outline.treatmentsFromOutline(
+    square.points, renderedChamfer.points, renderedChamfer.basis, renderedChamfer.bulges,
+  );
+  const chamferPipelineLabels = outline.sketchLabels(
+    square.points, [], chamferTreatments.rounds, chamferTreatments.chamfers, chamferTreatments.edgeBulges,
+  );
+  check('end to end: chamfering corner 2 draws exactly one C label and ZERO bow labels',
+    chamferPipelineLabels.corners.length === 1
+    && chamferPipelineLabels.corners[0].kind === 'chamfer'
+    && chamferPipelineLabels.bows.length === 0,
+    JSON.stringify({ corners: chamferPipelineLabels.corners, bows: chamferPipelineLabels.bows }));
+
+  // Control: a genuinely bowed edge (legacy bulges, no rounds/chamfers at
+  // all -- outlineOf's "pass through untouched" path) must still produce its
+  // bow label through the SAME treatmentsFromOutline adapter, so the fix
+  // above did not just delete bow labels wholesale.
+  const renderedBow = arc.outlineOf({ ...square, bulges: { 0: 0.5 } });
+  const bowTreatments = outline.treatmentsFromOutline(
+    square.points, renderedBow.points, renderedBow.basis, renderedBow.bulges,
+  );
+  const bowPipelineLabels = outline.sketchLabels(
+    square.points, [], bowTreatments.rounds, bowTreatments.chamfers, bowTreatments.edgeBulges,
+  );
+  check('a GENUINELY bowed edge still gets its bow label through the same adapter',
+    bowPipelineLabels.bows.length === 1 && bowPipelineLabels.bows[0].edge === 0,
+    JSON.stringify(bowPipelineLabels.bows));
+
   const chamferLabels = outline.sketchLabels(square.points, [], undefined, { 2: 2.5 });
   check('a chamfered corner gets a "C" label',
     chamferLabels.corners.length === 1

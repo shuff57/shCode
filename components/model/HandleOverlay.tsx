@@ -11,9 +11,9 @@
 // the drag, which is what keeps the model still while a dimension moves.
 
 import { useEffect, useRef, useState } from 'react';
-import { arcFromBulge, segmentRoles, type Point } from '../../lib/sketch-arc';
+import { arcFromBulge, type Point } from '../../lib/sketch-arc';
 import { type Constraint, losingEdges, residualsOf } from '../../lib/sketch-solve';
-import { sketchLabels } from '../../lib/sketch-outline';
+import { sketchLabels, treatmentsFromOutline } from '../../lib/sketch-outline';
 
 /**
  * One selected sketch's outline, in plane coordinates -- what the overlay
@@ -206,40 +206,6 @@ function edgeGlyphs(
   return out;
 }
 
-/**
- * Which design corners carry a round or a chamfer, and what value to label
- * them with -- recovered from the RENDERED outline alone, because
- * `SketchOutline` (SandboxWorkspace.tsx's own carrier) never threads the raw
- * `rounds`/`chamfers` dicts through, only `design`, `points`, `bulges` and
- * `basis`. A 'corner' segment (segmentRoles) WITH a bulge is a round, sized
- * by arcFromBulge's own radius off the same two trim points outlineOf()
- * already produced; one with no bulge is a chamfer, sized by a trim point's
- * distance back to the original corner (`design[basis]`) -- the corner
- * itself, not a derived point, because that distance is exactly what
- * chamferCorner() asked outlineOf() to cut.
- */
-function cornerTreatmentsFrom(o: SketchOutline): { rounds: Record<number, number>; chamfers: Record<number, number> } {
-  const rounds: Record<number, number> = {};
-  const chamfers: Record<number, number> = {};
-  if (o.shape === 'circle') return { rounds, chamfers };
-  const count = o.points.length;
-  const roles = segmentRoles(o.basis);
-  for (let i = 0; i < count; i++) {
-    if (roles[i]?.role !== 'corner') continue;
-    const corner = roles[i].index;
-    const design = o.design[corner];
-    if (!design) continue;
-    const a = o.points[i];
-    const b = o.points[(i + 1) % count];
-    const bulge = o.bulges?.[i];
-    if (bulge) {
-      rounds[corner] = arcFromBulge(a, b, bulge).radius;
-    } else {
-      chamfers[corner] = Math.hypot(a[0] - design[0], a[1] - design[1]);
-    }
-  }
-  return { rounds, chamfers };
-}
 
 /** The outline's screen points, or null when a corner anchor is not on
  *  screen (edge-on plane, same fallback the old flat rendering already had
@@ -547,14 +513,20 @@ export default function HandleOverlay({
             }
             // The actual numbers on the geometry -- "40", "20", "R3" -- not
             // just which rule is set. lib/sketch-outline.ts lays these out in
-            // plane coordinates; the treatments it needs to tell a round from
-            // a chamfer are read back off the RENDERED outline (see
-            // cornerTreatmentsFrom's own comment), because SketchOutline
-            // never carries the raw rounds/chamfers dict through.
-            const { rounds, chamfers } = cornerTreatmentsFrom(o);
+            // plane coordinates; the treatments it needs to tell a round or a
+            // chamfer from a genuinely bowed edge are read back off the
+            // RENDERED outline (see treatmentsFromOutline's own comment),
+            // because SketchOutline never carries the raw rounds/chamfers
+            // dict through -- and o.bulges itself must NOT be handed to
+            // sketchLabels raw: its keys are positions in the rendered
+            // outline, not design edge numbers, once any corner has trim
+            // points inserted ahead of a later edge. Measured 2026-09-04:
+            // that raw hand-off drew a spurious bow label on the very arc a
+            // corner round had just created.
+            const { rounds, chamfers, edgeBulges } = treatmentsFromOutline(o.design, o.points, o.basis, o.bulges);
             const labels = o.shape === 'circle'
               ? { edges: [], corners: [], bows: [] }
-              : sketchLabels(o.design, o.constraints ?? [], rounds, chamfers, o.bulges);
+              : sketchLabels(o.design, o.constraints ?? [], rounds, chamfers, edgeBulges);
             return (
               <g key={n}>
                 <polygon
