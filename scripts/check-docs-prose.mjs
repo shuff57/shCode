@@ -3,36 +3,30 @@
 // vocabulary while the code beside it is reSHape. Body text and code drifted
 // apart when the examples were converted; this measures the gap and keeps it shut.
 import { readFileSync } from 'node:fs';
+import { dslVocabulary } from './reshape-harness.mjs';
 
 const SRC = new URL('../lib/reshape-docs.ts', import.meta.url);
 const text = readFileSync(SRC, 'utf8');
 
-// reSHape replaces exactly twelve names. Those are the ones prose must not
-// teach. Everything else in the app IS JSCAD's own vocabulary used bare —
-// translate, union, subtract, hull, align, colorize — so a page saying
-// "translate hands back a moved copy" is correct, not drift.
-// INVERTED BY THE RENAME. This used to forbid prose from teaching the real
-// @jscad/modeling vocabulary, because the code beside it was reSHape's own
-// words. reSHape now IS those words, so naming cuboid in prose is correct and
-// the drift runs the other way: prose still teaching box, ball or tube names a
-// function that no longer exists. Same gate, opposite list.
-// INVERTED BY THE RENAME. This used to forbid prose from teaching the real
-// @jscad/modeling vocabulary, because the code beside it was reSHape's own
-// words. reSHape now IS those words, so naming cuboid in prose is correct and
-// the drift runs the other way: prose still teaching box, ball or tube names a
-// function that no longer exists.
+// Since 2026-09-03 the code beside the prose is reSHape Script (box, hole,
+// hollow, round, …), so the drift this measures is prose that still teaches a
+// JSCAD call: cuboid(, translate(, union(, the old shim's rect( / ball( / turn-
+// era sit(. The word JSCAD itself is fine (see NAMING below); a CALL a student
+// cannot make is not.
 //
-// EVERY entry is soft -- a call, not a mention. That is not laziness, it is the
-// only line that holds after the rename: "a bounding box", "a ring of radius 4"
-// and "the tube travels along" are ordinary English about the shape and are
-// correct prose, while box( names something a student cannot call any more.
-// Hard-listing the words flagged 105 pages, nearly all of them for writing
-// English.
+// EVERY entry is soft -- a call, not a mention. "a bounding box", "translate
+// that into" and "the union of" are ordinary English and correct prose, while
+// translate( names something a student cannot call any more. A preceding dot
+// is a method (sk.rect(…) is a real sketch call) and is not counted.
 const REPLACED = [];
 
 const REPLACED_SOFT = [
-  'box', 'rect', 'disc', 'ball', 'tube', 'cone', 'ring', 'poly',
-  'extrude', 'revolve',
+  // @jscad/modeling
+  'cuboid', 'cylinderElliptic', 'torus', 'rectangle', 'extrudeLinear', 'extrudeRotate',
+  'translate', 'rotate', 'union', 'subtract', 'intersect', 'hull', 'align', 'colorize',
+  'measureBoundingBox', 'measureVolume',
+  // the JSCAD-era shim's names that reSHape Script does not have
+  'rect', 'disc', 'ball', 'tube', 'poly', 'extrude', 'revolve', 'sit',
 ];
 
 // The boilerplate reSHape does away with. A file in this app has no require
@@ -90,7 +84,7 @@ function hits(body) {
       let at = part.indexOf(name + '(');
       while (at !== -1) {
         const before = at === 0 ? ' ' : part[at - 1];
-        if (!/[A-Za-z0-9_]/.test(before)) { push(name + '()'); break; }
+        if (!/[A-Za-z0-9_.]/.test(before)) { push(name + '()'); break; }
         at = part.indexOf(name + '(', at + 1);
       }
     }
@@ -103,10 +97,7 @@ function hits(body) {
 // has no name for any of them, so their own names are the only ones there are.
 const NOT_TAUGHT = 'beyond';
 
-const RESHAPE_NAMES = [
-  'box', 'rect', 'disc', 'ball', 'tube', 'cone', 'ring', 'poly',
-  'extrude', 'revolve', 'turn', 'sit',
-];
+const RESHAPE_NAMES = dslVocabulary();
 
 /**
  * A comment is prose that happens to sit inside the code block, so it drifts

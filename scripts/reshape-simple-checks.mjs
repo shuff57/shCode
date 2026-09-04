@@ -385,7 +385,7 @@ export const TURN_IN_PLACE = [
  *
  * So "the order you apply transforms in changes the answer" — §9.2's
  * composition topic — is NOT observable through turn. That is a thing turn
- * takes away, it is stated in reshape.js's banner and in reference.md, and both
+ * takes away, it is stated in reshape.js's banner and in jscad-legacy.md, and both
  * halves are asserted here so neither claim can rot: `commutes` failing would
  * mean turn had stopped rotating in place, and `rotateCommutes` becoming true
  * would mean the library's rotate had changed under the whole argument.
@@ -528,11 +528,11 @@ export const REFUSALS_NAME_THE_REAL_CALL = [
  * reSHape replaces, and three of the mappings (extrudeRotate -> revolve,
  * align -> sit, rotate -> turn) cannot be guessed backwards at all.
  *
- * So reference.md carries both directions and this pins the second one: every
+ * So jscad-legacy.md carries both directions and this pins the second one: every
  * name reSHape stands in for has a row, pointing at the reSHape word for it.
  */
 export const REVERSE_LOOKUP = {
-  path: join(REPO, 'public/reshape/docs/reference.md'),
+  path: join(REPO, 'public/reshape/docs/jscad-legacy.md'),
   heading: '#### Reading the book',
   /** real name in the left cell -> the reSHape name its right cell must name. */
   // Ten rows are GONE, not lost: cuboid -> cuboid is not a lookup. Since reSHape
@@ -573,13 +573,13 @@ export const REVERSE_LOOKUP = {
 };
 
 /**
- * Read a two-column table of ``real`` -> ``reshape`` out of reference.md, the
+ * Read a two-column table of ``real`` -> ``reshape`` out of jscad-legacy.md, the
  * same way readGraduationTable reads the forward one.
  */
 export function readReverseTable(text = readFileSync(REVERSE_LOOKUP.path, 'utf8')) {
   const lines = text.replace(/\r\n/g, '\n').split('\n');
   const start = lines.indexOf(REVERSE_LOOKUP.heading);
-  if (start === -1) return { error: `reference.md has no "${REVERSE_LOOKUP.heading}" heading` };
+  if (start === -1) return { error: `jscad-legacy.md has no "${REVERSE_LOOKUP.heading}" heading` };
   const rows = [];
   let seen = false;
   for (let i = start + 1; i < lines.length; i++) {
@@ -786,7 +786,7 @@ export const ARITY_GUARDS = [
  * `tubeRadius` has a second, smaller version of it: read as the tube's
  * THICKNESS rather than its radius, torus(14, 8) comes out 44 x 44 x 16.
  *
- * So the honest claim — the one reference.md and the banner now make, and the
+ * So the honest claim — the one jscad-legacy.md and the banner now make, and the
  * one that is still enough to justify the name — is narrower than "both of
  * ring's words are true":
  *
@@ -854,7 +854,7 @@ export const RING_ARITHMETIC = {
  * It is a real crossover cost and it belongs next to poly wherever poly is
  * explained, so this is pinned as data and asserted rather than described.
  * `alsoBare` is the reason it is a trap rather than a rule: `line`, the other
- * points-taking primitive in reference.md's catalogue, really does take its
+ * points-taking primitive in jscad-legacy.md's catalogue, really does take its
  * array bare, so "some of them do" is the truth a student has to carry.
  */
 export const POLY_BARE_ARRAY = {
@@ -1106,7 +1106,7 @@ export const INTEROP = [
 /**
  * THE GRADUATION TABLE, AS AN ANSWER KEY RATHER THAN A DESCRIPTION.
  *
- * reference.md's "#### The nine names" table is the one document a student
+ * jscad-legacy.md's "#### The nine names" table is the one document a student
  * reads at the moment they leave reSHape, and it is the only place the real call
  * is written out for them to copy. EQUIVALENTS above proves reshape.js matches
  * the real API; it proves nothing about what that table SAYS, so the two could
@@ -1125,7 +1125,7 @@ export const INTEROP = [
  * The table cannot be wrong again without the gate going red.
  */
 export const GRADUATION = {
-  path: join(REPO, 'public/reshape/docs/reference.md'),
+  path: join(REPO, 'public/reshape/docs/jscad-legacy.md'),
   heading: '#### The twelve names',
 
   /**
@@ -1161,14 +1161,14 @@ export const GRADUATION = {
 };
 
 /**
- * Pull the graduation table out of reference.md as rows. Both cells are read as
+ * Pull the graduation table out of jscad-legacy.md as rows. Both cells are read as
  * their FIRST backticked span, which is how the table is written: the code
  * first, any commentary after it.
  */
 export function readGraduationTable(text = readFileSync(GRADUATION.path, 'utf8')) {
   const lines = text.replace(/\r\n/g, '\n').split('\n');
   const start = lines.indexOf(GRADUATION.heading);
-  if (start === -1) return { error: `reference.md has no "${GRADUATION.heading}" heading` };
+  if (start === -1) return { error: `jscad-legacy.md has no "${GRADUATION.heading}" heading` };
 
   const rows = [];
   let seen = false;
@@ -1198,7 +1198,7 @@ export function readGraduationTable(text = readFileSync(GRADUATION.path, 'utf8')
 export function createGraduationContext() {
   const ctx = createSimpleContext();
   vm.runInContext(GRADUATION.bindings, ctx.ctx, { filename: 'graduation-bindings' });
-  ctx.evaluate = (expr) => vm.runInContext(`(${expr})`, ctx.ctx, { filename: 'reference.md' });
+  ctx.evaluate = (expr) => vm.runInContext(`(${expr})`, ctx.ctx, { filename: 'jscad-legacy.md' });
   return ctx;
 }
 
@@ -1369,7 +1369,7 @@ export function sameModel(jscad, a, b) {
  * gate: an assertion named below, which fails their build if the generator ever
  * reverses its build-at-origin-then-translate ordering.
  *
- * reference.md therefore CITES that assertion instead of restating the fact.
+ * jscad-legacy.md therefore CITES that assertion instead of restating the fact.
  * A doc sentence and a test drift apart silently; a doc that points at a
  * build-failing test cannot go stale without someone noticing — provided the
  * thing it points at still exists. That is what this check is for.
@@ -1381,7 +1381,7 @@ export function sameModel(jscad, a, b) {
  * undertaking rather than a substitute for it.
  *
  * If it ever goes red: find what the assertion was renamed to, update `name`
- * here AND the citation in reference.md together. Do not delete the check to
+ * here AND the citation in jscad-legacy.md together. Do not delete the check to
  * make it green — that is the citation rotting, which is the whole thing this
  * exists to prevent.
  */
@@ -1405,7 +1405,7 @@ export const BORROWED_ASSERTION = BORROWED_ASSERTIONS[0];
 
 // ===========================================================================
 // THE BRIDGE — every call the seven written Q3 chapters make, and the row in
-// reference.md that answers it.
+// jscad-legacy.md that answers it.
 // ===========================================================================
 //
 // REVERSE_LOOKUP above asks a narrow question: does every name reSHape stands in
@@ -1442,7 +1442,7 @@ export const BOOK_CENSUS = {
   /**
    * name -> how many times the chapters CALL it in runnable code.
    * Every one of these must be a real export of the vendored bundle, and must
-   * have a row in one of reference.md's two bridge tables — never both.
+   * have a row in one of jscad-legacy.md's two bridge tables — never both.
    */
   calls: {
     circle: 59, rectangle: 31, translate: 27, cuboid: 24, subtract: 13, cube: 12,
@@ -1565,7 +1565,7 @@ export const ASSIGNMENT_POOL = {
 
   /**
    * The softener nobody had measured, recorded because it is larger than
-   * anything the three new names did: reference.md's own primitives catalogue
+   * anything the three new names did: jscad-legacy.md's own primitives catalogue
    * publishes the option signature of every surviving target, lib/reshape-docs.ts
    * mirrors it under the SYNC gate, and /docs/reshape serves it in-app. "Using
    * only the JSCAD documentation" is therefore satisfiable without leaving
@@ -1577,14 +1577,14 @@ export const ASSIGNMENT_POOL = {
 };
 
 /**
- * Where reference.md answers each half of the census.
+ * Where jscad-legacy.md answers each half of the census.
  *
  * Two tables, deliberately separate. The first is the reverse lookup
  * REVERSE_LOOKUP already reads. The second is the one that did not exist: a row
  * per name reSHape has NO word for, saying so, because silence reads as safety.
  */
 export const BRIDGE = {
-  path: join(REPO, 'public/reshape/docs/reference.md'),
+  path: join(REPO, 'public/reshape/docs/jscad-legacy.md'),
   reshapeWordHeading: REVERSE_LOOKUP.heading,
   noWordHeading: "#### The book's other names — type what the book typed",
   tauHeading: '#### `TAU` is a value, not a name in scope',
@@ -1599,7 +1599,7 @@ export const BRIDGE = {
 export function readBridgeTable(heading, text = readFileSync(BRIDGE.path, 'utf8')) {
   const lines = text.replace(/\r\n/g, '\n').split('\n');
   const start = lines.indexOf(heading);
-  if (start === -1) return { error: `reference.md has no "${heading}" heading` };
+  if (start === -1) return { error: `jscad-legacy.md has no "${heading}" heading` };
   const rows = [];
   for (let i = start + 1; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -1665,7 +1665,7 @@ export const BRIDGE_WARNINGS = [
     why: 'extrude has no options object at all, so it has no twistAngle either, and three of '
       + "§9.1's five extrudeLinear calls carry one. Found by sweeping the chapters for object "
       + 'KEYS rather than call names, the same way the parameter-type hole was found: `extrude` '
-      + 'had a plain rename row, `twistAngle` appeared nowhere in reference.md at all, and the '
+      + 'had a plain rename row, `twistAngle` appeared nowhere in jscad-legacy.md at all, and the '
       + 'in-app docs taught it — two doc surfaces disagreeing again, in the direction that '
       + 'leaves the file a student is told to keep open the poorer of the two',
   },
@@ -1706,7 +1706,7 @@ export const SIT_VS_BOOK_ALIGN = {
  * reSHape's `revolve` exists to serve.
  *
  * This is not fixed by adding a name. runner.html installs the scope and this
- * layer adds no tenth word, so the fix is that reference.md says what to type
+ * layer adds no tenth word, so the fix is that jscad-legacy.md says what to type
  * and reSHape's own refusals spell a call that runs. Both are checked.
  *
  * `inScope: false` is asserted, not assumed. The day the runner does install a
@@ -1873,7 +1873,7 @@ export const BOOK_OPTION_KEYS = [
  * layer ships each appear in a worked example rather than only in a table.
  */
 export const OBJECT_DEPTH = {
-  path: join(REPO, 'public/reshape/docs/reference.md'),
+  path: join(REPO, 'public/reshape/docs/jscad-legacy.md'),
   heading: '## reSHape — the simplified names',
   endsBefore: '## Modules',
 
@@ -1953,13 +1953,13 @@ export function liveObjectLiterals(code) {
   return out;
 }
 
-/** The slice of reference.md the reSHape layer owns. */
+/** The slice of jscad-legacy.md the reSHape layer owns. */
 export function reshapeSection(text = readFileSync(OBJECT_DEPTH.path, 'utf8')) {
   const src = text.replace(/\r\n/g, '\n');
   const start = src.indexOf(OBJECT_DEPTH.heading);
-  if (start === -1) return { error: `reference.md has no "${OBJECT_DEPTH.heading}" heading` };
+  if (start === -1) return { error: `jscad-legacy.md has no "${OBJECT_DEPTH.heading}" heading` };
   const end = src.indexOf(OBJECT_DEPTH.endsBefore, start);
-  if (end === -1) return { error: `reference.md has no "${OBJECT_DEPTH.endsBefore}" heading after it` };
+  if (end === -1) return { error: `jscad-legacy.md has no "${OBJECT_DEPTH.endsBefore}" heading after it` };
   const body = src.slice(start, end);
   const line = src.slice(0, start).split('\n').length;
   return { body, line };
@@ -1986,13 +1986,13 @@ export function evaluateInShcad(bindings, expr) {
 // Measured: a reSHape-only reader translated every one of §8.5's 28 calls and
 // then stopped dead on line two of its first parameter block —
 // `{ name: 'ringRadius', type: 'float', ... }`. `float` appeared nowhere in
-// anything shCode shipped: not in reference.md's four-row type table, not on
+// anything shCode shipped: not in jscad-legacy.md's four-row type table, not on
 // any bridge table, and the in-app docs said "THREE of the types hand you a
 // number" — which does not merely omit `float`, it counts the numeric types
 // and gets the wrong answer, so the docs actively denied it existed. One line
-// earlier, `type: 'int'` had the same problem for anyone reading reference.md
-// alone: the in-app docs teach `int` and `slider`, reference.md listed
-// neither, and reference.md is the file the reSHape section tells a student to
+// earlier, `type: 'int'` had the same problem for anyone reading jscad-legacy.md
+// alone: the in-app docs teach `int` and `slider`, jscad-legacy.md listed
+// neither, and jscad-legacy.md is the file the reSHape section tells a student to
 // keep open while reading.
 //
 // The answer is one sentence, and it is what the checks below pin rather than
@@ -2002,7 +2002,7 @@ export function evaluateInShcad(bindings, expr) {
 // has been correctly trained not to guess.
 
 export const PARAM_TYPES = {
-  path: join(REPO, 'public/reshape/docs/reference.md'),
+  path: join(REPO, 'public/reshape/docs/jscad-legacy.md'),
   inApp: join(REPO, 'lib/reshape-docs.ts'),
 
   /** The book -> shCode table, in the reSHape section. */
@@ -2030,7 +2030,7 @@ export const PARAM_TYPES = {
   totalDefinitions: 27,
 
   /**
-   * Every type reference.md's own table has to carry a row for: the seven the
+   * Every type jscad-legacy.md's own table has to carry a row for: the seven the
    * chapters print, plus `text` and `color`, which the in-app docs teach with
    * a worked example each. A type taught on one surface and absent from the
    * other is how this went wrong the first time.
@@ -2097,7 +2097,7 @@ export const PARAM_TYPES = {
 export function readFirstColumn(heading, text = readFileSync(PARAM_TYPES.path, 'utf8')) {
   const lines = text.replace(/\r\n/g, '\n').split('\n');
   const start = lines.indexOf(heading);
-  if (start === -1) return { error: `reference.md has no "${heading}" heading` };
+  if (start === -1) return { error: `jscad-legacy.md has no "${heading}" heading` };
   const rows = [];
   for (let i = start + 1; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -2121,24 +2121,24 @@ function main(params) { globalThis.__seen = params; return cuboid(10, 10, 10) }`
 
 
 /**
- * EVERY OPTION KEY THE CHAPTERS TYPE, AND WHETHER reference.md WRITES IT.
+ * EVERY OPTION KEY THE CHAPTERS TYPE, AND WHETHER jscad-legacy.md WRITES IT.
  *
  * This is the generalised wall behind two stalls that were found by hand, one
  * per round, both of the same shape: a word the book prints INSIDE an object
  * literal rather than as a call, so no census counted it and no bridge table
  * covered it.
  *
- *   round 1  `type: 'float'` (§8.5). reference.md's parameter table had four
+ *   round 1  `type: 'float'` (§8.5). jscad-legacy.md's parameter table had four
  *            rows and the book prints seven types. See PARAM_TYPES.
  *   round 2  `twistAngle` / `twistSteps` (§9.1, three runnable editors).
  *            `extrudeLinear` had a plain rename row pointing at `extrude`,
  *            which has no options object at all — and the two words appeared
- *            NOWHERE in reference.md, while the in-app docs taught both.
+ *            NOWHERE in jscad-legacy.md, while the in-app docs taught both.
  *
  * Both times the defect was the same one: two doc surfaces disagreeing, with
- * reference.md — the file the reSHape section tells a student to keep open while
+ * jscad-legacy.md — the file the reSHape section tells a student to keep open while
  * reading — the poorer of the two. So the list below is swept rather than
- * spot-checked. A key here must be WRITTEN in reference.md, inside backticks,
+ * spot-checked. A key here must be WRITTEN in jscad-legacy.md, inside backticks,
  * not merely implied by the function that takes it.
  *
  * Measured the same way as BOOK_CENSUS: object-literal keys inside the 209
@@ -2147,7 +2147,7 @@ function main(params) { globalThis.__seen = params; return cuboid(10, 10, 10) }`
  * belong to a student's own object rather than to the library.
  */
 export const BOOK_OPTION_WORDS = {
-  path: join(REPO, 'public/reshape/docs/reference.md'),
+  path: join(REPO, 'public/reshape/docs/jscad-legacy.md'),
 
   /** key -> the call that takes it, for the failure message. */
   keys: {
@@ -2183,7 +2183,7 @@ export const BOOK_OPTION_WORDS = {
    * And the keys reSHape's own refusals SPELL OUT. Three of the twelve names hand
    * a student a real call carrying a key the layer does not offer — cone's
    * frustum and pie slice, ring's segmented torus. REFUSAL_CALLS proves those
-   * calls run; this proves reference.md writes the words, so a student who met
+   * calls run; this proves jscad-legacy.md writes the words, so a student who met
    * one in an error message can look it up in the file they were told to keep
    * open rather than only in the error.
    */

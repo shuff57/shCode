@@ -39,6 +39,11 @@ export const PATHS = {
   runner: join(REPO, 'public/reshape/runner.html'),
   inAppDocs: join(REPO, 'lib/reshape-docs.ts'),
   reference: join(REPO, 'public/reshape/docs/reference.md'),
+  // The JSCAD reference, verbatim, behind ?engine=jscad. reference.md and
+  // lib/reshape-docs.ts teach reSHape Script now (2026-09-03); every check
+  // that measures the JSCAD shim reads THIS file.
+  legacyReference: join(REPO, 'public/reshape/docs/jscad-legacy.md'),
+  script: join(REPO, 'lib/reshape-script.ts'),
 };
 
 // ---- artifacts ------------------------------------------------------------
@@ -312,23 +317,45 @@ export function inAppExamples() {
 }
 
 /**
- * reference.md's ```js fences. An info string beyond `js` is carried through as
- * a tag; `shcode-only` is the one tag the gate understands (see test-reshape.mjs).
+ * A markdown file's ```js fences. An info string beyond `js` is carried through
+ * as a tag; `shcode-only` is the one tag the gate understands (see
+ * test-reshape.mjs).
  */
-export function referenceExamples() {
-  const src = read(PATHS.reference);
+function fencesOf(path, source) {
+  const src = read(path);
   const out = [];
   const rx = /^```js([^\n]*)\n([\s\S]*?)^```/gm;
   let m;
   while ((m = rx.exec(src)) !== null) {
     out.push({
-      source: 'public/reshape/docs/reference.md',
+      source,
       line: src.slice(0, m.index).split('\n').length + 1,
       code: m[2],
       tags: (m[1] || '').trim().split(/\s+/).filter(Boolean),
     });
   }
   return out;
+}
+
+/** reference.md: reSHape Script. Run on the kernel by test-reshape-script.mjs. */
+export function referenceExamples() {
+  return fencesOf(PATHS.reference, 'public/reshape/docs/reference.md');
+}
+
+/** jscad-legacy.md: the JSCAD reference. Every fence is held to jscad.app portability. */
+export function legacyExamples() {
+  return fencesOf(PATHS.legacyReference, 'public/reshape/docs/jscad-legacy.md');
+}
+
+/**
+ * The reSHape Script vocabulary, read out of lib/reshape-script.ts so the doc
+ * sync check follows the language rather than a copy of its word list.
+ */
+export function dslVocabulary() {
+  const src = read(PATHS.script);
+  const m = src.match(/export const VOCABULARY = \[([\s\S]*?)\]/);
+  if (!m) throw new Error('lib/reshape-script.ts has no `export const VOCABULARY = [` -- the scan needs updating');
+  return [...m[1].matchAll(/'([A-Za-z]+)'/g)].map((x) => x[1]);
 }
 
 export function docExamples() {
@@ -381,4 +408,5 @@ export function docBodyOf(ts) {
 export const docText = {
   inApp: () => docBodyOf(read(PATHS.inAppDocs)),
   reference: () => read(PATHS.reference),
+  legacy: () => read(PATHS.legacyReference),
 };

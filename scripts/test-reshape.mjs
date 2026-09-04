@@ -15,11 +15,14 @@
 //   RENDERER  every regl symbol runner.html reaches resolves, and the camera /
 //             orbit / entity wiring runs. 160 lines of renderer code that no
 //             test touches is 160 lines that are correct by assertion only.
-//   DOCS      every example in lib/reshape-docs.ts and public/reshape/docs/
-//             reference.md runs in a require-only context — the jscad.app
-//             environment, with the shim subtracted back out.
-//   SYNC      the in-app docs and reference.md document the same API surface.
-//             public/reshape/docs/CLAUDE.md states this rule; this enforces it.
+//   DOCS      every example in public/reshape/docs/jscad-legacy.md runs in a
+//             require-only context — the jscad.app environment, with the shim
+//             subtracted back out. (reference.md and lib/reshape-docs.ts teach
+//             reSHape Script since 2026-09-03; test-reshape-script.mjs runs
+//             every one of those examples on the B-rep kernel.)
+//   SYNC      the in-app docs and reference.md document the same reSHape
+//             Script vocabulary. public/reshape/docs/CLAUDE.md states this
+//             rule; this enforces it.
 //   REACH     something a student can actually click loads this runtime. The
 //             other six groups all measure whether the runtime is CORRECT;
 //             none of them noticed that for the whole of the first build
@@ -39,10 +42,11 @@ import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import vm from 'node:vm';
 import { join, relative } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import {
   REPO, PATHS, extractShim, runnerSource, loadModeling, loadRenderer,
   createShimContext, createRequireOnlyContext, runProgram, isGeometry,
-  docExamples, apiNames, documentedNames, docText, captureConsole,
+  legacyExamples, referenceExamples, inAppExamples, dslVocabulary, apiNames, documentedNames, docText, captureConsole,
 } from './reshape-harness.mjs';
 import {
   EXPECTED_BUNDLES,
@@ -317,16 +321,16 @@ check('module.exports is the real CommonJS surface', () => {
 at('api');
 
 const taught = (() => {
-  const derived = taughtFromReference(docText.reference());
+  const derived = taughtFromReference(docText.legacy());
   const seen = new Set(derived.map((t) => `${t.module}.${t.name}`));
   return [...derived, ...CORE_TAUGHT.filter((t) => !seen.has(`${t.module}.${t.name}`))];
 })();
 
 check('the reference still documents the core taught API', () => {
-  const derived = new Set(taughtFromReference(docText.reference()).map((t) => `${t.module}.${t.name}`));
+  const derived = new Set(taughtFromReference(docText.legacy()).map((t) => `${t.module}.${t.name}`));
   const missing = CORE_TAUGHT.filter((t) => !derived.has(`${t.module}.${t.name}`));
   return missing.length
-    ? `reference.md no longer documents ${missing.map((t) => `${t.module}.${t.name}`).join(', ')}`
+    ? `jscad-legacy.md no longer documents ${missing.map((t) => `${t.module}.${t.name}`).join(', ')}`
     : true;
 });
 
@@ -488,7 +492,7 @@ check('the grid and axis draw commands the runner names exist', () => {
 
 at('docs');
 
-const examples = docExamples();
+const examples = legacyExamples();
 
 check('the doc example extractors still find the examples', () => {
   return examples.length >= MIN_DOC_EXAMPLES
@@ -496,40 +500,21 @@ check('the doc example extractors still find the examples', () => {
     : `only ${examples.length} examples extracted — an extractor has broken`;
 });
 
-check('every fence tag in reference.md is one the gate understands', () => {
+check('every fence tag in jscad-legacy.md is one the gate understands', () => {
   const known = new Set(['js', ...Object.keys(FENCE_TAGS)]);
   const bad = [];
   for (const e of examples) for (const t of e.tags) if (!known.has(t)) bad.push(`${e.source}:${e.line} "${t}"`);
   return bad.length ? `unknown fence tag: ${bad.join(', ')}` : true;
 });
 
-// TWO CONTRACTS, BECAUSE THE TWO DOCUMENTS DO DIFFERENT JOBS.
-//
-// lib/reshape-docs.ts is what a student reads at /docs/reshape, and it is now
-// written in reSHape words -- bare names, no require(), box rather than
-// primitives.cuboid. Those examples CANNOT run on jscad.app by construction, so
-// holding them to that bar would fail the docs for being what the course
-// teaches. They are held to the bar that applies: they must run HERE, in the
-// runner a student actually has.
-//
-// reference.md keeps the old contract. It is the bridge document -- it carries
-// the graduation tables and has to show the real API working -- so every fence
-// there stays portable unless it is tagged shcode-only, and a tag on a fence
-// that would run portably is still a failure.
+// jscad-legacy.md is the bridge document -- it carries the graduation tables
+// and has to show the real API working -- so every fence there stays portable
+// unless it is tagged shcode-only, and a tag on a fence that would run
+// portably is still a failure. The reSHape Script documents (reference.md,
+// lib/reshape-docs.ts) cannot run on jscad.app by construction and are held to
+// their own bar in test-reshape-script.mjs: every example builds on the kernel.
 for (const e of examples) {
   const label = `${e.source}:${e.line}`;
-  const inApp = e.source.endsWith('reshape-docs.ts');
-
-  if (inApp) {
-    check(`runs in the reSHape runner — ${label}`, () => {
-      const cap = captureConsole();
-      const { ctx } = createSimpleContext({ consoleImpl: cap.console });
-      const r = runProgram(ctx, e.code, label, { lineOffset: e.line - 1 });
-      if (!r.ok) return `${r.phase}: ${r.error.message}`;
-      return true;
-    });
-    continue;
-  }
 
   check(`runs on jscad.app — ${label}`, () => {
     const cap = captureConsole();
@@ -569,9 +554,8 @@ for (const e of examples) {
 
 at('sync');
 
-check('the in-app docs and reference.md document the same API', () => {
-  const { jscad } = loadModeling();
-  const candidates = [...apiNames(jscad).keys()];
+check('the in-app docs and reference.md document the same reSHape Script vocabulary', () => {
+  const candidates = dslVocabulary();
   const inApp = documentedNames(docText.inApp(), candidates);
   const ref = documentedNames(docText.reference(), candidates);
   const allow = new Map(DOC_SYNC_EXCEPTIONS.map((x) => [x.name, x.only]));
@@ -586,8 +570,8 @@ check('the in-app docs and reference.md document the same API', () => {
 });
 
 check('the sync check is actually looking at both files', () => {
-  const { jscad } = loadModeling();
-  const candidates = [...apiNames(jscad).keys()];
+  const candidates = dslVocabulary();
+  if (candidates.length < 20) return `only ${candidates.length} names read from lib/reshape-script.ts — the vocabulary scan has broken`;
   const inApp = documentedNames(docText.inApp(), candidates).size;
   const ref = documentedNames(docText.reference(), candidates).size;
   return inApp >= 20 && ref >= 20 ? true : `in-app ${inApp}, reference ${ref} — a doc scan has broken`;
@@ -751,9 +735,17 @@ check('reshape.js is vendored in public/reshape and loaded by the runner', () =>
 // rename lost real time to exactly that. It also catches a shadow that happens
 // NOT to break yet, which is the one that breaks later.
 check('no doc example names a variable after a shape function', () => {
-  const owned = new Set([...OWNED_NAMES, ...RESHAPE_NAMES.map((n) => n.name)]);
+  // The JSCAD reference owns the shim's names; the reSHape Script documents
+  // own the script vocabulary (a `const holes = …` there is the same TDZ trap).
+  const shimOwned = new Set([...OWNED_NAMES, ...RESHAPE_NAMES.map((n) => n.name)]);
+  const dslOwned = new Set(dslVocabulary());
+  const all = [
+    ...legacyExamples().map((ex) => ({ ex, owned: shimOwned })),
+    ...referenceExamples().map((ex) => ({ ex, owned: dslOwned })),
+    ...inAppExamples().map((ex) => ({ ex, owned: dslOwned })),
+  ];
   const bad = [];
-  for (const ex of docExamples()) {
+  for (const { ex, owned } of all) {
     // Fresh regex per example: one shared /g regex carries lastIndex between
     // examples and can scan a later one from the wrong offset.
     const rx = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)/g;
@@ -853,35 +845,34 @@ check('each measure wrapper returns exactly what the library returns', () => {
   return true;
 });
 
-// The /sandbox mode labelled reSHape must actually BE reSHape. It was not:
-// the starter shipped `require('@jscad/modeling')` plus primitives.cuboid and
-// booleans.subtract, so a student clicking the reSHape tab met not one reSHape
-// name. Nothing gated it, which is how it drifted -- so this asserts both
-// halves: the vocabulary, and that the thing still builds.
-check('the sandbox reSHape starter is written in reSHape', () => {
+// The /sandbox mode labelled reSHape must actually BE reSHape. It was not,
+// once: the starter shipped `require('@jscad/modeling')` plus
+// primitives.cuboid and booleans.subtract, so a student clicking the reSHape
+// tab met not one reSHape name. Nothing gated it, which is how it drifted --
+// so this asserts both halves: the vocabulary, and that the thing still runs.
+// Since 2026-09-03 the starter is reSHape Script, and "runs" means the compiled
+// runtime that script-runner.html loads turns it into a document with steps.
+const SCRIPT_RUNTIME = join(REPO, 'public/reshape/kernel/reshape-script.js');
+const scriptRuntime = existsSync(SCRIPT_RUNTIME) ? await import(pathToFileURL(SCRIPT_RUNTIME).href) : null;
+
+check('the sandbox reSHape starter is written in reSHape Script', () => {
   const src = readFileSync(join(REPO, 'lib/sandbox-modes.ts'), 'utf8');
   const m = src.match(/const RESHAPE_STARTER = `([\s\S]*?)`;/);
   if (!m) return 'RESHAPE_STARTER is gone from lib/sandbox-modes.ts';
   const code = m[1];
-  const leaked = ['require(', 'primitives.', 'booleans.', 'transforms.', 'extrusions.']
+  const leaked = ['require(', 'primitives.', 'booleans.', 'transforms.', 'extrusions.', 'cuboid(', 'main(', 'getParameterDefinitions']
     .filter((t) => code.includes(t));
-  if (leaked.length) return `the starter still reaches for the real API: ${leaked.join(', ')}`;
-  const names = ['cuboid', 'rectangle', 'circle', 'sphere', 'cylinder', 'cylinderElliptic', 'torus', 'polygon',
-    'extrudeLinear', 'extrudeRotate', 'turn', 'sit'].filter((n) => code.includes(`${n}(`));
-  if (!names.length) return 'the starter calls no reSHape name at all';
+  if (leaked.length) return `the starter still speaks JSCAD: ${leaked.join(', ')}`;
+  const names = dslVocabulary().filter((n) => code.includes(`${n}(`));
+  if (!names.length) return 'the starter calls no reSHape Script name at all';
 
-  // And it builds -- on every branch its own parameters can take.
-  const { ctx, jscad } = createSimpleContext();
-  vm.runInContext(`${code}
-;globalThis.__d = getParameterDefinitions(); globalThis.__m = main;`, ctx);
-  const defs = Object.fromEntries(ctx.__d.map((d) => [d.name, d.initial]));
-  for (const tweak of [{}, { round: 0 }, { hole: 0 }]) {
-    const out = ctx.__m({ ...defs, ...tweak });
-    if (!jscad.geometries.geom3.isA(out)) {
-      return `the starter builds nothing solid with ${JSON.stringify(tweak)}`;
-    }
-  }
-  return true;
+  // And it runs, in the runtime a student actually has.
+  if (!scriptRuntime) return `${relative(REPO, SCRIPT_RUNTIME)} is not built — run node scripts/build-brep-kernel.mjs`;
+  const r = scriptRuntime.runScript(code);
+  const errs = Array.isArray(r && r.errors) ? r.errors : [];
+  if (errs.length) return `the starter does not run: ${String(errs[0].message || errs[0]).slice(0, 160)}`;
+  const n = r && r.doc && Array.isArray(r.doc.features) ? r.doc.features.length : 0;
+  return n >= 2 ? true : `the starter produced ${n} step(s); a starter shows at least a shape and one step on it`;
 });
 
 // extrude takes a path2, because extrudeLinear does. §8.1 turns a vectorText
@@ -1093,7 +1084,7 @@ for (const t of TURN_COMPOSITION) {
     const movedThenTurned = w.turn(t.degrees, w.translate(t.move, t.build(w)));
     if (!sameModel(jscad, turnedThenMoved, movedThenTurned)) {
       return 'turn no longer commutes with translate — it has stopped rotating in place, '
-        + 'and the banner in reshape.js plus the reference.md section on it are now wrong';
+        + 'and the banner in reshape.js plus the jscad-legacy.md section on it are now wrong';
     }
 
     const spunThenMoved = w.translate(t.move, w.rotate(t.radians, t.build(w)));
@@ -1113,12 +1104,12 @@ check('the loss turn causes is written down where a student will read it', () =>
   // with turn the order makes no difference at all. It must not come back.
   // (\s+ spans the line wrap either way round, CRLF included.)
   if (/teaches why you build\s+at the origin/.test(md)) {
-    return 'reference.md still claims turn teaches the build-at-the-origin lesson — '
+    return 'jscad-legacy.md still claims turn teaches the build-at-the-origin lesson — '
       + 'turn is the one name that makes that lesson impossible to observe';
   }
   return /cannot be shown with `turn`/i.test(md)
     ? true
-    : 'reference.md does not say that the order of transforms cannot be shown with turn';
+    : 'jscad-legacy.md does not say that the order of transforms cannot be shown with turn';
 });
 
 at('svg');
@@ -1184,7 +1175,7 @@ check('svg: the runner offers the button and loads the file', () => {
   return /svg:\s*\{\s*name: 'design\.svg'/.test(html) ? true : 'svg is not in FORMATS';
 });
 
-// reference.md cites another session's assertion instead of restating the
+// jscad-legacy.md cites another session's assertion instead of restating the
 // world-origin fact. That citation is only worth more than a paragraph while
 // the thing it points at still exists — so the rename breaks OUR build, which
 // is where the maintenance burden belongs.
@@ -1192,7 +1183,7 @@ for (const b of BORROWED_ASSERTIONS) {
   check(`the borrowed assertion still exists: "${b.name}"`, () => {
     const md = readFileSync(GRADUATION.path, 'utf8');
     if (!md.includes(b.name)) {
-      return `reference.md no longer cites "${b.name}" in ${b.cited} — if the citation was `
+      return `jscad-legacy.md no longer cites "${b.name}" in ${b.cited} — if the citation was `
         + 'removed on purpose, remove its BORROWED_ASSERTIONS entry too; a half-removed '
         + 'citation is the rot';
     }
@@ -1200,14 +1191,14 @@ for (const b of BORROWED_ASSERTIONS) {
     try {
       src = readFileSync(join(REPO, b.file), 'utf8');
     } catch {
-      return `${b.file} is gone, and reference.md sends a student to it. `
+      return `${b.file} is gone, and jscad-legacy.md sends a student to it. `
         + `Owned by ${b.owner} — ask them where it went, then fix both.`;
     }
     return src.includes(b.name)
       ? true
       : `${b.file} no longer contains the assertion "${b.name}". It was renamed or deleted `
         + `by ${b.owner}. Find the new name, then update BORROWED_ASSERTIONS and the citation `
-        + 'in reference.md TOGETHER. Do not delete this check to go green — that is the '
+        + 'in jscad-legacy.md TOGETHER. Do not delete this check to go green — that is the '
         + 'citation rotting, which is what it exists to catch.';
   });
 }
@@ -1421,7 +1412,7 @@ for (const m of RING_ARITHMETIC.misread) {
 // ring's none, which made the case for ring look stronger than it is: reading
 // `ringRadius` as the donut's outer edge is exactly as available as reading
 // `outerRadius` that way, and it builds the byte-identical wrong model. The
-// published table in reference.md carries these two rows for the same reason.
+// published table in jscad-legacy.md carries these two rows for the same reason.
 for (const m of RING_ARITHMETIC.ownMisread) {
   check(`ring's OWN misreading builds silently too — ${m.what}`, () => {
     const { window: w } = createSimpleContext();
@@ -1429,14 +1420,14 @@ for (const m of RING_ARITHMETIC.ownMisread) {
     try {
       out = m.run(w);
     } catch (e) {
-      return `it throws now (${e.message}). That would be good news, but reference.md and `
+      return `it throws now (${e.message}). That would be good news, but jscad-legacy.md and `
         + "reshape.js's banner both publish this as a SILENT wrong answer — re-measure and "
         + 'rewrite all three together rather than deleting the row';
     }
     const dims = w.measureDimensions(out);
     if (!same(dims, m.dimensions)) {
       return `it now measures ${JSON.stringify(dims)}, not ${JSON.stringify(m.dimensions)} — `
-        + 'the misread table in reference.md prints this number';
+        + 'the misread table in jscad-legacy.md prints this number';
     }
     if (m.sameAs) {
       const twin = w.measureDimensions(m.sameAs(w));
@@ -1575,7 +1566,7 @@ check(`${ASSIGNMENT_POOL.assignment}'s largest softener is still written down`, 
   if (!ASSIGNMENT_POOL.spoiledByOurOwnDocs) {
     return 'ASSIGNMENT_POOL.spoiledByOurOwnDocs is false. If shCode genuinely stopped '
       + 'publishing the option signatures of A8.2.2\'s eligible primitives, delete this check '
-      + 'with it — but verify that first, because reference.md and lib/reshape-docs.ts both '
+      + 'with it — but verify that first, because jscad-legacy.md and lib/reshape-docs.ts both '
       + 'carried them and /docs/reshape served them in-app.';
   }
   const banner = readFileSync(SIMPLE_PATH, 'utf8')
@@ -1646,7 +1637,7 @@ check('polygon answers the bare list poly trains with a silently empty shape', (
     bare = POLY_BARE_ARRAY.bare(jscad);
   } catch (e) {
     return `polygon([[…]]) throws now (${e.message}) — that would be GOOD NEWS, and it means `
-      + "reference.md's poly crossover table and reshape.js's banner are both saying something "
+      + "jscad-legacy.md's poly crossover table and reshape.js's banner are both saying something "
       + 'false. Rewrite them rather than deleting this check';
   }
   if (!isGeometry(bare)) return 'the bare call no longer returns geometry at all';
@@ -1664,7 +1655,7 @@ check('polygon answers the bare list poly trains with a silently empty shape', (
   const line = POLY_BARE_ARRAY.alsoBare(jscad);
   return isGeometry(line)
     ? true
-    : 'line() no longer takes a bare array, so reference.md\'s "some of them do" is wrong and '
+    : 'line() no longer takes a bare array, so jscad-legacy.md\'s "some of them do" is wrong and '
       + 'the honest rule really would be "always wrap it"';
 });
 
@@ -1694,7 +1685,7 @@ for (const i of INTEROP) {
 }
 
 // ---------------------------------------------------------------------------
-// The graduation table in reference.md, executed rather than read.
+// The graduation table in jscad-legacy.md, executed rather than read.
 //
 // EQUIVALENTS above proves reshape.js matches the real API. It proves nothing
 // about what the DOCS say the real API is — and that table is the only place a
@@ -1708,7 +1699,7 @@ for (const i of INTEROP) {
 
 const graduation = readGraduationTable();
 
-check('the graduation table in reference.md parses, and covers every reSHape name', () => {
+check('the graduation table in jscad-legacy.md parses, and covers every reSHape name', () => {
   if (graduation.error) return graduation.error;
   const { rows } = graduation;
   if (!rows.length) return `no rows found under "${GRADUATION.heading}"`;
@@ -1741,19 +1732,19 @@ for (const row of graduation.rows || []) {
     try {
       mine = g.evaluate(row.reshape);
     } catch (e) {
-      return `reference.md:${row.line} — the reSHape half does not run: ${e.message}`;
+      return `jscad-legacy.md:${row.line} — the reSHape half does not run: ${e.message}`;
     }
     try {
       theirs = g.evaluate(row.real);
     } catch (e) {
-      return `reference.md:${row.line} — the real call a student would copy does not run: ${e.message}`;
+      return `jscad-legacy.md:${row.line} — the real call a student would copy does not run: ${e.message}`;
     }
-    if (!isGeometry(mine)) return `reference.md:${row.line} — the reSHape half built nothing drawable`;
-    if (!isGeometry(theirs)) return `reference.md:${row.line} — the real half built nothing drawable`;
+    if (!isGeometry(mine)) return `jscad-legacy.md:${row.line} — the reSHape half built nothing drawable`;
+    if (!isGeometry(theirs)) return `jscad-legacy.md:${row.line} — the real half built nothing drawable`;
     const verdict = sameGeometry(mine, theirs);
     return verdict === true
       ? true
-      : `reference.md:${row.line} — a student copying this row gets a different model: ${verdict}`;
+      : `jscad-legacy.md:${row.line} — a student copying this row gets a different model: ${verdict}`;
   });
 }
 
@@ -1787,12 +1778,12 @@ for (const t of GRADUATION_TRIPWIRES) {
 // READS cuboid and has to write box. Measured on the chapter sources, roughly
 // half the calls in the assigned reading are in a spelling reSHape replaces, and
 // three of the mappings — extrudeRotate -> revolve, align -> sit, rotate ->
-// turn — cannot be guessed backwards at all. reference.md carries both
+// turn — cannot be guessed backwards at all. jscad-legacy.md carries both
 // directions; this is the check that it keeps carrying the second one.
 
 const reverse = readReverseTable();
 
-check('reference.md maps every real name reSHape replaces back to its reSHape word', () => {
+check('jscad-legacy.md maps every real name reSHape replaces back to its reSHape word', () => {
   if (reverse.error) return reverse.error;
   const rows = new Map(reverse.rows.map((r) => [r.real, r]));
   const problems = [];
@@ -1803,7 +1794,7 @@ check('reference.md maps every real name reSHape replaces back to its reSHape wo
       continue;
     }
     if (!new RegExp(`\\b${reshape}\\b`).test(row.says)) {
-      problems.push(`reference.md:${row.line} — ${real} does not point at ${reshape}: ${row.says}`);
+      problems.push(`jscad-legacy.md:${row.line} — ${real} does not point at ${reshape}: ${row.says}`);
     }
   }
   return problems.length ? problems.join('; ') : true;
@@ -1817,7 +1808,7 @@ check('the reverse table points only at names reSHape really has', () => {
     return named.length > 0 && !named.some((n) => known.has(n));
   });
   return bad.length
-    ? `rows naming no reSHape word: ${bad.map((r) => `reference.md:${r.line} ${r.real}`).join(', ')}`
+    ? `rows naming no reSHape word: ${bad.map((r) => `jscad-legacy.md:${r.line} ${r.real}`).join(', ')}`
     : true;
 });
 
@@ -1833,7 +1824,7 @@ check('every real name in the reverse table is one reSHape actually stands in fo
 // WORK anywhere — so the turn example, the one a student is most likely to copy
 // out of the hardest section, was never executed at all. Run them where they
 // are meant to run.
-for (const e of examples.filter((x) => x.source.endsWith('reference.md') && x.tags.includes('shcode-only'))) {
+for (const e of examples.filter((x) => x.source.endsWith('jscad-legacy.md') && x.tags.includes('shcode-only'))) {
   check(`the reSHape example at ${e.source}:${e.line} actually runs`, () => {
     const cap = captureConsole();
     const { ctx } = createSimpleContext({ consoleImpl: cap.console });
@@ -1848,14 +1839,14 @@ for (const e of examples.filter((x) => x.source.endsWith('reference.md') && x.ta
   });
 }
 
-check('reference.md documents every reSHape name in a shcode-only fence', () => {
+check('jscad-legacy.md documents every reSHape name in a shcode-only fence', () => {
   const fenced = examples
-    .filter((e) => e.source.endsWith('reference.md') && e.tags.includes('shcode-only'))
+    .filter((e) => e.source.endsWith('jscad-legacy.md') && e.tags.includes('shcode-only'))
     .map((e) => e.code)
     .join('\n');
   const missing = RESHAPE_NAMES.filter((n) => !new RegExp(`\\b${n.name}\\s*\\(`).test(fenced));
   return missing.length
-    ? `not shown in reference.md: ${missing.map((n) => n.name).join(', ')} — every reSHape example needs the shcode-only tag or the portability check fails it`
+    ? `not shown in jscad-legacy.md: ${missing.map((n) => n.name).join(', ')} — every reSHape example needs the shcode-only tag or the portability check fails it`
     : true;
 });
 
@@ -1900,7 +1891,7 @@ check('the book census adds up to the total it reports', () => {
 const bridgeWord = readBridgeTable(BRIDGE.reshapeWordHeading);
 const bridgeNoWord = readBridgeTable(BRIDGE.noWordHeading);
 
-check('reference.md carries both halves of the bridge', () => {
+check('jscad-legacy.md carries both halves of the bridge', () => {
   if (bridgeWord.error) return bridgeWord.error;
   if (bridgeNoWord.error) return bridgeNoWord.error;
   if (!bridgeWord.rows.length) return `no rows under "${BRIDGE.reshapeWordHeading}"`;
@@ -1908,7 +1899,7 @@ check('reference.md carries both halves of the bridge', () => {
   return true;
 });
 
-check('every call the seven chapters make has a row in reference.md', () => {
+check('every call the seven chapters make has a row in jscad-legacy.md', () => {
   if (bridgeWord.error || bridgeNoWord.error) return bridgeWord.error || bridgeNoWord.error;
   const word = new Set(bridgeWord.rows.map((r) => r.left));
   const noWord = new Set(bridgeNoWord.rows.map((r) => r.left));
@@ -1939,7 +1930,7 @@ check('the "no reSHape word" table names only real library functions', () => {
     const path = BOOK_CENSUS.dottedCalls[row.left];
     let v = jscad;
     if (path) for (const step of path.slice(0, -1)) v = v && v[step];
-    if (!path || typeof v !== 'function') bad.push(`reference.md:${row.line} ${row.left}`);
+    if (!path || typeof v !== 'function') bad.push(`jscad-legacy.md:${row.line} ${row.left}`);
   }
   return bad.length ? `rows for things the library does not export: ${bad.join(', ')}` : true;
 });
@@ -1952,7 +1943,7 @@ check('nothing on the "no reSHape word" table actually has one', () => {
     : true;
 });
 
-check('the size of the bridge in reference.md is the measured size', () => {
+check('the size of the bridge in jscad-legacy.md is the measured size', () => {
   if (bridgeWord.error) return bridgeWord.error;
   const word = new Set(bridgeWord.rows.map((r) => r.left));
   const replaced = Object.entries(BOOK_CENSUS.calls)
@@ -1964,11 +1955,11 @@ check('the size of the bridge in reference.md is the measured size', () => {
   }
   const md = readFileSync(BRIDGE.path, 'utf8');
   if (!new RegExp(`\\*\\*${BOOK_CENSUS.totalCalls} library calls\\*\\*`).test(md)) {
-    return `reference.md does not print the measured total (${BOOK_CENSUS.totalCalls})`;
+    return `jscad-legacy.md does not print the measured total (${BOOK_CENSUS.totalCalls})`;
   }
   return new RegExp(`\\*\\*${replaced} of them`).test(md)
     ? true
-    : `reference.md does not print the measured ${replaced} calls reSHape replaces`;
+    : `jscad-legacy.md does not print the measured ${replaced} calls reSHape replaces`;
 });
 
 // The rows that are not renames. Each of these is a real call and a reSHape word
@@ -1982,7 +1973,7 @@ for (const wrn of BRIDGE_WARNINGS) {
     if (!row) return `${wrn.real} has no row at all`;
     const silent = wrn.says.filter((rx) => !rx.test(row.right));
     return silent.length
-      ? `reference.md:${row.line} — the row says nothing about ${silent.join(' / ')}. ${wrn.why}`
+      ? `jscad-legacy.md:${row.line} — the row says nothing about ${silent.join(' / ')}. ${wrn.why}`
       : true;
   });
 }
@@ -2017,13 +2008,13 @@ check('sit is not the align the seven chapters print', () => {
 // spells something runnable, because runner.html owns the scope and reSHape adds
 // no tenth name.
 for (const id of BOOK_IDENTIFIERS) {
-  check(`${id.name} is not in scope here, and reference.md says what to type instead`, () => {
+  check(`${id.name} is not in scope here, and jscad-legacy.md says what to type instead`, () => {
     const { ctx } = createSimpleContext();
     const inScope = vm.runInContext(`typeof ${id.name} !== 'undefined'`, ctx);
     if (inScope !== id.inScope) {
       return inScope
         ? `${id.name} IS in scope now — runner.html changed, so delete this check and the `
-          + 'reference.md section it guards rather than leaving them saying something false'
+          + 'jscad-legacy.md section it guards rather than leaving them saying something false'
         : `${id.name} is no longer measurable`;
     }
     for (const spelling of [id.write, id.portable, id.alsoWrite]) {
@@ -2031,15 +2022,15 @@ for (const id of BOOK_IDENTIFIERS) {
       try {
         v = vm.runInContext(`(${spelling})`, ctx);
       } catch (e) {
-        return `reference.md tells a student to write ${spelling}, and it throws: ${e.message}`;
+        return `jscad-legacy.md tells a student to write ${spelling}, and it throws: ${e.message}`;
       }
       if (v !== id.value) return `${spelling} is ${v}, not ${id.value}`;
     }
     const md = readFileSync(BRIDGE.path, 'utf8');
-    if (!md.includes(BRIDGE.tauHeading)) return `reference.md has no "${BRIDGE.tauHeading}" section`;
+    if (!md.includes(BRIDGE.tauHeading)) return `jscad-legacy.md has no "${BRIDGE.tauHeading}" section`;
     const missing = [id.write, id.portable, id.alsoWrite].filter((s) => !md.includes(s));
     return missing.length
-      ? `reference.md never gives the working spelling: ${missing.join(', ')}`
+      ? `jscad-legacy.md never gives the working spelling: ${missing.join(', ')}`
       : true;
   });
 }
@@ -2089,7 +2080,7 @@ for (const k of BOOK_OPTION_KEYS) {
           + 'ignoring it, silently, and the row that names it is not a translation';
     }
     if (a !== b) {
-      return `this key WORKS now, so the warning reference.md carries about it is out of date `
+      return `this key WORKS now, so the warning jscad-legacy.md carries about it is out of date `
         + `— delete the warning rather than leave it saying something false (${k.why})`;
     }
     if (!k.row) return true;
@@ -2097,7 +2088,7 @@ for (const k of BOOK_OPTION_KEYS) {
     if (!row) return `${k.row} has no row to carry the warning`;
     const silent = k.says.filter((rx) => !rx.test(row.right));
     return silent.length
-      ? `reference.md:${row.line} — the ${k.row} row says nothing about ${silent.join(' / ')}. `
+      ? `jscad-legacy.md:${row.line} — the ${k.row} row says nothing about ${silent.join(' / ')}. `
         + `A student copying the book's spelling gets no letter and no error (${k.why})`
       : true;
   });
@@ -2169,7 +2160,7 @@ check('the parameter panel example is a real array of objects, and its defaults 
 
   const cap = captureConsole();
   const ctx = createSimpleContext({ consoleImpl: cap.console });
-  const r = runProgram(ctx.ctx, fence.code, 'reference.md', { lineOffset: 0 });
+  const r = runProgram(ctx.ctx, fence.code, 'jscad-legacy.md', { lineOffset: 0 });
   if (!r.ok) return `${r.phase}: ${r.error.message}`;
 
   let defs;
@@ -2203,21 +2194,21 @@ check('the parameter panel example is a real array of objects, and its defaults 
       + 'declared defaults are not reaching the shape';
 });
 
-check('the parameter trap reference.md names is really in runner.html', () => {
+check('the parameter trap jscad-legacy.md names is really in runner.html', () => {
   const html = runnerSource();
   const fn = html.slice(html.indexOf('function initialOf('));
   const body = fn.slice(0, fn.indexOf('\n\t}'));
   const unread = PARAM_DEFAULTS.reads.filter((k) => !body.includes(`d.${k}`));
   if (unread.length) {
-    return `runner.html's initialOf no longer reads ${unread.join(', ')} — reference.md says it does`;
+    return `runner.html's initialOf no longer reads ${unread.join(', ')} — jscad-legacy.md says it does`;
   }
   if (body.includes(`d.${PARAM_DEFAULTS.ignores}`)) {
-    return `runner.html now reads d.${PARAM_DEFAULTS.ignores} too, so reference.md's warning that `
+    return `runner.html now reads d.${PARAM_DEFAULTS.ignores} too, so jscad-legacy.md's warning that `
       + 'a checkbox default never arrives is out of date — delete it rather than leave it wrong';
   }
   return PARAM_DEFAULTS.saysInReference.test(readFileSync(BRIDGE.path, 'utf8'))
     ? true
-    : 'reference.md does not warn that a checkbox default never reaches main() in this runner';
+    : 'jscad-legacy.md does not warn that a checkbox default never reaches main() in this runner';
 });
 
 // ---------------------------------------------------------------------------
@@ -2258,10 +2249,10 @@ for (const [type, m] of Object.entries(PARAM_TYPES.spellings)) {
         + 'editor, and a word missing from this table reads as "do not type this"';
     }
     if (!row.rest.includes(`§${m.chapter}`)) {
-      return `reference.md:${row.line} — the row does not say where the book prints it (§${m.chapter})`;
+      return `jscad-legacy.md:${row.line} — the row does not say where the book prints it (§${m.chapter})`;
     }
     if (!row.rest.includes(want)) {
-      return `reference.md:${row.line} — the row names no spelling to type in shCode`;
+      return `jscad-legacy.md:${row.line} — the row names no spelling to type in shCode`;
     }
     // A row that cites the book's own parameters has to cite the RIGHT ones,
     // and ONLY those. Written from memory the first time, this row named a
@@ -2273,29 +2264,29 @@ for (const [type, m] of Object.entries(PARAM_TYPES.spellings)) {
     const marker = `§${m.chapter}'s`;
     const at = row.rest.indexOf(marker);
     if (at === -1) {
-      return `reference.md:${row.line} — the row does not point at the parameters §${m.chapter} `
+      return `jscad-legacy.md:${row.line} — the row does not point at the parameters §${m.chapter} `
         + `declares with this type (${m.names.join(', ')})`;
     }
     const cited = [...row.rest.slice(at).matchAll(/`([^`]+)`/g)].map((c) => c[1]);
     const invented = cited.filter((n) => !m.names.includes(n));
     const absent = m.names.filter((n) => !cited.includes(n));
     if (invented.length) {
-      return `reference.md:${row.line} — the row cites ${invented.join(', ')}, and §${m.chapter} `
+      return `jscad-legacy.md:${row.line} — the row cites ${invented.join(', ')}, and §${m.chapter} `
         + `declares no such parameter. It declares ${m.names.join(', ')}`;
     }
     return absent.length
-      ? `reference.md:${row.line} — the row does not name §${m.chapter}'s ${absent.join(', ')}`
+      ? `jscad-legacy.md:${row.line} — the row does not name §${m.chapter}'s ${absent.join(', ')}`
       : true;
   });
 }
 
-check("reference.md's own type table lists every type either surface teaches", () => {
+check("jscad-legacy.md's own type table lists every type either surface teaches", () => {
   if (paramRefTable.error) return paramRefTable.error;
   const have = new Set(paramRefTable.rows.map((r) => r.left));
   const missing = PARAM_TYPES.documented.filter((t) => !have.has(t));
   return missing.length
     ? `§Parameters has no row for: ${missing.join(', ')} — the in-app docs teach these and `
-      + 'reference.md is the file the reSHape section tells a student to keep open. Two doc '
+      + 'jscad-legacy.md is the file the reSHape section tells a student to keep open. Two doc '
       + 'surfaces disagreeing about the list is how int and float went missing'
     : true;
 });
@@ -2306,12 +2297,12 @@ check('runner.html reads a definition initial and never its type', () => {
   const body = fn.slice(0, fn.indexOf('\n\t}'));
   if (body.includes(`d.${PARAM_DEFAULTS.neverReads}`)) {
     return `initialOf now reads d.${PARAM_DEFAULTS.neverReads}, so an unlisted type is no longer `
-      + 'harmless — every "type what the book typed" row in reference.md just became a guess. '
+      + 'harmless — every "type what the book typed" row in jscad-legacy.md just became a guess. '
       + 'Fix the docs, not this check';
   }
   return PARAM_DEFAULTS.saysTypeIsIgnored.test(readFileSync(BRIDGE.path, 'utf8'))
     ? true
-    : 'reference.md does not say that type picks the control and initial carries the value — '
+    : 'jscad-legacy.md does not say that type picks the control and initial carries the value — '
       + 'which is the one sentence that makes the type table safe to stop consulting';
 });
 
@@ -2346,39 +2337,34 @@ for (const d of PARAM_TYPES.declaresNothing) {
     const seen = vm.runInContext('__seen', ctx);
     const name = (d.def.match(/name:\s*'([^']+)'/) || [])[1];
     return seen && name in seen
-      ? `${name} DOES arrive now (${JSON.stringify(seen[name])}), so reference.md's warning about `
+      ? `${name} DOES arrive now (${JSON.stringify(seen[name])}), so jscad-legacy.md's warning about `
         + 'it is out of date — delete the warning rather than leave it saying something false'
       : true;
   });
 }
 
-check('the in-app docs count the numeric types and get the list right', () => {
-  const ts = readFileSync(PARAM_TYPES.inApp, 'utf8');
-  const m = ts.match(PARAM_TYPES.numericSentence);
-  if (!m) return 'the in-app docs no longer count the numeric types — if that sentence went away '
-    + 'on purpose, retire numericSentence with it rather than leaving this asking about nothing';
-  return m[1] === PARAM_TYPES.numericWord
-    ? true
-    : `the in-app docs say "${m[1]} of the types hand you a number" and there are `
-      + `${PARAM_TYPES.numeric.length} (${PARAM_TYPES.numeric.join(', ')}). A count that is wrong `
-      + 'does not merely omit a type, it tells a student the type does not exist';
+// lib/reshape-docs.ts stopped teaching getParameterDefinitions on 2026-09-03:
+// reSHape Script's param() takes a number and optional bounds, and there is no
+// type word for a student to get wrong. So the "both surfaces" pair below is
+// now one surface, jscad-legacy.md, plus a tripwire: the day a `type: '…'`
+// declaration reappears in the in-app docs, the two-surface comparison has to
+// come back with it.
+check('the JSCAD reference names every numeric parameter type', () => {
+  const text = readFileSync(PARAM_TYPES.path, 'utf8');
+  const bad = PARAM_TYPES.numeric.filter((t) => !new RegExp(`type:\\s*'${t}'`).test(text));
+  return bad.length
+    ? `${bad.join(', ')} never written in jscad-legacy.md — a type missing from the list is `
+      + 'exactly how int and float went missing, and a student reading it stalls'
+    : true;
 });
 
-check('both doc surfaces name every numeric parameter type', () => {
-  const surfaces = [
-    ['reference.md', readFileSync(PARAM_TYPES.path, 'utf8')],
-    ['lib/reshape-docs.ts', readFileSync(PARAM_TYPES.inApp, 'utf8')],
-  ];
-  const bad = [];
-  for (const [where, text] of surfaces) {
-    for (const t of PARAM_TYPES.numeric) {
-      if (!new RegExp(`type:\\s*'${t}'`).test(text)) bad.push(`${t} is never written in ${where}`);
-    }
+check('the in-app docs teach param(), not getParameterDefinitions types', () => {
+  const ts = readFileSync(PARAM_TYPES.inApp, 'utf8');
+  if (/type:\s*'(number|slider|int|float)'/.test(ts)) {
+    return 'lib/reshape-docs.ts declares a parameter type again — restore the two-surface '
+      + 'numeric-type comparison this check replaced (git log -S numericSentence scripts/test-reshape.mjs)';
   }
-  return bad.length
-    ? `${bad.join('; ')} — a type taught on one surface and absent from the other is exactly `
-      + 'how int and float went missing, and a student reading the short file stalls'
-    : true;
+  return /\bparam\s*\(/.test(ts) ? true : 'lib/reshape-docs.ts never shows param() — the panel caption is untaught';
 });
 
 check('the reSHape section works the four numeric types in one runnable example', () => {
@@ -2393,7 +2379,7 @@ check('the reSHape section works the four numeric types in one runnable example'
 
   const cap = captureConsole();
   const ctx = createSimpleContext({ consoleImpl: cap.console });
-  const r = runProgram(ctx.ctx, fence.code, 'reference.md', { lineOffset: 0 });
+  const r = runProgram(ctx.ctx, fence.code, 'jscad-legacy.md', { lineOffset: 0 });
   if (!r.ok) return `${r.phase}: ${r.error.message}`;
   if (!isGeometry(r.geometry)) return 'main(defaults) built nothing drawable';
 
@@ -2418,12 +2404,12 @@ for (const [key, takenBy] of Object.entries({
   ...BOOK_OPTION_WORDS.keys, ...BOOK_OPTION_WORDS.alsoFromGraduation,
   ...BOOK_OPTION_WORDS.alsoFromRefusals,
 })) {
-  check(`reference.md writes the option key ${key}`, () => {
+  check(`jscad-legacy.md writes the option key ${key}`, () => {
     const md = readFileSync(BOOK_OPTION_WORDS.path, 'utf8');
     return new RegExp('`[^`\\n]*\\b' + key + '\\b[^`\\n]*`').test(md)
       ? true
-      : `${key} is never written in reference.md, and the seven chapters type it (${takenBy}). `
-        + 'The in-app docs are not a substitute: reference.md is the file the reSHape section '
+      : `${key} is never written in jscad-legacy.md, and the seven chapters type it (${takenBy}). `
+        + 'The in-app docs are not a substitute: jscad-legacy.md is the file the reSHape section '
         + 'tells a student to keep open while reading, so a word only the other surface '
         + 'carries is a word that student cannot reach';
   });
