@@ -1,4 +1,6 @@
 import type { DiagramConfig } from './diagram-types';
+import type { LessonMode } from './lesson-mode';
+import type { ModelExpect } from './model-check';
 
 // ---- File System ----
 
@@ -37,7 +39,7 @@ export type FileHistory = Record<string, Version[]>;
 // ---- Lessons & Assignments ----
 
 export type LessonType = 'lesson' | 'assignment' | 'project' | 'example' | 'challenge';
-export type RequirementType = 'regex' | 'inFunction' | 'output' | 'function' | 'custom';
+export type RequirementType = 'regex' | 'inFunction' | 'output' | 'function' | 'custom' | 'model';
 
 export interface Step {
   id: string;
@@ -74,6 +76,12 @@ export interface Requirement {
    *  (e.g. "at least four // comments"), since stripping runs first and
    *  would delete the very thing being matched for. Defaults to true. */
   stripComments?: boolean;
+  /** type: 'model' only. The features (and named fields on them) the
+   *  student's ModelDoc must contain — see lib/model-check.ts. */
+  expect?: ModelExpect[];
+  /** type: 'model' only. Absolute tolerance for numeric field comparisons.
+   *  Defaults to 0.01 (see lib/model-check.ts). */
+  tolerance?: number;
 }
 
 export interface Grading {
@@ -112,6 +120,10 @@ export interface Lesson {
   category?: string;
   unit?: string;
   preview?: 'html' | 'console' | 'reshape' | 'moshion' | 'reading' | 'video' | 'example' | 'challenge' | 'assignment' | 'slides' | 'diagram' | 'quiz';
+  /** Which reSHape side(s) this lesson shows: 'visual' = Build tools only,
+   *  'code' = script only, 'both' = both, Build first. A teacher's
+   *  class/assignment mode (see lib/lesson-mode.ts) overrides this. */
+  mode?: LessonMode;
   week?: number;
   slos?: string[];
   files: FileNode[];

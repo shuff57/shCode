@@ -1,4 +1,15 @@
 import type { Requirement } from './types';
+import type { ModelDoc } from './model-types';
+import { checkModel } from './model-check';
+
+/** The reSHape ModelDoc a `model` requirement checks against. Optional and
+ *  last so every existing caller — which passes only
+ *  (requirements, files, passingScore) — keeps working unchanged; a caller
+ *  with no reSHape lesson in play simply never supplies it, and a `model`
+ *  requirement then fails via checkModel's own null-doc message. */
+export interface GradeContext {
+  modelDoc?: ModelDoc | null;
+}
 
 export interface GradeResult {
   id: string;
@@ -108,7 +119,8 @@ function checkInFunction(req: Requirement, files: Record<string, string>): boole
 export function grade(
   requirements: Requirement[],
   files: Record<string, string>,
-  passingScore: number = 0
+  passingScore: number = 0,
+  context?: GradeContext
 ): GradeReport {
   const results: GradeResult[] = requirements.map((req) => {
     const type = req.type || 'regex';
@@ -128,6 +140,9 @@ export function grade(
         break;
       case 'custom':
         passed = false;
+        break;
+      case 'model':
+        passed = checkModel(req, context?.modelDoc ?? null).passed;
         break;
     }
 

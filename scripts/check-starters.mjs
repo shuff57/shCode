@@ -90,7 +90,8 @@ try {
     if (!existsSync(cfgPath)) continue;
     let cfg;
     try { cfg = JSON.parse(read(cfgPath)); } catch { continue; }
-    const reqs = (cfg.requirements ?? []).filter((r) => (r.type ?? 'regex') !== 'manual');
+    const reqs = (cfg.requirements ?? [])
+      .filter((r) => !['manual', 'model'].includes(r.type ?? 'regex'));
     if (!reqs.length) continue;
 
     const ref = referenceFiles(id);
