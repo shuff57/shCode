@@ -64,7 +64,9 @@ import {
   Hexagon,
 } from 'lucide-react';
 import SketchConstraints from './SketchConstraints';
-import { solveSketch, type Constraint, type Point } from '../../lib/sketch-solve';
+import {
+  solveSketch, seedForNewRule, collapsedByRatio, type Constraint, type Point,
+} from '../../lib/sketch-solve';
 import { whyDeletingCosts, withoutFeatures } from '../../lib/model-deps';
 import {
   bowEdge,
@@ -1188,15 +1190,37 @@ export default function ModelEditor({
     // rule. So the rule is tried here first and refused with a reason; the
     // same gate runs again inside solveDoc(), silently, for every other way a
     // doc gets adopted.
-    const solved = solveSketch(f.points.map((p): Point => [p[0], p[1]]), next);
+    //
+    // Solved from seedForNewRule()'s seed, not the raw points, for a
+    // between-edges rule (parallel/perpendicular/equal): that seed holds
+    // every corner not on the far edge still and only rotates/scales that
+    // edge, which is the fewest-movers attempt a beginner expects -- a plain
+    // least-squares solve is free to shrink an edge toward the other one
+    // instead of just turning it, and a small shrink is a legitimate part of
+    // the cheapest joint answer (S09, 2026-09-04: `parallel` between two
+    // edges of a trapezoid squeezed all four corners to a ~0.3mm sliver,
+    // residual 0, nothing over-constrained). It falls back to `points`
+    // unchanged for every other kind, so this is also the ordinary solve.
+    const rawPoints = f.points.map((p): Point => [p[0], p[1]]);
+    const solved = solveSketch(seedForNewRule(rawPoints, next), next);
     const points = solved.points.map((p) => [p[0], p[1]] as [number, number]);
     const outline = outlineOf({ ...f, points });
-    if (!outline.ok) {
+    // A near-collapse is not caught by outlineOf() -- it only refuses a
+    // TRUE zero-length edge, and a rule can be satisfied by squeezing the
+    // shape to a sliver well short of that (same S09 case as above). The
+    // gate here is proportion, not exact collapse: any edge or the whole
+    // outline losing more than 3/4 of what it was before this solve reads
+    // as the sketch breaking, not the rule succeeding.
+    const shrunk = collapsedByRatio(rawPoints, points);
+    if (!outline.ok || shrunk) {
       // The remedy is the corner handles, which really are on screen right
       // now: this panel only renders for a selected sketch, and
       // sketchHandles() emits one two-axis handle per design corner, drawn by
       // HandleOverlay as the blue squares.
-      say(`${outline.why} Drag that edge into the direction you want first -- `
+      const why = outline.why
+        ?? 'That would squeeze this sketch down to a sliver, leaving it barely '
+          + 'a shape at all. It has been left as it was.';
+      say(`${why} Drag that edge into the direction you want first -- `
         + 'the blue corner handles move it -- then set the rule.');
       return;
     }

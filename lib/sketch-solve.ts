@@ -344,6 +344,151 @@ export function residualOf(pts: Point[], constraints: Constraint[]): number {
   return worst;
 }
 
+/** The whole outline's own area, shoelace, unsigned. Used only by the
+ *  collapse gate below -- every other path in this file keeps judging
+ *  geometry the way it already did. */
+function polygonArea(pts: Point[]): number {
+  let a = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const [x1, y1] = pts[i];
+    const [x2, y2] = pts[(i + 1) % pts.length];
+    a += x1 * y2 - x2 * y1;
+  }
+  return Math.abs(a) / 2;
+}
+
+/** How much of itself a shape may lose to one solve before "satisfied" reads
+ *  as "collapsed" instead. Measured against the S09 sliver (2026-09-04): a
+ *  `parallel` rule between two edges of a trapezoid squeezed all four
+ *  corners to a ~0.3mm sliver, which is nowhere near this floor either way
+ *  --  the point of the number is to catch the family of near-miss cases
+ *  around it, not that one exact width. */
+const COLLAPSE_RATIO = 0.25;
+
+/**
+ * True when solving moved the shape past collapsed rather than merely
+ * satisfying a rule: some edge fell under 25% of its own pre-solve length,
+ * or the whole outline's area fell under 25% of its pre-solve area.
+ *
+ * residual/overConstrained cannot see this on their own -- a rule the solver
+ * satisfies by squeezing the shape to a sliver reports exactly the residual
+ * a sensible answer would, because collapsing IS what satisfied it. Only
+ * geometry, compared against what the shape looked like before this solve,
+ * can tell the difference.
+ *
+ * Both edges AND area, not just one: an edge can hold its own length while
+ * the whole outline still folds thin (three corners forced onto one line),
+ * and the outline can hold its area while a single edge alone is squeezed
+ * to nothing.
+ */
+export function collapsedByRatio(before: Point[], after: Point[]): boolean {
+  const n = before.length;
+  if (n !== after.length || n < 3) return false;
+  for (let i = 0; i < n; i++) {
+    const b = edgeLength(before, i);
+    if (b < 1e-9) continue; // already had no length to lose -- not this gate's job
+    if (edgeLength(after, i) < b * COLLAPSE_RATIO) return true;
+  }
+  const areaBefore = polygonArea(before);
+  if (areaBefore < 1e-9) return false;
+  return polygonArea(after) < areaBefore * COLLAPSE_RATIO;
+}
+
+/**
+ * A starting point for solving a FRESHLY ADDED between-edges rule (parallel,
+ * perpendicular, equal) that moves the fewest corners: every corner not on
+ * edge `other` stays exactly where it was, and edge `other`'s own two
+ * corners rotate (parallel/perpendicular) or scale (equal) about a pivot --
+ * the corner it shares with edge `edge`, if the two are adjacent, else
+ * `other`'s own midpoint -- to satisfy the rule against edge `edge` as it
+ * currently stands.
+ *
+ * This is a SEED, not a hard constraint: the real solve afterward still
+ * treats every corner as free, so if some OTHER rule genuinely needs edge
+ * `other`'s neighbours to move too, they still can (HOME_PULL just makes
+ * that cost something). What changes is where the search starts and is
+ * pulled back toward -- the fewest-movers case is the one it lands on when
+ * nothing else is pulling it elsewhere, which is exactly the S09 case this
+ * exists for: adding `parallel` to a trapezoid with no other rule on the
+ * edge being turned. Before this, least squares was free to rotate AND
+ * shrink both edges toward each other at once, and a small shrink is a
+ * legitimate part of the cheapest joint answer -- which is how a real
+ * trapezoid became a 0.3mm sliver while reporting residual 0.
+ */
+function fewestMoversSeed(
+  pts: Point[],
+  edge: number,
+  other: number,
+  kind: 'parallel' | 'perpendicular' | 'equal',
+  count: number,
+): Point[] {
+  const seed = pts.map((p): Point => [p[0], p[1]]);
+  const angleA = edgeAngle(pts, edge, count);
+  if (angleA === null) return seed; // nothing to align to -- fall back to the plain solve
+
+  const [a1, a2] = edgeCorners(edge, count);
+  const [b1, b2] = edgeCorners(other, count);
+  const shared = [b1, b2].find((c) => c === a1 || c === a2);
+  const pivot: Point = shared !== undefined
+    ? pts[shared]
+    : [(pts[b1][0] + pts[b2][0]) / 2, (pts[b1][1] + pts[b2][1]) / 2];
+
+  if (kind === 'equal') {
+    const lenA = edgeLength(pts, edge);
+    const lenB = edgeLength(pts, other);
+    if (lenB < 1e-9) return seed;
+    const scale = lenA / lenB;
+    for (const c of [b1, b2]) {
+      if (c === shared) continue; // the pivot corner does not move by definition
+      seed[c] = [
+        pivot[0] + (pts[c][0] - pivot[0]) * scale,
+        pivot[1] + (pts[c][1] - pivot[1]) * scale,
+      ];
+    }
+    return seed;
+  }
+
+  const angleB = edgeAngle(pts, other, count);
+  if (angleB === null) return seed;
+  const target = kind === 'perpendicular' ? angleA + Math.PI / 2 : angleA;
+  // Normalised into (-PI/2, PI/2], the same wrap residualOfPair uses -- a
+  // line has no distinguished direction, so the raw angle difference can be
+  // out by a half turn even when the LINE itself only needs a small tilt.
+  // Rotating by that raw, un-wrapped amount swings edge `other`'s corners
+  // most of the way around the pivot instead of nudging them into place,
+  // which crosses them past the rest of the outline and hands the real
+  // solve a self-intersecting bowtie to recover from -- measured 2026-09-04,
+  // this is what turned the S09 trapezoid into a sliver even with a seed.
+  let rotate = (target - angleB) % Math.PI;
+  if (rotate > Math.PI / 2) rotate -= Math.PI;
+  if (rotate <= -Math.PI / 2) rotate += Math.PI;
+  const cos = Math.cos(rotate);
+  const sin = Math.sin(rotate);
+  for (const c of [b1, b2]) {
+    if (c === shared) continue;
+    const dx = pts[c][0] - pivot[0];
+    const dy = pts[c][1] - pivot[1];
+    seed[c] = [pivot[0] + dx * cos - dy * sin, pivot[1] + dx * sin + dy * cos];
+  }
+  return seed;
+}
+
+/**
+ * The seed a freshly-added rule should be solved FROM: fewestMoversSeed for
+ * a between-edges rule that is the LAST entry in `constraints` (the
+ * convention every SketchConstraints.tsx handler already appends to), the
+ * raw points unchanged otherwise. Shared by ModelEditor's own gate and
+ * addConstraintSettling so both judge the exact same attempt.
+ */
+export function seedForNewRule(points: Point[], constraints: Constraint[]): Point[] {
+  const added = constraints[constraints.length - 1];
+  if (!added) return points;
+  if (added.kind !== 'parallel' && added.kind !== 'perpendicular' && added.kind !== 'equal') {
+    return points;
+  }
+  return fewestMoversSeed(points, added.edge, added.other, added.kind, points.length);
+}
+
 export function describe(c: Constraint): string {
   if (c.kind === 'horizontal') return `edge ${c.edge + 1} across`;
   if (c.kind === 'vertical') return `edge ${c.edge + 1} up`;
@@ -354,24 +499,42 @@ export function describe(c: Constraint): string {
   return `corner ${c.corner + 1} pinned`;
 }
 
-/** Same claim as describe(), phrased as the thing that just left rather than
- *  the thing that is still true -- "Edge 2's length 20", not "edge 2 = 20".
- *  Capitalised because it opens the sentence describeRemovalNote() builds. */
-function describeAsRemoved(c: Constraint): string {
-  if (c.kind === 'horizontal') return `Edge ${c.edge + 1}'s across rule`;
-  if (c.kind === 'vertical') return `Edge ${c.edge + 1}'s up rule`;
-  if (c.kind === 'length') return `Edge ${c.edge + 1}'s length ${c.value}`;
-  if (c.kind === 'equal') return `Edge ${c.edge + 1} = Edge ${c.other + 1}`;
-  if (c.kind === 'parallel') return `Edge ${c.edge + 1} ∥ Edge ${c.other + 1}`;
-  if (c.kind === 'perpendicular') return `Edge ${c.edge + 1} ⊥ Edge ${c.other + 1}`;
-  return `Corner ${c.corner + 1}'s pin`;
+/** What a rule asks an edge to keep, in the course's own words -- "stay
+ *  level" for horizontal, not "hold horizontal=true". This is the half of
+ *  describeRemovalNote() that reads as a QUALITY given up ("no longer has
+ *  to stay level"), which is why it is a verb phrase and describe() above,
+ *  built for a different sentence shape, is not reused here. */
+function describeQuality(c: Constraint): string {
+  if (c.kind === 'horizontal') return 'stay level';
+  if (c.kind === 'vertical') return 'stay upright';
+  if (c.kind === 'length') return `stay ${c.value} long`;
+  if (c.kind === 'equal') return `stay the same length as edge ${c.other + 1}`;
+  if (c.kind === 'parallel') return `stay parallel to edge ${c.other + 1}`;
+  if (c.kind === 'perpendicular') return `stay at a right angle to edge ${c.other + 1}`;
+  return 'stay pinned in place';
 }
 
-/** "Edge 2's length 20 was removed so edge 1 = edge 2 could hold." -- the
- *  panel note addConstraintSettling's caller shows in place of the red
- *  conflict banner, when settling the new rule cost an older one. */
+function subjectOf(c: Constraint, lower: boolean): string {
+  if (c.kind === 'lock') return (lower ? 'c' : 'C') + `orner ${c.corner + 1}`;
+  return (lower ? 'e' : 'E') + `dge ${c.edge + 1}`;
+}
+
+/** "Edge 3 no longer has to stay level so edge 2 can. Undo puts it back." --
+ *  the panel note addConstraintSettling's caller shows IN PLACE OF the red
+ *  conflict banner, when settling the new rule cost an older one its place.
+ *  This is the beginner-facing case working exactly as intended, so it is
+ *  written as a fact about the sketch, not as news of a removal: naming a
+ *  RULE ("Edge 1's across rule was removed") reads like an error even when
+ *  nothing went wrong, and a blind critic read it as one (2026-09-04). "so
+ *  edge N can" is left to trail off when the new rule asks the same thing of
+ *  its edge as the old one did (both `horizontal`, say) -- spelling out the
+ *  shared quality twice reads like the sentence forgot what it just said. */
 export function describeRemovalNote(removed: Constraint, added: Constraint): string {
-  return `${describeAsRemoved(removed)} was removed so ${describe(added)} could hold.`;
+  const removedQuality = describeQuality(removed);
+  const addedQuality = describeQuality(added);
+  const tail = removedQuality === addedQuality ? 'can' : `can ${addedQuality}`;
+  return `${subjectOf(removed, false)} no longer has to ${removedQuality} so `
+    + `${subjectOf(added, true)} ${tail}. Undo puts it back.`;
 }
 
 export interface ConflictResolution {
@@ -394,25 +557,78 @@ export interface ConflictResolution {
  * Measured 2026-09-04: cycling "Edges 1 and 2" to equal after both edges
  * already carried fixed, different lengths (40 and 20) landed the sketch in
  * "these rules cannot all be true", garbled numbers, red banner -- for a
- * rule the student had just asked for on purpose.
+ * rule the student had just asked for on purpose. Solved and judged from
+ * seedForNewRule()'s seed rather than the raw points, so a between-edges
+ * rule gets the same fewest-movers attempt ModelEditor's own gate does --
+ * settling should not have to fight a collapse the seed would have avoided.
  *
- * Tries removing each older rule in turn, OLDEST first (array order, since
- * every rule already sits in the order it was added), and keeps the first
- * single removal that resolves it. A conflict that needs more than one rule
- * gone is left alone, banner included: this is a nudge for the ordinary
- * "these two just started disagreeing" case, not a general re-solver for
- * every possible contradiction.
+ * "Unsatisfiable" now means the geometric gate too (collapsedByRatio), not
+ * only overConstrained: a between-edges rule can satisfy every residual by
+ * collapsing the shape to a sliver (S09, 2026-09-04), which is exactly the
+ * case this function exists to route around, not to wave through because
+ * the numbers came back clean.
+ *
+ * Tries removing each older rule in turn -- never the one just added -- and
+ * keeps the single removal that resolves it AND keeps the most of the
+ * sketch's own area. Array order (oldest first) alone is not enough: S11
+ * (2026-09-04) had two older rules that would each individually resolve the
+ * conflict on their own, and the older of the two was the wrong one to drop
+ * -- it left the sketch's UNTOUCHED bottom edge tilted, where dropping the
+ * other left the edge the student was actually working on tilted instead,
+ * and kept 38% of the sketch's area against the older removal's 28%. A
+ * conflict that needs more than one rule gone is left alone, banner
+ * included: this is a nudge for the ordinary "these two just started
+ * disagreeing" case, not a general re-solver for every possible
+ * contradiction (three different lengths pinned to one edge, for instance,
+ * never resolves by dropping any single one of them, and must not pretend
+ * to by cascading through a second removal).
  */
 export function addConstraintSettling(points: Point[], next: Constraint[]): ConflictResolution {
   if (next.length === 0) return { constraints: next, removed: null };
-  if (!solveSketch(points, next).overConstrained) return { constraints: next, removed: null };
-  for (let i = 0; i < next.length - 1; i++) {
+  const added = next[next.length - 1];
+
+  // seedForNewRule returns `points` unchanged for anything but a
+  // between-edges rule, so `seed` is also the ordinary, unmodified starting
+  // point for every other kind -- one solve function serves both. Used for
+  // EVERY attempt below, including the removal search: a between-edges rule
+  // has a cheap, degenerate way to satisfy itself that the seed exists to
+  // avoid (collapse an edge to zero length, which erases its own angle and
+  // trivially "meets" a parallel/perpendicular/equal rule against it) --
+  // measured 2026-09-04, solving a removal candidate from the RAW points let
+  // exactly that happen and manufactured a spurious "no valid removal"
+  // refusal for a sketch that has a perfectly good non-degenerate answer.
+  const seed = seedForNewRule(points, next);
+  const isBad = (cs: Constraint[]) => {
+    const solved = solveSketch(seed, cs);
+    return solved.overConstrained || collapsedByRatio(points, solved.points);
+  };
+  if (!isBad(next)) return { constraints: next, removed: null };
+
+  // Free more corners: try dropping exactly one OLDER rule -- never the one
+  // just added. Among several whose removal resolves it on their own, the
+  // one that keeps the most of the sketch's own area wins: array order
+  // alone is not enough (S11, 2026-09-04) -- two older rules each
+  // individually resolved the conflict, and the older of the two was the
+  // wrong one to drop, since it left the sketch's untouched far edge tilted
+  // instead of the edge the student was actually working on. A conflict
+  // that needs more than one rule gone is left alone, banner included --
+  // this is a nudge for the ordinary "these two just started disagreeing"
+  // case, not a general re-solver for every possible contradiction (three
+  // different lengths pinned to one edge, for instance, never resolves by
+  // dropping any single one of them, and must not pretend to by cascading
+  // through a second removal).
+  let bestIdx = -1;
+  let bestArea = -Infinity;
+  for (let i = 0; i < next.length; i++) {
+    if (next[i] === added) continue;
     const candidate = next.filter((_, idx) => idx !== i);
-    if (!solveSketch(points, candidate).overConstrained) {
-      return { constraints: candidate, removed: next[i] };
-    }
+    const solved = solveSketch(seed, candidate);
+    if (solved.overConstrained || collapsedByRatio(points, solved.points)) continue;
+    const area = polygonArea(solved.points);
+    if (area > bestArea) { bestArea = area; bestIdx = i; }
   }
-  return { constraints: next, removed: null };
+  if (bestIdx === -1) return { constraints: next, removed: null };
+  return { constraints: next.filter((_, idx) => idx !== bestIdx), removed: next[bestIdx] };
 }
 
 /** Which DESIGN EDGES are named by a constraint that is still violated after a

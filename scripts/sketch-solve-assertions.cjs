@@ -529,7 +529,8 @@ module.exports = function run(dir) {
     JSON.stringify(settledEqual));
   check('...and the note reads exactly the sentence a beginner needs',
     S.describeRemovalNote(settledEqual.removed, afterEqual[afterEqual.length - 1])
-      === "Edge 2's length 20 was removed so edge 1 = edge 2 could hold.",
+      === 'Edge 2 no longer has to stay 20 long so edge 1 can stay the same length as edge 2. '
+        + 'Undo puts it back.',
     S.describeRemovalNote(settledEqual.removed, afterEqual[afterEqual.length - 1]));
 
   // Then: typing 25 into edge 1's Length box. setLength() always filters out
@@ -564,6 +565,122 @@ module.exports = function run(dir) {
   check('a conflict that needs more than one rule gone is left alone -- banner included',
     trulyStuck.removed === null && trulyStuck.constraints.length === 3,
     JSON.stringify(trulyStuck));
+
+  console.log('\n=== a between-edges rule must not collapse the sketch (S09/S10/S11) ===');
+
+  // Solve a freshly-added rule the way the app actually does: settle it
+  // (which may drop an older rule), then solve the settled constraints from
+  // seedForNewRule's own seed -- the same two calls
+  // SketchConstraints.settle() and ModelEditor.setConstraints both make.
+  const applyRule = (points, constraints) => {
+    const settled = S.addConstraintSettling(points, constraints);
+    const seed = S.seedForNewRule(points, settled.constraints);
+    const solved = S.solveSketch(seed, settled.constraints);
+    return { settled, solved };
+  };
+  const quadArea = (p) => {
+    let a = 0;
+    for (let i = 0; i < p.length; i++) {
+      const [x1, y1] = p[i];
+      const [x2, y2] = p[(i + 1) % p.length];
+      a += x1 * y2 - x2 * y1;
+    }
+    return Math.abs(a) / 2;
+  };
+  const withinQuarter = (before, after, n) =>
+    S.edgeLength(after, n) >= 0.25 * S.edgeLength(before, n);
+
+  // S09: a genuine trapezoid (edge 0 flat, edge 2 sloped) made parallel
+  // between edges 1 and 3 (design edges 0 and 2, "Edges 1 and 3" in the
+  // panel). Regression for the sliver: this same rule on this same
+  // trapezoid used to snap all four corners to one `across` value, a
+  // ~0.3mm-wide degenerate outline, reported as residual 0.
+  const trapezoid = [[0, 0], [40, 0], [40, 15], [0, 25]];
+  const trapCS = [
+    { kind: 'horizontal', edge: 0 }, { kind: 'vertical', edge: 1 }, { kind: 'vertical', edge: 3 },
+    { kind: 'parallel', edge: 0, other: 2 },
+  ];
+  const par09 = applyRule(trapezoid, trapCS);
+  check('parallel on the S09 trapezoid needs nothing removed -- nothing here actually conflicts',
+    par09.settled.removed === null, JSON.stringify(par09.settled.removed));
+  check('...every edge keeps at least 25% of its length from before the rule',
+    [0, 1, 2, 3].every((n) => withinQuarter(trapezoid, par09.solved.points, n)),
+    JSON.stringify([0, 1, 2, 3].map((n) =>
+      (S.edgeLength(par09.solved.points, n) / S.edgeLength(trapezoid, n)).toFixed(3))));
+  check('...the outline keeps at least 25% of its own area',
+    quadArea(par09.solved.points) >= 0.25 * quadArea(trapezoid),
+    `${quadArea(par09.solved.points).toFixed(1)} vs ${quadArea(trapezoid)} before`);
+  check('...the gate agrees nothing collapsed',
+    !S.collapsedByRatio(trapezoid, par09.solved.points));
+  check('...and edges 1 and 3 actually end up parallel, not just uncollapsed',
+    near(angleDiff(edgeAngle(par09.solved.points, 0), edgeAngle(par09.solved.points, 2)), 0, 1e-2),
+    JSON.stringify([edgeAngle(par09.solved.points, 0), edgeAngle(par09.solved.points, 2)]));
+
+  // S10: the same quad shape, `perpendicular` between edges 1 and 3 while
+  // BOTH already carry their own `across` (horizontal) rule -- a genuine
+  // disagreement (edge 1 and edge 3 cannot stay horizontal AND become
+  // perpendicular to each other), so exactly one older rule has to go.
+  const s10Quad = [[0, 0], [40, 0], [50, 25], [0, 25]];
+  const s10CS = [
+    { kind: 'horizontal', edge: 0 }, { kind: 'horizontal', edge: 2 }, { kind: 'vertical', edge: 3 },
+    { kind: 'perpendicular', edge: 0, other: 2 },
+  ];
+  const perp10 = applyRule(s10Quad, s10CS);
+  check('perpendicular on the S10 quad settles by dropping exactly one older rule',
+    perp10.settled.removed !== null && perp10.settled.constraints.length === 3,
+    JSON.stringify(perp10.settled));
+  check('...every edge keeps at least 25% of its length from before the rule',
+    [0, 1, 2, 3].every((n) => withinQuarter(s10Quad, perp10.solved.points, n)),
+    JSON.stringify([0, 1, 2, 3].map((n) =>
+      (S.edgeLength(perp10.solved.points, n) / S.edgeLength(s10Quad, n)).toFixed(3))));
+  check('...the outline keeps at least 25% of its own area',
+    quadArea(perp10.solved.points) >= 0.25 * quadArea(s10Quad),
+    `${quadArea(perp10.solved.points).toFixed(1)} vs ${quadArea(s10Quad)} before`);
+  check('...edges 1 and 3 actually end up perpendicular',
+    near(Math.abs(angleDiff(edgeAngle(perp10.solved.points, 0), edgeAngle(perp10.solved.points, 2))),
+      Math.PI / 2, 1e-2));
+  check('...and the note reads as information, in the course\'s own words, not an error',
+    S.describeRemovalNote(perp10.settled.removed, s10CS[s10CS.length - 1]).endsWith('Undo puts it back.'),
+    S.describeRemovalNote(perp10.settled.removed, s10CS[s10CS.length - 1]));
+
+  // S11: pressing "Edge 2 across" while "Edge 3 across" is already on --
+  // over-constrained in a way that used to satisfy every residual at once by
+  // collapsing the whole outline flat (residual 0, nothing flagged), which
+  // addConstraintSettling's old overConstrained-only check could not see.
+  const s11Quad = [[0, 0], [40, 0], [55, 25], [0, 25]];
+  const s11CS = [
+    { kind: 'horizontal', edge: 0 }, { kind: 'horizontal', edge: 2 }, { kind: 'vertical', edge: 3 },
+    { kind: 'horizontal', edge: 1 },
+  ];
+  const h11 = applyRule(s11Quad, s11CS);
+  check('S11 succeeds on the first press by dropping edge 3\'s across rule specifically',
+    h11.settled.removed && h11.settled.removed.kind === 'horizontal' && h11.settled.removed.edge === 2,
+    JSON.stringify(h11.settled.removed));
+  check('...not by silently collapsing the sketch (the old bug: residual 0, ratio ~0)',
+    !S.collapsedByRatio(s11Quad, h11.solved.points), JSON.stringify(h11.solved.points));
+
+  // equal on two adjacent edges (design edges 0 and 1, sharing corner 1) --
+  // a sizeable length difference, nothing else in the way, so this is the
+  // "fewest movers" attempt on its own: edge 0 should not move at all.
+  const adjacentQuad = [[0, 0], [40, 0], [40, 10], [0, 10]];
+  const adjacentCS = [{ kind: 'equal', edge: 0, other: 1 }];
+  const eqAdj = applyRule(adjacentQuad, adjacentCS);
+  check('equal on two adjacent edges needs nothing removed',
+    eqAdj.settled.removed === null, JSON.stringify(eqAdj.settled.removed));
+  check('...the shared edge (edge 0) does not move at all',
+    eqAdj.solved.points[0][0] === adjacentQuad[0][0] && eqAdj.solved.points[0][1] === adjacentQuad[0][1]
+    && eqAdj.solved.points[1][0] === adjacentQuad[1][0] && eqAdj.solved.points[1][1] === adjacentQuad[1][1],
+    JSON.stringify(eqAdj.solved.points));
+  check('...both edges land at the same length',
+    near(S.edgeLength(eqAdj.solved.points, 0), S.edgeLength(eqAdj.solved.points, 1), 1e-2),
+    `${S.edgeLength(eqAdj.solved.points, 0)} vs ${S.edgeLength(eqAdj.solved.points, 1)}`);
+  check('...every edge keeps at least 25% of its length from before the rule',
+    [0, 1, 2, 3].every((n) => withinQuarter(adjacentQuad, eqAdj.solved.points, n)),
+    JSON.stringify([0, 1, 2, 3].map((n) =>
+      (S.edgeLength(eqAdj.solved.points, n) / S.edgeLength(adjacentQuad, n)).toFixed(3))));
+  check('...the outline keeps at least 25% of its own area',
+    quadArea(eqAdj.solved.points) >= 0.25 * quadArea(adjacentQuad),
+    `${quadArea(eqAdj.solved.points).toFixed(1)} vs ${quadArea(adjacentQuad)} before`);
 
   if (deltas.length) {
     console.log('\n=== HOW THIS SOLVER SETTLES (reported, never gated) ===');

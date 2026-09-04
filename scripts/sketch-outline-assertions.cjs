@@ -576,8 +576,14 @@ module.exports = function run(dir) {
   check('...and so does the live-preview doc a drag puts on screen',
     /previewDocRef\.current = foldParams\(/.test(wsSrc),
     'the preview doc is built without the gate the committed one goes through');
+  // `!outline.ok` alone only catches a TRUE zero-length collapse -- a rule
+  // can satisfy every residual by squeezing the shape to a sliver well short
+  // of that (S09, 2026-09-04), so the toggle's refusal condition grew a
+  // second half, `collapsedByRatio`, alongside it rather than in place of it.
   check('...the constraint toggle refuses a collapsing rule out loud',
-    /outlineOf\(\{ \.\.\.f, points \}\)/.test(editorSrc) && /if \(!outline\.ok\)/.test(editorSrc),
+    /outlineOf\(\{ \.\.\.f, points \}\)/.test(editorSrc)
+      && /if \(!outline\.ok \|\| shrunk\)/.test(editorSrc)
+      && /collapsedByRatio\(rawPoints, points\)/.test(editorSrc),
     'ModelEditor.setConstraints applies any rule the solver will accept, collapse included');
   check('...the Round box shows the radius currently set, so it can be edited or cleared',
     /defaultValue=\{set !== undefined \? String\(set\) : ''\}/.test(panelSrc),

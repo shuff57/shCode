@@ -177,6 +177,17 @@ const PANEL_CSS = `
         .sk-rules-note-info {
           color: #bd93f9; background-color: #2d2b3a; border-left-color: #bd93f9;
         }
+        /* The one visual difference between "a rule settled quietly" and
+           "these rules are actually fighting" that survives a screenshot
+           with no colour in it: an explicit glyph, not just a different
+           border colour, so the note reads as information rather than as
+           an error even in black and white. */
+        .sk-rules-note-glyph {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 13px; height: 13px; border-radius: 50%; margin-right: 2px;
+          background: #bd93f9; color: #2d2b3a; font-size: 10px; font-weight: 700;
+          font-style: italic; line-height: 1;
+        }
         .sk-table { width: 100%; border-collapse: collapse; }
         .sk-table th {
           text-align: left; font-weight: normal; color: #6272a4;
@@ -348,6 +359,14 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
   }
 
   function toggle(kind: 'horizontal' | 'vertical', edge: number) {
+    // Whichever way this turns out, edge `edge` is what the student just
+    // pressed -- same "last touched" cue setLength/the pair grid already
+    // give their own edge(s), so the sticky pink line, the name pill and
+    // this row light up together instead of only the two of them that
+    // already had it wired.
+    const touched: typeof lastTouched = { kind: 'edge', indices: [edge] };
+    setLastTouched(touched);
+    onHoverPart?.(stickyForCanvas(touched));
     if (has(constraints, kind, edge)) {
       onChange(constraints.filter((c) => !('edge' in c && c.edge === edge && c.kind === kind)));
       return;
@@ -467,7 +486,9 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
           whenever this has something to say, because settle() only leaves a
           note when it found a fix that actually resolved the conflict. */}
       {!fighting && autoNote && (
-        <p className="sk-rules-note sk-rules-note-info">{autoNote}</p>
+        <p className="sk-rules-note sk-rules-note-info">
+          <span className="sk-rules-note-glyph" aria-hidden="true">i</span> {autoNote}
+        </p>
       )}
 
       {planeRow}

@@ -18,7 +18,7 @@
 // reSHape twin by design -- and `ring` takes no options, so a positioned ring is
 // a translate around one rather than an argument to it.
 
-import { solveSketch, type Point } from './sketch-solve';
+import { solveSketch, collapsedByRatio, type Point } from './sketch-solve';
 import { maxFilletRadius, outlineOf } from './sketch-arc';
 import {
   type Feature,
@@ -447,7 +447,13 @@ export function solveDoc(doc: ModelDoc): ModelDoc {
     // on EVERY doc adoption, so a load, an undo and a drag are covered by the
     // same line. The toggle says so out loud (ModelEditor.setConstraints);
     // this is the belt under that belt, and stays silent.
+    //
+    // collapsedByRatio catches the near-miss outlineOf cannot: a rule can be
+    // satisfied by squeezing the shape to a sliver well short of a TRUE
+    // zero-length edge (S09, 2026-09-04), and that is just as much a doc
+    // this function should refuse to adopt.
     if (!outlineOf({ ...f, points }).ok) return f;
+    if (collapsedByRatio(f.points.map((p) => [p[0], p[1]] as Point), points)) return f;
     changed = true;
     return { ...f, points };
   });

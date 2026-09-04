@@ -444,6 +444,22 @@ export default function HandleOverlay({
     ? shownHoverParts.filter((p) => p.kind === 'edge').map((p) => p.index) : [];
   const stickyCorners = forcedActive
     ? shownHoverParts.filter((p) => p.kind === 'corner').map((p) => p.index) : [];
+  // A one-shot ~1s flash on the rule glyph itself, on top of the sticky pink
+  // line/pill above (which stay lit indefinitely). Bumped whenever the panel
+  // hands up a NEW committed touch -- not on every render, and not on the
+  // plain pointer hover a mouse passing over the canvas already produces --
+  // so pressing the same rule button twice in a row flashes it again rather
+  // than only the first time. The bump itself just changes a number; what
+  // actually restarts the CSS animation is the glyph's own key including it
+  // (see the chip render below), which forces React to remount that one
+  // node instead of reusing it with the animation already finished.
+  const [touchGen, setTouchGen] = useState(0);
+  const lastForcedSig = useRef<string>('');
+  useEffect(() => {
+    const sig = forcedHoverPart ? JSON.stringify(forcedHoverPart) : '';
+    if (sig && sig !== lastForcedSig.current) setTouchGen((g) => g + 1);
+    lastForcedSig.current = sig;
+  }, [forcedHoverPart]);
   // Whether the current pointerdown-to-pointerup has crossed TAP_TOLERANCE_PX
   // yet. A click on a handle (e.g. the height handle sitting over a face's
   // own centre) must still pick that face -- see onTap's own doc comment --
@@ -839,8 +855,22 @@ export default function HandleOverlay({
                   // it is the "look over here" cue, and it has to fire even
                   // when only one of several glyphs inside it is red.
                   const anyLosing = glyphs.some((g) => g.losing);
+                  // A brief flash on top of the chip's ordinary purple/red --
+                  // "this is the glyph the rule you just set/toggled lives
+                  // on" for about a second, separate from the INDEFINITE
+                  // sticky pink line and pill above. The key includes
+                  // `touchGen` so React remounts this one node on a fresh
+                  // touch (restarting the CSS animation) rather than reusing
+                  // it with the animation already finished -- a plain class
+                  // toggle would not replay on the SAME edge touched twice
+                  // in a row.
+                  const flashing = forcedActive && stickyEdges.includes(edge);
                   return (
-                    <g key={edge} transform={`translate(${spot.x}, ${spot.y})`}>
+                    <g
+                      key={flashing ? `${edge}-flash-${touchGen}` : edge}
+                      transform={`translate(${spot.x}, ${spot.y})`}
+                      className={flashing ? 'sk-chip-flash' : undefined}
+                    >
                       <rect
                         x={-w / 2}
                         y={-9}
@@ -1341,6 +1371,18 @@ export default function HandleOverlay({
         .sketch-lines .is-sticky-edge {
           fill: none;
           stroke: #ff79c6; stroke-width: 2.5;
+        }
+        /* The rule glyph's own ~1s flash when its edge is freshly touched --
+           separate from is-sticky-edge above, which stays lit indefinitely.
+           A glow that decays on its own rather than a colour swap that has
+           to be timed out in JS: the CSS animation finishing IS the "back to
+           normal" state, so there is no timer to clear on unmount. */
+        .sketch-lines .sk-chip-flash {
+          animation: sk-chip-flash 1s ease-out;
+        }
+        @keyframes sk-chip-flash {
+          0% { filter: drop-shadow(0 0 5px #ff79c6) drop-shadow(0 0 5px #ff79c6); }
+          100% { filter: drop-shadow(0 0 0 transparent); }
         }
         /* The three kinds of number drawn on top of a sketch: a plain length
            nobody has ruled (dim token, same "just information" weight as a
