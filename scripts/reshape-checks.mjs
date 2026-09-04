@@ -306,10 +306,18 @@ export const REACH_CHAIN = [
  */
 export const REACH_LESSON = {
   file: 'components/LessonWorkspace.tsx',
+  // 2026-09-04: a reSHape lesson mounts ReshapeStudio (the sandbox's reSHape
+  // half, Build + Code on the B-rep kernel), not the retired JSCAD runner
+  // iframe it used to reach through <ReshapePreview code={reshapeCode}>.
   requires: [
     { what: "isReshapeMode derived from lesson.preview", pattern: /isReshapeMode\s*=\s*lesson\.preview === 'reshape'/ },
-    { what: 'a render branch mounting ReshapePreview', pattern: /isReshapeMode \?[\s\S]{0,80}<ReshapePreview/ },
-    { what: 'ReshapePreview receives code and runKey', pattern: /<ReshapePreview code=\{reshapeCode\} runKey=\{runKey\} \/>/ },
+    // A comment sits between the branch and the mount; the window is wide
+    // enough for prose but not for a second component in between.
+    { what: 'a render branch mounting ReshapeStudio', pattern: /isReshapeMode \?[\s\S]{0,900}<ReshapeStudio/ },
+    { what: 'ReshapeStudio is handed script.js and reports the doc back', pattern: /value=\{files\['script\.js'\][\s\S]{0,400}onDocChange=/ },
+  ],
+  forbids: [
+    { what: 'the retired JSCAD runner path (<ReshapePreview code={reshapeCode}>)', pattern: /<ReshapePreview code=\{reshapeCode\}/ },
   ],
 };
 

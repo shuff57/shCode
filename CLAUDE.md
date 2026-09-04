@@ -60,6 +60,26 @@ name is resolved through its two faces, never through a fillet's edge
 history. The Rules panel is a docked column; a sketch is viewed flat and
 fitted to the visible canvas; Home fits the model.
 
+**Update, 2026-09-04, evening.** reSHape now lives inside lessons. Module
+8.1 Solid Shapes (`lessons/8-1-*`, `curriculum/modules/8.1_solid-shapes.md`,
+category "Unit 3: reSHape: Solid Modelling") is the first; every lesson
+passes the three cs-student lenses in a real browser (record:
+`.gauntlet/reshape-module-loop.json`). The pieces a lesson author needs:
+`preview: "reshape"` mounts `components/reshape/ReshapeStudio.tsx` (the
+sandbox's reSHape half, extracted); `mode: visual | code | both` picks the
+side(s) through `lib/lesson-mode.ts`; `script.js` is the one saved artifact
+(Build regenerates it, reload rebuilds the model from it); a requirement of
+`type: "model"` checks the built `ModelDoc` through `lib/model-check.ts`
+(named fields only, tolerance 0.01, a feature the kernel refused does not
+count, sentences in the course's words). Targets must not equal a tool's
+default (Box 40x40x20, Hole 6, Hollow wall 2, Round 4) or the typing step
+is never exercised. `scripts/check-reshape-solutions.mjs` builds every
+reference and starter on the kernel; `scripts/verify-reshape-grading.py`
+and `scripts/verify-reshape-lesson.py` drive the browser. For a student
+walk on the dev server use `DEV_ROLE=student npm run dev` and a
+`dev_student=<name>` cookie per browser (server.js keeps that identity's
+progress in memory).
+
 ### Where the line already falls
 
 Measured 2026-09-01 across the 55 files that round of work touched:

@@ -667,7 +667,7 @@ check('every DocsSandbox and DocsClient call site names its runtime', () => {
 
 check('the moSHion docs still load the moSHion runner', () => assertHop(REACH_MOSHION, REACH_MOSHION.file));
 
-check('a lesson with preview:"reshape" would mount the JSCAD runner', () => assertHop(REACH_LESSON, REACH_LESSON.file));
+check('a lesson with preview:"reshape" mounts ReshapeStudio, not the retired runner', () => assertHop(REACH_LESSON, REACH_LESSON.file));
 
 // ===========================================================================
 // SIMPLE  (reSHape — public/reshape/reshape.js, the layer Q3 actually teaches)

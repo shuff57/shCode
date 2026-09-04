@@ -1,0 +1,54 @@
+{
+  "loop": "module 8.1 Solid Shapes: the first reSHape module, student-lens gauntlet",
+  "started": "2026-09-04T06:50-07:00",
+  "closed": "2026-09-04T13:00-07:00",
+  "bar": "a 14-year-old beginner finishes every lesson unaided; measured by the cs-student-beginner, cs-student-moderate and cs-student-advanced lenses working each lesson in headless Chromium on the dev server (DEV_ROLE=student, one dev_student cookie per lens) and by fresh critics reading their transcripts",
+  "round0_finding": "no lesson opened reSHape: preview: \"reshape\" gave a code editor and the retired JSCAD iframe, no Build tools, no saved model, no model-aware check",
+  "host_built": [
+    "components/reshape/ReshapeStudio.tsx extracted from SandboxWorkspace (2257 -> ~490 lines); a lesson mounts the same Build + Code experience the sandbox does",
+    "Build writes script.js (debounced toScript); reload rebuilds the doc by running script.js once through the sandboxed iframe; the Code side shows the same B-rep viewport",
+    "lesson.mode (visual | code | both) through the existing lesson-mode resolver; teacher class/assignment overrides still win",
+    "requirement type model (lib/model-check.ts, pure): feature kinds + named fields, tolerance 0.01, derived fields (box width/depth/height, hole across, sketch width/depth/across, shell open: true); refused features do not count; messages in the course's words",
+    "grade() takes { modelDoc, refusals } as its 4th argument; a reSHape lesson re-grades 250 ms after every model change",
+    "scripts/check-reshape-solutions.mjs builds every reference and starter on the kernel: reference must pass with no refusal, starter must fail",
+    "dev server: in-memory lesson-state and submissions, keyed by a dev_student cookie"
+  ],
+  "lessons": [
+    "8.1.1 reading",
+    "8.1.2 box 40x40x30",
+    "8.1.3 change a step",
+    "8.1.4 hole 12",
+    "8.1.5 round 3",
+    "8.1.6 hollow wall 3 open top",
+    "8.1.7 reading",
+    "8.1.8 read the script (code)",
+    "8.1.9 write it (code)",
+    "8.1.10 sketch 40x20 pull 10",
+    "8.1.11 desk tray 80x50x20 wall 2 round 3 (both)"
+  ],
+  "rounds": {
+    "r1": "beginner 11/11, moderate 11/11 after a redo, advanced 6/11. Lenses found three host defects in their first minutes: the grader never re-ran on a model change (Submit never enabled), Ctrl+Shift+T graded the mount-time doc, a declared Round the kernel refused passed the check. Critics: FAIL 8.1.2/8.1.4 (targets equal tool defaults), 8.1.7 (false hole1 claim), 8.1.8 (solvable on Build), 8.1.11 (the reference itself rounded the 2 mm rim); PASS the rest",
+    "r2": "beginner 11/11, moderate 11/11, advanced 9/11 (8.1.6 wall = default -> 3 typed; 8.1.11 Code path -> overruled: the project teaches both sides and the round must build). Found the lesson Code side showed no text and no model (fixed), near-rim clicks grab the hollow's inner edge",
+    "r3": "advanced PASS 8.1.6/8.1.11; beginner+moderate FAIL 8.1.5 and 8.1.11 on the lead's own hint text (hover is light blue not pink; Undo deleted the hollow). Fixed hints and the Round tooltip",
+    "r4": "beginner and moderate PASS 8.1.5 and 8.1.11 following only the lesson text; a deliberate near-rim click reads Hollow 1 · edge, the tooltip names it, moving down the edge recovers"
+  },
+  "final": "11/11 lessons pass all three lenses; advanced lens dissents on 8.1.11 (Code path skips the mouse edge pick), recorded and overruled",
+  "commits": "f8738068 .. ce7a9573 on cs-3d (this loop's 17 commits; aac082b2 and 013841e5 are another session's)",
+  "checks_owned": [
+    "scripts/test-model-check.mjs 31/31",
+    "scripts/check-reshape-solutions.mjs 9/9 on the kernel",
+    "scripts/verify-reshape-grading.py 5/5",
+    "scripts/verify-reshape-lesson.py 20/20",
+    "the parity loop's five sandbox scripts 33/33"
+  ],
+  "left_open": [
+    "the upright corner of an open hollow is two pickable edges near the rim (outer box edge, inner hollow edge) that hover identically; the lesson and tooltip route around it, the picker could prefer the outer edge",
+    "Delete on a timeline row cascades to every downstream step with no confirmation (moderate r4 wiped a model with an imprecise click)",
+    "a model requirement passes on geometry alone; which side (mouse or script) produced it is not measured (advanced lens's standing objection)",
+    "8.1.11 hint 3 (delete a refused Round step and retry) was never exercised by a lens",
+    "uncommitted work is lost on reload for every lesson type (progress saves on commit/submit); pre-existing, not module-specific",
+    "no deploy: shcode.pages.dev still runs 61660ec7; git push never done by the loop"
+  ],
+  "lens_evidence": "session scratchpad lens-r1 .. lens-r4/<lens>/ (transcripts, screenshots, summary.json), critic-r1/*.md",
+  "gate": "npm test exit 0 at close (reSHape gate 370/370; two source scans repointed from SandboxWorkspace.tsx to ReshapeStudio.tsx after the extraction)"
+}

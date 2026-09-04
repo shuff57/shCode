@@ -546,7 +546,9 @@ module.exports = function run(dir) {
 
   const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
   const editorSrc = read('components', 'model', 'ModelEditor.tsx');
-  const wsSrc = read('components', 'SandboxWorkspace.tsx');
+  // The reSHape half of SandboxWorkspace moved into ReshapeStudio.tsx on
+  // 2026-09-04 (SPEC-A1); the wiring under test lives there now.
+  const wsSrc = read('components', 'reshape', 'ReshapeStudio.tsx');
   const panelSrc = read('components', 'model', 'SketchConstraints.tsx');
 
   check('Round a corner writes a request, not geometry',
@@ -560,7 +562,7 @@ module.exports = function run(dir) {
     'ModelEditor.tsx still imports filletCorner');
   check('...the outline the overlay draws comes from outlineOf, not from f.points',
     /outlineOf\(f\)/.test(wsSrc) && /basis: o\.basis/.test(wsSrc),
-    'SandboxWorkspace.tsx still hands the raw feature points to the overlay');
+    'ReshapeStudio.tsx still hands the raw feature points to the overlay');
   // The gate moved into foldParams when the B-rep live preview landed, so this
   // reads the property where it now lives rather than grepping for the old
   // line -- and there are THREE adoption paths to cover now, not two: a
