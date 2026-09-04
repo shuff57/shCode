@@ -9,6 +9,7 @@ import { lessonHref } from '../lib/lesson-href';
 import { moduleIdFromTitle, resolveDue, useDueDates, useLessonAvailability } from '../lib/due-dates';
 import DueBadge, { OpensBadge } from './DueBadge';
 import DueDateChip from './DueDateChip';
+import LessonAccessChip from './LessonAccessChip';
 import { ownDate, ownOpenDate, resolveForClass, useTeacherDue } from '../lib/due-dates-edit';
 
 const typeBadgeColors: Record<string, string> = {
@@ -121,6 +122,26 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
           openOwnAt={ownOpenDate(teacherDue, 'lesson', lesson.id)}
           pushRight
         />
+        {/* Same roster-checkbox controls as the Due Dates panel, so a teacher
+            doesn't have to leave the home page to grant one student early or
+            late access. Self-gated on teacherDue.canEdit — renders null for
+            a student, same as DueDateChip above. */}
+        {teacherDue.canEdit && teacherDue.activeClassId && (
+          <>
+            <LessonAccessChip
+              classId={teacherDue.activeClassId}
+              lessonId={lesson.id}
+              lessonTitle={lesson.title}
+              kind="early"
+            />
+            <LessonAccessChip
+              classId={teacherDue.activeClassId}
+              lessonId={lesson.id}
+              lessonTitle={lesson.title}
+              kind="late"
+            />
+          </>
+        )}
         {locked && (
           <span
             style={{
