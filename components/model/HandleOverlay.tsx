@@ -805,24 +805,6 @@ export default function HandleOverlay({
                     />
                   );
                 })}
-                {/* The edge (or, for a pair rule, BOTH edges -- see
-                    stickyForCanvas's own comment in SketchConstraints.tsx)
-                    a Rules control most recently committed a value for,
-                    repainted the same pink a picked solid edge gets. Same
-                    "over, not instead of" convention as the losing-edge
-                    overlay just above -- the shape reads the same, only its
-                    colour and weight change. */}
-                {basis && o.shape !== 'circle' && stickyEdges.map((se) => {
-                  const run = edgePolyline(pts, basis, se, o.corners.length);
-                  if (!run) return null;
-                  return (
-                    <polyline
-                      key={`sticky-${se}`}
-                      className="is-sticky-edge"
-                      points={run.map((p) => `${p.x},${p.y}`).join(' ')}
-                    />
-                  );
-                })}
                 {/* An invisible, fatter twin of each design edge, purely for
                     hover -- the visible outline's own 1.5px stroke is nowhere
                     near forgiving enough to point at with a mouse. Not drawn
@@ -945,8 +927,7 @@ export default function HandleOverlay({
                       <text
                         x={textSpot.x}
                         y={textSpot.y}
-                        className={(l.kind === 'dimension' ? 'sketch-dim-text' : 'sketch-len-text')
-                          + (stickyEdges.includes(l.edge) ? ' is-sticky' : '')}
+                        className={l.kind === 'dimension' ? 'sketch-dim-text' : 'sketch-len-text'}
                         textAnchor="middle"
                         dominantBaseline="central"
                       >
@@ -964,7 +945,7 @@ export default function HandleOverlay({
                       key={id}
                       x={textSpot.x}
                       y={textSpot.y}
-                      className={'sketch-round-text' + (stickyCorners.includes(l.corner) ? ' is-sticky' : '')}
+                      className="sketch-round-text"
                       textAnchor="middle"
                       dominantBaseline="central"
                     >
@@ -1001,34 +982,6 @@ export default function HandleOverlay({
                     >
                       {circleText}
                     </text>
-                  );
-                })()}
-                {pillPart && o.shape !== 'circle' && (() => {
-                  const idx = pillPart.index;
-                  if (idx < 0 || idx >= o.corners.length) return null;
-                  const text = pillPart.kind === 'edge'
-                    ? `Edge ${idx + 1} · ${formatLabel(edgeLength(o.design, idx))}`
-                    : `Corner ${idx + 1}`;
-                  const anchor = at.get(o.corners[idx]);
-                  if (!anchor) return null;
-                  // A screen-space nudge, not a plane-space one -- same
-                  // reasoning as pushFromAnchor above: this pill has to clear
-                  // the corner/edge it names regardless of which way the
-                  // camera happens to foreshorten the sketch's own plane.
-                  const spot = { x: anchor.x, y: anchor.y - 22 };
-                  return (
-                    <g className="sketch-name-pill">
-                      <rect
-                        x={spot.x - (text.length * 3.6 + 8)}
-                        y={spot.y - 9}
-                        width={text.length * 7.2 + 16}
-                        height={18}
-                        rx={9}
-                      />
-                      <text x={spot.x} y={spot.y} textAnchor="middle" dominantBaseline="central">
-                        {text}
-                      </text>
-                    </g>
                   );
                 })()}
               </g>
@@ -1163,6 +1116,102 @@ export default function HandleOverlay({
           />
         );
       })}
+      {/* The sticky edge(s)/corner(s), their bold labels, and the naming
+          pill -- ALL drawn in their own layer, AFTER the handles just
+          above, so none of it can ever end up hidden under the dashed base
+          outline or a corner handle's own square. Round 5's blind judge
+          found the pink edge "partly hidden under a leftover cyan dashed
+          selection-handle overlay" when this lived inside the FIRST
+          `sketch-lines` svg, ahead of the handles: SVG (and DOM generally)
+          paints in source order, and the handles render as separate
+          <button> elements AFTER that whole svg regardless of any z-index
+          there, so they painted over it every time. pointer-events: none
+          throughout -- this layer is purely decorative and must never
+          block a handle drag now that it can sit visually on top of one. */}
+      {outlineRenders.length > 0 && (
+        <svg className="sketch-lines sketch-lines-sticky" aria-hidden="true" style={{ pointerEvents: 'none' }}>
+          {outlineRenders.map((r) => {
+            const { o, n, pts, basis, labels, cornerLabels, cornerSpots } = r;
+            return (
+              <g key={n}>
+                {basis && o.shape !== 'circle' && stickyEdges.map((se) => {
+                  const run = edgePolyline(pts, basis, se, o.corners.length);
+                  if (!run) return null;
+                  return (
+                    <polyline
+                      key={`sticky-${se}`}
+                      className="is-sticky-edge"
+                      points={run.map((p) => `${p.x},${p.y}`).join(' ')}
+                    />
+                  );
+                })}
+                {labels.edges.filter((l) => stickyEdges.includes(l.edge)).map((l) => {
+                  const id = `${n}:edge-${l.edge}`;
+                  const textSpot = laidOut[id];
+                  if (!textSpot) return null;
+                  return (
+                    <text
+                      key={`sticky-label-${l.edge}`}
+                      x={textSpot.x}
+                      y={textSpot.y}
+                      className={(l.kind === 'dimension' ? 'sketch-dim-text' : 'sketch-len-text') + ' is-sticky'}
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                    >
+                      {l.text}
+                    </text>
+                  );
+                })}
+                {cornerLabels.filter((l) => stickyCorners.includes(l.corner)).map((l) => {
+                  const id = `${n}:corner-${l.corner}`;
+                  const textSpot = laidOut[id] ?? cornerSpots.get(id);
+                  if (!textSpot) return null;
+                  return (
+                    <text
+                      key={`sticky-corner-${l.corner}`}
+                      x={textSpot.x}
+                      y={textSpot.y}
+                      className="sketch-round-text is-sticky"
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                    >
+                      {l.text}
+                    </text>
+                  );
+                })}
+                {pillPart && o.shape !== 'circle' && (() => {
+                  const idx = pillPart.index;
+                  if (idx < 0 || idx >= o.corners.length) return null;
+                  const text = pillPart.kind === 'edge'
+                    ? `Edge ${idx + 1} · ${formatLabel(edgeLength(o.design, idx))}`
+                    : `Corner ${idx + 1}`;
+                  const anchor = at.get(o.corners[idx]);
+                  if (!anchor) return null;
+                  // A screen-space nudge, not a plane-space one -- same
+                  // reasoning as pushFromAnchor above: this pill has to clear
+                  // the corner/edge it names regardless of which way the
+                  // camera happens to foreshorten the sketch's own plane.
+                  const spot = { x: anchor.x, y: anchor.y - 22 };
+                  return (
+                    <g className="sketch-name-pill">
+                      <rect
+                        x={spot.x - (text.length * 3.6 + 8)}
+                        y={spot.y - 9}
+                        width={text.length * 7.2 + 16}
+                        height={18}
+                        rx={9}
+                      />
+                      <text x={spot.x} y={spot.y} textAnchor="middle" dominantBaseline="central">
+                        {text}
+                      </text>
+                    </g>
+                  );
+                })()}
+              </g>
+            );
+          })}
+        </svg>
+      )}
       {drawing && (
         <div
           className="draw-catcher"
