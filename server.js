@@ -120,11 +120,19 @@ app.prepare().then(() => {
   // emulate. Without these stubs every lesson past the first in a module
   // renders "Lesson locked" because the client sees role=null. Production
   // (Cloudflare Pages) ignores this file entirely — dev convenience only.
-  server.get('/api/me', (_req, res) => {
-    res.json({ email: DEV_EMAIL, role: DEV_ROLE });
+  // A `dev_student=<name>` cookie (set by a test harness on its browser
+  // context) gives that browser its own progress, so several headless
+  // students can walk a module on one server without unlocking each other's
+  // lessons. No cookie means the single shared DEV_EMAIL identity.
+  const devIdentity = (req) => {
+    const m = /(?:^|;\s*)dev_student=([^;]+)/.exec(req.headers.cookie || '');
+    return m ? decodeURIComponent(m[1]) : DEV_EMAIL;
+  };
+  server.get('/api/me', (req, res) => {
+    res.json({ email: devIdentity(req), role: DEV_ROLE });
   });
-  server.post('/api/auth/login', (_req, res) => {
-    res.json({ email: DEV_EMAIL, role: DEV_ROLE });
+  server.post('/api/auth/login', (req, res) => {
+    res.json({ email: devIdentity(req), role: DEV_ROLE });
   });
   server.post('/api/auth/logout', (_req, res) => {
     res.json({ ok: true });
@@ -153,24 +161,31 @@ app.prepare().then(() => {
   // one unlocks after navigation. Before this, POST was a no-op and GET always
   // returned {}, so every lesson past the first read "Lesson locked" the
   // moment the page reloaded. Restarting the server is the reset.
-  const devLessonState = { states: {}, scores: {} };
-  server.get('/api/lesson-state', (_req, res) => {
-    res.json({ ...devLessonState, role: DEV_ROLE });
+  const devLessonStates = new Map();
+  const devStateFor = (req) => {
+    const id = devIdentity(req);
+    if (!devLessonStates.has(id)) devLessonStates.set(id, { states: {}, scores: {} });
+    return devLessonStates.get(id);
+  };
+  server.get('/api/lesson-state', (req, res) => {
+    res.json({ ...devStateFor(req), role: DEV_ROLE });
   });
   server.post('/api/lesson-state/:lessonId', express.json(), (req, res) => {
+    const st = devStateFor(req);
     const { lessonId } = req.params;
     const { state, score } = req.body || {};
     if (state === 'completed') {
-      devLessonState.states[lessonId] = 'completed';
-      if (typeof score === 'number') devLessonState.scores[lessonId] = score;
-    } else if (state === 'started' && !devLessonState.states[lessonId]) {
-      devLessonState.states[lessonId] = 'started';
+      st.states[lessonId] = 'completed';
+      if (typeof score === 'number') st.scores[lessonId] = score;
+    } else if (state === 'started' && !st.states[lessonId]) {
+      st.states[lessonId] = 'started';
     }
     res.json({ ok: true });
   });
   server.delete('/api/lesson-state/:lessonId', (req, res) => {
-    delete devLessonState.states[req.params.lessonId];
-    delete devLessonState.scores[req.params.lessonId];
+    const st = devStateFor(req);
+    delete st.states[req.params.lessonId];
+    delete st.scores[req.params.lessonId];
     res.json({ ok: true });
   });
   // Submit records a submission before it marks the lesson complete and
@@ -184,7 +199,7 @@ app.prepare().then(() => {
   });
   server.post('/api/lesson-submissions', express.json({ limit: '1mb' }), (req, res) => {
     const body = req.body || {};
-    devSubmissions.push({ ...body, studentEmail: DEV_EMAIL, submittedAt: Date.now() });
+    devSubmissions.push({ ...body, studentEmail: devIdentity(req), submittedAt: Date.now() });
     res.json({ ok: true, id: body.id });
   });
   // The student gradebook on /progress. The real route is
