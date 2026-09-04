@@ -74,6 +74,7 @@ import type { BuildResult } from '../../lib/occt-build';
 import type { HandleSpec } from '../../lib/model-handles';
 import type { AnchorPoint } from './HandleOverlay';
 import { mergeMeshes, type MeshInput } from '../../lib/mesh-export';
+import { bboxCenter, fitDistance, type Box3Like } from '../../lib/camera-fit';
 
 const KERNEL_BASE = '/reshape/kernel';
 
@@ -381,6 +382,12 @@ export default function BrepViewportThree({
    *  Null whenever nothing is animating -- see renderOnDemand() below for why
    *  that matters. */
   const dampingRafRef = useRef<number | null>(null);
+  /** Whether fitToModel() has already run for the model currently on screen
+   *  -- see that function's own comment. Flips back to false the moment the
+   *  document goes empty (the "build a fresh box after Undo" case), so the
+   *  NEXT shape gets its own automatic fit rather than inheriting whatever
+   *  distance a since-deleted model happened to leave the camera at. */
+  const hasFitOnceRef = useRef(false);
   const onStatsRef = useRef(onStats);
   onStatsRef.current = onStats;
   const onMeshRef = useRef(onMesh);
@@ -1080,6 +1087,69 @@ export default function BrepViewportThree({
     projectAnchors();
   }
 
+  /**
+   * Aims the camera at the model's own bounding-box centre along a preset
+   * DIRECTION, at a distance computed by lib/camera-fit.ts's fitDistance() so
+   * the model's longest dimension fills ~45% of the viewport's shorter side.
+   *
+   * Unlike lookFrom() above -- which deliberately PRESERVES whatever distance
+   * and target the student already has, because Top/Front/Underneath are not
+   * supposed to undo a zoom -- this is Home's own job, and Home is the one
+   * button whose whole point is "start over from a view where the model
+   * actually reads". Measured 2026-09-04: at the literal HOME_DIR position
+   * (140,160,130), a 40mm box renders about 180px wide in a ~1164x662
+   * viewport (~27% of the shorter side), which is small enough that a 3mm
+   * fillet is a handful of screen pixels -- visually indistinguishable from
+   * an unrounded edge to a beginner and to a naive before/after pixel-diff
+   * alike, even though the geometry itself was never wrong (confirmed by
+   * zooming in by hand on the exact same fillet, which shows an obvious
+   * curve). Called once automatically the first time a document goes from
+   * empty to having a shape (see the build effect below, and
+   * hasFitOnceRef's own comment for why that is a re-arming flag and not a
+   * one-time-per-mount fact), and again every time the Home button itself is
+   * pressed -- both go through this function, neither goes through
+   * lookFrom(). Top/Front/Underneath still call lookFrom(), so they inherit
+   * whatever distance a fit (or the student's own zoom since) last left the
+   * camera at, exactly as before.
+   *
+   * A no-op when nothing has been drawn yet (`solidGroupRef` is empty --
+   * `THREE.Box3.isEmpty()` says so) rather than collapsing the camera onto a
+   * degenerate point: the empty-stage view (grid + axes, no solid) has
+   * nothing to fit around, and fitDistance()'s own MIN_FIT_DISTANCE floor
+   * exists for a different case (a non-empty but vanishingly small model),
+   * not for "there is no model at all".
+   */
+  function fitToModel(dir: [number, number, number]) {
+    const three = threeRef.current;
+    const camera = cameraRef.current;
+    const controls = controlsRef.current;
+    const renderer = rendererRef.current;
+    const scene = sceneRef.current;
+    const container = containerRef.current;
+    const group = solidGroupRef.current;
+    if (!three || !camera || !controls || !renderer || !scene || !container || !group) return;
+    const { THREE } = three;
+
+    const box = new THREE.Box3().setFromObject(group);
+    if (box.isEmpty()) return;
+    const bbox: Box3Like = {
+      min: [box.min.x, box.min.y, box.min.z],
+      max: [box.max.x, box.max.y, box.max.z],
+    };
+    const center = bboxCenter(bbox);
+    const distance = fitDistance(bbox, container.clientWidth, container.clientHeight, camera.fov);
+
+    const direction = new THREE.Vector3(dir[0], dir[1], dir[2]).normalize();
+    controls.target.set(center[0], center[1], center[2]);
+    camera.position.copy(controls.target).addScaledVector(direction, distance);
+    controls.update();
+    renderer.render(scene, camera);
+    // Same reasoning as lookFrom()'s own final line: this sets camera state
+    // directly rather than through a drag, so the dampingTick flush point
+    // never fires for it and handles need reprojecting here instead.
+    projectAnchors();
+  }
+
   function projectAnchors() {
     const three = threeRef.current;
     const camera = cameraRef.current;
@@ -1459,6 +1529,11 @@ export default function BrepViewportThree({
         const onlySketches = doc.features.length > 0 && doc.features.every((f) => f.kind === 'sketch');
         if (doc.features.length === 0 || onlySketches) {
           setStageHint(onlySketches ? 'A sketch is flat. Select it and press Pull to make it solid.' : null);
+          // No solid on screen -- rearm the auto-fit so the NEXT shape (a
+          // fresh box after Undo cleared everything, say) gets its own fit
+          // rather than inheriting whatever distance a since-deleted model
+          // left the camera at. See hasFitOnceRef's own comment.
+          hasFitOnceRef.current = false;
           const t = performance.now();
           const meshes = drawGeoms([]);
           lastBuiltRef.current = built;
@@ -1498,6 +1573,16 @@ export default function BrepViewportThree({
       if (cancelled) return;
       setStageHint(null);
       setBuildError(null);
+      // The model's FIRST shape gets an automatic fit -- see fitToModel()'s
+      // own comment for why this, and not the literal HOME_DIR position, is
+      // what a beginner needs to actually see a 3mm round without zooming.
+      // Never on a later rebuild: a dimension edit or a new feature must not
+      // yank the camera out from under a student who has already framed the
+      // shot themselves (Home still does this on demand, on its own click).
+      if (!hasFitOnceRef.current) {
+        hasFitOnceRef.current = true;
+        fitToModel(HOME_DIR);
+      }
       const triangles = meshed.reduce((n, m) => n + (m.geometry.getIndex()?.count ?? 0) / 3, 0);
       onStatsRef.current?.({
         buildMs: round(buildMs), meshMs: round(meshMs), drawMs: round(drawMs), triangles,
@@ -1589,7 +1674,7 @@ export default function BrepViewportThree({
         // family as selectionBadgeStyle/edgeHintStyle so it reads as this
         // app's existing "small overlay" language rather than a new one.
         <div style={viewStripStyle}>
-          <button type="button" title="Back to the starting view" style={preset === 'home' ? viewStripActiveStyle : viewStripButtonStyle} aria-pressed={preset === 'home'} onClick={() => { lookFrom(HOME_DIR); setPreset('home'); }}>
+          <button type="button" title="Back to the starting view" style={preset === 'home' ? viewStripActiveStyle : viewStripButtonStyle} aria-pressed={preset === 'home'} onClick={() => { fitToModel(HOME_DIR); setPreset('home'); }}>
             Home
           </button>
           <button type="button" title="Look from above" style={preset === 'top' ? viewStripActiveStyle : viewStripButtonStyle} aria-pressed={preset === 'top'} onClick={() => { lookFrom(TOP_DIR); setPreset('top'); }}>
