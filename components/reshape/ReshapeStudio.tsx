@@ -566,14 +566,48 @@ export default function ReshapeStudio({
   // doc that came FROM `value` in the first place -- otherwise every page
   // load rewrites script.js with a re-serialized copy of what was already
   // there.
+  //
+  // ALSO skipped on the component's very first render, unconditionally --
+  // `useEffect` runs after every render INCLUDING the first one, so with
+  // only the ref above this fired on mount whenever the mount hydration
+  // never adopts a doc at all (a comment-only starter: `value` has no
+  // box()/hole() calls, so the sandboxed run produces an empty doc, and the
+  // runner deliberately WITHHOLDS `reshape-doc` for an empty result -- see
+  // that branch's own comment -- so skipNextRegenRef is never even set).
+  // `doc` still starts at its EMPTY_DOC initial value regardless, so this
+  // effect ran anyway, 300ms later called onChange(toScript(EMPTY_DOC)),
+  // and silently replaced a comment-only starter (e.g.
+  // lessons/8-1-11-project-desk-tray/script.js) with near-nothing before
+  // the student had touched anything (SPEC-A1 rework 2, mode:"both" lens).
+  //
+  // ALSO gated on `build` -- Build tools are the ONLY legitimate source of a
+  // student EDIT to `doc`; on the Code side `doc` only ever changes via the
+  // mount/first-run hydration adopt above, which has no business writing
+  // ANYTHING back into the text the student is actively looking at and
+  // typing into. This is not just belt-and-suspenders for the same case
+  // skipNextRegenRef covers: once `scriptDoc` is non-null, `showBrepOnCode`
+  // flips true and the visible pane swaps from the runner iframe to
+  // BrepViewport -- which, in the same commit, MOUNTS the (until-now absent)
+  // hidden shadow runner instance for the first time (`wantsHydrationShadow`
+  // becomes true). That fresh iframe navigates with the SAME `code`/`runKey`
+  // it inherits and re-runs it, so a second, redundant 'reshape-doc' arrives
+  // with a NEW `namedParams` array (referentially different even with equal
+  // content). `hydrated` is already true by then, so the adopt branch (and
+  // its skipNextRegenRef) never re-arms -- but `scriptNamedParams` is still
+  // in this effect's deps and just changed, firing it with the guard
+  // already spent. Measured 2026-09-04, 8-1-9 (mode:"code"): script.js was
+  // emptied by this exact sequence, seconds after a successful Run.
+  const isMountRenderRef = useRef(true);
   useEffect(() => {
+    if (isMountRenderRef.current) { isMountRenderRef.current = false; return; }
+    if (!build) return;
     if (skipNextRegenRef.current) { skipNextRegenRef.current = false; return; }
     const t = setTimeout(() => {
       const text = scriptEngine ? toScript(doc, scriptNamedParams ?? undefined) : toReshape(doc);
       onChangeRef.current(text);
     }, 300);
     return () => clearTimeout(t);
-  }, [doc, scriptNamedParams, scriptEngine]);
+  }, [doc, scriptNamedParams, scriptEngine, build]);
 
   function chooseSide(next: 'build' | 'code') {
     if (next === 'build' && scriptEngine && scriptDoc && !build) {
@@ -671,11 +705,25 @@ export default function ReshapeStudio({
   }
 
   const showBrep = brepEngine && build;
+  // Code's own visible model: once a Run (or the mount hydration) has built
+  // something, Code shows the SAME B-rep viewport Build uses, fed by the
+  // last thing the script produced -- a Code-only lesson (`mode: "code"`,
+  // no Build side at all) otherwise has NO way to ever see a shape, and a
+  // `both` lesson's Code tab went from "editor + blank pane" back to
+  // "editor + model" the way the pre-extraction sandbox always showed it.
+  // Never true before the first successful build (scriptDoc still null) --
+  // that state keeps ReshapePreview's own "write a script and click Run"
+  // placeholder instead, in the branch below.
+  const showBrepOnCode = !build && brepEngine && scriptEngine && scriptDoc != null;
+  const shownDoc = showBrep ? (previewDoc ?? effectiveDoc) : (scriptDoc ?? EMPTY_DOC);
   // The shadow iframe only helps when the script format is round-trippable
   // (reSHape Script) -- toReshape()'s JSCAD is deliberately one-way, so a
   // build+brep+jscad-code combination (the ?script=0 escape hatch) has no
-  // way to recover `doc` from text at all, same as it always has.
-  const wantsHydrationShadow = showBrep && scriptEngine;
+  // way to recover `doc` from text at all, same as it always has. Needed
+  // whenever the VISIBLE pane is a BrepViewport rather than the runner
+  // iframe itself -- Build always, and Code once it has switched over to
+  // showBrepOnCode -- so a later Run still has something to execute it.
+  const wantsHydrationShadow = scriptEngine && (showBrep || showBrepOnCode);
 
   return (
     <div
@@ -790,9 +838,9 @@ export default function ReshapeStudio({
         <div className="reshape-pane">
           <div id="reshapeRules" className="reshape-pane-rules" aria-hidden={!build} />
           <div className="reshape-pane-view">
-            {showBrep ? (
+            {(showBrep || showBrepOnCode) ? (
               <BrepViewport
-                doc={previewDoc ?? effectiveDoc}
+                doc={shownDoc}
                 onStats={(st: BrepViewportStats) => {
                   const total = st.buildMs + st.meshMs + st.drawMs;
                   if (previewDoc != null && total > PREVIEW_DEGRADE_MS) {
@@ -800,10 +848,10 @@ export default function ReshapeStudio({
                     setPreviewDoc(null);
                   }
                   setRebuildMs(Math.round(total));
-                  setStale(st.triangles > 0 || isSketchOnly(previewDoc ?? effectiveDoc) ? null : 'empty');
+                  setStale(st.triangles > 0 || isSketchOnly(shownDoc) ? null : 'empty');
                   if (!refusalsUnchanged(refusals, st.refusals)) setRefusals(st.refusals);
                 }}
-                onPick={(p: ViewportPick | null) => {
+                onPick={showBrep ? (p: ViewportPick | null) => {
                   if (!p) {
                     setSelected([]);
                     setPickedEdge(null);
@@ -814,10 +862,10 @@ export default function ReshapeStudio({
                   if (owner) setSelected([owner]);
                   setPickedEdge(p.kind === 'edge' ? { target: p.target, edge: p.name } : null);
                   setPickedFace(p.kind === 'face' ? { target: p.target, face: p.name } : null);
-                }}
-                pick={pickedEdge?.edge ? { target: pickedEdge.target, name: pickedEdge.edge } : null}
-                selectedCount={selected.length}
-                selectionLabel={selectionLabel}
+                } : () => { /* Code's viewport is read-only: no ModelEditor here to act on a pick, and `selected`/`pickedEdge` are Build's own state, resolved against `doc`, not `scriptDoc` -- reusing them here would risk a stale/wrong-looking selection. */ }}
+                pick={showBrep && pickedEdge?.edge ? { target: pickedEdge.target, name: pickedEdge.edge } : null}
+                selectedCount={showBrep ? selected.length : 0}
+                selectionLabel={showBrep ? selectionLabel : null}
                 sketchPlane={activeSketchPlane}
                 panelOcclusionPx={activeSketchPlane ? RULES_PANEL_WIDTH_PX : 0}
                 anchors={specs}
