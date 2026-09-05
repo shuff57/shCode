@@ -1013,7 +1013,22 @@ export default function BrepViewportThree({
         const distPx = Math.hypot(cursor.x - cx, cursor.y - cy);
         if (distPx < bestDistPx) {
           bestDistPx = distPx;
-          bestDepth = a.depth + (b.depth - a.depth) * t;
+          // PERSPECTIVE-CORRECT interpolation, not linear -- depth does not
+          // vary linearly with screen-space `t` under a perspective camera
+          // (1/depth does). Linear interpolation of `depth` itself is only
+          // a good approximation when a segment's own depth range is small
+          // relative to its distance from the camera, which is true at an
+          // ordinary Home-view distance but breaks down once the camera is
+          // close: item S measured a rim edge's own two endpoints landing
+          // 2.5-5.5 world units apart from the true depth at close zoom
+          // (60 scroll steps in), which the occlusion check's tolerance
+          // (a small FRACTION of camera distance, deliberately tight so a
+          // genuinely hidden edge stays rejected) cannot absorb -- wrongly
+          // marking a plainly visible rim edge "occluded" behind the very
+          // face it borders, with no edge-pick zone left anywhere near it.
+          const invA = 1 / a.depth;
+          const invB = 1 / b.depth;
+          bestDepth = 1 / (invA + (invB - invA) * t);
         }
       }
       return { distPx: bestDistPx, depth: bestDepth };
