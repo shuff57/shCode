@@ -244,6 +244,23 @@ sk.rect(20, 10)
 const shape = pull(sk, 30)`,
       },
       {
+        title: 'polygon: any flat shape from corners',
+        body: `sk.polygon([[x, y], ...]) draws any flat shape from a list of corners, in the order you give them, and closes the last corner back to the first automatically. Corners and edges are both numbered starting at 1: corner 1 is the first point in the list, edge 1 runs from corner 1 to corner 2, and so on around the shape, with the last edge always closing back to corner 1. Those numbers are what the Rules panel shows for this sketch, and what the next page's rules take as arguments.`,
+        code: `const sk = sketch('top')
+sk.polygon([[0, 0], [40, 0], [40, 15], [15, 15], [15, 30], [0, 30]])
+const shape = pull(sk, 12)`,
+      },
+      {
+        title: 'rules: holding a sketch in shape',
+        body: `A sketch can hold rules on its edges and corners, the same rules the Rules panel offers on Build: sk.across(edge) holds an edge horizontal (the panel calls this column Level), sk.up(edge) holds an edge vertical (Upright), sk.length(edge, mm) fixes an edge's length, sk.equal(a, b) holds two edges the same length, sk.parallel(a, b) holds two edges parallel, sk.perpendicular(a, b) holds two edges at a right angle, and sk.pin(corner) locks a corner in place. A rule set in a script is the exact same rule the panel shows on Build, and a rule you set with the mouse is still there after Code -> Run. If a new rule conflicts with an older one, the older rule is quietly dropped with a note in the panel -- the script itself never stops for it.`,
+        code: `const sk = sketch('top')
+sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
+sk.across(1)
+sk.up(2)
+sk.length(1, 40)
+const shape = pull(sk, 12)`,
+      },
+      {
         title: 'pull: extruding sketches',
         body: `pull(sk, 30) extrudes 30 mm upward perpendicular to the sketch plane.`,
         code: `const sk = sketch('front')
