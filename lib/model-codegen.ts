@@ -83,22 +83,33 @@ export function generatedParams(doc: ModelDoc): GeneratedParam[] {
       if (f.round !== undefined) push('round', 'corner', f.round, { min: 0, max: 40, step: 0.5 });
       pushTurn(out, f.id, label, f.rotate);
     } else if (f.kind === 'cylinder') {
-      push('radius', 'radius', f.radius);
+      // "across" (diameter), not "radius" -- the course word from
+      // reference.md's Shapes section (cylinder(30, 80) is 30mm ACROSS),
+      // matching Ring/Circle's own convention. The slot name stays
+      // 'radius' (applyParam converts back on the way in); only the
+      // caption and the displayed number change.
+      push('radius', 'across', f.radius * 2);
       push('height', 'height', f.height);
       pushCentre(out, f.id, label, f.center);
       if (f.round !== undefined) push('round', 'corner', f.round, { min: 0, max: 40, step: 0.5 });
       pushTurn(out, f.id, label, f.rotate);
     } else if (f.kind === 'cone') {
-      push('radius', 'radius', f.radius);
+      push('radius', 'across', f.radius * 2);
       push('height', 'height', f.height);
       pushCentre(out, f.id, label, f.center);
       pushTurn(out, f.id, label, f.rotate);
     } else if (f.kind === 'torus') {
-      push('ring', 'ring', f.ringRadius);
-      push('tube', 'tube', f.tubeRadius);
+      // Same formula reshape-script.ts's ring() already uses for the
+      // OTHER direction (script text -> ringRadius/tubeRadius): the ring's
+      // "across" is the OUTSIDE diameter of the whole donut, not twice the
+      // centreline radius, and the tube's "across" is its own diameter.
+      // Keeping this in step with that formula means Build and Code agree
+      // on what "across" means for a Ring, not just Cylinder/Sphere/Cone.
+      push('ring', 'across', 2 * (f.ringRadius + f.tubeRadius));
+      push('tube', 'tube across', 2 * f.tubeRadius);
       pushCentre(out, f.id, label, f.center);
     } else if (f.kind === 'sphere') {
-      push('radius', 'radius', f.radius);
+      push('radius', 'across', f.radius * 2);
       pushCentre(out, f.id, label, f.center);
     } else if (f.kind === 'sketch') {
       if (f.shape === 'circle' && f.points.length === 2) {
@@ -283,17 +294,31 @@ export function applyParam(doc: ModelDoc, name: string, value: number): ModelDoc
       if (slot === 'round') { changed = true; return { ...f, round: value }; }
     }
     if (f.kind === 'cylinder') {
-      if (slot === 'radius') { changed = true; return { ...f, radius: value }; }
+      // The panel now shows/accepts "across" (diameter) -- see
+      // generatedParams -- so the incoming value halves back to the
+      // stored radius.
+      if (slot === 'radius') { changed = true; return { ...f, radius: value / 2 }; }
       if (slot === 'height') { changed = true; return { ...f, height: value }; }
       if (slot === 'round') { changed = true; return { ...f, round: value }; }
     }
     if (f.kind === 'cone') {
-      if (slot === 'radius') { changed = true; return { ...f, radius: value }; }
+      if (slot === 'radius') { changed = true; return { ...f, radius: value / 2 }; }
       if (slot === 'height') { changed = true; return { ...f, height: value }; }
     }
     if (f.kind === 'torus') {
-      if (slot === 'ring') { changed = true; return { ...f, ringRadius: value }; }
-      if (slot === 'tube') { changed = true; return { ...f, tubeRadius: value }; }
+      // Inverse of generatedParams' 2*(ringRadius+tubeRadius) / 2*tubeRadius.
+      // Each field holds the OTHER one's currently-shown "across" number
+      // fixed -- editing tube across must not silently move the ring
+      // across number the student did not touch, and vice versa (the
+      // same "changing one field must not re-aim another" rule the
+      // circle sketch's 'across' handling below already follows).
+      if (slot === 'ring') { changed = true; return { ...f, ringRadius: value / 2 - f.tubeRadius }; }
+      if (slot === 'tube') {
+        changed = true;
+        const tubeRadius = value / 2;
+        const ringRadius = f.ringRadius + f.tubeRadius - tubeRadius;
+        return { ...f, ringRadius, tubeRadius };
+      }
     }
     if (f.kind === 'sketch') {
       if (f.shape === 'circle' && f.points.length === 2 && (slot === 'across' || slot === 'x' || slot === 'y')) {
@@ -366,7 +391,7 @@ export function applyParam(doc: ModelDoc, name: string, value: number): ModelDoc
     }
     if (f.kind === 'sphere' && slot === 'radius') {
       changed = true;
-      return { ...f, radius: value };
+      return { ...f, radius: value / 2 };
     }
     if (f.kind === 'revolve' && slot === 'angle') {
       changed = true;
@@ -544,7 +569,12 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
   }
 
   if (f.kind === 'cylinder') {
-    const r = `p.${pname(f.id, 'radius')}`;
+    // The 'radius' slot holds "across" (diameter) now -- see
+    // generatedParams()'s own comment -- but JSCAD's cylinder() still wants
+    // a true radius, so the halving happens right here at the one call
+    // site, not by un-doing the panel's unit for every consumer of the
+    // 'radius' param name.
+    const r = `(p.${pname(f.id, 'radius')} / 2)`;
     const h = `p.${pname(f.id, 'height')}`;
     if (!f.round) return place(`cylinder(${r}, ${h}, { center: ${c} })`);
     if (f.roundStyle === 'chamfer') {
@@ -556,7 +586,8 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
 
   if (f.kind === 'cone') {
     // JSCAD has no cylinderElliptic(): a cylinder whose far end has zero radius is one.
-    return place(`cylinderElliptic(p.${pname(f.id, 'radius')}, p.${pname(f.id, 'height')}, { center: ${c} })`);
+    // Same across-to-radius halving as cylinder above.
+    return place(`cylinderElliptic((p.${pname(f.id, 'radius')} / 2), p.${pname(f.id, 'height')}, { center: ${c} })`);
   }
 
   if (f.kind === 'torus') {
@@ -568,13 +599,22 @@ function featureExpr(f: Feature, needs: Set<string>, byId: Map<string, Feature>)
     // torus() refuses an options object, and rightly: torus accepts `center` and
     // silently drops it. So the position has to be a translate around the ring,
     // not an argument to it.
-    const donut = `torus(p.${pname(f.id, 'ring')}, p.${pname(f.id, 'tube')})`;
+    //
+    // The 'ring'/'tube' slots hold the OUTSIDE diameter of the whole donut
+    // and the tube's own diameter now (generatedParams()'s own comment,
+    // same formula reshape-script.ts's ring() already uses for the other
+    // direction) -- JSCAD's torus() still wants the centreline radius and
+    // the tube radius, so both are derived right here rather than at every
+    // reader of the 'ring'/'tube' param names.
+    const ringAcross = `p.${pname(f.id, 'ring')}`;
+    const tubeAcross = `p.${pname(f.id, 'tube')}`;
+    const donut = `torus((${ringAcross} - ${tubeAcross}) / 2, ${tubeAcross} / 2)`;
     return turned ? place(`transforms.translate(${c}, ${donut})`)
                   : `transforms.translate(${c}, ${donut})`;
   }
 
   if (f.kind === 'sphere') {
-    return place(`sphere(p.${pname(f.id, 'radius')}, { center: ${c} })`);
+    return place(`sphere((p.${pname(f.id, 'radius')} / 2), { center: ${c} })`);
   }
 
   if (f.kind === 'sketch') {

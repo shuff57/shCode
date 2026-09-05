@@ -185,6 +185,29 @@ module.exports = function run(dir) {
     check('the plane argument still passes through untouched alongside a centre', f.plane === 'xz', f.plane);
   }
 
+  console.log('\n=== whyCannotBlend: a circle is a real outline, not a refusal ===');
+
+  {
+    const circleSk = (id, plane, offset) => ({ ...types.newCircleSketch(doc(), plane, [0, 0]), id, offset });
+    const sq = (id, plane, offset) => ({ ...sketch(id), plane, offset, shape: undefined });
+
+    check('two circles on the same plane at different offsets blend cleanly -- the Build gate must accept this the same as reSHape Script does',
+      types.whyCannotBlend(circleSk('sk1', 'xy', 0), circleSk('sk2', 'xy', 30)) === null);
+    check('a square blended to a circle (the P08 task shape) is allowed -- was refused as "fewer than three corners" before the fix',
+      types.whyCannotBlend(sq('sk1', 'xy', 0), circleSk('sk2', 'xy', 30)) === null);
+    check('a circle blended to a square, arguments reversed, is allowed too',
+      types.whyCannotBlend(circleSk('sk1', 'xy', 0), sq('sk2', 'xy', 30)) === null);
+    check('a genuinely open two-point sketch (no circle tag) still refuses -- the fix is scoped to shape === "circle", not to points.length alone',
+      typeof types.whyCannotBlend(
+        { id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0, points: [[0, 0], [10, 0]] },
+        sq('sk2', 'xy', 30),
+      ) === 'string');
+    check('two sketches on different planes still refuse regardless of shape',
+      typeof types.whyCannotBlend(circleSk('sk1', 'xy', 0), circleSk('sk2', 'xz', 30)) === 'string');
+    check('two sketches at the same offset still refuse -- nothing to skin between',
+      typeof types.whyCannotBlend(circleSk('sk1', 'xy', 0), circleSk('sk2', 'xy', 0)) === 'string');
+  }
+
   console.log(fails.length === 0
     ? `\nall ${pass} checks passed`
     : `\n${fails.length} failed`);

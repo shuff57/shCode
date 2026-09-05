@@ -122,8 +122,11 @@ module.exports = function run(dir) {
 
   const coneSrc = gen.toReshape(doc(cone('k1')));
   const ringSrc = gen.toReshape(doc(ring('r1')));
-  check('a cone is a reSHape cone', coneSrc.includes('cylinderElliptic(p.k1_radius, p.k1_height'));
-  check('a ring is a reSHape ring', ringSrc.includes('torus(p.r1_ring, p.r1_tube)'));
+  // The 'radius'/'ring'/'tube' slots hold "across" (diameter) now -- item D
+  // -- so the emitted JSCAD call halves them back to the radius JSCAD's own
+  // primitives actually want; see featureExpr()'s own comment.
+  check('a cone is a reSHape cone', coneSrc.includes('cylinderElliptic((p.k1_radius / 2), p.k1_height'));
+  check('a ring is a reSHape ring', ringSrc.includes('torus((p.r1_ring - p.r1_tube) / 2, p.r1_tube / 2)'));
   // ring() refuses an options object because torus accepts `center` and drops
   // it silently. A positioned ring must therefore be a translate around one.
   check('a ring is positioned by translate, not by an argument',
@@ -276,8 +279,11 @@ module.exports = function run(dir) {
   check('the first cylinder is Cylinder 1 even after a box', nm.c1 === 'Cylinder 1', nm.c1);
   check('the second box is Box 2', nm.b2 === 'Box 2', nm.b2);
   check('the second cylinder is Cylinder 2', nm.c2 === 'Cylinder 2', nm.c2);
+  // 'across', not 'radius' -- item D: the panel now speaks in the course's
+  // diameter word for every round shape, matching Ring/Circle's own
+  // long-standing convention.
   check('captions follow the same names',
-    gen.generatedParams(mixed).some((p) => p.caption === 'Cylinder 1 radius'));
+    gen.generatedParams(mixed).some((p) => p.caption === 'Cylinder 1 across'));
 
   console.log('\n=== display numbers are stable under reordering (root cause B, finding 4) ===');
 
@@ -1118,16 +1124,44 @@ module.exports = function run(dir) {
   const labelNm = types.nameMap(labelDoc);
   check('revolve is labelled Spin', labelNm.rev1 === 'Spin 1', labelNm.rev1);
   check('mirror is labelled Mirror', labelNm.m1 === 'Mirror 1', labelNm.m1);
-  check('pattern is labelled Repeat', labelNm.pat1 === 'Repeat 1', labelNm.pat1);
+  check('a linear pattern is labelled Repeat', labelNm.pat1 === 'Repeat 1', labelNm.pat1);
   check('hole is labelled Hole', labelNm.hole1 === 'Hole 1', labelNm.hole1);
   check('shell is labelled Hollow', labelNm.shell1 === 'Hollow 1', labelNm.shell1);
-  check('move is labelled Move', labelNm.move1 === 'Move 1', labelNm.move1);
+  // move1 above has copy:true -- it must read "Copy 1", not "Move 1"
+  // (item C: the toolbar's own Move/Copy distinction, ModelEditor.tsx's
+  // moveLabel(), used to be lost once nameMap() got involved).
+  check('a copy:true move is labelled Copy, not Move', labelNm.move1 === 'Copy 1', labelNm.move1);
 
   const newKindIds = ['rev1', 'm1', 'pat1', 'hole1', 'shell1', 'move1'];
   check('isDerived recognizes every new feature as depending on an earlier one',
     newKindIds.every((id) => types.isDerived(labelDoc.features.find((f) => f.id === id))));
   check('isShape excludes every new feature -- none of them has a plain centre',
     newKindIds.every((id) => !types.isShape(labelDoc.features.find((f) => f.id === id))));
+
+  console.log('\n=== one name per tool: chip label matches the toolbar (item C) ===');
+
+  {
+    const circPatDoc = doc(box('b2'), { id: 'pat2', kind: 'pattern', target: 'b2', mode: 'circular', count: 6, axis: 'z', totalAngle: 360 });
+    const nm = types.nameMap(circPatDoc);
+    check('a circular pattern is labelled Repeat Around, not Repeat -- the toolbar already distinguishes these two buttons',
+      nm.pat2 === 'Repeat Around 1', nm.pat2);
+  }
+  {
+    const copyOnlyDoc = doc(box('b3'), { id: 'mv3', kind: 'move', target: 'b3', offset: [10, 0, 0], copy: false });
+    const nm = types.nameMap(copyOnlyDoc);
+    check('a plain copy:false move still reads Move, unaffected by the copy:true fix above',
+      nm.mv3 === 'Move 1', nm.mv3);
+  }
+  {
+    const roundDoc = doc(box('b4'), { id: 'fr1', kind: 'fillet', target: 'b4', edge: null, size: 3, style: 'fillet' });
+    const chamferDoc = doc(box('b5'), { id: 'fc1', kind: 'fillet', target: 'b5', edge: null, size: 3, style: 'chamfer' });
+    check('a fillet-style round is labelled Round', types.nameMap(roundDoc).fr1 === 'Round 1', types.nameMap(roundDoc).fr1);
+    // Matches the toolbar's own button text (ModelEditor.tsx's roundLabel) --
+    // NOT reference.md/studentWord()'s "bevel", a naming disagreement this
+    // pass flags rather than resolves (see model-types.ts's labelOf comment).
+    check('a chamfer-style round is labelled Angled Corner, matching the toolbar button -- not Bevel',
+      types.nameMap(chamferDoc).fc1 === 'Angled Corner 1', types.nameMap(chamferDoc).fc1);
+  }
 
   console.log('\n=== sketch build 1: circle (shape tag) ===');
 
@@ -1602,6 +1636,54 @@ module.exports = function run(dir) {
     const orphanParam = gen.generatedParams(orphanDoc).find((p) => p.name === 'r1_size');
     check('an orphaned root falls back to the stored size rather than throwing',
       orphanParam !== undefined && orphanParam.max === 5, orphanParam && JSON.stringify(orphanParam));
+  }
+
+  console.log('\n=== item D: the round-shape panel speaks "across" (diameter), not radius ===');
+
+  {
+    const cylDoc = doc({ id: 'c1', kind: 'cylinder', radius: 10, height: 40, center: [0, 0, 0] });
+    const p = gen.generatedParams(cylDoc).find((x) => x.name === 'c1_radius');
+    check('a cylinder radius:10 shows as across:20 in the panel', p && p.value === 20, p && JSON.stringify(p));
+    check('typing 20 across writes radius:10 back to the doc',
+      gen.applyParam(cylDoc, 'c1_radius', 20).features[0].radius === 10);
+
+    const coneDoc = doc({ id: 'k1', kind: 'cone', radius: 15, height: 30, center: [0, 0, 0] });
+    const pk = gen.generatedParams(coneDoc).find((x) => x.name === 'k1_radius');
+    check('a cone radius:15 shows as across:30', pk && pk.value === 30, pk && JSON.stringify(pk));
+    check('typing 30 across writes radius:15 back',
+      gen.applyParam(coneDoc, 'k1_radius', 30).features[0].radius === 15);
+
+    const sphDoc = doc({ id: 's1', kind: 'sphere', radius: 12, center: [0, 0, 0] });
+    const ps = gen.generatedParams(sphDoc).find((x) => x.name === 's1_radius');
+    check('a sphere radius:12 shows as across:24', ps && ps.value === 24, ps && JSON.stringify(ps));
+    check('typing 24 across writes radius:12 back',
+      gen.applyParam(sphDoc, 's1_radius', 24).features[0].radius === 12);
+
+    // Ring: 'across' is the OUTSIDE diameter of the whole donut
+    // (2*(ringRadius+tubeRadius)), not twice the centreline radius -- the
+    // same formula reshape-script.ts's ring() already uses.
+    const ringDoc = doc({ id: 'r1', kind: 'torus', ringRadius: 18, tubeRadius: 4, center: [0, 0, 0] });
+    const params = gen.generatedParams(ringDoc);
+    const pr = params.find((x) => x.name === 'r1_ring');
+    const pt = params.find((x) => x.name === 'r1_tube');
+    check('ringRadius:18 + tubeRadius:4 shows ring across:44 (2*(18+4))', pr && pr.value === 44, pr && JSON.stringify(pr));
+    check('tubeRadius:4 shows tube across:8', pt && pt.value === 8, pt && JSON.stringify(pt));
+
+    // Editing the TUBE across must not silently change the RING across the
+    // student did not touch (the same "changing one field must not re-aim
+    // another" rule the circle sketch's own 'across' handling already
+    // follows) -- so the ring across, read back after, is still 44.
+    const afterTube = gen.applyParam(ringDoc, 'r1_tube', 10).features[0];
+    check('typing tube across 10 writes tubeRadius:5', afterTube.tubeRadius === 5, JSON.stringify(afterTube));
+    const ringAcrossAfter = 2 * (afterTube.ringRadius + afterTube.tubeRadius);
+    check('...and holds the ring across fixed at 44 (ringRadius adjusts to compensate)',
+      Math.abs(ringAcrossAfter - 44) < 1e-9, ringAcrossAfter);
+
+    // The reverse: editing the RING across must not silently change the
+    // tube across the student did not touch.
+    const afterRing = gen.applyParam(ringDoc, 'r1_ring', 50).features[0];
+    check('typing ring across 50 leaves tubeRadius:4 untouched', afterRing.tubeRadius === 4, JSON.stringify(afterRing));
+    check('...and ringRadius becomes 21 (50/2 - 4)', afterRing.ringRadius === 21, JSON.stringify(afterRing));
   }
 
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);

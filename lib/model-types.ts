@@ -808,7 +808,11 @@ export function whyCannotBlend(a: Feature, b: Feature): string | null {
   if (a.offset === b.offset) {
     return "Both sketches sit at the same offset, so there is no gap to fill. Slide one of them along its plane first.";
   }
-  if (a.points.length < 3 || b.points.length < 3) {
+  // A circle has no corners by design (see SketchFeature.shape) and is a
+  // real closed outline anyway -- sketchWire() in lib/occt-build.ts skins
+  // it the same as any polygon. Only an open or single-point sketch (fewer
+  // than 3 points and NOT tagged 'circle') is the genuine refusal case.
+  if ((a.shape !== 'circle' && a.points.length < 3) || (b.shape !== 'circle' && b.points.length < 3)) {
     return "A blend needs two real outlines, and one of these has fewer than three corners.";
   }
   return null;
@@ -1071,17 +1075,32 @@ function labelOf(f: Feature): string {
     : f.kind === 'extrude' ? 'Pull'
     : f.kind === 'revolve' ? 'Spin'
     : f.kind === 'mirror' ? 'Mirror'
-    : f.kind === 'pattern' ? 'Repeat'
+    // Match the toolbar's own two labels (ModelEditor.tsx's patternLabel) --
+    // this used to collapse both modes to plain "Repeat", so a circular
+    // Repeat Around step showed up in the timeline as "Repeat 1", the same
+    // name a linear Repeat would get.
+    : f.kind === 'pattern' ? (f.mode === 'circular' ? 'Repeat Around' : 'Repeat')
     : f.kind === 'hole' ? 'Hole'
     : f.kind === 'shell' ? 'Hollow'
-    : f.kind === 'move' ? 'Move'
+    // Match the toolbar's own two labels (ModelEditor.tsx's moveLabel) --
+    // this used to always say "Move", so a Copy step showed up in the
+    // timeline as "Move 2" with nothing marking it as a copy.
+    : f.kind === 'move' ? (f.copy ? 'Copy' : 'Move')
     : f.kind === 'box' ? 'Box'
     : f.kind === 'cylinder' ? 'Cylinder'
     : f.kind === 'cone' ? 'Cone'
     : f.kind === 'torus' ? 'Ring'
     : f.kind === 'blend' ? 'Blend'
     : f.kind === 'sphere' ? 'Sphere'
-    : f.kind === 'fillet' ? (f.style === 'chamfer' ? 'Bevel' : 'Round')
+    // Match the toolbar's own button text (ModelEditor.tsx's roundLabel):
+    // "Angled Corner" is the deliberate plain-English name on the button,
+    // with "bevel" reserved for the tooltip and reSHape Script's real API
+    // name. This used to say "Bevel" here, so the timeline chip used the
+    // CAD word the button itself avoids. NOTE: this puts the chip out of
+    // step with studentWord() (lib/model-check.ts) and reference.md, which
+    // both call this "bevel" -- that disagreement is unresolved, flagged
+    // for the lead rather than silently picked one way.
+    : f.kind === 'fillet' ? (f.style === 'chamfer' ? 'Angled Corner' : 'Round')
     : f.kind === 'draft' ? (f.whole ? 'Body draft' : 'Draft')
     : nameless(f);
 }

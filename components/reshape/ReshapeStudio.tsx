@@ -39,6 +39,14 @@ import {
 } from '../../lib/model-codegen';
 import { toScript, type ScriptParamRef } from '../../lib/reshape-script-gen';
 
+/** Structural equality for a TopoName -- a plain, serializable object (see
+ *  lib/topo-name.ts), so JSON.stringify is a safe and cheap comparison. Used
+ *  only to dedupe/toggle a Shift-click multi-selection (item E); nothing
+ *  here builds a Fillet from the comparison itself. */
+function sameTopo(a: TopoName, b: TopoName): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
 export type ReshapeStudioProps = {
   /** script.js text -- the ONE saved artifact. Controlled: Code edits it
    *  through the store-backed CodeEditor this component renders, and Build
@@ -220,6 +228,32 @@ export default function ReshapeStudio({
   }, [doc]);
   const [pickedEdge, setPickedEdge] = useState<{ target: string; edge: TopoName | null } | null>(null);
   const [pickedFace, setPickedFace] = useState<{ target: string; face: TopoName | null } | null>(null);
+  // Item E: a Shift-held click on a second edge/face adds it to the
+  // selection instead of replacing it, the same way the timeline/sketch
+  // chips already work (ModelEditor.tsx's pick()). `pickedEdge`/`pickedFace`
+  // above stay exactly as they were -- "the most recent pick", which every
+  // existing single-edge/single-face consumer (round(), Hole, Hollow, the
+  // tooltip text) still reads unchanged -- these two arrays are purely
+  // additive, read only by the multi-edge Round path and the selection pill.
+  // BrepViewportThree.tsx's onPick carries no modifier-key info (a separate
+  // team owns that file), so Shift is tracked here independently via
+  // plain window listeners rather than threaded through the pick payload.
+  const shiftHeldRef = useRef(false);
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => { if (e.key === 'Shift') shiftHeldRef.current = true; };
+    const up = (e: KeyboardEvent) => { if (e.key === 'Shift') shiftHeldRef.current = false; };
+    const blur = () => { shiftHeldRef.current = false; };
+    window.addEventListener('keydown', down);
+    window.addEventListener('keyup', up);
+    window.addEventListener('blur', blur);
+    return () => {
+      window.removeEventListener('keydown', down);
+      window.removeEventListener('keyup', up);
+      window.removeEventListener('blur', blur);
+    };
+  }, []);
+  const [pickedEdges, setPickedEdges] = useState<Array<{ target: string; edge: TopoName }>>([]);
+  const [pickedFaces, setPickedFaces] = useState<Array<{ target: string; face: TopoName }>>([]);
   const [pointerHoverPart, setPointerHoverPart] = useState<{ kind: 'edge' | 'corner'; index: number } | null>(null);
   const [rowHoverPart, setRowHoverPart] = useState<
     { kind: 'edge' | 'corner'; index: number } | { kind: 'edge' | 'corner'; index: number }[] | null
@@ -423,13 +457,23 @@ export default function ReshapeStudio({
     const id = selected[0];
     if (!doc.features.some((f) => f.id === id)) return null;
     const base = nameMap(doc)[id] ?? id;
-    const part = pickedEdge && ownerOf(doc, pickedEdge) === id
-      ? (partWordFor(pickedEdge.edge) ?? 'edge')
-      : pickedFace && ownerOf(doc, pickedFace) === id
-        ? (partWordFor(pickedFace.face) ?? 'face')
-        : null;
+    // Item E: "3 edges"/"2 faces" once a Shift-click multi-selection is two
+    // or more deep on the currently selected solid -- ownerOf() filters out
+    // anything a stray pick left pointing at a different solid, the same
+    // guard round()'s multi-edge path applies before it builds anything.
+    const edgesHere = pickedEdges.filter((e) => ownerOf(doc, e) === id);
+    const facesHere = pickedFaces.filter((f) => ownerOf(doc, f) === id);
+    const part = edgesHere.length > 1
+      ? `${edgesHere.length} edges`
+      : facesHere.length > 1
+        ? `${facesHere.length} faces`
+        : pickedEdge && ownerOf(doc, pickedEdge) === id
+          ? (partWordFor(pickedEdge.edge) ?? 'edge')
+          : pickedFace && ownerOf(doc, pickedFace) === id
+            ? (partWordFor(pickedFace.face) ?? 'face')
+            : null;
     return part ? `${base} · ${part}` : base;
-  }, [selected, doc, pickedFace, pickedEdge]);
+  }, [selected, doc, pickedFace, pickedEdge, pickedEdges, pickedFaces]);
 
   const activeSketchPlane = useMemo<'xy' | 'xz' | 'yz' | null>(() => {
     if (drawTool) return 'xy';
@@ -863,6 +907,8 @@ export default function ReshapeStudio({
               onClearPickedEdge={() => setPickedEdge(null)}
               pickedFace={pickedFace}
               onClearPickedFace={() => setPickedFace(null)}
+              pickedEdges={pickedEdges}
+              onClearPickedEdges={() => setPickedEdges([])}
               refusals={refusals}
             />
           </div>
@@ -894,12 +940,40 @@ export default function ReshapeStudio({
                     setSelected([]);
                     setPickedEdge(null);
                     setPickedFace(null);
+                    setPickedEdges([]);
+                    setPickedFaces([]);
                     return;
                   }
                   const owner = ownerOf(doc, p);
                   if (owner) setSelected([owner]);
                   setPickedEdge(p.kind === 'edge' ? { target: p.target, edge: p.name } : null);
                   setPickedFace(p.kind === 'face' ? { target: p.target, face: p.name } : null);
+                  // Item E: an unnamed pick (nameEdgeOnCurrentShape/
+                  // nameFaceOnCurrentShape honestly refused it -- see
+                  // ViewportPick's own comment) cannot join a multi-select,
+                  // since Round/Angled Corner need a real name to build
+                  // from same as the single-edge path already does.
+                  const shift = shiftHeldRef.current;
+                  if (p.kind === 'edge' && p.name) {
+                    const name = p.name;
+                    setPickedEdges((prev) => {
+                      const hit = shift && prev.some((e) => e.target === p.target && sameTopo(e.edge, name));
+                      if (hit) return prev.filter((e) => !(e.target === p.target && sameTopo(e.edge, name)));
+                      return shift ? [...prev, { target: p.target, edge: name }] : [{ target: p.target, edge: name }];
+                    });
+                    setPickedFaces([]);
+                  } else if (p.kind === 'face' && p.name) {
+                    const name = p.name;
+                    setPickedFaces((prev) => {
+                      const hit = shift && prev.some((e) => e.target === p.target && sameTopo(e.face, name));
+                      if (hit) return prev.filter((e) => !(e.target === p.target && sameTopo(e.face, name)));
+                      return shift ? [...prev, { target: p.target, face: name }] : [{ target: p.target, face: name }];
+                    });
+                    setPickedEdges([]);
+                  } else {
+                    setPickedEdges([]);
+                    setPickedFaces([]);
+                  }
                 } : () => { /* Code's viewport is read-only: no ModelEditor here to act on a pick, and `selected`/`pickedEdge` are Build's own state, resolved against `doc`, not `scriptDoc` -- reusing them here would risk a stale/wrong-looking selection. */ }}
                 pick={showBrep && pickedEdge?.edge ? { target: pickedEdge.target, name: pickedEdge.edge } : null}
                 selectedCount={showBrep ? selected.length : 0}

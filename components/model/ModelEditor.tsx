@@ -67,7 +67,7 @@ import SketchConstraints from './SketchConstraints';
 import {
   solveSketch, seedForNewRule, collapsedByRatio, type Constraint, type Point,
 } from '../../lib/sketch-solve';
-import { whyDeletingCosts, withoutFeatures } from '../../lib/model-deps';
+import { withoutFeatures, orphanedBy } from '../../lib/model-deps';
 import {
   bowEdge,
   removeCorner,
@@ -193,6 +193,20 @@ interface Props {
   /** Called once a picked face has been consumed into a new open ShellFeature,
    *  the same reason onClearPickedEdge exists. */
   onClearPickedFace?: () => void;
+  /**
+   * Every edge the student has Shift-added to the selection (item E), most
+   * recent last -- purely additive over `pickedEdge` above, which keeps
+   * meaning "the most recent pick" for every consumer that only ever cared
+   * about one edge (the tooltip, the disabled-state message, Hole/Hollow's
+   * own single-face requirement). round() below only takes the multi-edge
+   * path once two or more of these resolve to the SAME solid as `chosen`;
+   * otherwise it falls straight through to the single-edge/whole-shape
+   * logic that already existed, unchanged.
+   */
+  pickedEdges?: Array<{ target: string; edge: TopoName }>;
+  /** Called once every edge in a multi-selection has been consumed into new
+   *  FilletFeatures, the same reason onClearPickedEdge exists. */
+  onClearPickedEdges?: () => void;
   /** Feature id -> why that feature could not be built, from the B-rep build.
    *  A refused feature is ABSENT from the model but still present in the
    *  history, which without this marker looks like the app ignoring a click. */
@@ -404,10 +418,28 @@ function FlyoutButton({
 }
 
 export default function ModelEditor({
-  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, onStartDraw, drawTool, pickedEdge, onClearPickedEdge, pickedFace, onClearPickedFace, refusals,
+  doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, onStartDraw, drawTool, pickedEdge, onClearPickedEdge, pickedFace, onClearPickedFace, pickedEdges, onClearPickedEdges, refusals,
   hoveredPart, onHoverPart, historyGen,
 }: Props) {
   const [note, setNote] = useState<string | null>(null);
+  // Which single rule the student most recently set or changed in the Rules
+  // panel, if any -- so the toolbar Delete can tell "delete this rule" apart
+  // from "delete the whole sketch". Both stay selected together (the Rules
+  // panel only ever shows for the one selected sketch), so selection alone
+  // cannot make that call; EXPLORE-2d.md's own reproduction (cycle Edges 1
+  // and 2 to equal, press the toolbar Delete, the ENTIRE SKETCH vanished)
+  // is exactly the case this exists to catch. Cleared whenever the student
+  // re-clicks a chip (pick(), below) -- a fresh click on the sketch's own
+  // chip is what re-arms "the sketch goes" per item B.
+  const [lastRuleTouched, setLastRuleTouched] = useState<{ sketchId: string; constraint: Constraint } | null>(null);
+  // Pending confirmation for a Delete that would take dependents with it
+  // (item B / D4): named in the course's words, Delete or Keep, Undo still
+  // works afterward same as any other edit. A delete with NOTHING riding on
+  // it (the common case) still goes through immediately -- only a delete
+  // that would silently cost the student more than they clicked gets a stop
+  // sign, the same principle Clear model already applies to wiping the
+  // whole document.
+  const [confirmDelete, setConfirmDelete] = useState<{ ids: string[]; message: string } | null>(null);
   // A note describes something that just happened going FORWARD -- a rule
   // applied, a refusal explained. An Undo/Redo moves the doc a step in
   // TIME instead, and whatever note was on screen may no longer describe
@@ -420,12 +452,18 @@ export default function ModelEditor({
   useEffect(() => {
     if (!historyGenMounted.current) { historyGenMounted.current = true; return; }
     setNote(null);
+    // Same reasoning as the note above: an Undo/Redo can put the constraint
+    // list back to something that no longer contains -- or no longer
+    // matches -- whatever rule was "last touched", and a stale confirm
+    // dialog naming steps a Redo already brought back is worse than none.
+    setLastRuleTouched(null);
+    setConfirmDelete(null);
   }, [historyGen]);
   // An empty document has nothing for a note to be about: Reset clears the
   // model but used to leave "Hollowed, open at the face you clicked." beside
   // "Nothing here yet" (moderate lens, round 2).
   useEffect(() => {
-    if (doc.features.length === 0) setNote(null);
+    if (doc.features.length === 0) { setNote(null); setLastRuleTouched(null); setConfirmDelete(null); }
   }, [doc.features.length]);
   const [search, setSearch] = useState('');
   const [menu, setMenu] = useState<MenuId>(null);
@@ -439,7 +477,6 @@ export default function ModelEditor({
     onCollapsed?.(next);
   };
   const [lastShape, setLastShape] = useState<ShapeKind>('box');
-  const [lastBoolOp, setLastBoolOp] = useState<BoolOp>('union');
   const [lastRound, setLastRound] = useState<RoundStyle>('fillet');
   const [lastPattern, setLastPattern] = useState<PatternMode>('linear');
   const [lastMoveCopy, setLastMoveCopy] = useState(false);
@@ -576,12 +613,54 @@ export default function ModelEditor({
     const f: Feature = { id: nextId(doc, 'op'), kind: 'combine', op, targets };
     onChange({ ...doc, features: [...doc.features, f] });
     setSelected([f.id]);
-    setLastBoolOp(op);
     setMenu(null);
     say(null);
   }
 
   function round(style: RoundStyle) {
+    // Item E: two or more Shift-selected edges on the SAME solid as `chosen`
+    // round/bevel together from one click. ownerOf() re-checks each one the
+    // same staleness-guard reason the single-edge branch below re-checks
+    // pickedEdge -- a picked edge whose solid the student has since
+    // deselected does not belong in this batch.
+    //
+    // This lands as one FilletFeature PER edge, not one feature naming
+    // several edges: lib/occt-build.ts's fillet builder (this pass's item F
+    // is the only change owned there) resolves a Fillet against exactly one
+    // named edge, and giving it a list is a kernel-side change out of
+    // scope here. Functionally this is still "Round applies to every
+    // selected edge in one step" -- one click, every edge rounds -- just as
+    // several timeline rows instead of one; flagged rather than silently
+    // presented as a single feature.
+    const multi = (pickedEdges ?? []).filter(
+      (e) => chosen.length === 1 && chosen[0].id === ownerOf(doc, e)
+    );
+    if (multi.length > 1) {
+      let building = doc;
+      const made: FilletFeature[] = [];
+      for (const e of multi) {
+        const root = building.features.find((x) => x.id === e.edge.feature);
+        const size = root && isRoundable(root) ? Math.min(maxRound(root), 4) : 4;
+        const f: FilletFeature = {
+          id: nextId(building, style === 'chamfer' ? 'bevel' : 'round'),
+          kind: 'fillet',
+          target: e.target,
+          edge: e.edge,
+          size,
+          style,
+        };
+        made.push(f);
+        building = { ...building, features: [...building.features, f] };
+      }
+      onChange(building);
+      setSelected(made.map((f) => f.id));
+      onClearPickedEdges?.();
+      onClearPickedEdge?.();
+      setLastRound(style);
+      setMenu(null);
+      say(null);
+      return;
+    }
     // A picked EDGE (a click in the 3D viewport) takes priority over the
     // whole-shape round below -- see FilletFeature's own doc comment for why
     // this is a different feature kind, not a narrower case of the same
@@ -1147,6 +1226,22 @@ export default function ModelEditor({
 
   function remove() {
     if (!chosen.length) return;
+    // A rule row the student just set or changed wins over the whole
+    // feature it lives on: EXPLORE-2d.md's own reproduction (cycle Edges 1
+    // and 2 to equal, press the toolbar Delete) took out the entire sketch
+    // for what was clearly meant as "undo that one rule". Only fires when
+    // the sketch that rule belongs to is the (sole) thing selected -- a
+    // fresh click on the chip (pick(), above) clears lastRuleTouched and
+    // falls straight through to the ordinary path below.
+    if (lastRuleTouched && chosen.length === 1 && chosen[0].id === lastRuleTouched.sketchId
+      && chosen[0].kind === 'sketch') {
+      const f = chosen[0];
+      const touchedJson = JSON.stringify(lastRuleTouched.constraint);
+      const next = (f.constraints ?? []).filter((c) => JSON.stringify(c) !== touchedJson);
+      setLastRuleTouched(null);
+      setConstraints(f, next);
+      return;
+    }
     // Everything built from what is going has to go too, however far down the
     // chain. Filtering only combines -- which is what this did -- left a Pull
     // pointing at a deleted sketch, and the generated source then referred to a
@@ -1157,13 +1252,39 @@ export default function ModelEditor({
     // `chosen`, not `selected`: the selection can outlive a feature (a rollback,
     // an undo), and a stale id would put a raw `pull1` into the sentence.
     const asked = chosen.map((f) => f.id);
-    const cost = whyDeletingCosts(doc, asked, (id) => names[id] ?? id);
+    // Dependents named up front now (item B / D4), not after the fact: Clear
+    // model already stops a student before it wipes the document, and a
+    // Delete that can silently take dependent steps down with it deserves
+    // the same stop sign. A delete with nothing riding on it (orphaned ==
+    // asked, nothing else) still goes through on the one click -- only a
+    // delete that costs MORE than what was clicked gets a confirm.
+    const doomed = [...orphanedBy(doc, asked)];
+    const extra = doc.features.filter((f) => doomed.includes(f.id) && !asked.includes(f.id));
+    if (extra.length > 0) {
+      const extraNames = extra.map((f) => names[f.id] ?? f.id);
+      const list = extraNames.length === 1
+        ? extraNames[0]
+        : extraNames.slice(0, -1).join(', ') + ' and ' + extraNames[extraNames.length - 1];
+      const subject = asked.length === 1 ? (names[asked[0]] ?? asked[0]) : 'these';
+      const verb = extraNames.length === 1 ? 'goes' : 'go';
+      setConfirmDelete({ ids: asked, message: `Delete ${subject}? ${list} ${verb} with it.` });
+      return;
+    }
     onChange(withoutFeatures(doc, asked));
     setSelected([]);
-    // Said after the fact, not as a confirmation. Delete is undoable here and
-    // an "are you sure" on a reversible action trains people to click through
-    // it -- but vanishing three rows with no explanation is worse still.
-    say(cost);
+    say(null);
+  }
+
+  function confirmRemove() {
+    if (!confirmDelete) return;
+    onChange(withoutFeatures(doc, confirmDelete.ids));
+    setSelected([]);
+    setConfirmDelete(null);
+    say(null);
+  }
+
+  function cancelRemove() {
+    setConfirmDelete(null);
   }
 
   function move(id: string, by: -1 | 1) {
@@ -1198,6 +1319,10 @@ export default function ModelEditor({
         : [id]
     );
     say(null);
+    // A fresh click on a chip is what item B means by "the sketch chip
+    // itself is selected" -- it re-arms the toolbar Delete for the whole
+    // feature, overriding whatever rule was last touched in the panel.
+    setLastRuleTouched(null);
   }
 
   // Only records the rules. Solving happens where the doc is adopted, which is
@@ -1251,6 +1376,14 @@ export default function ModelEditor({
       features: doc.features.map((x) => (x.id === f.id ? { ...x, constraints: next } : x)),
     });
     say(null);
+    // The rule this call added or changed, so the toolbar Delete has
+    // something to target instead of the whole sketch (see
+    // lastRuleTouched's own comment). A pure removal (next has nothing old
+    // did not) leaves nothing to point at -- that row already reads "no
+    // rule" -- so it clears the tracked rule rather than guessing.
+    const before = new Set((f.constraints ?? []).map((c) => JSON.stringify(c)));
+    const touched = next.find((c) => !before.has(JSON.stringify(c))) ?? null;
+    setLastRuleTouched(touched ? { sketchId: f.id, constraint: touched } : null);
   }
 
   const activeSketch =
@@ -1606,12 +1739,21 @@ export default function ModelEditor({
             {patternSelectVisible && patternBoolVisible && <div className="model-tool-divider" />}
             {patternBoolVisible && (
               <div className="model-tool-group">
+                {/* Unlike every other flyout family on this bar, the Combine
+                    group's main button does NOT show "the last variant used"
+                    (see the file-top comment). A student who just Cut two
+                    shapes and comes back later expects Join to still be
+                    where they left it -- and "More join tools" to still say
+                    "join" -- not to have to remember the button now reads
+                    "Cut" and search under "More cut tools" to find Join
+                    again (P19b/P19c). Join is pinned; Cut and Overlap live
+                    only in the flyout. */}
                 <FlyoutButton
-                  label={boolLabel(lastBoolOp)}
-                  icon={boolIcon(lastBoolOp)}
-                  onMain={() => combine(lastBoolOp)}
+                  label={boolLabel('union')}
+                  icon={boolIcon('union')}
+                  onMain={() => combine('union')}
                   disabled={!canCombine}
-                  title={canCombine ? boolLabel(lastBoolOp) : 'Pick two shapes first — click one, then hold Shift (or Ctrl, or Cmd) and click another.'}
+                  title={canCombine ? boolLabel('union') : 'Pick two shapes first — click one, then hold Shift (or Ctrl, or Cmd) and click another.'}
                   open={menu === 'bool'}
                   onToggleOpen={() => toggleMenu('bool')}
                   matches={matches}
@@ -1683,6 +1825,27 @@ export default function ModelEditor({
       {note && !timelineHost && <p className="model-note">{note}</p>}
       {timelineHost && note ? createPortal(
         <p className="model-note model-note-timeline">{note}</p>,
+        timelineHost
+      ) : null}
+      {/* Item B / D4: a Delete that would also take dependents down with it
+          stops here first, named in the course's words, same posture Clear
+          model already has for wiping the whole document. Rendered in the
+          same spot the note occupies -- the status strip where the timeline
+          usually sits -- so it reads as "what Delete is about to do", not a
+          separate popup. */}
+      {confirmDelete && !timelineHost && (
+        <div className="model-confirm-delete">
+          <span>{confirmDelete.message}</span>
+          <button type="button" onClick={confirmRemove} className="model-confirm-delete-go">Delete</button>
+          <button type="button" onClick={cancelRemove} className="model-confirm-delete-keep">Keep</button>
+        </div>
+      )}
+      {timelineHost && confirmDelete ? createPortal(
+        <div className="model-confirm-delete model-confirm-delete-timeline">
+          <span>{confirmDelete.message}</span>
+          <button type="button" onClick={confirmRemove} className="model-confirm-delete-go">Delete</button>
+          <button type="button" onClick={cancelRemove} className="model-confirm-delete-keep">Keep</button>
+        </div>,
         timelineHost
       ) : null}
       {timelineHost ? createPortal(
@@ -2052,6 +2215,25 @@ export default function ModelEditor({
           border-left: 2px solid #ffb86c; flex-shrink: 0;
         }
         .model-note-timeline { align-self: center; margin-left: 8px; margin-right: 8px; max-width: 46ch; order: 2; }
+        /* Dracula red -- the same accent HandleOverlay.tsx already uses for
+           its own destructive-adjacent state -- rather than the note's amber,
+           so a delete confirm reads as a different kind of message than an
+           ordinary teaching note. */
+        .model-confirm-delete {
+          display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+          margin: 0; padding: 7px 10px; font-size: 12px; line-height: 1.45;
+          color: #ff5555; background-color: #3a2328;
+          border-left: 2px solid #ff5555;
+        }
+        .model-confirm-delete-timeline { align-self: center; margin-left: 8px; margin-right: 8px; max-width: 52ch; order: 2; }
+        .model-confirm-delete-go, .model-confirm-delete-keep {
+          flex-shrink: 0; padding: 3px 10px; font-size: 12px; border-radius: 3px;
+          cursor: pointer;
+        }
+        .model-confirm-delete-go { background: #ff5555; border: 1px solid #ff5555; color: #282a36; }
+        .model-confirm-delete-go:hover { background: #ff7777; border-color: #ff7777; }
+        .model-confirm-delete-keep { background: transparent; border: 1px solid #ff5555; color: #ff5555; }
+        .model-confirm-delete-keep:hover { background: #3a2328; }
         .model-list { margin: 0; padding: 6px; list-style: none; overflow-y: auto; flex: 1 1 auto; }
         /* The parametric timeline: the same feature list, laid out as a
            horizontal strip of chips across the bottom of the canvas, Fusion

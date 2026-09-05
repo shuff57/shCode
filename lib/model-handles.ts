@@ -287,25 +287,31 @@ export function handlesFor(f: Feature, doc?: ModelDoc): HandleSpec[] {
   } else if (f.kind === 'cylinder') {
     reach = Math.max(f.radius * 2, f.height) * 0.75;
     size.push(
-      { kind: 'size', param: `${f.id}_radius`, origin: [cx + f.radius, cy, cz], axis: [1, 0, 0], scale: 1, label: 'radius' },
+      // scale: 2, not 1 -- the panel now shows/edits "across" (diameter,
+      // see lib/model-codegen.ts's generatedParams/applyParam), but this
+      // handle still sits at a single-sided radius offset from the centre.
+      // 1mm of drag has to read as 1mm of radius growth (2mm of diameter),
+      // the same reasoning the box's centred width handle above already
+      // uses for the opposite (both-sides) case.
+      { kind: 'size', param: `${f.id}_radius`, origin: [cx + f.radius, cy, cz], axis: [1, 0, 0], scale: 2, label: 'across' },
       { kind: 'size', param: `${f.id}_height`, origin: [cx, cy, cz + f.height / 2], axis: [0, 0, 1], scale: 2, label: 'height' },
     );
   } else if (f.kind === 'cone') {
     reach = Math.max(f.radius * 2, f.height) * 0.75;
     size.push(
-      { kind: 'size', param: `${f.id}_radius`, origin: [cx + f.radius, cy, cz - f.height / 2], axis: [1, 0, 0], scale: 1, label: 'radius' },
+      { kind: 'size', param: `${f.id}_radius`, origin: [cx + f.radius, cy, cz - f.height / 2], axis: [1, 0, 0], scale: 2, label: 'across' },
       { kind: 'size', param: `${f.id}_height`, origin: [cx, cy, cz + f.height / 2], axis: [0, 0, 1], scale: 2, label: 'height' },
     );
   } else if (f.kind === 'torus') {
     reach = (f.ringRadius + f.tubeRadius) * 1.4;
     size.push(
-      { kind: 'size', param: `${f.id}_ring`, origin: [cx + f.ringRadius, cy, cz], axis: [1, 0, 0], scale: 1, label: 'ring' },
-      { kind: 'size', param: `${f.id}_tube`, origin: [cx + f.ringRadius, cy, cz + f.tubeRadius], axis: [0, 0, 1], scale: 1, label: 'tube' },
+      { kind: 'size', param: `${f.id}_ring`, origin: [cx + f.ringRadius, cy, cz], axis: [1, 0, 0], scale: 2, label: 'across' },
+      { kind: 'size', param: `${f.id}_tube`, origin: [cx + f.ringRadius, cy, cz + f.tubeRadius], axis: [0, 0, 1], scale: 2, label: 'tube across' },
     );
   } else {
     reach = f.radius * 1.5;
     size.push(
-      { kind: 'size', param: `${f.id}_radius`, origin: [cx + f.radius, cy, cz], axis: [1, 0, 0], scale: 1, label: 'radius' },
+      { kind: 'size', param: `${f.id}_radius`, origin: [cx + f.radius, cy, cz], axis: [1, 0, 0], scale: 2, label: 'across' },
     );
   }
 
