@@ -873,6 +873,12 @@ export default function BrepViewportThree({
     controls.target.set(0, 0, 0);
     controls.enableDamping = true;
     controls.dampingFactor = 0.1;
+    // This app's navigation convention, the one onClick below relies on:
+    // right-drag orbits, middle-drag pans, the wheel zooms, and left-drag is a
+    // deliberate no-op so a left click never contends with the camera for the
+    // gesture. OrbitControls' defaults are the opposite (left orbits, middle
+    // zooms, right pans); scripts/drive-phase-b.py section 3 measures this.
+    controls.mouseButtons = { LEFT: null, MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.ROTATE };
 
     const renderNow = () => renderer.render(scene, camera);
 
