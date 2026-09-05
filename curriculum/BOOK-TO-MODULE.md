@@ -8,7 +8,7 @@ rewritten) and the matching shCode unit needs to be built (or resynced).
 (`book_manifest.yaml`); the lesson-authoring conventions live only on this side
 (`curriculum/resources/`). Neither knows about the other. This file is the bridge.
 
-- **Book repo:** `C:/Users/shuff/Documents/GitHub/bookSHelf`
+- **Book repo:** `C:/Users/shuff57/Documents/GitHub/bookSHelf`
 - **Book project:** `projects/Introduction to Programming Concepts and Methodologies/`
 - **Mapping table:** that project's `book_manifest.yaml`, `shCode:` block
 - **This repo's build specs:** `curriculum/modules/` + `curriculum/resources/`
@@ -382,6 +382,19 @@ Resync a unit like this, in this order:
    book change that renames an API silently breaks every regex requirement mentioning
    it.
 5. **Update `status:`** in the spec frontmatter (`draft | ready | shipped | built`).
+6. **Run `npm run test:book-refs`.** Chapter 2 only, for now — it is the only chapter
+   whose lessons carry `sourceRef` at all. It reads the book off disk and fails if any
+   `Definition`/`Example`/`Try It Now`/`Problem Set` a lesson cites is not in the book
+   any more, or if a `book N.S.K` anchor names no subsection.
+
+   This exists because the rot it catches already shipped: the book renumbered its
+   elements from two parts to three (`Example 2.4` → `Example 2.1.5`) and 58 lessons
+   kept the old numbers for weeks. **The offset was not constant** — §2.1 gained an
+   example partway through — so when it fires, resolve each hit by matching the
+   element's *title*, never by shifting the number. It is not in `npm test`: it needs
+   bookSHelf checked out (`BOOKSHELF=/path/to/bookSHelf` overrides the sibling-clone
+   default) and a checker that goes quiet when the book is missing would report green
+   for a question it never asked.
 
 Assignments and challenges are shCode's own. A book change does **not** justify
 rewriting a working lab unless the concept it grades actually moved.
