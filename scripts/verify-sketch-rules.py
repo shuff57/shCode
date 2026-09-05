@@ -26,6 +26,20 @@ on any FAIL.
     typing -3 into a Bow cell bows the edge the OTHER way (addendum item G).
 (8) An info note left on screen by an earlier action (a Bow) is cleared by
     Undo (addendum item H).
+(9) Pinning a corner AFTER a between-edges pair rule (equal) is already set
+    holds -- both the pin and the pair rule survive, matching the literal
+    order named in addendum item I. The deeper fix (addConstraintSettling
+    must not drop a LOCK over a non-lock rule just because removing the
+    lock leaves more area) is proven directly against the solver in
+    scripts/sketch-solve-assertions.cjs -- constructing a live sequence
+    where the two actually collide, rather than each individually
+    resolving, was not reachable through ordinary Rules-panel/Dimensions-
+    panel interaction (every attempt that tried to leave two corners at a
+    genuinely conflicting position under an active horizontal/vertical
+    rule got pulled back into consistency by the very same solve that is
+    supposed to keep the sketch sane -- itself a reasonable thing for it
+    to do). This check instead re-proves the literal repro holds end to
+    end and does not regress.
 
 Rules-panel controls that predate this probe's item-D fix are still clicked
 via `el.click()` in the page's own JS (locator.evaluate) for the S09/S10/S11
@@ -288,6 +302,30 @@ def check_undo_clears_note(page):
         not after_note.count() or not after_text, repr(after_text))
 
 
+def check_lock_after_pair_rule(page):
+    print("\n=== I: pinning a corner AFTER a between-edges pair rule holds ===")
+    arm_sketch(page)
+    cell = page.locator('[title^="Edges 1 and 2"]').first
+    cell.click()  # -> equal (edges 1 and 2 genuinely differ: 40 vs 25)
+    time.sleep(0.2)
+    check("setup: 'equal' between edges 1 and 2 is on before the pin",
+        (cell.get_attribute("aria-label") or "").endswith(": equal"),
+        cell.get_attribute("aria-label"))
+
+    pin = page.locator('[aria-label="Pin corner 1"]')
+    pin.click()
+    time.sleep(0.3)
+    check("the pin holds after a pair rule was already set",
+        pin.get_attribute("aria-pressed") == "true", pin.get_attribute("aria-pressed"))
+    check("...and the pair rule itself is not the thing silently dropped for it",
+        (cell.get_attribute("aria-label") or "").endswith(": equal"),
+        cell.get_attribute("aria-label"))
+    note = page.locator(".model-note")
+    note_text = note.first.text_content() if note.count() else None
+    check("...with no refusal banner shown",
+        "That would" not in (note_text or ""), repr(note_text))
+
+
 def check_s09(page):
     print("\n=== S09: parallel between edges 1 and 3 must not collapse the sketch ===")
     arm_sketch(page)
@@ -414,6 +452,11 @@ def main():
             check_undo_clears_note(page)
         except Exception as exc:  # noqa: BLE001
             check("H checks ran without an exception", False, repr(exc))
+
+        try:
+            check_lock_after_pair_rule(page)
+        except Exception as exc:  # noqa: BLE001
+            check("I checks ran without an exception", False, repr(exc))
 
         browser.close()
 

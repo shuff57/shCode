@@ -566,6 +566,63 @@ module.exports = function run(dir) {
     trulyStuck.removed === null && trulyStuck.constraints.length === 3,
     JSON.stringify(trulyStuck));
 
+  console.log('\n=== a lock is the last resort, not just whichever removal leaves more area (item I) ===');
+
+  // Corners 0 and 1 locked at DIFFERENT y's -- a direct contradiction with
+  // `horizontal` on edge 0, which demands they match. Two removals each
+  // resolve it alone: drop edge 0's horizontal rule (a real, non-degenerate
+  // quad, area 100) or drop corner 0's lock (a bigger rectangle, area 800).
+  // Pure area-maximising picks the lock every time; a lock must lose only
+  // when nothing else can settle it.
+  const lockQuad = [[0, 0], [40, 45], [40, 25], [0, 25]];
+  const lockCS = [
+    { kind: 'horizontal', edge: 0 }, { kind: 'vertical', edge: 1 },
+    { kind: 'horizontal', edge: 2 }, { kind: 'vertical', edge: 3 },
+    { kind: 'lock', corner: 0 }, { kind: 'lock', corner: 1 },
+  ];
+  const lockSettled = S.addConstraintSettling(lockQuad, lockCS);
+  check('...setup: this really is a conflict that needs a removal',
+    S.solveSketch(lockQuad, lockCS).overConstrained, 'setup check, not the fix under test');
+  check('locking corner 1 after corner 0 is already locked drops edge 0\'s '
+    + 'horizontal rule, not either lock',
+    lockSettled.removed && lockSettled.removed.kind === 'horizontal' && lockSettled.removed.edge === 0
+    && lockSettled.constraints.some((c) => c.kind === 'lock' && c.corner === 0)
+    && lockSettled.constraints.some((c) => c.kind === 'lock' && c.corner === 1),
+    JSON.stringify(lockSettled));
+  check('...and both locked corners genuinely hold in the result',
+    (() => {
+      const solved = S.solveSketch(lockQuad, lockSettled.constraints);
+      return near(solved.points[0][0], 0) && near(solved.points[0][1], 0)
+        && near(solved.points[1][0], 40) && near(solved.points[1][1], 45);
+    })(),
+    JSON.stringify(S.solveSketch(lockQuad, lockSettled.constraints).points));
+
+  // A fresh lock on a sketch that is not otherwise in any conflict must
+  // simply hold -- no removal, no banner, same as any other harmless add.
+  const freshLockCS = [
+    { kind: 'horizontal', edge: 0 }, { kind: 'vertical', edge: 1 },
+    { kind: 'horizontal', edge: 2 }, { kind: 'vertical', edge: 3 },
+    { kind: 'lock', corner: 2 },
+  ];
+  const freshLockSettled = S.addConstraintSettling(rect(), freshLockCS);
+  check('a fresh lock on an unconflicted sketch simply holds -- nothing removed',
+    freshLockSettled.removed === null && freshLockSettled.constraints.length === freshLockCS.length,
+    JSON.stringify(freshLockSettled));
+
+  // The order the addendum named directly: a between-edges rule set FIRST,
+  // then a corner locked -- must not silently drop the just-added lock, and
+  // must not drop any EARLIER lock either when a non-lock removal exists.
+  const pairThenLockBase = [
+    { kind: 'horizontal', edge: 0 }, { kind: 'horizontal', edge: 2 },
+    { kind: 'vertical', edge: 3 }, { kind: 'horizontal', edge: 1 },
+  ];
+  const pairThenLockCS = [...pairThenLockBase, { kind: 'lock', corner: 2 }];
+  const pairThenLockPts = [[0, 0], [40, 0], [55, 25], [0, 25]];
+  const pairThenLockSettled = S.addConstraintSettling(pairThenLockPts, pairThenLockCS);
+  check('a lock added after a between-edges/other rule is already set is not itself dropped',
+    pairThenLockSettled.constraints.some((c) => c.kind === 'lock' && c.corner === 2),
+    JSON.stringify(pairThenLockSettled));
+
   console.log('\n=== a between-edges rule must not collapse the sketch (S09/S10/S11) ===');
 
   // Solve a freshly-added rule the way the app actually does: settle it

@@ -617,15 +617,35 @@ export function addConstraintSettling(points: Point[], next: Constraint[]): Conf
   // different lengths pinned to one edge, for instance, never resolves by
   // dropping any single one of them, and must not pretend to by cascading
   // through a second removal).
+  //
+  // A `lock` is deprioritised below every other kind, area be damned: it is
+  // the one rule a student sets purely to protect something from moving,
+  // and losing it silently defeats the entire point of having pinned that
+  // corner in the first place -- unlike an across/up/length/equal rule,
+  // which merely describes a shape and is no great loss to relax. Measured
+  // 2026-09-04 (item I): a corner locked before a between-edges rule went
+  // on to conflict with an unrelated older rule, and pure area-maximising
+  // picked dropping the LOCK over dropping that older rule because the
+  // resulting shape happened to be bigger -- a rectangle 0, [0,45],
+  // [40,25], [0,25] with corners 0 and 1 both locked at different y's:
+  // freeing corner 0 (dropping its lock) reached area 800, freeing the
+  // conflicting horizontal rule instead reached only 100, and the old
+  // code kept whichever number was larger. A lock is only ever removed
+  // here when NO non-lock candidate resolves the conflict on its own.
   let bestIdx = -1;
   let bestArea = -Infinity;
+  let bestIsLock = true;
   for (let i = 0; i < next.length; i++) {
     if (next[i] === added) continue;
     const candidate = next.filter((_, idx) => idx !== i);
     const solved = solveSketch(seed, candidate);
     if (solved.overConstrained || collapsedByRatio(points, solved.points)) continue;
+    const isLock = next[i].kind === 'lock';
     const area = polygonArea(solved.points);
-    if (area > bestArea) { bestArea = area; bestIdx = i; }
+    const better = bestIdx === -1
+      || (bestIsLock && !isLock)
+      || (bestIsLock === isLock && area > bestArea);
+    if (better) { bestArea = area; bestIdx = i; bestIsLock = isLock; }
   }
   if (bestIdx === -1) return { constraints: next, removed: null };
   return { constraints: next.filter((_, idx) => idx !== bestIdx), removed: next[bestIdx] };
