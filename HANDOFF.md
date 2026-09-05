@@ -1,37 +1,29 @@
-# Handoff — 2026-09-05 (latest) · the JSCAD runner is deleted
+# Handoff — 2026-09-05 (latest) · JSCAD is gone from the tree and the site
 
-The JSCAD runner, its vendored bundles, `public/reshape/docs/jscad-legacy.md`,
-and every script that only measured them are gone (git rm, not just retired —
-full list in `CLAUDE.md`'s "JSCAD is retired" section, 2026-09-05 update).
-`lib/model-codegen.ts` keeps only its doc-level exports; `toReshape()` is
-deleted. `?engine=jscad` / `?script=0` no longer exist.
+Two passes today. The first deleted the runner, its vendored bundles,
+`jscad-legacy.md`, `toReshape()` and every script that only measured them
+(full list: CLAUDE.md, "JSCAD is retired", the 2026-09-05 updates). The
+second swept what the first left: the JSCAD `challenges.md` ladder and its
+docs-index card, the `/brep-three/` spike page (twin of the deleted
+`/brep-test/`), the three `lessons/_retired/jscad-*` folders, the two python
+sandbox gates that drove `public/jscad/runner.html`, and the book-conversion
+audit. Nothing on shcode.pages.dev answers with JSCAD code any more.
 
-Defect found and fixed along the way: `/docs/reshape/overview/` and the
-lesson docs-drawer snippet were still sending reSHape Script to the deleted
-JSCAD runner, throwing `ReferenceError: box is not defined` on every Run —
-both now go through the new `components/ReshapeScriptPreview.tsx` onto the
-kernel, same as everywhere else in the app.
+Trap found on the way: `scripts/generate-lesson-starters.mjs` walked
+`lessons/_retired/` and shipped every retired starter -- the JSCAD ones
+included -- inside the Pages Functions worker under an `_retired` key. It now
+skips any `_folder`; `lib/lessons.ts` and the manifest generator already did.
 
----
-# Handoff — 2026-09-01 (latest) · JSCAD is retired as a direction
+Defect found and fixed in pass one: `/docs/reshape/overview/` and the lesson
+docs-drawer snippet were still sending reSHape Script to the deleted JSCAD
+runner (`ReferenceError: box is not defined` on every Run); both now go
+through `components/ReshapeScriptPreview.tsx` onto the kernel.
 
-reSHape (which is the thing referred to as jSketcher) runs on JSCAD, and JSCAD
-is now retired: it is what gets replaced, not what gets built on. The full note,
-including where the line already falls, is at the top of `CLAUDE.md`.
-
-The short version, measured across the 55 files this session touched: the
-solver, the sketch geometry, the constraint rules, the whole Rules-panel and
-canvas UI, and all 501 assertions have **zero** JSCAD coupling.
-`lib/model-codegen.ts` is the single translation layer, with 11 real call
-sites. `ModelDoc` is the seam and it is already the right one -- keep new work
-above it.
-
-What does NOT survive a core swap: the 227 doc examples and `reference.md`,
-which teach JSCAD's API by name, and the vendored bundle itself.
-
-A B-rep kernel was measured and refused the same day -- 21.9 MB and LGPL
-against 0.41 MB and MIT, for six tools worth having. Retiring JSCAD does not
-make OpenCascade the answer.
+Still carrying the word, deliberately: `public/_redirects` (`/docs/jscad/*`
+-> `/docs/reshape/`, keeps old links alive), `lib/version-control.ts` (renames
+students' `sandbox-jscad*` localStorage keys), `.gauntlet/oracle.json` (a
+frozen fixture), comments that compare kernel results with the old engine,
+and the curriculum planning docs under `curriculum-data/`.
 
 ---
 # Handoff — 2026-09-01 (later) · Phase B run; two defects found and fixed

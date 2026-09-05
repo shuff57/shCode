@@ -126,6 +126,20 @@ to send reSHape Script to the JSCAD runner and fail with `ReferenceError: box is
 not defined`, now run through `components/ReshapeScriptPreview.tsx` onto the
 kernel, same as everywhere else.
 
+**Update, 2026-09-05, evening.** The sweep after the runner:
+`public/reshape/docs/challenges.md` (the JSCAD challenge ladder) and its card
+on the docs index, `app/brep-three/` (the spike page twinning the deleted
+`/brep-test/`), `lessons/_retired/jscad-*`, `scripts/sandbox-checks.py` and
+`scripts/sandbox-mutations.py` (they drove `public/jscad/runner.html`; their
+`test:sandbox*` npm aliases went with them), `scripts/_prose-dump.mjs` and
+`scripts/audit-book-conversion.mjs` are deleted. `scripts/generate-lesson-starters.mjs`
+no longer walks `lessons/_retired/` -- it had been shipping the retired JSCAD
+starters into the Pages Functions worker. `scripts/drive-phase-b.py` section 4
+drives the studio's Export STL/OBJ/3MF buttons instead of the runner's Save
+bar. Kept on purpose: the `/docs/jscad/*` redirects, the `sandbox-jscad*`
+localStorage rename in `lib/version-control.ts`, `.gauntlet/oracle.json`, and
+the comments that compare kernel results with the old engine.
+
 ### Where the line already falls
 
 Measured 2026-09-01 across the 55 files that round of work touched (see the

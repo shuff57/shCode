@@ -38,8 +38,6 @@
     "test:reshape-docs": "node scripts/test-reshape-docs.mjs",
     "test:js-docs": "node scripts/test-js-docs.mjs",
     "test:docs-prose": "node scripts/check-docs-prose.mjs",
-    "test:sandbox": "python scripts/sandbox-checks.py",
-    "test:sandbox-mutations": "python scripts/sandbox-mutations.py",
     "test:model": "node scripts/test-model-codegen.mjs",
     "test:handles": "node scripts/test-model-handles.mjs",
     "test:mesh-export": "node scripts/test-mesh-export.mjs",

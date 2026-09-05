@@ -2,9 +2,9 @@
 
 // The three.js twin of components/model/BrepViewport.tsx -- same OpenCascade
 // kernel, same ModelDoc, same props, a different renderer underneath. Built
-// alongside the JSCAD/regl viewport rather than in place of it so the two can
-// be measured side by side; see app/brep-three/page.tsx and
-// app/brep-test/page.tsx, which run the identical hardcoded document.
+// alongside the JSCAD/regl viewport rather than in place of it so the two
+// could be measured side by side (the spike pages that ran the identical
+// hardcoded document, app/brep-test and app/brep-three, are deleted).
 //
 // WHY THIS EXISTS AT ALL. @jscad/regl-renderer is the last piece of JSCAD
 // still in the B-rep path -- lib/occt-mesh.ts exists purely to translate an
@@ -2455,7 +2455,7 @@ const errorPanelStyle: React.CSSProperties = {
 // this component's own canvas (see HANDOFF.md's "Build floats a 48px ribbon
 // over that band"), so a plain top-right corner sits directly under its
 // buttons. This clears it while staying a normal top-right stack on every
-// OTHER host (app/brep-three/page.tsx has no ribbon at all).
+// OTHER host (a bare page with no ribbon at all).
 //
 // A column, not a single fixed-position badge, because the hint and the
 // selection badge can be true AT THE SAME TIME -- a shape already selected
@@ -2487,7 +2487,7 @@ const selectionBadgeStyle: React.CSSProperties = {
 // side by side), so a literal left:12 strip lands directly under it: a
 // real click on "Home" there hit the rail, not this button. 70 clears the
 // rail's right edge (12 + 46 = 58) with an 12px gap. On a host with no such
-// rail (app/brep-three/page.tsx, app/brep-test/page.tsx) this is just a
+// rail this is just a
 // slightly wider left margin than the minimum -- no functional cost.
 const viewStripStyle: React.CSSProperties = {
   position: 'absolute', left: 70, bottom: 12, display: 'flex', gap: 6,

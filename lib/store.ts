@@ -90,7 +90,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       files.map((f) => [f.path, normalizeEol(f.content || '')])
     );
 
-    // For JS-only preview modes (console, jscad, moshion), default to script.js
+    // For JS-only preview modes (console, reshape, moshion), default to script.js
     const jsPreviewModes = ['console', 'reshape', 'moshion'];
     const defaultFile = jsPreviewModes.includes(lesson.preview || '')
       ? (files.find((f) => f.path.endsWith('.js'))?.path || files[0]?.path)

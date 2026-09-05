@@ -11,7 +11,6 @@ why.
 | File | Covers |
 |---|---|
 | `reference.md` | Hand-authored reSHape Script reference — every call the course teaches, with signatures + examples |
-| `challenges.md` | Challenge ladder still written against the old JSCAD API (`require`/`main()`/`module.exports`) — not yet converted to reSHape Script; treat as a known gap, not a source of truth |
 | `CLAUDE.md` | How the app builds and verifies reSHape Script (the interpreter, the kernel, the doc-sync gates) — dev reference |
 | `index.html` | Docs index page (open `docs/` in a browser) |
 

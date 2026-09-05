@@ -1547,8 +1547,8 @@ function DetailView({ classId }: { classId: string }) {
         </button>
       </div>
 
-      {/* Shape tools vs code. Only JSCAD assignments can be gated — the setting
-          decides which editor a JSCAD lesson opens in, and means nothing to a
+      {/* Shape tools vs code. Only reSHape assignments can be gated — the setting
+          decides which side a reSHape lesson opens on, and means nothing to a
           moSHion or console one. */}
       {activeView === 'roster' && (
         <LessonModeControl

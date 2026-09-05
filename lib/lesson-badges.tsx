@@ -44,7 +44,6 @@ export const PREVIEW_BADGES: Record<string, PreviewBadge> = {
   slides:     makeBadge(Presentation, 'Slides',         '#bd93f9'),
   moshion:     makeBadge(Play,         'moSHion Lesson',  '#ff79c6'),
   console:    makeBadge(Terminal,     'Console',        '#50fa7b'),
-  jscad:      makeBadge(Box,          'JSCAD',          '#ffb86c'),
   html:       makeBadge(Globe,        'HTML',           '#8be9fd'),
   diagram:    makeBadge(Workflow,     'Flowchart',      '#f1fa8c'),
   quiz:       makeBadge(ListChecks,   'Quiz',           '#f1fa8c'),

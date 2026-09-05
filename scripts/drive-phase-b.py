@@ -22,6 +22,7 @@
 # without allow-same-origin: its DOM is unreadable by design, so the only
 # honest question is whether the picture changed.
 import os
+import re
 import sys
 import tempfile
 from playwright.sync_api import sync_playwright
@@ -72,8 +73,10 @@ with sync_playwright() as p:
     pg.wait_for_timeout(3500)
     rows = pg.locator(".model-timeline .model-row")
     check("the timeline holds the sketch and the solid it became", rows.count() == 2, rows.count())
-    frame = pg.locator("iframe.reshape-frame")
-    check("the preview frame is on the page", frame.count() == 1, frame.count())
+    # The model is drawn by the host page (components/model/BrepViewportThree.tsx)
+    # since the JSCAD runner iframe was deleted; screenshot that canvas instead.
+    frame = pg.locator("canvas").first
+    check("the preview canvas is on the page", frame.count() == 1, frame.count())
     solid = SHOTS + "/50-solid.png"
     frame.screenshot(path=solid)
 
@@ -157,14 +160,19 @@ with sync_playwright() as p:
 
     print("")
     print("--- 4. save a file ---")
-    rf = pg.frame_locator("iframe.reshape-frame")
-    saves = rf.locator("button[data-format]")
-    check("the runner offers all four formats", saves.count() == 4, saves.count())
+    # The Export buttons live on the host page now (components/reshape/
+    # ReshapeStudio.tsx), one per mesh format. The JSCAD runner that used to
+    # own Save, and its SVG button, are deleted; three formats, all meshes,
+    # so there is no refusal case left to drive.
+    saves = pg.get_by_role("button", name=re.compile(r"^Export (STL|OBJ|3MF)$"))
+    check("the studio offers all three mesh formats", saves.count() == 3, saves.count())
     got = {}
-    for fmt in ["stl", "3mf", "obj"]:
+    for fmt in ["stl", "obj", "3mf"]:
         try:
+            btn = pg.get_by_role("button", name="Export " + fmt.upper())
+            btn.wait_for(state="visible", timeout=5000)
             with pg.expect_download(timeout=25000) as info:
-                rf.locator('button[data-format="' + fmt + '"]').click()
+                btn.click()
             d = info.value
             path = os.path.join(SHOTS, d.suggested_filename)
             d.save_as(path)
@@ -173,31 +181,16 @@ with sync_playwright() as p:
             got[fmt] = ("(no download)", 0, str(e)[:140])
     for fmt in got:
         name, size, path = got[fmt]
-        check("Save " + fmt.upper() + " produces a real file", size > 0,
+        check("Export " + fmt.upper() + " produces a real file", size > 0,
               name + " " + str(size) + " bytes -- " + str(path))
 
-    # SVG is the one format that is NOT a mesh. A solid has no flat shapes,
-    # so refusing is correct -- what matters is that it refuses OUT LOUD
-    # rather than doing nothing. The first version of this driver asserted a
-    # download here and was wrong about the app, not the other way round.
-    rf.locator('button[data-format="svg"]').click()
-    pg.wait_for_timeout(2500)
-    shown = rf.locator("#__jscadError").inner_text()
-    check("Save SVG on a SOLID refuses rather than writing an empty file",
-          "SVG" in shown and "flat shapes" in shown, repr(shown[:160]))
-    check("...and says what to do instead, on the canvas where the student is looking",
-          "save STL for a solid" in shown, repr(shown[:160]))
-    # A save that declines must not be reported as a build that failed. The
-    # host's amber panel says 'These numbers stopped the code before it
-    # produced a shape' -- true for a build error, false here, and it appeared
-    # seconds after the same model exported to STL and OBJ.
+    # An export must not be reported as a build that failed. The host's amber
+    # panel says 'These numbers stopped the code before it produced a shape'
+    # -- true for a build error, false after a save.
     panel = pg.inner_text(".reshape-pane-params")
     check("...and the host is NOT told the model failed to build",
           "stopped the code" not in panel,
-          "the Dimensions panel claims a build failure after a save refusal")
-
-    check("...and the earlier saves still worked, so this is a refusal not a broken bar",
-          got["stl"][1] > 0 and got["obj"][1] > 0)
+          "the Dimensions panel claims a build failure after an export")
 
     if got["stl"][1] > 0:
         raw = open(got["stl"][2], "rb").read()

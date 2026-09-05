@@ -2,8 +2,8 @@
 # cannot call /api/* as the student. That makes it an OPAQUE origin, and an
 # opaque origin's fetches are cross-origin with `Origin: null`.
 #
-# A classic <script src> is fetched no-cors, which is why the JSCAD bundle loads
-# there today without any of this. An ES MODULE is always fetched in CORS mode,
+# A classic <script src> is fetched no-cors, which is why the old JSCAD bundle
+# loaded there without any of this. An ES MODULE is always fetched in CORS mode,
 # and so is the .wasm an emscripten module pulls in -- so a module-shipped
 # kernel is blocked before its wasm is even requested. Measured 2026-09-01:
 # without this header the OpenCascade build fails at the module script with
