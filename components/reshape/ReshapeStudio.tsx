@@ -267,6 +267,14 @@ export default function ReshapeStudio({
   const [rowHoverPart, setRowHoverPart] = useState<
     { kind: 'edge' | 'corner'; index: number } | { kind: 'edge' | 'corner'; index: number }[] | null
   >(null);
+  // Item N: when the Rules panel or a handle was last actually touched --
+  // a click that commits a value (setRowHoverPart only fires with a real
+  // touch, never on a plain mouse-leave clear) or a handle drag/commit.
+  // BrepViewportThree.tsx uses this to hold its own "A sketch is flat..."
+  // Pull hint off screen while a student is visibly busy in the panel,
+  // rather than refreshing it on top of every rule they set.
+  const [ruleActivityAt, setRuleActivityAt] = useState<number | null>(null);
+  const touchRuleActivity = () => setRuleActivityAt(Date.now());
   const [rollbackIndex, setRollbackIndex] = useState<number | null>(null);
   const [drawTool, setDrawTool] = useState<'rect' | 'polygon' | null>(null);
   const [drawFirst, setDrawFirst] = useState<[number, number] | null>(null);
@@ -910,7 +918,7 @@ export default function ReshapeStudio({
               onStartDraw={setDrawTool}
               drawTool={drawTool}
               hoveredPart={pointerHoverPart}
-              onHoverPart={setRowHoverPart}
+              onHoverPart={(p) => { setRowHoverPart(p); if (p) touchRuleActivity(); }}
               onUndo={undo}
               onRedo={redo}
               canUndo={depth.back > 0}
@@ -941,6 +949,7 @@ export default function ReshapeStudio({
             {(showBrep || showBrepOnCode) ? (
               <BrepViewport
                 doc={shownDoc}
+                ruleActivityAt={ruleActivityAt}
                 onStats={(st: BrepViewportStats) => {
                   const total = st.buildMs + st.meshMs + st.drawMs;
                   if (previewDoc != null && total > PREVIEW_DEGRADE_MS) {
@@ -1033,8 +1042,8 @@ export default function ReshapeStudio({
                 points={anchors}
                 values={paramValues}
                 scales={scales}
-                onDrag={(param, val) => sendParams({ [param]: val })}
-                onCommit={commitParams}
+                onDrag={(param, val) => { sendParams({ [param]: val }); touchRuleActivity(); }}
+                onCommit={() => { commitParams(); touchRuleActivity(); }}
                 onTap={(x, y) => pickAtRef.current?.(x, y)}
                 outlines={outlines}
                 drawing={drawTool ?? false}

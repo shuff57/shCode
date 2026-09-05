@@ -1159,8 +1159,11 @@ module.exports = function run(dir) {
     // Matches the toolbar's own button text (ModelEditor.tsx's roundLabel) --
     // NOT reference.md/studentWord()'s "bevel", a naming disagreement this
     // pass flags rather than resolves (see model-types.ts's labelOf comment).
-    check('a chamfer-style round is labelled Angled Corner, matching the toolbar button -- not Bevel',
-      types.nameMap(chamferDoc).fc1 === 'Angled Corner 1', types.nameMap(chamferDoc).fc1);
+    // Decision: reference.md/studentWord() win the naming disagreement --
+    // "Bevel", not the toolbar's retired "Angled Corner" (kept only as a
+    // search alias, see ModelEditor.tsx's FlyoutVariant.alias).
+    check('a chamfer-style round is labelled Bevel, matching reference.md/studentWord()',
+      types.nameMap(chamferDoc).fc1 === 'Bevel 1', types.nameMap(chamferDoc).fc1);
   }
 
   console.log('\n=== sketch build 1: circle (shape tag) ===');

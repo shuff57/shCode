@@ -164,16 +164,18 @@ def check_rule_focused_delete(page):
     cell = page.locator('[title^="Edges 1 and 2"]').first
     check("the Rules panel's Edges 1 and 2 pair cell is present", cell.count() > 0)
 
-    # Cycle it to "equal" (the exact EXPLORE-2d.md repro).
-    reached = False
-    for _ in range(5):
-        state = cell.get_attribute("aria-label") or ""
-        if state.endswith(": equal"):
-            reached = True
-            break
-        cell.evaluate("el => el.click()")
+    # Item M: the cell opens a picker rather than cycling on click -- open
+    # it, then pick "Equal" directly (the exact EXPLORE-2d.md repro, just
+    # via the picker instead of the retired click-to-cycle button).
+    cell.evaluate("el => el.click()")
+    time.sleep(0.2)
+    option = page.locator('.sk-pair-picker[aria-label="Edges 1 and 2"]').get_by_role("option", name="Equal", exact=True)
+    reached = option.count() > 0
+    if reached:
+        option.first.evaluate("el => el.click()")
         time.sleep(0.2)
-    check("Edges 1 and 2 cycles to 'equal'", reached, cell.get_attribute("aria-label") or "")
+        reached = (cell.get_attribute("aria-label") or "").endswith(": equal")
+    check("Edges 1 and 2 is set to 'equal' via the pair picker", reached, cell.get_attribute("aria-label") or "")
 
     # The rule just touched is a rule row "focused" per item B -- press the
     # toolbar Delete now.

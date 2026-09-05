@@ -132,16 +132,27 @@ def read_pair_state(page, lo, hi):
     return label or ""
 
 
+PAIR_WORD = {"equal": "Equal", "parallel": "Parallel", "perpendicular": "Right angle", "none": "None"}
+
+
 def cycle_pair_to(page, lo, hi, target):
-    """Click the "Edges lo and hi" pair-rule cell until its own aria-label
-    reports `target` ('equal' | 'parallel' | 'perpendicular'), up to the
-    length of the cycle plus one extra to absorb a double-fire."""
+    """Opens the "Edges lo and hi" pair cell's picker (item M) and picks
+    the option matching `target` ('equal' | 'parallel' | 'perpendicular' |
+    'none') directly -- kept under its old name (every existing check
+    already calls it) even though the mechanism underneath is no longer a
+    click-to-cycle button but a picker: one pick, not several clicks."""
+    if read_pair_state(page, lo, hi).endswith(f": {target}"):
+        return True
     cell = page.locator(f'[title^="Edges {lo} and {hi}"]').first
-    for _ in range(5):
-        state = read_pair_state(page, lo, hi)
-        if state.endswith(f": {target}"):
-            return True
+    if cell.get_attribute("aria-expanded") != "true":
         js_click(cell)
+        time.sleep(0.15)
+    picker = page.locator(f'.sk-pair-picker[aria-label="Edges {lo} and {hi}"]')
+    option = picker.get_by_role("option", name=PAIR_WORD[target], exact=True)
+    if option.count() == 0:
+        return False
+    js_click(option.first)
+    time.sleep(0.2)
     return read_pair_state(page, lo, hi).endswith(f": {target}")
 
 
@@ -193,14 +204,18 @@ def type_into_number_box(page, locator, text):
 
 def check_plain_click_on_pair_grid(page):
     print("\n=== D: a plain click reaches the pair-rule grid ===")
+    # Item M changed what a click on the cell DOES (opens a picker, rather
+    # than directly cycling the rule), but this check's own point --
+    # proving a real click actually lands on the control, not swallowed by
+    # the overlapping tools card -- still holds: aria-expanded flips true.
     arm_sketch(page)
     cell = page.locator('[title^="Edges 1 and 3"]').first
-    before = cell.get_attribute("aria-label")
+    before = cell.get_attribute("aria-expanded")
     cell.click()  # deliberately NOT force=True and NOT js_click
     time.sleep(0.2)
-    after = cell.get_attribute("aria-label")
-    check("a plain Playwright click on 'Edges 1 and 3' changes its aria-label",
-        before != after, f"before={before!r} after={after!r}")
+    after = cell.get_attribute("aria-expanded")
+    check("a plain Playwright click on 'Edges 1 and 3' opens its picker (aria-expanded)",
+        before == "false" and after == "true", f"before={before!r} after={after!r}")
 
 
 def check_pin_drag_sync(page):
@@ -329,8 +344,7 @@ def check_lock_after_pair_rule(page):
     print("\n=== I: pinning a corner AFTER a between-edges pair rule holds ===")
     arm_sketch(page)
     cell = page.locator('[title^="Edges 1 and 2"]').first
-    cell.click()  # -> equal (edges 1 and 2 genuinely differ: 40 vs 25)
-    time.sleep(0.2)
+    cycle_pair_to(page, 1, 2, "equal")  # edges 1 and 2 genuinely differ: 40 vs 25
     check("setup: 'equal' between edges 1 and 2 is on before the pin",
         (cell.get_attribute("aria-label") or "").endswith(": equal"),
         cell.get_attribute("aria-label"))
@@ -357,13 +371,11 @@ def check_two_rule_settle(page):
     # "Edges 1 and 3" reaches perpendicular, edge 1 and edge 3 each still
     # carry their own conflicting horizontal rule and neither alone can be
     # dropped to settle it (see the constructed case in
-    # sketch-solve-assertions.cjs, which pins the exact geometry this
-    # click-driven repro cannot: the pair grid can only be cycled through
-    # equal -> parallel -> perpendicular, each step COMMITTING a real solve
-    # along the way, so the geometry actually reached at the final click is
-    # already reshaped by the intermediate ones -- often (as here) enough
-    # that only one rule ends up needing to go, not the two the assertions
-    # file proves the algorithm handles).
+    # sketch-solve-assertions.cjs, which pins the exact geometry). Item M's
+    # picker (cycle_pair_to, below) now applies "perpendicular" directly,
+    # with no intermediate "parallel" commit reshaping the geometry along
+    # the way the way the old click-to-cycle button used to -- a cleaner
+    # repro of the same two-conflicting-rules case, not a different one.
     js_click(rule_button(page, "Edge 2 up"))
     across = page.get_by_label("Sketch 1 corner 3 across", exact=True)
     across.fill("60")
@@ -379,15 +391,9 @@ def check_two_rule_settle(page):
         "setup check, not the fix under test")
 
     cell = page.locator('[title^="Edges 1 and 3"]').first
-    for _ in range(4):
-        state = cell.get_attribute("aria-label") or ""
-        if state.endswith(": perpendicular"):
-            break
-        js_click(cell)
-        time.sleep(0.2)
+    reached = cycle_pair_to(page, 1, 3, "perpendicular")
     check("the pair cell reaches 'perpendicular'",
-        (cell.get_attribute("aria-label") or "").endswith(": perpendicular"),
-        cell.get_attribute("aria-label"))
+        reached, cell.get_attribute("aria-label"))
 
     edge1_on = rule_button(page, "Edge 1 across").get_attribute("aria-pressed")
     edge3_on = rule_button(page, "Edge 3 across").get_attribute("aria-pressed")
@@ -396,15 +402,15 @@ def check_two_rule_settle(page):
         edge1_on == "false" or edge3_on == "false",
         f"Edge 1 across={edge1_on} Edge 3 across={edge3_on}")
     # NOT asserted here: that the fighting banner clears, or that a note
-    # appears. Both depend on the sketch's stored POINTS matching its
-    # constraints after this settle, and that hand-off -- ModelEditor.tsx's
-    # setConstraints() computing the correct seeded solve but committing
-    # only the new CONSTRAINTS, not the solved POINTS, leaving solveDoc()
-    # to re-solve from scratch without that seed -- is a separate, real gap
-    # this session found but does not own (ModelEditor.tsx is the 3D
-    # builder's file right now). addConstraintSettling's own resolution is
-    # proven directly, independent of that gap, in
-    # scripts/sketch-solve-assertions.cjs.
+    # appears -- this scenario's own intermediate commits (each pair-grid
+    # step along the way) make the exact post-settle residual harder to
+    # pin down than the plain case check_settled_perpendicular_no_banner
+    # (item L, below) covers. That plain case is the one proving
+    # setConstraints() now commits the SEEDED solve's own points alongside
+    # the new constraints, closing the gap that used to leave solveDoc()
+    # re-solving from scratch, unseeded, after a settle here.
+    # addConstraintSettling's own resolution is proven directly,
+    # independent of that gap, in scripts/sketch-solve-assertions.cjs.
 
 
 def check_marks_on_geometry(page):
@@ -418,12 +424,7 @@ def check_marks_on_geometry(page):
     field.fill("15")
     field.press("Tab")
     time.sleep(0.2)
-    cell = page.locator('[title^="Edges 1 and 3"]').first
-    for _ in range(4):
-        if (cell.get_attribute("aria-label") or "").endswith(": parallel"):
-            break
-        js_click(cell)
-        time.sleep(0.2)
+    cycle_pair_to(page, 1, 3, "parallel")
     time.sleep(0.3)
 
     parallel_marks = page.locator('[data-mark="parallel"]')
@@ -451,12 +452,7 @@ def check_marks_on_geometry(page):
     across.fill("50")
     across.press("Tab")
     time.sleep(0.2)
-    cell2 = page.locator('[title^="Edges 1 and 3"]').first
-    for _ in range(4):
-        if (cell2.get_attribute("aria-label") or "").endswith(": perpendicular"):
-            break
-        js_click(cell2)
-        time.sleep(0.2)
+    cycle_pair_to(page, 1, 3, "perpendicular")
     time.sleep(0.3)
 
     perp_marks = page.locator('[data-mark="perpendicular"]')
@@ -567,6 +563,117 @@ def check_edge2_selected(page):
         row.count() > 0, "no tr.sk-row-hovered found")
 
 
+def check_settled_perpendicular_no_banner(page):
+    print("\n=== L: a settled perpendicular leaves no fighting banner behind ===")
+    # A plain, uncomplicated perpendicular this time (not S10 round 2's own
+    # two-conflicting-axis-rules setup above) -- item L's own fix is about
+    # setConstraints() committing the SOLVED points along with the new
+    # constraints, not about settling logic, so the simplest case that
+    # reaches a genuine solve is the right one to prove it with. Edges 1
+    # and 3 (opposite, not adjacent) -- 1 and 2 share a corner, and cycling
+    # an adjacent pair toward parallel is a genuine, different refusal (the
+    # shared corner would be forced straight), not this bug.
+    arm_sketch(page)
+    # arm_sketch's own default rectangle keeps every edge's across/up rule
+    # on (it has to, to stay a rectangle) -- same reason check_marks_on_
+    # geometry's own K setup turns one off first: a perpendicular between
+    # edges 1 and 3 that BOTH still carry their own axis rule is a
+    # different, genuine conflict (K/S10's own territory), not this bug.
+    js_click(rule_button(page, "Edge 3 across"))
+    time.sleep(0.2)
+    ok = cycle_pair_to(page, 1, 3, "perpendicular")
+    check("the pair cell reaches 'perpendicular'", ok, read_pair_state(page, 1, 3))
+
+    fighting = page.locator(".fighting")
+    check("no rule button carries the 'fighting' (unsettled) class afterward",
+        fighting.count() == 0, f"{fighting.count()} fighting element(s)")
+
+    # Same invariant Undo/Redo already gets elsewhere in this file: the doc
+    # this component reads its OWN residual from (points vs constraints) is
+    # internally consistent, which is exactly what committing only
+    # `constraints` and not `points` used to break.
+    residual_ok = page.evaluate(
+        """() => {
+            const btns = [...document.querySelectorAll('.sk-table button, .sk-pairs-grid td button')];
+            return !btns.some(b => b.classList.contains('fighting'));
+        }"""
+    )
+    check("...confirmed by a direct DOM sweep, not just the locator's own count",
+        residual_ok, str(residual_ok))
+
+
+def check_pair_picker_direct_pick(page):
+    print("\n=== M: the pair picker applies a choice directly, no intermediate commit ===")
+    # Edges 1 and 2 are ADJACENT (share a corner) -- the exact case where
+    # the retired click-to-cycle button forced a student through "parallel"
+    # on the way to "perpendicular", pulling the shared corner toward
+    # collinear and refusing the perpendicular step that would have
+    # settled fine on its own (S10 round 3). Picking "Right angle" directly
+    # must never pass through that intermediate at all.
+    arm_sketch(page)
+    before = read_all_corners(page, "Sketch 1")
+
+    reached = cycle_pair_to(page, 1, 2, "perpendicular")
+    check('picking "right angle" for edges 1 and 2 directly reaches perpendicular',
+        reached, read_pair_state(page, 1, 2))
+
+    note = page.locator(".model-note")
+    note_text = note.first.text_content() if note.count() else None
+    check("...with no refusal banner shown",
+        "That would" not in (note_text or ""), repr(note_text))
+    fighting = page.locator(".fighting")
+    check("...and no rule button left in the 'fighting' state",
+        fighting.count() == 0, f"{fighting.count()} fighting element(s)")
+
+    perp_marks = page.locator('[data-mark="perpendicular"]')
+    check("the right-angle mark appears on the canvas",
+        perp_marks.count() == 1, f"count={perp_marks.count()}")
+    named = sorted([perp_marks.first.get_attribute("data-edge1"), perp_marks.first.get_attribute("data-edge2")])
+    check("...naming edges 1 and 2", named == ["1", "2"], f"named={named}")
+
+    # The parallel state was never committed: one Undo goes straight back
+    # to the pre-rule outline, not to a parallel intermediate.
+    page.keyboard.press("Control+z")
+    time.sleep(0.3)
+    check("Undo once clears the pair rule entirely",
+        read_pair_state(page, 1, 2).endswith(": no rule"), read_pair_state(page, 1, 2))
+    after_undo = read_all_corners(page, "Sketch 1")
+    close_enough = all(
+        a is not None and b is not None and abs(a[0] - b[0]) < 0.5 and abs(a[1] - b[1]) < 0.5
+        for a, b in zip(before, after_undo)
+    )
+    check("...and restores the ORIGINAL pre-rule corners, not a parallel-settled shape",
+        close_enough, f"before={before} after_undo={after_undo}")
+
+
+def check_pull_hint_hides_during_rules(page):
+    print("\n=== N: the Pull hint hides while a rule is being set ===")
+    arm_sketch(page)
+    time.sleep(0.2)
+    pull_hint = lambda: page.evaluate(  # noqa: E731
+        """() => [...document.querySelectorAll('div')].some(
+            d => d.textContent && d.textContent.includes('A sketch is flat'))"""
+    )
+    check("setup: the Pull hint shows for a freshly-drawn, untouched sketch",
+        pull_hint(), "no Pull hint found before any rule interaction")
+
+    js_click(rule_button(page, "Edge 3 across"))
+    time.sleep(0.2)
+    check("pressing a rule cell hides the Pull hint immediately",
+        not pull_hint(), "Pull hint still visible after pressing a rule")
+
+
+def check_rule_controls_say_their_names(page):
+    print("\n=== O: the rule controls say their names in words ===")
+    arm_sketch(page)
+    text = page.evaluate("() => document.querySelector('.sk-rules')?.innerText ?? ''")
+    # "Level"/"Upright" are the toggle-column headers; "parallel"/"right
+    # angle" (lowercase) come from the pair grid's own legend sentence, not
+    # the picker's option words (those only render once a cell is opened).
+    for word in ["Level", "Upright", "parallel", "right angle"]:
+        check(f'the Rules panel\'s visible text contains "{word}"', word in text, text[:400])
+
+
 def main():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -622,6 +729,26 @@ def main():
             check_marks_on_geometry(page)
         except Exception as exc:  # noqa: BLE001
             check("K checks ran without an exception", False, repr(exc))
+
+        try:
+            check_settled_perpendicular_no_banner(page)
+        except Exception as exc:  # noqa: BLE001
+            check("L checks ran without an exception", False, repr(exc))
+
+        try:
+            check_pair_picker_direct_pick(page)
+        except Exception as exc:  # noqa: BLE001
+            check("M checks ran without an exception", False, repr(exc))
+
+        try:
+            check_pull_hint_hides_during_rules(page)
+        except Exception as exc:  # noqa: BLE001
+            check("N checks ran without an exception", False, repr(exc))
+
+        try:
+            check_rule_controls_say_their_names(page)
+        except Exception as exc:  # noqa: BLE001
+            check("O checks ran without an exception", False, repr(exc))
 
         browser.close()
 

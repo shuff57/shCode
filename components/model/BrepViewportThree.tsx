@@ -245,6 +245,16 @@ interface Props {
    */
   selectedCount?: number;
   /**
+   * Item N: Date.now() of the last time the Rules panel or a handle was
+   * actually touched (ReshapeStudio.tsx's own touchRuleActivity()), or
+   * null if never. Used to hold the "A sketch is flat..." Pull hint off
+   * screen for ~3s after real activity there -- a blind judge read it as
+   * an unrelated prompt with no affordance for the rule they were setting,
+   * because it kept refreshing on top of every rule committed. Absent or
+   * null behaves exactly as before (the hint shows immediately).
+   */
+  ruleActivityAt?: number | null;
+  /**
    * What to print in that badge instead of the bare count, once there is
    * exactly one selection worth naming -- "Box 1", "Hole 1 -- top face",
    * "Round 1 -- edge" (SandboxWorkspace.tsx computes this from `selected`,
@@ -482,7 +492,7 @@ const EDGE_TUBE_RADIUS = 0.75;
  */
 export default function BrepViewportThree({
   doc, deflection, onStats, onPick, pick, selectedCount, selectionLabel, anchors, onAnchors, onMesh, registerPickAt,
-  sketchPlane, panelOcclusionPx,
+  sketchPlane, panelOcclusionPx, ruleActivityAt,
 }: Props) {
   const [phase, setPhase] = useState<'loading' | 'ready' | 'error'>('loading');
   // Which view-strip preset the camera is sitting on, or null once the
@@ -496,6 +506,22 @@ export default function BrepViewportThree({
   // gets a hint, not the red panel. Measured 2026-09-03: a beginner who had
   // just drawn a circle read "Could not build this model" as their mistake.
   const [stageHint, setStageHint] = useState<string | null>(null);
+  // Item N: stageHint itself is still set the same way (a doc rebuild's
+  // own "this is sketch-only" check, unchanged below) -- this is purely a
+  // DISPLAY delay layered on top, so a rebuild triggered by a rule commit
+  // does not re-flash the same Pull hint the student was just working
+  // around. Hidden the instant ruleActivityAt moves; shown again once 3s
+  // pass with no further activity, or immediately if there has been none
+  // yet (ruleActivityAt null -- unchanged, first-run behaviour).
+  const [showStageHint, setShowStageHint] = useState(true);
+  useEffect(() => {
+    if (!stageHint) { setShowStageHint(true); return undefined; }
+    const elapsed = ruleActivityAt ? Date.now() - ruleActivityAt : Infinity;
+    if (elapsed >= 3000) { setShowStageHint(true); return undefined; }
+    setShowStageHint(false);
+    const timer = setTimeout(() => setShowStageHint(true), 3000 - elapsed);
+    return () => clearTimeout(timer);
+  }, [stageHint, ruleActivityAt]);
   /** Whether the pointer is CURRENTLY over a pickable edge -- drives the
    *  "click this edge" hint below. React state, not a ref, because it has to
    *  cause a render (the hint is JSX); set from inside applyHover(), which
@@ -2053,8 +2079,17 @@ export default function BrepViewportThree({
           <div style={{ color: COLORS.fg, maxWidth: 480, textAlign: 'center' }}>{loadError}</div>
         </div>
       )}
-      {phase === 'ready' && stageHint && !buildError && (
+      {phase === 'ready' && stageHint && !buildError && showStageHint && (
         <div style={stageHintStyle}>{stageHint}</div>
+      )}
+      {/* Item N: the same hint slot, while the Pull hint is held off screen
+          for a real touch in the Rules panel/on a handle -- so a student
+          mid-rule still sees something there, just the sentence that
+          actually explains what they are doing right now. */}
+      {phase === 'ready' && stageHint && !buildError && !showStageHint && ruleActivityAt && (
+        <div style={stageHintStyle}>
+          Rules keep an edge level, upright, equal, parallel or at a right angle to another.
+        </div>
       )}
       {phase === 'ready' && buildError && (
         <div style={errorPanelStyle}>

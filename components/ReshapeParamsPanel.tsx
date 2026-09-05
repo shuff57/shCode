@@ -98,6 +98,14 @@ export default function ReshapeParamsPanel({
   const [draft, setDraft] = useState<Record<string, string>>({});
   const rafRef = useRef<number | null>(null);
   const pendingRef = useRef<ParamValues | null>(null);
+  // Item G (EXPLORE-3d.md, common controls): typing 0 or a negative number
+  // into a size field used to silently clamp to the panel's own minimum
+  // with no explanation. Same "put it back and say why" fix the sketch's
+  // own numeric fields already got (SketchConstraints.tsx's setLength/
+  // Round/Chamfer notes) -- shown here the same way that panel's `notice`
+  // already is, so the two "why did my number change" cases in this app
+  // read as one family, not two different mechanisms.
+  const [clampNote, setClampNote] = useState<string | null>(null);
 
   useEffect(() => {
     setDraft({});
@@ -168,6 +176,7 @@ export default function ReshapeParamsPanel({
       </div>
 
       {notice && <p className="reshape-params-empty-warn reshape-params-notice">{notice}</p>}
+      {clampNote && <p className="reshape-params-empty-warn reshape-params-notice">{clampNote}</p>}
       {stale && (
         <p className="reshape-params-empty-warn">
           {stale === 'empty'
@@ -303,6 +312,18 @@ export default function ReshapeParamsPanel({
                   if (!bad) {
                     const v = settle(parsed, d);
                     if (v !== num) push(d.name, v);
+                    // Item G: a field whose minimum is itself positive (a
+                    // size, never a corner-round or angle, which validly
+                    // reach 0) refuses 0 or below -- named generically
+                    // ("A size", not this field's own caption) because the
+                    // same sentence is true of every such field, matching
+                    // the sketch note's own "put it back and say why", not
+                    // a per-field essay.
+                    setClampNote(
+                      typeof d.min === 'number' && d.min > 0 && parsed <= 0
+                        ? `A size has to be more than 0, so ${displayNumber(v)} was used.`
+                        : null
+                    );
                   }
                   // Leaving the field ends the gesture. Without this the typed
                   // value lives only in the panel's optimistic state and is

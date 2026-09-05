@@ -166,7 +166,9 @@ def check_item_a_blend_circle(page):
 
 
 def check_item_c_naming(page):
-    # Angled Corner -> "Angled Corner 1", not "Bevel 1".
+    # Decision: reference.md/studentWord() win -- the toolbar button itself
+    # now says "Bevel" (chip "Bevel 1"); "Angled Corner" survives only as a
+    # search alias for a student who remembers the old name.
     arm_build(page)
     page.get_by_title("Add a box").click()
     time.sleep(0.3)
@@ -175,12 +177,26 @@ def check_item_c_naming(page):
     click_vertical_edge(page, "left", cx, cy)
     page.get_by_title("More round tools").click()
     time.sleep(0.2)
-    page.get_by_role("button", name="Angled Corner", exact=True).click()
+    page.get_by_role("button", name="Bevel", exact=True).click()
     time.sleep(0.3)
     tl = timeline(page)
-    check('an Angled Corner step reads "Angled Corner 1", not "Bevel 1"',
-          tl is not None and any("Angled Corner 1" in row for row in tl)
-          and not any("Bevel" in row for row in tl), str(tl))
+    check('a Bevel step reads "Bevel 1"',
+          tl is not None and any("Bevel 1" in row for row in tl), str(tl))
+
+    # "Angled Corner" still finds the tool by its retired name.
+    arm_build(page)
+    page.get_by_title("Add a box").click()
+    time.sleep(0.3)
+    search_btn = page.locator('[aria-label="Search tools (Alt+C)"]')
+    search_btn.click()
+    time.sleep(0.2)
+    page.keyboard.type("Angled Corner")
+    time.sleep(0.3)
+    bevel_visible = page.evaluate(
+        """() => [...document.querySelectorAll('button')].some(b => b.textContent.trim() === 'Bevel')"""
+    )
+    check('searching the retired name "Angled Corner" still surfaces the Bevel tool',
+          bevel_visible, str(bevel_visible))
 
     # Repeat Around -> "Repeat Around 1", not "Repeat 1".
     arm_build(page)
@@ -383,6 +399,24 @@ def check_item_j_rim_pick(page):
           pill is not None and pill.startswith("Box 1"), str(pill))
 
 
+def check_item_g_clamp_note(page):
+    arm_build(page)
+    page.get_by_title("Add a box").click()
+    time.sleep(0.3)
+    field = page.get_by_label("Box 1 width", exact=True)
+    field.fill("-5")
+    field.press("Tab")
+    time.sleep(0.3)
+    value = page.get_by_label("Box 1 width", exact=True).input_value()
+    note = page.evaluate(
+        "() => { const n = document.querySelector('.reshape-params-notice'); return n ? n.textContent : null; }"
+    )
+    check("typing -5 into Box width is put back to 1, not left negative or at 0",
+          value == "1", value)
+    check('a calm note explains why -- "A size has to be more than 0, so 1 was used."',
+          note is not None and "more than 0" in note and "1" in note, str(note))
+
+
 def main():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -395,6 +429,7 @@ def main():
             ("item E (multi-select)", check_item_e_multiselect),
             ("item H (pick size)", check_item_h_size),
             ("item J (rim pick)", check_item_j_rim_pick),
+            ("item G (clamp note)", check_item_g_clamp_note),
         ]:
             try:
                 fn(page)

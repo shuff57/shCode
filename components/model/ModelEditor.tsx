@@ -257,11 +257,14 @@ function boolLabel(op: BoolOp) {
 }
 const BOOL_OPS: BoolOp[] = ['union', 'subtract', 'intersect'];
 
-// "Chamfer" is the one CAD word left in the bar. The button keeps saying it
-// in plain English -- the real term shows up in the tooltip instead, same as
-// every other real-API-as-the-why relationship in reSHape.
+// Decision, naming disagreement resolved: reference.md and studentWord()
+// (lib/model-check.ts) both call this "bevel", so the button follows them
+// rather than keeping its own plain-English "Angled Corner" -- one word for
+// the tool everywhere a student meets it (toolbar, chip, failure message),
+// not three. "Angled Corner" survives only as a search alias (see
+// FlyoutVariant.alias) for a student who learned the old name first.
 function roundLabel(style: RoundStyle) {
-  return style === 'fillet' ? 'Round' : 'Angled Corner';
+  return style === 'fillet' ? 'Round' : 'Bevel';
 }
 function roundIcon(style: RoundStyle) {
   return style === 'fillet' ? <SquareRoundCorner size={14} /> : <Octagon size={14} />;
@@ -298,8 +301,7 @@ function moveLabel(copy: boolean) {
 
 // The plane is named by which way it flips, not by its axis letters -- "yz"
 // means nothing to a student, but "left to right" is the picture in their
-// head. The real CAD name still reaches them, in the tooltip, same deal as
-// "Angled Corner" carrying "chamfer" below.
+// head. The real CAD name still reaches them, in the tooltip.
 const MIRROR_PLANES: SketchPlane[] = ['yz', 'xz', 'xy'];
 function mirrorPlaneLabel(plane: SketchPlane) {
   return plane === 'yz' ? 'Left-Right' : plane === 'xz' ? 'Front-Back' : 'Top-Bottom';
@@ -339,13 +341,18 @@ interface FlyoutVariant {
   onClick: () => void;
   disabled?: boolean;
   title?: string;
+  /** A retired display name kept searchable so a student who remembers it
+   *  still finds the tool -- e.g. Bevel's own "Angled Corner" (see
+   *  roundLabel's own comment). Checked the same way `id` already is;
+   *  never shown anywhere, only searched. */
+  alias?: string;
 }
 
 /** One family of tools (five primitives, three booleans, ...) collapsed into a
  *  single button whose face is the last variant used, plus a caret that opens
  *  the rest. Matches the Onshape flyout pattern this toolbar is modeled on. */
 function FlyoutButton({
-  label, icon, onMain, disabled, title, open, onToggleOpen, variants, matches, searchActive,
+  label, icon, onMain, disabled, title, open, onToggleOpen, variants, matches, searchActive, alias,
 }: {
   label: string;
   icon: ReactNode;
@@ -355,17 +362,23 @@ function FlyoutButton({
   open: boolean;
   onToggleOpen: () => void;
   variants: FlyoutVariant[];
-  /** Checked against a variant's label AND its id, so a variant can still be
-   *  found by its real-world/CAD name even when its visible label is the
-   *  plain-English rename (e.g. searching "chamfer" finds "Angled Corner"). */
+  /** Checked against a variant's label, its id, and its retired alias (see
+   *  FlyoutVariant.alias) if it has one, so a variant can still be found by
+   *  its real-world/CAD name (searching "chamfer") or its own retired
+   *  display name (searching "Angled Corner") even when its visible label
+   *  is neither. */
   matches: (text: string) => boolean;
   /** Whether the search box currently has text in it. */
   searchActive: boolean;
+  /** The face's own retired name, when the last-used variant has one --
+   *  same reasoning as FlyoutVariant.alias, for the main button rather
+   *  than a dropdown row. */
+  alias?: string;
 }) {
   const wrapRef = useRef<HTMLSpanElement>(null);
   const [at, setAt] = useState<{ left: number; top: number } | null>(null);
-  const shown = variants.filter((v) => matches(v.label) || matches(v.id));
-  const faceMatches = matches(label);
+  const shown = variants.filter((v) => matches(v.label) || matches(v.id) || (v.alias ? matches(v.alias) : false));
+  const faceMatches = matches(label) || (alias ? matches(alias) : false);
   const filteredOut = !faceMatches && shown.length === 0;
   // A match hiding inside a closed flyout is invisible to the student who
   // typed for it -- if the face itself doesn't match but a variant does,
@@ -1407,9 +1420,20 @@ export default function ModelEditor({
         + 'the blue corner handles move it -- then set the rule.');
       return;
     }
+    // Item L: commit the SEEDED solve's own points along with the new
+    // constraints, not just the constraints. This gate already computed
+    // `points` above to check the rule would not collapse the sketch --
+    // discarding them and committing only `constraints` meant solveDoc()'s
+    // own later, UNSEEDED re-solve (every doc adoption runs it) was free to
+    // land somewhere else entirely, including a genuinely worse basin for a
+    // between-edges rule than the fewest-movers seed above just found. That
+    // gap is exactly how a successful settle here could still leave the
+    // fighting banner up afterward (a real, separate report this session
+    // does not own the deeper fix for -- see HANDOFF.md-adjacent notes) --
+    // solveDoc re-solving from the OLD points instead of these new ones.
     onChange({
       ...doc,
-      features: doc.features.map((x) => (x.id === f.id ? { ...x, constraints: next } : x)),
+      features: doc.features.map((x) => (x.id === f.id ? { ...x, points, constraints: next } : x)),
     });
     say(null);
     // The rule this call added or changed, so the toolbar Delete has
@@ -1495,7 +1519,13 @@ export default function ModelEditor({
   // only render when at least one of its tools' names still matches.
   const sketchVisible = ['Sketch', 'Corner', 'Circle'].some(matches);
   const createVisible = [...SHAPE_KINDS.map(shapeLabel), 'Pull', 'Spin'].some(matches);
-  const modifyVisible = ['Round', 'Fillet', 'Chamfer', 'Turn', 'Hole', 'Four Corners', 'Hollow'].some(matches);
+  // 'Bevel' is the button's own current name; 'Fillet'/'Chamfer' are its
+  // real CAD terms; 'Angled Corner' is the retired name kept searchable
+  // (see FlyoutVariant.alias) -- this group-level gate is separate from
+  // that per-tool matching and needs its own copy of the same list, or a
+  // search for a name not on it hides the whole group before FlyoutButton
+  // ever gets a chance to reveal itself.
+  const modifyVisible = ['Round', 'Fillet', 'Chamfer', 'Bevel', 'Angled Corner', 'Turn', 'Hole', 'Four Corners', 'Hollow'].some(matches);
   // Split so a divider can mark the selection-rule boundary Onshape draws
   // too: Repeat/Mirror/Move work on ONE shape, Join/Cut/Overlap need TWO+.
   const patternSelectVisible = [
@@ -1642,12 +1672,14 @@ export default function ModelEditor({
                 onToggleOpen={() => toggleMenu('round')}
                 matches={matches}
                 searchActive={searchActive}
+                alias={lastRound === 'chamfer' ? 'Angled Corner' : undefined}
                 variants={ROUND_STYLES.map((s) => ({
                   id: s,
                   label: roundLabel(s),
                   icon: roundIcon(s),
                   onClick: () => round(s),
-                  title: s === 'fillet' ? 'Round the edges off (fillet)' : 'Slice the edges off at an angle (chamfer)',
+                  title: s === 'fillet' ? 'Round the edges off (fillet)' : 'Slice the edge off at an angle (a bevel)',
+                  alias: s === 'chamfer' ? 'Angled Corner' : undefined,
                 }))}
               />
               {matches('Turn') && (

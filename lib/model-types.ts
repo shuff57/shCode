@@ -1092,15 +1092,12 @@ function labelOf(f: Feature): string {
     : f.kind === 'torus' ? 'Ring'
     : f.kind === 'blend' ? 'Blend'
     : f.kind === 'sphere' ? 'Sphere'
-    // Match the toolbar's own button text (ModelEditor.tsx's roundLabel):
-    // "Angled Corner" is the deliberate plain-English name on the button,
-    // with "bevel" reserved for the tooltip and reSHape Script's real API
-    // name. This used to say "Bevel" here, so the timeline chip used the
-    // CAD word the button itself avoids. NOTE: this puts the chip out of
-    // step with studentWord() (lib/model-check.ts) and reference.md, which
-    // both call this "bevel" -- that disagreement is unresolved, flagged
-    // for the lead rather than silently picked one way.
-    : f.kind === 'fillet' ? (f.style === 'chamfer' ? 'Angled Corner' : 'Round')
+    // Decision: reference.md and studentWord() (lib/model-check.ts) both
+    // call this "bevel", and the toolbar's own button (ModelEditor.tsx's
+    // roundLabel) now says "Bevel" too -- one word for the tool everywhere
+    // a student meets it, not the three-way split ("Angled Corner" on the
+    // button, "bevel" in messages and the reference) this used to be.
+    : f.kind === 'fillet' ? (f.style === 'chamfer' ? 'Bevel' : 'Round')
     : f.kind === 'draft' ? (f.whole ? 'Body draft' : 'Draft')
     : nameless(f);
 }
