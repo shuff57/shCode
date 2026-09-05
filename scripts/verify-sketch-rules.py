@@ -76,6 +76,15 @@ the element's centre, which on a 42px-wide box can hit the spinner instead
 of placing a text cursor (measured writing this probe: a centred click alone
 stepped Bow from empty to -0.5 with no typing at all). Every check below
 that types into one of those clicks near the LEFT edge first.
+
+Item R: a contextual rule strip mirrors the Rules panel where the hand
+already is -- select one edge on the canvas and it shows Level / Upright /
+Length..., select a second (Shift-click) and it shows Equal / Parallel /
+Right angle instead, select a corner and it shows Pin. Every button calls
+the exact same handler the matching panel row/cell does, so the pair grid
+and the canvas marks update identically either way (see RuleActions in
+SketchConstraints.tsx). The matrix cell itself now shows its rule's own
+word ("parallel") when set, and a faint "+" when empty.
 """
 import math
 import sys
@@ -674,6 +683,97 @@ def check_rule_controls_say_their_names(page):
         check(f'the Rules panel\'s visible text contains "{word}"', word in text, text[:400])
 
 
+def edge_hit(page, index):
+    """The invisible, fatter hit region for design edge `index` (0-based) --
+    HandleOverlay.tsx's `.sketch-edge-hit` polyline, in DOM order matching
+    the design edge order (hit 0 is Edge 1, etc)."""
+    return page.locator(".sketch-edge-hit").nth(index)
+
+
+def click_center(page, locator):
+    box = locator.bounding_box()
+    page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+
+
+def check_contextual_rule_strip(page):
+    print("\n=== R: a contextual rule strip mirrors the Rules panel on the selection ===")
+    arm_sketch(page)
+
+    # One edge selected -- Edge 4 (hit index 3), away from the 1/3 pair the
+    # rest of this check uses, so the two halves cannot interfere.
+    click_center(page, edge_hit(page, 3))
+    time.sleep(0.25)
+    strip = page.locator(".sketch-rule-strip")
+    check("select one edge on the canvas shows the strip",
+        strip.count() > 0, "no .sketch-rule-strip after clicking an edge")
+    strip_text = strip.inner_text() if strip.count() > 0 else ""
+    check('...and the strip contains "Level"', "Level" in strip_text, strip_text)
+
+    # Two edges (Edge 1 and Edge 3, hit indices 0 and 2) -- opposite sides
+    # of the default rectangle, already parallel by construction, so
+    # setting "parallel" between them settles with nothing to fight.
+    click_center(page, edge_hit(page, 0))
+    time.sleep(0.15)
+    page.keyboard.down("Shift")
+    click_center(page, edge_hit(page, 2))
+    page.keyboard.up("Shift")
+    time.sleep(0.25)
+    strip2 = page.locator(".sketch-rule-strip")
+    check("select two edges (Shift-click) shows the strip",
+        strip2.count() > 0, "no .sketch-rule-strip after a Shift-click")
+    strip2_text = strip2.inner_text() if strip2.count() > 0 else ""
+    check('...and the strip contains "Parallel"', "Parallel" in strip2_text, strip2_text)
+
+    if strip2.count() > 0 and "Parallel" in strip2_text:
+        strip2.locator("button", has_text="Parallel").click()
+        time.sleep(0.3)
+        check("pressing it, the pair cell reads parallel",
+            read_pair_state(page, 1, 3).endswith(": parallel"), read_pair_state(page, 1, 3))
+        parallel_marks = page.locator('[data-mark="parallel"]')
+        check("...and the marks appear on the canvas",
+            parallel_marks.count() == 2, f"count={parallel_marks.count()}")
+
+        # The matrix cell itself now spells out the word, not just a mark,
+        # and the empty cells beside it show a faint "+" rather than
+        # nothing at all.
+        cell = page.locator('button[aria-label="Edges 1 and 3: parallel"]')
+        check('the "Edges 1 and 3" matrix cell shows the word "Parallel", not just a mark',
+            cell.count() > 0 and cell.first.inner_text().strip() == "Parallel",
+            cell.first.inner_text() if cell.count() > 0 else "cell not found")
+        empty_cell = page.locator('button[aria-label="Edges 1 and 2: no rule"] .sk-pair-plus')
+        check("an empty pair cell shows a faint '+' rather than nothing",
+            empty_cell.count() > 0, f"count={empty_cell.count()}")
+
+    # A corner selected shows Pin, and pressing it acts through the same
+    # lockCorner() the "Pin a corner" row already uses.
+    page.keyboard.press("Escape")
+    time.sleep(0.15)
+    corner_handle = page.locator(".handle.is-point").first
+    click_center(page, corner_handle)
+    time.sleep(0.25)
+    strip3 = page.locator(".sketch-rule-strip")
+    strip3_text = strip3.inner_text() if strip3.count() > 0 else ""
+    check('select a corner shows the strip with "Pin"',
+        strip3.count() > 0 and "Pin" in strip3_text, strip3_text)
+    if strip3.count() > 0 and "Pin" in strip3_text:
+        strip3.locator("button", has_text="Pin").click()
+        time.sleep(0.25)
+        pinned = page.evaluate(
+            """() => { const b = [...document.querySelectorAll('.sk-pins button')]
+                .find(x => x.getAttribute('aria-label') === 'Pin corner 1');
+                return b ? b.getAttribute('aria-pressed') : null; }"""
+        )
+        check("...and pressing it pins corner 1 in the panel below",
+            pinned == "true", f"aria-pressed={pinned}")
+
+    # Escape clears a standing selection (and its strip) with no other
+    # click needed.
+    page.keyboard.press("Escape")
+    time.sleep(0.15)
+    check("Escape clears the strip", page.locator(".sketch-rule-strip").count() == 0,
+        f"{page.locator('.sketch-rule-strip').count()} strip(s) still visible")
+
+
 def main():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -749,6 +849,11 @@ def main():
             check_rule_controls_say_their_names(page)
         except Exception as exc:  # noqa: BLE001
             check("O checks ran without an exception", False, repr(exc))
+
+        try:
+            check_contextual_rule_strip(page)
+        except Exception as exc:  # noqa: BLE001
+            check("R checks ran without an exception", False, repr(exc))
 
         browser.close()
 

@@ -22,7 +22,8 @@ import ReshapePreview from '../ReshapePreview';
 import ReshapeParamsPanel, { type ParamDef, type ParamValues } from '../ReshapeParamsPanel';
 import ModelEditor from '../model/ModelEditor';
 import BrepViewport, { type BrepViewportStats, type ViewportPick } from '../model/BrepViewportThree';
-import HandleOverlay, { type AnchorPoint, type SketchOutline } from '../model/HandleOverlay';
+import HandleOverlay, { type AnchorPoint, type SketchOutline, type SketchPart } from '../model/HandleOverlay';
+import type { RuleActions } from '../model/SketchConstraints';
 import { writeSTL, writeOBJ, write3MF, type MeshInput } from '../../lib/mesh-export';
 import { outlineOf } from '../../lib/sketch-arc';
 import { handlesFor, planeAnchor } from '../../lib/model-handles';
@@ -275,6 +276,68 @@ export default function ReshapeStudio({
   // rather than refreshing it on top of every rule they set.
   const [ruleActivityAt, setRuleActivityAt] = useState<number | null>(null);
   const touchRuleActivity = () => setRuleActivityAt(Date.now());
+  // Item R: which edge(s)/corner of the active sketch a canvas CLICK has
+  // selected -- see SketchPart's own doc comment for why this outlives a
+  // hover. `ruleActionsRef` is the matching handle-out: SketchConstraints
+  // (mounted inside ModelEditor, a sibling of HandleOverlay here) registers
+  // its own row/cell handlers into it on every render, the same
+  // `registerPickAt` pattern this file already uses for BrepViewportThree's
+  // 3D pick. A plain ref, not state: the strip's buttons read it at click
+  // time, and nothing here needs to re-render when it changes.
+  const [selectedSketchParts, setSelectedSketchParts] = useState<SketchPart[]>([]);
+  const ruleActionsRef = useRef<RuleActions | null>(null);
+  // A stable object, created once, whose own methods dereference the ref
+  // above at CALL time rather than at prop-pass time -- the same reasoning
+  // `onTap={(x, y) => pickAtRef.current?.(x, y)}` below already relies on.
+  // Without this indirection, HandleOverlay's `ruleActions` prop would be
+  // whatever `ruleActionsRef.current` happened to be during ReshapeStudio's
+  // OWN last render, one tick behind SketchConstraints' own render (a
+  // child, whose registration effect runs after this component's).
+  const ruleActionsProxy = useRef<RuleActions>({
+    toggleEdge: (kind, edge) => ruleActionsRef.current?.toggleEdge(kind, edge),
+    openLength: (edge) => ruleActionsRef.current?.openLength(edge),
+    setPair: (a, b, kind) => ruleActionsRef.current?.setPair(a, b, kind),
+    togglePin: (corner) => ruleActionsRef.current?.togglePin(corner),
+  }).current;
+  const handleSelectPart = (part: SketchPart, opts: { shift: boolean }) => {
+    touchRuleActivity();
+    setSelectedSketchParts((cur) => {
+      if (part.kind === 'corner') {
+        // A corner selection is always solo; re-clicking the same one
+        // clears it, the only way to dismiss the strip short of Escape
+        // or clicking something else.
+        return cur.length === 1 && cur[0].kind === 'corner' && cur[0].index === part.index
+          ? [] : [part];
+      }
+      if (!opts.shift) {
+        return cur.length === 1 && cur[0].kind === 'edge' && cur[0].index === part.index
+          ? [] : [part];
+      }
+      const edges = cur.filter((p): p is SketchPart & { kind: 'edge' } => p.kind === 'edge');
+      if (edges.some((p) => p.index === part.index)) {
+        // Shift-clicking an already-selected edge removes it, same
+        // toggle-within-a-multi-selection convention item E's 3D
+        // multi-select already uses.
+        return edges.filter((p) => p.index !== part.index);
+      }
+      // A pair rule only ever names two edges -- a third Shift-click drops
+      // the older of the two rather than growing without bound.
+      return [...edges.slice(-1), part];
+    });
+  };
+  // Switching which feature the model tree has selected (a different
+  // sketch, or none) makes any standing selection meaningless -- its
+  // indices belong to whichever sketch's Rules panel was open when it was
+  // made. Escape is the other way to clear it, for a student who wants the
+  // strip gone without picking something else.
+  useEffect(() => { setSelectedSketchParts([]); }, [selected]);
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setSelectedSketchParts([]);
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
   const [rollbackIndex, setRollbackIndex] = useState<number | null>(null);
   const [drawTool, setDrawTool] = useState<'rect' | 'polygon' | null>(null);
   const [drawFirst, setDrawFirst] = useState<[number, number] | null>(null);
@@ -919,6 +982,7 @@ export default function ReshapeStudio({
               drawTool={drawTool}
               hoveredPart={pointerHoverPart}
               onHoverPart={(p) => { setRowHoverPart(p); if (p) touchRuleActivity(); }}
+              registerActions={(actions) => { ruleActionsRef.current = actions; }}
               onUndo={undo}
               onRedo={redo}
               canUndo={depth.back > 0}
@@ -1050,6 +1114,9 @@ export default function ReshapeStudio({
                 onPlace={handlePlace}
                 onHoverPart={setPointerHoverPart}
                 forcedHoverPart={rowHoverPart}
+                selectedParts={selectedSketchParts}
+                onSelectPart={handleSelectPart}
+                ruleActions={ruleActionsProxy}
                 bottomInset={TIMELINE_HEIGHT_PX}
               />
             )}

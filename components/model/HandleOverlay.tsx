@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from 'react';
 import { arcFromBulge, type Point } from '../../lib/sketch-arc';
 import { type Constraint, edgeLength, losingEdges, residualsOf } from '../../lib/sketch-solve';
 import { circleLabel, formatLabel, type LabelBox, type LabelObstacle, layoutLabels, sketchLabels, treatmentsFromOutline } from '../../lib/sketch-outline';
+import type { PairKind, RuleActions } from './SketchConstraints';
 
 /**
  * One selected sketch's outline, in plane coordinates -- what the overlay
@@ -151,6 +152,38 @@ interface Props {
    */
   forcedHoverPart?: { kind: 'edge' | 'corner'; index: number }
     | { kind: 'edge' | 'corner'; index: number }[] | null;
+  /**
+   * Item R: which edge(s)/corner of the SELECTED sketch a click on the
+   * canvas has picked -- distinct from `hoveredPart`/`forcedHoverPart`
+   * above, which are transient (gone the moment the pointer leaves). A
+   * selection survives until something else is clicked, which is what
+   * lets the contextual rule strip stay on screen while a student reads
+   * it or moves the mouse to reach one of its buttons. At most one corner,
+   * or up to two edges (a Shift-click adds a second) -- ReshapeStudio owns
+   * the array and its shift/toggle rules; this component only reads it to
+   * decide what the strip shows and where.
+   */
+  selectedParts?: SketchPart[];
+  /** Fired on a genuine CLICK (not a drag-then-release) on an edge's hit
+   *  region or a corner's own handle. `shift` is the click's own shiftKey,
+   *  read directly off the DOM event rather than tracked globally, since
+   *  every edge-hit polyline already has one to read it off of. */
+  onSelectPart?: (part: SketchPart, opts: { shift: boolean }) => void;
+  /** Item R: the active sketch's own Rules-panel handlers (SketchConstraints,
+   *  a sibling this component knows nothing else about), so the strip's
+   *  buttons can act through the EXACT SAME code path a panel click would --
+   *  see RuleActions' own doc comment for why this is a hand-out of real
+   *  closures rather than a second implementation. Null/absent means no
+   *  sketch is being edited right now, and the strip renders nothing. */
+  ruleActions?: RuleActions | null;
+}
+
+/** One selectable part of the active sketch's outline -- an edge (by design
+ *  index) or a corner. Plain data, exported so ReshapeStudio can hold the
+ *  selection array without redeclaring the shape itself. */
+export interface SketchPart {
+  kind: 'edge' | 'corner';
+  index: number;
 }
 
 /**
@@ -618,7 +651,7 @@ const TAP_TOLERANCE_PX = 4;
 
 export default function HandleOverlay({
   points, values, scales, onDrag, onCommit, onTap, outlines, drawing, onPlace, bottomInset = 0,
-  onHoverPart, forcedHoverPart,
+  onHoverPart, forcedHoverPart, selectedParts, onSelectPart, ruleActions,
 }: Props) {
   const [dragging, setDragging] = useState<string | null>(null);
   // A floating name for whichever edge or corner of the SELECTED sketch the
@@ -1023,6 +1056,38 @@ export default function HandleOverlay({
     [...handleObstacles, ...markObstacles],
   );
 
+  // Item R: the contextual rule strip -- the panel's own rows, shown where
+  // the hand already is. Only ever reads the SELECTED sketch's own render
+  // (never a background one drawn only for context -- same restriction
+  // `onSelectPart` above already applies when a selection is BORN, kept
+  // here too since `selected` can flip without the selection itself being
+  // re-cleared, e.g. Undo). Computed once, outside the JSX below, because
+  // both its position and its button list need the same lookup.
+  const selectedOutline = outlineRenders.find((r) => r?.o.selected);
+  const stripParts = selectedOutline && selectedParts && selectedParts.length > 0
+    ? selectedParts : [];
+  let stripSpot: { x: number; y: number } | null = null;
+  if (selectedOutline && stripParts.length > 0) {
+    const anchors = stripParts.map((p) => {
+      if (p.kind === 'corner') return at.get(selectedOutline.o.corners[p.index]);
+      const a1 = at.get(selectedOutline.o.corners[p.index]);
+      const a2 = at.get(selectedOutline.o.corners[(p.index + 1) % selectedOutline.o.corners.length]);
+      return a1 && a2 ? { x: (a1.x + a2.x) / 2, y: (a1.y + a2.y) / 2 } : undefined;
+    }).filter((a): a is { x: number; y: number } => Boolean(a));
+    if (anchors.length > 0) {
+      stripSpot = {
+        x: anchors.reduce((s, a) => s + a.x, 0) / anchors.length,
+        // Below the anchor, not above like the hover pill (spot.y - 22) --
+        // "clear of the pill" per the spec, and a selection is meant to
+        // outlast a hover, so the two must never occupy the same pixels.
+        y: anchors.reduce((s, a) => s + a.y, 0) / anchors.length + 26,
+      };
+    }
+  }
+  const selCons = selectedOutline?.o.constraints ?? [];
+  const stripEdges = stripParts.filter((p): p is SketchPart & { kind: 'edge' } => p.kind === 'edge');
+  const stripCorner = stripParts.find((p): p is SketchPart & { kind: 'corner' } => p.kind === 'corner');
+
   return (
     <div
       className="handle-layer"
@@ -1082,6 +1147,16 @@ export default function HandleOverlay({
                       onMouseLeave={() =>
                         setHoveredPart((cur) => (cur?.kind === 'edge' && cur.index === e ? null : cur))
                       }
+                      // Item R: a click SELECTS the edge (persists past the
+                      // hover that already worked) -- only for the sketch the
+                      // model tree actually has selected, same restriction
+                      // `selected` exists for in the first place; clicking a
+                      // background sketch drawn only for context selects
+                      // nothing, since there is no Rules panel open for it to
+                      // act through anyway.
+                      onClick={o.selected
+                        ? (ev) => onSelectPart?.({ kind: 'edge', index: e }, { shift: ev.shiftKey })
+                        : undefined}
                     />
                   );
                 })}
@@ -1412,6 +1487,22 @@ export default function HandleOverlay({
               setAlongV(0);
               if (wasDrag) {
                 commit();
+              } else if (a.kind === 'point') {
+                // Item R: a 'point' handle IS a sketch corner (see the
+                // hover handler just above this one, which uses the same
+                // regex) -- every other handle kind belongs to the 3D
+                // model, not a sketch. Measured: routing this through
+                // onTap's own 3D pick FIRST (as every other kind still does
+                // below) reached ReshapeStudio's `pickAtRef`, which can
+                // change the model tree's own selection -- and that
+                // selection change fires this file's own
+                // `setSelectedSketchParts([])` effect a beat later,
+                // erasing the very corner selection this tap just made.
+                // A tap on a corner handle has nothing 3D worth picking
+                // underneath it anyway, so it skips onTap entirely rather
+                // than fire it and then fight its side effect.
+                const m = /_p(\d+)u$/.exec(a.param);
+                if (m) onSelectPart?.({ kind: 'corner', index: Number(m[1]) }, { shift: e.shiftKey });
               } else {
                 // A tap: act exactly as a click on the canvas at this point
                 // would, instead of committing a zero-length drag.
@@ -1521,6 +1612,79 @@ export default function HandleOverlay({
             );
           })}
         </svg>
+      )}
+      {/* Item R: a contextual rule strip -- the Rules panel's own rows,
+          shown where the hand already is instead of only in a docked
+          column the student has to look away to. One edge gets Level /
+          Upright / Length..., two (a Shift-click) get Equal / Parallel /
+          Right angle, a corner gets Pin -- exactly the panel's own three
+          groups, and every button below calls the exact same handler the
+          matching panel row/cell does (see `ruleActions`'s own doc
+          comment), so settling, the auto-note, and the marks on the
+          geometry are identical either way. */}
+      {ruleActions && stripSpot && (
+        <div
+          className="sketch-rule-strip"
+          style={{ left: stripSpot.x, top: stripSpot.y }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {stripEdges.length === 2 ? (() => {
+            const [a, b] = stripEdges;
+            const lo = Math.min(a.index, b.index);
+            const hi = Math.max(a.index, b.index);
+            const cur = selCons.find(
+              (c) => 'other' in c && c.edge === lo && c.other === hi
+                && (c.kind === 'equal' || c.kind === 'parallel' || c.kind === 'perpendicular')
+            )?.kind as PairKind | undefined;
+            return (['equal', 'parallel', 'perpendicular'] as const).map((kind) => (
+              <button
+                key={kind}
+                type="button"
+                aria-pressed={cur === kind}
+                className={cur === kind ? 'on' : undefined}
+                onClick={() => ruleActions.setPair(lo, hi, cur === kind ? null : kind)}
+              >
+                {kind === 'equal' ? 'Equal' : kind === 'parallel' ? 'Parallel' : 'Right angle'}
+              </button>
+            ));
+          })() : stripCorner ? (
+            <button
+              type="button"
+              aria-pressed={selCons.some((c) => c.kind === 'lock' && c.corner === stripCorner.index)}
+              className={selCons.some((c) => c.kind === 'lock' && c.corner === stripCorner.index) ? 'on' : undefined}
+              onClick={() => ruleActions.togglePin(stripCorner.index)}
+            >
+              Pin
+            </button>
+          ) : stripEdges.length === 1 ? (() => {
+            const idx = stripEdges[0].index;
+            const horiz = selCons.some((c) => 'edge' in c && c.kind === 'horizontal' && c.edge === idx);
+            const vert = selCons.some((c) => 'edge' in c && c.kind === 'vertical' && c.edge === idx);
+            return (
+              <>
+                <button
+                  type="button"
+                  aria-pressed={horiz}
+                  className={horiz ? 'on' : undefined}
+                  onClick={() => ruleActions.toggleEdge('horizontal', idx)}
+                >
+                  Level
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={vert}
+                  className={vert ? 'on' : undefined}
+                  onClick={() => ruleActions.toggleEdge('vertical', idx)}
+                >
+                  Upright
+                </button>
+                <button type="button" onClick={() => ruleActions.openLength(idx)}>
+                  Length…
+                </button>
+              </>
+            );
+          })() : null}
+        </div>
       )}
       {drawing && (
         <div
@@ -1723,6 +1887,31 @@ export default function HandleOverlay({
         }
         .sketch-lines .sketch-name-pill text {
           fill: #f8f8f2; font-size: 11px; font-weight: 600;
+        }
+        /* Item R: the contextual rule strip. Same dark-panel family as the
+           pill just above (a plain HTML div, not SVG, since it needs real
+           buttons) -- centred under its anchor rather than pinned to a
+           corner, and capped at 320px so it can never crowd the pill it
+           sits below. pointer-events: auto is load-bearing: the parent
+           .handle-layer disables pointer events wholesale so it never
+           steals a drag or an orbit meant for the canvas underneath it. */
+        .sketch-rule-strip {
+          position: absolute; transform: translateX(-50%);
+          display: flex; gap: 4px; max-width: 320px; flex-wrap: wrap;
+          padding: 5px 6px; border-radius: 7px;
+          background: #282a36; border: 1px solid #6272a4;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+          pointer-events: auto;
+        }
+        .sketch-rule-strip button {
+          background: transparent; color: #f8f8f2;
+          border: 1px solid #44475a; border-radius: 5px;
+          padding: 3px 8px; font-size: 11px; line-height: 1.3;
+          cursor: pointer; white-space: nowrap;
+        }
+        .sketch-rule-strip button:hover { border-color: #8be9fd; }
+        .sketch-rule-strip button.on {
+          background: #bd93f9; color: #282a36; border-color: #bd93f9;
         }
         /* The Rules panel names which rules disagree and this does not repeat
            that -- it exists to be impossible to miss and to point at the red. */
