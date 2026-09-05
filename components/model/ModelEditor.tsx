@@ -90,6 +90,7 @@ import {
   addCorner,
   canRotate,
   dependsOn,
+  extentAlong,
   isRoundable,
   maxRound,
   nameMap,
@@ -252,6 +253,24 @@ function boolIcon(op: BoolOp) {
   if (op === 'subtract') return <Scissors size={14} />;
   return <SquareDashedBottom size={14} />;
 }
+/** Item P: the same inset-from-the-side conversion generatedParams()/
+ *  applyParam() (lib/model-codegen.ts) apply to the Dimensions panel,
+ *  used here so the timeline chip says the same number the panel does --
+ *  "4 holes ⌀6, 8 in from the sides" -- rather than the raw stored
+ *  centre-offset nothing else on screen matches. One number when both
+ *  axes agree (the common case, and what a student actually typed); both
+ *  named when they do not. Falls back to the raw dx/dy the same way the
+ *  panel does when the target's own extent cannot be read (a Move, a
+ *  rotated shape, ...). */
+function cornerInsetText(doc: ModelDoc, target: string, corners: { dx: number; dy: number }): string {
+  const fullX = extentAlong(doc, target, 'x');
+  const fullY = extentAlong(doc, target, 'y');
+  const round = (n: number) => Math.round(n * 100) / 100;
+  const insetX = round(fullX != null ? fullX / 2 - corners.dx : corners.dx);
+  const insetY = round(fullY != null ? fullY / 2 - corners.dy : corners.dy);
+  return insetX === insetY ? `${insetX} in from the sides` : `${insetX} in from the sides across, ${insetY} up`;
+}
+
 function boolLabel(op: BoolOp) {
   return op === 'union' ? 'Join' : op === 'subtract' ? 'Cut' : 'Overlap';
 }
@@ -1705,7 +1724,12 @@ export default function ModelEditor({
                   {
                     id: 'four-corners', label: 'Four Corners', icon: <Grid2x2 size={14} />,
                     onClick: drillHoleCorners,
-                    title: 'Drill four holes at once, evenly spaced from the middle — a bolt pattern with matching offsets on every side',
+                    // Item P: "evenly spaced from the middle" was true of the
+                    // stored numbers but not of what the panel showed a
+                    // student typing -- the corner spacing fields now say
+                    // exactly what they measure (in from each side), so the
+                    // tooltip does too.
+                    title: 'Drill four holes at once, the same distance in from every side — a bolt pattern with matching offsets on every corner',
                   },
                 ]}
               />
@@ -1993,7 +2017,9 @@ export default function ModelEditor({
                   )}
                   {f.kind === 'hole' && (
                     <em className="model-detail">
-                      {' '}⌀{f.diameter}{f.corners ? ' × 4 corners' : ''} in {names[f.target] ?? f.target}
+                      {' '}{f.corners ? '4 holes ' : ''}⌀{f.diameter}
+                      {f.corners ? `, ${cornerInsetText(doc, f.target, f.corners)}` : ''}
+                      {' '}in {names[f.target] ?? f.target}
                     </em>
                   )}
                   {f.kind === 'shell' && (
@@ -2107,7 +2133,9 @@ export default function ModelEditor({
                   )}
                   {f.kind === 'hole' && (
                     <em className="model-detail">
-                      {' '}⌀{f.diameter}{f.corners ? ' × 4 corners' : ''} in {names[f.target] ?? f.target}
+                      {' '}{f.corners ? '4 holes ' : ''}⌀{f.diameter}
+                      {f.corners ? `, ${cornerInsetText(doc, f.target, f.corners)}` : ''}
+                      {' '}in {names[f.target] ?? f.target}
                     </em>
                   )}
                   {f.kind === 'shell' && (

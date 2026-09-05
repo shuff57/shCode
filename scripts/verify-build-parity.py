@@ -32,6 +32,13 @@ on any FAIL.
     the hollow), not to Hollow 1's own new inner rim or the interior wall
     face -- even when the click lands only a couple of screen pixels from
     the rendered rim line.
+
+(P) Four Corners hole spacing fields say what they measure: on a
+    non-square target (60x40) the two fields read "Hole 1 in from each
+    side (across)"/"(up)" -- not "corner spacing" -- and hold the distance
+    from the target's own edge to the hole centre. The timeline chip
+    matches ("4 holes ⌀6, 8 in from the sides"), and typing an inset that
+    would put the hole through the side is put back with a calm note.
 """
 import sys
 import time
@@ -417,6 +424,58 @@ def check_item_g_clamp_note(page):
           note is not None and "more than 0" in note and "1" in note, str(note))
 
 
+def check_item_p_corner_inset(page):
+    arm_build(page)
+    page.get_by_title("Add a box").click()
+    time.sleep(0.3)
+    # Non-square target -- P13's own repro shape (a square target can't
+    # show a crowded edge, since across and up read the same either way).
+    page.get_by_label("Box 1 width", exact=True).fill("60")
+    page.get_by_label("Box 1 width", exact=True).press("Tab")
+    time.sleep(0.2)
+    cx, cy = canvas_center(page)
+    page.mouse.click(cx, cy - 100)
+    time.sleep(0.3)
+    page.get_by_title("More hole tools").click()
+    time.sleep(0.2)
+    page.get_by_role("button", name="Four Corners", exact=True).click()
+    time.sleep(0.3)
+
+    field_x = page.get_by_label("Hole 1 in from each side (across)", exact=True)
+    field_y = page.get_by_label("Hole 1 in from each side (up)", exact=True)
+    check('field is captioned "in from each side (across)", not "corner spacing"',
+          field_x.count() > 0, "field not found")
+    check('field is captioned "in from each side (up)", not "corner spacing"',
+          field_y.count() > 0, "field not found")
+
+    field_x.fill("8")
+    field_x.press("Tab")
+    time.sleep(0.2)
+    field_y.fill("8")
+    field_y.press("Tab")
+    time.sleep(0.3)
+    tl = timeline(page)
+    check('timeline chip reads "4 holes diameter, N in from the sides"',
+          tl is not None and any("4 holes" in row and "in from the sides" in row for row in tl),
+          str(tl))
+
+    # An inset that would put the hole through the box's own side (below
+    # the diameter/2 + 0.5 margin) is put back, with a calm note -- not
+    # silently left breaking the wall.
+    field_x2 = page.get_by_label("Hole 1 in from each side (across)", exact=True)
+    field_x2.fill("1")
+    field_x2.press("Tab")
+    time.sleep(0.3)
+    value = page.get_by_label("Hole 1 in from each side (across)", exact=True).input_value()
+    note = page.evaluate(
+        "() => { const n = document.querySelector('.reshape-params-notice'); return n ? n.textContent : null; }"
+    )
+    check("typing 1 (through the side) is put back to the margin, not left at 1",
+          value != "1", value)
+    check('a calm note explains why -- "cut through the side the hole is measured from"',
+          note is not None and "cut through the side" in note, str(note))
+
+
 def main():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -430,6 +489,7 @@ def main():
             ("item H (pick size)", check_item_h_size),
             ("item J (rim pick)", check_item_j_rim_pick),
             ("item G (clamp note)", check_item_g_clamp_note),
+            ("item P (corner inset)", check_item_p_corner_inset),
         ]:
             try:
                 fn(page)

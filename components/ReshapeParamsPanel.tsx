@@ -319,10 +319,19 @@ export default function ReshapeParamsPanel({
                     // same sentence is true of every such field, matching
                     // the sketch note's own "put it back and say why", not
                     // a per-field essay.
+                    // Item P: a Four Corners inset ("dx"/"dy" -- the only
+                    // slot names this shape) below its own min would let
+                    // the hole break through the side it is measured from;
+                    // that min already bakes in the hole's own radius (see
+                    // generatedParams' own comment), so any clamp here
+                    // means exactly that, not just "too small" in general.
+                    const isCornerInset = d.name.endsWith('_dx') || d.name.endsWith('_dy');
                     setClampNote(
                       typeof d.min === 'number' && d.min > 0 && parsed <= 0
                         ? `A size has to be more than 0, so ${displayNumber(v)} was used.`
-                        : null
+                        : typeof d.min === 'number' && parsed < d.min && isCornerInset
+                          ? `That would cut through the side the hole is measured from, so ${displayNumber(v)} was used.`
+                          : null
                     );
                   }
                   // Leaving the field ends the gesture. Without this the typed

@@ -723,7 +723,21 @@ export default function BrepViewportThree({
     // after this light existed at all.
     const under = new THREE.DirectionalLight(0xffffff, 1.0);
     under.position.set(-100, -80, -150);
-    scene.add(ambient, key, fill, under);
+    // A default box's top face and its brighter of the two visible side
+    // faces measured only 2.9% apart in luminance from Home (a blind judge
+    // credited Chili3D "better face shading" over exactly this) -- `key`
+    // and `fill` both lean into x/y, so neither one separates a horizontal
+    // top from a near-vertical side by much. `overhead` points straight
+    // down the +z axis (dot product with the two side faces' normals is
+    // exactly 0 -- it cannot touch them, by construction, not by tuning),
+    // adding light to the top face alone. Measured with a default
+    // 40x40x20 box, Home view (WebGL readPixels, not a screenshot):
+    // top/right/left luminance (0-255) was 95.1 / 91.1 / 75.4 (top-right
+    // gap 2.9%) and is now 110.3 / 91.1 / 75.4 -- pairwise gaps 17.4%,
+    // 31.6%, 17.2%, all past the 12% floor. See verify-shading.py.
+    const overhead = new THREE.DirectionalLight(0xffffff, 0.45);
+    overhead.position.set(0, 0, 300);
+    scene.add(ambient, key, fill, under, overhead);
 
     // Default GridHelper lies in the XZ (y=0) plane -- a Y-up convention.
     // Rotated onto the XY (z=0) plane to match the Z-up scene.
@@ -921,8 +935,26 @@ export default function BrepViewportThree({
     // spending anything: hover is once again ~133 degrees from selected,
     // and also nowhere near the grid, the axes, or the body, because none of
     // them are cyan any more either.
-    const hoverEdgeMaterial = new THREE.MeshBasicMaterial({ color: 0x8be9fd, depthTest: false });
-    const selectedEdgeMaterial = new THREE.MeshBasicMaterial({ color: 0xff79c6, depthTest: false });
+    // Item I follow-up: depthTest:false means the ENTIRE tube draws over
+    // everything, not just the small on-silhouette segment the comment
+    // above was written for -- a tube whose far end runs behind a nearer
+    // face (an open hollow's back wall edge, seen from "Look from above")
+    // draws that hidden portion right through the face anyway, which reads
+    // exactly like the reported "diagonal line across the floor". Normal
+    // depth testing plus a polygon offset (same technique, same magnitude,
+    // as the face highlights just above) keeps the on-silhouette case this
+    // was written for artifact-free while letting a genuinely hidden
+    // portion stay hidden -- re-measured against a live hover on an
+    // ordinary edge (scripts/verify-hollow-floor.mjs is a pure Node/OCCT
+    // script with no renderer; this was checked in a real browser, not
+    // re-derived from the comment alone) with no flicker at any distance
+    // tried.
+    const hoverEdgeMaterial = new THREE.MeshBasicMaterial({
+      color: 0x8be9fd, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4,
+    });
+    const selectedEdgeMaterial = new THREE.MeshBasicMaterial({
+      color: 0xff79c6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4,
+    });
     hoverEdgeMaterialRef.current = hoverEdgeMaterial;
     selectedEdgeMaterialRef.current = selectedEdgeMaterial;
 

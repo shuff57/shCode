@@ -885,9 +885,12 @@ module.exports = function run(dir) {
 
   check('a plain Hole still declares no corner spacing at all',
     !gen.generatedParams(holeDoc).some((p) => p.name.endsWith('_dx') || p.name.endsWith('_dy')));
-  check('a four-corners Hole declares both spacings, captioned across/up',
-    gen.generatedParams(cornersDoc).some((p) => p.name === 'hole1_dx' && p.caption === 'Hole 1 corner spacing across')
-    && gen.generatedParams(cornersDoc).some((p) => p.name === 'hole1_dy' && p.caption === 'Hole 1 corner spacing up'));
+  // Item P: the panel now shows the INSET from each side, not the raw
+  // centre-offset -- plate is 60x40 (dx:20 -> 30-20=10 in from the side;
+  // dy:15 -> 20-15=5 in from the side).
+  check('a four-corners Hole declares both spacings, captioned "in from each side"',
+    gen.generatedParams(cornersDoc).some((p) => p.name === 'hole1_dx' && p.caption === 'Hole 1 in from each side (across)' && p.value === 10)
+    && gen.generatedParams(cornersDoc).some((p) => p.name === 'hole1_dy' && p.caption === 'Hole 1 in from each side (up)' && p.value === 5));
 
   check('newHole() makes a plain single hole with no corners field',
     types.newHole(doc(), 'b1').corners === undefined);
@@ -956,10 +959,14 @@ module.exports = function run(dir) {
     types.newShape(defaultBoxDoc, 'box').center[1] === 0
     && types.newShape(defaultBoxDoc, 'box').center[2] === 0);
 
-  const widerCorners = gen.applyParam(gen.applyParam(cornersDoc, 'hole1_dx', 25), 'hole1_dy', 18);
-  check('applyParam widens the corner spacing without touching diameter, depth or centre',
-    widerCorners.features[1].corners.dx === 25
-    && widerCorners.features[1].corners.dy === 18
+  // Item P: applyParam takes the typed INSET and converts it back to the
+  // stored centre-offset (plate 60x40: half 30/20) -- typing 15 in from
+  // the side across gives dx = 30-15 = 15; typing 8 in from the side up
+  // gives dy = 20-8 = 12.
+  const widerCorners = gen.applyParam(gen.applyParam(cornersDoc, 'hole1_dx', 15), 'hole1_dy', 8);
+  check('applyParam converts a typed inset back to the stored centre-offset, without touching diameter, depth or centre',
+    widerCorners.features[1].corners.dx === 15
+    && widerCorners.features[1].corners.dy === 12
     && widerCorners.features[1].diameter === 6
     && widerCorners.features[1].center.join() === '0,0,0');
 
@@ -1687,6 +1694,51 @@ module.exports = function run(dir) {
     const afterRing = gen.applyParam(ringDoc, 'r1_ring', 50).features[0];
     check('typing ring across 50 leaves tubeRadius:4 untouched', afterRing.tubeRadius === 4, JSON.stringify(afterRing));
     check('...and ringRadius becomes 21 (50/2 - 4)', afterRing.ringRadius === 21, JSON.stringify(afterRing));
+  }
+
+  console.log('\n=== item P: Four Corners spacing means "in from each side", on a non-square target ===');
+
+  {
+    // A 60x40 plate on purpose -- item P's own bug only shows on a
+    // non-square target, where "distance from centre" and "distance from
+    // the side" disagree by a different amount on each axis.
+    const plate = { id: 'b1', kind: 'box', size: [60, 40, 10], center: [0, 0, 0] };
+    const holeDoc = (dx, dy) => ({
+      version: 1,
+      features: [plate, { id: 'hole1', kind: 'hole', target: 'b1', diameter: 6, depth: 10, center: [0, 0, 0], axis: 'z', corners: { dx, dy } }],
+    });
+
+    // Typing the SAME inset (10) on both axes must give the SAME margin on
+    // both, even though the plate's width (60) and depth (40) differ --
+    // stored dx/dy come out DIFFERENT (20 and 10) precisely because the
+    // panel is now measuring from each side, not the centre.
+    const same = gen.applyParam(gen.applyParam(holeDoc(0, 0), 'hole1_dx', 10), 'hole1_dy', 10);
+    check('typing the same inset (10) on a 60x40 plate gives dx=20 (30-10), not dx=10',
+      same.features[1].corners.dx === 20, JSON.stringify(same.features[1].corners));
+    check('...and dy=10 (20-10), a DIFFERENT stored value for the SAME typed margin',
+      same.features[1].corners.dy === 10, JSON.stringify(same.features[1].corners));
+
+    // The built geometry actually reflects that shared 10mm margin on
+    // both axes -- not the crowded-on-one-axis result item P's own bug
+    // report described.
+    const src = gen.toReshape(same);
+    const built = build(src);
+    check('the built plate is smaller than an unbored one (the holes actually cut)',
+      built.volume < 60 * 40 * 10, `${built.volume}`);
+
+    // Round-trip through generatedParams: the same 10mm inset reads back
+    // out as 10 on both axes, regardless of the plate's own shape.
+    const params = gen.generatedParams(same);
+    const dxP = params.find((p) => p.name === 'hole1_dx');
+    const dyP = params.find((p) => p.name === 'hole1_dy');
+    check('reading the panel back shows 10 in from each side on BOTH axes',
+      dxP.value === 10 && dyP.value === 10, JSON.stringify({ dxP, dyP }));
+
+    // The min bound bakes in the hole's own radius (diameter 6 -> radius 3,
+    // plus a hair of margin) so a typed inset that would break the side is
+    // refused before it ever reaches the kernel.
+    check("the inset's own min accounts for the hole's radius (diameter 6 -> min 3.5)",
+      dxP.min === 3.5 && dyP.min === 3.5, JSON.stringify({ dxP, dyP }));
   }
 
   console.log(`\n${fails.length ? 'FAIL' : 'ALL PASS'}  (${pass} assertions${fails.length ? ', ' + fails.length + ' failed: ' + fails.join(', ') : ''})`);
