@@ -56,6 +56,13 @@ on any FAIL.
     the seeded POINTS it correctly solved for gating, and solveDoc()'s own
     follow-up re-solve (no seed) can land somewhere its OWN collapse gate
     then rejects -- so this check does not assert the banner clears.
+(11) Addendum item K: every rule the overlay draws as a MARK on the
+    geometry, not a floating text chip a student has to already know the
+    meaning of. Parallel on the S09 trapezoid draws two tick marks whose
+    own data-edge1 attribute names edges 1 and 3; perpendicular between the
+    same two edges draws one right-angle square naming both edges at their
+    shared corner. Also checks the pair grid's own headers now read
+    "Edge N" rather than a bare number.
 
 Rules-panel controls that predate this probe's item-D fix are still clicked
 via `el.click()` in the page's own JS (locator.evaluate) for the S09/S10/S11
@@ -400,6 +407,80 @@ def check_two_rule_settle(page):
     # scripts/sketch-solve-assertions.cjs.
 
 
+def check_marks_on_geometry(page):
+    print("\n=== K: rules draw a mark on the geometry itself, not just a colored cell ===")
+    # Same S09 trapezoid setup as check_s09 below -- parallel between edges
+    # 1 and 3 -- but this time reading the CANVAS overlay's own marks
+    # (components/model/HandleOverlay.tsx), not the corner values.
+    arm_sketch(page)
+    js_click(rule_button(page, "Edge 3 across"))
+    field = page.get_by_label("Sketch 1 corner 3 up", exact=True)
+    field.fill("15")
+    field.press("Tab")
+    time.sleep(0.2)
+    cell = page.locator('[title^="Edges 1 and 3"]').first
+    for _ in range(4):
+        if (cell.get_attribute("aria-label") or "").endswith(": parallel"):
+            break
+        js_click(cell)
+        time.sleep(0.2)
+    time.sleep(0.3)
+
+    parallel_marks = page.locator('[data-mark="parallel"]')
+    check("the overlay draws exactly two parallel-tick marks",
+        parallel_marks.count() == 2, f"count={parallel_marks.count()}")
+    named_edges = sorted(
+        parallel_marks.nth(i).get_attribute("data-edge1") for i in range(parallel_marks.count())
+    )
+    check("...naming edges 1 and 3, not a floating '∥' chip",
+        named_edges == ["1", "3"], f"named={named_edges}")
+    # Scoped to the canvas overlay's own <svg>, not the whole page -- the
+    # Rules panel's OWN pair-grid button still legitimately shows "∥" as
+    # its cell glyph, which is the panel control, not the floating canvas
+    # chip this item removes.
+    canvas_parallel_text = page.locator("svg.sketch-lines text", has_text="∥")
+    check("the old floating '∥' text chip on the canvas overlay is gone",
+        page.locator('[data-mark]').count() > 0 and canvas_parallel_text.count() == 0,
+        f"canvas '∥' text count={canvas_parallel_text.count()}")
+
+    # Now S10's setup -- perpendicular between the same two edges -- for the
+    # right-angle square at their shared corner.
+    arm_sketch(page)
+    js_click(rule_button(page, "Edge 2 up"))
+    across = page.get_by_label("Sketch 1 corner 3 across", exact=True)
+    across.fill("50")
+    across.press("Tab")
+    time.sleep(0.2)
+    cell2 = page.locator('[title^="Edges 1 and 3"]').first
+    for _ in range(4):
+        if (cell2.get_attribute("aria-label") or "").endswith(": perpendicular"):
+            break
+        js_click(cell2)
+        time.sleep(0.2)
+    time.sleep(0.3)
+
+    perp_marks = page.locator('[data-mark="perpendicular"]')
+    check("a right-angle square mark exists for the perpendicular rule",
+        perp_marks.count() == 1, f"count={perp_marks.count()}")
+    if perp_marks.count():
+        check("...naming edges 1 and 3, at their shared corner",
+            perp_marks.first.get_attribute("data-edge1") == "1"
+            and perp_marks.first.get_attribute("data-edge2") == "3",
+            f"edge1={perp_marks.first.get_attribute('data-edge1')} "
+            f"edge2={perp_marks.first.get_attribute('data-edge2')}")
+        # Three sides, drawn as three polylines -- see buildMarks()' own
+        # right-angle-square construction.
+        check("...drawn as an actual square (three line segments), not a symbol",
+            perp_marks.first.locator("polyline").count() == 3,
+            f"segment count={perp_marks.first.locator('polyline').count()}")
+
+    # The pair grid's own headers, checked while we are here (item K's
+    # other half): "Edge N", not a bare number.
+    check("the pair grid's column headers say 'Edge N', not a bare number",
+        page.locator(".sk-pairs-grid thead th").nth(1).text_content() == "Edge 1",
+        page.locator(".sk-pairs-grid thead th").nth(1).text_content())
+
+
 def check_s09(page):
     print("\n=== S09: parallel between edges 1 and 3 must not collapse the sketch ===")
     arm_sketch(page)
@@ -536,6 +617,11 @@ def main():
             check_two_rule_settle(page)
         except Exception as exc:  # noqa: BLE001
             check("J checks ran without an exception", False, repr(exc))
+
+        try:
+            check_marks_on_geometry(page)
+        except Exception as exc:  # noqa: BLE001
+            check("K checks ran without an exception", False, repr(exc))
 
         browser.close()
 
