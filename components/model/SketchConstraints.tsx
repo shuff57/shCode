@@ -306,6 +306,17 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
   // the sketch is, never create a new fight to settle).
   const [autoNote, setAutoNote] = useState<string | null>(null);
 
+  // A typed number this panel refused outright -- zero or negative on a
+  // Length or Round/Chamfer box, none of which have a defined meaning below
+  // (or at) zero the way Bow's signed value does. Every one of these fields
+  // used to snap the box back with nothing on screen saying why (EXPLORE-2d,
+  // 2026-09-04): typing -5 or 0 into a Length box silently reverted it, no
+  // different to a typo. lib/reshape-script.ts's own positiveNumber() throws
+  // "a size has to be a positive number" for the exact same mistake made in
+  // Code -- this is that sentence's Build-side twin. Cleared on the next
+  // successful edit anywhere in the panel, same lifetime as autoNote.
+  const [inputNote, setInputNote] = useState<string | null>(null);
+
   // The edge (or edges, for a pair rule) or corner most recently COMMITTED
   // -- not merely hovered -- so a beginner can look back at the sketch a
   // moment later and still see what they just did, without needing to keep
@@ -380,13 +391,29 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
     settle([...cleaned, { kind, edge }]);
   }
 
-  function setLength(edge: number, raw: string) {
+  function setLength(edge: number, input: HTMLInputElement) {
+    const raw = input.value;
     const rest = constraints.filter((c) => !(c.kind === 'length' && c.edge === edge));
-    const v = Number(raw);
-    if (raw.trim() === '' || !Number.isFinite(v) || v <= 0) {
+    // Empty is a deliberate CLEAR, not a bad number -- typed on purpose to
+    // take the rule off, so it gets no note, same as unchecking any other
+    // box here never does.
+    if (raw.trim() === '') {
+      setInputNote(null);
       onChange(rest);
       return;
     }
+    const v = Number(raw);
+    if (!Number.isFinite(v) || v <= 0) {
+      setInputNote(`Edge ${edge + 1}'s length has to be a positive number. It has been put back.`);
+      // Same restore-the-box move the Round/Chamfer boxes below already make
+      // on a non-numeric entry -- there is no OTHER length rule on this edge
+      // to fall back to, so blank (which shows the live measured length as
+      // its placeholder) is the honest "put back" state.
+      const current = constraints.find((c) => c.kind === 'length' && c.edge === edge);
+      input.value = current && current.kind === 'length' ? String(current.value) : '';
+      return;
+    }
+    setInputNote(null);
     settle([...rest, { kind: 'length', edge, value: Math.round(v * 100) / 100 }]);
     const touched: typeof lastTouched = { kind: 'edge', indices: [edge] };
     setLastTouched(touched);
@@ -491,6 +518,15 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
         </p>
       )}
 
+      {/* A refused NUMBER, not a refused RULE -- the amber a genuine
+          conflict already uses, since this is the same kind of thing: the
+          request could not be honoured and nothing changed. Distinct from
+          autoNote just above (which reports a settle that DID succeed) so
+          the two are never confusable at a glance. */}
+      {inputNote && (
+        <p className="sk-rules-note">{inputNote}</p>
+      )}
+
       {planeRow}
 
       <table className="sk-table">
@@ -570,7 +606,7 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
                     className={edgeConflict('length', e) ? 'fighting' : undefined}
                     placeholder={edgeLength(points, e).toFixed(1)}
                     defaultValue={fixed && fixed.kind === 'length' ? String(fixed.value) : ''}
-                    onBlur={(ev) => setLength(e, ev.target.value)}
+                    onBlur={(ev) => setLength(e, ev.target)}
                     onKeyDown={(ev) => {
                       if (ev.key === 'Enter') (ev.target as HTMLInputElement).blur();
                     }}
@@ -736,16 +772,33 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
               onBlur={(ev) => {
                 const v = Number(ev.target.value);
                 if (!Number.isFinite(v)) { ev.target.value = set !== undefined ? String(set) : ''; return; }
+                // Genuinely NEGATIVE is checked BEFORE the "0 with nothing
+                // set" case right below -- v <= 0 is also true for a
+                // negative v, and that check used to catch it first, so the
+                // note here never fired for exactly the input it exists
+                // for. 0 has a real meaning (the tooltip's own "or 0 to undo
+                // it"); a negative radius does not, and `min={0}` on the
+                // input does not stop a typed "-5" from reaching this
+                // handler. It used to reach onRound() anyway via
+                // Math.max(0, v), silently un-rounding the corner as if 0
+                // had been typed, with nothing on screen explaining why the
+                // number came back different from what was typed.
+                if (v < 0) {
+                  setInputNote(`Round corner ${i + 1} has to be 0 or a positive number. It has been put back.`);
+                  ev.target.value = set !== undefined ? String(set) : '';
+                  return;
+                }
                 // 0 (or an emptied box) is un-round, and it reaches onRound()
                 // like any other value. It could not before -- the old guard
                 // returned early on v <= 0 -- so a corner, once rounded, could
                 // never be made sharp again, and no message anywhere said so.
                 if (v <= 0 && set === undefined) { ev.target.value = ''; return; }
+                setInputNote(null);
                 // Pass what the student TYPED, not the clamped value. Clamping
                 // here made a request for 500 and a request for 10 arrive
                 // identically, so no caller could tell a clamp had happened and
                 // nothing could say so (sketch gauntlet round 3, blind judge).
-                onRound(i, Math.max(0, v));
+                onRound(i, v);
                 // Only a genuine round is a "corner round typed" -- un-
                 // rounding back to 0 has nothing left on this corner worth
                 // pointing at.
@@ -790,8 +843,22 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
               onBlur={(ev) => {
                 const v = Number(ev.target.value);
                 if (!Number.isFinite(v)) { ev.target.value = set !== undefined ? String(set) : ''; return; }
+                // Checked BEFORE "0 with nothing set" below -- same ordering
+                // bug the Round box above had: v <= 0 is also true for a
+                // negative v, and that check used to catch it first, so this
+                // note never fired for the input it exists for. 0 is the
+                // tooltip's own "undo it" value, a negative distance is not,
+                // and it used to reach onChamfer() anyway via
+                // Math.max(0, v) with no explanation for why the corner
+                // un-chamfered instead.
+                if (v < 0) {
+                  setInputNote(`Chamfer corner ${i + 1} has to be 0 or a positive number. It has been put back.`);
+                  ev.target.value = set !== undefined ? String(set) : '';
+                  return;
+                }
                 if (v <= 0 && set === undefined) { ev.target.value = ''; return; }
-                onChamfer(i, Math.max(0, v));
+                setInputNote(null);
+                onChamfer(i, v);
               }}
               onKeyDown={(ev) => {
                 if (ev.key === 'Enter') (ev.target as HTMLInputElement).blur();

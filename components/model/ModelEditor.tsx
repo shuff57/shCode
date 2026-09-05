@@ -127,6 +127,15 @@ interface Props {
   onRedo: () => void;
   canUndo: boolean;
   canRedo: boolean;
+  /** Bumped by the caller on every Undo/Redo, whichever way it was
+   *  triggered -- the toolbar button here, or the Ctrl+Z/Ctrl+Shift+Z
+   *  shortcut, which the caller owns and this component never sees
+   *  directly. Clears the info banner below on change (see its own
+   *  effect): an Undo that puts a curved edge back to straight left the
+   *  banner still claiming it curves (EXPLORE-2d, 2026-09-04), because
+   *  nothing told this component the doc it is reading just moved a step
+   *  in time rather than forward from a fresh edit. */
+  historyGen?: number;
   /** When set, the panel breaks down to a thin preview bar and back. Used by
    *  the sandbox's Build mode, where the canvas owns the window and the tools
    *  are a sidebar the student can hide to look at the shape. The state lives
@@ -396,9 +405,22 @@ function FlyoutButton({
 
 export default function ModelEditor({
   doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, onStartDraw, drawTool, pickedEdge, onClearPickedEdge, pickedFace, onClearPickedFace, refusals,
-  hoveredPart, onHoverPart,
+  hoveredPart, onHoverPart, historyGen,
 }: Props) {
   const [note, setNote] = useState<string | null>(null);
+  // A note describes something that just happened going FORWARD -- a rule
+  // applied, a refusal explained. An Undo/Redo moves the doc a step in
+  // TIME instead, and whatever note was on screen may no longer describe
+  // it at all (EXPLORE-2d, 2026-09-04: undoing a Bow left "Edge 1 now
+  // curves..." on screen after the edge was straight again). Skips the
+  // very first render (historyGen starts undefined/0 with nothing to
+  // clear) so mounting fresh never wipes a note some OTHER effect just set
+  // in the same tick.
+  const historyGenMounted = useRef(false);
+  useEffect(() => {
+    if (!historyGenMounted.current) { historyGenMounted.current = true; return; }
+    setNote(null);
+  }, [historyGen]);
   // An empty document has nothing for a note to be about: Reset clears the
   // model but used to leave "Hollowed, open at the face you clicked." beside
   // "Nothing here yet" (moderate lens, round 2).

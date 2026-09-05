@@ -108,11 +108,29 @@ function sketchIsUnconsumed(doc: ModelDoc, sketchId: string): boolean {
 }
 
 function foldParams(base: ModelDoc, pending: ParamValues): ModelDoc {
-  let next = base;
+  const numeric: Record<string, number> = {};
   for (const [k, v] of Object.entries(pending)) {
-    if (typeof v === 'number') next = applyParam(next, k, v);
+    if (typeof v === 'number') numeric[k] = v;
   }
+  let next = base;
+  for (const [k, v] of Object.entries(numeric)) next = applyParam(next, k, v);
   if (next === base) return base;
+  // Re-run the exact pinned solve the live drag preview already promised --
+  // solveSketchDrag holds whichever corner(s) `pending` names still, the
+  // same way sendParams() pins them for the in-progress drag -- before the
+  // generic solveDoc() pass below, which only ever holds a corner for a
+  // `lock` rule. Without this, a sketch with an ACTIVE lock on one corner
+  // could resolve a drag on a DIFFERENT corner by moving the just-dragged
+  // corner again to satisfy its own horizontal/vertical rules, landing the
+  // committed doc on a point neither panel had just shown: pin corner 1,
+  // drag corner 2, and the committed shape no longer matched either the
+  // Dimensions panel (which reads THIS pinned solve) or what the drag had
+  // just drawn (measured 2026-09-04, S12). Harmless for every param that
+  // is not a sketch corner -- solveSketchDrag only ever touches names
+  // shaped `<sketchId>_p<n>u`/`v`, so a box width or a radius passes
+  // through untouched.
+  const pinned = solveSketchDrag(next, numeric);
+  for (const [k, v] of Object.entries(pinned)) next = applyParam(next, k, v);
   return solveDoc(next);
 }
 
@@ -271,12 +289,19 @@ export default function ReshapeStudio({
     loadDoc(merged);
   }, [remember, loadDoc]);
 
+  // Bumped on every Undo/Redo so ModelEditor can clear its own info banner
+  // regardless of which trigger fired it -- the toolbar button (which calls
+  // this same `undo`/`redo`) or the Ctrl+Z/Ctrl+Shift+Z shortcut below,
+  // which ModelEditor never sees at all.
+  const [historyGen, setHistoryGen] = useState(0);
+
   const undo = useCallback(() => {
     const prev = past.current.pop();
     if (!prev) return;
     future.current = [docRef.current, ...future.current];
     setDepth({ back: past.current.length, forward: future.current.length });
     loadDoc(prev);
+    setHistoryGen((g) => g + 1);
   }, [loadDoc]);
 
   const redo = useCallback(() => {
@@ -286,6 +311,7 @@ export default function ReshapeStudio({
     future.current = rest;
     setDepth({ back: past.current.length, forward: rest.length });
     loadDoc(next);
+    setHistoryGen((g) => g + 1);
   }, [loadDoc]);
 
   const uncommitted = useRef<ParamValues>({});
@@ -341,6 +367,17 @@ export default function ReshapeStudio({
     remember(docRef.current);
     setDoc(next);
     docRef.current = next;
+    // Re-derive EVERY param fresh from the committed doc, the same call
+    // loadDoc() already makes on every doc adoption -- not just the ones
+    // `pending` named. Without this, the Dimensions panel keeps showing
+    // whatever the last live-drag frame computed (sendParams' own
+    // setParamValues, mid-gesture), and a commit that lands anywhere other
+    // than that exact frame -- a sketch's OWN constraint solve moving a
+    // second corner to keep an edge rule true, say -- leaves the panel
+    // stating a number the committed doc no longer has (measured
+    // 2026-09-04, S12/EXPLORE-2d's circle-rim case: same defect, two
+    // different sketch tools, neither one exercising a lock).
+    setParamValues(docParams(next));
   }, [remember]);
 
   const specs = useMemo(() => {
@@ -818,6 +855,7 @@ export default function ReshapeStudio({
               onRedo={redo}
               canUndo={depth.back > 0}
               canRedo={depth.forward > 0}
+              historyGen={historyGen}
               collapsible
               onCollapsed={setToolsHidden}
               onContentChange={setCardHasContent}
@@ -1084,9 +1122,30 @@ export default function ReshapeStudio({
         }
         /* Clears the floating ribbon and stops short of the timeline, the
            same offsets #reshapeRules used pre-extraction. */
+        /* margin-left below also clears the floating tools card SIDEWAYS,
+           the one dimension the comment above never covered:
+           .reshape-studio-tools is position:absolute and z-index:40, so
+           it visually and interactively sits ON TOP of whatever the
+           (position:relative, z-index:auto) rules pane draws underneath
+           it, even at its collapsed 46px rail width -- a real mouse click
+           at a "Rules between two edges" cell within that band lands on
+           the rail's own div instead (measured 2026-09-04, S08/S12: a
+           click at the button's own live getBoundingClientRect() center
+           resolved via document.elementFromPoint to .model-editor inside
+           .reshape-studio-tools, not the button). The timeline strip below
+           already dodges the same card this way; the rules pane never got
+           the equivalent margin.
+           NB: no backticks in this comment -- this whole block is a
+           template literal, and a backtick here closes it early, which is
+           exactly what broke this file the first time this comment was
+           written. */
         .reshape-studio.is-build .reshape-pane-rules:not(:empty) {
           margin-top: 48px;
           height: calc(100% - 48px - ${TIMELINE_HEIGHT_PX}px);
+          margin-left: calc(min(420px, 45%) + 24px);
+        }
+        .reshape-studio.is-build.is-card-empty .reshape-pane-rules:not(:empty) {
+          margin-left: 66px;
         }
         .reshape-pane-view { flex: 1 1 auto; min-width: 0; display: flex; position: relative; }
         .reshape-pane-view .reshape-frame, .reshape-pane-view .reshape-empty { flex: 1; }

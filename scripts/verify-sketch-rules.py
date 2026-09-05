@@ -13,13 +13,32 @@ on any FAIL.
     informational note rather than the error banner.
 (3) After (2), edge 2 is left as the selected/highlighted edge (the floating
     name pill reads "Edge 2 ...").
+(4) A PLAIN Playwright click (no force, no JS) on a pair-grid cell changes
+    its aria-label -- regression check for the overlapping-div click defect
+    (S08/S12 addendum item D).
+(5) Pin corner 1, drag corner 2 of a Rectangle: the Rules panel's Length
+    cells (canvas-derived) agree with the Dimensions panel's own corner
+    values to within 0.5mm (addendum item E).
+(6) Drag a circle's rim handle: the Dimensions panel's `across` value
+    updates away from the pre-drag default and holds after a further wait
+    (addendum item F).
+(7) Typing -5 into a Length cell shows a note and restores the value;
+    typing -3 into a Bow cell bows the edge the OTHER way (addendum item G).
+(8) An info note left on screen by an earlier action (a Bow) is cleared by
+    Undo (addendum item H).
 
-Rules-panel controls are clicked via `el.click()` in the page's own JS
-(locator.evaluate), not a plain Playwright click: an overlapping
-`model-editor` div intercepts a real on-screen click there (documented in the
-round-1 evidence notes for S08/S09/S10, and reconfirmed writing this probe --
-a real click, even with force=True, still resolves to whatever is actually
-topmost at that pixel and silently does nothing to the pair-rule grid).
+Rules-panel controls that predate this probe's item-D fix are still clicked
+via `el.click()` in the page's own JS (locator.evaluate) for the S09/S10/S11
+setup steps, matching the workaround the round-1 evidence notes for
+S08/S09/S10 used -- check (4) below is what actually re-proves a plain click
+now lands.
+
+A NATIVE `<input type="number">` (Round/Chamfer/Bow) renders its own
+up/down spinner arrows inside the box; Playwright's default click lands at
+the element's centre, which on a 42px-wide box can hit the spinner instead
+of placing a text cursor (measured writing this probe: a centred click alone
+stepped Bow from empty to -0.5 with no typing at all). Every check below
+that types into one of those clicks near the LEFT edge first.
 """
 import math
 import sys
@@ -123,6 +142,152 @@ def edge_len(pts, n):
     return math.hypot(b[0] - a[0], b[1] - a[1])
 
 
+def type_into_number_box(page, locator, text):
+    """Click near the LEFT edge of a native <input type="number"> (never its
+    centre -- see the module docstring's spinner note), select-all, and type
+    `text` via real key presses (not .fill(), which never exercises the
+    per-keystroke path a real student's typing does)."""
+    box = locator.bounding_box()
+    page.mouse.click(box["x"] + 5, box["y"] + box["height"] / 2)
+    page.keyboard.press("Control+a")
+    for ch in text:
+        page.keyboard.press(ch)
+
+
+def check_plain_click_on_pair_grid(page):
+    print("\n=== D: a plain click reaches the pair-rule grid ===")
+    arm_sketch(page)
+    cell = page.locator('[title^="Edges 1 and 3"]').first
+    before = cell.get_attribute("aria-label")
+    cell.click()  # deliberately NOT force=True and NOT js_click
+    time.sleep(0.2)
+    after = cell.get_attribute("aria-label")
+    check("a plain Playwright click on 'Edges 1 and 3' changes its aria-label",
+        before != after, f"before={before!r} after={after!r}")
+
+
+def check_pin_drag_sync(page):
+    print("\n=== E: pin + drag keeps the canvas/Rules panel and Dimensions panel in sync ===")
+    page.goto(f"{BASE}/sandbox/")
+    page.evaluate("() => localStorage.setItem('shCode:sandbox-mode', 'reshape')")
+    page.reload()
+    page.wait_for_selector("canvas", timeout=15000)
+    page.get_by_role("button", name="Rectangle", exact=True).click()
+    canvas = page.locator("canvas").first
+    cb = canvas.bounding_box()
+    cx0, cy0 = cb["x"] + cb["width"] / 2 - 80, cb["y"] + cb["height"] / 2 - 40
+    cx1, cy1 = cb["x"] + cb["width"] / 2 + 80, cb["y"] + cb["height"] / 2 + 40
+    page.mouse.click(cx0, cy0)
+    time.sleep(0.15)
+    page.mouse.click(cx1, cy1)
+    time.sleep(0.2)
+    page.wait_for_selector('button[aria-label="Pin corner 1"]', timeout=10000)
+    page.locator('[aria-label="Pin corner 1"]').click()
+    time.sleep(0.2)
+
+    handle = page.locator('[aria-label^="Drag"][aria-label*="orner 2"]').first
+    box = handle.bounding_box()
+    hx, hy = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
+    page.mouse.move(hx, hy)
+    page.mouse.down()
+    for i in range(1, 6):
+        page.mouse.move(hx + i * 20, hy + i * 10, steps=3)
+        time.sleep(0.04)
+    page.mouse.up()
+    time.sleep(0.4)
+
+    corners = read_all_corners(page, "Sketch 1")
+    ok_corners = all(u is not None and v is not None for u, v in corners)
+    lengths = {}
+    for e in [1, 2, 3, 4]:
+        placeholder = page.locator(f'input[aria-label="Edge {e} length"]').get_attribute("placeholder")
+        lengths[e] = float(placeholder) if placeholder else None
+    if ok_corners and all(v is not None for v in lengths.values()):
+        actual = [edge_len(corners, n) for n in range(4)]
+        diffs = [abs(actual[n] - lengths[n + 1]) for n in range(4)]
+        check("the Rules panel's Length cells agree with the Dimensions panel's "
+            "corner values (within 0.5mm)",
+            all(d < 0.5 for d in diffs),
+            f"corners={corners} lengths={lengths} diffs={[round(d, 3) for d in diffs]}")
+    else:
+        check("the Rules panel's Length cells agree with the Dimensions panel's "
+            "corner values (within 0.5mm)", False,
+            f"could not read all values: corners={corners} lengths={lengths}")
+
+
+def check_circle_rim_sync(page):
+    print("\n=== F: a circle rim drag updates the Dimensions panel's `across` ===")
+    page.goto(f"{BASE}/sandbox/")
+    page.evaluate("() => localStorage.setItem('shCode:sandbox-mode', 'reshape')")
+    page.reload()
+    page.wait_for_selector("canvas", timeout=15000)
+    page.get_by_role("button", name="Circle", exact=True).click()
+    page.wait_for_selector("#reshapeRules", timeout=10000)
+    time.sleep(0.2)
+    across_field = page.get_by_label("Sketch 1 across", exact=True)
+    before = across_field.input_value()
+
+    handle = page.locator('[aria-label^="Drag"]').first
+    box = handle.bounding_box()
+    hx, hy = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
+    page.mouse.move(hx, hy)
+    page.mouse.down()
+    for i in range(1, 6):
+        page.mouse.move(hx + i * 15, hy, steps=3)
+        time.sleep(0.04)
+    page.mouse.up()
+    time.sleep(0.4)
+    after = across_field.input_value()
+    time.sleep(0.5)
+    after_settled = across_field.input_value()
+    check("the Dimensions panel's `across` value moves off its pre-drag default",
+        before != after, f"before={before!r} after={after!r}")
+    check("...and holds after a further wait, rather than reverting",
+        after == after_settled, f"after={after!r} after_settled={after_settled!r}")
+
+
+def check_bad_numbers(page):
+    print("\n=== G: a refused number shows a note and is put back; Bow honours negative ===")
+    arm_sketch(page)
+    length_field = page.locator('input[aria-label="Edge 1 length"]')
+    length_field.fill("-5")
+    length_field.press("Tab")
+    time.sleep(0.2)
+    check("a Length cell put back to -5 shows an empty box (value refused, not stored)",
+        length_field.input_value() == "", repr(length_field.input_value()))
+    note = page.locator(".sk-rules-note").filter(has_not=page.locator(".sk-rules-note-info"))
+    check("...and a note explains why", note.count() > 0 and "positive" in (note.first.text_content() or ""),
+        note.first.text_content() if note.count() else "no note found")
+
+    bow_field = page.locator('input[aria-label="Bow edge 2"]')
+    type_into_number_box(page, bow_field, "-3")
+    page.keyboard.press("Enter")
+    time.sleep(0.3)
+    row = page.locator("table.sk-table tbody tr").nth(1)  # edge 2 is the second row
+    check("typing -3 into Bow bows edge 2 the OTHER way (still curved, not refused)",
+        "curved" in row.inner_text(), row.inner_text())
+
+
+def check_undo_clears_note(page):
+    print("\n=== H: Undo clears a note left by an earlier action ===")
+    arm_sketch(page)
+    bow_field = page.locator('input[aria-label="Bow edge 1"]')
+    type_into_number_box(page, bow_field, "5")
+    page.keyboard.press("Enter")
+    time.sleep(0.2)
+    before_note = page.locator(".model-note")
+    had_note = before_note.count() > 0 and bool(before_note.first.text_content())
+    check("setup: bowing edge 1 leaves an info banner on screen",
+        had_note, before_note.first.text_content() if before_note.count() else None)
+
+    page.keyboard.press("Control+z")
+    time.sleep(0.3)
+    after_note = page.locator(".model-note")
+    after_text = after_note.first.text_content() if after_note.count() else None
+    check("Ctrl+Z (not the toolbar button) clears the banner",
+        not after_note.count() or not after_text, repr(after_text))
+
+
 def check_s09(page):
     print("\n=== S09: parallel between edges 1 and 3 must not collapse the sketch ===")
     arm_sketch(page)
@@ -224,6 +389,31 @@ def main():
             check_edge2_selected(page)
         except Exception as exc:  # noqa: BLE001
             check("S11 checks ran without an exception", False, repr(exc))
+
+        try:
+            check_plain_click_on_pair_grid(page)
+        except Exception as exc:  # noqa: BLE001
+            check("D checks ran without an exception", False, repr(exc))
+
+        try:
+            check_pin_drag_sync(page)
+        except Exception as exc:  # noqa: BLE001
+            check("E checks ran without an exception", False, repr(exc))
+
+        try:
+            check_circle_rim_sync(page)
+        except Exception as exc:  # noqa: BLE001
+            check("F checks ran without an exception", False, repr(exc))
+
+        try:
+            check_bad_numbers(page)
+        except Exception as exc:  # noqa: BLE001
+            check("G checks ran without an exception", False, repr(exc))
+
+        try:
+            check_undo_clears_note(page)
+        except Exception as exc:  # noqa: BLE001
+            check("H checks ran without an exception", False, repr(exc))
 
         browser.close()
 
