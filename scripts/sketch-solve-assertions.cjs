@@ -549,21 +549,39 @@ module.exports = function run(dir) {
     near(S.edgeLength(bothAt25.points, 0), 25) && near(S.edgeLength(bothAt25.points, 1), 25),
     JSON.stringify(bothAt25.points));
 
-  // The banner still has to be the honest answer when NO single removal
-  // would fix it -- addConstraintSettling must not invent a multi-rule
-  // rewrite just to make the red banner go away. Three DIFFERENT lengths on
-  // the SAME edge is exactly that: dropping any one of the three still
-  // leaves two different values fighting over the same edge, so no single
-  // removal ever clears it (unlike three mutually perpendicular triangle
-  // edges, where dropping any ONE of the three resolves it immediately --
-  // measured while writing this test, and the wrong fixture to use here).
-  const trulyStuck = S.addConstraintSettling(rect(), [
+  // Three DIFFERENT lengths on the SAME edge: dropping any ONE of the three
+  // still leaves two different values fighting, so no SINGLE removal ever
+  // clears it (unlike three mutually perpendicular triangle edges, where
+  // dropping any ONE of the three resolves it immediately -- measured while
+  // writing this test, and the wrong fixture to use here). It DOES resolve
+  // by dropping a PAIR, though (item J, 2026-09-04): any two of the three
+  // gone leaves exactly one length rule standing, which is trivially
+  // satisfiable, and the pair that keeps the most area -- the two OLDER,
+  // smaller values -- is what the same area-first ranking the single-removal
+  // case already uses picks here too.
+  const threeLengths = S.addConstraintSettling(rect(), [
     { kind: 'length', edge: 0, value: 10 },
     { kind: 'length', edge: 0, value: 20 },
     { kind: 'length', edge: 0, value: 30 },
   ]);
-  check('a conflict that needs more than one rule gone is left alone -- banner included',
-    trulyStuck.removed === null && trulyStuck.constraints.length === 3,
+  check('three different lengths on one edge settles by dropping a PAIR, not a single removal',
+    threeLengths.removed && threeLengths.removed.value === 10
+    && threeLengths.removedAlso && threeLengths.removedAlso.value === 20
+    && threeLengths.constraints.length === 1 && threeLengths.constraints[0].value === 30,
+    JSON.stringify(threeLengths));
+
+  // The banner still has to be the honest answer when not even a PAIR would
+  // fix it -- addConstraintSettling must not invent a three-rule rewrite
+  // just to make the red banner go away. FOUR different lengths on one edge
+  // needs three gone to leave a single survivor, past the two-rule cap.
+  const trulyStuck = S.addConstraintSettling(rect(), [
+    { kind: 'length', edge: 0, value: 10 },
+    { kind: 'length', edge: 0, value: 20 },
+    { kind: 'length', edge: 0, value: 30 },
+    { kind: 'length', edge: 0, value: 40 },
+  ]);
+  check('a conflict that needs three rules gone is still left alone -- banner included',
+    trulyStuck.removed === null && trulyStuck.removedAlso === null && trulyStuck.constraints.length === 4,
     JSON.stringify(trulyStuck));
 
   console.log('\n=== a lock is the last resort, not just whichever removal leaves more area (item I) ===');
@@ -622,6 +640,49 @@ module.exports = function run(dir) {
   check('a lock added after a between-edges/other rule is already set is not itself dropped',
     pairThenLockSettled.constraints.some((c) => c.kind === 'lock' && c.corner === 2),
     JSON.stringify(pairThenLockSettled));
+
+  console.log('\n=== a conflict needing TWO older rules gone settles instead of banner-ing (item J) ===');
+
+  // S10 round 2: perpendicular between edges 1 and 3, while EACH of those
+  // two edges still carries its own horizontal lock. Neither lock alone
+  // stands in the way -- dropping just one still leaves the OTHER edge
+  // horizontal-locked and unable to turn -- so no single removal ever
+  // settles it, and the old code banner'd "remove one to settle it" even
+  // though removing one never could. Both have to go together.
+  const twoLocksPts = [[0, 0], [40, 0], [60, 10], [0, 25]];
+  const twoLocksCS = [
+    { kind: 'horizontal', edge: 0 }, { kind: 'horizontal', edge: 2 }, { kind: 'vertical', edge: 3 },
+    { kind: 'perpendicular', edge: 0, other: 2 },
+  ];
+  check('setup: this really needs more than one removal -- no single rule fixes it',
+    (() => {
+      const seed = S.seedForNewRule(twoLocksPts, twoLocksCS);
+      for (let i = 0; i < twoLocksCS.length - 1; i++) {
+        const cand = twoLocksCS.filter((_, idx) => idx !== i);
+        const solved = S.solveSketch(seed, cand);
+        if (!solved.overConstrained && !S.collapsedByRatio(twoLocksPts, solved.points)) return false;
+      }
+      return true;
+    })(), 'setup check, not the fix under test');
+  const twoLocksSettled = S.addConstraintSettling(twoLocksPts, twoLocksCS);
+  check('perpendicular against two horizontal-locked edges settles by dropping a PAIR, not a banner',
+    twoLocksSettled.removed !== null && twoLocksSettled.removedAlso !== null
+    && twoLocksSettled.constraints.length === 2
+    && twoLocksSettled.constraints.some((c) => c.kind === 'perpendicular'),
+    JSON.stringify(twoLocksSettled));
+  check('...and the result is a real, non-collapsed, genuinely perpendicular quad',
+    (() => {
+      const seed = S.seedForNewRule(twoLocksPts, twoLocksSettled.constraints);
+      const solved = S.solveSketch(seed, twoLocksSettled.constraints);
+      if (solved.overConstrained || S.collapsedByRatio(twoLocksPts, solved.points)) return false;
+      const a = edgeAngle(solved.points, 0);
+      const b = edgeAngle(solved.points, 2);
+      return near(Math.abs(angleDiff(a, b)), Math.PI / 2, 1e-2);
+    })());
+  check('...and the note names BOTH removed rules in one sentence, in the course\'s own words',
+    S.describeRemovalNotePair(twoLocksSettled.removed, twoLocksSettled.removedAlso, twoLocksCS[twoLocksCS.length - 1])
+      .endsWith('Undo puts them back.'),
+    S.describeRemovalNotePair(twoLocksSettled.removed, twoLocksSettled.removedAlso, twoLocksCS[twoLocksCS.length - 1]));
 
   console.log('\n=== a between-edges rule must not collapse the sketch (S09/S10/S11) ===');
 

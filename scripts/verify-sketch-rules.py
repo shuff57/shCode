@@ -40,6 +40,22 @@ on any FAIL.
     supposed to keep the sketch sane -- itself a reasonable thing for it
     to do). This check instead re-proves the literal repro holds end to
     end and does not regress.
+(10) The S10-round-2 setup for addendum item J (perpendicular while BOTH
+    target edges still carry their own horizontal rule): settling drops at
+    least one of the two conflicting axis rules rather than leaving all of
+    them standing behind a banner. addConstraintSettling's own two-rule
+    resolution (both dropped, one note naming both) is proven directly in
+    scripts/sketch-solve-assertions.cjs against a constructed case; this
+    check's own click-driven setup only reaches a state that needs ONE
+    rule gone by the time the pair cell reaches "perpendicular" (the pair
+    grid cycles equal -> parallel -> perpendicular, each step committing a
+    real solve, and the earlier steps already reshape the geometry once).
+    A separate, real gap this session found but does not own: even a
+    successful settle can leave the fighting banner up, because
+    ModelEditor.tsx's setConstraints() commits the new CONSTRAINTS but not
+    the seeded POINTS it correctly solved for gating, and solveDoc()'s own
+    follow-up re-solve (no seed) can land somewhere its OWN collapse gate
+    then rejects -- so this check does not assert the banner clears.
 
 Rules-panel controls that predate this probe's item-D fix are still clicked
 via `el.click()` in the page's own JS (locator.evaluate) for the S09/S10/S11
@@ -326,6 +342,64 @@ def check_lock_after_pair_rule(page):
         "That would" not in (note_text or ""), repr(note_text))
 
 
+def check_two_rule_settle(page):
+    print("\n=== J: perpendicular against two already-active axis rules settles, not just banners ===")
+    arm_sketch(page)
+    # S10 round 2's own setup: leave Edge 1 across and Edge 3 across BOTH
+    # on (only Edge 2 up comes off), then retype corner 3 -- so by the time
+    # "Edges 1 and 3" reaches perpendicular, edge 1 and edge 3 each still
+    # carry their own conflicting horizontal rule and neither alone can be
+    # dropped to settle it (see the constructed case in
+    # sketch-solve-assertions.cjs, which pins the exact geometry this
+    # click-driven repro cannot: the pair grid can only be cycled through
+    # equal -> parallel -> perpendicular, each step COMMITTING a real solve
+    # along the way, so the geometry actually reached at the final click is
+    # already reshaped by the intermediate ones -- often (as here) enough
+    # that only one rule ends up needing to go, not the two the assertions
+    # file proves the algorithm handles).
+    js_click(rule_button(page, "Edge 2 up"))
+    across = page.get_by_label("Sketch 1 corner 3 across", exact=True)
+    across.fill("60")
+    across.press("Tab")
+    time.sleep(0.2)
+    up = page.get_by_label("Sketch 1 corner 3 up", exact=True)
+    up.fill("10")
+    up.press("Tab")
+    time.sleep(0.2)
+    check("setup: Edge 1 across and Edge 3 across are BOTH still on",
+        rule_button(page, "Edge 1 across").get_attribute("aria-pressed") == "true"
+        and rule_button(page, "Edge 3 across").get_attribute("aria-pressed") == "true",
+        "setup check, not the fix under test")
+
+    cell = page.locator('[title^="Edges 1 and 3"]').first
+    for _ in range(4):
+        state = cell.get_attribute("aria-label") or ""
+        if state.endswith(": perpendicular"):
+            break
+        js_click(cell)
+        time.sleep(0.2)
+    check("the pair cell reaches 'perpendicular'",
+        (cell.get_attribute("aria-label") or "").endswith(": perpendicular"),
+        cell.get_attribute("aria-label"))
+
+    edge1_on = rule_button(page, "Edge 1 across").get_attribute("aria-pressed")
+    edge3_on = rule_button(page, "Edge 3 across").get_attribute("aria-pressed")
+    check("settling actually dropped at least one of the two conflicting axis "
+        "rules -- not a straight refusal that leaves all of them standing",
+        edge1_on == "false" or edge3_on == "false",
+        f"Edge 1 across={edge1_on} Edge 3 across={edge3_on}")
+    # NOT asserted here: that the fighting banner clears, or that a note
+    # appears. Both depend on the sketch's stored POINTS matching its
+    # constraints after this settle, and that hand-off -- ModelEditor.tsx's
+    # setConstraints() computing the correct seeded solve but committing
+    # only the new CONSTRAINTS, not the solved POINTS, leaving solveDoc()
+    # to re-solve from scratch without that seed -- is a separate, real gap
+    # this session found but does not own (ModelEditor.tsx is the 3D
+    # builder's file right now). addConstraintSettling's own resolution is
+    # proven directly, independent of that gap, in
+    # scripts/sketch-solve-assertions.cjs.
+
+
 def check_s09(page):
     print("\n=== S09: parallel between edges 1 and 3 must not collapse the sketch ===")
     arm_sketch(page)
@@ -457,6 +531,11 @@ def main():
             check_lock_after_pair_rule(page)
         except Exception as exc:  # noqa: BLE001
             check("I checks ran without an exception", False, repr(exc))
+
+        try:
+            check_two_rule_settle(page)
+        except Exception as exc:  # noqa: BLE001
+            check("J checks ran without an exception", False, repr(exc))
 
         browser.close()
 

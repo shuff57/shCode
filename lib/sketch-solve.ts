@@ -537,14 +537,45 @@ export function describeRemovalNote(removed: Constraint, added: Constraint): str
     + `${subjectOf(added, true)} ${tail}. Undo puts it back.`;
 }
 
+/** What a between-edges rule accomplishes for its TWO edges together --
+ *  "meet at a right angle", not "stay at a right angle to edge N" --
+ *  needed only by describeRemovalNotePair() below, where naming just one
+ *  of the new rule's own edges would leave the other one unexplained. */
+function describePairGoal(c: Extract<Constraint, { other: number }>): string {
+  if (c.kind === 'equal') return 'match in length';
+  if (c.kind === 'parallel') return 'run parallel';
+  return 'meet at a right angle';
+}
+
+/** Same claim as describeRemovalNote() above, for the rarer case where
+ *  settling the new rule cost TWO older rules, not one: "Edge 3 no longer
+ *  has to stay level and edge 4 no longer has to stay upright so they can
+ *  meet at a right angle. Undo puts them back." One sentence naming both,
+ *  not two separate notes -- a beginner reads two rules going at once as
+ *  one event (this rule needed both), not as two unrelated changes. */
+export function describeRemovalNotePair(
+  removed: Constraint, removedAlso: Constraint, added: Constraint,
+): string {
+  const goal = 'other' in added ? describePairGoal(added) : describeQuality(added);
+  return `${subjectOf(removed, false)} no longer has to ${describeQuality(removed)} and `
+    + `${subjectOf(removedAlso, true)} no longer has to ${describeQuality(removedAlso)} `
+    + `so they can ${goal}. Undo puts them back.`;
+}
+
 export interface ConflictResolution {
   constraints: Constraint[];
   /** The older rule that had to go to make room for the new one, or null
    *  when nothing needed to -- either the new rule fit cleanly, or no
-   *  single older rule's removal would have settled it (the banner is the
-   *  honest answer in that case, and `constraints` here is just `next`,
-   *  unchanged, same as if this function had never been called). */
+   *  removal (single or, failing that, a pair -- see `removedAlso`) would
+   *  have settled it (the banner is the honest answer in that case, and
+   *  `constraints` here is just `next`, unchanged, same as if this
+   *  function had never been called). */
   removed: Constraint | null;
+  /** A SECOND older rule that also had to go, only when `removed` alone
+   *  was not enough -- see addConstraintSettling's own comment on when a
+   *  between-edges rule needs two rules gone at once. Always null unless
+   *  `removed` is also set. */
+  removedAlso: Constraint | null;
 }
 
 /**
@@ -584,7 +615,7 @@ export interface ConflictResolution {
  * to by cascading through a second removal).
  */
 export function addConstraintSettling(points: Point[], next: Constraint[]): ConflictResolution {
-  if (next.length === 0) return { constraints: next, removed: null };
+  if (next.length === 0) return { constraints: next, removed: null, removedAlso: null };
   const added = next[next.length - 1];
 
   // seedForNewRule returns `points` unchanged for anything but a
@@ -602,7 +633,7 @@ export function addConstraintSettling(points: Point[], next: Constraint[]): Conf
     const solved = solveSketch(seed, cs);
     return solved.overConstrained || collapsedByRatio(points, solved.points);
   };
-  if (!isBad(next)) return { constraints: next, removed: null };
+  if (!isBad(next)) return { constraints: next, removed: null, removedAlso: null };
 
   // Free more corners: try dropping exactly one OLDER rule -- never the one
   // just added. Among several whose removal resolves it on their own, the
@@ -610,13 +641,13 @@ export function addConstraintSettling(points: Point[], next: Constraint[]): Conf
   // alone is not enough (S11, 2026-09-04) -- two older rules each
   // individually resolved the conflict, and the older of the two was the
   // wrong one to drop, since it left the sketch's untouched far edge tilted
-  // instead of the edge the student was actually working on. A conflict
-  // that needs more than one rule gone is left alone, banner included --
-  // this is a nudge for the ordinary "these two just started disagreeing"
-  // case, not a general re-solver for every possible contradiction (three
-  // different lengths pinned to one edge, for instance, never resolves by
-  // dropping any single one of them, and must not pretend to by cascading
-  // through a second removal).
+  // instead of the edge the student was actually working on. If no SINGLE
+  // removal resolves it, a PAIR is tried next (below) before giving up --
+  // this is still a nudge for the ordinary "a couple of older rules got in
+  // the way" case, not a general re-solver for every possible contradiction
+  // (three different lengths pinned to one edge, for instance, never
+  // resolves by dropping any one or two of them, and must not pretend to
+  // by cascading further).
   //
   // A `lock` is deprioritised below every other kind, area be damned: it is
   // the one rule a student sets purely to protect something from moving,
@@ -647,8 +678,49 @@ export function addConstraintSettling(points: Point[], next: Constraint[]): Conf
       || (bestIsLock === isLock && area > bestArea);
     if (better) { bestArea = area; bestIdx = i; bestIsLock = isLock; }
   }
-  if (bestIdx === -1) return { constraints: next, removed: null };
-  return { constraints: next.filter((_, idx) => idx !== bestIdx), removed: next[bestIdx] };
+  if (bestIdx !== -1) {
+    return {
+      constraints: next.filter((_, idx) => idx !== bestIdx),
+      removed: next[bestIdx],
+      removedAlso: null,
+    };
+  }
+
+  // No single removal settles it: try every PAIR of older rules next, same
+  // ranking as above (a lock pool is worse than a non-lock one, area
+  // decides within a pool), oldest pair first on a tie. A between-edges
+  // rule whose own two edges EACH carry a conflicting axis lock needs both
+  // gone at once -- dropping either alone still leaves the other edge
+  // unable to turn (S10, round 2, 2026-09-04: perpendicular against edges
+  // that were both still horizontal-locked banner'd with "remove one to
+  // settle it" even though removing ONE never could -- it always needed
+  // both). Still capped at two: a conflict needing three or more gone is
+  // exactly the three-different-lengths case above and stays refused.
+  let bestI = -1;
+  let bestJ = -1;
+  let bestPairArea = -Infinity;
+  let bestPairLocks = 3; // worse than any real count (0, 1, or 2)
+  for (let i = 0; i < next.length; i++) {
+    if (next[i] === added) continue;
+    for (let j = i + 1; j < next.length; j++) {
+      if (next[j] === added) continue;
+      const candidate = next.filter((_, idx) => idx !== i && idx !== j);
+      const solved = solveSketch(seed, candidate);
+      if (solved.overConstrained || collapsedByRatio(points, solved.points)) continue;
+      const locks = (next[i].kind === 'lock' ? 1 : 0) + (next[j].kind === 'lock' ? 1 : 0);
+      const area = polygonArea(solved.points);
+      const better = bestI === -1
+        || locks < bestPairLocks
+        || (locks === bestPairLocks && area > bestPairArea);
+      if (better) { bestI = i; bestJ = j; bestPairArea = area; bestPairLocks = locks; }
+    }
+  }
+  if (bestI === -1) return { constraints: next, removed: null, removedAlso: null };
+  return {
+    constraints: next.filter((_, idx) => idx !== bestI && idx !== bestJ),
+    removed: next[bestI],
+    removedAlso: next[bestJ],
+  };
 }
 
 /** Which DESIGN EDGES are named by a constraint that is still violated after a

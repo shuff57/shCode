@@ -11,6 +11,7 @@ import {
   addConstraintSettling,
   describe,
   describeRemovalNote,
+  describeRemovalNotePair,
   edgeCorners,
   edgeLength,
   residualOf,
@@ -365,7 +366,14 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
    *  of a banner over the rule they just asked for. */
   function settle(next: Constraint[]) {
     const result = addConstraintSettling(points, next);
-    setAutoNote(result.removed ? describeRemovalNote(result.removed, next[next.length - 1]) : null);
+    const addedRule = next[next.length - 1];
+    setAutoNote(
+      result.removedAlso
+        ? describeRemovalNotePair(result.removed as Constraint, result.removedAlso, addedRule)
+        : result.removed
+          ? describeRemovalNote(result.removed, addedRule)
+          : null
+    );
     onChange(result.constraints);
   }
 
