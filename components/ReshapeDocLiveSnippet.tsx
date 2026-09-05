@@ -1,24 +1,24 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Play, RotateCcw } from 'lucide-react';
 import CodeMirrorPane from './CodeMirrorPane';
-import ReshapePreview from './ReshapePreview';
+import ReshapeScriptPreview from './ReshapeScriptPreview';
 
 interface Props {
   initialCode: string;
   fileKey: string;
 }
 
-// Editor + 3D preview pair for reSHape/JSCAD snippets in the docs drawer.
-// Same shape as MoshionDocLiveSnippet, but the preview is the reshape runner
-// (public/reshape/runner.html) — JSCAD source cannot execute in the moSHion
-// runner and vice versa, so each docs set keeps its own snippet component.
+// Editor + 3D preview pair for reSHape Script snippets in the docs drawer.
+// Same shape as MoshionDocLiveSnippet, but the preview runs the script
+// through the B-rep kernel (components/ReshapeScriptPreview.tsx) — moSHion
+// source cannot execute here and vice versa, so each docs set keeps its own
+// snippet component.
 export default function ReshapeDocLiveSnippet({ initialCode, fileKey }: Props) {
   const [code, setCode] = useState(initialCode);
   const [runCode, setRunCode] = useState('');
   const [runKey, setRunKey] = useState(0);
-  const frameRef = useRef<HTMLIFrameElement | null>(null);
   const dirty = code !== initialCode;
 
   const handleRun = () => {
@@ -61,7 +61,7 @@ export default function ReshapeDocLiveSnippet({ initialCode, fileKey }: Props) {
             Click <strong style={{ color: '#50fa7b', margin: '0 4px' }}>Run</strong> to build the model
           </div>
         ) : (
-          <ReshapePreview ref={frameRef} code={runCode} runKey={runKey} />
+          <ReshapeScriptPreview code={runCode} runKey={runKey} />
         )}
       </div>
       <div style={{ display: 'flex', gap: 6 }}>

@@ -766,7 +766,7 @@ describePlayer({ score: 900, name: "Grace", level: 2 });  // order free`,
 
 It is the reverse of the object literal: the literal packs values into names, destructuring unpacks them. The two are the same shape, written on opposite sides of the equals sign.
 
-Destructuring a parameter is the same thing in a function signature: a function that takes { name, score } receives an object and gets the two properties as local variables. It is how the reSHape docs' require line works — const { primitives } = require('@jscad/modeling') pulls one module out of the library.`,
+Destructuring a parameter is the same thing in a function signature: a function that takes { name, score } receives an object and gets the two properties as local variables. It shows up anywhere a function hands back a bundle of related values — const { width, height } = getScreenSize() pulls the two numbers you actually need straight out of the result.`,
         code: `const player = { name: "Ada", score: 1200, level: 3 };
 
 const { name, score } = player;

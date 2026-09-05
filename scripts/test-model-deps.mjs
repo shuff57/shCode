@@ -1,10 +1,11 @@
 // Runs scripts/model-deps-assertions.cjs against lib/model-deps.ts.
 //
 // Same shape as test-topo-name.mjs: compile the TypeScript to CommonJS in a
-// temp dir, hand the dir to the assertions, clean up. model-codegen comes along
-// because the assertion that matters is a cross-check between the two -- a
-// document the dependency layer calls clean must generate source that declares
-// everything it uses.
+// temp dir, hand the dir to the assertions, clean up. Used to pull
+// lib/model-codegen.ts along too, for a cross-check against generated JSCAD
+// source text; that engine and its cross-check are gone (CLAUDE.md's "JSCAD
+// is retired" section) -- the assertions now check deps.danglingRefs()
+// directly, so model-deps.ts alone is enough.
 
 import { execFileSync } from 'child_process';
 import { mkdtempSync, rmSync, writeFileSync } from 'fs';
@@ -23,7 +24,6 @@ try {
     [
       path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
       'lib/model-deps.ts',
-      'lib/model-codegen.ts',
       '--outDir', out,
       '--module', 'commonjs',
       '--target', 'es2022',

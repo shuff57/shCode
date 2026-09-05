@@ -70,8 +70,8 @@ export function arcFromBulge(
   // Unreachable from filletCorner(), whose sweep is always pi - interior and
   // so always under a half turn -- but reachable from a hand-written or
   // imported doc, and shared by tessellate(), splitEdge() and the overlay.
-  // The generated polyArc() helper in model-codegen.ts carried the same line
-  // and has the same fix.
+  // The old JSCAD path's generated polyArc() helper carried the same line
+  // and needed the same fix.
   const sign = (bulge >= 0 ? 1 : -1) * (Math.abs(bulge) > 1 ? -1 : 1);
   const center: Point = [mx + px * toCentre * sign, my + py * toCentre * sign];
   const startAngle = Math.atan2(a[1] - center[1], a[0] - center[0]);
@@ -786,7 +786,7 @@ export function outlineOf(f: SketchLike): Outline {
     // Legacy / imported: a doc carrying `bulges` and no `rounds` (or
     // `chamfers`) is an outline somebody else already built, and it passes
     // through untouched. This is what keeps a pre-rounds saved sandbox
-    // generating exactly the polyArc it always did.
+    // building the exact same rounded outline it always has.
     return collapsed
       ? { ok: false, points: f.points, bulges: f.bulges, basis: identity, notes: [], why: collapsed }
       : { ok: true, points: f.points, bulges: f.bulges, basis: identity, notes: [] };

@@ -1,3 +1,18 @@
+# Handoff — 2026-09-05 (latest) · the JSCAD runner is deleted
+
+The JSCAD runner, its vendored bundles, `public/reshape/docs/jscad-legacy.md`,
+and every script that only measured them are gone (git rm, not just retired —
+full list in `CLAUDE.md`'s "JSCAD is retired" section, 2026-09-05 update).
+`lib/model-codegen.ts` keeps only its doc-level exports; `toReshape()` is
+deleted. `?engine=jscad` / `?script=0` no longer exist.
+
+Defect found and fixed along the way: `/docs/reshape/overview/` and the
+lesson docs-drawer snippet were still sending reSHape Script to the deleted
+JSCAD runner, throwing `ReferenceError: box is not defined` on every Run —
+both now go through the new `components/ReshapeScriptPreview.tsx` onto the
+kernel, same as everywhere else in the app.
+
+---
 # Handoff — 2026-09-01 (latest) · JSCAD is retired as a direction
 
 reSHape (which is the thing referred to as jSketcher) runs on JSCAD, and JSCAD

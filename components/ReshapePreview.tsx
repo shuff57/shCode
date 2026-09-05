@@ -7,21 +7,21 @@ import { encodeCode } from './MoshionPreview';
 interface Props {
   code: string;
   runKey: number;
-  // Which engine draws this frame. Defaults to the JSCAD runner every lesson
-  // and the sandbox has always used; 'brep' is opt-in through ?engine=brep
-  // (see SandboxWorkspace.tsx) and points at the OpenCascade runner instead.
-  // 'script' is the reSHape Script runtime (lib/reshape-script.ts) behind
-  // ?script=1 -- it draws NOTHING itself (see script-runner.html's own file
-  // header): it evals `code` into a ModelDoc and posts it out as
-  // 'reshape-doc', and the parent's B-rep viewport is what actually shows
-  // it. So unlike 'brep' this frame is invisible on purpose (see the
-  // `display: none` below) rather than a second canvas competing with the
-  // real one Build mode already owns.
-  engine?: 'jscad' | 'brep' | 'script';
+  // Which engine draws this frame -- both point at the B-rep kernel, never
+  // JSCAD. 'brep' is Build mode's own runner-brep.html, drawing the model
+  // directly. 'script' is the reSHape Script runtime (lib/reshape-script.ts)
+  // -- it draws NOTHING itself (see script-runner.html's own file header):
+  // it evals `code` into a ModelDoc and posts it out as 'reshape-doc', and
+  // the parent's B-rep viewport is what actually shows it. So unlike 'brep'
+  // this frame is invisible on purpose (see the `display: none` below)
+  // rather than a second canvas competing with the real one Build mode
+  // already owns. Required, not defaulted -- there is no safe fallback
+  // engine any more.
+  engine: 'brep' | 'script';
 }
 
 const ReshapePreview = forwardRef<HTMLIFrameElement, Props>(function ReshapePreview(
-  { code, runKey, engine = 'jscad' },
+  { code, runKey, engine },
   ref
 ) {
   const brep = engine === 'brep';
@@ -79,7 +79,7 @@ const ReshapePreview = forwardRef<HTMLIFrameElement, Props>(function ReshapePrev
         <p>
           {script
             ? <>Write a reSHape script and click <strong>Run</strong>, then switch to Build to see it.</>
-            : <>Write JSCAD code and click <strong>Run</strong> to see your 3D model.</>}
+            : <>Click <strong>Run</strong> to see your 3D model.</>}
         </p>
       </div>
     );
@@ -87,17 +87,15 @@ const ReshapePreview = forwardRef<HTMLIFrameElement, Props>(function ReshapePrev
 
   const src = brep
     ? brepSrc.current
-    : script
-    ? `/reshape/script-runner.html?code=${encodeCode(code)}&r=${runKey}`
-    : `/reshape/runner.html?code=${encodeCode(code)}&r=${runKey}`;
+    : `/reshape/script-runner.html?code=${encodeCode(code)}&r=${runKey}`;
 
   return (
     <iframe
       ref={setRefs}
       // brep: a constant key, so React reconciles the SAME iframe on every
       // re-render instead of recreating it -- that identity is the whole
-      // point above. jscad/script: unchanged, a fresh runKey still remounts
-      // -- script-runner.html carries no expensive one-time kernel load, so
+      // point above. script: unchanged, a fresh runKey still remounts --
+      // script-runner.html carries no expensive one-time kernel load, so
       // it has nothing to amortise the way the brep frame does.
       key={brep ? 'brep' : runKey}
       id="preview"

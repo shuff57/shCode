@@ -297,14 +297,15 @@ function unwrap(v: unknown): number {
 }
 
 // ---------------------------------------------------------------------------
-// Validation, in reshape.js's own voice (plain-English sentence, names the
-// thing that is wrong, never a stack trace) -- see public/reshape/reshape.js's
-// requireNumbers()/readOptions() for the house style this matches. Not
-// literally shared code: reshape.js's guards duck-type a JSCAD geometry
-// object, which does not exist on this path at all (runScript never builds
-// one), so a fresh, smaller pair of guards is honest about what this layer
-// actually has to tell apart -- a number (boxed or not), a plain { } options
-// object, and everything else.
+// Validation, in the old JSCAD sugar layer's own voice (plain-English
+// sentence, names the thing that is wrong, never a stack trace) -- matching
+// the house style its requireNumbers()/readOptions() guards used, in the
+// now-deleted public/reshape/reshape.js. Not literally shared code even
+// then: those guards duck-typed a JSCAD geometry object, which does not
+// exist on this path at all (runScript never builds one), so a fresh,
+// smaller pair of guards is honest about what this layer actually has to
+// tell apart -- a number (boxed or not), a plain { } options object, and
+// everything else.
 // ---------------------------------------------------------------------------
 
 function isFiniteNumber(v: unknown): boolean {
@@ -690,10 +691,10 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
 
   // cone(across, tall) -- TWO arguments, not the spec's three. ConeFeature
   // (lib/model-types.ts) carries exactly one radius: newShape('cone') and
-  // featureExpr()'s cylinderElliptic(radius, height, ...) both build a
-  // pointed cone with no way to store a flat top radius at all, so the
-  // spec's `cone(across, acrossTop, tall)` frustum form has nothing to write
-  // its middle argument into. Implemented against what the Build tool
+  // the kernel's coneOf() (lib/occt-build.ts) both build a pointed cone with
+  // no way to store a flat top radius at all, so the spec's
+  // `cone(across, acrossTop, tall)` frustum form has nothing to write its
+  // middle argument into. Implemented against what the Build tool
   // actually produces rather than inventing a doc field the rest of the app
   // does not read -- flagged in the build report as a deviation from the
   // spec text, not silently narrowed.
@@ -1339,8 +1340,9 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
 
   // INTENTIONAL new Function(). `source` is a STUDENT PROGRAM, not untrusted
   // input to be sanitized -- running arbitrary student JavaScript is this
-  // file's entire job, the same job public/reshape/runner.html and
-  // runner-brep.html already do for the JSCAD path with a real <script> tag.
+  // file's entire job, the same job runner-brep.html already does (and the
+  // now-deleted public/reshape/runner.html already did, for the JSCAD path)
+  // with a real <script> tag.
   // The safety boundary is where this function is CALLED FROM, not how it
   // evaluates its argument: public/reshape/script-runner.html runs
   // runScript() inside an iframe sandboxed `allow-scripts` WITHOUT

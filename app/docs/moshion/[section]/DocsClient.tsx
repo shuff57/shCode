@@ -16,10 +16,11 @@ interface Props {
   basePath: string;
   docsTitle: string;
   searchPlaceholder: string;
-  /** Which runner the live sandbox on each page loads. JSCAD source needs
-   *  /reshape/runner.html; moSHion source needs /moshion/runner.html. Neither
-   *  runtime can execute the other's examples, so this is required, not a
-   *  convenience — a wrong value throws on every Run. */
+  /** Which runner the live sandbox on each page loads. reSHape Script source
+   *  runs through /reshape/script-runner.html onto the B-rep kernel;
+   *  moSHion source needs /moshion/runner.html. Neither runtime can execute
+   *  the other's examples, so this is required, not a convenience — a wrong
+   *  value throws on every Run. */
   preview: 'moshion' | 'reshape';
 }
 

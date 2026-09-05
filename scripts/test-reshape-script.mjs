@@ -825,8 +825,8 @@ if (!occtDir || !existsSync(path.join(occtDir, 'replicad_single.js'))) {
     checkVolume('sphere(30) -- across is diameter', 'sphere(30)', (4 / 3) * Math.PI * 15 * 15 * 15);
 
     // ring(across, tubeAcross): ringRadius = (across - tubeAcross) / 2 --
-    // reshape.js's own header spells out this exact formula for `ring`.
-    // across 48, tube 8 -> ringRadius 20, tubeRadius 4.
+    // the now-deleted reshape.js's own header spelled out this exact formula
+    // for `ring`. across 48, tube 8 -> ringRadius 20, tubeRadius 4.
     checkVolume('ring(48, 8)', 'ring(48, 8)', 2 * Math.PI * Math.PI * 20 * 4 * 4);
 
     // hole(b, { across: 6 }) -- a THROUGH hole (depth defaults to extent + 2,

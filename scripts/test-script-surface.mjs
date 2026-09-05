@@ -1,33 +1,24 @@
 #!/usr/bin/env node
 // The gate for the scripting surface: lib/script-surface.ts and lib/hull.ts.
 //
-// WHAT THIS PROTECTS. reSHape's typed half is 183 documented examples calling 75
-// API names, and the kernel underneath it is being replaced. Every one of those
-// names either survives the swap or it does not, and until this file existed
-// nobody had counted which. The count is not the deliverable -- the count going
-// STALE is what this stops. A new example that reaches for a name nobody has
-// judged fails here, at the point where judging it is cheap, rather than in a
-// classroom.
+// WHAT THIS PROTECTS. lib/script-surface.ts classifies which JSCAD API names
+// the B-rep kernel can build, which are blocked, and which (hull) are ours
+// outright. That classification's own internal consistency is what this
+// checks: HULL measures lib/hull.ts against arithmetic; SURFACE measures
+// lib/script-surface.ts against itself, that a verdict carries what it
+// implies and the two REFUSALS stay apart (one is geometry we owe, the other
+// is a line in a build config).
 //
-// Three parts:
+// USED TO ALSO measure the classification against a real JSCAD export list
+// and a real JSCAD-documented example corpus (public/reshape/docs/
+// jscad-legacy.md, apiNames(loadModeling().jscad)) and print a portability
+// percentage -- both the reference page and the vendored bundle are gone
+// (CLAUDE.md's "JSCAD is retired" section), and no engine-independent
+// substitute survived the deletion (see the comment where that section used
+// to be). Left undone rather than guessed at.
 //
-//   HULL       lib/hull.ts against arithmetic. `hull` is the one name in the
-//              vocabulary with no OpenCascade operation behind it in any build,
-//              so it is ours, and a convex hull has exact volumes that a wrong
-//              implementation cannot fake.
-//   SURFACE    lib/script-surface.ts against itself -- that a verdict carries
-//              what the verdict implies, and that the two REFUSALS stay apart.
-//              One is geometry we owe; the other is a line in a build config.
-//   DOCS       lib/reshape-docs.ts read as DATA, never re-parsed with a regex
-//              for its structure, and every name its examples call held against
-//              the classification.
-//
-// The docs half also PRINTS the portability number every run, the way
-// test-reshape-docs.mjs prints coverage. A number that only exists in a commit
-// message is a number that stops being true.
-//
-// A red check is closed by fixing the classification or the docs -- never by
-// widening an assertion here. Reclassifying a name to make the count nicer is
+// A red check is closed by fixing the classification -- never by widening an
+// assertion here. Reclassifying a name to make the count nicer is exactly
 // the failure this file is built to make visible.
 //
 //   node scripts/test-script-surface.mjs
@@ -38,8 +29,6 @@ import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSy
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-import { apiNames, loadModeling } from './reshape-harness.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -107,129 +96,20 @@ try {
   // over the more dangerous one -- a real page misclassified as blocked by a
   // name it never calls.
 
-  console.log('\n=== documented examples against the classification ===');
-
-  const KEYWORD = new Set(['if', 'for', 'while', 'switch', 'catch', 'return', 'function',
-    'typeof', 'new', 'delete', 'void', 'in', 'of', 'do', 'else', 'try', 'throw', 'const',
-    'let', 'var', 'require', 'main']);
-
-  const namesIn = (code) => {
-    const src = code
-      .replace(/\/\/[^\n]*/g, '')
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/'(?:[^'\\]|\\.)*'/g, "''")
-      .replace(/"(?:[^"\\]|\\.)*"/g, '""')
-      .replace(/`(?:[^`\\]|\\.)*`/g, '``');
-    const called = new Set();
-    const rx = /(^|[^.\w$])([A-Za-z_$][\w$]*)\s*\(/g;
-    let m;
-    while ((m = rx.exec(src))) if (!KEYWORD.has(m[2])) called.add(m[2]);
-    const declared = new Set();
-    const lrx = /(?:function\s+([A-Za-z_$][\w$]*)|(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=)/g;
-    let d;
-    while ((d = lrx.exec(src))) declared.add(d[1] || d[2]);
-    return [...called].filter((n) => !declared.has(n));
-  };
-
-  // The typed half this file judges is the JSCAD vocabulary. Since 2026-09-03
-  // lib/reshape-docs.ts and reference.md teach reSHape Script (a different,
-  // kernel-native surface with its own gate, scripts/test-reshape-script.mjs),
-  // so the examples judged here come from the legacy reference, which is the
-  // last place the JSCAD names are still documented.
-  const legacy = readFileSync(path.join(root, 'public', 'reshape', 'docs', 'jscad-legacy.md'), 'utf8');
-  const pages = [];
-  const fence = /```js(?:[ \t]+([^\r\n]+))?\r?\n([\s\S]*?)```/g;
-  let fm;
-  while ((fm = fence.exec(legacy))) {
-    if (!fm[2].trim()) continue;
-    pages.push({ key: `jscad-legacy.md: ${(fm[1] || 'unnamed').trim()}`, names: namesIn(fm[2]) });
-  }
-  check('the legacy reference still carries runnable examples', pages.length > 30, `${pages.length} fenced examples`);
-
-  // Only names the BUNDLE exports are API calls. Anything else the read picked
-  // up is a false positive from the crude parse and is not the classification's
-  // problem -- which is measured rather than assumed, by intersecting with the
-  // real export list.
-  //
-  // RESHAPE_ONLY is the one deliberate exception, and it is a fixed, tiny list
-  // rather than a pattern -- turn and sit slipped past this whole gate once
-  // already, and the exported.has(n) intersection is *why*: both are called
-  // bare in the docs, but neither is a jscad export at all, so they were
-  // dropped here before unclassified() ever saw them, silently, with no WARN.
-  // That is a DIFFERENT hole from the dot-prefix one two paragraphs up --
-  // minkowskiSum is a real export missed by the CALL SYNTAX; turn and sit are
-  // missed because they are not exports in the first place, no matter how they
-  // are called. Widening the dot-regex would not have touched this one.
-  //
-  // This does not reopen the vec3.scale / transforms.scale misattribution that
-  // widening the dot-regex caused: that bug came from matching a bare name
-  // across every module without knowing which module a call went through.
-  // This list adds two specific, already-classified names with no other export
-  // to be confused with, and only when called bare -- it changes nothing about
-  // how dotted calls are read.
-  const RESHAPE_ONLY = new Set(['turn', 'sit']);
-  const exported = new Set([...apiNames(loadModeling().jscad).keys(), ...RESHAPE_ONLY]);
-  const called = new Set();
-  for (const p of pages) for (const n of p.names) if (exported.has(n)) called.add(n);
-  note(`${pages.length} pages call ${called.size} distinct @jscad/modeling names`);
-
-  const missing = surface.unclassified([...called]).sort();
-  check('every name a documented example calls has a verdict',
-    missing.length === 0,
-    missing.length ? `unclassified: ${missing.join(', ')} — add each to SURFACE in lib/script-surface.ts` : '');
-
-  // The other direction. A classified name nobody calls any more is not a
-  // failure -- the classification is allowed to be wider than the docs -- but it
-  // must not be a real export that vanished, and it must not go unnoticed.
-  const stale = surface.SURFACE.filter((e) => !exported.has(e.name)).map((e) => e.name);
-  check('every classified name is a real @jscad/modeling export',
-    stale.length === 0, stale.join(', '));
-
-  const uncalled = surface.SURFACE.filter((e) => !called.has(e.name)).map((e) => e.name);
-  if (uncalled.length === 0) check('every classified name is still called by an example', true);
-  else warn(`${uncalled.length} classified name(s) no example calls any more`, uncalled.join(', '));
-
-  // -------------------------------------------------------------------------
-  // THE NUMBER
-  // -------------------------------------------------------------------------
-
-  console.log('\n=== portability ===');
-
-  const blocked = [];
-  for (const p of pages) {
-    const b = surface.blockedNames(p.names.filter((n) => exported.has(n)));
-    if (b.length) blocked.push({ key: p.key, why: b });
-  }
-  const portable = pages.length - blocked.length;
-  const pct = Math.round((portable / pages.length) * 1000) / 10;
-  console.log(`  ----  ${portable} / ${pages.length} pages (${pct}%) run on a B-rep kernel`);
-
-  const absent = new Set();
-  const unbound = new Set();
-  for (const b of blocked) {
-    for (const e of b.why) (e.serves === 'absent' ? absent : unbound).add(e.name);
-  }
-  console.log(`  ----  ${blocked.length} blocked: ${absent.size} name(s) OpenCascade lacks `
-    + `(${[...absent].sort().join(', ')}), ${unbound.size} this build does not bind `
-    + `(${[...unbound].sort().join(', ')})`);
-  for (const b of blocked) console.log(`  ----    ${b.key}  [${b.why.map((e) => e.name).join(', ')}]`);
-
-  // A floor, not a target. It exists so that a change which quietly breaks
-  // dozens of pages cannot pass as a rounding difference; it is deliberately
-  // well below the measured 90.7% so that classifying one more name honestly
-  // does not require editing this file.
-  check('most of the documented surface survives the swap', pct >= 85, `${pct}%`);
-
-  // ...and its control. A gate that only has a floor goes green when the
-  // classification stops finding anything, so the CEILING is asserted too: if
-  // every page suddenly reads as portable, either the blocked names got fixed
-  // (in which case delete this) or the read stopped working (much more likely).
-  // The legacy reference happens to use neither hull nor a non-uniform scale,
-  // so the control asks the classifier directly: the two names this file
-  // exists to keep honest must still read as blocked.
-  check('CONTROL: hull and non-uniform scale still read as blocked',
-    surface.blockedNames(['hull', 'scale']).length === 2,
-    'one of them now has a path, or blockedNames() stopped answering');
+  // The DOCS + portability measurement that used to run here read
+  // public/reshape/docs/jscad-legacy.md and apiNames(loadModeling().jscad) --
+  // the JSCAD reference page and the vendored bundle's own export list, both
+  // deleted along with the JSCAD runner (CLAUDE.md's "JSCAD is retired"
+  // section). lib/script-surface.ts's classification (which JSCAD names port
+  // to the kernel, which are blocked, which are ours) is not itself deleted
+  // -- HULL and SURFACE above still measure it -- but there is no longer a
+  // real JSCAD export list or a JSCAD-documented example corpus to hold it
+  // against, so the "every classified name is real"/"every called name has a
+  // verdict"/"X% portable" measurement this section made has no surviving
+  // engine-independent form. Left undone rather than guessed at: this file
+  // was not named in the JSCAD-retirement spec, and reclassifying
+  // lib/script-surface.ts's whole purpose is a bigger call than fixing an
+  // import.
 
   // -------------------------------------------------------------------------
   // NOTHING DEV-ONLY IS SITTING WHERE IT WOULD SHIP
@@ -251,9 +131,9 @@ try {
 
   const shipped = readdirSync(path.join(root, 'public', 'reshape'))
     .filter((f) => f.endsWith('.html'));
-  // Two student runners ship on purpose: runner.html (JSCAD, the ?engine=jscad
-  // path for one more release) and script-runner.html (reSHape Script).
-  const allowed = ['runner.html', 'script-runner.html'];
+  // One student runner ships now: script-runner.html (reSHape Script). The
+  // JSCAD runner.html is gone (CLAUDE.md's "JSCAD is retired" section).
+  const allowed = ['script-runner.html'];
   check('the only pages public/reshape ships are the two student runners',
     shipped.length === allowed.length && allowed.every((f) => shipped.includes(f)),
     shipped.join(', ') + ' — a probe or diagnostic page here WILL be deployed; '

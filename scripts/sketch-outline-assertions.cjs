@@ -17,7 +17,6 @@
 module.exports = function run(dir) {
   const path = require('path');
   const fs = require('fs');
-  const vm = require('vm');
   const arc = require(path.join(dir, 'sketch-arc.js'));
   const gen = require(path.join(dir, 'model-codegen.js'));
   const handles = require(path.join(dir, 'model-handles.js'));
@@ -350,99 +349,18 @@ module.exports = function run(dir) {
       + 'bulges-only passthrough and the chamfer was ignored');
 
   // ------------------------------------------------------------------ C5 --
-  console.log('\n=== C5 the generated source drags live ===');
-
-  const src = gen.toReshape({
-    version: 1,
-    features: [
-      sk({ rounds: { 1: 8 } }),
-      { id: 'pull1', kind: 'extrude', target: 'sk1', height: 10 },
-    ],
-  });
-  const at = src.indexOf('const sk1 =');
-  const call = src.slice(at, src.indexOf('\n', at));
-  check('#C5 a rounded sketch emits roundPoly, not a baked outline',
-    /roundPoly\(\[/.test(call), call);
-  check('...its corners are PARAMETERS, so a drag moves the shape without regenerating',
-    ['p.sk1_p0u', 'p.sk1_p1u', 'p.sk1_p2u', 'p.sk1_p3u'].every((n) => call.includes(n)),
-    `${call} -- literal trim points here mean the corner parameters are referenced by `
-      + 'nothing, so the shape freezes mid-drag and only catches up on release');
-  check('...and so is the radius, which is the only live readout of it anywhere',
-    call.includes('p.sk1_r1') && src.includes("{ name: 'sk1_r1', type: 'float', initial: 8"),
-    call);
-  // The corner list specifically: a bare number anywhere in it is a baked
-  // trim point, which is the freeze-mid-drag failure. (The rounds map beside
-  // it legitimately contains the corner INDEX as a key, so the whole call
-  // cannot be scanned for digits.)
-  const cornerList = call.slice(call.indexOf('roundPoly([') + 10, call.indexOf(']],') + 1);
-  check('...no coordinate is emitted as a literal in the corner list',
-    // Regex LITERAL, not new RegExp(a string): inside a string the \\d collapsed to a
-    // bare d, so this was a character class of 'd' and '.', matched nothing, and
-    // stayed green when every coordinate was emitted as a baked literal. Watched
-    // failing after the fix, against that same sabotage.
-    !/\[\s*-?[\d.]/.test(cornerList), cornerList);
-
-  // The generated helper is a second implementation of the same arithmetic --
-  // it has to be, it runs inside the sandboxed frame with no imports. So it is
-  // measured against the first one rather than trusted. This is the only thing
-  // that catches the two drifting apart.
-  // Both helpers by name, in dependency order -- toReshape emits them in
-  // whatever order the needs set happened to fill, so slicing a range from
-  // one of them silently drops the other.
-  const fnSrc = (name) => {
-    const i = src.indexOf(`function ${name}(`);
-    return i < 0 ? '' : src.slice(i, src.indexOf('\n}', i) + 2);
-  };
-  const helperSrc = `${fnSrc('polyArc')}\n${fnSrc('roundPoly')}`;
-  const captured = [];
-  const sandbox = {
-    Math,
-    Object,
-    Number,
-    geometries: { geom2: { fromPoints: (pts) => { captured.push(pts); return pts; } } },
-  };
-  vm.createContext(sandbox);
-
-  // Four requests, not one. A single r=8 round on a 40x25 rectangle sits well
-  // under every limit, so it exercises none of the arithmetic the two copies
-  // could disagree about -- watched: deleting the clamp from the generated
-  // helper left this check green while r=8 was the only case. 12.5+8 makes the
-  // two rounds fight over the edge between them (descending order, and the
-  // second clamp), all-four fills the ring, and 500 is a request only a clamp
-  // can survive.
-  const CASES = [
-    ['one modest round', { 1: 8 }],
-    ['two rounds sharing an edge', { 1: 12.5, 2: 8 }],
-    ['all four', { 0: 8, 1: 8, 2: 8, 3: 8 }],
-    ['a request far past the ceiling', { 1: 500 }],
-  ];
-  for (const [label, rounds] of CASES) {
-    captured.length = 0;
-    vm.runInContext(
-      `${helperSrc}\nroundPoly([[0,0],[40,0],[40,25],[0,25]], ${JSON.stringify(rounds)}, {})`,
-      sandbox);
-    const fromHelper = captured[0];
-    const o = arc.outlineOf(sk({ rounds }));
-    const fromLib = arc.tessellate({ points: o.points, bulges: o.bulges });
-    check(`...the generated roundPoly agrees with outlineOf: ${label}`,
-      Array.isArray(fromHelper) && fromHelper.length === fromLib.length
-        && fromHelper.every((p, i) => Math.abs(p[0] - fromLib[i][0]) < 1e-9
-          && Math.abs(p[1] - fromLib[i][1]) < 1e-9),
-      `helper gave ${Array.isArray(fromHelper) ? fromHelper.length : 'nothing'} points, lib `
-        + `gave ${fromLib.length} -- two separate implementations of the same trim/bulge `
-        + 'arithmetic, and this is the only thing tying them together');
-    check(`...(and ${label} is a real sampled outline, not two empty lists)`,
-      fromLib.length > 8 && Array.isArray(fromHelper) && fromHelper.length > 8,
-      `lib ${fromLib.length}, helper ${Array.isArray(fromHelper) ? fromHelper.length : 'n/a'}`);
-  }
-
-  // Unchanged: a doc with bulges and no rounds is somebody else's outline.
-  const legacySrc = gen.toReshape(doc(sk({
-    points: [[0, 0], [25, 0], [28, 9], [0, 30]],
-    bulges: { 1: 0.720748 },
-  })));
-  check('#C4 a bulges-no-rounds doc still emits polyArc, untouched',
-    /polyArc\(\[/.test(legacySrc) && !legacySrc.includes('roundPoly(['), legacySrc);
+  // This section used to decompile the generated JSCAD source, extract its
+  // roundPoly()/polyArc() helper bodies (a from-scratch SECOND
+  // implementation of the corner-trim arithmetic, forced to exist because
+  // the sandboxed runner had no import access to lib/sketch-arc.ts), and
+  // measure that copy against outlineOf() directly. That whole premise is
+  // gone: the kernel (lib/occt-build.ts) calls arc.outlineOf() itself --
+  // see its own "the part of the adapter that pays off the architecture"
+  // comment -- so there is no second implementation left to drift, and
+  // nothing generates source text at all for reSHape Script to decompile
+  // (toScript()'s `.round(k, r)` call carries the radius as a literal
+  // by design, not as a live p.<name> reference the way JSCAD's did). No
+  // engine-independent property survives to port.
 
   // --------------------------------------------------------- the handles --
   console.log('\n=== the handles a student can actually grab ===');

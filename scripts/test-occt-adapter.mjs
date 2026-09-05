@@ -10,6 +10,15 @@
 // A round fixture that does not move means the adapter is not really using the
 // kernel. A flat one that moves is a defect. Both are failures here.
 //
+// .gauntlet/oracle.json IS NOW A FROZEN FIXTURE. It was recorded from
+// @jscad/modeling 2.13.0 by scripts/oracle-measure.mjs, at the sha its own
+// "sha" field names -- both the JSCAD bundle that produced it and the script
+// that ran it are deleted (CLAUDE.md's "JSCAD is retired" section), so it can
+// no longer be regenerated. Each fixture's `exact` field (the analytic
+// volume) is the real target these checks compare the kernel against; the
+// tessellated `volume` field is history, kept only because some of the
+// checks below still name it in their failure messages for context.
+//
 // NOT part of `npm test`: it needs an OpenCascade build, which is 21.9 MB and
 // not vendored. Point it at one and run it by hand:
 //
@@ -184,8 +193,9 @@ try {
     // fed through the SAME generic pass/fail rule every fixture above uses:
     // flat must match JSCAD to the digit, curved is allowed 2%, and an
     // exact+curved fixture must land on the analytic number and have moved
-    // off JSCAD's. Same doc shapes as scripts/oracle-measure.mjs's new
-    // fixtures, on purpose -- these are the same edge/face names too.
+    // off JSCAD's. Same doc shapes as the matching entries recorded in
+    // .gauntlet/oracle.json, on purpose -- these are the same edge/face
+    // names too.
     'hole-through': [
       { id: 'b1', kind: 'box', size: [40, 40, 20], center: [0, 0, 0] },
       { id: 'hole1', kind: 'hole', target: 'b1', diameter: 6, depth: 22, center: [0, 0, 0], axis: 'z' },
@@ -267,12 +277,12 @@ try {
     }
 
     const db = Math.max(...want.bbox.flatMap((row, i) => row.map((v, j) => Math.abs(got.bbox[i][j] - v))));
-    // JSCAD never runs a fillet, chamfer or draft at all -- whyNotOnJscad()
-    // in lib/model-types.ts, and featureExpr()'s fillet/draft branch in
-    // lib/model-codegen.ts passes the target straight through unchanged.
-    // So `want.volume` for one of these three is not a worse MEASUREMENT of
-    // the shape the way a tessellated cylinder is -- it is the UNMODIFIED
-    // target, because the feature never ran on that engine. Holding B-rep to
+    // JSCAD never ran a fillet, chamfer or draft at all -- the old JSCAD
+    // path's featureExpr() fillet/draft branch passed the target straight
+    // through unchanged. So `want.volume` for one of these three is not a
+    // worse MEASUREMENT of the shape the way a tessellated cylinder is -- it
+    // is the UNMODIFIED target, because the feature never ran on that
+    // engine. Holding B-rep to
     // "moved far enough off JSCAD" tests whether JSCAD's number is wrong,
     // which it structurally cannot be here (there is nothing to be wrong
     // ABOUT), so this gets its own rule instead of the curved+exact one

@@ -7,8 +7,8 @@
 // .gauntlet/SPEC-reshape-script.md for the engine history this inherits.
 //
 // THE CONTRACT: `value`/`onChange` is `script.js`'s text, the single source
-// of truth a caller persists. Build writes it (debounced, via toScript()/
-// toReshape()); Code edits it directly (through the store-backed
+// of truth a caller persists. Build writes it (debounced, via toScript());
+// Code edits it directly (through the store-backed
 // <CodeEditor/>, which both the sandbox and a lesson already point at the
 // same fileContents['script.js'] this component is handed). On mount, this
 // component has `value` but no `doc` -- it silently runs `value` through the
@@ -36,7 +36,6 @@ import {
   paramValues as docParams,
   solveDoc,
   solveSketchDrag,
-  toReshape,
 } from '../../lib/model-codegen';
 import { toScript, type ScriptParamRef } from '../../lib/reshape-script-gen';
 
@@ -70,12 +69,6 @@ export type ReshapeStudioProps = {
    *  time), kept for a future per-instance need and so a caller always has
    *  something stable to key a remount on (e.g. a lesson's Reset button). */
   lessonId: string;
-  /** Sandbox-only escape hatch: 'jscad' opts BOTH sides back onto the
-   *  legacy JSCAD engine. Default (or 'brep') is the B-rep kernel. */
-  engine?: 'brep' | 'jscad';
-  /** Sandbox-only escape hatch: false keeps the kernel for Build but puts
-   *  Code back on the JSCAD runner (the ?script=0 case). Default true. */
-  scriptRunner?: boolean;
   /** Fires once on mount and again on every Build/Code toggle. A caller that
    *  wraps this in its own chrome (SandboxWorkspace hides its header and the
    *  program-type tabs while Build is showing, matching the pre-extraction
@@ -177,8 +170,6 @@ export default function ReshapeStudio({
   sides,
   startSide,
   onDocChange,
-  engine,
-  scriptRunner,
   onSideChange,
   toolbarExtra,
   autoRunOnMount = true,
@@ -204,9 +195,6 @@ export default function ReshapeStudio({
     if (!build && !canCode) setBuild(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canBuild, canCode]);
-
-  const brepEngine = engine !== 'jscad';
-  const scriptEngine = brepEngine && scriptRunner !== false;
 
   const onChangeRef = useRef(onChange);
   useEffect(() => { onChangeRef.current = onChange; });
@@ -475,7 +463,7 @@ export default function ReshapeStudio({
       '*'
     );
 
-    if (brepEngine && build && !previewDegradedRef.current) {
+    if (build && !previewDegradedRef.current) {
       previewDocRef.current = foldParams(docRef.current, uncommitted.current);
       if (previewRafRef.current == null) {
         previewRafRef.current = requestAnimationFrame(() => {
@@ -485,7 +473,7 @@ export default function ReshapeStudio({
         });
       }
     }
-  }, [brepEngine, build]);
+  }, [build]);
 
   const commitParams = useCallback(() => {
     const pending = uncommitted.current;
@@ -529,7 +517,6 @@ export default function ReshapeStudio({
   }, [build, doc, selected, drawTool]);
 
   const brepParamDefs = useMemo(() => {
-    if (!brepEngine) return [];
     if (selected.length === 0) return [];
     const bindings = new Map<string, ScriptParamRef>();
     if (scriptNamedParams) {
@@ -547,7 +534,7 @@ export default function ReshapeStudio({
         const caption = named.caption !== named.name ? named.caption : capitalize(named.name);
         return { name: p.name, caption, initial: p.value, min: named.min, max: named.max, step: named.step };
       });
-  }, [brepEngine, doc, selected, scriptNamedParams]);
+  }, [doc, selected, scriptNamedParams]);
   const scales = useMemo(
     () => Object.fromEntries(specs.map((h) => [h.param, h.scale])),
     [specs]
@@ -660,7 +647,7 @@ export default function ReshapeStudio({
   useEffect(() => {
     if (!autoRunOnMount) return;
     onDocChangeRef.current?.(null);
-    if (value.trim() && scriptEngine) {
+    if (value.trim()) {
       setCode(value);
       setRunKey((k) => k + 1);
     }
@@ -722,7 +709,7 @@ export default function ReshapeStudio({
       } else if (d?.source === 'preview-error') {
         setStale('error');
         if (!hydrated) setHydrated(true);
-        if (scriptEngine && !build) {
+        if (!build) {
           const line = typeof d.error?.line === 'number' ? d.error.line : null;
           const msg = d.error?.message ?? 'The script stopped before it finished.';
           setScriptErrorMessage(line ? `Line ${line}: ${msg}` : msg);
@@ -731,7 +718,7 @@ export default function ReshapeStudio({
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, [build, scriptEngine, hydrated, loadDoc]);
+  }, [build, hydrated, loadDoc]);
 
   // Report the latest built doc to the caller for grading: the Build doc
   // while on Build, the last script run's doc while on Code (falling back
@@ -793,14 +780,14 @@ export default function ReshapeStudio({
     if (!build) return;
     if (skipNextRegenRef.current) { skipNextRegenRef.current = false; return; }
     const t = setTimeout(() => {
-      const text = scriptEngine ? toScript(doc, scriptNamedParams ?? undefined) : toReshape(doc);
+      const text = toScript(doc, scriptNamedParams ?? undefined);
       onChangeRef.current(text);
     }, 300);
     return () => clearTimeout(t);
-  }, [doc, scriptNamedParams, scriptEngine, build]);
+  }, [doc, scriptNamedParams, build]);
 
   function chooseSide(next: 'build' | 'code') {
-    if (next === 'build' && scriptEngine && scriptDoc && !build) {
+    if (next === 'build' && scriptDoc && !build) {
       // Code -> Build: adopt whatever the last Run built, same as the
       // sandbox's own chooseBuild() always has.
       loadDoc(scriptDoc);
@@ -894,7 +881,7 @@ export default function ReshapeStudio({
     URL.revokeObjectURL(url);
   }
 
-  const showBrep = brepEngine && build;
+  const showBrep = build;
   // Code's own visible model: once a Run (or the mount hydration) has built
   // something, Code shows the SAME B-rep viewport Build uses, fed by the
   // last thing the script produced -- a Code-only lesson (`mode: "code"`,
@@ -904,16 +891,15 @@ export default function ReshapeStudio({
   // Never true before the first successful build (scriptDoc still null) --
   // that state keeps ReshapePreview's own "write a script and click Run"
   // placeholder instead, in the branch below.
-  const showBrepOnCode = !build && brepEngine && scriptEngine && scriptDoc != null;
+  const showBrepOnCode = !build && scriptDoc != null;
   const shownDoc = showBrep ? (previewDoc ?? effectiveDoc) : (scriptDoc ?? EMPTY_DOC);
-  // The shadow iframe only helps when the script format is round-trippable
-  // (reSHape Script) -- toReshape()'s JSCAD is deliberately one-way, so a
-  // build+brep+jscad-code combination (the ?script=0 escape hatch) has no
-  // way to recover `doc` from text at all, same as it always has. Needed
-  // whenever the VISIBLE pane is a BrepViewport rather than the runner
-  // iframe itself -- Build always, and Code once it has switched over to
-  // showBrepOnCode -- so a later Run still has something to execute it.
-  const wantsHydrationShadow = scriptEngine && (showBrep || showBrepOnCode);
+  // reSHape Script's format is round-trippable -- toScript()'s output can be
+  // re-run to recover `doc` from text, which is what makes the shadow iframe
+  // below work at all. Needed whenever the VISIBLE pane is a BrepViewport
+  // rather than the runner iframe itself -- Build always, and Code once it
+  // has switched over to showBrepOnCode -- so a later Run still has
+  // something to execute it.
+  const wantsHydrationShadow = showBrep || showBrepOnCode;
 
   return (
     <div
@@ -956,7 +942,7 @@ export default function ReshapeStudio({
             Clear model
           </button>
         )}
-        {build && brepEngine && (
+        {build && (
           <>
             <button
               style={hasMesh ? chipStyle : { ...chipStyle, opacity: 0.35, cursor: 'not-allowed' }}
@@ -1107,7 +1093,7 @@ export default function ReshapeStudio({
                 ref={frameRef}
                 code={code}
                 runKey={runKey}
-                engine={scriptEngine ? 'script' : 'jscad'}
+                engine="script"
               />
             )}
             {wantsHydrationShadow && (
@@ -1147,18 +1133,16 @@ export default function ReshapeStudio({
           {(runKey > 0 || build) && (
             <aside className="reshape-pane-params">
               <ReshapeParamsPanel
-                defs={brepEngine ? brepParamDefs : paramDefs}
-                emptyMessage={brepEngine
-                  ? (build
-                    ? (selected.length
-                      ? 'This step has no numbers to adjust.'
-                      : 'Pick a step in the timeline, or a face on the model, to see its numbers.')
-                    : "Run a script and its numbers appear here. param('name', value) gives one a caption.")
-                  : undefined}
+                defs={brepParamDefs}
+                emptyMessage={build
+                  ? (selected.length
+                    ? 'This step has no numbers to adjust.'
+                    : 'Pick a step in the timeline, or a face on the model, to see its numbers.')
+                  : "Run a script and its numbers appear here. param('name', value) gives one a caption."}
                 notice={
-                  scriptEngine && !build && scriptErrorMessage
+                  !build && scriptErrorMessage
                     ? scriptErrorMessage
-                    : brepEngine && selected.length === 1 ? refusals?.get(selected[0]) ?? null : null
+                    : selected.length === 1 ? refusals?.get(selected[0]) ?? null : null
                 }
                 values={paramValues}
                 onChange={sendParams}

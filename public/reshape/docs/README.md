@@ -1,34 +1,33 @@
-# JSCAD docs
+# reSHape docs
 
-Reference material for the JSCAD 3D-modeling unit (Q3–Q4 of the course).
-JSCAD **is vendored** — `@jscad/modeling` and `@jscad/regl-renderer` live in
-`public/reshape/lib/` and are loaded by `public/reshape/runner.html` over relative
-paths. Nothing loads from a CDN at runtime.
+Reference material for the reSHape Solid Modelling unit. reSHape Script is a
+first-party language (`lib/reshape-script.ts`) built on the B-rep kernel
+(`public/reshape/kernel/`, gitignored, rebuilt by `prebuild`). JSCAD is
+retired — see `CLAUDE.md`'s own opening section for what that replaced and
+why.
 
 ## What's in this folder
 
 | File | Covers |
 |---|---|
-| `reference.md` | Hand-authored API reference — the exact function subset the course teaches, with signatures + examples |
-| `challenges.md` | Challenge ladder written against the real @jscad/modeling API |
-| `CLAUDE.md` | How the app integrates JSCAD (the runner, vendored versions, the additive scope shim) — dev reference |
-| `LICENSE.md` | License notes for @jscad/modeling and @jscad/regl-renderer |
+| `reference.md` | Hand-authored reSHape Script reference — every call the course teaches, with signatures + examples |
+| `challenges.md` | Challenge ladder still written against the old JSCAD API (`require`/`main()`/`module.exports`) — not yet converted to reSHape Script; treat as a known gap, not a source of truth |
+| `CLAUDE.md` | How the app builds and verifies reSHape Script (the interpreter, the kernel, the doc-sync gates) — dev reference |
 | `index.html` | Docs index page (open `docs/` in a browser) |
 
 ## Where the docs live in the app
 
 - **In-app:** `/docs/reshape` — built from `lib/reshape-docs.ts`, with live
-  runnable examples in the same sandbox style as `/docs/moshion`.
-- **External (canonical):** https://openjscad.xyz/docs/ — the generated JSDoc
-  for the full `@jscad/modeling` surface. The in-app docs cover only what the
-  course teaches; the external docs cover everything.
-
-## Versions
-
-- `@jscad/modeling@2.13.0` — vendored at `public/reshape/lib/jscad-modeling.min.js`.
-- `@jscad/regl-renderer@2.6.15` — the 3D viewport renderer, vendored at
-  `public/reshape/lib/jscad-regl-renderer.min.js`.
+  runnable examples (`components/ReshapeScriptPreview.tsx`) in the same
+  sandbox style as `/docs/moshion`.
+- There is no external canonical site the way jscad.app was for JSCAD —
+  reSHape Script only means something inside this app, against this kernel.
 
 ## Licensing
 
-`@jscad/modeling` and `@jscad/regl-renderer` are MIT. See `LICENSE.md`.
+Nothing shipped derives from JSCAD source any more — `lib/hull.ts`, the one
+name OpenCascade has no equivalent for, is first-party (see its own file
+header, "Convex hull, ours."). The kernel itself (OpenCascade via a
+replicad-family wasm build, LGPL-2.1) loads at runtime as a wasm module and
+is never linked into or bundled with our own code; three.js (the viewport
+renderer) is MIT.

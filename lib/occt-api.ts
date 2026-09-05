@@ -59,7 +59,8 @@
 // function's own comment rather than smoothed over.
 //
 // NO WRAPPERS. Every function returns a raw OpenCascade TopoDS_Shape, the same
-// way public/reshape/reshape.js is careful to return a raw JSCAD geom. A wrapper
+// way the now-deleted public/reshape/reshape.js was careful to return a raw
+// JSCAD geom. A wrapper
 // would render fine, pass a "does it draw" check, and quietly break the moment
 // anything reached past this layer.
 
@@ -833,8 +834,8 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
 
   api.cylinderElliptic = (...args: any[]) => {
     // POSITIONAL MEANS A CONE, which is not the library's argument order and
-    // was worth measuring rather than assuming. public/reshape/reshape.js maps
-    // cylinderElliptic(radius, height) to
+    // was worth measuring rather than assuming. The now-deleted
+    // public/reshape/reshape.js mapped cylinderElliptic(radius, height) to
     // { startRadius: [r, r], endRadius: [0, 0], height } -- a point, because the
     // /sandbox modeller emits exactly that call for its Cone kind. Reading the
     // two numbers as startRadius and endRadius instead built a shape 38% wrong
@@ -1103,7 +1104,8 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
    * nothing"). Neither answer is available here -- there is no sensible
    * "extrude a solid" result to hand back -- so the type is checked before
    * the call, and the refusal reads the way reSHape's own extrudeLinear wrapper
-   * (public/reshape/reshape.js) already reads for the same mistake.
+   * (the now-deleted public/reshape/reshape.js) already read for the same
+   * mistake.
    */
   const extrudeProfile = (f: any): any => {
     if (isPathVal(f)) {
@@ -1402,8 +1404,8 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
   /**
    * sit(shape) -- drop the shape so its lowest point rests on z = 0.
    *
-   * Not a new recipe: public/reshape/reshape.js builds sit from
-   * transforms.align({ modes: ['none', 'none', 'min'], relativeTo: [0, 0, 0] }, shape),
+   * Not a new recipe: the now-deleted public/reshape/reshape.js built sit
+   * from transforms.align({ modes: ['none', 'none', 'min'], relativeTo: [0, 0, 0] }, shape),
    * and api.align above already treats an axis whose mode is neither 'center'
    * nor 'min' nor 'max' as untouched -- so 'none' already means "leave this
    * axis alone" with no extra code. sit is that same call, fixed.
@@ -1425,12 +1427,13 @@ export function createApi(oc: Occt, deps: ApiDeps = {}): Api {
    * WORLD origin, which is what @jscad/modeling's rotate does and what a
    * student who moves a shape and then rotates it gets burned by; turn's
    * recipe is measure the shape's own middle, translate it to the origin,
-   * rotate, translate back -- exactly what public/reshape/reshape.js's turn()
-   * does over the real library's translate/rotate, replayed here over gp_Trsf.
+   * rotate, translate back -- exactly what the now-deleted
+   * public/reshape/reshape.js's turn() did over the real library's
+   * translate/rotate, replayed here over gp_Trsf.
    *
-   * Angle argument comes FIRST, matching reshape.js and unlike every other
-   * transform here: turn(90, shape) about Z, or turn([0, 90, 0], shape) to
-   * pick the axis.
+   * Angle argument comes FIRST, matching that same turn() and unlike every
+   * other transform here: turn(90, shape) about Z, or turn([0, 90, 0], shape)
+   * to pick the axis.
    */
   api.turn = (degrees: number | Vec3, ...shapes: any[]) => {
     const spin: Vec3 = typeof degrees === 'number' ? [0, 0, degrees] : degrees;

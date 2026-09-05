@@ -17,7 +17,9 @@ export type { Constraint as SketchConstraint } from './sketch-solve';
 
 export type Vec3 = [number, number, number];
 
-/** How a shape's edges are killed. JSCAD has no fillet(); see model-codegen. */
+/** How a shape's edges are killed. The old JSCAD path had no true fillet and
+ *  faked one with a hull of two cylinders; the B-rep kernel (lib/occt-build.ts)
+ *  builds a real one for either style. */
 export type RoundStyle = 'fillet' | 'chamfer';
 
 /** A single world axis, spelled out rather than as a Vec3 direction — a
@@ -132,8 +134,8 @@ export interface SketchFeature {
    * movers did exactly that.
    *
    * A doc carrying `bulges` and NO `rounds` is a legacy or imported outline:
-   * somebody else already built those arcs, so it passes through untouched and
-   * generates exactly the polyArc() it always did.
+   * somebody else already built those arcs, so it passes through untouched
+   * and builds the exact same rounded outline it always has.
    */
   rounds?: Record<number, number>;
   /**
@@ -229,9 +231,9 @@ export interface MirrorFeature {
  * Repeated copies of an earlier feature — a linear row or a ring around an
  * axis. `count` includes the original, so count 1 is a no-op pattern.
  *
- * Unlike every other feature, a pattern's generated code is not one
- * expression: model-codegen emits it as a real `for` loop, because a pattern
- * IS a loop and hiding that behind a helper call would throw away the point.
+ * reSHape Script emits this as one `repeat()`/`repeatAround()` call
+ * (lib/reshape-script-gen.ts), not a real `for` loop — the loop itself is
+ * the kernel's job (lib/occt-build.ts builds and fuses `count` instances).
  */
 export interface PatternFeature {
   id: string;
@@ -267,7 +269,7 @@ export interface HoleFeature {
   /** Where the hole's mouth sits, as an offset from `target`'s own
    *  bounding-box centre -- not an absolute world position. [0, 0, 0]
    *  means "dead centre on the target," wherever the target actually is;
-   *  see centerOn() in model-codegen.ts. */
+   *  the kernel (lib/occt-build.ts) resolves that offset at build time. */
   center: Vec3;
   /** Which way the drill points. 'z' bores straight down, matching a hole
    *  placed on a flat top face without any tilt. */
@@ -287,13 +289,13 @@ export interface HoleFeature {
  * A hollowed-out copy of an earlier solid: wall thickness in, solid body out.
  *
  * NOT a true shell. A true shell offsets every face inward by the same
- * distance, so the wall is exactly `thickness` everywhere. This scales a copy
- * of the whole body inward around its own bounding-box centre by a fraction
- * computed from that box, which means a long thin part gets a thin wall on
- * its long axis and a thick one on its short axis, and a curved body (a ball,
- * a tube) is not uniformly thin at all. The vendored JSCAD bundle has no
- * boolean offset operation, which is the only thing that would do this
- * honestly — see the `shellOp` comment in model-codegen.ts.
+ * distance, so the wall is exactly `thickness` everywhere. The old JSCAD path
+ * had no boolean offset operation, so it scaled a copy of the whole body
+ * inward around its own bounding-box centre by a fraction computed from that
+ * box instead -- a long thin part got a thin wall on its long axis and a
+ * thick one on its short axis, and a curved body (a ball, a tube) was not
+ * uniformly thin at all. The kernel (lib/occt-build.ts) does this honestly,
+ * with a real constant-distance inward offset.
  */
 export interface ShellFeature {
   id: string;
@@ -319,10 +321,10 @@ export interface ShellFeature {
  * edge to point at. This names an edge -- as the meeting of two named faces,
  * see the `between` cause in lib/topo-name.ts -- and rounds that one.
  *
- * WHICH ENGINE BUILDS IT. lib/occt-build.ts does, exactly. The JSCAD path
- * cannot and does not pretend to: see whyNotOnJscad() below, and featureExpr()
- * in lib/model-codegen.ts, which passes the target through unchanged rather
- * than emitting something that looks like a round and is not one.
+ * WHICH ENGINE BUILDS IT. lib/occt-build.ts does, exactly. The old JSCAD
+ * path could not and did not pretend to -- it passed the target through
+ * unchanged rather than emitting something that looks like a round and is
+ * not one.
  */
 export interface FilletFeature {
   id: string;
@@ -366,27 +368,6 @@ export interface DraftFeature {
   pull: Axis3;
   /** Where along `pull` the part does not move. */
   neutral: number;
-}
-
-/**
- * Why a fillet or a draft shows nothing in the preview today.
- *
- * The preview runs JSCAD, which has no addressable edges or faces, so neither
- * feature can be built there. Saying so is the contract: a tool that silently
- * does nothing is worse than one that is honestly unavailable, and this repo
- * has the sentence-with-a-reason pattern everywhere already
- * (whyCannotRoundCorner, whyRemovingCornerCosts, whyNameLost).
- *
- * Returns null once the preview is running the B-rep adapter, which is the
- * single place this needs changing when that lands.
- */
-export function whyNotOnJscad(f: Feature): string | null {
-  if (f.kind !== 'fillet' && f.kind !== 'draft') return null;
-  const what = f.kind === 'fillet'
-    ? (f.style === 'chamfer' ? 'Cutting one edge off flat' : 'Rounding one edge')
-    : 'Draft';
-  return `${what} needs the shape to know its own edges and faces, and the `
-    + 'preview does not yet. The feature is kept and will build when it does.';
 }
 
 /**
@@ -872,10 +853,10 @@ export function newPattern(
 }
 
 /** center: [0, 0, 0] is not world zero -- see HoleFeature.center. It is "no
- *  offset," so codegen (centerOn() in model-codegen.ts) reads it against
- *  the TARGET's own bounding-box centre at build time, wherever the target
- *  actually sits. A doc-level default has no target geometry to ask, which
- *  is exactly why the interpretation lives in codegen and not here. */
+ *  offset," so the kernel (lib/occt-build.ts) reads it against the TARGET's
+ *  own bounding-box centre at build time, wherever the target actually
+ *  sits. A doc-level default has no target geometry to ask, which is
+ *  exactly why the interpretation lives at build time and not here. */
 export function newHole(doc: ModelDoc, target: string): HoleFeature {
   const extent = extentAlong(doc, target, 'z');
   const depth = extent != null ? extent + 2 : 10;

@@ -87,30 +87,11 @@ export default function SandboxWorkspace() {
   // the OLD model on screen next to the NEW starter text.
   const [reshapeResetKey, setReshapeResetKey] = useState(0);
 
-  // WHICH GEOMETRY ENGINE DRAWS reSHape.
-  //
-  // B-rep is the default engine (operator decision 2026-09-03, after the
-  // Chili3D gauntlet and the B-rep-default loop: oracle 134/134, three
-  // student lenses through the Build tools twice). ?engine=jscad opts back
-  // into the JSCAD path. ?script=0 keeps the kernel for Build but the JSCAD
-  // runner for Code, for the one release the legacy runner still ships.
-  // Both are handed down to ReshapeStudio as escape-hatch props.
-  //
-  // Read in an effect rather than at first render: this app is a static export,
-  // so the server-rendered HTML has no location and reading one during render
-  // is a hydration mismatch.
-  const [brepEngine, setBrepEngine] = useState(true);
-  const [scriptEngine, setScriptEngine] = useState(true);
-  useEffect(() => {
-    try {
-      const q = new URLSearchParams(window.location.search);
-      const kernel = q.get('engine') !== 'jscad';
-      setBrepEngine(kernel);
-      setScriptEngine(kernel && q.get('script') !== '0');
-    } catch {
-      /* no window, or a URL we cannot parse: stay on the engine that works */
-    }
-  }, []);
+  // WHICH GEOMETRY ENGINE DRAWS reSHape. The B-rep kernel, always -- operator
+  // decision 2026-09-03, after the Chili3D gauntlet and the B-rep-default
+  // loop: oracle 134/134, three student lenses through the Build tools
+  // twice. The JSCAD runner and its ?engine=jscad / ?script=0 escape hatches
+  // are gone (CLAUDE.md's "JSCAD is retired" section).
 
   // What the student's teachers have set. A failed or missing fetch resolves to
   // 'both', so a gate that cannot be read never locks anyone out of their work.
@@ -571,8 +552,6 @@ export default function SandboxWorkspace() {
               // own doc comment.
               autoRunOnMount={false}
               lessonId="sandbox"
-              engine={brepEngine ? undefined : 'jscad'}
-              scriptRunner={brepEngine && !scriptEngine ? false : undefined}
             />
           ) : (
             <>

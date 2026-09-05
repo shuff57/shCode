@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>JSCAD docs</title>
+<title>reSHape docs</title>
 <style>
   html, body { margin: 0; padding: 0; background: #282a36; color: #f8f8f2; font-family: system-ui, -apple-system, sans-serif; }
   main { max-width: 720px; margin: 40px auto; padding: 0 24px; }
@@ -18,36 +18,31 @@
 </head>
 <body>
 <main>
-  <h1>JSCAD docs</h1>
-  <p class="sub">Reference material for the JSCAD 3D-modeling unit. Open any of these in a new tab while you work.</p>
+  <h1>reSHape docs</h1>
+  <p class="sub">Reference material for the reSHape Solid Modelling unit. Open any of these in a new tab while you work.</p>
 
   <a class="card" href="./reference.md" target="_blank">
     <h2>API Reference</h2>
-    <p>The function subset the course teaches — primitives, transforms, booleans, extrusions, hulls, measurements, colors, text, parameters — with signatures and examples.</p>
+    <p>Every reSHape Script call the course teaches — shapes, placing, holes, hollowing, rounding, patterns, mirroring, moving, combining, sketches, parameters — with signatures and examples.</p>
   </a>
 
   <a class="card" href="./challenges.md" target="_blank">
     <h2>Challenges</h2>
-    <p>The 15-challenge ladder for the JSCAD units. Concepts + verifiable goals per tier.</p>
+    <p>The 15-challenge ladder. Still written against the old JSCAD API and not yet converted to reSHape Script — a known gap, not a source of truth.</p>
   </a>
 
   <a class="card" href="./CLAUDE.md" target="_blank">
     <h2>Architecture Notes</h2>
-    <p>How the app integrates JSCAD: the vendored bundles, the runner iframe, the additive scope shim.</p>
+    <p>How the app builds and verifies reSHape Script: the interpreter, the B-rep kernel, the doc-sync gates.</p>
   </a>
 
   <a class="card" href="./README.md" target="_blank">
     <h2>README</h2>
-    <p>Project overview, versions, and where the docs live.</p>
-  </a>
-
-  <a class="card" href="./LICENSE.md" target="_blank">
-    <h2>License</h2>
-    <p>MIT for @jscad/modeling and @jscad/regl-renderer (vendored in public/reshape/lib).</p>
+    <p>Project overview and where the docs live.</p>
   </a>
 
   <footer>
-    In-app docs with live examples: <a href="/docs/reshape">/docs/reshape</a>. Canonical external API docs: <a href="https://openjscad.xyz/docs/">openjscad.xyz/docs</a>.
+    In-app docs with live examples: <a href="/docs/reshape">/docs/reshape</a>.
   </footer>
 </main>
 </body>

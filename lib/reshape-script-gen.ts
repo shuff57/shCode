@@ -1,12 +1,14 @@
-// ModelDoc -> reSHape Script source. The Code-mode twin of toReshape() in
-// lib/model-codegen.ts, and the other half of lib/reshape-script.ts's
+// ModelDoc -> reSHape Script source. The other half of lib/reshape-script.ts's
 // contract: runScript(toScript(doc)).doc must equal doc up to ids and
 // defaults (see that file's own header, and scripts/test-reshape-script.mjs,
-// which pins this against every fixture in scripts/oracle-measure.mjs).
+// which pins this against every fixture in .gauntlet/oracle.json -- a frozen
+// fixture now that the JSCAD-era scripts/oracle-measure.mjs that recorded it
+// is deleted, CLAUDE.md's "JSCAD is retired" section).
 //
-// ONE LINE PER FEATURE, in doc order -- same rule toReshape() follows, for
-// the same reason: a script is the Build timeline written down, so its shape
-// on the page should mirror the timeline's own shape.
+// ONE LINE PER FEATURE, in doc order -- lib/model-codegen.ts's now-deleted
+// toReshape() followed the same rule, for the same reason: a script is the
+// Build timeline written down, so its shape on the page should mirror the
+// timeline's own shape.
 //
 // THE HARD PART IS NOT THE ARITHMETIC, IT IS THE VARIABLE. A Build-mode doc
 // names its OWN targets by feature id (`hole1.target === 'box1'`), but a

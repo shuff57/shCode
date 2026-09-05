@@ -1,55 +1,52 @@
 #!/usr/bin/env node
-// test-reshape-docs.mjs — the verification gate for the JSCAD docs stack.
+// test-reshape-docs.mjs — the verification gate for the reSHape docs stack.
 //
-// Six groups. Each one closes a claim the stack currently makes only in prose:
+// Three groups now. Each one closes a claim the stack currently makes only
+// in prose:
 //
 //   NETWORK    nothing under public/reshape/ or on the preview path pulls a
 //              resource off the network. A CDN reference works fine at a desk
 //              and dies in a classroom behind a filter.
-//   BUNDLE     the two vendored libraries are present and full-size.
-//   EXAMPLES   every `code` field on every page of lib/reshape-docs.ts is
-//              executed against the VENDORED bundle inside the SAME shim scope
-//              public/reshape/runner.html gives a student, and must hand back
-//              real geometry. Reported per page, by section slug + page title.
-//   STYLES     bare `cube(...)` and qualified `primitives.cube(...)` both work
-//              and are the same reference — the check that stops a future shim
-//              from wrapping geometry and breaking paste-into-jscad.app.
 //   DRIFT      lib/reshape-docs.ts and public/reshape/docs/reference.md document
-//              the same API surface. Reported as a WARNING with a count so the
-//              two references cannot silently diverge.
-//   COVERAGE   documented X / Y exports (Z%). Printed every run. This is the
+//              the same DSL vocabulary. Reported as a WARNING with a count so
+//              the two references cannot silently diverge.
+//   COVERAGE   documented X / Y DSL calls (Z%). Printed every run. This is the
 //              measurable half of the bar.
 //
+// USED TO ALSO run BUNDLE (the two vendored JSCAD libraries present and
+// full-size), EXAMPLES (every `code` field on lib/reshape-docs.ts executed
+// against the vendored bundle inside the JSCAD shim scope
+// public/reshape/runner.html gave a student) and STYLES (bare vs qualified
+// JSCAD calls resolving to the same reference). All three measured the JSCAD
+// runner and bundle, both deleted along with it (CLAUDE.md's "JSCAD is
+// retired" section) -- scripts/test-reshape-script.mjs already runs every
+// reference fence and in-app page on the kernel instead, which is why this
+// file does not duplicate that here. There is no separate "refusal
+// sentences" group heading in this comment because there never was one to
+// promise; the check below it still runs, just without a banner of its own
+// in this list.
+//
 // lib/reshape-docs.ts is TypeScript that imports without a file extension, which
-// neither Node's ESM resolver nor its type stripping will load. So compile it
-// to CommonJS in a temp dir first and require the real `sections` array out of
-// it — the docs are read as DATA, never re-parsed with a regex. Same trick
-// scripts/test-diagram.mjs uses on lib/diagram-*.ts.
+// neither Node's ESM resolver nor its type stripping will load. DRIFT compiles
+// lib/reshape-script.ts (for its VOCABULARY constant) to CommonJS in a temp
+// dir for the same reason. Same trick scripts/test-diagram.mjs uses on
+// lib/diagram-*.ts.
 //
-// The runtime itself is never reimplemented here: the bundle is the vendored
-// file evaluated as-is, and the scope shim is cut out of runner.html at run
-// time by scripts/reshape-harness.mjs. Edit the shim and this gate tests the edit.
-//
-// A red check is closed by fixing runner.html, the vendored bundles, or the
-// docs — never by loosening an assertion here. Do not edit lib/reshape-docs.ts
-// to make an example pass; a failing example is a finding.
+// A red check is closed by fixing the docs — never by loosening an assertion
+// here.
 //
 //   node scripts/test-reshape-docs.mjs
 
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import {
-  existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync,
+  existsSync, readdirSync, readFileSync, mkdtempSync, rmSync, writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import {
-  PATHS, createShimContext, runProgram, isGeometry, captureConsole,
-  documentedNames, docText,
-} from './reshape-harness.mjs';
-import { createSimpleContext } from './reshape-simple-checks.mjs';
+import { documentedNames, docText } from './reshape-docs-text.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -110,15 +107,20 @@ const PREVIEW_PATH = [
 ];
 
 const SCANNABLE = /\.(html|js|mjs|cjs|md|ts|tsx|json|css)$/;
-const VENDORED = new Set([PATHS.modeling, PATHS.regl]);
+// public/reshape/kernel/ is gitignored build output (scripts/build-brep-kernel.mjs)
+// -- three.js and the OpenCascade wasm loader, vendored third-party code that
+// carries its own license URLs same as the deleted JSCAD bundles did. Not
+// ours to audit, and it will not exist at all in a fresh checkout that has
+// not run `prebuild` yet.
+const KERNEL_DIR = path.join(root, 'public/reshape/kernel');
 
 function scanTargets() {
   const files = [];
   const walk = (dir) => {
     for (const e of readdirSync(dir, { withFileTypes: true })) {
       const p = path.join(dir, e.name);
+      if (p === KERNEL_DIR) continue;
       if (e.isDirectory()) { walk(p); continue; }
-      if (VENDORED.has(p)) continue;          // the libraries themselves carry license URLs
       if (!SCANNABLE.test(e.name)) continue;
       files.push(p);
     }
@@ -158,15 +160,6 @@ note(`scanned ${scanned.length} files under public/reshape/ + the preview path`)
 }
 
 {
-  // The vendored libraries must be reached by relative path, or the whole
-  // exercise was pointless.
-  const html = readFileSync(PATHS.runner, 'utf8');
-  const missing = ['./lib/jscad-modeling.min.js', './lib/jscad-regl-renderer.min.js']
-    .filter((s) => !html.includes(`src="${s}"`));
-  ok('runner.html loads both bundles by relative path', missing.length === 0, `missing: ${missing.join(', ')}`);
-}
-
-{
   // Not a failure — but every one gets listed, so a real offender can never
   // hide behind "there are always some URLs in there".
   const urls = [];
@@ -180,161 +173,6 @@ note(`scanned ${scanned.length} files under public/reshape/ + the preview path`)
   if (urls.length === 0) ok('no http(s):// text references at all', true);
   else warn(`${urls.length} http(s):// text reference(s) — prose/attribution links, nothing is fetched`,
     urls.join('\n        '));
-}
-
-// ---------------------------------------------------------------------------
-// VENDORED LIBS PRESENT
-// ---------------------------------------------------------------------------
-
-section('vendored libs');
-
-const MIN_BYTES = 100 * 1024;
-
-for (const [label, p, globalName] of [
-  ['jscad-modeling.min.js', PATHS.modeling, 'jscadModeling'],
-  ['jscad-regl-renderer.min.js', PATHS.regl, 'jscadReglRenderer'],
-]) {
-  ok(`${label} exists`, existsSync(p), `missing ${rel(p)}`);
-  if (!existsSync(p)) continue;
-  const bytes = statSync(p).size;
-  ok(`${label} is > 100KB`, bytes > MIN_BYTES, `${bytes} bytes — too small to be the real library`);
-  ok(`${label} exports window.${globalName}`, readFileSync(p, 'utf8').includes(globalName));
-}
-
-{
-  const dir = path.join(root, 'public/reshape/lib');
-  const mins = existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith('.min.js')) : [];
-  ok('public/reshape/lib/*.min.js is non-empty', mins.length >= 2, `found ${JSON.stringify(mins)}`);
-}
-
-// ---------------------------------------------------------------------------
-// EVERY DOCUMENTED EXAMPLE RUNS -- THE LEGACY JSCAD REFERENCE ONLY
-// ---------------------------------------------------------------------------
-//
-// lib/reshape-docs.ts's `code` fields are reSHape SCRIPT now (the DSL
-// scripts/reshape-script.ts runs, tested against a real kernel by
-// scripts/test-reshape-script.mjs, in the very same ownership as this file).
-// Feeding them to the JSCAD shim below would be testing the wrong language
-// against the wrong runtime -- every one of them would report "box is not
-// defined" or worse, silently return whatever @jscad/modeling's OWN box()
-// means, and neither result says anything about whether the DSL script is
-// correct. So this group's material moved: public/reshape/docs/jscad-legacy.md
-// is now the JSCAD reference (the page the DSL rewrite displaced), and it is
-// this group's job for as long as that page still ships behind ?engine=jscad
-// (see .gauntlet/SPEC-reshape-script.md's migration step 3).
-//
-// Read as markdown, not as data -- unlike lib/reshape-docs.ts, jscad-legacy.md
-// has no compiled `sections` array to require, so its ```js fences are parsed
-// the same way scripts/reshape-harness.mjs's own referenceExamples() parses
-// reference.md's (an optional slug after `js`, everything up to the matching
-// closing fence). Untagged fences (jscad-legacy.md has several -- a
-// require()-form counterpart shown right after a `shcode-only` shortcut, for
-// instance) are labelled by line number instead of a slug, so nothing is
-// silently skipped for lacking a name.
-
-section('documented examples (JSCAD legacy reference)');
-
-const LEGACY_PATH = path.join(root, 'public/reshape/docs/jscad-legacy.md');
-
-function parseLegacyExamples(mdPath) {
-  const src = readFileSync(mdPath, 'utf8');
-  const rx = /^```js([^\n]*)\n([\s\S]*?)^```$/gm;
-  const out = [];
-  let m;
-  while ((m = rx.exec(src)) !== null) {
-    const tag = (m[1] || '').trim();
-    const line = src.slice(0, m.index).split('\n').length + 1;
-    out.push({ label: tag || `line ${line}`, code: m[2] });
-  }
-  return out;
-}
-
-const legacyExamples = existsSync(LEGACY_PATH) ? parseLegacyExamples(LEGACY_PATH) : null;
-ok('public/reshape/docs/jscad-legacy.md exists', legacyExamples !== null, `missing ${rel(LEGACY_PATH)}`);
-
-if (legacyExamples) {
-  note(`${legacyExamples.length} fenced examples in jscad-legacy.md`);
-  ok('the legacy reference still carries examples', legacyExamples.length > 0, 'no ```js fence found');
-
-  // Every example runs in the SAME scope the JSCAD runner gives a student:
-  // the vendored bundle, the additive shim cut live out of runner.html, AND
-  // reshape.js -- this file predates the DSL and some of its examples still
-  // use the eleven-name sugar layer (box, ball, tube, ...), not only bare
-  // @jscad/modeling calls. One fresh context per example — module.exports
-  // persists otherwise, and an example with no main() would inherit the
-  // previous one's.
-  for (const ex of legacyExamples) {
-    // 'skeleton' is the program template with main() left empty on purpose:
-    // it does not build a shape, so 'main() returned undefined' is its
-    // correct behaviour, not an example that broke.
-    if (ex.label === 'skeleton') continue;
-    const label = `jscad-legacy.md: ${ex.label}`;
-    const cap = captureConsole();
-    let r;
-    try {
-      const { ctx } = createSimpleContext({ consoleImpl: cap.console });
-      r = runProgram(ctx, ex.code, `jscad-legacy.md<${ex.label}>`);
-    } catch (e) {
-      ok(label, false, `context build threw: ${e.message}`);
-      continue;
-    }
-    if (!r.ok) { ok(label, false, `${r.phase}: ${r.error.message}`); continue; }
-    if (!r.main) { ok(label, false, 'no main() to call'); continue; }
-    if (r.geometry === undefined) { ok(label, false, 'main() returned undefined'); continue; }
-    const errs = cap.lines.filter((l) => l.type === 'error');
-    if (errs.length) { ok(label, false, `console.error: ${errs[0].text.slice(0, 140)}`); continue; }
-    ok(label, isGeometry(r.geometry),
-      `main() returned ${Array.isArray(r.geometry) ? `an array of ${r.geometry.length}` : typeof r.geometry} the renderer could not draw`);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// BOTH CALL STYLES
-// ---------------------------------------------------------------------------
-//
-// The shim is additive: it must ADD `cube` without replacing `primitives.cube`,
-// and the two must be the same function object. A shim that wrapped geometry in
-// something friendlier would still pass a "does it render" check and would
-// quietly stop the student's file from running on jscad.app.
-
-section('both call styles');
-
-{
-  const SPOT = [
-    ['primitives', 'cube'],
-    ['primitives', 'sphere'],
-    ['transforms', 'translate'],
-    ['booleans', 'union'],
-  ];
-  const { ctx, jscad } = createShimContext();
-
-  for (const [mod, name] of SPOT) {
-    const qualified = jscad?.[mod]?.[name];
-    const bare = ctx[name];
-    ok(`${mod}.${name} exists on the bundle`, typeof qualified === 'function', typeof qualified);
-    ok(`bare ${name} is installed by the shim`, typeof bare === 'function', typeof bare);
-    ok(`bare ${name} IS ${mod}.${name} (same reference)`, bare === qualified);
-  }
-
-  // And run both forms end to end, since "same reference" is only half of it.
-  const bareRun = runProgram(
-    createShimContext().ctx,
-    'function main() { return cube({ size: 10 }) }\nmodule.exports = { main }',
-    'spot-check<bare>',
-  );
-  ok('a bare-style program returns geometry',
-    bareRun.ok && isGeometry(bareRun.geometry),
-    bareRun.ok ? 'ran but returned nothing drawable' : `${bareRun.phase}: ${bareRun.error.message}`);
-
-  const qualRun = runProgram(
-    createShimContext().ctx,
-    "const { primitives } = require('@jscad/modeling')\n" +
-    'function main() { return primitives.cube({ size: 10 }) }\nmodule.exports = { main }',
-    'spot-check<qualified>',
-  );
-  ok('a qualified-style program returns geometry',
-    qualRun.ok && isGeometry(qualRun.geometry),
-    qualRun.ok ? 'ran but returned nothing drawable' : `${qualRun.phase}: ${qualRun.error.message}`);
 }
 
 // ---------------------------------------------------------------------------
@@ -427,8 +265,8 @@ section('refusal sentences are the runtime\'s own');
   ok('the runtime yields refusal templates to compare against', templates.length >= 20, `${templates.length} templates`);
   const looksLikeRefusal = (q) => / -- /.test(q) || /Round the shape before/.test(q);
   const DOCS = [
-    ['public/reshape/docs/reference.md', readFileSync(PATHS.reference, 'utf8')],
-    ['lib/reshape-docs.ts', readFileSync(PATHS.inAppDocs, 'utf8')],
+    ['public/reshape/docs/reference.md', docText.reference()],
+    ['lib/reshape-docs.ts', readFileSync(path.join(root, 'lib/reshape-docs.ts'), 'utf8')],
   ];
   let quotes = 0;
   for (const [where, text] of DOCS) {

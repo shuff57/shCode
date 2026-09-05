@@ -1,10 +1,10 @@
 // First-party STL, OBJ and 3MF writers.
 //
-// WHY THIS EXISTS. public/reshape/lib/jscad-io.min.js currently vendors
-// @jscad/{stl,3mf,obj}-serializer behind Save STL / Save 3MF / Save OBJ in
-// public/reshape/runner.html. JSCAD is retired (see CLAUDE.md's "JSCAD is
-// retired" note) -- it is the engine being replaced, not a target -- so the
-// Save buttons cannot go on depending on its I/O half either.
+// WHY THIS EXISTS. Save STL / Save 3MF / Save OBJ used to run through
+// public/reshape/lib/jscad-io.min.js's vendored @jscad/{stl,3mf,obj}-serializer,
+// behind public/reshape/runner.html. Both are deleted now (CLAUDE.md's
+// "JSCAD is retired" section) -- the Save buttons could not go on depending
+// on JSCAD's I/O half once the engine itself was gone.
 //
 // WHY NOT THE KERNEL. OpenCascade has its own STL writer (StlAPI_Writer), but
 // it is not among the 89 symbols in the custom kernel build

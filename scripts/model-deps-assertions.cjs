@@ -18,7 +18,6 @@
 module.exports = function run(dir) {
   const path = require('path');
   const deps = require(path.join(dir, 'model-deps.js'));
-  const gen = require(path.join(dir, 'model-codegen.js'));
 
   let pass = 0;
   const fails = [];
@@ -81,72 +80,39 @@ module.exports = function run(dir) {
     !String(deps.whyDeletingCosts(DOC, ['sk1'], label)).startsWith('Sketch 1,'),
     'the student knows what they clicked; the sentence is for the rest');
 
-  console.log('\n=== the cross-check: no source that uses what it never declared ===');
+  console.log('\n=== the cross-check: a cascading delete leaves no dangling reference ===');
 
-  // Two detectors, both exact, neither guessing.
-  //
-  // The first takes the universe of ids explicitly. An earlier version derived
-  // it from the document being checked, which is precisely wrong: the id that
-  // dangles is the one that was REMOVED, so it is never in that document and
-  // was never looked for. The control below caught that -- it went green
-  // against source that visibly used an undeclared `sk1` -- which is the whole
-  // reason the control is there.
-  function usesRemovedIds(doc, universe) {
-    const src = String(gen.toReshape(doc));
-    const at = src.indexOf('function main');
-    if (at < 0) return ['(no main)'];
-    const body = src.slice(at, src.indexOf('module.exports', at));
-    const here = new Set(doc.features.map((f) => f.id));
-    return universe.filter((id) => !here.has(id)
-      && new RegExp('(^|[^\\w$.])' + id + '([^\\w$]|$)').test(body));
-  }
-
-  // The second needs no universe at all: every parameter the generated main()
-  // reads has to be one getParameterDefinitions actually declares. `p.sk1_offset`
-  // survived the old delete and was undefined at runtime, which is the same
-  // defect showing up on the parameter side rather than the variable side.
-  function undeclaredParams(doc) {
-    const src = String(gen.toReshape(doc));
-    const declared = new Set();
-    const re = /name:\s*'([^']+)'/g;
-    let m;
-    while ((m = re.exec(src))) declared.add(m[1]);
-    const at = src.indexOf('function main');
-    const body = src.slice(at, src.indexOf('module.exports', at));
-    const used = new Set();
-    const ru = /\bp\.([A-Za-z_$][\w$]*)/g;
-    while ((m = ru.exec(body))) used.add(m[1]);
-    return [...used].filter((u) => !declared.has(u));
-  }
-
-  const ALL = DOC.features.map((f) => f.id);
-
-  check('CONTROL: the intact document generates source that declares everything',
-    usesRemovedIds(DOC, ALL).length === 0 && undeclaredParams(DOC).length === 0,
-    JSON.stringify([usesRemovedIds(DOC, ALL), undeclaredParams(DOC)]));
+  // This used to probe generated JSCAD source text for a use of a removed id
+  // or an undeclared `p.<name>` -- both specific to that engine's
+  // getParameterDefinitions()/p.<name> shape, which reSHape Script does not
+  // share (a script declares a real local const per param, not an object
+  // property, so "used but never declared" there is a ReferenceError the
+  // JS engine itself catches, not a silent runtime undefined). The property
+  // that actually matters -- a cascading delete must not leave a reference
+  // to something it removed -- is engine-independent and already has a
+  // first-party, doc-level detector: deps.danglingRefs(). Ported to that
+  // rather than deleted, since the control right below proves it can fail.
+  check('CONTROL: the intact document has no dangling reference',
+    deps.danglingRefs(DOC).length === 0,
+    JSON.stringify(deps.danglingRefs(DOC)));
 
   // The exact edit that shipped broken: the OLD delete, which removed the
   // sketch and filtered combines only.
   const oldDelete = { ...DOC, features: DOC.features
     .filter((f) => f.id !== 'sk1')
     .filter((f) => f.kind !== 'combine' || f.targets.every((t) => t !== 'sk1')) };
-  check('CONTROL: the delete this replaced really does leave a use with no declaration',
-    usesRemovedIds(oldDelete, ALL).includes('sk1')
-      && undeclaredParams(oldDelete).includes('sk1_offset'),
+  check('CONTROL: the delete this replaced really does leave a dangling reference to sk1',
+    deps.danglingRefs(oldDelete).some((r) => r.missing === 'sk1'),
     'if this stops failing, the checks below are measuring nothing: '
-      + JSON.stringify([usesRemovedIds(oldDelete, ALL), undeclaredParams(oldDelete)]));
+      + JSON.stringify(deps.danglingRefs(oldDelete)));
 
   check('...and the cascading delete leaves none',
-    usesRemovedIds(deps.withoutFeatures(DOC, ['sk1']), ALL).length === 0
-      && undeclaredParams(deps.withoutFeatures(DOC, ['sk1'])).length === 0,
-    JSON.stringify([usesRemovedIds(deps.withoutFeatures(DOC, ['sk1']), ALL),
-      undeclaredParams(deps.withoutFeatures(DOC, ['sk1']))]));
+    deps.danglingRefs(deps.withoutFeatures(DOC, ['sk1'])).length === 0,
+    JSON.stringify(deps.danglingRefs(deps.withoutFeatures(DOC, ['sk1']))));
   check('...for a delete anywhere in the chain',
     ['pull1', 'hole1', 'b1', 'cut1'].every((id) => {
       const d = deps.withoutFeatures(DOC, [id]);
-      return usesRemovedIds(d, ALL).length === 0
-        && undeclaredParams(d).length === 0
-        && deps.danglingRefs(d).length === 0;
+      return deps.danglingRefs(d).length === 0;
     }),
     'one of the four leaves a broken document');
   check('...and for deleting everything at once',

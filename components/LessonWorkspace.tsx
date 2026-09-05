@@ -139,7 +139,7 @@ export default function LessonWorkspace({
   // the Reset button (which also restores the starter).
   const [solutionLoaded, setSolutionLoaded] = useState(false);
   // Last runtime error from the most recent run (uncaught exception in console
-  // mode, or a `preview-error` postMessage from the q5/jscad iframe). Blocks
+  // mode, or a `preview-error` postMessage from the moSHion/reSHape iframe). Blocks
   // Submit even when every requirement is green — otherwise students could
   // submit code that satisfies static graders but crashes at runtime.
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
@@ -450,7 +450,7 @@ export default function LessonWorkspace({
     setRuntimeError(null);
   }
 
-  // Listen for uncaught errors from the q5/jscad iframe runner. The runner
+  // Listen for uncaught errors from the moSHion/reSHape iframe runner. The runner
   // posts `preview-error` for window.onerror + unhandledrejection events;
   // those are the only signals that mean "code crashed", as opposed to
   // student calls to console.error.

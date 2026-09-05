@@ -116,11 +116,11 @@ console.log(`compiled ${SOURCES.length} sources, rewrote imports in ${rewritten}
 // not committed. runner-brep.html draws with three.js instead of
 // @jscad/regl-renderer, and an ES module import of three needs the SAME
 // Access-Control-Allow-Origin cover the OpenCascade module needs -- see the
-// file-header comment on why /reshape/kernel/ carries that header and
-// public/reshape/lib/ (the classic-script JSCAD bundles) does not. There is no
-// UMD build of three.js any more (dropped upstream), so a <script src> tag
-// cannot load it; it has to be an ES module, which is what puts it here rather
-// than beside jscad-modeling.min.js.
+// file-header comment on why /reshape/kernel/ carries that header, which the
+// now-deleted public/reshape/lib/ (the classic-script JSCAD bundles) never
+// needed to. There is no UMD build of three.js any more (dropped upstream),
+// so a <script src> tag cannot load it; it has to be an ES module, which is
+// what puts it here rather than beside the (now-deleted) jscad-modeling.min.js.
 // three.module.min.js imports `from "./three.core.min.js"` -- a recent-ish
 // split upstream that is easy to miss because node_modules/three's own
 // package.json "exports" map hides it entirely (it resolves "three" straight

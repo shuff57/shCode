@@ -243,16 +243,18 @@ export const SURFACE: SurfaceName[] = [
       + 'the corner chosen per axis. This is what sit() is built on.',
     needs: 'Bnd_Box + BRepBndLib, then a translate', kernel: ['Bnd_Box'] },
   // turn and sit have no `module` to be exported from -- neither is a
-  // @jscad/modeling name at all, renamed or otherwise. They are the two of
-  // reSHape's twelve extra names (public/reshape/reshape.js) that are not a
-  // pure rename plus a bracket: turn pivots about the shape's own middle where
-  // rotate spins about the world origin, and sit refuses the options align
-  // accepts. Both are still fully specified against real library calls --
-  // occt-api.ts's own banner calls turn out by name as the one deliberate
-  // divergence -- so they get a verdict here too, and
-  // scripts/test-script-surface.mjs's RESHAPE_ONLY set is what keeps the
-  // "every classified name is a real @jscad/modeling export" control from
-  // reading these two as stale.
+  // @jscad/modeling name at all, renamed or otherwise. They were two of
+  // reSHape's twelve extra names (the now-deleted public/reshape/reshape.js)
+  // that were not a pure rename plus a bracket: turn pivots about the
+  // shape's own middle where rotate spins about the world origin, and sit
+  // refuses the options align accepts. Both are still fully specified
+  // against real library calls -- occt-api.ts's own banner calls turn out by
+  // name as the one deliberate divergence -- so they get a verdict here too,
+  // even with no live JSCAD export list left to check them against
+  // (scripts/test-script-surface.mjs's own "documented examples against the
+  // classification" section, which used to hold this pair against a real
+  // @jscad/modeling export list, has no engine-independent form and is left
+  // undone -- see that file's header).
   { name: 'sit', module: 'transforms', proof: 'bbox-arithmetic', serves: 'recipe',
     note: 'align with modes fixed to [\'none\', \'none\', \'min\'] -- the exact recipe '
       + 'align already proves, just with X and Y left alone.',

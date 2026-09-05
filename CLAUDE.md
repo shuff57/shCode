@@ -106,18 +106,39 @@ chrome, not controls (the docked Rules column, the timeline strip), and a
 win over an invalid bar shot is void until the bar is recaptured with its
 sizes proven by the bar's own Measure tool.
 
+**Update, 2026-09-05, later.** The JSCAD runner is gone: `public/reshape/runner.html`,
+`public/reshape/reshape.js`, `public/reshape/svg.js`, the vendored bundles under
+`public/reshape/lib/`, `public/reshape/docs/jscad-legacy.md`, and the scripts that
+only ever measured them (`test-reshape.mjs`, `reshape-harness.mjs`,
+`reshape-simple-checks.mjs`, `reshape-checks.mjs`, `reshape-render-check.mjs`,
+`reshape-build-harness.cjs`, `check-runner-hoisting.mjs`, `oracle-measure.mjs`) are
+all deleted. `lib/model-codegen.ts`'s `toReshape()` (the JSCAD text emitter) is
+deleted with it; the file keeps only the doc-level helpers (`generatedParams`,
+`applyParam`, `paramValues`, `solveDoc`, `solveSketchDrag`) that `lib/reshape-script.ts`
+and `lib/reshape-script-gen.ts` still import. `?engine=jscad` and `?script=0` no
+longer exist — the kernel is the only engine, unconditionally, on both sides.
+`.gauntlet/oracle.json` is now a frozen fixture: it was recorded from
+`@jscad/modeling` 2.13.0 by the now-deleted `oracle-measure.mjs` and can no longer
+be regenerated, so `scripts/test-occt-adapter.mjs` reads it as a fixed baseline
+going forward (its `exact` fields are the real targets; the tessellated `volume`
+field is history). The docs live preview and the docs-drawer snippet, which used
+to send reSHape Script to the JSCAD runner and fail with `ReferenceError: box is
+not defined`, now run through `components/ReshapeScriptPreview.tsx` onto the
+kernel, same as everywhere else.
+
 ### Where the line already falls
 
-Measured 2026-09-01 across the 55 files that round of work touched:
+Measured 2026-09-01 across the 55 files that round of work touched (see the
+2026-09-05 update above for what has since been deleted outright):
 
 | Layer | Couples to JSCAD? |
 | --- | --- |
 | `lib/least-squares.ts`, `lib/sketch-solve.ts`, `lib/sketch-arc.ts` | **no** -- zero mentions |
 | `components/model/*` (Rules panel, handles, overlay) | **no** -- zero mentions |
 | `lib/model-types.ts` (`ModelDoc`, the Feature kinds) | comments only |
-| **`lib/model-codegen.ts`** | **yes -- 11 real call sites. This is the translation layer** |
-| `public/reshape/reshape.js` + `public/reshape/lib/` | yes -- the shim and the bundle |
-| `public/reshape/docs/reference.md` + its 227 examples | yes -- they teach JSCAD's API by name |
+| **`lib/model-codegen.ts`** | no longer emits engine calls at all -- `toReshape()` is deleted; the surviving exports are doc-level only |
+| `public/reshape/reshape.js` + `public/reshape/lib/` | **deleted** -- was the shim and the bundle |
+| `public/reshape/docs/reference.md` + its 227 examples | **deleted the JSCAD half** -- reference.md now teaches reSHape Script only (public/reshape/docs/jscad-legacy.md, the JSCAD copy, is deleted) |
 
 `ModelDoc` is the interface and it is already the right one. Everything above it
 is first-party and portable; `model-codegen.ts` is the one file that turns a

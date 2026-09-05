@@ -517,8 +517,8 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
   const ops = new Map<string, OpRecord[]>();
   const sweeps = new Map<string, SweepRecord>();
   // Half A of the silent-fillet-refusal fix: something has to notice a
-  // refusal and say why, in the words this repo already uses elsewhere
-  // (whyNotOnJscad, whyCannotRound, whyCannotRoundCorner). These three are
+  // refusal and say why, in the sentence-with-a-reason pattern this repo
+  // already uses elsewhere (whyCannotRound, whyCannotRoundCorner). These are
   // exactly what whyNameLost() itself needs and nothing more -- computed
   // once here because they only depend on `doc`, not on anything built so
   // far, and every fillet in the loop below can share them.
@@ -568,9 +568,9 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
       }
     } else if (f.kind === 'sketch') {
       // A sketch is kept as a FACE, not a solid. Nothing renders it on its
-      // own -- an extrude or a revolve consumes it -- which is the same rule
-      // the JSCAD path follows and why a bare sketch is not returned as the
-      // model.
+      // own -- an extrude or a revolve consumes it -- the same rule the old
+      // JSCAD path followed too, and why a bare sketch is not returned as
+      // the model.
       if (arc) {
         const marks: Mark[] = [];
         shape = sketchFace(oc, arc, f, marks);
@@ -629,9 +629,9 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
         }
       }
     } else if (f.kind === 'blend') {
-      // A REAL loft. On the JSCAD side this is extrudeFromSlices with two
-      // hand-resampled rings and a winding fix; here the kernel skins between
-      // two wires and the resampling problem does not exist.
+      // A REAL loft. On the old JSCAD path this was extrudeFromSlices with
+      // two hand-resampled rings and a winding fix; here the kernel skins
+      // between two wires and the resampling problem does not exist.
       const [loId, hiId] = f.targets;
       const lo = doc.features.find((x) => x.id === loId);
       const hi = doc.features.find((x) => x.id === hiId);
@@ -817,9 +817,8 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
         // NOT the world origin. reSHape mirrors through the part's own face
         // -- whichever of its two faces on this axis sits nearer to zero --
         // so the copy lands touching the part instead of being flung across
-        // the origin. That is a documented behavioural contract of the app
-        // (see mirrorThroughFace in lib/model-codegen.ts) and the adapter
-        // owes it. Mirroring through the origin instead gave the right
+        // the origin. That is a documented behavioural contract of the app,
+        // and the adapter owes it. Mirroring through the origin instead gave the right
         // VOLUME and a bounding box 40 units wrong, which is exactly the
         // shape of bug that passes a careless check.
         const b = measureShape(oc, src);
@@ -841,13 +840,12 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
         shape = boolean('BRepAlgoAPI_Fuse', src, flipped, f.id, [f.target]);
       }
     } else if (f.kind === 'pattern') {
-      // Matches patternLines() in lib/model-codegen.ts exactly: at i = 0 both
-      // modes are identity, so the loop's first instance IS the original,
-      // unmoved -- f.count total instances (original included) fused into
-      // one shape. Circular orbits the WORLD axis (a line through the origin
-      // along f.axis), NOT the target's own centre -- see that function's
-      // own long comment on why the centre-of-target pivot was tried and was
-      // wrong (every copy lands on the original, unions into one no-op).
+      // At i = 0 both modes are identity, so the loop's first instance IS
+      // the original, unmoved -- f.count total instances (original
+      // included) fused into one shape. Circular orbits the WORLD axis (a
+      // line through the origin along f.axis), NOT the target's own centre
+      // -- a centre-of-target pivot was tried and was wrong: every copy
+      // lands back on the original, unioning into one no-op.
       const src = built.get(f.target);
       if (src) {
         if (f.count < 1) {
@@ -891,10 +889,9 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
         }
       }
     } else if (f.kind === 'hole') {
-      // Sugar over cylinder + subtract, exactly mirroring the JSCAD
-      // behavioural contract in featureExpr()'s 'hole' branch and
-      // holePatternLines() in lib/model-codegen.ts: f.center is an offset
-      // from the TARGET's own bounding-box centre, never a world position.
+      // Sugar over cylinder + subtract. f.center is an offset from the
+      // TARGET's own bounding-box centre, never a world position -- a
+      // documented behavioural contract of the app.
       const src = built.get(f.target);
       if (src) {
         if (f.diameter <= 0 || f.depth <= 0) {
@@ -927,8 +924,7 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
             // own grows-from-zero placement -- then tilted to lie along
             // f.axis: 'x' -> rotate 90 deg about Y, 'y' -> rotate 90 deg
             // about X, 'z' -> no rotation, since the bore's own local axis
-            // already starts along Z. See the hole codegen's `tilted` var in
-            // lib/model-codegen.ts.
+            // already starts along Z.
             const bore = () => {
               let cyl = new oc.BRepPrimAPI_MakeCylinder(f.diameter / 2, f.depth).Shape();
               cyl = moved(oc, cyl, [0, 0, -f.depth / 2]);
@@ -952,8 +948,7 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
                 ]
               : [[cx, cy, cz]];
             // All bores fused into ONE tool before the cut -- not a chain of
-            // N separate cuts -- matching holePatternLines()'s own comment on
-            // why that matters: overlapping bores subtracted one at a time
+            // N separate cuts: overlapping bores subtracted one at a time
             // can have a later cut refill material the earlier one just
             // removed. This fuse is scratch tool-building, not a
             // target-history step, so it is NOT recorded into `ops`; only the
@@ -970,11 +965,11 @@ export function buildDoc(oc: Occt, doc: ModelDoc, arc?: any): BuildResult {
         }
       }
     } else if (f.kind === 'shell') {
-      // JSCAD's shellOp() is an explicitly-documented approximation: scale a
-      // copy of the whole body inward around its own bbox centre and
-      // subtract it, because the vendored bundle has no boolean offset --
-      // see that function's own comment in lib/model-codegen.ts. OCCT has
-      // the real operation: BRepOffsetAPI_MakeThickSolid with an EMPTY
+      // The old JSCAD path's shell was an explicitly-documented
+      // approximation: scale a copy of the whole body inward around its own
+      // bbox centre and subtract it, because the vendored bundle had no
+      // boolean offset. OCCT has the real operation:
+      // BRepOffsetAPI_MakeThickSolid with an EMPTY
       // closing-face list computes a genuine constant-distance inward offset
       // of the WHOLE solid -- measured against the kernel directly: a
       // 100x20x20 box offset by -2 comes back inset by exactly 2 on every

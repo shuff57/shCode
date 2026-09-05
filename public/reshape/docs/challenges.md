@@ -1,4 +1,12 @@
-# JSCAD Challenges
+# JSCAD Challenges (not yet converted to reSHape Script)
+
+**Known gap, not current teaching material.** These challenges are still
+written against the JSCAD `require`/`main()`/`module.exports` idiom and the
+real `@jscad/modeling` API (v2.13.0) — the JSCAD runner that ran them is
+retired (see CLAUDE.md's "JSCAD is retired" section), and unlike
+`reference.md` this file was not converted to reSHape Script along with it.
+A student cannot run any of the code below in this app today. Left as
+historical reference until it is rewritten; do not point a student at it.
 
 Challenge ideas written against the real `@jscad/modeling` API (v2.13.0) and
 the course's Q3–Q4 progression. Each challenge has:

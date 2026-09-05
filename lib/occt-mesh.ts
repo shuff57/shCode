@@ -8,11 +8,12 @@
 //
 // WHAT IT HANDS BACK, and why that shape. A plain JSCAD `geom3`:
 // `{ polygons: [{ vertices: [[x,y,z] x3] }], transforms }`. Not a new format --
-// the SAME object @jscad/modeling produces, so public/reshape/runner.html's
-// regl renderer draws an OpenCascade solid with no change to the renderer, the
-// runner, or the preview component. The alternative was a second renderer
-// beside the first, which would have made the swap an all-or-nothing cutover
-// instead of something one lesson can try.
+// the SAME object @jscad/modeling produces, so the (now-deleted) JSCAD regl
+// renderer could draw an OpenCascade solid with no change to the renderer,
+// the runner, or the preview component -- letting the swap ship one lesson
+// at a time instead of as an all-or-nothing cutover. The three.js path
+// (lib/occt-three.ts, components/model/BrepViewportThree.tsx) that replaced
+// it consumes this same tessellation.
 //
 // DEFLECTION IS THE DIAL, and it is the same question the hull recipe is parked
 // on: how finely to sample a curved surface. It is the accuracy/speed trade for

@@ -3,7 +3,7 @@
 // vocabulary while the code beside it is reSHape. Body text and code drifted
 // apart when the examples were converted; this measures the gap and keeps it shut.
 import { readFileSync } from 'node:fs';
-import { dslVocabulary } from './reshape-harness.mjs';
+import { dslVocabulary } from './reshape-docs-text.mjs';
 
 const SRC = new URL('../lib/reshape-docs.ts', import.meta.url);
 const text = readFileSync(SRC, 'utf8');
