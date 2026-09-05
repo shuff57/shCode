@@ -47,6 +47,7 @@ import {
   type TorusFeature,
   type SphereFeature,
   type SketchFeature,
+  type SketchConstraint,
   type FilletFeature,
   type DraftFeature,
   type ShellFeature,
@@ -70,6 +71,22 @@ import {
   whyCannotOrbit,
 } from './model-types';
 import { generatedParams, applyParam, pname } from './model-codegen';
+// addConstraintSettling is the SAME beginner-friendly settle a click on the
+// Rules panel runs through (components/model/SketchConstraints.tsx's own
+// settle()) -- reused rather than re-derived, so a script call and a click
+// that "mean the same thing" leave the sketch in the identical state: an
+// older rule quietly dropped when that resolves a fresh conflict, or the new
+// rule left in place, fighting, when it does not -- see SPEC-d2-rules-in-script.md.
+// `describe` is aliased -- this file already has its own local `describe()`
+// for error messages (line 296), unrelated to sketch-solve.ts's constraint-
+// naming one ("edge 1 = edge 2").
+import {
+  addConstraintSettling,
+  seedForNewRule,
+  solveSketch,
+  collapsedByRatio,
+  describe as describeConstraint,
+} from './sketch-solve';
 import type { TopoName } from './topo-name';
 
 // ---------------------------------------------------------------------------
@@ -121,6 +138,16 @@ export interface RunResult {
    *  NamedParamDef's own comment. Empty when the script named nothing. */
   namedParams: NamedParamDef[];
   errors: ScriptError[];
+  /**
+   * A rule call (.equal(), .pin(), ...) that never halts the script -- see
+   * applyConstraint()'s own comment. Populated only when a freshly-added
+   * sketch rule could not be cleanly settled by dropping one older rule and
+   * is left in the constraint list still fighting, same as a live Rules
+   * panel conflict. Empty on every script that never touches a rule, or
+   * whose rules all settle. Optional so nothing that destructures RunResult
+   * before this field existed has to change.
+   */
+  warnings?: string[];
 }
 
 /**
@@ -324,9 +351,10 @@ function optionalNumber(fn: string, label: string, v: unknown): number | undefin
  * its siblings exist to close elsewhere in this app -- a control that
  * quietly does something other than what was asked, with nothing on screen
  * saying so. `${fn}():` (with the parens) is a deliberately different
- * template from requiredNumber()'s `${fn}'s ${label}` -- this is a distinct
- * failure ("the number means something impossible"), not "not a number at
- * all", and the two should never read as the same sentence reworded.
+ * template from the `${fn}'s ${label}` one requiredNumber() uses -- this is
+ * a distinct failure ("the number means something impossible"), not "not a
+ * number at all", and the two should never read as the same sentence
+ * reworded.
  */
 function positiveNumber(fn: string, label: string, v: unknown): number {
   const n = requiredNumber(fn, label, v);
@@ -349,6 +377,23 @@ function wholeNumberAtLeastOne(fn: string, label: string, v: unknown): number {
     throw new Error(`${fn}(): ${label} has to be a whole number of at least 1 -- got ${val}.`);
   }
   return n;
+}
+
+/**
+ * A rule call's edge or corner number -- the Rules panel's own 1-based
+ * numbering (edgeCorners()/the panel's row index + 1), bounded to the
+ * sketch's actual edge count so `sk.across(9)` on a rectangle is refused
+ * the same way an out-of-range param() slot would be, rather than handed to
+ * the solver as a silently-wrapped index. Returns the 0-based design index
+ * sketch-solve.ts's Constraint shape stores.
+ */
+function wholeIndex(fn: string, label: string, v: unknown, count: number): number {
+  const n = requiredNumber(fn, label, v);
+  const val = unwrap(n);
+  if (!Number.isInteger(val) || val < 1 || val > count) {
+    throw new Error(`${fn}'s ${label} has to be a whole number from 1 to ${count} -- you gave it ${val}.`);
+  }
+  return val - 1;
 }
 
 function isPlainOptions(v: unknown): v is Record<string, unknown> {
@@ -475,6 +520,17 @@ export interface SketchHandle {
   polygon(points: unknown): SketchHandle;
   round(corner: unknown, radius: unknown): SketchHandle;
   chamfer(corner: unknown, distance: unknown): SketchHandle;
+  // The Rules panel, one call per row -- SketchConstraints.tsx's own words
+  // (its "Across"/"Up" columns, its pair grid's "equal"/"parallel"/
+  // "perpendicular" labels, its "Pin a corner" row), not a renamed synonym.
+  // Edge and corner numbers are 1-based, the same numbers the panel shows.
+  across(edge: unknown): SketchHandle;
+  up(edge: unknown): SketchHandle;
+  length(edge: unknown, value: unknown): SketchHandle;
+  equal(edge: unknown, other: unknown): SketchHandle;
+  parallel(edge: unknown, other: unknown): SketchHandle;
+  perpendicular(edge: unknown, other: unknown): SketchHandle;
+  pin(corner: unknown): SketchHandle;
 }
 
 function isHandle(v: unknown): v is SolidHandle {
@@ -502,6 +558,8 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
   // the Build tool's automatic one for that slot. See num()'s own comment.
   const slotOverrides = new Map<string, string>();
   const usedParamNames = new Set<string>();
+  // See applyConstraint()'s own comment and RunResult.warnings.
+  const ruleWarnings: string[] = [];
 
   const docNow = (): ModelDoc => ({ version: 1, features });
 
@@ -681,6 +739,81 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
     return makeSketchHandle(f.id);
   }
 
+  /** True when a and b are the same rule on the same edge(s)/corner --
+   *  used to make a rule call idempotent (calling across() a second time
+   *  is a no-op, not a toggle-off: a script re-run has to land on the same
+   *  doc every time, which a click-driven toggle cannot promise). */
+  function sameConstraint(a: SketchConstraint, b: SketchConstraint): boolean {
+    if (a.kind !== b.kind) return false;
+    if (a.kind === 'lock' && b.kind === 'lock') return a.corner === b.corner;
+    if (a.kind === 'length' && b.kind === 'length') return a.edge === b.edge && a.value === b.value;
+    if ((a.kind === 'horizontal' || a.kind === 'vertical') && 'edge' in b) return a.edge === b.edge;
+    if ('other' in a && 'other' in b) return a.edge === b.edge && a.other === b.other;
+    return false;
+  }
+
+  /** Is c a pair rule (equal/parallel/perpendicular) already sitting on
+   *  this exact pair of edges, regardless of which of the three it is? Used
+   *  to replace rather than stack -- SketchConstraints.tsx's cyclePair() only
+   *  ever keeps one pair rule per pair, and a script call means the same
+   *  thing a click through that grid does. */
+  function isPairOn(c: SketchConstraint, edge: number, other: number): boolean {
+    return (c.kind === 'equal' || c.kind === 'parallel' || c.kind === 'perpendicular')
+      && c.edge === edge && c.other === other;
+  }
+
+  /**
+   * Adds one rule to sketch sketchId, through the exact settling path the
+   * live Rules panel uses (addConstraintSettling) -- so a fresh conflict
+   * resolves itself by dropping an older rule when that fixes it, and is
+   * left in the constraint list, fighting, when it does not. Either way the
+   * result is written straight into the feature's constraints, same as
+   * SketchConstraints.tsx's own settle(); the POINTS are left for whatever
+   * already re-solves a doc on adoption (lib/model-codegen.ts's solveDoc) --
+   * this function only ever changes which rules apply, never the geometry.
+   *
+   * NEVER throws for a rule that simply cannot hold. That is a refusal a
+   * beginner asked for on purpose (equal/parallel/perpendicular/length can
+   * always disagree with an earlier rule), not a mistake in the call itself
+   * -- so the script keeps going, exactly like every other kernel-level
+   * refusal this file's own docs describe, and the sketch is left fighting
+   * for the Rules panel to show the moment you look at it, the same as a
+   * click would. RunResult.warnings carries the house sentence for a caller
+   * that never opens Build to look.
+   */
+  function applyConstraint(sketchId: string, added: SketchConstraint) {
+    const cur = findFeature(sketchId) as SketchFeature;
+    const existing = cur.constraints ?? [];
+    if (existing.some((c) => sameConstraint(c, added))) return; // idempotent
+    let base = existing;
+    if (added.kind === 'horizontal' || added.kind === 'vertical') {
+      // Across and Up on one edge is a contradiction, not a stack -- same
+      // cleanup toggle() does before settling a fresh horizontal/vertical.
+      const opposite = added.kind === 'horizontal' ? 'vertical' : 'horizontal';
+      base = base.filter((c) => !(c.kind === opposite && 'edge' in c && c.edge === added.edge));
+    } else if (added.kind === 'equal' || added.kind === 'parallel' || added.kind === 'perpendicular') {
+      base = base.filter((c) => !isPairOn(c, added.edge, added.other));
+    }
+    const next = [...base, added];
+    const points = cur.points.map((p): [number, number] => [p[0], p[1]]);
+    const result = addConstraintSettling(points, next);
+    replaceFeature(sketchId, { ...cur, constraints: result.constraints });
+    // result.removed === null covers TWO cases: the rule fit cleanly (fine,
+    // nothing to say), or nothing removed made it fit (genuinely fighting).
+    // Tell them apart the same way addConstraintSettling's own isBad() does,
+    // rather than trusting removed === null to mean either on its own.
+    if (result.removed === null) {
+      const seed = seedForNewRule(points, result.constraints);
+      const solved = solveSketch(seed, result.constraints);
+      if (solved.overConstrained || collapsedByRatio(points, solved.points)) {
+        ruleWarnings.push(
+          `${describeConstraint(added)} cannot hold along with the rules already on this sketch -- `
+            + `the shape is as close as it can get to all of them. Remove one to settle it.`
+        );
+      }
+    }
+  }
+
   function makeSketchHandle(id: string): SketchHandle {
     const handle: SketchHandle = {
       __reshapeSketch: true,
@@ -767,6 +900,58 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
         const cur = findFeature(id) as SketchFeature;
         const chamfers = { ...(cur.chamfers ?? {}), [k]: dist };
         replaceFeature(id, { ...cur, chamfers });
+        return handle;
+      },
+      across(edge) {
+        const cur = findFeature(id) as SketchFeature;
+        const e = wholeIndex('.across()', 'edge', edge, cur.points.length);
+        applyConstraint(id, { kind: 'horizontal', edge: e });
+        return handle;
+      },
+      up(edge) {
+        const cur = findFeature(id) as SketchFeature;
+        const e = wholeIndex('.up()', 'edge', edge, cur.points.length);
+        applyConstraint(id, { kind: 'vertical', edge: e });
+        return handle;
+      },
+      length(edge, value) {
+        const cur = findFeature(id) as SketchFeature;
+        const e = wholeIndex('.length()', 'edge', edge, cur.points.length);
+        const v = positiveNumber('.length()', 'value', value);
+        applyConstraint(id, { kind: 'length', edge: e, value: num(v, id, `len${e}`) });
+        return handle;
+      },
+      equal(edge, other) {
+        const cur = findFeature(id) as SketchFeature;
+        const count = cur.points.length;
+        const a = wholeIndex('.equal()', 'edge', edge, count);
+        const b = wholeIndex('.equal()', 'other', other, count);
+        if (a === b) throw new Error('.equal() needs two DIFFERENT edges.');
+        applyConstraint(id, { kind: 'equal', edge: Math.min(a, b), other: Math.max(a, b) });
+        return handle;
+      },
+      parallel(edge, other) {
+        const cur = findFeature(id) as SketchFeature;
+        const count = cur.points.length;
+        const a = wholeIndex('.parallel()', 'edge', edge, count);
+        const b = wholeIndex('.parallel()', 'other', other, count);
+        if (a === b) throw new Error('.parallel() needs two DIFFERENT edges.');
+        applyConstraint(id, { kind: 'parallel', edge: Math.min(a, b), other: Math.max(a, b) });
+        return handle;
+      },
+      perpendicular(edge, other) {
+        const cur = findFeature(id) as SketchFeature;
+        const count = cur.points.length;
+        const a = wholeIndex('.perpendicular()', 'edge', edge, count);
+        const b = wholeIndex('.perpendicular()', 'other', other, count);
+        if (a === b) throw new Error('.perpendicular() needs two DIFFERENT edges.');
+        applyConstraint(id, { kind: 'perpendicular', edge: Math.min(a, b), other: Math.max(a, b) });
+        return handle;
+      },
+      pin(corner) {
+        const cur = findFeature(id) as SketchFeature;
+        const c = wholeIndex('.pin()', 'corner', corner, cur.points.length);
+        applyConstraint(id, { kind: 'lock', corner: c });
         return handle;
       },
     };
@@ -1228,7 +1413,10 @@ export function runScript(source: string, opts: RunOptions = {}): RunResult {
     slots: slotsByParamName.get(def.name) ?? [],
   }));
 
-  return { doc: finalDoc, params, namedParams: namedParamsOut, errors };
+  return {
+    doc: finalDoc, params, namedParams: namedParamsOut, errors,
+    ...(ruleWarnings.length > 0 ? { warnings: ruleWarnings } : {}),
+  };
 }
 
 // ---------------------------------------------------------------------------

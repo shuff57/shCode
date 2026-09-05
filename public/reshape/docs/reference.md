@@ -520,6 +520,77 @@ const shape = pull(sk, 25)
 
 A complex shape extruded from a sketch with multiple elements.
 
+**Rules on a sketch.** The Rules panel's own rules -- Across, Up, Length, the equal/parallel/perpendicular pair grid, and Pin a corner -- are also script calls, one per row, in the panel's own words. Edge and corner numbers are 1-based, the same numbers the panel shows. A rule call adds to whatever rules the sketch already has and settles through the exact same path a click in the panel uses, so a rule you set with the mouse is still there after Code -> Run, and a rule you set in a script is still there in the panel on Build.
+
+`sk.across(1)` holds edge 1 horizontal, the panel's "Across" column.
+
+`sk.up(2)` holds edge 2 vertical, the panel's "Up" column.
+
+`sk.length(1, 40)` holds edge 1 at exactly 40 mm.
+
+`sk.equal(2, 4)` holds edges 2 and 4 to the same length as each other.
+
+`sk.parallel(1, 3)` holds edges 1 and 3 parallel to each other.
+
+`sk.perpendicular(1, 2)` holds edges 1 and 2 at a right angle to each other.
+
+`sk.pin(1)` locks corner 1 in place -- the solver may not move it to satisfy anything else.
+
+```js rule-across
+const sk = sketch('top')
+sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
+sk.across(1)
+const shape = pull(sk, 12)
+```
+
+```js rule-up
+const sk = sketch('top')
+sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
+sk.up(2)
+const shape = pull(sk, 12)
+```
+
+```js rule-length
+const sk = sketch('top')
+sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
+sk.length(1, 40)
+const shape = pull(sk, 12)
+```
+
+```js rule-equal
+const sk = sketch('top')
+sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
+sk.equal(2, 4)
+const shape = pull(sk, 12)
+```
+
+```js rule-parallel
+const sk = sketch('top')
+sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
+sk.parallel(1, 3)
+const shape = pull(sk, 12)
+```
+
+```js rule-perpendicular
+const sk = sketch('top')
+sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
+sk.perpendicular(1, 2)
+const shape = pull(sk, 12)
+```
+
+```js rule-pin
+const sk = sketch('top')
+sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
+sk.pin(1)
+const shape = pull(sk, 12)
+```
+
+A rectangular prism, same as `sk.rect(40, 25)` would draw -- these seven examples exist to show the call, not a different shape.
+
+A rule call never stops the script. It settles the same way a click on the panel does: if dropping one OLDER rule would make the new one fit, that rule quietly goes, and the sketch keeps building. If nothing does, the new rule is still added, and the sketch is left fighting -- the same thing you would see by clicking the same rule into the panel by hand:
+
+- **"Edge 1 = edge 2 cannot hold along with the rules already on this sketch -- the shape is as close as it can get to all of them. Remove one to settle it."** Means the two rules genuinely disagree. Switch to Build and remove one from the Rules panel.
+
 ## Parameters
 
 A **param** is a named number that appears as a slider on the Dimensions panel. Change the slider and the model rebuilds automatically.

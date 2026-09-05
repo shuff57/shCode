@@ -128,6 +128,88 @@ function oracleFixtures() {
       { ...sketch('sk1'), chamfers: { 1: 6 } },
       { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
     ),
+    // One fixture per Rules-panel rule kind (SPEC-d2-rules-in-script.md) --
+    // each on the DEFAULT rectangle's own points, but with only the ONE rule
+    // named (not the rectangle's usual four), which is exactly what forces
+    // toScript() off the .rect() shortcut and onto the per-rule .polygon()
+    // + call path this spec adds (hasRectangleConstraints() in
+    // reshape-script-gen.ts requires an EXACT four-rule match). Every rule
+    // here is already true of these exact points, so round-tripping never
+    // asks the solver to move anything -- the fixture is testing that the
+    // call is EMITTED and READ BACK, not that solving converges.
+    'sketch-rule-across': doc(
+      {
+        id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0,
+        points: [[0, 0], [40, 0], [40, 25], [0, 25]],
+        constraints: [{ kind: 'horizontal', edge: 0 }],
+      },
+      { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
+    ),
+    'sketch-rule-up': doc(
+      {
+        id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0,
+        points: [[0, 0], [40, 0], [40, 25], [0, 25]],
+        constraints: [{ kind: 'vertical', edge: 1 }],
+      },
+      { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
+    ),
+    'sketch-rule-length': doc(
+      {
+        id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0,
+        points: [[0, 0], [40, 0], [40, 25], [0, 25]],
+        constraints: [{ kind: 'length', edge: 0, value: 40 }],
+      },
+      { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
+    ),
+    'sketch-rule-equal': doc(
+      {
+        id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0,
+        points: [[0, 0], [40, 0], [40, 25], [0, 25]],
+        constraints: [{ kind: 'equal', edge: 1, other: 3 }],
+      },
+      { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
+    ),
+    'sketch-rule-parallel': doc(
+      {
+        id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0,
+        points: [[0, 0], [40, 0], [40, 25], [0, 25]],
+        constraints: [{ kind: 'parallel', edge: 0, other: 2 }],
+      },
+      { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
+    ),
+    'sketch-rule-perpendicular': doc(
+      {
+        id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0,
+        points: [[0, 0], [40, 0], [40, 25], [0, 25]],
+        constraints: [{ kind: 'perpendicular', edge: 0, other: 1 }],
+      },
+      { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
+    ),
+    'sketch-rule-pin': doc(
+      {
+        id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0,
+        points: [[0, 0], [40, 0], [40, 25], [0, 25]],
+        constraints: [{ kind: 'lock', corner: 0 }],
+      },
+      { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
+    ),
+    // Three rules at once, on a FREE outline (not axis-aligned, not born
+    // from newSketch()'s rectangle default) -- the D2 evidence's own
+    // reproduction shape. Edge 2 (from [30,20] to [10,35], dx=-20 dy=15) is
+    // exactly 25 long, so the length rule is already satisfied and nothing
+    // here needs the solver to move a point either.
+    'sketch-rules-free-outline': doc(
+      {
+        id: 'sk1', kind: 'sketch', plane: 'xy', offset: 0,
+        points: [[0, 0], [30, 0], [30, 20], [10, 35]],
+        constraints: [
+          { kind: 'horizontal', edge: 0 },
+          { kind: 'vertical', edge: 1 },
+          { kind: 'length', edge: 2, value: 25 },
+        ],
+      },
+      { id: 'e1', kind: 'extrude', target: 'sk1', height: 12 },
+    ),
     // 'bowed-edge' (a `bulges`-only sketch, no `rounds`) is EXCLUDED here on
     // purpose: model-types.ts's own doc comment on SketchFeature.bulges calls
     // that shape "a legacy or imported outline" -- something ELSE already

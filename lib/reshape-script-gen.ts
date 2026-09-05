@@ -37,6 +37,7 @@
 import {
   type ModelDoc,
   type SketchFeature,
+  type SketchConstraint,
   newShape,
   newSketch,
   RECTANGLE_CONSTRAINTS,
@@ -113,6 +114,19 @@ function faceWord(part: string): string {
 
 const MIRROR_WORD: Record<string, string> = { yz: 'left-right', xz: 'front-back', xy: 'top-bottom' };
 const PLANE_WORD: Record<string, string> = { xy: 'top', xz: 'front', yz: 'side' };
+
+/** One rule as a script call on sketch variable `v` -- the Rules panel's own
+ *  words (SketchConstraints.tsx's Across/Up columns, its equal/parallel/
+ *  perpendicular pair grid, its Pin a corner row), 1-based, matching
+ *  lib/reshape-script.ts's SketchHandle methods exactly (see that file's own
+ *  comment on why "across"/"up" rather than a synonym like "level"). */
+function constraintCallLine(v: string, c: SketchConstraint): string {
+  if (c.kind === 'horizontal') return `${v}.across(${c.edge + 1})`;
+  if (c.kind === 'vertical') return `${v}.up(${c.edge + 1})`;
+  if (c.kind === 'length') return `${v}.length(${c.edge + 1}, ${lit(c.value)})`;
+  if (c.kind === 'lock') return `${v}.pin(${c.corner + 1})`;
+  return `${v}.${c.kind}(${c.edge + 1}, ${c.other + 1})`; // equal / parallel / perpendicular
+}
 
 /** For every feature id, the script variable that currently represents it --
  *  see the file header. Consuming kinds (hole, shell, fillet, draft,
@@ -366,13 +380,13 @@ export function toScript(doc: ModelDoc, namedParams?: readonly ScriptParamRef[])
           // A rule set by hand through the Rules panel -- equal, parallel,
           // a Length, or the rectangle set itself sitting on a shape .rect()
           // cannot describe (not axis-aligned, a corner dragged off, and so
-          // on) -- has no .polygon() equivalent in the language this round.
-          // Said out loud rather than silently dropped: a generated script
-          // with a bare .polygon() and no comment would read as though
-          // nothing had ever been asked of that edge.
-          if (f.constraints && f.constraints.length > 0) {
-            const n = f.constraints.length;
-            lines.push(`// ${n} rule${n === 1 ? '' : 's'} set in Build ${n === 1 ? 'is' : 'are'} not written here`);
+          // on) -- now has a .polygon() equivalent: one call per rule, in the
+          // Rules panel's own words (SPEC-d2-rules-in-script.md). This used
+          // to emit a `// N rules set in Build are not written here` comment
+          // instead and drop them on the Code -> Run round trip; every rule
+          // in `f.constraints` is written here now, so nothing is lost.
+          for (const c of f.constraints ?? []) {
+            lines.push(constraintCallLine(f.id, c));
           }
         }
         for (const [k, r] of Object.entries(f.rounds ?? {})) {
