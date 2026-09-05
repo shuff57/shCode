@@ -122,6 +122,13 @@ def check_delete_confirm(page):
     check("confirmed Delete removes BOTH Box 1 and Round 1",
           after_delete is not None and len(after_delete) == 1 and "Nothing here yet" in after_delete[0],
           str(after_delete))
+    after_note = page.evaluate(
+        "() => { const n = document.querySelector('.model-note, .model-note-timeline'); return n ? n.textContent : null; }"
+    )
+    check('the after-state says what happened -- "Box 1 and Round 1 removed. Undo puts them back."',
+          after_note is not None and "Box 1" in after_note and "Round 1" in after_note
+          and "removed" in after_note and "Undo" in after_note,
+          str(after_note))
 
     # Undo restores both.
     page.get_by_role("button", name="Undo", exact=True).click()

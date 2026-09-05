@@ -439,7 +439,7 @@ export default function ModelEditor({
   // that would silently cost the student more than they clicked gets a stop
   // sign, the same principle Clear model already applies to wiping the
   // whole document.
-  const [confirmDelete, setConfirmDelete] = useState<{ ids: string[]; message: string } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ ids: string[]; message: string; removedNames: string[] } | null>(null);
   // A note describes something that just happened going FORWARD -- a rule
   // applied, a refusal explained. An Undo/Redo moves the doc a step in
   // TIME instead, and whatever note was on screen may no longer describe
@@ -462,8 +462,23 @@ export default function ModelEditor({
   // An empty document has nothing for a note to be about: Reset clears the
   // model but used to leave "Hollowed, open at the face you clicked." beside
   // "Nothing here yet" (moderate lens, round 2).
+  //
+  // suppressEmptyNoteClear is the one exception: a cascading Delete that
+  // empties the WHOLE document is exactly the case item B/D4's after-state
+  // note exists for ("Box 1 and Round 1 removed. Undo puts them back.") --
+  // without it, this same effect fired on the very same features.length
+  // transition and wiped that note before a student ever saw it.
+  const suppressEmptyNoteClear = useRef(false);
   useEffect(() => {
-    if (doc.features.length === 0) { setNote(null); setLastRuleTouched(null); setConfirmDelete(null); }
+    if (doc.features.length === 0) {
+      if (suppressEmptyNoteClear.current) {
+        suppressEmptyNoteClear.current = false;
+      } else {
+        setNote(null);
+      }
+      setLastRuleTouched(null);
+      setConfirmDelete(null);
+    }
   }, [doc.features.length]);
   const [search, setSearch] = useState('');
   const [menu, setMenu] = useState<MenuId>(null);
@@ -1267,7 +1282,12 @@ export default function ModelEditor({
         : extraNames.slice(0, -1).join(', ') + ' and ' + extraNames[extraNames.length - 1];
       const subject = asked.length === 1 ? (names[asked[0]] ?? asked[0]) : 'these';
       const verb = extraNames.length === 1 ? 'goes' : 'go';
-      setConfirmDelete({ ids: asked, message: `Delete ${subject}? ${list} ${verb} with it.` });
+      // In timeline order, everything that is actually about to go --
+      // `doomed` already contains `asked` itself (orphanedBy seeds with it),
+      // so filtering doc.features by membership gives asked+extras together
+      // in the order the panel shows them, for the after-state note below.
+      const removedNames = doc.features.filter((f) => doomed.includes(f.id)).map((f) => names[f.id] ?? f.id);
+      setConfirmDelete({ ids: asked, message: `Delete ${subject}? ${list} ${verb} with it.`, removedNames });
       return;
     }
     onChange(withoutFeatures(doc, asked));
@@ -1277,10 +1297,26 @@ export default function ModelEditor({
 
   function confirmRemove() {
     if (!confirmDelete) return;
-    onChange(withoutFeatures(doc, confirmDelete.ids));
+    const next = withoutFeatures(doc, confirmDelete.ids);
+    // See suppressEmptyNoteClear's own comment: without this, the very
+    // features.length transition this delete causes wipes the note two
+    // lines below before it is ever seen.
+    if (next.features.length === 0) suppressEmptyNoteClear.current = true;
+    onChange(next);
     setSelected([]);
+    // The after-state, not just the before-state warning: a cascading
+    // delete can leave the canvas completely empty (D4's own repro did),
+    // and an empty canvas with no explanation reads as broken, not as "it
+    // did what the confirm said it would". Names every removed feature,
+    // asked-for and dependent alike, same join convention the confirm
+    // message itself uses.
+    const removed = confirmDelete.removedNames;
+    const list = removed.length === 1
+      ? removed[0]
+      : removed.slice(0, -1).join(', ') + ' and ' + removed[removed.length - 1];
+    const verb = removed.length === 1 ? 'was' : 'were';
     setConfirmDelete(null);
-    say(null);
+    say(`${list} ${verb} removed. Undo puts ${removed.length === 1 ? 'it' : 'them'} back.`);
   }
 
   function cancelRemove() {

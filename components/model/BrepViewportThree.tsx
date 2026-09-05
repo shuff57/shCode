@@ -69,7 +69,7 @@ import type { Feature, ModelDoc } from '../../lib/model-types';
 import { topLevel } from '../../lib/model-types';
 import { edgesToThree, tessellateToThree, type FaceRange } from '../../lib/occt-three';
 import { facesOf, nameEdgeOnCurrentShape, nameFaceOnCurrentShape, resolveName } from '../../lib/topo-resolve';
-import type { TopoName } from '../../lib/topo-name';
+import { rootFeature, type TopoName } from '../../lib/topo-name';
 import type { BuildResult } from '../../lib/occt-build';
 import type { HandleSpec } from '../../lib/model-handles';
 import type { AnchorPoint } from './HandleOverlay';
@@ -152,8 +152,65 @@ export interface BrepViewportStats {
  * build a Fillet, or an open Hollow, from it.
  */
 export type ViewportPick =
-  | { kind: 'face'; target: string; faceIndex: number; name: TopoName | null }
-  | { kind: 'edge'; target: string; name: TopoName | null };
+  | { kind: 'face'; target: string; faceIndex: number; name: TopoName | null; size?: [number, number] }
+  | { kind: 'edge'; target: string; name: TopoName | null; size?: number };
+
+/**
+ * Item H (P20): the picked face's own in-plane size, e.g. [40, 40] for a
+ * box's top face -- read off the BUILT geometry (a real bounding box on
+ * this one face, not the doc's own fields), so it stays right after a
+ * Round, Hole or Hollow reshapes the solid those fields still describe.
+ *
+ * A planar, axis-aligned face (every primitive's own flat face, and every
+ * flat face a Hollow/Hole/Round leaves alone) has one bbox axis pinned to
+ * (near) zero width -- its own normal. Dropping that axis and reporting
+ * the other two, smallest first for a stable "W x D" reading regardless of
+ * which world axes they happen to be, is exactly "40 x 40". A curved or
+ * non-axis-aligned face has no single degenerate axis to drop; null there
+ * rather than a bbox number nobody asked for and nobody could act on.
+ */
+function faceSize(oc: any, face: any): [number, number] | null {
+  // Defensive, not load-bearing: a size the kernel could not compute (a
+  // binding-signature mismatch on some build, a degenerate face) is a
+  // missing THIRD word in the pill, never a reason to lose the pick
+  // itself -- see hitAt()'s own caller, which still needs `name` even
+  // when this returns null.
+  try {
+    const box = new oc.Bnd_Box();
+    oc.BRepBndLib.Add(face, box, true);
+    if (box.IsVoid?.()) return null;
+    const lo = box.CornerMin();
+    const hi = box.CornerMax();
+    const extents = [hi.X() - lo.X(), hi.Y() - lo.Y(), hi.Z() - lo.Z()];
+    const flatAxis = extents.findIndex((e) => e < 0.05);
+    if (flatAxis < 0) return null;
+    const rest = extents.filter((_, i) => i !== flatAxis).sort((a, b) => a - b);
+    const round = (n: number) => Math.round(n * 100) / 100;
+    return [round(rest[0]), round(rest[1])];
+  } catch {
+    return null;
+  }
+}
+
+/** Item H: a picked edge's own length -- true arc length via
+ *  BRepGProp.LinearProperties (a curved edge's length is not its two
+ *  endpoints' straight-line distance), so a rounded edge reads correctly
+ *  too, not just a straight one. */
+function edgeLength(oc: any, edge: any): number | null {
+  try {
+    const g = new oc.GProp_GProps();
+    // Same (shape, props, ...flags) shape as VolumeProperties/
+    // SurfaceProperties elsewhere in this codebase (see occt-build.ts's
+    // measureShape) -- this build's binding refuses the 2-argument call
+    // outright (measured: "invalid signature ... expects
+    // (TopoDS_Shape,GProp_GProps,boolean,boolean)").
+    oc.BRepGProp.LinearProperties(edge, g, false, false);
+    const len = g.Mass();
+    return Number.isFinite(len) && len > 0 ? Math.round(len * 100) / 100 : null;
+  } catch {
+    return null;
+  }
+}
 
 interface Props {
   doc: ModelDoc;
@@ -978,9 +1035,37 @@ export default function BrepViewportThree({
       // itself (which stays exactly as strict, and still does its real job
       // of rejecting a genuinely hidden edge glimpsed through open space).
       const dist = camera.position.distanceTo(controls.target);
-      for (const c of candidates) {
+      const surviving = candidates.filter((c) => {
         const occluded = !!faceHit && c.depth > faceHit.distance + Math.max(0.5, dist * EDGE_OCCLUSION_TOLERANCE_FRACTION);
-        if (!occluded) return { kind: 'edge', line: c.line };
+        return !occluded;
+      });
+      if (surviving.length > 0) {
+        // Item J (D3): an open hollow's outer rim (inherited from the box
+        // underneath -- nameEdgeOnCurrentShape() resolves it) and its own
+        // BRAND NEW inner rim (no primitive lineage, resolves to null --
+        // same "no answer" case a Hole's own fresh wall already has, per
+        // that function's own comment) sit only the wall's thickness apart
+        // in world space. Most camera angles foreshorten that to a couple
+        // of screen pixels, well inside distPx's own float/discretisation
+        // noise -- close enough that "closest wins outright" started
+        // picking the inner edge (or missing both and falling through to
+        // the interior wall face) for a click plainly meant for the outer
+        // one. Only consulted once there is more than one edge candidate
+        // actually surviving occlusion -- the ordinary one-edge and
+        // same-primitive-corner cases (both candidates resolve to a name,
+        // so the first/closest still wins, exactly as before) are
+        // untouched, and this never runs at all for the common case of a
+        // single edge in the band.
+        if (surviving.length > 1 && lastBuiltRef.current && kernelRef.current?.oc) {
+          const built = lastBuiltRef.current;
+          const oc = kernelRef.current.oc;
+          const named = surviving.find((c) => {
+            const { featureId, kernelEdge } = c.line.userData as { featureId: string; kernelEdge: any };
+            return nameEdgeOnCurrentShape(oc, built, docRef.current, featureId, kernelEdge) !== null;
+          });
+          if (named) return { kind: 'edge', line: named.line };
+        }
+        return { kind: 'edge', line: surviving[0].line };
       }
 
       if (!faceHit) return null;
@@ -1069,7 +1154,8 @@ export default function BrepViewportThree({
         // resize). Remember whether it was named so restorePicks() can try
         // again on the build that replaces this one.
         unnamedFacePickRef.current = name ? null : { featureId, faceIndex: hit.range.index };
-        onPickRef.current?.({ kind: 'face', target: featureId, faceIndex: hit.range.index, name });
+        const size = kernelFace ? faceSize(kernelRef.current!.oc, kernelFace) ?? undefined : undefined;
+        onPickRef.current?.({ kind: 'face', target: featureId, faceIndex: hit.range.index, name, size });
       } else {
         const { featureId, kernelEdge } = hit.line.userData as {
           featureId: string; kernelEdge: any;
@@ -1090,7 +1176,8 @@ export default function BrepViewportThree({
         setSelectedEdgeTube(hit.line.userData.tubeMesh as THREE_NS.Mesh);
         selectedFaceMesh.visible = false;
         selectedFaceStateRef.current = null;
-        onPickRef.current?.({ kind: 'edge', target: featureId, name });
+        const size = edgeLength(kernelRef.current!.oc, kernelEdge) ?? undefined;
+        onPickRef.current?.({ kind: 'edge', target: featureId, name, size });
       }
       renderNow();
     }
@@ -1717,7 +1804,8 @@ export default function BrepViewportThree({
           : null;
         if (name) {
           unnamedFacePickRef.current = null;
-          onPickRef.current?.({ kind: 'face', target: sel.featureId, faceIndex: sel.faceIndex, name });
+          const size = kernelFace ? faceSize(kernel.oc, kernelFace) ?? undefined : undefined;
+          onPickRef.current?.({ kind: 'face', target: sel.featureId, faceIndex: sel.faceIndex, name, size });
         }
       }
     } else {

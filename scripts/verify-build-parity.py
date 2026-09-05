@@ -1,4 +1,4 @@
-"""SPEC-3d-build verification: items A, C, D, E, against a live dev server.
+"""SPEC-3d-build verification: items A, C, D, E, H, J, against a live dev server.
 
 Playwright, headless Chromium, 1440x900, against http://localhost:3002/sandbox/
 in reSHape/Build mode. Prints one PASS/FAIL line per check and exits non-zero
@@ -22,6 +22,16 @@ on any FAIL.
 (E) Shift-click on a second vertical edge adds it to the selection (the
     pill reads "N edges"); pressing Round from that multi-selection acts on
     every selected edge from the one click.
+
+(H) P20's addendum: the selection pill carries the picked face/edge's own
+    size, read off the BUILT kernel geometry, not the doc's own fields --
+    "Box 1 · top face · 40 x 40", "Box 1 · edge · 20".
+
+(J) D3's addendum: a click within the edge pick band of an open hollow's
+    OUTER rim resolves to that outer edge (Box 1's own, inherited through
+    the hollow), not to Hollow 1's own new inner rim or the interior wall
+    face -- even when the click lands only a couple of screen pixels from
+    the rendered rim line.
 """
 import sys
 import time
@@ -281,7 +291,10 @@ def check_item_e_multiselect(page):
             return hit ? hit.textContent.trim() : null;
         }"""
     )
-    check('picking one edge reads "Box 1 · edge"', pill_after_one == "Box 1 · edge", str(pill_after_one))
+    # "Box 1 · edge · 20" now (item H adds the picked edge's own length) --
+    # startswith rather than equality so this check does not fight over
+    # item H's own concern, which check_item_h_size covers directly.
+    check('picking one edge reads "Box 1 · edge..."', (pill_after_one or "").startswith("Box 1 · edge"), str(pill_after_one))
 
     click_vertical_edge(page, "shift-right", cx, cy)
     pill_after_two = page.evaluate(
@@ -302,6 +315,74 @@ def check_item_e_multiselect(page):
           len(round_rows) == 2, str(tl))
 
 
+def selection_pill(page):
+    return page.evaluate(
+        """() => {
+            const divs = [...document.querySelectorAll('div')];
+            const hit = divs.find(d => d.children.length === 0 && /Box 1/.test(d.textContent || ''));
+            return hit ? hit.textContent.trim() : null;
+        }"""
+    )
+
+
+def check_item_h_size(page):
+    arm_build(page)
+    page.get_by_title("Add a box").click()
+    time.sleep(0.3)
+    cx, cy = canvas_center(page)
+    # Top face, roughly upper-middle of the box in the default Home view.
+    page.mouse.click(cx, cy - 100)
+    time.sleep(0.3)
+    face_pill = selection_pill(page)
+    check('selecting the top face of a 40x40x20 box reads its own size -- "... top face · 40 x 40"',
+          face_pill is not None and face_pill.count("40") == 2 and "top face" in face_pill,
+          str(face_pill))
+
+    arm_build(page)
+    page.get_by_title("Add a box").click()
+    time.sleep(0.3)
+    arm_front_view(page)
+    cx, cy = canvas_center(page)
+    click_vertical_edge(page, "left", cx, cy)
+    edge_pill = selection_pill(page)
+    check('selecting a vertical edge of a 40x40x20 box reads its own length -- "... edge · 20"',
+          edge_pill is not None and "20" in edge_pill and "edge" in edge_pill,
+          str(edge_pill))
+
+
+def check_item_j_rim_pick(page):
+    # D3's exact repro: hollow a box open at the top, click 2 SCREEN px
+    # outside the (rendered) rim, and the pick must resolve to an edge of
+    # Box 1 -- the outer rim, inherited through the hollow -- never to
+    # Hollow 1's own new inner rim or the interior wall face behind it.
+    #
+    # The true rim sits well inside the visible silhouette line's own
+    # rendered width, so "2 px outside" is found empirically here rather
+    # than computed: hand-verified against a live session (explore-j*.py in
+    # the scratchpad, not committed) that (708, 421) in this exact
+    # default-Home-view, default-box, default-hollow framing sits within a
+    # couple of screen pixels of the true outer/inner rim boundary, on the
+    # side that used to resolve to Hollow 1 before item J's fix.
+    arm_build(page)
+    page.get_by_title("Add a box").click()
+    time.sleep(0.3)
+    cx, cy = canvas_center(page)
+    page.mouse.click(cx, cy - 100)
+    time.sleep(0.3)
+    page.get_by_role("button", name="Hollow", exact=True).click()
+    time.sleep(0.3)
+    tl = timeline(page)
+    check("setup: an open Hollow 1 built on Box 1",
+          tl is not None and any("Hollow 1" in r for r in tl), str(tl))
+
+    x, y = cx + (708 - 602), cy + (421 - 432)
+    page.mouse.click(x, y)
+    time.sleep(0.3)
+    pill = selection_pill(page)
+    check('a click within 2px of the outer rim resolves to Box 1 (never Hollow 1)',
+          pill is not None and pill.startswith("Box 1"), str(pill))
+
+
 def main():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -312,6 +393,8 @@ def main():
             ("item C (naming)", check_item_c_naming),
             ("item D (across)", check_item_d_across),
             ("item E (multi-select)", check_item_e_multiselect),
+            ("item H (pick size)", check_item_h_size),
+            ("item J (rim pick)", check_item_j_rim_pick),
         ]:
             try:
                 fn(page)

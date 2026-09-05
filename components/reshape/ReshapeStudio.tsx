@@ -228,6 +228,15 @@ export default function ReshapeStudio({
   }, [doc]);
   const [pickedEdge, setPickedEdge] = useState<{ target: string; edge: TopoName | null } | null>(null);
   const [pickedFace, setPickedFace] = useState<{ target: string; face: TopoName | null } | null>(null);
+  // Item H (P20): the most recent pick's own size, straight off the kernel
+  // (see BrepViewportThree.tsx's faceSize()/edgeLength()) -- kept separate
+  // from pickedEdge/pickedFace above rather than added onto their shape,
+  // since those two are also ModelEditor's own props and every existing
+  // consumer there (round()'s edge-picked branch, Hole/Hollow's face
+  // requirement, the disabled-state messages) only ever needed WHICH edge
+  // or face, never its size. Purely additive, read only by selectionLabel
+  // below.
+  const [pickedSize, setPickedSize] = useState<number | [number, number] | null>(null);
   // Item E: a Shift-held click on a second edge/face adds it to the
   // selection instead of replacing it, the same way the timeline/sketch
   // chips already work (ModelEditor.tsx's pick()). `pickedEdge`/`pickedFace`
@@ -463,17 +472,24 @@ export default function ReshapeStudio({
     // guard round()'s multi-edge path applies before it builds anything.
     const edgesHere = pickedEdges.filter((e) => ownerOf(doc, e) === id);
     const facesHere = pickedFaces.filter((f) => ownerOf(doc, f) === id);
+    // Item H (P20): a single picked edge/face carries its own kernel-
+    // measured size as a third segment -- "Box 1 · top face · 40 x 40",
+    // "Box 1 · edge · 20" -- but a multi-selection ("3 edges") has no one
+    // size to show, so pickedSize is read only in the single-pick branches.
+    const single = edgesHere.length <= 1 && facesHere.length <= 1;
     const part = edgesHere.length > 1
       ? `${edgesHere.length} edges`
       : facesHere.length > 1
         ? `${facesHere.length} faces`
         : pickedEdge && ownerOf(doc, pickedEdge) === id
           ? (partWordFor(pickedEdge.edge) ?? 'edge')
+            + (single && typeof pickedSize === 'number' ? ` · ${pickedSize}` : '')
           : pickedFace && ownerOf(doc, pickedFace) === id
             ? (partWordFor(pickedFace.face) ?? 'face')
+              + (single && Array.isArray(pickedSize) ? ` · ${pickedSize[0]} x ${pickedSize[1]}` : '')
             : null;
     return part ? `${base} · ${part}` : base;
-  }, [selected, doc, pickedFace, pickedEdge, pickedEdges, pickedFaces]);
+  }, [selected, doc, pickedFace, pickedEdge, pickedEdges, pickedFaces, pickedSize]);
 
   const activeSketchPlane = useMemo<'xy' | 'xz' | 'yz' | null>(() => {
     if (drawTool) return 'xy';
@@ -942,12 +958,14 @@ export default function ReshapeStudio({
                     setPickedFace(null);
                     setPickedEdges([]);
                     setPickedFaces([]);
+                    setPickedSize(null);
                     return;
                   }
                   const owner = ownerOf(doc, p);
                   if (owner) setSelected([owner]);
                   setPickedEdge(p.kind === 'edge' ? { target: p.target, edge: p.name } : null);
                   setPickedFace(p.kind === 'face' ? { target: p.target, face: p.name } : null);
+                  setPickedSize(p.size ?? null);
                   // Item E: an unnamed pick (nameEdgeOnCurrentShape/
                   // nameFaceOnCurrentShape honestly refused it -- see
                   // ViewportPick's own comment) cannot join a multi-select,
