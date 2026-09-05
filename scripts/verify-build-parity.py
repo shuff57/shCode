@@ -472,6 +472,88 @@ def check_item_s_rim_pickable(page):
           str(inner_pill))
 
 
+def model_pixel_span_fraction(page, canvas_box):
+    """The built solid's own projected screen span as a fraction of the
+    canvas width, from a real screenshot -- not a pixel-diff against a
+    reference, an absolute measurement. Scoped to a narrow ORANGE band
+    (the model's own MeshStandardMaterial colour, shaded) and a y-range
+    that stays clear of the axis lines' own extended reach, which a wider
+    colour match or a full-height scan both picked up as false "model"
+    pixels while writing this probe."""
+    import io
+    png_bytes = page.screenshot()
+    from PIL import Image
+    img = Image.open(io.BytesIO(png_bytes)).convert("RGB")
+    cx0, cy0 = int(canvas_box["x"]), int(canvas_box["y"])
+    cw, ch = int(canvas_box["width"]), int(canvas_box["height"])
+    y0, y1 = int(ch * 0.25), int(ch * 0.75)
+    minx, maxx = cw, 0
+    for x in range(0, cw, 1):
+        for y in range(y0, y1, 2):
+            r, g, b = img.getpixel((cx0 + x, cy0 + y))
+            if r > 150 and 40 < g < 130 and b < 90 and r > g + 60:
+                minx = min(minx, x)
+                maxx = max(maxx, x)
+    return (maxx - minx) / cw if maxx > minx else 0.0
+
+
+def check_item_t_autofit(page):
+    # Round 5 (P06/Pull): a blind judge gave Chili3D the "looks" win on
+    # framing alone -- our pulled plate rendered at roughly an eighth of
+    # the canvas because the flat sketch's own fit (calibrated for a 2D
+    # outline viewed straight-on) was never redone once Pull turned it
+    # into a 3D shape. Required: the model's first SOLID (not merely its
+    # first sketch) gets its own automatic Home-style fit.
+    arm_build(page)
+    page.get_by_title("Draw a flat outline to pull or spin into a solid", exact=True).click()
+    time.sleep(0.2)
+    cx, cy = canvas_center(page)
+    page.mouse.click(cx - 100, cy + 50)
+    time.sleep(0.1)
+    page.mouse.click(cx + 100, cy - 50)
+    time.sleep(0.3)
+    # The draw tool leaves the new sketch on the timeline but not
+    # SELECTED (unlike verify-sketch-rules.py's own "Sketch" button,
+    # which both places and selects a default one) -- the Rules panel
+    # only ever renders for ModelEditor's own `activeSketch`, so it has
+    # to be picked off the timeline before its fields exist to fill.
+    page.query_selector_all("ol li")[0].click()
+    time.sleep(0.2)
+    page.wait_for_selector('button[aria-label="Edge 1 across"]', timeout=10000)
+    page.get_by_label("Edge 1 length", exact=True).fill("40")
+    page.get_by_label("Edge 1 length", exact=True).press("Tab")
+    time.sleep(0.2)
+    page.get_by_label("Edge 2 length", exact=True).fill("20")
+    page.get_by_label("Edge 2 length", exact=True).press("Tab")
+    time.sleep(0.3)
+
+    page.get_by_title("Pull the selected sketch straight up into a solid").click()
+    time.sleep(0.2)
+    page.get_by_label("Pull 1 height", exact=True).fill("10")
+    page.get_by_label("Pull 1 height", exact=True).press("Tab")
+    # The animation itself runs ~250ms; give it time to land before
+    # measuring, same as every other post-edit settle wait in this file.
+    time.sleep(0.6)
+
+    canvas = page.query_selector("canvas")
+    canvas_box = canvas.bounding_box()
+    frac = model_pixel_span_fraction(page, canvas_box)
+    check("Pull's own first solid is auto-fit -- it covers >= 25% of the canvas width, no Home press",
+          frac >= 0.25, f"fraction={frac:.3f}")
+
+    # An ordinary edit that leaves the result in frame must NOT yank the
+    # camera -- widen the pull height slightly (still well inside the
+    # existing framing) and confirm the model's own span barely moves,
+    # rather than snapping back to a fresh fit each time.
+    before = frac
+    page.get_by_label("Pull 1 height", exact=True).fill("12")
+    page.get_by_label("Pull 1 height", exact=True).press("Tab")
+    time.sleep(0.5)
+    after = model_pixel_span_fraction(page, canvas_box)
+    check("an ordinary edit that stays in frame does not trigger a fresh fit",
+          abs(after - before) < 0.08, f"before={before:.3f} after={after:.3f}")
+
+
 def check_item_g_clamp_note(page):
     arm_build(page)
     page.get_by_title("Add a box").click()
@@ -555,6 +637,7 @@ def main():
             ("item H (pick size)", check_item_h_size),
             ("item J (rim pick)", check_item_j_rim_pick),
             ("item S (rim edges pickable)", check_item_s_rim_pickable),
+            ("item T (auto-fit first solid)", check_item_t_autofit),
             ("item G (clamp note)", check_item_g_clamp_note),
             ("item P (corner inset)", check_item_p_corner_inset),
         ]:

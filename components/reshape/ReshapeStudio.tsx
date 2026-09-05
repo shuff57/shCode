@@ -23,7 +23,7 @@ import ReshapeParamsPanel, { type ParamDef, type ParamValues } from '../ReshapeP
 import ModelEditor from '../model/ModelEditor';
 import BrepViewport, { type BrepViewportStats, type ViewportPick } from '../model/BrepViewportThree';
 import HandleOverlay, { type AnchorPoint, type SketchOutline, type SketchPart } from '../model/HandleOverlay';
-import type { RuleActions } from '../model/SketchConstraints';
+import type { RuleActions, TouchedPart } from '../model/SketchConstraints';
 import { writeSTL, writeOBJ, write3MF, type MeshInput } from '../../lib/mesh-export';
 import { outlineOf } from '../../lib/sketch-arc';
 import { handlesFor, planeAnchor } from '../../lib/model-handles';
@@ -298,6 +298,7 @@ export default function ReshapeStudio({
     openLength: (edge) => ruleActionsRef.current?.openLength(edge),
     setPair: (a, b, kind) => ruleActionsRef.current?.setPair(a, b, kind),
     togglePin: (corner) => ruleActionsRef.current?.togglePin(corner),
+    clearTouch: () => ruleActionsRef.current?.clearTouch(),
   }).current;
   const handleSelectPart = (part: SketchPart, opts: { shift: boolean }) => {
     touchRuleActivity();
@@ -331,13 +332,34 @@ export default function ReshapeStudio({
   // made. Escape is the other way to clear it, for a student who wants the
   // strip gone without picking something else.
   useEffect(() => { setSelectedSketchParts([]); }, [selected]);
+  // Item U: "Escape clears both" -- the canvas selection right here, AND
+  // the Rules panel's OWN sticky "last touched" pink highlight, which
+  // lives as SketchConstraints' own local state and is otherwise never
+  // told a selection just ended. Goes through the same ref-backed proxy
+  // its other three actions already do, so this reaches whichever sketch
+  // is currently open without this file needing to know its shape.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setSelectedSketchParts([]);
+      if (e.key === 'Escape') { setSelectedSketchParts([]); ruleActionsProxy.clearTouch(); }
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
+  // Item U: a panel row/cell commit (typing a length, pressing Level, a
+  // pair rule, a pin) IS the canvas selection now, not a second state a
+  // click has to separately catch up to -- round-6's own finding was an
+  // edge left lit pink with no strip beside it, because "touched in the
+  // panel" and "selected on the canvas" disagreed. `null` (Escape, or a
+  // rule that removed itself) clears the selection the same way a plain
+  // canvas click on nothing would.
+  const handleTouch = (touched: TouchedPart | null) => {
+    if (!touched) { setSelectedSketchParts([]); return; }
+    setSelectedSketchParts(
+      touched.kind === 'edge'
+        ? touched.indices.map((index): SketchPart => ({ kind: 'edge', index }))
+        : [{ kind: 'corner', index: touched.index }]
+    );
+  };
   const [rollbackIndex, setRollbackIndex] = useState<number | null>(null);
   const [drawTool, setDrawTool] = useState<'rect' | 'polygon' | null>(null);
   const [drawFirst, setDrawFirst] = useState<[number, number] | null>(null);
@@ -983,6 +1005,7 @@ export default function ReshapeStudio({
               hoveredPart={pointerHoverPart}
               onHoverPart={(p) => { setRowHoverPart(p); if (p) touchRuleActivity(); }}
               registerActions={(actions) => { ruleActionsRef.current = actions; }}
+              onTouch={handleTouch}
               onUndo={undo}
               onRedo={redo}
               canUndo={depth.back > 0}

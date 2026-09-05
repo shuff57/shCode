@@ -559,6 +559,22 @@ export default function BrepViewportThree({
    *  NEXT shape gets its own automatic fit rather than inheriting whatever
    *  distance a since-deleted model happened to leave the camera at. */
   const hasFitOnceRef = useRef(false);
+  /** Item T: whether the LAST successful build had at least one real SOLID
+   *  (not just a sketch) -- distinct from `hasFitOnceRef`, which a
+   *  sketch-only doc's own first-shape fit already sets true before any
+   *  solid ever exists (see the `onlySketches` branch below). A Pull on
+   *  that same sketch is the model's first SOLID even though it is not the
+   *  first FIT, and it needs its own fresh Home-style fit -- the flat
+   *  sketch fit that already ran was calibrated for a 2D outline viewed
+   *  straight-on, not for the 3D shape Pull just gave it (P06's own
+   *  finding: the pulled plate sat at roughly an eighth of the frame,
+   *  because it kept the sketch's own fit distance and angle). Reset to
+   *  false alongside `hasFitOnceRef` the moment the doc goes empty. */
+  const hadSolidRef = useRef(false);
+  /** In-flight camera-fit animation frame, if any -- cancelled before
+   *  starting a new one so two fits in quick succession (an edit landing
+   *  mid-animation) do not fight over the camera. */
+  const fitAnimRef = useRef<number | null>(null);
   /** The orbit (camera position + controls target) the student had right
    *  before `sketchPlane` first went from null to a plane -- i.e. right
    *  before this component snapped to a flat, straight-on view of a sketch.
@@ -1464,6 +1480,138 @@ export default function BrepViewportThree({
   }
 
   /**
+   * Item T: the SAME fit fitToModel() computes -- same target, same
+   * distance, same direction -- eased into over `durationMs` rather than
+   * snapped to instantly. This is what an AUTOMATIC fit (the model's first
+   * solid, or a step that left the result mostly out of view) uses instead
+   * of fitToModel() itself: a student who is watching the canvas when this
+   * fires should see the camera move, not have it teleport out from under
+   * them, but the Home button and every other deliberate, on-demand call
+   * (a student's own click) stays exactly as instant as it always was --
+   * this function is never wired to a button.
+   *
+   * Respects prefers-reduced-motion by skipping straight to the instant
+   * fitToModel() behaviour (0ms is still "the same fit", just not eased).
+   */
+  function animateFitToModel(dir: [number, number, number], durationMs = 250) {
+    const three = threeRef.current;
+    const camera = cameraRef.current;
+    const controls = controlsRef.current;
+    const renderer = rendererRef.current;
+    const scene = sceneRef.current;
+    const container = containerRef.current;
+    if (!three || !camera || !controls || !renderer || !scene || !container) return;
+    const { THREE } = three;
+
+    const box = computeSceneBox();
+    if (!box || box.isEmpty()) return;
+    const bbox: Box3Like = {
+      min: [box.min.x, box.min.y, box.min.z],
+      max: [box.max.x, box.max.y, box.max.z],
+    };
+    const center = bboxCenter(bbox);
+    const distance = fitDistance(bbox, container.clientWidth, container.clientHeight, camera.fov);
+    const direction = new THREE.Vector3(dir[0], dir[1], dir[2]).normalize();
+
+    const toTarget = new THREE.Vector3(center[0], center[1], center[2]);
+    const toPosition = toTarget.clone().addScaledVector(direction, distance);
+
+    if (fitAnimRef.current != null) {
+      cancelAnimationFrame(fitAnimRef.current);
+      fitAnimRef.current = null;
+    }
+
+    const reducedMotion = typeof window !== 'undefined'
+      && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion || durationMs <= 0) {
+      controls.target.copy(toTarget);
+      camera.position.copy(toPosition);
+      controls.update();
+      renderer.render(scene, camera);
+      projectAnchors();
+      return;
+    }
+
+    const fromTarget = controls.target.clone();
+    const fromPosition = camera.position.clone();
+    const start = performance.now();
+    // Aliased so the closure below captures values TS knows are non-null --
+    // `camera`/`controls`/`renderer`/`scene` are narrowed by the early
+    // return above, but that narrowing does not survive into a nested
+    // function TS cannot prove still runs before any of them could change.
+    const cam = camera; const ctrl = controls; const rend = renderer; const scn = scene;
+
+    const step = (now: number) => {
+      const t = Math.min(1, (now - start) / durationMs);
+      // Smoothstep -- eases in and out rather than a linear pace that reads
+      // as mechanical for something this short.
+      const eased = t * t * (3 - 2 * t);
+      ctrl.target.lerpVectors(fromTarget, toTarget, eased);
+      cam.position.lerpVectors(fromPosition, toPosition, eased);
+      ctrl.update();
+      rend.render(scn, cam);
+      projectAnchors();
+      fitAnimRef.current = t < 1 ? requestAnimationFrame(step) : null;
+    };
+    fitAnimRef.current = requestAnimationFrame(step);
+  }
+
+  /**
+   * Item T's second trigger: true when the model's own projected bounding
+   * rectangle overlaps the visible canvas by less than half its own area --
+   * "a step's result lies more than half outside the current view", per
+   * the spec. A screen-space AABB-of-a-3D-AABB, the same order of
+   * approximation fitDistance() itself already uses elsewhere in this
+   * file, not a true silhouette test -- cheap, and the failure mode it
+   * exists to catch (a plate parked at an eighth of the frame after a
+   * Pull) is nowhere near the 50% line, so the approximation's own slop
+   * never matters at the threshold. Any corner landing BEHIND the camera
+   * counts as fully out of view outright, rather than trusting its
+   * projected (and, behind the lens, mirrored) screen position.
+   */
+  function modelMostlyOutOfView(): boolean {
+    const three = threeRef.current;
+    const camera = cameraRef.current;
+    const container = containerRef.current;
+    if (!three || !camera || !container) return false;
+    const { THREE } = three;
+    const box = computeSceneBox();
+    if (!box || box.isEmpty()) return false;
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    if (w <= 0 || h <= 0) return false;
+
+    const corners: [number, number, number][] = [
+      [box.min.x, box.min.y, box.min.z], [box.max.x, box.min.y, box.min.z],
+      [box.min.x, box.max.y, box.min.z], [box.max.x, box.max.y, box.min.z],
+      [box.min.x, box.min.y, box.max.z], [box.max.x, box.min.y, box.max.z],
+      [box.min.x, box.max.y, box.max.z], [box.max.x, box.max.y, box.max.z],
+    ];
+    let minX = Infinity; let minY = Infinity; let maxX = -Infinity; let maxY = -Infinity;
+    const v = new THREE.Vector3();
+    for (const [x, y, z] of corners) {
+      v.set(x, y, z);
+      // View-space Z is negative in front of a standard three.js perspective
+      // camera; positive means this corner is behind the lens, where
+      // project()'s own screen coordinates fold back on themselves rather
+      // than meaning "off to one side".
+      const viewZ = v.clone().applyMatrix4(camera.matrixWorldInverse).z;
+      if (viewZ > 0) return true;
+      v.project(camera);
+      const sx = (v.x * 0.5 + 0.5) * w;
+      const sy = (1 - (v.y * 0.5 + 0.5)) * h;
+      minX = Math.min(minX, sx); maxX = Math.max(maxX, sx);
+      minY = Math.min(minY, sy); maxY = Math.max(maxY, sy);
+    }
+    const modelArea = Math.max(0, maxX - minX) * Math.max(0, maxY - minY);
+    if (modelArea <= 0) return true;
+    const ix0 = Math.max(minX, 0); const iy0 = Math.max(minY, 0);
+    const ix1 = Math.min(maxX, w); const iy1 = Math.min(maxY, h);
+    const overlapArea = Math.max(0, ix1 - ix0) * Math.max(0, iy1 - iy0);
+    return overlapArea / modelArea < 0.5;
+  }
+
+  /**
    * Looks straight down a sketch plane's own normal (Ground/xy -> the same
    * direction the Top view-strip preset uses, Front/xz -> Front, Side/yz ->
    * from +x) and fits to the scene the way fitToModel() does, but with
@@ -1918,7 +2066,7 @@ export default function BrepViewportThree({
           // whatever distance a since-deleted model left the camera at. See
           // hasFitOnceRef's own comment. A sketch-only doc does NOT rearm
           // here -- it gets its own first-shape fit call below instead.
-          if (doc.features.length === 0) hasFitOnceRef.current = false;
+          if (doc.features.length === 0) { hasFitOnceRef.current = false; hadSolidRef.current = false; }
           const t = performance.now();
           const meshes = drawGeoms([]);
           lastBuiltRef.current = built;
@@ -1980,15 +2128,23 @@ export default function BrepViewportThree({
       if (cancelled) return;
       setStageHint(null);
       setBuildError(null);
-      // The model's FIRST shape gets an automatic fit -- see fitToModel()'s
+      // The model's FIRST SOLID gets an automatic fit -- see fitToModel()'s
       // own comment for why this, and not the literal HOME_DIR position, is
       // what a beginner needs to actually see a 3mm round without zooming.
-      // Never on a later rebuild: a dimension edit or a new feature must not
-      // yank the camera out from under a student who has already framed the
-      // shot themselves (Home still does this on demand, on its own click).
-      if (!hasFitOnceRef.current) {
+      // Item T's second trigger: a step whose result now sits mostly
+      // outside whatever view the student already has (P06's own finding --
+      // a Pull inherited a flat sketch's own fit and rendered at roughly an
+      // eighth of the frame) gets the SAME fit. Neither fires on an
+      // ordinary edit that stays in frame: a dimension change or a new
+      // feature must not yank the camera out from under a student who has
+      // already framed the shot themselves (Home still does this on
+      // demand, on its own click, instantly rather than eased).
+      if (!hadSolidRef.current) {
+        hadSolidRef.current = true;
         hasFitOnceRef.current = true;
-        fitToModel(HOME_DIR);
+        animateFitToModel(HOME_DIR);
+      } else if (modelMostlyOutOfView()) {
+        animateFitToModel(HOME_DIR);
       }
       const triangles = meshed.reduce((n, m) => n + (m.geometry.getIndex()?.count ?? 0) / 3, 0);
       onStatsRef.current?.({

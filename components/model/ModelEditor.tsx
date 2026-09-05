@@ -63,7 +63,7 @@ import {
   Octagon,
   Hexagon,
 } from 'lucide-react';
-import SketchConstraints, { type RuleActions } from './SketchConstraints';
+import SketchConstraints, { type RuleActions, type TouchedPart } from './SketchConstraints';
 import {
   solveSketch, seedForNewRule, collapsedByRatio, type Constraint, type Point,
 } from '../../lib/sketch-solve';
@@ -230,6 +230,9 @@ interface Props {
    *  up so ReshapeStudio can hand them to HandleOverlay for a canvas-side
    *  contextual strip -- same pass-through as onHoverPart just above. */
   registerActions?: (actions: RuleActions | null) => void;
+  /** Item U: pure pass-through of SketchConstraints' own `onTouch` -- see
+   *  that prop's own doc comment. */
+  onTouch?: (touched: TouchedPart | null) => void;
 }
 
 type BoolOp = 'union' | 'subtract' | 'intersect';
@@ -482,7 +485,7 @@ function FlyoutButton({
 
 export default function ModelEditor({
   doc, onChange, selected, onSelect, onUndo, onRedo, canUndo, canRedo, collapsible, onCollapsed, onContentChange, rollbackIndex, onRollback, onStartDraw, drawTool, pickedEdge, onClearPickedEdge, pickedFace, onClearPickedFace, pickedEdges, onClearPickedEdges, refusals,
-  hoveredPart, onHoverPart, registerActions, historyGen,
+  hoveredPart, onHoverPart, registerActions, onTouch, historyGen,
 }: Props) {
   const [note, setNote] = useState<string | null>(null);
   // Which single rule the student most recently set or changed in the Rules
@@ -2236,6 +2239,7 @@ export default function ModelEditor({
             hoveredPart={hoveredPart}
             onHoverPart={onHoverPart}
             registerActions={registerActions}
+            onTouch={onTouch}
           />
         );
         return rulesHost ? createPortal(rules, rulesHost) : rules;

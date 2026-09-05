@@ -774,6 +774,49 @@ def check_contextual_rule_strip(page):
         f"{page.locator('.sketch-rule-strip').count()} strip(s) still visible")
 
 
+def check_panel_touch_is_canvas_selection(page):
+    print("\n=== U: a panel-touched edge IS the canvas selection, not a second state ===")
+    # Round 6 (S10/S11): typing a length left the edge lit pink (the panel's
+    # own sticky "last touched" highlight) with no floating strip beside it
+    # -- only a real canvas click ever showed one. "One selection state"
+    # means the panel's own touch has to BE the selection, not a second
+    # thing a click has to separately catch up to.
+    arm_sketch(page)
+    field = page.get_by_label("Edge 2 length", exact=True)
+    field.fill("22")
+    field.press("Tab")
+    time.sleep(0.3)
+
+    strip = page.locator(".sketch-rule-strip")
+    strip_text = strip.inner_text() if strip.count() > 0 else ""
+    check("typing a length in edge 2's cell shows the strip",
+        strip.count() > 0, "no .sketch-rule-strip after committing a length")
+    check("...naming edge 2's rules (Level/Upright/Length, the single-edge set)",
+        "Level" in strip_text and "Upright" in strip_text, strip_text)
+
+    # The strip acts through the exact same handler the panel row does --
+    # confirmed by pressing its own Level button and reading it back off
+    # THAT row, not a different one.
+    if strip.count() > 0 and "Level" in strip_text:
+        strip.locator("button", has_text="Level").click()
+        time.sleep(0.25)
+        pressed = rule_button(page, "Edge 2 across").get_attribute("aria-pressed")
+        check("...and pressing it sets Edge 2 across in the panel below",
+            pressed == "true", f"aria-pressed={pressed}")
+
+    # Escape clears BOTH halves of what used to be two separate states --
+    # the strip, and the panel's own sticky pink row.
+    page.keyboard.press("Escape")
+    time.sleep(0.2)
+    check("Escape clears the strip here too",
+        page.locator(".sketch-rule-strip").count() == 0, "strip still visible")
+    row_classes = page.evaluate(
+        "() => [...document.querySelectorAll('.sk-table tbody tr')].map(r => r.className)"
+    )
+    check("...and clears the panel's own sticky pink row",
+        not any('sk-row-hovered' in c for c in row_classes), str(row_classes))
+
+
 def main():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -854,6 +897,11 @@ def main():
             check_contextual_rule_strip(page)
         except Exception as exc:  # noqa: BLE001
             check("R checks ran without an exception", False, repr(exc))
+
+        try:
+            check_panel_touch_is_canvas_selection(page)
+        except Exception as exc:  # noqa: BLE001
+            check("U checks ran without an exception", False, repr(exc))
 
         browser.close()
 

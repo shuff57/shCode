@@ -127,6 +127,19 @@ interface Props {
    *  fresh set of closures (cheap: the receiver only stores them in a
    *  ref), and once with `null` on unmount. */
   registerActions?: (actions: RuleActions | null) => void;
+  /**
+   * Item U: fires with the SAME value `lastTouched` is set to, every time
+   * a panel row/cell actually commits something (typing a length,
+   * pressing Level, picking a pair rule, pinning a corner) -- never for a
+   * plain hover. Round-6 (S10/S11): editing an edge's field left it lit
+   * pink (the sticky hover this component already had) with no floating
+   * strip, because "touched in the panel" and "selected on the canvas"
+   * were two different pieces of state that only one of them updated.
+   * ReshapeStudio folds this into its own `selectedSketchParts` so the
+   * two can no longer disagree -- the fix is one state, not two kept in
+   * sync by hand.
+   */
+  onTouch?: (touched: TouchedPart | null) => void;
 }
 
 function has(cs: Constraint[], kind: Constraint['kind'], edge: number) {
@@ -162,7 +175,22 @@ export interface RuleActions {
   openLength: (edge: number) => void;
   setPair: (a: number, b: number, kind: PairKind | null) => void;
   togglePin: (corner: number) => void;
+  /** Item U: clears this panel's OWN "last touched" sticky highlight --
+   *  the half of "Escape clears both" that lives in here, not in
+   *  ReshapeStudio's own `selectedSketchParts`. See TouchedPart's own doc
+   *  comment for why this state exists twice in the first place. */
+  clearTouch: () => void;
 }
+
+/**
+ * Item U: the shape `lastTouched` already carried internally, exported so
+ * the one caller that needs to REACT to a touch (ReshapeStudio, via
+ * `onTouch` below) can name it without re-declaring it. An edge touch
+ * carries an array because a pair rule touches two at once; a corner
+ * touch is always exactly one -- same convention `stickyForCanvas` already
+ * uses for the hover channel.
+ */
+export type TouchedPart = { kind: 'edge'; indices: number[] } | { kind: 'corner'; index: number };
 
 const PAIR_CYCLES: PairKind[] = ['equal', 'parallel', 'perpendicular'];
 
@@ -386,7 +414,7 @@ const PANEL_CSS = `
         .sk-pair-picker button[aria-selected="true"] .sk-pair-picker-mark { color: #282a36; }
       `;
 
-export default function SketchConstraints({ points, bulges, rounds, chamfers, constraints, onChange, onRound, onChamfer, onBow, onRemoveCorner, plane, onPlane, shape, hoveredPart, onHoverPart, registerActions }: Props) {
+export default function SketchConstraints({ points, bulges, rounds, chamfers, constraints, onChange, onRound, onChamfer, onBow, onRemoveCorner, plane, onPlane, shape, hoveredPart, onHoverPart, registerActions, onTouch }: Props) {
   const count = points.length;
   const residual = residualOf(points, constraints);
   const fighting = residual > 1e-3;
@@ -440,9 +468,7 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
   // sketch to another sketch does NOT clear it (SketchConstraints stays
   // mounted, just re-propped): a known, narrow gap, not covered by any
   // browser check this feature shipped against.
-  const [lastTouched, setLastTouched] = useState<
-    { kind: 'edge'; indices: number[] } | { kind: 'corner'; index: number } | null
-  >(null);
+  const [lastTouched, setLastTouched] = useState<TouchedPart | null>(null);
   // Item M: which pair cell's picker is open, if any, and which of its
   // four choices is keyboard-highlighted inside it. A real popup listbox
   // (Esc/click-away close it with no change; arrows move; Enter picks),
@@ -470,6 +496,16 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
   const stickyForCanvas = (t: typeof lastTouched)
   : { kind: 'edge' | 'corner'; index: number } | { kind: 'edge' | 'corner'; index: number }[] | null =>
     !t ? null : t.kind === 'edge' ? t.indices.map((index) => ({ kind: 'edge' as const, index })) : t;
+  // Item U: the one place `lastTouched` is ever SET to a non-null value --
+  // every call site below that used to inline `setLastTouched` plus the
+  // sticky-hover push now goes through this instead, so `onTouch` (the
+  // signal that makes this the canvas selection too, not just a pink line)
+  // can never be forgotten at a call site that adds a sixth one later.
+  const touch = (next: TouchedPart) => {
+    setLastTouched(next);
+    onHoverPart?.(stickyForCanvas(next));
+    onTouch?.(next);
+  };
   // A row's onMouseLeave used to always clear the canvas hint to null; now
   // it falls back to whatever is sticky instead, so leaving the row does
   // not erase the very highlight this feature exists to keep. `onHoverPart`
@@ -514,8 +550,7 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
     // this row light up together instead of only the two of them that
     // already had it wired.
     const touched: typeof lastTouched = { kind: 'edge', indices: [edge] };
-    setLastTouched(touched);
-    onHoverPart?.(stickyForCanvas(touched));
+    touch(touched);
     if (has(constraints, kind, edge)) {
       onChange(constraints.filter((c) => !('edge' in c && c.edge === edge && c.kind === kind)));
       return;
@@ -554,8 +589,7 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
     setInputNote(null);
     settle([...rest, { kind: 'length', edge, value: Math.round(v * 100) / 100 }]);
     const touched: typeof lastTouched = { kind: 'edge', indices: [edge] };
-    setLastTouched(touched);
-    onHoverPart?.(stickyForCanvas(touched));
+    touch(touched);
   }
 
   function lockCorner(corner: number) {
@@ -577,8 +611,7 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
   function applyPair(a: number, b: number, kind: PairKind | null) {
     settle(setPairKind(constraints, a, b, kind));
     const touched: typeof lastTouched = { kind: 'edge', indices: [Math.min(a, b), Math.max(a, b)] };
-    setLastTouched(touched);
-    onHoverPart?.(stickyForCanvas(touched));
+    touch(touched);
     setOpenPair(null);
   }
 
@@ -593,8 +626,7 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
     el.focus();
     el.select();
     const touched: typeof lastTouched = { kind: 'edge', indices: [edge] };
-    setLastTouched(touched);
-    onHoverPart?.(stickyForCanvas(touched));
+    touch(touched);
   }
 
   // Re-registers on every render rather than off a dependency list: every
@@ -604,7 +636,10 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
   // only ever stores these in a ref -- calling it once too often costs
   // nothing a beginner could notice.
   useEffect(() => {
-    registerActions?.({ toggleEdge: toggle, openLength, setPair: applyPair, togglePin: lockCorner });
+    registerActions?.({
+      toggleEdge: toggle, openLength, setPair: applyPair, togglePin: lockCorner,
+      clearTouch: () => setLastTouched(null),
+    });
     return () => registerActions?.(null);
   }); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -1066,8 +1101,7 @@ export default function SketchConstraints({ points, bulges, rounds, chamfers, co
                 // pointing at.
                 if (v > 0) {
                   const touched: typeof lastTouched = { kind: 'corner', index: i };
-                  setLastTouched(touched);
-                  onHoverPart?.(stickyForCanvas(touched));
+                  touch(touched);
                 }
               }}
               onKeyDown={(ev) => {
