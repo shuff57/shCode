@@ -80,6 +80,32 @@ walk on the dev server use `DEV_ROLE=student npm run dev` and a
 `dev_student=<name>` cookie per browser (server.js keeps that identity's
 progress in memory).
 
+**Update, 2026-09-05.** Tool-by-tool parity loop against Chili3D (3D) and
+jsketcher's sketcher (2D), blind judges, one piece per Build tool plus the
+four defects the six-task loop left open: record and the bar facts it
+settled in `.gauntlet/reshape-tool-parity-loop.json`. Rules a lesson author
+or a builder now relies on: a sketch rule is drawn on the geometry (dash,
+tick, slanted tick, right-angle square, pin), never a floating chip; the
+Rules panel's words are Level / Upright / Equal / Parallel / Right angle /
+Pin, the pair cell is a picker (never a cycle), and the same rules appear as
+a strip beside a clicked edge or corner; a rule added in Build survives the
+Code round trip through `sk.across()/up()/length()/equal()/parallel()/
+perpendicular()/pin()` (lib/reshape-script.ts, emitted by
+lib/reshape-script-gen.ts); a between-edges rule is solved fewest-movers and
+refused if any edge or the area would lose 75% (`collapsedByRatio`); a
+conflict drops the oldest one or two non-lock rules with a calm note, a lock
+last. On the solid side: the chamfer tool is "Bevel" everywhere (reference
+wins over the toolbar); every round shape's panel says "across" (diameter);
+Four Corners fields are "in from each side"; Shift-click builds a multi-edge
+selection for Round/Bevel; the pill reads the picked face or edge size off
+the kernel ("Box 1 · top face · 40 x 40"); Delete on a step with dependents
+confirms by name and says afterwards what went; Blend accepts a circle; a
+single-edge round ending in a sharp cap at the far vertex is correct B-rep
+behaviour, not a defect. Capture rule learned twice: a blind pack must crop
+chrome, not controls (the docked Rules column, the timeline strip), and a
+win over an invalid bar shot is void until the bar is recaptured with its
+sizes proven by the bar's own Measure tool.
+
 ### Where the line already falls
 
 Measured 2026-09-01 across the 55 files that round of work touched:

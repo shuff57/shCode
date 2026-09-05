@@ -65,6 +65,9 @@
 import { useEffect, useRef, useState } from 'react';
 import type * as THREE_NS from 'three';
 import type { OrbitControls as OrbitControlsType } from 'three/examples/jsm/controls/OrbitControls.js';
+import type { LineSegments2 as LineSegments2Type } from 'three/examples/jsm/lines/LineSegments2.js';
+import type { LineSegmentsGeometry as LineSegmentsGeometryType } from 'three/examples/jsm/lines/LineSegmentsGeometry.js';
+import type { LineMaterial as LineMaterialType } from 'three/examples/jsm/lines/LineMaterial.js';
 import type { Feature, ModelDoc } from '../../lib/model-types';
 import { topLevel } from '../../lib/model-types';
 import { edgesToThree, tessellateToThree, type FaceRange } from '../../lib/occt-three';
@@ -408,13 +411,32 @@ function loadKernel(): Promise<Kernel> {
  * webpack sees this one and is meant to: that is what makes it a separate
  * chunk instead of an inline one.
  */
-let threePromise: Promise<{ THREE: typeof THREE_NS; OrbitControls: typeof OrbitControlsType }> | null = null;
+let threePromise: Promise<{
+  THREE: typeof THREE_NS; OrbitControls: typeof OrbitControlsType;
+  LineSegments2: typeof LineSegments2Type; LineSegmentsGeometry: typeof LineSegmentsGeometryType;
+  LineMaterial: typeof LineMaterialType;
+}> | null = null;
 function loadThree() {
   if (!threePromise) {
     threePromise = Promise.all([
       import('three'),
       import('three/examples/jsm/controls/OrbitControls.js'),
-    ]).then(([THREE, controlsMod]) => ({ THREE, OrbitControls: controlsMod.OrbitControls }));
+      // Item V: the axis/grid guide lines need a REAL depth offset so a
+      // line lying exactly on a face still shows instead of z-fighting
+      // with it -- confirmed empirically that setting `polygonOffset` on
+      // a GridHelper/AxesHelper's own material changes nothing, because
+      // WebGL's polygon-offset state is specified to affect GL_TRIANGLES
+      // rasterisation only, never GL_LINES. LineSegments2 draws its
+      // "lines" as camera-facing triangle strips, which DOES honour it.
+      import('three/examples/jsm/lines/LineSegments2.js'),
+      import('three/examples/jsm/lines/LineSegmentsGeometry.js'),
+      import('three/examples/jsm/lines/LineMaterial.js'),
+    ]).then(([THREE, controlsMod, ls2Mod, lsgMod, lmMod]) => ({
+      THREE, OrbitControls: controlsMod.OrbitControls,
+      LineSegments2: ls2Mod.LineSegments2,
+      LineSegmentsGeometry: lsgMod.LineSegmentsGeometry,
+      LineMaterial: lmMod.LineMaterial,
+    }));
   }
   return threePromise;
 }
@@ -536,7 +558,7 @@ export default function BrepViewportThree({
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const kernelRef = useRef<Kernel | null>(null);
-  const threeRef = useRef<{ THREE: typeof THREE_NS; OrbitControls: typeof OrbitControlsType } | null>(null);
+  const threeRef = useRef<Awaited<ReturnType<typeof loadThree>> | null>(null);
 
   /** Created once per mount, on the first successful draw, and reused for
    *  every rebuild after that -- recreating any of this per doc change would
@@ -692,7 +714,7 @@ export default function BrepViewportThree({
     const container = containerRef.current;
     const three = threeRef.current;
     if (!container || !three || phase !== 'ready' || rendererRef.current) return;
-    const { THREE, OrbitControls } = three;
+    const { THREE, OrbitControls, LineSegments2, LineSegmentsGeometry, LineMaterial } = three;
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(COLORS.bg);
@@ -768,13 +790,80 @@ export default function BrepViewportThree({
     // this app's own reviewer credited: spatial context against a "rectangle
     // floating in fog") without competing with anything that gets drawn on
     // top of it, ever.
-    const grid = new THREE.GridHelper(120, 24, 0x6272a4, 0x44475a);
+    // Item V (round 6, P06): "a stray axis line pierces straight through
+    // the top of the box and diagonal grid-axis lines run off-frame".
+    // Measured both halves directly:
+    //
+    // (1) A GridHelper/AxesHelper draws via gl.LINES, and WebGL's own
+    // polygon-offset state is specified to affect GL_TRIANGLES rasterisation
+    // ONLY -- confirmed empirically, not assumed: setting `polygonOffset`
+    // on either helper's own material changed a live pixel readback at the
+    // box's own top face NOT AT ALL, before and after, identical values.
+    // So the two helpers below exist ONLY to generate the vertex data
+    // (position + colour) they already know how to build; that data is
+    // handed to LineSegments2 (three/examples/jsm/lines), which rasterises
+    // a "line" as a camera-facing triangle strip -- real polygon geometry,
+    // which DOES honour a depth offset -- rather than being added to the
+    // scene itself.
+    //
+    // (2) GridHelper(120, ...) and AxesHelper(60) both predate
+    // DEFAULT_FILL_FRACTION (0.45, lib/camera-fit.ts): Home fits a model's
+    // longest dimension to 45% of the viewport's shorter side, so a 40-unit
+    // default box leaves roughly 40/0.45 ~= 89 world units of shorter-side
+    // headroom at Home -- inside which BOTH helpers' own 120/60-unit reach
+    // no longer fits, which is the "runs off-frame" half of the same
+    // report. Halved to 80/40 (same 5-unit cell size, 16 divisions instead
+    // of 24) so they terminate inside frame at Home's own default fit
+    // instead of only at some larger, incidental zoom-out.
+    const rawGrid = new THREE.GridHelper(80, 16, 0x6272a4, 0x44475a);
+    const gridGeometry = new LineSegmentsGeometry();
+    gridGeometry.setPositions(Array.from(rawGrid.geometry.attributes.position.array as ArrayLike<number>));
+    gridGeometry.setColors(Array.from(rawGrid.geometry.attributes.color.array as ArrayLike<number>));
+    rawGrid.geometry.dispose();
+    const gridMaterial = new LineMaterial({
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.35,
+      linewidth: 1,
+      worldUnits: false,
+      depthTest: true,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1,
+    });
+    gridMaterial.resolution.set(container.clientWidth, container.clientHeight);
+    const grid = new LineSegments2(gridGeometry, gridMaterial);
+    // Default GridHelper lies in the XZ (y=0) plane -- a Y-up convention.
+    // Rotated onto the XY (z=0) plane to match the Z-up scene.
     grid.rotation.x = Math.PI / 2;
-    (grid.material as THREE_NS.Material).transparent = true;
-    (grid.material as THREE_NS.Material).opacity = 0.35;
+    // CENTRE LINE IS DESATURATED BLUE-GREY (0x6272a4, this app's own existing
+    // "dim" token -- see COLORS above), NOT the saturated cyan it used to be.
+    // A grid's job is "here is a ground plane", not "here is the app's own
+    // accent colour" -- moving the hover highlight OFF this exact hex (see
+    // hoverEdgeMaterial below) fixed a colour collision that cost a blind
+    // round, but a saturated grid line was always going to collide with
+    // SOMETHING drawn above it. A neutral one does its actual job (which
+    // this app's own reviewer credited: spatial context against a "rectangle
+    // floating in fog") without competing with anything that gets drawn on
+    // top of it, ever.
     scene.add(grid);
 
-    const axes = new THREE.AxesHelper(60);
+    const rawAxes = new THREE.AxesHelper(40);
+    const axesGeometry = new LineSegmentsGeometry();
+    axesGeometry.setPositions(Array.from(rawAxes.geometry.attributes.position.array as ArrayLike<number>));
+    axesGeometry.setColors(Array.from(rawAxes.geometry.attributes.color.array as ArrayLike<number>));
+    rawAxes.geometry.dispose();
+    const axesMaterial = new LineMaterial({
+      vertexColors: true,
+      linewidth: 1,
+      worldUnits: false,
+      depthTest: true,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1,
+    });
+    axesMaterial.resolution.set(container.clientWidth, container.clientHeight);
+    const axes = new LineSegments2(axesGeometry, axesMaterial);
     scene.add(axes);
 
     const solidGroup = new THREE.Group();
@@ -863,6 +952,12 @@ export default function BrepViewportThree({
       renderer.setSize(w, h);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      // LineMaterial (item V's grid/axes) computes its own screen-space
+      // line width from this -- stale after a resize would draw them too
+      // thick or too thin relative to every other pixel-sized thing on
+      // screen, not merely mis-scaled.
+      gridMaterial.resolution.set(w, h);
+      axesMaterial.resolution.set(w, h);
       renderNow();
       // A resize can happen with no orbit gesture in progress at all (the
       // student never touched the camera), so this cannot wait for

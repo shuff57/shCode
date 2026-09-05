@@ -130,6 +130,52 @@ def check_edge_antialiasing(page):
     check("an edge cross-section shows an antialiased intermediate pixel", found)
 
 
+def check_axis_not_piercing(page):
+    # Item V (round 6, P06): "a stray axis line pierces straight through the
+    # top of the box and diagonal grid-axis lines run off-frame" -- the
+    # world-axis/grid guide overlay drawn without a real depth test against
+    # the model. GridHelper/AxesHelper draw via gl.LINES, and WebGL's own
+    # polygon-offset state is specified to affect GL_TRIANGLES rasterisation
+    # only -- confirmed empirically (a live pixel readback measured
+    # identically before and after setting `polygonOffset` on either
+    # helper's own material). Fixed by handing their generated vertex data
+    # to LineSegments2 (three/examples/jsm/lines), which rasterises a line
+    # as a camera-facing triangle strip that DOES honour a depth offset --
+    # and by halving both helpers' own reach (120->80, 60->40) to match
+    # DEFAULT_FILL_FRACTION (lib/camera-fit.ts): a 40-unit box already fills
+    # 45% of the shorter side at Home, leaving ~89 world units of headroom,
+    # inside which the old 120/60 no longer fit.
+    arm(page)
+    canvas = page.query_selector("canvas")
+    box = canvas.bounding_box()
+    cx = box["x"] + box["width"] / 2
+    cy = box["y"] + box["height"] / 2
+
+    # The Z axis projects to a screen path that stays almost exactly at
+    # canvas-centre X for this app's fixed Home camera (measured: x moved
+    # well under 1px across the box's own 20mm height) -- a vertical sweep
+    # at cx, spanning the same "top" region check_face_shading's own
+    # already-verified sample point (cx, cy-50) sits inside, covers the
+    # visible top face without straying above its silhouette into open air
+    # (where the axis legitimately IS visible, and should be).
+    def is_axis_blue(rgb):
+        r, g, b = rgb
+        return b > r + 40 and b > g + 40
+
+    # -60 to -20: comfortably inside the top face's own silhouette (measured
+    # boundary sits around -62 for this exact default-box/Home framing --
+    # explore-v*.py in the scratchpad, not committed) with margin either
+    # side, so this range can never accidentally sample the open air just
+    # above the box, where the axis legitimately IS visible and blue.
+    offenders = []
+    for dy in range(-60, -19, 5):
+        rgb = read_at(page, cx, cy + dy)
+        if is_axis_blue(rgb):
+            offenders.append((dy, rgb))
+    check("no axis-blue pixels along the Z axis inside the top face",
+          len(offenders) == 0, str(offenders))
+
+
 def main():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -138,6 +184,7 @@ def main():
         for label, fn in [
             ("face shading contrast", check_face_shading),
             ("edge antialiasing", check_edge_antialiasing),
+            ("axis not piercing the model", check_axis_not_piercing),
         ]:
             try:
                 fn(page)
