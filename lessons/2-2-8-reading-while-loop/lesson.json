@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.2.3: Example 2.3 (while-loop spelling); do…while is shCode-designed, not present in book §2.2: see build report gap",
+  "sourceRef": "book 2.2.3: Example 2.2.3 (while-loop spelling); do…while is shCode-designed, not present in book §2.2: see build report gap",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

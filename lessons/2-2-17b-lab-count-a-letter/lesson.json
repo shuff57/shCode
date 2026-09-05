@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.2.4: 'Introduction to Loops', Example 2.6 (the letter-counting half)",
+  "sourceRef": "book 2.2.4: 'Introduction to Loops', Example 2.2.6 (the letter-counting half)",
   "steps": [
     {
       "id": "s1",

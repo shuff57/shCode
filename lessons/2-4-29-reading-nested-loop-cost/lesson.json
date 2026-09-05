@@ -7,7 +7,7 @@
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
   "preview": "reading",
-  "sourceRef": "book 2.4: Context Pause on nested-loop cost",
+  "sourceRef": "book 2.4.6: Context Pause on nested-loop cost",
   "week": 7,
   "slos": [
     "SLO-3"

@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.1.5: 'Conditional Operator ?', Example 2.5: Ticket Price",
+  "sourceRef": "book 2.1.5: 'Conditional Operator ?', Example 2.1.6: Ticket Price",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

@@ -10,7 +10,7 @@
   "slos": [
     "SLO-3"
   ],
-  "sourceRef": "book 2.1.8: 'Combining Conditions', Example 2.12: A Condition That Is Always True",
+  "sourceRef": "book 2.1.8: 'Combining Conditions', Example 2.1.12: A Condition That Is Always True",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

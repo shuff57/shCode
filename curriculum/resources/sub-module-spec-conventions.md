@@ -72,7 +72,7 @@ prerequisites:
   - "<plain-English prereq>"
 externalSources:
   moshionDocsInApp: "/docs/moshion"   # only when relevant
-status: draft|ready|shipped
+status: draft|ready|shipped|built
 ---
 ```
 
