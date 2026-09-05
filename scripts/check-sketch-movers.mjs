@@ -79,6 +79,25 @@ const SANCTIONED = {
     // newSketch/newCircleSketch build a feature from nothing; there is no
     // existing outline for them to damage.
   },
+  'components/model/ModelEditor.tsx': {
+    // Item L: setConstraints() seeds a solve to check a new between-edges
+    // rule would not collapse the sketch, then has to commit THOSE points
+    // (not just the constraint) or solveDoc()'s own later unseeded re-solve
+    // is free to land somewhere worse. Pulled into this named function
+    // specifically so this census could name it instead of misattributing
+    // the write to whichever unrelated top-level component happened to sit
+    // above setConstraints() in the file.
+    //
+    // The answer this file demands: a constraint solve moves points, but
+    // never reorders or removes a corner, splits an edge, or merges two --
+    // so every round/chamfer (keyed by CORNER) and bulge (keyed by EDGE)
+    // carries over UNCHANGED, still describing the same corner/edge it
+    // always did. If a moved corner's round no longer fits the shorter
+    // edges now beside it, outlineOf() already clamps that at render/build
+    // time, the same path a handle drag or a typed Length goes through --
+    // this function does not need its own copy of that clamp.
+    commitSettledPoints: 'writes a constraint solve\'s own points alongside the new constraints that required it; rounds/chamfers/bulges are untouched and stay keyed to the same corners/edges, clamped downstream by outlineOf if a round no longer fits',
+  },
 };
 
 // An object literal that spreads something and also carries points or bulges.

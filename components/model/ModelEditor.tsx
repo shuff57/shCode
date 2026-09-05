@@ -292,6 +292,33 @@ function roundLabel(style: RoundStyle) {
 function roundIcon(style: RoundStyle) {
   return style === 'fillet' ? <SquareRoundCorner size={14} /> : <Octagon size={14} />;
 }
+/**
+ * Item L: commits a constraint solve's own points alongside its new
+ * constraints, in the SAME write -- pulled out to a named top-level
+ * function so scripts/check-sketch-movers.mjs' census can name and
+ * register it, rather than misattributing the write to whichever
+ * top-level declaration happens to sit above setConstraints() in the
+ * file (that census is column-0-anchored on purpose; a function nested
+ * inside the component does not count as one).
+ *
+ * The answer that census demands: rounds and chamfers are keyed by
+ * CORNER index and bulges by EDGE index, and a constraint solve moves
+ * points -- it never reorders or removes a corner, splits an edge, or
+ * merges two -- so every round, chamfer, and bulge carries over
+ * UNCHANGED, still describing the exact corner/edge it always did. If a
+ * moved corner's own round radius no longer fits the shorter edges now
+ * beside it, outlineOf() already clamps that at render/build time, the
+ * same path a handle drag or a typed Length already goes through --
+ * this function does not need a second copy of that clamp.
+ */
+function commitSettledPoints(
+  doc: ModelDoc, featureId: string, points: Point[], constraints: Constraint[],
+): ModelDoc {
+  return {
+    ...doc,
+    features: doc.features.map((x) => (x.id === featureId ? { ...x, points, constraints } : x)),
+  };
+}
 // `edgePicked` is `pickedEdgeUsable` at the call site: round() tries the
 // single-edge Fillet path FIRST whenever that is true (see round()'s own
 // doc comment), so the button's title has to say so BEFORE the click, not
@@ -1454,10 +1481,7 @@ export default function ModelEditor({
     // fighting banner up afterward (a real, separate report this session
     // does not own the deeper fix for -- see HANDOFF.md-adjacent notes) --
     // solveDoc re-solving from the OLD points instead of these new ones.
-    onChange({
-      ...doc,
-      features: doc.features.map((x) => (x.id === f.id ? { ...x, points, constraints: next } : x)),
-    });
+    onChange(commitSettledPoints(doc, f.id, points, next));
     say(null);
     // The rule this call added or changed, so the toolbar Delete has
     // something to target instead of the whole sketch (see
