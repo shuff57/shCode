@@ -1,0 +1,73 @@
+{
+  "loop": "reSHape tool-by-tool parity: every Build tool against the same operation in Chili3D (3D) and jsketcher's standalone sketcher (2D), plus the four defects the six-task parity loop left open",
+  "started": "2026-09-04T13:20-07:00",
+  "closed": "2026-09-04T23:46-0700",
+  "bars": {
+    "3d": "Chili3D v0.8-beta.1, https://chili3d.com, live at 1440x900; captures in the session scratchpad toolparity/bars/chili3d and chili3d-v2 (the newer done-crop per piece is the judged one)",
+    "2d": "jsketcher standalone sketcher, web/sketcher.html from source on :3100 (parity/bars/jsketcher-src)"
+  },
+  "method": "One piece per tool (P01-P20 3D, S01-S13 2D) and D1-D4, fixed tasks in toolparity/TASKS.md. Capture agents used each app like a first-time person (tooltips, drags, right-clicks, deliberate mistakes; EXPLORE*.md per side, unblinded evidence for the lead only). Blind visual-analyzer critics judged A/B packs with names stripped and chrome cropped, two strict picks per pair (finishes, looks) plus the biggest gap. A win by default over an invalid bar shot was never counted: every such pair was recaptured (Chili3D sizes proven by its own Measure tool after its Properties labels were found to mislabel the axes). The crop must include the working surface where the task's controls live (our docked Rules column, the timeline strip for Delete), not the canvas alone.",
+  "rounds_2d": "r1 ours 7, split 1, bar 2 (S10 conflict note read as an error; S11 no bare line). r2 bar 3 (rules left no mark on the geometry; S11 reworded to a four-sided outline on both sides). r3 split (marks landed; crop hid the Rules column). r4 split (icons, no words). r5 split (matrix cell unlabeled before click). r6 ours 3/3 on both questions (canvas click + rule strip; jsketcher's gap: an eight-option unlabeled menu and no dimension readout). Final 2D: ours S01-S05 S07-S13, S06 no bar (no chamfer in jsketcher), D2 fixed (rules survive Run).",
+  "rounds_3d": "r1 9/9 ours VOID (Chili3D box tall: Properties 'Length' drives the vertical extent). r2 ours 6, split 1 (P14), bar 1 (P20 no face size), 4 void (bar invalid). r3 ours 3, split 2 (P06 looks, P13 looks). r4 ours 4 (bar outcomes with sizes proven). r5 ours 3, split 1 (P06 framing). defects: D1 parity (kernel behaviour), D3 ours, D4 ours after the crop included the timeline. r5 (after the fixes) ours P13 P14 P20, P06 split on framing alone. r6 P06 after the auto-fit: finishes ours (4 inputs vs 17, Pull 1 chip), looks bar (axis guides drew through the solid). r7 after 80dbbf85 (guides depth-tested, tools card out of the crop): ours on both questions (4 inputs vs 17, Pull 1 chip; bar has no readout confirming the pull).",
+  "commits": [
+    "6993b038 sketch rule solve: fewest-movers seed, collapse gate, area-ranked settle, calm note, applied edge lit",
+    "2cc59cbd Rules pane click target (tools card overlap), pin/rim drag desync, non-positive note, Undo clears notes",
+    "00cfaf02 sketch rules survive the Code round trip (across/up/length/equal/parallel/perpendicular/pin)",
+    "33b800bb a lock is dropped last",
+    "863a9853 two-rule conflicts settle",
+    "a1d33328 every rule drawn on the geometry (dash, tick, slanted tick, right-angle square, pin)",
+    "8160a332 Blend accepts a circle; Delete confirms and names dependents; one name per tool; across everywhere; Shift multi-edge Round",
+    "7011ad9d pill shows the picked face/edge size from kernel geometry; rim pick prefers the outer edge; delete after-note",
+    "7c55f655 Bevel naming; clamp note; pair-rule picker; hint timing; Level/Upright labels",
+    "a0c59bfa edge overlay depth; Four Corners 'in from each side' (caught a dropped-bore bug); overhead light (face gaps 17/32/17%)",
+    "924fb9ee contextual rule strip on a sketch selection",
+    "4dd5be00 commitSettledPoints registered with the sketch-mover census; full gate green",
+    "54075ebf rim edges pickable and named from Home; edge depth interpolates 1/depth (perspective-correct)",
+    "515882db auto-fit the first solid and any result leaving the frame (250 ms, reduced-motion aware); a panel-edited edge is the canvas selection and shows the rule strip",
+    "80dbbf85 axis/grid guides depth-test against the model (LineSegments2 with a real depth offset; polygon offset never applied to GL_LINES) and stop in frame; this commit also carried the lead's staged CLAUDE.md note for this loop"
+  ],
+  "bar_facts": [
+    "Chili3D v0.8: Properties Length/Width/Height do not map to X/Y/Z as labelled (Length = vertical extent); reading a field back is not proof; fast typing truncates '30' to '3'; Rectangle sketches on a vertical plane unless Working Plane is toggled; Intersect returns an empty result on two overlapping boxes; Cut left the box unchanged (silhouette area identical); Array made three overlapping pairs; perspective camera makes a d20 h30 cylinder read as a cone; no per-face size readout; no Hole tool; no draft tool; Shell flaky; Repeat Around needs a four-step radius interaction the UI never labels",
+    "jsketcher: no chamfer; short edges snap-merge silently at default zoom; fillet radius not settable exactly; Lock Point needs APPLY (Esc cancels); no hover highlight; Ctrl+Z no-op; Length=0 collapses, -15 taken as 15; a hidden text command console; selection shows a name, never a length"
+  ],
+  "left_open": [
+    "P03 P05 P07 (sphere, torus, spin), P08 (loft), P17 (mirror), P19c (overlap): Chili3D could not be driven to a result by three agents in three attempts each; recorded, not counted",
+    "the reverse of item U (a canvas click does not persistently light the panel row) was scoped out",
+    "D3 at extreme zoom (camera-to-target ~37 units, inside the box's ~59 bounding diagonal): sweeping the rim goes top face -> +y face with an EMPTY edge candidate list, no edge line within the 8 px pick band; reproduced from the round-5 armed.png framing, root cause not found, no code change made (build-3d, after 54075ebf). At Home and ordinary zooms both rim edges pick and name correctly (verify-build-parity 34/34)."
+  ],
+  "lens_evidence": "session scratchpad toolparity/ (TASKS.md, BRIEF-*.md, bars/*, ours/*, judge/r*/{3d,2d,def}/{pack,verdicts.json,unblinded.json,_key})",
+  "final": {
+    "3d": "ours P01 P02 P04 P06 P09 P10 P12 P13 P14 P15 P16 P18 P19a P19b P20 (15); no bar P11; no bar result P03 P05 P07 P08 P17 P19c (Chili3D could not be driven to a result in three attempts each)",
+    "2d": "ours S01-S05 S07-S13 (12); S06 no bar (jsketcher has no chamfer)",
+    "defects": "D1 parity (single-edge fillet cap is correct B-rep behaviour, tried r0 and r0.001 neighbours on the real kernel); D2 fixed (rules survive Run, 00cfaf02); D3 ours; D4 ours"
+  },
+  "checks_owned": [
+    "scripts/verify-sketch-rules.py 68/68",
+    "scripts/verify-build-parity.py 34/34",
+    "scripts/verify-timeline-delete.py 13/13",
+    "scripts/verify-rules-round-trip.py 9/9",
+    "scripts/verify-edge-depth.py 2/2",
+    "scripts/verify-hollow-floor.mjs --occt public/reshape/kernel 5/5",
+    "scripts/test-sketch-solve.mjs 91/91",
+    "scripts/test-reshape-script.mjs 211/211",
+    "npm test exit 0 on 4dd5be00 and 515882db (lead's own runs)",
+    "scripts/verify-shading.py 5/5 (incl. the axis-through-face guard)"
+  ],
+  "deployment": {
+    "commit": "80dbbf85",
+    "url": "https://81c9837e.shcode.pages.dev",
+    "production": "https://shcode.pages.dev",
+    "earlier": "515882db as https://c30c500d.shcode.pages.dev",
+    "verified_live": "occt-build.js 200; replicad_single.wasm application/wasm with Access-Control-Allow-Origin: *; brep/brep-check/play 404; served chunk 6595-2f530c16b9381a11.js carries LineSegments2 (the depth-tested guides); the sandbox in reSHape mode builds Box 1 on the live kernel with no page errors; lesson pages stay sequence-locked for a signed-out visitor"
+  },
+  "collisions": "two Chili3D agents wrote the same directory after crossed messages (chili3d vs chili3d-v2); resolved by taking the newer done-crop per piece; a builder's mid-edit twice left the shared dev server returning 500 (a backtick inside a styled-jsx comment), fixed by the rule 'reload the sandbox after every save'",
+  "gate": "npm test exit 0, ALL PASS 45/45 against the oracle, on 4dd5be00, 515882db and 80dbbf85 (lead's own runs)",
+  "tally": {
+    "pieces": 37,
+    "ours": 29,
+    "parity_or_fixed": 2,
+    "no_bar": 8,
+    "bar": 0,
+    "note": "ours = 15 3D + 12 2D + D3 D4; parity/fixed = D1 (kernel behaviour) and D2 (script round trip, no bar); no bar = P11 S06 + six Chili3D no-result pieces; bar wins = 0 after 7 rounds"
+  }
+}
