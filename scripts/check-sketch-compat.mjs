@@ -39,12 +39,10 @@
 // and it did not happen), not a silent skip. Without the flag at all, the
 // geometry checks are left out and one visible line says so -- still no
 // skip of the checks that do not need a kernel.
-import { execFileSync } from 'child_process';
-import { mkdtempSync, rmSync, writeFileSync, readFileSync, existsSync } from 'fs';
-import { tmpdir } from 'os';
+import { readFileSync, existsSync } from 'fs';
 import path from 'path';
-import { createRequire } from 'module';
 import { fileURLToPath, pathToFileURL } from 'url';
+import { loadModulesAsync } from './_pkg-load.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -64,27 +62,20 @@ if (occtRequested && !occtReady) {
     `${occtDir} has no replicad_single.js -- geometry cannot be measured`);
 }
 
-const out = mkdtempSync(path.join(tmpdir(), 'shcode-compat-'));
-
+// reshape-script.ts and friends moved to reshape-cad's packages/kernel,
+// packages/script and packages/sketch (B1 extraction, plan:
+// freecad-browser.md) -- see scripts/_pkg-load.mjs for why this compiles
+// across that split instead of the flat lib/*.ts list this used to be.
 try {
-  execFileSync(
-    process.execPath,
-    [path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-     'lib/reshape-script.ts', 'lib/reshape-script-gen.ts',
-     'lib/model-types.ts', 'lib/model-codegen.ts', 'lib/occt-build.ts',
-     'lib/sketch-arc.ts', 'lib/sketch-solve.ts', 'lib/topo-name.ts', 'lib/topo-resolve.ts',
-     'lib/topo-history.ts',
-     '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck'],
-    { cwd: root, stdio: 'inherit' },
-  );
-  writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
-
-  const require = createRequire(import.meta.url);
-  const script = require(path.join(out, 'reshape-script.js'));
-  const gen = require(path.join(out, 'reshape-script-gen.js'));
-  const types = require(path.join(out, 'model-types.js'));
-  const adapter = require(path.join(out, 'occt-build.js'));
-  const arc = require(path.join(out, 'sketch-arc.js'));
+  const { load } = await loadModulesAsync([
+    'reshape-script', 'reshape-script-gen', 'model-types', 'model-codegen', 'occt-build',
+    'sketch-arc', 'sketch-solve', 'topo-name', 'topo-resolve', 'topo-history',
+  ]);
+  const script = await load('reshape-script');
+  const gen = await load('reshape-script-gen');
+  const types = await load('model-types');
+  const adapter = await load('occt-build');
+  const arc = await load('sketch-arc');
 
   let oc = null;
   if (occtReady) {
@@ -211,8 +202,9 @@ try {
   } else {
     console.log('  ----  geometry not measured: pass --occt public/reshape/kernel');
   }
-} finally {
-  rmSync(out, { recursive: true, force: true });
+} catch (e) {
+  console.error(e);
+  process.exit(1);
 }
 
 if (failures) {

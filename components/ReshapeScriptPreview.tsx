@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import ReshapePreview from './ReshapePreview';
-import BrepViewport from './model/BrepViewportThree';
+// BrepViewportThree.tsx moved to reshape-cad's packages/studio (B1
+// extraction, plan: freecad-browser.md) -- this component is a second,
+// independent consumer of it alongside the package's own ReshapeStudio.
+import BrepViewport from '@shuff57/reshape-studio/model/BrepViewportThree';
 import type { ModelDoc } from '../lib/model-types';
 
 interface Props {

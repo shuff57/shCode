@@ -16,7 +16,7 @@
 // SHIPPED grade() -- comment stripping included -- not a copy of it.
 
 import { execFileSync } from 'child_process';
-import { mkdtempSync, rmSync, writeFileSync, readFileSync } from 'fs';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync } from 'fs';
 import { createRequire } from 'module';
 import { tmpdir } from 'os';
 import path from 'path';
@@ -24,7 +24,8 @@ import { fileURLToPath } from 'url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
-const out = mkdtempSync(path.join(tmpdir(), 'shcode-console-labs-'));
+mkdirSync(path.join(root, 'node_modules', '.pkg-load-cache'), { recursive: true });
+const out = mkdtempSync(path.join(root, 'node_modules', '.pkg-load-cache', 'shcode-console-labs-'));
 
 let failures = 0;
 const check = (name, actual, expected) => {

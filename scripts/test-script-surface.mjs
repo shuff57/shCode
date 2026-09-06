@@ -23,12 +23,11 @@
 //
 //   node scripts/test-script-surface.mjs
 
-import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadModules } from './_pkg-load.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -46,23 +45,17 @@ const warn = (name, extra) => {
 const note = (t) => console.log('  ----  ' + t);
 const near = (a, b, tol) => Math.abs(a - b) <= tol * Math.max(1, Math.abs(b));
 
-const out = mkdtempSync(path.join(tmpdir(), 'shcode-surface-'));
-
+// hull.ts, script-surface.ts and reshape-docs.ts moved to reshape-cad's
+// packages/script (B1 extraction, plan: freecad-browser.md); docs-core.ts
+// is vendored there too (it stays in shCode's own lib/ as well, for
+// js-docs.ts and moshion-docs.ts, which are not reSHape). All four still
+// live in one package, so this compiles exactly as before -- see
+// scripts/_pkg-load.mjs for why the loader exists at all.
 try {
-  execFileSync(
-    process.execPath,
-    [
-      path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-      'lib/hull.ts', 'lib/script-surface.ts', 'lib/docs-core.ts', 'lib/reshape-docs.ts',
-      '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',
-    ],
-    { cwd: root, stdio: 'inherit' },
-  );
-  writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
-  const req = createRequire(path.join(out, 'noop.cjs'));
-  const hull = req(path.join(out, 'hull.js'));
-  const surface = req(path.join(out, 'script-surface.js'));
-  const { sections } = req(path.join(out, 'reshape-docs.js'));
+  const { load } = loadModules(['hull', 'script-surface', 'docs-core', 'reshape-docs']);
+  const hull = load('hull');
+  const surface = load('script-surface');
+  const { sections } = load('reshape-docs');
 
   const local = createRequire(import.meta.url);
   console.log('=== lib/hull.ts ===');
@@ -153,8 +146,9 @@ try {
     existsSync(path.join(root, 'scripts', 'brep-probe', 'brep.html'))
       && existsSync(path.join(root, 'scripts', 'brep-probe', 'brep-check.html')),
     'public/reshape being clean means nothing if the probe was simply deleted');
-} finally {
-  rmSync(out, { recursive: true, force: true });
+} catch (e) {
+  console.error(e);
+  process.exit(1);
 }
 
 console.log(`\n${fails === 0 ? 'ALL PASS' : fails + ' FAILED'}${warns ? `, ${warns} warning(s)` : ''}`);

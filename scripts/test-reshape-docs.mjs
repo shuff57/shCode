@@ -37,16 +37,12 @@
 //
 //   node scripts/test-reshape-docs.mjs
 
-import { execFileSync } from 'node:child_process';
-import { createRequire } from 'node:module';
-import {
-  existsSync, readdirSync, readFileSync, mkdtempSync, rmSync, writeFileSync,
-} from 'node:fs';
-import { tmpdir } from 'node:os';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documentedNames, docText } from './reshape-docs-text.mjs';
+import { loadModulesAsync, srcPath } from './_pkg-load.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -194,26 +190,17 @@ note(`scanned ${scanned.length} files under public/reshape/ + the preview path`)
 
 section('doc drift (warnings)');
 
-const vocabOutDir = mkdtempSync(path.join(tmpdir(), 'shcode-reshape-vocab-'));
+// reshape-script.ts and friends moved to reshape-cad's packages/script and
+// packages/sketch (B1 extraction, plan: freecad-browser.md) -- see
+// scripts/_pkg-load.mjs for why this loads it this way now.
 let VOCABULARY = null;
 try {
-  execFileSync(
-    process.execPath,
-    [
-      path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-      'lib/reshape-script.ts', 'lib/model-types.ts', 'lib/model-codegen.ts',
-      'lib/sketch-arc.ts', 'lib/sketch-solve.ts', 'lib/topo-name.ts',
-      '--outDir', vocabOutDir, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',
-    ],
-    { cwd: root, stdio: 'inherit' },
-  );
-  writeFileSync(path.join(vocabOutDir, 'package.json'), '{"type":"commonjs"}');
-  const requireVocab = createRequire(path.join(vocabOutDir, 'noop.cjs'));
-  VOCABULARY = requireVocab(path.join(vocabOutDir, 'reshape-script.js')).VOCABULARY;
+  const { load } = await loadModulesAsync([
+    'reshape-script', 'model-types', 'model-codegen', 'sketch-arc', 'sketch-solve', 'topo-name',
+  ]);
+  VOCABULARY = (await load('reshape-script')).VOCABULARY;
 } catch (e) {
-  ok('lib/reshape-script.ts compiles and exports `VOCABULARY`', false, e.message);
-} finally {
-  rmSync(vocabOutDir, { recursive: true, force: true });
+  ok('reshape-script.ts compiles and exports `VOCABULARY`', false, e.message);
 }
 
 ok(
@@ -250,10 +237,13 @@ section('refusal sentences are the runtime\'s own');
   // So: every quoted sentence that reads like a refusal must be an instance of
   // a string template in the runtime. `${...}` in a template matches anything;
   // `a -- ` + `b` continuations are joined before extraction.
-  const SOURCES = ['lib/occt-build.ts', 'lib/model-types.ts', 'lib/reshape-script.ts'];
+  // occt-build.ts, model-types.ts and reshape-script.ts moved to
+  // reshape-cad's packages/kernel and packages/script (B1 extraction, plan:
+  // freecad-browser.md).
+  const SOURCES = [srcPath('occt-build'), srcPath('model-types'), srcPath('reshape-script')];
   const templates = [];
   for (const f of SOURCES) {
-    let s = readFileSync(path.join(root, f), 'utf8').replace(/\r\n/g, '\n');
+    let s = readFileSync(f, 'utf8').replace(/\r\n/g, '\n');
     s = s.replace(/`\s*\n\s*\+\s*`/g, '');
     for (const m of s.matchAll(/`((?:[^`\\]|\\.)*)`|'((?:[^'\\\n]|\\.)*)'/g)) {
       const lit = m[1] ?? m[2];
@@ -266,7 +256,7 @@ section('refusal sentences are the runtime\'s own');
   const looksLikeRefusal = (q) => / -- /.test(q) || /Round the shape before/.test(q);
   const DOCS = [
     ['public/reshape/docs/reference.md', docText.reference()],
-    ['lib/reshape-docs.ts', readFileSync(path.join(root, 'lib/reshape-docs.ts'), 'utf8')],
+    ['reshape-docs.ts', readFileSync(srcPath('reshape-docs'), 'utf8')],
   ];
   let quotes = 0;
   for (const [where, text] of DOCS) {

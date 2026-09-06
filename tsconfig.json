@@ -12,7 +12,18 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
+    // @shuff57/reshape-* (file: deps on ../reshape-cad/packages/*) are real
+    // symlinks into a sibling repo with its own node_modules/react. Without
+    // this, TS resolves those packages' own `import 'react'` from THEIR
+    // real location (reshape-cad/node_modules/react) instead of shCode's,
+    // and two distinct react/@types/react installs are not the same type
+    // to TS -- ForwardRefExoticComponent and friends stop being assignable
+    // to themselves. preserveSymlinks makes resolution walk up from the
+    // symlink's apparent location in shCode's own node_modules instead, so
+    // it finds shCode's single copy. next.config.js sets the matching
+    // webpack option for the actual bundle.
+    "preserveSymlinks": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",

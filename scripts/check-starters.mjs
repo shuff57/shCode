@@ -22,7 +22,7 @@
 //
 // Run: node scripts/check-starters.mjs   (also part of `npm test`)
 import { execFileSync } from 'child_process';
-import { mkdtempSync, rmSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'fs';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'fs';
 import { tmpdir } from 'os';
 import path from 'path';
 import { createRequire } from 'module';
@@ -66,7 +66,8 @@ function starterFiles(id, keys) {
   return Object.keys(files).length ? files : null;
 }
 
-const out = mkdtempSync(path.join(tmpdir(), 'shcode-starters-'));
+mkdirSync(path.join(root, 'node_modules', '.pkg-load-cache'), { recursive: true });
+const out = mkdtempSync(path.join(root, 'node_modules', '.pkg-load-cache', 'shcode-starters-'));
 let failures = 0;
 try {
   execFileSync(process.execPath, [

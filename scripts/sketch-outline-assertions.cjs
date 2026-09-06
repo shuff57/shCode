@@ -14,14 +14,14 @@
 // stops breaking, the check beside it is measuring nothing and says so. Every
 // pinned number was measured, both ways, before it was written down.
 
-module.exports = function run(dir) {
+module.exports = async function run(load) {
   const path = require('path');
   const fs = require('fs');
-  const arc = require(path.join(dir, 'sketch-arc.js'));
-  const gen = require(path.join(dir, 'model-codegen.js'));
-  const handles = require(path.join(dir, 'model-handles.js'));
-  const solve = require(path.join(dir, 'sketch-solve.js'));
-  const outline = require(path.join(dir, 'sketch-outline.js'));
+  const arc = await load('sketch-arc');
+  const gen = await load('model-codegen');
+  const handles = await load('model-handles');
+  const solve = await load('sketch-solve');
+  const outline = await load('sketch-outline');
 
   let pass = 0;
   const fails = [];
@@ -263,7 +263,7 @@ module.exports = function run(dir) {
   // corner 2 afterwards. Getting this wrong slides a student's radius onto a
   // corner they never chose, silently, on a button press that is supposed to
   // leave the outline exactly where it was.
-  const types = require(path.join(dir, 'model-types.js'));
+  const types = await load('model-types');
   const split = types.addCorner(sk({ rounds: { 1: 8 } }), 0);
   check('...Corner moves a round with its corner (1 -> 2), not with its index',
     split.points.length === 5 && split.rounds && split.rounds[2] === 8
@@ -463,11 +463,11 @@ module.exports = function run(dir) {
   console.log('\n=== the wiring, because a fix that never reaches a click is half a fix ===');
 
   const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
-  const editorSrc = read('components', 'model', 'ModelEditor.tsx');
+  const editorSrc = read('..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'ModelEditor.tsx');
   // The reSHape half of SandboxWorkspace moved into ReshapeStudio.tsx on
   // 2026-09-04 (SPEC-A1); the wiring under test lives there now.
-  const wsSrc = read('components', 'reshape', 'ReshapeStudio.tsx');
-  const panelSrc = read('components', 'model', 'SketchConstraints.tsx');
+  const wsSrc = read('..', 'reshape-cad', 'packages', 'studio', 'src', 'ReshapeStudio.tsx');
+  const panelSrc = read('..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'SketchConstraints.tsx');
 
   check('Round a corner writes a request, not geometry',
     /rounds: \{ \.\.\.\(f\.rounds \?\? \{\}\), \[corner\]: radius \}/.test(editorSrc),

@@ -48,7 +48,10 @@
 //
 // Run: node scripts/test-mesh-export.mjs   (also part of `npm test`)
 
-import { writeSTL, writeOBJ, write3MF, mergeMeshes } from '../lib/mesh-export.ts';
+// Moved to reshape-cad's packages/studio (B1 extraction, plan:
+// freecad-browser.md); consumed as the real npm package now (built dist,
+// resolved through its package.json "exports" map), not a raw .ts import.
+import { writeSTL, writeOBJ, write3MF, mergeMeshes } from '@shuff57/reshape-studio/mesh-export';
 import JSZip from 'jszip';
 
 let pass = 0;

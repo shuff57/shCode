@@ -254,7 +254,10 @@ module.exports = function run(dir) {
   // sketchHandles() in lib/model-handles.ts emits one 'point' handle per
   // sketch corner. Checked in the source rather than asserted in prose,
   // because an unreachable remedy has now shipped three generations running.
-  const handlesSrc = fs.readFileSync(path.join(__dirname, '..', 'lib', 'model-handles.ts'), 'utf8');
+  // model-handles.ts moved to reshape-cad's packages/script (B1 extraction,
+  // plan: freecad-browser.md).
+  const handlesSrc = fs.readFileSync(
+    path.join(__dirname, '..', '..', 'reshape-cad', 'packages', 'script', 'src', 'model-handles.ts'), 'utf8');
   check('#D1 ...and "drag the corner" is a remedy that actually exists',
     /kind:\s*'point'\s*as const/.test(handlesSrc) && /f\.points\.map/.test(handlesSrc),
     'sketchHandles() no longer emits a per-corner point handle, so the message tells a ' +
@@ -536,14 +539,16 @@ module.exports = function run(dir) {
   // A library that refuses correctly and a UI that never passes the bulges
   // is the same defect wearing a different hat: the panel would keep
   // offering a ceiling for a corner that cannot be rounded.
+  // SketchConstraints.tsx and ModelEditor.tsx moved to reshape-cad's
+  // packages/studio (B1 extraction, plan: freecad-browser.md).
   const panelSrc = fs.readFileSync(
-    path.join(__dirname, '..', 'components', 'model', 'SketchConstraints.tsx'), 'utf8');
+    path.join(__dirname, '..', '..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'SketchConstraints.tsx'), 'utf8');
   check('the Rules panel asks maxFilletRadius with the bulges, not just the points',
     /maxFilletRadius\(\s*points\s*,\s*i\s*,\s*bulges\s*\)/.test(panelSrc),
     'SketchConstraints.tsx still calls maxFilletRadius(points, i) -- the ceiling it shows is for ' +
     'a straight-edged sketch that is not the one on screen');
   const editorSrc = fs.readFileSync(
-    path.join(__dirname, '..', 'components', 'model', 'ModelEditor.tsx'), 'utf8');
+    path.join(__dirname, '..', '..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'ModelEditor.tsx'), 'utf8');
   check('...and the editor asks whyCannotRoundCorner with them too',
     /whyCannotRoundCorner\(\s*f\.points\s*,\s*corner\s*,\s*f\.bulges\s*\)/.test(editorSrc),
     'ModelEditor.tsx still calls whyCannotRoundCorner(f.points, corner)');

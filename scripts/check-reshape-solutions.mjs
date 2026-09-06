@@ -21,12 +21,10 @@
 //
 // Run: node scripts/check-reshape-solutions.mjs [--occt <dir>]
 //      (also part of `npm test`; --occt defaults to public/reshape/kernel)
-import { execFileSync } from 'child_process';
-import { mkdtempSync, rmSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'fs';
-import { tmpdir } from 'os';
+import { readFileSync, readdirSync, existsSync } from 'fs';
 import path from 'path';
-import { createRequire } from 'module';
 import { fileURLToPath, pathToFileURL } from 'url';
+import { loadModulesAsync } from './_pkg-load.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -69,27 +67,15 @@ if (!existsSync(path.join(occtDir, 'replicad_single.js'))) {
   process.exit(1);
 }
 
-const out = mkdtempSync(path.join(tmpdir(), 'shcode-reshape-solutions-'));
 let failures = 0;
 let checkedAny = false;
 
+// model-check.ts moved to reshape-cad's packages/script (B1 extraction,
+// plan: freecad-browser.md) -- see scripts/_pkg-load.mjs for why this loads
+// it this way now.
 try {
-  execFileSync(
-    process.execPath,
-    [
-      path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-      'lib/model-check.ts',
-      '--outDir', out,
-      '--module', 'commonjs',
-      '--target', 'es2022',
-      '--skipLibCheck',
-    ],
-    { cwd: root, stdio: 'inherit' },
-  );
-  writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
-
-  const require = createRequire(import.meta.url);
-  const { checkModel } = require(path.join(out, 'model-check.js'));
+  const { load } = await loadModulesAsync(['model-check', 'model-types', 'topo-name']);
+  const { checkModel } = await load('model-check');
   const { runScript } = await import(pathToFileURL(SCRIPT_RUNTIME).href);
 
   // The kernel loads once for the whole module's labs, not once per lesson --
@@ -200,8 +186,9 @@ try {
     console.log(`PASS ${id} solution ${refResults.length}/${modelReqs.length},`
       + ` starter fails ${modelReqs.length - starterPassed}/${modelReqs.length}`);
   }
-} finally {
-  rmSync(out, { recursive: true, force: true });
+} catch (e) {
+  console.error(e);
+  process.exit(1);
 }
 
 if (!checkedAny) {

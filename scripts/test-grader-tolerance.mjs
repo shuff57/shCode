@@ -18,7 +18,7 @@
 // Run: node scripts/test-grader-tolerance.mjs   (also part of `npm test`)
 
 import { execFileSync } from 'child_process';
-import { mkdtempSync, rmSync, writeFileSync, readFileSync } from 'fs';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync } from 'fs';
 import { tmpdir } from 'os';
 import path from 'path';
 import { createRequire } from 'module';
@@ -26,7 +26,8 @@ import { fileURLToPath } from 'url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
-const out = mkdtempSync(path.join(tmpdir(), 'shcode-tolerance-'));
+mkdirSync(path.join(root, 'node_modules', '.pkg-load-cache'), { recursive: true });
+const out = mkdtempSync(path.join(root, 'node_modules', '.pkg-load-cache', 'shcode-tolerance-'));
 
 const BT = String.fromCharCode(96);   // backtick -- typing one is not portable
 const AP = String.fromCharCode(39);   // apostrophe

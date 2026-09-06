@@ -29,11 +29,9 @@
 // itself making before.
 
 import { execFileSync } from 'child_process';
-import { mkdtempSync, rmSync, writeFileSync, readFileSync, existsSync } from 'fs';
-import { tmpdir } from 'os';
+import { writeFileSync, readFileSync, existsSync } from 'fs';
 import path from 'path';
 import { pathToFileURL } from 'url';
-import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -64,7 +62,6 @@ if (!dir || !existsSync(path.join(dir, 'replicad_single.js'))) {
 }
 
 const baseline = JSON.parse(readFileSync(path.join(root, '.gauntlet', 'oracle.json'), 'utf8'));
-const out = mkdtempSync(path.join(tmpdir(), 'shcode-occt-'));
 let pass = 0;
 const fails = [];
 const check = (name, ok, detail) => {
@@ -72,26 +69,24 @@ const check = (name, ok, detail) => {
   else { fails.push(name); console.log('  FAIL  ' + name + (detail ? ' -- ' + detail : '')); }
 };
 
+// occt-build.ts, model-types.ts, sketch-arc.ts, topo-resolve.ts,
+// topo-history.ts, topo-name.ts, script-surface.ts, hull.ts and occt-mesh.ts
+// moved to reshape-cad's packages/kernel, packages/script and
+// packages/sketch (B1 extraction, plan: freecad-browser.md) -- see
+// scripts/_pkg-load.mjs for why this compiles across that split instead of
+// the flat lib/*.ts list this used to be.
 try {
-  execFileSync(
-    process.execPath,
-    [
-      path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-      'lib/occt-build.ts', 'lib/model-types.ts', 'lib/sketch-arc.ts', 'lib/topo-resolve.ts',
-      'lib/topo-history.ts', 'lib/topo-name.ts',
-      'lib/script-surface.ts', 'lib/hull.ts', 'lib/occt-mesh.ts',
-      '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',
-    ],
-    { cwd: root, stdio: 'inherit' },
-  );
-  writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
-  const require = createRequire(import.meta.url);
-  const adapter = require(path.join(out, 'occt-build.js'));
-  const arc = require(path.join(out, 'sketch-arc.js'));
-  const topo = require(path.join(out, 'topo-resolve.js'));
-  const hist = require(path.join(out, 'topo-history.js'));
-  const naming = require(path.join(out, 'topo-name.js'));
-  const types = require(path.join(out, 'model-types.js'));
+  const { loadModulesAsync } = await import('./_pkg-load.mjs');
+  const { load } = await loadModulesAsync([
+    'occt-build', 'model-types', 'sketch-arc', 'topo-resolve',
+    'topo-history', 'topo-name', 'script-surface', 'hull', 'occt-mesh',
+  ]);
+  const adapter = await load('occt-build');
+  const arc = await load('sketch-arc');
+  const topo = await load('topo-resolve');
+  const hist = await load('topo-history');
+  const naming = await load('topo-name');
+  const types = await load('model-types');
 
   const oc = await (await import(pathToFileURL(path.join(dir, 'replicad_single.js')).href)).default();
   console.log('OpenCascade up, ' + Object.keys(oc).length + ' exports\n');
@@ -106,9 +101,9 @@ try {
   globalThis.__types = types;
   globalThis.__hist = hist;
   globalThis.__name = naming;
-  globalThis.__surface = require(path.join(out, 'script-surface.js'));
-  globalThis.__hull = require(path.join(out, 'hull.js'));
-  globalThis.__mesh = require(path.join(out, 'occt-mesh.js'));
+  globalThis.__surface = await load('script-surface');
+  globalThis.__hull = await load('hull');
+  globalThis.__mesh = await load('occt-mesh');
 
   // The fixtures this slice claims: primitives, booleans, move, mirror.
   const DOCS = {
@@ -338,8 +333,9 @@ try {
         'got ' + got.volume + ' vs ' + want.volume + ', bbox off by ' + db.toFixed(4));
     }
   }
-} finally {
-  rmSync(out, { recursive: true, force: true });
+} catch (e) {
+  console.error(e);
+  process.exit(1);
 }
 
 // ---- the claim the whole naming design rests on -------------------------

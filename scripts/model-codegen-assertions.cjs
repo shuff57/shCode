@@ -1,10 +1,10 @@
 // Assertions for lib/model-types.ts + lib/model-codegen.ts, run against a
 // CommonJS build by scripts/test-model-codegen.mjs.
 
-module.exports = function run(dir) {
+module.exports = async function run(load) {
   const path = require('path');
-  const types = require(path.join(dir, 'model-types.js'));
-  const gen = require(path.join(dir, 'model-codegen.js'));
+  const types = await load('model-types');
+  const gen = await load('model-codegen');
 
   let pass = 0;
   const fails = [];
@@ -204,7 +204,7 @@ module.exports = function run(dir) {
       /round a corner/i.test(msg) && /rules panel/i.test(msg), msg);
   }
   check('the fabricated-tool sentence is gone from the whole codebase',
-    !fs.readFileSync(path.join(__dirname, '..', 'lib', 'model-types.ts'), 'utf8')
+    !fs.readFileSync(path.join(__dirname, '..', '..', 'reshape-cad', 'packages', 'script', 'src', 'model-types.ts'), 'utf8')
       .includes('no way to round a corner'));
 
   // ROOT CAUSE A / finding 3: the Move message used to always say "before
@@ -631,11 +631,11 @@ module.exports = function run(dir) {
   // homes (the sketch branch and the extrude/revolve branch both carried it)
   // and shipping fillet while either survived would leave the app naming a
   // remedy it had just made false again in the other direction.
-  const libSrc = fs.readFileSync(path.join(__dirname, '..', 'lib', 'model-types.ts'), 'utf8');
+  const libSrc = fs.readFileSync(path.join(__dirname, '..', '..', 'reshape-cad', 'packages', 'script', 'src', 'model-types.ts'), 'utf8');
   check('#13 "no way to round a corner" has no hits left in lib/model-types.ts',
     !libSrc.includes('no way to round a corner'));
 
-  const overlaySrc = fs.readFileSync(path.join(__dirname, '..', 'components', 'model', 'ModelEditor.tsx'), 'utf8');
+  const overlaySrc = fs.readFileSync(path.join(__dirname, '..', '..', 'reshape-cad', 'packages', 'studio', 'src', 'model', 'ModelEditor.tsx'), 'utf8');
   check('#14 the sketch tool group is searchable by "Circle" -- sketchVisible includes it',
     /sketchVisible\s*=\s*\[[^\]]*'Circle'[^\]]*\]/.test(overlaySrc),
     'a stale sketchVisible list would hide the whole sketch group, including the button being searched for, ' +
@@ -651,7 +651,7 @@ module.exports = function run(dir) {
   // whole edge's factor over half the chord -- half the radius each. That
   // reads as a perfectly plausible pair of bulge numbers. Only the shape
   // gives it away.
-  const arcLib = require(path.join(dir, 'sketch-arc.js'));
+  const arcLib = await load('sketch-arc');
   const area = (pts) => {
     let a = 0;
     for (let i = 0; i < pts.length; i++) {
@@ -703,7 +703,7 @@ module.exports = function run(dir) {
   // state left to run. This is a source check because the defect was React
   // wiring, not codegen -- checking the new home for the same guarantee.
   const studioSrc = fs.readFileSync(
-    path.join(__dirname, '..', 'components', 'reshape', 'ReshapeStudio.tsx'), 'utf8');
+    path.join(__dirname, '..', '..', 'reshape-cad', 'packages', 'studio', 'src', 'ReshapeStudio.tsx'), 'utf8');
   // toReshape() (the JSCAD emitter) is gone -- toScript() (reSHape Script,
   // the kernel's only remaining source emitter) is the sole path now, so
   // this checks for its presence AND toReshape's absence rather than both

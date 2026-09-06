@@ -30,7 +30,7 @@
 //   node scripts/audit-grader-tolerance.mjs --gate       # layout axes, exits 1 on a hit
 
 import { execFileSync } from 'child_process';
-import { mkdtempSync, rmSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'fs';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'fs';
 import { tmpdir } from 'os';
 import path from 'path';
 import { createRequire } from 'module';
@@ -238,7 +238,8 @@ const MUTATIONS = [
 
 // ---------------------------------------------------------------- run
 
-const out = mkdtempSync(path.join(tmpdir(), 'shcode-audit-'));
+mkdirSync(path.join(root, 'node_modules', '.pkg-load-cache'), { recursive: true });
+const out = mkdtempSync(path.join(root, 'node_modules', '.pkg-load-cache', 'shcode-audit-'));
 try {
   execFileSync(
     process.execPath,

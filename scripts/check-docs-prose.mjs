@@ -5,7 +5,9 @@
 import { readFileSync } from 'node:fs';
 import { dslVocabulary } from './reshape-docs-text.mjs';
 
-const SRC = new URL('../lib/reshape-docs.ts', import.meta.url);
+// Moved to reshape-cad's packages/script (B1 extraction, plan:
+// freecad-browser.md).
+const SRC = new URL('../../reshape-cad/packages/script/src/reshape-docs.ts', import.meta.url);
 const text = readFileSync(SRC, 'utf8');
 
 // Since 2026-09-03 the code beside the prose is reSHape Script (box, hole,

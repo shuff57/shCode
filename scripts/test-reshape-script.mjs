@@ -41,12 +41,10 @@
 //
 //   node scripts/test-reshape-script.mjs --occt public/reshape/kernel
 
-import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { loadModules, loadModulesAsync } from './_pkg-load.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -388,29 +386,21 @@ function docsEqualUpToIds(original, reconstructed) {
 // Compile lib/reshape-script.ts + lib/reshape-script-gen.ts + their deps.
 // ---------------------------------------------------------------------------
 
-const out = mkdtempSync(path.join(tmpdir(), 'shcode-reshape-script-'));
+// reshape-script.ts and friends moved to reshape-cad's packages/kernel,
+// packages/script and packages/sketch (B1 extraction, plan:
+// freecad-browser.md) -- see scripts/_pkg-load.mjs for why this compiles
+// across that split instead of the flat lib/*.ts list this used to be.
 let script, gen, types, codegen;
 try {
-  execFileSync(
-    process.execPath,
-    [
-      path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-      'lib/reshape-script.ts', 'lib/reshape-script-gen.ts',
-      'lib/model-types.ts', 'lib/model-codegen.ts',
-      'lib/sketch-arc.ts', 'lib/sketch-solve.ts', 'lib/topo-name.ts',
-      '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',
-    ],
-    { cwd: root, stdio: 'inherit' },
-  );
-  writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
-  const require = createRequire(import.meta.url);
-  script = require(path.join(out, 'reshape-script.js'));
-  gen = require(path.join(out, 'reshape-script-gen.js'));
-  types = require(path.join(out, 'model-types.js'));
-  codegen = require(path.join(out, 'model-codegen.js'));
+  const { load } = await loadModulesAsync([
+    'reshape-script', 'reshape-script-gen', 'model-types', 'model-codegen', 'sketch-arc', 'sketch-solve', 'topo-name',
+  ]);
+  script = await load('reshape-script');
+  gen = await load('reshape-script-gen');
+  types = await load('model-types');
+  codegen = await load('model-codegen');
 } catch (e) {
-  console.error('failed to compile lib/reshape-script.ts and friends: ' + (e && e.message ? e.message : e));
-  rmSync(out, { recursive: true, force: true });
+  console.error('failed to compile reshape-script.ts and friends: ' + (e && e.message ? e.message : e));
   process.exit(1);
 }
 
@@ -719,22 +709,12 @@ if (!occtDir || !existsSync(path.join(occtDir, 'replicad_single.js'))) {
   console.log('          node scripts/test-reshape-script.mjs --occt <dir with replicad_single.js>');
   console.log('          (a skip, not a pass -- (a) and (c) above still ran and are the real gate for those)');
 } else {
-  const kernelOut = mkdtempSync(path.join(tmpdir(), 'shcode-reshape-script-kernel-'));
   try {
-    execFileSync(
-      process.execPath,
-      [
-        path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-        'lib/occt-build.ts', 'lib/model-types.ts', 'lib/sketch-arc.ts',
-        'lib/topo-resolve.ts', 'lib/topo-history.ts', 'lib/topo-name.ts',
-        '--outDir', kernelOut, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',
-      ],
-      { cwd: root, stdio: 'inherit' },
-    );
-    writeFileSync(path.join(kernelOut, 'package.json'), '{"type":"commonjs"}');
-    const require = createRequire(import.meta.url);
-    const adapter = require(path.join(kernelOut, 'occt-build.js'));
-    const arc = require(path.join(kernelOut, 'sketch-arc.js'));
+    const { load: loadKernel } = await loadModulesAsync([
+      'occt-build', 'model-types', 'sketch-arc', 'topo-resolve', 'topo-history', 'topo-name',
+    ]);
+    const adapter = await loadKernel('occt-build');
+    const arc = await loadKernel('sketch-arc');
 
     const oc = await (await import(pathToFileURL(path.join(occtDir, 'replicad_single.js')).href)).default();
     console.log('OpenCascade up, ' + Object.keys(oc).length + ' exports\n');
@@ -999,20 +979,12 @@ if (!occtDir || !existsSync(path.join(occtDir, 'replicad_single.js'))) {
 
     // ---- (e) lib/reshape-docs.ts's `code` fields, the same three checks --
     console.log('\n=== (e) lib/reshape-docs.ts code fields: refusal / drawable / stated volume ===');
-    const docsOut = mkdtempSync(path.join(tmpdir(), 'shcode-reshape-docs-ts-'));
     try {
-      execFileSync(
-        process.execPath,
-        [
-          path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-          'lib/docs-core.ts', 'lib/reshape-docs.ts',
-          '--outDir', docsOut, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',
-        ],
-        { cwd: root, stdio: 'inherit' },
-      );
-      writeFileSync(path.join(docsOut, 'package.json'), '{"type":"commonjs"}');
-      const requireDocs = createRequire(import.meta.url);
-      const { sections: docSections } = requireDocs(path.join(docsOut, 'reshape-docs.js'));
+      // docs-core.ts and reshape-docs.ts both moved to reshape-cad's
+      // packages/script (B1 extraction) -- one package, so this stays the
+      // simple sync loader.
+      const { load: loadDocs } = loadModules(['docs-core', 'reshape-docs']);
+      const { sections: docSections } = loadDocs('reshape-docs');
       let pageCount = 0;
       for (const s of docSections) {
         for (const p of s.pages || []) {
@@ -1024,17 +996,11 @@ if (!occtDir || !existsSync(path.join(occtDir, 'replicad_single.js'))) {
       console.log(`  ----  ${pageCount} pages carrying a code example`);
     } catch (e) {
       check('lib/reshape-docs.ts examples', false, 'threw: ' + (e && e.message ? e.message : e));
-    } finally {
-      rmSync(docsOut, { recursive: true, force: true });
     }
   } catch (e) {
     check('kernel harness', false, 'threw before any check ran: ' + (e && e.message ? e.message : e));
-  } finally {
-    rmSync(kernelOut, { recursive: true, force: true });
   }
 }
-
-rmSync(out, { recursive: true, force: true });
 
 console.log('\n' + (fails.length ? 'FAIL' : 'ALL PASS') + '  (' + pass + '/' + (pass + fails.length) + ')');
 if (fails.length) {

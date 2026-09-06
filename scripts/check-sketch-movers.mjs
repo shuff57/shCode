@@ -26,7 +26,14 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const shcodeRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+// The four lib/ files this census watches (plus ModelEditor.tsx) moved to
+// reshape-cad's packages/script, packages/sketch and packages/studio (B1
+// extraction, plan: freecad-browser.md). `rel` below is computed against
+// their common ancestor -- shCode and reshape-cad's parent folder -- so a
+// key here reads 'reshape-cad/packages/...' for the moved files.
+const root = path.resolve(shcodeRoot, '..');
+const reshapeCadRoot = path.join(root, 'reshape-cad');
 
 // file -> function -> why it is allowed to write this.
 const SANCTIONED = {
@@ -36,10 +43,10 @@ const SANCTIONED = {
   // call, so no key can describe a point that has since moved. sk.round() and
   // sk.chamfer() then go through filletCorner/chamferCorner like the Rules
   // panel does.
-  'lib/reshape-script.ts': {
+  'reshape-cad/packages/script/src/reshape-script.ts': {
     runScript: 'replaces a sketch whole (points + rounds + chamfers + bulges together); never moves a point under a key',
   },
-  'lib/sketch-arc.ts': {
+  'reshape-cad/packages/sketch/src/sketch-arc.ts': {
     splitEdge: 'owns the split, including dividing an arc into two arcs that retrace it',
     filletCorner: 'builds the trim points and the arc; the one place they are constructed',
     chamferCorner: 'builds the trim points and the straight edge; the slice counterpart of filletCorner',
@@ -71,15 +78,15 @@ const SANCTIONED = {
     // restores the tessellated area exactly (sketch-arc-assertions.cjs).
     removeCorner: 'splices one design corner out and merges the two edges beside it, deciding every corner- and edge-keyed field explicitly',
   },
-  'lib/model-codegen.ts': {
+  'reshape-cad/packages/script/src/model-codegen.ts': {
     applyParam: 'writes a DESIGN corner from a drag handle or a typed dimension',
     solveDoc: 'writes DESIGN corners the constraint solver moved, gated by outlineOf',
   },
-  'lib/model-types.ts': {
+  'reshape-cad/packages/script/src/model-types.ts': {
     // newSketch/newCircleSketch build a feature from nothing; there is no
     // existing outline for them to damage.
   },
-  'components/model/ModelEditor.tsx': {
+  'reshape-cad/packages/studio/src/model/ModelEditor.tsx': {
     // Item L: setConstraints() seeds a solve to check a new between-edges
     // rule would not collapse the sketch, then has to commit THOSE points
     // (not just the constraint) or solveDoc()'s own later unseeded re-solve
@@ -109,7 +116,7 @@ function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
     const full = path.join(dir, name);
     if (statSync(full).isDirectory()) {
-      if (name === 'node_modules' || name.startsWith('.')) continue;
+      if (name === 'node_modules' || name === 'dist' || name.startsWith('.')) continue;
       walk(full, out);
     } else if (/\.(ts|tsx)$/.test(name)) {
       out.push(full);
@@ -136,7 +143,11 @@ const problems = [];
 let sites = 0;
 let probes = 0;
 
-for (const file of [...walk(path.join(root, 'lib')), ...walk(path.join(root, 'components'))]) {
+for (const file of [
+  ...walk(path.join(shcodeRoot, 'lib')),
+  ...walk(path.join(shcodeRoot, 'components')),
+  ...walk(path.join(reshapeCadRoot, 'packages')),
+]) {
   const rel = path.relative(root, file).split(path.sep).join('/');
   const src = readFileSync(file, 'utf8');
   // Diagram/quiz/grader files have their own unrelated `points`; only sketch

@@ -46,68 +46,109 @@ const dest = path.join(root, 'public', 'reshape', 'kernel');
 const argIdx = process.argv.indexOf('--occt');
 const occtDir = argIdx > -1 ? process.argv[argIdx + 1] : process.env.OCCT_DIR;
 
-/** Our own layer. occt-build is the entry; the rest are what it reaches. */
-const SOURCES = [
-  'lib/occt-build.ts',
-  // The TAUGHT vocabulary, which occt-build does not reach: the mouse path goes
-  // through buildDoc(), the script path goes through createApi(). Both halves
-  // of the modeller have to be in the bundle or one of them 404s at import.
-  'lib/occt-api.ts',
-  'lib/occt-mesh.ts',
-  'lib/model-types.ts',
-  'lib/sketch-arc.ts',
-  'lib/topo-name.ts',
-  'lib/topo-resolve.ts',
-  'lib/topo-history.ts',
-  'lib/hull.ts',
-  // three.js's twin of occt-mesh.ts -- runner-brep.html draws through this
-  // instead of the JSCAD/regl geom3 path. Type-only 'three' import, so tsc
-  // erases it and this file carries no runtime dependency on three itself.
-  'lib/occt-three.ts',
-  // The script-runner's interpreter (see public/reshape/script-runner.html
-  // and lib/reshape-script.ts's own header). It never touches OpenCascade or
-  // three.js -- it only builds a ModelDoc -- but it has to compile to a real
-  // ES module here rather than ship through Next's own bundle, because it
-  // has to run inside the SAME sandboxed, allow-same-origin-less iframe
-  // model-types.ts's compiled twin already runs in, for the same reason:
-  // student code must never execute in the parent's own origin. model-codegen
-  // is dragged in as a dependency (pname(), generatedParams(), applyParam())
-  // rather than duplicated -- see reshape-script.ts's num() for why the two
-  // must agree on one key format.
-  'lib/reshape-script.ts',
-  'lib/model-codegen.ts',
-  'lib/sketch-solve.ts',
-];
+// Our own layer moved to reshape-cad's packages/kernel, packages/script and
+// packages/sketch (B1 extraction, plan: freecad-browser.md). occt-build is
+// the entry; the rest are what it reaches. Grouped by package because each
+// group is compiled with ITS OWN --rootDir (see below) -- a browser page has
+// no bundler and no import map (the NO BUNDLER note above), so every file
+// still has to land flat in `dest` and resolve every import as a plain
+// relative './x.js', including the ones that now cross a package boundary
+// as a '@shuff57/reshape-*' specifier.
+const reshapeCadRoot = path.join(root, '..', 'reshape-cad', 'packages');
+const PACKAGE_SOURCES = {
+  kernel: [
+    'occt-build.ts',
+    // The TAUGHT vocabulary, which occt-build does not reach: the mouse path
+    // goes through buildDoc(), the script path goes through createApi().
+    // Both halves of the modeller have to be in the bundle or one of them
+    // 404s at import.
+    'occt-api.ts',
+    'occt-mesh.ts',
+    'topo-resolve.ts',
+    // three.js's twin of occt-mesh.ts -- runner-brep.html draws through this
+    // instead of the JSCAD/regl geom3 path. Type-only 'three' import, so tsc
+    // erases it and this file carries no runtime dependency on three itself.
+    'occt-three.ts',
+  ],
+  script: [
+    'model-types.ts',
+    'topo-name.ts',
+    'topo-history.ts',
+    'hull.ts',
+    // The script-runner's interpreter (see public/reshape/script-runner.html
+    // and reshape-script.ts's own header). It never touches OpenCascade or
+    // three.js -- it only builds a ModelDoc -- but it has to compile to a
+    // real ES module here rather than ship through Next's own bundle,
+    // because it has to run inside the SAME sandboxed,
+    // allow-same-origin-less iframe model-types.ts's compiled twin already
+    // runs in, for the same reason: student code must never execute in the
+    // parent's own origin. model-codegen is dragged in as a dependency
+    // (pname(), generatedParams(), applyParam()) rather than duplicated --
+    // see reshape-script.ts's num() for why the two must agree on one key
+    // format.
+    'reshape-script.ts',
+    'model-codegen.ts',
+  ],
+  sketch: [
+    'sketch-arc.ts',
+    'sketch-solve.ts',
+  ],
+};
+const SOURCES = Object.values(PACKAGE_SOURCES).flat();
 
 mkdirSync(dest, { recursive: true });
 
-execFileSync(
-  process.execPath,
-  [
-    path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-    ...SOURCES,
-    '--outDir', dest,
-    '--module', 'es2022',
-    '--target', 'es2022',
-    '--moduleResolution', 'bundler',
-    '--skipLibCheck',
-  ],
-  { cwd: root, stdio: 'inherit' },
-);
+// Compiled ONE PACKAGE AT A TIME, each with --rootDir set to that package's
+// own src/, so tsc's per-invocation common-root stays that one directory and
+// the output lands flat in `dest` across all three calls (filenames are
+// unique across the whole set -- verified against PACKAGE_SOURCES above).
+// A single combined invocation would instead root at packages/ (the nearest
+// common ancestor across kernel+script+sketch) and nest the output
+// (dest/kernel/src/occt-build.js, ...), which the browser cannot fetch from
+// the flat /reshape/kernel/ paths dynamicImportKernel() hardcodes.
+for (const [pkg, files] of Object.entries(PACKAGE_SOURCES)) {
+  const srcDir = path.join(reshapeCadRoot, pkg, 'src');
+  execFileSync(
+    process.execPath,
+    [
+      path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
+      ...files.map((f) => path.join(srcDir, f)),
+      '--outDir', dest,
+      '--rootDir', srcDir,
+      '--module', 'es2022',
+      '--target', 'es2022',
+      '--moduleResolution', 'bundler',
+      '--skipLibCheck',
+    ],
+    { cwd: root, stdio: 'inherit' },
+  );
+}
 
-// tsc leaves `from './model-types'`, which is legal TypeScript and not a legal
-// browser module specifier. Rewritten rather than configured because
-// `moduleResolution: node16` would demand the .js suffix in the SOURCE files
-// too, and those are also compiled by Next, which does not want it.
+// tsc leaves `from './model-types'` (legal TypeScript, not a legal browser
+// module specifier) and, at a package boundary, `from '@shuff57/reshape-script/model-types'`
+// (a bare specifier, which a bundler-less page cannot resolve at all). Both
+// are rewritten to a flat relative path -- everything above compiled into
+// this same directory, so the package name and subpath are irrelevant here;
+// only the file's own base name matters. Rewritten rather than configured
+// because `moduleResolution: node16` would demand the .js suffix in the
+// SOURCE files too, and those are also compiled by Next (via the npm
+// package build), which does not want a browser-specific rewrite.
 let rewritten = 0;
 for (const f of readdirSync(dest)) {
   if (!f.endsWith('.js')) continue;
   const p = path.join(dest, f);
   const before = readFileSync(p, 'utf8');
-  const after = before.replace(
-    /(\bfrom\s+['"])(\.\.?\/[^'"]+?)(['"])/g,
-    (m, a, spec, z) => (spec.endsWith('.js') ? m : a + spec + '.js' + z),
-  );
+  const after = before
+    // '@shuff57/reshape-<pkg>/<name>' -> './<name>.js' (flat, same directory)
+    .replace(
+      /(\bfrom\s+['"])@shuff57\/reshape-(?:kernel|script|sketch)\/([a-zA-Z0-9-]+)(['"])/g,
+      (m, a, name, z) => a + './' + name + '.js' + z,
+    )
+    // './model-types' -> './model-types.js' (relative, missing extension)
+    .replace(
+      /(\bfrom\s+['"])(\.\.?\/[^'"]+?)(['"])/g,
+      (m, a, spec, z) => (spec.endsWith('.js') ? m : a + spec + '.js' + z),
+    );
   if (after !== before) { writeFileSync(p, after); rewritten++; }
 }
 console.log(`compiled ${SOURCES.length} sources, rewrote imports in ${rewritten} file(s)`);

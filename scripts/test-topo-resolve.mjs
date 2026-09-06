@@ -62,12 +62,10 @@
 //   node scripts/test-topo-resolve.mjs --occt <dir with replicad_single.js>
 //   node scripts/test-topo-resolve.mjs --occt public/reshape/kernel   (if you have one locally)
 
-import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { loadModulesAsync } from './_pkg-load.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -94,26 +92,20 @@ const skip = (name, why) => {
   console.log('  SKIP/UNTESTABLE  ' + name + '\n        ' + why);
 };
 
-const out = mkdtempSync(path.join(tmpdir(), 'shcode-topores-'));
-
+// occt-build.ts, model-types.ts, sketch-arc.ts, topo-resolve.ts,
+// topo-history.ts and topo-name.ts moved to reshape-cad's packages/kernel,
+// packages/script and packages/sketch (B1 extraction, plan:
+// freecad-browser.md) -- see scripts/_pkg-load.mjs for why this compiles
+// across that split instead of the flat lib/*.ts list this used to be.
 try {
-  execFileSync(
-    process.execPath,
-    [
-      path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-      'lib/occt-build.ts', 'lib/model-types.ts', 'lib/sketch-arc.ts',
-      'lib/topo-resolve.ts', 'lib/topo-history.ts', 'lib/topo-name.ts',
-      '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',
-    ],
-    { cwd: root, stdio: 'inherit' },
-  );
-  writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
-  const require = createRequire(import.meta.url);
-  const adapter = require(path.join(out, 'occt-build.js'));
-  const arc = require(path.join(out, 'sketch-arc.js'));
-  const model = require(path.join(out, 'model-types.js'));
-  const topo = require(path.join(out, 'topo-resolve.js'));
-  const hist = require(path.join(out, 'topo-history.js'));
+  const { load } = await loadModulesAsync([
+    'occt-build', 'model-types', 'sketch-arc', 'topo-resolve', 'topo-history', 'topo-name',
+  ]);
+  const adapter = await load('occt-build');
+  const arc = await load('sketch-arc');
+  const model = await load('model-types');
+  const topo = await load('topo-resolve');
+  const hist = await load('topo-history');
 
   const oc = await (await import(pathToFileURL(path.join(dir, 'replicad_single.js')).href)).default();
   console.log('OpenCascade up, ' + Object.keys(oc).length + ' exports\n');
@@ -1447,8 +1439,9 @@ try {
     console.log('\nSKIP/UNTESTABLE (not counted as pass or fail):');
     for (const u of untestable) console.log('  - ' + u);
   }
-} finally {
-  rmSync(out, { recursive: true, force: true });
+} catch (e) {
+  console.error(e);
+  process.exit(1);
 }
 
 console.log(`\n${fails.length === 0 ? 'ALL PASS' : fails.length + ' FAILED'}`);

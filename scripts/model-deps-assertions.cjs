@@ -15,9 +15,8 @@
 // would have gone green the day the bug shipped, because the sets were never
 // the thing that was wrong.
 
-module.exports = function run(dir) {
-  const path = require('path');
-  const deps = require(path.join(dir, 'model-deps.js'));
+module.exports = async function run(load) {
+  const deps = await load('model-deps');
 
   let pass = 0;
   const fails = [];

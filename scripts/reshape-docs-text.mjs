@@ -18,9 +18,12 @@ const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 const read = (p) => readFileSync(p, 'utf8').replace(/\r\n/g, '\n');
 
+// reshape-script.ts and reshape-docs.ts moved to reshape-cad's
+// packages/script (B1 extraction, plan: freecad-browser.md).
+const RESHAPE_CAD_SCRIPT = join(REPO, '..', 'reshape-cad', 'packages', 'script', 'src');
 const PATHS = {
-  script: join(REPO, 'lib/reshape-script.ts'),
-  inAppDocs: join(REPO, 'lib/reshape-docs.ts'),
+  script: join(RESHAPE_CAD_SCRIPT, 'reshape-script.ts'),
+  inAppDocs: join(RESHAPE_CAD_SCRIPT, 'reshape-docs.ts'),
   reference: join(REPO, 'public/reshape/docs/reference.md'),
 };
 

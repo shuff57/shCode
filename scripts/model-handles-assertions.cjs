@@ -1,9 +1,8 @@
 // Assertions for lib/model-handles.ts's planeAnchor, run against a CommonJS
 // build by scripts/test-model-handles.mjs.
 
-module.exports = function run(dir) {
-  const path = require('path');
-  const handles = require(path.join(dir, 'model-handles.js'));
+module.exports = async function run(load) {
+  const handles = await load('model-handles');
 
   let pass = 0;
   const fails = [];

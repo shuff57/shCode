@@ -1,10 +1,9 @@
 // Assertions for lib/model-check.ts's checkModel(), run against a CommonJS
 // build by scripts/test-model-check.mjs.
 
-module.exports = function run(dir) {
-  const path = require('path');
-  const { checkModel } = require(path.join(dir, 'model-check.js'));
-  const { formatName } = require(path.join(dir, 'topo-name.js'));
+module.exports = async function run(load) {
+  const { checkModel } = await load('model-check');
+  const { formatName } = await load('topo-name');
 
   let pass = 0;
   const fails = [];

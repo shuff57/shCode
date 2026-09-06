@@ -37,12 +37,10 @@
 //
 //   node scripts/verify-hollow-floor.mjs --occt <dir with replicad_single.js>
 
-import { execFileSync } from 'node:child_process';
-import { createRequire } from 'node:module';
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { loadModulesAsync } from './_pkg-load.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -62,22 +60,17 @@ const check = (name, cond, extra) => {
   else { fails++; console.log('  FAIL  ' + name + (extra !== undefined ? '\n        ' + extra : '')); }
 };
 
-const out = mkdtempSync(path.join(tmpdir(), 'shcode-hollow-floor-'));
+// occt-build.ts and friends moved to reshape-cad's packages/kernel,
+// packages/script and packages/sketch (B1 extraction, plan:
+// freecad-browser.md) -- see scripts/_pkg-load.mjs for why this compiles
+// across that split instead of the flat lib/*.ts list this used to be.
 try {
-  execFileSync(
-    process.execPath,
-    [
-      path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-      'lib/occt-build.ts', 'lib/model-types.ts', 'lib/sketch-arc.ts', 'lib/topo-resolve.ts',
-      'lib/topo-history.ts', 'lib/topo-name.ts', 'lib/script-surface.ts', 'lib/hull.ts', 'lib/occt-mesh.ts',
-      '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck',
-    ],
-    { cwd: root, stdio: 'inherit' },
-  );
-  writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
-  const require = createRequire(import.meta.url);
-  const adapter = require(path.join(out, 'occt-build.js'));
-  const meshMod = require(path.join(out, 'occt-mesh.js'));
+  const { load } = await loadModulesAsync([
+    'occt-build', 'model-types', 'sketch-arc', 'topo-resolve',
+    'topo-history', 'topo-name', 'script-surface', 'hull', 'occt-mesh',
+  ]);
+  const adapter = await load('occt-build');
+  const meshMod = await load('occt-mesh');
 
   const oc = await (await import(pathToFileURL(path.join(dir, 'replicad_single.js')).href)).default();
   console.log('OpenCascade up, ' + Object.keys(oc).length + ' exports\n');
@@ -163,6 +156,7 @@ try {
 
   console.log(fails === 0 ? '\nALL PASS' : `\n${fails} FAILED`);
   process.exit(fails === 0 ? 0 : 1);
-} finally {
-  rmSync(out, { recursive: true, force: true });
+} catch (e) {
+  console.error(e);
+  process.exit(1);
 }

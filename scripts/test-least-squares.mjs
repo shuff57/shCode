@@ -1,38 +1,11 @@
-// Runs scripts/least-squares-assertions.cjs against lib/least-squares.ts.
-//
-// Same shape as test-sketch-solve.mjs: compile the TypeScript to CommonJS in a
-// temp dir, hand the dir to the assertions, clean up. No test framework here.
+// Runs scripts/least-squares-assertions.cjs against packages/sketch's
+// least-squares.ts (moved from lib/least-squares.ts in the B1 extraction,
+// plan: freecad-browser.md -- see scripts/_pkg-load.mjs for why).
 
-import { execFileSync } from 'child_process';
-import { mkdtempSync, rmSync, writeFileSync } from 'fs';
-import { tmpdir } from 'os';
-import path from 'path';
+import { loadModules } from './_pkg-load.mjs';
 import { createRequire } from 'module';
-import { fileURLToPath } from 'url';
 
-const here = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(here, '..');
-const out = mkdtempSync(path.join(tmpdir(), 'shcode-ls-'));
-
-try {
-  execFileSync(
-    process.execPath,
-    [
-      path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-      'lib/least-squares.ts',
-      '--outDir', out,
-      '--module', 'commonjs',
-      '--target', 'es2022',
-      '--skipLibCheck',
-    ],
-    { cwd: root, stdio: 'inherit' },
-  );
-
-  writeFileSync(path.join(out, 'package.json'), '{"type":"commonjs"}');
-
-  const require = createRequire(import.meta.url);
-  const ok = require('./least-squares-assertions.cjs')(out.replace(/\\/g, '/'));
-  if (!ok) process.exit(1);
-} finally {
-  rmSync(out, { recursive: true, force: true });
-}
+const { out } = loadModules(['least-squares']);
+const require = createRequire(import.meta.url);
+const ok = require('./least-squares-assertions.cjs')(out.replace(/\\/g, '/'));
+if (!ok) process.exit(1);

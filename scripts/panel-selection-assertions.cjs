@@ -21,9 +21,8 @@
 // anyway since `rootFeature()` supports them and a future resolver may start
 // producing them.
 
-module.exports = function run(dir) {
-  const path = require('path');
-  const sel = require(path.join(dir, 'model-selection.js'));
+module.exports = async function run(load) {
+  const sel = await load('model-selection');
 
   let pass = 0;
   const fails = [];

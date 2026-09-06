@@ -5,9 +5,8 @@
 // gate: zero triangles is only a build FAILURE when the doc contains
 // something that should have produced a solid.
 
-module.exports = function run(dir) {
-  const path = require('path');
-  const types = require(path.join(dir, 'model-types.js'));
+module.exports = async function run(load) {
+  const types = await load('model-types');
 
   let pass = 0;
   const fails = [];

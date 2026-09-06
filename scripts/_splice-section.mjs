@@ -1,7 +1,7 @@
 // Replace one section's pages array in lib/reshape-docs.ts.
 //   node scripts/_splice-section.mjs <slug> <nextSlug> <file>
 import { readFileSync, writeFileSync } from 'node:fs';
-const DOC = new URL('../lib/reshape-docs.ts', import.meta.url);
+const DOC = new URL('../../reshape-cad/packages/script/src/reshape-docs.ts', import.meta.url);
 const [slug, next, file] = process.argv.slice(2);
 let s = readFileSync(DOC, 'utf8');
 // Normalise line endings on the way in. A CRLF copy of this file makes every
