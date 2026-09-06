@@ -45,37 +45,17 @@ Follow the arrows with a finger and answer these before running any code:
 
 That fourth question is the infinite loop, drawn. With the rectangle gone, the arrow still returns to the diamond, the diamond still asks `count > 0`, and the answer is still `yes`: forever. The `no` branch and the End oval are still on the page; the program just never reaches them. **An infinite loop is not a chart with a missing End. It is a chart with an End that nothing can get to.**
 
-## The do…while Loop
+## Try it
 
-**What you'll learn:**
-- How `do…while` guarantees at least one run
-- A short example that shows the difference from `while`
-
-A `do…while` loop is the same as `while` except the body runs **first**, then the condition is checked. That means the body always executes at least once, even if the condition starts out `false`.
-
-```
-do {
-  // runs at least once
-} while (condition);
-```
-
-**Try it:** The first loop counts down from 3. The second `do…while` runs its body once even though its condition is already false from the start.
+The countdown below is the chart above, written as code. Run it and check your predictions line by line.
 
 ```js live plain
-// while countdown
 let count = 3;
 while (count > 0) {
   console.log("Countdown: " + count);
   count--;
 }
 console.log("Liftoff!");
-
-// do...while: body runs even when condition starts false
-let x = 0;
-do {
-  console.log("do...while ran with x = " + x);
-  x++;
-} while (x < 1);
 ```
 
 ---
@@ -85,7 +65,6 @@ do {
 | Term | Meaning |
 |------|---------|
 | **while loop** | Repeats while a condition is true; condition is checked first |
-| **do…while loop** | Like `while`, but the body runs at least once before the condition is checked |
 | **`count--`** | Shorthand for `count = count - 1` |
 | **infinite loop** | A loop whose condition never becomes false; program freezes |
 | **condition variable** | The variable the loop checks: must change inside the loop to avoid an infinite loop |
