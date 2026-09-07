@@ -13,4 +13,6 @@ switch (fruit) {
   case "banana":
     console.log("Bananas are yellow.");
     break;
+  default:
+    console.log("Unknown fruit.");
 }

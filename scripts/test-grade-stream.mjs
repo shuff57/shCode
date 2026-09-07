@@ -16,7 +16,7 @@
 
 import { execFileSync } from 'child_process';
 import { createServer } from 'http';
-import { mkdtempSync, rmSync, writeFileSync } from 'fs';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -78,7 +78,13 @@ function startStub(chunks, { status = 200 } = {}) {
 // ---------------------------------------------------------------------------
 // Compile the Function + its deps to CommonJS so Node can load them, same
 // trick as test-grader.mjs.
-const out = mkdtempSync(path.join(tmpdir(), 'shcode-gradestream-'));
+// The output lands under node_modules/ on purpose: the compiled auth.js does
+// `require('jose')`, and a bare require from a %TEMP% dir has no way back to
+// this repo's node_modules (mkdtempSync there breaks resolution). Same reason
+// check-starters.mjs and test-rubric-tolerance-2-1.mjs compile into
+// .pkg-load-cache.
+mkdirSync(path.join(root, 'node_modules', '.pkg-load-cache'), { recursive: true });
+const out = mkdtempSync(path.join(root, 'node_modules', '.pkg-load-cache', 'shcode-gradestream-'));
 
 try {
   execFileSync(

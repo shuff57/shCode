@@ -128,7 +128,8 @@
       "file": "script.js",
       "pattern": "//[^\\n]*\\bbreak\\b",
       "flags": "i",
-      "points": 0
+      "points": 0,
+      "stripComments": false
     }
   ],
   "grading": {
