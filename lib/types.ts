@@ -106,6 +106,17 @@ export interface Grading {
    * unit sets whichever one its renderer reads.
    */
   summative?: boolean;
+  /**
+   * The lesson's CORRECT answer includes an uncaught runtime error -- 2.5.3
+   * asks the student to log an undeclared variable and watch it fail, before
+   * try/catch exists to catch it, and 2.5.24 requires a second error left
+   * deliberately unguarded. Drops the runtimeError half of canSubmit ONLY;
+   * the requirements gate still applies, which is what makes this narrower
+   * than `summative` (which drops both). Without it these two lessons can
+   * never be submitted, and because access is gated on prior siblings being
+   * completed, 2.5.3 walls a student out of the rest of the module.
+   */
+  expectsRuntimeError?: boolean;
 }
 
 export interface Lesson {

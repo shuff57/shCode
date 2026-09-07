@@ -38,7 +38,9 @@ const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
 });
 import { recordLessonCompleted, useLessonState } from '../lib/progress';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
-import { fetchDraft, saveDraft, recordSubmission } from '../lib/written-grader-store';
+import { fetchDraft, saveDraft, recordSubmission, streamGrade } from '../lib/written-grader-store';
+import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
+import GraderPicker, { useGraderChoice } from './GraderPicker';
 import { checkDiagram, allPassed, type CheckResult } from '../lib/diagram-check';
 import { describeDiagram, fromMermaid } from '../lib/diagram-mermaid';
 import { DEFAULT_RULES, emptyDiagram, type DiagramConfig, type DiagramDoc } from '../lib/diagram-types';
@@ -113,6 +115,11 @@ export default function DiagramAssignmentView({
   const [checks, setChecks] = useState<CheckResult[] | null>(null);
   const [result, setResult] = useState<GradeResult | null>(null);
   const [grading, setGrading] = useState(false);
+  // Mirrors WrittenGrader: the server reports what it is doing, so Submit shows
+  // motion instead of a still spinner. Null when no stage was reported.
+  const [stage, setStage] = useState<GradeStage | null>(null);
+  // Which grader marks this. Remembered per browser; see useGraderChoice.
+  const { graders, grader, setGrader } = useGraderChoice();
   const [error, setError] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -209,11 +216,8 @@ export default function DiagramAssignmentView({
     setError(null);
     setOffline(false);
     try {
-      const res = await fetch('/api/grade-written', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify({
+      const { status, data } = await streamGrade(
+        {
           lessonId,
           lessonTitle,
           prompt: config.aiGrader.prompt ?? config.prompt ?? fallbackPrompt ?? '',
@@ -223,13 +227,12 @@ export default function DiagramAssignmentView({
           rubric: config.aiGrader.rubric,
           model: config.aiGrader.model,
           contextDocs: config.aiGrader.contextDocs,
-        }),
-      });
-      const text = await res.text();
-      let data: any;
-      try {
-        data = text ? JSON.parse(text) : null;
-      } catch {
+          grader,
+        },
+        setStage,
+      );
+      const res = { status };
+      if (data === null) {
         setError(
           `Grader returned a non-JSON response (HTTP ${res.status}). Ask your teacher — the Ollama key or endpoint may not be configured.`,
         );
@@ -259,6 +262,7 @@ export default function DiagramAssignmentView({
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setGrading(false);
+      setStage(null);
     }
   }
 
@@ -357,7 +361,9 @@ export default function DiagramAssignmentView({
           {/* Structure-only lessons have no feedback to offer — the checks are the
               grade — so promising it on the button misnames what the click does. */}
           {grading
-            ? 'Grading…'
+            ? stage
+              ? `${GRADE_STAGE_LABELS[stage]}…`
+              : 'Grading…'
             : config.aiGrader
               ? result
                 ? 'Re-submit for feedback'
@@ -394,6 +400,22 @@ export default function DiagramAssignmentView({
           {doc.nodes.length} shapes · {doc.edges.length} arrows
         </span>
       </div>
+
+      {/* Only a lesson with an aiGrader makes a model call at all -- on a
+          structure-only chart the checks ARE the grade, so offering a choice of
+          grader would name a step that never runs. Renders nothing anyway when
+          the deploy has one grader. */}
+      {config.aiGrader ? (
+        <div style={{ marginTop: 10 }}>
+          <GraderPicker
+            graders={graders}
+            value={grader}
+            onChange={setGrader}
+            disabled={grading}
+            cloudModel={config.aiGrader.model}
+          />
+        </div>
+      ) : null}
 
       {/* Between the checker and the grader: the checker names a broken rule
           but not the shape that fixes it, and the grader only speaks after

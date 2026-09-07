@@ -10,7 +10,10 @@ import {
   saveDraft,
   recordSubmission,
   fetchSubmissions,
+  streamGrade,
 } from '../lib/written-grader-store';
+import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
+import GraderPicker, { hasGraderChoice, useGraderChoice } from './GraderPicker';
 import SolutionPanel from './SolutionPanel';
 
 export interface AiRubricItem {
@@ -105,6 +108,11 @@ type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }: Props) {
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
+  // What the grader is currently doing. Null while idle, or when a deploy
+  // answers without the stream (the reader falls back to plain JSON) -- in
+  // which case the button reverts to its old wording rather than lying about
+  // a stage nobody reported.
+  const [stage, setStage] = useState<GradeStage | null>(null);
   const [result, setResult] = useState<GradeResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
@@ -112,6 +120,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
   const progress = useLessonState();
+  // Which grader marks this. Remembered per browser; see useGraderChoice.
+  const { graders, grader, setGrader } = useGraderChoice();
   const totalPossible = config.rubric.reduce((s, r) => s + r.points, 0);
   // A test, not a practice assignment: see AiGraderConfig.summative.
   const summative = !!config.summative;
@@ -216,11 +226,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
     setError(null);
     setOffline(false);
     try {
-      const res = await fetch('/api/grade-written', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify({
+      const { status, data } = await streamGrade(
+        {
           lessonId,
           lessonTitle,
           prompt,
@@ -228,13 +235,12 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
           rubric: config.rubric,
           model: config.model,
           contextDocs: config.contextDocs,
-        }),
-      });
-      const text = await res.text();
-      let data: any;
-      try {
-        data = text ? JSON.parse(text) : null;
-      } catch {
+          grader,
+        },
+        setStage,
+      );
+      const res = { status };
+      if (data === null) {
         const reason = `Grader returned a non-JSON response (HTTP ${res.status}).`;
         setError(`${reason} Ask your teacher — the Ollama key or endpoint may not be configured. Your answer has been saved and sent to your teacher for marking.`);
         await recordFailedAttempt(reason, res.status);
@@ -278,6 +284,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
       await recordFailedAttempt(reason, 0);
     } finally {
       setLoading(false);
+      setStage(null);
     }
   }
 
@@ -392,9 +399,14 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         >
           {loading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
           {loading
-            ? summative
-              ? 'Submitting…'
-              : 'Grading…'
+            ? // A reported stage always wins: it is what the server actually
+              // did, where 'Grading…' is only what we assumed. Falls back to
+              // the old wording when no stage arrived.
+              stage
+              ? `${GRADE_STAGE_LABELS[stage]}…`
+              : summative
+                ? 'Submitting…'
+                : 'Grading…'
             : summative
               ? locked
                 ? 'Submitted'
@@ -428,11 +440,25 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config }:
         <span style={{ color: '#666', fontSize: 12 }}>
           {response.trim().length} chars · {response.trim().split(/\s+/).filter(Boolean).length} words
         </span>
-        {config.model ? (
+        {hasGraderChoice(graders) ? null : config.model ? (
           <code style={{ color: '#6272a4', fontSize: 11, marginLeft: 'auto' }}>
             model: {config.model}
           </code>
         ) : null}
+      </div>
+
+      {/* Its own row rather than squeezed in beside Submit: on a narrow screen
+          the label, menu and description wrap, and wrapping them through the
+          buttons puts the dropdown under "Save draft" where it reads as part
+          of it. Renders nothing when this deploy has only one grader. */}
+      <div style={{ marginTop: 10 }}>
+        <GraderPicker
+          graders={graders}
+          value={grader}
+          onChange={setGrader}
+          disabled={loading || locked}
+          cloudModel={config.model}
+        />
       </div>
 
       {error && (

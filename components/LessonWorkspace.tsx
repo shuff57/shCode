@@ -648,9 +648,17 @@ export default function LessonWorkspace({
   // test most needs to hear from. Submitting broken code on a test is
   // allowed; it is what the marker is for.
   const isSummative = !!lesson.grading?.summative;
+  // A lesson whose correct answer IS an uncaught error (Grading
+  // .expectsRuntimeError) drops the runtimeError gate and keeps the
+  // requirements gate -- narrower than summative, which drops both. 2.5.3
+  // instructs the student to log an undeclared variable one lesson before
+  // try/catch is taught, and 2.5.24 requires a second error left unguarded;
+  // both satisfy their regexes and then crash by design, so the generic
+  // "don't ship code that crashes" rule made them permanently unsubmittable.
+  const expectsRuntimeError = !!lesson.grading?.expectsRuntimeError;
   const canSubmit =
     isSummative ||
-    (!runtimeError &&
+    ((!runtimeError || expectsRuntimeError) &&
       (isMoshionMode || isNoPoints
         ? allRequirementsPassed
         : totalScore >= (lesson.grading?.passingScore ?? 0)));

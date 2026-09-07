@@ -3,6 +3,68 @@
 Ideas parked for later. Not scheduled, not specced. Newest first.
 Lives beside `log.jsonl` so it ships with the repo and travels between machines.
 
+## Stream grading progress so Submit never looks hung (2026-09-04)
+
+A student clicks Submit on a written response and gets a spinner until the whole
+grade lands. `POST /api/grade-written` is a single non-streaming call: it builds the
+prompt, waits for the model's entire JSON object, shapes it, and only then returns.
+Nothing reaches the browser in between.
+
+**Why it matters now and did not before.** The prod grader is a cloud model and the
+wait is short. Measured on the NAS on 2026-09-04, a local model is a different animal:
+the grading response is ~1200 tokens, and on the Ryzen AI NPU the 35B MoE decodes at
+13.0 tok/s with a 3.1 s time-to-first-token. That is **~90 s of motionless spinner**.
+A student reads that as broken well before it finishes and hits Submit again. Even the
+fast local path (`qwen3.5:2b`, 22 tok/s) is ~55 s.
+
+**The idea: stream stage labels, not tokens.** The student does not want to watch JSON
+arrive - the grade is meaningless half-parsed, and partial rubric verdicts would be
+actively misleading if the model revises one. What removes the "is it stuck" feeling is
+evidence of motion:
+
+    reading your response ... -> checking against the rubric ...
+      -> writing feedback ... -> done
+
+`POST /api/ai-help` already streams `text/plain` from a Pages Function, so the transport
+question is settled - copy that shape rather than inventing one. Two ways to drive it:
+
+| approach | cost | honesty |
+| --- | --- | --- |
+| timed stages, client-side only | trivial, no API change | fake - it is a progress bar that lies if the model stalls |
+| server streams real stage markers | small route change | real - a stall shows as a stall |
+
+Prefer the second. The route already has natural seams (prompt built, model call opened,
+first bytes back, JSON parsed, `shapeResult` done) and the model call can stream so the
+route knows tokens are flowing. Emitting a marker per seam gives motion that is tied to
+actual progress, so a genuinely hung request still looks hung - which is the correct
+behaviour.
+
+Watch out for: `grade-written` returns JSON today and `parseModelJson` needs the whole
+object, so streaming markers must be a separate channel from the payload (NDJSON lines,
+last line = the result) rather than interleaved into it. Also the quota check and the
+fail-closed grader lookup must stay BEFORE the first byte, or a 429/404 turns into a
+200 that streams an error.
+
+**BUILT 2026-09-04.** The second option, as preferred above. `?stream=1` answers
+NDJSON: zero or more `{stage}` lines, then exactly one terminal `{result}` or
+`{error}`. Four stages - reading / thinking / writing / checking - each fired by a
+real seam, so a stall shows as a stall. No query param means the old single JSON
+object byte for byte, and the client falls back to it when the content type is not
+ndjson, which is what made it safe to merge before the Function was deployed
+everywhere. Both watch-outs above are enforced by tests in
+`scripts/test-grade-stream.mjs`: the terminal event is the last line and appears
+exactly once, and a rate-limited request still returns a real 429 as plain JSON.
+
+The stage count question resolved itself: four seams exist in the route regardless
+of how long the wait is, so the same set reads fine at 15 s and at 90 s.
+
+Shipped alongside it, and the reason the 90 s case is now reachable at all: a
+student-facing **grader dropdown** (`components/GraderPicker.tsx`) choosing between
+the hosted cloud model and a self-hosted one. Both go through the identical
+streaming path. See the API notes in CLAUDE.md for the env vars and for why the
+choice travels as an enum rather than a host.
+
+
 ## Warn during a fillet drag, without asking the kernel (2026-09-03)
 
 A student can drag a fillet radius to a value the kernel refuses and gets no hint

@@ -47,3 +47,31 @@ bucket_name = "shcode-uploads"
 #
 # Optional: set OLLAMA_HOST if you ever want to point at something other than
 # https://ollama.com (e.g. a self-hosted proxy). Plain env var, not a secret.
+#
+# The "Classroom grader" option in the student dropdown is a SECOND target,
+# configured separately. Both vars are required before it appears at all:
+#
+#   OLLAMA_LOCAL_HOST   e.g. https://ollama.example.org  (plain var)
+#   OLLAMA_LOCAL_MODEL  the model id as the local server names it (plain var)
+#   OLLAMA_LOCAL_API_KEY  optional secret; omit for an unauthenticated box
+#
+# OLLAMA_LOCAL_HOST must be reachable FROM CLOUDFLARE. A Pages Function runs in
+# Cloudflare's network, not on the school LAN, so a bare 192.168.x.y address
+# will time out on every submission -- publish the box through a Cloudflare
+# Tunnel and point this at the tunnel hostname.
+
+# Workers AI. This is a BINDING, not a host or a key -- the Function calls
+# env.AI.run() and Cloudflare routes it. Nothing to keep alive, nothing to
+# rotate, and no tunnel.
+#
+# wrangler.toml covers local dev ONLY. Production reads the binding from the
+# dashboard: Pages project -> Settings -> Functions -> AI bindings, variable
+# name "AI". Without that, GET /api/grade-written reports the fast grader as
+# unavailable and the picker hides it -- it does not fail at grading time.
+#
+# Model comes from WORKERS_AI_MODEL, defaulting to @cf/google/gemma-4-26b-a4b-it.
+# That default was measured, not chosen by reputation: 20/20 on the repo's own
+# rubrics and 25/25 under a 25-way simultaneous burst, where an equally accurate
+# frontier model refused five of the twenty-five to its 20-rpm cap.
+[ai]
+binding = "AI"

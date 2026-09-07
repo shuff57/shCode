@@ -226,6 +226,11 @@ Cloudflare dashboard env vars pane (plain vars):
 | `AUTH_SECRET` | secret | HS256 signing key for session JWTs |
 | `OLLAMA_API_KEY` | secret | Bearer token for `https://ollama.com/api/chat` |
 | `OLLAMA_HOST` | var (optional) | Override Ollama endpoint (defaults to `https://ollama.com`) |
+| `AI` | **binding** | Workers AI. Not a variable — attach it in the dashboard: Pages → shcode → Settings → Functions → **AI bindings**, name `AI`. `wrangler.toml`'s `[ai]` block covers local dev only. Absent ⇒ the fast grader reports unavailable and the picker hides it; grading still works on the other targets. |
+| `WORKERS_AI_MODEL` | var (optional) | Model id for the `workersai` target. Defaults to `@cf/google/gemma-4-26b-a4b-it`. **Do not swap this for a frontier model** (`kimi-k2.*`, `glm-5.2`) — those carry a 20-requests-per-minute account cap, measured to refuse 5 of 25 simultaneous submissions. Ordinary text-generation models get 300/min. |
+| `OLLAMA_LOCAL_HOST` | var (optional) | Second grading target — the "Classroom grader" in the student dropdown. Must be reachable **from Cloudflare**, so a LAN address will not work; publish the box through a Cloudflare Tunnel. |
+| `OLLAMA_LOCAL_MODEL` | var (optional) | Model id as the *local* server names it. No default: a lesson's `model` is a cloud id and will not exist on the box. Without this the local grader stays unavailable even when the host is set. |
+| `OLLAMA_LOCAL_API_KEY` | secret (optional) | Bearer token for the local server. Omit for an unauthenticated box — the Function then sends no `Authorization` header at all. |
 | `ADMIN_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='admin'` |
 | `TEACHER_EMAILS` | var | Comma-separated allowlist; matches at signup → `role='teacher'` |
 | `AI_HELP_DAILY_LIMIT` | var (optional) | Per-student per-unit daily quota for `POST /api/ai-help`; default `10`. Each unit gets its own bucket. Teachers/admins are exempt. |
@@ -290,6 +295,48 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   server-side; clients cannot set it. Legacy NULLs coerce to `student_email`.
 - `POST /api/ai-help` streams `text/plain`, trims code blocks to <=3 lines, and
   is quota'd per student **per unit** per UTC day (`AI_HELP_DAILY_LIMIT`).
+- `POST /api/grade-written?stream=1` answers **NDJSON**: zero or more `{stage}`
+  lines while work happens, then exactly one terminal `{result}` or `{error}`
+  line. Without the query param the response is one plain JSON object, byte for
+  byte as before, and the client falls back to that when the content type is
+  not ndjson. Two rules hold the design together. **Every guard that can refuse
+  runs before the first byte** — once a byte is written the HTTP status is
+  committed, so a 429 or 503 could not be expressed any more. And **the model's
+  own tokens are never forwarded**: a half-arrived grade is meaningless, and a
+  rubric verdict the model then revises would lie to the student about their
+  score. Stage labels move; the grade appears once, whole.
+- The grader target is chosen by an enum, and there are three. `workersai` is
+  the **Workers AI binding** and the preferred one: no host, no key, no tunnel,
+  nothing to keep alive. `resolveTargets()` marks each target `kind: 'ollama'`
+  (an HTTP endpoint we fetch) or `kind: 'binding'` (an object Cloudflare hands
+  the Function); everything downstream branches on that and nothing else. The
+  default is resolved **per request** by `pickDefault()` walking
+  `['workersai', 'cloud', 'local']` and taking the first available, so a deploy
+  that never adds the AI binding keeps grading on `cloud` instead of 503ing.
+  `DEFAULT_GRADER` stays `'cloud'` as the last-resort constant for that reason.
+- **`max_tokens` on the Workers AI path is load-bearing** (`WORKERS_AI_MAX_TOKENS`,
+  8000). At 1500 a reasoning model spent its whole budget on its `reasoning`
+  field, stopped with `finish_reason: "length"`, and returned `content: null` —
+  which is indistinguishable from "this model cannot produce JSON" unless you
+  read `finish_reason`. That mistake made a first benchmark run score two
+  perfectly good models at 85% and 30%; both are 20/20. A null `content` is now
+  reported by name rather than read as `''`.
+- Model choice was **measured, not assumed** (2026-09-05, against the repo's own
+  rubrics via `buildPrompt` and `isPassingGrade`): `gemma-4-26b-a4b-it` and
+  `glm-5.3-flash` both scored 20/20 on a labelled set of strong / thin /
+  off-topic / prompt-injection answers. Only the burst separated them —
+  25 simultaneous submissions gave 25/25 for gemma and 20/25 for glm, the five
+  refusals being `3021: rate limiting`, i.e. the 20-rpm frontier cap. Cost ran
+  75–81 neurons per grade, so ~130 grades/day inside the free 10,000.
+- `GET /api/grade-written` lists the grading targets this deploy can run —
+  `workersai` (the binding), `cloud` (hosted) and `local` (the school's own box). The student picks between
+  them in `components/GraderPicker.tsx`; the choice is remembered per browser
+  and travels as a `grader` **enum** on the POST body. It is never a host, a
+  model, or a key — those are read from env in `resolveTargets()` and nowhere
+  else, for the same reason the rubric is: a client-supplied host is the
+  client-supplied-rubric hole one level down. An unconfigured target refuses
+  with 503 + `offline: true` rather than silently falling back, and both targets
+  share one rate-limit bucket so flipping the dropdown cannot reset the cap.
 - `POST /api/grade-written` takes **only** `lessonId` and `response` from the
   client. The rubric, prompt, model and contextDocs are read server-side from
   `public/ai-graders.json` (generated by `scripts/generate-ai-graders.mjs`,
