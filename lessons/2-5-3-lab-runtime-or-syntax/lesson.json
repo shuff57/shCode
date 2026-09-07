@@ -54,6 +54,7 @@
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,
-    "allowLateSubmit": true
+    "allowLateSubmit": true,
+    "expectsRuntimeError": true
   }
 }
