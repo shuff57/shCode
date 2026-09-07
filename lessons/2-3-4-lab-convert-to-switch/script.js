@@ -4,7 +4,7 @@
 //         For example: "Monday", "Friday", or "Saturday".
 
 // STEP 2: Write a switch statement that checks the value of day.
-//         Include at least two branches, one per day you want to
+//         Include at least two branches, one per day you want to name.
 //         Add a default label to handle any value you did not list.
 //         End each branch the way the reading showed, so it stops there
 //         instead of falling through to the next one.
