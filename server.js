@@ -137,6 +137,92 @@ app.prepare().then(() => {
   server.post('/api/auth/logout', (_req, res) => {
     res.json({ ok: true });
   });
+  // Class-scoped student data. The real routes are
+  // functions/api/my-enrollments.ts and my-due-dates.ts and both need D1; this
+  // server has no binding, so it answers the well-formed empty case. Without
+  // them both 404, and lib/due-dates.ts THROWS on a non-OK response -- so every
+  // page in dev ran its date logic through a caught exception, and HeaderNav +
+  // AnnouncementBanner ate a failed fetch on every load.
+  server.get('/api/my-enrollments', (_req, res) => {
+    res.json({ enrollments: [] });
+  });
+  server.get('/api/my-due-dates', (_req, res) => {
+    res.json({ classes: [], overrides: [], dueWaivers: [] });
+  });
+  // Written-answer drafts. Real route: functions/api/lesson-drafts/[lessonId].ts
+  // (D1 table lesson_drafts, one row per student+lesson). Held in memory here,
+  // keyed the same way. NOTE the 404 on a missing draft is CORRECT and matches
+  // production -- a student who has not saved yet has no row.
+  const devDrafts = new Map(); // `${identity}\u0000${lessonId}` -> {response, updatedAt}
+  const draftKey = (req) => `${devIdentity(req)}\u0000${req.params.lessonId}`;
+  server.get('/api/lesson-drafts/:lessonId', (req, res) => {
+    const row = devDrafts.get(draftKey(req));
+    if (!row) return res.status(404).json({ error: 'Not found' });
+    res.json(row);
+  });
+  server.post('/api/lesson-drafts/:lessonId', express.json({ limit: '1mb' }), (req, res) => {
+    const { response } = req.body || {};
+    if (typeof response !== 'string') {
+      return res.status(400).json({ error: 'response (string) required' });
+    }
+    const updatedAt = Date.now();
+    devDrafts.set(draftKey(req), { response, updatedAt });
+    res.json({ ok: true, updatedAt });
+  });
+  server.delete('/api/lesson-drafts/:lessonId', (req, res) => {
+    devDrafts.delete(draftKey(req));
+    res.json({ ok: true });
+  });
+  // Grading targets. Real route: functions/api/grade-written.ts onRequestGet.
+  // No OLLAMA/Workers-AI credentials exist in dev, so the honest answer is an
+  // empty list -- GraderPicker's hasGraderChoice() renders nothing below two
+  // available targets, which is the correct unconfigured-dev surface.
+  server.get('/api/grade-written', (_req, res) => {
+    res.json({ graders: [], fallback: null });
+  });
+  // Version-control commit pool. Real routes: functions/api/commits/index.ts
+  // (GET ?lessonId= -> { commits }, POST -> { commit }) and commits/[id].ts
+  // (DELETE). Held in memory, keyed by identity+lesson the way the D1 table is.
+  // Without this listCommits() THREW an ApiError on every code lab, because
+  // lib/commits-api.ts rejects any non-OK response.
+  const devCommits = new Map(); // `${identity}\u0000${lessonId}` -> ApiCommit[]
+  const commitKey = (req, lessonId) => `${devIdentity(req)}\u0000${lessonId}`;
+  server.get('/api/commits', (req, res) => {
+    const lessonId = req.query.lessonId;
+    if (typeof lessonId !== 'string' || !lessonId) {
+      return res.status(400).json({ error: 'lessonId required' });
+    }
+    res.json({ commits: devCommits.get(commitKey(req, lessonId)) ?? [] });
+  });
+  server.post('/api/commits', express.json({ limit: '4mb' }), (req, res) => {
+    const { id, lessonId, message, files, changedFileIds } = req.body || {};
+    if (typeof id !== 'string' || typeof lessonId !== 'string') {
+      return res.status(400).json({ error: 'id and lessonId required' });
+    }
+    const commit = {
+      id,
+      lessonId,
+      message: typeof message === 'string' ? message : '',
+      files: files && typeof files === 'object' ? files : {},
+      changedFileIds: Array.isArray(changedFileIds) ? changedFileIds : [],
+      createdAt: Date.now(),
+      authoredByEmail: devIdentity(req),
+    };
+    const key = commitKey(req, lessonId);
+    // Newest first, matching the real route's ORDER BY created_at DESC.
+    devCommits.set(key, [commit, ...(devCommits.get(key) ?? [])]);
+    res.json({ commit });
+  });
+  server.delete('/api/commits/:id', (req, res) => {
+    for (const [key, list] of devCommits) {
+      const next = list.filter((c) => c.id !== req.params.id);
+      if (next.length !== list.length) {
+        devCommits.set(key, next);
+        return res.json({ ok: true });
+      }
+    }
+    res.status(404).json({ error: 'Not found' });
+  });
   // Teacher gates (migrations/0016_lesson_modes.sql). Held in memory rather
   // than D1 because this server does not have a D1 binding; the real routes
   // are functions/api/classes/[id]/lesson-modes.ts and my-lesson-modes.ts.
