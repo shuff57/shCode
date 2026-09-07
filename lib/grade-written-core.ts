@@ -20,6 +20,13 @@ export interface GradeRequest {
   rubric: RubricItem[];
   model?: string;
   contextDocs?: string[];
+  /**
+   * Which configured grader to run this on. An enum, validated server-side
+   * against what the deploy actually has -- see GraderId. Absent means
+   * DEFAULT_GRADER, so every client written before the picker existed keeps
+   * working unchanged.
+   */
+  grader?: GraderId;
 }
 
 export interface CriterionResult {
@@ -47,6 +54,15 @@ export interface GradeResponse {
   criteria: CriterionResult[];
   summary: string;
   hints: string[];
+  /**
+   * Which grader produced this, stamped server-side. Carried into the stored
+   * submission so a teacher looking at a surprising grade can tell whether the
+   * cloud model or the classroom box wrote it -- the two are different models
+   * and will not always agree. Optional: rows graded before the picker have
+   * neither field.
+   */
+  grader?: GraderId;
+  graderModel?: string;
 }
 
 function buildDocContext(slugs: string[] | undefined): string {
@@ -222,4 +238,118 @@ export function validateRequest(body: Partial<GradeRequest>): string | null {
     return `Response is too long (${body.response.length} characters, limit ${MAX_RESPONSE_CHARS}).`;
   }
   return null;
+}
+
+// ---------------------------------------------------------------------------
+// Progress streaming (NDJSON)
+//
+// Grading is one long model call. Non-streaming, the student clicks Submit and
+// watches a motionless spinner until the whole JSON object lands -- long enough
+// on a slow model to read as "broken" and get a second Submit.
+//
+// So `POST /api/grade-written?stream=1` answers with newline-delimited JSON
+// instead: zero or more {stage} lines while work happens, then exactly one
+// terminal {result} or {error} line. The default (no query param) is unchanged
+// and still returns one plain JSON object, because every guard that can refuse
+// the request must be able to set a real HTTP status -- once a byte is written
+// the status is committed, so a 429 or 503 could not be expressed any more.
+//
+// Deliberately NOT streamed: the model's own tokens. A half-arrived grade is
+// meaningless, and showing a rubric verdict the model then revises would lie to
+// the student about their score. Stage labels move; the grade appears once.
+
+export type GradeStage =
+  /** request accepted, prompt assembled */
+  | 'reading'
+  /** model call opened, nothing back yet */
+  | 'thinking'
+  /** model has started producing output */
+  | 'writing'
+  /** output complete, parsing + shaping */
+  | 'checking';
+
+export interface GradeStageEvent {
+  stage: GradeStage;
+  /** Model output characters seen so far. Present from 'writing' onward. */
+  chars?: number;
+}
+
+export interface GradeResultEvent {
+  result: GradeResponse;
+}
+
+export interface GradeErrorEvent {
+  error: string;
+  /** Mirrors the non-streaming body so the client's error path is shared. */
+  offline?: boolean;
+  raw?: string;
+}
+
+export type GradeStreamEvent = GradeStageEvent | GradeResultEvent | GradeErrorEvent;
+
+// What a student reads while each stage is in flight. Kept beside the type so
+// a new stage cannot be added without someone deciding what it says out loud.
+export const GRADE_STAGE_LABELS: Record<GradeStage, string> = {
+  reading: 'Reading your response',
+  thinking: 'Checking it against the rubric',
+  writing: 'Writing your feedback',
+  checking: 'Finishing up',
+};
+
+// ---------------------------------------------------------------------------
+// Which grader runs the call
+//
+// Two targets, both server-side. `cloud` is the hosted Ollama the course has
+// always used; `local` is a self-hosted Ollama on the school's own hardware.
+// The student picks between them; the server owns everything else.
+//
+// The choice is a client-supplied ENUM, and that is the whole reason it is
+// safe. It selects among hosts the deploy configured -- it never carries a
+// host, a key, a model name, or a rubric. The rule from the injection incident
+// still holds without exception: the only field a student controls is their
+// own answer.
+//
+// A target the deploy has not configured is reported unavailable rather than
+// hidden, so a class that expects the local grader and is not getting it can
+// see why instead of wondering where the menu went.
+
+export type GraderId = 'cloud' | 'local' | 'workersai' | 'openrouter';
+
+export const GRADER_IDS: readonly GraderId[] = ['workersai', 'cloud', 'local', 'openrouter'];
+/**
+ * The grader used when the client names none, and the last-resort fallback.
+ *
+ * NOT the preference order -- that lives in the Function, which is the only
+ * place that knows what this deploy actually has configured. A deploy with the
+ * Workers AI binding prefers it (no host to keep alive, no key to rotate, and
+ * it survives 25 submissions in the same minute where a 20-rpm model does not);
+ * one without falls back through here. Keeping this constant at 'cloud' means
+ * a deploy that loses its AI binding degrades to the target that has been
+ * running all along rather than to a 503.
+ */
+export const DEFAULT_GRADER: GraderId = 'cloud';
+
+export function isGraderId(v: unknown): v is GraderId {
+  return v === 'cloud' || v === 'local' || v === 'workersai' || v === 'openrouter';
+}
+
+/** One entry in the student's dropdown. Never carries the host or the key. */
+export interface GraderOption {
+  id: GraderId;
+  /** Short name on the menu. */
+  label: string;
+  /** One line under it, in the course's words. */
+  description: string;
+  /** The model this target would use, so a teacher can confirm it at a glance. */
+  model: string | null;
+  /** False when this deploy has not configured the target. */
+  available: boolean;
+  /** Present only when unavailable: what is missing. Teacher-facing. */
+  unavailableReason?: string;
+}
+
+export interface GraderListResponse {
+  graders: GraderOption[];
+  /** What a client that sends no `grader` field gets. */
+  fallback: GraderId;
 }
