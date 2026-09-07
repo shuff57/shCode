@@ -1631,7 +1631,7 @@
     },
     {
       "id": "2-1-37-challenges",
-      "title": "2.1.41 Challenges: Optional Stretch",
+      "title": "2.1.41 Challenges: Stretch Problems",
       "unit": "2.1 Conditionals",
       "preview": "console",
       "type": "challenge",
@@ -1775,7 +1775,7 @@
     },
     {
       "id": "2-2-13-challenges",
-      "title": "2.2.22 Challenges: Optional Stretch",
+      "title": "2.2.22 Challenges: Stretch Problems",
       "unit": "2.2 Algorithms and Loops",
       "preview": "console",
       "type": "challenge",
@@ -1919,7 +1919,7 @@
     },
     {
       "id": "2-2-8-reading-while-loop",
-      "title": "2.2.13 Reading, while & do…while",
+      "title": "2.2.13 Reading: The while Loop",
       "unit": "2.2 Algorithms and Loops",
       "preview": "reading",
       "type": "lesson",
@@ -2144,7 +2144,7 @@
     },
     {
       "id": "2-3-30-challenges",
-      "title": "2.3.31 Challenges: Optional Stretch",
+      "title": "2.3.31 Challenges: Stretch Problems",
       "unit": "2.3 The switch Statement",
       "preview": "console",
       "type": "challenge",
@@ -2450,7 +2450,7 @@
     },
     {
       "id": "2-4-33-challenges",
-      "title": "2.4.33 Challenges: Optional Stretch",
+      "title": "2.4.33 Challenges: Stretch Problems",
       "unit": "2.4 Loop Control and Nested Loops",
       "preview": "console",
       "type": "challenge",
@@ -2684,7 +2684,7 @@
     },
     {
       "id": "2-5-27-challenges",
-      "title": "2.5.27 Challenges: Optional Stretch",
+      "title": "2.5.27 Challenges: Stretch Problems",
       "unit": "2.5 Handling Errors with try/catch",
       "preview": "console",
       "type": "challenge",
@@ -4688,6 +4688,105 @@
       "type": "assignment",
       "category": "Unit 2: moSHion: Applied Game Development",
       "week": 18
+    },
+    {
+      "id": "8-1-1-reading-a-part-is-a-list-of-steps",
+      "title": "8.1.1 Reading: A Part Is a List of Steps",
+      "unit": "8.1 Solid Shapes",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 3: reSHape: Solid Modelling",
+      "week": null
+    },
+    {
+      "id": "8-1-10-lab-sketch-and-pull",
+      "title": "8.1.10 Lab: Sketch and Pull",
+      "unit": "8.1 Solid Shapes",
+      "preview": "reshape",
+      "type": "assignment",
+      "category": "Unit 3: reSHape: Solid Modelling",
+      "week": null
+    },
+    {
+      "id": "8-1-11-project-desk-tray",
+      "title": "8.1.11 Project: Desk Tray",
+      "unit": "8.1 Solid Shapes",
+      "preview": "reshape",
+      "type": "assignment",
+      "category": "Unit 3: reSHape: Solid Modelling",
+      "week": null
+    },
+    {
+      "id": "8-1-2-lab-your-first-box",
+      "title": "8.1.2 Lab: Your First Box",
+      "unit": "8.1 Solid Shapes",
+      "preview": "reshape",
+      "type": "assignment",
+      "category": "Unit 3: reSHape: Solid Modelling",
+      "week": null
+    },
+    {
+      "id": "8-1-3-lab-change-your-mind",
+      "title": "8.1.3 Lab: Change Your Mind",
+      "unit": "8.1 Solid Shapes",
+      "preview": "reshape",
+      "type": "assignment",
+      "category": "Unit 3: reSHape: Solid Modelling",
+      "week": null
+    },
+    {
+      "id": "8-1-4-lab-drill-a-hole",
+      "title": "8.1.4 Lab: Drill a Hole",
+      "unit": "8.1 Solid Shapes",
+      "preview": "reshape",
+      "type": "assignment",
+      "category": "Unit 3: reSHape: Solid Modelling",
+      "week": null
+    },
+    {
+      "id": "8-1-5-lab-round-an-edge",
+      "title": "8.1.5 Lab: Round an Edge",
+      "unit": "8.1 Solid Shapes",
+      "preview": "reshape",
+      "type": "assignment",
+      "category": "Unit 3: reSHape: Solid Modelling",
+      "week": null
+    },
+    {
+      "id": "8-1-6-lab-hollow-it-out",
+      "title": "8.1.6 Lab: Hollow It Out",
+      "unit": "8.1 Solid Shapes",
+      "preview": "reshape",
+      "type": "assignment",
+      "category": "Unit 3: reSHape: Solid Modelling",
+      "week": null
+    },
+    {
+      "id": "8-1-7-reading-build-wrote-a-program",
+      "title": "8.1.7 Reading: Build Wrote a Program",
+      "unit": "8.1 Solid Shapes",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 3: reSHape: Solid Modelling",
+      "week": null
+    },
+    {
+      "id": "8-1-8-lab-read-the-script",
+      "title": "8.1.8 Lab: Read the Script",
+      "unit": "8.1 Solid Shapes",
+      "preview": "reshape",
+      "type": "assignment",
+      "category": "Unit 3: reSHape: Solid Modelling",
+      "week": null
+    },
+    {
+      "id": "8-1-9-lab-write-it-yourself",
+      "title": "8.1.9 Lab: Write It Yourself",
+      "unit": "8.1 Solid Shapes",
+      "preview": "reshape",
+      "type": "assignment",
+      "category": "Unit 3: reSHape: Solid Modelling",
+      "week": null
     },
     {
       "id": "moshion-bounce",
