@@ -1,7 +1,7 @@
 {
   "id": "2-5-27-challenges",
-  "title": "2.5.27 Challenges: Optional Stretch",
-  "description": "Optional stretch problems. Auto-graded.",
+  "title": "2.5.27 Challenges: Stretch Problems",
+  "description": "Stretch problems. Every challenge is required to continue. Auto-graded.",
   "type": "challenge",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
