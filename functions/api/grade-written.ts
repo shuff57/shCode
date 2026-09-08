@@ -311,10 +311,17 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async (cont
   const { env, data } = context;
   const targets = resolveTargets(env);
   const openRouterAllowed = await isOpenRouterAllowed(env, env.DB, data.email);
-  const displayIds: GraderId[] = openRouterAllowed ? [...PREFERENCE, 'openrouter'] : [...PREFERENCE];
+  // An allowed class sees ONLY OpenRouter -- the picker itself hides once there
+  // is nothing to choose between (hasGraderChoice in GraderPicker.tsx needs
+  // 2+ available options), so this is what actually removes the dropdown.
+  // workersai/cloud/local stay fully resolvable server-side regardless: the
+  // non-streaming and streaming paths fall back to `cloud` if the OpenRouter
+  // call itself fails, and a class outside the allowlist still gets the
+  // ordinary menu.
+  const displayIds: GraderId[] = openRouterAllowed ? ['openrouter'] : [...PREFERENCE];
   return json({
     graders: displayIds.map((id) => toOption(targets[id])),
-    fallback: pickDefault(targets),
+    fallback: openRouterAllowed ? 'openrouter' : pickDefault(targets),
   });
 };
 
@@ -354,13 +361,20 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   // An unrecognised value falls back rather than erroring: the field is
   // optional, and a client from before the picker existed sends nothing.
   const targets = resolveTargets(env, config.model);
-  const requested: GraderId = isGraderId(body.grader) ? body.grader : pickDefault(targets);
+  // Computed once and reused below -- the default-pick and the fail-closed
+  // gate used to each run their own DB query for the same answer.
+  const openRouterAllowed = await isOpenRouterAllowed(env, env.DB, data.email);
+  const requested: GraderId = isGraderId(body.grader)
+    ? body.grader
+    : openRouterAllowed
+      ? 'openrouter'
+      : pickDefault(targets);
 
   // Fail-closed, independent of isAvailable() below: a student outside an
   // allowed class must be refused even on a deploy with OPENROUTER_API_KEY
   // configured. This is deliberately checked here, before the "is this target
   // configured at all" check, not folded into it.
-  if (requested === 'openrouter' && !(await isOpenRouterAllowed(env, env.DB, data.email))) {
+  if (requested === 'openrouter' && !openRouterAllowed) {
     return json(
       {
         ok: false,
@@ -463,6 +477,12 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
       user,
       rubric: config.rubric,
       grader: requested,
+      // Only meaningful when target.kind === 'openrouter' -- the silent
+      // retry target if that call fails. null when this deploy has no cloud
+      // grader configured, so the failure surfaces instead of a confusing
+      // "cloud not set up" error.
+      fallbackTarget:
+        target.kind === 'openrouter' && isAvailable(targets.cloud) ? targets.cloud : null,
     });
   }
 
@@ -474,6 +494,10 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   const timeout = setTimeout(() => controller.abort(), 180_000);
 
   let raw: string;
+  // Overridden below only on an OpenRouter-to-cloud fallback, so the response
+  // always names the grader that actually produced the text.
+  let effectiveGrader: GraderId = requested;
+  let effectiveModel: string = model;
   try {
     if (target.kind === 'binding') {
       // Non-streaming binding call. The same max_tokens ceiling applies: it is
@@ -509,66 +533,59 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
       }
       raw = text;
     } else if (target.kind === 'openrouter') {
-      const res = await fetch(OPENROUTER_ENDPOINT, {
-        method: 'POST',
-        headers: chatHeaders(target.apiKey),
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: 'system', content: system },
-            { role: 'user', content: user },
-          ],
-          temperature: 0.2,
-          response_format: { type: 'json_object' },
-        }),
-        signal: controller.signal,
-      });
-
-      if (res.status === 429) {
-        return json(
-          { ok: false, error: 'The grader is busy right now. Wait a moment and submit again.', grader: requested },
-          503,
+      // OpenRouter is a single external API with no SLA of its own -- unlike
+      // Workers AI (Cloudflare's binding) it can genuinely be down or rate
+      // limiting while the rest of the site is fine. A class that only sees
+      // this one grader must not lose grading entirely when that happens, so
+      // any failure here (429, a non-2xx, or the fetch throwing) retries once
+      // against `cloud` (Ollama) rather than surfacing an error -- silently,
+      // the way a student expects a submit button to just work.
+      try {
+        const res = await fetch(OPENROUTER_ENDPOINT, {
+          method: 'POST',
+          headers: chatHeaders(target.apiKey),
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: 'system', content: system },
+              { role: 'user', content: user },
+            ],
+            temperature: 0.2,
+            response_format: { type: 'json_object' },
+          }),
+          signal: controller.signal,
+        });
+        if (res.status === 429) {
+          throw new GraderError('The grader is busy right now. Wait a moment and submit again.');
+        }
+        if (!res.ok) {
+          const text = await res.text();
+          throw new GraderError(`OpenRouter ${res.status}: ${text.slice(0, 300)}`);
+        }
+        const payload = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+        raw = payload.choices?.[0]?.message?.content || '';
+      } catch (openRouterErr) {
+        const cloudTarget = targets.cloud;
+        // No cloud fallback configured on this deploy -- surface the original
+        // OpenRouter failure rather than a confusing "cloud not set up" one.
+        if (!isAvailable(cloudTarget)) throw openRouterErr;
+        raw = await callOllamaChat(
+          cloudTarget.host as string,
+          cloudTarget.apiKey,
+          cloudTarget.model as string,
+          system,
+          user,
+          controller.signal,
         );
+        effectiveGrader = 'cloud';
+        effectiveModel = cloudTarget.model as string;
       }
-      if (!res.ok) {
-        const text = await res.text();
-        return json(
-          { ok: false, error: `OpenRouter ${res.status}: ${text.slice(0, 300)}`, grader: requested },
-          502,
-        );
-      }
-      const payload = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-      raw = payload.choices?.[0]?.message?.content || '';
     } else {
-      const res = await fetch(`${host}/api/chat`, {
-        method: 'POST',
-        headers: chatHeaders(target.apiKey),
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: 'system', content: system },
-            { role: 'user', content: user },
-          ],
-          stream: false,
-          format: 'json',
-          options: { temperature: 0.2 },
-        }),
-        signal: controller.signal,
-      });
-
-      if (!res.ok) {
-        const text = await res.text();
-        return json(
-          { ok: false, error: `Ollama ${res.status}: ${text.slice(0, 300)}`, grader: requested },
-          502,
-        );
-      }
-      const data = (await res.json()) as { message?: { content?: string } };
-      raw = data.message?.content || '';
+      raw = await callOllamaChat(host, target.apiKey, model, system, user, controller.signal);
     }
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
-    if (/3021|rate limit/i.test(msg)) {
+    if (/3021|rate limit|busy right now/i.test(msg)) {
       return json(
         {
           ok: false,
@@ -578,7 +595,11 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
         503,
       );
     }
-    return json({ ok: false, error: `Grader call failed: ${msg}`, grader: requested }, 502);
+    // A GraderError (thrown by callOllamaChat, or the openrouter branch above)
+    // already carries a student-readable sentence -- only an unexpected throw
+    // gets the generic wrapper. Mirrors the streaming path's identical check.
+    const errorText = e instanceof GraderError ? msg : `Grader call failed: ${msg}`;
+    return json({ ok: false, error: errorText, grader: requested }, 502);
   } finally {
     clearTimeout(timeout);
   }
@@ -612,8 +633,43 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     );
   }
 
-  return json({ ...shapeResult(parsed, config.rubric), grader: requested, graderModel: model });
+  return json({ ...shapeResult(parsed, config.rubric), grader: effectiveGrader, graderModel: effectiveModel });
 };
+
+// Shared Ollama /api/chat call (non-streaming): used for the `cloud`/`local`
+// targets directly, and as the silent fallback when `openrouter` fails.
+// Throws GraderError so callers can catch it the same way a thrown fetch
+// error is caught -- one failure shape, not two.
+async function callOllamaChat(
+  host: string,
+  apiKey: string | null,
+  model: string,
+  system: string,
+  user: string,
+  signal: AbortSignal,
+): Promise<string> {
+  const res = await fetch(`${host}/api/chat`, {
+    method: 'POST',
+    headers: chatHeaders(apiKey),
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: user },
+      ],
+      stream: false,
+      format: 'json',
+      options: { temperature: 0.2 },
+    }),
+    signal,
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new GraderError(`Ollama ${res.status}: ${text.slice(0, 300)}`);
+  }
+  const data = (await res.json()) as { message?: { content?: string } };
+  return data.message?.content || '';
+}
 
 function json(body: unknown, status = 200, extraHeaders?: Record<string, string>): Response {
   return new Response(JSON.stringify(body), {
@@ -900,9 +956,12 @@ interface StreamArgs {
   user: string;
   rubric: Parameters<typeof shapeResult>[1];
   grader: GraderId;
+  // The silent retry target if `target.kind === 'openrouter'` fails. null
+  // when there is nothing to fall back to.
+  fallbackTarget: GraderTarget | null;
 }
 
-function streamGrade({ target, model, system, user, rubric, grader }: StreamArgs): Response {
+function streamGrade({ target, model, system, user, rubric, grader, fallbackTarget }: StreamArgs): Response {
   const host = target.host as string;
   const apiKey = target.apiKey;
   const encoder = new TextEncoder();
@@ -919,6 +978,11 @@ function streamGrade({ target, model, system, user, rubric, grader }: StreamArgs
       const controllerAbort = new AbortController();
       const timeout = setTimeout(() => controllerAbort.abort(), 180_000);
 
+      // Overridden below only on an OpenRouter-to-cloud fallback, so the
+      // terminal result always names the grader that actually produced it.
+      let effectiveGrader = grader;
+      let effectiveModel = model;
+
       try {
         stage('reading');
 
@@ -927,12 +991,32 @@ function streamGrade({ target, model, system, user, rubric, grader }: StreamArgs
         // partial grade -- see the note on GradeStage. Branching here rather
         // than writing two streamGrade functions is what keeps "is it the model
         // or the plumbing?" answerable.
-        const raw =
-          target.kind === 'binding'
-            ? await readBinding(target.ai as Ai, model, system, user, stage)
-            : target.kind === 'openrouter'
-              ? await readOpenRouter(apiKey, model, system, user, stage, controllerAbort.signal)
-              : await readOllama(host, apiKey, model, system, user, stage, controllerAbort.signal);
+        let raw: string;
+        if (target.kind === 'binding') {
+          raw = await readBinding(target.ai as Ai, model, system, user, stage);
+        } else if (target.kind === 'openrouter') {
+          try {
+            raw = await readOpenRouter(apiKey, model, system, user, stage, controllerAbort.signal);
+          } catch (openRouterErr) {
+            // Same silent retry as the non-streaming path: no stage naming a
+            // specific grader has been sent yet ('reading' is generic), so
+            // switching underneath the student here is invisible, not a lie.
+            if (!fallbackTarget) throw openRouterErr;
+            raw = await readOllama(
+              fallbackTarget.host as string,
+              fallbackTarget.apiKey,
+              fallbackTarget.model as string,
+              system,
+              user,
+              stage,
+              controllerAbort.signal,
+            );
+            effectiveGrader = fallbackTarget.id;
+            effectiveModel = fallbackTarget.model as string;
+          }
+        } else {
+          raw = await readOllama(host, apiKey, model, system, user, stage, controllerAbort.signal);
+        }
 
         stage('checking', raw.length);
 
@@ -952,7 +1036,7 @@ function streamGrade({ target, model, system, user, rubric, grader }: StreamArgs
           return;
         }
 
-        send({ result: { ...shapeResult(parsed, rubric), grader, graderModel: model } });
+        send({ result: { ...shapeResult(parsed, rubric), grader: effectiveGrader, graderModel: effectiveModel } });
       } catch (e: unknown) {
         // A GraderError already carries a student-readable sentence; anything
         // else is an unexpected throw and gets the generic wrapper.

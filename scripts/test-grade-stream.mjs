@@ -13,6 +13,13 @@
 //      JSON with a real status. Streaming must not swallow a 429 into a 200.
 //   5. A model reply with no criteria is an error event, not a scoreless grade.
 //   6. No ?stream=1 -> unchanged single-object JSON, for older clients.
+//   7. A class allowed for OpenRouter sees ONLY that grader in the menu, and it
+//      becomes the silent default; a class outside the allowlist is unaffected.
+//   8. An OpenRouter failure (5xx, 429, or the fetch itself throwing) retries
+//      once against `cloud` automatically -- a class with only one grader
+//      showing must not lose grading to a single external API being down.
+//      With no cloud fallback configured, the OpenRouter failure surfaces for
+//      real rather than pretending to succeed.
 
 import { execFileSync } from 'child_process';
 import { createServer } from 'http';
@@ -190,6 +197,44 @@ try {
     };
   }
 
+  // Intercepts global fetch for calls to the OpenRouter endpoint only; anything
+  // else (the local stub Ollama servers) passes straight through to the real
+  // fetch. OPENROUTER_ENDPOINT is a hardcoded constant in the Function, not
+  // env-driven like OLLAMA_HOST, so this is the only way to test that path at
+  // all without hitting the real service.
+  function makeOpenRouterFetch({ mode = 'ok', content } = {}) {
+    const seen = [];
+    const realFetch = global.fetch;
+    global.fetch = async (url, init) => {
+      const urlStr = typeof url === 'string' ? url : url.url;
+      if (!urlStr.includes('openrouter.ai')) return realFetch(url, init);
+      let parsed = null;
+      try { parsed = JSON.parse(init.body); } catch {}
+      seen.push({
+        auth: init.headers?.Authorization ?? null,
+        model: parsed?.model ?? null,
+        stream: !!parsed?.stream,
+      });
+      if (mode === 'network-error') throw new Error('network unreachable');
+      if (mode === 'ratelimit') return new Response('rate limited', { status: 429 });
+      if (mode === 'fail') return new Response('boom', { status: 500 });
+      const text = content ?? GOOD_GRADE;
+      if (parsed?.stream) {
+        const lines = [];
+        for (const piece of text.match(/[\s\S]{1,40}/g)) {
+          lines.push('data: ' + JSON.stringify({ choices: [{ delta: { content: piece } }] }));
+        }
+        lines.push('data: [DONE]');
+        return new Response(lines.join('\n') + '\n', {
+          status: 200,
+          headers: { 'Content-Type': 'text/event-stream' },
+        });
+      }
+      return new Response(JSON.stringify({ choices: [{ message: { content: text } }] }), { status: 200 });
+    };
+    return { seen, restore: () => { global.fetch = realFetch; } };
+  }
+
   function makeEnv({
     rateCount = 0,
     host,
@@ -199,6 +244,9 @@ try {
     localKey,
     ai,
     workersModel,
+    openrouterKey,
+    openrouterModel,
+    openrouterAllowed,
   }) {
     return {
       AI: ai,
@@ -208,6 +256,9 @@ try {
       OLLAMA_LOCAL_HOST: localHost,
       OLLAMA_LOCAL_MODEL: localModel,
       OLLAMA_LOCAL_API_KEY: localKey,
+      OPENROUTER_API_KEY: openrouterKey,
+      OPENROUTER_MODEL: openrouterModel,
+      OPENROUTER_ALLOWED_OWNER_EMAILS: openrouterAllowed,
       GRADE_WRITTEN_DAILY_LIMIT: '30',
       // Both loadAiGrader and isLessonAccessible read static JSON through
       // env.ASSETS, so the stub has to route by pathname -- handing the
@@ -672,6 +723,119 @@ providedRoles: [],
     ok(plain.status === 502, 'non-streaming answers 502, got ' + plain.status);
     const body = await plain.json();
     ok(body.finishReason === 'length', 'and records finish_reason, got ' + body.finishReason);
+  }
+
+  // -- 18: an allowed class is offered ONLY openrouter, and it is the default
+  {
+    console.log('an allowed class is offered only the OpenRouter grader');
+    const cloud = await startStub([GOOD_GRADE]);
+    const or = makeOpenRouterFetch({ content: GOOD_GRADE });
+    try {
+      const env = makeEnv({
+        host: `http://127.0.0.1:${cloud.port}`,
+        openrouterKey: 'or-stub-key',
+        openrouterAllowed: 'kid@example.test',
+        openrouterModel: 'stub/or-model',
+      });
+
+      const menu = await (await callGet(env)).json();
+      ok(menu.graders.length === 1, 'menu carries exactly one grader, got ' + menu.graders.length);
+      ok(menu.graders[0]?.id === 'openrouter', 'and it is openrouter, got ' + menu.graders[0]?.id);
+      ok(menu.fallback === 'openrouter', 'fallback is openrouter too, got ' + menu.fallback);
+
+      const t = (await readNdjson(await call(env))).pop();
+      ok(t.result?.grader === 'openrouter', 'no grader named still routes to openrouter, got ' + t.result?.grader);
+      ok(t.result?.graderModel === 'stub/or-model', 'and names the lesson-configured model');
+      ok(or.seen.length === 1, 'the openrouter endpoint got the call');
+      ok(or.seen[0].auth === 'Bearer or-stub-key', 'carrying the configured key');
+      ok(cloud.seen.length === 0, 'and the ordinary cloud target was never touched');
+    } finally {
+      or.restore();
+      cloud.srv.close();
+    }
+  }
+
+  // -- 19: a class NOT on the allowlist keeps the ordinary menu, unaffected --
+  {
+    console.log('a class outside the allowlist keeps the ordinary three-way menu');
+    const cloud = await startStub([GOOD_GRADE]);
+    const env = makeEnv({
+      host: `http://127.0.0.1:${cloud.port}`,
+      openrouterKey: 'or-stub-key',
+      openrouterAllowed: 'someone.else@example.test', // not this caller (kid@example.test)
+    });
+    const menu = await (await callGet(env)).json();
+    ok(menu.graders.length === 3, 'still three targets, got ' + menu.graders.length);
+    ok(!menu.graders.some((g) => g.id === 'openrouter'), 'openrouter does not appear at all');
+    cloud.srv.close();
+  }
+
+  // -- 20: an OpenRouter failure falls back to cloud SILENTLY, both transports
+  {
+    console.log('an OpenRouter failure falls back to the cloud grader, not an error');
+    const cloud = await startStub([GOOD_GRADE]);
+    const or = makeOpenRouterFetch({ mode: 'fail' });
+    try {
+      const env = makeEnv({
+        host: `http://127.0.0.1:${cloud.port}`,
+        openrouterKey: 'or-stub-key',
+        openrouterAllowed: 'kid@example.test',
+      });
+
+      const streamed = (await readNdjson(await call(env))).pop();
+      ok(!!streamed.result, 'streaming: still produced a grade, not an error');
+      ok(streamed.result?.grader === 'cloud', 'stamped cloud, got ' + streamed.result?.grader);
+
+      const plain = await (await call(env, { stream: false })).json();
+      ok(plain.ok === true, 'non-streaming: still produced a grade');
+      ok(plain.grader === 'cloud', 'non-streaming stamped cloud too, got ' + plain.grader);
+
+      ok(cloud.seen.length === 2, 'the cloud server actually received both retries, got ' + cloud.seen.length);
+    } finally {
+      or.restore();
+      cloud.srv.close();
+    }
+  }
+
+  // -- 21: a 429 from OpenRouter falls back too, not just a hard failure -----
+  {
+    console.log('a 429 from OpenRouter falls back too, not just a 5xx');
+    const cloud = await startStub([GOOD_GRADE]);
+    const or = makeOpenRouterFetch({ mode: 'ratelimit' });
+    try {
+      const env = makeEnv({
+        host: `http://127.0.0.1:${cloud.port}`,
+        openrouterKey: 'or-stub-key',
+        openrouterAllowed: 'kid@example.test',
+      });
+      const t = (await readNdjson(await call(env))).pop();
+      ok(t.result?.grader === 'cloud', 'falls back on 429 too, got ' + JSON.stringify(t));
+    } finally {
+      or.restore();
+      cloud.srv.close();
+    }
+  }
+
+  // -- 22: with no fallback configured, an OpenRouter failure is a real error
+  {
+    console.log('with no cloud key configured, an OpenRouter failure is a real error');
+    const or = makeOpenRouterFetch({ mode: 'fail' });
+    try {
+      const env = makeEnv({
+        host: 'http://127.0.0.1:1',
+        cloudKey: null, // no fallback available on this deploy
+        openrouterKey: 'or-stub-key',
+        openrouterAllowed: 'kid@example.test',
+      });
+      const t = (await readNdjson(await call(env))).pop();
+      ok(!!t.error, 'terminal is an error, not a silent success');
+      ok(!t.result, 'no grade emitted');
+
+      const plain = await call(env, { stream: false });
+      ok(plain.status === 502, 'non-streaming answers 502, got ' + plain.status);
+    } finally {
+      or.restore();
+    }
   }
 } finally {
   rmSync(out, { recursive: true, force: true });
