@@ -32,9 +32,18 @@ if (day === "Saturday" || "Sunday") {
 
 A non-empty string is truthy (`2.1.12 Reading: Truthy and Falsy Values`). `"Sunday"` is truthy no matter what `day` is, so the right side of `||` is always `true`: which makes the whole condition always `true`.
 
+Run this to see it directly. First the bare string on its own, then the broken condition with a day that matches **neither** side.
+
 ```js live plain
-console.log(Boolean("Sunday"));
-console.log("Tuesday" === "Saturday" || "Sunday");
+if ("Sunday") {
+  console.log("A bare non-empty string is enough to get into an if.");
+}
+
+let day = "Tuesday";
+
+if (day === "Monday" || "Sunday") {
+  console.log("Got in anyway, and Tuesday is not Monday either.");
+}
 ```
 
 ## Key takeaways

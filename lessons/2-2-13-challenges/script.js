@@ -1,4 +1,4 @@
-// 2.2.22 Challenges: Optional Stretch
+// 2.2.22 Challenges: Stretch Problems
 
 // CHALLENGE 1: FizzBuzz
 //   Loop through every integer from 1 to 20.
