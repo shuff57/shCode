@@ -243,27 +243,23 @@ with sync_playwright() as p:
           pg.locator(".sk-point-rows").count() == 1)
     pg.screenshot(path=SCRATCH + "/05-emptied.png")
 
-    # KNOWN AND UNFIXED, asserted rather than ignored so it cannot quietly
-    # become normal. Adding a distanceX/distanceY/symmetric rule makes
-    # toScript() THROW on every render of the Code view:
+    # THIS USED TO BE AN ALLOWANCE, AND IS NOW A WALL. Between 2026-09-09 and
+    # 2026-09-10 this block permitted a specific throw:
     #
     #   toScript(): no reSHape Script word for 'distanceX' yet
     #   -- P1d added the solver rule but not the DSL syntax.
     #
-    # The message is deliberate, so the gap was known when P1d landed (msgbox
-    # #140 says the same: the four constraints have no reSHape Script word).
-    # What was NOT known is that it surfaces as a repeated pageerror the
-    # moment a student uses the panel -- found here, and missed by the manual
-    # dogfood on 2026-09-09 because console errors were not readable then.
-    # `angle` does not throw; only the three that reached toScript first.
-    known = [e for e in errors if "no reSHape Script word" in e]
-    other = [e for e in errors if "no reSHape Script word" not in e]
-    check("no UNEXPECTED console or page errors", other == [], other)
-    check("the known toScript gap is still exactly that, and nothing worse",
-          len(known) > 0 and all("distanceX" in e or "symmetric" in e or "distanceY" in e
-                                 for e in known),
-          known[:2])
-    print("   known toScript throws: %d (see FUTURE.md)" % len(known))
+    # This script found it on its first complete run -- six pageerrors from one
+    # short session, because toScript() ran on every render of the Code view
+    # and a distanceX/distanceY/symmetric rule had no word to emit. reshape-cad
+    # answered it by adding .distX()/.distY()/.symmetric()/.angle() to
+    # SketchHandle rather than by skipping the constraint, since skipping would
+    # have dropped a student's rule on Build -> Code without saying so.
+    #
+    # Measured after that landed: zero throws. So the allowance is gone and any
+    # page error fails the run. If this ever goes red naming a reSHape Script
+    # word again, a fifth constraint kind reached the panel without one.
+    check("no console or page errors at all", errors == [], errors)
     b.close()
 
 print("\n" + ("FAIL: " + ", ".join(fails) if fails else "ALL PASS"))
