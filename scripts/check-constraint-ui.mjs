@@ -41,14 +41,29 @@ if (!union) {
   console.error(`\nFAIL  could not find the Constraint union in ${SOLVER}.`);
   process.exit(1);
 }
-const kinds = [...union[1].matchAll(/kind:\s*'([a-z]+)'/g)].map((m) => m[1]);
+// [A-Za-z] and not [a-z] -- P1d added `distanceX` and `distanceY`, and a
+// lowercase-only class does not match a camelCase kind. This did not fail
+// loudly: it captured the leading `distance` off each, found no 'distance'
+// control, and still reported only symmetric and angle -- because `distanceX`
+// was never in the list to be missing FROM. So the check ran, failed for a
+// real reason, and was silently not looking at two of the eleven kinds it
+// exists to census. Measured 2026-09-09: [a-z]+ yields 9, [A-Za-z]+ yields 11.
+const kinds = [...union[1].matchAll(/kind:\s*'([A-Za-z]+)'/g)].map((m) => m[1]);
 
 // A census that found nothing is a census that is not looking.
-if (kinds.length < 5) {
+//
+// The floor is the union's ACTUAL size, not a round number safely under it.
+// At 5 this guard was satisfied by 9 of 11 and never fired on the camelCase
+// miss above -- a tripwire set low enough to step over. Raise it whenever the
+// union grows; a failure here means the parse broke, not that the union did.
+const EXPECTED_KINDS = 11;
+if (kinds.length < EXPECTED_KINDS) {
   console.error(
-    `\nFAIL  only parsed ${kinds.length} constraint kind(s) out of ${SOLVER}.\n`
-    + 'The union has not shrunk, so this parse has stopped matching and the\n'
-    + 'check is passing without looking at anything.\n');
+    `\nFAIL  only parsed ${kinds.length} constraint kind(s) out of ${SOLVER}, `
+    + `expected ${EXPECTED_KINDS}.\n`
+    + 'Either this parse has stopped matching -- so the check is passing\n'
+    + 'without looking at everything -- or the union really did shrink, in\n'
+    + 'which case lower EXPECTED_KINDS deliberately and say why.\n');
   process.exit(1);
 }
 
