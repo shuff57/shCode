@@ -536,6 +536,20 @@ A complex shape extruded from a sketch with multiple elements.
 
 `sk.pin(1)` locks corner 1 in place -- the solver may not move it to satisfy anything else.
 
+**Rules between corners.** Four more rules name corners rather than edges. They are the panel's "Point rules" section, in the same words.
+
+`sk.distX(1, 3, 12)` holds corners 1 and 3 exactly 12 mm apart measured across.
+
+`sk.distY(1, 3, 10)` holds corners 1 and 3 exactly 10 mm apart measured up.
+
+`sk.symmetric(1, 3, 2)` holds corner 2 exactly halfway between corners 1 and 3 -- on both axes, not just the obvious one.
+
+`sk.angle(1, 2, 30)` holds edges 1 and 2 at a 30 degree turn to each other.
+
+These four numbers can be **negative**, unlike a length. `sk.distX(1, 3, -12)` asks for corner 3 to sit 12 mm to the LEFT of corner 1, which is a genuinely different shape from 12 mm to the right -- measured, the rectangle mirrors. A minus sign here is an instruction, not a mistake.
+
+Not every pair of these can hold at once. Asking a rectangle for both a `distX` and a `distY` across the same diagonal is asking it to be two shapes, so the older rule is dropped with a note in the panel, exactly like any other conflict.
+
 ```js rule-across
 const sk = sketch('top')
 sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
@@ -586,6 +600,36 @@ const shape = pull(sk, 12)
 ```
 
 A rectangular prism, same as `sk.rect(40, 25)` would draw -- these seven examples exist to show the call, not a different shape.
+
+The four corner rules are the exception: each of these does change the shape, because that is the whole point of naming a distance or a symmetry.
+
+```js rule-distx
+const sk = sketch('top')
+sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
+sk.distX(1, 3, 30)
+const shape = pull(sk, 12)
+```
+
+```js rule-disty
+const sk = sketch('top')
+sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
+sk.distY(1, 3, 15)
+const shape = pull(sk, 12)
+```
+
+```js rule-symmetric
+const sk = sketch('top')
+sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
+sk.symmetric(1, 3, 2)
+const shape = pull(sk, 12)
+```
+
+```js rule-angle
+const sk = sketch('top')
+sk.polygon([[0, 0], [40, 0], [40, 25], [0, 25]])
+sk.angle(1, 2, 60)
+const shape = pull(sk, 12)
+```
 
 A rule call never stops the script. It settles the same way a click on the panel does: if dropping one OLDER rule would make the new one fit, that rule quietly goes, and the sketch keeps building. If nothing does, the new rule is still added, and the sketch is left fighting -- the same thing you would see by clicking the same rule into the panel by hand:
 
