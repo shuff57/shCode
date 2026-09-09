@@ -596,9 +596,19 @@ console.log('\n=== (c3) param() round-trips through toScript(doc, namedParams) =
     /param\('wall', 2, \{ min: 0\.5, max: 10 \}\)/.test(regenerated),
     regenerated
   );
+  // `shell(`, not `hollow(`. reshape-cad 19591f9 (2026-09-07) deliberately
+  // made toScript emit the OFFICIAL vocabulary -- "the generated text is what
+  // a student reads, edits and binds variables through, so it teaches the
+  // transferable names" -- and hollow is the documented student ALIAS of
+  // shell, the same reference, not a separate function. These expectations
+  // predate that (ce164707, 2026-09-05) and were simply never updated.
+  //
+  // The SUBJECT of this check is unchanged and is not about the word at all:
+  // that the emitted call binds the VARIABLE `wall` rather than inlining the
+  // literal 2. Only the scaffolding naming the call was stale.
   check(
-    'toScript(doc, namedParams) uses `wall` in hollow(), not a literal 2',
-    /hollow\([^)]*\{\s*wall\s*\}\)/.test(regenerated) && !/wall:\s*2\b/.test(regenerated),
+    'toScript(doc, namedParams) uses `wall` in shell(), not a literal 2',
+    /shell\([^)]*\{\s*wall\s*\}\)/.test(regenerated) && !/wall:\s*2\b/.test(regenerated),
     regenerated
   );
   const second = script.runScript(regenerated);
@@ -694,7 +704,8 @@ console.log('\n=== (c4) the full two-round-trip sequence: param() must survive w
   check(
     'two-round-trip: a drag on the SECOND visit lands inside param(), not a literal',
     /param\('wall', 10, \{ min: 0\.5, max: 10 \}\)/.test(codeAfterDrag)
-      && /hollow\([^)]*\{\s*wall\s*\}\)/.test(codeAfterDrag),
+      // shell(, not hollow( -- see the note on the (c3) check above.
+      && /shell\([^)]*\{\s*wall\s*\}\)/.test(codeAfterDrag),
     codeAfterDrag
   );
 }
