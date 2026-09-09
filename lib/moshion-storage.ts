@@ -82,8 +82,6 @@ const TEXTURE_PREFIX = 'texture:';
 // does not begin with 'texture:', so meta never lists as a texture.
 const TEXMETA_PREFIX = 'texmeta:';
 
-/** Bytes a single saved texture may occupy, matching the bridge's own cap. */
-export const TEXTURE_MAX_BYTES = MAX_VALUE_BYTES;
 
 export interface SavedTexture {
   name: string;

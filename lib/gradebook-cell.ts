@@ -13,7 +13,7 @@
 
 import { isPastDue } from './due-dates-core';
 
-export interface TeacherNotes {
+interface TeacherNotes {
   feedback: string | null;
   reviewedAt: number | null;
   /** The WrittenGrader outage marker: handed in, but nothing scored it. */

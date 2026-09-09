@@ -53,7 +53,7 @@ export function redactQuiz(quiz: QuizConfig): QuizConfig {
 }
 
 /** True when this written item's grading rubric must not reach the browser. */
-export function isSummativeAiGrader(cfg: AiGraderConfig | undefined): boolean {
+function isSummativeAiGrader(cfg: AiGraderConfig | undefined): boolean {
   return !!cfg?.summative;
 }
 
@@ -66,7 +66,7 @@ export function isSummativeAiGrader(cfg: AiGraderConfig | undefined): boolean {
  * true — every point value on every PA rubric is 0, so this changes nothing
  * that reaches the screen. Returns the input unchanged for a formative item.
  */
-export function redactAiGrader(cfg: AiGraderConfig): AiGraderConfig {
+function redactAiGrader(cfg: AiGraderConfig): AiGraderConfig {
   if (!isSummativeAiGrader(cfg)) return cfg;
   return {
     summative: true,

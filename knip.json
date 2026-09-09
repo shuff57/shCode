@@ -1,0 +1,21 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "functions/**/*.ts",
+    "scripts/**/*.{mjs,cjs}"
+  ],
+  "ignore": [
+    "public/**",
+    "lessons/**",
+    "assignments/**",
+    "spikes/**",
+    "_workspace/**",
+    "scripts/create-lesson.ts"
+  ],
+  "ignoreDependencies": [
+    "wrangler",
+    "@cloudflare/workers-types",
+    "@shuff57/reshape-kernel",
+    "@shuff57/reshape-sketch"
+  ]
+}

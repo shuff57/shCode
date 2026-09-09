@@ -16,14 +16,14 @@ import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
 import GraderPicker, { hasGraderChoice, useGraderChoice } from './GraderPicker';
 import SolutionPanel from './SolutionPanel';
 
-export interface AiRubricItem {
+interface AiRubricItem {
   id: string;
   title: string;
   description?: string;
   points: number;
 }
 
-export interface AiGraderConfig {
+interface AiGraderConfig {
   /** Test mode -- one submission, no rubric feedback. See lib/types.ts. */
   summative?: boolean;
   rubricTitle?: string;

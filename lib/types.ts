@@ -38,10 +38,10 @@ export type FileHistory = Record<string, Version[]>;
 
 // ---- Lessons & Assignments ----
 
-export type LessonType = 'lesson' | 'assignment' | 'project' | 'example' | 'challenge';
-export type RequirementType = 'regex' | 'inFunction' | 'output' | 'function' | 'custom' | 'model';
+type LessonType = 'lesson' | 'assignment' | 'project' | 'example' | 'challenge';
+type RequirementType = 'regex' | 'inFunction' | 'output' | 'function' | 'custom' | 'model';
 
-export interface Step {
+interface Step {
   id: string;
   title: string;
   instructions?: string;
@@ -84,7 +84,7 @@ export interface Requirement {
   tolerance?: number;
 }
 
-export interface Grading {
+interface Grading {
   totalPoints: number;
   passingScore: number;
   allowLateSubmit?: boolean;
@@ -234,7 +234,7 @@ export interface AiGraderConfig {
 
 // ---- Student State (localStorage) ----
 
-export interface StudentProgress {
+interface StudentProgress {
   lessonId: string;
   fileContents: Record<string, string>;
   commits: Commit[];

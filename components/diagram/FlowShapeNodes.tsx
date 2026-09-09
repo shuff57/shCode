@@ -12,7 +12,7 @@ import { memo } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import type { FlowShape } from '../../lib/diagram-types';
 
-export interface ShapeNodeData extends Record<string, unknown> {
+interface ShapeNodeData extends Record<string, unknown> {
   label: string;
   shape: FlowShape;
   /** Set by a failed structural check so the offending shape stands out. */
@@ -64,14 +64,14 @@ function cornerRadius(shape: FlowShape): number {
 const BORDER = 2;
 
 /** The four attach points. Handle ids are `s-<side>` and `t-<side>`. */
-export const SIDES = [
+const SIDES = [
   { id: 't', position: Position.Top },
   { id: 'r', position: Position.Right },
   { id: 'b', position: Position.Bottom },
   { id: 'l', position: Position.Left },
 ] as const;
 
-export type SideId = (typeof SIDES)[number]['id'];
+type SideId = (typeof SIDES)[number]['id'];
 
 function handleStyle(color: string) {
   return {

@@ -2,7 +2,7 @@
 // Uses same-origin cookies — the session cookie is HttpOnly and managed
 // by the server.
 
-export type Role = 'admin' | 'teacher' | 'student';
+type Role = 'admin' | 'teacher' | 'student';
 
 function parseRole(raw: unknown): Role {
   return raw === 'admin' || raw === 'teacher' ? raw : 'student';
@@ -46,7 +46,7 @@ async function fetchCurrentUser(): Promise<CurrentUser | null> {
 }
 
 /** Force the next getCurrentUser() call to re-fetch. */
-export function invalidateCurrentUser(): void {
+function invalidateCurrentUser(): void {
   cache = undefined;
   inFlight = null;
 }

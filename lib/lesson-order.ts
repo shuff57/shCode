@@ -17,7 +17,7 @@
 
 /** "1.1.17" out of "1.1.17 Reading: The Four Ps". Null for the pages that
  *  carry no numbered title. */
-export function parseNumberedId(title: string): string | null {
+function parseNumberedId(title: string): string | null {
   const m = title.match(/^(\d+\.\d+\.\d+)/);
   return m ? m[1] : null;
 }
@@ -30,7 +30,7 @@ export interface OrderableLesson {
  *  Deliberately identical to getNextLesson() in lib/lesson-neighbors.ts: the
  *  two must agree, or "Up Next" names a different lesson than the Next button
  *  actually navigates to. */
-export function compareLessons(a: OrderableLesson, b: OrderableLesson): number {
+function compareLessons(a: OrderableLesson, b: OrderableLesson): number {
   const an = parseNumberedId(a.title);
   const bn = parseNumberedId(b.title);
   if (an && bn) return an.localeCompare(bn, undefined, { numeric: true });

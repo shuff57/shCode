@@ -91,13 +91,6 @@ export function restoreToCommit(
   };
 }
 
-// ---- Restore a single file version ----
-export function restoreFileVersion(
-  fileId: string,
-  version: Version
-): { fileId: string; content: string } {
-  return { fileId, content: version.content };
-}
 
 // ---- Get history for a file from commits ----
 export function getFileHistoryFromCommits(
@@ -123,15 +116,6 @@ export function getFileHistoryFromCommits(
   return versions;
 }
 
-// ---- Filter commits by file/folder ----
-export function filterCommitsByPath(
-  commits: Commit[],
-  fileIds: Set<string>
-): Commit[] {
-  return commits.filter((c) =>
-    c.changedFileIds.some((id) => fileIds.has(id))
-  );
-}
 
 // ---- localStorage persistence ----
 const STORAGE_KEY = 'shCode:progress';

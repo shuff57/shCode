@@ -22,12 +22,11 @@ import {
   searchDocs as coreSearchDocs,
   getSection as coreGetSection,
   getAllSectionSlugs as coreGetAllSectionSlugs,
-  type DocPage,
   type DocSection,
   type DocSearchResult,
 } from './docs-core';
 
-export type { DocPage, DocSection, DocSearchResult };
+export type { DocSection, DocSearchResult };
 
 export const sections: DocSection[] = [
   {

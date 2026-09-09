@@ -29,7 +29,7 @@ export interface GradeRequest {
   grader?: GraderId;
 }
 
-export interface CriterionResult {
+interface CriterionResult {
   id: string;
   /**
    * The rubric's wording at the moment this was graded. Carried into the
@@ -226,7 +226,7 @@ export function shapeResult(parsed: any, rubric: RubricItem[]): GradeResponse {
 // `response` is the ONLY field the client is trusted to supply — the rubric and
 // prompt are looked up server-side (functions/_shared/aiGraders.ts), so there is
 // deliberately no rubric check here any more.
-export const MAX_RESPONSE_CHARS = 8000;
+const MAX_RESPONSE_CHARS = 8000;
 
 export function validateRequest(body: Partial<GradeRequest>): string | null {
   if (!body.response || body.response.trim().length < 20) {
@@ -268,17 +268,17 @@ export type GradeStage =
   /** output complete, parsing + shaping */
   | 'checking';
 
-export interface GradeStageEvent {
+interface GradeStageEvent {
   stage: GradeStage;
   /** Model output characters seen so far. Present from 'writing' onward. */
   chars?: number;
 }
 
-export interface GradeResultEvent {
+interface GradeResultEvent {
   result: GradeResponse;
 }
 
-export interface GradeErrorEvent {
+interface GradeErrorEvent {
   error: string;
   /** Mirrors the non-streaming body so the client's error path is shared. */
   offline?: boolean;
@@ -315,7 +315,7 @@ export const GRADE_STAGE_LABELS: Record<GradeStage, string> = {
 
 export type GraderId = 'cloud' | 'local' | 'workersai' | 'openrouter';
 
-export const GRADER_IDS: readonly GraderId[] = ['workersai', 'cloud', 'local', 'openrouter'];
+
 /**
  * The grader used when the client names none, and the last-resort fallback.
  *

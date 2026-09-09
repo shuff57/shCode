@@ -19,11 +19,6 @@ interface UIState {
   activeSidebarTab: 'Files' | 'Grading';
 }
 
-/** Coerce stale persisted value 'Steps' → 'Grading'. */
-export function parseTab(raw: unknown): 'Files' | 'Grading' {
-  if (raw === 'Files') return 'Files';
-  return 'Grading';
-}
 
 interface LessonState {
   // Lesson

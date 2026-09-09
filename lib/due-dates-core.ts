@@ -234,7 +234,7 @@ export function resolveDueAt(index: DueIndex, ids: LessonScopeIds): number | nul
   return null;
 }
 
-export type ModuleDueKind = 'none' | 'single' | 'mixed';
+type ModuleDueKind = 'none' | 'single' | 'mixed';
 
 export interface ModuleDueSummary {
   kind: ModuleDueKind;

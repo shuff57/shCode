@@ -15,7 +15,7 @@ import DOMPurify from 'isomorphic-dompurify';
 
 marked.setOptions({ breaks: true, gfm: true });
 
-export function renderMarkdown(text: string): string {
+function renderMarkdown(text: string): string {
   const html = marked.parse(text, { async: false }) as string;
   return DOMPurify.sanitize(html, {
     USE_PROFILES: { html: true },

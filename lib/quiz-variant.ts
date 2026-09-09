@@ -21,7 +21,7 @@
 import type { QuizConfig, QuizQuestion } from './types';
 
 /** One question as it should be drawn for this student. */
-export interface QuizViewQuestion {
+interface QuizViewQuestion {
   question: QuizQuestion;
   /**
    * Display order. `order[displayed] = index into question.options`, so the

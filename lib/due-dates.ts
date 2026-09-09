@@ -22,15 +22,11 @@ import {
 } from './due-dates-core';
 
 export {
-  SCHOOL_TZ,
   dueStatus,
   formatDue,
   formatDueTime,
   formatTime,
-  isAvailable,
   moduleIdFromTitle,
-  schoolDateString,
-  schoolTimeString,
   type DueStatus,
   type ModuleDueSummary,
 } from './due-dates-core';
@@ -85,7 +81,7 @@ interface ApiClass {
 }
 
 /** When a lesson opens, and which class said so. */
-export interface ResolvedOpen {
+interface ResolvedOpen {
   openAt: number;
   className: string;
   /** True when more than one of the student's classes gates this lesson. */
@@ -125,7 +121,7 @@ async function load(): Promise<DueDatesSnapshot> {
   }
 }
 
-export function ensureDueDatesLoaded(): Promise<DueDatesSnapshot> {
+function ensureDueDatesLoaded(): Promise<DueDatesSnapshot> {
   if (cache.loaded) return Promise.resolve(cache);
   if (!inflight) {
     inflight = load().then((s) => {
@@ -216,7 +212,7 @@ export function useLessonAvailability(
 // Most students sit in two classes (the archived Legacy class plus their
 // real one); letting an ungated class veto a gated one would mean the
 // feature never locked anything for anybody.
-export function resolveOpen(
+function resolveOpen(
   snap: DueDatesSnapshot,
   lessonId: string,
   moduleId?: string | null,
@@ -247,7 +243,7 @@ export interface LessonAvailability {
 
 /** Always available — the answer before the snapshot loads, and for a
  *  role that bypasses locks. Shared so no caller invents its own default. */
-export const ALWAYS_AVAILABLE: LessonAvailability = { available: true, openAt: null, ambiguous: false };
+const ALWAYS_AVAILABLE: LessonAvailability = { available: true, openAt: null, ambiguous: false };
 
 // The single availability answer for one lesson. Every lock site calls this
 // rather than comparing timestamps itself, so the card, the module row, the

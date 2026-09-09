@@ -35,7 +35,7 @@ function makeBadge(Icon: any, label: string, color: string): PreviewBadge {
   return { Icon: Wrapped, label, color };
 }
 
-export const PREVIEW_BADGES: Record<string, PreviewBadge> = {
+const PREVIEW_BADGES: Record<string, PreviewBadge> = {
   reading:    makeBadge(BookOpen,     'Reading',        '#8be9fd'),
   video:      makeBadge(Film,         'Video',          '#ff79c6'),
   example:    makeBadge(Lightbulb,    'Worked Example', '#ffb86c'),
@@ -49,7 +49,7 @@ export const PREVIEW_BADGES: Record<string, PreviewBadge> = {
   quiz:       makeBadge(ListChecks,   'Quiz',           '#f1fa8c'),
 };
 
-export const FALLBACK_BADGE: PreviewBadge = makeBadge(FileText, 'Content', '#888888');
+const FALLBACK_BADGE: PreviewBadge = makeBadge(FileText, 'Content', '#888888');
 
 export function badgeFor(preview: string | undefined): PreviewBadge {
   if (!preview) return FALLBACK_BADGE;

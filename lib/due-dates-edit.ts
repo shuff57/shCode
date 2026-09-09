@@ -40,7 +40,7 @@ const ENDPOINT: Record<Kind, string> = { due: 'due-dates', open: 'open-dates' };
 
 const ACTIVE_CLASS_KEY = 'shcode.dueDates.activeClass';
 
-export interface DueClassOption {
+interface DueClassOption {
   id: string;
   name: string;
 }
@@ -59,7 +59,7 @@ export interface TeacherDueSnapshot {
   activeClassId: string | null;
   /** @internal — read through ownDate/resolveForClass/etc, not directly. */
   due: KindState;
-  /** @internal — read through ownOpenDate/resolveOpenForClass/etc, not directly. */
+  /** @internal — read through ownOpenDate/etc, not directly. */
   open: KindState;
   saving: boolean;
   error: string | null;
@@ -179,7 +179,7 @@ async function load(): Promise<void> {
   }
 }
 
-export function ensureTeacherDueLoaded(): void {
+function ensureTeacherDueLoaded(): void {
   if (cache.loaded || inflight) return;
   inflight = load().finally(() => {
     inflight = null;
@@ -360,15 +360,6 @@ export function applyModuleOpenDateToAll(
 
 export function ownOpenDate(snap: TeacherDueSnapshot, scope: DueScope, scopeId: string): number | null {
   return snap.open.own.get(`${scope}:${scopeId}`) ?? null;
-}
-
-export function resolveOpenForClass(
-  snap: TeacherDueSnapshot,
-  lessonId: string,
-  moduleId?: string | null,
-  unitId?: string | null,
-): number | null {
-  return resolveDueAt(snap.open.index, { lessonId, moduleId, unitId });
 }
 
 export function moduleOpenSummaryForClass(

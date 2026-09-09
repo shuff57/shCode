@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from 'react';
 
-export type LessonState = 'started' | 'completed';
+type LessonState = 'started' | 'completed';
 export type Role = 'admin' | 'teacher' | 'student';
 
 export interface LessonStateSnapshot {

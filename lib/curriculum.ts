@@ -184,5 +184,3 @@ export async function getModule(moduleId: string): Promise<{
   return { summary, html, lessons, artifacts };
 }
 
-// backward-compat: getUnit is identical to getModule for our hierarchy
-export const getUnit = getModule;

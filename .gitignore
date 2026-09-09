@@ -56,3 +56,6 @@ grader-tolerance-audit.txt
 # beside it is compiled from lib/, so both are built rather than committed.
 public/reshape/kernel/
 public/reshape/kernel-cors-control.js
+
+# evolver agent data (untracked by design, see _workspace/README.md)
+_workspace/

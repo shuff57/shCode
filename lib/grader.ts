@@ -14,7 +14,7 @@ export interface GradeContext {
   refusals?: Refusals | null;
 }
 
-export interface GradeResult {
+interface GradeResult {
   id: string;
   title: string;
   status: 'passed' | 'failed';

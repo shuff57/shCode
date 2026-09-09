@@ -3,7 +3,7 @@
 
 import type { QuizQuestion } from './types';
 
-export const DEFAULT_PASS_PERCENT = 70;
+const DEFAULT_PASS_PERCENT = 70;
 
 /**
  * How many correct answers are needed to advance.
