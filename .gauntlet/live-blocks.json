@@ -1,0 +1,4003 @@
+{
+  "1-1-10-reading-umbrella#0": {
+    "code": "console.log(\"quality management - touches: every phase\");\nconsole.log(\"risk management - touches: every phase\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "quality management - touches: every phase"
+      },
+      {
+        "type": "log",
+        "text": "risk management - touches: every phase"
+      }
+    ]
+  },
+  "1-1-10-reading-umbrella#1": {
+    "code": "console.log(\"security management - touches: deployment\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "security management - touches: deployment"
+      }
+    ]
+  },
+  "1-1-12-reading-actions#0": {
+    "code": "console.log(\"inception: define the requirements\");\nconsole.log(\"elaboration: design the architecture\");\nconsole.log(\"construction: code and build the software\");\nconsole.log(\"deployment: release to end users\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "inception: define the requirements"
+      },
+      {
+        "type": "log",
+        "text": "elaboration: design the architecture"
+      },
+      {
+        "type": "log",
+        "text": "construction: code and build the software"
+      },
+      {
+        "type": "log",
+        "text": "deployment: release to end users"
+      }
+    ]
+  },
+  "1-1-12-reading-actions#1": {
+    "code": "console.log(\"an action in construction: code and build the software\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "an action in construction: code and build the software"
+      }
+    ]
+  },
+  "1-1-13-reading-task-sets#0": {
+    "code": "console.log(\"task 1: write test cases for the greeting\");\nconsole.log(\"task 2: run the tests and record the results\");\nconsole.log(\"task 3: fix any failures and re-run\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "task 1: write test cases for the greeting"
+      },
+      {
+        "type": "log",
+        "text": "task 2: run the tests and record the results"
+      },
+      {
+        "type": "log",
+        "text": "task 3: fix any failures and re-run"
+      }
+    ]
+  },
+  "1-1-13-reading-task-sets#1": {
+    "code": "console.log(\"task 4: confirm the greeting shows correctly\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "task 4: confirm the greeting shows correctly"
+      }
+    ]
+  },
+  "1-1-14-example-task-set-loop#0": {
+    "code": "// A loop that prints 1..5 but skips 3.\nfor (let i = 1; i <= 5; i++) {\n  if (i === 3) {\n    continue;\n  }\n  console.log(\"count: \" + i);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "count: 1"
+      },
+      {
+        "type": "log",
+        "text": "count: 2"
+      },
+      {
+        "type": "log",
+        "text": "count: 4"
+      },
+      {
+        "type": "log",
+        "text": "count: 5"
+      }
+    ]
+  },
+  "1-1-14-example-task-set-loop#1": {
+    "code": "console.log(\"The loop runs from 1 to 5.\");\nconsole.log(\"The `continue` skips 3. That is the bug.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "The loop runs from 1 to 5."
+      },
+      {
+        "type": "log",
+        "text": "The `continue` skips 3. That is the bug."
+      }
+    ]
+  },
+  "1-1-14-example-task-set-loop#2": {
+    "code": "console.log(\"Hand trace (expected):\");\nfor (let i = 1; i <= 5; i++) {\n  console.log(\"expected count: \" + i);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hand trace (expected):"
+      },
+      {
+        "type": "log",
+        "text": "expected count: 1"
+      },
+      {
+        "type": "log",
+        "text": "expected count: 2"
+      },
+      {
+        "type": "log",
+        "text": "expected count: 3"
+      },
+      {
+        "type": "log",
+        "text": "expected count: 4"
+      },
+      {
+        "type": "log",
+        "text": "expected count: 5"
+      }
+    ]
+  },
+  "1-1-14-example-task-set-loop#3": {
+    "code": "// Fixed: no `continue`, so every number prints.\nfor (let i = 1; i <= 5; i++) {\n  console.log(\"count: \" + i);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "count: 1"
+      },
+      {
+        "type": "log",
+        "text": "count: 2"
+      },
+      {
+        "type": "log",
+        "text": "count: 3"
+      },
+      {
+        "type": "log",
+        "text": "count: 4"
+      },
+      {
+        "type": "log",
+        "text": "count: 5"
+      }
+    ]
+  },
+  "1-1-16-reading-sdlc#0": {
+    "code": "console.log(\"objective 1: efficiency\");\nconsole.log(\"objective 2: lower risk\");\nconsole.log(\"objective 3: predictability\");\nconsole.log(\"objective 4: captured best practice\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "objective 1: efficiency"
+      },
+      {
+        "type": "log",
+        "text": "objective 2: lower risk"
+      },
+      {
+        "type": "log",
+        "text": "objective 3: predictability"
+      },
+      {
+        "type": "log",
+        "text": "objective 4: captured best practice"
+      }
+    ]
+  },
+  "1-1-16-reading-sdlc#1": {
+    "code": "console.log(\"predictability matters most: it keeps the project on schedule\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "predictability matters most: it keeps the project on schedule"
+      }
+    ]
+  },
+  "1-1-17-reading-four-ps#0": {
+    "code": "console.log(\"problem - changes how hard the work is\");\nconsole.log(\"project - changes how it is managed\");\nconsole.log(\"people - changes who works on it\");\nconsole.log(\"product - changes what gets built\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "problem - changes how hard the work is"
+      },
+      {
+        "type": "log",
+        "text": "project - changes how it is managed"
+      },
+      {
+        "type": "log",
+        "text": "people - changes who works on it"
+      },
+      {
+        "type": "log",
+        "text": "product - changes what gets built"
+      }
+    ]
+  },
+  "1-1-17-reading-four-ps#1": {
+    "code": "console.log(\"for a banking system, the product matters most: it must be reliable\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "for a banking system, the product matters most: it must be reliable"
+      }
+    ]
+  },
+  "1-1-19-reading-prescriptive#0": {
+    "code": "console.log(\"objective 1: efficiency\");\nconsole.log(\"objective 2: lower risk\");\nconsole.log(\"objective 3: predictability\");\nconsole.log(\"objective 4: captured best practice\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "objective 1: efficiency"
+      },
+      {
+        "type": "log",
+        "text": "objective 2: lower risk"
+      },
+      {
+        "type": "log",
+        "text": "objective 3: predictability"
+      },
+      {
+        "type": "log",
+        "text": "objective 4: captured best practice"
+      }
+    ]
+  },
+  "1-1-19-reading-prescriptive#1": {
+    "code": "console.log(\"waterfall sounds most orderly: one phase finishes before the next begins\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "waterfall sounds most orderly: one phase finishes before the next begins"
+      }
+    ]
+  },
+  "1-1-2-reading-console-log#0": {
+    "code": "console.log(\"Hello, world!\");\nconsole.log(2 + 2);\nconsole.log(10 > 5);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello, world!"
+      },
+      {
+        "type": "log",
+        "text": "4"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      }
+    ]
+  },
+  "1-1-2-reading-console-log#1": {
+    "code": "console.log(\"Step 1: I run first.\");\nconsole.log(\"Step 2: I run second.\");\nconsole.log(\"Step 3: I run third.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Step 1: I run first."
+      },
+      {
+        "type": "log",
+        "text": "Step 2: I run second."
+      },
+      {
+        "type": "log",
+        "text": "Step 3: I run third."
+      }
+    ]
+  },
+  "1-1-20-reading-prescriptive-limits#0": {
+    "code": "console.log(\"fits: a well-understood project with stable requirements\");\nconsole.log(\"does not fit: a project where requirements change weekly\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "fits: a well-understood project with stable requirements"
+      },
+      {
+        "type": "log",
+        "text": "does not fit: a project where requirements change weekly"
+      }
+    ]
+  },
+  "1-1-20-reading-prescriptive-limits#1": {
+    "code": "console.log(\"reason: re-planning takes longer than the plan saves\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "reason: re-planning takes longer than the plan saves"
+      }
+    ]
+  },
+  "1-1-6-reading-four-phases#0": {
+    "code": "console.log(\"inception\");\nconsole.log(\"elaboration\");\nconsole.log(\"construction\");\nconsole.log(\"deployment\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "inception"
+      },
+      {
+        "type": "log",
+        "text": "elaboration"
+      },
+      {
+        "type": "log",
+        "text": "construction"
+      },
+      {
+        "type": "log",
+        "text": "deployment"
+      }
+    ]
+  },
+  "1-1-6-reading-four-phases#1": {
+    "code": "var guess = \"construction\";\nvar answer = \"construction\";\nconsole.log(\"My guess: \" + guess);\nconsole.log(\"Answer: \" + answer);\nconsole.log(\"Why: that line is the actual code being written, which is the construction phase.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "My guess: construction"
+      },
+      {
+        "type": "log",
+        "text": "Answer: construction"
+      },
+      {
+        "type": "log",
+        "text": "Why: that line is the actual code being written, which is the construction phase."
+      }
+    ]
+  },
+  "1-1-8-example-greeting-phases#0": {
+    "code": "// Inception: the goal\nconsole.log(\"Goal: greet a user by name.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Goal: greet a user by name."
+      }
+    ]
+  },
+  "1-1-8-example-greeting-phases#1": {
+    "code": "// Elaboration: the requirement and the plan\nconsole.log(\"Requirement: ask for a name, then greet it.\");\nconsole.log(\"Plan: get name -> build greeting -> print it.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Requirement: ask for a name, then greet it."
+      },
+      {
+        "type": "log",
+        "text": "Plan: get name -> build greeting -> print it."
+      }
+    ]
+  },
+  "1-1-8-example-greeting-phases#2": {
+    "code": "let name = \"Sam\";\nconsole.log(\"Hello, \" + name + \"!\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello, Sam!"
+      }
+    ]
+  },
+  "1-1-8-example-greeting-phases#3": {
+    "code": "// Deployment: release it and see it run\nconsole.log(\"The page is live. A user opens it and sees the greeting.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "The page is live. A user opens it and sees the greeting."
+      }
+    ]
+  },
+  "1-2-11-reading-bigint#0": {
+    "code": "console.log(9007199254740991 + 1);\nconsole.log(9007199254740991 + 2);\n\n// the \"n\" at the end means BigInt\nconst big = 1234567890123456789012345678901234567890n;\nconsole.log(big);\n\nconsole.log(9007199254740991n + 3n);   // exact",
+    "output": [
+      {
+        "type": "log",
+        "text": "9007199254740992"
+      },
+      {
+        "type": "log",
+        "text": "9007199254740992"
+      },
+      {
+        "type": "log",
+        "text": "1234567890123456789012345678901234567890"
+      },
+      {
+        "type": "log",
+        "text": "9007199254740994"
+      }
+    ]
+  },
+  "1-2-12-reading-strings-and-quotes#0": {
+    "code": "let str = \"Hello\";\nconsole.log(str);\n\nlet str2 = 'Single quotes are ok too';\nconsole.log(str2);\n\nlet phrase = `can embed another ${str}`;\nconsole.log(phrase);\n\nlet empty = \"\";\nconsole.log(empty.length);   // 0, still a string",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello"
+      },
+      {
+        "type": "log",
+        "text": "Single quotes are ok too"
+      },
+      {
+        "type": "log",
+        "text": "can embed another Hello"
+      },
+      {
+        "type": "log",
+        "text": "0"
+      }
+    ]
+  },
+  "1-2-13-reading-template-literals#0": {
+    "code": "let name = \"John\";\n\nconsole.log( `Hello, ${name}!` );\nconsole.log( `the result is ${1 + 2}` );\n\nlet price = 4;\nlet qty = 3;\nconsole.log( `${qty} at $${price} each is $${price * qty}` );\n\n// double quotes do nothing with it\nconsole.log( \"the result is ${1 + 2}\" );",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello, John!"
+      },
+      {
+        "type": "log",
+        "text": "the result is 3"
+      },
+      {
+        "type": "log",
+        "text": "3 at $4 each is $12"
+      },
+      {
+        "type": "log",
+        "text": "the result is ${1 + 2}"
+      }
+    ]
+  },
+  "1-2-14-reading-string-methods#0": {
+    "code": "let itemName = \"Coffee Mug\";\nlet material = \"ceramic\";\n\nlet sentence = `This is a ${itemName} made of ${material}.`;\nconsole.log(sentence);\n\nconsole.log(sentence.length);\nconsole.log(itemName.toUpperCase());\nconsole.log(material.includes(\"era\"));",
+    "output": [
+      {
+        "type": "log",
+        "text": "This is a Coffee Mug made of ceramic."
+      },
+      {
+        "type": "log",
+        "text": "37"
+      },
+      {
+        "type": "log",
+        "text": "COFFEE MUG"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      }
+    ]
+  },
+  "1-2-17-reading-boolean#0": {
+    "code": "let nameFieldChecked = true;    // yes, the name field is checked\nlet ageFieldChecked = false;    // no, it is not\n\nconsole.log(nameFieldChecked);\nconsole.log(ageFieldChecked);\n\nlet isGreater = 4 > 1;          // the comparison produces a boolean\nconsole.log(isGreater);\n\nconsole.log(typeof true);       // \"boolean\"\nconsole.log(typeof \"true\");     // \"string\": quotes change everything",
+    "output": [
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "false"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "boolean"
+      },
+      {
+        "type": "log",
+        "text": "string"
+      }
+    ]
+  },
+  "1-2-18-example-comparisons-make-booleans#0": {
+    "code": "console.log( 10 > 5 );\nconsole.log( 3 < 1 );\nconsole.log( \"apple\" === \"orange\" );\nconsole.log( 100 === 100 );",
+    "output": [
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "false"
+      },
+      {
+        "type": "log",
+        "text": "false"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      }
+    ]
+  },
+  "1-2-18-example-comparisons-make-booleans#1": {
+    "code": "let temperature = 91;\n\nlet isHot = temperature > 80;\n\nconsole.log(isHot);\nconsole.log(typeof isHot);",
+    "output": [
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "boolean"
+      }
+    ]
+  },
+  "1-2-18-example-comparisons-make-booleans#2": {
+    "code": "let score = 88;\n\nlet passedByComparison = score >= 60;   // computed\nlet passedByHand = true;                // typed\n\nconsole.log(passedByComparison);\nconsole.log(passedByHand);\nconsole.log( typeof passedByComparison === typeof passedByHand );",
+    "output": [
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      }
+    ]
+  },
+  "1-2-19-reading-null#0": {
+    "code": "let age = null;\nconsole.log(age);\n\nlet chosenColour = null;    // no choice made yet, on purpose\nconsole.log(chosenColour);\n\nconsole.log(typeof age);    // \"object\": this is a known bug",
+    "output": [
+      {
+        "type": "log",
+        "text": "null"
+      },
+      {
+        "type": "log",
+        "text": "null"
+      },
+      {
+        "type": "log",
+        "text": "object"
+      }
+    ]
+  },
+  "1-2-2-reading-let-const#0": {
+    "code": "let score = 0;\nconst playerName = \"Jordan\";\n\nconsole.log(playerName + \" starts with score \" + score);\n\nscore = 10;\nconsole.log(playerName + \" now has score \" + score);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Jordan starts with score 0"
+      },
+      {
+        "type": "log",
+        "text": "Jordan now has score 10"
+      }
+    ]
+  },
+  "1-2-20-reading-undefined#0": {
+    "code": "let futureValue;\nconsole.log(futureValue);          // undefined: nobody assigned anything\nconsole.log(typeof futureValue);   // \"undefined\"\n\nlet age = 100;\nage = undefined;                   // possible, but don't do this\nconsole.log(age);\n\nlet chosenColour = null;           // do this instead\nconsole.log(chosenColour);",
+    "output": [
+      {
+        "type": "log",
+        "text": "undefined"
+      },
+      {
+        "type": "log",
+        "text": "undefined"
+      },
+      {
+        "type": "log",
+        "text": "undefined"
+      },
+      {
+        "type": "log",
+        "text": "null"
+      }
+    ]
+  },
+  "1-2-22-reading-primitive-vs-object#0": {
+    "code": "// primitives: one thing each\nlet pages = 200;\nlet title = \"JavaScript Guide\";\nlet inStock = true;\n\nconsole.log(pages, title, inStock);\n\n// an object: several things, one value\nlet book = { title: \"JavaScript Guide\", pages: 200 };\n\nconsole.log(book);\nconsole.log(book.title);\nconsole.log(typeof book);   // \"object\"",
+    "output": [
+      {
+        "type": "log",
+        "text": "200 JavaScript Guide true"
+      },
+      {
+        "type": "log",
+        "text": "{\n  \"title\": \"JavaScript Guide\",\n  \"pages\": 200\n}"
+      },
+      {
+        "type": "log",
+        "text": "JavaScript Guide"
+      },
+      {
+        "type": "log",
+        "text": "object"
+      }
+    ]
+  },
+  "1-2-23-reading-typeof#0": {
+    "code": "console.log(typeof undefined);      // \"undefined\"\nconsole.log(typeof 0);              // \"number\"\nconsole.log(typeof 10n);            // \"bigint\"\nconsole.log(typeof true);           // \"boolean\"\nconsole.log(typeof \"foo\");          // \"string\"\n\nconsole.log(typeof(42));            // same as typeof 42\nconsole.log(typeof typeof 0);       // \"string\": the answer is itself a string",
+    "output": [
+      {
+        "type": "log",
+        "text": "undefined"
+      },
+      {
+        "type": "log",
+        "text": "number"
+      },
+      {
+        "type": "log",
+        "text": "bigint"
+      },
+      {
+        "type": "log",
+        "text": "boolean"
+      },
+      {
+        "type": "log",
+        "text": "string"
+      },
+      {
+        "type": "log",
+        "text": "number"
+      },
+      {
+        "type": "log",
+        "text": "string"
+      }
+    ]
+  },
+  "1-2-24-example-typeof-surprises#0": {
+    "code": "console.log(typeof Math);",
+    "output": [
+      {
+        "type": "log",
+        "text": "object"
+      }
+    ]
+  },
+  "1-2-24-example-typeof-surprises#1": {
+    "code": "console.log(typeof null);",
+    "output": [
+      {
+        "type": "log",
+        "text": "object"
+      }
+    ]
+  },
+  "1-2-24-example-typeof-surprises#2": {
+    "code": "function greet() {\n  console.log(\"hi\");\n}\n\nconsole.log(typeof greet);",
+    "output": [
+      {
+        "type": "log",
+        "text": "function"
+      }
+    ]
+  },
+  "1-2-24-example-typeof-surprises#3": {
+    "code": "console.log(typeof \"hello\");           // \"string\"\nconsole.log(typeof 42);                // \"number\"\nconsole.log(typeof true);              // \"boolean\"\nconsole.log(typeof undefined);         // \"undefined\"\nconsole.log(typeof null);              // \"object\"  <-- the bug\nconsole.log(typeof { name: \"Sarah\" }); // \"object\"",
+    "output": [
+      {
+        "type": "log",
+        "text": "string"
+      },
+      {
+        "type": "log",
+        "text": "number"
+      },
+      {
+        "type": "log",
+        "text": "boolean"
+      },
+      {
+        "type": "log",
+        "text": "undefined"
+      },
+      {
+        "type": "log",
+        "text": "object"
+      },
+      {
+        "type": "log",
+        "text": "object"
+      }
+    ]
+  },
+  "1-2-27-reading-the-seven-primitives#0": {
+    "code": "console.log(typeof 42);                  // number\nconsole.log(typeof 42n);                 // bigint\nconsole.log(typeof \"text\");              // string\nconsole.log(typeof false);               // boolean\nconsole.log(typeof null);                // object  <-- the known bug\nconsole.log(typeof undefined);           // undefined\nconsole.log(typeof Symbol(\"id\"));        // symbol\nconsole.log(typeof { pages: 200 });      // object",
+    "output": [
+      {
+        "type": "log",
+        "text": "number"
+      },
+      {
+        "type": "log",
+        "text": "bigint"
+      },
+      {
+        "type": "log",
+        "text": "string"
+      },
+      {
+        "type": "log",
+        "text": "boolean"
+      },
+      {
+        "type": "log",
+        "text": "object"
+      },
+      {
+        "type": "log",
+        "text": "undefined"
+      },
+      {
+        "type": "log",
+        "text": "symbol"
+      },
+      {
+        "type": "log",
+        "text": "object"
+      }
+    ]
+  },
+  "1-2-3-reading-every-value-has-a-type#0": {
+    "code": "let count = 42;              // number\nlet greeting = \"hello\";      // string\nlet isReady = true;          // boolean\nlet chosen = null;           // null\nlet notSetYet;               // undefined\n\nconsole.log(count);\nconsole.log(greeting);\nconsole.log(isReady);\nconsole.log(chosen);\nconsole.log(notSetYet);",
+    "output": [
+      {
+        "type": "log",
+        "text": "42"
+      },
+      {
+        "type": "log",
+        "text": "hello"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "null"
+      },
+      {
+        "type": "log",
+        "text": "undefined"
+      }
+    ]
+  },
+  "1-2-4-reading-dynamically-typed#0": {
+    "code": "let message = \"hello\";\nconsole.log(message);\n\nmessage = 123456;\nconsole.log(message);",
+    "output": [
+      {
+        "type": "log",
+        "text": "hello"
+      },
+      {
+        "type": "log",
+        "text": "123456"
+      }
+    ]
+  },
+  "1-2-6-reading-number#0": {
+    "code": "let n = 123;\nconsole.log(n);\n\nn = 12.345;\nconsole.log(n);\n\nconsole.log(10 * 3);\nconsole.log(10 / 4);   // 2.5: no rounding\nconsole.log(10 - 3);",
+    "output": [
+      {
+        "type": "log",
+        "text": "123"
+      },
+      {
+        "type": "log",
+        "text": "12.345"
+      },
+      {
+        "type": "log",
+        "text": "30"
+      },
+      {
+        "type": "log",
+        "text": "2.5"
+      },
+      {
+        "type": "log",
+        "text": "7"
+      }
+    ]
+  },
+  "1-2-7-reading-operators-coercion#0": {
+    "code": "console.log(\"5\" + 3);\nconsole.log(\"5\" - 3);\nconsole.log(\"10\" * \"2\");\nconsole.log(5 + 3 + \"px\");\nconsole.log(\"px\" + 5 + 3);",
+    "output": [
+      {
+        "type": "log",
+        "text": "53"
+      },
+      {
+        "type": "log",
+        "text": "2"
+      },
+      {
+        "type": "log",
+        "text": "20"
+      },
+      {
+        "type": "log",
+        "text": "8px"
+      },
+      {
+        "type": "log",
+        "text": "px53"
+      }
+    ]
+  },
+  "1-2-8-reading-special-numeric-values#0": {
+    "code": "console.log( 1 / 0 );                  // Infinity\nconsole.log( Infinity );               // Infinity: you can write it directly\nconsole.log( -1 / 0 );                 // -Infinity\nconsole.log( \"not a number\" / 2 );     // NaN\nconsole.log( 5 );                      // still running",
+    "output": [
+      {
+        "type": "log",
+        "text": "Infinity"
+      },
+      {
+        "type": "log",
+        "text": "Infinity"
+      },
+      {
+        "type": "log",
+        "text": "-Infinity"
+      },
+      {
+        "type": "log",
+        "text": "NaN"
+      },
+      {
+        "type": "log",
+        "text": "5"
+      }
+    ]
+  },
+  "1-2-9-example-nan-is-sticky#0": {
+    "code": "console.log( NaN + 1 );\nconsole.log( 3 * NaN );\nconsole.log( \"not a number\" / 2 - 1 );",
+    "output": [
+      {
+        "type": "log",
+        "text": "NaN"
+      },
+      {
+        "type": "log",
+        "text": "NaN"
+      },
+      {
+        "type": "log",
+        "text": "NaN"
+      }
+    ]
+  },
+  "1-2-9-example-nan-is-sticky#1": {
+    "code": "let price = \"$12.99\";       // oops: text with a $ in it, not a number\nlet quantity = 3;\n\nlet subtotal = price * quantity;\nlet tax = subtotal * 0.08;\nlet total = subtotal + tax;\n\nconsole.log(\"total: \" + total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "total: NaN"
+      }
+    ]
+  },
+  "1-2-9-example-nan-is-sticky#2": {
+    "code": "console.log( NaN ** 0 );",
+    "output": [
+      {
+        "type": "log",
+        "text": "1"
+      }
+    ]
+  },
+  "1-3-10-example-good-vs-bad-names#0": {
+    "code": "let a = \"John\";\nlet b = 90;\nlet c = a + \" scored \" + b + \"%\";\nconsole.log(c);",
+    "output": [
+      {
+        "type": "log",
+        "text": "John scored 90%"
+      }
+    ]
+  },
+  "1-3-10-example-good-vs-bad-names#1": {
+    "code": "let studentName = \"John\";\nlet examScore = 90;\nlet result = studentName + \" scored \" + examScore + \"%\";\nconsole.log(result);",
+    "output": [
+      {
+        "type": "log",
+        "text": "John scored 90%"
+      }
+    ]
+  },
+  "1-3-10-example-good-vs-bad-names#2": {
+    "code": "let studentName = \"John\";\nlet examScore = 90;\nlet scoreReport = studentName + \" scored \" + examScore + \"%\";\nconsole.log(scoreReport);",
+    "output": [
+      {
+        "type": "log",
+        "text": "John scored 90%"
+      }
+    ]
+  },
+  "1-3-13-reading-reuse-or-create#0": {
+    "code": "// Bad: one variable, three unrelated purposes\nlet item = 42;\nconsole.log(item);\nitem = \"hello\";\nconsole.log(item);\nitem = true;\nconsole.log(item);\n\n// Good: each variable has one clear purpose\nlet answer = 42;\nconsole.log(answer);\nlet greeting = \"hello\";\nconsole.log(greeting);\nlet isComplete = true;\nconsole.log(isComplete);",
+    "output": [
+      {
+        "type": "log",
+        "text": "42"
+      },
+      {
+        "type": "log",
+        "text": "hello"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "42"
+      },
+      {
+        "type": "log",
+        "text": "hello"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      }
+    ]
+  },
+  "1-3-14-reading-why-reuse-costs-you#0": {
+    "code": "let value = 10;\nvalue = value * 2;\n\nlet label = \"total\";\nvalue = label;          // reused for something completely different\n\nvalue = value + 5;\n\nconsole.log(value);",
+    "output": [
+      {
+        "type": "log",
+        "text": "total5"
+      }
+    ]
+  },
+  "1-3-15-example-one-variable-three-meanings#0": {
+    "code": "let x = 100;\nconsole.log(x);\nx = \"Alice\";\nconsole.log(x);\nx = true;\nconsole.log(x);",
+    "output": [
+      {
+        "type": "log",
+        "text": "100"
+      },
+      {
+        "type": "log",
+        "text": "Alice"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      }
+    ]
+  },
+  "1-3-15-example-one-variable-three-meanings#1": {
+    "code": "let maxScore = 100;\nconsole.log(maxScore);\n\nlet playerName = \"Alice\";\nconsole.log(playerName);\n\nlet isGameOver = true;\nconsole.log(isGameOver);",
+    "output": [
+      {
+        "type": "log",
+        "text": "100"
+      },
+      {
+        "type": "log",
+        "text": "Alice"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      }
+    ]
+  },
+  "1-3-15-example-one-variable-three-meanings#2": {
+    "code": "let score = 0;\nconsole.log(score);\n\nscore = score + 10;    // same purpose, new value\nconsole.log(score);\n\nscore = score * 2;\nconsole.log(score);",
+    "output": [
+      {
+        "type": "log",
+        "text": "0"
+      },
+      {
+        "type": "log",
+        "text": "10"
+      },
+      {
+        "type": "log",
+        "text": "20"
+      }
+    ]
+  },
+  "1-3-18-reading-what-a-readme-is#0": {
+    "code": "const TAX_RATE = 0.0725;\n\nlet itemPrice = 19.99;\nlet itemCount = 3;\n\nlet subtotal = itemPrice * itemCount;\nlet total = subtotal + subtotal * TAX_RATE;\n\nconsole.log(`Subtotal: $${subtotal.toFixed(2)}`);\nconsole.log(`Total with tax: $${total.toFixed(2)}`);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Subtotal: $59.97"
+      },
+      {
+        "type": "log",
+        "text": "Total with tax: $64.32"
+      }
+    ]
+  },
+  "1-3-2-reading-camelcase#0": {
+    "code": "// Mystery names: what does this even calculate?\nlet p = 29.99;\nlet q = 3;\nlet t = p * q;\nconsole.log(t);\n\n// Same math, readable names\nlet unitPrice = 29.99;\nlet quantity = 3;\nlet subtotal = unitPrice * quantity;\nconsole.log(\"Subtotal: $\" + subtotal);",
+    "output": [
+      {
+        "type": "log",
+        "text": "89.97"
+      },
+      {
+        "type": "log",
+        "text": "Subtotal: $89.97"
+      }
+    ]
+  },
+  "1-3-2-reading-camelcase#1": {
+    "code": "const DAYS_IN_WEEK = 7;\n\nlet weeksWorked = 3;\nlet daysWorked = weeksWorked * DAYS_IN_WEEK;\n\nconsole.log(\"Days worked: \" + daysWorked);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Days worked: 21"
+      }
+    ]
+  },
+  "1-3-3-reading-code-layout#0": {
+    "code": "// Cramped and hard to read (but it still runs)\nlet age=17;if(age>=18){console.log(\"adult\");}else{console.log(\"minor\");}\n\n// Clean: spaces, indentation, semicolons\nlet years = 17;\nif (years >= 18) {\n  console.log(\"adult\");\n} else {\n  console.log(\"minor\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "minor"
+      },
+      {
+        "type": "log",
+        "text": "minor"
+      }
+    ]
+  },
+  "1-3-4-reading-comments#0": {
+    "code": "// This line is a comment: the computer ignores it entirely.\nlet age = 17; // age in years\n\n// Print a greeting\nconsole.log(\"Hello! Age: \" + age);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello! Age: 17"
+      }
+    ]
+  },
+  "1-3-4-reading-comments#1": {
+    "code": "/*\n  Program: Greeting\n  Purpose: show a name and age in the console\n*/\n\nlet name = \"Jordan\";\nlet score = 95;\n\nconsole.log(name + \" scored \" + score);\n/* The line above prints the result.\n   Nothing else needs to happen here. */",
+    "output": [
+      {
+        "type": "log",
+        "text": "Jordan scored 95"
+      }
+    ]
+  },
+  "1-3-5-why-documentation#0": {
+    "code": "let price = 20;\nlet shipping = 7;\n\n// Summer sale: the store owner asked us to take $2 off shipping.\n// Ends in September - remove the discount then, not before.\nlet total = price + shipping - 2;\n\nconsole.log(\"Total: \" + total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Total: 25"
+      }
+    ]
+  },
+  "1-3-6-reading-human-readable-names#0": {
+    "code": "// You have to guess\nlet x = 29.99;\nlet y = 3;\nlet z = x * y;\nconsole.log(z);\n\n// You do not\nlet totalPrice = 29.99;\nlet itemCount = 3;\nlet orderTotal = totalPrice * itemCount;\nconsole.log(orderTotal);",
+    "output": [
+      {
+        "type": "log",
+        "text": "89.97"
+      },
+      {
+        "type": "log",
+        "text": "89.97"
+      }
+    ]
+  },
+  "1-3-7-reading-avoid-abbreviations#0": {
+    "code": "// What is this program about? Read the names only.\nlet n = 3;\nlet d = 2.5;\nlet p = n * d;\nconsole.log(p);\n\n// Same arithmetic, and now you know\nlet hoursWorked = 3;\nlet hourlyRate = 2.5;\nlet pay = hoursWorked * hourlyRate;\nconsole.log(pay);",
+    "output": [
+      {
+        "type": "log",
+        "text": "7.5"
+      },
+      {
+        "type": "log",
+        "text": "7.5"
+      }
+    ]
+  },
+  "1-3-8-reading-descriptive-but-concise#0": {
+    "code": "// Too vague: three names, no information\nlet data = 88;\nlet value = \"Maya\";\nlet result = value + \" got \" + data;\nconsole.log(result);\n\n// Descriptive and concise\nlet examScore = 88;\nlet studentName = \"Maya\";\nlet report = studentName + \" got \" + examScore;\nconsole.log(report);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Maya got 88"
+      },
+      {
+        "type": "log",
+        "text": "Maya got 88"
+      }
+    ]
+  },
+  "1-3-9-reading-agree-on-terms#0": {
+    "code": "// Two people, two words, one shopping cart\nlet cartItems = 3;\nlet basketTotal = 24.50;\nconsole.log(\"items: \" + cartItems + \", total: \" + basketTotal);\n\n// One agreed word\nlet cartItemCount = 3;\nlet cartTotal = 24.50;\nconsole.log(\"items: \" + cartItemCount + \", total: \" + cartTotal);",
+    "output": [
+      {
+        "type": "log",
+        "text": "items: 3, total: 24.5"
+      },
+      {
+        "type": "log",
+        "text": "items: 3, total: 24.5"
+      }
+    ]
+  },
+  "1-4-10-reading-three-structures#0": {
+    "code": "let score = 88;                       // sequence\n\nif (score >= 60) {                    // selection\n  console.log(\"pass\");\n} else {\n  console.log(\"retake\");\n}\n\nfor (let i = 1; i <= 3; i = i + 1) {  // repetition\n  console.log(\"star \" + i);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "pass"
+      },
+      {
+        "type": "log",
+        "text": "star 1"
+      },
+      {
+        "type": "log",
+        "text": "star 2"
+      },
+      {
+        "type": "log",
+        "text": "star 3"
+      }
+    ]
+  },
+  "1-4-11-example-which-structures#0": {
+    "code": "let subtotal = 25;\nlet tax = subtotal * 0.08;\nlet total = subtotal + tax;\nconsole.log(total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "27"
+      }
+    ]
+  },
+  "1-4-11-example-which-structures#1": {
+    "code": "let subtotal = 25;\n\nif (subtotal >= 20) {\n  subtotal = subtotal - 5;\n  console.log(\"discount applied\");\n}\n\nlet tax = subtotal * 0.08;\nconsole.log(subtotal + tax);",
+    "output": [
+      {
+        "type": "log",
+        "text": "discount applied"
+      },
+      {
+        "type": "log",
+        "text": "21.6"
+      }
+    ]
+  },
+  "1-4-11-example-which-structures#2": {
+    "code": "let prices = [8, 25, 3];\nlet total = 0;\n\nfor (let i = 0; i < prices.length; i = i + 1) {\n  if (prices[i] >= 20) {\n    console.log(\"big item: \" + prices[i]);\n  }\n  total = total + prices[i];\n}\n\nconsole.log(\"total: \" + total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "big item: 25"
+      },
+      {
+        "type": "log",
+        "text": "total: 36"
+      }
+    ]
+  },
+  "1-4-13-reading-why-goto-went-away#0": {
+    "code": "let temperature = 71;\n\nconsole.log(\"step 1: read the temperature\");\n\nif (temperature > 80) {\n  console.log(\"step 2: too hot\");\n} else {\n  console.log(\"step 2: comfortable\");\n}\n\nconsole.log(\"step 3: done\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "step 1: read the temperature"
+      },
+      {
+        "type": "log",
+        "text": "step 2: comfortable"
+      },
+      {
+        "type": "log",
+        "text": "step 3: done"
+      }
+    ]
+  },
+  "1-4-15-reading-object-oriented#0": {
+    "code": "let book = { title: \"JavaScript Guide\", pages: 200 };\n\nconsole.log(book.title);\nconsole.log(book.pages);",
+    "output": [
+      {
+        "type": "log",
+        "text": "JavaScript Guide"
+      },
+      {
+        "type": "log",
+        "text": "200"
+      }
+    ]
+  },
+  "1-4-16-example-procedural-vs-oo#0": {
+    "code": "let title = \"JavaScript Guide\";\nlet pages = 200;\nconsole.log(title + \" has \" + pages + \" pages.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "JavaScript Guide has 200 pages."
+      }
+    ]
+  },
+  "1-4-16-example-procedural-vs-oo#1": {
+    "code": "let book = { title: \"JavaScript Guide\", pages: 200 };\nconsole.log(book.title + \" has \" + book.pages + \" pages.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "JavaScript Guide has 200 pages."
+      }
+    ]
+  },
+  "1-4-16-example-procedural-vs-oo#2": {
+    "code": "// Procedural, for two books: the pairing is only in your head\nlet title1 = \"JavaScript Guide\";  let pages1 = 200;\nlet title2 = \"Learning Python\";   let pages2 = 350;\nconsole.log(title1 + \", \" + title2);\n\n// Object-oriented: each book keeps its own facts together\nlet books = [\n  { title: \"JavaScript Guide\", pages: 200 },\n  { title: \"Learning Python\", pages: 350 }\n];\nconsole.log(books[0].title + \", \" + books[1].title);",
+    "output": [
+      {
+        "type": "log",
+        "text": "JavaScript Guide, Learning Python"
+      },
+      {
+        "type": "log",
+        "text": "JavaScript Guide, Learning Python"
+      }
+    ]
+  },
+  "1-4-18-reading-functional-programming#0": {
+    "code": "let temps = [58, 72, 91, 64, 88, 45];\n\nlet hot = temps.filter(function (t) { return t > 70; });\n\nconsole.log(\"hot days: \", hot);\nconsole.log(\"original: \", temps);   // all six: untouched",
+    "output": [
+      {
+        "type": "log",
+        "text": "hot days:  [\n  72,\n  91,\n  88\n]"
+      },
+      {
+        "type": "log",
+        "text": "original:  [\n  58,\n  72,\n  91,\n  64,\n  88,\n  45\n]"
+      }
+    ]
+  },
+  "1-4-19-reading-multi-paradigm#0": {
+    "code": "// Object-oriented: data bundled into one value\nlet player = { name: \"Ada\", scores: [8, 25, 3] };\n\n// Functional: a new list, original untouched\nlet bigScores = player.scores.filter(function (s) { return s > 5; });\n\n// Procedural: steps in order, changing a running total\nlet total = 0;\nfor (let i = 0; i < bigScores.length; i = i + 1) {\n  total = total + bigScores[i];\n}\n\nconsole.log(player.name + \" scored \" + total + \" on big plays\");\nconsole.log(\"original scores still: \" + player.scores);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Ada scored 33 on big plays"
+      },
+      {
+        "type": "log",
+        "text": "original scores still: 8,25,3"
+      }
+    ]
+  },
+  "1-4-2-reading-why-so-many-languages#0": {
+    "code": "let languages = [\"Python\", \"C\", \"SQL\", \"Swift\"];\nlet jobs = [\"analysing data\", \"an operating system\", \"a database question\", \"an iPhone app\"];\n\nfor (let i = 0; i < languages.length; i = i + 1) {\n  console.log(languages[i] + \" -> \" + jobs[i]);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Python -> analysing data"
+      },
+      {
+        "type": "log",
+        "text": "C -> an operating system"
+      },
+      {
+        "type": "log",
+        "text": "SQL -> a database question"
+      },
+      {
+        "type": "log",
+        "text": "Swift -> an iPhone app"
+      }
+    ]
+  },
+  "1-4-4-reading-levels-of-abstraction#0": {
+    "code": "let total = 5 + 3;\nconsole.log(total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "8"
+      }
+    ]
+  },
+  "1-4-5-reading-high-and-low-level#0": {
+    "code": "let name = \"Sam\";\nlet score = 42;\nconsole.log(name + \" scored \" + score);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Sam scored 42"
+      }
+    ]
+  },
+  "1-4-7-reading-what-is-a-paradigm#0": {
+    "code": "// Organised as separate values\nlet title = \"JavaScript Guide\";\nlet pages = 200;\nconsole.log(title + \" has \" + pages + \" pages.\");\n\n// Organised as one bundle\nlet book = { title: \"JavaScript Guide\", pages: 200 };\nconsole.log(book.title + \" has \" + book.pages + \" pages.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "JavaScript Guide has 200 pages."
+      },
+      {
+        "type": "log",
+        "text": "JavaScript Guide has 200 pages."
+      }
+    ]
+  },
+  "1-4-8-reading-procedural-programming#0": {
+    "code": "let price = 20;\nlet quantity = 3;\nlet total = price * quantity;\n\nconsole.log(\"Total: \" + total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Total: 60"
+      }
+    ]
+  },
+  "1-4-9-reading-structured-programming#0": {
+    "code": "let subtotal = 25;\nlet tax = subtotal * 0.08;\nlet total = subtotal + tax;\nconsole.log(total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "27"
+      }
+    ]
+  },
+  "1-5-10-reading-inductive-and-deductive#0": {
+    "code": "// INDUCTION: three observations, one suspected rule\nconsole.log(3 + 5);      // even\nconsole.log(7 + 1);      // even\nconsole.log(9 + 11);     // even\n// suspected rule: odd + odd is always even\n\n// DEDUCTION: the rules force an answer before you run it\nlet input = 4;\nlet output = input * 5;\nconsole.log(\"must be 20, and is: \" + output);",
+    "output": [
+      {
+        "type": "log",
+        "text": "8"
+      },
+      {
+        "type": "log",
+        "text": "8"
+      },
+      {
+        "type": "log",
+        "text": "20"
+      },
+      {
+        "type": "log",
+        "text": "must be 20, and is: 20"
+      }
+    ]
+  },
+  "1-5-11-example-decomposing-the-sandwich#0": {
+    "code": "let ingredients = [\"bread\", \"jam\", \"butter\"];\nlet equipment = [\"plate\", \"knife\"];\nlet actions = [\"repeat x times\", \"left hand\", \"right hand\", \"pick up\", \"unscrew\", \"spread\"];\n\nconsole.log(\"ingredients: \" + ingredients.length);\nconsole.log(\"equipment:   \" + equipment.length);\nconsole.log(\"actions:     \" + actions.length);",
+    "output": [
+      {
+        "type": "log",
+        "text": "ingredients: 3"
+      },
+      {
+        "type": "log",
+        "text": "equipment:   2"
+      },
+      {
+        "type": "log",
+        "text": "actions:     6"
+      }
+    ]
+  },
+  "1-5-11-example-decomposing-the-sandwich#1": {
+    "code": "let actions = [\n  \"pick up\", \"put down\", \"unscrew\", \"screw on\",\n  \"spread\", \"repeat x times\", \"left hand\", \"right hand\"\n];\n\nfor (let i = 0; i < actions.length; i = i + 1) {\n  console.log((i + 1) + \". \" + actions[i]);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "1. pick up"
+      },
+      {
+        "type": "log",
+        "text": "2. put down"
+      },
+      {
+        "type": "log",
+        "text": "3. unscrew"
+      },
+      {
+        "type": "log",
+        "text": "4. screw on"
+      },
+      {
+        "type": "log",
+        "text": "5. spread"
+      },
+      {
+        "type": "log",
+        "text": "6. repeat x times"
+      },
+      {
+        "type": "log",
+        "text": "7. left hand"
+      },
+      {
+        "type": "log",
+        "text": "8. right hand"
+      }
+    ]
+  },
+  "1-5-13-reading-abstraction#0": {
+    "code": "// Everything we know\nlet name = \"Maya\";\nlet score = 88;\nlet favouriteColour = \"green\";\nlet busRoute = 14;\nlet heightCm = 162;\nlet hasSiblings = true;\n\n// The abstraction: a grade report needs two of those six.\nconsole.log(name + \" scored \" + score);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Maya scored 88"
+      }
+    ]
+  },
+  "1-5-14-reading-layers-of-abstraction#0": {
+    "code": "// Bottom layer: the machine adds numbers. You never see this happen.\nlet prices = [4.50, 2.25, 9.99];\n\n// Middle layer: a language feature that walks a list and totals it.\nlet total = 0;\nfor (let i = 0; i < prices.length; i = i + 1) {\n  total = total + prices[i];\n}\n\n// Top layer: what the person actually asked for.\nconsole.log(\"Your basket comes to $\" + total.toFixed(2));",
+    "output": [
+      {
+        "type": "log",
+        "text": "Your basket comes to $16.74"
+      }
+    ]
+  },
+  "1-5-15-example-computational-thinking-in-chess#0": {
+    "code": "// The full board state is 64 squares. The abstraction is: which\n// pieces actually bear on the decision in front of me?\nlet relevant = [\"my queen\", \"their rook\", \"the pawn on e5\"];\nlet ignoredForNow = 29;\n\nconsole.log(\"tracking \" + relevant.length + \" pieces closely\");\nconsole.log(\"deliberately not tracking \" + ignoredForNow);\n\nfor (let i = 0; i < relevant.length; i = i + 1) {\n  console.log(\"  watching: \" + relevant[i]);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "tracking 3 pieces closely"
+      },
+      {
+        "type": "log",
+        "text": "deliberately not tracking 29"
+      },
+      {
+        "type": "log",
+        "text": "  watching: my queen"
+      },
+      {
+        "type": "log",
+        "text": "  watching: their rook"
+      },
+      {
+        "type": "log",
+        "text": "  watching: the pawn on e5"
+      }
+    ]
+  },
+  "1-5-18-reading-what-an-algorithm-is#0": {
+    "code": "// As a plan, in words:\n//   1. set total to 0\n//   2. set i to 1\n//   3. while i is 5 or less: add i to total, then add 1 to i\n//   4. print total\n\n// As JavaScript:\nlet total = 0;\nfor (let i = 1; i <= 5; i = i + 1) {\n  total = total + i;\n}\nconsole.log(total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "15"
+      }
+    ]
+  },
+  "1-5-2-reading-think-before-you-type#0": {
+    "code": "// Plan problem: this runs perfectly and is wrong.\n// It is supposed to print the average of the three scores.\nlet a = 6;\nlet b = 9;\nlet c = 3;\nlet average = a + b + c / 3;\n\nconsole.log(\"average is \" + average);",
+    "output": [
+      {
+        "type": "log",
+        "text": "average is 16"
+      }
+    ]
+  },
+  "1-5-20-reading-the-two-pseudocode-rules#0": {
+    "code": "let total = 0;              // set total to 0\nlet i = 1;                  // set i to 1\n\nwhile (i <= 5) {            // while i is 5 or less\n  total = total + i;        //     add i to total\n  i = i + 1;                //     add 1 to i\n}\n\nconsole.log(total);         // print total",
+    "output": [
+      {
+        "type": "log",
+        "text": "15"
+      }
+    ]
+  },
+  "1-5-21-example-pseudocode-for-a-decision#0": {
+    "code": "let age = 20;                        // ask the user for their age\n\nif (age >= 18) {                     // if age is 18 or more\n  console.log(\"You may vote\");       //     print \"You may vote\"\n} else {                             // otherwise\n  console.log(\"Too young to vote\");  //     print \"Too young to vote\"\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "You may vote"
+      }
+    ]
+  },
+  "1-5-22-example-butter-or-no-butter#0": {
+    "code": "let wantsButter = true;              // INPUT\n\nif (wantsButter) {                   // IF ... THEN\n  console.log(\"spread butter on the bread\");\n} else {                             // ELSE\n  // do nothing\n}\n\nconsole.log(\"spread jam on the bread\");\nconsole.log(\"here is your sandwich\");   // OUTPUT",
+    "output": [
+      {
+        "type": "log",
+        "text": "spread butter on the bread"
+      },
+      {
+        "type": "log",
+        "text": "spread jam on the bread"
+      },
+      {
+        "type": "log",
+        "text": "here is your sandwich"
+      }
+    ]
+  },
+  "1-5-25-reading-the-three-shapes#0": {
+    "code": "// OVAL      Start\n// RECTANGLE get the age\nlet age = 20;\n\n// DIAMOND   is age >= 18?  -- two ways out\nif (age >= 18) {\n  // RECTANGLE (yes path)\n  console.log(\"You may vote\");\n} else {\n  // RECTANGLE (no path)\n  console.log(\"Too young to vote\");\n}\n\n// OVAL      End -- both paths arrive here\nconsole.log(\"done\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "You may vote"
+      },
+      {
+        "type": "log",
+        "text": "done"
+      }
+    ]
+  },
+  "1-5-26-reading-the-diamond#0": {
+    "code": "let temperature = 91;\n\nconsole.log(\"start\");\n\nif (temperature > 80) {          // the diamond\n  console.log(\"  yes path: take water\");\n} else {\n  console.log(\"  no path: take a jacket\");\n}\n\nconsole.log(\"leave the house\");  // both paths reach this\nconsole.log(\"end\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "start"
+      },
+      {
+        "type": "log",
+        "text": "  yes path: take water"
+      },
+      {
+        "type": "log",
+        "text": "leave the house"
+      },
+      {
+        "type": "log",
+        "text": "end"
+      }
+    ]
+  },
+  "1-5-27-reading-when-to-use-which#0": {
+    "code": "let age = 15;\nlet hasPermit = true;\nlet isSupervised = false;\n\nif (age >= 18) {\n  console.log(\"may drive alone\");\n} else {\n  if (hasPermit) {\n    if (isSupervised) {\n      console.log(\"may drive supervised\");\n    } else {\n      console.log(\"permit only, needs supervision\");\n    }\n  } else {\n    console.log(\"may not drive\");\n  }\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "permit only, needs supervision"
+      }
+    ]
+  },
+  "1-5-3-reading-computational-thinking#0": {
+    "code": "// The plan, in English:\n//   start a total at zero\n//   add each score to the total\n//   divide the total by how many scores there were\n//   print the answer\n\nlet scores = [6, 9, 3];\nlet total = 0;\n\nfor (let i = 0; i < scores.length; i = i + 1) {\n  total = total + scores[i];\n}\n\nconsole.log(\"average is \" + total / scores.length);",
+    "output": [
+      {
+        "type": "log",
+        "text": "average is 6"
+      }
+    ]
+  },
+  "1-5-32-reading-sequential-parallel-concurrent#0": {
+    "code": "console.log(\"queue A: person 1\");\nconsole.log(\"queue A: person 2\");\nconsole.log(\"queue A: person 3\");\n\nconsole.log(\"--- if two queues ran in parallel ---\");\nconsole.log(\"A:1 and B:1 at the same instant\");\nconsole.log(\"A:2 and B:2 at the same instant\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "queue A: person 1"
+      },
+      {
+        "type": "log",
+        "text": "queue A: person 2"
+      },
+      {
+        "type": "log",
+        "text": "queue A: person 3"
+      },
+      {
+        "type": "log",
+        "text": "--- if two queues ran in parallel ---"
+      },
+      {
+        "type": "log",
+        "text": "A:1 and B:1 at the same instant"
+      },
+      {
+        "type": "log",
+        "text": "A:2 and B:2 at the same instant"
+      }
+    ]
+  },
+  "1-5-33-reading-recursion#0": {
+    "code": "function recursiveSum(x) {\n  // Base case\n  if (x === 0) {\n    return 0;\n  } else {\n    // Recursive step\n    return x + recursiveSum(x - 1);\n  }\n}\n\nconsole.log(recursiveSum(10));",
+    "output": [
+      {
+        "type": "log",
+        "text": "55"
+      }
+    ]
+  },
+  "1-5-34-example-stack-overflow-on-purpose#0": {
+    "code": "function recursiveSum(x) {\n  return x + recursiveSum(x - 1);\n}\n\ntry {\n  console.log(recursiveSum(10));\n} catch (err) {\n  console.log(\"It stopped itself:\");\n  console.log(err.name + \": \" + err.message);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "It stopped itself:"
+      },
+      {
+        "type": "log",
+        "text": "RangeError: Maximum call stack size exceeded"
+      }
+    ]
+  },
+  "1-5-34-example-stack-overflow-on-purpose#1": {
+    "code": "function recursiveSum(x) {\n  if (x === 0) {\n    return 0;\n  }\n  return x + recursiveSum(x - 1);\n}\n\nconsole.log(recursiveSum(10));",
+    "output": [
+      {
+        "type": "log",
+        "text": "55"
+      }
+    ]
+  },
+  "1-5-35-reading-the-browser-console#0": {
+    "code": "console.log(\"Hello from the console\");\n\n// The console is fastest for settling a question you are unsure of\nconsole.log(typeof \"42\");\nconsole.log(7 % 2);\nconsole.log(\"abc\".toUpperCase());",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello from the console"
+      },
+      {
+        "type": "log",
+        "text": "string"
+      },
+      {
+        "type": "log",
+        "text": "1"
+      },
+      {
+        "type": "log",
+        "text": "ABC"
+      }
+    ]
+  },
+  "1-5-36-reading-a-code-editor#0": {
+    "code": "const TAX_RATE = 0.0725;\n\nlet itemPrice = 19.99;\nlet itemCount = 3;\n\nif (itemCount > 0) {\n  let subtotal = itemPrice * itemCount;\n  let total = subtotal + subtotal * TAX_RATE;\n  console.log(\"Total: $\" + total.toFixed(2));\n} else {\n  console.log(\"Nothing in the basket\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Total: $64.32"
+      }
+    ]
+  },
+  "1-5-38-reading-reading-an-error-message#0": {
+    "code": "let total = 10;\nconsole.log(\"Total is \" + total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Total is 10"
+      }
+    ]
+  },
+  "1-5-4-reading-the-four-techniques#0": {
+    "code": "// DECOMPOSITION: the problem breaks into: hold the scores,\n//   compare them, report the winner.\nlet scores = [78, 91, 84];\nlet names = [\"Ada\", \"Bo\", \"Cy\"];\n\n// PATTERN RECOGNITION: \"compare and keep the bigger\" repeats\n//   for every score, so one rule covers all of them.\nlet bestIndex = 0;\n\n// ABSTRACTION: nothing here needs the students' ages, classes\n//   or the subject. Only names and scores matter.\nfor (let i = 1; i < scores.length; i = i + 1) {\n  if (scores[i] > scores[bestIndex]) {\n    bestIndex = i;\n  }\n}\n\n// ALGORITHM: the ordered steps above, ending in a result.\nconsole.log(names[bestIndex] + \" scored highest with \" + scores[bestIndex]);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Bo scored highest with 91"
+      }
+    ]
+  },
+  "1-5-40-reading-testing-and-test-cases#0": {
+    "code": "let width = 4;\nlet height = 5;\nlet area = width * height;\n\n// test case 1: 4 by 5 should be 20\nif (area === 20) {\n  console.log(\"PASS  4x5 = \" + area);\n} else {\n  console.log(\"FAIL  4x5 gave \" + area + \", expected 20\");\n}\n\n// test case 2: a square, 3 by 3, should be 9\nwidth = 3;\nheight = 3;\narea = width * height;\nif (area === 9) {\n  console.log(\"PASS  3x3 = \" + area);\n} else {\n  console.log(\"FAIL  3x3 gave \" + area + \", expected 9\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "PASS  4x5 = 20"
+      },
+      {
+        "type": "log",
+        "text": "PASS  3x3 = 9"
+      }
+    ]
+  },
+  "1-5-41-reading-debugging-with-console-log#0": {
+    "code": "let price = 20;\nlet quantity = 3;\nlet total = price + quantity;\n\nconsole.log(\"price is \" + price);\nconsole.log(\"quantity is \" + quantity);\nconsole.log(\"total is \" + total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "price is 20"
+      },
+      {
+        "type": "log",
+        "text": "quantity is 3"
+      },
+      {
+        "type": "log",
+        "text": "total is 23"
+      }
+    ]
+  },
+  "1-5-42-example-finding-the-rectangle-bug#0": {
+    "code": "let width = 4;\nlet height = 5;\nlet area = width + height;\n\nconsole.log(\"The area is \" + area);",
+    "output": [
+      {
+        "type": "log",
+        "text": "The area is 9"
+      }
+    ]
+  },
+  "1-5-42-example-finding-the-rectangle-bug#1": {
+    "code": "let width = 4;\nlet height = 5;\nlet area = width + height;\n\nconsole.log(\"width is \" + width);\nconsole.log(\"height is \" + height);\nconsole.log(\"area is \" + area);",
+    "output": [
+      {
+        "type": "log",
+        "text": "width is 4"
+      },
+      {
+        "type": "log",
+        "text": "height is 5"
+      },
+      {
+        "type": "log",
+        "text": "area is 9"
+      }
+    ]
+  },
+  "1-5-42-example-finding-the-rectangle-bug#2": {
+    "code": "let width = 4;\nlet height = 5;\nlet area = width * height;\n\nconsole.log(\"The area is \" + area);",
+    "output": [
+      {
+        "type": "log",
+        "text": "The area is 20"
+      }
+    ]
+  },
+  "1-5-5-reading-the-three-as#0": {
+    "code": "// ABSTRACTION: formulate: \"is this year a leap year?\"\n//   What matters: the year number. What does not: the month, the day.\nlet year = 2024;\n\n// AUTOMATION: express the rule as steps.\nlet isLeap = false;\nif (year % 4 === 0) {\n  isLeap = true;\n}\n\n// ANALYSIS: evaluate against cases you know the answer to.\nconsole.log(year + \" -> \" + isLeap);   // 2024 is a leap year: correct\nconsole.log(\"check 1900: \" + (1900 % 4 === 0));",
+    "output": [
+      {
+        "type": "log",
+        "text": "2024 -> true"
+      },
+      {
+        "type": "log",
+        "text": "check 1900: true"
+      }
+    ]
+  },
+  "1-5-6-example-the-jam-sandwich-robot#0": {
+    "code": "// \"Add the scores together\": obvious to a person.\nlet firstScore = \"8\";     // came from somewhere as text\nlet secondScore = 9;\n\nlet total = firstScore + secondScore;\nconsole.log(\"total is \" + total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "total is 89"
+      }
+    ]
+  },
+  "1-5-8-reading-decomposition#0": {
+    "code": "// part 1: know what was bought and how much it costs\nlet itemName = \"Notebook\";\nlet unitPrice = 3.50;\nlet quantity = 4;\n\n// part 2: work out the cost before tax\nlet subtotal = unitPrice * quantity;\n\n// part 3: work out the tax\nconst TAX_RATE = 0.0725;\nlet tax = subtotal * TAX_RATE;\n\n// part 4: report it\nconsole.log(quantity + \" x \" + itemName);\nconsole.log(\"subtotal \" + subtotal.toFixed(2));\nconsole.log(\"tax      \" + tax.toFixed(2));\nconsole.log(\"total    \" + (subtotal + tax).toFixed(2));",
+    "output": [
+      {
+        "type": "log",
+        "text": "4 x Notebook"
+      },
+      {
+        "type": "log",
+        "text": "subtotal 14.00"
+      },
+      {
+        "type": "log",
+        "text": "tax      1.01"
+      },
+      {
+        "type": "log",
+        "text": "total    15.02"
+      }
+    ]
+  },
+  "1-5-9-reading-pattern-recognition#0": {
+    "code": "// Before: four separate facts to track\nconsole.log(\"pick up the knife\");\nconsole.log(\"pick up the jar\");\nconsole.log(\"pick up the bread\");\nconsole.log(\"pick up the plate\");\n\nconsole.log(\"---\");\n\n// After: one pattern, applied four times\nlet things = [\"knife\", \"jar\", \"bread\", \"plate\"];\n\nfor (let i = 0; i < things.length; i = i + 1) {\n  console.log(\"pick up the \" + things[i]);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "pick up the knife"
+      },
+      {
+        "type": "log",
+        "text": "pick up the jar"
+      },
+      {
+        "type": "log",
+        "text": "pick up the bread"
+      },
+      {
+        "type": "log",
+        "text": "pick up the plate"
+      },
+      {
+        "type": "log",
+        "text": "---"
+      },
+      {
+        "type": "log",
+        "text": "pick up the knife"
+      },
+      {
+        "type": "log",
+        "text": "pick up the jar"
+      },
+      {
+        "type": "log",
+        "text": "pick up the bread"
+      },
+      {
+        "type": "log",
+        "text": "pick up the plate"
+      }
+    ]
+  },
+  "2-1-10-reading-logical-operators#0": {
+    "code": "let age = 16;\nlet hasTicket = true;\n\n// &&: both must be true\nif (age >= 13 && age <= 17) {\n  console.log(\"You are a teenager.\");\n}\n\n// ||, at least one must be true\nif (age < 13 || age > 17) {\n  console.log(\"You are not a teenager.\");\n}\n\n// !: flip a boolean\nif (!hasTicket) {\n  console.log(\"You need a ticket to enter.\");\n} else {\n  console.log(\"Welcome in!\");\n}\n\n// combining && in a real check\nif (age >= 13 && hasTicket) {\n  console.log(\"You can attend the teen event.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "You are a teenager."
+      },
+      {
+        "type": "log",
+        "text": "Welcome in!"
+      },
+      {
+        "type": "log",
+        "text": "You can attend the teen event."
+      }
+    ]
+  },
+  "2-1-11-example-combining-conditions#0": {
+    "code": "let age = 16;\n\nif (age >= 13 && age <= 19) {\n  console.log(\"You are a teenager.\");\n} else {\n  console.log(\"Not a teenager.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "You are a teenager."
+      }
+    ]
+  },
+  "2-1-11-example-combining-conditions#1": {
+    "code": "let day = \"Sat\";\n\nif (day === \"Sat\" || day === \"Sun\") {\n  console.log(\"It's the weekend!\");\n} else {\n  console.log(\"Weekday.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "It's the weekend!"
+      }
+    ]
+  },
+  "2-1-11-example-combining-conditions#2": {
+    "code": "let isRaining = false;\n\nif (!isRaining) {\n  console.log(\"Great day for a walk.\");\n} else {\n  console.log(\"Stay inside.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Great day for a walk."
+      }
+    ]
+  },
+  "2-1-15-reading-nested-conditionals#0": {
+    "code": "let isMember = true;\nlet yearsActive = 3;\n\nif (isMember) {\n  console.log(\"Member confirmed.\");\n\n  if (yearsActive >= 5) {\n    console.log(\"Eligible for the loyalty discount.\");\n  } else {\n    console.log(\"Not yet eligible for the loyalty discount.\");\n  }\n} else {\n  console.log(\"Not a member.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Member confirmed."
+      },
+      {
+        "type": "log",
+        "text": "Not yet eligible for the loyalty discount."
+      }
+    ]
+  },
+  "2-1-16-example-nested-conditionals#0": {
+    "code": "let hasTicket = true;\nlet age = 10;\n\nif (hasTicket) {\n  console.log(\"Ticket confirmed.\");\n\n  if (age < 12) {\n    console.log(\"Kids' seating section.\");\n  } else {\n    console.log(\"General seating section.\");\n  }\n} else {\n  console.log(\"No entry without a ticket.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Ticket confirmed."
+      },
+      {
+        "type": "log",
+        "text": "Kids' seating section."
+      }
+    ]
+  },
+  "2-1-16-example-nested-conditionals#1": {
+    "code": "let hasTicket = false;\nlet age = 10;\n\nif (hasTicket) {\n  console.log(\"Ticket confirmed.\");\n\n  if (age < 12) {\n    console.log(\"Kids' seating section.\");\n  } else {\n    console.log(\"General seating section.\");\n  }\n} else {\n  console.log(\"No entry without a ticket.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "No entry without a ticket."
+      }
+    ]
+  },
+  "2-1-16-example-nested-conditionals#2": {
+    "code": "let hasTicket = true;\nlet age = 20;\n\nif (hasTicket) {\n  console.log(\"Ticket confirmed.\");\n\n  if (age < 12) {\n    console.log(\"Kids' seating section.\");\n  } else {\n    console.log(\"General seating section.\");\n  }\n} else {\n  console.log(\"No entry without a ticket.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Ticket confirmed."
+      },
+      {
+        "type": "log",
+        "text": "General seating section."
+      }
+    ]
+  },
+  "2-1-18-reading-truthy-falsy#0": {
+    "code": "let cartCount = 0;\n\nif (cartCount) {\n  console.log(\"You have items in your cart.\");\n} else {\n  console.log(\"Your cart is empty.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Your cart is empty."
+      }
+    ]
+  },
+  "2-1-19-example-falsy-values#0": {
+    "code": "let name = \"\";\n\nif (name) {\n  console.log(\"Hello, \" + name);\n} else {\n  console.log(\"No name entered.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "No name entered."
+      }
+    ]
+  },
+  "2-1-19-example-falsy-values#1": {
+    "code": "let name = \"Sam\";\n\nif (name) {\n  console.log(\"Hello, \" + name);\n} else {\n  console.log(\"No name entered.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello, Sam"
+      }
+    ]
+  },
+  "2-1-19-example-falsy-values#2": {
+    "code": "let itemsInCart = 0;\n\nif (itemsInCart) {\n  console.log(\"You have items in your cart.\");\n} else {\n  console.log(\"Your cart is empty.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Your cart is empty."
+      }
+    ]
+  },
+  "2-1-21-reading-precedence#0": {
+    "code": "let age = 25;\nlet hasException = true;\n\nconsole.log((age >= 13 && age <= 19) || hasException);\nconsole.log(age >= 13 && age <= 19 || hasException);",
+    "output": [
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      }
+    ]
+  },
+  "2-1-22-reading-ternary#0": {
+    "code": "let age = 8;\nlet price = (age < 12) ? 10: 15;\nconsole.log(price);",
+    "output": [
+      {
+        "type": "log",
+        "text": "10"
+      }
+    ]
+  },
+  "2-1-23-example-ternary#0": {
+    "code": "let age = 8;\nconsole.log(age);",
+    "output": [
+      {
+        "type": "log",
+        "text": "8"
+      }
+    ]
+  },
+  "2-1-23-example-ternary#1": {
+    "code": "let age = 8;\nlet price = (age < 12) ? 10: 15;\nconsole.log(price);",
+    "output": [
+      {
+        "type": "log",
+        "text": "10"
+      }
+    ]
+  },
+  "2-1-23-example-ternary#2": {
+    "code": "let age = 15;\nlet price = (age < 12) ? 10: 15;\nconsole.log(price);",
+    "output": [
+      {
+        "type": "log",
+        "text": "15"
+      }
+    ]
+  },
+  "2-1-25-reading-ternary-chain#0": {
+    "code": "let waist = 34;\nlet size = (waist < 30) ? \"Small\" :\n  (waist < 36) ? \"Medium\" :\n  (waist < 42) ? \"Large\" :\n  \"Extra Large\";\nconsole.log(size);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Medium"
+      }
+    ]
+  },
+  "2-1-26-example-ternary-chain#0": {
+    "code": "let speed = 55;\nlet zone = (speed < 25) ? \"School zone\" :\n  (speed < 45) ? \"City\" :\n  (speed < 65) ? \"Highway\" :\n  \"Autobahn\";\nconsole.log(zone);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Highway"
+      }
+    ]
+  },
+  "2-1-26-example-ternary-chain#1": {
+    "code": "let speed = 10;\nlet zone = (speed < 25) ? \"School zone\" :\n  (speed < 45) ? \"City\" :\n  (speed < 65) ? \"Highway\" :\n  \"Autobahn\";\nconsole.log(zone);",
+    "output": [
+      {
+        "type": "log",
+        "text": "School zone"
+      }
+    ]
+  },
+  "2-1-26-example-ternary-chain#2": {
+    "code": "let speed = 10;\nlet zone = (speed < 65) ? \"Highway\" :\n  (speed < 25) ? \"School zone\" :\n  (speed < 45) ? \"City\" :\n  \"Autobahn\";\nconsole.log(zone);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Highway"
+      }
+    ]
+  },
+  "2-1-28-reading-ternary-vs-if#0": {
+    "code": "let loggedIn = false;\n\n(loggedIn) ? console.log(\"Welcome back!\"): console.log(\"Please log in.\");\n\nif (loggedIn) {\n  console.log(\"Welcome back!\");\n} else {\n  console.log(\"Please log in.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Please log in."
+      },
+      {
+        "type": "log",
+        "text": "Please log in."
+      }
+    ]
+  },
+  "2-1-29-example-ternary-vs-if#0": {
+    "code": "let hour = 9;\nlet greeting = (hour < 12) ? \"Good morning\": \"Good afternoon\";\nconsole.log(greeting);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Good morning"
+      }
+    ]
+  },
+  "2-1-29-example-ternary-vs-if#1": {
+    "code": "let loggedIn = \"yes\";\n\n(loggedIn === \"yes\") ? console.log(\"Welcome back!\"): console.log(\"Please log in.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Welcome back!"
+      }
+    ]
+  },
+  "2-1-29-example-ternary-vs-if#2": {
+    "code": "let loggedIn = \"yes\";\n\nif (loggedIn === \"yes\") {\n  console.log(\"Welcome back!\");\n} else {\n  console.log(\"Please log in.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Welcome back!"
+      }
+    ]
+  },
+  "2-1-3-reading-if-else#0": {
+    "code": "let score = 85;\n\nif (score >= 90) {\n  console.log(\"Grade: A\");\n} else if (score >= 80) {\n  console.log(\"Grade: B\");\n} else if (score >= 70) {\n  console.log(\"Grade: C\");\n} else if (score >= 60) {\n  console.log(\"Grade: D\");\n} else {\n  console.log(\"Grade: F\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Grade: B"
+      }
+    ]
+  },
+  "2-1-32-example-or-trap#0": {
+    "code": "let day = \"Tuesday\";\n\nif (day === \"Saturday\" || day === \"Sunday\") {\n  console.log(\"It is the weekend.\");\n} else {\n  console.log(\"It is a weekday.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "It is a weekday."
+      }
+    ]
+  },
+  "2-1-32-example-or-trap#1": {
+    "code": "let day = \"Tuesday\";\n\nif (day === \"Saturday\" || \"Sunday\") {\n  console.log(\"It is the weekend.\");\n} else {\n  console.log(\"It is a weekday.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "It is the weekend."
+      }
+    ]
+  },
+  "2-1-32-example-or-trap#2": {
+    "code": "if (\"Sunday\") {\n  console.log(\"A bare non-empty string is enough to get into an if.\");\n}\n\nlet day = \"Tuesday\";\n\nif (day === \"Monday\" || \"Sunday\") {\n  console.log(\"Got in anyway, and Tuesday is not Monday either.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "A bare non-empty string is enough to get into an if."
+      },
+      {
+        "type": "log",
+        "text": "Got in anyway, and Tuesday is not Monday either."
+      }
+    ]
+  },
+  "2-1-34a-example-always-true-comparison#0": {
+    "code": "let x = 500;\nconsole.log( 0 < x < 10 );\n\nx = -7;\nconsole.log( 0 < x < 10 );",
+    "output": [
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      }
+    ]
+  },
+  "2-1-34a-example-always-true-comparison#1": {
+    "code": "console.log( 0 < 500 );\nconsole.log( Number(true) );\nconsole.log( 1 < 10 );",
+    "output": [
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "1"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      }
+    ]
+  },
+  "2-1-34a-example-always-true-comparison#2": {
+    "code": "let x = 500;\nconsole.log( x > 0 && x < 10 );\n\nx = 5;\nconsole.log( x > 0 && x < 10 );",
+    "output": [
+      {
+        "type": "log",
+        "text": "false"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      }
+    ]
+  },
+  "2-1-4-example-trace-if-else#0": {
+    "code": "let score = 85;\n\nif (score >= 90) {\n  console.log(\"Grade: A\");\n} else if (score >= 80) {\n  console.log(\"Grade: B\");\n} else if (score >= 70) {\n  console.log(\"Grade: C\");\n} else if (score >= 60) {\n  console.log(\"Grade: D\");\n} else {\n  console.log(\"Grade: F\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Grade: B"
+      }
+    ]
+  },
+  "2-1-4-example-trace-if-else#1": {
+    "code": "let score = 55;\n\nif (score >= 90) {\n  console.log(\"Grade: A\");\n} else if (score >= 80) {\n  console.log(\"Grade: B\");\n} else if (score >= 70) {\n  console.log(\"Grade: C\");\n} else if (score >= 60) {\n  console.log(\"Grade: D\");\n} else {\n  console.log(\"Grade: F\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Grade: F"
+      }
+    ]
+  },
+  "2-1-4-example-trace-if-else#2": {
+    "code": "let score = 30;\n\nif (score >= 90) {\n  console.log(\"Grade: A\");\n} else if (score >= 80) {\n  console.log(\"Grade: B\");\n} else if (score >= 70) {\n  console.log(\"Grade: C\");\n} else if (score >= 60) {\n  console.log(\"Grade: D\");\n} else {\n  console.log(\"Grade: F\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Grade: F"
+      }
+    ]
+  },
+  "2-1-7-reading-comparison-operators#0": {
+    "code": "console.log(5 === 5);       // same value, same type → true\nconsole.log(5 === \"5\");     // number vs string → false  (=== is strict)\nconsole.log(5 == \"5\");      // == converts types → true  (risky!)\nconsole.log(10 > 3);\nconsole.log(10 < 3);\nconsole.log(7 <= 7);\nconsole.log(4 >= 5);\nconsole.log(5 !== 6);",
+    "output": [
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "false"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "false"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "false"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      }
+    ]
+  },
+  "2-1-7-reading-comparison-operators#1": {
+    "code": "console.log(\"Yes\" === \"yes\");\nconsole.log(\"Yes\".toLowerCase() === \"yes\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "false"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      }
+    ]
+  },
+  "2-1-8-example-comparisons#0": {
+    "code": "console.log(5 > 3);\nconsole.log(5 < 3);\nconsole.log(10 >= 10);\nconsole.log(7 !== 8);",
+    "output": [
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "false"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "true"
+      }
+    ]
+  },
+  "2-1-8-example-comparisons#1": {
+    "code": "console.log(5 === 5);\nconsole.log(5 === \"5\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "false"
+      }
+    ]
+  },
+  "2-1-8-example-comparisons#2": {
+    "code": "console.log(5 == \"5\");\nconsole.log(5 === \"5\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "true"
+      },
+      {
+        "type": "log",
+        "text": "false"
+      }
+    ]
+  },
+  "2-1-9a-example-count-the-equals#0": {
+    "code": "let score = 50;\n\nif (score = 100) {\n  console.log(\"Perfect score!\");\n}\n\nconsole.log(score);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Perfect score!"
+      },
+      {
+        "type": "log",
+        "text": "100"
+      }
+    ]
+  },
+  "2-1-9a-example-count-the-equals#1": {
+    "code": "let score = 0;\n\nif (score = 100) {\n  console.log(\"Perfect score!\");\n}\n\nconsole.log(score);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Perfect score!"
+      },
+      {
+        "type": "log",
+        "text": "100"
+      }
+    ]
+  },
+  "2-1-9a-example-count-the-equals#2": {
+    "code": "let score = 50;\n\nif (score === 100) {\n  console.log(\"Perfect score!\");\n}\n\nconsole.log(score);",
+    "output": [
+      {
+        "type": "log",
+        "text": "50"
+      }
+    ]
+  },
+  "2-2-14-reading-programs-implement-algorithms#0": {
+    "code": "let temperature = 55;\n\nif (temperature < 60) {\n  console.log(\"Wear a jacket.\");\n} else {\n  console.log(\"Wear a t-shirt.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Wear a jacket."
+      }
+    ]
+  },
+  "2-2-14-reading-programs-implement-algorithms#1": {
+    "code": "let score = 75;\n\nif (score >= 70) {\n  console.log(\"Passing\");\n} else {\n  console.log(\"Failing\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Passing"
+      }
+    ]
+  },
+  "2-2-15-example-three-spellings#0": {
+    "code": "for (let i = 1; i <= 5; i++) {\n  console.log(i);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "1"
+      },
+      {
+        "type": "log",
+        "text": "2"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "4"
+      },
+      {
+        "type": "log",
+        "text": "5"
+      }
+    ]
+  },
+  "2-2-15-example-three-spellings#1": {
+    "code": "let i = 1;\nwhile (i <= 5) {\n  console.log(i);\n  i++;\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "1"
+      },
+      {
+        "type": "log",
+        "text": "2"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "4"
+      },
+      {
+        "type": "log",
+        "text": "5"
+      }
+    ]
+  },
+  "2-2-15-example-three-spellings#2": {
+    "code": "for (let count = 1; count <= 3; count++) {\n  console.log(\"Hello\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello"
+      },
+      {
+        "type": "log",
+        "text": "Hello"
+      },
+      {
+        "type": "log",
+        "text": "Hello"
+      }
+    ]
+  },
+  "2-2-17-reading-canonical-algorithms#0": {
+    "code": "let target = 7;\nlet found = false;\n\nfor (let i = 1; i <= 10; i++) {\n  if (i === target) {\n    found = true;\n    console.log(\"Found \" + target + \" at position \" + i);\n  }\n}\n\nif (!found) {\n  console.log(target + \" not found.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Found 7 at position 7"
+      }
+    ]
+  },
+  "2-2-17a-example-walk-a-word#0": {
+    "code": "let word = \"banana\";\n\nconsole.log(word[0]);\nconsole.log(word[1]);\nconsole.log(word.length);",
+    "output": [
+      {
+        "type": "log",
+        "text": "b"
+      },
+      {
+        "type": "log",
+        "text": "a"
+      },
+      {
+        "type": "log",
+        "text": "6"
+      }
+    ]
+  },
+  "2-2-17a-example-walk-a-word#1": {
+    "code": "let word = \"banana\";\n\nfor (let i = 0; i < word.length; i++) {\n  console.log(i + \": \" + word[i]);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "0: b"
+      },
+      {
+        "type": "log",
+        "text": "1: a"
+      },
+      {
+        "type": "log",
+        "text": "2: n"
+      },
+      {
+        "type": "log",
+        "text": "3: a"
+      },
+      {
+        "type": "log",
+        "text": "4: n"
+      },
+      {
+        "type": "log",
+        "text": "5: a"
+      }
+    ]
+  },
+  "2-2-17a-example-walk-a-word#2": {
+    "code": "let word = \"banana\";\n\nfor (let i = 0; i <= word.length; i++) {\n  console.log(i + \": \" + word[i]);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "0: b"
+      },
+      {
+        "type": "log",
+        "text": "1: a"
+      },
+      {
+        "type": "log",
+        "text": "2: n"
+      },
+      {
+        "type": "log",
+        "text": "3: a"
+      },
+      {
+        "type": "log",
+        "text": "4: n"
+      },
+      {
+        "type": "log",
+        "text": "5: a"
+      },
+      {
+        "type": "log",
+        "text": "6: undefined"
+      }
+    ]
+  },
+  "2-2-17a-example-walk-a-word#3": {
+    "code": "let word = \"banana\";\nlet count = 0;\n\nfor (let i = 0; i < word.length; i++) {\n  if (word[i] === \"a\") {\n    count = count + 1;\n  }\n}\n\nconsole.log(count);",
+    "output": [
+      {
+        "type": "log",
+        "text": "3"
+      }
+    ]
+  },
+  "2-2-2-reading-what-is-algorithm#0": {
+    "code": "let a = 14;\nlet b = 27;\nlet c = 9;\n\nlet largest = a;\n\nif (b > largest) {\n  largest = b;\n}\n\nif (c > largest) {\n  largest = c;\n}\n\nconsole.log(\"The largest number is: \" + largest);",
+    "output": [
+      {
+        "type": "log",
+        "text": "The largest number is: 27"
+      }
+    ]
+  },
+  "2-2-3-example-pseudocode-to-code#0": {
+    "code": "// Algorithm: find the largest of three numbers a, b, c\n// 1. Start by assuming a is the largest.\n// 2. If b is larger than our current largest, update largest to b.\n// 3. If c is larger than our current largest, update largest to c.\n// 4. Print the largest.\n\nlet a = 14;\nlet b = 27;\nlet c = 9;",
+    "output": []
+  },
+  "2-2-3-example-pseudocode-to-code#1": {
+    "code": "let a = 14;\nlet b = 27;\nlet c = 9;\n\n// 1. Start by assuming a is the largest.\nlet largest = a;\n\n// 2. If b is larger than our current largest, update it.\nif (b > largest) {\n  largest = b;\n}\n\n// 3. If c is larger than our current largest, update it.\nif (c > largest) {\n  largest = c;\n}\n\n// 4. Print the largest.\nconsole.log(\"Largest:\", largest);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Largest: 27"
+      }
+    ]
+  },
+  "2-2-3-example-pseudocode-to-code#2": {
+    "code": "let a = 99;\nlet b = 1;\nlet c = 2;\n\nlet largest = a;\n\nif (b > largest) {\n  largest = b;\n}\n\nif (c > largest) {\n  largest = c;\n}\n\nconsole.log(\"Largest:\", largest);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Largest: 99"
+      }
+    ]
+  },
+  "2-2-5-reading-for-loop#0": {
+    "code": "// Print 1 through 5\nfor (let i = 1; i <= 5; i++) {\n  console.log(i);\n}\n\n// Sum 1 through 5\nlet total = 0;\nfor (let i = 1; i <= 5; i++) {\n  total = total + i;\n}\nconsole.log(\"Sum of 1 to 5: \" + total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "1"
+      },
+      {
+        "type": "log",
+        "text": "2"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "4"
+      },
+      {
+        "type": "log",
+        "text": "5"
+      },
+      {
+        "type": "log",
+        "text": "Sum of 1 to 5: 15"
+      }
+    ]
+  },
+  "2-2-6-example-trace-for#0": {
+    "code": "for (let i = 1; i <= 5; i++) {\n  console.log(i);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "1"
+      },
+      {
+        "type": "log",
+        "text": "2"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "4"
+      },
+      {
+        "type": "log",
+        "text": "5"
+      }
+    ]
+  },
+  "2-2-6-example-trace-for#1": {
+    "code": "let total = 0;\n\nfor (let i = 1; i <= 5; i++) {\n  total = total + i;\n}\n\nconsole.log(\"Sum 1 to 5:\", total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Sum 1 to 5: 15"
+      }
+    ]
+  },
+  "2-2-6-example-trace-for#2": {
+    "code": "let total = 0;\n\nfor (let i = 1; i <= 3; i++) {\n  total = total + i;\n  console.log(\"after pass i=\" + i + \", total=\" + total);\n}\n\nconsole.log(\"Done. Total:\", total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "after pass i=1, total=1"
+      },
+      {
+        "type": "log",
+        "text": "after pass i=2, total=3"
+      },
+      {
+        "type": "log",
+        "text": "after pass i=3, total=6"
+      },
+      {
+        "type": "log",
+        "text": "Done. Total: 6"
+      }
+    ]
+  },
+  "2-2-6-example-trace-for#3": {
+    "code": "for (let i = 2; i <= 10; i += 2) {\n  console.log(i);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "2"
+      },
+      {
+        "type": "log",
+        "text": "4"
+      },
+      {
+        "type": "log",
+        "text": "6"
+      },
+      {
+        "type": "log",
+        "text": "8"
+      },
+      {
+        "type": "log",
+        "text": "10"
+      }
+    ]
+  },
+  "2-2-6-example-trace-for#4": {
+    "code": "for (let i = 5; i >= 1; i--) {\n  console.log(i);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "5"
+      },
+      {
+        "type": "log",
+        "text": "4"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "2"
+      },
+      {
+        "type": "log",
+        "text": "1"
+      }
+    ]
+  },
+  "2-2-8-reading-while-loop#0": {
+    "code": "let count = 3;\nwhile (count > 0) {\n  console.log(\"Countdown: \" + count);\n  count--;\n}\nconsole.log(\"Liftoff!\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Countdown: 3"
+      },
+      {
+        "type": "log",
+        "text": "Countdown: 2"
+      },
+      {
+        "type": "log",
+        "text": "Countdown: 1"
+      },
+      {
+        "type": "log",
+        "text": "Liftoff!"
+      }
+    ]
+  },
+  "2-2-9-example-while-vs-for#0": {
+    "code": "let count = 3;\n\nwhile (count > 0) {\n  console.log(\"T-minus \" + count);\n  count = count - 1;\n}\n\nconsole.log(\"Liftoff!\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "T-minus 3"
+      },
+      {
+        "type": "log",
+        "text": "T-minus 2"
+      },
+      {
+        "type": "log",
+        "text": "T-minus 1"
+      },
+      {
+        "type": "log",
+        "text": "Liftoff!"
+      }
+    ]
+  },
+  "2-2-9-example-while-vs-for#1": {
+    "code": "let count = 3;\n\n// Safe: count decreases each pass, so the loop WILL end.\nwhile (count > 0) {\n  console.log(\"count = \" + count);\n  count = count - 1;   // <-- this line is what makes it safe\n}\n\nconsole.log(\"Finished safely.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "count = 3"
+      },
+      {
+        "type": "log",
+        "text": "count = 2"
+      },
+      {
+        "type": "log",
+        "text": "count = 1"
+      },
+      {
+        "type": "log",
+        "text": "Finished safely."
+      }
+    ]
+  },
+  "2-3-10-reading-fall-through#0": {
+    "code": "let selection = \"A\";\n\nswitch (selection) {\n  case \"A\":\n    console.log(\"Dispensing: chips\");\n  case \"B\":\n    console.log(\"Dispensing: pretzels\");\n  case \"C\":\n    console.log(\"Dispensing: cookies\");\n  default:\n    console.log(\"Unknown selection. Refunding your money.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Dispensing: chips"
+      },
+      {
+        "type": "log",
+        "text": "Dispensing: pretzels"
+      },
+      {
+        "type": "log",
+        "text": "Dispensing: cookies"
+      },
+      {
+        "type": "log",
+        "text": "Unknown selection. Refunding your money."
+      }
+    ]
+  },
+  "2-3-10-reading-fall-through#1": {
+    "code": "let level = 3;\n\nswitch (level) {\n  case 1:\n    console.log(\"Beginner\");\n    break;\n  case 2:\n    console.log(\"Intermediate\");\n    break;\n  case 3:\n    console.log(\"Advanced\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Advanced"
+      }
+    ]
+  },
+  "2-3-11-example-missing-break#0": {
+    "code": "let level = 2;\n\nswitch (level) {\n  case 1:\n    console.log(\"Beginner\");\n    break;\n  case 2:\n    console.log(\"Intermediate\");\n  case 3:\n    console.log(\"Advanced\");\n    break;\n  default:\n    console.log(\"Unknown level\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Intermediate"
+      },
+      {
+        "type": "log",
+        "text": "Advanced"
+      }
+    ]
+  },
+  "2-3-11-example-missing-break#1": {
+    "code": "let level = 2;\n\nswitch (level) {\n  case 1:\n    console.log(\"Beginner\");\n    break;\n  case 2:\n    console.log(\"Intermediate\");\n    break;\n  case 3:\n    console.log(\"Advanced\");\n    break;\n  default:\n    console.log(\"Unknown level\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Intermediate"
+      }
+    ]
+  },
+  "2-3-14-reading-grouping-cases#0": {
+    "code": "let day = \"Saturday\";\n\nswitch (day) {\n  case \"Saturday\":\n  case \"Sunday\":\n    console.log(\"It is the weekend.\");\n    break;\n  default:\n    console.log(\"It is a weekday.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "It is the weekend."
+      }
+    ]
+  },
+  "2-3-14-reading-grouping-cases#1": {
+    "code": "let day = \"Saturday\";\n\nswitch (day) {\n  case \"Saturday\":\n  case \"Sunday\":\n    console.log(\"It is the weekend.\");\n    break;\n  default:\n    console.log(\"It is a weekday.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "It is the weekend."
+      }
+    ]
+  },
+  "2-3-15-example-weekend-weekday#0": {
+    "code": "let day = \"Tuesday\";\n\nswitch (day) {\n  case \"Saturday\":\n  case \"Sunday\":\n    console.log(\"It is the weekend.\");\n    break;\n  default:\n    console.log(\"It is a weekday.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "It is a weekday."
+      }
+    ]
+  },
+  "2-3-15-example-weekend-weekday#1": {
+    "code": "let day = \"Tuesday\";\n\nif (day === \"Saturday\" || day === \"Sunday\") {\n  console.log(\"It is the weekend.\");\n} else {\n  console.log(\"It is a weekday.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "It is a weekday."
+      }
+    ]
+  },
+  "2-3-16-example-days-in-month#0": {
+    "code": "let month = \"February\";\nlet days;\n\nswitch (month) {\n  case \"January\":\n  case \"March\":\n  case \"May\":\n  case \"July\":\n  case \"August\":\n  case \"October\":\n  case \"December\":\n    days = 31;\n    break;\n  case \"April\":\n  case \"June\":\n  case \"September\":\n  case \"November\":\n    days = 30;\n    break;\n  case \"February\":\n    days = 28;\n    break;\n  default:\n    days = 0;\n    console.log(\"Not a month.\");\n}\n\nconsole.log(month + \" has \" + days + \" days.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "February has 28 days."
+      }
+    ]
+  },
+  "2-3-16-example-days-in-month#1": {
+    "code": "let month = \"April\";\nlet days;\n\nswitch (month) {\n  case \"January\":\n  case \"March\":\n  case \"May\":\n  case \"July\":\n  case \"August\":\n  case \"October\":\n  case \"December\":\n    days = 31;\n    break;\n  case \"April\":\n  case \"June\":\n  case \"September\":\n  case \"November\":\n    days = 30;\n    break;\n  case \"February\":\n    days = 28;\n    break;\n  default:\n    days = 0;\n    console.log(\"Not a month.\");\n}\n\nconsole.log(month + \" has \" + days + \" days.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "April has 30 days."
+      }
+    ]
+  },
+  "2-3-18-reading-strict-equality#0": {
+    "code": "let answer = \"3\";\n\nswitch (answer) {\n  case 1:\n    console.log(\"You chose one.\");\n    break;\n  case 2:\n    console.log(\"You chose two.\");\n    break;\n  case 3:\n    console.log(\"You chose three.\");\n    break;\n  default:\n    console.log(\"Not a valid choice.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Not a valid choice."
+      }
+    ]
+  },
+  "2-3-18-reading-strict-equality#1": {
+    "code": "let answer = 3;\n\nswitch (answer) {\n  case 1:\n    console.log(\"You chose one.\");\n    break;\n  case 2:\n    console.log(\"You chose two.\");\n    break;\n  case 3:\n    console.log(\"You chose three.\");\n    break;\n  default:\n    console.log(\"Not a valid choice.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "You chose three."
+      }
+    ]
+  },
+  "2-3-18-reading-strict-equality#2": {
+    "code": "let n = 0;\n\nswitch (n) {\n  case false:\n    console.log(\"matched false\");\n    break;\n  case 0:\n    console.log(\"matched zero\");\n    break;\n  default:\n    console.log(\"matched nothing\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "matched zero"
+      }
+    ]
+  },
+  "2-3-2-reading-switch#0": {
+    "code": "let grade = \"B\";\n\nswitch (grade) {\n  case \"A\":\n    console.log(\"Excellent\");\n    break;\n  case \"B\":\n    console.log(\"Good\");\n    break;\n  default:\n    console.log(\"See me after class\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Good"
+      }
+    ]
+  },
+  "2-3-2-reading-switch#1": {
+    "code": "let n = 99;\n\nswitch (n) {\n  case 1:\n    console.log(\"one\");\n    break;\n  default:\n    console.log(\"something else\");\n    break;\n  case 2:\n    console.log(\"two\");\n    break;\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "something else"
+      }
+    ]
+  },
+  "2-3-20-example-fix-case-type#0": {
+    "code": "let answer = \"3\";\n\nswitch (answer) {\n  case 1:\n    console.log(\"You chose one.\");\n    break;\n  case 2:\n    console.log(\"You chose two.\");\n    break;\n  case 3:\n    console.log(\"You chose three.\");\n    break;\n  default:\n    console.log(\"Not a valid choice.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Not a valid choice."
+      }
+    ]
+  },
+  "2-3-20-example-fix-case-type#1": {
+    "code": "let answer = \"3\";\n\nswitch (answer) {\n  case \"1\":\n    console.log(\"You chose one.\");\n    break;\n  case \"2\":\n    console.log(\"You chose two.\");\n    break;\n  case \"3\":\n    console.log(\"You chose three.\");\n    break;\n  default:\n    console.log(\"Not a valid choice.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "You chose three."
+      }
+    ]
+  },
+  "2-3-21-example-fix-number-convert#0": {
+    "code": "let answer = \"3\";\n\nswitch (Number(answer)) {\n  case 1:\n    console.log(\"Converted: one.\");\n    break;\n  case 2:\n    console.log(\"Converted: two.\");\n    break;\n  case 3:\n    console.log(\"Converted: three.\");\n    break;\n  default:\n    console.log(\"Converted: not a valid choice.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Converted: three."
+      }
+    ]
+  },
+  "2-3-21-example-fix-number-convert#1": {
+    "code": "let answer = \"nine\";\n\nswitch (Number(answer)) {\n  case 1:\n    console.log(\"Converted: one.\");\n    break;\n  case 2:\n    console.log(\"Converted: two.\");\n    break;\n  case 3:\n    console.log(\"Converted: three.\");\n    break;\n  default:\n    console.log(\"Converted: not a valid choice.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Converted: not a valid choice."
+      }
+    ]
+  },
+  "2-3-23-reading-choosing#0": {
+    "code": "let command = \"north\";\n\nswitch (command) {\n  case \"north\":\n    console.log(\"You walk north.\");\n    break;\n  case \"south\":\n    console.log(\"You walk south.\");\n    break;\n  default:\n    console.log(\"You cannot go that way.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "You walk north."
+      }
+    ]
+  },
+  "2-3-23-reading-choosing#1": {
+    "code": "let score = 87;\n\nif (score >= 90) {\n  console.log(\"A\");\n} else if (score >= 80) {\n  console.log(\"B\");\n} else if (score >= 70) {\n  console.log(\"C\");\n} else {\n  console.log(\"F\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "B"
+      }
+    ]
+  },
+  "2-3-24-example-command-dispatch#0": {
+    "code": "let command = \"north\";\n\nswitch (command) {\n  case \"north\":\n    console.log(\"You walk north.\");\n    break;\n  case \"south\":\n    console.log(\"You walk south.\");\n    break;\n  default:\n    console.log(\"You cannot go that way.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "You walk north."
+      }
+    ]
+  },
+  "2-3-24-example-command-dispatch#1": {
+    "code": "let command = \"east\";\n\nswitch (command) {\n  case \"north\":\n    console.log(\"You walk north.\");\n    break;\n  case \"south\":\n    console.log(\"You walk south.\");\n    break;\n  case \"east\":\n    console.log(\"You walk east.\");\n    break;\n  case \"west\":\n    console.log(\"You walk west.\");\n    break;\n  default:\n    console.log(\"You cannot go that way.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "You walk east."
+      }
+    ]
+  },
+  "2-3-25-example-grade-chain#0": {
+    "code": "let score = 89;\n\nif (score >= 90) {\n  console.log(\"A\");\n} else if (score >= 80) {\n  console.log(\"B\");\n} else if (score >= 70) {\n  console.log(\"C\");\n} else {\n  console.log(\"F\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "B"
+      }
+    ]
+  },
+  "2-3-3-example-switch-vs-if#0": {
+    "code": "let day = \"Wed\";\n\nif (day === \"Mon\") {\n  console.log(\"Start of the week.\");\n} else if (day === \"Wed\") {\n  console.log(\"Middle of the week.\");\n} else if (day === \"Fri\") {\n  console.log(\"Almost the weekend!\");\n} else {\n  console.log(\"Some other day.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Middle of the week."
+      }
+    ]
+  },
+  "2-3-3-example-switch-vs-if#1": {
+    "code": "let day = \"Wed\";\n\nswitch (day) {\n  case \"Mon\":\n    console.log(\"Start of the week.\");\n    break;\n  case \"Wed\":\n    console.log(\"Middle of the week.\");\n    break;\n  case \"Fri\":\n    console.log(\"Almost the weekend!\");\n    break;\n  default:\n    console.log(\"Some other day.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Middle of the week."
+      }
+    ]
+  },
+  "2-3-3-example-switch-vs-if#2": {
+    "code": "let day = \"Wed\";\n\nswitch (day) {\n  case \"Mon\":\n    console.log(\"Start of the week.\");\n    break;\n  case \"Wed\":\n    console.log(\"Middle of the week.\");\n    // no break here: fall-through on purpose to see what happens\n  case \"Fri\":\n    console.log(\"Almost the weekend!\");\n    break;\n  default:\n    console.log(\"Some other day.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Middle of the week."
+      },
+      {
+        "type": "log",
+        "text": "Almost the weekend!"
+      }
+    ]
+  },
+  "2-3-5-reading-one-value-many-answers#0": {
+    "code": "let day = 3;\n\nif (day === 1) {\n  console.log(\"Monday\");\n} else if (day === 2) {\n  console.log(\"Tuesday\");\n} else if (day === 3) {\n  console.log(\"Wednesday\");\n} else if (day === 4) {\n  console.log(\"Thursday\");\n} else if (day === 5) {\n  console.log(\"Friday\");\n} else {\n  console.log(\"Weekend\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Wednesday"
+      }
+    ]
+  },
+  "2-3-6-example-menu-of-options#0": {
+    "code": "let selection = \"B\";\n\nswitch (selection) {\n  case \"A\":\n    console.log(\"Dispensing: chips\");\n    break;\n  case \"B\":\n    console.log(\"Dispensing: pretzels\");\n    break;\n  case \"C\":\n    console.log(\"Dispensing: cookies\");\n    break;\n  default:\n    console.log(\"Unknown selection. Refunding your money.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Dispensing: pretzels"
+      }
+    ]
+  },
+  "2-3-6-example-menu-of-options#1": {
+    "code": "let selection = \"Z\";\n\nswitch (selection) {\n  case \"A\":\n    console.log(\"Dispensing: chips\");\n    break;\n  case \"B\":\n    console.log(\"Dispensing: pretzels\");\n    break;\n  case \"C\":\n    console.log(\"Dispensing: cookies\");\n    break;\n  default:\n    console.log(\"Unknown selection. Refunding your money.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Unknown selection. Refunding your money."
+      }
+    ]
+  },
+  "2-3-7-example-switch-on-expression#0": {
+    "code": "let a = 2 + 2;\n\nswitch (a) {\n  case 3:\n    console.log(\"Too small\");\n    break;\n  case 4:\n    console.log(\"Exactly!\");\n    break;\n  case 5:\n    console.log(\"Too big\");\n    break;\n  default:\n    console.log(\"I do not know such values\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Exactly!"
+      }
+    ]
+  },
+  "2-3-7-example-switch-on-expression#1": {
+    "code": "let a = 4;\n\nswitch (a) {\n  case 3 + 1:\n    console.log(\"Matched 3 + 1, same as case 4\");\n    break;\n  default:\n    console.log(\"No match\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Matched 3 + 1, same as case 4"
+      }
+    ]
+  },
+  "2-4-10-example-search-until-found#0": {
+    "code": "let current = 20;\n\nwhile (true) {\n  if (current % 7 === 0) {\n    console.log(\"Found: \" + current);\n    break;\n  }\n  current++;\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Found: 21"
+      }
+    ]
+  },
+  "2-4-13-reading-continue#0": {
+    "code": "for (let i = 1; i <= 6; i++) {\n  if (i % 2 === 0) {\n    continue;\n  }\n  console.log(i);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "1"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "5"
+      }
+    ]
+  },
+  "2-4-14-example-filtering-while-loop#0": {
+    "code": "let total = 0;\n\nfor (let n = -5; n <= 5; n++) {\n  if (n <= 0) {\n    continue;\n  }\n  total = total + n;\n}\n\nconsole.log(\"Total of positive values: \" + total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Total of positive values: 15"
+      }
+    ]
+  },
+  "2-4-14-example-filtering-while-loop#1": {
+    "code": "let total = 0;\n\nfor (let n = -5; n <= 5; n++) {\n  if (n > 0) {\n    total = total + n;\n  }\n}\n\nconsole.log(\"Total of positive values: \" + total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Total of positive values: 15"
+      }
+    ]
+  },
+  "2-4-16-reading-continue-while-trap#0": {
+    "code": "for (let i = 1; i <= 6; i++) {\n  if (i % 2 === 0) {\n    continue;\n  }\n  console.log(i);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "1"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "5"
+      }
+    ]
+  },
+  "2-4-16-reading-continue-while-trap#1": {
+    "code": "let i = 0;\n\nwhile (i < 5) {\n  i++;\n  if (i % 2 === 0) {\n    continue;\n  }\n  console.log(i);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "1"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "5"
+      }
+    ]
+  },
+  "2-4-17-example-continue-trap-fix#0": {
+    "code": "let i = 0;\n\nwhile (i < 5) {\n  i++;\n  if (i % 2 === 0) {\n    continue;\n  }\n  console.log(i);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "1"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "5"
+      }
+    ]
+  },
+  "2-4-18-example-predict-break-vs-continue#0": {
+    "code": "for (let i = 1; i <= 5; i++) {\n  if (i === 3) {\n    continue;\n  }\n  console.log(i);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "1"
+      },
+      {
+        "type": "log",
+        "text": "2"
+      },
+      {
+        "type": "log",
+        "text": "4"
+      },
+      {
+        "type": "log",
+        "text": "5"
+      }
+    ]
+  },
+  "2-4-18-example-predict-break-vs-continue#1": {
+    "code": "let shelf = 1;\nlet emptyShelf = null;\n\nwhile (shelf <= 20) {\n  if (shelf % 7 === 0) {\n    emptyShelf = shelf;\n    break;\n  }\n  shelf++;\n}\n\nconsole.log(\"First empty shelf is #\" + emptyShelf);",
+    "output": [
+      {
+        "type": "log",
+        "text": "First empty shelf is #7"
+      }
+    ]
+  },
+  "2-4-2-reading-for-vs-while#0": {
+    "code": "for (let i = 1; i <= 3; i++) {\n  console.log(\"for: \" + i);\n}\n\nlet j = 1;\nwhile (j <= 3) {\n  console.log(\"while: \" + j);\n  j++;\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "for: 1"
+      },
+      {
+        "type": "log",
+        "text": "for: 2"
+      },
+      {
+        "type": "log",
+        "text": "for: 3"
+      },
+      {
+        "type": "log",
+        "text": "while: 1"
+      },
+      {
+        "type": "log",
+        "text": "while: 2"
+      },
+      {
+        "type": "log",
+        "text": "while: 3"
+      }
+    ]
+  },
+  "2-4-2-reading-for-vs-while#1": {
+    "code": "let balance = 100;\nlet years = 0;\n\nwhile (balance < 200) {\n  balance = balance * 1.1;\n  years++;\n}\n\nconsole.log(\"Doubled after \" + years + \" years.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Doubled after 8 years."
+      }
+    ]
+  },
+  "2-4-21-example-infinite-loop-safe#0": {
+    "code": "let value = 1;\nlet guard = 0;\n\nwhile (value < 100) {\n  value = value * 2;\n  guard++;\n  if (guard > 1000) {\n    console.log(\"Guard tripped: this loop was not terminating.\");\n    break;\n  }\n}\n\nconsole.log(\"Finished with value \" + value + \" after \" + guard + \" rounds.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Finished with value 128 after 7 rounds."
+      }
+    ]
+  },
+  "2-4-21-example-infinite-loop-safe#1": {
+    "code": "let value = 1;\nlet guard = 0;\n\nwhile (value < 100) {\n  value = value * 1;   // bug: this never changes value\n  guard++;\n  if (guard > 1000) {\n    console.log(\"Guard tripped: this loop was not terminating.\");\n    break;\n  }\n}\n\nconsole.log(\"Finished with value \" + value + \" after \" + guard + \" rounds.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Guard tripped: this loop was not terminating."
+      },
+      {
+        "type": "log",
+        "text": "Finished with value 1 after 1001 rounds."
+      }
+    ]
+  },
+  "2-4-24-reading-nested-loops#0": {
+    "code": "for (let row = 1; row <= 3; row++) {\n  for (let col = 1; col <= 4; col++) {\n    console.log(\"row \" + row + \", col \" + col);\n  }\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "row 1, col 1"
+      },
+      {
+        "type": "log",
+        "text": "row 1, col 2"
+      },
+      {
+        "type": "log",
+        "text": "row 1, col 3"
+      },
+      {
+        "type": "log",
+        "text": "row 1, col 4"
+      },
+      {
+        "type": "log",
+        "text": "row 2, col 1"
+      },
+      {
+        "type": "log",
+        "text": "row 2, col 2"
+      },
+      {
+        "type": "log",
+        "text": "row 2, col 3"
+      },
+      {
+        "type": "log",
+        "text": "row 2, col 4"
+      },
+      {
+        "type": "log",
+        "text": "row 3, col 1"
+      },
+      {
+        "type": "log",
+        "text": "row 3, col 2"
+      },
+      {
+        "type": "log",
+        "text": "row 3, col 3"
+      },
+      {
+        "type": "log",
+        "text": "row 3, col 4"
+      }
+    ]
+  },
+  "2-4-25-example-multiplication-table#0": {
+    "code": "for (let a = 1; a <= 4; a++) {\n  let line = \"\";\n  for (let b = 1; b <= 4; b++) {\n    line = line + (a * b) + \"\\t\";\n  }\n  console.log(line);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "1\t2\t3\t4\t"
+      },
+      {
+        "type": "log",
+        "text": "2\t4\t6\t8\t"
+      },
+      {
+        "type": "log",
+        "text": "3\t6\t9\t12\t"
+      },
+      {
+        "type": "log",
+        "text": "4\t8\t12\t16\t"
+      }
+    ]
+  },
+  "2-4-25-example-multiplication-table#1": {
+    "code": "let line = \"\";   // moved outside: now it never resets\n\nfor (let a = 1; a <= 4; a++) {\n  for (let b = 1; b <= 4; b++) {\n    line = line + (a * b) + \"\\t\";\n  }\n  console.log(line);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "1\t2\t3\t4\t"
+      },
+      {
+        "type": "log",
+        "text": "1\t2\t3\t4\t2\t4\t6\t8\t"
+      },
+      {
+        "type": "log",
+        "text": "1\t2\t3\t4\t2\t4\t6\t8\t3\t6\t9\t12\t"
+      },
+      {
+        "type": "log",
+        "text": "1\t2\t3\t4\t2\t4\t6\t8\t3\t6\t9\t12\t4\t8\t12\t16\t"
+      }
+    ]
+  },
+  "2-4-27-example-break-inner-loop#0": {
+    "code": "for (let i = 1; i <= 3; i++) {\n  for (let j = 1; j <= 3; j++) {\n    if (j === 2) {\n      break;\n    }\n    console.log(\"i=\" + i + \" j=\" + j);\n  }\n}\n\nconsole.log(\"Done.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "i=1 j=1"
+      },
+      {
+        "type": "log",
+        "text": "i=2 j=1"
+      },
+      {
+        "type": "log",
+        "text": "i=3 j=1"
+      },
+      {
+        "type": "log",
+        "text": "Done."
+      }
+    ]
+  },
+  "2-4-28-example-break-both-loops#0": {
+    "code": "let stop = false;\n\nfor (let i = 1; i <= 3 && !stop; i++) {\n  for (let j = 1; j <= 3; j++) {\n    if (i === 2 && j === 2) {\n      stop = true;\n      break;\n    }\n    console.log(\"i=\" + i + \" j=\" + j);\n  }\n}\n\nconsole.log(\"Done.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "i=1 j=1"
+      },
+      {
+        "type": "log",
+        "text": "i=1 j=2"
+      },
+      {
+        "type": "log",
+        "text": "i=1 j=3"
+      },
+      {
+        "type": "log",
+        "text": "i=2 j=1"
+      },
+      {
+        "type": "log",
+        "text": "Done."
+      }
+    ]
+  },
+  "2-4-29-reading-nested-loop-cost#0": {
+    "code": "let count = 0;\n\nfor (let i = 0; i < 100; i++) {\n  for (let j = 0; j < 100; j++) {\n    count++;\n  }\n}\n\nconsole.log(\"Inner body ran \" + count + \" times.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Inner body ran 10000 times."
+      }
+    ]
+  },
+  "2-4-3-example-predict-which-loop#0": {
+    "code": "let count = 12;\n\nfor (let i = 1; i <= count; i++) {\n  console.log(\"Name #\" + i);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Name #1"
+      },
+      {
+        "type": "log",
+        "text": "Name #2"
+      },
+      {
+        "type": "log",
+        "text": "Name #3"
+      },
+      {
+        "type": "log",
+        "text": "Name #4"
+      },
+      {
+        "type": "log",
+        "text": "Name #5"
+      },
+      {
+        "type": "log",
+        "text": "Name #6"
+      },
+      {
+        "type": "log",
+        "text": "Name #7"
+      },
+      {
+        "type": "log",
+        "text": "Name #8"
+      },
+      {
+        "type": "log",
+        "text": "Name #9"
+      },
+      {
+        "type": "log",
+        "text": "Name #10"
+      },
+      {
+        "type": "log",
+        "text": "Name #11"
+      },
+      {
+        "type": "log",
+        "text": "Name #12"
+      }
+    ]
+  },
+  "2-4-3-example-predict-which-loop#1": {
+    "code": "let topCard = Math.floor(Math.random() * 13); // 0 = ace\nlet shuffles = 0;\n\nwhile (topCard !== 0) {\n  topCard = Math.floor(Math.random() * 13);\n  shuffles++;\n}\n\nconsole.log(\"Took \" + shuffles + \" shuffle(s) to get an ace.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Took 31 shuffle(s) to get an ace."
+      }
+    ],
+    "nondeterministic": true
+  },
+  "2-4-5-reading-do-while#0": {
+    "code": "let count = 10;\n\nwhile (count < 5) {\n  console.log(\"This never prints.\");\n  count++;\n}\n\nconsole.log(\"Done. count is still \" + count);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Done. count is still 10"
+      }
+    ]
+  },
+  "2-4-5-reading-do-while#1": {
+    "code": "let attempts = 0;\n\ndo {\n  attempts++;\n  console.log(\"Attempt \" + attempts);\n} while (attempts < 3);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Attempt 1"
+      },
+      {
+        "type": "log",
+        "text": "Attempt 2"
+      },
+      {
+        "type": "log",
+        "text": "Attempt 3"
+      }
+    ]
+  },
+  "2-4-6-example-while-vs-do-while#0": {
+    "code": "let n = 100;\n\nwhile (n < 10) {\n  console.log(\"while body ran\");\n}\n\ndo {\n  console.log(\"do...while body ran\");\n} while (n < 10);",
+    "output": [
+      {
+        "type": "log",
+        "text": "do...while body ran"
+      }
+    ]
+  },
+  "2-4-6-example-while-vs-do-while#1": {
+    "code": "let x = 0;\n\ndo {\n  console.log(\"ran\");\n  x++;\n} while (x < 0);",
+    "output": [
+      {
+        "type": "log",
+        "text": "ran"
+      }
+    ]
+  },
+  "2-4-9-reading-break#0": {
+    "code": "for (let i = 1; i <= 10; i++) {\n  if (i === 4) {\n    console.log(\"Stopping at \" + i);\n    break;\n  }\n  console.log(i);\n}\n\nconsole.log(\"After the loop.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "1"
+      },
+      {
+        "type": "log",
+        "text": "2"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "Stopping at 4"
+      },
+      {
+        "type": "log",
+        "text": "After the loop."
+      }
+    ]
+  },
+  "2-5-10-reading-empty-catch-trap#0": {
+    "code": "// Says nothing:\ntry {\n  console.log(\"Total price: $\" + itemPrice);\n} catch (err) {\n  // does nothing\n}\nconsole.log(\"Order placed.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Order placed."
+      }
+    ]
+  },
+  "2-5-10-reading-empty-catch-trap#1": {
+    "code": "// Reports what happened:\ntry {\n  console.log(\"Total price: $\" + itemPrice);\n} catch (err) {\n  console.log(\"Could not calculate the price: order not placed.\");\n}\nconsole.log(\"Order placed.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Could not calculate the price: order not placed."
+      },
+      {
+        "type": "log",
+        "text": "Order placed."
+      }
+    ]
+  },
+  "2-5-12-reading-error-object#0": {
+    "code": "try {\n  console.log(nothingHere);\n} catch (err) {\n  console.log(\"Kind:    \" + err.name);\n  console.log(\"Details: \" + err.message);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Kind:    ReferenceError"
+      },
+      {
+        "type": "log",
+        "text": "Details: nothingHere is not defined"
+      }
+    ]
+  },
+  "2-5-12-reading-error-object#1": {
+    "code": "try {\n  const nothing = null;\n  console.log(nothing.length);\n} catch (err) {\n  console.log(\"Kind:    \" + err.name);\n  console.log(\"Details: \" + err.message);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Kind:    TypeError"
+      },
+      {
+        "type": "log",
+        "text": "Details: Cannot read properties of null (reading 'length')"
+      }
+    ]
+  },
+  "2-5-13-example-reporting-vs-guessing#0": {
+    "code": "try {\n  console.log(config);\n} catch (err) {\n  console.log(\"Error!\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Error!"
+      }
+    ]
+  },
+  "2-5-13-example-reporting-vs-guessing#1": {
+    "code": "try {\n  console.log(config);\n} catch (err) {\n  console.log(\"Could not read the setting: \" + err.message);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Could not read the setting: config is not defined"
+      }
+    ]
+  },
+  "2-5-15-reading-throwing-errors#0": {
+    "code": "const age = -5;\n\ntry {\n  if (age < 0) {\n    throw new Error(\"Age cannot be negative.\");\n  }\n  console.log(\"Age accepted: \" + age);\n} catch (err) {\n  console.log(\"Rejected: \" + err.message);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Rejected: Age cannot be negative."
+      }
+    ]
+  },
+  "2-5-16-example-validate-then-trust#0": {
+    "code": "const typed = \"abc\";\n\ntry {\n  const quantity = Number(typed);\n\n  if (Number.isNaN(quantity)) {\n    throw new Error(\"That is not a number: \" + typed);\n  }\n\n  console.log(\"Ordering \" + quantity + \" items.\");\n} catch (err) {\n  console.log(\"Could not place the order. \" + err.message);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Could not place the order. That is not a number: abc"
+      }
+    ]
+  },
+  "2-5-16-example-validate-then-trust#1": {
+    "code": "const typed = \"0\";\n\ntry {\n  const quantity = Number(typed);\n\n  if (Number.isNaN(quantity)) {\n    throw new Error(\"That is not a number: \" + typed);\n  }\n  if (quantity <= 0) {\n    throw new Error(\"Quantity must be at least 1.\");\n  }\n\n  console.log(\"Ordering \" + quantity + \" items.\");\n} catch (err) {\n  console.log(\"Could not place the order. \" + err.message);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Could not place the order. Quantity must be at least 1."
+      }
+    ]
+  },
+  "2-5-16-example-validate-then-trust#2": {
+    "code": "const typed = \"3\";\n\ntry {\n  const quantity = Number(typed);\n\n  if (Number.isNaN(quantity)) {\n    throw new Error(\"That is not a number: \" + typed);\n  }\n  if (quantity <= 0) {\n    throw new Error(\"Quantity must be at least 1.\");\n  }\n\n  console.log(\"Ordering \" + quantity + \" items.\");\n} catch (err) {\n  console.log(\"Could not place the order. \" + err.message);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Ordering 3 items."
+      }
+    ]
+  },
+  "2-5-18-reading-throw-vs-if#0": {
+    "code": "// Plain if: the code that notices is also the code that decides\nconst age = -5;\n\nif (age < 0) {\n  console.log(\"Age cannot be negative.\");\n} else {\n  console.log(\"Age accepted: \" + age);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Age cannot be negative."
+      }
+    ]
+  },
+  "2-5-18-reading-throw-vs-if#1": {
+    "code": "// throw, because something further out should decide what the user sees\nconst age = -5;\n\ntry {\n  if (age < 0) {\n    throw new Error(\"Age cannot be negative.\");\n  }\n  console.log(\"Age accepted: \" + age);\n} catch (err) {\n  console.log(\"Rejected: \" + err.message);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Rejected: Age cannot be negative."
+      }
+    ]
+  },
+  "2-5-2-reading-what-errors-do#0": {
+    "code": "console.log(\"Line 1 runs.\");\nconsole.log(total);\nconsole.log(\"Line 3 never runs.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Line 1 runs."
+      }
+    ],
+    "error": "total is not defined"
+  },
+  "2-5-2-reading-what-errors-do#1": {
+    "code": "let price = 10;\nconsole.log(\"Price is \" + price);\nconsole.log(quantity);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Price is 10"
+      }
+    ],
+    "error": "quantity is not defined"
+  },
+  "2-5-21-reading-finally#0": {
+    "code": "try {\n  console.log(\"Opening the connection.\");\n  console.log(missingSetting);\n  console.log(\"This never runs.\");\n} catch (err) {\n  console.log(\"Handling: \" + err.message);\n} finally {\n  console.log(\"Closing the connection.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Opening the connection."
+      },
+      {
+        "type": "log",
+        "text": "Handling: missingSetting is not defined"
+      },
+      {
+        "type": "log",
+        "text": "Closing the connection."
+      }
+    ]
+  },
+  "2-5-21-reading-finally#1": {
+    "code": "try {\n  console.log(\"Opening the connection.\");\n  console.log(\"Work done.\");\n} catch (err) {\n  console.log(\"Handling: \" + err.message);\n} finally {\n  console.log(\"Closing the connection.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Opening the connection."
+      },
+      {
+        "type": "log",
+        "text": "Work done."
+      },
+      {
+        "type": "log",
+        "text": "Closing the connection."
+      }
+    ]
+  },
+  "2-5-23-reading-limits-of-try-catch#0": {
+    "code": "try {\n  console.log(\"Inside try.\");\n} catch (err) {\n  console.log(\"Not reached.\");\n}\n\nconsole.log(outsideTheTry);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Inside try."
+      }
+    ],
+    "error": "outsideTheTry is not defined"
+  },
+  "2-5-4-reading-try-catch#0": {
+    "code": "try {\n  console.log(\"Trying...\");\n  console.log(quantity);\n  console.log(\"This line never runs.\");\n} catch (err) {\n  console.log(\"Something went wrong, but we recovered.\");\n}\n\nconsole.log(\"The program keeps going.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Trying..."
+      },
+      {
+        "type": "log",
+        "text": "Something went wrong, but we recovered."
+      },
+      {
+        "type": "log",
+        "text": "The program keeps going."
+      }
+    ]
+  },
+  "2-5-4-reading-try-catch#1": {
+    "code": "try {\n  console.log(\"Trying...\");\n  console.log(\"All fine.\");\n} catch (err) {\n  console.log(\"This is skipped when there is no error.\");\n}\n\nconsole.log(\"Done.\");",
+    "output": [
+      {
+        "type": "log",
+        "text": "Trying..."
+      },
+      {
+        "type": "log",
+        "text": "All fine."
+      },
+      {
+        "type": "log",
+        "text": "Done."
+      }
+    ]
+  },
+  "2-5-5-example-wrap-what-can-fail#0": {
+    "code": "const readings = [12, 7, 19];\nlet total = 0;\n\nfor (let i = 0; i < readings.length; i++) {\n  total = total + readings[i];\n}\n\ntry {\n  console.log(sensorName);\n} catch (err) {\n  console.log(\"No sensor name available, using a default.\");\n}\n\nconsole.log(\"Total: \" + total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "No sensor name available, using a default."
+      },
+      {
+        "type": "log",
+        "text": "Total: 38"
+      }
+    ]
+  },
+  "2-5-5-example-wrap-what-can-fail#1": {
+    "code": "const readings = [12, 7, 19];\nlet total = 0;\n\ntry {\n  for (let i = 0; i < readings.length; i++) {\n    total = total + readings[i];\n  }\n  console.log(sensorName);\n  console.log(\"Total: \" + total);\n} catch (err) {\n  console.log(\"Something went wrong.\");\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Something went wrong."
+      }
+    ]
+  },
+  "3-1-2-reading-function-basics#0": {
+    "code": "function greet() {\n  console.log(\"Hello from greet!\");\n}\n\ngreet();\ngreet();",
+    "output": [
+      {
+        "type": "log",
+        "text": "Hello from greet!"
+      },
+      {
+        "type": "log",
+        "text": "Hello from greet!"
+      }
+    ]
+  },
+  "3-1-3-reading-parameters-return#0": {
+    "code": "function add(a, b) {\n  return a + b;\n}\n\nlet result = add(10, 5);\nconsole.log(result);\n\n// This function prints directly: the result is NOT stored anywhere\nfunction showSum(a, b) {\n  console.log(a + b);\n}\n\nshowSum(10, 5);",
+    "output": [
+      {
+        "type": "log",
+        "text": "15"
+      },
+      {
+        "type": "log",
+        "text": "15"
+      }
+    ]
+  },
+  "3-1-4-reading-scope#0": {
+    "code": "let score = 42;   // global: declared outside any function\n\nfunction showResult() {\n  // reading the global variable from inside a function: works fine\n  console.log(\"Score is: \" + score);\n}\n\nfunction describeScore() {\n  let label = \"points\";   // local, only exists inside describeScore\n  console.log(score + \" \" + label);\n}\n\nshowResult();\ndescribeScore();\n\n// 'label' does not exist out here.\n// If we tried console.log(label) at this point, we'd get a ReferenceError.\n// Try uncommenting the line below to see that error:\n// console.log(label);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Score is: 42"
+      },
+      {
+        "type": "log",
+        "text": "42 points"
+      }
+    ]
+  },
+  "3-1-5-reading-pass-by-value-reference#0": {
+    "code": "// --- Pass by VALUE (number) ---\nfunction tryToDouble(n) {\n  n = n * 2;\n  console.log(\"inside function, n =\", n);\n}\n\nvar myNumber = 5;\ntryToDouble(myNumber);\nconsole.log(\"after function, myNumber =\", myNumber); // still 5\n\n// --- Pass by REFERENCE (array) ---\nfunction addItem(arr) {\n  arr.push(\"new item\");\n}\n\nvar myList = [\"apple\", \"banana\"];\naddItem(myList);\nconsole.log(\"after function, myList =\", myList); // has \"new item\"",
+    "output": [
+      {
+        "type": "log",
+        "text": "inside function, n = 10"
+      },
+      {
+        "type": "log",
+        "text": "after function, myNumber = 5"
+      },
+      {
+        "type": "log",
+        "text": "after function, myList = [\n  \"apple\",\n  \"banana\",\n  \"new item\"\n]"
+      }
+    ]
+  },
+  "3-1-6-reading-defensive-copying#0": {
+    "code": "var scores = [90, 85, 78];\n\n// Make a copy, then change the copy\nvar scoresCopy = [...scores];\nscoresCopy.push(100);\n\nconsole.log(\"original:\", scores);    // [90, 85, 78]: unchanged\nconsole.log(\"copy:\", scoresCopy);    // [90, 85, 78, 100]\n\n// Object copy works the same way\nvar student = { name: \"Alex\", grade: \"A\" };\nvar studentCopy = { ...student };\nstudentCopy.grade = \"B\";\n\nconsole.log(\"original student:\", student.grade);   // A: unchanged\nconsole.log(\"copy student:\", studentCopy.grade);   // B",
+    "output": [
+      {
+        "type": "log",
+        "text": "original: [\n  90,\n  85,\n  78\n]"
+      },
+      {
+        "type": "log",
+        "text": "copy: [\n  90,\n  85,\n  78,\n  100\n]"
+      },
+      {
+        "type": "log",
+        "text": "original student: A"
+      },
+      {
+        "type": "log",
+        "text": "copy student: B"
+      }
+    ]
+  },
+  "3-2-2-reading-array-basics#0": {
+    "code": "let fruits = [\"apple\", \"banana\", \"cherry\"];\n\nconsole.log(fruits[0]);        // first item\nconsole.log(fruits[2]);        // third item\nconsole.log(fruits.length);    // 3\n\nfruits.push(\"date\");\nconsole.log(fruits.length);    // 4\nconsole.log(fruits[3]);        // \"date\"\n\nlet removed = fruits.pop();\nconsole.log(removed);          // \"date\"\nconsole.log(fruits.length);    // 3",
+    "output": [
+      {
+        "type": "log",
+        "text": "apple"
+      },
+      {
+        "type": "log",
+        "text": "cherry"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      },
+      {
+        "type": "log",
+        "text": "4"
+      },
+      {
+        "type": "log",
+        "text": "date"
+      },
+      {
+        "type": "log",
+        "text": "date"
+      },
+      {
+        "type": "log",
+        "text": "3"
+      }
+    ]
+  },
+  "3-2-3-reading-array-iteration#0": {
+    "code": "let scores = [10, 20, 30, 40, 50];\n\n// Sum using a for loop (needs the index to accumulate)\nlet total = 0;\nfor (let i = 0; i < scores.length; i++) {\n    total = total + scores[i];\n}\nconsole.log(\"Total:\", total);      // 150\n\n// Print each item using for...of (no index needed)\nfor (const score of scores) {\n    console.log(\"Score:\", score);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Total: 150"
+      },
+      {
+        "type": "log",
+        "text": "Score: 10"
+      },
+      {
+        "type": "log",
+        "text": "Score: 20"
+      },
+      {
+        "type": "log",
+        "text": "Score: 30"
+      },
+      {
+        "type": "log",
+        "text": "Score: 40"
+      },
+      {
+        "type": "log",
+        "text": "Score: 50"
+      }
+    ]
+  },
+  "3-2-4-reading-split-lines#0": {
+    "code": "let fileContents = `Alice,90\nBob,75\nCarol,88\nDan,95`;\n\nlet lines = fileContents.split(\"\\n\");\n\nconsole.log(\"Total lines:\", lines.length);\n\nfor (let i = 0; i < lines.length; i++) {\n    console.log(\"Line \" + (i + 1) + \": \" + lines[i]);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Total lines: 4"
+      },
+      {
+        "type": "log",
+        "text": "Line 1: Alice,90"
+      },
+      {
+        "type": "log",
+        "text": "Line 2: Bob,75"
+      },
+      {
+        "type": "log",
+        "text": "Line 3: Carol,88"
+      },
+      {
+        "type": "log",
+        "text": "Line 4: Dan,95"
+      }
+    ]
+  },
+  "3-2-6-example-menu-loop#0": {
+    "code": "let menu = [\"start\", \"help\", \"quit\"];\n\nfor (let i = 0; i < menu.length; i++) {\n  console.log(\"Item \" + i + \": \" + menu[i]);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Item 0: start"
+      },
+      {
+        "type": "log",
+        "text": "Item 1: help"
+      },
+      {
+        "type": "log",
+        "text": "Item 2: quit"
+      }
+    ]
+  },
+  "3-2-6-example-menu-loop#1": {
+    "code": "let menu = [\"start\", \"help\", \"quit\"];\n\nfor (let i = 0; i < menu.length; i++) {\n  let choice = menu[i];\n\n  if (choice === \"start\") {\n    console.log(\"Starting the program...\");\n  } else if (choice === \"help\") {\n    console.log(\"Showing help text.\");\n  } else if (choice === \"quit\") {\n    console.log(\"Goodbye!\");\n  } else {\n    console.log(\"Unknown option: \" + choice);\n  }\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Starting the program..."
+      },
+      {
+        "type": "log",
+        "text": "Showing help text."
+      },
+      {
+        "type": "log",
+        "text": "Goodbye!"
+      }
+    ]
+  },
+  "3-2-6-example-menu-loop#2": {
+    "code": "let menu = [\"start\", \"help\", \"settings\", \"quit\"];\n\nfor (let i = 0; i < menu.length; i++) {\n  let choice = menu[i];\n\n  if (choice === \"start\") {\n    console.log(\"Starting the program...\");\n  } else if (choice === \"help\") {\n    console.log(\"Showing help text.\");\n  } else if (choice === \"quit\") {\n    console.log(\"Goodbye!\");\n  } else {\n    console.log(\"Unknown option: \" + choice);\n  }\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Starting the program..."
+      },
+      {
+        "type": "log",
+        "text": "Showing help text."
+      },
+      {
+        "type": "log",
+        "text": "Unknown option: settings"
+      },
+      {
+        "type": "log",
+        "text": "Goodbye!"
+      }
+    ]
+  },
+  "4-1-2-reading-plan-before-code#0": {
+    "code": "// Step 1: Set up the numbers we need\nvar price = 12;\nvar quantity = 5;\nvar discountRate = 0.1;\n\n// Step 2: Calculate the subtotal before any discount\nvar subtotal = price * quantity;\nconsole.log(\"Subtotal: \" + subtotal);\n\n// Step 3: Calculate the discount amount\nvar discount = subtotal * discountRate;\nconsole.log(\"Discount: \" + discount);\n\n// Step 4: Subtract the discount to get the final total\nvar total = subtotal - discount;\nconsole.log(\"Total: \" + total);",
+    "output": [
+      {
+        "type": "log",
+        "text": "Subtotal: 60"
+      },
+      {
+        "type": "log",
+        "text": "Discount: 6"
+      },
+      {
+        "type": "log",
+        "text": "Total: 54"
+      }
+    ]
+  },
+  "4-1-3-reading-manual-testing#0": {
+    "code": "// The function we want to test\nfunction double(n) {\n  return n * 2;\n}\n\n// Test 1: double(3) should return 6\nvar actual1 = double(3);\nvar expected1 = 6;\nif (actual1 === expected1) {\n  console.log(\"Test 1: PASS\");\n} else {\n  console.log(\"Test 1: FAIL: got \" + actual1 + \", expected \" + expected1);\n}\n\n// Test 2: double(0) should return 0\nvar actual2 = double(0);\nvar expected2 = 0;\nif (actual2 === expected2) {\n  console.log(\"Test 2: PASS\");\n} else {\n  console.log(\"Test 2: FAIL: got \" + actual2 + \", expected \" + expected2);\n}",
+    "output": [
+      {
+        "type": "log",
+        "text": "Test 1: PASS"
+      },
+      {
+        "type": "log",
+        "text": "Test 2: PASS"
+      }
+    ]
+  }
+}

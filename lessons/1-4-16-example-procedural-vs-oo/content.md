@@ -32,7 +32,7 @@ Here is the part worth slowing down for. Snippet B does not yet carry a method o
 ## Step 4: Why it matters at scale
 
 ```js live plain
-// Procedural, for three books: the pairing is only in your head
+// Procedural, for two books: the pairing is only in your head
 let title1 = "JavaScript Guide";  let pages1 = 200;
 let title2 = "Learning Python";   let pages2 = 350;
 console.log(title1 + ", " + title2);

@@ -1,4 +1,4 @@
-// 2.5.27 Challenges -- Stretch Problems
+// 2.5.27 Challenges: Stretch Problems
 
 // Challenge 1: Divide Safely
 // JavaScript returns Infinity on division by zero, so we throw our own
