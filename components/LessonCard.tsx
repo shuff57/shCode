@@ -46,7 +46,7 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
   const moduleId = moduleIdFromTitle(lesson.title);
   const lessonDue = resolveDue(due, lesson.id, moduleId, lesson.category ?? null);
   const availability = useLessonAvailability(lesson.id, moduleId, lesson.category ?? null);
-  const bypass = bypassesLessonLock(progress.role);
+  const bypass = bypassesLessonLock(progress);
   // Two independent gates, and either one closes the card:
   //   sequence — caller flagged it (prior lesson not green)
   //   clock    — the teacher's "available after" time hasn't arrived

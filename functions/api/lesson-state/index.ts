@@ -32,7 +32,20 @@ export const onRequestGet: PagesFunction<Env, string, Session> = async (context:
     if (r.score !== null) scores[r.lesson_id] = r.score;
   }
 
-  return new Response(JSON.stringify({ states, scores, role: data.role }), {
-    headers: { 'Content-Type': 'application/json' },
-  });
+  // The skip_lessons flag rides on the same response as the role so the
+  // client snapshot can resolve every lock in one place. Absent column
+  // (pre-0026) reads as false.
+  const student = await env.DB.prepare('SELECT skip_lessons FROM students WHERE email = ?')
+    .bind(data.email)
+    .first<{ skip_lessons: number | null }>();
+
+  return new Response(
+    JSON.stringify({
+      states,
+      scores,
+      role: data.role,
+      skipLessons: student?.skip_lessons === 1,
+    }),
+    { headers: { 'Content-Type': 'application/json' } },
+  );
 };

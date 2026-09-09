@@ -16,15 +16,20 @@ export interface LessonStateSnapshot {
   states: Record<string, LessonState>;
   scores: Record<string, number>;
   role: Role | null;
+  /** Per-student "skip lessons" flag — lets a student bypass the sequence
+   *  and clock locks the way admins/teachers do. */
+  skipLessons: boolean;
 }
 
-// Admins and teachers bypass green-to-advance gating in the UI. Used by
-// every lock-rendering component so they share one source of truth.
-export function bypassesLessonLock(role: Role | null): boolean {
-  return role === 'admin' || role === 'teacher';
+// Admins and teachers bypass green-to-advance gating in the UI, and so does
+// a student with the skip_lessons flag set. Used by every lock-rendering
+// component so they share one source of truth. The snapshot is passed in
+// rather than the role alone because the flag lives on the snapshot.
+export function bypassesLessonLock(snap: Pick<LessonStateSnapshot, 'role' | 'skipLessons'>): boolean {
+  return snap.role === 'admin' || snap.role === 'teacher' || snap.skipLessons === true;
 }
 
-const empty: LessonStateSnapshot = { loaded: false, authed: false, states: {}, scores: {}, role: null };
+const empty: LessonStateSnapshot = { loaded: false, authed: false, states: {}, scores: {}, role: null, skipLessons: false };
 let cache: LessonStateSnapshot = empty;
 let inflight: Promise<LessonStateSnapshot> | null = null;
 const subs = new Set<(s: LessonStateSnapshot) => void>();
@@ -37,13 +42,20 @@ async function load(): Promise<LessonStateSnapshot> {
   try {
     const res = await fetch('/api/lesson-state', { credentials: 'include' });
     if (res.status === 401) {
-      return { loaded: true, authed: false, states: {}, scores: {}, role: null };
+      return { loaded: true, authed: false, states: {}, scores: {}, role: null, skipLessons: false };
     }
     if (!res.ok) throw new Error(`lesson-state GET ${res.status}`);
-    const data = (await res.json()) as { states: Record<string, LessonState>; scores: Record<string, number>; role?: Role };
-    return { loaded: true, authed: true, states: data.states ?? {}, scores: data.scores ?? {}, role: data.role ?? null };
+    const data = (await res.json()) as { states: Record<string, LessonState>; scores: Record<string, number>; role?: Role; skipLessons?: boolean };
+    return {
+      loaded: true,
+      authed: true,
+      states: data.states ?? {},
+      scores: data.scores ?? {},
+      role: data.role ?? null,
+      skipLessons: data.skipLessons === true,
+    };
   } catch {
-    return { loaded: true, authed: false, states: {}, scores: {}, role: null };
+    return { loaded: true, authed: false, states: {}, scores: {}, role: null, skipLessons: false };
   }
 }
 

@@ -66,7 +66,7 @@ export default function LessonAccessGate({
   // idx <= 0 shortcut. Role bypass needs the snapshot, so an unloaded
   // snapshot falls through to the placeholder below rather than locking a
   // teacher out for a frame.
-  if (!availability.available && snap.loaded && !bypassesLessonLock(snap.role)) {
+  if (!availability.available && snap.loaded && !bypassesLessonLock(snap)) {
     return <NotYetPanel openAt={availability.openAt} moduleId={moduleId} />;
   }
 
@@ -92,7 +92,7 @@ export default function LessonAccessGate({
     );
   }
 
-  if (bypassesLessonLock(snap.role)) return <>{children}</>;
+  if (bypassesLessonLock(snap)) return <>{children}</>;
 
   const allPriorComplete = siblings
     .slice(0, idx)

@@ -44,7 +44,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
     }
     return lessons.length;
   })();
-  const lockBypass = bypassesLessonLock(snap.role);
+  const lockBypass = bypassesLessonLock(snap);
 
   return (
     <div

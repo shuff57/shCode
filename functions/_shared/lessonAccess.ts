@@ -105,6 +105,14 @@ export async function isLessonAccessible(
 ): Promise<boolean> {
   if (role === 'admin' || role === 'teacher') return true;
 
+  // A student with the skip_lessons flag bypasses the sequence lock the same
+  // way admins/teachers do. Read per request rather than cached: the flag is
+  // rare and toggling it should take effect immediately.
+  const student = await env.DB.prepare('SELECT skip_lessons FROM students WHERE email = ?')
+    .bind(email)
+    .first<{ skip_lessons: number | null }>();
+  if (student?.skip_lessons === 1) return true;
+
   const map = await loadSiblingMap(env, request);
   if (!map) return true; // fail open on manifest unreachable
 

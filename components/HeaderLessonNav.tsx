@@ -102,7 +102,7 @@ export default function HeaderLessonNav() {
   // by the progress footer, so this isn't surprising. Admins and teachers
   // bypass the gate.
   const currentCompleted = snap.states[route.id] === 'completed';
-  const nextLocked = !currentCompleted && !bypassesLessonLock(snap.role);
+  const nextLocked = !currentCompleted && !bypassesLessonLock(snap);
 
   return (
     <div

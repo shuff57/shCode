@@ -1,0 +1,13 @@
+-- Per-student "skip lessons" flag. A student with this set bypasses the
+-- green-to-advance sequence lock (and the "available after" clock lock) the
+-- same way admins and teachers do — for a student who is refreshing known
+-- material and needs to move through the course on their own.
+--
+-- The flag lives on students, not enrollments, because the bypass is about
+-- the person, not the class: a student who knows the material knows it in
+-- every class. It is read by GET /api/lesson-state (carried to the client
+-- snapshot) and by functions/_shared/lessonAccess.ts (server-side gate on
+-- every write endpoint).
+--
+-- Presence of the flag is the grant; setting it back to 0 revokes it.
+ALTER TABLE students ADD COLUMN skip_lessons INTEGER NOT NULL DEFAULT 0;

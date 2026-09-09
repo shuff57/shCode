@@ -72,7 +72,7 @@ export default function ModuleLessonsList({
     }
     return lessons.length; // all done
   })();
-  const lockBypass = bypassesLessonLock(progress.role);
+  const lockBypass = bypassesLessonLock(progress);
 
   // Module header summary: one date if every lesson agrees, otherwise "Mixed"
   // with the range it spans. Computed, never stored — see lib/due-dates-core.
