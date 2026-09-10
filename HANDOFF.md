@@ -1,3 +1,56 @@
+# Handoff — 2026-09-09 · shCode's `npm test` is red, and both causes live in ../reshape-cad
+
+`npm test` is a single `&&` chain, so it stops at the first red. Two scripts
+fail, neither because of anything in this repo. Verified by hand on 2026-09-09
+by running the whole remainder of the chain in two halves — only these two fail.
+
+**1. `scripts/test-reshape-script.mjs` — 97/99.** Both failures are the same
+vocabulary conflict. The test asserts the emitted script says `hollow(...)`;
+`../reshape-cad/packages/script/src/reshape-script-gen.ts` emits `shell(...)`,
+and `cuboid(...)` where the test expects `box(...)`. Emitted text today:
+
+```
+const wall = param('wall', 10, { min: 0.5, max: 10 })
+const box1 = cuboid(40, 40, 20)
+shell(box1, { wall })
+```
+
+`reshape-cad/docs/specs/SPEC-P1-parity-closeout.md` settles which side is
+wrong — *"(none new — the official names ARE the course now)"*, human-approved
+2026-09-08. So **shCode is the side that migrates**, and it is not a one-line
+fix: `public/reshape/docs/reference.md` (15 uses) and ~189 lesson files teach
+`box`/`hollow`. That is a scoped piece of work, not a test tweak. **Nobody has
+approved it yet** — do not start the sweep without asking.
+
+**2. `scripts/check-constraint-ui.mjs` — FAIL, 2 kinds.** `symmetric` and
+`angle` are in the `Constraint` union in
+`../reshape-cad/packages/sketch/src/sketch-solve.ts` and the solver honours
+them, but `../reshape-cad/packages/studio/src/model/SketchConstraints.tsx` —
+the React sketcher this app embeds — has controls for only the original seven.
+P1d added them to `engine/play`, not to `packages/studio`;
+`SPEC-P1-parity-closeout.md` scopes P1d to `engine/play` + bridge +
+`packages/sketch` and **explicitly not** `packages/studio`. So this gap is in
+no spec. It is the last thing holding shCode's gate red, and it needs its own
+slice in reshape-cad. Flagged to that repo's thread as msgbox #140; not claimed,
+not started.
+
+**Deferred by the user, on the record:** trimming the two remaining dead exports
+knip found — `ensureLessonStateLoaded` (`lib/progress.ts:50`) and `DocPage`
+(`lib/docs-core.ts:6`). The directive was *"we need to finish reshape-cad before
+we trim 2D/3D exports."* Leave them.
+
+**Green as of 2026-09-09:** tree clean, `tsc --noEmit` exit 0,
+`scripts/check-live-blocks.mjs` 278/278, knip down 75 → 12 (9 documented false
+positives, 1 benign `listModules|listUnits` duplicate, 2 real dead exports above).
+
+**Trap, if you go into ../reshape-cad:** another Claude session is live there.
+Both sessions are the agent name `claude`, so the msgbox read cursor AND the
+claim table are shared — `msg.mjs read --as claude` eats their unread mail, and
+a threaded `msg.mjs send` auto-releases their claims unless you pass `--keep 1`.
+Look with `msg.mjs log --n 20`. Both mistakes were made on 2026-09-09.
+
+---
+
 # Handoff — 2026-09-05 (latest) · JSCAD is gone from the tree and the site
 
 Two passes today. The first deleted the runner, its vendored bundles,
